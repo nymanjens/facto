@@ -132,7 +132,6 @@ $PAYED_WITH_WHAT = array(
 );
 // the relevant combinations of accounts and payment methods
 $ACCOUNT_METHOD_COMBINATIONS = array(
-    array('CASH', 'Common'),
     array('CARD', 'Common'),
     array('CASH', 'Alice'),
     array('CARD', 'Alice'),

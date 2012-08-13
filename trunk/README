@@ -17,11 +17,11 @@ Webserver (local or on the internet) with:
     - php 5
     - MySQL
     - Apache
-installed.
 
 
 ================ Installation ================
 - enable mod_rewrite in Apache
+- make /library/dwoo/compiled writable for apache
 - load structure.sql into a database table
 
 
