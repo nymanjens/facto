@@ -1,0 +1,16 @@
+## Enable URL rewriting for pretty URLs
+Options +FollowSymLinks
+RewriteEngine On
+
+## ignore existing directories
+#RewriteCond %{SCRIPT_FILENAME} !-d
+## ignore existing files
+RewriteCond %{SCRIPT_FILENAME} !-f
+
+## redirect everything to index.php
+RewriteRule ^.*$ ./index.php
+
+
+## alternative
+#RewriteEngine on
+#RewriteRule !\.(js|ico|gif|jpg|png|css|xml|php)$ index.php

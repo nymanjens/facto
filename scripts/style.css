@@ -1,0 +1,248 @@
+/********************** GENERAL CLASSES **********************/
+html {
+	overflow-x: auto;
+	height: 100%;
+}
+body{
+	color: #1a1a1a;
+	background: white;
+	font-family: Verdana, Tahoma, Arial, "Trebuchet MS", "Lucida Grande",
+		"Lucida Sans Unicode", Nimbus Sans L, Sans-Serif, Georgia, Courier,
+		Times New Roman, Serif;
+	font-size: 11px; /* necessary for top links */
+}
+div, th , td {
+	text-align: left;
+}
+td {
+	vertical-align: top;
+	font-size: 12px;
+}
+form {
+	display: inline;
+	margin: 0;
+	padding: 0;
+}
+img {
+	border: 0;
+	vertical-align: middle;
+}
+a:link,a:visited,a:active{
+	color: black;
+	text-decoration: none;
+}
+a:hover{
+	color: #86A3C1;
+	text-decoration: underline;
+}
+acronym {
+	border-bottom: none;
+	cursor: pointer;
+}
+
+
+
+/********************** SELF DEFINED CLASSES **********************/
+.top_title_borderwrap {
+	min-width: 800px;
+	max-width: 1300px;
+}
+.top_title_borderwrap, .borderwrap, .borderwrap_without_width{
+	background: #FFF;
+	border: 1px solid #072A66;
+	padding: 0px;
+	margin: 0px;
+	line-height: 135%;
+	height: 100%;
+}
+.borderwrap, .width_equals_borderwrap{
+	width: 85%;
+	max-width: 900px;
+	min-width: 500px;
+}
+.borderwrap *, .borderwrap_without_width *{
+	text-align: left;
+}
+#top_title{
+	background: #3860BB url(../images/top_title.gif);
+	border: 1px solid #FFF;
+	height: 68px;
+	margin: 0;
+	padding: 0;
+}
+#submenu{
+	background: transparent url(../images/top_title_sub.gif);
+	border: 1px solid #FFF;
+	border-top: 0;
+	color: #3A4F6C;
+	margin: 0;
+	height: 29px;
+	text-align: right;
+}
+.tts-top-left-link, .tts-top-right-link {
+	background: transparent url(../images/top_title_sub.gif);
+	float: right;
+	font-size: 10px;
+	font-weight: bold;
+	letter-spacing: 0.5px;
+	margin: 0px;
+	padding: 7px 0 7px 0;
+	width: auto;
+	border-left: 1px solid #dce3ee;
+}
+
+.tts-top-left-link {
+	float: left;
+	border-left: 0px;
+	border-right: 1px solid #dce3ee;
+}
+
+.tts-top-left-link a:link, .tts-top-left-link a:visited,
+.tts-top-right-link a:link, .tts-top-right-link a:visited{
+	background: transparent;
+	color: #8b8b4c;
+	padding: 0 6px 0 6px;
+	text-decoration: none;
+}
+
+.tts-top-left-link a:hover, .tts-top-left-link a:active,
+.tts-top-right-link a:hover, .tts-top-right-link a:active{
+	background: transparent;
+	color: #35351d;
+}
+.navstrip{
+	color: #999;
+	font-size: 11px;
+	margin: 0 0 2px 0;
+	padding: 0px 0px 0px 0px;
+}
+.navstrip a:link, .navstrip a:visited{
+	background: transparent;
+	color: black;
+	text-decoration: none;
+}
+.navstrip a:hover, .navstrip a:active{
+	background: transparent;
+	color: #697D96;
+}
+.navstrip img{
+	vertical-align: baseline;
+}
+.borderwrap h3,
+.frame_title{
+	background: url(../images/frame_title.gif);
+	border: 1px solid #FFF;
+	border-bottom: 1px solid #697D96;
+	margin: 0px;
+	padding: 4px 6px 4px 6px;
+}
+
+.frame_title, .frame_title td {
+	color: #50503d;
+	font-size: 13px;
+	font-weight: bold;
+}
+.frame_title a:link, .frame_title a:visited, .frame_title a:active{
+	color: white;
+	text-decoration: underline;
+}
+.frame_title a:hover{
+	color: #86A3C1;
+	text-decoration: none;
+}
+.frame_cont {
+	width: 100%;
+}
+table.frame_cont, tr.frame_cont, td.frame_cont {
+	background: transparent;
+	color: #1a1a1a;
+	line-height: 125%;
+}
+.frame_cont_2, table.frame_cont td, div.frame_cont{
+	background-color: #e8fccb;
+}
+.frame_cont td {
+	padding: 3px;
+}
+.frame_cont th {
+	background: transparent url(../images/frame_title_sub.gif);
+	border-bottom: 1px solid #697D96;
+	color: #4f502b;
+	font-size: 10px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	margin: 0;
+	padding: 5px;
+	white-space: nowrap;
+}
+div.frame_cont {
+	padding: 4px 6px 4px 6px;
+}
+/********************** OWN GLOBAL CLASSES **********************/
+input, select, textarea {
+	font-size: 12px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+a.link:link, a.link:visited, a.link:active{
+	text-decoration: none;
+	color: #1D559A;
+}
+a.link:hover{
+	text-decoration: underline;
+}
+
+/********************** OWN SPECIFIC CLASSES **********************/
+.form_error{
+	color: red;
+	font-weight: bold;
+}
+.hidden {
+	display: none;
+	overflow: hidden;
+	text-indent: -5000px;
+	width: 0px;
+	height: 0px;
+}
+
+/***** data table *****/
+table.data_table td{
+	vertical-align: middle;
+	background-color: inherit;
+}
+table.data_table tr{
+	background-color: #e8fccb;
+}
+table.data_table tr:hover{
+	background-color: #f7fcef; 
+}
+
+/***** buttons *****/
+a.small_remove_button, a.small_add_button, a.small_edit_button {
+	display: block;
+	overflow: hidden;
+	text-indent: -5000px;
+	background-repeat: no-repeat;
+	height: 11px;
+	background-image: url(../images/buttons_small_edit.gif);
+}
+a.small_remove_button {
+	width: 11px;
+	background-position: 0 0;
+}
+a.small_remove_button:hover {
+	background-position: 0 -11px;
+}
+a.small_add_button {
+	width: 10px;
+	background-position: -11px 0;
+}
+a.small_add_button:hover {
+	background-position: -11px -11px;
+}
+a.small_edit_button {
+	width: 11px;
+	background-position: -21px 0;
+}
+a.small_edit_button:hover {
+	background-position: -21px -11px;
+}

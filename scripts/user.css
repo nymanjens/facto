@@ -1,0 +1,11 @@
+@CHARSET "ISO-8859-1";
+
+/***** DASHBOARD *****/
+table.dashboard {
+	min-width: 320px;
+}
+table.dashboard .left {
+	text-align: right;
+	width: 120px;
+}
+
