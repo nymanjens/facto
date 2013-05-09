@@ -53,6 +53,11 @@
             
           {/if}
         {/foreach}
+        {if $method.expand_link}
+          <tr><td colspan="50" style="text-align: center;">
+            <a href="{$method.expand_link}" class="link">...</a>
+          </td></tr>
+        {/if}
         <tr><td colspan="50" style="text-align: right;">
           <a href="{$root_url}accounting/set_balance/{$method.method}/{$method.account}/{$method.default_balance}/?returnto={self_url}" class="link">{t('Set balance')}</a>
         </td></tr>

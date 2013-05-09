@@ -47,7 +47,7 @@ function add_info_to_account_input_row(&$elem) {
  * add balance information
  */
 function add_balance_information(&$list, $method, $account) {
-    $q = "SELECT * FROM ".TAG."account_inputs WHERE payed_with_what='$method' AND payed_with_whose='$account' ORDER BY timestamp";
+    $q = "SELECT * FROM ".TAG."account_inputs WHERE payed_with_what='$method' AND payed_with_whose='$account' ORDER BY timestamp, creation_time";
     $res = query($q);
     // get balance at each point
     $balance = 0;
@@ -97,9 +97,9 @@ function create_account_input($arr, $account = null, $category = null, $payed_wi
     $id = get_next_table_id('account_inputs');
     // do query
     $q = sprintf("INSERT INTO ".TAG."account_inputs
-        (id, issuer, account, category, payed_with_what, payed_with_whose, description, price, timestamp)
-        VALUES (%d, '%s', '%s', '%s', '%s', '%s', '%s', %s, %d)", $id, $user->id, $account,
-        $category, $payed_with_what, $payed_with_whose, $description, $price, $timestamp);
+        (id, issuer, account, category, payed_with_what, payed_with_whose, description, price, timestamp, creation_time)
+        VALUES (%d, '%s', '%s', '%s', '%s', '%s', '%s', %s, %d, %d)", $id, $user->id, $account,
+        $category, $payed_with_what, $payed_with_whose, $description, $price, $timestamp, time());
     query_with_log($q);
 }
 

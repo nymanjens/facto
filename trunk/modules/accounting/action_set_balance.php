@@ -82,9 +82,9 @@ if( $form->isSubmittedAndValid() ) {
     } else {
         $id = get_next_table_id('account_inputs');
         $q = sprintf("INSERT INTO ".TAG."account_inputs
-            (id, issuer, account, category, payed_with_what, payed_with_whose, price, timestamp)
-            VALUES (%d, '%s', '%s', '%s', '%s', '%s', %s, %d)", $id, $user->id, '', '[BALANCE_SET]', $method, $account,
-            $values['price'], $values['timestamp']);
+            (id, issuer, account, category, payed_with_what, payed_with_whose, price, timestamp, creation_time)
+            VALUES (%d, '%s', '%s', '%s', '%s', '%s', %s, %d, %d)", $id, $user->id, '', '[BALANCE_SET]', $method, $account,
+            $values['price'], $values['timestamp'], time());
     }
     query_with_log($q);
     $user->setInstantMessage('message', t("Balance set successfully"));

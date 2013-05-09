@@ -22,7 +22,7 @@ class DateToTimestampPostFilter extends Filter {
 	 * @return integer
 	 */
 	public function filter($str) {
-		return strtotime($str . ' ' . date('H:i:s'));
+		return strtotime($str);
 	}
 }
 
