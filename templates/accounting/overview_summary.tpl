@@ -15,7 +15,7 @@
       <tr>
         <th>&nbsp;</th>
         {foreach $account.years year months}
-          {if !$.foreach.default.last && !$show_all_years}
+          {if !$.foreach.default.last && !$show_all_years && $focus_year != $year}
             <th>{$year}</th>
           {else}
             <th colspan="{count_and_add_1($months)}">{$year}</th>
@@ -25,7 +25,7 @@
       <tr>
         <th>{t('Category')}</th>
         {foreach $account.years year months name="months_per_y"}
-          {if $.foreach.months_per_y.last || $show_all_years}
+          {if $.foreach.months_per_y.last || $show_all_years || $focus_year == $year}
             {foreach $months month}
               <th>{$month}</th>
             {/foreach}
@@ -37,7 +37,7 @@
         <tr>
           <td>{$CATEGORIES.$category.name}</td>
           {foreach $data_per_y year data name="forloop_per_y"}
-            {if $.foreach.forloop_per_y.last || $show_all_years}
+            {if $.foreach.forloop_per_y.last || $show_all_years || $focus_year == $year}
               {foreach $data value}
                 {if !$value.totexp}
                   <td style="color: #BBBBBB;">0.00</td>
@@ -54,8 +54,14 @@
                   </td>
                 {/if}
               {/foreach}
+              <td class="average">{$account.averages.$year.$category}</td>
+            {else}
+              <td class="average averagelink">
+                <a href="{$self_path}?show_all_accounts={$disable_num_limit}&disable_num_limit={$disable_num_limit}&focus_year={$year}">
+                  {$account.averages.$year.$category}
+                </a>
+              </td>
             {/if}
-            <td class="average">{$account.averages.$year.$category}</td>
         {/foreach}
         </tr>
       {else}
@@ -65,7 +71,7 @@
         <tr class="total">
           <td>{t('Total')}<span style="font-weight: normal; font-size: 9px;"> ({t('without acc.')})</span></td>
           {foreach $account.years year months}
-            {if $.foreach.default.last || $show_all_years}
+            {if $.foreach.default.last || $show_all_years || $focus_year == $year}
               {foreach $months month}
                 <td>{$account.totals.$year.$month}</td>
               {/foreach}

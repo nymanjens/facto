@@ -21,7 +21,6 @@
       type="text/javascript" src="{$root_url}{$script}">
     </script>
   {/foreach}
-    
   <script language="JavaScript" type="text/javascript" src="{$root_url}scripts/jquery.js"></script>
   <script language="JavaScript" type="text/javascript" src="{$root_url}scripts/jquery.shortcuts.min.js"></script>
   <script language="JavaScript" type="text/javascript" src="{$root_url}scripts/jquery.fieldselection.js"></script>

@@ -38,6 +38,11 @@
           <td class="buttons">{$elem.html_edit_delete}</td>
         </tr>
         {if $.foreach.default.last}
+          {if $account.expand_link}
+            <tr><td colspan="50" style="text-align: center;">
+              <a href="{$account.expand_link}" class="link">...</a>
+            </td></tr>
+          {/if}
           <tr><td colspan="50" style="text-align: right;">
             <a href="{$root_url}accounting/liquidate/{$account.account1}/{$account.account2}/{$account.total}" class="link">{t('Liquidate')}</a>
           </td></tr>

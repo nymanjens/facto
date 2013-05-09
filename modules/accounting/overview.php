@@ -7,16 +7,14 @@
 $ACCOUNT_INPUTS_LIMIT = 10;
 // get control parameters
 $overview_type = isset($HTTP_REQUEST[2]) ? $HTTP_REQUEST[2] : DEFAULT_OVERVIEW_TYPE;
-$disable_num_limit = isset($_GET['disable_num_limit']) && $_GET['disable_num_limit'];
-$show_all_accounts = isset($_GET['show_all_accounts']) && $_GET['show_all_accounts'];
+$disable_num_limit = isset($_GET['disable_num_limit'])? $_GET['disable_num_limit']:'';
+$show_all_accounts = isset($_GET['show_all_accounts'])? $_GET['show_all_accounts']:'';
 // get shown accounts
 $accounts = array(COMMON_ACCOUNT);
 if(in_array($user->name, array_keys($ACCOUNTS)))
     $accounts[] = $user->name;
 // override if $show_all_accounts == true
 $accounts = $show_all_accounts ? array_keys($ACCOUNTS) : $accounts;
-// get limit
-$limit = $disable_num_limit ? '' : 'LIMIT ' . $ACCOUNT_INPUTS_LIMIT;
 // set default template parameters
 $template_name = 'overview_' . $overview_type;
 $view->assign('selected_link', 'accounting/overview/' . $overview_type);
@@ -28,11 +26,32 @@ $view->assign('disable_num_limit_label', $disable_num_limit ? t("Show only %d re
 
 // utility function
 function alter_account_inputs_limit($new_limit){
-    global $limit, $view, $disable_num_limit, $ACCOUNT_INPUTS_LIMIT;
+    global $view, $disable_num_limit, $ACCOUNT_INPUTS_LIMIT;
     $ACCOUNT_INPUTS_LIMIT = $new_limit;
-    $limit = $disable_num_limit ? '' : 'LIMIT ' . $new_limit;
     $view->assign('disable_num_limit_label', $disable_num_limit ? t("Show only %d results", $new_limit)
         : t("Show more than %d results", $new_limit));
+}
+function limit($expand_keyword='none') {
+    global $disable_num_limit, $ACCOUNT_INPUTS_LIMIT;
+    if($disable_num_limit == $expand_keyword || $disable_num_limit == '1')
+        return '';
+    else
+        return 'LIMIT ' . $ACCOUNT_INPUTS_LIMIT;
+}
+function expand_link_if_necessary($q, $expand_keyword='none', $skip_query=-1){
+    global $ACCOUNT_INPUTS_LIMIT, $overview_type, $show_all_accounts;
+    if(!limit($expand_keyword))
+        return '';
+    if($skip_query === -1) {
+        $res = query($q);
+        if(mysql_num_rows($res) <= $ACCOUNT_INPUTS_LIMIT)
+            return '';
+    } else {
+        if(!$skip_query)
+            return '';
+    }
+    return ROOT_URL.sprintf('accounting/overview/%s?disable_num_limit=%s&show_all_accounts=%s',
+        $overview_type, $expand_keyword, $show_all_accounts);
 }
 
 // get data
@@ -41,13 +60,14 @@ switch($overview_type) {
 case 'everything':
     alter_account_inputs_limit(50);
     $list = array();
-    $q = "SELECT * FROM ".TAG."account_inputs WHERE category!='[BALANCE_SET]' ORDER BY timestamp DESC $limit";
+    $q = sprintf("SELECT * FROM ".TAG."account_inputs WHERE category!='[BALANCE_SET]' ORDER BY timestamp DESC, creation_time DESC %s", limit());
     $res = query($q);
     $list = fetch_all_account_inputs($res);
     $view->assign('list', $list);
     $view->assign('actions_hide_show_all_accounts', true);
     $view->assign('actions_show_withdrawal_button', true);
     $view->assign('actions_show_endowment_button', true);
+    $view->assign('expand_link', expand_link_if_necessary(sprintf("SELECT * FROM ".TAG."account_inputs WHERE category!='[BALANCE_SET]'")));
     break;
 
 case 'income_expenses':
@@ -55,11 +75,16 @@ case 'income_expenses':
     $lists = array();
     foreach($accounts as $account) {
         $q = sprintf("SELECT * FROM ".TAG."account_inputs WHERE category!='%s' AND category!='[BALANCE_SET]'
-            AND account='%s' ORDER BY timestamp DESC $limit", ACCOUNTING_CATEGORY, $account);
+            AND account='%s' ORDER BY timestamp DESC, creation_time DESC %s", ACCOUNTING_CATEGORY, $account, limit($account));
         $res = query($q);
         $lists[] = array(
             'title' => t("Income/Expenses") . ": " . $account,
             'list' => fetch_all_account_inputs($res),
+            'expand_link' => expand_link_if_necessary(
+                sprintf("SELECT * FROM ".TAG."account_inputs WHERE category!='%s' AND category!='[BALANCE_SET]'
+                    AND account='%s'", ACCOUNTING_CATEGORY, $account),
+                $account
+            ),
         );
     }
     $view->assign('lists', $lists);
@@ -75,7 +100,7 @@ case 'cash_flow':
                 continue;
             // get inputs
             $q = sprintf("SELECT * FROM ".TAG."account_inputs WHERE payed_with_whose='%s' AND payed_with_what='%s'
-                ORDER BY timestamp DESC $limit", strtolower($account), $method);
+                ORDER BY timestamp DESC, creation_time DESC %s", strtolower($account), $method, limit($account.$method));
             $res = query($q);
             $inputs = fetch_all_account_inputs($res);
             // add balance info
@@ -86,6 +111,11 @@ case 'cash_flow':
                 'account' => $account,
                 'list' => $inputs,
                 'default_balance' => count($inputs) > 0 ? $inputs[reset(array_keys($inputs))]['balance'] : '0.00',
+                'expand_link' => expand_link_if_necessary(
+                    sprintf("SELECT * FROM ".TAG."account_inputs WHERE payed_with_whose='%s' AND payed_with_what='%s'",
+                        strtolower($account), $method),
+                    $account.$method
+                ),
             );
         }
         $lists[] = $list;
@@ -100,7 +130,7 @@ case 'liquidation':
        $show_all_accounts = true; 
     
     $lists = array();
-    $q = "SELECT * FROM ".TAG."account_inputs WHERE category!='[BALANCE_SET]' ORDER BY timestamp ASC";
+    $q = "SELECT * FROM ".TAG."account_inputs WHERE category!='[BALANCE_SET]' ORDER BY timestamp ASC, creation_time ASC";
     $res = query($q);
     $master_inputs = fetch_all_account_inputs($res);
     // get accounts
@@ -146,9 +176,13 @@ case 'liquidation':
             $in['total'] = sprintf("%.2f", $total);
         }
         // truncate lists
-        if(!$disable_num_limit)
-            while(count($inputs) > $ACCOUNT_INPUTS_LIMIT)
+        $truncated_list = false;
+        if(limit($account1.$account2)) {
+            while(count($inputs) > $ACCOUNT_INPUTS_LIMIT) {
                 array_shift($inputs);
+                $truncated_list = true;
+            }
+        }
         // reverse list
         $inputs = array_reverse($inputs);
         $lists[] = array(
@@ -158,6 +192,7 @@ case 'liquidation':
             'account1' => $account1,
             'account2' => $account2,
             'total' => sprintf("%.2f", $total),
+            'expand_link' => expand_link_if_necessary('', $account1.$account2, $truncated_list),
         );
     }
     $view->assign('lists', $lists);
@@ -171,11 +206,15 @@ case 'endowments':
     $accounts = array_keys($ACCOUNTS);
     foreach($accounts as $account) {
         $q = sprintf("SELECT * FROM ".TAG."account_inputs WHERE category='%s' AND account='%s'
-            ORDER BY timestamp DESC $limit", ENDOWMENT_CATEGORY, $account);
+            ORDER BY timestamp DESC, creation_time DESC %s", ENDOWMENT_CATEGORY, $account, limit($account));
         $res = query($q);
         $lists[] = array(
             'title' => t("Endowments") . ": " . $account,
             'list' => fetch_all_account_inputs($res),
+            'expand_link' => expand_link_if_necessary(
+                sprintf("SELECT * FROM ".TAG."account_inputs WHERE category='%s' AND account='%s'", ENDOWMENT_CATEGORY, $account),
+                $account
+            ),
         );
     }
     $view->assign('lists', $lists);
@@ -190,7 +229,7 @@ case 'summary':
         $matrix = array();
         $years = array();
         $q = sprintf("SELECT * FROM ".TAG."account_inputs WHERE account='%s'
-            ORDER BY timestamp ASC", $account);
+            ORDER BY timestamp ASC, creation_time ASC", $account);
         $res = query($q);
         while($elem = mysql_fetch_array($res)) {
             add_info_to_account_input_row($elem);
@@ -239,24 +278,22 @@ case 'summary':
             }
         }
         // calculate totals
-        if($account == COMMON_ACCOUNT)
-            $totals = NULL;
-        else {
-            $totals = array();
-            foreach($years as $year => $months) {
-                $totals[$year] = array();
-                foreach($months as $month) {
-                    $total = 0;
-                    foreach($CATEGORIES as $cat_code => $category) {
-                        if($cat_code == ACCOUNTING_CATEGORY)
-                            continue;
-                        if(!isset($matrix[$cat_code]))
-                            continue;
-                        if(isset($matrix[$cat_code][$year][$month]))
-                            $total += $matrix[$cat_code][$year][$month]['totexp'];
-                    }
-                    $totals[$year][$month] =  sprintf("%.2f", $total);
+        $totals = array();
+        foreach($years as $year => $months) {
+            $totals[$year] = array();
+            foreach($months as $month) {
+                $total = 0;
+                foreach($CATEGORIES as $cat_code => $category) {
+                    if($cat_code == ACCOUNTING_CATEGORY)
+                        continue;
+                    if($cat_code == ENDOWMENT_CATEGORY && $account == COMMON_ACCOUNT)
+                        continue;
+                    if(!isset($matrix[$cat_code]))
+                        continue;
+                    if(isset($matrix[$cat_code][$year][$month]))
+                        $total += $matrix[$cat_code][$year][$month]['totexp'];
                 }
+                $totals[$year][$month] =  sprintf("%.2f", $total);
             }
         }
         // calculate averages
@@ -309,6 +346,8 @@ case 'summary':
     // show all years
     $view->assign('disable_num_limit_label', $disable_num_limit ? t("Show last year") : t("Show all years"));
     $view->assign('show_all_years', $disable_num_limit);
+    // focus year: open up one year
+    $view->assign('focus_year', isset($_GET['focus_year'])? $_GET['focus_year']+0 : 0);
     break;
 
 default:

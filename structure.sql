@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS `facto_account_inputs` (
   `description` text NOT NULL,
   `price` float NOT NULL,
   `timestamp` int(11) NOT NULL,
+  `creation_time` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `issuer` (`issuer`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;

@@ -56,7 +56,7 @@ td.average {
     border: 1px dotted #50503D;
     background-color: #e1e37d;
     display: none;
-    margin: 5px 0 0 20px;
+    margin: 0 0 0 20px;
     padding: 5px 0;
 }
 .help_text ul {
@@ -69,6 +69,21 @@ td.summary:hover {
 }
 td.summary:hover .help_text {
     display: block;
+}
+td.averagelink a {
+    width: 100%;
+    display: block;
+    padding: 3px;
+}
+td.averagelink a:hover{
+    text-decoration: none;
+    color: black;
+}
+td.averagelink {
+    padding: 0px;
+}
+td.averagelink:hover{
+    background-color: #AAA!important;
 }
 
 /*** input forms ***/

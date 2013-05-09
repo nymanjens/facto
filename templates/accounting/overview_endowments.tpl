@@ -30,6 +30,11 @@
           {else}
             <tr><td colspan="50">{t('Nothing present')}</td></tr>
           {/foreach}
+          {if $account.expand_link}
+            <tr><td colspan="50" style="text-align: center;">
+              <a href="{$account.expand_link}" class="link">...</a>
+            </td></tr>
+          {/if}
         </table>
       </div>
     </div>

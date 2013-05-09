@@ -35,6 +35,11 @@
     {else}
       <tr><td colspan="50">{t('No transactions registered yet')}</td></tr>
     {/foreach}
+    {if $expand_link}
+      <tr><td colspan="50" style="text-align: center;">
+        <a href="{$expand_link}" class="link">...</a>
+      </td></tr>
+    {/if}
   </table>
 </div>
 

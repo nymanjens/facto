@@ -27,6 +27,9 @@ img {
 	border: 0;
 	vertical-align: middle;
 }
+a {
+    outline: 0;
+} 
 a:link,a:visited,a:active{
 	color: black;
 	text-decoration: none;
