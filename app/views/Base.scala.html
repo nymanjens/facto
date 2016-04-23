@@ -1,0 +1,71 @@
+@(title: String, extrascript: Html = Html(""))(content: Html)
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>@title</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Family Accounting Tool">
+    <meta name="author" content="Jens Nyman">
+    <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+
+    <!-- ################ CSS ################ -->
+    <!-- Bootstrap Core CSS -->
+    <link href="@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.css"))" rel="stylesheet">
+
+    <!-- MetisMenu CSS -->
+    <link href="@routes.WebJarAssets.at(WebJarAssets.locate("metisMenu.min.css"))" rel="stylesheet">
+
+    <!-- DataTables CSS -->
+    <link href="@routes.WebJarAssets.at(WebJarAssets.locate("integration/bootstrap/3/dataTables.bootstrap.css"))" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="@routes.WebJarAssets.at(WebJarAssets.locate("font-awesome.min.css"))" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- startbootstrap-sb-admin-2 CSS -->
+    <link href="@routes.Assets.at("bower_components/startbootstrap-sb-admin-2/dist/css/sb-admin-2.css")" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="@routes.Assets.at("stylesheets/main.css")" rel="stylesheet">
+
+  </head>
+  <body>
+
+    @content
+
+    <!-- ################ JAVASCRIPT ################ -->
+    <!-- jQuery -->
+    <script src="@routes.WebJarAssets.at(WebJarAssets.locate("dist/jquery.min.js"))"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.js"))"></script>
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="@routes.WebJarAssets.at(WebJarAssets.locate("metisMenu.min.js"))"></script>
+
+    <!-- DataTables JavaScript -->
+    <script src="@routes.WebJarAssets.at(WebJarAssets.locate("media/js/jquery.dataTables.min.js"))"></script>
+    <script src="@routes.WebJarAssets.at(WebJarAssets.locate("integration/bootstrap/3/dataTables.bootstrap.min.js"))"></script>
+
+    <!-- startbootstrap-sb-admin-2 JavaScript -->
+    <script src="@routes.Assets.at("bower_components/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js")"></script>
+
+    <!-- Custom JavaScript -->
+    <script src="@routes.Assets.at("javascripts/utils.js")"></script>
+    <script src="@routes.Assets.at("main.js")"></script>
+
+    @extrascript
+
+  </body>
+</html>

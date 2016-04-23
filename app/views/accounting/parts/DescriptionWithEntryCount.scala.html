@@ -1,0 +1,13 @@
+@import controllers.helpers.accounting.GroupedTransactions
+
+@(entry: GroupedTransactions)
+
+@if(entry.transactions.size == 1) {
+  @entry.descriptions.map(Html(_)).mkString(", ")
+} else {
+  @UpperRightCorner{ @* centralContent *@
+    @entry.descriptions.map(Html(_)).mkString(", ")
+  } { @* cornerContent *@
+    (@entry.transactions.size)
+  }
+}

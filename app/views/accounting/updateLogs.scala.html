@@ -1,0 +1,35 @@
+@import models.User
+@import models.accounting.{UpdateLog}
+@import viewhelpers.Formatting._
+@import views.html.accounting.parts._
+
+@(entries: Seq[UpdateLog], numEntriesToShow: Int)(implicit user: User, request: Request[AnyContent], flash: Flash)
+
+@Main("Update Logs") {
+  <h1><i class="fa fa-archive fa-fw"></i> Update Logs</h1>
+
+  @Panel(
+    title = "Logs"
+  ) { @* panel content *@
+
+    @viewhelpers.accounting.Table(
+      title = s"All",
+      tableClasses = "table-update-logs",
+      allEntriesLink = (entries.size > numEntriesToShow) match {
+          case true => Some(controllers.accounting.routes.GeneralActions.updateLogsAll())
+          case false => None
+        },
+      numEntriesShownByDefault = numEntriesToShow,
+      colspan = 3,
+      entries = entries.reverse.take(numEntriesToShow)
+    ) { @* table headers *@
+      <th>User</th>
+      <th>Date</th>
+      <th>Description</th>
+    } { (entry, _) =>  @* table datas *@
+      <td>@entry.user.name</td>
+      <td>@formatDateTime(entry.date)</td>
+      <td>@entry.change</td>
+    }
+  }
+}

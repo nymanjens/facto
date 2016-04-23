@@ -1,0 +1,54 @@
+@import models.User
+@import models.accounting.Money.CurrencyUnit
+@import models.accounting.config.{Config, Account, MoneyReservoir, Category}
+@import controllers.helpers.accounting.{AccountPair, LiquidationEntry}
+@import viewhelpers.Formatting._
+@import views.html.accounting.parts._
+
+@(pairsToEntries: Map[AccountPair, Seq[LiquidationEntry]], numEntriesShownByDefault: Int,
+    expandedNumEntries: Int)(implicit user: User, request: Request[AnyContent], flash: Flash)
+
+@Main("Liquidation") {
+  <h1><i class="fa fa-users fa-fw"></i> Liquidation</h1>
+
+  @Panel(
+    title = if (pairsToEntries.size > 1) "All Combinations" else "Single Combination"
+  ) { @* panel content *@
+
+    @for((AccountPair(account1, account2), entries) <- pairsToEntries) {
+      @viewhelpers.accounting.Table(
+        title = s"Debt of ${account1.longName} to ${account2.longName}",
+        tableClasses = "table-liquidation",
+        allEntriesLink = (entries.size > expandedNumEntries) match {
+            case true => Some(controllers.accounting.routes.Views.liquidationOfSingle(account1.code, account2.code))
+            case false => None
+          },
+        numEntriesShownByDefault = numEntriesShownByDefault,
+        colspan = 8,
+        entries = entries.reverse.take(expandedNumEntries)
+      ) { @* table headers *@
+        <th>Payed</th>
+        <th>Beneficiary</th>
+        <th>Payed with/to</th>
+        <th>Category</th>
+        <th>Description</th>
+        <th>Flow (@CurrencyUnit.default.htmlSymbol)</th>
+        <th>@account1.veryShortName -> @account2.veryShortName (@CurrencyUnit.default.htmlSymbol)</th>
+        <th>
+          @if(!entries.isEmpty) {
+            @LiquidationRepayButton(account1, account2, entries.last.debt)
+          }
+        </th>
+      } { (entry, _) =>  @* table datas *@
+        <td>@entry.transactionDates.map(formatDate).mkString(", ")</td>
+        <td>@entry.beneficiaries.map(_.longName).mkString(", ")</td>
+        <td>@entry.moneyReservoirs.map(_.name).mkString(", ")</td>
+        <td>@entry.categories.map(_.name).mkString(", ")</td>
+        <td>@DescriptionWithEntryCount(entry)</td>
+        <td>@entry.flow.formatFloat</td>
+        <td>@entry.debt.formatFloat</td>
+        <td>@TransactionGroupEditButton(entry.groupId)</td>
+      }
+    }
+  }
+}

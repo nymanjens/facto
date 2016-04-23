@@ -1,0 +1,76 @@
+@import models.User
+@import models.accounting.Money.CurrencyUnit
+@import models.accounting.config.{Config, Account, MoneyReservoir, Category}
+@import controllers.helpers.accounting._
+@import viewhelpers.Formatting._
+@import views.html.accounting.parts._
+
+@(accountToReservoirs: Map[Account, Iterable[MoneyReservoir]], reservoirToEntries: Map[MoneyReservoir, Seq[CashFlowEntry]],
+  numEntriesShownByDefault: Int, expandedNumEntries: Int)(implicit user: User, request: Request[AnyContent], flash: Flash)
+
+@Main("Cash Flow", generateToc = true) {
+  <h1><i class="fa fa-money fa-fw"></i> Cash Flow</h1>
+  
+  @for((account, reservoirs) <- accountToReservoirs) {
+    @Panel(
+      title = s"Account: ${account.longName}",
+      panelClasses = if(account.isMineOrCommon) "" else "hidden other-accounts"
+    ) { @* panel content *@
+
+      @for(reservoir <- reservoirs) {
+        @viewhelpers.accounting.Table(
+          title = reservoir.name,
+          tableClasses = "table-cashflow",
+          allEntriesLink = (reservoirToEntries(reservoir).size > expandedNumEntries) match {
+              case true => Some(controllers.accounting.routes.Views.cashFlowOfSingle(reservoir.code))
+              case false => None
+            },
+          numEntriesShownByDefault = numEntriesShownByDefault,
+          colspan = 8,
+          entries = reservoirToEntries(reservoir).reverse.take(expandedNumEntries)
+        ) { @* table headers *@
+          <th>Payed</th>
+          <th>Consumed</th>
+          <th>Beneficiary</th>
+          <th>Category</th>
+          <th>Description</th>
+          <th>Flow (@reservoir.currency.htmlSymbol)</th>
+          <th>Balance (@reservoir.currency.htmlSymbol)</th>
+          <th>@BalanceCheckAddNewButton(reservoir)</th>
+        } { (entry, i) =>  @* table datas *@
+          @entry match {
+            case entry:RegularEntry => {
+              <td>@entry.transactionDates.map(formatDate).mkString(", ")</td>
+              <td>@entry.consumedDates.map(formatDate).mkString(", ")</td>
+              <td>@entry.beneficiaries.map(_.longName).mkString(", ")</td>
+              <td>@entry.categories.map(_.name).mkString(", ")</td>
+              <td>@DescriptionWithEntryCount(entry)</td>
+              <td>@entry.flow.formatFloat</td>
+              <td>
+                @entry.balance.formatFloat
+                @if(entry.balanceVerified) {
+                  <i class="fa fa-check fa-fw"></i>
+                }
+                @if(!entry.balanceVerified && i == 0) {
+                  @BalanceCheckConfirmButton(reservoir, entry)
+                }
+              </td>
+              <td>@TransactionGroupEditButton(entry.groupId)</td>
+            }
+            case BalanceCorrection(bc) => {
+              <td>@formatDate(bc.checkDate)</td>
+              <td colspan="5" style="font-weight: bold;">Balance correction:</td>
+              <td>@bc.balance.formatFloat</td>
+              <td>@BalanceCheckEditButton(bc)</td>
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @* Unhide other accounts *@
+  @if(!reservoirToEntries.filterKeys(!_.owner.isMineOrCommon).isEmpty) {
+    @OtherAccounts()
+  }
+}

@@ -1,0 +1,55 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET  /                controllers.Application.index
+
+# Auth
+GET  /login/          controllers.Auth.login
+POST /login/          controllers.Auth.authenticate
+GET  /logout/         controllers.Auth.logout
+
+# User
+GET  /profile/         controllers.Application.profile
+POST  /profile/changepassword/ controllers.Application.changePassword
+GET  /administration/          controllers.Application.administration
+POST  /profile/adduser/ controllers.Application.addUser
+
+# Accounting - general
+GET  /acc/logs/                    controllers.accounting.GeneralActions.updateLogsLatest
+GET  /acc/logs/all/                controllers.accounting.GeneralActions.updateLogsAll
+
+# Accounting - views
+GET  /acc/general/                 controllers.accounting.Views.generalLatest
+GET  /acc/general/all/             controllers.accounting.Views.generalAll
+GET  /acc/cashflow/                controllers.accounting.Views.cashFlowOfAll
+GET  /acc/cashflow/:reservoirCode/ controllers.accounting.Views.cashFlowOfSingle(reservoirCode)
+GET  /acc/liquidation/             controllers.accounting.Views.liquidationOfAll
+GET  /acc/liquidation/:accountCode1/:accountCode2/  controllers.accounting.Views.liquidationOfSingle(accountCode1, accountCode2)
+GET  /acc/endowments/              controllers.accounting.Views.endowmentsOfAll
+GET  /acc/endowments/:accountCode/ controllers.accounting.Views.endowmentsOfSingle(accountCode)
+GET  /acc/summary/                 controllers.accounting.Views.summaryForCurrentYear
+GET  /acc/summary/:expandedyear/   controllers.accounting.Views.summaryFor(expandedyear: Int)
+
+# Accounting - transaction group operations
+GET  /acc/trans/new/:redirectTo     controllers.accounting.TransactionGroupOperations.addNewForm(redirectTo)
+POST /acc/trans/new/:redirectTo     controllers.accounting.TransactionGroupOperations.addNew(redirectTo)
+GET  /acc/trans/edit/:transGroupId/:redirectTo     controllers.accounting.TransactionGroupOperations.editForm(transGroupId: Long, redirectTo)
+POST /acc/trans/edit/:transGroupId/:redirectTo     controllers.accounting.TransactionGroupOperations.edit(transGroupId: Long, redirectTo)
+GET  /acc/trans/delete/:transGroupId/:redirectTo     controllers.accounting.TransactionGroupOperations.delete(transGroupId: Long, redirectTo)
+
+# Accounting - transaction group operations - shortcuts
+GET  /acc/trans/repay/:accountCode1/:accountCode2/:amountInCents/:redirectTo  controllers.accounting.TransactionGroupOperations.addNewLiquidationRepayForm(accountCode1, accountCode2, amountInCents: Long, redirectTo)
+
+# Accounting - balance check operations
+GET  /acc/bc/new/:moneyReservoirCode/:redirectTo     controllers.accounting.BalanceCheckOperations.addNewForm(moneyReservoirCode, redirectTo)
+POST /acc/bc/new/:moneyReservoirCode/:redirectTo     controllers.accounting.BalanceCheckOperations.addNew(moneyReservoirCode, redirectTo)
+GET  /acc/bc/confirm/:moneyReservoirCode/:balanceInCents/:mostRecentTransactionId/:redirectTo     controllers.accounting.BalanceCheckOperations.addConfirmation(moneyReservoirCode, balanceInCents: Long, mostRecentTransactionId: Long, redirectTo)
+GET  /acc/bc/edit/:bcId/:redirectTo     controllers.accounting.BalanceCheckOperations.editForm(bcId: Long, redirectTo)
+POST /acc/bc/edit/:bcId/:redirectTo     controllers.accounting.BalanceCheckOperations.edit(bcId: Long, redirectTo)
+GET  /acc/bc/delete/:bcId/:redirectTo     controllers.accounting.BalanceCheckOperations.delete(bcId: Long, redirectTo)
+
+# Map static resources from the /public folder to the /assets URL path
+GET  /assets/*file    controllers.Assets.at(path="/public", file)
+GET  /webjars/*file   controllers.WebJarAssets.at(file)

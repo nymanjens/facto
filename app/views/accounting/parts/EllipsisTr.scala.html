@@ -1,0 +1,10 @@
+@(colspan: Int, trClasses: String = "", btnClasses: String = "", href: Option[Call] = None)
+
+<tr class="@trClasses">
+  <td colspan="@colspan" style="text-align: center">
+    <a href="@href.getOrElse("javascript:;")"
+        type="button" class="btn btn-sm btn-default btn-circle @btnClasses">
+      <i class="fa  fa-ellipsis-h"></i>
+    </a>
+  </td>
+</tr>

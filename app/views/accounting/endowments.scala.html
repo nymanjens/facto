@@ -1,0 +1,50 @@
+@import models.User
+@import models.accounting.Money.CurrencyUnit
+@import models.accounting.config.{Config, Account, MoneyReservoir, Category}
+@import controllers.helpers.accounting.GeneralEntry
+@import viewhelpers.Formatting._
+@import views.html.accounting.parts._
+
+@(accountToEntries: Map[Account, Seq[GeneralEntry]], numEntriesShownByDefault: Int,
+    expandedNumEntries: Int)(implicit user: User, request: Request[AnyContent], flash: Flash)
+
+@Main("Endowments") {
+  <h1><i class="fa fa-refresh fa-fw"></i> Endowments</h1>
+
+  @Panel(
+    title = if (accountToEntries.size > 1) "All Accounts" else "Single Account"
+  ) { @* panel content *@
+
+    @for((account, entries) <- accountToEntries) {
+      @viewhelpers.accounting.Table(
+        title = s"Endowments of ${account.longName}",
+        tableClasses = "table-endowments",
+        allEntriesLink = (entries.size > expandedNumEntries) match {
+            case true => Some(controllers.accounting.routes.Views.endowmentsOfSingle(account.code))
+            case false => None
+          },
+        numEntriesShownByDefault = numEntriesShownByDefault,
+        colspan = 8,
+        entries = entries.reverse.take(expandedNumEntries)
+      ) { @* table headers *@
+        <th>Payed</th>
+        <th>Consumed</th>
+        <th>Beneficiary</th>
+        <th>Payed with/to</th>
+        <th>Category</th>
+        <th>Description</th>
+        <th>Flow (@CurrencyUnit.default.htmlSymbol)</th>
+        <th>&nbsp;</th>
+      } { (entry, _) =>  @* table datas *@
+        <td>@entry.transactionDates.map(formatDate).mkString(", ")</td>
+        <td>@entry.consumedDates.map(formatDate).mkString(", ")</td>
+        <td>@entry.beneficiaries.map(_.longName).mkString(", ")</td>
+        <td>@entry.moneyReservoirs.map(_.name).mkString(", ")</td>
+        <td>@entry.categories.map(_.name).mkString(", ")</td>
+        <td>@DescriptionWithEntryCount(entry)</td>
+        <td>@entry.flow.formatFloat</td>
+        <td>@TransactionGroupEditButton(entry.groupId)</td>
+      }
+    }
+  }
+}

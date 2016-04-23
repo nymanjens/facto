@@ -1,0 +1,272 @@
+3 :: Bob :: ACC :: CARD_BOB :: Sed nisi Nulla quis sem at nibh elementum  :: -500 :: 1425855600 :: 0 :: 1425928738
+2 :: Common :: LIFE :: CARD_COMMON :: imperdiet Duis  :: -25.04 :: 1425855600 :: 0 :: 1425934823
+2 :: Alice :: ACC :: CARD_COMMON :: sagittis ipsum  :: -100 :: 1425855600 :: 0 :: 1425938116
+2 :: Alice :: ACC :: SAVINGS_ALICE :: Praesent mauris Fusce  :: 100 :: 1425855600 :: 0 :: 1425938117
+3 :: Bob :: FUN :: CASH_COMMON :: nec tellus sed augue  :: -2 :: 1426028400 :: 1426374000 :: 1426072653
+3 :: Bob :: TRANS :: CARD_BOB :: semper porta Mauris  :: -51 :: 1426028400 :: 0 :: 1426188094
+2 :: Alice :: ACC :: CARD_ALICE :: massa Vestibulum  :: -47.3 :: 1426028400 :: 0 :: 1426243738
+3 :: Common :: LIFE :: CASH_COMMON :: lacinia arcu eget nulla :: -5 :: 1426287600 :: 0 :: 1426357028
+3 :: Bob :: FUN :: CASH_COMMON :: Class aptent taciti  :: -0.65 :: 1426287600 :: 0 :: 1426357039
+2 :: Common :: LIFE :: CASH_ALICE :: sociosqu ad litora  :: -1 :: 1425942000 :: 0 :: 1426427659
+2 :: Alice :: FUN :: CASH_ALICE :: torquent per conubia  :: -1.9 :: 1426028400 :: 0 :: 1426427694
+2 :: Common :: LIFE :: CASH_ALICE :: nostra, per inceptos  :: -10 :: 1426201200 :: 0 :: 1426427829
+2 :: Bob :: FUN :: CASH_ALICE :: himenaeos Curabitur  :: -25 :: 1426201200 :: 0 :: 1426427830
+2 :: Alice :: FUN :: CASH_ALICE :: sodales ligula in  :: -26 :: 1426201200 :: 0 :: 1426427831
+2 :: Bob :: FUN :: CASH_COMMON :: libero Sed dignissim  :: -1 :: 1426201200 :: 0 :: 1426427832
+2 :: Common :: LIFE :: CASH_ALICE :: lacinia nunc  :: -3 :: 1426287600 :: 0 :: 1426427860
+2 :: Common :: LIFE :: CARD_COMMON :: Curabitur tortor  :: -30.82 :: 1426374000 :: 0 :: 1426427944
+2 :: Common :: MED :: CARD_ALICE :: Pellentesque nibh  :: -31.09 :: 1426374000 :: 0 :: 1426429038
+2 :: Common :: LIFE :: CASH_ALICE :: Aenean quam In  :: -5 :: 1426546800 :: 0 :: 1426798625
+2 :: Alice :: FUN :: CASH_ALICE :: scelerisque sem at  :: -4.3 :: 1426546800 :: 0 :: 1426798626
+2 :: Common :: LIFE :: CASH_ALICE :: dolor Maecenas mattis :: -5 :: 1426633200 :: 0 :: 1426798660
+2 :: Alice :: FUN :: CASH_ALICE :: Sed convallis  :: -2.2 :: 1426633200 :: 0 :: 1426798661
+2 :: Alice :: FUN :: CASH_ALICE :: tristique sem Proin  :: 3 :: 1426719600 :: 1419375600 :: 1426798950
+2 :: Common :: LIFE :: CASH_ALICE :: ut ligula vel nunc  :: -2.1 :: 1426719600 :: 0 :: 1426799278
+3 :: Common :: LIFE :: CASH_COMMON :: egestas porttitor  :: -5 :: 1427151600 :: 0 :: 1427231907
+3 :: Bob :: FUN :: CASH_COMMON :: Morbi lectus risus,  :: -1 :: 1427151600 :: 0 :: 1427231928
+3 :: Bob :: TRANS :: CARD_BOB :: iaculis vel, suscipit  :: -14 :: 1427324400 :: 0 :: 1427375180
+2 :: Common :: LIFE :: CASH_ALICE :: quis, luctus non,  :: -4.5 :: 1426806000 :: 0 :: 1427397245
+2 :: Common :: LIFE :: CASH_ALICE :: massa Fusce ac  :: 30 :: 1426978800 :: 0 :: 1427397311
+2 :: Common :: LIFE :: CARD_COMMON :: turpis quis ligula  :: -49.43 :: 1426978800 :: 0 :: 1427397313
+2 :: Common :: LIFE :: CARD_COMMON :: lacinia aliquet  :: -14.51 :: 1426374000 :: 0 :: 1427397336
+2 :: Common :: LIFE :: CASH_ALICE :: Mauris ipsum Nulla  :: -2.1 :: 1427151600 :: 0 :: 1427397361
+2 :: Common :: LIFE :: CASH_ALICE :: metus metus,  :: -14 :: 1427238000 :: 0 :: 1427397547
+2 :: Alice :: FUN :: CASH_ALICE :: ullamcorper vel,  :: -14 :: 1427238000 :: 0 :: 1427397548
+2 :: Alice :: FUN :: CARD_ALICE :: tincidunt sed,  :: -47.9 :: 1427151600 :: 0 :: 1427397686
+3 :: Common :: LIFE :: CASH_COMMON :: euismod in, nibh  :: -10 :: 1427238000 :: 0 :: 1427409800
+3 :: Bob :: FUN :: CASH_COMMON :: Quisque volutpat  :: -9.05 :: 1427238000 :: 0 :: 1427409846
+3 :: Alice :: FUN :: CASH_COMMON :: condimentum velit  :: -9.05 :: 1427238000 :: 0 :: 1427409858
+3 :: Common :: ONE :: CASH_COMMON :: Class aptent taciti  :: -3.53 :: 1427410800 :: 0 :: 1427477057
+3 :: Common :: PRES :: CARD_BOB :: sociosqu ad litora  :: -2.75 :: 1427410800 :: 1427497200 :: 1427477112
+3 :: Bob :: ACC :: CARD_BOB :: torquent per conubia  :: -40 :: 1427410800 :: 0 :: 1427477153
+3 :: Bob :: ACC :: CASH_COMMON :: nostra, per inceptos  :: 40 :: 1427410800 :: 0 :: 1427477153
+3 :: Common :: PRES :: CASH_COMMON :: himenaeos Nam nec  :: -20 :: 1427410800 :: 1427497200 :: 1427477242
+3 :: Common :: RECUR :: CARD_COMMON :: ante Sed lacinia,  :: -649.08 :: 1427410800 :: 0 :: 1427485796
+3 :: Common :: RECUR :: CARD_COMMON :: urna non tincidunt  :: -8.16 :: 1427410800 :: 0 :: 1427485834
+3 :: Common :: RECUR :: CARD_COMMON :: mattis, tortor neque  :: -26.99 :: 1427410800 :: 0 :: 1427485856
+3 :: Common :: RECUR :: CARD_COMMON :: adipiscing diam, a  :: -553.47 :: 1425942000 :: 0 :: 1427486099
+2 :: Alice :: ACC :: CARD_COMMON :: cursus ipsum ante  :: 47.3 :: 1426633200 :: 0 :: 1427497440
+2 :: Bob :: FUN :: CARD_ALICE :: quis turpis Nulla  :: -5 :: 1427324400 :: 1429135200 :: 1427551676
+2 :: Alice :: FUN :: CARD_ALICE :: facilisi Ut fringilla :: -5 :: 1427324400 :: 1429135200 :: 1427551679
+2 :: Common :: LIFE :: CASH_ALICE :: Suspendisse potenti :: -5 :: 1427410800 :: 0 :: 1427551717
+2 :: Alice :: FUN :: CASH_ALICE :: Nunc feugiat mi a  :: -0.5 :: 1427410800 :: 0 :: 1427551722
+2 :: Common :: LIFE :: CASH_ALICE :: tellus consequat  :: -9 :: 1427497200 :: 0 :: 1427551763
+2 :: Alice :: FUN :: CASH_ALICE :: imperdiet  :: -1.5 :: 1427497200 :: 0 :: 1427551764
+2 :: Alice :: TRANS :: CARD_ALICE :: Vestibulum sapien  :: -229 :: 1427583600 :: 1428357600 :: 1427632197
+3 :: Common :: LIFE :: CASH_COMMON :: Proin quam Etiam  :: -2 :: 1427752800 :: 0 :: 1427794788
+3 :: Common :: LIFE :: CASH_COMMON :: ultrices  :: -5 :: 1427410800 :: 0 :: 1427800996
+3 :: Bob :: FUN :: CASH_COMMON :: Suspendisse in justo  :: -1.65 :: 1427410800 :: 0 :: 1427801010
+3 :: Bob :: PRES :: CASH_COMMON :: eu magna luctus  :: 50 :: 1427752800 :: 1426201200 :: 1427801050
+3 :: Common :: LIFE :: CASH_COMMON :: suscipit Sed lectus :: -5 :: 1428012000 :: 0 :: 1428083179
+3 :: Bob :: FUN :: CASH_COMMON :: Integer euismod  :: -1.65 :: 1428012000 :: 0 :: 1428083189
+2 :: Alice :: ACC :: CARD_ALICE :: lacus luctus magna  :: -70 :: 1427497200 :: 0 :: 1428150342
+2 :: Alice :: ACC :: CASH_ALICE :: Quisque cursus,  :: 70 :: 1427497200 :: 0 :: 1428150342
+2 :: Common :: LIFE :: CARD_COMMON :: metus vitae  :: -21.65 :: 1428098400 :: 0 :: 1428150586
+2 :: Common :: LIFE :: CASH_ALICE :: pharetra auctor,  :: -0.58 :: 1427666400 :: 0 :: 1428150649
+2 :: Alice :: FUN :: CARD_ALICE :: sem massa mattis  :: -14.5 :: 1427752800 :: 0 :: 1428150695
+2 :: Common :: LIFE :: CASH_ALICE :: sem, at interdum  :: -2.9 :: 1427752800 :: 0 :: 1428150779
+2 :: Common :: LIFE :: CASH_ALICE :: magna augue eget  :: -2.1 :: 1427752800 :: 0 :: 1428150812
+2 :: Alice :: FUN :: CASH_ALICE :: diam Vestibulum  :: -2.2 :: 1427666400 :: 0 :: 1428150944
+2 :: Common :: LIFE :: CASH_ALICE :: ante ipsum primis  :: -2.1 :: 1427839200 :: 0 :: 1428151021
+2 :: Alice :: IN :: CARD_COMMON :: in faucibus orci  :: 42.55 :: 1427839200 :: 0 :: 1428151401
+2 :: Alice :: TRANS :: CARD_COMMON :: luctus et ultrices  :: 81 :: 1427839200 :: 0 :: 1428151431
+2 :: Alice :: ENDOW :: CARD_COMMON :: posuere cubilia  :: -226.13 :: 1428098400 :: 0 :: 1428151655
+2 :: Common :: ENDOW :: CARD_COMMON :: Curae; Morbi  :: 226.13 :: 1428098400 :: 0 :: 1428151655
+2 :: Alice :: ACC :: CARD_COMMON :: lacinia molestie dui :: -300 :: 1428098400 :: 0 :: 1428152225
+2 :: Alice :: ACC :: CARD_ALICE :: Praesent blandit  :: 300 :: 1428098400 :: 0 :: 1428152228
+2 :: Alice :: ACC :: CARD_COMMON :: dolor Sed non quam :: -500 :: 1428098400 :: 0 :: 1428152229
+2 :: Alice :: ACC :: SAVINGS_ALICE :: In vel mi sit amet  :: 500 :: 1428098400 :: 0 :: 1428152230
+3 :: Bob :: IN :: CARD_BOB :: augue congue  :: 652.79 :: 1427752800 :: 0 :: 1428212625
+3 :: Common :: LIFE :: CASH_COMMON :: elementum Morbi  :: -3.3 :: 1428184800 :: 0 :: 1428226526
+3 :: Bob :: ACC :: CARD_BOB :: in ipsum sit amet  :: -500 :: 1428184800 :: 0 :: 1428213346
+3 :: Common :: RECUR :: CARD_COMMON :: pede facilisis  :: -85.86 :: 1428876000 :: 0 :: 1428213388
+3 :: Common :: RECUR :: CARD_COMMON :: laoreet Donec  :: -453.47 :: 1428616800 :: 0 :: 1428213425
+2 :: Bob :: ENDOW :: CARD_BOB :: lacus nunc,  :: -67.27 :: 1428098400 :: 0 :: 1428224319
+2 :: Common :: ENDOW :: CARD_COMMON :: viverra nec,  :: 67.27 :: 1428098400 :: 0 :: 1428224319
+2 :: Common :: LIFE :: CASH_ALICE :: blandit vel,  :: -2.1 :: 1428357600 :: 0 :: 1428428192
+2 :: Common :: LIFE :: CASH_ALICE :: egestas et, augue :: -5 :: 1428357600 :: 0 :: 1428428232
+2 :: Alice :: FUN :: CASH_ALICE :: Vestibulum  :: -0.5 :: 1428357600 :: 0 :: 1428428237
+2 :: Common :: LIFE :: CARD_COMMON :: tincidunt  :: -54.97 :: 1428530400 :: 0 :: 1428688701
+2 :: Common :: LIFE :: CASH_ALICE :: malesuada tellus :: 40 :: 1428530400 :: 0 :: 1428688708
+2 :: Common :: LIFE :: CASH_ALICE :: Ut ultrices  :: -5 :: 1428444000 :: 0 :: 1428688741
+2 :: Alice :: FUN :: CASH_ALICE :: ultrices enim  :: -5 :: 1428444000 :: 0 :: 1428688745
+2 :: Common :: LIFE :: CASH_ALICE :: Curabitur sit  :: -2.1 :: 1428616800 :: 0 :: 1428688764
+2 :: Common :: LIFE :: CASH_ALICE :: amet mauris  :: -4 :: 1428703200 :: 0 :: 1428785982
+2 :: Alice :: IN :: CARD_ALICE :: Morbi in dui  :: -36 :: 1428703200 :: 0 :: 1428787128
+3 :: Common :: LIFE :: CASH_COMMON :: quis est  :: -5 :: 1428962400 :: 0 :: 1429180104
+3 :: Bob :: FUN :: CASH_COMMON :: pulvinar  :: -1 :: 1428962400 :: 0 :: 1429180118
+3 :: Bob :: FUN :: CARD_BOB :: ullamcorper  :: -12.5 :: 1429135200 :: 1443736800 :: 1429180219
+3 :: Alice :: FUN :: CARD_BOB :: Nulla facilisi  :: -12.5 :: 1429135200 :: 1443736800 :: 1429180237
+3 :: Common :: LIFE :: CARD_COMMON :: Integer lacinia  :: -30.98 :: 1429221600 :: 0 :: 1429286776
+2 :: Common :: LIFE :: CASH_ALICE :: sollicitudin  :: -2.1 :: 1429048800 :: 0 :: 1429297888
+2 :: Alice :: FUN :: CASH_ALICE :: massa Cras  :: -2.1 :: 1429221600 :: 0 :: 1429297899
+2 :: Common :: RECUR :: CASH_COMMON :: metus Sed  :: -30 :: 1429394400 :: 0 :: 1429459718
+2 :: Common :: LIFE :: CARD_ALICE :: aliquet risus a  :: -23.97 :: 1429394400 :: 0 :: 1429459776
+2 :: Alice :: ONE :: CARD_ALICE :: tortor Integer  :: -165 :: 1429480800 :: 0 :: 1429555763
+2 :: Common :: LIFE :: CASH_ALICE :: id quam Morbi  :: -10 :: 1429394400 :: 0 :: 1429527433
+2 :: Bob :: FUN :: CASH_ALICE :: mi Quisque  :: -17.5 :: 1429394400 :: 0 :: 1429527434
+2 :: Alice :: FUN :: CASH_ALICE :: nisl felis,  :: -17.5 :: 1429394400 :: 0 :: 1429527434
+2 :: Bob :: ONE :: CARD_ALICE :: venenatis  :: -25 :: 1429221600 :: 1440799200 :: 1429555255
+2 :: Alice :: FUN :: CARD_ALICE :: tristique,  :: -25 :: 1429221600 :: 1440799200 :: 1429555256
+2 :: Alice :: FUN :: CARD_ALICE :: dignissim in,  :: -23.98 :: 1429394400 :: 0 :: 1429555537
+3 :: Common :: LIFE :: CASH_COMMON :: ultrices sit  :: -5 :: 1429567200 :: 0 :: 1429646775
+3 :: Bob :: FUN :: CASH_COMMON :: amet, augue  :: -2.15 :: 1429567200 :: 0 :: 1429646793
+2 :: Common :: LIFE :: CASH_ALICE :: Proin sodales  :: -2.1 :: 1429567200 :: 0 :: 1429886928
+2 :: Common :: LIFE :: CASH_ALICE :: libero eget ante :: -2.1 :: 1429826400 :: 0 :: 1429886929
+2 :: Common :: LIFE :: CASH_ALICE :: Nulla quam  :: -5 :: 1429567200 :: 0 :: 1429886949
+2 :: Alice :: FUN :: CASH_ALICE :: Aenean laoreet  :: -5.4 :: 1429567200 :: 0 :: 1429886958
+2 :: Alice :: FUN :: CASH_ALICE :: Vestibulum nisi  :: -2.5 :: 1429740000 :: 0 :: 1429887027
+3 :: Common :: LIFE :: CARD_BOB :: lectus, commodo  :: -3 :: 1429912800 :: 0 :: 1429956392
+3 :: Bob :: FUN :: CASH_COMMON :: ac, facilisis  :: -1 :: 1429826400 :: 0 :: 1429956417
+3 :: Bob :: FUN :: CASH_COMMON :: ac, ultricies  :: -4.8 :: 1429826400 :: 0 :: 1429956465
+3 :: Alice :: FUN :: CASH_COMMON :: eu, pede Ut  :: -4.8 :: 1429826400 :: 0 :: 1429956477
+2 :: Common :: LIFE :: CASH_ALICE :: orci risus,  :: -10 :: 1429826400 :: 0 :: 1429981545
+3 :: Bob :: ACC :: CARD_BOB :: accumsan  :: -30 :: 1429912800 :: 0 :: 1430133273
+3 :: Bob :: ACC :: CASH_COMMON :: porttitor,  :: 30 :: 1429912800 :: 0 :: 1430133273
+3 :: Common :: LIFE :: CARD_COMMON :: cursus quis,  :: -18.29 :: 1430085600 :: 0 :: 1430133350
+3 :: Bob :: FUN :: CARD_BOB :: aliquet eget,  :: -10 :: 1429221600 :: 0 :: 1430134157
+3 :: Common :: RECUR :: CARD_COMMON :: justo Sed  :: -49.08 :: 1430085600 :: 0 :: 1430134271
+3 :: Common :: RECUR :: CARD_COMMON :: pretium blandit  :: -26.99 :: 1430085600 :: 0 :: 1430134322
+3 :: Common :: RECUR :: CARD_COMMON :: orci Ut eu  :: -8.16 :: 1430085600 :: 0 :: 1430134384
+3 :: Common :: RECUR :: CARD_COMMON :: diam at pede  :: -53.47 :: 1431208800 :: 0 :: 1430134889
+2 :: Common :: LIFE :: CARD_COMMON :: suscipit sodales :: -59.99 :: 1429999200 :: 0 :: 1430160787
+2 :: Common :: LIFE :: CASH_ALICE :: Aenean lectus  :: 50 :: 1429999200 :: 0 :: 1430160788
+3 :: Alice :: BIG :: CARD_COMMON :: elit, fermentum  :: -52.94 :: 1430172000 :: 1418166000 :: 1430219820
+3 :: Bob :: INVEST :: CARD_COMMON :: non, convallis  :: -52.94 :: 1430172000 :: 1418166000 :: 1430220460
+3 :: Common :: LIFE :: CARD_COMMON :: id, sagittis  :: -20.56 :: 1430344800 :: 0 :: 1430394599
+2 :: Common :: LIFE :: CASH_ALICE :: at, neque  :: -2.1 :: 1430172000 :: 0 :: 1430572793
+2 :: Common :: LIFE :: CASH_ALICE :: Nullam mauris  :: -5 :: 1430172000 :: 0 :: 1430572834
+2 :: Alice :: FUN :: CASH_ALICE :: orci, aliquet  :: -5 :: 1430172000 :: 0 :: 1430572835
+2 :: Common :: LIFE :: CASH_ALICE :: et, iaculis et,  :: -5 :: 1430431200 :: 0 :: 1430572881
+2 :: Alice :: FUN :: CASH_ALICE :: viverra vitae,  :: -16 :: 1430431200 :: 0 :: 1430572882
+2 :: Common :: LIFE :: CASH_ALICE :: ligula Nulla  :: 3.5 :: 1430258400 :: 0 :: 1430573146
+2 :: Alice :: FUN :: CASH_ALICE :: ut felis in  :: 3.5 :: 1430258400 :: 0 :: 1430573147
+3 :: Common :: LIFE :: CASH_COMMON :: purus aliquam  :: -5 :: 1430517600 :: 0 :: 1430592161
+3 :: Bob :: FUN :: CASH_COMMON :: imperdiet  :: -2 :: 1430517600 :: 0 :: 1430592175
+2 :: Common :: ACC :: CARD_COMMON :: Maecenas  :: -50 :: 1430604000 :: 0 :: 1430668049
+2 :: Common :: ACC :: CASH_ALICE :: aliquet mollis  :: 50 :: 1430604000 :: 0 :: 1430668054
+2 :: Alice :: ACC :: CASH_ALICE :: lectus Vivamus  :: -40 :: 1430604000 :: 0 :: 1430668079
+2 :: Common :: LIFE :: CARD_COMMON :: consectetuer  :: -47.63 :: 1430604000 :: 0 :: 1430668230
+2 :: Common :: LIFE :: CASH_ALICE :: risus et tortor :: 30 :: 1430604000 :: 0 :: 1430668238
+3 :: Bob :: IN :: CARD_BOB :: Lorem ipsum  :: 691.51 :: 1430344800 :: 0 :: 1430766772
+3 :: Bob :: ACC :: CARD_BOB :: dolor sit  :: -500 :: 1430690400 :: 0 :: 1430767656
+2 :: Alice :: IN :: CARD_COMMON :: amet,  :: 042.55 :: 1430431200 :: 0 :: 1430767867
+2 :: Alice :: TRANS :: CARD_COMMON :: consectetur  :: 81 :: 1430431200 :: 0 :: 1430767868
+2 :: Bob :: ENDOW :: CARD_BOB :: adipiscing elit :: -98.07 :: 1430690400 :: 0 :: 1430768507
+2 :: Common :: ENDOW :: CARD_COMMON :: Integer nec  :: 98.07 :: 1430690400 :: 0 :: 1430768507
+3 :: Bob :: FUN :: CARD_BOB :: odio Praesent  :: -10 :: 1430172000 :: 0 :: 1430768803
+3 :: Common :: LIFE :: CASH_COMMON :: libero Sed  :: -5 :: 1430776800 :: 0 :: 1430853716
+3 :: Bob :: FUN :: CASH_COMMON :: cursus ante  :: -1 :: 1430776800 :: 0 :: 1430853724
+2 :: Alice :: FUN :: CASH_ALICE :: dapibus diam  :: -2 :: 1430604000 :: 0 :: 1430910052
+2 :: Common :: LIFE :: CASH_ALICE :: Sed nisi  :: -5 :: 1430776800 :: 0 :: 1430910102
+2 :: Alice :: FUN :: CASH_ALICE :: Nulla quis sem  :: -4.7 :: 1430776800 :: 0 :: 1430910103
+2 :: Alice :: FUN :: CASH_ALICE :: at nibh  :: -10.1 :: 1430776800 :: 0 :: 1430910123
+2 :: Common :: LIFE :: CASH_ALICE :: elementum  :: -2.1 :: 1430863200 :: 0 :: 1430910136
+2 :: Alice :: FUN :: CARD_COMMON :: imperdiet  :: -14.5 :: 1430776800 :: 0 :: 1430910177
+2 :: Alice :: TRANS :: CASH_ALICE :: Duis sagittis  :: -3 :: 1430863200 :: 0 :: 1430942219
+2 :: Alice :: FUN :: CASH_ALICE :: ipsum  :: 300 :: 1430949600 :: 0 :: 1431026167
+2 :: Bob :: FUN :: CARD_ALICE :: Praesent mauris :: 3.61 :: 1430431200 :: 0 :: 1431027782
+2 :: Alice :: ONE :: CARD_ALICE :: Fusce nec  :: -3.61 :: 1430431200 :: 0 :: 1431027785
+3 :: Common :: CLOTH :: CASH_COMMON :: tellus sed  :: -14 :: 1430949600 :: 0 :: 1431034099
+3 :: Common :: PRES :: CASH_COMMON :: augue semper  :: -1.29 :: 1430949600 :: 0 :: 1431034143
+2 :: Alice :: FUN :: CARD_ALICE :: porta Mauris  :: -10 :: 1430949600 :: 0 :: 1431034179
+2 :: Bob :: TRANS :: CARD_ALICE :: massa  :: 10 :: 1430949600 :: 0 :: 1431034193
+3 :: Common :: LIFE :: CARD_COMMON :: Vestibulum  :: -23.6 :: 1431036000 :: 0 :: 1431112738
+2 :: Common :: LIFE :: CASH_ALICE :: lacinia arcu  :: -10 :: 1431122400 :: 0 :: 1431252717
+2 :: Bob :: FUN :: CASH_ALICE :: eget nulla  :: -0.85 :: 1431122400 :: 0 :: 1431252718
+2 :: Alice :: FUN :: CASH_ALICE :: Class aptent  :: -0.85 :: 1431122400 :: 0 :: 1431252719
+2 :: Common :: LIFE :: CASH_ALICE :: taciti  :: -3.5 :: 1431208800 :: 0 :: 1431252761
+2 :: Alice :: ONE :: CASH_ALICE :: sociosqu ad  :: -9 :: 1431122400 :: 0 :: 1431252885
+2 :: Common :: LIFE :: CASH_ALICE :: litora  :: -0.17 :: 1431122400 :: 0 :: 1431252910
+2 :: Common :: LIFE :: CASH_ALICE :: torquent per  :: -6.95 :: 1431036000 :: 0 :: 1431253421
+2 :: Common :: LIFE :: CASH_ALICE :: conubia  :: -2.1 :: 1431295200 :: 0 :: 1431460097
+2 :: Alice :: FUN :: CASH_ALICE :: nostra, per  :: -6.6 :: 1431295200 :: 0 :: 1431460121
+3 :: Common :: LIFE :: CARD_BOB :: inceptos  :: -3 :: 1431468000 :: 0 :: 1431514065
+3 :: Common :: ACC :: CARD_BOB :: himenaeos  :: -25 :: 1431468000 :: 0 :: 1431514083
+3 :: Common :: ACC :: CASH_COMMON :: Curabitur  :: 25 :: 1431468000 :: 0 :: 1431514083
+3 :: Bob :: ACC :: CARD_BOB :: sodales ligula  :: -6 :: 1431468000 :: 0 :: 1431514154
+3 :: Bob :: ACC :: CASH_COMMON :: in libero Sed  :: 6 :: 1431468000 :: 0 :: 1431514226
+3 :: Common :: LIFE :: CASH_COMMON :: dignissim  :: -5 :: 1431468000 :: 1433455200 :: 1431522248
+3 :: Bob :: FUN :: CASH_COMMON :: lacinia nunc Curabitur tortor  :: -1 :: 1431468000 :: 1433455200 :: 1431522311
+3 :: Common :: PRES :: CASH_COMMON :: Pellentesque nibh Aenean quam In  :: -25 :: 1431468000 :: 1431554400 :: 1431530022
+2 :: Common :: LIFE :: CARD_ALICE :: scelerisque sem at dolor Maecenas  :: -15 :: 1431468000 :: 0 :: 1431541286
+2 :: Alice :: FUN :: CARD_ALICE :: mattis Sed convallis tristique sem  :: -15 :: 1431468000 :: 0 :: 1431541294
+2 :: Alice :: ENDOW :: CARD_ALICE :: Proin ut ligula vel nunc egestas  :: -226.13 :: 1430604000 :: 0 :: 1431541351
+2 :: Common :: ENDOW :: CARD_COMMON :: porttitor Morbi lectus risus,  :: 226.13 :: 1430604000 :: 0 :: 1431541351
+2 :: Common :: ACC :: CARD_COMMON :: iaculis vel, suscipit quis, luctus  :: -226.13 :: 1430604000 :: 0 :: 1431541415
+2 :: Common :: ACC :: CARD_ALICE :: non, massa Fusce ac turpis quis  :: 226.13 :: 1430604000 :: 0 :: 1431541415
+2 :: Alice :: ACC :: CARD_COMMON :: ligula lacinia aliquet Mauris ipsum  :: -400 :: 1431468000 :: 0 :: 1431542167
+2 :: Alice :: ACC :: CARD_ALICE :: Nulla metus metus, ullamcorper vel, tincidunt sed, euismod in, nibh  :: 400 :: 1431468000 :: 0 :: 1431542169
+2 :: Alice :: ACC :: CARD_COMMON :: Quisque volutpat condimentum velit  :: -500 :: 1431468000 :: 0 :: 1431542214
+2 :: Alice :: ACC :: SAVINGS_ALICE :: Class aptent taciti sociosqu ad  :: 500 :: 1431468000 :: 0 :: 1431542218
+3 :: Bob :: FUN :: CASH_COMMON :: litora torquent per conubia nostra,  :: -0.01 :: 1431554400 :: 0 :: 1431952743
+3 :: Bob :: FUN :: CASH_COMMON :: per inceptos himenaeos Nam nec ante  :: -0.1 :: 1431727200 :: 0 :: 1431952787
+3 :: Alice :: FUN :: CASH_COMMON :: Sed lacinia, urna non tincidunt  :: -0.1 :: 1431727200 :: 0 :: 1431952799
+2 :: Alice :: FUN :: CASH_ALICE :: mattis, tortor neque adipiscing diam,  :: -0.02 :: 1431727200 :: 0 :: 1431960164
+2 :: Common :: LIFE :: CASH_ALICE :: a cursus ipsum ante quis turpis  :: -2.35 :: 1431900000 :: 0 :: 1431960208
+2 :: Common :: LIFE :: CARD_COMMON :: Nulla facilisi Ut fringilla  :: -14.96 :: 1431727200 :: 0 :: 1431960267
+2 :: Common :: LIFE :: CARD_COMMON :: Suspendisse potenti Nunc feugiat mi  :: -4.98 :: 1431640800 :: 0 :: 1431968338
+3 :: Bob :: ACC :: CARD_BOB :: a tellus consequat imperdiet  :: -30 :: 1431986400 :: 0 :: 1432058632
+3 :: Bob :: ACC :: CASH_COMMON :: Vestibulum sapien Proin quam Etiam  :: 30 :: 1431986400 :: 0 :: 1432058632
+3 :: Common :: LIFE :: CASH_COMMON :: ultrices Suspendisse in justo eu  :: -5 :: 1431986400 :: 0 :: 1432058767
+3 :: Bob :: FUN :: CASH_COMMON :: magna luctus suscipit Sed lectus  :: -1.65 :: 1431986400 :: 0 :: 1432058784
+2 :: Common :: LIFE :: CASH_ALICE :: Integer euismod lacus luctus magna  :: -3 :: 1432072800 :: 0 :: 1432121876
+3 :: Common :: LIFE :: CASH_COMMON :: Quisque cursus, metus vitae pharetra  :: -5 :: 1432072800 :: 0 :: 1432140100
+3 :: Bob :: FUN :: CASH_COMMON :: auctor, sem massa mattis sem, at  :: -2.8 :: 1432072800 :: 0 :: 1432140113
+2 :: Common :: LIFE :: CARD_ALICE :: interdum magna augue eget diam  :: -3 :: 1432072800 :: 0 :: 1432151823
+2 :: Alice :: FUN :: CARD_ALICE :: Vestibulum ante ipsum primis in  :: -3 :: 1432072800 :: 0 :: 1432151828
+3 :: Common :: ONE :: CARD_COMMON :: faucibus orci luctus et ultrices  :: -11.8 :: 1432245600 :: 0 :: 1432310628
+3 :: Common :: LIFE :: CASH_COMMON :: posuere cubilia Curae; Morbi lacinia  :: -3.5 :: 1432504800 :: 0 :: 1432590449
+3 :: Common :: LIFE :: CASH_COMMON :: molestie dui Praesent blandit dolor  :: -4.08 :: 1432591200 :: 0 :: 1432634752
+2 :: Common :: LIFE :: CASH_ALICE :: Sed non quam In vel mi sit amet  :: -2.1 :: 1432591200 :: 0 :: 1432668098
+2 :: Common :: LIFE :: CASH_ALICE :: augue congue elementum Morbi in  :: -2.1 :: 1432159200 :: 0 :: 1432668122
+2 :: Alice :: FUN :: CASH_ALICE :: ipsum sit amet pede facilisis laoreet :: -1.6 :: 1432418400 :: 0 :: 1432668139
+2 :: Alice :: ONE :: CARD_ALICE :: Donec lacus nunc, viverra nec,  :: -20.2 :: 1432591200 :: 0 :: 1432668165
+2 :: Common :: LIFE :: CARD_COMMON :: blandit vel, egestas et, augue  :: -15.72 :: 1432332000 :: 0 :: 1432668265
+2 :: Common :: LIFE :: CARD_COMMON :: Vestibulum tincidunt malesuada tellus :: -10.61 :: 1432072800 :: 0 :: 1432668281
+2 :: Alice :: FUN :: CARD_ALICE :: Ut ultrices ultrices enim  :: -24 :: 1432591200 :: 0 :: 1432668893
+2 :: Alice :: ACC :: CARD_ALICE :: Curabitur sit amet mauris Morbi in  :: 40 :: 1430776800 :: 0 :: 1432669042
+2 :: Alice :: FUN :: CARD_ALICE :: dui quis est pulvinar ullamcorper taciti sociosqu ad litora torquent ultrices Suspendisse in justo eu ipsum sit amet pede facilisis laoreet :: 10 :: 1430776800 :: 0 :: 1432669042
+3 :: Common :: RECUR :: CARD_COMMON :: Nulla facilisi Integer lacinia  :: -649.08 :: 1432591200 :: 0 :: 1432670941
+3 :: Common :: RECUR :: CARD_COMMON :: sollicitudin massa Cras metus Sed  :: -8.16 :: 1432591200 :: 0 :: 1432670981
+3 :: Common :: RECUR :: CARD_COMMON :: aliquet risus a tortor Integer id  :: -26.99 :: 1432591200 :: 0 :: 1432671010
+2 :: Bob :: ONE :: CARD_COMMON :: quam Morbi mi Quisque nisl felis,  :: -50 :: 1430776800 :: 1440799200 :: 1432673314
+2 :: Alice :: FUN :: CARD_COMMON :: venenatis tristique, dignissim in,  :: -50 :: 1430776800 :: 1440799200 :: 1432673314
+3 :: Common :: ONE :: CARD_BOB :: ultrices sit amet, augue Proin  :: -9.98 :: 1432677600 :: 0 :: 1432745891
+3 :: Common :: ONE :: CARD_COMMON :: sodales libero eget ante Nulla quam :: -18.98 :: 1432850400 :: 0 :: 1432906006
+3 :: Common :: LIFE :: CARD_COMMON :: Aenean laoreet Vestibulum nisi  :: -9.85 :: 1432850400 :: 0 :: 1432906107
+3 :: Alice :: FUN :: CARD_COMMON :: lectus, commodo ac, facilisis ac,  :: -75 :: 1432677600 :: 1440799200 :: 1432906277
+3 :: Bob :: ONE :: CARD_COMMON :: ultricies eu, pede Ut orci risus,  :: -109 :: 1432677600 :: 1440799200 :: 1432906347
+3 :: Common :: ONE :: CARD_COMMON :: accumsan porttitor, cursus quis,  :: -24.75 :: 1432850400 :: 0 :: 1433000964
+3 :: Bob :: FUN :: CASH_COMMON :: aliquet eget, justo Sed pretium  :: -0.7 :: 1432850400 :: 0 :: 1433001010
+3 :: Common :: LIFE :: CARD_COMMON :: blandit orci Ut eu diam at pede  :: -32.78 :: 1432936800 :: 0 :: 1433001101
+3 :: Common :: ACC :: CARD_COMMON :: suscipit sodales Aenean lectus  :: -30 :: 1432936800 :: 0 :: 1433001111
+3 :: Common :: ACC :: CASH_COMMON :: elit, fermentum non, convallis id,  :: 30 :: 1432936800 :: 0 :: 1433001111
+3 :: Common :: RECUR :: CASH_COMMON :: sagittis at, neque Nullam mauris  :: -30 :: 1432936800 :: 0 :: 1433001123
+3 :: Common :: LIFE :: CASH_COMMON :: orci, aliquet et, iaculis et,  :: -5 :: 1432591200 :: 0 :: 1433001243
+3 :: Bob :: FUN :: CASH_COMMON :: viverra vitae, ligula Nulla ut  :: -1 :: 1432591200 :: 0 :: 1433001254
+3 :: Common :: LIFE :: CASH_COMMON :: felis in purus aliquam imperdiet  :: -1.5 :: 1432591200 :: 0 :: 1433001315
+2 :: Common :: LIFE :: CASH_ALICE :: Maecenas aliquet mollis lectus  :: -2.1 :: 1432764000 :: 0 :: 1433063555
+2 :: Alice :: FUN :: CASH_ALICE :: Vivamus consectetuer risus et tortor :: -2.2 :: 1432850400 :: 0 :: 1433063568
+2 :: Common :: LIFE :: CASH_ALICE :: Lorem ipsum dolor sit amet,  :: -10 :: 1432850400 :: 0 :: 1433063699
+2 :: Bob :: FUN :: CASH_ALICE :: consectetur adipiscing elit  :: -9 :: 1432850400 :: 0 :: 1433063699
+2 :: Alice :: FUN :: CASH_ALICE :: Integer nec odio Praesent libero  :: -9 :: 1432850400 :: 0 :: 1433063700
+2 :: Alice :: FUN :: CASH_ALICE :: Sed cursus ante dapibus diam Sed  :: -2 :: 1432936800 :: 0 :: 1433063726
+2 :: Alice :: FUN :: CASH_ALICE :: nisi Nulla quis sem at nibh  :: -5 :: 1432936800 :: 0 :: 1433063742
+2 :: Bob :: FUN :: CASH_ALICE :: elementum imperdiet Duis sagittis  :: -3.65 :: 1432850400 :: 0 :: 1433063839
+2 :: Alice :: FUN :: CASH_ALICE :: ipsum Praesent mauris Fusce nec  :: -3.65 :: 1432850400 :: 0 :: 1433063842
+2 :: Alice :: FUN :: CARD_ALICE :: tellus sed augue semper porta  :: -5.4 :: 1432936800 :: 0 :: 1433064044
+3 :: Common :: LIFE :: CARD_COMMON :: Mauris massa Vestibulum lacinia  :: -17.54 :: 1433109600 :: 0 :: 1433181675
+2 :: Alice :: FUN :: CASH_ALICE :: arcu eget nulla Class aptent  :: 220 :: 1433109600 :: 0 :: 1433184254
+2 :: Alice :: FUN :: CASH_COMMON :: taciti sociosqu ad litora torquent  :: 40 :: 1433109600 :: 0 :: 1433184255
+2 :: Alice :: IN :: CARD_ALICE :: per conubia nostra, per inceptos  :: 42.55 :: 1433109600 :: 0 :: 1433184661
+2 :: Alice :: TRANS :: CARD_ALICE :: himenaeos Curabitur sodales ligula  :: 81 :: 1433109600 :: 0 :: 1433184663
+2 :: Common :: LIFE :: CASH_ALICE :: in libero Sed dignissim lacinia  :: -2.1 :: 1433196000 :: 0 :: 1433315007
+2 :: Alice :: FUN :: CASH_ALICE :: nunc Curabitur tortor  :: -6.25 :: 1433196000 :: 0 :: 1433315067
+2 :: Bob :: FUN :: CASH_ALICE :: Pellentesque nibh Aenean quam In  :: -6.25 :: 1433196000 :: 0 :: 1433315067
+2 :: Common :: LIFE :: CASH_ALICE :: scelerisque sem at dolor Maecenas  :: -10 :: 1433196000 :: 0 :: 1433315068
+3 :: Bob :: BIG :: CARD_COMMON :: mattis Sed convallis tristique sem :: -4.36 :: 1433368800 :: 1440799200 :: 1433440364
+3 :: Alice :: FUN :: CARD_COMMON :: Proin ut ligula vel nunc egestas  :: -4.36 :: 1433368800 :: 1440799200 :: 1433440396
+2 :: Alice :: FUN :: CASH_ALICE :: porttitor Morbi lectus risus,  :: -2 :: 1433455200 :: 0 :: 1433511636
+2 :: Alice :: FUN :: CASH_ALICE :: iaculis vel, suscipit quis, luctus  :: -2 :: 1433368800 :: 0 :: 1433584758
+2 :: Common :: LIFE :: CASH_ALICE :: non, massa Fusce ac turpis quis :: 88 :: 1433455200 :: 0 :: 1433584771

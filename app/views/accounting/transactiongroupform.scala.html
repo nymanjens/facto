@@ -1,0 +1,117 @@
+@import helper._
+@import common.CollectionUtils.toListMap
+@import models.User
+@import models.accounting.Money.CurrencyUnit
+@import models.accounting.config.{Config, Account, MoneyReservoir, Category}
+@import controllers.accounting.TransactionGroupOperations.Forms._
+@import views.html.utils.{repeatWithIndex, bootstrap3}
+@(title: String,
+  transGroupForm: Form[TransGroupData],
+  formAction: Call,
+  deleteAction: Option[Call])(
+    implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash)
+
+@zeroSum = @{
+  transGroupForm("zeroSum").value.getOrElse(false) match {
+    case b: Boolean => b
+    case "false" => false
+    case "" => false
+    case _ => true
+  }
+}
+
+@extrascript = {
+  <script src="@routes.Assets.at("javascripts/transactiongroupform.js")"></script>
+}
+
+@Main(title, extrascript) {
+  <div class="transaction-group-form">
+    @form(action = formAction, 'class ->  "form-horizontal") {
+      <div class="row">
+          <div class="col-lg-12">
+              <h1>
+                <i class="fa fa-plus-circle fa-fw"></i> @title
+                @for(action <- deleteAction) {
+                  <a class="btn btn-default" href="@action" role="button">
+                    <i class="fa fa-times"></i> Delete
+                  </a>
+                }
+                <span class="total-transaction-flow-box">
+                  <span class="total-flow-text">
+                    Total: @CurrencyUnit.default.htmlSymbol <span class="total-transaction-flow">0.00</span>
+                  </span>
+                  <div class="btn-group" data-toggle="buttons">
+                    <label class="btn btn-default btn-sm @if(!zeroSum){active}">
+                      <input type="radio" name="zeroSum" value="false" autocomplete="off" @if(!zeroSum){checked}> Any Total
+                    </label>
+                    <label class="btn btn-default btn-sm @if(zeroSum){active}">
+                      <input type="radio" name="zeroSum" value="true" autocomplete="off" @if(zeroSum){checked}> Zero Sum
+                    </label>
+                  </div>
+                </span>
+              </h1>
+          </div>
+      </div>
+      @for(error <- transGroupForm.globalErrors) {
+        <div class="alert alert-danger" role="alert">
+          @Messages(error.message)
+        </div>
+      }
+      <div class="row">
+        @repeatWithIndex(transGroupForm("transactions"), min = 1) { (transactionForm, index) =>
+          <div class="col-lg-6 transaction-holder"  id="transaction-holder-@index">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <span class="panel-heading-title">Transaction @{index + 1}</span>
+
+                <div class="pull-right rm-transaction-button-holder @if(index == 0){hidden}">
+                  <button type="button" class="btn btn-default btn-xs rm-transaction-button">
+                       <i class="fa  fa-times fa-fw"></i>
+                   </button>
+                </div>
+              </div>
+              <div class="panel-body">
+                @bootstrap3.Text(transactionForm("transactionDate"), "Date payed", args=if(index==0) Map('autofocus -> "autofocus") else Map(),
+                    classes=Seq("bind-until-change", "bind-to-root-form"))
+                @bootstrap3.Text(transactionForm("consumedDate"), "Date consumed",
+                    classes=Seq("bind-until-change", "bind-to-formfield-transactionDate", "bind-to-root-form"))
+                @bootstrap3.Text(transactionForm("issuerName"), "Issuer", args=Map('readonly -> "readonly"))
+                @bootstrap3.Select(transactionForm("beneficiaryAccountCode"), "Beneficiary", Config.accounts.mapValues(_.longName),
+                    classes=Seq("bind-until-change", "bind-to-root-form"))
+                @bootstrap3.Select(transactionForm("moneyReservoirCode"), "Payed with/to",
+                    toListMap(Config.moneyReservoirs.mapValues(_.name)) ++ Map("" -> "N/A"), classes=Seq("bind-until-change", "bind-to-root-form"))
+                @bootstrap3.Select(transactionForm("categoryCode"), "Category", Config.categories.mapValues(_.name),
+                    classes=Seq("bind-until-change", "bind-to-root-form"),
+                    optionArgs=Config.categories.mapValues(cat => Map('accounts -> cat.accounts.map(_.code).mkString(" "))))
+                @bootstrap3.Text(transactionForm("description"), "Description",
+                    classes=Seq("bind-until-change", "bind-to-root-form"))
+                @bootstrap3.Money(transactionForm("flowAsFloat"), CurrencyUnit.default, "Flow",
+                    classes=Seq("flow-as-float"))
+                @bootstrap3.Textarea(transactionForm("detailDescription"), "More info",
+                    classes=Seq("bind-until-change", "bind-to-root-form"))
+              </div>
+            </div>
+          </div>
+        }
+        <div id="extra-transactions"></div>
+        <div class="col-lg-6 add-transaction-button-holder">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              New Transaction
+            </div>
+            <div class="panel-body">
+              <table>
+                <td><button type="button" class="btn btn-primary btn-huge add-transaction-button"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button></td>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-default">Ok</button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}

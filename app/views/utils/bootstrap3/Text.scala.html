@@ -1,0 +1,16 @@
+@(field: Field, label: String, placeholder: String = "", help: String = "", args: Map[Symbol, Any] = Map(), classes: Seq[String] = Seq())(implicit messages: Messages)
+
+
+  <div class="form-group @if(field.hasErrors) {has-error}">
+    <label class="col-sm-4 control-label">@label</label>
+    <div class="col-sm-8">
+      <input type="text" 
+             class="form-control @classes.mkString(" ")" 
+             id="@field.id" 
+             name="@field.name" 
+             value="@field.value.getOrElse("")"
+             placeholder="@placeholder" @toHtmlArgs(args) />
+      <span class="help-block">@help</span>
+      <span class="help-block">@{field.error.map { error => Messages(error.message) }}</span>
+    </div>
+  </div>

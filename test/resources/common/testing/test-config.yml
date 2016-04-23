@@ -1,0 +1,77 @@
+!!models.accounting.config.Parsable$Config
+categories:
+  - &catB !!models.accounting.config.Parsable$Category
+    code: CAT_B
+    name: "Category B"
+    helpText: "b-help"
+  - &catA !!models.accounting.config.Parsable$Category
+    code: CAT_A
+    name: "Category A"
+
+accounts:
+  - &accCommon !!models.accounting.config.Parsable$Account
+    code: ACC_COMMON
+    longName: Account Common
+    shorterName: Acc.Common
+    veryShortName: Common
+    categories:
+      - *catA
+      - *catB
+  - &accA !!models.accounting.config.Parsable$Account
+    code: ACC_A
+    longName: Account A
+    shorterName: Acc.A
+    veryShortName: A
+    userLoginName: a
+    categories:
+      - *catA
+      - *catB
+    summaryTotalRows:
+      - rowTitleHtml: <b>Total</b>
+        categoriesToIgnore: []
+      - rowTitleHtml: <b>Total</b> (without catA)
+        categoriesToIgnore: [*catA]
+  - &accB !!models.accounting.config.Parsable$Account
+    code: ACC_B
+    longName: Account B
+    shorterName: Acc.B
+    veryShortName: B
+    userLoginName: b
+    categories:
+      - *catB
+
+moneyReservoirs:
+  - &reservoirCashCommon !!models.accounting.config.Parsable$MoneyReservoir
+    code: CASH_COMMON
+    name: Cash Common
+    owner: *accCommon
+  - &reservoirCardCommon !!models.accounting.config.Parsable$MoneyReservoir
+    code: CARD_COMMON
+    name: Card Common
+    owner: *accCommon
+  - &reservoirCashA !!models.accounting.config.Parsable$MoneyReservoir
+    code: CASH_A
+    name: Cash A
+    owner: *accA
+  - &reservoirCardA !!models.accounting.config.Parsable$MoneyReservoir
+    code: CARD_A
+    name: Card A
+    owner: *accA
+  - &reservoirCashB !!models.accounting.config.Parsable$MoneyReservoir
+    code: CASH_B
+    name: Cash B
+    owner: *accB
+  - &reservoirCardB !!models.accounting.config.Parsable$MoneyReservoir
+    code: CARD_B
+    name: Card B
+    owner: *accB
+
+constants: !!models.accounting.config.Parsable$Constants
+    commonAccount: *accCommon
+    accountingCategory: *catA
+    endowmentCategory: *catB
+    defaultElectronicMoneyReservoirs: # one per account
+        - *reservoirCardCommon
+        - *reservoirCardB
+        - *reservoirCardA
+    defaultCurrencySymbol: EUR
