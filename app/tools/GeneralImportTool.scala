@@ -2,9 +2,9 @@ package tools
 
 import play.api.Logger
 
-import slick.driver.H2Driver.api._
+import models.SlickUtils.dbApi._
 
-import models.ModelUtils.dbRun
+import models.SlickUtils.dbRun
 import models.Users
 import models.accounting.{UpdateLogs, BalanceChecks, TransactionGroups, Transactions}
 

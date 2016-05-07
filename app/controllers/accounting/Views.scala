@@ -26,7 +26,7 @@ object Views extends Controller with Secured {
   def cashFlowOfAll = ActionWithUser { implicit user =>
     implicit request =>
       cashFlow(
-        reservoirs = Config.moneyReservoirs.values,
+        reservoirs = Config.visibleReservoirs,
         numEntriesShownByDefaultToShow = 10,
         expandedNumEntriesToShow = 30)
   }
@@ -34,7 +34,7 @@ object Views extends Controller with Secured {
   def cashFlowOfSingle(reservoirCode: String) = ActionWithUser { implicit user =>
     implicit request =>
       cashFlow(
-        reservoirs = Seq(Config.moneyReservoirs(reservoirCode)))
+        reservoirs = Seq(Config.moneyReservoir(reservoirCode)))
   }
 
   def liquidationOfAll = ActionWithUser { implicit user =>

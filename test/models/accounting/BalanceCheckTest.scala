@@ -16,7 +16,7 @@ import models._
 @RunWith(classOf[JUnitRunner])
 class BalanceCheckTest extends Specification {
 
-  "test the BalanceCheck model" in new WithApplication(fakeApplication) {
+  "test the BalanceCheck model" in new WithApplication {
 
     // prepare users
     val user1 = Users.all.save(Users.newWithUnhashedPw(loginName = "tester", password = "x", name = "Tester"))

@@ -1,11 +1,9 @@
-name := """Family Accounting Tool (facto)"""
-
+name := """facto"""
 version := "1.0-SNAPSHOT"
-
-lazy val root = (project in file(".")).enablePlugins(PlayScala, SbtWeb)
-
 scalaVersion := "2.11.6"
 
+lazy val root = (project in file(".")).enablePlugins(PlayScala, SbtWeb)
+javaOptions in Test += "-Dconfig.file=conf/testing/application.conf"
 resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 
 libraryDependencies ++= Seq(

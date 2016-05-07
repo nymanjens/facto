@@ -7,16 +7,17 @@ import scala.util.matching.Regex
 
 import java.nio.file.Path
 
-import play.api.Application
+import play.api.{Application, Logger}
 
 import com.google.common.base.Splitter
 import org.joda.time.DateTime
-import slick.driver.H2Driver.api._
+import models.SlickUtils.dbApi._
 import org.apache.commons.lang.StringEscapeUtils
 
-import models.ModelUtils.dbRun
+import models.SlickUtils.dbRun
 import models.{User, Users}
 import models.accounting.{BalanceCheck, Money, Transaction, TransactionGroup, UpdateLogs, UpdateLog, BalanceChecks, TransactionGroups, Transactions}
+import models.accounting.config.Config
 
 object FactoV1ImportTool {
 
@@ -49,7 +50,10 @@ object FactoV1ImportTool {
     }.toMap
 
     // Insert rest
-    for (sqlInsert <- sqlInserts) {
+    for ((sqlInsert, i) <- sqlInserts.zipWithIndex) {
+      if (i > 0 && i % 1000 == 0) {
+        println(s"  Processed $i lines out of ${sqlInserts.size}")
+      }
       sqlInsert match {
         case _: UserInsert => Unit
         case insert: TransactionOrBalanceCheckInsert => insert.doImport(originalUserIdToUser)
@@ -60,6 +64,10 @@ object FactoV1ImportTool {
 
   private def defaultPassword(implicit app: Application): String = {
     app.configuration.getString("facto.import.defaultPassword") getOrElse "changeme"
+  }
+
+  private def dateForMillisSinceEpoch(millis: Long): DateTime = {
+    new DateTime(millis * 1000) plusHours 2 // +2 hours to correct for timezone problem in facto v1 (ugly hack)
   }
 
   sealed abstract class SqlInsert(values: String)
@@ -75,18 +83,21 @@ object FactoV1ImportTool {
         case valuesRegex(issuerOriginalId, accountCode, categoryCode, payedWithWhatCode, payedWithWhoseCode, description, price, datePayed, dateConsumed, creationTime) =>
           val issuer = originalUserIdToUser(issuerOriginalId.toLong)
           val moneyReservoirCode = s"${payedWithWhatCode}_${payedWithWhoseCode.toUpperCase}"
+          if (Config.moneyReservoirOption(moneyReservoirCode).isEmpty) {
+            Logger.error(s"Found unknown moneyReservoirCode: $moneyReservoirCode")
+          }
 
           if (categoryCode == "[BALANCE_SET]") {
             BalanceChecks.all.save(BalanceCheck(
               issuerId = issuer.id.get,
               moneyReservoirCode = moneyReservoirCode,
               balance = Money.fromFloat(price.toDouble),
-              createdDate = new DateTime(creationTime.toLong * 1000),
-              checkDate = new DateTime(datePayed.toLong * 1000)))
+              createdDate = dateForMillisSinceEpoch(creationTime.toLong),
+              checkDate = dateForMillisSinceEpoch(datePayed.toLong)))
 
           } else {
             // Transaction
-            val group = TransactionGroups.all.save(TransactionGroup(createdDate = new DateTime(creationTime.toLong * 1000)))
+            val group = TransactionGroups.all.save(TransactionGroup(createdDate = dateForMillisSinceEpoch(creationTime.toLong)))
             Transactions.all.save(Transaction(
               transactionGroupId = group.id.get,
               issuerId = issuer.id.get,
@@ -95,9 +106,9 @@ object FactoV1ImportTool {
               categoryCode = categoryCode,
               description = StringEscapeUtils.unescapeHtml(StringEscapeUtils.unescapeHtml(description)),
               flow = Money.fromFloat(price.toDouble),
-              createdDate = new DateTime(creationTime.toLong * 1000),
-              transactionDate = new DateTime(datePayed.toLong * 1000),
-              consumedDate = new DateTime(if (dateConsumed.toLong == 0) datePayed.toLong * 1000 else dateConsumed.toLong * 1000)
+              createdDate = dateForMillisSinceEpoch(creationTime.toLong),
+              transactionDate = dateForMillisSinceEpoch(datePayed.toLong),
+              consumedDate = dateForMillisSinceEpoch(if (dateConsumed.toLong == 0) datePayed.toLong else dateConsumed.toLong)
             ))
           }
       }
@@ -117,7 +128,7 @@ object FactoV1ImportTool {
           UpdateLogs.all.save(UpdateLog(
             userId = user.id.get,
             change = StringEscapeUtils.unescapeHtml(sql.replace("\\", "")),
-            date = new DateTime(timestamp.toLong * 1000)
+            date = dateForMillisSinceEpoch(timestamp.toLong)
           ))
       }
     }

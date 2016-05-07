@@ -18,7 +18,7 @@ class UpdateLogTest extends HookedSpecification {
 
   override def afterAll = Clock.cleanupAfterTest
 
-  "UpdateLogs.fetchLastNEntries" in new WithApplication(fakeApplication) {
+  "UpdateLogs.fetchLastNEntries" in new WithApplication {
     // add logs
     Clock.setTimeForTest(dateAt(2016, April, 1))
     UpdateLogs.addLog(testUser, UpdateLogs.AddNew, balanceCheck(111))
@@ -46,7 +46,7 @@ class UpdateLogTest extends HookedSpecification {
     entries(2).date mustEqual dateAt(2016, April, 7)
   }
 
-  "Logged TransactionGroup contains all relevant info" in new WithApplication(fakeApplication) {
+  "Logged TransactionGroup contains all relevant info" in new WithApplication {
     // add logs
     Clock.setTimeForTest(dateAt(2016, April, 1))
     val transGrp = TransactionGroups.all.save(TransactionGroup())
@@ -81,7 +81,7 @@ class UpdateLogTest extends HookedSpecification {
     change must contain("2016")
   }
 
-  "Logged BalanceCheck contains all relevant info" in new WithApplication(fakeApplication) {
+  "Logged BalanceCheck contains all relevant info" in new WithApplication {
     // add logs
     Clock.setTimeForTest(dateAt(2016, April, 1))
     UpdateLogs.addLog(testUser, UpdateLogs.AddNew, balanceCheck(8788))

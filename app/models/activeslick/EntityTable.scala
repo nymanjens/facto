@@ -1,6 +1,6 @@
 package models.activeslick
 
-import slick.driver.H2Driver.api._
+import models.SlickUtils.dbApi._
 
 /** Table extension to be used with a Model that has an Id. */
 abstract class EntityTable[M <: Identifiable[M]](tag: Tag, schemaName: Option[String], tableName: String)(implicit val colType: BaseColumnType[Long])

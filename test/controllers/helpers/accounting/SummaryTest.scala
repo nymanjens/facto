@@ -26,7 +26,7 @@ class SummaryTest extends HookedSpecification {
   override def afterAll = Clock.cleanupAfterTest
 
   "Summary.fetchSummary()" should {
-    "combine transactions in same month and category" in new WithApplication(fakeApplication) {
+    "combine transactions in same month and category" in new WithApplication {
       val trans1 = persistTransaction(groupId = 1, flow = Money(200), date = dateAt(2009, February, 2))
       val trans2 = persistTransaction(groupId = 1, flow = Money(201), date = dateAt(2009, February, 20))
       val trans3 = persistTransaction(groupId = 1, flow = Money(202), date = dateAt(2009, March, 1))
@@ -40,7 +40,7 @@ class SummaryTest extends HookedSpecification {
       }
     }
 
-    "caculate monthRangeForAverages" in new WithApplication(fakeApplication) {
+    "caculate monthRangeForAverages" in new WithApplication {
       persistTransaction(groupId = 1, flow = Money(200), date = dateAt(2009, February, 2))
       persistTransaction(groupId = 1, flow = Money(201), date = dateAt(2009, February, 20))
       persistTransaction(groupId = 1, flow = Money(202), date = dateAt(2009, March, 1))
@@ -51,12 +51,12 @@ class SummaryTest extends HookedSpecification {
       summary.monthRangeForAverages shouldEqual MonthRange(dateAt(2009, February, 1), dateAt(2010, April, 1))
     }
 
-    "return successfully when there are no transactions" in new WithApplication(fakeApplication) {
+    "return successfully when there are no transactions" in new WithApplication {
       val summary = Summary.fetchSummary(testAccount, 2009)
       summary.totalRowTitles must not(beEmpty)
     }
 
-    "ignore the current and future months when calculating the averages" in new WithApplication(fakeApplication) {
+    "ignore the current and future months when calculating the averages" in new WithApplication {
       persistTransaction(groupId = 1, flow = Money(999), date = dateAt(2009, April, 2))
       persistTransaction(groupId = 1, flow = Money(100), date = dateAt(2010, February, 2))
       persistTransaction(groupId = 1, flow = Money(112), date = dateAt(2010, March, 2))
@@ -71,7 +71,7 @@ class SummaryTest extends HookedSpecification {
     }
 
 
-    "ignore the pre-facto months when calculating the averages" in new WithApplication(fakeApplication) {
+    "ignore the pre-facto months when calculating the averages" in new WithApplication {
       persistTransaction(groupId = 1, flow = Money(100), date = dateAt(2010, February, 2))
       persistTransaction(groupId = 1, flow = Money(112), date = dateAt(2010, March, 2))
       persistTransaction(groupId = 1, flow = Money(120), date = dateAt(2010, April, 2))
@@ -82,7 +82,7 @@ class SummaryTest extends HookedSpecification {
       summary.monthRangeForAverages shouldEqual MonthRange(dateAt(2010, February, 1), dateAt(2010, April, 1))
     }
 
-    "calculates totals" in new WithApplication(fakeApplication) {
+    "calculates totals" in new WithApplication {
       persistTransaction(groupId = 1, flow = Money(3), date = dateAt(2010, January, 2), category = testCategoryA)
       persistTransaction(groupId = 1, flow = Money(100), date = dateAt(2010, February, 2), category = testCategoryA)
       persistTransaction(groupId = 1, flow = Money(102), date = dateAt(2010, February, 2), category = testCategoryB)
@@ -99,6 +99,15 @@ class SummaryTest extends HookedSpecification {
       totalRows(1).yearlyAverage mustEqual Money(34)
 
       summary.totalRowTitles mustEqual Seq(Html("<b>Total</b>"), Html("<b>Total</b> (without catA)"))
+    }
+
+    "prunes unused categories" in new WithApplication {
+      persistTransaction(groupId = 1, flow = Money(3), date = dateAt(2010, January, 2), category = testCategoryA)
+
+      val summary = Summary.fetchSummary(testAccount, 2010)
+
+      summary.categories must contain(testCategoryA)
+      summary.categories must not(contain(testCategoryB))
     }
   }
 

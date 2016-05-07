@@ -9,22 +9,23 @@ import play.api.Logger
 
 import com.google.common.base.Splitter
 import org.joda.time.DateTime
-import slick.driver.H2Driver.api._
+import models.SlickUtils.dbApi._
 
-import models.ModelUtils.dbRun
+import models.SlickUtils.dbRun
 import models.Users
 import models.accounting.{BalanceCheck, Money, Transaction, TransactionGroup, UpdateLogs, BalanceChecks, TransactionGroups, Transactions}
 
 
 object CsvImportTool {
 
-  def importTransactions(csvFilePath: Path):Unit = {
+  def importTransactions(csvFilePath: Path): Unit = {
     // example of line: "2 :: Common :: LIFE :: CARD_COMMON :: imperdiet Duis  :: -25.04 :: 1425855600 :: 0 :: 1425934823"
     val lines = for (line <- Source.fromFile(csvFilePath.toFile).getLines() if (!line.trim.isEmpty)) yield line.trim
     for (line <- lines) {
       val parts = Splitter.on(" :: ").trimResults().split(line).asScala.toList
       parts match {
-        case List(issuerId, beneficiaryAccountCode, categoryCode, moneyReservoirCode, description, flowAsFloat, transactionDateStamp, consumedDateStamp, createdDateStamp) =>
+        case List(issuerId, beneficiaryAccountCode, categoryCode, moneyReservoirCode, description, flowAsFloat,
+        transactionDateStamp, consumedDateStamp, createdDateStamp) =>
           val group = TransactionGroups.all.save(TransactionGroup())
           Transactions.all.save(Transaction(
             transactionGroupId = group.id.get,
@@ -42,7 +43,7 @@ object CsvImportTool {
     }
   }
 
-  def importBalanceChecks(csvFilePath: Path):Unit = {
+  def importBalanceChecks(csvFilePath: Path): Unit = {
     // example of line: "2 :: CASH_COMMON :: 40.58 :: 1426287600 :: 1426357095"
     val lines = for (line <- Source.fromFile(csvFilePath.toFile).getLines() if (!line.trim.isEmpty)) yield line.trim
     for (line <- lines) {

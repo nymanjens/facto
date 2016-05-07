@@ -1,9 +1,9 @@
 package models.activeslick
 
-import slick.driver.H2Driver.api._
+import models.SlickUtils.dbApi._
 import scala.language.implicitConversions
 import scala.util.{Success, Failure, Try}
-import models.ModelUtils.dbRun
+import models.SlickUtils.dbRun
 
 class EntityTableQuery[M <: Identifiable[M], T <: EntityTable[M]](cons: Tag => T) extends TableQuery(cons) {
 
@@ -41,9 +41,13 @@ class EntityTableQuery[M <: Identifiable[M], T <: EntityTable[M]](cons: Tag => T
 
     val affectedRows = query
 
-    if (affectedRows == 1) Success(Unit)
-    else if (affectedRows == 0) Failure(NoRowsAffectedException)
-    else Failure(ManyRowsAffectedException(affectedRows))
+    if (affectedRows == 1) {
+      Success(Unit)
+    } else if (affectedRows == 0) {
+      Failure(NoRowsAffectedException)
+    } else {
+      Failure(ManyRowsAffectedException(affectedRows))
+    }
 
   }
 

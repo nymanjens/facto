@@ -3,12 +3,12 @@ package models.accounting
 import collection.immutable.Seq
 
 import org.joda.time.DateTime
-import slick.driver.H2Driver.api._
+import models.SlickUtils.dbApi._
 
 import common.Clock
 import common.ScalaUtils.objectName
 import models.{User, Users}
-import models.ModelUtils.{JodaToSqlDateMapper, dbRun}
+import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
 import models.accounting.config.Config
 import models.accounting.config.{Category, Account, MoneyReservoir}
 import models.activeslick._
@@ -31,7 +31,7 @@ class UpdateLogs(tag: Tag) extends EntityTable[UpdateLog](tag, "UPDATE_LOGS") {
   def change = column[String]("change")
   def date = column[DateTime]("date")
 
-  def * = (userId, change, date, id.?) <>(UpdateLog.tupled, UpdateLog.unapply)
+  override def * = (userId, change, date, id.?) <>(UpdateLog.tupled, UpdateLog.unapply)
 }
 
 object UpdateLogs {

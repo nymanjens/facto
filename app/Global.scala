@@ -19,6 +19,24 @@ object Global extends GlobalSettings {
   override def onStart(app: Application): Unit = {
     implicit val _ = app
 
+    processFlags()
+
+    if (Set(Mode.Test, Mode.Dev) contains app.mode) {
+      if (AppConfigHelper.dropAndCreateNewDb) {
+        dropAndCreateNewDb()
+      }
+      if (AppConfigHelper.loadDummyUsers) {
+        loadDummyUsers()
+      }
+      if (AppConfigHelper.loadCsvDummyData) {
+        loadCsvDummyData(AppConfigHelper.csvDummyDataFolder)
+      } else if (AppConfigHelper.loadFactoV1Data) {
+        FactoV1ImportTool.importFromSqlDump(AppConfigHelper.factoV1SqlFilePath)
+      }
+    }
+  }
+
+  private def processFlags()(implicit app: Application) = {
     if (CommandLineFlags.dropAndCreateNewDb()) {
       println("")
       println("  Dropping the database tables (if present) and creating new ones...")
@@ -38,36 +56,17 @@ object Global extends GlobalSettings {
 
       System.exit(0)
     }
-
-    app.mode match {
-      case Mode.Dev =>
-        dropAndCreateNewDb()
-        if (AppConfigHelper.loadCsvTestData) {
-          populateDbWithCsvTestData(AppConfigHelper.csvTestDataFolder)
-        } else if (AppConfigHelper.loadFactoV1Data) {
-          FactoV1ImportTool.importFromSqlDump(AppConfigHelper.factoV1SqlFilePath)
-        }
-
-      case Mode.Test =>
-        dropAndCreateNewDb()
-    }
   }
 
-  private def populateDbWithCsvTestData(csvDataFolder: Path) = {
-    Logger.debug("Populating tables...")
-
-    // populate users
+  private def loadDummyUsers() = {
     Users.all.save(Users.newWithUnhashedPw(loginName = "admin", password = "a", name = "Admin"))
     Users.all.save(Users.newWithUnhashedPw(loginName = "alice", password = "a", name = "Alice"))
     Users.all.save(Users.newWithUnhashedPw(loginName = "bob", password = "b", name = "Bob"))
+  }
 
-    // populate transactions
+  private def loadCsvDummyData(csvDataFolder: Path) = {
     CsvImportTool.importTransactions(assertExists(csvDataFolder resolve "transactions.csv"))
-
-    // populate BalanceChecks
     CsvImportTool.importBalanceChecks(assertExists(csvDataFolder resolve "balancechecks.csv"))
-
-    Logger.debug(" done")
   }
 
   private def assertExists(path: Path): Path = {
@@ -88,18 +87,18 @@ object Global extends GlobalSettings {
   }
 
   private object AppConfigHelper {
-    def loadCsvTestData(implicit app: Application): Boolean =
-      app.configuration.getBoolean("facto.development.loadCsvTestData") getOrElse false
+    def dropAndCreateNewDb(implicit app: Application): Boolean = getBoolean("facto.development.dropAndCreateNewDb")
+    def loadDummyUsers(implicit app: Application):     Boolean = getBoolean("facto.development.loadDummyUsers")
+    def loadCsvDummyData(implicit app: Application):   Boolean = getBoolean("facto.development.loadCsvDummyData")
+    def csvDummyDataFolder(implicit app: Application): Path =    getExistingPath("facto.development.csvDummyDataFolder")
+    def loadFactoV1Data(implicit app: Application):    Boolean = getBoolean("facto.development.loadFactoV1Data")
+    def factoV1SqlFilePath(implicit app: Application): Path =    getExistingPath("facto.development.factoV1SqlFilePath")
 
-    def csvTestDataFolder(implicit app: Application): Path = assertExists {
-      Paths.get(app.configuration.getString("facto.development.csvTestDataFolder").get)
-    }
+    private def getBoolean(cfgPath: String)(implicit app: Application): Boolean =
+      app.configuration.getBoolean(cfgPath) getOrElse false
 
-    def loadFactoV1Data(implicit app: Application): Boolean =
-      app.configuration.getBoolean("facto.development.loadFactoV1Data") getOrElse false
-
-    def factoV1SqlFilePath(implicit app: Application): Path = assertExists {
-      Paths.get(app.configuration.getString("facto.development.factoV1SqlFilePath").get)
+    private def getExistingPath(cfgPath: String)(implicit app: Application): Path = assertExists {
+      Paths.get(app.configuration.getString(cfgPath).get)
     }
   }
 }

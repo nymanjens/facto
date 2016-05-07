@@ -14,31 +14,31 @@ import models._
 @RunWith(classOf[JUnitRunner])
 class ConfigTest extends Specification {
 
-  "test configuration parsing" in new WithApplication(fakeApplication) {
+  "test configuration parsing" in new WithApplication {
+    // create test users
+    val userA = Users.all.save(Users.newWithUnhashedPw(loginName = "a", password = "pw", name = "Test User A"))
+    val userB = Users.all.save(Users.newWithUnhashedPw(loginName = "b", password = "pw", name = "Test User B"))
+    val userOther = Users.all.save(Users.newWithUnhashedPw(loginName = "other", password = "other", name = "Other"))
 
     // check keys
     Config.accounts.keys.toList must beEqualTo(List("ACC_COMMON", "ACC_A", "ACC_B"))
     Config.categories.keys.toList must beEqualTo(List("CAT_B", "CAT_A"))
-    Config.moneyReservoirs.keys.toList must beEqualTo(List("CASH_COMMON", "CARD_COMMON", "CASH_A", "CARD_A", "CASH_B", "CARD_B"))
+    Config.visibleReservoirs.map(_.code) must beEqualTo(List("CASH_COMMON", "CARD_COMMON", "CASH_A", "CARD_A", "CASH_B", "CARD_B"))
 
     // check content by samples
     Config.accounts("ACC_A").code must beEqualTo("ACC_A")
     Config.accounts("ACC_A").longName must beEqualTo("Account A")
     Config.accounts("ACC_A").categories must beEqualTo(List(Config.categories("CAT_A"), Config.categories("CAT_B")))
-    Config.accounts("ACC_A").userLoginName must beEqualTo(Some("a"))
-    Config.accounts("ACC_COMMON").userLoginName must beEqualTo(None)
+    Config.accounts("ACC_A").user mustEqual Some(userA)
+    Config.accounts("ACC_COMMON").user mustEqual None
 
     // check defaults
-    Config.moneyReservoirs("DOESNT_EXIST").owner.code must beEqualTo("UNKNOWN")
+    Config.moneyReservoir("DOESNT_EXIST").owner.code must beEqualTo("UNKNOWN")
 
     // check common account
     Config.constants.commonAccount must beEqualTo(Config.accounts("ACC_COMMON"))
 
     // check accountOf()
-    val userA = Users.all.save(Users.newWithUnhashedPw(loginName = "a", password = "a", name = "A"))
-    // make sure all required users exist
-    val userB = Users.all.save(Users.newWithUnhashedPw(loginName = "b", password = "b", name = "B"))
-    val userOther = Users.all.save(Users.newWithUnhashedPw(loginName = "other", password = "other", name = "Other"))
     Config.accountOf(userA) must beEqualTo(Some(Config.accounts("ACC_A")))
     Config.accountOf(userB) must beEqualTo(Some(Config.accounts("ACC_B")))
     Config.accountOf(userOther) must beEqualTo(None)
@@ -50,7 +50,7 @@ class ConfigTest extends Specification {
   }
 
 
-  "test Config.personallySortedAccounts()" in new WithApplication(fakeApplication) {
+  "test Config.personallySortedAccounts()" in new WithApplication {
 
     // get vars
     val accCommon = Config.constants.commonAccount

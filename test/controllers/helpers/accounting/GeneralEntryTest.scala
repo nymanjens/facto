@@ -17,7 +17,7 @@ import common.testing.TestUtils._
 @RunWith(classOf[JUnitRunner])
 class GeneralEntryTest extends Specification {
 
-  "fetchLastNEntries()" in new WithApplication(fakeApplication) {
+  "fetchLastNEntries()" in new WithApplication {
     // Get and persist dummy transactions
     val trans1 = persistTransaction(groupId = 1, flow = Money(200), timestamp = 1000)
     val trans2 = persistTransaction(groupId = 2, flow = Money(300), timestamp = 1020)
@@ -45,7 +45,7 @@ class GeneralEntryTest extends Specification {
     GeneralEntry.fetchLastNEntries(n = 1000) mustEqual expectedEntries
   }
 
-  "fetchLastNEndowments()" in new WithApplication(fakeApplication) {
+  "fetchLastNEndowments()" in new WithApplication {
     // Get and persist dummy transactions
     // Irrelevant transactions (should be ignored)
     persistTransaction(groupId = 91, account = testAccountB)

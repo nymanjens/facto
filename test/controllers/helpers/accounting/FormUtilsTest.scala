@@ -18,7 +18,7 @@ import models.accounting.config.{MoneyReservoir, Account}
 @RunWith(classOf[JUnitRunner])
 class FormUtilsTest extends Specification {
 
-  "validFlowAsFloat" in {
+  "validFlowAsFloat" in new WithApplication {
     val constraint = FormUtils.validFlowAsFloat
     
     constraint("abc") mustNotEqual Valid
@@ -27,7 +27,7 @@ class FormUtilsTest extends Specification {
     constraint("123.44") mustEqual Valid
   }
 
-  "flowAsFloatStringToMoney" in new WithApplication(fakeApplication) {
+  "flowAsFloatStringToMoney" in new WithApplication {
     FormUtils.flowAsFloatStringToMoney("123.44") mustEqual Money(12344)
   }
 }

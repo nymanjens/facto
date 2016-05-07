@@ -3,8 +3,8 @@ package models
 import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
 import models.activeslick._
-import slick.driver.H2Driver.api._
-import ModelUtils.dbRun
+import models.SlickUtils.dbApi._
+import SlickUtils.dbRun
 
 case class User(loginName: String,
                 passwordHash: String,
@@ -25,7 +25,7 @@ class Users(tag: Tag) extends EntityTable[User](tag, "USERS") {
 
   def name = column[String]("name")
 
-  def * = (loginName, passwordHash, name, id.?) <>(User.tupled, User.unapply)
+  override def * = (loginName, passwordHash, name, id.?) <>(User.tupled, User.unapply)
 }
 
 object Users {

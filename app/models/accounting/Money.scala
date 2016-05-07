@@ -1,8 +1,10 @@
 package models.accounting
 
-import java.lang.Math.{abs, round}
-
 import scala.collection.JavaConverters._
+
+import java.lang.Math.{abs, round}
+import java.text.NumberFormat
+import java.util.Locale
 
 import play.twirl.api.Html
 
@@ -27,10 +29,12 @@ case class Money(cents: Long, currency: CurrencyUnit = CurrencyUnit.default) {
 
   def formatFloat: String = {
     val sign = if (cents < 0) "-" else ""
-    "%s%d.%02d".format(sign, abs(cents) / 100, abs(cents % 100))
+    val integerPart = NumberFormat.getNumberInstance(Locale.US).format(abs(cents) / 100)
+    val centsPart = abs(cents % 100)
+    "%s%s.%02d".format(sign, integerPart, centsPart)
   }
 
-  override def toString: String = s"${currency.threeLetterSymbol} $formatFloat"
+  override def toString = s"${currency.threeLetterSymbol} $formatFloat"
 
   private def doCentOperation[T](operation: (Long, Long) => T)(that: Money): T = {
     require(this.currency == that.currency)

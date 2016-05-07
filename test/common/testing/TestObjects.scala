@@ -19,10 +19,10 @@ object TestObjects {
   def testCategoryB: Category = Config.categories("CAT_B")
   def testCategory: Category = testCategoryA
 
-  def testReservoirOfAccountA: MoneyReservoir = Config.moneyReservoirs("CASH_A")
-  def testReservoirOfAccountB: MoneyReservoir = Config.moneyReservoirs("CASH_B")
-  def testReservoir: MoneyReservoir = Config.moneyReservoirs("CASH_COMMON")
-  def otherTestReservoir: MoneyReservoir = Config.moneyReservoirs("CARD_COMMON")
+  def testReservoirOfAccountA: MoneyReservoir = Config.moneyReservoir("CASH_A")
+  def testReservoirOfAccountB: MoneyReservoir = Config.moneyReservoir("CASH_B")
+  def testReservoir: MoneyReservoir = Config.moneyReservoir("CASH_COMMON")
+  def otherTestReservoir: MoneyReservoir = Config.moneyReservoir("CARD_COMMON")
 
   def testUser: User = {
     val loginName = "testUser"

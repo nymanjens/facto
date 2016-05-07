@@ -41,8 +41,8 @@
         </th>
       } { (entry, _) =>  @* table datas *@
         <td>@entry.transactionDates.map(formatDate).mkString(", ")</td>
-        <td>@entry.beneficiaries.map(_.longName).mkString(", ")</td>
-        <td>@entry.moneyReservoirs.map(_.name).mkString(", ")</td>
+        <td>@entry.beneficiaries.map(_.shorterName).mkString(", ")</td>
+        <td>@entry.moneyReservoirs.map(_.shorterName).mkString(", ")</td>
         <td>@entry.categories.map(_.name).mkString(", ")</td>
         <td>@DescriptionWithEntryCount(entry)</td>
         <td>@entry.flow.formatFloat</td>

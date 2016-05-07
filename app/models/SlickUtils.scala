@@ -1,14 +1,19 @@
 package models
 
-import models.accounting.Money
-import slick.driver.H2Driver.api._
-
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-object ModelUtils {
+import slick.backend.DatabaseConfig
+import slick.driver.JdbcDriver
+
+import models.accounting.Money
+
+object SlickUtils {
 
   // ********** db helpers ********** //
+  val dbConfig: DatabaseConfig[JdbcDriver] = DatabaseConfig.forConfig("db.default.slick")
+  val dbApi = dbConfig.driver.api
+  import dbApi._
   val database = Database.forConfig("db.default")
 
   def dbRun[T](query: DBIO[T]): T = {

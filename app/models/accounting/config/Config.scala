@@ -11,10 +11,12 @@ import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor
 import org.yaml.snakeyaml.introspector.BeanAccess
 
 import models.User
+import models.accounting.config.MoneyReservoir.NullMoneyReservoir
 
 case class Config(accounts: Map[String, Account],
                   categories: Map[String, Category],
                   moneyReservoirs: Map[String, MoneyReservoir],
+                  templates: Seq[Template],
                   constants: Constants) {
   requireNonNullFields(this)
 }
@@ -42,8 +44,22 @@ object Config {
   val accounts: Map[String, Account] = loadedConfig.accounts
   /** Maps code to category */
   val categories: Map[String, Category] = loadedConfig.categories
-  /** Maps code to reservoir */
-  val moneyReservoirs: Map[String, MoneyReservoir] = loadedConfig.moneyReservoirs
+
+  // Not exposing moneyReservoirs because it's too easy to accidentally show hidden reservoirs
+  def moneyReservoir(code: String): MoneyReservoir = loadedConfig.moneyReservoirs(code)
+  def moneyReservoirOption(code: String): Option[MoneyReservoir] = loadedConfig.moneyReservoirs.get(code)
+
+  val visibleReservoirs: Seq[MoneyReservoir] = loadedConfig.moneyReservoirs.values.filter(!_.hidden).toVector
+  def visibleReservoirs(includeNullReservoir: Boolean = false): Seq[MoneyReservoir] = {
+    if (includeNullReservoir) {
+      visibleReservoirs ++ Seq(NullMoneyReservoir)
+    } else {
+      visibleReservoirs
+    }
+  }
+
+  def templatesToShowFor(location: Template.Placement, user: User): Seq[Template] =
+    loadedConfig.templates filter (_.showFor(location, user))
 
   val constants: Constants = loadedConfig.constants
 

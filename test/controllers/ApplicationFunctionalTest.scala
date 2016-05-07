@@ -17,7 +17,7 @@ import models.accounting.config.{MoneyReservoir, Account}
 // TODO: Get this to work.
 class ApplicationFunctionalTest extends PlaySpecification {
 
-  //  "index" in new WithApplication(fakeApplication) {
+  //  "index" in new WithApplication {
   //    val action: EssentialAction = Auth.login
   //
   //    val request = FakeRequest(Helpers.POST, controllers.routes.Auth.login().url, FakeHeaders(), """ {"name": "New Group", "collabs": ["foo", "asdf"]} """)
@@ -29,7 +29,7 @@ class ApplicationFunctionalTest extends PlaySpecification {
   //    contentAsString(result) mustEqual "value"
   //  }
 
-//  "index try 2" in new WithApplication(fakeApplication) {
+//  "index try 2" in new WithApplication {
 //    val fakeRequest = FakeRequest(Helpers.POST, controllers.routes.Auth.login().url, FakeHeaders(), """ {"name": "New Group", "collabs": ["foo", "asdf"]} """)
 //
 //    val result = route(fakeRequest.withCookies(Cookie("myMemberId", "d"))).get

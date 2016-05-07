@@ -13,7 +13,7 @@ case class Account(code: String,
                    longName: String,
                    shorterName: String,
                    veryShortName: String,
-                   userLoginName: Option[String] = None,
+                   private val userLoginName: Option[String] = None,
                    categories: Seq[Category] = Nil,
                    summaryTotalRows: Seq[SummaryTotalRowDef] = Nil) {
   requireNonNullFields(this)
@@ -28,9 +28,9 @@ case class Account(code: String,
     }
   }
 
-  def reservoirs: Seq[MoneyReservoir] = Config.moneyReservoirs.values.filter(_.owner == this).toList
+  def visibleReservoirs: Seq[MoneyReservoir] = Config.visibleReservoirs.filter(_.owner == this).toList
 
-  def isMineOrCommon(implicit user: User) = Set(Config.accountOf(user), Some(Config.constants.commonAccount)).flatten.contains(this)
+  def isMineOrCommon(implicit user: User): Boolean = Set(Config.accountOf(user), Some(Config.constants.commonAccount)).flatten.contains(this)
 }
 
 object Account {

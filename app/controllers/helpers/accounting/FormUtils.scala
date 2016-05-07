@@ -11,9 +11,9 @@ import models.accounting.config.Config
 
 object FormUtils {
 
-  def validMoneyReservoir: Constraint[String] = oneOf(Config.moneyReservoirs.values.map(_.code))
+  def validMoneyReservoir: Constraint[String] = oneOf(Config.visibleReservoirs.map(_.code))
 
-  def validMoneyReservoirOrEmpty: Constraint[String] = oneOf(Config.moneyReservoirs.values.map(_.code) ++ Seq(""))
+  def validMoneyReservoirOrNullReservoir: Constraint[String] = oneOf(Config.visibleReservoirs(includeNullReservoir = true).map(_.code))
 
   def validAccountCode: Constraint[String] = oneOf(Config.accounts.values.map(_.code))
 
@@ -33,10 +33,11 @@ object FormUtils {
 
   private def oneOf(options: Iterable[String]) = Constraint[String]("error.invalid")({
     input =>
-      if (options.toSet.contains(input))
+      if (options.toSet.contains(input)) {
         Valid
-      else
+      } else {
         invalidWithMessageCode("error.invalid")
+      }
   })
 
   private val flowAsFloatRegex: Regex = """[\-+]{0,1}\d+[\.,]{0,1}\d{0,2}""".r

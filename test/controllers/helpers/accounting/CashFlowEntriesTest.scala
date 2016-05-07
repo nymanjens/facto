@@ -10,7 +10,7 @@ import play.api.test._
 import play.api.test.Helpers._
 import models._
 import models.accounting._
-import slick.driver.H2Driver.api._
+import models.SlickUtils.dbApi._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.collection.immutable.Stack
 import scala.util.Random
@@ -25,7 +25,7 @@ import models.accounting.config.Account
 @RunWith(classOf[JUnitRunner])
 class CashFlowEntriesTest extends Specification {
 
-  "CashFlowEntry.fetchLastNEntries()" in new WithApplication(fakeApplication) {
+  "CashFlowEntry.fetchLastNEntries()" in new WithApplication {
     // get and persist dummy transactions/BCs
     val trans1 = persistTransaction(groupId = 1, flow = Money(200), timestamp = 1000)
     val bc1 = persistBalanceCheck(balance = Money(20), timestamp = 1010)
@@ -66,16 +66,17 @@ class CashFlowEntriesTest extends Specification {
     CashFlowEntry.fetchLastNEntries(testReservoir, n = 1000) mustEqual expectedEntries
   }
 
-  "CashFlowEntry.fetchLastNEntries() with large database" in new WithApplication(fakeApplication) {
-    // get and persist dummy transactions/BCs
-    for (i <- 1 to 20 * 1000) {
-      //if (i % 1000 == 0) println(s"Persisting entries... (persisted $i)")
-      persistTransaction(groupId = i, flow = Money(Random.nextInt), timestamp = i)
-      persistBalanceCheck(balance = Money(Random.nextInt), timestamp = i)
-    }
-
-    CashFlowEntry.fetchLastNEntries(testReservoir, n = 4000) must haveSize(4000)
-    CashFlowEntry.fetchLastNEntries(testReservoir, n = 15 * 1000) must haveSize(15 * 1000)
-    CashFlowEntry.fetchLastNEntries(testReservoir, n = 35 * 1000) must haveSize(35 * 1000)
-  }
+  // TODO: Re-enable this relatively slow test
+//  "CashFlowEntry.fetchLastNEntries() with large database" in new WithApplication {
+//    // get and persist dummy transactions/BCs
+//    for (i <- 1 to 20 * 1000) {
+//      //if (i % 1000 == 0) println(s"Persisting entries... (persisted $i)")
+//      persistTransaction(groupId = i, flow = Money(Random.nextInt), timestamp = i)
+//      persistBalanceCheck(balance = Money(Random.nextInt), timestamp = i)
+//    }
+//
+//    CashFlowEntry.fetchLastNEntries(testReservoir, n = 4000) must haveSize(4000)
+//    CashFlowEntry.fetchLastNEntries(testReservoir, n = 15 * 1000) must haveSize(15 * 1000)
+//    CashFlowEntry.fetchLastNEntries(testReservoir, n = 35 * 1000) must haveSize(35 * 1000)
+//  }
 }

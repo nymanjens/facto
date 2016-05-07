@@ -26,8 +26,8 @@
       entries = entries.reverse.take(numEntriesToShow)
     ) { @* table headers *@
       <th>Issuer</th>
-      <th>Consumed</th>
       <th>Payed</th>
+      <th>Consumed</th>
       <th>Beneficiary</th>
       <th>Payed with/to</th>
       <th>Category</th>
@@ -36,10 +36,10 @@
       <th>&nbsp;</th>
     } { (entry, _) =>  @* table datas *@
       <td>@entry.issuer.name</td>
-      <td>@entry.consumedDates.map(formatDate).mkString(", ")</td>
       <td>@entry.transactionDates.map(formatDate).mkString(", ")</td>
-      <td>@entry.beneficiaries.map(_.longName).mkString(", ")</td>
-      <td>@entry.moneyReservoirs.map(_.name).mkString(", ")</td>
+      <td>@entry.consumedDates.map(formatDate).mkString(", ")</td>
+      <td>@entry.beneficiaries.map(_.shorterName).mkString(", ")</td>
+      <td>@entry.moneyReservoirs.map(_.shorterName).mkString(", ")</td>
       <td>@entry.categories.map(_.name).mkString(", ")</td>
       <td>@DescriptionWithEntryCount(entry)</td>
       <td>@entry.flow.formatFloat</td>

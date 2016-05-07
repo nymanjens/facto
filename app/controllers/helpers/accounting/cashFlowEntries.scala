@@ -4,9 +4,9 @@ import collection.immutable.Seq
 
 import org.joda.time.DateTime
 import com.github.nscala_time.time.Imports._
-import slick.driver.H2Driver.api._
+import models.SlickUtils.dbApi._
 
-import models.ModelUtils.{dbRun, JodaToSqlDateMapper}
+import models.SlickUtils.{dbRun, JodaToSqlDateMapper}
 import models.accounting._
 import models.accounting.config.{Account, MoneyReservoir, Category}
 

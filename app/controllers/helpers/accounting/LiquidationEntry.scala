@@ -2,10 +2,10 @@ package controllers.helpers.accounting
 
 import collection.immutable.Seq
 
-import models.ModelUtils.{JodaToSqlDateMapper, dbRun}
+import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
 import models.accounting.{Transaction, Transactions, Money}
 import models.accounting.config.{Account, MoneyReservoir, Category}
-import slick.driver.H2Driver.api._
+import models.SlickUtils.dbApi._
 
 /**
   * @param debt The debt of the first account to the second (may be negative).

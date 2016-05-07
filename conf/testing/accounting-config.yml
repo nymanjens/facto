@@ -1,15 +1,15 @@
 !!models.accounting.config.Parsable$Config
 categories:
-  - &catB !!models.accounting.config.Parsable$Category
+  - &catB
     code: CAT_B
     name: "Category B"
     helpText: "b-help"
-  - &catA !!models.accounting.config.Parsable$Category
+  - &catA
     code: CAT_A
     name: "Category A"
 
 accounts:
-  - &accCommon !!models.accounting.config.Parsable$Account
+  - &accCommon
     code: ACC_COMMON
     longName: Account Common
     shorterName: Acc.Common
@@ -17,7 +17,7 @@ accounts:
     categories:
       - *catA
       - *catB
-  - &accA !!models.accounting.config.Parsable$Account
+  - &accA
     code: ACC_A
     longName: Account A
     shorterName: Acc.A
@@ -31,7 +31,7 @@ accounts:
         categoriesToIgnore: []
       - rowTitleHtml: <b>Total</b> (without catA)
         categoriesToIgnore: [*catA]
-  - &accB !!models.accounting.config.Parsable$Account
+  - &accB
     code: ACC_B
     longName: Account B
     shorterName: Acc.B
@@ -41,32 +41,51 @@ accounts:
       - *catB
 
 moneyReservoirs:
-  - &reservoirCashCommon !!models.accounting.config.Parsable$MoneyReservoir
+  - &reservoirCashCommon
     code: CASH_COMMON
     name: Cash Common
     owner: *accCommon
-  - &reservoirCardCommon !!models.accounting.config.Parsable$MoneyReservoir
+  - &reservoirCardCommon
     code: CARD_COMMON
     name: Card Common
     owner: *accCommon
-  - &reservoirCashA !!models.accounting.config.Parsable$MoneyReservoir
+  - &reservoirCashA
     code: CASH_A
     name: Cash A
     owner: *accA
-  - &reservoirCardA !!models.accounting.config.Parsable$MoneyReservoir
+  - &reservoirCardA
     code: CARD_A
     name: Card A
     owner: *accA
-  - &reservoirCashB !!models.accounting.config.Parsable$MoneyReservoir
+  - &reservoirCashB
     code: CASH_B
     name: Cash B
     owner: *accB
-  - &reservoirCardB !!models.accounting.config.Parsable$MoneyReservoir
+  - &reservoirCardB
     code: CARD_B
     name: Card B
     owner: *accB
+  - &reservoirHidden
+    code: HIDDEN
+    name: Card B
+    owner: *accB
+    hidden: true
 
-constants: !!models.accounting.config.Parsable$Constants
+templates:
+  - name: New Endowment
+    placement: [ENDOWMENTS]
+    zeroSum: true
+    transactions:
+      - beneficiaryCode: ACC_COMMON
+        moneyReservoirCode: "" # N/A
+        categoryCode: CAT_A
+        description: Endowment for ${account.longName}
+      - beneficiaryCode: ${account.code}
+        moneyReservoirCode: "" # N/A
+        categoryCode: CAT_A
+        description: Endowment for ${account.longName}
+
+constants:
     commonAccount: *accCommon
     accountingCategory: *catA
     endowmentCategory: *catB

@@ -1,5 +1,8 @@
 package controllers.accounting
 
+import scala.collection.{Seq => MutableSeq}
+import scala.collection.immutable.Seq
+
 import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation.{Constraint, Valid, Invalid, ValidationError}
@@ -15,17 +18,17 @@ import org.joda.time.DateTime
 import common.Clock
 import common.CollectionUtils
 import models.User
-import models.accounting.{Transaction, Transactions, TransactionGroup, TransactionGroups, Money, UpdateLogs}
+import models.accounting.{Transaction, Transactions, TransactionPartial, TransactionGroup, TransactionGroupPartial, TransactionGroups, Money, UpdateLogs}
 import models.accounting.config.Config
 import models.accounting.config.{Account, MoneyReservoir, Category}
 import controllers.Secured
 import controllers.helpers.accounting.CashFlowEntry
-import controllers.helpers.accounting.FormUtils.{validMoneyReservoirOrEmpty, validAccountCode, validCategoryCode, validFlowAsFloat, flowAsFloatStringToMoney, invalidWithMessageCode}
+import controllers.helpers.accounting.FormUtils.{validMoneyReservoirOrNullReservoir, validAccountCode, validCategoryCode, validFlowAsFloat, flowAsFloatStringToMoney, invalidWithMessageCode}
 
 object TransactionGroupOperations extends Controller with Secured {
 
   // ********** actions ********** //
-  def addNewForm(redirectTo: String) = addNewFormFromTemplate(TransactionTemplate.from(), redirectTo)
+  def addNewForm(redirectTo: String) = addNewFormFromPartial(TransactionPartial.from(), redirectTo)
 
   def editForm(transGroupId: Long, redirectTo: String) = ActionWithUser { implicit user =>
     implicit request =>
@@ -64,42 +67,42 @@ object TransactionGroupOperations extends Controller with Secured {
       val account1 = Config.accounts(accountCode1)
       val account2 = Config.accounts(accountCode2)
       def electronicReservoir(account: Account) = Config.constants.defaultElectronicMoneyReservoirByAccount(account)
-      addNewFormFromTemplate(templates = Seq(
-        TransactionTemplate.from(
+      addNewFormFromPartial(TransactionGroupPartial(Seq(
+        TransactionPartial.from(
           beneficiary = account1,
           moneyReservoir = electronicReservoir(account1),
           category = Config.constants.accountingCategory,
           description = Config.constants.liquidationDescription,
           flow = amount.negated),
-        TransactionTemplate.from(
+        TransactionPartial.from(
           beneficiary = account1,
           moneyReservoir = electronicReservoir(account2),
           category = Config.constants.accountingCategory,
           description = Config.constants.liquidationDescription,
           flow = amount)),
-        redirectTo,
-        zeroSum = true)
+        zeroSum = true
+      ),
+        redirectTo)
     }
   }
 
   // ********** private helper controllers ********** //
-  private def addNewFormFromTemplate(template: TransactionTemplate, redirectTo: String): EssentialAction =
-    addNewFormFromTemplate(Seq(template), redirectTo)
+  private def addNewFormFromPartial(partial: TransactionPartial, redirectTo: String): EssentialAction =
+    addNewFormFromPartial(TransactionGroupPartial(Seq(partial)), redirectTo)
 
-  private def addNewFormFromTemplate(templates: Seq[TransactionTemplate],
-                                     redirectTo: String,
-                                     zeroSum: Boolean = false): EssentialAction = ActionWithUser { implicit user =>
+  private def addNewFormFromPartial(partial: TransactionGroupPartial,
+                                    redirectTo: String): EssentialAction = ActionWithUser { implicit user =>
     implicit request =>
-      val initialData = Forms.TransGroupData.fromTemplate(templates, zeroSum)
+      val initialData = Forms.TransGroupData.fromPartial(partial)
       Ok(formView(AddNewOperationMeta(), initialData, redirectTo))
   }
 
   private def addOrEdit(operationMeta: OperationMeta, redirectTo: String) =
     ActionWithUser { implicit user =>
       implicit request =>
-        val cleanedRequestMap: Map[String, Seq[String]] = {
+        val cleanedRequestMap: Map[String, MutableSeq[String]] = {
           // get sent data (copied from Form.bindFromRequest())
-          val requestMap: Map[String, Seq[String]] = (request.body match {
+          val requestMap: Map[String, MutableSeq[String]] = (request.body match {
             case body: AnyContent if body.asFormUrlEncoded.isDefined => body.asFormUrlEncoded.get
             case body: Map[_, _] => body.asInstanceOf[Map[String, Seq[String]]]
           }) ++ request.queryString
@@ -214,31 +217,6 @@ object TransactionGroupOperations extends Controller with Secured {
       deleteAction = deleteAction)
   }
 
-  // ********** TransactionTemplate ********** //
-  private case class TransactionTemplate(beneficiary: Option[Account],
-                                         moneyReservoir: Option[MoneyReservoir],
-                                         category: Option[Category],
-                                         description: String,
-                                         flow: Money,
-                                         detailDescription: String = "")
-
-  private object TransactionTemplate {
-    def from(beneficiary: Account = null,
-             moneyReservoir: MoneyReservoir = null,
-             category: Category = null,
-             description: String = "",
-             flow: Money = Money(0),
-             detailDescription: String = ""): TransactionTemplate =
-      TransactionTemplate(
-        Option(beneficiary),
-        Option(moneyReservoir),
-        Option(category),
-        description,
-        flow,
-        detailDescription
-      )
-  }
-
   // ********** forms ********** //
   object Forms {
 
@@ -255,9 +233,9 @@ object TransactionGroupOperations extends Controller with Secured {
 
     object TransactionData {
 
-      def fromTemplate(trans: TransactionTemplate)(implicit user: User) = {
+      def fromPartial(trans: TransactionPartial)(implicit user: User) = {
         val beneficiary = trans.beneficiary.getOrElse(Config.accounts.values.head)
-        val moneyReservoir = trans.moneyReservoir.getOrElse(Config.moneyReservoirs.values.filter(_.owner == beneficiary).head)
+        val moneyReservoir = trans.moneyReservoir.getOrElse(Config.visibleReservoirs.filter(_.owner == beneficiary).head)
         TransactionData(
           issuerName = user.name,
           beneficiaryAccountCode = beneficiary.code,
@@ -280,11 +258,11 @@ object TransactionGroupOperations extends Controller with Secured {
         consumedDate = trans.consumedDate)
     }
 
-    case class TransGroupData(transactions: Seq[TransactionData], zeroSum: Boolean = false)
+    case class TransGroupData(transactions: MutableSeq[TransactionData], zeroSum: Boolean = false)
 
     object TransGroupData {
-      def fromTemplate(transGroup: Seq[TransactionTemplate], zeroSum: Boolean)(implicit user: User) =
-        TransGroupData(transGroup.map(TransactionData.fromTemplate(_)), zeroSum)
+      def fromPartial(transGroup: TransactionGroupPartial)(implicit user: User) =
+        TransGroupData(transGroup.transactions.map(TransactionData.fromPartial(_)), transGroup.zeroSum)
 
       def fromModel(transGroup: TransactionGroup) =
         TransGroupData(
@@ -299,7 +277,7 @@ object TransactionGroupOperations extends Controller with Secured {
           mapping(
             "issuerName" -> text,
             "beneficiaryAccountCode" -> nonEmptyText.verifying(validAccountCode),
-            "moneyReservoirCode" -> text.verifying(validMoneyReservoirOrEmpty),
+            "moneyReservoirCode" -> text.verifying(validMoneyReservoirOrNullReservoir),
             "categoryCode" -> nonEmptyText.verifying(validCategoryCode),
             "description" -> nonEmptyText,
             "flowAsFloat" -> nonEmptyText.verifying(validFlowAsFloat).transform[Money](flowAsFloatStringToMoney, _.formatFloat),
@@ -319,8 +297,11 @@ object TransactionGroupOperations extends Controller with Secured {
           case 1 if containsEmptyReservoirCodes => invalidWithMessageCode("facto.error.noReservoir.atLeast2")
           case 1 => Valid
           case _ if allReservoirCodesAreEmpty =>
-            if (totalFlow == Money(0)) Valid
-            else invalidWithMessageCode("facto.error.noReservoir.zeroSum")
+            if (totalFlow == Money(0)) {
+              Valid
+            } else {
+              invalidWithMessageCode("facto.error.noReservoir.zeroSum")
+            }
           case _ if containsEmptyReservoirCodes => invalidWithMessageCode("facto.error.noReservoir.notAllTheSame")
           case _ => Valid
         }

@@ -10,7 +10,7 @@ import play.api.test._
 import play.api.test.Helpers._
 
 import org.joda.time.DateTime
-import slick.driver.H2Driver.api._
+import models.SlickUtils.dbApi._
 
 import common.Clock
 import common.testing.TestObjects._
@@ -20,7 +20,7 @@ import models._
 @RunWith(classOf[JUnitRunner])
 class TransactionAndGroupTests extends Specification {
 
-  "test the Transaction and TransactionGroup models" in new WithApplication(fakeApplication) {
+  "test the Transaction and TransactionGroup models" in new WithApplication {
 
     // prepare users
     val user1 = Users.all.save(Users.newWithUnhashedPw(loginName = "tester", password = "x", name = "Tester"))

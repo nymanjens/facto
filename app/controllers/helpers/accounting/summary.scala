@@ -5,7 +5,7 @@ import scala.collection.JavaConverters._
 
 import com.google.common.collect.{HashMultimap, ImmutableTable, Tables, Table, Multimap, Range}
 import org.joda.time.DateTime
-import slick.driver.H2Driver.api._
+import models.SlickUtils.dbApi._
 import com.github.nscala_time.time.Imports._
 
 import play.api.Logger
@@ -14,7 +14,7 @@ import play.twirl.api.Html
 import common.{Clock, MonthRange, DatedMonth}
 import common.CollectionUtils.toListMap
 import common.GuavaUtils.asGuava
-import models.ModelUtils.{dbRun, JodaToSqlDateMapper}
+import models.SlickUtils.{dbRun, JodaToSqlDateMapper}
 import models.accounting.{Transactions, Transaction, Money}
 import models.accounting.config.{Category, Account}
 import models.accounting.config.Account.SummaryTotalRowDef
@@ -59,7 +59,11 @@ object Summary {
       }
     }
 
-    Summary(yearToSummary, account.categories, monthRangeForAverages)
+    val categories: Seq[Category] = account.categories.filter { category =>
+      !yearToSummary.values.filter(_.hasEntries(category)).isEmpty
+    }
+
+    Summary(yearToSummary, categories, monthRangeForAverages)
   }
 }
 
@@ -72,6 +76,14 @@ case class SummaryForYear(cells: ImmutableTable[Category, DatedMonth, SummaryCel
   def categories: Iterable[Category] = categoryToAverages.keys
 
   def cell(category: Category, month: DatedMonth): SummaryCell = cells.get(category, month)
+
+  def hasEntries(category: Category): Boolean = {
+    val entries = for {
+      cell <- cells.row(category).values.asScala
+      entry <- cell.entries
+    } yield entry
+    !entries.isEmpty
+  }
 }
 
 object SummaryForYear {

@@ -3,11 +3,11 @@ package models.accounting
 import scala.util.Try
 
 import org.joda.time.DateTime
-import slick.driver.H2Driver.api._
 
 import common.Clock
+import models.SlickUtils.dbApi._
 import models.{User, Users}
-import models.ModelUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
+import models.SlickUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
 import models.accounting.config.Config
 import models.accounting.config.{Category, Account, MoneyReservoir}
 import models.activeslick._
@@ -41,11 +41,35 @@ case class Transaction(transactionGroupId: Long,
   lazy val transactionGroup: TransactionGroup = TransactionGroups.all.findById(transactionGroupId)
   lazy val issuer: User = Users.all.findById(issuerId)
   lazy val beneficiary: Account = Config.accounts(beneficiaryAccountCode)
-  lazy val moneyReservoir: MoneyReservoir = Config.moneyReservoirs(moneyReservoirCode)
+  lazy val moneyReservoir: MoneyReservoir = Config.moneyReservoir(moneyReservoirCode)
   lazy val category: Category = Config.categories(categoryCode)
 
   /** Returns None if the consumed date is the same as the transaction date (and thus carries no further information. */
   def consumedDateOption: Option[DateTime] = if (consumedDate == transactionDate) None else Some(consumedDate)
+}
+
+case class TransactionPartial(beneficiary: Option[Account],
+                              moneyReservoir: Option[MoneyReservoir],
+                              category: Option[Category],
+                              description: String,
+                              flow: Money,
+                              detailDescription: String = "")
+
+object TransactionPartial {
+  def from(beneficiary: Account = null,
+           moneyReservoir: MoneyReservoir = null,
+           category: Category = null,
+           description: String = "",
+           flow: Money = Money(0),
+           detailDescription: String = ""): TransactionPartial =
+    TransactionPartial(
+      Option(beneficiary),
+      Option(moneyReservoir),
+      Option(category),
+      description,
+      flow,
+      detailDescription
+    )
 }
 
 class Transactions(tag: Tag) extends EntityTable[Transaction](tag, "TRANSACTIONS") {
@@ -61,7 +85,8 @@ class Transactions(tag: Tag) extends EntityTable[Transaction](tag, "TRANSACTIONS
   def transactionDate = column[DateTime]("transactionDate")
   def consumedDate = column[DateTime]("consumedDate")
 
-  def * = (transactionGroupId, issuerId, beneficiaryAccountCode, moneyReservoirCode, categoryCode, description, flow, detailDescription, createdDate, transactionDate, consumedDate, id.?) <>(Transaction.tupled, Transaction.unapply)
+  override def * = (transactionGroupId, issuerId, beneficiaryAccountCode, moneyReservoirCode, categoryCode, description, flow,
+    detailDescription, createdDate, transactionDate, consumedDate, id.?) <>(Transaction.tupled, Transaction.unapply)
 }
 
 object Transactions {

@@ -79,7 +79,8 @@
                 @bootstrap3.Select(transactionForm("beneficiaryAccountCode"), "Beneficiary", Config.accounts.mapValues(_.longName),
                     classes=Seq("bind-until-change", "bind-to-root-form"))
                 @bootstrap3.Select(transactionForm("moneyReservoirCode"), "Payed with/to",
-                    toListMap(Config.moneyReservoirs.mapValues(_.name)) ++ Map("" -> "N/A"), classes=Seq("bind-until-change", "bind-to-root-form"))
+                    toListMap(Config.visibleReservoirs(includeNullReservoir = true).map(reservoir => reservoir.code -> reservoir.name)),
+                    classes=Seq("bind-until-change", "bind-to-root-form"))
                 @bootstrap3.Select(transactionForm("categoryCode"), "Category", Config.categories.mapValues(_.name),
                     classes=Seq("bind-until-change", "bind-to-root-form"),
                     optionArgs=Config.categories.mapValues(cat => Map('accounts -> cat.accounts.map(_.code).mkString(" "))))

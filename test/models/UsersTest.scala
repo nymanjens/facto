@@ -6,15 +6,15 @@ import org.junit.runner._
 
 import play.api.test._
 
-import slick.driver.H2Driver.api._
+import models.SlickUtils.dbApi._
 import common.testing.TestObjects._
 import common.testing.TestUtils._
-import models.ModelUtils.dbRun
+import models.SlickUtils.dbRun
 
 @RunWith(classOf[JUnitRunner])
 class UserTest extends Specification {
 
-  "test the User model" in new WithApplication(fakeApplication) {
+  "test the User model" in new WithApplication {
 
     val user1 = Users.all.save(Users.newWithUnhashedPw(loginName = "alice", password = "j", name = "Alice"))
     dbRun(Users.all.result) mustEqual Seq(user1)

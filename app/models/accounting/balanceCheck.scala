@@ -4,10 +4,10 @@ import org.joda.time.DateTime
 
 import common.Clock
 import models.{User, Users}
-import models.ModelUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
-import models.accounting.config.Config
+import models.SlickUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
+import models.accounting.config.{Config, MoneyReservoir}
 import models.activeslick._
-import slick.driver.H2Driver.api._
+import models.SlickUtils.dbApi._
 
 case class BalanceCheck(issuerId: Long,
                         moneyReservoirCode: String,
@@ -22,7 +22,7 @@ case class BalanceCheck(issuerId: Long,
 
   lazy val issuer: User = Users.all.findById(issuerId)
 
-  lazy val moneyReservoir = Config.moneyReservoirs(moneyReservoirCode)
+  lazy val moneyReservoir: MoneyReservoir = Config.moneyReservoir(moneyReservoirCode)
 }
 
 class BalanceChecks(tag: Tag) extends EntityTable[BalanceCheck](tag, "BALANCE_CHECKS") {
@@ -32,7 +32,7 @@ class BalanceChecks(tag: Tag) extends EntityTable[BalanceCheck](tag, "BALANCE_CH
   def createdDate = column[DateTime]("createdDate")
   def checkDate = column[DateTime]("checkDate")
 
-  def * = (issuerId, moneyReservoirCode, balance, createdDate, checkDate, id.?) <>(BalanceCheck.tupled, BalanceCheck.unapply)
+  override def * = (issuerId, moneyReservoirCode, balance, createdDate, checkDate, id.?) <>(BalanceCheck.tupled, BalanceCheck.unapply)
 }
 
 object BalanceChecks {

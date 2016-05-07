@@ -22,7 +22,7 @@ object BalanceCheckOperations extends Controller with Secured {
   // ********** actions ********** //
   def addNewForm(moneyReservoirCode: String, redirectTo: String) = ActionWithUser { implicit user =>
     implicit request =>
-      val moneyReservoir = Config.moneyReservoirs(moneyReservoirCode)
+      val moneyReservoir = Config.moneyReservoir(moneyReservoirCode)
       val initialData = Forms.BcData(
         issuerName = user.name,
         moneyReservoirName = moneyReservoir.name,
@@ -44,7 +44,7 @@ object BalanceCheckOperations extends Controller with Secured {
     ActionWithUser { implicit user =>
       implicit request =>
         val balance = Money(balanceInCents)
-        val moneyReservoir = Config.moneyReservoirs(moneyReservoirCode)
+        val moneyReservoir = Config.moneyReservoir(moneyReservoirCode)
         val mostRecentTransaction = Transactions.all.findById(mostRecentTransactionId)
 
         val balanceCheck = BalanceCheck(
@@ -178,7 +178,7 @@ object BalanceCheckOperations extends Controller with Secured {
   private sealed trait OperationMeta {
     def moneyReservoirCode: String
 
-    val moneyReservoir = Config.moneyReservoirs(moneyReservoirCode)
+    val moneyReservoir = Config.moneyReservoir(moneyReservoirCode)
 
     def bcIdOption: Option[Long]
   }

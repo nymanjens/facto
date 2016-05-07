@@ -13,7 +13,7 @@ import common.testing.TestUtils._
 
 @RunWith(classOf[JUnitRunner])
 class LiquidationEntryTest extends Specification {
-  "fetchLastNEntries()" in new WithApplication(fakeApplication) {
+  "fetchLastNEntries()" in new WithApplication {
     // Get and persist dummy transactions
     // Irrelevant transactions (should be ignored)
     persistTransaction(groupId = 91, account = testAccountA, reservoir = testReservoirOfAccountA)

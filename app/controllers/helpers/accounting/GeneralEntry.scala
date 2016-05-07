@@ -1,9 +1,9 @@
 package controllers.helpers.accounting
 
 import collection.immutable.Seq
-import slick.driver.H2Driver.api._
 
-import models.ModelUtils.{JodaToSqlDateMapper, dbRun}
+import models.SlickUtils.dbApi._
+import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
 import models.accounting.{Transaction, Transactions}
 import models.accounting.config.{Account, MoneyReservoir, Category, Config}
 

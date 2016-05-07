@@ -156,10 +156,25 @@ moneyReservoirs:
         owner: *accountAlice
     - &reservoirSavingsAlice
         code: SAVINGS_ALICE
-        name: Savings Alice
+        name: Savings account Alice at Just-Another-Bank
+        shorterName: Savings Alice
         owner: *accountAlice
 
-constants: !!models.accounting.config.Parsable$Constants
+templates:
+  - name: New Endowment
+    placement: [ENDOWMENTS]
+    zeroSum: true
+    transactions:
+      - beneficiaryCode: Common
+        moneyReservoirCode: "" # N/A
+        categoryCode: ENDOW
+        description: Endowment for ${account.longName}
+      - beneficiaryCode: ${account.code}
+        moneyReservoirCode: "" # N/A
+        categoryCode: ENDOW
+        description: Endowment for ${account.longName}
+
+constants:
     commonAccount: *accountCommon
     accountingCategory: *catAcc
     endowmentCategory: *catEndow

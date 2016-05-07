@@ -42,7 +42,7 @@
             case entry:RegularEntry => {
               <td>@entry.transactionDates.map(formatDate).mkString(", ")</td>
               <td>@entry.consumedDates.map(formatDate).mkString(", ")</td>
-              <td>@entry.beneficiaries.map(_.longName).mkString(", ")</td>
+              <td>@entry.beneficiaries.map(_.shorterName).mkString(", ")</td>
               <td>@entry.categories.map(_.name).mkString(", ")</td>
               <td>@DescriptionWithEntryCount(entry)</td>
               <td>@entry.flow.formatFloat</td>

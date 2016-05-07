@@ -28,5 +28,9 @@
         trClasses = if(tableDatas.size > numEntriesShownByDefault) "hidden next-hidden-entries" else "",
         href = Some(link))
     }
+
+    @if(tableDatas.isEmpty) {
+      <td colspan="@colspan" class="no-entries">No Entries</td>
+    }
   </tbody>
 </table>

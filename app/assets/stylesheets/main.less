@@ -1,10 +1,15 @@
 /****** general ******/
-.table-overflow-elipsis {
-  td, th {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 350px;
+.table {
+  &.table-overflow-elipsis {
+    td, th {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 350px;
+    }
+  }
+  .no-entries {
+    font-style: italic;
   }
 }
 
