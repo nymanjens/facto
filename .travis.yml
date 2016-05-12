@@ -4,5 +4,5 @@ scala:
 jdk:
   - oraclejdk8
 
-script:
+after_script:
   - sbt scalastyle
