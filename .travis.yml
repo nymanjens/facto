@@ -4,5 +4,6 @@ scala:
 jdk:
   - oraclejdk8
 
-after_script:
+script:
+  - sbt test
   - sbt scalastyle
