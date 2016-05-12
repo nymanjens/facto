@@ -3,5 +3,8 @@ scala:
    - 2.11.6
 jdk:
   - oraclejdk8
+
+before_install:
+ - unset SBT_OPTS JVM_OPTS
 script:
   - ./activator scalastyle
