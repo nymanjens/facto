@@ -7,7 +7,7 @@ import models.{User, Users}
 import models.SlickUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
 import models.accounting.config.{Config, MoneyReservoir}
 import models.activeslick._
-import models.SlickUtils.dbApi._ 
+import models.SlickUtils.dbApi._
 
 case class BalanceCheck(issuerId: Long,
                         moneyReservoirCode: String,
