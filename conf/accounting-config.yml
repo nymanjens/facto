@@ -67,6 +67,7 @@ accounts:
       longName: Common
       shorterName: Common
       veryShortName: C.
+      defaultElectronicReservoirCode: CARD_COMMON
       categories:
         - *catLife
         - *catFun
@@ -91,6 +92,8 @@ accounts:
       shorterName: Alice
       veryShortName: A.
       userLoginName: alice
+      defaultCashReservoirCode: CASH_ALICE
+      defaultElectronicReservoirCode: CARD_ALICE
       categories:
         - *catFun
         - *catTrans
@@ -117,6 +120,8 @@ accounts:
       shorterName: Bob
       veryShortName: B.
       userLoginName: bob
+      defaultCashReservoirCode: CASH_COMMON
+      defaultElectronicReservoirCode: CARD_BOB
       categories:
         - *catFun
         - *catTrans
@@ -161,8 +166,22 @@ moneyReservoirs:
         owner: *accountAlice
 
 templates:
+  - name: New Withdrawal
+    placement: [CASH_FLOW_VIEW]
+    zeroSum: true
+    transactions:
+      - beneficiaryCode: ${account.code}
+        moneyReservoirCode: ${account.defaultElectronicReservoir.code}
+        categoryCode: ACC
+        description: Withdrawal
+        flowAsFloat: -50
+      - beneficiaryCode: ${account.code}
+        moneyReservoirCode: ${account.defaultCashReservoir.code}
+        categoryCode: ACC
+        description: Withdrawal
+        flowAsFloat: 50
   - name: New Endowment
-    placement: [ENDOWMENTS]
+    placement: [ENDOWMENTS_VIEW]
     zeroSum: true
     transactions:
       - beneficiaryCode: Common
@@ -173,14 +192,17 @@ templates:
         moneyReservoirCode: "" # N/A
         categoryCode: ENDOW
         description: Endowment for ${account.longName}
+  - name: Bakery
+    placement: [TEMPLATE_LIST]
+    transactions:
+      - beneficiaryCode: Common
+        moneyReservoirCode: ${account.defaultCashReservoir.code}
+        categoryCode: LIFE
+        description: Bakery
 
 constants:
     commonAccount: *accountCommon
     accountingCategory: *catAcc
     endowmentCategory: *catEndow
-    defaultElectronicMoneyReservoirs: # one per account
-        - *reservoirCardCommon
-        - *reservoirCardBob
-        - *reservoirCardAlice
     defaultCurrencySymbol: EUR
     liquidationDescription: Liquidation

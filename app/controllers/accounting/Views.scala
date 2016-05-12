@@ -8,7 +8,7 @@ import controllers.Secured
 import controllers.helpers.accounting._
 import models.User
 import models.accounting.config.Config
-import models.accounting.config.{Account, MoneyReservoir, Category}
+import models.accounting.config.{Account, MoneyReservoir, Category, Template}
 
 object Views extends Controller with Secured {
 
@@ -93,7 +93,8 @@ object Views extends Controller with Secured {
     // render
     Ok(views.html.accounting.general(
       entries = entries,
-      numEntriesToShow = numEntriesToShow))
+      numEntriesToShow = numEntriesToShow,
+      templatesInNavbar = Config.templatesToShowFor(Template.Placement.GeneralView, user)))
   }
 
   private def cashFlow(reservoirs: Iterable[MoneyReservoir],
@@ -118,7 +119,8 @@ object Views extends Controller with Secured {
       accountToReservoirs = sortedAccountToReservoirs,
       reservoirToEntries = reservoirToEntries,
       numEntriesShownByDefault = numEntriesShownByDefaultToShow,
-      expandedNumEntries = expandedNumEntriesToShow))
+      expandedNumEntries = expandedNumEntriesToShow,
+      templatesInNavbar = Config.templatesToShowFor(Template.Placement.CashFlowView, user)))
   }
 
 
@@ -135,7 +137,8 @@ object Views extends Controller with Secured {
     Ok(views.html.accounting.liquidation(
       pairsToEntries = pairsToEntries,
       numEntriesShownByDefault = numEntriesShownByDefaultToShow,
-      expandedNumEntries = expandedNumEntriesToShow))
+      expandedNumEntries = expandedNumEntriesToShow,
+      templatesInNavbar = Config.templatesToShowFor(Template.Placement.LiquidationView, user)))
   }
 
   private def endowments(accounts: Iterable[Account],
@@ -151,7 +154,8 @@ object Views extends Controller with Secured {
     Ok(views.html.accounting.endowments(
       accountToEntries = accountToEntries,
       numEntriesShownByDefault = numEntriesShownByDefaultToShow,
-      expandedNumEntries = expandedNumEntriesToShow))
+      expandedNumEntries = expandedNumEntriesToShow,
+      templatesInNavbar = Config.templatesToShowFor(Template.Placement.EndowmentsView, user)))
   }
 
   private def summary(accounts: Iterable[Account], expandedYear: Int)
@@ -164,6 +168,7 @@ object Views extends Controller with Secured {
     // render
     Ok(views.html.accounting.summary(
       accountToSummary,
-      expandedYear))
+      expandedYear,
+      templatesInNavbar = Config.templatesToShowFor(Template.Placement.SummaryView, user)))
   }
 }

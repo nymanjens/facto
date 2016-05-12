@@ -19,6 +19,7 @@ POST  /profile/adduser/ controllers.Application.addUser
 # Accounting - general
 GET  /acc/logs/                    controllers.accounting.GeneralActions.updateLogsLatest
 GET  /acc/logs/all/                controllers.accounting.GeneralActions.updateLogsAll
+GET  /acc/templates/               controllers.accounting.GeneralActions.templateList
 
 # Accounting - views
 GET  /acc/general/                 controllers.accounting.Views.generalLatest
@@ -37,9 +38,10 @@ GET  /acc/trans/new/:redirectTo     controllers.accounting.TransactionGroupOpera
 POST /acc/trans/new/:redirectTo     controllers.accounting.TransactionGroupOperations.addNew(redirectTo)
 GET  /acc/trans/edit/:transGroupId/:redirectTo     controllers.accounting.TransactionGroupOperations.editForm(transGroupId: Long, redirectTo)
 POST /acc/trans/edit/:transGroupId/:redirectTo     controllers.accounting.TransactionGroupOperations.edit(transGroupId: Long, redirectTo)
-GET  /acc/trans/delete/:transGroupId/:redirectTo     controllers.accounting.TransactionGroupOperations.delete(transGroupId: Long, redirectTo)
+GET  /acc/trans/delete/:transGroupId/:redirectTo   controllers.accounting.TransactionGroupOperations.delete(transGroupId: Long, redirectTo)
 
 # Accounting - transaction group operations - shortcuts
+GET /acc/trans/newfromtpl/:templateId/:redirectTo     controllers.accounting.TransactionGroupOperations.addNewFromTemplate(templateId: Long, redirectTo)
 GET  /acc/trans/repay/:accountCode1/:accountCode2/:amountInCents/:redirectTo  controllers.accounting.TransactionGroupOperations.addNewLiquidationRepayForm(accountCode1, accountCode2, amountInCents: Long, redirectTo)
 
 # Accounting - balance check operations

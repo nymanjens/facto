@@ -1,14 +1,22 @@
+@import scala.collection.immutable.Seq
+
 @import models.User
 @import models.accounting.Money.CurrencyUnit
-@import models.accounting.config.{Config, Account, MoneyReservoir, Category}
+@import models.accounting.config.{Account, MoneyReservoir, Category, Template}
 @import controllers.helpers.accounting.GeneralEntry
 @import viewhelpers.Formatting._
 @import views.html.accounting.parts._
 
-@(accountToEntries: Map[Account, Seq[GeneralEntry]], numEntriesShownByDefault: Int,
-    expandedNumEntries: Int)(implicit user: User, request: Request[AnyContent], flash: Flash)
+@(
+  accountToEntries: Map[Account, Seq[GeneralEntry]],
+  numEntriesShownByDefault: Int,
+  expandedNumEntries: Int,
+  templatesInNavbar: Seq[Template]
+)(
+  implicit user: User, request: Request[AnyContent], flash: Flash
+)
 
-@Main("Endowments") {
+@Main("Endowments", templatesInNavbar = templatesInNavbar) {
   <h1><i class="fa fa-refresh fa-fw"></i> Endowments</h1>
 
   @Panel(

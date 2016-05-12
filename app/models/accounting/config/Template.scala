@@ -10,12 +10,14 @@ import models.accounting.{TransactionGroupPartial, TransactionPartial, Money}
 
 // Every field ending with "Tpl" may contain $-prefixed placeholders.
 // Example: descriptionTpl = "Endowment for ${account.longName}"
-case class Template(nameTpl: String,
+case class Template(id: Long,
+                    name: String,
                     private val placement: Set[Template.Placement],
                     private val onlyShowForUserLoginNames: Option[Set[String]],
                     private val zeroSum: Boolean,
                     private val transactions: Seq[Template.Transaction]) {
   requireNonNullFields(this)
+  validateLoginNames()
 
   def showFor(location: Template.Placement, user: User): Boolean = {
     val showAtLocation = placement contains location
@@ -35,9 +37,18 @@ case class Template(nameTpl: String,
   private def onlyShowForUsers: Option[Set[User]] = {
     onlyShowForUserLoginNames.map { loginNameOption =>
       loginNameOption.map { loginName =>
+        Users.findByLoginName(loginName).get // This will exist because earlier check in validateLoginNames() succeeded.
+      }
+    }
+  }
+
+  private def validateLoginNames(): Unit = {
+    onlyShowForUserLoginNames.map { loginNameOption =>
+      loginNameOption.map { loginName =>
         val user = Users.findByLoginName(loginName)
-        checkState(user.isDefined, "No user exists with loginName '%s'", loginName)
-        user.get
+        require(user.isDefined, s"No user exists with loginName '$loginName'")
+        require(Config.accountOf(user.get).isDefined, s"Only user names that have an associated account can be used in templates " +
+          s"(user = '$loginName', template = '$name')")
       }
     }
   }
@@ -46,20 +57,20 @@ case class Template(nameTpl: String,
 object Template {
   sealed trait Placement
   object Placement {
-    object EverythingView extends Placement
+    object GeneralView extends Placement
     object CashFlowView extends Placement
     object LiquidationView extends Placement
     object EndowmentsView extends Placement
     object SummaryView extends Placement
-    object TemplatesList extends Placement
+    object TemplateList extends Placement
 
     def fromString(string: String): Placement = string match {
-      case "EVERYTHING" => EverythingView
-      case "CASHFLOW" => CashFlowView
-      case "LIQUIDATION" => LiquidationView
-      case "ENDOWMENTS" => EndowmentsView
-      case "SUMMARY" => SummaryView
-      case "TEMPLATES" => TemplatesList
+      case "GENERAL_VIEW" => GeneralView
+      case "CASH_FLOW_VIEW" => CashFlowView
+      case "LIQUIDATION_VIEW" => LiquidationView
+      case "ENDOWMENTS_VIEW" => EndowmentsView
+      case "SUMMARY_VIEW" => SummaryView
+      case "TEMPLATE_LIST" => TemplateList
     }
   }
 
@@ -74,7 +85,9 @@ object Template {
       def fillInPlaceholders(string: String): String = {
         val placeholderToReplacement = Map(
           "${account.code}" -> account.code,
-          "${account.longName}" -> account.longName)
+          "${account.longName}" -> account.longName,
+          "${account.defaultCashReservoir.code}" -> account.defaultCashReservoir.map(_.code).getOrElse(""),
+          "${account.defaultElectronicReservoir.code}" -> account.defaultElectronicReservoir.code)
         var result = string
         for ((placeholder, replacement) <- placeholderToReplacement) {
           result = result.replace(placeholder, replacement)

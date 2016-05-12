@@ -1,0 +1,24 @@
+@import scala.collection.immutable.Seq
+
+@import models.User
+@import models.accounting.Money.CurrencyUnit
+@import models.accounting.config.{Account, MoneyReservoir, Category, Template}
+@import controllers.helpers.accounting._
+@import viewhelpers.Formatting._
+@import views.html.accounting.parts._
+
+@(
+  templates: Seq[Template]
+)(
+  implicit user: User, request: Request[AnyContent], flash: Flash
+)
+
+@Main("Templates") {
+  <h1><i class="fa fa-fast-forward fa-fw"></i> Templates</h1>
+
+  @for(template <- templates) {
+    <div>
+      <button type="button" class="btn btn-info btn-lg">@template.name</button>
+    </div>
+  }
+}

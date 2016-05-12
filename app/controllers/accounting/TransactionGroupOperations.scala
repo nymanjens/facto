@@ -19,8 +19,7 @@ import common.Clock
 import common.CollectionUtils
 import models.User
 import models.accounting.{Transaction, Transactions, TransactionPartial, TransactionGroup, TransactionGroupPartial, TransactionGroups, Money, UpdateLogs}
-import models.accounting.config.Config
-import models.accounting.config.{Account, MoneyReservoir, Category}
+import models.accounting.config.{Config, Account, MoneyReservoir, Category, Template}
 import controllers.Secured
 import controllers.helpers.accounting.CashFlowEntry
 import controllers.helpers.accounting.FormUtils.{validMoneyReservoirOrNullReservoir, validAccountCode, validCategoryCode, validFlowAsFloat, flowAsFloatStringToMoney, invalidWithMessageCode}
@@ -34,7 +33,7 @@ object TransactionGroupOperations extends Controller with Secured {
     implicit request =>
       val transGroup = TransactionGroups.all.findById(transGroupId)
       val formData = Forms.TransGroupData.fromModel(transGroup)
-      Ok(formView(EditOperationMeta(transGroupId), formData, redirectTo))
+      Ok(formViewWithInitialData(EditOperationMeta(transGroupId), formData, redirectTo))
   }
 
   def addNew(redirectTo: String) =
@@ -59,6 +58,16 @@ object TransactionGroupOperations extends Controller with Secured {
   }
 
   // ********** shortcuts ********** //
+  def addNewFromTemplate(templateId: Long, redirectTo: String) = ActionWithUser { implicit user =>
+    implicit request =>
+      val template = Config.templateWithId(templateId)
+      // If this user is not associated with an account, it should not see any templates.
+      val userAccount = Config.accountOf(user).get
+      val partial = template.toPartial(userAccount)
+      val initialData = Forms.TransGroupData.fromPartial(partial)
+      Ok(formViewWithInitialData(AddNewOperationMeta(), initialData, redirectTo, templatesInNavbar = Seq(template)))
+  }
+
   def addNewLiquidationRepayForm(accountCode1: String, accountCode2: String, amountInCents: Long, redirectTo: String): EssentialAction = {
     val amount = Money(amountInCents)
     if (amount < Money(0)) {
@@ -66,17 +75,16 @@ object TransactionGroupOperations extends Controller with Secured {
     } else {
       val account1 = Config.accounts(accountCode1)
       val account2 = Config.accounts(accountCode2)
-      def electronicReservoir(account: Account) = Config.constants.defaultElectronicMoneyReservoirByAccount(account)
       addNewFormFromPartial(TransactionGroupPartial(Seq(
         TransactionPartial.from(
           beneficiary = account1,
-          moneyReservoir = electronicReservoir(account1),
+          moneyReservoir = account1.defaultElectronicReservoir,
           category = Config.constants.accountingCategory,
           description = Config.constants.liquidationDescription,
           flow = amount.negated),
         TransactionPartial.from(
           beneficiary = account1,
-          moneyReservoir = electronicReservoir(account2),
+          moneyReservoir = account2.defaultElectronicReservoir,
           category = Config.constants.accountingCategory,
           description = Config.constants.liquidationDescription,
           flow = amount)),
@@ -94,7 +102,7 @@ object TransactionGroupOperations extends Controller with Secured {
                                     redirectTo: String): EssentialAction = ActionWithUser { implicit user =>
     implicit request =>
       val initialData = Forms.TransGroupData.fromPartial(partial)
-      Ok(formView(AddNewOperationMeta(), initialData, redirectTo))
+      Ok(formViewWithInitialData(AddNewOperationMeta(), initialData, redirectTo))
   }
 
   private def addOrEdit(operationMeta: OperationMeta, redirectTo: String) =
@@ -191,12 +199,18 @@ object TransactionGroupOperations extends Controller with Secured {
     UpdateLogs.addLog(user, operation, group)
   }
 
-  private def formView(operationMeta: OperationMeta, formData: Forms.TransGroupData, redirectTo: String)
-                      (implicit user: User, request: Request[AnyContent]): Html =
-    formView(operationMeta, Forms.transactionGroupForm.fill(formData), redirectTo)
+  private def formViewWithInitialData(operationMeta: OperationMeta,
+                                      formData: Forms.TransGroupData,
+                                      redirectTo: String,
+                                      templatesInNavbar: Seq[Template] = Seq())
+                                     (implicit user: User, request: Request[AnyContent]): Html =
+    formView(operationMeta, Forms.transactionGroupForm.fill(formData), redirectTo, templatesInNavbar)
 
 
-  private def formView(operationMeta: OperationMeta, form: Form[Forms.TransGroupData], redirectTo: String)
+  private def formView(operationMeta: OperationMeta,
+                       form: Form[Forms.TransGroupData],
+                       redirectTo: String,
+                       templatesInNavbar: Seq[Template] = Seq())
                       (implicit user: User, request: Request[AnyContent]): Html = {
     val title = operationMeta match {
       case AddNewOperationMeta() => "New Transaction"
@@ -214,7 +228,9 @@ object TransactionGroupOperations extends Controller with Secured {
       title,
       transGroupForm = form,
       formAction = formAction,
-      deleteAction = deleteAction)
+      deleteAction = deleteAction,
+      redirectTo = redirectTo,
+      templatesInNavbar = templatesInNavbar)
   }
 
   // ********** forms ********** //

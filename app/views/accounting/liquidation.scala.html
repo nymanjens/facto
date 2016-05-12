@@ -1,14 +1,22 @@
+@import scala.collection.immutable.Seq
+
 @import models.User
 @import models.accounting.Money.CurrencyUnit
-@import models.accounting.config.{Config, Account, MoneyReservoir, Category}
+@import models.accounting.config.{Account, MoneyReservoir, Category, Template}
 @import controllers.helpers.accounting.{AccountPair, LiquidationEntry}
 @import viewhelpers.Formatting._
 @import views.html.accounting.parts._
 
-@(pairsToEntries: Map[AccountPair, Seq[LiquidationEntry]], numEntriesShownByDefault: Int,
-    expandedNumEntries: Int)(implicit user: User, request: Request[AnyContent], flash: Flash)
+@(
+  pairsToEntries: Map[AccountPair, Seq[LiquidationEntry]],
+  numEntriesShownByDefault: Int,
+  expandedNumEntries: Int,
+  templatesInNavbar: Seq[Template]
+)(
+  implicit user: User, request: Request[AnyContent], flash: Flash
+)
 
-@Main("Liquidation") {
+@Main("Liquidation", templatesInNavbar = templatesInNavbar) {
   <h1><i class="fa fa-users fa-fw"></i> Liquidation</h1>
 
   @Panel(

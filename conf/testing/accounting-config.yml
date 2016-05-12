@@ -1,79 +1,84 @@
 !!models.accounting.config.Parsable$Config
 categories:
   - &catB
-    code: CAT_B
-    name: "Category B"
-    helpText: "b-help"
+      code: CAT_B
+      name: "Category B"
+      helpText: "b-help"
   - &catA
-    code: CAT_A
-    name: "Category A"
+      code: CAT_A
+      name: "Category A"
 
 accounts:
   - &accCommon
-    code: ACC_COMMON
-    longName: Account Common
-    shorterName: Acc.Common
-    veryShortName: Common
-    categories:
-      - *catA
-      - *catB
+      code: ACC_COMMON
+      longName: Account Common
+      shorterName: Acc.Common
+      veryShortName: Common
+      defaultElectronicReservoirCode: CARD_COMMON
+      categories:
+        - *catA
+        - *catB
   - &accA
-    code: ACC_A
-    longName: Account A
-    shorterName: Acc.A
-    veryShortName: A
-    userLoginName: a
-    categories:
-      - *catA
-      - *catB
-    summaryTotalRows:
-      - rowTitleHtml: <b>Total</b>
-        categoriesToIgnore: []
-      - rowTitleHtml: <b>Total</b> (without catA)
-        categoriesToIgnore: [*catA]
+      code: ACC_A
+      longName: Account A
+      shorterName: Acc.A
+      veryShortName: A
+      userLoginName: a
+      defaultCashReservoirCode: CASH_A
+      defaultElectronicReservoirCode: CARD_A
+      categories:
+        - *catA
+        - *catB
+      summaryTotalRows:
+        - rowTitleHtml: <b>Total</b>
+          categoriesToIgnore: []
+        - rowTitleHtml: <b>Total</b> (without catA)
+          categoriesToIgnore: [*catA]
   - &accB
-    code: ACC_B
-    longName: Account B
-    shorterName: Acc.B
-    veryShortName: B
-    userLoginName: b
-    categories:
-      - *catB
+      code: ACC_B
+      longName: Account B
+      shorterName: Acc.B
+      veryShortName: B
+      userLoginName: b
+      defaultCashReservoirCode: CASH_B
+      defaultElectronicReservoirCode: CARD_B
+      categories:
+        - *catB
 
 moneyReservoirs:
   - &reservoirCashCommon
-    code: CASH_COMMON
-    name: Cash Common
-    owner: *accCommon
+      code: CASH_COMMON
+      name: Cash Common
+      owner: *accCommon
   - &reservoirCardCommon
-    code: CARD_COMMON
-    name: Card Common
-    owner: *accCommon
+      code: CARD_COMMON
+      name: Card Common
+      owner: *accCommon
   - &reservoirCashA
-    code: CASH_A
-    name: Cash A
-    owner: *accA
+      code: CASH_A
+      name: Cash A
+      owner: *accA
   - &reservoirCardA
-    code: CARD_A
-    name: Card A
-    owner: *accA
+      code: CARD_A
+      name: Card A
+      owner: *accA
   - &reservoirCashB
-    code: CASH_B
-    name: Cash B
-    owner: *accB
+      code: CASH_B
+      name: Cash B
+      owner: *accB
   - &reservoirCardB
-    code: CARD_B
-    name: Card B
-    owner: *accB
+      code: CARD_B
+      name: Card B
+      owner: *accB
   - &reservoirHidden
-    code: HIDDEN
-    name: Card B
-    owner: *accB
-    hidden: true
+      code: HIDDEN
+      name: Card B
+      owner: *accB
+      hidden: true
 
 templates:
   - name: New Endowment
-    placement: [ENDOWMENTS]
+    placement: [ENDOWMENTS_VIEW]
     zeroSum: true
     transactions:
       - beneficiaryCode: ACC_COMMON
@@ -89,8 +94,4 @@ constants:
     commonAccount: *accCommon
     accountingCategory: *catA
     endowmentCategory: *catB
-    defaultElectronicMoneyReservoirs: # one per account
-        - *reservoirCardCommon
-        - *reservoirCardB
-        - *reservoirCardA
     defaultCurrencySymbol: EUR

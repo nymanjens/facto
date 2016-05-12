@@ -8,6 +8,7 @@ import play.api.i18n.Messages.Implicits._
 
 import models.User
 import models.accounting.UpdateLogs
+import models.accounting.config.{Config, Template}
 import controllers.Secured
 
 object GeneralActions extends Controller with Secured {
@@ -23,6 +24,11 @@ object GeneralActions extends Controller with Secured {
       updateLogs()
   }
 
+  def templateList = ActionWithUser { implicit user =>
+    implicit request =>
+      Ok(views.html.accounting.templatelist(
+        templates = Config.templatesToShowFor(Template.Placement.TemplateList, user)))
+  }
 
   // ********** private helper controllers ********** //
   private def updateLogs(numEntriesToShow: Int = 100000)(implicit request: Request[AnyContent], user: User): Result = {

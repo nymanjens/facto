@@ -32,9 +32,6 @@ class ConfigTest extends Specification {
     Config.accounts("ACC_A").user mustEqual Some(userA)
     Config.accounts("ACC_COMMON").user mustEqual None
 
-    // check defaults
-    Config.moneyReservoir("DOESNT_EXIST").owner.code must beEqualTo("UNKNOWN")
-
     // check common account
     Config.constants.commonAccount must beEqualTo(Config.accounts("ACC_COMMON"))
 

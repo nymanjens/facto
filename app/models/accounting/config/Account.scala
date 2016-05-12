@@ -14,22 +14,34 @@ case class Account(code: String,
                    shorterName: String,
                    veryShortName: String,
                    private val userLoginName: Option[String] = None,
+                   private val defaultCashReservoirCode: Option[String] = None,
+                   private val defaultElectronicReservoirCode: String,
                    categories: Seq[Category] = Nil,
                    summaryTotalRows: Seq[SummaryTotalRowDef] = Nil) {
   requireNonNullFields(this)
 
+  private[config] def validateCodes(moneyReservoirs: Iterable[MoneyReservoir]): Unit = {
+    def requireValidCode(code: String): Unit = {
+      val moneyReservoirCodes = moneyReservoirs.map(_.code).toSet
+      require(moneyReservoirCodes contains code, s"Unknown code '$code', valid codes = $moneyReservoirCodes")
+    }
+    defaultCashReservoirCode foreach requireValidCode
+    requireValidCode(defaultElectronicReservoirCode)
+  }
+
   override def toString = s"Account($code)"
 
   def user: Option[User] = {
-    userLoginName.map { loginName =>
-      val user = Users.findByLoginName(loginName)
-      checkState(user.isDefined, "No user exists with loginName '%s'", loginName)
-      user.get
+    userLoginName.map {
+      loginName =>
+        val user = Users.findByLoginName(loginName)
+        checkState(user.isDefined, "No user exists with loginName '%s'", loginName)
+        user.get
     }
   }
-
+  def defaultCashReservoir: Option[MoneyReservoir] = defaultCashReservoirCode map Config.moneyReservoir
+  def defaultElectronicReservoir: MoneyReservoir = Config.moneyReservoir(defaultElectronicReservoirCode)
   def visibleReservoirs: Seq[MoneyReservoir] = Config.visibleReservoirs.filter(_.owner == this).toList
-
   def isMineOrCommon(implicit user: User): Boolean = Set(Config.accountOf(user), Some(Config.constants.commonAccount)).flatten.contains(this)
 }
 

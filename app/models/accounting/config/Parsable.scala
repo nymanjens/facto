@@ -27,7 +27,13 @@ object Parsable {
       val parsedAccounts = toListMap(accounts)(_.code, _.parse)
       val parsedCategories = toListMap(categories)(_.code, _.parse)
       val parsedReservoirs = toListMap(moneyReservoirs)(_.code, _.parse)
-      val parsedTemplates = templates.asScala.toVector map (_.parse(parsedAccounts, parsedReservoirs, parsedCategories))
+      val parsedTemplates = templates.asScala.toVector.zipWithIndex map { case (tpl, index) =>
+        tpl.parse(index, parsedAccounts, parsedReservoirs, parsedCategories)
+      }
+
+      // Validation
+      parsedAccounts.values foreach (_.validateCodes(parsedReservoirs.values))
+
       ParsedConfig(parsedAccounts, parsedCategories, parsedReservoirs, parsedTemplates, constants.parse)
     }
   }
@@ -37,9 +43,11 @@ object Parsable {
                      shorterName: String,
                      veryShortName: String,
                      userLoginName: /* nullable */ String,
+                     defaultCashReservoirCode: /* nullable */ String,
+                     defaultElectronicReservoirCode: String,
                      categories: java.util.List[Category],
                      summaryTotalRows: /* nullable */ java.util.List[Account.SummaryTotalRowDef]) {
-    def this() = this(null, null, null, null, null, null, null)
+    def this() = this(null, null, null, null, null, null, null, null, null)
 
     def parse: ParsedAccount = {
       var nonNullSummaryTotalRows = if (summaryTotalRows == null) ImmutableList.of(Account.SummaryTotalRowDef.default) else summaryTotalRows
@@ -48,7 +56,9 @@ object Parsable {
         longName = longName,
         shorterName = shorterName,
         veryShortName = veryShortName,
-        userLoginName = if (userLoginName == null) None else Some(userLoginName),
+        userLoginName = Option(userLoginName),
+        defaultCashReservoirCode = Option(defaultCashReservoirCode),
+        defaultElectronicReservoirCode = defaultElectronicReservoirCode,
         categories = categories.asScala.toList.map(_.parse),
         summaryTotalRows = nonNullSummaryTotalRows.asScala.toList.map(_.parse))
     }
@@ -92,11 +102,13 @@ object Parsable {
 
     def this() = this(null, null, null, zeroSum = false, null)
 
-    def parse(accounts: Map[String, ParsedAccount],
+    def parse(id: Long,
+              accounts: Map[String, ParsedAccount],
               reservoirs: Map[String, ParsedMoneyReservoir],
               categories: Map[String, ParsedCategory]): ParsedTemplate = {
       ParsedTemplate(
-        nameTpl = name,
+        id = id,
+        name = name,
         placement = placement.asScala.toSet map ParsedTemplate.Placement.fromString,
         onlyShowForUserLoginNames = Option(onlyShowForUserLoginNames) map (_.asScala.toSet),
         zeroSum = zeroSum,
@@ -109,8 +121,8 @@ object Parsable {
                            moneyReservoirCode: /* nullable */ String,
                            categoryCode: /* nullable */ String,
                            description: String,
-                           flowInCents: Long) {
-      def this() = this(null, null, null, description = "", flowInCents = 0)
+                           flowAsFloat: Double) {
+      def this() = this(null, null, null, description = "", flowAsFloat = 0)
 
       def parse(accounts: Map[String, ParsedAccount],
                 reservoirs: Map[String, ParsedMoneyReservoir],
@@ -127,7 +139,7 @@ object Parsable {
           moneyReservoirCodeTpl = Option(moneyReservoirCode) map validateCode(reservoirsIncludingNull.keySet),
           categoryCodeTpl = Option(categoryCode) map validateCode(categories.keySet),
           descriptionTpl = description,
-          flowInCents = flowInCents)
+          flowInCents = (flowAsFloat.toDouble * 100).round)
       }
     }
   }
@@ -136,17 +148,15 @@ object Parsable {
   case class Constants(commonAccount: Account,
                        accountingCategory: Category,
                        endowmentCategory: Category,
-                       defaultElectronicMoneyReservoirs: java.util.List[MoneyReservoir],
                        defaultCurrencySymbol: String,
                        liquidationDescription: String) {
-    def this() = this(null, null, null, null, null, liquidationDescription = "Liquidation")
+    def this() = this(null, null, null, null, liquidationDescription = "Liquidation")
 
     def parse: ParsedConstants = {
       ParsedConstants(
         commonAccount = commonAccount.parse,
         accountingCategory = accountingCategory.parse,
         endowmentCategory = endowmentCategory.parse,
-        defaultElectronicMoneyReservoirByAccount = toListMap(defaultElectronicMoneyReservoirs)(_.parse.owner, _.parse),
         liquidationDescription = liquidationDescription,
         defaultCurrencySymbol = defaultCurrencySymbol)
     }

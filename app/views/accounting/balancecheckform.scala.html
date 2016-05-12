@@ -1,6 +1,6 @@
 @import helper._
 @import models.User
-@import models.accounting.config.{Config, Account, MoneyReservoir, Category}
+@import models.accounting.config.{Account, MoneyReservoir, Category}
 @import controllers.accounting.BalanceCheckOperations.Forms._
 @import views.html.utils.bootstrap3
 @(reservoir: MoneyReservoir, title: String, bcForm: Form[BcData], formAction: Call, deleteAction: Option[Call])(

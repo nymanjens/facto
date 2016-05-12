@@ -1,15 +1,23 @@
+@import scala.collection.immutable.Seq
+
 @import common.Clock
 @import models.User
 @import models.accounting.Money
 @import models.accounting.Money.CurrencyUnit
-@import models.accounting.config.{Config, Account, MoneyReservoir, Category}
+@import models.accounting.config.{Account, MoneyReservoir, Category, Template}
 @import controllers.helpers.accounting.Summary
 @import viewhelpers.Formatting._
 @import views.html.accounting.parts._
 
-@(accountToSummary: Map[Account, Summary], expandedYear: Int)(implicit user: User, request: Request[AnyContent], flash: Flash)
+@(
+  accountToSummary: Map[Account, Summary],
+  expandedYear: Int,
+  templatesInNavbar: Seq[Template]
+)(
+  implicit user: User, request: Request[AnyContent], flash: Flash
+)
 
-@Main("Summary") {
+@Main("Summary", templatesInNavbar = templatesInNavbar) {
   <h1><i class="fa fa-table fa-fw"></i> Summary</h1>
 
 

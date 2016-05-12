@@ -1,13 +1,21 @@
+@import scala.collection.immutable.Seq
+
 @import models.User
 @import models.accounting.Money.CurrencyUnit
-@import models.accounting.config.{Config, Account, MoneyReservoir, Category}
+@import models.accounting.config.{Account, MoneyReservoir, Category, Template}
 @import controllers.helpers.accounting.GeneralEntry
 @import viewhelpers.Formatting._
 @import views.html.accounting.parts._
 
-@(entries: Seq[GeneralEntry], numEntriesToShow: Int)(implicit user: User, request: Request[AnyContent], flash: Flash)
+@(
+  entries: Seq[GeneralEntry],
+  numEntriesToShow: Int,
+  templatesInNavbar: Seq[Template]
+)(
+  implicit user: User, request: Request[AnyContent], flash: Flash
+)
 
-@Main("Everything") {
+@Main("Everything", templatesInNavbar = templatesInNavbar) {
   <h1><i class="fa fa-list fa-fw"></i> Everything</h1>
 
   @Panel(

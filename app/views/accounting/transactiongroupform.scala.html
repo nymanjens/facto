@@ -1,15 +1,24 @@
+@import scala.collection.immutable.Seq
+
 @import helper._
+
 @import common.CollectionUtils.toListMap
 @import models.User
 @import models.accounting.Money.CurrencyUnit
-@import models.accounting.config.{Config, Account, MoneyReservoir, Category}
+@import models.accounting.config.{Config, Account, MoneyReservoir, Category, Template}
 @import controllers.accounting.TransactionGroupOperations.Forms._
 @import views.html.utils.{repeatWithIndex, bootstrap3}
-@(title: String,
+
+@(
+  title: String,
   transGroupForm: Form[TransGroupData],
   formAction: Call,
-  deleteAction: Option[Call])(
-    implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash)
+  deleteAction: Option[Call],
+  redirectTo: String,
+  templatesInNavbar: Seq[Template]
+)(
+  implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash
+)
 
 @zeroSum = @{
   transGroupForm("zeroSum").value.getOrElse(false) match {
@@ -24,7 +33,7 @@
   <script src="@routes.Assets.at("javascripts/transactiongroupform.js")"></script>
 }
 
-@Main(title, extrascript) {
+@Main(title, extrascript, templatesInNavbar, redirectToOption = Some(redirectTo)) {
   <div class="transaction-group-form">
     @form(action = formAction, 'class ->  "form-horizontal") {
       <div class="row">

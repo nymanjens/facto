@@ -61,6 +61,11 @@ object Config {
   def templatesToShowFor(location: Template.Placement, user: User): Seq[Template] =
     loadedConfig.templates filter (_.showFor(location, user))
 
+  def templateWithId(id: Long): Template = {
+    val idToTemplate = {for(tpl <- loadedConfig.templates) yield tpl.id -> tpl}.toMap
+    idToTemplate(id)
+  }
+
   val constants: Constants = loadedConfig.constants
 
   def accountOf(user: User): Option[Account] = accounts.values.filter(_.user == Some(user)).headOption
