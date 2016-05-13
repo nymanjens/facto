@@ -1,15 +1,16 @@
 package models.accounting.config
 
-import common.Require.requireNonNullFields
-
 import collection.immutable.Seq
 
 import play.Play.application
+import play.api.Logger
 
+import com.google.common.base.Throwables
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor
 import org.yaml.snakeyaml.introspector.BeanAccess
 
+import common.Require.requireNonNullFields
 import models.User
 import models.accounting.config.MoneyReservoir.NullMoneyReservoir
 
@@ -24,20 +25,27 @@ case class Config(accounts: Map[String, Account],
 object Config {
 
   private val loadedConfig: Config = {
-    // get configLocation
-    val configLocation = application.configuration.getString("facto.accounting.configYamlFilePath")
+    try {
+      // get configLocation
+      val configLocation = application.configuration.getString("facto.accounting.configYamlFilePath")
 
-    // get data
-    val stringData = scala.io.Source.fromFile(configLocation).mkString
+      // get data
+      val stringData = scala.io.Source.fromFile(configLocation).mkString
 
-    // parse data
-    val constr = new CustomClassLoaderConstructor(getClass.getClassLoader)
-    val yaml = new Yaml(constr)
-    yaml.setBeanAccess(BeanAccess.FIELD)
-    val configData = yaml.load(stringData).asInstanceOf[Parsable.Config]
+      // parse data
+      val constr = new CustomClassLoaderConstructor(getClass.getClassLoader)
+      val yaml = new Yaml(constr)
+      yaml.setBeanAccess(BeanAccess.FIELD)
+      val configData = yaml.load(stringData).asInstanceOf[Parsable.Config]
 
-    // convert to parsed config
-    configData.parse
+      // convert to parsed config
+      configData.parse
+    } catch {
+      case e: Throwable =>
+        val stackTrace = Throwables.getStackTraceAsString(e)
+        Logger.error(s"Error when parsing accounting-config.yml: $stackTrace")
+        throw e
+    }
   }
 
   /** Maps code to account */
@@ -62,7 +70,9 @@ object Config {
     loadedConfig.templates filter (_.showFor(location, user))
 
   def templateWithId(id: Long): Template = {
-    val idToTemplate = {for(tpl <- loadedConfig.templates) yield tpl.id -> tpl}.toMap
+    val idToTemplate = {
+      for (tpl <- loadedConfig.templates) yield tpl.id -> tpl
+    }.toMap
     idToTemplate(id)
   }
 

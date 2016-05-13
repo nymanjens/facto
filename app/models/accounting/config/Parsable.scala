@@ -1,15 +1,16 @@
 package models.accounting.config
 
-import java.util.Collections
-
 import scala.collection.JavaConverters._
 import scala.collection.immutable.ListMap
+import java.util.Collections
 
+import com.google.common.base.Preconditions.checkNotNull
 import com.google.common.collect.ImmutableList
+
 import play.twirl.api.Html
 
-import models.accounting.config.{Config => ParsedConfig, Account => ParsedAccount, Category => ParsedCategory, MoneyReservoir => ParsedMoneyReservoir,
-Template => ParsedTemplate, Constants => ParsedConstants}
+import common.Require.requireNonNullFields
+import models.accounting.config.{Account => ParsedAccount, Category => ParsedCategory, Config => ParsedConfig, Constants => ParsedConstants, MoneyReservoir => ParsedMoneyReservoir, Template => ParsedTemplate}
 import models.accounting.config.Account.{SummaryTotalRowDef => ParsedSummaryTotalRowDef}
 import models.accounting.config.MoneyReservoir.NullMoneyReservoir
 import models.accounting.Money
@@ -24,6 +25,7 @@ object Parsable {
     def this() = this(null, null, null, null, null)
 
     def parse: ParsedConfig = {
+      requireNonNullFields(this)
       val parsedAccounts = toListMap(accounts)(_.code, _.parse)
       val parsedCategories = toListMap(categories)(_.code, _.parse)
       val parsedReservoirs = toListMap(moneyReservoirs)(_.code, _.parse)
@@ -59,7 +61,7 @@ object Parsable {
         userLoginName = Option(userLoginName),
         defaultCashReservoirCode = Option(defaultCashReservoirCode),
         defaultElectronicReservoirCode = defaultElectronicReservoirCode,
-        categories = categories.asScala.toList.map(_.parse),
+        categories = checkNotNull(categories).asScala.toList.map(_.parse),
         summaryTotalRows = nonNullSummaryTotalRows.asScala.toList.map(_.parse))
     }
   }
@@ -69,7 +71,7 @@ object Parsable {
 
       def parse: ParsedSummaryTotalRowDef = ParsedSummaryTotalRowDef(
         rowTitleHtml = Html(rowTitleHtml),
-        categoriesToIgnore = categoriesToIgnore.asScala.map(_.parse).toSet)
+        categoriesToIgnore = checkNotNull(categoriesToIgnore).asScala.map(_.parse).toSet)
     }
     object SummaryTotalRowDef {
       val default: SummaryTotalRowDef = SummaryTotalRowDef("<b>Total</b>", Collections.emptyList[Category])
@@ -110,11 +112,11 @@ object Parsable {
       ParsedTemplate(
         id = id,
         name = name,
-        placement = placement.asScala.toSet map ParsedTemplate.Placement.fromString,
+        placement = checkNotNull(placement).asScala.toSet map ParsedTemplate.Placement.fromString,
         onlyShowForUserLoginNames = Option(onlyShowForUserLoginNames) map (_.asScala.toSet),
         zeroSum = zeroSum,
         fontAwesomeClass = icon,
-        transactions = transactions.asScala.toList map (_.parse(accounts, reservoirs, categories)))
+        transactions = checkNotNull(transactions).asScala.toList map (_.parse(accounts, reservoirs, categories)))
     }
   }
 
@@ -166,6 +168,7 @@ object Parsable {
 
 
   private def toListMap[T, K, V](list: java.util.List[T])(keyGetter: T => K, valueGetter: T => V): ListMap[K, V] = {
+    checkNotNull(list)
     val tuples = list.asScala.map(t => (keyGetter(t), valueGetter(t)))
     val resultBuilder = ListMap.newBuilder[K, V]
     tuples.foreach(resultBuilder += _)
