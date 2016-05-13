@@ -4,6 +4,10 @@ scala:
 jdk:
   - oraclejdk8
 
+before_script:
+  - "npm install -g jshint"
+
 script:
   - sbt test
   - sbt scalastyle
+  - jshint app/assets/javascripts/
