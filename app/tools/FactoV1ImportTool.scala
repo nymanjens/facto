@@ -63,7 +63,7 @@ object FactoV1ImportTool {
   }
 
   private def defaultPassword(implicit app: Application): String = {
-    app.configuration.getString("facto.import.defaultPassword") getOrElse "changeme"
+    app.configuration.getString("facto.setup.defaultPassword") getOrElse "changeme"
   }
 
   private def dateForMillisSinceEpoch(millis: Long): DateTime = {

@@ -56,6 +56,20 @@ object Global extends GlobalSettings {
 
       System.exit(0)
     }
+
+    if(CommandLineFlags.createAdminUser()) {
+      val loginName = "admin"
+      val password = AppConfigHelper.defaultPassword getOrElse "changeme"
+
+      println("")
+      println("  Createing admin user...")
+      println(s"    loginName: $loginName")
+      println(s"    password: $password")
+      Users.all.save(Users.newWithUnhashedPw(loginName, password, name = "Admin"))
+      println("  Done. Exiting.")
+
+      System.exit(0)
+    }
   }
 
   private def loadDummyUsers() = {
@@ -77,13 +91,14 @@ object Global extends GlobalSettings {
   private object CommandLineFlags {
     private val properties = System.getProperties.asScala
 
-    def loadFactoV1DataFromPath(): Option[Path] = {
-      properties.get("loadFactoV1DataFromPath").map(Paths.get(_))
-    }
+    def loadFactoV1DataFromPath(): Option[Path] = getExistingPath("loadFactoV1DataFromPath")
+    def dropAndCreateNewDb():      Boolean =      getBoolean("dropAndCreateNewDb")
+    def createAdminUser():         Boolean =      getBoolean("createAdminUser")
 
-    def dropAndCreateNewDb(): Boolean = {
-      properties.get("dropAndCreateNewDb").isDefined
-    }
+    private def getBoolean(name: String): Boolean = properties.get(name).isDefined
+
+    private def getExistingPath(name: String): Option[Path] =
+      properties.get(name) map (Paths.get(_)) map assertExists
   }
 
   private object AppConfigHelper {
@@ -93,9 +108,13 @@ object Global extends GlobalSettings {
     def csvDummyDataFolder(implicit app: Application): Path =    getExistingPath("facto.development.csvDummyDataFolder")
     def loadFactoV1Data(implicit app: Application):    Boolean = getBoolean("facto.development.loadFactoV1Data")
     def factoV1SqlFilePath(implicit app: Application): Path =    getExistingPath("facto.development.factoV1SqlFilePath")
+    def defaultPassword(implicit app: Application):    Option[String] = getString("facto.setup.defaultPassword")
 
     private def getBoolean(cfgPath: String)(implicit app: Application): Boolean =
       app.configuration.getBoolean(cfgPath) getOrElse false
+
+    private def getString(cfgPath: String)(implicit app: Application): Option[String] =
+      app.configuration.getString(cfgPath)
 
     private def getExistingPath(cfgPath: String)(implicit app: Application): Path = assertExists {
       Paths.get(app.configuration.getString(cfgPath).get)
