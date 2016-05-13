@@ -75,12 +75,12 @@
             <li>
               <a href="@controllers.accounting.routes.TransactionGroupOperations.addNewForm(redirectTo)">
                 <i class="fa fa-plus-square fa-fw"></i> New Entry</a>
+              <a href="@controllers.accounting.routes.GeneralActions.templateList">
+                <i class="fa fa-fast-forward fa-fw"></i> Templates</a>
               @for(template <- templatesInNavbar) {
                 <a href="@controllers.accounting.routes.TransactionGroupOperations.addNewFromTemplate(template.id, redirectTo)">
                   <i class="fa @template.fontAwesomeClass fa-fw"></i> @template.name</a>
               }
-              <a href="@controllers.accounting.routes.GeneralActions.templateList">
-                <i class="fa fa-fast-forward fa-fw"></i> Templates</a>
             </li>
           </ul>
 

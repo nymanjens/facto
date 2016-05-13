@@ -18,7 +18,6 @@ case class Template(id: Long,
                     val fontAwesomeClass: String,
                     private val transactions: Seq[Template.Transaction]) {
   requireNonNullFields(this)
-  validateLoginNames()
 
   def showFor(location: Template.Placement, user: User): Boolean = {
     val showAtLocation = placement contains location
@@ -38,18 +37,11 @@ case class Template(id: Long,
   private def onlyShowForUsers: Option[Set[User]] = {
     onlyShowForUserLoginNames.map { loginNameOption =>
       loginNameOption.map { loginName =>
-        Users.findByLoginName(loginName).get // This will exist because earlier check in validateLoginNames() succeeded.
-      }
-    }
-  }
-
-  private def validateLoginNames(): Unit = {
-    onlyShowForUserLoginNames.map { loginNameOption =>
-      loginNameOption.map { loginName =>
         val user = Users.findByLoginName(loginName)
         require(user.isDefined, s"No user exists with loginName '$loginName'")
         require(Config.accountOf(user.get).isDefined, s"Only user names that have an associated account can be used in templates " +
           s"(user = '$loginName', template = '$name')")
+        user.get
       }
     }
   }

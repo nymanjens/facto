@@ -194,6 +194,7 @@ templates:
         moneyReservoirCode: "" # N/A
         categoryCode: ENDOW
         description: Endowment for ${account.longName}
+
   - name: Bakery
     placement: [TEMPLATE_LIST]
     icon: fa-shopping-cart
@@ -202,28 +203,27 @@ templates:
         moneyReservoirCode: ${account.defaultCashReservoir.code}
         categoryCode: LIFE
         description: Bakery
-  - name: Bakery
+        flowAsFloat: -2.1
+  - name: Wages Alice
     placement: [TEMPLATE_LIST]
-    icon: fa-shopping-cart
+    icon: fa-suitcase
+    onlyShowForUserLoginNames: [alice]
     transactions:
-      - beneficiaryCode: Common
-        moneyReservoirCode: ${account.defaultCashReservoir.code}
-        categoryCode: LIFE
-        description: Bakery
-  - name: Bakery
+      - beneficiaryCode: Alice
+        moneyReservoirCode: CARD_ALICE
+        categoryCode: IN
+        description: Wages
+        flowAsFloat: 910
+  - name: Wages Bob
     placement: [TEMPLATE_LIST]
+    icon: fa-suitcase
+    onlyShowForUserLoginNames: [bob]
     transactions:
-      - beneficiaryCode: Common
-        moneyReservoirCode: ${account.defaultCashReservoir.code}
-        categoryCode: LIFE
-        description: Bakery
-  - name: Bakery
-    placement: [TEMPLATE_LIST]
-    transactions:
-      - beneficiaryCode: Common
-        moneyReservoirCode: ${account.defaultCashReservoir.code}
-        categoryCode: LIFE
-        description: Bakery
+      - beneficiaryCode: Bob
+        moneyReservoirCode: CARD_BOB
+        categoryCode: IN
+        description: Wages
+        flowAsFloat: 900
 
 constants:
     commonAccount: *accountCommon
