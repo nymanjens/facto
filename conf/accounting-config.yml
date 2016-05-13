@@ -169,6 +169,7 @@ templates:
   - name: New Withdrawal
     placement: [CASH_FLOW_VIEW]
     zeroSum: true
+    icon: fa-credit-card
     transactions:
       - beneficiaryCode: ${account.code}
         moneyReservoirCode: ${account.defaultElectronicReservoir.code}
@@ -183,6 +184,7 @@ templates:
   - name: New Endowment
     placement: [ENDOWMENTS_VIEW]
     zeroSum: true
+    icon: fa-refresh
     transactions:
       - beneficiaryCode: Common
         moneyReservoirCode: "" # N/A
@@ -192,6 +194,29 @@ templates:
         moneyReservoirCode: "" # N/A
         categoryCode: ENDOW
         description: Endowment for ${account.longName}
+  - name: Bakery
+    placement: [TEMPLATE_LIST]
+    icon: fa-shopping-cart
+    transactions:
+      - beneficiaryCode: Common
+        moneyReservoirCode: ${account.defaultCashReservoir.code}
+        categoryCode: LIFE
+        description: Bakery
+  - name: Bakery
+    placement: [TEMPLATE_LIST]
+    icon: fa-shopping-cart
+    transactions:
+      - beneficiaryCode: Common
+        moneyReservoirCode: ${account.defaultCashReservoir.code}
+        categoryCode: LIFE
+        description: Bakery
+  - name: Bakery
+    placement: [TEMPLATE_LIST]
+    transactions:
+      - beneficiaryCode: Common
+        moneyReservoirCode: ${account.defaultCashReservoir.code}
+        categoryCode: LIFE
+        description: Bakery
   - name: Bakery
     placement: [TEMPLATE_LIST]
     transactions:

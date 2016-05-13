@@ -1,3 +1,5 @@
+'use strict';
+
 $(document).ready(() => {
 
   // show next hidden entries

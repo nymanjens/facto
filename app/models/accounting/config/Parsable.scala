@@ -98,9 +98,10 @@ object Parsable {
                       placement: java.util.List[String],
                       onlyShowForUserLoginNames: /* nullable */ java.util.List[String],
                       zeroSum: Boolean,
+                      icon: String,
                       transactions: java.util.List[Template.Transaction]) {
 
-    def this() = this(null, null, null, zeroSum = false, null)
+    def this() = this(null, null, null, zeroSum = false, icon = "fa-plus-square", null)
 
     def parse(id: Long,
               accounts: Map[String, ParsedAccount],
@@ -112,6 +113,7 @@ object Parsable {
         placement = placement.asScala.toSet map ParsedTemplate.Placement.fromString,
         onlyShowForUserLoginNames = Option(onlyShowForUserLoginNames) map (_.asScala.toSet),
         zeroSum = zeroSum,
+        fontAwesomeClass = icon,
         transactions = transactions.asScala.toList map (_.parse(accounts, reservoirs, categories)))
     }
   }
