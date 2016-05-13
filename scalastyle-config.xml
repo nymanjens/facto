@@ -56,9 +56,9 @@
  <check level="error" class="org.scalastyle.scalariform.StructuralTypeChecker" enabled="true"></check>
  <check level="error" class="org.scalastyle.file.RegexChecker" enabled="true">
   <parameters>
-   <parameter name="regex">println\("[^" ]</parameter>
+   <parameter name="regex">println\( *(s"[^" ]|"[^" ]|[^" ]{2})</parameter>
   </parameters>
-  <customMessage>Only println statements starting with a space are allowed. All others are considered debug printlns.</customMessage>
+  <customMessage>Only println statements with a string starting with a space are allowed. All others are considered debug printlns.</customMessage>
  </check>
  <check level="error" class="org.scalastyle.scalariform.NumberOfTypesChecker" enabled="true">
   <parameters>
