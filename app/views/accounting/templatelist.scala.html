@@ -16,9 +16,15 @@
 @Main("Templates") {
   <h1><i class="fa fa-fast-forward fa-fw"></i> Templates</h1>
 
-  @for(template <- templates) {
-    <div>
-      <button type="button" class="btn btn-info btn-lg">@template.name</button>
-    </div>
+  @Panel(
+    title = "Templates",
+    panelClasses = "templates-panel"
+  ) { @* panel content *@
+
+    @for(template <- templates) {
+        <a href="@controllers.accounting.routes.TransactionGroupOperations.addNewFromTemplate(template.id, redirectTo = request.uri)"
+            class="btn btn-info btn-lg">
+          @template.name</a>
+    }
   }
 }
