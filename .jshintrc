@@ -25,7 +25,7 @@
     "maxcomplexity" : false,
     "maxlen"        : false,
 
-    "asi"           : false,
+    "asi"           : true,
     "boss"          : false,
     "debug"         : false,
     "eqnull"        : false,
