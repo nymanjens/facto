@@ -4,6 +4,7 @@
 .tmpBin
 /*.iml
 /.classpath
+/.idea
 /.idea/workspace.xml
 /.idea_modules
 /.project
@@ -11,6 +12,7 @@
 /out
 /RUNNING_PID
 bin/
+database.db
 logs
 project/project
 project/target
