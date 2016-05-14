@@ -1,7 +1,6 @@
 package controllers
 
-import controllers.Application.Forms.{ChangePasswordData, AddUserData}
-import models.Users
+import play.Play._
 import play.api.data.Form
 import play.api.mvc._
 import play.api.data.Forms._
@@ -10,6 +9,8 @@ import play.api.data.Forms._
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 
+import controllers.Application.Forms.{AddUserData, ChangePasswordData}
+import models.Users
 
 object Application extends Controller with Secured {
 
@@ -56,6 +57,16 @@ object Application extends Controller with Secured {
         }
       )
   }
+
+  def backup(applicationSecret: String) = Action { implicit request =>
+    val realApplicationSecret = application.configuration.getString("play.crypto.secret")
+    if (realApplicationSecret == applicationSecret) {
+      Ok(applicationSecret)
+    } else {
+      Forbidden("Incorrect aplication secret")
+    }
+  }
+
 
   // ********** forms ********** //
   object Forms {

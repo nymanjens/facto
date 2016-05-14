@@ -3,18 +3,21 @@
 # ~~~~
 
 # Home page
-GET  /                controllers.Application.index
+GET  /                             controllers.Application.index
 
 # Auth
-GET  /login/          controllers.Auth.login
-POST /login/          controllers.Auth.authenticate
-GET  /logout/         controllers.Auth.logout
+GET  /login/                       controllers.Auth.login
+POST /login/                       controllers.Auth.authenticate
+GET  /logout/                      controllers.Auth.logout
 
 # User
-GET  /profile/         controllers.Application.profile
-POST  /profile/changepassword/ controllers.Application.changePassword
-GET  /administration/          controllers.Application.administration
-POST  /profile/adduser/ controllers.Application.addUser
+GET   /profile/                    controllers.Application.profile
+POST  /profile/changepassword/     controllers.Application.changePassword
+GET   /administration/             controllers.Application.administration
+POST  /profile/adduser/            controllers.Application.addUser
+
+# Backup
+GET   /backup/:applicationSecret/  controllers.Application.backup(applicationSecret)
 
 # Accounting - general
 GET  /acc/logs/                    controllers.accounting.GeneralActions.updateLogsLatest
@@ -34,8 +37,8 @@ GET  /acc/summary/                 controllers.accounting.Views.summaryForCurren
 GET  /acc/summary/:expandedyear/   controllers.accounting.Views.summaryFor(expandedyear: Int)
 
 # Accounting - transaction group operations
-GET  /acc/trans/new/:redirectTo     controllers.accounting.TransactionGroupOperations.addNewForm(redirectTo)
-POST /acc/trans/new/:redirectTo     controllers.accounting.TransactionGroupOperations.addNew(redirectTo)
+GET  /acc/trans/new/:redirectTo                    controllers.accounting.TransactionGroupOperations.addNewForm(redirectTo)
+POST /acc/trans/new/:redirectTo                    controllers.accounting.TransactionGroupOperations.addNew(redirectTo)
 GET  /acc/trans/edit/:transGroupId/:redirectTo     controllers.accounting.TransactionGroupOperations.editForm(transGroupId: Long, redirectTo)
 POST /acc/trans/edit/:transGroupId/:redirectTo     controllers.accounting.TransactionGroupOperations.edit(transGroupId: Long, redirectTo)
 GET  /acc/trans/delete/:transGroupId/:redirectTo   controllers.accounting.TransactionGroupOperations.delete(transGroupId: Long, redirectTo)
@@ -48,8 +51,8 @@ GET  /acc/trans/repay/:accountCode1/:accountCode2/:amountInCents/:redirectTo  co
 GET  /acc/bc/new/:moneyReservoirCode/:redirectTo     controllers.accounting.BalanceCheckOperations.addNewForm(moneyReservoirCode, redirectTo)
 POST /acc/bc/new/:moneyReservoirCode/:redirectTo     controllers.accounting.BalanceCheckOperations.addNew(moneyReservoirCode, redirectTo)
 GET  /acc/bc/confirm/:moneyReservoirCode/:balanceInCents/:mostRecentTransactionId/:redirectTo     controllers.accounting.BalanceCheckOperations.addConfirmation(moneyReservoirCode, balanceInCents: Long, mostRecentTransactionId: Long, redirectTo)
-GET  /acc/bc/edit/:bcId/:redirectTo     controllers.accounting.BalanceCheckOperations.editForm(bcId: Long, redirectTo)
-POST /acc/bc/edit/:bcId/:redirectTo     controllers.accounting.BalanceCheckOperations.edit(bcId: Long, redirectTo)
+GET  /acc/bc/edit/:bcId/:redirectTo       controllers.accounting.BalanceCheckOperations.editForm(bcId: Long, redirectTo)
+POST /acc/bc/edit/:bcId/:redirectTo       controllers.accounting.BalanceCheckOperations.edit(bcId: Long, redirectTo)
 GET  /acc/bc/delete/:bcId/:redirectTo     controllers.accounting.BalanceCheckOperations.delete(bcId: Long, redirectTo)
 
 # Map static resources from the /public folder to the /assets URL path
