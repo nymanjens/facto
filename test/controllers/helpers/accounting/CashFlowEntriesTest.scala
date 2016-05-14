@@ -71,6 +71,7 @@ class CashFlowEntriesTest extends Specification {
     for (i <- 1 to 20 * 1000) {
       if (i % 1000 == 0) {
         Logger.info(s"Persisting entries... (persisted $i)")
+        println("test")
       }
       persistTransaction(groupId = i, flow = Money(Random.nextInt), timestamp = i)
       persistBalanceCheck(balance = Money(Random.nextInt), timestamp = i)
