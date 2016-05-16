@@ -36,4 +36,24 @@ $(document).ready(() => {
   }
   reloadToc()
   $('.btn-toggle-other-accounts').click(reloadToc)
+
+  // Key bindings
+  const shortcuts = {
+    'shift+alt+e': "menu-link-general",
+    'shift+alt+a': "menu-link-general",
+    'shift+alt+c': "menu-link-cashflow",
+    'shift+alt+l': "menu-link-liquidation",
+    'shift+alt+v': "menu-link-liquidation",
+    'shift+alt+d': "menu-link-endowments",
+    'shift+alt+s': "menu-link-summary",
+    'shift+alt+o': "menu-link-summary",
+    'shift+alt+t': "menu-link-newtransgroup",
+    'shift+alt+n': "menu-link-templates",
+  }
+  $.each(shortcuts, (key_combo, link_id) => {
+    Mousetrap.bind(key_combo,() => {
+      console.log(`Keypress ${key_combo} detected. Pressing on link ${link_id}`)
+      $(`#${link_id}`).click()
+    });
+  })
 })

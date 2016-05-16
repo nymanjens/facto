@@ -59,24 +59,24 @@
         <div class="sidebar-nav navbar-collapse">
           <ul class="nav" id="side-menu">
             <li>
-              <a href="@controllers.accounting.routes.Views.generalLatest">
-                <i class="icon-list"></i> Everything</a>
-              <a href="@controllers.accounting.routes.Views.cashFlowOfAll">
-                <i class="icon-money"></i> Cash Flow</a>
-              <a href="@controllers.accounting.routes.Views.liquidationOfAll">
-                <i class="icon-water"></i> Liquidation</a>
-              <a href="@controllers.accounting.routes.Views.endowmentsOfAll">
-                <i class="icon-crown"></i> Endowments</a>
-              <a href="@controllers.accounting.routes.Views.summaryForCurrentYear">
-                <i class="icon-table"></i> Summary</a>
+              <a href="@controllers.accounting.routes.Views.generalLatest" id="menu-link-general">
+                <i class="icon-list"></i> <u>E</u>verything</a>
+              <a href="@controllers.accounting.routes.Views.cashFlowOfAll" id="menu-link-cashflow">
+                <i class="icon-money"></i> <u>C</u>ash Flow</a>
+              <a href="@controllers.accounting.routes.Views.liquidationOfAll" id="menu-link-liquidation">
+                <i class="icon-water"></i> <u>L</u>iquidation</a>
+              <a href="@controllers.accounting.routes.Views.endowmentsOfAll" id="menu-link-endowments">
+                <i class="icon-crown"></i> En<u>d</u>owments</a>
+              <a href="@controllers.accounting.routes.Views.summaryForCurrentYear" id="menu-link-summary">
+                <i class="icon-table"></i> <u>S</u>ummary</a>
             </li>
           </ul>
           <ul class="nav" id="side-menu">
             <li>
-              <a href="@controllers.accounting.routes.TransactionGroupOperations.addNewForm(redirectTo)">
-                <i class="icon-plus-squared"></i> New Entry</a>
-              <a href="@controllers.accounting.routes.GeneralActions.templateList">
-                <i class="icon-check-empty"></i> Templates</a>
+              <a href="@controllers.accounting.routes.TransactionGroupOperations.addNewForm(redirectTo)" id="menu-link-newtransgroup">
+                <i class="icon-plus-squared"></i> <u>N</u>ew Entry</a>
+              <a href="@controllers.accounting.routes.GeneralActions.templateList" id="menu-link-templates">
+                <i class="icon-check-empty"></i> <u>T</u>emplates</a>
               @for(template <- templatesInNavbar) {
                 <a href="@controllers.accounting.routes.TransactionGroupOperations.addNewFromTemplate(template.id, redirectTo)">
                   <i class="@template.iconClass"></i> @template.name</a>
