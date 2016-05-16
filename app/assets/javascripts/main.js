@@ -47,13 +47,16 @@ $(document).ready(() => {
     'shift+alt+d': "menu-link-endowments",
     'shift+alt+s': "menu-link-summary",
     'shift+alt+o': "menu-link-summary",
-    'shift+alt+t': "menu-link-newtransgroup",
-    'shift+alt+n': "menu-link-templates",
+    'shift+alt+t': "menu-link-templates",
+    'shift+alt+n': "menu-link-newtransgroup",
   }
   $.each(shortcuts, (key_combo, link_id) => {
-    Mousetrap.bind(key_combo,() => {
+    Mousetrap.bind(key_combo, (e) => {
+      if (e.preventDefault) {
+        e.preventDefault();
+      }
       console.log(`Keypress ${key_combo} detected. Pressing on link ${link_id}`)
-      $(`#${link_id}`).click()
+      document.getElementById(link_id).click()
     });
   })
 })
