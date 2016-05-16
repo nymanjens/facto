@@ -67,6 +67,7 @@
 
     "globals"       : {
         "assert": false,
-        "stripPrefix": false
+        "stripPrefix": false,
+        "Mousetrap": false
     }
 }
