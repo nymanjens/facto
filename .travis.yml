@@ -10,4 +10,5 @@ before_script:
 script:
   - sbt test
   - sbt scalastyle
+  - sbt test:scalastyle # run scalastyle in test code
   - jshint app/assets/javascripts/

@@ -7,6 +7,7 @@ import org.specs2.runner._
 import org.junit.runner._
 import play.api.test._
 import play.api.mvc._
+import play.api.Logger
 import models.accounting._
 import scala.util.Random
 import org.joda.time.DateTime
@@ -52,6 +53,6 @@ class ApplicationFunctionalTest extends PlaySpecification {
   //    val result = route(fakeRequest.withCookies(Cookie("myMemberId", "d"))).get
   //
   //    status(result) mustEqual OK
-  //    println(contentAsString(result))
+  //    Logger.info(contentAsString(result))
   //  }
 }

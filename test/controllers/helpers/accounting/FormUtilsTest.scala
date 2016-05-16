@@ -20,7 +20,7 @@ class FormUtilsTest extends Specification {
 
   "validFlowAsFloat" in new WithApplication {
     val constraint = FormUtils.validFlowAsFloat
-    
+
     constraint("abc") mustNotEqual Valid
     constraint("0x123") mustNotEqual Valid
 
