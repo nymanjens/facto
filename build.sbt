@@ -25,11 +25,12 @@ libraryDependencies ++= Seq(
   "org.webjars"            %  "datatables"            % "1.10.4",
   "org.webjars"            %  "datatables-plugins"    % "1.10.7",
   "org.webjars"            %  "flot"                  % "0.8.3",
-  "org.webjars"            %  "font-awesome"          % "4.2.0",
+  "org.webjars"            %  "font-awesome"          % "4.6.2",
   "org.webjars.bower"      %  "holderjs"              % "2.6.0",
   "org.webjars"            %  "metisMenu"             % "1.1.3",
   "org.webjars"            %  "morrisjs"              % "0.5.1",
   "org.webjars.bower"      %  "datatables-responsive" % "1.0.6",
   "org.webjars"            %  "bootstrap-social"      % "4.9.0",
-  "org.webjars.bower"      %  "flot.tooltip"          % "0.8.5"
+  "org.webjars.bower"      %  "flot.tooltip"          % "0.8.5",
+  "org.webjars"            %  "mousetrap"             % "1.5.3-1"
 )

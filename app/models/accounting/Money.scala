@@ -51,7 +51,7 @@ object Money {
   def fromFloat(float: Double, currency: CurrencyUnit = CurrencyUnit.default): Money =
     Money((float.toDouble * 100).round, currency)
 
-  sealed abstract class CurrencyUnit(val threeLetterSymbol: String, val htmlSymbol: Html, val fontAwesomeClass: Option[String] = None) {
+  sealed abstract class CurrencyUnit(val threeLetterSymbol: String, val htmlSymbol: Html, val iconClass: Option[String] = None) {
     override def toString = threeLetterSymbol
   }
 
@@ -64,9 +64,9 @@ object Money {
     lazy val default: CurrencyUnit = CurrencyUnit.of(Config.constants.defaultCurrencySymbol)
 
     private def all: Set[CurrencyUnit] = Set(Eur, Gbp, Usd)
-    object Eur extends CurrencyUnit("EUR", Html("&euro;"), Some("fa-eur"))
-    object Gbp extends CurrencyUnit("GBP", Html("&pound;"), Some("fa-gbp"))
-    object Usd extends CurrencyUnit("USD", Html("$"), Some("fa-usd"))
+    object Eur extends CurrencyUnit("EUR", Html("&euro;"), Some("fa fa-eur"))
+    object Gbp extends CurrencyUnit("GBP", Html("&pound;"), Some("fa fa-gbp"))
+    object Usd extends CurrencyUnit("USD", Html("$"), Some("fa fa-usd"))
   }
 
   implicit object MoneyNumeric extends Numeric[Money] {

@@ -169,7 +169,7 @@ templates:
   - name: New Withdrawal
     placement: [CASH_FLOW_VIEW]
     zeroSum: true
-    icon: fa-credit-card
+    icon: fa fa-credit-card fa-fw
     transactions:
       - beneficiaryCode: ${account.code}
         moneyReservoirCode: ${account.defaultElectronicReservoir.code}
@@ -184,7 +184,7 @@ templates:
   - name: New Endowment
     placement: [ENDOWMENTS_VIEW]
     zeroSum: true
-    icon: fa-refresh
+    icon: icon-crown
     transactions:
       - beneficiaryCode: Common
         moneyReservoirCode: "" # N/A
@@ -197,7 +197,7 @@ templates:
 
   - name: Bakery
     placement: [TEMPLATE_LIST]
-    icon: fa-shopping-cart
+    icon: fa fa-shopping-cart fa-fw
     transactions:
       - beneficiaryCode: Common
         moneyReservoirCode: ${account.defaultCashReservoir.code}
@@ -206,7 +206,7 @@ templates:
         flowAsFloat: -2.1
   - name: Wages Alice
     placement: [TEMPLATE_LIST]
-    icon: fa-suitcase
+    icon: fa fa-suitcase fa-fw
     onlyShowForUserLoginNames: [alice]
     transactions:
       - beneficiaryCode: Alice
@@ -216,7 +216,7 @@ templates:
         flowAsFloat: 910
   - name: Wages Bob
     placement: [TEMPLATE_LIST]
-    icon: fa-suitcase
+    icon: fa fa-suitcase fa-fw
     onlyShowForUserLoginNames: [bob]
     transactions:
       - beneficiaryCode: Bob

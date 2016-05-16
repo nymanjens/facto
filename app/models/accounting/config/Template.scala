@@ -15,7 +15,7 @@ case class Template(id: Long,
                     private val placement: Set[Template.Placement],
                     private val onlyShowForUserLoginNames: Option[Set[String]],
                     private val zeroSum: Boolean,
-                    val fontAwesomeClass: String,
+                    val iconClass: String,
                     private val transactions: Seq[Template.Transaction]) {
   requireNonNullFields(this)
 

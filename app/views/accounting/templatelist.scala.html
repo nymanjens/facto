@@ -14,7 +14,7 @@
 )
 
 @Main("Templates") {
-  <h1><i class="fa fa-fast-forward fa-fw"></i> Templates</h1>
+  <h1><i class="icon-check-empty"></i> Templates</h1>
 
   @Panel(
     title = "Templates",
@@ -24,7 +24,7 @@
     @for(template <- templates) {
         <a href="@controllers.accounting.routes.TransactionGroupOperations.addNewFromTemplate(template.id, redirectTo = request.uri)"
             class="btn btn-info btn-lg">
-          <i class="fa @template.fontAwesomeClass fa-fw"></i> @template.name
+          <i class="@template.iconClass"></i> @template.name
         </a>
     }
   }

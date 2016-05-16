@@ -67,7 +67,6 @@ object Application extends Controller with Secured {
     }
   }
 
-
   // ********** forms ********** //
   object Forms {
 

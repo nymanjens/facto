@@ -116,7 +116,7 @@ object Parsable {
         placement = checkNotNull(placement).asScala.toSet map ParsedTemplate.Placement.fromString,
         onlyShowForUserLoginNames = Option(onlyShowForUserLoginNames) map (_.asScala.toSet),
         zeroSum = zeroSum,
-        fontAwesomeClass = icon,
+        iconClass = icon,
         transactions = checkNotNull(transactions).asScala.toList map (_.parse(accounts, reservoirs, categories)))
     }
   }

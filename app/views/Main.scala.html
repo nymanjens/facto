@@ -60,26 +60,26 @@
           <ul class="nav" id="side-menu">
             <li>
               <a href="@controllers.accounting.routes.Views.generalLatest">
-                <i class="fa fa-list fa-fw"></i> Everything</a>
+                <i class="icon-list"></i> Everything</a>
               <a href="@controllers.accounting.routes.Views.cashFlowOfAll">
-                <i class="fa fa-money fa-fw"></i> Cash Flow</a>
+                <i class="icon-money"></i> Cash Flow</a>
               <a href="@controllers.accounting.routes.Views.liquidationOfAll">
-                <i class="fa fa-users fa-fw"></i> Liquidation</a>
+                <i class="icon-water"></i> Liquidation</a>
               <a href="@controllers.accounting.routes.Views.endowmentsOfAll">
-                <i class="fa fa-refresh fa-fw"></i> Endowments</a>
+                <i class="icon-crown"></i> Endowments</a>
               <a href="@controllers.accounting.routes.Views.summaryForCurrentYear">
-                <i class="fa fa-table fa-fw"></i> Summary</a>
+                <i class="icon-table"></i> Summary</a>
             </li>
           </ul>
           <ul class="nav" id="side-menu">
             <li>
               <a href="@controllers.accounting.routes.TransactionGroupOperations.addNewForm(redirectTo)">
-                <i class="fa fa-plus-square fa-fw"></i> New Entry</a>
+                <i class="icon-plus-squared"></i> New Entry</a>
               <a href="@controllers.accounting.routes.GeneralActions.templateList">
-                <i class="fa fa-fast-forward fa-fw"></i> Templates</a>
+                <i class="icon-check-empty"></i> Templates</a>
               @for(template <- templatesInNavbar) {
                 <a href="@controllers.accounting.routes.TransactionGroupOperations.addNewFromTemplate(template.id, redirectTo)">
-                  <i class="fa @template.fontAwesomeClass fa-fw"></i> @template.name</a>
+                  <i class="@template.iconClass"></i> @template.name</a>
               }
             </li>
           </ul>
