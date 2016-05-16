@@ -49,21 +49,15 @@
       "src": "fontawesome"
     },
     {
-      "uid": "c03284ddefae90dfd5ae9f0ee03325a2",
-      "css": "fast-forward",
-      "code": 59399,
-      "src": "elusive"
-    },
-    {
-      "uid": "babd288a0685a4b701a934fd40679a80",
-      "css": "iphone-home",
-      "code": 59400,
-      "src": "elusive"
-    },
-    {
       "uid": "4b900d04e8ab8c82f080c1cfbac5772c",
       "css": "check-empty",
       "code": 59401,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "30b79160618d99ce798e4bd11cafe3fe",
+      "css": "food",
+      "code": 59402,
       "src": "fontawesome"
     }
   ]
