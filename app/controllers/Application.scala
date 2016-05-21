@@ -58,15 +58,6 @@ object Application extends Controller with Secured {
       )
   }
 
-  def backup(applicationSecret: String) = Action { implicit request =>
-    val realApplicationSecret = application.configuration.getString("play.crypto.secret")
-    if (realApplicationSecret == applicationSecret) {
-      Ok(applicationSecret)
-    } else {
-      Forbidden("Incorrect aplication secret")
-    }
-  }
-
   // ********** forms ********** //
   object Forms {
 

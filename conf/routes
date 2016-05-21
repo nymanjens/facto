@@ -16,9 +16,6 @@ POST  /profile/changepassword/     controllers.Application.changePassword
 GET   /administration/             controllers.Application.administration
 POST  /profile/adduser/            controllers.Application.addUser
 
-# Backup
-GET   /backup/:applicationSecret/  controllers.Application.backup(applicationSecret)
-
 # Accounting - general
 GET  /acc/logs/                    controllers.accounting.GeneralActions.updateLogsLatest
 GET  /acc/logs/all/                controllers.accounting.GeneralActions.updateLogsAll
