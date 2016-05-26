@@ -20,27 +20,27 @@ import controllers.helpers.accounting.FormUtils.{validFlowAsFloat, flowAsFloatSt
 object BalanceCheckOperations extends Controller with Secured {
 
   // ********** actions ********** //
-  def addNewForm(moneyReservoirCode: String, redirectTo: String) = ActionWithUser { implicit user =>
+  def addNewForm(moneyReservoirCode: String, returnTo: String) = ActionWithUser { implicit user =>
     implicit request =>
       val moneyReservoir = Config.moneyReservoir(moneyReservoirCode)
       val initialData = Forms.BcData(
         issuerName = user.name,
         moneyReservoirName = moneyReservoir.name,
         balance = Money(0))
-      Ok(formView(AddNewOperationMeta(moneyReservoirCode), initialData, redirectTo))
+      Ok(formView(AddNewOperationMeta(moneyReservoirCode), initialData, returnTo))
   }
 
-  def editForm(bcId: Long, redirectTo: String) = ActionWithUser { implicit user =>
+  def editForm(bcId: Long, returnTo: String) = ActionWithUser { implicit user =>
     implicit request =>
       val bc = BalanceChecks.all.findById(bcId)
       val formData = Forms.BcData.fromModel(bc)
-      Ok(formView(EditOperationMeta(bcId), formData, redirectTo))
+      Ok(formView(EditOperationMeta(bcId), formData, returnTo))
   }
 
-  def addNew(moneyReservoirCode: String, redirectTo: String) =
-    addOrEdit(AddNewOperationMeta(moneyReservoirCode), redirectTo)
+  def addNew(moneyReservoirCode: String, returnTo: String) =
+    addOrEdit(AddNewOperationMeta(moneyReservoirCode), returnTo)
 
-  def addConfirmation(moneyReservoirCode: String, balanceInCents: Long, mostRecentTransactionId: Long, redirectTo: String) =
+  def addConfirmation(moneyReservoirCode: String, balanceInCents: Long, mostRecentTransactionId: Long, returnTo: String) =
     ActionWithUser { implicit user =>
       implicit request =>
         val balance = Money(balanceInCents)
@@ -57,13 +57,13 @@ object BalanceCheckOperations extends Controller with Secured {
 
         val moneyReservoirName = moneyReservoir.name
         val message = s"Successfully added a balance check for $moneyReservoirName"
-        Redirect(redirectTo).flashing("message" -> message)
+        Redirect(returnTo).flashing("message" -> message)
     }
 
-  def edit(bcId: Long, redirectTo: String) =
-    addOrEdit(EditOperationMeta(bcId), redirectTo)
+  def edit(bcId: Long, returnTo: String) =
+    addOrEdit(EditOperationMeta(bcId), returnTo)
 
-  def delete(bcId: Long, redirectTo: String) = ActionWithUser { implicit user =>
+  def delete(bcId: Long, returnTo: String) = ActionWithUser { implicit user =>
     implicit request =>
       val bc = BalanceChecks.all.findById(bcId)
       UpdateLogs.addLog(user, UpdateLogs.Delete, bc)
@@ -71,11 +71,11 @@ object BalanceCheckOperations extends Controller with Secured {
 
       val moneyReservoirName = bc.moneyReservoir.name
       val message = s"Successfully deleted balance check for $moneyReservoirName"
-      Redirect(redirectTo).flashing("message" -> message)
+      Redirect(returnTo).flashing("message" -> message)
   }
 
   // ********** private helper controllers ********** //
-  private def addOrEdit(operationMeta: OperationMeta, redirectTo: String) = ActionWithUser { implicit user =>
+  private def addOrEdit(operationMeta: OperationMeta, returnTo: String) = ActionWithUser { implicit user =>
     implicit request =>
       // get sent data (copied from Form.bindFromRequest())
       val requestMap: Map[String, Seq[String]] = (request.body match {
@@ -85,7 +85,7 @@ object BalanceCheckOperations extends Controller with Secured {
 
       Forms.balanceCheckForm.bindFromRequest(requestMap).fold(
         formWithErrors => {
-          BadRequest(formView(operationMeta, formWithErrors, redirectTo))
+          BadRequest(formView(operationMeta, formWithErrors, returnTo))
         },
         bc => {
           persistBc(bc, operationMeta)
@@ -95,7 +95,7 @@ object BalanceCheckOperations extends Controller with Secured {
             case _: AddNewOperationMeta => s"Successfully created a balance check for $moneyReservoirName"
             case _: EditOperationMeta => s"Successfully edited a balance check for $moneyReservoirName"
           }
-          Redirect(redirectTo).flashing("message" -> message)
+          Redirect(returnTo).flashing("message" -> message)
         })
   }
 
@@ -121,12 +121,12 @@ object BalanceCheckOperations extends Controller with Secured {
     UpdateLogs.addLog(user, operation, persistedBc)
   }
 
-  private def formView(operationMeta: OperationMeta, formData: Forms.BcData, redirectTo: String)
+  private def formView(operationMeta: OperationMeta, formData: Forms.BcData, returnTo: String)
                       (implicit user: User, request: Request[AnyContent]): Html =
-    formView(operationMeta, Forms.balanceCheckForm.fill(formData), redirectTo)
+    formView(operationMeta, Forms.balanceCheckForm.fill(formData), returnTo)
 
 
-  private def formView(operationMeta: OperationMeta, form: Form[Forms.BcData], redirectTo: String)
+  private def formView(operationMeta: OperationMeta, form: Form[Forms.BcData], returnTo: String)
                       (implicit user: User, request: Request[AnyContent]): Html = {
     val title = operationMeta match {
       case _: AddNewOperationMeta => "New Balance Check"
@@ -134,11 +134,11 @@ object BalanceCheckOperations extends Controller with Secured {
     }
     val formAction = operationMeta match {
       case AddNewOperationMeta(moneyReservoirCode) =>
-        routes.BalanceCheckOperations.addNew(moneyReservoirCode, redirectTo)
-      case EditOperationMeta(bcId) => routes.BalanceCheckOperations.edit(bcId, redirectTo)
+        routes.BalanceCheckOperations.addNew(moneyReservoirCode, returnTo)
+      case EditOperationMeta(bcId) => routes.BalanceCheckOperations.edit(bcId, returnTo)
     }
     val deleteAction = operationMeta.bcIdOption.map(bcId =>
-      routes.BalanceCheckOperations.delete(bcId, redirectTo))
+      routes.BalanceCheckOperations.delete(bcId, returnTo))
     views.html.accounting.balancecheckform(
       reservoir = operationMeta.moneyReservoir,
       title,

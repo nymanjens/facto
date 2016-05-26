@@ -22,7 +22,7 @@
   ) { @* panel content *@
 
     @for(template <- templates) {
-        <a href="@controllers.accounting.routes.TransactionGroupOperations.addNewFromTemplate(template.id, redirectTo = request.uri)"
+        <a href="@controllers.accounting.routes.TransactionGroupOperations.addNewFromTemplate(template.id, returnTo = request.uri)"
             class="btn btn-info btn-lg">
           <i class="@template.iconClass"></i> @template.name
         </a>

@@ -27,22 +27,22 @@ import controllers.helpers.accounting.FormUtils.{validMoneyReservoirOrNullReserv
 object TransactionGroupOperations extends Controller with Secured {
 
   // ********** actions ********** //
-  def addNewForm(redirectTo: String) = addNewFormFromPartial(TransactionPartial.from(), redirectTo)
+  def addNewForm(returnTo: String) = addNewFormFromPartial(TransactionPartial.from(), returnTo)
 
-  def editForm(transGroupId: Long, redirectTo: String) = ActionWithUser { implicit user =>
+  def editForm(transGroupId: Long, returnTo: String) = ActionWithUser { implicit user =>
     implicit request =>
       val transGroup = TransactionGroups.all.findById(transGroupId)
       val formData = Forms.TransGroupData.fromModel(transGroup)
-      Ok(formViewWithInitialData(EditOperationMeta(transGroupId), formData, redirectTo))
+      Ok(formViewWithInitialData(EditOperationMeta(transGroupId), formData, returnTo))
   }
 
-  def addNew(redirectTo: String) =
-    addOrEdit(AddNewOperationMeta(), redirectTo)
+  def addNew(returnTo: String) =
+    addOrEdit(AddNewOperationMeta(), returnTo)
 
-  def edit(transGroupId: Long, redirectTo: String) =
-    addOrEdit(EditOperationMeta(transGroupId), redirectTo)
+  def edit(transGroupId: Long, returnTo: String) =
+    addOrEdit(EditOperationMeta(transGroupId), returnTo)
 
-  def delete(transGroupId: Long, redirectTo: String) = ActionWithUser { implicit user =>
+  def delete(transGroupId: Long, returnTo: String) = ActionWithUser { implicit user =>
     implicit request =>
       val group = TransactionGroups.all.findById(transGroupId)
       val numTrans = group.transactions.size
@@ -54,24 +54,24 @@ object TransactionGroupOperations extends Controller with Secured {
       TransactionGroups.all.delete(group)
 
       val message = s"""Successfully deleted ${numTrans} transaction${if (numTrans == 1) "" else "s"}"""
-      Redirect(redirectTo).flashing("message" -> message)
+      Redirect(returnTo).flashing("message" -> message)
   }
 
   // ********** shortcuts ********** //
-  def addNewFromTemplate(templateId: Long, redirectTo: String) = ActionWithUser { implicit user =>
+  def addNewFromTemplate(templateId: Long, returnTo: String) = ActionWithUser { implicit user =>
     implicit request =>
       val template = Config.templateWithId(templateId)
       // If this user is not associated with an account, it should not see any templates.
       val userAccount = Config.accountOf(user).get
       val partial = template.toPartial(userAccount)
       val initialData = Forms.TransGroupData.fromPartial(partial)
-      Ok(formViewWithInitialData(AddNewOperationMeta(), initialData, redirectTo, templatesInNavbar = Seq(template)))
+      Ok(formViewWithInitialData(AddNewOperationMeta(), initialData, returnTo, templatesInNavbar = Seq(template)))
   }
 
-  def addNewLiquidationRepayForm(accountCode1: String, accountCode2: String, amountInCents: Long, redirectTo: String): EssentialAction = {
+  def addNewLiquidationRepayForm(accountCode1: String, accountCode2: String, amountInCents: Long, returnTo: String): EssentialAction = {
     val amount = Money(amountInCents)
     if (amount < Money(0)) {
-      addNewLiquidationRepayForm(accountCode2, accountCode1, -amount.cents, redirectTo)
+      addNewLiquidationRepayForm(accountCode2, accountCode1, -amount.cents, returnTo)
     } else {
       val account1 = Config.accounts(accountCode1)
       val account2 = Config.accounts(accountCode2)
@@ -90,22 +90,22 @@ object TransactionGroupOperations extends Controller with Secured {
           flow = amount)),
         zeroSum = true
       ),
-        redirectTo)
+        returnTo)
     }
   }
 
   // ********** private helper controllers ********** //
-  private def addNewFormFromPartial(partial: TransactionPartial, redirectTo: String): EssentialAction =
-    addNewFormFromPartial(TransactionGroupPartial(Seq(partial)), redirectTo)
+  private def addNewFormFromPartial(partial: TransactionPartial, returnTo: String): EssentialAction =
+    addNewFormFromPartial(TransactionGroupPartial(Seq(partial)), returnTo)
 
   private def addNewFormFromPartial(partial: TransactionGroupPartial,
-                                    redirectTo: String): EssentialAction = ActionWithUser { implicit user =>
+                                    returnTo: String): EssentialAction = ActionWithUser { implicit user =>
     implicit request =>
       val initialData = Forms.TransGroupData.fromPartial(partial)
-      Ok(formViewWithInitialData(AddNewOperationMeta(), initialData, redirectTo))
+      Ok(formViewWithInitialData(AddNewOperationMeta(), initialData, returnTo))
   }
 
-  private def addOrEdit(operationMeta: OperationMeta, redirectTo: String) =
+  private def addOrEdit(operationMeta: OperationMeta, returnTo: String) =
     ActionWithUser { implicit user =>
       implicit request =>
         val cleanedRequestMap: Map[String, MutableSeq[String]] = {
@@ -150,7 +150,7 @@ object TransactionGroupOperations extends Controller with Secured {
 
         Forms.transactionGroupForm.bindFromRequest(cleanedRequestMap).fold(
           formWithErrors => {
-            BadRequest(formView(operationMeta, formWithErrors, redirectTo))
+            BadRequest(formView(operationMeta, formWithErrors, returnTo))
           },
           transGroup => {
             persistTransGroup(transGroup, operationMeta)
@@ -160,7 +160,7 @@ object TransactionGroupOperations extends Controller with Secured {
               case AddNewOperationMeta() => s"""Successfully created ${numTrans} transaction${if (numTrans == 1) "" else "s"}"""
               case EditOperationMeta(_) => s"""Successfully edited ${numTrans} transaction${if (numTrans == 1) "" else "s"}"""
             }
-            Redirect(redirectTo).flashing("message" -> message)
+            Redirect(returnTo).flashing("message" -> message)
           })
     }
 
@@ -201,15 +201,15 @@ object TransactionGroupOperations extends Controller with Secured {
 
   private def formViewWithInitialData(operationMeta: OperationMeta,
                                       formData: Forms.TransGroupData,
-                                      redirectTo: String,
+                                      returnTo: String,
                                       templatesInNavbar: Seq[Template] = Seq())
                                      (implicit user: User, request: Request[AnyContent]): Html =
-    formView(operationMeta, Forms.transactionGroupForm.fill(formData), redirectTo, templatesInNavbar)
+    formView(operationMeta, Forms.transactionGroupForm.fill(formData), returnTo, templatesInNavbar)
 
 
   private def formView(operationMeta: OperationMeta,
                        form: Form[Forms.TransGroupData],
-                       redirectTo: String,
+                       returnTo: String,
                        templatesInNavbar: Seq[Template] = Seq())
                       (implicit user: User, request: Request[AnyContent]): Html = {
     val title = operationMeta match {
@@ -217,19 +217,19 @@ object TransactionGroupOperations extends Controller with Secured {
       case EditOperationMeta(_) => "Edit Transaction"
     }
     val formAction = operationMeta match {
-      case AddNewOperationMeta() => routes.TransactionGroupOperations.addNew(redirectTo)
-      case EditOperationMeta(transGroupId) => routes.TransactionGroupOperations.edit(transGroupId, redirectTo)
+      case AddNewOperationMeta() => routes.TransactionGroupOperations.addNew(returnTo)
+      case EditOperationMeta(transGroupId) => routes.TransactionGroupOperations.edit(transGroupId, returnTo)
     }
     val deleteAction = operationMeta match {
       case AddNewOperationMeta() => None
-      case EditOperationMeta(transGroupId) => Some(routes.TransactionGroupOperations.delete(transGroupId, redirectTo))
+      case EditOperationMeta(transGroupId) => Some(routes.TransactionGroupOperations.delete(transGroupId, returnTo))
     }
     views.html.accounting.transactiongroupform(
       title,
       transGroupForm = form,
       formAction = formAction,
       deleteAction = deleteAction,
-      redirectTo = redirectTo,
+      returnTo = returnTo,
       templatesInNavbar = templatesInNavbar)
   }
 

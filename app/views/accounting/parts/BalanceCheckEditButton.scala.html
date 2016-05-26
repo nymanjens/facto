@@ -3,6 +3,6 @@
 @(bc: BalanceCheck)(implicit request: Request[AnyContent])
 
 <a class="btn btn-default btn-xs"
-    href="@controllers.accounting.routes.BalanceCheckOperations.editForm(bc.id.get, redirectTo = request.uri)" role="button">
+    href="@controllers.accounting.routes.BalanceCheckOperations.editForm(bc.id.get, returnTo = request.uri)" role="button">
   <i class="fa fa-pencil fa-fw"></i> edit
 </a>

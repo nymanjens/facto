@@ -70,7 +70,7 @@
                           <div class="entries">
                             @for(entry <- summaryForYear.cell(category, month).entries) {
                               <div>
-                                <a href="@controllers.accounting.routes.TransactionGroupOperations.editForm(entry.groupId, redirectTo = request.uri)">
+                                <a href="@controllers.accounting.routes.TransactionGroupOperations.editForm(entry.groupId, returnTo = request.uri)">
                                   @entry.flow.currency.htmlSymbol @entry.flow.formatFloat - @entry.descriptions
                                 </a>
                               </div>

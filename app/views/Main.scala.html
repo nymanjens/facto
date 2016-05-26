@@ -5,14 +5,14 @@
   title: String,
   extrascript: Html = Html(""),
   templatesInNavbar: Seq[Template] = Seq(),
-  redirectToOption: Option[String] = None,
+  returnToOption: Option[String] = None,
   generateToc: Boolean = false
 )(
   content: Html
 )(
   implicit user: User, request: Request[AnyContent], flash: Flash
 )
-@redirectTo = @{redirectToOption getOrElse request.uri}
+@returnTo = @{returnToOption getOrElse request.uri}
 
 @Base(title, extrascript) {
 
@@ -73,12 +73,12 @@
           </ul>
           <ul class="nav" id="side-menu">
             <li>
-              <a href="@controllers.accounting.routes.TransactionGroupOperations.addNewForm(redirectTo)" id="menu-link-newtransgroup">
+              <a href="@controllers.accounting.routes.TransactionGroupOperations.addNewForm(returnTo)" id="menu-link-newtransgroup">
                 <i class="icon-plus-squared"></i> <u>N</u>ew Entry</a>
               <a href="@controllers.accounting.routes.GeneralActions.templateList" id="menu-link-templates">
                 <i class="icon-check-empty"></i> <u>T</u>emplates</a>
               @for(template <- templatesInNavbar) {
-                <a href="@controllers.accounting.routes.TransactionGroupOperations.addNewFromTemplate(template.id, redirectTo)">
+                <a href="@controllers.accounting.routes.TransactionGroupOperations.addNewFromTemplate(template.id, returnTo)">
                   <i class="@template.iconClass"></i> @template.name</a>
               }
             </li>

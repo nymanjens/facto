@@ -14,7 +14,7 @@
   transGroupForm: Form[TransGroupData],
   formAction: Call,
   deleteAction: Option[Call],
-  redirectTo: String,
+  returnTo: String,
   templatesInNavbar: Seq[Template]
 )(
   implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash
@@ -33,7 +33,7 @@
   <script src="@routes.Assets.at("javascripts/transactiongroupform.js")"></script>
 }
 
-@Main(title, extrascript, templatesInNavbar, redirectToOption = Some(redirectTo)) {
+@Main(title, extrascript, templatesInNavbar, returnToOption = Some(returnTo)) {
   <div class="transaction-group-form">
     @form(action = formAction, 'class ->  "form-horizontal") {
       <div class="row">
