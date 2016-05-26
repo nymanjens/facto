@@ -7,7 +7,7 @@
 @(reservoir: MoneyReservoir, title: String, bcForm: Form[BcData], formAction: Call, deleteAction: Option[Call])(
     implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash, returnTo: ReturnTo)
 
-@Main(title, returnToOption = Some(returnTo.url)) {
+@Main(title, returnToOption = Some(returnTo)) {
   <div class="row">
       <div class="col-lg-12">
           <h1>

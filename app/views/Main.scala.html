@@ -1,18 +1,19 @@
 @import scala.collection.immutable.Seq
+@import common.ReturnTo
 @import models.accounting.config.Template
 
 @(
   title: String,
   extrascript: Html = Html(""),
   templatesInNavbar: Seq[Template] = Seq(),
-  returnToOption: Option[String] = None,
+  returnToOption: Option[ReturnTo] = None,
   generateToc: Boolean = false
 )(
   content: Html
 )(
   implicit user: User, request: Request[AnyContent], flash: Flash
 )
-@returnTo = @{returnToOption getOrElse request.uri}
+@returnTo = @{returnToOption getOrElse ReturnTo(request.uri)}
 
 @Base(title, extrascript) {
 
@@ -73,15 +74,15 @@
           </ul>
           <ul class="nav" id="side-menu">
             <li>
-              <a href="@controllers.accounting.routes.TransactionGroupOperations.addNewForm(
-                    )?returnTo=@returnTo @* explicit param to avoid slash escaping *@"
+              <a href="@(controllers.accounting.routes.TransactionGroupOperations.addNewForm(
+                    ) ++: returnTo)"
                   id="menu-link-newtransgroup">
                 <i class="icon-plus-squared"></i> <u>N</u>ew Entry</a>
               <a href="@controllers.accounting.routes.GeneralActions.templateList" id="menu-link-templates">
                 <i class="icon-check-empty"></i> <u>T</u>emplates</a>
               @for(template <- templatesInNavbar) {
-                <a href="@controllers.accounting.routes.TransactionGroupOperations.addNewFromTemplate(template.id
-                    )?returnTo=@returnTo @* explicit param to avoid slash escaping *@">
+                <a href="@(controllers.accounting.routes.TransactionGroupOperations.addNewFromTemplate(template.id
+                    ) ++: returnTo)">
                   <i class="@template.iconClass"></i> @template.name</a>
               }
             </li>

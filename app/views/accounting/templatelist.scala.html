@@ -1,5 +1,6 @@
 @import scala.collection.immutable.Seq
 
+@import common.ReturnTo
 @import models.User
 @import models.accounting.Money.CurrencyUnit
 @import models.accounting.config.{Account, MoneyReservoir, Category, Template}
@@ -22,8 +23,8 @@
   ) { @* panel content *@
 
     @for(template <- templates) {
-        <a href="@controllers.accounting.routes.TransactionGroupOperations.addNewFromTemplate(template.id
-              )?returnTo=@request.uri @* explicit param to avoid slash escaping *@"
+        <a href="@(controllers.accounting.routes.TransactionGroupOperations.addNewFromTemplate(template.id
+              ) ++: ReturnTo(request.uri))
             class="btn btn-info btn-lg">
           <i class="@template.iconClass"></i> @template.name
         </a>

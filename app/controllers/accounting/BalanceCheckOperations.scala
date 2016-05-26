@@ -152,7 +152,7 @@ object BalanceCheckOperations extends Controller with Secured {
       case EditOperationMeta(bcId) => routes.BalanceCheckOperations.edit(bcId) ++: returnTo
     }
     val deleteAction = operationMeta.bcIdOption.map(bcId =>
-      routes.BalanceCheckOperations.delete(bcId)) ++: returnTo
+      routes.BalanceCheckOperations.delete(bcId) ++: returnTo)
     views.html.accounting.balancecheckform(
       reservoir = operationMeta.moneyReservoir,
       title,
