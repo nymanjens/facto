@@ -85,7 +85,7 @@
  </check>
  <check level="error" class="org.scalastyle.scalariform.MethodNamesChecker" enabled="true">
   <parameters>
-   <parameter name="regex"><![CDATA[^[a-z][A-Za-z0-9]*$]]></parameter>
+   <parameter name="regex"><![CDATA[^[A-Za-z0-9+-:]*$]]></parameter>
    <parameter name="ignoreOverride">true</parameter>
    <parameter name="ignoreRegex">^([+-\\*/>&lt;]|==|&lt;=|>=|Action[A-Za-z0-9]*)$</parameter>
   </parameters>
