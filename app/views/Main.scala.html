@@ -73,12 +73,15 @@
           </ul>
           <ul class="nav" id="side-menu">
             <li>
-              <a href="@controllers.accounting.routes.TransactionGroupOperations.addNewForm(returnTo)" id="menu-link-newtransgroup">
+              <a href="@controllers.accounting.routes.TransactionGroupOperations.addNewForm(
+                    )?returnTo=@returnTo @* explicit param to avoid slash escaping *@"
+                  id="menu-link-newtransgroup">
                 <i class="icon-plus-squared"></i> <u>N</u>ew Entry</a>
               <a href="@controllers.accounting.routes.GeneralActions.templateList" id="menu-link-templates">
                 <i class="icon-check-empty"></i> <u>T</u>emplates</a>
               @for(template <- templatesInNavbar) {
-                <a href="@controllers.accounting.routes.TransactionGroupOperations.addNewFromTemplate(template.id, returnTo)">
+                <a href="@controllers.accounting.routes.TransactionGroupOperations.addNewFromTemplate(template.id
+                    )?returnTo=@returnTo @* explicit param to avoid slash escaping *@">
                   <i class="@template.iconClass"></i> @template.name</a>
               }
             </li>

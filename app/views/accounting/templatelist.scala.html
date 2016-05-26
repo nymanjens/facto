@@ -22,7 +22,8 @@
   ) { @* panel content *@
 
     @for(template <- templates) {
-        <a href="@controllers.accounting.routes.TransactionGroupOperations.addNewFromTemplate(template.id, returnTo = request.uri)"
+        <a href="@controllers.accounting.routes.TransactionGroupOperations.addNewFromTemplate(template.id
+              )?returnTo=@request.uri @* explicit param to avoid slash escaping *@"
             class="btn btn-info btn-lg">
           <i class="@template.iconClass"></i> @template.name
         </a>

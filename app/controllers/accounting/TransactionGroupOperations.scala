@@ -116,8 +116,7 @@ object TransactionGroupOperations extends Controller with Secured {
           }) ++ request.queryString
 
           /** fix for non-consecutive transaction numbers **/
-          val otherExpectedFields = Set("zeroSum")
-
+          val otherExpectedFields = Set("zeroSum", "returnTo")
           // find transactionNumMapping
           def extractTransNum(key: String): Int = {
             val transNumRegex = """\w+\[(\d+)\].*""".r

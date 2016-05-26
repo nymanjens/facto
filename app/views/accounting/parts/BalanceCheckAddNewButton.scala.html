@@ -3,6 +3,8 @@
 @(reservoir: MoneyReservoir)(implicit request: Request[AnyContent])
 
 <a class="btn btn-info btn-xs"
-    href="@controllers.accounting.routes.BalanceCheckOperations.addNewForm(reservoir.code, returnTo = request.uri)" role="button">
+    href="@controllers.accounting.routes.BalanceCheckOperations.addNewForm(reservoir.code
+      )?returnTo=@request.uri @* explicit param to avoid slash escaping *@"
+    role="button">
   <i class="fa fa-check-square-o fa-fw"></i> set
 </a>
