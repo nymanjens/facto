@@ -1,0 +1,8 @@
+@(field: Field, args: Map[Symbol, Any] = Map(), classes: Seq[String] = Seq())
+
+<input type="hidden" 
+       class="@classes.mkString(" ")" 
+       id="@field.id" 
+       name="@field.name" 
+       value="@field.value.getOrElse("")"
+       @toHtmlArgs(args) />

@@ -84,7 +84,9 @@
                     classes=Seq("bind-until-change", "bind-to-root-form"))
                 @bootstrap3.Text(transactionForm("consumedDate"), "Date consumed",
                     classes=Seq("bind-until-change", "bind-to-formfield-transactionDate", "bind-to-root-form"))
-                @if(transactionForm("issuerName").value.getOrElse("") != user.name) {
+                @if(transactionForm("issuerName").value.getOrElse("") == user.name) {
+                  @bootstrap3.Hidden(transactionForm("issuerName"))
+                } else {
                   @bootstrap3.Text(transactionForm("issuerName"), "Issuer", args=Map('readonly -> "readonly"))
                 }
                 @bootstrap3.Select(transactionForm("beneficiaryAccountCode"), "Beneficiary", Config.accounts.mapValues(_.longName),
