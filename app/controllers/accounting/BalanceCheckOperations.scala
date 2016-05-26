@@ -10,7 +10,7 @@ import play.twirl.api.Html
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 
-import common.Clock
+import common.{Clock, ReturnTo}
 import models.User
 import models.accounting.{BalanceCheck, BalanceChecks, Transactions, Money, UpdateLogs}
 import models.accounting.config.{MoneyReservoir, Config}
@@ -22,27 +22,36 @@ object BalanceCheckOperations extends Controller with Secured {
   // ********** actions ********** //
   def addNewForm(moneyReservoirCode: String, returnTo: String) = ActionWithUser { implicit user =>
     implicit request =>
+      implicit val returnToImplicit = ReturnTo(returnTo)
+
       val moneyReservoir = Config.moneyReservoir(moneyReservoirCode)
       val initialData = Forms.BcData(
         issuerName = user.name,
         moneyReservoirName = moneyReservoir.name,
         balance = Money(0))
-      Ok(formView(AddNewOperationMeta(moneyReservoirCode), initialData, returnTo))
+      Ok(formView(AddNewOperationMeta(moneyReservoirCode), initialData))
   }
 
   def editForm(bcId: Long, returnTo: String) = ActionWithUser { implicit user =>
     implicit request =>
+      implicit val returnToImplicit = ReturnTo(returnTo)
+
       val bc = BalanceChecks.all.findById(bcId)
       val formData = Forms.BcData.fromModel(bc)
-      Ok(formView(EditOperationMeta(bcId), formData, returnTo))
+      Ok(formView(EditOperationMeta(bcId), formData))
   }
 
-  def addNew(moneyReservoirCode: String, returnTo: String) =
-    addOrEdit(AddNewOperationMeta(moneyReservoirCode), returnTo)
+  def addNew(moneyReservoirCode: String, returnTo: String) = {
+    implicit val returnToImplicit = ReturnTo(returnTo)
+
+    addOrEdit(AddNewOperationMeta(moneyReservoirCode))
+  }
 
   def addConfirmation(moneyReservoirCode: String, balanceInCents: Long, mostRecentTransactionId: Long, returnTo: String) =
     ActionWithUser { implicit user =>
       implicit request =>
+        implicit val returnToImplicit = ReturnTo(returnTo)
+
         val balance = Money(balanceInCents)
         val moneyReservoir = Config.moneyReservoir(moneyReservoirCode)
         val mostRecentTransaction = Transactions.all.findById(mostRecentTransactionId)
@@ -60,11 +69,16 @@ object BalanceCheckOperations extends Controller with Secured {
         Redirect(returnTo).flashing("message" -> message)
     }
 
-  def edit(bcId: Long, returnTo: String) =
-    addOrEdit(EditOperationMeta(bcId), returnTo)
+  def edit(bcId: Long, returnTo: String) = {
+    implicit val returnToImplicit = ReturnTo(returnTo)
+
+    addOrEdit(EditOperationMeta(bcId))
+  }
 
   def delete(bcId: Long, returnTo: String) = ActionWithUser { implicit user =>
     implicit request =>
+      implicit val returnToImplicit = ReturnTo(returnTo)
+
       val bc = BalanceChecks.all.findById(bcId)
       UpdateLogs.addLog(user, UpdateLogs.Delete, bc)
       BalanceChecks.all.delete(bc)
@@ -75,7 +89,7 @@ object BalanceCheckOperations extends Controller with Secured {
   }
 
   // ********** private helper controllers ********** //
-  private def addOrEdit(operationMeta: OperationMeta, returnTo: String) = ActionWithUser { implicit user =>
+  private def addOrEdit(operationMeta: OperationMeta)(implicit returnTo: ReturnTo) = ActionWithUser { implicit user =>
     implicit request =>
       // get sent data (copied from Form.bindFromRequest())
       val requestMap: Map[String, Seq[String]] = (request.body match {
@@ -85,7 +99,7 @@ object BalanceCheckOperations extends Controller with Secured {
 
       Forms.balanceCheckForm.bindFromRequest(requestMap).fold(
         formWithErrors => {
-          BadRequest(formView(operationMeta, formWithErrors, returnTo))
+          BadRequest(formView(operationMeta, formWithErrors))
         },
         bc => {
           persistBc(bc, operationMeta)
@@ -95,7 +109,7 @@ object BalanceCheckOperations extends Controller with Secured {
             case _: AddNewOperationMeta => s"Successfully created a balance check for $moneyReservoirName"
             case _: EditOperationMeta => s"Successfully edited a balance check for $moneyReservoirName"
           }
-          Redirect(returnTo).flashing("message" -> message)
+          Redirect(returnTo.url).flashing("message" -> message)
         })
   }
 
@@ -121,24 +135,24 @@ object BalanceCheckOperations extends Controller with Secured {
     UpdateLogs.addLog(user, operation, persistedBc)
   }
 
-  private def formView(operationMeta: OperationMeta, formData: Forms.BcData, returnTo: String)
-                      (implicit user: User, request: Request[AnyContent]): Html =
-    formView(operationMeta, Forms.balanceCheckForm.fill(formData), returnTo)
+  private def formView(operationMeta: OperationMeta, formData: Forms.BcData)
+                      (implicit user: User, request: Request[AnyContent], returnTo: ReturnTo): Html =
+    formView(operationMeta, Forms.balanceCheckForm.fill(formData))
 
 
-  private def formView(operationMeta: OperationMeta, form: Form[Forms.BcData], returnTo: String)
-                      (implicit user: User, request: Request[AnyContent]): Html = {
+  private def formView(operationMeta: OperationMeta, form: Form[Forms.BcData])
+                      (implicit user: User, request: Request[AnyContent], returnTo: ReturnTo): Html = {
     val title = operationMeta match {
       case _: AddNewOperationMeta => "New Balance Check"
       case _: EditOperationMeta => "Edit Balance Check"
     }
     val formAction = operationMeta match {
       case AddNewOperationMeta(moneyReservoirCode) =>
-        routes.BalanceCheckOperations.addNew(moneyReservoirCode, returnTo)
-      case EditOperationMeta(bcId) => routes.BalanceCheckOperations.edit(bcId, returnTo)
+        routes.BalanceCheckOperations.addNew(moneyReservoirCode) ++: returnTo
+      case EditOperationMeta(bcId) => routes.BalanceCheckOperations.edit(bcId) ++: returnTo
     }
     val deleteAction = operationMeta.bcIdOption.map(bcId =>
-      routes.BalanceCheckOperations.delete(bcId, returnTo))
+      routes.BalanceCheckOperations.delete(bcId)) ++: returnTo
     views.html.accounting.balancecheckform(
       reservoir = operationMeta.moneyReservoir,
       title,

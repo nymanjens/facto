@@ -1,11 +1,12 @@
 package controllers.accounting
 
+import common.ReturnTo
+
 import scala.collection.{Seq => MutableSeq}
 import scala.collection.immutable.Seq
-
 import play.api.data._
 import play.api.data.Forms._
-import play.api.data.validation.{Constraint, Valid, Invalid, ValidationError}
+import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 import play.api.mvc._
 import play.twirl.api.Html
 
@@ -15,8 +16,7 @@ import play.api.i18n.Messages.Implicits._
 
 import org.joda.time.DateTime
 
-import common.Clock
-import common.CollectionUtils
+import common.{Clock, ReturnTo}
 import models.User
 import models.accounting.{Transaction, Transactions, TransactionPartial, TransactionGroup, TransactionGroupPartial, TransactionGroups, Money, UpdateLogs}
 import models.accounting.config.{Config, Account, MoneyReservoir, Category, Template}
@@ -27,20 +27,32 @@ import controllers.helpers.accounting.FormUtils.{validMoneyReservoirOrNullReserv
 object TransactionGroupOperations extends Controller with Secured {
 
   // ********** actions ********** //
-  def addNewForm(returnTo: String) = addNewFormFromPartial(TransactionPartial.from(), returnTo)
+  def addNewForm(returnTo: String) = {
+    implicit val returnToImplicit = ReturnTo(returnTo)
+
+    addNewFormFromPartial(TransactionPartial.from())
+  }
 
   def editForm(transGroupId: Long, returnTo: String) = ActionWithUser { implicit user =>
     implicit request =>
+      implicit val returnToImplicit = ReturnTo(returnTo)
+
       val transGroup = TransactionGroups.all.findById(transGroupId)
       val formData = Forms.TransGroupData.fromModel(transGroup)
-      Ok(formViewWithInitialData(EditOperationMeta(transGroupId), formData, returnTo))
+      Ok(formViewWithInitialData(EditOperationMeta(transGroupId), formData))
   }
 
-  def addNew(returnTo: String) =
-    addOrEdit(AddNewOperationMeta(), returnTo)
+  def addNew(returnTo: String) = {
+    implicit val returnToImplicit = ReturnTo(returnTo)
 
-  def edit(transGroupId: Long, returnTo: String) =
-    addOrEdit(EditOperationMeta(transGroupId), returnTo)
+    addOrEdit(AddNewOperationMeta())
+  }
+
+  def edit(transGroupId: Long, returnTo: String) = {
+    implicit val returnToImplicit = ReturnTo(returnTo)
+
+    addOrEdit(EditOperationMeta(transGroupId))
+  }
 
   def delete(transGroupId: Long, returnTo: String) = ActionWithUser { implicit user =>
     implicit request =>
@@ -60,15 +72,19 @@ object TransactionGroupOperations extends Controller with Secured {
   // ********** shortcuts ********** //
   def addNewFromTemplate(templateId: Long, returnTo: String) = ActionWithUser { implicit user =>
     implicit request =>
+      implicit val returnToImplicit = ReturnTo(returnTo)
+
       val template = Config.templateWithId(templateId)
       // If this user is not associated with an account, it should not see any templates.
       val userAccount = Config.accountOf(user).get
       val partial = template.toPartial(userAccount)
       val initialData = Forms.TransGroupData.fromPartial(partial)
-      Ok(formViewWithInitialData(AddNewOperationMeta(), initialData, returnTo, templatesInNavbar = Seq(template)))
+      Ok(formViewWithInitialData(AddNewOperationMeta(), initialData, templatesInNavbar = Seq(template)))
   }
 
   def addNewLiquidationRepayForm(accountCode1: String, accountCode2: String, amountInCents: Long, returnTo: String): EssentialAction = {
+    implicit val returnToImplicit = ReturnTo(returnTo)
+
     val amount = Money(amountInCents)
     if (amount < Money(0)) {
       addNewLiquidationRepayForm(accountCode2, accountCode1, -amount.cents, returnTo)
@@ -89,23 +105,22 @@ object TransactionGroupOperations extends Controller with Secured {
           description = Config.constants.liquidationDescription,
           flow = amount)),
         zeroSum = true
-      ),
-        returnTo)
+      ))
     }
   }
 
   // ********** private helper controllers ********** //
-  private def addNewFormFromPartial(partial: TransactionPartial, returnTo: String): EssentialAction =
-    addNewFormFromPartial(TransactionGroupPartial(Seq(partial)), returnTo)
+  private def addNewFormFromPartial(partial: TransactionPartial)(implicit returnTo: ReturnTo): EssentialAction =
+    addNewFormFromPartial(TransactionGroupPartial(Seq(partial)))
 
-  private def addNewFormFromPartial(partial: TransactionGroupPartial,
-                                    returnTo: String): EssentialAction = ActionWithUser { implicit user =>
+  private def addNewFormFromPartial(partial: TransactionGroupPartial)
+                                   (implicit returnTo: ReturnTo): EssentialAction = ActionWithUser { implicit user =>
     implicit request =>
       val initialData = Forms.TransGroupData.fromPartial(partial)
-      Ok(formViewWithInitialData(AddNewOperationMeta(), initialData, returnTo))
+      Ok(formViewWithInitialData(AddNewOperationMeta(), initialData))
   }
 
-  private def addOrEdit(operationMeta: OperationMeta, returnTo: String) =
+  private def addOrEdit(operationMeta: OperationMeta)(implicit returnTo: ReturnTo) =
     ActionWithUser { implicit user =>
       implicit request =>
         val cleanedRequestMap: Map[String, MutableSeq[String]] = {
@@ -149,7 +164,7 @@ object TransactionGroupOperations extends Controller with Secured {
 
         Forms.transactionGroupForm.bindFromRequest(cleanedRequestMap).fold(
           formWithErrors => {
-            BadRequest(formView(operationMeta, formWithErrors, returnTo))
+            BadRequest(formView(operationMeta, formWithErrors))
           },
           transGroup => {
             persistTransGroup(transGroup, operationMeta)
@@ -159,7 +174,7 @@ object TransactionGroupOperations extends Controller with Secured {
               case AddNewOperationMeta() => s"""Successfully created ${numTrans} transaction${if (numTrans == 1) "" else "s"}"""
               case EditOperationMeta(_) => s"""Successfully edited ${numTrans} transaction${if (numTrans == 1) "" else "s"}"""
             }
-            Redirect(returnTo).flashing("message" -> message)
+            Redirect(returnTo.url).flashing("message" -> message)
           })
     }
 
@@ -200,35 +215,32 @@ object TransactionGroupOperations extends Controller with Secured {
 
   private def formViewWithInitialData(operationMeta: OperationMeta,
                                       formData: Forms.TransGroupData,
-                                      returnTo: String,
                                       templatesInNavbar: Seq[Template] = Seq())
-                                     (implicit user: User, request: Request[AnyContent]): Html =
-    formView(operationMeta, Forms.transactionGroupForm.fill(formData), returnTo, templatesInNavbar)
+                                     (implicit user: User, request: Request[AnyContent], returnTo: ReturnTo): Html =
+    formView(operationMeta, Forms.transactionGroupForm.fill(formData), templatesInNavbar)
 
 
   private def formView(operationMeta: OperationMeta,
                        form: Form[Forms.TransGroupData],
-                       returnTo: String,
                        templatesInNavbar: Seq[Template] = Seq())
-                      (implicit user: User, request: Request[AnyContent]): Html = {
+                      (implicit user: User, request: Request[AnyContent], returnTo: ReturnTo): Html = {
     val title = operationMeta match {
       case AddNewOperationMeta() => "New Transaction"
       case EditOperationMeta(_) => "Edit Transaction"
     }
-    val formAction = operationMeta match {
-      case AddNewOperationMeta() => routes.TransactionGroupOperations.addNew(returnTo)
-      case EditOperationMeta(transGroupId) => routes.TransactionGroupOperations.edit(transGroupId, returnTo)
+    val formAction: Call = operationMeta match {
+      case AddNewOperationMeta() => routes.TransactionGroupOperations.addNew() ++: returnTo
+      case EditOperationMeta(transGroupId) => routes.TransactionGroupOperations.edit(transGroupId) ++: returnTo
     }
     val deleteAction = operationMeta match {
       case AddNewOperationMeta() => None
-      case EditOperationMeta(transGroupId) => Some(routes.TransactionGroupOperations.delete(transGroupId, returnTo))
+      case EditOperationMeta(transGroupId) => Some(routes.TransactionGroupOperations.delete(transGroupId) ++: returnTo)
     }
     views.html.accounting.transactiongroupform(
       title,
       transGroupForm = form,
       formAction = formAction,
       deleteAction = deleteAction,
-      returnTo = returnTo,
       templatesInNavbar = templatesInNavbar)
   }
 

@@ -3,6 +3,7 @@
 @import helper._
 
 @import common.CollectionUtils.toListMap
+@import common.ReturnTo
 @import models.User
 @import models.accounting.Money.CurrencyUnit
 @import models.accounting.config.{Config, Account, MoneyReservoir, Category, Template}
@@ -14,10 +15,9 @@
   transGroupForm: Form[TransGroupData],
   formAction: Call,
   deleteAction: Option[Call],
-  returnTo: String,
   templatesInNavbar: Seq[Template]
 )(
-  implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash
+  implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash, returnTo: ReturnTo
 )
 
 @zeroSum = @{
@@ -33,7 +33,7 @@
   <script src="@routes.Assets.at("javascripts/transactiongroupform.js")"></script>
 }
 
-@Main(title, extrascript, templatesInNavbar, returnToOption = Some(returnTo)) {
+@Main(title, extrascript, templatesInNavbar, returnToOption = Some(returnTo.url)) {
   <div class="transaction-group-form">
     @form(action = formAction, 'class ->  "form-horizontal") {
       <div class="row">

@@ -1,12 +1,13 @@
 @import helper._
+@import common.ReturnTo
 @import models.User
 @import models.accounting.config.{Account, MoneyReservoir, Category}
 @import controllers.accounting.BalanceCheckOperations.Forms._
 @import views.html.utils.bootstrap3
 @(reservoir: MoneyReservoir, title: String, bcForm: Form[BcData], formAction: Call, deleteAction: Option[Call])(
-    implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash)
+    implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash, returnTo: ReturnTo)
 
-@Main(title) {
+@Main(title, returnToOption = Some(returnTo.url)) {
   <div class="row">
       <div class="col-lg-12">
           <h1>
