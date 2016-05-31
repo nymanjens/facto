@@ -7,8 +7,8 @@ import models.SlickUtils.dbApi._
 
 import common.Clock
 import models.SlickUtils.dbRun
-import models.activeslick._
 import models.SlickUtils.JodaToSqlDateMapper
+import models.manager.{Identifiable, EntityTable, DatabaseBackedEntityManager}
 
 
 case class TransactionGroup(createdDate: DateTime = Clock.now,
@@ -16,7 +16,7 @@ case class TransactionGroup(createdDate: DateTime = Clock.now,
 
   override def withId(id: Long) = copy(id = Some(id))
 
-  def transactions: Seq[Transaction] = dbRun(Transactions.all.filter {
+  def transactions: Seq[Transaction] = dbRun(Transactions.all.newQuery.filter {
     _.transactionGroupId === id
   }.result).toList
 
@@ -26,12 +26,13 @@ case class TransactionGroup(createdDate: DateTime = Clock.now,
 case class TransactionGroupPartial(transactions: Seq[TransactionPartial],
                                    zeroSum: Boolean = false)
 
-class TransactionGroups(tag: Tag) extends EntityTable[TransactionGroup](tag, "TRANSACTION_GROUPS") {
+class TransactionGroups(tag: Tag) extends EntityTable[TransactionGroup](tag, TransactionGroups.tableName) {
   def createdDate = column[DateTime]("createdDate")
 
   override def * = (createdDate, id.?) <>(TransactionGroup.tupled, TransactionGroup.unapply)
 }
 
 object TransactionGroups {
-  val all = new EntityTableQuery[TransactionGroup, TransactionGroups](tag => new TransactionGroups(tag))
+  private val tableName: String = "TRANSACTION_GROUPS"
+  val all = new DatabaseBackedEntityManager[TransactionGroup, TransactionGroups](tag => new TransactionGroups(tag), tableName)
 }

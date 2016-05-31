@@ -97,8 +97,8 @@ object FactoV1ImportTool {
 
           } else {
             // Transaction
-            val group = TransactionGroups.all.save(TransactionGroup(createdDate = dateForMillisSinceEpoch(creationTime.toLong)))
-            Transactions.all.save(Transaction(
+            val group = TransactionGroups.all.add(TransactionGroup(createdDate = dateForMillisSinceEpoch(creationTime.toLong)))
+            Transactions.all.add(Transaction(
               transactionGroupId = group.id.get,
               issuerId = issuer.id.get,
               beneficiaryAccountCode = accountCode,
@@ -125,7 +125,7 @@ object FactoV1ImportTool {
       values match {
         case valuesRegex(timestamp, originalUserId, sql) =>
           val user = originalUserIdToUser(originalUserId.toLong)
-          UpdateLogs.all.save(UpdateLog(
+          UpdateLogs.all.add(UpdateLog(
             userId = user.id.get,
             change = StringEscapeUtils.unescapeHtml(sql.replace("\\", "")),
             date = dateForMillisSinceEpoch(timestamp.toLong)
@@ -146,7 +146,7 @@ object FactoV1ImportTool {
       }
 
     def doImport()(implicit app: Application): User = {
-      Users.all.save(Users.newWithUnhashedPw(loginName, defaultPassword, name))
+      Users.all.add(Users.newWithUnhashedPw(loginName, defaultPassword, name))
     }
   }
 }

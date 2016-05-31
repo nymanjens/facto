@@ -6,9 +6,8 @@ import common.Clock
 import models.{User, Users}
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
-import models.manager.DatabaseBackedEntityManager
+import models.manager.{Identifiable, EntityTable, DatabaseBackedEntityManager}
 import models.accounting.config.{Config, MoneyReservoir}
-import models.activeslick._
 
 case class BalanceCheck(issuerId: Long,
                         moneyReservoirCode: String,
@@ -38,6 +37,5 @@ class BalanceChecks(tag: Tag) extends EntityTable[BalanceCheck](tag, BalanceChec
 
 object BalanceChecks {
   private val tableName: String = "BALANCE_CHECKS"
-
   val all = new DatabaseBackedEntityManager[BalanceCheck, BalanceChecks](tag => new BalanceChecks(tag), tableName)
 }

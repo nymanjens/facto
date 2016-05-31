@@ -16,9 +16,9 @@ class ConfigTest extends Specification {
 
   "test configuration parsing" in new WithApplication {
     // create test users
-    val userA = Users.all.save(Users.newWithUnhashedPw(loginName = "a", password = "pw", name = "Test User A"))
-    val userB = Users.all.save(Users.newWithUnhashedPw(loginName = "b", password = "pw", name = "Test User B"))
-    val userOther = Users.all.save(Users.newWithUnhashedPw(loginName = "other", password = "other", name = "Other"))
+    val userA = Users.all.add(Users.newWithUnhashedPw(loginName = "a", password = "pw", name = "Test User A"))
+    val userB = Users.all.add(Users.newWithUnhashedPw(loginName = "b", password = "pw", name = "Test User B"))
+    val userOther = Users.all.add(Users.newWithUnhashedPw(loginName = "other", password = "other", name = "Other"))
 
     // check keys
     Config.accounts.keys.toList must beEqualTo(List("ACC_COMMON", "ACC_A", "ACC_B"))
@@ -53,10 +53,10 @@ class ConfigTest extends Specification {
     val accCommon = Config.constants.commonAccount
     val accA = Config.accounts("ACC_A")
     val accB = Config.accounts("ACC_B")
-    val userA = Users.all.save(Users.newWithUnhashedPw(loginName = "a", password = "a", name = "A"))
+    val userA = Users.all.add(Users.newWithUnhashedPw(loginName = "a", password = "a", name = "A"))
     // make sure all required users exist
-    val userB = Users.all.save(Users.newWithUnhashedPw(loginName = "b", password = "b", name = "B"))
-    val userOther = Users.all.save(Users.newWithUnhashedPw(loginName = "other", password = "other", name = "Other"))
+    val userB = Users.all.add(Users.newWithUnhashedPw(loginName = "b", password = "b", name = "B"))
+    val userOther = Users.all.add(Users.newWithUnhashedPw(loginName = "other", password = "other", name = "Other"))
 
     // call personallySortedAccounts()
     Config.personallySortedAccounts(userA) mustEqual Seq(accCommon, accA, accB)

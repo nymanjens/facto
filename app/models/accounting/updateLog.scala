@@ -9,9 +9,9 @@ import common.Clock
 import common.ScalaUtils.objectName
 import models.{User, Users}
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
+import models.manager.{Identifiable, EntityTable, DatabaseBackedEntityManager}
 import models.accounting.config.Config
 import models.accounting.config.{Category, Account, MoneyReservoir}
-import models.activeslick._
 
 case class UpdateLog(userId: Long,
                      change: String,
@@ -26,7 +26,7 @@ case class UpdateLog(userId: Long,
   lazy val user: User = Users.all.findById(userId)
 }
 
-class UpdateLogs(tag: Tag) extends EntityTable[UpdateLog](tag, "UPDATE_LOGS") {
+class UpdateLogs(tag: Tag) extends EntityTable[UpdateLog](tag, UpdateLogs.tableName) {
   def userId = column[Long]("userId")
   def change = column[String]("change")
   def date = column[DateTime]("date")
@@ -35,11 +35,12 @@ class UpdateLogs(tag: Tag) extends EntityTable[UpdateLog](tag, "UPDATE_LOGS") {
 }
 
 object UpdateLogs {
-  val all = new EntityTableQuery[UpdateLog, UpdateLogs](tag => new UpdateLogs(tag))
+  private val tableName: String = "UPDATE_LOGS"
+  val all = new DatabaseBackedEntityManager[UpdateLog, UpdateLogs](tag => new UpdateLogs(tag), tableName)
 
   /* Returns most recent n entries sorted from old to new. */
   def fetchLastNEntries(n: Int): Seq[UpdateLog] =
-    dbRun(all.sortBy(_.date.desc).take(n)).reverse.toList
+    dbRun(all.newQuery.sortBy(_.date.desc).take(n)).reverse.toList
 
   def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: TransactionGroup): Unit = {
     require(newOrDeletedValue.id.isDefined, s"Given value must be persisted before logging it: ${newOrDeletedValue}")
@@ -67,7 +68,7 @@ object UpdateLogs {
   private def addLog(user: User, operation: UpdateOperation, newOrDeletedValueString: String): Unit = {
     val operationName = objectName(operation)
     val change = s"$operationName $newOrDeletedValueString"
-    all.save(UpdateLog(user.id.get, change))
+    all.add(UpdateLog(user.id.get, change))
   }
 
   sealed trait UpdateOperation

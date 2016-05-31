@@ -182,7 +182,7 @@ object TransactionGroupOperations extends Controller with Secured {
   private def persistTransGroup(transactionGroupData: Forms.TransGroupData, operationMeta: OperationMeta)
                                (implicit user: User): Unit = {
     val group = operationMeta match {
-      case AddNewOperationMeta() => TransactionGroups.all.save(TransactionGroup())
+      case AddNewOperationMeta() => TransactionGroups.all.add(TransactionGroup())
       case EditOperationMeta(transGroupId) => TransactionGroups.all.findById(transGroupId)
     }
 
@@ -192,7 +192,7 @@ object TransactionGroupOperations extends Controller with Secured {
     }
 
     for (trans <- transactionGroupData.transactions) {
-      Transactions.all.save(Transaction(
+      Transactions.all.add(Transaction(
         transactionGroupId = group.id.get,
         issuerId = user.id.get,
         beneficiaryAccountCode = trans.beneficiaryAccountCode,

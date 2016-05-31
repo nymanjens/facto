@@ -26,8 +26,8 @@ object CsvImportTool {
       parts match {
         case List(issuerId, beneficiaryAccountCode, categoryCode, moneyReservoirCode, description, flowAsFloat,
         transactionDateStamp, consumedDateStamp, createdDateStamp) =>
-          val group = TransactionGroups.all.save(TransactionGroup())
-          Transactions.all.save(Transaction(
+          val group = TransactionGroups.all.add(TransactionGroup())
+          Transactions.all.add(Transaction(
             transactionGroupId = group.id.get,
             issuerId = issuerId.toInt,
             beneficiaryAccountCode = beneficiaryAccountCode,
@@ -50,7 +50,7 @@ object CsvImportTool {
       val parts = Splitter.on(" :: ").trimResults().split(line).asScala.toList
       parts match {
         case List(issuerId, moneyReservoirCode, balanceAsFloat, checkDateStamp, createdDateStamp) =>
-          val group = TransactionGroups.all.save(TransactionGroup())
+          val group = TransactionGroups.all.add(TransactionGroup())
           BalanceChecks.all.add(BalanceCheck(
             issuerId = issuerId.toInt,
             moneyReservoirCode = moneyReservoirCode,

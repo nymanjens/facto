@@ -23,16 +23,16 @@ class TransactionAndGroupTests extends Specification {
   "test the Transaction and TransactionGroup models" in new WithApplication {
 
     // prepare users
-    val user1 = Users.all.save(Users.newWithUnhashedPw(loginName = "tester", password = "x", name = "Tester"))
-    val user2 = Users.all.save(Users.newWithUnhashedPw(loginName = "tester2", password = "x", name = "Tester2"))
+    val user1 = Users.all.add(Users.newWithUnhashedPw(loginName = "tester", password = "x", name = "Tester"))
+    val user2 = Users.all.add(Users.newWithUnhashedPw(loginName = "tester2", password = "x", name = "Tester2"))
 
     // get and persist dummy transaction groups
-    val transGrp1 = TransactionGroups.all.save(TransactionGroup())
-    val transGrp2 = TransactionGroups.all.save(TransactionGroup())
-    val transGrp3 = TransactionGroups.all.save(TransactionGroup())
+    val transGrp1 = TransactionGroups.all.add(TransactionGroup())
+    val transGrp2 = TransactionGroups.all.add(TransactionGroup())
+    val transGrp3 = TransactionGroups.all.add(TransactionGroup())
 
     // get and persist dummy transactions
-    val trans1A = Transactions.all.save(Transaction(
+    val trans1A = Transactions.all.add(Transaction(
       transactionGroupId = transGrp1.id.get,
       issuerId = user1.id.get,
       beneficiaryAccountCode = "ACC_A",
@@ -43,7 +43,7 @@ class TransactionAndGroupTests extends Specification {
       transactionDate = Clock.now,
       consumedDate = Clock.now
     ))
-    val trans1B = Transactions.all.save(Transaction(
+    val trans1B = Transactions.all.add(Transaction(
       transactionGroupId = transGrp1.id.get,
       issuerId = user1.id.get,
       beneficiaryAccountCode = "ACC_A",
@@ -54,7 +54,7 @@ class TransactionAndGroupTests extends Specification {
       transactionDate = Clock.now,
       consumedDate = Clock.now
     ))
-    val trans2 = Transactions.all.save(Transaction(
+    val trans2 = Transactions.all.add(Transaction(
       transactionGroupId = transGrp2.id.get,
       issuerId = user2.id.get,
       beneficiaryAccountCode = "ACC_A",
@@ -79,6 +79,6 @@ class TransactionAndGroupTests extends Specification {
     trans1B.issuer mustEqual user1
     trans2.issuer mustEqual user2
 
-    Transactions.all.fetchAll mustEqual Seq(trans1A, trans1B, trans2)
+    Transactions.all.fetchAll() mustEqual Seq(trans1A, trans1B, trans2)
   }
 }

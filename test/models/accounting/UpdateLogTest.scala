@@ -49,8 +49,8 @@ class UpdateLogTest extends HookedSpecification {
   "Logged TransactionGroup contains all relevant info" in new WithApplication {
     // add logs
     Clock.setTimeForTest(dateAt(2016, April, 1))
-    val transGrp = TransactionGroups.all.save(TransactionGroup())
-    Transactions.all.save(Transaction(
+    val transGrp = TransactionGroups.all.add(TransactionGroup())
+    Transactions.all.add(Transaction(
       transactionGroupId = transGrp.id.get,
       issuerId = testUser.id.get,
       beneficiaryAccountCode = testAccount.code,

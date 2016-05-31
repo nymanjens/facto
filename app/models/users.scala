@@ -2,9 +2,9 @@ package models
 
 import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
-import models.activeslick._
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
+import models.manager.{Identifiable, EntityTable, DatabaseBackedEntityManager}
 
 case class User(loginName: String,
                 passwordHash: String,
@@ -18,7 +18,7 @@ case class User(loginName: String,
   }
 }
 
-class Users(tag: Tag) extends EntityTable[User](tag, "USERS") {
+class Users(tag: Tag) extends EntityTable[User](tag, Users.tableName) {
   def loginName = column[String]("loginName")
 
   def passwordHash = column[String]("passwordHash")
@@ -29,7 +29,8 @@ class Users(tag: Tag) extends EntityTable[User](tag, "USERS") {
 }
 
 object Users {
-  val all = new EntityTableQuery[User, Users](tag => new Users(tag))
+  private val tableName: String = "USERS"
+  val all = new DatabaseBackedEntityManager[User, Users](tag => new Users(tag), tableName)
 
   private[models] def hash(password: String) = Hashing.sha512().hashString(password, Charsets.UTF_8).toString()
 
@@ -37,7 +38,7 @@ object Users {
     new User(loginName, hash(password), name)
 
   def authenticate(loginName: String, password: String): Boolean = {
-    val receivedUserList: Seq[User] = dbRun(Users.all.filter(u => u.loginName === loginName && u.passwordHash === hash(password)).result)
+    val receivedUserList: Seq[User] = dbRun(Users.all.newQuery.filter(u => u.loginName === loginName && u.passwordHash === hash(password)).result)
     receivedUserList match {
       case Seq() => false
       case Seq(u) => true
@@ -45,7 +46,7 @@ object Users {
   }
 
   def findByLoginName(loginName: String): Option[User] = {
-    val receivedUserList: Seq[User] = dbRun(Users.all.filter(u => u.loginName === loginName).result)
+    val receivedUserList: Seq[User] = dbRun(Users.all.newQuery.filter(u => u.loginName === loginName).result)
     receivedUserList match {
       case Seq() => None
       case Seq(u) => Option(u)

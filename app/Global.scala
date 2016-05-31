@@ -65,7 +65,7 @@ object Global extends GlobalSettings {
       println("  Createing admin user...")
       println(s"    loginName: $loginName")
       println(s"    password: $password")
-      Users.all.save(Users.newWithUnhashedPw(loginName, password, name = "Admin"))
+      Users.all.add(Users.newWithUnhashedPw(loginName, password, name = "Admin"))
       println("  Done. Exiting.")
 
       System.exit(0)
@@ -73,9 +73,9 @@ object Global extends GlobalSettings {
   }
 
   private def loadDummyUsers() = {
-    Users.all.save(Users.newWithUnhashedPw(loginName = "admin", password = "a", name = "Admin"))
-    Users.all.save(Users.newWithUnhashedPw(loginName = "alice", password = "a", name = "Alice"))
-    Users.all.save(Users.newWithUnhashedPw(loginName = "bob", password = "b", name = "Bob"))
+    Users.all.add(Users.newWithUnhashedPw(loginName = "admin", password = "a", name = "Admin"))
+    Users.all.add(Users.newWithUnhashedPw(loginName = "alice", password = "a", name = "Alice"))
+    Users.all.add(Users.newWithUnhashedPw(loginName = "bob", password = "b", name = "Bob"))
   }
 
   private def loadCsvDummyData(csvDataFolder: Path) = {

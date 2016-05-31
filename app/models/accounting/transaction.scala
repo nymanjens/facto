@@ -6,11 +6,11 @@ import org.joda.time.DateTime
 
 import common.Clock
 import models.SlickUtils.dbApi._
-import models.{User, Users}
 import models.SlickUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
+import models.manager.{Identifiable, EntityTable, DatabaseBackedEntityManager}
+import models.{User, Users}
 import models.accounting.config.Config
 import models.accounting.config.{Category, Account, MoneyReservoir}
-import models.activeslick._
 
 case class Transaction(transactionGroupId: Long,
                        issuerId: Long,
@@ -72,7 +72,7 @@ object TransactionPartial {
     )
 }
 
-class Transactions(tag: Tag) extends EntityTable[Transaction](tag, "TRANSACTIONS") {
+class Transactions(tag: Tag) extends EntityTable[Transaction](tag, Transactions.tableName) {
   def transactionGroupId = column[Long]("transactionGroupId")
   def issuerId = column[Long]("issuerId")
   def beneficiaryAccountCode = column[String]("beneficiaryAccountCode")
@@ -90,5 +90,6 @@ class Transactions(tag: Tag) extends EntityTable[Transaction](tag, "TRANSACTIONS
 }
 
 object Transactions {
-  val all = new EntityTableQuery[Transaction, Transactions](tag => new Transactions(tag))
+  private val tableName: String = "TRANSACTIONS"
+  val all = new DatabaseBackedEntityManager[Transaction, Transactions](tag => new Transactions(tag), tableName)
 }

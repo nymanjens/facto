@@ -19,8 +19,8 @@ class BalanceCheckTest extends Specification {
   "test the BalanceCheck model" in new WithApplication {
 
     // prepare users
-    val user1 = Users.all.save(Users.newWithUnhashedPw(loginName = "tester", password = "x", name = "Tester"))
-    val user2 = Users.all.save(Users.newWithUnhashedPw(loginName = "tester2", password = "x", name = "Tester2"))
+    val user1 = Users.all.add(Users.newWithUnhashedPw(loginName = "tester", password = "x", name = "Tester"))
+    val user2 = Users.all.add(Users.newWithUnhashedPw(loginName = "tester2", password = "x", name = "Tester2"))
 
     // get and persist dummy BalanceChecks
     val checkA1 = BalanceChecks.all.add(BalanceCheck(

@@ -9,7 +9,7 @@ class EntityTableQuery[M <: Identifiable[M], T <: EntityTable[M]](cons: Tag => T
 
   def count: Int = dbRun(this.length.result)
 
-  def fetchAll: Seq[M] = dbRun(this.result)
+  def fetchAll(): Seq[M] = dbRun(this.result)
 
   def save(model: M): M = trySave(model).get
 

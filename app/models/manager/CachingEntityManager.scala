@@ -18,12 +18,12 @@
 //
 //  // ********** Additional API ********** //
 //  def initialize(): Unit = lock.synchronized {
-//    all.fetchAll foreach { e => cache.put(e.id.get, e) }
+//    all.fetchAll() foreach { e => cache.put(e.id.get, e) }
 //  }
 //
 //  // This should always succeed
 //  def verifyConsistency(): Unit = lock.synchronized {
-//    val fetchedEntities = all.fetchAll
+//    val fetchedEntities = all.fetchAll()
 //
 //    require(
 //      cache.size == fetchedEntities.size,

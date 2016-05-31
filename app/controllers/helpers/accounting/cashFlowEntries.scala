@@ -25,14 +25,14 @@ object CashFlowEntry {
   def fetchLastNEntries(moneyReservoir: MoneyReservoir, n: Int): Seq[CashFlowEntry] = {
     val (oldestBalanceDate, initialBalance): (DateTime, Money) = {
       val numTransactionsToFetch = 3 * n
-      val totalNumTransactions = dbRun(Transactions.all.filter(_.moneyReservoirCode === moneyReservoir.code).length.result)
+      val totalNumTransactions = dbRun(Transactions.all.newQuery.filter(_.moneyReservoirCode === moneyReservoir.code).length.result)
 
       if (totalNumTransactions < numTransactionsToFetch) {
         (new DateTime(0), Money(0)) // get all entries
 
       } else {
         // get oldest oldestTransDate
-        val oldestTransDate = dbRun(Transactions.all.filter(_.moneyReservoirCode === moneyReservoir.code)
+        val oldestTransDate = dbRun(Transactions.all.newQuery.filter(_.moneyReservoirCode === moneyReservoir.code)
           .sortBy(r => (r.transactionDate.desc, r.createdDate.desc)).take(numTransactionsToFetch)).last.transactionDate
 
         // get relevant balance checks
@@ -47,7 +47,7 @@ object CashFlowEntry {
       .filter(_.checkDate > oldestBalanceDate).sortBy(r => (r.checkDate, r.createdDate))).toList
 
     // get relevant transactions
-    val transactions: List[Transaction] = dbRun(Transactions.all.filter(_.moneyReservoirCode === moneyReservoir.code)
+    val transactions: List[Transaction] = dbRun(Transactions.all.newQuery.filter(_.moneyReservoirCode === moneyReservoir.code)
       .filter(_.transactionDate > oldestBalanceDate).sortBy(r => (r.transactionDate, r.createdDate))).toList
 
     // merge the two (recursion does not lead to growing stack because of Stream)

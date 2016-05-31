@@ -16,7 +16,7 @@ object GeneralEntry {
   def fetchLastNEntries(n: Int): Seq[GeneralEntry] = {
     val transactions: Seq[Transaction] =
       dbRun(
-        Transactions.all
+        Transactions.all.newQuery
           .sortBy(r => (r.transactionDate.desc, r.createdDate.desc))
           .take(3 * n))
         .reverse
@@ -33,7 +33,7 @@ object GeneralEntry {
   def fetchLastNEndowments(account: Account, n: Int) = {
     val transactions: Seq[Transaction] =
       dbRun(
-        Transactions.all
+        Transactions.all.newQuery
           .filter(_.categoryCode === Config.constants.endowmentCategory.code)
           .filter(_.beneficiaryAccountCode === account.code)
           .sortBy(r => (r.consumedDate.desc, r.createdDate.desc))
