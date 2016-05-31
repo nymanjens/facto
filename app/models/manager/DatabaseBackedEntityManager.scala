@@ -48,9 +48,7 @@ final class DatabaseBackedEntityManager[E <: Identifiable[E], T <: EntityTable[E
   }
 
   // ********** Implementation of QueryableEntityManager interface ********** //
-  override def newQuery: TableQuery[T] = {
-    return new TableQuery(cons)
-  }
+  override def newQuery: TableQuery[T] = new TableQuery(cons)
 
   protected def mustAffectOneSingleRow(query: => Int): Unit = {
     val affectedRows = query
