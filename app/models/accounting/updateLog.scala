@@ -16,12 +16,12 @@ import models.accounting.config.{Category, Account, MoneyReservoir}
 case class UpdateLog(userId: Long,
                      change: String,
                      date: DateTime = Clock.now,
-                     id: Option[Long] = None) extends Identifiable[UpdateLog] {
+                     idOption: Option[Long] = None) extends Identifiable[UpdateLog] {
   require(userId > 0)
   require(!change.isEmpty)
-  for (idVal <- id) require(idVal > 0)
+  for (idVal <- idOption) require(idVal > 0)
 
-  override def withId(id: Long) = copy(id = Some(id))
+  override def withId(id: Long) = copy(idOption = Some(id))
 
   lazy val user: User = Users.all.findById(userId)
 }
@@ -43,7 +43,7 @@ object UpdateLogs {
     dbRun(all.newQuery.sortBy(_.date.desc).take(n)).reverse.toList
 
   def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: TransactionGroup): Unit = {
-    require(newOrDeletedValue.id.isDefined, s"Given value must be persisted before logging it: ${newOrDeletedValue}")
+    require(newOrDeletedValue.idOption.isDefined, s"Given value must be persisted before logging it: ${newOrDeletedValue}")
     def fullyDescriptiveTransaction(t: Transaction): String = {
       s"Transaction(id=${t.id}, issuer=${t.issuer.loginName}, beneficiaryAccount=${t.beneficiaryAccountCode}, " +
         s"moneyReservoir=${t.moneyReservoirCode}, category=${t.categoryCode}, flow=${t.flow}, " +
@@ -57,7 +57,7 @@ object UpdateLogs {
     addLog(user, operation, fullyDescriptiveString(newOrDeletedValue))
   }
   def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: BalanceCheck): Unit = {
-    require(newOrDeletedValue.id.isDefined, s"Given value must be persisted before logging it: ${newOrDeletedValue}")
+    require(newOrDeletedValue.idOption.isDefined, s"Given value must be persisted before logging it: ${newOrDeletedValue}")
     def fullyDescriptiveString(bc: BalanceCheck): String = {
       s"BalanceCheck(id=${bc.id}, issuer=${bc.issuer.loginName}, moneyReservoir=${bc.moneyReservoirCode}, " +
         s"balance=${bc.balance}, createdDate=${bc.createdDate}, checkDate=${bc.checkDate})"

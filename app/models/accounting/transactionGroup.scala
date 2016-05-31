@@ -12,9 +12,9 @@ import models.manager.{Identifiable, EntityTable, DatabaseBackedEntityManager}
 
 
 case class TransactionGroup(createdDate: DateTime = Clock.now,
-                            id: Option[Long] = None) extends Identifiable[TransactionGroup] {
+                            idOption: Option[Long] = None) extends Identifiable[TransactionGroup] {
 
-  override def withId(id: Long) = copy(id = Some(id))
+  override def withId(id: Long) = copy(idOption = Some(id))
 
   def transactions: Seq[Transaction] = dbRun(Transactions.all.newQuery.filter {
     _.transactionGroupId === id

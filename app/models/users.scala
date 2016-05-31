@@ -9,9 +9,9 @@ import models.manager.{Identifiable, EntityTable, DatabaseBackedEntityManager}
 case class User(loginName: String,
                 passwordHash: String,
                 name: String,
-                id: Option[Long] = None) extends Identifiable[User] {
+                idOption: Option[Long] = None) extends Identifiable[User] {
 
-  override def withId(id: Long) = copy(id = Some(id))
+  override def withId(id: Long) = copy(idOption = Some(id))
 
   def withPasswordHashFromUnhashed(password: String): User = {
     copy(passwordHash = Users.hash(password))

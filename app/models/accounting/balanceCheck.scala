@@ -14,9 +14,9 @@ case class BalanceCheck(issuerId: Long,
                         balance: Money,
                         createdDate: DateTime = Clock.now,
                         checkDate: DateTime,
-                        id: Option[Long] = None) extends Identifiable[BalanceCheck] {
+                        idOption: Option[Long] = None) extends Identifiable[BalanceCheck] {
 
-  override def withId(id: Long) = copy(id = Some(id))
+  override def withId(id: Long) = copy(idOption = Some(id))
 
   override def toString = s"BalanceCheck(issuer=$issuerId, $moneyReservoirCode, balance=$balance)"
 

@@ -23,15 +23,15 @@ case class Transaction(transactionGroupId: Long,
                        createdDate: DateTime = Clock.now,
                        transactionDate: DateTime,
                        consumedDate: DateTime,
-                       id: Option[Long] = None) extends Identifiable[Transaction] {
+                       idOption: Option[Long] = None) extends Identifiable[Transaction] {
   require(transactionGroupId > 0)
   require(issuerId > 0)
   require(!beneficiaryAccountCode.isEmpty)
   require(!categoryCode.isEmpty)
   require(!description.isEmpty)
-  for (idVal <- id) require(idVal > 0)
+  for (idVal <- idOption) require(idVal > 0)
 
-  override def withId(id: Long) = copy(id = Some(id))
+  override def withId(id: Long) = copy(idOption = Some(id))
 
   override def toString = {
     val issuerString = Try(issuer.loginName).getOrElse(issuerId.toString)
