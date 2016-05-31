@@ -39,6 +39,5 @@ class BalanceChecks(tag: Tag) extends EntityTable[BalanceCheck](tag, BalanceChec
 object BalanceChecks {
   private val tableName: String = "BALANCE_CHECKS"
 
-  val all = new EntityTableQuery[BalanceCheck, BalanceChecks](tag => new BalanceChecks(tag))
-  val all2 = new DatabaseBackedEntityManager[BalanceCheck, BalanceChecks](tag => new BalanceChecks(tag), tableName)
+  val all = new DatabaseBackedEntityManager[BalanceCheck, BalanceChecks](tag => new BalanceChecks(tag), tableName)
 }

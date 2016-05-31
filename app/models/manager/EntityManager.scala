@@ -14,7 +14,7 @@ trait EntityManager[E <: Identifiable[E]] {
 
   // ********** Mutators ********** //
   def add(entity: E): E
-  def update(entity: E): Unit
+  def update(entity: E): E
   def delete(entity: E): Unit
 
   // ********** Getters ********** //

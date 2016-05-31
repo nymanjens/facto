@@ -51,7 +51,7 @@ object CsvImportTool {
       parts match {
         case List(issuerId, moneyReservoirCode, balanceAsFloat, checkDateStamp, createdDateStamp) =>
           val group = TransactionGroups.all.save(TransactionGroup())
-          BalanceChecks.all.save(BalanceCheck(
+          BalanceChecks.all.add(BalanceCheck(
             issuerId = issuerId.toInt,
             moneyReservoirCode = moneyReservoirCode,
             balance = Money.fromFloat(balanceAsFloat.toDouble),

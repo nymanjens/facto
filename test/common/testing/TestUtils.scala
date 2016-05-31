@@ -39,7 +39,7 @@ object TestUtils {
                           timestamp: Long = -1,
                           reservoir: MoneyReservoir = testReservoir): BalanceCheck = {
     val actualDate = if (timestamp == -1) date else new DateTime(timestamp)
-    BalanceChecks.all.save(BalanceCheck(
+    BalanceChecks.all.add(BalanceCheck(
       issuerId = 2,
       moneyReservoirCode = reservoir.code,
       balance = balance,

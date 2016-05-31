@@ -61,7 +61,7 @@ object BalanceCheckOperations extends Controller with Secured {
           moneyReservoirCode = moneyReservoir.code,
           balance = balance,
           checkDate = mostRecentTransaction.transactionDate)
-        val persistedBc = BalanceChecks.all.save(balanceCheck)
+        val persistedBc = BalanceChecks.all.add(balanceCheck)
         UpdateLogs.addLog(user, UpdateLogs.AddNew, persistedBc)
 
         val moneyReservoirName = moneyReservoir.name
@@ -123,7 +123,7 @@ object BalanceCheckOperations extends Controller with Secured {
       checkDate = formData.checkDate)
     val persistedBc = operationMeta match {
       case AddNewOperationMeta(_) =>
-        BalanceChecks.all.save(balanceCheck)
+        BalanceChecks.all.add(balanceCheck)
       case EditOperationMeta(bcId) =>
         BalanceChecks.all.update(balanceCheck withId bcId)
     }

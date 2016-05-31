@@ -23,7 +23,7 @@ object GeneralImportTool {
     dbRun(TransactionGroups.all.schema.create)
 
     dbRun( sqlu"""DROP TABLE IF EXISTS BALANCE_CHECKS """)
-    dbRun(BalanceChecks.all.schema.create)
+    dbRun(BalanceChecks.all.newQuery.schema.create)
 
     dbRun( sqlu"""DROP TABLE IF EXISTS UPDATE_LOGS """)
     dbRun(UpdateLogs.all.schema.create)

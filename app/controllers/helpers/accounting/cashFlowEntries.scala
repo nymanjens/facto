@@ -36,14 +36,14 @@ object CashFlowEntry {
           .sortBy(r => (r.transactionDate.desc, r.createdDate.desc)).take(numTransactionsToFetch)).last.transactionDate
 
         // get relevant balance checks
-        val oldestBC = dbRun(BalanceChecks.all.filter(_.moneyReservoirCode === moneyReservoir.code)
+        val oldestBC = dbRun(BalanceChecks.all.newQuery.filter(_.moneyReservoirCode === moneyReservoir.code)
           .filter(_.checkDate < oldestTransDate).sortBy(r => (r.checkDate.desc, r.createdDate.desc)).take(1)).headOption
         val oldestBalanceDate = oldestBC.map(_.checkDate).getOrElse(new DateTime(0))
         val initialBalance = oldestBC.map(_.balance).getOrElse(Money(0L))
         (oldestBalanceDate, initialBalance)
       }
     }
-    val balanceChecks: List[BalanceCheck] = dbRun(BalanceChecks.all.filter(_.moneyReservoirCode === moneyReservoir.code)
+    val balanceChecks: List[BalanceCheck] = dbRun(BalanceChecks.all.newQuery.filter(_.moneyReservoirCode === moneyReservoir.code)
       .filter(_.checkDate > oldestBalanceDate).sortBy(r => (r.checkDate, r.createdDate))).toList
 
     // get relevant transactions

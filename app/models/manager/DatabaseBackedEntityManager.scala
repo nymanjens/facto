@@ -23,10 +23,11 @@ final class DatabaseBackedEntityManager[E <: Identifiable[E], T <: EntityTable[E
     entity.withId(id)
   }
 
-  override def update(entity: E): Unit = {
+  override def update(entity: E): E = {
     mustAffectOneSingleRow {
       dbRun(newQuery.filter(_.id === entity.id.get).update(entity))
     }
+    entity
   }
 
   override def delete(entity: E): Unit = {
@@ -43,7 +44,8 @@ final class DatabaseBackedEntityManager[E <: Identifiable[E], T <: EntityTable[E
   }
 
   override def fetchAll(selection: Stream[E] => Stream[E]): Seq[E] = {
-    dbRun(newQuery.result).toVector
+    val result = dbRun(newQuery.result)
+    selection(result.toStream).toVector
   }
 
   // ********** Implementation of QueryableEntityManager interface ********** //

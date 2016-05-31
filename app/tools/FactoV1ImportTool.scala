@@ -88,7 +88,7 @@ object FactoV1ImportTool {
           }
 
           if (categoryCode == "[BALANCE_SET]") {
-            BalanceChecks.all.save(BalanceCheck(
+            BalanceChecks.all.add(BalanceCheck(
               issuerId = issuer.id.get,
               moneyReservoirCode = moneyReservoirCode,
               balance = Money.fromFloat(price.toDouble),
