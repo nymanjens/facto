@@ -4,7 +4,7 @@ import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
 import models.activeslick._
 import models.SlickUtils.dbApi._
-import SlickUtils.dbRun
+import models.SlickUtils.dbRun
 
 case class User(loginName: String,
                 passwordHash: String,
