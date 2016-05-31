@@ -51,8 +51,8 @@ class UpdateLogTest extends HookedSpecification {
     Clock.setTimeForTest(dateAt(2016, April, 1))
     val transGrp = TransactionGroups.all.add(TransactionGroup())
     Transactions.all.add(Transaction(
-      transactionGroupId = transGrp.id.get,
-      issuerId = testUser.id.get,
+      transactionGroupId = transGrp.id,
+      issuerId = testUser.id,
       beneficiaryAccountCode = testAccount.code,
       moneyReservoirCode = testReservoir.code,
       categoryCode = testCategory.code,
@@ -69,7 +69,7 @@ class UpdateLogTest extends HookedSpecification {
     // check result
     entries must haveSize(1)
     val change = entries(0).change
-    change must contain(transGrp.id.get.toString)
+    change must contain(transGrp.id.toString)
     change must contain(testUser.loginName)
     change must contain(testAccount.code)
     change must contain(testReservoir.code)
@@ -100,7 +100,7 @@ class UpdateLogTest extends HookedSpecification {
 
   private def balanceCheck(balance: Long): BalanceCheck = {
     BalanceChecks.all.add(BalanceCheck(
-      issuerId = testUser.id.get,
+      issuerId = testUser.id,
       moneyReservoirCode = testReservoir.code,
       balance = Money(balance),
       checkDate = Clock.now))

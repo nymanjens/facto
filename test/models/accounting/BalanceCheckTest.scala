@@ -24,19 +24,19 @@ class BalanceCheckTest extends Specification {
 
     // get and persist dummy BalanceChecks
     val checkA1 = BalanceChecks.all.add(BalanceCheck(
-      issuerId = user1.id.get,
+      issuerId = user1.id,
       moneyReservoirCode = "ACC_A",
       balance = Money(999),
       checkDate = new DateTime(1000)
     ))
     val checkA2 = BalanceChecks.all.add(BalanceCheck(
-      issuerId = user1.id.get,
+      issuerId = user1.id,
       moneyReservoirCode = "ACC_A",
       balance = Money(1000),
       checkDate = new DateTime(2000)
     ))
     val checkB = BalanceChecks.all.add(BalanceCheck(
-      issuerId = user2.id.get,
+      issuerId = user2.id,
       moneyReservoirCode = "ACC_B",
       balance = Money(999),
       checkDate = Clock.now

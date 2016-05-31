@@ -16,7 +16,7 @@
 //
 //  // ********** Additional API ********** //
 //  def initialize(): Unit = lock.synchronized {
-//    all.fetchAll() foreach { e => cache.put(e.id.get, e) }
+//    all.fetchAll() foreach { e => cache.put(e.id, e) }
 //  }
 //
 //  // This should always succeed
@@ -27,7 +27,7 @@
 //      cache.size == fetchedEntities.size,
 //      s"cache.size = ${cache.size} must be equal to fetchedEntities.size = ${fetchedEntities.size}")
 //    for (fetched <- fetchedEntities) {
-//      val cached = cache(fetched.id.get)
+//      val cached = cache(fetched.id)
 //      require(
 //        cached == fetched,
 //        s"Cached entity is not equal to fetched entity (cached = $cached, fetched = $fetched)")
@@ -37,19 +37,19 @@
 //  // ********** Implementation of EntityManager interface ********** //
 //  override def save(e: E): E = lock.synchronized {
 //    val result: E = all.save(e)
-//    cache.put(result.id.get, result)
+//    cache.put(result.id, result)
 //    result
 //  }
 //
 //  override def update(e: E): E = lock.synchronized {
 //    val result: E = all.update(e)
-//    cache.put(result.id.get, result)
+//    cache.put(result.id, result)
 //    result
 //  }
 //
 //  override def delete(e: E): Unit = lock.synchronized {
 //    all.delete(e)
-//    cache.remove(e.id.get)
+//    cache.remove(e.id)
 //  }
 //
 //  override def getAll(selection: Stream[E] => Stream[E]): Seq[E] = lock.synchronized {

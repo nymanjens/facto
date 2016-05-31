@@ -17,21 +17,21 @@ final class DatabaseBackedEntityManager[E <: Identifiable[E], T <: EntityTable[E
 
   // ********** Implementation of EntityManager interface - Mutators ********** //
   override def add(entity: E): E = {
-    require(entity.id.isEmpty, s"This entity was already persisted with id ${entity.id.get}")
+    require(entity.idOption.isEmpty, s"This entity was already persisted with id ${entity.id}")
     val id = dbRun(newQuery.returning(newQuery.map(_.id)).+=(entity))
     entity.withId(id)
   }
 
   override def update(entity: E): E = {
     mustAffectOneSingleRow {
-      dbRun(newQuery.filter(_.id === entity.id.get).update(entity))
+      dbRun(newQuery.filter(_.id === entity.id).update(entity))
     }
     entity
   }
 
   override def delete(entity: E): Unit = {
     mustAffectOneSingleRow {
-      dbRun(newQuery.filter(_.id === entity.id.get).delete)
+      dbRun(newQuery.filter(_.id === entity.id).delete)
     }
   }
 

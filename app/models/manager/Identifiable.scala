@@ -5,12 +5,15 @@ package models.manager
 /** Base trait to define a model having an ID (i.e.: Entity). */
 trait Identifiable[E <: Identifiable[E]] {
 
+  /** Returns the Entity ID */
+  final def id: Long = idOption.get
+
   /**
     * The Entity ID wrapped in an Option.
     * Expected to be None when Entity not yet persisted, otherwise Some[Id].
     */
-  def id: Option[Long]
+  protected[manager] def idOption: Option[Long]
 
   /** Returns a copy of this Entity with an ID. */
-  private[manager] def withId(id: Long): E
+  protected[manager] def withId(id: Long): E
 }

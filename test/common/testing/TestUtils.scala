@@ -19,7 +19,7 @@ object TestUtils {
                          account: Account = testAccount,
                          category: Category = testCategory,
                          reservoir: MoneyReservoir = testReservoir): Transaction = {
-    val actualGroupId = if (groupId == -1) TransactionGroups.all.add(TransactionGroup()).id.get else groupId
+    val actualGroupId = if (groupId == -1) TransactionGroups.all.add(TransactionGroup()).id else groupId
     val actualDate = if (timestamp == -1) date else new DateTime(timestamp)
     Transactions.all.add(Transaction(
       transactionGroupId = actualGroupId,

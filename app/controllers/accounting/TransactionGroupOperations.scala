@@ -193,8 +193,8 @@ object TransactionGroupOperations extends Controller with Secured {
 
     for (trans <- transactionGroupData.transactions) {
       Transactions.all.add(Transaction(
-        transactionGroupId = group.id.get,
-        issuerId = user.id.get,
+        transactionGroupId = group.id,
+        issuerId = user.id,
         beneficiaryAccountCode = trans.beneficiaryAccountCode,
         moneyReservoirCode = trans.moneyReservoirCode,
         categoryCode = trans.categoryCode,

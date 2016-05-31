@@ -28,7 +28,7 @@ object CsvImportTool {
         transactionDateStamp, consumedDateStamp, createdDateStamp) =>
           val group = TransactionGroups.all.add(TransactionGroup())
           Transactions.all.add(Transaction(
-            transactionGroupId = group.id.get,
+            transactionGroupId = group.id,
             issuerId = issuerId.toInt,
             beneficiaryAccountCode = beneficiaryAccountCode,
             moneyReservoirCode = moneyReservoirCode,

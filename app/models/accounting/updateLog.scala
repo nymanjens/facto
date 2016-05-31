@@ -45,21 +45,21 @@ object UpdateLogs {
   def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: TransactionGroup): Unit = {
     require(newOrDeletedValue.id.isDefined, s"Given value must be persisted before logging it: ${newOrDeletedValue}")
     def fullyDescriptiveTransaction(t: Transaction): String = {
-      s"Transaction(id=${t.id.get}, issuer=${t.issuer.loginName}, beneficiaryAccount=${t.beneficiaryAccountCode}, " +
+      s"Transaction(id=${t.id}, issuer=${t.issuer.loginName}, beneficiaryAccount=${t.beneficiaryAccountCode}, " +
         s"moneyReservoir=${t.moneyReservoirCode}, category=${t.categoryCode}, flow=${t.flow}, " +
         s"description=${t.description}, detailDescription=${t.detailDescription}, createdDate=${t.createdDate}, " +
         s"transactionDate=${t.transactionDate}, consumedDate=${t.consumedDate})"
     }
     def fullyDescriptiveString(group: TransactionGroup): String = {
       val transactionsString = group.transactions.map(fullyDescriptiveTransaction).mkString(", ")
-      s"TransactionGroup(id=${group.id.get}, $transactionsString)"
+      s"TransactionGroup(id=${group.id}, $transactionsString)"
     }
     addLog(user, operation, fullyDescriptiveString(newOrDeletedValue))
   }
   def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: BalanceCheck): Unit = {
     require(newOrDeletedValue.id.isDefined, s"Given value must be persisted before logging it: ${newOrDeletedValue}")
     def fullyDescriptiveString(bc: BalanceCheck): String = {
-      s"BalanceCheck(id=${bc.id.get}, issuer=${bc.issuer.loginName}, moneyReservoir=${bc.moneyReservoirCode}, " +
+      s"BalanceCheck(id=${bc.id}, issuer=${bc.issuer.loginName}, moneyReservoir=${bc.moneyReservoirCode}, " +
         s"balance=${bc.balance}, createdDate=${bc.createdDate}, checkDate=${bc.checkDate})"
     }
     addLog(user, operation, fullyDescriptiveString(newOrDeletedValue))
@@ -68,7 +68,7 @@ object UpdateLogs {
   private def addLog(user: User, operation: UpdateOperation, newOrDeletedValueString: String): Unit = {
     val operationName = objectName(operation)
     val change = s"$operationName $newOrDeletedValueString"
-    all.add(UpdateLog(user.id.get, change))
+    all.add(UpdateLog(user.id, change))
   }
 
   sealed trait UpdateOperation

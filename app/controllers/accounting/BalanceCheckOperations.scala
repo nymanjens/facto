@@ -57,7 +57,7 @@ object BalanceCheckOperations extends Controller with Secured {
         val mostRecentTransaction = Transactions.all.findById(mostRecentTransactionId)
 
         val balanceCheck = BalanceCheck(
-          issuerId = user.id.get,
+          issuerId = user.id,
           moneyReservoirCode = moneyReservoir.code,
           balance = balance,
           checkDate = mostRecentTransaction.transactionDate)
@@ -117,7 +117,7 @@ object BalanceCheckOperations extends Controller with Secured {
   private def persistBc(formData: Forms.BcData, operationMeta: OperationMeta)
                        (implicit user: User): Unit = {
     val balanceCheck = BalanceCheck(
-      issuerId = user.id.get,
+      issuerId = user.id,
       moneyReservoirCode = operationMeta.moneyReservoir.code,
       balance = formData.balance,
       checkDate = formData.checkDate)

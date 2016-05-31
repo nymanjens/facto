@@ -33,8 +33,8 @@ class TransactionAndGroupTests extends Specification {
 
     // get and persist dummy transactions
     val trans1A = Transactions.all.add(Transaction(
-      transactionGroupId = transGrp1.id.get,
-      issuerId = user1.id.get,
+      transactionGroupId = transGrp1.id,
+      issuerId = user1.id,
       beneficiaryAccountCode = "ACC_A",
       moneyReservoirCode = "CASH",
       categoryCode = "CAT_A",
@@ -44,8 +44,8 @@ class TransactionAndGroupTests extends Specification {
       consumedDate = Clock.now
     ))
     val trans1B = Transactions.all.add(Transaction(
-      transactionGroupId = transGrp1.id.get,
-      issuerId = user1.id.get,
+      transactionGroupId = transGrp1.id,
+      issuerId = user1.id,
       beneficiaryAccountCode = "ACC_A",
       moneyReservoirCode = "CASH",
       categoryCode = "CAT_A",
@@ -55,8 +55,8 @@ class TransactionAndGroupTests extends Specification {
       consumedDate = Clock.now
     ))
     val trans2 = Transactions.all.add(Transaction(
-      transactionGroupId = transGrp2.id.get,
-      issuerId = user2.id.get,
+      transactionGroupId = transGrp2.id,
+      issuerId = user2.id,
       beneficiaryAccountCode = "ACC_A",
       moneyReservoirCode = "CASH",
       categoryCode = "CAT_A",

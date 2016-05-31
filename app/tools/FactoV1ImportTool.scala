@@ -89,7 +89,7 @@ object FactoV1ImportTool {
 
           if (categoryCode == "[BALANCE_SET]") {
             BalanceChecks.all.add(BalanceCheck(
-              issuerId = issuer.id.get,
+              issuerId = issuer.id,
               moneyReservoirCode = moneyReservoirCode,
               balance = Money.fromFloat(price.toDouble),
               createdDate = dateForMillisSinceEpoch(creationTime.toLong),
@@ -99,8 +99,8 @@ object FactoV1ImportTool {
             // Transaction
             val group = TransactionGroups.all.add(TransactionGroup(createdDate = dateForMillisSinceEpoch(creationTime.toLong)))
             Transactions.all.add(Transaction(
-              transactionGroupId = group.id.get,
-              issuerId = issuer.id.get,
+              transactionGroupId = group.id,
+              issuerId = issuer.id,
               beneficiaryAccountCode = accountCode,
               moneyReservoirCode = moneyReservoirCode,
               categoryCode = categoryCode,
@@ -126,7 +126,7 @@ object FactoV1ImportTool {
         case valuesRegex(timestamp, originalUserId, sql) =>
           val user = originalUserIdToUser(originalUserId.toLong)
           UpdateLogs.all.add(UpdateLog(
-            userId = user.id.get,
+            userId = user.id,
             change = StringEscapeUtils.unescapeHtml(sql.replace("\\", "")),
             date = dateForMillisSinceEpoch(timestamp.toLong)
           ))
