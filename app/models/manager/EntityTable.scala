@@ -2,17 +2,14 @@ package models.manager
 
 import models.SlickUtils.dbApi._
 
-///** Table extension to be used with a Model that has an Id. */
-//abstract class EntityTable[M <: Identifiable[M]](tag: Tag, schemaName: Option[String], tableName: String)(implicit val colType: BaseColumnType[Long])
-//  extends Table[M](tag, schemaName, tableName) {
-//
-//  def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
-//
-//  /** Constructor without schemaName */
-//  def this(tag: Tag, tableName: String)(implicit mapping: BaseColumnType[Long]) = this(tag, None, tableName)
-//}
+// Based on active-slick (https://github.com/strongtyped/active-slick)
 
-import models.activeslick.{EntityTable => ActiveSlickEntityTable}
+/** Table extension to be used with an Identifiable model. */
+abstract class EntityTable[M <: Identifiable[M]](tag: Tag,
+                                                 tableName: String,
+                                                 schemaName: Option[String] = None)
+                                                (implicit val colType: BaseColumnType[Long])
+  extends Table[M](tag, schemaName, tableName) {
 
-abstract class EntityTable[M <: Identifiable[M]](tag: Tag, tableName: String)(implicit colType: BaseColumnType[Long])
-  extends ActiveSlickEntityTable[M](tag, None, tableName)
+  def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
+}

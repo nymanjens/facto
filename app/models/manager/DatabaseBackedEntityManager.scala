@@ -3,7 +3,6 @@ package models.manager
 import scala.util.{Success, Failure, Try}
 import scala.collection.immutable.Seq
 
-import models.activeslick.{Identifiable, EntityTable}
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
 

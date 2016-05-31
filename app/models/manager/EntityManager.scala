@@ -2,8 +2,6 @@ package models.manager
 
 import scala.collection.immutable.Seq
 
-import models.activeslick.Identifiable
-
 trait EntityManager[E <: Identifiable[E]] {
 
   // ********** Management methods ********** //

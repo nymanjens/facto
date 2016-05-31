@@ -1,26 +1,16 @@
 package models.manager
 
-//
-///**
-//  * Base trait to define a model having an ID (i.e.: Entity).
-//  * The ID is defined as a type alias as it needs to
-//  * be accessed by ActiveSlick via type projection when mapping to databse tables.
-//  */
-//trait Identifiable[E <: Identifiable[E]] {
-//
-//  /**
-//    * The Entity ID wrapped in an Option.
-//    * Expected to be None when Entity not yet persisted, otherwise Some[Id]
-//    */
-//  def id: Option[Long]
-//
-//  /**
-//    * Provide the means to assign an ID to the entity
-//    * @return A copy of this Entity with an ID.
-//    */
-//  def withId(id: Long): E
-//}
+// Based on active-slick (https://github.com/strongtyped/active-slick)
 
-import models.activeslick.{Identifiable => ActiveSlickIdentifiable}
+/** Base trait to define a model having an ID (i.e.: Entity). */
+trait Identifiable[E <: Identifiable[E]] {
 
-trait Identifiable[E <: Identifiable[E]] extends ActiveSlickIdentifiable[E]
+  /**
+    * The Entity ID wrapped in an Option.
+    * Expected to be None when Entity not yet persisted, otherwise Some[Id].
+    */
+  def id: Option[Long]
+
+  /** Returns a copy of this Entity with an ID. */
+  private[manager] def withId(id: Long): E
+}

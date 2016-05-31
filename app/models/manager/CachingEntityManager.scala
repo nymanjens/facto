@@ -6,8 +6,6 @@
 //
 //import org.apache.http.annotation.GuardedBy
 //
-//import models.activeslick.{EntityTableQuery, Identifiable}
-//
 //final class CachingEntityManager[E <: Identifiable[E]](all: EntityTableQuery[E, _])
 //  extends EntityManager[E] {
 //
