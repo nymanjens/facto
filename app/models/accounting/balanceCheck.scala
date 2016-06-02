@@ -35,12 +35,7 @@ class BalanceChecks(tag: Tag) extends EntityTable[BalanceCheck](tag, BalanceChec
   override def * = (issuerId, moneyReservoirCode, balance, createdDate, checkDate, id.?) <>(BalanceCheck.tupled, BalanceCheck.unapply)
 }
 
-// object BalanceChecks extends ForwardingEntityManager[BalanceCheck](
-//   EntityManager.caching(
-//     QueryableEntityManager.backedByDatabase[BalanceCheck, BalanceChecks](
-//       tag => new BalanceChecks(tag), tableName = "BALANCE_CHECKS")))
-
-import models.manager.ForwardingQueryableEntityManager
-object BalanceChecks extends ForwardingQueryableEntityManager[BalanceCheck, BalanceChecks](
-  QueryableEntityManager.backedByDatabase[BalanceCheck, BalanceChecks](
-    tag => new BalanceChecks(tag), tableName = "BALANCE_CHECKS"))
+object BalanceChecks extends ForwardingEntityManager[BalanceCheck](
+  EntityManager.caching(
+    QueryableEntityManager.backedByDatabase[BalanceCheck, BalanceChecks](
+      tag => new BalanceChecks(tag), tableName = "BALANCE_CHECKS")))
