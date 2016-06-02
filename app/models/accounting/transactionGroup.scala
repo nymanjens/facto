@@ -30,13 +30,7 @@ class TransactionGroups(tag: Tag) extends EntityTable[TransactionGroup](tag, Tra
   override def * = (createdDate, id.?) <>(TransactionGroup.tupled, TransactionGroup.unapply)
 }
 
-//object TransactionGroups  extends ForwardingEntityManager[TransactionGroup](
-//  EntityManager.caching(
-//    QueryableEntityManager.backedByDatabase[TransactionGroup, TransactionGroups](
-//      tag => new TransactionGroups(tag), tableName = "TRANSACTION_GROUPS")))
-
-import models.manager.ForwardingQueryableEntityManager
-
-object TransactionGroups extends ForwardingQueryableEntityManager[TransactionGroup, TransactionGroups](
-  QueryableEntityManager.backedByDatabase[TransactionGroup, TransactionGroups](
-    tag => new TransactionGroups(tag), tableName = "TRANSACTION_GROUPS"))
+object TransactionGroups extends ForwardingEntityManager[TransactionGroup](
+  EntityManager.caching(
+    QueryableEntityManager.backedByDatabase[TransactionGroup, TransactionGroups](
+      tag => new TransactionGroups(tag), tableName = "TRANSACTION_GROUPS")))
