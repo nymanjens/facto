@@ -19,3 +19,8 @@ trait EntityManager[E <: Identifiable[E]] {
   def findById(id: Long): E
   def fetchAll(selection: Stream[E] => Stream[E] = s => s): Seq[E]
 }
+
+object EntityManager {
+  def caching[E <: Identifiable[E]](delegate: EntityManager[E]): EntityManager[E] =
+    new CachingEntityManager(delegate)
+}
