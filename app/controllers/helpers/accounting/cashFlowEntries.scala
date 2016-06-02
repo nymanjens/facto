@@ -25,15 +25,19 @@ object CashFlowEntry {
   def fetchLastNEntries(moneyReservoir: MoneyReservoir, n: Int): Seq[CashFlowEntry] = {
     val (oldestBalanceDate, initialBalance): (DateTime, Money) = {
       val numTransactionsToFetch = 3 * n
-      val totalNumTransactions = dbRun(Transactions.newQuery.filter(_.moneyReservoirCode === moneyReservoir.code).length.result)
+      val totalNumTransactions = Transactions.count(_.moneyReservoirCode == moneyReservoir.code)
 
       if (totalNumTransactions < numTransactionsToFetch) {
         (new DateTime(0), Money(0)) // get all entries
 
       } else {
         // get oldest oldestTransDate
-        val oldestTransDate = dbRun(Transactions.newQuery.filter(_.moneyReservoirCode === moneyReservoir.code)
-          .sortBy(r => (r.transactionDate.desc, r.createdDate.desc)).take(numTransactionsToFetch)).last.transactionDate
+        val oldestTransDate = Transactions.fetchFromAll(_
+          .filter(_.moneyReservoirCode == moneyReservoir.code)
+          .sortBy(r => (r.transactionDate, r.createdDate))(Ordering[(DateTime, DateTime)].reverse)
+          .take(numTransactionsToFetch)
+          .last
+          .transactionDate)
 
         // get relevant balance checks
         val oldestBC = dbRun(BalanceChecks.newQuery.filter(_.moneyReservoirCode === moneyReservoir.code)
@@ -47,8 +51,10 @@ object CashFlowEntry {
       .filter(_.checkDate > oldestBalanceDate).sortBy(r => (r.checkDate, r.createdDate))).toList
 
     // get relevant transactions
-    val transactions: List[Transaction] = dbRun(Transactions.newQuery.filter(_.moneyReservoirCode === moneyReservoir.code)
-      .filter(_.transactionDate > oldestBalanceDate).sortBy(r => (r.transactionDate, r.createdDate))).toList
+    val transactions: List[Transaction] = Transactions.fetchAll(_
+      .filter(_.moneyReservoirCode == moneyReservoir.code)
+      .filter(_.transactionDate > oldestBalanceDate)
+      .sortBy(r => (r.transactionDate, r.createdDate)))
 
     // merge the two (recursion does not lead to growing stack because of Stream)
     def merge(nextTransactions: List[Transaction], nextBalanceChecks: List[BalanceCheck]): Stream[AnyRef] = {

@@ -17,7 +17,9 @@ trait EntityManager[E <: Identifiable[E]] {
 
   // ********** Getters ********** //
   def findById(id: Long): E
-  def fetchAll(selection: Stream[E] => Stream[E] = s => s): Seq[E]
+  def fetchFromAll[R](calculateResult: Stream[E] => R): R
+  def fetchAll(selection: Stream[E] => Stream[E] = s => s): List[E] = fetchFromAll(stream => selection(stream).toList)
+  def count(predicate: E => Boolean = _ => true): Int = fetchFromAll(_.count(predicate))
 }
 
 object EntityManager {

@@ -42,9 +42,9 @@ private[manager] final class DatabaseBackedEntityManager[E <: Identifiable[E], T
     }
   }
 
-  override def fetchAll(selection: Stream[E] => Stream[E]): Seq[E] = {
+  override def fetchFromAll[R](calculateResult: Stream[E] => R): R = {
     val result = dbRun(newQuery.result)
-    selection(result.toStream).toVector
+    calculateResult(result.toStream)
   }
 
   // ********** Implementation of QueryableEntityManager interface ********** //

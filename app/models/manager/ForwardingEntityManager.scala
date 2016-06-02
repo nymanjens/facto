@@ -18,5 +18,7 @@ abstract class ForwardingEntityManager[E <: Identifiable[E]](delegate: EntityMan
 
   // ********** Getters ********** //
   override def findById(id: Long): E = delegate.findById(id)
-  override def fetchAll(selection: Stream[E] => Stream[E]): Seq[E] = delegate.fetchAll(selection)
+  override def fetchFromAll[R](calculateResult: Stream[E] => R): R = delegate.fetchFromAll(calculateResult)
+  override def fetchAll(selection: Stream[E] => Stream[E]): List[E] = delegate.fetchAll(selection)
+  override def count(predicate: E => Boolean): Int = delegate.count(predicate)
 }

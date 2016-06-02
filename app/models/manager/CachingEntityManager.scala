@@ -53,12 +53,12 @@ private[manager] final class CachingEntityManager[E <: Identifiable[E]](delegate
   }
 
   // ********** Implementation of EntityManager interface: Getters ********** //
-  override def findById(id: Long)  = lock.synchronized {
+  override def findById(id: Long) = lock.synchronized {
     cache(id)
   }
 
-  override def fetchAll(selection: Stream[E] => Stream[E]): Seq[E] = lock.synchronized {
+  override def fetchFromAll[R](calculateResult: Stream[E] => R): R = lock.synchronized {
     val stream = cache.values.toStream
-    selection(stream).toVector
+    calculateResult(stream)
   }
 }
