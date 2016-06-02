@@ -9,7 +9,7 @@ import common.Clock
 import common.ScalaUtils.objectName
 import models.{User, Users}
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
-import models.manager.{Identifiable, EntityTable, DatabaseBackedEntityManager}
+import models.manager.{Identifiable, EntityTable, QueryableEntityManager}
 import models.accounting.config.Config
 import models.accounting.config.{Category, Account, MoneyReservoir}
 
@@ -36,7 +36,7 @@ class UpdateLogs(tag: Tag) extends EntityTable[UpdateLog](tag, UpdateLogs.tableN
 
 object UpdateLogs {
   private val tableName: String = "UPDATE_LOGS"
-  val all = new DatabaseBackedEntityManager[UpdateLog, UpdateLogs](tag => new UpdateLogs(tag), tableName)
+  val all = QueryableEntityManager.backedByDatabase[UpdateLog, UpdateLogs](tag => new UpdateLogs(tag), tableName)
 
   /* Returns most recent n entries sorted from old to new. */
   def fetchLastNEntries(n: Int): Seq[UpdateLog] =

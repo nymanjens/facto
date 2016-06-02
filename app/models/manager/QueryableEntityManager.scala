@@ -13,5 +13,5 @@ trait QueryableEntityManager[E <: Identifiable[E], T <: AbstractTable[_]] extend
 object QueryableEntityManager {
   def backedByDatabase[E <: Identifiable[E], T <: EntityTable[E]](cons: Tag => T,
                                                                   tableName: String
-                                                                 ) = new DatabaseBackedEntityManager(cons, tableName)
+                                                                 ) = new DatabaseBackedEntityManager[E, T](cons, tableName)
 }

@@ -8,7 +8,7 @@ import models.SlickUtils.dbApi._
 import common.Clock
 import models.SlickUtils.dbRun
 import models.SlickUtils.JodaToSqlDateMapper
-import models.manager.{Identifiable, EntityTable, DatabaseBackedEntityManager}
+import models.manager.{Identifiable, EntityTable, QueryableEntityManager}
 
 
 case class TransactionGroup(createdDate: DateTime = Clock.now,
@@ -34,5 +34,5 @@ class TransactionGroups(tag: Tag) extends EntityTable[TransactionGroup](tag, Tra
 
 object TransactionGroups {
   private val tableName: String = "TRANSACTION_GROUPS"
-  val all = new DatabaseBackedEntityManager[TransactionGroup, TransactionGroups](tag => new TransactionGroups(tag), tableName)
+  val all = QueryableEntityManager.backedByDatabase[TransactionGroup, TransactionGroups](tag => new TransactionGroups(tag), tableName)
 }

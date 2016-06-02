@@ -4,7 +4,7 @@ import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
-import models.manager.{Identifiable, EntityTable, DatabaseBackedEntityManager}
+import models.manager.{Identifiable, EntityTable, QueryableEntityManager}
 
 case class User(loginName: String,
                 passwordHash: String,
@@ -30,7 +30,7 @@ class Users(tag: Tag) extends EntityTable[User](tag, Users.tableName) {
 
 object Users {
   private val tableName: String = "USERS"
-  val all = new DatabaseBackedEntityManager[User, Users](tag => new Users(tag), tableName)
+  val all = QueryableEntityManager.backedByDatabase[User, Users](tag => new Users(tag), tableName)
 
   private[models] def hash(password: String) = Hashing.sha512().hashString(password, Charsets.UTF_8).toString()
 
