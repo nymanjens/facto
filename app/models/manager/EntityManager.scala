@@ -2,11 +2,15 @@ package models.manager
 
 import scala.collection.immutable.Seq
 
+/** Provides access to persisted entries. */
 trait EntityManager[E <: Identifiable[E]] {
 
   // ********** Management methods ********** //
+  /* Initializes this manager. This is called once at the start of the application. */
   def initialize(): Unit = {}
+  /* Throws an exception if there is a consistency problem in this manager. */
   def verifyConsistency(): Unit = {}
+  /* Creates the persisted database table for this manager. */
   def createSchema: Unit
   def tableName: String
 

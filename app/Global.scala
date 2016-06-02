@@ -19,6 +19,10 @@ object Global extends GlobalSettings {
   override def onStart(app: Application): Unit = {
     implicit val _ = app
 
+    for (tableManager <- Tables.allManagers) {
+      tableManager.initialize()
+    }
+
     processFlags()
 
     if (Set(Mode.Test, Mode.Dev) contains app.mode) {
@@ -33,10 +37,6 @@ object Global extends GlobalSettings {
       } else if (AppConfigHelper.loadFactoV1Data) {
         FactoV1ImportTool.importFromSqlDump(AppConfigHelper.factoV1SqlFilePath)
       }
-    }
-
-    for(tableManager <- Tables.allManagers) {
-      tableManager.initialize()
     }
   }
 
@@ -61,7 +61,7 @@ object Global extends GlobalSettings {
       System.exit(0)
     }
 
-    if(CommandLineFlags.createAdminUser()) {
+    if (CommandLineFlags.createAdminUser()) {
       val loginName = "admin"
       val password = AppConfigHelper.defaultPassword getOrElse "changeme"
 
@@ -96,8 +96,8 @@ object Global extends GlobalSettings {
     private val properties = System.getProperties.asScala
 
     def loadFactoV1DataFromPath(): Option[Path] = getExistingPath("loadFactoV1DataFromPath")
-    def dropAndCreateNewDb():      Boolean =      getBoolean("dropAndCreateNewDb")
-    def createAdminUser():         Boolean =      getBoolean("createAdminUser")
+    def dropAndCreateNewDb(): Boolean = getBoolean("dropAndCreateNewDb")
+    def createAdminUser(): Boolean = getBoolean("createAdminUser")
 
     private def getBoolean(name: String): Boolean = properties.get(name).isDefined
 
@@ -107,12 +107,12 @@ object Global extends GlobalSettings {
 
   private object AppConfigHelper {
     def dropAndCreateNewDb(implicit app: Application): Boolean = getBoolean("facto.development.dropAndCreateNewDb")
-    def loadDummyUsers(implicit app: Application):     Boolean = getBoolean("facto.development.loadDummyUsers")
-    def loadCsvDummyData(implicit app: Application):   Boolean = getBoolean("facto.development.loadCsvDummyData")
-    def csvDummyDataFolder(implicit app: Application): Path =    getExistingPath("facto.development.csvDummyDataFolder")
-    def loadFactoV1Data(implicit app: Application):    Boolean = getBoolean("facto.development.loadFactoV1Data")
-    def factoV1SqlFilePath(implicit app: Application): Path =    getExistingPath("facto.development.factoV1SqlFilePath")
-    def defaultPassword(implicit app: Application):    Option[String] = getString("facto.setup.defaultPassword")
+    def loadDummyUsers(implicit app: Application): Boolean = getBoolean("facto.development.loadDummyUsers")
+    def loadCsvDummyData(implicit app: Application): Boolean = getBoolean("facto.development.loadCsvDummyData")
+    def csvDummyDataFolder(implicit app: Application): Path = getExistingPath("facto.development.csvDummyDataFolder")
+    def loadFactoV1Data(implicit app: Application): Boolean = getBoolean("facto.development.loadFactoV1Data")
+    def factoV1SqlFilePath(implicit app: Application): Path = getExistingPath("facto.development.factoV1SqlFilePath")
+    def defaultPassword(implicit app: Application): Option[String] = getString("facto.setup.defaultPassword")
 
     private def getBoolean(cfgPath: String)(implicit app: Application): Boolean =
       app.configuration.getBoolean(cfgPath) getOrElse false
