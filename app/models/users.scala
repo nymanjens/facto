@@ -2,9 +2,10 @@ package models
 
 import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
+
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
-import models.manager.{EntityTable, ForwardingQueryableEntityManager, Identifiable, QueryableEntityManager}
+import models.manager.{EntityTable, Identifiable, EntityManager, QueryableEntityManager, ForwardingEntityManager}
 
 case class User(loginName: String,
                 passwordHash: String,
@@ -28,8 +29,9 @@ class Users(tag: Tag) extends EntityTable[User](tag, Users.tableName) {
   override def * = (loginName, passwordHash, name, id.?) <>(User.tupled, User.unapply)
 }
 
-object Users extends ForwardingQueryableEntityManager[User, Users](
-  QueryableEntityManager.backedByDatabase[User, Users](tag => new Users(tag), tableName = "USERS")) {
+object Users extends ForwardingEntityManager[User](
+  EntityManager.caching(
+    QueryableEntityManager.backedByDatabase[User, Users](tag => new Users(tag), tableName = "USERS"))) {
 
   private[models] def hash(password: String) = Hashing.sha512().hashString(password, Charsets.UTF_8).toString()
 
@@ -37,16 +39,15 @@ object Users extends ForwardingQueryableEntityManager[User, Users](
     new User(loginName, hash(password), name)
 
   def authenticate(loginName: String, password: String): Boolean = {
-    val receivedUserList: Seq[User] = dbRun(newQuery.filter(u => u.loginName === loginName && u.passwordHash === hash(password)).result)
-    receivedUserList match {
-      case Seq() => false
-      case Seq(u) => true
+    findByLoginName(loginName) match {
+      case Some(user) if user.passwordHash == hash(password) => true
+      case _ => false
     }
   }
 
   def findByLoginName(loginName: String): Option[User] = {
-    val receivedUserList: Seq[User] = dbRun(newQuery.filter(u => u.loginName === loginName).result)
-    receivedUserList match {
+    val users = fetchAll(_.filter(u => u.loginName == loginName))
+    users match {
       case Seq() => None
       case Seq(u) => Option(u)
     }

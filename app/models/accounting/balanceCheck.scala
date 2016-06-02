@@ -6,7 +6,7 @@ import common.Clock
 import models.{User, Users}
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
-import models.manager.{Identifiable, EntityTable, QueryableEntityManager}
+import models.manager.{EntityTable, ForwardingQueryableEntityManager, Identifiable, QueryableEntityManager}
 import models.accounting.config.{Config, MoneyReservoir}
 
 case class BalanceCheck(issuerId: Long,

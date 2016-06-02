@@ -3,13 +3,13 @@ package models.accounting
 import collection.immutable.Seq
 
 import org.joda.time.DateTime
-import models.SlickUtils.dbApi._
 
 import common.Clock
 import common.ScalaUtils.objectName
+import models.SlickUtils.dbApi._
 import models.{User, Users}
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
-import models.manager.{Identifiable, EntityTable, QueryableEntityManager}
+import models.manager.{EntityTable, ForwardingQueryableEntityManager, Identifiable, QueryableEntityManager}
 import models.accounting.config.Config
 import models.accounting.config.{Category, Account, MoneyReservoir}
 

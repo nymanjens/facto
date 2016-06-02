@@ -3,12 +3,12 @@ package models.accounting
 import scala.collection.immutable.Seq
 
 import org.joda.time.DateTime
-import models.SlickUtils.dbApi._
 
 import common.Clock
+import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
 import models.SlickUtils.JodaToSqlDateMapper
-import models.manager.{Identifiable, EntityTable, QueryableEntityManager}
+import models.manager.{EntityTable, ForwardingQueryableEntityManager, Identifiable, QueryableEntityManager}
 
 
 case class TransactionGroup(createdDate: DateTime = Clock.now,
