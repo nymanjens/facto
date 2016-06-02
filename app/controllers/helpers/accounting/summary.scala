@@ -31,11 +31,9 @@ case class Summary(yearToSummary: Map[Int, SummaryForYear],
 object Summary {
   def fetchSummary(account: Account, expandedYear: Int): Summary = {
     val now = Clock.now
-    val allTransactions = dbRun(
-      Transactions.newQuery
-        .filter(_.beneficiaryAccountCode === account.code)
+    val allTransactions = Transactions.fetchAll(_
+        .filter(_.beneficiaryAccountCode == account.code)
         .sortBy(r => (r.consumedDate, r.createdDate)))
-      .toList
     val yearToTransactions: Map[Int, Seq[Transaction]] = allTransactions.groupBy(t => t.consumedDate.getYear)
     val years: Seq[Int] = {
       val yearsSet = yearToTransactions.keySet ++ Set(now.getYear, expandedYear)

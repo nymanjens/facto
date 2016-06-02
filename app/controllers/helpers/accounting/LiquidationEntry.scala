@@ -2,6 +2,8 @@ package controllers.helpers.accounting
 
 import collection.immutable.Seq
 
+import com.github.nscala_time.time.Imports._
+
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
 import models.accounting.{Transaction, Transactions, Money}
 import models.accounting.config.{Account, MoneyReservoir, Category}
