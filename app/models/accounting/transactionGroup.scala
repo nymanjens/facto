@@ -16,9 +16,7 @@ case class TransactionGroup(createdDate: DateTime = Clock.now,
 
   override def withId(id: Long) = copy(idOption = Some(id))
 
-  def transactions: Seq[Transaction] = dbRun(Transactions.newQuery.filter {
-    _.transactionGroupId === id
-  }.result).toList
+  def transactions: Seq[Transaction] = Transactions.fetchAll(_.filter(_.transactionGroupId == id))
 
   def isZeroSum: Boolean = transactions.map(_.flow).sum == Money(0)
 }
@@ -38,6 +36,7 @@ class TransactionGroups(tag: Tag) extends EntityTable[TransactionGroup](tag, Tra
 //      tag => new TransactionGroups(tag), tableName = "TRANSACTION_GROUPS")))
 
 import models.manager.ForwardingQueryableEntityManager
+
 object TransactionGroups extends ForwardingQueryableEntityManager[TransactionGroup, TransactionGroups](
   QueryableEntityManager.backedByDatabase[TransactionGroup, TransactionGroups](
     tag => new TransactionGroups(tag), tableName = "TRANSACTION_GROUPS"))

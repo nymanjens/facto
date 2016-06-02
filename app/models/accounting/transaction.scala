@@ -89,13 +89,7 @@ class Transactions(tag: Tag) extends EntityTable[Transaction](tag, Transactions.
     detailDescription, createdDate, transactionDate, consumedDate, id.?) <>(Transaction.tupled, Transaction.unapply)
 }
 
-
-//object Transactions extends ForwardingEntityManager[Transaction](
-//  EntityManager.caching(
-//    QueryableEntityManager.backedByDatabase[Transaction, Transactions](
-//      tag => new Transactions(tag), tableName = "TRANSACTIONS")))
-
-import models.manager.ForwardingQueryableEntityManager
-object Transactions extends ForwardingQueryableEntityManager[Transaction, Transactions](
+object Transactions extends ForwardingEntityManager[Transaction](
+  EntityManager.caching(
     QueryableEntityManager.backedByDatabase[Transaction, Transactions](
-      tag => new Transactions(tag), tableName = "TRANSACTIONS"))
+      tag => new Transactions(tag), tableName = "TRANSACTIONS")))
