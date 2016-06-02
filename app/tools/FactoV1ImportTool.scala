@@ -146,7 +146,7 @@ object FactoV1ImportTool {
       }
 
     def doImport()(implicit app: Application): User = {
-      Users.all.add(Users.newWithUnhashedPw(loginName, defaultPassword, name))
+      Users.add(Users.newWithUnhashedPw(loginName, defaultPassword, name))
     }
   }
 }

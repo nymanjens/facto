@@ -33,7 +33,7 @@ object Application extends Controller with Secured {
         formData => formData match {
           case ChangePasswordData(loginName, _, password, _) =>
             require(loginName == user.loginName)
-            Users.all.add(user.withPasswordHashFromUnhashed(password))
+            Users.add(user.withPasswordHashFromUnhashed(password))
             val message = "Successfully updated password"
             Redirect(routes.Application.profile).flashing("message" -> message)
         }
@@ -42,16 +42,16 @@ object Application extends Controller with Secured {
 
   def administration() = ActionWithAdminUser { implicit user =>
     implicit request =>
-      Ok(views.html.administration(users = Users.all.fetchAll(), Forms.addUserForm))
+      Ok(views.html.administration(users = Users.fetchAll(), Forms.addUserForm))
   }
 
   def addUser() = ActionWithAdminUser { implicit user =>
     implicit request =>
       Forms.addUserForm.bindFromRequest.fold(
-        formWithErrors => BadRequest(views.html.administration(users = Users.all.fetchAll(), formWithErrors)),
+        formWithErrors => BadRequest(views.html.administration(users = Users.fetchAll(), formWithErrors)),
         formData => formData match {
           case AddUserData(loginName, name, password, _) =>
-            Users.all.add(Users.newWithUnhashedPw(loginName, password, name))
+            Users.add(Users.newWithUnhashedPw(loginName, password, name))
             val message = s"Successfully added user $name"
             Redirect(routes.Application.administration).flashing("message" -> message)
         }

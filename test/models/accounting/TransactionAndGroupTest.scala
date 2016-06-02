@@ -23,8 +23,8 @@ class TransactionAndGroupTests extends Specification {
   "test the Transaction and TransactionGroup models" in new WithApplication {
 
     // prepare users
-    val user1 = Users.all.add(Users.newWithUnhashedPw(loginName = "tester", password = "x", name = "Tester"))
-    val user2 = Users.all.add(Users.newWithUnhashedPw(loginName = "tester2", password = "x", name = "Tester2"))
+    val user1 = Users.add(Users.newWithUnhashedPw(loginName = "tester", password = "x", name = "Tester"))
+    val user2 = Users.add(Users.newWithUnhashedPw(loginName = "tester2", password = "x", name = "Tester2"))
 
     // get and persist dummy transaction groups
     val transGrp1 = TransactionGroups.all.add(TransactionGroup())

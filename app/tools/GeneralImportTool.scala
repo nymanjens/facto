@@ -13,7 +13,7 @@ object GeneralImportTool {
     Logger.debug("Creating tables...")
 
     dbRun(sqlu"""DROP TABLE IF EXISTS USERS""")
-    Users.all.createSchema
+    Users.createSchema
 
     dbRun(sqlu"""DROP TABLE IF EXISTS TRANSACTIONS""")
     Transactions.all.createSchema

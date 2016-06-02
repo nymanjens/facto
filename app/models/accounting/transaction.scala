@@ -39,7 +39,7 @@ case class Transaction(transactionGroupId: Long,
   }
 
   lazy val transactionGroup: TransactionGroup = TransactionGroups.all.findById(transactionGroupId)
-  lazy val issuer: User = Users.all.findById(issuerId)
+  lazy val issuer: User = Users.findById(issuerId)
   lazy val beneficiary: Account = Config.accounts(beneficiaryAccountCode)
   lazy val moneyReservoir: MoneyReservoir = Config.moneyReservoir(moneyReservoirCode)
   lazy val category: Category = Config.categories(categoryCode)

@@ -29,7 +29,7 @@ object TestObjects {
     Users.findByLoginName(loginName) match {
       case Some(user) => user
       case None =>
-        Users.all.add(Users.newWithUnhashedPw(loginName = loginName, password = "tu", name = "Test User"))
+        Users.add(Users.newWithUnhashedPw(loginName = loginName, password = "tu", name = "Test User"))
     }
   }
 }

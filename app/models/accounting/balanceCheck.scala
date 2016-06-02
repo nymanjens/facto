@@ -20,7 +20,7 @@ case class BalanceCheck(issuerId: Long,
 
   override def toString = s"BalanceCheck(issuer=$issuerId, $moneyReservoirCode, balance=$balance)"
 
-  lazy val issuer: User = Users.all.findById(issuerId)
+  lazy val issuer: User = Users.findById(issuerId)
 
   lazy val moneyReservoir: MoneyReservoir = Config.moneyReservoir(moneyReservoirCode)
 }

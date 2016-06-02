@@ -23,7 +23,7 @@ case class UpdateLog(userId: Long,
 
   override def withId(id: Long) = copy(idOption = Some(id))
 
-  lazy val user: User = Users.all.findById(userId)
+  lazy val user: User = Users.findById(userId)
 }
 
 class UpdateLogs(tag: Tag) extends EntityTable[UpdateLog](tag, UpdateLogs.tableName) {
