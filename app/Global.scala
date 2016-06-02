@@ -8,7 +8,7 @@ import java.lang.System
 
 import play.api.{Application, Mode, Logger, GlobalSettings}
 
-import models.Users
+import models.{Tables, Users}
 import tools.GeneralImportTool.dropAndCreateNewDb
 import tools.CsvImportTool
 import tools.FactoV1ImportTool
@@ -33,6 +33,10 @@ object Global extends GlobalSettings {
       } else if (AppConfigHelper.loadFactoV1Data) {
         FactoV1ImportTool.importFromSqlDump(AppConfigHelper.factoV1SqlFilePath)
       }
+    }
+
+    for(tableManager <- Tables.allManagers) {
+      tableManager.initialize()
     }
   }
 

@@ -6,7 +6,7 @@ import slick.lifted.{AbstractTable, TableQuery}
 
 import models.SlickUtils.dbApi._
 
-trait QueryableEntityManager[E <: Identifiable[E], T <: AbstractTable[_]] extends EntityManager[E] {
+trait QueryableEntityManager[E <: Identifiable[E], T <: AbstractTable[E]] extends EntityManager[E] {
   def newQuery: TableQuery[T]
 }
 

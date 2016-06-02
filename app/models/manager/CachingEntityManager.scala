@@ -15,6 +15,7 @@ private[manager] final class CachingEntityManager[E <: Identifiable[E]](delegate
 
   // ********** Implementation of EntityManager interface: Management methods ********** //
   override def initialize(): Unit = lock.synchronized {
+    cache.clear()
     delegate.fetchAll() foreach { e => cache.put(e.id, e) }
   }
 

@@ -16,13 +16,13 @@ object GeneralImportTool {
     Users.createSchema
 
     dbRun(sqlu"""DROP TABLE IF EXISTS TRANSACTIONS""")
-    Transactions.all.createSchema
+    Transactions.createSchema
 
     dbRun(sqlu"""DROP TABLE IF EXISTS TRANSACTION_GROUPS""")
-    TransactionGroups.all.createSchema
+    TransactionGroups.createSchema
 
     dbRun(sqlu"""DROP TABLE IF EXISTS BALANCE_CHECKS""")
-    BalanceChecks.all.createSchema
+    BalanceChecks.createSchema
 
     dbRun(sqlu"""DROP TABLE IF EXISTS UPDATE_LOGS""")
     UpdateLogs.createSchema

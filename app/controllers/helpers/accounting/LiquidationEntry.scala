@@ -18,7 +18,7 @@ object LiquidationEntry {
   /* Returns most recent n entries sorted from old to new. */
   def fetchLastNEntries(accountPair: AccountPair, n: Int): Seq[LiquidationEntry] = {
     val allTransactions: List[Transaction] =
-      dbRun(Transactions.all.newQuery.sortBy(r => (r.transactionDate, r.createdDate))).toList
+      dbRun(Transactions.newQuery.sortBy(r => (r.transactionDate, r.createdDate))).toList
 
     val relevantTransactions =
       for {

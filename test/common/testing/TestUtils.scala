@@ -19,9 +19,9 @@ object TestUtils {
                          account: Account = testAccount,
                          category: Category = testCategory,
                          reservoir: MoneyReservoir = testReservoir): Transaction = {
-    val actualGroupId = if (groupId == -1) TransactionGroups.all.add(TransactionGroup()).id else groupId
+    val actualGroupId = if (groupId == -1) TransactionGroups.add(TransactionGroup()).id else groupId
     val actualDate = if (timestamp == -1) date else new DateTime(timestamp)
-    Transactions.all.add(Transaction(
+    Transactions.add(Transaction(
       transactionGroupId = actualGroupId,
       issuerId = 1,
       beneficiaryAccountCode = account.code,
@@ -39,7 +39,7 @@ object TestUtils {
                           timestamp: Long = -1,
                           reservoir: MoneyReservoir = testReservoir): BalanceCheck = {
     val actualDate = if (timestamp == -1) date else new DateTime(timestamp)
-    BalanceChecks.all.add(BalanceCheck(
+    BalanceChecks.add(BalanceCheck(
       issuerId = 2,
       moneyReservoirCode = reservoir.code,
       balance = balance,

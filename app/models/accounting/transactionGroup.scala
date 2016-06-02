@@ -8,7 +8,7 @@ import common.Clock
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
 import models.SlickUtils.JodaToSqlDateMapper
-import models.manager.{EntityTable, ForwardingQueryableEntityManager, Identifiable, QueryableEntityManager}
+import models.manager.{EntityTable, Identifiable, EntityManager, QueryableEntityManager, ForwardingEntityManager}
 
 
 case class TransactionGroup(createdDate: DateTime = Clock.now,
@@ -16,7 +16,7 @@ case class TransactionGroup(createdDate: DateTime = Clock.now,
 
   override def withId(id: Long) = copy(idOption = Some(id))
 
-  def transactions: Seq[Transaction] = dbRun(Transactions.all.newQuery.filter {
+  def transactions: Seq[Transaction] = dbRun(Transactions.newQuery.filter {
     _.transactionGroupId === id
   }.result).toList
 
@@ -32,7 +32,12 @@ class TransactionGroups(tag: Tag) extends EntityTable[TransactionGroup](tag, Tra
   override def * = (createdDate, id.?) <>(TransactionGroup.tupled, TransactionGroup.unapply)
 }
 
-object TransactionGroups {
-  private val tableName: String = "TRANSACTION_GROUPS"
-  val all = QueryableEntityManager.backedByDatabase[TransactionGroup, TransactionGroups](tag => new TransactionGroups(tag), tableName)
-}
+//object TransactionGroups  extends ForwardingEntityManager[TransactionGroup](
+//  EntityManager.caching(
+//    QueryableEntityManager.backedByDatabase[TransactionGroup, TransactionGroups](
+//      tag => new TransactionGroups(tag), tableName = "TRANSACTION_GROUPS")))
+
+import models.manager.ForwardingQueryableEntityManager
+object TransactionGroups extends ForwardingQueryableEntityManager[TransactionGroup, TransactionGroups](
+  QueryableEntityManager.backedByDatabase[TransactionGroup, TransactionGroups](
+    tag => new TransactionGroups(tag), tableName = "TRANSACTION_GROUPS"))

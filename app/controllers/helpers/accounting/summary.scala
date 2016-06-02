@@ -32,7 +32,7 @@ object Summary {
   def fetchSummary(account: Account, expandedYear: Int): Summary = {
     val now = Clock.now
     val allTransactions = dbRun(
-      Transactions.all.newQuery
+      Transactions.newQuery
         .filter(_.beneficiaryAccountCode === account.code)
         .sortBy(r => (r.consumedDate, r.createdDate)))
       .toList

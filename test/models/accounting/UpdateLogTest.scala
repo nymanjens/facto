@@ -49,8 +49,8 @@ class UpdateLogTest extends HookedSpecification {
   "Logged TransactionGroup contains all relevant info" in new WithApplication {
     // add logs
     Clock.setTimeForTest(dateAt(2016, April, 1))
-    val transGrp = TransactionGroups.all.add(TransactionGroup())
-    Transactions.all.add(Transaction(
+    val transGrp = TransactionGroups.add(TransactionGroup())
+    Transactions.add(Transaction(
       transactionGroupId = transGrp.id,
       issuerId = testUser.id,
       beneficiaryAccountCode = testAccount.code,
@@ -99,7 +99,7 @@ class UpdateLogTest extends HookedSpecification {
   }
 
   private def balanceCheck(balance: Long): BalanceCheck = {
-    BalanceChecks.all.add(BalanceCheck(
+    BalanceChecks.add(BalanceCheck(
       issuerId = testUser.id,
       moneyReservoirCode = testReservoir.code,
       balance = Money(balance),

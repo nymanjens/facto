@@ -37,7 +37,7 @@ object TransactionGroupOperations extends Controller with Secured {
     implicit request =>
       implicit val returnToImplicit = ReturnTo(returnTo)
 
-      val transGroup = TransactionGroups.all.findById(transGroupId)
+      val transGroup = TransactionGroups.findById(transGroupId)
       val formData = Forms.TransGroupData.fromModel(transGroup)
       Ok(formViewWithInitialData(EditOperationMeta(transGroupId), formData))
   }
@@ -56,14 +56,14 @@ object TransactionGroupOperations extends Controller with Secured {
 
   def delete(transGroupId: Long, returnTo: String) = ActionWithUser { implicit user =>
     implicit request =>
-      val group = TransactionGroups.all.findById(transGroupId)
+      val group = TransactionGroups.findById(transGroupId)
       val numTrans = group.transactions.size
 
       UpdateLogs.addLog(user, UpdateLogs.Delete, group)
       for (transaction <- group.transactions) {
-        Transactions.all.delete(transaction)
+        Transactions.delete(transaction)
       }
-      TransactionGroups.all.delete(group)
+      TransactionGroups.delete(group)
 
       val message = s"""Successfully deleted ${numTrans} transaction${if (numTrans == 1) "" else "s"}"""
       Redirect(returnTo).flashing("message" -> message)
@@ -182,17 +182,17 @@ object TransactionGroupOperations extends Controller with Secured {
   private def persistTransGroup(transactionGroupData: Forms.TransGroupData, operationMeta: OperationMeta)
                                (implicit user: User): Unit = {
     val group = operationMeta match {
-      case AddNewOperationMeta() => TransactionGroups.all.add(TransactionGroup())
-      case EditOperationMeta(transGroupId) => TransactionGroups.all.findById(transGroupId)
+      case AddNewOperationMeta() => TransactionGroups.add(TransactionGroup())
+      case EditOperationMeta(transGroupId) => TransactionGroups.findById(transGroupId)
     }
 
     // reomve existing transactions in this group
     for (transaction <- group.transactions) {
-      Transactions.all.delete(transaction)
+      Transactions.delete(transaction)
     }
 
     for (trans <- transactionGroupData.transactions) {
-      Transactions.all.add(Transaction(
+      Transactions.add(Transaction(
         transactionGroupId = group.id,
         issuerId = user.id,
         beneficiaryAccountCode = trans.beneficiaryAccountCode,

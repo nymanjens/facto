@@ -36,7 +36,7 @@ object BalanceCheckOperations extends Controller with Secured {
     implicit request =>
       implicit val returnToImplicit = ReturnTo(returnTo)
 
-      val bc = BalanceChecks.all.findById(bcId)
+      val bc = BalanceChecks.findById(bcId)
       val formData = Forms.BcData.fromModel(bc)
       Ok(formView(EditOperationMeta(bcId), formData))
   }
@@ -54,14 +54,14 @@ object BalanceCheckOperations extends Controller with Secured {
 
         val balance = Money(balanceInCents)
         val moneyReservoir = Config.moneyReservoir(moneyReservoirCode)
-        val mostRecentTransaction = Transactions.all.findById(mostRecentTransactionId)
+        val mostRecentTransaction = Transactions.findById(mostRecentTransactionId)
 
         val balanceCheck = BalanceCheck(
           issuerId = user.id,
           moneyReservoirCode = moneyReservoir.code,
           balance = balance,
           checkDate = mostRecentTransaction.transactionDate)
-        val persistedBc = BalanceChecks.all.add(balanceCheck)
+        val persistedBc = BalanceChecks.add(balanceCheck)
         UpdateLogs.addLog(user, UpdateLogs.AddNew, persistedBc)
 
         val moneyReservoirName = moneyReservoir.name
@@ -79,9 +79,9 @@ object BalanceCheckOperations extends Controller with Secured {
     implicit request =>
       implicit val returnToImplicit = ReturnTo(returnTo)
 
-      val bc = BalanceChecks.all.findById(bcId)
+      val bc = BalanceChecks.findById(bcId)
       UpdateLogs.addLog(user, UpdateLogs.Delete, bc)
-      BalanceChecks.all.delete(bc)
+      BalanceChecks.delete(bc)
 
       val moneyReservoirName = bc.moneyReservoir.name
       val message = s"Successfully deleted balance check for $moneyReservoirName"
@@ -123,9 +123,9 @@ object BalanceCheckOperations extends Controller with Secured {
       checkDate = formData.checkDate)
     val persistedBc = operationMeta match {
       case AddNewOperationMeta(_) =>
-        BalanceChecks.all.add(balanceCheck)
+        BalanceChecks.add(balanceCheck)
       case EditOperationMeta(bcId) =>
-        BalanceChecks.all.update(balanceCheck withId bcId)
+        BalanceChecks.update(balanceCheck withId bcId)
     }
 
     val operation = operationMeta match {
@@ -202,7 +202,7 @@ object BalanceCheckOperations extends Controller with Secured {
   }
 
   private case class EditOperationMeta(bcId: Long) extends OperationMeta {
-    override def moneyReservoirCode = BalanceChecks.all.findById(bcId).moneyReservoir.code
+    override def moneyReservoirCode = BalanceChecks.findById(bcId).moneyReservoir.code
     override def bcIdOption = Some(bcId)
   }
 }

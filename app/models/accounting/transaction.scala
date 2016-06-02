@@ -7,7 +7,7 @@ import org.joda.time.DateTime
 import common.Clock
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
-import models.manager.{EntityTable, ForwardingQueryableEntityManager, Identifiable, QueryableEntityManager}
+import models.manager.{EntityTable, Identifiable, EntityManager, QueryableEntityManager, ForwardingEntityManager}
 import models.{User, Users}
 import models.accounting.config.Config
 import models.accounting.config.{Category, Account, MoneyReservoir}
@@ -38,7 +38,7 @@ case class Transaction(transactionGroupId: Long,
     s"Transaction(group=$transactionGroupId, issuer=${issuerString}, $beneficiaryAccountCode, $moneyReservoirCode, $categoryCode, flow=$flow, $description)"
   }
 
-  lazy val transactionGroup: TransactionGroup = TransactionGroups.all.findById(transactionGroupId)
+  lazy val transactionGroup: TransactionGroup = TransactionGroups.findById(transactionGroupId)
   lazy val issuer: User = Users.findById(issuerId)
   lazy val beneficiary: Account = Config.accounts(beneficiaryAccountCode)
   lazy val moneyReservoir: MoneyReservoir = Config.moneyReservoir(moneyReservoirCode)
@@ -89,7 +89,13 @@ class Transactions(tag: Tag) extends EntityTable[Transaction](tag, Transactions.
     detailDescription, createdDate, transactionDate, consumedDate, id.?) <>(Transaction.tupled, Transaction.unapply)
 }
 
-object Transactions {
-  private val tableName: String = "TRANSACTIONS"
-  val all = QueryableEntityManager.backedByDatabase[Transaction, Transactions](tag => new Transactions(tag), tableName)
-}
+
+//object Transactions extends ForwardingEntityManager[Transaction](
+//  EntityManager.caching(
+//    QueryableEntityManager.backedByDatabase[Transaction, Transactions](
+//      tag => new Transactions(tag), tableName = "TRANSACTIONS")))
+
+import models.manager.ForwardingQueryableEntityManager
+object Transactions extends ForwardingQueryableEntityManager[Transaction, Transactions](
+    QueryableEntityManager.backedByDatabase[Transaction, Transactions](
+      tag => new Transactions(tag), tableName = "TRANSACTIONS"))

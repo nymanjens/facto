@@ -88,7 +88,7 @@ object FactoV1ImportTool {
           }
 
           if (categoryCode == "[BALANCE_SET]") {
-            BalanceChecks.all.add(BalanceCheck(
+            BalanceChecks.add(BalanceCheck(
               issuerId = issuer.id,
               moneyReservoirCode = moneyReservoirCode,
               balance = Money.fromFloat(price.toDouble),
@@ -97,8 +97,8 @@ object FactoV1ImportTool {
 
           } else {
             // Transaction
-            val group = TransactionGroups.all.add(TransactionGroup(createdDate = dateForMillisSinceEpoch(creationTime.toLong)))
-            Transactions.all.add(Transaction(
+            val group = TransactionGroups.add(TransactionGroup(createdDate = dateForMillisSinceEpoch(creationTime.toLong)))
+            Transactions.add(Transaction(
               transactionGroupId = group.id,
               issuerId = issuer.id,
               beneficiaryAccountCode = accountCode,
