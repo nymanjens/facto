@@ -11,7 +11,7 @@ trait EntityManager[E <: Identifiable[E]] {
   /* Throws an exception if there is a consistency problem in this manager. */
   def verifyConsistency(): Unit = {}
   /* Creates the persisted database table for this manager. */
-  def createSchema: Unit
+  def createTable: Unit
   def tableName: String
 
   // ********** Mutators ********** //
