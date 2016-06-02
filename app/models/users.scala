@@ -46,7 +46,7 @@ object Users extends ForwardingEntityManager[User](
   }
 
   def findByLoginName(loginName: String): Option[User] = {
-    val users = fetchAll(_.filter(u => u.loginName == loginName))
+    val users = Users.fetchAll(_.filter(u => u.loginName == loginName))
     users match {
       case Seq() => None
       case Seq(u) => Option(u)

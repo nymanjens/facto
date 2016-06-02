@@ -34,13 +34,12 @@ class UpdateLogs(tag: Tag) extends EntityTable[UpdateLog](tag, UpdateLogs.tableN
   override def * = (userId, change, date, id.?) <>(UpdateLog.tupled, UpdateLog.unapply)
 }
 
-object UpdateLogs {
-  private val tableName: String = "UPDATE_LOGS"
-  val all = QueryableEntityManager.backedByDatabase[UpdateLog, UpdateLogs](tag => new UpdateLogs(tag), tableName)
+object UpdateLogs  extends ForwardingQueryableEntityManager[UpdateLog, UpdateLogs](
+  QueryableEntityManager.backedByDatabase[UpdateLog, UpdateLogs](tag => new UpdateLogs(tag), tableName = "UPDATE_LOGS")) {
 
   /* Returns most recent n entries sorted from old to new. */
   def fetchLastNEntries(n: Int): Seq[UpdateLog] =
-    dbRun(all.newQuery.sortBy(_.date.desc).take(n)).reverse.toList
+    dbRun(UpdateLogs.newQuery.sortBy(_.date.desc).take(n)).reverse.toList
 
   def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: TransactionGroup): Unit = {
     require(newOrDeletedValue.idOption.isDefined, s"Given value must be persisted before logging it: ${newOrDeletedValue}")
@@ -68,7 +67,7 @@ object UpdateLogs {
   private def addLog(user: User, operation: UpdateOperation, newOrDeletedValueString: String): Unit = {
     val operationName = objectName(operation)
     val change = s"$operationName $newOrDeletedValueString"
-    all.add(UpdateLog(user.id, change))
+    UpdateLogs.add(UpdateLog(user.id, change))
   }
 
   sealed trait UpdateOperation

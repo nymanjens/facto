@@ -25,7 +25,7 @@ object GeneralImportTool {
     BalanceChecks.all.createSchema
 
     dbRun(sqlu"""DROP TABLE IF EXISTS UPDATE_LOGS""")
-    UpdateLogs.all.createSchema
+    UpdateLogs.createSchema
 
     Logger.debug(" done")
   }

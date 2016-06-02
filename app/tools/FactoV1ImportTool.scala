@@ -125,7 +125,7 @@ object FactoV1ImportTool {
       values match {
         case valuesRegex(timestamp, originalUserId, sql) =>
           val user = originalUserIdToUser(originalUserId.toLong)
-          UpdateLogs.all.add(UpdateLog(
+          UpdateLogs.add(UpdateLog(
             userId = user.id,
             change = StringEscapeUtils.unescapeHtml(sql.replace("\\", "")),
             date = dateForMillisSinceEpoch(timestamp.toLong)
