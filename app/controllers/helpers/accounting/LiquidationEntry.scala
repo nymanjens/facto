@@ -2,8 +2,6 @@ package controllers.helpers.accounting
 
 import collection.immutable.Seq
 
-import com.github.nscala_time.time.Imports._
-
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
 import models.accounting.{Transaction, Transactions, Money}
 import models.accounting.config.{Account, MoneyReservoir, Category}
@@ -20,7 +18,7 @@ object LiquidationEntry {
   /* Returns most recent n entries sorted from old to new. */
   def fetchLastNEntries(accountPair: AccountPair, n: Int): Seq[LiquidationEntry] = {
     val allTransactions: List[Transaction] =
-      Transactions.fetchAll(_.sortBy(r => (r.transactionDate, r.createdDate)))
+      dbRun(Transactions.newQuery.sortBy(r => (r.transactionDate, r.createdDate))).toList
 
     val relevantTransactions =
       for {

@@ -18,10 +18,12 @@ object GeneralEntry {
   /* Returns most recent n entries sorted from old to new. */
   def fetchLastNEntries(n: Int): Seq[GeneralEntry] = {
     val transactions: Seq[Transaction] =
-      Transactions.fetchAll(_
-        .sortBy(r => (r.transactionDate, r.createdDate))(Ordering[(DateTime, DateTime)].reverse)
-        .take(3 * n)
-        .reverse)
+      dbRun(
+        Transactions.newQuery
+          .sortBy(r => (r.transactionDate.desc, r.createdDate.desc))
+          .take(3 * n))
+        .reverse
+        .toList
 
     var entries = transactions.map(t => GeneralEntry(Seq(t)))
 
@@ -33,12 +35,14 @@ object GeneralEntry {
   /* Returns most recent n entries sorted from old to new. */
   def fetchLastNEndowments(account: Account, n: Int) = {
     val transactions: Seq[Transaction] =
-      Transactions.fetchAll(_
-        .filter(_.categoryCode == Config.constants.endowmentCategory.code)
-        .filter(_.beneficiaryAccountCode == account.code)
-        .sortBy(r => (r.consumedDate, r.createdDate))(Ordering[(DateTime, DateTime)].reverse)
-        .take(3 * n)
-        .reverse)
+      dbRun(
+        Transactions.newQuery
+          .filter(_.categoryCode === Config.constants.endowmentCategory.code)
+          .filter(_.beneficiaryAccountCode === account.code)
+          .sortBy(r => (r.consumedDate.desc, r.createdDate.desc))
+          .take(3 * n))
+        .reverse
+        .toList
 
     var entries = transactions.map(t => GeneralEntry(Seq(t)))
 
