@@ -20,7 +20,7 @@ object Application extends Controller with Secured {
       Redirect(controllers.accounting.routes.Views.cashFlowOfAll)
   }
 
-  def verifyCachingConsistency(applicationSecret: String) = Action { implicit request =>
+  def verifyCacheConsistency(applicationSecret: String) = Action { implicit request =>
     val realApplicationSecret = application.configuration.getString("play.crypto.secret")
     require(applicationSecret == realApplicationSecret, "Invalid application secret")
 
