@@ -9,7 +9,7 @@ import common.ScalaUtils.objectName
 import models.SlickUtils.dbApi._
 import models.{User, Users}
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
-import models.manager.{EntityTable, ForwardingQueryableEntityManager, Identifiable, QueryableEntityManager}
+import models.manager.{EntityTable, ForwardingEntityManager, Identifiable, EntityManager}
 import models.accounting.config.Config
 import models.accounting.config.{Category, Account, MoneyReservoir}
 
@@ -34,8 +34,8 @@ class UpdateLogs(tag: Tag) extends EntityTable[UpdateLog](tag, UpdateLogs.tableN
   override def * = (userId, change, date, id.?) <>(UpdateLog.tupled, UpdateLog.unapply)
 }
 
-object UpdateLogs  extends ForwardingQueryableEntityManager[UpdateLog, UpdateLogs](
-  QueryableEntityManager.backedByDatabase[UpdateLog, UpdateLogs](tag => new UpdateLogs(tag), tableName = "UPDATE_LOGS")) {
+object UpdateLogs extends ForwardingEntityManager[UpdateLog, UpdateLogs](
+  EntityManager.create[UpdateLog, UpdateLogs](tag => new UpdateLogs(tag), tableName = "UPDATE_LOGS")) {
 
   /* Returns most recent n entries sorted from old to new. */
   def fetchLastNEntries(n: Int): Seq[UpdateLog] =

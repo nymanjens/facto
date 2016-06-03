@@ -1,9 +1,10 @@
 package models.manager
 
-import scala.collection.immutable.Seq
+import slick.lifted.{AbstractTable, TableQuery}
 
 /** EntityManager base implementation that forwards all calls to a given delegate. */
-abstract class ForwardingEntityManager[E <: Identifiable[E]](delegate: EntityManager[E]) extends EntityManager[E] {
+abstract class ForwardingEntityManager[E <: Identifiable[E], T <: AbstractTable[E]](delegate: EntityManager[E, T])
+  extends EntityManager[E, T] {
 
   // ********** Management methods ********** //
   override def initialize(): Unit = delegate.initialize()
@@ -18,7 +19,6 @@ abstract class ForwardingEntityManager[E <: Identifiable[E]](delegate: EntityMan
 
   // ********** Getters ********** //
   override def findById(id: Long): E = delegate.findById(id)
-  override def fetchFromAll[R](calculateResult: Stream[E] => R): R = delegate.fetchFromAll(calculateResult)
-  override def fetchAll(selection: Stream[E] => Stream[E]): List[E] = delegate.fetchAll(selection)
-  override def count(predicate: E => Boolean): Int = delegate.count(predicate)
+  override def fetchAll(): List[E] = delegate.fetchAll()
+  override def newQuery: TableQuery[T] = delegate.newQuery
 }

@@ -7,7 +7,7 @@ import org.joda.time.DateTime
 import common.Clock
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
-import models.manager.{EntityTable, Identifiable, EntityManager, QueryableEntityManager, ForwardingEntityManager}
+import models.manager.{EntityTable, Identifiable, EntityManager, ForwardingEntityManager}
 import models.{User, Users}
 import models.accounting.config.Config
 import models.accounting.config.{Category, Account, MoneyReservoir}
@@ -89,7 +89,6 @@ class Transactions(tag: Tag) extends EntityTable[Transaction](tag, Transactions.
     detailDescription, createdDate, transactionDate, consumedDate, id.?) <>(Transaction.tupled, Transaction.unapply)
 }
 
-object Transactions extends ForwardingEntityManager[Transaction](
-  EntityManager.caching(
-    QueryableEntityManager.backedByDatabase[Transaction, Transactions](
-      tag => new Transactions(tag), tableName = "TRANSACTIONS")))
+object Transactions extends ForwardingEntityManager[Transaction, Transactions](
+  EntityManager.create[Transaction, Transactions](
+    tag => new Transactions(tag), tableName = "TRANSACTIONS"))

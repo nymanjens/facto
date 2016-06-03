@@ -2,8 +2,12 @@ package models.manager
 
 import scala.collection.immutable.Seq
 
+import slick.lifted.{AbstractTable, TableQuery}
+
+import models.SlickUtils.dbApi._
+
 /** Provides access to persisted entries. */
-trait EntityManager[E <: Identifiable[E]] {
+trait EntityManager[E <: Identifiable[E], T <: AbstractTable[E]] {
 
   // ********** Management methods ********** //
   /** Initializes this manager. This is called once at the start of the application. */
@@ -25,17 +29,26 @@ trait EntityManager[E <: Identifiable[E]] {
   // ********** Getters ********** //
   /** Returns the entity with given ID or throws an exception. */
   def findById(id: Long): E
-  /** Returns the result of given function on the stream of all entities. Note that the result must be immutable. */
-  def fetchFromAll[R](calculateResult: Stream[E] => R): R
-  /** Returns the result of given function on the stream of all entities. */
-  def fetchAll(selection: Stream[E] => Stream[E] = s => s): List[E] = fetchFromAll(stream => selection(stream).toList)
-  /** Returns the number of entities that conform to given predicate. */
-  def count(predicate: E => Boolean = _ => true): Int = fetchFromAll(_.count(predicate))
+  /** Returns all stored entities. */
+  def fetchAll(): List[E]
+  /**
+    * Returns a new query that should be run by models.SlickUtils.dbRun. Don't run any mutating operations using these queries!
+    *
+    * Don't run any mutating operations using these queries!
+    */
+  def newQuery: TableQuery[T]
 }
 
 object EntityManager {
   /** Decorates the given manager with a caching layer that loads all data in memory. */
-  def caching[E <: Identifiable[E]](delegate: EntityManager[E]): EntityManager[E] =
-    delegate
-//    new CachingEntityManager(delegate)
+  //  def caching[E <: Identifiable[E]](delegate: EntityManager[E]): EntityManager[E] = ???
+
+  /** Factory method for creating a database backed EntityManager */
+  def create[E <: Identifiable[E], T <: EntityTable[E]](cons: Tag => T,
+                                                        tableName: String
+                                                       ) = {
+    new InvalidatingEntityManager[E, T](
+      new DatabaseBackedEntityManager[E, T](cons, tableName)
+    )
+  }
 }

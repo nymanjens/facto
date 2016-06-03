@@ -6,7 +6,7 @@ import common.Clock
 import models.{User, Users}
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
-import models.manager.{EntityTable, Identifiable, EntityManager, QueryableEntityManager, ForwardingEntityManager}
+import models.manager.{EntityTable, Identifiable, EntityManager, ForwardingEntityManager}
 import models.accounting.config.{Config, MoneyReservoir}
 
 case class BalanceCheck(issuerId: Long,
@@ -35,7 +35,6 @@ class BalanceChecks(tag: Tag) extends EntityTable[BalanceCheck](tag, BalanceChec
   override def * = (issuerId, moneyReservoirCode, balance, createdDate, checkDate, id.?) <>(BalanceCheck.tupled, BalanceCheck.unapply)
 }
 
-object BalanceChecks extends ForwardingEntityManager[BalanceCheck](
-  EntityManager.caching(
-    QueryableEntityManager.backedByDatabase[BalanceCheck, BalanceChecks](
-      tag => new BalanceChecks(tag), tableName = "BALANCE_CHECKS")))
+object BalanceChecks extends ForwardingEntityManager[BalanceCheck, BalanceChecks](
+  EntityManager.create[BalanceCheck, BalanceChecks](
+    tag => new BalanceChecks(tag), tableName = "BALANCE_CHECKS"))

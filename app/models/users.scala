@@ -5,7 +5,7 @@ import com.google.common.hash.Hashing
 
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
-import models.manager.{EntityTable, Identifiable, EntityManager, QueryableEntityManager, ForwardingEntityManager}
+import models.manager.{EntityTable, Identifiable, EntityManager, ForwardingEntityManager}
 
 case class User(loginName: String,
                 passwordHash: String,
@@ -29,9 +29,8 @@ class Users(tag: Tag) extends EntityTable[User](tag, Users.tableName) {
   override def * = (loginName, passwordHash, name, id.?) <>(User.tupled, User.unapply)
 }
 
-object Users extends ForwardingEntityManager[User](
-  EntityManager.caching(
-    QueryableEntityManager.backedByDatabase[User, Users](tag => new Users(tag), tableName = "USERS"))) {
+object Users extends ForwardingEntityManager[User, Users](
+  EntityManager.create[User, Users](tag => new Users(tag), tableName = "USERS")) {
 
   private[models] def hash(password: String) = Hashing.sha512().hashString(password, Charsets.UTF_8).toString()
 

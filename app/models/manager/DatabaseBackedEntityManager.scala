@@ -8,7 +8,7 @@ import models.SlickUtils.dbRun
 
 private[manager] final class DatabaseBackedEntityManager[E <: Identifiable[E], T <: EntityTable[E]](cons: Tag => T,
                                                                                    val tableName: String)
-  extends QueryableEntityManager[E, T] {
+  extends EntityManager[E, T] {
 
   // ********** Implementation of EntityManager interface - Management methods ********** //
   override def createTable: Unit = {
@@ -42,12 +42,11 @@ private[manager] final class DatabaseBackedEntityManager[E <: Identifiable[E], T
     }
   }
 
-  override def fetchFromAll[R](calculateResult: Stream[E] => R): R = {
-    val result = dbRun(newQuery.result)
-    calculateResult(result.toStream)
+  override def fetchAll(): List[E] = {
+    dbRun(newQuery.result).toList
   }
 
-  // ********** Implementation of QueryableEntityManager interface ********** //
+  // ********** Implementation of EntityManager interface ********** //
   override def newQuery: TableQuery[T] = new TableQuery(cons)
 
   protected def mustAffectOneSingleRow(query: => Int): Unit = {
