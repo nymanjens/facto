@@ -8,14 +8,19 @@ import models.manager.Identifiable
 
 object HelperCache {
   trait CacheIdentifier {
-    def invalidateWhenUpdating(entity: Identifiable[_]): Boolean
+    def invalidateWhenUpdating: PartialFunction[Any, Boolean]
+
+    private[helpers] def safeInvalidateWhenUpdating(entity: Identifiable[_]): Boolean = {
+      invalidateWhenUpdating.lift(entity) getOrElse false
+    }
   }
 
   @GuardedBy("lock")
   private val cache: mutable.Map[CacheIdentifier, CacheEntry[_]] = mutable.Map[CacheIdentifier, CacheEntry[_]]()
   private val lock = new Object
 
-  def cached[R](identifier: CacheIdentifier)(expensiveFunction: () => R) = lock.synchronized {
+  def cached[R](identifier: CacheIdentifier)(expensiveValue: => R): R = lock.synchronized {
+    val expensiveFunction = () => expensiveValue
     if (!cache.contains(identifier)) {
       cache.put(identifier, CacheEntry(expensiveFunction))
     }
@@ -24,8 +29,8 @@ object HelperCache {
 
   def invalidateCache(entity: Identifiable[_]): Unit = lock.synchronized {
     for ((identifier, entry) <- cache) {
-      if (identifier.invalidateWhenUpdating(entity)) {
-        cache.put(identifier, entry.recalculated())
+      if (identifier.safeInvalidateWhenUpdating(entity)) {
+        cache.remove(identifier)
       }
     }
   }
