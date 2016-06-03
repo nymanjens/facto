@@ -7,5 +7,5 @@ import models.accounting.{Transactions, TransactionGroups, BalanceChecks, Update
 
 object Tables {
 
-  val allManagers: Seq[EntityManager[_]] = Seq(Users, Transactions, TransactionGroups, BalanceChecks, UpdateLogs)
+  val allEntityManagers: Seq[EntityManager[_]] = Seq(Users, Transactions, TransactionGroups, BalanceChecks, UpdateLogs)
 }

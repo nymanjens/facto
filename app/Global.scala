@@ -29,8 +29,8 @@ object Global extends GlobalSettings {
     }
 
     // Initialize table managers (notably the caching ones)
-    for (tableManager <- Tables.allManagers) {
-      tableManager.initialize()
+    for (entityManager <- Tables.allEntityManagers) {
+      entityManager.initialize()
     }
 
     // Populate the database with dummy data

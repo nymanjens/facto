@@ -24,8 +24,8 @@ object Application extends Controller with Secured {
     val realApplicationSecret = application.configuration.getString("play.crypto.secret")
     require(applicationSecret == realApplicationSecret, "Invalid application secret")
 
-    for (tableManager <- Tables.allManagers) {
-      tableManager.verifyConsistency()
+    for (entityManager <- Tables.allEntityManagers) {
+      entityManager.verifyConsistency()
     }
     Ok("OK")
   }
