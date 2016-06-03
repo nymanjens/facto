@@ -1,16 +1,16 @@
 package controllers
 
-import play.Play._
 import play.api.data.Form
 import play.api.mvc._
 import play.api.data.Forms._
+import play.Play.application
 
 // imports for 2.4 i18n (https://www.playframework.com/documentation/2.4.x/Migration24#I18n)
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
-import models.Users
+import models.{Tables, Users}
 
 object Application extends Controller with Secured {
 
@@ -18,6 +18,16 @@ object Application extends Controller with Secured {
   def index() = ActionWithUser { implicit user =>
     implicit request =>
       Redirect(controllers.accounting.routes.Views.cashFlowOfAll)
+  }
+
+  def verifyCachingConsistency(applicationSecret: String) = Action { implicit request =>
+    val realApplicationSecret = application.configuration.getString("play.crypto.secret")
+    require(applicationSecret == realApplicationSecret, "Invalid application secret")
+
+    for (tableManager <- Tables.allManagers) {
+      tableManager.verifyConsistency()
+    }
+    Ok("OK")
   }
 
   def profile() = ActionWithUser { implicit user =>

@@ -19,16 +19,22 @@ object Global extends GlobalSettings {
   override def onStart(app: Application): Unit = {
     implicit val _ = app
 
-    for (tableManager <- Tables.allManagers) {
-      tableManager.initialize()
-    }
-
     processFlags()
 
+    // Set up database if necessary
     if (Set(Mode.Test, Mode.Dev) contains app.mode) {
       if (AppConfigHelper.dropAndCreateNewDb) {
         dropAndCreateNewDb()
       }
+    }
+
+    // Initialize table managers (notably the caching ones)
+    for (tableManager <- Tables.allManagers) {
+      tableManager.initialize()
+    }
+
+    // Populate the database with dummy data
+    if (Set(Mode.Test, Mode.Dev) contains app.mode) {
       if (AppConfigHelper.loadDummyUsers) {
         loadDummyUsers()
       }

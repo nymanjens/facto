@@ -2,17 +2,18 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Home page
-GET  /                             controllers.Application.index
+# General
+GET  /                                 controllers.Application.index
+GET  /verifycachingconsistency/:applicationSecret/  controllers.Application.verifyCachingConsistency(applicationSecret)
 
 # Auth
-GET  /login/                       controllers.Auth.login
-POST /login/                       controllers.Auth.authenticate
-GET  /logout/                      controllers.Auth.logout
+GET  /login/                           controllers.Auth.login
+POST /login/                           controllers.Auth.authenticate
+GET  /logout/                          controllers.Auth.logout
 
 # User
-GET   /profile/                    controllers.Application.profile
-POST  /profile/changepassword/     controllers.Application.changePassword
+GET   /profile/                        controllers.Application.profile
+POST  /profile/changepassword/         controllers.Application.changePassword
 GET   /administration/                 controllers.Application.administration
 POST  /profile/adduser/                controllers.Application.addUser
 
