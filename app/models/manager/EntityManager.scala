@@ -36,5 +36,6 @@ trait EntityManager[E <: Identifiable[E]] {
 object EntityManager {
   /** Decorates the given manager with a caching layer that loads all data in memory. */
   def caching[E <: Identifiable[E]](delegate: EntityManager[E]): EntityManager[E] =
-    new CachingEntityManager(delegate)
+    delegate
+//    new CachingEntityManager(delegate)
 }

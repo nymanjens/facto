@@ -16,5 +16,9 @@ object QueryableEntityManager {
   /** Factory method for creating a database backed QueryableEntityManager */
   def backedByDatabase[E <: Identifiable[E], T <: EntityTable[E]](cons: Tag => T,
                                                                   tableName: String
-                                                                 ) = new DatabaseBackedEntityManager[E, T](cons, tableName)
+                                                                 ) = {
+    new InvalidatingEntityManager[E,T](
+      new DatabaseBackedEntityManager[E, T](cons, tableName)
+    )
+  }
 }
