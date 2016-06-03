@@ -6,6 +6,7 @@ import scala.util.Sorting
 
 import org.apache.http.annotation.GuardedBy
 
+/** Caching decorator for an EntityManager that loads all data in memory and keeps it in sync with all updates. */
 private[manager] final class CachingEntityManager[E <: Identifiable[E]](delegate: EntityManager[E])
   extends ForwardingEntityManager[E](delegate) {
 
