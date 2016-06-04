@@ -61,7 +61,7 @@ object LiquidationEntry {
   }
 
   private case class FetchLastNEntries(accountPair: AccountPair, n: Int) extends CacheIdentifier[Seq[LiquidationEntry]] {
-    override protected def invalidateWhenUpdating = {
+    protected override def invalidateWhenUpdating = {
       case transaction: Transaction => isRelevantForAccounts(transaction, accountPair)
     }
   }

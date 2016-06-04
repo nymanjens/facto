@@ -61,7 +61,7 @@ object GeneralEntry {
   }
 
   private case class FetchLastNEndowments(account: Account, n: Int) extends CacheIdentifier[Seq[GeneralEntry]] {
-    override protected def invalidateWhenUpdating = {
+    protected override def invalidateWhenUpdating = {
       case transaction: Transaction =>
         transaction.categoryCode == Config.constants.endowmentCategory.code &&
           transaction.beneficiaryAccountCode == account.code
