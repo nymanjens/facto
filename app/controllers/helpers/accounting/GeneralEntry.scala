@@ -9,6 +9,8 @@ import models.SlickUtils.dbApi._
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
 import models.accounting.{Transaction, Transactions}
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
+import controllers.helpers.HelperCache
+import controllers.helpers.HelperCache.CacheIdentifier
 
 case class GeneralEntry(override val transactions: Seq[Transaction])
   extends GroupedTransactions(transactions)
@@ -33,27 +35,36 @@ object GeneralEntry {
   }
 
   /* Returns most recent n entries sorted from old to new. */
-  def fetchLastNEndowments(account: Account, n: Int) = {
-    val transactions: Seq[Transaction] =
-      dbRun(
-        Transactions.newQuery
-          .filter(_.categoryCode === Config.constants.endowmentCategory.code)
-          .filter(_.beneficiaryAccountCode === account.code)
-          .sortBy(r => (r.consumedDate.desc, r.createdDate.desc))
-          .take(3 * n))
-        .reverse
-        .toList
+  def fetchLastNEndowments(account: Account, n: Int) =
+    HelperCache.cached(FetchLastNEndowments(account, n)) {
+      val transactions: Seq[Transaction] =
+        dbRun(
+          Transactions.newQuery
+            .filter(_.categoryCode === Config.constants.endowmentCategory.code)
+            .filter(_.beneficiaryAccountCode === account.code)
+            .sortBy(r => (r.consumedDate.desc, r.createdDate.desc))
+            .take(3 * n))
+          .reverse
+          .toList
 
-    var entries = transactions.map(t => GeneralEntry(Seq(t)))
+      var entries = transactions.map(t => GeneralEntry(Seq(t)))
 
-    entries = combineConsecutiveOfSameGroup(entries)
+      entries = combineConsecutiveOfSameGroup(entries)
 
-    entries.takeRight(n)
-  }
+      entries.takeRight(n)
+    }
 
   private[accounting] def combineConsecutiveOfSameGroup(entries: Seq[GeneralEntry]): Seq[GeneralEntry] = {
     GroupedTransactions.combineConsecutiveOfSameGroup(entries) {
       /* combine */ (first, last) => GeneralEntry(first.transactions ++ last.transactions)
+    }
+  }
+
+  private case class FetchLastNEndowments(account: Account, n: Int) extends CacheIdentifier {
+    override def invalidateWhenUpdating = {
+      case transaction: Transaction =>
+        transaction.categoryCode == Config.constants.endowmentCategory.code &&
+          transaction.beneficiaryAccountCode == account.code
     }
   }
 }
