@@ -30,7 +30,11 @@ class Users(tag: Tag) extends EntityTable[User](tag, Users.tableName) {
 }
 
 object Users extends ForwardingEntityManager[User, Users](
-  EntityManager.create[User, Users](tag => new Users(tag), tableName = "USERS")) {
+  EntityManager.create[User, Users](
+    tag => new Users(tag),
+    tableName = "USERS",
+    cached = true
+  )) {
 
   private[models] def hash(password: String) = Hashing.sha512().hashString(password, Charsets.UTF_8).toString()
 

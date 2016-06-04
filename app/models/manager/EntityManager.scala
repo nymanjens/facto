@@ -45,10 +45,14 @@ object EntityManager {
 
   /** Factory method for creating a database backed EntityManager */
   def create[E <: Identifiable[E], T <: EntityTable[E]](cons: Tag => T,
-                                                        tableName: String
-                                                       ) = {
-    new InvalidatingEntityManager[E, T](
-      new DatabaseBackedEntityManager[E, T](cons, tableName)
-    )
+                                                        tableName: String,
+                                                        cached: Boolean = false
+                                                       ): EntityManager[E, T] = {
+    var result: EntityManager[E, T] = new DatabaseBackedEntityManager[E, T](cons, tableName)
+    if (cached) {
+      result = new CachingEntityManager[E, T](result)
+    }
+    result = new InvalidatingEntityManager[E, T](result)
+    result
   }
 }
