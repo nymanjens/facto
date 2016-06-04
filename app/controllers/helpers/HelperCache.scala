@@ -35,6 +35,14 @@ object HelperCache {
     }
   }
 
+  def verifyConsistency(): Unit = lock.synchronized {
+    for ((identifier, entry) <- cache) {
+      val cachedValue = entry.value
+      val newValue = entry.expensiveFunction()
+      require(cachedValue == newValue, s"cachedValue = $cachedValue != newValue = $newValue")
+    }
+  }
+
   private case class CacheEntry[R](value: R, expensiveFunction: () => R) {
     def recalculated(): CacheEntry[R] = CacheEntry(expensiveFunction)
   }

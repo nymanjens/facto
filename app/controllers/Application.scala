@@ -9,8 +9,9 @@ import play.Play.application
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 
-import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 import models.{Tables, Users}
+import controllers.helpers.HelperCache
+import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 
 object Application extends Controller with Secured {
 
@@ -27,6 +28,8 @@ object Application extends Controller with Secured {
     for (entityManager <- Tables.allEntityManagers) {
       entityManager.verifyConsistency()
     }
+    HelperCache.verifyConsistency()
+    
     Ok("OK")
   }
 
