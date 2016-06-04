@@ -40,10 +40,12 @@ trait EntityManager[E <: Identifiable[E], T <: AbstractTable[E]] {
 }
 
 object EntityManager {
-  /** Decorates the given manager with a caching layer that loads all data in memory. */
-  //  def caching[E <: Identifiable[E]](delegate: EntityManager[E]): EntityManager[E] = ???
 
-  /** Factory method for creating a database backed EntityManager */
+  /**
+    * Factory method for creating a database backed EntityManager.
+    *
+    * @param cached if true, the manager is decorated with a caching layer that loads all data in memory.
+    */
   def create[E <: Identifiable[E], T <: EntityTable[E]](cons: Tag => T,
                                                         tableName: String,
                                                         cached: Boolean = false
