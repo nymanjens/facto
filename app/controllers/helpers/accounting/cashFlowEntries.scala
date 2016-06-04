@@ -127,8 +127,8 @@ object CashFlowEntry {
       entries.takeRight(n)
     }
 
-  private case class FetchLastNEntries(moneyReservoir: MoneyReservoir, n: Int) extends CacheIdentifier {
-    override def invalidateWhenUpdating = {
+  private case class FetchLastNEntries(moneyReservoir: MoneyReservoir, n: Int) extends CacheIdentifier[Seq[CashFlowEntry]] {
+    override protected def invalidateWhenUpdating = {
       case transaction: Transaction => transaction.moneyReservoirCode == moneyReservoir.code
       case bc: BalanceCheck => bc.moneyReservoirCode == moneyReservoir.code
     }

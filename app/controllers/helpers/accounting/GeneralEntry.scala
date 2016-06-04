@@ -35,7 +35,7 @@ object GeneralEntry {
   }
 
   /* Returns most recent n entries sorted from old to new. */
-  def fetchLastNEndowments(account: Account, n: Int) =
+  def fetchLastNEndowments(account: Account, n: Int): Seq[GeneralEntry] =
     HelperCache.cached(FetchLastNEndowments(account, n)) {
       val transactions: Seq[Transaction] =
         dbRun(
@@ -60,8 +60,8 @@ object GeneralEntry {
     }
   }
 
-  private case class FetchLastNEndowments(account: Account, n: Int) extends CacheIdentifier {
-    override def invalidateWhenUpdating = {
+  private case class FetchLastNEndowments(account: Account, n: Int) extends CacheIdentifier[Seq[GeneralEntry]] {
+    override protected def invalidateWhenUpdating = {
       case transaction: Transaction =>
         transaction.categoryCode == Config.constants.endowmentCategory.code &&
           transaction.beneficiaryAccountCode == account.code

@@ -60,8 +60,8 @@ object LiquidationEntry {
     accountPair.toSet == involvedAccounts
   }
 
-  private case class FetchLastNEntries(accountPair: AccountPair, n: Int) extends CacheIdentifier {
-    override def invalidateWhenUpdating = {
+  private case class FetchLastNEntries(accountPair: AccountPair, n: Int) extends CacheIdentifier[Seq[LiquidationEntry]] {
+    override protected def invalidateWhenUpdating = {
       case transaction: Transaction => isRelevantForAccounts(transaction, accountPair)
     }
   }

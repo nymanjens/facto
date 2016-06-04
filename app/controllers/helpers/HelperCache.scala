@@ -7,29 +7,31 @@ import org.apache.http.annotation.GuardedBy
 import models.manager.Identifiable
 
 object HelperCache {
-  trait CacheIdentifier {
-    def invalidateWhenUpdating: PartialFunction[Any, Boolean]
+  trait CacheIdentifier[R] {
+    protected def invalidateWhenUpdating: PartialFunction[Any, Boolean] = PartialFunction.empty
+    protected def invalidateWhenUpdatingEntity(oldValue: R): PartialFunction[Any, Boolean] = PartialFunction.empty
 
-    private[helpers] def safeInvalidateWhenUpdating(entity: Identifiable[_]): Boolean = {
-      invalidateWhenUpdating.lift(entity) getOrElse false
+    private[helpers] def combinedInvalidateWhenUpdating(oldValue: R, entity: Identifiable[_]): Boolean = {
+      val combinedInvalidate = invalidateWhenUpdating orElse invalidateWhenUpdatingEntity(oldValue)
+      if (combinedInvalidate.isDefinedAt(entity)) combinedInvalidate(entity) else false
     }
   }
 
   @GuardedBy("lock")
-  private val cache: mutable.Map[CacheIdentifier, CacheEntry[_]] = mutable.Map[CacheIdentifier, CacheEntry[_]]()
+  private val cache: mutable.Map[CacheIdentifier[_], CacheEntry[_]] = mutable.Map[CacheIdentifier[_], CacheEntry[_]]()
   private val lock = new Object
 
-  def cached[R](identifier: CacheIdentifier)(expensiveValue: => R): R = lock.synchronized {
+  def cached[R](identifier: CacheIdentifier[R])(expensiveValue: => R): R = lock.synchronized {
     val expensiveFunction = () => expensiveValue
     if (!cache.contains(identifier)) {
-      cache.put(identifier, CacheEntry(expensiveFunction))
+      cache.put(identifier, CacheEntry(identifier, expensiveFunction))
     }
     cache(identifier).value.asInstanceOf[R]
   }
 
   def invalidateCache(entity: Identifiable[_]): Unit = lock.synchronized {
     for ((identifier, entry) <- cache) {
-      if (identifier.safeInvalidateWhenUpdating(entity)) {
+      if (entry.invalidateWhenUpdating(entity)) {
         cache.remove(identifier)
       }
     }
@@ -43,13 +45,18 @@ object HelperCache {
     }
   }
 
-  private case class CacheEntry[R](value: R, expensiveFunction: () => R) {
-    def recalculated(): CacheEntry[R] = CacheEntry(expensiveFunction)
+  private case class CacheEntry[R](identifier: CacheIdentifier[R],
+                                   value: R,
+                                   expensiveFunction: () => R) {
+    def recalculated(): CacheEntry[R] = CacheEntry(identifier, expensiveFunction)
+
+    private[helpers] def invalidateWhenUpdating(entity: Identifiable[_]): Boolean =
+      identifier.combinedInvalidateWhenUpdating(value, entity)
   }
 
   private object CacheEntry {
-    def apply[R](expensiveFunction: () => R): CacheEntry[R] = {
-      CacheEntry(expensiveFunction(), expensiveFunction)
+    def apply[R](identifier: CacheIdentifier[R], expensiveFunction: () => R): CacheEntry[R] = {
+      CacheEntry(identifier, expensiveFunction(), expensiveFunction)
     }
   }
 }
