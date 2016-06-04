@@ -18,6 +18,8 @@ import models.SlickUtils.{dbRun, JodaToSqlDateMapper}
 import models.accounting.{Transactions, Transaction, Money}
 import models.accounting.config.{Category, Account}
 import models.accounting.config.Account.SummaryTotalRowDef
+import controllers.helpers.HelperCache
+import controllers.helpers.HelperCache.CacheIdentifier
 
 case class Summary(yearToSummary: Map[Int, SummaryForYear],
                    categories: Seq[Category],
@@ -31,18 +33,16 @@ case class Summary(yearToSummary: Map[Int, SummaryForYear],
 object Summary {
   def fetchSummary(account: Account, expandedYear: Int): Summary = {
     val now = Clock.now
-    val allTransactions = dbRun(
-      Transactions.newQuery
-        .filter(_.beneficiaryAccountCode === account.code)
-        .sortBy(r => (r.consumedDate, r.createdDate)))
-      .toList
-    val yearToTransactions: Map[Int, Seq[Transaction]] = allTransactions.groupBy(t => t.consumedDate.getYear)
-    val years: Seq[Int] = {
-      val yearsSet = yearToTransactions.keySet ++ Set(now.getYear, expandedYear)
-      yearsSet.toList.sorted
-    }
+
+    val years: Seq[Int] = getSummaryYears(account, expandedYear, now.getYear)
     val monthRangeForAverages: MonthRange = {
-      allTransactions.headOption.map(_.consumedDate) match {
+      val oldestTransaction = dbRun(
+        Transactions.newQuery
+          .filter(_.beneficiaryAccountCode === account.code)
+          .sortBy(_.consumedDate)
+          .take(1))
+        .headOption
+      oldestTransaction.map(_.consumedDate) match {
         case Some(firstDate) =>
           val atLeastFirst = MonthRange.atLeast(DatedMonth.containing(firstDate))
           val atMostLastMonth = MonthRange.lessThan(DatedMonth.containing(now))
@@ -54,8 +54,7 @@ object Summary {
 
     val yearToSummary: Map[Int, SummaryForYear] = toListMap {
       for ((year, i) <- years.zipWithIndex) yield {
-        val transactions = yearToTransactions.get(year) getOrElse Seq()
-        year -> SummaryForYear.fromTransactions(transactions, account, monthRangeForAverages, year)
+        year -> SummaryForYear.fetch(account, monthRangeForAverages, year)
       }
     }
 
@@ -64,6 +63,24 @@ object Summary {
     }
 
     Summary(yearToSummary, categories, monthRangeForAverages)
+  }
+
+  private def getSummaryYears(account: Account, expandedYear: Int, thisYear: Int): Seq[Int] =
+    HelperCache.cached(GetSummaryYears(account, expandedYear, thisYear)) {
+      val allTransactions = dbRun(
+        Transactions.newQuery
+          .filter(_.beneficiaryAccountCode === account.code))
+      val transactionYears = allTransactions.toStream.map(t => t.consumedDate.getYear).toSet
+      val yearsSet = transactionYears ++ Set(thisYear, expandedYear)
+      yearsSet.toList.sorted
+
+    }
+
+  private case class GetSummaryYears(account: Account, expandedYear: Int, thisYear: Int) extends CacheIdentifier[Seq[Int]] {
+    protected override def invalidateWhenUpdatingEntity(oldYears: Seq[Int]) = {
+      case transaction: Transaction =>
+        transaction.beneficiaryAccountCode == account.code && !oldYears.contains(transaction.consumedDate.getYear)
+    }
   }
 }
 
@@ -88,12 +105,30 @@ case class SummaryForYear(cells: ImmutableTable[Category, DatedMonth, SummaryCel
 
 object SummaryForYear {
 
-  private[accounting] def fromTransactions(transactions: Seq[Transaction], account: Account, monthRangeForAverages: MonthRange, year: Int): SummaryForYear = {
-    val summaryBuilder = new SummaryForYear.Builder(account, monthRangeForAverages, year)
-    for (transaction <- transactions) {
-      summaryBuilder.addTransaction(transaction)
+  private[accounting] def fetch(account: Account, monthRangeForAverages: MonthRange, year: Int): SummaryForYear =
+    HelperCache.cached(GetSummaryForYear(account, monthRangeForAverages, year)) {
+      val transactions: Seq[Transaction] = {
+        val yearRange = MonthRange.forYear(year)
+        dbRun(Transactions.newQuery
+          .filter(_.beneficiaryAccountCode === account.code)
+          .filter(_.consumedDate >= yearRange.start)
+          .filter(_.consumedDate < yearRange.startOfNextMonth)
+          .sortBy(r => (r.consumedDate, r.createdDate)))
+          .toList
+      }
+
+      val summaryBuilder = new SummaryForYear.Builder(account, monthRangeForAverages, year)
+      for (transaction <- transactions) {
+        summaryBuilder.addTransaction(transaction)
+      }
+      summaryBuilder.result
     }
-    summaryBuilder.result
+
+  private case class GetSummaryForYear(account: Account, monthRangeForAverages: MonthRange, year: Int) extends CacheIdentifier[SummaryForYear] {
+    protected override def invalidateWhenUpdating = {
+      case transaction: Transaction =>
+        transaction.beneficiaryAccountCode == account.code && transaction.consumedDate.getYear == year
+    }
   }
 
   private class Builder(account: Account, monthRangeForAverages: MonthRange, year: Int) {
