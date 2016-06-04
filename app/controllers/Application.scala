@@ -29,7 +29,7 @@ object Application extends Controller with Secured {
       entityManager.verifyConsistency()
     }
     HelperCache.verifyConsistency()
-    
+
     Ok("OK")
   }
 
@@ -108,5 +108,4 @@ object Application extends Controller with Secured {
       })
     )
   }
-
 }
