@@ -22,18 +22,11 @@ case class BalanceCorrection(balanceCheck: BalanceCheck) extends CashFlowEntry
 
 object CashFlowEntry {
 
-  private case class FetchLastNEntriesCacheIdentifier(moneyReservoir: MoneyReservoir, n: Int) extends CacheIdentifier {
-    override def invalidateWhenUpdating = {
-      case transaction: Transaction => transaction.moneyReservoirCode == moneyReservoir.code
-      case bc: BalanceCheck => bc.moneyReservoirCode == moneyReservoir.code
-    }
-  }
-
   /**
     * Returns the last n CashFlowEntries for the given reservoir, ordered from old to new.
     */
   def fetchLastNEntries(moneyReservoir: MoneyReservoir, n: Int): Seq[CashFlowEntry] =
-    HelperCache.cached(FetchLastNEntriesCacheIdentifier(moneyReservoir, n)) {
+    HelperCache.cached(FetchLastNEntries(moneyReservoir, n)) {
       val (oldestBalanceDate, initialBalance): (DateTime, Money) = {
         val numTransactionsToFetch = 3 * n
         val totalNumTransactions = dbRun(Transactions.newQuery
@@ -133,4 +126,11 @@ object CashFlowEntry {
 
       entries.takeRight(n)
     }
+
+  private case class FetchLastNEntries(moneyReservoir: MoneyReservoir, n: Int) extends CacheIdentifier {
+    override def invalidateWhenUpdating = {
+      case transaction: Transaction => transaction.moneyReservoirCode == moneyReservoir.code
+      case bc: BalanceCheck => bc.moneyReservoirCode == moneyReservoir.code
+    }
+  }
 }

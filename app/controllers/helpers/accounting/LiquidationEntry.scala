@@ -6,6 +6,8 @@ import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
 import models.accounting.{Transaction, Transactions, Money}
 import models.accounting.config.{Account, MoneyReservoir, Category}
 import models.SlickUtils.dbApi._
+import controllers.helpers.HelperCache
+import controllers.helpers.HelperCache.CacheIdentifier
 
 /**
   * @param debt The debt of the first account to the second (may be negative).
@@ -16,34 +18,35 @@ case class LiquidationEntry(override val transactions: Seq[Transaction], debt: M
 object LiquidationEntry {
 
   /* Returns most recent n entries sorted from old to new. */
-  def fetchLastNEntries(accountPair: AccountPair, n: Int): Seq[LiquidationEntry] = {
-    val allTransactions: List[Transaction] =
-      dbRun(Transactions.newQuery.sortBy(r => (r.transactionDate, r.createdDate))).toList
+  def fetchLastNEntries(accountPair: AccountPair, n: Int): Seq[LiquidationEntry] =
+    HelperCache.cached(FetchLastNEntries(accountPair, n)) {
+      val allTransactions: List[Transaction] =
+        dbRun(Transactions.newQuery.sortBy(r => (r.transactionDate, r.createdDate))).toList
 
-    val relevantTransactions =
-      for {
-        transaction <- allTransactions
-        if isRelevantForAccounts(transaction, accountPair)
-      } yield transaction
+      val relevantTransactions =
+        for {
+          transaction <- allTransactions
+          if isRelevantForAccounts(transaction, accountPair)
+        } yield transaction
 
-    // convert to entries (recursion does not lead to growing stack because of Stream)
-    def convertToEntries(nextTransactions: List[Transaction], currentDebt: Money): Stream[LiquidationEntry] =
-      nextTransactions match {
-        case trans :: rest =>
-          val addsTo1To2Debt = trans.beneficiary == accountPair.account2
-          val newDebt = if (addsTo1To2Debt) currentDebt + trans.flow else currentDebt - trans.flow
-          LiquidationEntry(Seq(trans), newDebt) #:: convertToEntries(rest, newDebt)
-        case Nil =>
-          Stream.empty
+      // convert to entries (recursion does not lead to growing stack because of Stream)
+      def convertToEntries(nextTransactions: List[Transaction], currentDebt: Money): Stream[LiquidationEntry] =
+        nextTransactions match {
+          case trans :: rest =>
+            val addsTo1To2Debt = trans.beneficiary == accountPair.account2
+            val newDebt = if (addsTo1To2Debt) currentDebt + trans.flow else currentDebt - trans.flow
+            LiquidationEntry(Seq(trans), newDebt) #:: convertToEntries(rest, newDebt)
+          case Nil =>
+            Stream.empty
+        }
+      var entries = convertToEntries(relevantTransactions, Money(0) /* initial debt */).toList
+
+      entries = GroupedTransactions.combineConsecutiveOfSameGroup(entries) {
+        /* combine */ (first, last) => LiquidationEntry(first.transactions ++ last.transactions, last.debt)
       }
-    var entries = convertToEntries(relevantTransactions, Money(0) /* initial debt */).toList
 
-    entries = GroupedTransactions.combineConsecutiveOfSameGroup(entries) {
-      /* combine */ (first, last) => LiquidationEntry(first.transactions ++ last.transactions, last.debt)
+      entries.takeRight(n)
     }
-
-    entries.takeRight(n)
-  }
 
   private def isRelevantForAccounts(transaction: Transaction, accountPair: AccountPair): Boolean = {
     val moneyReservoirOwner = transaction.moneyReservoirCode match {
@@ -55,5 +58,11 @@ object LiquidationEntry {
     }
     val involvedAccounts: Set[Account] = Set(transaction.beneficiary, moneyReservoirOwner)
     accountPair.toSet == involvedAccounts
+  }
+
+  private case class FetchLastNEntries(accountPair: AccountPair, n: Int) extends CacheIdentifier {
+    override def invalidateWhenUpdating = {
+      case transaction: Transaction => isRelevantForAccounts(transaction, accountPair)
+    }
   }
 }
