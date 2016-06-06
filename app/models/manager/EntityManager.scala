@@ -12,8 +12,6 @@ trait EntityManager[E <: Entity[E], T <: AbstractTable[E]] {
   // ********** Management methods ********** //
   /** Initializes this manager. This is called once at the start of the application. */
   def initialize(): Unit = {}
-  /** Throws an exception if there is a consistency problem in this manager. */
-  def verifyConsistency(): Unit = {}
   /** Creates the persisted database table for this manager. */
   def createTable: Unit
   def tableName: String

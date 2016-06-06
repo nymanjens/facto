@@ -7,9 +7,13 @@ import scala.util.Sorting
 import slick.lifted.AbstractTable
 import org.apache.http.annotation.GuardedBy
 
+import common.cache.CacheMaintenanceManager
+
 /** Caching decorator for an EntityManager that loads all data in memory and keeps it in sync with all updates. */
-private[manager] final class CachingEntityManager[E <: Entity[E], T <: AbstractTable[E]](delegate: EntityManager[E,T])
-  extends ForwardingEntityManager[E,T](delegate) {
+private[manager] final class CachingEntityManager[E <: Entity[E], T <: AbstractTable[E]](delegate: EntityManager[E, T])
+  extends ForwardingEntityManager[E, T](delegate) {
+  CacheMaintenanceManager.registerCache(verifyConsistency = verifyConsistency)
+
 
   @GuardedBy("lock")
   private val cache: mutable.Map[Long, E] = mutable.Map[Long, E]()
@@ -19,21 +23,6 @@ private[manager] final class CachingEntityManager[E <: Entity[E], T <: AbstractT
   override def initialize(): Unit = lock.synchronized {
     cache.clear()
     delegate.fetchAll() foreach { e => cache.put(e.id, e) }
-  }
-
-  // This should always succeed
-  override def verifyConsistency(): Unit = lock.synchronized {
-    val fetchedEntities = delegate.fetchAll()
-
-    require(
-      cache.size == fetchedEntities.size,
-      s"cache.size = ${cache.size} must be equal to fetchedEntities.size = ${fetchedEntities.size}")
-    for (fetched <- fetchedEntities) {
-      val cached = cache(fetched.id)
-      require(
-        cached == fetched,
-        s"Cached entity is not equal to fetched entity (cached = $cached, fetched = $fetched)")
-    }
   }
 
   // ********** Implementation of EntityManager interface: Mutators ********** //
@@ -61,5 +50,20 @@ private[manager] final class CachingEntityManager[E <: Entity[E], T <: AbstractT
 
   override def fetchAll(): List[E] = lock.synchronized {
     cache.values.toList
+  }
+
+  // ********** Private Management methods ********** //
+  private def verifyConsistency(): Unit = lock.synchronized {
+    val fetchedEntities = delegate.fetchAll()
+
+    require(
+      cache.size == fetchedEntities.size,
+      s"cache.size = ${cache.size} must be equal to fetchedEntities.size = ${fetchedEntities.size}")
+    for (fetched <- fetchedEntities) {
+      val cached = cache(fetched.id)
+      require(
+        cached == fetched,
+        s"Cached entity is not equal to fetched entity (cached = $cached, fetched = $fetched)")
+    }
   }
 }

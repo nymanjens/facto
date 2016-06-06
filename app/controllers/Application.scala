@@ -11,6 +11,7 @@ import play.Play.application
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 
+import common.cache.CacheMaintenanceManager
 import models.{Tables, Users, User}
 import controllers.accounting.Views
 import controllers.helpers.{HelperCache, AuthenticatedAction}
@@ -26,12 +27,7 @@ object Application extends Controller {
 
   def doCacheManagement(applicationSecret: String) = Action { implicit request =>
     validateApplicationSecret(applicationSecret)
-
-    for (entityManager <- Tables.allEntityManagers) {
-      entityManager.verifyConsistency()
-    }
-    HelperCache.verifyConsistency()
-
+    CacheMaintenanceManager.doMaintenanceAndVerifyConsistency()
     Ok("OK")
   }
 
@@ -40,7 +36,6 @@ object Application extends Controller {
     validateApplicationSecret(applicationSecret)
 
     val admin: User = Users.findByLoginName("admin").get
-
     val actions: Seq[AuthenticatedAction] = Seq(
       Views.generalLatest,
       Views.cashFlowOfAll,

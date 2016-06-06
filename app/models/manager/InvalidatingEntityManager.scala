@@ -5,6 +5,7 @@ import scala.collection.mutable
 import slick.lifted.{AbstractTable, TableQuery}
 import org.apache.http.annotation.GuardedBy
 
+import common.cache.CacheMaintenanceManager
 import controllers.helpers.HelperCache
 
 /** TODO. */
@@ -14,17 +15,17 @@ private[manager] final class InvalidatingEntityManager[E <: Entity[E], T <: Abst
   // ********** Implementation of EntityManager interface: Mutators ********** //
   override def add(entity: E): E = {
     val savedEntity = delegate.add(entity)
-    HelperCache.invalidateCache(savedEntity)
+    CacheMaintenanceManager.invalidateCachesWhenUpdated(savedEntity)
     savedEntity
   }
 
   override def update(entity: E): E = {
-    HelperCache.invalidateCache(entity)
+    CacheMaintenanceManager.invalidateCachesWhenUpdated(entity)
     delegate.update(entity)
   }
 
   override def delete(entity: E): Unit = {
-    HelperCache.invalidateCache(entity)
+    CacheMaintenanceManager.invalidateCachesWhenUpdated(entity)
     delegate.delete(entity)
   }
 }

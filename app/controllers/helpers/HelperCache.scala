@@ -4,18 +4,14 @@ import scala.collection.mutable
 
 import org.apache.http.annotation.GuardedBy
 
+import common.cache.CacheMaintenanceManager
 import models.manager.Entity
 
 object HelperCache {
-  trait CacheIdentifier[R] {
-    protected def invalidateWhenUpdating: PartialFunction[Any, Boolean] = PartialFunction.empty
-    protected def invalidateWhenUpdatingEntity(oldValue: R): PartialFunction[Any, Boolean] = PartialFunction.empty
-
-    private[helpers] def combinedInvalidateWhenUpdating(oldValue: R, entity: Entity[_]): Boolean = {
-      val combinedInvalidate = invalidateWhenUpdating orElse invalidateWhenUpdatingEntity(oldValue)
-      if (combinedInvalidate.isDefinedAt(entity)) combinedInvalidate(entity) else false
-    }
-  }
+  CacheMaintenanceManager.registerCache(
+    doMaintenance = doMaintenance,
+    verifyConsistency = verifyConsistency,
+    invalidateCache = invalidateCache)
 
   @GuardedBy("lock")
   private val cache: mutable.Map[CacheIdentifier[_], CacheEntry[_]] = mutable.Map[CacheIdentifier[_], CacheEntry[_]]()
@@ -29,7 +25,7 @@ object HelperCache {
     cache(identifier).value.asInstanceOf[R]
   }
 
-  def invalidateCache(entity: Entity[_]): Unit = lock.synchronized {
+  private def invalidateCache(entity: Entity[_]): Unit = lock.synchronized {
     for ((identifier, entry) <- cache) {
       if (entry.invalidateWhenUpdating(entity)) {
         cache.remove(identifier)
@@ -37,11 +33,25 @@ object HelperCache {
     }
   }
 
-  def verifyConsistency(): Unit = lock.synchronized {
+  private def doMaintenance(): Unit = lock.synchronized {
+    // TOOD: implement
+  }
+
+  private def verifyConsistency(): Unit = lock.synchronized {
     for ((identifier, entry) <- cache) {
       val cachedValue = entry.value
       val newValue = entry.expensiveFunction()
       require(cachedValue == newValue, s"cachedValue = $cachedValue != newValue = $newValue")
+    }
+  }
+
+  trait CacheIdentifier[R] {
+    protected def invalidateWhenUpdating: PartialFunction[Any, Boolean] = PartialFunction.empty
+    protected def invalidateWhenUpdatingEntity(oldValue: R): PartialFunction[Any, Boolean] = PartialFunction.empty
+
+    private[helpers] def combinedInvalidateWhenUpdating(oldValue: R, entity: Entity[_]): Boolean = {
+      val combinedInvalidate = invalidateWhenUpdating orElse invalidateWhenUpdatingEntity(oldValue)
+      if (combinedInvalidate.isDefinedAt(entity)) combinedInvalidate(entity) else false
     }
   }
 
