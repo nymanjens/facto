@@ -43,29 +43,3 @@ object Auth extends Controller {
   }
 
 }
-
-trait Secured {
-
-  def username(request: RequestHeader) = request.session.get(Security.username)
-
-  def onUnauthorized(request: RequestHeader) = Results.Redirect(routes.Auth.login)
-
-  def ActionWithAuth(f: => String => Request[AnyContent] => Result) = {
-    Security.Authenticated(username, onUnauthorized) { user =>
-      Action(request => f(user)(request))
-    }
-  }
-
-  def ActionWithUser(f: User => Request[AnyContent] => Result) = ActionWithAuth { username =>
-    implicit request =>
-      Users.findByLoginName(username).map { user =>
-        f(user)(request)
-      }.getOrElse(onUnauthorized(request))
-  }
-
-  def ActionWithAdminUser(f: User => Request[AnyContent] => Result) = ActionWithUser { implicit user =>
-    implicit request =>
-      require(user.loginName == "admin")
-      f(user)(request)
-  }
-}

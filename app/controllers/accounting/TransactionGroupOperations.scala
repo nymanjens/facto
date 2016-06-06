@@ -20,11 +20,11 @@ import common.{Clock, ReturnTo}
 import models.User
 import models.accounting.{Transaction, Transactions, TransactionPartial, TransactionGroup, TransactionGroupPartial, TransactionGroups, Money, UpdateLogs}
 import models.accounting.config.{Config, Account, MoneyReservoir, Category, Template}
-import controllers.Secured
+import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting.CashFlowEntry
 import controllers.helpers.accounting.FormUtils.{validMoneyReservoirOrNullReservoir, validAccountCode, validCategoryCode, validFlowAsFloat, flowAsFloatStringToMoney, invalidWithMessageCode}
 
-object TransactionGroupOperations extends Controller with Secured {
+object TransactionGroupOperations extends Controller {
 
   // ********** actions ********** //
   def addNewForm(returnTo: String) = {
@@ -33,7 +33,7 @@ object TransactionGroupOperations extends Controller with Secured {
     addNewFormFromPartial(TransactionPartial.from())
   }
 
-  def editForm(transGroupId: Long, returnTo: String) = ActionWithUser { implicit user =>
+  def editForm(transGroupId: Long, returnTo: String) = AuthenticatedAction { implicit user =>
     implicit request =>
       implicit val returnToImplicit = ReturnTo(returnTo)
 
@@ -54,7 +54,7 @@ object TransactionGroupOperations extends Controller with Secured {
     addOrEdit(EditOperationMeta(transGroupId))
   }
 
-  def delete(transGroupId: Long, returnTo: String) = ActionWithUser { implicit user =>
+  def delete(transGroupId: Long, returnTo: String) = AuthenticatedAction { implicit user =>
     implicit request =>
       val group = TransactionGroups.findById(transGroupId)
       val numTrans = group.transactions.size
@@ -70,7 +70,7 @@ object TransactionGroupOperations extends Controller with Secured {
   }
 
   // ********** shortcuts ********** //
-  def addNewFromTemplate(templateId: Long, returnTo: String) = ActionWithUser { implicit user =>
+  def addNewFromTemplate(templateId: Long, returnTo: String) = AuthenticatedAction { implicit user =>
     implicit request =>
       implicit val returnToImplicit = ReturnTo(returnTo)
 
@@ -82,7 +82,7 @@ object TransactionGroupOperations extends Controller with Secured {
       Ok(formViewWithInitialData(AddNewOperationMeta(), initialData, templatesInNavbar = Seq(template)))
   }
 
-  def addNewLiquidationRepayForm(accountCode1: String, accountCode2: String, amountInCents: Long, returnTo: String): EssentialAction = {
+  def addNewLiquidationRepayForm(accountCode1: String, accountCode2: String, amountInCents: Long, returnTo: String): AuthenticatedAction = {
     implicit val returnToImplicit = ReturnTo(returnTo)
 
     val amount = Money(amountInCents)
@@ -110,18 +110,18 @@ object TransactionGroupOperations extends Controller with Secured {
   }
 
   // ********** private helper controllers ********** //
-  private def addNewFormFromPartial(partial: TransactionPartial)(implicit returnTo: ReturnTo): EssentialAction =
+  private def addNewFormFromPartial(partial: TransactionPartial)(implicit returnTo: ReturnTo): AuthenticatedAction =
     addNewFormFromPartial(TransactionGroupPartial(Seq(partial)))
 
   private def addNewFormFromPartial(partial: TransactionGroupPartial)
-                                   (implicit returnTo: ReturnTo): EssentialAction = ActionWithUser { implicit user =>
+                                   (implicit returnTo: ReturnTo): AuthenticatedAction = AuthenticatedAction { implicit user =>
     implicit request =>
       val initialData = Forms.TransGroupData.fromPartial(partial)
       Ok(formViewWithInitialData(AddNewOperationMeta(), initialData))
   }
 
   private def addOrEdit(operationMeta: OperationMeta)(implicit returnTo: ReturnTo) =
-    ActionWithUser { implicit user =>
+    AuthenticatedAction { implicit user =>
       implicit request =>
         val cleanedRequestMap: Map[String, MutableSeq[String]] = {
           // get sent data (copied from Form.bindFromRequest())

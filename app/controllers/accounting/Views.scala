@@ -4,26 +4,26 @@ import play.api.mvc.{Controller, Flash, Result, Request, AnyContent}
 
 import common.Clock
 import common.CollectionUtils.toListMap
-import controllers.Secured
-import controllers.helpers.accounting._
 import models.User
 import models.accounting.config.Config
 import models.accounting.config.{Account, MoneyReservoir, Category, Template}
+import controllers.helpers.AuthenticatedAction
+import controllers.helpers.accounting._
 
-object Views extends Controller with Secured {
+object Views extends Controller {
 
   // ********** actions - views ********** //
-  def generalLatest = ActionWithUser { implicit user =>
+  def generalLatest = AuthenticatedAction { implicit user =>
     implicit request =>
       general(numEntriesToShow = 400)
   }
 
-  def generalAll = ActionWithUser { implicit user =>
+  def generalAll = AuthenticatedAction { implicit user =>
     implicit request =>
       general()
   }
 
-  def cashFlowOfAll = ActionWithUser { implicit user =>
+  def cashFlowOfAll = AuthenticatedAction { implicit user =>
     implicit request =>
       cashFlow(
         reservoirs = Config.visibleReservoirs,
@@ -31,13 +31,13 @@ object Views extends Controller with Secured {
         expandedNumEntriesToShow = 30)
   }
 
-  def cashFlowOfSingle(reservoirCode: String) = ActionWithUser { implicit user =>
+  def cashFlowOfSingle(reservoirCode: String) = AuthenticatedAction { implicit user =>
     implicit request =>
       cashFlow(
         reservoirs = Seq(Config.moneyReservoir(reservoirCode)))
   }
 
-  def liquidationOfAll = ActionWithUser { implicit user =>
+  def liquidationOfAll = AuthenticatedAction { implicit user =>
     implicit request =>
       val allCombinations: Seq[AccountPair] =
         for {
@@ -51,13 +51,13 @@ object Views extends Controller with Secured {
         expandedNumEntriesToShow = 30)
   }
 
-  def liquidationOfSingle(accountCode1: String, accountCode2: String) = ActionWithUser { implicit user =>
+  def liquidationOfSingle(accountCode1: String, accountCode2: String) = AuthenticatedAction { implicit user =>
     implicit request =>
       liquidation(
         accountPairs = Seq(AccountPair(Config.accounts(accountCode1), Config.accounts(accountCode2))))
   }
 
-  def endowmentsOfAll = ActionWithUser { implicit user =>
+  def endowmentsOfAll = AuthenticatedAction { implicit user =>
     implicit request =>
       endowments(
         accounts = Config.personallySortedAccounts,
@@ -65,20 +65,20 @@ object Views extends Controller with Secured {
         expandedNumEntriesToShow = 100)
   }
 
-  def endowmentsOfSingle(accountCode: String) = ActionWithUser { implicit user =>
+  def endowmentsOfSingle(accountCode: String) = AuthenticatedAction { implicit user =>
     implicit request =>
       endowments(
         accounts = Seq(Config.accounts(accountCode)))
   }
 
-  def summaryForCurrentYear = ActionWithUser { implicit user =>
+  def summaryForCurrentYear = AuthenticatedAction { implicit user =>
     implicit request =>
       summary(
         accounts = Config.personallySortedAccounts,
         expandedYear = Clock.now.getYear)
   }
 
-  def summaryFor(expandedYear: Int) = ActionWithUser { implicit user =>
+  def summaryFor(expandedYear: Int) = AuthenticatedAction { implicit user =>
     implicit request =>
       summary(
         accounts = Config.personallySortedAccounts,

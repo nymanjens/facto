@@ -9,22 +9,22 @@ import play.api.i18n.Messages.Implicits._
 import models.User
 import models.accounting.UpdateLogs
 import models.accounting.config.{Config, Template}
-import controllers.Secured
+import controllers.helpers.AuthenticatedAction
 
-object GeneralActions extends Controller with Secured {
+object GeneralActions extends Controller {
 
   // ********** actions ********** //
-  def updateLogsLatest = ActionWithUser { implicit user =>
+  def updateLogsLatest = AuthenticatedAction { implicit user =>
     implicit request =>
       updateLogs(numEntriesToShow = 400)
   }
 
-  def updateLogsAll = ActionWithUser { implicit user =>
+  def updateLogsAll = AuthenticatedAction { implicit user =>
     implicit request =>
       updateLogs()
   }
 
-  def templateList = ActionWithUser { implicit user =>
+  def templateList = AuthenticatedAction { implicit user =>
     implicit request =>
       Ok(views.html.accounting.templatelist(
         templates = Config.templatesToShowFor(Template.Placement.TemplateList, user)))

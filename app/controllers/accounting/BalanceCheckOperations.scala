@@ -14,13 +14,13 @@ import common.{Clock, ReturnTo}
 import models.User
 import models.accounting.{BalanceCheck, BalanceChecks, Transactions, Money, UpdateLogs}
 import models.accounting.config.{MoneyReservoir, Config}
-import controllers.Secured
+import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting.FormUtils.{validFlowAsFloat, flowAsFloatStringToMoney}
 
-object BalanceCheckOperations extends Controller with Secured {
+object BalanceCheckOperations extends Controller {
 
   // ********** actions ********** //
-  def addNewForm(moneyReservoirCode: String, returnTo: String) = ActionWithUser { implicit user =>
+  def addNewForm(moneyReservoirCode: String, returnTo: String) = AuthenticatedAction { implicit user =>
     implicit request =>
       implicit val returnToImplicit = ReturnTo(returnTo)
 
@@ -32,7 +32,7 @@ object BalanceCheckOperations extends Controller with Secured {
       Ok(formView(AddNewOperationMeta(moneyReservoirCode), initialData))
   }
 
-  def editForm(bcId: Long, returnTo: String) = ActionWithUser { implicit user =>
+  def editForm(bcId: Long, returnTo: String) = AuthenticatedAction { implicit user =>
     implicit request =>
       implicit val returnToImplicit = ReturnTo(returnTo)
 
@@ -48,7 +48,7 @@ object BalanceCheckOperations extends Controller with Secured {
   }
 
   def addConfirmation(moneyReservoirCode: String, balanceInCents: Long, mostRecentTransactionId: Long, returnTo: String) =
-    ActionWithUser { implicit user =>
+    AuthenticatedAction { implicit user =>
       implicit request =>
         implicit val returnToImplicit = ReturnTo(returnTo)
 
@@ -75,7 +75,7 @@ object BalanceCheckOperations extends Controller with Secured {
     addOrEdit(EditOperationMeta(bcId))
   }
 
-  def delete(bcId: Long, returnTo: String) = ActionWithUser { implicit user =>
+  def delete(bcId: Long, returnTo: String) = AuthenticatedAction { implicit user =>
     implicit request =>
       implicit val returnToImplicit = ReturnTo(returnTo)
 
@@ -89,7 +89,7 @@ object BalanceCheckOperations extends Controller with Secured {
   }
 
   // ********** private helper controllers ********** //
-  private def addOrEdit(operationMeta: OperationMeta)(implicit returnTo: ReturnTo) = ActionWithUser { implicit user =>
+  private def addOrEdit(operationMeta: OperationMeta)(implicit returnTo: ReturnTo) = AuthenticatedAction { implicit user =>
     implicit request =>
       // get sent data (copied from Form.bindFromRequest())
       val requestMap: Map[String, Seq[String]] = (request.body match {

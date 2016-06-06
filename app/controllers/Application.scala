@@ -10,13 +10,13 @@ import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 
 import models.{Tables, Users}
-import controllers.helpers.HelperCache
+import controllers.helpers.{HelperCache, AuthenticatedAction}
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 
-object Application extends Controller with Secured {
+object Application extends Controller {
 
   // ********** actions ********** //
-  def index() = ActionWithUser { implicit user =>
+  def index() = AuthenticatedAction { implicit user =>
     implicit request =>
       Redirect(controllers.accounting.routes.Views.cashFlowOfAll)
   }
@@ -33,13 +33,13 @@ object Application extends Controller with Secured {
     Ok("OK")
   }
 
-  def profile() = ActionWithUser { implicit user =>
+  def profile() = AuthenticatedAction { implicit user =>
     implicit request =>
       val initialData = ChangePasswordData(user.loginName)
       Ok(views.html.profile(Forms.changePasswordForm.fill(initialData)))
   }
 
-  def changePassword = ActionWithUser { implicit user =>
+  def changePassword = AuthenticatedAction { implicit user =>
     implicit request =>
       Forms.changePasswordForm.bindFromRequest.fold(
         formWithErrors => BadRequest(views.html.profile(formWithErrors)),
@@ -53,12 +53,12 @@ object Application extends Controller with Secured {
       )
   }
 
-  def administration() = ActionWithAdminUser { implicit user =>
+  def administration() = AuthenticatedAction.requireAdminUser { implicit user =>
     implicit request =>
       Ok(views.html.administration(users = Users.fetchAll(), Forms.addUserForm))
   }
 
-  def addUser() = ActionWithAdminUser { implicit user =>
+  def addUser() = AuthenticatedAction.requireAdminUser { implicit user =>
     implicit request =>
       Forms.addUserForm.bindFromRequest.fold(
         formWithErrors => BadRequest(views.html.administration(users = Users.fetchAll(), formWithErrors)),
