@@ -4,14 +4,14 @@ import scala.collection.mutable
 
 import org.apache.http.annotation.GuardedBy
 
-import models.manager.Identifiable
+import models.manager.Entity
 
 object HelperCache {
   trait CacheIdentifier[R] {
     protected def invalidateWhenUpdating: PartialFunction[Any, Boolean] = PartialFunction.empty
     protected def invalidateWhenUpdatingEntity(oldValue: R): PartialFunction[Any, Boolean] = PartialFunction.empty
 
-    private[helpers] def combinedInvalidateWhenUpdating(oldValue: R, entity: Identifiable[_]): Boolean = {
+    private[helpers] def combinedInvalidateWhenUpdating(oldValue: R, entity: Entity[_]): Boolean = {
       val combinedInvalidate = invalidateWhenUpdating orElse invalidateWhenUpdatingEntity(oldValue)
       if (combinedInvalidate.isDefinedAt(entity)) combinedInvalidate(entity) else false
     }
@@ -29,7 +29,7 @@ object HelperCache {
     cache(identifier).value.asInstanceOf[R]
   }
 
-  def invalidateCache(entity: Identifiable[_]): Unit = lock.synchronized {
+  def invalidateCache(entity: Entity[_]): Unit = lock.synchronized {
     for ((identifier, entry) <- cache) {
       if (entry.invalidateWhenUpdating(entity)) {
         cache.remove(identifier)
@@ -50,7 +50,7 @@ object HelperCache {
                                    expensiveFunction: () => R) {
     def recalculated(): CacheEntry[R] = CacheEntry(identifier, expensiveFunction)
 
-    private[helpers] def invalidateWhenUpdating(entity: Identifiable[_]): Boolean =
+    private[helpers] def invalidateWhenUpdating(entity: Entity[_]): Boolean =
       identifier.combinedInvalidateWhenUpdating(value, entity)
   }
 

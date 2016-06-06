@@ -9,14 +9,14 @@ import common.ScalaUtils.objectName
 import models.SlickUtils.dbApi._
 import models.{User, Users}
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
-import models.manager.{EntityTable, ForwardingEntityManager, Identifiable, EntityManager}
+import models.manager.{EntityTable, ForwardingEntityManager, Entity, EntityManager}
 import models.accounting.config.Config
 import models.accounting.config.{Category, Account, MoneyReservoir}
 
 case class UpdateLog(userId: Long,
                      change: String,
                      date: DateTime = Clock.now,
-                     idOption: Option[Long] = None) extends Identifiable[UpdateLog] {
+                     idOption: Option[Long] = None) extends Entity[UpdateLog] {
   require(userId > 0)
   require(!change.isEmpty)
   for (idVal <- idOption) require(idVal > 0)

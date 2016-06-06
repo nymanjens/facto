@@ -3,7 +3,7 @@ package models.manager
 import slick.lifted.{AbstractTable, TableQuery}
 
 /** EntityManager base implementation that forwards all calls to a given delegate. */
-abstract class ForwardingEntityManager[E <: Identifiable[E], T <: AbstractTable[E]](delegate: EntityManager[E, T])
+abstract class ForwardingEntityManager[E <: Entity[E], T <: AbstractTable[E]](delegate: EntityManager[E, T])
   extends EntityManager[E, T] {
 
   // ********** Management methods ********** //

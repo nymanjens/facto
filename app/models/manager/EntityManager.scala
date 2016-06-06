@@ -7,7 +7,7 @@ import slick.lifted.{AbstractTable, TableQuery}
 import models.SlickUtils.dbApi._
 
 /** Provides access to persisted entries. */
-trait EntityManager[E <: Identifiable[E], T <: AbstractTable[E]] {
+trait EntityManager[E <: Entity[E], T <: AbstractTable[E]] {
 
   // ********** Management methods ********** //
   /** Initializes this manager. This is called once at the start of the application. */
@@ -46,9 +46,9 @@ object EntityManager {
     *
     * @param cached if true, the manager is decorated with a caching layer that loads all data in memory.
     */
-  def create[E <: Identifiable[E], T <: EntityTable[E]](cons: Tag => T,
-                                                        tableName: String,
-                                                        cached: Boolean = false
+  def create[E <: Entity[E], T <: EntityTable[E]](cons: Tag => T,
+                                                  tableName: String,
+                                                  cached: Boolean = false
                                                        ): EntityManager[E, T] = {
     var result: EntityManager[E, T] = new DatabaseBackedEntityManager[E, T](cons, tableName)
     if (cached) {

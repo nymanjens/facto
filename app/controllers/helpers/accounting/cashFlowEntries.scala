@@ -7,7 +7,7 @@ import com.github.nscala_time.time.Imports._
 import models.SlickUtils.dbApi._
 
 import models.SlickUtils.{dbRun, JodaToSqlDateMapper}
-import models.manager.Identifiable
+import models.manager.Entity
 import models.accounting._
 import models.accounting.config.{Account, MoneyReservoir, Category}
 import controllers.helpers.HelperCache

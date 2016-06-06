@@ -6,7 +6,7 @@ import common.Clock
 import models.{User, Users}
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
-import models.manager.{EntityTable, Identifiable, EntityManager, ForwardingEntityManager}
+import models.manager.{EntityTable, Entity, EntityManager, ForwardingEntityManager}
 import models.accounting.config.{Config, MoneyReservoir}
 
 case class BalanceCheck(issuerId: Long,
@@ -14,7 +14,7 @@ case class BalanceCheck(issuerId: Long,
                         balance: Money,
                         createdDate: DateTime = Clock.now,
                         checkDate: DateTime,
-                        idOption: Option[Long] = None) extends Identifiable[BalanceCheck] {
+                        idOption: Option[Long] = None) extends Entity[BalanceCheck] {
 
   override def withId(id: Long) = copy(idOption = Some(id))
 

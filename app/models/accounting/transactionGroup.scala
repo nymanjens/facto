@@ -8,11 +8,11 @@ import common.Clock
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
 import models.SlickUtils.JodaToSqlDateMapper
-import models.manager.{EntityTable, Identifiable, EntityManager, ForwardingEntityManager}
+import models.manager.{EntityTable, Entity, EntityManager, ForwardingEntityManager}
 
 
 case class TransactionGroup(createdDate: DateTime = Clock.now,
-                            idOption: Option[Long] = None) extends Identifiable[TransactionGroup] {
+                            idOption: Option[Long] = None) extends Entity[TransactionGroup] {
 
   override def withId(id: Long) = copy(idOption = Some(id))
 

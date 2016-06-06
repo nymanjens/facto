@@ -6,8 +6,8 @@ import scala.collection.immutable.Seq
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
 
-private[manager] final class DatabaseBackedEntityManager[E <: Identifiable[E], T <: EntityTable[E]](cons: Tag => T,
-                                                                                   val tableName: String)
+private[manager] final class DatabaseBackedEntityManager[E <: Entity[E], T <: EntityTable[E]](cons: Tag => T,
+                                                                                              val tableName: String)
   extends EntityManager[E, T] {
 
   // ********** Implementation of EntityManager interface - Management methods ********** //

@@ -7,7 +7,7 @@ import org.joda.time.DateTime
 import common.Clock
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
-import models.manager.{EntityTable, Identifiable, EntityManager, ForwardingEntityManager}
+import models.manager.{EntityTable, Entity, EntityManager, ForwardingEntityManager}
 import models.{User, Users}
 import models.accounting.config.Config
 import models.accounting.config.{Category, Account, MoneyReservoir}
@@ -23,7 +23,7 @@ case class Transaction(transactionGroupId: Long,
                        createdDate: DateTime = Clock.now,
                        transactionDate: DateTime,
                        consumedDate: DateTime,
-                       idOption: Option[Long] = None) extends Identifiable[Transaction] {
+                       idOption: Option[Long] = None) extends Entity[Transaction] {
   require(transactionGroupId > 0)
   require(issuerId > 0)
   require(!beneficiaryAccountCode.isEmpty)

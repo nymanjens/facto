@@ -8,7 +8,7 @@ import slick.lifted.AbstractTable
 import org.apache.http.annotation.GuardedBy
 
 /** Caching decorator for an EntityManager that loads all data in memory and keeps it in sync with all updates. */
-private[manager] final class CachingEntityManager[E <: Identifiable[E], T <: AbstractTable[E]](delegate: EntityManager[E,T])
+private[manager] final class CachingEntityManager[E <: Entity[E], T <: AbstractTable[E]](delegate: EntityManager[E,T])
   extends ForwardingEntityManager[E,T](delegate) {
 
   @GuardedBy("lock")

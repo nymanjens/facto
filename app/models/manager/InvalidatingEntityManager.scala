@@ -8,7 +8,7 @@ import org.apache.http.annotation.GuardedBy
 import controllers.helpers.HelperCache
 
 /** TODO. */
-private[manager] final class InvalidatingEntityManager[E <: Identifiable[E], T <: AbstractTable[E]](delegate: EntityManager[E, T])
+private[manager] final class InvalidatingEntityManager[E <: Entity[E], T <: AbstractTable[E]](delegate: EntityManager[E, T])
   extends ForwardingEntityManager[E, T](delegate) {
 
   // ********** Implementation of EntityManager interface: Mutators ********** //
