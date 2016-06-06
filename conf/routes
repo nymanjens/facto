@@ -5,6 +5,7 @@
 # General
 GET  /                                 controllers.Application.index
 GET  /docachemanagement/:applicationSecret/  controllers.Application.doCacheManagement(applicationSecret)
+GET  /warmupcaches/:applicationSecret/ controllers.Application.warmUpCaches(applicationSecret)
 
 # Auth
 GET  /login/                           controllers.Auth.login

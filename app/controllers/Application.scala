@@ -1,5 +1,7 @@
 package controllers
 
+import scala.collection.immutable.Seq
+
 import play.api.data.Form
 import play.api.mvc._
 import play.api.data.Forms._
@@ -9,7 +11,7 @@ import play.Play.application
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 
-import models.{Tables, Users}
+import models.{Tables, Users, User}
 import controllers.accounting.Views
 import controllers.helpers.{HelperCache, AuthenticatedAction}
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
@@ -29,6 +31,26 @@ object Application extends Controller {
       entityManager.verifyConsistency()
     }
     HelperCache.verifyConsistency()
+
+    Ok("OK")
+  }
+
+  /** Warms up caches by rendering the most used views. */
+  def warmUpCaches(applicationSecret: String) = Action { implicit request =>
+    validateApplicationSecret(applicationSecret)
+
+    val admin: User = Users.findByLoginName("admin").get
+
+    val actions: Seq[AuthenticatedAction] = Seq(
+      Views.generalLatest,
+      Views.cashFlowOfAll,
+      Views.liquidationOfAll,
+      Views.endowmentsOfAll,
+      Views.summaryForCurrentYear
+    )
+    for (action <- actions) {
+      action.calculateResult(admin, request)
+    }
 
     Ok("OK")
   }
@@ -72,7 +94,7 @@ object Application extends Controller {
   }
 
   // ********** private helper methods ********** //
-  private def validateApplicationSecret(applicationSecret:String) = {
+  private def validateApplicationSecret(applicationSecret: String) = {
     val realApplicationSecret = application.configuration.getString("play.crypto.secret")
     require(applicationSecret == realApplicationSecret, "Invalid application secret")
   }
