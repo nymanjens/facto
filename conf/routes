@@ -4,7 +4,7 @@
 
 # General
 GET  /                                 controllers.Application.index
-GET  /verifycacheconsistency/:applicationSecret/  controllers.Application.verifyCacheConsistency(applicationSecret)
+GET  /docachemanagement/:applicationSecret/  controllers.Application.doCacheManagement(applicationSecret)
 
 # Auth
 GET  /login/                           controllers.Auth.login

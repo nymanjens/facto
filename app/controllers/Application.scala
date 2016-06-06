@@ -10,6 +10,7 @@ import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 
 import models.{Tables, Users}
+import controllers.accounting.Views
 import controllers.helpers.{HelperCache, AuthenticatedAction}
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 
@@ -21,9 +22,8 @@ object Application extends Controller {
       Redirect(controllers.accounting.routes.Views.cashFlowOfAll)
   }
 
-  def verifyCacheConsistency(applicationSecret: String) = Action { implicit request =>
-    val realApplicationSecret = application.configuration.getString("play.crypto.secret")
-    require(applicationSecret == realApplicationSecret, "Invalid application secret")
+  def doCacheManagement(applicationSecret: String) = Action { implicit request =>
+    validateApplicationSecret(applicationSecret)
 
     for (entityManager <- Tables.allEntityManagers) {
       entityManager.verifyConsistency()
@@ -69,6 +69,12 @@ object Application extends Controller {
             Redirect(routes.Application.administration).flashing("message" -> message)
         }
       )
+  }
+
+  // ********** private helper methods ********** //
+  private def validateApplicationSecret(applicationSecret:String) = {
+    val realApplicationSecret = application.configuration.getString("play.crypto.secret")
+    require(applicationSecret == realApplicationSecret, "Invalid application secret")
   }
 
   // ********** forms ********** //
