@@ -1,44 +1,42 @@
 package controllers.helpers
 
+import scala.collection.immutable.Seq
 import scala.collection.mutable
 
+import com.google.common.cache.{Cache, CacheBuilder}
 import org.apache.http.annotation.GuardedBy
+import org.joda.time.Period
 
-import common.cache.CacheMaintenanceManager
+import common.cache.{SynchronizedCache, CacheMaintenanceManager}
 import models.manager.Entity
 
 object HelperCache {
   CacheMaintenanceManager.registerCache(
-    doMaintenance = doMaintenance,
     verifyConsistency = verifyConsistency,
     invalidateCache = invalidateCache)
 
-  @GuardedBy("lock")
-  private val cache: mutable.Map[CacheIdentifier[_], CacheEntry[_]] = mutable.Map[CacheIdentifier[_], CacheEntry[_]]()
-  private val lock = new Object
+  private val cache: SynchronizedCache[CacheIdentifier[_], CacheEntry[_]] =
+    new SynchronizedCache(expireAfterAccess = Period.hours(32))
 
-  def cached[R](identifier: CacheIdentifier[R])(expensiveValue: => R): R = lock.synchronized {
+  def cached[R](identifier: CacheIdentifier[R])(expensiveValue: => R): R = {
     val expensiveFunction = () => expensiveValue
-    if (!cache.contains(identifier)) {
-      cache.put(identifier, CacheEntry(identifier, expensiveFunction))
-    }
-    cache(identifier).value.asInstanceOf[R]
+    val cacheEntry = cache.getOrCalculate(
+      identifier,
+      () => CacheEntry.calculate(identifier, expensiveFunction)
+    )
+    cacheEntry.value.asInstanceOf[R]
   }
 
-  private def invalidateCache(entity: Entity[_]): Unit = lock.synchronized {
-    for ((identifier, entry) <- cache) {
+  private def invalidateCache(entity: Entity[_]): Unit = {
+    cache.foreachWithLock { entry =>
       if (entry.invalidateWhenUpdating(entity)) {
-        cache.remove(identifier)
+        cache.invalidate(entry.identifier)
       }
     }
   }
 
-  private def doMaintenance(): Unit = lock.synchronized {
-    // TOOD: implement
-  }
-
-  private def verifyConsistency(): Unit = lock.synchronized {
-    for ((identifier, entry) <- cache) {
+  private def verifyConsistency(): Unit = {
+    cache.foreachWithLock { entry =>
       val cachedValue = entry.value
       val newValue = entry.expensiveFunction()
       require(cachedValue == newValue, s"cachedValue = $cachedValue != newValue = $newValue")
@@ -58,14 +56,14 @@ object HelperCache {
   private case class CacheEntry[R](identifier: CacheIdentifier[R],
                                    value: R,
                                    expensiveFunction: () => R) {
-    def recalculated(): CacheEntry[R] = CacheEntry(identifier, expensiveFunction)
+    def recalculated(): CacheEntry[R] = CacheEntry.calculate(identifier, expensiveFunction)
 
     private[helpers] def invalidateWhenUpdating(entity: Entity[_]): Boolean =
       identifier.combinedInvalidateWhenUpdating(value, entity)
   }
 
   private object CacheEntry {
-    def apply[R](identifier: CacheIdentifier[R], expensiveFunction: () => R): CacheEntry[R] = {
+    def calculate[R](identifier: CacheIdentifier[R], expensiveFunction: () => R): CacheEntry[R] = {
       CacheEntry(identifier, expensiveFunction(), expensiveFunction)
     }
   }
