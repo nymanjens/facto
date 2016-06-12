@@ -7,7 +7,7 @@ import java.util.function.BiConsumer
 import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.Callable
 
-import org.joda.time.Period
+import org.joda.time.Duration
 import org.apache.http.annotation.GuardedBy
 import com.google.common.cache.{Cache, CacheBuilder, LoadingCache, CacheLoader}
 
@@ -18,7 +18,7 @@ trait SynchronizedCache[K <: Object, V <: Object] {
 }
 
 object SynchronizedCache {
-  def apply[K <: Object, V <: Object](expireAfterAccess: Period = Period.years(99),
+  def apply[K <: Object, V <: Object](expireAfterAccess: Duration = Duration.standardDays(99999),
                                       maximumSize: Long = Long.MaxValue): SynchronizedCache[K, V] = {
     new GuavaBackedSynchronizedCache[K, V](expireAfterAccess, maximumSize)
   }

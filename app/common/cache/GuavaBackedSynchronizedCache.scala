@@ -4,21 +4,21 @@ import scala.collection.immutable.Seq
 import scala.collection.mutable
 
 import java.util.function.BiConsumer
-import java.util.concurrent.TimeUnit.SECONDS
+import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.Callable
 
-import org.joda.time.Period
+import org.joda.time.Duration
 import org.apache.http.annotation.GuardedBy
 import com.google.common.cache.{Cache, CacheBuilder, LoadingCache, CacheLoader}
 
-class GuavaBackedSynchronizedCache[K <: Object, V <: Object](expireAfterAccess: Period, maximumSize: Long)
+class GuavaBackedSynchronizedCache[K <: Object, V <: Object](expireAfterAccess: Duration, maximumSize: Long)
   extends SynchronizedCache[K, V] {
   CacheMaintenanceManager.registerCache(doMaintenance = () => guavaCache.cleanUp())
 
   @GuardedBy("lock (all reads and writes)")
   private val guavaCache: Cache[K, V] = CacheBuilder.newBuilder()
     .maximumSize(maximumSize)
-    .expireAfterAccess(expireAfterAccess.getSeconds, SECONDS)
+    .expireAfterAccess(expireAfterAccess.getMillis, MILLISECONDS)
     .build[K, V]()
 
   private val lock = new Object
@@ -27,7 +27,7 @@ class GuavaBackedSynchronizedCache[K <: Object, V <: Object](expireAfterAccess: 
     val currentValue = lock synchronized {
       Option(guavaCache.getIfPresent(key))
     }
-    
+
     if (currentValue.isDefined) {
       currentValue.get
     } else {

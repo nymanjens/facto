@@ -2,7 +2,7 @@ package controllers.helpers
 
 import scala.collection.immutable.Seq
 
-import org.joda.time.Period
+import org.joda.time.Duration
 
 import common.cache.{SynchronizedCache, CacheMaintenanceManager}
 import models.manager.Entity
@@ -13,7 +13,7 @@ object ControllerHelperCache {
     invalidateCache = invalidateCache)
 
   private val cache: SynchronizedCache[CacheIdentifier[_], CacheEntry[_]] =
-    SynchronizedCache(expireAfterAccess = Period.hours(32))
+    SynchronizedCache(expireAfterAccess = Duration.standardHours(32))
 
   def cached[R](identifier: CacheIdentifier[R])(expensiveValue: => R): R = {
     val expensiveFunction = () => expensiveValue
