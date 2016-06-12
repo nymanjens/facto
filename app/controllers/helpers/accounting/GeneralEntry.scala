@@ -9,8 +9,8 @@ import models.SlickUtils.dbApi._
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
 import models.accounting.{Transaction, Transactions}
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
-import controllers.helpers.HelperCache
-import controllers.helpers.HelperCache.CacheIdentifier
+import controllers.helpers.ControllerHelperCache
+import controllers.helpers.ControllerHelperCache.CacheIdentifier
 
 case class GeneralEntry(override val transactions: Seq[Transaction])
   extends GroupedTransactions(transactions)
@@ -36,7 +36,7 @@ object GeneralEntry {
 
   /* Returns most recent n entries sorted from old to new. */
   def fetchLastNEndowments(account: Account, n: Int): Seq[GeneralEntry] =
-    HelperCache.cached(FetchLastNEndowments(account, n)) {
+    ControllerHelperCache.cached(FetchLastNEndowments(account, n)) {
       val transactions: Seq[Transaction] =
         dbRun(
           Transactions.newQuery

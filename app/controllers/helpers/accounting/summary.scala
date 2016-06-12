@@ -18,8 +18,8 @@ import models.SlickUtils.{dbRun, JodaToSqlDateMapper}
 import models.accounting.{Transactions, Transaction, Money}
 import models.accounting.config.{Category, Account}
 import models.accounting.config.Account.SummaryTotalRowDef
-import controllers.helpers.HelperCache
-import controllers.helpers.HelperCache.CacheIdentifier
+import controllers.helpers.ControllerHelperCache
+import controllers.helpers.ControllerHelperCache.CacheIdentifier
 
 case class Summary(yearToSummary: Map[Int, SummaryForYear],
                    categories: Seq[Category],
@@ -66,7 +66,7 @@ object Summary {
   }
 
   private def getSummaryYears(account: Account, expandedYear: Int, thisYear: Int): Seq[Int] =
-    HelperCache.cached(GetSummaryYears(account, expandedYear, thisYear)) {
+    ControllerHelperCache.cached(GetSummaryYears(account, expandedYear, thisYear)) {
       val allTransactions = dbRun(
         Transactions.newQuery
           .filter(_.beneficiaryAccountCode === account.code))
@@ -106,7 +106,7 @@ case class SummaryForYear(cells: ImmutableTable[Category, DatedMonth, SummaryCel
 object SummaryForYear {
 
   private[accounting] def fetch(account: Account, monthRangeForAverages: MonthRange, year: Int): SummaryForYear =
-    HelperCache.cached(GetSummaryForYear(account, monthRangeForAverages, year)) {
+    ControllerHelperCache.cached(GetSummaryForYear(account, monthRangeForAverages, year)) {
       val transactions: Seq[Transaction] = {
         val yearRange = MonthRange.forYear(year)
         dbRun(Transactions.newQuery

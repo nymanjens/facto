@@ -14,7 +14,7 @@ import play.api.i18n.Messages.Implicits._
 import common.cache.CacheMaintenanceManager
 import models.{Tables, Users, User}
 import controllers.accounting.Views
-import controllers.helpers.{HelperCache, AuthenticatedAction}
+import controllers.helpers.{ControllerHelperCache, AuthenticatedAction}
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 
 object Application extends Controller {

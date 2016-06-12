@@ -6,7 +6,7 @@ import slick.lifted.{AbstractTable, TableQuery}
 import org.apache.http.annotation.GuardedBy
 
 import common.cache.CacheMaintenanceManager
-import controllers.helpers.HelperCache
+import controllers.helpers.ControllerHelperCache
 
 /** TODO. */
 private[manager] final class InvalidatingEntityManager[E <: Entity[E], T <: AbstractTable[E]](delegate: EntityManager[E, T])

@@ -10,8 +10,8 @@ import models.SlickUtils.{dbRun, JodaToSqlDateMapper}
 import models.manager.Entity
 import models.accounting._
 import models.accounting.config.{Account, MoneyReservoir, Category}
-import controllers.helpers.HelperCache
-import controllers.helpers.HelperCache.CacheIdentifier
+import controllers.helpers.ControllerHelperCache
+import controllers.helpers.ControllerHelperCache.CacheIdentifier
 
 sealed trait CashFlowEntry
 
@@ -26,7 +26,7 @@ object CashFlowEntry {
     * Returns the last n CashFlowEntries for the given reservoir, ordered from old to new.
     */
   def fetchLastNEntries(moneyReservoir: MoneyReservoir, n: Int): Seq[CashFlowEntry] =
-    HelperCache.cached(FetchLastNEntries(moneyReservoir, n)) {
+    ControllerHelperCache.cached(FetchLastNEntries(moneyReservoir, n)) {
       val (oldestBalanceDate, initialBalance): (DateTime, Money) = {
         val numTransactionsToFetch = 3 * n
         val totalNumTransactions = dbRun(Transactions.newQuery

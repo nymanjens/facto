@@ -6,8 +6,8 @@ import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
 import models.accounting.{Transaction, Transactions, Money}
 import models.accounting.config.{Account, MoneyReservoir, Category}
 import models.SlickUtils.dbApi._
-import controllers.helpers.HelperCache
-import controllers.helpers.HelperCache.CacheIdentifier
+import controllers.helpers.ControllerHelperCache
+import controllers.helpers.ControllerHelperCache.CacheIdentifier
 
 /**
   * @param debt The debt of the first account to the second (may be negative).
@@ -19,7 +19,7 @@ object LiquidationEntry {
 
   /* Returns most recent n entries sorted from old to new. */
   def fetchLastNEntries(accountPair: AccountPair, n: Int): Seq[LiquidationEntry] =
-    HelperCache.cached(FetchLastNEntries(accountPair, n)) {
+    ControllerHelperCache.cached(FetchLastNEntries(accountPair, n)) {
       val allTransactions: List[Transaction] =
         dbRun(Transactions.newQuery.sortBy(r => (r.transactionDate, r.createdDate))).toList
 

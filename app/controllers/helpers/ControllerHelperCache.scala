@@ -1,16 +1,13 @@
 package controllers.helpers
 
 import scala.collection.immutable.Seq
-import scala.collection.mutable
 
-import com.google.common.cache.{Cache, CacheBuilder}
-import org.apache.http.annotation.GuardedBy
 import org.joda.time.Period
 
 import common.cache.{SynchronizedCache, CacheMaintenanceManager}
 import models.manager.Entity
 
-object HelperCache {
+object ControllerHelperCache {
   CacheMaintenanceManager.registerCache(
     verifyConsistency = verifyConsistency,
     invalidateCache = invalidateCache)
