@@ -22,4 +22,9 @@ object SynchronizedCache {
                                       maximumSize: Long = Long.MaxValue): SynchronizedCache[K, V] = {
     new GuavaBackedSynchronizedCache[K, V](expireAfterAccess, maximumSize)
   }
+
+  def hashingKeys[K <: UniquelyHashable, V <: Object](expireAfterAccess: Duration = Duration.standardDays(99999),
+                                                      maximumSize: Long = Long.MaxValue): SynchronizedCache[K, V] = {
+    new KeyHashingSynchronizedCache[K, V](SynchronizedCache[String, V](expireAfterAccess, maximumSize))
+  }
 }

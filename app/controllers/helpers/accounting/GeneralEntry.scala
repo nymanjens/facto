@@ -1,10 +1,13 @@
 package controllers.helpers.accounting
 
 import collection.immutable.Seq
+import scala.collection.JavaConverters._
 
+import com.google.common.base.Joiner
 import org.joda.time.DateTime
 import com.github.nscala_time.time.Imports._
 
+import common.cache.UniquelyHashable
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
 import models.accounting.{Transaction, Transactions}
@@ -13,7 +16,12 @@ import controllers.helpers.ControllerHelperCache
 import controllers.helpers.ControllerHelperCache.CacheIdentifier
 
 case class GeneralEntry(override val transactions: Seq[Transaction])
-  extends GroupedTransactions(transactions)
+  extends GroupedTransactions(transactions) with UniquelyHashable {
+
+  override lazy val uniqueHash =
+    // Transactions are immutable
+    Joiner.on("*").join(transactions.map(_.id).asJava)
+}
 
 object GeneralEntry {
 
