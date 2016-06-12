@@ -26,7 +26,7 @@
       <th>User</th>
       <th>Date</th>
       <th>Description</th>
-    } { (entry, _) =>  @* table datas *@
+    } { entry =>  @* table datas *@
       <td>@entry.user.name</td>
       <td>@formatDateTime(entry.date)</td>
       <td>@entry.change</td>

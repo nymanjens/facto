@@ -42,7 +42,7 @@
       <th>Description</th>
       <th>Flow (@CurrencyUnit.default.htmlSymbol)</th>
       <th>&nbsp;</th>
-    } { (entry, _) =>  @* table datas *@
+    } { entry =>  @* table datas *@
       <td>@entry.issuer.name</td>
       <td>@entry.transactionDates.map(formatDate).mkString(", ")</td>
       <td>@entry.consumedDates.map(formatDate).mkString(", ")</td>

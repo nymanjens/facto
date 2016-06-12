@@ -27,7 +27,7 @@
     ) { @* panel content *@
 
       @for(reservoir <- reservoirs) {
-        @viewhelpers.accounting.Table(
+        @viewhelpers.accounting.Table.withIndexedEntries(
           title = reservoir.name,
           tableClasses = "table-cashflow",
           allEntriesLink = (reservoirToEntries(reservoir).size > expandedNumEntries) match {

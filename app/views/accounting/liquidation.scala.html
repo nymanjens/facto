@@ -47,7 +47,7 @@
             @LiquidationRepayButton(account1, account2, entries.last.debt)
           }
         </th>
-      } { (entry, _) =>  @* table datas *@
+      } { entry =>  @* table datas *@
         <td>@entry.transactionDates.map(formatDate).mkString(", ")</td>
         <td>@entry.beneficiaries.map(_.shorterName).mkString(", ")</td>
         <td>@entry.moneyReservoirs.map(_.shorterName).mkString(", ")</td>
