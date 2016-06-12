@@ -13,7 +13,7 @@ object ControllerHelperCache {
     invalidateCache = invalidateCache)
 
   private val cache: SynchronizedCache[CacheIdentifier[_], CacheEntry[_]] =
-    new SynchronizedCache(expireAfterAccess = Period.hours(32))
+    SynchronizedCache(expireAfterAccess = Period.hours(32))
 
   def cached[R](identifier: CacheIdentifier[R])(expensiveValue: => R): R = {
     val expensiveFunction = () => expensiveValue
