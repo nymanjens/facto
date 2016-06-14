@@ -1,20 +1,19 @@
 package controllers.helpers.accounting
 
-import collection.immutable.Seq
-
-import com.google.common.base.Charsets
-import com.google.common.hash.{Hashing, HashCode}
-import org.joda.time.DateTime
-import com.github.nscala_time.time.Imports._
-
+import com.google.common.hash.Hashing
 import common.cache.UniquelyHashable
-import models.SlickUtils.dbApi._
-import models.SlickUtils.{dbRun, JodaToSqlDateMapper}
-import models.manager.Entity
-import models.accounting._
-import models.accounting.config.{Account, MoneyReservoir, Category}
+import common.cache.UniquelyHashable.UniquelyHashableIterableFunnel
 import controllers.helpers.ControllerHelperCache
 import controllers.helpers.ControllerHelperCache.CacheIdentifier
+import models.SlickUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
+import models.SlickUtils.dbApi._
+import com.github.nscala_time.time.Imports._
+import models.SlickUtils.dbRun
+import models.accounting._
+import models.accounting.config.MoneyReservoir
+import org.joda.time.DateTime
+
+import scala.collection.immutable.Seq
 
 sealed trait CashFlowEntry extends UniquelyHashable
 
@@ -22,27 +21,16 @@ case class RegularEntry(override val transactions: Seq[Transaction], balance: Mo
   extends GroupedTransactions(transactions) with CashFlowEntry {
 
   override val uniqueHash = {
-    val hasher = Hashing.sha1().newHasher()
-    for (transaction <- transactions) {
-      // Transactions are immutable
-      hasher.putLong(transaction.id)
-      // Heuristic (TODO: document)
-      hasher.putInt(transaction.hashCode())
-    }
-    hasher.putLong(balance.cents)
-    hasher.putBoolean(balanceVerified)
-    hasher.hash().toString
+    Hashing.sha1().newHasher()
+      .putObject(transactions, UniquelyHashableIterableFunnel)
+      .putLong(balance.cents)
+      .putBoolean(balanceVerified)
+      .hash()
   }
 }
 
 case class BalanceCorrection(balanceCheck: BalanceCheck) extends CashFlowEntry {
-  override val uniqueHash = {
-    val hasher = Hashing.sha1().newHasher()
-    hasher.putLong(balanceCheck.id)
-    hasher.putLong(balanceCheck.balance.cents)
-    hasher.putInt(balanceCheck.hashCode())
-    hasher.hash().toString
-  }
+  override val uniqueHash = balanceCheck.uniqueHash
 }
 
 object CashFlowEntry {

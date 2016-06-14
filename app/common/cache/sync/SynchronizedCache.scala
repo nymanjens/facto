@@ -1,5 +1,6 @@
 package common.cache.sync
 
+import com.google.common.hash.HashCode
 import common.cache.UniquelyHashable
 import org.joda.time.Duration
 
@@ -17,6 +18,6 @@ object SynchronizedCache {
 
   def hashingKeys[K <: UniquelyHashable, V <: Object](expireAfterAccess: Duration = Duration.standardDays(99999),
                                                       maximumSize: Long = Long.MaxValue): SynchronizedCache[K, V] = {
-    new KeyHashingSynchronizedCache[K, V](SynchronizedCache[String, V](expireAfterAccess, maximumSize))
+    new KeyHashingSynchronizedCache[K, V](SynchronizedCache[HashCode, V](expireAfterAccess, maximumSize))
   }
 }

@@ -3,6 +3,7 @@ package viewhelpers.accounting
 import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
 import common.cache.UniquelyHashable
+import common.cache.UniquelyHashable.UniquelyHashableIterableFunnel
 import common.cache.sync.SynchronizedCache
 import common.cache.versioned.VersionedKeyValueCache
 import org.joda.time.Duration
@@ -46,7 +47,7 @@ object Table {
                                     entries: Seq[T])
                                    (tableHeaders: Html)
                                    (entryToTableDatas: T => Html): Html = {
-    val tableIdentifier = TableIdentifier(tableTypeIdentifierForCache,  numEntriesShownByDefault)
+    val tableIdentifier = TableIdentifier(tableTypeIdentifierForCache, numEntriesShownByDefault)
     val tableContentIdentifier = TableContentIdentifier(entries)
 
     tableCache.getOrCalculate(tableIdentifier, tableContentIdentifier, () => {
@@ -84,28 +85,37 @@ object Table {
                              numEntriesShownByDefault: Int) extends UniquelyHashable {
 
     override val uniqueHash = {
-      val hasher = Hashing.sha1().newHasher()
-      hasher.putString(tableType, Charsets.UTF_8)
-      hasher.putInt(numEntriesShownByDefault)
-      hasher.hash().toString
+      Hashing.sha1().newHasher()
+        .putString(tableType, Charsets.UTF_8)
+        .putInt(numEntriesShownByDefault)
+        .hash()
     }
   }
 
   case class TableContentIdentifier(entries: Seq[UniquelyHashable]) extends UniquelyHashable {
 
     override val uniqueHash = {
-      val hasher = Hashing.sha1().newHasher()
-      for (entry <- entries) {
-        hasher.putUnencodedChars(entry.uniqueHash)
-      }
-      hasher.hash().toString
+      Hashing.sha1().newHasher()
+        .putObject(entries, UniquelyHashableIterableFunnel)
+        .hash()
     }
   }
 
   case class RowIdentifier(tableIdentifier: TableIdentifier, entry: UniquelyHashable) extends UniquelyHashable {
-    override val uniqueHash = s"$tableIdentifier!!${entry.uniqueHash}"
+
+    override val uniqueHash = {
+      Hashing.sha1().newHasher()
+        .putObject(Seq(tableIdentifier, entry), UniquelyHashableIterableFunnel)
+        .hash()
+    }
   }
   case class IndexedRowIdentifier(tableIdentifier: TableIdentifier, entry: UniquelyHashable, index: Int) extends UniquelyHashable {
-    override val uniqueHash = s"$tableIdentifier!!${entry.uniqueHash}!!$index"
+
+    override val uniqueHash = {
+      Hashing.sha1().newHasher()
+        .putObject(Seq(tableIdentifier, entry), UniquelyHashableIterableFunnel)
+        .putInt(index)
+        .hash()
+    }
   }
 }

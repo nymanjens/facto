@@ -1,16 +1,18 @@
 package common.cache
 
-import scala.collection.immutable.Seq
-import scala.collection.mutable
-
-import java.util.function.BiConsumer
-import java.util.concurrent.TimeUnit.SECONDS
-import java.util.concurrent.Callable
-
-import org.joda.time.Duration
-import org.apache.http.annotation.GuardedBy
-import com.google.common.cache.{Cache, CacheBuilder, LoadingCache, CacheLoader}
+import com.google.common.hash.{Funnel, HashCode, PrimitiveSink}
 
 trait UniquelyHashable extends Object {
-  def uniqueHash: String
+  def uniqueHash: HashCode
+}
+
+object UniquelyHashable {
+
+  object UniquelyHashableIterableFunnel extends Funnel[Iterable[UniquelyHashable]] {
+    override def funnel(from: Iterable[UniquelyHashable], into: PrimitiveSink): Unit = {
+      for(hashable <- from) {
+        into.putBytes(hashable.uniqueHash.asBytes)
+      }
+    }
+  }
 }

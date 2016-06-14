@@ -1,17 +1,19 @@
 package models.accounting
 
+import com.google.common.hash.Hashing
+
 import scala.util.Try
-
 import org.joda.time.DateTime
-
 import common.Clock
+import common.cache.UniquelyHashable
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
-import models.manager.{EntityTable, Entity, EntityManager, ForwardingEntityManager}
+import models.manager.{Entity, EntityManager, EntityTable, ForwardingEntityManager}
 import models.{User, Users}
 import models.accounting.config.Config
-import models.accounting.config.{Category, Account, MoneyReservoir}
+import models.accounting.config.{Account, Category, MoneyReservoir}
 
+/** Transactions rows should be treated as immutable. Just delete and create new when updating. */
 case class Transaction(transactionGroupId: Long,
                        issuerId: Long,
                        beneficiaryAccountCode: String,
@@ -23,7 +25,7 @@ case class Transaction(transactionGroupId: Long,
                        createdDate: DateTime = Clock.now,
                        transactionDate: DateTime,
                        consumedDate: DateTime,
-                       idOption: Option[Long] = None) extends Entity[Transaction] {
+                       idOption: Option[Long] = None) extends Entity[Transaction] with UniquelyHashable {
   require(transactionGroupId > 0)
   require(issuerId > 0)
   require(!beneficiaryAccountCode.isEmpty)
@@ -33,11 +35,6 @@ case class Transaction(transactionGroupId: Long,
 
   override def withId(id: Long) = copy(idOption = Some(id))
 
-  override def toString = {
-    val issuerString = Try(issuer.loginName).getOrElse(issuerId.toString)
-    s"Transaction(group=$transactionGroupId, issuer=${issuerString}, $beneficiaryAccountCode, $moneyReservoirCode, $categoryCode, flow=$flow, $description)"
-  }
-
   lazy val transactionGroup: TransactionGroup = TransactionGroups.findById(transactionGroupId)
   lazy val issuer: User = Users.findById(issuerId)
   lazy val beneficiary: Account = Config.accounts(beneficiaryAccountCode)
@@ -46,6 +43,19 @@ case class Transaction(transactionGroupId: Long,
 
   /** Returns None if the consumed date is the same as the transaction date (and thus carries no further information. */
   def consumedDateOption: Option[DateTime] = if (consumedDate == transactionDate) None else Some(consumedDate)
+
+
+  override def toString = {
+    val issuerString = Try(issuer.loginName).getOrElse(issuerId.toString)
+    s"Transaction(group=$transactionGroupId, issuer=${issuerString}, $beneficiaryAccountCode, $moneyReservoirCode, $categoryCode, flow=$flow, $description)"
+  }
+
+  override def uniqueHash = Hashing.sha1().newHasher()
+    // Transactions are immutable
+    .putLong(id)
+    // Heuristic: If for some reason a transaction is mutated, the hashCode will most likely change as well
+    .putInt(hashCode())
+    .hash()
 }
 
 case class TransactionPartial(beneficiary: Option[Account],

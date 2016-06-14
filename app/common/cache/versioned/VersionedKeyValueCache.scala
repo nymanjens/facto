@@ -1,8 +1,7 @@
 package common.cache.versioned
 
+import com.google.common.hash.HashCode
 import common.cache.UniquelyHashable
-import common.cache.sync.{GuavaBackedSynchronizedCache, KeyHashingSynchronizedCache}
-import org.joda.time.Duration
 
 trait VersionedKeyValueCache[Key, Version, Value] {
 
@@ -15,5 +14,5 @@ object VersionedKeyValueCache {
     new VersionedKeyValueCacheImpl[Key, Version, Value]()
 
   def hashingKeys[Key <: UniquelyHashable, Version <: UniquelyHashable, Value](): VersionedKeyValueCache[Key, Version, Value] =
-    new HashingVersionedKeyValueCache(new VersionedKeyValueCacheImpl[String, String, Value]())
+    new HashingVersionedKeyValueCache(new VersionedKeyValueCacheImpl[HashCode, HashCode, Value]())
 }
