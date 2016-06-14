@@ -2,21 +2,22 @@ package viewhelpers.accounting
 
 import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
+import common.cache.UniquelyHashable
 import common.cache.sync.SynchronizedCache
-import play.twirl.api.Html
-import play.api.mvc.Call
+import common.cache.versioned.VersionedKeyValueCache
 import org.joda.time.Duration
-import common.cache.{CacheMaintenanceManager, UniquelyHashable}
+import play.api.mvc.Call
+import play.twirl.api.Html
 
 object Table {
 
   private val defaultNumEntriesShown = 20
 
-  private val tableCache: Map[TableCacheIdentifier, TableCacheEntry] =
+  private val tableCache: VersionedKeyValueCache[TableIdentifier, TableContentIdentifier, Html] =
+    VersionedKeyValueCache.hashingKeys()
+  private val rowCache: SynchronizedCache[RowIdentifier, Html] =
     SynchronizedCache.hashingKeys(expireAfterAccess = Duration.standardHours(32))
-  private val rowCache: SynchronizedCache[RowCacheIdentifier, Html] =
-    SynchronizedCache.hashingKeys(expireAfterAccess = Duration.standardHours(32))
-  private val indexedRowCache: SynchronizedCache[IndexedRowCacheIdentifier, Html] =
+  private val indexedRowCache: SynchronizedCache[IndexedRowIdentifier, Html] =
     SynchronizedCache.hashingKeys(expireAfterAccess = Duration.standardHours(32))
 
   def apply[T](title: String, tableClasses: String = "", allEntriesLink: Option[Call] = None, numEntriesShownByDefault: Int = defaultNumEntriesShown, colspan: Int = 9999,
@@ -45,11 +46,12 @@ object Table {
                                     entries: Seq[T])
                                    (tableHeaders: Html)
                                    (entryToTableDatas: T => Html): Html = {
-    val tableIdentifier = TableCacheIdentifier(tableTypeIdentifierForCache, entries, numEntriesShownByDefault)
+    val tableIdentifier = TableIdentifier(tableTypeIdentifierForCache,  numEntriesShownByDefault)
+    val tableContentIdentifier = TableContentIdentifier(entries)
 
-    tableCache.getOrCalculate(tableIdentifier, () => {
+    tableCache.getOrCalculate(tableIdentifier, tableContentIdentifier, () => {
       val tableDatas = entries.map { entry =>
-        val rowIdentifier = RowCacheIdentifier(tableIdentifier, entry)
+        val rowIdentifier = RowIdentifier(tableIdentifier, entry)
         rowCache.getOrCalculate(rowIdentifier, () => entryToTableDatas(entry))
       }
       views.html.accounting.parts.Table(title, tableClasses, allEntriesLink, numEntriesShownByDefault, colspan, tableHeaders, tableDatas)
@@ -66,35 +68,44 @@ object Table {
                                                       entries: Seq[T])
                                                      (tableHeaders: Html)
                                                      (entryToTableDatas: (T, Int) => Html): Html = {
-    val tableIdentifier = TableCacheIdentifier(tableTypeIdentifierForCache, entries, numEntriesShownByDefault)
+    val tableIdentifier = TableIdentifier(tableTypeIdentifierForCache, numEntriesShownByDefault)
+    val tableContentIdentifier = TableContentIdentifier(entries)
 
-    tableCache.getOrCalculate(tableIdentifier, () => {
+    tableCache.getOrCalculate(tableIdentifier, tableContentIdentifier, () => {
       val tableDatas = entries.zipWithIndex.map { case (entry, index) =>
-        val rowIdentifier = IndexedRowCacheIdentifier(tableIdentifier, entry, index)
+        val rowIdentifier = IndexedRowIdentifier(tableIdentifier, entry, index)
         indexedRowCache.getOrCalculate(rowIdentifier, () => entryToTableDatas(entry, index))
       }
       views.html.accounting.parts.Table(title, tableClasses, allEntriesLink, numEntriesShownByDefault, colspan, tableHeaders, tableDatas)
     })
   }
 
-  case class TableCacheIdentifier(tableType: String,
-                                  numEntriesShownByDefault: Int) extends UniquelyHashable {
+  case class TableIdentifier(tableType: String,
+                             numEntriesShownByDefault: Int) extends UniquelyHashable {
 
     override val uniqueHash = {
       val hasher = Hashing.sha1().newHasher()
       hasher.putString(tableType, Charsets.UTF_8)
-      for (entry <- entries) {
-        hasher.putUnencodedChars(entry.uniqueHash)
-      }
       hasher.putInt(numEntriesShownByDefault)
       hasher.hash().toString
     }
   }
 
-  case class RowCacheIdentifier(tableIdentifier: TableCacheIdentifier, entry: UniquelyHashable) extends UniquelyHashable {
+  case class TableContentIdentifier(entries: Seq[UniquelyHashable]) extends UniquelyHashable {
+
+    override val uniqueHash = {
+      val hasher = Hashing.sha1().newHasher()
+      for (entry <- entries) {
+        hasher.putUnencodedChars(entry.uniqueHash)
+      }
+      hasher.hash().toString
+    }
+  }
+
+  case class RowIdentifier(tableIdentifier: TableIdentifier, entry: UniquelyHashable) extends UniquelyHashable {
     override val uniqueHash = s"$tableIdentifier!!${entry.uniqueHash}"
   }
-  case class IndexedRowCacheIdentifier(tableIdentifier: TableCacheIdentifier, entry: UniquelyHashable, index: Int) extends UniquelyHashable {
+  case class IndexedRowIdentifier(tableIdentifier: TableIdentifier, entry: UniquelyHashable, index: Int) extends UniquelyHashable {
     override val uniqueHash = s"$tableIdentifier!!${entry.uniqueHash}!!$index"
   }
 }

@@ -1,14 +1,19 @@
 package common.cache.versioned
 
-import java.util.concurrent.ConcurrentHashMap
+import common.cache.UniquelyHashable
+import common.cache.sync.{GuavaBackedSynchronizedCache, KeyHashingSynchronizedCache}
+import org.joda.time.Duration
 
-final class VersionedKeyValueCache[Key, Version, Value]() {
+trait VersionedKeyValueCache[Key, Version, Value] {
 
-  private val keyToEntries: ConcurrentHashMap[Key, CacheEntry[Value]] = new ConcurrentHashMap()
+  def getOrCalculate(key: Key, version: Version, calculateValueFunc: () => Value): Value
+}
 
-  def getOrCalculate(key: Key, version: Version, calculateValueFunc: () => Value): Value = {
+object VersionedKeyValueCache {
 
-  }
+  def apply[Key, Version, Value](): VersionedKeyValueCache[Key, Version, Value] =
+    new VersionedKeyValueCacheImpl[Key, Version, Value]()
 
-  case class CacheEntry[Value](version: Key, value: Value)
+  def hashingKeys[Key <: UniquelyHashable, Version <: UniquelyHashable, Value](): VersionedKeyValueCache[Key, Version, Value] =
+    new HashingVersionedKeyValueCache(new VersionedKeyValueCacheImpl[String, String, Value]())
 }

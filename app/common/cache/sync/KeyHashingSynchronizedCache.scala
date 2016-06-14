@@ -2,7 +2,7 @@ package common.cache.sync
 
 import common.cache.UniquelyHashable
 
-final class KeyHashingSynchronizedCache[K <: UniquelyHashable, V <: Object](delegate: SynchronizedCache[String, V])
+private[sync] final class KeyHashingSynchronizedCache[K <: UniquelyHashable, V <: Object](delegate: SynchronizedCache[String, V])
   extends SynchronizedCache[K, V] {
 
   override def getOrCalculate(key: K, calculateValueFunc: () => V): V =

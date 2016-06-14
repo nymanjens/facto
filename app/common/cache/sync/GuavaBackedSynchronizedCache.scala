@@ -9,7 +9,7 @@ import common.cache.CacheMaintenanceManager
 import org.apache.http.annotation.GuardedBy
 import org.joda.time.Duration
 
-final class GuavaBackedSynchronizedCache[K <: Object, V <: Object](expireAfterAccess: Duration, maximumSize: Long)
+private[sync] final class GuavaBackedSynchronizedCache[K <: Object, V <: Object](expireAfterAccess: Duration, maximumSize: Long)
   extends SynchronizedCache[K, V] {
   CacheMaintenanceManager.registerCache(doMaintenance = () => guavaCache.cleanUp())
 
