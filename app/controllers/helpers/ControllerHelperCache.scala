@@ -1,10 +1,9 @@
 package controllers.helpers
 
 import scala.collection.immutable.Seq
-
 import org.joda.time.Duration
-
-import common.cache.{SynchronizedCache, CacheMaintenanceManager}
+import common.cache.CacheMaintenanceManager
+import common.cache.sync.SynchronizedCache
 import models.manager.Entity
 
 object ControllerHelperCache {

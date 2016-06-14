@@ -1,17 +1,15 @@
-package common.cache
+package common.cache.sync
 
-import scala.collection.immutable.Seq
-import scala.collection.mutable
-
-import java.util.function.BiConsumer
-import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.Callable
+import java.util.concurrent.TimeUnit.MILLISECONDS
+import java.util.function.BiConsumer
 
-import org.joda.time.Duration
+import com.google.common.cache.{Cache, CacheBuilder}
+import common.cache.CacheMaintenanceManager
 import org.apache.http.annotation.GuardedBy
-import com.google.common.cache.{Cache, CacheBuilder, LoadingCache, CacheLoader}
+import org.joda.time.Duration
 
-class GuavaBackedSynchronizedCache[K <: Object, V <: Object](expireAfterAccess: Duration, maximumSize: Long)
+final class GuavaBackedSynchronizedCache[K <: Object, V <: Object](expireAfterAccess: Duration, maximumSize: Long)
   extends SynchronizedCache[K, V] {
   CacheMaintenanceManager.registerCache(doMaintenance = () => guavaCache.cleanUp())
 

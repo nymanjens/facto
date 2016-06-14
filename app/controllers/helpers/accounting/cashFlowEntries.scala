@@ -3,7 +3,7 @@ package controllers.helpers.accounting
 import collection.immutable.Seq
 
 import com.google.common.base.Charsets
-import com.google.common.hash.{Hashing}
+import com.google.common.hash.{Hashing, HashCode}
 import org.joda.time.DateTime
 import com.github.nscala_time.time.Imports._
 

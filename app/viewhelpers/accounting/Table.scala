@@ -1,18 +1,18 @@
 package viewhelpers.accounting
 
 import com.google.common.base.Charsets
-import com.google.common.hash.{Hashing}
+import com.google.common.hash.Hashing
+import common.cache.sync.SynchronizedCache
 import play.twirl.api.Html
 import play.api.mvc.Call
 import org.joda.time.Duration
-
-import common.cache.{CacheMaintenanceManager, SynchronizedCache, UniquelyHashable}
+import common.cache.{CacheMaintenanceManager, UniquelyHashable}
 
 object Table {
 
   private val defaultNumEntriesShown = 20
 
-  private val tableCache: SynchronizedCache[TableCacheIdentifier, Html] =
+  private val tableCache: Map[TableCacheIdentifier, TableCacheEntry] =
     SynchronizedCache.hashingKeys(expireAfterAccess = Duration.standardHours(32))
   private val rowCache: SynchronizedCache[RowCacheIdentifier, Html] =
     SynchronizedCache.hashingKeys(expireAfterAccess = Duration.standardHours(32))
@@ -78,7 +78,6 @@ object Table {
   }
 
   case class TableCacheIdentifier(tableType: String,
-                                  entries: Seq[UniquelyHashable],
                                   numEntriesShownByDefault: Int) extends UniquelyHashable {
 
     override val uniqueHash = {
