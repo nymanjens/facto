@@ -24,9 +24,9 @@
   ) { @* panel content *@
 
     @for((account, entries) <- accountToEntries) {
-      @viewhelpers.accounting.Table(
+      @viewhelpers.accounting.Table.cached(
         title = s"Endowments of ${account.longName}",
-        //tableTypeIdentifierForCache = ("endowments", account),
+        tableTypeIdentifierForCache = s"endowments_${account.code}",
         tableClasses = "table-endowments",
         allEntriesLink = (entries.size > expandedNumEntries) match {
             case true => Some(controllers.accounting.routes.Views.endowmentsOfSingle(account.code))
