@@ -14,7 +14,6 @@ private[manager] final class CachingEntityManager[E <: Entity[E], T <: AbstractT
   extends ForwardingEntityManager[E, T](delegate) {
   CacheRegistry.registerCache(verifyConsistency = verifyConsistency)
 
-
   @GuardedBy("lock")
   private val cache: mutable.Map[Long, E] = mutable.Map[Long, E]()
   private val lock = new Object
