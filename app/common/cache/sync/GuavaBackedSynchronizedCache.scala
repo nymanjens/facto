@@ -5,13 +5,13 @@ import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.function.BiConsumer
 
 import com.google.common.cache.{Cache, CacheBuilder}
-import common.cache.CacheMaintenanceManager
+import common.cache.CacheRegistry
 import org.apache.http.annotation.GuardedBy
 import org.joda.time.Duration
 
 private[sync] final class GuavaBackedSynchronizedCache[K <: Object, V <: Object](expireAfterAccess: Duration, maximumSize: Long)
   extends SynchronizedCache[K, V] {
-  CacheMaintenanceManager.registerCache(doMaintenance = () => guavaCache.cleanUp())
+  CacheRegistry.registerCache(doMaintenance = () => guavaCache.cleanUp())
 
   @GuardedBy("lock (all reads and writes)")
   private val guavaCache: Cache[K, V] = CacheBuilder.newBuilder()
