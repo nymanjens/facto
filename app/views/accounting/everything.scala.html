@@ -24,10 +24,10 @@
 
     @viewhelpers.accounting.Table.cached(
       title = s"All",
-      tableTypeIdentifierForCache = "general",
-      tableClasses = "table-general",
+      tableTypeIdentifierForCache = "everything",
+      tableClasses = "table-everything",
       allEntriesLink = (entries.size > numEntriesToShow) match {
-          case true => Some(controllers.accounting.routes.Views.generalAll())
+          case true => Some(controllers.accounting.routes.Views.everythingAll())
           case false => None
         },
       numEntriesShownByDefault = numEntriesToShow,

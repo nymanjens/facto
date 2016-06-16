@@ -37,7 +37,7 @@ object Application extends Controller {
 
     val admin: User = Users.findByLoginName("admin").get
     val actions: Seq[AuthenticatedAction] = Seq(
-      Views.generalLatest,
+      Views.everythingLatest,
       Views.cashFlowOfAll,
       Views.liquidationOfAll,
       Views.endowmentsOfAll,

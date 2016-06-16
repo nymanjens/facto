@@ -50,7 +50,7 @@ case class Template(id: Long,
 object Template {
   sealed trait Placement
   object Placement {
-    object GeneralView extends Placement
+    object EverythingView extends Placement
     object CashFlowView extends Placement
     object LiquidationView extends Placement
     object EndowmentsView extends Placement
@@ -58,7 +58,7 @@ object Template {
     object TemplateList extends Placement
 
     def fromString(string: String): Placement = string match {
-      case "GENERAL_VIEW" => GeneralView
+      case "EVERYTHING_VIEW" => EverythingView
       case "CASH_FLOW_VIEW" => CashFlowView
       case "LIQUIDATION_VIEW" => LiquidationView
       case "ENDOWMENTS_VIEW" => EndowmentsView

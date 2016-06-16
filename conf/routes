@@ -24,8 +24,8 @@ GET  /acc/logs/all/                    controllers.accounting.GeneralActions.upd
 GET  /acc/templates/                   controllers.accounting.GeneralActions.templateList
 
 # Accounting - views
-GET  /acc/general/                     controllers.accounting.Views.generalLatest
-GET  /acc/general/all/                 controllers.accounting.Views.generalAll
+GET  /acc/everything/                     controllers.accounting.Views.everythingLatest
+GET  /acc/everything/all/                 controllers.accounting.Views.everythingAll
 GET  /acc/cashflow/                    controllers.accounting.Views.cashFlowOfAll
 GET  /acc/cashflow/:reservoirCode/     controllers.accounting.Views.cashFlowOfSingle(reservoirCode)
 GET  /acc/liquidation/                 controllers.accounting.Views.liquidationOfAll

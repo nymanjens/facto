@@ -39,8 +39,8 @@ $(document).ready(() => {
 
   // Key bindings
   const shortcuts = {
-    'shift+alt+e': "menu-link-general",
-    'shift+alt+a': "menu-link-general",
+    'shift+alt+e': "menu-link-everything",
+    'shift+alt+a': "menu-link-everything",
     'shift+alt+c': "menu-link-cashflow",
     'shift+alt+l': "menu-link-liquidation",
     'shift+alt+v': "menu-link-liquidation",
