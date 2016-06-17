@@ -10,6 +10,7 @@ import models.manager.{Entity, EntityManager, EntityTable, ForwardingEntityManag
 import models.{User, Users}
 import org.joda.time.DateTime
 
+/** BalanceCheck entities are immutable. Just delete and create a new one when updating. */
 case class BalanceCheck(issuerId: Long,
                         moneyReservoirCode: String,
                         balance: Money,

@@ -8,9 +8,9 @@ import common.Clock
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
 import models.SlickUtils.JodaToSqlDateMapper
-import models.manager.{EntityTable, Entity, EntityManager, ForwardingEntityManager}
+import models.manager.{EntityTable, Entity, EntityManager, ImmutableEntityManager}
 
-
+/** Transaction groups should be treated as immutable. */
 case class TransactionGroup(createdDate: DateTime = Clock.now,
                             idOption: Option[Long] = None) extends Entity[TransactionGroup] {
 
@@ -30,6 +30,6 @@ class TransactionGroups(tag: Tag) extends EntityTable[TransactionGroup](tag, Tra
   override def * = (createdDate, id.?) <>(TransactionGroup.tupled, TransactionGroup.unapply)
 }
 
-object TransactionGroups extends ForwardingEntityManager[TransactionGroup, TransactionGroups](
+object TransactionGroups extends ImmutableEntityManager[TransactionGroup, TransactionGroups](
   EntityManager.create[TransactionGroup, TransactionGroups](
     tag => new TransactionGroups(tag), tableName = "TRANSACTION_GROUPS"))

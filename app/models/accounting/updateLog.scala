@@ -9,10 +9,11 @@ import common.ScalaUtils.objectName
 import models.SlickUtils.dbApi._
 import models.{User, Users}
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
-import models.manager.{EntityTable, ForwardingEntityManager, Entity, EntityManager}
+import models.manager.{EntityTable, ImmutableEntityManager, Entity, EntityManager}
 import models.accounting.config.Config
 import models.accounting.config.{Category, Account, MoneyReservoir}
 
+/** UpdateLog entities are immutable. */
 case class UpdateLog(userId: Long,
                      change: String,
                      date: DateTime = Clock.now,
@@ -34,7 +35,7 @@ class UpdateLogs(tag: Tag) extends EntityTable[UpdateLog](tag, UpdateLogs.tableN
   override def * = (userId, change, date, id.?) <>(UpdateLog.tupled, UpdateLog.unapply)
 }
 
-object UpdateLogs extends ForwardingEntityManager[UpdateLog, UpdateLogs](
+object UpdateLogs extends ImmutableEntityManager[UpdateLog, UpdateLogs](
   EntityManager.create[UpdateLog, UpdateLogs](tag => new UpdateLogs(tag), tableName = "UPDATE_LOGS")) {
 
   /* Returns most recent n entries sorted from old to new. */

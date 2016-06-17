@@ -2,12 +2,12 @@ package models.accounting
 
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
-import models.manager.{Entity, EntityManager, EntityTable, ForwardingEntityManager}
+import models.manager.{Entity, EntityManager, EntityTable, ImmutableEntityManager}
 
 /**
   * Notes when using TagEntities:
   *   - TagEntities should only be updated by the Transactions EntityManager!
-  *   - TagEntities rows should be treated as immutable. Just delete and create a new one when updating.
+  *   - TagEntities are immutable. Just delete and create a new one when updating.
   */
 case class TagEntity(name: String,
                      transactionId: Long,
@@ -33,7 +33,7 @@ class TagEntities(tag: Tag) extends EntityTable[TagEntity](tag, TagEntities.tabl
   override def * = (name, transactionId, id.?) <>(TagEntity.tupled, TagEntity.unapply)
 }
 
-object TagEntities extends ForwardingEntityManager[TagEntity, TagEntities](
+object TagEntities extends ImmutableEntityManager[TagEntity, TagEntities](
   EntityManager.create[TagEntity, TagEntities](
     tag => new TagEntities(tag), tableName = "TAG_ENTITIES")) {
 
