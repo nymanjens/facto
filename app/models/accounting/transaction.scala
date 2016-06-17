@@ -6,6 +6,7 @@ import common.Clock
 import common.cache.UniquelyHashable
 import models.SlickUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
 import models.SlickUtils.dbApi._
+import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.manager.{Entity, EntityManager, EntityTable, ImmutableEntityManager}
 import models.{User, Users}
@@ -88,7 +89,7 @@ object TransactionPartial {
     )
 }
 
-class Transactions(tag: Tag) extends EntityTable[Transaction](tag, Transactions.tableName) {
+class Transactions(tag: SlickTag) extends EntityTable[Transaction](tag, Transactions.tableName) {
   def transactionGroupId = column[Long]("transactionGroupId")
   def issuerId = column[Long]("issuerId")
   def beneficiaryAccountCode = column[String]("beneficiaryAccountCode")

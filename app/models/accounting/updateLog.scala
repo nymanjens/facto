@@ -7,6 +7,7 @@ import org.joda.time.DateTime
 import common.Clock
 import common.ScalaUtils.objectName
 import models.SlickUtils.dbApi._
+import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.{User, Users}
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
 import models.manager.{EntityTable, ImmutableEntityManager, Entity, EntityManager}
@@ -27,7 +28,7 @@ case class UpdateLog(userId: Long,
   lazy val user: User = Users.findById(userId)
 }
 
-class UpdateLogs(tag: Tag) extends EntityTable[UpdateLog](tag, UpdateLogs.tableName) {
+class UpdateLogs(tag: SlickTag) extends EntityTable[UpdateLog](tag, UpdateLogs.tableName) {
   def userId = column[Long]("userId")
   def change = column[String]("change")
   def date = column[DateTime]("date")

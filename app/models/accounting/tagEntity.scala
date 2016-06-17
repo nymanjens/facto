@@ -1,6 +1,7 @@
 package models.accounting
 
 import models.SlickUtils.dbApi._
+import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.SlickUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
 import models.manager.{Entity, EntityManager, EntityTable, ImmutableEntityManager}
 
@@ -26,7 +27,7 @@ case class TagEntity(name: String,
   }
 }
 
-class TagEntities(tag: Tag) extends EntityTable[TagEntity](tag, TagEntities.tableName) {
+class TagEntities(tag: SlickTag) extends EntityTable[TagEntity](tag, TagEntities.tableName) {
   def name = column[String]("name")
   def transactionId = column[Long]("transactionId")
 

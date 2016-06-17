@@ -4,6 +4,7 @@ import com.google.common.hash.Hashing
 import common.Clock
 import common.cache.UniquelyHashable
 import models.SlickUtils.dbApi._
+import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.SlickUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
 import models.accounting.config.{Config, MoneyReservoir}
 import models.manager.{Entity, EntityManager, EntityTable, ForwardingEntityManager}
@@ -36,7 +37,7 @@ case class BalanceCheck(issuerId: Long,
     .hash()
 }
 
-class BalanceChecks(tag: Tag) extends EntityTable[BalanceCheck](tag, BalanceChecks.tableName) {
+class BalanceChecks(tag: SlickTag) extends EntityTable[BalanceCheck](tag, BalanceChecks.tableName) {
   def issuerId = column[Long]("issuerId")
   def moneyReservoirCode = column[String]("moneyReservoirCode")
   def balance = column[Money]("balance")

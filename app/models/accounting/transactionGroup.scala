@@ -6,6 +6,7 @@ import org.joda.time.DateTime
 
 import common.Clock
 import models.SlickUtils.dbApi._
+import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.SlickUtils.dbRun
 import models.SlickUtils.JodaToSqlDateMapper
 import models.manager.{EntityTable, Entity, EntityManager, ImmutableEntityManager}
@@ -24,7 +25,7 @@ case class TransactionGroup(createdDate: DateTime = Clock.now,
 case class TransactionGroupPartial(transactions: Seq[TransactionPartial],
                                    zeroSum: Boolean = false)
 
-class TransactionGroups(tag: Tag) extends EntityTable[TransactionGroup](tag, TransactionGroups.tableName) {
+class TransactionGroups(tag: SlickTag) extends EntityTable[TransactionGroup](tag, TransactionGroups.tableName) {
   def createdDate = column[DateTime]("createdDate")
 
   override def * = (createdDate, id.?) <>(TransactionGroup.tupled, TransactionGroup.unapply)
