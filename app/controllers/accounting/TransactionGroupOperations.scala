@@ -22,7 +22,7 @@ import models.accounting.{Transaction, Transactions, TransactionPartial, Transac
 import models.accounting.config.{Config, Account, MoneyReservoir, Category, Template}
 import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting.CashFlowEntry
-import controllers.helpers.accounting.FormUtils.{validMoneyReservoirOrNullReservoir, validAccountCode, validCategoryCode, validFlowAsFloat, flowAsFloatStringToMoney, invalidWithMessageCode}
+import controllers.helpers.accounting.FormUtils.{validMoneyReservoirOrNullReservoir, validAccountCode, validCategoryCode, validFlowAsFloat, flowAsFloatStringToMoney, validTagsString, invalidWithMessageCode}
 
 object TransactionGroupOperations extends Controller {
 
@@ -313,7 +313,7 @@ object TransactionGroupOperations extends Controller {
             "description" -> nonEmptyText,
             "flowAsFloat" -> nonEmptyText.verifying(validFlowAsFloat).transform[Money](flowAsFloatStringToMoney, _.formatFloat),
             "detailDescription" -> text,
-            "tags" -> text,
+            "tags" -> text.verifying(validTagsString),
             "transactionDate" -> jodaDate("yyyy-MM-dd"),
             "consumedDate" -> jodaDate("yyyy-MM-dd")
           )(TransactionData.apply)(TransactionData.unapply)

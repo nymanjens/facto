@@ -5,6 +5,7 @@ import com.google.common.hash.{HashCode, Hashing}
 import common.Clock
 import common.cache.UniquelyHashable
 import models.SlickUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
+import models.SlickUtils.dbRun
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
@@ -111,12 +112,25 @@ object Transactions extends ImmutableEntityManager[Transaction, Transactions](
   // Overriding mutators to update the TagEntities table
   override def add(transaction: Transaction): Transaction = {
     val persistedTransaction = super.add(transaction)
-    // TODO: add tags
+
+    // Add TagEntities to database
+    for (tag <- persistedTransaction.tags) {
+      TagEntities.add(
+        TagEntity(
+          name = tag.name,
+          transactionId = persistedTransaction.id))
+    }
+
     persistedTransaction
   }
 
   override def delete(transaction: Transaction): Unit = {
-    // TODO: delete tags
+    // Remove TagEntities from database
+    val tags = dbRun(TagEntities.newQuery.filter(_.transactionId === transaction.id))
+    for (tag <- tags) {
+      TagEntities.delete(tag)
+    }
+
     super.delete(transaction)
   }
 }

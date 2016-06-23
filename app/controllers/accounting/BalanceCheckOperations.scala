@@ -125,7 +125,7 @@ object BalanceCheckOperations extends Controller {
       case AddNewOperationMeta(_) =>
         BalanceChecks.add(balanceCheck)
       case EditOperationMeta(bcId) =>
-        BalanceChecks.delete(balanceCheck withId bcId)
+        BalanceChecks.delete(BalanceChecks.findById(bcId))
         BalanceChecks.add(balanceCheck)
     }
 

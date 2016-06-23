@@ -30,4 +30,14 @@ class FormUtilsTest extends Specification {
   "flowAsFloatStringToMoney" in new WithApplication {
     FormUtils.flowAsFloatStringToMoney("123.44") mustEqual Money(12344)
   }
+
+  "validTagsString"  in new WithApplication {
+    val constraint = FormUtils.validTagsString
+    constraint("") mustEqual Valid
+    constraint("abc") mustEqual Valid
+    constraint("abc,def") mustEqual Valid
+    constraint("abc def") mustNotEqual Valid
+    constraint(" ") mustNotEqual Valid
+    constraint(" abc") mustNotEqual Valid
+  }
 }
