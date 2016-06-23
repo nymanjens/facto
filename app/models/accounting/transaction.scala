@@ -45,7 +45,7 @@ case class Transaction(transactionGroupId: Long,
   lazy val beneficiary: Account = Config.accounts(beneficiaryAccountCode)
   lazy val moneyReservoir: MoneyReservoir = Config.moneyReservoir(moneyReservoirCode)
   lazy val category: Category = Config.categories(categoryCode)
-  lazy val tags: Seq[Tag] = Splitter.on(",").split(tagsString).asScala.map(Tag.apply).toVector
+  lazy val tags: Seq[Tag] = Splitter.on(",").omitEmptyStrings().split(tagsString).asScala.map(Tag.apply).toVector
 
   /** Returns None if the consumed date is the same as the transaction date (and thus carries no further information. */
   def consumedDateOption: Option[DateTime] = if (consumedDate == transactionDate) None else Some(consumedDate)
