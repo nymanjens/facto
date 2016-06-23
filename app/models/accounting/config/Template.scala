@@ -71,7 +71,8 @@ object Template {
                          moneyReservoirCodeTpl: Option[String],
                          categoryCodeTpl: Option[String],
                          descriptionTpl: String,
-                         flowInCents: Long) {
+                         flowInCents: Long,
+                         tagsString: String) {
     requireNonNullFields(this)
 
     def toPartial(account: Account): TransactionPartial = {
@@ -97,7 +98,8 @@ object Template {
         category = categoryCodeTpl map fillInPlaceholders map Config.categories,
         description = fillInPlaceholders(descriptionTpl),
         flow = Money(flowInCents),
-        detailDescription = "")
+        detailDescription = "",
+        tagsString = tagsString)
     }
   }
 }

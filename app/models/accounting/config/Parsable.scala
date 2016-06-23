@@ -126,8 +126,9 @@ object Parsable {
                            moneyReservoirCode: /* nullable */ String,
                            categoryCode: /* nullable */ String,
                            description: String,
-                           flowAsFloat: Double) {
-      def this() = this(null, null, null, description = "", flowAsFloat = 0)
+                           flowAsFloat: Double,
+                           tagsString: String) {
+      def this() = this(null, null, null, description = "", flowAsFloat = 0, tagsString = "")
 
       def parse(accounts: Map[String, ParsedAccount],
                 reservoirs: Map[String, ParsedMoneyReservoir],
@@ -144,7 +145,8 @@ object Parsable {
           moneyReservoirCodeTpl = Option(moneyReservoirCode) map validateCode(reservoirsIncludingNull.keySet),
           categoryCodeTpl = Option(categoryCode) map validateCode(categories.keySet),
           descriptionTpl = description,
-          flowInCents = (flowAsFloat.toDouble * 100).round)
+          flowInCents = (flowAsFloat.toDouble * 100).round,
+          tagsString = tagsString)
       }
     }
   }
