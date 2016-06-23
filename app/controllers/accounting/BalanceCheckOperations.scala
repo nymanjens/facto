@@ -125,7 +125,8 @@ object BalanceCheckOperations extends Controller {
       case AddNewOperationMeta(_) =>
         BalanceChecks.add(balanceCheck)
       case EditOperationMeta(bcId) =>
-        BalanceChecks.update(balanceCheck withId bcId)
+        BalanceChecks.delete(balanceCheck withId bcId)
+        BalanceChecks.add(balanceCheck)
     }
 
     val operation = operationMeta match {

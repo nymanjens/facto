@@ -1,7 +1,7 @@
 package models.accounting
 
 import com.google.common.base.Splitter
-import com.google.common.hash.Hashing
+import com.google.common.hash.{HashCode, Hashing}
 import common.Clock
 import common.cache.UniquelyHashable
 import models.SlickUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
@@ -54,12 +54,8 @@ case class Transaction(transactionGroupId: Long,
     s"Transaction(group=$transactionGroupId, issuer=${issuerString}, $beneficiaryAccountCode, $moneyReservoirCode, $categoryCode, flow=$flow, $description)"
   }
 
-  override def uniqueHash = Hashing.sha1().newHasher()
-    // Transactions are immutable
-    .putLong(id)
-    // Heuristic: If for some reason a transaction is mutated, the hashCode will most likely change as well
-    .putInt(hashCode())
-    .hash()
+  // Transactions are immutable
+  override def uniqueHash = HashCode.fromLong(id)
 }
 
 case class TransactionPartial(beneficiary: Option[Account],

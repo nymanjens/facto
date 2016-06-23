@@ -1,13 +1,13 @@
 package models.accounting
 
-import com.google.common.hash.Hashing
+import com.google.common.hash.{HashCode, Hashing}
 import common.Clock
 import common.cache.UniquelyHashable
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.SlickUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
 import models.accounting.config.{Config, MoneyReservoir}
-import models.manager.{Entity, EntityManager, EntityTable, ForwardingEntityManager}
+import models.manager.{Entity, EntityManager, EntityTable, ImmutableEntityManager}
 import models.{User, Users}
 import org.joda.time.DateTime
 
@@ -27,14 +27,8 @@ case class BalanceCheck(issuerId: Long,
 
   lazy val moneyReservoir: MoneyReservoir = Config.moneyReservoir(moneyReservoirCode)
 
-
-  override def uniqueHash = Hashing.sha1().newHasher()
-    .putLong(id)
-    .putLong(balance.cents)
-    .putLong(checkDate.getMillis)
-    // Heuristic: If any other fields change (normally not the case), the hashCode will most likely change as well.
-    .putInt(hashCode())
-    .hash()
+  // BalanceChecks are immutable
+  override def uniqueHash = HashCode.fromLong(id)
 }
 
 class BalanceChecks(tag: SlickTag) extends EntityTable[BalanceCheck](tag, BalanceChecks.tableName) {
@@ -47,6 +41,6 @@ class BalanceChecks(tag: SlickTag) extends EntityTable[BalanceCheck](tag, Balanc
   override def * = (issuerId, moneyReservoirCode, balance, createdDate, checkDate, id.?) <>(BalanceCheck.tupled, BalanceCheck.unapply)
 }
 
-object BalanceChecks extends ForwardingEntityManager[BalanceCheck, BalanceChecks](
+object BalanceChecks extends ImmutableEntityManager[BalanceCheck, BalanceChecks](
   EntityManager.create[BalanceCheck, BalanceChecks](
     tag => new BalanceChecks(tag), tableName = "BALANCE_CHECKS"))
