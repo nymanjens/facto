@@ -2,10 +2,18 @@
 
 @(entry: GroupedTransactions)
 
+@tagIndications = {
+  @for(tag <- entry.tags) {
+    <span class="label @tag.labelClass">@tag.name</span>
+  }
+}
+
 @if(entry.transactions.size == 1) {
+  @tagIndications
   @entry.descriptions.map(Html(_)).mkString(", ")
 } else {
   @UpperRightCorner{ @* centralContent *@
+    @tagIndications
     @entry.descriptions.map(Html(_)).mkString(", ")
   } { @* cornerContent *@
     (@entry.transactions.size)
