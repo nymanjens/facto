@@ -1,13 +1,7 @@
 package common
 
-import java.io.Serializable
-
 import play.api.mvc.Call
-import com.google.common.base.Splitter
 
-import scala.collection.{AbstractSeq, LinearSeqOptimized}
-import scala.collection.generic._
-import scala.collection.immutable.{LinearSeq, List}
 /**
   * Represents the URL to return to after the current flow is finished.
   */

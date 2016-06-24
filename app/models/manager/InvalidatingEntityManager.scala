@@ -5,27 +5,27 @@ import scala.collection.mutable
 import slick.lifted.{AbstractTable, TableQuery}
 import org.apache.http.annotation.GuardedBy
 
-import common.cache.CacheMaintenanceManager
+import common.cache.CacheRegistry
 import controllers.helpers.ControllerHelperCache
 
-/** TODO. */
+/** EntityManager decorator that triggers the CacheRegistry's invalidateCache hook when an entity is updated. */
 private[manager] final class InvalidatingEntityManager[E <: Entity[E], T <: AbstractTable[E]](delegate: EntityManager[E, T])
   extends ForwardingEntityManager[E, T](delegate) {
 
   // ********** Implementation of EntityManager interface: Mutators ********** //
   override def add(entity: E): E = {
     val savedEntity = delegate.add(entity)
-    CacheMaintenanceManager.invalidateCachesWhenUpdated(savedEntity)
+    CacheRegistry.invalidateCachesWhenUpdated(savedEntity)
     savedEntity
   }
 
   override def update(entity: E): E = {
-    CacheMaintenanceManager.invalidateCachesWhenUpdated(entity)
+    CacheRegistry.invalidateCachesWhenUpdated(entity)
     delegate.update(entity)
   }
 
   override def delete(entity: E): Unit = {
-    CacheMaintenanceManager.invalidateCachesWhenUpdated(entity)
+    CacheRegistry.invalidateCachesWhenUpdated(entity)
     delegate.delete(entity)
   }
 }

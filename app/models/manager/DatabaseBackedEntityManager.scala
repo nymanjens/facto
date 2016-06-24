@@ -39,6 +39,7 @@ private[manager] final class DatabaseBackedEntityManager[E <: Entity[E], T <: En
   override def findById(id: Long): E = {
     dbRun(newQuery.filter(_.id === id).result) match {
       case Seq(x) => x
+      case Seq() => throw new IllegalArgumentException(s"Could not find entry with id=$id")
     }
   }
 

@@ -7,12 +7,14 @@ import org.joda.time.DateTime
 import common.Clock
 import common.ScalaUtils.objectName
 import models.SlickUtils.dbApi._
+import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.{User, Users}
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
-import models.manager.{EntityTable, ForwardingEntityManager, Entity, EntityManager}
+import models.manager.{EntityTable, ImmutableEntityManager, Entity, EntityManager}
 import models.accounting.config.Config
 import models.accounting.config.{Category, Account, MoneyReservoir}
 
+/** UpdateLog entities are immutable. */
 case class UpdateLog(userId: Long,
                      change: String,
                      date: DateTime = Clock.now,
@@ -26,7 +28,7 @@ case class UpdateLog(userId: Long,
   lazy val user: User = Users.findById(userId)
 }
 
-class UpdateLogs(tag: Tag) extends EntityTable[UpdateLog](tag, UpdateLogs.tableName) {
+class UpdateLogs(tag: SlickTag) extends EntityTable[UpdateLog](tag, UpdateLogs.tableName) {
   def userId = column[Long]("userId")
   def change = column[String]("change")
   def date = column[DateTime]("date")
@@ -34,7 +36,7 @@ class UpdateLogs(tag: Tag) extends EntityTable[UpdateLog](tag, UpdateLogs.tableN
   override def * = (userId, change, date, id.?) <>(UpdateLog.tupled, UpdateLog.unapply)
 }
 
-object UpdateLogs extends ForwardingEntityManager[UpdateLog, UpdateLogs](
+object UpdateLogs extends ImmutableEntityManager[UpdateLog, UpdateLogs](
   EntityManager.create[UpdateLog, UpdateLogs](tag => new UpdateLogs(tag), tableName = "UPDATE_LOGS")) {
 
   /* Returns most recent n entries sorted from old to new. */

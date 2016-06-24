@@ -54,8 +54,11 @@ object Config {
   val categories: Map[String, Category] = loadedConfig.categories
 
   // Not exposing moneyReservoirs because it's too easy to accidentally show hidden reservoirs
-  def moneyReservoir(code: String): MoneyReservoir = loadedConfig.moneyReservoirs(code)
-  def moneyReservoirOption(code: String): Option[MoneyReservoir] = loadedConfig.moneyReservoirs.get(code)
+  def moneyReservoir(code: String): MoneyReservoir = moneyReservoirOption(code).get
+  def moneyReservoirOption(code: String): Option[MoneyReservoir] = code match {
+    case "" => Some(NullMoneyReservoir)
+    case _ => loadedConfig.moneyReservoirs.get(code)
+  }
 
   val visibleReservoirs: Seq[MoneyReservoir] = loadedConfig.moneyReservoirs.values.filter(!_.hidden).toVector
   def visibleReservoirs(includeNullReservoir: Boolean = false): Seq[MoneyReservoir] = {

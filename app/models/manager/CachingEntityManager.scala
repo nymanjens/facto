@@ -7,13 +7,12 @@ import scala.util.Sorting
 import slick.lifted.AbstractTable
 import org.apache.http.annotation.GuardedBy
 
-import common.cache.CacheMaintenanceManager
+import common.cache.CacheRegistry
 
 /** Caching decorator for an EntityManager that loads all data in memory and keeps it in sync with all updates. */
 private[manager] final class CachingEntityManager[E <: Entity[E], T <: AbstractTable[E]](delegate: EntityManager[E, T])
   extends ForwardingEntityManager[E, T](delegate) {
-  CacheMaintenanceManager.registerCache(verifyConsistency = verifyConsistency)
-
+  CacheRegistry.registerCache(verifyConsistency = verifyConsistency)
 
   @GuardedBy("lock")
   private val cache: mutable.Map[Long, E] = mutable.Map[Long, E]()

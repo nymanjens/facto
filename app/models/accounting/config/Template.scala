@@ -50,7 +50,7 @@ case class Template(id: Long,
 object Template {
   sealed trait Placement
   object Placement {
-    object GeneralView extends Placement
+    object EverythingView extends Placement
     object CashFlowView extends Placement
     object LiquidationView extends Placement
     object EndowmentsView extends Placement
@@ -58,7 +58,7 @@ object Template {
     object TemplateList extends Placement
 
     def fromString(string: String): Placement = string match {
-      case "GENERAL_VIEW" => GeneralView
+      case "EVERYTHING_VIEW" => EverythingView
       case "CASH_FLOW_VIEW" => CashFlowView
       case "LIQUIDATION_VIEW" => LiquidationView
       case "ENDOWMENTS_VIEW" => EndowmentsView
@@ -71,7 +71,8 @@ object Template {
                          moneyReservoirCodeTpl: Option[String],
                          categoryCodeTpl: Option[String],
                          descriptionTpl: String,
-                         flowInCents: Long) {
+                         flowInCents: Long,
+                         tagsString: String) {
     requireNonNullFields(this)
 
     def toPartial(account: Account): TransactionPartial = {
@@ -97,7 +98,8 @@ object Template {
         category = categoryCodeTpl map fillInPlaceholders map Config.categories,
         description = fillInPlaceholders(descriptionTpl),
         flow = Money(flowInCents),
-        detailDescription = "")
+        detailDescription = "",
+        tagsString = tagsString)
     }
   }
 }

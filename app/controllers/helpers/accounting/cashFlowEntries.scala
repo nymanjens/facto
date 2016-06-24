@@ -1,24 +1,37 @@
 package controllers.helpers.accounting
 
-import collection.immutable.Seq
-
-import org.joda.time.DateTime
-import com.github.nscala_time.time.Imports._
-import models.SlickUtils.dbApi._
-
-import models.SlickUtils.{dbRun, JodaToSqlDateMapper}
-import models.manager.Entity
-import models.accounting._
-import models.accounting.config.{Account, MoneyReservoir, Category}
+import com.google.common.hash.Hashing
+import common.cache.UniquelyHashable
+import common.cache.UniquelyHashable.UniquelyHashableIterableFunnel
 import controllers.helpers.ControllerHelperCache
 import controllers.helpers.ControllerHelperCache.CacheIdentifier
+import models.SlickUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
+import models.SlickUtils.dbApi._
+import com.github.nscala_time.time.Imports._
+import models.SlickUtils.dbRun
+import models.accounting._
+import models.accounting.config.MoneyReservoir
+import org.joda.time.DateTime
 
-sealed trait CashFlowEntry
+import scala.collection.immutable.Seq
+
+sealed trait CashFlowEntry extends UniquelyHashable
 
 case class RegularEntry(override val transactions: Seq[Transaction], balance: Money, balanceVerified: Boolean)
-  extends GroupedTransactions(transactions) with CashFlowEntry
+  extends GroupedTransactions(transactions) with CashFlowEntry {
 
-case class BalanceCorrection(balanceCheck: BalanceCheck) extends CashFlowEntry
+  override val uniqueHash = {
+    Hashing.sha1().newHasher()
+      .putObject(transactions, UniquelyHashableIterableFunnel)
+      .putLong(balance.cents)
+      .putBoolean(balanceVerified)
+      .hash()
+  }
+}
+
+case class BalanceCorrection(balanceCheck: BalanceCheck) extends CashFlowEntry {
+  override val uniqueHash = balanceCheck.uniqueHash
+}
 
 object CashFlowEntry {
 

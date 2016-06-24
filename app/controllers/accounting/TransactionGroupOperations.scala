@@ -22,7 +22,7 @@ import models.accounting.{Transaction, Transactions, TransactionPartial, Transac
 import models.accounting.config.{Config, Account, MoneyReservoir, Category, Template}
 import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting.CashFlowEntry
-import controllers.helpers.accounting.FormUtils.{validMoneyReservoirOrNullReservoir, validAccountCode, validCategoryCode, validFlowAsFloat, flowAsFloatStringToMoney, invalidWithMessageCode}
+import controllers.helpers.accounting.FormUtils.{validMoneyReservoirOrNullReservoir, validAccountCode, validCategoryCode, validFlowAsFloat, flowAsFloatStringToMoney, validTagsString, invalidWithMessageCode}
 
 object TransactionGroupOperations extends Controller {
 
@@ -201,6 +201,7 @@ object TransactionGroupOperations extends Controller {
         description = trans.description,
         flow = trans.flow,
         detailDescription = trans.detailDescription,
+        tagsString = trans.tagsString,
         createdDate = group.createdDate,
         transactionDate = trans.transactionDate,
         consumedDate = trans.consumedDate))
@@ -255,6 +256,7 @@ object TransactionGroupOperations extends Controller {
                                description: String = "",
                                flow: Money = Money(0),
                                detailDescription: String = "",
+                               tagsString: String = "",
                                transactionDate: DateTime = Clock.now,
                                consumedDate: DateTime = Clock.now)
 
@@ -270,7 +272,8 @@ object TransactionGroupOperations extends Controller {
           categoryCode = trans.category.map(_.code).getOrElse(""),
           description = trans.description,
           flow = trans.flow,
-          detailDescription = trans.detailDescription)
+          detailDescription = trans.detailDescription,
+          tagsString = trans.tagsString)
       }
 
       def fromModel(trans: Transaction) = TransactionData(
@@ -281,6 +284,7 @@ object TransactionGroupOperations extends Controller {
         description = trans.description,
         flow = trans.flow,
         detailDescription = trans.detailDescription,
+        tagsString = trans.tagsString,
         transactionDate = trans.transactionDate,
         consumedDate = trans.consumedDate)
     }
@@ -309,6 +313,7 @@ object TransactionGroupOperations extends Controller {
             "description" -> nonEmptyText,
             "flowAsFloat" -> nonEmptyText.verifying(validFlowAsFloat).transform[Money](flowAsFloatStringToMoney, _.formatFloat),
             "detailDescription" -> text,
+            "tags" -> text.verifying(validTagsString),
             "transactionDate" -> jodaDate("yyyy-MM-dd"),
             "consumedDate" -> jodaDate("yyyy-MM-dd")
           )(TransactionData.apply)(TransactionData.unapply)

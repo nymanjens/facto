@@ -13,14 +13,14 @@ import controllers.helpers.accounting._
 object Views extends Controller {
 
   // ********** actions - views ********** //
-  def generalLatest = AuthenticatedAction { implicit user =>
+  def everythingLatest = AuthenticatedAction { implicit user =>
     implicit request =>
-      general(numEntriesToShow = 400)
+      everything(numEntriesToShow = 400)
   }
 
-  def generalAll = AuthenticatedAction { implicit user =>
+  def everythingAll = AuthenticatedAction { implicit user =>
     implicit request =>
-      general()
+      everything()
   }
 
   def cashFlowOfAll = AuthenticatedAction { implicit user =>
@@ -86,15 +86,15 @@ object Views extends Controller {
   }
 
   // ********** private helper controllers ********** //
-  private def general(numEntriesToShow: Int = 100000)(implicit request: Request[AnyContent], user: User): Result = {
+  private def everything(numEntriesToShow: Int = 100000)(implicit request: Request[AnyContent], user: User): Result = {
     // get entries
     val entries = GeneralEntry.fetchLastNEntries(numEntriesToShow + 1)
 
     // render
-    Ok(views.html.accounting.general(
+    Ok(views.html.accounting.everything(
       entries = entries,
       numEntriesToShow = numEntriesToShow,
-      templatesInNavbar = Config.templatesToShowFor(Template.Placement.GeneralView, user)))
+      templatesInNavbar = Config.templatesToShowFor(Template.Placement.EverythingView, user)))
   }
 
   private def cashFlow(reservoirs: Iterable[MoneyReservoir],
