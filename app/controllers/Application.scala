@@ -41,7 +41,7 @@ object Application extends Controller {
       Views.cashFlowOfAll,
       Views.liquidationOfAll,
       Views.endowmentsOfAll,
-      Views.summaryForCurrentYear
+      Views.summaryForCurrentYear()
     )
     for (action <- actions) {
       action.calculateResult(admin, request)

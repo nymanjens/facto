@@ -1,12 +1,14 @@
 package controllers.accounting
 
-import play.api.mvc.{Controller, Flash, Result, Request, AnyContent}
-
-import common.Clock
+import scala.collection.JavaConverters._
+import com.google.common.base.Joiner
+import play.api.mvc.{AnyContent, Controller, Flash, Request, Result}
+import common.{Clock, GetParameter}
 import common.CollectionUtils.toListMap
 import models.User
+import models.accounting.Tag
 import models.accounting.config.Config
-import models.accounting.config.{Account, MoneyReservoir, Category, Template}
+import models.accounting.config.{Account, Category, MoneyReservoir, Template}
 import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting._
 
@@ -71,18 +73,22 @@ object Views extends Controller {
         accounts = Seq(Config.accounts(accountCode)))
   }
 
-  def summaryForCurrentYear = AuthenticatedAction { implicit user =>
+  def summaryForCurrentYear(tags: String = "", toggleTag: String = "") = AuthenticatedAction { implicit user =>
     implicit request =>
       summary(
         accounts = Config.personallySortedAccounts,
-        expandedYear = Clock.now.getYear)
+        expandedYear = Clock.now.getYear,
+        tagsString = tags,
+        toggleTag = toggleTag)
   }
 
-  def summaryFor(expandedYear: Int) = AuthenticatedAction { implicit user =>
+  def summaryFor(expandedYear: Int, tags: String, toggleTag: String) = AuthenticatedAction { implicit user =>
     implicit request =>
       summary(
         accounts = Config.personallySortedAccounts,
-        expandedYear)
+        expandedYear,
+        tagsString = tags,
+        toggleTag = toggleTag)
   }
 
   // ********** private helper controllers ********** //
@@ -158,17 +164,37 @@ object Views extends Controller {
       templatesInNavbar = Config.templatesToShowFor(Template.Placement.EndowmentsView, user)))
   }
 
-  private def summary(accounts: Iterable[Account], expandedYear: Int)
+  private def summary(accounts: Iterable[Account], expandedYear: Int, tagsString: String, toggleTag: String)
                      (implicit request: Request[AnyContent], user: User): Result = {
-    // get accountToEntries
-    val accountToSummary = toListMap {
-      for (account <- accounts) yield account -> Summary.fetchSummary(account, expandedYear)
-    }
+    val tags = Tag.parseTagsString(tagsString)
 
-    // render
-    Ok(views.html.accounting.summary(
-      accountToSummary,
-      expandedYear,
-      templatesInNavbar = Config.templatesToShowFor(Template.Placement.SummaryView, user)))
+    if (toggleTag != "") {
+      // Redirect to the same page with the toggled tag in tagsString
+      val newTags = {
+        val newTag = Tag(toggleTag)
+        if (tags contains newTag)
+          tags.filter(_ != newTag)
+        else if (Tag.isValidTagName(toggleTag))
+          tags ++ Seq(newTag)
+        else
+          tags
+      }
+      val newTagsString = Joiner.on(",").join(newTags.map(_.name).asJava)
+      Redirect(controllers.accounting.routes.Views.summaryFor(expandedYear, newTagsString, toggleTag = ""))
+
+    } else {
+      // get accountToEntries
+      val accountToSummary = toListMap {
+        for (account <- accounts) yield account -> Summary.fetchSummary(account, expandedYear)
+      }
+
+      // render
+      Ok(views.html.accounting.summary(
+        accountToSummary,
+        expandedYear,
+        templatesInNavbar = Config.templatesToShowFor(Template.Placement.SummaryView, user),
+        tags = tags,
+        tagsString = tagsString))
+    }
   }
 }

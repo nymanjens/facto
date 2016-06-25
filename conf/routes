@@ -24,16 +24,16 @@ GET  /acc/logs/all/                    controllers.accounting.GeneralActions.upd
 GET  /acc/templates/                   controllers.accounting.GeneralActions.templateList
 
 # Accounting - views
-GET  /acc/everything/                     controllers.accounting.Views.everythingLatest
-GET  /acc/everything/all/                 controllers.accounting.Views.everythingAll
+GET  /acc/everything/                  controllers.accounting.Views.everythingLatest
+GET  /acc/everything/all/              controllers.accounting.Views.everythingAll
 GET  /acc/cashflow/                    controllers.accounting.Views.cashFlowOfAll
 GET  /acc/cashflow/:reservoirCode/     controllers.accounting.Views.cashFlowOfSingle(reservoirCode)
 GET  /acc/liquidation/                 controllers.accounting.Views.liquidationOfAll
 GET  /acc/liquidation/:accountCode1/:accountCode2/  controllers.accounting.Views.liquidationOfSingle(accountCode1, accountCode2)
 GET  /acc/endowments/                  controllers.accounting.Views.endowmentsOfAll
 GET  /acc/endowments/:accountCode/     controllers.accounting.Views.endowmentsOfSingle(accountCode)
-GET  /acc/summary/                     controllers.accounting.Views.summaryForCurrentYear
-GET  /acc/summary/:expandedyear/       controllers.accounting.Views.summaryFor(expandedyear: Int)
+GET  /acc/summary/                     controllers.accounting.Views.summaryForCurrentYear(tags ?= "", toggleTag ?= "")
+GET  /acc/summary/:expandedyear/       controllers.accounting.Views.summaryFor(expandedyear: Int, tags ?= "", toggleTag ?= "")
 
 # Accounting - transaction group operations
 GET  /acc/trans/new/                   controllers.accounting.TransactionGroupOperations.addNewForm(returnTo ?= "/")

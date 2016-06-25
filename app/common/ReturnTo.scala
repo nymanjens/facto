@@ -1,34 +1,25 @@
 package common
 
-import play.api.mvc.Call
-
 /**
   * Represents the URL to return to after the current flow is finished.
+  *
+  * Note: don't pass given URL as route parameter directly because Play Framework will escape
+  * the slashes, which is annoying when setting up Facto with Apache.
   */
-case class ReturnTo(url: String) {
+trait ReturnTo extends GetParameter {
 
   /**
-    * Adds this url to the given Call.
+    * The URL to return to.
     *
-    * Don't pass this.url as route parameter because Play Framework will escape
+    * Note: don't pass this URL as route parameter directly because Play Framework will escape
     * the slashes, which is annoying when setting up Facto with Apache.
-    */
-  def appendTo(call: Call): Call = {
-    val newUrl = if (call.url contains "?") {
-      s"${call.url}&returnTo=${this.url}"
-    } else {
-      s"${call.url}?returnTo=${this.url}"
-    }
-    Call(call.method, newUrl, call.fragment)
+    **/
+  def url: String
+}
+
+object ReturnTo {
+
+  def apply(url: String): ReturnTo = new GetParameter.Impl(key = "returnTo", value = url) with ReturnTo {
+    override def url = url
   }
-
-  /**
-    * Adds this url to the given Call.
-    *
-    * Example: call ++: returnTo
-    *
-    * Don't pass this.url as route parameter because Play Framework will escape
-    * the slashes, which is annoying when setting up Facto with Apache.
-    */
-  def ++:(call: Call): Call = this appendTo call
 }

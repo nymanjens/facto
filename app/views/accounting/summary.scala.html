@@ -1,10 +1,11 @@
 @import scala.collection.immutable.Seq
 
-@import common.{Clock, ReturnTo}
+@import common.{Clock, ReturnTo, GetParameter}
 @import models.User
 @import models.accounting.Money
 @import models.accounting.Money.CurrencyUnit
 @import models.accounting.config.{Account, MoneyReservoir, Category, Template}
+@import models.accounting.{Tag, TagEntities}
 @import controllers.helpers.accounting.Summary
 @import viewhelpers.Formatting._
 @import views.html.accounting.parts._
@@ -12,14 +13,36 @@
 @(
   accountToSummary: Map[Account, Summary],
   expandedYear: Int,
-  templatesInNavbar: Seq[Template]
+  templatesInNavbar: Seq[Template],
+  tags: Seq[Tag],
+  tagsString: String
 )(
   implicit user: User, request: Request[AnyContent], flash: Flash
 )
 
 @Main("Summary", templatesInNavbar = templatesInNavbar) {
-  <h1><i class="icon-table"></i> Summary</h1>
-
+  <h1>
+    <i class="icon-table"></i> Summary
+    <div class="summary-tag-filters">
+      Filter:
+      @for((tag, numUsages) <- TagEntities.usageAndReccomendations(tags, 4)) {
+        <span class="tag-with-usage">
+          <a class="btn btn-xs
+                @if(tags.contains(tag)){btn-@tag.bootstrapClassSuffix}
+                @if(!tags.contains(tag)){btn-default}"
+              href="@{request.uri ++: GetParameter("toggleTag", tag.name)}"
+              role="button">
+            @tag.name</a>
+          &times; @numUsages
+        </span>
+      }
+      <form action="@request.uri" method="GET">
+        <input type="hidden" name="tags" value="@tagsString" />
+        <input type="text" name="toggleTag" placeholder="Other tag" />
+      </form>
+    </div>
+    <div style="clear: both"></div>
+  </h1>
 
   @for((account, summary) <- accountToSummary) {
     @Panel(
@@ -32,7 +55,7 @@
             <th>(@CurrencyUnit.default.htmlSymbol)</th>
             @for((year, summaryForYear) <- summary.yearToSummary) {
               <th colspan="@{if(year == expandedYear) summaryForYear.months.size + 1 else 1}">
-                <a href="@controllers.accounting.routes.Views.summaryFor(year)">
+                <a href="@controllers.accounting.routes.Views.summaryFor(year, tags=tagsString)">
                   @year
                 </a>
               </th>
@@ -75,7 +98,7 @@
                                   @entry.flow.currency.htmlSymbol @entry.flow.formatFloat
                                   -
                                   @for(tag <- entry.tags) {
-                                    <span class="label @tag.labelClass">@tag.name</span>
+                                    <span class="label label-@tag.bootstrapClassSuffix">@tag.name</span>
                                   }
                                   @entry.descriptions
                                 </a>

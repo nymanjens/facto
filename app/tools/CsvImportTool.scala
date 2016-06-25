@@ -35,6 +35,7 @@ object CsvImportTool {
             categoryCode = categoryCode,
             description = description,
             flow = Money.fromFloat(flowAsFloat.toDouble),
+            tagsString = s"csv-import-$beneficiaryAccountCode",
             createdDate = new DateTime(createdDateStamp.toLong * 1000),
             transactionDate = new DateTime(transactionDateStamp.toLong * 1000),
             consumedDate = new DateTime(if (consumedDateStamp.toLong == 0) transactionDateStamp.toLong * 1000 else consumedDateStamp.toLong * 1000)

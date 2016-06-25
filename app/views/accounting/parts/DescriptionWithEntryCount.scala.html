@@ -4,7 +4,7 @@
 
 @tagIndications = {
   @for(tag <- entry.tags) {
-    <span class="label @tag.labelClass">@tag.name</span>
+    <span class="label label-@tag.bootstrapClassSuffix">@tag.name</span>
   }
 }
 
