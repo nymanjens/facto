@@ -172,12 +172,13 @@ object Views extends Controller {
       // Redirect to the same page with the toggled tag in tagsString
       val newTags = {
         val newTag = Tag(toggleTag)
-        if (tags contains newTag)
+        if (tags contains newTag) {
           tags.filter(_ != newTag)
-        else if (Tag.isValidTagName(toggleTag))
+        } else if (Tag.isValidTagName(toggleTag)) {
           tags ++ Seq(newTag)
-        else
+        } else {
           tags
+        }
       }
       val newTagsString = Joiner.on(",").join(newTags.map(_.name).asJava)
       Redirect(controllers.accounting.routes.Views.summaryFor(expandedYear, newTagsString, toggleTag = ""))
