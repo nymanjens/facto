@@ -22,7 +22,8 @@ import models.accounting.{Transaction, Transactions, TransactionPartial, Transac
 import models.accounting.config.{Config, Account, MoneyReservoir, Category, Template}
 import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting.CashFlowEntry
-import controllers.helpers.accounting.FormUtils.{validMoneyReservoirOrNullReservoir, validAccountCode, validCategoryCode, validFlowAsFloat, flowAsFloatStringToMoney, validTagsString, invalidWithMessageCode}
+import controllers.helpers.accounting.FormUtils.{validMoneyReservoirOrNullReservoir, validAccountCode, validCategoryCode,
+validFlowAsFloat, flowAsFloatStringToMoney, validTagsString, invalidWithMessageCode}
 
 object TransactionGroupOperations extends Controller {
 
