@@ -42,10 +42,11 @@ object GetParameter {
     }
 
     override def appendTo(uri: String): String = {
+      val escapedValue = value.replace("&", "%26")
       if (uri contains "?") {
-        s"$uri&$key=$value"
+        s"$uri&$key=$escapedValue"
       } else {
-        s"$uri?$key=$value"
+        s"$uri?$key=$escapedValue"
       }
     }
   }
