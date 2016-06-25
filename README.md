@@ -75,7 +75,7 @@ special categories:
 ### Accounts
 An account can refer to a regular person or the common account.
 
-** Example:**
+**Example:**
 
 A family has two members: Alice and Bob. There will be three accounts:
 
