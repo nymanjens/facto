@@ -57,9 +57,23 @@ error.path.missing=Missing path
 error.path.result.multiple=Multiple results for the given path
 
 # --- Project-specific messages
+facto.date.month.jan.abbrev=Jan
+facto.date.month.feb.abbrev=Feb
+facto.date.month.mar.abbrev=Mar
+facto.date.month.apr.abbrev=Apr
+facto.date.month.may.abbrev=May
+facto.date.month.june.abbrev=June
+facto.date.month.july.abbrev=July
+facto.date.month.aug.abbrev=Aug
+facto.date.month.sept.abbrev=Sept
+facto.date.month.oct.abbrev=Oct
+facto.date.month.nov.abbrev=Nov
+facto.date.month.dec.abbrev=Dec
+
 facto.error.noReservoir.atLeast2=To be able to use the N/A money reservoir, there must be at least two transactions
 facto.error.noReservoir.zeroSum=To be able to use the N/A money reservoir, the total flow of this group must sum to 0
 facto.error.noReservoir.notAllTheSame=The N/A money reservoir can be selected for either all transactions or no transactions
+
 facto.user-profile=User Profile
 facto.user-administration=User Administration
 facto.update-logs=Update Logs

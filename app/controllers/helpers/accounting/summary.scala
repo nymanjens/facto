@@ -31,7 +31,7 @@ case class Summary(yearToSummary: Map[Int, SummaryForYear],
 }
 
 object Summary {
-  def fetchSummary(account: Account, expandedYear: Int, tags: Seq[Tag]): Summary = {
+  def fetchSummary(account: Account, expandedYear: Int, tags: Seq[Tag] = Seq()): Summary = {
     val now = Clock.now
 
     val years: Seq[Int] = getSummaryYears(account, expandedYear, now.getYear)

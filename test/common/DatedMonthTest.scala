@@ -1,13 +1,21 @@
 package common
 
 import org.specs2.mutable._
-import common.TimeUtils.{February, dateAt, June, May, April, March}
+import common.TimeUtils.{April, February, June, March, May, dateAt}
+import play.api.i18n.{Lang, Messages}
+import play.api.test.{FakeApplication, WithApplication}
+import play.api.Application
+
+// imports for 2.4 i18n (https://www.playframework.com/documentation/2.4.x/Migration24#I18n)
+import play.api.i18n.Messages.Implicits.applicationMessages
 
 class DatedMonthTest extends Specification {
 
-  "abbreviation" in {
+  val application: Application = FakeApplication()
+  "abbreviation" in new WithApplication(application) {
+    val messages: Messages = applicationMessages(lang = Lang("en"), application)
     val month = DatedMonth(dateAt(1990, June, 1))
-    month.abbreviation mustEqual "June"
+    month.abbreviation(messages) mustEqual "June"
   }
 
   "contains" in {

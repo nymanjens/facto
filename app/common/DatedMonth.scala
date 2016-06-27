@@ -1,18 +1,18 @@
 package common
 
 import scala.collection.immutable.Seq
-
 import com.google.common.collect.Range
 import org.joda.time.{DateTime, Months}
-
 import TimeUtils._
+import play.api.i18n.Messages
 
 case class DatedMonth(startDate: DateTime) extends Ordered[DatedMonth] {
   TimeUtils.requireStartOfMonth(startDate)
 
   /** Returns abbreviation e.g. "Jan". */
-  def abbreviation: String = {
-    DatedMonth.abbreviations(startDate.getMonthOfYear - 1)
+  def abbreviation(implicit messages: Messages): String = {
+    val code = DatedMonth.abbreviationCodes(startDate.getMonthOfYear - 1)
+    Messages(code)
   }
 
   def contains(date: DateTime): Boolean = {
@@ -24,7 +24,20 @@ case class DatedMonth(startDate: DateTime) extends Ordered[DatedMonth] {
 
 object DatedMonth {
 
-  private val abbreviations = Seq("¢Jan£", "¢Feb£", "¢Mar£", "¢Apr£", "¢May£", "¢June£", "¢July£", "¢Aug£", "¢Sept£", "¢Oct£", "¢Nov£", "¢Dec£")
+  private val abbreviationCodes = Seq(
+    "facto.date.month.jan.abbrev",
+    "facto.date.month.feb.abbrev",
+    "facto.date.month.mar.abbrev",
+    "facto.date.month.apr.abbrev",
+    "facto.date.month.may.abbrev",
+    "facto.date.month.june.abbrev",
+    "facto.date.month.july.abbrev",
+    "facto.date.month.aug.abbrev",
+    "facto.date.month.sept.abbrev",
+    "facto.date.month.oct.abbrev",
+    "facto.date.month.nov.abbrev",
+    "facto.date.month.dec.abbrev"
+  )
 
   def containing(date: DateTime): DatedMonth = DatedMonth(startOfMonthContaining(date))
 

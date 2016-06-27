@@ -10,9 +10,23 @@ error.required=XXThis field is required
 error.date=XXValid date required
 
 # --- Project-specific messages
+facto.date.month.jan.abbrev=XXJan
+facto.date.month.feb.abbrev=XXFeb
+facto.date.month.mar.abbrev=XXMar
+facto.date.month.apr.abbrev=XXApr
+facto.date.month.may.abbrev=XXMay
+facto.date.month.june.abbrev=XXJune
+facto.date.month.july.abbrev=XXJuly
+facto.date.month.aug.abbrev=XXAug
+facto.date.month.sept.abbrev=XXSept
+facto.date.month.oct.abbrev=XXOct
+facto.date.month.nov.abbrev=XXNov
+facto.date.month.dec.abbrev=XXDec
+
 facto.error.noReservoir.atLeast2=XXTo be able to use the N/A money reservoir, there must be at least two transactions
 facto.error.noReservoir.zeroSum=XXTo be able to use the N/A money reservoir, the total flow of this group must sum to 0
 facto.error.noReservoir.notAllTheSame=XXThe N/A money reservoir can be selected for either all transactions or no transactions
+
 facto.user-profile=XXUser Profile
 facto.user-administration=XXUser Administration
 facto.update-logs=XXUpdate Logs
