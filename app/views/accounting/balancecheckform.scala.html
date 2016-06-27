@@ -29,10 +29,10 @@
             <span class="panel-heading-title">@Messages("facto.balance-check")</span>
           </div>
           <div class="panel-body">
-            @bootstrap3.Text(bcForm("issuerName"), "Issuer", args=Map('readonly -> "readonly"))
-            @bootstrap3.Text(bcForm("moneyReservoirName"), "Reservoir", args=Map('readonly -> "readonly"))
-            @bootstrap3.Text(bcForm("checkDate"), "Check date", args=Map('autofocus -> "autofocus"))
-            @bootstrap3.Money(bcForm("balanceAsFloat"), reservoir.currency, "Balance")
+            @bootstrap3.Text(bcForm("issuerName"), "¢Issuer£", args=Map('readonly -> "readonly"))
+            @bootstrap3.Text(bcForm("moneyReservoirName"), "¢Reservoir£", args=Map('readonly -> "readonly"))
+            @bootstrap3.Text(bcForm("checkDate"), "¢Check date£", args=Map('autofocus -> "autofocus"))
+            @bootstrap3.Money(bcForm("balanceAsFloat"), reservoir.currency, "¢Balance£")
           </div>
         </div>
       </div>

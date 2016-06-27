@@ -230,4 +230,4 @@ constants:
     accountingCategory: *catAcc
     endowmentCategory: *catEndow
     defaultCurrencySymbol: EUR
-    liquidationDescription: Liquidation
+    liquidationDescription: ++Liquidation
