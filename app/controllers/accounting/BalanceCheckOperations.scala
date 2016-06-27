@@ -65,7 +65,7 @@ object BalanceCheckOperations extends Controller {
         UpdateLogs.addLog(user, UpdateLogs.AddNew, persistedBc)
 
         val moneyReservoirName = moneyReservoir.name
-        val message = s"Successfully added a balance check for $moneyReservoirName"
+        val message = s"¢Successfully added a balance check for£ $moneyReservoirName"
         Redirect(returnTo).flashing("message" -> message)
     }
 
@@ -84,7 +84,7 @@ object BalanceCheckOperations extends Controller {
       BalanceChecks.delete(bc)
 
       val moneyReservoirName = bc.moneyReservoir.name
-      val message = s"Successfully deleted balance check for $moneyReservoirName"
+      val message = s"¢Successfully deleted balance check for£ $moneyReservoirName"
       Redirect(returnTo).flashing("message" -> message)
   }
 
@@ -106,8 +106,8 @@ object BalanceCheckOperations extends Controller {
 
           val moneyReservoirName = operationMeta.moneyReservoir.name
           val message = operationMeta match {
-            case _: AddNewOperationMeta => s"Successfully created a balance check for $moneyReservoirName"
-            case _: EditOperationMeta => s"Successfully edited a balance check for $moneyReservoirName"
+            case _: AddNewOperationMeta => s"¢Successfully created a balance check for£ $moneyReservoirName"
+            case _: EditOperationMeta => s"¢Successfully edited a balance check for£ $moneyReservoirName"
           }
           Redirect(returnTo.url).flashing("message" -> message)
         })
@@ -144,8 +144,8 @@ object BalanceCheckOperations extends Controller {
   private def formView(operationMeta: OperationMeta, form: Form[Forms.BcData])
                       (implicit user: User, request: Request[AnyContent], returnTo: ReturnTo): Html = {
     val title = operationMeta match {
-      case _: AddNewOperationMeta => "New Balance Check"
-      case _: EditOperationMeta => "Edit Balance Check"
+      case _: AddNewOperationMeta => "¢New Balance Check£"
+      case _: EditOperationMeta => "¢Edit Balance Check£"
     }
     val formAction = operationMeta match {
       case AddNewOperationMeta(moneyReservoirCode) =>

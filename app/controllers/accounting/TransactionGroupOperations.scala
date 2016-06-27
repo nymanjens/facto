@@ -66,7 +66,7 @@ object TransactionGroupOperations extends Controller {
       }
       TransactionGroups.delete(group)
 
-      val message = s"""Successfully deleted ${numTrans} transaction${if (numTrans == 1) "" else "s"}"""
+      val message = s"""¢Successfully deleted£ ${numTrans} transaction${if (numTrans == 1) "" else "s"}"""
       Redirect(returnTo).flashing("message" -> message)
   }
 
@@ -172,8 +172,8 @@ object TransactionGroupOperations extends Controller {
 
             val numTrans = transGroup.transactions.size
             val message = operationMeta match {
-              case AddNewOperationMeta() => s"""Successfully created ${numTrans} transaction${if (numTrans == 1) "" else "s"}"""
-              case EditOperationMeta(_) => s"""Successfully edited ${numTrans} transaction${if (numTrans == 1) "" else "s"}"""
+              case AddNewOperationMeta() => s"""¢Successfully created£ ${numTrans} transaction${if (numTrans == 1) "" else "s"}"""
+              case EditOperationMeta(_) => s"""¢Successfully edited£ ${numTrans} transaction${if (numTrans == 1) "" else "s"}"""
             }
             Redirect(returnTo.url).flashing("message" -> message)
           })
@@ -227,8 +227,8 @@ object TransactionGroupOperations extends Controller {
                        templatesInNavbar: Seq[Template] = Seq())
                       (implicit user: User, request: Request[AnyContent], returnTo: ReturnTo): Html = {
     val title = operationMeta match {
-      case AddNewOperationMeta() => "New Transaction"
-      case EditOperationMeta(_) => "Edit Transaction"
+      case AddNewOperationMeta() => "¢New Transaction£"
+      case EditOperationMeta(_) => "¢Edit Transaction£"
     }
     val formAction: Call = operationMeta match {
       case AddNewOperationMeta() => routes.TransactionGroupOperations.addNew() ++: returnTo
