@@ -15,15 +15,15 @@
   implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash
 )
 
-@Main("Everything", templatesInNavbar = templatesInNavbar) {
+@Main("¢Everything£", templatesInNavbar = templatesInNavbar) {
   <h1><i class="icon-list"></i> Everything</h1>
 
   @Panel(
-    title = "Genral Information About All Entries"
+    title = "¢Genral Information About All Entries£"
   ) { @* panel content *@
 
     @viewhelpers.accounting.Table.cached(
-      title = s"All",
+      title = s"¢All£",
       tableTypeIdentifierForCache = "everything",
       tableClasses = "table-everything",
       allEntriesLink = (entries.size > numEntriesToShow) match {
@@ -34,14 +34,14 @@
       colspan = 9,
       entries = entries.reverse.take(numEntriesToShow)
     ) { @* table headers *@
-      <th>Issuer</th>
-      <th>Payed</th>
-      <th>Consumed</th>
-      <th>Beneficiary</th>
-      <th>Payed with/to</th>
-      <th>Category</th>
-      <th>Description</th>
-      <th>Flow (@CurrencyUnit.default.htmlSymbol)</th>
+      <th>~Issuer£</th>
+      <th>~Payed£</th>
+      <th>~Consumed£</th>
+      <th>~Beneficiary£</th>
+      <th>~Payed£ with/to</th>
+      <th>~Category£</th>
+      <th>~Description£</th>
+      <th>~Flow£ (@CurrencyUnit.default.htmlSymbol)</th>
       <th>&nbsp;</th>
     } { entry =>  @* table datas *@
       <td>@entry.issuer.name</td>

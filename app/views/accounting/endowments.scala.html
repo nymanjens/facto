@@ -16,16 +16,16 @@
   implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash
 )
 
-@Main("Endowments", templatesInNavbar = templatesInNavbar) {
+@Main("¢Endowments£", templatesInNavbar = templatesInNavbar) {
   <h1><i class="icon-crown"></i> Endowments</h1>
 
   @Panel(
-    title = if (accountToEntries.size > 1) "All Accounts" else "Single Account"
+    title = if (accountToEntries.size > 1) "¢All Accounts£" else "¢Single Account£"
   ) { @* panel content *@
 
     @for((account, entries) <- accountToEntries) {
       @viewhelpers.accounting.Table.cached(
-        title = s"Endowments of ${account.longName}",
+        title = s"¢Endowments of£ ${account.longName}",
         tableTypeIdentifierForCache = s"endowments_${account.code}",
         tableClasses = "table-endowments",
         allEntriesLink = (entries.size > expandedNumEntries) match {
@@ -36,13 +36,13 @@
         colspan = 8,
         entries = entries.reverse.take(expandedNumEntries)
       ) { @* table headers *@
-        <th>Payed</th>
-        <th>Consumed</th>
-        <th>Beneficiary</th>
-        <th>Payed with/to</th>
-        <th>Category</th>
-        <th>Description</th>
-        <th>Flow (@CurrencyUnit.default.htmlSymbol)</th>
+        <th>~Payed£</th>
+        <th>~Consumed£</th>
+        <th>~Beneficiary£</th>
+        <th>~Payed£ with/to</th>
+        <th>~Category£</th>
+        <th>~Description£</th>
+        <th>~Flow£ (@CurrencyUnit.default.htmlSymbol)</th>
         <th>&nbsp;</th>
       } { entry =>  @* table datas *@
         <td>@entry.transactionDates.map(formatDate).mkString(", ")</td>

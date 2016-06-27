@@ -10,8 +10,13 @@ def generate_code(words_html):
   return "facto.{}".format(code)
 
 def add_to_messages(fpath, code, words):
-  if code not in open(fpath).read():
-    line_to_add = "{}={}\n".format(code, words)
+  line_to_add = "{}={}\n".format(code, words)
+  if code+"=" in open(fpath).read():
+    lines = open(fpath).readlines()
+    matching_lines = [l for l in lines if l.startswith(code+"=")]
+    assert len(matching_lines) == 1
+    assert matching_lines[0] == line_to_add
+  else:
     open(fpath, 'a').write(line_to_add)
 
 def add_to_all_messages(code, words):
@@ -19,7 +24,7 @@ def add_to_all_messages(code, words):
   add_to_messages("conf/messages.nl", code, "XX" + words)
 
 def main():
-  for root, subdirs, files in os.walk('.'):
+  for root, subdirs, files in os.walk('app'):
     for filename in files:
       if filename.endswith(".scala.html") or  filename.endswith(".scala"):
         path = os.path.join(root, filename)
@@ -28,7 +33,7 @@ def main():
         for words in re.findall(r'~(.*?)£', fcontent):
           match = "~{}£".format(words)
           code = generate_code(words)
-          new_fcontent = new_fcontent.replace(match, '@Messages("{}")'.format(code))
+          new_fcontent = new_fcontent.replace(match, '@Html(Messages("{}"))'.format(code))
           add_to_all_messages(code, words)
           print path, generate_code(words)
         open(path, "w").write(new_fcontent)
