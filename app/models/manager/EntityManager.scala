@@ -13,7 +13,7 @@ trait EntityManager[E <: Entity[E], T <: AbstractTable[E]] {
   /** Initializes this manager. This is called once at the start of the application. */
   def initialize(): Unit = {}
   /** Creates the persisted database table for this manager. */
-  def createTable: Unit
+  def createTable(): Unit
   def tableName: String
 
   // ********** Mutators ********** //

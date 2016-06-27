@@ -13,7 +13,7 @@ object GeneralImportTool {
 
     for (entityManager <- Tables.allEntityManagers) {
       dbRun(sqlu"""DROP TABLE IF EXISTS #${entityManager.tableName}""")
-      entityManager.createTable
+      entityManager.createTable()
     }
 
     Logger.debug(" done")

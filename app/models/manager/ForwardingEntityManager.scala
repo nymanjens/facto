@@ -8,7 +8,7 @@ abstract class ForwardingEntityManager[E <: Entity[E], T <: AbstractTable[E]](de
 
   // ********** Management methods ********** //
   override def initialize(): Unit = delegate.initialize()
-  override def createTable: Unit = delegate.createTable
+  override def createTable(): Unit = delegate.createTable
   override def tableName: String = delegate.tableName
 
   // ********** Mutators ********** //

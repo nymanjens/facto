@@ -11,7 +11,7 @@ private[manager] final class DatabaseBackedEntityManager[E <: Entity[E], T <: En
   extends EntityManager[E, T] {
 
   // ********** Implementation of EntityManager interface - Management methods ********** //
-  override def createTable: Unit = {
+  override def createTable(): Unit = {
     dbRun(newQuery.schema.create)
   }
 
