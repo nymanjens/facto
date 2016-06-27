@@ -1,6 +1,10 @@
 @import common.ReturnTo
 
-@(groupId: Long)(implicit request: Request[AnyContent])
+@(
+  groupId: Long
+)(
+  implicit request: Request[AnyContent], messages: Messages
+)
 
 <a class="btn btn-default btn-xs"
     href="@(controllers.accounting.routes.TransactionGroupOperations.editForm(groupId

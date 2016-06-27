@@ -1,7 +1,16 @@
 @import viewhelpers.IdGenerator
 
-@(title: String, tableClasses: String, allEntriesLink: Option[Call], numEntriesShownByDefault: Int, colspan: Int,
-  tableHeaders: Html, tableDatas: Seq[Html])
+@(
+  title: String,
+  tableClasses: String,
+  allEntriesLink: Option[Call],
+  numEntriesShownByDefault: Int,
+  colspan: Int,
+  tableHeaders: Html,
+  tableDatas: Seq[Html]
+)(
+  implicit messages: Messages
+)
 
 <table class="table table-bordered table-hover table-condensed table-overflow-elipsis add-toc-level-2 @tableClasses"
     id="@IdGenerator.uniqueId(title)">

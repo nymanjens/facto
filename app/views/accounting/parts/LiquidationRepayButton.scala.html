@@ -2,7 +2,13 @@
 @import models.accounting.Money
 @import models.accounting.config.Account
 
-@(account1: Account, account2: Account, amount: Money)(implicit request: Request[AnyContent])
+@(
+  account1: Account,
+  account2: Account,
+  amount: Money
+)(
+  implicit request: Request[AnyContent], messages: Messages
+)
 
 <a class="btn btn-info btn-xs"
     href="@(controllers.accounting.routes.TransactionGroupOperations.addNewLiquidationRepayForm(

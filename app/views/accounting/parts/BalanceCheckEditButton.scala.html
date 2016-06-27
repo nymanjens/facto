@@ -1,7 +1,11 @@
 @import common.ReturnTo
 @import models.accounting.BalanceCheck
 
-@(bc: BalanceCheck)(implicit request: Request[AnyContent])
+@(
+  bc: BalanceCheck
+)(
+  implicit request: Request[AnyContent], messages: Messages
+)
 
 <a class="btn btn-default btn-xs"
     href="@(controllers.accounting.routes.BalanceCheckOperations.editForm(bc.id
