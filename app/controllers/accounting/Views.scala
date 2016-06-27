@@ -12,6 +12,10 @@ import models.accounting.config.{Account, Category, MoneyReservoir, Template}
 import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting._
 
+// imports for 2.4 i18n (https://www.playframework.com/documentation/2.4.x/Migration24#I18n)
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
+
 object Views extends Controller {
 
   // ********** actions - views ********** //

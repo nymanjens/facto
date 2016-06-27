@@ -14,7 +14,7 @@
   expandedNumEntries: Int,
   templatesInNavbar: Seq[Template]
 )(
-  implicit user: User, request: Request[AnyContent], flash: Flash
+  implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash
 )
 
 @Main("Cash Flow", templatesInNavbar = templatesInNavbar, generateToc = true) {

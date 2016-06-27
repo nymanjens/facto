@@ -3,7 +3,12 @@
 @import viewhelpers.Formatting._
 @import views.html.accounting.parts._
 
-@(entries: Seq[UpdateLog], numEntriesToShow: Int)(implicit user: User, request: Request[AnyContent], flash: Flash)
+@(
+  entries: Seq[UpdateLog],
+  numEntriesToShow: Int
+)(
+  implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash
+)
 
 @Main("Update Logs") {
   <h1><i class="fa fa-archive fa-fw"></i> Update Logs</h1>

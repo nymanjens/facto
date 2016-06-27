@@ -17,7 +17,7 @@
   tags: Seq[Tag],
   tagsString: String
 )(
-  implicit user: User, request: Request[AnyContent], flash: Flash
+  implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash
 )
 
 @Main("Summary", templatesInNavbar = templatesInNavbar) {

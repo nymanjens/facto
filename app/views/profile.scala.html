@@ -2,7 +2,11 @@
 @import controllers.Application.Forms.ChangePasswordData
 @import views.html.utils.bootstrap3
 
-@(changePasswordForm: Form[ChangePasswordData])(implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash)
+@(
+  changePasswordForm: Form[ChangePasswordData]
+)(
+  implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash
+)
 
 @Main("Profile") {
   <h1><i class="fa fa-user fa-fw"></i> Profile of @user.name</h1>
