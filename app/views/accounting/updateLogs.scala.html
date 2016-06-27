@@ -11,7 +11,7 @@
 )
 
 @Main("¢Update Logs£") {
-  <h1><i class="fa fa-archive fa-fw"></i> ~Update Logs£</h1>
+  <h1><i class="fa fa-archive fa-fw"></i> @Messages("facto.update-logs")</h1>
 
   @Panel(
     title = "¢Logs£"
@@ -28,9 +28,9 @@
       colspan = 3,
       entries = entries.reverse.take(numEntriesToShow)
     ) { @* table headers *@
-      <th>~User£</th>
-      <th>~Date£</th>
-      <th>~Description£</th>
+      <th>@Messages("facto.user")</th>
+      <th>@Messages("facto.date")</th>
+      <th>@Messages("facto.description")</th>
     } { entry =>  @* table datas *@
       <td>@entry.user.name</td>
       <td>@formatDateTime(entry.date)</td>

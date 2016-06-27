@@ -22,7 +22,7 @@
 
 @Main("¢Summary£", templatesInNavbar = templatesInNavbar) {
   <h1>
-    <i class="icon-table"></i> ~Summary£
+    <i class="icon-table"></i> @Messages("facto.summary")
     <div class="summary-tag-filters">
       Filter:
       @for((tag, numUsages) <- TagEntities.usageAndReccomendations(tags, 4)) {
@@ -38,7 +38,7 @@
       }
       <form action="@request.uri" method="GET">
         <input type="hidden" name="tags" value="@tagsString" />
-        <input type="text" name="toggleTag" placeholder="~Other tag£" />
+        <input type="text" name="toggleTag" placeholder="@Messages("facto.other-tag")" />
       </form>
     </div>
     <div style="clear: both"></div>
@@ -62,7 +62,7 @@
             }
           </tr>
           <tr>
-            <th>~Category£</th>
+            <th>@Messages("facto.category")</th>
             @for((year, summaryForYear) <- summary.yearToSummary) {
               @if(year == expandedYear) {
                 @for(month <- summaryForYear.months) {

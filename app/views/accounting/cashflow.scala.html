@@ -39,13 +39,13 @@
           colspan = 8,
           entries = reservoirToEntries(reservoir).reverse.take(expandedNumEntries)
         ) { @* table headers *@
-          <th>~Payed£</th>
-          <th>~Consumed£</th>
-          <th>~Beneficiary£</th>
-          <th>~Category£</th>
-          <th>~Description£</th>
-          <th>~Flow£ (@reservoir.currency.htmlSymbol)</th>
-          <th>~Balance£ (@reservoir.currency.htmlSymbol)</th>
+          <th>@Messages("facto.payed")</th>
+          <th>@Messages("facto.consumed")</th>
+          <th>@Messages("facto.beneficiary")</th>
+          <th>@Messages("facto.category")</th>
+          <th>@Messages("facto.description")</th>
+          <th>@Messages("facto.flow") (@reservoir.currency.htmlSymbol)</th>
+          <th>@Messages("facto.balance") (@reservoir.currency.htmlSymbol)</th>
           <th>@BalanceCheckAddNewButton(reservoir)</th>
         } { (entry, i) =>  @* table datas *@
           @entry match {
@@ -69,7 +69,7 @@
             }
             case BalanceCorrection(bc) => {
               <td>@formatDate(bc.checkDate)</td>
-              <td colspan="5" style="font-weight: bold;">~Balance correction£:</td>
+              <td colspan="5" style="font-weight: bold;">@Messages("facto.balance-correction"):</td>
               <td>@bc.balance.formatFloat</td>
               <td>@BalanceCheckEditButton(bc)</td>
             }

@@ -35,12 +35,12 @@
         colspan = 8,
         entries = entries.reverse.take(expandedNumEntries)
       ) { @* table headers *@
-        <th>~Payed£</th>
-        <th>~Beneficiary£</th>
-        <th>~Payed£ with/to</th>
-        <th>~Category£</th>
-        <th>~Description£</th>
-        <th>~Flow£ (@CurrencyUnit.default.htmlSymbol)</th>
+        <th>@Messages("facto.payed")</th>
+        <th>@Messages("facto.beneficiary")</th>
+        <th>@Messages("facto.payed") with/to</th>
+        <th>@Messages("facto.category")</th>
+        <th>@Messages("facto.description")</th>
+        <th>@Messages("facto.flow") (@CurrencyUnit.default.htmlSymbol)</th>
         <th>@account1.veryShortName -> @account2.veryShortName (@CurrencyUnit.default.htmlSymbol)</th>
         <th>
           @if(!entries.isEmpty) {

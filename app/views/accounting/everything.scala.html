@@ -34,14 +34,14 @@
       colspan = 9,
       entries = entries.reverse.take(numEntriesToShow)
     ) { @* table headers *@
-      <th>~Issuer£</th>
-      <th>~Payed£</th>
-      <th>~Consumed£</th>
-      <th>~Beneficiary£</th>
-      <th>~Payed£ with/to</th>
-      <th>~Category£</th>
-      <th>~Description£</th>
-      <th>~Flow£ (@CurrencyUnit.default.htmlSymbol)</th>
+      <th>@Messages("facto.issuer")</th>
+      <th>@Messages("facto.payed")</th>
+      <th>@Messages("facto.consumed")</th>
+      <th>@Messages("facto.beneficiary")</th>
+      <th>@Messages("facto.payed") with/to</th>
+      <th>@Messages("facto.category")</th>
+      <th>@Messages("facto.description")</th>
+      <th>@Messages("facto.flow") (@CurrencyUnit.default.htmlSymbol)</th>
       <th>&nbsp;</th>
     } { entry =>  @* table datas *@
       <td>@entry.issuer.name</td>

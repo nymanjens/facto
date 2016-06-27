@@ -14,7 +14,7 @@
             <i class="fa fa-plus-circle fa-fw"></i> @title
             @for(action <- deleteAction) {
               <a class="btn btn-default" href="@action" role="button">
-                <i class="fa fa-times"></i> ~Delete£
+                <i class="fa fa-times"></i> @Messages("facto.delete")
               </a>
             }
           </h1>
@@ -26,7 +26,7 @@
       <div class="col-lg-6">
         <div class="panel panel-default">
           <div class="panel-heading">
-            <span class="panel-heading-title">~Balance Check£</span>
+            <span class="panel-heading-title">@Messages("facto.balance-check")</span>
           </div>
           <div class="panel-body">
             @bootstrap3.Text(bcForm("issuerName"), "Issuer", args=Map('readonly -> "readonly"))
@@ -38,7 +38,7 @@
       </div>
       <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
-          <button type="submit" class="btn btn-default">~Ok£</button>
+          <button type="submit" class="btn btn-default">@Messages("facto.ok")</button>
         </div>
       </div>
     }
