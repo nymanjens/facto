@@ -7,12 +7,9 @@ import common.cache.UniquelyHashable.UniquelyHashableIterableFunnel
 import common.cache.sync.SynchronizedCache
 import common.cache.versioned.VersionedKeyValueCache
 import org.joda.time.Duration
+import play.api.i18n.Messages
 import play.api.mvc.Call
 import play.twirl.api.Html
-
-// imports for 2.4 i18n (https://www.playframework.com/documentation/2.4.x/Migration24#I18n)
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
 
 object Table {
 
@@ -28,7 +25,8 @@ object Table {
   def apply[T](title: String, tableClasses: String = "", allEntriesLink: Option[Call] = None, numEntriesShownByDefault: Int = defaultNumEntriesShown, colspan: Int = 9999,
                entries: Seq[T])
               (tableHeaders: Html)
-              (entryToTableDatas: T => Html): Html = {
+              (entryToTableDatas: T => Html)
+              (implicit messages: Messages): Html = {
     val tableDatas = entries map entryToTableDatas
     views.html.accounting.parts.Table(title, tableClasses, allEntriesLink, numEntriesShownByDefault, colspan, tableHeaders, tableDatas)
   }
@@ -36,7 +34,8 @@ object Table {
   def withIndexedEntries[T](title: String, tableClasses: String = "", allEntriesLink: Option[Call] = None, numEntriesShownByDefault: Int = defaultNumEntriesShown, colspan: Int = 9999,
                             entries: Seq[T])
                            (tableHeaders: Html)
-                           (entryToTableDatas: (T, Int) => Html): Html = {
+                           (entryToTableDatas: (T, Int) => Html)
+                           (implicit messages: Messages): Html = {
     val tableDatas = entries.zipWithIndex.map(entryToTableDatas.tupled)
     views.html.accounting.parts.Table(title, tableClasses, allEntriesLink, numEntriesShownByDefault, colspan, tableHeaders, tableDatas)
   }
@@ -50,7 +49,8 @@ object Table {
                                     colspan: Int = 9999,
                                     entries: Seq[T])
                                    (tableHeaders: Html)
-                                   (entryToTableDatas: T => Html): Html = {
+                                   (entryToTableDatas: T => Html)
+                                   (implicit messages: Messages): Html = {
     val tableIdentifier = TableIdentifier(tableTypeIdentifierForCache, numEntriesShownByDefault)
     val tableContentIdentifier = TableContentIdentifier(entries)
 
@@ -72,7 +72,8 @@ object Table {
                                                       colspan: Int = 9999,
                                                       entries: Seq[T])
                                                      (tableHeaders: Html)
-                                                     (entryToTableDatas: (T, Int) => Html): Html = {
+                                                     (entryToTableDatas: (T, Int) => Html)
+                                                     (implicit messages: Messages): Html = {
     val tableIdentifier = TableIdentifier(tableTypeIdentifierForCache, numEntriesShownByDefault)
     val tableContentIdentifier = TableContentIdentifier(entries)
 
