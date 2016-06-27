@@ -16,8 +16,8 @@
   implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash
 )
 
-@Main("Liquidation", templatesInNavbar = templatesInNavbar) {
-  <h1><i class="icon-water"></i> Liquidation</h1>
+@Main("¢Liquidation£", templatesInNavbar = templatesInNavbar) {
+  <h1><i class="icon-water"></i> @Messages("facto.liquidation")</h1>
 
   @Panel(
     title = if (pairsToEntries.size > 1) "¢All Combinations£" else "¢Single Combination£"

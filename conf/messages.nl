@@ -108,3 +108,4 @@ facto.set=XXset
 facto.show-other-accounts=XXShow other accounts
 facto.hide-other-accounts=XXHide other accounts
 facto.no-entries=XXNo Entries
+facto.liquidation=XXLiquidation
