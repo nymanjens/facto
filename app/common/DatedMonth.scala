@@ -24,7 +24,7 @@ case class DatedMonth(startDate: DateTime) extends Ordered[DatedMonth] {
 
 object DatedMonth {
 
-  private val abbreviations = Seq("Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec")
+  private val abbreviations = Seq("¢Jan£", "¢Feb£", "¢Mar£", "¢Apr£", "¢May£", "¢June£", "¢July£", "¢Aug£", "¢Sept£", "¢Oct£", "¢Nov£", "¢Dec£")
 
   def containing(date: DateTime): DatedMonth = DatedMonth(startOfMonthContaining(date))
 

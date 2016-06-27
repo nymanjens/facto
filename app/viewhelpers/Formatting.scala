@@ -21,18 +21,18 @@ object Formatting {
       val dayDifference = abs(now.getDayOfYear - date.getDayOfYear)
 
       if (date.getDayOfYear == now.getDayOfYear) {
-        "Today"
+        "**Today"
       } else if (date.getDayOfYear == now.getDayOfYear - 1) {
-        "Yesterday"
+        "**Yesterday"
       } else if (date.getDayOfYear == now.getDayOfYear + 1) {
-        "Tomorrow"
+        "**Tomorrow"
       } else if (dayDifference < 7) {
-        s"$dayOfWeek, $dayMonthString"
+        s"**$dayOfWeek, $dayMonthString"
       } else {
-        dayMonthString
+        "**" + dayMonthString
       }
     } else {
-      s"$dayMonthString '$yearString"
+      s"**$dayMonthString '$yearString"
     }
   }
 

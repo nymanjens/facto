@@ -25,7 +25,7 @@ object Auth extends Controller {
 
   def logout = Action {
     Redirect(routes.Auth.login).withNewSession.flashing(
-      "message" -> "You are now logged out."
+      "message" -> "¢You are now logged out£"
     )
   }
 
@@ -36,7 +36,7 @@ object Auth extends Controller {
       tuple(
         "loginName" -> nonEmptyText,
         "password" -> text
-      ) verifying("Invalid username or password", result => result match {
+      ) verifying("¢Invalid username or password£", result => result match {
         case (loginName, password) => Users.authenticate(loginName, password)
       })
     )
