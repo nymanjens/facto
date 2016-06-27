@@ -7,7 +7,10 @@ def generate_code(words_html):
   words = re.sub("<.*?>", "", words_html) # remove tags
   code = words.strip().replace(" ", "-").lower()
   assert re.match(r'^[a-z0-9-]+$', code), "Illegal code: {}".format(code)
-  return "facto.{}".format(code)
+  if words_html != words:
+    return "facto.{}.html".format(code)
+  else:
+    return "facto.{}".format(code)
 
 def add_to_messages(fpath, code, words):
   line_to_add = "{}={}\n".format(code, words)
@@ -15,7 +18,7 @@ def add_to_messages(fpath, code, words):
     lines = open(fpath).readlines()
     matching_lines = [l for l in lines if l.startswith(code+"=")]
     assert len(matching_lines) == 1
-    assert matching_lines[0] == line_to_add
+    assert matching_lines[0] == line_to_add, "Conflict for code {}:\nExpected:\n{}Got:\n{}".format(code, line_to_add, matching_lines[0])
   else:
     open(fpath, 'a').write(line_to_add)
 
@@ -33,7 +36,7 @@ def main():
         for words in re.findall(r'~(.*?)£', fcontent):
           match = "~{}£".format(words)
           code = generate_code(words)
-          new_fcontent = new_fcontent.replace(match, '@Html(Messages("{}"))'.format(code))
+          new_fcontent = new_fcontent.replace(match, '@Messages("{}")'.format(code))
           add_to_all_messages(code, words)
           print path, generate_code(words)
         open(path, "w").write(new_fcontent)
