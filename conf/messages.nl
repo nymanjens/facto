@@ -65,3 +65,4 @@ facto.liquidation=XXLiquidation
 facto.cash-flow=XXCash Flow
 facto.everything=XXEverything
 facto.endowments=XXEndowments
+facto.avg=XXAvg.
