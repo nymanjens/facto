@@ -186,7 +186,7 @@ object Views extends Controller {
     } else {
       // get accountToEntries
       val accountToSummary = toListMap {
-        for (account <- accounts) yield account -> Summary.fetchSummary(account, expandedYear)
+        for (account <- accounts) yield account -> Summary.fetchSummary(account, expandedYear, tags)
       }
 
       // render

@@ -15,7 +15,7 @@ import common.{Clock, MonthRange, DatedMonth}
 import common.CollectionUtils.toListMap
 import common.GuavaUtils.asGuava
 import models.SlickUtils.{dbRun, JodaToSqlDateMapper}
-import models.accounting.{Transactions, Transaction, Money}
+import models.accounting.{Transactions, Transaction, Money, Tag}
 import models.accounting.config.{Category, Account}
 import models.accounting.config.Account.SummaryTotalRowDef
 import controllers.helpers.ControllerHelperCache
@@ -31,7 +31,7 @@ case class Summary(yearToSummary: Map[Int, SummaryForYear],
 }
 
 object Summary {
-  def fetchSummary(account: Account, expandedYear: Int): Summary = {
+  def fetchSummary(account: Account, expandedYear: Int, tags: Seq[Tag]): Summary = {
     val now = Clock.now
 
     val years: Seq[Int] = getSummaryYears(account, expandedYear, now.getYear)
@@ -54,7 +54,7 @@ object Summary {
 
     val yearToSummary: Map[Int, SummaryForYear] = toListMap {
       for ((year, i) <- years.zipWithIndex) yield {
-        year -> SummaryForYear.fetch(account, monthRangeForAverages, year)
+        year -> SummaryForYear.fetch(account, monthRangeForAverages, year, tags)
       }
     }
 
@@ -105,16 +105,22 @@ case class SummaryForYear(cells: ImmutableTable[Category, DatedMonth, SummaryCel
 
 object SummaryForYear {
 
-  private[accounting] def fetch(account: Account, monthRangeForAverages: MonthRange, year: Int): SummaryForYear =
-    ControllerHelperCache.cached(GetSummaryForYear(account, monthRangeForAverages, year)) {
+  private[accounting] def fetch(account: Account, monthRangeForAverages: MonthRange, year: Int, tags: Seq[Tag]): SummaryForYear =
+    ControllerHelperCache.cached(GetSummaryForYear(account, monthRangeForAverages, year, tags)) {
       val transactions: Seq[Transaction] = {
         val yearRange = MonthRange.forYear(year)
-        dbRun(Transactions.newQuery
+        val allTransactions = dbRun(Transactions.newQuery
           .filter(_.beneficiaryAccountCode === account.code)
           .filter(_.consumedDate >= yearRange.start)
           .filter(_.consumedDate < yearRange.startOfNextMonth)
           .sortBy(r => (r.consumedDate, r.createdDate)))
           .toList
+        if (tags.isEmpty) {
+          allTransactions // don't filter
+        } else {
+          def containsAllTags(iterable: Iterable[Tag]): Boolean = iterable.filter(tags.contains).size == tags.size
+          allTransactions.filter(trans => containsAllTags(trans.tags))
+        }
       }
 
       val summaryBuilder = new SummaryForYear.Builder(account, monthRangeForAverages, year)
@@ -124,7 +130,7 @@ object SummaryForYear {
       summaryBuilder.result
     }
 
-  private case class GetSummaryForYear(account: Account, monthRangeForAverages: MonthRange, year: Int) extends CacheIdentifier[SummaryForYear] {
+  private case class GetSummaryForYear(account: Account, monthRangeForAverages: MonthRange, year: Int, tags: Seq[Tag]) extends CacheIdentifier[SummaryForYear] {
     protected override def invalidateWhenUpdating = {
       case transaction: Transaction =>
         transaction.beneficiaryAccountCode == account.code && transaction.consumedDate.getYear == year
