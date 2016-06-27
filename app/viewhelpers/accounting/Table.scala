@@ -10,6 +10,10 @@ import org.joda.time.Duration
 import play.api.mvc.Call
 import play.twirl.api.Html
 
+// imports for 2.4 i18n (https://www.playframework.com/documentation/2.4.x/Migration24#I18n)
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
+
 object Table {
 
   private val defaultNumEntriesShown = 20

@@ -71,7 +71,10 @@
           <div class="col-lg-6 transaction-holder"  id="transaction-holder-@index">
             <div class="panel panel-default">
               <div class="panel-heading">
-                <span class="panel-heading-title">@Messages("facto.transaction") @{index + 1}</span>
+                <span class="panel-heading-title">
+                  @Messages("facto.transaction")
+                  @{index + 1}
+                </span>
 
                 <div class="pull-right rm-transaction-button-holder @if(index == 0){hidden}">
                   <button type="button" class="btn btn-default btn-xs rm-transaction-button">
