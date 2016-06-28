@@ -1,7 +1,3 @@
-#
-# Copyright (C) 2009-2015 Typesafe Inc. <http://www.typesafe.com>
-#
-
 # Default messages
 
 # --- Errors
@@ -114,9 +110,9 @@ facto.successfully-edited-a-balance-check-for=XXSuccessfully edited a balance ch
 facto.successfully-deleted-1-transaction=XXSuccessfully deleted 1 transaction
 facto.successfully-created-1-transaction=XXSuccessfully created 1 transaction
 facto.successfully-edited-1-transaction=XXSuccessfully edited 1 transaction
-successfully-deleted-transactions=XXSuccessfully deleted {0} transactions
-successfully-created-transactions=XXSuccessfully created {0} transactions
-successfully-edited-transactions=XXSuccessfully edited {0} transactions
+facto.successfully-deleted-transactions=XXSuccessfully deleted {0} transactions
+facto.successfully-created-transactions=XXSuccessfully created {0} transactions
+facto.successfully-edited-transactions=XXSuccessfully edited {0} transactions
 facto.debt-of=XXDebt of {0} to {1}
-account-of=XXAccount: {0}
+facto.account-of=XXAccount: {0}
 facto.endowments-of=XXEndowments of {0}

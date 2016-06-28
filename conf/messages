@@ -1,7 +1,3 @@
-#
-# Copyright (C) 2009-2015 Typesafe Inc. <http://www.typesafe.com>
-#
-
 # Default messages
 
 # --- Constraints
@@ -161,9 +157,9 @@ facto.successfully-edited-a-balance-check-for=Successfully edited a balance chec
 facto.successfully-deleted-1-transaction=Successfully deleted 1 transaction
 facto.successfully-created-1-transaction=Successfully created 1 transaction
 facto.successfully-edited-1-transaction=Successfully edited 1 transaction
-successfully-deleted-transactions=Successfully deleted {0} transactions
-successfully-created-transactions=Successfully created {0} transactions
-successfully-edited-transactions=Successfully edited {0} transactions
+facto.successfully-deleted-transactions=Successfully deleted {0} transactions
+facto.successfully-created-transactions=Successfully created {0} transactions
+facto.successfully-edited-transactions=Successfully edited {0} transactions
 facto.debt-of=Debt of {0} to {1}
-account-of=Account: {0}
+facto.account-of=Account: {0}
 facto.endowments-of=Endowments of {0}
