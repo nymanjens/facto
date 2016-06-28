@@ -53,9 +53,9 @@ def main():
           new_fcontent = new_fcontent.replace(match, 'Messages("{}")'.format(code))
           add_to_all_messages(code, words)
           print path, generate_code(words)
-        # Example: '"∞Successfully deleted balance check for§ $moneyReservoirName£"'
-        for string in re.findall(r'"∞(.*?§.*?)£"', fcontent):
-          match = '"∞{}£"'.format(string)
+        # Example: 's"∞Successfully deleted balance check for§ $moneyReservoirName£"'
+        for string in re.findall(r's"∞(.*?§.*?)£"', fcontent):
+          match = 's"∞{}£"'.format(string)
           parts = string.split('§')
           assert len(parts) == 2
           words = parts[0]
@@ -63,7 +63,7 @@ def main():
           variables = [strip_prefix("$", v) for v in re.findall(r'\$\w+|\${.*?}', parts[1])]
           new_fcontent = new_fcontent.replace(match, 'Messages("{}", {})'.format(code, ', '.join(variables)))
 
-          templated_words = string
+          templated_words = ''.join(parts)
           old_templated_words = None
           ctr = 0
           while old_templated_words != templated_words:
