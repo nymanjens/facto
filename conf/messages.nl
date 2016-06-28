@@ -48,6 +48,7 @@ facto.profile-of=XXProfile of
 facto.change-password=XXChange Password
 facto.ok=XXOk
 facto.payed=XXPayed
+facto.payed-with-to=XXPayed with/to
 facto.beneficiary=XXBeneficiary
 facto.category=XXCategory
 facto.description=XXDescription
