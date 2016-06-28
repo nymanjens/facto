@@ -68,7 +68,8 @@ def main():
           ctr = 0
           while old_templated_words != templated_words:
             old_templated_words = templated_words
-            templated_words = re.sub(r'', '{%s}' % ctr, templated_words, count=1)
+            templated_words = re.sub(r'\$\w+|\${.*?}', r'\{%s}' % ctr, templated_words, count=1)
+            print templated_words
             ctr += 1
 
           add_to_all_messages(code, templated_words)
