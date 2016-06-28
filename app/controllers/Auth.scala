@@ -24,7 +24,7 @@ object Auth extends Controller {
     )
   }
 
-  def logout = Action {
+  def logout = Action { implicit request =>
     Redirect(routes.Auth.login).withNewSession.flashing(
       "message" -> Messages("facto.you-are-now-logged-out")
     )
