@@ -22,7 +22,7 @@
   
   @for((account, reservoirs) <- accountToReservoirs) {
     @Panel(
-      title = Messages("account-of", account.longName),
+      title = Messages("facto.account-of", account.longName),
       panelClasses = if(account.isMineOrCommon) "" else "hidden other-accounts"
     ) { @* panel content *@
 

@@ -70,7 +70,7 @@ object TransactionGroupOperations extends Controller {
       val message = if (numTrans == 1) {
         Messages("facto.successfully-deleted-1-transaction")
       } else {
-        Messages("successfully-deleted-transactions", numTrans)
+        Messages("facto.successfully-deleted-transactions", numTrans)
       }
       Redirect(returnTo).flashing("message" -> message)
   }
@@ -180,12 +180,12 @@ object TransactionGroupOperations extends Controller {
               case AddNewOperationMeta() => if (numTrans == 1) {
                 Messages("facto.successfully-created-1-transaction")
               } else {
-                Messages("successfully-created-transactions", numTrans)
+                Messages("facto.successfully-created-transactions", numTrans)
               }
               case EditOperationMeta(_) => if (numTrans == 1) {
                 Messages("facto.successfully-edited-1-transaction")
               } else {
-                Messages("successfully-edited-transactions", numTrans)
+                Messages("facto.successfully-edited-transactions", numTrans)
               }
             }
             Redirect(returnTo.url).flashing("message" -> message)
