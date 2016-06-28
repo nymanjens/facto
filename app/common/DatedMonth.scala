@@ -30,10 +30,10 @@ object DatedMonth {
     "facto.date.month.mar.abbrev",
     "facto.date.month.apr.abbrev",
     "facto.date.month.may.abbrev",
-    "facto.date.month.june.abbrev",
-    "facto.date.month.july.abbrev",
+    "facto.date.month.jun.abbrev",
+    "facto.date.month.jul.abbrev",
     "facto.date.month.aug.abbrev",
-    "facto.date.month.sept.abbrev",
+    "facto.date.month.sep.abbrev",
     "facto.date.month.oct.abbrev",
     "facto.date.month.nov.abbrev",
     "facto.date.month.dec.abbrev"

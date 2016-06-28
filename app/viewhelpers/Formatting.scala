@@ -16,8 +16,8 @@ object Formatting {
     val now = Clock.now
 
     val yearString = date.toString(forPattern("yy"))
-    val dayMonthString = date.toString(forPattern("d MMM"))
-    val dayOfWeek = date.toString(forPattern("EEE"))
+    val dayMonthString = date.toString(forPattern("d")) + " " + extractMonth(date)
+    val dayOfWeek = extractDayOfWeek(date)
 
     if (date.getYear == now.getYear) {
       val dayDifference = abs(now.getDayOfYear - date.getDayOfYear)
@@ -29,16 +29,28 @@ object Formatting {
       } else if (date.getDayOfYear == now.getDayOfYear + 1) {
         Messages("facto.tomorrow")
       } else if (dayDifference < 7) {
-        s"**$dayOfWeek, $dayMonthString"
+        s"$dayOfWeek, $dayMonthString"
       } else {
-        "**" + dayMonthString
+        dayMonthString
       }
     } else {
-      s"**$dayMonthString '$yearString"
+      s"$dayMonthString '$yearString"
     }
   }
 
   def formatDateTime(date: DateTime) = {
     date.toString(forPattern("d MMM yyyy, HH:mm"))
+  }
+
+  def extractDayOfWeek(date: DateTime)
+                      (implicit messages: Messages): String = {
+    val dayAbbrevEnglish = date.toString(forPattern("EEE")).toLowerCase
+    Messages(s"facto.date.dayofweek.$dayAbbrevEnglish.abbrev")
+  }
+
+  def extractMonth(date: DateTime)
+                  (implicit messages: Messages): String = {
+    val monthAbbrevEnglish = date.toString(forPattern("MMM")).toLowerCase
+    Messages(s"facto.date.month.$monthAbbrevEnglish.abbrev")
   }
 }

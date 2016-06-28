@@ -11,13 +11,21 @@ facto.date.month.feb.abbrev=XXFeb
 facto.date.month.mar.abbrev=XXMar
 facto.date.month.apr.abbrev=XXApr
 facto.date.month.may.abbrev=XXMay
-facto.date.month.june.abbrev=XXJune
-facto.date.month.july.abbrev=XXJuly
+facto.date.month.jun.abbrev=XXJune
+facto.date.month.jul.abbrev=XXJuly
 facto.date.month.aug.abbrev=XXAug
-facto.date.month.sept.abbrev=XXSept
+facto.date.month.sep.abbrev=XXSept
 facto.date.month.oct.abbrev=XXOct
 facto.date.month.nov.abbrev=XXNov
 facto.date.month.dec.abbrev=XXDec
+
+facto.date.dayofweek.mon=XXMon
+facto.date.dayofweek.tue=XXTue
+facto.date.dayofweek.wed=XXWed
+facto.date.dayofweek.thu=XXThu
+facto.date.dayofweek.fri=XXFri
+facto.date.dayofweek.sat=XXSat
+facto.date.dayofweek.sun=XXSun
 
 facto.error.old-password-is-incorrect=XXOld password is incorrect
 facto.error.passwords-should-match=XXPasswords should match
