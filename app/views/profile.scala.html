@@ -25,10 +25,10 @@
                 @Messages(error.message)
               </div>
             }
-            @bootstrap3.Text(changePasswordForm("loginName"), "¢Login name£", args=Map('readonly -> "readonly"))
-            @bootstrap3.Password(changePasswordForm("oldPassword"), "¢Old password£")
+            @bootstrap3.Text(changePasswordForm("loginName"), "¢Login Name£", args=Map('readonly -> "readonly"))
+            @bootstrap3.Password(changePasswordForm("oldPassword"), "¢Old Password£")
             @bootstrap3.Password(changePasswordForm("password"), "¢Password£")
-            @bootstrap3.Password(changePasswordForm("passwordVerification"), "¢Retype password£")
+            @bootstrap3.Password(changePasswordForm("passwordVerification"), "¢Retype Password£")
             <button type="submit" class="btn btn-default">@Messages("facto.ok")</button>
           </div>
         </div>
