@@ -85,7 +85,7 @@ object BalanceCheckOperations extends Controller {
       BalanceChecks.delete(bc)
 
       val moneyReservoirName = bc.moneyReservoir.name
-      val message = s"¢Successfully deleted balance check for£ $moneyReservoirName"
+      val message = s"∞Successfully deleted balance check for§ $moneyReservoirName£"
       Redirect(returnTo).flashing("message" -> message)
   }
 
