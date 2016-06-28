@@ -68,9 +68,9 @@ object TransactionGroupOperations extends Controller {
       TransactionGroups.delete(group)
 
       val message = if (numTrans == 1) {
-        "¢Successfully deleted 1 transaction£"
+        Messages("facto.successfully-deleted-1-transaction")
       } else {
-        s"∞successfully-deleted-transactions¶Successfully deleted ${numTrans} transactions£"
+        Messages("successfully-deleted-transactions", numTrans)
       }
       Redirect(returnTo).flashing("message" -> message)
   }
@@ -178,14 +178,14 @@ object TransactionGroupOperations extends Controller {
             val numTrans = transGroup.transactions.size
             val message = operationMeta match {
               case AddNewOperationMeta() => if (numTrans == 1) {
-                "¢Successfully created 1 transaction£"
+                Messages("facto.successfully-created-1-transaction")
               } else {
-                s"∞successfully-created-transactions¶Successfully created ${numTrans} transactions£"
+                Messages("successfully-created-transactions", numTrans)
               }
               case EditOperationMeta(_) => if (numTrans == 1) {
-                "¢Successfully edited 1 transaction£"
+                Messages("facto.successfully-edited-1-transaction")
               } else {
-                s"∞successfully-edited-transactions¶Successfully edited ${numTrans} transactions£"
+                Messages("successfully-edited-transactions", numTrans)
               }
             }
             Redirect(returnTo.url).flashing("message" -> message)

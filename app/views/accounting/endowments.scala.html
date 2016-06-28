@@ -25,7 +25,7 @@
 
     @for((account, entries) <- accountToEntries) {
       @viewhelpers.accounting.Table.cached(
-        title = s"∞Endowments of§ ${account.longName}£",
+        title = Messages("facto.endowments-of", account.longName),
         tableTypeIdentifierForCache = s"endowments_${account.code}",
         tableClasses = "table-endowments",
         allEntriesLink = (entries.size > expandedNumEntries) match {

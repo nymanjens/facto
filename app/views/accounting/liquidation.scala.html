@@ -25,7 +25,7 @@
 
     @for((AccountPair(account1, account2), entries) <- pairsToEntries) {
       @viewhelpers.accounting.Table(
-        title = s"∞Debt of§ ${account1.longName} to ${account2.longName}£",
+        title = Messages("facto.debt-of", account1.longName, account2.longName),
         tableClasses = "table-liquidation",
         allEntriesLink = (entries.size > expandedNumEntries) match {
             case true => Some(controllers.accounting.routes.Views.liquidationOfSingle(account1.code, account2.code))
