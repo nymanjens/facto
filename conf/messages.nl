@@ -119,3 +119,6 @@ facto.account-of=XXAccount: {0}
 facto.endowments-of=XXEndowments of {0}
 facto.filter=XXFilter
 facto.username=XXUsername
+facto.today=XXToday
+facto.yesterday=XXYesterday
+facto.tomorrow=XXTomorrow

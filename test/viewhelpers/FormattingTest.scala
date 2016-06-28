@@ -4,20 +4,24 @@ import org.junit.runner._
 import org.specs2.mutable._
 import org.specs2.runner._
 import play.api.test._
-
 import org.joda.time.DateTime
-
-import common.{TimeUtils, Clock, DatedMonth, MonthRange}
-import common.TimeUtils.{dateAt, January, February, March, April, May, December}
+import common.{Clock, DatedMonth, MonthRange, TimeUtils}
+import common.TimeUtils.{April, December, February, January, March, May, dateAt}
 import common.testing.HookedSpecification
+import play.api.Application
+import play.api.i18n.{Lang, Messages}
+import play.api.i18n.Messages.Implicits._
 
 @RunWith(classOf[JUnitRunner])
 class FormattingTest extends HookedSpecification {
 
+  val application: Application = FakeApplication()
+  val messages: Messages = applicationMessages(lang = Lang("en"), application)
+
   override def before = Clock.setTimeForTest(dateAt(2010, April, 4))
   override def afterAll = Clock.cleanupAfterTest
 
-  "formatDate()" in {
+  "formatDate()" in new WithApplication(application) {
     Formatting.formatDate(dateAt(2010, April, 4)) mustEqual "Today"
     Formatting.formatDate(dateAt(2010, April, 3)) mustEqual "Yesterday"
     Formatting.formatDate(dateAt(2010, April, 5)) mustEqual "Tomorrow"

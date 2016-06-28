@@ -5,12 +5,14 @@ import java.lang.Math.abs
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat.forPattern
 import com.github.nscala_time.time.Imports._
+import play.api.i18n.Messages
 
 import common.Clock
 
 object Formatting {
 
-  def formatDate(date: DateTime) = {
+  def formatDate(date: DateTime)
+                (implicit messages: Messages) = {
     val now = Clock.now
 
     val yearString = date.toString(forPattern("yy"))
@@ -21,11 +23,11 @@ object Formatting {
       val dayDifference = abs(now.getDayOfYear - date.getDayOfYear)
 
       if (date.getDayOfYear == now.getDayOfYear) {
-        "**Today"
+        Messages("facto.today")
       } else if (date.getDayOfYear == now.getDayOfYear - 1) {
-        "**Yesterday"
+        Messages("facto.yesterday")
       } else if (date.getDayOfYear == now.getDayOfYear + 1) {
-        "**Tomorrow"
+        Messages("facto.tomorrow")
       } else if (dayDifference < 7) {
         s"**$dayOfWeek, $dayMonthString"
       } else {
