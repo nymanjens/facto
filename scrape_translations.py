@@ -39,6 +39,12 @@ def main():
           new_fcontent = new_fcontent.replace(match, '@Messages("{}")'.format(code))
           add_to_all_messages(code, words)
           print path, generate_code(words)
+        for words in re.findall(r'"¢(.*?)£"', fcontent):
+          match = '"¢{}£"'.format(words)
+          code = generate_code(words)
+          new_fcontent = new_fcontent.replace(match, 'Messages("{}")'.format(code))
+          add_to_all_messages(code, words)
+          print path, generate_code(words)
         open(path, "w").write(new_fcontent)
 
 if __name__ == '__main__':
