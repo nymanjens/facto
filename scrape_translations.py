@@ -54,7 +54,7 @@ def main():
           add_to_all_messages(code, words)
           print path, generate_code(words)
         # Example: 's"∞Successfully deleted balance check for§ $moneyReservoirName£"'
-        for string in re.findall(r's"∞(.*?§.*?)£"', fcontent):
+        for string in re.findall(r's"∞(.*?)£"', fcontent):
           match = 's"∞{}£"'.format(string)
 
           code = None
@@ -72,7 +72,7 @@ def main():
               code = generate_code(words)
             text = ''.join(parts)
 
-          variables = [strip_prefix("$", v) for v in re.findall(r'\$\w+|\${.*?}', text)]
+          variables = [strip_prefix("$", v).strip("{}") for v in re.findall(r'\$\w+|\${.*?}', text)]
           new_fcontent = new_fcontent.replace(match, 'Messages("{}", {})'.format(code, ', '.join(variables)))
 
           templated_text = text
