@@ -63,13 +63,12 @@ def main():
           variables = [strip_prefix("$", v) for v in re.findall(r'\$\w+|\${.*?}', parts[1])]
           new_fcontent = new_fcontent.replace(match, 'Messages("{}", {})'.format(code, ', '.join(variables)))
 
-          templated_words = words
+          templated_words = string
           old_templated_words = None
           ctr = 0
           while old_templated_words != templated_words:
             old_templated_words = templated_words
-            templated_words = re.sub(r'\$\w+|\${.*?}', r'\{%s}' % ctr, templated_words, count=1)
-            print templated_words
+            templated_words = re.sub(r'\$\w+|\${.*?}', '{%s}' % ctr, templated_words, count=1)
             ctr += 1
 
           add_to_all_messages(code, templated_words)
