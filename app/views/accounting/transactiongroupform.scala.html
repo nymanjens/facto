@@ -83,30 +83,30 @@
                 </div>
               </div>
               <div class="panel-body">
-                @bootstrap3.Text(transactionForm("transactionDate"), "¢Date payed£", args=if(index==0) Map('autofocus -> "autofocus") else Map(),
+                @bootstrap3.Text(transactionForm("transactionDate"), Messages("facto.date-payed"), args=if(index==0) Map('autofocus -> "autofocus") else Map(),
                     classes=Seq("bind-until-change", "bind-to-root-form"))
-                @bootstrap3.Text(transactionForm("consumedDate"), "¢Date consumed£",
+                @bootstrap3.Text(transactionForm("consumedDate"), Messages("facto.date-consumed"),
                     classes=Seq("bind-until-change", "bind-to-formfield-transactionDate", "bind-to-root-form"))
                 @if(transactionForm("issuerName").value.getOrElse("") == user.name) {
                   @bootstrap3.Hidden(transactionForm("issuerName"))
                 } else {
-                  @bootstrap3.Text(transactionForm("issuerName"), "¢Issuer£", args=Map('readonly -> "readonly"))
+                  @bootstrap3.Text(transactionForm("issuerName"), Messages("facto.issuer"), args=Map('readonly -> "readonly"))
                 }
-                @bootstrap3.Select(transactionForm("beneficiaryAccountCode"), "¢Beneficiary£", Config.accounts.mapValues(_.longName),
+                @bootstrap3.Select(transactionForm("beneficiaryAccountCode"), Messages("facto.beneficiary"), Config.accounts.mapValues(_.longName),
                     classes=Seq("bind-until-change", "bind-to-root-form"))
-                @bootstrap3.Select(transactionForm("moneyReservoirCode"), "¢Payed with/to£",
+                @bootstrap3.Select(transactionForm("moneyReservoirCode"), Messages("facto.payed-with-to"),
                     toListMap(Config.visibleReservoirs(includeNullReservoir = true).map(reservoir => reservoir.code -> reservoir.name)),
                     classes=Seq("bind-until-change", "bind-to-root-form"))
-                @bootstrap3.Select(transactionForm("categoryCode"), "¢Category£", Config.categories.mapValues(_.name),
+                @bootstrap3.Select(transactionForm("categoryCode"), Messages("facto.category"), Config.categories.mapValues(_.name),
                     classes=Seq("bind-until-change", "bind-to-root-form"),
                     optionArgs=Config.categories.mapValues(cat => Map('accounts -> cat.accounts.map(_.code).mkString(" "))))
-                @bootstrap3.Text(transactionForm("description"), "¢Description£",
+                @bootstrap3.Text(transactionForm("description"), Messages("facto.description"),
                     classes=Seq("bind-until-change", "bind-to-root-form"))
-                @bootstrap3.Money(transactionForm("flowAsFloat"), CurrencyUnit.default, "¢Flow£",
+                @bootstrap3.Money(transactionForm("flowAsFloat"), CurrencyUnit.default, Messages("facto.flow"),
                     classes=Seq("flow-as-float"))
-                @bootstrap3.Textarea(transactionForm("detailDescription"), "¢More info£",
+                @bootstrap3.Textarea(transactionForm("detailDescription"), Messages("facto.more-info"),
                     classes=Seq("bind-until-change", "bind-to-root-form"))
-                @bootstrap3.Text(transactionForm("tags"), "¢Tags£",
+                @bootstrap3.Text(transactionForm("tags"), Messages("facto.tags"),
                     classes=Seq("bind-until-change", "bind-to-root-form"))
               </div>
             </div>

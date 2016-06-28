@@ -4,6 +4,7 @@ import models._
 import play.api.mvc._
 import play.api.data.Forms._
 import play.api.data._
+import play.api.i18n.Messages
 
 // imports for 2.4 i18n (https://www.playframework.com/documentation/2.4.x/Migration24#I18n)
 import play.api.Play.current
@@ -25,7 +26,7 @@ object Auth extends Controller {
 
   def logout = Action {
     Redirect(routes.Auth.login).withNewSession.flashing(
-      "message" -> "¢You are now logged out£"
+      "message" -> Messages("facto.you-are-now-logged-out")
     )
   }
 

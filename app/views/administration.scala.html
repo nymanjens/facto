@@ -4,7 +4,7 @@
 
 @(users: Seq[User], addUserForm: Form[AddUserData])(implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash)
 
-@Main("¢User Administration£") {
+@Main(Messages("facto.user-administration")) {
   <h1><i class="fa fa-cogs fa-fw"></i> @Messages("facto.user-administration")</h1>
 
   <div class="row">
@@ -48,10 +48,10 @@
                 @Messages(error.message)
               </div>
             }
-            @bootstrap3.Text(addUserForm("loginName"), "¢Login Name£")
-            @bootstrap3.Text(addUserForm("name"), "¢Full Name£")
-            @bootstrap3.Password(addUserForm("password"), "¢Password£")
-            @bootstrap3.Password(addUserForm("passwordVerification"), "¢Retype Password£")
+            @bootstrap3.Text(addUserForm("loginName"), Messages("facto.login-name"))
+            @bootstrap3.Text(addUserForm("name"), Messages("facto.full-name"))
+            @bootstrap3.Password(addUserForm("password"), Messages("facto.password"))
+            @bootstrap3.Password(addUserForm("passwordVerification"), Messages("facto.retype-password"))
             <button type="submit" class="btn btn-default">@Messages("facto.add")</button>
           </div>
         </div>

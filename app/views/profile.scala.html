@@ -8,7 +8,7 @@
   implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash
 )
 
-@Main("¢Profile£") {
+@Main(Messages("facto.profile")) {
   <h1><i class="fa fa-user fa-fw"></i> @Messages("facto.profile-of") @user.name</h1>
 
 
@@ -25,10 +25,10 @@
                 @Messages(error.message)
               </div>
             }
-            @bootstrap3.Text(changePasswordForm("loginName"), "¢Login Name£", args=Map('readonly -> "readonly"))
-            @bootstrap3.Password(changePasswordForm("oldPassword"), "¢Old Password£")
-            @bootstrap3.Password(changePasswordForm("password"), "¢Password£")
-            @bootstrap3.Password(changePasswordForm("passwordVerification"), "¢Retype Password£")
+            @bootstrap3.Text(changePasswordForm("loginName"), Messages("facto.login-name"), args=Map('readonly -> "readonly"))
+            @bootstrap3.Password(changePasswordForm("oldPassword"), Messages("facto.old-password"))
+            @bootstrap3.Password(changePasswordForm("password"), Messages("facto.password"))
+            @bootstrap3.Password(changePasswordForm("passwordVerification"), Messages("facto.retype-password"))
             <button type="submit" class="btn btn-default">@Messages("facto.ok")</button>
           </div>
         </div>

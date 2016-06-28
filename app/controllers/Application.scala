@@ -1,11 +1,11 @@
 package controllers
 
 import scala.collection.immutable.Seq
-
 import play.api.data.Form
 import play.api.mvc._
 import play.api.data.Forms._
 import play.Play.application
+import play.api.i18n.Messages
 
 // imports for 2.4 i18n (https://www.playframework.com/documentation/2.4.x/Migration24#I18n)
 import play.api.Play.current
@@ -64,7 +64,7 @@ object Application extends Controller {
           case ChangePasswordData(loginName, _, password, _) =>
             require(loginName == user.loginName)
             Users.add(user.withPasswordHashFromUnhashed(password))
-            val message = "¢Successfully updated password£"
+            val message = Messages("facto.successfully-updated-password")
             Redirect(routes.Application.profile).flashing("message" -> message)
         }
       )

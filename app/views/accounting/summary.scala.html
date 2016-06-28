@@ -20,7 +20,7 @@
   implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash
 )
 
-@Main("¢Summary£", templatesInNavbar = templatesInNavbar) {
+@Main(Messages("facto.summary"), templatesInNavbar = templatesInNavbar) {
   <h1>
     <i class="icon-table"></i> @Messages("facto.summary")
     <div class="summary-tag-filters">

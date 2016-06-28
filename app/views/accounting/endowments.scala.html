@@ -16,11 +16,11 @@
   implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash
 )
 
-@Main("¢Endowments£", templatesInNavbar = templatesInNavbar) {
+@Main(Messages("facto.endowments"), templatesInNavbar = templatesInNavbar) {
   <h1><i class="icon-crown"></i> @Messages("facto.endowments")</h1>
 
   @Panel(
-    title = if (accountToEntries.size > 1) "¢All Accounts£" else "¢Single Account£"
+    title = if (accountToEntries.size > 1) Messages("facto.all-accounts") else Messages("facto.single-account")
   ) { @* panel content *@
 
     @for((account, entries) <- accountToEntries) {

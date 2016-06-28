@@ -6,6 +6,7 @@ import play.api.mvc._
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 
+import play.api.i18n.Messages
 import models.User
 import models.accounting.UpdateLogs
 import models.accounting.config.{Config, Template}
