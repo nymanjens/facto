@@ -22,7 +22,7 @@
           <div class="panel-body">
             @for(error <- changePasswordForm.globalErrors) {
               <div class="alert alert-danger" role="alert">
-                @error.message
+                @Messages(error.message)
               </div>
             }
             @bootstrap3.Text(changePasswordForm("loginName"), "¢Login name£", args=Map('readonly -> "readonly"))

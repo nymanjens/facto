@@ -36,7 +36,7 @@ object Auth extends Controller {
       tuple(
         "loginName" -> nonEmptyText,
         "password" -> text
-      ) verifying("¢Invalid username or password£", result => result match {
+      ) verifying("facto.error.invalid-username-or-password", result => result match {
         case (loginName, password) => Users.authenticate(loginName, password)
       })
     )

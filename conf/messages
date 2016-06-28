@@ -70,6 +70,9 @@ facto.date.month.oct.abbrev=Oct
 facto.date.month.nov.abbrev=Nov
 facto.date.month.dec.abbrev=Dec
 
+facto.error.old-password-is-incorrect=Old password is incorrect
+facto.error.passwords-should-match=Passwords should match
+facto.error.invalid-username-or-password=Invalid username or password
 facto.error.noReservoir.atLeast2=To be able to use the N/A money reservoir, there must be at least two transactions
 facto.error.noReservoir.zeroSum=To be able to use the N/A money reservoir, the total flow of this group must sum to 0
 facto.error.noReservoir.notAllTheSame=The N/A money reservoir can be selected for either all transactions or no transactions

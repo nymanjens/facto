@@ -45,7 +45,7 @@
           <div class="panel-body">
             @for(error <- addUserForm.globalErrors) {
               <div class="alert alert-danger" role="alert">
-                @error.message
+                @Messages(error.message)
               </div>
             }
             @bootstrap3.Text(addUserForm("loginName"), "¢Login name£")
