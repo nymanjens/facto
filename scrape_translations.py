@@ -5,8 +5,10 @@ import re
 
 def generate_code(words_html):
   words = re.sub("<.*?>", "", words_html) # remove tags
+  words = words.replace("/", "-")
   code = words.strip().replace(" ", "-").lower()
   assert re.match(r'^[a-z0-9-]+$', code), "Illegal code: {}".format(code)
+  assert "--" not in code, "Illegal code: {}".format(code)
   if words_html != words:
     return "facto.{}.html".format(code)
   else:
