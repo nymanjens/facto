@@ -66,7 +66,7 @@ object BalanceCheckOperations extends Controller {
         UpdateLogs.addLog(user, UpdateLogs.AddNew, persistedBc)
 
         val moneyReservoirName = moneyReservoir.name
-        val message = s"¢Successfully added a balance check for£ $moneyReservoirName"
+        val message = s"∞Successfully added a balance check for§ $moneyReservoirName£"
         Redirect(returnTo).flashing("message" -> message)
     }
 
@@ -107,8 +107,8 @@ object BalanceCheckOperations extends Controller {
 
           val moneyReservoirName = operationMeta.moneyReservoir.name
           val message = operationMeta match {
-            case _: AddNewOperationMeta => s"¢Successfully created a balance check for£ $moneyReservoirName"
-            case _: EditOperationMeta => s"¢Successfully edited a balance check for£ $moneyReservoirName"
+            case _: AddNewOperationMeta => s"∞Successfully created a balance check for§ $moneyReservoirName£"
+            case _: EditOperationMeta => s"∞Successfully edited a balance check for§ $moneyReservoirName£"
           }
           Redirect(returnTo.url).flashing("message" -> message)
         })

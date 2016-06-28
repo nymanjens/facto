@@ -82,7 +82,7 @@ object Application extends Controller {
         formData => formData match {
           case AddUserData(loginName, name, password, _) =>
             Users.add(Users.newWithUnhashedPw(loginName, password, name))
-            val message = s"¢Successfully added user£ $name"
+            val message = s"∞Successfully added user§ $name£"
             Redirect(routes.Application.administration).flashing("message" -> message)
         }
       )

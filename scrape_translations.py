@@ -56,22 +56,34 @@ def main():
         # Example: 's"∞Successfully deleted balance check for§ $moneyReservoirName£"'
         for string in re.findall(r's"∞(.*?§.*?)£"', fcontent):
           match = 's"∞{}£"'.format(string)
-          parts = string.split('§')
-          assert len(parts) == 2
-          words = parts[0]
-          code = generate_code(words)
-          variables = [strip_prefix("$", v) for v in re.findall(r'\$\w+|\${.*?}', parts[1])]
+
+          code = None
+          text = None
+          if '¶' in string:
+            p = string.split('¶')
+            assert len(p) == 2
+            code = p[0]
+            text = p[1]
+          else:
+            parts = string.split('§')
+            assert len(parts) == 2
+            words = parts[0]
+            if not code:
+              code = generate_code(words)
+            text = ''.join(parts)
+
+          variables = [strip_prefix("$", v) for v in re.findall(r'\$\w+|\${.*?}', text)]
           new_fcontent = new_fcontent.replace(match, 'Messages("{}", {})'.format(code, ', '.join(variables)))
 
-          templated_words = ''.join(parts)
-          old_templated_words = None
+          templated_text = text
+          old_templated_text = None
           ctr = 0
-          while old_templated_words != templated_words:
-            old_templated_words = templated_words
-            templated_words = re.sub(r'\$\w+|\${.*?}', '{%s}' % ctr, templated_words, count=1)
+          while old_templated_text != templated_text:
+            old_templated_text = templated_text
+            templated_text = re.sub(r'\$\w+|\${.*?}', '{%s}' % ctr, templated_text, count=1)
             ctr += 1
 
-          add_to_all_messages(code, templated_words)
+          add_to_all_messages(code, templated_text)
 
           print path, generate_code(words)
         open(path, "w").write(new_fcontent)
