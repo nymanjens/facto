@@ -24,7 +24,7 @@
   <h1>
     <i class="icon-table"></i> @Messages("facto.summary")
     <div class="summary-tag-filters">
-      Filter:
+      @Messages("facto.filter"):
       @for((tag, numUsages) <- TagEntities.usageAndReccomendations(tags, 4)) {
         <span class="tag-with-usage">
           <a class="btn btn-xs
