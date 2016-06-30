@@ -63,7 +63,7 @@ object Application extends Controller {
         formData => formData match {
           case ChangePasswordData(loginName, _, password, _) =>
             require(loginName == user.loginName)
-            Users.add(user.withPasswordHashFromUnhashed(password))
+            Users.update(user.withPasswordHashFromUnhashed(password))
             val message = Messages("facto.successfully-updated-password")
             Redirect(routes.Application.profile).flashing("message" -> message)
         }
