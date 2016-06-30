@@ -15,6 +15,11 @@ import controllers.helpers.AuthenticatedAction
 object GeneralActions extends Controller {
 
   // ********** actions ********** //
+  def search(q: String) = AuthenticatedAction { implicit user =>
+    implicit request =>
+    Ok(q)
+  }
+
   def updateLogsLatest = AuthenticatedAction { implicit user =>
     implicit request =>
       updateLogs(numEntriesToShow = 400)

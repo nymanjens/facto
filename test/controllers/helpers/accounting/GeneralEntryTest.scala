@@ -77,4 +77,43 @@ class GeneralEntryTest extends Specification {
     // test when n > num entries
     GeneralEntry.fetchLastNEndowments(testAccountA, n = 1000) mustEqual expectedEntries
   }
+
+  "search()" should {
+    "Assign higher value to matching tags > description > detailDescription" in new WithApplication {
+      // Get and persist dummy transactions
+      val trans1 = persistTransaction(groupId = 1)
+      val trans2 = persistTransaction(groupId = 2, description = "abc def")
+      val trans3 = persistTransaction(groupId = 2, description = "abc")
+      val trans4 = persistTransaction(groupId = 3, detailDescription = "abc")
+      val trans5 = persistTransaction(groupId = 4, tagsString = "abc def")
+
+      // Get expectations
+      val expectedEntries = Vector(
+        GeneralEntry(Seq(trans5)),
+        GeneralEntry(Seq(trans2, trans3)),
+        GeneralEntry(Seq(trans4))
+      )
+
+      GeneralEntry.search("def abc") mustEqual expectedEntries
+    }
+
+    "Match the Money flow" in new WithApplication {
+      // Get and persist dummy transactions
+      val trans1 = persistTransaction(flow = Money(999))
+      val trans2 = persistTransaction(flow = Money(-1234))
+      val trans3 = persistTransaction(flow = Money(91234))
+      val trans4 = persistTransaction(flow = Money(1234), timestamp = 1010)
+      val trans5 = persistTransaction(flow = Money(1234), timestamp = 1020)
+
+      // Get expectations
+      val expectedEntries = Vector(
+        GeneralEntry(Seq(trans5)),
+        GeneralEntry(Seq(trans4)),
+        GeneralEntry(Seq(trans2)),
+        GeneralEntry(Seq(trans3))
+      )
+
+      GeneralEntry.search("12.34") mustEqual expectedEntries
+    }
+  }
 }

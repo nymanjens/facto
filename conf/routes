@@ -19,6 +19,7 @@ GET   /administration/                 controllers.Application.administration
 POST  /profile/adduser/                controllers.Application.addUser
 
 # Accounting - general
+GET  /acc/search/                      controllers.accounting.GeneralActions.search(q ?= "")
 GET  /acc/logs/                        controllers.accounting.GeneralActions.updateLogsLatest
 GET  /acc/logs/all/                    controllers.accounting.GeneralActions.updateLogsAll
 GET  /acc/templates/                   controllers.accounting.GeneralActions.templateList

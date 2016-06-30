@@ -2,7 +2,7 @@ package controllers.helpers.accounting
 
 import collection.immutable.Seq
 import scala.collection.JavaConverters._
-import com.google.common.base.Joiner
+import com.google.common.base.{Joiner, Splitter}
 import org.joda.time.DateTime
 import com.github.nscala_time.time.Imports._
 import com.google.common.hash.Hashing
@@ -32,7 +32,7 @@ object GeneralEntry {
     val transactions: Seq[Transaction] =
       dbRun(
         Transactions.newQuery
-          .sortBy(r => (r.transactionDate.desc, r.createdDate.desc))
+          .sortBy(r => (r.createdDate.desc, r.transactionDate.desc))
           .take(3 * n))
         .reverse
         .toList
@@ -64,6 +64,34 @@ object GeneralEntry {
       entries.takeRight(n)
     }
 
+  /* Returns all entries that contain the given query, with the most relevant entries first. */
+  def search(query: String): Seq[GeneralEntry] = {
+    val transactions: Seq[Transaction] =
+      dbRun(
+        Transactions.newQuery
+          .sortBy(r => (r.createdDate, r.transactionDate)))
+        .toList
+
+    val filteredTransactions: Seq[Transaction] = {
+      val queryParts: Seq[String] = Splitter.on(" ")
+        .omitEmptyStrings()
+        .trimResults()
+        .splitToList(query)
+        .asScala
+        .toVector
+      val scoreMap = transactions
+        .map { t => (t, QueryScore(t, queryParts)) }
+        .toMap
+      transactions
+        .filter(t => scoreMap(t).matchesQuery)
+        .sortBy(t => scoreMap(t))
+        .reverse
+    }
+
+    val entries = filteredTransactions.map(t => GeneralEntry(Seq(t)))
+    combineConsecutiveOfSameGroup(entries)
+  }
+
   private[accounting] def combineConsecutiveOfSameGroup(entries: Seq[GeneralEntry]): Seq[GeneralEntry] = {
     GroupedTransactions.combineConsecutiveOfSameGroup(entries) {
       /* combine */ (first, last) => GeneralEntry(first.transactions ++ last.transactions)
@@ -76,5 +104,39 @@ object GeneralEntry {
         transaction.categoryCode == Config.constants.endowmentCategory.code &&
           transaction.beneficiaryAccountCode == account.code
     }
+  }
+
+  case class QueryScore(scoreNumber: Double, createdDate: DateTime, transactionDate: DateTime) {
+    def matchesQuery: Boolean = scoreNumber > 0
+  }
+  object QueryScore {
+    def apply(transaction: Transaction, queryParts: Seq[String]): QueryScore = {
+      def stripSign(s: String) = s.replace("-", "")
+      def scorePart(queryPart: String): Double = {
+        var score: Double = 0
+        if (transaction.description contains queryPart) {
+          score += 1
+        }
+        if (transaction.detailDescription contains queryPart) {
+          score += 0.7
+        }
+        if (transaction.tagsString contains queryPart) {
+          score += 2
+        }
+        val flowAsString = transaction.flow.formatFloat
+        if (flowAsString == queryPart) {
+          score += 3
+        } else if (stripSign(flowAsString) == stripSign(queryPart)) {
+          score += 2.5
+        } else if (flowAsString contains queryPart) {
+          score += 0.1
+        }
+        score
+      }
+      val scoreNumber = queryParts.map(scorePart).sum
+      QueryScore(scoreNumber, transaction.createdDate, transaction.consumedDate)
+    }
+
+    implicit def defaultOrdering: Ordering[QueryScore] = Ordering.by(QueryScore.unapply)
   }
 }
