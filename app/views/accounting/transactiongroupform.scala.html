@@ -97,7 +97,9 @@
                 @bootstrap3.Select(transactionForm("moneyReservoirCode"), Messages("facto.payed-with-to"),
                     toListMap(Config.visibleReservoirs(includeNullReservoir = true).map(reservoir => reservoir.code -> reservoir.name)),
                     classes=Seq("bind-until-change", "bind-to-root-form"))
-                @bootstrap3.Select(transactionForm("categoryCode"), Messages("facto.category"), Config.categories.mapValues(_.name),
+                @bootstrap3.Select(transactionForm("categoryCode"), Messages("facto.category"),
+                    Config.categories.mapValues(category =>
+                      if(category.helpText.isEmpty) category.name else s"${category.name} (${category.helpText})"),
                     classes=Seq("bind-until-change", "bind-to-root-form"),
                     optionArgs=Config.categories.mapValues(cat => Map('accounts -> cat.accounts.map(_.code).mkString(" "))))
                 @bootstrap3.Text(transactionForm("description"), Messages("facto.description"),
