@@ -42,19 +42,19 @@
                 <i class="fa fa-plus-circle fa-fw"></i> @title
                 @for(action <- deleteAction) {
                   <a class="btn btn-default" href="@action" role="button">
-                    <i class="fa fa-times"></i> ~Delete£
+                    <i class="fa fa-times"></i> @Messages("facto.delete")
                   </a>
                 }
                 <span class="total-transaction-flow-box">
                   <span class="total-flow-text">
-                    ~Total£: @CurrencyUnit.default.htmlSymbol <span class="total-transaction-flow">0.00</span>
+                    @Messages("facto.total"): @CurrencyUnit.default.htmlSymbol <span class="total-transaction-flow">0.00</span>
                   </span>
                   <div class="btn-group" data-toggle="buttons">
                     <label class="btn btn-default btn-sm @if(!zeroSum){active}">
-                      <input type="radio" name="zeroSum" value="false" autocomplete="off" @if(!zeroSum){checked}> ~Any Total£
+                      <input type="radio" name="zeroSum" value="false" autocomplete="off" @if(!zeroSum){checked}> @Messages("facto.any-total")
                     </label>
                     <label class="btn btn-default btn-sm @if(zeroSum){active}">
-                      <input type="radio" name="zeroSum" value="true" autocomplete="off" @if(zeroSum){checked}> ~Zero Sum£
+                      <input type="radio" name="zeroSum" value="true" autocomplete="off" @if(zeroSum){checked}> @Messages("facto.zero-sum")
                     </label>
                   </div>
                 </span>
@@ -71,7 +71,10 @@
           <div class="col-lg-6 transaction-holder"  id="transaction-holder-@index">
             <div class="panel panel-default">
               <div class="panel-heading">
-                <span class="panel-heading-title">~Transaction£ @{index + 1}</span>
+                <span class="panel-heading-title">
+                  @Messages("facto.transaction")
+                  @{index + 1}
+                </span>
 
                 <div class="pull-right rm-transaction-button-holder @if(index == 0){hidden}">
                   <button type="button" class="btn btn-default btn-xs rm-transaction-button">
@@ -80,30 +83,30 @@
                 </div>
               </div>
               <div class="panel-body">
-                @bootstrap3.Text(transactionForm("transactionDate"), "¢Date payed£", args=if(index==0) Map('autofocus -> "autofocus") else Map(),
+                @bootstrap3.Text(transactionForm("transactionDate"), Messages("facto.date-payed"), args=if(index==0) Map('autofocus -> "autofocus") else Map(),
                     classes=Seq("bind-until-change", "bind-to-root-form"))
-                @bootstrap3.Text(transactionForm("consumedDate"), "¢Date consumed£",
+                @bootstrap3.Text(transactionForm("consumedDate"), Messages("facto.date-consumed"),
                     classes=Seq("bind-until-change", "bind-to-formfield-transactionDate", "bind-to-root-form"))
                 @if(transactionForm("issuerName").value.getOrElse("") == user.name) {
                   @bootstrap3.Hidden(transactionForm("issuerName"))
                 } else {
-                  @bootstrap3.Text(transactionForm("issuerName"), "¢Issuer£", args=Map('readonly -> "readonly"))
+                  @bootstrap3.Text(transactionForm("issuerName"), Messages("facto.issuer"), args=Map('readonly -> "readonly"))
                 }
-                @bootstrap3.Select(transactionForm("beneficiaryAccountCode"), "¢Beneficiary£", Config.accounts.mapValues(_.longName),
+                @bootstrap3.Select(transactionForm("beneficiaryAccountCode"), Messages("facto.beneficiary"), Config.accounts.mapValues(_.longName),
                     classes=Seq("bind-until-change", "bind-to-root-form"))
-                @bootstrap3.Select(transactionForm("moneyReservoirCode"), "¢Payed with/to£",
+                @bootstrap3.Select(transactionForm("moneyReservoirCode"), Messages("facto.payed-with-to"),
                     toListMap(Config.visibleReservoirs(includeNullReservoir = true).map(reservoir => reservoir.code -> reservoir.name)),
                     classes=Seq("bind-until-change", "bind-to-root-form"))
-                @bootstrap3.Select(transactionForm("categoryCode"), "¢Category£", Config.categories.mapValues(_.name),
+                @bootstrap3.Select(transactionForm("categoryCode"), Messages("facto.category"), Config.categories.mapValues(_.name),
                     classes=Seq("bind-until-change", "bind-to-root-form"),
                     optionArgs=Config.categories.mapValues(cat => Map('accounts -> cat.accounts.map(_.code).mkString(" "))))
-                @bootstrap3.Text(transactionForm("description"), "¢Description£",
+                @bootstrap3.Text(transactionForm("description"), Messages("facto.description"),
                     classes=Seq("bind-until-change", "bind-to-root-form"))
-                @bootstrap3.Money(transactionForm("flowAsFloat"), CurrencyUnit.default, "¢Flow£",
+                @bootstrap3.Money(transactionForm("flowAsFloat"), CurrencyUnit.default, Messages("facto.flow"),
                     classes=Seq("flow-as-float"))
-                @bootstrap3.Textarea(transactionForm("detailDescription"), "¢More info£",
+                @bootstrap3.Textarea(transactionForm("detailDescription"), Messages("facto.more-info"),
                     classes=Seq("bind-until-change", "bind-to-root-form"))
-                @bootstrap3.Text(transactionForm("tags"), "¢Tags£",
+                @bootstrap3.Text(transactionForm("tags"), Messages("facto.tags"),
                     classes=Seq("bind-until-change", "bind-to-root-form"))
               </div>
             </div>
@@ -113,7 +116,7 @@
         <div class="col-lg-6 add-transaction-button-holder">
           <div class="panel panel-default">
             <div class="panel-heading">
-              ~New Transaction£
+              @Messages("facto.new-transaction")
             </div>
             <div class="panel-body">
               <table>
@@ -124,7 +127,7 @@
         </div>
         <div class="form-group">
           <div class="col-sm-offset-2 col-sm-10">
-            <button type="submit" class="btn btn-default">~Ok£</button>
+            <button type="submit" class="btn btn-default">@Messages("facto.ok")</button>
           </div>
         </div>
       </div>

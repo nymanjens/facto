@@ -48,6 +48,7 @@ $(document).ready(() => {
     'shift+alt+s': "menu-link-summary",
     'shift+alt+o': "menu-link-summary",
     'shift+alt+t': "menu-link-templates",
+    'shift+alt+j': "menu-link-templates",
     'shift+alt+n': "menu-link-newtransgroup",
   }
   $.each(shortcuts, (key_combo, link_id) => {

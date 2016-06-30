@@ -14,11 +14,11 @@
   implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash
 )
 
-@Main("Templates") {
-  <h1><i class="icon-check-empty"></i> Templates</h1>
+@Main(Messages("facto.templates")) {
+  <h1><i class="icon-check-empty"></i> @Messages("facto.templates")</h1>
 
   @Panel(
-    title = "Templates",
+    title = Messages("facto.templates"),
     panelClasses = "templates-panel"
   ) { @* panel content *@
 

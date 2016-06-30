@@ -5,6 +5,7 @@ import play.api.data._
 import play.api.data.Forms._
 import play.api.mvc.{Controller, Call, Request, AnyContent}
 import play.twirl.api.Html
+import play.api.i18n.Messages
 
 // imports for 2.4 i18n (https://www.playframework.com/documentation/2.4.x/Migration24#I18n)
 import play.api.Play.current
@@ -65,7 +66,7 @@ object BalanceCheckOperations extends Controller {
         UpdateLogs.addLog(user, UpdateLogs.AddNew, persistedBc)
 
         val moneyReservoirName = moneyReservoir.name
-        val message = s"Successfully added a balance check for $moneyReservoirName"
+        val message = Messages("facto.successfully-added-a-balance-check-for", moneyReservoirName)
         Redirect(returnTo).flashing("message" -> message)
     }
 
@@ -84,7 +85,7 @@ object BalanceCheckOperations extends Controller {
       BalanceChecks.delete(bc)
 
       val moneyReservoirName = bc.moneyReservoir.name
-      val message = s"Successfully deleted balance check for $moneyReservoirName"
+      val message = Messages("facto.successfully-deleted-balance-check-for", moneyReservoirName)
       Redirect(returnTo).flashing("message" -> message)
   }
 
@@ -106,8 +107,8 @@ object BalanceCheckOperations extends Controller {
 
           val moneyReservoirName = operationMeta.moneyReservoir.name
           val message = operationMeta match {
-            case _: AddNewOperationMeta => s"Successfully created a balance check for $moneyReservoirName"
-            case _: EditOperationMeta => s"Successfully edited a balance check for $moneyReservoirName"
+            case _: AddNewOperationMeta => Messages("facto.successfully-created-a-balance-check-for", moneyReservoirName)
+            case _: EditOperationMeta => Messages("facto.successfully-edited-a-balance-check-for", moneyReservoirName)
           }
           Redirect(returnTo.url).flashing("message" -> message)
         })
@@ -144,8 +145,8 @@ object BalanceCheckOperations extends Controller {
   private def formView(operationMeta: OperationMeta, form: Form[Forms.BcData])
                       (implicit user: User, request: Request[AnyContent], returnTo: ReturnTo): Html = {
     val title = operationMeta match {
-      case _: AddNewOperationMeta => "New Balance Check"
-      case _: EditOperationMeta => "Edit Balance Check"
+      case _: AddNewOperationMeta => Messages("facto.new-balance-check")
+      case _: EditOperationMeta => Messages("facto.edit-balance-check")
     }
     val formAction = operationMeta match {
       case AddNewOperationMeta(moneyReservoirCode) =>

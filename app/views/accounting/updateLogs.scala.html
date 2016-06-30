@@ -10,15 +10,15 @@
   implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash
 )
 
-@Main("¢Update Logs£") {
-  <h1><i class="fa fa-archive fa-fw"></i> ~Update Logs£</h1>
+@Main(Messages("facto.update-logs")) {
+  <h1><i class="fa fa-archive fa-fw"></i> @Messages("facto.update-logs")</h1>
 
   @Panel(
-    title = "¢Logs£"
+    title = Messages("facto.logs")
   ) { @* panel content *@
 
     @viewhelpers.accounting.Table(
-      title = s"¢All£",
+      title = Messages("facto.all"),
       tableClasses = "table-update-logs",
       allEntriesLink = (entries.size > numEntriesToShow) match {
           case true => Some(controllers.accounting.routes.GeneralActions.updateLogsAll())
@@ -28,9 +28,9 @@
       colspan = 3,
       entries = entries.reverse.take(numEntriesToShow)
     ) { @* table headers *@
-      <th>~User£</th>
-      <th>~Date£</th>
-      <th>~Description£</th>
+      <th>@Messages("facto.user")</th>
+      <th>@Messages("facto.date")</th>
+      <th>@Messages("facto.description")</th>
     } { entry =>  @* table datas *@
       <td>@entry.user.name</td>
       <td>@formatDateTime(entry.date)</td>

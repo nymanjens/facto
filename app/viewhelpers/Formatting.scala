@@ -5,27 +5,29 @@ import java.lang.Math.abs
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat.forPattern
 import com.github.nscala_time.time.Imports._
+import play.api.i18n.Messages
 
 import common.Clock
 
 object Formatting {
 
-  def formatDate(date: DateTime) = {
+  def formatDate(date: DateTime)
+                (implicit messages: Messages) = {
     val now = Clock.now
 
     val yearString = date.toString(forPattern("yy"))
-    val dayMonthString = date.toString(forPattern("d MMM"))
-    val dayOfWeek = date.toString(forPattern("EEE"))
+    val dayMonthString = date.toString(forPattern("d")) + " " + extractMonth(date)
+    val dayOfWeek = extractDayOfWeek(date)
 
     if (date.getYear == now.getYear) {
       val dayDifference = abs(now.getDayOfYear - date.getDayOfYear)
 
       if (date.getDayOfYear == now.getDayOfYear) {
-        "Today"
+        Messages("facto.today")
       } else if (date.getDayOfYear == now.getDayOfYear - 1) {
-        "Yesterday"
+        Messages("facto.yesterday")
       } else if (date.getDayOfYear == now.getDayOfYear + 1) {
-        "Tomorrow"
+        Messages("facto.tomorrow")
       } else if (dayDifference < 7) {
         s"$dayOfWeek, $dayMonthString"
       } else {
@@ -38,5 +40,17 @@ object Formatting {
 
   def formatDateTime(date: DateTime) = {
     date.toString(forPattern("d MMM yyyy, HH:mm"))
+  }
+
+  def extractDayOfWeek(date: DateTime)
+                      (implicit messages: Messages): String = {
+    val dayAbbrevEnglish = date.toString(forPattern("EEE")).toLowerCase
+    Messages(s"facto.date.dayofweek.$dayAbbrevEnglish.abbrev")
+  }
+
+  def extractMonth(date: DateTime)
+                  (implicit messages: Messages): String = {
+    val monthAbbrevEnglish = date.toString(forPattern("MMM")).toLowerCase
+    Messages(s"facto.date.month.$monthAbbrevEnglish.abbrev")
   }
 }

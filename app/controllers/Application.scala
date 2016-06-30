@@ -1,11 +1,11 @@
 package controllers
 
 import scala.collection.immutable.Seq
-
 import play.api.data.Form
 import play.api.mvc._
 import play.api.data.Forms._
 import play.Play.application
+import play.api.i18n.Messages
 
 // imports for 2.4 i18n (https://www.playframework.com/documentation/2.4.x/Migration24#I18n)
 import play.api.Play.current
@@ -64,7 +64,7 @@ object Application extends Controller {
           case ChangePasswordData(loginName, _, password, _) =>
             require(loginName == user.loginName)
             Users.add(user.withPasswordHashFromUnhashed(password))
-            val message = "Successfully updated password"
+            val message = Messages("facto.successfully-updated-password")
             Redirect(routes.Application.profile).flashing("message" -> message)
         }
       )
@@ -82,7 +82,7 @@ object Application extends Controller {
         formData => formData match {
           case AddUserData(loginName, name, password, _) =>
             Users.add(Users.newWithUnhashedPw(loginName, password, name))
-            val message = s"Successfully added user $name"
+            val message = Messages("facto.successfully-added-user", name)
             Redirect(routes.Application.administration).flashing("message" -> message)
         }
       )
@@ -108,9 +108,9 @@ object Application extends Controller {
         "oldPassword" -> nonEmptyText,
         "password" -> nonEmptyText,
         "passwordVerification" -> nonEmptyText
-      )(ChangePasswordData.apply)(ChangePasswordData.unapply) verifying("Old password is incorrect", result => result match {
+      )(ChangePasswordData.apply)(ChangePasswordData.unapply) verifying("facto.error.old-password-is-incorrect", result => result match {
         case ChangePasswordData(loginName, oldPassword, _, _) => Users.authenticate(loginName, oldPassword)
-      }) verifying("Passwords should match", result => result match {
+      }) verifying("facto.error.passwords-should-match", result => result match {
         case ChangePasswordData(_, _, password, passwordVerification) => password == passwordVerification
       })
     )
@@ -126,7 +126,7 @@ object Application extends Controller {
         "name" -> nonEmptyText,
         "password" -> nonEmptyText,
         "passwordVerification" -> nonEmptyText
-      )(AddUserData.apply)(AddUserData.unapply) verifying("Passwords should match", result => result match {
+      )(AddUserData.apply)(AddUserData.unapply) verifying("facto.error.passwords-should-match", result => result match {
         case AddUserData(_, _, password, passwordVerification) => password == passwordVerification
       })
     )

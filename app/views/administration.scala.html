@@ -4,21 +4,21 @@
 
 @(users: Seq[User], addUserForm: Form[AddUserData])(implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash)
 
-@Main("¢User Administration£") {
-  <h1><i class="fa fa-cogs fa-fw"></i> ~User Administration£</h1>
+@Main(Messages("facto.user-administration")) {
+  <h1><i class="fa fa-cogs fa-fw"></i> @Messages("facto.user-administration")</h1>
 
   <div class="row">
     <div class="col-lg-6">
       <div class="panel panel-default">
         <div class="panel-heading">
-          <span class="panel-heading-title">~All Users£</span>
+          <span class="panel-heading-title">@Messages("facto.all-users")</span>
         </div>
         <div class="panel-body">
           <table class="table table-bordered table-hover table-condensed">
             <thead>
               <tr>
-                <th>~Login Name£</th>
-                <th>~Name£</th>
+                <th>@Messages("facto.login-name")</th>
+                <th>@Messages("facto.name")</th>
               </tr>
             </thead>
             <tbody>
@@ -40,19 +40,19 @@
       <div class="col-lg-6">
         <div class="panel panel-default">
           <div class="panel-heading">
-            <span class="panel-heading-title">~Add User£</span>
+            <span class="panel-heading-title">@Messages("facto.add-user")</span>
           </div>
           <div class="panel-body">
             @for(error <- addUserForm.globalErrors) {
               <div class="alert alert-danger" role="alert">
-                @error.message
+                @Messages(error.message)
               </div>
             }
-            @bootstrap3.Text(addUserForm("loginName"), "Login name")
-            @bootstrap3.Text(addUserForm("name"), "Full name")
-            @bootstrap3.Password(addUserForm("password"), "Password")
-            @bootstrap3.Password(addUserForm("passwordVerification"), "Retype password")
-            <button type="submit" class="btn btn-default">~Add£</button>
+            @bootstrap3.Text(addUserForm("loginName"), Messages("facto.login-name"))
+            @bootstrap3.Text(addUserForm("name"), Messages("facto.full-name"))
+            @bootstrap3.Password(addUserForm("password"), Messages("facto.password"))
+            @bootstrap3.Password(addUserForm("passwordVerification"), Messages("facto.retype-password"))
+            <button type="submit" class="btn btn-default">@Messages("facto.add")</button>
           </div>
         </div>
       </div>
