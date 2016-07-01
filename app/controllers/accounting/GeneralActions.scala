@@ -18,7 +18,7 @@ object GeneralActions extends Controller {
   // ********** actions ********** //
   def searchMostRelevant(q: String) = AuthenticatedAction { implicit user =>
     implicit request =>
-      search(q, numEntriesToShow = 400)
+      search(q, numEntriesToShow = 200)
   }
 
   def searchAll(q: String) = AuthenticatedAction { implicit user =>
@@ -44,12 +44,15 @@ object GeneralActions extends Controller {
 
   // ********** private helper controllers ********** //
   private def search(query: String, numEntriesToShow: Int = 100000)
-                        (implicit request: Request[AnyContent], user: User): Result = {
+                    (implicit request: Request[AnyContent], user: User): Result = {
     // get entries
-    val entries = GeneralEntry.search(query).take(numEntriesToShow + 1)
+    val allEntries = GeneralEntry.search(query)
+    val entries = allEntries.take(numEntriesToShow + 1)
 
     // render
-    Ok(views.html.accounting.everything(
+    Ok(views.html.accounting.search(
+      query = query,
+      totalNumResults = allEntries.size,
       entries = entries,
       numEntriesToShow = numEntriesToShow,
       templatesInNavbar = Config.templatesToShowFor(Template.Placement.SearchView, user)))

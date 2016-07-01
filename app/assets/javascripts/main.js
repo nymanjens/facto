@@ -56,8 +56,13 @@ $(document).ready(() => {
       if (e.preventDefault) {
         e.preventDefault();
       }
-      console.log(`Keypress ${key_combo} detected. Pressing on link ${link_id}`)
       document.getElementById(link_id).click()
     });
   })
+  Mousetrap.bind("shift+alt+f", (e) => {
+    if (e.preventDefault) {
+      e.preventDefault();
+    }
+    document.getElementById("search-box").focus()
+  });
 })

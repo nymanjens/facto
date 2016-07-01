@@ -62,7 +62,12 @@
             <li class="sidebar-search">
               <form action="@controllers.accounting.routes.GeneralActions.searchMostRelevant()" method="GET">
                 <div class="input-group custom-search-form">
-                  <input type="text" name="q" class="form-control" placeholder="Search..."/>
+                  <input type="text"
+                      name="q"
+                      class="form-control"
+                      placeholder="Search..."
+                      value="@request.getQueryString("q")"
+                      id="search-box" />
                   <span class="input-group-btn">
                     <button class="btn btn-default" type="submit">
                       <i class="fa fa-search"></i>
