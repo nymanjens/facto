@@ -56,6 +56,7 @@ object Template {
     object EndowmentsView extends Placement
     object SummaryView extends Placement
     object TemplateList extends Placement
+    object SearchView extends Placement
 
     def fromString(string: String): Placement = string match {
       case "EVERYTHING_VIEW" => EverythingView
@@ -64,6 +65,7 @@ object Template {
       case "ENDOWMENTS_VIEW" => EndowmentsView
       case "SUMMARY_VIEW" => SummaryView
       case "TEMPLATE_LIST" => TemplateList
+      case "SEARCH_VIEW" => EverythingView
     }
   }
 

@@ -1,5 +1,6 @@
 package controllers.accounting
 
+import controllers.helpers.accounting.GeneralEntry
 import play.api.mvc._
 
 // imports for 2.4 i18n (https://www.playframework.com/documentation/2.4.x/Migration24#I18n)
@@ -15,9 +16,14 @@ import controllers.helpers.AuthenticatedAction
 object GeneralActions extends Controller {
 
   // ********** actions ********** //
-  def search(q: String) = AuthenticatedAction { implicit user =>
+  def searchMostRelevant(q: String) = AuthenticatedAction { implicit user =>
     implicit request =>
-    Ok(q)
+      search(q, numEntriesToShow = 400)
+  }
+
+  def searchAll(q: String) = AuthenticatedAction { implicit user =>
+    implicit request =>
+      search(q)
   }
 
   def updateLogsLatest = AuthenticatedAction { implicit user =>
@@ -37,6 +43,18 @@ object GeneralActions extends Controller {
   }
 
   // ********** private helper controllers ********** //
+  private def search(query: String, numEntriesToShow: Int = 100000)
+                        (implicit request: Request[AnyContent], user: User): Result = {
+    // get entries
+    val entries = GeneralEntry.search(query).take(numEntriesToShow + 1)
+
+    // render
+    Ok(views.html.accounting.everything(
+      entries = entries,
+      numEntriesToShow = numEntriesToShow,
+      templatesInNavbar = Config.templatesToShowFor(Template.Placement.SearchView, user)))
+  }
+
   private def updateLogs(numEntriesToShow: Int = 100000)(implicit request: Request[AnyContent], user: User): Result = {
     // get entries
     val entries = UpdateLogs.fetchLastNEntries(numEntriesToShow + 1)
