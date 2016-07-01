@@ -111,18 +111,33 @@ object GeneralEntry {
   }
   object QueryScore {
     def apply(transaction: Transaction, queryParts: Seq[String]): QueryScore = {
-      def stripSign(s: String) = s.replace("-", "")
       def scorePart(queryPart: String): Double = {
+        def splitToParts(s: String): Seq[String] = {
+          Splitter.onPattern("[ ,.]")
+            .trimResults()
+            .omitEmptyStrings()
+            .split(s)
+            .asScala
+            .toVector
+        }
+        val searchableParts: Seq[String] = Seq(
+          transaction.description,
+          transaction.detailDescription,
+          transaction.tagsString,
+          transaction.beneficiary.longName,
+          transaction.moneyReservoir.name,
+          transaction.category.name)
+          .flatMap(splitToParts)
+          .map(_.toLowerCase)
+
         var score: Double = 0
-        if (transaction.description contains queryPart) {
+        if(searchableParts contains queryPart.toLowerCase) {
+          score += 2
+        } else if (searchableParts.map(_ contains queryPart.toLowerCase) contains true){
           score += 1
         }
-        if (transaction.detailDescription contains queryPart) {
-          score += 0.7
-        }
-        if (transaction.tagsString contains queryPart) {
-          score += 2
-        }
+
+        def stripSign(s: String) = s.replace("-", "")
         val flowAsString = transaction.flow.formatFloat
         if (flowAsString == queryPart) {
           score += 3
