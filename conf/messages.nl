@@ -129,3 +129,7 @@ facto.username=Gebruikersnaam
 facto.today=Vandaag
 facto.yesterday=Gisteren
 facto.tomorrow=Morgen
+facto.search-results=Zoekresultaten
+facto.search-results-for=Zoekresultaten voor {0}
+facto.num-results={0} resultaten
+facto.one-result=1 resultaat

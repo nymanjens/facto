@@ -19,6 +19,8 @@ object TestUtils {
                          account: Account = testAccount,
                          category: Category = testCategory,
                          reservoir: MoneyReservoir = testReservoir,
+                         description: String = "description",
+                         detailDescription: String = "detailDescription",
                          tagsString: String = ""): Transaction = {
     val actualGroupId = if (groupId == -1) TransactionGroups.add(TransactionGroup()).id else groupId
     val actualDate = if (timestamp == -1) date else new DateTime(timestamp)
@@ -28,7 +30,8 @@ object TestUtils {
       beneficiaryAccountCode = account.code,
       moneyReservoirCode = reservoir.code,
       categoryCode = category.code,
-      description = "description",
+      description = description,
+      detailDescription = detailDescription,
       flow = flow,
       tagsString = tagsString,
       transactionDate = actualDate,
