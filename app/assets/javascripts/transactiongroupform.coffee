@@ -50,6 +50,25 @@ updateAllTotalState = ($thisFormContainer) ->
   updateTotal(totalInCents)
   updateTotalColor(totalInCents)
 
+### setup bootstrap-tagsinput ###
+setupBootstrapTagsinput = (formContainer) ->
+  $formContainer = $(formContainer)
+  $formContainer.find('input.tags-input').tagsinput({
+    confirmKeys: [13, 32, 44, 46], # 13=newline, 32=space, 44=comma, 46=dot
+    # tagClass: (item) -> 
+    #   return '' # TODO
+    # ,
+    # typeahead: {
+    #   source: ['Amsterdam', 'Washington', 'Sydney', 'Beijing', 'Cairo'] # TODO
+    # },
+    # typeaheadjs: {
+    #   name: 'citynames',
+    #   displayKey: 'name',
+    #   valueKey: 'name',
+    #   source: ["aaaaaa", "bbbbb", "ccccccccc"], # TODO
+    # },
+  })
+
 $(document).ready(() ->
   ### constants ###
   ROOT_FORM_CONTAINER = $('#transaction-holder-0')
@@ -75,6 +94,12 @@ $(document).ready(() ->
     # bugfix in clone(): manually copying select selection and textarea content
     newForm.find('select').each((index, item) -> $(item).val(ROOT_FORM_CONTAINER.find('select').eq(index).val()))
     newForm.find('textarea').each((index, item) -> $(item).val(ROOT_FORM_CONTAINER.find('textarea').eq(index).val()))
+
+    # bugfix in clone() + bootstrap-tagsinput: restore regular input and re-run setup
+    newForm.find('.bootstrap-tagsinput').each((index, item) -> 
+      $(item).remove()
+    )
+    setupBootstrapTagsinput(newForm)
 
     # update names, ids and title to the correct transactionNum
     newForm.find("[id]").add(newForm).each(() ->
@@ -189,29 +214,12 @@ $(document).ready(() ->
     $beneficiaryAccountSelect.change(updateCategories)
     updateCategories()
 
-    ### setup tags select ###
-    $formContainer.find('input').keyup((e) -> console.log(e.keyCode))
-    $formContainer.find('input.tags-input').tagsinput({
-      confirmKeys: [13, 32, 44, 46], # 13=newline, 32=space, 44=comma, 46=dot
-      # tagClass: (item) -> 
-      #   return '' # TODO
-      # ,
-      # typeahead: {
-      #   source: ['Amsterdam', 'Washington', 'Sydney', 'Beijing', 'Cairo'] # TODO
-      # },
-      # typeaheadjs: {
-      #   name: 'citynames',
-      #   displayKey: 'name',
-      #   valueKey: 'name',
-      #   source: ["aaaaaa", "bbbbb", "ccccccccc"], # TODO
-      # },
-    })
-
     ### update total ###
     $formContainer.find(".flow-as-float").keydown(() -> setTimeout(() -> updateAllTotalState($formContainer)))
     $formContainer.find(".flow-as-float").change(() -> updateAllTotalState($formContainer))
 
   $(".transaction-holder").each(() -> addTransactionSpecificEventListeners(this))
+  $(".transaction-holder").each(() -> setupBootstrapTagsinput(this))
   $("input:radio[name=zeroSum]").change(() -> updateAllTotalState(null))
   updateAllTotalState(null)
 )
