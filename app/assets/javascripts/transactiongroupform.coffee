@@ -183,11 +183,29 @@ $(document).ready(() ->
       )
       # make sure the current value is not hidden
       if($categorySelect.find("option:selected").hasClass("hidden"))
-        $categorySelect.val($categorySelect.find("option").not(".hidden").first().val());
+        $categorySelect.val($categorySelect.find("option").not(".hidden").first().val())
 
     $beneficiaryAccountSelect.keydown(() -> setTimeout(() -> updateCategories()))
     $beneficiaryAccountSelect.change(updateCategories)
     updateCategories()
+
+    ### setup tags select ###
+    $formContainer.find('input').keyup((e) -> console.log(e.keyCode))
+    $formContainer.find('input.tags-input').tagsinput({
+      confirmKeys: [13, 32, 44, 46], # 13=newline, 32=space, 44=comma, 46=dot
+      # tagClass: (item) -> 
+      #   return '' # TODO
+      # ,
+      # typeahead: {
+      #   source: ['Amsterdam', 'Washington', 'Sydney', 'Beijing', 'Cairo'] # TODO
+      # },
+      # typeaheadjs: {
+      #   name: 'citynames',
+      #   displayKey: 'name',
+      #   valueKey: 'name',
+      #   source: ["aaaaaa", "bbbbb", "ccccccccc"], # TODO
+      # },
+    })
 
     ### update total ###
     $formContainer.find(".flow-as-float").keydown(() -> setTimeout(() -> updateAllTotalState($formContainer)))
