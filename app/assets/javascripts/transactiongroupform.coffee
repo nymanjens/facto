@@ -50,6 +50,35 @@ updateAllTotalState = ($thisFormContainer) ->
   updateTotal(totalInCents)
   updateTotalColor(totalInCents)
 
+### setup bootstrap-tagsinput ###
+setupBootstrapTagsinput = (formContainer) ->
+  $formContainer = $(formContainer)
+
+  bloodhound = new Bloodhound({
+    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    prefetch: {
+      url: '/api/acc/tags/all/',
+      filter: (list) ->
+        return $.map(list, (tagname) ->
+          return { name: tagname })
+    }
+  })
+  bloodhound.initialize()
+
+  $formContainer.find('input.tags-input').tagsinput({
+    confirmKeys: [13, 32, 44, 46], # 13=newline, 32=space, 44=comma, 46=dot
+    # tagClass: (item) ->
+    #   return '' # TODO
+    # ,
+    typeaheadjs: {
+      name: 'tagnames',
+      displayKey: 'name',
+      valueKey: 'name',
+      source: bloodhound.ttAdapter()
+    },
+  })
+
 $(document).ready(() ->
   ### constants ###
   ROOT_FORM_CONTAINER = $('#transaction-holder-0')
@@ -75,6 +104,12 @@ $(document).ready(() ->
     # bugfix in clone(): manually copying select selection and textarea content
     newForm.find('select').each((index, item) -> $(item).val(ROOT_FORM_CONTAINER.find('select').eq(index).val()))
     newForm.find('textarea').each((index, item) -> $(item).val(ROOT_FORM_CONTAINER.find('textarea').eq(index).val()))
+
+    # bugfix in clone() + bootstrap-tagsinput: restore regular input and re-run setup
+    newForm.find('.bootstrap-tagsinput').each((index, item) ->
+      $(item).remove()
+    )
+    setupBootstrapTagsinput(newForm)
 
     # update names, ids and title to the correct transactionNum
     newForm.find("[id]").add(newForm).each(() ->
@@ -170,6 +205,47 @@ $(document).ready(() ->
           boundSources.keydown(() -> sourceElem = $(this); setTimeout(() -> sourceElem.change()))
     )
 
+    ### enforce bind-tags-input-until-change-to-root ###
+    $formContainer.find(".bind-tags-input-until-change-to-root").each(() ->
+      # get boundSource
+      boundInputElem = $(this)
+      elemName = boundInputElem.attr('name')
+      isRootElem = elemName.contains("[0]")
+      if(isRootElem)
+        return # early
+      sourceElemName = elemName.replace(/\[\d\]/, "[0]")
+      boundSource = ROOT_FORM_CONTAINER.find("[name='#{sourceElemName}']")
+
+      # get boundTagsinputElem
+      boundTagsinputElem = () -> boundInputElem.parent().find(".bootstrap-tagsinput")
+
+      # update bounded-state
+      updateBoundedState = () ->
+        equalToSource = false
+        if(boundSource.val() == boundInputElem.val())
+          equalToSource = true
+        boundTagsinputElem().toggleClass("bound-until-change", equalToSource)
+        return equalToSource
+
+      setTimeout(() -> # allow boundTagsinputElem to be rendered first
+        updateBoundedState()
+      )
+      boundInputElem.on('itemAdded', updateBoundedState)
+      boundInputElem.on('itemRemoved', updateBoundedState)
+      boundSource.on('itemAdded', (event) ->
+        if(boundTagsinputElem().hasClass("bound-until-change"))
+          boundInputElem.tagsinput('add', event.item)
+        else
+          updateBoundedState() # maybe now the source is again equal to the bounded elem
+      )
+      boundSource.on('itemRemoved', (event) ->
+        if(boundTagsinputElem().hasClass("bound-until-change"))
+          boundInputElem.tagsinput('remove', event.item)
+        else
+          updateBoundedState() # maybe now the source is again equal to the bounded elem
+      )
+    )
+
     ### filter categories, based on current beneficiaryAccount ###
     $beneficiaryAccountSelect = $formContainer.find("select[id$=_beneficiaryAccountCode]")
     $categorySelect = $formContainer.find("select[id$=_categoryCode]")
@@ -183,7 +259,7 @@ $(document).ready(() ->
       )
       # make sure the current value is not hidden
       if($categorySelect.find("option:selected").hasClass("hidden"))
-        $categorySelect.val($categorySelect.find("option").not(".hidden").first().val());
+        $categorySelect.val($categorySelect.find("option").not(".hidden").first().val())
 
     $beneficiaryAccountSelect.keydown(() -> setTimeout(() -> updateCategories()))
     $beneficiaryAccountSelect.change(updateCategories)
@@ -194,6 +270,7 @@ $(document).ready(() ->
     $formContainer.find(".flow-as-float").change(() -> updateAllTotalState($formContainer))
 
   $(".transaction-holder").each(() -> addTransactionSpecificEventListeners(this))
+  $(".transaction-holder").each(() -> setupBootstrapTagsinput(this))
   $("input:radio[name=zeroSum]").change(() -> updateAllTotalState(null))
   updateAllTotalState(null)
 )
