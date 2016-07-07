@@ -55,7 +55,7 @@ setupBootstrapTagsinput = (formContainer) ->
   $formContainer = $(formContainer)
   $formContainer.find('input.tags-input').tagsinput({
     confirmKeys: [13, 32, 44, 46], # 13=newline, 32=space, 44=comma, 46=dot
-    # tagClass: (item) -> 
+    # tagClass: (item) ->
     #   return '' # TODO
     # ,
     # typeahead: {
@@ -96,7 +96,7 @@ $(document).ready(() ->
     newForm.find('textarea').each((index, item) -> $(item).val(ROOT_FORM_CONTAINER.find('textarea').eq(index).val()))
 
     # bugfix in clone() + bootstrap-tagsinput: restore regular input and re-run setup
-    newForm.find('.bootstrap-tagsinput').each((index, item) -> 
+    newForm.find('.bootstrap-tagsinput').each((index, item) ->
       $(item).remove()
     )
     setupBootstrapTagsinput(newForm)
@@ -193,6 +193,47 @@ $(document).ready(() ->
 
           )
           boundSources.keydown(() -> sourceElem = $(this); setTimeout(() -> sourceElem.change()))
+    )
+
+    ### enforce bind-tags-input-until-change-to-root ###
+    $formContainer.find(".bind-tags-input-until-change-to-root").each(() ->
+      # get boundSource
+      boundInputElem = $(this)
+      elemName = boundInputElem.attr('name')
+      isRootElem = elemName.contains("[0]")
+      if(isRootElem)
+        return # early
+      sourceElemName = elemName.replace(/\[\d\]/, "[0]")
+      boundSource = ROOT_FORM_CONTAINER.find("[name='#{sourceElemName}']")
+
+      # get boundTagsinputElem
+      boundTagsinputElem = () -> boundInputElem.parent().find(".bootstrap-tagsinput")
+
+      # update bounded-state
+      updateBoundedState = () ->
+        equalToSource = false
+        if(boundSource.val() == boundInputElem.val())
+          equalToSource = true
+        boundTagsinputElem().toggleClass("bound-until-change", equalToSource)
+        return equalToSource
+
+      setTimeout(() -> # allow boundTagsinputElem to be rendered first
+        updateBoundedState()
+      )
+      boundInputElem.on('itemAdded', updateBoundedState)
+      boundInputElem.on('itemRemoved', updateBoundedState)
+      boundSource.on('itemAdded', (event) ->
+        if(boundTagsinputElem().hasClass("bound-until-change"))
+          boundInputElem.tagsinput('add', event.item)
+        else
+          updateBoundedState() # maybe now the source is again equal to the bounded elem
+      )
+      boundSource.on('itemRemoved', (event) ->
+        if(boundTagsinputElem().hasClass("bound-until-change"))
+          boundInputElem.tagsinput('remove', event.item)
+        else
+          updateBoundedState() # maybe now the source is again equal to the bounded elem
+      )
     )
 
     ### filter categories, based on current beneficiaryAccount ###
