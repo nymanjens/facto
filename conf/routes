@@ -25,6 +25,9 @@ GET  /acc/logs/                        controllers.accounting.GeneralActions.upd
 GET  /acc/logs/all/                    controllers.accounting.GeneralActions.updateLogsAll
 GET  /acc/templates/                   controllers.accounting.GeneralActions.templateList
 
+# Accounting - JSON API
+GET  /api/acc/tags/all/                controllers.accounting.JsonApiActions.getAllTags
+
 # Accounting - views
 GET  /acc/everything/                  controllers.accounting.Views.everythingLatest
 GET  /acc/everything/all/              controllers.accounting.Views.everythingAll

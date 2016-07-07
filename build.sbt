@@ -34,6 +34,7 @@ libraryDependencies ++= Seq(
   "org.webjars.bower"      %  "flot.tooltip"          % "0.8.5",
   "org.webjars"            %  "mousetrap"             % "1.5.3-1",
   "org.webjars.bower"      %  "bootstrap-tagsinput"   % "0.8.0",
+  "org.webjars.bower"      %  "SHA-1"                 % "0.1.1",
   "org.webjars"            %  "typeaheadjs"           % "0.11.1"
   // TODO: add startbootstrap-sb-admin-2 > v1.0.8 when webjars supports their license
 )

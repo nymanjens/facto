@@ -53,20 +53,30 @@ updateAllTotalState = ($thisFormContainer) ->
 ### setup bootstrap-tagsinput ###
 setupBootstrapTagsinput = (formContainer) ->
   $formContainer = $(formContainer)
+
+  bloodhound = new Bloodhound({
+    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    prefetch: {
+      url: '/api/acc/tags/all/',
+      filter: (list) ->
+        return $.map(list, (tagname) ->
+          return { name: tagname })
+    }
+  })
+  bloodhound.initialize()
+
   $formContainer.find('input.tags-input').tagsinput({
     confirmKeys: [13, 32, 44, 46], # 13=newline, 32=space, 44=comma, 46=dot
     # tagClass: (item) ->
     #   return '' # TODO
     # ,
-    # typeahead: {
-    #   source: ['Amsterdam', 'Washington', 'Sydney', 'Beijing', 'Cairo'] # TODO
-    # },
-    # typeaheadjs: {
-    #   name: 'citynames',
-    #   displayKey: 'name',
-    #   valueKey: 'name',
-    #   source: ["aaaaaa", "bbbbb", "ccccccccc"], # TODO
-    # },
+    typeaheadjs: {
+      name: 'tagnames',
+      displayKey: 'name',
+      valueKey: 'name',
+      source: bloodhound.ttAdapter()
+    },
   })
 
 $(document).ready(() ->
