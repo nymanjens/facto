@@ -58,7 +58,7 @@ setupBootstrapTagsinput = (formContainer) ->
     datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
     queryTokenizer: Bloodhound.tokenizers.whitespace,
     prefetch: {
-      url: '/api/acc/tags/all/',
+      url: '/jsonapi/acc/tags/all/',
       filter: (list) ->
         return $.map(list, (tagname) ->
           return { name: tagname })
