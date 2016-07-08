@@ -116,5 +116,5 @@ Some of Facto's caches need to be regularly cleaned up, to avoid memory leaks. Y
 by setting up following crontab:
 
 ```
-0 2 * * *  curl http://localhost/docachemanagement/<application_secret>/
+0 2 * * *  curl http://localhost/externalapi/docachemanagement/<application_secret>/
 ```

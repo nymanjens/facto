@@ -25,31 +25,6 @@ object Application extends Controller {
       Redirect(controllers.accounting.routes.Views.cashFlowOfAll)
   }
 
-  def doCacheManagement(applicationSecret: String) = Action { implicit request =>
-    validateApplicationSecret(applicationSecret)
-    CacheRegistry.doMaintenanceAndVerifyConsistency()
-    Ok("OK")
-  }
-
-  /** Warms up caches by rendering the most used views. */
-  def warmUpCaches(applicationSecret: String) = Action { implicit request =>
-    validateApplicationSecret(applicationSecret)
-
-    val admin: User = Users.findByLoginName("admin").get
-    val actions: Seq[AuthenticatedAction] = Seq(
-      Views.everythingLatest,
-      Views.cashFlowOfAll,
-      Views.liquidationOfAll,
-      Views.endowmentsOfAll,
-      Views.summaryForCurrentYear()
-    )
-    for (action <- actions) {
-      action.calculateResult(admin, request)
-    }
-
-    Ok("OK")
-  }
-
   def profile() = AuthenticatedAction { implicit user =>
     implicit request =>
       val initialData = ChangePasswordData(user.loginName)
@@ -86,12 +61,6 @@ object Application extends Controller {
             Redirect(routes.Application.administration).flashing("message" -> message)
         }
       )
-  }
-
-  // ********** private helper methods ********** //
-  private def validateApplicationSecret(applicationSecret: String) = {
-    val realApplicationSecret = application.configuration.getString("play.crypto.secret")
-    require(applicationSecret == realApplicationSecret, "Invalid application secret")
   }
 
   // ********** forms ********** //

@@ -4,8 +4,10 @@
 
 # General
 GET  /                                 controllers.Application.index
-GET  /docachemanagement/:applicationSecret/  controllers.Application.doCacheManagement(applicationSecret)
-GET  /warmupcaches/:applicationSecret/ controllers.Application.warmUpCaches(applicationSecret)
+
+# External API
+GET  /externalapi/docachemanagement/:appSecret/            controllers.ExternalApi.doCacheManagement(appSecret)
+GET  /externalapi/warmupcaches/:appSecret/                 controllers.ExternalApi.warmUpCaches(appSecret)
 
 # Auth
 GET  /login/                           controllers.Auth.login
