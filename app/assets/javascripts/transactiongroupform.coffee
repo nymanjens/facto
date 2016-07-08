@@ -68,9 +68,28 @@ setupBootstrapTagsinput = (formContainer) ->
 
   $formContainer.find('input.tags-input').tagsinput({
     confirmKeys: [13, 32, 44, 46], # 13=newline, 32=space, 44=comma, 46=dot
-    # tagClass: (item) ->
-    #   return '' # TODO
-    # ,
+    tagClass: (item) ->
+      sha1Val = sha1(item)
+
+      stringToHashedInt = (s) ->
+        hash = 0
+        len = s.length
+        if(len == 0)
+          return hash
+        i = 0
+        while(i < len)
+          chr   = s.charCodeAt(i)
+          hash  = ((hash << 5) - hash) + chr
+          hash |= 0 # Convert to 32bit integer
+          i++
+        return hash
+      hashedInt = stringToHashedInt(sha1Val)
+
+      bootstrapClassSuffixOptions = ["primary", "success", "info", "warning", "danger"]
+      index = Math.abs(hashedInt) % bootstrapClassSuffixOptions.length
+      bootstrapClassSuffix = bootstrapClassSuffixOptions[index]
+      return "label label-#{bootstrapClassSuffix}"
+    ,
     typeaheadjs: {
       name: 'tagnames',
       displayKey: 'name',
