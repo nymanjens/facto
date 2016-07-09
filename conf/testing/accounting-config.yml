@@ -77,7 +77,8 @@ moneyReservoirs:
       hidden: true
 
 templates:
-  - name: New Endowment
+  - code: new-endowment
+    name: New Endowment
     placement: [ENDOWMENTS_VIEW]
     zeroSum: true
     transactions:

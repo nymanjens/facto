@@ -166,7 +166,8 @@ moneyReservoirs:
         owner: *accountAlice
 
 templates:
-  - name: New Withdrawal
+  - code: new-withdrawal
+    name: New Withdrawal
     placement: [CASH_FLOW_VIEW]
     zeroSum: true
     icon: fa fa-credit-card fa-fw
@@ -181,7 +182,8 @@ templates:
         categoryCode: ACC
         description: Withdrawal
         flowAsFloat: 50
-  - name: New Endowment
+  - code: new-endowment
+    name: New Endowment
     placement: [ENDOWMENTS_VIEW]
     zeroSum: true
     icon: icon-crown
@@ -195,7 +197,8 @@ templates:
         categoryCode: ENDOW
         description: Endowment for ${account.longName}
 
-  - name: Bakery
+  - code: bakery
+    name: Bakery
     placement: [TEMPLATE_LIST]
     icon: icon-food
     transactions:
@@ -204,7 +207,8 @@ templates:
         categoryCode: LIFE
         description: Bakery
         flowAsFloat: -2.1
-  - name: Wages Alice
+  - code: wages-alice
+    name: Wages Alice
     placement: [TEMPLATE_LIST]
     icon: fa fa-suitcase fa-fw
     onlyShowForUserLoginNames: [alice]
@@ -214,7 +218,8 @@ templates:
         categoryCode: IN
         description: Wages
         flowAsFloat: 910
-  - name: Wages Bob
+  - code: wages-bob
+    name: Wages Bob
     placement: [TEMPLATE_LIST]
     icon: fa fa-suitcase fa-fw
     onlyShowForUserLoginNames: [bob]
