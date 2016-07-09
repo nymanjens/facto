@@ -72,11 +72,11 @@ object Config {
   def templatesToShowFor(location: Template.Placement, user: User): Seq[Template] =
     loadedConfig.templates filter (_.showFor(location, user))
 
-  def templateWithId(id: Long): Template = {
-    val idToTemplate = {
-      for (tpl <- loadedConfig.templates) yield tpl.id -> tpl
+  def templateWithCode(code: String): Template = {
+    val codeToTemplate = {
+      for (tpl <- loadedConfig.templates) yield tpl.code -> tpl
     }.toMap
-    idToTemplate(id)
+    codeToTemplate(code)
   }
 
   val constants: Constants = loadedConfig.constants
