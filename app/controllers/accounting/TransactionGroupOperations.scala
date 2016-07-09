@@ -76,11 +76,11 @@ object TransactionGroupOperations extends Controller {
   }
 
   // ********** shortcuts ********** //
-  def addNewFromTemplate(templateId: Long, returnTo: String) = AuthenticatedAction { implicit user =>
+  def addNewFromTemplate(templateCode: String, returnTo: String) = AuthenticatedAction { implicit user =>
     implicit request =>
       implicit val returnToImplicit = ReturnTo(returnTo)
 
-      val template = Config.templateWithId(templateId)
+      val template = Config.templateWithCode(templateCode)
       // If this user is not associated with an account, it should not see any templates.
       val userAccount = Config.accountOf(user).get
       val partial = template.toPartial(userAccount)

@@ -98,7 +98,7 @@
               <a href="@controllers.accounting.routes.GeneralActions.templateList" id="menu-link-templates">
                 <i class="icon-check-empty"></i> @Html(Messages("facto.templates.html"))</a>
               @for(template <- templatesInNavbar) {
-                <a href="@(controllers.accounting.routes.TransactionGroupOperations.addNewFromTemplate(template.id
+                <a href="@(controllers.accounting.routes.TransactionGroupOperations.addNewFromTemplate(template.code
                     ) ++: returnTo)">
                   <i class="@template.iconClass"></i> @template.name</a>
               }
