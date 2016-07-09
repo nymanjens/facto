@@ -8,6 +8,7 @@ GET  /                                 controllers.Application.index
 # External API
 GET  /externalapi/docachemanagement/:appSecret/            controllers.ExternalApi.doCacheManagement(appSecret)
 GET  /externalapi/warmupcaches/:appSecret/                 controllers.ExternalApi.warmUpCaches(appSecret)
+GET  /externalapi/acc/trans/addfromtpl/:tplId/:appSecret/  controllers.ExternalApi.addTransactionFromTemplate(tplId: Long, appSecret)
 
 # Auth
 GET  /login/                           controllers.Auth.login

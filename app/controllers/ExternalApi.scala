@@ -45,6 +45,13 @@ object ExternalApi extends Controller {
     Ok("OK")
   }
 
+  def addTransactionFromTemplate(templateId: Long, applicationSecret: String) = Action { implicit request =>
+    validateApplicationSecret(applicationSecret)
+
+    Ok("OK")
+  }
+
+
   // ********** private helper methods ********** //
   private def validateApplicationSecret(applicationSecret: String) = {
     val realApplicationSecret = application.configuration.getString("play.crypto.secret")
