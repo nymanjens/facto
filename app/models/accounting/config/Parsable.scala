@@ -30,8 +30,8 @@ object Parsable {
       val parsedAccounts = toListMap(accounts)(_.code, _.parse)
       val parsedCategories = toListMap(categories)(_.code, _.parse)
       val parsedReservoirs = toListMap(moneyReservoirs)(_.code, _.parse)
-      val parsedTemplates = templates.asScala.toVector.zipWithIndex map { case (tpl, index) =>
-        tpl.parse(index, parsedAccounts, parsedReservoirs, parsedCategories)
+      val parsedTemplates = templates.asScala.toVector map { tpl =>
+        tpl.parse(parsedAccounts, parsedReservoirs, parsedCategories)
       }
 
       // Validation
@@ -97,21 +97,21 @@ object Parsable {
     }
   }
 
-  case class Template(name: String,
+  case class Template(code: String,
+                      name: String,
                       placement: java.util.List[String],
                       onlyShowForUserLoginNames: /* nullable */ java.util.List[String],
                       zeroSum: Boolean,
                       icon: String,
                       transactions: java.util.List[Template.Transaction]) {
 
-    def this() = this(null, null, null, zeroSum = false, icon = "fa-plus-square", null)
+    def this() = this(null, null, null, null, zeroSum = false, icon = "fa-plus-square", null)
 
-    def parse(id: Long,
-              accounts: Map[String, ParsedAccount],
+    def parse(accounts: Map[String, ParsedAccount],
               reservoirs: Map[String, ParsedMoneyReservoir],
               categories: Map[String, ParsedCategory]): ParsedTemplate = {
       ParsedTemplate(
-        id = id,
+        code = code,
         name = name,
         placement = checkNotNull(placement).asScala.toSet map ParsedTemplate.Placement.fromString,
         onlyShowForUserLoginNames = Option(onlyShowForUserLoginNames) map (_.asScala.toSet),

@@ -10,7 +10,7 @@ import models.accounting.{TransactionGroupPartial, TransactionPartial, Money}
 
 // Every field ending with "Tpl" may contain $-prefixed placeholders.
 // Example: descriptionTpl = "Endowment for ${account.longName}"
-case class Template(id: Long,
+case class Template(code: String,
                     name: String,
                     private val placement: Set[Template.Placement],
                     private val onlyShowForUserLoginNames: Option[Set[String]],
