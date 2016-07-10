@@ -100,7 +100,7 @@
                                   @for(tag <- entry.tags) {
                                     <span class="label label-@tag.bootstrapClassSuffix">@tag.name</span>
                                   }
-                                  @entry.descriptions
+                                  @entry.descriptions.mkString(", ")
                                 </a>
                               </div>
                             }
