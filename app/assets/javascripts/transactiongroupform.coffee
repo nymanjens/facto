@@ -60,8 +60,8 @@ setupBootstrapTagsinput = (formContainer) ->
     prefetch: {
       url: '/jsonapi/acc/tags/all/',
       filter: (list) ->
-        return $.map(list, (tagname) ->
-          return { name: tagname })
+        $.map(list, (tagname) ->
+          { name: tagname })
     }
   })
   bloodhound.initialize()
@@ -75,20 +75,21 @@ setupBootstrapTagsinput = (formContainer) ->
         hash = 0
         len = s.length
         if(len == 0)
-          return hash
-        i = 0
-        while(i < len)
-          chr   = s.charCodeAt(i)
-          hash  = ((hash << 5) - hash) + chr
-          hash |= 0 # Convert to 32bit integer
-          i++
-        return hash
+          hash
+        else
+          i = 0
+          while(i < len)
+            chr   = s.charCodeAt(i)
+            hash  = ((hash << 5) - hash) + chr
+            hash |= 0 # Convert to 32bit integer
+            i++
+          hash
       hashedInt = stringToHashedInt(sha1Val)
 
       bootstrapClassSuffixOptions = ["primary", "success", "info", "warning", "danger"]
       index = Math.abs(hashedInt) % bootstrapClassSuffixOptions.length
       bootstrapClassSuffix = bootstrapClassSuffixOptions[index]
-      return "label label-#{bootstrapClassSuffix}"
+      "label label-#{bootstrapClassSuffix}"
     ,
     typeaheadjs: {
       name: 'tagnames',
@@ -112,7 +113,7 @@ $(document).ready(() ->
       while($("#transaction-holder-#{@highestTransactionNum+1}").length)
         @highestTransactionNum++
     getNext: () ->
-      return ++@highestTransactionNum
+      ++@highestTransactionNum
   transactionNumGenerator = new TransactionNumGenerator()
 
   ### new transaction behaviour ###
@@ -179,7 +180,7 @@ $(document).ready(() ->
               sourceElemName = elemName.replace(/\[\d\]/, "[0]")
               sources = sources.add(ROOT_FORM_CONTAINER.find("[name='#{sourceElemName}']"))
         )
-        return sources
+        sources
 
       boundElem = $(this)
       boundSources = getBoundSources(boundElem)
@@ -244,7 +245,7 @@ $(document).ready(() ->
         if(boundSource.val() == boundInputElem.val())
           equalToSource = true
         boundTagsinputElem().toggleClass("bound-until-change", equalToSource)
-        return equalToSource
+        equalToSource
 
       setTimeout(() -> # allow boundTagsinputElem to be rendered first
         updateBoundedState()
