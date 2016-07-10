@@ -6,9 +6,9 @@
 GET  /                                 controllers.Application.index
 
 # External API
-GET  /externalapi/docachemanagement/:appSecret/            controllers.ExternalApi.doCacheManagement(appSecret)
-GET  /externalapi/warmupcaches/:appSecret/                 controllers.ExternalApi.warmUpCaches(appSecret)
-GET  /externalapi/acc/trans/addfromtpl/:tplId/:appSecret/  controllers.ExternalApi.addTransactionFromTemplate(tplId: Long, appSecret)
+GET  /externalapi/docachemanagement/:appSecret/              controllers.ExternalApi.doCacheManagement(appSecret)
+GET  /externalapi/warmupcaches/:appSecret/                   controllers.ExternalApi.warmUpCaches(appSecret)
+GET  /externalapi/acc/trans/addfromtpl/:tplCode/:appSecret/  controllers.ExternalApi.addTransactionFromTemplate(tplCode, appSecret)
 
 # Auth
 GET  /login/                           controllers.Auth.login
@@ -51,7 +51,7 @@ POST /acc/trans/edit/:transGroupId/    controllers.accounting.TransactionGroupOp
 GET  /acc/trans/delete/:transGroupId/  controllers.accounting.TransactionGroupOperations.delete(transGroupId: Long, returnTo ?= "/")
 
 # Accounting - transaction group operations - shortcuts
-GET /acc/trans/newfromtpl/:templateCode/  controllers.accounting.TransactionGroupOperations.addNewFromTemplate(templateCode: String, returnTo ?= "/")
+GET /acc/trans/newfromtpl/:tplCode/  controllers.accounting.TransactionGroupOperations.addNewFromTemplate(tplCode: String, returnTo ?= "/")
 GET  /acc/trans/repay/:accountCode1/:accountCode2/:amountInCents/  controllers.accounting.TransactionGroupOperations.addNewLiquidationRepayForm(accountCode1, accountCode2, amountInCents: Long, returnTo ?= "/")
 
 # Accounting - balance check operations

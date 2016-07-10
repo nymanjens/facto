@@ -46,6 +46,13 @@ case class Account(code: String,
 }
 
 object Account {
+  val nullInstance = Account(
+    code = "NULL_INSTANCE",
+    longName = "NULL_INSTANCE",
+    shorterName = "NULL_INSTANCE",
+    veryShortName = "NULL_INSTANCE",
+    defaultElectronicReservoirCode = "")
+
   case class SummaryTotalRowDef(rowTitleHtml: Html, categoriesToIgnore: Set[Category]) {
     requireNonNullFields(this)
   }

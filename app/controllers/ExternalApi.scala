@@ -1,5 +1,9 @@
 package controllers
 
+import common.Clock
+import models.accounting.{Transaction, TransactionGroup, TransactionGroups, TransactionPartial}
+import models.accounting.config.{Account, Config}
+
 import scala.collection.immutable.Seq
 import play.api.data.Form
 import play.api.mvc._
@@ -45,7 +49,7 @@ object ExternalApi extends Controller {
     Ok("OK")
   }
 
-  def addTransactionFromTemplate(templateId: Long, applicationSecret: String) = Action { implicit request =>
+  def addTransactionFromTemplate(templateCode: String, applicationSecret: String) = Action { implicit request =>
     validateApplicationSecret(applicationSecret)
 
     Ok("OK")
@@ -56,5 +60,24 @@ object ExternalApi extends Controller {
   private def validateApplicationSecret(applicationSecret: String) = {
     val realApplicationSecret = application.configuration.getString("play.crypto.secret")
     require(applicationSecret == realApplicationSecret, "Invalid application secret")
+  }
+
+  def transactionPartialToTransaction(partial: TransactionPartial, transactionGroup: TransactionGroup, issuer: User): Transaction = {
+    def checkNotEmpty(s: String): String = {
+      require(!s.isEmpty)
+      s
+    }
+    Transaction(
+      transactionGroupId = transactionGroup.id,
+      issuerId = issuer.id,
+      beneficiaryAccountCode = partial.beneficiary.get.code,
+      moneyReservoirCode = partial.moneyReservoir.get.code,
+      categoryCode = partial.category.get.code,
+      description = checkNotEmpty(partial.description),
+      flow = partial.flow,
+      detailDescription = partial.detailDescription,
+      tagsString = partial.tagsString,
+      transactionDate = Clock.now,
+      consumedDate = Clock.now)
   }
 }
