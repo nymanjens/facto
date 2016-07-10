@@ -19,7 +19,7 @@ object JsonApiActions extends Controller {
   // ********** actions ********** //
   def getAllTags = AuthenticatedAction { implicit user =>
     implicit request =>
-      val tagNames = TagEntities.fetchAll().map(_.tag.name)
+      val tagNames = TagEntities.fetchAll().map(_.tag.name).toSet
       Ok(Json.toJson(tagNames))
   }
 }
