@@ -208,7 +208,8 @@ object SummaryCell {
 
     def result: SummaryCell = {
       var entries = transactions.result().map(t => GeneralEntry(Seq(t)))
-      entries = GeneralEntry.combineConsecutiveOfSameGroup(entries)
+      // Disabled combining because this often leads to confusing situations rather than helping
+      //entries = GeneralEntry.combineConsecutiveOfSameGroup(entries)
       SummaryCell(entries)
     }
   }

@@ -26,20 +26,6 @@ class SummaryTest extends HookedSpecification {
   override def afterAll = Clock.cleanupAfterTest
 
   "Summary.fetchSummary()" should {
-    "combine transactions in same month and category" in new WithApplication {
-      val trans1 = persistTransaction(groupId = 1, flow = Money(200), date = dateAt(2009, February, 2))
-      val trans2 = persistTransaction(groupId = 1, flow = Money(201), date = dateAt(2009, February, 20))
-      val trans3 = persistTransaction(groupId = 1, flow = Money(202), date = dateAt(2009, March, 1))
-
-      val summary = Summary.fetchSummary(testAccount, 2009)
-
-      summary.yearToSummary.keySet mustEqual Set(2009, 2010)
-      summary.yearToSummary(2009).cell(testCategory, february(2009)).entries must contain(exactly(GeneralEntry(Seq(trans1, trans2))))
-      for (cell <- summary.yearToSummary(2010).cells.values.asScala) {
-        cell.totalFlow mustEqual Money(0)
-      }
-    }
-
     "caculate monthRangeForAverages" in new WithApplication {
       persistTransaction(groupId = 1, flow = Money(200), date = dateAt(2009, February, 2))
       persistTransaction(groupId = 1, flow = Money(201), date = dateAt(2009, February, 20))
