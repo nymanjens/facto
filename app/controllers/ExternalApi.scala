@@ -52,6 +52,17 @@ object ExternalApi extends Controller {
   def addTransactionFromTemplate(templateCode: String, applicationSecret: String) = Action { implicit request =>
     validateApplicationSecret(applicationSecret)
 
+    val template = Config.templateWithCode(templateCode)
+    val partial = template.toPartial(Account.nullInstance)
+
+    val group = TransactionGroups.add(TransactionGroup())
+    for(transPartial <- partial.transactions) {
+      val transaction  =transactionPartialToTransaction(transPartial, group, issuer)
+      // persist
+    }
+    // log
+    partial.transactions
+
     Ok("OK")
   }
 
