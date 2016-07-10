@@ -160,6 +160,7 @@ $(document).ready(() ->
     ### remove transaction button behaviour ###
     $formContainer.find(".rm-transaction-button").click(() ->
       $formContainer.remove()
+      updateAllTotalState(null)
     )
 
     ### enforce bind-until-change ###
