@@ -9,7 +9,7 @@ centsToFloatString = (inCents) ->
   afterDot = "" + Math.abs(inCents%100)
   if afterDot.length < 2
     afterDot = "0" + afterDot
-  beforeDot = Math.round(Math.abs(inCents / 100))
+  beforeDot = Math.round(Math.abs(inCents // 100))
   sign = ""
   sign = "-" if(inCents < 0)
   "#{sign}#{beforeDot}.#{afterDot}"
