@@ -27,10 +27,10 @@ class SummaryTest extends HookedSpecification {
 
   "Summary.fetchSummary()" should {
     "caculate monthRangeForAverages" in new WithApplication {
-      persistTransaction(groupId = 1, flow = Money(200), date = dateAt(2009, February, 2))
-      persistTransaction(groupId = 1, flow = Money(201), date = dateAt(2009, February, 20))
-      persistTransaction(groupId = 1, flow = Money(202), date = dateAt(2009, March, 1))
-      persistTransaction(groupId = 1, flow = Money(202), date = dateAt(2010, May, 4))
+      persistTransaction(flow = Money(200), date = dateAt(2009, February, 2))
+      persistTransaction(flow = Money(201), date = dateAt(2009, February, 20))
+      persistTransaction(flow = Money(202), date = dateAt(2009, March, 1))
+      persistTransaction(flow = Money(202), date = dateAt(2010, May, 4))
 
       val summary = Summary.fetchSummary(testAccount, 2009)
 
@@ -43,12 +43,12 @@ class SummaryTest extends HookedSpecification {
     }
 
     "ignore the current and future months when calculating the averages" in new WithApplication {
-      persistTransaction(groupId = 1, flow = Money(999), date = dateAt(2009, April, 2))
-      persistTransaction(groupId = 1, flow = Money(100), date = dateAt(2010, February, 2))
-      persistTransaction(groupId = 1, flow = Money(112), date = dateAt(2010, March, 2))
-      persistTransaction(groupId = 1, flow = Money(120), date = dateAt(2010, April, 2))
-      persistTransaction(groupId = 1, flow = Money(130), date = dateAt(2010, May, 2))
-      persistTransaction(groupId = 1, flow = Money(1999), date = dateAt(2011, April, 2))
+      persistTransaction(flow = Money(999), date = dateAt(2009, April, 2))
+      persistTransaction(flow = Money(100), date = dateAt(2010, February, 2))
+      persistTransaction(flow = Money(112), date = dateAt(2010, March, 2))
+      persistTransaction(flow = Money(120), date = dateAt(2010, April, 2))
+      persistTransaction(flow = Money(130), date = dateAt(2010, May, 2))
+      persistTransaction(flow = Money(1999), date = dateAt(2011, April, 2))
 
       val summary = Summary.fetchSummary(testAccount, 2009)
 
@@ -58,9 +58,9 @@ class SummaryTest extends HookedSpecification {
 
 
     "ignore the pre-facto months when calculating the averages" in new WithApplication {
-      persistTransaction(groupId = 1, flow = Money(100), date = dateAt(2010, February, 2))
-      persistTransaction(groupId = 1, flow = Money(112), date = dateAt(2010, March, 2))
-      persistTransaction(groupId = 1, flow = Money(120), date = dateAt(2010, April, 2))
+      persistTransaction(flow = Money(100), date = dateAt(2010, February, 2))
+      persistTransaction(flow = Money(112), date = dateAt(2010, March, 2))
+      persistTransaction(flow = Money(120), date = dateAt(2010, April, 2))
 
       val summary = Summary.fetchSummary(testAccount, 2009)
 
@@ -69,9 +69,9 @@ class SummaryTest extends HookedSpecification {
     }
 
     "calculates totals" in new WithApplication {
-      persistTransaction(groupId = 1, flow = Money(3), date = dateAt(2010, January, 2), category = testCategoryA)
-      persistTransaction(groupId = 1, flow = Money(100), date = dateAt(2010, February, 2), category = testCategoryA)
-      persistTransaction(groupId = 1, flow = Money(102), date = dateAt(2010, February, 2), category = testCategoryB)
+      persistTransaction(flow = Money(3), date = dateAt(2010, January, 2), category = testCategoryA)
+      persistTransaction(flow = Money(100), date = dateAt(2010, February, 2), category = testCategoryA)
+      persistTransaction(flow = Money(102), date = dateAt(2010, February, 2), category = testCategoryB)
 
       val summary = Summary.fetchSummary(testAccount, 2009)
 
@@ -88,7 +88,7 @@ class SummaryTest extends HookedSpecification {
     }
 
     "prunes unused categories" in new WithApplication {
-      persistTransaction(groupId = 1, flow = Money(3), date = dateAt(2010, January, 2), category = testCategoryA)
+      persistTransaction(flow = Money(3), date = dateAt(2010, January, 2), category = testCategoryA)
 
       val summary = Summary.fetchSummary(testAccount, 2010)
 
