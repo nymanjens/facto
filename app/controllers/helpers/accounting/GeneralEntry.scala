@@ -32,7 +32,7 @@ object GeneralEntry {
     val transactions: Seq[Transaction] =
       dbRun(
         Transactions.newQuery
-          .sortBy(r => (r.createdDate.desc, r.transactionDate.desc))
+          .sortBy(r => (r.transactionDate.desc, r.createdDate.desc))
           .take(3 * n))
         .reverse
         .toList
