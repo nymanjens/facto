@@ -46,7 +46,6 @@ $(document).ready(() => {
     'shift+alt+v': "menu-link-liquidation",
     'shift+alt+d': "menu-link-endowments",
     'shift+alt+s': "menu-link-summary",
-    'shift+alt+o': "menu-link-summary",
     'shift+alt+t': "menu-link-templates",
     'shift+alt+j': "menu-link-templates",
     'shift+alt+n': "menu-link-newtransgroup",
