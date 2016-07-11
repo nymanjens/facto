@@ -99,6 +99,17 @@ setupBootstrapTagsinput = (formContainer) ->
     },
   })
 
+  # Bugfix for tagsinput + typeahead.js: When losing focus, the last tag was not created
+  $formContainer.find('.bootstrap-tagsinput').focusout(() ->
+    $tagsinput_generated = $(this)
+    $tagsinput_generated_input = $tagsinput_generated.find("input.tt-input")
+    $tagsinput_coded = $tagsinput_generated.parent().find(".tags-input")
+
+    leftover_value = $tagsinput_generated_input.val()
+    if(leftover_value)
+      $tagsinput_coded.tagsinput('add', leftover_value)
+  )
+
 $(document).ready(() ->
   ### constants ###
   ROOT_FORM_CONTAINER = $('#transaction-holder-0')
