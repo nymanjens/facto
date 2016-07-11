@@ -38,7 +38,7 @@ object Users extends ForwardingEntityManager[User, Users](
 
   private[models] def hash(password: String) = Hashing.sha512().hashString(password, Charsets.UTF_8).toString()
 
-  def newWithUnhashedPw(loginName: String, password: String, name: String) =
+  def newWithUnhashedPw(loginName: String, password: String, name: String): User =
     new User(loginName, hash(password), name)
 
   def authenticate(loginName: String, password: String): Boolean = {
