@@ -1,7 +1,9 @@
 package controllers
 
+import com.google.common.base.Charsets
+import com.google.common.hash.Hashing
 import common.Clock
-import models.accounting.{Transaction, TransactionGroup, TransactionGroups, TransactionPartial}
+import models.accounting._
 import models.accounting.config.{Account, Config}
 
 import scala.collection.immutable.Seq
@@ -54,14 +56,19 @@ object ExternalApi extends Controller {
 
     val template = Config.templateWithCode(templateCode)
     val partial = template.toPartial(Account.nullInstance)
+    val issuer = getOrCreateRobotUser()
 
+    // Add group
     val group = TransactionGroups.add(TransactionGroup())
-    for(transPartial <- partial.transactions) {
-      val transaction  =transactionPartialToTransaction(transPartial, group, issuer)
-      // persist
+
+    // Add transactions
+    for (transPartial <- partial.transactions) {
+      val transaction = transactionPartialToTransaction(transPartial, group, issuer)
+      Transactions.add(transaction)
     }
-    // log
-    partial.transactions
+
+    // Add log
+    UpdateLogs.addLog(issuer, UpdateLogs.AddNew, group)
 
     Ok("OK")
   }
@@ -73,7 +80,23 @@ object ExternalApi extends Controller {
     require(applicationSecret == realApplicationSecret, "Invalid application secret")
   }
 
-  def transactionPartialToTransaction(partial: TransactionPartial, transactionGroup: TransactionGroup, issuer: User): Transaction = {
+  def getOrCreateRobotUser(): User = {
+    val loginName = "robot"
+    def hash(s: String) = Hashing.sha512().hashString(s, Charsets.UTF_8).toString()
+
+    Users.findByLoginName(loginName) match {
+      case Some(user) => user
+      case None =>
+        val user = Users.newWithUnhashedPw(
+          loginName = loginName,
+          password = hash(Clock.now.toString),
+          name = Messages("facto.robot")
+        )
+        Users.add(user)
+    }
+  }
+
+  private def transactionPartialToTransaction(partial: TransactionPartial, transactionGroup: TransactionGroup, issuer: User): Transaction = {
     def checkNotEmpty(s: String): String = {
       require(!s.isEmpty)
       s
@@ -81,9 +104,9 @@ object ExternalApi extends Controller {
     Transaction(
       transactionGroupId = transactionGroup.id,
       issuerId = issuer.id,
-      beneficiaryAccountCode = partial.beneficiary.get.code,
-      moneyReservoirCode = partial.moneyReservoir.get.code,
-      categoryCode = partial.category.get.code,
+      beneficiaryAccountCode = checkNotEmpty(partial.beneficiary.get.code),
+      moneyReservoirCode = checkNotEmpty(partial.moneyReservoir.get.code),
+      categoryCode = checkNotEmpty(partial.category.get.code),
       description = checkNotEmpty(partial.description),
       flow = partial.flow,
       detailDescription = partial.detailDescription,
