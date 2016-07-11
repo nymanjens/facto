@@ -29,7 +29,8 @@ GET  /acc/logs/all/                    controllers.accounting.GeneralActions.upd
 GET  /acc/templates/                   controllers.accounting.GeneralActions.templateList
 
 # Accounting - JSON API
-GET  /jsonapi/acc/tags/all/                controllers.accounting.JsonApiActions.getAllTags
+GET  /jsonapi/acc/descriptions/*query  controllers.accounting.JsonApiActions.filterDescriptions(query)
+GET  /jsonapi/acc/tags/all/            controllers.accounting.JsonApiActions.getAllTags
 
 # Accounting - views
 GET  /acc/everything/                  controllers.accounting.Views.everythingLatest

@@ -17,6 +17,12 @@ import controllers.helpers.AuthenticatedAction
 object JsonApiActions extends Controller {
 
   // ********** actions ********** //
+  def filterDescriptions(query: String) = AuthenticatedAction { implicit user =>
+    implicit request =>
+      val descriptions = Set(query + "XX")
+      Ok(Json.toJson(descriptions))
+  }
+
   def getAllTags = AuthenticatedAction { implicit user =>
     implicit request =>
       val tagNames = TagEntities.fetchAll().map(_.tag.name).toSet
