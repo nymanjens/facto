@@ -50,6 +50,36 @@ updateAllTotalState = ($thisFormContainer) ->
   updateTotal(totalInCents)
   updateTotalColor(totalInCents)
 
+### setup descriptions' typeahead ###
+setupDescriptionsTypeahead = (formContainer) ->
+  $formContainer = $(formContainer)
+
+  $formContainer.find('.description').typeahead(
+    {
+      highlight: true,
+      minLength: 1,
+    },
+    {
+      name: 'description',
+      source: new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.whitespace,
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        remote: {
+          url: '/jsonapi/acc/descriptions/null/null/null/%QUERY',
+          wildcard: '%QUERY'
+          prepare: ((query) ->
+            beneficiaryCode = $formContainer.find('.beneficiaryAccountCode').val()
+            reservoirCode = $formContainer.find('.moneyReservoirCode').val()
+            categoryCode = $formContainer.find('.categoryCode').val()
+            {
+              url: "/jsonapi/acc/descriptions/#{beneficiaryCode}/#{reservoirCode}/#{categoryCode}/#{query}",
+            }
+          )
+        }
+      })
+    }
+  )
+
 ### setup bootstrap-tagsinput ###
 setupBootstrapTagsinput = (formContainer) ->
   $formContainer = $(formContainer)
@@ -140,6 +170,7 @@ $(document).ready(() ->
     newForm.find('.bootstrap-tagsinput').each((index, item) ->
       $(item).remove()
     )
+    setupDescriptionsTypeahead(newForm)
     setupBootstrapTagsinput(newForm)
 
     # update names, ids and title to the correct transactionNum
@@ -302,6 +333,7 @@ $(document).ready(() ->
     $formContainer.find(".flow-as-float").change(() -> updateAllTotalState($formContainer))
 
   $(".transaction-holder").each(() -> addTransactionSpecificEventListeners(this))
+  $(".transaction-holder").each(() -> setupDescriptionsTypeahead(this))
   $(".transaction-holder").each(() -> setupBootstrapTagsinput(this))
   $("input:radio[name=zeroSum]").change(() -> updateAllTotalState(null))
   updateAllTotalState(null)
