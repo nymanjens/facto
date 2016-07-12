@@ -65,8 +65,7 @@ object BalanceCheckOperations extends Controller {
         val persistedBc = BalanceChecks.add(balanceCheck)
         UpdateLogs.addLog(user, UpdateLogs.AddNew, persistedBc)
 
-        val moneyReservoirName = moneyReservoir.name
-        val message = Messages("facto.successfully-added-a-balance-check-for", moneyReservoirName)
+        val message = Messages("facto.successfully-added-a-balance-check-for", moneyReservoir.name)
         Redirect(returnTo).flashing("message" -> message)
     }
 
