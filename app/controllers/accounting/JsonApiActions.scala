@@ -22,4 +22,11 @@ object JsonApiActions extends Controller {
       val tagNames = TagEntities.fetchAll().map(_.tag.name).toSet
       Ok(Json.toJson(tagNames))
   }
+
+  def addConfirmation(moneyReservoirCode: String, balanceInCents: Long, mostRecentTransactionId: Long) =
+    AuthenticatedAction { implicit user =>
+      implicit request =>
+        BalanceCheckOperations.doAddConfirmation(moneyReservoirCode, balanceInCents, mostRecentTransactionId)
+        Ok(Json.toJson("OK"))
+    }
 }
