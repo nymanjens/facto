@@ -78,12 +78,13 @@ setupDescriptionsTypeahead = (formContainer) ->
     },
     {
       name: 'description',
+      limit: 30, # Explicitly setting limit because the default limit (5) surfaces a bug
+                 # where typeahead only shows (limit - numResults) results.
       source: new Bloodhound({
         datumTokenizer: Bloodhound.tokenizers.whitespace,
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         remote: {
           url: '/jsonapi/acc/descriptions/null/null/null/%QUERY',
-          wildcard: '%QUERY'
           prepare: ((query) ->
             beneficiaryCode = $formContainer.find('.beneficiaryAccountCode').val()
             reservoirCode = $formContainer.find('.moneyReservoirCode').val()
