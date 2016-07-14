@@ -23,12 +23,17 @@ class FormUtilsTest extends Specification {
 
     constraint("abc") mustNotEqual Valid
     constraint("0x123") mustNotEqual Valid
+    constraint("123.123") mustNotEqual Valid
 
     constraint("123.44") mustEqual Valid
+    constraint("  1,991,123 . 44 ") mustEqual Valid
+    constraint("1.000,") mustEqual Valid
   }
 
   "flowAsFloatStringToMoney" in new WithApplication {
     FormUtils.flowAsFloatStringToMoney("123.44") mustEqual Money(12344)
+    FormUtils.flowAsFloatStringToMoney("  1,991,123 . 44 ") mustEqual Money(199112344)
+    FormUtils.flowAsFloatStringToMoney("  1.000,") mustEqual Money(100000)
   }
 
   "validTagsString"  in new WithApplication {
