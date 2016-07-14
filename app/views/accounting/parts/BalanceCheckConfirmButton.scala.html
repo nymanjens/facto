@@ -4,10 +4,10 @@
 
 @(reservoir: MoneyReservoir, entry: RegularEntry)(implicit request: Request[AnyContent])
 
-<a class="btn btn-info btn-xs"
-  href="@(controllers.accounting.routes.BalanceCheckOperations.addConfirmation(
+<button class="btn btn-info btn-xs"
+  ajax-href="@(controllers.accounting.routes.JsonApiActions.addBalanceCheck(
       reservoir.code, entry.balance.cents, entry.mostRecentTransaction.id
     ) ++: ReturnTo(request.uri))"
   role="button">
   <i class="fa fa-check-square-o fa-fw"></i>
-</a>
+</button>

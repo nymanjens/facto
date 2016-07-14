@@ -23,7 +23,7 @@ object JsonApiActions extends Controller {
       Ok(Json.toJson(tagNames))
   }
 
-  def addConfirmation(moneyReservoirCode: String, balanceInCents: Long, mostRecentTransactionId: Long) =
+  def addBalanceCheck(moneyReservoirCode: String, balanceInCents: Long, mostRecentTransactionId: Long) =
     AuthenticatedAction { implicit user =>
       implicit request =>
         BalanceCheckOperations.doAddConfirmation(moneyReservoirCode, balanceInCents, mostRecentTransactionId)

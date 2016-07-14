@@ -31,7 +31,7 @@ GET  /acc/templates/                   controllers.accounting.GeneralActions.tem
 # Accounting - JSON API
 GET  /jsonapi/acc/tags/all/                controllers.accounting.JsonApiActions.getAllTags
 GET  /jsonapi/acc/tags/all/                controllers.accounting.JsonApiActions.getAllTags
-GET  /jsonapi/acc/bc/confirm/:moneyReservoirCode/:balanceInCents/:mostRecentTransactionId/  controllers.accounting.JsonApiActions.addConfirmation(moneyReservoirCode, balanceInCents: Long, mostRecentTransactionId: Long)
+GET  /jsonapi/acc/bc/confirm/:moneyReservoirCode/:balanceInCents/:mostRecentTransactionId/  controllers.accounting.JsonApiActions.addBalanceCheck(moneyReservoirCode, balanceInCents: Long, mostRecentTransactionId: Long)
 
 # Accounting - views
 GET  /acc/everything/                  controllers.accounting.Views.everythingLatest
