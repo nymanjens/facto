@@ -48,28 +48,6 @@ object BalanceCheckOperations extends Controller {
     addOrEdit(AddNewOperationMeta(moneyReservoirCode))
   }
 
-  def addConfirmation(moneyReservoirCode: String, balanceInCents: Long, mostRecentTransactionId: Long, returnTo: String) =
-    AuthenticatedAction { implicit user =>
-      implicit request =>
-        implicit val returnToImplicit = ReturnTo(returnTo)
-
-        val balance = Money(balanceInCents)
-        val moneyReservoir = Config.moneyReservoir(moneyReservoirCode)
-        val mostRecentTransaction = Transactions.findById(mostRecentTransactionId)
-
-        val balanceCheck = BalanceCheck(
-          issuerId = user.id,
-          moneyReservoirCode = moneyReservoir.code,
-          balance = balance,
-          checkDate = mostRecentTransaction.transactionDate)
-        val persistedBc = BalanceChecks.add(balanceCheck)
-        UpdateLogs.addLog(user, UpdateLogs.AddNew, persistedBc)
-
-        val moneyReservoirName = moneyReservoir.name
-        val message = Messages("facto.successfully-added-a-balance-check-for", moneyReservoirName)
-        Redirect(returnTo).flashing("message" -> message)
-    }
-
   def edit(bcId: Long, returnTo: String) = {
     implicit val returnToImplicit = ReturnTo(returnTo)
 
@@ -87,6 +65,24 @@ object BalanceCheckOperations extends Controller {
       val moneyReservoirName = bc.moneyReservoir.name
       val message = Messages("facto.successfully-deleted-balance-check-for", moneyReservoirName)
       Redirect(returnTo).flashing("message" -> message)
+  }
+
+  // ********** package-private helper controllers ********** //
+  private[accounting] def doAddConfirmation(moneyReservoirCode: String,
+                                            balanceInCents: Long,
+                                            mostRecentTransactionId: Long)
+                                           (implicit user: User): Unit = {
+    val balance = Money(balanceInCents)
+    val moneyReservoir = Config.moneyReservoir(moneyReservoirCode)
+    val mostRecentTransaction = Transactions.findById(mostRecentTransactionId)
+
+    val balanceCheck = BalanceCheck(
+      issuerId = user.id,
+      moneyReservoirCode = moneyReservoir.code,
+      balance = balance,
+      checkDate = mostRecentTransaction.transactionDate)
+    val persistedBc = BalanceChecks.add(balanceCheck)
+    UpdateLogs.addLog(user, UpdateLogs.AddNew, persistedBc)
   }
 
   // ********** private helper controllers ********** //

@@ -5,6 +5,7 @@ import scala.util.matching.Regex
 import Math.abs
 
 import com.google.common.base.Splitter
+import com.google.common.collect.Iterables
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 import models.accounting.{Money, Tag}
 import models.accounting.config.Config
@@ -20,10 +21,12 @@ object FormUtils {
 
   def validCategoryCode: Constraint[String] = oneOf(Config.categories.values.map(_.code))
 
-  def validFlowAsFloat = Constraint[String]("error.invalid")({
-    case flowAsFloatRegex() => Valid
-    case _ => invalidWithMessageCode("error.invalid")
-  })
+  def validFlowAsFloat = Constraint[String]("error.invalid") { string =>
+    normalizeMoneyString(string) match {
+      case flowAsFloatRegex() => Valid
+      case _ => invalidWithMessageCode("error.invalid")
+    }
+  }
 
   def validTagsString = Constraint[String]("error.invalid")({
     tagsString =>
@@ -40,9 +43,12 @@ object FormUtils {
       }
   })
 
-  def flowAsFloatStringToMoney(flowAsFloat: String): Money = flowAsFloat match {
-    case flowAsFloatRegex() => Money((flowAsFloat.replace(',', '.').toDouble * 100).round)
-    case _ => Money(0)
+  def flowAsFloatStringToMoney(string: String): Money = {
+    val normalizedString = normalizeMoneyString(string)
+    normalizedString match {
+      case flowAsFloatRegex() => Money((normalizedString.toDouble * 100).round)
+      case _ => Money(0)
+    }
   }
 
   def invalidWithMessageCode(code: String) = Invalid(Seq(ValidationError(code)))
@@ -56,5 +62,26 @@ object FormUtils {
       }
   })
 
-  private val flowAsFloatRegex: Regex = """[\-+]{0,1}\d+[\.,]{0,1}\d{0,2}""".r
+  /**
+    * Trims the given string and only keeps the last punctuation (',' or '.').
+    *
+    * Examples:
+    *   "  1,200.39" --> "120.39".
+    *   "  1.000," --> "1000.".
+    */
+  private def normalizeMoneyString(s: String): String = {
+    val parts = Splitter.onPattern("""[\.,]""")
+      .trimResults()
+      .split(s)
+      .asScala.toList
+    def dotBetweenLastElements(list: List[String]): String = list match {
+      case s :: Nil => s
+      case first :: last :: Nil => s"$first.$last"
+      case first :: rest => first + dotBetweenLastElements(rest)
+      case Nil => ""
+    }
+    dotBetweenLastElements(parts)
+  }
+
+  private val flowAsFloatRegex: Regex = """[\-+]{0,1}\d+\.{0,1}\d{0,2}""".r
 }

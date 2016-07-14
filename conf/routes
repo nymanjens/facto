@@ -31,6 +31,7 @@ GET  /acc/templates/                   controllers.accounting.GeneralActions.tem
 # Accounting - JSON API
 GET  /jsonapi/acc/descriptions/:beneficiaryCode/:reservoirCode/:categoryCode/*query  controllers.accounting.JsonApiActions.filterDescriptions(beneficiaryCode, reservoirCode, categoryCode, query)
 GET  /jsonapi/acc/tags/all/            controllers.accounting.JsonApiActions.getAllTags
+POST /jsonapi/acc/bc/confirm/:moneyReservoirCode/:balanceInCents/:mostRecentTransactionId/  controllers.accounting.JsonApiActions.addBalanceCheck(moneyReservoirCode, balanceInCents: Long, mostRecentTransactionId: Long)
 
 # Accounting - views
 GET  /acc/everything/                  controllers.accounting.Views.everythingLatest
@@ -58,7 +59,6 @@ GET  /acc/trans/repay/:accountCode1/:accountCode2/:amountInCents/  controllers.a
 # Accounting - balance check operations
 GET  /acc/bc/new/:moneyReservoirCode/  controllers.accounting.BalanceCheckOperations.addNewForm(moneyReservoirCode, returnTo ?= "/")
 POST /acc/bc/new/:moneyReservoirCode/  controllers.accounting.BalanceCheckOperations.addNew(moneyReservoirCode, returnTo ?= "/")
-GET  /acc/bc/confirm/:moneyReservoirCode/:balanceInCents/:mostRecentTransactionId/  controllers.accounting.BalanceCheckOperations.addConfirmation(moneyReservoirCode, balanceInCents: Long, mostRecentTransactionId: Long, returnTo ?= "/")
 GET  /acc/bc/edit/:bcId/               controllers.accounting.BalanceCheckOperations.editForm(bcId: Long, returnTo ?= "/")
 POST /acc/bc/edit/:bcId/               controllers.accounting.BalanceCheckOperations.edit(bcId: Long, returnTo ?= "/")
 GET  /acc/bc/delete/:bcId/             controllers.accounting.BalanceCheckOperations.delete(bcId: Long, returnTo ?= "/")

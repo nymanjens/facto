@@ -1,6 +1,23 @@
 ### utility functions ###
 parseMoneyAsFloatToCents = (moneyAsFloatString) ->
-  parsed = parseFloat(moneyAsFloatString)
+  parts = []
+  moneyAsFloatString.split(",").map (e1) ->
+    e1.split(".").map (e2) ->
+      parts.push(e2.trim())
+
+  dotBetweenLastElements = (list) ->
+    result = ""
+    i = 0
+    while(i < list.length)
+      result += list[i]
+      if(i == list.length - 2)
+        result += "."
+      i++
+    result
+  dotBetweenLastElements(parts)
+
+  normalized = dotBetweenLastElements(parts)
+  parsed = parseFloat(normalized)
   if isNaN(parsed)
     parsed = 0
   Math.round(parsed * 100)

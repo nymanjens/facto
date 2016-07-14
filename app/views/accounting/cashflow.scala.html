@@ -17,7 +17,11 @@
   implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash
 )
 
-@Main(Messages("facto.cash-flow"), templatesInNavbar = templatesInNavbar, generateToc = true) {
+@extrascript = {
+  <script src="@routes.Assets.at("javascripts/cashflow.js")"></script>
+}
+
+@Main(Messages("facto.cash-flow"), extrascript, templatesInNavbar = templatesInNavbar, generateToc = true) {
   <h1><i class="icon-money"></i> @Messages("facto.cash-flow")</h1>
   
   @for((account, reservoirs) <- accountToReservoirs) {
@@ -62,7 +66,9 @@
                   <i class="fa fa-check fa-fw"></i>
                 }
                 @if(!entry.balanceVerified && i == 0) {
-                  @BalanceCheckConfirmButton(reservoir, entry)
+                  @BalanceCheckConfirmButton(reservoir, entry){ @* contentWhenConfirmed *@
+                    <i class="fa fa-check fa-fw"></i>
+                  }
                 }
               </td>
               <td>@TransactionGroupEditButton(entry.groupId)</td>
