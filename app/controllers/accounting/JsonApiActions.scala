@@ -15,7 +15,7 @@ import models.accounting.TagEntities
 import models.accounting.config.{Config, Template}
 import controllers.helpers.AuthenticatedAction
 import models.SlickUtils.dbApi._
-import models.SlickUtils.dbRun
+import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
 
 object JsonApiActions extends Controller {
 
@@ -29,9 +29,11 @@ object JsonApiActions extends Controller {
             .filter(_.moneyReservoirCode === reservoirCode)
             .filter(_.categoryCode === categoryCode)
             .filter(_.description.toLowerCase startsWith query.toLowerCase)
-            .take(5))
-          .map(_.description)
-          .toSet
+            .sortBy(r => (r.createdDate.desc))
+            .map(_.description)
+            .take(50))
+          .distinct
+          .take(10)
         Ok(Json.toJson(descriptions))
     }
 
