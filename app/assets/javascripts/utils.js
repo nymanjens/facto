@@ -12,7 +12,13 @@ String.prototype.startsWith = function(prefix) {
 // source: http://stackoverflow.com/a/1978419/1218058
 String.prototype.contains = function(it) { return this.indexOf(it) !== -1; };
 
-// http://stackoverflow.com/a/15313435/1218058
+// source: http://stackoverflow.com/a/17606289/1218058
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.split(search).join(replacement);
+};
+
+// source: http://stackoverflow.com/a/15313435/1218058
 function assert(condition, message) {
     if (!condition) {
         message = message || "Assertion failed";

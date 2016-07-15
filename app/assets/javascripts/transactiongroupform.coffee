@@ -89,8 +89,14 @@ setupDescriptionsTypeahead = (formContainer) ->
             beneficiaryCode = $formContainer.find('.beneficiaryAccountCode').val()
             reservoirCode = $formContainer.find('.moneyReservoirCode').val()
             categoryCode = $formContainer.find('.categoryCode').val()
+            query = query
+                .replaceAll("%", "%25") # has to come first
+                .replaceAll("#", "%23")
+                .replaceAll("&", "%26") # TODO replace all
+                .replaceAll("+", "%2B")
+                .replaceAll(";", "%3B")
             {
-              url: "/jsonapi/acc/descriptions/#{beneficiaryCode}/#{reservoirCode}/#{categoryCode}/#{query}",
+              url: "/jsonapi/acc/descriptions/#{beneficiaryCode}/#{reservoirCode}/#{categoryCode}/?q=#{query}",
             }
           )
         }
