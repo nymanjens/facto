@@ -33,7 +33,7 @@
   <script src="@routes.Assets.at("javascripts/transactiongroupform.js")"></script>
 }
 
-@Main(title, extrascript, templatesInNavbar, returnToOption = Some(returnTo)) {
+@Main(title, extrascript = extrascript, templatesInNavbar, returnToOption = Some(returnTo)) {
   <div class="transaction-group-form">
     @form(action = formAction, 'class ->  "form-horizontal") {
       <div class="row">

@@ -15,7 +15,7 @@
 )
 @returnTo = @{returnToOption getOrElse ReturnTo(request.uri)}
 
-@Base(title, extrascript) {
+@Base(title, extrascript = extrascript) {
 
   <div id="wrapper">
 

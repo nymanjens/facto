@@ -21,7 +21,7 @@
   <script src="@routes.Assets.at("javascripts/cashflow.js")"></script>
 }
 
-@Main(Messages("facto.cash-flow"), extrascript, templatesInNavbar = templatesInNavbar, generateToc = true) {
+@Main(Messages("facto.cash-flow"), extrascript = extrascript, templatesInNavbar = templatesInNavbar, generateToc = true) {
   <h1><i class="icon-money"></i> @Messages("facto.cash-flow")</h1>
   
   @for((account, reservoirs) <- accountToReservoirs) {
