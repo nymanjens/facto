@@ -194,8 +194,13 @@ $(document).ready(() ->
     newForm.find('.bootstrap-tagsinput').each((index, item) ->
       $(item).remove()
     )
-    setupDescriptionsTypeahead(newForm)
     setupBootstrapTagsinput(newForm)
+    # Twitter typeahead fix: Restore regular input and re-run setup
+    newForm.find('span.twitter-typeahead').each (index, item) ->
+      $replacement = $(item).find(".tt-input")
+      $(item).replaceWith($replacement)
+
+    setupDescriptionsTypeahead(newForm)
 
     # update names, ids and title to the correct transactionNum
     newForm.find("[id]").add(newForm).each(() ->
@@ -234,6 +239,9 @@ $(document).ready(() ->
       # get boundSources
       getBoundSources = (boundElem) ->
         elemName = boundElem.attr('name')
+        # Twitter typeahead fix: Typeahead creates two inputs (only one with a name)
+        if(!elemName)
+          return []
         sources = $()
         $.each(boundElem.attr('class').split(/\s+/), (index, clazz) ->
           if(clazz.startsWith("bind-to-formfield-"))
@@ -262,10 +270,25 @@ $(document).ready(() ->
           )
           boundElem.toggleClass("bound-until-change", equalToAnySource)
 
+          # Twitter typeahead fix: Typeahead creates an enclosing span.twitter-typeahead
+          # that should be the one changing color.
+          boundElem.parent(".twitter-typeahead").toggleClass("bound-until-change", equalToAnySource)
+
         updateBoundedState()
         boundElem.keyup(() -> setTimeout(updateBoundedState))
         boundElem.change(() -> setTimeout(updateBoundedState))
-        if(boundElem.attr("type") == "text" || boundElem[0].tagName == "TEXTAREA")
+        # Twitter typeahead fix: It's tricky to get the old value and this isn't really
+        # necessary when there is no transitive dependency
+        if(boundElem.hasClass("tt-input"))
+          boundSources.keydown (e) ->
+            sourceElem = $(this)
+            setTimeout () ->
+              newSourceElemValue = sourceElem.val()
+              if(boundElem.hasClass("bound-until-change"))
+                boundElem.val(newSourceElemValue)
+              updateBoundedState()
+
+        else if(boundElem.attr("type") == "text" || boundElem[0].tagName == "TEXTAREA")
           boundSources.keydown((e) ->
             sourceElem = $(this)
             oldSourceElemValue = sourceElem.val()
@@ -275,7 +298,7 @@ $(document).ready(() ->
               if(boundElem.hasClass("bound-until-change") && oldSourceElemValue == boundElemValue)
                 boundElem.val(newSourceElemValue)
 
-              #updateBoundedState() # might be better that bound-until-change does not get picked up be changing source
+              updateBoundedState()
             )
             if(boundElem.hasClass("bound-until-change"))
               boundElem.trigger(e) # trigger event for handling transitive binds(should schedule its timeout after this one)
@@ -289,7 +312,9 @@ $(document).ready(() ->
               boundElem.change() # allow e.g. updateCategoires to react
 
           )
-          boundSources.keydown(() -> sourceElem = $(this); setTimeout(() -> sourceElem.change()))
+          boundSources.keydown () ->
+            $sourceElem = $(this)
+            setTimeout () -> $sourceElem.change()
     )
 
     ### enforce bind-tags-input-until-change-to-root ###
