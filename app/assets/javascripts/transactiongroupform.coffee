@@ -67,6 +67,43 @@ updateAllTotalState = ($thisFormContainer) ->
   updateTotal(totalInCents)
   updateTotalColor(totalInCents)
 
+### setup descriptions' typeahead ###
+setupDescriptionsTypeahead = (formContainer) ->
+  $formContainer = $(formContainer)
+
+  $formContainer.find('.description').typeahead(
+    {
+      highlight: true,
+      minLength: 1,
+    },
+    {
+      name: 'description',
+      limit: 30, # Explicitly setting limit because the default limit (5) surfaces a bug
+                 # where typeahead only shows (limit - numResults) results.
+      source: new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.whitespace,
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        remote: {
+          url: '/jsonapi/acc/descriptions/null/null/null/%QUERY',
+          prepare: ((query) ->
+            beneficiaryCode = $formContainer.find('.beneficiaryAccountCode').val()
+            reservoirCode = $formContainer.find('.moneyReservoirCode').val()
+            categoryCode = $formContainer.find('.categoryCode').val()
+            query = query
+                .replaceAll("%", "%25") # has to come first
+                .replaceAll("#", "%23")
+                .replaceAll("&", "%26") # TODO replace all
+                .replaceAll("+", "%2B")
+                .replaceAll(";", "%3B")
+            {
+              url: "/jsonapi/acc/descriptions/#{beneficiaryCode}/#{reservoirCode}/#{categoryCode}/?q=#{query}",
+            }
+          )
+        }
+      })
+    }
+  )
+
 ### setup bootstrap-tagsinput ###
 setupBootstrapTagsinput = (formContainer) ->
   $formContainer = $(formContainer)
@@ -158,6 +195,12 @@ $(document).ready(() ->
       $(item).remove()
     )
     setupBootstrapTagsinput(newForm)
+    # Twitter typeahead fix: Restore regular input and re-run setup
+    newForm.find('span.twitter-typeahead').each (index, item) ->
+      $replacement = $(item).find(".tt-input")
+      $(item).replaceWith($replacement)
+
+    setupDescriptionsTypeahead(newForm)
 
     # update names, ids and title to the correct transactionNum
     newForm.find("[id]").add(newForm).each(() ->
@@ -196,6 +239,9 @@ $(document).ready(() ->
       # get boundSources
       getBoundSources = (boundElem) ->
         elemName = boundElem.attr('name')
+        # Twitter typeahead fix: Typeahead creates two inputs (only one with a name)
+        if(!elemName)
+          return []
         sources = $()
         $.each(boundElem.attr('class').split(/\s+/), (index, clazz) ->
           if(clazz.startsWith("bind-to-formfield-"))
@@ -224,10 +270,25 @@ $(document).ready(() ->
           )
           boundElem.toggleClass("bound-until-change", equalToAnySource)
 
+          # Twitter typeahead fix: Typeahead creates an enclosing span.twitter-typeahead
+          # that should be the one changing color.
+          boundElem.parent(".twitter-typeahead").toggleClass("bound-until-change", equalToAnySource)
+
         updateBoundedState()
         boundElem.keyup(() -> setTimeout(updateBoundedState))
         boundElem.change(() -> setTimeout(updateBoundedState))
-        if(boundElem.attr("type") == "text" || boundElem[0].tagName == "TEXTAREA")
+        # Twitter typeahead fix: It's tricky to get the old value and this isn't really
+        # necessary when there is no transitive dependency
+        if(boundElem.hasClass("tt-input"))
+          boundSources.keydown (e) ->
+            sourceElem = $(this)
+            setTimeout () ->
+              newSourceElemValue = sourceElem.val()
+              if(boundElem.hasClass("bound-until-change"))
+                boundElem.val(newSourceElemValue)
+              updateBoundedState()
+
+        else if(boundElem.attr("type") == "text" || boundElem[0].tagName == "TEXTAREA")
           boundSources.keydown((e) ->
             sourceElem = $(this)
             oldSourceElemValue = sourceElem.val()
@@ -237,7 +298,7 @@ $(document).ready(() ->
               if(boundElem.hasClass("bound-until-change") && oldSourceElemValue == boundElemValue)
                 boundElem.val(newSourceElemValue)
 
-              #updateBoundedState() # might be better that bound-until-change does not get picked up be changing source
+              updateBoundedState()
             )
             if(boundElem.hasClass("bound-until-change"))
               boundElem.trigger(e) # trigger event for handling transitive binds(should schedule its timeout after this one)
@@ -251,7 +312,9 @@ $(document).ready(() ->
               boundElem.change() # allow e.g. updateCategoires to react
 
           )
-          boundSources.keydown(() -> sourceElem = $(this); setTimeout(() -> sourceElem.change()))
+          boundSources.keydown () ->
+            $sourceElem = $(this)
+            setTimeout () -> $sourceElem.change()
     )
 
     ### enforce bind-tags-input-until-change-to-root ###
@@ -319,6 +382,7 @@ $(document).ready(() ->
     $formContainer.find(".flow-as-float").change(() -> updateAllTotalState($formContainer))
 
   $(".transaction-holder").each(() -> addTransactionSpecificEventListeners(this))
+  $(".transaction-holder").each(() -> setupDescriptionsTypeahead(this))
   $(".transaction-holder").each(() -> setupBootstrapTagsinput(this))
   $("input:radio[name=zeroSum]").change(() -> updateAllTotalState(null))
   updateAllTotalState(null)

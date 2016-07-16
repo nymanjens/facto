@@ -93,17 +93,17 @@
                   @bootstrap3.Text(transactionForm("issuerName"), Messages("facto.issuer"), args=Map('readonly -> "readonly"))
                 }
                 @bootstrap3.Select(transactionForm("beneficiaryAccountCode"), Messages("facto.beneficiary"), Config.accounts.mapValues(_.longName),
-                    classes=Seq("bind-until-change", "bind-to-root-form"))
+                    classes=Seq("bind-until-change", "bind-to-root-form", "beneficiaryAccountCode"))
                 @bootstrap3.Select(transactionForm("moneyReservoirCode"), Messages("facto.payed-with-to"),
                     toListMap(Config.visibleReservoirs(includeNullReservoir = true).map(reservoir => reservoir.code -> reservoir.name)),
-                    classes=Seq("bind-until-change", "bind-to-root-form"))
+                    classes=Seq("bind-until-change", "bind-to-root-form", "moneyReservoirCode"))
                 @bootstrap3.Select(transactionForm("categoryCode"), Messages("facto.category"),
                     Config.categories.mapValues(category =>
                       if(category.helpText.isEmpty) category.name else s"${category.name} (${category.helpText})"),
-                    classes=Seq("bind-until-change", "bind-to-root-form"),
+                    classes=Seq("bind-until-change", "bind-to-root-form", "categoryCode"),
                     optionArgs=Config.categories.mapValues(cat => Map('accounts -> cat.accounts.map(_.code).mkString(" "))))
                 @bootstrap3.Text(transactionForm("description"), Messages("facto.description"),
-                    classes=Seq("bind-until-change", "bind-to-root-form"))
+                    classes=Seq("bind-until-change", "bind-to-root-form", "description"))
                 @bootstrap3.Money(transactionForm("flowAsFloat"), CurrencyUnit.default, Messages("facto.flow"),
                     classes=Seq("flow-as-float"))
                 @bootstrap3.Textarea(transactionForm("detailDescription"), Messages("facto.more-info"),
