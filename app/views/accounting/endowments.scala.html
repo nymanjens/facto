@@ -17,7 +17,7 @@
 )
 
 @Main(Messages("facto.endowments"), templatesInNavbar = templatesInNavbar) {
-  <h1><i class="icon-crown"></i> @Messages("facto.endowments")</h1>
+  <h1 class="page-header"><i class="icon-crown"></i> @Messages("facto.endowments")</h1>
 
   @Panel(
     title = if (accountToEntries.size > 1) Messages("facto.all-accounts") else Messages("facto.single-account")

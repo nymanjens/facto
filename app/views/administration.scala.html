@@ -5,7 +5,7 @@
 @(users: Seq[User], addUserForm: Form[AddUserData])(implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash)
 
 @Main(Messages("facto.user-administration")) {
-  <h1><i class="fa fa-cogs fa-fw"></i> @Messages("facto.user-administration")</h1>
+  <h1 class="page-header"><i class="fa fa-cogs fa-fw"></i> @Messages("facto.user-administration")</h1>
 
   <div class="row">
     <div class="col-lg-6">

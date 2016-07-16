@@ -18,7 +18,7 @@
 )
 
 @Main(Messages("facto.search-results"), templatesInNavbar = templatesInNavbar) {
-  <h1><i class="icon-list"></i> @Messages("facto.search-results-for", query)</h1>
+  <h1 class="page-header"><i class="icon-list"></i> @Messages("facto.search-results-for", query)</h1>
 
   @Panel(
     title = if(totalNumResults == 1) Messages("facto.one-result") else Messages("facto.num-results", totalNumResults)
