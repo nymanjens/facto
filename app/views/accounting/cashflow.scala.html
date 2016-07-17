@@ -31,9 +31,8 @@
     ) { @* panel content *@
 
       @for(reservoir <- reservoirs) {
-        @viewhelpers.accounting.Table.cachedWithIndexedEntries(
+        @viewhelpers.accounting.Table.withIndexedEntries(
           title = reservoir.name,
-          tableTypeIdentifierForCache = s"cachflow_${reservoir.code}",
           tableClasses = "table-cashflow",
           allEntriesLink = (reservoirToEntries(reservoir).size > expandedNumEntries) match {
               case true => Some(controllers.accounting.routes.Views.cashFlowOfSingle(reservoir.code))
