@@ -22,9 +22,8 @@
     title = Messages("facto.genral-information-about-all-entries")
   ) { @* panel content *@
 
-    @viewhelpers.accounting.Table.cached(
+    @viewhelpers.accounting.Table(
       title = Messages("facto.all"),
-      tableTypeIdentifierForCache = "everything",
       tableClasses = "table-everything",
       allEntriesLink = (entries.size > numEntriesToShow) match {
           case true => Some(controllers.accounting.routes.Views.everythingAll())

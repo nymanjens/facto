@@ -3,7 +3,6 @@ package models.accounting
 import com.google.common.base.Splitter
 import com.google.common.hash.{HashCode, Hashing}
 import common.Clock
-import common.cache.UniquelyHashable
 import models.SlickUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
 import models.SlickUtils.dbRun
 import models.SlickUtils.dbApi._
@@ -30,7 +29,7 @@ case class Transaction(transactionGroupId: Long,
                        createdDate: DateTime = Clock.now,
                        transactionDate: DateTime,
                        consumedDate: DateTime,
-                       idOption: Option[Long] = None) extends Entity[Transaction] with UniquelyHashable {
+                       idOption: Option[Long] = None) extends Entity[Transaction] {
   require(transactionGroupId > 0)
   require(issuerId > 0)
   require(!beneficiaryAccountCode.isEmpty)
@@ -54,9 +53,6 @@ case class Transaction(transactionGroupId: Long,
     val issuerString = Try(issuer.loginName).getOrElse(issuerId.toString)
     s"Transaction(group=$transactionGroupId, issuer=${issuerString}, $beneficiaryAccountCode, $moneyReservoirCode, $categoryCode, flow=$flow, $description)"
   }
-
-  // Transactions are immutable
-  override def uniqueHash = HashCode.fromLong(id)
 }
 
 case class TransactionPartial(beneficiary: Option[Account],

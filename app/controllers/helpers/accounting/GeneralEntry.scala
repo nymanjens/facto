@@ -6,8 +6,6 @@ import com.google.common.base.{Joiner, Splitter}
 import org.joda.time.DateTime
 import com.github.nscala_time.time.Imports._
 import com.google.common.hash.Hashing
-import common.cache.UniquelyHashable
-import common.cache.UniquelyHashable.UniquelyHashableIterableFunnel
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
 import models.accounting.{Transaction, Transactions}
@@ -16,14 +14,7 @@ import controllers.helpers.ControllerHelperCache
 import controllers.helpers.ControllerHelperCache.CacheIdentifier
 
 case class GeneralEntry(override val transactions: Seq[Transaction])
-  extends GroupedTransactions(transactions) with UniquelyHashable {
-
-  override val uniqueHash = {
-    Hashing.sha1().newHasher()
-      .putObject(transactions, UniquelyHashableIterableFunnel)
-      .hash()
-  }
-}
+  extends GroupedTransactions(transactions)
 
 object GeneralEntry {
 
@@ -131,9 +122,9 @@ object GeneralEntry {
           .map(_.toLowerCase)
 
         var score: Double = 0
-        if(searchableParts contains queryPart.toLowerCase) {
+        if (searchableParts contains queryPart.toLowerCase) {
           score += 2
-        } else if (searchableParts.map(_ contains queryPart.toLowerCase) contains true){
+        } else if (searchableParts.map(_ contains queryPart.toLowerCase) contains true) {
           score += 1
         }
 
