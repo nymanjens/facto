@@ -1,8 +1,6 @@
 package controllers.helpers.accounting
 
 import com.google.common.hash.Hashing
-import common.cache.UniquelyHashable
-import common.cache.UniquelyHashable.UniquelyHashableIterableFunnel
 import controllers.helpers.ControllerHelperCache
 import controllers.helpers.ControllerHelperCache.CacheIdentifier
 import models.SlickUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
@@ -15,23 +13,12 @@ import org.joda.time.DateTime
 
 import scala.collection.immutable.Seq
 
-sealed trait CashFlowEntry extends UniquelyHashable
+sealed trait CashFlowEntry
 
 case class RegularEntry(override val transactions: Seq[Transaction], balance: Money, balanceVerified: Boolean)
-  extends GroupedTransactions(transactions) with CashFlowEntry {
+  extends GroupedTransactions(transactions) with CashFlowEntry
 
-  override val uniqueHash = {
-    Hashing.sha1().newHasher()
-      .putObject(transactions, UniquelyHashableIterableFunnel)
-      .putLong(balance.cents)
-      .putBoolean(balanceVerified)
-      .hash()
-  }
-}
-
-case class BalanceCorrection(balanceCheck: BalanceCheck) extends CashFlowEntry {
-  override val uniqueHash = balanceCheck.uniqueHash
-}
+case class BalanceCorrection(balanceCheck: BalanceCheck) extends CashFlowEntry
 
 object CashFlowEntry {
 
