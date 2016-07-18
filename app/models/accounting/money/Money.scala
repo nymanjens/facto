@@ -11,28 +11,26 @@ import play.twirl.api.Html
 
 import scala.collection.JavaConverters._
 
+// TODO: Remove default currency
 case class Money(override val cents: Long, currency: CurrencyUnit = CurrencyUnit.default) extends CentOperations[Money] {
 
-  def formatFloat: String = Money.centsToFloatString(cents)
+  override protected def withCents(newCents: Long): Money = copy(cents = newCents)
+
+  override protected def validateCentOperation(that: Money): Unit = {
+    require(this.currency == that.currency, s"The currencies of ${this} and ${that} differ")
+  }
 
   override def toString = s"${currency.threeLetterSymbol} $formatFloat"
 
-  override def doCentOperation[T](operation: (Long, Long) => T)(that: Money): T = {
-    if (this.cents != 0 && that.cents != 0) {
-      require(this.currency == that.currency, s"The currencies of ${this} and ${that} differ")
-    }
-    operation(this.cents, that.cents)
-  }
-  override def doCentOperationToSelfType(operation: (Long, Long) => Long)(that: Money): Money = {
-    Money(doCentOperation(operation)(that), this.currency)
-  }
+  def formatFloat: String = Money.centsToFloatString(cents)
 
-  override def withCents(newCents: Long): Money = copy(cents = newCents)
+  def toReferenceCurrency: ReferenceMoney = {
+    // TODO: Apply exchange rate
+    ReferenceMoney(cents)
+  }
 }
 
 object Money {
-
-  val zero: Money = Money(0)
 
   def centsToFloatString(cents: Long): String = {
     val sign = if (cents < 0) "-" else ""
@@ -44,7 +42,8 @@ object Money {
   def floatToCents(float: Double): Long =
     (float.toDouble * 100).round
 
+  // TODO: Remove this
   implicit object MoneyNumeric extends CentOperationsNumeric[Money] {
-    override def fromInt(x: Int): Money = Money.zero
+    override def fromInt(x: Int): Money = Money(0)
   }
 }

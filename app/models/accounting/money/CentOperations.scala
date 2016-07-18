@@ -23,9 +23,7 @@ trait CentOperations[M <: CentOperations[M]] {
 
   protected def withCents(newCents: Long): M
 
-  protected def doCentOperation[T](operation: (Long, Long) => T)(that: M): T
-
-  protected def doCentOperationToSelfType(operation: (Long, Long) => Long)(that: M): M
+  protected def validateCentOperation(that: M): Unit
 
   // **************** Arithmetic operations **************** //
   final def negated: M = withCents(-cents)
@@ -39,6 +37,15 @@ trait CentOperations[M <: CentOperations[M]] {
   final def <(that: M): Boolean = doCentOperation(_ < _)(that)
   final def >=(that: M): Boolean = doCentOperation(_ >= _)(that)
   final def <=(that: M): Boolean = doCentOperation(_ <= _)(that)
+
+  // **************** Private helper methods **************** //
+  private def doCentOperation[T](operation: (Long, Long) => T)(that: M): T = {
+    validateCentOperation(that)
+    operation(this.cents, that.cents)
+  }
+
+  private def doCentOperationToSelfType(operation: (Long, Long) => Long)(that: M): M =
+    withCents(doCentOperation(operation)(that))
 }
 
 object CentOperations {
