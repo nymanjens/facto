@@ -43,6 +43,8 @@ case class Money(cents: Long, currency: CurrencyUnit = CurrencyUnit.default) {
 
 object Money {
 
+  val zero: Money = Money(0)
+
   def centsToFloatString(cents: Long): String = {
     val sign = if (cents < 0) "-" else ""
     val integerPart = NumberFormat.getNumberInstance(Locale.US).format(abs(cents) / 100)
@@ -64,7 +66,7 @@ object Money {
     override def toInt(x: Money): Int = x.cents.toInt
     override def toLong(x: Money): Long = x.cents
 
-    override def fromInt(x: Int): Money = ???
+    override def fromInt(x: Int): Money = Money.zero
     override def compare(x: Money, y: Money): Int = (x.cents - y.cents).signum
   }
 }
