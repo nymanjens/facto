@@ -64,7 +64,7 @@ object Money {
     override def toInt(x: Money): Int = x.cents.toInt
     override def toLong(x: Money): Long = x.cents
 
-    override def fromInt(x: Int): Money = Money(x)
+    override def fromInt(x: Int): Money = ???
     override def compare(x: Money, y: Money): Int = (x.cents - y.cents).signum
   }
 }

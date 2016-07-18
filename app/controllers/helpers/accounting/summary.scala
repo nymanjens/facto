@@ -17,7 +17,7 @@ import models.accounting.config.{Account, Category}
 import models.accounting.config.Account.SummaryTotalRowDef
 import controllers.helpers.ControllerHelperCache
 import controllers.helpers.ControllerHelperCache.CacheIdentifier
-import models.accounting.money.Money
+import models.accounting.money.{CurrencyUnit, Money}
 
 case class Summary(yearToSummary: Map[Int, SummaryForYear],
                    categories: Seq[Category],
@@ -169,7 +169,7 @@ object SummaryForYear {
             val transactions = categoryToTransactions.get(category).asScala
             val totalFlow = transactions.map(_.flow).sum
             val numMonths = (monthRangeForAverages intersection MonthRange.forYear(year)).countMonths
-            val average = if (numMonths > 0) totalFlow / numMonths else Money(0)
+            val average = if (numMonths > 0) totalFlow / numMonths else Money(0, CurrencyUnit.default)
             category -> average
           }
         }

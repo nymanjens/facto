@@ -7,7 +7,7 @@ import models.accounting.config.{Account, Category, MoneyReservoir}
 import models.SlickUtils.dbApi._
 import controllers.helpers.ControllerHelperCache
 import controllers.helpers.ControllerHelperCache.CacheIdentifier
-import models.accounting.money.Money
+import models.accounting.money.{CurrencyUnit, Money}
 
 /**
   * @param debt The debt of the first account to the second (may be negative).
@@ -39,7 +39,7 @@ object LiquidationEntry {
           case Nil =>
             Stream.empty
         }
-      var entries = convertToEntries(relevantTransactions, Money(0) /* initial debt */).toList
+      var entries = convertToEntries(relevantTransactions, Money(0, CurrencyUnit.default) /* initial debt */).toList
 
       entries = GroupedTransactions.combineConsecutiveOfSameGroup(entries) {
         /* combine */ (first, last) => LiquidationEntry(first.transactions ++ last.transactions, last.debt)

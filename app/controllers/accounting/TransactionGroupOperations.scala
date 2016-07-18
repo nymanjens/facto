@@ -92,9 +92,8 @@ object TransactionGroupOperations extends Controller {
   def addNewLiquidationRepayForm(accountCode1: String, accountCode2: String, amountInCents: Long, returnTo: String): AuthenticatedAction = {
     implicit val returnToImplicit = ReturnTo(returnTo)
 
-    val amount = Money(amountInCents)
-    if (amount < Money(0)) {
-      addNewLiquidationRepayForm(accountCode2, accountCode1, -amount.cents, returnTo)
+    if (amountInCents < 0) {
+      addNewLiquidationRepayForm(accountCode2, accountCode1, -amountInCents, returnTo)
     } else {
       val account1 = Config.accounts(accountCode1)
       val account2 = Config.accounts(accountCode2)
@@ -104,13 +103,13 @@ object TransactionGroupOperations extends Controller {
           moneyReservoir = account1.defaultElectronicReservoir,
           category = Config.constants.accountingCategory,
           description = Config.constants.liquidationDescription,
-          flowInCents = -amount.cents),
+          flowInCents = -amountInCents),
         TransactionPartial.from(
           beneficiary = account1,
           moneyReservoir = account2.defaultElectronicReservoir,
           category = Config.constants.accountingCategory,
           description = Config.constants.liquidationDescription,
-          flowInCents = amount.cents)),
+          flowInCents = amountInCents)),
         zeroSum = true
       ))
     }
