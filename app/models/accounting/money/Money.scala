@@ -6,39 +6,28 @@ import java.util.Locale
 
 import com.google.common.collect.Iterables
 import models.accounting.config.Config
+import models.accounting.money.CentOperations.CentOperationsNumeric
 import play.twirl.api.Html
 
 import scala.collection.JavaConverters._
 
-case class Money(cents: Long, currency: CurrencyUnit = CurrencyUnit.default) {
-
-  def negated: Money = withCents(-cents)
-
-  def +(that: Money): Money = doCentOperationToMoney(_ + _)(that)
-  def -(that: Money): Money = doCentOperationToMoney(_ - _)(that)
-  def *(number: Long): Money = withCents(cents * number)
-  def /(number: Long): Money = withCents(round(cents * 1.0 / number))
-  def ==(that: Money): Boolean = doCentOperation(_ == _)(that)
-  def >(that: Money): Boolean = doCentOperation(_ > _)(that)
-  def <(that: Money): Boolean = doCentOperation(_ < _)(that)
-  def >=(that: Money): Boolean = doCentOperation(_ >= _)(that)
-  def <=(that: Money): Boolean = doCentOperation(_ <= _)(that)
+case class Money(override val cents: Long, currency: CurrencyUnit = CurrencyUnit.default) extends CentOperations[Money] {
 
   def formatFloat: String = Money.centsToFloatString(cents)
 
   override def toString = s"${currency.threeLetterSymbol} $formatFloat"
 
-  private def doCentOperation[T](operation: (Long, Long) => T)(that: Money): T = {
+  override def doCentOperation[T](operation: (Long, Long) => T)(that: Money): T = {
     if (this.cents != 0 && that.cents != 0) {
       require(this.currency == that.currency, s"The currencies of ${this} and ${that} differ")
     }
     operation(this.cents, that.cents)
   }
-  private def doCentOperationToMoney(operation: (Long, Long) => Long)(that: Money): Money = {
+  override def doCentOperationToSelfType(operation: (Long, Long) => Long)(that: Money): Money = {
     Money(doCentOperation(operation)(that), this.currency)
   }
 
-  private def withCents(newCents: Long): Money = copy(cents = newCents)
+  override def withCents(newCents: Long): Money = copy(cents = newCents)
 }
 
 object Money {
@@ -55,18 +44,7 @@ object Money {
   def floatToCents(float: Double): Long =
     (float.toDouble * 100).round
 
-  implicit object MoneyNumeric extends Numeric[Money] {
-    override def negate(x: Money): Money = x.negated
-    override def plus(x: Money, y: Money): Money = x + y
-    override def minus(x: Money, y: Money): Money = x - y
-    override def times(x: Money, y: Money): Money = throw new UnsupportedOperationException("Multiplication of Money doesn't make sense.")
-
-    override def toDouble(x: Money): Double = x.cents.toDouble
-    override def toFloat(x: Money): Float = x.cents.toFloat
-    override def toInt(x: Money): Int = x.cents.toInt
-    override def toLong(x: Money): Long = x.cents
-
+  implicit object MoneyNumeric extends CentOperationsNumeric[Money] {
     override def fromInt(x: Int): Money = Money.zero
-    override def compare(x: Money, y: Money): Int = (x.cents - y.cents).signum
   }
 }
