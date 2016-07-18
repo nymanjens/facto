@@ -61,7 +61,7 @@ object Money {
       Iterables.getOnlyElement(candidates.asJava)
     }
 
-    lazy val default: CurrencyUnit = CurrencyUnit.of(Config.constants.defaultCurrencySymbol)
+    lazy val default: CurrencyUnit = CurrencyUnit.of(Config.constants.defaultCurrency)
 
     private def all: Set[CurrencyUnit] = Set(Eur, Gbp, Usd)
     object Eur extends CurrencyUnit("EUR", Html("&euro;"), Some("fa fa-eur"))

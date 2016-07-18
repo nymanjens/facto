@@ -6,6 +6,6 @@ case class Constants(commonAccount: Account,
                      accountingCategory: Category,
                      endowmentCategory: Category,
                      liquidationDescription: String,
-                     defaultCurrencySymbol: String) {
+                     defaultCurrency: String) {
   requireNonNullFields(this)
 }

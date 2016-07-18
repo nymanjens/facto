@@ -234,5 +234,5 @@ constants:
     commonAccount: *accountCommon
     accountingCategory: *catAcc
     endowmentCategory: *catEndow
-    defaultCurrencySymbol: EUR
+    defaultCurrency: EUR
     liquidationDescription: Liquidation

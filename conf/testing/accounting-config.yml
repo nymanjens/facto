@@ -95,4 +95,4 @@ constants:
     commonAccount: *accCommon
     accountingCategory: *catA
     endowmentCategory: *catB
-    defaultCurrencySymbol: EUR
+    defaultCurrency: EUR
