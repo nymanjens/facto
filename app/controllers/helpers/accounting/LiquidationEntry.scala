@@ -7,12 +7,12 @@ import models.accounting.config.{Account, Category, MoneyReservoir}
 import models.SlickUtils.dbApi._
 import controllers.helpers.ControllerHelperCache
 import controllers.helpers.ControllerHelperCache.CacheIdentifier
-import models.accounting.money.{CurrencyUnit, Money}
+import models.accounting.money.ReferenceMoney
 
 /**
   * @param debt The debt of the first account to the second (may be negative).
   */
-case class LiquidationEntry(override val transactions: Seq[Transaction], debt: Money)
+case class LiquidationEntry(override val transactions: Seq[Transaction], debt: ReferenceMoney)
   extends GroupedTransactions(transactions)
 
 object LiquidationEntry {
@@ -30,16 +30,17 @@ object LiquidationEntry {
         } yield transaction
 
       // convert to entries (recursion does not lead to growing stack because of Stream)
-      def convertToEntries(nextTransactions: List[Transaction], currentDebt: Money): Stream[LiquidationEntry] =
+      def convertToEntries(nextTransactions: List[Transaction], currentDebt: ReferenceMoney): Stream[LiquidationEntry] =
         nextTransactions match {
           case trans :: rest =>
             val addsTo1To2Debt = trans.beneficiary == accountPair.account2
-            val newDebt = if (addsTo1To2Debt) currentDebt + trans.flow else currentDebt - trans.flow
+            val flow = trans.flow.toReferenceCurrency
+            val newDebt = if (addsTo1To2Debt) currentDebt + flow else currentDebt - flow
             LiquidationEntry(Seq(trans), newDebt) #:: convertToEntries(rest, newDebt)
           case Nil =>
             Stream.empty
         }
-      var entries = convertToEntries(relevantTransactions, Money(0, CurrencyUnit.default) /* initial debt */).toList
+      var entries = convertToEntries(relevantTransactions, ReferenceMoney(0) /* initial debt */).toList
 
       entries = GroupedTransactions.combineConsecutiveOfSameGroup(entries) {
         /* combine */ (first, last) => LiquidationEntry(first.transactions ++ last.transactions, last.debt)

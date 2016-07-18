@@ -42,8 +42,7 @@ object Money {
   def floatToCents(float: Double): Long =
     (float.toDouble * 100).round
 
-  // TODO: Remove this
-  implicit object MoneyNumeric extends CentOperationsNumeric[Money] {
-    override def fromInt(x: Int): Money = Money(0)
+  def moneyNumeric(currency: CurrencyUnit): Numeric[Money]  = new CentOperationsNumeric[Money] {
+    override def fromInt(x: Int): Money = Money(0, currency)
   }
 }

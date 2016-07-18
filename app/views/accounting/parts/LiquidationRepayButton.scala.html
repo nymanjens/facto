@@ -1,11 +1,11 @@
 @import common.ReturnTo
-@import models.accounting.money.Money
+@import models.accounting.money.ReferenceMoney
 @import models.accounting.config.Account
 
 @(
   account1: Account,
   account2: Account,
-  amount: Money
+  amount: ReferenceMoney
 )(
   implicit request: Request[AnyContent], messages: Messages
 )

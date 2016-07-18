@@ -9,6 +9,8 @@ case class ReferenceMoney(override val cents: Long) extends CentOperations[Refer
   override protected def validateCentOperation(that: ReferenceMoney): Unit = {}
 
   def formatFloat: String = Money.centsToFloatString(cents)
+
+  def toMoney: Money = Money(cents, CurrencyUnit.default)
 }
 
 object ReferenceMoney {
