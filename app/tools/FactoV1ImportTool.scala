@@ -4,20 +4,18 @@ import scala.io.Source
 import scala.collection.immutable.Seq
 import scala.collection.JavaConverters._
 import scala.util.matching.Regex
-
 import java.nio.file.Path
 
 import play.api.{Application, Logger}
-
 import com.google.common.base.Splitter
 import org.joda.time.DateTime
 import models.SlickUtils.dbApi._
 import org.apache.commons.lang.StringEscapeUtils
-
 import models.SlickUtils.dbRun
 import models.{User, Users}
-import models.accounting.{BalanceCheck, Money, Transaction, TransactionGroup, UpdateLogs, UpdateLog, BalanceChecks, TransactionGroups, Transactions}
+import models.accounting.{BalanceCheck, BalanceChecks, Transaction, TransactionGroup, TransactionGroups, Transactions, UpdateLog, UpdateLogs}
 import models.accounting.config.Config
+import models.accounting.money.Money
 
 object FactoV1ImportTool {
 

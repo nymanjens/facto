@@ -1,9 +1,10 @@
 package controllers.accounting
 
+import models.accounting.money.Money
 import org.joda.time.DateTime
 import play.api.data._
 import play.api.data.Forms._
-import play.api.mvc.{Controller, Call, Request, AnyContent}
+import play.api.mvc.{AnyContent, Call, Controller, Request}
 import play.twirl.api.Html
 import play.api.i18n.Messages
 
@@ -13,7 +14,7 @@ import play.api.i18n.Messages.Implicits._
 
 import common.{Clock, ReturnTo}
 import models.User
-import models.accounting.{BalanceCheck, BalanceChecks, Transactions, Money, UpdateLogs}
+import models.accounting.{BalanceCheck, BalanceChecks, Transactions, UpdateLogs}
 import models.accounting.config.{MoneyReservoir, Config}
 import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting.FormUtils.{validFlowAsFloat, flowAsFloatStringToMoney}

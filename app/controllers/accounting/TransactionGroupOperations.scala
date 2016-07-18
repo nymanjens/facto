@@ -1,6 +1,7 @@
 package controllers.accounting
 
 import common.ReturnTo
+import models.accounting.money.Money
 
 import scala.collection.{Seq => MutableSeq}
 import scala.collection.immutable.Seq
@@ -19,7 +20,7 @@ import org.joda.time.DateTime
 
 import common.{Clock, ReturnTo}
 import models.User
-import models.accounting.{Transaction, Transactions, TransactionPartial, TransactionGroup, TransactionGroupPartial, TransactionGroups, Money, UpdateLogs}
+import models.accounting.{Transaction, Transactions, TransactionPartial, TransactionGroup, TransactionGroupPartial, TransactionGroups, UpdateLogs}
 import models.accounting.config.{Config, Account, MoneyReservoir, Category, Template}
 import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting.CashFlowEntry

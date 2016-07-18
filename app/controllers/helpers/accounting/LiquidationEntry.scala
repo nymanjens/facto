@@ -1,13 +1,13 @@
 package controllers.helpers.accounting
 
 import collection.immutable.Seq
-
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
-import models.accounting.{Transaction, Transactions, Money}
-import models.accounting.config.{Account, MoneyReservoir, Category}
+import models.accounting.{Transaction, Transactions}
+import models.accounting.config.{Account, Category, MoneyReservoir}
 import models.SlickUtils.dbApi._
 import controllers.helpers.ControllerHelperCache
 import controllers.helpers.ControllerHelperCache.CacheIdentifier
+import models.accounting.money.Money
 
 /**
   * @param debt The debt of the first account to the second (may be negative).

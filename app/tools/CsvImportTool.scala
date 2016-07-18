@@ -2,18 +2,16 @@ package tools
 
 import scala.io.Source
 import scala.collection.JavaConverters._
-
 import java.nio.file.Path
 
 import play.api.Logger
-
 import com.google.common.base.Splitter
 import org.joda.time.DateTime
 import models.SlickUtils.dbApi._
-
 import models.SlickUtils.dbRun
 import models.Users
-import models.accounting.{BalanceCheck, Money, Transaction, TransactionGroup, UpdateLogs, BalanceChecks, TransactionGroups, Transactions}
+import models.accounting.money.Money
+import models.accounting.{BalanceCheck, BalanceChecks, Transaction, TransactionGroup, TransactionGroups, Transactions, UpdateLogs}
 
 
 object CsvImportTool {

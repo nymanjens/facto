@@ -1,13 +1,13 @@
 package models.accounting
 
-import java.util.{Date, Calendar}
+import java.util.{Calendar, Date}
 
 import org.specs2.mutable._
 import play.api.test.FakeApplication
 import play.api.test.WithApplication
-
 import common.testing.TestObjects._
 import common.testing.TestUtils._
+import models.accounting.money.Money
 
 class MoneyTest extends Specification {
 

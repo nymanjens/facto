@@ -1,15 +1,14 @@
 package models.accounting
 
 import scala.collection.immutable.Seq
-
 import org.joda.time.DateTime
-
 import common.Clock
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.SlickUtils.dbRun
 import models.SlickUtils.JodaToSqlDateMapper
-import models.manager.{EntityTable, Entity, EntityManager, ImmutableEntityManager}
+import models.accounting.money.Money
+import models.manager.{Entity, EntityManager, EntityTable, ImmutableEntityManager}
 
 /** Transaction groups should be treated as immutable. */
 case class TransactionGroup(createdDate: DateTime = Clock.now,

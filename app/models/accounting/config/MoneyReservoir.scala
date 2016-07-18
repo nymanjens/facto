@@ -1,7 +1,8 @@
 package models.accounting.config
 
 import common.Require.requireNonNullFields
-import models.accounting.Money.CurrencyUnit
+import models.accounting.money.Money.CurrencyUnit
+import models.accounting.money.Money
 
 case class MoneyReservoir(code: String,
                           name: String,

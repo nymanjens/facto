@@ -1,15 +1,14 @@
 package controllers.helpers.accounting
 
 import scala.collection.immutable.Seq
-
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
 import play.api.test._
-
 import models.accounting._
 import common.testing.TestObjects._
 import common.testing.TestUtils._
+import models.accounting.money.Money
 
 @RunWith(classOf[JUnitRunner])
 class LiquidationEntryTest extends Specification {

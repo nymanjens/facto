@@ -1,12 +1,11 @@
 package models
 
+import models.accounting.money.Money
+
 import scala.concurrent.Await
 import scala.concurrent.duration._
-
 import slick.backend.DatabaseConfig
 import slick.driver.JdbcDriver
-
-import models.accounting.Money
 
 object SlickUtils {
 

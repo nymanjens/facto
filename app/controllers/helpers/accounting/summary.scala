@@ -2,24 +2,22 @@ package controllers.helpers.accounting
 
 import scala.collection.immutable.Seq
 import scala.collection.JavaConverters._
-
-import com.google.common.collect.{HashMultimap, ImmutableTable, Tables, Table, Multimap, Range}
+import com.google.common.collect.{HashMultimap, ImmutableTable, Multimap, Range, Table, Tables}
 import org.joda.time.DateTime
 import models.SlickUtils.dbApi._
 import com.github.nscala_time.time.Imports._
-
 import play.api.Logger
 import play.twirl.api.Html
-
-import common.{Clock, MonthRange, DatedMonth}
+import common.{Clock, DatedMonth, MonthRange}
 import common.CollectionUtils.toListMap
 import common.GuavaUtils.asGuava
-import models.SlickUtils.{dbRun, JodaToSqlDateMapper}
-import models.accounting.{Transactions, Transaction, Money, Tag}
-import models.accounting.config.{Category, Account}
+import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
+import models.accounting.{Tag, Transaction, Transactions}
+import models.accounting.config.{Account, Category}
 import models.accounting.config.Account.SummaryTotalRowDef
 import controllers.helpers.ControllerHelperCache
 import controllers.helpers.ControllerHelperCache.CacheIdentifier
+import models.accounting.money.Money
 
 case class Summary(yearToSummary: Map[Int, SummaryForYear],
                    categories: Seq[Category],
