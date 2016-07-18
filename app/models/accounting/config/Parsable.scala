@@ -88,12 +88,17 @@ object Parsable {
   }
 
 
-  case class MoneyReservoir(code: String, name: String, shorterName: /* nullable */ String, owner: Account, hidden: Boolean) {
-    def this() = this(null, null, null, null, hidden = false)
+  case class MoneyReservoir(code: String,
+                            name: String,
+                            shorterName: /* nullable */ String,
+                            owner: Account,
+                            hidden: Boolean,
+                            currency: /* nullable */ String) {
+    def this() = this(null, null, null, null, hidden = false, null)
 
     def parse: ParsedMoneyReservoir = {
       val parsedShorterName = if (shorterName == null) name else shorterName
-      ParsedMoneyReservoir(code, name, parsedShorterName, owner.parse, hidden)
+      ParsedMoneyReservoir(code, name, parsedShorterName, owner.parse, hidden, currencyCode = Option(currency))
     }
   }
 

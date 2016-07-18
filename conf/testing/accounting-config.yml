@@ -58,6 +58,7 @@ moneyReservoirs:
       code: CASH_A
       name: Cash A
       owner: *accA
+      currency: GBP
   - &reservoirCardA
       code: CARD_A
       name: Card A

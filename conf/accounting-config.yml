@@ -155,6 +155,7 @@ moneyReservoirs:
         code: CASH_ALICE
         name: Cash Alice
         owner: *accountAlice
+        currency: GBP
     - &reservoirCardAlice
         code: CARD_ALICE
         name: Card Alice
