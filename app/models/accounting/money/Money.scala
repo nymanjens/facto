@@ -11,8 +11,7 @@ import play.twirl.api.Html
 
 import scala.collection.JavaConverters._
 
-// TODO: Remove default currency
-case class Money(override val cents: Long, currency: CurrencyUnit = CurrencyUnit.default) extends CentOperations[Money] {
+case class Money(override val cents: Long, currency: CurrencyUnit) extends CentOperations[Money] {
 
   override protected def withCents(newCents: Long): Money = copy(cents = newCents)
 
