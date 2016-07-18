@@ -147,6 +147,7 @@ moneyReservoirs:
         code: CARD_COMMON
         name: Card Common
         owner: *accountCommon
+        currency: GBP
     - &reservoirCardBob
         code: CARD_BOB
         name: Card Bob

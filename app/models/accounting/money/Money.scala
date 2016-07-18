@@ -29,11 +29,14 @@ case class Money(cents: Long, currency: CurrencyUnit = CurrencyUnit.default) {
   override def toString = s"${currency.threeLetterSymbol} $formatFloat"
 
   private def doCentOperation[T](operation: (Long, Long) => T)(that: Money): T = {
-    require(this.currency == that.currency, s"${this.currency} is different from ${that.currency}")
+    if (this.cents != 0 && that.cents != 0) {
+      require(this.currency == that.currency, s"The currencies of ${this} and ${that} differ")
+    }
     operation(this.cents, that.cents)
   }
-  private def doCentOperationToMoney(operation: (Long, Long) => Long)(that: Money): Money =
-    withCents(doCentOperation(operation)(that))
+  private def doCentOperationToMoney(operation: (Long, Long) => Long)(that: Money): Money = {
+    Money(doCentOperation(operation)(that), this.currency)
+  }
 
   private def withCents(newCents: Long): Money = copy(cents = newCents)
 }

@@ -36,7 +36,7 @@ object CashFlowEntry {
           .result)
 
         if (totalNumTransactions < numTransactionsToFetch) {
-          (new DateTime(0), Money(0)) // get all entries
+          (new DateTime(0), Money(0, moneyReservoir.currency)) // get all entries
 
         } else {
           // get oldest oldestTransDate
@@ -55,7 +55,7 @@ object CashFlowEntry {
             .take(1))
             .headOption
           val oldestBalanceDate = oldestBC.map(_.checkDate).getOrElse(new DateTime(0))
-          val initialBalance = oldestBC.map(_.balance).getOrElse(Money(0L))
+          val initialBalance = oldestBC.map(_.balance).getOrElse(Money(0, moneyReservoir.currency))
           (oldestBalanceDate, initialBalance)
         }
       }
