@@ -98,7 +98,7 @@ object Template {
         moneyReservoir = moneyReservoirCodeTpl map fillInPlaceholders map reservoirsIncludingNullMap,
         category = categoryCodeTpl map fillInPlaceholders map Config.categories,
         description = fillInPlaceholders(descriptionTpl),
-        flow = Money(flowInCents),
+        flowInCents = flowInCents,
         detailDescription = "",
         tagsString = tagsString)
     }

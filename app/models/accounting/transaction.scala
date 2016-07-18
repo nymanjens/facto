@@ -3,7 +3,7 @@ package models.accounting
 import com.google.common.base.Splitter
 import com.google.common.hash.{HashCode, Hashing}
 import common.Clock
-import models.SlickUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
+import models.SlickUtils.JodaToSqlDateMapper
 import models.SlickUtils.dbRun
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}
@@ -24,7 +24,7 @@ case class Transaction(transactionGroupId: Long,
                        moneyReservoirCode: String,
                        categoryCode: String,
                        description: String,
-                       flow: Money,
+                       private val flowInCents: Long,
                        detailDescription: String = "",
                        tagsString: String = "",
                        createdDate: DateTime = Clock.now,
@@ -45,6 +45,7 @@ case class Transaction(transactionGroupId: Long,
   lazy val beneficiary: Account = Config.accounts(beneficiaryAccountCode)
   lazy val moneyReservoir: MoneyReservoir = Config.moneyReservoir(moneyReservoirCode)
   lazy val category: Category = Config.categories(categoryCode)
+  lazy val flow: Money = Money(flowInCents, moneyReservoir.currency)
   lazy val tags: Seq[Tag] = Tag.parseTagsString(tagsString)
 
   /** Returns None if the consumed date is the same as the transaction date (and thus carries no further information. */
@@ -60,7 +61,7 @@ case class TransactionPartial(beneficiary: Option[Account],
                               moneyReservoir: Option[MoneyReservoir],
                               category: Option[Category],
                               description: String,
-                              flow: Money,
+                              flowInCents: Long,
                               detailDescription: String = "",
                               tagsString: String = "")
 
@@ -69,7 +70,7 @@ object TransactionPartial {
            moneyReservoir: MoneyReservoir = null,
            category: Category = null,
            description: String = "",
-           flow: Money = Money(0),
+           flowInCents: Long = 0,
            detailDescription: String = "",
            tagsString: String = ""): TransactionPartial =
     TransactionPartial(
@@ -77,7 +78,7 @@ object TransactionPartial {
       Option(moneyReservoir),
       Option(category),
       description,
-      flow,
+      flowInCents,
       detailDescription,
       tagsString
     )
@@ -90,7 +91,7 @@ class Transactions(tag: SlickTag) extends EntityTable[Transaction](tag, Transact
   def moneyReservoirCode = column[String]("moneyReservoirCode")
   def categoryCode = column[String]("categoryCode")
   def description = column[String]("description")
-  def flow = column[Money]("flow")
+  def flow = column[Long]("flow")
   def detailDescription = column[String]("detailDescription")
   def tagsString = column[String]("tagsString")
   def createdDate = column[DateTime]("createdDate")

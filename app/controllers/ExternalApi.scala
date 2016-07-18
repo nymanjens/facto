@@ -108,7 +108,7 @@ object ExternalApi extends Controller {
       moneyReservoirCode = checkNotEmpty(partial.moneyReservoir.get.code),
       categoryCode = checkNotEmpty(partial.category.get.code),
       description = checkNotEmpty(partial.description),
-      flow = partial.flow,
+      flowInCents = partial.flowInCents,
       detailDescription = partial.detailDescription,
       tagsString = partial.tagsString,
       transactionDate = Clock.now,

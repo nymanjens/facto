@@ -25,7 +25,7 @@ import models.accounting.config.{Config, Account, MoneyReservoir, Category, Temp
 import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting.CashFlowEntry
 import controllers.helpers.accounting.FormUtils.{validMoneyReservoirOrNullReservoir, validAccountCode, validCategoryCode,
-validFlowAsFloat, flowAsFloatStringToMoney, validTagsString, invalidWithMessageCode}
+validFlowAsFloat, flowAsFloatStringToCents, validTagsString, invalidWithMessageCode}
 
 object TransactionGroupOperations extends Controller {
 
@@ -104,13 +104,13 @@ object TransactionGroupOperations extends Controller {
           moneyReservoir = account1.defaultElectronicReservoir,
           category = Config.constants.accountingCategory,
           description = Config.constants.liquidationDescription,
-          flow = amount.negated),
+          flowInCents = -amount.cents),
         TransactionPartial.from(
           beneficiary = account1,
           moneyReservoir = account2.defaultElectronicReservoir,
           category = Config.constants.accountingCategory,
           description = Config.constants.liquidationDescription,
-          flow = amount)),
+          flowInCents = amount.cents)),
         zeroSum = true
       ))
     }
@@ -214,7 +214,7 @@ object TransactionGroupOperations extends Controller {
         moneyReservoirCode = trans.moneyReservoirCode,
         categoryCode = trans.categoryCode,
         description = trans.description,
-        flow = trans.flow,
+        flowInCents = trans.flowInCents,
         detailDescription = trans.detailDescription,
         tagsString = trans.tagsString,
         createdDate = group.createdDate,
@@ -269,7 +269,7 @@ object TransactionGroupOperations extends Controller {
                                moneyReservoirCode: String = "",
                                categoryCode: String = "",
                                description: String = "",
-                               flow: Money = Money(0),
+                               flowInCents: Long = 0,
                                detailDescription: String = "",
                                tagsString: String = "",
                                transactionDate: DateTime = Clock.now,
@@ -286,7 +286,7 @@ object TransactionGroupOperations extends Controller {
           moneyReservoirCode = moneyReservoir.code,
           categoryCode = trans.category.map(_.code).getOrElse(""),
           description = trans.description,
-          flow = trans.flow,
+          flowInCents = trans.flowInCents,
           detailDescription = trans.detailDescription,
           tagsString = trans.tagsString)
       }
@@ -297,7 +297,7 @@ object TransactionGroupOperations extends Controller {
         moneyReservoirCode = trans.moneyReservoirCode,
         categoryCode = trans.categoryCode,
         description = trans.description,
-        flow = trans.flow,
+        flowInCents = trans.flow.cents,
         detailDescription = trans.detailDescription,
         tagsString = trans.tagsString,
         transactionDate = trans.transactionDate,
@@ -326,7 +326,7 @@ object TransactionGroupOperations extends Controller {
             "moneyReservoirCode" -> text.verifying(validMoneyReservoirOrNullReservoir),
             "categoryCode" -> nonEmptyText.verifying(validCategoryCode),
             "description" -> nonEmptyText,
-            "flowAsFloat" -> nonEmptyText.verifying(validFlowAsFloat).transform[Money](flowAsFloatStringToMoney, _.formatFloat),
+            "flowAsFloat" -> nonEmptyText.verifying(validFlowAsFloat).transform[Long](flowAsFloatStringToCents, Money.centsToFloatString),
             "detailDescription" -> text,
             "tags" -> text.verifying(validTagsString),
             "transactionDate" -> jodaDate("yyyy-MM-dd"),
@@ -337,14 +337,14 @@ object TransactionGroupOperations extends Controller {
       )(TransGroupData.apply)(TransGroupData.unapply) verifying Constraint[TransGroupData]("error.invalid")(groupData => {
         val containsEmptyReservoirCodes = groupData.transactions.exists(_.moneyReservoirCode == "")
         val allReservoirCodesAreEmpty = !groupData.transactions.exists(_.moneyReservoirCode != "")
-        val totalFlow = groupData.transactions.map(_.flow).sum
+        val totalFlowInCents = groupData.transactions.map(_.flowInCents).sum
 
         groupData.transactions.size match {
           case 0 => throw new AssertionError("Should not be possible")
           case 1 if containsEmptyReservoirCodes => invalidWithMessageCode("facto.error.noReservoir.atLeast2")
           case 1 => Valid
           case _ if allReservoirCodesAreEmpty =>
-            if (totalFlow == Money(0)) {
+            if (totalFlowInCents == 0) {
               Valid
             } else {
               invalidWithMessageCode("facto.error.noReservoir.zeroSum")

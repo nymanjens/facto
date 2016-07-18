@@ -3,7 +3,7 @@ package controllers.helpers.accounting
 import com.google.common.hash.Hashing
 import controllers.helpers.ControllerHelperCache
 import controllers.helpers.ControllerHelperCache.CacheIdentifier
-import models.SlickUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
+import models.SlickUtils.JodaToSqlDateMapper
 import models.SlickUtils.dbApi._
 import com.github.nscala_time.time.Imports._
 import models.SlickUtils.dbRun

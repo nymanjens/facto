@@ -27,8 +27,4 @@ object SlickUtils {
       d => new java.sql.Timestamp(d.getMillis),
       d => new org.joda.time.DateTime(d.getTime))
 
-  implicit val MoneyToLongMapper =
-    MappedColumnType.base[Money, Long](
-      money => money.cents,
-      cents => Money(cents))
 }

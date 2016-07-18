@@ -24,17 +24,12 @@ case class Money(cents: Long, currency: CurrencyUnit = CurrencyUnit.default) {
   def >=(that: Money): Boolean = doCentOperation(_ >= _)(that)
   def <=(that: Money): Boolean = doCentOperation(_ <= _)(that)
 
-  def formatFloat: String = {
-    val sign = if (cents < 0) "-" else ""
-    val integerPart = NumberFormat.getNumberInstance(Locale.US).format(abs(cents) / 100)
-    val centsPart = abs(cents % 100)
-    "%s%s.%02d".format(sign, integerPart, centsPart)
-  }
+  def formatFloat: String = Money.centsToFloatString(cents)
 
   override def toString = s"${currency.threeLetterSymbol} $formatFloat"
 
   private def doCentOperation[T](operation: (Long, Long) => T)(that: Money): T = {
-    require(this.currency == that.currency)
+    require(this.currency == that.currency, s"${this.currency} is different from ${that.currency}")
     operation(this.cents, that.cents)
   }
   private def doCentOperationToMoney(operation: (Long, Long) => Long)(that: Money): Money =
@@ -45,8 +40,15 @@ case class Money(cents: Long, currency: CurrencyUnit = CurrencyUnit.default) {
 
 object Money {
 
-  def fromFloat(float: Double, currency: CurrencyUnit = CurrencyUnit.default): Money =
-    Money((float.toDouble * 100).round, currency)
+  def centsToFloatString(cents: Long): String = {
+    val sign = if (cents < 0) "-" else ""
+    val integerPart = NumberFormat.getNumberInstance(Locale.US).format(abs(cents) / 100)
+    val centsPart = abs(cents % 100)
+    "%s%s.%02d".format(sign, integerPart, centsPart)
+  }
+
+  def floatToCents(float: Double): Long =
+    (float.toDouble * 100).round
 
   implicit object MoneyNumeric extends Numeric[Money] {
     override def negate(x: Money): Money = x.negated

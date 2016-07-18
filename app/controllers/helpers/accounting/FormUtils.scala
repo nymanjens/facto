@@ -3,6 +3,8 @@ package controllers.helpers.accounting
 import scala.collection.JavaConverters._
 import scala.util.matching.Regex
 import Math.abs
+import java.text.NumberFormat
+import java.util.Locale
 
 import com.google.common.base.Splitter
 import com.google.common.collect.Iterables
@@ -44,11 +46,11 @@ object FormUtils {
       }
   })
 
-  def flowAsFloatStringToMoney(string: String): Money = {
+  def flowAsFloatStringToCents(string: String): Long = {
     val normalizedString = normalizeMoneyString(string)
     normalizedString match {
-      case flowAsFloatRegex() => Money((normalizedString.toDouble * 100).round)
-      case _ => Money(0)
+      case flowAsFloatRegex() => (normalizedString.toDouble * 100).round
+      case _ => 0
     }
   }
 
@@ -67,8 +69,8 @@ object FormUtils {
     * Trims the given string and only keeps the last punctuation (',' or '.').
     *
     * Examples:
-    *   "  1,200.39" --> "120.39".
-    *   "  1.000," --> "1000.".
+    * "  1,200.39" --> "120.39".
+    * "  1.000," --> "1000.".
     */
   private def normalizeMoneyString(s: String): String = {
     val parts = Splitter.onPattern("""[\.,]""")
