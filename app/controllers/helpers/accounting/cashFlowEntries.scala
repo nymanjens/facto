@@ -9,6 +9,7 @@ import com.github.nscala_time.time.Imports._
 import models.SlickUtils.dbRun
 import models.accounting._
 import models.accounting.config.MoneyReservoir
+import models.accounting.money.Money
 import org.joda.time.DateTime
 
 import scala.collection.immutable.Seq

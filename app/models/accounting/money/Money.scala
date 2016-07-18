@@ -1,17 +1,15 @@
-package models.accounting
-
-import scala.collection.JavaConverters._
+package models.accounting.money
 
 import java.lang.Math.{abs, round}
 import java.text.NumberFormat
 import java.util.Locale
 
+import com.google.common.collect.Iterables
+import models.accounting.config.Config
 import play.twirl.api.Html
 
-import com.google.common.collect.Iterables
-
-import models.accounting.config.Config
-import models.accounting.Money.CurrencyUnit
+import scala.collection.JavaConverters._
+import Money.CurrencyUnit
 
 case class Money(cents: Long, currency: CurrencyUnit = CurrencyUnit.default) {
 

@@ -7,7 +7,7 @@ import org.joda.time.DateTime
 import common.Clock
 import models.{User, Users}
 import models.accounting.config.{MoneyReservoir, Account, Category, Config}
-import models.accounting.{Transaction, Transactions, TransactionGroups, TransactionGroup, BalanceCheck, BalanceChecks, Money}
+import models.accounting.{Transaction, Transactions, TransactionGroups, TransactionGroup, BalanceCheck, BalanceChecks}
 
 object TestObjects {
 

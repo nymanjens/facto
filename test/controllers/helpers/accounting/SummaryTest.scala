@@ -2,22 +2,20 @@ package controllers.helpers.accounting
 
 import scala.collection.immutable.Seq
 import scala.collection.JavaConverters._
-
 import org.junit.runner._
 import org.specs2.mutable._
 import org.specs2.runner._
 import play.api.test._
-
 import play.twirl.api.Html
 import org.joda.time.DateTime
-
-import common.{TimeUtils, Clock, DatedMonth, MonthRange}
-import common.TimeUtils.{dateAt, January, February, March, April, May}
+import common.{Clock, DatedMonth, MonthRange, TimeUtils}
+import common.TimeUtils.{April, February, January, March, May, dateAt}
 import common.testing.TestObjects._
 import common.testing.TestUtils._
 import common.testing.HookedSpecification
 import models.accounting._
-import models.accounting.config.{Config, Account, Category}
+import models.accounting.config.{Account, Category, Config}
+import models.accounting.money.Money
 
 @RunWith(classOf[JUnitRunner])
 class SummaryTest extends HookedSpecification {

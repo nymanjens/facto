@@ -3,15 +3,13 @@ package models.accounting
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
-
 import play.api.test._
-
 import org.joda.time.DateTime
-
 import common.Clock
 import common.testing.TestObjects._
 import common.testing.TestUtils._
 import models._
+import models.accounting.money.Money
 
 @RunWith(classOf[JUnitRunner])
 class BalanceCheckTest extends Specification {

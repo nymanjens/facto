@@ -1,18 +1,17 @@
 package controllers.helpers.accounting
 
 import scala.collection.immutable.Seq
-
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
 import play.api.test._
 import org.joda.time.DateTime
-
 import models.accounting._
-import models.accounting.config.{Category, MoneyReservoir, Account}
+import models.accounting.config.{Account, Category, MoneyReservoir}
 import models.accounting.config.Config.constants.endowmentCategory
 import common.testing.TestObjects._
 import common.testing.TestUtils._
+import models.accounting.money.Money
 
 @RunWith(classOf[JUnitRunner])
 class GeneralEntryTest extends Specification {

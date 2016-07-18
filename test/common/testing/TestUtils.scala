@@ -3,12 +3,12 @@ package common.testing
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import org.joda.time.DateTime
-
 import common.Clock
 import common.testing.TestObjects._
 import models.{User, Users}
-import models.accounting.config.{MoneyReservoir, Account, Category, Config}
-import models.accounting.{Transaction, Transactions, TransactionGroups, TransactionGroup, BalanceCheck, BalanceChecks, Money}
+import models.accounting.config.{Account, Category, Config, MoneyReservoir}
+import models.accounting.money.Money
+import models.accounting.{BalanceCheck, BalanceChecks, Transaction, TransactionGroup, TransactionGroups, Transactions}
 
 object TestUtils {
 

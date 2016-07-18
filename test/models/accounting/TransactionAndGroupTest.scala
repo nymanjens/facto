@@ -1,21 +1,18 @@
 package models.accounting
 
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
-
 import play.api.test._
 import play.api.test.Helpers._
-
 import org.joda.time.DateTime
 import models.SlickUtils.dbApi._
-
 import common.Clock
 import common.testing.TestObjects._
 import common.testing.TestUtils._
 import models._
+import models.accounting.money.Money
 
 @RunWith(classOf[JUnitRunner])
 class TransactionAndGroupTests extends Specification {

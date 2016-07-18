@@ -8,6 +8,7 @@ import models.SlickUtils.dbRun
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
+import models.accounting.money.Money
 import models.manager.{Entity, EntityManager, EntityTable, ImmutableEntityManager}
 import models.{User, Users}
 import org.joda.time.DateTime

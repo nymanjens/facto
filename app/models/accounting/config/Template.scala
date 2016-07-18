@@ -1,12 +1,11 @@
 package models.accounting.config
 
 import scala.collection.immutable.Seq
-
 import com.google.common.base.Preconditions.checkState
-
 import common.Require.requireNonNullFields
-import models.{Users, User}
-import models.accounting.{TransactionGroupPartial, TransactionPartial, Money}
+import models.accounting.money.Money
+import models.{User, Users}
+import models.accounting.{TransactionGroupPartial, TransactionPartial}
 
 // Every field ending with "Tpl" may contain $-prefixed placeholders.
 // Example: descriptionTpl = "Endowment for ${account.longName}"

@@ -4,16 +4,13 @@ import collection.immutable.Seq
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.collection.immutable.Stack
 import scala.util.Random
-
 import play.api.Logger
 import play.api.test._
 import play.api.test.Helpers._
-
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
 import org.joda.time.DateTime
-
 import common.testing.TestObjects._
 import common.testing.TestUtils._
 import models.accounting.config.MoneyReservoir
@@ -21,6 +18,7 @@ import models.accounting.config.Account
 import models._
 import models.accounting._
 import models.SlickUtils.dbApi._
+import models.accounting.money.Money
 
 @RunWith(classOf[JUnitRunner])
 class CashFlowEntriesTest extends Specification {
