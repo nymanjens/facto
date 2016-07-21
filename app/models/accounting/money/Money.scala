@@ -8,6 +8,7 @@ import java.util.Locale
 import com.google.common.collect.Iterables
 import models.accounting.config.Config
 import models.accounting.money.CentOperations.CentOperationsNumeric
+import org.joda.time.DateTime
 import play.twirl.api.Html
 
 import scala.collection.JavaConverters._
@@ -30,12 +31,12 @@ case class Money(override val cents: Long, currency: CurrencyUnit) extends CentO
     if (currency == CurrencyUnit.default) {
       baseHtml
     } else {
-      val defaultCurrencyHtml = toReferenceCurrency.toHtmlWithCurrency
+      val defaultCurrencyHtml = exchangedForReferenceCurrency.toHtmlWithCurrency
       baseHtml ++ """ <span class="reference-currency">""" ++ defaultCurrencyHtml ++ "</span>"
     }
   }
 
-  def toReferenceCurrency: ReferenceMoney = {
+  def exchangedForReferenceCurrency: ReferenceMoney = {
     // TODO: Apply exchange rate
     ReferenceMoney(cents)
   }

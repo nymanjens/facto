@@ -18,7 +18,7 @@ case class TransactionGroup(createdDate: DateTime = Clock.now,
 
   def transactions: Seq[Transaction] = dbRun(Transactions.newQuery.filter(_.transactionGroupId === id)).toList
 
-  def isZeroSum: Boolean = transactions.map(_.flow.toReferenceCurrency).sum == ReferenceMoney(0)
+  def isZeroSum: Boolean = transactions.map(_.flow.exchangedForReferenceCurrency).sum == ReferenceMoney(0)
 }
 
 case class TransactionGroupPartial(transactions: Seq[TransactionPartial],

@@ -167,7 +167,7 @@ object SummaryForYear {
         toListMap {
           for (category <- account.categories) yield {
             val transactions = categoryToTransactions.get(category).asScala
-            val totalFlow = transactions.map(_.flow.toReferenceCurrency).sum
+            val totalFlow = transactions.map(_.flow.exchangedForReferenceCurrency).sum
             val numMonths = (monthRangeForAverages intersection MonthRange.forYear(year)).countMonths
             val average = if (numMonths > 0) totalFlow / numMonths else ReferenceMoney(0)
             category -> average
@@ -189,7 +189,7 @@ case class SummaryCell(entries: Seq[GeneralEntry]) {
       for {
         entry <- entries
         transaction <- entry.transactions
-      } yield transaction.flow.toReferenceCurrency
+      } yield transaction.flow.exchangedForReferenceCurrency
     }.sum
   }
 }

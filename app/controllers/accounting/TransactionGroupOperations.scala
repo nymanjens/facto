@@ -1,7 +1,7 @@
 package controllers.accounting
 
 import common.ReturnTo
-import models.accounting.money.Money
+import models.accounting.money.{Money, ReferenceMoney}
 
 import scala.collection.{Seq => MutableSeq}
 import scala.collection.immutable.Seq
@@ -97,19 +97,25 @@ object TransactionGroupOperations extends Controller {
     } else {
       val account1 = Config.accounts(accountCode1)
       val account2 = Config.accounts(accountCode2)
+      def getAbsoluteFlowForAccountCurrency(account: Account): Money = {
+        val amount = ReferenceMoney(amountInCents)
+        val currency = account.defaultElectronicReservoir.currency
+        amount.exchangedForCurrency(currency, Clock.now)
+      }
+
       addNewFormFromPartial(TransactionGroupPartial(Seq(
         TransactionPartial.from(
           beneficiary = account1,
           moneyReservoir = account1.defaultElectronicReservoir,
           category = Config.constants.accountingCategory,
           description = Config.constants.liquidationDescription,
-          flowInCents = -amountInCents),
+          flowInCents = -getAbsoluteFlowForAccountCurrency(account1).cents),
         TransactionPartial.from(
           beneficiary = account1,
           moneyReservoir = account2.defaultElectronicReservoir,
           category = Config.constants.accountingCategory,
           description = Config.constants.liquidationDescription,
-          flowInCents = amountInCents)),
+          flowInCents = getAbsoluteFlowForAccountCurrency(account2).cents)),
         zeroSum = true
       ))
     }
