@@ -5,7 +5,7 @@
 @import common.CollectionUtils.toListMap
 @import common.ReturnTo
 @import models.User
-@import models.accounting.money.CurrencyUnit
+@import models.accounting.money.Currency
 @import models.accounting.config.{Config, Account, MoneyReservoir, Category, Template}
 @import controllers.accounting.TransactionGroupOperations.Forms._
 @import views.html.utils.{repeatWithIndex, bootstrap3}
@@ -47,7 +47,7 @@
                 }
                 <span class="total-transaction-flow-box">
                   <span class="total-flow-text">
-                    @Messages("facto.total"): @CurrencyUnit.default.htmlSymbol <span class="total-transaction-flow">0.00</span>
+                    @Messages("facto.total"): @Currency.default.htmlSymbol <span class="total-transaction-flow">0.00</span>
                   </span>
                   <div class="btn-group" data-toggle="buttons">
                     <label class="btn btn-default btn-sm @if(!zeroSum){active}">
@@ -104,7 +104,7 @@
                     optionArgs=Config.categories.mapValues(cat => Map('accounts -> cat.accounts.map(_.code).mkString(" "))))
                 @bootstrap3.Text(transactionForm("description"), Messages("facto.description"),
                     classes=Seq("bind-until-change", "bind-to-root-form", "description"))
-                @bootstrap3.Money(transactionForm("flowAsFloat"), CurrencyUnit.default, Messages("facto.flow"),
+                @bootstrap3.Money(transactionForm("flowAsFloat"), Currency.default, Messages("facto.flow"),
                     classes=Seq("flow-as-float"))
                 @bootstrap3.Textarea(transactionForm("detailDescription"), Messages("facto.more-info"),
                     classes=Seq("bind-until-change", "bind-to-root-form"))

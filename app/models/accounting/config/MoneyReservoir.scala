@@ -1,7 +1,7 @@
 package models.accounting.config
 
 import common.Require.requireNonNullFields
-import models.accounting.money.CurrencyUnit
+import models.accounting.money.Currency
 import models.accounting.money.Money
 
 case class MoneyReservoir(code: String,
@@ -14,9 +14,9 @@ case class MoneyReservoir(code: String,
 
   override def toString = s"MoneyReservoir($code)"
 
-  lazy val currency: CurrencyUnit = currencyCode match {
-    case Some(code) => CurrencyUnit.of(code)
-    case None => CurrencyUnit.default
+  lazy val currency: Currency = currencyCode match {
+    case Some(code) => Currency.of(code)
+    case None => Currency.default
   }
 }
 

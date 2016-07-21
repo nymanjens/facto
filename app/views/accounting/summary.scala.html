@@ -3,7 +3,7 @@
 @import common.{Clock, ReturnTo, GetParameter}
 @import models.User
 @import models.accounting.money.Money
-@import models.accounting.money.CurrencyUnit
+@import models.accounting.money.Currency
 @import models.accounting.config.{Account, MoneyReservoir, Category, Template}
 @import models.accounting.{Tag, TagEntities}
 @import controllers.helpers.accounting.Summary
@@ -52,7 +52,7 @@
       <table class="table table-bordered table-hover table-condensed table-summary">
         <thead>
           <tr>
-            <th>(@CurrencyUnit.default.htmlSymbol)</th>
+            <th>(@Currency.default.htmlSymbol)</th>
             @for((year, summaryForYear) <- summary.yearToSummary) {
               <th colspan="@{if(year == expandedYear) summaryForYear.months.size + 1 else 1}">
                 <a href="@controllers.accounting.routes.Views.summaryFor(year, tags=tagsString)">

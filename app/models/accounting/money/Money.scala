@@ -13,7 +13,7 @@ import play.twirl.api.Html
 
 import scala.collection.JavaConverters._
 
-case class Money(override val cents: Long, currency: CurrencyUnit) extends CentOperations[Money] {
+case class Money(override val cents: Long, currency: Currency) extends CentOperations[Money] {
 
   override protected def withCents(newCents: Long): Money = copy(cents = newCents)
 
@@ -28,7 +28,7 @@ case class Money(override val cents: Long, currency: CurrencyUnit) extends CentO
   def toHtmlWithCurrency: Html = {
     import Money.SummableHtml
     val baseHtml = Money.centsToHtmlWithCurrency(cents, currency)
-    if (currency == CurrencyUnit.default) {
+    if (currency == Currency.default) {
       baseHtml
     } else {
       val defaultCurrencyHtml = exchangedForReferenceCurrency.toHtmlWithCurrency
@@ -51,14 +51,14 @@ object Money {
     "%s%s.%02d".format(sign, integerPart, centsPart)
   }
 
-  private[money] def centsToHtmlWithCurrency(cents: Long, currency: CurrencyUnit): Html = {
+  private[money] def centsToHtmlWithCurrency(cents: Long, currency: Currency): Html = {
     currency.htmlSymbol ++ s" ${centsToFloatString(cents)}"
   }
 
   def floatToCents(float: Double): Long =
     (float.toDouble * 100).round
 
-  def moneyNumeric(currency: CurrencyUnit): Numeric[Money] = new CentOperationsNumeric[Money] {
+  def moneyNumeric(currency: Currency): Numeric[Money] = new CentOperationsNumeric[Money] {
     override def fromInt(x: Int): Money = Money(0, currency)
   }
 
