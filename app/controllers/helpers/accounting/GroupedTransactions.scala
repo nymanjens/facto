@@ -3,6 +3,7 @@ package controllers.helpers.accounting
 import collection.immutable.Seq
 import org.joda.time.DateTime
 import com.github.nscala_time.time.Imports._
+import common.Clock
 import models.User
 import models.accounting.{Tag, Transaction}
 import models.accounting.config.{Account, Category, MoneyReservoir}
@@ -26,7 +27,7 @@ abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
       case Seq(currency) =>
         transactions.map(_.flow).sum(Money.moneyNumeric(currency))
       case _ =>
-        transactions.map(_.flow.exchangedForReferenceCurrency).sum.toMoney
+        transactions.map(_.flow.exchangedForReferenceCurrency).sum.toMoney(Clock.now) // TODO: Remove toMoney() call
     }
   }
 }

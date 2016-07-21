@@ -27,7 +27,7 @@ case class Money(override val cents: Long, currency: CurrencyUnit) extends CentO
 
   def toHtmlWithCurrency: Html = {
     import Money.SummableHtml
-    val baseHtml = currency.htmlSymbol ++ s" ${formatFloat}"
+    val baseHtml = Money.centsToHtmlWithCurrency(cents, currency)
     if (currency == CurrencyUnit.default) {
       baseHtml
     } else {
@@ -49,6 +49,10 @@ object Money {
     val integerPart = NumberFormat.getNumberInstance(Locale.US).format(abs(cents) / 100)
     val centsPart = abs(cents % 100)
     "%s%s.%02d".format(sign, integerPart, centsPart)
+  }
+
+  private[money] def centsToHtmlWithCurrency(cents: Long, currency: CurrencyUnit): Html = {
+    currency.htmlSymbol ++ s" ${centsToFloatString(cents)}"
   }
 
   def floatToCents(float: Double): Long =

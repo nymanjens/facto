@@ -12,13 +12,13 @@ case class ReferenceMoney(override val cents: Long) extends CentOperations[Refer
 
   def formatFloat: String = Money.centsToFloatString(cents)
 
-  def toHtmlWithCurrency: Html = toMoney.toHtmlWithCurrency
+  def toHtmlWithCurrency: Html = Money.centsToHtmlWithCurrency(cents, CurrencyUnit.default)
 
-  def toMoney: Money = Money(cents, CurrencyUnit.default)
+  def toMoney(date: DateTime): Money = Money(cents, CurrencyUnit.default)
 
-  def exchangedForCurrency(currencyUnit: CurrencyUnit, date: DateTime): Money = {
+  def exchangedForCurrency(currency: CurrencyUnit, date: DateTime): Money = {
     // TODO: Apply exchange rate
-    Money(cents, currencyUnit)
+    Money(cents, currency)
   }
 }
 
