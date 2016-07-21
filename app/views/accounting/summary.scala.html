@@ -95,7 +95,7 @@
                               <div>
                                 <a href="@(controllers.accounting.routes.TransactionGroupOperations.editForm(entry.groupId
                                     ) ++: ReturnTo(request.uri))">
-                                  @entry.flow.currency.htmlSymbol @entry.flow.formatFloat
+                                  @entry.flow.toHtmlWithCurrency
                                   -
                                   @for(tag <- entry.tags) {
                                     <span class="label label-@tag.bootstrapClassSuffix">@tag.name</span>

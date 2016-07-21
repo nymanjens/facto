@@ -1,5 +1,6 @@
 package models.accounting.money
 
+import scala.collection.immutable.Seq
 import java.lang.Math.{abs, round}
 import java.text.NumberFormat
 import java.util.Locale
@@ -23,6 +24,17 @@ case class Money(override val cents: Long, currency: CurrencyUnit) extends CentO
 
   def formatFloat: String = Money.centsToFloatString(cents)
 
+  def toHtmlWithCurrency: Html = {
+    import Money.SummableHtml
+    val baseHtml = currency.htmlSymbol ++ s" ${formatFloat}"
+    if (currency == CurrencyUnit.default) {
+      baseHtml
+    } else {
+      val defaultCurrencyHtml = toReferenceCurrency.toHtmlWithCurrency
+      baseHtml ++ """ <span class="reference-currency">""" ++ defaultCurrencyHtml ++ "</span>"
+    }
+  }
+
   def toReferenceCurrency: ReferenceMoney = {
     // TODO: Apply exchange rate
     ReferenceMoney(cents)
@@ -41,7 +53,16 @@ object Money {
   def floatToCents(float: Double): Long =
     (float.toDouble * 100).round
 
-  def moneyNumeric(currency: CurrencyUnit): Numeric[Money]  = new CentOperationsNumeric[Money] {
+  def moneyNumeric(currency: CurrencyUnit): Numeric[Money] = new CentOperationsNumeric[Money] {
     override def fromInt(x: Int): Money = Money(0, currency)
+  }
+
+  private implicit class SummableHtml(html: Html) {
+    def ++(string: String): Html = {
+      this ++ Html(string)
+    }
+    def ++(otherHtml: Html): Html = {
+      new Html(Seq(html, otherHtml))
+    }
   }
 }

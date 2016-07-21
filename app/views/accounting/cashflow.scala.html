@@ -58,9 +58,9 @@
               <td>@entry.beneficiaries.map(_.shorterName).mkString(", ")</td>
               <td>@entry.categories.map(_.name).mkString(", ")</td>
               <td>@DescriptionWithEntryCount(entry)</td>
-              <td>@entry.flow.formatFloat</td>
+              <td>@entry.flow.toHtmlWithCurrency</td>
               <td>
-                @entry.balance.formatFloat
+                @entry.balance.toHtmlWithCurrency
                 @if(entry.balanceVerified) {
                   <i class="fa fa-check fa-fw"></i>
                 }
@@ -75,7 +75,7 @@
             case BalanceCorrection(bc) => {
               <td>@formatDate(bc.checkDate)</td>
               <td colspan="5" style="font-weight: bold;">@Messages("facto.balance-correction"):</td>
-              <td>@bc.balance.formatFloat</td>
+              <td>@bc.balance.toHtmlWithCurrency</td>
               <td>@BalanceCheckEditButton(bc)</td>
             }
           }
