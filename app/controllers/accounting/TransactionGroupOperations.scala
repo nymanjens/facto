@@ -100,7 +100,8 @@ object TransactionGroupOperations extends Controller {
       def getAbsoluteFlowForAccountCurrency(account: Account): DatedMoney = {
         val amount = ReferenceMoney(amountInCents)
         val currency = account.defaultElectronicReservoir.currency
-        amount.exchangedForCurrency(currency, Clock.now)
+        // Using current date because the repayment takes place today.
+        amount.withDate(Clock.now).exchangedForCurrency(currency)
       }
 
       addNewFormFromPartial(TransactionGroupPartial(Seq(

@@ -26,8 +26,11 @@ case class DatedMoney(override val cents: Long, override val currency: Currency,
     }
   }
 
-  def exchangedForReferenceCurrency: ReferenceMoney = {
+  def exchangedForReferenceCurrency: ReferenceMoney =
+    ReferenceMoney(exchangedForCurrency(Currency.default).cents)
+
+  def exchangedForCurrency(currency: Currency): DatedMoney = {
     // TODO: Apply exchange rate
-    ReferenceMoney(cents)
+    DatedMoney(cents, currency, date)
   }
 }
