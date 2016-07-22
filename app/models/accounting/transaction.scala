@@ -8,7 +8,7 @@ import models.SlickUtils.dbRun
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
-import models.accounting.money.Money
+import models.accounting.money.{DatedMoney, Money}
 import models.manager.{Entity, EntityManager, EntityTable, ImmutableEntityManager}
 import models.{User, Users}
 import org.joda.time.DateTime
@@ -45,7 +45,7 @@ case class Transaction(transactionGroupId: Long,
   lazy val beneficiary: Account = Config.accounts(beneficiaryAccountCode)
   lazy val moneyReservoir: MoneyReservoir = Config.moneyReservoir(moneyReservoirCode)
   lazy val category: Category = Config.categories(categoryCode)
-  lazy val flow: Money = Money(flowInCents, moneyReservoir.currency)
+  lazy val flow: DatedMoney = DatedMoney(flowInCents, moneyReservoir.currency, transactionDate)
   lazy val tags: Seq[Tag] = Tag.parseTagsString(tagsString)
 
   /** Returns None if the consumed date is the same as the transaction date (and thus carries no further information. */

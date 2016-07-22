@@ -13,33 +13,19 @@ import play.twirl.api.Html
 
 import scala.collection.JavaConverters._
 
-case class Money(override val cents: Long, currency: Currency) extends CentOperations[Money] {
+trait Money {
 
-  override protected def withCents(newCents: Long): Money = copy(cents = newCents)
+  def cents: Long
+  def currency: Currency
+  def toHtmlWithCurrency: Html
 
-  override protected def validateCentOperation(that: Money): Unit = {
-    require(this.currency == that.currency, s"The currencies of ${this} and ${that} differ")
+  final def formatFloat: String = Money.centsToFloatString(cents)
+
+  final def withDate(date: DateTime): DatedMoney = {
+    DatedMoney(cents, currency, date)
   }
 
   override def toString = s"${currency.threeLetterSymbol} $formatFloat"
-
-  def formatFloat: String = Money.centsToFloatString(cents)
-
-  def toHtmlWithCurrency: Html = {
-    import Money.SummableHtml
-    val baseHtml = Money.centsToHtmlWithCurrency(cents, currency)
-    if (currency == Currency.default) {
-      baseHtml
-    } else {
-      val defaultCurrencyHtml = exchangedForReferenceCurrency.toHtmlWithCurrency
-      baseHtml ++ """ <span class="reference-currency">""" ++ defaultCurrencyHtml ++ "</span>"
-    }
-  }
-
-  def exchangedForReferenceCurrency: ReferenceMoney = {
-    // TODO: Apply exchange rate
-    ReferenceMoney(cents)
-  }
 }
 
 object Money {
@@ -51,18 +37,14 @@ object Money {
     "%s%s.%02d".format(sign, integerPart, centsPart)
   }
 
+  def floatToCents(float: Double): Long =
+    (float.toDouble * 100).round
+
   private[money] def centsToHtmlWithCurrency(cents: Long, currency: Currency): Html = {
     currency.htmlSymbol ++ s" ${centsToFloatString(cents)}"
   }
 
-  def floatToCents(float: Double): Long =
-    (float.toDouble * 100).round
-
-  def moneyNumeric(currency: Currency): Numeric[Money] = new CentOperationsNumeric[Money] {
-    override def fromInt(x: Int): Money = Money(0, currency)
-  }
-
-  private implicit class SummableHtml(html: Html) {
+  private[money] implicit class SummableHtml(html: Html) {
     def ++(string: String): Html = {
       this ++ Html(string)
     }

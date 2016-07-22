@@ -19,7 +19,7 @@ import scala.collection.JavaConverters._
 trait CentOperations[M <: CentOperations[M]] {
 
   // **************** Methods to be overridden **************** //
-  protected def cents: Long
+  def cents: Long
 
   protected def withCents(newCents: Long): M
 

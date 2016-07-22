@@ -1,7 +1,7 @@
 package controllers.accounting
 
 import common.ReturnTo
-import models.accounting.money.{Money, ReferenceMoney}
+import models.accounting.money.{Money, DatedMoney, ReferenceMoney}
 
 import scala.collection.{Seq => MutableSeq}
 import scala.collection.immutable.Seq
@@ -97,7 +97,7 @@ object TransactionGroupOperations extends Controller {
     } else {
       val account1 = Config.accounts(accountCode1)
       val account2 = Config.accounts(accountCode2)
-      def getAbsoluteFlowForAccountCurrency(account: Account): Money = {
+      def getAbsoluteFlowForAccountCurrency(account: Account): DatedMoney = {
         val amount = ReferenceMoney(amountInCents)
         val currency = account.defaultElectronicReservoir.currency
         amount.exchangedForCurrency(currency, Clock.now)

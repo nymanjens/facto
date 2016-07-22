@@ -7,7 +7,7 @@ import common.Clock
 import models.User
 import models.accounting.{Tag, Transaction}
 import models.accounting.config.{Account, Category, MoneyReservoir}
-import models.accounting.money.{Money, ReferenceMoney}
+import models.accounting.money.{DatedMoney, Money, MoneyWithGeneralCurrency, ReferenceMoney}
 
 abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
   def groupId = transactions(0).transactionGroupId
@@ -24,10 +24,18 @@ abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
   def flow: Money = {
     val currencies = transactions.map(_.flow.currency).distinct
     currencies match {
-      case Seq(currency) =>
-        transactions.map(_.flow).sum(Money.moneyNumeric(currency))
-      case _ =>
-        transactions.map(_.flow.exchangedForReferenceCurrency).sum.toMoney(Clock.now) // TODO: Remove toMoney() call
+      case Seq(currency) => // All transactions have the same currency
+        val dates = transactions.map(_.transactionDate).distinct
+        val flow: MoneyWithGeneralCurrency = transactions.map(_.flow).sum(MoneyWithGeneralCurrency.numeric(currency))
+        if (dates.size == 1) {
+          // All transactions have the same date, so this should be a DatedMoney
+          flow.withDate(dates(0))
+        } else {
+          // Dates differ, so the best we can do is general Money
+          flow
+        }
+      case _ => // Multiple currencies --> only show reference currency
+        transactions.map(_.flow.exchangedForReferenceCurrency).sum
     }
   }
 }

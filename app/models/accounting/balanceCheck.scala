@@ -6,7 +6,7 @@ import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.SlickUtils.JodaToSqlDateMapper
 import models.accounting.config.{Config, MoneyReservoir}
-import models.accounting.money.Money
+import models.accounting.money.{DatedMoney, Money}
 import models.manager.{Entity, EntityManager, EntityTable, ImmutableEntityManager}
 import models.{User, Users}
 import org.joda.time.DateTime
@@ -25,7 +25,7 @@ case class BalanceCheck(issuerId: Long,
 
   lazy val issuer: User = Users.findById(issuerId)
   lazy val moneyReservoir: MoneyReservoir = Config.moneyReservoir(moneyReservoirCode)
-  lazy val balance: Money = Money(balanceInCents, moneyReservoir.currency)
+  lazy val balance: DatedMoney = DatedMoney(balanceInCents, moneyReservoir.currency, checkDate)
 }
 
 class BalanceChecks(tag: SlickTag) extends EntityTable[BalanceCheck](tag, BalanceChecks.tableName) {
