@@ -32,6 +32,7 @@ GET  /acc/templates/                   controllers.accounting.GeneralActions.tem
 GET  /jsonapi/acc/descriptions/:beneficiaryCode/:reservoirCode/:categoryCode/  controllers.accounting.JsonApiActions.filterDescriptions(beneficiaryCode, reservoirCode, categoryCode, q ?= "")
 GET  /jsonapi/acc/tags/all/            controllers.accounting.JsonApiActions.getAllTags
 POST /jsonapi/acc/bc/confirm/:moneyReservoirCode/:balanceInCents/:mostRecentTransactionId/  controllers.accounting.JsonApiActions.addBalanceCheck(moneyReservoirCode, balanceInCents: Long, mostRecentTransactionId: Long)
+POST  /jsonapi/acc/money/exchange/:fromCents/:fromCurrency/:date/:toCurrency/  controllers.accounting.JsonApiActions.exchangeMoney(fromCents: Long, fromCurrency, date, toCurrency)
 
 # Accounting - views
 GET  /acc/everything/                  controllers.accounting.Views.everythingLatest
@@ -53,7 +54,7 @@ POST /acc/trans/edit/:transGroupId/    controllers.accounting.TransactionGroupOp
 GET  /acc/trans/delete/:transGroupId/  controllers.accounting.TransactionGroupOperations.delete(transGroupId: Long, returnTo ?= "/")
 
 # Accounting - transaction group operations - shortcuts
-GET /acc/trans/newfromtpl/:tplCode/  controllers.accounting.TransactionGroupOperations.addNewFromTemplate(tplCode: String, returnTo ?= "/")
+GET /acc/trans/newfromtpl/:tplCode/  controllers.accounting.TransactionGroupOperations.addNewFromTemplate(tplCode, returnTo ?= "/")
 GET  /acc/trans/repay/:accountCode1/:accountCode2/:amountInCents/  controllers.accounting.TransactionGroupOperations.addNewLiquidationRepayForm(accountCode1, accountCode2, amountInCents: Long, returnTo ?= "/")
 
 # Accounting - balance check operations
