@@ -54,7 +54,7 @@ object JsonApiActions extends Controller {
         Ok(Json.toJson("OK"))
     }
 
-  def exchangeMoney(fromCents: Long, fromCurrencySymbol: String, dateString: String, toCurrencySymbol: String) =
+  def exchangeMoney(fromCents: Long, fromCurrencyCode: String, dateString: String, toCurrencyCode: String) =
     AuthenticatedAction { implicit user =>
       implicit request =>
         val date: DateTime = {
@@ -65,8 +65,8 @@ object JsonApiActions extends Controller {
           }
         }
 
-        val fromMoney = DatedMoney(fromCents, Currency.of(fromCurrencySymbol), date)
-        val toMoney = fromMoney.exchangedForCurrency(Currency.of(toCurrencySymbol))
+        val fromMoney = DatedMoney(fromCents, Currency.of(fromCurrencyCode), date)
+        val toMoney = fromMoney.exchangedForCurrency(Currency.of(toCurrencyCode))
         Ok(Json.toJson(toMoney.cents))
     }
 }

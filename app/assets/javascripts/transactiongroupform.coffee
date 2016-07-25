@@ -164,6 +164,21 @@ setupBootstrapTagsinput = (formContainer) ->
       $tagsinput_coded.tagsinput('add', leftover_value)
   )
 
+### setup flow currency update ###
+setupFlowCurrencyUpdate = (formContainer) ->
+  $formContainer = $(formContainer)
+
+  $reservoirCodeSelect = $formContainer.find("select[id$=_moneyReservoirCode]")
+  setFlowCurrency = () ->
+    selectedReservoirCode = $reservoirCodeSelect.val()
+    $selectedOption = $reservoirCodeSelect.find("option[value='#{selectedReservoirCode}']")
+    currencyCode = $selectedOption.attr("currency-code")
+    currencyIconClass = $selectedOption.attr("currency-icon-class")
+    $formContainer.find(".currency-indicator").html("<i class='#{currencyIconClass}'></i>")
+  $reservoirCodeSelect.keydown(() -> setTimeout(() -> setFlowCurrency()))
+  $reservoirCodeSelect.change(setFlowCurrency)
+  setFlowCurrency()
+
 $(document).ready(() ->
   ### constants ###
   ROOT_FORM_CONTAINER = $('#transaction-holder-0')
@@ -201,6 +216,7 @@ $(document).ready(() ->
       $(item).replaceWith($replacement)
 
     setupDescriptionsTypeahead(newForm)
+    setupFlowCurrencyUpdate(newForm)
 
     # update names, ids and title to the correct transactionNum
     newForm.find("[id]").add(newForm).each(() ->
@@ -384,6 +400,7 @@ $(document).ready(() ->
   $(".transaction-holder").each(() -> addTransactionSpecificEventListeners(this))
   $(".transaction-holder").each(() -> setupDescriptionsTypeahead(this))
   $(".transaction-holder").each(() -> setupBootstrapTagsinput(this))
+  $(".transaction-holder").each(() -> setupFlowCurrencyUpdate(this))
   $("input:radio[name=zeroSum]").change(() -> updateAllTotalState(null))
   updateAllTotalState(null)
 )

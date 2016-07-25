@@ -145,7 +145,7 @@ moneyReservoirs:
         owner: *accountCommon
     - &reservoirCardCommon
         code: CARD_COMMON
-        name: Card Common
+        name: Card Common (£)
         owner: *accountCommon
         currency: GBP
     - &reservoirCardBob
@@ -154,7 +154,7 @@ moneyReservoirs:
         owner: *accountBob
     - &reservoirCashAlice
         code: CASH_ALICE
-        name: Cash Alice
+        name: Cash Alice (£)
         owner: *accountAlice
         currency: GBP
     - &reservoirCardAlice
