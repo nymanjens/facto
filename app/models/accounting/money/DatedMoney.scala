@@ -36,6 +36,6 @@ case class DatedMoney(override val cents: Long, override val currency: Currency,
   def exchangedForCurrency(otherCurrency: Currency): DatedMoney = {
     val ratio = ExchangeRateManager.getRatioSecondToFirstCurrency(currency, otherCurrency, date)
     val centsInOtherCurrency = roundToLong(ratio * cents, HALF_EVEN)
-    DatedMoney(centsInOtherCurrency, currency, date)
+    DatedMoney(centsInOtherCurrency, otherCurrency, date)
   }
 }

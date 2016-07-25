@@ -28,9 +28,9 @@ class FormUtilsTest extends Specification {
   }
 
   "flowAsFloatStringToCents" in new WithApplication {
-    FormUtils.flowAsFloatStringToCents("123.44") mustEqual Money(12344)
-    FormUtils.flowAsFloatStringToCents("  1,991,123 . 44 ") mustEqual Money(199112344)
-    FormUtils.flowAsFloatStringToCents("  1.000,") mustEqual Money(100000)
+    FormUtils.flowAsFloatStringToCents("123.44") mustEqual 12344L
+    FormUtils.flowAsFloatStringToCents("  1,991,123 . 44 ") mustEqual 199112344L
+    FormUtils.flowAsFloatStringToCents("  1.000,") mustEqual 100000L
   }
 
   "validTagsString"  in new WithApplication {

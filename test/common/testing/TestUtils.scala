@@ -13,7 +13,7 @@ import models.accounting.{BalanceCheck, BalanceChecks, Transaction, TransactionG
 object TestUtils {
 
   def persistTransaction(groupId: Long = -1,
-                         flow: Money = Money(0),
+                         flowInCents: Long = 0,
                          date: DateTime = Clock.now,
                          timestamp: Long = -1,
                          account: Account = testAccount,
@@ -32,14 +32,14 @@ object TestUtils {
       categoryCode = category.code,
       description = description,
       detailDescription = detailDescription,
-      flow = flow,
+      flowInCents = flowInCents,
       tagsString = tagsString,
       transactionDate = actualDate,
       consumedDate = actualDate
     ))
   }
 
-  def persistBalanceCheck(balance: Money = Money(0),
+  def persistBalanceCheck(balanceInCents: Long = 0,
                           date: DateTime = Clock.now,
                           timestamp: Long = -1,
                           reservoir: MoneyReservoir = testReservoir): BalanceCheck = {
@@ -47,7 +47,7 @@ object TestUtils {
     BalanceChecks.add(BalanceCheck(
       issuerId = 2,
       moneyReservoirCode = reservoir.code,
-      balance = balance,
+      balanceInCents = balanceInCents,
       checkDate = actualDate
     ))
   }

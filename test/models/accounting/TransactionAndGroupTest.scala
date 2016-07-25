@@ -36,7 +36,7 @@ class TransactionAndGroupTests extends Specification {
       moneyReservoirCode = "CASH",
       categoryCode = "CAT_A",
       description = "description 1A",
-      flow = Money(300),
+      flowInCents = 300,
       transactionDate = Clock.now,
       consumedDate = Clock.now
     ))
@@ -47,7 +47,7 @@ class TransactionAndGroupTests extends Specification {
       moneyReservoirCode = "CASH",
       categoryCode = "CAT_A",
       description = "description 1B",
-      flow = Money(600),
+      flowInCents = 600,
       transactionDate = Clock.now,
       consumedDate = Clock.now
     ))
@@ -58,7 +58,7 @@ class TransactionAndGroupTests extends Specification {
       moneyReservoirCode = "CASH",
       categoryCode = "CAT_A",
       description = "description 2",
-      flow = Money(600),
+      flowInCents = 600,
       transactionDate = Clock.now,
       consumedDate = Clock.now
     ))
