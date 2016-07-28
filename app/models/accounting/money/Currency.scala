@@ -9,7 +9,8 @@ import scala.collection.JavaConverters._
 /**
   * @param code The three letter symbol.
   */
-sealed abstract class Currency(val code: String, val htmlSymbol: Html, val iconClass: Option[String] = None) {
+sealed abstract class Currency(val code: String, val htmlSymbol: Html, val iconClassOption: Option[String] = None) {
+  def iconClass: String = iconClassOption.getOrElse("fa fa-money")
   override def toString = code
 }
 
