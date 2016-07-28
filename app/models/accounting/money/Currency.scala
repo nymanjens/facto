@@ -11,6 +11,7 @@ import scala.collection.JavaConverters._
   */
 sealed abstract class Currency(val code: String, val htmlSymbol: Html, val iconClassOption: Option[String] = None) {
   def iconClass: String = iconClassOption.getOrElse("fa fa-money")
+  def isForeign: Boolean = this != Currency.default
   override def toString = code
 }
 

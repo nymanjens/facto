@@ -80,6 +80,7 @@ facto.error.invalid-username-or-password=Invalid username or password
 facto.error.noReservoir.atLeast2=To be able to use the N/A money reservoir, there must be at least two transactions
 facto.error.noReservoir.zeroSum=To be able to use the N/A money reservoir, the total flow of this group must sum to 0
 facto.error.noReservoir.notAllTheSame=The N/A money reservoir can be selected for either all transactions or no transactions
+facto.error.foreignReservoirInFuture=There is a "date payed" field defined in the future for a foreign currency
 
 facto.user-profile=User Profile
 facto.user-administration=User Administration

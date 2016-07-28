@@ -18,6 +18,7 @@ import play.api.i18n.Messages.Implicits._
 
 import org.joda.time.DateTime
 
+import com.github.nscala_time.time.Imports._
 import common.{Clock, ReturnTo}
 import models.User
 import models.accounting.{Transaction, Transactions, TransactionPartial, TransactionGroup, TransactionGroupPartial, TransactionGroups, UpdateLogs}
@@ -357,6 +358,19 @@ object TransactionGroupOperations extends Controller {
             }
           case _ if containsEmptyReservoirCodes => invalidWithMessageCode("facto.error.noReservoir.notAllTheSame")
           case _ => Valid
+        }
+      }) verifying Constraint[TransGroupData]("error.invalid")(groupData => {
+        // Don't allow future transactions in a foreign currency because we don't know what the exchange rate
+        // to the default currency will be. Future fluctuations might break the immutability of the conversion.
+        val futureForeignTransactions = groupData.transactions.filter { transactionData =>
+          val foreignCurrency = Config.moneyReservoir(transactionData.moneyReservoirCode).currency.isForeign
+          val dateInFuture = transactionData.transactionDate > Clock.now
+          foreignCurrency && dateInFuture
+        }
+        if (futureForeignTransactions.isEmpty) {
+          Valid
+        } else {
+          invalidWithMessageCode("facto.error.foreignReservoirInFuture")
         }
       })
     )
