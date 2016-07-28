@@ -1,3 +1,62 @@
+### utility classes ###
+class DatedMoney
+  constructor: (@cents, @currencyCode, @date) ->
+
+class DatedMoneyCache
+  constructor: () ->
+    @cache = {}
+
+  contains: (datedMoney) ->
+    @cache[@_getCacheKey(datedMoney)] != undefined
+
+  get: (datedMoney) ->
+    @cache[@_getCacheKey(datedMoney)]
+
+  put: (datedMoney, cents) ->
+    @cache[@_getCacheKey(datedMoney)] = cents
+
+  _getCacheKey: (datedMoney) ->
+    "#{datedMoney.cents}_#{datedMoney.currencyCode}_#{datedMoney.date}"
+
+class MoneyExchanger
+  constructor: (@defaultCurrencyCode) ->
+    @cache = new DatedMoneyCache()
+
+  exchangeToDefaultAndSum: (datedMoneyArray, callback) ->
+    callbacksLeft = datedMoneyArray.length
+    sum = 0
+    for datedMoney in datedMoneyArray
+      @exchangeToDefault(datedMoney, (cents) ->
+        sum += cents
+        callbacksLeft--
+        if(callbacksLeft == 0)
+          callback(sum)
+      )
+
+  exchangeToDefault: (datedMoney, callback) ->
+    @exchangeTo(datedMoney, @defaultCurrencyCode, callback)
+
+  exchangeTo: (datedMoney, toCurrency, callback) ->
+    fromCents = datedMoney.cents
+    fromCurrency = datedMoney.currencyCode
+    date = datedMoney.date
+
+    if fromCurrency == toCurrency
+      callback(fromCents)
+    else if @cache.contains(datedMoney)
+      callback(@cache.get(datedMoney))
+    else
+      outerThis = this
+      $.post("/jsonapi/acc/money/exchange/#{fromCents}/#{fromCurrency}/#{date}/#{toCurrency}/")
+        .done((result) ->
+          cents = parseInt(result)
+          outerThis.cache.put(datedMoney, cents)
+          callback(cents)
+        )
+
+# Singleton instance
+MONEY_EXCHANGER = null
+
 ### utility functions ###
 parseMoneyAsFloatToCents = (moneyAsFloatString) ->
   parts = []
@@ -31,41 +90,76 @@ centsToFloatString = (inCents) ->
   sign = "-" if(inCents < 0)
   "#{sign}#{beforeDot}.#{afterDot}"
 
+getReservoirCurrencyCode = ($formContainer) ->
+  $reservoirCodeSelect = $formContainer.find("select[id$=_moneyReservoirCode]")
+  selectedReservoirCode = $reservoirCodeSelect.val()
+  $selectedOption = $reservoirCodeSelect.find("option[value='#{selectedReservoirCode}']")
+  $selectedOption.attr("currency-code")
+
+getReservoirCurrencyIconClass = ($formContainer) ->
+  $reservoirCodeSelect = $formContainer.find("select[id$=_moneyReservoirCode]")
+  selectedReservoirCode = $reservoirCodeSelect.val()
+  $selectedOption = $reservoirCodeSelect.find("option[value='#{selectedReservoirCode}']")
+  $selectedOption.attr("currency-icon-class")
+
+getDefaultCurrencySymbol = ($formContainer) ->
+  $reservoirCodeSelect = $formContainer.find("select[id$=_moneyReservoirCode]")
+  $nullReservoirOption = $reservoirCodeSelect.find("option[value='']")
+  $nullReservoirOption.attr("currency-code")
+
+getConsumedDate = ($formContainer) ->
+  $formContainer.find("input[id$=_consumedDate]").val()
+
 ### update total functions ###
 updateAllTotalState = ($thisFormContainer) ->
-  getTotalInCentsFromInputs = () ->
-    totalInCents = 0
-    $(".flow-as-float").each(() ->
-      totalInCents += parseMoneyAsFloatToCents(this.value)
-    )
-    totalInCents
+  getTotalInCentsFromInputs = (callback) ->
+    datedMoneyArray = []
+    $(".transaction-holder").each () ->
+      $formContainer = $(this)
+      cents = parseMoneyAsFloatToCents($formContainer.find(".flow-as-float").val())
+      currencyCode = getReservoirCurrencyCode($formContainer)
+      date = getConsumedDate($formContainer)
+      datedMoneyArray.push(new DatedMoney(cents, currencyCode, date))
+
+    MONEY_EXCHANGER.exchangeToDefaultAndSum(datedMoneyArray, callback)
 
   isZeroSumForm = () ->
     $("input:radio[name=zeroSum]:checked").val() == "true"
 
-  fixTotalZeroIfNotLast = (totalInCents) ->
+  fixTotalZeroIfNotLast = (totalInCents, callback) ->
     $lastContainer = $(".transaction-holder").last()
     isLast = $lastContainer.is($thisFormContainer)
     numForms = $(".transaction-holder").length
     if isZeroSumForm() and not isLast and numForms > 1
       lastValue = parseMoneyAsFloatToCents(($lastContainer.find(".flow-as-float").val()))
-      newLastValue = lastValue - totalInCents
-      $lastContainer.find(".flow-as-float").val(centsToFloatString(newLastValue))
-      0
+      lastCurrencyCode = getReservoirCurrencyCode($lastContainer)
+      lastConsumedDate = getConsumedDate($lastContainer)
+      datedMoney = new DatedMoney(totalInCents, MONEY_EXCHANGER.defaultCurrencyCode, lastConsumedDate)
+      MONEY_EXCHANGER.exchangeTo(datedMoney, lastCurrencyCode, (totalInCents) ->
+        newLastValue = lastValue - totalInCents
+        $lastContainer.find(".flow-as-float").val(centsToFloatString(newLastValue))
+        callback(0)
+      )
     else
-      totalInCents
+      callback(totalInCents)
 
   updateTotal = (totalInCents) ->
-    $(".total-transaction-flow").html(centsToFloatString(totalInCents))
+    if totalInCents == null
+      $(".total-transaction-flow").html("...")
+    else
+      $(".total-transaction-flow").html(centsToFloatString(totalInCents))
 
   updateTotalColor = (totalInCents) ->
     zeroSum = isZeroSumForm()
     $(".total-flow-text").toggleClass("nonzero-warning", zeroSum && totalInCents != 0)
 
-  totalInCents = getTotalInCentsFromInputs()
-  totalInCents = fixTotalZeroIfNotLast(totalInCents)
-  updateTotal(totalInCents)
-  updateTotalColor(totalInCents)
+  updateTotal(null)
+  updateTotalColor(0)
+  getTotalInCentsFromInputs (totalInCents) ->
+    fixTotalZeroIfNotLast(totalInCents, (totalInCents) ->
+      updateTotal(totalInCents)
+      updateTotalColor(totalInCents)
+    )
 
 ### setup descriptions' typeahead ###
 setupDescriptionsTypeahead = (formContainer) ->
@@ -168,20 +262,21 @@ setupBootstrapTagsinput = (formContainer) ->
 setupFlowCurrencyUpdate = (formContainer) ->
   $formContainer = $(formContainer)
 
-  $reservoirCodeSelect = $formContainer.find("select[id$=_moneyReservoirCode]")
-  setFlowCurrency = () ->
-    selectedReservoirCode = $reservoirCodeSelect.val()
-    $selectedOption = $reservoirCodeSelect.find("option[value='#{selectedReservoirCode}']")
-    currencyCode = $selectedOption.attr("currency-code")
-    currencyIconClass = $selectedOption.attr("currency-icon-class")
+  updateFlowCurrency = () ->
+    currencyIconClass = getReservoirCurrencyIconClass($formContainer)
     $formContainer.find(".currency-indicator").html("<i class='#{currencyIconClass}'></i>")
-  $reservoirCodeSelect.keydown(() -> setTimeout(() -> setFlowCurrency()))
-  $reservoirCodeSelect.change(setFlowCurrency)
-  setFlowCurrency()
+
+    updateAllTotalState($formContainer)
+
+  $reservoirCodeSelect = $formContainer.find("select[id$=_moneyReservoirCode]")
+  $reservoirCodeSelect.keydown(() -> setTimeout(() -> updateFlowCurrency()))
+  $reservoirCodeSelect.change(updateFlowCurrency)
+  updateFlowCurrency()
 
 $(document).ready(() ->
   ### constants ###
   ROOT_FORM_CONTAINER = $('#transaction-holder-0')
+  MONEY_EXCHANGER = new MoneyExchanger(getDefaultCurrencySymbol(ROOT_FORM_CONTAINER))
 
   ### make add-transaction window have the same height as all other windows ###
   $('.add-transaction-button-holder .panel-body').height($('#transaction-holder-0 .panel-body').height())
@@ -396,6 +491,8 @@ $(document).ready(() ->
     ### update total ###
     $formContainer.find(".flow-as-float").keydown(() -> setTimeout(() -> updateAllTotalState($formContainer)))
     $formContainer.find(".flow-as-float").change(() -> updateAllTotalState($formContainer))
+    $formContainer.find("input[id$=_consumedDate]").keydown(() -> setTimeout(() -> updateAllTotalState($formContainer)))
+    $formContainer.find("input[id$=_consumedDate]").change(() -> updateAllTotalState($formContainer))
 
   $(".transaction-holder").each(() -> addTransactionSpecificEventListeners(this))
   $(".transaction-holder").each(() -> setupDescriptionsTypeahead(this))
