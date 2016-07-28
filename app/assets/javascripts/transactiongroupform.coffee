@@ -107,8 +107,8 @@ getDefaultCurrencySymbol = ($formContainer) ->
   $nullReservoirOption = $reservoirCodeSelect.find("option[value='']")
   $nullReservoirOption.attr("currency-code")
 
-getConsumedDate = ($formContainer) ->
-  $formContainer.find("input[id$=_consumedDate]").val()
+getTransactionDate = ($formContainer) ->
+  $formContainer.find("input[id$=_transactionDate]").val()
 
 ### update total functions ###
 updateAllTotalState = ($thisFormContainer) ->
@@ -118,7 +118,7 @@ updateAllTotalState = ($thisFormContainer) ->
       $formContainer = $(this)
       cents = parseMoneyAsFloatToCents($formContainer.find(".flow-as-float").val())
       currencyCode = getReservoirCurrencyCode($formContainer)
-      date = getConsumedDate($formContainer)
+      date = getTransactionDate($formContainer)
       datedMoneyArray.push(new DatedMoney(cents, currencyCode, date))
 
     MONEY_EXCHANGER.exchangeToDefaultAndSum(datedMoneyArray, callback)
@@ -133,7 +133,7 @@ updateAllTotalState = ($thisFormContainer) ->
     if isZeroSumForm() and not isLast and numForms > 1
       lastValue = parseMoneyAsFloatToCents(($lastContainer.find(".flow-as-float").val()))
       lastCurrencyCode = getReservoirCurrencyCode($lastContainer)
-      lastConsumedDate = getConsumedDate($lastContainer)
+      lastConsumedDate = getTransactionDate($lastContainer)
       datedMoney = new DatedMoney(totalInCents, MONEY_EXCHANGER.defaultCurrencyCode, lastConsumedDate)
       MONEY_EXCHANGER.exchangeTo(datedMoney, lastCurrencyCode, (totalInCents) ->
         newLastValue = lastValue - totalInCents
@@ -491,8 +491,8 @@ $(document).ready(() ->
     ### update total ###
     $formContainer.find(".flow-as-float").keydown(() -> setTimeout(() -> updateAllTotalState($formContainer)))
     $formContainer.find(".flow-as-float").change(() -> updateAllTotalState($formContainer))
-    $formContainer.find("input[id$=_consumedDate]").keydown(() -> setTimeout(() -> updateAllTotalState($formContainer)))
-    $formContainer.find("input[id$=_consumedDate]").change(() -> updateAllTotalState($formContainer))
+    $formContainer.find("input[id$=_transactionDate]").keydown(() -> setTimeout(() -> updateAllTotalState($formContainer)))
+    $formContainer.find("input[id$=_transactionDate]").change(() -> updateAllTotalState($formContainer))
 
   $(".transaction-holder").each(() -> addTransactionSpecificEventListeners(this))
   $(".transaction-holder").each(() -> setupDescriptionsTypeahead(this))
