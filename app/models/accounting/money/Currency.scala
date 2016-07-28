@@ -7,15 +7,15 @@ import play.twirl.api.Html
 import scala.collection.JavaConverters._
 
 /**
-  * @param threeLetterSymbol The three letter symbol.
+  * @param code The three letter symbol.
   */
-sealed abstract class Currency(val threeLetterSymbol: String, val htmlSymbol: Html, val iconClass: Option[String] = None) {
-  override def toString = threeLetterSymbol
+sealed abstract class Currency(val code: String, val htmlSymbol: Html, val iconClass: Option[String] = None) {
+  override def toString = code
 }
 
 object Currency {
-  def of(threeLetterSymbol: String): Currency = {
-    val candidates = all.filter(_.threeLetterSymbol.toLowerCase == threeLetterSymbol.toLowerCase)
+  def of(code: String): Currency = {
+    val candidates = all.filter(_.code.toLowerCase == code.toLowerCase)
     Iterables.getOnlyElement(candidates.asJava)
   }
 

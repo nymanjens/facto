@@ -100,7 +100,7 @@
                     optionArgs=toListMap(
                         Config.visibleReservoirs(includeNullReservoir = true)
                           .map(reservoir => reservoir.code -> Map(
-                            Symbol("currency-code") -> reservoir.currency.threeLetterSymbol,
+                            Symbol("currency-code") -> reservoir.currency.code,
                             Symbol("currency-icon-class") -> reservoir.currency.iconClass.getOrElse("fa fa-money")))))
                 @bootstrap3.Select(transactionForm("categoryCode"), Messages("facto.category"),
                     Config.categories.mapValues(category =>
