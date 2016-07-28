@@ -12,9 +12,10 @@ private[money] object ExchangeRateManager {
       case (foreignCurrency, Currency.default) =>
         ratioReferenceToForeignCurrency(foreignCurrency)
       case (Currency.default, foreignCurrency) =>
-        1 / getRatioSecondToFirstCurrency(secondCurrency, foreignCurrency, date)
+        1 / getRatioSecondToFirstCurrency(secondCurrency, firstCurrency, date)
       case _ =>
-        throw new UnsupportedOperationException(s"Exchanging from non-reference to non-reference currency is not supported")
+        throw new UnsupportedOperationException(s"Exchanging from non-reference to non-reference currency is not " +
+          s"supported ($firstCurrency -> $secondCurrency)")
     }
   }
 }
