@@ -233,8 +233,8 @@ templates:
         flowAsFloat: 900
 
 constants:
-    commonAccount: *accountCommon
-    accountingCategory: *catAcc
-    endowmentCategory: *catEndow
-    defaultCurrency: EUR
-    liquidationDescription: Liquidation
+  commonAccount: *accountCommon
+  accountingCategory: *catAcc
+  endowmentCategory: *catEndow
+  defaultCurrency: EUR
+  liquidationDescription: Liquidation
