@@ -1,5 +1,6 @@
 package models.accounting
 
+import com.google.common.collect.{ImmutableMultiset, Multiset}
 import common.CollectionUtils.toListMap
 import models.SlickUtils.dbRun
 import models.SlickUtils.dbApi._
@@ -7,6 +8,7 @@ import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.SlickUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
 import models.manager.{Entity, EntityManager, EntityTable, ImmutableEntityManager}
 
+import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
 import scala.collection.immutable.ListMap
 
@@ -58,20 +60,30 @@ object TagEntities extends ImmutableEntityManager[TagEntity, TagEntities](
     *         it is used in
     */
   def usageAndReccomendations(selectedTags: Seq[Tag], maxNumRecommendations: Int): ListMap[Tag, Int] = {
-    val recommendedTags: Seq[Tag] = {
-      val numRecommendations = maxNumRecommendations - selectedTags.size
-      if (numRecommendations <= 0) {
-        Seq()
-      } else {
-        val entities = dbRun(newQuery.sortBy(_.id.desc).take(maxNumRecommendations))
-        val allRecommendations = entities.map(e => Tag(e.name)).toVector
-        allRecommendations.filterNot(selectedTags.contains).take(numRecommendations)
+    val tagToUsagePairs: Seq[(Tag, Int)] = {
+      val allTagNames = dbRun(newQuery.map(_.name))
+      val multiset = ImmutableMultiset.copyOf(allTagNames.asJava)
+      for (tagName <- multiset.elementSet.asScala.toList) yield {
+        Tag(tagName) -> multiset.count(tagName)
       }
     }
-    toListMap(
-      for (tag <- selectedTags ++ recommendedTags) yield {
-        val count = dbRun(newQuery.filter(_.name === tag.name).length.result)
-        (tag, count)
-      })
+    val tagToUsageMap: Map[Tag, Int] = tagToUsagePairs.toMap
+
+    val selectedTagsMap: ListMap[Tag, Int] = {
+      toListMap(
+        for (tag <- selectedTags) yield {
+          (tag, tagToUsageMap(tag))
+        })
+    }
+    val recommendedTagsMap: ListMap[Tag, Int] = {
+      val numRecommendations = maxNumRecommendations - selectedTags.size
+      if (numRecommendations <= 0) {
+        toListMap(Seq())
+      } else {
+        toListMap(tagToUsagePairs.sortBy(-_._2).take(numRecommendations))
+      }
+    }
+
+    selectedTagsMap ++ recommendedTagsMap
   }
 }
