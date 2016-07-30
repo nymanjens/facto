@@ -22,20 +22,15 @@ private[sync] final class GuavaBackedSynchronizedCache[K <: Object, V <: Object]
   private val lock = new Object
 
   override def getOrCalculate(key: K, calculateValueFunc: () => V): V = {
-    val currentValue = lock synchronized {
-      Option(guavaCache.getIfPresent(key))
-    }
+    lock synchronized {
+      val currentValue = Option(guavaCache.getIfPresent(key))
 
-    if (currentValue.isDefined) {
-      currentValue.get
-    } else {
-      // Key not yet cached. Calculate outside of lock and put in cache.
-      val value = calculateValueFunc()
-      lock synchronized {
-        // Not using put because there might already be a value by now.
-        guavaCache.get(key, new Callable[V]() {
-          override def call = value
-        })
+      if (currentValue.isDefined) {
+        currentValue.get
+      } else {
+        val value = calculateValueFunc()
+        guavaCache.put(key, value)
+        value
       }
     }
   }
