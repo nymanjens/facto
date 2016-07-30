@@ -1,7 +1,7 @@
 package controllers.accounting
 
 import common.ReturnTo
-import models.accounting.money.Money
+import models.accounting.money.{Money, DatedMoney, ReferenceMoney}
 
 import scala.collection.{Seq => MutableSeq}
 import scala.collection.immutable.Seq
@@ -18,6 +18,7 @@ import play.api.i18n.Messages.Implicits._
 
 import org.joda.time.DateTime
 
+import com.github.nscala_time.time.Imports._
 import common.{Clock, ReturnTo}
 import models.User
 import models.accounting.{Transaction, Transactions, TransactionPartial, TransactionGroup, TransactionGroupPartial, TransactionGroups, UpdateLogs}
@@ -25,7 +26,7 @@ import models.accounting.config.{Config, Account, MoneyReservoir, Category, Temp
 import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting.CashFlowEntry
 import controllers.helpers.accounting.FormUtils.{validMoneyReservoirOrNullReservoir, validAccountCode, validCategoryCode,
-validFlowAsFloat, flowAsFloatStringToMoney, validTagsString, invalidWithMessageCode}
+validFlowAsFloat, flowAsFloatStringToCents, validTagsString, invalidWithMessageCode}
 
 object TransactionGroupOperations extends Controller {
 
@@ -92,25 +93,31 @@ object TransactionGroupOperations extends Controller {
   def addNewLiquidationRepayForm(accountCode1: String, accountCode2: String, amountInCents: Long, returnTo: String): AuthenticatedAction = {
     implicit val returnToImplicit = ReturnTo(returnTo)
 
-    val amount = Money(amountInCents)
-    if (amount < Money(0)) {
-      addNewLiquidationRepayForm(accountCode2, accountCode1, -amount.cents, returnTo)
+    if (amountInCents < 0) {
+      addNewLiquidationRepayForm(accountCode2, accountCode1, -amountInCents, returnTo)
     } else {
       val account1 = Config.accounts(accountCode1)
       val account2 = Config.accounts(accountCode2)
+      def getAbsoluteFlowForAccountCurrency(account: Account): DatedMoney = {
+        val amount = ReferenceMoney(amountInCents)
+        val currency = account.defaultElectronicReservoir.currency
+        // Using current date because the repayment takes place today.
+        amount.withDate(Clock.now).exchangedForCurrency(currency)
+      }
+
       addNewFormFromPartial(TransactionGroupPartial(Seq(
         TransactionPartial.from(
           beneficiary = account1,
           moneyReservoir = account1.defaultElectronicReservoir,
           category = Config.constants.accountingCategory,
           description = Config.constants.liquidationDescription,
-          flow = amount.negated),
+          flowInCents = -getAbsoluteFlowForAccountCurrency(account1).cents),
         TransactionPartial.from(
           beneficiary = account1,
           moneyReservoir = account2.defaultElectronicReservoir,
           category = Config.constants.accountingCategory,
           description = Config.constants.liquidationDescription,
-          flow = amount)),
+          flowInCents = getAbsoluteFlowForAccountCurrency(account2).cents)),
         zeroSum = true
       ))
     }
@@ -214,7 +221,7 @@ object TransactionGroupOperations extends Controller {
         moneyReservoirCode = trans.moneyReservoirCode,
         categoryCode = trans.categoryCode,
         description = trans.description,
-        flow = trans.flow,
+        flowInCents = trans.flowInCents,
         detailDescription = trans.detailDescription,
         tagsString = trans.tagsString,
         createdDate = group.createdDate,
@@ -269,7 +276,7 @@ object TransactionGroupOperations extends Controller {
                                moneyReservoirCode: String = "",
                                categoryCode: String = "",
                                description: String = "",
-                               flow: Money = Money(0),
+                               flowInCents: Long = 0,
                                detailDescription: String = "",
                                tagsString: String = "",
                                transactionDate: DateTime = Clock.now,
@@ -286,7 +293,7 @@ object TransactionGroupOperations extends Controller {
           moneyReservoirCode = moneyReservoir.code,
           categoryCode = trans.category.map(_.code).getOrElse(""),
           description = trans.description,
-          flow = trans.flow,
+          flowInCents = trans.flowInCents,
           detailDescription = trans.detailDescription,
           tagsString = trans.tagsString)
       }
@@ -297,7 +304,7 @@ object TransactionGroupOperations extends Controller {
         moneyReservoirCode = trans.moneyReservoirCode,
         categoryCode = trans.categoryCode,
         description = trans.description,
-        flow = trans.flow,
+        flowInCents = trans.flow.cents,
         detailDescription = trans.detailDescription,
         tagsString = trans.tagsString,
         transactionDate = trans.transactionDate,
@@ -326,7 +333,7 @@ object TransactionGroupOperations extends Controller {
             "moneyReservoirCode" -> text.verifying(validMoneyReservoirOrNullReservoir),
             "categoryCode" -> nonEmptyText.verifying(validCategoryCode),
             "description" -> nonEmptyText,
-            "flowAsFloat" -> nonEmptyText.verifying(validFlowAsFloat).transform[Money](flowAsFloatStringToMoney, _.formatFloat),
+            "flowAsFloat" -> nonEmptyText.verifying(validFlowAsFloat).transform[Long](flowAsFloatStringToCents, Money.centsToFloatString),
             "detailDescription" -> text,
             "tags" -> text.verifying(validTagsString),
             "transactionDate" -> jodaDate("yyyy-MM-dd"),
@@ -337,20 +344,33 @@ object TransactionGroupOperations extends Controller {
       )(TransGroupData.apply)(TransGroupData.unapply) verifying Constraint[TransGroupData]("error.invalid")(groupData => {
         val containsEmptyReservoirCodes = groupData.transactions.exists(_.moneyReservoirCode == "")
         val allReservoirCodesAreEmpty = !groupData.transactions.exists(_.moneyReservoirCode != "")
-        val totalFlow = groupData.transactions.map(_.flow).sum
+        val totalFlowInCents = groupData.transactions.map(_.flowInCents).sum
 
         groupData.transactions.size match {
           case 0 => throw new AssertionError("Should not be possible")
           case 1 if containsEmptyReservoirCodes => invalidWithMessageCode("facto.error.noReservoir.atLeast2")
           case 1 => Valid
           case _ if allReservoirCodesAreEmpty =>
-            if (totalFlow == Money(0)) {
+            if (totalFlowInCents == 0) {
               Valid
             } else {
               invalidWithMessageCode("facto.error.noReservoir.zeroSum")
             }
           case _ if containsEmptyReservoirCodes => invalidWithMessageCode("facto.error.noReservoir.notAllTheSame")
           case _ => Valid
+        }
+      }) verifying Constraint[TransGroupData]("error.invalid")(groupData => {
+        // Don't allow future transactions in a foreign currency because we don't know what the exchange rate
+        // to the default currency will be. Future fluctuations might break the immutability of the conversion.
+        val futureForeignTransactions = groupData.transactions.filter { transactionData =>
+          val foreignCurrency = Config.moneyReservoir(transactionData.moneyReservoirCode).currency.isForeign
+          val dateInFuture = transactionData.transactionDate > Clock.now
+          foreignCurrency && dateInFuture
+        }
+        if (futureForeignTransactions.isEmpty) {
+          Valid
+        } else {
+          invalidWithMessageCode("facto.error.foreignReservoirInFuture")
         }
       })
     )

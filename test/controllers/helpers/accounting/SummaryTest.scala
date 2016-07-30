@@ -15,7 +15,7 @@ import common.testing.TestUtils._
 import common.testing.HookedSpecification
 import models.accounting._
 import models.accounting.config.{Account, Category, Config}
-import models.accounting.money.Money
+import models.accounting.money.{Money, ReferenceMoney}
 
 @RunWith(classOf[JUnitRunner])
 class SummaryTest extends HookedSpecification {
@@ -25,10 +25,10 @@ class SummaryTest extends HookedSpecification {
 
   "Summary.fetchSummary()" should {
     "caculate monthRangeForAverages" in new WithApplication {
-      persistTransaction(flow = Money(200), date = dateAt(2009, February, 2))
-      persistTransaction(flow = Money(201), date = dateAt(2009, February, 20))
-      persistTransaction(flow = Money(202), date = dateAt(2009, March, 1))
-      persistTransaction(flow = Money(202), date = dateAt(2010, May, 4))
+      persistTransaction(flowInCents = 200, date = dateAt(2009, February, 2))
+      persistTransaction(flowInCents = 201, date = dateAt(2009, February, 20))
+      persistTransaction(flowInCents = 202, date = dateAt(2009, March, 1))
+      persistTransaction(flowInCents = 202, date = dateAt(2010, May, 4))
 
       val summary = Summary.fetchSummary(testAccount, 2009)
 
@@ -41,52 +41,52 @@ class SummaryTest extends HookedSpecification {
     }
 
     "ignore the current and future months when calculating the averages" in new WithApplication {
-      persistTransaction(flow = Money(999), date = dateAt(2009, April, 2))
-      persistTransaction(flow = Money(100), date = dateAt(2010, February, 2))
-      persistTransaction(flow = Money(112), date = dateAt(2010, March, 2))
-      persistTransaction(flow = Money(120), date = dateAt(2010, April, 2))
-      persistTransaction(flow = Money(130), date = dateAt(2010, May, 2))
-      persistTransaction(flow = Money(1999), date = dateAt(2011, April, 2))
+      persistTransaction(flowInCents = 999, date = dateAt(2009, April, 2))
+      persistTransaction(flowInCents = 100, date = dateAt(2010, February, 2))
+      persistTransaction(flowInCents = 112, date = dateAt(2010, March, 2))
+      persistTransaction(flowInCents = 120, date = dateAt(2010, April, 2))
+      persistTransaction(flowInCents = 130, date = dateAt(2010, May, 2))
+      persistTransaction(flowInCents = 1999, date = dateAt(2011, April, 2))
 
       val summary = Summary.fetchSummary(testAccount, 2009)
 
-      summary.yearToSummary(2010).categoryToAverages(testCategory) mustEqual Money(71)
+      summary.yearToSummary(2010).categoryToAverages(testCategory) mustEqual ReferenceMoney(71)
       summary.monthRangeForAverages shouldEqual MonthRange(dateAt(2009, April, 1), dateAt(2010, April, 1))
     }
 
 
     "ignore the pre-facto months when calculating the averages" in new WithApplication {
-      persistTransaction(flow = Money(100), date = dateAt(2010, February, 2))
-      persistTransaction(flow = Money(112), date = dateAt(2010, March, 2))
-      persistTransaction(flow = Money(120), date = dateAt(2010, April, 2))
+      persistTransaction(flowInCents = 100, date = dateAt(2010, February, 2))
+      persistTransaction(flowInCents = 112, date = dateAt(2010, March, 2))
+      persistTransaction(flowInCents = 120, date = dateAt(2010, April, 2))
 
       val summary = Summary.fetchSummary(testAccount, 2009)
 
-      summary.yearToSummary(2010).categoryToAverages(testCategory) mustEqual Money(106)
+      summary.yearToSummary(2010).categoryToAverages(testCategory) mustEqual ReferenceMoney(106)
       summary.monthRangeForAverages shouldEqual MonthRange(dateAt(2010, February, 1), dateAt(2010, April, 1))
     }
 
     "calculates totals" in new WithApplication {
-      persistTransaction(flow = Money(3), date = dateAt(2010, January, 2), category = testCategoryA)
-      persistTransaction(flow = Money(100), date = dateAt(2010, February, 2), category = testCategoryA)
-      persistTransaction(flow = Money(102), date = dateAt(2010, February, 2), category = testCategoryB)
+      persistTransaction(flowInCents = 3, date = dateAt(2010, January, 2), category = testCategoryA)
+      persistTransaction(flowInCents = 100, date = dateAt(2010, February, 2), category = testCategoryA)
+      persistTransaction(flowInCents = 102, date = dateAt(2010, February, 2), category = testCategoryB)
 
       val summary = Summary.fetchSummary(testAccount, 2009)
 
       val totalRows = summary.yearToSummary(2010).totalRows
       totalRows must haveSize(2)
       totalRows(0).rowTitleHtml mustEqual Html("<b>Total</b>")
-      totalRows(0).monthToTotal(february(2010)) mustEqual Money(202)
-      totalRows(0).yearlyAverage mustEqual Money(68)
+      totalRows(0).monthToTotal(february(2010)) mustEqual ReferenceMoney(202)
+      totalRows(0).yearlyAverage mustEqual ReferenceMoney(68)
       totalRows(1).rowTitleHtml mustEqual Html("<b>Total</b> (without catA)")
-      totalRows(1).monthToTotal(february(2010)) mustEqual Money(102)
-      totalRows(1).yearlyAverage mustEqual Money(34)
+      totalRows(1).monthToTotal(february(2010)) mustEqual ReferenceMoney(102)
+      totalRows(1).yearlyAverage mustEqual ReferenceMoney(34)
 
       summary.totalRowTitles mustEqual Seq(Html("<b>Total</b>"), Html("<b>Total</b> (without catA)"))
     }
 
     "prunes unused categories" in new WithApplication {
-      persistTransaction(flow = Money(3), date = dateAt(2010, January, 2), category = testCategoryA)
+      persistTransaction(flowInCents = 3, date = dateAt(2010, January, 2), category = testCategoryA)
 
       val summary = Summary.fetchSummary(testAccount, 2010)
 

@@ -32,7 +32,7 @@ object CsvImportTool {
             moneyReservoirCode = moneyReservoirCode,
             categoryCode = categoryCode,
             description = description,
-            flow = Money.fromFloat(flowAsFloat.toDouble),
+            flowInCents = Money.floatToCents(flowAsFloat.toDouble),
             tagsString = s"csv-import-$beneficiaryAccountCode",
             createdDate = new DateTime(createdDateStamp.toLong * 1000),
             transactionDate = new DateTime(transactionDateStamp.toLong * 1000),
@@ -53,7 +53,7 @@ object CsvImportTool {
           BalanceChecks.add(BalanceCheck(
             issuerId = issuerId.toInt,
             moneyReservoirCode = moneyReservoirCode,
-            balance = Money.fromFloat(balanceAsFloat.toDouble),
+            balanceInCents = Money.floatToCents(balanceAsFloat.toDouble),
             createdDate = new DateTime(createdDateStamp.toLong * 1000),
             checkDate = new DateTime(checkDateStamp.toLong * 1000)
           ))

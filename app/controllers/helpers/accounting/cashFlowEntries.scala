@@ -3,21 +3,29 @@ package controllers.helpers.accounting
 import com.google.common.hash.Hashing
 import controllers.helpers.ControllerHelperCache
 import controllers.helpers.ControllerHelperCache.CacheIdentifier
-import models.SlickUtils.{JodaToSqlDateMapper, MoneyToLongMapper}
+import models.SlickUtils.JodaToSqlDateMapper
 import models.SlickUtils.dbApi._
 import com.github.nscala_time.time.Imports._
 import models.SlickUtils.dbRun
 import models.accounting._
 import models.accounting.config.MoneyReservoir
-import models.accounting.money.Money
+import models.accounting.money.{DatedMoney, Money, MoneyWithGeneralCurrency}
 import org.joda.time.DateTime
 
 import scala.collection.immutable.Seq
 
 sealed trait CashFlowEntry
 
-case class RegularEntry(override val transactions: Seq[Transaction], balance: Money, balanceVerified: Boolean)
-  extends GroupedTransactions(transactions) with CashFlowEntry
+case class RegularEntry(override val transactions: Seq[Transaction],
+                        private val nonDatedBalance: MoneyWithGeneralCurrency,
+                        balanceVerified: Boolean)
+  extends GroupedTransactions(transactions) with CashFlowEntry {
+
+  def balance: DatedMoney = {
+    val latestDate = transactions.map(_.transactionDate).max
+    nonDatedBalance.withDate(latestDate)
+  }
+}
 
 case class BalanceCorrection(balanceCheck: BalanceCheck) extends CashFlowEntry
 
@@ -28,7 +36,7 @@ object CashFlowEntry {
     */
   def fetchLastNEntries(moneyReservoir: MoneyReservoir, n: Int): Seq[CashFlowEntry] =
     ControllerHelperCache.cached(FetchLastNEntries(moneyReservoir, n)) {
-      val (oldestBalanceDate, initialBalance): (DateTime, Money) = {
+      val (oldestBalanceDate, initialBalance): (DateTime, MoneyWithGeneralCurrency) = {
         val numTransactionsToFetch = 3 * n
         val totalNumTransactions = dbRun(Transactions.newQuery
           .filter(_.moneyReservoirCode === moneyReservoir.code)
@@ -36,7 +44,7 @@ object CashFlowEntry {
           .result)
 
         if (totalNumTransactions < numTransactionsToFetch) {
-          (new DateTime(0), Money(0)) // get all entries
+          (new DateTime(0), MoneyWithGeneralCurrency(0, moneyReservoir.currency)) // get all entries
 
         } else {
           // get oldest oldestTransDate
@@ -55,7 +63,7 @@ object CashFlowEntry {
             .take(1))
             .headOption
           val oldestBalanceDate = oldestBC.map(_.checkDate).getOrElse(new DateTime(0))
-          val initialBalance = oldestBC.map(_.balance).getOrElse(Money(0L))
+          val initialBalance = oldestBC.map(_.balance).getOrElse(MoneyWithGeneralCurrency(0, moneyReservoir.currency))
           (oldestBalanceDate, initialBalance)
         }
       }
@@ -90,7 +98,7 @@ object CashFlowEntry {
       val mergedRows = merge(transactions, balanceChecks).toList
 
       // convert to entries (recursion does not lead to growing stack because of Stream)
-      def convertToEntries(nextRows: List[AnyRef], currentBalance: Money): Stream[CashFlowEntry] = (nextRows: @unchecked) match {
+      def convertToEntries(nextRows: List[AnyRef], currentBalance: MoneyWithGeneralCurrency): Stream[CashFlowEntry] = (nextRows: @unchecked) match {
         case (trans: Transaction) :: rest =>
           val newBalance = currentBalance + trans.flow
           RegularEntry(List(trans), newBalance, false) #:: convertToEntries(rest, newBalance)

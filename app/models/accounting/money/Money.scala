@@ -1,65 +1,55 @@
 package models.accounting.money
 
+import scala.collection.immutable.Seq
 import java.lang.Math.{abs, round}
 import java.text.NumberFormat
 import java.util.Locale
 
 import com.google.common.collect.Iterables
 import models.accounting.config.Config
+import models.accounting.money.CentOperations.CentOperationsNumeric
+import org.joda.time.DateTime
 import play.twirl.api.Html
 
 import scala.collection.JavaConverters._
 
-case class Money(cents: Long, currency: CurrencyUnit = CurrencyUnit.default) {
+trait Money {
 
-  def negated: Money = withCents(-cents)
+  def cents: Long
+  def currency: Currency
+  def toHtmlWithCurrency: Html
 
-  def +(that: Money): Money = doCentOperationToMoney(_ + _)(that)
-  def -(that: Money): Money = doCentOperationToMoney(_ - _)(that)
-  def *(number: Long): Money = withCents(cents * number)
-  def /(number: Long): Money = withCents(round(cents * 1.0 / number))
-  def ==(that: Money): Boolean = doCentOperation(_ == _)(that)
-  def >(that: Money): Boolean = doCentOperation(_ > _)(that)
-  def <(that: Money): Boolean = doCentOperation(_ < _)(that)
-  def >=(that: Money): Boolean = doCentOperation(_ >= _)(that)
-  def <=(that: Money): Boolean = doCentOperation(_ <= _)(that)
+  final def formatFloat: String = Money.centsToFloatString(cents)
 
-  def formatFloat: String = {
+  final def withDate(date: DateTime): DatedMoney = {
+    DatedMoney(cents, currency, date)
+  }
+
+  override def toString = s"${currency.code} $formatFloat"
+}
+
+object Money {
+
+  def centsToFloatString(cents: Long): String = {
     val sign = if (cents < 0) "-" else ""
     val integerPart = NumberFormat.getNumberInstance(Locale.US).format(abs(cents) / 100)
     val centsPart = abs(cents % 100)
     "%s%s.%02d".format(sign, integerPart, centsPart)
   }
 
-  override def toString = s"${currency.threeLetterSymbol} $formatFloat"
+  def floatToCents(float: Double): Long =
+    (float.toDouble * 100).round
 
-  private def doCentOperation[T](operation: (Long, Long) => T)(that: Money): T = {
-    require(this.currency == that.currency)
-    operation(this.cents, that.cents)
+  private[money] def centsToHtmlWithCurrency(cents: Long, currency: Currency): Html = {
+    currency.htmlSymbol ++ s" ${centsToFloatString(cents)}"
   }
-  private def doCentOperationToMoney(operation: (Long, Long) => Long)(that: Money): Money =
-    withCents(doCentOperation(operation)(that))
 
-  private def withCents(newCents: Long): Money = copy(cents = newCents)
-}
-
-object Money {
-
-  def fromFloat(float: Double, currency: CurrencyUnit = CurrencyUnit.default): Money =
-    Money((float.toDouble * 100).round, currency)
-
-  implicit object MoneyNumeric extends Numeric[Money] {
-    override def negate(x: Money): Money = x.negated
-    override def plus(x: Money, y: Money): Money = x + y
-    override def minus(x: Money, y: Money): Money = x - y
-    override def times(x: Money, y: Money): Money = throw new UnsupportedOperationException("Multiplication of Money doesn't make sense.")
-
-    override def toDouble(x: Money): Double = x.cents.toDouble
-    override def toFloat(x: Money): Float = x.cents.toFloat
-    override def toInt(x: Money): Int = x.cents.toInt
-    override def toLong(x: Money): Long = x.cents
-
-    override def fromInt(x: Int): Money = Money(x)
-    override def compare(x: Money, y: Money): Int = (x.cents - y.cents).signum
+  private[money] implicit class SummableHtml(html: Html) {
+    def ++(string: String): Html = {
+      this ++ Html(string)
+    }
+    def ++(otherHtml: Html): Html = {
+      new Html(Seq(html, otherHtml))
+    }
   }
 }

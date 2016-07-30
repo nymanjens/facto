@@ -3,10 +3,11 @@ package controllers.helpers.accounting
 import collection.immutable.Seq
 import org.joda.time.DateTime
 import com.github.nscala_time.time.Imports._
+import common.Clock
 import models.User
 import models.accounting.{Tag, Transaction}
 import models.accounting.config.{Account, Category, MoneyReservoir}
-import models.accounting.money.Money
+import models.accounting.money.{DatedMoney, Money, MoneyWithGeneralCurrency, ReferenceMoney}
 
 abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
   def groupId = transactions(0).transactionGroupId
@@ -17,9 +18,26 @@ abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
   def moneyReservoirs: Seq[MoneyReservoir] = transactions.map(_.moneyReservoir).distinct
   def categories: Seq[Category] = transactions.map(_.category).distinct
   def descriptions: Seq[String] = transactions.map(_.description).distinct
-  def flow: Money = transactions.map(_.flow).sum
   def mostRecentTransaction: Transaction = transactions.sortBy(_.transactionDate).last
   def tags: Seq[Tag] = transactions.flatMap(_.tags).distinct
+
+  def flow: Money = {
+    val currencies = transactions.map(_.flow.currency).distinct
+    currencies match {
+      case Seq(currency) => // All transactions have the same currency
+        val dates = transactions.map(_.transactionDate).distinct
+        val flow: MoneyWithGeneralCurrency = transactions.map(_.flow).sum(MoneyWithGeneralCurrency.numeric(currency))
+        if (dates.size == 1) {
+          // All transactions have the same date, so this should be a DatedMoney
+          flow.withDate(dates(0))
+        } else {
+          // Dates differ, so the best we can do is general Money
+          flow
+        }
+      case _ => // Multiple currencies --> only show reference currency
+        transactions.map(_.flow.exchangedForReferenceCurrency).sum
+    }
+  }
 }
 
 object GroupedTransactions {

@@ -57,7 +57,7 @@ class UpdateLogTest extends HookedSpecification {
       moneyReservoirCode = testReservoir.code,
       categoryCode = testCategory.code,
       description = "test description",
-      flow = Money(9199),
+      flowInCents = 9199,
       transactionDate = dateAt(2014, April, 1),
       consumedDate = dateAt(2015, April, 1)
     ))
@@ -102,7 +102,7 @@ class UpdateLogTest extends HookedSpecification {
     BalanceChecks.add(BalanceCheck(
       issuerId = testUser.id,
       moneyReservoirCode = testReservoir.code,
-      balance = Money(balance),
+      balanceInCents = balance,
       checkDate = Clock.now))
   }
 }

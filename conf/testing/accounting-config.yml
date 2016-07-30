@@ -72,8 +72,14 @@ moneyReservoirs:
       owner: *accB
   - &reservoirHidden
       code: HIDDEN
-      name: Card B
+      name: Card Hidden
       owner: *accB
+      hidden: true
+  - &reservoirCashGbp
+      code: CASH_GBP
+      name: Cash GBP
+      owner: *accA
+      currency: GBP
       hidden: true
 
 templates:

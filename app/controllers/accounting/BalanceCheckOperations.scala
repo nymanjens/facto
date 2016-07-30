@@ -17,7 +17,7 @@ import models.User
 import models.accounting.{BalanceCheck, BalanceChecks, Transactions, UpdateLogs}
 import models.accounting.config.{MoneyReservoir, Config}
 import controllers.helpers.AuthenticatedAction
-import controllers.helpers.accounting.FormUtils.{validFlowAsFloat, flowAsFloatStringToMoney}
+import controllers.helpers.accounting.FormUtils.{validFlowAsFloat, flowAsFloatStringToCents}
 
 object BalanceCheckOperations extends Controller {
 
@@ -30,7 +30,7 @@ object BalanceCheckOperations extends Controller {
       val initialData = Forms.BcData(
         issuerName = user.name,
         moneyReservoirName = moneyReservoir.name,
-        balance = Money(0))
+        balanceInCents = 0)
       Ok(formView(AddNewOperationMeta(moneyReservoirCode), initialData))
   }
 
@@ -73,14 +73,13 @@ object BalanceCheckOperations extends Controller {
                                             balanceInCents: Long,
                                             mostRecentTransactionId: Long)
                                            (implicit user: User): Unit = {
-    val balance = Money(balanceInCents)
     val moneyReservoir = Config.moneyReservoir(moneyReservoirCode)
     val mostRecentTransaction = Transactions.findById(mostRecentTransactionId)
 
     val balanceCheck = BalanceCheck(
       issuerId = user.id,
       moneyReservoirCode = moneyReservoir.code,
-      balance = balance,
+      balanceInCents = balanceInCents,
       checkDate = mostRecentTransaction.transactionDate)
     val persistedBc = BalanceChecks.add(balanceCheck)
     UpdateLogs.addLog(user, UpdateLogs.AddNew, persistedBc)
@@ -117,7 +116,7 @@ object BalanceCheckOperations extends Controller {
     val balanceCheck = BalanceCheck(
       issuerId = user.id,
       moneyReservoirCode = operationMeta.moneyReservoir.code,
-      balance = formData.balance,
+      balanceInCents = formData.balanceInCents,
       checkDate = formData.checkDate)
     val persistedBc = operationMeta match {
       case AddNewOperationMeta(_) =>
@@ -167,14 +166,14 @@ object BalanceCheckOperations extends Controller {
     case class BcData(issuerName: String,
                       moneyReservoirName: String,
                       checkDate: DateTime = Clock.now,
-                      balance: Money = Money(0))
+                      balanceInCents: Long = 0)
 
     object BcData {
       def fromModel(bc: BalanceCheck) = BcData(
         issuerName = bc.issuer.name,
         moneyReservoirName = bc.moneyReservoir.name,
         checkDate = bc.checkDate,
-        balance = bc.balance)
+        balanceInCents = bc.balance.cents)
     }
 
     // ********** form classes ********** //
@@ -183,7 +182,7 @@ object BalanceCheckOperations extends Controller {
         "issuerName" -> text,
         "moneyReservoirName" -> text,
         "checkDate" -> jodaDate("yyyy-MM-dd"),
-        "balanceAsFloat" -> nonEmptyText.verifying(validFlowAsFloat).transform[Money](flowAsFloatStringToMoney, _.formatFloat)
+        "balanceAsFloat" -> nonEmptyText.verifying(validFlowAsFloat).transform[Long](flowAsFloatStringToCents, Money.centsToFloatString)
       )(BcData.apply)(BcData.unapply)
     )
   }

@@ -18,40 +18,40 @@ import models.accounting.config.Account
 import models._
 import models.accounting._
 import models.SlickUtils.dbApi._
-import models.accounting.money.Money
+import models.accounting.money.{Currency, Money, MoneyWithGeneralCurrency}
 
 @RunWith(classOf[JUnitRunner])
 class CashFlowEntriesTest extends Specification {
 
   "CashFlowEntry.fetchLastNEntries()" in new WithApplication {
     // get and persist dummy transactions/BCs
-    val trans1 = persistTransaction(groupId = 1, flow = Money(200), timestamp = 1000)
-    val bc1 = persistBalanceCheck(balance = Money(20), timestamp = 1010)
-    val trans2 = persistTransaction(groupId = 2, flow = Money(300), timestamp = 1020)
-    val trans3 = persistTransaction(groupId = 2, flow = Money(100), timestamp = 1030)
-    val bc2 = persistBalanceCheck(balance = Money(20), timestamp = 1040)
-    val bc3 = persistBalanceCheck(balance = Money(30), timestamp = 1050)
-    val bc4 = persistBalanceCheck(balance = Money(30), timestamp = 1060)
-    val bc5 = persistBalanceCheck(balance = Money(30), timestamp = 1070)
-    val trans4 = persistTransaction(groupId = 1, flow = Money(-200), timestamp = 1080)
-    val bc6 = persistBalanceCheck(balance = Money(-170), timestamp = 1085)
-    val trans5 = persistTransaction(groupId = 5, flow = Money(-50), timestamp = 1090)
-    val trans6 = persistTransaction(groupId = 6, flow = Money(-30), timestamp = 1100)
-    val bc7 = persistBalanceCheck(balance = Money(-250), timestamp = 1110)
+    val trans1 = persistTransaction(groupId = 1, flowInCents = 200, timestamp = 1000)
+    val bc1 = persistBalanceCheck(balanceInCents = 20, timestamp = 1010)
+    val trans2 = persistTransaction(groupId = 2, flowInCents = 300, timestamp = 1020)
+    val trans3 = persistTransaction(groupId = 2, flowInCents = 100, timestamp = 1030)
+    val bc2 = persistBalanceCheck(balanceInCents = 20, timestamp = 1040)
+    val bc3 = persistBalanceCheck(balanceInCents = 30, timestamp = 1050)
+    val bc4 = persistBalanceCheck(balanceInCents = 30, timestamp = 1060)
+    val bc5 = persistBalanceCheck(balanceInCents = 30, timestamp = 1070)
+    val trans4 = persistTransaction(groupId = 1, flowInCents = -200, timestamp = 1080)
+    val bc6 = persistBalanceCheck(balanceInCents = -170, timestamp = 1085)
+    val trans5 = persistTransaction(groupId = 5, flowInCents = -50, timestamp = 1090)
+    val trans6 = persistTransaction(groupId = 6, flowInCents = -30, timestamp = 1100)
+    val bc7 = persistBalanceCheck(balanceInCents = -250, timestamp = 1110)
 
-    persistBalanceCheck(balance = Money(20), timestamp = 99000, reservoir = otherTestReservoir)
-    persistTransaction(groupId = 10, flow = Money(29989), timestamp = 99000, reservoir = otherTestReservoir)
+    persistBalanceCheck(balanceInCents = 20, timestamp = 99000, reservoir = otherTestReservoir)
+    persistTransaction(groupId = 10, flowInCents = 29989, timestamp = 99000, reservoir = otherTestReservoir)
 
     // get expectations
     val expectedEntries = Vector(
-      RegularEntry(Seq(trans1), Money(200), false),
+      RegularEntry(Seq(trans1), MoneyWithGeneralCurrency(200, Currency.default), false),
       BalanceCorrection(bc1),
-      RegularEntry(Seq(trans2, trans3), Money(420), false),
+      RegularEntry(Seq(trans2, trans3), MoneyWithGeneralCurrency(420, Currency.default), false),
       BalanceCorrection(bc2),
       BalanceCorrection(bc3),
-      RegularEntry(Seq(trans4), Money(-170), true),
-      RegularEntry(Seq(trans5), Money(-220), false),
-      RegularEntry(Seq(trans6), Money(-250), true)
+      RegularEntry(Seq(trans4), MoneyWithGeneralCurrency(-170, Currency.default), true),
+      RegularEntry(Seq(trans5), MoneyWithGeneralCurrency(-220, Currency.default), false),
+      RegularEntry(Seq(trans6), MoneyWithGeneralCurrency(-250, Currency.default), true)
     )
 
     // run tests
@@ -70,8 +70,8 @@ class CashFlowEntriesTest extends Specification {
       if (i % 1000 == 0) {
         Logger.info(s"Persisting entries... (persisted $i)")
       }
-      persistTransaction(groupId = i, flow = Money(Random.nextInt), timestamp = i)
-      persistBalanceCheck(balance = Money(Random.nextInt), timestamp = i)
+      persistTransaction(groupId = i, flowInCents = Random.nextInt, timestamp = i)
+      persistBalanceCheck(balanceInCents = Random.nextInt, timestamp = i)
     }
 
     CashFlowEntry.fetchLastNEntries(testReservoir, n = 4000) must haveSize(4000)

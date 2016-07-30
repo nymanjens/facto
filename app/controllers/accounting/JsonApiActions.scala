@@ -1,7 +1,11 @@
 package controllers.accounting
 
+import common.Clock
 import controllers.helpers.accounting.GeneralEntry
 import models.accounting.Transactions
+import models.accounting.money.{Currency, DatedMoney}
+import org.joda.time.DateTime
+import play.api.data.{FormError, Forms}
 import play.api.mvc._
 
 // imports for 2.4 i18n (https://www.playframework.com/documentation/2.4.x/Migration24#I18n)
@@ -48,5 +52,21 @@ object JsonApiActions extends Controller {
       implicit request =>
         BalanceCheckOperations.doAddConfirmation(moneyReservoirCode, balanceInCents, mostRecentTransactionId)
         Ok(Json.toJson("OK"))
+    }
+
+  def exchangeMoney(fromCents: Long, fromCurrencyCode: String, dateString: String, toCurrencyCode: String) =
+    AuthenticatedAction { implicit user =>
+      implicit request =>
+        val date: DateTime = {
+          val parsedDate: Either[Seq[FormError], DateTime] = Forms.jodaDate("yyyy-MM-dd").bind(Map("" -> dateString))
+          parsedDate match {
+            case Left(error) => throw new IllegalArgumentException(error.toString)
+            case Right(date) => date
+          }
+        }
+
+        val fromMoney = DatedMoney(fromCents, Currency.of(fromCurrencyCode), date)
+        val toMoney = fromMoney.exchangedForCurrency(Currency.of(toCurrencyCode))
+        Ok(Json.toJson(toMoney.cents))
     }
 }

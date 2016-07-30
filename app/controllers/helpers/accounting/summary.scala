@@ -17,7 +17,7 @@ import models.accounting.config.{Account, Category}
 import models.accounting.config.Account.SummaryTotalRowDef
 import controllers.helpers.ControllerHelperCache
 import controllers.helpers.ControllerHelperCache.CacheIdentifier
-import models.accounting.money.Money
+import models.accounting.money.ReferenceMoney
 
 case class Summary(yearToSummary: Map[Int, SummaryForYear],
                    categories: Seq[Category],
@@ -83,7 +83,7 @@ object Summary {
 }
 
 case class SummaryForYear(cells: ImmutableTable[Category, DatedMonth, SummaryCell],
-                          categoryToAverages: Map[Category, Money],
+                          categoryToAverages: Map[Category, ReferenceMoney],
                           totalRows: Seq[SummaryTotalRow]) {
 
   def months: Seq[DatedMonth] = cells.columnKeySet().asScala.toList
@@ -163,13 +163,13 @@ object SummaryForYear {
 
     def result: SummaryForYear = {
       val cells = Tables.transformValues(cellBuilders, asGuava[SummaryCell.Builder, SummaryCell](_.result))
-      val categoryToAverages: Map[Category, Money] = {
+      val categoryToAverages: Map[Category, ReferenceMoney] = {
         toListMap {
           for (category <- account.categories) yield {
             val transactions = categoryToTransactions.get(category).asScala
-            val totalFlow = transactions.map(_.flow).sum
+            val totalFlow = transactions.map(_.flow.exchangedForReferenceCurrency).sum
             val numMonths = (monthRangeForAverages intersection MonthRange.forYear(year)).countMonths
-            val average = if (numMonths > 0) totalFlow / numMonths else Money(0)
+            val average = if (numMonths > 0) totalFlow / numMonths else ReferenceMoney(0)
             category -> average
           }
         }
@@ -184,12 +184,12 @@ object SummaryForYear {
 }
 
 case class SummaryCell(entries: Seq[GeneralEntry]) {
-  def totalFlow: Money = {
+  def totalFlow: ReferenceMoney = {
     {
       for {
         entry <- entries
         transaction <- entry.transactions
-      } yield transaction.flow
+      } yield transaction.flow.exchangedForReferenceCurrency
     }.sum
   }
 }
@@ -213,21 +213,21 @@ object SummaryCell {
   }
 }
 
-case class SummaryTotalRow(rowTitleHtml: Html, monthToTotal: Map[DatedMonth, Money], yearlyAverage: Money)
+case class SummaryTotalRow(rowTitleHtml: Html, monthToTotal: Map[DatedMonth, ReferenceMoney], yearlyAverage: ReferenceMoney)
 
 object SummaryTotalRow {
   def calculate(totalRowDef: SummaryTotalRowDef,
                 cells: Table[Category, DatedMonth, SummaryCell],
-                categoryToAverages: Map[Category, Money]): SummaryTotalRow = {
-    def sumNonIgnoredCategories(categoryToMoney: Map[Category, Money]): Money = {
+                categoryToAverages: Map[Category, ReferenceMoney]): SummaryTotalRow = {
+    def sumNonIgnoredCategories(categoryToMoney: Map[Category, ReferenceMoney]): ReferenceMoney = {
       categoryToMoney.filter { case (cat, _) => !totalRowDef.categoriesToIgnore.contains(cat) }.values.sum
     }
-    val monthToTotal: Map[DatedMonth, Money] = toListMap {
+    val monthToTotal: Map[DatedMonth, ReferenceMoney] = toListMap {
       for ((month, categoryToCell) <- cells.columnMap().asScala.toSeq.sortBy(_._1))
         yield month -> sumNonIgnoredCategories(
           categoryToMoney = categoryToCell.asScala.toMap.mapValues(_.totalFlow))
     }
-    val yearlyAverage: Money = sumNonIgnoredCategories(categoryToAverages)
+    val yearlyAverage: ReferenceMoney = sumNonIgnoredCategories(categoryToAverages)
     SummaryTotalRow(
       rowTitleHtml = totalRowDef.rowTitleHtml,
       monthToTotal = monthToTotal,

@@ -89,7 +89,7 @@ object FactoV1ImportTool {
             BalanceChecks.add(BalanceCheck(
               issuerId = issuer.id,
               moneyReservoirCode = moneyReservoirCode,
-              balance = Money.fromFloat(price.toDouble),
+              balanceInCents = Money.floatToCents(price.toDouble),
               createdDate = dateForMillisSinceEpoch(creationTime.toLong),
               checkDate = dateForMillisSinceEpoch(datePayed.toLong)))
 
@@ -103,7 +103,7 @@ object FactoV1ImportTool {
               moneyReservoirCode = moneyReservoirCode,
               categoryCode = categoryCode,
               description = StringEscapeUtils.unescapeHtml(StringEscapeUtils.unescapeHtml(description)),
-              flow = Money.fromFloat(price.toDouble),
+              flowInCents = Money.floatToCents(price.toDouble),
               createdDate = dateForMillisSinceEpoch(creationTime.toLong),
               transactionDate = dateForMillisSinceEpoch(datePayed.toLong),
               consumedDate = dateForMillisSinceEpoch(if (dateConsumed.toLong == 0) datePayed.toLong else dateConsumed.toLong)

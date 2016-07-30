@@ -18,12 +18,12 @@ class GeneralEntryTest extends Specification {
 
   "fetchLastNEntries()" in new WithApplication {
     // Get and persist dummy transactions
-    val trans1 = persistTransaction(groupId = 1, flow = Money(200), timestamp = 1000)
-    val trans2 = persistTransaction(groupId = 2, flow = Money(300), timestamp = 1020)
-    val trans3 = persistTransaction(groupId = 2, flow = Money(100), timestamp = 1030)
-    val trans4 = persistTransaction(groupId = 1, flow = Money(-200), timestamp = 1080)
-    val trans5 = persistTransaction(groupId = 5, flow = Money(-50), timestamp = 1090)
-    val trans6 = persistTransaction(groupId = 6, flow = Money(-30), timestamp = 1100)
+    val trans1 = persistTransaction(groupId = 1, flowInCents = 200, timestamp = 1000)
+    val trans2 = persistTransaction(groupId = 2, flowInCents = 300, timestamp = 1020)
+    val trans3 = persistTransaction(groupId = 2, flowInCents = 100, timestamp = 1030)
+    val trans4 = persistTransaction(groupId = 1, flowInCents = -200, timestamp = 1080)
+    val trans5 = persistTransaction(groupId = 5, flowInCents = -50, timestamp = 1090)
+    val trans6 = persistTransaction(groupId = 6, flowInCents = -30, timestamp = 1100)
 
     // Get expectations
     val expectedEntries = Vector(
@@ -51,12 +51,12 @@ class GeneralEntryTest extends Specification {
     persistTransaction(groupId = 92, account = testAccountA, category = testCategory)
 
     // Relevant
-    val trans1 = persistTransaction(groupId = 1, Money(201), timestamp = 1000, account = testAccountA, category = endowmentCategory)
-    val trans2 = persistTransaction(groupId = 2, Money(202), timestamp = 1010, account = testAccountA, category = endowmentCategory)
-    val trans3 = persistTransaction(groupId = 2, Money(203), timestamp = 1020, account = testAccountA, category = endowmentCategory)
-    val trans4 = persistTransaction(groupId = 3, Money(204), timestamp = 1030, account = testAccountA, category = endowmentCategory)
-    val trans5 = persistTransaction(groupId = 4, Money(205), timestamp = 1040, account = testAccountA, category = endowmentCategory)
-    val trans6 = persistTransaction(groupId = 5, Money(206), timestamp = 1050, account = testAccountA, category = endowmentCategory)
+    val trans1 = persistTransaction(groupId = 1, flowInCents = 201, timestamp = 1000, account = testAccountA, category = endowmentCategory)
+    val trans2 = persistTransaction(groupId = 2, flowInCents = 202, timestamp = 1010, account = testAccountA, category = endowmentCategory)
+    val trans3 = persistTransaction(groupId = 2, flowInCents = 203, timestamp = 1020, account = testAccountA, category = endowmentCategory)
+    val trans4 = persistTransaction(groupId = 3, flowInCents = 204, timestamp = 1030, account = testAccountA, category = endowmentCategory)
+    val trans5 = persistTransaction(groupId = 4, flowInCents = 205, timestamp = 1040, account = testAccountA, category = endowmentCategory)
+    val trans6 = persistTransaction(groupId = 5, flowInCents = 206, timestamp = 1050, account = testAccountA, category = endowmentCategory)
 
     // Get expectations
     val expectedEntries = Vector(
@@ -96,11 +96,11 @@ class GeneralEntryTest extends Specification {
 
     "Match the Money flow" in new WithApplication {
       // Get and persist dummy transactions
-      val trans1 = persistTransaction(flow = Money(999))
-      val trans2 = persistTransaction(flow = Money(-1234))
-      val trans3 = persistTransaction(flow = Money(91234))
-      val trans4 = persistTransaction(flow = Money(1234), timestamp = 1010)
-      val trans5 = persistTransaction(flow = Money(1234), timestamp = 1020)
+      val trans1 = persistTransaction(flowInCents = 999)
+      val trans2 = persistTransaction(flowInCents = -1234)
+      val trans3 = persistTransaction(flowInCents = 91234)
+      val trans4 = persistTransaction(flowInCents = 1234, timestamp = 1010)
+      val trans5 = persistTransaction(flowInCents = 1234, timestamp = 1020)
 
       // Get expectations
       val expectedEntries = Vector(
