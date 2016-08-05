@@ -60,14 +60,22 @@ object Config {
     case _ => loadedConfig.moneyReservoirs.get(code)
   }
 
-  val visibleReservoirs: Seq[MoneyReservoir] = loadedConfig.moneyReservoirs.values.filter(!_.hidden).toVector
-  def visibleReservoirs(includeNullReservoir: Boolean = false): Seq[MoneyReservoir] = {
-    if (includeNullReservoir) {
-      visibleReservoirs ++ Seq(NullMoneyReservoir)
-    } else {
-      visibleReservoirs
+  def moneyReservoirs(includeNullReservoir: Boolean = false, includeHidden: Boolean = false): Seq[MoneyReservoir] = {
+    var result = loadedConfig.moneyReservoirs.values.toVector
+    if (!includeHidden) {
+      result = result.filter(!_.hidden)
     }
+    if (includeNullReservoir) {
+      result ++= Seq(NullMoneyReservoir)
+    }
+    result
   }
+
+  // Shortcuts for moneyReservoirs(), added because visibleReservoirs makes it clearer that only visible reservoirs
+  // are returned than the equivalent moneyReservoirs()
+  val visibleReservoirs: Seq[MoneyReservoir] = moneyReservoirs()
+  def visibleReservoirs(includeNullReservoir: Boolean = false): Seq[MoneyReservoir] =
+    moneyReservoirs(includeNullReservoir = includeNullReservoir)
 
   def templatesToShowFor(location: Template.Placement, user: User): Seq[Template] =
     loadedConfig.templates filter (_.showFor(location, user))

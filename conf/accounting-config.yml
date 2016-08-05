@@ -166,6 +166,7 @@ moneyReservoirs:
         name: Savings account Alice at Just-Another-Bank
         shorterName: Savings Alice
         owner: *accountAlice
+        hidden: true
 
 templates:
   - code: new-withdrawal

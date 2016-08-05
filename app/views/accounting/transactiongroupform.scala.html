@@ -29,6 +29,13 @@
   }
 }
 
+@selectableReservoirs(transactionForm: Field) = @{
+  val currentReservoirCode = transactionForm("moneyReservoirCode").value.getOrElse("")
+  Config.moneyReservoirs(includeNullReservoir = false, includeHidden = true)
+        .filter(r => r.code == currentReservoirCode || !r.hidden) ++
+      Seq(MoneyReservoir.NullMoneyReservoir)
+}
+
 @extrascript = {
   <script src="@routes.Assets.at("javascripts/transactiongroupform.js")"></script>
 }
@@ -95,11 +102,10 @@
                 @bootstrap3.Select(transactionForm("beneficiaryAccountCode"), Messages("facto.beneficiary"), Config.accounts.mapValues(_.longName),
                     classes=Seq("bind-until-change", "bind-to-root-form", "beneficiaryAccountCode"))
                 @bootstrap3.Select(transactionForm("moneyReservoirCode"), Messages("facto.payed-with-to"),
-                    toListMap(Config.visibleReservoirs(includeNullReservoir = true).map(reservoir => reservoir.code -> reservoir.name)),
+                    toListMap(selectableReservoirs(transactionForm).map(reservoir => reservoir.code -> reservoir.name)),
                     classes=Seq("bind-until-change", "bind-to-root-form", "moneyReservoirCode"),
                     optionArgs=toListMap(
-                        Config.visibleReservoirs(includeNullReservoir = true)
-                          .map(reservoir => reservoir.code -> Map(
+                        selectableReservoirs(transactionForm).map(reservoir => reservoir.code -> Map(
                             Symbol("currency-code") -> reservoir.currency.code,
                             Symbol("currency-icon-class") -> reservoir.currency.iconClass))))
                 @bootstrap3.Select(transactionForm("categoryCode"), Messages("facto.category"),

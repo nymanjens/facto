@@ -18,7 +18,8 @@ object FormUtils {
 
   def validMoneyReservoir: Constraint[String] = oneOf(Config.visibleReservoirs.map(_.code))
 
-  def validMoneyReservoirOrNullReservoir: Constraint[String] = oneOf(Config.visibleReservoirs(includeNullReservoir = true).map(_.code))
+  def validMoneyReservoirOrNullReservoir: Constraint[String] =
+    oneOf(Config.moneyReservoirs(includeNullReservoir = true, includeHidden = true).map(_.code))
 
   def validAccountCode: Constraint[String] = oneOf(Config.accounts.values.map(_.code))
 
