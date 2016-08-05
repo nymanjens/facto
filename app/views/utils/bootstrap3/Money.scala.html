@@ -8,10 +8,11 @@
       <div class="input-group">
         <span class="input-group-addon currency-indicator"><i class="@currency.iconClass"></i>
         </span>
-        <input type="text" 
-               class="form-control form-input-money @classes.mkString(" ")" 
-               id="@field.id" 
-               name="@field.name" 
+        <input type="text"
+               autocomplete="off"
+               class="form-control form-input-money @classes.mkString(" ")"
+               id="@field.id"
+               name="@field.name"
                value="@field.value.getOrElse("")"
                placeholder="@placeholder" @toHtmlArgs(args) />
       </div>
