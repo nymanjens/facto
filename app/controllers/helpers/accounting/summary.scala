@@ -116,8 +116,8 @@ object SummaryForYear {
         if (tags.isEmpty) {
           allTransactions // don't filter
         } else {
-          def containsAllTags(iterable: Iterable[Tag]): Boolean = iterable.filter(tags.contains).size == tags.size
-          allTransactions.filter(trans => containsAllTags(trans.tags))
+          def containsAnyTag(seq: Seq[Tag]): Boolean = !seq.filter(tags.contains).isEmpty
+          allTransactions.filter(trans => containsAnyTag(trans.tags))
         }
       }
 
