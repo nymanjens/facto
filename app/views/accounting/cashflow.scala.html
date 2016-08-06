@@ -20,6 +20,7 @@
 @extrascript = {
   <script src="@routes.Assets.at("javascripts/cashflow.js")"></script>
 }
+@showingAllOfSingleReservoir = @{accountToReservoirs.size == 1}
 
 @Main(Messages("facto.cash-flow"), extrascript = extrascript, templatesInNavbar = templatesInNavbar, generateToc = true) {
   <h1 class="page-header"><i class="icon-money"></i> @Messages("facto.cash-flow")</h1>
@@ -27,7 +28,7 @@
   @for((account, reservoirs) <- accountToReservoirs) {
     @Panel(
       title = Messages("facto.account-of", account.longName),
-      panelClasses = if(account.isMineOrCommon) "" else "hidden other-accounts"
+      panelClasses = if(account.isMineOrCommon || showingAllOfSingleReservoir) "" else "hidden other-accounts"
     ) { @* panel content *@
 
       @for(reservoir <- reservoirs) {
@@ -85,7 +86,7 @@
   }
 
   @* Unhide other accounts *@
-  @if(!reservoirToEntries.filterKeys(!_.owner.isMineOrCommon).isEmpty) {
+  @if(!reservoirToEntries.filterKeys(!_.owner.isMineOrCommon).isEmpty && !showingAllOfSingleReservoir) {
     @OtherAccounts()
   }
 }
