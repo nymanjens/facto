@@ -29,10 +29,10 @@ GET  /acc/logs/all/                    controllers.accounting.GeneralActions.upd
 GET  /acc/templates/                   controllers.accounting.GeneralActions.templateList
 
 # Accounting - JSON API
-GET  /jsonapi/acc/descriptions/:beneficiaryCode/:reservoirCode/:categoryCode/  controllers.accounting.JsonApiActions.filterDescriptions(beneficiaryCode, reservoirCode, categoryCode, q ?= "")
-GET  /jsonapi/acc/tags/all/            controllers.accounting.JsonApiActions.getAllTags
-POST /jsonapi/acc/bc/confirm/:moneyReservoirCode/:balanceInCents/:mostRecentTransactionId/  controllers.accounting.JsonApiActions.addBalanceCheck(moneyReservoirCode, balanceInCents: Long, mostRecentTransactionId: Long)
-POST  /jsonapi/acc/money/exchange/:fromCents/:fromCurrency/:date/:toCurrency/  controllers.accounting.JsonApiActions.exchangeMoney(fromCents: Long, fromCurrency, date, toCurrency)
+GET  /jsonapi/acc/descriptions/:beneficiaryCode/:reservoirCode/:categoryCode/  controllers.accounting.JsonApi.filterDescriptions(beneficiaryCode, reservoirCode, categoryCode, q ?= "")
+GET  /jsonapi/acc/tags/all/            controllers.accounting.JsonApi.getAllTags
+POST /jsonapi/acc/bc/confirm/:moneyReservoirCode/:balanceInCents/:mostRecentTransactionId/  controllers.accounting.JsonApi.addBalanceCheck(moneyReservoirCode, balanceInCents: Long, mostRecentTransactionId: Long)
+POST  /jsonapi/acc/money/exchange/:fromCents/:fromCurrency/:date/:toCurrency/  controllers.accounting.JsonApi.exchangeMoney(fromCents: Long, fromCurrency, date, toCurrency)
 
 # Accounting - views
 GET  /acc/everything/                  controllers.accounting.Views.everythingLatest

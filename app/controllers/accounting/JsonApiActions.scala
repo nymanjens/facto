@@ -21,7 +21,7 @@ import controllers.helpers.AuthenticatedAction
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
 
-object JsonApiActions extends Controller {
+object JsonApi extends Controller {
 
   // ********** actions ********** //
   def filterDescriptions(beneficiaryCode: String, reservoirCode: String, categoryCode: String, query: String) =
