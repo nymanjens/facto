@@ -99,8 +99,10 @@
                 } else {
                   @bootstrap3.Text(transactionForm("issuerName"), Messages("facto.issuer"), args=Map('readonly -> "readonly"))
                 }
-                @bootstrap3.Select(transactionForm("beneficiaryAccountCode"), Messages("facto.beneficiary"), Config.accounts.mapValues(_.longName),
-                    classes=Seq("bind-until-change", "bind-to-root-form", "beneficiaryAccountCode"))
+                @bootstrap3.Select(transactionForm("beneficiaryAccountCode"), Messages("facto.beneficiary"),
+                    optionIdToNameMap=Config.accounts.mapValues(_.longName),
+                    classes=Seq("bind-until-change", "bind-to-root-form", "beneficiaryAccountCode"),
+                    optionArgs=Config.accounts.mapValues(acc => Map(Symbol("category-codes") -> acc.categories.map(_.code).mkString(" "))))
                 @bootstrap3.Select(transactionForm("moneyReservoirCode"), Messages("facto.payed-with-to"),
                     toListMap(selectableReservoirs(transactionForm).map(reservoir => reservoir.code -> reservoir.name)),
                     classes=Seq("bind-until-change", "bind-to-root-form", "moneyReservoirCode"),
@@ -109,10 +111,9 @@
                             Symbol("currency-code") -> reservoir.currency.code,
                             Symbol("currency-icon-class") -> reservoir.currency.iconClass))))
                 @bootstrap3.Select(transactionForm("categoryCode"), Messages("facto.category"),
-                    Config.categories.mapValues(category =>
+                    optionIdToNameMap=Config.categories.mapValues(category =>
                       if(category.helpText.isEmpty) category.name else s"${category.name} (${category.helpText})"),
-                    classes=Seq("bind-until-change", "bind-to-root-form", "categoryCode"),
-                    optionArgs=Config.categories.mapValues(cat => Map('accounts -> cat.accounts.map(_.code).mkString(" "))))
+                    classes=Seq("bind-until-change", "bind-to-root-form", "categoryCode"))
                 @bootstrap3.Text(transactionForm("description"), Messages("facto.description"),
                     classes=Seq("bind-until-change", "bind-to-root-form", "description"))
                 @bootstrap3.Money(transactionForm("flowAsFloat"), Currency.default, Messages("facto.flow"),

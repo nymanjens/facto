@@ -96,6 +96,7 @@ accounts:
       defaultElectronicReservoirCode: CARD_ALICE
       categories:
         - *catFun
+        - *catLife
         - *catTrans
         - *catCloth
         - *catRecur

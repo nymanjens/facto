@@ -110,6 +110,12 @@ getDefaultCurrencySymbol = ($formContainer) ->
 getTransactionDate = ($formContainer) ->
   $formContainer.find("input[id$=_transactionDate]").val()
 
+getBeneficiaryAccountCategoryCodes = ($formContainer) ->
+  $beneficiaryAccountSelect = $formContainer.find("select[id$=_beneficiaryAccountCode]")
+  accountCode = $beneficiaryAccountSelect.val()
+  $selectedOption = $beneficiaryAccountSelect.find("option[value='#{accountCode}']")
+  $selectedOption.attr("category-codes").split(' ')
+
 ### update total functions ###
 updateAllTotalState = ($thisFormContainer) ->
   getTotalInCentsFromInputs = (callback) ->
@@ -473,13 +479,24 @@ $(document).ready(() ->
     $beneficiaryAccountSelect = $formContainer.find("select[id$=_beneficiaryAccountCode]")
     $categorySelect = $formContainer.find("select[id$=_categoryCode]")
     updateCategories = () ->
-      beneficiaryAccountCode = $beneficiaryAccountSelect.val()
+      categoryCodes = getBeneficiaryAccountCategoryCodes($formContainer) # in order
+      currentCategory = $categorySelect.val()
       # update option's hidden state
-      $formContainer.find("option[accounts]").each(() ->
+      $categorySelect.find("option").each(() ->
         $option = $(this)
-        accounts = $option.attr("accounts").split(' ')
-        $option.toggleClass("hidden", beneficiaryAccountCode not in accounts)
+        $option.toggleClass("hidden", $option.val() not in categoryCodes)
       )
+      # adapt ordering to the one of categoryCodes
+      $firstUnorderedOption = $categorySelect.find("option").first()
+      first = true
+      for nextCategoryCode in categoryCodes
+        $nextOption = $categorySelect.find("option[value='#{nextCategoryCode}']")
+        if first
+          first = false
+          $firstUnorderedOption.before($nextOption)
+        else
+          $previousOption.after($nextOption)
+        $previousOption = $nextOption
       # make sure the current value is not hidden
       if($categorySelect.find("option:selected").hasClass("hidden"))
         $categorySelect.val($categorySelect.find("option").not(".hidden").first().val())
