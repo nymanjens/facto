@@ -38,7 +38,8 @@ POST  /jsonapi/acc/money/exchange/:fromCents/:fromCurrency/:date/:toCurrency/  c
 GET  /acc/everything/                  controllers.accounting.Views.everythingLatest
 GET  /acc/everything/all/              controllers.accounting.Views.everythingAll
 GET  /acc/cashflow/                    controllers.accounting.Views.cashFlowOfAll
-GET  /acc/cashflow/:reservoirCode/     controllers.accounting.Views.cashFlowOfSingle(reservoirCode)
+GET  /acc/cashflow/r/:reservoirCode/   controllers.accounting.Views.cashFlowOfSingle(reservoirCode)
+GET  /acc/cashflow/hidden/             controllers.accounting.Views.cashFlowOfHidden
 GET  /acc/liquidation/                 controllers.accounting.Views.liquidationOfAll
 GET  /acc/liquidation/:accountCode1/:accountCode2/  controllers.accounting.Views.liquidationOfSingle(accountCode1, accountCode2)
 GET  /acc/endowments/                  controllers.accounting.Views.endowmentsOfAll

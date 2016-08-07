@@ -44,6 +44,14 @@ object Views extends Controller {
         reservoirs = Seq(Config.moneyReservoir(reservoirCode)))
   }
 
+  def cashFlowOfHidden = AuthenticatedAction { implicit user =>
+    implicit request =>
+      cashFlow(
+        reservoirs = Config.moneyReservoirs(includeHidden=true).filter(_.hidden),
+        numEntriesShownByDefaultToShow = 10,
+        expandedNumEntriesToShow = 30)
+  }
+
   def liquidationOfAll = AuthenticatedAction { implicit user =>
     implicit request =>
       val allCombinations: Seq[AccountPair] =
