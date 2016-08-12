@@ -18,6 +18,19 @@ String.prototype.replaceAll = function(search, replacement) {
     return target.split(search).join(replacement);
 };
 
+// source: http://stackoverflow.com/a/1961068/1218058
+Array.prototype.unique = function(){
+   var u = {}, a = [];
+   for(var i = 0, l = this.length; i < l; ++i){
+      if(u.hasOwnProperty(this[i])) {
+         continue;
+      }
+      a.push(this[i]);
+      u[this[i]] = 1;
+   }
+   return a;
+}
+
 // source: http://stackoverflow.com/a/15313435/1218058
 function assert(condition, message) {
     if (!condition) {

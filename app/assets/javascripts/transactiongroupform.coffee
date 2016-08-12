@@ -107,6 +107,11 @@ getDefaultCurrencySymbol = ($formContainer) ->
   $nullReservoirOption = $reservoirCodeSelect.find("option[value='']")
   $nullReservoirOption.attr("currency-code")
 
+getDefaultCurrencyIconClass = ($formContainer) ->
+  $reservoirCodeSelect = $formContainer.find("select[id$=_moneyReservoirCode]")
+  $nullReservoirOption = $reservoirCodeSelect.find("option[value='']")
+  $nullReservoirOption.attr("currency-icon-class")
+
 getTransactionDate = ($formContainer) ->
   $formContainer.find("input[id$=_transactionDate]").val()
 
@@ -118,7 +123,7 @@ getBeneficiaryAccountCategoryCodes = ($formContainer) ->
 
 ### update total functions ###
 updateAllTotalState = ($thisFormContainer) ->
-  getTotalInCentsFromInputs = (callback) ->
+  getTotalInDefaultCentsFromInputs = (callback) ->
     datedMoneyArray = []
     $(".transaction-holder").each () ->
       $formContainer = $(this)
@@ -132,7 +137,7 @@ updateAllTotalState = ($thisFormContainer) ->
   isZeroSumForm = () ->
     $("input:radio[name=zeroSum]:checked").val() == "true"
 
-  fixTotalZeroIfNotLast = (totalInCents, callback) ->
+  fixTotalZeroIfNotLast = (totalInDefaultCents, callback) ->
     $lastContainer = $(".transaction-holder").last()
     isLast = $lastContainer.is($thisFormContainer)
     numForms = $(".transaction-holder").length
@@ -140,32 +145,60 @@ updateAllTotalState = ($thisFormContainer) ->
       lastValue = parseMoneyAsFloatToCents(($lastContainer.find(".flow-as-float").val()))
       lastCurrencyCode = getReservoirCurrencyCode($lastContainer)
       lastConsumedDate = getTransactionDate($lastContainer)
-      datedMoney = new DatedMoney(totalInCents, MONEY_EXCHANGER.defaultCurrencyCode, lastConsumedDate)
-      MONEY_EXCHANGER.exchangeTo(datedMoney, lastCurrencyCode, (totalInCents) ->
-        newLastValue = lastValue - totalInCents
+      datedMoney = new DatedMoney(totalInDefaultCents, MONEY_EXCHANGER.defaultCurrencyCode, lastConsumedDate)
+      MONEY_EXCHANGER.exchangeTo(datedMoney, lastCurrencyCode, (totalInDefaultCents) ->
+        newLastValue = lastValue - totalInDefaultCents
         $lastContainer.find(".flow-as-float").val(centsToFloatString(newLastValue))
         updateInDefaultCurrency($lastContainer)
         callback(0)
       )
     else
-      callback(totalInCents)
+      callback(totalInDefaultCents)
 
-  updateTotal = (totalInCents) ->
-    if totalInCents == null
-      $(".total-transaction-flow").html("...")
-    else
-      $(".total-transaction-flow").html(centsToFloatString(totalInCents))
+  updateTotal = (totalInDefaultCents) ->
+    distinctCurrencyCodes = () ->
+      codes = []
+      $(".transaction-holder").each () ->
+        $formContainer = $(this)
+        codes.push(getReservoirCurrencyCode($formContainer))
+      codes.unique()
+    symbol = (currencyIconClass) ->
+      "<i class='#{currencyIconClass}'></i>"
+    getTotalInUnexchangedCentsFromInputs = () ->
+      total = 0
+      $(".transaction-holder").each () ->
+        $formContainer = $(this)
+        total += parseMoneyAsFloatToCents($formContainer.find(".flow-as-float").val())
+      total
 
-  updateTotalColor = (totalInCents) ->
+    defaultCurrencyIconClass = getDefaultCurrencyIconClass($(".transaction-holder").first())
+    defaultCurrencyString = "#{symbol(defaultCurrencyIconClass)} " +
+      if totalInDefaultCents == null
+        "..."
+      else
+        centsToFloatString(totalInDefaultCents)
+
+    totalString = defaultCurrencyString
+    if distinctCurrencyCodes().length == 1
+      $formContainer = $(".transaction-holder").first()
+      currencyCode = getReservoirCurrencyCode($formContainer)
+      currencyIconClass = getReservoirCurrencyIconClass($formContainer)
+      if currencyCode != MONEY_EXCHANGER.defaultCurrencyCode
+        totalInForeignCents = getTotalInUnexchangedCentsFromInputs()
+        totalString = "#{symbol(currencyIconClass)} #{centsToFloatString(totalInForeignCents)} " +
+            "(#{defaultCurrencyString})"
+    $(".total-transaction-flow").html(totalString)
+
+  updateTotalColor = (totalInDefaultCents) ->
     zeroSum = isZeroSumForm()
-    $(".total-flow-text").toggleClass("nonzero-warning", zeroSum && totalInCents != 0)
+    $(".total-flow-text").toggleClass("nonzero-warning", zeroSum && totalInDefaultCents != 0)
 
   updateTotal(null)
   updateTotalColor(0)
-  getTotalInCentsFromInputs (totalInCents) ->
-    fixTotalZeroIfNotLast(totalInCents, (totalInCents) ->
-      updateTotal(totalInCents)
-      updateTotalColor(totalInCents)
+  getTotalInDefaultCentsFromInputs (totalInDefaultCents) ->
+    fixTotalZeroIfNotLast(totalInDefaultCents, (totalInDefaultCents) ->
+      updateTotal(totalInDefaultCents)
+      updateTotalColor(totalInDefaultCents)
     )
 
 ### update in-default-currency ###
