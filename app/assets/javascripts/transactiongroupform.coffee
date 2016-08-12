@@ -144,6 +144,7 @@ updateAllTotalState = ($thisFormContainer) ->
       MONEY_EXCHANGER.exchangeTo(datedMoney, lastCurrencyCode, (totalInCents) ->
         newLastValue = lastValue - totalInCents
         $lastContainer.find(".flow-as-float").val(centsToFloatString(newLastValue))
+        updateInDefaultCurrency($lastContainer)
         callback(0)
       )
     else
@@ -166,6 +167,19 @@ updateAllTotalState = ($thisFormContainer) ->
       updateTotal(totalInCents)
       updateTotalColor(totalInCents)
     )
+
+### update in-default-currency ###
+updateInDefaultCurrency = (formContainer) ->
+  $formContainer = $(formContainer)
+
+  cents = parseMoneyAsFloatToCents($formContainer.find(".flow-as-float").val())
+  currencyCode = getReservoirCurrencyCode($formContainer)
+  date = getTransactionDate($formContainer)
+  MONEY_EXCHANGER.exchangeToDefault(new DatedMoney(cents, currencyCode, date), (defaultCents) ->
+    $inDefaultCurrency = $formContainer.find(".in-default-currency")
+    $inDefaultCurrency.toggleClass("hidden", currencyCode == MONEY_EXCHANGER.defaultCurrencyCode)
+    $inDefaultCurrency.find(".amount").html(centsToFloatString(defaultCents))
+  )
 
 ### setup descriptions' typeahead ###
 setupDescriptionsTypeahead = (formContainer) ->
@@ -273,6 +287,7 @@ setupFlowCurrencyUpdate = (formContainer) ->
     $formContainer.find(".currency-indicator").html("<i class='#{currencyIconClass}'></i>")
 
     updateAllTotalState($formContainer)
+    updateInDefaultCurrency($formContainer)
 
   $reservoirCodeSelect = $formContainer.find("select[id$=_moneyReservoirCode]")
   $reservoirCodeSelect.keydown(() -> setTimeout(() -> updateFlowCurrency()))
@@ -510,6 +525,13 @@ $(document).ready(() ->
     $formContainer.find(".flow-as-float").change(() -> updateAllTotalState($formContainer))
     $formContainer.find("input[id$=_transactionDate]").keydown(() -> setTimeout(() -> updateAllTotalState($formContainer)))
     $formContainer.find("input[id$=_transactionDate]").change(() -> updateAllTotalState($formContainer))
+
+    ### update in-default-currency ###
+    $formContainer.find(".flow-as-float").keydown(() -> setTimeout(() -> updateInDefaultCurrency($formContainer)))
+    $formContainer.find(".flow-as-float").change(() -> updateInDefaultCurrency($formContainer))
+    $formContainer.find("input[id$=_transactionDate]").keydown(() -> setTimeout(() -> updateInDefaultCurrency($formContainer)))
+    $formContainer.find("input[id$=_transactionDate]").change(() -> updateInDefaultCurrency($formContainer))
+    updateInDefaultCurrency($formContainer)
 
   $(".transaction-holder").each(() -> addTransactionSpecificEventListeners(this))
   $(".transaction-holder").each(() -> setupDescriptionsTypeahead(this))

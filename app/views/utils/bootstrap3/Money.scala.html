@@ -6,7 +6,8 @@
     <label class="col-sm-4 control-label">@label</label>
     <div class="col-sm-8">
       <div class="input-group">
-        <span class="input-group-addon currency-indicator"><i class="@currency.iconClass"></i>
+        <span class="input-group-addon currency-indicator">
+          <i class="@currency.iconClass"></i>
         </span>
         <input type="text"
                autocomplete="off"
@@ -15,6 +16,10 @@
                name="@field.name"
                value="@field.value.getOrElse("")"
                placeholder="@placeholder" @toHtmlArgs(args) />
+        <span class="input-group-addon in-default-currency hidden">
+          <i class="@Currency.default.iconClass"></i>
+          <span class="amount"></span>
+        </span>
       </div>
       <span class="help-block">@help</span>
       <span class="help-block">@{field.error.map { error => Messages(error.message) }}</span>
