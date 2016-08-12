@@ -13,12 +13,6 @@
       "src": "fontelico"
     },
     {
-      "uid": "36a1cee80657a9c66e8384dd57bed66c",
-      "css": "water",
-      "code": 59393,
-      "src": "entypo"
-    },
-    {
       "uid": "8a4eb4f98d8e0f3686a741c952b03c08",
       "css": "tennis",
       "code": 59394,
@@ -51,13 +45,19 @@
     {
       "uid": "4b900d04e8ab8c82f080c1cfbac5772c",
       "css": "check-empty",
-      "code": 59401,
+      "code": 59399,
       "src": "fontawesome"
     },
     {
       "uid": "30b79160618d99ce798e4bd11cafe3fe",
       "css": "food",
-      "code": 59402,
+      "code": 59400,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "ff1710a605b3fc98346903db89034558",
+      "css": "balance-scale",
+      "code": 62030,
       "src": "fontawesome"
     }
   ]
