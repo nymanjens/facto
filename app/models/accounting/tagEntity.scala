@@ -67,7 +67,7 @@ object TagEntities extends ImmutableEntityManager[TagEntity, TagEntities](
         Tag(tagName) -> multiset.count(tagName)
       }
     }
-    val tagToUsageMap: Map[Tag, Int] = tagToUsagePairs.toMap
+    val tagToUsageMap: Map[Tag, Int] = tagToUsagePairs.toMap withDefault (_ => 0)
 
     val selectedTagsMap: ListMap[Tag, Int] = {
       toListMap(
