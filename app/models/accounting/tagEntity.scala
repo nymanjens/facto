@@ -80,7 +80,10 @@ object TagEntities extends ImmutableEntityManager[TagEntity, TagEntities](
       if (numRecommendations <= 0) {
         toListMap(Seq())
       } else {
-        toListMap(tagToUsagePairs.sortBy(-_._2).take(numRecommendations))
+        toListMap(
+          tagToUsagePairs.sortBy(-_._2)
+            .filter{ case (tag, usage) => !selectedTagsMap.contains(tag) }
+            .take(numRecommendations))
       }
     }
 
