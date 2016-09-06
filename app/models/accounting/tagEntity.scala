@@ -38,7 +38,7 @@ class TagEntities(tag: SlickTag) extends EntityTable[TagEntity](tag, TagEntities
   def name = column[String]("name")
   def transactionId = column[Long]("transactionId")
 
-  override def * = (name, transactionId, id.?) <>(TagEntity.tupled, TagEntity.unapply)
+  override def * = (name, transactionId, id.?) <> (TagEntity.tupled, TagEntity.unapply)
 }
 
 object TagEntities extends ImmutableEntityManager[TagEntity, TagEntities](
@@ -82,7 +82,7 @@ object TagEntities extends ImmutableEntityManager[TagEntity, TagEntities](
       } else {
         toListMap(
           tagToUsagePairs.sortBy(-_._2)
-            .filter{ case (tag, usage) => !selectedTagsMap.contains(tag) }
+            .filter { case (tag, usage) => !selectedTagsMap.contains(tag) }
             .take(numRecommendations))
       }
     }
