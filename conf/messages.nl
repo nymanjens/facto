@@ -34,6 +34,7 @@ facto.error.noReservoir.atLeast2=Minstens twee inboekingen vereist bij fictieve 
 facto.error.noReservoir.zeroSum=De som van de bedragen bij een fictieve overschrijving moet 0 zijn
 facto.error.noReservoir.notAllTheSame=Fictieve overschrijving moet voor ofwel alle ofwel geen enkele inboeking geselecteerd worden
 facto.error.foreignReservoirInFuture=Er is een betaaldatum gedefiniëerd in de toekomst bij een buitenlandse munteenheid
+facto.error.duplicateTransactionGroup=Er is al een identieke inboeking. Als dit de bedoeling is, kan deze check overgeslagen worden door iets unieks toe te voegen aan "Meer info".
 
 facto.user-profile=Profiel
 facto.user-administration=Administratie

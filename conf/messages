@@ -81,6 +81,7 @@ facto.error.noReservoir.atLeast2=To be able to use the N/A money reservoir, ther
 facto.error.noReservoir.zeroSum=To be able to use the N/A money reservoir, the total flow of this group must sum to 0
 facto.error.noReservoir.notAllTheSame=The N/A money reservoir can be selected for either all transactions or no transactions
 facto.error.foreignReservoirInFuture=There is a "date payed" field defined in the future for a foreign currency
+facto.error.duplicateTransactionGroup=There already exists a transaction that is exactly the same. If this is intended, you can bypass this check by adding something unique to "More info".
 
 facto.user-profile=User Profile
 facto.user-administration=User Administration

@@ -20,6 +20,8 @@ import org.joda.time.DateTime
 
 import com.github.nscala_time.time.Imports._
 import common.{Clock, ReturnTo}
+import models.SlickUtils.dbApi._
+import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
 import models.User
 import models.accounting.{Transaction, Transactions, TransactionPartial, TransactionGroup, TransactionGroupPartial, TransactionGroups, UpdateLogs}
 import models.accounting.config.{Config, Account, MoneyReservoir, Category, Template}
@@ -176,7 +178,7 @@ object TransactionGroupOperations extends Controller {
           }
         }
 
-        Forms.transactionGroupForm.bindFromRequest(cleanedRequestMap).fold(
+        Forms.transactionGroupForm.forOperation(operationMeta).bindFromRequest(cleanedRequestMap).fold(
           formWithErrors => {
             BadRequest(formView(operationMeta, formWithErrors))
           },
@@ -240,7 +242,7 @@ object TransactionGroupOperations extends Controller {
                                       formData: Forms.TransGroupData,
                                       templatesInNavbar: Seq[Template] = Seq())
                                      (implicit user: User, request: Request[AnyContent], returnTo: ReturnTo): Html =
-    formView(operationMeta, Forms.transactionGroupForm.fill(formData), templatesInNavbar)
+    formView(operationMeta, Forms.transactionGroupForm.forOperation(operationMeta).fill(formData), templatesInNavbar)
 
 
   private def formView(operationMeta: OperationMeta,
@@ -324,8 +326,15 @@ object TransactionGroupOperations extends Controller {
     }
 
     // ********** form classes ********** //
-    val transactionGroupForm: Form[TransGroupData] = Form(
-      mapping(
+    val transactionGroupForm = new Object {
+      def forOperation(operationMeta: OperationMeta): Form[TransGroupData] = operationMeta match {
+        case AddNewOperationMeta() =>
+          Form(formMapping verifying uniqueTransaction)
+        case EditOperationMeta(_) =>
+          Form(formMapping)
+      }
+
+      private val formMapping: Mapping[TransGroupData] = mapping(
         "transactions" -> seq(
           mapping(
             "issuerName" -> text,
@@ -341,7 +350,9 @@ object TransactionGroupOperations extends Controller {
           )(TransactionData.apply)(TransactionData.unapply)
         ),
         "zeroSum" -> boolean
-      )(TransGroupData.apply)(TransGroupData.unapply) verifying Constraint[TransGroupData]("error.invalid")(groupData => {
+      )(TransGroupData.apply)(TransGroupData.unapply) verifying validMoneyReservoirs verifying noFutureForeignTransactions
+
+      private def validMoneyReservoirs = Constraint[TransGroupData]((groupData: TransGroupData) => {
         val containsEmptyReservoirCodes = groupData.transactions.exists(_.moneyReservoirCode == "")
         val allReservoirCodesAreEmpty = !groupData.transactions.exists(_.moneyReservoirCode != "")
         val totalFlowInCents = groupData.transactions.map(_.flowInCents).sum
@@ -359,9 +370,11 @@ object TransactionGroupOperations extends Controller {
           case _ if containsEmptyReservoirCodes => invalidWithMessageCode("facto.error.noReservoir.notAllTheSame")
           case _ => Valid
         }
-      }) verifying Constraint[TransGroupData]("error.invalid")(groupData => {
-        // Don't allow future transactions in a foreign currency because we don't know what the exchange rate
-        // to the default currency will be. Future fluctuations might break the immutability of the conversion.
+      })
+
+      // Don't allow future transactions in a foreign currency because we don't know what the exchange rate
+      // to the default currency will be. Future fluctuations might break the immutability of the conversion.
+      private def noFutureForeignTransactions = Constraint[TransGroupData]((groupData: TransGroupData) => {
         val futureForeignTransactions = groupData.transactions.filter { transactionData =>
           val foreignCurrency = Config.moneyReservoir(transactionData.moneyReservoirCode).currency.isForeign
           val dateInFuture = transactionData.transactionDate > Clock.now
@@ -373,13 +386,36 @@ object TransactionGroupOperations extends Controller {
           invalidWithMessageCode("facto.error.foreignReservoirInFuture")
         }
       })
-    )
+
+      // Don't allow creation of duplicate transactions because they are probably unintended (e.g. pressing enter twice).
+      private def uniqueTransaction = Constraint[TransGroupData]((groupData: TransGroupData) => {
+        def fetchMatchingTransaction(transactionData: TransactionData): Option[Transaction] = {
+          val possibleMatches = dbRun(
+            Transactions.newQuery
+              .filter(_.transactionDate === transactionData.transactionDate)
+              .filter(_.categoryCode === transactionData.categoryCode))
+
+          possibleMatches.view
+            .filter(trans => TransactionData.fromModel(trans) == transactionData).headOption
+        }
+
+        val matches = groupData.transactions.toStream.map(fetchMatchingTransaction)
+        if (matches.filter(_ == None).isEmpty) {
+          // Matching transaction present for all transactionDatas
+          if (matches.map(_.get.transactionGroupId).toSet.size == 1) {
+            // All same group
+            invalidWithMessageCode("facto.error.duplicateTransactionGroup")
+          } else {
+            Valid
+          }
+        } else {
+          Valid
+        }
+      })
+    }
   }
 
-  private sealed trait OperationMeta
-
-  private case class AddNewOperationMeta() extends OperationMeta
-
-  private case class EditOperationMeta(transGroupId: Long) extends OperationMeta
-
+  private[TransactionGroupOperations] sealed trait OperationMeta
+  private[TransactionGroupOperations] case class AddNewOperationMeta() extends OperationMeta
+  private[TransactionGroupOperations] case class EditOperationMeta(transGroupId: Long) extends OperationMeta
 }

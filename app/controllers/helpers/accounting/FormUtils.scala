@@ -25,26 +25,25 @@ object FormUtils {
 
   def validCategoryCode: Constraint[String] = oneOf(Config.categories.values.map(_.code))
 
-  def validFlowAsFloat = Constraint[String]("error.invalid") { string =>
+  def validFlowAsFloat = Constraint[String] { (string: String) =>
     normalizeMoneyString(string) match {
       case flowAsFloatRegex() => Valid
       case _ => invalidWithMessageCode("error.invalid")
     }
   }
 
-  def validTagsString = Constraint[String]("error.invalid")({
-    tagsString =>
-      if (tagsString == "") {
-        Valid
+  def validTagsString = Constraint[String]({ (tagsString: String) =>
+    if (tagsString == "") {
+      Valid
+    } else {
+      val tags = Splitter.on(",").split(tagsString).asScala.toList
+      val anyInvalid = tags.exists(tag => !Tag.isValidTagName(tag))
+      if (anyInvalid) {
+        invalidWithMessageCode("error.invalid")
       } else {
-        val tags = Splitter.on(",").split(tagsString).asScala.toList
-        val anyInvalid = tags.exists(tag => !Tag.isValidTagName(tag))
-        if (anyInvalid) {
-          invalidWithMessageCode("error.invalid")
-        } else {
-          Valid
-        }
+        Valid
       }
+    }
   })
 
   def flowAsFloatStringToCents(string: String): Long = {
@@ -57,13 +56,12 @@ object FormUtils {
 
   def invalidWithMessageCode(code: String) = Invalid(Seq(ValidationError(code)))
 
-  private def oneOf(options: Iterable[String]) = Constraint[String]("error.invalid")({
-    input =>
-      if (options.toSet.contains(input)) {
-        Valid
-      } else {
-        invalidWithMessageCode("error.invalid")
-      }
+  private def oneOf(options: Iterable[String]) = Constraint[String]({ (input: String) =>
+    if (options.toSet.contains(input)) {
+      Valid
+    } else {
+      invalidWithMessageCode("error.invalid")
+    }
   })
 
   /**
