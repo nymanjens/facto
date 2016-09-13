@@ -11,7 +11,9 @@ import org.joda.time.Duration
 
 private[sync] final class GuavaBackedSynchronizedCache[K <: Object, V <: Object](expireAfterAccess: Duration, maximumSize: Long)
   extends SynchronizedCache[K, V] {
-  CacheRegistry.registerCache(doMaintenance = () => guavaCache.cleanUp())
+  CacheRegistry.registerCache(
+    doMaintenance = () => guavaCache.cleanUp(),
+    resetForTests = () => guavaCache.invalidateAll())
 
   @GuardedBy("lock (all reads and writes)")
   private val guavaCache: Cache[K, V] = CacheBuilder.newBuilder()

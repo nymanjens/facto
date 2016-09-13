@@ -9,8 +9,10 @@ import org.joda.time.DateTime
 import scala.collection.mutable
 
 private[money] object ExchangeRateManager {
-  CacheRegistry.registerCache(verifyConsistency = verifyConsistency, resetForTests = resetForTests)
-  ExchangeRateMeasurements.addListener(measurementAddedListener = measurementWasAdded)
+  CacheRegistry.registerCache(
+    verifyConsistency = verifyConsistency,
+    resetForTests = resetForTests)
+  ExchangeRateMeasurements.addListener(measurementWasAdded)
 
   @GuardedBy("lock")
   private val measurementsCache: mutable.Map[Currency, NavigableMap[DateTime, Double]] = mutable.Map()
