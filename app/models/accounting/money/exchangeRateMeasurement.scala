@@ -44,15 +44,16 @@ object ExchangeRateMeasurements extends ImmutableEntityManager[ExchangeRateMeasu
     tag => new ExchangeRateMeasurements(tag), tableName = "EXCHANGE_RATE_MEASUREMENT")) {
 
   type AdditionListener = ExchangeRateMeasurement => Unit
-  @volatile var listeners: Vector[AdditionListener] = Nil
+  @volatile var listeners: Vector[AdditionListener] = Vector.empty
 
   override def add(measurement: ExchangeRateMeasurement): ExchangeRateMeasurement = {
-    super.add(measurement)
+    val added = super.add(measurement)
 
     // Call addition listeners
     for (additionListener <- listeners) {
       additionListener(measurement)
     }
+    added
   }
 
   def addListener(measurementAddedListener: AdditionListener): Unit = {
