@@ -5,7 +5,7 @@ import org.specs2.specification.core.Fragments
 
 trait HookedSpecification extends Specification {
 
-  override def map(fragments: => Fragments): Fragments = {
+  override final def map(fragments: => Fragments): Fragments = {
     val fragmentsWithBeforeAndAfter = fragments flatMap (fragment => {
       val extendedFragments: Fragments = step(before) ^ fragment ^ step(after)
       extendedFragments.contents
