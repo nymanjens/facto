@@ -1,5 +1,8 @@
 package models.accounting.money
 
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.function.Consumer
+
 import com.google.common.collect.{ImmutableMultiset, Multiset}
 import common.Clock
 import common.CollectionUtils.toListMap
@@ -40,8 +43,20 @@ object ExchangeRateMeasurements extends ImmutableEntityManager[ExchangeRateMeasu
   EntityManager.create[ExchangeRateMeasurement, ExchangeRateMeasurements](
     tag => new ExchangeRateMeasurements(tag), tableName = "EXCHANGE_RATE_MEASUREMENT")) {
 
-  def addListener(measurementAddedListener: ExchangeRateMeasurement => Unit): Unit = {
-    ???
+  type AdditionListener = ExchangeRateMeasurement => Unit
+  @volatile var listeners: Vector[AdditionListener] = Nil
+
+  override def add(measurement: ExchangeRateMeasurement): ExchangeRateMeasurement = {
+    super.add(measurement)
+
+    // Call addition listeners
+    for (additionListener <- listeners) {
+      additionListener(measurement)
+    }
+  }
+
+  def addListener(measurementAddedListener: AdditionListener): Unit = {
+    listeners :+= measurementAddedListener
   }
 
   def fetchAll(currency: Currency): Seq[ExchangeRateMeasurement] = {
