@@ -1,9 +1,10 @@
 package common
 
+import scala.collection.{Seq => MutableSeq}
 import scala.collection.immutable.Seq
-
 import com.google.common.collect.Range
 import org.joda.time.{DateTime, Months}
+import play.api.data.{FormError, Forms}
 
 object TimeUtils {
 
@@ -42,4 +43,19 @@ object TimeUtils {
   object October extends Month(10)
   object November extends Month(11)
   object December extends Month(12)
+
+
+  /**
+    * Parses the incoming date string to a DateTime.
+    *
+    * @param dateString in the form of yyyy-mm-dd, e.g. "2016-03-13".
+    * @throws IllegalArgumentException if the given string could not be parsed
+    */
+  def parseDateString(dateString: String): DateTime = {
+    val parsedDate: Either[MutableSeq[FormError], DateTime] = Forms.jodaDate("yyyy-MM-dd").bind(Map("" -> dateString))
+    parsedDate match {
+      case Left(error) => throw new IllegalArgumentException(error.toString)
+      case Right(date) => date
+    }
+  }
 }

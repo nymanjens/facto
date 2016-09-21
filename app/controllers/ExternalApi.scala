@@ -2,9 +2,10 @@ package controllers
 
 import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
-import common.Clock
+import common.{Clock, TimeUtils}
 import models.accounting._
 import models.accounting.config.{Account, Config}
+import models.accounting.money.{Currency, ExchangeRateMeasurement, ExchangeRateMeasurements}
 
 import scala.collection.immutable.Seq
 import play.api.data.Form
@@ -73,6 +74,21 @@ object ExternalApi extends Controller {
     Ok("OK")
   }
 
+  def addExchangeRateMeasurement(dateString: String,
+                                 foreignCurrencyCode: String,
+                                 ratioReferenceToForeignCurrency: Double,
+                                 applicationSecret: String) = Action { implicit request =>
+    validateApplicationSecret(applicationSecret)
+
+    val date = TimeUtils.parseDateString(dateString)
+    require(Currency.of(foreignCurrencyCode).isForeign)
+
+    ExchangeRateMeasurements.add(ExchangeRateMeasurement(
+      date = date,
+      foreignCurrencyCode = foreignCurrencyCode,
+      ratioReferenceToForeignCurrency = ratioReferenceToForeignCurrency))
+    Ok("OK")
+  }
 
   // ********** private helper methods ********** //
   private def validateApplicationSecret(applicationSecret: String) = {
