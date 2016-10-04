@@ -92,7 +92,7 @@ object Global extends GlobalSettings {
     CsvImportTool.importTransactions(assertExists(csvDataFolder resolve "transactions.csv"))
     CsvImportTool.importBalanceChecks(assertExists(csvDataFolder resolve "balancechecks.csv"))
     ExchangeRateMeasurements.add(ExchangeRateMeasurement(
-      date = new DateTime(0),
+      date = new DateTime(1990, 1, 1, 0, 0), // Jan 1, 1990
       foreignCurrencyCode = "GBP",
       ratioReferenceToForeignCurrency = 1.2))
   }
