@@ -1,10 +1,10 @@
 package models.manager
 
-import scala.util.{Success, Failure, Try}
+import scala.util.{Failure, Success, Try}
 import scala.collection.immutable.Seq
-
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
+import play.api.Logger
 
 private[manager] final class DatabaseBackedEntityManager[E <: Entity[E], T <: EntityTable[E]](cons: Tag => T,
                                                                                               val tableName: String)
@@ -12,6 +12,7 @@ private[manager] final class DatabaseBackedEntityManager[E <: Entity[E], T <: En
 
   // ********** Implementation of EntityManager interface - Management methods ********** //
   override def createTable(): Unit = {
+    Logger.info(s"Creating table `$tableName`:\n        " + newQuery.schema.createStatements.mkString("\n"))
     dbRun(newQuery.schema.create)
   }
 
