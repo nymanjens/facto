@@ -1,10 +1,11 @@
 
 .icon-crown:before { content: '\e800'; } /* '' */
+.icon-new-empty:before { content: '\e801'; } /* '' */
 .icon-tennis:before { content: '\e802'; } /* '' */
 .icon-list:before { content: '\e803'; } /* '' */
 .icon-money:before { content: '\e804'; } /* '' */
 .icon-table:before { content: '\e805'; } /* '' */
-.icon-plus-squared:before { content: '\e806'; } /* '' */
-.icon-check-empty:before { content: '\e807'; } /* '' */
 .icon-food:before { content: '\e808'; } /* '' */
+.icon-building:before { content: '\e811'; } /* '' */
+.icon-template:before { content: '\f0f6'; } /* '' */
 .icon-balance-scale:before { content: '\f24e'; } /* '' */

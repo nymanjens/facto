@@ -8,7 +8,6 @@ import java.util.Locale
 
 import com.google.common.collect.Iterables
 import models.accounting.config.Config
-import models.accounting.money.Money
 import play.twirl.api.Html
 
 import scala.collection.JavaConverters._
