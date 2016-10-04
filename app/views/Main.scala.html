@@ -94,9 +94,9 @@
               <a href="@(controllers.accounting.routes.TransactionGroupOperations.addNewForm(
                     ) ++: returnTo)"
                   id="menu-link-newtransgroup">
-                <i class="icon-plus-squared"></i> @Html(Messages("facto.new-entry.html"))</a>
+                <i class="icon-new-empty"></i> @Html(Messages("facto.new-entry.html"))</a>
               <a href="@controllers.accounting.routes.GeneralActions.templateList" id="menu-link-templates">
-                <i class="icon-check-empty"></i> @Html(Messages("facto.templates.html"))</a>
+                <i class="icon-template"></i> @Html(Messages("facto.templates.html"))</a>
               @for(template <- templatesInNavbar) {
                 <a href="@(controllers.accounting.routes.TransactionGroupOperations.addNewFromTemplate(template.code
                     ) ++: returnTo)">

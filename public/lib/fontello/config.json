@@ -37,18 +37,6 @@
       "src": "fontawesome"
     },
     {
-      "uid": "1a5cfa186647e8c929c2b17b9fc4dac1",
-      "css": "plus-squared",
-      "code": 59398,
-      "src": "fontawesome"
-    },
-    {
-      "uid": "4b900d04e8ab8c82f080c1cfbac5772c",
-      "css": "check-empty",
-      "code": 59399,
-      "src": "fontawesome"
-    },
-    {
       "uid": "30b79160618d99ce798e4bd11cafe3fe",
       "css": "food",
       "code": 59400,
@@ -59,6 +47,24 @@
       "css": "balance-scale",
       "code": 62030,
       "src": "fontawesome"
+    },
+    {
+      "uid": "5408be43f7c42bccee419c6be53fdef5",
+      "css": "template",
+      "code": 61686,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "1b5a5d7b7e3c71437f5a26befdd045ed",
+      "css": "new-empty",
+      "code": 59393,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "fc455b9530e0b37facc289f42a120fdd",
+      "css": "building",
+      "code": 59409,
+      "src": "maki"
     }
   ]
 }
