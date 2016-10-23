@@ -9,6 +9,7 @@ GET  /                                 controllers.Application.index
 GET  /externalapi/docachemanagement/:appSecret/              controllers.ExternalApi.doCacheManagement(appSecret)
 GET  /externalapi/warmupcaches/:appSecret/                   controllers.ExternalApi.warmUpCaches(appSecret)
 GET  /externalapi/acc/trans/addfromtpl/:tplCode/:appSecret/  controllers.ExternalApi.addTransactionFromTemplate(tplCode, appSecret)
+GET  /externalapi/acc/money/xchgmeasurement/:date/:currency/:ratio/:appSecret/  controllers.ExternalApi.addExchangeRateMeasurement(date, currency, ratio: Double, appSecret)
 
 # Auth
 GET  /login/                           controllers.Auth.login
@@ -32,7 +33,7 @@ GET  /acc/templates/                   controllers.accounting.GeneralActions.tem
 GET  /jsonapi/acc/descriptions/:beneficiaryCode/:reservoirCode/:categoryCode/  controllers.accounting.JsonApi.filterDescriptions(beneficiaryCode, reservoirCode, categoryCode, q ?= "")
 GET  /jsonapi/acc/tags/all/            controllers.accounting.JsonApi.getAllTags
 POST /jsonapi/acc/bc/confirm/:moneyReservoirCode/:balanceInCents/:mostRecentTransactionId/  controllers.accounting.JsonApi.addBalanceCheck(moneyReservoirCode, balanceInCents: Long, mostRecentTransactionId: Long)
-POST  /jsonapi/acc/money/exchange/:fromCents/:fromCurrency/:date/:toCurrency/  controllers.accounting.JsonApi.exchangeMoney(fromCents: Long, fromCurrency, date, toCurrency)
+POST /jsonapi/acc/money/exchange/:fromCents/:fromCurrency/:date/:toCurrency/  controllers.accounting.JsonApi.exchangeMoney(fromCents: Long, fromCurrency, date, toCurrency)
 
 # Accounting - views
 GET  /acc/everything/                  controllers.accounting.Views.everythingLatest

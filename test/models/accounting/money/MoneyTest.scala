@@ -1,11 +1,13 @@
 package models.accounting.money
 
 import common.Clock
+import common.testing.CacheClearingSpecification
+import common.testing.TestUtils.persistGbpMeasurement
 import org.specs2.mutable._
 import play.api.test.WithApplication
 import play.twirl.api.Html
 
-class MoneyTest extends Specification {
+class MoneyTest extends CacheClearingSpecification {
 
   "Money" should {
     "centsToFloatString" in new WithApplication {
@@ -72,17 +74,23 @@ class MoneyTest extends Specification {
 
   "DatedMoney" should {
     "exchangedForReferenceCurrency" in new WithApplication {
+      persistGbpMeasurement(millisSinceEpoch = 0, ratio = 1.3)
+
       val money = DatedMoney(10, Currency.Gbp, Clock.now)
       money.exchangedForReferenceCurrency mustEqual ReferenceMoney(13)
     }
 
     "exchangedForCurrency" in new WithApplication {
+      persistGbpMeasurement(millisSinceEpoch = 0, ratio = 1.3)
+
       val date = Clock.now
       val money = DatedMoney(10, Currency.Gbp, date)
       money.exchangedForCurrency(Currency.default) mustEqual DatedMoney(13, Currency.default, date)
     }
 
     "toHtmlWithCurrency" in new WithApplication {
+      persistGbpMeasurement(millisSinceEpoch = 0, ratio = 1.3)
+
       DatedMoney(10, Currency.Gbp, Clock.now).toHtmlWithCurrency mustEqual
         Html("""&pound; 0.10 <span class="reference-currency">&euro; 0.13</span>""")
     }

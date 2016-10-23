@@ -12,7 +12,9 @@ import common.cache.CacheRegistry
 /** Caching decorator for an EntityManager that loads all data in memory and keeps it in sync with all updates. */
 private[manager] final class CachingEntityManager[E <: Entity[E], T <: AbstractTable[E]](delegate: EntityManager[E, T])
   extends ForwardingEntityManager[E, T](delegate) {
-  CacheRegistry.registerCache(verifyConsistency = verifyConsistency)
+  CacheRegistry.registerCache(
+    verifyConsistency = verifyConsistency,
+    resetForTests = resetForTests)
 
   @GuardedBy("lock")
   private val cache: mutable.Map[Long, E] = mutable.Map[Long, E]()
@@ -64,5 +66,9 @@ private[manager] final class CachingEntityManager[E <: Entity[E], T <: AbstractT
         cached == fetched,
         s"Cached entity is not equal to fetched entity (cached = $cached, fetched = $fetched)")
     }
+  }
+
+  private def resetForTests(): Unit = lock.synchronized {
+    cache.clear()
   }
 }

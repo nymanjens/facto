@@ -1,14 +1,14 @@
-import java.nio.file.{Files, Paths, Path}
+import java.nio.file.{Files, Path, Paths}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Await
 import scala.concurrent.duration._
-
 import java.lang.System
 
-import play.api.{Application, Mode, Logger, GlobalSettings}
-
+import models.accounting.money.{ExchangeRateMeasurement, ExchangeRateMeasurements}
+import play.api.{Application, GlobalSettings, Logger, Mode}
 import models.{Tables, Users}
+import org.joda.time.DateTime
 import tools.GeneralImportTool.dropAndCreateNewDb
 import tools.CsvImportTool
 import tools.FactoV1ImportTool
@@ -91,6 +91,10 @@ object Global extends GlobalSettings {
   private def loadCsvDummyData(csvDataFolder: Path) = {
     CsvImportTool.importTransactions(assertExists(csvDataFolder resolve "transactions.csv"))
     CsvImportTool.importBalanceChecks(assertExists(csvDataFolder resolve "balancechecks.csv"))
+    ExchangeRateMeasurements.add(ExchangeRateMeasurement(
+      date = new DateTime(1990, 1, 1, 0, 0), // Jan 1, 1990
+      foreignCurrencyCode = "GBP",
+      ratioReferenceToForeignCurrency = 1.2))
   }
 
   private def assertExists(path: Path): Path = {

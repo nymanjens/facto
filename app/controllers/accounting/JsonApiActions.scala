@@ -1,6 +1,6 @@
 package controllers.accounting
 
-import common.Clock
+import common.{Clock, TimeUtils}
 import controllers.helpers.accounting.GeneralEntry
 import models.accounting.Transactions
 import models.accounting.money.{Currency, DatedMoney}
@@ -57,14 +57,7 @@ object JsonApi extends Controller {
   def exchangeMoney(fromCents: Long, fromCurrencyCode: String, dateString: String, toCurrencyCode: String) =
     AuthenticatedAction { implicit user =>
       implicit request =>
-        val date: DateTime = {
-          val parsedDate: Either[Seq[FormError], DateTime] = Forms.jodaDate("yyyy-MM-dd").bind(Map("" -> dateString))
-          parsedDate match {
-            case Left(error) => throw new IllegalArgumentException(error.toString)
-            case Right(date) => date
-          }
-        }
-
+        val date = TimeUtils.parseDateString(dateString)
         val fromMoney = DatedMoney(fromCents, Currency.of(fromCurrencyCode), date)
         val toMoney = fromMoney.exchangedForCurrency(Currency.of(toCurrencyCode))
         Ok(Json.toJson(toMoney.cents))

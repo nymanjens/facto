@@ -17,14 +17,17 @@ object CacheRegistry {
   private val doMaintenanceFunctions: List[() => Unit] = new CopyOnWriteArrayList
   private val verifyConsistencyFunctions: List[() => Unit] = new CopyOnWriteArrayList
   private val invalidateCacheFunctions: List[Entity[_] => Unit] = new CopyOnWriteArrayList
+  private val resetForTestsFunctions: List[() => Unit] = new CopyOnWriteArrayList
 
   /** Registers given functions so that they are called when their respective events are triggered. */
   def registerCache(doMaintenance: () => Unit = doNothing,
                     verifyConsistency: () => Unit = doNothing,
-                    invalidateCache: Entity[_] => Unit = doNothing): Unit = {
+                    invalidateCache: Entity[_] => Unit = doNothing,
+                    resetForTests: () => Unit = doNothing): Unit = {
     doMaintenanceFunctions.add(doMaintenance)
     verifyConsistencyFunctions.add(verifyConsistency)
     invalidateCacheFunctions.add(invalidateCache)
+    resetForTestsFunctions.add(resetForTests)
   }
 
   /** Performs regular maintenance on all caches and throws an exception if there is a consistency problem. */
@@ -41,6 +44,13 @@ object CacheRegistry {
   def invalidateCachesWhenUpdated(entity: Entity[_]): Unit = {
     for (invalidateCache <- invalidateCacheFunctions.asScala) {
       invalidateCache(entity)
+    }
+  }
+
+  /** Resets all caches to their initial state. This avoids interference between test cases. */
+  def resetCachesForTests(): Unit = {
+    for (resetForTests <- resetForTestsFunctions.asScala) {
+      resetForTests()
     }
   }
 
