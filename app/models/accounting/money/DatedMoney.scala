@@ -17,6 +17,11 @@ import play.twirl.api.Html
 import scala.collection.JavaConverters._
 import java.math.RoundingMode.HALF_EVEN
 
+/**
+  * Represents an amount of money that was spent or gained at a given date.
+  *
+  * The date allows the instance to be converted into other currences with the exchange rate of that day.
+  */
 case class DatedMoney(override val cents: Long, override val currency: Currency, date: DateTime) extends MoneyWithGeneralCurrency {
 
   override def toHtmlWithCurrency: Html = {

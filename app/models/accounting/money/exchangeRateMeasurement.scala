@@ -17,7 +17,14 @@ import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
 import scala.collection.immutable.ListMap
 
-/** ExchangeRateMeasurement entities are immutable. */
+/**
+  * Measurements of the exchange rate of the reference currency to another (foreign) currency at a certain point in
+  * time.
+  *
+  * This exchange rate is valid from this `date` until the `date` of the next measurement.
+  *
+  * ExchangeRateMeasurement entities are immutable.
+  */
 case class ExchangeRateMeasurement(date: DateTime = Clock.now,
                                    private val foreignCurrencyCode: String,
                                    ratioReferenceToForeignCurrency: Double,

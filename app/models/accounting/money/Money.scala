@@ -13,6 +13,11 @@ import play.twirl.api.Html
 
 import scala.collection.JavaConverters._
 
+/**
+  * Base class for any type that represents an amount of money.
+  *
+  * Although this has a `currency` method, implementations are allowed to pick a single fixed currency.
+  */
 trait Money {
 
   def cents: Long

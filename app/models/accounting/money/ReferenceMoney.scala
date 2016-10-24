@@ -4,6 +4,12 @@ import models.accounting.money.CentOperations.CentOperationsNumeric
 import org.joda.time.DateTime
 import play.twirl.api.Html
 
+/**
+  * Represents an amount of money in the (default) reference currency.
+  *
+  * Note that this can't be converted into other currencies since we don't know what date we should assume for the
+  * exchange rate.
+  */
 case class ReferenceMoney(override val cents: Long) extends Money with CentOperations[ReferenceMoney] {
 
   override def currency = Currency.default

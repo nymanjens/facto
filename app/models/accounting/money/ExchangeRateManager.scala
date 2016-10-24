@@ -8,6 +8,9 @@ import org.joda.time.DateTime
 
 import scala.collection.mutable
 
+/**
+  * Single point of access for converting an amount of money from one currency into another.
+  */
 private[money] object ExchangeRateManager {
   CacheRegistry.registerCache(
     verifyConsistency = verifyConsistency,
