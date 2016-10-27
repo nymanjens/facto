@@ -19,7 +19,7 @@ trait AuthenticatedAction extends EssentialAction {
     }
   }
 
-  def apply(requestHeader: RequestHeader): Iteratee[Array[Byte], Result] = delegate.apply(requestHeader)
+  override def apply(requestHeader: RequestHeader) = delegate.apply(requestHeader)
 
   def calculateResult(implicit user: User, request: Request[AnyContent]): Result
 
