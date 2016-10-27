@@ -2,6 +2,7 @@ package controllers
 
 import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
+import com.google.inject.Inject
 import common.{Clock, TimeUtils}
 import models.accounting._
 import models.accounting.config.{Account, Config}
@@ -24,7 +25,7 @@ import controllers.accounting.Views
 import controllers.helpers.{ControllerHelperCache, AuthenticatedAction}
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 
-object ExternalApi extends Controller {
+class ExternalApi @Inject() (viewsController: Views) extends Controller {
 
   // ********** actions ********** //
   def doCacheManagement(applicationSecret: String) = Action { implicit request =>
@@ -39,11 +40,11 @@ object ExternalApi extends Controller {
 
     val admin: User = Users.findByLoginName("admin").get
     val actions: Seq[AuthenticatedAction] = Seq(
-      Views.everythingLatest,
-      Views.cashFlowOfAll,
-      Views.liquidationOfAll,
-      Views.endowmentsOfAll,
-      Views.summaryForCurrentYear()
+      viewsController.everythingLatest,
+      viewsController.cashFlowOfAll,
+      viewsController.liquidationOfAll,
+      viewsController.endowmentsOfAll,
+      viewsController.summaryForCurrentYear()
     )
     for (action <- actions) {
       action.calculateResult(admin, request)

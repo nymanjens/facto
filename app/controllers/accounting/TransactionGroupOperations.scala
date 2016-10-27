@@ -29,8 +29,9 @@ import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting.CashFlowEntry
 import controllers.helpers.accounting.FormUtils.{validMoneyReservoirOrNullReservoir, validAccountCode, validCategoryCode,
 validFlowAsFloat, flowAsFloatStringToCents, validTagsString, invalidWithMessageCode}
+import controllers.accounting.TransactionGroupOperations.{Forms, EditOperationMeta, AddNewOperationMeta, OperationMeta}
 
-object TransactionGroupOperations extends Controller {
+class TransactionGroupOperations extends Controller {
 
   // ********** actions ********** //
   def addNewForm(returnTo: String) = {
@@ -127,7 +128,7 @@ object TransactionGroupOperations extends Controller {
 
   // ********** private helper controllers ********** //
   private def addNewFormFromPartial(partial: TransactionPartial)(implicit returnTo: ReturnTo): AuthenticatedAction =
-    addNewFormFromPartial(TransactionGroupPartial(Seq(partial)))
+  addNewFormFromPartial(TransactionGroupPartial(Seq(partial)))
 
   private def addNewFormFromPartial(partial: TransactionGroupPartial)
                                    (implicit returnTo: ReturnTo): AuthenticatedAction = AuthenticatedAction { implicit user =>
@@ -268,7 +269,9 @@ object TransactionGroupOperations extends Controller {
       deleteAction = deleteAction,
       templatesInNavbar = templatesInNavbar)
   }
+}
 
+object TransactionGroupOperations {
   // ********** forms ********** //
   object Forms {
 

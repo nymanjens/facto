@@ -20,7 +20,7 @@ import controllers.helpers.{ControllerHelperCache, AuthenticatedAction}
 import controllers.Application.Forms
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 
-class Application() extends Controller {
+class Application extends Controller {
 
   // ********** actions ********** //
   def index() = AuthenticatedAction { implicit user =>

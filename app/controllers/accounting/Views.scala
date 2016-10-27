@@ -17,7 +17,7 @@ import play.api.i18n.Messages
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 
-object Views extends Controller {
+class Views extends Controller {
 
   // ********** actions - views ********** //
   def everythingLatest = AuthenticatedAction { implicit user =>

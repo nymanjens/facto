@@ -18,8 +18,9 @@ import models.accounting.{BalanceCheck, BalanceChecks, Transactions, UpdateLogs}
 import models.accounting.config.{MoneyReservoir, Config}
 import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting.FormUtils.{validFlowAsFloat, flowAsFloatStringToCents}
+import controllers.accounting.BalanceCheckOperations.{Forms, AddNewOperationMeta, EditOperationMeta, OperationMeta}
 
-object BalanceCheckOperations extends Controller {
+class BalanceCheckOperations extends Controller {
 
   // ********** actions ********** //
   def addNewForm(moneyReservoirCode: String, returnTo: String) = AuthenticatedAction { implicit user =>
@@ -158,7 +159,9 @@ object BalanceCheckOperations extends Controller {
       formAction,
       deleteAction)
   }
+}
 
+object BalanceCheckOperations {
   // ********** forms ********** //
   object Forms {
 
@@ -187,7 +190,7 @@ object BalanceCheckOperations extends Controller {
     )
   }
 
-  private sealed trait OperationMeta {
+  private[BalanceCheckOperations] sealed trait OperationMeta {
     def moneyReservoirCode: String
 
     val moneyReservoir = Config.moneyReservoir(moneyReservoirCode)
@@ -195,11 +198,11 @@ object BalanceCheckOperations extends Controller {
     def bcIdOption: Option[Long]
   }
 
-  private case class AddNewOperationMeta(moneyReservoirCode: String) extends OperationMeta {
+  private[BalanceCheckOperations] case class AddNewOperationMeta(moneyReservoirCode: String) extends OperationMeta {
     override def bcIdOption = None
   }
 
-  private case class EditOperationMeta(bcId: Long) extends OperationMeta {
+  private[BalanceCheckOperations] case class EditOperationMeta(bcId: Long) extends OperationMeta {
     override def moneyReservoirCode = BalanceChecks.findById(bcId).moneyReservoir.code
     override def bcIdOption = Some(bcId)
   }

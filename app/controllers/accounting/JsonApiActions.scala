@@ -1,5 +1,6 @@
 package controllers.accounting
 
+import com.google.inject.Inject
 import common.{Clock, TimeUtils}
 import controllers.helpers.accounting.GeneralEntry
 import models.accounting.Transactions
@@ -21,7 +22,7 @@ import controllers.helpers.AuthenticatedAction
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
 
-object JsonApi extends Controller {
+class JsonApi @Inject() (balanceCheckOperations: BalanceCheckOperations) extends Controller {
 
   // ********** actions ********** //
   def filterDescriptions(beneficiaryCode: String, reservoirCode: String, categoryCode: String, query: String) =
@@ -50,7 +51,7 @@ object JsonApi extends Controller {
   def addBalanceCheck(moneyReservoirCode: String, balanceInCents: Long, mostRecentTransactionId: Long) =
     AuthenticatedAction { implicit user =>
       implicit request =>
-        BalanceCheckOperations.doAddConfirmation(moneyReservoirCode, balanceInCents, mostRecentTransactionId)
+        balanceCheckOperations.doAddConfirmation(moneyReservoirCode, balanceInCents, mostRecentTransactionId)
         Ok(Json.toJson("OK"))
     }
 

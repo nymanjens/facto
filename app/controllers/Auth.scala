@@ -9,8 +9,9 @@ import play.api.i18n.Messages
 // imports for 2.4 i18n (https://www.playframework.com/documentation/2.4.x/Migration24#I18n)
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
+import controllers.Auth.Forms
 
-object Auth extends Controller {
+class Auth extends Controller {
 
   // ********** actions ********** //
   def login = Action { implicit request =>
@@ -29,7 +30,9 @@ object Auth extends Controller {
       "message" -> Messages("facto.you-are-now-logged-out")
     )
   }
+}
 
+object Auth {
   // ********** forms ********** //
   object Forms {
 
