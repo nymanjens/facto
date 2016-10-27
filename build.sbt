@@ -20,7 +20,7 @@ libraryDependencies ++= Seq(
   "org.xerial"             %  "sqlite-jdbc"           % "3.8.11.2",
 
 
-  "org.webjars"            %% "webjars-play"          % "2.4.0-1",
+  "org.webjars"            %% "webjars-play"          % "2.4.0-2",
   "org.webjars"            %  "bootstrap"             % "3.3.1",
   "org.webjars"            %  "datatables"            % "1.10.4",
   "org.webjars"            %  "datatables-plugins"    % "1.10.7",

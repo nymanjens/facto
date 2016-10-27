@@ -9,7 +9,6 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-less" % "1.0.0")
 addSbtPlugin("com.typesafe.sbt" % "sbt-traceur" % "1.0.1") // ES6->ES5
 addSbtPlugin("com.typesafe.sbt" % "sbt-rjs" % "1.0.1")
 addSbtPlugin("com.typesafe.sbt" % "sbt-digest" % "1.0.0")
-addSbtPlugin("com.typesafe.sbt" % "sbt-mocha" % "1.1.0")
 
 // Eclipse plugin
 addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "4.0.0-RC2")
