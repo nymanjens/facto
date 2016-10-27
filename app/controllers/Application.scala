@@ -1,5 +1,7 @@
 package controllers
 
+import com.google.inject.Inject
+
 import scala.collection.immutable.Seq
 import play.api.data.Form
 import play.api.mvc._
@@ -15,9 +17,10 @@ import common.cache.CacheRegistry
 import models.{Tables, Users, User}
 import controllers.accounting.Views
 import controllers.helpers.{ControllerHelperCache, AuthenticatedAction}
+import controllers.Application.Forms
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 
-object Application extends Controller {
+class Application() extends Controller {
 
   // ********** actions ********** //
   def index() = AuthenticatedAction { implicit user =>
@@ -62,7 +65,9 @@ object Application extends Controller {
         }
       )
   }
+}
 
+object Application {
   // ********** forms ********** //
   object Forms {
 
