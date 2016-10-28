@@ -7,11 +7,7 @@ import play.api.data.Form
 import play.api.mvc._
 import play.api.data.Forms._
 import play.Play.application
-import play.api.i18n.Messages
-
-// imports for 2.4 i18n (https://www.playframework.com/documentation/2.4.x/Migration24#I18n)
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
+import play.api.i18n.{MessagesApi, Messages, I18nSupport}
 
 import common.cache.CacheRegistry
 import models.{Tables, Users, User}
@@ -20,7 +16,7 @@ import controllers.helpers.{ControllerHelperCache, AuthenticatedAction}
 import controllers.Application.Forms
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 
-class Application extends Controller {
+class Application @Inject()(val messagesApi: MessagesApi) extends Controller with I18nSupport {
 
   // ********** actions ********** //
   def index() = AuthenticatedAction { implicit user =>

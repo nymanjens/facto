@@ -8,12 +8,8 @@ import models.accounting.money.{Currency, DatedMoney}
 import org.joda.time.DateTime
 import play.api.data.{FormError, Forms}
 import play.api.mvc._
+import play.api.i18n.{MessagesApi, Messages, I18nSupport}
 
-// imports for 2.4 i18n (https://www.playframework.com/documentation/2.4.x/Migration24#I18n)
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
-
-import play.api.i18n.Messages
 import models.User
 import play.api.libs.json.Json
 import models.accounting.TagEntities
@@ -22,25 +18,26 @@ import controllers.helpers.AuthenticatedAction
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
 
-class JsonApi @Inject() (balanceCheckOperations: BalanceCheckOperations) extends Controller {
+class JsonApi @Inject()(balanceCheckOperations: BalanceCheckOperations, val messagesApi: MessagesApi)
+  extends Controller with I18nSupport {
 
   // ********** actions ********** //
   def filterDescriptions(beneficiaryCode: String, reservoirCode: String, categoryCode: String, query: String) =
-    AuthenticatedAction { implicit user =>
-      implicit request =>
-        val descriptions = dbRun(
-          Transactions.newQuery
-            .filter(_.beneficiaryAccountCode === beneficiaryCode)
-            .filter(_.moneyReservoirCode === reservoirCode)
-            .filter(_.categoryCode === categoryCode)
-            .filter(_.description.toLowerCase startsWith query.toLowerCase)
-            .sortBy(r => (r.createdDate.desc))
-            .map(_.description)
-            .take(50))
-          .distinct
-          .take(10)
-        Ok(Json.toJson(descriptions))
-    }
+  AuthenticatedAction { implicit user =>
+    implicit request =>
+      val descriptions = dbRun(
+        Transactions.newQuery
+          .filter(_.beneficiaryAccountCode === beneficiaryCode)
+          .filter(_.moneyReservoirCode === reservoirCode)
+          .filter(_.categoryCode === categoryCode)
+          .filter(_.description.toLowerCase startsWith query.toLowerCase)
+          .sortBy(r => (r.createdDate.desc))
+          .map(_.description)
+          .take(50))
+        .distinct
+        .take(10)
+      Ok(Json.toJson(descriptions))
+  }
 
   def getAllTags = AuthenticatedAction { implicit user =>
     implicit request =>

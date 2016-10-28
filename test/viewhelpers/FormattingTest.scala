@@ -6,17 +6,16 @@ import org.specs2.runner._
 import play.api.test._
 import org.joda.time.DateTime
 import common.{Clock, DatedMonth, MonthRange, TimeUtils}
-import common.TimeUtils.{January, February, March, April, May, June, July, August, September, October, November, December, dateAt}
+import common.TimeUtils.{April, August, December, February, January, July, June, March, May, November, October, September, dateAt}
 import common.testing.HookedSpecification
 import play.api.Application
-import play.api.i18n.{Lang, Messages}
-import play.api.i18n.Messages.Implicits._
+import play.api.i18n.{Lang, Messages, MessagesApi}
 
 @RunWith(classOf[JUnitRunner])
 class FormattingTest extends HookedSpecification {
 
   val application: Application = FakeApplication()
-  val messages: Messages = applicationMessages(lang = Lang("en"), application)
+  implicit val messages: Messages = Messages(lang = Lang("en"), application.injector.instanceOf[MessagesApi])
 
   override def before = Clock.setTimeForTest(dateAt(2010, April, 4))
   override def afterAll = Clock.cleanupAfterTest

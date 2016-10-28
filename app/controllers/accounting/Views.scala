@@ -2,6 +2,7 @@ package controllers.accounting
 
 import scala.collection.JavaConverters._
 import com.google.common.base.Joiner
+import com.google.inject.Inject
 import play.api.mvc.{AnyContent, Controller, Flash, Request, Result}
 import common.{Clock, GetParameter}
 import common.CollectionUtils.toListMap
@@ -11,13 +12,9 @@ import models.accounting.config.Config
 import models.accounting.config.{Account, Category, MoneyReservoir, Template}
 import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting._
-import play.api.i18n.Messages
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 
-// imports for 2.4 i18n (https://www.playframework.com/documentation/2.4.x/Migration24#I18n)
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
-
-class Views extends Controller {
+class Views @Inject()(val messagesApi: MessagesApi) extends Controller with I18nSupport {
 
   // ********** actions - views ********** //
   def everythingLatest = AuthenticatedAction { implicit user =>
@@ -47,7 +44,7 @@ class Views extends Controller {
   def cashFlowOfHidden = AuthenticatedAction { implicit user =>
     implicit request =>
       cashFlow(
-        reservoirs = Config.moneyReservoirs(includeHidden=true).filter(_.hidden),
+        reservoirs = Config.moneyReservoirs(includeHidden = true).filter(_.hidden),
         numEntriesShownByDefaultToShow = 10,
         expandedNumEntriesToShow = 30)
   }

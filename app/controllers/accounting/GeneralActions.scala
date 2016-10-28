@@ -1,19 +1,16 @@
 package controllers.accounting
 
+import com.google.inject.Inject
 import controllers.helpers.accounting.GeneralEntry
 import play.api.mvc._
 
-// imports for 2.4 i18n (https://www.playframework.com/documentation/2.4.x/Migration24#I18n)
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
-
-import play.api.i18n.Messages
+import play.api.i18n.{MessagesApi, Messages, I18nSupport}
 import models.User
 import models.accounting.UpdateLogs
 import models.accounting.config.{Config, Template}
 import controllers.helpers.AuthenticatedAction
 
-class GeneralActions extends Controller {
+class GeneralActions @Inject()(val messagesApi: MessagesApi) extends Controller with I18nSupport {
 
   // ********** actions ********** //
   def searchMostRelevant(q: String) = AuthenticatedAction { implicit user =>

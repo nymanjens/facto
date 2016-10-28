@@ -1,16 +1,13 @@
 package controllers.accounting
 
+import com.google.inject.Inject
 import models.accounting.money.Money
 import org.joda.time.DateTime
 import play.api.data._
 import play.api.data.Forms._
 import play.api.mvc.{AnyContent, Call, Controller, Request}
 import play.twirl.api.Html
-import play.api.i18n.Messages
-
-// imports for 2.4 i18n (https://www.playframework.com/documentation/2.4.x/Migration24#I18n)
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 
 import common.{Clock, ReturnTo}
 import models.User
@@ -20,7 +17,7 @@ import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting.FormUtils.{validFlowAsFloat, flowAsFloatStringToCents}
 import controllers.accounting.BalanceCheckOperations.{Forms, AddNewOperationMeta, EditOperationMeta, OperationMeta}
 
-class BalanceCheckOperations extends Controller {
+class BalanceCheckOperations @Inject()(val messagesApi: MessagesApi) extends Controller with I18nSupport {
 
   // ********** actions ********** //
   def addNewForm(moneyReservoirCode: String, returnTo: String) = AuthenticatedAction { implicit user =>
