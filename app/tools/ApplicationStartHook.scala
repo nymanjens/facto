@@ -1,24 +1,20 @@
+package tools
+
 import java.nio.file.{Files, Path, Paths}
 
-import scala.collection.JavaConverters._
-import scala.concurrent.Await
-import scala.concurrent.duration._
-import java.lang.System
-
+import com.google.inject.Inject
 import models.accounting.money.{ExchangeRateMeasurement, ExchangeRateMeasurements}
-import play.api.{Application, GlobalSettings, Logger, Mode}
 import models.{Tables, Users}
 import org.joda.time.DateTime
+import play.api.{Application, Mode}
 import tools.GeneralImportTool.dropAndCreateNewDb
-import tools.CsvImportTool
-import tools.FactoV1ImportTool
 
+import scala.collection.JavaConverters._
 
-object Global extends GlobalSettings {
+class ApplicationStartHook @Inject() (implicit app: Application){
+  onStart()
 
-  override def onStart(app: Application): Unit = {
-    implicit val _ = app
-
+  private def onStart(): Unit = {
     processFlags()
 
     // Set up database if necessary
@@ -46,7 +42,7 @@ object Global extends GlobalSettings {
     }
   }
 
-  private def processFlags()(implicit app: Application) = {
+  private def processFlags() = {
     if (CommandLineFlags.dropAndCreateNewDb()) {
       println("")
       println("  Dropping the database tables (if present) and creating new ones...")
@@ -116,21 +112,21 @@ object Global extends GlobalSettings {
   }
 
   private object AppConfigHelper {
-    def dropAndCreateNewDb(implicit app: Application): Boolean = getBoolean("facto.development.dropAndCreateNewDb")
-    def loadDummyUsers(implicit app: Application): Boolean = getBoolean("facto.development.loadDummyUsers")
-    def loadCsvDummyData(implicit app: Application): Boolean = getBoolean("facto.development.loadCsvDummyData")
-    def csvDummyDataFolder(implicit app: Application): Path = getExistingPath("facto.development.csvDummyDataFolder")
-    def loadFactoV1Data(implicit app: Application): Boolean = getBoolean("facto.development.loadFactoV1Data")
-    def factoV1SqlFilePath(implicit app: Application): Path = getExistingPath("facto.development.factoV1SqlFilePath")
-    def defaultPassword(implicit app: Application): Option[String] = getString("facto.setup.defaultPassword")
+    def dropAndCreateNewDb: Boolean = getBoolean("facto.development.dropAndCreateNewDb")
+    def loadDummyUsers: Boolean = getBoolean("facto.development.loadDummyUsers")
+    def loadCsvDummyData: Boolean = getBoolean("facto.development.loadCsvDummyData")
+    def csvDummyDataFolder: Path = getExistingPath("facto.development.csvDummyDataFolder")
+    def loadFactoV1Data: Boolean = getBoolean("facto.development.loadFactoV1Data")
+    def factoV1SqlFilePath: Path = getExistingPath("facto.development.factoV1SqlFilePath")
+    def defaultPassword: Option[String] = getString("facto.setup.defaultPassword")
 
-    private def getBoolean(cfgPath: String)(implicit app: Application): Boolean =
+    private def getBoolean(cfgPath: String): Boolean =
       app.configuration.getBoolean(cfgPath) getOrElse false
 
-    private def getString(cfgPath: String)(implicit app: Application): Option[String] =
+    private def getString(cfgPath: String): Option[String] =
       app.configuration.getString(cfgPath)
 
-    private def getExistingPath(cfgPath: String)(implicit app: Application): Path = assertExists {
+    private def getExistingPath(cfgPath: String): Path = assertExists {
       Paths.get(app.configuration.getString(cfgPath).get)
     }
   }

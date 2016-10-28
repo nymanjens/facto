@@ -1,16 +1,13 @@
 package controllers.accounting
 
+import com.google.inject.Inject
 import models.accounting.money.Money
 import org.joda.time.DateTime
 import play.api.data._
 import play.api.data.Forms._
 import play.api.mvc.{AnyContent, Call, Controller, Request}
 import play.twirl.api.Html
-import play.api.i18n.Messages
-
-// imports for 2.4 i18n (https://www.playframework.com/documentation/2.4.x/Migration24#I18n)
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 
 import common.{Clock, ReturnTo}
 import models.User
@@ -18,8 +15,9 @@ import models.accounting.{BalanceCheck, BalanceChecks, Transactions, UpdateLogs}
 import models.accounting.config.{MoneyReservoir, Config}
 import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting.FormUtils.{validFlowAsFloat, flowAsFloatStringToCents}
+import controllers.accounting.BalanceCheckOperations.{Forms, AddNewOperationMeta, EditOperationMeta, OperationMeta}
 
-object BalanceCheckOperations extends Controller {
+class BalanceCheckOperations @Inject()(val messagesApi: MessagesApi) extends Controller with I18nSupport {
 
   // ********** actions ********** //
   def addNewForm(moneyReservoirCode: String, returnTo: String) = AuthenticatedAction { implicit user =>
@@ -158,7 +156,9 @@ object BalanceCheckOperations extends Controller {
       formAction,
       deleteAction)
   }
+}
 
+object BalanceCheckOperations {
   // ********** forms ********** //
   object Forms {
 
@@ -187,7 +187,7 @@ object BalanceCheckOperations extends Controller {
     )
   }
 
-  private sealed trait OperationMeta {
+  private[BalanceCheckOperations] sealed trait OperationMeta {
     def moneyReservoirCode: String
 
     val moneyReservoir = Config.moneyReservoir(moneyReservoirCode)
@@ -195,11 +195,11 @@ object BalanceCheckOperations extends Controller {
     def bcIdOption: Option[Long]
   }
 
-  private case class AddNewOperationMeta(moneyReservoirCode: String) extends OperationMeta {
+  private[BalanceCheckOperations] case class AddNewOperationMeta(moneyReservoirCode: String) extends OperationMeta {
     override def bcIdOption = None
   }
 
-  private case class EditOperationMeta(bcId: Long) extends OperationMeta {
+  private[BalanceCheckOperations] case class EditOperationMeta(bcId: Long) extends OperationMeta {
     override def moneyReservoirCode = BalanceChecks.findById(bcId).moneyReservoir.code
     override def bcIdOption = Some(bcId)
   }

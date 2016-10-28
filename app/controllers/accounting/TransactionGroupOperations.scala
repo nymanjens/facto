@@ -1,7 +1,8 @@
 package controllers.accounting
 
+import com.google.inject.Inject
 import common.ReturnTo
-import models.accounting.money.{Money, DatedMoney, ReferenceMoney}
+import models.accounting.money.{DatedMoney, Money, ReferenceMoney}
 
 import scala.collection.{Seq => MutableSeq}
 import scala.collection.immutable.Seq
@@ -10,11 +11,7 @@ import play.api.data.Forms._
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 import play.api.mvc._
 import play.twirl.api.Html
-import play.api.i18n.Messages
-
-// imports for 2.4 i18n (https://www.playframework.com/documentation/2.4.x/Migration24#I18n)
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 
 import org.joda.time.DateTime
 
@@ -29,8 +26,9 @@ import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting.CashFlowEntry
 import controllers.helpers.accounting.FormUtils.{validMoneyReservoirOrNullReservoir, validAccountCode, validCategoryCode,
 validFlowAsFloat, flowAsFloatStringToCents, validTagsString, invalidWithMessageCode}
+import controllers.accounting.TransactionGroupOperations.{Forms, EditOperationMeta, AddNewOperationMeta, OperationMeta}
 
-object TransactionGroupOperations extends Controller {
+class TransactionGroupOperations @Inject()(val messagesApi: MessagesApi) extends Controller with I18nSupport{
 
   // ********** actions ********** //
   def addNewForm(returnTo: String) = {
@@ -127,7 +125,7 @@ object TransactionGroupOperations extends Controller {
 
   // ********** private helper controllers ********** //
   private def addNewFormFromPartial(partial: TransactionPartial)(implicit returnTo: ReturnTo): AuthenticatedAction =
-    addNewFormFromPartial(TransactionGroupPartial(Seq(partial)))
+  addNewFormFromPartial(TransactionGroupPartial(Seq(partial)))
 
   private def addNewFormFromPartial(partial: TransactionGroupPartial)
                                    (implicit returnTo: ReturnTo): AuthenticatedAction = AuthenticatedAction { implicit user =>
@@ -268,7 +266,9 @@ object TransactionGroupOperations extends Controller {
       deleteAction = deleteAction,
       templatesInNavbar = templatesInNavbar)
   }
+}
 
+object TransactionGroupOperations {
   // ********** forms ********** //
   object Forms {
 

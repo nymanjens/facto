@@ -1,6 +1,6 @@
 name := """facto"""
 version := "1.0-SNAPSHOT"
-scalaVersion := "2.11.6"
+scalaVersion := "2.11.8"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala, SbtWeb)
 javaOptions in Test += "-Dconfig.file=conf/testing/application.conf"
@@ -20,7 +20,7 @@ libraryDependencies ++= Seq(
   "org.xerial"             %  "sqlite-jdbc"           % "3.8.11.2",
 
 
-  "org.webjars"            %% "webjars-play"          % "2.4.0-1",
+  "org.webjars"            %% "webjars-play"          % "2.4.0-2",
   "org.webjars"            %  "bootstrap"             % "3.3.1",
   "org.webjars"            %  "datatables"            % "1.10.4",
   "org.webjars"            %  "datatables-plugins"    % "1.10.7",
