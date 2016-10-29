@@ -6,11 +6,12 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala, SbtWeb)
 javaOptions in Test += "-Dconfig.file=conf/testing/application.conf"
 resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 
+val playVersion = "2.5.9" // Must be the same as the Play sbt-plugin in plugins.sbt
 libraryDependencies ++= Seq(
-  jdbc,
-  cache,
-  ws,
-  specs2 % Test,
+  "com.typesafe.play"      %% "play-jdbc"             % playVersion,
+  "com.typesafe.play"      %% "play-cache"            % playVersion,
+  "com.typesafe.play"      %% "play-ws"               % playVersion,
+  "com.typesafe.play"      %% "play-specs2"           % playVersion % Test,
   
   "org.yaml"               %  "snakeyaml"             % "1.14",
   "com.github.nscala-time" %% "nscala-time"           % "2.12.0",
