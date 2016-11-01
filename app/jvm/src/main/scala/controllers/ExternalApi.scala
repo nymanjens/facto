@@ -12,16 +12,15 @@ import scala.collection.immutable.Seq
 import play.api.data.Form
 import play.api.mvc._
 import play.api.data.Forms._
-import play.Play.application
-import play.api.i18n.{MessagesApi, Messages, I18nSupport}
-
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import common.cache.CacheRegistry
-import models.{Tables, Users, User}
+import models.{Tables, User, Users}
 import controllers.accounting.Views
-import controllers.helpers.{ControllerHelperCache, AuthenticatedAction}
+import controllers.helpers.{AuthenticatedAction, ControllerHelperCache}
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 
-class ExternalApi @Inject()(viewsController: Views, val messagesApi: MessagesApi) extends Controller with I18nSupport {
+class ExternalApi @Inject()(viewsController: Views, val messagesApi: MessagesApi, configuration: play.api.Configuration)
+  extends Controller with I18nSupport {
 
   // ********** actions ********** //
   def doCacheManagement(applicationSecret: String) = Action { implicit request =>
@@ -89,7 +88,7 @@ class ExternalApi @Inject()(viewsController: Views, val messagesApi: MessagesApi
 
   // ********** private helper methods ********** //
   private def validateApplicationSecret(applicationSecret: String) = {
-    val realApplicationSecret = application.configuration.getString("play.crypto.secret")
+    val realApplicationSecret = configuration.getString("play.crypto.secret")
     require(applicationSecret == realApplicationSecret, "Invalid application secret")
   }
 

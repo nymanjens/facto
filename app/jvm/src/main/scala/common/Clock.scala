@@ -15,7 +15,7 @@ object Clock {
     timeOverride = Some(date)
   }
 
-  def cleanupAfterTest: Unit = {
+  def cleanupAfterTest(): Unit = {
     timeOverride = None
   }
 }
