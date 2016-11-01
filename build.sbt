@@ -1,42 +1,83 @@
-name := """facto"""
-version := "1.0-SNAPSHOT"
-scalaVersion := "2.11.8"
+import sbt.Keys._
+import sbt.Project.projectToRef
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala, SbtWeb)
-javaOptions in Test += "-Dconfig.file=conf/testing/application.conf"
-resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
+// a special crossProject for configuring a JS/JVM/shared structure
+lazy val shared = (crossProject.crossType(CrossType.Pure) in file("app/shared"))
+  .settings(
+    scalaVersion := Settings.versions.scala,
+    libraryDependencies ++= Settings.sharedDependencies.value
+  )
+  // set up settings specific to the JS project
+  .jsConfigure(_ enablePlugins ScalaJSPlay)
 
-val playVersion = "2.5.9" // Must be the same as the Play sbt-plugin in plugins.sbt
-libraryDependencies ++= Seq(
-  "com.typesafe.play"      %% "play-jdbc"             % playVersion,
-  "com.typesafe.play"      %% "play-cache"            % playVersion,
-  "com.typesafe.play"      %% "play-ws"               % playVersion,
-  "com.typesafe.play"      %% "play-specs2"           % playVersion % Test,
-  
-  "org.yaml"               %  "snakeyaml"             % "1.14",
-  "com.github.nscala-time" %% "nscala-time"           % "2.12.0",
-  "com.typesafe.slick"     %% "slick"                 % "3.0.0",
-  "commons-lang"           %  "commons-lang"          % "2.6",
-  "mysql"                  %  "mysql-connector-java"  % "5.1.36",
-  "org.xerial"             %  "sqlite-jdbc"           % "3.8.11.2",
+lazy val sharedJVM = shared.jvm.settings(name := "sharedJVM")
 
+lazy val sharedJS = shared.js.settings(name := "sharedJS")
 
-  "org.webjars"            %% "webjars-play"          % "2.4.0-2",
-  "org.webjars"            %  "bootstrap"             % "3.3.1",
-  "org.webjars"            %  "datatables"            % "1.10.4",
-  "org.webjars"            %  "datatables-plugins"    % "1.10.7",
-  "org.webjars"            %  "flot"                  % "0.8.3",
-  "org.webjars"            %  "font-awesome"          % "4.6.2",
-  "org.webjars.bower"      %  "holderjs"              % "2.6.0",
-  "org.webjars"            %  "metisMenu"             % "1.1.3",
-  "org.webjars"            %  "morrisjs"              % "0.5.1",
-  "org.webjars.bower"      %  "datatables-responsive" % "1.0.6",
-  "org.webjars"            %  "bootstrap-social"      % "4.9.0",
-  "org.webjars.bower"      %  "flot.tooltip"          % "0.8.5",
-  "org.webjars"            %  "mousetrap"             % "1.5.3-1",
-  "org.webjars.bower"      %  "bootstrap-tagsinput"   % "0.8.0",
-  "org.webjars.bower"      %  "SHA-1"                 % "0.1.1",
-  "org.webjars.bower"      %  "ladda-bootstrap"       % "0.1.0",
-  "org.webjars"            %  "typeaheadjs"           % "0.11.1"
-  // TODO: add startbootstrap-sb-admin-2 > v1.0.8 when webjars supports their license
-)
+// use eliding to drop some debug code in the production build
+lazy val elideOptions = settingKey[Seq[String]]("Set limit for elidable functions")
+
+// instantiate the JS project for SBT with some additional settings
+lazy val client: Project = (project in file("app/js"))
+  .settings(
+    name := "client",
+    version := Settings.version,
+    scalaVersion := Settings.versions.scala,
+    scalacOptions ++= Settings.scalacOptions,
+    libraryDependencies ++= Settings.scalajsDependencies.value,
+    // by default we do development build, no eliding
+    elideOptions := Seq(),
+    scalacOptions ++= elideOptions.value,
+    jsDependencies ++= Settings.jsDependencies.value,
+    // RuntimeDOM is needed for tests
+    jsDependencies += RuntimeDOM % "test",
+    // yes, we want to package JS dependencies
+    skip in packageJSDependencies := false,
+    // use Scala.js provided launcher code to start the client app
+    persistLauncher := true,
+    persistLauncher in Test := false,
+    // use uTest framework for tests
+    testFrameworks += new TestFramework("utest.runner.Framework")
+  )
+  .enablePlugins(ScalaJSPlugin, ScalaJSPlay)
+  .dependsOn(sharedJS)
+
+// Client projects (just one in this case)
+lazy val clients = Seq(client)
+
+// instantiate the JVM project for SBT with some additional settings
+lazy val server = (project in file("app/jvm"))
+  .settings(
+    name := "server",
+    version := Settings.version,
+    scalaVersion := Settings.versions.scala,
+    scalacOptions ++= Settings.scalacOptions,
+    libraryDependencies ++= Settings.jvmDependencies.value,
+    commands += ReleaseCmd,
+    // connect to the client project
+    scalaJSProjects := clients,
+    pipelineStages := Seq(scalaJSProd, digest, gzip),
+    // compress CSS
+    LessKeys.compress in Assets := true
+  )
+  .enablePlugins(PlayScala)
+  .disablePlugins(PlayLayoutPlugin) // use the standard directory layout instead of Play's custom
+  .aggregate(clients.map(projectToRef): _*)
+  .dependsOn(sharedJVM)
+
+// Command for building a release
+lazy val ReleaseCmd = Command.command("release") {
+  state => "set elideOptions in client := Seq(\"-Xelide-below\", \"WARNING\")" ::
+    "client/clean" ::
+    "client/test" ::
+    "server/clean" ::
+    "server/test" ::
+    "server/dist" ::
+    "set elideOptions in client := Seq()" ::
+    state
+}
+
+// lazy val root = (project in file(".")).aggregate(client, server)
+
+// loads the Play server project at sbt startup
+onLoad in Global := (Command.process("project server", _: State)) compose (onLoad in Global).value
