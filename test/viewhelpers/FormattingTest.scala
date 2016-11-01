@@ -18,7 +18,7 @@ class FormattingTest extends HookedSpecification {
   implicit val messages: Messages = Messages(lang = Lang("en"), application.injector.instanceOf[MessagesApi])
 
   override def before = Clock.setTimeForTest(dateAt(2010, April, 4))
-  override def afterAll = Clock.cleanupAfterTest
+  override def afterAll = Clock.cleanupAfterTest()
 
   "formatDate()" in new WithApplication(application) {
     Formatting.formatDate(dateAt(2010, March, 31)) mustEqual "Wed, 31 Mar"

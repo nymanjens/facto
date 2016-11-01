@@ -21,7 +21,7 @@ import models.accounting.money.{Money, ReferenceMoney}
 class SummaryTest extends HookedSpecification {
 
   override def before = Clock.setTimeForTest(dateAt(2010, April, 4))
-  override def afterAll = Clock.cleanupAfterTest
+  override def afterAll = Clock.cleanupAfterTest()
 
   "Summary.fetchSummary()" should {
     "caculate monthRangeForAverages" in new WithApplication {

@@ -16,7 +16,7 @@ import models.accounting.money.Money
 @RunWith(classOf[JUnitRunner])
 class UpdateLogTest extends HookedSpecification {
 
-  override def afterAll = Clock.cleanupAfterTest
+  override def afterAll = Clock.cleanupAfterTest()
 
   "UpdateLogs.fetchLastNEntries" in new WithApplication {
     // add logs
