@@ -11,6 +11,7 @@ import com.google.common.base.Splitter
 import org.joda.time.DateTime
 import models.SlickUtils.dbApi._
 import org.apache.commons.lang.StringEscapeUtils
+import common.ResourceFiles
 import models.SlickUtils.dbRun
 import models.{User, Users}
 import models.accounting.{BalanceCheck, BalanceChecks, Transaction, TransactionGroup, TransactionGroups, Transactions, UpdateLog, UpdateLogs}
@@ -22,7 +23,7 @@ object FactoV1ImportTool {
   def importFromSqlDump(sqlFilePath: Path)(implicit app: Application): Unit = {
     val sqlInserts: Seq[SqlInsert] = {
       for {
-        line <- Source.fromFile(sqlFilePath.toFile, "UTF-8").getLines()
+        line <- ResourceFiles.readLines(sqlFilePath)
         if (line startsWith "INSERT INTO ")
       } yield {
         // Ignore all lines except those starting with "INSTERT INTO"

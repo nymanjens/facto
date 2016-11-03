@@ -3,6 +3,7 @@ package tools
 import java.nio.file.{Files, Path, Paths}
 
 import com.google.inject.Inject
+import common.ResourceFiles
 import models.accounting.money.{ExchangeRateMeasurement, ExchangeRateMeasurements}
 import models.{Tables, Users}
 import org.joda.time.DateTime
@@ -94,7 +95,7 @@ class ApplicationStartHook @Inject() (implicit app: Application){
   }
 
   private def assertExists(path: Path): Path = {
-    require(Files.exists(path), s"Couldn't find path: $path")
+    require(ResourceFiles.exists(path), s"Couldn't find path: $path")
     path
   }
 

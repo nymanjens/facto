@@ -7,6 +7,7 @@ import java.nio.file.Path
 import play.api.Logger
 import com.google.common.base.Splitter
 import org.joda.time.DateTime
+import common.ResourceFiles
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
 import models.Users
@@ -18,7 +19,7 @@ object CsvImportTool {
 
   def importTransactions(csvFilePath: Path): Unit = {
     // example of line: "2 :: Common :: LIFE :: CARD_COMMON :: imperdiet Duis  :: -25.04 :: 1425855600 :: 0 :: 1425934823"
-    val lines = for (line <- Source.fromFile(csvFilePath.toFile).getLines() if (!line.trim.isEmpty)) yield line.trim
+    val lines = for (line <- ResourceFiles.readLines(csvFilePath) if (!line.trim.isEmpty)) yield line.trim
     for (line <- lines) {
       val parts = Splitter.on(" :: ").trimResults().split(line).asScala.toList
       parts match {
@@ -44,7 +45,7 @@ object CsvImportTool {
 
   def importBalanceChecks(csvFilePath: Path): Unit = {
     // example of line: "2 :: CASH_COMMON :: 40.58 :: 1426287600 :: 1426357095"
-    val lines = for (line <- Source.fromFile(csvFilePath.toFile).getLines() if (!line.trim.isEmpty)) yield line.trim
+    val lines = for (line <- ResourceFiles.readLines(csvFilePath) if (!line.trim.isEmpty)) yield line.trim
     for (line <- lines) {
       val parts = Splitter.on(" :: ").trimResults().split(line).asScala.toList
       parts match {
