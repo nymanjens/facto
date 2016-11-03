@@ -54,7 +54,8 @@
 
     @* ************ JAVASCRIPT ************ *@
     @* jQuery *@
-    <script src="@routes.WebJarAssets.at(WebJarAssets.locate("dist/jquery.min.js"))"></script>
+    @* Note: Not using WebJarAssets.locate() because there are jquery files packaged with other libraries. *@
+    <script src="@routes.Assets.at("lib/jquery/jquery.min.js")"></script>
 
     @* Bootstrap Core JavaScript *@
     @* Note: Not using WebJarAssets.locate() because there are bootstrap files packaged with other libraries. *@
