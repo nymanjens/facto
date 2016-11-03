@@ -86,10 +86,11 @@ class L4JSLogger(jsLogger:JSLogger) extends Logger {
   private var ajaxAppender:AjaxAppender = null
 
   private def undefOrError(e:Exception):js.UndefOr[js.Error] = {
-    if(e == null)
+    if(e == null) {
       js.undefined
-    else
+    } else {
       e.asInstanceOf[js.Error]
+    }
   }
 
   override def trace(msg: String, e: Exception): Unit = jsLogger.trace(msg, undefOrError(e))

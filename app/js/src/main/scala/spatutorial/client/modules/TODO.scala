@@ -48,9 +48,12 @@ object Todo {
           item => editTodo(Some(item)), item => p.proxy.dispatch(DeleteTodo(item)))),
         Button(Button.Props(editTodo(None)), Icon.plusSquare, " New")),
         // if the dialog is open, add it to the panel
-        if (s.showTodoForm) TodoForm(TodoForm.Props(s.selectedItem, todoEdited))
-        else // otherwise add an empty placeholder
-          Seq.empty[ReactElement])
+        if (s.showTodoForm) {
+          TodoForm(TodoForm.Props(s.selectedItem, todoEdited))
+        }  else { // otherwise add an empty placeholder
+          Seq.empty[ReactElement]
+        }
+      )
   }
 
   // create the React component for To Do management

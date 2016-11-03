@@ -20,7 +20,7 @@
    <parameter name="regex"><![CDATA[[A-Z][A-Za-z]*]]></parameter>
   </parameters>
  </check>
- <check level="error" class="org.scalastyle.scalariform.ObjectNamesChecker" enabled="true">
+ <check level="error" class="org.scalastyle.scalariform.ObjectNamesChecker" enabled="false">
   <parameters>
    <parameter name="regex"><![CDATA[[A-Z][A-Za-z]*]]></parameter>
   </parameters>
@@ -83,14 +83,14 @@
    <parameter name="maxLength"><![CDATA[50]]></parameter>
   </parameters>
  </check>
- <check level="error" class="org.scalastyle.scalariform.MethodNamesChecker" enabled="true">
+ <check level="error" class="org.scalastyle.scalariform.MethodNamesChecker" enabled="false">
   <parameters>
    <parameter name="regex"><![CDATA[^[A-Za-z0-9+-:]*$]]></parameter>
    <parameter name="ignoreOverride">true</parameter>
    <parameter name="ignoreRegex">^([+-\\*/>&lt;]|==|&lt;=|>=|Action[A-Za-z0-9]*)$</parameter>
   </parameters>
  </check>
- <check level="error" class="org.scalastyle.scalariform.NumberOfMethodsInTypeChecker" enabled="true">
+ <check level="error" class="org.scalastyle.scalariform.NumberOfMethodsInTypeChecker" enabled="false">
   <parameters>
    <parameter name="maxMethods"><![CDATA[30]]></parameter>
   </parameters>
