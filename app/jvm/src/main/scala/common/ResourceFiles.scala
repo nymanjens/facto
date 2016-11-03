@@ -5,6 +5,15 @@ import java.nio.file.Path
 
 object ResourceFiles {
 
+  def read(path: String): String = {
+    Option(getClass.getResourceAsStream(path))
+      .map(scala.io.Source.fromInputStream)
+      .map(_.mkString)
+      .getOrElse(throw new FileNotFoundException(path))
+  }
+
+  def read(path: Path): String = read(path.toString)
+
   def readLines(path: String): List[String] = {
     Option(getClass.getResourceAsStream(path))
       .map(scala.io.Source.fromInputStream)

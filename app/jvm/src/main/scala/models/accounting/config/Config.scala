@@ -1,9 +1,11 @@
 package models.accounting.config
 
 import collection.immutable.Seq
+import java.nio.file.{Files, Paths}
 
 import play.Play.application
 import play.api.Logger
+import common.ResourceFiles
 
 import com.google.common.base.Throwables
 import org.yaml.snakeyaml.Yaml
@@ -30,7 +32,14 @@ object Config {
       val configLocation = application.configuration.getString("facto.accounting.configYamlFilePath")
 
       // get data
-      val stringData = scala.io.Source.fromFile(configLocation).mkString
+      val stringData = {
+        if (Files.exists(Paths.get(configLocation))) {
+          scala.io.Source.fromFile(configLocation).mkString
+        } else {
+          require(ResourceFiles.exists(configLocation), s"Could not find $configLocation as file or as resource")
+          ResourceFiles.read(configLocation)
+        }
+      }
 
       // parse data
       val constr = new CustomClassLoaderConstructor(getClass.getClassLoader)
