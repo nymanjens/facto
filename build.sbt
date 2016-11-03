@@ -54,6 +54,7 @@ lazy val server = (project in file("app/jvm"))
     scalacOptions ++= Settings.scalacOptions,
     libraryDependencies ++= Settings.jvmDependencies.value,
     commands += ReleaseCmd,
+    javaOptions += "-Dconfig.file=conf/application.conf",
     // connect to the client project
     scalaJSProjects := clients,
     pipelineStages := Seq(scalaJSProd, digest, gzip),
