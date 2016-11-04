@@ -53,7 +53,6 @@ object Settings {
   /** Dependencies only used by the JVM project */
   val jvmDependencies = Def.setting(Seq(
     "com.vmunier" %% "play-scalajs-scripts" % versions.playScripts,
-    "org.webjars" % "font-awesome" % "4.3.0-1" % Provided,
     "org.webjars" % "bootstrap" % versions.bootstrap % Provided,
     "com.lihaoyi" %% "utest" % versions.uTest % Test,
 
@@ -73,7 +72,7 @@ object Settings {
     "org.webjars"            %  "datatables"            % "1.10.4",
     "org.webjars"            %  "datatables-plugins"    % "1.10.7",
     "org.webjars"            %  "flot"                  % "0.8.3",
-    "org.webjars"            %  "font-awesome"          % "4.6.2",
+    "org.webjars"            %  "font-awesome"          % "4.6.2" % Provided,
     "org.webjars.bower"      %  "holderjs"              % "2.6.0",
     "org.webjars"            %  "metisMenu"             % "1.1.3",
     "org.webjars"            %  "morrisjs"              % "0.5.1",
