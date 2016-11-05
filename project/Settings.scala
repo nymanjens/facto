@@ -34,7 +34,7 @@ object Settings {
     val uTest = "0.4.3"
 
     val react = "15.1.0"
-    val jQuery = "1.11.1"
+    val jQuery = "2.2.4"
     val bootstrap = "3.3.6"
     val chartjs = "2.1.3"
 
@@ -52,15 +52,15 @@ object Settings {
 
   /** Dependencies only used by the JVM project */
   val jvmDependencies = Def.setting(Seq(
-    "com.vmunier" %% "play-scalajs-scripts" % versions.playScripts,
-    "org.webjars" % "bootstrap" % versions.bootstrap % Provided,
-    "com.lihaoyi" %% "utest" % versions.uTest % Test,
+    "com.vmunier"            %% "play-scalajs-scripts"  % versions.playScripts,
+    "com.lihaoyi"            %% "utest"                 % versions.uTest % Test,
 
     "com.typesafe.play"      %% "play-jdbc"             % versions.play,
     "com.typesafe.play"      %% "play-cache"            % versions.play,
     "com.typesafe.play"      %% "play-ws"               % versions.play,
     "com.typesafe.play"      %% "play-specs2"           % versions.play % Test,
 
+    "org.webjars"            %  "jquery"                % versions.jQuery,
     "org.yaml"               %  "snakeyaml"             % "1.14",
     "com.github.nscala-time" %% "nscala-time"           % "2.12.0",
     "com.typesafe.slick"     %% "slick"                 % "3.0.0",
@@ -68,11 +68,11 @@ object Settings {
     "mysql"                  %  "mysql-connector-java"  % "5.1.36",
     "org.xerial"             %  "sqlite-jdbc"           % "3.8.11.2",
     "org.webjars"            %% "webjars-play"          % "2.4.0-2",
-    "org.webjars"            %  "bootstrap"             % "3.3.1",
+    "org.webjars"            %  "bootstrap"             % versions.bootstrap,
     "org.webjars"            %  "datatables"            % "1.10.4",
     "org.webjars"            %  "datatables-plugins"    % "1.10.7",
     "org.webjars"            %  "flot"                  % "0.8.3",
-    "org.webjars"            %  "font-awesome"          % "4.6.2" % Provided,
+    "org.webjars"            %  "font-awesome"          % "4.6.2",
     "org.webjars.bower"      %  "holderjs"              % "2.6.0",
     "org.webjars"            %  "metisMenu"             % "1.1.3",
     "org.webjars"            %  "morrisjs"              % "0.5.1",
