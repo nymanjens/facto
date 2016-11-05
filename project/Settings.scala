@@ -24,21 +24,13 @@ object Settings {
   object versions {
     val scala = "2.11.8"
     val play = "2.5.9" // Must be the same as the Play sbt-plugin in plugins.sbt
-    val scalaDom = "0.9.1"
-    val scalajsReact = "0.11.1"
-    val scalaCSS = "0.4.1"
-    val log4js = "1.4.10"
-    val autowire = "0.2.5"
-    val booPickle = "1.2.4"
-    val diode = "1.0.0"
-    val uTest = "0.4.3"
 
-    val react = "15.1.0"
     val jQuery = "2.2.4"
     val bootstrap = "3.3.6"
-    val chartjs = "2.1.3"
-
-    val playScripts = "0.5.0"
+    val uTest = "0.4.3"
+    val react = "15.1.0"
+    val scalajsReact = "0.11.1"
+    val diode = "1.0.0"
   }
 
   /**
@@ -46,13 +38,13 @@ object Settings {
    * the special %%% function selects the correct version for each project
    */
   val sharedDependencies = Def.setting(Seq(
-    "com.lihaoyi" %%% "autowire" % versions.autowire,
-    "me.chrons" %%% "boopickle" % versions.booPickle
+    "com.lihaoyi"            %%% "autowire"             % "0.2.5",
+    "me.chrons"              %%% "boopickle"            % "1.2.4"
   ))
 
   /** Dependencies only used by the JVM project */
   val jvmDependencies = Def.setting(Seq(
-    "com.vmunier"            %% "play-scalajs-scripts"  % versions.playScripts,
+    "com.vmunier"            %% "play-scalajs-scripts"  % "0.5.0",
     "com.lihaoyi"            %% "utest"                 % versions.uTest % Test,
 
     "com.typesafe.play"      %% "play-jdbc"             % versions.play,
@@ -88,22 +80,22 @@ object Settings {
 
   /** Dependencies only used by the JS project (note the use of %%% instead of %%) */
   val scalajsDependencies = Def.setting(Seq(
-    "com.github.japgolly.scalajs-react" %%% "core" % versions.scalajsReact,
-    "com.github.japgolly.scalajs-react" %%% "extra" % versions.scalajsReact,
-    "com.github.japgolly.scalacss" %%% "ext-react" % versions.scalaCSS,
-    "me.chrons" %%% "diode" % versions.diode,
-    "me.chrons" %%% "diode-react" % versions.diode,
-    "org.scala-js" %%% "scalajs-dom" % versions.scalaDom,
-    "com.lihaoyi" %%% "utest" % versions.uTest % Test
+    "com.github.japgolly.scalajs-react" %%% "core"        % versions.scalajsReact,
+    "com.github.japgolly.scalajs-react" %%% "extra"       % versions.scalajsReact,
+    "com.github.japgolly.scalacss"      %%% "ext-react"   % "0.4.1",
+    "me.chrons"                         %%% "diode"       % versions.diode,
+    "me.chrons"                         %%% "diode-react" % versions.diode,
+    "org.scala-js"                      %%% "scalajs-dom" % "0.9.1",
+    "com.lihaoyi"                       %%% "utest"       % versions.uTest % Test
   ))
 
   /** Dependencies for external JS libs that are bundled into a single .js file according to dependency order */
   val jsDependencies = Def.setting(Seq(
-    "org.webjars.bower" % "react" % versions.react / "react-with-addons.js" minified "react-with-addons.min.js" commonJSName "React",
-    "org.webjars.bower" % "react" % versions.react / "react-dom.js" minified "react-dom.min.js" dependsOn "react-with-addons.js" commonJSName "ReactDOM",
-    "org.webjars" % "jquery" % versions.jQuery / "jquery.js" minified "jquery.min.js",
-    "org.webjars" % "bootstrap" % versions.bootstrap / "bootstrap.js" minified "bootstrap.min.js" dependsOn "jquery.js",
-    "org.webjars" % "chartjs" % versions.chartjs / "Chart.js" minified "Chart.min.js",
-    "org.webjars" % "log4javascript" % versions.log4js / "js/log4javascript_uncompressed.js" minified "js/log4javascript.js"
+    "org.webjars.bower"      % "react"                  % versions.react     / "react-with-addons.js" minified "react-with-addons.min.js" commonJSName "React",
+    "org.webjars.bower"      % "react"                  % versions.react     / "react-dom.js" minified "react-dom.min.js" dependsOn "react-with-addons.js" commonJSName "ReactDOM",
+    "org.webjars"            % "jquery"                 % versions.jQuery    / "jquery.js" minified "jquery.min.js",
+    "org.webjars"            % "bootstrap"              % versions.bootstrap / "bootstrap.js" minified "bootstrap.min.js" dependsOn "jquery.js",
+    "org.webjars"            % "chartjs"                % "2.1.3"            / "Chart.js" minified "Chart.min.js",
+    "org.webjars"            % "log4javascript"         % "1.4.10"           / "js/log4javascript_uncompressed.js" minified "js/log4javascript.js"
   ))
 }
