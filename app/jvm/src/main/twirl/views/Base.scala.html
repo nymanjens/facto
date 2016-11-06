@@ -18,12 +18,6 @@
     @* Note: Not using WebJarAssets.locate() because there are bootstrap files packaged with other libraries. *@
     <link href="@routes.Assets.at("lib/bootstrap/css/bootstrap.min.css")" rel="stylesheet">
 
-    @* MetisMenu CSS *@
-    <link href="@routes.WebJarAssets.at(WebJarAssets.locate("metisMenu.min.css"))" rel="stylesheet">
-
-    @* DataTables CSS *@
-    <link href="@routes.WebJarAssets.at(WebJarAssets.locate("integration/bootstrap/3/dataTables.bootstrap.css"))" rel="stylesheet">
-
     @* Bootstrap Tags Input *@
     <link href="@routes.WebJarAssets.at(WebJarAssets.locate("dist/bootstrap-tagsinput.css"))" rel="stylesheet">
     <link href="@routes.WebJarAssets.at(WebJarAssets.locate("dist/bootstrap-tagsinput-typeahead.css"))" rel="stylesheet">
@@ -53,20 +47,8 @@
     @content
 
     @* ************ JAVASCRIPT ************ *@
-    @* jQuery *@
-    @* Note: Not using WebJarAssets.locate() because there are jquery files packaged with other libraries. *@
-    <script src="@routes.Assets.at("lib/jquery/jquery.min.js")"></script>
-
-    @* Bootstrap Core JavaScript *@
-    @* Note: Not using WebJarAssets.locate() because there are bootstrap files packaged with other libraries. *@
-    <script src="@routes.Assets.at("lib/bootstrap/js/bootstrap.min.js")"></script>
-
-    @* Metis Menu Plugin JavaScript *@
-    <script src="@routes.WebJarAssets.at(WebJarAssets.locate("metisMenu.min.js"))"></script>
-
-    @* DataTables JavaScript *@
-    <script src="@routes.WebJarAssets.at(WebJarAssets.locate("media/js/jquery.dataTables.min.js"))"></script>
-    <script src="@routes.WebJarAssets.at(WebJarAssets.locate("integration/bootstrap/3/dataTables.bootstrap.min.js"))"></script>
+    @* Bundled JavaScript deps *@
+    <script src="@routes.Assets.at("client-jsdeps.js")" type="text/javascript"></script>
 
     @* Mousetrap JavaScript *@
     <script src="@routes.WebJarAssets.at(WebJarAssets.locate("mousetrap.min.js"))"></script>

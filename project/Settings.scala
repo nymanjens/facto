@@ -25,12 +25,26 @@ object Settings {
     val scala = "2.11.8"
     val play = "2.5.9" // Must be the same as the Play sbt-plugin in plugins.sbt
 
-    val jQuery = "2.2.4"
-    val bootstrap = "3.3.6"
     val uTest = "0.4.3"
-    val react = "15.1.0"
     val scalajsReact = "0.11.1"
     val diode = "1.0.0"
+  }
+
+  object webjarDeps {
+    val jQuery             = "org.webjars"            %  "jquery"                % "2.2.4"
+    val bootstrap          = "org.webjars"            %  "bootstrap"             % "3.3.6"
+
+    val bootstrapTagsinput = "org.webjars.bower"      %  "bootstrap-tagsinput"   % "0.8.0"
+    val chartJs            = "org.webjars"            %  "chartjs"               % "2.1.3"
+    val fontAwesome        = "org.webjars"            %  "font-awesome"          % "4.6.2"
+    val laddaBootstrap     = "org.webjars.bower"      %  "ladda-bootstrap"       % "0.1.0"
+    val log4Javascript     = "org.webjars"            %  "log4javascript"        % "1.4.10"
+    val metisMenu          = "org.webjars"            %  "metisMenu"             % "1.1.3"
+    val mousetrap          = "org.webjars"            %  "mousetrap"             % "1.5.3-1"
+    val react              = "org.webjars.bower"      %  "react"                 % "15.1.0"
+    val sha1               = "org.webjars.bower"      %  "SHA-1"                 % "0.1.1"
+    val typeaheadJs        = "org.webjars"            %  "typeaheadjs"           % "0.11.1"
+    val webjarsPlay        = "org.webjars"            %% "webjars-play"          % "2.4.0-2"
   }
 
   /**
@@ -52,30 +66,23 @@ object Settings {
     "com.typesafe.play"      %% "play-ws"               % versions.play,
     "com.typesafe.play"      %% "play-specs2"           % versions.play % Test,
 
-    "org.webjars"            %  "jquery"                % versions.jQuery,
     "org.yaml"               %  "snakeyaml"             % "1.14",
     "com.github.nscala-time" %% "nscala-time"           % "2.12.0",
     "com.typesafe.slick"     %% "slick"                 % "3.0.0",
     "commons-lang"           %  "commons-lang"          % "2.6",
     "mysql"                  %  "mysql-connector-java"  % "5.1.36",
     "org.xerial"             %  "sqlite-jdbc"           % "3.8.11.2",
-    "org.webjars"            %% "webjars-play"          % "2.4.0-2",
-    "org.webjars"            %  "bootstrap"             % versions.bootstrap,
-    "org.webjars"            %  "datatables"            % "1.10.4",
-    "org.webjars"            %  "datatables-plugins"    % "1.10.7",
-    "org.webjars"            %  "flot"                  % "0.8.3",
-    "org.webjars"            %  "font-awesome"          % "4.6.2",
-    "org.webjars.bower"      %  "holderjs"              % "2.6.0",
-    "org.webjars"            %  "metisMenu"             % "1.1.3",
-    "org.webjars"            %  "morrisjs"              % "0.5.1",
-    "org.webjars.bower"      %  "datatables-responsive" % "1.0.6",
-    "org.webjars"            %  "bootstrap-social"      % "4.9.0",
-    "org.webjars.bower"      %  "flot.tooltip"          % "0.8.5",
-    "org.webjars"            %  "mousetrap"             % "1.5.3-1",
-    "org.webjars.bower"      %  "bootstrap-tagsinput"   % "0.8.0",
-    "org.webjars.bower"      %  "SHA-1"                 % "0.1.1",
-    "org.webjars.bower"      %  "ladda-bootstrap"       % "0.1.0",
-    "org.webjars"            %  "typeaheadjs"           % "0.11.1"
+
+    webjarDeps.jQuery,
+    webjarDeps.bootstrap,
+    webjarDeps.metisMenu,
+    webjarDeps.webjarsPlay,
+    webjarDeps.fontAwesome,
+    webjarDeps.mousetrap,
+    webjarDeps.bootstrapTagsinput,
+    webjarDeps.sha1,
+    webjarDeps.laddaBootstrap,
+    webjarDeps.typeaheadJs
   ))
 
   /** Dependencies only used by the JS project (note the use of %%% instead of %%) */
@@ -91,11 +98,12 @@ object Settings {
 
   /** Dependencies for external JS libs that are bundled into a single .js file according to dependency order */
   val jsDependencies = Def.setting(Seq(
-    "org.webjars.bower"      % "react"                  % versions.react     / "react-with-addons.js" minified "react-with-addons.min.js" commonJSName "React",
-    "org.webjars.bower"      % "react"                  % versions.react     / "react-dom.js" minified "react-dom.min.js" dependsOn "react-with-addons.js" commonJSName "ReactDOM",
-    "org.webjars"            % "jquery"                 % versions.jQuery    / "jquery.js" minified "jquery.min.js",
-    "org.webjars"            % "bootstrap"              % versions.bootstrap / "bootstrap.js" minified "bootstrap.min.js" dependsOn "jquery.js",
-    "org.webjars"            % "chartjs"                % "2.1.3"            / "Chart.js" minified "Chart.min.js",
-    "org.webjars"            % "log4javascript"         % "1.4.10"           / "js/log4javascript_uncompressed.js" minified "js/log4javascript.js"
+    webjarDeps.react / "react-with-addons.js" minified "react-with-addons.min.js" commonJSName "React",
+    webjarDeps.react / "react-dom.js" minified "react-dom.min.js" dependsOn "react-with-addons.js" commonJSName "ReactDOM",
+    webjarDeps.jQuery / "jquery.js" minified "jquery.min.js",
+    webjarDeps.bootstrap / "bootstrap.js" minified "bootstrap.min.js" dependsOn "jquery.js",
+    webjarDeps.metisMenu / "metisMenu.js" minified "metisMenu.min.js" dependsOn "bootstrap.js",
+    webjarDeps.chartJs / "Chart.js" minified "Chart.min.js",
+    webjarDeps.log4Javascript / "js/log4javascript_uncompressed.js" minified "js/log4javascript.js"
   ))
 }
