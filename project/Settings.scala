@@ -28,23 +28,25 @@ object Settings {
     val uTest = "0.4.3"
     val scalajsReact = "0.11.1"
     val diode = "1.0.0"
+    val jQuery = "2.2.4"
+    val bootstrap = "3.3.6"
   }
 
-  object webjarDeps {
-    val jQuery             = "org.webjars"            %  "jquery"                % "2.2.4"
-    val bootstrap          = "org.webjars"            %  "bootstrap"             % "3.3.6"
+  private object webjarDeps {
+    val jQuery             = "org.webjars"       %  "jquery"              % versions.jQuery
+    val bootstrap          = "org.webjars"       %  "bootstrap"           % versions.bootstrap
 
-    val bootstrapTagsinput = "org.webjars.bower"      %  "bootstrap-tagsinput"   % "0.8.0"
-    val chartJs            = "org.webjars"            %  "chartjs"               % "2.1.3"
-    val fontAwesome        = "org.webjars"            %  "font-awesome"          % "4.6.2"
-    val laddaBootstrap     = "org.webjars.bower"      %  "ladda-bootstrap"       % "0.1.0"
-    val log4Javascript     = "org.webjars"            %  "log4javascript"        % "1.4.10"
-    val metisMenu          = "org.webjars"            %  "metisMenu"             % "1.1.3"
-    val mousetrap          = "org.webjars"            %  "mousetrap"             % "1.5.3-1"
-    val react              = "org.webjars.bower"      %  "react"                 % "15.1.0"
-    val sha1               = "org.webjars.bower"      %  "SHA-1"                 % "0.1.1"
-    val typeaheadJs        = "org.webjars"            %  "typeaheadjs"           % "0.11.1"
-    val webjarsPlay        = "org.webjars"            %% "webjars-play"          % "2.4.0-2"
+    val bootstrapTagsinput = "org.webjars.bower" %  "bootstrap-tagsinput" % "0.8.0"
+    val chartJs            = "org.webjars"       %  "chartjs"             % "2.1.3"
+    val fontAwesome        = "org.webjars"       %  "font-awesome"        % "4.6.2"
+    val laddaBootstrap     = "org.webjars.bower" %  "ladda-bootstrap"     % "0.1.0"
+    val log4Javascript     = "org.webjars"       %  "log4javascript"      % "1.4.10"
+    val metisMenu          = "org.webjars"       %  "metisMenu"           % "1.1.3"
+    val mousetrap          = "org.webjars"       %  "mousetrap"           % "1.5.3-1"
+    val react              = "org.webjars.bower" %  "react"               % "15.1.0"
+    val sha1               = "org.webjars.bower" %  "SHA-1"               % "0.1.1"
+    val typeaheadJs        = "org.webjars"       %  "typeaheadjs"         % "0.11.1"
+    val webjarsPlay        = "org.webjars"       %% "webjars-play"        % "2.4.0-2"
   }
 
   /**
@@ -73,14 +75,10 @@ object Settings {
     "mysql"                  %  "mysql-connector-java"  % "5.1.36",
     "org.xerial"             %  "sqlite-jdbc"           % "3.8.11.2",
 
-    webjarDeps.jQuery,
     webjarDeps.bootstrap,
-    webjarDeps.metisMenu,
     webjarDeps.webjarsPlay,
     webjarDeps.fontAwesome,
-    webjarDeps.mousetrap,
     webjarDeps.bootstrapTagsinput,
-    webjarDeps.sha1,
     webjarDeps.laddaBootstrap,
     webjarDeps.typeaheadJs
   ))
@@ -96,14 +94,25 @@ object Settings {
     "com.lihaoyi"                       %%% "utest"       % versions.uTest % Test
   ))
 
+  private object files {
+    val jQuery    = s"${versions.jQuery}/jquery.min.js"
+    val bootstrap = s"${versions.bootstrap}/js/bootstrap.min.js"
+  }
+
   /** Dependencies for external JS libs that are bundled into a single .js file according to dependency order */
   val jsDependencies = Def.setting(Seq(
-    webjarDeps.react / "react-with-addons.js" minified "react-with-addons.min.js" commonJSName "React",
-    webjarDeps.react / "react-dom.js" minified "react-dom.min.js" dependsOn "react-with-addons.js" commonJSName "ReactDOM",
-    webjarDeps.jQuery / "jquery.js" minified "jquery.min.js",
-    webjarDeps.bootstrap / "bootstrap.js" minified "bootstrap.min.js" dependsOn "jquery.js",
-    webjarDeps.metisMenu / "metisMenu.js" minified "metisMenu.min.js" dependsOn "bootstrap.js",
-    webjarDeps.chartJs / "Chart.js" minified "Chart.min.js",
-    webjarDeps.log4Javascript / "js/log4javascript_uncompressed.js" minified "js/log4javascript.js"
+    webjarDeps.react / "react-with-addons.min.js" commonJSName "React",
+    webjarDeps.react / "react-dom.min.js" dependsOn "react-with-addons.min.js" commonJSName "ReactDOM",
+    webjarDeps.jQuery / files.jQuery,
+    webjarDeps.bootstrap / files.bootstrap dependsOn files.jQuery,
+    webjarDeps.metisMenu / "metisMenu.min.js" dependsOn files.bootstrap,
+    webjarDeps.mousetrap / "mousetrap.min.js",
+    webjarDeps.bootstrapTagsinput / "bootstrap-tagsinput.min.js" dependsOn files.bootstrap,
+    webjarDeps.typeaheadJs / "typeahead.bundle.min.js" dependsOn files.bootstrap,
+    webjarDeps.sha1 / "sha1.js",
+    webjarDeps.laddaBootstrap / "spin.min.js",
+    webjarDeps.laddaBootstrap / "ladda.min.js",
+    webjarDeps.chartJs / "Chart.min.js",
+    webjarDeps.log4Javascript / "js/log4javascript.js"
   ))
 }
