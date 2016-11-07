@@ -15,7 +15,10 @@ import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 
-class Views @Inject()(val messagesApi: MessagesApi, accountingConfig: Config) extends Controller with I18nSupport {
+class Views @Inject()(val messagesApi: MessagesApi,
+                      accountingConfig: Config,
+                      generalEntries: GeneralEntries,
+                      cashFlowEntries: CashFlowEntries) extends Controller with I18nSupport {
 
   // ********** actions - views ********** //
   def everythingLatest = AuthenticatedAction { implicit user =>
@@ -105,7 +108,7 @@ class Views @Inject()(val messagesApi: MessagesApi, accountingConfig: Config) ex
   // ********** private helper controllers ********** //
   private def everything(numEntriesToShow: Int = 100000)(implicit request: Request[AnyContent], user: User): Result = {
     // get entries
-    val entries = GeneralEntry.fetchLastNEntries(numEntriesToShow + 1)
+    val entries = generalEntries.fetchLastNEntries(numEntriesToShow + 1)
 
     // render
     Ok(views.html.accounting.everything(
@@ -121,7 +124,7 @@ class Views @Inject()(val messagesApi: MessagesApi, accountingConfig: Config) ex
     // get reservoirToEntries
     val reservoirToEntries = toListMap {
       for (res <- reservoirs) yield {
-        res -> CashFlowEntry.fetchLastNEntries(moneyReservoir = res, n = expandedNumEntriesToShow + 1)
+        res -> cashFlowEntries.fetchLastNEntries(moneyReservoir = res, n = expandedNumEntriesToShow + 1)
       }
     }
 
@@ -164,7 +167,7 @@ class Views @Inject()(val messagesApi: MessagesApi, accountingConfig: Config) ex
                         (implicit request: Request[AnyContent], user: User): Result = {
     // get accountToEntries
     val accountToEntries = toListMap {
-      for (account <- accounts) yield account -> GeneralEntry.fetchLastNEndowments(account, n = expandedNumEntriesToShow + 1)
+      for (account <- accounts) yield account -> generalEntries.fetchLastNEndowments(account, n = expandedNumEntriesToShow + 1)
     }
 
     // render

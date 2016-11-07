@@ -170,7 +170,7 @@ object BalanceCheckOperations {
                       balanceInCents: Long = 0)
 
     object BcData {
-      def fromModel(bc: BalanceCheck) = BcData(
+      def fromModel(bc: BalanceCheck)(implicit accountingConfig: Config) = BcData(
         issuerName = bc.issuer.name,
         moneyReservoirName = bc.moneyReservoir.name,
         checkDate = bc.checkDate,
@@ -201,7 +201,7 @@ object BalanceCheckOperations {
   }
 
   private[BalanceCheckOperations] case class EditOperationMeta(bcId: Long) extends OperationMeta {
-    override def moneyReservoirCode = BalanceChecks.findById(bcId).moneyReservoir.code
+    override def moneyReservoirCode = BalanceChecks.findById(bcId).moneyReservoirCode
     override def bcIdOption = Some(bcId)
   }
 }

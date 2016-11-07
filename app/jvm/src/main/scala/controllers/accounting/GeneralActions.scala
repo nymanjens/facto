@@ -1,7 +1,7 @@
 package controllers.accounting
 
 import com.google.inject.Inject
-import controllers.helpers.accounting.GeneralEntry
+import controllers.helpers.accounting.{GeneralEntry, GeneralEntries}
 import play.api.mvc._
 
 import play.api.i18n.{MessagesApi, Messages, I18nSupport}
@@ -10,7 +10,7 @@ import models.accounting.UpdateLogs
 import models.accounting.config.{Config, Template}
 import controllers.helpers.AuthenticatedAction
 
-class GeneralActions @Inject()(val messagesApi: MessagesApi, accountingConfig: Config) extends Controller with I18nSupport {
+class GeneralActions @Inject()(val messagesApi: MessagesApi, accountingConfig: Config, generalEntries: GeneralEntries) extends Controller with I18nSupport {
 
   // ********** actions ********** //
   def searchMostRelevant(q: String) = AuthenticatedAction { implicit user =>
@@ -43,7 +43,7 @@ class GeneralActions @Inject()(val messagesApi: MessagesApi, accountingConfig: C
   private def search(query: String, numEntriesToShow: Int = 100000)
                     (implicit request: Request[AnyContent], user: User): Result = {
     // get entries
-    val allEntries = GeneralEntry.search(query)
+    val allEntries = generalEntries.search(query)
     val entries = allEntries.take(numEntriesToShow + 1)
 
     // render
