@@ -1,3 +1,4 @@
+
 package controllers.accounting
 
 import scala.collection.JavaConverters._
@@ -14,7 +15,7 @@ import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 
-class Views @Inject()(val messagesApi: MessagesApi) extends Controller with I18nSupport {
+class Views @Inject()(val messagesApi: MessagesApi, accountingConfig: Config) extends Controller with I18nSupport {
 
   // ********** actions - views ********** //
   def everythingLatest = AuthenticatedAction { implicit user =>
@@ -30,7 +31,7 @@ class Views @Inject()(val messagesApi: MessagesApi) extends Controller with I18n
   def cashFlowOfAll = AuthenticatedAction { implicit user =>
     implicit request =>
       cashFlow(
-        reservoirs = Config.visibleReservoirs,
+        reservoirs = accountingConfig.visibleReservoirs,
         numEntriesShownByDefaultToShow = 10,
         expandedNumEntriesToShow = 30)
   }
@@ -38,13 +39,13 @@ class Views @Inject()(val messagesApi: MessagesApi) extends Controller with I18n
   def cashFlowOfSingle(reservoirCode: String) = AuthenticatedAction { implicit user =>
     implicit request =>
       cashFlow(
-        reservoirs = Seq(Config.moneyReservoir(reservoirCode)))
+        reservoirs = Seq(accountingConfig.moneyReservoir(reservoirCode)))
   }
 
   def cashFlowOfHidden = AuthenticatedAction { implicit user =>
     implicit request =>
       cashFlow(
-        reservoirs = Config.moneyReservoirs(includeHidden = true).filter(_.hidden),
+        reservoirs = accountingConfig.moneyReservoirs(includeHidden = true).filter(_.hidden),
         numEntriesShownByDefaultToShow = 10,
         expandedNumEntriesToShow = 30)
   }
@@ -53,8 +54,8 @@ class Views @Inject()(val messagesApi: MessagesApi) extends Controller with I18n
     implicit request =>
       val allCombinations: Seq[AccountPair] =
         for {
-          (acc1, i1) <- Config.personallySortedAccounts.zipWithIndex
-          (acc2, i2) <- Config.personallySortedAccounts.zipWithIndex
+          (acc1, i1) <- accountingConfig.personallySortedAccounts.zipWithIndex
+          (acc2, i2) <- accountingConfig.personallySortedAccounts.zipWithIndex
           if i1 < i2
         } yield AccountPair(acc1, acc2)
       liquidation(
@@ -66,13 +67,13 @@ class Views @Inject()(val messagesApi: MessagesApi) extends Controller with I18n
   def liquidationOfSingle(accountCode1: String, accountCode2: String) = AuthenticatedAction { implicit user =>
     implicit request =>
       liquidation(
-        accountPairs = Seq(AccountPair(Config.accounts(accountCode1), Config.accounts(accountCode2))))
+        accountPairs = Seq(AccountPair(accountingConfig.accounts(accountCode1), accountingConfig.accounts(accountCode2))))
   }
 
   def endowmentsOfAll = AuthenticatedAction { implicit user =>
     implicit request =>
       endowments(
-        accounts = Config.personallySortedAccounts,
+        accounts = accountingConfig.personallySortedAccounts,
         numEntriesShownByDefaultToShow = 30,
         expandedNumEntriesToShow = 100)
   }
@@ -80,13 +81,13 @@ class Views @Inject()(val messagesApi: MessagesApi) extends Controller with I18n
   def endowmentsOfSingle(accountCode: String) = AuthenticatedAction { implicit user =>
     implicit request =>
       endowments(
-        accounts = Seq(Config.accounts(accountCode)))
+        accounts = Seq(accountingConfig.accounts(accountCode)))
   }
 
   def summaryForCurrentYear(tags: String = "", toggleTag: String = "") = AuthenticatedAction { implicit user =>
     implicit request =>
       summary(
-        accounts = Config.personallySortedAccounts,
+        accounts = accountingConfig.personallySortedAccounts,
         expandedYear = Clock.now.getYear,
         tagsString = tags,
         toggleTag = toggleTag)
@@ -95,7 +96,7 @@ class Views @Inject()(val messagesApi: MessagesApi) extends Controller with I18n
   def summaryFor(expandedYear: Int, tags: String, toggleTag: String) = AuthenticatedAction { implicit user =>
     implicit request =>
       summary(
-        accounts = Config.personallySortedAccounts,
+        accounts = accountingConfig.personallySortedAccounts,
         expandedYear,
         tagsString = tags,
         toggleTag = toggleTag)
@@ -110,7 +111,7 @@ class Views @Inject()(val messagesApi: MessagesApi) extends Controller with I18n
     Ok(views.html.accounting.everything(
       entries = entries,
       numEntriesToShow = numEntriesToShow,
-      templatesInNavbar = Config.templatesToShowFor(Template.Placement.EverythingView, user)))
+      templatesInNavbar = accountingConfig.templatesToShowFor(Template.Placement.EverythingView, user)))
   }
 
   private def cashFlow(reservoirs: Iterable[MoneyReservoir],
@@ -127,7 +128,7 @@ class Views @Inject()(val messagesApi: MessagesApi) extends Controller with I18n
     // get sorted accounts -> reservoir to show
     val accountToReservoirs = reservoirs.groupBy(_.owner)
     val sortedAccountToReservoirs = toListMap(
-      for (acc <- Config.personallySortedAccounts; if accountToReservoirs.contains(acc))
+      for (acc <- accountingConfig.personallySortedAccounts; if accountToReservoirs.contains(acc))
         yield (acc, accountToReservoirs(acc)))
 
     // render
@@ -136,7 +137,7 @@ class Views @Inject()(val messagesApi: MessagesApi) extends Controller with I18n
       reservoirToEntries = reservoirToEntries,
       numEntriesShownByDefault = numEntriesShownByDefaultToShow,
       expandedNumEntries = expandedNumEntriesToShow,
-      templatesInNavbar = Config.templatesToShowFor(Template.Placement.CashFlowView, user)))
+      templatesInNavbar = accountingConfig.templatesToShowFor(Template.Placement.CashFlowView, user)))
   }
 
 
@@ -154,7 +155,7 @@ class Views @Inject()(val messagesApi: MessagesApi) extends Controller with I18n
       pairsToEntries = pairsToEntries,
       numEntriesShownByDefault = numEntriesShownByDefaultToShow,
       expandedNumEntries = expandedNumEntriesToShow,
-      templatesInNavbar = Config.templatesToShowFor(Template.Placement.LiquidationView, user)))
+      templatesInNavbar = accountingConfig.templatesToShowFor(Template.Placement.LiquidationView, user)))
   }
 
   private def endowments(accounts: Iterable[Account],
@@ -171,7 +172,7 @@ class Views @Inject()(val messagesApi: MessagesApi) extends Controller with I18n
       accountToEntries = accountToEntries,
       numEntriesShownByDefault = numEntriesShownByDefaultToShow,
       expandedNumEntries = expandedNumEntriesToShow,
-      templatesInNavbar = Config.templatesToShowFor(Template.Placement.EndowmentsView, user)))
+      templatesInNavbar = accountingConfig.templatesToShowFor(Template.Placement.EndowmentsView, user)))
   }
 
   private def summary(accounts: Iterable[Account], expandedYear: Int, tagsString: String, toggleTag: String)
@@ -203,7 +204,7 @@ class Views @Inject()(val messagesApi: MessagesApi) extends Controller with I18n
       Ok(views.html.accounting.summary(
         accountToSummary,
         expandedYear,
-        templatesInNavbar = Config.templatesToShowFor(Template.Placement.SummaryView, user),
+        templatesInNavbar = accountingConfig.templatesToShowFor(Template.Placement.SummaryView, user),
         tags = tags,
         tagsString = tagsString))
     }
