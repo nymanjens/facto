@@ -13,19 +13,6 @@ import models.accounting.{Transaction, Transactions, TransactionGroups, Transact
 
 object TestObjects {
 
-  final class FactoTestModule extends AbstractModule {
-
-    override def configure() = {
-      install(new ConfigModule)
-    }
-
-    @Provides()
-    private[testing] def playConfiguration(): play.api.Configuration = {
-      ???
-    }
-  }
-
-
   implicit lazy val accountingConfig: Config = {
     Guice.createInjector(new FactoTestModule).getInstance(classOf[Config])
   }

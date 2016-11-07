@@ -1,8 +1,11 @@
 package controllers.helpers.accounting
 
+import com.google.inject._
+
 import scala.collection.immutable.Seq
 import common.testing.TestObjects._
 import common.testing.TestUtils._
+import common.testing.{FactoTestModule, HookedSpecification}
 import models.accounting.money.ReferenceMoney
 import org.junit.runner._
 import org.specs2.mutable._
@@ -10,7 +13,14 @@ import org.specs2.runner._
 import play.api.test.WithApplication
 
 @RunWith(classOf[JUnitRunner])
-class LiquidationEntryTest extends Specification {
+class LiquidationEntryTest extends HookedSpecification {
+
+  @Inject val liquidationEntries: LiquidationEntries = null
+
+  override def before() = {
+    Guice.createInjector(new FactoTestModule).injectMembers(this)
+  }
+
   "fetchLastNEntries()" in new WithApplication {
     // Get and persist dummy transactions
     // Irrelevant transactions (should be ignored)
@@ -38,10 +48,10 @@ class LiquidationEntryTest extends Specification {
     val pair = AccountPair(testAccountA, testAccountB)
     for (i <- 1 to expectedEntries.size) {
       val subList = expectedEntries.takeRight(i)
-      LiquidationEntry.fetchLastNEntries(pair, n = subList.size) mustEqual subList
+      liquidationEntries.fetchLastNEntries(pair, n = subList.size) mustEqual subList
     }
 
     // test when n > num entries
-    LiquidationEntry.fetchLastNEntries(pair, n = 1000) mustEqual expectedEntries
+    liquidationEntries.fetchLastNEntries(pair, n = 1000) mustEqual expectedEntries
   }
 }
