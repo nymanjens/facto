@@ -10,7 +10,7 @@ import models.accounting.UpdateLogs
 import models.accounting.config.{Config, Template}
 import controllers.helpers.AuthenticatedAction
 
-class GeneralActions @Inject()(val messagesApi: MessagesApi) extends Controller with I18nSupport {
+class GeneralActions @Inject()(val messagesApi: MessagesApi, accountingConfig: Config) extends Controller with I18nSupport {
 
   // ********** actions ********** //
   def searchMostRelevant(q: String) = AuthenticatedAction { implicit user =>
@@ -36,7 +36,7 @@ class GeneralActions @Inject()(val messagesApi: MessagesApi) extends Controller 
   def templateList = AuthenticatedAction { implicit user =>
     implicit request =>
       Ok(views.html.accounting.templatelist(
-        templates = Config.templatesToShowFor(Template.Placement.TemplateList, user)))
+        templates = accountingConfig.templatesToShowFor(Template.Placement.TemplateList, user)))
   }
 
   // ********** private helper controllers ********** //
@@ -52,7 +52,7 @@ class GeneralActions @Inject()(val messagesApi: MessagesApi) extends Controller 
       totalNumResults = allEntries.size,
       entries = entries,
       numEntriesToShow = numEntriesToShow,
-      templatesInNavbar = Config.templatesToShowFor(Template.Placement.SearchView, user)))
+      templatesInNavbar = accountingConfig.templatesToShowFor(Template.Placement.SearchView, user)))
   }
 
   private def updateLogs(numEntriesToShow: Int = 100000)(implicit request: Request[AnyContent], user: User): Result = {
