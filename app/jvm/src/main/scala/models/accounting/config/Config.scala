@@ -74,37 +74,3 @@ case class Config(accounts: Map[String, Account],
     Seq(List(constants.commonAccount), myAccount.toList, otherAccounts).flatten
   }
 }
-
-object Config {
-
-  private val loadedConfig: Config = {
-    try {
-      // get configLocation
-      val configLocation = application.configuration.getString("facto.accounting.configYamlFilePath")
-
-      // get data
-      val stringData = {
-        if (Files.exists(Paths.get(configLocation))) {
-          scala.io.Source.fromFile(configLocation).mkString
-        } else {
-          require(ResourceFiles.exists(configLocation), s"Could not find $configLocation as file or as resource")
-          ResourceFiles.read(configLocation)
-        }
-      }
-
-      // parse data
-      val constr = new CustomClassLoaderConstructor(getClass.getClassLoader)
-      val yaml = new Yaml(constr)
-      yaml.setBeanAccess(BeanAccess.FIELD)
-      val configData = yaml.load(stringData).asInstanceOf[Parsable.Config]
-
-      // convert to parsed config
-      configData.parse
-    } catch {
-      case e: Throwable =>
-        val stackTrace = Throwables.getStackTraceAsString(e)
-        Logger.error(s"Error when parsing accounting-config.yml: $stackTrace")
-        throw e
-    }
-  }
-}
