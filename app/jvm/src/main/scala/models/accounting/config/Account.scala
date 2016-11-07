@@ -39,10 +39,18 @@ case class Account(code: String,
         user.get
     }
   }
-  def defaultCashReservoir: Option[MoneyReservoir] = defaultCashReservoirCode map Config.moneyReservoir
-  def defaultElectronicReservoir: MoneyReservoir = Config.moneyReservoir(defaultElectronicReservoirCode)
-  def visibleReservoirs: Seq[MoneyReservoir] = Config.visibleReservoirs.filter(_.owner == this).toList
-  def isMineOrCommon(implicit user: User): Boolean = Set(Config.accountOf(user), Some(Config.constants.commonAccount)).flatten.contains(this)
+
+  def defaultCashReservoir(implicit accountingConfig: Config): Option[MoneyReservoir] =
+    defaultCashReservoirCode map accountingConfig.moneyReservoir
+
+  def defaultElectronicReservoir(implicit accountingConfig: Config): MoneyReservoir =
+    accountingConfig.moneyReservoir(defaultElectronicReservoirCode)
+
+  def visibleReservoirs(implicit accountingConfig: Config): Seq[MoneyReservoir] =
+    accountingConfig.visibleReservoirs.filter(_.owner == this).toList
+
+  def isMineOrCommon(implicit accountingConfig: Config, user: User): Boolean =
+    Set(accountingConfig.accountOf(user), Some(accountingConfig.constants.commonAccount)).flatten.contains(this)
 }
 
 object Account {
