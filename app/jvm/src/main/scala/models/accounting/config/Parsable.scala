@@ -158,17 +158,15 @@ object Parsable {
   case class Constants(commonAccount: Account,
                        accountingCategory: Category,
                        endowmentCategory: Category,
-                       defaultCurrency: String,
                        liquidationDescription: String) {
-    def this() = this(null, null, null, null, liquidationDescription = "Liquidation")
+    def this() = this(null, null, null, liquidationDescription = "Liquidation")
 
     def parse: ParsedConstants = {
       ParsedConstants(
         commonAccount = commonAccount.parse,
         accountingCategory = accountingCategory.parse,
         endowmentCategory = endowmentCategory.parse,
-        liquidationDescription = liquidationDescription,
-        defaultCurrency = defaultCurrency)
+        liquidationDescription = liquidationDescription)
     }
   }
 

@@ -20,4 +20,10 @@ object Require {
       require(value != null, s"Value for field '$fieldName' may not be null.")
     }
   }
+
+  def requireNonNull(objects: AnyRef*) : Unit = {
+    for ((obj, index) <- objects.zipWithIndex) {
+     require(obj != null, s"Reference at index $index is null")
+    }
+  }
 }

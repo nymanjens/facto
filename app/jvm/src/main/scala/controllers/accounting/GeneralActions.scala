@@ -10,7 +10,9 @@ import models.accounting.UpdateLogs
 import models.accounting.config.{Config, Template}
 import controllers.helpers.AuthenticatedAction
 
-class GeneralActions @Inject()(val messagesApi: MessagesApi, accountingConfig: Config, generalEntries: GeneralEntries) extends Controller with I18nSupport {
+class GeneralActions @Inject()(implicit val messagesApi: MessagesApi,
+                               accountingConfig: Config,
+                               generalEntries: GeneralEntries) extends Controller with I18nSupport {
 
   // ********** actions ********** //
   def searchMostRelevant(q: String) = AuthenticatedAction { implicit user =>

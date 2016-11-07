@@ -4,7 +4,6 @@ import com.google.inject.{AbstractModule, Provides}
 import collection.immutable.Seq
 import java.nio.file.{Files, Paths}
 
-import play.Play.application
 import play.api.Logger
 import common.ResourceFiles
 
@@ -22,10 +21,10 @@ final class ConfigModule extends AbstractModule {
   override def configure() = {}
 
   @Provides()
-  private[config] def config(): Config = {
+  private[config] def config(playConfiguration: play.api.Configuration): Config = {
     try {
       // get configLocation
-      val configLocation = application.configuration.getString("facto.accounting.configYamlFilePath")
+      val configLocation = playConfiguration.getString("facto.accounting.configYamlFilePath").get
 
       // get data
       val stringData = {

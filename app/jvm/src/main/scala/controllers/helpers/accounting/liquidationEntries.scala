@@ -1,9 +1,10 @@
 package controllers.helpers.accounting
 
+import com.google.inject.{Inject, Singleton}
 import collection.immutable.Seq
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
 import models.accounting.{Transaction, Transactions}
-import models.accounting.config.{Account, Category, MoneyReservoir}
+import models.accounting.config.{Account, Category, MoneyReservoir, Config}
 import models.SlickUtils.dbApi._
 import controllers.helpers.ControllerHelperCache
 import controllers.helpers.ControllerHelperCache.CacheIdentifier
@@ -15,7 +16,7 @@ import models.accounting.money.ReferenceMoney
 case class LiquidationEntry(override val transactions: Seq[Transaction], debt: ReferenceMoney)
   extends GroupedTransactions(transactions)
 
-object LiquidationEntry {
+class LiquidationEntries @Inject()(implicit accountingConfig: Config) {
 
   /* Returns most recent n entries sorted from old to new. */
   def fetchLastNEntries(accountPair: AccountPair, n: Int): Seq[LiquidationEntry] =

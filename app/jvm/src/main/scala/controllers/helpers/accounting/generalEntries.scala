@@ -18,7 +18,7 @@ case class GeneralEntry(override val transactions: Seq[Transaction])
   extends GroupedTransactions(transactions)
 
 @Singleton()
-class GeneralEntries @Inject()(accountingConfig: Config) {
+class GeneralEntries @Inject()(implicit accountingConfig: Config) {
 
   /* Returns most recent n entries sorted from old to new. */
   def fetchLastNEntries(n: Int): Seq[GeneralEntry] = {
@@ -104,7 +104,7 @@ private case class QueryScore(scoreNumber: Double, createdDate: DateTime, transa
   def matchesQuery: Boolean = scoreNumber > 0
 }
 private object QueryScore {
-  def apply(transaction: Transaction, queryParts: Seq[String]): QueryScore = {
+  def apply(transaction: Transaction, queryParts: Seq[String])(implicit accountingConfig: Config): QueryScore = {
     def scorePart(queryPart: String): Double = {
       def splitToParts(s: String): Seq[String] = {
         Splitter.onPattern("[ ,.]")

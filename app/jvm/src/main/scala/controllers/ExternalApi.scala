@@ -19,8 +19,8 @@ import controllers.accounting.Views
 import controllers.helpers.{AuthenticatedAction, ControllerHelperCache}
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 
-class ExternalApi @Inject()(viewsController: Views,
-                            val messagesApi: MessagesApi,
+class ExternalApi @Inject()(implicit val messagesApi: MessagesApi,
+                            viewsController: Views,
                             playConfiguration: play.api.Configuration,
                             accountingConfig: Config)
   extends Controller with I18nSupport {

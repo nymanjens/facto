@@ -40,10 +40,6 @@ Familiy Accounting Tool keeps track of every transaction your family makes. Its 
     bin/facto -DcreateAdminUser
     rm RUNNING_PID
 
-    # (Optional) Import Facto v1 backups
-    bin/facto -DloadFactoV1DataFromPath=path/to/backup.sql
-    rm RUNNING_PID
-
     # Run application
     bin/facto
     ```

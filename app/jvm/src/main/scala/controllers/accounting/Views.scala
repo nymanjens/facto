@@ -15,10 +15,12 @@ import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 
-class Views @Inject()(val messagesApi: MessagesApi,
+class Views @Inject()(implicit val messagesApi: MessagesApi,
                       accountingConfig: Config,
                       generalEntries: GeneralEntries,
-                      cashFlowEntries: CashFlowEntries) extends Controller with I18nSupport {
+                      cashFlowEntries: CashFlowEntries,
+                      liquidationEntries: LiquidationEntries,
+                      summaries: Summaries) extends Controller with I18nSupport {
 
   // ********** actions - views ********** //
   def everythingLatest = AuthenticatedAction { implicit user =>
@@ -151,7 +153,7 @@ class Views @Inject()(val messagesApi: MessagesApi,
     // get pairsToEntries
     val pairsToEntries = toListMap(
       for (accountPair <- accountPairs)
-        yield (accountPair, LiquidationEntry.fetchLastNEntries(accountPair, n = expandedNumEntriesToShow + 1)))
+        yield (accountPair, liquidationEntries.fetchLastNEntries(accountPair, n = expandedNumEntriesToShow + 1)))
 
     // render
     Ok(views.html.accounting.liquidation(
@@ -200,7 +202,7 @@ class Views @Inject()(val messagesApi: MessagesApi,
     } else {
       // get accountToEntries
       val accountToSummary = toListMap {
-        for (account <- accounts) yield account -> Summary.fetchSummary(account, expandedYear, tags)
+        for (account <- accounts) yield account -> summaries.fetchSummary(account, expandedYear, tags)
       }
 
       // render

@@ -300,7 +300,7 @@ object TransactionGroupOperations {
           tagsString = trans.tagsString)
       }
 
-      def fromModel(trans: Transaction) = TransactionData(
+      def fromModel(trans: Transaction)(implicit accountingConfig: Config) = TransactionData(
         issuerName = trans.issuer.name,
         beneficiaryAccountCode = trans.beneficiaryAccountCode,
         moneyReservoirCode = trans.moneyReservoirCode,
@@ -319,7 +319,7 @@ object TransactionGroupOperations {
       def fromPartial(transGroup: TransactionGroupPartial)(implicit user: User, accountingConfig: Config) =
         TransGroupData(transGroup.transactions.map(TransactionData.fromPartial(_)), transGroup.zeroSum)
 
-      def fromModel(transGroup: TransactionGroup) =
+      def fromModel(transGroup: TransactionGroup)(implicit accountingConfig: Config) =
         TransGroupData(
           transGroup.transactions.map(TransactionData.fromModel(_)),
           zeroSum = transGroup.isZeroSum)
@@ -388,7 +388,7 @@ object TransactionGroupOperations {
       })
 
       // Don't allow creation of duplicate transactions because they are probably unintended (e.g. pressing enter twice).
-      private def uniqueTransaction = Constraint[TransGroupData]((groupData: TransGroupData) => {
+      private def uniqueTransaction(implicit accountingConfig: Config) = Constraint[TransGroupData]((groupData: TransGroupData) => {
         def fetchMatchingTransaction(transactionData: TransactionData): Option[Transaction] = {
           val possibleMatches = dbRun(
             Transactions.newQuery

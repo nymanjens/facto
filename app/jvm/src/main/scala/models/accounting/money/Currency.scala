@@ -21,7 +21,8 @@ object Currency {
     Iterables.getOnlyElement(candidates.asJava)
   }
 
-  lazy val default: Currency = Currency.of(Config.constants.defaultCurrency)
+  // TOOD: Make this configurable
+  val default: Currency = Eur
 
   private def all: Set[Currency] = Set(Eur, Gbp, Usd)
   object Eur extends Currency("EUR", Html("&euro;"), Some("fa fa-eur"))

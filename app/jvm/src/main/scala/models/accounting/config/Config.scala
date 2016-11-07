@@ -12,7 +12,7 @@ import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor
 import org.yaml.snakeyaml.introspector.BeanAccess
 
-import common.Require.requireNonNullFields
+import common.Require.requireNonNull
 import models.User
 import models.accounting.config.MoneyReservoir.NullMoneyReservoir
 
@@ -27,7 +27,7 @@ case class Config(accounts: Map[String, Account],
                   private val moneyReservoirsMap: Map[String, MoneyReservoir],
                   private val templates: Seq[Template],
                   constants: Constants) {
-  requireNonNullFields(this)
+  requireNonNull(accounts, categories, moneyReservoirsMap, templates, constants)
 
   // Not exposing moneyReservoirs because it's too easy to accidentally show hidden reservoirs
   def moneyReservoir(code: String): MoneyReservoir = moneyReservoirOption(code).get
@@ -53,7 +53,7 @@ case class Config(accounts: Map[String, Account],
   def visibleReservoirs(includeNullReservoir: Boolean = false): Seq[MoneyReservoir] =
     moneyReservoirs(includeNullReservoir = includeNullReservoir)
 
-  def templatesToShowFor(location: Template.Placement, user: User): Seq[Template] =
+  def templatesToShowFor(location: Template.Placement, user: User)(implicit accountingConfig: Config): Seq[Template] =
     templates filter (_.showFor(location, user))
 
   def templateWithCode(code: String): Template = {

@@ -18,7 +18,7 @@ case class Template(code: String,
                     private val transactions: Seq[Template.Transaction]) {
   requireNonNullFields(this)
 
-  def showFor(location: Template.Placement, user: User): Boolean = {
+  def showFor(location: Template.Placement, user: User)(implicit accountingConfig: Config): Boolean = {
     val showAtLocation = placement contains location
     val showToUser = onlyShowForUsers match {
       case Some(users) => users contains user
@@ -27,18 +27,18 @@ case class Template(code: String,
     showAtLocation && showToUser
   }
 
-  def toPartial(account: Account): TransactionGroupPartial = {
+  def toPartial(account: Account)(implicit accountingConfig: Config): TransactionGroupPartial = {
     TransactionGroupPartial(
       transactions = transactions map (_.toPartial(account)),
       zeroSum = zeroSum)
   }
 
-  private def onlyShowForUsers: Option[Set[User]] = {
+  private def onlyShowForUsers(implicit accountingConfig: Config): Option[Set[User]] = {
     onlyShowForUserLoginNames.map { loginNameOption =>
       loginNameOption.map { loginName =>
         val user = Users.findByLoginName(loginName)
         require(user.isDefined, s"No user exists with loginName '$loginName'")
-        require(Config.accountOf(user.get).isDefined, s"Only user names that have an associated account can be used in templates " +
+        require(accountingConfig.accountOf(user.get).isDefined, s"Only user names that have an associated account can be used in templates " +
           s"(user = '$loginName', template = '$name')")
         user.get
       }
@@ -76,7 +76,7 @@ object Template {
                          tagsString: String) {
     requireNonNullFields(this)
 
-    def toPartial(account: Account): TransactionPartial = {
+    def toPartial(account: Account)(implicit accountingConfig: Config): TransactionPartial = {
       def fillInPlaceholders(string: String): String = {
         val placeholderToReplacement = Map(
           "${account.code}" -> account.code,
@@ -90,13 +90,13 @@ object Template {
         result
       }
       val reservoirsIncludingNullMap = {
-        for (reservoir <- Config.visibleReservoirs(includeNullReservoir = true))
+        for (reservoir <- accountingConfig.visibleReservoirs(includeNullReservoir = true))
           yield reservoir.code -> reservoir
       }.toMap
       TransactionPartial(
-        beneficiary = beneficiaryCodeTpl map fillInPlaceholders map Config.accounts,
+        beneficiary = beneficiaryCodeTpl map fillInPlaceholders map accountingConfig.accounts,
         moneyReservoir = moneyReservoirCodeTpl map fillInPlaceholders map reservoirsIncludingNullMap,
-        category = categoryCodeTpl map fillInPlaceholders map Config.categories,
+        category = categoryCodeTpl map fillInPlaceholders map accountingConfig.categories,
         description = fillInPlaceholders(descriptionTpl),
         flowInCents = flowInCents,
         detailDescription = "",
