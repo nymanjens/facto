@@ -14,20 +14,3 @@
   implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash
 )
 
-@Main(Messages("facto.templates")) {
-  <h1 class="page-header"><i class="icon-template"></i> @Messages("facto.templates")</h1>
-
-  @Panel(
-    title = Messages("facto.templates"),
-    panelClasses = "templates-panel"
-  ) { @* panel content *@
-
-    @for(template <- templates) {
-        <a href="@(controllers.accounting.routes.TransactionGroupOperations.addNewFromTemplate(template.code
-              ) ++: ReturnTo(request.uri))"
-            class="btn btn-info btn-lg">
-          <i class="@template.iconClass"></i> @template.name
-        </a>
-    }
-  }
-}
