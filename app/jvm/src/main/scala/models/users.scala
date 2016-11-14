@@ -5,7 +5,7 @@ import com.google.common.hash.Hashing
 
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
-import models.manager.{EntityTable, Entity, EntityManager, ForwardingEntityManager}
+import models.manager.{EntityTable, Entity, SlickEntityManager, ForwardingEntityManager}
 
 class Users(tag: Tag) extends EntityTable[User](tag, Users.tableName) {
   def loginName = column[String]("loginName")
@@ -18,7 +18,7 @@ class Users(tag: Tag) extends EntityTable[User](tag, Users.tableName) {
 }
 
 object Users extends ForwardingEntityManager[User, Users](
-  EntityManager.create[User, Users](
+  SlickEntityManager.create[User, Users](
     tag => new Users(tag),
     tableName = "USERS",
     cached = true

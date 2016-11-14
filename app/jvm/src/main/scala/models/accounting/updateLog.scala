@@ -10,7 +10,7 @@ import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.{User, Users}
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
-import models.manager.{EntityTable, ImmutableEntityManager, Entity, EntityManager}
+import models.manager.{EntityTable, ImmutableEntityManager, Entity, SlickEntityManager}
 import models.accounting.config.Config
 import models.accounting.config.{Category, Account, MoneyReservoir}
 
@@ -37,7 +37,7 @@ class UpdateLogs(tag: SlickTag) extends EntityTable[UpdateLog](tag, UpdateLogs.t
 }
 
 object UpdateLogs extends ImmutableEntityManager[UpdateLog, UpdateLogs](
-  EntityManager.create[UpdateLog, UpdateLogs](tag => new UpdateLogs(tag), tableName = "UPDATE_LOGS")) {
+  SlickEntityManager.create[UpdateLog, UpdateLogs](tag => new UpdateLogs(tag), tableName = "UPDATE_LOGS")) {
 
   /* Returns most recent n entries sorted from old to new. */
   def fetchLastNEntries(n: Int): Seq[UpdateLog] =

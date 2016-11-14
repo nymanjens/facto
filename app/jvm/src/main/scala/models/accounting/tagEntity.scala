@@ -6,7 +6,7 @@ import models.SlickUtils.dbRun
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.SlickUtils.JodaToSqlDateMapper
-import models.manager.{Entity, EntityManager, EntityTable, ImmutableEntityManager}
+import models.manager.{Entity, SlickEntityManager, EntityTable, ImmutableEntityManager}
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
@@ -14,7 +14,7 @@ import scala.collection.immutable.ListMap
 
 /**
   * Notes when using TagEntities:
-  * - TagEntities should only be updated by the Transactions EntityManager!
+  * - TagEntities should only be updated by the Transactions SlickEntityManager!
   * - TagEntities are immutable. Just delete and create a new one when updating.
   */
 case class TagEntity(name: String,
@@ -42,7 +42,7 @@ class TagEntities(tag: SlickTag) extends EntityTable[TagEntity](tag, TagEntities
 }
 
 object TagEntities extends ImmutableEntityManager[TagEntity, TagEntities](
-  EntityManager.create[TagEntity, TagEntities](
+  SlickEntityManager.create[TagEntity, TagEntities](
     tag => new TagEntities(tag), tableName = "TAG_ENTITIES")) {
 
   // Validates the tag name at creation time

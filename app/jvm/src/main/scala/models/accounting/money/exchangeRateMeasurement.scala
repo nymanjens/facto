@@ -10,7 +10,7 @@ import models.SlickUtils.dbRun
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.SlickUtils.JodaToSqlDateMapper
-import models.manager.{Entity, EntityManager, EntityTable, ImmutableEntityManager}
+import models.manager.{Entity, SlickEntityManager, EntityTable, ImmutableEntityManager}
 import org.joda.time.DateTime
 
 import scala.collection.JavaConverters._
@@ -47,7 +47,7 @@ class ExchangeRateMeasurements(tag: SlickTag) extends EntityTable[ExchangeRateMe
 }
 
 object ExchangeRateMeasurements extends ImmutableEntityManager[ExchangeRateMeasurement, ExchangeRateMeasurements](
-  EntityManager.create[ExchangeRateMeasurement, ExchangeRateMeasurements](
+  SlickEntityManager.create[ExchangeRateMeasurement, ExchangeRateMeasurements](
     tag => new ExchangeRateMeasurements(tag), tableName = "EXCHANGE_RATE_MEASUREMENT")) {
 
   type AdditionListener = ExchangeRateMeasurement => Unit

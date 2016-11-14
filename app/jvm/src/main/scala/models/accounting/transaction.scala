@@ -9,7 +9,7 @@ import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.accounting.money.{DatedMoney, Money}
-import models.manager.{Entity, EntityManager, EntityTable, ImmutableEntityManager}
+import models.manager.{Entity, SlickEntityManager, EntityTable, ImmutableEntityManager}
 import models.{User, Users}
 import org.joda.time.DateTime
 
@@ -103,7 +103,7 @@ class Transactions(tag: SlickTag) extends EntityTable[Transaction](tag, Transact
 }
 
 object Transactions extends ImmutableEntityManager[Transaction, Transactions](
-  EntityManager.create[Transaction, Transactions](
+  SlickEntityManager.create[Transaction, Transactions](
     tag => new Transactions(tag), tableName = "TRANSACTIONS")) {
 
   // ********** Mutators ********** //

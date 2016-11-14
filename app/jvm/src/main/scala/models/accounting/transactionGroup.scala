@@ -9,7 +9,7 @@ import models.SlickUtils.dbRun
 import models.SlickUtils.JodaToSqlDateMapper
 import models.accounting.money.{Money, ReferenceMoney}
 import models.accounting.config.Config
-import models.manager.{Entity, EntityManager, EntityTable, ImmutableEntityManager}
+import models.manager.{Entity, SlickEntityManager, EntityTable, ImmutableEntityManager}
 
 /** Transaction groups should be treated as immutable. */
 case class TransactionGroup(createdDate: DateTime = Clock.now,
@@ -32,5 +32,5 @@ class TransactionGroups(tag: SlickTag) extends EntityTable[TransactionGroup](tag
 }
 
 object TransactionGroups extends ImmutableEntityManager[TransactionGroup, TransactionGroups](
-  EntityManager.create[TransactionGroup, TransactionGroups](
+  SlickEntityManager.create[TransactionGroup, TransactionGroups](
     tag => new TransactionGroups(tag), tableName = "TRANSACTION_GROUPS"))

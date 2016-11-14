@@ -5,10 +5,10 @@
 //
 //import models.SlickUtils.dbApi._
 //import models.SlickUtils.dbRun
-//import models.manager.{EntityTable, Entity, EntityManager, ForwardingEntityManager}
+//import models.manager.{EntityTable, Entity, SlickEntityManager, ForwardingEntityManager}
 //
-//class UserManager extends EntityManager[User, Users](
-//  EntityManager.create[User, Users](
+//class UserManager extends SlickEntityManager[User, Users](
+//  SlickEntityManager.create[User, Users](
 //    tag => new Users(tag),
 //    tableName = "USERS",
 //    cached = true

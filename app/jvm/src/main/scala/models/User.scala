@@ -5,7 +5,7 @@ import com.google.common.hash.Hashing
 
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
-import models.manager.{EntityTable, Entity, EntityManager, ForwardingEntityManager}
+import models.manager.{EntityTable, Entity, SlickEntityManager, ForwardingEntityManager}
 
 case class User(loginName: String,
                 passwordHash: String,

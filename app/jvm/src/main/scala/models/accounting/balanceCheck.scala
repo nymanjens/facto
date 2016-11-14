@@ -7,7 +7,7 @@ import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.SlickUtils.JodaToSqlDateMapper
 import models.accounting.config.{Config, MoneyReservoir}
 import models.accounting.money.{DatedMoney, Money}
-import models.manager.{Entity, EntityManager, EntityTable, ImmutableEntityManager}
+import models.manager.{Entity, SlickEntityManager, EntityTable, ImmutableEntityManager}
 import models.{User, Users}
 import org.joda.time.DateTime
 
@@ -39,5 +39,5 @@ class BalanceChecks(tag: SlickTag) extends EntityTable[BalanceCheck](tag, Balanc
 }
 
 object BalanceChecks extends ImmutableEntityManager[BalanceCheck, BalanceChecks](
-  EntityManager.create[BalanceCheck, BalanceChecks](
+  SlickEntityManager.create[BalanceCheck, BalanceChecks](
     tag => new BalanceChecks(tag), tableName = "BALANCE_CHECKS"))
