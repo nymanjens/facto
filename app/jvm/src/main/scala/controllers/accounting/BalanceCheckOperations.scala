@@ -17,14 +17,15 @@ import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting.FormUtils.{validFlowAsFloat, flowAsFloatStringToCents}
 import controllers.accounting.BalanceCheckOperations.{Forms, AddNewOperationMeta, EditOperationMeta, OperationMeta}
 
-class BalanceCheckOperations @Inject()(val messagesApi: MessagesApi) extends Controller with I18nSupport {
+class BalanceCheckOperations @Inject()(implicit val messagesApi: MessagesApi, accountingConfig: Config)
+  extends Controller with I18nSupport {
 
   // ********** actions ********** //
   def addNewForm(moneyReservoirCode: String, returnTo: String) = AuthenticatedAction { implicit user =>
     implicit request =>
       implicit val returnToImplicit = ReturnTo(returnTo)
 
-      val moneyReservoir = Config.moneyReservoir(moneyReservoirCode)
+      val moneyReservoir = accountingConfig.moneyReservoir(moneyReservoirCode)
       val initialData = Forms.BcData(
         issuerName = user.name,
         moneyReservoirName = moneyReservoir.name,
@@ -71,7 +72,7 @@ class BalanceCheckOperations @Inject()(val messagesApi: MessagesApi) extends Con
                                             balanceInCents: Long,
                                             mostRecentTransactionId: Long)
                                            (implicit user: User): Unit = {
-    val moneyReservoir = Config.moneyReservoir(moneyReservoirCode)
+    val moneyReservoir = accountingConfig.moneyReservoir(moneyReservoirCode)
     val mostRecentTransaction = Transactions.findById(mostRecentTransactionId)
 
     val balanceCheck = BalanceCheck(
@@ -169,7 +170,7 @@ object BalanceCheckOperations {
                       balanceInCents: Long = 0)
 
     object BcData {
-      def fromModel(bc: BalanceCheck) = BcData(
+      def fromModel(bc: BalanceCheck)(implicit accountingConfig: Config) = BcData(
         issuerName = bc.issuer.name,
         moneyReservoirName = bc.moneyReservoir.name,
         checkDate = bc.checkDate,
@@ -190,7 +191,7 @@ object BalanceCheckOperations {
   private[BalanceCheckOperations] sealed trait OperationMeta {
     def moneyReservoirCode: String
 
-    val moneyReservoir = Config.moneyReservoir(moneyReservoirCode)
+    def moneyReservoir(implicit accountingConfig: Config) = accountingConfig.moneyReservoir(moneyReservoirCode)
 
     def bcIdOption: Option[Long]
   }
@@ -200,7 +201,7 @@ object BalanceCheckOperations {
   }
 
   private[BalanceCheckOperations] case class EditOperationMeta(bcId: Long) extends OperationMeta {
-    override def moneyReservoirCode = BalanceChecks.findById(bcId).moneyReservoir.code
+    override def moneyReservoirCode = BalanceChecks.findById(bcId).moneyReservoirCode
     override def bcIdOption = Some(bcId)
   }
 }

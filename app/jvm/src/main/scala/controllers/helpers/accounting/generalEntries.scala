@@ -1,5 +1,6 @@
 package controllers.helpers.accounting
 
+import com.google.inject.{Inject, Singleton}
 import collection.immutable.Seq
 import scala.collection.JavaConverters._
 import com.google.common.base.{Joiner, Splitter}
@@ -16,7 +17,8 @@ import controllers.helpers.ControllerHelperCache.CacheIdentifier
 case class GeneralEntry(override val transactions: Seq[Transaction])
   extends GroupedTransactions(transactions)
 
-object GeneralEntry {
+@Singleton()
+class GeneralEntries @Inject()(implicit accountingConfig: Config) {
 
   /* Returns most recent n entries sorted from old to new. */
   def fetchLastNEntries(n: Int): Seq[GeneralEntry] = {
@@ -41,7 +43,7 @@ object GeneralEntry {
       val transactions: Seq[Transaction] =
         dbRun(
           Transactions.newQuery
-            .filter(_.categoryCode === Config.constants.endowmentCategory.code)
+            .filter(_.categoryCode === accountingConfig.constants.endowmentCategory.code)
             .filter(_.beneficiaryAccountCode === account.code)
             .sortBy(r => (r.consumedDate.desc, r.createdDate.desc))
             .take(3 * n))
@@ -92,57 +94,57 @@ object GeneralEntry {
   private case class FetchLastNEndowments(account: Account, n: Int) extends CacheIdentifier[Seq[GeneralEntry]] {
     protected override def invalidateWhenUpdating = {
       case transaction: Transaction =>
-        transaction.categoryCode == Config.constants.endowmentCategory.code &&
+        transaction.categoryCode == accountingConfig.constants.endowmentCategory.code &&
           transaction.beneficiaryAccountCode == account.code
     }
   }
+}
 
-  case class QueryScore(scoreNumber: Double, createdDate: DateTime, transactionDate: DateTime) {
-    def matchesQuery: Boolean = scoreNumber > 0
-  }
-  object QueryScore {
-    def apply(transaction: Transaction, queryParts: Seq[String]): QueryScore = {
-      def scorePart(queryPart: String): Double = {
-        def splitToParts(s: String): Seq[String] = {
-          Splitter.onPattern("[ ,.]")
-            .trimResults()
-            .omitEmptyStrings()
-            .split(s)
-            .asScala
-            .toVector
-        }
-        val searchableParts: Seq[String] = Seq(
-          transaction.description,
-          transaction.detailDescription,
-          transaction.tagsString,
-          transaction.beneficiary.longName,
-          transaction.moneyReservoir.name,
-          transaction.category.name)
-          .flatMap(splitToParts)
-          .map(_.toLowerCase)
-
-        var score: Double = 0
-        if (searchableParts contains queryPart.toLowerCase) {
-          score += 2
-        } else if (searchableParts.map(_ contains queryPart.toLowerCase) contains true) {
-          score += 1
-        }
-
-        def stripSign(s: String) = s.replace("-", "")
-        val flowAsString = transaction.flow.formatFloat
-        if (flowAsString == queryPart) {
-          score += 3
-        } else if (stripSign(flowAsString) == stripSign(queryPart)) {
-          score += 2.5
-        } else if (flowAsString contains queryPart) {
-          score += 0.1
-        }
-        score
+private case class QueryScore(scoreNumber: Double, createdDate: DateTime, transactionDate: DateTime) {
+  def matchesQuery: Boolean = scoreNumber > 0
+}
+private object QueryScore {
+  def apply(transaction: Transaction, queryParts: Seq[String])(implicit accountingConfig: Config): QueryScore = {
+    def scorePart(queryPart: String): Double = {
+      def splitToParts(s: String): Seq[String] = {
+        Splitter.onPattern("[ ,.]")
+          .trimResults()
+          .omitEmptyStrings()
+          .split(s)
+          .asScala
+          .toVector
       }
-      val scoreNumber = queryParts.map(scorePart).sum
-      QueryScore(scoreNumber, transaction.createdDate, transaction.consumedDate)
-    }
+      val searchableParts: Seq[String] = Seq(
+        transaction.description,
+        transaction.detailDescription,
+        transaction.tagsString,
+        transaction.beneficiary.longName,
+        transaction.moneyReservoir.name,
+        transaction.category.name)
+        .flatMap(splitToParts)
+        .map(_.toLowerCase)
 
-    implicit def defaultOrdering: Ordering[QueryScore] = Ordering.by(QueryScore.unapply)
+      var score: Double = 0
+      if (searchableParts contains queryPart.toLowerCase) {
+        score += 2
+      } else if (searchableParts.map(_ contains queryPart.toLowerCase) contains true) {
+        score += 1
+      }
+
+      def stripSign(s: String) = s.replace("-", "")
+      val flowAsString = transaction.flow.formatFloat
+      if (flowAsString == queryPart) {
+        score += 3
+      } else if (stripSign(flowAsString) == stripSign(queryPart)) {
+        score += 2.5
+      } else if (flowAsString contains queryPart) {
+        score += 0.1
+      }
+      score
+    }
+    val scoreNumber = queryParts.map(scorePart).sum
+    QueryScore(scoreNumber, transaction.createdDate, transaction.consumedDate)
   }
+
+  implicit def defaultOrdering: Ordering[QueryScore] = Ordering.by(QueryScore.unapply)
 }

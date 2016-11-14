@@ -16,14 +16,17 @@ import models.accounting.money.Money
 
 object FormUtils {
 
-  def validMoneyReservoir: Constraint[String] = oneOf(Config.visibleReservoirs.map(_.code))
+  def validMoneyReservoir(implicit accountingConfig: Config): Constraint[String] =
+    oneOf(accountingConfig.visibleReservoirs.map(_.code))
 
-  def validMoneyReservoirOrNullReservoir: Constraint[String] =
-    oneOf(Config.moneyReservoirs(includeNullReservoir = true, includeHidden = true).map(_.code))
+  def validMoneyReservoirOrNullReservoir(implicit accountingConfig: Config): Constraint[String] =
+    oneOf(accountingConfig.moneyReservoirs(includeNullReservoir = true, includeHidden = true).map(_.code))
 
-  def validAccountCode: Constraint[String] = oneOf(Config.accounts.values.map(_.code))
+  def validAccountCode(implicit accountingConfig: Config): Constraint[String] =
+    oneOf(accountingConfig.accounts.values.map(_.code))
 
-  def validCategoryCode: Constraint[String] = oneOf(Config.categories.values.map(_.code))
+  def validCategoryCode(implicit accountingConfig: Config): Constraint[String] =
+    oneOf(accountingConfig.categories.values.map(_.code))
 
   def validFlowAsFloat = Constraint[String] { (string: String) =>
     normalizeMoneyString(string) match {

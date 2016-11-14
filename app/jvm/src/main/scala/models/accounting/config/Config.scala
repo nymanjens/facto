@@ -12,65 +12,32 @@ import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor
 import org.yaml.snakeyaml.introspector.BeanAccess
 
-import common.Require.requireNonNullFields
+import common.Require.requireNonNull
 import models.User
 import models.accounting.config.MoneyReservoir.NullMoneyReservoir
 
+/**
+  * Contains the accountin configuration of this application. This is assumed to remain constant.
+  *
+  * @param accounts Maps code to account
+  * @param categories Maps code to category
+  */
 case class Config(accounts: Map[String, Account],
                   categories: Map[String, Category],
-                  moneyReservoirs: Map[String, MoneyReservoir],
-                  templates: Seq[Template],
+                  private val moneyReservoirsMap: Map[String, MoneyReservoir],
+                  private val templates: Seq[Template],
                   constants: Constants) {
-  requireNonNullFields(this)
-}
-
-object Config {
-
-  private val loadedConfig: Config = {
-    try {
-      // get configLocation
-      val configLocation = application.configuration.getString("facto.accounting.configYamlFilePath")
-
-      // get data
-      val stringData = {
-        if (Files.exists(Paths.get(configLocation))) {
-          scala.io.Source.fromFile(configLocation).mkString
-        } else {
-          require(ResourceFiles.exists(configLocation), s"Could not find $configLocation as file or as resource")
-          ResourceFiles.read(configLocation)
-        }
-      }
-
-      // parse data
-      val constr = new CustomClassLoaderConstructor(getClass.getClassLoader)
-      val yaml = new Yaml(constr)
-      yaml.setBeanAccess(BeanAccess.FIELD)
-      val configData = yaml.load(stringData).asInstanceOf[Parsable.Config]
-
-      // convert to parsed config
-      configData.parse
-    } catch {
-      case e: Throwable =>
-        val stackTrace = Throwables.getStackTraceAsString(e)
-        Logger.error(s"Error when parsing accounting-config.yml: $stackTrace")
-        throw e
-    }
-  }
-
-  /** Maps code to account */
-  val accounts: Map[String, Account] = loadedConfig.accounts
-  /** Maps code to category */
-  val categories: Map[String, Category] = loadedConfig.categories
+  requireNonNull(accounts, categories, moneyReservoirsMap, templates, constants)
 
   // Not exposing moneyReservoirs because it's too easy to accidentally show hidden reservoirs
   def moneyReservoir(code: String): MoneyReservoir = moneyReservoirOption(code).get
   def moneyReservoirOption(code: String): Option[MoneyReservoir] = code match {
     case "" => Some(NullMoneyReservoir)
-    case _ => loadedConfig.moneyReservoirs.get(code)
+    case _ => moneyReservoirsMap.get(code)
   }
 
   def moneyReservoirs(includeNullReservoir: Boolean = false, includeHidden: Boolean = false): Seq[MoneyReservoir] = {
-    var result = loadedConfig.moneyReservoirs.values.toVector
+    var result = moneyReservoirsMap.values.toVector
     if (!includeHidden) {
       result = result.filter(!_.hidden)
     }
@@ -86,17 +53,15 @@ object Config {
   def visibleReservoirs(includeNullReservoir: Boolean = false): Seq[MoneyReservoir] =
     moneyReservoirs(includeNullReservoir = includeNullReservoir)
 
-  def templatesToShowFor(location: Template.Placement, user: User): Seq[Template] =
-    loadedConfig.templates filter (_.showFor(location, user))
+  def templatesToShowFor(location: Template.Placement, user: User)(implicit accountingConfig: Config): Seq[Template] =
+    templates filter (_.showFor(location, user))
 
   def templateWithCode(code: String): Template = {
     val codeToTemplate = {
-      for (tpl <- loadedConfig.templates) yield tpl.code -> tpl
+      for (tpl <- templates) yield tpl.code -> tpl
     }.toMap
     codeToTemplate(code)
   }
-
-  val constants: Constants = loadedConfig.constants
 
   def accountOf(user: User): Option[Account] = accounts.values.filter(_.user == Some(user)).headOption
 

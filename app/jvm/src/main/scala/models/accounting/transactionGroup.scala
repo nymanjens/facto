@@ -8,6 +8,7 @@ import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.SlickUtils.dbRun
 import models.SlickUtils.JodaToSqlDateMapper
 import models.accounting.money.{Money, ReferenceMoney}
+import models.accounting.config.Config
 import models.manager.{Entity, EntityManager, EntityTable, ImmutableEntityManager}
 
 /** Transaction groups should be treated as immutable. */
@@ -18,7 +19,7 @@ case class TransactionGroup(createdDate: DateTime = Clock.now,
 
   def transactions: Seq[Transaction] = dbRun(Transactions.newQuery.filter(_.transactionGroupId === id)).toList
 
-  def isZeroSum: Boolean = transactions.map(_.flow.exchangedForReferenceCurrency).sum == ReferenceMoney(0)
+  def isZeroSum(implicit accountingConfig: Config): Boolean = transactions.map(_.flow.exchangedForReferenceCurrency).sum == ReferenceMoney(0)
 }
 
 case class TransactionGroupPartial(transactions: Seq[TransactionPartial],

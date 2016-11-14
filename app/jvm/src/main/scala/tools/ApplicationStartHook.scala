@@ -37,8 +37,6 @@ class ApplicationStartHook @Inject() (implicit app: Application){
       }
       if (AppConfigHelper.loadCsvDummyData) {
         loadCsvDummyData(AppConfigHelper.csvDummyDataFolder)
-      } else if (AppConfigHelper.loadFactoV1Data) {
-        FactoV1ImportTool.importFromSqlDump(AppConfigHelper.factoV1SqlFilePath)
       }
     }
   }
@@ -48,17 +46,6 @@ class ApplicationStartHook @Inject() (implicit app: Application){
       println("")
       println("  Dropping the database tables (if present) and creating new ones...")
       dropAndCreateNewDb()
-      println("  Done. Exiting.")
-
-      System.exit(0)
-    }
-
-    if (CommandLineFlags.loadFactoV1DataFromPath().isDefined) {
-      val Some(factoV1SqlFilePath) = CommandLineFlags.loadFactoV1DataFromPath()
-
-      println("")
-      println(s"  Importing from facto v1 backup file (at $factoV1SqlFilePath)...")
-      FactoV1ImportTool.importFromSqlDump(factoV1SqlFilePath)
       println("  Done. Exiting.")
 
       System.exit(0)
@@ -102,7 +89,6 @@ class ApplicationStartHook @Inject() (implicit app: Application){
   private object CommandLineFlags {
     private val properties = System.getProperties.asScala
 
-    def loadFactoV1DataFromPath(): Option[Path] = getExistingPath("loadFactoV1DataFromPath")
     def dropAndCreateNewDb(): Boolean = getBoolean("dropAndCreateNewDb")
     def createAdminUser(): Boolean = getBoolean("createAdminUser")
 
@@ -117,8 +103,6 @@ class ApplicationStartHook @Inject() (implicit app: Application){
     def loadDummyUsers: Boolean = getBoolean("facto.development.loadDummyUsers")
     def loadCsvDummyData: Boolean = getBoolean("facto.development.loadCsvDummyData")
     def csvDummyDataFolder: Path = getExistingPath("facto.development.csvDummyDataFolder")
-    def loadFactoV1Data: Boolean = getBoolean("facto.development.loadFactoV1Data")
-    def factoV1SqlFilePath: Path = getExistingPath("facto.development.factoV1SqlFilePath")
     def defaultPassword: Option[String] = getString("facto.setup.defaultPassword")
 
     private def getBoolean(cfgPath: String): Boolean =

@@ -28,7 +28,7 @@ import controllers.helpers.accounting.FormUtils.{validMoneyReservoirOrNullReserv
 validFlowAsFloat, flowAsFloatStringToCents, validTagsString, invalidWithMessageCode}
 import controllers.accounting.TransactionGroupOperations.{Forms, EditOperationMeta, AddNewOperationMeta, OperationMeta}
 
-class TransactionGroupOperations @Inject()(val messagesApi: MessagesApi) extends Controller with I18nSupport{
+class TransactionGroupOperations @Inject()(implicit val messagesApi: MessagesApi, accountingConfig: Config) extends Controller with I18nSupport {
 
   // ********** actions ********** //
   def addNewForm(returnTo: String) = {
@@ -82,9 +82,9 @@ class TransactionGroupOperations @Inject()(val messagesApi: MessagesApi) extends
     implicit request =>
       implicit val returnToImplicit = ReturnTo(returnTo)
 
-      val template = Config.templateWithCode(templateCode)
+      val template = accountingConfig.templateWithCode(templateCode)
       // If this user is not associated with an account, it should not see any templates.
-      val userAccount = Config.accountOf(user).get
+      val userAccount = accountingConfig.accountOf(user).get
       val partial = template.toPartial(userAccount)
       val initialData = Forms.TransGroupData.fromPartial(partial)
       Ok(formViewWithInitialData(AddNewOperationMeta(), initialData, templatesInNavbar = Seq(template)))
@@ -96,8 +96,8 @@ class TransactionGroupOperations @Inject()(val messagesApi: MessagesApi) extends
     if (amountInCents < 0) {
       addNewLiquidationRepayForm(accountCode2, accountCode1, -amountInCents, returnTo)
     } else {
-      val account1 = Config.accounts(accountCode1)
-      val account2 = Config.accounts(accountCode2)
+      val account1 = accountingConfig.accounts(accountCode1)
+      val account2 = accountingConfig.accounts(accountCode2)
       def getAbsoluteFlowForAccountCurrency(account: Account): DatedMoney = {
         val amount = ReferenceMoney(amountInCents)
         val currency = account.defaultElectronicReservoir.currency
@@ -109,14 +109,14 @@ class TransactionGroupOperations @Inject()(val messagesApi: MessagesApi) extends
         TransactionPartial.from(
           beneficiary = account1,
           moneyReservoir = account1.defaultElectronicReservoir,
-          category = Config.constants.accountingCategory,
-          description = Config.constants.liquidationDescription,
+          category = accountingConfig.constants.accountingCategory,
+          description = accountingConfig.constants.liquidationDescription,
           flowInCents = -getAbsoluteFlowForAccountCurrency(account1).cents),
         TransactionPartial.from(
           beneficiary = account1,
           moneyReservoir = account2.defaultElectronicReservoir,
-          category = Config.constants.accountingCategory,
-          description = Config.constants.liquidationDescription,
+          category = accountingConfig.constants.accountingCategory,
+          description = accountingConfig.constants.liquidationDescription,
           flowInCents = getAbsoluteFlowForAccountCurrency(account2).cents)),
         zeroSum = true
       ))
@@ -286,9 +286,9 @@ object TransactionGroupOperations {
 
     object TransactionData {
 
-      def fromPartial(trans: TransactionPartial)(implicit user: User) = {
-        val beneficiary = trans.beneficiary.getOrElse(Config.accounts.values.head)
-        val moneyReservoir = trans.moneyReservoir.getOrElse(Config.visibleReservoirs.filter(_.owner == beneficiary).head)
+      def fromPartial(trans: TransactionPartial)(implicit user: User, accountingConfig: Config) = {
+        val beneficiary = trans.beneficiary.getOrElse(accountingConfig.accounts.values.head)
+        val moneyReservoir = trans.moneyReservoir.getOrElse(accountingConfig.visibleReservoirs.filter(_.owner == beneficiary).head)
         TransactionData(
           issuerName = user.name,
           beneficiaryAccountCode = beneficiary.code,
@@ -300,7 +300,7 @@ object TransactionGroupOperations {
           tagsString = trans.tagsString)
       }
 
-      def fromModel(trans: Transaction) = TransactionData(
+      def fromModel(trans: Transaction)(implicit accountingConfig: Config) = TransactionData(
         issuerName = trans.issuer.name,
         beneficiaryAccountCode = trans.beneficiaryAccountCode,
         moneyReservoirCode = trans.moneyReservoirCode,
@@ -316,10 +316,10 @@ object TransactionGroupOperations {
     case class TransGroupData(transactions: MutableSeq[TransactionData], zeroSum: Boolean = false)
 
     object TransGroupData {
-      def fromPartial(transGroup: TransactionGroupPartial)(implicit user: User) =
+      def fromPartial(transGroup: TransactionGroupPartial)(implicit user: User, accountingConfig: Config) =
         TransGroupData(transGroup.transactions.map(TransactionData.fromPartial(_)), transGroup.zeroSum)
 
-      def fromModel(transGroup: TransactionGroup) =
+      def fromModel(transGroup: TransactionGroup)(implicit accountingConfig: Config) =
         TransGroupData(
           transGroup.transactions.map(TransactionData.fromModel(_)),
           zeroSum = transGroup.isZeroSum)
@@ -327,14 +327,14 @@ object TransactionGroupOperations {
 
     // ********** form classes ********** //
     val transactionGroupForm = new Object {
-      def forOperation(operationMeta: OperationMeta): Form[TransGroupData] = operationMeta match {
+      def forOperation(operationMeta: OperationMeta)(implicit accountingConfig: Config): Form[TransGroupData] = operationMeta match {
         case AddNewOperationMeta() =>
           Form(formMapping verifying uniqueTransaction)
         case EditOperationMeta(_) =>
           Form(formMapping)
       }
 
-      private val formMapping: Mapping[TransGroupData] = mapping(
+      private def formMapping(implicit accountingConfig: Config): Mapping[TransGroupData] = mapping(
         "transactions" -> seq(
           mapping(
             "issuerName" -> text,
@@ -374,9 +374,9 @@ object TransactionGroupOperations {
 
       // Don't allow future transactions in a foreign currency because we don't know what the exchange rate
       // to the default currency will be. Future fluctuations might break the immutability of the conversion.
-      private def noFutureForeignTransactions = Constraint[TransGroupData]((groupData: TransGroupData) => {
+      private def noFutureForeignTransactions(implicit accountingConfig: Config) = Constraint[TransGroupData]((groupData: TransGroupData) => {
         val futureForeignTransactions = groupData.transactions.filter { transactionData =>
-          val foreignCurrency = Config.moneyReservoir(transactionData.moneyReservoirCode).currency.isForeign
+          val foreignCurrency = accountingConfig.moneyReservoir(transactionData.moneyReservoirCode).currency.isForeign
           val dateInFuture = transactionData.transactionDate > Clock.now
           foreignCurrency && dateInFuture
         }
@@ -388,7 +388,7 @@ object TransactionGroupOperations {
       })
 
       // Don't allow creation of duplicate transactions because they are probably unintended (e.g. pressing enter twice).
-      private def uniqueTransaction = Constraint[TransGroupData]((groupData: TransGroupData) => {
+      private def uniqueTransaction(implicit accountingConfig: Config) = Constraint[TransGroupData]((groupData: TransGroupData) => {
         def fetchMatchingTransaction(transactionData: TransactionData): Option[Transaction] = {
           val possibleMatches = dbRun(
             Transactions.newQuery

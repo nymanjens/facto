@@ -1,5 +1,8 @@
 package controllers.helpers.accounting
 
+import com.google.inject._
+import common.testing._
+
 import collection.immutable.Seq
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.collection.immutable.Stack
@@ -21,9 +24,15 @@ import models.SlickUtils.dbApi._
 import models.accounting.money.{Currency, Money, MoneyWithGeneralCurrency}
 
 @RunWith(classOf[JUnitRunner])
-class CashFlowEntriesTest extends Specification {
+class CashFlowEntriesTest extends HookedSpecification {
 
-  "CashFlowEntry.fetchLastNEntries()" in new WithApplication {
+  @Inject val cashFlowEntries: CashFlowEntries = null
+
+  override def before() = {
+    Guice.createInjector(new FactoTestModule).injectMembers(this)
+  }
+
+  "cashFlowEntries.fetchLastNEntries()" in new WithApplication {
     // get and persist dummy transactions/BCs
     val trans1 = persistTransaction(groupId = 1, flowInCents = 200, timestamp = 1000)
     val bc1 = persistBalanceCheck(balanceInCents = 20, timestamp = 1010)
@@ -57,14 +66,14 @@ class CashFlowEntriesTest extends Specification {
     // run tests
     for (i <- 1 to expectedEntries.size) {
       val subList = expectedEntries.takeRight(i)
-      CashFlowEntry.fetchLastNEntries(testReservoir, n = subList.size) mustEqual subList
+      cashFlowEntries.fetchLastNEntries(testReservoir, n = subList.size) mustEqual subList
     }
 
     // test when n > num entries
-    CashFlowEntry.fetchLastNEntries(testReservoir, n = 1000) mustEqual expectedEntries
+    cashFlowEntries.fetchLastNEntries(testReservoir, n = 1000) mustEqual expectedEntries
   }
 
-  "CashFlowEntry.fetchLastNEntries() with large database" in new WithApplication {
+  "cashFlowEntries.fetchLastNEntries() with large database" in new WithApplication {
     // get and persist dummy transactions/BCs
     for (i <- 1 to 20 * 1000) {
       if (i % 1000 == 0) {
@@ -74,8 +83,8 @@ class CashFlowEntriesTest extends Specification {
       persistBalanceCheck(balanceInCents = Random.nextInt, timestamp = i)
     }
 
-    CashFlowEntry.fetchLastNEntries(testReservoir, n = 4000) must haveSize(4000)
-    CashFlowEntry.fetchLastNEntries(testReservoir, n = 15 * 1000) must haveSize(15 * 1000)
-    CashFlowEntry.fetchLastNEntries(testReservoir, n = 35 * 1000) must haveSize(35 * 1000)
+    cashFlowEntries.fetchLastNEntries(testReservoir, n = 4000) must haveSize(4000)
+    cashFlowEntries.fetchLastNEntries(testReservoir, n = 15 * 1000) must haveSize(15 * 1000)
+    cashFlowEntries.fetchLastNEntries(testReservoir, n = 35 * 1000) must haveSize(35 * 1000)
   }
 }

@@ -42,10 +42,10 @@ case class Transaction(transactionGroupId: Long,
 
   lazy val transactionGroup: TransactionGroup = TransactionGroups.findById(transactionGroupId)
   lazy val issuer: User = Users.findById(issuerId)
-  lazy val beneficiary: Account = Config.accounts(beneficiaryAccountCode)
-  lazy val moneyReservoir: MoneyReservoir = Config.moneyReservoir(moneyReservoirCode)
-  lazy val category: Category = Config.categories(categoryCode)
-  lazy val flow: DatedMoney = DatedMoney(flowInCents, moneyReservoir.currency, transactionDate)
+  def beneficiary(implicit accountingConfig: Config): Account = accountingConfig.accounts(beneficiaryAccountCode)
+  def moneyReservoir(implicit accountingConfig: Config): MoneyReservoir = accountingConfig.moneyReservoir(moneyReservoirCode)
+  def category(implicit accountingConfig: Config): Category = accountingConfig.categories(categoryCode)
+  def flow(implicit accountingConfig: Config): DatedMoney = DatedMoney(flowInCents, moneyReservoir.currency, transactionDate)
   lazy val tags: Seq[Tag] = Tag.parseTagsString(tagsString)
 
   /** Returns None if the consumed date is the same as the transaction date (and thus carries no further information. */
@@ -53,7 +53,7 @@ case class Transaction(transactionGroupId: Long,
 
   override def toString = {
     val issuerString = Try(issuer.loginName).getOrElse(issuerId.toString)
-    s"Transaction(group=$transactionGroupId, issuer=${issuerString}, $beneficiaryAccountCode, $moneyReservoirCode, $categoryCode, flow=$flow, $description)"
+    s"Transaction(group=$transactionGroupId, issuer=${issuerString}, $beneficiaryAccountCode, $moneyReservoirCode, $categoryCode, flowInCents=$flowInCents, $description)"
   }
 }
 

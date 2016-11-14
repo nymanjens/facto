@@ -19,7 +19,10 @@ import controllers.accounting.Views
 import controllers.helpers.{AuthenticatedAction, ControllerHelperCache}
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 
-class ExternalApi @Inject()(viewsController: Views, val messagesApi: MessagesApi, configuration: play.api.Configuration)
+class ExternalApi @Inject()(implicit val messagesApi: MessagesApi,
+                            viewsController: Views,
+                            playConfiguration: play.api.Configuration,
+                            accountingConfig: Config)
   extends Controller with I18nSupport {
 
   // ********** actions ********** //
@@ -51,7 +54,7 @@ class ExternalApi @Inject()(viewsController: Views, val messagesApi: MessagesApi
   def addTransactionFromTemplate(templateCode: String, applicationSecret: String) = Action { implicit request =>
     validateApplicationSecret(applicationSecret)
 
-    val template = Config.templateWithCode(templateCode)
+    val template = accountingConfig.templateWithCode(templateCode)
     val partial = template.toPartial(Account.nullInstance)
     val issuer = getOrCreateRobotUser()
 
@@ -88,7 +91,7 @@ class ExternalApi @Inject()(viewsController: Views, val messagesApi: MessagesApi
 
   // ********** private helper methods ********** //
   private def validateApplicationSecret(applicationSecret: String) = {
-    val realApplicationSecret = configuration.getString("play.crypto.secret")
+    val realApplicationSecret = playConfiguration.getString("play.crypto.secret")
     require(applicationSecret == realApplicationSecret, "Invalid application secret")
   }
 

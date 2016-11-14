@@ -6,7 +6,7 @@ import com.github.nscala_time.time.Imports._
 import common.Clock
 import models.User
 import models.accounting.{Tag, Transaction}
-import models.accounting.config.{Account, Category, MoneyReservoir}
+import models.accounting.config.{Account, Category, MoneyReservoir, Config}
 import models.accounting.money.{DatedMoney, Money, MoneyWithGeneralCurrency, ReferenceMoney}
 
 abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
@@ -14,14 +14,17 @@ abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
   def issuer: User = transactions(0).issuer
   def transactionDates: Seq[DateTime] = transactions.map(_.transactionDate).distinct
   def consumedDates: Seq[DateTime] = transactions.flatMap(_.consumedDateOption).distinct
-  def beneficiaries: Seq[Account] = transactions.map(_.beneficiary).distinct
-  def moneyReservoirs: Seq[MoneyReservoir] = transactions.map(_.moneyReservoir).distinct
-  def categories: Seq[Category] = transactions.map(_.category).distinct
+  def beneficiaries(implicit accountingConfig: Config): Seq[Account] =
+    transactions.map(_.beneficiary).distinct
+  def moneyReservoirs(implicit accountingConfig: Config): Seq[MoneyReservoir] =
+    transactions.map(_.moneyReservoir).distinct
+  def categories(implicit accountingConfig: Config): Seq[Category] =
+    transactions.map(_.category).distinct
   def descriptions: Seq[String] = transactions.map(_.description).distinct
   def mostRecentTransaction: Transaction = transactions.sortBy(_.transactionDate).last
   def tags: Seq[Tag] = transactions.flatMap(_.tags).distinct
 
-  def flow: Money = {
+  def flow(implicit accountingConfig: Config): Money = {
     val currencies = transactions.map(_.flow.currency).distinct
     currencies match {
       case Seq(currency) => // All transactions have the same currency

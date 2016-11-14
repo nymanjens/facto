@@ -1,5 +1,6 @@
 package controllers.helpers.accounting
 
+import com.google.inject.{Inject, Singleton}
 import scala.collection.immutable.Seq
 import scala.collection.JavaConverters._
 import com.google.common.collect.{HashMultimap, ImmutableTable, Multimap, Range, Table, Tables}
@@ -13,7 +14,7 @@ import common.CollectionUtils.toListMap
 import common.GuavaUtils.asGuava
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
 import models.accounting.{Tag, Transaction, Transactions}
-import models.accounting.config.{Account, Category}
+import models.accounting.config.{Account, Category, Config}
 import models.accounting.config.Account.SummaryTotalRowDef
 import controllers.helpers.ControllerHelperCache
 import controllers.helpers.ControllerHelperCache.CacheIdentifier
@@ -28,7 +29,7 @@ case class Summary(yearToSummary: Map[Int, SummaryForYear],
   }
 }
 
-object Summary {
+class Summaries @Inject()(implicit accountingConfig: Config) {
   def fetchSummary(account: Account, expandedYear: Int, tags: Seq[Tag] = Seq()): Summary = {
     val now = Clock.now
 
@@ -73,12 +74,12 @@ object Summary {
       yearsSet.toList.sorted
 
     }
+}
 
-  private case class GetSummaryYears(account: Account, expandedYear: Int, thisYear: Int) extends CacheIdentifier[Seq[Int]] {
-    protected override def invalidateWhenUpdatingEntity(oldYears: Seq[Int]) = {
-      case transaction: Transaction =>
-        transaction.beneficiaryAccountCode == account.code && !oldYears.contains(transaction.consumedDate.getYear)
-    }
+private case class GetSummaryYears(account: Account, expandedYear: Int, thisYear: Int) extends CacheIdentifier[Seq[Int]] {
+  protected override def invalidateWhenUpdatingEntity(oldYears: Seq[Int]) = {
+    case transaction: Transaction =>
+      transaction.beneficiaryAccountCode == account.code && !oldYears.contains(transaction.consumedDate.getYear)
   }
 }
 
@@ -103,7 +104,7 @@ case class SummaryForYear(cells: ImmutableTable[Category, DatedMonth, SummaryCel
 
 object SummaryForYear {
 
-  private[accounting] def fetch(account: Account, monthRangeForAverages: MonthRange, year: Int, tags: Seq[Tag]): SummaryForYear =
+  private[accounting] def fetch(account: Account, monthRangeForAverages: MonthRange, year: Int, tags: Seq[Tag])(implicit accountingConfig: Config): SummaryForYear =
     ControllerHelperCache.cached(GetSummaryForYear(account, monthRangeForAverages, year, tags)) {
       val transactions: Seq[Transaction] = {
         val yearRange = MonthRange.forYear(year)
@@ -135,7 +136,7 @@ object SummaryForYear {
     }
   }
 
-  private class Builder(account: Account, monthRangeForAverages: MonthRange, year: Int) {
+  private class Builder(account: Account, monthRangeForAverages: MonthRange, year: Int)(implicit accountingConfig: Config) {
     private val cellBuilders: ImmutableTable[Category, DatedMonth, SummaryCell.Builder] = {
       val tableBuilder = ImmutableTable.builder[Category, DatedMonth, SummaryCell.Builder]()
       for (category <- account.categories) {
@@ -184,7 +185,7 @@ object SummaryForYear {
 }
 
 case class SummaryCell(entries: Seq[GeneralEntry]) {
-  def totalFlow: ReferenceMoney = {
+  def totalFlow(implicit accountingConfig: Config): ReferenceMoney = {
     {
       for {
         entry <- entries
@@ -218,7 +219,8 @@ case class SummaryTotalRow(rowTitleHtml: Html, monthToTotal: Map[DatedMonth, Ref
 object SummaryTotalRow {
   def calculate(totalRowDef: SummaryTotalRowDef,
                 cells: Table[Category, DatedMonth, SummaryCell],
-                categoryToAverages: Map[Category, ReferenceMoney]): SummaryTotalRow = {
+                categoryToAverages: Map[Category, ReferenceMoney])(
+                 implicit accountingConfig: Config): SummaryTotalRow = {
     def sumNonIgnoredCategories(categoryToMoney: Map[Category, ReferenceMoney]): ReferenceMoney = {
       categoryToMoney.filter { case (cat, _) => !totalRowDef.categoriesToIgnore.contains(cat) }.values.sum
     }

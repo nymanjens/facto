@@ -21,11 +21,11 @@ case class BalanceCheck(issuerId: Long,
 
   override def withId(id: Long) = copy(idOption = Some(id))
 
-  override def toString = s"BalanceCheck(issuer=$issuerId, $moneyReservoirCode, balance=$balance)"
+  override def toString = s"BalanceCheck(issuer=$issuerId, $moneyReservoirCode)"
 
   lazy val issuer: User = Users.findById(issuerId)
-  lazy val moneyReservoir: MoneyReservoir = Config.moneyReservoir(moneyReservoirCode)
-  lazy val balance: DatedMoney = DatedMoney(balanceInCents, moneyReservoir.currency, checkDate)
+  def moneyReservoir(implicit accountingConfig: Config): MoneyReservoir = accountingConfig.moneyReservoir(moneyReservoirCode)
+  def balance(implicit accountingConfig: Config): DatedMoney = DatedMoney(balanceInCents, moneyReservoir.currency, checkDate)
 }
 
 class BalanceChecks(tag: SlickTag) extends EntityTable[BalanceCheck](tag, BalanceChecks.tableName) {

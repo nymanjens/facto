@@ -43,7 +43,7 @@ object UpdateLogs extends ImmutableEntityManager[UpdateLog, UpdateLogs](
   def fetchLastNEntries(n: Int): Seq[UpdateLog] =
     dbRun(UpdateLogs.newQuery.sortBy(_.date.desc).take(n)).reverse.toList
 
-  def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: TransactionGroup): Unit = {
+  def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: TransactionGroup)(implicit accountingConfig: Config): Unit = {
     require(newOrDeletedValue.idOption.isDefined, s"Given value must be persisted before logging it: ${newOrDeletedValue}")
     def fullyDescriptiveTransaction(t: Transaction): String = {
       s"Transaction(id=${t.id}, issuer=${t.issuer.loginName}, beneficiaryAccount=${t.beneficiaryAccountCode}, " +
@@ -57,7 +57,7 @@ object UpdateLogs extends ImmutableEntityManager[UpdateLog, UpdateLogs](
     }
     addLog(user, operation, fullyDescriptiveString(newOrDeletedValue))
   }
-  def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: BalanceCheck): Unit = {
+  def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: BalanceCheck)(implicit accountingConfig: Config): Unit = {
     require(newOrDeletedValue.idOption.isDefined, s"Given value must be persisted before logging it: ${newOrDeletedValue}")
     def fullyDescriptiveString(bc: BalanceCheck): String = {
       s"BalanceCheck(id=${bc.id}, issuer=${bc.issuer.loginName}, moneyReservoir=${bc.moneyReservoirCode}, " +
