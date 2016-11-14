@@ -49,7 +49,7 @@ case class Account(code: String,
   def visibleReservoirs(implicit accountingConfig: Config): Seq[MoneyReservoir] =
     accountingConfig.visibleReservoirs.filter(_.owner == this).toList
 
-  def isMineOrCommon(implicit accountingConfig: Config, user: User): Boolean =
+  def isMineOrCommon(implicit user: User, accountingConfig: Config): Boolean =
     Set(accountingConfig.accountOf(user), Some(accountingConfig.constants.commonAccount)).flatten.contains(this)
 }
 

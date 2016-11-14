@@ -1,5 +1,7 @@
 package controllers.helpers.accounting
 
+import com.google.inject._
+import common.testing._
 import scala.collection.immutable.Seq
 import scala.collection.JavaConverters._
 import org.junit.runner._
@@ -20,7 +22,14 @@ import models.accounting.money.{Money, ReferenceMoney}
 @RunWith(classOf[JUnitRunner])
 class SummaryTest extends HookedSpecification {
 
-  override def before = Clock.setTimeForTest(dateAt(2010, April, 4))
+  @Inject val summaries: Summaries = null
+
+  override def before = {
+    Guice.createInjector(new FactoTestModule).injectMembers(this)
+
+    Clock.setTimeForTest(dateAt(2010, April, 4))
+  }
+
   override def afterAll = Clock.cleanupAfterTest()
 
   "Summary.fetchSummary()" should {
@@ -30,13 +39,13 @@ class SummaryTest extends HookedSpecification {
       persistTransaction(flowInCents = 202, date = dateAt(2009, March, 1))
       persistTransaction(flowInCents = 202, date = dateAt(2010, May, 4))
 
-      val summary = Summary.fetchSummary(testAccount, 2009)
+      val summary = summaries.fetchSummary(testAccount, 2009)
 
       summary.monthRangeForAverages shouldEqual MonthRange(dateAt(2009, February, 1), dateAt(2010, April, 1))
     }
 
     "return successfully when there are no transactions" in new WithApplication {
-      val summary = Summary.fetchSummary(testAccount, 2009)
+      val summary = summaries.fetchSummary(testAccount, 2009)
       summary.totalRowTitles must not(beEmpty)
     }
 
@@ -48,7 +57,7 @@ class SummaryTest extends HookedSpecification {
       persistTransaction(flowInCents = 130, date = dateAt(2010, May, 2))
       persistTransaction(flowInCents = 1999, date = dateAt(2011, April, 2))
 
-      val summary = Summary.fetchSummary(testAccount, 2009)
+      val summary = summaries.fetchSummary(testAccount, 2009)
 
       summary.yearToSummary(2010).categoryToAverages(testCategory) mustEqual ReferenceMoney(71)
       summary.monthRangeForAverages shouldEqual MonthRange(dateAt(2009, April, 1), dateAt(2010, April, 1))
@@ -60,7 +69,7 @@ class SummaryTest extends HookedSpecification {
       persistTransaction(flowInCents = 112, date = dateAt(2010, March, 2))
       persistTransaction(flowInCents = 120, date = dateAt(2010, April, 2))
 
-      val summary = Summary.fetchSummary(testAccount, 2009)
+      val summary = summaries.fetchSummary(testAccount, 2009)
 
       summary.yearToSummary(2010).categoryToAverages(testCategory) mustEqual ReferenceMoney(106)
       summary.monthRangeForAverages shouldEqual MonthRange(dateAt(2010, February, 1), dateAt(2010, April, 1))
@@ -71,7 +80,7 @@ class SummaryTest extends HookedSpecification {
       persistTransaction(flowInCents = 100, date = dateAt(2010, February, 2), category = testCategoryA)
       persistTransaction(flowInCents = 102, date = dateAt(2010, February, 2), category = testCategoryB)
 
-      val summary = Summary.fetchSummary(testAccount, 2009)
+      val summary = summaries.fetchSummary(testAccount, 2009)
 
       val totalRows = summary.yearToSummary(2010).totalRows
       totalRows must haveSize(2)
@@ -88,7 +97,7 @@ class SummaryTest extends HookedSpecification {
     "prunes unused categories" in new WithApplication {
       persistTransaction(flowInCents = 3, date = dateAt(2010, January, 2), category = testCategoryA)
 
-      val summary = Summary.fetchSummary(testAccount, 2010)
+      val summary = summaries.fetchSummary(testAccount, 2010)
 
       summary.categories must contain(testCategoryA)
       summary.categories must not(contain(testCategoryB))

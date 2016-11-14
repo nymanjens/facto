@@ -1,5 +1,7 @@
 package controllers.helpers.accounting
 
+import com.google.inject._
+import common.testing._
 import scala.collection.immutable.Seq
 import org.specs2.mutable._
 import org.specs2.runner._
@@ -8,13 +10,19 @@ import play.api.test._
 import org.joda.time.DateTime
 import models.accounting._
 import models.accounting.config.{Account, Category, MoneyReservoir}
-import models.accounting.config.Config.constants.endowmentCategory
 import common.testing.TestObjects._
+import common.testing.TestObjects.accountingConfig.constants.endowmentCategory
 import common.testing.TestUtils._
 import models.accounting.money.Money
 
 @RunWith(classOf[JUnitRunner])
-class GeneralEntryTest extends Specification {
+class GeneralEntryTest extends HookedSpecification {
+
+  @Inject val generalEntries: GeneralEntries = null
+
+  override def before() = {
+    Guice.createInjector(new FactoTestModule).injectMembers(this)
+  }
 
   "fetchLastNEntries()" in new WithApplication {
     // Get and persist dummy transactions
@@ -37,11 +45,11 @@ class GeneralEntryTest extends Specification {
     // Run tests
     for (i <- 1 to expectedEntries.size) {
       val subList = expectedEntries.takeRight(i)
-      GeneralEntry.fetchLastNEntries(n = subList.size) mustEqual subList
+      generalEntries.fetchLastNEntries(n = subList.size) mustEqual subList
     }
 
     // Test when n > num entries
-    GeneralEntry.fetchLastNEntries(n = 1000) mustEqual expectedEntries
+    generalEntries.fetchLastNEntries(n = 1000) mustEqual expectedEntries
   }
 
   "fetchLastNEndowments()" in new WithApplication {
@@ -70,11 +78,11 @@ class GeneralEntryTest extends Specification {
     // Run tests
     for (i <- 1 to expectedEntries.size) {
       val subList = expectedEntries.takeRight(i)
-      GeneralEntry.fetchLastNEndowments(testAccountA, n = subList.size) mustEqual subList
+      generalEntries.fetchLastNEndowments(testAccountA, n = subList.size) mustEqual subList
     }
 
     // test when n > num entries
-    GeneralEntry.fetchLastNEndowments(testAccountA, n = 1000) mustEqual expectedEntries
+    generalEntries.fetchLastNEndowments(testAccountA, n = 1000) mustEqual expectedEntries
   }
 
   "search()" should {
@@ -91,7 +99,7 @@ class GeneralEntryTest extends Specification {
         GeneralEntry(Seq(trans2, trans3))
       )
 
-      GeneralEntry.search("def abc") mustEqual expectedEntries
+      generalEntries.search("def abc") mustEqual expectedEntries
     }
 
     "Match the Money flow" in new WithApplication {
@@ -110,7 +118,7 @@ class GeneralEntryTest extends Specification {
         GeneralEntry(Seq(trans3))
       )
 
-      GeneralEntry.search("12.34") mustEqual expectedEntries
+      generalEntries.search("12.34") mustEqual expectedEntries
     }
   }
 }
