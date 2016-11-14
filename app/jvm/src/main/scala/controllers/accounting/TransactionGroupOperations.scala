@@ -19,7 +19,7 @@ import com.github.nscala_time.time.Imports._
 import common.{Clock, ReturnTo}
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
-import models.User
+import models._
 import models.accounting.{Transaction, Transactions, TransactionPartial, TransactionGroup, TransactionGroupPartial, TransactionGroups, UpdateLogs}
 import models.accounting.config.{Config, Account, MoneyReservoir, Category, Template}
 import controllers.helpers.AuthenticatedAction
@@ -28,7 +28,9 @@ import controllers.helpers.accounting.FormUtils.{validMoneyReservoirOrNullReserv
 validFlowAsFloat, flowAsFloatStringToCents, validTagsString, invalidWithMessageCode}
 import controllers.accounting.TransactionGroupOperations.{Forms, EditOperationMeta, AddNewOperationMeta, OperationMeta}
 
-class TransactionGroupOperations @Inject()(implicit val messagesApi: MessagesApi, accountingConfig: Config) extends Controller with I18nSupport {
+final class TransactionGroupOperations @Inject()(implicit val messagesApi: MessagesApi,
+                                                 entityAccess: EntityAccess,
+                                                 accountingConfig: Config) extends Controller with I18nSupport {
 
   // ********** actions ********** //
   def addNewForm(returnTo: String) = {
@@ -300,7 +302,8 @@ object TransactionGroupOperations {
           tagsString = trans.tagsString)
       }
 
-      def fromModel(trans: Transaction)(implicit accountingConfig: Config) = TransactionData(
+      def fromModel(trans: Transaction)(implicit accountingConfig: Config,
+                                        entityAccess: EntityAccess) = TransactionData(
         issuerName = trans.issuer.name,
         beneficiaryAccountCode = trans.beneficiaryAccountCode,
         moneyReservoirCode = trans.moneyReservoirCode,
@@ -319,7 +322,8 @@ object TransactionGroupOperations {
       def fromPartial(transGroup: TransactionGroupPartial)(implicit user: User, accountingConfig: Config) =
         TransGroupData(transGroup.transactions.map(TransactionData.fromPartial(_)), transGroup.zeroSum)
 
-      def fromModel(transGroup: TransactionGroup)(implicit accountingConfig: Config) =
+      def fromModel(transGroup: TransactionGroup)(implicit accountingConfig: Config,
+                                                  entityAccess: EntityAccess) =
         TransGroupData(
           transGroup.transactions.map(TransactionData.fromModel(_)),
           zeroSum = transGroup.isZeroSum)
@@ -327,7 +331,8 @@ object TransactionGroupOperations {
 
     // ********** form classes ********** //
     val transactionGroupForm = new Object {
-      def forOperation(operationMeta: OperationMeta)(implicit accountingConfig: Config): Form[TransGroupData] = operationMeta match {
+      def forOperation(operationMeta: OperationMeta)(implicit accountingConfig: Config,
+                                                     entityAccess: EntityAccess): Form[TransGroupData] = operationMeta match {
         case AddNewOperationMeta() =>
           Form(formMapping verifying uniqueTransaction)
         case EditOperationMeta(_) =>
@@ -388,7 +393,8 @@ object TransactionGroupOperations {
       })
 
       // Don't allow creation of duplicate transactions because they are probably unintended (e.g. pressing enter twice).
-      private def uniqueTransaction(implicit accountingConfig: Config) = Constraint[TransGroupData]((groupData: TransGroupData) => {
+      private def uniqueTransaction(implicit accountingConfig: Config,
+                                    entityAccess: EntityAccess) = Constraint[TransGroupData]((groupData: TransGroupData) => {
         def fetchMatchingTransaction(transactionData: TransactionData): Option[Transaction] = {
           val possibleMatches = dbRun(
             Transactions.newQuery

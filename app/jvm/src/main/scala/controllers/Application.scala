@@ -10,13 +10,15 @@ import play.Play.application
 import play.api.i18n.{MessagesApi, Messages, I18nSupport}
 
 import common.cache.CacheRegistry
-import models.{Tables, Users, User}
+import models.{UserManager, User, EntityAccess}
 import controllers.accounting.Views
 import controllers.helpers.{ControllerHelperCache, AuthenticatedAction}
 import controllers.Application.Forms
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 
-class Application @Inject()(val messagesApi: MessagesApi) extends Controller with I18nSupport {
+final class Application @Inject()(implicit val messagesApi: MessagesApi,
+                            userManager: UserManager,
+                            entityAccess: EntityAccess) extends Controller with I18nSupport {
 
   // ********** actions ********** //
   def index() = AuthenticatedAction { implicit user =>
@@ -37,7 +39,7 @@ class Application @Inject()(val messagesApi: MessagesApi) extends Controller wit
         formData => formData match {
           case ChangePasswordData(loginName, _, password, _) =>
             require(loginName == user.loginName)
-            Users.update(user.withPasswordHashFromUnhashed(password))
+            userManager.update(user.withPasswordHashFromUnhashed(password))
             val message = Messages("facto.successfully-updated-password")
             Redirect(routes.Application.profile).flashing("message" -> message)
         }
@@ -46,16 +48,16 @@ class Application @Inject()(val messagesApi: MessagesApi) extends Controller wit
 
   def administration() = AuthenticatedAction.requireAdminUser { implicit user =>
     implicit request =>
-      Ok(views.html.administration(users = Users.fetchAll(), Forms.addUserForm))
+      Ok(views.html.administration(users = userManager.fetchAll(), Forms.addUserForm))
   }
 
   def addUser() = AuthenticatedAction.requireAdminUser { implicit user =>
     implicit request =>
       Forms.addUserForm.bindFromRequest.fold(
-        formWithErrors => BadRequest(views.html.administration(users = Users.fetchAll(), formWithErrors)),
+        formWithErrors => BadRequest(views.html.administration(users = userManager.fetchAll(), formWithErrors)),
         formData => formData match {
           case AddUserData(loginName, name, password, _) =>
-            Users.add(Users.newWithUnhashedPw(loginName, password, name))
+            userManager.add(userManager.newWithUnhashedPw(loginName, password, name))
             val message = Messages("facto.successfully-added-user", name)
             Redirect(routes.Application.administration).flashing("message" -> message)
         }
@@ -72,14 +74,14 @@ object Application {
                                   password: String = "",
                                   passwordVerification: String = "")
 
-    val changePasswordForm = Form(
+    def changePasswordForm(implicit entityAccess: EntityAccess) = Form(
       mapping(
         "loginName" -> nonEmptyText,
         "oldPassword" -> nonEmptyText,
         "password" -> nonEmptyText,
         "passwordVerification" -> nonEmptyText
       )(ChangePasswordData.apply)(ChangePasswordData.unapply) verifying("facto.error.old-password-is-incorrect", result => result match {
-        case ChangePasswordData(loginName, oldPassword, _, _) => Users.authenticate(loginName, oldPassword)
+        case ChangePasswordData(loginName, oldPassword, _, _) => entityAccess.userManager.authenticate(loginName, oldPassword)
       }) verifying("facto.error.passwords-should-match", result => result match {
         case ChangePasswordData(_, _, password, passwordVerification) => password == passwordVerification
       })

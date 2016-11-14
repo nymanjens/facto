@@ -4,7 +4,7 @@ import scala.collection.immutable.Seq
 import com.google.common.base.Preconditions.checkState
 import common.Require.requireNonNullFields
 import models.accounting.money.Money
-import models.{User, Users}
+import models._
 import models.accounting.{TransactionGroupPartial, TransactionPartial}
 
 // Every field ending with "Tpl" may contain $-prefixed placeholders.
@@ -18,7 +18,8 @@ case class Template(code: String,
                     private val transactions: Seq[Template.Transaction]) {
   requireNonNullFields(this)
 
-  def showFor(location: Template.Placement, user: User)(implicit accountingConfig: Config): Boolean = {
+  def showFor(location: Template.Placement, user: User)(implicit accountingConfig: Config,
+                                                        entityAccess: EntityAccess): Boolean = {
     val showAtLocation = placement contains location
     val showToUser = onlyShowForUsers match {
       case Some(users) => users contains user
@@ -33,10 +34,11 @@ case class Template(code: String,
       zeroSum = zeroSum)
   }
 
-  private def onlyShowForUsers(implicit accountingConfig: Config): Option[Set[User]] = {
+  private def onlyShowForUsers(implicit accountingConfig: Config,
+                               entityAccess: EntityAccess): Option[Set[User]] = {
     onlyShowForUserLoginNames.map { loginNameOption =>
       loginNameOption.map { loginName =>
-        val user = Users.findByLoginName(loginName)
+        val user = entityAccess.userManager.findByLoginName(loginName)
         require(user.isDefined, s"No user exists with loginName '$loginName'")
         require(accountingConfig.accountOf(user.get).isDefined, s"Only user names that have an associated account can be used in templates " +
           s"(user = '$loginName', template = '$name')")

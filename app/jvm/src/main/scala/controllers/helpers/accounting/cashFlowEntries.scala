@@ -31,7 +31,7 @@ case class RegularEntry(override val transactions: Seq[Transaction],
 case class BalanceCorrection(balanceCheck: BalanceCheck) extends CashFlowEntry
 
 @Singleton()
-class CashFlowEntries @Inject()(implicit accountingConfig: Config) {
+final class CashFlowEntries @Inject()(implicit accountingConfig: Config) {
 
   /**
     * Returns the last n CashFlowEntries for the given reservoir, ordered from old to new.

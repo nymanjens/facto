@@ -29,7 +29,7 @@ case class Summary(yearToSummary: Map[Int, SummaryForYear],
   }
 }
 
-class Summaries @Inject()(implicit accountingConfig: Config) {
+final class Summaries @Inject()(implicit accountingConfig: Config) {
   def fetchSummary(account: Account, expandedYear: Int, tags: Seq[Tag] = Seq()): Summary = {
     val now = Clock.now
 

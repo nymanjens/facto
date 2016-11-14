@@ -5,14 +5,15 @@ import controllers.helpers.accounting.{GeneralEntry, GeneralEntries}
 import play.api.mvc._
 
 import play.api.i18n.{MessagesApi, Messages, I18nSupport}
-import models.User
+import models._
 import models.accounting.UpdateLogs
 import models.accounting.config.{Config, Template}
 import controllers.helpers.AuthenticatedAction
 
-class GeneralActions @Inject()(implicit val messagesApi: MessagesApi,
-                               accountingConfig: Config,
-                               generalEntries: GeneralEntries) extends Controller with I18nSupport {
+final class GeneralActions @Inject()(implicit val messagesApi: MessagesApi,
+                                     accountingConfig: Config,
+                                     entityAccess: EntityAccess,
+                                     generalEntries: GeneralEntries) extends Controller with I18nSupport {
 
   // ********** actions ********** //
   def searchMostRelevant(q: String) = AuthenticatedAction { implicit user =>

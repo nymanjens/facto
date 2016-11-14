@@ -10,7 +10,7 @@ import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.accounting.money.{DatedMoney, Money}
 import models.manager.{Entity, SlickEntityManager, EntityTable, ImmutableEntityManager}
-import models.{User, Users}
+import models._
 import org.joda.time.DateTime
 
 import scala.collection.JavaConverters._
@@ -41,7 +41,7 @@ case class Transaction(transactionGroupId: Long,
   override def withId(id: Long) = copy(idOption = Some(id))
 
   lazy val transactionGroup: TransactionGroup = TransactionGroups.findById(transactionGroupId)
-  lazy val issuer: User = Users.findById(issuerId)
+  def issuer(implicit entityAccess: EntityAccess): User = entityAccess.userManager.findById(issuerId)
   def beneficiary(implicit accountingConfig: Config): Account = accountingConfig.accounts(beneficiaryAccountCode)
   def moneyReservoir(implicit accountingConfig: Config): MoneyReservoir = accountingConfig.moneyReservoir(moneyReservoirCode)
   def category(implicit accountingConfig: Config): Category = accountingConfig.categories(categoryCode)
@@ -52,8 +52,7 @@ case class Transaction(transactionGroupId: Long,
   def consumedDateOption: Option[DateTime] = if (consumedDate == transactionDate) None else Some(consumedDate)
 
   override def toString = {
-    val issuerString = Try(issuer.loginName).getOrElse(issuerId.toString)
-    s"Transaction(group=$transactionGroupId, issuer=${issuerString}, $beneficiaryAccountCode, $moneyReservoirCode, $categoryCode, flowInCents=$flowInCents, $description)"
+    s"Transaction(group=$transactionGroupId, issuer=${issuerId}, $beneficiaryAccountCode, $moneyReservoirCode, $categoryCode, flowInCents=$flowInCents, $description)"
   }
 }
 
@@ -99,7 +98,7 @@ class Transactions(tag: SlickTag) extends EntityTable[Transaction](tag, Transact
   def consumedDate = column[DateTime]("consumedDate")
 
   override def * = (transactionGroupId, issuerId, beneficiaryAccountCode, moneyReservoirCode, categoryCode, description, flow,
-    detailDescription, tagsString, createdDate, transactionDate, consumedDate, id.?) <>(Transaction.tupled, Transaction.unapply)
+    detailDescription, tagsString, createdDate, transactionDate, consumedDate, id.?) <> (Transaction.tupled, Transaction.unapply)
 }
 
 object Transactions extends ImmutableEntityManager[Transaction, Transactions](

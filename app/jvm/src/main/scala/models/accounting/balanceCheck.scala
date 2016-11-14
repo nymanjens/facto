@@ -8,7 +8,7 @@ import models.SlickUtils.JodaToSqlDateMapper
 import models.accounting.config.{Config, MoneyReservoir}
 import models.accounting.money.{DatedMoney, Money}
 import models.manager.{Entity, SlickEntityManager, EntityTable, ImmutableEntityManager}
-import models.{User, Users}
+import models._
 import org.joda.time.DateTime
 
 /** BalanceCheck entities are immutable. Just delete and create a new one when updating. */
@@ -23,7 +23,7 @@ case class BalanceCheck(issuerId: Long,
 
   override def toString = s"BalanceCheck(issuer=$issuerId, $moneyReservoirCode)"
 
-  lazy val issuer: User = Users.findById(issuerId)
+  def issuer(implicit entityAccess: EntityAccess): User = entityAccess.userManager.findById(issuerId)
   def moneyReservoir(implicit accountingConfig: Config): MoneyReservoir = accountingConfig.moneyReservoir(moneyReservoirCode)
   def balance(implicit accountingConfig: Config): DatedMoney = DatedMoney(balanceInCents, moneyReservoir.currency, checkDate)
 }

@@ -10,14 +10,16 @@ import play.twirl.api.Html
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 
 import common.{Clock, ReturnTo}
-import models.User
+import models._
 import models.accounting.{BalanceCheck, BalanceChecks, Transactions, UpdateLogs}
 import models.accounting.config.{MoneyReservoir, Config}
 import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting.FormUtils.{validFlowAsFloat, flowAsFloatStringToCents}
 import controllers.accounting.BalanceCheckOperations.{Forms, AddNewOperationMeta, EditOperationMeta, OperationMeta}
 
-class BalanceCheckOperations @Inject()(implicit val messagesApi: MessagesApi, accountingConfig: Config)
+final class BalanceCheckOperations @Inject()(implicit val messagesApi: MessagesApi,
+                                             entityAccess: EntityAccess,
+                                             accountingConfig: Config)
   extends Controller with I18nSupport {
 
   // ********** actions ********** //
@@ -170,7 +172,7 @@ object BalanceCheckOperations {
                       balanceInCents: Long = 0)
 
     object BcData {
-      def fromModel(bc: BalanceCheck)(implicit accountingConfig: Config) = BcData(
+      def fromModel(bc: BalanceCheck)(implicit accountingConfig: Config, entityAccess: EntityAccess) = BcData(
         issuerName = bc.issuer.name,
         moneyReservoirName = bc.moneyReservoir.name,
         checkDate = bc.checkDate,

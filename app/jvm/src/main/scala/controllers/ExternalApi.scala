@@ -14,15 +14,17 @@ import play.api.mvc._
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import common.cache.CacheRegistry
-import models.{Tables, User, Users}
+import models._
 import controllers.accounting.Views
 import controllers.helpers.{AuthenticatedAction, ControllerHelperCache}
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 
-class ExternalApi @Inject()(implicit val messagesApi: MessagesApi,
+final class ExternalApi @Inject()(implicit val messagesApi: MessagesApi,
                             viewsController: Views,
                             playConfiguration: play.api.Configuration,
-                            accountingConfig: Config)
+                            accountingConfig: Config,
+                            userManager: UserManager,
+                            entityAccess: EntityAccess)
   extends Controller with I18nSupport {
 
   // ********** actions ********** //
@@ -36,7 +38,7 @@ class ExternalApi @Inject()(implicit val messagesApi: MessagesApi,
   def warmUpCaches(applicationSecret: String) = Action { implicit request =>
     validateApplicationSecret(applicationSecret)
 
-    val admin: User = Users.findByLoginName("admin").get
+    val admin: User = userManager.findByLoginName("admin").get
     val actions: Seq[AuthenticatedAction] = Seq(
       viewsController.everythingLatest,
       viewsController.cashFlowOfAll,
@@ -99,15 +101,15 @@ class ExternalApi @Inject()(implicit val messagesApi: MessagesApi,
     val loginName = "robot"
     def hash(s: String) = Hashing.sha512().hashString(s, Charsets.UTF_8).toString()
 
-    Users.findByLoginName(loginName) match {
+    userManager.findByLoginName(loginName) match {
       case Some(user) => user
       case None =>
-        val user = Users.newWithUnhashedPw(
+        val user = userManager.newWithUnhashedPw(
           loginName = loginName,
           password = hash(Clock.now.toString),
           name = Messages("facto.robot")
         )
-        Users.add(user)
+        userManager.add(user)
     }
   }
 

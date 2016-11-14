@@ -7,7 +7,7 @@ import com.google.inject.Inject
 import play.api.mvc.{AnyContent, Controller, Flash, Request, Result}
 import common.{Clock, GetParameter}
 import common.CollectionUtils.toListMap
-import models.User
+import models._
 import models.accounting.Tag
 import models.accounting.config.Config
 import models.accounting.config.{Account, Category, MoneyReservoir, Template}
@@ -15,12 +15,13 @@ import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 
-class Views @Inject()(implicit val messagesApi: MessagesApi,
-                      accountingConfig: Config,
-                      generalEntries: GeneralEntries,
-                      cashFlowEntries: CashFlowEntries,
-                      liquidationEntries: LiquidationEntries,
-                      summaries: Summaries) extends Controller with I18nSupport {
+final class Views @Inject()(implicit val messagesApi: MessagesApi,
+                            accountingConfig: Config,
+                            generalEntries: GeneralEntries,
+                            cashFlowEntries: CashFlowEntries,
+                            liquidationEntries: LiquidationEntries,
+                            summaries: Summaries,
+                            entityAccess: EntityAccess) extends Controller with I18nSupport {
 
   // ********** actions - views ********** //
   def everythingLatest = AuthenticatedAction { implicit user =>

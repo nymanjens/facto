@@ -10,7 +10,7 @@ import play.api.data.{FormError, Forms}
 import play.api.mvc._
 import play.api.i18n.{MessagesApi, Messages, I18nSupport}
 
-import models.User
+import models._
 import play.api.libs.json.Json
 import models.accounting.TagEntities
 import models.accounting.config.{Config, Template}
@@ -18,7 +18,9 @@ import controllers.helpers.AuthenticatedAction
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
 
-class JsonApi @Inject()(balanceCheckOperations: BalanceCheckOperations, val messagesApi: MessagesApi)
+final class JsonApi @Inject()(implicit val messagesApi: MessagesApi,
+                              balanceCheckOperations: BalanceCheckOperations,
+                              entityAccess: EntityAccess)
   extends Controller with I18nSupport {
 
   // ********** actions ********** //

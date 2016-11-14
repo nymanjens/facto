@@ -16,7 +16,7 @@ import models.accounting.money.ReferenceMoney
 case class LiquidationEntry(override val transactions: Seq[Transaction], debt: ReferenceMoney)
   extends GroupedTransactions(transactions)
 
-class LiquidationEntries @Inject()(implicit accountingConfig: Config) {
+final class LiquidationEntries @Inject()(implicit accountingConfig: Config) {
 
   /* Returns most recent n entries sorted from old to new. */
   def fetchLastNEntries(accountPair: AccountPair, n: Int): Seq[LiquidationEntry] =

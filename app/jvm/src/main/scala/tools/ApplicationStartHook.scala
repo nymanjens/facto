@@ -5,14 +5,17 @@ import java.nio.file.{Files, Path, Paths}
 import com.google.inject.Inject
 import common.ResourceFiles
 import models.accounting.money.{ExchangeRateMeasurement, ExchangeRateMeasurements}
-import models.{Tables, Users}
+import models._
 import org.joda.time.DateTime
 import play.api.{Application, Mode}
-import tools.GeneralImportTool.dropAndCreateNewDb
 
 import scala.collection.JavaConverters._
 
-class ApplicationStartHook @Inject() (implicit app: Application){
+final class ApplicationStartHook @Inject()(implicit app: Application,
+                                           userManager: UserManager,
+                                           entityAccess: SlickEntityAccess,
+                                           generalImportTool: GeneralImportTool,
+                                           csvImportTool: CsvImportTool) {
   onStart()
 
   private def onStart(): Unit = {
@@ -21,12 +24,12 @@ class ApplicationStartHook @Inject() (implicit app: Application){
     // Set up database if necessary
     if (Set(Mode.Test, Mode.Dev) contains app.mode) {
       if (AppConfigHelper.dropAndCreateNewDb) {
-        dropAndCreateNewDb()
+        generalImportTool.dropAndCreateNewDb()
       }
     }
 
     // Initialize table managers (notably the caching ones)
-    for (entityManager <- Tables.allEntityManagers) {
+    for (entityManager <- entityAccess.allEntityManagers) {
       entityManager.initialize()
     }
 
@@ -45,7 +48,7 @@ class ApplicationStartHook @Inject() (implicit app: Application){
     if (CommandLineFlags.dropAndCreateNewDb()) {
       println("")
       println("  Dropping the database tables (if present) and creating new ones...")
-      dropAndCreateNewDb()
+      generalImportTool.dropAndCreateNewDb()
       println("  Done. Exiting.")
 
       System.exit(0)
@@ -59,7 +62,7 @@ class ApplicationStartHook @Inject() (implicit app: Application){
       println("  Createing admin user...")
       println(s"    loginName: $loginName")
       println(s"    password: $password")
-      Users.add(Users.newWithUnhashedPw(loginName, password, name = "Admin"))
+      userManager.add(userManager.newWithUnhashedPw(loginName, password, name = "Admin"))
       println("  Done. Exiting.")
 
       System.exit(0)
@@ -67,14 +70,14 @@ class ApplicationStartHook @Inject() (implicit app: Application){
   }
 
   private def loadDummyUsers() = {
-    Users.add(Users.newWithUnhashedPw(loginName = "admin", password = "a", name = "Admin"))
-    Users.add(Users.newWithUnhashedPw(loginName = "alice", password = "a", name = "Alice"))
-    Users.add(Users.newWithUnhashedPw(loginName = "bob", password = "b", name = "Bob"))
+    userManager.add(userManager.newWithUnhashedPw(loginName = "admin", password = "a", name = "Admin"))
+    userManager.add(userManager.newWithUnhashedPw(loginName = "alice", password = "a", name = "Alice"))
+    userManager.add(userManager.newWithUnhashedPw(loginName = "bob", password = "b", name = "Bob"))
   }
 
   private def loadCsvDummyData(csvDataFolder: Path) = {
-    CsvImportTool.importTransactions(assertExists(csvDataFolder resolve "transactions.csv"))
-    CsvImportTool.importBalanceChecks(assertExists(csvDataFolder resolve "balancechecks.csv"))
+    csvImportTool.importTransactions(assertExists(csvDataFolder resolve "transactions.csv"))
+    csvImportTool.importBalanceChecks(assertExists(csvDataFolder resolve "balancechecks.csv"))
     ExchangeRateMeasurements.add(ExchangeRateMeasurement(
       date = new DateTime(1990, 1, 1, 0, 0), // Jan 1, 1990
       foreignCurrencyCode = "GBP",

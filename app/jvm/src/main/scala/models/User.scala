@@ -3,9 +3,7 @@ package models
 import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
 
-import models.SlickUtils.dbApi._
-import models.SlickUtils.dbRun
-import models.manager.{EntityTable, Entity, SlickEntityManager, ForwardingEntityManager}
+import models.manager.Entity
 
 case class User(loginName: String,
                 passwordHash: String,
@@ -15,6 +13,6 @@ case class User(loginName: String,
   override def withId(id: Long) = copy(idOption = Some(id))
 
   def withPasswordHashFromUnhashed(password: String): User = {
-    copy(passwordHash = Users.hash(password))
+    copy(passwordHash = UserManager.hash(password))
   }
 }

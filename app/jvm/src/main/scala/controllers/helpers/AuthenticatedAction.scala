@@ -6,12 +6,12 @@ import play.api.libs.iteratee.Iteratee
 
 import controllers.helpers.AuthenticatedAction.UserAndRequestToResult
 
-trait AuthenticatedAction extends EssentialAction {
+abstract class AuthenticatedAction(implicit entityAccess: EntityAccess) extends EssentialAction {
 
   private val delegate: EssentialAction = {
     Security.Authenticated(username, onUnauthorized) { username =>
       Action { request =>
-        Users.findByLoginName(username) match {
+        entityAccess.userManager.findByLoginName(username) match {
           case Some(user) => calculateResult(user, request)
           case None => onUnauthorized(request)
         }
@@ -32,7 +32,7 @@ object AuthenticatedAction {
 
   type UserAndRequestToResult = User => Request[AnyContent] => Result
 
-  def apply(userAndRequestToResult: UserAndRequestToResult): AuthenticatedAction = {
+  def apply(userAndRequestToResult: UserAndRequestToResult)(implicit entityAccess: EntityAccess): AuthenticatedAction = {
     new AuthenticatedAction {
       override def calculateResult(implicit user: User, request: Request[AnyContent]): Result = {
         userAndRequestToResult(user)(request)
@@ -40,8 +40,8 @@ object AuthenticatedAction {
     }
   }
 
-  def requireAdminUser(userAndRequestToResult: UserAndRequestToResult): AuthenticatedAction =
-    AuthenticatedAction { user =>
+  def requireAdminUser(userAndRequestToResult: UserAndRequestToResult)(implicit entityAccess: EntityAccess): AuthenticatedAction =
+    apply { user =>
       request =>
         require(user.loginName == "admin")
         userAndRequestToResult(user)(request)

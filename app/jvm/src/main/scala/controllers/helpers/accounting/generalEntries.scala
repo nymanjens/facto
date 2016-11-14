@@ -18,7 +18,7 @@ case class GeneralEntry(override val transactions: Seq[Transaction])
   extends GroupedTransactions(transactions)
 
 @Singleton()
-class GeneralEntries @Inject()(implicit accountingConfig: Config) {
+final class GeneralEntries @Inject()(implicit accountingConfig: Config) {
 
   /* Returns most recent n entries sorted from old to new. */
   def fetchLastNEntries(n: Int): Seq[GeneralEntry] = {

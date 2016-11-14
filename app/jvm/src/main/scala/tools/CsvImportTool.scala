@@ -4,18 +4,19 @@ import scala.io.Source
 import scala.collection.JavaConverters._
 import java.nio.file.Path
 
+import com.google.inject.Inject
 import play.api.Logger
 import com.google.common.base.Splitter
 import org.joda.time.DateTime
 import common.ResourceFiles
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
-import models.Users
+import models._
 import models.accounting.money.Money
 import models.accounting.{BalanceCheck, BalanceChecks, Transaction, TransactionGroup, TransactionGroups, Transactions, UpdateLogs}
 
-
-object CsvImportTool {
+final class CsvImportTool @Inject()(implicit userManager: UserManager,
+                                    entityAccess: SlickEntityAccess) {
 
   def importTransactions(csvFilePath: Path): Unit = {
     // example of line: "2 :: Common :: LIFE :: CARD_COMMON :: imperdiet Duis  :: -25.04 :: 1425855600 :: 0 :: 1425934823"

@@ -8,7 +8,7 @@ import common.Clock
 import common.ScalaUtils.objectName
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}
-import models.{User, Users}
+import models._
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
 import models.manager.{EntityTable, ImmutableEntityManager, Entity, SlickEntityManager}
 import models.accounting.config.Config
@@ -25,7 +25,7 @@ case class UpdateLog(userId: Long,
 
   override def withId(id: Long) = copy(idOption = Some(id))
 
-  lazy val user: User = Users.findById(userId)
+  def user(implicit entityAccess: EntityAccess): User = entityAccess.userManager.findById(userId)
 }
 
 class UpdateLogs(tag: SlickTag) extends EntityTable[UpdateLog](tag, UpdateLogs.tableName) {
@@ -33,7 +33,7 @@ class UpdateLogs(tag: SlickTag) extends EntityTable[UpdateLog](tag, UpdateLogs.t
   def change = column[String]("change")
   def date = column[DateTime]("date")
 
-  override def * = (userId, change, date, id.?) <>(UpdateLog.tupled, UpdateLog.unapply)
+  override def * = (userId, change, date, id.?) <> (UpdateLog.tupled, UpdateLog.unapply)
 }
 
 object UpdateLogs extends ImmutableEntityManager[UpdateLog, UpdateLogs](
@@ -41,9 +41,10 @@ object UpdateLogs extends ImmutableEntityManager[UpdateLog, UpdateLogs](
 
   /* Returns most recent n entries sorted from old to new. */
   def fetchLastNEntries(n: Int): Seq[UpdateLog] =
-    dbRun(UpdateLogs.newQuery.sortBy(_.date.desc).take(n)).reverse.toList
+  dbRun(UpdateLogs.newQuery.sortBy(_.date.desc).take(n)).reverse.toList
 
-  def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: TransactionGroup)(implicit accountingConfig: Config): Unit = {
+  def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: TransactionGroup)(implicit accountingConfig: Config,
+                                                                                          entityAccess: EntityAccess): Unit = {
     require(newOrDeletedValue.idOption.isDefined, s"Given value must be persisted before logging it: ${newOrDeletedValue}")
     def fullyDescriptiveTransaction(t: Transaction): String = {
       s"Transaction(id=${t.id}, issuer=${t.issuer.loginName}, beneficiaryAccount=${t.beneficiaryAccountCode}, " +
@@ -57,7 +58,8 @@ object UpdateLogs extends ImmutableEntityManager[UpdateLog, UpdateLogs](
     }
     addLog(user, operation, fullyDescriptiveString(newOrDeletedValue))
   }
-  def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: BalanceCheck)(implicit accountingConfig: Config): Unit = {
+  def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: BalanceCheck)(implicit accountingConfig: Config,
+                                                                                      entityAccess: EntityAccess): Unit = {
     require(newOrDeletedValue.idOption.isDefined, s"Given value must be persisted before logging it: ${newOrDeletedValue}")
     def fullyDescriptiveString(bc: BalanceCheck): String = {
       s"BalanceCheck(id=${bc.id}, issuer=${bc.issuer.loginName}, moneyReservoir=${bc.moneyReservoirCode}, " +

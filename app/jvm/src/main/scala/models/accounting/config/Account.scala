@@ -6,7 +6,7 @@ import com.google.common.base.Preconditions._
 import play.twirl.api.Html
 
 import common.Require.requireNonNullFields
-import models.{User, Users}
+import models._
 import Account.SummaryTotalRowDef
 
 case class Account(code: String,
@@ -31,10 +31,10 @@ case class Account(code: String,
 
   override def toString = s"Account($code)"
 
-  def user: Option[User] = {
+  def user(implicit entityAccess: EntityAccess): Option[User] = {
     userLoginName.map {
       loginName =>
-        val user = Users.findByLoginName(loginName)
+        val user = entityAccess.userManager.findByLoginName(loginName)
         checkState(user.isDefined, "No user exists with loginName '%s'", loginName)
         user.get
     }
@@ -49,7 +49,9 @@ case class Account(code: String,
   def visibleReservoirs(implicit accountingConfig: Config): Seq[MoneyReservoir] =
     accountingConfig.visibleReservoirs.filter(_.owner == this).toList
 
-  def isMineOrCommon(implicit user: User, accountingConfig: Config): Boolean =
+  def isMineOrCommon(implicit user: User,
+                     accountingConfig: Config,
+                     entityAccess: EntityAccess): Boolean =
     Set(accountingConfig.accountOf(user), Some(accountingConfig.constants.commonAccount)).flatten.contains(this)
 }
 
