@@ -3,7 +3,6 @@ package controllers.accounting
 import com.google.inject.Inject
 import common.{Clock, TimeUtils}
 import controllers.helpers.accounting.GeneralEntry
-import models.accounting.Transactions
 import models.accounting.money.{Currency, DatedMoney}
 import org.joda.time.DateTime
 import play.api.data.{FormError, Forms}
@@ -20,7 +19,7 @@ import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
 
 final class JsonApi @Inject()(implicit val messagesApi: MessagesApi,
                               balanceCheckOperations: BalanceCheckOperations,
-                              entityAccess: EntityAccess)
+                              entityAccess: SlickEntityAccess)
   extends Controller with I18nSupport {
 
   // ********** actions ********** //
@@ -28,7 +27,7 @@ final class JsonApi @Inject()(implicit val messagesApi: MessagesApi,
   AuthenticatedAction { implicit user =>
     implicit request =>
       val descriptions = dbRun(
-        Transactions.newQuery
+        entityAccess.transactionManager.newQuery
           .filter(_.beneficiaryAccountCode === beneficiaryCode)
           .filter(_.moneyReservoirCode === reservoirCode)
           .filter(_.categoryCode === categoryCode)

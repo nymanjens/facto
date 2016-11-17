@@ -3,6 +3,7 @@ package models.accounting
 import com.google.common.collect.{ImmutableMultiset, Multiset}
 import common.CollectionUtils.toListMap
 import models.manager.{Entity, EntityManager, EntityTable, ImmutableEntityManager}
+import models.EntityAccess
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
@@ -23,7 +24,8 @@ case class TagEntity(name: String,
   override def withId(id: Long) = copy(idOption = Some(id))
 
   def tag: Tag = Tag(name)
-  lazy val transaction: Transaction = Transactions.findById(transactionId)
+  def transaction(implicit entityAccess: EntityAccess): Transaction =
+    entityAccess.transactionManager.findById(transactionId)
 
   override def toString = {
     s"TagEntity($name, transactionId=$transactionId)"

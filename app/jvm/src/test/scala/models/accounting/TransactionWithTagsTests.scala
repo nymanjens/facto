@@ -13,7 +13,7 @@ import play.api.test._
 class TransactionWithTagsTests extends Specification {
 
   "test the Transaction and TagEntity models" in new WithApplication {
-    val transGrp = TransactionGroups.add(TransactionGroup())
+    val transGrp = transactionGroupManager.add(TransactionGroup())
 
     // Add dummy transaction
     val trans = TestUtils.persistTransaction(tagsString = "a,b")
@@ -24,7 +24,7 @@ class TransactionWithTagsTests extends Specification {
     getWithTag("b", tagEntities).transactionId mustEqual trans.id
 
     // Remove transaction
-    Transactions.delete(trans)
+    transactionManager.delete(trans)
 
     // Do checks
     tagEntityManager.fetchAll() must beEmpty

@@ -20,7 +20,7 @@ import common.{Clock, ReturnTo}
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
 import models._
-import models.accounting.{Transaction, Transactions, TransactionPartial, TransactionGroup, TransactionGroupPartial, TransactionGroups, UpdateLogs}
+import models.accounting.{Transaction, TransactionGroup, UpdateLogs}
 import models.accounting.config.{Config, Account, MoneyReservoir, Category, Template}
 import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting.CashFlowEntry
@@ -29,21 +29,23 @@ validFlowAsFloat, flowAsFloatStringToCents, validTagsString, invalidWithMessageC
 import controllers.accounting.TransactionGroupOperations.{Forms, EditOperationMeta, AddNewOperationMeta, OperationMeta}
 
 final class TransactionGroupOperations @Inject()(implicit val messagesApi: MessagesApi,
-                                                 entityAccess: EntityAccess,
+                                                 entityAccess: SlickEntityAccess,
+                                                 transactionManager: Transaction.Manager,
+                                                 transactionGroupManager: TransactionGroup.Manager,
                                                  accountingConfig: Config) extends Controller with I18nSupport {
 
   // ********** actions ********** //
   def addNewForm(returnTo: String) = {
     implicit val returnToImplicit = ReturnTo(returnTo)
 
-    addNewFormFromPartial(TransactionPartial.from())
+    addNewFormFromPartial(Transaction.Partial.from())
   }
 
   def editForm(transGroupId: Long, returnTo: String) = AuthenticatedAction { implicit user =>
     implicit request =>
       implicit val returnToImplicit = ReturnTo(returnTo)
 
-      val transGroup = TransactionGroups.findById(transGroupId)
+      val transGroup = transactionGroupManager.findById(transGroupId)
       val formData = Forms.TransGroupData.fromModel(transGroup)
       Ok(formViewWithInitialData(EditOperationMeta(transGroupId), formData))
   }
@@ -62,14 +64,14 @@ final class TransactionGroupOperations @Inject()(implicit val messagesApi: Messa
 
   def delete(transGroupId: Long, returnTo: String) = AuthenticatedAction { implicit user =>
     implicit request =>
-      val group = TransactionGroups.findById(transGroupId)
+      val group = transactionGroupManager.findById(transGroupId)
       val numTrans = group.transactions.size
 
       UpdateLogs.addLog(user, UpdateLogs.Delete, group)
       for (transaction <- group.transactions) {
-        Transactions.delete(transaction)
+        transactionManager.delete(transaction)
       }
-      TransactionGroups.delete(group)
+      transactionGroupManager.delete(group)
 
       val message = if (numTrans == 1) {
         Messages("facto.successfully-deleted-1-transaction")
@@ -107,14 +109,14 @@ final class TransactionGroupOperations @Inject()(implicit val messagesApi: Messa
         amount.withDate(Clock.now).exchangedForCurrency(currency)
       }
 
-      addNewFormFromPartial(TransactionGroupPartial(Seq(
-        TransactionPartial.from(
+      addNewFormFromPartial(TransactionGroup.Partial(Seq(
+        Transaction.Partial.from(
           beneficiary = account1,
           moneyReservoir = account1.defaultElectronicReservoir,
           category = accountingConfig.constants.accountingCategory,
           description = accountingConfig.constants.liquidationDescription,
           flowInCents = -getAbsoluteFlowForAccountCurrency(account1).cents),
-        TransactionPartial.from(
+        Transaction.Partial.from(
           beneficiary = account1,
           moneyReservoir = account2.defaultElectronicReservoir,
           category = accountingConfig.constants.accountingCategory,
@@ -126,10 +128,10 @@ final class TransactionGroupOperations @Inject()(implicit val messagesApi: Messa
   }
 
   // ********** private helper controllers ********** //
-  private def addNewFormFromPartial(partial: TransactionPartial)(implicit returnTo: ReturnTo): AuthenticatedAction =
-  addNewFormFromPartial(TransactionGroupPartial(Seq(partial)))
+  private def addNewFormFromPartial(partial: Transaction.Partial)(implicit returnTo: ReturnTo): AuthenticatedAction =
+  addNewFormFromPartial(TransactionGroup.Partial(Seq(partial)))
 
-  private def addNewFormFromPartial(partial: TransactionGroupPartial)
+  private def addNewFormFromPartial(partial: TransactionGroup.Partial)
                                    (implicit returnTo: ReturnTo): AuthenticatedAction = AuthenticatedAction { implicit user =>
     implicit request =>
       val initialData = Forms.TransGroupData.fromPartial(partial)
@@ -206,17 +208,17 @@ final class TransactionGroupOperations @Inject()(implicit val messagesApi: Messa
   private def persistTransGroup(transactionGroupData: Forms.TransGroupData, operationMeta: OperationMeta)
                                (implicit user: User): Unit = {
     val group = operationMeta match {
-      case AddNewOperationMeta() => TransactionGroups.add(TransactionGroup())
-      case EditOperationMeta(transGroupId) => TransactionGroups.findById(transGroupId)
+      case AddNewOperationMeta() => transactionGroupManager.add(TransactionGroup())
+      case EditOperationMeta(transGroupId) => transactionGroupManager.findById(transGroupId)
     }
 
     // reomve existing transactions in this group
     for (transaction <- group.transactions) {
-      Transactions.delete(transaction)
+      transactionManager.delete(transaction)
     }
 
     for (trans <- transactionGroupData.transactions) {
-      Transactions.add(Transaction(
+      transactionManager.add(Transaction(
         transactionGroupId = group.id,
         issuerId = user.id,
         beneficiaryAccountCode = trans.beneficiaryAccountCode,
@@ -288,7 +290,7 @@ object TransactionGroupOperations {
 
     object TransactionData {
 
-      def fromPartial(trans: TransactionPartial)(implicit user: User, accountingConfig: Config) = {
+      def fromPartial(trans: Transaction.Partial)(implicit user: User, accountingConfig: Config) = {
         val beneficiary = trans.beneficiary.getOrElse(accountingConfig.accounts.values.head)
         val moneyReservoir = trans.moneyReservoir.getOrElse(accountingConfig.visibleReservoirs.filter(_.owner == beneficiary).head)
         TransactionData(
@@ -303,7 +305,7 @@ object TransactionGroupOperations {
       }
 
       def fromModel(trans: Transaction)(implicit accountingConfig: Config,
-                                        entityAccess: EntityAccess) = TransactionData(
+                                        entityAccess: SlickEntityAccess) = TransactionData(
         issuerName = trans.issuer.name,
         beneficiaryAccountCode = trans.beneficiaryAccountCode,
         moneyReservoirCode = trans.moneyReservoirCode,
@@ -319,11 +321,11 @@ object TransactionGroupOperations {
     case class TransGroupData(transactions: MutableSeq[TransactionData], zeroSum: Boolean = false)
 
     object TransGroupData {
-      def fromPartial(transGroup: TransactionGroupPartial)(implicit user: User, accountingConfig: Config) =
+      def fromPartial(transGroup: TransactionGroup.Partial)(implicit user: User, accountingConfig: Config) =
         TransGroupData(transGroup.transactions.map(TransactionData.fromPartial(_)), transGroup.zeroSum)
 
       def fromModel(transGroup: TransactionGroup)(implicit accountingConfig: Config,
-                                                  entityAccess: EntityAccess) =
+                                                  entityAccess: SlickEntityAccess) =
         TransGroupData(
           transGroup.transactions.map(TransactionData.fromModel(_)),
           zeroSum = transGroup.isZeroSum)
@@ -332,7 +334,7 @@ object TransactionGroupOperations {
     // ********** form classes ********** //
     val transactionGroupForm = new Object {
       def forOperation(operationMeta: OperationMeta)(implicit accountingConfig: Config,
-                                                     entityAccess: EntityAccess): Form[TransGroupData] = operationMeta match {
+                                                     entityAccess: SlickEntityAccess): Form[TransGroupData] = operationMeta match {
         case AddNewOperationMeta() =>
           Form(formMapping verifying uniqueTransaction)
         case EditOperationMeta(_) =>
@@ -394,10 +396,10 @@ object TransactionGroupOperations {
 
       // Don't allow creation of duplicate transactions because they are probably unintended (e.g. pressing enter twice).
       private def uniqueTransaction(implicit accountingConfig: Config,
-                                    entityAccess: EntityAccess) = Constraint[TransGroupData]((groupData: TransGroupData) => {
+                                    entityAccess: SlickEntityAccess) = Constraint[TransGroupData]((groupData: TransGroupData) => {
         def fetchMatchingTransaction(transactionData: TransactionData): Option[Transaction] = {
           val possibleMatches = dbRun(
-            Transactions.newQuery
+            entityAccess.transactionManager.newQuery
               .filter(_.transactionDate === transactionData.transactionDate)
               .filter(_.categoryCode === transactionData.categoryCode))
 

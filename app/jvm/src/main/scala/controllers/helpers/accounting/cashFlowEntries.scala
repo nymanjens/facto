@@ -33,7 +33,8 @@ case class BalanceCorrection(balanceCheck: BalanceCheck) extends CashFlowEntry
 
 @Singleton()
 final class CashFlowEntries @Inject()(implicit accountingConfig: Config,
-                                     balanceCheckManager: SlickBalanceCheckManager) {
+                                      balanceCheckManager: SlickBalanceCheckManager,
+                                      transactionManager: SlickTransactionManager) {
 
   /**
     * Returns the last n CashFlowEntries for the given reservoir, ordered from old to new.
@@ -42,7 +43,7 @@ final class CashFlowEntries @Inject()(implicit accountingConfig: Config,
   ControllerHelperCache.cached(FetchLastNEntries(moneyReservoir, n)) {
     val (oldestBalanceDate, initialBalance): (DateTime, MoneyWithGeneralCurrency) = {
       val numTransactionsToFetch = 3 * n
-      val totalNumTransactions = dbRun(Transactions.newQuery
+      val totalNumTransactions = dbRun(transactionManager.newQuery
         .filter(_.moneyReservoirCode === moneyReservoir.code)
         .length
         .result)
@@ -52,7 +53,7 @@ final class CashFlowEntries @Inject()(implicit accountingConfig: Config,
 
       } else {
         // get oldest oldestTransDate
-        val oldestTransDate = dbRun(Transactions.newQuery
+        val oldestTransDate = dbRun(transactionManager.newQuery
           .filter(_.moneyReservoirCode === moneyReservoir.code)
           .sortBy(r => (r.transactionDate.desc, r.createdDate.desc))
           .take(numTransactionsToFetch))
@@ -78,7 +79,7 @@ final class CashFlowEntries @Inject()(implicit accountingConfig: Config,
       .toList
 
     // get relevant transactions
-    val transactions: List[Transaction] = dbRun(Transactions.newQuery
+    val transactions: List[Transaction] = dbRun(transactionManager.newQuery
       .filter(_.moneyReservoirCode === moneyReservoir.code)
       .filter(_.transactionDate > oldestBalanceDate)
       .sortBy(r => (r.transactionDate, r.createdDate)))

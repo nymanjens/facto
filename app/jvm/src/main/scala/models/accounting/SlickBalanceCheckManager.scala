@@ -18,8 +18,7 @@ final class SlickBalanceCheckManager extends ImmutableEntityManager[BalanceCheck
   SlickEntityManager.create[BalanceCheck, BalanceChecks](
     tag => new BalanceChecks(tag),
     tableName = tableName
-  )) with BalanceCheck.Manager {
-}
+  )) with BalanceCheck.Manager
 
 object SlickBalanceCheckManager {
   private val tableName: String = "BALANCE_CHECKS"

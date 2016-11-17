@@ -24,12 +24,12 @@ class TransactionAndGroupTests extends Specification {
     val user2 = Users.add(Users.newWithUnhashedPw(loginName = "tester2", password = "x", name = "Tester2"))
 
     // get and persist dummy transaction groups
-    val transGrp1 = TransactionGroups.add(TransactionGroup())
-    val transGrp2 = TransactionGroups.add(TransactionGroup())
-    val transGrp3 = TransactionGroups.add(TransactionGroup())
+    val transGrp1 = transactionGroupManager.add(TransactionGroup())
+    val transGrp2 = transactionGroupManager.add(TransactionGroup())
+    val transGrp3 = transactionGroupManager.add(TransactionGroup())
 
     // get and persist dummy transactions
-    val trans1A = Transactions.add(Transaction(
+    val trans1A = transactionManager.add(Transaction(
       transactionGroupId = transGrp1.id,
       issuerId = user1.id,
       beneficiaryAccountCode = "ACC_A",
@@ -40,7 +40,7 @@ class TransactionAndGroupTests extends Specification {
       transactionDate = Clock.now,
       consumedDate = Clock.now
     ))
-    val trans1B = Transactions.add(Transaction(
+    val trans1B = transactionManager.add(Transaction(
       transactionGroupId = transGrp1.id,
       issuerId = user1.id,
       beneficiaryAccountCode = "ACC_A",
@@ -51,7 +51,7 @@ class TransactionAndGroupTests extends Specification {
       transactionDate = Clock.now,
       consumedDate = Clock.now
     ))
-    val trans2 = Transactions.add(Transaction(
+    val trans2 = transactionManager.add(Transaction(
       transactionGroupId = transGrp2.id,
       issuerId = user2.id,
       beneficiaryAccountCode = "ACC_A",
@@ -76,6 +76,6 @@ class TransactionAndGroupTests extends Specification {
     trans1B.issuer mustEqual user1
     trans2.issuer mustEqual user2
 
-    Transactions.fetchAll() mustEqual Seq(trans1A, trans1B, trans2)
+    transactionManager.fetchAll() mustEqual Seq(trans1A, trans1B, trans2)
   }
 }

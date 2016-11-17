@@ -13,12 +13,13 @@ import common.{Clock, DatedMonth, MonthRange}
 import common.CollectionUtils.toListMap
 import common.GuavaUtils.asGuava
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
-import models.accounting.{Tag, Transaction, Transactions}
+import models.accounting.{Tag, Transaction, SlickTransactionManager}
 import models.accounting.config.{Account, Category, Config}
 import models.accounting.config.Account.SummaryTotalRowDef
 import controllers.helpers.ControllerHelperCache
 import controllers.helpers.ControllerHelperCache.CacheIdentifier
 import models.accounting.money.ReferenceMoney
+import models.SlickEntityAccess
 
 case class Summary(yearToSummary: Map[Int, SummaryForYear],
                    categories: Seq[Category],
@@ -29,14 +30,16 @@ case class Summary(yearToSummary: Map[Int, SummaryForYear],
   }
 }
 
-final class Summaries @Inject()(implicit accountingConfig: Config) {
+final class Summaries @Inject()(implicit accountingConfig: Config,
+                                entityAccess: SlickEntityAccess,
+                                transactionManager: SlickTransactionManager) {
   def fetchSummary(account: Account, expandedYear: Int, tags: Seq[Tag] = Seq()): Summary = {
     val now = Clock.now
 
     val years: Seq[Int] = getSummaryYears(account, expandedYear, now.getYear)
     val monthRangeForAverages: MonthRange = {
       val oldestTransaction = dbRun(
-        Transactions.newQuery
+        transactionManager.newQuery
           .filter(_.beneficiaryAccountCode === account.code)
           .sortBy(_.consumedDate)
           .take(1))
@@ -67,7 +70,7 @@ final class Summaries @Inject()(implicit accountingConfig: Config) {
   private def getSummaryYears(account: Account, expandedYear: Int, thisYear: Int): Seq[Int] =
     ControllerHelperCache.cached(GetSummaryYears(account, expandedYear, thisYear)) {
       val allTransactions = dbRun(
-        Transactions.newQuery
+        transactionManager.newQuery
           .filter(_.beneficiaryAccountCode === account.code))
       val transactionYears = allTransactions.toStream.map(t => t.consumedDate.getYear).toSet
       val yearsSet = transactionYears ++ Set(thisYear, expandedYear)
@@ -104,11 +107,12 @@ case class SummaryForYear(cells: ImmutableTable[Category, DatedMonth, SummaryCel
 
 object SummaryForYear {
 
-  private[accounting] def fetch(account: Account, monthRangeForAverages: MonthRange, year: Int, tags: Seq[Tag])(implicit accountingConfig: Config): SummaryForYear =
+  private[accounting] def fetch(account: Account, monthRangeForAverages: MonthRange, year: Int, tags: Seq[Tag])(implicit accountingConfig: Config,
+                                                                                                                entityAccess: SlickEntityAccess): SummaryForYear =
     ControllerHelperCache.cached(GetSummaryForYear(account, monthRangeForAverages, year, tags)) {
       val transactions: Seq[Transaction] = {
         val yearRange = MonthRange.forYear(year)
-        val allTransactions = dbRun(Transactions.newQuery
+        val allTransactions = dbRun(entityAccess.transactionManager.newQuery
           .filter(_.beneficiaryAccountCode === account.code)
           .filter(_.consumedDate >= yearRange.start)
           .filter(_.consumedDate < yearRange.startOfNextMonth)

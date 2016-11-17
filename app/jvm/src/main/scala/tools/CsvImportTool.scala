@@ -13,10 +13,10 @@ import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
 import models._
 import models.accounting.money.Money
-import models.accounting.{BalanceCheck, Transaction, TransactionGroup, TransactionGroups, Transactions, UpdateLogs}
+import models.accounting.{BalanceCheck, Transaction, TransactionGroup, UpdateLogs}
 
 final class CsvImportTool @Inject()(implicit userManager: User.Manager,
-                                    entityAccess: SlickEntityAccess) {
+                                    entityAccess: EntityAccess) {
 
   def importTransactions(csvFilePath: Path): Unit = {
     // example of line: "2 :: Common :: LIFE :: CARD_COMMON :: imperdiet Duis  :: -25.04 :: 1425855600 :: 0 :: 1425934823"
@@ -26,8 +26,8 @@ final class CsvImportTool @Inject()(implicit userManager: User.Manager,
       parts match {
         case List(issuerId, beneficiaryAccountCode, categoryCode, moneyReservoirCode, description, flowAsFloat,
         transactionDateStamp, consumedDateStamp, createdDateStamp) =>
-          val group = TransactionGroups.add(TransactionGroup())
-          Transactions.add(Transaction(
+          val group = entityAccess.transactionGroupManager.add(TransactionGroup())
+          entityAccess.transactionManager.add(Transaction(
             transactionGroupId = group.id,
             issuerId = issuerId.toInt,
             beneficiaryAccountCode = beneficiaryAccountCode,
@@ -51,7 +51,7 @@ final class CsvImportTool @Inject()(implicit userManager: User.Manager,
       val parts = Splitter.on(" :: ").trimResults().split(line).asScala.toList
       parts match {
         case List(issuerId, moneyReservoirCode, balanceAsFloat, checkDateStamp, createdDateStamp) =>
-          val group = TransactionGroups.add(TransactionGroup())
+          val group = entityAccess.transactionGroupManager.add(TransactionGroup())
           entityAccess.balanceCheckManager.add(BalanceCheck(
             issuerId = issuerId.toInt,
             moneyReservoirCode = moneyReservoirCode,

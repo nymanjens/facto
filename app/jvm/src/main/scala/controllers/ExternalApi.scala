@@ -61,12 +61,12 @@ final class ExternalApi @Inject()(implicit val messagesApi: MessagesApi,
     val issuer = getOrCreateRobotUser()
 
     // Add group
-    val group = TransactionGroups.add(TransactionGroup())
+    val group = entityAccess.transactionGroupManager.add(TransactionGroup())
 
     // Add transactions
     for (transPartial <- partial.transactions) {
       val transaction = transactionPartialToTransaction(transPartial, group, issuer)
-      Transactions.add(transaction)
+      entityAccess.transactionManager.add(transaction)
     }
 
     // Add log
@@ -113,7 +113,7 @@ final class ExternalApi @Inject()(implicit val messagesApi: MessagesApi,
     }
   }
 
-  private def transactionPartialToTransaction(partial: TransactionPartial, transactionGroup: TransactionGroup, issuer: User): Transaction = {
+  private def transactionPartialToTransaction(partial: Transaction.Partial, transactionGroup: TransactionGroup, issuer: User): Transaction = {
     def checkNotEmpty(s: String): String = {
       require(!s.isEmpty)
       s

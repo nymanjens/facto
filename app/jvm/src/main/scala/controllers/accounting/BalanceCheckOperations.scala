@@ -11,7 +11,7 @@ import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 
 import common.{Clock, ReturnTo}
 import models._
-import models.accounting.{BalanceCheck, Transactions, UpdateLogs}
+import models.accounting.{BalanceCheck, Transaction, UpdateLogs}
 import models.accounting.config.{MoneyReservoir, Config}
 import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting.FormUtils.{validFlowAsFloat, flowAsFloatStringToCents}
@@ -76,7 +76,7 @@ final class BalanceCheckOperations @Inject()(implicit val messagesApi: MessagesA
                                             mostRecentTransactionId: Long)
                                            (implicit user: User): Unit = {
     val moneyReservoir = accountingConfig.moneyReservoir(moneyReservoirCode)
-    val mostRecentTransaction = Transactions.findById(mostRecentTransactionId)
+    val mostRecentTransaction = entityAccess.transactionManager.findById(mostRecentTransactionId)
 
     val balanceCheck = BalanceCheck(
       issuerId = user.id,

@@ -9,7 +9,7 @@ import models.{User, Users}
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.accounting.money.Currency.Gbp
 import models.accounting.money.{ExchangeRateMeasurement, ExchangeRateMeasurements, Money}
-import models.accounting.{BalanceCheck, Transaction, TransactionGroup, TransactionGroups, Transactions}
+import models.accounting.{BalanceCheck, Transaction, TransactionGroup, transactionManager}
 
 object TestUtils {
 
@@ -23,9 +23,9 @@ object TestUtils {
                          description: String = "description",
                          detailDescription: String = "detailDescription",
                          tagsString: String = ""): Transaction = {
-    val actualGroupId = if (groupId == -1) TransactionGroups.add(TransactionGroup()).id else groupId
+    val actualGroupId = if (groupId == -1) transactionGroupManager.add(TransactionGroup()).id else groupId
     val actualDate = if (timestamp == -1) date else new DateTime(timestamp)
-    Transactions.add(Transaction(
+    transactionManager.add(Transaction(
       transactionGroupId = actualGroupId,
       issuerId = 1,
       beneficiaryAccountCode = account.code,
