@@ -12,7 +12,7 @@ import play.api.i18n.{MessagesApi, Messages, I18nSupport}
 
 import models._
 import play.api.libs.json.Json
-import models.accounting.TagEntities
+import models.accounting.TagEntity
 import models.accounting.config.{Config, Template}
 import controllers.helpers.AuthenticatedAction
 import models.SlickUtils.dbApi._
@@ -43,7 +43,7 @@ final class JsonApi @Inject()(implicit val messagesApi: MessagesApi,
 
   def getAllTags = AuthenticatedAction { implicit user =>
     implicit request =>
-      val tagNames = TagEntities.fetchAll().map(_.tag.name).toSet
+      val tagNames = entityAccess.tagEntityManager.fetchAll().map(_.tag.name).toSet
       Ok(Json.toJson(tagNames))
   }
 

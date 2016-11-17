@@ -19,7 +19,7 @@ class TransactionWithTagsTests extends Specification {
     val trans = TestUtils.persistTransaction(tagsString = "a,b")
 
     // Do checks
-    val tagEntities = TagEntities.fetchAll()
+    val tagEntities = tagEntityManager.fetchAll()
     getWithTag("a", tagEntities).transactionId mustEqual trans.id
     getWithTag("b", tagEntities).transactionId mustEqual trans.id
 
@@ -27,7 +27,7 @@ class TransactionWithTagsTests extends Specification {
     Transactions.delete(trans)
 
     // Do checks
-    TagEntities.fetchAll() must beEmpty
+    tagEntityManager.fetchAll() must beEmpty
   }
 
   private def getWithTag(name: String, tagEntities: Seq[TagEntity]): TagEntity = {

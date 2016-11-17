@@ -7,5 +7,6 @@ import models.accounting._
 import models.accounting.money.ExchangeRateMeasurements
 
 class EntityAccess @Inject()(implicit val userManager: User.Manager,
-                             val balanceCheckManager: BalanceCheck.Manager)
+                             val balanceCheckManager: BalanceCheck.Manager,
+                             val tagEntityManager: TagEntity.Manager)
 

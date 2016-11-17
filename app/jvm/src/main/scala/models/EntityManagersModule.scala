@@ -8,6 +8,7 @@ final class EntityManagersModule extends AbstractModule {
   override def configure() = {
     bindSingleton(classOf[User.Manager], classOf[SlickUserManager])
     bindSingleton(classOf[BalanceCheck.Manager], classOf[SlickBalanceCheckManager])
+    bindSingleton(classOf[TagEntity.Manager], classOf[SlickTagEntityManager])
   }
 
   private def bindSingleton[T](interface: Class[T], implementation: Class[_ <: T]): Unit = {

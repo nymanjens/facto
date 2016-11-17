@@ -105,14 +105,17 @@ object Transactions extends ImmutableEntityManager[Transaction, Transactions](
   SlickEntityManager.create[Transaction, Transactions](
     tag => new Transactions(tag), tableName = "TRANSACTIONS")) {
 
+  // TODO: Inject tagEntityManager
+  val tagEntityManager: SlickTagEntityManager = null
+
   // ********** Mutators ********** //
-  // Overriding mutators to update the TagEntities table
+  // Overriding mutators to update the tagEntityManager table
   override def add(transaction: Transaction): Transaction = {
     val persistedTransaction = super.add(transaction)
 
-    // Add TagEntities to database
+    // Add tagEntityManager to database
     for (tag <- persistedTransaction.tags) {
-      TagEntities.add(
+      tagEntityManager.add(
         TagEntity(
           name = tag.name,
           transactionId = persistedTransaction.id))
@@ -122,10 +125,10 @@ object Transactions extends ImmutableEntityManager[Transaction, Transactions](
   }
 
   override def delete(transaction: Transaction): Unit = {
-    // Remove TagEntities from database
-    val tags = dbRun(TagEntities.newQuery.filter(_.transactionId === transaction.id))
+    // Remove tagEntityManager from database
+    val tags = dbRun(tagEntityManager.newQuery.filter(_.transactionId === transaction.id))
     for (tag <- tags) {
-      TagEntities.delete(tag)
+      tagEntityManager.delete(tag)
     }
 
     super.delete(transaction)

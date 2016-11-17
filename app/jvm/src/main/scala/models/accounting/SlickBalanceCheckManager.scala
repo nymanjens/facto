@@ -24,7 +24,7 @@ final class SlickBalanceCheckManager extends ImmutableEntityManager[BalanceCheck
 object SlickBalanceCheckManager {
   private val tableName: String = "BALANCE_CHECKS"
 
-  final class BalanceChecks(tag: SlickTag) extends EntityTable[BalanceCheck](tag, SlickBalanceCheckManager.tableName) {
+  final class BalanceChecks(tag: SlickTag) extends EntityTable[BalanceCheck](tag, tableName) {
     def issuerId = column[Long]("issuerId")
     def moneyReservoirCode = column[String]("moneyReservoirCode")
     def balance = column[Long]("balance")
