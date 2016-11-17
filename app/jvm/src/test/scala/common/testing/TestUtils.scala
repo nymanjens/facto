@@ -9,7 +9,7 @@ import models.{User, Users}
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.accounting.money.Currency.Gbp
 import models.accounting.money.{ExchangeRateMeasurement, ExchangeRateMeasurements, Money}
-import models.accounting.{BalanceCheck, BalanceChecks, Transaction, TransactionGroup, TransactionGroups, Transactions}
+import models.accounting.{BalanceCheck, Transaction, TransactionGroup, TransactionGroups, Transactions}
 
 object TestUtils {
 
@@ -45,7 +45,7 @@ object TestUtils {
                           timestamp: Long = -1,
                           reservoir: MoneyReservoir = testReservoir): BalanceCheck = {
     val actualDate = if (timestamp == -1) date else new DateTime(timestamp)
-    BalanceChecks.add(BalanceCheck(
+    balanceCheckManager.add(BalanceCheck(
       issuerId = 2,
       moneyReservoirCode = reservoir.code,
       balanceInCents = balanceInCents,

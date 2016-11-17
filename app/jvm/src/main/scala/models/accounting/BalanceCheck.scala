@@ -2,13 +2,10 @@ package models.accounting
 
 import com.google.common.hash.{HashCode, Hashing}
 import common.Clock
-import models.SlickUtils.dbApi._
-import models.SlickUtils.dbApi.{Tag => SlickTag}
-import models.SlickUtils.JodaToSqlDateMapper
 import models.accounting.config.{Config, MoneyReservoir}
 import models.accounting.money.{DatedMoney, Money}
-import models.manager.{Entity, SlickEntityManager, EntityTable, ImmutableEntityManager}
-import models._
+import models.manager.{Entity, EntityManager}
+import models.{User, EntityAccess}
 import org.joda.time.DateTime
 
 /** BalanceCheck entities are immutable. Just delete and create a new one when updating. */
@@ -28,16 +25,8 @@ case class BalanceCheck(issuerId: Long,
   def balance(implicit accountingConfig: Config): DatedMoney = DatedMoney(balanceInCents, moneyReservoir.currency, checkDate)
 }
 
-class BalanceChecks(tag: SlickTag) extends EntityTable[BalanceCheck](tag, BalanceChecks.tableName) {
-  def issuerId = column[Long]("issuerId")
-  def moneyReservoirCode = column[String]("moneyReservoirCode")
-  def balance = column[Long]("balance")
-  def createdDate = column[DateTime]("createdDate")
-  def checkDate = column[DateTime]("checkDate")
+object BalanceCheck {
+  def tupled = (this.apply _).tupled
 
-  override def * = (issuerId, moneyReservoirCode, balance, createdDate, checkDate, id.?) <>(BalanceCheck.tupled, BalanceCheck.unapply)
+  trait Manager extends EntityManager[BalanceCheck]
 }
-
-object BalanceChecks extends ImmutableEntityManager[BalanceCheck, BalanceChecks](
-  SlickEntityManager.create[BalanceCheck, BalanceChecks](
-    tag => new BalanceChecks(tag), tableName = "BALANCE_CHECKS"))

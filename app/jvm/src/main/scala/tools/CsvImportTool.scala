@@ -13,7 +13,7 @@ import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
 import models._
 import models.accounting.money.Money
-import models.accounting.{BalanceCheck, BalanceChecks, Transaction, TransactionGroup, TransactionGroups, Transactions, UpdateLogs}
+import models.accounting.{BalanceCheck, Transaction, TransactionGroup, TransactionGroups, Transactions, UpdateLogs}
 
 final class CsvImportTool @Inject()(implicit userManager: User.Manager,
                                     entityAccess: SlickEntityAccess) {
@@ -52,7 +52,7 @@ final class CsvImportTool @Inject()(implicit userManager: User.Manager,
       parts match {
         case List(issuerId, moneyReservoirCode, balanceAsFloat, checkDateStamp, createdDateStamp) =>
           val group = TransactionGroups.add(TransactionGroup())
-          BalanceChecks.add(BalanceCheck(
+          entityAccess.balanceCheckManager.add(BalanceCheck(
             issuerId = issuerId.toInt,
             moneyReservoirCode = moneyReservoirCode,
             balanceInCents = Money.floatToCents(balanceAsFloat.toDouble),

@@ -99,7 +99,7 @@ class UpdateLogTest extends HookedSpecification {
   }
 
   private def balanceCheck(balance: Long): BalanceCheck = {
-    BalanceChecks.add(BalanceCheck(
+    balanceCheckManager.add(BalanceCheck(
       issuerId = testUser.id,
       moneyReservoirCode = testReservoir.code,
       balanceInCents = balance,

@@ -2,10 +2,16 @@ package models
 
 import com.google.inject.AbstractModule
 import tools.ApplicationStartHook
-import models.accounting.config.ConfigModule
+import models.accounting._
 
 final class EntityManagersModule extends AbstractModule {
   override def configure() = {
-    bind(classOf[User.Manager]).to(classOf[SlickUserManager])
+    bindSingleton(classOf[User.Manager], classOf[SlickUserManager])
+    bindSingleton(classOf[BalanceCheck.Manager], classOf[SlickBalanceCheckManager])
+  }
+
+  private def bindSingleton[T](interface: Class[T], implementation: Class[_ <: T]): Unit = {
+    bind(interface).to(implementation)
+    bind(implementation).asEagerSingleton
   }
 }

@@ -6,5 +6,6 @@ import models.manager.SlickEntityManager
 import models.accounting._
 import models.accounting.money.ExchangeRateMeasurements
 
-class EntityAccess @Inject()(implicit val userManager: User.Manager)
+class EntityAccess @Inject()(implicit val userManager: User.Manager,
+                             val balanceCheckManager: BalanceCheck.Manager)
 

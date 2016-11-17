@@ -20,20 +20,20 @@ class BalanceCheckTest extends Specification {
     val user1 = Users.add(Users.newWithUnhashedPw(loginName = "tester", password = "x", name = "Tester"))
     val user2 = Users.add(Users.newWithUnhashedPw(loginName = "tester2", password = "x", name = "Tester2"))
 
-    // get and persist dummy BalanceChecks
-    val checkA1 = BalanceChecks.add(BalanceCheck(
+    // get and persist dummy balanceCheckManager
+    val checkA1 = balanceCheckManager.add(BalanceCheck(
       issuerId = user1.id,
       moneyReservoirCode = "ACC_A",
       balanceInCents = 999,
       checkDate = new DateTime(1000)
     ))
-    val checkA2 = BalanceChecks.add(BalanceCheck(
+    val checkA2 = balanceCheckManager.add(BalanceCheck(
       issuerId = user1.id,
       moneyReservoirCode = "ACC_A",
       balanceInCents = 1000,
       checkDate = new DateTime(2000)
     ))
-    val checkB = BalanceChecks.add(BalanceCheck(
+    val checkB = balanceCheckManager.add(BalanceCheck(
       issuerId = user2.id,
       moneyReservoirCode = "ACC_B",
       balanceInCents = 999,
@@ -43,6 +43,6 @@ class BalanceCheckTest extends Specification {
     // do basic checks
     checkA1.issuer mustEqual user1
     checkA2.moneyReservoirCode mustEqual "ACC_A"
-    BalanceChecks.fetchAll() mustEqual Seq(checkA1, checkA2, checkB)
+    balanceCheckManager.fetchAll() mustEqual Seq(checkA1, checkA2, checkB)
   }
 }

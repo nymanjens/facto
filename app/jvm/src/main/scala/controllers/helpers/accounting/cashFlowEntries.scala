@@ -8,6 +8,7 @@ import models.SlickUtils.JodaToSqlDateMapper
 import models.SlickUtils.dbApi._
 import com.github.nscala_time.time.Imports._
 import models.SlickUtils.dbRun
+import models._
 import models.accounting._
 import models.accounting.config.{MoneyReservoir, Config}
 import models.accounting.money.{DatedMoney, Money, MoneyWithGeneralCurrency}
@@ -31,7 +32,8 @@ case class RegularEntry(override val transactions: Seq[Transaction],
 case class BalanceCorrection(balanceCheck: BalanceCheck) extends CashFlowEntry
 
 @Singleton()
-final class CashFlowEntries @Inject()(implicit accountingConfig: Config) {
+final class CashFlowEntries @Inject()(implicit accountingConfig: Config,
+                                     balanceCheckManager: SlickBalanceCheckManager) {
 
   /**
     * Returns the last n CashFlowEntries for the given reservoir, ordered from old to new.
@@ -58,7 +60,7 @@ final class CashFlowEntries @Inject()(implicit accountingConfig: Config) {
           .transactionDate
 
         // get relevant balance checks
-        val oldestBC = dbRun(BalanceChecks.newQuery
+        val oldestBC = dbRun(balanceCheckManager.newQuery
           .filter(_.moneyReservoirCode === moneyReservoir.code)
           .filter(_.checkDate < oldestTransDate)
           .sortBy(r => (r.checkDate.desc, r.createdDate.desc))
@@ -69,7 +71,7 @@ final class CashFlowEntries @Inject()(implicit accountingConfig: Config) {
         (oldestBalanceDate, initialBalance)
       }
     }
-    val balanceChecks: List[BalanceCheck] = dbRun(BalanceChecks.newQuery
+    val balanceChecks: List[BalanceCheck] = dbRun(balanceCheckManager.newQuery
       .filter(_.moneyReservoirCode === moneyReservoir.code)
       .filter(_.checkDate > oldestBalanceDate)
       .sortBy(r => (r.checkDate, r.createdDate)))

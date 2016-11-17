@@ -6,8 +6,9 @@ import models.manager.SlickEntityManager
 import models.accounting._
 import models.accounting.money.ExchangeRateMeasurements
 
-final class SlickEntityAccess @Inject()(implicit override val userManager: SlickUserManager) extends EntityAccess {
+final class SlickEntityAccess @Inject()(implicit override val userManager: SlickUserManager,
+                                        override val balanceCheckManager: SlickBalanceCheckManager) extends EntityAccess {
 
   val allEntityManagers: Seq[SlickEntityManager[_, _]] =
-    Seq(userManager, Transactions, TransactionGroups, BalanceChecks, TagEntities, UpdateLogs, ExchangeRateMeasurements)
+    Seq(userManager, Transactions, TransactionGroups, balanceCheckManager, TagEntities, UpdateLogs, ExchangeRateMeasurements)
 }

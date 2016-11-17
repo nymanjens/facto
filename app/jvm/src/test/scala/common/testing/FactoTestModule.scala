@@ -9,7 +9,7 @@ import org.joda.time.DateTime
 import common.Clock
 import models.{User, Users}
 import models.accounting.config.{MoneyReservoir, Account, Category, Config, ConfigModule}
-import models.accounting.{Transaction, Transactions, TransactionGroups, TransactionGroup, BalanceCheck, BalanceChecks}
+import models.accounting.{Transaction, Transactions, TransactionGroups, TransactionGroup, BalanceCheck}
 
 final class FactoTestModule extends AbstractModule {
 
