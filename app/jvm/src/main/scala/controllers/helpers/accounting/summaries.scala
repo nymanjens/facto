@@ -18,7 +18,7 @@ import models.accounting.config.{Account, Category, Config}
 import models.accounting.config.Account.SummaryTotalRowDef
 import controllers.helpers.ControllerHelperCache
 import controllers.helpers.ControllerHelperCache.CacheIdentifier
-import models.accounting.money.ReferenceMoney
+import models.accounting.money.{ReferenceMoney, ExchangeRateManager}
 import models.SlickEntityAccess
 
 case class Summary(yearToSummary: Map[Int, SummaryForYear],
@@ -32,6 +32,7 @@ case class Summary(yearToSummary: Map[Int, SummaryForYear],
 
 final class Summaries @Inject()(implicit accountingConfig: Config,
                                 entityAccess: SlickEntityAccess,
+                                exchangeRateManager: ExchangeRateManager,
                                 transactionManager: SlickTransactionManager) {
   def fetchSummary(account: Account, expandedYear: Int, tags: Seq[Tag] = Seq()): Summary = {
     val now = Clock.now
@@ -108,6 +109,7 @@ case class SummaryForYear(cells: ImmutableTable[Category, DatedMonth, SummaryCel
 object SummaryForYear {
 
   private[accounting] def fetch(account: Account, monthRangeForAverages: MonthRange, year: Int, tags: Seq[Tag])(implicit accountingConfig: Config,
+                                                                                                                exchangeRateManager: ExchangeRateManager,
                                                                                                                 entityAccess: SlickEntityAccess): SummaryForYear =
     ControllerHelperCache.cached(GetSummaryForYear(account, monthRangeForAverages, year, tags)) {
       val transactions: Seq[Transaction] = {
@@ -140,7 +142,8 @@ object SummaryForYear {
     }
   }
 
-  private class Builder(account: Account, monthRangeForAverages: MonthRange, year: Int)(implicit accountingConfig: Config) {
+  private class Builder(account: Account, monthRangeForAverages: MonthRange, year: Int)(implicit accountingConfig: Config,
+                                                                                        exchangeRateManager: ExchangeRateManager) {
     private val cellBuilders: ImmutableTable[Category, DatedMonth, SummaryCell.Builder] = {
       val tableBuilder = ImmutableTable.builder[Category, DatedMonth, SummaryCell.Builder]()
       for (category <- account.categories) {
@@ -189,7 +192,8 @@ object SummaryForYear {
 }
 
 case class SummaryCell(entries: Seq[GeneralEntry]) {
-  def totalFlow(implicit accountingConfig: Config): ReferenceMoney = {
+  def totalFlow(implicit exchangeRateManager: ExchangeRateManager,
+                accountingConfig: Config): ReferenceMoney = {
     {
       for {
         entry <- entries
@@ -223,8 +227,8 @@ case class SummaryTotalRow(rowTitleHtml: Html, monthToTotal: Map[DatedMonth, Ref
 object SummaryTotalRow {
   def calculate(totalRowDef: SummaryTotalRowDef,
                 cells: Table[Category, DatedMonth, SummaryCell],
-                categoryToAverages: Map[Category, ReferenceMoney])(
-                 implicit accountingConfig: Config): SummaryTotalRow = {
+                categoryToAverages: Map[Category, ReferenceMoney])(implicit exchangeRateManager: ExchangeRateManager,
+                                                                   accountingConfig: Config): SummaryTotalRow = {
     def sumNonIgnoredCategories(categoryToMoney: Map[Category, ReferenceMoney]): ReferenceMoney = {
       categoryToMoney.filter { case (cat, _) => !totalRowDef.categoriesToIgnore.contains(cat) }.values.sum
     }

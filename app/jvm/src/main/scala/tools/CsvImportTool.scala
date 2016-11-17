@@ -13,7 +13,7 @@ import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
 import models._
 import models.accounting.money.Money
-import models.accounting.{BalanceCheck, Transaction, TransactionGroup, UpdateLogs}
+import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 
 final class CsvImportTool @Inject()(implicit userManager: User.Manager,
                                     entityAccess: EntityAccess) {

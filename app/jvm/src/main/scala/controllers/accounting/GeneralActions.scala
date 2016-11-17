@@ -6,7 +6,7 @@ import play.api.mvc._
 
 import play.api.i18n.{MessagesApi, Messages, I18nSupport}
 import models._
-import models.accounting.UpdateLogs
+import models.accounting.UpdateLog
 import models.accounting.config.{Config, Template}
 import controllers.helpers.AuthenticatedAction
 
@@ -60,7 +60,7 @@ final class GeneralActions @Inject()(implicit val messagesApi: MessagesApi,
 
   private def updateLogs(numEntriesToShow: Int = 100000)(implicit request: Request[AnyContent], user: User): Result = {
     // get entries
-    val entries = UpdateLogs.fetchLastNEntries(numEntriesToShow + 1)
+    val entries = entityAccess.updateLogManager.fetchLastNEntries(numEntriesToShow + 1)
 
     // render
     Ok(views.html.accounting.updateLogs(

@@ -2,6 +2,7 @@ package models.accounting
 
 import collection.immutable.Seq
 
+import com.google.inject._
 import org.joda.time.DateTime
 
 import common.Clock
@@ -14,37 +15,20 @@ import models.manager.{EntityTable, ImmutableEntityManager, Entity, SlickEntityM
 import models.accounting.config.Config
 import models.accounting.config.{Category, Account, MoneyReservoir}
 
-/** UpdateLog entities are immutable. */
-case class UpdateLog(userId: Long,
-                     change: String,
-                     date: DateTime = Clock.now,
-                     idOption: Option[Long] = None) extends Entity[UpdateLog] {
-  require(userId > 0)
-  require(!change.isEmpty)
-  for (idVal <- idOption) require(idVal > 0)
+import UpdateLog.UpdateOperation
+import SlickUpdateLogManager.{UpdateLogs, tableName}
 
-  override def withId(id: Long) = copy(idOption = Some(id))
+final class SlickUpdateLogManager @Inject()(implicit accountingConfig: Config) extends ImmutableEntityManager[UpdateLog, UpdateLogs](
+  SlickEntityManager.create[UpdateLog, UpdateLogs](
+    tag => new UpdateLogs(tag),
+    tableName = tableName
+  )) with UpdateLog.Manager {
 
-  def user(implicit entityAccess: EntityAccess): User = entityAccess.userManager.findById(userId)
-}
+  override def fetchLastNEntries(n: Int): Seq[UpdateLog] = {
+    dbRun(newQuery.sortBy(_.date.desc).take(n)).reverse.toList
+  }
 
-class UpdateLogs(tag: SlickTag) extends EntityTable[UpdateLog](tag, UpdateLogs.tableName) {
-  def userId = column[Long]("userId")
-  def change = column[String]("change")
-  def date = column[DateTime]("date")
-
-  override def * = (userId, change, date, id.?) <> (UpdateLog.tupled, UpdateLog.unapply)
-}
-
-object UpdateLogs extends ImmutableEntityManager[UpdateLog, UpdateLogs](
-  SlickEntityManager.create[UpdateLog, UpdateLogs](tag => new UpdateLogs(tag), tableName = "UPDATE_LOGS")) {
-
-  /* Returns most recent n entries sorted from old to new. */
-  def fetchLastNEntries(n: Int): Seq[UpdateLog] =
-  dbRun(UpdateLogs.newQuery.sortBy(_.date.desc).take(n)).reverse.toList
-
-  def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: TransactionGroup)(implicit accountingConfig: Config,
-                                                                                          entityAccess: EntityAccess): Unit = {
+  override def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: TransactionGroup)(implicit entityAccess: EntityAccess): Unit = {
     require(newOrDeletedValue.idOption.isDefined, s"Given value must be persisted before logging it: ${newOrDeletedValue}")
     def fullyDescriptiveTransaction(t: Transaction): String = {
       s"Transaction(id=${t.id}, issuer=${t.issuer.loginName}, beneficiaryAccount=${t.beneficiaryAccountCode}, " +
@@ -58,8 +42,8 @@ object UpdateLogs extends ImmutableEntityManager[UpdateLog, UpdateLogs](
     }
     addLog(user, operation, fullyDescriptiveString(newOrDeletedValue))
   }
-  def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: BalanceCheck)(implicit accountingConfig: Config,
-                                                                                      entityAccess: EntityAccess): Unit = {
+
+  override def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: BalanceCheck)(implicit entityAccess: EntityAccess): Unit = {
     require(newOrDeletedValue.idOption.isDefined, s"Given value must be persisted before logging it: ${newOrDeletedValue}")
     def fullyDescriptiveString(bc: BalanceCheck): String = {
       s"BalanceCheck(id=${bc.id}, issuer=${bc.issuer.loginName}, moneyReservoir=${bc.moneyReservoirCode}, " +
@@ -71,11 +55,17 @@ object UpdateLogs extends ImmutableEntityManager[UpdateLog, UpdateLogs](
   private def addLog(user: User, operation: UpdateOperation, newOrDeletedValueString: String): Unit = {
     val operationName = objectName(operation)
     val change = s"$operationName $newOrDeletedValueString"
-    UpdateLogs.add(UpdateLog(user.id, change))
+    add(UpdateLog(user.id, change))
   }
+}
+object SlickUpdateLogManager {
+  private val tableName: String = "UPDATE_LOGS"
 
-  sealed trait UpdateOperation
-  object AddNew extends UpdateOperation
-  object Edit extends UpdateOperation
-  object Delete extends UpdateOperation
+  final class UpdateLogs(tag: SlickTag) extends EntityTable[UpdateLog](tag, tableName) {
+    def userId = column[Long]("userId")
+    def change = column[String]("change")
+    def date = column[DateTime]("date")
+
+    override def * = (userId, change, date, id.?) <> (UpdateLog.tupled, UpdateLog.unapply)
+  }
 }

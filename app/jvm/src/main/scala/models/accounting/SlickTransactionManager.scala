@@ -61,7 +61,7 @@ final class SlickTransactionManager @Inject()(tagEntityManager: SlickTagEntityMa
 object SlickTransactionManager {
   private val tableName: String = "TRANSACTIONS"
 
-  class Transactions(tag: SlickTag) extends EntityTable[Transaction](tag, tableName) {
+  final class Transactions(tag: SlickTag) extends EntityTable[Transaction](tag, tableName) {
     def transactionGroupId = column[Long]("transactionGroupId")
     def issuerId = column[Long]("issuerId")
     def beneficiaryAccountCode = column[String]("beneficiaryAccountCode")

@@ -6,7 +6,7 @@ import com.google.inject.Inject
 import common.{Clock, TimeUtils}
 import models.accounting._
 import models.accounting.config.{Account, Config}
-import models.accounting.money.{Currency, ExchangeRateMeasurement, ExchangeRateMeasurements}
+import models.accounting.money.{Currency, ExchangeRateMeasurement}
 
 import scala.collection.immutable.Seq
 import play.api.data.Form
@@ -70,7 +70,7 @@ final class ExternalApi @Inject()(implicit val messagesApi: MessagesApi,
     }
 
     // Add log
-    UpdateLogs.addLog(issuer, UpdateLogs.AddNew, group)
+    entityAccess.updateLogManager.addLog(issuer, UpdateLog.AddNew, group)
 
     Ok("OK")
   }
@@ -84,7 +84,7 @@ final class ExternalApi @Inject()(implicit val messagesApi: MessagesApi,
     val date = TimeUtils.parseDateString(dateString)
     require(Currency.of(foreignCurrencyCode).isForeign)
 
-    ExchangeRateMeasurements.add(ExchangeRateMeasurement(
+    entityAccess.exchangeRateMeasurementManager.add(ExchangeRateMeasurement(
       date = date,
       foreignCurrencyCode = foreignCurrencyCode,
       ratioReferenceToForeignCurrency = ratioReferenceToForeignCurrency))

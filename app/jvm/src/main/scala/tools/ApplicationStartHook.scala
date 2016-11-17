@@ -4,7 +4,7 @@ import java.nio.file.{Files, Path, Paths}
 
 import com.google.inject.Inject
 import common.ResourceFiles
-import models.accounting.money.{ExchangeRateMeasurement, ExchangeRateMeasurements}
+import models.accounting.money.{ExchangeRateMeasurement}
 import models._
 import org.joda.time.DateTime
 import play.api.{Application, Mode}
@@ -78,7 +78,7 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
   private def loadCsvDummyData(csvDataFolder: Path) = {
     csvImportTool.importTransactions(assertExists(csvDataFolder resolve "transactions.csv"))
     csvImportTool.importBalanceChecks(assertExists(csvDataFolder resolve "balancechecks.csv"))
-    ExchangeRateMeasurements.add(ExchangeRateMeasurement(
+    entityAccess.exchangeRateMeasurementManager.add(ExchangeRateMeasurement(
       date = new DateTime(1990, 1, 1, 0, 0), // Jan 1, 1990
       foreignCurrencyCode = "GBP",
       ratioReferenceToForeignCurrency = 1.2))

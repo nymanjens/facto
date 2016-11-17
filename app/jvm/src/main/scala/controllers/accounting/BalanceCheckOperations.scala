@@ -11,7 +11,7 @@ import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 
 import common.{Clock, ReturnTo}
 import models._
-import models.accounting.{BalanceCheck, Transaction, UpdateLogs}
+import models.accounting.{BalanceCheck, Transaction, UpdateLog}
 import models.accounting.config.{MoneyReservoir, Config}
 import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting.FormUtils.{validFlowAsFloat, flowAsFloatStringToCents}
@@ -20,6 +20,7 @@ import controllers.accounting.BalanceCheckOperations.{Forms, AddNewOperationMeta
 final class BalanceCheckOperations @Inject()(implicit val messagesApi: MessagesApi,
                                              entityAccess: EntityAccess,
                                              balanceCheckManager: BalanceCheck.Manager,
+                                             updateLogManager: UpdateLog.Manager,
                                              accountingConfig: Config)
   extends Controller with I18nSupport {
 
@@ -62,7 +63,7 @@ final class BalanceCheckOperations @Inject()(implicit val messagesApi: MessagesA
       implicit val returnToImplicit = ReturnTo(returnTo)
 
       val bc = balanceCheckManager.findById(bcId)
-      UpdateLogs.addLog(user, UpdateLogs.Delete, bc)
+      updateLogManager.addLog(user, UpdateLog.Delete, bc)
       balanceCheckManager.delete(bc)
 
       val moneyReservoirName = bc.moneyReservoir.name
@@ -84,7 +85,7 @@ final class BalanceCheckOperations @Inject()(implicit val messagesApi: MessagesA
       balanceInCents = balanceInCents,
       checkDate = mostRecentTransaction.transactionDate)
     val persistedBc = balanceCheckManager.add(balanceCheck)
-    UpdateLogs.addLog(user, UpdateLogs.AddNew, persistedBc)
+    updateLogManager.addLog(user, UpdateLog.AddNew, persistedBc)
   }
 
   // ********** private helper controllers ********** //
@@ -129,10 +130,10 @@ final class BalanceCheckOperations @Inject()(implicit val messagesApi: MessagesA
     }
 
     val operation = operationMeta match {
-      case _: AddNewOperationMeta => UpdateLogs.AddNew
-      case _: EditOperationMeta => UpdateLogs.Edit
+      case _: AddNewOperationMeta => UpdateLog.AddNew
+      case _: EditOperationMeta => UpdateLog.Edit
     }
-    UpdateLogs.addLog(user, operation, persistedBc)
+    updateLogManager.addLog(user, operation, persistedBc)
   }
 
   private def formView(operationMeta: OperationMeta, formData: Forms.BcData)

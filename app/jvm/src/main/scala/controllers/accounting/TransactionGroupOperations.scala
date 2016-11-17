@@ -2,7 +2,7 @@ package controllers.accounting
 
 import com.google.inject.Inject
 import common.ReturnTo
-import models.accounting.money.{DatedMoney, Money, ReferenceMoney}
+import models.accounting.money.{DatedMoney, Money, ReferenceMoney, ExchangeRateManager}
 
 import scala.collection.{Seq => MutableSeq}
 import scala.collection.immutable.Seq
@@ -20,7 +20,7 @@ import common.{Clock, ReturnTo}
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
 import models._
-import models.accounting.{Transaction, TransactionGroup, UpdateLogs}
+import models.accounting.{Transaction, TransactionGroup, UpdateLog}
 import models.accounting.config.{Config, Account, MoneyReservoir, Category, Template}
 import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting.CashFlowEntry
@@ -32,6 +32,8 @@ final class TransactionGroupOperations @Inject()(implicit val messagesApi: Messa
                                                  entityAccess: SlickEntityAccess,
                                                  transactionManager: Transaction.Manager,
                                                  transactionGroupManager: TransactionGroup.Manager,
+                                                 updateLogManager: UpdateLog.Manager,
+                                                 exchangeRateManager: ExchangeRateManager,
                                                  accountingConfig: Config) extends Controller with I18nSupport {
 
   // ********** actions ********** //
@@ -67,7 +69,7 @@ final class TransactionGroupOperations @Inject()(implicit val messagesApi: Messa
       val group = transactionGroupManager.findById(transGroupId)
       val numTrans = group.transactions.size
 
-      UpdateLogs.addLog(user, UpdateLogs.Delete, group)
+      updateLogManager.addLog(user, UpdateLog.Delete, group)
       for (transaction <- group.transactions) {
         transactionManager.delete(transaction)
       }
@@ -234,10 +236,10 @@ final class TransactionGroupOperations @Inject()(implicit val messagesApi: Messa
     }
 
     val operation = operationMeta match {
-      case _: AddNewOperationMeta => UpdateLogs.AddNew
-      case _: EditOperationMeta => UpdateLogs.Edit
+      case _: AddNewOperationMeta => UpdateLog.AddNew
+      case _: EditOperationMeta => UpdateLog.Edit
     }
-    UpdateLogs.addLog(user, operation, group)
+    updateLogManager.addLog(user, operation, group)
   }
 
   private def formViewWithInitialData(operationMeta: OperationMeta,
@@ -324,7 +326,8 @@ object TransactionGroupOperations {
       def fromPartial(transGroup: TransactionGroup.Partial)(implicit user: User, accountingConfig: Config) =
         TransGroupData(transGroup.transactions.map(TransactionData.fromPartial(_)), transGroup.zeroSum)
 
-      def fromModel(transGroup: TransactionGroup)(implicit accountingConfig: Config,
+      def fromModel(transGroup: TransactionGroup)(implicit exchangeRateManager: ExchangeRateManager,
+                                                  accountingConfig: Config,
                                                   entityAccess: SlickEntityAccess) =
         TransGroupData(
           transGroup.transactions.map(TransactionData.fromModel(_)),

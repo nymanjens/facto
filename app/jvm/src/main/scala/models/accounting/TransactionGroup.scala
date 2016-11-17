@@ -3,7 +3,7 @@ package models.accounting
 import scala.collection.immutable.Seq
 import org.joda.time.DateTime
 import common.Clock
-import models.accounting.money.{Money, ReferenceMoney}
+import models.accounting.money.{Money, ReferenceMoney, ExchangeRateManager}
 import models.accounting.config.Config
 import models.manager.{Entity, EntityManager}
 import models.EntityAccess
@@ -17,7 +17,9 @@ case class TransactionGroup(createdDate: DateTime = Clock.now,
   def transactions(implicit entityAccess: EntityAccess): Seq[Transaction] =
     entityAccess.transactionManager.findByGroupId(id)
 
-  def isZeroSum(implicit accountingConfig: Config, entityAccess: EntityAccess): Boolean =
+  def isZeroSum(implicit exchangeRateManager: ExchangeRateManager,
+                accountingConfig: Config,
+                entityAccess: EntityAccess): Boolean =
     transactions.map(_.flow.exchangedForReferenceCurrency).sum == ReferenceMoney(0)
 }
 

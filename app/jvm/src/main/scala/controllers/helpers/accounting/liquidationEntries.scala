@@ -8,7 +8,7 @@ import models.accounting.config.{Account, Category, MoneyReservoir, Config}
 import models.SlickUtils.dbApi._
 import controllers.helpers.ControllerHelperCache
 import controllers.helpers.ControllerHelperCache.CacheIdentifier
-import models.accounting.money.ReferenceMoney
+import models.accounting.money.{ReferenceMoney, ExchangeRateManager}
 import models.EntityAccess
 
 /**
@@ -18,6 +18,7 @@ case class LiquidationEntry(override val transactions: Seq[Transaction], debt: R
   extends GroupedTransactions(transactions)
 
 final class LiquidationEntries @Inject()(implicit accountingConfig: Config,
+                                         exchangeRateManager: ExchangeRateManager,
                                          transactionManager: SlickTransactionManager,
                                          entityAccess: EntityAccess) {
 

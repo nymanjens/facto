@@ -8,7 +8,7 @@ import common.testing.TestObjects._
 import models.{User, Users}
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.accounting.money.Currency.Gbp
-import models.accounting.money.{ExchangeRateMeasurement, ExchangeRateMeasurements, Money}
+import models.accounting.money.{ExchangeRateMeasurement, Money}
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup, transactionManager}
 
 object TestUtils {
@@ -54,7 +54,7 @@ object TestUtils {
   }
 
   def persistGbpMeasurement(millisSinceEpoch: Long, ratio: Double): Unit = {
-    ExchangeRateMeasurements.add(ExchangeRateMeasurement(
+    exchangeRateMeasurementManager.add(ExchangeRateMeasurement(
       date = new DateTime(millisSinceEpoch),
       foreignCurrencyCode = Gbp.code,
       ratioReferenceToForeignCurrency = ratio))
