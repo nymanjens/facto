@@ -14,7 +14,7 @@ final class SlickUserManager extends ForwardingEntityManager[User, Users](
     tag => new Users(tag),
     tableName = tableName,
     cached = true
-  )) with UserManager {
+  )) with User.Manager {
 
   override def findByLoginName(loginName: String): Option[User] = {
     val users: Seq[User] = dbRun(newQuery.filter(u => u.loginName === loginName).result)

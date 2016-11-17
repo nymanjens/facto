@@ -23,7 +23,7 @@ final class ExternalApi @Inject()(implicit val messagesApi: MessagesApi,
                             viewsController: Views,
                             playConfiguration: play.api.Configuration,
                             accountingConfig: Config,
-                            userManager: UserManager,
+                            userManager: User.Manager,
                             entityAccess: EntityAccess)
   extends Controller with I18nSupport {
 

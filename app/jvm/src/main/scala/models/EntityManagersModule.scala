@@ -6,6 +6,6 @@ import models.accounting.config.ConfigModule
 
 final class EntityManagersModule extends AbstractModule {
   override def configure() = {
-    bind(classOf[UserManager]).to(classOf[SlickUserManager])
+    bind(classOf[User.Manager]).to(classOf[SlickUserManager])
   }
 }

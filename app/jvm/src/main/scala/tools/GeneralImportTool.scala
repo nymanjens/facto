@@ -7,7 +7,7 @@ import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
 import models._
 
-final class GeneralImportTool @Inject()(implicit userManager: UserManager,
+final class GeneralImportTool @Inject()(implicit userManager: User.Manager,
                                         entityAccess: SlickEntityAccess) {
 
   def dropAndCreateNewDb() = {

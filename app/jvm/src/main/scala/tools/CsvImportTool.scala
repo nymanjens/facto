@@ -15,7 +15,7 @@ import models._
 import models.accounting.money.Money
 import models.accounting.{BalanceCheck, BalanceChecks, Transaction, TransactionGroup, TransactionGroups, Transactions, UpdateLogs}
 
-final class CsvImportTool @Inject()(implicit userManager: UserManager,
+final class CsvImportTool @Inject()(implicit userManager: User.Manager,
                                     entityAccess: SlickEntityAccess) {
 
   def importTransactions(csvFilePath: Path): Unit = {

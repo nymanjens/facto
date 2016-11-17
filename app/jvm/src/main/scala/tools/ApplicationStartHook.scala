@@ -12,7 +12,7 @@ import play.api.{Application, Mode}
 import scala.collection.JavaConverters._
 
 final class ApplicationStartHook @Inject()(implicit app: Application,
-                                           userManager: UserManager,
+                                           userManager: User.Manager,
                                            entityAccess: SlickEntityAccess,
                                            generalImportTool: GeneralImportTool,
                                            csvImportTool: CsvImportTool) {
