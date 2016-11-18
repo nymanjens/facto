@@ -9,8 +9,8 @@ import org.apache.http.annotation.GuardedBy
 
 import common.cache.CacheRegistry
 
-/** Caching decorator for an EntityManager that loads all data in memory and keeps it in sync with all updates. */
-private[manager] final class CachingEntityManager[E <: Entity[E], T <: AbstractTable[E]](delegate: EntityManager[E, T])
+/** Caching decorator for an SlickEntityManager that loads all data in memory and keeps it in sync with all updates. */
+private[manager] final class CachingEntityManager[E <: Entity[E], T <: AbstractTable[E]](delegate: SlickEntityManager[E, T])
   extends ForwardingEntityManager[E, T](delegate) {
   CacheRegistry.registerCache(
     verifyConsistency = verifyConsistency,
@@ -20,13 +20,13 @@ private[manager] final class CachingEntityManager[E <: Entity[E], T <: AbstractT
   private val cache: mutable.Map[Long, E] = mutable.Map[Long, E]()
   private val lock = new Object
 
-  // ********** Implementation of EntityManager interface: Management methods ********** //
+  // ********** Implementation of SlickEntityManager interface: Management methods ********** //
   override def initialize(): Unit = lock.synchronized {
     cache.clear()
     delegate.fetchAll() foreach { e => cache.put(e.id, e) }
   }
 
-  // ********** Implementation of EntityManager interface: Mutators ********** //
+  // ********** Implementation of SlickEntityManager interface: Mutators ********** //
   override def add(e: E): E = lock.synchronized {
     val result = delegate.add(e)
     cache.put(result.id, result)
@@ -44,7 +44,7 @@ private[manager] final class CachingEntityManager[E <: Entity[E], T <: AbstractT
     cache.remove(e.id)
   }
 
-  // ********** Implementation of EntityManager interface: Getters ********** //
+  // ********** Implementation of SlickEntityManager interface: Getters ********** //
   override def findById(id: Long) = lock.synchronized {
     cache(id)
   }

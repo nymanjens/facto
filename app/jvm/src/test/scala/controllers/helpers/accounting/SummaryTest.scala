@@ -15,6 +15,7 @@ import common.TimeUtils.{April, February, January, March, May, dateAt}
 import common.testing.TestObjects._
 import common.testing.TestUtils._
 import common.testing.HookedSpecification
+import models._
 import models.accounting._
 import models.accounting.config.{Account, Category, Config}
 import models.accounting.money.{Money, ReferenceMoney}
@@ -23,6 +24,7 @@ import models.accounting.money.{Money, ReferenceMoney}
 class SummaryTest extends HookedSpecification {
 
   @Inject val summaries: Summaries = null
+  @Inject implicit val entityAccess: EntityAccess = null
 
   override def before = {
     Guice.createInjector(new FactoTestModule).injectMembers(this)

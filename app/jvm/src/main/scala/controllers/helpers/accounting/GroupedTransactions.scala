@@ -4,14 +4,14 @@ import collection.immutable.Seq
 import org.joda.time.DateTime
 import com.github.nscala_time.time.Imports._
 import common.Clock
-import models.User
+import models._
 import models.accounting.{Tag, Transaction}
 import models.accounting.config.{Account, Category, MoneyReservoir, Config}
-import models.accounting.money.{DatedMoney, Money, MoneyWithGeneralCurrency, ReferenceMoney}
+import models.accounting.money.{DatedMoney, Money, MoneyWithGeneralCurrency, ReferenceMoney, ExchangeRateManager}
 
 abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
   def groupId = transactions(0).transactionGroupId
-  def issuer: User = transactions(0).issuer
+  def issuer(implicit entityAccess: EntityAccess): User = transactions(0).issuer
   def transactionDates: Seq[DateTime] = transactions.map(_.transactionDate).distinct
   def consumedDates: Seq[DateTime] = transactions.flatMap(_.consumedDateOption).distinct
   def beneficiaries(implicit accountingConfig: Config): Seq[Account] =
@@ -24,7 +24,8 @@ abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
   def mostRecentTransaction: Transaction = transactions.sortBy(_.transactionDate).last
   def tags: Seq[Tag] = transactions.flatMap(_.tags).distinct
 
-  def flow(implicit accountingConfig: Config): Money = {
+  def flow(implicit exchangeRateManager: ExchangeRateManager,
+           accountingConfig: Config): Money = {
     val currencies = transactions.map(_.flow.currency).distinct
     currencies match {
       case Seq(currency) => // All transactions have the same currency

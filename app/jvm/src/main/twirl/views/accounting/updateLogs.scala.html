@@ -1,4 +1,4 @@
-@import models.User
+@import models._
 @import models.accounting.{UpdateLog}
 @import viewhelpers.Formatting._
 @import views.html.accounting.parts._
@@ -7,7 +7,7 @@
   entries: Seq[UpdateLog],
   numEntriesToShow: Int
 )(
-  implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash
+  implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash, entityAccess: EntityAccess
 )
 
 @Main(Messages("facto.update-logs")) {

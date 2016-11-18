@@ -10,7 +10,7 @@ import play.twirl.api.Html
   */
 private[money] case class MoneyWithGeneralCurrencyImpl(override val cents: Long, currency: Currency) extends MoneyWithGeneralCurrency {
 
-  override def toHtmlWithCurrency: Html = {
+  override def toHtmlWithCurrency(implicit exchangeRateManager: ExchangeRateManager): Html = {
     Money.centsToHtmlWithCurrency(cents, currency)
   }
 }

@@ -24,7 +24,7 @@ import java.math.RoundingMode.HALF_EVEN
   */
 case class DatedMoney(override val cents: Long, override val currency: Currency, date: DateTime) extends MoneyWithGeneralCurrency {
 
-  override def toHtmlWithCurrency: Html = {
+  override def toHtmlWithCurrency(implicit exchangeRateManager: ExchangeRateManager): Html = {
     import Money.SummableHtml
     val baseHtml = Money.centsToHtmlWithCurrency(cents, currency)
     if (currency == Currency.default) {
@@ -35,11 +35,11 @@ case class DatedMoney(override val cents: Long, override val currency: Currency,
     }
   }
 
-  def exchangedForReferenceCurrency: ReferenceMoney =
+  def exchangedForReferenceCurrency(implicit exchangeRateManager: ExchangeRateManager): ReferenceMoney =
     ReferenceMoney(exchangedForCurrency(Currency.default).cents)
 
-  def exchangedForCurrency(otherCurrency: Currency): DatedMoney = {
-    val ratio = ExchangeRateManager.getRatioSecondToFirstCurrency(currency, otherCurrency, date)
+  def exchangedForCurrency(otherCurrency: Currency)(implicit exchangeRateManager: ExchangeRateManager): DatedMoney = {
+    val ratio = exchangeRateManager.getRatioSecondToFirstCurrency(currency, otherCurrency, date)
     val centsInOtherCurrency = roundToLong(ratio * cents, HALF_EVEN)
     DatedMoney(centsInOtherCurrency, otherCurrency, date)
   }

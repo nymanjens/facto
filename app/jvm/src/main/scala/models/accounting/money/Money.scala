@@ -22,7 +22,7 @@ trait Money {
 
   def cents: Long
   def currency: Currency
-  def toHtmlWithCurrency: Html
+  def toHtmlWithCurrency(implicit exchangeRateManager: ExchangeRateManager): Html
 
   final def formatFloat: String = Money.centsToFloatString(cents)
 

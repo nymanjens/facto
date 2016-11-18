@@ -14,11 +14,13 @@ import common.testing.TestObjects._
 import common.testing.TestObjects.accountingConfig.constants.endowmentCategory
 import common.testing.TestUtils._
 import models.accounting.money.Money
+import models._
 
 @RunWith(classOf[JUnitRunner])
 class GeneralEntryTest extends HookedSpecification {
 
   @Inject val generalEntries: GeneralEntries = null
+  @Inject implicit val entityAccess: EntityAccess = null
 
   override def before() = {
     Guice.createInjector(new FactoTestModule).injectMembers(this)

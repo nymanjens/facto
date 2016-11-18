@@ -8,7 +8,8 @@ import play.api.data._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
 
-class Auth @Inject()(val messagesApi: MessagesApi) extends Controller with I18nSupport{
+final class Auth @Inject()(implicit val messagesApi: MessagesApi,
+                           entityAccess: EntityAccess) extends Controller with I18nSupport {
 
   // ********** actions ********** //
   def login = Action { implicit request =>
@@ -33,12 +34,12 @@ object Auth {
   // ********** forms ********** //
   object Forms {
 
-    val loginForm = Form(
+    def  loginForm(implicit entityAccess: EntityAccess) = Form(
       tuple(
         "loginName" -> nonEmptyText,
         "password" -> text
       ) verifying("facto.error.invalid-username-or-password", result => result match {
-        case (loginName, password) => Users.authenticate(loginName, password)
+        case (loginName, password) => entityAccess.userManager.authenticate(loginName, password)
       })
     )
   }

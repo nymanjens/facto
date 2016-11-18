@@ -1,5 +1,6 @@
 package models.accounting
 
+import com.google.inject._
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
@@ -9,34 +10,45 @@ import common.Clock
 import common.TimeUtils.{April, dateAt}
 import common.testing.TestObjects._
 import common.testing.TestUtils._
+import common.testing._
 import common.testing.HookedSpecification
 import models._
 import models.accounting.money.Money
 
 @RunWith(classOf[JUnitRunner])
-class UpdateLogTest extends HookedSpecification {
+class SlickUpdateLogManagerTest extends HookedSpecification {
+
+  @Inject implicit val entityAccess: EntityAccess = null
+  @Inject val updateLogManager: SlickUpdateLogManager = null
+  @Inject val transactionManager: Transaction.Manager = null
+  @Inject val transactionGroupManager: TransactionGroup.Manager = null
+  @Inject val balanceCheckManager: BalanceCheck.Manager = null
+
+  override def before() = {
+    Guice.createInjector(new FactoTestModule).injectMembers(this)
+  }
 
   override def afterAll = Clock.cleanupAfterTest()
 
-  "UpdateLogs.fetchLastNEntries" in new WithApplication {
+  "SlickUpdateLogManager.fetchLastNEntries" in new WithApplication {
     // add logs
     Clock.setTimeForTest(dateAt(2016, April, 1))
-    UpdateLogs.addLog(testUser, UpdateLogs.AddNew, balanceCheck(111))
+    updateLogManager.addLog(testUser, UpdateLog.AddNew, balanceCheck(111))
     Clock.setTimeForTest(dateAt(2016, April, 2))
-    UpdateLogs.addLog(testUser, UpdateLogs.AddNew, balanceCheck(222))
+    updateLogManager.addLog(testUser, UpdateLog.AddNew, balanceCheck(222))
     Clock.setTimeForTest(dateAt(2016, April, 3))
-    UpdateLogs.addLog(testUser, UpdateLogs.AddNew, balanceCheck(333))
+    updateLogManager.addLog(testUser, UpdateLog.AddNew, balanceCheck(333))
     Clock.setTimeForTest(dateAt(2016, April, 4))
-    UpdateLogs.addLog(testUser, UpdateLogs.AddNew, balanceCheck(444))
+    updateLogManager.addLog(testUser, UpdateLog.AddNew, balanceCheck(444))
     Clock.setTimeForTest(dateAt(2016, April, 5))
-    UpdateLogs.addLog(testUser, UpdateLogs.AddNew, balanceCheck(555))
+    updateLogManager.addLog(testUser, UpdateLog.AddNew, balanceCheck(555))
     Clock.setTimeForTest(dateAt(2016, April, 6))
-    UpdateLogs.addLog(testUser, UpdateLogs.Edit, balanceCheck(666))
+    updateLogManager.addLog(testUser, UpdateLog.Edit, balanceCheck(666))
     Clock.setTimeForTest(dateAt(2016, April, 7))
-    UpdateLogs.addLog(testUser, UpdateLogs.Delete, balanceCheck(777))
+    updateLogManager.addLog(testUser, UpdateLog.Delete, balanceCheck(777))
 
     // fetch logs
-    val entries = UpdateLogs.fetchLastNEntries(n = 3)
+    val entries = updateLogManager.fetchLastNEntries(n = 3)
 
     // check result
     entries must haveSize(3)
@@ -49,8 +61,8 @@ class UpdateLogTest extends HookedSpecification {
   "Logged TransactionGroup contains all relevant info" in new WithApplication {
     // add logs
     Clock.setTimeForTest(dateAt(2016, April, 1))
-    val transGrp = TransactionGroups.add(TransactionGroup())
-    Transactions.add(Transaction(
+    val transGrp = transactionGroupManager.add(TransactionGroup())
+    transactionManager.add(Transaction(
       transactionGroupId = transGrp.id,
       issuerId = testUser.id,
       beneficiaryAccountCode = testAccount.code,
@@ -61,10 +73,10 @@ class UpdateLogTest extends HookedSpecification {
       transactionDate = dateAt(2014, April, 1),
       consumedDate = dateAt(2015, April, 1)
     ))
-    UpdateLogs.addLog(testUser, UpdateLogs.AddNew, transGrp)
+    updateLogManager.addLog(testUser, UpdateLog.AddNew, transGrp)
 
     // fetch logs
-    val entries = UpdateLogs.fetchLastNEntries(n = 3)
+    val entries = updateLogManager.fetchLastNEntries(n = 3)
 
     // check result
     entries must haveSize(1)
@@ -84,10 +96,10 @@ class UpdateLogTest extends HookedSpecification {
   "Logged BalanceCheck contains all relevant info" in new WithApplication {
     // add logs
     Clock.setTimeForTest(dateAt(2016, April, 1))
-    UpdateLogs.addLog(testUser, UpdateLogs.AddNew, balanceCheck(8788))
+    updateLogManager.addLog(testUser, UpdateLog.AddNew, balanceCheck(8788))
 
     // fetch logs
-    val entries = UpdateLogs.fetchLastNEntries(n = 3)
+    val entries = updateLogManager.fetchLastNEntries(n = 3)
 
     // check result
     entries must haveSize(1)
@@ -99,7 +111,7 @@ class UpdateLogTest extends HookedSpecification {
   }
 
   private def balanceCheck(balance: Long): BalanceCheck = {
-    BalanceChecks.add(BalanceCheck(
+    balanceCheckManager.add(BalanceCheck(
       issuerId = testUser.id,
       moneyReservoirCode = testReservoir.code,
       balanceInCents = balance,

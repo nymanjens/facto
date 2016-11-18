@@ -3,12 +3,13 @@ package controllers.helpers.accounting
 import com.google.inject.{Inject, Singleton}
 import collection.immutable.Seq
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
-import models.accounting.{Transaction, Transactions}
+import models.accounting.{Transaction, SlickTransactionManager}
 import models.accounting.config.{Account, Category, MoneyReservoir, Config}
 import models.SlickUtils.dbApi._
 import controllers.helpers.ControllerHelperCache
 import controllers.helpers.ControllerHelperCache.CacheIdentifier
-import models.accounting.money.ReferenceMoney
+import models.accounting.money.{ReferenceMoney, ExchangeRateManager}
+import models.EntityAccess
 
 /**
   * @param debt The debt of the first account to the second (may be negative).
@@ -16,13 +17,16 @@ import models.accounting.money.ReferenceMoney
 case class LiquidationEntry(override val transactions: Seq[Transaction], debt: ReferenceMoney)
   extends GroupedTransactions(transactions)
 
-class LiquidationEntries @Inject()(implicit accountingConfig: Config) {
+final class LiquidationEntries @Inject()(implicit accountingConfig: Config,
+                                         exchangeRateManager: ExchangeRateManager,
+                                         transactionManager: SlickTransactionManager,
+                                         entityAccess: EntityAccess) {
 
   /* Returns most recent n entries sorted from old to new. */
   def fetchLastNEntries(accountPair: AccountPair, n: Int): Seq[LiquidationEntry] =
     ControllerHelperCache.cached(FetchLastNEntries(accountPair, n)) {
       val allTransactions: List[Transaction] =
-        dbRun(Transactions.newQuery.sortBy(r => (r.transactionDate, r.createdDate))).toList
+        dbRun(transactionManager.newQuery.sortBy(r => (r.transactionDate, r.createdDate))).toList
 
       val relevantTransactions =
         for {
@@ -55,7 +59,7 @@ class LiquidationEntries @Inject()(implicit accountingConfig: Config) {
       case "" =>
         // Pick the first beneficiary in the group. This simulates that the zero sum transaction was physically
         // performed on an actual reservoir, which is needed for the liquidation calculator to work.
-        transaction.transactionGroup.transactions(0).beneficiary
+        transaction.transactionGroup.transactions.head.beneficiary
       case _ => transaction.moneyReservoir.owner
     }
     val involvedAccounts: Set[Account] = Set(transaction.beneficiary, moneyReservoirOwner)

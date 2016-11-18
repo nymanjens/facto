@@ -3,22 +3,24 @@ package controllers.accounting
 import com.google.inject.Inject
 import common.{Clock, TimeUtils}
 import controllers.helpers.accounting.GeneralEntry
-import models.accounting.Transactions
-import models.accounting.money.{Currency, DatedMoney}
+import models.accounting.money.{Currency, DatedMoney, ExchangeRateManager}
 import org.joda.time.DateTime
 import play.api.data.{FormError, Forms}
 import play.api.mvc._
 import play.api.i18n.{MessagesApi, Messages, I18nSupport}
 
-import models.User
+import models._
 import play.api.libs.json.Json
-import models.accounting.TagEntities
+import models.accounting.TagEntity
 import models.accounting.config.{Config, Template}
 import controllers.helpers.AuthenticatedAction
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
 
-class JsonApi @Inject()(balanceCheckOperations: BalanceCheckOperations, val messagesApi: MessagesApi)
+final class JsonApi @Inject()(implicit val messagesApi: MessagesApi,
+                              balanceCheckOperations: BalanceCheckOperations,
+                              entityAccess: SlickEntityAccess,
+exchangeRateManager: ExchangeRateManager)
   extends Controller with I18nSupport {
 
   // ********** actions ********** //
@@ -26,7 +28,7 @@ class JsonApi @Inject()(balanceCheckOperations: BalanceCheckOperations, val mess
   AuthenticatedAction { implicit user =>
     implicit request =>
       val descriptions = dbRun(
-        Transactions.newQuery
+        entityAccess.transactionManager.newQuery
           .filter(_.beneficiaryAccountCode === beneficiaryCode)
           .filter(_.moneyReservoirCode === reservoirCode)
           .filter(_.categoryCode === categoryCode)
@@ -41,7 +43,7 @@ class JsonApi @Inject()(balanceCheckOperations: BalanceCheckOperations, val mess
 
   def getAllTags = AuthenticatedAction { implicit user =>
     implicit request =>
-      val tagNames = TagEntities.fetchAll().map(_.tag.name).toSet
+      val tagNames = entityAccess.tagEntityManager.fetchAll().map(_.tag.name).toSet
       Ok(Json.toJson(tagNames))
   }
 

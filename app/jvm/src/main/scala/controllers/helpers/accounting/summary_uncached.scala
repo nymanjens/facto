@@ -15,7 +15,7 @@
 //import common.CollectionUtils.toListMap
 //import common.GuavaUtils.asGuava
 //import models.SlickUtils.{dbRun, JodaToSqlDateMapper}
-//import models.accounting.{Transactions, Transaction, Money}
+//import models.accounting.{Transaction, Money}
 //import models.accounting.config.{Category, Account}
 //import models.accounting.config.Account.SummaryTotalRowDef
 //
@@ -32,7 +32,7 @@
 //  def fetchSummary(account: Account, expandedYear: Int): Summary = {
 //    val now = Clock.now
 //    val allTransactions = dbRun(
-//      Transactions.newQuery
+//      transactionManager.newQuery
 //        .filter(_.beneficiaryAccountCode === account.code)
 //        .sortBy(r => (r.consumedDate, r.createdDate)))
 //      .toList

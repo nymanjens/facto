@@ -10,14 +10,18 @@ import play.twirl.api.Html
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 
 import common.{Clock, ReturnTo}
-import models.User
-import models.accounting.{BalanceCheck, BalanceChecks, Transactions, UpdateLogs}
+import models._
+import models.accounting.{BalanceCheck, Transaction, UpdateLog}
 import models.accounting.config.{MoneyReservoir, Config}
 import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting.FormUtils.{validFlowAsFloat, flowAsFloatStringToCents}
 import controllers.accounting.BalanceCheckOperations.{Forms, AddNewOperationMeta, EditOperationMeta, OperationMeta}
 
-class BalanceCheckOperations @Inject()(implicit val messagesApi: MessagesApi, accountingConfig: Config)
+final class BalanceCheckOperations @Inject()(implicit val messagesApi: MessagesApi,
+                                             entityAccess: EntityAccess,
+                                             balanceCheckManager: BalanceCheck.Manager,
+                                             updateLogManager: UpdateLog.Manager,
+                                             accountingConfig: Config)
   extends Controller with I18nSupport {
 
   // ********** actions ********** //
@@ -37,7 +41,7 @@ class BalanceCheckOperations @Inject()(implicit val messagesApi: MessagesApi, ac
     implicit request =>
       implicit val returnToImplicit = ReturnTo(returnTo)
 
-      val bc = BalanceChecks.findById(bcId)
+      val bc = balanceCheckManager.findById(bcId)
       val formData = Forms.BcData.fromModel(bc)
       Ok(formView(EditOperationMeta(bcId), formData))
   }
@@ -58,9 +62,9 @@ class BalanceCheckOperations @Inject()(implicit val messagesApi: MessagesApi, ac
     implicit request =>
       implicit val returnToImplicit = ReturnTo(returnTo)
 
-      val bc = BalanceChecks.findById(bcId)
-      UpdateLogs.addLog(user, UpdateLogs.Delete, bc)
-      BalanceChecks.delete(bc)
+      val bc = balanceCheckManager.findById(bcId)
+      updateLogManager.addLog(user, UpdateLog.Delete, bc)
+      balanceCheckManager.delete(bc)
 
       val moneyReservoirName = bc.moneyReservoir.name
       val message = Messages("facto.successfully-deleted-balance-check-for", moneyReservoirName)
@@ -73,15 +77,15 @@ class BalanceCheckOperations @Inject()(implicit val messagesApi: MessagesApi, ac
                                             mostRecentTransactionId: Long)
                                            (implicit user: User): Unit = {
     val moneyReservoir = accountingConfig.moneyReservoir(moneyReservoirCode)
-    val mostRecentTransaction = Transactions.findById(mostRecentTransactionId)
+    val mostRecentTransaction = entityAccess.transactionManager.findById(mostRecentTransactionId)
 
     val balanceCheck = BalanceCheck(
       issuerId = user.id,
       moneyReservoirCode = moneyReservoir.code,
       balanceInCents = balanceInCents,
       checkDate = mostRecentTransaction.transactionDate)
-    val persistedBc = BalanceChecks.add(balanceCheck)
-    UpdateLogs.addLog(user, UpdateLogs.AddNew, persistedBc)
+    val persistedBc = balanceCheckManager.add(balanceCheck)
+    updateLogManager.addLog(user, UpdateLog.AddNew, persistedBc)
   }
 
   // ********** private helper controllers ********** //
@@ -119,17 +123,17 @@ class BalanceCheckOperations @Inject()(implicit val messagesApi: MessagesApi, ac
       checkDate = formData.checkDate)
     val persistedBc = operationMeta match {
       case AddNewOperationMeta(_) =>
-        BalanceChecks.add(balanceCheck)
+        balanceCheckManager.add(balanceCheck)
       case EditOperationMeta(bcId) =>
-        BalanceChecks.delete(BalanceChecks.findById(bcId))
-        BalanceChecks.add(balanceCheck)
+        balanceCheckManager.delete(balanceCheckManager.findById(bcId))
+        balanceCheckManager.add(balanceCheck)
     }
 
     val operation = operationMeta match {
-      case _: AddNewOperationMeta => UpdateLogs.AddNew
-      case _: EditOperationMeta => UpdateLogs.Edit
+      case _: AddNewOperationMeta => UpdateLog.AddNew
+      case _: EditOperationMeta => UpdateLog.Edit
     }
-    UpdateLogs.addLog(user, operation, persistedBc)
+    updateLogManager.addLog(user, operation, persistedBc)
   }
 
   private def formView(operationMeta: OperationMeta, formData: Forms.BcData)
@@ -170,7 +174,7 @@ object BalanceCheckOperations {
                       balanceInCents: Long = 0)
 
     object BcData {
-      def fromModel(bc: BalanceCheck)(implicit accountingConfig: Config) = BcData(
+      def fromModel(bc: BalanceCheck)(implicit accountingConfig: Config, entityAccess: EntityAccess) = BcData(
         issuerName = bc.issuer.name,
         moneyReservoirName = bc.moneyReservoir.name,
         checkDate = bc.checkDate,
@@ -189,19 +193,21 @@ object BalanceCheckOperations {
   }
 
   private[BalanceCheckOperations] sealed trait OperationMeta {
-    def moneyReservoirCode: String
-
-    def moneyReservoir(implicit accountingConfig: Config) = accountingConfig.moneyReservoir(moneyReservoirCode)
-
+    def moneyReservoirCode(implicit entityAccess: EntityAccess): String
     def bcIdOption: Option[Long]
+
+    final def moneyReservoir(implicit accountingConfig: Config, entityAccess: EntityAccess) =
+      accountingConfig.moneyReservoir(moneyReservoirCode)
   }
 
-  private[BalanceCheckOperations] case class AddNewOperationMeta(moneyReservoirCode: String) extends OperationMeta {
+  private[BalanceCheckOperations] case class AddNewOperationMeta(code: String) extends OperationMeta {
+    override def moneyReservoirCode(implicit entityAccess: EntityAccess) = code
     override def bcIdOption = None
   }
 
   private[BalanceCheckOperations] case class EditOperationMeta(bcId: Long) extends OperationMeta {
-    override def moneyReservoirCode = BalanceChecks.findById(bcId).moneyReservoirCode
+    override def moneyReservoirCode(implicit entityAccess: EntityAccess) =
+      entityAccess.balanceCheckManager.findById(bcId).moneyReservoirCode
     override def bcIdOption = Some(bcId)
   }
 }

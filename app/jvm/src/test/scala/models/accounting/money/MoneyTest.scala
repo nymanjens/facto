@@ -1,13 +1,22 @@
 package models.accounting.money
 
+import com.google.inject._
 import common.Clock
-import common.testing.CacheClearingSpecification
+import common.testing._
 import common.testing.TestUtils.persistGbpMeasurement
 import org.specs2.mutable._
 import play.api.test.WithApplication
 import play.twirl.api.Html
+import models._
 
 class MoneyTest extends CacheClearingSpecification {
+
+  @Inject implicit val entityAccess: EntityAccess = null
+  @Inject implicit val exchangeRateManager: ExchangeRateManager = null
+
+  override def beforeEveryTest() = {
+    Guice.createInjector(new FactoTestModule).injectMembers(this)
+  }
 
   "Money" should {
     "centsToFloatString" in new WithApplication {

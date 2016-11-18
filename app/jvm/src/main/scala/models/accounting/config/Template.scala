@@ -4,8 +4,8 @@ import scala.collection.immutable.Seq
 import com.google.common.base.Preconditions.checkState
 import common.Require.requireNonNullFields
 import models.accounting.money.Money
-import models.{User, Users}
-import models.accounting.{TransactionGroupPartial, TransactionPartial}
+import models._
+import models.accounting.{TransactionGroup=>AccountingTransactionGroup, Transaction=>AccountingTransaction}
 
 // Every field ending with "Tpl" may contain $-prefixed placeholders.
 // Example: descriptionTpl = "Endowment for ${account.longName}"
@@ -18,7 +18,8 @@ case class Template(code: String,
                     private val transactions: Seq[Template.Transaction]) {
   requireNonNullFields(this)
 
-  def showFor(location: Template.Placement, user: User)(implicit accountingConfig: Config): Boolean = {
+  def showFor(location: Template.Placement, user: User)(implicit accountingConfig: Config,
+                                                        entityAccess: EntityAccess): Boolean = {
     val showAtLocation = placement contains location
     val showToUser = onlyShowForUsers match {
       case Some(users) => users contains user
@@ -27,16 +28,17 @@ case class Template(code: String,
     showAtLocation && showToUser
   }
 
-  def toPartial(account: Account)(implicit accountingConfig: Config): TransactionGroupPartial = {
-    TransactionGroupPartial(
+  def toPartial(account: Account)(implicit accountingConfig: Config): AccountingTransactionGroup.Partial = {
+    AccountingTransactionGroup.Partial(
       transactions = transactions map (_.toPartial(account)),
       zeroSum = zeroSum)
   }
 
-  private def onlyShowForUsers(implicit accountingConfig: Config): Option[Set[User]] = {
+  private def onlyShowForUsers(implicit accountingConfig: Config,
+                               entityAccess: EntityAccess): Option[Set[User]] = {
     onlyShowForUserLoginNames.map { loginNameOption =>
       loginNameOption.map { loginName =>
-        val user = Users.findByLoginName(loginName)
+        val user = entityAccess.userManager.findByLoginName(loginName)
         require(user.isDefined, s"No user exists with loginName '$loginName'")
         require(accountingConfig.accountOf(user.get).isDefined, s"Only user names that have an associated account can be used in templates " +
           s"(user = '$loginName', template = '$name')")
@@ -76,7 +78,7 @@ object Template {
                          tagsString: String) {
     requireNonNullFields(this)
 
-    def toPartial(account: Account)(implicit accountingConfig: Config): TransactionPartial = {
+    def toPartial(account: Account)(implicit accountingConfig: Config): AccountingTransaction.Partial = {
       def fillInPlaceholders(string: String): String = {
         val placeholderToReplacement = Map(
           "${account.code}" -> account.code,
@@ -93,7 +95,7 @@ object Template {
         for (reservoir <- accountingConfig.visibleReservoirs(includeNullReservoir = true))
           yield reservoir.code -> reservoir
       }.toMap
-      TransactionPartial(
+      AccountingTransaction.Partial(
         beneficiary = beneficiaryCodeTpl map fillInPlaceholders map accountingConfig.accounts,
         moneyReservoir = moneyReservoirCodeTpl map fillInPlaceholders map reservoirsIncludingNullMap,
         category = categoryCodeTpl map fillInPlaceholders map accountingConfig.categories,

@@ -8,15 +8,15 @@ import play.api.Logger
 
 private[manager] final class DatabaseBackedEntityManager[E <: Entity[E], T <: EntityTable[E]](cons: Tag => T,
                                                                                               val tableName: String)
-  extends EntityManager[E, T] {
+  extends SlickEntityManager[E, T] {
 
-  // ********** Implementation of EntityManager interface - Management methods ********** //
+  // ********** Implementation of SlickEntityManager interface - Management methods ********** //
   override def createTable(): Unit = {
     Logger.info(s"Creating table `$tableName`:\n        " + newQuery.schema.createStatements.mkString("\n"))
     dbRun(newQuery.schema.create)
   }
 
-  // ********** Implementation of EntityManager interface - Mutators ********** //
+  // ********** Implementation of SlickEntityManager interface - Mutators ********** //
   override def add(entity: E): E = {
     require(entity.idOption.isEmpty, s"This entity was already persisted with id ${entity.id}")
     val id = dbRun(newQuery.returning(newQuery.map(_.id)).+=(entity))
@@ -36,7 +36,7 @@ private[manager] final class DatabaseBackedEntityManager[E <: Entity[E], T <: En
     }
   }
 
-  // ********** Implementation of EntityManager interface - Getters ********** //
+  // ********** Implementation of SlickEntityManager interface - Getters ********** //
   override def findById(id: Long): E = {
     dbRun(newQuery.filter(_.id === id).result) match {
       case Seq(x) => x
@@ -48,7 +48,7 @@ private[manager] final class DatabaseBackedEntityManager[E <: Entity[E], T <: En
     dbRun(newQuery.result).toList
   }
 
-  // ********** Implementation of EntityManager interface ********** //
+  // ********** Implementation of SlickEntityManager interface ********** //
   override def newQuery: TableQuery[T] = new TableQuery(cons)
 
   protected def mustAffectOneSingleRow(query: => Int): Unit = {

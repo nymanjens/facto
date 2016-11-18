@@ -1,5 +1,6 @@
 package models.accounting.money
 
+import com.google.inject.{Inject, Singleton}
 import java.util.{NavigableMap, TreeMap}
 
 import common.cache.CacheRegistry
@@ -11,11 +12,12 @@ import scala.collection.mutable
 /**
   * Single point of access for converting an amount of money from one currency into another.
   */
-private[money] object ExchangeRateManager {
+@Singleton()
+final class ExchangeRateManager @Inject() (implicit exchangeRateMeasurementManager: SlickExchangeRateMeasurementManager) {
   CacheRegistry.registerCache(
     verifyConsistency = verifyConsistency,
     resetForTests = resetForTests)
-  ExchangeRateMeasurements.addListener(measurementWasAdded)
+  exchangeRateMeasurementManager.addListener(measurementWasAdded)
 
   @GuardedBy("lock")
   private val measurementsCache: mutable.Map[Currency, NavigableMap[DateTime, Double]] = mutable.Map()
@@ -71,7 +73,7 @@ private[money] object ExchangeRateManager {
 
   private def fetchNavigableMap(currency: Currency): NavigableMap[DateTime, Double] = {
     val map = new TreeMap[DateTime, Double]()
-    for (measurement <- ExchangeRateMeasurements.fetchAll(currency)) {
+    for (measurement <- exchangeRateMeasurementManager.fetchAll(currency)) {
       map.put(measurement.date, measurement.ratioReferenceToForeignCurrency)
     }
     map

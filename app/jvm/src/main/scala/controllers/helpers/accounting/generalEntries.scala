@@ -9,7 +9,7 @@ import com.github.nscala_time.time.Imports._
 import com.google.common.hash.Hashing
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
-import models.accounting.{Transaction, Transactions}
+import models.accounting.{Transaction, SlickTransactionManager}
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import controllers.helpers.ControllerHelperCache
 import controllers.helpers.ControllerHelperCache.CacheIdentifier
@@ -18,13 +18,14 @@ case class GeneralEntry(override val transactions: Seq[Transaction])
   extends GroupedTransactions(transactions)
 
 @Singleton()
-class GeneralEntries @Inject()(implicit accountingConfig: Config) {
+final class GeneralEntries @Inject()(implicit accountingConfig: Config,
+                                     transactionManager: SlickTransactionManager) {
 
   /* Returns most recent n entries sorted from old to new. */
   def fetchLastNEntries(n: Int): Seq[GeneralEntry] = {
     val transactions: Seq[Transaction] =
       dbRun(
-        Transactions.newQuery
+        transactionManager.newQuery
           .sortBy(r => (r.transactionDate.desc, r.createdDate.desc))
           .take(3 * n))
         .reverse
@@ -42,7 +43,7 @@ class GeneralEntries @Inject()(implicit accountingConfig: Config) {
     ControllerHelperCache.cached(FetchLastNEndowments(account, n)) {
       val transactions: Seq[Transaction] =
         dbRun(
-          Transactions.newQuery
+          transactionManager.newQuery
             .filter(_.categoryCode === accountingConfig.constants.endowmentCategory.code)
             .filter(_.beneficiaryAccountCode === account.code)
             .sortBy(r => (r.consumedDate.desc, r.createdDate.desc))
@@ -61,7 +62,7 @@ class GeneralEntries @Inject()(implicit accountingConfig: Config) {
   def search(query: String): Seq[GeneralEntry] = {
     val transactions: Seq[Transaction] =
       dbRun(
-        Transactions.newQuery
+        transactionManager.newQuery
           .sortBy(r => (r.createdDate, r.transactionDate)))
         .toList
 

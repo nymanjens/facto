@@ -13,13 +13,13 @@ import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor
 import org.yaml.snakeyaml.introspector.BeanAccess
 
 import common.Require.requireNonNull
-import models.User
+import models._
 import models.accounting.config.MoneyReservoir.NullMoneyReservoir
 
 /**
   * Contains the accountin configuration of this application. This is assumed to remain constant.
   *
-  * @param accounts Maps code to account
+  * @param accounts   Maps code to account
   * @param categories Maps code to category
   */
 case class Config(accounts: Map[String, Account],
@@ -53,7 +53,8 @@ case class Config(accounts: Map[String, Account],
   def visibleReservoirs(includeNullReservoir: Boolean = false): Seq[MoneyReservoir] =
     moneyReservoirs(includeNullReservoir = includeNullReservoir)
 
-  def templatesToShowFor(location: Template.Placement, user: User)(implicit accountingConfig: Config): Seq[Template] =
+  def templatesToShowFor(location: Template.Placement, user: User)(implicit accountingConfig: Config,
+                                                                   entityAccess: EntityAccess): Seq[Template] =
     templates filter (_.showFor(location, user))
 
   def templateWithCode(code: String): Template = {
@@ -63,9 +64,11 @@ case class Config(accounts: Map[String, Account],
     codeToTemplate(code)
   }
 
-  def accountOf(user: User): Option[Account] = accounts.values.filter(_.user == Some(user)).headOption
+  def accountOf(user: User)(implicit entityAccess: EntityAccess): Option[Account] =
+    accounts.values.filter(_.user == Some(user)).headOption
 
-  def personallySortedAccounts(implicit user: User): Seq[Account] = {
+  def personallySortedAccounts(implicit user: User,
+                               entityAccess: EntityAccess): Seq[Account] = {
     val myAccount = accountOf(user)
     val otherAccounts = for {
       acc <- accounts.values
