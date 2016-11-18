@@ -14,11 +14,12 @@ import models._
 import models.accounting.money.Money
 
 @RunWith(classOf[JUnitRunner])
-class BalanceCheckTest extends HookedSpecification {
+class SlickBalanceCheckManagerTest extends HookedSpecification {
 
   @Inject implicit val entityAccess: EntityAccess = null
   @Inject val userManager: User.Manager = null
-  @Inject val balanceCheckManager: BalanceCheck.Manager = null
+
+  @Inject val balanceCheckManager: SlickBalanceCheckManager = null
 
   override def before() = {
     Guice.createInjector(new FactoTestModule).injectMembers(this)

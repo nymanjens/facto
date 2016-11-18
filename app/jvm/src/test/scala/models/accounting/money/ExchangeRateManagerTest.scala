@@ -15,6 +15,7 @@ import models._
 class ExchangeRateManagerTest extends CacheClearingSpecification {
 
   @Inject implicit val entityAccess: EntityAccess = null
+
   @Inject val exchangeRateManager: ExchangeRateManager = null
 
   override def beforeEveryTest() = {
