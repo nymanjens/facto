@@ -5,11 +5,11 @@ import play.api.test.Helpers._
 import org.joda.time.DateTime
 import common.Clock
 import common.testing.TestObjects._
-import models.{User, Users}
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.accounting.money.Currency.Gbp
 import models.accounting.money.{ExchangeRateMeasurement, Money}
-import models.accounting.{BalanceCheck, Transaction, TransactionGroup, transactionManager}
+import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
+import models.EntityAccess
 
 object TestUtils {
 
@@ -22,10 +22,14 @@ object TestUtils {
                          reservoir: MoneyReservoir = testReservoir,
                          description: String = "description",
                          detailDescription: String = "detailDescription",
-                         tagsString: String = ""): Transaction = {
-    val actualGroupId = if (groupId == -1) transactionGroupManager.add(TransactionGroup()).id else groupId
+                         tagsString: String = "")(implicit entityAccess: EntityAccess): Transaction = {
+    val actualGroupId = if (groupId == -1) {
+      entityAccess.transactionGroupManager.add(TransactionGroup()).id
+    } else {
+      groupId
+    }
     val actualDate = if (timestamp == -1) date else new DateTime(timestamp)
-    transactionManager.add(Transaction(
+    entityAccess.transactionManager.add(Transaction(
       transactionGroupId = actualGroupId,
       issuerId = 1,
       beneficiaryAccountCode = account.code,
@@ -43,9 +47,9 @@ object TestUtils {
   def persistBalanceCheck(balanceInCents: Long = 0,
                           date: DateTime = Clock.now,
                           timestamp: Long = -1,
-                          reservoir: MoneyReservoir = testReservoir): BalanceCheck = {
+                          reservoir: MoneyReservoir = testReservoir)(implicit entityAccess: EntityAccess): BalanceCheck = {
     val actualDate = if (timestamp == -1) date else new DateTime(timestamp)
-    balanceCheckManager.add(BalanceCheck(
+    entityAccess.balanceCheckManager.add(BalanceCheck(
       issuerId = 2,
       moneyReservoirCode = reservoir.code,
       balanceInCents = balanceInCents,
@@ -53,8 +57,8 @@ object TestUtils {
     ))
   }
 
-  def persistGbpMeasurement(millisSinceEpoch: Long, ratio: Double): Unit = {
-    exchangeRateMeasurementManager.add(ExchangeRateMeasurement(
+  def persistGbpMeasurement(millisSinceEpoch: Long, ratio: Double)(implicit entityAccess: EntityAccess): Unit = {
+    entityAccess.exchangeRateMeasurementManager.add(ExchangeRateMeasurement(
       date = new DateTime(millisSinceEpoch),
       foreignCurrencyCode = Gbp.code,
       ratioReferenceToForeignCurrency = ratio))

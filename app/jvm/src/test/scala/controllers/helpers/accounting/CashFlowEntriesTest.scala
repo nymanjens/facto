@@ -27,6 +27,7 @@ import models.accounting.money.{Currency, Money, MoneyWithGeneralCurrency}
 class CashFlowEntriesTest extends HookedSpecification {
 
   @Inject val cashFlowEntries: CashFlowEntries = null
+  @Inject implicit val entityAccess: EntityAccess = null
 
   override def before() = {
     Guice.createInjector(new FactoTestModule).injectMembers(this)

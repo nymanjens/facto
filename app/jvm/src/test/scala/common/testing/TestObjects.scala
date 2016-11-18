@@ -7,7 +7,7 @@ import play.api.test.Helpers._
 import org.joda.time.DateTime
 
 import common.Clock
-import models.{User, Users}
+import models.{User, EntityAccess}
 import models.accounting.config.{MoneyReservoir, Account, Category, Config, ConfigModule}
 import models.accounting.{Transaction, TransactionGroup, BalanceCheck}
 
@@ -30,12 +30,16 @@ object TestObjects {
   def testReservoir: MoneyReservoir = accountingConfig.moneyReservoir("CASH_COMMON")
   def otherTestReservoir: MoneyReservoir = accountingConfig.moneyReservoir("CARD_COMMON")
 
-  def testUser: User = {
+  def testUser(implicit entityAccess: EntityAccess): User = {
     val loginName = "testUser"
-    Users.findByLoginName(loginName) match {
+    entityAccess.userManager.findByLoginName(loginName) match {
       case Some(user) => user
       case None =>
-        Users.add(Users.newWithUnhashedPw(loginName = loginName, password = "tu", name = "Test User"))
+        entityAccess.userManager.add(
+          entityAccess.userManager.newWithUnhashedPw(
+            loginName = loginName,
+            password = "tu",
+            name = "Test User"))
     }
   }
 }

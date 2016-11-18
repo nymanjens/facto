@@ -1,5 +1,6 @@
 package models.accounting
 
+import com.google.inject._
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
@@ -8,17 +9,26 @@ import org.joda.time.DateTime
 import common.Clock
 import common.testing.TestObjects._
 import common.testing.TestUtils._
+import common.testing._
 import models._
 import models.accounting.money.Money
 
 @RunWith(classOf[JUnitRunner])
-class BalanceCheckTest extends Specification {
+class BalanceCheckTest extends HookedSpecification {
+
+  @Inject implicit val entityAccess: EntityAccess = null
+  @Inject val userManager: User.Manager = null
+  @Inject val balanceCheckManager: BalanceCheck.Manager = null
+
+  override def before() = {
+    Guice.createInjector(new FactoTestModule).injectMembers(this)
+  }
 
   "test the BalanceCheck model" in new WithApplication {
 
     // prepare users
-    val user1 = Users.add(Users.newWithUnhashedPw(loginName = "tester", password = "x", name = "Tester"))
-    val user2 = Users.add(Users.newWithUnhashedPw(loginName = "tester2", password = "x", name = "Tester2"))
+    val user1 = userManager.add(userManager.newWithUnhashedPw(loginName = "tester", password = "x", name = "Tester"))
+    val user2 = userManager.add(userManager.newWithUnhashedPw(loginName = "tester2", password = "x", name = "Tester2"))
 
     // get and persist dummy balanceCheckManager
     val checkA1 = balanceCheckManager.add(BalanceCheck(

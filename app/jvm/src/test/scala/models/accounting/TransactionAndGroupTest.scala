@@ -1,5 +1,6 @@
 package models.accounting
 
+import com.google.inject._
 import scala.concurrent.ExecutionContext.Implicits.global
 import org.specs2.mutable._
 import org.specs2.runner._
@@ -11,17 +12,28 @@ import models.SlickUtils.dbApi._
 import common.Clock
 import common.testing.TestObjects._
 import common.testing.TestUtils._
+import common.testing._
 import models._
 import models.accounting.money.Money
 
 @RunWith(classOf[JUnitRunner])
-class TransactionAndGroupTests extends Specification {
+class TransactionAndGroupTests extends HookedSpecification {
+
+  @Inject implicit val entityAccess: EntityAccess = null
+  @Inject val userManager: User.Manager = null
+  @Inject val transactionManager: Transaction.Manager = null
+  @Inject val transactionGroupManager: TransactionGroup.Manager = null
+  @Inject val balanceCheckManager: BalanceCheck.Manager = null
+
+  override def before() = {
+    Guice.createInjector(new FactoTestModule).injectMembers(this)
+  }
 
   "test the Transaction and TransactionGroup models" in new WithApplication {
 
     // prepare users
-    val user1 = Users.add(Users.newWithUnhashedPw(loginName = "tester", password = "x", name = "Tester"))
-    val user2 = Users.add(Users.newWithUnhashedPw(loginName = "tester2", password = "x", name = "Tester2"))
+    val user1 = userManager.add(userManager.newWithUnhashedPw(loginName = "tester", password = "x", name = "Tester"))
+    val user2 = userManager.add(userManager.newWithUnhashedPw(loginName = "tester2", password = "x", name = "Tester2"))
 
     // get and persist dummy transaction groups
     val transGrp1 = transactionGroupManager.add(TransactionGroup())

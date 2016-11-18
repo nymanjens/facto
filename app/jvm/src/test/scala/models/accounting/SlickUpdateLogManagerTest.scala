@@ -1,5 +1,6 @@
 package models.accounting
 
+import com.google.inject._
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
@@ -9,12 +10,23 @@ import common.Clock
 import common.TimeUtils.{April, dateAt}
 import common.testing.TestObjects._
 import common.testing.TestUtils._
+import common.testing._
 import common.testing.HookedSpecification
 import models._
 import models.accounting.money.Money
 
 @RunWith(classOf[JUnitRunner])
-class UpdateLogTest extends HookedSpecification {
+class SlickUpdateLogManagerTest extends HookedSpecification {
+
+  @Inject implicit val entityAccess: EntityAccess = null
+  @Inject val updateLogManager: SlickUpdateLogManager = null
+  @Inject val transactionManager: Transaction.Manager = null
+  @Inject val transactionGroupManager: TransactionGroup.Manager = null
+  @Inject val balanceCheckManager: BalanceCheck.Manager = null
+
+  override def before() = {
+    Guice.createInjector(new FactoTestModule).injectMembers(this)
+  }
 
   override def afterAll = Clock.cleanupAfterTest()
 

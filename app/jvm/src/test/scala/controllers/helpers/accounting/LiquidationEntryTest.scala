@@ -6,6 +6,7 @@ import scala.collection.immutable.Seq
 import common.testing.TestObjects._
 import common.testing.TestUtils._
 import common.testing.{FactoTestModule, HookedSpecification}
+import models._
 import models.accounting.money.ReferenceMoney
 import org.junit.runner._
 import org.specs2.mutable._
@@ -16,6 +17,7 @@ import play.api.test.WithApplication
 class LiquidationEntryTest extends HookedSpecification {
 
   @Inject val liquidationEntries: LiquidationEntries = null
+  @Inject implicit val entityAccess: EntityAccess = null
 
   override def before() = {
     Guice.createInjector(new FactoTestModule).injectMembers(this)
