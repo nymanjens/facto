@@ -17,3 +17,16 @@
   implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash
 )
 
+@Main(Messages("facto.update-logs")) {
+  <h1 class="page-header"><i class="fa fa-archive fa-fw"></i> @Messages("facto.update-logs")</h1>
+
+  @Panel(
+    title = Messages("facto.logs")
+  ) { @* panel content *@
+
+    <script src="@routes.Assets.versioned("client-fastopt.js")" type="text/javascript"></script>
+    <script>
+      SPAMain().factoPortabilityTest()
+    </script>
+  }
+}

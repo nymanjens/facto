@@ -5,7 +5,6 @@ import collection.immutable.Seq
 import org.joda.time.DateTime
 
 import common.Clock
-import common.ScalaUtils.objectName
 import models._
 import models.manager.{EntityManager, Entity}
 import models.accounting.config.Config

@@ -1,7 +1,5 @@
 package common
 
-import com.google.common.base.Function
-
 object Require {
 
   def requireNonNullFields(caseClassInstance: Product, lazyFieldNames: Set[String] = Set()): Unit = {
