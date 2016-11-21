@@ -5,7 +5,7 @@ import scala.collection.immutable.Seq
 import scala.collection.JavaConverters._
 import com.google.common.collect.{HashMultimap, ImmutableTable, Multimap, Range, Table, Tables}
 import models.SlickUtils.dbApi._
-import com.github.nscala_time.time.Imports._
+
 import play.api.Logger
 import play.twirl.api.Html
 import common.{Clock, DatedMonth, MonthRange}

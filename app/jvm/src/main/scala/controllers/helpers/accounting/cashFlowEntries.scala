@@ -6,13 +6,13 @@ import controllers.helpers.ControllerHelperCache
 import controllers.helpers.ControllerHelperCache.CacheIdentifier
 import models.SlickUtils.JodaToSqlDateMapper
 import models.SlickUtils.dbApi._
-import com.github.nscala_time.time.Imports._
+
 import models.SlickUtils.dbRun
 import models._
 import models.accounting._
 import models.accounting.config.{MoneyReservoir, Config}
 import models.accounting.money.{DatedMoney, Money, MoneyWithGeneralCurrency}
-import org.joda.time.Instant
+import java.time.Instant
 
 import scala.collection.immutable.Seq
 
@@ -49,7 +49,7 @@ final class CashFlowEntries @Inject()(implicit accountingConfig: Config,
         .result)
 
       if (totalNumTransactions < numTransactionsToFetch) {
-        (new Instant(0), MoneyWithGeneralCurrency(0, moneyReservoir.currency)) // get all entries
+        (Instant.ofEpochMilli(0), MoneyWithGeneralCurrency(0, moneyReservoir.currency)) // get all entries
 
       } else {
         // get oldest oldestTransDate
@@ -67,7 +67,7 @@ final class CashFlowEntries @Inject()(implicit accountingConfig: Config,
           .sortBy(r => (r.checkDate.desc, r.createdDate.desc))
           .take(1))
           .headOption
-        val oldestBalanceDate = oldestBC.map(_.checkDate).getOrElse(new Instant(0))
+        val oldestBalanceDate = oldestBC.map(_.checkDate).getOrElse(Instant.ofEpochMilli(0))
         val initialBalance = oldestBC.map(_.balance).getOrElse(MoneyWithGeneralCurrency(0, moneyReservoir.currency))
         (oldestBalanceDate, initialBalance)
       }

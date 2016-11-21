@@ -5,7 +5,7 @@ import java.util.{NavigableMap, TreeMap}
 
 import common.cache.CacheRegistry
 import org.apache.http.annotation.GuardedBy
-import org.joda.time.Instant
+import java.time.Instant
 
 import scala.collection.mutable
 

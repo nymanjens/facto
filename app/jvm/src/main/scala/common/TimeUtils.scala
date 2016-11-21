@@ -3,13 +3,13 @@ package common
 import scala.collection.{Seq => MutableSeq}
 import scala.collection.immutable.Seq
 import com.google.common.collect.Range
-import org.joda.time.{Instant, Months}
+import java.time.{Instant, LocalDate}
 import play.api.data.{FormError, Forms}
 
 object TimeUtils {
 
   def dateAt(year: Int, month: Month, dayOfMonth: Int): Instant = {
-    new Instant(
+    Instant.ofEpochMilli(
       year,
       month.number,
       dayOfMonth,
@@ -18,9 +18,8 @@ object TimeUtils {
     )
   }
 
-  def requireStartOfMonth(date: Instant): Unit = {
+  def requireStartOfMonth(date: LocalDate): Unit = {
     require(date.getDayOfMonth == 1, s"Date $date should be at the first day of the month.")
-    require(date.getMillisOfDay == 0, s"Date $date should be at the first millisecond of the day, but millisOfDay was ${date.getMillisOfDay}.")
   }
 
   sealed abstract class Month(val number: Int) {

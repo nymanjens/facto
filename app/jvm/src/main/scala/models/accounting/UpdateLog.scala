@@ -2,7 +2,7 @@ package models.accounting
 
 import collection.immutable.Seq
 
-import org.joda.time.Instant
+import java.time.Instant
 
 import common.Clock
 import models._

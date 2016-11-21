@@ -6,7 +6,7 @@ import Currency.{Eur, Gbp, Usd}
 import common.cache.CacheRegistry
 import common.testing._
 import common.testing.TestUtils.persistGbpMeasurement
-import org.joda.time.Instant
+import java.time.Instant
 import org.specs2.mutable._
 import play.api.test.WithApplication
 import play.twirl.api.Html
@@ -30,11 +30,11 @@ class ExchangeRateManagerTest extends CacheClearingSpecification {
     exchangeRateManager.getRatioSecondToFirstCurrency(Eur, Eur, Instant.now) mustEqual 1.0
     exchangeRateManager.getRatioSecondToFirstCurrency(Eur, Usd, Instant.now) mustEqual 1.0
 
-    exchangeRateManager.getRatioSecondToFirstCurrency(Gbp, Eur, new Instant(0)) mustEqual 1.0
-    exchangeRateManager.getRatioSecondToFirstCurrency(Gbp, Eur, new Instant(999)) mustEqual 1.0
-    exchangeRateManager.getRatioSecondToFirstCurrency(Gbp, Eur, new Instant(1000)) mustEqual 2.0
-    exchangeRateManager.getRatioSecondToFirstCurrency(Gbp, Eur, new Instant(1001)) mustEqual 2.0
-    exchangeRateManager.getRatioSecondToFirstCurrency(Gbp, Eur, new Instant(2000)) mustEqual 3.0
+    exchangeRateManager.getRatioSecondToFirstCurrency(Gbp, Eur, Instant.ofEpochMilli(0)) mustEqual 1.0
+    exchangeRateManager.getRatioSecondToFirstCurrency(Gbp, Eur, Instant.ofEpochMilli(999)) mustEqual 1.0
+    exchangeRateManager.getRatioSecondToFirstCurrency(Gbp, Eur, Instant.ofEpochMilli(1000)) mustEqual 2.0
+    exchangeRateManager.getRatioSecondToFirstCurrency(Gbp, Eur, Instant.ofEpochMilli(1001)) mustEqual 2.0
+    exchangeRateManager.getRatioSecondToFirstCurrency(Gbp, Eur, Instant.ofEpochMilli(2000)) mustEqual 3.0
     exchangeRateManager.getRatioSecondToFirstCurrency(Gbp, Eur, Instant.now) mustEqual 0.5
 
     exchangeRateManager.getRatioSecondToFirstCurrency(Eur, Gbp, Instant.now) mustEqual 2.0

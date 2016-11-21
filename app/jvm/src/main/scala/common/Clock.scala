@@ -1,6 +1,6 @@
 package common
 
-import org.joda.time.Instant
+import java.time.Instant
 
 object Clock {
 
@@ -8,7 +8,7 @@ object Clock {
 
   def now: Instant = timeOverride match {
     case Some(date) => date
-    case None => new Instant()
+    case None => Instant.now()
   }
 
   def setTimeForTest(date: Instant): Unit = {

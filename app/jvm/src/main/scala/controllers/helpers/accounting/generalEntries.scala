@@ -4,8 +4,8 @@ import com.google.inject.{Inject, Singleton}
 import collection.immutable.Seq
 import scala.collection.JavaConverters._
 import com.google.common.base.{Joiner, Splitter}
-import org.joda.time.Instant
-import com.github.nscala_time.time.Imports._
+import java.time.Instant
+
 import com.google.common.hash.Hashing
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}

@@ -1,9 +1,8 @@
 package common
 
-import org.joda.time.{Months, Instant}
-import com.github.nscala_time.time.Imports._
+import java.time.{Instant, LocalDate, Period, ZoneId}
 
-import common.TimeUtils.{February, dateAt, January}
+import common.TimeUtils.{February, January, dateAt}
 
 /**
   * Represents a continuous (possibly empty) range of dated months in time space.
@@ -26,7 +25,10 @@ case class MonthRange(start: Instant, startOfNextMonth: Instant) {
       MonthRange(newStart, newStartOfNextMonth)
   }
 
-  def countMonths: Int = Months.monthsBetween(start, startOfNextMonth).getMonths
+  def countMonths: Int = {
+    val zone = ZoneId.of("Europe/Paris")
+    Period.between(start.atZone(zone).toLocalDate, startOfNextMonth.atZone(zone).toLocalDate).toTotalMonths
+  }
 
   def contains(date: Instant): Boolean = start <= date && date < startOfNextMonth
 
@@ -40,7 +42,7 @@ object MonthRange {
     dateAt(1970, February, 1)
   }
 
-  private val lastPossibleStartOfMonth: Instant = DatedMonth.containing(new Instant(Long.MaxValue)).startDate
+  private val lastPossibleStartOfMonth: Instant = DatedMonth.containing(Instant.ofEpochMilli(Long.MaxValue)).startDate
 
   val empty: MonthRange = MonthRange(firstStartOfMonthSinceEpoch, firstStartOfMonthSinceEpoch)
 

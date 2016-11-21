@@ -1,6 +1,6 @@
 package common.cache.sync
 
-import org.joda.time.Duration
+import java.time.Duration
 
 /**
   * Defines a cache that acts similar to a Guava cache, except that the client can iterate over every entry while

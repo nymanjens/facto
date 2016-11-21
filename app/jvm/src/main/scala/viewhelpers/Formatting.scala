@@ -2,9 +2,9 @@ package viewhelpers
 
 import java.lang.Math.abs
 
-import org.joda.time.Instant
-import org.joda.time.format.DateTimeFormat.forPattern
-import com.github.nscala_time.time.Imports._
+import java.time.Instant
+import java.time.format.DateTimeFormat.forPattern
+
 import play.api.i18n.Messages
 
 import common.Clock

@@ -10,7 +10,7 @@ import play.api.mvc._
 import play.api.Logger
 import models.accounting._
 import scala.util.Random
-import org.joda.time.Instant
+import java.time.Instant
 import common.testing.TestObjects._
 import common.testing.TestUtils._
 import models.accounting.config.{MoneyReservoir, Account}

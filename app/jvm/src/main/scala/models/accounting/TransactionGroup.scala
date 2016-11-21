@@ -1,7 +1,7 @@
 package models.accounting
 
 import scala.collection.immutable.Seq
-import org.joda.time.Instant
+import java.time.Instant
 import common.Clock
 import models.accounting.money.{Money, ReferenceMoney, ExchangeRateManager}
 import models.accounting.config.Config

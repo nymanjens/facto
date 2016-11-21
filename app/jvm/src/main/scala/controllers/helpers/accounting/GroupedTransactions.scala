@@ -1,8 +1,8 @@
 package controllers.helpers.accounting
 
 import collection.immutable.Seq
-import org.joda.time.Instant
-import com.github.nscala_time.time.Imports._
+import java.time.Instant
+
 import common.Clock
 import models._
 import models.accounting.{Tag, Transaction}

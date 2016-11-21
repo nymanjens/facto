@@ -6,7 +6,7 @@ import com.google.inject.Inject
 import common.ResourceFiles
 import models.accounting.money.{ExchangeRateMeasurement}
 import models._
-import org.joda.time.Instant
+import java.time.Instant
 import play.api.{Application, Mode}
 
 import scala.collection.JavaConverters._
@@ -79,7 +79,7 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
     csvImportTool.importTransactions(assertExists(csvDataFolder resolve "transactions.csv"))
     csvImportTool.importBalanceChecks(assertExists(csvDataFolder resolve "balancechecks.csv"))
     entityAccess.exchangeRateMeasurementManager.add(ExchangeRateMeasurement(
-      date = new Instant(1990, 1, 1, 0, 0), // Jan 1, 1990
+      date = Instant.ofEpochMilli(1990, 1, 1, 0, 0), // Jan 1, 1990
       foreignCurrencyCode = "GBP",
       ratioReferenceToForeignCurrency = 1.2))
   }

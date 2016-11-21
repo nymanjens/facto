@@ -7,7 +7,7 @@ import com.google.common.collect.{ImmutableMultiset, Multiset}
 import common.Clock
 import common.CollectionUtils.toListMap
 import models.manager.{Entity, EntityManager}
-import org.joda.time.Instant
+import java.time.Instant
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq

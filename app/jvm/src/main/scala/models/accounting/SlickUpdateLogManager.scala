@@ -3,7 +3,7 @@ package models.accounting
 import collection.immutable.Seq
 
 import com.google.inject._
-import org.joda.time.Instant
+import java.time.Instant
 
 import common.Clock
 import common.ScalaUtils.objectName

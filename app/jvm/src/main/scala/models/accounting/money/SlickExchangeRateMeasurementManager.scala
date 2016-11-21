@@ -11,7 +11,7 @@ import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.SlickUtils.JodaToSqlDateMapper
 import models.manager.{Entity, SlickEntityManager, EntityTable, ImmutableEntityManager}
-import org.joda.time.Instant
+import java.time.Instant
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq

@@ -2,7 +2,7 @@ package controllers.accounting
 
 import com.google.inject.Inject
 import models.accounting.money.Money
-import org.joda.time.Instant
+import java.time.Instant
 import play.api.data._
 import play.api.data.Forms._
 import play.api.mvc.{AnyContent, Call, Controller, Request}
