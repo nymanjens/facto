@@ -7,7 +7,7 @@ import java.nio.file.Path
 import com.google.inject.Inject
 import play.api.Logger
 import com.google.common.base.Splitter
-import org.joda.time.DateTime
+import org.joda.time.Instant
 import common.ResourceFiles
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
@@ -36,9 +36,9 @@ final class CsvImportTool @Inject()(implicit userManager: User.Manager,
             description = description,
             flowInCents = Money.floatToCents(flowAsFloat.toDouble),
             tagsString = s"csv-import-$beneficiaryAccountCode",
-            createdDate = new DateTime(createdDateStamp.toLong * 1000),
-            transactionDate = new DateTime(transactionDateStamp.toLong * 1000),
-            consumedDate = new DateTime(if (consumedDateStamp.toLong == 0) transactionDateStamp.toLong * 1000 else consumedDateStamp.toLong * 1000)
+            createdDate = new Instant(createdDateStamp.toLong * 1000),
+            transactionDate = new Instant(transactionDateStamp.toLong * 1000),
+            consumedDate = new Instant(if (consumedDateStamp.toLong == 0) transactionDateStamp.toLong * 1000 else consumedDateStamp.toLong * 1000)
           ))
       }
     }
@@ -56,8 +56,8 @@ final class CsvImportTool @Inject()(implicit userManager: User.Manager,
             issuerId = issuerId.toInt,
             moneyReservoirCode = moneyReservoirCode,
             balanceInCents = Money.floatToCents(balanceAsFloat.toDouble),
-            createdDate = new DateTime(createdDateStamp.toLong * 1000),
-            checkDate = new DateTime(checkDateStamp.toLong * 1000)
+            createdDate = new Instant(createdDateStamp.toLong * 1000),
+            checkDate = new Instant(checkDateStamp.toLong * 1000)
           ))
       }
     }

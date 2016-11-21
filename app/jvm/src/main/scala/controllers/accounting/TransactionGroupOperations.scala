@@ -13,7 +13,7 @@ import play.api.mvc._
 import play.twirl.api.Html
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 
-import org.joda.time.DateTime
+import org.joda.time.Instant
 
 import com.github.nscala_time.time.Imports._
 import common.{Clock, ReturnTo}
@@ -287,8 +287,8 @@ object TransactionGroupOperations {
                                flowInCents: Long = 0,
                                detailDescription: String = "",
                                tagsString: String = "",
-                               transactionDate: DateTime = Clock.now,
-                               consumedDate: DateTime = Clock.now)
+                               transactionDate: Instant = Clock.now,
+                               consumedDate: Instant = Clock.now)
 
     object TransactionData {
 

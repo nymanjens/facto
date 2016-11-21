@@ -1,17 +1,17 @@
 package common
 
-import org.joda.time.DateTime
+import org.joda.time.Instant
 
 object Clock {
 
-  @volatile private var timeOverride: Option[DateTime] = None
+  @volatile private var timeOverride: Option[Instant] = None
 
-  def now: DateTime = timeOverride match {
+  def now: Instant = timeOverride match {
     case Some(date) => date
-    case None => new DateTime()
+    case None => new Instant()
   }
 
-  def setTimeForTest(date: DateTime): Unit = {
+  def setTimeForTest(date: Instant): Unit = {
     timeOverride = Some(date)
   }
 

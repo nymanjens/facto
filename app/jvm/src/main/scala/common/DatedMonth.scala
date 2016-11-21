@@ -2,11 +2,11 @@ package common
 
 import scala.collection.immutable.Seq
 import com.google.common.collect.Range
-import org.joda.time.{DateTime, Months}
+import org.joda.time.{Instant, Months}
 import TimeUtils._
 import play.api.i18n.Messages
 
-case class DatedMonth(startDate: DateTime) extends Ordered[DatedMonth] {
+case class DatedMonth(startDate: Instant) extends Ordered[DatedMonth] {
   TimeUtils.requireStartOfMonth(startDate)
 
   /** Returns abbreviation e.g. "Jan". */
@@ -15,7 +15,7 @@ case class DatedMonth(startDate: DateTime) extends Ordered[DatedMonth] {
     Messages(code)
   }
 
-  def contains(date: DateTime): Boolean = {
+  def contains(date: Instant): Boolean = {
     date.getYear == startDate.getYear && date.getMonthOfYear == startDate.getMonthOfYear
   }
 
@@ -39,14 +39,14 @@ object DatedMonth {
     "facto.date.month.dec.abbrev"
   )
 
-  def containing(date: DateTime): DatedMonth = DatedMonth(startOfMonthContaining(date))
+  def containing(date: Instant): DatedMonth = DatedMonth(startOfMonthContaining(date))
 
   def allMonthsIn(year: Int): Seq[DatedMonth] = {
     for (month <- TimeUtils.allMonths)
       yield DatedMonth(dateAt(year, month, 1))
   }
 
-  private def startOfMonthContaining(date: DateTime): DateTime = {
+  private def startOfMonthContaining(date: Instant): Instant = {
     date
       .withDayOfMonth(1)
       .withMillisOfDay(0)

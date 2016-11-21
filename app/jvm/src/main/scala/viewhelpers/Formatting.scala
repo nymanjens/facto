@@ -2,7 +2,7 @@ package viewhelpers
 
 import java.lang.Math.abs
 
-import org.joda.time.DateTime
+import org.joda.time.Instant
 import org.joda.time.format.DateTimeFormat.forPattern
 import com.github.nscala_time.time.Imports._
 import play.api.i18n.Messages
@@ -11,7 +11,7 @@ import common.Clock
 
 object Formatting {
 
-  def formatDate(date: DateTime)
+  def formatDate(date: Instant)
                 (implicit messages: Messages) = {
     val now = Clock.now
 
@@ -38,17 +38,17 @@ object Formatting {
     }
   }
 
-  def formatDateTime(date: DateTime) = {
+  def formatDateTime(date: Instant) = {
     date.toString(forPattern("d MMM yyyy, HH:mm"))
   }
 
-  def extractDayOfWeek(date: DateTime)
+  def extractDayOfWeek(date: Instant)
                       (implicit messages: Messages): String = {
     val dayAbbrevEnglish = date.toString(forPattern("EEE")).toLowerCase
     Messages(s"facto.date.dayofweek.$dayAbbrevEnglish.abbrev")
   }
 
-  def extractMonth(date: DateTime)
+  def extractMonth(date: Instant)
                   (implicit messages: Messages): String = {
     val monthAbbrevEnglish = date.toString(forPattern("MMM")).toLowerCase
     Messages(s"facto.date.month.$monthAbbrevEnglish.abbrev")

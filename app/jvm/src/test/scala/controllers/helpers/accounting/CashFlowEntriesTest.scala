@@ -13,7 +13,6 @@ import play.api.test.Helpers._
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
-import org.joda.time.DateTime
 import common.testing.TestObjects._
 import common.testing.TestUtils._
 import models.accounting.config.MoneyReservoir

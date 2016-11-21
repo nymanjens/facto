@@ -23,8 +23,8 @@ object SlickUtils {
 
   // ********** datetime helpers ********** //
   implicit val JodaToSqlDateMapper =
-    MappedColumnType.base[org.joda.time.DateTime, java.sql.Timestamp](
+    MappedColumnType.base[org.joda.time.Instant, java.sql.Timestamp](
       d => new java.sql.Timestamp(d.getMillis),
-      d => new org.joda.time.DateTime(d.getTime))
+      d => new org.joda.time.Instant(d.getTime))
 
 }

@@ -2,7 +2,7 @@ package controllers.accounting
 
 import com.google.inject.Inject
 import models.accounting.money.Money
-import org.joda.time.DateTime
+import org.joda.time.Instant
 import play.api.data._
 import play.api.data.Forms._
 import play.api.mvc.{AnyContent, Call, Controller, Request}
@@ -170,7 +170,7 @@ object BalanceCheckOperations {
     // ********** form-data case classes ********** //
     case class BcData(issuerName: String,
                       moneyReservoirName: String,
-                      checkDate: DateTime = Clock.now,
+                      checkDate: Instant = Clock.now,
                       balanceInCents: Long = 0)
 
     object BcData {

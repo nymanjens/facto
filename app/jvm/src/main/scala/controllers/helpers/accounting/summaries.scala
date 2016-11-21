@@ -4,7 +4,6 @@ import com.google.inject.{Inject, Singleton}
 import scala.collection.immutable.Seq
 import scala.collection.JavaConverters._
 import com.google.common.collect.{HashMultimap, ImmutableTable, Multimap, Range, Table, Tables}
-import org.joda.time.DateTime
 import models.SlickUtils.dbApi._
 import com.github.nscala_time.time.Imports._
 import play.api.Logger

@@ -6,14 +6,14 @@ import models.accounting.config.{Config, MoneyReservoir}
 import models.accounting.money.{DatedMoney, Money}
 import models.manager.{Entity, EntityManager}
 import models.{User, EntityAccess}
-import org.joda.time.DateTime
+import org.joda.time.Instant
 
 /** BalanceCheck entities are immutable. Just delete and create a new one when updating. */
 case class BalanceCheck(issuerId: Long,
                         moneyReservoirCode: String,
                         balanceInCents: Long,
-                        createdDate: DateTime = Clock.now,
-                        checkDate: DateTime,
+                        createdDate: Instant = Clock.now,
+                        checkDate: Instant,
                         idOption: Option[Long] = None) extends Entity[BalanceCheck] {
 
   override def withId(id: Long) = copy(idOption = Some(id))

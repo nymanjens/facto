@@ -12,7 +12,7 @@ import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.accounting.money.{DatedMoney, Money}
 import models.manager.{Entity, SlickEntityManager, EntityTable, ImmutableEntityManager}
 import models._
-import org.joda.time.DateTime
+import org.joda.time.Instant
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
@@ -71,9 +71,9 @@ object SlickTransactionManager {
     def flow = column[Long]("flow")
     def detailDescription = column[String]("detailDescription")
     def tagsString = column[String]("tagsString")
-    def createdDate = column[DateTime]("createdDate")
-    def transactionDate = column[DateTime]("transactionDate")
-    def consumedDate = column[DateTime]("consumedDate")
+    def createdDate = column[Instant]("createdDate")
+    def transactionDate = column[Instant]("transactionDate")
+    def consumedDate = column[Instant]("consumedDate")
 
     override def * = (transactionGroupId, issuerId, beneficiaryAccountCode, moneyReservoirCode, categoryCode, description, flow,
       detailDescription, tagsString, createdDate, transactionDate, consumedDate, id.?) <> (Transaction.tupled, Transaction.unapply)

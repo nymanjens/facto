@@ -12,7 +12,7 @@ import models._
 import models.accounting._
 import models.accounting.config.{MoneyReservoir, Config}
 import models.accounting.money.{DatedMoney, Money, MoneyWithGeneralCurrency}
-import org.joda.time.DateTime
+import org.joda.time.Instant
 
 import scala.collection.immutable.Seq
 
@@ -41,7 +41,7 @@ final class CashFlowEntries @Inject()(implicit accountingConfig: Config,
     */
   def fetchLastNEntries(moneyReservoir: MoneyReservoir, n: Int): Seq[CashFlowEntry] =
   ControllerHelperCache.cached(FetchLastNEntries(moneyReservoir, n)) {
-    val (oldestBalanceDate, initialBalance): (DateTime, MoneyWithGeneralCurrency) = {
+    val (oldestBalanceDate, initialBalance): (Instant, MoneyWithGeneralCurrency) = {
       val numTransactionsToFetch = 3 * n
       val totalNumTransactions = dbRun(transactionManager.newQuery
         .filter(_.moneyReservoirCode === moneyReservoir.code)
@@ -49,7 +49,7 @@ final class CashFlowEntries @Inject()(implicit accountingConfig: Config,
         .result)
 
       if (totalNumTransactions < numTransactionsToFetch) {
-        (new DateTime(0), MoneyWithGeneralCurrency(0, moneyReservoir.currency)) // get all entries
+        (new Instant(0), MoneyWithGeneralCurrency(0, moneyReservoir.currency)) // get all entries
 
       } else {
         // get oldest oldestTransDate
@@ -67,7 +67,7 @@ final class CashFlowEntries @Inject()(implicit accountingConfig: Config,
           .sortBy(r => (r.checkDate.desc, r.createdDate.desc))
           .take(1))
           .headOption
-        val oldestBalanceDate = oldestBC.map(_.checkDate).getOrElse(new DateTime(0))
+        val oldestBalanceDate = oldestBC.map(_.checkDate).getOrElse(new Instant(0))
         val initialBalance = oldestBC.map(_.balance).getOrElse(MoneyWithGeneralCurrency(0, moneyReservoir.currency))
         (oldestBalanceDate, initialBalance)
       }

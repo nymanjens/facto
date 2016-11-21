@@ -1,6 +1,6 @@
 package common
 
-import org.joda.time.{Months, DateTime}
+import org.joda.time.{Months, Instant}
 import com.github.nscala_time.time.Imports._
 
 import common.TimeUtils.{February, dateAt, January}
@@ -8,7 +8,7 @@ import common.TimeUtils.{February, dateAt, January}
 /**
   * Represents a continuous (possibly empty) range of dated months in time space.
   */
-case class MonthRange(start: DateTime, startOfNextMonth: DateTime) {
+case class MonthRange(start: Instant, startOfNextMonth: Instant) {
   require(start <= startOfNextMonth, s"The start date ($start) should never be older than the start date of the next " +
     s"month ($startOfNextMonth). Use equal dates to represent an empty range.")
   TimeUtils.requireStartOfMonth(start)
@@ -28,19 +28,19 @@ case class MonthRange(start: DateTime, startOfNextMonth: DateTime) {
 
   def countMonths: Int = Months.monthsBetween(start, startOfNextMonth).getMonths
 
-  def contains(date: DateTime): Boolean = start <= date && date < startOfNextMonth
+  def contains(date: Instant): Boolean = start <= date && date < startOfNextMonth
 
   def contains(month: DatedMonth): Boolean = contains(month.startDate)
 }
 
 object MonthRange {
 
-  private val firstStartOfMonthSinceEpoch: DateTime = {
+  private val firstStartOfMonthSinceEpoch: Instant = {
     // Needs to be february because we epoch may not have hours == 0 in the local time zone.
     dateAt(1970, February, 1)
   }
 
-  private val lastPossibleStartOfMonth: DateTime = DatedMonth.containing(new DateTime(Long.MaxValue)).startDate
+  private val lastPossibleStartOfMonth: Instant = DatedMonth.containing(new Instant(Long.MaxValue)).startDate
 
   val empty: MonthRange = MonthRange(firstStartOfMonthSinceEpoch, firstStartOfMonthSinceEpoch)
 
@@ -50,10 +50,10 @@ object MonthRange {
     MonthRange(startDate, endDate)
   }
 
-  def atLeast(start: DateTime): MonthRange = MonthRange(start, lastPossibleStartOfMonth)
+  def atLeast(start: Instant): MonthRange = MonthRange(start, lastPossibleStartOfMonth)
   def atLeast(datedMonth: DatedMonth): MonthRange = atLeast(datedMonth.startDate)
 
-  def lessThan(startOfNextMonth: DateTime): MonthRange = MonthRange(firstStartOfMonthSinceEpoch, startOfNextMonth)
+  def lessThan(startOfNextMonth: Instant): MonthRange = MonthRange(firstStartOfMonthSinceEpoch, startOfNextMonth)
   def lessThan(datedMonth: DatedMonth): MonthRange = lessThan(datedMonth.startDate)
 
 }

@@ -1,7 +1,7 @@
 package models.accounting
 
 import scala.collection.immutable.Seq
-import org.joda.time.DateTime
+import org.joda.time.Instant
 import common.Clock
 import models.accounting.money.{Money, ReferenceMoney, ExchangeRateManager}
 import models.accounting.config.Config
@@ -9,7 +9,7 @@ import models.manager.{Entity, EntityManager}
 import models.EntityAccess
 
 /** Transaction groups should be treated as immutable. */
-case class TransactionGroup(createdDate: DateTime = Clock.now,
+case class TransactionGroup(createdDate: Instant = Clock.now,
                             idOption: Option[Long] = None) extends Entity[TransactionGroup] {
 
   override def withId(id: Long) = copy(idOption = Some(id))

@@ -8,7 +8,7 @@ import java.util.Locale
 import com.google.common.collect.Iterables
 import models.accounting.config.Config
 import models.accounting.money.CentOperations.CentOperationsNumeric
-import org.joda.time.DateTime
+import org.joda.time.Instant
 import play.twirl.api.Html
 
 import scala.collection.JavaConverters._
@@ -26,7 +26,7 @@ trait Money {
 
   final def formatFloat: String = Money.centsToFloatString(cents)
 
-  final def withDate(date: DateTime): DatedMoney = {
+  final def withDate(date: Instant): DatedMoney = {
     DatedMoney(cents, currency, date)
   }
 

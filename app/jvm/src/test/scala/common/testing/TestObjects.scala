@@ -4,7 +4,6 @@ import com.google.inject._
 import collection.immutable.Seq
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
-import org.joda.time.DateTime
 
 import common.Clock
 import models.{User, EntityAccess}

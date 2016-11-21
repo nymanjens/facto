@@ -1,7 +1,7 @@
 package models.accounting
 
 import scala.collection.immutable.Seq
-import org.joda.time.DateTime
+import org.joda.time.Instant
 import common.Clock
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}
@@ -23,7 +23,7 @@ object SlickTransactionGroupManager {
   private val tableName: String = "TRANSACTION_GROUPS"
 
   final class TransactionGroups(tag: SlickTag) extends EntityTable[TransactionGroup](tag, tableName) {
-    def createdDate = column[DateTime]("createdDate")
+    def createdDate = column[Instant]("createdDate")
 
     override def * = (createdDate, id.?) <> (TransactionGroup.tupled, TransactionGroup.unapply)
   }

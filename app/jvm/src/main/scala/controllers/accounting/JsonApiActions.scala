@@ -4,7 +4,6 @@ import com.google.inject.Inject
 import common.{Clock, TimeUtils}
 import controllers.helpers.accounting.GeneralEntry
 import models.accounting.money.{Currency, DatedMoney, ExchangeRateManager}
-import org.joda.time.DateTime
 import play.api.data.{FormError, Forms}
 import play.api.mvc._
 import play.api.i18n.{MessagesApi, Messages, I18nSupport}

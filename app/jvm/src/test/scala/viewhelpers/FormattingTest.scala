@@ -4,7 +4,6 @@ import org.junit.runner._
 import org.specs2.mutable._
 import org.specs2.runner._
 import play.api.test._
-import org.joda.time.DateTime
 import common.{Clock, DatedMonth, MonthRange, TimeUtils}
 import common.TimeUtils.{April, August, December, February, January, July, June, March, May, November, October, September, dateAt}
 import common.testing.HookedSpecification

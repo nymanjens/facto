@@ -2,7 +2,7 @@ package models
 
 import com.google.common.hash.{HashCode, Hashing}
 import common.Clock
-import org.joda.time.DateTime
+import org.joda.time.Instant
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.SlickUtils.JodaToSqlDateMapper
@@ -27,8 +27,8 @@ object SlickBalanceCheckManager {
     def issuerId = column[Long]("issuerId")
     def moneyReservoirCode = column[String]("moneyReservoirCode")
     def balance = column[Long]("balance")
-    def createdDate = column[DateTime]("createdDate")
-    def checkDate = column[DateTime]("checkDate")
+    def createdDate = column[Instant]("createdDate")
+    def checkDate = column[Instant]("checkDate")
 
     override def * = (issuerId, moneyReservoirCode, balance, createdDate, checkDate, id.?) <> (BalanceCheck.tupled, BalanceCheck.unapply)
   }
