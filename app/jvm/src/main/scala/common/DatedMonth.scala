@@ -5,16 +5,14 @@ import scala.collection.immutable.Seq
 import com.google.common.collect.Range
 import java.time.{Instant, ZoneId, Month, LocalDate}
 import TimeUtils._
-import play.api.i18n.Messages
-import TimeUtils._
 
 case class DatedMonth(startDate: LocalDate) extends Ordered[DatedMonth] {
   TimeUtils.requireStartOfMonth(startDate)
 
   /** Returns abbreviation e.g. "Jan". */
-  def abbreviation(implicit messages: Messages): String = {
+  def abbreviation(implicit i18n: I18n): String = {
     val code = DatedMonth.abbreviationCodes(startDate.getMonth)
-    Messages(code)
+    i18n(code)
   }
 
   def contains(instant: Instant): Boolean = {

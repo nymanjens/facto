@@ -5,7 +5,7 @@ import scala.collection.JavaConverters._
 import com.google.common.base.Joiner
 import com.google.inject.Inject
 import play.api.mvc.{AnyContent, Controller, Flash, Request, Result}
-import common.{Clock, GetParameter, TimeUtils}
+import common.{Clock, GetParameter, TimeUtils, I18n}
 import common.CollectionUtils.toListMap
 import models._
 import models.accounting.{Tag, TagEntity}
@@ -24,7 +24,8 @@ final class Views @Inject()(implicit val messagesApi: MessagesApi,
                             summaries: Summaries,
                             tagEntityManager: TagEntity.Manager,
                             exchangeRateManager: ExchangeRateManager,
-                            entityAccess: EntityAccess) extends Controller with I18nSupport {
+                            entityAccess: EntityAccess,
+                            i18n: I18n) extends Controller with I18nSupport {
 
   // ********** actions - views ********** //
   def everythingLatest = AuthenticatedAction { implicit user =>

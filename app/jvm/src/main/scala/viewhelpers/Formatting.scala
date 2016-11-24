@@ -1,18 +1,17 @@
 package viewhelpers
 
+import common.I18n
 import java.lang.Math.abs
 
 import java.time.{Instant, LocalDate, Month, ZoneId}
 import java.time.format.DateTimeFormatter
-
-import play.api.i18n.Messages
 
 import common.Clock
 
 object Formatting {
 
   def formatDate(instant: Instant)
-                (implicit messages: Messages) = {
+                (implicit i18n: I18n) = {
     val zone = ZoneId.of("Europe/Paris")
     val now = Clock.now.atZone(zone).toLocalDate
     val date = instant.atZone(zone).toLocalDate
@@ -25,11 +24,11 @@ object Formatting {
       val dayDifference = abs(now.getDayOfYear - date.getDayOfYear)
 
       if (date.getDayOfYear == now.getDayOfYear) {
-        Messages("facto.today")
+        i18n("facto.today")
       } else if (date.getDayOfYear == now.getDayOfYear - 1) {
-        Messages("facto.yesterday")
+        i18n("facto.yesterday")
       } else if (date.getDayOfYear == now.getDayOfYear + 1) {
-        Messages("facto.tomorrow")
+        i18n("facto.tomorrow")
       } else if (dayDifference < 7) {
         s"$dayOfWeek, $dayMonthString"
       } else {
@@ -46,14 +45,14 @@ object Formatting {
   }
 
   private def extractDayOfWeek(date: LocalDate)
-                              (implicit messages: Messages): String = {
+                              (implicit i18n: I18n): String = {
     val dayAbbrevEnglish = DateTimeFormatter.ofPattern("EEE").format(date).toLowerCase
-    Messages(s"facto.date.dayofweek.$dayAbbrevEnglish.abbrev")
+    i18n(s"facto.date.dayofweek.$dayAbbrevEnglish.abbrev")
   }
 
   private def extractMonth(date: LocalDate)
-                          (implicit messages: Messages): String = {
+                          (implicit i18n: I18n): String = {
     val monthAbbrevEnglish = DateTimeFormatter.ofPattern("MMM").format(date).toLowerCase
-    Messages(s"facto.date.month.$monthAbbrevEnglish.abbrev")
+    i18n(s"facto.date.month.$monthAbbrevEnglish.abbrev")
   }
 }
