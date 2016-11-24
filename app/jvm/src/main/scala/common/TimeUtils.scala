@@ -11,6 +11,11 @@ object TimeUtils {
     LocalDate.of(year, month, dayOfMonth).atStartOfDay(zone).toInstant
   }
 
+  def yearAt(instant: Instant): Int = {
+    val zone = ZoneId.of("Europe/Paris")
+    instant.atZone(zone).toLocalDate.getYear
+  }
+
   def requireStartOfMonth(date: LocalDate): Unit = {
     require(date.getDayOfMonth == 1, s"Date $date should be at the first day of the month.")
   }

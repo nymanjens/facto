@@ -29,6 +29,11 @@ case class MonthRange(start: LocalDate, startOfNextMonth: LocalDate) {
   def contains(date: LocalDate): Boolean = start <= date && date < startOfNextMonth
 
   def contains(month: DatedMonth): Boolean = contains(month.startDate)
+
+  def contains(instant: Instant): Boolean = {
+    val zone = ZoneId.of("Europe/Paris")
+    contains(instant.atZone(zone).toLocalDate)
+  }
 }
 
 object MonthRange {

@@ -43,6 +43,10 @@ object DatedMonth {
     Month.DECEMBER -> "facto.date.month.dec.abbrev"
   )
 
+  def containing(date: LocalDate): DatedMonth = {
+    DatedMonth(startOfMonthContaining(date))
+  }
+
   def containing(instant: Instant): DatedMonth = {
     val zone = ZoneId.of("Europe/Paris")
     val date = instant.atZone(zone).toLocalDate

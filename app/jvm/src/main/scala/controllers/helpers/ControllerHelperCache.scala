@@ -19,7 +19,7 @@ object ControllerHelperCache {
     invalidateCache = invalidateCache)
 
   private val cache: SynchronizedCache[CacheIdentifier[_], CacheEntry[_]] =
-    SynchronizedCache(expireAfterAccess = Duration.standardHours(32))
+    SynchronizedCache(expireAfterAccess = Duration.ofHours(32))
 
   /**
     * If given identifier is in the cache, returns the cached value. Otherwise, expensive value is calculated and
