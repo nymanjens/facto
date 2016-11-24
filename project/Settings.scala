@@ -84,13 +84,14 @@ object Settings {
 
   /** Dependencies only used by the JS project (note the use of %%% instead of %%) */
   val scalajsDependencies = Def.setting(Seq(
-    "com.github.japgolly.scalajs-react" %%% "core"        % versions.scalajsReact,
-    "com.github.japgolly.scalajs-react" %%% "extra"       % versions.scalajsReact,
-    "com.github.japgolly.scalacss"      %%% "ext-react"   % "0.4.1",
-    "me.chrons"                         %%% "diode"       % versions.diode,
-    "me.chrons"                         %%% "diode-react" % versions.diode,
-    "org.scala-js"                      %%% "scalajs-dom" % "0.9.1",
-    "com.lihaoyi"                       %%% "utest"       % versions.uTest % Test
+    "com.github.japgolly.scalajs-react" %%% "core"              % versions.scalajsReact,
+    "com.github.japgolly.scalajs-react" %%% "extra"             % versions.scalajsReact,
+    "com.github.japgolly.scalacss"      %%% "ext-react"         % "0.4.1",
+    "me.chrons"                         %%% "diode"             % versions.diode,
+    "me.chrons"                         %%% "diode-react"       % versions.diode,
+    "org.scala-js"                      %%% "scalajs-dom"       % "0.9.1",
+    "org.scala-js"                      %%% "scalajs-java-time" % "0.2.0",
+    "com.lihaoyi"                       %%% "utest"             % versions.uTest % Test
   ))
 
   private object files {

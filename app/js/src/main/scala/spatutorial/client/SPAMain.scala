@@ -69,11 +69,12 @@ object SPAMain extends js.JSApp {
 //    ReactDOM.render(router(), dom.document.getElementById("root"))
   }
 
-  import common.Require
+  import common.{Require, Clock}
 
   @JSExport
   def factoPortabilityTest(): Unit = {
-
+    println("factoPortabilityTest() starting")
+    println(Clock.now)
 
     X(null)
   }
