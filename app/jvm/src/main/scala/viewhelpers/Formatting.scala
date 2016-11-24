@@ -40,7 +40,7 @@ object Formatting {
     }
   }
 
-  def formatDateTime(instant: Instant) = {
+  jshint def formatDateTime(instant: Instant) = {
     val zone = ZoneId.of("Europe/Paris")
     DateTimeFormatter.ofPattern("d MMM yyyy, HH:mm").format(instant.atZone(zone).toLocalDate)
   }
