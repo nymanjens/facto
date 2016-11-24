@@ -4,8 +4,8 @@ import com.google.inject.{Inject, Singleton}
 import collection.immutable.Seq
 import scala.collection.JavaConverters._
 import com.google.common.base.{Joiner, Splitter}
-import org.joda.time.DateTime
-import com.github.nscala_time.time.Imports._
+import java.time.Instant
+
 import com.google.common.hash.Hashing
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
@@ -101,7 +101,7 @@ final class GeneralEntries @Inject()(implicit accountingConfig: Config,
   }
 }
 
-private case class QueryScore(scoreNumber: Double, createdDate: DateTime, transactionDate: DateTime) {
+private case class QueryScore(scoreNumber: Double, createdDate: Instant, transactionDate: Instant) {
   def matchesQuery: Boolean = scoreNumber > 0
 }
 private object QueryScore {

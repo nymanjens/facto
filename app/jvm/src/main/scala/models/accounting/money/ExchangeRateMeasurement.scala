@@ -7,7 +7,7 @@ import com.google.common.collect.{ImmutableMultiset, Multiset}
 import common.Clock
 import common.CollectionUtils.toListMap
 import models.manager.{Entity, EntityManager}
-import org.joda.time.DateTime
+import java.time.Instant
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
@@ -21,7 +21,7 @@ import scala.collection.immutable.ListMap
   *
   * ExchangeRateMeasurement entities are immutable.
   */
-case class ExchangeRateMeasurement(date: DateTime = Clock.now,
+case class ExchangeRateMeasurement(date: Instant = Clock.now,
                                    private val foreignCurrencyCode: String,
                                    ratioReferenceToForeignCurrency: Double,
                                    idOption: Option[Long] = None) extends Entity[ExchangeRateMeasurement] {

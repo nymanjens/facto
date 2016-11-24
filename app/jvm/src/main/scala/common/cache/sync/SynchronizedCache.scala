@@ -1,6 +1,6 @@
 package common.cache.sync
 
-import org.joda.time.Duration
+import java.time.Duration
 
 /**
   * Defines a cache that acts similar to a Guava cache, except that the client can iterate over every entry while
@@ -26,7 +26,7 @@ trait SynchronizedCache[K <: Object, V <: Object] {
 
 object SynchronizedCache {
 
-  def apply[K <: Object, V <: Object](expireAfterAccess: Duration = Duration.standardDays(99999),
+  def apply[K <: Object, V <: Object](expireAfterAccess: Duration = Duration.ofDays(99999),
                                       maximumSize: Long = Long.MaxValue): SynchronizedCache[K, V] = {
     new GuavaBackedSynchronizedCache[K, V](expireAfterAccess, maximumSize)
   }

@@ -1,8 +1,8 @@
 package controllers.helpers.accounting
 
 import collection.immutable.Seq
-import org.joda.time.DateTime
-import com.github.nscala_time.time.Imports._
+import java.time.Instant
+
 import common.Clock
 import models._
 import models.accounting.{Tag, Transaction}
@@ -12,8 +12,8 @@ import models.accounting.money.{DatedMoney, Money, MoneyWithGeneralCurrency, Ref
 abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
   def groupId = transactions(0).transactionGroupId
   def issuer(implicit entityAccess: EntityAccess): User = transactions(0).issuer
-  def transactionDates: Seq[DateTime] = transactions.map(_.transactionDate).distinct
-  def consumedDates: Seq[DateTime] = transactions.flatMap(_.consumedDateOption).distinct
+  def transactionDates: Seq[Instant] = transactions.map(_.transactionDate).distinct
+  def consumedDates: Seq[Instant] = transactions.flatMap(_.consumedDateOption).distinct
   def beneficiaries(implicit accountingConfig: Config): Seq[Account] =
     transactions.map(_.beneficiary).distinct
   def moneyReservoirs(implicit accountingConfig: Config): Seq[MoneyReservoir] =

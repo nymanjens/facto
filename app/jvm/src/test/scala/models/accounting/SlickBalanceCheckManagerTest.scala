@@ -5,7 +5,7 @@ import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
 import play.api.test._
-import org.joda.time.DateTime
+import java.time.Instant
 import common.Clock
 import common.testing.TestObjects._
 import common.testing.TestUtils._
@@ -36,13 +36,13 @@ class SlickBalanceCheckManagerTest extends HookedSpecification {
       issuerId = user1.id,
       moneyReservoirCode = "ACC_A",
       balanceInCents = 999,
-      checkDate = new DateTime(1000)
+      checkDate = Instant.ofEpochMilli(1000)
     ))
     val checkA2 = balanceCheckManager.add(BalanceCheck(
       issuerId = user1.id,
       moneyReservoirCode = "ACC_A",
       balanceInCents = 1000,
-      checkDate = new DateTime(2000)
+      checkDate = Instant.ofEpochMilli(2000)
     ))
     val checkB = balanceCheckManager.add(BalanceCheck(
       issuerId = user2.id,

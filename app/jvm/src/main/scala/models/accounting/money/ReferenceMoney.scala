@@ -1,7 +1,6 @@
 package models.accounting.money
 
 import models.accounting.money.CentOperations.CentOperationsNumeric
-import org.joda.time.DateTime
 import play.twirl.api.Html
 
 /**

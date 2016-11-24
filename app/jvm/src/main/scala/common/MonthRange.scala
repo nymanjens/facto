@@ -1,14 +1,12 @@
 package common
 
-import org.joda.time.{Months, DateTime}
-import com.github.nscala_time.time.Imports._
-
-import common.TimeUtils.{February, dateAt, January}
+import java.time.{Instant, LocalDate, Period, ZoneId, Month}
+import common.JavaTimeImplicits._
 
 /**
   * Represents a continuous (possibly empty) range of dated months in time space.
   */
-case class MonthRange(start: DateTime, startOfNextMonth: DateTime) {
+case class MonthRange(start: LocalDate, startOfNextMonth: LocalDate) {
   require(start <= startOfNextMonth, s"The start date ($start) should never be older than the start date of the next " +
     s"month ($startOfNextMonth). Use equal dates to represent an empty range.")
   TimeUtils.requireStartOfMonth(start)
@@ -26,34 +24,39 @@ case class MonthRange(start: DateTime, startOfNextMonth: DateTime) {
       MonthRange(newStart, newStartOfNextMonth)
   }
 
-  def countMonths: Int = Months.monthsBetween(start, startOfNextMonth).getMonths
+  def countMonths: Int = Period.between(start, startOfNextMonth).toTotalMonths.toInt
 
-  def contains(date: DateTime): Boolean = start <= date && date < startOfNextMonth
+  def contains(date: LocalDate): Boolean = start <= date && date < startOfNextMonth
 
   def contains(month: DatedMonth): Boolean = contains(month.startDate)
+
+  def contains(instant: Instant): Boolean = {
+    val zone = ZoneId.of("Europe/Paris")
+    contains(instant.atZone(zone).toLocalDate)
+  }
 }
 
 object MonthRange {
 
-  private val firstStartOfMonthSinceEpoch: DateTime = {
+  private val firstStartOfMonthSinceEpoch: LocalDate = {
     // Needs to be february because we epoch may not have hours == 0 in the local time zone.
-    dateAt(1970, February, 1)
+    LocalDate.of(1970, Month.FEBRUARY, 1)
   }
 
-  private val lastPossibleStartOfMonth: DateTime = DatedMonth.containing(new DateTime(Long.MaxValue)).startDate
+  private val lastPossibleStartOfMonth: LocalDate = LocalDate.MAX.withDayOfMonth(1)
 
   val empty: MonthRange = MonthRange(firstStartOfMonthSinceEpoch, firstStartOfMonthSinceEpoch)
 
   def forYear(year: Int): MonthRange = {
-    val startDate = dateAt(year, January, 1)
-    val endDate = dateAt(year + 1, January, 1)
+    val startDate = LocalDate.of(year, Month.JANUARY, 1)
+    val endDate = LocalDate.of(year + 1, Month.JANUARY, 1)
     MonthRange(startDate, endDate)
   }
 
-  def atLeast(start: DateTime): MonthRange = MonthRange(start, lastPossibleStartOfMonth)
+  def atLeast(start: LocalDate): MonthRange = MonthRange(start, lastPossibleStartOfMonth)
   def atLeast(datedMonth: DatedMonth): MonthRange = atLeast(datedMonth.startDate)
 
-  def lessThan(startOfNextMonth: DateTime): MonthRange = MonthRange(firstStartOfMonthSinceEpoch, startOfNextMonth)
+  def lessThan(startOfNextMonth: LocalDate): MonthRange = MonthRange(firstStartOfMonthSinceEpoch, startOfNextMonth)
   def lessThan(datedMonth: DatedMonth): MonthRange = lessThan(datedMonth.startDate)
 
 }

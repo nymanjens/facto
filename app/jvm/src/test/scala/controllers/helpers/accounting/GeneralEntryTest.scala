@@ -7,7 +7,6 @@ import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
 import play.api.test._
-import org.joda.time.DateTime
 import models.accounting._
 import models.accounting.config.{Account, Category, MoneyReservoir}
 import common.testing.TestObjects._

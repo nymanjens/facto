@@ -3,7 +3,7 @@ package models.accounting
 import collection.immutable.Seq
 
 import com.google.inject._
-import org.joda.time.DateTime
+import java.time.Instant
 
 import common.Clock
 import common.ScalaUtils.objectName
@@ -64,7 +64,7 @@ object SlickUpdateLogManager {
   final class UpdateLogs(tag: SlickTag) extends EntityTable[UpdateLog](tag, tableName) {
     def userId = column[Long]("userId")
     def change = column[String]("change")
-    def date = column[DateTime]("date")
+    def date = column[Instant]("date")
 
     override def * = (userId, change, date, id.?) <> (UpdateLog.tupled, UpdateLog.unapply)
   }

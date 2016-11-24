@@ -1,7 +1,7 @@
 package controllers.helpers
 
 import scala.collection.immutable.Seq
-import org.joda.time.Duration
+import java.time.Duration
 import common.cache.CacheRegistry
 import common.cache.sync.SynchronizedCache
 import models.manager.Entity
@@ -19,7 +19,7 @@ object ControllerHelperCache {
     invalidateCache = invalidateCache)
 
   private val cache: SynchronizedCache[CacheIdentifier[_], CacheEntry[_]] =
-    SynchronizedCache(expireAfterAccess = Duration.standardHours(32))
+    SynchronizedCache(expireAfterAccess = Duration.ofHours(32))
 
   /**
     * If given identifier is in the cache, returns the cached value. Otherwise, expensive value is calculated and

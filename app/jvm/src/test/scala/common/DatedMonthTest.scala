@@ -14,19 +14,19 @@ class DatedMonthTest extends Specification {
   val application: Application = FakeApplication()
   "abbreviation" in new WithApplication(application) {
     val messages: Messages = applicationMessages(lang = Lang("en"), application)
-    val month = DatedMonth(dateAt(1990, June, 1))
+    val month = DatedMonth(instantAt(1990, June, 1))
     month.abbreviation(messages) mustEqual "June"
   }
 
   "contains" in {
-    val month = DatedMonth(dateAt(1990, June, 1))
-    month.contains(dateAt(1990, June, 20)) mustEqual true
-    month.contains(dateAt(1990, May, 20)) mustEqual false
-    month.contains(dateAt(1991, June, 20)) mustEqual false
+    val month = DatedMonth(instantAt(1990, June, 1))
+    month.contains(instantAt(1990, June, 20)) mustEqual true
+    month.contains(instantAt(1990, May, 20)) mustEqual false
+    month.contains(instantAt(1991, June, 20)) mustEqual false
   }
 
   "containing" in {
-    val month = DatedMonth.containing(dateAt(1990, June, 8))
-    month mustEqual DatedMonth(dateAt(1990, June, 1))
+    val month = DatedMonth.containing(instantAt(1990, June, 8))
+    month mustEqual DatedMonth(instantAt(1990, June, 1))
   }
 }

@@ -1,15 +1,15 @@
 package controllers.helpers.accounting
 
 import com.google.inject.{Inject, Singleton}
+import java.time.{Instant, LocalDate, Month, ZoneId}
 import scala.collection.immutable.Seq
 import scala.collection.JavaConverters._
 import com.google.common.collect.{HashMultimap, ImmutableTable, Multimap, Range, Table, Tables}
-import org.joda.time.DateTime
 import models.SlickUtils.dbApi._
-import com.github.nscala_time.time.Imports._
+
 import play.api.Logger
 import play.twirl.api.Html
-import common.{Clock, DatedMonth, MonthRange}
+import common.{Clock, DatedMonth, MonthRange, TimeUtils}
 import common.CollectionUtils.toListMap
 import common.GuavaUtils.asGuava
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
@@ -35,7 +35,8 @@ final class Summaries @Inject()(implicit accountingConfig: Config,
                                 exchangeRateManager: ExchangeRateManager,
                                 transactionManager: SlickTransactionManager) {
   def fetchSummary(account: Account, expandedYear: Int, tags: Seq[Tag] = Seq()): Summary = {
-    val now = Clock.now
+    val zone = ZoneId.of("Europe/Paris")
+    val now = Clock.now.atZone(zone).toLocalDate
 
     val years: Seq[Int] = getSummaryYears(account, expandedYear, now.getYear)
     val monthRangeForAverages: MonthRange = {
@@ -46,7 +47,9 @@ final class Summaries @Inject()(implicit accountingConfig: Config,
           .take(1))
         .headOption
       oldestTransaction.map(_.consumedDate) match {
-        case Some(firstDate) =>
+        case Some(firstInstant) =>
+          val zone = ZoneId.of("Europe/Paris")
+          val firstDate = firstInstant.atZone(zone).toLocalDate
           val atLeastFirst = MonthRange.atLeast(DatedMonth.containing(firstDate))
           val atMostLastMonth = MonthRange.lessThan(DatedMonth.containing(now))
           atLeastFirst intersection atMostLastMonth
@@ -73,7 +76,7 @@ final class Summaries @Inject()(implicit accountingConfig: Config,
       val allTransactions = dbRun(
         transactionManager.newQuery
           .filter(_.beneficiaryAccountCode === account.code))
-      val transactionYears = allTransactions.toStream.map(t => t.consumedDate.getYear).toSet
+      val transactionYears = allTransactions.toStream.map(t => TimeUtils.yearAt(t.consumedDate)).toSet
       val yearsSet = transactionYears ++ Set(thisYear, expandedYear)
       yearsSet.toList.sorted
 
@@ -83,7 +86,7 @@ final class Summaries @Inject()(implicit accountingConfig: Config,
 private case class GetSummaryYears(account: Account, expandedYear: Int, thisYear: Int) extends CacheIdentifier[Seq[Int]] {
   protected override def invalidateWhenUpdatingEntity(oldYears: Seq[Int]) = {
     case transaction: Transaction =>
-      transaction.beneficiaryAccountCode == account.code && !oldYears.contains(transaction.consumedDate.getYear)
+      transaction.beneficiaryAccountCode == account.code && !oldYears.contains(TimeUtils.yearAt(transaction.consumedDate))
   }
 }
 
@@ -112,12 +115,13 @@ object SummaryForYear {
                                                                                                                 exchangeRateManager: ExchangeRateManager,
                                                                                                                 entityAccess: SlickEntityAccess): SummaryForYear =
     ControllerHelperCache.cached(GetSummaryForYear(account, monthRangeForAverages, year, tags)) {
+      val zone = ZoneId.of("Europe/Paris")
       val transactions: Seq[Transaction] = {
         val yearRange = MonthRange.forYear(year)
         val allTransactions = dbRun(entityAccess.transactionManager.newQuery
           .filter(_.beneficiaryAccountCode === account.code)
-          .filter(_.consumedDate >= yearRange.start)
-          .filter(_.consumedDate < yearRange.startOfNextMonth)
+          .filter(_.consumedDate >= yearRange.start.atStartOfDay(zone).toInstant)
+          .filter(_.consumedDate < yearRange.startOfNextMonth.atStartOfDay(zone).toInstant)
           .sortBy(r => (r.consumedDate, r.createdDate)))
           .toList
         if (tags.isEmpty) {
@@ -138,7 +142,7 @@ object SummaryForYear {
   private case class GetSummaryForYear(account: Account, monthRangeForAverages: MonthRange, year: Int, tags: Seq[Tag]) extends CacheIdentifier[SummaryForYear] {
     protected override def invalidateWhenUpdating = {
       case transaction: Transaction =>
-        transaction.beneficiaryAccountCode == account.code && transaction.consumedDate.getYear == year
+        transaction.beneficiaryAccountCode == account.code && TimeUtils.yearAt(transaction.consumedDate) == year
     }
   }
 

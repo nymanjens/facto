@@ -11,7 +11,7 @@ import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.SlickUtils.JodaToSqlDateMapper
 import models.manager.{Entity, SlickEntityManager, EntityTable, ImmutableEntityManager}
-import org.joda.time.DateTime
+import java.time.Instant
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
@@ -55,7 +55,7 @@ object SlickExchangeRateMeasurementManager {
   private val tableName: String = "EXCHANGE_RATE_MEASUREMENT"
 
   final class ExchangeRateMeasurements(tag: SlickTag) extends EntityTable[ExchangeRateMeasurement](tag, tableName) {
-    def date = column[DateTime]("date")
+    def date = column[Instant]("date")
     def foreignCurrencyCode = column[String]("foreignCurrencyCode")
     def ratioReferenceToForeignCurrency = column[Double]("ratioReferenceToForeignCurrency")
 

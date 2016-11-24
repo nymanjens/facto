@@ -4,7 +4,6 @@ import com.google.inject.Inject
 import common.{Clock, TimeUtils}
 import controllers.helpers.accounting.GeneralEntry
 import models.accounting.money.{Currency, DatedMoney, ExchangeRateManager}
-import org.joda.time.DateTime
 import play.api.data.{FormError, Forms}
 import play.api.mvc._
 import play.api.i18n.{MessagesApi, Messages, I18nSupport}
@@ -18,7 +17,6 @@ import models.SlickUtils.dbApi._
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
 
 final class JsonApi @Inject()(implicit val messagesApi: MessagesApi,
-                              balanceCheckOperations: BalanceCheckOperations,
                               entityAccess: SlickEntityAccess,
 exchangeRateManager: ExchangeRateManager)
   extends Controller with I18nSupport {
@@ -46,13 +44,6 @@ exchangeRateManager: ExchangeRateManager)
       val tagNames = entityAccess.tagEntityManager.fetchAll().map(_.tag.name).toSet
       Ok(Json.toJson(tagNames))
   }
-
-  def addBalanceCheck(moneyReservoirCode: String, balanceInCents: Long, mostRecentTransactionId: Long) =
-    AuthenticatedAction { implicit user =>
-      implicit request =>
-        balanceCheckOperations.doAddConfirmation(moneyReservoirCode, balanceInCents, mostRecentTransactionId)
-        Ok(Json.toJson("OK"))
-    }
 
   def exchangeMoney(fromCents: Long, fromCurrencyCode: String, dateString: String, toCurrencyCode: String) =
     AuthenticatedAction { implicit user =>

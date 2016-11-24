@@ -69,7 +69,6 @@ object Settings {
     "com.typesafe.play"      %% "play-specs2"           % versions.play % Test,
 
     "org.yaml"               %  "snakeyaml"             % "1.14",
-    "com.github.nscala-time" %% "nscala-time"           % "2.12.0",
     "com.typesafe.slick"     %% "slick"                 % "3.0.0",
     "commons-lang"           %  "commons-lang"          % "2.6",
     "mysql"                  %  "mysql-connector-java"  % "5.1.36",

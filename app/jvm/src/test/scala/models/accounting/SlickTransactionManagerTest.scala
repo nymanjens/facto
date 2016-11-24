@@ -7,7 +7,6 @@ import org.specs2.runner._
 import org.junit.runner._
 import play.api.test._
 import play.api.test.Helpers._
-import org.joda.time.DateTime
 import models.SlickUtils.dbApi._
 import common.Clock
 import common.testing.TestObjects._

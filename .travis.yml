@@ -11,4 +11,4 @@ script:
   - sbt test
   - sbt scalastyle
   - sbt test:scalastyle # run scalastyle in test code
-  - jshint app/assets/javascripts/
+  - jshint app/jvm/src/main/assets/javascripts

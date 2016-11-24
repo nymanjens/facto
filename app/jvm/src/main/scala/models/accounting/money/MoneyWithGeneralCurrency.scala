@@ -1,7 +1,6 @@
 package models.accounting.money
 
 import models.accounting.money.CentOperations.CentOperationsNumeric
-import org.joda.time.DateTime
 
 /**
   * Base class for an amount of money with an arbitrary currency.

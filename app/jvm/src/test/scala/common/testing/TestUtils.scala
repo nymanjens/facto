@@ -2,7 +2,7 @@ package common.testing
 
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
-import org.joda.time.DateTime
+import java.time.Instant
 import common.Clock
 import common.testing.TestObjects._
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
@@ -15,7 +15,7 @@ object TestUtils {
 
   def persistTransaction(groupId: Long = -1,
                          flowInCents: Long = 0,
-                         date: DateTime = Clock.now,
+                         date: Instant = Clock.now,
                          timestamp: Long = -1,
                          account: Account = testAccount,
                          category: Category = testCategory,
@@ -28,7 +28,7 @@ object TestUtils {
     } else {
       groupId
     }
-    val actualDate = if (timestamp == -1) date else new DateTime(timestamp)
+    val actualDate = if (timestamp == -1) date else Instant.ofEpochMilli(timestamp)
     entityAccess.transactionManager.add(Transaction(
       transactionGroupId = actualGroupId,
       issuerId = 1,
@@ -45,10 +45,10 @@ object TestUtils {
   }
 
   def persistBalanceCheck(balanceInCents: Long = 0,
-                          date: DateTime = Clock.now,
+                          date: Instant = Clock.now,
                           timestamp: Long = -1,
                           reservoir: MoneyReservoir = testReservoir)(implicit entityAccess: EntityAccess): BalanceCheck = {
-    val actualDate = if (timestamp == -1) date else new DateTime(timestamp)
+    val actualDate = if (timestamp == -1) date else Instant.ofEpochMilli(timestamp)
     entityAccess.balanceCheckManager.add(BalanceCheck(
       issuerId = 2,
       moneyReservoirCode = reservoir.code,
@@ -59,7 +59,7 @@ object TestUtils {
 
   def persistGbpMeasurement(millisSinceEpoch: Long, ratio: Double)(implicit entityAccess: EntityAccess): Unit = {
     entityAccess.exchangeRateMeasurementManager.add(ExchangeRateMeasurement(
-      date = new DateTime(millisSinceEpoch),
+      date = Instant.ofEpochMilli(millisSinceEpoch),
       foreignCurrencyCode = Gbp.code,
       ratioReferenceToForeignCurrency = ratio))
   }
