@@ -8,8 +8,9 @@ import play.api.mvc.{AnyContent, Controller, Flash, Request, Result}
 import common.{Clock, GetParameter, TimeUtils}
 import common.CollectionUtils.toListMap
 import models._
-import models.accounting.Tag
+import models.accounting.{Tag, TagEntity}
 import models.accounting.config.Config
+import models.accounting.money.ExchangeRateManager
 import models.accounting.config.{Account, Category, MoneyReservoir, Template}
 import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting._
@@ -21,6 +22,8 @@ final class Views @Inject()(implicit val messagesApi: MessagesApi,
                             cashFlowEntries: CashFlowEntries,
                             liquidationEntries: LiquidationEntries,
                             summaries: Summaries,
+                            tagEntityManager: TagEntity.Manager,
+                            exchangeRateManager: ExchangeRateManager,
                             entityAccess: EntityAccess) extends Controller with I18nSupport {
 
   // ********** actions - views ********** //

@@ -1,8 +1,8 @@
 @import scala.collection.immutable.Seq
 
 @import models.User
-@import models.accounting.money.Currency
-@import models.accounting.config.{Account, MoneyReservoir, Category, Template}
+@import models.accounting.money.{Currency, Money, ExchangeRateManager}
+@import models.accounting.config.{Account, MoneyReservoir, Category, Template, Config}
 @import controllers.helpers.accounting.{AccountPair, LiquidationEntry}
 @import viewhelpers.Formatting._
 @import views.html.accounting.parts._
@@ -13,6 +13,50 @@
   expandedNumEntries: Int,
   templatesInNavbar: Seq[Template]
 )(
-  implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash
+  implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash, config: Config, entityAccess: EntityAccess, exchangeRateManager: ExchangeRateManager
 )
 
+@Main(Messages("facto.liquidation"), templatesInNavbar = templatesInNavbar) {
+  <h1 class="page-header"><i class="icon-balance-scale"></i> @Messages("facto.liquidation")</h1>
+
+  @Panel(
+    title = if (pairsToEntries.size > 1) Messages("facto.all-combinations") else Messages("facto.single-combination")
+  ) { @* panel content *@
+
+    @for((AccountPair(account1, account2), entries) <- pairsToEntries) {
+      @viewhelpers.accounting.Table(
+        title = Messages("facto.debt-of", account1.longName, account2.longName),
+        tableClasses = "table-liquidation",
+        allEntriesLink = (entries.size > expandedNumEntries) match {
+            case true => Some(controllers.accounting.routes.Views.liquidationOfSingle(account1.code, account2.code))
+            case false => None
+          },
+        numEntriesShownByDefault = numEntriesShownByDefault,
+        colspan = 8,
+        entries = entries.reverse.take(expandedNumEntries)
+      ) { @* table headers *@
+        <th>@Messages("facto.payed")</th>
+        <th>@Messages("facto.beneficiary")</th>
+        <th>@Messages("facto.payed-with-to")</th>
+        <th>@Messages("facto.category")</th>
+        <th>@Messages("facto.description")</th>
+        <th>@Messages("facto.flow")</th>
+        <th>@account1.veryShortName -> @account2.veryShortName</th>
+        <th>
+          @if(!entries.isEmpty) {
+            @LiquidationRepayButton(account1, account2, entries.last.debt)
+          }
+        </th>
+      } { entry =>  @* table datas *@
+        <td>@entry.transactionDates.map(formatDate).mkString(", ")</td>
+        <td>@entry.beneficiaries.map(_.shorterName).mkString(", ")</td>
+        <td>@entry.moneyReservoirs.map(_.shorterName).mkString(", ")</td>
+        <td>@entry.categories.map(_.name).mkString(", ")</td>
+        <td>@DescriptionWithEntryCount(entry)</td>
+        <td>@entry.flow.toHtmlWithCurrency</td>
+        <td>@entry.debt.toHtmlWithCurrency</td>
+        <td>@TransactionGroupEditButton(entry.groupId)</td>
+      }
+    }
+  }
+}
