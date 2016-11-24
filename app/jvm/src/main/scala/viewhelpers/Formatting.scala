@@ -46,13 +46,13 @@ object Formatting {
   }
 
   private def extractDayOfWeek(date: LocalDate)
-                      (implicit messages: Messages): String = {
+                              (implicit messages: Messages): String = {
     val dayAbbrevEnglish = DateTimeFormatter.ofPattern("EEE").format(date).toLowerCase
     Messages(s"facto.date.dayofweek.$dayAbbrevEnglish.abbrev")
   }
 
   private def extractMonth(date: LocalDate)
-                  (implicit messages: Messages): String = {
+                          (implicit messages: Messages): String = {
     val monthAbbrevEnglish = DateTimeFormatter.ofPattern("MMM").format(date).toLowerCase
     Messages(s"facto.date.month.$monthAbbrevEnglish.abbrev")
   }
