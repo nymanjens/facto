@@ -2,8 +2,8 @@ package viewhelpers
 
 import java.lang.Math.abs
 
-import java.time.Instant
-import java.time.format.DateTimeFormat.forPattern
+import java.time.{Instant, LocalDate, Month, ZoneId}
+import java.time.format.DateTimeFormatter
 
 import play.api.i18n.Messages
 
@@ -11,12 +11,14 @@ import common.Clock
 
 object Formatting {
 
-  def formatDate(date: Instant)
+  def formatDate(instant: Instant)
                 (implicit messages: Messages) = {
-    val now = Clock.now
+    val zone = ZoneId.of("Europe/Paris")
+    val now = Clock.now.atZone(zone).toLocalDate
+    val date = instant.atZone(zone).toLocalDate
 
-    val yearString = date.toString(forPattern("yy"))
-    val dayMonthString = date.toString(forPattern("d")) + " " + extractMonth(date)
+    val yearString = DateTimeFormatter.ofPattern("yy").format(date)
+    val dayMonthString = DateTimeFormatter.ofPattern("d").format(date) + " " + extractMonth(date)
     val dayOfWeek = extractDayOfWeek(date)
 
     if (date.getYear == now.getYear) {
@@ -38,19 +40,19 @@ object Formatting {
     }
   }
 
-  def formatDateTime(date: Instant) = {
-    date.toString(forPattern("d MMM yyyy, HH:mm"))
+  def formatDateTime(date: LocalDate) = {
+    DateTimeFormatter.ofPattern("d MMM yyyy, HH:mm").format(date)
   }
 
-  def extractDayOfWeek(date: Instant)
+  def extractDayOfWeek(date: LocalDate)
                       (implicit messages: Messages): String = {
-    val dayAbbrevEnglish = date.toString(forPattern("EEE")).toLowerCase
+    val dayAbbrevEnglish = DateTimeFormatter.ofPattern("EEE").format(date).toLowerCase
     Messages(s"facto.date.dayofweek.$dayAbbrevEnglish.abbrev")
   }
 
-  def extractMonth(date: Instant)
+  def extractMonth(date: LocalDate)
                   (implicit messages: Messages): String = {
-    val monthAbbrevEnglish = date.toString(forPattern("MMM")).toLowerCase
+    val monthAbbrevEnglish = DateTimeFormatter.ofPattern("MMM").format(date).toLowerCase
     Messages(s"facto.date.month.$monthAbbrevEnglish.abbrev")
   }
 }

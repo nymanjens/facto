@@ -91,15 +91,13 @@
           </ul>
           <ul class="nav" id="side-menu">
             <li>
-              <a href="@(controllers.accounting.routes.TransactionGroupOperations.addNewForm(
-                    ) ++: returnTo)"
+              <a href=""
                   id="menu-link-newtransgroup">
                 <i class="icon-new-empty"></i> @Html(Messages("facto.new-entry.html"))</a>
               <a href="@controllers.accounting.routes.GeneralActions.templateList" id="menu-link-templates">
                 <i class="icon-template"></i> @Html(Messages("facto.templates.html"))</a>
               @for(template <- templatesInNavbar) {
-                <a href="@(controllers.accounting.routes.TransactionGroupOperations.addNewFromTemplate(template.code
-                    ) ++: returnTo)">
+                <a href="">
                   <i class="@template.iconClass"></i> @template.name</a>
               }
             </li>
