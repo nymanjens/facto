@@ -35,10 +35,6 @@ object FormUtils {
     }
   }
 
-  def toInstant(localDate: org.joda.DateTime): Instant = {
-
-  }
-
   def validTagsString = Constraint[String]({ (tagsString: String) =>
     if (tagsString == "") {
       Valid
