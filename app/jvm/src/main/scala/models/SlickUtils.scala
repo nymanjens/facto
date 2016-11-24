@@ -12,7 +12,9 @@ object SlickUtils {
   // ********** db helpers ********** //
   val dbConfig: DatabaseConfig[JdbcDriver] = DatabaseConfig.forConfig("db.default.slick")
   val dbApi = dbConfig.driver.api
+
   import dbApi._
+
   val database = Database.forConfig("db.default")
 
   def dbRun[T](query: DBIO[T]): T = {
@@ -23,7 +25,5 @@ object SlickUtils {
 
   // ********** datetime helpers ********** //
   implicit val JodaToSqlDateMapper =
-    MappedColumnType.base[java.time.Instant, java.sql.Timestamp](
-      d => new java.sql.Timestamp(d.toEpochMilli),
-      d => java.time.Instant.ofEpochSecond(d.getTime))
+  MappedColumnType.base[java.time.Instant, java.sql.Timestamp](java.sql.Timestamp.from, _.toInstant)
 }
