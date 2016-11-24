@@ -1,7 +1,7 @@
 package common.cache.sync
 
 import java.util.concurrent.Callable
-import java.util.concurrent.TimeUnit.MILLISECONDS
+import java.util.concurrent.TimeUnit.NANOSECONDS
 import java.util.function.BiConsumer
 
 import com.google.common.cache.{Cache, CacheBuilder}
@@ -18,7 +18,7 @@ private[sync] final class GuavaBackedSynchronizedCache[K <: Object, V <: Object]
   @GuardedBy("lock (all reads and writes)")
   private val guavaCache: Cache[K, V] = CacheBuilder.newBuilder()
     .maximumSize(maximumSize)
-    .expireAfterAccess(expireAfterAccess.getMillis, MILLISECONDS)
+    .expireAfterAccess(expireAfterAccess.getNano, NANOSECONDS)
     .build[K, V]()
 
   private val lock = new Object

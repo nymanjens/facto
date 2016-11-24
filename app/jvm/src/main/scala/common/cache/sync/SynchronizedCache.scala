@@ -26,7 +26,7 @@ trait SynchronizedCache[K <: Object, V <: Object] {
 
 object SynchronizedCache {
 
-  def apply[K <: Object, V <: Object](expireAfterAccess: Duration = Duration.standardDays(99999),
+  def apply[K <: Object, V <: Object](expireAfterAccess: Duration = Duration.ofDays(99999),
                                       maximumSize: Long = Long.MaxValue): SynchronizedCache[K, V] = {
     new GuavaBackedSynchronizedCache[K, V](expireAfterAccess, maximumSize)
   }

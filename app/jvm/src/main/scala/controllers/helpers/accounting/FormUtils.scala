@@ -12,7 +12,7 @@ import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 import models.accounting.Tag
 import models.accounting.config.Config
 import models.accounting.money.Money
-
+import java.time.Instant
 
 object FormUtils {
 
@@ -33,6 +33,10 @@ object FormUtils {
       case flowAsFloatRegex() => Valid
       case _ => invalidWithMessageCode("error.invalid")
     }
+  }
+
+  def toInstant(localDate: org.joda.DateTime): Instant = {
+
   }
 
   def validTagsString = Constraint[String]({ (tagsString: String) =>

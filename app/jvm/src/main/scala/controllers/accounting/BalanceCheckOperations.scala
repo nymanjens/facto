@@ -186,7 +186,7 @@ object BalanceCheckOperations {
       mapping(
         "issuerName" -> text,
         "moneyReservoirName" -> text,
-        "checkDate" -> jodaDate("yyyy-MM-dd"),
+        "checkDate" -> jodaDate("yyyy-MM-dd").transform[Instant](toInstant, ),
         "balanceAsFloat" -> nonEmptyText.verifying(validFlowAsFloat).transform[Long](flowAsFloatStringToCents, Money.centsToFloatString)
       )(BcData.apply)(BcData.unapply)
     )

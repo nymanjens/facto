@@ -9,7 +9,7 @@ import TimeUtils.dateAt
 class TimeUtilsTest extends Specification {
 
   "dateAt" in {
-    val date = dateAt(1998, TimeUtils.March, 3)
+    val date = instantAt(1998, TimeUtils.March, 3)
     date.getYear mustEqual 1998
     date.getMonthOfYear mustEqual 3
     date.getDayOfMonth mustEqual 3
@@ -31,5 +31,9 @@ class TimeUtilsTest extends Specification {
     // Check that subtracting only a second leads to the previous day.
     calendar.add(Calendar.SECOND, -1)
     calendar.get(Calendar.DAY_OF_MONTH) mustEqual 2
+  }
+
+  "parseDateString" in {
+    // TODO
   }
 }
