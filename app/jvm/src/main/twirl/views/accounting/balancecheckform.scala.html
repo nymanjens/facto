@@ -1,8 +1,0 @@
-@import helper._
-@import common.ReturnTo
-@import models.User
-@import models.accounting.config.{Account, MoneyReservoir, Category}
-@import views.html.utils.bootstrap3
-@(reservoir: MoneyReservoir, title: String, bcForm: Form[BcData], formAction: Call, deleteAction: Option[Call])(
-    implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash, returnTo: ReturnTo)
-

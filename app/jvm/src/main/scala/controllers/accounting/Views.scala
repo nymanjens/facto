@@ -5,7 +5,7 @@ import scala.collection.JavaConverters._
 import com.google.common.base.Joiner
 import com.google.inject.Inject
 import play.api.mvc.{AnyContent, Controller, Flash, Request, Result}
-import common.{Clock, GetParameter}
+import common.{Clock, GetParameter, TimeUtils}
 import common.CollectionUtils.toListMap
 import models._
 import models.accounting.Tag
@@ -94,7 +94,7 @@ final class Views @Inject()(implicit val messagesApi: MessagesApi,
     implicit request =>
       summary(
         accounts = accountingConfig.personallySortedAccounts,
-        expandedYear = Clock.now.getYear,
+        expandedYear = TimeUtils.yearAt(Clock.now),
         tagsString = tags,
         toggleTag = toggleTag)
   }

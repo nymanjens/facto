@@ -40,17 +40,18 @@ object Formatting {
     }
   }
 
-  def formatDateTime(date: LocalDate) = {
-    DateTimeFormatter.ofPattern("d MMM yyyy, HH:mm").format(date)
+  def formatDateTime(instant: Instant) = {
+    val zone = ZoneId.of("Europe/Paris")
+    DateTimeFormatter.ofPattern("d MMM yyyy, HH:mm").format(instant.atZone(zone).toLocalDate)
   }
 
-  def extractDayOfWeek(date: LocalDate)
+  private def extractDayOfWeek(date: LocalDate)
                       (implicit messages: Messages): String = {
     val dayAbbrevEnglish = DateTimeFormatter.ofPattern("EEE").format(date).toLowerCase
     Messages(s"facto.date.dayofweek.$dayAbbrevEnglish.abbrev")
   }
 
-  def extractMonth(date: LocalDate)
+  private def extractMonth(date: LocalDate)
                   (implicit messages: Messages): String = {
     val monthAbbrevEnglish = DateTimeFormatter.ofPattern("MMM").format(date).toLowerCase
     Messages(s"facto.date.month.$monthAbbrevEnglish.abbrev")
