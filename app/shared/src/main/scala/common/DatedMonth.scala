@@ -1,10 +1,7 @@
 package common
 
-import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
-import com.google.common.collect.Range
 import java.time.{Instant, ZoneId, Month, LocalDate}
-import TimeUtils._
 
 case class DatedMonth(startDate: LocalDate) extends Ordered[DatedMonth] {
   TimeUtils.requireStartOfMonth(startDate)

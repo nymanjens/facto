@@ -1,16 +1,13 @@
 package common
 
-import common.I18n
 import java.lang.Math.abs
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, LocalDate, ZoneId}
 
-import common.{Clock, I18n}
-
 object Formatting {
 
   def formatDate(instant: Instant)
-                (implicit i18n: I18n) = {
+                (implicit i18n: I18n): String = {
     val zone = ZoneId.of("Europe/Paris")
     val now = Clock.now.atZone(zone).toLocalDate
     val date = instant.atZone(zone).toLocalDate
@@ -38,7 +35,7 @@ object Formatting {
     }
   }
 
-  def formatDateTime(instant: Instant) = {
+  def formatDateTime(instant: Instant): String = {
     val zone = ZoneId.of("Europe/Paris")
     DateTimeFormatter.ofPattern("d MMM yyyy, HH:mm").format(instant.atZone(zone).toLocalDate)
   }
