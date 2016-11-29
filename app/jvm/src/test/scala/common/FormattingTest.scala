@@ -1,10 +1,9 @@
-package viewhelpers
+package common
 
 import org.junit.runner._
 import org.specs2.mutable._
 import org.specs2.runner._
 import play.api.test._
-import common.{Clock, DatedMonth, MonthRange, TimeUtils}
 import common.TimeUtils.{April, August, December, February, January, July, June, March, May, November, October, September, dateAt}
 import common.testing.HookedSpecification
 import play.api.Application

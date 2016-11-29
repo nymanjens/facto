@@ -1,12 +1,11 @@
-package viewhelpers
+package common
 
 import common.I18n
 import java.lang.Math.abs
-
-import java.time.{Instant, LocalDate, Month, ZoneId}
 import java.time.format.DateTimeFormatter
+import java.time.{Instant, LocalDate, ZoneId}
 
-import common.Clock
+import common.{Clock, I18n}
 
 object Formatting {
 
