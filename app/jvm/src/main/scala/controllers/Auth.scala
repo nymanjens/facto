@@ -9,7 +9,7 @@ import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
 
 final class Auth @Inject()(implicit val messagesApi: MessagesApi,
-                           entityAccess: EntityAccess) extends Controller with I18nSupport {
+                           entityAccess: SlickEntityAccess) extends Controller with I18nSupport {
 
   // ********** actions ********** //
   def login = Action { implicit request =>
@@ -34,7 +34,7 @@ object Auth {
   // ********** forms ********** //
   object Forms {
 
-    def  loginForm(implicit entityAccess: EntityAccess) = Form(
+    def  loginForm(implicit entityAccess: SlickEntityAccess) = Form(
       tuple(
         "loginName" -> nonEmptyText,
         "password" -> text
