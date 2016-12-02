@@ -64,7 +64,7 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
       println("  Createing admin user...")
       println(s"    loginName: $loginName")
       println(s"    password: $password")
-      userManager.add(userManager.newWithUnhashedPw(loginName, password, name = "Admin"))
+      userManager.add(SlickUserManager.createUser(loginName, password, name = "Admin"))
       println("  Done. Exiting.")
 
       System.exit(0)
@@ -72,9 +72,9 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
   }
 
   private def loadDummyUsers() = {
-    userManager.add(userManager.newWithUnhashedPw(loginName = "admin", password = "a", name = "Admin"))
-    userManager.add(userManager.newWithUnhashedPw(loginName = "alice", password = "a", name = "Alice"))
-    userManager.add(userManager.newWithUnhashedPw(loginName = "bob", password = "b", name = "Bob"))
+    userManager.add(SlickUserManager.createUser(loginName = "admin", password = "a", name = "Admin"))
+    userManager.add(SlickUserManager.createUser(loginName = "alice", password = "a", name = "Alice"))
+    userManager.add(SlickUserManager.createUser(loginName = "bob", password = "b", name = "Bob"))
   }
 
   private def loadCsvDummyData(csvDataFolder: Path) = {

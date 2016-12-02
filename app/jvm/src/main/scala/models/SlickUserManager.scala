@@ -23,10 +23,27 @@ final class SlickUserManager extends ForwardingEntityManager[User, Users](
       case Seq(u) => Option(u)
     }
   }
+
+  def authenticate(loginName: String, password: String): Boolean = {
+    findByLoginName(loginName) match {
+      case Some(user) if user.passwordHash == SlickUserManager.hash(password) => true
+      case _ => false
+    }
+  }
 }
 
 object SlickUserManager {
   private val tableName: String = "USERS"
+
+  def createUser(loginName: String, password: String, name: String): User = {
+    User(loginName, SlickUserManager.hash(password), name)
+  }
+
+  def copyUserWithPassword(user: User, password: String): User = {
+    user.copy(passwordHash = hash(password))
+  }
+
+  private def hash(password: String) = Hashing.sha512().hashString(password, Charsets.UTF_8).toString()
 
   final class Users(tag: Tag) extends EntityTable[User](tag, tableName) {
     def loginName = column[String]("loginName")

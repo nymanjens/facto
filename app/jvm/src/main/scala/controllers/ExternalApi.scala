@@ -105,7 +105,7 @@ final class ExternalApi @Inject()(implicit val messagesApi: MessagesApi,
     userManager.findByLoginName(loginName) match {
       case Some(user) => user
       case None =>
-        val user = userManager.newWithUnhashedPw(
+        val user = SlickUserManager.createUser(
           loginName = loginName,
           password = hash(clock.now.toString),
           name = Messages("facto.robot")

@@ -10,15 +10,15 @@ import play.Play.application
 import play.api.i18n.{MessagesApi, Messages, I18nSupport}
 
 import common.cache.CacheRegistry
-import models.{User, EntityAccess}
+import models.{User, EntityAccess, SlickUserManager, SlickEntityAccess}
 import controllers.accounting.Views
 import controllers.helpers.{ControllerHelperCache, AuthenticatedAction}
 import controllers.Application.Forms
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 
 final class Application @Inject()(implicit val messagesApi: MessagesApi,
-                                  userManager: User.Manager,
-                                  entityAccess: EntityAccess) extends Controller with I18nSupport {
+                                  userManager: SlickUserManager,
+                                  entityAccess: SlickEntityAccess) extends Controller with I18nSupport {
 
   // ********** actions ********** //
   def index() = AuthenticatedAction { implicit user =>
@@ -39,7 +39,7 @@ final class Application @Inject()(implicit val messagesApi: MessagesApi,
         formData => formData match {
           case ChangePasswordData(loginName, _, password, _) =>
             require(loginName == user.loginName)
-            userManager.update(user.withPasswordHashFromUnhashed(password))
+            userManager.update(SlickUserManager.copyUserWithPassword(user, password))
             val message = Messages("facto.successfully-updated-password")
             Redirect(routes.Application.profile).flashing("message" -> message)
         }
@@ -57,7 +57,7 @@ final class Application @Inject()(implicit val messagesApi: MessagesApi,
         formWithErrors => BadRequest(views.html.administration(users = userManager.fetchAll(), formWithErrors)),
         formData => formData match {
           case AddUserData(loginName, name, password, _) =>
-            userManager.add(userManager.newWithUnhashedPw(loginName, password, name))
+            userManager.add(SlickUserManager.createUser(loginName, password, name))
             val message = Messages("facto.successfully-added-user", name)
             Redirect(routes.Application.administration).flashing("message" -> message)
         }
@@ -74,7 +74,7 @@ object Application {
                                   password: String = "",
                                   passwordVerification: String = "")
 
-    def changePasswordForm(implicit entityAccess: EntityAccess) = Form(
+    def changePasswordForm(implicit entityAccess: SlickEntityAccess) = Form(
       mapping(
         "loginName" -> nonEmptyText,
         "oldPassword" -> nonEmptyText,
