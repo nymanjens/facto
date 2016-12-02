@@ -17,8 +17,8 @@ import controllers.Application.Forms
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 
 final class Application @Inject()(implicit val messagesApi: MessagesApi,
-                            userManager: User.Manager,
-                            entityAccess: EntityAccess) extends Controller with I18nSupport {
+                                  userManager: User.Manager,
+                                  entityAccess: EntityAccess) extends Controller with I18nSupport {
 
   // ********** actions ********** //
   def index() = AuthenticatedAction { implicit user =>
