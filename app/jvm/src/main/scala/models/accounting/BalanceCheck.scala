@@ -6,7 +6,7 @@ import models.accounting.config.{Config, MoneyReservoir}
 import models.accounting.money.{DatedMoney, Money}
 import models.manager.{Entity, EntityManager}
 import models.{User, EntityAccess}
-import java.time.LocalDateTime
+import common.time.LocalDateTime
 
 /** BalanceCheck entities are immutable. Just delete and create a new one when updating. */
 case class BalanceCheck(issuerId: Long,

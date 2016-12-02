@@ -13,7 +13,7 @@ import models._
 import models.accounting._
 import models.accounting.config.{MoneyReservoir, Config}
 import models.accounting.money.{DatedMoney, Money, MoneyWithGeneralCurrency}
-import java.time.LocalDateTime
+import common.time.LocalDateTime
 
 import scala.collection.immutable.Seq
 

@@ -1,7 +1,7 @@
 package models
 
 import java.time.{LocalDateTime => JavaLocalDateTime}
-import java.time.LocalDateTime
+import common.time.LocalDateTime
 import java.time.{ZoneId, LocalDate, LocalTime}
 import models.accounting.money.Money
 
@@ -36,7 +36,7 @@ object SlickUtils {
     }
     val toLocalDateTime = (sqlTimestamp: java.sql.Timestamp) => {
       val javaDate = sqlTimestamp.toInstant.atZone(zone).toLocalDateTime
-      LocalDateTime.of(javaDate.toLocalDate, javaDate.toLocalTime)
+      LocalDateTime.ofJavaLocalDateTime(javaDate)
     }
     MappedColumnType.base[LocalDateTime, java.sql.Timestamp](toSql, toLocalDateTime)
   }

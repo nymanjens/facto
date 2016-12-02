@@ -76,7 +76,7 @@ object SPAMain extends js.JSApp {
   import common.time._
   import common.time.JavaTimeImplicits._
   import java.time.Month._
-  import java.time.LocalDate
+  import common.time.LocalDateTime
   import java.time.format._
 
   @JSExport

@@ -11,7 +11,7 @@ import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.SlickUtils.LocalDateTimeToSqlDateMapper
 import models.manager.{Entity, SlickEntityManager, EntityTable, ImmutableEntityManager}
-import java.time.LocalDateTime
+import common.time.LocalDateTime
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq

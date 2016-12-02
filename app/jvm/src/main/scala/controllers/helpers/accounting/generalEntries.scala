@@ -4,7 +4,7 @@ import com.google.inject.{Inject, Singleton}
 import collection.immutable.Seq
 import scala.collection.JavaConverters._
 import com.google.common.base.{Joiner, Splitter}
-import java.time.LocalDateTime
+import common.time.LocalDateTime
 
 import com.google.common.hash.Hashing
 import common.time.JavaTimeImplicits._

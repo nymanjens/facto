@@ -3,7 +3,7 @@ package models.accounting
 import collection.immutable.Seq
 
 import com.google.inject._
-import java.time.LocalDateTime
+import common.time.LocalDateTime
 
 import common.time.Clock
 import common.ScalaUtils.objectName

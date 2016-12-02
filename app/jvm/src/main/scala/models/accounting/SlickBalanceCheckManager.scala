@@ -2,7 +2,7 @@ package models
 
 import com.google.common.hash.{HashCode, Hashing}
 import common.time.Clock
-import java.time.LocalDateTime
+import common.time.LocalDateTime
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.SlickUtils.LocalDateTimeToSqlDateMapper

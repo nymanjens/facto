@@ -8,7 +8,7 @@ import com.google.inject.Inject
 import common.ResourceFiles
 import models.accounting.money.{ExchangeRateMeasurement}
 import models._
-import java.time.LocalDateTime
+import common.time.LocalDateTime
 import play.api.{Application, Mode}
 
 import scala.collection.JavaConverters._

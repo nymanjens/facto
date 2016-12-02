@@ -2,7 +2,7 @@ package models.accounting
 
 import collection.immutable.Seq
 
-import java.time.LocalDateTime
+import common.time.LocalDateTime
 
 import common.time.Clock
 import models._
