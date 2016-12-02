@@ -83,7 +83,7 @@ object SPAMain extends js.JSApp {
   def factoPortabilityTest(): Unit = {
     out("factoPortabilityTest() starting")
 
-    val clock = new JvmClock
+    val clock = new JsClock
     out(clock.now)
 
     out(LocalDate.now)
