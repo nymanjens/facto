@@ -73,7 +73,8 @@ object SPAMain extends js.JSApp {
   }
 
   import common._
-  import common.JavaTimeImplicits._
+  import common.time._
+  import common.time.JavaTimeImplicits._
   import java.time.Month._
   import java.time.{Instant, LocalDate}
   import java.time.format._

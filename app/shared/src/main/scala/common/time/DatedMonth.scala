@@ -1,7 +1,9 @@
-package common
+package common.time
 
 import scala.collection.immutable.Seq
 import java.time.{Instant, ZoneId, Month, LocalDate}
+
+import common.I18n
 
 case class DatedMonth(startDate: LocalDate) extends Ordered[DatedMonth] {
   TimeUtils.requireStartOfMonth(startDate)

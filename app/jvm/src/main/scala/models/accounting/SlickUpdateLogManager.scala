@@ -5,7 +5,7 @@ import collection.immutable.Seq
 import com.google.inject._
 import java.time.Instant
 
-import common.Clock
+import common.time.Clock
 import common.ScalaUtils.objectName
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}

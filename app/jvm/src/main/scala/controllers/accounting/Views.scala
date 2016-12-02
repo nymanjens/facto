@@ -5,7 +5,8 @@ import scala.collection.JavaConverters._
 import com.google.common.base.Joiner
 import com.google.inject.Inject
 import play.api.mvc.{AnyContent, Controller, Flash, Request, Result}
-import common.{Clock, GetParameter, TimeUtils, I18n}
+import common.{GetParameter, I18n}
+import common.time.{Clock, TimeUtils}
 import common.CollectionUtils.toListMap
 import models._
 import models.accounting.{Tag, TagEntity}

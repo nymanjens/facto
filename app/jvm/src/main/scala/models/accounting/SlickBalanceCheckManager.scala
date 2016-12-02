@@ -1,7 +1,7 @@
 package models
 
 import com.google.common.hash.{HashCode, Hashing}
-import common.Clock
+import common.time.Clock
 import java.time.Instant
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}

@@ -1,4 +1,4 @@
-package common
+package common.time
 
 import java.time._
 import java.time.chrono.ChronoLocalDate

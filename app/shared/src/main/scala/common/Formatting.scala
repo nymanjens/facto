@@ -4,6 +4,8 @@ import java.lang.Math.abs
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, LocalDate, ZoneId}
 
+import common.time.Clock
+
 object Formatting {
 
   def formatDate(instant: Instant)

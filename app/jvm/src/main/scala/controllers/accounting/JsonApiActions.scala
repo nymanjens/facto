@@ -1,7 +1,7 @@
 package controllers.accounting
 
 import com.google.inject.Inject
-import common.{Clock, TimeUtils}
+import common.time.{Clock, TimeUtils}
 import controllers.helpers.accounting.GeneralEntry
 import models.accounting.money.{Currency, DatedMoney, ExchangeRateManager}
 import play.api.data.{FormError, Forms}

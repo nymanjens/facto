@@ -8,7 +8,7 @@ import org.junit.runner._
 import play.api.test._
 import play.api.test.Helpers._
 import models.SlickUtils.dbApi._
-import common.Clock
+import common.time.Clock
 import common.testing.TestObjects._
 import common.testing.TestUtils._
 import common.testing._

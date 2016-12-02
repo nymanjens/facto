@@ -7,7 +7,7 @@ import controllers.helpers.ControllerHelperCache.CacheIdentifier
 import models.SlickUtils.JodaToSqlDateMapper
 import models.SlickUtils.dbApi._
 
-import common.JavaTimeImplicits._
+import common.time.JavaTimeImplicits._
 import models.SlickUtils.dbRun
 import models._
 import models.accounting._

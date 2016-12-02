@@ -1,7 +1,7 @@
-package common
+package common.time
 
 import java.time.{Instant, LocalDate, Period, ZoneId, Month}
-import common.JavaTimeImplicits._
+import common.time.JavaTimeImplicits._
 
 /**
   * Represents a continuous (possibly empty) range of dated months in time space.

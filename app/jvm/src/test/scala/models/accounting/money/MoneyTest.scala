@@ -1,7 +1,7 @@
 package models.accounting.money
 
 import com.google.inject._
-import common.Clock
+import common.time.Clock
 import common.testing._
 import common.testing.TestUtils.persistGbpMeasurement
 import org.specs2.mutable._

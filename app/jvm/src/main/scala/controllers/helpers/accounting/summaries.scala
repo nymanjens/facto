@@ -9,7 +9,7 @@ import models.SlickUtils.dbApi._
 
 import play.api.Logger
 import play.twirl.api.Html
-import common.{Clock, DatedMonth, MonthRange, TimeUtils}
+import common.time.{Clock, DatedMonth, MonthRange, TimeUtils}
 import common.CollectionUtils.toListMap
 import common.GuavaUtils.asGuava
 import models.SlickUtils.{JodaToSqlDateMapper, dbRun}

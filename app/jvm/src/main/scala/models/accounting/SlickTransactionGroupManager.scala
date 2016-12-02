@@ -2,7 +2,7 @@ package models.accounting
 
 import scala.collection.immutable.Seq
 import java.time.Instant
-import common.Clock
+import common.time.Clock
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.SlickUtils.dbRun

@@ -3,7 +3,7 @@ package controllers
 import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
 import com.google.inject.Inject
-import common.{Clock, TimeUtils}
+import common.time.{Clock, TimeUtils}
 import models.accounting._
 import models.accounting.config.{Account, Config}
 import models.accounting.money.{Currency, ExchangeRateMeasurement}

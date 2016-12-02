@@ -3,7 +3,7 @@ package models.accounting
 import com.google.inject._
 import com.google.common.base.Splitter
 import com.google.common.hash.{HashCode, Hashing}
-import common.Clock
+import common.time.Clock
 import models.SlickUtils.JodaToSqlDateMapper
 import models.SlickUtils.dbRun
 import models.SlickUtils.dbApi._

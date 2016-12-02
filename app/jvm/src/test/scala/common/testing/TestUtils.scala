@@ -3,7 +3,7 @@ package common.testing
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import java.time.Instant
-import common.Clock
+import common.time.Clock
 import common.testing.TestObjects._
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.accounting.money.Currency.Gbp

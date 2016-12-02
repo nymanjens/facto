@@ -5,7 +5,7 @@ import collection.immutable.Seq
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
 
-import common.Clock
+import common.time.Clock
 import models.accounting.config.{MoneyReservoir, Account, Category, Config, ConfigModule}
 import models.accounting.{Transaction, TransactionGroup, BalanceCheck}
 import models.EntityManagersModule

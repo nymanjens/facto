@@ -2,7 +2,7 @@ package models.accounting
 
 import com.google.inject._
 import scala.collection.immutable.Seq
-import common.Clock
+import common.time.Clock
 import common.testing._
 import models._
 import models.accounting._

@@ -1,7 +1,7 @@
 package models.accounting.money
 
 import com.google.inject._
-import common.Clock
+import common.time.Clock
 import Currency.{Eur, Gbp, Usd}
 import common.cache.CacheRegistry
 import common.testing._

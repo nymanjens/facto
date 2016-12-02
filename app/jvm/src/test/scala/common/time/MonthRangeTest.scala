@@ -1,4 +1,4 @@
-package common
+package common.time
 
 import org.specs2.mutable._
 import common.TimeUtils.{May, June, February, April, March, dateAt}

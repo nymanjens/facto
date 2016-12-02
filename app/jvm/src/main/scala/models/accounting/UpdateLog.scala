@@ -4,7 +4,7 @@ import collection.immutable.Seq
 
 import java.time.Instant
 
-import common.Clock
+import common.time.Clock
 import models._
 import models.manager.{EntityManager, Entity}
 import models.accounting.config.Config

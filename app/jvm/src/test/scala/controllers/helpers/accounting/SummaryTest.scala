@@ -9,7 +9,7 @@ import org.specs2.mutable._
 import org.specs2.runner._
 import play.api.test._
 import play.twirl.api.Html
-import common.{Clock, DatedMonth, MonthRange, TimeUtils}
+import common.time.{Clock, DatedMonth, MonthRange, TimeUtils}
 import common.TimeUtils.{April, February, January, March, May, dateAt}
 import common.testing.TestObjects._
 import common.testing.TestUtils._

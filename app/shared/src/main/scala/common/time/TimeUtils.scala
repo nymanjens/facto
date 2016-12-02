@@ -1,4 +1,4 @@
-package common
+package common.time
 
 import scala.collection.immutable.Seq
 import java.time.{Instant, LocalDate, Month, ZoneId}
