@@ -5,8 +5,10 @@ import tools.ApplicationStartHook
 import models.accounting._
 import models.accounting.money._
 
-final class EntityManagersModule extends AbstractModule {
+final class ModelsModule extends AbstractModule {
   override def configure() = {
+    bind(classOf[EntityAccess]).to(classOf[SlickEntityAccess])
+
     bindSingleton(classOf[User.Manager], classOf[SlickUserManager])
     bindSingleton(classOf[BalanceCheck.Manager], classOf[SlickBalanceCheckManager])
     bindSingleton(classOf[TagEntity.Manager], classOf[SlickTagEntityManager])

@@ -8,13 +8,13 @@ import play.api.test.Helpers._
 import common.time.Clock
 import models.accounting.config.{MoneyReservoir, Account, Category, Config, ConfigModule}
 import models.accounting.{Transaction, TransactionGroup, BalanceCheck}
-import models.EntityManagersModule
+import models.ModelsModule
 
 final class FactoTestModule extends AbstractModule {
 
   override def configure() = {
     install(new ConfigModule)
-    install(new EntityManagersModule)
+    install(new ModelsModule)
   }
 
   @Provides()
