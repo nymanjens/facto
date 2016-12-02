@@ -13,7 +13,7 @@ import models.accounting.config.{Category, Account, MoneyReservoir}
 /** UpdateLog entities are immutable. */
 case class UpdateLog(userId: Long,
                      change: String,
-                     date: LocalDateTime = clock.now,
+                     date: LocalDateTime,
                      idOption: Option[Long] = None) extends Entity[UpdateLog] {
   require(userId > 0)
   require(!change.isEmpty)

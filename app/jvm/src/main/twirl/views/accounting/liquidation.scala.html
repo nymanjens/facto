@@ -1,5 +1,6 @@
 @import scala.collection.immutable.Seq
 
+@import common.time.Clock
 @import common._
 @import models.User
 @import models.accounting.money.{Currency, Money, ExchangeRateManager}
@@ -14,7 +15,7 @@
   expandedNumEntries: Int,
   templatesInNavbar: Seq[Template]
 )(
-  implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash, config: Config, entityAccess: EntityAccess, exchangeRateManager: ExchangeRateManager, i18n: I18n
+  implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash, config: Config, entityAccess: EntityAccess, exchangeRateManager: ExchangeRateManager, i18n: I18n, clock: Clock
 )
 
 @Main(Messages("facto.liquidation"), templatesInNavbar = templatesInNavbar) {

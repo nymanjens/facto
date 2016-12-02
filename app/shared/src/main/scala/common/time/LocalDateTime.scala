@@ -20,7 +20,6 @@
 //public static final LocalDateTime MAX = LocalDateTime.of(LocalDate.MAX, LocalTime.MAX);
 //
 //  def of(localDate: LocalDate, localTime: LocalTime): LocalDateTime = LocalDateTimeImpl(localDate, localTime)
-//  def of(localDate: LocalDate): LocalDateTime = LocalDateTimeImpl(localDate, LocalTime.MIN)
 //
 //  private case class LocalDateTimeImpl(private val localDate: LocalDate,
 //                                       private val localTime: LocalTime) extends LocalDateTime {

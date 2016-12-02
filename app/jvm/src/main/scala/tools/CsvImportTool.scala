@@ -4,10 +4,12 @@ import scala.io.Source
 import scala.collection.JavaConverters._
 import java.nio.file.Path
 
+import common.time.Clock
 import com.google.inject.Inject
 import play.api.Logger
 import com.google.common.base.Splitter
 import java.time.LocalDateTime
+import java.time.Instant
 import common.ResourceFiles
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
@@ -16,6 +18,7 @@ import models.accounting.money.Money
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 
 final class CsvImportTool @Inject()(implicit userManager: User.Manager,
+                                    clock: Clock,
                                     entityAccess: EntityAccess) {
 
   def importTransactions(csvFilePath: Path): Unit = {
@@ -36,9 +39,9 @@ final class CsvImportTool @Inject()(implicit userManager: User.Manager,
             description = description,
             flowInCents = Money.floatToCents(flowAsFloat.toDouble),
             tagsString = s"csv-import-$beneficiaryAccountCode",
-            createdDate = LocalDateTime.ofEpochMilli(createdDateStamp.toLong * 1000),
-            transactionDate = LocalDateTime.ofEpochMilli(transactionDateStamp.toLong * 1000),
-            consumedDate = LocalDateTime.ofEpochMilli(if (consumedDateStamp.toLong == 0) transactionDateStamp.toLong * 1000 else consumedDateStamp.toLong * 1000)
+            createdDate = epochSecondsToDateTime(createdDateStamp.toLong),
+            transactionDate = epochSecondsToDateTime(transactionDateStamp.toLong),
+            consumedDate = epochSecondsToDateTime(if (consumedDateStamp.toLong == 0) transactionDateStamp.toLong else consumedDateStamp.toLong)
           ))
       }
     }
@@ -56,10 +59,17 @@ final class CsvImportTool @Inject()(implicit userManager: User.Manager,
             issuerId = issuerId.toInt,
             moneyReservoirCode = moneyReservoirCode,
             balanceInCents = Money.floatToCents(balanceAsFloat.toDouble),
-            createdDate = LocalDateTime.ofEpochMilli(createdDateStamp.toLong * 1000),
-            checkDate = LocalDateTime.ofEpochMilli(checkDateStamp.toLong * 1000)
+            createdDate = epochSecondsToDateTime(createdDateStamp.toLong),
+            checkDate = epochSecondsToDateTime(checkDateStamp.toLong)
           ))
       }
     }
+  }
+
+  private def epochSecondsToDateTime(epochSeconds: Long): LocalDateTime = {
+    val instant = Instant.ofEpochSecond(epochSeconds)
+    val zone = java.time.Clock.systemDefaultZone().getZone
+    val javaDateTime = instant.atZone(zone).toLocalDateTime
+    LocalDateTime.of(javaDateTime.toLocalDate, javaDateTime.toLocalTime)
   }
 }

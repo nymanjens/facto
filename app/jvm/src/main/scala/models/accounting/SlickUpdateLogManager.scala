@@ -18,7 +18,8 @@ import models.accounting.config.{Category, Account, MoneyReservoir}
 import UpdateLog.UpdateOperation
 import SlickUpdateLogManager.{UpdateLogs, tableName}
 
-final class SlickUpdateLogManager @Inject()(implicit accountingConfig: Config) extends ImmutableEntityManager[UpdateLog, UpdateLogs](
+final class SlickUpdateLogManager @Inject()(implicit accountingConfig: Config,
+                                            clock: Clock) extends ImmutableEntityManager[UpdateLog, UpdateLogs](
   SlickEntityManager.create[UpdateLog, UpdateLogs](
     tag => new UpdateLogs(tag),
     tableName = tableName
@@ -55,7 +56,7 @@ final class SlickUpdateLogManager @Inject()(implicit accountingConfig: Config) e
   private def addLog(user: User, operation: UpdateOperation, newOrDeletedValueString: String): Unit = {
     val operationName = objectName(operation)
     val change = s"$operationName $newOrDeletedValueString"
-    add(UpdateLog(user.id, change))
+    add(UpdateLog(user.id, change, date = clock.now))
   }
 }
 object SlickUpdateLogManager {

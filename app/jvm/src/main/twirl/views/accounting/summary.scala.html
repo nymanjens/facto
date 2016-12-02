@@ -17,7 +17,7 @@
   tags: Seq[Tag],
   tagsString: String
 )(
-  implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash, tagEntityManager: TagEntity.Manager, config: Config, entityAccess: EntityAccess, exchangeRateManager: ExchangeRateManager, i18n: I18n
+  implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash, tagEntityManager: TagEntity.Manager, config: Config, entityAccess: EntityAccess, exchangeRateManager: ExchangeRateManager, i18n: I18n, clock: Clock
 )
 
 @Main(Messages("facto.summary"), templatesInNavbar = templatesInNavbar) {

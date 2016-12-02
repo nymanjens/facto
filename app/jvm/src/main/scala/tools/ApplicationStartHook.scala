@@ -1,6 +1,6 @@
 package tools
 
-import java.time.{LocalDate, Month}
+import java.time.{LocalDate, Month, LocalTime}
 import java.time.Month.JANUARY
 import java.nio.file.{Files, Path, Paths}
 
@@ -81,7 +81,7 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
     csvImportTool.importTransactions(assertExists(csvDataFolder resolve "transactions.csv"))
     csvImportTool.importBalanceChecks(assertExists(csvDataFolder resolve "balancechecks.csv"))
     entityAccess.exchangeRateMeasurementManager.add(ExchangeRateMeasurement(
-      date = LocalDateTime.of(LocalDate.of(1990, JANUARY, 1)),
+      date = LocalDateTime.of(LocalDate.of(1990, JANUARY, 1), LocalTime.MIN),
       foreignCurrencyCode = "GBP",
       ratioReferenceToForeignCurrency = 1.2))
   }
