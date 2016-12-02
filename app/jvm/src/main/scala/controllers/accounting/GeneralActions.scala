@@ -6,6 +6,7 @@ import play.api.mvc._
 
 import play.api.i18n.{MessagesApi, Messages, I18nSupport}
 import common.time.Clock
+import common._
 import models._
 import models.accounting.UpdateLog
 import models.accounting.config.{Config, Template}
@@ -15,7 +16,8 @@ final class GeneralActions @Inject()(implicit val messagesApi: MessagesApi,
                                      clock: Clock,
                                      accountingConfig: Config,
                                      entityAccess: EntityAccess,
-                                     generalEntries: GeneralEntries) extends Controller with I18nSupport {
+                                     generalEntries: GeneralEntries,
+                                     i18n: I18n) extends Controller with I18nSupport {
 
   // ********** actions ********** //
   def searchMostRelevant(q: String) = AuthenticatedAction { implicit user =>
