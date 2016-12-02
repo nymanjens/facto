@@ -25,18 +25,20 @@ object LocalDateTime {
     LocalDateTime.of(javaDateTime.toLocalDate, javaDateTime.toLocalTime)
   }
 
-  private case class LocalDateTimeImpl(private val localDate: LocalDate,
-                                       private val localTime: LocalTime) extends LocalDateTime {
-    requireNonNull(localDate, localTime)
+  private case class LocalDateTimeImpl(private val date: LocalDate,
+                                       private val time: LocalTime) extends LocalDateTime {
+    requireNonNull(date, time)
 
-    override def toLocalDate = localDate
-    override def toLocalTime = localTime
-    override def getYear = localDate.getYear
-    override def getMonth = localDate.getMonth
+    override def toLocalDate = date
+    override def toLocalTime = time
+    override def getYear = date.getYear
+    override def getMonth = date.getMonth
+
+    override def toString = s"$date $time"
 
     override def compareTo(other: LocalDateTime): Int = {
-      var cmp = this.localDate.compareTo(other.toLocalDate)
-      if (cmp == 0) cmp = this.localTime.compareTo(other.toLocalTime)
+      var cmp = this.date.compareTo(other.toLocalDate)
+      if (cmp == 0) cmp = this.time.compareTo(other.toLocalTime)
       cmp
     }
   }
