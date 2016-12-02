@@ -4,7 +4,6 @@ import common.CollectionUtils.toListMap
 import models.manager.{Entity, EntityManager}
 import models.EntityAccess
 
-import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
 import scala.collection.immutable.ListMap
 
