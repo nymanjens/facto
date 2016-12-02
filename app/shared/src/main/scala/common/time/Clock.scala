@@ -1,21 +1,8 @@
 package common.time
 
-import java.time.Instant
+import java.time.LocalDateTime
 
-object Clock {
+trait Clock {
 
-  @volatile private var timeOverride: Option[Instant] = None
-
-  def now: Instant = timeOverride match {
-    case Some(date) => date
-    case None => Instant.now()
-  }
-
-  def setTimeForTest(date: Instant): Unit = {
-    timeOverride = Some(date)
-  }
-
-  def cleanupAfterTest(): Unit = {
-    timeOverride = None
-  }
+  def now: LocalDateTime
 }

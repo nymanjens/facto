@@ -7,7 +7,7 @@ import java.nio.file.Path
 import com.google.inject.Inject
 import play.api.Logger
 import com.google.common.base.Splitter
-import java.time.Instant
+import java.time.LocalDateTime
 import common.ResourceFiles
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
@@ -26,7 +26,7 @@ final class CsvImportTool @Inject()(implicit userManager: User.Manager,
       parts match {
         case List(issuerId, beneficiaryAccountCode, categoryCode, moneyReservoirCode, description, flowAsFloat,
         transactionDateStamp, consumedDateStamp, createdDateStamp) =>
-          val group = entityAccess.transactionGroupManager.add(TransactionGroup())
+          val group = entityAccess.transactionGroupManager.add(TransactionGroup(createdDate = clock.now))
           entityAccess.transactionManager.add(Transaction(
             transactionGroupId = group.id,
             issuerId = issuerId.toInt,
@@ -36,9 +36,9 @@ final class CsvImportTool @Inject()(implicit userManager: User.Manager,
             description = description,
             flowInCents = Money.floatToCents(flowAsFloat.toDouble),
             tagsString = s"csv-import-$beneficiaryAccountCode",
-            createdDate = Instant.ofEpochMilli(createdDateStamp.toLong * 1000),
-            transactionDate = Instant.ofEpochMilli(transactionDateStamp.toLong * 1000),
-            consumedDate = Instant.ofEpochMilli(if (consumedDateStamp.toLong == 0) transactionDateStamp.toLong * 1000 else consumedDateStamp.toLong * 1000)
+            createdDate = LocalDateTime.ofEpochMilli(createdDateStamp.toLong * 1000),
+            transactionDate = LocalDateTime.ofEpochMilli(transactionDateStamp.toLong * 1000),
+            consumedDate = LocalDateTime.ofEpochMilli(if (consumedDateStamp.toLong == 0) transactionDateStamp.toLong * 1000 else consumedDateStamp.toLong * 1000)
           ))
       }
     }
@@ -51,13 +51,13 @@ final class CsvImportTool @Inject()(implicit userManager: User.Manager,
       val parts = Splitter.on(" :: ").trimResults().split(line).asScala.toList
       parts match {
         case List(issuerId, moneyReservoirCode, balanceAsFloat, checkDateStamp, createdDateStamp) =>
-          val group = entityAccess.transactionGroupManager.add(TransactionGroup())
+          val group = entityAccess.transactionGroupManager.add(TransactionGroup(createdDate = clock.now))
           entityAccess.balanceCheckManager.add(BalanceCheck(
             issuerId = issuerId.toInt,
             moneyReservoirCode = moneyReservoirCode,
             balanceInCents = Money.floatToCents(balanceAsFloat.toDouble),
-            createdDate = Instant.ofEpochMilli(createdDateStamp.toLong * 1000),
-            checkDate = Instant.ofEpochMilli(checkDateStamp.toLong * 1000)
+            createdDate = LocalDateTime.ofEpochMilli(createdDateStamp.toLong * 1000),
+            checkDate = LocalDateTime.ofEpochMilli(checkDateStamp.toLong * 1000)
           ))
       }
     }

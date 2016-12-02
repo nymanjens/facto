@@ -11,7 +11,7 @@ import com.google.common.collect.Iterables
 import com.google.common.math.DoubleMath.roundToLong
 import models.accounting.config.Config
 import models.accounting.money.CentOperations.CentOperationsNumeric
-import java.time.Instant
+import java.time.LocalDateTime
 import play.twirl.api.Html
 
 import scala.collection.JavaConverters._
@@ -22,7 +22,7 @@ import java.math.RoundingMode.HALF_EVEN
   *
   * The date allows the instance to be converted into other currences with the exchange rate of that day.
   */
-case class DatedMoney(override val cents: Long, override val currency: Currency, date: Instant) extends MoneyWithGeneralCurrency {
+case class DatedMoney(override val cents: Long, override val currency: Currency, date: LocalDateTime) extends MoneyWithGeneralCurrency {
 
   override def toHtmlWithCurrency(implicit exchangeRateManager: ExchangeRateManager): Html = {
     import Money.SummableHtml

@@ -4,7 +4,7 @@ import com.google.inject._
 import com.google.common.base.Splitter
 import com.google.common.hash.{HashCode, Hashing}
 import common.time.Clock
-import models.SlickUtils.JodaToSqlDateMapper
+import models.SlickUtils.LocalDateTimeToSqlDateMapper
 import models.SlickUtils.dbRun
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}
@@ -12,7 +12,7 @@ import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.accounting.money.{DatedMoney, Money}
 import models.manager.{Entity, SlickEntityManager, EntityTable, ImmutableEntityManager}
 import models._
-import java.time.Instant
+import java.time.LocalDateTime
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
@@ -71,9 +71,9 @@ object SlickTransactionManager {
     def flow = column[Long]("flow")
     def detailDescription = column[String]("detailDescription")
     def tagsString = column[String]("tagsString")
-    def createdDate = column[Instant]("createdDate")
-    def transactionDate = column[Instant]("transactionDate")
-    def consumedDate = column[Instant]("consumedDate")
+    def createdDate = column[LocalDateTime]("createdDate")
+    def transactionDate = column[LocalDateTime]("transactionDate")
+    def consumedDate = column[LocalDateTime]("consumedDate")
 
     override def * = (transactionGroupId, issuerId, beneficiaryAccountCode, moneyReservoirCode, categoryCode, description, flow,
       detailDescription, tagsString, createdDate, transactionDate, consumedDate, id.?) <> (Transaction.tupled, Transaction.unapply)

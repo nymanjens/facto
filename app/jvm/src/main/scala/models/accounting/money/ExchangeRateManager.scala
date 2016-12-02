@@ -5,7 +5,7 @@ import java.util.{NavigableMap, TreeMap}
 
 import common.cache.CacheRegistry
 import org.apache.http.annotation.GuardedBy
-import java.time.Instant
+import java.time.LocalDateTime
 
 import scala.collection.mutable
 
@@ -20,10 +20,10 @@ final class ExchangeRateManager @Inject() (implicit exchangeRateMeasurementManag
   exchangeRateMeasurementManager.addListener(measurementWasAdded)
 
   @GuardedBy("lock")
-  private val measurementsCache: mutable.Map[Currency, NavigableMap[Instant, Double]] = mutable.Map()
+  private val measurementsCache: mutable.Map[Currency, NavigableMap[LocalDateTime, Double]] = mutable.Map()
   private val lock = new Object
 
-  def getRatioSecondToFirstCurrency(firstCurrency: Currency, secondCurrency: Currency, date: Instant): Double = {
+  def getRatioSecondToFirstCurrency(firstCurrency: Currency, secondCurrency: Currency, date: LocalDateTime): Double = {
     (firstCurrency, secondCurrency) match {
       case (Currency.default, Currency.default) => 1.0
       case (foreignCurrency, Currency.default) =>
@@ -36,7 +36,7 @@ final class ExchangeRateManager @Inject() (implicit exchangeRateMeasurementManag
     }
   }
 
-  private def ratioReferenceToForeignCurrency(currency: Currency, date: Instant): Double = lock.synchronized {
+  private def ratioReferenceToForeignCurrency(currency: Currency, date: LocalDateTime): Double = lock.synchronized {
     if (!(measurementsCache contains currency)) {
       measurementsCache.put(currency, fetchNavigableMap(currency))
     }
@@ -71,8 +71,8 @@ final class ExchangeRateManager @Inject() (implicit exchangeRateMeasurementManag
     measurementsCache.clear()
   }
 
-  private def fetchNavigableMap(currency: Currency): NavigableMap[Instant, Double] = {
-    val map = new TreeMap[Instant, Double]()
+  private def fetchNavigableMap(currency: Currency): NavigableMap[LocalDateTime, Double] = {
+    val map = new TreeMap[LocalDateTime, Double]()
     for (measurement <- exchangeRateMeasurementManager.fetchAll(currency)) {
       map.put(measurement.date, measurement.ratioReferenceToForeignCurrency)
     }

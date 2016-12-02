@@ -1,6 +1,7 @@
 package common.time
 
-import java.time.{Instant, LocalDate, Period, ZoneId, Month}
+import java.time.LocalDateTime
+import java.time.{LocalDate, Period, ZoneId, Month}
 import common.time.JavaTimeImplicits._
 
 /**
@@ -30,10 +31,7 @@ case class MonthRange(start: LocalDate, startOfNextMonth: LocalDate) {
 
   def contains(month: DatedMonth): Boolean = contains(month.startDate)
 
-  def contains(instant: Instant): Boolean = {
-    val zone = ZoneId.of("Europe/Paris")
-    contains(instant.atZone(zone).toLocalDate)
-  }
+  def contains(dateTime: LocalDateTime): Boolean = contains(dateTime.toLocalDate)
 }
 
 object MonthRange {

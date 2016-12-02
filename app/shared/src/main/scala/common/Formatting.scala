@@ -2,17 +2,18 @@ package common
 
 import java.lang.Math.abs
 import java.time.format.DateTimeFormatter
-import java.time.{Instant, LocalDate, ZoneId}
+import java.time.LocalDateTime
+import java.time.{LocalDate, ZoneId}
 
 import common.time.Clock
 
 object Formatting {
 
-  def formatDate(instant: Instant)
-                (implicit i18n: I18n): String = {
+  def formatDate(dateTime: LocalDateTime)
+                (implicit i18n: I18n, clock: Clock): String = {
     val zone = ZoneId.of("Europe/Paris")
-    val now = Clock.now.atZone(zone).toLocalDate
-    val date = instant.atZone(zone).toLocalDate
+    val now = clock.now.toLocalDate
+    val date = dateTime.toLocalDate
 
     val yearString = DateTimeFormatter.ofPattern("yy").format(date)
     val dayMonthString = DateTimeFormatter.ofPattern("d").format(date) + " " + extractMonth(date)
@@ -37,9 +38,9 @@ object Formatting {
     }
   }
 
-  def formatDateTime(instant: Instant): String = {
+  def formatDateTime(dateTime: LocalDateTime): String = {
     val zone = ZoneId.of("Europe/Paris")
-    DateTimeFormatter.ofPattern("d MMM yyyy, HH:mm").format(instant.atZone(zone).toLocalDate)
+    DateTimeFormatter.ofPattern("d MMM yyyy, HH:mm").format(dateTime.toLocalDate)
   }
 
   private def extractDayOfWeek(date: LocalDate)

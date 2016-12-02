@@ -1,7 +1,9 @@
 package common.time
 
+import java.time.LocalDateTime
 import scala.collection.immutable.Seq
-import java.time.{Instant, ZoneId, Month, LocalDate}
+import java.time.LocalDateTime
+import java.time.{ZoneId, Month, LocalDate}
 
 import common.I18n
 
@@ -14,9 +16,7 @@ case class DatedMonth(startDate: LocalDate) extends Ordered[DatedMonth] {
     i18n(code)
   }
 
-  def contains(instant: Instant): Boolean = {
-    val zone = ZoneId.of("Europe/Paris")
-    val date = instant.atZone(zone)
+  def contains(date: LocalDateTime): Boolean = {
     date.getYear == startDate.getYear && date.getMonth == startDate.getMonth
   }
 
@@ -44,11 +44,7 @@ object DatedMonth {
     DatedMonth(startOfMonthContaining(date))
   }
 
-  def containing(instant: Instant): DatedMonth = {
-    val zone = ZoneId.of("Europe/Paris")
-    val date = instant.atZone(zone).toLocalDate
-    DatedMonth(startOfMonthContaining(date))
-  }
+  def containing(dateTime: LocalDateTime): DatedMonth = containing(dateTime.toLocalDate)
 
   def allMonthsIn(year: Int): Seq[DatedMonth] = {
     Month.values()

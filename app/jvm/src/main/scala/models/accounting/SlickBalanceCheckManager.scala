@@ -2,10 +2,10 @@ package models
 
 import com.google.common.hash.{HashCode, Hashing}
 import common.time.Clock
-import java.time.Instant
+import java.time.LocalDateTime
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}
-import models.SlickUtils.JodaToSqlDateMapper
+import models.SlickUtils.LocalDateTimeToSqlDateMapper
 import models.accounting.config.{Config, MoneyReservoir}
 import models.accounting.money.{DatedMoney, Money}
 import models._
@@ -27,8 +27,8 @@ object SlickBalanceCheckManager {
     def issuerId = column[Long]("issuerId")
     def moneyReservoirCode = column[String]("moneyReservoirCode")
     def balance = column[Long]("balance")
-    def createdDate = column[Instant]("createdDate")
-    def checkDate = column[Instant]("checkDate")
+    def createdDate = column[LocalDateTime]("createdDate")
+    def checkDate = column[LocalDateTime]("checkDate")
 
     override def * = (issuerId, moneyReservoirCode, balance, createdDate, checkDate, id.?) <> (BalanceCheck.tupled, BalanceCheck.unapply)
   }

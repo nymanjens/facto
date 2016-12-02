@@ -1,13 +1,14 @@
 package tools
 
-import java.time.{Instant, LocalDate, Month, ZoneId}
+import java.time.{LocalDate, Month}
+import java.time.Month.JANUARY
 import java.nio.file.{Files, Path, Paths}
 
 import com.google.inject.Inject
 import common.ResourceFiles
 import models.accounting.money.{ExchangeRateMeasurement}
 import models._
-import java.time.Instant
+import java.time.LocalDateTime
 import play.api.{Application, Mode}
 
 import scala.collection.JavaConverters._
@@ -79,9 +80,8 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
   private def loadCsvDummyData(csvDataFolder: Path) = {
     csvImportTool.importTransactions(assertExists(csvDataFolder resolve "transactions.csv"))
     csvImportTool.importBalanceChecks(assertExists(csvDataFolder resolve "balancechecks.csv"))
-    val zone = ZoneId.of("Europe/Paris")
     entityAccess.exchangeRateMeasurementManager.add(ExchangeRateMeasurement(
-      date = LocalDate.of(1990, 1, 1).atStartOfDay(zone).toInstant, // Jan 1, 1990
+      date = LocalDateTime.of(LocalDate.of(1990, JANUARY, 1)),
       foreignCurrencyCode = "GBP",
       ratioReferenceToForeignCurrency = 1.2))
   }

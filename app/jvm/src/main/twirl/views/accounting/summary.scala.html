@@ -81,7 +81,7 @@
                 @if(year == expandedYear) {
                   @for(month <- summaryForYear.months) {
                     <td class="cell
-                        @if(month.contains(Clock.now)) {current-month}
+                        @if(month.contains(clock.now)) {current-month}
                         @if(summary.monthRangeForAverages.contains(month)) {month-for-averages}">
                       @UpperRightCorner{ @* centralContent *@
                         @{summaryForYear.cell(category, month).totalFlow match {
@@ -127,7 +127,7 @@
                 @if(year == expandedYear) {
                   @for((month, totalThisMonth) <- summaryForYear.totalRows(rowIndex).monthToTotal) {
                     <td class="cell
-                        @if(month.contains(Clock.now)) {current-month}
+                        @if(month.contains(clock.now)) {current-month}
                         @if(summary.monthRangeForAverages.contains(month)) {month-for-averages}">
                       @if(totalThisMonth.cents != 0) { @totalThisMonth.formatFloat }
                     </td>

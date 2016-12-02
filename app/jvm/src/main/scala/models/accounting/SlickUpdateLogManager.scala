@@ -3,14 +3,14 @@ package models.accounting
 import collection.immutable.Seq
 
 import com.google.inject._
-import java.time.Instant
+import java.time.LocalDateTime
 
 import common.time.Clock
 import common.ScalaUtils.objectName
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models._
-import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
+import models.SlickUtils.{LocalDateTimeToSqlDateMapper, dbRun}
 import models.manager.{EntityTable, ImmutableEntityManager, Entity, SlickEntityManager}
 import models.accounting.config.Config
 import models.accounting.config.{Category, Account, MoneyReservoir}
@@ -64,7 +64,7 @@ object SlickUpdateLogManager {
   final class UpdateLogs(tag: SlickTag) extends EntityTable[UpdateLog](tag, tableName) {
     def userId = column[Long]("userId")
     def change = column[String]("change")
-    def date = column[Instant]("date")
+    def date = column[LocalDateTime]("date")
 
     override def * = (userId, change, date, id.?) <> (UpdateLog.tupled, UpdateLog.unapply)
   }

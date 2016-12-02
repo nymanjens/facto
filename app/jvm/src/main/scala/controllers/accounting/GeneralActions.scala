@@ -5,12 +5,14 @@ import controllers.helpers.accounting.{GeneralEntry, GeneralEntries}
 import play.api.mvc._
 
 import play.api.i18n.{MessagesApi, Messages, I18nSupport}
+import common.time.Clock
 import models._
 import models.accounting.UpdateLog
 import models.accounting.config.{Config, Template}
 import controllers.helpers.AuthenticatedAction
 
 final class GeneralActions @Inject()(implicit val messagesApi: MessagesApi,
+                                     clock: Clock,
                                      accountingConfig: Config,
                                      entityAccess: EntityAccess,
                                      generalEntries: GeneralEntries) extends Controller with I18nSupport {

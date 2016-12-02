@@ -18,6 +18,7 @@ import controllers.helpers.accounting._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 
 final class Views @Inject()(implicit val messagesApi: MessagesApi,
+                            clock: Clock,
                             accountingConfig: Config,
                             generalEntries: GeneralEntries,
                             cashFlowEntries: CashFlowEntries,
@@ -99,7 +100,7 @@ final class Views @Inject()(implicit val messagesApi: MessagesApi,
     implicit request =>
       summary(
         accounts = accountingConfig.personallySortedAccounts,
-        expandedYear = TimeUtils.yearAt(Clock.now),
+        expandedYear = clock.now.getYear,
         tagsString = tags,
         toggleTag = toggleTag)
   }

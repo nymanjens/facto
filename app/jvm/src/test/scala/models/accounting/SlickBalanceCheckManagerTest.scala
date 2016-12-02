@@ -48,7 +48,7 @@ class SlickBalanceCheckManagerTest extends HookedSpecification {
       issuerId = user2.id,
       moneyReservoirCode = "ACC_B",
       balanceInCents = 999,
-      checkDate = Clock.now
+      checkDate = clock.now
     ))
 
     // do basic checks

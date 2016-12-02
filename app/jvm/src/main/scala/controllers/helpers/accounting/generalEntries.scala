@@ -4,11 +4,12 @@ import com.google.inject.{Inject, Singleton}
 import collection.immutable.Seq
 import scala.collection.JavaConverters._
 import com.google.common.base.{Joiner, Splitter}
-import java.time.Instant
+import java.time.LocalDateTime
 
 import com.google.common.hash.Hashing
+import common.time.JavaTimeImplicits._
 import models.SlickUtils.dbApi._
-import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
+import models.SlickUtils.{LocalDateTimeToSqlDateMapper, dbRun}
 import models.accounting.{Transaction, SlickTransactionManager}
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import controllers.helpers.ControllerHelperCache
@@ -101,7 +102,7 @@ final class GeneralEntries @Inject()(implicit accountingConfig: Config,
   }
 }
 
-private case class QueryScore(scoreNumber: Double, createdDate: Instant, transactionDate: Instant) {
+private case class QueryScore(scoreNumber: Double, createdDate: LocalDateTime, transactionDate: LocalDateTime) {
   def matchesQuery: Boolean = scoreNumber > 0
 }
 private object QueryScore {

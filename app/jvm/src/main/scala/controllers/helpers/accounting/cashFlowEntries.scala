@@ -4,7 +4,7 @@ import com.google.inject.{Inject, Singleton}
 import com.google.common.hash.Hashing
 import controllers.helpers.ControllerHelperCache
 import controllers.helpers.ControllerHelperCache.CacheIdentifier
-import models.SlickUtils.JodaToSqlDateMapper
+import models.SlickUtils.LocalDateTimeToSqlDateMapper
 import models.SlickUtils.dbApi._
 
 import common.time.JavaTimeImplicits._
@@ -13,7 +13,7 @@ import models._
 import models.accounting._
 import models.accounting.config.{MoneyReservoir, Config}
 import models.accounting.money.{DatedMoney, Money, MoneyWithGeneralCurrency}
-import java.time.Instant
+import java.time.LocalDateTime
 
 import scala.collection.immutable.Seq
 
@@ -42,7 +42,7 @@ final class CashFlowEntries @Inject()(implicit accountingConfig: Config,
     */
   def fetchLastNEntries(moneyReservoir: MoneyReservoir, n: Int): Seq[CashFlowEntry] =
   ControllerHelperCache.cached(FetchLastNEntries(moneyReservoir, n)) {
-    val (oldestBalanceDate, initialBalance): (Instant, MoneyWithGeneralCurrency) = {
+    val (oldestBalanceDate, initialBalance): (LocalDateTime, MoneyWithGeneralCurrency) = {
       val numTransactionsToFetch = 3 * n
       val totalNumTransactions = dbRun(transactionManager.newQuery
         .filter(_.moneyReservoirCode === moneyReservoir.code)
@@ -50,7 +50,7 @@ final class CashFlowEntries @Inject()(implicit accountingConfig: Config,
         .result)
 
       if (totalNumTransactions < numTransactionsToFetch) {
-        (Instant.ofEpochMilli(0), MoneyWithGeneralCurrency(0, moneyReservoir.currency)) // get all entries
+        (LocalDateTime.MIN, MoneyWithGeneralCurrency(0, moneyReservoir.currency)) // get all entries
 
       } else {
         // get oldest oldestTransDate
@@ -68,7 +68,7 @@ final class CashFlowEntries @Inject()(implicit accountingConfig: Config,
           .sortBy(r => (r.checkDate.desc, r.createdDate.desc))
           .take(1))
           .headOption
-        val oldestBalanceDate = oldestBC.map(_.checkDate).getOrElse(Instant.ofEpochMilli(0))
+        val oldestBalanceDate = oldestBC.map(_.checkDate).getOrElse(LocalDateTime.MIN)
         val initialBalance = oldestBC.map(_.balance).getOrElse(MoneyWithGeneralCurrency(0, moneyReservoir.currency))
         (oldestBalanceDate, initialBalance)
       }

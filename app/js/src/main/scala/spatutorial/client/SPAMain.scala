@@ -76,22 +76,20 @@ object SPAMain extends js.JSApp {
   import common.time._
   import common.time.JavaTimeImplicits._
   import java.time.Month._
-  import java.time.{Instant, LocalDate}
+  import java.time.LocalDate
   import java.time.format._
 
   @JSExport
   def factoPortabilityTest(): Unit = {
     out("factoPortabilityTest() starting")
-    out(Clock.now)
 
-    val instant = Instant.ofEpochMilli(100020303)
-    out(instant)
+    val clock = new JvmClock
+    out(clock.now)
+
     out(LocalDate.now)
     out(LocalTime.now)
     val time = LocalTime.now
 
-//    out(TimeUtils.yearAt(Clock.now))
-//    out(TimeUtils.yearAt(TimeUtils.instantAt(2100, DECEMBER, 2)))
 //    TimeUtils.requireStartOfMonth(LocalDate.of(2010, NOVEMBER, 1))
 //    out(TimeUtils.allMonths)
 //    out(TimeUtils.instantAt(2100, DECEMBER, 1) < TimeUtils.instantAt(2100, DECEMBER, 2))

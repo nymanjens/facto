@@ -20,11 +20,12 @@ import controllers.helpers.{AuthenticatedAction, ControllerHelperCache}
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 
 final class ExternalApi @Inject()(implicit val messagesApi: MessagesApi,
-                            viewsController: Views,
-                            playConfiguration: play.api.Configuration,
-                            accountingConfig: Config,
-                            userManager: User.Manager,
-                            entityAccess: EntityAccess)
+                                  clock: Clock,
+                                  viewsController: Views,
+                                  playConfiguration: play.api.Configuration,
+                                  accountingConfig: Config,
+                                  userManager: User.Manager,
+                                  entityAccess: EntityAccess)
   extends Controller with I18nSupport {
 
   // ********** actions ********** //
@@ -61,7 +62,7 @@ final class ExternalApi @Inject()(implicit val messagesApi: MessagesApi,
     val issuer = getOrCreateRobotUser()
 
     // Add group
-    val group = entityAccess.transactionGroupManager.add(TransactionGroup())
+    val group = entityAccess.transactionGroupManager.add(TransactionGroup(createdDate = clock.now))
 
     // Add transactions
     for (transPartial <- partial.transactions) {
@@ -106,7 +107,7 @@ final class ExternalApi @Inject()(implicit val messagesApi: MessagesApi,
       case None =>
         val user = userManager.newWithUnhashedPw(
           loginName = loginName,
-          password = hash(Clock.now.toString),
+          password = hash(clock.now.toString),
           name = Messages("facto.robot")
         )
         userManager.add(user)
@@ -128,7 +129,8 @@ final class ExternalApi @Inject()(implicit val messagesApi: MessagesApi,
       flowInCents = partial.flowInCents,
       detailDescription = partial.detailDescription,
       tagsString = partial.tagsString,
-      transactionDate = Clock.now,
-      consumedDate = Clock.now)
+      createdDate = clock.now,
+      transactionDate = clock.now,
+      consumedDate = clock.now)
   }
 }

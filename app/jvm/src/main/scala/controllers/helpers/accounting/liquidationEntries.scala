@@ -2,7 +2,7 @@ package controllers.helpers.accounting
 
 import com.google.inject.{Inject, Singleton}
 import collection.immutable.Seq
-import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
+import models.SlickUtils.{LocalDateTimeToSqlDateMapper, dbRun}
 import models.accounting.{Transaction, SlickTransactionManager}
 import models.accounting.config.{Account, Category, MoneyReservoir, Config}
 import models.SlickUtils.dbApi._

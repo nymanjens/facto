@@ -1,9 +1,10 @@
 package controllers.helpers.accounting
 
 import collection.immutable.Seq
-import java.time.Instant
 
+import java.time.LocalDateTime
 import common.time.Clock
+import common.time.JavaTimeImplicits._
 import models._
 import models.accounting.{Tag, Transaction}
 import models.accounting.config.{Account, Category, MoneyReservoir, Config}
@@ -12,8 +13,8 @@ import models.accounting.money.{DatedMoney, Money, MoneyWithGeneralCurrency, Ref
 abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
   def groupId = transactions(0).transactionGroupId
   def issuer(implicit entityAccess: EntityAccess): User = transactions(0).issuer
-  def transactionDates: Seq[Instant] = transactions.map(_.transactionDate).distinct
-  def consumedDates: Seq[Instant] = transactions.flatMap(_.consumedDateOption).distinct
+  def transactionDates: Seq[LocalDateTime] = transactions.map(_.transactionDate).distinct
+  def consumedDates: Seq[LocalDateTime] = transactions.flatMap(_.consumedDateOption).distinct
   def beneficiaries(implicit accountingConfig: Config): Seq[Account] =
     transactions.map(_.beneficiary).distinct
   def moneyReservoirs(implicit accountingConfig: Config): Seq[MoneyReservoir] =

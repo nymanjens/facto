@@ -14,11 +14,12 @@ import models.accounting.TagEntity
 import models.accounting.config.{Config, Template}
 import controllers.helpers.AuthenticatedAction
 import models.SlickUtils.dbApi._
-import models.SlickUtils.{JodaToSqlDateMapper, dbRun}
+import models.SlickUtils.{LocalDateTimeToSqlDateMapper, dbRun}
 
 final class JsonApi @Inject()(implicit val messagesApi: MessagesApi,
+                              clock: Clock,
                               entityAccess: SlickEntityAccess,
-exchangeRateManager: ExchangeRateManager)
+                              exchangeRateManager: ExchangeRateManager)
   extends Controller with I18nSupport {
 
   // ********** actions ********** //

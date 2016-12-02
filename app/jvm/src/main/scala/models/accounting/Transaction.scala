@@ -7,7 +7,7 @@ import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.accounting.money.{DatedMoney, Money}
 import models.manager.{Entity, EntityManager}
 import models._
-import java.time.Instant
+import java.time.LocalDateTime
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
@@ -23,9 +23,9 @@ case class Transaction(transactionGroupId: Long,
                        private val flowInCents: Long,
                        detailDescription: String = "",
                        tagsString: String = "",
-                       createdDate: Instant = Clock.now,
-                       transactionDate: Instant,
-                       consumedDate: Instant,
+                       createdDate: LocalDateTime,
+                       transactionDate: LocalDateTime,
+                       consumedDate: LocalDateTime,
                        idOption: Option[Long] = None) extends Entity[Transaction] {
   require(transactionGroupId > 0)
   require(issuerId > 0)
@@ -45,7 +45,7 @@ case class Transaction(transactionGroupId: Long,
   lazy val tags: Seq[Tag] = Tag.parseTagsString(tagsString)
 
   /** Returns None if the consumed date is the same as the transaction date (and thus carries no further information. */
-  def consumedDateOption: Option[Instant] = if (consumedDate == transactionDate) None else Some(consumedDate)
+  def consumedDateOption: Option[LocalDateTime] = if (consumedDate == transactionDate) None else Some(consumedDate)
 
   override def toString = {
     s"Transaction(group=$transactionGroupId, issuer=${issuerId}, $beneficiaryAccountCode, $moneyReservoirCode, $categoryCode, flowInCents=$flowInCents, $description)"

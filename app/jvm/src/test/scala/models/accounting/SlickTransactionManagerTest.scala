@@ -36,9 +36,9 @@ class SlickTransactionManagerTest extends HookedSpecification {
     val user2 = userManager.add(userManager.newWithUnhashedPw(loginName = "tester2", password = "x", name = "Tester2"))
 
     // get and persist dummy transaction groups
-    val transGrp1 = transactionGroupManager.add(TransactionGroup())
-    val transGrp2 = transactionGroupManager.add(TransactionGroup())
-    val transGrp3 = transactionGroupManager.add(TransactionGroup())
+    val transGrp1 = transactionGroupManager.add(TransactionGroup(createdDate = clock.now))
+    val transGrp2 = transactionGroupManager.add(TransactionGroup(createdDate = clock.now))
+    val transGrp3 = transactionGroupManager.add(TransactionGroup(createdDate = clock.now))
 
     // get and persist dummy transactions
     val trans1A = transactionManager.add(Transaction(
@@ -49,8 +49,8 @@ class SlickTransactionManagerTest extends HookedSpecification {
       categoryCode = "CAT_A",
       description = "description 1A",
       flowInCents = 300,
-      transactionDate = Clock.now,
-      consumedDate = Clock.now
+      transactionDate = clock.now,
+      consumedDate = clock.now
     ))
     val trans1B = transactionManager.add(Transaction(
       transactionGroupId = transGrp1.id,
@@ -60,8 +60,8 @@ class SlickTransactionManagerTest extends HookedSpecification {
       categoryCode = "CAT_A",
       description = "description 1B",
       flowInCents = 600,
-      transactionDate = Clock.now,
-      consumedDate = Clock.now
+      transactionDate = clock.now,
+      consumedDate = clock.now
     ))
     val trans2 = transactionManager.add(Transaction(
       transactionGroupId = transGrp2.id,
@@ -71,8 +71,8 @@ class SlickTransactionManagerTest extends HookedSpecification {
       categoryCode = "CAT_A",
       description = "description 2",
       flowInCents = 600,
-      transactionDate = Clock.now,
-      consumedDate = Clock.now
+      transactionDate = clock.now,
+      consumedDate = clock.now
     ))
 
     // do checks

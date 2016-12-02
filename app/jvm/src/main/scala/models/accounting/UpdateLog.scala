@@ -2,7 +2,7 @@ package models.accounting
 
 import collection.immutable.Seq
 
-import java.time.Instant
+import java.time.LocalDateTime
 
 import common.time.Clock
 import models._
@@ -13,7 +13,7 @@ import models.accounting.config.{Category, Account, MoneyReservoir}
 /** UpdateLog entities are immutable. */
 case class UpdateLog(userId: Long,
                      change: String,
-                     date: Instant = Clock.now,
+                     date: LocalDateTime = clock.now,
                      idOption: Option[Long] = None) extends Entity[UpdateLog] {
   require(userId > 0)
   require(!change.isEmpty)

@@ -60,7 +60,7 @@ class SlickUpdateLogManagerTest extends HookedSpecification {
   "Logged TransactionGroup contains all relevant info" in new WithApplication {
     // add logs
     Clock.setTimeForTest(instantAt(2016, April, 1))
-    val transGrp = transactionGroupManager.add(TransactionGroup())
+    val transGrp = transactionGroupManager.add(TransactionGroup(createdDate = clock.now))
     transactionManager.add(Transaction(
       transactionGroupId = transGrp.id,
       issuerId = testUser.id,
@@ -114,6 +114,6 @@ class SlickUpdateLogManagerTest extends HookedSpecification {
       issuerId = testUser.id,
       moneyReservoirCode = testReservoir.code,
       balanceInCents = balance,
-      checkDate = Clock.now))
+      checkDate = clock.now))
   }
 }

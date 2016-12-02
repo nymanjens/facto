@@ -1,12 +1,12 @@
 package models.accounting
 
 import scala.collection.immutable.Seq
-import java.time.Instant
+import java.time.LocalDateTime
 import common.time.Clock
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.SlickUtils.dbRun
-import models.SlickUtils.JodaToSqlDateMapper
+import models.SlickUtils.LocalDateTimeToSqlDateMapper
 import models.accounting.money.{Money, ReferenceMoney}
 import models.accounting.config.Config
 import models.manager.{Entity, SlickEntityManager, EntityTable, ImmutableEntityManager}
@@ -23,7 +23,7 @@ object SlickTransactionGroupManager {
   private val tableName: String = "TRANSACTION_GROUPS"
 
   final class TransactionGroups(tag: SlickTag) extends EntityTable[TransactionGroup](tag, tableName) {
-    def createdDate = column[Instant]("createdDate")
+    def createdDate = column[LocalDateTime]("createdDate")
 
     override def * = (createdDate, id.?) <> (TransactionGroup.tupled, TransactionGroup.unapply)
   }
