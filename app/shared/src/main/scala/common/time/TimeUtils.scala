@@ -2,7 +2,7 @@ package common.time
 
 import scala.collection.immutable.Seq
 import common.time.LocalDateTime
-import java.time.{LocalDate, Month, ZoneId}
+import java.time.{LocalDate, Month}
 import java.time.format.{DateTimeFormatter, DateTimeParseException}
 
 object TimeUtils {
