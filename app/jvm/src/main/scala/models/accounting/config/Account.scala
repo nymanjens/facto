@@ -5,7 +5,7 @@ import collection.immutable.Seq
 import com.google.common.base.Preconditions._
 import play.twirl.api.Html
 
-import common.Require.requireNonNullFields
+import common.Require.requireNonNull
 import models._
 import Account.SummaryTotalRowDef
 
@@ -18,7 +18,9 @@ case class Account(code: String,
                    private val defaultElectronicReservoirCode: String,
                    categories: Seq[Category] = Nil,
                    summaryTotalRows: Seq[SummaryTotalRowDef] = Nil) {
-  requireNonNullFields(this)
+  requireNonNull(
+    code, longName, shorterName, veryShortName, userLoginName, defaultCashReservoirCode,
+    defaultCashReservoirCode, categories, summaryTotalRows)
 
   private[config] def validateCodes(moneyReservoirs: Iterable[MoneyReservoir]): Unit = {
     def requireValidCode(code: String): Unit = {
@@ -64,6 +66,6 @@ object Account {
     defaultElectronicReservoirCode = "")
 
   case class SummaryTotalRowDef(rowTitleHtml: Html, categoriesToIgnore: Set[Category]) {
-    requireNonNullFields(this)
+    requireNonNull(rowTitleHtml, categoriesToIgnore)
   }
 }
