@@ -35,6 +35,6 @@ object Tag {
   }
 
   def parseTagsString(tagsString: String): Seq[Tag] = {
-    Splitter.on(",").omitEmptyStrings().split(tagsString).asScala.map(Tag.apply).toVector
+    tagsString.split(",").asScala.map(_.strip).filter(!_.isEmpty).map(Tag.apply).toVector
   }
 }

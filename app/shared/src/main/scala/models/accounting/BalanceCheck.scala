@@ -1,6 +1,5 @@
 package models.accounting
 
-import com.google.common.hash.{HashCode, Hashing}
 import common.time.Clock
 import models.accounting.config.{Config, MoneyReservoir}
 import models.accounting.money.{DatedMoney, Money}

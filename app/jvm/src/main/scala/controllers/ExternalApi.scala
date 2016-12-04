@@ -94,8 +94,10 @@ final class ExternalApi @Inject()(implicit val messagesApi: MessagesApi,
 
   // ********** private helper methods ********** //
   private def validateApplicationSecret(applicationSecret: String) = {
-    val realApplicationSecret = playConfiguration.getString("play.crypto.secret")
-    require(applicationSecret == realApplicationSecret, "Invalid application secret")
+    val realApplicationSecret: String = playConfiguration.getString("play.crypto.secret").get
+    require(
+      applicationSecret == realApplicationSecret,
+      s"Invalid application secret. Found '$applicationSecret' but should be '$realApplicationSecret'")
   }
 
   def getOrCreateRobotUser(): User = {
