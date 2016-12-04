@@ -89,7 +89,9 @@ class ExternalApi @Inject()(viewsController: Views, val messagesApi: MessagesApi
   // ********** private helper methods ********** //
   private def validateApplicationSecret(applicationSecret: String) = {
     val realApplicationSecret = configuration.getString("play.crypto.secret")
-    require(applicationSecret == realApplicationSecret, "Invalid application secret")
+    require(
+      applicationSecret == realApplicationSecret,
+      s"Invalid application secret. Found '$applicationSecret' but should be '$realApplicationSecret'")
   }
 
   def getOrCreateRobotUser(): User = {
