@@ -2,9 +2,6 @@ package models.accounting.config
 
 import collection.immutable.Seq
 
-import com.google.common.base.Preconditions._
-import play.twirl.api.Html
-
 import common.Require.requireNonNull
 import models._
 import Account.SummaryTotalRowDef
@@ -37,7 +34,7 @@ case class Account(code: String,
     userLoginName.map {
       loginName =>
         val user = entityAccess.userManager.findByLoginName(loginName)
-        checkState(user.isDefined, "No user exists with loginName '%s'", loginName)
+        require(user.isDefined, s"No user exists with loginName '$loginName'")
         user.get
     }
   }
@@ -65,7 +62,7 @@ object Account {
     veryShortName = "NULL_INSTANCE",
     defaultElectronicReservoirCode = "")
 
-  case class SummaryTotalRowDef(rowTitleHtml: Html, categoriesToIgnore: Set[Category]) {
+  case class SummaryTotalRowDef(rowTitleHtml: String, categoriesToIgnore: Set[Category]) {
     requireNonNull(rowTitleHtml, categoriesToIgnore)
   }
 }
