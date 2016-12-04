@@ -1,25 +1,13 @@
 package models.accounting
 
-import com.google.common.base.{Charsets, Splitter}
-import com.google.common.hash.Hashing
-
 import math.abs
 import scala.collection.immutable.Seq
 import scala.util.matching.Regex
-import scala.collection.JavaConverters._
 
 case class Tag(name: String) {
   /** Returns the Bootstrap label class for this Tag. **/
   def bootstrapClassSuffix: String = {
-    val hashString: String = Hashing.sha1().hashString(name, Charsets.UTF_8).toString()
-    val hashedInt: Int = {
-      var hash: Int = 0
-      for (char <- hashString) {
-        hash = ((hash << 5) - hash) + char;
-      }
-      hash
-    }
-    val index = abs(hashedInt) % Tag.bootstrapClassSuffixOptions.size
+    val index = abs(name.hashCode) % Tag.bootstrapClassSuffixOptions.size
     Tag.bootstrapClassSuffixOptions(index)
   }
 }
@@ -35,6 +23,6 @@ object Tag {
   }
 
   def parseTagsString(tagsString: String): Seq[Tag] = {
-    tagsString.split(",").asScala.map(_.strip).filter(!_.isEmpty).map(Tag.apply).toVector
+    tagsString.split(",").map(_.trim).filter(!_.isEmpty).map(Tag.apply).toVector
   }
 }
