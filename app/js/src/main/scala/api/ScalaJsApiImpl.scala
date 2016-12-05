@@ -1,9 +1,32 @@
 package api
 
-//import models.accounting.config.Config
-//
-//final class ScalaJsApiServer extends ScalaJsApi {
-//  override def getAccountingConfig(): Config = accountingConfig
-//}
-//
-//object ScalaJsApiClient
+import models.accounting.config.Config
+import java.nio.ByteBuffer
+
+import boopickle.Default._
+import org.scalajs.dom
+
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.scalajs.js.typedarray._
+
+object ScalaJsApiClient {
+  def create(): ScalaJsApi = {
+    AutowireClient[ScalaJsApi]
+  }
+
+  private object AutowireClient extends autowire.Client[ByteBuffer, Pickler, Pickler] {
+    override def doCall(req: Request): Future[ByteBuffer] = {
+      dom.ext.Ajax.post(
+        url = "/scalajsapi/" + req.path.mkString("/"),
+        data = Pickle.intoBytes(req.args),
+        responseType = "arraybuffer",
+        headers = Map("Content-Type" -> "application/octet-stream")
+      ).map(r => TypedArrayBuffer.wrap(r.response.asInstanceOf[ArrayBuffer]))
+    }
+
+    override def read[Result: Pickler](p: ByteBuffer) = Unpickle[Result].fromBytes(p)
+    override def write[Result: Pickler](r: Result) = Pickle.intoBytes(r)
+  }
+
+}
