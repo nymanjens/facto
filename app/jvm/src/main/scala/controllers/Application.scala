@@ -1,6 +1,8 @@
 package controllers
 
 import java.nio.ByteBuffer
+import scala.concurrent.Await
+import scala.concurrent.duration._
 
 import boopickle.Default._
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -70,12 +72,8 @@ final class Application @Inject()(implicit val messagesApi: MessagesApi,
       )
   }
 
-  object Router extends autowire.Server[ByteBuffer, Pickler, Pickler] {
-    override def read[R: Pickler](p: ByteBuffer) = Unpickle[R].fromBytes(p)
-    override def write[R: Pickler](r: R) = Pickle.intoBytes(r)
-  }
 
-  def autowireApi(path: String) = Action.async(parse.raw) {
+  def autowireApi(path: String) = AuthenticatedAction(parse.raw) { implicit user =>
     implicit request =>
       println(s"Request path: $path")
 
@@ -83,17 +81,24 @@ final class Application @Inject()(implicit val messagesApi: MessagesApi,
       val b = request.body.asBytes(parse.UNLIMITED).get
 
       // call Autowire route
-      Router.route[Api](api)(
-        autowire.Core.Request(path.split("/"), Unpickle[Map[String, ByteBuffer]].fromBytes(b.asByteBuffer))
-      ).map(buffer => {
-        val data = Array.ofDim[Byte](buffer.remaining())
-        buffer.get(data)
-        Ok(data)
-      })
+      Await.result(
+        Application.Router.route[Api](api)(
+          autowire.Core.Request(path.split("/"), Unpickle[Map[String, ByteBuffer]].fromBytes(b.asByteBuffer))
+        ).map(buffer => {
+          val data = Array.ofDim[Byte](buffer.remaining())
+          buffer.get(data)
+          Ok(data)
+        }), 1.minute)
+
   }
 }
 
 object Application {
+  object Router extends autowire.Server[ByteBuffer, Pickler, Pickler] {
+    override def read[R: Pickler](p: ByteBuffer) = Unpickle[R].fromBytes(p)
+    override def write[R: Pickler](r: R) = Pickle.intoBytes(r)
+  }
+
   // ********** forms ********** //
   object Forms {
 

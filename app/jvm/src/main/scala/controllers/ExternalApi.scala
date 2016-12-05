@@ -40,7 +40,7 @@ final class ExternalApi @Inject()(implicit val messagesApi: MessagesApi,
     validateApplicationSecret(applicationSecret)
 
     val admin: User = userManager.findByLoginName("admin").get
-    val actions: Seq[AuthenticatedAction] = Seq(
+    val actions: Seq[AuthenticatedAction[AnyContent]] = Seq(
       viewsController.everythingLatest,
       viewsController.cashFlowOfAll,
       viewsController.liquidationOfAll,
