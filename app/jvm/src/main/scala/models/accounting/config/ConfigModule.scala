@@ -12,7 +12,7 @@ import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor
 import org.yaml.snakeyaml.introspector.BeanAccess
 
-import common.Require.requireNonNullFields
+import common.Require.requireNonNull
 import models.User
 import models.accounting.config.MoneyReservoir.NullMoneyReservoir
 

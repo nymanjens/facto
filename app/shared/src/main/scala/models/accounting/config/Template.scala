@@ -1,8 +1,7 @@
 package models.accounting.config
 
 import scala.collection.immutable.Seq
-import com.google.common.base.Preconditions.checkState
-import common.Require.requireNonNullFields
+import common.Require.requireNonNull
 import models.accounting.money.Money
 import models._
 import models.accounting.{TransactionGroup=>AccountingTransactionGroup, Transaction=>AccountingTransaction}
@@ -16,7 +15,7 @@ case class Template(code: String,
                     private val zeroSum: Boolean,
                     val iconClass: String,
                     private val transactions: Seq[Template.Transaction]) {
-  requireNonNullFields(this)
+  requireNonNull(code, name, placement, onlyShowForUserLoginNames, zeroSum, iconClass, transactions)
 
   def showFor(location: Template.Placement, user: User)(implicit accountingConfig: Config,
                                                         entityAccess: EntityAccess): Boolean = {
@@ -76,7 +75,9 @@ object Template {
                          descriptionTpl: String,
                          flowInCents: Long,
                          tagsString: String) {
-    requireNonNullFields(this)
+    requireNonNull(
+      beneficiaryCodeTpl, moneyReservoirCodeTpl, categoryCodeTpl, descriptionTpl, flowInCents,
+      tagsString)
 
     def toPartial(account: Account)(implicit accountingConfig: Config): AccountingTransaction.Partial = {
       def fillInPlaceholders(string: String): String = {

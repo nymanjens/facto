@@ -1,10 +1,10 @@
 package models.accounting.config
 
-import common.Require.requireNonNullFields
+import common.Require.requireNonNull
 
 case class Constants(commonAccount: Account,
                      accountingCategory: Category,
                      endowmentCategory: Category,
                      liquidationDescription: String) {
-  requireNonNullFields(this)
+  requireNonNull(commonAccount, accountingCategory, endowmentCategory, liquidationDescription)
 }

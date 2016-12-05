@@ -1,6 +1,6 @@
 package models.accounting.config
 
-import common.Require.requireNonNullFields
+import common.Require.requireNonNull
 import models.accounting.money.Currency
 import models.accounting.money.Money
 
@@ -10,7 +10,7 @@ case class MoneyReservoir(code: String,
                           owner: Account,
                           hidden: Boolean,
                           private val currencyCode: Option[String] = None) {
-  requireNonNullFields(this, lazyFieldNames = Set("currency"))
+  requireNonNull(code, name, shorterName, owner, hidden, currencyCode)
 
   override def toString = s"MoneyReservoir($code)"
 

@@ -6,8 +6,7 @@ import java.util.Collections
 
 import com.google.common.base.Preconditions.checkNotNull
 import com.google.common.collect.ImmutableList
-import play.twirl.api.Html
-import common.Require.requireNonNullFields
+import common.Require.requireNonNull
 import models.accounting.config.{Account => ParsedAccount, Category => ParsedCategory, Config => ParsedConfig,
 Constants => ParsedConstants, MoneyReservoir => ParsedMoneyReservoir, Template => ParsedTemplate}
 import models.accounting.config.Account.{SummaryTotalRowDef => ParsedSummaryTotalRowDef}
@@ -24,7 +23,7 @@ object Parsable {
     def this() = this(null, null, null, null, null)
 
     def parse: ParsedConfig = {
-      requireNonNullFields(this)
+      requireNonNull(accounts, categories, moneyReservoirs, templates, constants)
       val parsedAccounts = toListMap(accounts)(_.code, _.parse)
       val parsedCategories = toListMap(categories)(_.code, _.parse)
       val parsedReservoirs = toListMap(moneyReservoirs)(_.code, _.parse)
@@ -69,7 +68,7 @@ object Parsable {
       def this() = this(null, null)
 
       def parse: ParsedSummaryTotalRowDef = ParsedSummaryTotalRowDef(
-        rowTitleHtml = Html(rowTitleHtml),
+        rowTitleHtml = checkNotNull(rowTitleHtml),
         categoriesToIgnore = checkNotNull(categoriesToIgnore).asScala.map(_.parse).toSet)
     }
     object SummaryTotalRowDef {

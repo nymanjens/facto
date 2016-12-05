@@ -8,7 +8,6 @@ import com.google.common.collect.{HashMultimap, ImmutableTable, Multimap, Range,
 import models.SlickUtils.dbApi._
 
 import play.api.Logger
-import play.twirl.api.Html
 import common.time.LocalDateTime
 import common.time.JavaTimeImplicits._
 import common.time.{Clock, DatedMonth, MonthRange, TimeUtils}
@@ -26,7 +25,7 @@ import models.SlickEntityAccess
 case class Summary(yearToSummary: Map[Int, SummaryForYear],
                    categories: Seq[Category],
                    monthRangeForAverages: MonthRange) {
-  def totalRowTitles: Seq[Html] = {
+  def totalRowTitles: Seq[String] = {
     val firstSummary = yearToSummary.values.iterator.next
     firstSummary.totalRows.map(_.rowTitleHtml)
   }
@@ -226,7 +225,7 @@ object SummaryCell {
   }
 }
 
-case class SummaryTotalRow(rowTitleHtml: Html, monthToTotal: Map[DatedMonth, ReferenceMoney], yearlyAverage: ReferenceMoney)
+case class SummaryTotalRow(rowTitleHtml: String, monthToTotal: Map[DatedMonth, ReferenceMoney], yearlyAverage: ReferenceMoney)
 
 object SummaryTotalRow {
   def calculate(totalRowDef: SummaryTotalRowDef,
