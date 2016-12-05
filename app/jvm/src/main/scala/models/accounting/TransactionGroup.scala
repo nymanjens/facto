@@ -2,7 +2,6 @@ package models.accounting
 
 import scala.collection.immutable.Seq
 import common.time.LocalDateTime
-import common.time.Clock
 import models.accounting.money.{Money, ReferenceMoney, ExchangeRateManager}
 import models.accounting.config.Config
 import models.manager.{Entity, EntityManager}
