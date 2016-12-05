@@ -4,6 +4,7 @@ import java.time.{DayOfWeek, LocalDate, LocalTime}
 import java.time.format.DateTimeFormatter
 import java.time.temporal.{ChronoField, TemporalField}
 
+import api.ScalaJsApiClient
 import org.scalajs.dom
 
 //import spatutorial.client.components.GlobalStyles
@@ -109,6 +110,8 @@ object SPAMain extends js.JSApp {
       case e: IllegalArgumentException =>
     }
     X("abc")
+
+    out(new ScalaJsApiClient().getAccountingConfig())
   }
 
   def out(x: Any): Unit = {

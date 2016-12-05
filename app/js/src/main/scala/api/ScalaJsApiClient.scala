@@ -1,5 +1,7 @@
 package api
 
+import autowire._
+
 import models.accounting.config.Config
 import java.nio.ByteBuffer
 
@@ -10,11 +12,14 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js.typedarray._
 
-object ScalaJsApiClient {
-  def create(): ScalaJsApi = {
-    AutowireClient[ScalaJsApi]
-  }
+final class ScalaJsApiClient {
 
+  import ScalaJsApiClient.AutowireClient
+
+  def getAccountingConfig(): Future[Config] = AutowireClient[ScalaJsApi].getAccountingConfig().call()
+}
+
+object ScalaJsApiClient {
   private object AutowireClient extends autowire.Client[ByteBuffer, Pickler, Pickler] {
     override def doCall(req: Request): Future[ByteBuffer] = {
       dom.ext.Ajax.post(
@@ -28,5 +33,4 @@ object ScalaJsApiClient {
     override def read[Result: Pickler](p: ByteBuffer) = Unpickle[Result].fromBytes(p)
     override def write[Result: Pickler](r: Result) = Pickle.intoBytes(r)
   }
-
 }
