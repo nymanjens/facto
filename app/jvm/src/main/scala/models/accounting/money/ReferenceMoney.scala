@@ -1,7 +1,6 @@
 package models.accounting.money
 
 import models.accounting.money.CentOperations.CentOperationsNumeric
-import play.twirl.api.Html
 
 /**
   * Represents an amount of money in the (default) reference currency.
@@ -17,7 +16,7 @@ case class ReferenceMoney(override val cents: Long) extends Money with CentOpera
 
   override protected def validateCentOperation(that: ReferenceMoney): Unit = {}
 
-  override def toHtmlWithCurrency(implicit exchangeRateManager: ExchangeRateManager): Html =
+  override def toHtmlWithCurrency(implicit exchangeRateManager: ExchangeRateManager): String =
     Money.centsToHtmlWithCurrency(cents, Currency.default)
 }
 

@@ -1,7 +1,5 @@
 package models.accounting.money
 
-import play.twirl.api.Html
-
 /**
   * Represents an amount of money with an arbitrary currency.
   *
@@ -10,7 +8,7 @@ import play.twirl.api.Html
   */
 private[money] case class MoneyWithGeneralCurrencyImpl(override val cents: Long, currency: Currency) extends MoneyWithGeneralCurrency {
 
-  override def toHtmlWithCurrency(implicit exchangeRateManager: ExchangeRateManager): Html = {
+  override def toHtmlWithCurrency(implicit exchangeRateManager: ExchangeRateManager): String = {
     Money.centsToHtmlWithCurrency(cents, currency)
   }
 }

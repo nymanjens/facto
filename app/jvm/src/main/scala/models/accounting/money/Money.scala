@@ -5,11 +5,9 @@ import java.lang.Math.{abs, round}
 import java.text.NumberFormat
 import java.util.Locale
 
-import com.google.common.collect.Iterables
 import models.accounting.config.Config
 import models.accounting.money.CentOperations.CentOperationsNumeric
 import common.time.LocalDateTime
-import play.twirl.api.Html
 
 import scala.collection.JavaConverters._
 
@@ -22,7 +20,7 @@ trait Money {
 
   def cents: Long
   def currency: Currency
-  def toHtmlWithCurrency(implicit exchangeRateManager: ExchangeRateManager): Html
+  def toHtmlWithCurrency(implicit exchangeRateManager: ExchangeRateManager): String
 
   final def formatFloat: String = Money.centsToFloatString(cents)
 
@@ -45,16 +43,7 @@ object Money {
   def floatToCents(float: Double): Long =
     (float.toDouble * 100).round
 
-  private[money] def centsToHtmlWithCurrency(cents: Long, currency: Currency): Html = {
-    currency.htmlSymbol ++ s" ${centsToFloatString(cents)}"
-  }
-
-  private[money] implicit class SummableHtml(html: Html) {
-    def ++(string: String): Html = {
-      this ++ Html(string)
-    }
-    def ++(otherHtml: Html): Html = {
-      new Html(Seq(html, otherHtml))
-    }
+  private[money] def centsToHtmlWithCurrency(cents: Long, currency: Currency): String = {
+    currency.htmlSymbol + s" ${centsToFloatString(cents)}"
   }
 }

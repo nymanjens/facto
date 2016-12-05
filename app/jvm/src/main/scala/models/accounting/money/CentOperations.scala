@@ -1,14 +1,10 @@
 package models.accounting.money
 
 import java.lang.Math.{abs, round}
-import java.text.NumberFormat
-import java.math.RoundingMode.HALF_EVEN
-import com.google.common.math.DoubleMath.roundToLong
+import common.GuavaReplacement.DoubleMath.roundToLong
 import java.util.Locale
 
-import com.google.common.collect.Iterables
 import models.accounting.config.Config
-import play.twirl.api.Html
 
 import scala.collection.JavaConverters._
 
@@ -32,7 +28,7 @@ trait CentOperations[M <: CentOperations[M]] {
   final def +(that: M): M = doCentOperationToSelfType(_ + _)(that)
   final def -(that: M): M = doCentOperationToSelfType(_ - _)(that)
   final def *(number: Long): M = withCents(cents * number)
-  final def /(number: Long): M = withCents(roundToLong(cents * 1.0 / number, HALF_EVEN))
+  final def /(number: Long): M = withCents(roundToLong(cents * 1.0 / number))
   final def ==(that: M): Boolean = doCentOperation(_ == _)(that)
   final def >(that: M): Boolean = doCentOperation(_ > _)(that)
   final def <(that: M): Boolean = doCentOperation(_ < _)(that)
