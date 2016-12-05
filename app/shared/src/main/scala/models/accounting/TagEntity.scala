@@ -1,6 +1,5 @@
 package models.accounting
 
-import common.CollectionUtils.toListMap
 import models.manager.{Entity, EntityManager}
 import models.EntityAccess
 
