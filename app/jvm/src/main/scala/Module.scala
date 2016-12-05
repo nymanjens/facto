@@ -1,3 +1,4 @@
+import api.ApiModule
 import com.google.inject.AbstractModule
 import tools.ApplicationStartHook
 import models.accounting.config.ConfigModule
@@ -11,5 +12,6 @@ final class Module extends AbstractModule {
     install(new CommonModule)
     install(new ConfigModule)
     install(new ModelsModule)
+    install(new ApiModule)
   }
 }

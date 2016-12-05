@@ -1,5 +1,9 @@
 package controllers
 
+import java.nio.ByteBuffer
+
+import boopickle.Default._
+import scala.concurrent.ExecutionContext.Implicits.global
 import com.google.inject.Inject
 
 import scala.collection.immutable.Seq
@@ -9,6 +13,7 @@ import play.api.data.Forms._
 import play.Play.application
 import play.api.i18n.{MessagesApi, Messages, I18nSupport}
 
+import api.Api
 import common.cache.CacheRegistry
 import models.{User, EntityAccess, SlickUserManager, SlickEntityAccess}
 import controllers.accounting.Views
@@ -18,7 +23,8 @@ import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 
 final class Application @Inject()(implicit val messagesApi: MessagesApi,
                                   userManager: SlickUserManager,
-                                  entityAccess: SlickEntityAccess) extends Controller with I18nSupport {
+                                  entityAccess: SlickEntityAccess,
+                                  api: Api) extends Controller with I18nSupport {
 
   // ********** actions ********** //
   def index() = AuthenticatedAction { implicit user =>
@@ -62,6 +68,28 @@ final class Application @Inject()(implicit val messagesApi: MessagesApi,
             Redirect(routes.Application.administration).flashing("message" -> message)
         }
       )
+  }
+
+  object Router extends autowire.Server[ByteBuffer, Pickler, Pickler] {
+    override def read[R: Pickler](p: ByteBuffer) = Unpickle[R].fromBytes(p)
+    override def write[R: Pickler](r: R) = Pickle.intoBytes(r)
+  }
+
+  def autowireApi(path: String) = Action.async(parse.raw) {
+    implicit request =>
+      println(s"Request path: $path")
+
+      // get the request body as ByteString
+      val b = request.body.asBytes(parse.UNLIMITED).get
+
+      // call Autowire route
+      Router.route[Api](api)(
+        autowire.Core.Request(path.split("/"), Unpickle[Map[String, ByteBuffer]].fromBytes(b.asByteBuffer))
+      ).map(buffer => {
+        val data = Array.ofDim[Byte](buffer.remaining())
+        buffer.get(data)
+        Ok(data)
+      })
   }
 }
 
