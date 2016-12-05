@@ -2,6 +2,6 @@ package api
 
 import models.accounting.config.Config
 
-trait Api {
+trait ScalaJsApi {
   def getAccountingConfig(): Config
 }

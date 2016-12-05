@@ -15,7 +15,7 @@ import play.api.data.Forms._
 import play.Play.application
 import play.api.i18n.{MessagesApi, Messages, I18nSupport}
 
-import api.Api
+import api.ScalaJsApi
 import common.cache.CacheRegistry
 import models.{User, EntityAccess, SlickUserManager, SlickEntityAccess}
 import controllers.accounting.Views
@@ -26,7 +26,7 @@ import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 final class Application @Inject()(implicit val messagesApi: MessagesApi,
                                   userManager: SlickUserManager,
                                   entityAccess: SlickEntityAccess,
-                                  api: Api) extends Controller with I18nSupport {
+                                  scalaJsApiService: ScalaJsApi) extends Controller with I18nSupport {
 
   // ********** actions ********** //
   def index() = AuthenticatedAction { implicit user =>
@@ -73,7 +73,7 @@ final class Application @Inject()(implicit val messagesApi: MessagesApi,
   }
 
 
-  def autowireApi(path: String) = AuthenticatedAction(parse.raw) { implicit user =>
+  def scalaJsApi(path: String) = AuthenticatedAction(parse.raw) { implicit user =>
     implicit request =>
       println(s"Request path: $path")
 
@@ -82,7 +82,7 @@ final class Application @Inject()(implicit val messagesApi: MessagesApi,
 
       // call Autowire route
       Await.result(
-        Application.Router.route[Api](api)(
+        Application.Router.route[ScalaJsApi](scalaJsApiService)(
           autowire.Core.Request(path.split("/"), Unpickle[Map[String, ByteBuffer]].fromBytes(b.asByteBuffer))
         ).map(buffer => {
           val data = Array.ofDim[Byte](buffer.remaining())
