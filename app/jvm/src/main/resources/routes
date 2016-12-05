@@ -47,6 +47,9 @@ GET  /acc/endowments/:accountCode/     controllers.accounting.Views.endowmentsOf
 GET  /acc/summary/                     controllers.accounting.Views.summaryForCurrentYear(tags ?= "", toggleTag ?= "")
 GET  /acc/summary/:expandedyear/       controllers.accounting.Views.summaryFor(expandedyear: Int, tags ?= "", toggleTag ?= "")
 
+# Autowire calls
+POST /api/*path                        controllers.Application.autowireApi(path: String)
+
 # Map static resources from the /public folder to the /assets URL path
 GET  /assets/*file                     controllers.Assets.at(path="/public", file)
 GET  /assets/*file                     controllers.Assets.versioned(path="/public", file: Asset)
