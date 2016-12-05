@@ -1,17 +1,8 @@
 package models.accounting.money
 
-import java.util.concurrent.CopyOnWriteArrayList
-import java.util.function.Consumer
-
-import com.google.common.collect.{ImmutableMultiset, Multiset}
-import common.time.Clock
-import common.CollectionUtils.toListMap
 import models.manager.{Entity, EntityManager}
 import common.time.LocalDateTime
-
-import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
-import scala.collection.immutable.ListMap
 
 /**
   * Measurements of the exchange rate of the reference currency to another (foreign) currency at a certain point in
