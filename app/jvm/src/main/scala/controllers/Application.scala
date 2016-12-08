@@ -81,15 +81,14 @@ final class Application @Inject()(implicit val messagesApi: MessagesApi,
       val argsMap = Unpickle[Map[String, ByteBuffer]].fromBytes(requestBuffer)
 
       val responseBuffer = path match {
-//        case "welcomeMsg" =>
-//          val name = Unpickle[String].fromBytes(argsMap("name"))
-//          scalaJsApiService.welcomeMsg(name)
+        case "welcomeMsg" =>
+          val name = Unpickle[String].fromBytes(argsMap("name"))
+          Pickle.intoBytes(scalaJsApiService.welcomeMsg(name))
         case "getAccountingConfig" =>
           Pickle.intoBytes(scalaJsApiService.getAccountingConfig())
       }
 
       // Serialize response in HTTP response
-//      val responseBuffer = Pickle.intoBytes(response)
       val data = Array.ofDim[Byte](responseBuffer.remaining())
       responseBuffer.get(data)
       Ok(data)
