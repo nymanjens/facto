@@ -17,6 +17,7 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExport
 import scalacss.Defaults._
 import scalacss.ScalaCssReact._
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @JSExport("SPAMain")
 object SPAMain extends js.JSApp {
@@ -111,7 +112,8 @@ object SPAMain extends js.JSApp {
     }
     X("abc")
 
-    out(new ScalaJsApiClient().getAccountingConfig())
+    new ScalaJsApiClient().getAccountingConfig().foreach(out)
+    new ScalaJsApiClient().welcomeMsg("You username").foreach(out)
   }
 
   def out(x: Any): Unit = {

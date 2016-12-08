@@ -72,24 +72,27 @@ final class Application @Inject()(implicit val messagesApi: MessagesApi,
       )
   }
 
-
+  // Note: This action manually implements what autowire normally does automatically. Unfortunately, autowire
+  // doesn't seem to work for some reason.
   def scalaJsApi(path: String) = AuthenticatedAction(parse.raw) { implicit user =>
     implicit request =>
-      println(s"Request path: $path")
+      // get the request body as ByteBuffer
+      val requestBuffer: ByteBuffer = request.body.asBytes(parse.UNLIMITED).get.asByteBuffer
+      val argsMap = Unpickle[Map[String, ByteBuffer]].fromBytes(requestBuffer)
 
-      // get the request body as ByteString
-      val b = request.body.asBytes(parse.UNLIMITED).get
+      val responseBuffer = path match {
+//        case "welcomeMsg" =>
+//          val name = Unpickle[String].fromBytes(argsMap("name"))
+//          scalaJsApiService.welcomeMsg(name)
+        case "getAccountingConfig" =>
+          Pickle.intoBytes(scalaJsApiService.getAccountingConfig())
+      }
 
-      // call Autowire route
-      Await.result(
-        Application.Router.route[ScalaJsApi](scalaJsApiService)(
-          autowire.Core.Request(path.split("/"), Unpickle[Map[String, ByteBuffer]].fromBytes(b.asByteBuffer))
-        ).map(buffer => {
-          val data = Array.ofDim[Byte](buffer.remaining())
-          buffer.get(data)
-          Ok(data)
-        }), 1.minute)
-
+      // Serialize response in HTTP response
+//      val responseBuffer = Pickle.intoBytes(response)
+      val data = Array.ofDim[Byte](responseBuffer.remaining())
+      responseBuffer.get(data)
+      Ok(data)
   }
 }
 
