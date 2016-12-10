@@ -5,6 +5,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 
 import boopickle.Default._
+import api.Picklers._
 import scala.concurrent.ExecutionContext.Implicits.global
 import com.google.inject.Inject
 
@@ -96,11 +97,6 @@ final class Application @Inject()(implicit val messagesApi: MessagesApi,
 }
 
 object Application {
-  private object Router extends autowire.Server[ByteBuffer, Pickler, Pickler] {
-    override def read[R: Pickler](p: ByteBuffer) = Unpickle[R].fromBytes(p)
-    override def write[R: Pickler](r: R) = Pickle.intoBytes(r)
-  }
-
   // ********** forms ********** //
   object Forms {
 

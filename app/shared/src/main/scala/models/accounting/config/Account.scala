@@ -10,9 +10,9 @@ case class Account(code: String,
                    longName: String,
                    shorterName: String,
                    veryShortName: String,
-                   private val userLoginName: Option[String] = None,
-                   private val defaultCashReservoirCode: Option[String] = None,
-                   private val defaultElectronicReservoirCode: String,
+                   userLoginName: Option[String] = None,
+                   defaultCashReservoirCode: Option[String] = None,
+                   defaultElectronicReservoirCode: String,
                    categories: Seq[Category] = Nil,
                    summaryTotalRows: Seq[SummaryTotalRowDef] = Nil) {
   requireNonNull(

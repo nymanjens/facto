@@ -9,7 +9,7 @@ case class MoneyReservoir(code: String,
                           shorterName: String,
                           owner: Account,
                           hidden: Boolean,
-                          private val currencyCode: Option[String] = None) {
+                          currencyCode: Option[String] = None) {
   requireNonNull(code, name, shorterName, owner, hidden, currencyCode)
 
   override def toString = s"MoneyReservoir($code)"

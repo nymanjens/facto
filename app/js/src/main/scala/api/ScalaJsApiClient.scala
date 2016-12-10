@@ -6,6 +6,7 @@ import models.accounting.config.Config
 import java.nio.ByteBuffer
 
 import boopickle.Default._
+import api.Picklers._
 import org.scalajs.dom
 
 import scala.concurrent.Future

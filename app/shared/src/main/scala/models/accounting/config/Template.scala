@@ -1,20 +1,21 @@
 package models.accounting.config
 
-import scala.collection.immutable.Seq
+import scala.collection.immutable.{Seq, Set}
 import common.Require.requireNonNull
 import models.accounting.money.Money
 import models._
-import models.accounting.{TransactionGroup=>AccountingTransactionGroup, Transaction=>AccountingTransaction}
+import models.accounting.{TransactionGroup => AccountingTransactionGroup, Transaction => AccountingTransaction}
+import models.accounting.config.Template.Transaction
 
 // Every field ending with "Tpl" may contain $-prefixed placeholders.
 // Example: descriptionTpl = "Endowment for ${account.longName}"
 case class Template(code: String,
                     name: String,
-                    private val placement: Set[Template.Placement],
-                    private val onlyShowForUserLoginNames: Option[Set[String]],
-                    private val zeroSum: Boolean,
-                    val iconClass: String,
-                    private val transactions: Seq[Template.Transaction]) {
+                    placement: Set[Template.Placement],
+                    onlyShowForUserLoginNames: Option[Set[String]],
+                    zeroSum: Boolean,
+                    iconClass: String,
+                    transactions: Seq[Template.Transaction]) {
   requireNonNull(code, name, placement, onlyShowForUserLoginNames, zeroSum, iconClass, transactions)
 
   def showFor(location: Template.Placement, user: User)(implicit accountingConfig: Config,
@@ -48,15 +49,17 @@ case class Template(code: String,
 }
 
 object Template {
-  sealed trait Placement
+  sealed abstract class Placement(code: String) {
+    override def toString = code
+  }
   object Placement {
-    object EverythingView extends Placement
-    object CashFlowView extends Placement
-    object LiquidationView extends Placement
-    object EndowmentsView extends Placement
-    object SummaryView extends Placement
-    object TemplateList extends Placement
-    object SearchView extends Placement
+    object EverythingView extends Placement("EVERYTHING_VIEW")
+    object CashFlowView extends Placement("CASH_FLOW_VIEW")
+    object LiquidationView extends Placement("LIQUIDATION_VIEW")
+    object EndowmentsView extends Placement("ENDOWMENTS_VIEW")
+    object SummaryView extends Placement("SUMMARY_VIEW")
+    object TemplateList extends Placement("TEMPLATE_LIST")
+    object SearchView extends Placement("SEARCH_VIEW")
 
     def fromString(string: String): Placement = string match {
       case "EVERYTHING_VIEW" => EverythingView

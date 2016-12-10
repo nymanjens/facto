@@ -13,8 +13,8 @@ import models.accounting.config.MoneyReservoir.NullMoneyReservoir
   */
 case class Config(accounts: Map[String, Account],
                   categories: Map[String, Category],
-                  private val moneyReservoirsMap: Map[String, MoneyReservoir],
-                  private val templates: Seq[Template],
+                  moneyReservoirsMap: Map[String, MoneyReservoir],
+                  templates: Seq[Template],
                   constants: Constants) {
   requireNonNull(accounts, categories, moneyReservoirsMap, templates, constants)
 
