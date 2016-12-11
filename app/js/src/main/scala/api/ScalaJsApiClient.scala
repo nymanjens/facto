@@ -18,7 +18,6 @@ final class ScalaJsApiClient {
   import ScalaJsApiClient.AutowireClient
 
   def getAccountingConfig(): Future[Config] = AutowireClient[ScalaJsApi].getAccountingConfig().call()
-  def welcomeMsg(name: String): Future[String] = AutowireClient[ScalaJsApi].welcomeMsg(name).call()
 }
 
 object ScalaJsApiClient {
