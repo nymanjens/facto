@@ -13,7 +13,7 @@ import scala.collection.immutable.Seq
   * ExchangeRateMeasurement entities are immutable.
   */
 case class ExchangeRateMeasurement(date: LocalDateTime,
-                                   private val foreignCurrencyCode: String,
+                                   foreignCurrencyCode: String,
                                    ratioReferenceToForeignCurrency: Double,
                                    idOption: Option[Long] = None) extends Entity[ExchangeRateMeasurement] {
   require(!foreignCurrencyCode.isEmpty)

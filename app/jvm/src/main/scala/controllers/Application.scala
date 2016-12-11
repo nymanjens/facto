@@ -87,6 +87,8 @@ final class Application @Inject()(implicit val messagesApi: MessagesApi,
         //   Pickle.intoBytes(scalaJsApiService.welcomeMsg(name))
         case "getAccountingConfig" =>
           Pickle.intoBytes(scalaJsApiService.getAccountingConfig())
+        case "getAllEntities" =>
+          Pickle.intoBytes(scalaJsApiService.getAllEntities())
       }
 
       // Serialize response in HTTP response

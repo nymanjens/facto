@@ -13,11 +13,15 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js.typedarray._
 
+import api.ScalaJsApi.AllEntries
+
 final class ScalaJsApiClient {
 
   import ScalaJsApiClient.AutowireClient
 
   def getAccountingConfig(): Future[Config] = AutowireClient[ScalaJsApi].getAccountingConfig().call()
+
+  def getAllEntities(): Future[AllEntries] = AutowireClient[ScalaJsApi].getAllEntities().call()
 }
 
 object ScalaJsApiClient {

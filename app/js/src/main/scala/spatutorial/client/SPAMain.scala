@@ -113,6 +113,7 @@ object SPAMain extends js.JSApp {
     X("abc")
 
     new ScalaJsApiClient().getAccountingConfig().foreach(out)
+    new ScalaJsApiClient().getAllEntities().foreach(out)
   }
 
   def out(x: Any): Unit = {
