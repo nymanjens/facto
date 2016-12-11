@@ -15,7 +15,7 @@
   expandedNumEntries: Int,
   templatesInNavbar: Seq[Template]
 )(
-  implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash, config: Config, entityAccess: EntityAccess, exchangeRateManager: ExchangeRateManager, i18n: I18n, clock: Clock
+  implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash, config: Config, entityAccess: EntityAccess, exchangeRateManager: ExchangeRateManager, i18n: I18n, clock: Clock, env: play.api.Environment
 )
 
 @Main(Messages("facto.liquidation"), templatesInNavbar = templatesInNavbar) {

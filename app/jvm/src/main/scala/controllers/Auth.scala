@@ -9,7 +9,8 @@ import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
 
 final class Auth @Inject()(implicit val messagesApi: MessagesApi,
-                           entityAccess: SlickEntityAccess) extends Controller with I18nSupport {
+                           entityAccess: SlickEntityAccess,
+                           env: play.api.Environment) extends Controller with I18nSupport {
 
   // ********** actions ********** //
   def login = Action { implicit request =>

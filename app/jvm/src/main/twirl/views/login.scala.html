@@ -1,7 +1,7 @@
 @(
   loginForm: Form[(String,String)]
 )(
-  implicit request: Request[AnyContent], messages: Messages, flash: Flash
+  implicit request: Request[AnyContent], messages: Messages, flash: Flash, env: play.api.Environment
 )
 
 @import helper._

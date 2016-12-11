@@ -27,7 +27,8 @@ final class Views @Inject()(implicit val messagesApi: MessagesApi,
                             tagEntityManager: TagEntity.Manager,
                             exchangeRateManager: ExchangeRateManager,
                             entityAccess: EntityAccess,
-                            i18n: I18n) extends Controller with I18nSupport {
+                            i18n: I18n,
+                            env: play.api.Environment) extends Controller with I18nSupport {
 
   // ********** actions - views ********** //
   def everythingLatest = AuthenticatedAction { implicit user =>

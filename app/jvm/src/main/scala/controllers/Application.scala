@@ -27,7 +27,8 @@ import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 final class Application @Inject()(implicit val messagesApi: MessagesApi,
                                   userManager: SlickUserManager,
                                   entityAccess: SlickEntityAccess,
-                                  scalaJsApiService: ScalaJsApi) extends Controller with I18nSupport {
+                                  scalaJsApiService: ScalaJsApi,
+                                  env: play.api.Environment) extends Controller with I18nSupport {
 
   // ********** actions ********** //
   def index() = AuthenticatedAction { implicit user =>

@@ -17,7 +17,8 @@ final class GeneralActions @Inject()(implicit val messagesApi: MessagesApi,
                                      accountingConfig: Config,
                                      entityAccess: EntityAccess,
                                      generalEntries: GeneralEntries,
-                                     i18n: I18n) extends Controller with I18nSupport {
+                                     i18n: I18n,
+                                     env: play.api.Environment) extends Controller with I18nSupport {
 
   // ********** actions ********** //
   def searchMostRelevant(q: String) = AuthenticatedAction { implicit user =>

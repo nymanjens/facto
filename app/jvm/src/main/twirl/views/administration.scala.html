@@ -2,7 +2,12 @@
 @import controllers.Application.Forms.AddUserData
 @import views.html.utils.bootstrap3
 
-@(users: Seq[User], addUserForm: Form[AddUserData])(implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash)
+@(
+  users: Seq[User],
+  addUserForm: Form[AddUserData]
+)(
+  implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash, env: play.api.Environment
+)
 
 @Main(Messages("facto.user-administration")) {
   <h1 class="page-header"><i class="fa fa-cogs fa-fw"></i> @Messages("facto.user-administration")</h1>
