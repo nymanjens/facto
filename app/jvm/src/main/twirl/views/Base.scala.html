@@ -55,10 +55,9 @@
 
     @* ************ JAVASCRIPT ************ *@
     @* Bundled JavaScript deps and the compiled scala.js code *@
-    <script src="@routes.Assets.versioned("client-jsdeps.js")" type="text/javascript"></script>
-    @playscalajs.html.scripts(
+    @playscalajs.html.jsdeps(
         projectName = "client",
-        path => routes.Assets.versioned(path).toString)
+        assets = path => routes.Assets.versioned(path).toString)
 
     @* startbootstrap-sb-admin-2 JavaScript *@
     <script src="@routes.Assets.versioned("bower_components/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js")"></script>

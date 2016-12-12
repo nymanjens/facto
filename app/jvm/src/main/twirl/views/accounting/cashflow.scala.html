@@ -18,6 +18,16 @@
 )
 
 @extrascript = {
+  @* The compiled scala.js code *@
+  @playscalajs.html.selectScript(
+      projectName = "client",
+      isProd = env.mode == play.api.Mode.Prod,
+      assets = path => routes.Assets.versioned(path).toString)
+  @* Launches the main method of the JSApp *@
+  @playscalajs.html.launcher(
+      projectName = "client",
+      assets = path => routes.Assets.versioned(path).toString)
+
   <script>
     SPAMain().factoPortabilityTest()
   </script>
