@@ -10,6 +10,14 @@ object Loki {
 
     def addCollection(name: String): Collection = js.native
     def getCollection(name: String): Collection = js.native
+    def getOrAddCollection(name: String): Collection = {
+      val collection = getCollection(name)
+      if (collection == null) {
+        addCollection(name)
+      } else {
+        collection
+      }
+    }
   }
 
   object Database {
