@@ -46,20 +46,18 @@ object Picklers {
       state.pickle(time.getHour)
       state.pickle(time.getMinute)
       state.pickle(time.getSecond)
-      state.pickle(time.getNano)
     }
     override def unpickle(implicit state: UnpickleState): LocalDateTime = {
       LocalDateTime.of(
         LocalDate.of(
-          state.unpickle[Int] /* year */ ,
-          state.unpickle[Int] /* month */ ,
+          state.unpickle[Int] /* year */,
+          state.unpickle[Int] /* month */,
           state.unpickle[Int] /* dayOfMonth */
         ),
         LocalTime.of(
-          state.unpickle[Int] /* hour */ ,
-          state.unpickle[Int] /* minute */ ,
-          state.unpickle[Int] /* second */ ,
-          state.unpickle[Int] /* nanoOfSecond */
+          state.unpickle[Int] /* hour */,
+          state.unpickle[Int] /* minute */,
+          state.unpickle[Int] /* second */
         )
       )
     }
