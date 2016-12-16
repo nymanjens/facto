@@ -6,6 +6,7 @@ import org.specs2.runner._
 import org.junit.runner._
 import play.api.test._
 import common.time.Clock
+import common.time.LocalDateTimes.createDateTime
 import common.TimeUtils.{April, dateAt}
 import common.testing.TestObjects._
 import common.testing.TestUtils._
@@ -31,19 +32,19 @@ class SlickUpdateLogManagerTest extends HookedSpecification {
 
   "SlickUpdateLogManager.fetchLastNEntries" in new WithApplication {
     // add logs
-    Clock.setTimeForTest(instantAt(2016, April, 1))
+    Clock.setTimeForTest(createDateTime(2016, April, 1))
     updateLogManager.addLog(testUser, UpdateLog.AddNew, balanceCheck(111))
-    Clock.setTimeForTest(instantAt(2016, April, 2))
+    Clock.setTimeForTest(createDateTime(2016, April, 2))
     updateLogManager.addLog(testUser, UpdateLog.AddNew, balanceCheck(222))
-    Clock.setTimeForTest(instantAt(2016, April, 3))
+    Clock.setTimeForTest(createDateTime(2016, April, 3))
     updateLogManager.addLog(testUser, UpdateLog.AddNew, balanceCheck(333))
-    Clock.setTimeForTest(instantAt(2016, April, 4))
+    Clock.setTimeForTest(createDateTime(2016, April, 4))
     updateLogManager.addLog(testUser, UpdateLog.AddNew, balanceCheck(444))
-    Clock.setTimeForTest(instantAt(2016, April, 5))
+    Clock.setTimeForTest(createDateTime(2016, April, 5))
     updateLogManager.addLog(testUser, UpdateLog.AddNew, balanceCheck(555))
-    Clock.setTimeForTest(instantAt(2016, April, 6))
+    Clock.setTimeForTest(createDateTime(2016, April, 6))
     updateLogManager.addLog(testUser, UpdateLog.Edit, balanceCheck(666))
-    Clock.setTimeForTest(instantAt(2016, April, 7))
+    Clock.setTimeForTest(createDateTime(2016, April, 7))
     updateLogManager.addLog(testUser, UpdateLog.Delete, balanceCheck(777))
 
     // fetch logs
@@ -52,14 +53,14 @@ class SlickUpdateLogManagerTest extends HookedSpecification {
     // check result
     entries must haveSize(3)
     for (entry <- entries) entry.user mustEqual testUser
-    entries(0).date mustEqual instantAt(2016, April, 5)
-    entries(1).date mustEqual instantAt(2016, April, 6)
-    entries(2).date mustEqual instantAt(2016, April, 7)
+    entries(0).date mustEqual createDateTime(2016, April, 5)
+    entries(1).date mustEqual createDateTime(2016, April, 6)
+    entries(2).date mustEqual createDateTime(2016, April, 7)
   }
 
   "Logged TransactionGroup contains all relevant info" in new WithApplication {
     // add logs
-    Clock.setTimeForTest(instantAt(2016, April, 1))
+    Clock.setTimeForTest(createDateTime(2016, April, 1))
     val transGrp = transactionGroupManager.add(TransactionGroup(createdDate = clock.now))
     transactionManager.add(Transaction(
       transactionGroupId = transGrp.id,
@@ -69,8 +70,8 @@ class SlickUpdateLogManagerTest extends HookedSpecification {
       categoryCode = testCategory.code,
       description = "test description",
       flowInCents = 9199,
-      transactionDate = instantAt(2014, April, 1),
-      consumedDate = instantAt(2015, April, 1)
+      transactionDate = createDateTime(2014, April, 1),
+      consumedDate = createDateTime(2015, April, 1)
     ))
     updateLogManager.addLog(testUser, UpdateLog.AddNew, transGrp)
 
@@ -94,7 +95,7 @@ class SlickUpdateLogManagerTest extends HookedSpecification {
 
   "Logged BalanceCheck contains all relevant info" in new WithApplication {
     // add logs
-    Clock.setTimeForTest(instantAt(2016, April, 1))
+    Clock.setTimeForTest(createDateTime(2016, April, 1))
     updateLogManager.addLog(testUser, UpdateLog.AddNew, balanceCheck(8788))
 
     // fetch logs

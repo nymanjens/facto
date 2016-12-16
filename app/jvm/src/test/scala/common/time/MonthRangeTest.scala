@@ -1,5 +1,6 @@
 package common.time
 
+import common.time.LocalDateTimes.createDateTime
 import org.specs2.mutable._
 import common.TimeUtils.{May, June, February, April, March, dateAt}
 
@@ -7,8 +8,8 @@ class MonthRangeTest extends Specification {
 
   "forYear factory method" in {
     val range = MonthRange.forYear(1998)
-    range.start mustEqual instantAt(1998, TimeUtils.January, 1)
-    range.startOfNextMonth mustEqual instantAt(1999, TimeUtils.January, 1)
+    range.start mustEqual createDateTime(1998, TimeUtils.January, 1)
+    range.startOfNextMonth mustEqual createDateTime(1999, TimeUtils.January, 1)
   }
 
   "completelyBefore" in {
@@ -56,16 +57,16 @@ class MonthRangeTest extends Specification {
   }
 
   "countMonths" in {
-    val range = MonthRange(instantAt(1998, TimeUtils.February, 1), instantAt(1999, TimeUtils.June, 1))
+    val range = MonthRange(createDateTime(1998, TimeUtils.February, 1), createDateTime(1999, TimeUtils.June, 1))
     range.countMonths mustEqual 16
   }
 
   "contains DateTime" in {
     val closedRange = MonthRange(dateA, dateB)
 
-    closedRange.contains(instantAt(2012, February, 27)) mustEqual false
+    closedRange.contains(createDateTime(2012, February, 27)) mustEqual false
     closedRange.contains(dateA) mustEqual true
-    closedRange.contains(instantAt(2012, March, 2)) mustEqual true
+    closedRange.contains(createDateTime(2012, March, 2)) mustEqual true
     closedRange.contains(dateB) mustEqual false
     closedRange.contains(dateC) mustEqual false
 
@@ -79,9 +80,9 @@ class MonthRangeTest extends Specification {
   "contains DatedMonth" in {
     val closedRange = MonthRange(dateA, dateB)
 
-    closedRange.contains(DatedMonth.containing(instantAt(2012, February, 27))) mustEqual false
+    closedRange.contains(DatedMonth.containing(createDateTime(2012, February, 27))) mustEqual false
     closedRange.contains(DatedMonth.containing(dateA)) mustEqual true
-    closedRange.contains(DatedMonth.containing(instantAt(2012, March, 2))) mustEqual true
+    closedRange.contains(DatedMonth.containing(createDateTime(2012, March, 2))) mustEqual true
     closedRange.contains(DatedMonth.containing(dateB)) mustEqual false
     closedRange.contains(DatedMonth.containing(dateC)) mustEqual false
 
@@ -92,8 +93,8 @@ class MonthRangeTest extends Specification {
     openRange.contains(DatedMonth.containing(dateC)) mustEqual false
   }
 
-  val dateA = instantAt(2012, March, 1)
-  val dateB = instantAt(2012, April, 1)
-  val dateC = instantAt(2012, May, 1)
-  val dateD = instantAt(2012, June, 1)
+  val dateA = createDateTime(2012, March, 1)
+  val dateB = createDateTime(2012, April, 1)
+  val dateC = createDateTime(2012, May, 1)
+  val dateD = createDateTime(2012, June, 1)
 }

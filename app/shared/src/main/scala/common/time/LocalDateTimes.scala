@@ -12,7 +12,7 @@ object LocalDateTimes {
     LocalDateTime.of(javaDateTime.toLocalDate, javaDateTime.toLocalTime)
   }
 
-  def of(year: Int, month: Month, dayOfMonth: Int): LocalDateTime = {
+  def createDateTime(year: Int, month: Month, dayOfMonth: Int): LocalDateTime = {
     LocalDateTime.of(year, month, dayOfMonth, 0, 0)
   }
 }

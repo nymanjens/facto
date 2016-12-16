@@ -3,6 +3,7 @@
 //package controllers.helpers.accounting
 //
 //import com.google.inject._
+//import common.time.LocalDateTimes.createDateTime
 //import common.testing._
 //import scala.collection.immutable.Seq
 //import scala.collection.JavaConverters._
@@ -30,21 +31,21 @@
 //  override def before = {
 //    Guice.createInjector(new FactoTestModule).injectMembers(this)
 //
-//    Clock.setTimeForTest(instantAt(2010, April, 4))
+//    Clock.setTimeForTest(createDateTime(2010, April, 4))
 //  }
 //
 //  override def afterAll = Clock.cleanupAfterTest()
 //
 //  "Summary.fetchSummary()" should {
 //    "caculate monthRangeForAverages" in new WithApplication {
-//      persistTransaction(flowInCents = 200, date = instantAt(2009, February, 2))
-//      persistTransaction(flowInCents = 201, date = instantAt(2009, February, 20))
-//      persistTransaction(flowInCents = 202, date = instantAt(2009, March, 1))
-//      persistTransaction(flowInCents = 202, date = instantAt(2010, May, 4))
+//      persistTransaction(flowInCents = 200, date = createDateTime(2009, February, 2))
+//      persistTransaction(flowInCents = 201, date = createDateTime(2009, February, 20))
+//      persistTransaction(flowInCents = 202, date = createDateTime(2009, March, 1))
+//      persistTransaction(flowInCents = 202, date = createDateTime(2010, May, 4))
 //
 //      val summary = summaries.fetchSummary(testAccount, 2009)
 //
-//      summary.monthRangeForAverages shouldEqual MonthRange(instantAt(2009, February, 1), instantAt(2010, April, 1))
+//      summary.monthRangeForAverages shouldEqual MonthRange(createDateTime(2009, February, 1), createDateTime(2010, April, 1))
 //    }
 //
 //    "return successfully when there are no transactions" in new WithApplication {
@@ -53,35 +54,35 @@
 //    }
 //
 //    "ignore the current and future months when calculating the averages" in new WithApplication {
-//      persistTransaction(flowInCents = 999, date = instantAt(2009, April, 2))
-//      persistTransaction(flowInCents = 100, date = instantAt(2010, February, 2))
-//      persistTransaction(flowInCents = 112, date = instantAt(2010, March, 2))
-//      persistTransaction(flowInCents = 120, date = instantAt(2010, April, 2))
-//      persistTransaction(flowInCents = 130, date = instantAt(2010, May, 2))
-//      persistTransaction(flowInCents = 1999, date = instantAt(2011, April, 2))
+//      persistTransaction(flowInCents = 999, date = createDateTime(2009, April, 2))
+//      persistTransaction(flowInCents = 100, date = createDateTime(2010, February, 2))
+//      persistTransaction(flowInCents = 112, date = createDateTime(2010, March, 2))
+//      persistTransaction(flowInCents = 120, date = createDateTime(2010, April, 2))
+//      persistTransaction(flowInCents = 130, date = createDateTime(2010, May, 2))
+//      persistTransaction(flowInCents = 1999, date = createDateTime(2011, April, 2))
 //
 //      val summary = summaries.fetchSummary(testAccount, 2009)
 //
 //      summary.yearToSummary(2010).categoryToAverages(testCategory) mustEqual ReferenceMoney(71)
-//      summary.monthRangeForAverages shouldEqual MonthRange(instantAt(2009, April, 1), instantAt(2010, April, 1))
+//      summary.monthRangeForAverages shouldEqual MonthRange(createDateTime(2009, April, 1), createDateTime(2010, April, 1))
 //    }
 //
 //
 //    "ignore the pre-facto months when calculating the averages" in new WithApplication {
-//      persistTransaction(flowInCents = 100, date = instantAt(2010, February, 2))
-//      persistTransaction(flowInCents = 112, date = instantAt(2010, March, 2))
-//      persistTransaction(flowInCents = 120, date = instantAt(2010, April, 2))
+//      persistTransaction(flowInCents = 100, date = createDateTime(2010, February, 2))
+//      persistTransaction(flowInCents = 112, date = createDateTime(2010, March, 2))
+//      persistTransaction(flowInCents = 120, date = createDateTime(2010, April, 2))
 //
 //      val summary = summaries.fetchSummary(testAccount, 2009)
 //
 //      summary.yearToSummary(2010).categoryToAverages(testCategory) mustEqual ReferenceMoney(106)
-//      summary.monthRangeForAverages shouldEqual MonthRange(instantAt(2010, February, 1), instantAt(2010, April, 1))
+//      summary.monthRangeForAverages shouldEqual MonthRange(createDateTime(2010, February, 1), createDateTime(2010, April, 1))
 //    }
 //
 //    "calculates totals" in new WithApplication {
-//      persistTransaction(flowInCents = 3, date = instantAt(2010, January, 2), category = testCategoryA)
-//      persistTransaction(flowInCents = 100, date = instantAt(2010, February, 2), category = testCategoryA)
-//      persistTransaction(flowInCents = 102, date = instantAt(2010, February, 2), category = testCategoryB)
+//      persistTransaction(flowInCents = 3, date = createDateTime(2010, January, 2), category = testCategoryA)
+//      persistTransaction(flowInCents = 100, date = createDateTime(2010, February, 2), category = testCategoryA)
+//      persistTransaction(flowInCents = 102, date = createDateTime(2010, February, 2), category = testCategoryB)
 //
 //      val summary = summaries.fetchSummary(testAccount, 2009)
 //
@@ -98,7 +99,7 @@
 //    }
 //
 //    "prunes unused categories" in new WithApplication {
-//      persistTransaction(flowInCents = 3, date = instantAt(2010, January, 2), category = testCategoryA)
+//      persistTransaction(flowInCents = 3, date = createDateTime(2010, January, 2), category = testCategoryA)
 //
 //      val summary = summaries.fetchSummary(testAccount, 2010)
 //
@@ -108,5 +109,5 @@
 //  }
 //
 //  // ********** private helper methods ********** //
-//  private def february(year: Int) = DatedMonth(instantAt(year, February, 1))
+//  private def february(year: Int) = DatedMonth(createDateTime(year, February, 1))
 //}

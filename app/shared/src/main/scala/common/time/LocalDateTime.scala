@@ -27,12 +27,6 @@ object LocalDateTime {
     LocalDateTime.of(date, time)
   }
 
-  def of(year: Int, month: Month, dayOfMonth: Int): LocalDateTime = {
-    val date: LocalDate = LocalDate.of(year, month, dayOfMonth)
-    val time: LocalTime = LocalTime.of(hour, minute)
-    LocalDateTime.of(date, time)
-  }
-
   private case class LocalDateTimeImpl(private val date: LocalDate,
                                        private val time: LocalTime) extends LocalDateTime {
     requireNonNull(date, time)
