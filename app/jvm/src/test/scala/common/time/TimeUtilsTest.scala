@@ -5,12 +5,12 @@ import org.specs2.mutable._
 
 import java.util.{Date, Calendar}
 
-import TimeUtils.dateAt
+import java.time.Month._
 
 class TimeUtilsTest extends Specification {
 
   "dateAt" in {
-    val date = createDateTime(1998, TimeUtils.March, 3)
+    val date = createDateTime(1998, MARCH, 3)
     date.getYear mustEqual 1998
     date.getMonthOfYear mustEqual 3
     date.getDayOfMonth mustEqual 3
