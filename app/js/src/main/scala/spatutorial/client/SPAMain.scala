@@ -119,18 +119,6 @@ object SPAMain extends js.JSApp {
     }
     X("abc")
 
-    //    new ScalaJsApiClient().getAccountingConfig().foreach(out)
-    //    new ScalaJsApiClient().getAllEntities().foreach(out)
-
-    val db = Loki.Database.persistent("loki-in-scalajs-test")
-    val children = db.addCollection("children")
-    children.insert(js.Dictionary("name" -> "John", "age" -> 4))
-    children.insert(js.Dictionary("name" -> "Harry", "age" -> 12))
-    children.insert(js.Dictionary("name" -> "Hermes", "age" -> 4))
-
-    out(children.find(js.Dictionary("age" -> 4)).toSeq map (_.toMap))
-    out(js.Dictionary("name" -> "Hermes", "age" -> 4).toMap)
-
     val transaction = Scala2Js.toScala[Transaction](js.JSON.parse(
       """{
           "transactionGroupId": 1232138,
@@ -150,8 +138,34 @@ object SPAMain extends js.JSApp {
       """))
     out(transaction)
     val transactionJs = Scala2Js.toJs(transaction)
-    outJs(transactionJs )
+    outJs(transactionJs)
     out(Scala2Js.toScala[Transaction](transactionJs))
+
+    //    new ScalaJsApiClient().getAccountingConfig().foreach(out)
+    //    new ScalaJsApiClient().getAllEntities().foreach(out)
+
+
+    val db = Loki.Database.persistent("loki-in-scalajs-test")
+    def save() = {
+      val transactions = db.getOrAddCollection("transactions")
+      new ScalaJsApiClient().getAllEntities().foreach(allEntries => {
+        for (transaction <- allEntries.transactions) {
+          transactions.insert(Scala2Js.toJs(transaction))
+        }
+        db.saveDatabase(() => out("Done saving transactions"))
+      })
+    }
+    def load() = {
+      out("loading")
+      db.loadDatabase()
+      db.loadDatabase(() => {
+        out("loaded")
+        val children = db.getOrAddCollection("transactions")
+        out(children.find(js.Dictionary("categoryCode" -> "LIFE")).toSeq map (_.toMap))
+      })
+    }
+//    save()
+    load()
   }
 
   def outJs(x: js.Any): Unit = {
