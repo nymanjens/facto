@@ -1,10 +1,12 @@
 package spatutorial.client
 
+import scala.collection.mutable
 import java.time.{DayOfWeek, LocalDate, LocalTime}
 import java.time.format.DateTimeFormatter
 import java.time.temporal.{ChronoField, TemporalField}
 
 import api.ScalaJsApiClient
+import models.accounting.Transaction
 import org.scalajs.dom
 
 //import spatutorial.client.components.GlobalStyles
@@ -14,10 +16,15 @@ import spatutorial.client.logger._
 //import spatutorial.client.services.SPACircuit
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSExport
+import scala.scalajs.js.annotation._
+import scala.annotation.meta.field
 import scalacss.Defaults._
 import scalacss.ScalaCssReact._
 import scala.concurrent.ExecutionContext.Implicits.global
+
+import jsfacades._
+import scala2js.Scala2Js
+import scala2js.Converters._
 
 @JSExport("SPAMain")
 object SPAMain extends js.JSApp {
@@ -112,8 +119,60 @@ object SPAMain extends js.JSApp {
     }
     X("abc")
 
-    new ScalaJsApiClient().getAccountingConfig().foreach(out)
-    new ScalaJsApiClient().getAllEntities().foreach(out)
+    val transaction = Scala2Js.toScala[Transaction](js.JSON.parse(
+      """{
+          "transactionGroupId": 1232138,
+          "issuerId": 32978,
+          "beneficiaryAccountCode": "abc",
+          "moneyReservoirCode": "def",
+          "categoryCode": "ghi",
+          "description": "safd",
+          "flowInCents": "8837432",
+          "detailDescription": "jkfdsa",
+          "tagsString": "",
+          "createdDate": 1237897,
+          "transactionDate": 1481666404,
+          "consumedDate": 1481666404,
+          "id": 43334
+        }
+      """))
+    out(transaction)
+    val transactionJs = Scala2Js.toJs(transaction)
+    outJs(transactionJs)
+    out(Scala2Js.toScala[Transaction](transactionJs))
+
+    //    new ScalaJsApiClient().getAccountingConfig().foreach(out)
+    //    new ScalaJsApiClient().getAllEntities().foreach(out)
+
+
+    val db = Loki.Database.persistent("loki-in-scalajs-test")
+    def save(callback: () => Unit = () => {}) = {
+      val transactions = db.getOrAddCollection("transactions")
+      new ScalaJsApiClient().getAllEntities().foreach(allEntries => {
+        for (transaction <- allEntries.transactions) {
+          transactions.insert(Scala2Js.toJs(transaction))
+        }
+        db.saveDatabase(() => {
+          out("Done saving transactions")
+          callback()
+        })
+      })
+    }
+    def load() = {
+      out("loading")
+      db.loadDatabase()
+      db.loadDatabase(() => {
+        out("loaded")
+        val children = db.getOrAddCollection("transactions")
+        out(children.find(js.Dictionary("categoryCode" -> "MED")).toSeq map (Scala2Js.toScala[Transaction]))
+      })
+    }
+//    save(() => load())
+        load()
+  }
+
+  def outJs(x: js.Any): Unit = {
+    out(js.JSON.stringify(x))
   }
 
   def out(x: Any): Unit = {
