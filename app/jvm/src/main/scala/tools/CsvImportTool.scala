@@ -9,6 +9,7 @@ import com.google.inject.Inject
 import play.api.Logger
 import com.google.common.base.Splitter
 import common.time.LocalDateTime
+import common.time.LocalDateTimes
 import java.time.Instant
 import common.ResourceFiles
 import models.SlickUtils.dbApi._
@@ -70,6 +71,6 @@ final class CsvImportTool @Inject()(implicit userManager: User.Manager,
     val instant = Instant.ofEpochSecond(epochSeconds)
     val zone = java.time.Clock.systemDefaultZone().getZone
     val javaDateTime = instant.atZone(zone).toLocalDateTime
-    LocalDateTime.ofJavaLocalDateTime(javaDateTime)
+    LocalDateTimes.ofJavaLocalDateTime(javaDateTime)
   }
 }

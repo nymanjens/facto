@@ -2,6 +2,7 @@ package common.time
 
 import scala.collection.immutable.Seq
 import common.time.LocalDateTime
+import common.time.LocalDateTimes
 import java.time.{LocalDate, Month}
 import java.time.format.{DateTimeFormatter, DateTimeParseException}
 
@@ -22,7 +23,7 @@ object TimeUtils {
   def parseDateString(dateString: String): LocalDateTime = {
     try {
       val localDate = LocalDate.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE)
-      LocalDateTime.ofJavaLocalDateTime(localDate.atStartOfDay())
+      LocalDateTimes.ofJavaLocalDateTime(localDate.atStartOfDay())
     } catch {
       case e: DateTimeParseException => throw new IllegalArgumentException(e)
     }

@@ -4,19 +4,24 @@ import org.junit.runner._
 import org.specs2.mutable._
 import org.specs2.runner._
 import play.api.test._
-import common.time.TimeUtils.{April, August, December, February, January, July, June, March, May, November, October, September, dateAt}
-import common.testing.HookedSpecification
+import java.time.Month._
+import common.time._
+import common.testing._
+import models._
+import org.specs2.mutable.Specification
 import play.api.Application
 import play.api.i18n.{Lang, Messages, MessagesApi}
 
 @RunWith(classOf[JUnitRunner])
 class FormattingTest extends HookedSpecification {
 
-  val application: Application = FakeApplication()
-  implicit val messages: Messages = Messages(lang = Lang("en"), application.injector.instanceOf[MessagesApi])
+  @Inject implicit val fakeClock: FakeClock = null
+  @Inject implicit val fakeI18n: FakeI18n ph= null
 
-  override def before = Clock.setTimeForTest(instantAt(2010, April, 4))
-  override def afterAll = Clock.cleanupAfterTest()
+  override def before() = {
+    Guice.createInjector(new FactoTestModule).injectMembers(this)
+  }
+
 
   "formatDate()" in new WithApplication(application) {
     Formatting.formatDate(instantAt(2010, March, 31)) mustEqual "Wed, 31 Mar"

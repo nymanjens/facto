@@ -5,7 +5,7 @@ import com.google.inject.Inject
 import common.GuavaReplacement.Iterables.getOnlyElement
 
 private[common] final class PlayI18n @Inject()(implicit val messagesApi: MessagesApi,
-                               langs: Langs) extends I18n {
+                                               langs: Langs) extends I18n {
 
   val defaultLang: Lang = {
     require(langs.availables.size == 1, "Only a single language is supported at a time.")

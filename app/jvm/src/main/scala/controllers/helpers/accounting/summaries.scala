@@ -10,7 +10,7 @@ import models.SlickUtils.dbApi._
 import play.api.Logger
 import common.time.LocalDateTime
 import common.time.JavaTimeImplicits._
-import common.time.{Clock, DatedMonth, MonthRange, TimeUtils}
+import common.time.{Clock, DatedMonth, MonthRange, TimeUtils, LocalDateTimes}
 import common.CollectionUtils.toListMap
 import common.GuavaUtils.asGuava
 import models.SlickUtils.{LocalDateTimeToSqlDateMapper, dbRun}
@@ -119,8 +119,8 @@ object SummaryForYear {
         val yearRange = MonthRange.forYear(year)
         val allTransactions = dbRun(entityAccess.transactionManager.newQuery
           .filter(_.beneficiaryAccountCode === account.code)
-          .filter(_.consumedDate >= LocalDateTime.ofJavaLocalDateTime(yearRange.start.atStartOfDay()))
-          .filter(_.consumedDate < LocalDateTime.ofJavaLocalDateTime(yearRange.startOfNextMonth.atStartOfDay()))
+          .filter(_.consumedDate >= LocalDateTimes.ofJavaLocalDateTime(yearRange.start.atStartOfDay()))
+          .filter(_.consumedDate < LocalDateTimes.ofJavaLocalDateTime(yearRange.startOfNextMonth.atStartOfDay()))
           .sortBy(r => (r.consumedDate, r.createdDate)))
           .toList
         if (tags.isEmpty) {

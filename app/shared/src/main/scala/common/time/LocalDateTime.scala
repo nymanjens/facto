@@ -21,10 +21,13 @@ object LocalDateTime {
 
   def of(localDate: LocalDate, localTime: LocalTime): LocalDateTime = LocalDateTimeImpl(localDate, localTime)
 
-  def ofJavaLocalDateTime(javaDateTime: java.time.LocalDateTime): LocalDateTime = {
-    LocalDateTime.of(javaDateTime.toLocalDate, javaDateTime.toLocalTime)
-  }
   def of(year: Int, month: Month, dayOfMonth: Int, hour: Int, minute: Int): LocalDateTime = {
+    val date: LocalDate = LocalDate.of(year, month, dayOfMonth)
+    val time: LocalTime = LocalTime.of(hour, minute)
+    LocalDateTime.of(date, time)
+  }
+
+  def of(year: Int, month: Month, dayOfMonth: Int): LocalDateTime = {
     val date: LocalDate = LocalDate.of(year, month, dayOfMonth)
     val time: LocalTime = LocalTime.of(hour, minute)
     LocalDateTime.of(date, time)
