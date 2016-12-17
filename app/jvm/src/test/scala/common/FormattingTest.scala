@@ -25,7 +25,7 @@ class FormattingTest extends HookedSpecification {
   }
 
 
-  "formatDate()" in new WithApplication(application) {
+  "formatDate()" in {
     Formatting.formatDate(createDateTime(2010, MARCH, 31)) mustEqual "Wed, 31 Mar"
     Formatting.formatDate(createDateTime(2010, APRIL, 1)) mustEqual "Thu, 1 Apr"
     Formatting.formatDate(createDateTime(2010, APRIL, 2)) mustEqual "Fri, 2 Apr"
