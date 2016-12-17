@@ -167,8 +167,8 @@ object SPAMain extends js.JSApp {
         out(children.find(js.Dictionary("categoryCode" -> "MED")).toSeq map (Scala2Js.toScala[Transaction]))
       })
     }
-//    save(() => load())
-        load()
+    save(() => load())
+//        load()
   }
 
   def outJs(x: js.Any): Unit = {
