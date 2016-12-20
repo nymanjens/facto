@@ -176,7 +176,7 @@ object SPAMain extends js.JSApp {
   }
 
   def out(x: Any): Unit = {
-    println(x)
+    println(s"  $x")
   }
 
   case class X(s: String) {
