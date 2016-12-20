@@ -1,6 +1,5 @@
 package common.time
 
-import common.time.LocalDateTime
 import java.time.{LocalDate, LocalTime}
 
 final class JsClock extends Clock {

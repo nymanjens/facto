@@ -32,7 +32,7 @@ object Converters {
   implicit object TransactionConverter extends Scala2Js.Converter[Transaction] {
     override def toJs(transaction: Transaction) = {
       val dateTimeConverter = implicitly[Scala2Js.Converter[LocalDateTime]]
-      val result = js.Dictionary(
+      val result = js.Dictionary[js.Any](
         "transactionGroupId" -> transaction.transactionGroupId.toInt,
         "issuerId" -> transaction.issuerId.toInt,
         "beneficiaryAccountCode" -> transaction.beneficiaryAccountCode,
