@@ -22,7 +22,7 @@ object TestObjects {
 
   def testCategoryA: Category = accountingConfig.categories("CAT_A")
   def testCategoryB: Category = accountingConfig.categories("CAT_B")
-  def testCategory: Catgsegory = testCategoryA
+  def testCategory: Category = testCategoryA
 
   def testReservoirOfAccountA: MoneyReservoir = accountingConfig.moneyReservoir("CASH_A")
   def testReservoirOfAccountB: MoneyReservoir = accountingConfig.moneyReservoir("CASH_B")
