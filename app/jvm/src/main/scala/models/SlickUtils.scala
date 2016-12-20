@@ -1,15 +1,14 @@
 package models
 
-import java.time.{LocalDateTime => JavaLocalDateTime}
-import common.time.LocalDateTime
-import common.time.LocalDateTimes
-import java.time.{ZoneId, LocalDate, LocalTime}
-import models.accounting.money.Money
+import java.time.{ZoneId, LocalDateTime => JavaLocalDateTime}
+
+import common.time.{LocalDateTime, LocalDateTimes}
+import slick.backend.DatabaseConfig
+import slick.driver.JdbcDriver
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
-import slick.backend.DatabaseConfig
-import slick.driver.JdbcDriver
+import scala.language.higherKinds
 
 object SlickUtils {
 
