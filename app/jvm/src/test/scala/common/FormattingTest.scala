@@ -22,8 +22,9 @@ class FormattingTest extends HookedSpecification {
 
   override def before() = {
     Guice.createInjector(new FactoTestModule).injectMembers(this)
+    setFakeI18nMappings()
+    fakeClock.setTime(createDateTime(2010, APRIL, 4))
   }
-
 
   "formatDate()" in {
     Formatting.formatDate(createDateTime(2010, MARCH, 31)) mustEqual "Wed, 31 Mar"
@@ -50,5 +51,31 @@ class FormattingTest extends HookedSpecification {
     Formatting.formatDate(createDateTime(2012, OCTOBER, 12)) mustEqual "12 Oct '12"
     Formatting.formatDate(createDateTime(2012, NOVEMBER, 12)) mustEqual "12 Nov '12"
     Formatting.formatDate(createDateTime(2012, DECEMBER, 12)) mustEqual "12 Dec '12"
+  }
+
+  private def setFakeI18nMappings(): Unit = {
+    fakeI18n.setMappings(
+      "facto.today" -> "Today",
+      "facto.yesterday" -> "Yesterday",
+      "facto.tomorrow" -> "Tomorrow",
+      "facto.date.month.jan.abbrev" -> "Jan",
+      "facto.date.month.feb.abbrev" -> "Feb",
+      "facto.date.month.mar.abbrev" -> "Mar",
+      "facto.date.month.apr.abbrev" -> "Apr",
+      "facto.date.month.may.abbrev" -> "May",
+      "facto.date.month.jun.abbrev" -> "June",
+      "facto.date.month.jul.abbrev" -> "July",
+      "facto.date.month.aug.abbrev" -> "Aug",
+      "facto.date.month.sep.abbrev" -> "Sept",
+      "facto.date.month.oct.abbrev" -> "Oct",
+      "facto.date.month.nov.abbrev" -> "Nov",
+      "facto.date.month.dec.abbrev" -> "Dec",
+      "facto.date.dayofweek.mon.abbrev" -> "Mon",
+      "facto.date.dayofweek.tue.abbrev" -> "Tue",
+      "facto.date.dayofweek.wed.abbrev" -> "Wed",
+      "facto.date.dayofweek.thu.abbrev" -> "Thu",
+      "facto.date.dayofweek.fri.abbrev" -> "Fri",
+      "facto.date.dayofweek.sat.abbrev" -> "Sat",
+      "facto.date.dayofweek.sun.abbrev" -> "Sun")
   }
 }

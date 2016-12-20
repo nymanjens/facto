@@ -26,13 +26,13 @@ object Formatting {
   )
 
   private val dayOfWeekToMessageKey: Map[DayOfWeek, String] = Map(
-    MONDAY -> "facto.date.dayofweek.mon",
-    TUESDAY -> "facto.date.dayofweek.tue",
-    WEDNESDAY -> "facto.date.dayofweek.wed",
-    THURSDAY -> "facto.date.dayofweek.thu",
-    FRIDAY -> "facto.date.dayofweek.fri",
-    SATURDAY -> "facto.date.dayofweek.sat",
-    SUNDAY -> "facto.date.dayofweek.sun"
+    MONDAY -> "facto.date.dayofweek.mon.abbrev",
+    TUESDAY -> "facto.date.dayofweek.tue.abbrev",
+    WEDNESDAY -> "facto.date.dayofweek.wed.abbrev",
+    THURSDAY -> "facto.date.dayofweek.thu.abbrev",
+    FRIDAY -> "facto.date.dayofweek.fri.abbrev",
+    SATURDAY -> "facto.date.dayofweek.sat.abbrev",
+    SUNDAY -> "facto.date.dayofweek.sun.abbrev"
   )
 
   def formatDate(dateTime: LocalDateTime)
