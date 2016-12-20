@@ -19,11 +19,11 @@ class MoneyTest extends CacheClearingSpecification {
   }
 
   "Money" should {
-    "centsToFloatString" in new WithApplication {
+    "centsToFloatString" in {
       Money.centsToFloatString(-8701) mustEqual "-87.01"
     }
 
-    "floatToCents" in new WithApplication {
+    "floatToCents" in {
       Money.floatToCents(81.234) mustEqual 8123
       Money.floatToCents(-1.234) mustEqual -123
       Money.floatToCents(0.236) mustEqual 24
@@ -31,11 +31,11 @@ class MoneyTest extends CacheClearingSpecification {
   }
 
   "ReferenceMoney" should {
-    "+" in new WithApplication {
+    "+" in {
       ReferenceMoney(4) + ReferenceMoney(-5) mustEqual ReferenceMoney(-1)
     }
 
-    "formatFloat" in new WithApplication {
+    "formatFloat" in {
       ReferenceMoney(0).formatFloat mustEqual "0.00"
       ReferenceMoney(87).formatFloat mustEqual "0.87"
       ReferenceMoney(987).formatFloat mustEqual "9.87"
@@ -44,11 +44,11 @@ class MoneyTest extends CacheClearingSpecification {
       ReferenceMoney(-8701).formatFloat mustEqual "-87.01"
     }
 
-    "toHtmlWithCurrency" in new WithApplication {
+    "toHtmlWithCurrency" in {
       ReferenceMoney(-987).toHtmlWithCurrency mustEqual "&euro; -9.87"
     }
 
-    "withDate" in new WithApplication {
+    "withDate" in {
       val date = clock.now
       ReferenceMoney(-987).withDate(date) mustEqual DatedMoney(cents = -987, currency = Currency.default, date = date)
     }
@@ -56,7 +56,7 @@ class MoneyTest extends CacheClearingSpecification {
 
 
   "MoneyWithGeneralCurrency" should {
-    "numeric" in new WithApplication {
+    "numeric" in {
       val numeric = MoneyWithGeneralCurrency.numeric(Currency.Gbp)
 
       Seq(
@@ -64,18 +64,13 @@ class MoneyTest extends CacheClearingSpecification {
         MoneyWithGeneralCurrency(-222, Currency.Gbp)
       ).sum(numeric) mustEqual MoneyWithGeneralCurrency(-333, Currency.Gbp)
 
-      try {
-        Seq(
-          MoneyWithGeneralCurrency(-111, Currency.Eur),
-          MoneyWithGeneralCurrency(-222, Currency.Gbp)
-        ).sum(numeric)
-        throw new AssertionError("Expected IllegalArgumentException")
-      } catch {
-        case e: IllegalArgumentException => "Expected"
-      }
+      Seq(
+        MoneyWithGeneralCurrency(-111, Currency.Eur),
+        MoneyWithGeneralCurrency(-222, Currency.Gbp)
+      ).sum(numeric) should throwA[IllegalArgumentException]
     }
 
-    "toHtmlWithCurrency" in new WithApplication {
+    "toHtmlWithCurrency" in {
       MoneyWithGeneralCurrency(-987, Currency.Gbp).toHtmlWithCurrency mustEqual "&pound; -9.87"
     }
 
