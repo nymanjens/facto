@@ -14,7 +14,7 @@ import common.testing._
 import models.SlickUtils.dbRun
 
 @RunWith(classOf[JUnitRunner])
-class UserTest extends HookedSpecification {
+class SlickUserManagerTest extends HookedSpecification {
 
   @Inject val userManager: SlickUserManager = null
 
