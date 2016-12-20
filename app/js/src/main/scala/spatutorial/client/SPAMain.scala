@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.{ChronoField, TemporalField}
 
 import api.ScalaJsApiClient
-import models.accounting.Transaction
+import models.accounting.{Tag, Transaction}
 import org.scalajs.dom
 
 //import spatutorial.client.components.GlobalStyles
@@ -103,6 +103,7 @@ object SPAMain extends js.JSApp {
     out(DatedMonth.containing(LocalDateTime.of(2100, DECEMBER, 1, 0, 0)).contains(LocalDateTime.of(2100, DECEMBER, 10, 0, 0)))
     out(DatedMonth.allMonthsIn(2012))
     out(MonthRange.forYear(2012) intersection MonthRange.atLeast(DatedMonth.containing(date)))
+    out(Tag.parseTagsString("ab,c"))
 
     implicit val i18n = new I18n {
       override def apply(key: String, args: Any*): String = key
