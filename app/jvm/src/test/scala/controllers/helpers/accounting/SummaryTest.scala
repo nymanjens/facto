@@ -32,10 +32,10 @@
 //  override def before = {
 //    Guice.createInjector(new FactoTestModule).injectMembers(this)
 //
-//    Clock.setTimeForTest(createDateTime(2010, APRIL, 4))
+//    fakeClock.setTime(createDateTime(2010, APRIL, 4))
 //  }
 //
-//  override def afterAll = Clock.cleanupAfterTest()
+//  override def afterAll = fakeClock.cleanupAfterTest()
 //
 //  "Summary.fetchSummary()" should {
 //    "caculate monthRangeForAverages" in new WithApplication {
