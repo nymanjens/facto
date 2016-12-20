@@ -1,35 +1,52 @@
-// TODO: Fix this test
+package common.time
 
-//package common.time
-//
-//import common.time.LocalDateTimes.createDateTime
-//import org.specs2.mutable._
-//import java.time.Month._
-//import play.api.i18n.{Lang, Messages}
-//import play.api.test.{FakeApplication, WithApplication}
-//import play.api.Application
-//
-//// imports for 2.4 i18n (https://www.playframework.com/documentation/2.4.x/Migration24#I18n)
-//import play.api.i18n.Messages.Implicits.applicationMessages
-//
-//class DatedMonthTest extends Specification {
-//
-//  val application: Application = FakeApplication()
-//  "abbreviation" in new WithApplication(application) {
-//    val messages: Messages = applicationMessages(lang = Lang("en"), application)
-//    val month = DatedMonth(createDateTime(1990, JUNE, 1))
-//    month.abbreviation(messages) mustEqual "June"
-//  }
-//
-//  "contains" in {
-//    val month = DatedMonth(createDateTime(1990, JUNE, 1))
-//    month.contains(createDateTime(1990, JUNE, 20)) mustEqual true
-//    month.contains(createDateTime(1990, MAY, 20)) mustEqual false
-//    month.contains(createDateTime(1991, JUNE, 20)) mustEqual false
-//  }
-//
-//  "containing" in {
-//    val month = DatedMonth.containing(createDateTime(1990, JUNE, 8))
-//    month mustEqual DatedMonth(createDateTime(1990, JUNE, 1))
-//  }
-//}
+import java.time.LocalDate
+import java.time.Month._
+
+import com.google.inject.{Guice, Inject}
+import common.testing.{FactoTestModule, FakeI18n, HookedSpecification}
+import common.time.LocalDateTimes.createDateTime
+
+class DatedMonthTest extends HookedSpecification {
+
+  @Inject implicit private val fakeI18n: FakeI18n = null
+
+  override def before() = {
+    Guice.createInjector(new FactoTestModule).injectMembers(this)
+  }
+
+  "abbreviation" in {
+    val month = DatedMonth(LocalDate.of(1990, JUNE, 1))
+    month.abbreviation mustEqual "facto.date.month.jun.abbrev"
+  }
+
+  "contains" in {
+    val month = DatedMonth(LocalDate.of(1990, JUNE, 1))
+    month.contains(createDateTime(1990, JUNE, 20)) mustEqual true
+    month.contains(createDateTime(1990, MAY, 20)) mustEqual false
+    month.contains(createDateTime(1991, JUNE, 20)) mustEqual false
+  }
+
+  "containing" in {
+    val month = DatedMonth.containing(LocalDate.of(1990, JUNE, 8))
+    month mustEqual DatedMonth(LocalDate.of(1990, JUNE, 1))
+  }
+
+  "allMonthsIn" in {
+    val months = DatedMonth.allMonthsIn(1990)
+    months mustEqual Seq(
+      DatedMonth(LocalDate.of(1990, JANUARY, 1)),
+      DatedMonth(LocalDate.of(1990, FEBRUARY, 1)),
+      DatedMonth(LocalDate.of(1990, MARCH, 1)),
+      DatedMonth(LocalDate.of(1990, APRIL, 1)),
+      DatedMonth(LocalDate.of(1990, MAY, 1)),
+      DatedMonth(LocalDate.of(1990, JUNE, 1)),
+      DatedMonth(LocalDate.of(1990, JULY, 1)),
+      DatedMonth(LocalDate.of(1990, AUGUST, 1)),
+      DatedMonth(LocalDate.of(1990, SEPTEMBER, 1)),
+      DatedMonth(LocalDate.of(1990, OCTOBER, 1)),
+      DatedMonth(LocalDate.of(1990, NOVEMBER, 1)),
+      DatedMonth(LocalDate.of(1990, DECEMBER, 1))
+    )
+  }
+}

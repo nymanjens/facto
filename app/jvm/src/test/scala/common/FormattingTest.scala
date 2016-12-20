@@ -1,24 +1,18 @@
 package common
 
+import java.time.Month._
+
 import com.google.inject._
+import common.testing._
 import common.time.LocalDateTimes.createDateTime
 import org.junit.runner._
-import org.specs2.mutable._
 import org.specs2.runner._
-import play.api.test._
-import java.time.Month._
-import common.time._
-import common.testing._
-import models._
-import org.specs2.mutable.Specification
-import play.api.Application
-import play.api.i18n.{Lang, Messages, MessagesApi}
 
 @RunWith(classOf[JUnitRunner])
 class FormattingTest extends HookedSpecification {
 
-  @Inject implicit val fakeClock: FakeClock = null
-  @Inject implicit val fakeI18n: FakeI18n = null
+  @Inject implicit private val fakeClock: FakeClock = null
+  @Inject implicit private val fakeI18n: FakeI18n = null
 
   override def before() = {
     Guice.createInjector(new FactoTestModule).injectMembers(this)
