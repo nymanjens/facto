@@ -99,6 +99,7 @@ object SPAMain extends js.JSApp {
     out(date)
     TimeUtils.requireStartOfMonth(LocalDate.of(2010, NOVEMBER, 1))
     out(TimeUtils.allMonths)
+    out(TimeUtils.parseDateString("2012-08-01"))
     out(DatedMonth.containing(LocalDateTime.of(2100, DECEMBER, 1, 0, 0)).contains(LocalDateTime.of(2100, DECEMBER, 10, 0, 0)))
     out(DatedMonth.allMonthsIn(2012))
     out(MonthRange.forYear(2012) intersection MonthRange.atLeast(DatedMonth.containing(date)))
