@@ -55,25 +55,26 @@ object Settings {
    * the special %%% function selects the correct version for each project
    */
   val sharedDependencies = Def.setting(Seq(
-    "com.lihaoyi"            %%% "autowire"             % "0.2.5",
-    "me.chrons"              %%% "boopickle"            % "1.2.4"
+    "com.lihaoyi" %%% "autowire"  % "0.2.5",
+    "me.chrons"   %%% "boopickle" % "1.2.4"
   ))
 
   /** Dependencies only used by the JVM project */
   val jvmDependencies = Def.setting(Seq(
-    "com.vmunier"            %% "play-scalajs-scripts"  % "0.5.0",
-    "com.lihaoyi"            %% "utest"                 % versions.uTest % Test,
+    "com.vmunier"              %% "play-scalajs-scripts"  % "0.5.0",
+    "com.lihaoyi"              %% "utest"                 % versions.uTest % Test,
 
-    "com.typesafe.play"      %% "play-jdbc"             % versions.play,
-    "com.typesafe.play"      %% "play-cache"            % versions.play,
-    "com.typesafe.play"      %% "play-ws"               % versions.play,
-    "com.typesafe.play"      %% "play-specs2"           % versions.play % Test,
+    "com.typesafe.play"        %% "play-jdbc"             % versions.play,
+    "com.typesafe.play"        %% "play-cache"            % versions.play,
+    "com.typesafe.play"        %% "play-ws"               % versions.play,
+    "com.typesafe.play"        %% "play-specs2"           % versions.play % Test,
 
-    "org.yaml"               %  "snakeyaml"             % "1.14",
-    "com.typesafe.slick"     %% "slick"                 % "3.0.0",
-    "commons-lang"           %  "commons-lang"          % "2.6",
-    "mysql"                  %  "mysql-connector-java"  % "5.1.36",
-    "org.xerial"             %  "sqlite-jdbc"           % "3.8.11.2",
+    "org.yaml"                 %  "snakeyaml"             % "1.14",
+    "com.typesafe.slick"       %% "slick"                 % "3.0.0",
+    "commons-lang"             %  "commons-lang"          % "2.6",
+    "mysql"                    %  "mysql-connector-java"  % "5.1.36",
+    "org.xerial"               %  "sqlite-jdbc"           % "3.8.11.2",
+    "com.google.code.findbugs" % "jsr305"                 % "1.3.+",
 
     webjarDeps.bootstrap,
     webjarDeps.webjarsPlay,

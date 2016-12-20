@@ -1,8 +1,8 @@
 package common.time
 
-import com.google.inject._
-import common.time.LocalDateTime
 import java.time.{LocalDate, LocalTime, ZoneId}
+
+import com.google.inject._
 import models.accounting.config.Config
 
 final class JvmClock @Inject()(accountingConfig: Config) extends Clock {
