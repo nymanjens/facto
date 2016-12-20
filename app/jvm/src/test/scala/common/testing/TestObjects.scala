@@ -6,7 +6,7 @@ import play.api.test.FakeApplication
 import play.api.test.Helpers._
 
 import common.time.Clock
-import models.{User, EntityAccess}
+import models.{User, EntityAccess, SlickUserManager}
 import models.accounting.config.{MoneyReservoir, Account, Category, Config, ConfigModule}
 import models.accounting.{Transaction, TransactionGroup, BalanceCheck}
 
@@ -35,7 +35,7 @@ object TestObjects {
       case Some(user) => user
       case None =>
         entityAccess.userManager.add(
-          entityAccess.userManager.newWithUnhashedPw(
+          SlickUserManager.createUser(
             loginName = loginName,
             password = "tu",
             name = "Test User"))
