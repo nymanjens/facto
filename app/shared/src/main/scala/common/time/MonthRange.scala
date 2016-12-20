@@ -1,7 +1,7 @@
 package common.time
 
-import common.time.LocalDateTime
-import java.time.{LocalDate, Period, Month}
+import java.time.{LocalDate, Month, Period}
+
 import common.time.JavaTimeImplicits._
 
 /**

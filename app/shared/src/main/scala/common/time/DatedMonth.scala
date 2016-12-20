@@ -1,11 +1,10 @@
 package common.time
 
-import common.time.LocalDateTime
-import scala.collection.immutable.Seq
-import common.time.LocalDateTime
-import java.time.{Month, LocalDate}
+import java.time.{LocalDate, Month}
 
 import common.I18n
+
+import scala.collection.immutable.Seq
 
 case class DatedMonth(startDate: LocalDate) extends Ordered[DatedMonth] {
   TimeUtils.requireStartOfMonth(startDate)

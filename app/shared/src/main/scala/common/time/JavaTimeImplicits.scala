@@ -1,8 +1,6 @@
 package common.time
 
-import common.time.LocalDateTime
 import java.time.LocalDate
-import java.time.chrono.ChronoLocalDate
 
 object JavaTimeImplicits {
 
