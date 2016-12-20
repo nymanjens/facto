@@ -1,42 +1,28 @@
-// TODO: Fix this test
+package common.time
 
-//package common.time
-//
-//import common.time.LocalDateTimes.createDateTime
-//import org.specs2.mutable._
-//
-//import java.util.{Date, Calendar}
-//
-//import java.time.Month._
-//
-//class TimeUtilsTest extends Specification {
-//
-//  "dateAt" in {
-//    val date = createDateTime(1998, MARCH, 3)
-//    date.getYear mustEqual 1998
-//    date.getMonthOfYear mustEqual 3
-//    date.getDayOfMonth mustEqual 3
-//    date.getHourOfDay mustEqual 0
-//    date.getSecondOfDay mustEqual 0
-//    date.getMillisOfDay mustEqual 0
-//
-//    // Compare to java.util.Date/Calendar.
-//    val calendar = new Calendar.Builder().setInstant(new Date(date.getMillis)).build()
-//
-//    // Check all expected derived properties.
-//    calendar.get(Calendar.YEAR) mustEqual 1998
-//    calendar.get(Calendar.MONTH) mustEqual Calendar.MARCH
-//    calendar.get(Calendar.DAY_OF_MONTH) mustEqual 3
-//    calendar.get(Calendar.HOUR) mustEqual 0
-//    calendar.get(Calendar.SECOND) mustEqual 0
-//    calendar.get(Calendar.MILLISECOND) mustEqual 0
-//
-//    // Check that subtracting only a second leads to the previous day.
-//    calendar.add(Calendar.SECOND, -1)
-//    calendar.get(Calendar.DAY_OF_MONTH) mustEqual 2
-//  }
-//
-//  "parseDateString" in {
-//    // TODO
-//  }
-//}
+import java.time.LocalDate
+import java.time.Month._
+
+import org.specs2.mutable._
+
+class TimeUtilsTest extends Specification {
+
+  "requireStartOfMonth" in {
+    TimeUtils.requireStartOfMonth(LocalDate.of(1991, APRIL, 1))
+    TimeUtils.requireStartOfMonth(LocalDate.of(1991, APRIL, 3)) must throwA[IllegalArgumentException]
+  }
+
+  "allMonths" in {
+    TimeUtils.allMonths mustEqual Seq(JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER)
+  }
+
+  "parseDateString" in {
+    TimeUtils.parseDateString("1992-07-22") mustEqual LocalDateTimes.createDateTime(1992, JULY, 22)
+    TimeUtils.parseDateString("2001-7-3") mustEqual LocalDateTimes.createDateTime(2001, JULY, 3)
+    TimeUtils.parseDateString("1992-07-33") must throwA[IllegalArgumentException]
+    TimeUtils.parseDateString("1992-0722") must throwA[IllegalArgumentException]
+    TimeUtils.parseDateString("1992-07-22-") must throwA[IllegalArgumentException]
+    TimeUtils.parseDateString("1992-07-dd") must throwA[IllegalArgumentException]
+    TimeUtils.parseDateString("19920722") must throwA[IllegalArgumentException]
+  }
+}
