@@ -28,9 +28,9 @@
 //
 //  "test configuration parsing" in new WithApplication {
 //    // create test users
-//    val userA = userManager.add(userManager.newWithUnhashedPw(loginName = "a", password = "pw", name = "Test User A"))
-//    val userB = userManager.add(userManager.newWithUnhashedPw(loginName = "b", password = "pw", name = "Test User B"))
-//    val userOther = userManager.add(userManager.newWithUnhashedPw(loginName = "other", password = "other", name = "Other"))
+//    val userA = userManager.add(SlickUserManager.createUser(loginName = "a", password = "pw", name = "Test User A"))
+//    val userB = userManager.add(SlickUserManager.createUser(loginName = "b", password = "pw", name = "Test User B"))
+//    val userOther = userManager.add(SlickUserManager.createUser(loginName = "other", password = "other", name = "Other"))
 //
 //    // check keys
 //    config.accounts.keys.toList must beEqualTo(List("ACC_COMMON", "ACC_A", "ACC_B"))
@@ -65,10 +65,10 @@
 //    val accCommon = config.constants.commonAccount
 //    val accA = config.accounts("ACC_A")
 //    val accB = config.accounts("ACC_B")
-//    val userA = userManager.add(userManager.newWithUnhashedPw(loginName = "a", password = "a", name = "A"))
+//    val userA = userManager.add(SlickUserManager.createUser(loginName = "a", password = "a", name = "A"))
 //    // make sure all required users exist
-//    val userB = userManager.add(userManager.newWithUnhashedPw(loginName = "b", password = "b", name = "B"))
-//    val userOther = userManager.add(userManager.newWithUnhashedPw(loginName = "other", password = "other", name = "Other"))
+//    val userB = userManager.add(SlickUserManager.createUser(loginName = "b", password = "b", name = "B"))
+//    val userOther = userManager.add(SlickUserManager.createUser(loginName = "other", password = "other", name = "Other"))
 //
 //    // call personallySortedAccounts()
 //    config.personallySortedAccounts(userA, entityAccess) mustEqual Seq(accCommon, accA, accB)

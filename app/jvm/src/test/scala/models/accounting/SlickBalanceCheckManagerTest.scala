@@ -30,8 +30,8 @@
 //  "test the BalanceCheck model" in new WithApplication {
 //
 //    // prepare users
-//    val user1 = userManager.add(userManager.newWithUnhashedPw(loginName = "tester", password = "x", name = "Tester"))
-//    val user2 = userManager.add(userManager.newWithUnhashedPw(loginName = "tester2", password = "x", name = "Tester2"))
+//    val user1 = userManager.add(SlickUserManager.createUser(loginName = "tester", password = "x", name = "Tester"))
+//    val user2 = userManager.add(SlickUserManager.createUser(loginName = "tester2", password = "x", name = "Tester2"))
 //
 //    // get and persist dummy balanceCheckManager
 //    val checkA1 = balanceCheckManager.add(BalanceCheck(

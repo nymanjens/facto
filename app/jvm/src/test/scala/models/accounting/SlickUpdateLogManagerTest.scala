@@ -15,11 +15,11 @@ import play.api.test._
 class SlickUpdateLogManagerTest extends HookedSpecification {
 
   @Inject implicit private val fakeClock: FakeClock = null
-  @Inject implicit val entityAccess: EntityAccess = null
-  @Inject val updateLogManager: SlickUpdateLogManager = null
-  @Inject val transactionManager: Transaction.Manager = null
-  @Inject val transactionGroupManager: TransactionGroup.Manager = null
-  @Inject val balanceCheckManager: BalanceCheck.Manager = null
+  @Inject implicit private val entityAccess: EntityAccess = null
+  @Inject private val updateLogManager: SlickUpdateLogManager = null
+  @Inject private val transactionManager: Transaction.Manager = null
+  @Inject private val transactionGroupManager: TransactionGroup.Manager = null
+  @Inject private val balanceCheckManager: BalanceCheck.Manager = null
 
   override def before() = {
     Guice.createInjector(new FactoTestModule).injectMembers(this)

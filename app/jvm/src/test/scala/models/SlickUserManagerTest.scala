@@ -16,7 +16,7 @@ import models.SlickUtils.dbRun
 @RunWith(classOf[JUnitRunner])
 class SlickUserManagerTest extends HookedSpecification {
 
-  @Inject val userManager: SlickUserManager = null
+  @Inject private val userManager: SlickUserManager = null
 
   override def before() = {
     Guice.createInjector(new FactoTestModule).injectMembers(this)
