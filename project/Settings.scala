@@ -74,7 +74,7 @@ object Settings {
     "commons-lang"             %  "commons-lang"          % "2.6",
     "mysql"                    %  "mysql-connector-java"  % "5.1.36",
     "org.xerial"               %  "sqlite-jdbc"           % "3.8.11.2",
-    "com.google.code.findbugs" % "jsr305"                 % "1.3.+",
+    "com.google.code.findbugs" % "jsr305"                 % "1.3.9",
 
     webjarDeps.bootstrap,
     webjarDeps.webjarsPlay,
