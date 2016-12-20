@@ -2,6 +2,7 @@ package models.accounting
 
 import com.google.inject._
 import common.testing._
+import common.time.Clock
 import models._
 import org.junit.runner._
 import org.specs2.runner._
@@ -12,7 +13,7 @@ import scala.collection.immutable.Seq
 @RunWith(classOf[JUnitRunner])
 class SlickTagEntityManagerTest extends HookedSpecification {
 
-  @Inject implicit private val fakeClock: FakeClock = null
+  @Inject implicit private val clock: Clock = null
   @Inject implicit private val entityAccess: EntityAccess = null
   @Inject private val transactionManager: Transaction.Manager = null
   @Inject private val transactionGroupManager: TransactionGroup.Manager = null
@@ -24,7 +25,7 @@ class SlickTagEntityManagerTest extends HookedSpecification {
   }
 
   "test the Transaction and TagEntity models" in new WithApplication {
-    val transGrp = transactionGroupManager.add(TransactionGroup(createdDate = fakeClock.now))
+    val transGrp = transactionGroupManager.add(TransactionGroup(createdDate = clock.now))
 
     // Add dummy transaction
     val trans = TestUtils.persistTransaction(tagsString = "a,b")
