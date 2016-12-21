@@ -121,6 +121,10 @@ object SPAMain extends js.JSApp {
     }
     X("abc")
 
+    out(UserModule.theUserStatusReader)
+    UserModule.theUserStatusReader.out()
+    UserModule.otherUserStatusReader.out()
+
     val transaction = Scala2Js.toScala[Transaction](js.JSON.parse(
       """{
           "transactionGroupId": 1232138,
@@ -166,11 +170,11 @@ object SPAMain extends js.JSApp {
       db.loadDatabase(() => {
         out("loaded")
         val children = db.getOrAddCollection("transactions")
-        out(children.find(js.Dictionary("categoryCode" -> "MED")).toSeq map (Scala2Js.toScala[Transaction]))
+//        out(children.find(js.Dictionary("categoryCode" -> "MED")).toSeq map (Scala2Js.toScala[Transaction]))
       })
     }
     save(() => load())
-//        load()
+    //        load()
   }
 
   def outJs(x: js.Any): Unit = {
@@ -183,5 +187,35 @@ object SPAMain extends js.JSApp {
 
   case class X(s: String) {
     Require.requireNonNull(s)
+  }
+
+  //////////////// MacWire test ///////////////////
+  trait DatabaseAccess {
+    def out(): Unit
+  }
+  class DatabaseAccessImpl() extends DatabaseAccess {
+    SPAMain.out("Creating DatabaseAccessImpl")
+    override def out() = SPAMain.out("IMPL!")
+  }
+  class SecurityFilter() {
+    SPAMain.out("Creating SecurityFilter")
+  }
+  class UserFinder(val databaseAccess: DatabaseAccess, securityFilter: SecurityFilter) {
+    SPAMain.out("Creating UserFinder")
+  }
+  class UserStatusReader(userFinder: UserFinder, databaseAccess: DatabaseAccess, securityFilter: SecurityFilter){
+    SPAMain.out("Creating UserStatusReader")
+    def out() = userFinder.databaseAccess.out()
+  }
+
+  object UserModule {
+
+    import com.softwaremill.macwire._
+
+    lazy val theDatabaseAccess = wire[DatabaseAccessImpl]
+    lazy val theSecurityFilter = wire[SecurityFilter]
+    lazy val theUserFinder = wire[UserFinder]
+    lazy val theUserStatusReader = wire[UserStatusReader]
+    lazy val otherUserStatusReader = wire[UserStatusReader]
   }
 }

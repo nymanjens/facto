@@ -93,6 +93,7 @@ object Settings {
     "me.chrons"                         %%% "diode-react"       % versions.diode,
     "org.scala-js"                      %%% "scalajs-dom"       % "0.9.1",
     "org.scala-js"                      %%% "scalajs-java-time" % "0.2.0",
+    "com.softwaremill.macwire"          %%  "macros"            % "2.2.5",
     "com.lihaoyi"                       %%% "utest"             % versions.uTest % Test
   ))
 
