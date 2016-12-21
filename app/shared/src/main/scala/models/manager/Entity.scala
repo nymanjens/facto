@@ -12,7 +12,7 @@ trait Entity[E <: Entity[E]] {
     * The Entity ID wrapped in an Option.
     * Expected to be None when Entity not yet persisted, otherwise Some[Id].
     */
-  protected[manager] def idOption: Option[Long]
+  def idOption: Option[Long]
 
   /** Returns a copy of this Entity with an ID. */
   protected[manager] def withId(id: Long): E
