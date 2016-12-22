@@ -3,6 +3,7 @@ package api
 import java.nio.ByteBuffer
 
 import api.ScalaJsApi.EntityType
+import common.ScalaUtils
 import models.User
 import models.accounting._
 import models.accounting.config.Config
@@ -31,6 +32,9 @@ object ScalaJsApi {
     def checkRightType(entity: Entity): get = entity match {
       case e: get => e
     }
+
+    def name: String = ScalaUtils.objectName(this)
+    override def toString = name
   }
   object EntityType {
     // @formatter:off
@@ -40,5 +44,7 @@ object ScalaJsApi {
     object BalanceCheckType extends EntityType { override type get = BalanceCheck }
     object ExchangeRateMeasurementType extends EntityType { override type get = ExchangeRateMeasurement }
     // @formatter:on
+
+    val values: Seq[EntityType] = Seq(UserType, TransactionType, TransactionGroupType, BalanceCheckType, ExchangeRateMeasurementType)
   }
 }

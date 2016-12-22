@@ -157,6 +157,10 @@ object SPAMain extends js.JSApp {
     new ScalaJsApiClient().getAllEntities(Seq(UserType)).foreach(users => out(s"Users: $users"))
     new ScalaJsApiClient().insertEntityWithId(UserType)(User("blah", "pw", "name", Option(2283)))
 
+    // --------------------------- Test LocalDatabase --------------------------- //
+    out(EntityType.BalanceCheckType.name)
+    out(EntityType.BalanceCheckType)
+
     // --------------------------- Test Loki --------------------------- //
     val db = Loki.Database.persistent("loki-in-scalajs-test")
     def save(callback: () => Unit = () => {}) = {
@@ -181,7 +185,7 @@ object SPAMain extends js.JSApp {
         //        out(children.find(js.Dictionary("categoryCode" -> "MED")).toSeq map (Scala2Js.toScala[Transaction]))
       })
     }
-    save(() => load())
+    //    save(() => load())
     //        load()
   }
 
