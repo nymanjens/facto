@@ -118,19 +118,14 @@ object SPAMain extends js.JSApp {
     out(Formatting.formatDateTime(clock.now))
     out(Formatting.formatDate(clock.now))
 
-    try {
-      X(null)
-      throw new AssertionError()
-    } catch {
-      case e: IllegalArgumentException =>
-    }
+    assertException(classOf[IllegalArgumentException], X(null))
     X("abc")
 
     // --------------------------- Test MacWire --------------------------- //
     UserModule.otherUserStatusReader.out()
 
     // --------------------------- Test Scala2Js --------------------------- //
-    val transaction = Scala2Js.toScala[Transaction](js.JSON.parse(
+    val transaction: Transaction = Scala2Js.toScala[Transaction](js.JSON.parse(
       """{
           "transactionGroupId": 1232138,
           "issuerId": 32978,
@@ -152,14 +147,17 @@ object SPAMain extends js.JSApp {
     outJs(transactionJs)
     out(Scala2Js.toScala[Transaction](transactionJs))
 
+    // --------------------------- Test LocalDatabase --------------------------- //
+    out(EntityType.BalanceCheckType.name)
+    out(EntityType.BalanceCheckType)
+    out(EntityType.BalanceCheckType.entityClass)
+    assertException(classOf[IllegalArgumentException], EntityType.BalanceCheckType.checkRightType(transaction))
+    EntityType.TransactionType.checkRightType(transaction)
+
     // --------------------------- Test ScalaJsApi --------------------------- //
     new ScalaJsApiClient().getAccountingConfig().foreach(out)
     new ScalaJsApiClient().getAllEntities(Seq(UserType)).foreach(users => out(s"Users: $users"))
     new ScalaJsApiClient().insertEntityWithId(UserType)(User("blah", "pw", "name", Option(2283)))
-
-    // --------------------------- Test LocalDatabase --------------------------- //
-    out(EntityType.BalanceCheckType.name)
-    out(EntityType.BalanceCheckType)
 
     // --------------------------- Test Loki --------------------------- //
     val db = Loki.Database.persistent("loki-in-scalajs-test")
@@ -195,6 +193,15 @@ object SPAMain extends js.JSApp {
 
   def out(x: Any): Unit = {
     println(s"  $x")
+  }
+
+  def assertException(exceptionType: Class[_ <: Exception], expression: => Unit): Unit = {
+    try {
+      expression
+      throw new AssertionError()
+    } catch {
+      case e: Exception => require(e.getClass == exceptionType)
+    }
   }
 
   case class X(s: String) {

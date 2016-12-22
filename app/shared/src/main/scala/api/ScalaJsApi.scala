@@ -11,6 +11,7 @@ import models.accounting.money.ExchangeRateMeasurement
 import models.manager.Entity
 
 import scala.collection.immutable.Seq
+import scala.reflect.ClassTag
 
 trait ScalaJsApi {
 
@@ -29,8 +30,13 @@ object ScalaJsApi {
   sealed trait EntityType {
     type get <: Entity
 
-    def checkRightType(entity: Entity): get = entity match {
-      case e: get => e
+    def entityClass: Class[get]
+
+    def checkRightType(entity: Entity): get = {
+      require(
+        entity.getClass == entityClass,
+        s"Got entity of type ${entity.getClass}, but this entityType requires $entityClass")
+      entity.asInstanceOf[get]
     }
 
     def name: String = ScalaUtils.objectName(this)
@@ -38,11 +44,11 @@ object ScalaJsApi {
   }
   object EntityType {
     // @formatter:off
-    object UserType extends EntityType { override type get = User }
-    object TransactionType extends EntityType { override type get = Transaction }
-    object TransactionGroupType extends EntityType { override type get = TransactionGroup }
-    object BalanceCheckType extends EntityType { override type get = BalanceCheck }
-    object ExchangeRateMeasurementType extends EntityType { override type get = ExchangeRateMeasurement }
+    object UserType extends EntityType { override type get = User; override def entityClass = classOf[User]}
+    object TransactionType extends EntityType { override type get = Transaction; override def entityClass = classOf[Transaction] }
+    object TransactionGroupType extends EntityType { override type get = TransactionGroup; override def entityClass = classOf[TransactionGroup] }
+    object BalanceCheckType extends EntityType { override type get = BalanceCheck; override def entityClass = classOf[BalanceCheck] }
+    object ExchangeRateMeasurementType extends EntityType { override type get = ExchangeRateMeasurement; override def entityClass = classOf[ExchangeRateMeasurement] }
     // @formatter:on
 
     val values: Seq[EntityType] = Seq(UserType, TransactionType, TransactionGroupType, BalanceCheckType, ExchangeRateMeasurementType)
