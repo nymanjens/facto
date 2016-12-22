@@ -14,7 +14,7 @@ import models.accounting.config.{Category, Account, MoneyReservoir}
 case class UpdateLog(userId: Long,
                      change: String,
                      date: LocalDateTime,
-                     idOption: Option[Long] = None) extends Entity[UpdateLog] {
+                     idOption: Option[Long] = None) extends Entity {
   require(userId > 0)
   require(!change.isEmpty)
   for (idVal <- idOption) require(idVal > 0)

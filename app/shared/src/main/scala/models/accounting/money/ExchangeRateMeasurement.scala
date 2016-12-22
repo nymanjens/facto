@@ -15,7 +15,7 @@ import scala.collection.immutable.Seq
 case class ExchangeRateMeasurement(date: LocalDateTime,
                                    foreignCurrencyCode: String,
                                    ratioReferenceToForeignCurrency: Double,
-                                   idOption: Option[Long] = None) extends Entity[ExchangeRateMeasurement] {
+                                   idOption: Option[Long] = None) extends Entity {
   require(!foreignCurrencyCode.isEmpty)
   require(ratioReferenceToForeignCurrency > 0)
   for (idVal <- idOption) require(idVal > 0)

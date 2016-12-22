@@ -24,7 +24,7 @@ case class Transaction(transactionGroupId: Long,
                        createdDate: LocalDateTime,
                        transactionDate: LocalDateTime,
                        consumedDate: LocalDateTime,
-                       idOption: Option[Long] = None) extends Entity[Transaction] {
+                       idOption: Option[Long] = None) extends Entity {
   require(transactionGroupId > 0)
   require(issuerId > 0)
   require(!beneficiaryAccountCode.isEmpty)

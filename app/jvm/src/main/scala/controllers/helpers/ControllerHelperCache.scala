@@ -36,7 +36,7 @@ object ControllerHelperCache {
     cacheEntry.value.asInstanceOf[R]
   }
 
-  private def invalidateCache(entity: Entity[_]): Unit = {
+  private def invalidateCache(entity: Entity): Unit = {
     cache.foreachWithLock { entry =>
       if (entry.invalidateWhenUpdating(entity)) {
         cache.invalidate(entry.identifier)
@@ -62,7 +62,7 @@ object ControllerHelperCache {
     protected def invalidateWhenUpdating: PartialFunction[Any, Boolean] = PartialFunction.empty
     protected def invalidateWhenUpdatingEntity(oldValue: R): PartialFunction[Any, Boolean] = PartialFunction.empty
 
-    private[helpers] def combinedInvalidateWhenUpdating(oldValue: R, entity: Entity[_]): Boolean = {
+    private[helpers] def combinedInvalidateWhenUpdating(oldValue: R, entity: Entity): Boolean = {
       val combinedInvalidate = invalidateWhenUpdating orElse invalidateWhenUpdatingEntity(oldValue)
       if (combinedInvalidate.isDefinedAt(entity)) combinedInvalidate(entity) else false
     }
@@ -73,7 +73,7 @@ object ControllerHelperCache {
                                    expensiveFunction: () => R) {
     def recalculated(): CacheEntry[R] = CacheEntry.calculate(identifier, expensiveFunction)
 
-    private[helpers] def invalidateWhenUpdating(entity: Entity[_]): Boolean =
+    private[helpers] def invalidateWhenUpdating(entity: Entity): Boolean =
       identifier.combinedInvalidateWhenUpdating(value, entity)
   }
 

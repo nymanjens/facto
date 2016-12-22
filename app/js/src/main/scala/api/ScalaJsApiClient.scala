@@ -21,7 +21,7 @@ final class ScalaJsApiClient {
 
   def getAccountingConfig(): Future[Config] = AutowireClient[ScalaJsApi].getAccountingConfig().call()
 
-  def getAllEntities(types: Seq[EntityType]): Future[Map[EntityType, Seq[Entity[_]]]] = {
+  def getAllEntities(types: Seq[EntityType]): Future[Map[EntityType, Seq[Entity]]] = {
     val resultMapFuture = AutowireClient[ScalaJsApi].getAllEntities(types).call()
 
     resultMapFuture.map(resultMap => {

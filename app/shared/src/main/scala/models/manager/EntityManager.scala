@@ -1,7 +1,7 @@
 package models.manager
 
 /** Provides access to persisted entries. */
-trait EntityManager[E <: Entity[E]] {
+trait EntityManager[E <: Entity] {
 
   // ********** Mutators ********** //
   /** Persists a new entity (without ID) and returns the same entity with its ID in the database. */

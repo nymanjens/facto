@@ -3,7 +3,7 @@ package models.manager
 // Based on active-slick (https://github.com/strongtyped/active-slick)
 
 /** Base trait to define a model having an ID (i.e.: Entity). */
-trait Entity[E <: Entity[E]] {
+trait Entity {
 
   /** Returns the Entity ID */
   final def id: Long = idOption.get
@@ -15,5 +15,5 @@ trait Entity[E <: Entity[E]] {
   def idOption: Option[Long]
 
   /** Returns a copy of this Entity with an ID. */
-  protected[manager] def withId(id: Long): E
+  protected[manager] def withId(id: Long): Entity
 }

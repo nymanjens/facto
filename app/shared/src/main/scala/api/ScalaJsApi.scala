@@ -30,7 +30,7 @@ trait ScalaJsApi {
 object ScalaJsApi {
 
   sealed trait EntityType {
-    type get <: Entity[get]
+    type get <: Entity
   }
   object EntityType {
     // @formatter:off

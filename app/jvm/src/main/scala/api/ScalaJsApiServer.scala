@@ -25,7 +25,7 @@ private[api] final class ScalaJsApiServer @Inject()(implicit accountingConfig: C
       .map(entityType => {
         val entities = getManager(entityType)
           .fetchAll()
-          .map(e => pickleEntity(entityType, e.asInstanceOf[Entity[_]]))
+          .map(e => pickleEntity(entityType, e.asInstanceOf[Entity]))
         entityType -> entities
       })
       .toMap
@@ -35,7 +35,7 @@ private[api] final class ScalaJsApiServer @Inject()(implicit accountingConfig: C
     val entity = unpickleEntity(entityType, entityBytes)
     require(entity.idOption.isDefined, s"Gotten an entity without ID ($entityType, $entity)")
 
-    def doInsert[E <: Entity[E]](entity: Entity[_]) = {
+    def doInsert[E <: Entity](entity: Entity) = {
       // TODO: Add with ID instead of regular add
       getManager(entityType).asInstanceOf[EntityManager[E]].add(entity.asInstanceOf[E])
     }

@@ -6,7 +6,7 @@ import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
 import play.api.Logger
 
-private[manager] final class DatabaseBackedEntityManager[E <: Entity[E], T <: EntityTable[E]](cons: Tag => T,
+private[manager] final class DatabaseBackedEntityManager[E <: Entity, T <: EntityTable[E]](cons: Tag => T,
                                                                                               val tableName: String)
   extends SlickEntityManager[E, T] {
 
@@ -20,7 +20,7 @@ private[manager] final class DatabaseBackedEntityManager[E <: Entity[E], T <: En
   override def add(entity: E): E = {
     require(entity.idOption.isEmpty, s"This entity was already persisted with id ${entity.id}")
     val id = dbRun(newQuery.returning(newQuery.map(_.id)).+=(entity))
-    entity.withId(id)
+    entity.withId(id).asInstanceOf[E]
   }
 
   override def update(entity: E): E = {

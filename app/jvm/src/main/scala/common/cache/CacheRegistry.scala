@@ -16,13 +16,13 @@ object CacheRegistry {
 
   private val doMaintenanceFunctions: List[() => Unit] = new CopyOnWriteArrayList
   private val verifyConsistencyFunctions: List[() => Unit] = new CopyOnWriteArrayList
-  private val invalidateCacheFunctions: List[Entity[_] => Unit] = new CopyOnWriteArrayList
+  private val invalidateCacheFunctions: List[Entity => Unit] = new CopyOnWriteArrayList
   private val resetForTestsFunctions: List[() => Unit] = new CopyOnWriteArrayList
 
   /** Registers given functions so that they are called when their respective events are triggered. */
   def registerCache(doMaintenance: () => Unit = doNothing,
                     verifyConsistency: () => Unit = doNothing,
-                    invalidateCache: Entity[_] => Unit = doNothing,
+                    invalidateCache: Entity => Unit = doNothing,
                     resetForTests: () => Unit = doNothing): Unit = {
     doMaintenanceFunctions.add(doMaintenance)
     verifyConsistencyFunctions.add(verifyConsistency)
@@ -41,7 +41,7 @@ object CacheRegistry {
   }
 
   /** Signals to all caches that given entity was updated and should be removed from all caches. */
-  def invalidateCachesWhenUpdated(entity: Entity[_]): Unit = {
+  def invalidateCachesWhenUpdated(entity: Entity): Unit = {
     for (invalidateCache <- invalidateCacheFunctions.asScala) {
       invalidateCache(entity)
     }
@@ -56,6 +56,6 @@ object CacheRegistry {
 
   object DoNothing {
     def doNothing(): Unit = {}
-    def doNothing(entity: Entity[_]): Unit = {}
+    def doNothing(entity: Entity): Unit = {}
   }
 }
