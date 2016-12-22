@@ -17,8 +17,7 @@ private[api] final class ScalaJsApiServer @Inject()(implicit accountingConfig: C
   override def getAllEntities(types: Seq[EntityType]): Map[EntityType, Seq[Entity]] = {
     types
       .map(entityType => {
-        val entities = getManager(entityType).fetchAll().map(_.asInstanceOf[Entity])
-        entityType -> entities
+        entityType -> getManager(entityType).fetchAll()
       })
       .toMap
   }
@@ -26,11 +25,8 @@ private[api] final class ScalaJsApiServer @Inject()(implicit accountingConfig: C
   override def insertEntityWithId(entityType: EntityType, entity: Entity): Unit = {
     require(entity.idOption.isDefined, s"Gotten an entity without ID ($entityType, $entity)")
 
-    def doInsert[E <: Entity](entity: Entity) = {
-      // TODO: Add with ID instead of regular add
-      getManager(entityType).asInstanceOf[EntityManager[E]].add(entity.asInstanceOf[E])
-    }
-    doInsert(entity)
+    // TODO: Add with ID instead of regular add
+    getManager(entityType).add(entityType.checkRightType(entity))
   }
 
   override def removeEntity(entityType: EntityType, entityId: Long): Unit = {
@@ -38,12 +34,14 @@ private[api] final class ScalaJsApiServer @Inject()(implicit accountingConfig: C
     // getManager(entityType).delete(entityId)
   }
 
-  private def getManager(entityType: EntityType): EntityManager[_] =
-    entityType match {
+  private def getManager(entityType: EntityType): EntityManager[entityType.get] = {
+    val manager = entityType match {
       case UserType => entityAccess.userManager
       case TransactionType => entityAccess.transactionManager
       case TransactionGroupType => entityAccess.transactionGroupManager
       case BalanceCheckType => entityAccess.balanceCheckManager
       case ExchangeRateMeasurementType => entityAccess.exchangeRateMeasurementManager
     }
+    manager.asInstanceOf[EntityManager[entityType.get]]
+  }
 }

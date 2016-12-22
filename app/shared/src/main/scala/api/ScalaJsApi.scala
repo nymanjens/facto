@@ -31,6 +31,10 @@ object ScalaJsApi {
 
   sealed trait EntityType {
     type get <: Entity
+
+    def checkRightType(entity: Entity): get = entity match {
+      case e: get => e
+    }
   }
   object EntityType {
     // @formatter:off
