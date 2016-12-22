@@ -125,8 +125,6 @@ object SPAMain extends js.JSApp {
     }
     X("abc")
 
-    out(UserModule.theUserStatusReader)
-    UserModule.theUserStatusReader.out()
     UserModule.otherUserStatusReader.out()
 
     val transaction = Scala2Js.toScala[Transaction](js.JSON.parse(
@@ -153,7 +151,7 @@ object SPAMain extends js.JSApp {
 
     new ScalaJsApiClient().getAccountingConfig().foreach(out)
     new ScalaJsApiClient().getAllEntities(Seq(UserType)).foreach(users => out(s"Users: $users"))
-    //    new ScalaJsApiClient().insertEntityWithId(UserType)(User("blah", "pw", "name", Option(2283)))
+    new ScalaJsApiClient().insertEntityWithId(UserType)(User("blah", "pw", "name", Option(2283)))
 
     val db = Loki.Database.persistent("loki-in-scalajs-test")
     def save(callback: () => Unit = () => {}) = {
@@ -199,17 +197,13 @@ object SPAMain extends js.JSApp {
     def out(): Unit
   }
   class DatabaseAccessImpl() extends DatabaseAccess {
-    SPAMain.out("Creating DatabaseAccessImpl")
     override def out() = SPAMain.out("IMPL!")
   }
   class SecurityFilter() {
-    SPAMain.out("Creating SecurityFilter")
   }
   class UserFinder(val databaseAccess: DatabaseAccess, securityFilter: SecurityFilter) {
-    SPAMain.out("Creating UserFinder")
   }
   class UserStatusReader(userFinder: UserFinder, databaseAccess: DatabaseAccess, securityFilter: SecurityFilter) {
-    SPAMain.out("Creating UserStatusReader")
     def out() = userFinder.databaseAccess.out()
   }
 
