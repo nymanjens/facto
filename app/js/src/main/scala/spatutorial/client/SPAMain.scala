@@ -30,6 +30,13 @@ import scala2js.Scala2Js
 import scala2js.Converters._
 import scala.collection.immutable.Seq
 
+import common._
+import common.time._
+import common.time.JavaTimeImplicits._
+import java.time.Month._
+import common.time.LocalDateTime
+import java.time.format._
+
 @JSExport("SPAMain")
 object SPAMain extends js.JSApp {
 
@@ -85,17 +92,11 @@ object SPAMain extends js.JSApp {
     //    ReactDOM.render(router(), dom.document.getElementById("root"))
   }
 
-  import common._
-  import common.time._
-  import common.time.JavaTimeImplicits._
-  import java.time.Month._
-  import common.time.LocalDateTime
-  import java.time.format._
-
   @JSExport
   def factoPortabilityTest(): Unit = {
     out("factoPortabilityTest() starting")
 
+    // --------------------------- Check for linker errors --------------------------- //
     implicit val clock = new JsClock
     val date = LocalDateTime.of(2012, DECEMBER, 1, 0, 0)
 
@@ -125,8 +126,10 @@ object SPAMain extends js.JSApp {
     }
     X("abc")
 
+    // --------------------------- Test MacWire --------------------------- //
     UserModule.otherUserStatusReader.out()
 
+    // --------------------------- Test Scala2Js --------------------------- //
     val transaction = Scala2Js.toScala[Transaction](js.JSON.parse(
       """{
           "transactionGroupId": 1232138,
@@ -149,10 +152,12 @@ object SPAMain extends js.JSApp {
     outJs(transactionJs)
     out(Scala2Js.toScala[Transaction](transactionJs))
 
+    // --------------------------- Test ScalaJsApi --------------------------- //
     new ScalaJsApiClient().getAccountingConfig().foreach(out)
     new ScalaJsApiClient().getAllEntities(Seq(UserType)).foreach(users => out(s"Users: $users"))
     new ScalaJsApiClient().insertEntityWithId(UserType)(User("blah", "pw", "name", Option(2283)))
 
+    // --------------------------- Test Loki --------------------------- //
     val db = Loki.Database.persistent("loki-in-scalajs-test")
     def save(callback: () => Unit = () => {}) = {
       val transactionsCollection = db.getOrAddCollection("transactions")
