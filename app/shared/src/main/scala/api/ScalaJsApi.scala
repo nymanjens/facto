@@ -20,11 +20,7 @@ trait ScalaJsApi {
 
   def insertEntityWithId(entityType: EntityType, entity: Entity): Unit
 
-  def removeEntity(entityType: EntityType, entityId: Long): Unit
-
-  def test(entityType: EntityType)(entity: entityType.get): Unit = {
-
-  }
+  def deleteEntity(entityType: EntityType, entity: Entity): Unit
 }
 
 object ScalaJsApi {

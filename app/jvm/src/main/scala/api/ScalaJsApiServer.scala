@@ -23,15 +23,16 @@ private[api] final class ScalaJsApiServer @Inject()(implicit accountingConfig: C
   }
 
   override def insertEntityWithId(entityType: EntityType, entity: Entity): Unit = {
-    require(entity.idOption.isDefined, s"Gotten an entity without ID ($entityType, $entity)")
+    require(entity.idOption.isDefined, s"Got an entity without ID ($entityType, $entity)")
 
     // TODO: Add with ID instead of regular add
     getManager(entityType).add(entityType.checkRightType(entity))
   }
 
-  override def removeEntity(entityType: EntityType, entityId: Long): Unit = {
-    // TODO: Delete by ID
-    // getManager(entityType).delete(entityId)
+  override def deleteEntity(entityType: EntityType, entity: Entity): Unit = {
+    require(entity.idOption.isDefined, s"Got an entity without ID ($entityType, $entity)")
+
+    getManager(entityType).delete(entityType.checkRightType(entity))
   }
 
   private def getManager(entityType: EntityType): EntityManager[entityType.get] = {
