@@ -33,7 +33,7 @@ object ScalaJsApi {
       case e: get => e
     }
 
-    val name: String = ScalaUtils.objectName(this)
+    def name: String = ScalaUtils.objectName(this)
     override def toString = name
   }
   object EntityType {
