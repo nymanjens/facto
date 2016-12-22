@@ -5,7 +5,10 @@ import java.time.{DayOfWeek, LocalDate, LocalTime}
 import java.time.format.DateTimeFormatter
 import java.time.temporal.{ChronoField, TemporalField}
 
+import api.ScalaJsApi.EntityType
+import api.ScalaJsApi.EntityType._
 import api.ScalaJsApiClient
+import models.User
 import models.accounting.{Tag, Transaction}
 import org.scalajs.dom
 
@@ -25,6 +28,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import jsfacades._
 import scala2js.Scala2Js
 import scala2js.Converters._
+import scala.collection.immutable.Seq
 
 @JSExport("SPAMain")
 object SPAMain extends js.JSApp {
@@ -121,8 +125,6 @@ object SPAMain extends js.JSApp {
     }
     X("abc")
 
-    out(UserModule.theUserStatusReader)
-    UserModule.theUserStatusReader.out()
     UserModule.otherUserStatusReader.out()
 
     val transaction = Scala2Js.toScala[Transaction](js.JSON.parse(
@@ -147,16 +149,17 @@ object SPAMain extends js.JSApp {
     outJs(transactionJs)
     out(Scala2Js.toScala[Transaction](transactionJs))
 
-    //    new ScalaJsApiClient().getAccountingConfig().foreach(out)
-    //    new ScalaJsApiClient().getAllEntities().foreach(out)
-
+    new ScalaJsApiClient().getAccountingConfig().foreach(out)
+    new ScalaJsApiClient().getAllEntities(Seq(UserType)).foreach(users => out(s"Users: $users"))
+    new ScalaJsApiClient().insertEntityWithId(UserType)(User("blah", "pw", "name", Option(2283)))
 
     val db = Loki.Database.persistent("loki-in-scalajs-test")
     def save(callback: () => Unit = () => {}) = {
-      val transactions = db.getOrAddCollection("transactions")
-      new ScalaJsApiClient().getAllEntities().foreach(allEntries => {
-        for (transaction <- allEntries.transactions) {
-          transactions.insert(Scala2Js.toJs(transaction))
+      val transactionsCollection = db.getOrAddCollection("transactions")
+      new ScalaJsApiClient().getAllEntities(Seq(TransactionType)).foreach(resultMap => {
+        val transactions = resultMap(TransactionType).asInstanceOf[Seq[Transaction]]
+        for (transaction <- transactions) {
+          transactionsCollection.insert(Scala2Js.toJs(transaction))
         }
         db.saveDatabase(() => {
           out("Done saving transactions")
@@ -170,7 +173,7 @@ object SPAMain extends js.JSApp {
       db.loadDatabase(() => {
         out("loaded")
         val children = db.getOrAddCollection("transactions")
-//        out(children.find(js.Dictionary("categoryCode" -> "MED")).toSeq map (Scala2Js.toScala[Transaction]))
+        //        out(children.find(js.Dictionary("categoryCode" -> "MED")).toSeq map (Scala2Js.toScala[Transaction]))
       })
     }
     save(() => load())
@@ -194,17 +197,13 @@ object SPAMain extends js.JSApp {
     def out(): Unit
   }
   class DatabaseAccessImpl() extends DatabaseAccess {
-    SPAMain.out("Creating DatabaseAccessImpl")
     override def out() = SPAMain.out("IMPL!")
   }
   class SecurityFilter() {
-    SPAMain.out("Creating SecurityFilter")
   }
   class UserFinder(val databaseAccess: DatabaseAccess, securityFilter: SecurityFilter) {
-    SPAMain.out("Creating UserFinder")
   }
-  class UserStatusReader(userFinder: UserFinder, databaseAccess: DatabaseAccess, securityFilter: SecurityFilter){
-    SPAMain.out("Creating UserStatusReader")
+  class UserStatusReader(userFinder: UserFinder, databaseAccess: DatabaseAccess, securityFilter: SecurityFilter) {
     def out() = userFinder.databaseAccess.out()
   }
 

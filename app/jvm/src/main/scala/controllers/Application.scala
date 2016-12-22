@@ -1,11 +1,12 @@
 package controllers
 
 import java.nio.ByteBuffer
+
 import scala.concurrent.Await
 import scala.concurrent.duration._
-
 import boopickle.Default._
 import api.Picklers._
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import com.google.inject.Inject
 
@@ -14,15 +15,16 @@ import play.api.data.Form
 import play.api.mvc._
 import play.api.data.Forms._
 import play.Play.application
-import play.api.i18n.{MessagesApi, Messages, I18nSupport}
-
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import api.ScalaJsApi
+import api.ScalaJsApi.EntityType
 import common.cache.CacheRegistry
-import models.{User, EntityAccess, SlickUserManager, SlickEntityAccess}
+import models.{EntityAccess, SlickEntityAccess, SlickUserManager, User}
 import controllers.accounting.Views
-import controllers.helpers.{ControllerHelperCache, AuthenticatedAction}
+import controllers.helpers.{AuthenticatedAction, ControllerHelperCache}
 import controllers.Application.Forms
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
+import models.manager.Entity
 
 final class Application @Inject()(implicit val messagesApi: MessagesApi,
                                   userManager: SlickUserManager,
@@ -83,13 +85,15 @@ final class Application @Inject()(implicit val messagesApi: MessagesApi,
       val argsMap = Unpickle[Map[String, ByteBuffer]].fromBytes(requestBuffer)
 
       val responseBuffer = path match {
-        // case "welcomeMsg" =>
-        //   val name = Unpickle[String].fromBytes(argsMap("name"))
-        //   Pickle.intoBytes(scalaJsApiService.welcomeMsg(name))
         case "getAccountingConfig" =>
           Pickle.intoBytes(scalaJsApiService.getAccountingConfig())
         case "getAllEntities" =>
-          Pickle.intoBytes(scalaJsApiService.getAllEntities())
+          val types = Unpickle[Seq[EntityType]].fromBytes(argsMap("types"))
+          Pickle.intoBytes(scalaJsApiService.getAllEntities(types))
+        case "insertEntityWithId" =>
+          val entityType = Unpickle[EntityType].fromBytes(argsMap("entityType"))
+          val entity = Unpickle[Entity].fromBytes(argsMap("entity"))
+          Pickle.intoBytes(scalaJsApiService.insertEntityWithId(entityType, entity))
       }
 
       // Serialize response in HTTP response

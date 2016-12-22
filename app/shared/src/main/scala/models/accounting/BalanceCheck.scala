@@ -13,7 +13,7 @@ case class BalanceCheck(issuerId: Long,
                         balanceInCents: Long,
                         createdDate: LocalDateTime,
                         checkDate: LocalDateTime,
-                        idOption: Option[Long] = None) extends Entity[BalanceCheck] {
+                        idOption: Option[Long] = None) extends Entity {
 
   override def withId(id: Long) = copy(idOption = Some(id))
 

@@ -13,7 +13,7 @@ import scala.collection.immutable.ListMap
   */
 case class TagEntity(name: String,
                      transactionId: Long,
-                     idOption: Option[Long] = None) extends Entity[TagEntity] {
+                     idOption: Option[Long] = None) extends Entity {
   require(!name.isEmpty)
   require(transactionId > 0)
   for (idVal <- idOption) require(idVal > 0)

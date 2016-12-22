@@ -1,19 +1,20 @@
 package api
 
 import autowire._
-
 import models.accounting.config.Config
 import java.nio.ByteBuffer
 
 import boopickle.Default._
 import api.Picklers._
+import api.ScalaJsApi.EntityType
+import models.manager.Entity
+import models.manager.Entity.asEntity
 import org.scalajs.dom
 
+import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js.typedarray._
-
-import api.ScalaJsApi.AllEntries
 
 final class ScalaJsApiClient {
 
@@ -21,7 +22,14 @@ final class ScalaJsApiClient {
 
   def getAccountingConfig(): Future[Config] = AutowireClient[ScalaJsApi].getAccountingConfig().call()
 
-  def getAllEntities(): Future[AllEntries] = AutowireClient[ScalaJsApi].getAllEntities().call()
+  def getAllEntities(types: Seq[EntityType]): Future[Map[EntityType, Seq[Entity]]] = {
+    AutowireClient[ScalaJsApi].getAllEntities(types).call()
+  }
+
+  def insertEntityWithId(entityType: EntityType)(entity: entityType.get): Future[_] = {
+    require(entity.idOption.isDefined, s"Gotten an entity without ID ($entityType, $entity)")
+    AutowireClient[ScalaJsApi].insertEntityWithId(entityType, asEntity(entity)).call()
+  }
 }
 
 object ScalaJsApiClient {

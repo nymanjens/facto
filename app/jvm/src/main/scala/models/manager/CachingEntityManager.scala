@@ -10,7 +10,7 @@ import org.apache.http.annotation.GuardedBy
 import common.cache.CacheRegistry
 
 /** Caching decorator for an SlickEntityManager that loads all data in memory and keeps it in sync with all updates. */
-private[manager] final class CachingEntityManager[E <: Entity[E], T <: AbstractTable[E]](delegate: SlickEntityManager[E, T])
+private[manager] final class CachingEntityManager[E <: Entity, T <: AbstractTable[E]](delegate: SlickEntityManager[E, T])
   extends ForwardingEntityManager[E, T](delegate) {
   CacheRegistry.registerCache(
     verifyConsistency = verifyConsistency,

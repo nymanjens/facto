@@ -9,7 +9,7 @@ import common.cache.CacheRegistry
 import controllers.helpers.ControllerHelperCache
 
 /** SlickEntityManager decorator that triggers the CacheRegistry's invalidateCache hook when an entity is updated. */
-private[manager] final class InvalidatingEntityManager[E <: Entity[E], T <: AbstractTable[E]](delegate: SlickEntityManager[E, T])
+private[manager] final class InvalidatingEntityManager[E <: Entity, T <: AbstractTable[E]](delegate: SlickEntityManager[E, T])
   extends ForwardingEntityManager[E, T](delegate) {
 
   // ********** Implementation of SlickEntityManager interface: Mutators ********** //
