@@ -17,3 +17,7 @@ trait Entity {
   /** Returns a copy of this Entity with an ID. */
   protected[manager] def withId(id: Long): Entity
 }
+
+object Entity {
+  def asEntity(entity: Entity): Entity = entity
+}

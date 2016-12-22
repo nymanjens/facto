@@ -8,6 +8,7 @@ import boopickle.Default._
 import api.Picklers._
 import api.ScalaJsApi.EntityType
 import models.manager.Entity
+import models.manager.Entity.asEntity
 import org.scalajs.dom
 
 import scala.collection.immutable.Seq
@@ -22,19 +23,12 @@ final class ScalaJsApiClient {
   def getAccountingConfig(): Future[Config] = AutowireClient[ScalaJsApi].getAccountingConfig().call()
 
   def getAllEntities(types: Seq[EntityType]): Future[Map[EntityType, Seq[Entity]]] = {
-    val resultMapFuture = AutowireClient[ScalaJsApi].getAllEntities(types).call()
-
-    resultMapFuture.map(resultMap => {
-      resultMap.map { case (entityType, seq) =>
-        entityType -> seq.map(entityBytes => unpickleEntity(entityType, entityBytes))
-      }
-    })
+    AutowireClient[ScalaJsApi].getAllEntities(types).call()
   }
 
   def insertEntityWithId(entityType: EntityType)(entity: entityType.get): Future[_] = {
     require(entity.idOption.isDefined, s"Gotten an entity without ID ($entityType, $entity)")
-    val entityBytes = pickleEntity(entityType, entity)
-    AutowireClient[ScalaJsApi].insertEntityWithId(entityType, entityBytes).call()
+    AutowireClient[ScalaJsApi].insertEntityWithId(entityType, asEntity(entity)).call()
   }
 }
 

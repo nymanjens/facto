@@ -1,16 +1,10 @@
 package api
 
-import java.nio.ByteBuffer
-
 import api.ScalaJsApi.EntityType
 import api.ScalaJsApi.EntityType._
-import boopickle.Default._
-import api.Picklers._
 import com.google.inject._
-import models.{EntityAccess, User}
-import models.accounting._
+import models.EntityAccess
 import models.accounting.config.Config
-import models.accounting.money.ExchangeRateMeasurement
 import models.manager.{Entity, EntityManager}
 
 import scala.collection.immutable.Seq
@@ -20,19 +14,16 @@ private[api] final class ScalaJsApiServer @Inject()(implicit accountingConfig: C
 
   override def getAccountingConfig(): Config = accountingConfig
 
-  override def getAllEntities(types: Seq[EntityType]): Map[EntityType, Seq[ByteBuffer]] = {
+  override def getAllEntities(types: Seq[EntityType]): Map[EntityType, Seq[Entity]] = {
     types
       .map(entityType => {
-        val entities = getManager(entityType)
-          .fetchAll()
-          .map(e => pickleEntity(entityType, e.asInstanceOf[Entity]))
+        val entities = getManager(entityType).fetchAll().map(_.asInstanceOf[Entity])
         entityType -> entities
       })
       .toMap
   }
 
-  override def insertEntityWithId(entityType: EntityType, entityBytes: ByteBuffer): Unit = {
-    val entity = unpickleEntity(entityType, entityBytes)
+  override def insertEntityWithId(entityType: EntityType, entity: Entity): Unit = {
     require(entity.idOption.isDefined, s"Gotten an entity without ID ($entityType, $entity)")
 
     def doInsert[E <: Entity](entity: Entity) = {

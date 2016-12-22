@@ -24,6 +24,7 @@ import controllers.accounting.Views
 import controllers.helpers.{AuthenticatedAction, ControllerHelperCache}
 import controllers.Application.Forms
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
+import models.manager.Entity
 
 final class Application @Inject()(implicit val messagesApi: MessagesApi,
                                   userManager: SlickUserManager,
@@ -91,7 +92,7 @@ final class Application @Inject()(implicit val messagesApi: MessagesApi,
           Pickle.intoBytes(scalaJsApiService.getAllEntities(types))
         case "insertEntityWithId" =>
           val entityType = Unpickle[EntityType].fromBytes(argsMap("entityType"))
-          val entity = argsMap("entity")
+          val entity = Unpickle[Entity].fromBytes(argsMap("entity"))
           Pickle.intoBytes(scalaJsApiService.insertEntityWithId(entityType, entity))
       }
 

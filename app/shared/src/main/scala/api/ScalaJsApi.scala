@@ -16,9 +16,9 @@ trait ScalaJsApi {
   def getAccountingConfig(): Config
 
   /** Returns a map, mapping the entity type to a sequence of all entities of that type. */
-  def getAllEntities(types: Seq[EntityType]): Map[EntityType, Seq[ByteBuffer]]
+  def getAllEntities(types: Seq[EntityType]): Map[EntityType, Seq[Entity]]
 
-  def insertEntityWithId(entityType: EntityType, entity: ByteBuffer): Unit
+  def insertEntityWithId(entityType: EntityType, entity: Entity): Unit
 
   def removeEntity(entityType: EntityType, entityId: Long): Unit
 

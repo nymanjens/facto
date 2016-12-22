@@ -92,26 +92,10 @@ object Picklers {
     }
   }
 
-  def pickleEntity(entityType: EntityType, entity: Entity): ByteBuffer =
-    entityType match {
-      case UserType => Pickle.intoBytes(entity.asInstanceOf[User])
-      case TransactionType => Pickle.intoBytes(entity.asInstanceOf[Transaction])
-      case TransactionGroupType => Pickle.intoBytes(entity.asInstanceOf[TransactionGroup])
-      case BalanceCheckType => Pickle.intoBytes(entity.asInstanceOf[BalanceCheck])
-      case ExchangeRateMeasurementType => Pickle.intoBytes(entity.asInstanceOf[ExchangeRateMeasurement])
-    }
-
-  def unpickleEntity(entityType: EntityType, entityBytes: ByteBuffer): Entity =
-    entityType match {
-      case UserType => Unpickle[User].fromBytes(entityBytes)
-      case TransactionType => Unpickle[Transaction].fromBytes(entityBytes)
-      case TransactionGroupType => Unpickle[TransactionGroup].fromBytes(entityBytes)
-      case BalanceCheckType => Unpickle[BalanceCheck].fromBytes(entityBytes)
-      case ExchangeRateMeasurementType => Unpickle[ExchangeRateMeasurement].fromBytes(entityBytes)
-    }
-
-  //  implicit val fruitPickler = compositePickler[Fruit].
-  //    addConcreteType[Banana].
-  //    addConcreteType[Kiwi].
-  //    addConcreteType[Carambola]
+  implicit val entityPickler = compositePickler[Entity].
+    addConcreteType[User].
+    addConcreteType[Transaction].
+    addConcreteType[TransactionGroup].
+    addConcreteType[BalanceCheck].
+    addConcreteType[ExchangeRateMeasurement]
 }
