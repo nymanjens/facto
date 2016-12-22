@@ -55,22 +55,4 @@ private[api] final class ScalaJsApiServer @Inject()(implicit accountingConfig: C
       case BalanceCheckType => entityAccess.balanceCheckManager
       case ExchangeRateMeasurementType => entityAccess.exchangeRateMeasurementManager
     }
-
-  private def pickleEntity(entityType: EntityType, entity: Entity[_]): ByteBuffer =
-    entityType match {
-      case UserType => Pickle.intoBytes(entity.asInstanceOf[User])
-      case TransactionType => Pickle.intoBytes(entity.asInstanceOf[Transaction])
-      case TransactionGroupType => Pickle.intoBytes(entity.asInstanceOf[TransactionGroup])
-      case BalanceCheckType => Pickle.intoBytes(entity.asInstanceOf[BalanceCheck])
-      case ExchangeRateMeasurementType => Pickle.intoBytes(entity.asInstanceOf[ExchangeRateMeasurement])
-    }
-
-  private def unpickleEntity(entityType: EntityType, entityBytes: ByteBuffer): Entity[_] =
-    entityType match {
-      case UserType => Unpickle[User].fromBytes(entityBytes)
-      case TransactionType => Unpickle[Transaction].fromBytes(entityBytes)
-      case TransactionGroupType => Unpickle[TransactionGroup].fromBytes(entityBytes)
-      case BalanceCheckType => Unpickle[BalanceCheck].fromBytes(entityBytes)
-      case ExchangeRateMeasurementType => Unpickle[ExchangeRateMeasurement].fromBytes(entityBytes)
-    }
 }

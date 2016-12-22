@@ -1,12 +1,17 @@
 package api
 
+import java.nio.ByteBuffer
 import java.time.{LocalDate, LocalTime}
 
 import api.ScalaJsApi.EntityType
 import api.ScalaJsApi.EntityType._
 import boopickle.Default._
 import common.time.LocalDateTime
+import models.User
+import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 import models.accounting.config._
+import models.accounting.money.ExchangeRateMeasurement
+import models.manager.Entity
 
 import scala.collection.immutable.{Seq, Set}
 
@@ -86,4 +91,22 @@ object Picklers {
       }
     }
   }
+
+  def pickleEntity(entityType: EntityType, entity: Entity[_]): ByteBuffer =
+    entityType match {
+      case UserType => Pickle.intoBytes(entity.asInstanceOf[User])
+      case TransactionType => Pickle.intoBytes(entity.asInstanceOf[Transaction])
+      case TransactionGroupType => Pickle.intoBytes(entity.asInstanceOf[TransactionGroup])
+      case BalanceCheckType => Pickle.intoBytes(entity.asInstanceOf[BalanceCheck])
+      case ExchangeRateMeasurementType => Pickle.intoBytes(entity.asInstanceOf[ExchangeRateMeasurement])
+    }
+
+  def unpickleEntity(entityType: EntityType, entityBytes: ByteBuffer): Entity[_] =
+    entityType match {
+      case UserType => Unpickle[User].fromBytes(entityBytes)
+      case TransactionType => Unpickle[Transaction].fromBytes(entityBytes)
+      case TransactionGroupType => Unpickle[TransactionGroup].fromBytes(entityBytes)
+      case BalanceCheckType => Unpickle[BalanceCheck].fromBytes(entityBytes)
+      case ExchangeRateMeasurementType => Unpickle[ExchangeRateMeasurement].fromBytes(entityBytes)
+    }
 }

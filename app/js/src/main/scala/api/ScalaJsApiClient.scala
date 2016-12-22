@@ -21,12 +21,19 @@ final class ScalaJsApiClient {
 
   def getAccountingConfig(): Future[Config] = AutowireClient[ScalaJsApi].getAccountingConfig().call()
 
-  def getAllEntities(types: Seq[EntityType]): Future[Map[EntityType, Seq[Entity[_]]]] =
-    AutowireClient[ScalaJsApi].getAllEntities(types).call()
+  def getAllEntities(types: Seq[EntityType]): Future[Map[EntityType, Seq[Entity[_]]]] = {
+    val resultMapFuture = AutowireClient[ScalaJsApi].getAllEntities(types).call()
 
-  def insertEntityWithId[E <: Entity[E]](entityType: EntityType[E], entity: E): Future[_] = {
+    resultMapFuture.map(resultMap => {
+      resultMap.map { case (entityType, seq) =>
+        entityType -> seq.map(entityBytes => unpickleEntity(entityType, entityBytes))
+      }
+    })
+  }
+
+  def insertEntityWithId(entityType: EntityType)(entity: entityType.get): Future[_] = {
     require(entity.idOption.isDefined, s"Gotten an entity without ID ($entityType, $entity)")
-    val entityBytes = Pickle.intoBytes(entity)
+    val entityBytes = pickleEntity(entityType, entity)
     AutowireClient[ScalaJsApi].insertEntityWithId(entityType, entityBytes).call()
   }
 }

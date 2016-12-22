@@ -152,13 +152,13 @@ object SPAMain extends js.JSApp {
     out(Scala2Js.toScala[Transaction](transactionJs))
 
     new ScalaJsApiClient().getAccountingConfig().foreach(out)
-    new ScalaJsApiClient().getAllEntities(Seq(UserType)).foreach(out)
-    new ScalaJsApiClient().insertEntityWithId(UserType, User("blah", "pw", "name", Option(2283)))
+    new ScalaJsApiClient().getAllEntities(Seq(UserType)).foreach(users => out(s"Users: $users"))
+    //    new ScalaJsApiClient().insertEntityWithId(UserType)(User("blah", "pw", "name", Option(2283)))
 
     val db = Loki.Database.persistent("loki-in-scalajs-test")
     def save(callback: () => Unit = () => {}) = {
       val transactionsCollection = db.getOrAddCollection("transactions")
-      new ScalaJsApiClient().getAllEntities(Seq(UserType)).foreach(resultMap => {
+      new ScalaJsApiClient().getAllEntities(Seq(TransactionType)).foreach(resultMap => {
         val transactions = resultMap(TransactionType).asInstanceOf[Seq[Transaction]]
         for (transaction <- transactions) {
           transactionsCollection.insert(Scala2Js.toJs(transaction))
