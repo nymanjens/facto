@@ -176,7 +176,6 @@ object SPAMain extends js.JSApp {
     }
     def load() = {
       out("loading")
-      db.loadDatabase()
       db.loadDatabase(() => {
         out("loaded")
         val children = db.getOrAddCollection("transactions")

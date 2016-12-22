@@ -49,5 +49,6 @@ object Loki {
 
     def insert(obj: js.Any): Unit = js.native
     def find(filter: js.Dictionary[js.Any]): js.Array[js.Dictionary[js.Any]] = js.native
+    def clear(): Unit = js.native
   }
 }
