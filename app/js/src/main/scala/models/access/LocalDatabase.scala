@@ -23,14 +23,14 @@ private[access] trait LocalDatabase {
   def clear(): Future[Unit]
 
   // **************** Inner types ****************//
-  trait Updater {
+  private[access] trait Updater {
     def applyModifications(modifications: Seq[EntityModification]): Updater
     def setSingletonValue[V](key: SingletonKey[V], value: V): Updater
     def save(): Future[Unit]
   }
 }
 
-object LocalDatabase {
+private[access] object LocalDatabase {
 
   def create(): Future[LocalDatabase] = {
     val lokiDb: Loki.Database = Loki.Database.persistent("facto-db")
