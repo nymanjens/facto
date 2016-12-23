@@ -16,7 +16,7 @@ trait RemoteDatabaseProxy {
   def hasLocalModifications(entityType: EntityType)(entity: entityType.get): Boolean
 
   // **************** Setters ****************//
-  def applyModifications(modifications: Seq[EntityModification]): Future[Unit]
+  def persistModifications(modifications: Seq[EntityModification]): Future[Unit]
 
   // **************** Other ****************//
   def registerListener(listener: RemoteDatabaseProxy.Listener): Unit
