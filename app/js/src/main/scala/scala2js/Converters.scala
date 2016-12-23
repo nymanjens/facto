@@ -10,6 +10,12 @@ import common.time.LocalDateTime
 
 object Converters {
 
+  implicit object StringConverter extends Scala2Js.Converter[String] {
+    override def toJs(string: String) = string
+    override def toScala(value: js.Any) = value.asInstanceOf[String]
+  }
+
+
   implicit object LocalDateTimeConverter extends Scala2Js.Converter[LocalDateTime] {
 
     private val secondsInDay = 60 * 60 * 24

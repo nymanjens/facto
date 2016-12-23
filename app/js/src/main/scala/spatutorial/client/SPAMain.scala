@@ -17,6 +17,7 @@ import spatutorial.client.logger._
 
 //import spatutorial.client.modules._
 //import spatutorial.client.services.SPACircuit
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation._
@@ -168,7 +169,7 @@ object SPAMain extends js.JSApp {
         for (transaction <- transactions) {
           transactionsCollection.insert(Scala2Js.toJs(transaction))
         }
-        db.saveDatabase(() => {
+        db.saveDatabase() map (_ => {
           out("Done saving transactions")
           callback()
         })
@@ -176,10 +177,10 @@ object SPAMain extends js.JSApp {
     }
     def load() = {
       out("loading")
-      db.loadDatabase(() => {
+      db.loadDatabase() map (_ => {
         out("loaded")
         val children = db.getOrAddCollection("transactions")
-        //        out(children.find(js.Dictionary("categoryCode" -> "MED")).toSeq map (Scala2Js.toScala[Transaction]))
+        //        out(children.find("categoryCode" -> "MED").toSeq map (Scala2Js.toScala[Transaction]))
       })
     }
     //    save(() => load())
