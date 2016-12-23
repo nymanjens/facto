@@ -15,10 +15,10 @@ private[access] sealed trait SingletonKey[V] {
 
 private[access] object SingletonKey {
   abstract class StringSingletonKey extends SingletonKey[String] {
-    override val converter = implicitly
+    override val converter = implicitly[Scala2Js.Converter[String]]
   }
   abstract class DateTimeSingletonKey extends SingletonKey[LocalDateTime] {
-    override val converter = implicitly
+    override val converter = implicitly[Scala2Js.Converter[LocalDateTime]]
   }
   object LastUpdateTimeKey extends DateTimeSingletonKey
   object VersionKey extends StringSingletonKey

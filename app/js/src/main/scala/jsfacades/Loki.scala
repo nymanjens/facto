@@ -91,13 +91,4 @@ object Loki {
     def data(): js.Array[js.Dictionary[js.Any]] = facade.data()
     def count(): Int = facade.count()
   }
-
-  object ResultSet {
-    val empty: ResultSet = new ResultSet(
-      new ResultSetFacade {
-        override def find(filter: js.Dictionary[js.Any]) = this
-        override def data() = Array()
-        override def count() = 0
-      })
-  }
 }

@@ -24,7 +24,6 @@ import scala.scalajs.js.annotation._
 import scala.annotation.meta.field
 import scalacss.Defaults._
 import scalacss.ScalaCssReact._
-import scala.concurrent.ExecutionContext.Implicits.global
 
 import jsfacades._
 import scala2js.Scala2Js
@@ -167,7 +166,7 @@ object SPAMain extends js.JSApp {
       new ScalaJsApiClient().getAllEntities(Seq(TransactionType)).foreach(resultMap => {
         val transactions = resultMap(TransactionType).asInstanceOf[Seq[Transaction]]
         for (transaction <- transactions) {
-          transactionsCollection.insert(Scala2Js.toJs(transaction))
+          transactionsCollection.insert(Scala2Js.toJs(transaction).asInstanceOf[js.Dictionary[js.Any]])
         }
         db.saveDatabase() map (_ => {
           out("Done saving transactions")
