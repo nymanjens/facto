@@ -20,6 +20,7 @@ trait ScalaJsApi {
   /** Returns a map, mapping the entity type to a sequence of all entities of that type. */
   def getAllEntities(types: Seq[EntityType]): Map[EntityType, Seq[Entity]]
 
+  // TODO: Reomve insert/delete and accept Seq[EntityModification] instead
   def insertEntityWithId(entityType: EntityType, entity: Entity): Unit
 
   def deleteEntity(entityType: EntityType, entity: Entity): Unit

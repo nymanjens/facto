@@ -91,4 +91,8 @@ object Loki {
     def data(): js.Array[js.Dictionary[js.Any]] = facade.data()
     def count(): Int = facade.count()
   }
+
+  object ResultSet {
+    val empty: ResultSet = ???
+  }
 }

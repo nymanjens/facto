@@ -11,7 +11,15 @@ import scala2js.Scala2Js
 import scala2js.Converters._
 
 // TODO: Move this
-trait EntityModification
+trait EntityModification {
+  def entityType: EntityType
+  def entityId: Long
+}
+
+object EntityModification {
+  case class Add(val entityType: EntityType, val entityId: Long) extends EntityModification
+  case class Remove(val entityType: EntityType, val entityId: Long) extends EntityModification
+}
 
 private[access] trait LocalDatabase {
   // **************** Getters ****************//
