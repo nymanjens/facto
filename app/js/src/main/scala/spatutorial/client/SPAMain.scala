@@ -157,7 +157,7 @@ object SPAMain extends js.JSApp {
     // --------------------------- Test ScalaJsApi --------------------------- //
     new ScalaJsApiClient().getAccountingConfig().foreach(out)
     new ScalaJsApiClient().getAllEntities(Seq(UserType)).foreach(users => out(s"Users: $users"))
-    new ScalaJsApiClient().insertEntityWithId(UserType)(User("blah", "pw", "name", Option(2283)))
+//    new ScalaJsApiClient().insertEntityWithId(UserType)(User("blah", "pw", "name", Option(2283)))
 
     // --------------------------- Test Loki --------------------------- //
     val db = Loki.Database.persistent("loki-in-scalajs-test")
@@ -166,7 +166,7 @@ object SPAMain extends js.JSApp {
       new ScalaJsApiClient().getAllEntities(Seq(TransactionType)).foreach(resultMap => {
         val transactions = resultMap(TransactionType).asInstanceOf[Seq[Transaction]]
         for (transaction <- transactions) {
-          transactionsCollection.insert(Scala2Js.toJs(transaction).asInstanceOf[js.Dictionary[js.Any]])
+          transactionsCollection.insert(Scala2Js.toJsMap(transaction))
         }
         db.saveDatabase() map (_ => {
           out("Done saving transactions")

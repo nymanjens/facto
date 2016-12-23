@@ -8,6 +8,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala2js.Scala2Js
+import scala2js.Converters._
 
 // TODO: Move this
 trait EntityModification
@@ -19,20 +20,19 @@ private[access] trait LocalDatabase {
   def isEmpty(): Boolean
 
   // **************** Setters ****************//
-  def newUpdater(): Updater
+  /** Applies given modification in memory but doesn't persist it in the browser's storage (call `save()` to do this). */
+  def applyModifications(modifications: Seq[EntityModification]): Unit
+  def addAll(entityType: EntityType)(entities: Seq[entityType.get]): Unit
+  /** Sets given singleton value in memory but doesn't persist it in the browser's storage (call `save()` to do this). */
+  def setSingletonValue[V](key: SingletonKey[V], value: V): Unit
+  /** Persists all previously made changes to the browser's storage. */
+  def save(): Future[Unit]
   def clear(): Future[Unit]
-
-  // **************** Inner types ****************//
-  private[access] trait Updater {
-    def applyModifications(modifications: Seq[EntityModification]): Updater
-    def setSingletonValue[V](key: SingletonKey[V], value: V): Updater
-    def save(): Future[Unit]
-  }
 }
 
 private[access] object LocalDatabase {
 
-  def create(): Future[LocalDatabase] = {
+  def createLoadedFuture(): Future[LocalDatabase] = {
     val lokiDb: Loki.Database = Loki.Database.persistent("facto-db")
     lokiDb.loadDatabase() map (_ => new Impl(lokiDb))
   }
@@ -61,22 +61,28 @@ private[access] object LocalDatabase {
     }
 
     // **************** Setters ****************//
-    override def newUpdater(): Updater = new Updater {
-      override def applyModifications(modifications: Seq[EntityModification]): Updater = ???
+    override def applyModifications(modifications: Seq[EntityModification]): Unit = {
+      ???
+    }
 
-      override def setSingletonValue[V](key: SingletonKey[V], value: V): Updater = {
-        implicit val converter = key.converter
-        singletonCollection.findAndRemove("key" -> key.name)
-        singletonCollection.insert(js.Dictionary(
-          "key" -> key.name,
-          "value" -> Scala2Js.toJs(value)
-        ))
-        this
+    override def addAll(entityType: EntityType)(entities: Seq[entityType.get]): Unit = {
+      implicit val converter = entityTypeToConverter(entityType)
+      for (entity <- entities) {
+        entityCollections(entityType).insert(Scala2Js.toJsMap(entity))
       }
+    }
 
-      override def save(): Future[Unit] = {
-        lokiDb.saveDatabase()
-      }
+    override def setSingletonValue[V](key: SingletonKey[V], value: V): Unit = {
+      implicit val converter = key.converter
+      singletonCollection.findAndRemove("key" -> key.name)
+      singletonCollection.insert(js.Dictionary(
+        "key" -> key.name,
+        "value" -> Scala2Js.toJs(value)
+      ))
+    }
+
+    override def save(): Future[Unit] = {
+      lokiDb.saveDatabase()
     }
 
     override def clear(): Future[Unit] = {

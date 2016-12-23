@@ -3,18 +3,22 @@ package scala2js
 import java.time.Month.AUGUST
 import java.time.{LocalDate, LocalTime}
 
-import scala.scalajs.js
+import api.ScalaJsApi.EntityType
 
+import scala.scalajs.js
 import models.accounting.Transaction
 import common.time.LocalDateTime
 
 object Converters {
 
+  def entityTypeToConverter(entityType: EntityType): Scala2Js.MapConverter[entityType.get] = {
+    ???
+  }
+
   implicit object StringConverter extends Scala2Js.Converter[String] {
     override def toJs(string: String) = string
     override def toScala(value: js.Any) = value.asInstanceOf[String]
   }
-
 
   implicit object LocalDateTimeConverter extends Scala2Js.Converter[LocalDateTime] {
 
@@ -35,7 +39,7 @@ object Converters {
     }
   }
 
-  implicit object TransactionConverter extends Scala2Js.Converter[Transaction] {
+  implicit object TransactionConverter extends Scala2Js.MapConverter[Transaction] {
     override def toJs(transaction: Transaction) = {
       val dateTimeConverter = implicitly[Scala2Js.Converter[LocalDateTime]]
       val result = js.Dictionary[js.Any](
@@ -57,11 +61,10 @@ object Converters {
       }
       result
     }
-    override def toScala(value: js.Any) = {
-      val dict = value.asInstanceOf[js.Dictionary[js.Any]]
+    override def toScala(dict: js.Dictionary[js.Any]) = {
       val dateTimeConverter = implicitly[Scala2Js.Converter[LocalDateTime]]
       def getValue[T](key: String): T = {
-        require(dict.contains(key), s"Key $key is missing from ${js.JSON.stringify(value)}")
+        require(dict.contains(key), s"Key $key is missing from ${js.JSON.stringify(dict)}")
         dict(key).asInstanceOf[T]
       }
       def getString(key: String): String = getValue[String](key)
