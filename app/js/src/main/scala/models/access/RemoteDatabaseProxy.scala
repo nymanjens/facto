@@ -29,9 +29,9 @@ trait RemoteDatabaseProxy {
 
 object RemoteDatabaseProxy {
 
-  val localDatabaseAndEntityVersion = "1.0"
+  private val localDatabaseAndEntityVersion = "1.0"
 
-  def create(apiClient: ScalaJsApiClient): RemoteDatabaseProxy = {
+  private[access] def create(apiClient: ScalaJsApiClient): RemoteDatabaseProxy = {
     val futureDb = LocalDatabase.createLoadedFuture()
     val validDb = futureDb.flatMap(db => {
       if (db.isEmpty() || db.getSingletonValue(VersionKey) != Some(localDatabaseAndEntityVersion)) {
