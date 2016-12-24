@@ -77,11 +77,12 @@ object RemoteDatabaseProxy {
   private[access] final class Impl(apiClient: ScalaJsApiClient,
                                    localDatabase: Future[LocalDatabase]) extends RemoteDatabaseProxy {
 
-    val listeners: mutable.Buffer[Listener] = mutable.Buffer()
+    var listeners: Seq[Listener] = Seq()
     val localAddModificationIds: Map[EntityType, mutable.Set[Long]] =
       EntityType.values.map(t => t -> mutable.Set[Long]()).toMap
+    var isCallingListeners: Boolean = false
 
-    localDatabase.onSuccess { case db => listeners.foreach(_.loadedDatabase()) }
+    localDatabase.onSuccess { case db => invokeListenersAsync(_.loadedDatabase()) }
     // TODO: Start getting latest changes, starting at t0 (db.setSingletonValue(LastUpdateTimeKey, ...))
 
     // **************** Getters ****************//
@@ -95,9 +96,11 @@ object RemoteDatabaseProxy {
 
     // **************** Setters ****************//
     override def persistModifications(modifications: Seq[EntityModification]): Unit = {
+      require(!isCallingListeners)
+
       localDatabase onSuccess { case db =>
         db.applyModifications(modifications)
-        listeners.foreach(_.addedLocally(modifications))
+        invokeListenersAsync(_.addedLocally(modifications))
         for {
           modification <- modifications
           if modification.isInstanceOf[EntityModification.Add]
@@ -108,18 +111,32 @@ object RemoteDatabaseProxy {
         //          modification <- modifications
         //          if modification.isInstanceOf[EntityModification.Add]
         //        } localAddModificationIds(modification.entityType) -= modification.entityId
-        //        listeners.foreach(_.persistedRemotely(modifications))
+        //        invokeListeners(_.persistedRemotely(modifications))
       }
     }
     override def clearLocalDatabase(): Future[Unit] = {
+      require(!isCallingListeners)
+
       val resultFuture = localDatabase.flatMap(_.clear())
-      resultFuture onSuccess { case _ => listeners.foreach(_.loadedDatabase()) }
+      resultFuture onSuccess { case _ => invokeListenersAsync(_.loadedDatabase()) }
       resultFuture
     }
 
     // **************** Other ****************//
     override def registerListener(listener: Listener): Unit = {
-      listeners += listener
+      require(!isCallingListeners)
+
+      listeners = listeners :+ listener
+    }
+
+    // **************** Private helper methods ****************//
+    private def invokeListenersAsync(func: Listener => Unit): Unit = {
+      Future {
+        require(!isCallingListeners)
+        isCallingListeners = true
+        listeners.foreach(func)
+        isCallingListeners = false
+      }
     }
   }
 }
