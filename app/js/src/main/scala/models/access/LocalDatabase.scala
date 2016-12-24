@@ -11,7 +11,7 @@ import scala2js.Scala2Js
 import scala2js.Converters._
 
 // TODO: Move this
-trait EntityModification {
+sealed trait EntityModification {
   def entityType: EntityType
   def entityId: Long
 }
