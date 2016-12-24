@@ -2,23 +2,33 @@ package models.access
 
 import api.ScalaJsApi.EntityType
 import jsfacades.Loki
+import models.manager.Entity
+
 import scala.scalajs.js
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala2js.Scala2Js
 import scala2js.Converters._
 
-// TODO: Move this
+// TODO: Move this to common
+/**
+  * Indicates an addition or removal of an immutable entity.
+  *
+  * This modification may used for desired modifications (not yet persisted) or to indicate an already changed state.
+  */
 sealed trait EntityModification {
   def entityType: EntityType
   def entityId: Long
 }
 
 object EntityModification {
-  case class Add(val entityType: EntityType, val entityId: Long) extends EntityModification
-  case class Remove(val entityType: EntityType, val entityId: Long) extends EntityModification
+  case class Add(override val entityType: EntityType, entity: Entity) extends EntityModification {
+    require(entity.isInstanceOf[entityType.get])
+
+    override def entityId: Long = entity.id
+  }
+  case class Remove(override val entityType: EntityType, override val entityId: Long) extends EntityModification
 }
 
 private[access] trait LocalDatabase {
