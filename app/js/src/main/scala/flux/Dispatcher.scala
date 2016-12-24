@@ -1,16 +1,35 @@
 package flux
 
-final class Dispatcher {
+import scala.collection.immutable.Seq
+import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-  def register(callback: Action => Unit): Unit = {
+trait Dispatcher {
 
-  }
+  def register(callback: PartialFunction[Action, Unit]): Unit
 
-  def dispatch(action: Action): Unit = {
+  def dispatch(action: Action): Unit
+}
 
-  }
+object Dispatcher {
+  private[flux] final class Impl extends Dispatcher {
+    var callbacks: Seq[PartialFunction[Action, Unit]] = Seq()
+    var isDispatching: Boolean = false
 
-  private def isDispatching(): Boolean = {
-    false // TODO
+    def register(callback: PartialFunction[Action, Unit]): Unit = {
+      require(!isDispatching)
+      callbacks = callbacks :+ callback
+    }
+
+    def dispatch(action: Action): Unit = {
+      require(!isDispatching)
+
+      Future {
+        require(!isDispatching)
+        isDispatching = true
+        callbacks.foreach(_.apply(action))
+        isDispatching = false
+      }
+    }
   }
 }
