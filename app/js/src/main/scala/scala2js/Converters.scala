@@ -9,16 +9,31 @@ import scala.scalajs.js
 import models.accounting.Transaction
 import common.time.LocalDateTime
 
+import scala.collection.immutable.Seq
+import scala2js.Scala2Js.Converter
+import js.JSConverters._
+import scala.collection.mutable
+
 object Converters {
 
+  // **************** Non-implicits **************** //
   def entityTypeToConverter(entityType: EntityType): Scala2Js.MapConverter[entityType.get] = {
     ???
   }
 
+  // **************** General converters **************** //
   implicit object StringConverter extends Scala2Js.Converter[String] {
     override def toJs(string: String) = string
     override def toScala(value: js.Any) = value.asInstanceOf[String]
   }
+
+  implicit def seqConverter[A](implicit elemConverter: Scala2Js.Converter[A]): Scala2Js.Converter[Seq[A]] =
+    new Converter[Seq[A]] {
+      override def toJs(seq: Seq[A]) =
+        seq.toStream.map(elemConverter.toJs).toJSArray
+      override def toScala(value: js.Any) =
+        value.asInstanceOf[js.Array[js.Any]].toStream.map(elemConverter.toScala).toVector
+    }
 
   implicit object LocalDateTimeConverter extends Scala2Js.Converter[LocalDateTime] {
 
@@ -39,6 +54,7 @@ object Converters {
     }
   }
 
+  // **************** Entity converters **************** //
   implicit object TransactionConverter extends Scala2Js.MapConverter[Transaction] {
     override def toJs(transaction: Transaction) = {
       val dateTimeConverter = implicitly[Scala2Js.Converter[LocalDateTime]]

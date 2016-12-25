@@ -6,6 +6,7 @@ import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.{Any, Array, Dictionary}
 import scala.scalajs.js.annotation.JSName
+import common.GuavaReplacement.Iterables.getOnlyElement
 
 object Loki {
   @JSName("loki")
@@ -58,8 +59,6 @@ object Loki {
   private trait CollectionFacade extends js.Object {
 
     def chain(): ResultSetFacade = js.native
-    def find(filter: js.Dictionary[js.Any]): js.Array[js.Dictionary[js.Any]] = js.native
-    def findOne(filter: js.Dictionary[js.Any]): /* nullable */ js.Dictionary[js.Any] = js.native
 
     def insert(obj: js.Dictionary[js.Any]): Unit = js.native
     def findAndRemove(filter: js.Dictionary[js.Any]): Unit = js.native
@@ -69,8 +68,6 @@ object Loki {
   final class Collection(facade: CollectionFacade) {
 
     def chain(): ResultSet = new ResultSet(facade.chain())
-    def find(filter: (String, js.Any)*): js.Array[js.Dictionary[js.Any]] = facade.find(js.Dictionary(filter: _*))
-    def findOne(filter: (String, js.Any)*): Option[js.Dictionary[js.Any]] = Option(facade.findOne(js.Dictionary(filter: _*)))
 
     def insert(obj: js.Dictionary[js.Any]): Unit = facade.insert(obj)
     def findAndRemove(filter: (String, js.Any)*): Unit = facade.findAndRemove(js.Dictionary(filter: _*))
@@ -80,14 +77,25 @@ object Loki {
   @js.native
   private trait ResultSetFacade extends js.Object {
 
-    def find(filter: js.Dictionary[js.Any]): ResultSetFacade = js.native
+    def find(filter: js.Dictionary[js.Any], firstOnly: Boolean = false): ResultSetFacade = js.native
     def data(): js.Array[js.Dictionary[js.Any]] = js.native
     def count(): Int = js.native
   }
 
   final class ResultSet(facade: ResultSetFacade) {
 
+    // **************** Intermediary operations **************** //
     def find(filter: (String, js.Any)*): ResultSet = new ResultSet(facade.find(js.Dictionary(filter: _*)))
+
+    // **************** Terminal operations **************** //
+    def findOne(filter: (String, js.Any)*): Option[js.Dictionary[js.Any]] = {
+      val data = facade.find(js.Dictionary(filter: _*), firstOnly = true).data()
+      if (data.length >= 1) {
+        Option(getOnlyElement(data))
+      } else {
+        None
+      }
+    }
     def data(): js.Array[js.Dictionary[js.Any]] = facade.data()
     def count(): Int = facade.count()
   }

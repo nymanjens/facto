@@ -70,7 +70,7 @@ private[access] object LocalDatabase {
 
     override def getSingletonValue[V](key: SingletonKey[V]): Option[V] = {
       implicit val converter = key.converter
-      val value = singletonCollection.findOne("key" -> key.name)
+      val value = singletonCollection.chain().findOne("key" -> key.name)
       value.map(v => Scala2Js.toScala[V](v("value")))
     }
 
