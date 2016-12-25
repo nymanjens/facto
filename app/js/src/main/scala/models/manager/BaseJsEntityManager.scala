@@ -41,8 +41,8 @@ abstract class BaseJsEntityManager[E <: Entity](database: RemoteDatabaseProxy) e
   // **************** Abstract methods ****************//
   protected def entityType: EntityType
 
-  // **************** Private helper methods ****************//
-  implicit private def entityConverter: Scala2Js.Converter[E] = {
+  // **************** Helper methods ****************//
+  implicit protected def entityConverter: Scala2Js.Converter[E] = {
     entityTypeToConverter(entityType).asInstanceOf[Scala2Js.Converter[E]]
   }
 }
