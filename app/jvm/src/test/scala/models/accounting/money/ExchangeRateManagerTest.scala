@@ -16,7 +16,7 @@ import common.testing.TestUtils._
 class ExchangeRateManagerTest extends CacheClearingSpecification {
 
   @Inject implicit private val clock: Clock = null
-  @Inject implicit private val entityAccess: EntityAccess = null
+  @Inject implicit private val entityAccess: SlickEntityAccess = null
 
   @Inject private val exchangeRateManager: ExchangeRateManager = null
 

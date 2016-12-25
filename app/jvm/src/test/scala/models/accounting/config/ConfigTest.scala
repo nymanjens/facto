@@ -12,7 +12,7 @@ class ConfigTest extends HookedSpecification {
 
   @Inject implicit val config: Config = null
   @Inject implicit val entityAccess: EntityAccess = null
-  @Inject val userManager: User.Manager = null
+  @Inject val userManager: SlickUserManager = null
 
   override def before() = {
     Guice.createInjector(new FactoTestModule).injectMembers(this)

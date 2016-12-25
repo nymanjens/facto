@@ -14,9 +14,9 @@ import scala.collection.immutable.Seq
 class SlickTagEntityManagerTest extends HookedSpecification {
 
   @Inject implicit private val clock: Clock = null
-  @Inject implicit private val entityAccess: EntityAccess = null
-  @Inject private val transactionManager: Transaction.Manager = null
-  @Inject private val transactionGroupManager: TransactionGroup.Manager = null
+  @Inject implicit private val entityAccess: SlickEntityAccess = null
+  @Inject private val transactionManager: SlickTransactionManager = null
+  @Inject private val transactionGroupManager: SlickTransactionGroupManager = null
 
   @Inject private val tagEntityManager: SlickTagEntityManager = null
 

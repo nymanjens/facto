@@ -2,15 +2,13 @@ package common.testing
 
 import java.time.{Instant, ZoneId}
 
-import play.api.test.FakeApplication
-import play.api.test.Helpers._
-import common.time.{Clock, LocalDateTime}
 import common.testing.TestObjects._
-import models.accounting.config.{Account, Category, Config, MoneyReservoir}
+import common.time.LocalDateTime
+import models.SlickEntityAccess
+import models.accounting.config.{Account, Category, MoneyReservoir}
 import models.accounting.money.Currency.Gbp
-import models.accounting.money.{ExchangeRateMeasurement, Money}
+import models.accounting.money.ExchangeRateMeasurement
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
-import models.EntityAccess
 
 object TestUtils {
 
@@ -23,7 +21,7 @@ object TestUtils {
                          reservoir: MoneyReservoir = testReservoir,
                          description: String = "description",
                          detailDescription: String = "detailDescription",
-                         tagsString: String = "")(implicit entityAccess: EntityAccess): Transaction = {
+                         tagsString: String = "")(implicit entityAccess: SlickEntityAccess): Transaction = {
     val actualGroupId = if (groupId == -1) {
       entityAccess.transactionGroupManager.add(TransactionGroup(createdDate = FakeClock.defaultTime)).id
     } else {
@@ -49,7 +47,7 @@ object TestUtils {
   def persistBalanceCheck(balanceInCents: Long = 0,
                           date: LocalDateTime = FakeClock.defaultTime,
                           timestamp: Long = -1,
-                          reservoir: MoneyReservoir = testReservoir)(implicit entityAccess: EntityAccess): BalanceCheck = {
+                          reservoir: MoneyReservoir = testReservoir)(implicit entityAccess: SlickEntityAccess): BalanceCheck = {
     val actualDate = if (timestamp == -1) date else localDateTimeOfEpochMilli(timestamp)
     entityAccess.balanceCheckManager.add(BalanceCheck(
       issuerId = 2,
@@ -60,7 +58,7 @@ object TestUtils {
     ))
   }
 
-  def persistGbpMeasurement(millisSinceEpoch: Long, ratio: Double)(implicit entityAccess: EntityAccess): Unit = {
+  def persistGbpMeasurement(millisSinceEpoch: Long, ratio: Double)(implicit entityAccess: SlickEntityAccess): Unit = {
     entityAccess.exchangeRateMeasurementManager.add(ExchangeRateMeasurement(
       date = localDateTimeOfEpochMilli(millisSinceEpoch),
       foreignCurrencyCode = Gbp.code,

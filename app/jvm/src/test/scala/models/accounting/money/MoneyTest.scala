@@ -11,7 +11,7 @@ import play.twirl.api.Html
 class MoneyTest extends CacheClearingSpecification {
 
   @Inject implicit private val clock: Clock = null
-  @Inject implicit private val entityAccess: EntityAccess = null
+  @Inject implicit private val entityAccess: SlickEntityAccess = null
   @Inject implicit private val exchangeRateManager: ExchangeRateManager = null
 
   override def beforeEveryTest() = {

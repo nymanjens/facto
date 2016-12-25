@@ -1,14 +1,8 @@
 package common.testing
 
 import com.google.inject._
-import collection.immutable.Seq
-import play.api.test.FakeApplication
-import play.api.test.Helpers._
-
-import common.time.Clock
-import models.{User, EntityAccess, SlickUserManager}
-import models.accounting.config.{MoneyReservoir, Account, Category, Config, ConfigModule}
-import models.accounting.{Transaction, TransactionGroup, BalanceCheck}
+import models.accounting.config.{Account, Category, Config, MoneyReservoir}
+import models.{SlickEntityAccess, SlickUserManager, User}
 
 object TestObjects {
 
@@ -29,7 +23,7 @@ object TestObjects {
   def testReservoir: MoneyReservoir = accountingConfig.moneyReservoir("CASH_COMMON")
   def otherTestReservoir: MoneyReservoir = accountingConfig.moneyReservoir("CARD_COMMON")
 
-  def testUser(implicit entityAccess: EntityAccess): User = {
+  def testUser(implicit entityAccess: SlickEntityAccess): User = {
     val loginName = "testUser"
     entityAccess.userManager.findByLoginName(loginName) match {
       case Some(user) => user
