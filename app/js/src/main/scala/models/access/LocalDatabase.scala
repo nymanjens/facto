@@ -24,7 +24,7 @@ sealed trait EntityModification {
 
 object EntityModification {
   case class Add(override val entityType: EntityType, entity: Entity) extends EntityModification {
-    require(entity.isInstanceOf[entityType.get])
+    entityType.checkRightType(entity)
 
     override def entityId: Long = entity.id
   }
