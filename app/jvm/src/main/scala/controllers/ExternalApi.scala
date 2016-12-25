@@ -24,8 +24,8 @@ final class ExternalApi @Inject()(implicit val messagesApi: MessagesApi,
                                   viewsController: Views,
                                   playConfiguration: play.api.Configuration,
                                   accountingConfig: Config,
-                                  userManager: User.Manager,
-                                  entityAccess: EntityAccess)
+                                  userManager: SlickUserManager,
+                                  entityAccess: SlickEntityAccess)
   extends Controller with I18nSupport {
 
   // ********** actions ********** //

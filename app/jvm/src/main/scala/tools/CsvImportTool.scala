@@ -18,9 +18,9 @@ import models._
 import models.accounting.money.Money
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 
-final class CsvImportTool @Inject()(implicit userManager: User.Manager,
+final class CsvImportTool @Inject()(implicit userManager: SlickUserManager,
                                     clock: Clock,
-                                    entityAccess: EntityAccess) {
+                                    entityAccess: SlickEntityAccess) {
 
   def importTransactions(csvFilePath: Path): Unit = {
     // example of line: "2 :: Common :: LIFE :: CARD_COMMON :: imperdiet Duis  :: -25.04 :: 1425855600 :: 0 :: 1425934823"

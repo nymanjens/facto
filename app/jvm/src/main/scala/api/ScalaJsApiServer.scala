@@ -3,14 +3,14 @@ package api
 import api.ScalaJsApi.EntityType
 import api.ScalaJsApi.EntityType._
 import com.google.inject._
-import models.EntityAccess
+import models.{EntityAccess, SlickEntityAccess}
 import models.accounting.config.Config
-import models.manager.{Entity, EntityManager}
+import models.manager.{Entity, EntityManager, SlickEntityManager}
 
 import scala.collection.immutable.Seq
 
 private[api] final class ScalaJsApiServer @Inject()(implicit accountingConfig: Config,
-                                                    entityAccess: EntityAccess) extends ScalaJsApi {
+                                                    entityAccess: SlickEntityAccess) extends ScalaJsApi {
 
   override def getAccountingConfig(): Config = accountingConfig
 
@@ -35,7 +35,7 @@ private[api] final class ScalaJsApiServer @Inject()(implicit accountingConfig: C
     getManager(entityType).delete(entityType.checkRightType(entity))
   }
 
-  private def getManager(entityType: EntityType): EntityManager[entityType.get] = {
+  private def getManager(entityType: EntityType): SlickEntityManager[entityType.get, _] = {
     val manager = entityType match {
       case UserType => entityAccess.userManager
       case TransactionType => entityAccess.transactionManager
@@ -43,6 +43,6 @@ private[api] final class ScalaJsApiServer @Inject()(implicit accountingConfig: C
       case BalanceCheckType => entityAccess.balanceCheckManager
       case ExchangeRateMeasurementType => entityAccess.exchangeRateMeasurementManager
     }
-    manager.asInstanceOf[EntityManager[entityType.get]]
+    manager.asInstanceOf[SlickEntityManager[entityType.get, _]]
   }
 }
