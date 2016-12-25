@@ -87,7 +87,8 @@ object RemoteDatabaseProxy {
 
     // **************** Getters ****************//
     override def newQuery(entityType: EntityType): Loki.ResultSet = {
-      localDatabase.value map { case Success(db) => db.newQuery(entityType) } getOrElse Loki.ResultSet.empty
+      val maybeDb = localDatabase.value.flatMap(_.toOption)
+      maybeDb.map(_.newQuery(entityType)) getOrElse Loki.ResultSet.empty
     }
     /** Returns true if there are local pending modifications for the given entity. Note that only its id is used. */
     override def hasLocalAddModifications(entityType: EntityType)(entity: entityType.get): Boolean = {
