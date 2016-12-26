@@ -15,9 +15,9 @@ object Scala2Js {
     def toScala(value: js.Dictionary[js.Any]): T
 
     // **************** Protected helper methods **************** //
-    protected final def getRequiredValueFromDict[T: Converter](value: js.Dictionary[js.Any])(key: String): T = {
+    protected final def getRequiredValueFromDict[V: Converter](value: js.Dictionary[js.Any])(key: String): V = {
       require(value.contains(key), s"Key $key is missing from ${js.JSON.stringify(value)}")
-      Scala2Js.toScala[T](value(key))
+      Scala2Js.toScala[V](value(key))
     }
   }
 
