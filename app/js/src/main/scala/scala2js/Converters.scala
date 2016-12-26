@@ -18,12 +18,9 @@ import scala.collection.mutable
 object Converters {
 
   // **************** Non-implicits **************** //
-  def entityTypeToConverter(entityType: EntityType.Any): Scala2Js.MapConverter[entityType.get] = {
-    ???
-  }
-  implicit def implicitEntityTypeToConverter[E <: Entity : EntityType]: Scala2Js.MapConverter[E] = {
+  implicit def entityTypeToConverter[E <: Entity : EntityType]: Scala2Js.MapConverter[E] = {
     val entityType: EntityType[E] = implicitly[EntityType[E]]
-    entityTypeToConverter(entityType)
+    ???
   }
 
   // **************** General converters **************** //

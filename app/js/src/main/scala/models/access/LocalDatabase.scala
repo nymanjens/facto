@@ -79,10 +79,12 @@ private[access] object LocalDatabase {
 
   private final class Impl(val lokiDb: Loki.Database) extends LocalDatabase {
     val entityCollections: Map[EntityType.Any, Loki.Collection[_]] = {
-      for (entityType <- EntityType.values) yield {
+      def getOrAddCollection[E <: Entity](implicit entityType: EntityType[E]): Loki.Collection[E] = {
         // TODO: Add primary indices
-        implicit val converter: Scala2Js.MapConverter[entityType.get] = entityTypeToConverter(entityType)
-        entityType -> lokiDb.getOrAddCollection[entityType.get](s"entities_${entityType.name}")
+        lokiDb.getOrAddCollection[E](s"entities_${entityType.name}")
+      }
+      for (entityType <- EntityType.values) yield {
+        entityType -> getOrAddCollection(entityType)
       }
     }.toMap
     // TODO: Add primary index on key
