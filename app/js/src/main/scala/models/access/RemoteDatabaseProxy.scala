@@ -36,7 +36,7 @@ object RemoteDatabaseProxy {
       * Called when the local database was updated with a modification due to a local change request. This change is not
       * yet persisted in the remote database.
       */
-    def addedLocally(entityModifications: Seq[EntityModification]): Unit
+    def addedLocally(modifications: Seq[EntityModification]): Unit
 
     /**
       * Called when a remote entity was changed, either due to a change request from this or another client.
@@ -44,7 +44,7 @@ object RemoteDatabaseProxy {
       * Note that a preceding `addedLocally()` call may have been made earlier for the same modifications, but this is
       * not always the case.
       */
-    def persistedRemotely(entityModifications: Seq[EntityModification]): Unit
+    def persistedRemotely(modifications: Seq[EntityModification]): Unit
     /**
       * Called after the initial loading or reloading of the database. This also gets called when the database is
       * cleared.
@@ -55,11 +55,11 @@ object RemoteDatabaseProxy {
   private[access] final class Impl(apiClient: ScalaJsApiClient,
                                    possiblyEmptyLocalDatabase: Future[LocalDatabase]) extends RemoteDatabaseProxy {
 
-    val localDatabase: Future[LocalDatabase] = possiblyEmptyLocalDatabase flatMap toValidDatabase
-    var listeners: Seq[Listener] = Seq()
-    val localAddModificationIds: Map[EntityType.any, mutable.Set[Long]] =
+    private val localDatabase: Future[LocalDatabase] = possiblyEmptyLocalDatabase flatMap toValidDatabase
+    private var listeners: Seq[Listener] = Seq()
+    private val localAddModificationIds: Map[EntityType.any, mutable.Set[Long]] =
       EntityType.values.map(t => t -> mutable.Set[Long]()).toMap
-    var isCallingListeners: Boolean = false
+    private var isCallingListeners: Boolean = false
 
     localDatabase.onSuccess { case db => invokeListenersAsync(_.loadedDatabase()) }
     // TODO: Start getting latest changes, starting at t0 (db.setSingletonValue(LastUpdateTimeKey, ...))

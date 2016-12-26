@@ -79,7 +79,18 @@ object Loki {
   @js.native
   private trait ResultSetFacade extends js.Object {
 
+    // **************** Intermediary operations **************** //
     def find(filter: js.Dictionary[js.Any], firstOnly: Boolean = false): ResultSetFacade = js.native
+
+    /**
+      * Loose evaluation for user to sort based on a property name. (chainable). Sorting based on the same lt/gt helper
+      * functions used for binary indices.
+      */
+    def simplesort(propName: String, isDesc: Boolean = false): ResultSetFacade = js.native
+
+    def limit(quantity: Int): ResultSetFacade = js.native
+
+    // **************** Terminal operations **************** //
     def data(): js.Array[js.Dictionary[js.Any]] = js.native
     def count(): Int = js.native
   }
@@ -89,6 +100,18 @@ object Loki {
     // **************** Intermediary operations **************** //
     def find(filter: (String, js.Any)*): ResultSet[E] = {
       new ResultSet[E](facade.find(js.Dictionary(filter: _*)))
+    }
+
+    /**
+      * Loose evaluation for user to sort based on a property name. (chainable). Sorting based on the same lt/gt helper
+      * functions used for binary indices.
+      */
+    def sort(propName: String, isDesc: Boolean = false): ResultSet[E] = {
+      new ResultSet[E](facade.simplesort(propName, isDesc))
+    }
+
+    def limit(quantity: Int): ResultSet[E] = {
+      new ResultSet[E](facade.limit(quantity))
     }
 
     // **************** Terminal operations **************** //
