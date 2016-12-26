@@ -18,7 +18,7 @@ import scala2js.Converters._
   * This modification may used for desired modifications (not yet persisted) or to indicate an already changed state.
   */
 sealed trait EntityModification {
-  def entityType: EntityType.Any
+  def entityType: EntityType.any
   def entityId: Long
 }
 
@@ -78,7 +78,7 @@ private[access] object LocalDatabase {
   }
 
   private final class Impl(val lokiDb: Loki.Database) extends LocalDatabase {
-    val entityCollections: Map[EntityType.Any, Loki.Collection[_]] = {
+    val entityCollections: Map[EntityType.any, Loki.Collection[_]] = {
       def getOrAddCollection[E <: Entity](implicit entityType: EntityType[E]): Loki.Collection[E] = {
         // TODO: Add primary indices
         lokiDb.getOrAddCollection[E](s"entities_${entityType.name}")

@@ -15,12 +15,12 @@ trait ScalaJsApi {
   def getAccountingConfig(): Config
 
   /** Returns a map, mapping the entity type to a sequence of all entities of that type. */
-  def getAllEntities(types: Seq[EntityType.Any]): Map[EntityType.Any, Seq[Entity]]
+  def getAllEntities(types: Seq[EntityType.any]): Map[EntityType.any, Seq[Entity]]
 
   // TODO: Reomve insert/delete and accept Seq[EntityModification] instead
-  def insertEntityWithId(entityType: EntityType.Any, entity: Entity): Unit
+  def insertEntityWithId(entityType: EntityType.any, entity: Entity): Unit
 
-  def deleteEntity(entityType: EntityType.Any, entity: Entity): Unit
+  def deleteEntity(entityType: EntityType.any, entity: Entity): Unit
 }
 
 object ScalaJsApi {
@@ -41,7 +41,7 @@ object ScalaJsApi {
     override def toString = name
   }
   object EntityType {
-    type Any = EntityType[_ <: Entity]
+    type any = EntityType[_ <: Entity]
 
     // @formatter:off
     object UserType extends EntityType[User] { override def entityClass = classOf[User]}
@@ -51,6 +51,6 @@ object ScalaJsApi {
     object ExchangeRateMeasurementType extends EntityType[ExchangeRateMeasurement] { override def entityClass = classOf[ExchangeRateMeasurement] }
     // @formatter:on
 
-    val values: Seq[EntityType.Any] = Seq(UserType, TransactionType, TransactionGroupType, BalanceCheckType, ExchangeRateMeasurementType)
+    val values: Seq[EntityType.any] = Seq(UserType, TransactionType, TransactionGroupType, BalanceCheckType, ExchangeRateMeasurementType)
   }
 }

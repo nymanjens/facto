@@ -14,7 +14,7 @@ private[api] final class ScalaJsApiServer @Inject()(implicit accountingConfig: C
 
   override def getAccountingConfig(): Config = accountingConfig
 
-  override def getAllEntities(types: Seq[EntityType.Any]): Map[EntityType.Any, Seq[Entity]] = {
+  override def getAllEntities(types: Seq[EntityType.any]): Map[EntityType.any, Seq[Entity]] = {
     types
       .map(entityType => {
         entityType -> getManager(entityType).fetchAll()
@@ -22,20 +22,20 @@ private[api] final class ScalaJsApiServer @Inject()(implicit accountingConfig: C
       .toMap
   }
 
-  override def insertEntityWithId(entityType: EntityType.Any, entity: Entity): Unit = {
+  override def insertEntityWithId(entityType: EntityType.any, entity: Entity): Unit = {
     require(entity.idOption.isDefined, s"Got an entity without ID ($entityType, $entity)")
 
     // TODO: Add with ID instead of regular add
     getManager(entityType).add(entityType.checkRightType(entity))
   }
 
-  override def deleteEntity(entityType: EntityType.Any, entity: Entity): Unit = {
+  override def deleteEntity(entityType: EntityType.any, entity: Entity): Unit = {
     require(entity.idOption.isDefined, s"Got an entity without ID ($entityType, $entity)")
 
     getManager(entityType).delete(entityType.checkRightType(entity))
   }
 
-  private def getManager(entityType: EntityType.Any): SlickEntityManager[entityType.get, _] = {
+  private def getManager(entityType: EntityType.any): SlickEntityManager[entityType.get, _] = {
     val manager = entityType match {
       case UserType => entityAccess.userManager
       case TransactionType => entityAccess.transactionManager

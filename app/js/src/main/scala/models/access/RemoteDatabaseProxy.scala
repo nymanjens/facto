@@ -80,7 +80,7 @@ object RemoteDatabaseProxy {
                                    localDatabase: Future[LocalDatabase]) extends RemoteDatabaseProxy {
 
     var listeners: Seq[Listener] = Seq()
-    val localAddModificationIds: Map[EntityType.Any, mutable.Set[Long]] =
+    val localAddModificationIds: Map[EntityType.any, mutable.Set[Long]] =
       EntityType.values.map(t => t -> mutable.Set[Long]()).toMap
     var isCallingListeners: Boolean = false
 

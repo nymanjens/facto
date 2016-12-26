@@ -22,7 +22,7 @@ final class ScalaJsApiClient {
 
   def getAccountingConfig(): Future[Config] = AutowireClient[ScalaJsApi].getAccountingConfig().call()
 
-  def getAllEntities(types: Seq[EntityType.Any]): Future[Map[EntityType.Any, Seq[Entity]]] = {
+  def getAllEntities(types: Seq[EntityType.any]): Future[Map[EntityType.any, Seq[Entity]]] = {
     AutowireClient[ScalaJsApi].getAllEntities(types).call()
   }
 

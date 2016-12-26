@@ -88,10 +88,10 @@ final class Application @Inject()(implicit val messagesApi: MessagesApi,
         case "getAccountingConfig" =>
           Pickle.intoBytes(scalaJsApiService.getAccountingConfig())
         case "getAllEntities" =>
-          val types = Unpickle[Seq[EntityType.Any]].fromBytes(argsMap("types"))
+          val types = Unpickle[Seq[EntityType.any]].fromBytes(argsMap("types"))
           Pickle.intoBytes(scalaJsApiService.getAllEntities(types))
         case "insertEntityWithId" =>
-          val entityType = Unpickle[EntityType.Any].fromBytes(argsMap("entityType"))
+          val entityType = Unpickle[EntityType.any].fromBytes(argsMap("entityType"))
           val entity = Unpickle[Entity].fromBytes(argsMap("entity"))
           Pickle.intoBytes(scalaJsApiService.insertEntityWithId(entityType, entity))
       }
