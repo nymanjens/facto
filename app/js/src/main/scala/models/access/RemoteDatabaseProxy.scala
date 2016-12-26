@@ -20,7 +20,7 @@ trait RemoteDatabaseProxy {
   def hasLocalAddModifications[E <: Entity : EntityType](entity: E): Boolean
 
   // **************** Setters ****************//
-  def persistModifications(modifications: Seq[EntityModification.any]): Unit
+  def persistModifications(modifications: Seq[EntityModification]): Unit
   def clearLocalDatabase(): Future[Unit]
 
   // **************** Other ****************//
@@ -60,7 +60,7 @@ object RemoteDatabaseProxy {
       * Called when the local database was updated with a modification due to a local change request. This change is not
       * yet persisted in the remote database.
       */
-    def addedLocally(entityModifications: Seq[EntityModification.any]): Unit
+    def addedLocally(entityModifications: Seq[EntityModification]): Unit
 
     /**
       * Called when a remote entity was changed, either due to a change request from this or another client.
@@ -68,7 +68,7 @@ object RemoteDatabaseProxy {
       * Note that a preceding `addedLocally()` call may have been made earlier for the same modifications, but this is
       * not always the case.
       */
-    def persistedRemotely(entityModifications: Seq[EntityModification.any]): Unit
+    def persistedRemotely(entityModifications: Seq[EntityModification]): Unit
     /**
       * Called after the initial loading or reloading of the database. This also gets called when the database is
       * cleared.
@@ -97,7 +97,7 @@ object RemoteDatabaseProxy {
     }
 
     // **************** Setters ****************//
-    override def persistModifications(modifications: Seq[EntityModification.any]): Unit = {
+    override def persistModifications(modifications: Seq[EntityModification]): Unit = {
       require(!isCallingListeners)
 
       localDatabase onSuccess { case db =>

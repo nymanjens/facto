@@ -17,18 +17,22 @@ import scala2js.Converters._
   *
   * This modification may used for desired modifications (not yet persisted) or to indicate an already changed state.
   */
-sealed abstract class EntityModification[E <: Entity : EntityType] {
+sealed trait EntityModification {
+  def entityType: EntityType.any
   def entityId: Long
-  final def entityType: EntityType[E] = implicitly[EntityType[E]]
 }
 
 object EntityModification {
-  type any = EntityModification[_ <: Entity]
   case class Add[E <: Entity : EntityType](entity: E) extends EntityModification {
+    entityType.checkRightType(entity)
+
+    override def entityType: EntityType[E] = implicitly[EntityType[E]]
     override def entityId: Long = entity.id
   }
 
-  case class Remove[E <: Entity : EntityType](override val entityId: Long) extends EntityModification
+  case class Remove[E <: Entity : EntityType](override val entityId: Long) extends EntityModification {
+    override def entityType: EntityType[E] = implicitly[EntityType[E]]
+  }
 }
 
 private[access] trait LocalDatabase {
@@ -39,7 +43,7 @@ private[access] trait LocalDatabase {
 
   // **************** Setters ****************//
   /** Applies given modification in memory but doesn't persist it in the browser's storage (call `save()` to do this). */
-  def applyModifications(modifications: Seq[EntityModification.any]): Unit
+  def applyModifications(modifications: Seq[EntityModification]): Unit
   def addAll[E <: Entity : EntityType](entities: Seq[E]): Unit
   /** Sets given singleton value in memory but doesn't persist it in the browser's storage (call `save()` to do this). */
   def setSingletonValue[V](key: SingletonKey[V], value: V): Unit
@@ -102,7 +106,7 @@ private[access] object LocalDatabase {
     }
 
     // **************** Setters ****************//
-    override def applyModifications(modifications: Seq[EntityModification.any]): Unit = {
+    override def applyModifications(modifications: Seq[EntityModification]): Unit = {
       ???
     }
 
