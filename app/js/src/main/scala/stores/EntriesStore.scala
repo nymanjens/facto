@@ -39,17 +39,17 @@ private[stores] abstract class EntriesStore(implicit database: RemoteDatabasePro
   }
 
   // **************** Abstract methods ****************//
-  protected def calculateState(oldState: State): State
+  protected def calculateState(oldState: Option[State]): State
 
   protected def modificationImpactsState(entityModification: EntityModification, state: State): Boolean
 
   // **************** Private helper methods ****************//
   private def updateState(): Unit = {
-    _state = Some(calculateState())
+    _state = Some(calculateState(_state))
   }
 
   private def impactsState(modifications: Seq[EntityModification]): Boolean = {
-    !modifications.toStream.filter(modificationImpactsState _).take(1).isEmpty
+    !modifications.toStream.filter(m => modificationImpactsState(m, _state.get)).take(1).isEmpty
   }
 
   private def invokeListenersAsync(): Unit = {

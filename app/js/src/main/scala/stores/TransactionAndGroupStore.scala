@@ -5,16 +5,15 @@ import flux.Action.AddTransactionGroup
 import flux.{Action, Dispatcher}
 import models.access.{EntityModification, RemoteDatabaseProxy}
 import models.accounting.Transaction
-import stores.entries.{GeneralEntry, GroupedTransactions}
+import stores.entries.GeneralEntry
 
 import scala.collection.immutable.Seq
-import scala.concurrent.Future
 
 final class TransactionAndGroupStore(implicit database: RemoteDatabaseProxy,
                                      dispatcher: Dispatcher) {
   dispatcher.register(actionCallback)
 
-  def actionCallback(action: Action): Unit = action match {
+  def actionCallback: PartialFunction[Action, Unit] = {
     case AddTransactionGroup(transactionsWithoutId) => ???
   }
 
@@ -23,7 +22,7 @@ final class TransactionAndGroupStore(implicit database: RemoteDatabaseProxy,
   final class LastNEntriesStore(n: Int) extends EntriesStore {
     override type State = ThisState
 
-    override def calculateState(oldState: State) = {
+    override def calculateState(oldState: Option[State]) = {
       val transactions: Seq[Transaction] =
         database.newQuery[Transaction]()
           .sort("transactionDate", isDesc = true)
