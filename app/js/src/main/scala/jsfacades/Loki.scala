@@ -111,6 +111,9 @@ object Loki {
   }
 
   object ResultSet {
-    def empty[E: Scala2Js.MapConverter]: ResultSet[E] = ??? // TODO: Maybe create this from an empty Loki db?
+    def empty[E: Scala2Js.MapConverter]: ResultSet[E] = {
+      val nonPersistentDb = new Database(new DatabaseFacade("empty-tmp-database"))
+      nonPersistentDb.getOrAddCollection[E]("empty-collection").chain()
+    }
   }
 }

@@ -20,7 +20,11 @@ object Converters {
   // **************** Non-implicits **************** //
   implicit def entityTypeToConverter[E <: Entity : EntityType]: Scala2Js.MapConverter[E] = {
     val entityType: EntityType[E] = implicitly[EntityType[E]]
-    ???
+    val converter: Scala2Js.MapConverter[_ <: Entity] = entityType match {
+      case EntityType.TransactionType => TransactionConverter
+      case _ => ???
+    }
+    converter.asInstanceOf[Scala2Js.MapConverter[E]]
   }
 
   // **************** General converters **************** //
