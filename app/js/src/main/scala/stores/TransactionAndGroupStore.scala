@@ -23,7 +23,7 @@ final class TransactionAndGroupStore(implicit database: RemoteDatabaseProxy,
   final class LastNEntriesStore(n: Int) extends EntriesStore {
     override type State = ThisState
 
-    override def calculateState() = {
+    override def calculateState(oldState: State) = {
       val transactions: Seq[Transaction] =
         database.newQuery[Transaction]()
           .sort("transactionDate", isDesc = true)
@@ -39,7 +39,7 @@ final class TransactionAndGroupStore(implicit database: RemoteDatabaseProxy,
       ThisState(entries.takeRight(n))
     }
 
-    override def modificationImpactsState(entityModification: EntityModification): Boolean = {
+    override def modificationImpactsState(entityModification: EntityModification, state: State): Boolean = {
       entityModification.entityType == EntityType.TransactionType
     }
 

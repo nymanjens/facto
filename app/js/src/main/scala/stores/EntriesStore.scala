@@ -39,9 +39,9 @@ private[stores] abstract class EntriesStore(implicit database: RemoteDatabasePro
   }
 
   // **************** Abstract methods ****************//
-  protected def calculateState(): State
+  protected def calculateState(oldState: State): State
 
-  protected def modificationImpactsState(entityModification: EntityModification): Boolean
+  protected def modificationImpactsState(entityModification: EntityModification, state: State): Boolean
 
   // **************** Private helper methods ****************//
   private def updateState(): Unit = {
