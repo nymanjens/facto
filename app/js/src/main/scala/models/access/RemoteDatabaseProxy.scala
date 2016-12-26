@@ -31,30 +31,6 @@ object RemoteDatabaseProxy {
 
   private val localDatabaseAndEntityVersion = "1.0"
 
-  private[access] def create(apiClient: ScalaJsApiClient): RemoteDatabaseProxy = {
-    val futureDb = LocalDatabase.createLoadedFuture()
-    val validDb = futureDb.flatMap(db => {
-      if (db.isEmpty() || !db.getSingletonValue(VersionKey).contains(localDatabaseAndEntityVersion)) {
-        // Reset database
-        db.clear()
-        db.setSingletonValue(VersionKey, localDatabaseAndEntityVersion)
-        // TODO: db.setSingletonValue(LastUpdateTimeKey, ...)
-        apiClient.getAllEntities(EntityType.values).map(resultMap => {
-          def addAllToDb[E <: Entity](entityType: EntityType[E])(entities: Seq[entityType.get]) =
-            db.addAll(entities.asInstanceOf[Seq[E]])(entityType)
-          for ((entityType, entities) <- resultMap) {
-            addAllToDb(entityType)(entities.asInstanceOf[Seq[entityType.get]])
-          }
-          db.save() // don't wait for this because it doesn't really matter when this completes
-          db
-        })
-      } else {
-        Future.successful(db)
-      }
-    })
-    new Impl(apiClient, validDb)
-  }
-
   trait Listener {
     /**
       * Called when the local database was updated with a modification due to a local change request. This change is not
@@ -77,8 +53,9 @@ object RemoteDatabaseProxy {
   }
 
   private[access] final class Impl(apiClient: ScalaJsApiClient,
-                                   localDatabase: Future[LocalDatabase]) extends RemoteDatabaseProxy {
+                                   possiblyEmptyLocalDatabase: Future[LocalDatabase]) extends RemoteDatabaseProxy {
 
+    val localDatabase: Future[LocalDatabase] = possiblyEmptyLocalDatabase flatMap toValidDatabase
     var listeners: Seq[Listener] = Seq()
     val localAddModificationIds: Map[EntityType.any, mutable.Set[Long]] =
       EntityType.values.map(t => t -> mutable.Set[Long]()).toMap
@@ -138,6 +115,26 @@ object RemoteDatabaseProxy {
         isCallingListeners = true
         listeners.foreach(func)
         isCallingListeners = false
+      }
+    }
+
+    private def toValidDatabase(db: LocalDatabase): Future[LocalDatabase] = {
+      if (db.isEmpty() || !db.getSingletonValue(VersionKey).contains(localDatabaseAndEntityVersion)) {
+        // Reset database
+        db.clear()
+        db.setSingletonValue(VersionKey, localDatabaseAndEntityVersion)
+        // TODO: db.setSingletonValue(LastUpdateTimeKey, ...)
+        apiClient.getAllEntities(EntityType.values).map(resultMap => {
+          def addAllToDb[E <: Entity](entityType: EntityType[E])(entities: Seq[entityType.get]) =
+            db.addAll(entities.asInstanceOf[Seq[E]])(entityType)
+          for ((entityType, entities) <- resultMap) {
+            addAllToDb(entityType)(entities.asInstanceOf[Seq[entityType.get]])
+          }
+          db.save() // don't wait for this because it doesn't really matter when this completes
+          db
+        })
+      } else {
+        Future.successful(db)
       }
     }
   }

@@ -5,7 +5,7 @@ import models.manager.BaseJsEntityManager
 
 import scala.collection.immutable.Seq
 
-private[accounting] final class JsTransactionManager(implicit database: RemoteDatabaseProxy)
+final class JsTransactionManager(implicit database: RemoteDatabaseProxy)
   extends BaseJsEntityManager[Transaction]
     with Transaction.Manager {
 

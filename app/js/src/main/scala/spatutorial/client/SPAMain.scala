@@ -120,9 +120,6 @@ object SPAMain extends js.JSApp {
     assertException(classOf[IllegalArgumentException], X(null))
     X("abc")
 
-    // --------------------------- Test MacWire --------------------------- //
-    UserModule.otherUserStatusReader.out()
-
     // --------------------------- Test Scala2Js --------------------------- //
     val transaction: Transaction = Scala2Js.toScala[Transaction](js.JSON.parse(
       """{
@@ -183,6 +180,9 @@ object SPAMain extends js.JSApp {
     }
     //    save(() => load())
     //        load()
+
+    // --------------------------- Test JsTransactionManager --------------------------- //
+    Module.tester.test()
   }
 
   def outJs(x: js.Any): Unit = {
@@ -207,28 +207,18 @@ object SPAMain extends js.JSApp {
   }
 
   //////////////// MacWire test ///////////////////
-  trait DatabaseAccess {
-    def out(): Unit
-  }
-  class DatabaseAccessImpl() extends DatabaseAccess {
-    override def out() = SPAMain.out("IMPL!")
-  }
-  class SecurityFilter() {
-  }
-  class UserFinder(val databaseAccess: DatabaseAccess, securityFilter: SecurityFilter) {
-  }
-  class UserStatusReader(userFinder: UserFinder, databaseAccess: DatabaseAccess, securityFilter: SecurityFilter) {
-    def out() = userFinder.databaseAccess.out()
+  private final class Tester(transactionManager: Transaction.Manager) {
+    def test(): Unit = {
+      out(transactionManager.fetchAll())
+    }
   }
 
-  object UserModule {
+  private object Module {
 
     import com.softwaremill.macwire._
+    import models.Module._
+    import models.access.Module._
 
-    lazy val theDatabaseAccess = wire[DatabaseAccessImpl]
-    lazy val theSecurityFilter = wire[SecurityFilter]
-    lazy val theUserFinder = wire[UserFinder]
-    lazy val theUserStatusReader = wire[UserStatusReader]
-    lazy val otherUserStatusReader = wire[UserStatusReader]
+    lazy val tester: Tester = wire[Tester]
   }
 }
