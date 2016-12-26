@@ -8,6 +8,7 @@ import api.ScalaJsApi.EntityType
 import scala.scalajs.js
 import models.accounting.Transaction
 import common.time.LocalDateTime
+import models.manager.Entity
 
 import scala.collection.immutable.Seq
 import scala2js.Scala2Js.Converter
@@ -17,7 +18,7 @@ import scala.collection.mutable
 object Converters {
 
   // **************** Non-implicits **************** //
-  def entityTypeToConverter(entityType: EntityType): Scala2Js.MapConverter[entityType.get] = {
+  def entityTypeToConverter(entityType: EntityType.Any): Scala2Js.MapConverter[entityType.get] = {
     ???
   }
 

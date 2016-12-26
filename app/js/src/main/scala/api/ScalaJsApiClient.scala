@@ -22,13 +22,14 @@ final class ScalaJsApiClient {
 
   def getAccountingConfig(): Future[Config] = AutowireClient[ScalaJsApi].getAccountingConfig().call()
 
-  def getAllEntities(types: Seq[EntityType]): Future[Map[EntityType, Seq[Entity]]] = {
+  def getAllEntities(types: Seq[EntityType.Any]): Future[Map[EntityType.Any, Seq[Entity]]] = {
     AutowireClient[ScalaJsApi].getAllEntities(types).call()
   }
 
-  def insertEntityWithId(entityType: EntityType)(entity: entityType.get): Future[Unit] = {
-    require(entity.idOption.isDefined, s"Gotten an entity without ID ($entityType, $entity)")
-    AutowireClient[ScalaJsApi].insertEntityWithId(entityType, asEntity(entity)).call()
+  def insertEntityWithId[E <: Entity](entityType: EntityType[E])(entity: E): Future[Unit] = {
+//    require(entity.idOption.isDefined, s"Gotten an entity without ID ($entityType, $entity)")
+//    AutowireClient[ScalaJsApi].insertEntityWithId(entityType, entity).call()
+    ???
   }
 }
 

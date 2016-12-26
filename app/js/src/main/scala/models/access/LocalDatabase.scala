@@ -18,29 +18,29 @@ import scala2js.Converters._
   * This modification may used for desired modifications (not yet persisted) or to indicate an already changed state.
   */
 sealed trait EntityModification {
-  def entityType: EntityType
+  def entityType: EntityType.Any
   def entityId: Long
 }
 
 object EntityModification {
-  case class Add(override val entityType: EntityType, entity: Entity) extends EntityModification {
+  case class Add(override val entityType: EntityType.Any, entity: Entity) extends EntityModification {
     entityType.checkRightType(entity)
 
     override def entityId: Long = entity.id
   }
-  case class Remove(override val entityType: EntityType, override val entityId: Long) extends EntityModification
+  case class Remove(override val entityType: EntityType.Any, override val entityId: Long) extends EntityModification
 }
 
 private[access] trait LocalDatabase {
   // **************** Getters ****************//
-  def newQuery(entityType: EntityType): Loki.ResultSet[entityType.get]
+  def newQuery[E <: Entity](entityType: EntityType[E]): Loki.ResultSet[E]
   def getSingletonValue[V](key: SingletonKey[V]): Option[V]
   def isEmpty(): Boolean
 
   // **************** Setters ****************//
   /** Applies given modification in memory but doesn't persist it in the browser's storage (call `save()` to do this). */
   def applyModifications(modifications: Seq[EntityModification]): Unit
-  def addAll(entityType: EntityType)(entities: Seq[entityType.get]): Unit
+  def addAll[E <: Entity](entityType: EntityType[E], entities: Seq[E]): Unit
   /** Sets given singleton value in memory but doesn't persist it in the browser's storage (call `save()` to do this). */
   def setSingletonValue[V](key: SingletonKey[V], value: V): Unit
   /** Persists all previously made changes to the browser's storage. */
@@ -74,10 +74,10 @@ private[access] object LocalDatabase {
   }
 
   private final class Impl(val lokiDb: Loki.Database) extends LocalDatabase {
-    val entityCollections: Map[EntityType, Loki.Collection[_]] = {
+    val entityCollections: Map[EntityType.Any, Loki.Collection[_]] = {
       for (entityType <- EntityType.values) yield {
         // TODO: Add primary indices
-        implicit val converter = entityTypeToConverter(entityType)
+        implicit val converter: Scala2Js.MapConverter[entityType.get] = entityTypeToConverter(entityType)
         entityType -> lokiDb.getOrAddCollection[entityType.get](s"entities_${entityType.name}")
       }
     }.toMap
@@ -85,7 +85,7 @@ private[access] object LocalDatabase {
     val singletonCollection: Loki.Collection[Singleton] = lokiDb.getOrAddCollection[Singleton](s"singletons")
 
     // **************** Getters ****************//
-    override def newQuery(entityType: EntityType) = entityCollectionForType(entityType).chain()
+    override def newQuery[E <: Entity](entityType: EntityType[E]) = entityCollectionForType(entityType).chain()
 
     override def getSingletonValue[V](key: SingletonKey[V]): Option[V] = {
       implicit val converter = key.valueConverter
@@ -102,7 +102,7 @@ private[access] object LocalDatabase {
       ???
     }
 
-    override def addAll(entityType: EntityType)(entities: Seq[entityType.get]): Unit = {
+    override def addAll[E <: Entity](entityType: EntityType[E], entities: Seq[E]): Unit = {
       for (entity <- entities) {
         entityCollectionForType(entityType).insert(entity)
       }
@@ -131,7 +131,7 @@ private[access] object LocalDatabase {
     // **************** Private helper methods ****************//
     private def allCollections: Seq[Loki.Collection[_]] = entityCollections.values.toList :+ singletonCollection
 
-    private def entityCollectionForType(entityType: EntityType): Loki.Collection[entityType.get] = {
+    private def entityCollectionForType(entityType: EntityType.Any): Loki.Collection[entityType.get] = {
       entityCollections(entityType).asInstanceOf[Loki.Collection[entityType.get]]
     }
   }

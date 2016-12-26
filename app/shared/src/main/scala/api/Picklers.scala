@@ -70,8 +70,8 @@ object Picklers {
   }
 
 
-  implicit object EntityTypePickler extends Pickler[EntityType] {
-    override def pickle(entityType: EntityType)(implicit state: PickleState): Unit = {
+  implicit object EntityTypePickler extends Pickler[EntityType.Any] {
+    override def pickle(entityType: EntityType.Any)(implicit state: PickleState): Unit = {
       val intValue: Int = entityType match {
         case UserType => 1
         case TransactionType => 2
@@ -81,7 +81,7 @@ object Picklers {
       }
       state.pickle(intValue)
     }
-    override def unpickle(implicit state: UnpickleState): EntityType = {
+    override def unpickle(implicit state: UnpickleState): EntityType.Any = {
       state.unpickle[Int] match {
         case 1 => UserType
         case 2 => TransactionType

@@ -9,13 +9,10 @@ import scala2js.Converters._
 import scala2js.Scala2Js
 
 private[accounting] final class JsTransactionManager(database: RemoteDatabaseProxy)
-  extends BaseJsEntityManager[Transaction](database)
+  extends BaseJsEntityManager[Transaction](database, EntityType.TransactionType)
     with Transaction.Manager {
 
   override def findByGroupId(groupId: Long): Seq[Transaction] = {
-    val result = database.newQuery(entityType).find("transactionGroupId" -> groupId.toString).data()
-    Scala2Js.toScala[Seq[Transaction]](result)
+    database.newQuery(entityType).find("transactionGroupId" -> groupId.toString).data()
   }
-
-  protected final val entityType: EntityType = EntityType.TransactionType
 }

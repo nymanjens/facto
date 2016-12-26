@@ -3,22 +3,21 @@ package models.access
 import api.ScalaJsApi.EntityType
 import api.ScalaJsApiClient
 import jsfacades.Loki
-import jsfacades.Loki.ResultSet
 import models.access.SingletonKey._
+import models.manager.Entity
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala.util.Success
 import scala2js.Converters._
 
 trait RemoteDatabaseProxy {
 
   // **************** Getters ****************//
-  def newQuery(entityType: EntityType): Loki.ResultSet[entityType.get]
+  def newQuery[E <: Entity](entityType: EntityType[E]): Loki.ResultSet[E]
   /** Returns true if there are local pending `Add` modifications for the given entity. Note that only its id is used. */
-  def hasLocalAddModifications(entityType: EntityType)(entity: entityType.get): Boolean
+  def hasLocalAddModifications[E <: Entity](entityType: EntityType[E], entity: E): Boolean
 
   // **************** Setters ****************//
   def persistModifications(modifications: Seq[EntityModification]): Unit
@@ -35,14 +34,16 @@ object RemoteDatabaseProxy {
   private[access] def create(apiClient: ScalaJsApiClient): RemoteDatabaseProxy = {
     val futureDb = LocalDatabase.createLoadedFuture()
     val validDb = futureDb.flatMap(db => {
-      if (db.isEmpty() || db.getSingletonValue(VersionKey) != Some(localDatabaseAndEntityVersion)) {
+      if (db.isEmpty() || !db.getSingletonValue(VersionKey).contains(localDatabaseAndEntityVersion)) {
         // Reset database
         db.clear()
         db.setSingletonValue(VersionKey, localDatabaseAndEntityVersion)
         // TODO: db.setSingletonValue(LastUpdateTimeKey, ...)
         apiClient.getAllEntities(EntityType.values).map(resultMap => {
+          def addAllToDb[E <: Entity](entityType: EntityType[E])(entities: Seq[entityType.get]) =
+            db.addAll(entityType, entities.asInstanceOf[Seq[E]])
           for ((entityType, entities) <- resultMap) {
-            db.addAll(entityType)(entities.asInstanceOf[Seq[entityType.get]])
+            addAllToDb(entityType)(entities.asInstanceOf[Seq[entityType.get]])
           }
           db.save() // don't wait for this because it doesn't really matter when this completes
           db
@@ -79,7 +80,7 @@ object RemoteDatabaseProxy {
                                    localDatabase: Future[LocalDatabase]) extends RemoteDatabaseProxy {
 
     var listeners: Seq[Listener] = Seq()
-    val localAddModificationIds: Map[EntityType, mutable.Set[Long]] =
+    val localAddModificationIds: Map[EntityType.Any, mutable.Set[Long]] =
       EntityType.values.map(t => t -> mutable.Set[Long]()).toMap
     var isCallingListeners: Boolean = false
 
@@ -87,13 +88,12 @@ object RemoteDatabaseProxy {
     // TODO: Start getting latest changes, starting at t0 (db.setSingletonValue(LastUpdateTimeKey, ...))
 
     // **************** Getters ****************//
-    override def newQuery(entityType: EntityType): Loki.ResultSet[entityType.get] = {
+    override def newQuery[E <: Entity](entityType: EntityType[E]): Loki.ResultSet[E] = {
       val maybeDb = localDatabase.value.flatMap(_.toOption)
       implicit val converter = entityTypeToConverter(entityType)
-      maybeDb.map(_.newQuery(entityType)) getOrElse Loki.ResultSet.empty[entityType.get]
+      maybeDb.map(_.newQuery(entityType)) getOrElse Loki.ResultSet.empty[E]
     }
-    /** Returns true if there are local pending modifications for the given entity. Note that only its id is used. */
-    override def hasLocalAddModifications(entityType: EntityType)(entity: entityType.get): Boolean = {
+    override def hasLocalAddModifications[E <: Entity](entityType: EntityType[E], entity: E): Boolean = {
       localAddModificationIds(entityType) contains entity.id
     }
 
