@@ -26,9 +26,9 @@ final class ScalaJsApiClient {
     AutowireClient[ScalaJsApi].getAllEntities(types).call()
   }
 
-  def insertEntityWithId[E <: Entity](entityType: EntityType[E])(entity: E): Future[Unit] = {
-//    require(entity.idOption.isDefined, s"Gotten an entity without ID ($entityType, $entity)")
-//    AutowireClient[ScalaJsApi].insertEntityWithId(entityType, entity).call()
+  def insertEntityWithId[E <: Entity : EntityType](entity: E): Future[Unit] = {
+    require(entity.idOption.isDefined, s"Gotten an entity without ID ($entity)")
+    //    AutowireClient[ScalaJsApi].insertEntityWithId(implicitly[EntityType[E]], entity).call()
     ???
   }
 }

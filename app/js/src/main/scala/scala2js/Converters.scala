@@ -21,6 +21,10 @@ object Converters {
   def entityTypeToConverter(entityType: EntityType.Any): Scala2Js.MapConverter[entityType.get] = {
     ???
   }
+  implicit def implicitEntityTypeToConverter[E <: Entity : EntityType]: Scala2Js.MapConverter[E] = {
+    val entityType: EntityType[E] = implicitly[EntityType[E]]
+    entityTypeToConverter(entityType)
+  }
 
   // **************** General converters **************** //
   implicit object NullConverter extends Scala2Js.Converter[js.Any] {

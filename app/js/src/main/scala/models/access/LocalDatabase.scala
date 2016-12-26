@@ -23,24 +23,28 @@ sealed trait EntityModification {
 }
 
 object EntityModification {
-  case class Add(override val entityType: EntityType.Any, entity: Entity) extends EntityModification {
+  case class Add[E <: Entity : EntityType](entity: E) extends EntityModification {
     entityType.checkRightType(entity)
 
+    override def entityType: EntityType[E] = implicitly[EntityType[E]]
     override def entityId: Long = entity.id
   }
-  case class Remove(override val entityType: EntityType.Any, override val entityId: Long) extends EntityModification
+
+  case class Remove[E <: Entity : EntityType](override val entityId: Long) extends EntityModification {
+    override def entityType: EntityType[E] = implicitly[EntityType[E]]
+  }
 }
 
 private[access] trait LocalDatabase {
   // **************** Getters ****************//
-  def newQuery[E <: Entity](entityType: EntityType[E]): Loki.ResultSet[E]
+  def newQuery[E <: Entity : EntityType](): Loki.ResultSet[E]
   def getSingletonValue[V](key: SingletonKey[V]): Option[V]
   def isEmpty(): Boolean
 
   // **************** Setters ****************//
   /** Applies given modification in memory but doesn't persist it in the browser's storage (call `save()` to do this). */
   def applyModifications(modifications: Seq[EntityModification]): Unit
-  def addAll[E <: Entity](entityType: EntityType[E], entities: Seq[E]): Unit
+  def addAll[E <: Entity : EntityType](entities: Seq[E]): Unit
   /** Sets given singleton value in memory but doesn't persist it in the browser's storage (call `save()` to do this). */
   def setSingletonValue[V](key: SingletonKey[V], value: V): Unit
   /** Persists all previously made changes to the browser's storage. */
@@ -85,7 +89,9 @@ private[access] object LocalDatabase {
     val singletonCollection: Loki.Collection[Singleton] = lokiDb.getOrAddCollection[Singleton](s"singletons")
 
     // **************** Getters ****************//
-    override def newQuery[E <: Entity](entityType: EntityType[E]) = entityCollectionForType(entityType).chain()
+    override def newQuery[E <: Entity : EntityType](): Loki.ResultSet[E] = {
+      entityCollectionForImplicitType.chain()
+    }
 
     override def getSingletonValue[V](key: SingletonKey[V]): Option[V] = {
       implicit val converter = key.valueConverter
@@ -102,9 +108,9 @@ private[access] object LocalDatabase {
       ???
     }
 
-    override def addAll[E <: Entity](entityType: EntityType[E], entities: Seq[E]): Unit = {
+    override def addAll[E <: Entity : EntityType](entities: Seq[E]): Unit = {
       for (entity <- entities) {
-        entityCollectionForType(entityType).insert(entity)
+        entityCollectionForImplicitType.insert(entity)
       }
     }
 
@@ -131,7 +137,7 @@ private[access] object LocalDatabase {
     // **************** Private helper methods ****************//
     private def allCollections: Seq[Loki.Collection[_]] = entityCollections.values.toList :+ singletonCollection
 
-    private def entityCollectionForType(entityType: EntityType.Any): Loki.Collection[entityType.get] = {
+    private def entityCollectionForImplicitType(implicit entityType: EntityType.Any): Loki.Collection[entityType.get] = {
       entityCollections(entityType).asInstanceOf[Loki.Collection[entityType.get]]
     }
   }

@@ -15,9 +15,9 @@ import scala2js.Converters._
 trait RemoteDatabaseProxy {
 
   // **************** Getters ****************//
-  def newQuery[E <: Entity](entityType: EntityType[E]): Loki.ResultSet[E]
+  def newQuery[E <: Entity : EntityType](): Loki.ResultSet[E]
   /** Returns true if there are local pending `Add` modifications for the given entity. Note that only its id is used. */
-  def hasLocalAddModifications[E <: Entity](entityType: EntityType[E], entity: E): Boolean
+  def hasLocalAddModifications[E <: Entity : EntityType](entity: E): Boolean
 
   // **************** Setters ****************//
   def persistModifications(modifications: Seq[EntityModification]): Unit
@@ -41,7 +41,7 @@ object RemoteDatabaseProxy {
         // TODO: db.setSingletonValue(LastUpdateTimeKey, ...)
         apiClient.getAllEntities(EntityType.values).map(resultMap => {
           def addAllToDb[E <: Entity](entityType: EntityType[E])(entities: Seq[entityType.get]) =
-            db.addAll(entityType, entities.asInstanceOf[Seq[E]])
+            db.addAll(entities.asInstanceOf[Seq[E]])(entityType)
           for ((entityType, entities) <- resultMap) {
             addAllToDb(entityType)(entities.asInstanceOf[Seq[entityType.get]])
           }
@@ -88,13 +88,12 @@ object RemoteDatabaseProxy {
     // TODO: Start getting latest changes, starting at t0 (db.setSingletonValue(LastUpdateTimeKey, ...))
 
     // **************** Getters ****************//
-    override def newQuery[E <: Entity](entityType: EntityType[E]): Loki.ResultSet[E] = {
+    override def newQuery[E <: Entity : EntityType](): Loki.ResultSet[E] = {
       val maybeDb = localDatabase.value.flatMap(_.toOption)
-      implicit val converter = entityTypeToConverter(entityType)
-      maybeDb.map(_.newQuery(entityType)) getOrElse Loki.ResultSet.empty[E]
+      maybeDb.map(_.newQuery[E]()) getOrElse Loki.ResultSet.empty[E]
     }
-    override def hasLocalAddModifications[E <: Entity](entityType: EntityType[E], entity: E): Boolean = {
-      localAddModificationIds(entityType) contains entity.id
+    override def hasLocalAddModifications[E <: Entity : EntityType](entity: E): Boolean = {
+      localAddModificationIds(implicitly[EntityType[E]]) contains entity.id
     }
 
     // **************** Setters ****************//
@@ -106,7 +105,7 @@ object RemoteDatabaseProxy {
         invokeListenersAsync(_.addedLocally(modifications))
         for {
           modification <- modifications
-          if modification.isInstanceOf[EntityModification.Add]
+          if modification.isInstanceOf[EntityModification.Add[_]]
         } localAddModificationIds(modification.entityType) += modification.entityId
 
         // TODO: persist remotely and execute code below:

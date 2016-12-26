@@ -1,5 +1,6 @@
 package models.accounting
 
+import api.ScalaJsApi.EntityType
 import common.time.Clock
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.accounting.money.{DatedMoney, Money}
@@ -51,6 +52,8 @@ case class Transaction(transactionGroupId: Long,
 }
 object Transaction {
   def tupled = (this.apply _).tupled
+
+  implicit val entityType: EntityType[Transaction] = EntityType.TransactionType
 
   trait Manager extends EntityManager[Transaction] {
     def findByGroupId(groupId: Long): Seq[Transaction]
