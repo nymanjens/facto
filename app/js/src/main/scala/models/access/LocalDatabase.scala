@@ -139,8 +139,8 @@ private[access] object LocalDatabase {
     // **************** Private helper methods ****************//
     private def allCollections: Seq[Loki.Collection[_]] = entityCollections.values.toList :+ singletonCollection
 
-    private def entityCollectionForImplicitType(implicit entityType: EntityType.Any): Loki.Collection[entityType.get] = {
-      entityCollections(entityType).asInstanceOf[Loki.Collection[entityType.get]]
+    private def entityCollectionForImplicitType[E <: Entity : EntityType]: Loki.Collection[E] = {
+      entityCollections(implicitly[EntityType[E]]).asInstanceOf[Loki.Collection[E]]
     }
   }
 
