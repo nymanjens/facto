@@ -1,6 +1,7 @@
 package models.manager
 
 import api.ScalaJsApi.EntityType
+import jsfacades.Loki
 import models.access.{EntityModification, RemoteDatabaseProxy}
 
 import scala.collection.immutable.Seq
@@ -29,20 +30,18 @@ abstract class BaseJsEntityManager[E <: Entity](database: RemoteDatabaseProxy) e
   //  }
 
   override final def findById(id: Long): E = {
-    val result = database.newQuery(entityType).findOne("id" -> id.toString).get
-    Scala2Js.toScala[E](result)
+    newQuery().findOne("id" -> id.toString).get
   }
 
   override final def fetchAll(): Seq[E] = {
-    val result = database.newQuery(entityType).data()
-    Scala2Js.toScala[Seq[E]](result)
+    newQuery().data()
   }
 
   // **************** Abstract methods ****************//
   protected def entityType: EntityType
 
   // **************** Helper methods ****************//
-  implicit protected def entityConverter: Scala2Js.Converter[E] = {
-    entityTypeToConverter(entityType).asInstanceOf[Scala2Js.Converter[E]]
+  def newQuery(): Loki.ResultSet[E] = {
+    database.newQuery(entityType).asInstanceOf[Loki.ResultSet[E]]
   }
 }

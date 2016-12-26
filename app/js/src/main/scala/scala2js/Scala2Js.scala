@@ -13,6 +13,12 @@ object Scala2Js {
     override def toJs(value: T): js.Dictionary[js.Any]
     final override def toScala(value: js.Any): T = toScala(value.asInstanceOf[js.Dictionary[js.Any]])
     def toScala(value: js.Dictionary[js.Any]): T
+
+    // **************** Protected helper methods **************** //
+    protected final def getRequiredValueFromDict[T: Converter](value: js.Dictionary[js.Any])(key: String): T = {
+      require(value.contains(key), s"Key $key is missing from ${js.JSON.stringify(value)}")
+      Scala2Js.toScala[T](value(key))
+    }
   }
 
   def toJs[T: Converter](value: T): js.Any = {

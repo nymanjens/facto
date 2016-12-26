@@ -166,7 +166,7 @@ object SPAMain extends js.JSApp {
       new ScalaJsApiClient().getAllEntities(Seq(TransactionType)).foreach(resultMap => {
         val transactions = resultMap(TransactionType).asInstanceOf[Seq[Transaction]]
         for (transaction <- transactions) {
-          transactionsCollection.insert(Scala2Js.toJsMap(transaction))
+          transactionsCollection.insert(transaction)
         }
         db.saveDatabase() map (_ => {
           out("Done saving transactions")

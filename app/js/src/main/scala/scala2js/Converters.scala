@@ -22,6 +22,11 @@ object Converters {
   }
 
   // **************** General converters **************** //
+  implicit object NullConverter extends Scala2Js.Converter[js.Any] {
+    override def toJs(obj: js.Any) = obj
+    override def toScala(obj: js.Any) = obj
+  }
+
   implicit object StringConverter extends Scala2Js.Converter[String] {
     override def toJs(string: String) = string
     override def toScala(value: js.Any) = value.asInstanceOf[String]

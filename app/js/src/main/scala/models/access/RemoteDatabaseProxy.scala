@@ -11,11 +11,12 @@ import scala.collection.mutable
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.util.Success
+import scala2js.Converters._
 
 trait RemoteDatabaseProxy {
 
   // **************** Getters ****************//
-  def newQuery(entityType: EntityType): Loki.ResultSet
+  def newQuery(entityType: EntityType): Loki.ResultSet[entityType.get]
   /** Returns true if there are local pending `Add` modifications for the given entity. Note that only its id is used. */
   def hasLocalAddModifications(entityType: EntityType)(entity: entityType.get): Boolean
 
@@ -86,9 +87,10 @@ object RemoteDatabaseProxy {
     // TODO: Start getting latest changes, starting at t0 (db.setSingletonValue(LastUpdateTimeKey, ...))
 
     // **************** Getters ****************//
-    override def newQuery(entityType: EntityType): Loki.ResultSet = {
+    override def newQuery(entityType: EntityType): Loki.ResultSet[entityType.get] = {
       val maybeDb = localDatabase.value.flatMap(_.toOption)
-      maybeDb.map(_.newQuery(entityType)) getOrElse Loki.ResultSet.empty
+      implicit val converter = entityTypeToConverter(entityType)
+      maybeDb.map(_.newQuery(entityType)) getOrElse Loki.ResultSet.empty[entityType.get]
     }
     /** Returns true if there are local pending modifications for the given entity. Note that only its id is used. */
     override def hasLocalAddModifications(entityType: EntityType)(entity: entityType.get): Boolean = {

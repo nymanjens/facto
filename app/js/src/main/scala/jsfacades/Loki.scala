@@ -1,12 +1,14 @@
 package jsfacades
 
+import common.GuavaReplacement.Iterables.getOnlyElement
 import common.ScalaUtils
 
+import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.js
-import scala.scalajs.js.{Any, Array, Dictionary}
 import scala.scalajs.js.annotation.JSName
-import common.GuavaReplacement.Iterables.getOnlyElement
+import scala2js.Scala2Js
+import scala2js.Converters._
 
 object Loki {
   @JSName("loki")
@@ -21,7 +23,7 @@ object Loki {
   }
 
   final class Database(facade: DatabaseFacade) {
-    def getOrAddCollection(name: String): Collection = {
+    def getOrAddCollection[E: Scala2Js.MapConverter](name: String): Collection[E] = {
       val collection = facade.getCollection(name)
       if (collection == null) {
         new Collection(facade.addCollection(name))
@@ -65,11 +67,11 @@ object Loki {
     def clear(): Unit = js.native
   }
 
-  final class Collection(facade: CollectionFacade) {
+  final class Collection[E: Scala2Js.MapConverter](facade: CollectionFacade) {
 
-    def chain(): ResultSet = new ResultSet(facade.chain())
+    def chain(): ResultSet[E] = new ResultSet[E](facade.chain())
 
-    def insert(obj: js.Dictionary[js.Any]): Unit = facade.insert(obj)
+    def insert(obj: E): Unit = facade.insert(Scala2Js.toJsMap(obj))
     def findAndRemove(filter: (String, js.Any)*): Unit = facade.findAndRemove(js.Dictionary(filter: _*))
     def clear(): Unit = facade.clear()
   }
@@ -82,25 +84,33 @@ object Loki {
     def count(): Int = js.native
   }
 
-  final class ResultSet(facade: ResultSetFacade) {
+  final class ResultSet[E: Scala2Js.MapConverter](facade: ResultSetFacade) {
 
     // **************** Intermediary operations **************** //
-    def find(filter: (String, js.Any)*): ResultSet = new ResultSet(facade.find(js.Dictionary(filter: _*)))
+    def find(filter: (String, js.Any)*): ResultSet[E] = {
+      new ResultSet[E](facade.find(js.Dictionary(filter: _*)))
+    }
 
     // **************** Terminal operations **************** //
-    def findOne(filter: (String, js.Any)*): Option[js.Dictionary[js.Any]] = {
+    def findOne(filter: (String, js.Any)*): Option[E] = {
       val data = facade.find(js.Dictionary(filter: _*), firstOnly = true).data()
       if (data.length >= 1) {
-        Option(getOnlyElement(data))
+        Option(Scala2Js.toScala[E](getOnlyElement(data)))
       } else {
         None
       }
     }
-    def data(): js.Array[js.Dictionary[js.Any]] = facade.data()
-    def count(): Int = facade.count()
+
+    def data(): Seq[E] = {
+      Scala2Js.toScala[Seq[E]](facade.data())
+    }
+
+    def count(): Int = {
+      facade.count()
+    }
   }
 
   object ResultSet {
-    val empty: ResultSet = ???
+    def empty[E: Scala2Js.MapConverter]: ResultSet[E] = ??? // TODO: Maybe create this from an empty Loki db?
   }
 }
