@@ -6,13 +6,12 @@ import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-private[stores] abstract class EntriesStore(listener: EntriesStore.Listener)(implicit database: RemoteDatabaseProxy) {
-  type State
-
+private[stores] abstract class EntriesStore[State](firstListener: EntriesStore.Listener)
+                                                  (implicit database: RemoteDatabaseProxy) {
   database.registerListener(RemoteDatabaseProxyListener)
 
   private var _state: State = calculateState(oldState = None)
-  private var stateUpdateListeners: Seq[EntriesStore.Listener] = Seq(listener)
+  private var stateUpdateListeners: Seq[EntriesStore.Listener] = Seq(firstListener)
   private var isCallingListeners: Boolean = false
 
   // **************** Public API ****************//
