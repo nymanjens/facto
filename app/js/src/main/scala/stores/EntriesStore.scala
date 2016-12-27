@@ -6,13 +6,13 @@ import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-private[stores] abstract class EntriesStore(implicit database: RemoteDatabaseProxy) {
+private[stores] abstract class EntriesStore(listener: EntriesStore.Listener)(implicit database: RemoteDatabaseProxy) {
   type State
 
   database.registerListener(RemoteDatabaseProxyListener)
 
-  private var _state: Option[State] = None
-  private var stateUpdateListeners: Seq[EntitiesStoreListener] = Seq()
+  private var _state: State = calculateState(oldState = None)
+  private var stateUpdateListeners: Seq[EntriesStore.Listener] = Seq(listener)
   private var isCallingListeners: Boolean = false
 
   // **************** Public API ****************//
@@ -21,10 +21,10 @@ private[stores] abstract class EntriesStore(implicit database: RemoteDatabasePro
       updateState()
     }
 
-    _state.get
+    _state
   }
 
-  final def register(listener: EntitiesStoreListener): Unit = {
+  final def register(listener: EntriesStore.Listener): Unit = {
     require(!isCallingListeners)
     if (stateUpdateListeners.isEmpty) {
       // Update state since it might have become outdated while there were no listeners
@@ -33,7 +33,7 @@ private[stores] abstract class EntriesStore(implicit database: RemoteDatabasePro
     stateUpdateListeners = stateUpdateListeners :+ listener
   }
 
-  final def deregister(listener: EntitiesStoreListener): Unit = {
+  final def deregister(listener: EntriesStore.Listener): Unit = {
     require(!isCallingListeners)
     stateUpdateListeners = stateUpdateListeners.filter(_ != listener)
   }
@@ -45,12 +45,11 @@ private[stores] abstract class EntriesStore(implicit database: RemoteDatabasePro
 
   // **************** Private helper methods ****************//
   private def updateState(): Unit = {
-    _state = Some(calculateState(_state))
+    _state = calculateState(Some(_state))
   }
 
-  private def impactsState(modifications: Seq[EntityModification]): Boolean = {
-    !modifications.toStream.filter(m => modificationImpactsState(m, _state.get)).take(1).isEmpty
-  }
+  private def impactsState(modifications: Seq[EntityModification]): Boolean =
+    modifications.toStream.filter(m => modificationImpactsState(m, _state)).take(1).nonEmpty
 
   private def invokeListenersAsync(): Unit = {
     Future {
@@ -62,14 +61,10 @@ private[stores] abstract class EntriesStore(implicit database: RemoteDatabasePro
   }
 
   // **************** Inner type definitions ****************//
-  trait EntitiesStoreListener {
-    def onStateUpdate(): Unit
-  }
-
   private object RemoteDatabaseProxyListener extends RemoteDatabaseProxy.Listener {
     override def addedLocally(modifications: Seq[EntityModification]): Unit = {
       require(!isCallingListeners)
-      if (!stateUpdateListeners.isEmpty) {
+      if (stateUpdateListeners.nonEmpty) {
         if (impactsState(modifications)) {
           updateState()
           invokeListenersAsync()
@@ -79,7 +74,7 @@ private[stores] abstract class EntriesStore(implicit database: RemoteDatabasePro
 
     override def persistedRemotely(modifications: Seq[EntityModification]): Unit = {
       require(!isCallingListeners)
-      if (!stateUpdateListeners.isEmpty) {
+      if (stateUpdateListeners.nonEmpty) {
         if (impactsState(modifications)) {
           invokeListenersAsync()
         }
@@ -87,10 +82,16 @@ private[stores] abstract class EntriesStore(implicit database: RemoteDatabasePro
     }
     override def loadedDatabase(): Unit = {
       require(!isCallingListeners)
-      if (!stateUpdateListeners.isEmpty) {
+      if (stateUpdateListeners.nonEmpty) {
         updateState()
         invokeListenersAsync()
       }
     }
+  }
+}
+
+object EntriesStore {
+  trait Listener {
+    def onStateUpdate(): Unit
   }
 }

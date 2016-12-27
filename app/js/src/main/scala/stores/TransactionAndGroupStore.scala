@@ -17,9 +17,9 @@ final class TransactionAndGroupStore(implicit database: RemoteDatabaseProxy,
     case AddTransactionGroup(transactionsWithoutId) => ???
   }
 
-  def lastNEntriesStore(n: Int) = new LastNEntriesStore(n)
+  def lastNEntriesStore(n: Int, registerListener: EntriesStore.Listener) = new LastNEntriesStore(n, registerListener)
 
-  final class LastNEntriesStore(n: Int) extends EntriesStore {
+  final class LastNEntriesStore(n: Int, listener: EntriesStore.Listener) extends EntriesStore(listener) {
     override type State = ThisState
 
     override def calculateState(oldState: Option[State]) = {
