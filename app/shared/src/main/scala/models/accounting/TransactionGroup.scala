@@ -1,8 +1,10 @@
 package models.accounting
 
+import api.ScalaJsApi.EntityType
+
 import scala.collection.immutable.Seq
 import common.time.LocalDateTime
-import models.accounting.money.{Money, ReferenceMoney, ExchangeRateManager}
+import models.accounting.money.{ExchangeRateManager, Money, ReferenceMoney}
 import models.accounting.config.Config
 import models.manager.{Entity, EntityManager}
 import models.EntityAccess
@@ -24,6 +26,8 @@ case class TransactionGroup(createdDate: LocalDateTime,
 
 object TransactionGroup {
   def tupled = (this.apply _).tupled
+
+  implicit val entityType: EntityType[TransactionGroup] = EntityType.TransactionGroupType
 
   trait Manager extends EntityManager[TransactionGroup]
 

@@ -15,7 +15,7 @@ trait Entity {
   def idOption: Option[Long]
 
   /** Returns a copy of this Entity with an ID. */
-  protected[manager] def withId(id: Long): Entity
+  def withId(id: Long): Entity
 }
 
 object Entity {

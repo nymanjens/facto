@@ -8,6 +8,7 @@ import scala.scalajs.js
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
+import scala.util.Random
 import scala2js.Scala2Js
 import scala2js.Converters._
 
@@ -23,6 +24,20 @@ sealed trait EntityModification {
 }
 
 object EntityModification {
+  def createAddWithRandomId[E <: Entity : EntityType](entityWithoutId: E): Add[E] = {
+    require(entityWithoutId.idOption.isEmpty, entityWithoutId)
+
+    val id = Random.nextLong
+    val entityWithId = entityWithoutId.withId(id).asInstanceOf[E]
+    Add(entityWithId)
+  }
+
+  def createDelete[E <: Entity : EntityType](entityWithId: E): Remove[E] = {
+    require(entityWithId.idOption.isDefined, entityWithId)
+
+    Remove[E](entityWithId.id)
+  }
+
   case class Add[E <: Entity : EntityType](entity: E) extends EntityModification {
     entityType.checkRightType(entity)
 

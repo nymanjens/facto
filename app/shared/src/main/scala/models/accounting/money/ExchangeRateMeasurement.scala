@@ -1,7 +1,9 @@
 package models.accounting.money
 
+import api.ScalaJsApi.EntityType
 import models.manager.{Entity, EntityManager}
 import common.time.LocalDateTime
+
 import scala.collection.immutable.Seq
 
 /**
@@ -27,6 +29,8 @@ case class ExchangeRateMeasurement(date: LocalDateTime,
 
 object ExchangeRateMeasurement {
   def tupled = (this.apply _).tupled
+
+  implicit val entityType: EntityType[ExchangeRateMeasurement] = EntityType.ExchangeRateMeasurementType
 
   trait Manager extends EntityManager[ExchangeRateMeasurement] {
 

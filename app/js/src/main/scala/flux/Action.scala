@@ -7,6 +7,7 @@ sealed trait Action
 
 object Action {
 
-  case class AddTransactionGroup(transactionsWithoutId: Seq[Transaction]) extends Action
-  case class RemoveTransactionGroup(transactionsGroupWithId: TransactionGroup) extends Action
+  case class AddTransactionGroup(transactionsWithoutIdProvider: TransactionGroup => Seq[Transaction]) extends Action
+  case class UpdateTransactionGroup(transactionGroupWithId: TransactionGroup, transactionsWithoutId: Seq[Transaction]) extends Action
+  case class RemoveTransactionGroup(transactionGroupWithId: TransactionGroup) extends Action
 }
