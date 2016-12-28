@@ -36,31 +36,4 @@ final class TransactionAndGroupStore(implicit database: RemoteDatabaseProxy,
       val groupDeletion = EntityModification.createDelete(group)
       database.persistModifications(transactionDeletions :+ groupDeletion)
   }
-
-  def lastNEntriesStore(n: Int, registerListener: EntriesStore.Listener): EntriesStore[LastNEntriesState] =
-    new EntriesStore[LastNEntriesState](registerListener) {
-      override protected def calculateState(oldState: Option[LastNEntriesState]) = {
-        val transactions: Seq[Transaction] =
-          database.newQuery[Transaction]()
-            .sort("transactionDate", isDesc = true)
-            .sort("createdDate", isDesc = true)
-            .limit(3 * n)
-            .data()
-            .reverse
-
-        var entries = transactions.map(t => GeneralEntry(Seq(t)))
-
-        entries = GeneralEntry.combineConsecutiveOfSameGroup(entries)
-
-        LastNEntriesState(entries.takeRight(n))
-      }
-
-      override protected def modificationImpactsState(entityModification: EntityModification, state: LastNEntriesState): Boolean = {
-        entityModification.entityType == EntityType.TransactionType
-      }
-    }
-}
-
-object TransactionAndGroupStore {
-  case class LastNEntriesState(entries: Seq[GeneralEntry])
 }
