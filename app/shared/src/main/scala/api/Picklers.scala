@@ -3,8 +3,8 @@ package api
 import java.nio.ByteBuffer
 import java.time.{LocalDate, LocalTime}
 
-import api.ScalaJsApi.EntityType
-import api.ScalaJsApi.EntityType._
+import models.manager.EntityType
+import models.manager.EntityType._
 import boopickle.Default._
 import common.time.LocalDateTime
 import models.User

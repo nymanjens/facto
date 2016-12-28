@@ -1,6 +1,6 @@
 package stores
 
-import api.ScalaJsApi.EntityType
+import models.manager.EntityType
 import models.access.{EntityModification, RemoteDatabaseProxy}
 import models.accounting.Transaction
 import stores.LastNEntriesStoreFactory.LastNEntriesState

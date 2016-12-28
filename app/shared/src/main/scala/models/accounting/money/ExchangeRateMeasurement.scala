@@ -1,6 +1,6 @@
 package models.accounting.money
 
-import api.ScalaJsApi.EntityType
+import models.manager.EntityType
 import models.manager.{Entity, EntityManager}
 import common.time.LocalDateTime
 

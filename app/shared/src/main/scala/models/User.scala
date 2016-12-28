@@ -1,6 +1,6 @@
 package models
 
-import api.ScalaJsApi.EntityType
+import models.manager.EntityType
 import models.manager.{Entity, EntityManager}
 
 case class User(loginName: String,

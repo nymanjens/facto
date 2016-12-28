@@ -1,6 +1,6 @@
 package models.accounting
 
-import api.ScalaJsApi.EntityType
+import models.manager.EntityType
 import common.time.Clock
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.accounting.money.{DatedMoney, Money}

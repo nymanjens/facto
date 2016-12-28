@@ -1,7 +1,7 @@
 package api
 
-import api.ScalaJsApi.EntityType
-import api.ScalaJsApi.EntityType._
+import models.manager.EntityType
+import models.manager.EntityType._
 import com.google.inject._
 import models.{EntityAccess, SlickEntityAccess}
 import models.accounting.config.Config

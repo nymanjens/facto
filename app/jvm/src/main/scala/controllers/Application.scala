@@ -17,7 +17,7 @@ import play.api.data.Forms._
 import play.Play.application
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import api.ScalaJsApi
-import api.ScalaJsApi.EntityType
+import models.manager.EntityType
 import common.cache.CacheRegistry
 import models.{EntityAccess, SlickEntityAccess, SlickUserManager, User}
 import controllers.accounting.Views

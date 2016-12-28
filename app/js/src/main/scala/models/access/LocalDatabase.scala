@@ -1,6 +1,6 @@
 package models.access
 
-import api.ScalaJsApi.EntityType
+import models.manager.EntityType
 import jsfacades.Loki
 import models.manager.Entity
 

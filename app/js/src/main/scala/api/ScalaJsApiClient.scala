@@ -6,7 +6,7 @@ import java.nio.ByteBuffer
 
 import boopickle.Default._
 import api.Picklers._
-import api.ScalaJsApi.EntityType
+import models.manager.EntityType
 import models.manager.Entity
 import models.manager.Entity.asEntity
 import org.scalajs.dom

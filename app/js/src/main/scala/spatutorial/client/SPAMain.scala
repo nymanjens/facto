@@ -5,7 +5,7 @@ import java.time.{DayOfWeek, LocalDate, LocalTime}
 import java.time.format.DateTimeFormatter
 import java.time.temporal.{ChronoField, TemporalField}
 
-import api.ScalaJsApi.EntityType
+import models.manager.EntityType
 import api.ScalaJsApiClient
 import models.User
 import models.accounting.{Tag, Transaction}

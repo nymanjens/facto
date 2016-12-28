@@ -1,6 +1,6 @@
 package models.manager
 
-import api.ScalaJsApi.EntityType
+import models.manager.EntityType
 import models.access.{EntityModification, RemoteDatabaseProxy}
 
 import scala.collection.immutable.Seq

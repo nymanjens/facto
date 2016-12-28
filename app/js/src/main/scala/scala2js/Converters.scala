@@ -3,7 +3,7 @@ package scala2js
 import java.time.Month.AUGUST
 import java.time.{LocalDate, LocalTime}
 
-import api.ScalaJsApi.EntityType
+import models.manager.EntityType
 
 import scala.scalajs.js
 import models.accounting.Transaction
