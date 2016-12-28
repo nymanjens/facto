@@ -1,16 +1,11 @@
 package stores
 
-import api.ScalaJsApi.EntityType
 import common.time.Clock
 import flux.Action.{AddTransactionGroup, RemoveTransactionGroup, UpdateTransactionGroup}
 import flux.{Action, Dispatcher}
 import models.EntityAccess
 import models.access.{EntityModification, RemoteDatabaseProxy}
 import models.accounting._
-import stores.TransactionAndGroupStore.LastNEntriesState
-import stores.entries.GeneralEntry
-
-import scala.collection.immutable.Seq
 
 final class TransactionAndGroupStore(implicit database: RemoteDatabaseProxy,
                                      entityAccess: EntityAccess,
