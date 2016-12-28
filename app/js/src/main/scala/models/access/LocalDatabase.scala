@@ -1,54 +1,14 @@
 package models.access
 
-import models.manager.EntityType
 import jsfacades.Loki
-import models.manager.Entity
+import models.manager.{Entity, EntityType, EntityModification}
 
-import scala.scalajs.js
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
-import scala.util.Random
-import scala2js.Scala2Js
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.scalajs.js
 import scala2js.Converters._
-
-// TODO: Move this to common
-/**
-  * Indicates an addition or removal of an immutable entity.
-  *
-  * This modification may used for desired modifications (not yet persisted) or to indicate an already changed state.
-  */
-sealed trait EntityModification {
-  def entityType: EntityType.any
-  def entityId: Long
-}
-
-object EntityModification {
-  def createAddWithRandomId[E <: Entity : EntityType](entityWithoutId: E): Add[E] = {
-    require(entityWithoutId.idOption.isEmpty, entityWithoutId)
-
-    val id = Random.nextLong
-    val entityWithId = entityWithoutId.withId(id).asInstanceOf[E]
-    Add(entityWithId)
-  }
-
-  def createDelete[E <: Entity : EntityType](entityWithId: E): Remove[E] = {
-    require(entityWithId.idOption.isDefined, entityWithId)
-
-    Remove[E](entityWithId.id)
-  }
-
-  case class Add[E <: Entity : EntityType](entity: E) extends EntityModification {
-    entityType.checkRightType(entity)
-
-    override def entityType: EntityType[E] = implicitly[EntityType[E]]
-    override def entityId: Long = entity.id
-  }
-
-  case class Remove[E <: Entity : EntityType](override val entityId: Long) extends EntityModification {
-    override def entityType: EntityType[E] = implicitly[EntityType[E]]
-  }
-}
+import scala2js.Scala2Js
 
 private[access] trait LocalDatabase {
   // **************** Getters ****************//

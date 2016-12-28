@@ -1,6 +1,7 @@
 package stores
 
-import models.access.{EntityModification, RemoteDatabaseProxy}
+import models.access.RemoteDatabaseProxy
+import models.manager.EntityModification
 
 import scala.collection.immutable.Seq
 import scala.concurrent.Future

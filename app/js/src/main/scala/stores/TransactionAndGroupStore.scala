@@ -4,8 +4,9 @@ import common.time.Clock
 import flux.Action.{AddTransactionGroup, RemoveTransactionGroup, UpdateTransactionGroup}
 import flux.{Action, Dispatcher}
 import models.EntityAccess
-import models.access.{EntityModification, RemoteDatabaseProxy}
+import models.access.RemoteDatabaseProxy
 import models.accounting._
+import models.manager.EntityModification
 
 final class TransactionAndGroupStore(implicit database: RemoteDatabaseProxy,
                                      entityAccess: EntityAccess,

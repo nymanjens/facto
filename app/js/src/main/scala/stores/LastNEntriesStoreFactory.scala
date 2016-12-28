@@ -1,8 +1,8 @@
 package stores
 
-import models.manager.EntityType
-import models.access.{EntityModification, RemoteDatabaseProxy}
+import models.access.RemoteDatabaseProxy
 import models.accounting.Transaction
+import models.manager.{EntityModification, EntityType}
 import stores.LastNEntriesStoreFactory.LastNEntriesState
 import stores.entries.GeneralEntry
 

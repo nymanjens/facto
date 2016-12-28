@@ -1,10 +1,9 @@
 package models.access
 
-import models.manager.EntityType
 import api.ScalaJsApiClient
 import jsfacades.Loki
 import models.access.SingletonKey._
-import models.manager.Entity
+import models.manager.{Entity, EntityModification, EntityType}
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
