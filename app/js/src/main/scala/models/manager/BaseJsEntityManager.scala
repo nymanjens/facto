@@ -1,10 +1,8 @@
 package models.manager
 
-import models.manager.EntityType
-import models.access.{EntityModification, RemoteDatabaseProxy}
+import models.access.RemoteDatabaseProxy
 
 import scala.collection.immutable.Seq
-import scala.util.Random
 
 abstract class BaseJsEntityManager[E <: Entity : EntityType](implicit database: RemoteDatabaseProxy) extends EntityManager[E] {
 
