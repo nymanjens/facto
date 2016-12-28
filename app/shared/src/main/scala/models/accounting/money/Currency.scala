@@ -1,7 +1,5 @@
 package models.accounting.money
 
-import common.GuavaReplacement.Iterables.getOnlyElement
-
 /**
   * @param code The three letter symbol.
   */
@@ -13,15 +11,20 @@ sealed abstract class Currency(val code: String, val htmlSymbol: String, val ico
 
 object Currency {
   def of(code: String): Currency = {
-    val candidates = all.filter(_.code.toLowerCase == code.toLowerCase)
-    getOnlyElement(candidates)
+    val candidates = allCustom.filter(_.code.toLowerCase == code.toLowerCase)
+
+    candidates.toSeq match {
+      case Seq(currency) => currency
+      case Seq() => General(code)
+    }
   }
 
-  // TOOD: Make this configurable
+  // TODO: Make this configurable
   val default: Currency = Eur
 
-  private def all: Set[Currency] = Set(Eur, Gbp, Usd)
+  private def allCustom: Set[Currency] = Set(Eur, Gbp, Usd)
   object Eur extends Currency("EUR", "&euro;", Some("fa fa-eur"))
   object Gbp extends Currency("GBP", "&pound;", Some("fa fa-gbp"))
   object Usd extends Currency("USD", "$", Some("fa fa-usd"))
+  case class General(symbol: String) extends Currency(symbol, symbol, None)
 }
