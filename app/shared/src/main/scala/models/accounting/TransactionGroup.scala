@@ -27,8 +27,6 @@ case class TransactionGroup(createdDate: LocalDateTime,
 object TransactionGroup {
   def tupled = (this.apply _).tupled
 
-  implicit val entityType: EntityType[TransactionGroup] = EntityType.TransactionGroupType
-
   trait Manager extends EntityManager[TransactionGroup]
 
   case class Partial(transactions: Seq[Transaction.Partial],

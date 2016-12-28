@@ -28,7 +28,5 @@ case class BalanceCheck(issuerId: Long,
 object BalanceCheck {
   def tupled = (this.apply _).tupled
 
-  implicit val entityType: EntityType[BalanceCheck] = EntityType.BalanceCheckType
-
   trait Manager extends EntityManager[BalanceCheck]
 }

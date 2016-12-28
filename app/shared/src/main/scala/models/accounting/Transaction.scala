@@ -53,8 +53,6 @@ case class Transaction(transactionGroupId: Long,
 object Transaction {
   def tupled = (this.apply _).tupled
 
-  implicit val entityType: EntityType[Transaction] = EntityType.TransactionType
-
   trait Manager extends EntityManager[Transaction] {
     def findByGroupId(groupId: Long): Seq[Transaction]
   }

@@ -14,8 +14,6 @@ case class User(loginName: String,
 object User {
   def tupled = (this.apply _).tupled
 
-  implicit val entityType: EntityType[User] = EntityType.UserType
-
   trait Manager extends EntityManager[User] {
     def findByLoginName(loginName: String): Option[User]
   }
