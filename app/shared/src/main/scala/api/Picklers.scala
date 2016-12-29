@@ -3,7 +3,7 @@ package api
 import java.nio.ByteBuffer
 import java.time.{LocalDate, LocalTime}
 
-import models.manager.EntityType
+import models.manager.{Entity, EntityModification, EntityType}
 import models.manager.EntityType._
 import boopickle.Default._
 import common.time.LocalDateTime
@@ -11,7 +11,6 @@ import models.User
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 import models.accounting.config._
 import models.accounting.money.ExchangeRateMeasurement
-import models.manager.Entity
 
 import scala.collection.immutable.{Seq, Set}
 
@@ -69,7 +68,6 @@ object Picklers {
     }
   }
 
-
   implicit object EntityTypePickler extends Pickler[EntityType.any] {
     override def pickle(entityType: EntityType.any)(implicit state: PickleState): Unit = {
       val intValue: Int = entityType match {
@@ -98,4 +96,38 @@ object Picklers {
     addConcreteType[TransactionGroup].
     addConcreteType[BalanceCheck].
     addConcreteType[ExchangeRateMeasurement]
+
+  implicit object EntityModificationPickler extends Pickler[EntityModification] {
+    val addNumber = 1
+    val removeNumber = 2
+
+    override def pickle(modification: EntityModification)(implicit state: PickleState): Unit = {
+      state.pickle[EntityType.any](modification.entityType)
+      // Pickle number
+      state.pickle(modification match {
+        case _: EntityModification.Add[_] => addNumber
+        case _: EntityModification.Remove[_] => removeNumber
+      })
+      modification match {
+        case EntityModification.Add(entity) =>
+          state.pickle(entity)
+        case EntityModification.Remove(entityId) =>
+          state.pickle(entityId)
+      }
+    }
+    override def unpickle(implicit state: UnpickleState): EntityModification = {
+      val entityType = state.unpickle[EntityType.any]
+      state.unpickle[Int] match {
+        case `addNumber` =>
+          val entity = state.unpickle[Entity]
+          def addModification[E <: Entity](entity: Entity, entityType: EntityType[E]): EntityModification = {
+            EntityModification.Add(entityType.checkRightType(entity))(entityType)
+          }
+          addModification(entity, entityType)
+        case `removeNumber` =>
+          val entityId = state.unpickle[Long]
+          EntityModification.Remove(entityId)(entityType)
+      }
+    }
+  }
 }

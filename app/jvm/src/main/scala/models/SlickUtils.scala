@@ -29,12 +29,12 @@ object SlickUtils {
   // ********** datetime helpers ********** //
   implicit val LocalDateTimeToSqlDateMapper = {
     val zone = ZoneId.of("Europe/Paris") // This is arbitrary. It just has to be the same in both directions
-    val toSql = (localDateTime: LocalDateTime) => {
+    def toSql(localDateTime: LocalDateTime) = {
       val javaDate = JavaLocalDateTime.of(localDateTime.toLocalDate, localDateTime.toLocalTime)
       val instant = javaDate.atZone(zone).toInstant
       java.sql.Timestamp.from(instant)
     }
-    val toLocalDateTime = (sqlTimestamp: java.sql.Timestamp) => {
+    def toLocalDateTime(sqlTimestamp: java.sql.Timestamp) = {
       val javaDate = sqlTimestamp.toInstant.atZone(zone).toLocalDateTime
       LocalDateTimes.ofJavaLocalDateTime(javaDate)
     }

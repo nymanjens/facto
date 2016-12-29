@@ -28,6 +28,7 @@ object EntityModification {
   }
 
   case class Add[E <: Entity : EntityType](entity: E) extends EntityModification {
+    require(entity.idOption.isDefined)
     entityType.checkRightType(entity)
 
     override def entityType: EntityType[E] = implicitly[EntityType[E]]
