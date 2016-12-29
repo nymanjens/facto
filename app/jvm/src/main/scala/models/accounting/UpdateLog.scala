@@ -1,14 +1,10 @@
 package models.accounting
 
-import collection.immutable.Seq
-
 import common.time.LocalDateTime
-
-import common.time.Clock
 import models._
-import models.manager.{EntityManager, Entity}
-import models.accounting.config.Config
-import models.accounting.config.{Category, Account, MoneyReservoir}
+import models.manager.{Entity, EntityManager}
+
+import scala.collection.immutable.Seq
 
 /** UpdateLog entities are immutable. */
 case class UpdateLog(userId: Long,

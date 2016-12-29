@@ -8,11 +8,11 @@ import models.accounting.money.SlickExchangeRateMeasurementManager
 
 final class SlickEntityAccess @Inject()(implicit override val userManager: SlickUserManager,
                                         override val balanceCheckManager: SlickBalanceCheckManager,
-                                        override val tagEntityManager: SlickTagEntityManager,
                                         override val transactionManager: SlickTransactionManager,
                                         override val transactionGroupManager: SlickTransactionGroupManager,
-                                        override val updateLogManager: SlickUpdateLogManager,
-                                        override val exchangeRateMeasurementManager: SlickExchangeRateMeasurementManager
+                                        override val exchangeRateMeasurementManager: SlickExchangeRateMeasurementManager,
+                                        val tagEntityManager: SlickTagEntityManager,
+                                        val updateLogManager: SlickUpdateLogManager
                                        ) extends EntityAccess {
 
   val allEntityManagers: Seq[SlickEntityManager[_, _]] =

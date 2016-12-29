@@ -15,7 +15,7 @@ import controllers.helpers.AuthenticatedAction
 final class GeneralActions @Inject()(implicit val messagesApi: MessagesApi,
                                      clock: Clock,
                                      accountingConfig: Config,
-                                     entityAccess: EntityAccess,
+                                     entityAccess: SlickEntityAccess,
                                      generalEntries: GeneralEntries,
                                      i18n: I18n,
                                      env: play.api.Environment) extends Controller with I18nSupport {

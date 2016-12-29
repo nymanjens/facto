@@ -1,10 +1,9 @@
 package models.accounting
 
-import models.manager.{Entity, EntityManager}
 import models.EntityAccess
+import models.manager.{Entity, EntityManager}
 
-import scala.collection.immutable.Seq
-import scala.collection.immutable.ListMap
+import scala.collection.immutable.{ListMap, Seq}
 
 /**
   * Notes when using TagEntities:
