@@ -14,7 +14,7 @@ import models.accounting.TagEntity
 import models.accounting.config.{Config, Template}
 import controllers.helpers.AuthenticatedAction
 import models.SlickUtils.dbApi._
-import models.SlickUtils.{LocalDateTimeToSqlDateMapper, dbRun}
+import models.SlickUtils.{localDateTimeToSqlDateMapper, dbRun}
 
 final class JsonApi @Inject()(implicit val messagesApi: MessagesApi,
                               clock: Clock,

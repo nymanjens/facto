@@ -5,7 +5,7 @@ import common.time.Clock
 import common.time.LocalDateTime
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}
-import models.SlickUtils.LocalDateTimeToSqlDateMapper
+import models.SlickUtils.localDateTimeToSqlDateMapper
 import models.accounting.config.{Config, MoneyReservoir}
 import models.accounting.money.{DatedMoney, Money}
 import models._

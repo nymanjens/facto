@@ -5,7 +5,7 @@ import java.nio.ByteBuffer
 import com.google.inject._
 import common.time.{Clock, LocalDateTime}
 import models.SlickEntityModificationEntityManager.{EntityModificationEntities, tableName}
-import models.SlickUtils.LocalDateTimeToSqlDateMapper
+import models.SlickUtils.localDateTimeToSqlDateMapper
 import models.SlickUtils.dbApi.{Tag => SlickTag, _}
 import models.accounting.config.Config
 import models.manager.{EntityModification, EntityTable, ImmutableEntityManager, SlickEntityManager}

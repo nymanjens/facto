@@ -10,7 +10,7 @@ import common.ScalaUtils.objectName
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models._
-import models.SlickUtils.{LocalDateTimeToSqlDateMapper, dbRun}
+import models.SlickUtils.{localDateTimeToSqlDateMapper, dbRun}
 import models.manager.{EntityTable, ImmutableEntityManager, Entity, SlickEntityManager}
 import models.accounting.config.Config
 import models.accounting.config.{Category, Account, MoneyReservoir}

@@ -4,7 +4,7 @@ import com.google.inject._
 import com.google.common.base.Splitter
 import com.google.common.hash.{HashCode, Hashing}
 import common.time.Clock
-import models.SlickUtils.LocalDateTimeToSqlDateMapper
+import models.SlickUtils.localDateTimeToSqlDateMapper
 import models.SlickUtils.dbRun
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}

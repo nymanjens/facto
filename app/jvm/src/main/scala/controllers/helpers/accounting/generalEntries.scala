@@ -9,7 +9,7 @@ import common.time.LocalDateTime
 import com.google.common.hash.Hashing
 import common.time.JavaTimeImplicits._
 import models.SlickUtils.dbApi._
-import models.SlickUtils.{LocalDateTimeToSqlDateMapper, dbRun}
+import models.SlickUtils.{localDateTimeToSqlDateMapper, dbRun}
 import models.accounting.{Transaction, SlickTransactionManager}
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import controllers.helpers.ControllerHelperCache

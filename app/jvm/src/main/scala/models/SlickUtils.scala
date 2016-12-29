@@ -27,7 +27,7 @@ object SlickUtils {
   def dbRun[T, C[T]](query: Query[_, T, C]): C[T] = dbRun(query.result)
 
   // ********** datetime helpers ********** //
-  implicit val LocalDateTimeToSqlDateMapper = {
+  implicit val localDateTimeToSqlDateMapper = {
     val zone = ZoneId.of("Europe/Paris") // This is arbitrary. It just has to be the same in both directions
     def toSql(localDateTime: LocalDateTime) = {
       val javaDate = JavaLocalDateTime.of(localDateTime.toLocalDate, localDateTime.toLocalTime)

@@ -9,7 +9,7 @@ import common.CollectionUtils.toListMap
 import models.SlickUtils.dbRun
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}
-import models.SlickUtils.LocalDateTimeToSqlDateMapper
+import models.SlickUtils.localDateTimeToSqlDateMapper
 import models.manager.{Entity, SlickEntityManager, EntityTable, ImmutableEntityManager}
 import common.time.LocalDateTime
 

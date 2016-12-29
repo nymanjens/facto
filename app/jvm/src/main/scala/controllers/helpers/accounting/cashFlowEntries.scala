@@ -4,7 +4,7 @@ import com.google.inject.{Inject, Singleton}
 import com.google.common.hash.Hashing
 import controllers.helpers.ControllerHelperCache
 import controllers.helpers.ControllerHelperCache.CacheIdentifier
-import models.SlickUtils.LocalDateTimeToSqlDateMapper
+import models.SlickUtils.localDateTimeToSqlDateMapper
 import models.SlickUtils.dbApi._
 
 import common.time.JavaTimeImplicits._

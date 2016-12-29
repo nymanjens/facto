@@ -13,7 +13,7 @@ import common.time.JavaTimeImplicits._
 import common.time.{Clock, DatedMonth, MonthRange, TimeUtils, LocalDateTimes}
 import common.CollectionUtils.toListMap
 import common.GuavaUtils.asGuava
-import models.SlickUtils.{LocalDateTimeToSqlDateMapper, dbRun}
+import models.SlickUtils.{localDateTimeToSqlDateMapper, dbRun}
 import models.accounting.{Tag, Transaction, SlickTransactionManager}
 import models.accounting.config.{Account, Category, Config}
 import models.accounting.config.Account.SummaryTotalRowDef
