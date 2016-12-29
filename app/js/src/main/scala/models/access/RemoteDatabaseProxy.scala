@@ -122,13 +122,13 @@ object RemoteDatabaseProxy {
         // Reset database
         db.clear()
         db.setSingletonValue(VersionKey, localDatabaseAndEntityVersion)
-        // TODO: db.setSingletonValue(LastUpdateTimeKey, ...)
-        apiClient.getAllEntities(EntityType.values).map(resultMap => {
-          def addAllToDb[E <: Entity](entityType: EntityType[E])(entities: Seq[entityType.get]) =
-            db.addAll(entities.asInstanceOf[Seq[E]])(entityType)
-          for ((entityType, entities) <- resultMap) {
-            addAllToDb(entityType)(entities.asInstanceOf[Seq[entityType.get]])
+        apiClient.getAllEntities(EntityType.values).map(response => {
+          for (entityType <- response.entityTypes) {
+            def addAllToDb[E <: Entity](implicit entityType: EntityType[E]) =
+              db.addAll(response.entities(entityType))
+            addAllToDb(entityType)
           }
+          db.setSingletonValue(NextUpdateTokenKey, response.nextUpdateToken)
           db.save() // don't wait for this because it doesn't really matter when this completes
           db
         })

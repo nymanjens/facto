@@ -90,10 +90,11 @@ final class Application @Inject()(implicit val messagesApi: MessagesApi,
         case "getAllEntities" =>
           val types = Unpickle[Seq[EntityType.any]].fromBytes(argsMap("types"))
           Pickle.intoBytes(scalaJsApiService.getAllEntities(types))
-        case "insertEntityWithId" =>
-          val entityType = Unpickle[EntityType.any].fromBytes(argsMap("entityType"))
-          val entity = Unpickle[Entity].fromBytes(argsMap("entity"))
-          Pickle.intoBytes(scalaJsApiService.insertEntityWithId(entityType, entity))
+          // TODO: Remove and add missing
+//        case "insertEntityWithId" =>
+//          val entityType = Unpickle[EntityType.any].fromBytes(argsMap("entityType"))
+//          val entity = Unpickle[Entity].fromBytes(argsMap("entity"))
+//          Pickle.intoBytes(scalaJsApiService.insertEntityWithId(entityType, entity))
       }
 
       // Serialize response in HTTP response

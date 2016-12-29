@@ -3,9 +3,12 @@ package models.manager
 import scala.util.Random
 
 /**
-  * Indicates an addition or removal of an immutable entity.
+  * Indicates an idempotent addition or removal of an immutable entity.
   *
   * This modification may used for desired modifications (not yet persisted) or to indicate an already changed state.
+  *
+  * It is important that these modifications are created and treated as idempotent modifications, i.e. applying a
+  * modification a seconds time is a no-op.
   */
 sealed trait EntityModification {
   def entityType: EntityType.any

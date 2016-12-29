@@ -1,28 +1,26 @@
 package api
 
-import autowire._
-import models.accounting.config.Config
 import java.nio.ByteBuffer
 
-import boopickle.Default._
 import api.Picklers._
-import models.manager.EntityType
-import models.manager.Entity
-import models.manager.Entity.asEntity
+import api.ScalaJsApi.GetAllEntitiesResponse
+import api.ScalaJsApiClient.AutowireClient
+import autowire._
+import boopickle.Default._
+import models.accounting.config.Config
+import models.manager.{Entity, EntityType}
 import org.scalajs.dom
 
 import scala.collection.immutable.Seq
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.scalajs.js.typedarray._
 
 final class ScalaJsApiClient {
 
-  import ScalaJsApiClient.AutowireClient
-
   def getAccountingConfig(): Future[Config] = AutowireClient[ScalaJsApi].getAccountingConfig().call()
 
-  def getAllEntities(types: Seq[EntityType.any]): Future[Map[EntityType.any, Seq[Entity]]] = {
+  def getAllEntities(types: Seq[EntityType.any]): Future[GetAllEntitiesResponse] = {
     AutowireClient[ScalaJsApi].getAllEntities(types).call()
   }
 
