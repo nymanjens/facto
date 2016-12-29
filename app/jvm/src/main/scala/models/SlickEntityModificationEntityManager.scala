@@ -30,7 +30,7 @@ object SlickEntityModificationEntityManager {
     override def * = (userId, change, date, id.?) <> (EntityModificationEntity.tupled, EntityModificationEntity.unapply)
   }
 
-  implicit val entityModificationToBytesMapper = {
+  implicit val entityModificationToBytesMapper: ColumnType[EntityModification] = {
     def toBytes(modification: EntityModification) = {
       val byteBuffer = Pickle.intoBytes(modification)
 
