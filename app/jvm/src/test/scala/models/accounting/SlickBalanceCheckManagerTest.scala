@@ -1,6 +1,8 @@
 package models.accounting
 
 import com.google.inject._
+import common.GuavaReplacement.Iterables.getOnlyElement
+import common.testing.TestObjects._
 import common.testing.TestUtils._
 import common.testing._
 import common.time.Clock
@@ -55,5 +57,31 @@ class SlickBalanceCheckManagerTest extends HookedSpecification {
     checkA1.issuer mustEqual user1
     checkA2.moneyReservoirCode mustEqual "ACC_A"
     balanceCheckManager.fetchAll() mustEqual Seq(checkA1, checkA2, checkB)
+  }
+
+  "test inserting a BC with ID" in new WithApplication {
+    val id = 12345
+    val bc = balanceCheckManager.addWithId(BalanceCheck(
+      issuerId = testUser.id,
+      moneyReservoirCode = testReservoir.code,
+      balanceInCents = 999,
+      createdDate = clock.now,
+      checkDate = localDateTimeOfEpochMilli(1000),
+      idOption = Option(id)
+    ))
+
+    bc.id mustEqual id
+    balanceCheckManager.fetchAll() must haveSize(1)
+    getOnlyElement(balanceCheckManager.fetchAll()).id mustEqual id
+    balanceCheckManager.fetchAll() mustEqual Seq(bc)
+
+    balanceCheckManager.addWithId(BalanceCheck(
+      issuerId = testUser.id,
+      moneyReservoirCode = testReservoir.code,
+      balanceInCents = 888888,
+      createdDate = clock.now,
+      checkDate = localDateTimeOfEpochMilli(1005),
+      idOption = Option(id)
+    )) must throwA[IllegalArgumentException]
   }
 }

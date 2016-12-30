@@ -25,7 +25,7 @@ trait SlickEntityManager[E <: Entity, T <: AbstractTable[E]] extends EntityManag
     *
     * @throws IllegalArgumentException if an entry with given ID already exists.
     */
-  def addWithId(entity: E): E = ???
+  def addWithId(entity: E): E
 
   /** Persists an update to an existing entity and returns the given entity. */
   def update(entity: E): E

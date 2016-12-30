@@ -33,6 +33,12 @@ private[manager] final class CachingEntityManager[E <: Entity, T <: AbstractTabl
     result
   }
 
+  override def addWithId(e: E): E = lock.synchronized {
+    val result = delegate.addWithId(e)
+    cache.put(result.id, result)
+    result
+  }
+
   override def update(e: E): E = lock.synchronized {
     val result: E = delegate.update(e)
     cache.put(result.id, result)

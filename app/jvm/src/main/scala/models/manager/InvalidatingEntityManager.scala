@@ -19,6 +19,12 @@ private[manager] final class InvalidatingEntityManager[E <: Entity, T <: Abstrac
     savedEntity
   }
 
+  override def addWithId(entity: E): E = {
+    val savedEntity = delegate.addWithId(entity)
+    CacheRegistry.invalidateCachesWhenUpdated(savedEntity)
+    savedEntity
+  }
+
   override def update(entity: E): E = {
     CacheRegistry.invalidateCachesWhenUpdated(entity)
     delegate.update(entity)
