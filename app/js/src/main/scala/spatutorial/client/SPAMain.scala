@@ -153,7 +153,8 @@ object SPAMain extends js.JSApp {
     // --------------------------- Test ScalaJsApi --------------------------- //
     new ScalaJsApiClient().getInitialData().foreach(out)
     new ScalaJsApiClient().getAllEntities(Seq(EntityType.UserType)).foreach(users => out(s"Users: $users"))
-    //    new ScalaJsApiClient().insertEntityWithId(UserType)(User("blah", "pw", "name", Option(2283)))
+    new ScalaJsApiClient().getEntityModifications(clock.now).foreach(out)
+    new ScalaJsApiClient().persistEntityModifications(Seq())
 
     // --------------------------- Test Loki --------------------------- //
     val db = Loki.Database.persistent("loki-in-scalajs-test")

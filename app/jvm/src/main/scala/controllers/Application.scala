@@ -6,6 +6,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import boopickle.Default._
 import api.Picklers._
+import api.ScalaJsApi.UpdateToken
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import com.google.inject.Inject
@@ -17,14 +18,13 @@ import play.api.data.Forms._
 import play.Play.application
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import api.{ScalaJsApi, ScalaJsApiServerFactory}
-import models.manager.EntityType
+import models.manager.{Entity, EntityModification, EntityType}
 import common.cache.CacheRegistry
 import models.{EntityAccess, SlickEntityAccess, SlickUserManager, User}
 import controllers.accounting.Views
 import controllers.helpers.{AuthenticatedAction, ControllerHelperCache}
 import controllers.Application.Forms
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
-import models.manager.Entity
 
 final class Application @Inject()(implicit val messagesApi: MessagesApi,
                                   userManager: SlickUserManager,
@@ -93,11 +93,12 @@ final class Application @Inject()(implicit val messagesApi: MessagesApi,
         case "getAllEntities" =>
           val types = Unpickle[Seq[EntityType.any]].fromBytes(argsMap("types"))
           Pickle.intoBytes(scalaJsApiServer.getAllEntities(types))
-        // TODO: Remove and add missing
-        //        case "insertEntityWithId" =>
-        //          val entityType = Unpickle[EntityType.any].fromBytes(argsMap("entityType"))
-        //          val entity = Unpickle[Entity].fromBytes(argsMap("entity"))
-        //          Pickle.intoBytes(scalaJsApiService.insertEntityWithId(entityType, entity))
+        case "getEntityModifications" =>
+          val updateToken = Unpickle[UpdateToken].fromBytes(argsMap("updateToken"))
+          Pickle.intoBytes(scalaJsApiServer.getEntityModifications(updateToken))
+        case "persistEntityModifications" =>
+          val modifications = Unpickle[Seq[EntityModification]].fromBytes(argsMap("modifications"))
+          Pickle.intoBytes(scalaJsApiServer.persistEntityModifications(modifications))
       }
 
       // Serialize response in HTTP response
