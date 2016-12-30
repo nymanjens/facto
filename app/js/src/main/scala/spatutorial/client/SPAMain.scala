@@ -151,7 +151,7 @@ object SPAMain extends js.JSApp {
     EntityType.TransactionType.checkRightType(transaction)
 
     // --------------------------- Test ScalaJsApi --------------------------- //
-    new ScalaJsApiClient().getAccountingConfig().foreach(out)
+    new ScalaJsApiClient().getInitialData().foreach(out)
     new ScalaJsApiClient().getAllEntities(Seq(EntityType.UserType)).foreach(users => out(s"Users: $users"))
     //    new ScalaJsApiClient().insertEntityWithId(UserType)(User("blah", "pw", "name", Option(2283)))
 

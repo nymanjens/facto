@@ -3,12 +3,13 @@ package api
 import java.nio.ByteBuffer
 
 import api.Picklers._
-import api.ScalaJsApi.GetAllEntitiesResponse
+import api.ScalaJsApi.{GetAllEntitiesResponse, GetEntityModificationsResponse, GetInitialDataResponse, UpdateToken}
 import api.ScalaJsApiClient.AutowireClient
 import autowire._
 import boopickle.Default._
+import models.User
 import models.accounting.config.Config
-import models.manager.{Entity, EntityType}
+import models.manager.{Entity, EntityModification, EntityType}
 import org.scalajs.dom
 
 import scala.collection.immutable.Seq
@@ -18,16 +19,20 @@ import scala.scalajs.js.typedarray._
 
 final class ScalaJsApiClient {
 
-  def getAccountingConfig(): Future[Config] = AutowireClient[ScalaJsApi].getAccountingConfig().call()
+  def getInitialData(): Future[GetInitialDataResponse] = {
+    AutowireClient[ScalaJsApi].getInitialData().call()
+  }
 
   def getAllEntities(types: Seq[EntityType.any]): Future[GetAllEntitiesResponse] = {
     AutowireClient[ScalaJsApi].getAllEntities(types).call()
   }
 
-  def insertEntityWithId[E <: Entity : EntityType](entity: E): Future[Unit] = {
-    require(entity.idOption.isDefined, s"Gotten an entity without ID ($entity)")
-    //    AutowireClient[ScalaJsApi].insertEntityWithId(implicitly[EntityType[E]], entity).call()
-    ???
+  def getEntityModifications(updateToken: UpdateToken): Future[GetEntityModificationsResponse] = {
+    AutowireClient[ScalaJsApi].getEntityModifications(updateToken).call()
+  }
+
+  def persistEntityModifications(modifications: Seq[EntityModification]): Future[Unit] = {
+    AutowireClient[ScalaJsApi].persistEntityModifications(modifications).call()
   }
 }
 

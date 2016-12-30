@@ -16,7 +16,7 @@ import play.api.mvc._
 import play.api.data.Forms._
 import play.Play.application
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import api.ScalaJsApi
+import api.{ScalaJsApi, ScalaJsApiServerFactory}
 import models.manager.EntityType
 import common.cache.CacheRegistry
 import models.{EntityAccess, SlickEntityAccess, SlickUserManager, User}
@@ -29,7 +29,7 @@ import models.manager.Entity
 final class Application @Inject()(implicit val messagesApi: MessagesApi,
                                   userManager: SlickUserManager,
                                   entityAccess: SlickEntityAccess,
-                                  scalaJsApiService: ScalaJsApi,
+                                  scalaJsApiServerFactory: ScalaJsApiServerFactory,
                                   env: play.api.Environment) extends Controller with I18nSupport {
 
   // ********** actions ********** //
@@ -80,21 +80,24 @@ final class Application @Inject()(implicit val messagesApi: MessagesApi,
   // doesn't seem to work for some reason.
   def scalaJsApi(path: String) = AuthenticatedAction(parse.raw) { implicit user =>
     implicit request =>
+      // Get the scalaJsApiServer
+      val scalaJsApiServer = scalaJsApiServerFactory.create()
+
       // get the request body as ByteBuffer
       val requestBuffer: ByteBuffer = request.body.asBytes(parse.UNLIMITED).get.asByteBuffer
       val argsMap = Unpickle[Map[String, ByteBuffer]].fromBytes(requestBuffer)
 
       val responseBuffer = path match {
-        case "getAccountingConfig" =>
-          Pickle.intoBytes(scalaJsApiService.getAccountingConfig())
+        case "getInitialData" =>
+          Pickle.intoBytes(scalaJsApiServer.getInitialData())
         case "getAllEntities" =>
           val types = Unpickle[Seq[EntityType.any]].fromBytes(argsMap("types"))
-          Pickle.intoBytes(scalaJsApiService.getAllEntities(types))
-          // TODO: Remove and add missing
-//        case "insertEntityWithId" =>
-//          val entityType = Unpickle[EntityType.any].fromBytes(argsMap("entityType"))
-//          val entity = Unpickle[Entity].fromBytes(argsMap("entity"))
-//          Pickle.intoBytes(scalaJsApiService.insertEntityWithId(entityType, entity))
+          Pickle.intoBytes(scalaJsApiServer.getAllEntities(types))
+        // TODO: Remove and add missing
+        //        case "insertEntityWithId" =>
+        //          val entityType = Unpickle[EntityType.any].fromBytes(argsMap("entityType"))
+        //          val entity = Unpickle[Entity].fromBytes(argsMap("entity"))
+        //          Pickle.intoBytes(scalaJsApiService.insertEntityWithId(entityType, entity))
       }
 
       // Serialize response in HTTP response

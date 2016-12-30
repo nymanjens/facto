@@ -1,7 +1,7 @@
 package api
 
 import api.Picklers._
-import api.ScalaJsApi.{GetAllEntitiesResponse, GetEntityModificationsResponse, UpdateToken}
+import api.ScalaJsApi.{GetAllEntitiesResponse, GetEntityModificationsResponse, GetInitialDataResponse, UpdateToken}
 import common.time.LocalDateTime
 import models.User
 import models.accounting.config.Config
@@ -11,18 +11,20 @@ import scala.collection.immutable.Seq
 
 trait ScalaJsApi {
 
-  def getAccountingConfig(): Config
+  def getInitialData(): GetInitialDataResponse
 
   /** Returns a map, mapping the entity type to a sequence of all entities of that type. */
   def getAllEntities(types: Seq[EntityType.any]): GetAllEntitiesResponse
 
   def getEntityModifications(updateToken: UpdateToken): GetEntityModificationsResponse
 
-  def persistEntityModifications(modifications: Seq[EntityModification])(implicit user: User): Unit
+  def persistEntityModifications(modifications: Seq[EntityModification]): Unit
 }
 
 object ScalaJsApi {
   type UpdateToken = LocalDateTime
+
+  case class GetInitialDataResponse(accountingConfig: Config, user: User)
 
   case class GetAllEntitiesResponse(entitiesMap: Map[EntityType.any, Seq[Entity]],
                                     nextUpdateToken: UpdateToken) {
