@@ -4,16 +4,19 @@ import api.Picklers._
 import api.ScalaJsApi.{GetAllEntitiesResponse, GetEntityModificationsResponse, UpdateToken}
 import com.google.inject._
 import common.time.Clock
-import models.SlickEntityAccess
+import models.SlickUtils.dbApi._
+import models.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}
 import models.accounting.config.Config
 import models.manager.EntityType._
 import models.manager._
+import models.{EntityModificationEntity, SlickEntityAccess, SlickEntityModificationEntityManager, User}
 
 import scala.collection.immutable.Seq
 
 private[api] final class ScalaJsApiServer @Inject()(implicit accountingConfig: Config,
                                                     clock: Clock,
-                                                    entityAccess: SlickEntityAccess) extends ScalaJsApi {
+                                                    entityAccess: SlickEntityAccess,
+                                                    entityModificationManager: SlickEntityModificationEntityManager) extends ScalaJsApi {
 
   override def getAccountingConfig(): Config = accountingConfig
 
@@ -31,22 +34,46 @@ private[api] final class ScalaJsApiServer @Inject()(implicit accountingConfig: C
     GetAllEntitiesResponse(entitiesMap, nextUpdateToken)
   }
 
-  override def getEntityModifications(updateToken: UpdateToken): GetEntityModificationsResponse = ???
-  override def persistEntityModifications(modifications: Seq[EntityModification]): Unit = ???
+  override def getEntityModifications(updateToken: UpdateToken): GetEntityModificationsResponse = {
+    // All modifications are idempotent so we can use the time when we started getting the entities as next update token.
+    val nextUpdateToken: UpdateToken = clock.now
 
-  // TODO: Remove
-  //  override def insertEntityWithId(entityType: EntityType.any, entity: Entity): Unit = {
-  //    require(entity.idOption.isDefined, s"Got an entity without ID ($entityType, $entity)")
-  //
-  //    // TODO: Add with ID instead of regular add
-  //    getManager(entityType).add(entityType.checkRightType(entity))
-  //  }
-  //
-  //  override def deleteEntity(entityType: EntityType.any, entity: Entity): Unit = {
-  //    require(entity.idOption.isDefined, s"Got an entity without ID ($entityType, $entity)")
-  //
-  //    getManager(entityType).delete(entityType.checkRightType(entity))
-  //  }
+    val modifications = {
+      val modificationEntities = dbRun(entityModificationManager.newQuery
+        .filter(_.date >= nextUpdateToken)
+        .sortBy(_.date))
+      modificationEntities.toStream.map(_.modification).toVector
+    }
+
+    GetEntityModificationsResponse(modifications, nextUpdateToken)
+  }
+
+  override def persistEntityModifications(modifications: Seq[EntityModification])(implicit user: User): Unit = {
+    for (modification <- modifications) {
+      // Apply modification
+      val entityType = modification.entityType
+      modification match {
+        case EntityModification.Add(entity) =>
+          getManager(entityType).addWithId(entity.asInstanceOf[entityType.get])
+        case EntityModification.Remove(entityId) =>
+          getManager(entityType).delete(getManager(entityType).findById(entityId))
+      }
+
+      // Add modification
+      entityModificationManager.add(EntityModificationEntity(
+        userId = user.id,
+        modification = modification,
+        date = clock.now
+      ))
+    }
+
+    // Add update logs
+    // (Do this after all other modifications were applied because TransactionGroups are added before their
+    // transactions)
+    for (modification <- modifications) {
+      // TODO
+    }
+  }
 
   private def getManager(entityType: EntityType.any): SlickEntityManager[entityType.get, _] = {
     val manager = entityType match {

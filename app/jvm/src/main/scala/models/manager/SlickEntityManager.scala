@@ -19,8 +19,17 @@ trait SlickEntityManager[E <: Entity, T <: AbstractTable[E]] extends EntityManag
   // ********** Mutators ********** //
   /** Persists a new entity (without ID) and returns the same entity with its ID in the database. */
   def add(entity: E): E
+
+  /**
+    * Persists a new entity (with ID) and returns the given entity.
+    *
+    * @throws IllegalArgumentException if an entry with given ID already exists.
+    */
+  def addWithId(entity: E): E = ???
+
   /** Persists an update to an existing entity and returns the given entity. */
   def update(entity: E): E
+
   /** Deletes an existing entity from the database. */
   def delete(entity: E): Unit
 

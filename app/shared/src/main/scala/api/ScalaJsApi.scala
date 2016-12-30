@@ -3,6 +3,7 @@ package api
 import api.Picklers._
 import api.ScalaJsApi.{GetAllEntitiesResponse, GetEntityModificationsResponse, UpdateToken}
 import common.time.LocalDateTime
+import models.User
 import models.accounting.config.Config
 import models.manager.{Entity, EntityModification, EntityType}
 
@@ -17,7 +18,7 @@ trait ScalaJsApi {
 
   def getEntityModifications(updateToken: UpdateToken): GetEntityModificationsResponse
 
-  def persistEntityModifications(modifications: Seq[EntityModification]): Unit
+  def persistEntityModifications(modifications: Seq[EntityModification])(implicit user: User): Unit
 }
 
 object ScalaJsApi {
