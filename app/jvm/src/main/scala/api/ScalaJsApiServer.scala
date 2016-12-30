@@ -6,6 +6,7 @@ import com.google.inject._
 import common.time.Clock
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}
+import models.accounting.{SlickUpdateLogManager, UpdateLog}
 import models.accounting.config.Config
 import models.manager.EntityType._
 import models.manager._
@@ -16,6 +17,7 @@ import scala.collection.immutable.Seq
 private[api] final class ScalaJsApiServer @Inject()(implicit accountingConfig: Config,
                                                     clock: Clock,
                                                     entityAccess: SlickEntityAccess,
+                                                    updateLogManager: SlickUpdateLogManager,
                                                     entityModificationManager: SlickEntityModificationEntityManager) extends ScalaJsApi {
 
   override def getAccountingConfig(): Config = accountingConfig
@@ -65,13 +67,6 @@ private[api] final class ScalaJsApiServer @Inject()(implicit accountingConfig: C
         modification = modification,
         date = clock.now
       ))
-    }
-
-    // Add update logs
-    // (Do this after all other modifications were applied because TransactionGroups are added before their
-    // transactions)
-    for (modification <- modifications) {
-      // TODO
     }
   }
 

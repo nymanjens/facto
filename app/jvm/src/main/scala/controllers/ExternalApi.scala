@@ -100,7 +100,7 @@ final class ExternalApi @Inject()(implicit val messagesApi: MessagesApi,
       s"Invalid application secret. Found '$applicationSecret' but should be '$realApplicationSecret'")
   }
 
-  def getOrCreateRobotUser(): User = {
+  private def getOrCreateRobotUser(): User = {
     val loginName = "robot"
     def hash(s: String) = Hashing.sha512().hashString(s, Charsets.UTF_8).toString()
 
