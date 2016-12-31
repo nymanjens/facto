@@ -168,7 +168,7 @@ object RemoteDatabaseProxy {
             invokeListenersAsync(_.addedRemotely(response.modifications))
           }
         }
-      } getOrElse Future.successful()
+      } getOrElse Future.successful((): Unit)
     }
   }
 }
