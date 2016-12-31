@@ -60,6 +60,35 @@ private[stores] abstract class EntriesStore[State](implicit database: RemoteData
   // **************** Inner type definitions ****************//
   private object RemoteDatabaseProxyListener extends RemoteDatabaseProxy.Listener {
     override def addedLocally(modifications: Seq[EntityModification]): Unit = {
+      addedModifications(modifications)
+    }
+
+    override def localModificationPersistedRemotely(modifications: Seq[EntityModification]): Unit = {
+      require(!isCallingListeners)
+
+      if (stateUpdateListeners.nonEmpty) {
+        if (impactsState(modifications)) {
+          invokeListenersAsync()
+        }
+      }
+    }
+
+    override def addedRemotely(modifications: Seq[EntityModification]): Unit = {
+      addedModifications(modifications)
+    }
+
+    override def loadedDatabase(): Unit = {
+      require(!isCallingListeners)
+
+      if (stateUpdateListeners.isEmpty) {
+        _state = None
+      } else {
+        updateState()
+        invokeListenersAsync()
+      }
+    }
+
+    private def addedModifications(modifications: Seq[EntityModification]): Unit = {
       require(!isCallingListeners)
 
       if (_state.isDefined) {
@@ -71,26 +100,6 @@ private[stores] abstract class EntriesStore[State](implicit database: RemoteData
             invokeListenersAsync()
           }
         }
-      }
-    }
-
-    override def persistedRemotely(modifications: Seq[EntityModification]): Unit = {
-      require(!isCallingListeners)
-
-      if (stateUpdateListeners.nonEmpty) {
-        if (impactsState(modifications)) {
-          invokeListenersAsync()
-        }
-      }
-    }
-    override def loadedDatabase(): Unit = {
-      require(!isCallingListeners)
-
-      if (stateUpdateListeners.isEmpty) {
-        _state = None
-      } else {
-        updateState()
-        invokeListenersAsync()
       }
     }
   }

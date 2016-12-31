@@ -1,5 +1,7 @@
 package models.access
 
+import scala.concurrent.duration._
+import scala.scalajs.js
 import api.ScalaJsApiClient
 import jsfacades.Loki
 import models.access.SingletonKey._
@@ -43,7 +45,13 @@ object RemoteDatabaseProxy {
       * Note that a preceding `addedLocally()` call may have been made earlier for the same modifications, but this is
       * not always the case.
       */
-    def persistedRemotely(modifications: Seq[EntityModification]): Unit
+    def localModificationPersistedRemotely(modifications: Seq[EntityModification]): Unit
+
+    /**
+      *
+      */
+    def addedRemotely(modifications: Seq[EntityModification]): Unit
+
     /**
       * Called after the initial loading or reloading of the database. This also gets called when the database is
       * cleared.
@@ -61,7 +69,7 @@ object RemoteDatabaseProxy {
     private var isCallingListeners: Boolean = false
 
     localDatabase.onSuccess { case db => invokeListenersAsync(_.loadedDatabase()) }
-    // TODO: Start getting latest changes, starting at t0 (db.setSingletonValue(LastUpdateTimeKey, ...))
+    startSchedulingModifiedEntityUpdates()
 
     // **************** Getters ****************//
     override def newQuery[E <: Entity : EntityType](): Loki.ResultSet[E] = {
@@ -78,18 +86,19 @@ object RemoteDatabaseProxy {
 
       localDatabase onSuccess { case db =>
         db.applyModifications(modifications)
-        invokeListenersAsync(_.addedLocally(modifications))
         for {
           modification <- modifications
           if modification.isInstanceOf[EntityModification.Add[_]]
         } localAddModificationIds(modification.entityType) += modification.entityId
+        invokeListenersAsync(_.addedLocally(modifications))
 
-        // TODO: persist remotely and execute code below:
-        //        for {
-        //          modification <- modifications
-        //          if modification.isInstanceOf[EntityModification.Add]
-        //        } localAddModificationIds(modification.entityType) -= modification.entityId
-        //        invokeListeners(_.persistedRemotely(modifications))
+        apiClient.persistEntityModifications(modifications) onSuccess { case _ =>
+          for {
+            modification <- modifications
+            if modification.isInstanceOf[EntityModification.Add[_]]
+          } localAddModificationIds(modification.entityType) -= modification.entityId
+          invokeListenersAsync(_.localModificationPersistedRemotely(modifications))
+        }
       }
     }
     override def clearLocalDatabase(): Future[Unit] = {
@@ -135,6 +144,31 @@ object RemoteDatabaseProxy {
       } else {
         Future.successful(db)
       }
+    }
+
+    private def startSchedulingModifiedEntityUpdates(): Unit = {
+      var timeout = 5.seconds
+      def cyclicLogic(): Unit = {
+        updateModifiedEntities() onComplete { _ =>
+          js.timers.setTimeout(timeout)(cyclicLogic)
+          timeout * 1.02
+        }
+      }
+
+      js.timers.setTimeout(0)(cyclicLogic)
+    }
+
+    private def updateModifiedEntities(): Future[Unit] = {
+      val maybeDb = localDatabase.value.flatMap(_.toOption)
+      maybeDb map { db =>
+        apiClient.getEntityModifications(db.getSingletonValue(NextUpdateTokenKey).get) map { response =>
+          db.setSingletonValue(NextUpdateTokenKey, response.nextUpdateToken)
+          if (response.modifications.nonEmpty) {
+            db.applyModifications(response.modifications)
+            invokeListenersAsync(_.addedRemotely(response.modifications))
+          }
+        }
+      } getOrElse Future.successful()
     }
   }
 }
