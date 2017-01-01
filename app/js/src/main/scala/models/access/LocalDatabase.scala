@@ -44,10 +44,10 @@ private[access] object LocalDatabase {
           "value" -> singleton.value)
       }
       override def toScala(dict: js.Dictionary[js.Any]) = {
-        def getRequiredValue[T: Scala2Js.Converter](key: String) = getRequiredValueFromDict[T](dict)(key)
+        def getRequired[T: Scala2Js.Converter](key: String) = getRequiredValueFromDict[T](dict)(key)
         Singleton(
-          key = getRequiredValue[String]("key"),
-          value = getRequiredValue[js.Any]("value"))
+          key = getRequired[String]("key"),
+          value = getRequired[js.Any]("value"))
       }
     }
   }

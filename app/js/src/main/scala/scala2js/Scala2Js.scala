@@ -19,6 +19,10 @@ object Scala2Js {
       require(value.contains(key), s"Key $key is missing from ${js.JSON.stringify(value)}")
       Scala2Js.toScala[V](value(key))
     }
+
+    protected final def getOptionalValueFromDict[V: Converter](value: js.Dictionary[js.Any])(key: String): Option[V] = {
+      value.get(key) map Scala2Js.toScala[V]
+    }
   }
 
   def toJs[T: Converter](value: T): js.Any = {

@@ -123,8 +123,8 @@ object SPAMain extends js.JSApp {
     // --------------------------- Test Scala2Js --------------------------- //
     val transaction: Transaction = Scala2Js.toScala[Transaction](js.JSON.parse(
       """{
-          "transactionGroupId": 1232138,
-          "issuerId": 32978,
+          "transactionGroupId": "1232138",
+          "issuerId": "32978",
           "beneficiaryAccountCode": "abc",
           "moneyReservoirCode": "def",
           "categoryCode": "ghi",
@@ -135,7 +135,7 @@ object SPAMain extends js.JSApp {
           "createdDate": 1237897,
           "transactionDate": 1481666404,
           "consumedDate": 1481666404,
-          "id": 43334
+          "id": "43334"
         }
       """))
     out(transaction)

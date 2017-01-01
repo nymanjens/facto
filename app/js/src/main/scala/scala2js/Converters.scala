@@ -70,8 +70,8 @@ object Converters {
     override def toJs(transaction: Transaction) = {
       val dateTimeConverter = implicitly[Scala2Js.Converter[LocalDateTime]]
       val result = js.Dictionary[js.Any](
-        "transactionGroupId" -> transaction.transactionGroupId.toInt,
-        "issuerId" -> transaction.issuerId.toInt,
+        "transactionGroupId" -> transaction.transactionGroupId.toString,
+        "issuerId" -> transaction.issuerId.toString,
         "beneficiaryAccountCode" -> transaction.beneficiaryAccountCode,
         "moneyReservoirCode" -> transaction.moneyReservoirCode,
         "categoryCode" -> transaction.categoryCode,
@@ -84,34 +84,28 @@ object Converters {
         "consumedDate" -> dateTimeConverter.toJs(transaction.consumedDate)
       )
       for (id <- transaction.idOption) {
-        result.update("id", id.toInt)
+        result.update("id", id.toString)
       }
       result
     }
     override def toScala(dict: js.Dictionary[js.Any]) = {
-      val dateTimeConverter = implicitly[Scala2Js.Converter[LocalDateTime]]
-      def getValue[T](key: String): T = {
-        require(dict.contains(key), s"Key $key is missing from ${js.JSON.stringify(dict)}")
-        dict(key).asInstanceOf[T]
-      }
-      def getString(key: String): String = getValue[String](key)
-      def getLong(key: String): Long = getValue[Int](key).toLong
-      def getDate(key: String): LocalDateTime = dateTimeConverter.toScala(getValue[js.Any](key))
+      def getRequired[T: Scala2Js.Converter](key: String) = getRequiredValueFromDict[T](dict)(key)
+      def getOptional[T: Scala2Js.Converter](key: String) = getOptionalValueFromDict[T](dict)(key)
 
       Transaction(
-        transactionGroupId = getLong("transactionGroupId"),
-        issuerId = getLong("issuerId"),
-        beneficiaryAccountCode = getString("beneficiaryAccountCode"),
-        moneyReservoirCode = getString("moneyReservoirCode"),
-        categoryCode = getString("categoryCode"),
-        description = getString("description"),
-        flowInCents = getString("flowInCents").toLong,
-        detailDescription = getString("detailDescription"),
-        tagsString = getString("tagsString"),
-        createdDate = getDate("createdDate"),
-        transactionDate = getDate("transactionDate"),
-        consumedDate = getDate("consumedDate"),
-        idOption = dict.get("id").map(_.asInstanceOf[Int].toLong))
+        transactionGroupId = getRequired[String]("transactionGroupId").toLong,
+        issuerId = getRequired[String]("issuerId").toLong,
+        beneficiaryAccountCode = getRequired[String]("beneficiaryAccountCode"),
+        moneyReservoirCode = getRequired[String]("moneyReservoirCode"),
+        categoryCode = getRequired[String]("categoryCode"),
+        description = getRequired[String]("description"),
+        flowInCents = getRequired[String]("flowInCents").toLong,
+        detailDescription = getRequired[String]("detailDescription"),
+        tagsString = getRequired[String]("tagsString"),
+        createdDate = getRequired[LocalDateTime]("createdDate"),
+        transactionDate = getRequired[LocalDateTime]("transactionDate"),
+        consumedDate = getRequired[LocalDateTime]("consumedDate"),
+        idOption = getOptional[String]("id").map(_.toLong))
     }
   }
 }
