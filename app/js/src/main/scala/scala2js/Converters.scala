@@ -38,12 +38,17 @@ object Converters {
     override def toScala(value: js.Any) = value.asInstanceOf[String]
   }
 
-  implicit def seqConverter[A](implicit elemConverter: Scala2Js.Converter[A]): Scala2Js.Converter[Seq[A]] =
+  implicit object IntConverter extends Scala2Js.Converter[Int] {
+    override def toJs(int: Int) = int
+    override def toScala(value: js.Any) = value.asInstanceOf[Int]
+  }
+
+  implicit def seqConverter[A: Scala2Js.Converter]: Scala2Js.Converter[Seq[A]] =
     new Converter[Seq[A]] {
       override def toJs(seq: Seq[A]) =
-        seq.toStream.map(elemConverter.toJs).toJSArray
+        seq.toStream.map(Scala2Js.toJs[A]).toJSArray
       override def toScala(value: js.Any) =
-        value.asInstanceOf[js.Array[js.Any]].toStream.map(elemConverter.toScala).toVector
+        value.asInstanceOf[js.Array[js.Any]].toStream.map(Scala2Js.toScala[A]).toVector
     }
 
   implicit object LocalDateTimeConverter extends Scala2Js.Converter[LocalDateTime] {
@@ -61,7 +66,7 @@ object Converters {
       val secondOfDay = combinedInt % secondsInDay
       LocalDateTime.of(
         LocalDate.ofEpochDay(epochDay),
-        LocalTime.ofNanoOfDay(secondOfDay))
+        LocalTime.ofSecondOfDay(secondOfDay))
     }
   }
 
