@@ -1,5 +1,6 @@
 package models.manager
 
+import java.lang.Math.abs
 import scala.util.Random
 
 /**
@@ -19,7 +20,7 @@ object EntityModification {
   def createAddWithRandomId[E <: Entity : EntityType](entityWithoutId: E): Add[E] = {
     require(entityWithoutId.idOption.isEmpty, entityWithoutId)
 
-    val id = Random.nextLong
+    val id = abs(Random.nextLong)
     val entityWithId = entityWithoutId.withId(id).asInstanceOf[E]
     Add(entityWithId)
   }

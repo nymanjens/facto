@@ -4,13 +4,21 @@ import java.time.{Instant, ZoneId}
 
 import common.testing.TestObjects._
 import common.time.LocalDateTime
-import models.SlickEntityAccess
+import models.{EntityAccess, SlickEntityAccess, User}
 import models.accounting.config.{Account, Category, MoneyReservoir}
 import models.accounting.money.Currency.Gbp
 import models.accounting.money.ExchangeRateMeasurement
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 
 object TestUtils {
+
+  def getPersistedTestUser(implicit entityAccess: SlickEntityAccess): User = {
+    val user = TestObjects.testUser
+    if (entityAccess.userManager.findByLoginName(user.loginName).isEmpty) {
+      entityAccess.userManager.addWithId(user)
+    }
+    user
+  }
 
   def persistTransaction(groupId: Long = -1,
                          flowInCents: Long = 0,
