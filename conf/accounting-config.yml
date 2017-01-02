@@ -238,4 +238,3 @@ constants:
   commonAccount: *accountCommon
   accountingCategory: *catAcc
   endowmentCategory: *catEndow
-  liquidationDescription: Liquidation

@@ -1,17 +1,12 @@
 package common.testing
 
-import com.google.inject._
+import models.User
 import models.accounting.config.Account.SummaryTotalRowDef
-import models.accounting.config.{Account, Category, Config, MoneyReservoir}
-import models.{SlickEntityAccess, SlickUserManager, User}
+import models.accounting.config._
 
 import scala.collection.immutable.Seq
 
 object TestObjects {
-
-  implicit lazy val accountingConfig: Config = {
-    Guice.createInjector(new FactoTestModule).getInstance(classOf[Config])
-  }
 
   val testCategoryA: Category = Category(code = "CAT_A", name = "Category A")
   val testCategoryB: Category = Category(code = "CAT_B", name = "Category B", helpText = "b-help")
@@ -29,8 +24,8 @@ object TestObjects {
     longName = "Account A",
     shorterName = "Acc.A",
     veryShortName = "A",
-    userLoginName = Option("a"),
-    defaultCashReservoirCode = Option("CASH_A"),
+    userLoginName = Some("a"),
+    defaultCashReservoirCode = Some("CASH_A"),
     defaultElectronicReservoirCode = "CARD_A",
     categories = Seq(testCategoryA, testCategoryB),
     summaryTotalRows = Seq(
@@ -45,16 +40,111 @@ object TestObjects {
     longName = "Account B",
     shorterName = "Acc.B",
     veryShortName = "B",
-    userLoginName = Option("b"),
-    defaultCashReservoirCode = Option("CASH_B"),
+    userLoginName = Some("b"),
+    defaultCashReservoirCode = Some("CASH_B"),
     defaultElectronicReservoirCode = "CARD_B",
     categories = Seq(testCategoryB))
   def testAccount: Account = testAccountA
 
-  def testReservoirOfAccountA: MoneyReservoir = accountingConfig.moneyReservoir("CASH_A")
-  def testReservoirOfAccountB: MoneyReservoir = accountingConfig.moneyReservoir("CASH_B")
-  def testReservoir: MoneyReservoir = accountingConfig.moneyReservoir("CASH_COMMON")
-  def otherTestReservoir: MoneyReservoir = accountingConfig.moneyReservoir("CARD_COMMON")
+
+  val testReservoirCashCommon = MoneyReservoir(
+    code = "CASH_COMMON",
+    name = "Cash Common",
+    shorterName = "Cash Common",
+    owner = testAccountCommon,
+    hidden = false)
+  val testReservoirCardCommon = MoneyReservoir(
+    code = "CARD_COMMON",
+    name = "Card Common",
+    shorterName = "Card Common",
+    owner = testAccountCommon,
+    hidden = false)
+  val testReservoirCashA = MoneyReservoir(
+    code = "CASH_A",
+    name = "Cash A",
+    shorterName = "Cash A",
+    owner = testAccountA,
+    hidden = false)
+  val testReservoirCardA = MoneyReservoir(
+    code = "CARD_A",
+    name = "Card A",
+    shorterName = "Card A",
+    owner = testAccountA,
+    hidden = false)
+  val testReservoirCashB = MoneyReservoir(
+    code = "CASH_B",
+    name = "Cash B",
+    shorterName = "Cash B",
+    owner = testAccountB,
+    hidden = false)
+  val testReservoirCardB = MoneyReservoir(
+    code = "CARD_B",
+    name = "Card B",
+    shorterName = "Card B",
+    owner = testAccountB,
+    hidden = false)
+  val testReservoirHidden = MoneyReservoir(
+    code = "HIDDEN",
+    name = "Card Hidden",
+    shorterName = "Card Hidden",
+    owner = testAccountB,
+    hidden = true)
+  val testReservoirCashGbp = MoneyReservoir(
+    code = "CASH_GBP",
+    name = "Cash GBP",
+    shorterName = "Cash GBP",
+    owner = testAccountA,
+    hidden = true,
+    currencyCode = Some("GBP"))
+  def testReservoirOfAccountA: MoneyReservoir = testReservoirCashA
+  def testReservoirOfAccountB: MoneyReservoir = testReservoirCashB
+  def testReservoir: MoneyReservoir = testReservoirCashCommon
+  def otherTestReservoir: MoneyReservoir = testReservoirCardCommon
+
+  val testTemplate: Template = Template(
+    code = "new-endowment",
+    name = "New Endowment",
+    placement = Set(Template.Placement.EndowmentsView),
+    zeroSum = true,
+    iconClass = "fa-plus-square",
+    transactions = Seq(
+      Template.Transaction(
+        beneficiaryCodeTpl = Some("ACC_COMMON"),
+        moneyReservoirCodeTpl = Some(""),
+        categoryCodeTpl = Some("CAT_A"),
+        descriptionTpl = "Endowment for ${account.longName}"),
+      Template.Transaction(
+        beneficiaryCodeTpl = Some("${account.code}"),
+        moneyReservoirCodeTpl = Some(""),
+        categoryCodeTpl = Some("CAT_A"),
+        descriptionTpl = "Endowment for ${account.longName}")))
+
+  val testConstants = Constants(
+    commonAccount = testAccountCommon,
+    accountingCategory = testCategoryA,
+    endowmentCategory = testCategoryB,
+    liquidationDescription = "Liquidation",
+    zoneId = "Europe/Brussels")
+
+  implicit val accountingConfig: Config = Config(
+    accounts = Map(
+      "ACC_COMMON" -> testAccountCommon,
+      "ACC_A" -> testAccountA,
+      "ACC_B" -> testAccountB),
+    categories = Map(
+      "CAT_B" -> testCategoryB,
+      "CAT_A" -> testCategoryA),
+    moneyReservoirsMap = Map(
+      "CASH_COMMON" -> testReservoirCashCommon,
+      "CARD_COMMON" -> testReservoirCardCommon,
+      "CASH_A" -> testReservoirCashA,
+      "CARD_A" -> testReservoirCardA,
+      "CASH_B" -> testReservoirCashB,
+      "CARD_B" -> testReservoirCardB,
+      "HIDDEN" -> testReservoirHidden,
+      "CASH_GBP" -> testReservoirCashGbp),
+    templates = Seq(testTemplate),
+    constants = testConstants)
 
   def testUser: User = User(
     loginName = "testUser",

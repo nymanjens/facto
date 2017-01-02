@@ -12,7 +12,7 @@ import models.accounting.config.Template.Transaction
 case class Template(code: String,
                     name: String,
                     placement: Set[Template.Placement],
-                    onlyShowForUserLoginNames: Option[Set[String]],
+                    onlyShowForUserLoginNames: Option[Set[String]] = None,
                     zeroSum: Boolean,
                     iconClass: String,
                     transactions: Seq[Template.Transaction]) {
@@ -72,12 +72,12 @@ object Template {
     }
   }
 
-  case class Transaction(beneficiaryCodeTpl: Option[String],
-                         moneyReservoirCodeTpl: Option[String],
-                         categoryCodeTpl: Option[String],
-                         descriptionTpl: String,
-                         flowInCents: Long,
-                         tagsString: String) {
+  case class Transaction(beneficiaryCodeTpl: Option[String] = None,
+                         moneyReservoirCodeTpl: Option[String] = None,
+                         categoryCodeTpl: Option[String] = None,
+                         descriptionTpl: String = "",
+                         flowInCents: Long = 0,
+                         tagsString: String = "") {
     requireNonNull(
       beneficiaryCodeTpl, moneyReservoirCodeTpl, categoryCodeTpl, descriptionTpl, flowInCents,
       tagsString)
