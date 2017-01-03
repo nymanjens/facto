@@ -8,6 +8,7 @@ import models.accounting.config.Account.SummaryTotalRowDef
 import models.accounting.config._
 import models.accounting.money.ExchangeRateMeasurement
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
+import models.manager.EntityModification
 
 import scala.collection.immutable.{ListMap, Seq}
 
@@ -209,4 +210,6 @@ object TestObjects {
     foreignCurrencyCode = "GBP",
     ratioReferenceToForeignCurrency = 1.234,
     idOption = Some(764785511))
+
+  val testModification: EntityModification = EntityModification.Add(testTransactionWithId)
 }

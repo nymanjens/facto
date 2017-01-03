@@ -45,7 +45,7 @@ class PicklersTest extends HookedSpecification {
 
   "GetEntityModificationsResponse" in {
     testPickleAndUnpickle[GetEntityModificationsResponse](GetEntityModificationsResponse(
-      modifications = Seq(EntityModification.Remove[Transaction](123054)),
+      modifications = Seq(testModification),
       nextUpdateToken = testDate))
   }
 
