@@ -22,11 +22,12 @@ class SlickBalanceCheckManagerTest extends HookedSpecification {
 
   override def before() = {
     Guice.createInjector(new FactoTestModule).injectMembers(this)
-    userManager.addWithId(testUserA)
-    userManager.addWithId(testUserB)
   }
 
   "test the BalanceCheck model" in new WithApplication {
+    userManager.addWithId(testUserA)
+    userManager.addWithId(testUserB)
+
     // get and persist dummy balanceCheckManager
     val checkA1 = balanceCheckManager.add(BalanceCheck(
       issuerId = testUserA.id,
@@ -57,9 +58,11 @@ class SlickBalanceCheckManagerTest extends HookedSpecification {
   }
 
   "test inserting a BC with ID" in new WithApplication {
+    userManager.addWithId(testUser)
+
     val id = 12345
     val bc = balanceCheckManager.addWithId(BalanceCheck(
-      issuerId = testUserA.id,
+      issuerId = testUser.id,
       moneyReservoirCode = testReservoir.code,
       balanceInCents = 999,
       createdDate = clock.now,
@@ -73,7 +76,7 @@ class SlickBalanceCheckManagerTest extends HookedSpecification {
     balanceCheckManager.fetchAll() mustEqual Seq(bc)
 
     balanceCheckManager.addWithId(BalanceCheck(
-      issuerId = testUserA.id,
+      issuerId = testUser.id,
       moneyReservoirCode = testReservoir.code,
       balanceInCents = 888888,
       createdDate = clock.now,
