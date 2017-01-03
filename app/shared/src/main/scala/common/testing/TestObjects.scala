@@ -24,7 +24,7 @@ object TestObjects {
     longName = "Account A",
     shorterName = "Acc.A",
     veryShortName = "A",
-    userLoginName = Some("a"),
+    userLoginName = Some("testUserA"),
     defaultCashReservoirCode = Some("CASH_A"),
     defaultElectronicReservoirCode = "CARD_A",
     categories = Seq(testCategoryA, testCategoryB),
@@ -40,7 +40,7 @@ object TestObjects {
     longName = "Account B",
     shorterName = "Acc.B",
     veryShortName = "B",
-    userLoginName = Some("b"),
+    userLoginName = Some("testUserB"),
     defaultCashReservoirCode = Some("CASH_B"),
     defaultElectronicReservoirCode = "CARD_B",
     categories = Seq(testCategoryB))
@@ -146,10 +146,19 @@ object TestObjects {
     templates = Seq(testTemplate),
     constants = testConstants)
 
-  def testUser: User = User(
-    loginName = "testUser",
+  def testUserA: User = User(
+    loginName = "testUserA",
     passwordHash = "be196838736ddfd0007dd8b2e8f46f22d440d4c5959925cb49135abc9cdb01e84961aa43dd0ddb6ee59975eb649280d9f44088840af37451828a6412b9b574fc",
     // = sha512("pw")
-    name = "Test User"
+    name = "Test User A",
+    idOption = Option(918273)
   )
+  val testUserB: User = User(
+    loginName = "testUserB",
+    passwordHash = "be196838736ddfd0007dd8b2e8f46f22d440d4c5959925cb49135abc9cdb01e84961aa43dd0ddb6ee59975eb649280d9f44088840af37451828a6412b9b574fc",
+    // = sha512("pw")
+    name = "Test User B",
+    idOption = Option(918274)
+  )
+  def testUser: User = testUserA
 }

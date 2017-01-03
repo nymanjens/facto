@@ -12,14 +12,6 @@ import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 
 object TestUtils {
 
-  def getPersistedTestUser(implicit entityAccess: SlickEntityAccess): User = {
-    val user = TestObjects.testUser
-    if (entityAccess.userManager.findByLoginName(user.loginName).isEmpty) {
-      entityAccess.userManager.addWithId(user)
-    }
-    user
-  }
-
   def persistTransaction(groupId: Long = -1,
                          flowInCents: Long = 0,
                          date: LocalDateTime = FakeClock.defaultTime,

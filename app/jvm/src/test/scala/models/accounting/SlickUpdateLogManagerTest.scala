@@ -20,9 +20,11 @@ class SlickUpdateLogManagerTest extends HookedSpecification {
   @Inject private val transactionManager: SlickTransactionManager = null
   @Inject private val transactionGroupManager: SlickTransactionGroupManager = null
   @Inject private val balanceCheckManager: SlickBalanceCheckManager = null
+  @Inject private val userManager: SlickUserManager = null
 
   override def before() = {
     Guice.createInjector(new FactoTestModule).injectMembers(this)
+    userManager.addWithId(testUser)
   }
 
   "SlickUpdateLogManager.fetchLastNEntries" in new WithApplication {
