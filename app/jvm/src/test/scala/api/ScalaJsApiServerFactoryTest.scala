@@ -1,0 +1,85 @@
+package api
+
+import common.GuavaReplacement.Iterables.getOnlyElement
+import com.google.inject._
+import common.testing.TestObjects._
+import common.testing.TestUtils._
+import common.testing._
+import common.time.Clock
+import models._
+import models.accounting.SlickTransactionManager
+import models.accounting.config._
+import models.manager.EntityType
+import org.junit.runner._
+import org.specs2.runner._
+import play.api.test._
+
+import scala.collection.immutable.Seq
+
+@RunWith(classOf[JUnitRunner])
+class ScalaJsApiServerFactoryTest extends HookedSpecification {
+
+  private val date1 = localDateTimeOfEpochMilli(999000111)
+  private val date2 = localDateTimeOfEpochMilli(999000222)
+  private val date3 = localDateTimeOfEpochMilli(999000333)
+
+  implicit private val user = testUser
+
+  @Inject implicit private val fakeClock: FakeClock = null
+  @Inject implicit private val entityAccess: SlickEntityAccess = null
+  @Inject implicit private val accountingConfig: Config = null
+  @Inject private val userManager: SlickUserManager = null
+  @Inject private val transactionManager: SlickTransactionManager = null
+  @Inject private val modificationEntityManager: SlickEntityModificationEntityManager = null
+
+  @Inject private val serverFactory: ScalaJsApiServerFactory = null
+
+  override def before() = {
+    Guice.createInjector(new FactoTestModule).injectMembers(this)
+  }
+
+  "getInitialData()" in new WithApplication {
+    val response = serverFactory.create().getInitialData()
+    response.accountingConfig mustEqual accountingConfig
+    response.user mustEqual user
+  }
+
+  "getAllEntities()" in new WithApplication {
+    fakeClock.setTime(testDate)
+    transactionManager.addWithId(testTransactionWithId)
+
+    val response = serverFactory.create().getAllEntities(Seq(EntityType.TransactionType))
+
+    response.entities(EntityType.TransactionType) mustEqual Seq(testTransactionWithId)
+    response.nextUpdateToken mustEqual testDate
+  }
+
+  "getEntityModifications()" in new WithApplication {
+    fakeClock.setTime(date3)
+    modificationEntityManager.add(EntityModificationEntity(
+      userId = testUser.id,
+      modification = testModificationA,
+      date = date1))
+    modificationEntityManager.add(EntityModificationEntity(
+      userId = testUser.id,
+      modification = testModificationB,
+      date = date3))
+
+    val response = serverFactory.create().getEntityModifications(updateToken = date2)
+
+    response.modifications mustEqual Seq(testModificationB)
+    response.nextUpdateToken mustEqual date3
+  }
+
+  "persistEntityModifications()" in new WithApplication {
+    fakeClock.setTime(testDate)
+
+    serverFactory.create().persistEntityModifications(Seq(testModification))
+
+    modificationEntityManager.fetchAll() must haveSize(1)
+    val modificationEntity = getOnlyElement(modificationEntityManager.fetchAll())
+    modificationEntity.userId mustEqual user.id
+    modificationEntity.modification mustEqual testModification
+    modificationEntity.date mustEqual testDate
+  }
+}

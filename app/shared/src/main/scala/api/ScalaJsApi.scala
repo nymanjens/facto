@@ -16,6 +16,7 @@ trait ScalaJsApi {
   /** Returns a map, mapping the entity type to a sequence of all entities of that type. */
   def getAllEntities(types: Seq[EntityType.any]): GetAllEntitiesResponse
 
+  /** Returns all modifications that happened after the given update token was returned, ordered from old to new. */
   def getEntityModifications(updateToken: UpdateToken): GetEntityModificationsResponse
 
   def persistEntityModifications(modifications: Seq[EntityModification]): Unit

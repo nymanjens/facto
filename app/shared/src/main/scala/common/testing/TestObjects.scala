@@ -211,5 +211,7 @@ object TestObjects {
     ratioReferenceToForeignCurrency = 1.234,
     idOption = Some(764785511))
 
-  val testModification: EntityModification = EntityModification.Add(testTransactionWithId)
+  val testModificationA: EntityModification = EntityModification.Add(testTransactionWithId)
+  val testModificationB: EntityModification = EntityModification.Remove[BalanceCheck](12341728695000000L)
+  def testModification: EntityModification = testModificationA
 }
