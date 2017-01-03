@@ -18,7 +18,11 @@ object TestObjects {
     shorterName = "Acc.Common",
     veryShortName = "Common",
     defaultElectronicReservoirCode = "CARD_COMMON",
-    categories = Seq(testCategoryA, testCategoryB))
+    categories = Seq(testCategoryA, testCategoryB),
+    summaryTotalRows = Seq(
+      SummaryTotalRowDef(
+        rowTitleHtml = "<b>Total</b>",
+        categoriesToIgnore = Set())))
   val testAccountA: Account = Account(
     code = "ACC_A",
     longName = "Account A",
@@ -43,7 +47,11 @@ object TestObjects {
     userLoginName = Some("testUserB"),
     defaultCashReservoirCode = Some("CASH_B"),
     defaultElectronicReservoirCode = "CARD_B",
-    categories = Seq(testCategoryB))
+    categories = Seq(testCategoryB),
+    summaryTotalRows = Seq(
+      SummaryTotalRowDef(
+        rowTitleHtml = "<b>Total</b>",
+        categoriesToIgnore = Set())))
   def testAccount: Account = testAccountA
 
 

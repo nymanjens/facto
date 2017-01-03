@@ -20,6 +20,9 @@ class ConfigTest extends HookedSpecification {
   }
 
   "configuration parsing" in new WithApplication {
+    userManager.addWithId(testUserA)
+    userManager.addWithId(testUserB)
+
     // check keys
     config.accounts.keys.toList must beEqualTo(List("ACC_COMMON", "ACC_A", "ACC_B"))
     config.categories.keys.toList must beEqualTo(List("CAT_B", "CAT_A"))
