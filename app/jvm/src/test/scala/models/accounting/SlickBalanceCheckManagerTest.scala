@@ -25,28 +25,26 @@ class SlickBalanceCheckManagerTest extends HookedSpecification {
   }
 
   "test the BalanceCheck model" in new WithApplication {
-
-    // prepare users
-    val user1 = userManager.add(SlickUserManager.createUser(loginName = "tester", password = "x", name = "Tester"))
-    val user2 = userManager.add(SlickUserManager.createUser(loginName = "tester2", password = "x", name = "Tester2"))
+    userManager.addWithId(testUserA)
+    userManager.addWithId(testUserB)
 
     // get and persist dummy balanceCheckManager
     val checkA1 = balanceCheckManager.add(BalanceCheck(
-      issuerId = user1.id,
+      issuerId = testUserA.id,
       moneyReservoirCode = "ACC_A",
       balanceInCents = 999,
       createdDate = clock.now,
       checkDate = localDateTimeOfEpochMilli(1000)
     ))
     val checkA2 = balanceCheckManager.add(BalanceCheck(
-      issuerId = user1.id,
+      issuerId = testUserA.id,
       moneyReservoirCode = "ACC_A",
       balanceInCents = 1000,
       createdDate = clock.now,
       checkDate = localDateTimeOfEpochMilli(2000)
     ))
     val checkB = balanceCheckManager.add(BalanceCheck(
-      issuerId = user2.id,
+      issuerId = testUserB.id,
       moneyReservoirCode = "ACC_B",
       balanceInCents = 999,
       createdDate = clock.now,
@@ -54,12 +52,14 @@ class SlickBalanceCheckManagerTest extends HookedSpecification {
     ))
 
     // do basic checks
-    checkA1.issuer mustEqual user1
+    checkA1.issuer mustEqual testUserA
     checkA2.moneyReservoirCode mustEqual "ACC_A"
     balanceCheckManager.fetchAll() mustEqual Seq(checkA1, checkA2, checkB)
   }
 
   "test inserting a BC with ID" in new WithApplication {
+    userManager.addWithId(testUser)
+
     val id = 12345
     val bc = balanceCheckManager.addWithId(BalanceCheck(
       issuerId = testUser.id,

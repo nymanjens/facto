@@ -20,12 +20,15 @@ class SlickUpdateLogManagerTest extends HookedSpecification {
   @Inject private val transactionManager: SlickTransactionManager = null
   @Inject private val transactionGroupManager: SlickTransactionGroupManager = null
   @Inject private val balanceCheckManager: SlickBalanceCheckManager = null
+  @Inject private val userManager: SlickUserManager = null
 
   override def before() = {
     Guice.createInjector(new FactoTestModule).injectMembers(this)
   }
 
   "SlickUpdateLogManager.fetchLastNEntries" in new WithApplication {
+    userManager.addWithId(testUser)
+
     // add logs
     fakeClock.setTime(createDateTime(2016, APRIL, 1))
     updateLogManager.addLog(testUser, UpdateLog.AddNew, balanceCheck(111))
@@ -54,6 +57,8 @@ class SlickUpdateLogManagerTest extends HookedSpecification {
   }
 
   "Logged TransactionGroup contains all relevant info" in new WithApplication {
+    userManager.addWithId(testUser)
+
     // add logs
     fakeClock.setTime(createDateTime(2016, APRIL, 1))
     val transGrp = transactionGroupManager.add(TransactionGroup(createdDate = fakeClock.now))
@@ -90,6 +95,8 @@ class SlickUpdateLogManagerTest extends HookedSpecification {
   }
 
   "Logged BalanceCheck contains all relevant info" in new WithApplication {
+    userManager.addWithId(testUser)
+
     // add logs
     fakeClock.setTime(createDateTime(2016, APRIL, 1))
     updateLogManager.addLog(testUser, UpdateLog.AddNew, balanceCheck(8788))

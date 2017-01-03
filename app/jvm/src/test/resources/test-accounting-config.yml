@@ -23,7 +23,7 @@ accounts:
       longName: Account A
       shorterName: Acc.A
       veryShortName: A
-      userLoginName: a
+      userLoginName: testUserA
       defaultCashReservoirCode: CASH_A
       defaultElectronicReservoirCode: CARD_A
       categories:
@@ -39,7 +39,7 @@ accounts:
       longName: Account B
       shorterName: Acc.B
       veryShortName: B
-      userLoginName: b
+      userLoginName: testUserB
       defaultCashReservoirCode: CASH_B
       defaultElectronicReservoirCode: CARD_B
       categories:
