@@ -4,7 +4,7 @@ import models.User
 import models.accounting.config.Account.SummaryTotalRowDef
 import models.accounting.config._
 
-import scala.collection.immutable.Seq
+import scala.collection.immutable.{ListMap, Seq}
 
 object TestObjects {
 
@@ -126,15 +126,15 @@ object TestObjects {
     liquidationDescription = "Liquidation",
     zoneId = "Europe/Brussels")
 
-  implicit val accountingConfig: Config = Config(
-    accounts = Map(
+  implicit val testAccountingConfig: Config = Config(
+    accounts = createListMap(
       "ACC_COMMON" -> testAccountCommon,
       "ACC_A" -> testAccountA,
       "ACC_B" -> testAccountB),
-    categories = Map(
+    categories = createListMap(
       "CAT_B" -> testCategoryB,
       "CAT_A" -> testCategoryA),
-    moneyReservoirsMap = Map(
+    moneyReservoirsMap = createListMap(
       "CASH_COMMON" -> testReservoirCashCommon,
       "CARD_COMMON" -> testReservoirCardCommon,
       "CASH_A" -> testReservoirCashA,
@@ -145,6 +145,12 @@ object TestObjects {
       "CASH_GBP" -> testReservoirCashGbp),
     templates = Seq(testTemplate),
     constants = testConstants)
+
+  private def createListMap[K, V](elems: (K, V)*): ListMap[K, V] = {
+    val resultBuilder = ListMap.newBuilder[K, V]
+    elems.foreach(resultBuilder += _)
+    resultBuilder.result
+  }
 
   def testUserA: User = User(
     loginName = "testUserA",
