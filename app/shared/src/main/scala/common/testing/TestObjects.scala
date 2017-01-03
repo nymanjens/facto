@@ -1,8 +1,13 @@
 package common.testing
 
+import common.time.{LocalDateTime, LocalDateTimes}
 import models.User
+import java.time.Month.MARCH
+
 import models.accounting.config.Account.SummaryTotalRowDef
 import models.accounting.config._
+import models.accounting.money.ExchangeRateMeasurement
+import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 
 import scala.collection.immutable.{ListMap, Seq}
 
@@ -175,4 +180,33 @@ object TestObjects {
     idOption = Option(918274)
   )
   def testUser: User = testUserA
+
+  val testDate: LocalDateTime = LocalDateTimes.createDateTime(2008, MARCH, 13)
+  val testTransactionGroupWithId: TransactionGroup = TransactionGroup(
+    createdDate = testDate,
+    idOption = Some(129874444))
+  val testTransactionWithId: Transaction = Transaction(
+    transactionGroupId = testTransactionGroupWithId.id,
+    issuerId = testUser.id,
+    beneficiaryAccountCode = testAccount.code,
+    moneyReservoirCode = testReservoir.code,
+    categoryCode = testCategory.code,
+    description = "Test description",
+    flowInCents = -123,
+    createdDate = testDate,
+    transactionDate = testDate,
+    consumedDate = testDate,
+    idOption = Some(721309875))
+  val testBalanceCheckWithId: BalanceCheck = BalanceCheck(
+    issuerId = testUser.id,
+    moneyReservoirCode = testReservoir.code,
+    balanceInCents = 38746,
+    createdDate = testDate,
+    checkDate = testDate,
+    idOption = Some(873865333))
+  val testExchangeRateMeasurementWithId: ExchangeRateMeasurement = ExchangeRateMeasurement(
+    date = testDate,
+    foreignCurrencyCode = "GBP",
+    ratioReferenceToForeignCurrency = 1.234,
+    idOption = Some(764785511))
 }
