@@ -159,7 +159,7 @@ object SPAMain extends js.JSApp {
     // --------------------------- Test Loki --------------------------- //
     val db = Loki.Database.persistent("loki-in-scalajs-test")
     def save(callback: () => Unit = () => {}) = {
-      val transactionsCollection = db.getOrAddCollection("transactions")
+      val transactionsCollection = db.getOrAddCollection[Transaction]("transactions")
       new ScalaJsApiClient().getAllEntities(Seq(EntityType.TransactionType)).foreach(response => {
         val transactions = response.entities(EntityType.TransactionType)
         for (transaction <- transactions) {
@@ -175,7 +175,7 @@ object SPAMain extends js.JSApp {
       out("loading")
       db.loadDatabase() map (_ => {
         out("loaded")
-        val children = db.getOrAddCollection("transactions")
+        val children = db.getOrAddCollection[Transaction]("transactions")
         //        out(children.find("categoryCode" -> "MED").toSeq map (Scala2Js.toScala[Transaction]))
       })
     }
