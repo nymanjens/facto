@@ -51,11 +51,23 @@ object Loki {
         new DatabaseFacade(
           dbName, js.Dictionary("adapter" -> new IndexedAdapter(dbName))))
     }
+
+    def inMemoryForTests(dbName: String): Database = {
+      new Database(
+        new DatabaseFacade(
+          dbName
+          ,js.Dictionary("adapter" -> new MemoryAdapter())
+        ))
+    }
   }
 
   @JSName("LokiIndexedAdapter")
   @js.native
   final class IndexedAdapter(name: String) extends js.Object
+
+  @JSName("loki.LokiMemoryAdapter")
+  @js.native
+  final class MemoryAdapter() extends js.Object
 
   @js.native
   private trait CollectionFacade extends js.Object {

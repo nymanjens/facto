@@ -29,8 +29,13 @@ private[access] trait LocalDatabase {
 
 private[access] object LocalDatabase {
 
-  def createLoadedFuture(): Future[LocalDatabase] = {
+  def createFuture(): Future[LocalDatabase] = {
     val lokiDb: Loki.Database = Loki.Database.persistent("facto-db")
+    lokiDb.loadDatabase() map (_ => new Impl(lokiDb))
+  }
+
+  def createInMemoryForTests(): Future[LocalDatabase] = {
+    val lokiDb: Loki.Database = Loki.Database.inMemoryForTests("facto-db")
     lokiDb.loadDatabase() map (_ => new Impl(lokiDb))
   }
 
@@ -82,7 +87,28 @@ private[access] object LocalDatabase {
 
     // **************** Setters ****************//
     override def applyModifications(modifications: Seq[EntityModification]): Unit = {
-      ???
+      for (modification <- modifications) {
+        modification match {
+          case addModification: EntityModification.Add[_] =>
+            def add[E <: Entity](modification: EntityModification.Add[E]): Unit = {
+              implicit val _ = modification.entityType
+              newQuery[E]().findOne("id" -> modification.entity.id.toString) match {
+                case Some(entity) => // do nothing
+                case None => entityCollectionForImplicitType[E].insert(modification.entity)
+              }
+            }
+            add(addModification)
+          case removeModification: EntityModification.Remove[_] =>
+            def remove[E <: Entity](modification: EntityModification.Remove[E]): Unit = {
+              implicit val _ = modification.entityType
+              newQuery[E]().findOne("id" -> modification.entityId.toString) match {
+                case Some(entity) => entityCollectionForImplicitType.findAndRemove("id" -> modification.entityId.toString)
+                case None => // do nothing
+              }
+            }
+            remove(removeModification)
+        }
+      }
     }
 
     override def addAll[E <: Entity : EntityType](entities: Seq[E]): Unit = {
@@ -118,70 +144,4 @@ private[access] object LocalDatabase {
       entityCollections(implicitly[EntityType[E]]).asInstanceOf[Loki.Collection[E]]
     }
   }
-
-  //
-  //  def create(scalaJsApiClient: ScalaJsApiClient): LocalDatabase = {
-  //    val loadingDatabase = new LoadingImpl()
-  //    val forwardingDatabase = new ForwardingImpl(loadingDatabase)
-  //
-  //    val lokiDb: Loki.Database = Loki.Database.persistent("facto-db")
-  //    lokiDb.loadDatabase() onSuccess { case _ =>
-  //      // TODO: Load entities if empty (or failure, what happens?) (or do this in client of this method?)
-  //      // TODO: reload everything if version mismatch (or do this in client of this method?)
-  //      // TODO: Load updates from scalaJsApiClient? (or do this in client of this method?)
-  //      val loadedDatabase = new LoadedImpl(lokiDb)
-  //      forwardingDatabase.setDelegate(loadedDatabase)
-  //    }
-  //    forwardingDatabase
-  //  }
-  //
-  //  private final class LoadingImpl extends LocalDatabase {
-  //    val queuedOperations: mutable.Buffer[LocalDatabase => Unit] = mutable.Buffer()
-  //
-  //    override def newQuery(entityType: EntityType) = Loki.ResultSet.empty
-  //
-  //    override def applyModifications(modifications: Seq[EntityModification]) =
-  //      appendMutableOperation(_.applyModifications(modifications))
-  //    override def clear() =
-  //      appendMutableOperation(_.clear())
-  //
-  //    private def appendMutableOperation[T](operation: LocalDatabase => Future[T]): Future[T] = {
-  //      val promise = Promise[T]()
-  //      queuedOperations.append(db => {
-  //        val future = operation(db)
-  //        future.onSuccess { case result => promise.success(result) }
-  //        future.onFailure { case cause => promise.failure(cause) }
-  //      })
-  //      promise.future
-  //    }
-  //  }
-  //
-  //  private final class LoadedImpl(val lokiDb: Loki.Database) extends LocalDatabase {
-  //    val entityCollections: Map[EntityType, Loki.Collection] = {
-  //      for (entityType <- EntityType.values) yield {
-  //        entityType -> lokiDb.getOrAddCollection(s"entities_${entityType.name}")
-  //      }
-  //    }.toMap
-  //
-  //    override def newQuery(entityType: EntityType) = entityCollections(entityType).chain()
-  //
-  //    override def applyModifications(modifications: Seq[EntityModification]) = ???
-  //
-  //    override def clear(): Future[Unit] = {
-  //      for (collection <- entityCollections.values) {
-  //        collection.clear()
-  //      }
-  //      lokiDb.saveDatabase()
-  //    }
-  //  }
-  //
-  //  private final class ForwardingImpl(var delegate: LocalDatabase) extends LocalDatabase {
-  //    override def newQuery(entityType: EntityType) = delegate.newQuery(entityType)
-  //    override def applyModifications(modifications: Seq[EntityModification]) = applyModifications(modifications)
-  //    override def clear() = delegate.clear()
-  //
-  //    def setDelegate(newDeleagate: LocalDatabase): Unit = {
-  //      delegate = newDeleagate
-  //    }
-  //  }
 }

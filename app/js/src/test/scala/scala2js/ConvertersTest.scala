@@ -17,7 +17,7 @@ import scala2js.Converters._
 object ConvertersTest extends TestSuite {
   val dateTime = LocalDateTime.of(2022, MARCH, 13, 12, 13)
 
-  def tests = TestSuite {
+  override def tests = TestSuite {
     "entityTypeToConverter" - {
       entityTypeToConverter(EntityType.UserType) ==> UserConverter
       entityTypeToConverter(EntityType.TransactionType) ==> TransactionConverter
