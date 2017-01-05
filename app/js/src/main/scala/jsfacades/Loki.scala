@@ -55,9 +55,11 @@ object Loki {
     def inMemoryForTests(dbName: String): Database = {
       new Database(
         new DatabaseFacade(
-          dbName
-          ,js.Dictionary("adapter" -> new MemoryAdapter())
-        ))
+          dbName, js.Dictionary(
+            "adapter" -> new MemoryAdapter(),
+            "autosave" -> false,
+            "autoload" -> false,
+            "env" -> "BROWSER")))
     }
   }
 
