@@ -57,8 +57,6 @@ object Loki {
         new DatabaseFacade(
           dbName, js.Dictionary(
             "adapter" -> new MemoryAdapter(),
-            "autosave" -> false,
-            "autoload" -> false,
             "env" -> "BROWSER")))
     }
   }

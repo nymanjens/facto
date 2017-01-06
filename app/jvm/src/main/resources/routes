@@ -4,6 +4,7 @@
 
 # General
 GET  /                                 controllers.Application.index
+GET  /manualtests/                     controllers.Application.manualTests
 
 # External API
 GET  /externalapi/docachemanagement/:appSecret/              controllers.ExternalApi.doCacheManagement(appSecret)

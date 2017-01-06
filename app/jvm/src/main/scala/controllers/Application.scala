@@ -106,6 +106,11 @@ final class Application @Inject()(implicit val messagesApi: MessagesApi,
       responseBuffer.get(data)
       Ok(data)
   }
+
+  def manualTests() = AuthenticatedAction { implicit user =>
+    implicit request =>
+      Ok(views.html.manualTests())
+  }
 }
 
 object Application {
