@@ -34,6 +34,11 @@ private[access] object LocalDatabase {
     lokiDb.loadDatabase() map (_ => new Impl(lokiDb))
   }
 
+  def createStoredForTests(): Future[LocalDatabase] = {
+    val lokiDb: Loki.Database = Loki.Database.persistent("test-db")
+    lokiDb.loadDatabase() map (_ => new Impl(lokiDb))
+  }
+
   def createInMemoryForTests(): Future[LocalDatabase] = {
     val lokiDb: Loki.Database = Loki.Database.inMemoryForTests("facto-db")
     lokiDb.loadDatabase() map (_ => new Impl(lokiDb))
@@ -113,7 +118,10 @@ private[access] object LocalDatabase {
 
     override def addAll[E <: Entity : EntityType](entities: Seq[E]): Unit = {
       for (entity <- entities) {
-        entityCollectionForImplicitType.insert(entity)
+        newQuery[E]().findOne("id" -> entity.id.toString) match {
+          case Some(entity) => // do nothing
+          case None => entityCollectionForImplicitType.insert(entity)
+        }
       }
     }
 

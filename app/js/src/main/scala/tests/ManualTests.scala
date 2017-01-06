@@ -7,6 +7,7 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js.annotation.JSExport
 
+/** Test framework for unit tests that have to be manually run in a browser. */
 @JSExport("ManualTests")
 object ManualTests {
 
