@@ -47,7 +47,7 @@ object LocalDatabaseTest extends ManualTestSuite {
 
     ManualTest("save") {
       async {
-        val db = await(LocalDatabase.createInMemoryForTests())
+        val db = await(LocalDatabase.createStoredForTests())
         await(db.clear())
         db.addAll(Seq(testTransactionWithId))
         db.setSingletonValue(VersionKey, "testVersion")
