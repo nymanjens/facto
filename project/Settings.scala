@@ -41,7 +41,7 @@ object Settings {
     val fontAwesome        = "org.webjars"       %  "font-awesome"        % "4.6.2"
     val laddaBootstrap     = "org.webjars.bower" %  "ladda-bootstrap"     % "0.1.0"
     val log4Javascript     = "org.webjars"       %  "log4javascript"      % "1.4.10"
-    val lokijs             = "org.webjars.bower" %  "lokijs"              % "1.4.1"
+    val lokijs             = "org.webjars.bower" %  "lokijs"              % "1.4.2"
     val metisMenu          = "org.webjars"       %  "metisMenu"           % "1.1.3"
     val mousetrap          = "org.webjars"       %  "mousetrap"           % "1.5.3-1"
     val react              = "org.webjars.bower" %  "react"               % "15.1.0"
@@ -55,8 +55,9 @@ object Settings {
    * the special %%% function selects the correct version for each project
    */
   val sharedDependencies = Def.setting(Seq(
-    "com.lihaoyi" %%% "autowire"  % "0.2.5",
-    "me.chrons"   %%% "boopickle" % "1.2.4"
+    "org.scala-lang.modules" %%  "scala-async" % "0.9.6",
+    "com.lihaoyi"            %%% "autowire"    % "0.2.5",
+    "me.chrons"              %%% "boopickle"   % "1.2.4"
   ))
 
   /** Dependencies only used by the JVM project */

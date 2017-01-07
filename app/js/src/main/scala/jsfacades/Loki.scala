@@ -51,11 +51,23 @@ object Loki {
         new DatabaseFacade(
           dbName, js.Dictionary("adapter" -> new IndexedAdapter(dbName))))
     }
+
+    def inMemoryForTests(dbName: String): Database = {
+      new Database(
+        new DatabaseFacade(
+          dbName, js.Dictionary(
+            "adapter" -> new MemoryAdapter(),
+            "env" -> "BROWSER")))
+    }
   }
 
   @JSName("LokiIndexedAdapter")
   @js.native
   final class IndexedAdapter(name: String) extends js.Object
+
+  @JSName("loki.LokiMemoryAdapter")
+  @js.native
+  final class MemoryAdapter() extends js.Object
 
   @js.native
   private trait CollectionFacade extends js.Object {
@@ -69,7 +81,7 @@ object Loki {
 
   final class Collection[E: Scala2Js.MapConverter](facade: CollectionFacade) {
 
-    def chain(): ResultSet[E] = new ResultSet[E](facade.chain())
+    def chain(): ResultSet[E] = new ResultSet.Impl[E](facade.chain())
 
     def insert(obj: E): Unit = facade.insert(Scala2Js.toJsMap(obj))
     def findAndRemove(filter: (String, js.Any)*): Unit = facade.findAndRemove(js.Dictionary(filter: _*))
@@ -81,13 +93,7 @@ object Loki {
 
     // **************** Intermediary operations **************** //
     def find(filter: js.Dictionary[js.Any], firstOnly: Boolean = false): ResultSetFacade = js.native
-
-    /**
-      * Loose evaluation for user to sort based on a property name. (chainable). Sorting based on the same lt/gt helper
-      * functions used for binary indices.
-      */
     def simplesort(propName: String, isDesc: Boolean = false): ResultSetFacade = js.native
-
     def limit(quantity: Int): ResultSetFacade = js.native
 
     // **************** Terminal operations **************** //
@@ -95,48 +101,60 @@ object Loki {
     def count(): Int = js.native
   }
 
-  final class ResultSet[E: Scala2Js.MapConverter](facade: ResultSetFacade) {
-
+  trait ResultSet[E] {
     // **************** Intermediary operations **************** //
-    def find(filter: (String, js.Any)*): ResultSet[E] = {
-      new ResultSet[E](facade.find(js.Dictionary(filter: _*)))
-    }
-
+    def find(filter: (String, js.Any)*): ResultSet[E]
     /**
       * Loose evaluation for user to sort based on a property name. (chainable). Sorting based on the same lt/gt helper
       * functions used for binary indices.
       */
-    def sort(propName: String, isDesc: Boolean = false): ResultSet[E] = {
-      new ResultSet[E](facade.simplesort(propName, isDesc))
-    }
-
-    def limit(quantity: Int): ResultSet[E] = {
-      new ResultSet[E](facade.limit(quantity))
-    }
+    def sort(propName: String, isDesc: Boolean = false): ResultSet[E]
+    def limit(quantity: Int): ResultSet[E]
 
     // **************** Terminal operations **************** //
-    def findOne(filter: (String, js.Any)*): Option[E] = {
-      val data = facade.find(js.Dictionary(filter: _*), firstOnly = true).data()
-      if (data.length >= 1) {
-        Option(Scala2Js.toScala[E](getOnlyElement(data)))
-      } else {
-        None
-      }
-    }
-
-    def data(): Seq[E] = {
-      Scala2Js.toScala[Seq[E]](facade.data())
-    }
-
-    def count(): Int = {
-      facade.count()
-    }
+    def findOne(filter: (String, js.Any)*): Option[E]
+    def data(): Seq[E]
+    def count(): Int
   }
 
   object ResultSet {
     def empty[E: Scala2Js.MapConverter]: ResultSet[E] = {
       val nonPersistentDb = new Database(new DatabaseFacade("empty-tmp-database"))
       nonPersistentDb.getOrAddCollection[E]("empty-collection").chain()
+    }
+
+    private[jsfacades] final class Impl[E: Scala2Js.MapConverter](facade: ResultSetFacade) extends ResultSet[E] {
+
+      // **************** Intermediary operations **************** //
+      override def find(filter: (String, js.Any)*) = {
+        new ResultSet.Impl[E](facade.find(js.Dictionary(filter: _*)))
+      }
+
+      override def sort(propName: String, isDesc: Boolean = false) = {
+        new ResultSet.Impl[E](facade.simplesort(propName, isDesc))
+      }
+
+      override def limit(quantity: Int) = {
+        new ResultSet.Impl[E](facade.limit(quantity))
+      }
+
+      // **************** Terminal operations **************** //
+      override def findOne(filter: (String, js.Any)*) = {
+        val data = facade.find(js.Dictionary(filter: _*), firstOnly = true).data()
+        if (data.length >= 1) {
+          Option(Scala2Js.toScala[E](getOnlyElement(data)))
+        } else {
+          None
+        }
+      }
+
+      override def data() = {
+        Scala2Js.toScala[Seq[E]](facade.data())
+      }
+
+      override def count() = {
+        facade.count()
+      }
     }
   }
 }

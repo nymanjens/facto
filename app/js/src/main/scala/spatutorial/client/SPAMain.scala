@@ -151,16 +151,16 @@ object SPAMain extends js.JSApp {
     EntityType.TransactionType.checkRightType(transaction)
 
     // --------------------------- Test ScalaJsApi --------------------------- //
-    new ScalaJsApiClient().getInitialData().foreach(out)
-    new ScalaJsApiClient().getAllEntities(Seq(EntityType.UserType)).foreach(users => out(s"Users: $users"))
-    new ScalaJsApiClient().getEntityModifications(clock.now).foreach(out)
-    new ScalaJsApiClient().persistEntityModifications(Seq())
+    Module.tester.scalaJsApiClient.getInitialData().foreach(out)
+    Module.tester.scalaJsApiClient.getAllEntities(Seq(EntityType.UserType)).foreach(users => out(s"Users: $users"))
+    Module.tester.scalaJsApiClient.getEntityModifications(clock.now).foreach(out)
+    Module.tester.scalaJsApiClient.persistEntityModifications(Seq())
 
     // --------------------------- Test Loki --------------------------- //
     val db = Loki.Database.persistent("loki-in-scalajs-test")
     def save(callback: () => Unit = () => {}) = {
       val transactionsCollection = db.getOrAddCollection[Transaction]("transactions")
-      new ScalaJsApiClient().getAllEntities(Seq(EntityType.TransactionType)).foreach(response => {
+      Module.tester.scalaJsApiClient.getAllEntities(Seq(EntityType.TransactionType)).foreach(response => {
         val transactions = response.entities(EntityType.TransactionType)
         for (transaction <- transactions) {
           transactionsCollection.insert(transaction)
@@ -208,7 +208,8 @@ object SPAMain extends js.JSApp {
   }
 
   //////////////// MacWire test ///////////////////
-  private final class Tester(transactionManager: Transaction.Manager) {
+  private final class Tester(val transactionManager: Transaction.Manager,
+                             val scalaJsApiClient: ScalaJsApiClient) {
     def test(): Unit = {
       out(transactionManager.fetchAll())
     }
@@ -217,6 +218,7 @@ object SPAMain extends js.JSApp {
   private object Module {
 
     import com.softwaremill.macwire._
+    import api.Module._
     import models.Module._
     import models.access.Module._
 

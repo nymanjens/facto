@@ -26,6 +26,7 @@ trait RemoteDatabaseProxy {
 
   // **************** Other ****************//
   def registerListener(listener: RemoteDatabaseProxy.Listener): Unit
+  private[access] def startSchedulingModifiedEntityUpdates(): Unit
 }
 
 object RemoteDatabaseProxy {
@@ -69,7 +70,6 @@ object RemoteDatabaseProxy {
     private var isCallingListeners: Boolean = false
 
     localDatabase.onSuccess { case db => invokeListenersAsync(_.loadedDatabase()) }
-    startSchedulingModifiedEntityUpdates()
 
     // **************** Getters ****************//
     override def newQuery[E <: Entity : EntityType](): Loki.ResultSet[E] = {
@@ -116,6 +116,18 @@ object RemoteDatabaseProxy {
       listeners = listeners :+ listener
     }
 
+    override private[access] def startSchedulingModifiedEntityUpdates(): Unit = {
+      var timeout = 5.seconds
+      def cyclicLogic(): Unit = {
+        updateModifiedEntities() onComplete { _ =>
+          js.timers.setTimeout(timeout)(cyclicLogic)
+          timeout * 1.02
+        }
+      }
+
+      js.timers.setTimeout(0)(cyclicLogic)
+    }
+
     // **************** Private helper methods ****************//
     private def invokeListenersAsync(func: Listener => Unit): Unit = {
       Future {
@@ -144,18 +156,6 @@ object RemoteDatabaseProxy {
       } else {
         Future.successful(db)
       }
-    }
-
-    private def startSchedulingModifiedEntityUpdates(): Unit = {
-      var timeout = 5.seconds
-      def cyclicLogic(): Unit = {
-        updateModifiedEntities() onComplete { _ =>
-          js.timers.setTimeout(timeout)(cyclicLogic)
-          timeout * 1.02
-        }
-      }
-
-      js.timers.setTimeout(0)(cyclicLogic)
     }
 
     private def updateModifiedEntities(): Future[Unit] = {
