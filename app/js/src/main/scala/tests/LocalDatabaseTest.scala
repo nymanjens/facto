@@ -1,5 +1,6 @@
 package models.access
 
+import scala.async.Async.{async, await}
 import common.testing.TestObjects._
 import models.User
 import models.access.SingletonKey.{NextUpdateTokenKey, VersionKey}
@@ -17,21 +18,23 @@ object LocalDatabaseTest extends ManualTestSuite {
 
   override def tests = Seq(
     ManualTest("isEmpty") {
-      LocalDatabase.createInMemoryForTests() flatMap { db =>
+      async {
+        val db = await(LocalDatabase.createInMemoryForTests())
         db.isEmpty() ==> true
         db.addAll(Seq(testTransactionWithId))
         db.isEmpty() ==> false
 
-        db.clear() map { _ =>
-          db.isEmpty() ==> true
-          db.setSingletonValue(NextUpdateTokenKey, testDate)
-          db.isEmpty() ==> false
-        }
+        await(db.clear())
+
+        db.isEmpty() ==> true
+        db.setSingletonValue(NextUpdateTokenKey, testDate)
+        db.isEmpty() ==> false
       }
     },
 
     ManualTest("setSingletonValue") {
-      LocalDatabase.createInMemoryForTests() map { db =>
+      async {
+        val db = await(LocalDatabase.createInMemoryForTests())
         db.getSingletonValue(VersionKey).isDefined ==> false
 
         db.setSingletonValue(VersionKey, "abc")
@@ -43,24 +46,24 @@ object LocalDatabaseTest extends ManualTestSuite {
     },
 
     ManualTest("save") {
-      LocalDatabase.createStoredForTests() flatMap { db =>
-        db.clear() flatMap { _ =>
-          db.addAll(Seq(testTransactionWithId))
-          db.setSingletonValue(VersionKey, "testVersion")
+      async {
+        val db = await(LocalDatabase.createInMemoryForTests())
+        await(db.clear())
+        db.addAll(Seq(testTransactionWithId))
+        db.setSingletonValue(VersionKey, "testVersion")
 
-          db.save() flatMap { _ =>
-            db.setSingletonValue(VersionKey, "otherTestVersion")
-            LocalDatabase.createStoredForTests() map { otherDb =>
-              otherDb.newQuery[Transaction]().data() ==> Seq(testTransactionWithId)
-              otherDb.getSingletonValue(VersionKey).get ==> "testVersion"
-            }
-          }
-        }
+        await(db.save())
+        db.setSingletonValue(VersionKey, "otherTestVersion")
+
+        val otherDb = await(LocalDatabase.createStoredForTests())
+        otherDb.newQuery[Transaction]().data() ==> Seq(testTransactionWithId)
+        otherDb.getSingletonValue(VersionKey).get ==> "testVersion"
       }
     },
 
     ManualTest("newQuery(): Lookup by ID works") {
-      LocalDatabase.createInMemoryForTests() map { db =>
+      async {
+        val db = await(LocalDatabase.createInMemoryForTests())
         val transaction2 = testTransactionWithId.copy(idOption = Some(99992))
         val transaction3 = testTransactionWithId.copy(idOption = Some(99993))
         db.addAll(Seq(testTransactionWithId, transaction2, transaction3))
@@ -70,18 +73,20 @@ object LocalDatabaseTest extends ManualTestSuite {
     },
 
     ManualTest("clear") {
-      LocalDatabase.createInMemoryForTests() flatMap { db =>
+      async {
+        val db = await(LocalDatabase.createInMemoryForTests())
         db.addAll(Seq(testTransactionWithId))
         db.setSingletonValue(VersionKey, "testVersion")
 
-        db.clear() map { _ =>
-          db.isEmpty() ==> true
-        }
+        await(db.clear())
+
+        db.isEmpty() ==> true
       }
     },
 
     ManualTest("addAll") {
-      LocalDatabase.createInMemoryForTests() map { db =>
+      async {
+        val db = await(LocalDatabase.createInMemoryForTests())
         db.addAll(Seq(testUser))
         db.addAll(Seq(testTransactionWithId))
         db.addAll(Seq(testTransactionGroupWithId))
@@ -97,7 +102,8 @@ object LocalDatabaseTest extends ManualTestSuite {
     },
 
     ManualTest("addAll: Inserts no duplicates IDs") {
-      LocalDatabase.createInMemoryForTests() map { db =>
+      async {
+        val db = await(LocalDatabase.createInMemoryForTests())
         val transactionWithSameIdA = testTransactionWithId.copy(categoryCode = "codeA")
         val transactionWithSameIdB = testTransactionWithId.copy(categoryCode = "codeB")
         db.addAll(Seq(testTransactionWithId, transactionWithSameIdA))
@@ -108,7 +114,8 @@ object LocalDatabaseTest extends ManualTestSuite {
     },
 
     ManualTest("applyModifications") {
-      LocalDatabase.createInMemoryForTests() map { db =>
+      async {
+        val db = await(LocalDatabase.createInMemoryForTests())
         val transaction2 = testTransactionWithId.copy(idOption = Some(99992))
         db.addAll(Seq(testTransactionWithId))
 
@@ -122,7 +129,8 @@ object LocalDatabaseTest extends ManualTestSuite {
     },
 
     ManualTest("applyModifications: Is idempotent") {
-      LocalDatabase.createInMemoryForTests() map { db =>
+      async {
+        val db = await(LocalDatabase.createInMemoryForTests())
         val transactionWithSameId = testTransactionWithId.copy(categoryCode = "codeA")
         val transaction2 = testTransactionWithId.copy(idOption = Some(99992))
         val transaction3 = testTransactionWithId.copy(idOption = Some(99993))
