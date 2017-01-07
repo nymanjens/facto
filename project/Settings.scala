@@ -55,8 +55,9 @@ object Settings {
    * the special %%% function selects the correct version for each project
    */
   val sharedDependencies = Def.setting(Seq(
-    "com.lihaoyi" %%% "autowire"  % "0.2.5",
-    "me.chrons"   %%% "boopickle" % "1.2.4"
+    "org.scala-lang.modules" %%  "scala-async" % "0.9.6",
+    "com.lihaoyi"            %%% "autowire"    % "0.2.5",
+    "me.chrons"              %%% "boopickle"   % "1.2.4"
   ))
 
   /** Dependencies only used by the JVM project */

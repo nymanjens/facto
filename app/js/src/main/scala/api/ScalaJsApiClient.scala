@@ -4,7 +4,6 @@ import java.nio.ByteBuffer
 
 import api.Picklers._
 import api.ScalaJsApi.{GetAllEntitiesResponse, GetEntityModificationsResponse, GetInitialDataResponse, UpdateToken}
-import api.ScalaJsApiClient.AutowireClient
 import autowire._
 import boopickle.Default._
 import models.User
@@ -17,26 +16,34 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js.typedarray._
 
-final class ScalaJsApiClient {
+trait ScalaJsApiClient {
 
-  def getInitialData(): Future[GetInitialDataResponse] = {
-    AutowireClient[ScalaJsApi].getInitialData().call()
-  }
-
-  def getAllEntities(types: Seq[EntityType.any]): Future[GetAllEntitiesResponse] = {
-    AutowireClient[ScalaJsApi].getAllEntities(types).call()
-  }
-
-  def getEntityModifications(updateToken: UpdateToken): Future[GetEntityModificationsResponse] = {
-    AutowireClient[ScalaJsApi].getEntityModifications(updateToken).call()
-  }
-
-  def persistEntityModifications(modifications: Seq[EntityModification]): Future[Unit] = {
-    AutowireClient[ScalaJsApi].persistEntityModifications(modifications).call()
-  }
+  def getInitialData(): Future[GetInitialDataResponse]
+  def getAllEntities(types: Seq[EntityType.any]): Future[GetAllEntitiesResponse]
+  def getEntityModifications(updateToken: UpdateToken): Future[GetEntityModificationsResponse]
+  def persistEntityModifications(modifications: Seq[EntityModification]): Future[Unit]
 }
 
 object ScalaJsApiClient {
+
+  final class Impl extends ScalaJsApiClient {
+    override def getInitialData() = {
+      AutowireClient[ScalaJsApi].getInitialData().call()
+    }
+
+    override def getAllEntities(types: Seq[EntityType.any]) = {
+      AutowireClient[ScalaJsApi].getAllEntities(types).call()
+    }
+
+    override def getEntityModifications(updateToken: UpdateToken) = {
+      AutowireClient[ScalaJsApi].getEntityModifications(updateToken).call()
+    }
+
+    override def persistEntityModifications(modifications: Seq[EntityModification]) = {
+      AutowireClient[ScalaJsApi].persistEntityModifications(modifications).call()
+    }
+  }
+
   private object AutowireClient extends autowire.Client[ByteBuffer, Pickler, Pickler] {
     override def doCall(req: Request): Future[ByteBuffer] = {
       dom.ext.Ajax.post(

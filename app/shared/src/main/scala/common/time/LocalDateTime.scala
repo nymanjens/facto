@@ -1,6 +1,6 @@
 package common.time
 
-import java.time.{LocalDate, LocalTime, Month}
+import java.time.{Duration, LocalDate, LocalTime, Month}
 
 import common.Require.requireNonNull
 
@@ -13,6 +13,8 @@ trait LocalDateTime extends Comparable[LocalDateTime] {
   def toLocalTime: LocalTime
   def getYear: Int
   def getMonth: Month
+
+  def plus(duration: Duration): LocalDateTime
 }
 
 object LocalDateTime {
@@ -36,6 +38,10 @@ object LocalDateTime {
     override def toLocalTime = time
     override def getYear = date.getYear
     override def getMonth = date.getMonth
+
+    override def plus(duration: Duration) = {
+      of(date plus duration, time plus duration)
+    }
 
     override def toString = s"$date $time"
 
