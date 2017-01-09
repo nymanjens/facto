@@ -6,6 +6,7 @@ import common.ScalaUtils
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.js
+import scala.scalajs.js.Any
 import scala.scalajs.js.annotation.JSName
 import scala2js.Scala2Js
 import scala2js.Converters._
@@ -118,10 +119,7 @@ object Loki {
   }
 
   object ResultSet {
-    def empty[E: Scala2Js.MapConverter]: ResultSet[E] = {
-      val nonPersistentDb = new Database(new DatabaseFacade("empty-tmp-database"))
-      nonPersistentDb.getOrAddCollection[E]("empty-collection").chain()
-    }
+    def empty[E: Scala2Js.MapConverter]: ResultSet[E] = new ResultSet.Fake(Seq())
 
     private[jsfacades] final class Impl[E: Scala2Js.MapConverter](facade: ResultSetFacade) extends ResultSet[E] {
 
@@ -130,7 +128,7 @@ object Loki {
         new ResultSet.Impl[E](facade.find(js.Dictionary(filter: _*)))
       }
 
-      override def sort(propName: String, isDesc: Boolean = false) = {
+      override def sort(propName: String, isDesc: Boolean) = {
         new ResultSet.Impl[E](facade.simplesort(propName, isDesc))
       }
 
@@ -155,6 +153,61 @@ object Loki {
       override def count() = {
         facade.count()
       }
+    }
+
+
+    private[jsfacades] final class Fake[E: Scala2Js.MapConverter](entities: Seq[E]) extends ResultSet[E] {
+
+      implicit val jsValueOrdering: Ordering[js.Any] = {
+        new Ordering[js.Any] {
+          override def compare(x: js.Any, y: js.Any): Int = {
+            if (x.getClass == classOf[String]) {
+              x.asInstanceOf[String] compareTo y.asInstanceOf[String]
+            } else if (x.isInstanceOf[Int]) {
+              x.asInstanceOf[Int] compareTo y.asInstanceOf[Int]
+            } else {
+              ???
+            }
+          }
+        }
+      }
+
+      // **************** Intermediary operations **************** //
+      override def find(filters: (String, js.Any)*) = new ResultSet.Fake(
+        entities filter { entity =>
+          val jsMap = Scala2Js.toJsMap(entity)
+          filters.filter { case (k, v) => jsMap(k) != v }.isEmpty
+        }
+      )
+
+      override def sort(propName: String, isDesc: Boolean) = {
+        val newData = {
+          val sorted = entities.sortBy { entity =>
+            val jsMap = Scala2Js.toJsMap(entity)
+            jsMap(propName)
+          }
+          if (isDesc) {
+            sorted.reverse
+          } else {
+            sorted
+          }
+        }
+        new ResultSet.Fake(newData)
+      }
+
+      override def limit(quantity: Int) = new ResultSet.Fake(
+        entities.take(quantity)
+      )
+
+      // **************** Terminal operations **************** //
+      override def data() = entities
+
+      override def findOne(filters: (String, js.Any)*) = find(filters: _*).limit(1).data() match {
+        case Seq(e) => Some(e)
+        case Seq() => None
+      }
+
+      override def count() = entities.length
     }
   }
 }

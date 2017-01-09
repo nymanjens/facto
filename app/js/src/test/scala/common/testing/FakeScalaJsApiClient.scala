@@ -64,8 +64,8 @@ final class FakeScalaJsApiClient extends ScalaJsApiClient {
   }
 
   // **************** Additional methods for setting data ****************//
-  def addEntities[E <: Entity : EntityType](entities: Entity*): Unit = {
-    persistEntityModifications(entities.map(EntityModification.Add[E](_)).toVector)
+  def addEntities[E <: Entity : EntityType](entities: E*): Unit = {
+    persistEntityModifications(entities.map(EntityModification.Add[E]).toVector)
   }
 
   // **************** Private helper methods ****************//
