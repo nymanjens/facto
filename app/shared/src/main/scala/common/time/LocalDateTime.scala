@@ -40,7 +40,13 @@ object LocalDateTime {
     override def getMonth = date.getMonth
 
     override def plus(duration: Duration) = {
-      of(date plus duration, time plus duration)
+      val millisInDay = 1000 * 60 * 60 *24
+      val durationMillis = duration.toMillis
+      val timeMillis = time.toNanoOfDay / 1000 / 1000
+      val dateMillis = date.toEpochDay * millisInDay
+
+      val newdateMillis = dateMillis + timeMillis + durationMillis
+      of(LocalDate.ofEpochDay(newdateMillis / millisInDay), time plus duration)
     }
 
     override def toString = s"$date $time"
