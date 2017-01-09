@@ -1,5 +1,6 @@
 package models.access
 
+import scala.async.Async.{async, await}
 import scala.concurrent.duration._
 import scala.scalajs.js
 import api.ScalaJsApiClient
@@ -69,7 +70,10 @@ object RemoteDatabaseProxy {
       EntityType.values.map(t => t -> mutable.Set[Long]()).toMap
     private var isCallingListeners: Boolean = false
 
-    localDatabase.onSuccess { case db => invokeListenersAsync(_.loadedDatabase()) }
+    /* visibleForTesting */ private[access] val completelyLoaded: Future[_] = async {
+      await(localDatabase)
+      invokeListenersAsync(_.loadedDatabase())
+    }
 
     // **************** Getters ****************//
     override def newQuery[E <: Entity : EntityType](): Loki.ResultSet[E] = {
@@ -138,27 +142,31 @@ object RemoteDatabaseProxy {
       }
     }
 
-    private def toValidDatabase(db: LocalDatabase): Future[LocalDatabase] = {
+    private def toValidDatabase(db: LocalDatabase): Future[LocalDatabase] = async {
       if (db.isEmpty() || !db.getSingletonValue(VersionKey).contains(localDatabaseAndEntityVersion)) {
         // Reset database
-        db.clear()
+        await(db.clear())
+
+        // Set version
         db.setSingletonValue(VersionKey, localDatabaseAndEntityVersion)
-        apiClient.getAllEntities(EntityType.values).map(response => {
-          for (entityType <- response.entityTypes) {
-            def addAllToDb[E <: Entity](implicit entityType: EntityType[E]) =
-              db.addAll(response.entities(entityType))
-            addAllToDb(entityType)
-          }
-          db.setSingletonValue(NextUpdateTokenKey, response.nextUpdateToken)
-          db.save() // don't wait for this because it doesn't really matter when this completes
-          db
-        })
+
+        // Add all entities
+        val allEntitiesResponse = await(apiClient.getAllEntities(EntityType.values))
+        for (entityType <- allEntitiesResponse.entityTypes) {
+          def addAllToDb[E <: Entity](implicit entityType: EntityType[E]) =
+            db.addAll(allEntitiesResponse.entities(entityType))
+          addAllToDb(entityType)
+        }
+        db.setSingletonValue(NextUpdateTokenKey, allEntitiesResponse.nextUpdateToken)
+
+        db.save() // don't await for this because it doesn't really matter when this completes
+        db
       } else {
-        Future.successful(db)
+        db
       }
     }
 
-    private def updateModifiedEntities(): Future[Unit] = {
+    /* visibleForTesting */ private[access] def updateModifiedEntities(): Future[Unit] = {
       val maybeDb = localDatabase.value.flatMap(_.toOption)
       maybeDb map { db =>
         apiClient.getEntityModifications(db.getSingletonValue(NextUpdateTokenKey).get) map { response =>

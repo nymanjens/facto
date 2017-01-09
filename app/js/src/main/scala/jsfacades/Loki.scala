@@ -156,7 +156,7 @@ object Loki {
     }
 
 
-    private[jsfacades] final class Fake[E: Scala2Js.MapConverter](entities: Seq[E]) extends ResultSet[E] {
+    final class Fake[E: Scala2Js.MapConverter](entities: Seq[E]) extends ResultSet[E] {
 
       implicit val jsValueOrdering: Ordering[js.Any] = {
         new Ordering[js.Any] {
