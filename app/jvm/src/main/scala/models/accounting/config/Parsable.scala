@@ -7,8 +7,8 @@ import java.util.Collections
 import com.google.common.base.Preconditions.checkNotNull
 import com.google.common.collect.ImmutableList
 import common.Require.requireNonNull
-import models.accounting.config.{Account => ParsedAccount, Category => ParsedCategory, Config => ParsedConfig,
-Constants => ParsedConstants, MoneyReservoir => ParsedMoneyReservoir, Template => ParsedTemplate}
+import common.ScalaUtils.nullable
+import models.accounting.config.{Account => ParsedAccount, Category => ParsedCategory, Config => ParsedConfig, Constants => ParsedConstants, MoneyReservoir => ParsedMoneyReservoir, Template => ParsedTemplate}
 import models.accounting.config.Account.{SummaryTotalRowDef => ParsedSummaryTotalRowDef}
 import models.accounting.config.MoneyReservoir.NullMoneyReservoir
 import models.accounting.money.Money
@@ -42,11 +42,11 @@ object Parsable {
                      longName: String,
                      shorterName: String,
                      veryShortName: String,
-                     userLoginName: /* nullable */ String,
-                     defaultCashReservoirCode: /* nullable */ String,
+                     userLoginName: String@nullable,
+                     defaultCashReservoirCode: String@nullable,
                      defaultElectronicReservoirCode: String,
                      categories: java.util.List[Category],
-                     summaryTotalRows: /* nullable */ java.util.List[Account.SummaryTotalRowDef]) {
+                     summaryTotalRows: java.util.List[Account.SummaryTotalRowDef]@nullable) {
     def this() = this(null, null, null, null, null, null, null, null, null)
 
     def parse: ParsedAccount = {
@@ -87,10 +87,10 @@ object Parsable {
 
   case class MoneyReservoir(code: String,
                             name: String,
-                            shorterName: /* nullable */ String,
+                            shorterName: String@nullable,
                             owner: Account,
                             hidden: Boolean,
-                            currency: /* nullable */ String) {
+                            currency: String@nullable) {
     def this() = this(null, null, null, null, hidden = false, null)
 
     def parse: ParsedMoneyReservoir = {
@@ -102,7 +102,7 @@ object Parsable {
   case class Template(code: String,
                       name: String,
                       placement: java.util.List[String],
-                      onlyShowForUserLoginNames: /* nullable */ java.util.List[String],
+                      onlyShowForUserLoginNames: java.util.List[String]@nullable,
                       zeroSum: Boolean,
                       icon: String,
                       transactions: java.util.List[Template.Transaction]) {
@@ -124,9 +124,9 @@ object Parsable {
   }
 
   object Template {
-    case class Transaction(beneficiaryCode: /* nullable */ String,
-                           moneyReservoirCode: /* nullable */ String,
-                           categoryCode: /* nullable */ String,
+    case class Transaction(beneficiaryCode: String@nullable,
+                           moneyReservoirCode: String@nullable,
+                           categoryCode: String@nullable,
                            description: String,
                            flowAsFloat: Double,
                            tagsString: String) {

@@ -1,5 +1,6 @@
 package common
 
+import scala.annotation.{StaticAnnotation, tailrec}
 import scala.concurrent._
 
 object ScalaUtils {
@@ -14,4 +15,9 @@ object ScalaUtils {
     val callback: () => Unit = () => promise.success()
     (callback, promise.future)
   }
+
+  /** Scala version of com.google.common.annotations.VisibleForTesting. */
+  class visibleForTesting extends StaticAnnotation
+  /** Scala version of javax.annotations.Nullable. */
+  class nullable extends StaticAnnotation
 }

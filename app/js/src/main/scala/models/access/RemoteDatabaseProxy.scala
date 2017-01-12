@@ -4,6 +4,7 @@ import scala.async.Async.{async, await}
 import scala.concurrent.duration._
 import scala.scalajs.js
 import api.ScalaJsApiClient
+import common.ScalaUtils.visibleForTesting
 import jsfacades.Loki
 import models.access.SingletonKey._
 import models.manager.{Entity, EntityModification, EntityType}
@@ -70,7 +71,7 @@ object RemoteDatabaseProxy {
       EntityType.values.map(t => t -> mutable.Set[Long]()).toMap
     private var isCallingListeners: Boolean = false
 
-    /* visibleForTesting */ private[access] val completelyLoaded: Future[_] = async {
+    @visibleForTesting private[access] val completelyLoaded: Future[_] = async {
       await(localDatabase)
       invokeListenersAsync(_.loadedDatabase())
     }
@@ -166,7 +167,7 @@ object RemoteDatabaseProxy {
       }
     }
 
-    /* visibleForTesting */ private[access] def updateModifiedEntities(): Future[Unit] = {
+    @visibleForTesting private[access] def updateModifiedEntities(): Future[Unit] = {
       val maybeDb = localDatabase.value.flatMap(_.toOption)
       maybeDb map { db =>
         apiClient.getEntityModifications(db.getSingletonValue(NextUpdateTokenKey).get) map { response =>
