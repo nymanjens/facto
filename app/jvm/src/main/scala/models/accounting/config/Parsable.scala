@@ -8,7 +8,8 @@ import com.google.common.base.Preconditions.checkNotNull
 import com.google.common.collect.ImmutableList
 import common.Require.requireNonNull
 import common.ScalaUtils.nullable
-import models.accounting.config.{Account => ParsedAccount, Category => ParsedCategory, Config => ParsedConfig, Constants => ParsedConstants, MoneyReservoir => ParsedMoneyReservoir, Template => ParsedTemplate}
+import models.accounting.config.{Account => ParsedAccount, Category => ParsedCategory, Config => ParsedConfig,
+Constants => ParsedConstants, MoneyReservoir => ParsedMoneyReservoir, Template => ParsedTemplate}
 import models.accounting.config.Account.{SummaryTotalRowDef => ParsedSummaryTotalRowDef}
 import models.accounting.config.MoneyReservoir.NullMoneyReservoir
 import models.accounting.money.Money

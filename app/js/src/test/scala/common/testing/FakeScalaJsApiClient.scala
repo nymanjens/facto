@@ -38,8 +38,10 @@ final class FakeScalaJsApiClient extends ScalaJsApiClient {
     Future.successful((): Unit)
   }
 
-  // **************** Additional methods for setting data ****************//
+  // **************** Additional methods for tests ****************//
   def addEntities[E <: Entity : EntityType](entities: E*): Unit = {
     modificationsBuffer.addEntities(entities.toVector)
   }
+
+  def allModifications: Seq[EntityModification] = modificationsBuffer.getModifications()
 }

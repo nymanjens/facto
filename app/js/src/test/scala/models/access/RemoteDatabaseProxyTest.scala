@@ -1,30 +1,26 @@
 package models.access
 
-import java.time.Month.MARCH
-
 import api.ScalaJsApiClient
+import scala2js.Converters._
+import common.testing.TestObjects._
 import common.testing.{FakeScalaJsApiClient, ModificationsBuffer}
-import common.time.LocalDateTime
-import models.accounting._
-import models.accounting.money.ExchangeRateMeasurement
+import jsfacades.Loki
+import models.accounting.Transaction
 import models.manager.{Entity, EntityModification, EntityType}
 import utest._
-import common.testing.TestObjects._
-import jsfacades.Loki
-import jsfacades.Loki.ResultSet
-import models.User
 
+import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
-import scala2js.Converters._
 
 object RemoteDatabaseProxyTest extends TestSuite {
 
   override def tests = TestSuite {
-    val fakeApiClient: ScalaJsApiClient = new FakeScalaJsApiClient()
-    val fakeLocalDatabase: LocalDatabase = new FakeLocalDatabase()
+    val fakeApiClient: FakeScalaJsApiClient = new FakeScalaJsApiClient()
+    val fakeLocalDatabase: FakeLocalDatabase = new FakeLocalDatabase()
 
     "loads initial data if db is empty" - {
       1 ==> 1
@@ -34,12 +30,21 @@ object RemoteDatabaseProxyTest extends TestSuite {
       1 ==> 1
     }
 
-    "persistModifications" - {
+    "persistModifications()" - async {
       val remoteDatabaseProxy = new RemoteDatabaseProxy.Impl(fakeApiClient, Future.successful(fakeLocalDatabase))
+      await(remoteDatabaseProxy.completelyLoaded)
+
+      await(remoteDatabaseProxy.persistModifications(Seq(testModification)))
+
+      fakeApiClient.allModifications ==> Seq(testModification)
+      fakeLocalDatabase.allModifications ==> Seq(testModification)
+    }
+
+    "persistModifications(): calls listeners" - {
       1 ==> 1
     }
 
-    "calls listeners" - {
+    "xxx(): calls listeners" - {
       1 ==> 1
     }
 
@@ -79,5 +84,8 @@ object RemoteDatabaseProxyTest extends TestSuite {
       singletonMap.clear()
       Future.successful((): Unit)
     }
+
+    // **************** Additional methods for tests ****************//
+    def allModifications: Seq[EntityModification] = modificationsBuffer.getModifications()
   }
 }

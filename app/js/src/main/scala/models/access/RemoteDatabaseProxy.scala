@@ -23,7 +23,7 @@ trait RemoteDatabaseProxy {
   def hasLocalAddModifications[E <: Entity : EntityType](entity: E): Boolean
 
   // **************** Setters ****************//
-  def persistModifications(modifications: Seq[EntityModification]): Unit
+  def persistModifications(modifications: Seq[EntityModification]): Future[Unit]
   def clearLocalDatabase(): Future[Unit]
 
   // **************** Other ****************//
@@ -73,7 +73,7 @@ object RemoteDatabaseProxy {
 
     @visibleForTesting private[access] val completelyLoaded: Future[_] = async {
       await(localDatabase)
-      invokeListenersAsync(_.loadedDatabase())
+      await(invokeListenersAsync(_.loadedDatabase()))
     }
 
     // **************** Getters ****************//
@@ -81,37 +81,43 @@ object RemoteDatabaseProxy {
       val maybeDb = localDatabase.value.flatMap(_.toOption)
       maybeDb.map(_.newQuery[E]()) getOrElse Loki.ResultSet.empty[E]
     }
+
     override def hasLocalAddModifications[E <: Entity : EntityType](entity: E): Boolean = {
       localAddModificationIds(implicitly[EntityType[E]]) contains entity.id
     }
 
     // **************** Setters ****************//
-    override def persistModifications(modifications: Seq[EntityModification]): Unit = {
+    override def persistModifications(modifications: Seq[EntityModification]): Future[Unit] = async {
       require(!isCallingListeners)
 
-      localDatabase onSuccess { case db =>
-        db.applyModifications(modifications)
-        for {
-          modification <- modifications
-          if modification.isInstanceOf[EntityModification.Add[_]]
-        } localAddModificationIds(modification.entityType) += modification.entityId
-        invokeListenersAsync(_.addedLocally(modifications))
+      val db = await(localDatabase)
+      db.applyModifications(modifications)
 
-        apiClient.persistEntityModifications(modifications) onSuccess { case _ =>
-          for {
-            modification <- modifications
-            if modification.isInstanceOf[EntityModification.Add[_]]
-          } localAddModificationIds(modification.entityType) -= modification.entityId
-          invokeListenersAsync(_.localModificationPersistedRemotely(modifications))
-        }
-      }
+      for {
+        modification <- modifications
+        if modification.isInstanceOf[EntityModification.Add[_]]
+      } localAddModificationIds(modification.entityType) += modification.entityId
+      val listeners1 = invokeListenersAsync(_.addedLocally(modifications))
+
+      await(apiClient.persistEntityModifications(modifications))
+
+      for {
+        modification <- modifications
+        if modification.isInstanceOf[EntityModification.Add[_]]
+      } localAddModificationIds(modification.entityType) -= modification.entityId
+      val listeners2 = invokeListenersAsync(_.localModificationPersistedRemotely(modifications))
+
+      await(listeners1)
+      await(listeners2)
     }
-    override def clearLocalDatabase(): Future[Unit] = {
+
+    override def clearLocalDatabase(): Future[Unit] = async {
       require(!isCallingListeners)
 
-      val resultFuture = localDatabase.flatMap(_.clear())
-      resultFuture onSuccess { case _ => invokeListenersAsync(_.loadedDatabase()) }
-      resultFuture
+      val db = await(localDatabase)
+      await(db.clear())
+
+      await(invokeListenersAsync(_.loadedDatabase()))
     }
 
     // **************** Other ****************//
@@ -134,7 +140,7 @@ object RemoteDatabaseProxy {
     }
 
     // **************** Private helper methods ****************//
-    private def invokeListenersAsync(func: Listener => Unit): Unit = {
+    private def invokeListenersAsync(func: Listener => Unit): Future[Unit] = {
       Future {
         require(!isCallingListeners)
         isCallingListeners = true
@@ -160,24 +166,23 @@ object RemoteDatabaseProxy {
         }
         db.setSingletonValue(NextUpdateTokenKey, allEntitiesResponse.nextUpdateToken)
 
-        db.save() // don't await for this because it doesn't really matter when this completes
+        // Await because we don't want to save unpersisted modifications that can be made as soon as
+        // the database becomes valid.
+        await(db.save())
         db
       } else {
         db
       }
     }
 
-    @visibleForTesting private[access] def updateModifiedEntities(): Future[Unit] = {
-      val maybeDb = localDatabase.value.flatMap(_.toOption)
-      maybeDb map { db =>
-        apiClient.getEntityModifications(db.getSingletonValue(NextUpdateTokenKey).get) map { response =>
-          db.setSingletonValue(NextUpdateTokenKey, response.nextUpdateToken)
-          if (response.modifications.nonEmpty) {
-            db.applyModifications(response.modifications)
-            invokeListenersAsync(_.addedRemotely(response.modifications))
-          }
-        }
-      } getOrElse Future.successful((): Unit)
+    @visibleForTesting private[access] def updateModifiedEntities(): Future[Unit] = async {
+      val db = await(localDatabase)
+      val response = await(apiClient.getEntityModifications(db.getSingletonValue(NextUpdateTokenKey).get))
+      db.setSingletonValue(NextUpdateTokenKey, response.nextUpdateToken)
+      if (response.modifications.nonEmpty) {
+        db.applyModifications(response.modifications)
+        await(invokeListenersAsync(_.addedRemotely(response.modifications)))
+      }
     }
   }
 }
