@@ -186,18 +186,31 @@ object TestObjects {
   val testTransactionGroupWithId: TransactionGroup = TransactionGroup(
     createdDate = testDate,
     idOption = Some(129874444))
-  val testTransactionWithId: Transaction = Transaction(
+  val testTransactionWithIdA: Transaction = Transaction(
     transactionGroupId = testTransactionGroupWithId.id,
-    issuerId = testUser.id,
-    beneficiaryAccountCode = testAccount.code,
+    issuerId = testUserA.id,
+    beneficiaryAccountCode = testAccountA.code,
     moneyReservoirCode = testReservoir.code,
-    categoryCode = testCategory.code,
+    categoryCode = testCategoryA.code,
     description = "Test description",
     flowInCents = -123,
     createdDate = testDate,
     transactionDate = testDate,
     consumedDate = testDate,
     idOption = Some(721309875))
+  val testTransactionWithIdB: Transaction = Transaction(
+    transactionGroupId = testTransactionGroupWithId.id,
+    issuerId = testUserB.id,
+    beneficiaryAccountCode = testAccountB.code,
+    moneyReservoirCode = testReservoir.code,
+    categoryCode = testCategoryB.code,
+    description = "Test description",
+    flowInCents = -123,
+    createdDate = testDate,
+    transactionDate = testDate,
+    consumedDate = testDate,
+    idOption = Some(4371098))
+  def testTransactionWithId: Transaction = testTransactionWithIdA
   val testBalanceCheckWithId: BalanceCheck = BalanceCheck(
     issuerId = testUser.id,
     moneyReservoirCode = testReservoir.code,
@@ -211,7 +224,7 @@ object TestObjects {
     ratioReferenceToForeignCurrency = 1.234,
     idOption = Some(764785511))
 
-  val testModificationA: EntityModification = EntityModification.Add(testTransactionWithId)
-  val testModificationB: EntityModification = EntityModification.Remove[BalanceCheck](12341728695000000L)
+  val testModificationA: EntityModification = EntityModification.Add(testTransactionWithIdA)
+  val testModificationB: EntityModification = EntityModification.Add(testTransactionWithIdB)
   def testModification: EntityModification = testModificationA
 }

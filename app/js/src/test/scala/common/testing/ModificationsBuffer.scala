@@ -1,6 +1,7 @@
 package common.testing
 
-import java.time.Duration
+import java.time.{Duration, Month}
+import java.time.Month.JANUARY
 
 import api.ScalaJsApi.UpdateToken
 import common.time.JavaTimeImplicits._
@@ -15,7 +16,7 @@ final class ModificationsBuffer {
   private val buffer: mutable.Buffer[ModificationWithToken] = mutable.Buffer()
 
   // **************** Getters ****************//
-  def getModifications(updateToken: UpdateToken = LocalDateTime.MIN): Seq[EntityModification] = Seq({
+  def getModifications(updateToken: UpdateToken = ModificationsBuffer.startToken): Seq[EntityModification] = Seq({
     for (m <- buffer if m.updateToken >= updateToken) yield m.modification
   }: _*)
 
@@ -32,7 +33,7 @@ final class ModificationsBuffer {
 
   def nextUpdateToken: UpdateToken = {
     if (buffer.isEmpty) {
-      LocalDateTime.MIN
+      ModificationsBuffer.startToken
     } else {
       buffer.map(_.updateToken).max plus Duration.ofDays(1)
     }
@@ -48,7 +49,7 @@ final class ModificationsBuffer {
   }
 
   def addEntities[E <: Entity : EntityType](entities: Seq[E]): Unit = {
-    addModifications(entities.map(EntityModification.Add[E]).toVector)
+    addModifications(entities.map(e => EntityModification.Add(e)))
   }
 
   def clear(): Unit = {
@@ -57,4 +58,8 @@ final class ModificationsBuffer {
 
   // **************** Inner types ****************//
   private case class ModificationWithToken(modification: EntityModification, updateToken: UpdateToken)
+}
+
+object ModificationsBuffer {
+  private val startToken = LocalDateTime.of(1990, JANUARY, 1, 0, 0)
 }
