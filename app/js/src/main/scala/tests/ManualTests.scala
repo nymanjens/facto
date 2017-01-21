@@ -33,6 +33,9 @@ object ManualTests {
         }
       }
     }
+    nextFuture map {_ =>
+      println(s"  All tests finished")
+    }
   }
 
   private val allTestSuites: Seq[ManualTestSuite] = Seq(LocalDatabaseTest)
