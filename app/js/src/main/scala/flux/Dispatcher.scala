@@ -13,7 +13,7 @@ trait Dispatcher {
 
   def register(callback: Action => Unit): Unit
 
-  def dispatch(action: Action): Unit
+  def dispatch(action: Action): Future[Unit]
 }
 
 object Dispatcher {
@@ -21,12 +21,12 @@ object Dispatcher {
     var callbacks: Seq[Action => Unit] = Seq()
     var isDispatching: Boolean = false
 
-    def register(callback: Action => Unit): Unit = {
+    def register(callback: Action => Unit) = {
       require(!isDispatching)
       callbacks = callbacks :+ callback
     }
 
-    def dispatch(action: Action): Unit = {
+    def dispatch(action: Action) = {
       require(!isDispatching)
 
       Future {
