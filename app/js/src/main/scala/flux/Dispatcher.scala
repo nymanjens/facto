@@ -37,4 +37,24 @@ object Dispatcher {
       }
     }
   }
+
+  final class FakeSynchronous extends Dispatcher {
+    var callbacks: Seq[Action => Unit] = Seq()
+    var isDispatching: Boolean = false
+
+    def register(callback: Action => Unit) = {
+      require(!isDispatching)
+      callbacks = callbacks :+ callback
+    }
+
+    def dispatch(action: Action) = {
+      require(!isDispatching)
+
+      isDispatching = true
+      callbacks.foreach(_.apply(action))
+      isDispatching = false
+
+      Future.successful((): Unit)
+    }
+  }
 }
