@@ -1,6 +1,8 @@
+
 package flux
 
 import scala.collection.immutable.Seq
+import scala.collection.mutable
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
@@ -18,12 +20,12 @@ trait Dispatcher {
 
 object Dispatcher {
   private[flux] final class Impl extends Dispatcher {
-    var callbacks: Seq[Action => Unit] = Seq()
-    var isDispatching: Boolean = false
+    private var callbacks: Set[Action => Unit] = Set()
+    private var isDispatching: Boolean = false
 
     def register(callback: Action => Unit) = {
       require(!isDispatching)
-      callbacks = callbacks :+ callback
+      callbacks = callbacks + callback
     }
 
     def dispatch(action: Action) = {
@@ -39,22 +41,30 @@ object Dispatcher {
   }
 
   final class FakeSynchronous extends Dispatcher {
-    var callbacks: Seq[Action => Unit] = Seq()
-    var isDispatching: Boolean = false
+    private var _callbacks: Set[Action => Unit] = Set()
+    private val _dispatchedActions: mutable.Buffer[Action] = mutable.Buffer()
+    private var isDispatching: Boolean = false
 
+    // ******************* Implementation of Dispatcher interface ******************* //
     def register(callback: Action => Unit) = {
       require(!isDispatching)
-      callbacks = callbacks :+ callback
+      _callbacks = _callbacks + callback
     }
 
     def dispatch(action: Action) = {
       require(!isDispatching)
 
       isDispatching = true
-      callbacks.foreach(_.apply(action))
+      _callbacks.foreach(_.apply(action))
       isDispatching = false
+
+      _dispatchedActions += action
 
       Future.successful((): Unit)
     }
+
+    // ******************* Additional API for testing ******************* //
+    def dispatchedActions: Seq[Action] = _dispatchedActions.toVector
+    def callbacks: Seq[Action => Unit] = _callbacks.toVector
   }
 }
