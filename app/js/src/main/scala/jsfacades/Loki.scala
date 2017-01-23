@@ -156,9 +156,10 @@ object Loki {
     }
 
 
-    final class Fake[E: Scala2Js.MapConverter](entities: Seq[E]) extends ResultSet[E] {
+    final class Fake[E: Scala2Js.MapConverter](entities: Seq[E],
+                                               previousSorts: Seq[(String, Boolean)] = Seq()) extends ResultSet[E] {
 
-      implicit val jsValueOrdering: Ordering[js.Any] = {
+      implicit private val jsValueOrdering: Ordering[js.Any] = {
         new Ordering[js.Any] {
           override def compare(x: js.Any, y: js.Any): Int = {
             if (x.getClass == classOf[String]) {
@@ -181,18 +182,25 @@ object Loki {
       )
 
       override def sort(propName: String, isDesc: Boolean) = {
-        val newData = {
-          val sorted = entities.sortBy { entity =>
-            val jsMap = Scala2Js.toJsMap(entity)
-            jsMap(propName)
-          }
-          if (isDesc) {
-            sorted.reverse
-          } else {
-            sorted
-          }
+        val sorts = previousSorts ++ Seq((propName, isDesc))
+        val newData: Seq[E] = {
+          entities.sortWith(lt = (lhs, rhs) => {
+            val lhsMap = Scala2Js.toJsMap(lhs)
+            val rhsMap = Scala2Js.toJsMap(rhs)
+            val results = for {
+              (propName, isDesc) <- sorts
+              if !jsValueOrdering.equiv(lhsMap(propName), rhsMap(propName))
+            } yield {
+              if (jsValueOrdering.lt(lhsMap(propName), rhsMap(propName))) {
+                !isDesc
+              } else {
+                isDesc
+              }
+            }
+            results.headOption getOrElse false
+          })
         }
-        new ResultSet.Fake(newData)
+        new ResultSet.Fake(newData, previousSorts = sorts)
       }
 
       override def limit(quantity: Int) = new ResultSet.Fake(

@@ -1,9 +1,6 @@
 package common.testing
 
-import api.ScalaJsApi.{GetAllEntitiesResponse, GetEntityModificationsResponse, UpdateToken}
-import api.ScalaJsApiClient
 import jsfacades.Loki
-import jsfacades.Loki.ResultSet
 import models.access.RemoteDatabaseProxy
 import models.access.RemoteDatabaseProxy.Listener
 import models.manager.{Entity, EntityModification, EntityType}
@@ -11,7 +8,7 @@ import models.manager.{Entity, EntityModification, EntityType}
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.concurrent.Future
-
+import scala2js.Converters._
 
 final class FakeRemoteDatabaseProxy extends RemoteDatabaseProxy {
 
@@ -39,6 +36,7 @@ final class FakeRemoteDatabaseProxy extends RemoteDatabaseProxy {
   override def registerListener(listener: Listener): Unit = {
     listeners += listener
   }
+  override def startSchedulingModifiedEntityUpdates(): Unit = ???
 
   // **************** Additional methods for tests ****************//
   // TODO: Add manipulation methods for localModificationIds

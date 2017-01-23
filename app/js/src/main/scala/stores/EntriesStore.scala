@@ -48,13 +48,11 @@ private[stores] abstract class EntriesStore[State](implicit database: RemoteData
   private def impactsState(modifications: Seq[EntityModification]): Boolean =
     modifications.toStream.filter(m => modificationImpactsState(m, state)).take(1).nonEmpty
 
-  private def invokeListenersAsync(): Unit = {
-    Future {
-      require(!isCallingListeners)
-      isCallingListeners = true
-      stateUpdateListeners.foreach(_.onStateUpdate())
-      isCallingListeners = false
-    }
+  private def invokeListeners(): Unit = {
+    require(!isCallingListeners)
+    isCallingListeners = true
+    stateUpdateListeners.foreach(_.onStateUpdate())
+    isCallingListeners = false
   }
 
   // **************** Inner type definitions ****************//
@@ -66,9 +64,11 @@ private[stores] abstract class EntriesStore[State](implicit database: RemoteData
     override def localModificationPersistedRemotely(modifications: Seq[EntityModification]): Unit = {
       require(!isCallingListeners)
 
-      if (stateUpdateListeners.nonEmpty) {
-        if (impactsState(modifications)) {
-          invokeListenersAsync()
+      if (_state.isDefined) {
+        if (stateUpdateListeners.nonEmpty) {
+          if (impactsState(modifications)) {
+            invokeListeners()
+          }
         }
       }
     }
@@ -84,7 +84,7 @@ private[stores] abstract class EntriesStore[State](implicit database: RemoteData
         _state = None
       } else {
         updateState()
-        invokeListenersAsync()
+        invokeListeners()
       }
     }
 
@@ -97,7 +97,7 @@ private[stores] abstract class EntriesStore[State](implicit database: RemoteData
             _state = None
           } else {
             updateState()
-            invokeListenersAsync()
+            invokeListeners()
           }
         }
       }
