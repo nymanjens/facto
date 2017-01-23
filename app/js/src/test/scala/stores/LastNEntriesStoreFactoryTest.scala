@@ -12,7 +12,7 @@ import utest._
 import common.testing.TestObjects._
 import models.User
 import models.access.RemoteDatabaseProxy
-import stores.LastNEntriesStoreFactory.LastNEntriesState
+import stores.LastNEntriesStoreFactory.{LastNEntriesState, N}
 import stores.entries.GeneralEntry
 
 import scala.collection.immutable.Seq
@@ -26,11 +26,11 @@ object LastNEntriesStoreFactoryTest extends TestSuite {
   override def tests = TestSuite {
     implicit val database = new FakeRemoteDatabaseProxy()
     val factory: LastNEntriesStoreFactory = new LastNEntriesStoreFactory()
-    val store: EntriesStore[LastNEntriesState] = factory.get(3 /* n */)
+    val store: EntriesStore[LastNEntriesState] = factory.get(N(3))
 
     "factory result is cached" - {
-      factory.get(3 /* n */) ==> store
-      assert(factory.get(4 /* n */) != store)
+      factory.get(N(3)) ==> store
+      assert(factory.get(N(4)) != store)
     }
 
     "store state is updated upon remote update" - {

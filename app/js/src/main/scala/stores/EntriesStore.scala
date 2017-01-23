@@ -7,6 +7,12 @@ import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
+/**
+  * General purpose flux store that maintains a state derived from data in the `RemoteDatabaseProxy`
+  * and doesn't support mutation operations.
+  *
+  * @tparam State Any immutable type that contains all state maintained by this store
+  */
 private[stores] abstract class EntriesStore[State](implicit database: RemoteDatabaseProxy) {
   database.registerListener(RemoteDatabaseProxyListener)
 
