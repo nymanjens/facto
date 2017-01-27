@@ -13,7 +13,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
   *
   * @tparam State Any immutable type that contains all state maintained by this store
   */
-private[stores] abstract class EntriesStore[State](implicit database: RemoteDatabaseProxy) {
+abstract class EntriesStore[State](implicit database: RemoteDatabaseProxy) {
   database.registerListener(RemoteDatabaseProxyListener)
 
   private var _state: Option[State] = None

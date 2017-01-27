@@ -1,8 +1,8 @@
-package spatutorial.client.components
+package spatutorial.client.spacomponents
 
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
-import spatutorial.client.components.Bootstrap.{CommonStyle, Button}
+import spatutorial.client.spacomponents.Bootstrap.{CommonStyle, Button}
 import spatutorial.shared._
 import scalacss.ScalaCssReact._
 

@@ -27,17 +27,10 @@
   @playscalajs.html.launcher(
       projectName = "client",
       assets = path => routes.Assets.versioned(path).toString)
-
-  <script>
-    SPAMain().factoPortabilityTest()
-  </script>
 }
 
-@Main(Messages("facto.update-logs"), extrascript) {
-  <h1 class="page-header"><i class="fa fa-archive fa-fw"></i> @Messages("facto.update-logs")</h1>
-
-  @Panel(
-    title = Messages("facto.logs")
-  ) { @* panel content *@
-  }
+@Base(Messages("facto.update-logs"), extrascript) {
+  <div>
+    !!!<div id="root"></div>===
+  </div>
 }

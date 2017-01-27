@@ -5,8 +5,8 @@ import diode.react._
 import diode.data.Pot
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
-import spatutorial.client.components.Bootstrap._
-import spatutorial.client.components._
+import spatutorial.client.spacomponents.Bootstrap._
+import spatutorial.client.spacomponents._
 import spatutorial.client.logger._
 import spatutorial.client.services._
 import spatutorial.shared._

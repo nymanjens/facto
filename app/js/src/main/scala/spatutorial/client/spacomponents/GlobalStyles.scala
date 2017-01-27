@@ -1,4 +1,4 @@
-package spatutorial.client.components
+package spatutorial.client.spacomponents
 
 import scalacss.Defaults._
 
