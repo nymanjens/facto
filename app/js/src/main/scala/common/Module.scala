@@ -7,6 +7,5 @@ final class Module(implicit getInitialDataResponse: GetInitialDataResponse) {
 
   import com.softwaremill.macwire._
 
-  // TODO: Implement I18n
-  implicit lazy val i18n: I18n = wire[FakeI18n]
+  implicit lazy val i18n: I18n = new JsI18n(getInitialDataResponse.i18nMessages)
 }
