@@ -1,6 +1,6 @@
 package spatutorial.client
 
-import flux.react.app.Module
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import japgolly.scalajs.react.ReactDOM
 import japgolly.scalajs.react.extra.router._
 import japgolly.scalajs.react.vdom.prefix_<^._
@@ -26,21 +26,23 @@ object SPAMain extends js.JSApp {
   case object TodoLoc extends Loc
 
   // configure the router
-  val routerConfig = RouterConfigDsl[Loc].buildConfig { dsl =>
-    import dsl._
+  def routerConfig(implicit reactAppModule: flux.react.app.Module) = {
+    RouterConfigDsl[Loc].buildConfig { dsl =>
+      import dsl._
 
-    val todoWrapper = SPACircuit.connect(_.todos)
-    // wrap/connect components to the circuit
-    (staticRoute(root, DashboardLoc) ~> renderR(ctl => SPACircuit.wrap(_.motd)(proxy => Dashboard(ctl, proxy)))
-      | staticRoute("#todo", TodoLoc) ~> renderR(ctl => todoWrapper(Todo(_)))
-      ).notFound(redirectToPage(DashboardLoc)(Redirect.Replace))
-  }.renderWith(layout)
+      val todoWrapper = SPACircuit.connect(_.todos)
+      // wrap/connect components to the circuit
+      (staticRoute(root, DashboardLoc) ~> renderR(ctl => SPACircuit.wrap(_.motd)(proxy => Dashboard(ctl, proxy)))
+        | staticRoute("#todo", TodoLoc) ~> renderR(ctl => todoWrapper(Todo(_)))
+        ).notFound(redirectToPage(DashboardLoc)(Redirect.Replace))
+    }.renderWith(layout)
+  }
 
   val todoCountWrapper = SPACircuit.connect(_.todos.map(_.items.count(!_.completed)).toOption)
   // base layout for all pages
-  def layout(c: RouterCtl[Loc], r: Resolution[Loc]) = {
+  def layout(c: RouterCtl[Loc], r: Resolution[Loc])(implicit reactAppModule: flux.react.app.Module) = {
     <.div(
-      Module.everything(20)
+      reactAppModule.everything(20)
     )
   }
 
@@ -48,14 +50,21 @@ object SPAMain extends js.JSApp {
   def main(): Unit = {
     log.warn("Application starting")
     // send log messages also to the server
-//    log.enableServerLogging("/logging")
-//    log.info("This message goes to server as well")
+    //    log.enableServerLogging("/logging")
+    //    log.info("This message goes to server as well")
 
     // create stylesheet
-//    GlobalStyles.addToDocument()
-    // create the router
-    val router = Router(BaseUrl.until_#, routerConfig)
-    // tell React to render the router in the document body
-    ReactDOM.render(router(), dom.document.getElementById("root"))
+    //    GlobalStyles.addToDocument()
+
+    api.Module.scalaJsApiClient.getInitialData() map { implicit response =>
+      implicit val reactAppModule = new flux.react.app.Module
+
+      // create the router
+      val router = Router(BaseUrl.until_#, routerConfig)
+
+      // tell React to render the router in the document body
+      ReactDOM.render(router(), dom.document.getElementById("root"))
+    }
+
   }
 }

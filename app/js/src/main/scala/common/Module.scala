@@ -1,8 +1,9 @@
 package common
 
+import api.ScalaJsApi.GetInitialDataResponse
 import common.testing.FakeI18n
 
-object Module {
+final class Module(implicit getInitialDataResponse: GetInitialDataResponse) {
 
   import com.softwaremill.macwire._
 
