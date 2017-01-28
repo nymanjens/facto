@@ -15,7 +15,7 @@ object GuavaReplacement {
 
   object DoubleMath {
     def roundToLong(x: Double): Long = {
-      StrictMath.rint(x).toLong
+      Math.round(x)
     }
   }
 }

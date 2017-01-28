@@ -2,12 +2,12 @@ package models.accounting.money
 
 import scala.collection.immutable.Seq
 import java.lang.Math.{abs, round}
-import java.text.NumberFormat
 import java.util.Locale
 
 import models.accounting.config.Config
 import models.accounting.money.CentOperations.CentOperationsNumeric
 import common.time.LocalDateTime
+import common.GuavaReplacement.DoubleMath.roundToLong
 
 import scala.collection.JavaConverters._
 
@@ -35,7 +35,7 @@ object Money {
 
   def centsToFloatString(cents: Long): String = {
     val sign = if (cents < 0) "-" else ""
-    val integerPart = NumberFormat.getNumberInstance(Locale.US).format(abs(cents) / 100)
+    val integerPart = roundToLong(abs(cents) / 100)
     val centsPart = abs(cents % 100)
     "%s%s.%02d".format(sign, integerPart, centsPart)
   }

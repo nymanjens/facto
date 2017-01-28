@@ -1,5 +1,6 @@
 package models
 
+import common.time.LocalDateTime
 import models.accounting._
 import models.accounting.money._
 
@@ -15,4 +16,9 @@ object Module {
   implicit lazy val jsExchangeRateMeasurementManager = wire[JsExchangeRateMeasurementManager]
 
   implicit lazy val entityAccess: EntityAccess = wire[JsEntityAccess]
+
+  // TODO: implement ExchangeRateManager
+  implicit lazy val exchangeRateManager: ExchangeRateManager = new ExchangeRateManager {
+    override def getRatioSecondToFirstCurrency(firstCurrency: Currency, secondCurrency: Currency, date: LocalDateTime) = 1
+  }
 }
