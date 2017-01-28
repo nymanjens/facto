@@ -1,5 +1,7 @@
 package components
 
+import common.I18n
+
 import scala.collection.immutable.Seq
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.TagMod
@@ -19,7 +21,8 @@ object ReactVdomUtils {
   }
 }
 
-final class Everything(implicit entriesStoreFactory: LastNEntriesStoreFactory) {
+final class Everything(implicit entriesStoreFactory: LastNEntriesStoreFactory,
+                       i18n: I18n) {
 
   object Panel {
     private case class Props(title: String, panelClasses: Seq[String])

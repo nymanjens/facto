@@ -6,6 +6,7 @@ import models.accounting.money._
 object Module {
 
   import com.softwaremill.macwire._
+  import common.Module._
   import models.access.Module._
   import models.Module._
   import stores.Module._
