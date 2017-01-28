@@ -16,9 +16,5 @@ object Module {
   implicit lazy val jsExchangeRateMeasurementManager = wire[JsExchangeRateMeasurementManager]
 
   implicit lazy val entityAccess: EntityAccess = wire[JsEntityAccess]
-
-  // TODO: implement ExchangeRateManager
-  implicit lazy val exchangeRateManager: ExchangeRateManager = new ExchangeRateManager {
-    override def getRatioSecondToFirstCurrency(firstCurrency: Currency, secondCurrency: Currency, date: LocalDateTime) = 1
-  }
+  implicit lazy val exchangeRateManager: ExchangeRateManager = wire[JsExchangeRateManager]
 }
