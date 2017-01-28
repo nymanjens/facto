@@ -1,4 +1,4 @@
-package stores
+package flux.stores
 
 import models.access.RemoteDatabaseProxy
 import models.manager.EntityModification

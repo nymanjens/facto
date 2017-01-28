@@ -1,7 +1,8 @@
-package stores
+package flux.stores
 
 import java.time.Month.JANUARY
 import java.lang.Math.abs
+
 import common.testing.FakeRemoteDatabaseProxy
 import common.time.{LocalDateTime, LocalDateTimes}
 import common.time.LocalDateTimes.createDateTime
@@ -10,6 +11,8 @@ import models.accounting.money.ExchangeRateMeasurement
 import models.manager.{EntityModification, EntityType}
 import utest._
 import common.testing.TestObjects._
+import flux.stores.LastNEntriesStoreFactory.LastNEntriesState
+import flux.stores.entries.GeneralEntry
 import models.User
 import models.access.RemoteDatabaseProxy
 import stores.LastNEntriesStoreFactory.{LastNEntriesState, N}

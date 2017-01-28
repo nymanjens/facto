@@ -1,4 +1,4 @@
-package stores.entries
+package flux.stores.entries
 
 import models.accounting.Transaction
 

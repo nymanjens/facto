@@ -1,4 +1,4 @@
-package stores.entries
+package flux.stores.entries
 
 import common.time.JavaTimeImplicits._
 import common.time.LocalDateTime

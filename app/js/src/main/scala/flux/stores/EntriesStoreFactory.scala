@@ -1,4 +1,4 @@
-package stores
+package flux.stores
 
 import scala.collection.mutable
 

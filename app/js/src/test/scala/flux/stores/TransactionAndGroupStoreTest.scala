@@ -1,4 +1,4 @@
-package stores
+package flux.stores
 
 import common.testing.TestObjects._
 import flux.Action

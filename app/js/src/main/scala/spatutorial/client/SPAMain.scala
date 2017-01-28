@@ -1,5 +1,6 @@
 package spatutorial.client
 
+import flux.react.app.Module
 import japgolly.scalajs.react.ReactDOM
 import japgolly.scalajs.react.extra.router._
 import japgolly.scalajs.react.vdom.prefix_<^._
@@ -39,7 +40,7 @@ object SPAMain extends js.JSApp {
   // base layout for all pages
   def layout(c: RouterCtl[Loc], r: Resolution[Loc]) = {
     <.div(
-      components.Module.everything(20)
+      Module.everything(20)
     )
   }
 

@@ -1,4 +1,4 @@
-package stores
+package flux.stores
 
 import models.accounting._
 import models.accounting.money._

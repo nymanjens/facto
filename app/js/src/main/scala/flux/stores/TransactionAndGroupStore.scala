@@ -1,4 +1,4 @@
-package stores
+package flux.stores
 
 import common.time.Clock
 import flux.Action.{AddTransactionGroup, RemoveTransactionGroup, UpdateTransactionGroup}

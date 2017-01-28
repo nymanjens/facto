@@ -1,10 +1,10 @@
-package stores
+package flux.stores
 
+import flux.stores.entries.GeneralEntry
 import models.access.RemoteDatabaseProxy
 import models.accounting.Transaction
 import models.manager.{EntityModification, EntityType}
-import stores.LastNEntriesStoreFactory.{LastNEntriesState, N}
-import stores.entries.GeneralEntry
+import flux.stores.LastNEntriesStoreFactory.{LastNEntriesState, N}
 
 import scala.collection.immutable.Seq
 
