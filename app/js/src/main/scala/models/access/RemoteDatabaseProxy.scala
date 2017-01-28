@@ -48,7 +48,7 @@ object RemoteDatabaseProxy {
       * Note that a preceding `addedLocally()` call may have been made earlier for the same modifications, but this is
       * not always the case.
       */
-    def localModificationPersistedRemotely(modifications: Seq[EntityModification]): Unit
+    def localModificationPersistedRemotely(modifications: Seq[EntityModification]): Unit = {}
 
     /**
       *
