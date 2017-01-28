@@ -25,7 +25,10 @@ trait ScalaJsApi {
 object ScalaJsApi {
   type UpdateToken = LocalDateTime
 
-  case class GetInitialDataResponse(accountingConfig: Config, user: User)
+  /**
+    * @param i18nMessages Maps key to the message with placeholders.
+    */
+  case class GetInitialDataResponse(accountingConfig: Config, user: User, i18nMessages: Map[String, String])
 
   case class GetAllEntitiesResponse(entitiesMap: Map[EntityType.any, Seq[Entity]],
                                     nextUpdateToken: UpdateToken) {

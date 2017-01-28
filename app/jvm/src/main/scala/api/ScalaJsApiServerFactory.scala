@@ -3,6 +3,7 @@ package api
 import api.Picklers._
 import api.ScalaJsApi.{GetAllEntitiesResponse, GetEntityModificationsResponse, GetInitialDataResponse, UpdateToken}
 import com.google.inject._
+import common.PlayI18n
 import common.time.Clock
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}
@@ -18,14 +19,15 @@ final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
                                               clock: Clock,
                                               entityAccess: SlickEntityAccess,
                                               updateLogManager: SlickUpdateLogManager,
+                                              i18n: PlayI18n,
                                               entityModificationManager: SlickEntityModificationEntityManager) {
 
   def create()(implicit user: User): ScalaJsApi = new ScalaJsApi() {
 
     override def getInitialData() = GetInitialDataResponse(
       accountingConfig = accountingConfig,
-      user = user
-    )
+      user = user,
+      i18nMessages = i18n.allI18nMessages)
 
     override def getAllEntities(types: Seq[EntityType.any]) = {
       // All modifications are idempotent so we can use the time when we started getting the entities as next update token.
