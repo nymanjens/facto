@@ -29,7 +29,7 @@
       assets = path => routes.Assets.versioned(path).toString)
 }
 
-@Base(Messages("facto.update-logs"), extrascript) {
+@Main(Messages("facto.cash-flow"), extrascript = extrascript) {
   <div>
     !!!<div id="root"></div>===
   </div>
