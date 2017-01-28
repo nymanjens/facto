@@ -83,6 +83,17 @@ abstract class EntriesStore[State](implicit database: RemoteDatabaseProxy) {
       addedModifications(modifications)
     }
 
+    override def loadedDatabase(): Unit = {
+      require(!isCallingListeners)
+
+      if (stateUpdateListeners.isEmpty) {
+        _state = None
+      } else {
+        updateState()
+        invokeListeners()
+      }
+    }
+
     private def addedModifications(modifications: Seq[EntityModification]): Unit = {
       require(!isCallingListeners)
 
@@ -95,17 +106,6 @@ abstract class EntriesStore[State](implicit database: RemoteDatabaseProxy) {
             invokeListeners()
           }
         }
-      }
-    }
-
-    override def loadedDatabase(): Unit = {
-      require(!isCallingListeners)
-
-      if (stateUpdateListeners.isEmpty) {
-        _state = None
-      } else {
-        updateState()
-        invokeListeners()
       }
     }
   }
