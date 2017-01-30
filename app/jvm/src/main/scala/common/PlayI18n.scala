@@ -20,6 +20,7 @@ final class PlayI18n @Inject()(implicit val messagesApi: MessagesApi,
   // ****************** Additional API ****************** //
   /** Returns a map that maps key to the message with placeholders. */
   def allI18nMessages: Map[String, String] = {
-    messagesApi.messages(defaultLang.code)
+    // defaultLang is extended by "default" in case it didn't overwrite a message key.
+    messagesApi.messages("default") ++ messagesApi.messages(defaultLang.code)
   }
 }

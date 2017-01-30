@@ -101,12 +101,13 @@ object Settings {
   private object files {
     val jQuery    = s"${versions.jQuery}/jquery.min.js"
     val bootstrap = s"${versions.bootstrap}/js/bootstrap.min.js"
+    val reactWithAddons = "react-with-addons.js" // TODO: Change to react-with-addons.min.js in prod
   }
 
   /** Dependencies for external JS libs that are bundled into a single .js file according to dependency order */
   val jsDependencies = Def.setting(Seq(
-    webjarDeps.react / "react-with-addons.min.js" commonJSName "React",
-    webjarDeps.react / "react-dom.min.js" dependsOn "react-with-addons.min.js" commonJSName "ReactDOM",
+    webjarDeps.react / files.reactWithAddons commonJSName "React",
+    webjarDeps.react / "react-dom.min.js" dependsOn files.reactWithAddons commonJSName "ReactDOM",
     webjarDeps.jQuery / files.jQuery,
     webjarDeps.bootstrap / files.bootstrap dependsOn files.jQuery,
     webjarDeps.metisMenu / "metisMenu.min.js" dependsOn files.bootstrap,

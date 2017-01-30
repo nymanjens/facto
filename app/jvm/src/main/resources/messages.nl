@@ -1,4 +1,4 @@
-# Default messages
+# Dutch messages
 
 # --- Errors
 error.invalid=Ongeldige waarde
@@ -19,13 +19,13 @@ facto.date.month.oct.abbrev=okt
 facto.date.month.nov.abbrev=nov
 facto.date.month.dec.abbrev=dec
 
-facto.date.dayofweek.mon=ma
-facto.date.dayofweek.tue=di
-facto.date.dayofweek.wed=wo
-facto.date.dayofweek.thu=do
-facto.date.dayofweek.fri=vr
-facto.date.dayofweek.sat=za
-facto.date.dayofweek.sun=zo
+facto.date.dayofweek.mon.abbrev=ma
+facto.date.dayofweek.tue.abbrev=di
+facto.date.dayofweek.wed.abbrev=wo
+facto.date.dayofweek.thu.abbrev=do
+facto.date.dayofweek.fri.abbrev=vr
+facto.date.dayofweek.sat.abbrev=za
+facto.date.dayofweek.sun.abbrev=zo
 
 facto.error.old-password-is-incorrect=Oud wachtwoord is fout
 facto.error.passwords-should-match=Wachtwoorden komen niet overeen
