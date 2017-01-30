@@ -4,6 +4,7 @@ package flux
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.concurrent.Future
+import common.LoggingUtils.logExceptions
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 /**
@@ -32,10 +33,12 @@ object Dispatcher {
       require(!isDispatching)
 
       Future {
-        require(!isDispatching)
-        isDispatching = true
-        callbacks.foreach(_.apply(action))
-        isDispatching = false
+        logExceptions {
+          require(!isDispatching)
+          isDispatching = true
+          callbacks.foreach(_.apply(action))
+          isDispatching = false
+        }
       }
     }
   }

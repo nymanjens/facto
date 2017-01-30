@@ -4,6 +4,7 @@ import scala.async.Async.{async, await}
 import scala.concurrent.duration._
 import scala.scalajs.js
 import api.ScalaJsApiClient
+import common.LoggingUtils.logExceptions
 import common.ScalaUtils.visibleForTesting
 import jsfacades.Loki
 import models.access.SingletonKey._
@@ -142,10 +143,12 @@ object RemoteDatabaseProxy {
     // **************** Private helper methods ****************//
     private def invokeListenersAsync(func: Listener => Unit): Future[Unit] = {
       Future {
-        require(!isCallingListeners)
-        isCallingListeners = true
-        listeners.foreach(func)
-        isCallingListeners = false
+        logExceptions {
+          require(!isCallingListeners)
+          isCallingListeners = true
+          listeners.foreach(func)
+          isCallingListeners = false
+        }
       }
     }
 
