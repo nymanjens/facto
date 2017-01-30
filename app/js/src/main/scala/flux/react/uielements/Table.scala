@@ -1,5 +1,6 @@
 package flux.react.uielements
 
+import scala.scalajs.js
 import common.I18n
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
@@ -31,15 +32,19 @@ object Table {
         <.tbody(
           props.tableDatas.map(tableData => <.tr(tableData)),
           if (props.tableDatas.isEmpty) {
-            <.td(^.colSpan := props.colSpan, ^^.classes("no-entries"),
-              props.i18n("facto.no-entries"))
+            <.tr(
+              <.td(^.colSpan := props.colSpan, ^^.classes("no-entries"),
+                props.i18n("facto.no-entries")
+              )
+            )
           } else if (props.moreEntriesCallback.isDefined) {
             <.tr(
-              <.td(^.colSpan := props.colSpan, ^.style := "text-align: center",
+              <.td(^.colSpan := props.colSpan,
+                ^.style := js.Dictionary("textAlign" -> "center"),
                 <.a(^.onClick --> props.moreEntriesCallback.get,
                   ^.tpe := "button",
-                  ^^.classes("btn", "btn-sm", "btn-default", "btn-circle", "@btnClasses")
-                  ,
+                  ^^.classes("btn", "btn-sm", "btn-default", "btn-circle", "@btnClasses"
+                  ),
                   <.i(^^.classes("fa", "fa-ellipsis-h"))
                 )
               )
