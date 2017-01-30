@@ -63,7 +63,7 @@ final class Everything(implicit entriesStoreFactory: LastNEntriesStoreFactory,
               <.td(entry.beneficiaries.map(_.shorterName).mkString(", ")),
               <.td(entry.moneyReservoirs.map(_.shorterName).mkString(", ")),
               <.td(entry.categories.map(_.name).mkString(", ")),
-              //            <.td(uielements.DescriptionWithEntryCount(entry)),
+              <.td(uielements.DescriptionWithEntryCount(entry)),
               <.td(entry.flow.toHtmlWithCurrency)
               //            <.td(uielements.TransactionGroupEditButton(entry.groupId))
             )
