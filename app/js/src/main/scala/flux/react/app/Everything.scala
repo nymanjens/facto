@@ -18,7 +18,7 @@ final class Everything(implicit entriesStoreFactory: LastNEntriesStoreFactory,
                        entityAccess: EntityAccess,
                        clock: Clock,
                        accountingConfig: Config,
-                       exchangeRateManager:ExchangeRateManager,
+                       exchangeRateManager: ExchangeRateManager,
                        i18n: I18n) {
 
   class Backend($: BackendScope[N, LastNEntriesState]) extends EntriesStore.Listener {

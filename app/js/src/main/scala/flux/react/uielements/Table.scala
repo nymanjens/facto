@@ -16,7 +16,7 @@ object Table {
                            i18n: I18n) {
     def colSpan: Int = tableHeaders.size
   }
-  private val component = ReactComponentB[Props]("Panel")
+  private val component = ReactComponentB[Props]("Table")
     .renderP((_, props) =>
       <.table(^^.classes(Seq("table", "table-bordered", "table-hover", "table-condensed", "table-overflow-elipsis", "add-toc-level-2") ++ props.tableClasses),
         <.thead(
