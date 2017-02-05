@@ -13,6 +13,8 @@ Familiy Accounting Tool keeps track of every transaction your family makes. Its 
 - Provide a way to check if no money is disappearing in unexpected expenses<br>
   _E.g.: You will notice when there are hidden banking costs_
 
+## Screenshot
+
 ![screenshot](screenshot.png "Screenshot")
 
 ## Installation
