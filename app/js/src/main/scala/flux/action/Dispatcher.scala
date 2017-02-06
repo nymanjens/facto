@@ -1,10 +1,11 @@
 
-package flux
+package flux.action
+
+import common.LoggingUtils.logExceptions
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.concurrent.Future
-import common.LoggingUtils.logExceptions
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 /**

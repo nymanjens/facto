@@ -1,8 +1,9 @@
 package flux.stores
 
 import common.time.Clock
-import flux.Action.{AddTransactionGroup, RemoveTransactionGroup, UpdateTransactionGroup}
-import flux.{Action, Dispatcher}
+import flux.action.Action.{AddTransactionGroup, RemoveTransactionGroup, UpdateTransactionGroup}
+import flux.Dispatcher
+import flux.action.{Action, Dispatcher}
 import models.EntityAccess
 import models.access.RemoteDatabaseProxy
 import models.accounting._

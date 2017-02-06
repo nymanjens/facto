@@ -1,7 +1,7 @@
 package flux.stores
 
 import common.testing.TestObjects._
-import flux.Action
+import flux.action.Action
 import models.accounting._
 import models.manager.EntityModification
 import utest._

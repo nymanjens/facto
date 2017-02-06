@@ -1,6 +1,7 @@
-package flux
+package flux.action
 
 import models.accounting.{Transaction, TransactionGroup}
+
 import scala.collection.immutable.Seq
 
 sealed trait Action

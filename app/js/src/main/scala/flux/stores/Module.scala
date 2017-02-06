@@ -7,7 +7,7 @@ object Module {
 
   import com.softwaremill.macwire._
   import common.time.Module._
-  import flux.Module._
+  import flux.action.Module._
   import models.access.Module._
   import models.Module._
 
