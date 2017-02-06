@@ -1,7 +1,7 @@
 package flux
 
 import api.ScalaJsApi.GetInitialDataResponse
-import flux.react.router.RouterFactory$
+import flux.react.router.RouterFactory
 import models.User
 import models.accounting.config.Config
 
