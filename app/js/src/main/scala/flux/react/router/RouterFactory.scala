@@ -1,25 +1,25 @@
 package flux.react.router
 
-import flux.react.router.RouterConfig.Page
-import flux.react.router.RouterConfig.Page.EverythingPage
+import flux.react.router.RouterFactory.Page
+import flux.react.router.RouterFactory.Page.EverythingPage
 import japgolly.scalajs.react.extra.router._
 import japgolly.scalajs.react.vdom.TagMod
 import japgolly.scalajs.react.vdom.prefix_<^._
 
 import scala.collection.immutable.Seq
 
-trait RouterConfig {
+trait RouterFactory {
 
   def createRouter(): Router[Page]
 }
 
-object RouterConfig {
+object RouterFactory {
   sealed trait Page
   object Page {
     case object EverythingPage extends Page
   }
 
-  private[router] final class Impl(implicit reactAppModule: flux.react.app.Module) extends RouterConfig {
+  private[router] final class Impl(implicit reactAppModule: flux.react.app.Module) extends RouterFactory {
 
     override def createRouter(): Router[Page] = {
       Router(BaseUrl.until_#, routerConfig)

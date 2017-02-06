@@ -8,5 +8,5 @@ final class Module(implicit reactAppModule: flux.react.app.Module) {
 
   import com.softwaremill.macwire._
 
-  implicit lazy val routerConfig: RouterConfig = wire[RouterConfig.Impl]
+  implicit lazy val routerFactory: RouterFactory = wire[RouterFactory.Impl]
 }

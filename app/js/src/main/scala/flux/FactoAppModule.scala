@@ -1,7 +1,7 @@
 package flux
 
 import api.ScalaJsApi.GetInitialDataResponse
-import flux.react.router.RouterConfig
+import flux.react.router.RouterFactory$
 import models.User
 import models.accounting.config.Config
 
@@ -16,5 +16,5 @@ final class FactoAppModule(implicit getInitialDataResponse: GetInitialDataRespon
   implicit private val reactAppModule = new flux.react.app.Module
   implicit private val routerModule = new flux.react.router.Module
 
-  val routerConfig: RouterConfig = routerModule.routerConfig
+  val routerFactory: RouterFactory = routerModule.routerFactory
 }
