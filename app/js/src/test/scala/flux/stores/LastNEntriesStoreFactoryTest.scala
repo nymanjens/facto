@@ -15,8 +15,8 @@ import flux.stores.LastNEntriesStoreFactory.LastNEntriesState
 import flux.stores.entries.GeneralEntry
 import models.User
 import models.access.RemoteDatabaseProxy
-import stores.LastNEntriesStoreFactory.{LastNEntriesState, N}
-import stores.entries.GeneralEntry
+import flux.stores.LastNEntriesStoreFactory.{LastNEntriesState, N}
+import flux.stores.entries.GeneralEntry
 
 import scala.collection.immutable.Seq
 import scala.scalajs.js
