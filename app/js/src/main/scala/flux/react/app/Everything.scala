@@ -24,14 +24,22 @@ final class Everything(implicit entriesStoreFactory: LastNEntriesStoreFactory,
   class Backend($: BackendScope[N, LastNEntriesState]) extends EntriesStore.Listener {
     private var entriesStore: EntriesStore[LastNEntriesState] = null
 
-    def mounted(n: N): Callback = Callback {
+    def willMount(n: N): Callback = Callback {
       entriesStore = entriesStoreFactory.get(n)
       entriesStore.register(this)
+      $.modState(_ => entriesStore.state).runNow()
     }
 
     def willUnmount(): Callback = Callback {
       entriesStore.deregister(this)
       entriesStore = null
+    }
+
+    def willReceiveProps(newN: N): Callback = Callback {
+      entriesStore.deregister(this)
+      entriesStore = entriesStoreFactory.get(newN)
+      entriesStore.register(this)
+      $.modState(_ => entriesStore.state).runNow()
     }
 
     override def onStateUpdate() = {
@@ -76,8 +84,9 @@ final class Everything(implicit entriesStoreFactory: LastNEntriesStoreFactory,
   private val component = ReactComponentB[N]("Everything")
     .initialState(LastNEntriesState(Seq()))
     .renderBackend[Backend]
-    .componentDidMount(scope => scope.backend.mounted(scope.props))
+    .componentWillMount(scope => scope.backend.willMount(scope.props))
     .componentWillUnmount(scope => scope.backend.willUnmount())
+    .componentWillReceiveProps(scope => scope.$.backend.willReceiveProps(scope.nextProps))
     .build
 
   def apply(n: Int): ReactElement = {
