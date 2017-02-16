@@ -16,5 +16,6 @@ final class Module(implicit i18n: I18n, accountingConfig: Config) {
   import models.Module._
   import flux.stores.Module._
 
+  implicit lazy val menu: Menu = wire[Menu]
   implicit lazy val everything: Everything = wire[Everything]
 }

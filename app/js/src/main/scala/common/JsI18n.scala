@@ -9,7 +9,7 @@ private[common] final class JsI18n(i18nMessages: Map[String, String]) extends I1
 
   // ****************** Implementation of I18n trait ****************** //
   override def apply(key: String, args: Any*): String = {
-    val messageWithPlaceholders = i18nMessages(key)
+    val messageWithPlaceholders = i18nMessages.get(key).getOrElse(key)
     messageFormat(messageWithPlaceholders, args: _*)
   }
 
