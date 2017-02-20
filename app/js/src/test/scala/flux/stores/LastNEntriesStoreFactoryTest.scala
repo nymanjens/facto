@@ -37,19 +37,19 @@ object LastNEntriesStoreFactoryTest extends TestSuite {
     }
 
     "store state is updated upon remote update" - {
-      store.state ==> LastNEntriesState(Seq())
+      store.state ==> LastNEntriesState.empty
 
       database.addRemotelyAddedEntities(testTransactionWithId)
 
-      store.state ==> LastNEntriesState(Seq(GeneralEntry(Seq(testTransactionWithId))))
+      store.state ==> LastNEntriesState(Seq(GeneralEntry(Seq(testTransactionWithId))), hasMore = false)
     }
 
     "store state is updated upon local update" - {
-      store.state ==> LastNEntriesState(Seq())
+      store.state ==> LastNEntriesState.empty
 
       database.persistModifications(Seq(EntityModification.Add(testTransactionWithId)))
 
-      store.state ==> LastNEntriesState(Seq(GeneralEntry(Seq(testTransactionWithId))))
+      store.state ==> LastNEntriesState(Seq(GeneralEntry(Seq(testTransactionWithId))), hasMore = false)
     }
 
     "store calls listeners" - {
@@ -80,7 +80,8 @@ object LastNEntriesStoreFactoryTest extends TestSuite {
 
       store.state ==> LastNEntriesState(Seq(
         GeneralEntry(Seq(trans1, trans2)),
-        GeneralEntry(Seq(trans3))))
+        GeneralEntry(Seq(trans3))),
+        hasMore = false)
     }
 
     "sorts entries on transaction date first and then created date" - {
@@ -96,7 +97,8 @@ object LastNEntriesStoreFactoryTest extends TestSuite {
       store.state ==> LastNEntriesState(Seq(
         GeneralEntry(Seq(trans1)),
         GeneralEntry(Seq(trans2)),
-        GeneralEntry(Seq(trans3))))
+        GeneralEntry(Seq(trans3))),
+        hasMore = false)
     }
 
     "respects maximum (n)" - {
@@ -113,7 +115,8 @@ object LastNEntriesStoreFactoryTest extends TestSuite {
       store.state ==> LastNEntriesState(Seq(
         GeneralEntry(Seq(trans2)),
         GeneralEntry(Seq(trans3)),
-        GeneralEntry(Seq(trans4))))
+        GeneralEntry(Seq(trans4))),
+        hasMore = true)
     }
   }
 }
