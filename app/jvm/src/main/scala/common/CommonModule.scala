@@ -7,7 +7,9 @@ import common.time.{Clock, JvmClock}
 final class CommonModule extends AbstractModule {
 
   override def configure() = {
-    bindSingleton(classOf[I18n], classOf[PlayI18n])
+    bindSingleton(classOf[PlayI18n], classOf[PlayI18n.Impl])
+    bind(classOf[I18n]).to(classOf[PlayI18n])
+
     bind(classOf[Clock]).to(classOf[JvmClock])
   }
 

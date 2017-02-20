@@ -19,7 +19,8 @@ final class FactoTestModule extends AbstractModule {
     install(new ModelsModule)
     install(new ScalaJsApiModule)
     bindSingleton(classOf[Clock], classOf[FakeClock])
-    bindSingleton(classOf[I18n], classOf[FakeI18n])
+    bindSingleton(classOf[PlayI18n], classOf[FakePlayI18n])
+    bind(classOf[I18n]).to(classOf[PlayI18n])
   }
 
   @Provides()
