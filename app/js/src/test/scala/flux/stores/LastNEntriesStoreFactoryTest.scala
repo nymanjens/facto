@@ -101,7 +101,7 @@ object LastNEntriesStoreFactoryTest extends TestSuite {
         hasMore = false)
     }
 
-    "respects maximum (n)" - {
+    "respects maximum N" - {
       def transaction(id: Long, date: LocalDateTime): Transaction = {
         testTransactionWithIdA.copy(idOption = Some(id), transactionGroupId = id, createdDate = date)
       }

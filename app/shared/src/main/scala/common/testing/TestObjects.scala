@@ -140,7 +140,7 @@ object TestObjects {
     liquidationDescription = "Liquidation",
     zoneId = "Europe/Brussels")
 
-  implicit val testAccountingConfig: Config = Config(
+  val testAccountingConfig: Config = Config(
     accounts = createListMap(
       "ACC_COMMON" -> testAccountCommon,
       "ACC_A" -> testAccountA,
