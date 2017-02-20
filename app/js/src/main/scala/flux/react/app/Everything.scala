@@ -63,7 +63,7 @@ final class Everything(implicit entriesStoreFactory: LastNEntriesStoreFactory,
             <.th(i18n("facto.flow")),
             <.th("")
           ),
-          tableDatas = state.entries.map(entry =>
+          tableDatas = state.entries.reverse.map(entry =>
             Seq[ReactElement](
               <.td(entry.issuer.name),
               <.td(entry.transactionDates.map(formatDate).mkString(", ")),
