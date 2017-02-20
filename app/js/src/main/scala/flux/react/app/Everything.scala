@@ -3,6 +3,7 @@ package flux.react.app
 import common.I18n
 import common.Formatting._
 import common.time.Clock
+import flux.react.app.Everything.NumEntriesStrategy
 import flux.react.uielements
 import flux.stores.LastNEntriesStoreFactory.{LastNEntriesState, N}
 import flux.stores.{EntriesStore, LastNEntriesStoreFactory}
@@ -21,13 +22,13 @@ final class Everything(implicit entriesStoreFactory: LastNEntriesStoreFactory,
                        exchangeRateManager: ExchangeRateManager,
                        i18n: I18n) {
 
-  class Backend($: BackendScope[N, LastNEntriesState]) extends EntriesStore.Listener {
+  private class Backend($: BackendScope[Everything.Props, Everything.State]) extends EntriesStore.Listener {
     private var entriesStore: EntriesStore[LastNEntriesState] = null
 
-    def willMount(n: N): Callback = Callback {
-      entriesStore = entriesStoreFactory.get(n)
+    def willMount(state: Everything.State): Callback = Callback{
+      entriesStore = entriesStoreFactory.get(N(state.n))
       entriesStore.register(this)
-      $.modState(_ => entriesStore.state).runNow()
+      $.modState(state => state.withEntriesStateFrom(entriesStore)).runNow()
     }
 
     def willUnmount(): Callback = Callback {
@@ -35,23 +36,17 @@ final class Everything(implicit entriesStoreFactory: LastNEntriesStoreFactory,
       entriesStore = null
     }
 
-    def willReceiveProps(newN: N): Callback = Callback {
-      entriesStore.deregister(this)
-      entriesStore = entriesStoreFactory.get(newN)
-      entriesStore.register(this)
-      $.modState(_ => entriesStore.state).runNow()
-    }
-
     override def onStateUpdate() = {
-      $.modState(_ => entriesStore.state).runNow()
+      $.modState(state => state.withEntriesStateFrom(entriesStore)).runNow()
     }
 
-    def render(n: N, state: LastNEntriesState) = {
+    def render(props: Everything.Props, state: Everything.State) = {
       uielements.Panel(i18n("facto.genral-information-about-all-entries"))(
         uielements.Table(
           title = i18n("facto.all"),
           tableClasses = Seq("table-everything"),
-          moreEntriesCallback = Option(Callback(println("  test!!!"))),
+          moreEntriesCallback =
+            if (state.entriesState.hasMore) Some(expandNumEntries(state)) else None,
           tableHeaders = Seq(
             <.th(i18n("facto.issuer")),
             <.th(i18n("facto.payed")),
@@ -63,7 +58,7 @@ final class Everything(implicit entriesStoreFactory: LastNEntriesStoreFactory,
             <.th(i18n("facto.flow")),
             <.th("")
           ),
-          tableDatas = state.entries.reverse.map(entry =>
+          tableDatas = state.entriesState.entries.reverse.map(entry =>
             Seq[ReactElement](
               <.td(entry.issuer.name),
               <.td(entry.transactionDates.map(formatDate).mkString(", ")),
@@ -79,17 +74,58 @@ final class Everything(implicit entriesStoreFactory: LastNEntriesStoreFactory,
         )
       )
     }
+
+    private def expandNumEntries(state: Everything.State): Callback = Callback{
+      def updateN(n: Int) = {
+        entriesStore.deregister(this)
+        entriesStore = entriesStoreFactory.get(N(n))
+        entriesStore.register(this)
+        println(s"Done registering")
+        println(s"state.hasMore = ${entriesStore.state.hasMore}")
+        $.modState(state => state.withEntriesStateFrom(entriesStore).copy(n = n)).runNow()
+      }
+
+      val nextN = {
+        val nextNCandidates = numEntriesStrategy.intermediateBeforeInf :+ Int.MaxValue
+        nextNCandidates.filter(_ > state.n).head
+      }
+        println(s"  Expanding #entries from ${state.n} to $nextN")
+      updateN(n =nextN )
+    }
+
   }
 
-  private val component = ReactComponentB[N]("Everything")
-    .initialState(LastNEntriesState(Seq()))
+  private val component = ReactComponentB[Everything.Props]("Everything")
+    .initialState(Everything.State(LastNEntriesState.empty, n = numEntriesStrategy.start))
     .renderBackend[Backend]
-    .componentWillMount(scope => scope.backend.willMount(scope.props))
+    .componentWillMount(scope => scope.backend.willMount(scope.state))
     .componentWillUnmount(scope => scope.backend.willUnmount())
-    .componentWillReceiveProps(scope => scope.$.backend.willReceiveProps(scope.nextProps))
     .build
 
-  def apply(n: Int): ReactElement = {
-    component(N(n))
+  def apply(): ReactElement = {
+    component(Everything.Props())
+  }
+
+  protected def numEntriesStrategy: NumEntriesStrategy = NumEntriesStrategy(
+    start = 5,
+    intermediateBeforeInf = Seq(30))
+}
+
+object Everything {
+  private case class Props()
+
+  private case class State(entriesState: LastNEntriesState, n: Int) {
+    def withEntriesStateFrom(store: EntriesStore[LastNEntriesState]): State =
+      copy(entriesState = store.state)
+  }
+
+  case class NumEntriesStrategy(start: Int, intermediateBeforeInf: Seq[Int] = Seq()) {
+    // Argument validation
+    if (intermediateBeforeInf.nonEmpty) {
+      val seq = start +: intermediateBeforeInf
+      for ((prev, next) <- seq.dropRight(1) zip seq.drop(1)) {
+        require(prev < next, s"$prev should be strictly smaller than $next")
+      }
+    }
   }
 }

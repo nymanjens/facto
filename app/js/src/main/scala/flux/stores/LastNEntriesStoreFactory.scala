@@ -27,7 +27,7 @@ final class LastNEntriesStoreFactory(implicit database: RemoteDatabaseProxy)
 
       entries = GeneralEntry.combineConsecutiveOfSameGroup(entries)
 
-      LastNEntriesState(entries.takeRight(n.toInt))
+      LastNEntriesState(entries.takeRight(n.toInt), hasMore = entries.size > n.toInt)
     }
 
     override protected def modificationImpactsState(entityModification: EntityModification, state: LastNEntriesState): Boolean = {
@@ -37,7 +37,10 @@ final class LastNEntriesStoreFactory(implicit database: RemoteDatabaseProxy)
 }
 
 object LastNEntriesStoreFactory {
-  case class LastNEntriesState(entries: Seq[GeneralEntry])
+  case class LastNEntriesState(entries: Seq[GeneralEntry], hasMore: Boolean)
+  object LastNEntriesState {
+    val empty: LastNEntriesState = LastNEntriesState(Seq(), false)
+  }
   case class N(n: Int) {
     def toInt: Int = n
   }
