@@ -89,6 +89,7 @@ object Settings {
   val scalajsDependencies = Def.setting(Seq(
     "com.github.japgolly.scalajs-react" %%% "core"              % versions.scalajsReact,
     "com.github.japgolly.scalajs-react" %%% "extra"             % versions.scalajsReact,
+    "com.github.japgolly.scalajs-react" %%% "test"              % versions.scalajsReact % Test,
     "com.github.japgolly.scalacss"      %%% "ext-react"         % "0.4.1",
     "me.chrons"                         %%% "diode"             % versions.diode,
     "me.chrons"                         %%% "diode-react"       % versions.diode,
@@ -101,13 +102,15 @@ object Settings {
   private object files {
     val jQuery    = s"${versions.jQuery}/jquery.min.js"
     val bootstrap = s"${versions.bootstrap}/js/bootstrap.min.js"
-    val reactWithAddons = "react-with-addons.js" // TODO: Change to react-with-addons.min.js in prod
+    val reactWithAddons = "react-with-addons.js"
+    val reactDom = "react-dom.js"
   }
 
   /** Dependencies for external JS libs that are bundled into a single .js file according to dependency order */
   val jsDependencies = Def.setting(Seq(
-    webjarDeps.react / files.reactWithAddons commonJSName "React",
-    webjarDeps.react / "react-dom.min.js" dependsOn files.reactWithAddons commonJSName "ReactDOM",
+    webjarDeps.react / files.reactWithAddons minified "react-with-addons.min.js" commonJSName "React",
+    webjarDeps.react / files.reactDom minified "react-dom.min.js" dependsOn files.reactWithAddons commonJSName "ReactDOM",
+    webjarDeps.react % Test / "react-dom-server.js" minified "react-dom-server.min.js" dependsOn files.reactDom commonJSName "ReactDOMServer",
     webjarDeps.jQuery / files.jQuery,
     webjarDeps.bootstrap / files.bootstrap dependsOn files.jQuery,
     webjarDeps.metisMenu / "metisMenu.min.js" dependsOn files.bootstrap,

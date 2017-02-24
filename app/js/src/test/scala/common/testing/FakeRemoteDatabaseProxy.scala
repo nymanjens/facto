@@ -46,7 +46,11 @@ final class FakeRemoteDatabaseProxy extends RemoteDatabaseProxy {
   }
 
   def addRemotelyAddedEntities[E <: Entity : EntityType](entities: E*): Unit = {
-    addRemoteModifications(entities.toVector map (e => EntityModification.Add(e)))
+    addRemotelyAddedEntities(entities.toVector)
+  }
+
+  def addRemotelyAddedEntities[E <: Entity : EntityType](entities: Seq[E]): Unit = {
+    addRemoteModifications(entities map (e => EntityModification.Add(e)))
   }
 
   def allModifications: Seq[EntityModification] = modificationsBuffer.getModifications()
