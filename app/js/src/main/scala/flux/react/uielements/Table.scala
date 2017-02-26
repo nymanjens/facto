@@ -30,7 +30,10 @@ object Table {
           <.tr(props.tableHeaders)
         ),
         <.tbody(
-          props.tableDatas.map(tableData => <.tr(tableData)),
+          props.tableDatas.map(tableData => <.tr(
+            ^.className := "data-row",
+            tableData)
+          ),
           if (props.tableDatas.isEmpty) {
             <.tr(
               <.td(^.colSpan := props.colSpan, ^^.classes("no-entries"),
@@ -43,7 +46,7 @@ object Table {
                 ^.style := js.Dictionary("textAlign" -> "center"),
                 <.a(^.onClick --> props.moreEntriesCallback.get,
                   ^.tpe := "button",
-                  ^^.classes("btn", "btn-sm", "btn-default", "btn-circle"),
+                  ^^.classes("btn", "btn-sm", "btn-default", "btn-circle", "expand-button"),
                   <.i(^^.classes("fa", "fa-ellipsis-h"))
                 )
               )
