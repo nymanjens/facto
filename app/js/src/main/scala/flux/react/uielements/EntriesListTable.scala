@@ -3,7 +3,7 @@ package flux.react.uielements
 import common.{I18n, LoggingUtils}
 import flux.react.uielements
 import flux.react.uielements.EntriesListTable.NumEntriesStrategy
-import flux.stores.{EntriesStore, EntriesListStoreFactory$}
+import flux.stores.{EntriesStore, EntriesListStoreFactory}
 import japgolly.scalajs.react._
 
 import scala.collection.immutable.Seq
