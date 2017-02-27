@@ -10,7 +10,7 @@ import utest._
 import scala.collection.immutable.Seq
 import scala2js.Converters._
 
-object LastNEntriesStoreFactoryTest extends TestSuite {
+object EverythingTest extends TestSuite {
 
   override def tests = TestSuite {
     val testModule = new ThisTestModule()
