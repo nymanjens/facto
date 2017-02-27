@@ -9,14 +9,7 @@ import flux.react.ReactVdomUtils.^^
 import scala.collection.immutable.Seq
 
 object Table {
-  private case class Props(title: String,
-                           tableClasses: Seq[String],
-                           expandNumEntriesCallback: Option[Callback],
-                           tableHeaders: Seq[ReactElement],
-                           tableDatas: Seq[Seq[ReactElement]],
-                           i18n: I18n) {
-    def colSpan: Int = tableHeaders.size
-  }
+
   private val component = ReactComponentB[Props]("Table")
     .renderP((_, props) =>
       <.table(^^.classes(Seq("table", "table-bordered", "table-hover", "table-condensed", "table-overflow-elipsis", "add-toc-level-2") ++ props.tableClasses),
@@ -64,5 +57,14 @@ object Table {
             tableHeaders: Seq[ReactElement],
             tableDatas: Seq[Seq[ReactElement]])(implicit i18n: I18n): ReactElement = {
     component(Props(title, tableClasses, expandNumEntriesCallback, tableHeaders, tableDatas, i18n))
+  }
+
+  private case class Props(title: String,
+                           tableClasses: Seq[String],
+                           expandNumEntriesCallback: Option[Callback],
+                           tableHeaders: Seq[ReactElement],
+                           tableDatas: Seq[Seq[ReactElement]],
+                           i18n: I18n) {
+    def colSpan: Int = tableHeaders.size
   }
 }
