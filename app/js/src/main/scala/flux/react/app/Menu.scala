@@ -1,15 +1,12 @@
 package flux.react.app
 
-import japgolly.scalajs.react.extra.router.RouterCtl
-import common.Formatting._
 import common.I18n
 import common.time.Clock
-import flux.react.router.RouterFactory.Page
-import flux.react.uielements
 import flux.react.ReactVdomUtils.^^
-import flux.stores.LastNEntriesStoreFactory.{LastNEntriesState, N}
-import flux.stores.{EntriesStore, LastNEntriesStoreFactory}
+import flux.react.router.RouterFactory.Page
+import flux.stores.LastNEntriesStoreFactory
 import japgolly.scalajs.react._
+import japgolly.scalajs.react.extra.router.RouterCtl
 import japgolly.scalajs.react.vdom.prefix_<^._
 import models.EntityAccess
 import models.accounting.config.Config

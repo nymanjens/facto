@@ -1,26 +1,17 @@
 package flux.stores
 
 import java.time.Month.JANUARY
-import java.lang.Math.abs
 
 import common.testing.FakeRemoteDatabaseProxy
-import common.time.{LocalDateTime, LocalDateTimes}
-import common.time.LocalDateTimes.createDateTime
-import models.accounting._
-import models.accounting.money.ExchangeRateMeasurement
-import models.manager.{EntityModification, EntityType}
-import utest._
 import common.testing.TestObjects._
-import flux.stores.LastNEntriesStoreFactory.LastNEntriesState
+import common.time.LocalDateTime
+import common.time.LocalDateTimes.createDateTime
 import flux.stores.entries.GeneralEntry
-import models.User
-import models.access.RemoteDatabaseProxy
-import flux.stores.LastNEntriesStoreFactory.{LastNEntriesState, N}
-import flux.stores.entries.GeneralEntry
+import models.accounting._
+import models.manager.EntityModification
+import utest._
 
 import scala.collection.immutable.Seq
-import scala.scalajs.js
-import scala.util.Random
 import scala2js.Converters._
 
 /** Test test also tests `EntriesStoreFactory` and `EntriesStore`. */
@@ -29,27 +20,27 @@ object LastNEntriesStoreFactoryTest extends TestSuite {
   override def tests = TestSuite {
     implicit val database = new FakeRemoteDatabaseProxy()
     val factory: LastNEntriesStoreFactory = new LastNEntriesStoreFactory()
-    val store: EntriesStore[LastNEntriesState] = factory.get(N(3))
+    val store: factory.Store = factory.get(maxNumEntries = 3)
 
     "factory result is cached" - {
-      factory.get(N(3)) ==> store
-      assert(factory.get(N(4)) != store)
+      factory.get(maxNumEntries = 3) ==> store
+      assert(factory.get(maxNumEntries = 4) != store)
     }
 
     "store state is updated upon remote update" - {
-      store.state ==> LastNEntriesState.empty
+      store.state ==> EntriesStoreListFactory.State.empty
 
       database.addRemotelyAddedEntities(testTransactionWithId)
 
-      store.state ==> LastNEntriesState(Seq(GeneralEntry(Seq(testTransactionWithId))), hasMore = false)
+      store.state ==> EntriesStoreListFactory.State(Seq(GeneralEntry(Seq(testTransactionWithId))), hasMore = false)
     }
 
     "store state is updated upon local update" - {
-      store.state ==> LastNEntriesState.empty
+      store.state ==> EntriesStoreListFactory.State.empty
 
       database.persistModifications(Seq(EntityModification.Add(testTransactionWithId)))
 
-      store.state ==> LastNEntriesState(Seq(GeneralEntry(Seq(testTransactionWithId))), hasMore = false)
+      store.state ==> EntriesStoreListFactory.State(Seq(GeneralEntry(Seq(testTransactionWithId))), hasMore = false)
     }
 
     "store calls listeners" - {
@@ -78,7 +69,7 @@ object LastNEntriesStoreFactoryTest extends TestSuite {
 
       database.addRemotelyAddedEntities(trans1, trans2, trans3)
 
-      store.state ==> LastNEntriesState(Seq(
+      store.state ==> EntriesStoreListFactory.State(Seq(
         GeneralEntry(Seq(trans1, trans2)),
         GeneralEntry(Seq(trans3))),
         hasMore = false)
@@ -94,7 +85,7 @@ object LastNEntriesStoreFactoryTest extends TestSuite {
 
       database.addRemotelyAddedEntities(trans3, trans2, trans1)
 
-      store.state ==> LastNEntriesState(Seq(
+      store.state ==> EntriesStoreListFactory.State(Seq(
         GeneralEntry(Seq(trans1)),
         GeneralEntry(Seq(trans2)),
         GeneralEntry(Seq(trans3))),
@@ -112,7 +103,7 @@ object LastNEntriesStoreFactoryTest extends TestSuite {
 
       database.addRemotelyAddedEntities(trans1, trans2, trans3, trans4)
 
-      store.state ==> LastNEntriesState(Seq(
+      store.state ==> EntriesStoreListFactory.State(Seq(
         GeneralEntry(Seq(trans2)),
         GeneralEntry(Seq(trans3)),
         GeneralEntry(Seq(trans4))),

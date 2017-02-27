@@ -1,41 +1,13 @@
 package flux.react.app
 
-import common.I18n
-import common.Formatting._
-import common.time.Clock
-import flux.react.app.Everything.NumEntriesStrategy
-import flux.react.uielements
-import flux.stores.LastNEntriesStoreFactory.{LastNEntriesState, N}
-import flux.stores.{EntriesStore, LastNEntriesStoreFactory}
-import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.prefix_<^._
-import models.EntityAccess
-import models.accounting.config.Config
-import models.accounting.money.ExchangeRateManager
-
-import scala.collection.immutable.Seq
-import java.time.Month.JANUARY
-import java.lang.Math.abs
-
-import common.testing.{FakeClock, FakeRemoteDatabaseProxy, ReactTestWrapper, TestModule}
-import common.time.{LocalDateTime, LocalDateTimes}
-import common.time.LocalDateTimes.createDateTime
-import models.accounting._
-import models.accounting.money.ExchangeRateMeasurement
-import models.manager.{EntityModification, EntityType}
-import utest._
 import common.testing.TestObjects._
-import flux.stores.LastNEntriesStoreFactory.LastNEntriesState
-import flux.stores.entries.GeneralEntry
-import models.User
-import models.access.RemoteDatabaseProxy
-import flux.stores.LastNEntriesStoreFactory.{LastNEntriesState, N}
-import flux.stores.entries.GeneralEntry
-import japgolly.scalajs.react.test.ReactTestUtils
+import common.testing.{ReactTestWrapper, TestModule}
+import flux.stores.LastNEntriesStoreFactory
+import japgolly.scalajs.react._
+import models.accounting._
+import utest._
 
 import scala.collection.immutable.Seq
-import scala.scalajs.js
-import scala.util.Random
 import scala2js.Converters._
 
 object LastNEntriesStoreFactoryTest extends TestSuite {

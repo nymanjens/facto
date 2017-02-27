@@ -5,8 +5,7 @@ import common.Formatting._
 import common.time.Clock
 import flux.react.app.Everything.NumEntriesStrategy
 import flux.react.uielements
-import flux.stores.LastNEntriesStoreFactory.{LastNEntriesState, N}
-import flux.stores.{EntriesStore, LastNEntriesStoreFactory}
+import flux.stores.{EntriesStore, EntriesStoreListFactory, LastNEntriesStoreFactory}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import models.EntityAccess
@@ -22,11 +21,11 @@ final class Everything(implicit entriesStoreFactory: LastNEntriesStoreFactory,
                        exchangeRateManager: ExchangeRateManager,
                        i18n: I18n) {
 
-  private class Backend($: BackendScope[Everything.Props, Everything.State]) extends EntriesStore.Listener {
-    private var entriesStore: EntriesStore[LastNEntriesState] = null
+  private class Backend($: BackendScope[Everything.Props, State]) extends EntriesStore.Listener {
+    private var entriesStore: entriesStoreFactory.Store = null
 
-    def willMount(state: Everything.State): Callback = Callback {
-      entriesStore = entriesStoreFactory.get(N(state.n))
+    def willMount(state: State): Callback = Callback {
+      entriesStore = entriesStoreFactory.get(state.maxNumEntries)
       entriesStore.register(this)
       $.modState(state => state.withEntriesStateFrom(entriesStore)).runNow()
     }
@@ -40,7 +39,7 @@ final class Everything(implicit entriesStoreFactory: LastNEntriesStoreFactory,
       $.modState(state => state.withEntriesStateFrom(entriesStore)).runNow()
     }
 
-    def render(props: Everything.Props, state: Everything.State) = LoggingUtils.logExceptions {
+    def render(props: Everything.Props, state: State) = LoggingUtils.logExceptions {
       uielements.Panel(i18n("facto.genral-information-about-all-entries"))(
         uielements.Table(
           title = i18n("facto.all"),
@@ -75,28 +74,26 @@ final class Everything(implicit entriesStoreFactory: LastNEntriesStoreFactory,
       )
     }
 
-    private def expandNumEntries(state: Everything.State): Callback = Callback {
-      def updateN(n: Int) = {
+    private def expandNumEntries(state: State): Callback = Callback {
+      def updateN(maxNumEntries: Int) = {
         entriesStore.deregister(this)
-        entriesStore = entriesStoreFactory.get(N(n))
+        entriesStore = entriesStoreFactory.get(maxNumEntries)
         entriesStore.register(this)
-        println(s"Done registering")
-        println(s"state.hasMore = ${entriesStore.state.hasMore}")
-        $.modState(state => state.withEntriesStateFrom(entriesStore).copy(n = n)).runNow()
+        $.modState(state => state.withEntriesStateFrom(entriesStore).copy(maxNumEntries = maxNumEntries)).runNow()
       }
 
-      val nextN = {
+      val nextMaxNumEntries = {
         val nextNCandidates = numEntriesStrategy.intermediateBeforeInf :+ Int.MaxValue
-        nextNCandidates.filter(_ > state.n).head
+        nextNCandidates.filter(_ > state.maxNumEntries).head
       }
-      println(s"  Expanding #entries from ${state.n} to $nextN")
-      updateN(n = nextN)
+      println(s"  Expanding #entries from ${state.maxNumEntries} to $nextMaxNumEntries")
+      updateN(maxNumEntries = nextMaxNumEntries)
     }
 
   }
 
   private val component = ReactComponentB[Everything.Props]("Everything")
-    .initialState(Everything.State(LastNEntriesState.empty, n = numEntriesStrategy.start))
+    .initialState(State(EntriesStoreListFactory.State.empty, maxNumEntries = numEntriesStrategy.start))
     .renderBackend[Backend]
     .componentWillMount(scope => scope.backend.willMount(scope.state))
     .componentWillUnmount(scope => scope.backend.willUnmount())
@@ -109,15 +106,15 @@ final class Everything(implicit entriesStoreFactory: LastNEntriesStoreFactory,
   protected def numEntriesStrategy: NumEntriesStrategy = NumEntriesStrategy(
     start = 5,
     intermediateBeforeInf = Seq(30))
+
+  private case class State(entriesState: entriesStoreFactory.State, maxNumEntries: Int) {
+    def withEntriesStateFrom(store: entriesStoreFactory.Store): State =
+      copy(entriesState = store.state)
+  }
 }
 
 object Everything {
   private case class Props()
-
-  private case class State(entriesState: LastNEntriesState, n: Int) {
-    def withEntriesStateFrom(store: EntriesStore[LastNEntriesState]): State =
-      copy(entriesState = store.state)
-  }
 
   case class NumEntriesStrategy(start: Int, intermediateBeforeInf: Seq[Int] = Seq()) {
     // Argument validation

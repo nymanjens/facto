@@ -4,22 +4,21 @@ import flux.stores.entries.GeneralEntry
 import models.access.RemoteDatabaseProxy
 import models.accounting.Transaction
 import models.manager.{EntityModification, EntityType}
-import flux.stores.LastNEntriesStoreFactory.{LastNEntriesState, N}
 
 import scala.collection.immutable.Seq
 
 final class LastNEntriesStoreFactory(implicit database: RemoteDatabaseProxy)
-  extends EntriesStoreFactory[LastNEntriesState] {
+  extends EntriesStoreListFactory[GeneralEntry] {
 
-  override protected type Input = N
+  override protected type AdditionalInput = Unit
 
-  override protected def createNew(n: N) = new EntriesStore[LastNEntriesState] {
+  override protected def createNew(maxNumEntries: Int, input: Unit) = new Store {
     override protected def calculateState() = {
       val transactions: Seq[Transaction] =
         database.newQuery[Transaction]()
           .sort("transactionDate", isDesc = true)
           .sort("createdDate", isDesc = true)
-          .limit(3 * n.toInt)
+          .limit(3 * maxNumEntries)
           .data()
           .reverse
 
@@ -27,21 +26,13 @@ final class LastNEntriesStoreFactory(implicit database: RemoteDatabaseProxy)
 
       entries = GeneralEntry.combineConsecutiveOfSameGroup(entries)
 
-      LastNEntriesState(entries.takeRight(n.toInt), hasMore = entries.size > n.toInt)
+      EntriesStoreListFactory.State(entries.takeRight(maxNumEntries), hasMore = entries.size > maxNumEntries)
     }
 
-    override protected def modificationImpactsState(entityModification: EntityModification, state: LastNEntriesState): Boolean = {
+    override protected def modificationImpactsState(entityModification: EntityModification, state: State): Boolean = {
       entityModification.entityType == EntityType.TransactionType
     }
   }
-}
 
-object LastNEntriesStoreFactory {
-  case class LastNEntriesState(entries: Seq[GeneralEntry], hasMore: Boolean)
-  object LastNEntriesState {
-    val empty: LastNEntriesState = LastNEntriesState(Seq(), false)
-  }
-  case class N(n: Int) {
-    def toInt: Int = n
-  }
+  def get(maxNumEntries: Int): Store = get(Input(maxNumEntries = maxNumEntries, additionalInput = (): Unit))
 }
