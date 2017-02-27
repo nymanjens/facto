@@ -1,6 +1,6 @@
 package common.time
 
-import java.time.LocalDate
+import java.time.{Duration, LocalDate}
 
 object JavaTimeImplicits {
 
@@ -14,10 +14,18 @@ object JavaTimeImplicits {
   implicit object LocalDateTimeOrdering extends Ordering[LocalDateTime] {
     override def compare(x: LocalDateTime, y: LocalDateTime): Int = x compareTo y
   }
-  implicit class LocalDateTimeWrapper(LocalDateTime: LocalDateTime) extends BaseWrapper[LocalDateTime](LocalDateTime)
+  implicit class LocalDateTimeWrapper(thisDate: LocalDateTime) extends BaseWrapper[LocalDateTime](thisDate) {
+
+    def -(other: LocalDateTime): Duration = {
+      // Heuristic because scala.js doesn't support Duration.between(LocalDate, LocalDate)
+      val localDateDayDiff = thisDate.toLocalDate.toEpochDay - other.toLocalDate.toEpochDay
+      val localTimeNanoDiff = thisDate.toLocalTime.toNanoOfDay - other.toLocalTime.toNanoOfDay
+      Duration.ofDays(localDateDayDiff) plus Duration.ofNanos(localTimeNanoDiff)
+    }
+  }
 
   implicit object LocalDateOrdering extends Ordering[LocalDate] {
     override def compare(x: LocalDate, y: LocalDate): Int = x compareTo y
   }
-  implicit class LocalDateWrapper(date: LocalDate) extends BaseWrapper[LocalDate](date)
+  implicit class LocalDateWrapper(thisDate: LocalDate) extends BaseWrapper[LocalDate](thisDate)
 }

@@ -1,6 +1,6 @@
 package flux.react.app
 
-import common.I18n
+import common.{I18n, LoggingUtils}
 import common.Formatting._
 import common.time.Clock
 import flux.react.app.Everything.NumEntriesStrategy
@@ -25,7 +25,7 @@ final class Everything(implicit entriesStoreFactory: LastNEntriesStoreFactory,
   private class Backend($: BackendScope[Everything.Props, Everything.State]) extends EntriesStore.Listener {
     private var entriesStore: EntriesStore[LastNEntriesState] = null
 
-    def willMount(state: Everything.State): Callback = Callback{
+    def willMount(state: Everything.State): Callback = Callback {
       entriesStore = entriesStoreFactory.get(N(state.n))
       entriesStore.register(this)
       $.modState(state => state.withEntriesStateFrom(entriesStore)).runNow()
@@ -40,7 +40,7 @@ final class Everything(implicit entriesStoreFactory: LastNEntriesStoreFactory,
       $.modState(state => state.withEntriesStateFrom(entriesStore)).runNow()
     }
 
-    def render(props: Everything.Props, state: Everything.State) = {
+    def render(props: Everything.Props, state: Everything.State) = LoggingUtils.logExceptions {
       uielements.Panel(i18n("facto.genral-information-about-all-entries"))(
         uielements.Table(
           title = i18n("facto.all"),
@@ -75,7 +75,7 @@ final class Everything(implicit entriesStoreFactory: LastNEntriesStoreFactory,
       )
     }
 
-    private def expandNumEntries(state: Everything.State): Callback = Callback{
+    private def expandNumEntries(state: Everything.State): Callback = Callback {
       def updateN(n: Int) = {
         entriesStore.deregister(this)
         entriesStore = entriesStoreFactory.get(N(n))
@@ -89,8 +89,8 @@ final class Everything(implicit entriesStoreFactory: LastNEntriesStoreFactory,
         val nextNCandidates = numEntriesStrategy.intermediateBeforeInf :+ Int.MaxValue
         nextNCandidates.filter(_ > state.n).head
       }
-        println(s"  Expanding #entries from ${state.n} to $nextN")
-      updateN(n =nextN )
+      println(s"  Expanding #entries from ${state.n} to $nextN")
+      updateN(n = nextN)
     }
 
   }
