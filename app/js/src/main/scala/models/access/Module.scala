@@ -9,5 +9,5 @@ object Module {
 
   private lazy val localDatabase: Future[LocalDatabase] = LocalDatabase.createFuture()
   implicit val remoteDatabaseProxy: RemoteDatabaseProxy = wire[RemoteDatabaseProxy.Impl]
-  remoteDatabaseProxy.startSchedulingModifiedEntityUpdates()
+  //  remoteDatabaseProxy.startSchedulingModifiedEntityUpdates() // Disabled for testing
 }
