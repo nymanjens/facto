@@ -33,7 +33,7 @@ object RouterFactory {
 
         // wrap/connect components to the circuit
         (staticRoute(root, EverythingPage) ~> renderR(ctl => reactAppModule.everything())
-          | staticRoute("#everything", EverythingPage2) ~> renderR(ctl => reactAppModule.everything())
+          | staticRoute("#everything", EverythingPage2) ~> renderR(ctl => <.div(reactAppModule.everything(), reactAppModule.everything(), reactAppModule.everything()))
           | staticRoute("#test", TestPage) ~> renderR(ctl => reactAppModule.menu(TestPage, ctl))
           ).notFound(redirectToPage(EverythingPage)(Redirect.Replace))
       }.renderWith(layout)

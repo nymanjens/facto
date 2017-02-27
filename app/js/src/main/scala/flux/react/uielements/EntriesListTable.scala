@@ -18,7 +18,7 @@ private final class EntriesListTable[Entry, Props](tableTitle: String,
                                                     i18n: I18n) {
 
   private val component = ReactComponentB[Props](getClass.getSimpleName)
-    .initialState(State(EntriesStoreListFactory.State.empty, maxNumEntries = 1))
+    .initialState(State(EntriesStoreListFactory.State.empty, maxNumEntries = numEntriesStrategy.start))
     .renderBackend[Backend]
     .componentWillMount(scope => scope.backend.willMount(scope.state))
     .componentWillUnmount(scope => scope.backend.willUnmount())
@@ -41,9 +41,7 @@ private final class EntriesListTable[Entry, Props](tableTitle: String,
     def willMount(state: State): Callback = Callback {
       entriesStore = entriesStoreFactory.get(entriesStoreFactory.Input(maxNumEntries = state.maxNumEntries, props))
       entriesStore.register(this)
-      $.modState(state => State(
-        entries = entriesStore.state,
-        maxNumEntries = numEntriesStrategy.start)).runNow()
+      $.modState(state => state.withEntriesFrom(entriesStore)).runNow()
     }
 
     def willUnmount(): Callback = Callback {
