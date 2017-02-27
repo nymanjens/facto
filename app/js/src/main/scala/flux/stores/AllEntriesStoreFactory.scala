@@ -7,7 +7,7 @@ import models.manager.{EntityModification, EntityType}
 
 import scala.collection.immutable.Seq
 
-final class LastNEntriesStoreFactory(implicit database: RemoteDatabaseProxy)
+final class AllEntriesStoreFactory(implicit database: RemoteDatabaseProxy)
   extends EntriesStoreListFactory[GeneralEntry] {
 
   override protected type AdditionalInput = Unit

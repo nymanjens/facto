@@ -15,11 +15,11 @@ import scala.collection.immutable.Seq
 import scala2js.Converters._
 
 /** Test test also tests `EntriesStoreFactory` and `EntriesStore`. */
-object LastNEntriesStoreFactoryTest extends TestSuite {
+object AllEntriesStoreFactoryTest extends TestSuite {
 
   override def tests = TestSuite {
     implicit val database = new FakeRemoteDatabaseProxy()
-    val factory: LastNEntriesStoreFactory = new LastNEntriesStoreFactory()
+    val factory: AllEntriesStoreFactory = new AllEntriesStoreFactory()
     val store: factory.Store = factory.get(maxNumEntries = 3)
 
     "factory result is cached" - {

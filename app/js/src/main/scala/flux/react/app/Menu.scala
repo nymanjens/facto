@@ -4,7 +4,7 @@ import common.I18n
 import common.time.Clock
 import flux.react.ReactVdomUtils.^^
 import flux.react.router.RouterFactory.Page
-import flux.stores.LastNEntriesStoreFactory
+import flux.stores.AllEntriesStoreFactory
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.RouterCtl
 import japgolly.scalajs.react.vdom.prefix_<^._
@@ -14,7 +14,7 @@ import models.accounting.money.ExchangeRateManager
 
 import scala.collection.immutable.Seq
 
-final class Menu(implicit entriesStoreFactory: LastNEntriesStoreFactory,
+final class Menu(implicit entriesStoreFactory: AllEntriesStoreFactory,
                  entityAccess: EntityAccess,
                  clock: Clock,
                  accountingConfig: Config,

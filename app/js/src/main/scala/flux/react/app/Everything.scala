@@ -5,7 +5,7 @@ import common.Formatting._
 import common.time.Clock
 import flux.react.app.Everything.NumEntriesStrategy
 import flux.react.uielements
-import flux.stores.{EntriesStore, EntriesStoreListFactory, LastNEntriesStoreFactory}
+import flux.stores.{EntriesStore, EntriesStoreListFactory, AllEntriesStoreFactory}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import models.EntityAccess
@@ -14,7 +14,7 @@ import models.accounting.money.ExchangeRateManager
 
 import scala.collection.immutable.Seq
 
-final class Everything(implicit entriesStoreFactory: LastNEntriesStoreFactory,
+final class Everything(implicit entriesStoreFactory: AllEntriesStoreFactory,
                        entityAccess: EntityAccess,
                        clock: Clock,
                        accountingConfig: Config,

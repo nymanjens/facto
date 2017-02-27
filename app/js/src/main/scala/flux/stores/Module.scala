@@ -11,6 +11,6 @@ object Module {
   import models.access.Module._
   import models.Module._
 
-  implicit lazy val lastNEntriesStoreFactory = wire[LastNEntriesStoreFactory]
+  implicit lazy val allEntriesStoreFactory = wire[AllEntriesStoreFactory]
   implicit lazy val transactionAndGroupStore = wire[TransactionAndGroupStore]
 }

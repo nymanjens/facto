@@ -2,7 +2,7 @@ package flux.react.app
 
 import common.testing.TestObjects._
 import common.testing.{ReactTestWrapper, TestModule}
-import flux.stores.LastNEntriesStoreFactory
+import flux.stores.AllEntriesStoreFactory
 import japgolly.scalajs.react._
 import models.accounting._
 import utest._
@@ -98,7 +98,7 @@ object EverythingTest extends TestSuite {
 
     import com.softwaremill.macwire._
 
-    implicit val factory: LastNEntriesStoreFactory = wire[LastNEntriesStoreFactory]
+    implicit val factory: AllEntriesStoreFactory = wire[AllEntriesStoreFactory]
     val everything: Everything = wire[Everything]
   }
 }
