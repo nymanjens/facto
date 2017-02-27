@@ -11,7 +11,7 @@ import scala.collection.immutable.Seq
 object Table {
   private case class Props(title: String,
                            tableClasses: Seq[String],
-                           moreEntriesCallback: Option[Callback],
+                           expandNumEntriesCallback: Option[Callback],
                            tableHeaders: Seq[ReactElement],
                            tableDatas: Seq[Seq[ReactElement]],
                            i18n: I18n) {
@@ -40,11 +40,11 @@ object Table {
                 props.i18n("facto.no-entries")
               )
             )
-          } else if (props.moreEntriesCallback.isDefined) {
+          } else if (props.expandNumEntriesCallback.isDefined) {
             <.tr(
               <.td(^.colSpan := props.colSpan,
                 ^.style := js.Dictionary("textAlign" -> "center"),
-                <.a(^.onClick --> props.moreEntriesCallback.get,
+                <.a(^.onClick --> props.expandNumEntriesCallback.get,
                   ^.tpe := "button",
                   ^^.classes("btn", "btn-sm", "btn-default", "btn-circle", "expand-button"),
                   <.i(^^.classes("fa", "fa-ellipsis-h"))
@@ -60,9 +60,9 @@ object Table {
 
   def apply(title: String,
             tableClasses: Seq[String] = Seq(),
-            moreEntriesCallback: Option[Callback] = None,
+            expandNumEntriesCallback: Option[Callback] = None,
             tableHeaders: Seq[ReactElement],
             tableDatas: Seq[Seq[ReactElement]])(implicit i18n: I18n): ReactElement = {
-    component(Props(title, tableClasses, moreEntriesCallback, tableHeaders, tableDatas, i18n))
+    component(Props(title, tableClasses, expandNumEntriesCallback, tableHeaders, tableDatas, i18n))
   }
 }

@@ -45,7 +45,7 @@ final class Everything(implicit entriesStoreFactory: LastNEntriesStoreFactory,
         uielements.Table(
           title = i18n("facto.all"),
           tableClasses = Seq("table-everything"),
-          moreEntriesCallback =
+          expandNumEntriesCallback =
             if (state.entriesState.hasMore) Some(expandNumEntries(state)) else None,
           tableHeaders = Seq(
             <.th(i18n("facto.issuer")),
