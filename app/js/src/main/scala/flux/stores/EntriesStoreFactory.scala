@@ -3,15 +3,21 @@ package flux.stores
 import scala.collection.mutable
 
 private[stores] abstract class EntriesStoreFactory[StateT] {
+
+  private val cache: mutable.Map[Input, Store] = mutable.Map()
+
+  // **************** Abstract methods/types ****************//
   /**
     * The (immutable) input type that together with injected dependencies is enough to
     * calculate the latest value of `State`. Example: Int.
     */
   protected type Input
 
-  private val cache: mutable.Map[Input, Store] = mutable.Map()
+  protected def createNew(input: Input): Store
 
-  final def get(input: Input): Store = {
+  // **************** API ****************//
+  /** Implementing classes should add a specialized version of `get()` with unpacked parameters. */
+  protected final def get(input: Input): Store = {
     if (cache contains input) {
       cache(input)
     } else {
@@ -21,9 +27,7 @@ private[stores] abstract class EntriesStoreFactory[StateT] {
     }
   }
 
-  protected def createNew(input: Input): Store
-
-  // Type aliases for brevity
+  // **************** Type aliases for brevity ****************//
   final type State = StateT
   final type Store = EntriesStore[StateT]
 }

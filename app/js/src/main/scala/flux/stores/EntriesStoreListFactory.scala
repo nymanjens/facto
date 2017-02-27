@@ -4,23 +4,22 @@ import models.access.RemoteDatabaseProxy
 
 import scala.collection.immutable.Seq
 
-private[stores] abstract class EntriesStoreListFactory[Entry](implicit database: RemoteDatabaseProxy)
+abstract class EntriesStoreListFactory[Entry](implicit database: RemoteDatabaseProxy)
   extends EntriesStoreFactory[EntriesStoreListFactory.State[Entry]] {
 
+  // **************** Abstract methods/types ****************//
   /**
     * The (immutable) input type that together with injected dependencies and the max number of entries is
     * enough to calculate the latest value of `State`. Example: Int.
     */
   protected type AdditionalInput
 
-
   protected def createNew(maxNumEntries: Int, input: AdditionalInput): Store
 
-  //  override protected final type Input = EntriesStoreListFactory.Input
-
+  // **************** Implementation of EntriesStoreFactory methods/types ****************//
   override protected final def createNew(input: Input) = createNew(input.maxNumEntries, input.additionalInput)
 
-  case class Input(maxNumEntries: Int, additionalInput: AdditionalInput)
+  /* override */ case class Input(maxNumEntries: Int, additionalInput: AdditionalInput)
 }
 
 object EntriesStoreListFactory {
