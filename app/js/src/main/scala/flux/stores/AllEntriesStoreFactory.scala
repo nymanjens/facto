@@ -8,9 +8,7 @@ import models.manager.{EntityModification, EntityType}
 import scala.collection.immutable.Seq
 
 final class AllEntriesStoreFactory(implicit database: RemoteDatabaseProxy)
-  extends EntriesStoreListFactory[GeneralEntry] {
-
-  override protected type AdditionalInput = Unit
+  extends EntriesStoreListFactory[GeneralEntry, Unit] {
 
   override protected def createNew(maxNumEntries: Int, input: Unit) = new Store {
     override protected def calculateState() = {

@@ -16,8 +16,8 @@ private[stores] abstract class EntriesStoreFactory[StateT] {
   protected def createNew(input: Input): Store
 
   // **************** API ****************//
-  /** Implementing classes should add a specialized version of `get()` with unpacked parameters. */
-  protected final def get(input: Input): Store = {
+  /** Implementing classes could add a specialized version of `get()` with unpacked parameters. */
+  final def get(input: Input): Store = {
     if (cache contains input) {
       cache(input)
     } else {
