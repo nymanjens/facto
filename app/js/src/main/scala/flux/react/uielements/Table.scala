@@ -46,7 +46,7 @@ object Table {
                 ^.style := js.Dictionary("textAlign" -> "center"),
                 <.a(^.onClick --> props.expandNumEntriesCallback.get,
                   ^.tpe := "button",
-                  ^^.classes("btn", "btn-sm", "btn-default", "btn-circle", "expand-button"),
+                  ^^.classes("btn", "btn-sm", "btn-default", "btn-circle", "expand-num-entries"),
                   <.i(^^.classes("fa", "fa-ellipsis-h"))
                 )
               )

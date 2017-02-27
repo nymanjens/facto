@@ -117,7 +117,7 @@ object LastNEntriesStoreFactoryTest extends TestSuite {
       }
 
       private def maybeComponent: Option[ReactTestWrapper] = {
-        component.maybeChild(clazz = "expand-button")
+        component.maybeChild(clazz = "expand-num-entries", tpe = "button")
       }
     }
   }
