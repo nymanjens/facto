@@ -3,7 +3,7 @@ package flux.react.uielements
 import common.{I18n, LoggingUtils}
 import flux.react.uielements
 import flux.react.uielements.EntriesListTable.NumEntriesStrategy
-import flux.stores.{EntriesStore, EntriesStoreListFactory}
+import flux.stores.{EntriesStore, EntriesListStoreFactory$}
 import japgolly.scalajs.react._
 
 import scala.collection.immutable.Seq
@@ -14,11 +14,11 @@ private final class EntriesListTable[Entry, Props](tableTitle: String,
                                                    tableHeaders: Seq[ReactElement],
                                                    calculateTableData: Entry => Seq[ReactElement],
                                                    props: Props)(
-                                                    implicit entriesStoreFactory: EntriesStoreListFactory[Entry, Props],
+                                                    implicit entriesStoreFactory: EntriesListStoreFactory[Entry, Props],
                                                     i18n: I18n) {
 
   private val component = ReactComponentB[Props](getClass.getSimpleName)
-    .initialState(State(EntriesStoreListFactory.State.empty, maxNumEntries = numEntriesStrategy.start))
+    .initialState(State(EntriesListStoreFactory.State.empty, maxNumEntries = numEntriesStrategy.start))
     .renderBackend[Backend]
     .componentWillMount(scope => scope.backend.willMount(scope.state))
     .componentWillUnmount(scope => scope.backend.willUnmount())
@@ -91,7 +91,7 @@ object EntriesListTable {
                           tableHeaders: Seq[ReactElement],
                           calculateTableData: Entry => Seq[ReactElement],
                           props: Props = (): Unit)(
-                           implicit entriesStoreFactory: EntriesStoreListFactory[Entry, Props],
+                           implicit entriesStoreFactory: EntriesListStoreFactory[Entry, Props],
                            i18n: I18n): ReactElement = {
     new EntriesListTable(
       tableTitle,

@@ -28,19 +28,19 @@ object AllEntriesStoreFactoryTest extends TestSuite {
     }
 
     "store state is updated upon remote update" - {
-      store.state ==> EntriesStoreListFactory.State.empty
+      store.state ==> EntriesListStoreFactory.State.empty
 
       database.addRemotelyAddedEntities(testTransactionWithId)
 
-      store.state ==> EntriesStoreListFactory.State(Seq(GeneralEntry(Seq(testTransactionWithId))), hasMore = false)
+      store.state ==> EntriesListStoreFactory.State(Seq(GeneralEntry(Seq(testTransactionWithId))), hasMore = false)
     }
 
     "store state is updated upon local update" - {
-      store.state ==> EntriesStoreListFactory.State.empty
+      store.state ==> EntriesListStoreFactory.State.empty
 
       database.persistModifications(Seq(EntityModification.Add(testTransactionWithId)))
 
-      store.state ==> EntriesStoreListFactory.State(Seq(GeneralEntry(Seq(testTransactionWithId))), hasMore = false)
+      store.state ==> EntriesListStoreFactory.State(Seq(GeneralEntry(Seq(testTransactionWithId))), hasMore = false)
     }
 
     "store calls listeners" - {
@@ -69,7 +69,7 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       database.addRemotelyAddedEntities(trans1, trans2, trans3)
 
-      store.state ==> EntriesStoreListFactory.State(Seq(
+      store.state ==> EntriesListStoreFactory.State(Seq(
         GeneralEntry(Seq(trans1, trans2)),
         GeneralEntry(Seq(trans3))),
         hasMore = false)
@@ -85,7 +85,7 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       database.addRemotelyAddedEntities(trans3, trans2, trans1)
 
-      store.state ==> EntriesStoreListFactory.State(Seq(
+      store.state ==> EntriesListStoreFactory.State(Seq(
         GeneralEntry(Seq(trans1)),
         GeneralEntry(Seq(trans2)),
         GeneralEntry(Seq(trans3))),
@@ -103,7 +103,7 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       database.addRemotelyAddedEntities(trans1, trans2, trans3, trans4)
 
-      store.state ==> EntriesStoreListFactory.State(Seq(
+      store.state ==> EntriesListStoreFactory.State(Seq(
         GeneralEntry(Seq(trans2)),
         GeneralEntry(Seq(trans3)),
         GeneralEntry(Seq(trans4))),

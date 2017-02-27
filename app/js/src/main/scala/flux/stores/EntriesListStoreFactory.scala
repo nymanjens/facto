@@ -8,8 +8,8 @@ import scala.collection.immutable.Seq
   * @tparam AdditionalInput The (immutable) input type that together with injected dependencies and the max number of
   *                         entries is enough to calculate the latest value of `State`. Example: Int.
   */
-abstract class EntriesStoreListFactory[Entry, AdditionalInput](implicit database: RemoteDatabaseProxy)
-  extends EntriesStoreFactory[EntriesStoreListFactory.State[Entry]] {
+abstract class EntriesListStoreFactory[Entry, AdditionalInput](implicit database: RemoteDatabaseProxy)
+  extends EntriesStoreFactory[EntriesListStoreFactory.State[Entry]] {
 
   // **************** Abstract methods/types ****************//
   protected def createNew(maxNumEntries: Int, input: AdditionalInput): Store
@@ -20,7 +20,7 @@ abstract class EntriesStoreListFactory[Entry, AdditionalInput](implicit database
   /* override */ case class Input(maxNumEntries: Int, additionalInput: AdditionalInput)
 }
 
-object EntriesStoreListFactory {
+object EntriesListStoreFactory {
 
   /**
     * @param entries the latest `maxNumEntries` entries sorted from old to new.
