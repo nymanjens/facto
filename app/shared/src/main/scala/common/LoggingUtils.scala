@@ -9,7 +9,7 @@ object LoggingUtils {
     try {
       codeBlock
     } catch {
-      case t =>
+      case t: Throwable =>
         println(s"  Caught exception: $t")
         t.printStackTrace()
         throw t
