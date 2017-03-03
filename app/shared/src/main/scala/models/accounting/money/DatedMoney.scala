@@ -17,16 +17,6 @@ import scala.collection.JavaConverters._
   */
 case class DatedMoney(override val cents: Long, override val currency: Currency, date: LocalDateTime) extends MoneyWithGeneralCurrency {
 
-  override def toHtmlWithCurrency(implicit exchangeRateManager: ExchangeRateManager): String = {
-    val baseHtml = Money.centsToHtmlWithCurrency(cents, currency)
-    if (currency == Currency.default) {
-      baseHtml
-    } else {
-      val defaultCurrencyHtml = exchangedForReferenceCurrency.toHtmlWithCurrency
-      s"""$baseHtml <span class="reference-currency">$defaultCurrencyHtml</span>"""
-    }
-  }
-
   def exchangedForReferenceCurrency(implicit exchangeRateManager: ExchangeRateManager): ReferenceMoney =
     ReferenceMoney(exchangedForCurrency(Currency.default).cents)
 

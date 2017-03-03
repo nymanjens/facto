@@ -15,7 +15,7 @@ object MoneyWithCurrency {
         case money:DatedMoney if money.currency != Currency.default =>
           val referenceMoney = money.exchangedForReferenceCurrency(props.exchangeRateManager)
           <.span(
-            money.toString,
+            money.toString + " ",
             <.span(^.className := "reference-currency",
               referenceMoney.toString
             )

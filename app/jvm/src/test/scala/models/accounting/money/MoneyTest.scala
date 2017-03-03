@@ -44,10 +44,6 @@ class MoneyTest extends CacheClearingSpecification {
       ReferenceMoney(-8701).formatFloat mustEqual "-87.01"
     }
 
-    "toHtmlWithCurrency" in {
-      ReferenceMoney(-987).toHtmlWithCurrency mustEqual "&euro; -9.87"
-    }
-
     "withDate" in {
       val date = clock.now
       ReferenceMoney(-987).withDate(date) mustEqual DatedMoney(cents = -987, currency = Currency.default, date = date)
@@ -69,11 +65,6 @@ class MoneyTest extends CacheClearingSpecification {
         MoneyWithGeneralCurrency(-222, Currency.Gbp)
       ).sum(numeric) should throwA[IllegalArgumentException]
     }
-
-    "toHtmlWithCurrency" in {
-      MoneyWithGeneralCurrency(-987, Currency.Gbp).toHtmlWithCurrency mustEqual "&pound; -9.87"
-    }
-
   }
 
   "DatedMoney" should {
@@ -90,13 +81,6 @@ class MoneyTest extends CacheClearingSpecification {
       val date = clock.now
       val money = DatedMoney(10, Currency.Gbp, date)
       money.exchangedForCurrency(Currency.default) mustEqual DatedMoney(13, Currency.default, date)
-    }
-
-    "toHtmlWithCurrency" in new WithApplication {
-      persistGbpMeasurement(millisSinceEpoch = 0, ratio = 1.3)
-
-      DatedMoney(10, Currency.Gbp, clock.now).toHtmlWithCurrency mustEqual
-        """&pound; 0.10 <span class="reference-currency">&euro; 0.13</span>"""
     }
   }
 }

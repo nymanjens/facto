@@ -55,8 +55,8 @@
         <td>@entry.moneyReservoirs.map(_.shorterName).mkString(", ")</td>
         <td>@entry.categories.map(_.name).mkString(", ")</td>
         <td>@DescriptionWithEntryCount(entry)</td>
-        <td>@entry.flow.toHtmlWithCurrency</td>
-        <td>@entry.debt.toHtmlWithCurrency</td>
+        <td> @*MoneyWithCurrency(..)*@ @entry.flow</td>
+        <td> @*MoneyWithCurrency(..)*@ @entry.debt</td>
         <td>@TransactionGroupEditButton(entry.groupId)</td>
       }
     }

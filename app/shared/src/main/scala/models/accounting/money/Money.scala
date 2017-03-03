@@ -20,7 +20,6 @@ trait Money {
 
   def cents: Long
   def currency: Currency
-  def toHtmlWithCurrency(implicit exchangeRateManager: ExchangeRateManager): String
 
   final def formatFloat: String = Money.centsToFloatString(cents)
 
@@ -42,8 +41,4 @@ object Money {
 
   def floatToCents(float: Double): Long =
     (float.toDouble * 100).round
-
-  private[money] def centsToHtmlWithCurrency(cents: Long, currency: Currency): String = {
-    currency.symbol + s" ${centsToFloatString(cents)}"
-  }
 }

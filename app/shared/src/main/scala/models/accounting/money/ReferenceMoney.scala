@@ -15,9 +15,6 @@ case class ReferenceMoney(override val cents: Long) extends Money with CentOpera
   override protected def withCents(newCents: Long): ReferenceMoney = copy(cents = newCents)
 
   override protected def validateCentOperation(that: ReferenceMoney): Unit = {}
-
-  override def toHtmlWithCurrency(implicit exchangeRateManager: ExchangeRateManager): String =
-    Money.centsToHtmlWithCurrency(cents, Currency.default)
 }
 
 object ReferenceMoney {

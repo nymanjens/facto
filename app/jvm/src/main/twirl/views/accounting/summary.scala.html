@@ -94,7 +94,7 @@
                             @for(entry <- summaryForYear.cell(category, month).entries) {
                               <div>
                                 <a href="">
-                                  @entry.flow.toHtmlWithCurrency
+                                  @*MoneyWithCurrency(..)*@ @entry.flow
                                   -
                                   @for(tag <- entry.tags) {
                                     <span class="label label-@tag.bootstrapClassSuffix">@tag.name</span>
