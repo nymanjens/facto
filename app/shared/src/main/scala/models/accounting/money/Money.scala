@@ -28,7 +28,7 @@ trait Money {
     DatedMoney(cents, currency, date)
   }
 
-  override def toString = s"${currency.code} $formatFloat"
+  override def toString = s"${currency.symbol} ${Money.centsToFloatString(cents)}"
 }
 
 object Money {

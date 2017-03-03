@@ -4,7 +4,7 @@ import common.Formatting._
 import common.I18n
 import common.time.Clock
 import flux.react.uielements
-import flux.react.uielements.EntriesListTable
+import flux.react.uielements.{EntriesListTable, MoneyWithCurrency}
 import flux.react.uielements.EntriesListTable.NumEntriesStrategy
 import flux.stores.AllEntriesStoreFactory
 import flux.stores.entries.GeneralEntry
@@ -52,7 +52,7 @@ final class Everything(implicit entriesStoreFactory: AllEntriesStoreFactory,
               <.td(entry.moneyReservoirs.map(_.shorterName).mkString(", ")),
               <.td(entry.categories.map(_.name).mkString(", ")),
               <.td(uielements.DescriptionWithEntryCount(entry)),
-              <.td(entry.flow.toHtmlWithCurrency),
+              <.td(uielements.MoneyWithCurrency(entry.flow)),
               <.td(uielements.TransactionGroupEditButton(entry.groupId))
             )
         )
