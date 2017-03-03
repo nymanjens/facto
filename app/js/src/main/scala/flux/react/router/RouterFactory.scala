@@ -17,6 +17,7 @@ object RouterFactory {
   sealed trait Page
   object Page {
     case object EverythingPage extends Page
+    case object NewTransactionGroupPage extends Page
     case object EverythingPage2 extends Page
     case object TestPage extends Page
   }
@@ -34,6 +35,7 @@ object RouterFactory {
         // wrap/connect components to the circuit
         (staticRoute(root, EverythingPage) ~> renderR(ctl => reactAppModule.everything())
           | staticRoute("#everything", EverythingPage2) ~> renderR(ctl => <.div(reactAppModule.everything(), reactAppModule.everything(), reactAppModule.everything()))
+          | staticRoute("#new", NewTransactionGroupPage) ~> renderR(ctl => reactAppModule.transactionGroupForm())
           | staticRoute("#test", TestPage) ~> renderR(ctl => reactAppModule.menu(TestPage, ctl))
           ).notFound(redirectToPage(EverythingPage)(Redirect.Replace))
       }.renderWith(layout)

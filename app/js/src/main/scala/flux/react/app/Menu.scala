@@ -32,7 +32,9 @@ final class Menu(implicit entriesStoreFactory: AllEntriesStoreFactory,
         for ((item, i) <- Menu.menuItems.zipWithIndex) yield {
           <.span(^.key := i, (props.currentPage == item.page) ?= (^.className := "active"),
             props.router.link(item.page)(
-              <.i(^^.classes(item.iconClass), " ", i18n(item.labelKey))
+              <.i(^^.classes(item.iconClass)),
+              " ",
+              i18n(item.labelKey)
             ),
             " - "
           )
@@ -47,6 +49,7 @@ object Menu {
   private val menuItems = Seq(
     MenuItem("Everything", "fa fa-money", Page.EverythingPage),
     MenuItem("Everything2", "fa fa-money", Page.EverythingPage2),
+    MenuItem("New", "icon-new-empty", Page.NewTransactionGroupPage),
     MenuItem("Test", "fa fa-money", Page.TestPage)
   )
 
