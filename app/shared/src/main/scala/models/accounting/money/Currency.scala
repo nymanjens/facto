@@ -23,8 +23,8 @@ object Currency {
   val default: Currency = Eur
 
   private def allCustom: Set[Currency] = Set(Eur, Gbp, Usd)
-  object Eur extends Currency("EUR", "&euro;", Some("fa fa-eur"))
-  object Gbp extends Currency("GBP", "&pound;", Some("fa fa-gbp"))
+  object Eur extends Currency("EUR", "€", Some("fa fa-eur"))
+  object Gbp extends Currency("GBP", "£", Some("fa fa-gbp"))
   object Usd extends Currency("USD", "$", Some("fa fa-usd"))
   case class General(symbol: String) extends Currency(symbol, symbol, None)
 }
