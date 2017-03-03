@@ -10,7 +10,7 @@ import scala.collection.immutable.Seq
 
 object Table {
 
-  private val component = ReactComponentB[Props]("Table")
+  private val component = ReactComponentB[Props](getClass.getSimpleName)
     .renderP((_, props) =>
       <.table(^^.classes(Seq("table", "table-bordered", "table-hover", "table-condensed", "table-overflow-elipsis") ++ props.tableClasses),
         <.thead(

@@ -8,7 +8,7 @@ import japgolly.scalajs.react.vdom.prefix_<^._
 
 object TransactionGroupEditButton {
   private case class Props(groupId: Long, i18n: I18n)
-  private val component = ReactComponentB[Props]("DescriptionWithEntryCount")
+  private val component = ReactComponentB[Props](getClass.getSimpleName)
     .renderP((_, props) => {
       <.a(^^.classes("btn", "btn-default", "btn-xs"),
         ^.href := "#",

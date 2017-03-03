@@ -10,7 +10,7 @@ import scala.collection.immutable.Seq
 
 object DescriptionWithEntryCount {
   private case class Props(entry: GroupedTransactions)
-  private val component = ReactComponentB[Props]("DescriptionWithEntryCount")
+  private val component = ReactComponentB[Props](getClass.getSimpleName)
     .renderP((_, props) => {
       val entry = props.entry
       val tagIndications = entry.tags.map(tag =>

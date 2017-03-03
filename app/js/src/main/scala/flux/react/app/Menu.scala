@@ -26,7 +26,7 @@ final class Menu(implicit entriesStoreFactory: AllEntriesStoreFactory,
   }
 
 
-  private val component = ReactComponentB[Menu.Props]("Menu")
+  private val component = ReactComponentB[Menu.Props](getClass.getSimpleName)
     .render_P { props =>
       <.div(<.b("Menu:"),
         for ((item, i) <- Menu.menuItems.zipWithIndex) yield {

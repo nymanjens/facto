@@ -8,7 +8,7 @@ import scala.collection.immutable.Seq
 
 object Panel {
   private case class Props(title: String, panelClasses: Seq[String])
-  private val component = ReactComponentB[Props]("Panel")
+  private val component = ReactComponentB[Props](getClass.getSimpleName)
     .renderPC((_, props, children) =>
       <.div(^^.classes("row" +: props.panelClasses),
         <.div(^^.classes("col-lg-12"),

@@ -10,7 +10,7 @@ import scala.scalajs.js
 
 object UpperRightCorner {
   private case class Props(cornerContent: Seq[TagMod], centralContent: Seq[TagMod])
-  private val component = ReactComponentB[Props]("UpperRightCorner")
+  private val component = ReactComponentB[Props](getClass.getSimpleName)
     .renderP((_, props) =>
       <.div(^^.classes("upper-right-corner-holder"),
         // Fix for Firefox problem: Background color overwrites
