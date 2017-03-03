@@ -10,10 +10,10 @@ object Panel {
   private case class Props(title: String, panelClasses: Seq[String])
   private val component = ReactComponentB[Props]("Panel")
     .renderPC((_, props, children) =>
-      <.div(^^.classes(Seq("row", "add-toc-level-1") ++ props.panelClasses),
+      <.div(^^.classes("row" +: props.panelClasses),
         <.div(^^.classes("col-lg-12"),
           <.div(^^.classes("panel panel-default"),
-            <.div(^^.classes("panel-heading toc-title"),
+            <.div(^^.classes("panel-heading"),
               props.title
             ),
             <.div(^^.classes("panel-body"),

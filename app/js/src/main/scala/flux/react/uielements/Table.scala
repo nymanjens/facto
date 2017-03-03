@@ -12,11 +12,10 @@ object Table {
 
   private val component = ReactComponentB[Props]("Table")
     .renderP((_, props) =>
-      <.table(^^.classes(Seq("table", "table-bordered", "table-hover", "table-condensed", "table-overflow-elipsis", "add-toc-level-2") ++ props.tableClasses),
+      <.table(^^.classes(Seq("table", "table-bordered", "table-hover", "table-condensed", "table-overflow-elipsis") ++ props.tableClasses),
         <.thead(
           <.tr(^^.classes("info"),
-            <.th(^^.classes("toc-title"),
-              ^.colSpan := props.colSpan,
+            <.th(^.colSpan := props.colSpan,
               props.title
             )
           ),
