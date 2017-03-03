@@ -52,7 +52,7 @@
       <table class="table table-bordered table-hover table-condensed table-summary">
         <thead>
           <tr>
-            <th>(@Currency.default.htmlSymbol)</th>
+            <th>(@Currency.default.symbol)</th>
             @for((year, summaryForYear) <- summary.yearToSummary) {
               <th colspan="@{if(year == expandedYear) summaryForYear.months.size + 1 else 1}">
                 <a href="@controllers.accounting.routes.Views.summaryFor(year, tags=tagsString)">
@@ -119,7 +119,7 @@
               }
             </tr>
           }
-            
+
           @for((totalRowTitle, rowIndex) <- summary.totalRowTitles.zipWithIndex) {
             <tr class="total total-@rowIndex">
               <td class="title">@totalRowTitle</td>

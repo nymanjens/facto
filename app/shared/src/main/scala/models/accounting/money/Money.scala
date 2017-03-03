@@ -44,6 +44,6 @@ object Money {
     (float.toDouble * 100).round
 
   private[money] def centsToHtmlWithCurrency(cents: Long, currency: Currency): String = {
-    currency.htmlSymbol + s" ${centsToFloatString(cents)}"
+    currency.symbol + s" ${centsToFloatString(cents)}"
   }
 }
