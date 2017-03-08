@@ -22,7 +22,10 @@ final class TransactionGroupForm(implicit accountingConfig: Config,
 
   private val component = ReactComponentB[Unit](getClass.getSimpleName)
     .renderPS((_, props, state) =>
-      <.span("test")
+      <.div(
+        AddTransactionPanel(onClick = Callback()),
+        TransactionPanel()
+      )
     ).build
 
   def apply(): ReactElement = {
