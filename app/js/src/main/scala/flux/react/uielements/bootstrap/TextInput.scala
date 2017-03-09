@@ -12,15 +12,30 @@ import scala.collection.immutable.Seq
 
 object TextInput {
 
+  private val component = ReactComponentB[Props](getClass.getSimpleName)
+    .initialState_P(props => props.defaultValue)
+    .renderBackend[Backend]
+    .build
+
+  // **************** API ****************//
+  def apply(ref: Reference): ReactElement = {
+    component.withRef(ref.refComp)(Props("label", "defaultValue"))
+  }
+
+  def ref(name: String): Reference = new Reference(Ref.to(component, name))
+
+  // **************** Inner types ****************//
   private type State = String
+
   private case class Props(label: String, defaultValue: String = "", help: String = "", errorMessage: Option[String] = None)
 
-  final class Reference(private[TextInput] val refComp: RefComp[Props, State, Backend, _ <: TopNode]) {
-    def apply($: BackendScope[_, _]): ComponentProxy = new ComponentProxy(refComp($).get)
-    final class ComponentProxy(private val component: ReactComponentU[Props, State, Backend, _ <: TopNode]) {
-      def value: String = component.state
-      def setValue(string: String): Unit = component.modState(_ => string)
-    }
+  final class Reference private[TextInput](private[TextInput] val refComp: RefComp[Props, State, Backend, _ <: TopNode]) {
+    def apply($: BackendScope[_, _]): ComponentProxy = new ComponentProxy(() => refComp($).get)
+  }
+
+  final class ComponentProxy private[TextInput](private val componentProvider: () => ReactComponentU[Props, State, Backend, _ <: TopNode]) {
+    def value: String = componentProvider().state
+    def setValue(string: String): Unit = componentProvider().modState(_ => string)
   }
 
   private final class Backend($: BackendScope[Props, State]) {
@@ -44,15 +59,4 @@ object TextInput {
       )
     }
   }
-
-  private val component = ReactComponentB[Props](getClass.getSimpleName)
-    .initialState_P(props => props.defaultValue)
-    .renderBackend[Backend]
-    .build
-
-  def apply(ref: Reference): ReactElement = {
-    component.withRef(ref.refComp)(Props("label", "defaultValue"))
-  }
-
-  def ref(name: String): Reference = new Reference(Ref.to(component, name))
 }
