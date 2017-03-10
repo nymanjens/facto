@@ -24,11 +24,7 @@ object TextInput {
 
   def ref(name: String): Reference = new Reference(Ref.to(component, name))
 
-  // **************** Inner types ****************//
-  private type State = String
-
-  private case class Props(label: String, defaultValue: String = "", help: String = "", errorMessage: Option[String] = None)
-
+  // **************** Public inner types ****************//
   final class Reference private[TextInput](private[TextInput] val refComp: RefComp[Props, State, Backend, _ <: TopNode]) {
     def apply($: BackendScope[_, _]): ComponentProxy = new ComponentProxy(() => refComp($).get)
   }
@@ -37,6 +33,12 @@ object TextInput {
     def value: String = componentProvider().state
     def setValue(string: String): Unit = componentProvider().modState(_ => string)
   }
+
+  // **************** Private inner types ****************//
+  private type State = String
+
+  private case class Props(label: String, defaultValue: String = "", help: String = "", errorMessage: Option[String] = None)
+
 
   private final class Backend($: BackendScope[Props, State]) {
     def onChange(e: ReactEventI) = $.setState(e.target.value)
