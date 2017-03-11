@@ -23,6 +23,7 @@ object TextInput {
             defaultValue: String = "",
             help: String = null,
             errorMessage: String = null,
+            inputClasses: Seq[String] = Seq(),
             onChange: String => Callback = _ => Callback(),
             ref: Reference = null): ReactElement = {
     val props = Props(
@@ -31,6 +32,7 @@ object TextInput {
       defaultValue = defaultValue,
       help = Option(help),
       errorMessage = Option(errorMessage),
+      inputClasses=inputClasses,
       onChange = onChange)
     if (ref == null) {
       component(props)
@@ -59,6 +61,7 @@ object TextInput {
                            defaultValue: String,
                            help: Option[String],
                            errorMessage: Option[String],
+                           inputClasses: Seq[String],
                            onChange: String => Callback)
 
   private final class Backend($: BackendScope[Props, State]) {
@@ -76,7 +79,7 @@ object TextInput {
           ^.className := "col-sm-8",
           <.input(
             ^.tpe := "text",
-            ^.className := "form-control",
+            ^^.classes("form-control" +: props.inputClasses),
             ^.id := props.name,
             ^.name := props.name,
             ^.value := state,
