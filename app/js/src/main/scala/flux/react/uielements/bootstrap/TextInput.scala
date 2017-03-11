@@ -18,8 +18,25 @@ object TextInput {
     .build
 
   // **************** API ****************//
-  def apply(ref: Reference): ReactElement = {
-    component.withRef(ref.refComp)(Props("label", "defaultValue"))
+  def apply(label: String,
+            name: String,
+            defaultValue: String = "",
+            help: String = null,
+            errorMessage: String = null,
+            onChange: String => Callback = _ => Callback(),
+            ref: Reference = null): ReactElement = {
+    val props = Props(
+      label = label,
+      name = name,
+      defaultValue = defaultValue,
+      help = Option(help),
+      errorMessage = Option(errorMessage),
+      onChange = onChange)
+    if (ref == null) {
+      component(props)
+    } else {
+      component.withRef(ref.refComp)(props)
+    }
   }
 
   def ref(name: String): Reference = new Reference(Ref.to(component, name))
@@ -37,26 +54,39 @@ object TextInput {
   // **************** Private inner types ****************//
   private type State = String
 
-  private case class Props(label: String, defaultValue: String = "", help: String = "", errorMessage: Option[String] = None)
-
+  private case class Props(label: String,
+                           name: String,
+                           defaultValue: String,
+                           help: Option[String],
+                           errorMessage: Option[String],
+                           onChange: String => Callback)
 
   private final class Backend($: BackendScope[Props, State]) {
-    def onChange(e: ReactEventI) = $.setState(e.target.value)
+    def onChange(e: ReactEventI): Callback = Callback {
+      val newValue = e.target.value
+      $.props.runNow().onChange(newValue).runNow()
+      $.setState(newValue).runNow()
+    }
 
     def render(props: Props, state: State) = LoggingUtils.logExceptions {
-      <.div(^.className := "form-group @if(field.hasErrors) {has-error}",
+      <.div(
+        ^^.classes("form-group", props.errorMessage.map(_ => "has-error") getOrElse ""),
         <.label(^.className := "col-sm-4 control-label", props.label),
-        <.div(^.className := "col-sm-8",
+        <.div(
+          ^.className := "col-sm-8",
           <.input(
             ^.tpe := "text",
             ^.className := "form-control",
-            ^.id := "@field.id",
-            ^.name := "@field.name",
+            ^.id := props.name,
+            ^.name := props.name,
             ^.value := state,
-            ^.placeholder := "@placeholder",
             ^.onChange ==> onChange),
-          <.span(^.className := "help-block", props.help),
-          <.span(^.className := "help-block", props.errorMessage)
+          ^^.ifThen(props.help) { msg =>
+            <.span(^.className := "help-block", msg)
+          },
+          ^^.ifThen(props.errorMessage) { msg =>
+            <.span(^.className := "help-block", msg)
+          }
         )
       )
     }

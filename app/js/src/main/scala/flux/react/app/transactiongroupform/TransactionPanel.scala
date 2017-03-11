@@ -20,7 +20,7 @@ object TransactionPanel {
       HalfPanel(
         title = <.span(props.title),
         closeButtonCallback = props.deleteButtonCallback)(
-        uielements.bootstrap.TextInput(priceRef),
+        uielements.bootstrap.TextInput("label", "price", ref = priceRef),
         <.button(
           ^.onClick --> Callback {
             priceRef($).setValue("test value")
