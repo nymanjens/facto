@@ -6,7 +6,7 @@ import flux.react.ReactVdomUtils.^^
 
 import scala.collection.immutable.Seq
 
-object HalfPanel {
+private[transactiongroupform] object HalfPanel {
   private case class Props(title: ReactElement, panelClasses: Seq[String], closeButtonCallback: Option[Callback])
   private val component = ReactComponentB[Props](getClass.getSimpleName)
     .renderPC((_, props, children) =>

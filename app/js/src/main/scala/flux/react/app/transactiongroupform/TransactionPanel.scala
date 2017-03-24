@@ -9,11 +9,11 @@ import org.scalajs.dom.raw.HTMLInputElement
 
 import scala.collection.immutable.Seq
 
-object TransactionPanel {
+private[transactiongroupform] object TransactionPanel {
   private case class Props(title: String, deleteButtonCallback: Option[Callback], i18n: I18n)
 
   private val price1Ref = uielements.bootstrap.TextInput.ref("price1")
-  private val price2Ref = uielements.bootstrap.TextInput.ref("price2")
+  private val price2Ref = InputWithDefaultFromReference.ref("price2")
 
   private class Backend($: BackendScope[Props, Unit]) {
 
@@ -22,17 +22,16 @@ object TransactionPanel {
         title = <.span(props.title),
         closeButtonCallback = props.deleteButtonCallback)(
         uielements.bootstrap.TextInput("label", "price 1", ref = price1Ref),
-        DefaultFromReference(
-          inputElementRef = price2Ref,
-          defaultValueRef = price1Ref)(extraProps =>
+        InputWithDefaultFromReference(
+          ref = price2Ref,
+          defaultValueProxy = price1Ref($))(extraProps =>
           uielements.bootstrap.TextInput(
             "label", "price 2", inputClasses = extraProps.inputClasses, ref = extraProps.ref)
         ),
         <.button(
           ^.onClick --> Callback {
-            price1Ref($).setValue("test value")
             println("  Price 1:" + price1Ref($).value)
-            println("  Price 2:" + price2Ref($).value)
+            println("  Price 2:" + price2Ref($).input.value)
           },
           "Test button"
         )
