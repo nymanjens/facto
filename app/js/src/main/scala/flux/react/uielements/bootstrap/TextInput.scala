@@ -13,7 +13,7 @@ import scala.collection.immutable.Seq
 object TextInput {
 
   private val component = ReactComponentB[Props](getClass.getSimpleName)
-    .initialState_P(props => props.defaultValue)
+    .initialState_P[State](props => State(value = props.defaultValue))
     .renderBackend[Backend]
     .build
 
@@ -24,7 +24,6 @@ object TextInput {
             help: String = null,
             errorMessage: String = null,
             inputClasses: Seq[String] = Seq(),
-            onChange: String => Callback = _ => Callback(),
             ref: Reference = null): ReactElement = {
     val props = Props(
       label = label,
@@ -32,8 +31,7 @@ object TextInput {
       defaultValue = defaultValue,
       help = Option(help),
       errorMessage = Option(errorMessage),
-      inputClasses=inputClasses,
-      onChange = onChange)
+      inputClasses = inputClasses)
     if (ref == null) {
       component(props)
     } else {
@@ -49,26 +47,38 @@ object TextInput {
   }
 
   final class ComponentProxy private[TextInput](private val componentProvider: () => ReactComponentU[Props, State, Backend, _ <: TopNode]) {
-    def value: String = componentProvider().state
-    def setValue(string: String): Unit = componentProvider().modState(_ => string)
+    def value: String = componentProvider().state.value
+    def setValue(string: String): Unit = componentProvider().modState(_.withValue(string))
+    def registerListener(listener: InputListener): Unit = componentProvider().modState(_.withListener(listener))
+    def deregisterListener(listener: InputListener): Unit = componentProvider().modState(_.withoutListener(listener))
+  }
+
+  trait InputListener {
+    /** Gets called every time this field gets updated. This includes updates that are not done by the user. */
+    def onChange(newValue: String): Callback
   }
 
   // **************** Private inner types ****************//
-  private type State = String
+  private case class State(value: String, listeners: Seq[InputListener] = Seq()) {
+    def withValue(newValue: String): State = copy(value = newValue)
+    def withListener(listener: InputListener): State = copy(listeners = listeners :+ listener)
+    def withoutListener(listener: InputListener): State = copy(listeners = listeners.filter(_ != listener))
+  }
 
   private case class Props(label: String,
                            name: String,
                            defaultValue: String,
                            help: Option[String],
                            errorMessage: Option[String],
-                           inputClasses: Seq[String],
-                           onChange: String => Callback)
+                           inputClasses: Seq[String])
 
   private final class Backend($: BackendScope[Props, State]) {
     def onChange(e: ReactEventI): Callback = Callback {
       val newValue = e.target.value
-      $.props.runNow().onChange(newValue).runNow()
-      $.setState(newValue).runNow()
+      for (listener <- $.state.runNow().listeners) {
+        listener.onChange(newValue).runNow()
+      }
+      $.modState(_.withValue(newValue)).runNow()
     }
 
     def render(props: Props, state: State) = LoggingUtils.logExceptions {
@@ -82,7 +92,7 @@ object TextInput {
             ^^.classes("form-control" +: props.inputClasses),
             ^.id := props.name,
             ^.name := props.name,
-            ^.value := state,
+            ^.value := state.value,
             ^.onChange ==> onChange),
           ^^.ifThen(props.help) { msg =>
             <.span(^.className := "help-block", msg)
