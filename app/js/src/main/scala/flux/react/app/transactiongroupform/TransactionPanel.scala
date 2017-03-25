@@ -10,14 +10,28 @@ import org.scalajs.dom.raw.HTMLInputElement
 import scala.collection.immutable.Seq
 
 private[transactiongroupform] object TransactionPanel {
-  private case class Props(title: String, deleteButtonCallback: Option[Callback], i18n: I18n)
 
   private val price1Ref = uielements.bootstrap.TextInput.ref("price1")
   private val price2Ref = InputWithDefaultFromReference.ref("price2")
+  private val component = ReactComponentB[Props](getClass.getSimpleName)
+    .renderBackend[Backend]
+    .build
 
-  private class Backend($: BackendScope[Props, Unit]) {
+  // **************** API ****************//
+  def apply(key: Int, closeButtonCallback: Option[Callback] = None)(implicit i18n: I18n): ReactElement = {
+    component.withKey(key)(Props("testTitle", closeButtonCallback, i18n))
+  }
 
-    def render(props: Props, state: Unit) = LoggingUtils.logExceptions {
+  // **************** Private inner types ****************//
+  private type State = Unit
+
+  private case class Props(title: String,
+                           deleteButtonCallback: Option[Callback],
+                           i18n: I18n)
+
+  private class Backend($: BackendScope[Props, State]) {
+
+    def render(props: Props, state: State) = LoggingUtils.logExceptions {
       HalfPanel(
         title = <.span(props.title),
         closeButtonCallback = props.deleteButtonCallback)(
@@ -37,12 +51,5 @@ private[transactiongroupform] object TransactionPanel {
         )
       )
     }
-  }
-  private val component = ReactComponentB[Props](getClass.getSimpleName)
-    .renderBackend[Backend]
-    .build
-
-  def apply(closeButtonCallback: Option[Callback] = None)(implicit i18n: I18n): ReactElement = {
-    component(Props("testTitle", closeButtonCallback, i18n))
   }
 }

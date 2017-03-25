@@ -1,5 +1,7 @@
 package flux.react.uielements.bootstrap
 
+import java.util.NoSuchElementException
+
 import common.LoggingUtils
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
@@ -50,7 +52,13 @@ object TextInput {
     def value: String = componentProvider().state.value
     def setValue(string: String): Unit = componentProvider().modState(_.withValue(string))
     def registerListener(listener: InputListener): Unit = componentProvider().modState(_.withListener(listener))
-    def deregisterListener(listener: InputListener): Unit = componentProvider().modState(_.withoutListener(listener))
+    def deregisterListener(listener: InputListener): Unit = {
+      try {
+        componentProvider().modState(_.withoutListener(listener))
+      } catch {
+        case _: NoSuchElementException => // Ignore the case this component no longer exists
+      }
+    }
   }
 
   trait InputListener {

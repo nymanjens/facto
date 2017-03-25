@@ -21,7 +21,7 @@ final class TransactionGroupForm(implicit accountingConfig: Config,
                                  i18n: I18n) {
 
   private val component = ReactComponentB[Props](getClass.getSimpleName)
-    .initialState[State](State(numberOfTransactionPanels = 2))
+    .initialState[State](State(panelIndices = Seq(0, 1)))
     .renderBackend[Backend]
     .build
 
@@ -31,9 +31,9 @@ final class TransactionGroupForm(implicit accountingConfig: Config,
   }
 
   // **************** Private inner types ****************//
-  private case class State(numberOfTransactionPanels: Int) {
-    def plusPanel(): State = copy(numberOfTransactionPanels = numberOfTransactionPanels + 1)
-    def minusPanel(): State = copy(numberOfTransactionPanels = numberOfTransactionPanels + 1)
+  private case class State(panelIndices: Seq[Int]) {
+    def plusPanel(): State = copy(panelIndices = panelIndices :+ panelIndices.max + 1)
+    def minusPanelIndex(index: Int): State = copy(panelIndices = panelIndices.filter(_ != index))
   }
 
   private case class Props()
@@ -43,8 +43,16 @@ final class TransactionGroupForm(implicit accountingConfig: Config,
     def render(props: Props, state: State) = LoggingUtils.logExceptions {
       <.div(
         ^.className := "transaction-group-form",
-        for (i <- 0 until state.numberOfTransactionPanels) yield {
-          TransactionPanel()
+        for (panelIndex <- state.panelIndices) yield {
+          TransactionPanel(
+            key = panelIndex,
+            closeButtonCallback = {
+              if (panelIndex == state.panelIndices.head) {
+                None
+              } else {
+                Some(removeTransactionPanel(panelIndex))
+              }
+            })
         },
         AddTransactionPanel(onClick = addTransactionPanel())
       )
@@ -53,6 +61,12 @@ final class TransactionGroupForm(implicit accountingConfig: Config,
     private def addTransactionPanel(): Callback = Callback {
       LoggingUtils.logExceptions {
         $.modState(_.plusPanel()).runNow()
+      }
+    }
+
+    private def removeTransactionPanel(index: Int): Callback = Callback {
+      LoggingUtils.logExceptions {
+        $.modState(_.minusPanelIndex(index)).runNow()
       }
     }
   }
