@@ -81,8 +81,8 @@ private[transactiongroupform] object TransactionPanel {
           ^.onClick --> Callback {
             println("  Price 1:" + price1Ref($).value)
             println("  Price 2:" + price2Ref($).input.value)
-            println("  Price 3:" + price3Ref($).input.value)
             for (panel <- props.defaultPanel) {
+              println("  Price 3:" + price3Ref($).input.value)
               println("  Panel.price:" + panel.price.value)
             }
           },
