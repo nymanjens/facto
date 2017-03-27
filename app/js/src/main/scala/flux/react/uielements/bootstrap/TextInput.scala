@@ -21,7 +21,6 @@ object TextInput {
 
   // **************** API ****************//
   def apply(label: String,
-            name: String,
             defaultValue: String = "",
             help: String = null,
             errorMessage: String = null,
