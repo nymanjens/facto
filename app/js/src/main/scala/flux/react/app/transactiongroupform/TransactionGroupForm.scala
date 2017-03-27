@@ -30,6 +30,9 @@ final class TransactionGroupForm(implicit accountingConfig: Config,
     component(Props())
   }
 
+  // **************** Private helper methods ****************//
+  private def panelRef(panelIndex: Int): TransactionPanel.Reference = TransactionPanel.ref(s"panel_$panelIndex")
+
   // **************** Private inner types ****************//
   private case class State(panelIndices: Seq[Int]) {
     def plusPanel(): State = copy(panelIndices = panelIndices :+ panelIndices.max + 1)
@@ -43,16 +46,15 @@ final class TransactionGroupForm(implicit accountingConfig: Config,
     def render(props: Props, state: State) = LoggingUtils.logExceptions {
       <.div(
         ^.className := "transaction-group-form",
-        for (panelIndex <- state.panelIndices) yield {
+        for ((panelIndex, i) <- state.panelIndices.zipWithIndex) yield {
+          val firstPanel = state.panelIndices.head
           TransactionPanel(
             key = panelIndex,
-            closeButtonCallback = {
-              if (panelIndex == state.panelIndices.head) {
-                None
-              } else {
-                Some(removeTransactionPanel(panelIndex))
-              }
-            })
+            ref = panelRef(panelIndex),
+            title = i18n("facto.transaction") + " " + (i + 1),
+            defaultPanel = if (panelIndex == firstPanel) None else Some(panelRef(panelIndex = firstPanel)($)),
+            closeButtonCallback = if (panelIndex == firstPanel) None else Some(removeTransactionPanel(panelIndex))
+          )
         },
         AddTransactionPanel(onClick = addTransactionPanel())
       )

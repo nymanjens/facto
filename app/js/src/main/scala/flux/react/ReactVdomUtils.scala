@@ -1,6 +1,6 @@
 package flux.react
 
-import japgolly.scalajs.react.ReactElement
+import japgolly.scalajs.react.{ReactElement, ReactNode}
 import japgolly.scalajs.react.vdom.TagMod
 import japgolly.scalajs.react.vdom.prefix_<^._
 
@@ -18,8 +18,21 @@ object ReactVdomUtils {
         Seq()
       }
     }
-
     def ifThen[T](option: Option[T])(thenElement: T => TagMod): TagMod = {
+      ifThen(option.isDefined)(thenElement(option.get))
+    }
+  }
+
+  object << {
+    def ifThen(cond: Boolean)(thenElement: => ReactNode): ReactNode = {
+      if (cond) {
+        thenElement
+      } else {
+        Seq()
+      }
+    }
+
+    def ifThen[T](option: Option[T])(thenElement: T => ReactNode): ReactNode = {
       ifThen(option.isDefined)(thenElement(option.get))
     }
   }

@@ -5,7 +5,7 @@ import java.util.NoSuchElementException
 import common.LoggingUtils
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
-import flux.react.ReactVdomUtils.^^
+import flux.react.ReactVdomUtils.{^^, <<}
 import japgolly.scalajs.react.ReactComponentC.ReqProps
 import org.scalajs.dom.raw.HTMLInputElement
 import japgolly.scalajs.react.TopNode
@@ -29,7 +29,7 @@ object TextInput {
             ref: Reference = null): ReactElement = {
     val props = Props(
       label = label,
-      name = name,
+      name = ref.refComp.name,
       defaultValue = defaultValue,
       help = Option(help),
       errorMessage = Option(errorMessage),
@@ -102,10 +102,10 @@ object TextInput {
             ^.name := props.name,
             ^.value := state.value,
             ^.onChange ==> onChange),
-          ^^.ifThen(props.help) { msg =>
+          <<.ifThen(props.help) { msg =>
             <.span(^.className := "help-block", msg)
           },
-          ^^.ifThen(props.errorMessage) { msg =>
+          <<.ifThen(props.errorMessage) { msg =>
             <.span(^.className := "help-block", msg)
           }
         )

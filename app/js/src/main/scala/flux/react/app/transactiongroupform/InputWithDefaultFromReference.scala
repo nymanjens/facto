@@ -3,7 +3,7 @@ package flux.react.app.transactiongroupform
 import common.LoggingUtils
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
-import flux.react.ReactVdomUtils.^^
+import flux.react.ReactVdomUtils.{^^, <<}
 import japgolly.scalajs.react.ReactComponentC.ReqProps
 import flux.react.uielements.bootstrap.TextInput
 import org.scalajs.dom.raw.HTMLInputElement
@@ -21,12 +21,12 @@ private[transactiongroupform] object InputWithDefaultFromReference {
     .build
 
   // **************** API ****************//
-  def apply(ref: InputWithDefaultFromReference.Reference,
-            defaultValueProxy: TextInput.ComponentProxy
+  def apply(ref: Reference,
+            defaultValueProxy: => TextInput.ComponentProxy
            )(inputElementFactory: InputElementExtraProps => ReactElement): ReactElement = {
     component.withRef(ref.refComp)(Props(
       inputElementRef = TextInput.ref(ref.refComp.name + "_input"),
-      defaultValueProxy,
+      () => defaultValueProxy,
       inputElementFactory))
   }
 
@@ -40,14 +40,16 @@ private[transactiongroupform] object InputWithDefaultFromReference {
   }
 
   final class ComponentProxy private[InputWithDefaultFromReference](private val componentProvider: () => ReactComponentU[Props, State, Backend, _ <: TopNode]) {
-    def input: TextInput.ComponentProxy = componentProvider().props.inputElementRef(componentProvider().backend.$)
+    def input: TextInput.ComponentProxy = componentProvider().props.inputElementRef(componentScope)
+
+    private def componentScope: BackendScope[Props, State] = componentProvider().backend.$
   }
 
   // **************** Private inner types ****************//
   private type State = ConnectionState
 
   private case class Props(inputElementRef: TextInput.Reference,
-                           defaultValueProxy: TextInput.ComponentProxy,
+                           defaultValueProxy: () => TextInput.ComponentProxy,
                            inputElementFactory: InputElementExtraProps => ReactElement)
 
   private final class Backend(val $: BackendScope[Props, State]) {
@@ -55,14 +57,14 @@ private[transactiongroupform] object InputWithDefaultFromReference {
     def didMount(props: Props): Callback = Callback {
       LoggingUtils.logExceptions {
         props.inputElementRef($).registerListener(InputValueListener)
-        props.defaultValueProxy.registerListener(DefaultValueListener)
+        props.defaultValueProxy().registerListener(DefaultValueListener)
       }
     }
 
     def willUnmount(props: Props): Callback = Callback {
       LoggingUtils.logExceptions {
         props.inputElementRef($).deregisterListener(InputValueListener)
-        props.defaultValueProxy.deregisterListener(DefaultValueListener)
+        props.defaultValueProxy().deregisterListener(DefaultValueListener)
       }
     }
 
@@ -74,7 +76,7 @@ private[transactiongroupform] object InputWithDefaultFromReference {
     private object InputValueListener extends TextInput.InputListener {
       override def onChange(newInputValue: String) = Callback {
         LoggingUtils.logExceptions {
-          val defaultValue = $.props.runNow().defaultValueProxy.value
+          val defaultValue = $.props.runNow().defaultValueProxy().value
           $.setState(ConnectionState(isConnected = defaultValue == newInputValue)).runNow()
         }
       }

@@ -2,7 +2,7 @@ package flux.react.app.transactiongroupform
 
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
-import flux.react.ReactVdomUtils.^^
+import flux.react.ReactVdomUtils.{^^, <<}
 
 import scala.collection.immutable.Seq
 
@@ -14,7 +14,7 @@ private[transactiongroupform] object HalfPanel {
         <.div(^^.classes("panel panel-default"),
           <.div(^^.classes("panel-heading"),
             props.title,
-            ^^.ifThen(props.closeButtonCallback.isDefined) {
+            <<.ifThen(props.closeButtonCallback.isDefined) {
               <.div(
                 ^.className := "pull-right",
                 <.button(
