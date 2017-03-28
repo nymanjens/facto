@@ -26,7 +26,7 @@ private[transactiongroupform] object InputWithDefaultFromReference {
             defaultValueProxy: => InputBase.Proxy
            )(inputElementFactory: InputElementExtraProps => ReactElement): ReactElement = {
     component.withRef(ref.name)(Props(
-      inputElementRef = TextInput.ref(ref.name + "_input"),
+      inputElementRef = TextInput.ref("delegate"),
       () => defaultValueProxy,
       inputElementFactory))
   }
