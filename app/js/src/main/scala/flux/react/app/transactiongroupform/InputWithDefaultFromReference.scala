@@ -1,20 +1,14 @@
 package flux.react.app.transactiongroupform
 
 import common.LoggingUtils
-import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.prefix_<^._
-import flux.react.ReactVdomUtils.{<<, ^^}
 import flux.react.uielements.InputBase
-import japgolly.scalajs.react.ReactComponentC.ReqProps
-import flux.react.uielements.bootstrap.TextInput
-import org.scalajs.dom.raw.HTMLInputElement
-import japgolly.scalajs.react.TopNode
+import japgolly.scalajs.react.{TopNode, _}
 
 import scala.collection.immutable.Seq
 
 private[transactiongroupform] object InputWithDefaultFromReference {
 
-  private val component = ReactComponentB[Props](getClass.getSimpleName)
+  private val component = ReactComponentB[Props.any](getClass.getSimpleName)
     .initialState[State](ConnectionState.connectedToDefault)
     .renderBackend[Backend]
     .componentDidMount(scope => scope.backend.didMount(scope.props))
@@ -22,11 +16,12 @@ private[transactiongroupform] object InputWithDefaultFromReference {
     .build
 
   // **************** API ****************//
-  def apply(ref: Reference,
-            defaultValueProxy: => InputBase.Proxy
-           )(inputElementFactory: InputElementExtraProps => ReactElement): ReactElement = {
+  def apply[DelegateRef <: InputBase.Reference](ref: Reference,
+                                                defaultValueProxy: => InputBase.Proxy,
+                                                nameToDelegateRef: String => DelegateRef
+                                               )(inputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement): ReactElement = {
     component.withRef(ref.name)(Props(
-      inputElementRef = TextInput.ref("delegate"),
+      inputElementRef = nameToDelegateRef("delegate"),
       () => defaultValueProxy,
       inputElementFactory))
   }
@@ -34,7 +29,8 @@ private[transactiongroupform] object InputWithDefaultFromReference {
   def ref(name: String): Reference = new Reference(Ref.to(component, name))
 
   // **************** Public inner types ****************//
-  case class InputElementExtraProps(ref: TextInput.Reference, inputClasses: Seq[String])
+  case class InputElementExtraProps[DelegateRef <: InputBase.Reference](ref: DelegateRef,
+                                                                        inputClasses: Seq[String])
 
   final class Reference private[InputWithDefaultFromReference](refComp: ThisRefComp) extends InputBase.Reference {
     override def apply($: BackendScope[_, _]) = {
@@ -48,33 +44,39 @@ private[transactiongroupform] object InputWithDefaultFromReference {
   }
 
   // **************** Private inner types ****************//
-  private type ThisRefComp = RefComp[Props, State, Backend, _ <: TopNode]
+  private type ThisRefComp = RefComp[Props.any, State, Backend, _ <: TopNode]
 
   private type State = ConnectionState
 
-  private case class Props(inputElementRef: TextInput.Reference,
-                           defaultValueProxy: () => InputBase.Proxy,
-                           inputElementFactory: InputElementExtraProps => ReactElement)
+  private case class Props[DelegateRef <: InputBase.Reference](inputElementRef: DelegateRef,
+                                                               defaultValueProxy: () => InputBase.Proxy,
+                                                               inputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement)
+  private object Props {
+    type any = Props[_ <: InputBase.Reference]
+  }
 
-  private final class Backend(val $: BackendScope[Props, State]) {
+  private final class Backend(val $: BackendScope[Props.any, State]) {
 
-    def didMount(props: Props): Callback = Callback {
+    def didMount(props: Props.any): Callback = Callback {
       LoggingUtils.logExceptions {
         props.inputElementRef($).registerListener(InputValueListener)
         props.defaultValueProxy().registerListener(DefaultValueListener)
       }
     }
 
-    def willUnmount(props: Props): Callback = Callback {
+    def willUnmount(props: Props.any): Callback = Callback {
       LoggingUtils.logExceptions {
         props.inputElementRef($).deregisterListener(InputValueListener)
         props.defaultValueProxy().deregisterListener(DefaultValueListener)
       }
     }
 
-    def render(props: Props, state: State) = LoggingUtils.logExceptions {
-      val inputClasses = if (state.isConnected) Seq("bound-until-change") else Seq()
-      props.inputElementFactory(InputElementExtraProps(props.inputElementRef, inputClasses))
+    def render(props: Props.any, state: State) = LoggingUtils.logExceptions {
+      def renderInternal[DelegateRef <: InputBase.Reference](props: Props[DelegateRef]) = {
+        val inputClasses = if (state.isConnected) Seq("bound-until-change") else Seq()
+        props.inputElementFactory(InputElementExtraProps(props.inputElementRef, inputClasses))
+      }
+      renderInternal(props)
     }
 
     private object InputValueListener extends InputBase.Listener {

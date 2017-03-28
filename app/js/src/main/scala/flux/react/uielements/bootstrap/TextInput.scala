@@ -21,12 +21,12 @@ object TextInput {
     .build
 
   // **************** API ****************//
-  def apply(label: String,
+  def apply(ref: Reference,
+            label: String,
             defaultValue: String = "",
             help: String = null,
             errorMessage: String = null,
-            inputClasses: Seq[String] = Seq(),
-            ref: Reference = null): ReactElement = {
+            inputClasses: Seq[String] = Seq()): ReactElement = {
     val props = Props(
       label = label,
       name = ref.name,

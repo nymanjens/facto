@@ -61,21 +61,23 @@ private[transactiongroupform] object TransactionPanel {
       HalfPanel(
         title = <.span(props.title),
         closeButtonCallback = props.deleteButtonCallback)(
-        uielements.bootstrap.TextInput("price 1", ref = price1Ref),
+        uielements.bootstrap.TextInput(ref = price1Ref, label = "price 1"),
         InputWithDefaultFromReference(
           ref = price2Ref,
-          defaultValueProxy = price1Ref($)) {
+          defaultValueProxy = price1Ref($),
+          nameToDelegateRef = uielements.bootstrap.TextInput.ref) {
           extraProps =>
             uielements.bootstrap.TextInput(
-              "price 2", inputClasses = extraProps.inputClasses, ref = extraProps.ref)
+              ref = extraProps.ref, label = "price 2", inputClasses = extraProps.inputClasses)
         },
         <<.ifThen(props.defaultPanel) { panelProxy =>
           InputWithDefaultFromReference(
             ref = price3Ref,
-            defaultValueProxy = panelProxy.price) {
+            defaultValueProxy = panelProxy.price,
+            nameToDelegateRef = uielements.bootstrap.TextInput.ref) {
             extraProps =>
               uielements.bootstrap.TextInput(
-                "price 3", inputClasses = extraProps.inputClasses, ref = extraProps.ref)
+                ref = extraProps.ref, label = "price 3", inputClasses = extraProps.inputClasses)
           }
         },
         <.button(
