@@ -22,7 +22,7 @@ private[transactiongroupform] object InputWithDefaultFromReference {
 
   // **************** API ****************//
   def apply(ref: Reference,
-            defaultValueProxy: => TextInput.ComponentProxy
+            defaultValueProxy: => TextInput.Proxy
            )(inputElementFactory: InputElementExtraProps => ReactElement): ReactElement = {
     component.withRef(ref.refComp)(Props(
       inputElementRef = TextInput.ref(ref.refComp.name + "_input"),
@@ -36,11 +36,11 @@ private[transactiongroupform] object InputWithDefaultFromReference {
   case class InputElementExtraProps(ref: TextInput.Reference, inputClasses: Seq[String])
 
   final class Reference private[InputWithDefaultFromReference](private[InputWithDefaultFromReference] val refComp: RefComp[Props, State, Backend, _ <: TopNode]) {
-    def apply($: BackendScope[_, _]): ComponentProxy = new ComponentProxy(() => refComp($).get)
+    def apply($: BackendScope[_, _]): Proxy = new Proxy(() => refComp($).get)
   }
 
-  final class ComponentProxy private[InputWithDefaultFromReference](private val componentProvider: () => ReactComponentU[Props, State, Backend, _ <: TopNode]) {
-    def input: TextInput.ComponentProxy = componentProvider().props.inputElementRef(componentScope)
+  final class Proxy private[InputWithDefaultFromReference](private val componentProvider: () => ReactComponentU[Props, State, Backend, _ <: TopNode]) {
+    def input: TextInput.Proxy = componentProvider().props.inputElementRef(componentScope)
 
     private def componentScope: BackendScope[Props, State] = componentProvider().backend.$
   }
@@ -49,7 +49,7 @@ private[transactiongroupform] object InputWithDefaultFromReference {
   private type State = ConnectionState
 
   private case class Props(inputElementRef: TextInput.Reference,
-                           defaultValueProxy: () => TextInput.ComponentProxy,
+                           defaultValueProxy: () => TextInput.Proxy,
                            inputElementFactory: InputElementExtraProps => ReactElement)
 
   private final class Backend(val $: BackendScope[Props, State]) {

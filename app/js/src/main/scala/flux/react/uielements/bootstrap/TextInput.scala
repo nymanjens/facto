@@ -44,10 +44,10 @@ object TextInput {
 
   // **************** Public inner types ****************//
   final class Reference private[TextInput](private[TextInput] val refComp: RefComp[Props, State, Backend, _ <: TopNode]) {
-    def apply($: BackendScope[_, _]): ComponentProxy = new ComponentProxy(() => refComp($).get)
+    def apply($: BackendScope[_, _]): Proxy = new Proxy(() => refComp($).get)
   }
 
-  final class ComponentProxy private[TextInput](private val componentProvider: () => ReactComponentU[Props, State, Backend, _ <: TopNode]) {
+  final class Proxy private[TextInput](private val componentProvider: () => ReactComponentU[Props, State, Backend, _ <: TopNode]) {
     def value: String = componentProvider().state.value
     def setValue(string: String): Unit = componentProvider().modState(_.withValue(string))
     def registerListener(listener: InputListener): Unit = componentProvider().modState(_.withListener(listener))

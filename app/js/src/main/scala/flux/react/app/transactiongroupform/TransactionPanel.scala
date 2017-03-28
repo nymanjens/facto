@@ -22,7 +22,7 @@ private[transactiongroupform] object TransactionPanel {
   def apply(key: Int,
             ref: Reference,
             title: String,
-            defaultPanel: Option[ComponentProxy],
+            defaultPanel: Option[Proxy],
             closeButtonCallback: Option[Callback] = None)(implicit i18n: I18n): ReactElement = {
     val props = Props(
       title,
@@ -36,11 +36,11 @@ private[transactiongroupform] object TransactionPanel {
 
   // **************** Public inner types ****************//
   final class Reference private[TransactionPanel](private[TransactionPanel] val refComp: RefComp[Props, State, Backend, _ <: TopNode]) {
-    def apply($: BackendScope[_, _]): ComponentProxy = new ComponentProxy(() => refComp($).get)
+    def apply($: BackendScope[_, _]): Proxy = new Proxy(() => refComp($).get)
   }
 
-  final class ComponentProxy private[TransactionPanel](private val componentProvider: () => ReactComponentU[Props, State, Backend, _ <: TopNode]) {
-    def price: uielements.bootstrap.TextInput.ComponentProxy = price2Ref(componentScope).input
+  final class Proxy private[TransactionPanel](private val componentProvider: () => ReactComponentU[Props, State, Backend, _ <: TopNode]) {
+    def price: uielements.bootstrap.TextInput.Proxy = price2Ref(componentScope).input
 
     private def componentScope: BackendScope[Props, State] = componentProvider().backend.$
   }
@@ -50,7 +50,7 @@ private[transactiongroupform] object TransactionPanel {
   private type State = Unit
 
   private case class Props(title: String,
-                           defaultPanel: Option[ComponentProxy],
+                           defaultPanel: Option[Proxy],
                            deleteButtonCallback: Option[Callback],
                            i18n: I18n)
 
