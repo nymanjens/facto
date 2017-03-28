@@ -2,6 +2,7 @@ package flux.react.uielements.bootstrap
 
 import java.util.NoSuchElementException
 
+import flux.react.uielements.InputBase
 import common.LoggingUtils
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
@@ -28,7 +29,7 @@ object TextInput {
             ref: Reference = null): ReactElement = {
     val props = Props(
       label = label,
-      name = ref.refComp.name,
+      name = ref.name,
       defaultValue = defaultValue,
       help = Option(help),
       errorMessage = Option(errorMessage),
@@ -36,22 +37,28 @@ object TextInput {
     if (ref == null) {
       component(props)
     } else {
-      component.withRef(ref.refComp)(props)
+      component.withRef(ref.name)(props)
     }
   }
 
   def ref(name: String): Reference = new Reference(Ref.to(component, name))
 
   // **************** Public inner types ****************//
-  final class Reference private[TextInput](private[TextInput] val refComp: RefComp[Props, State, Backend, _ <: TopNode]) {
-    def apply($: BackendScope[_, _]): Proxy = new Proxy(() => refComp($).get)
+  final class Reference private[TextInput](refComp: ThisRefComp) extends InputBase.Reference {
+    override def apply($: BackendScope[_, _]): InputBase.Proxy = new Proxy(() => refComp($).get)
+    override def name = refComp.name
   }
 
-  final class Proxy private[TextInput](private val componentProvider: () => ReactComponentU[Props, State, Backend, _ <: TopNode]) {
-    def value: String = componentProvider().state.value
-    def setValue(string: String): Unit = componentProvider().modState(_.withValue(string))
-    def registerListener(listener: InputListener): Unit = componentProvider().modState(_.withListener(listener))
-    def deregisterListener(listener: InputListener): Unit = {
+  // **************** Private inner types ****************//
+  private type ThisRefComp = RefComp[Props, State, Backend, _ <: TopNode]
+  private type ThisComponentU = ReactComponentU[Props, State, Backend, _ <: TopNode]
+
+
+  private final class Proxy(val componentProvider: () => ThisComponentU) extends InputBase.Proxy {
+    override def value = componentProvider().state.value
+    override def setValue(string: String) = componentProvider().modState(_.withValue(string))
+    override def registerListener(listener: InputBase.Listener) = componentProvider().modState(_.withListener(listener))
+    override def deregisterListener(listener: InputBase.Listener) = {
       try {
         componentProvider().modState(_.withoutListener(listener))
       } catch {
@@ -60,16 +67,10 @@ object TextInput {
     }
   }
 
-  trait InputListener {
-    /** Gets called every time this field gets updated. This includes updates that are not done by the user. */
-    def onChange(newValue: String): Callback
-  }
-
-  // **************** Private inner types ****************//
-  private case class State(value: String, listeners: Seq[InputListener] = Seq()) {
+  private case class State(value: String, listeners: Seq[InputBase.Listener] = Seq()) {
     def withValue(newValue: String): State = copy(value = newValue)
-    def withListener(listener: InputListener): State = copy(listeners = listeners :+ listener)
-    def withoutListener(listener: InputListener): State = copy(listeners = listeners.filter(_ != listener))
+    def withListener(listener: InputBase.Listener): State = copy(listeners = listeners :+ listener)
+    def withoutListener(listener: InputBase.Listener): State = copy(listeners = listeners.filter(_ != listener))
   }
 
   private case class Props(label: String,

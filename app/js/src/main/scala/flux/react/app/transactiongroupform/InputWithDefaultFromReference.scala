@@ -3,7 +3,8 @@ package flux.react.app.transactiongroupform
 import common.LoggingUtils
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
-import flux.react.ReactVdomUtils.{^^, <<}
+import flux.react.ReactVdomUtils.{<<, ^^}
+import flux.react.uielements.InputBase
 import japgolly.scalajs.react.ReactComponentC.ReqProps
 import flux.react.uielements.bootstrap.TextInput
 import org.scalajs.dom.raw.HTMLInputElement
@@ -22,10 +23,10 @@ private[transactiongroupform] object InputWithDefaultFromReference {
 
   // **************** API ****************//
   def apply(ref: Reference,
-            defaultValueProxy: => TextInput.Proxy
+            defaultValueProxy: => InputBase.Proxy
            )(inputElementFactory: InputElementExtraProps => ReactElement): ReactElement = {
-    component.withRef(ref.refComp)(Props(
-      inputElementRef = TextInput.ref(ref.refComp.name + "_input"),
+    component.withRef(ref.name)(Props(
+      inputElementRef = TextInput.ref(ref.name + "_input"),
       () => defaultValueProxy,
       inputElementFactory))
   }
@@ -35,21 +36,24 @@ private[transactiongroupform] object InputWithDefaultFromReference {
   // **************** Public inner types ****************//
   case class InputElementExtraProps(ref: TextInput.Reference, inputClasses: Seq[String])
 
-  final class Reference private[InputWithDefaultFromReference](private[InputWithDefaultFromReference] val refComp: RefComp[Props, State, Backend, _ <: TopNode]) {
-    def apply($: BackendScope[_, _]): Proxy = new Proxy(() => refComp($).get)
-  }
-
-  final class Proxy private[InputWithDefaultFromReference](private val componentProvider: () => ReactComponentU[Props, State, Backend, _ <: TopNode]) {
-    def input: TextInput.Proxy = componentProvider().props.inputElementRef(componentScope)
-
-    private def componentScope: BackendScope[Props, State] = componentProvider().backend.$
+  final class Reference private[InputWithDefaultFromReference](refComp: ThisRefComp) extends InputBase.Reference {
+    override def apply($: BackendScope[_, _]) = {
+      InputBase.Proxy.forwardingTo {
+        val component = refComp($).get
+        val componentScope = component.backend.$
+        component.props.inputElementRef(componentScope)
+      }
+    }
+    override def name = refComp.name
   }
 
   // **************** Private inner types ****************//
+  private type ThisRefComp = RefComp[Props, State, Backend, _ <: TopNode]
+
   private type State = ConnectionState
 
   private case class Props(inputElementRef: TextInput.Reference,
-                           defaultValueProxy: () => TextInput.Proxy,
+                           defaultValueProxy: () => InputBase.Proxy,
                            inputElementFactory: InputElementExtraProps => ReactElement)
 
   private final class Backend(val $: BackendScope[Props, State]) {
@@ -73,7 +77,7 @@ private[transactiongroupform] object InputWithDefaultFromReference {
       props.inputElementFactory(InputElementExtraProps(props.inputElementRef, inputClasses))
     }
 
-    private object InputValueListener extends TextInput.InputListener {
+    private object InputValueListener extends InputBase.Listener {
       override def onChange(newInputValue: String) = Callback {
         LoggingUtils.logExceptions {
           val defaultValue = $.props.runNow().defaultValueProxy().value
@@ -82,7 +86,7 @@ private[transactiongroupform] object InputWithDefaultFromReference {
       }
     }
 
-    private object DefaultValueListener extends TextInput.InputListener {
+    private object DefaultValueListener extends InputBase.Listener {
       override def onChange(newDefaultValue: String) = Callback {
         LoggingUtils.logExceptions {
           val inputProxy = $.props.runNow().inputElementRef($)

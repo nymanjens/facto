@@ -2,6 +2,7 @@ package flux.react.app.transactiongroupform
 
 import common.{I18n, LoggingUtils}
 import japgolly.scalajs.react._
+import flux.react.uielements.InputBase
 import japgolly.scalajs.react.vdom.prefix_<^._
 import flux.react.ReactVdomUtils.{^^, <<}
 import flux.react.uielements
@@ -40,7 +41,7 @@ private[transactiongroupform] object TransactionPanel {
   }
 
   final class Proxy private[TransactionPanel](private val componentProvider: () => ReactComponentU[Props, State, Backend, _ <: TopNode]) {
-    def price: uielements.bootstrap.TextInput.Proxy = price2Ref(componentScope).input
+    def price: InputBase.Proxy = price2Ref(componentScope)
 
     private def componentScope: BackendScope[Props, State] = componentProvider().backend.$
   }
@@ -80,9 +81,9 @@ private[transactiongroupform] object TransactionPanel {
         <.button(
           ^.onClick --> Callback {
             println("  Price 1:" + price1Ref($).value)
-            println("  Price 2:" + price2Ref($).input.value)
+            println("  Price 2:" + price2Ref($).value)
             for (panel <- props.defaultPanel) {
-              println("  Price 3:" + price3Ref($).input.value)
+              println("  Price 3:" + price3Ref($).value)
               println("  Panel.price:" + panel.price.value)
             }
           },
