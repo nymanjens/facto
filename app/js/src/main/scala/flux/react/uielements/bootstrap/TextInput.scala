@@ -56,7 +56,12 @@ object TextInput {
 
   private final class Proxy(val componentProvider: () => ThisComponentU) extends InputBase.Proxy {
     override def value = componentProvider().state.value
-    override def setValue(string: String) = componentProvider().modState(_.withValue(string))
+    override def setValue(string: String) = {
+      componentProvider().modState(_.withValue(string))
+      for (listener <- componentProvider().state.listeners) {
+        listener.onChange(string, directUserChange = false).runNow()
+      }
+    }
     override def registerListener(listener: InputBase.Listener) = componentProvider().modState(_.withListener(listener))
     override def deregisterListener(listener: InputBase.Listener) = {
       try {
@@ -81,14 +86,6 @@ object TextInput {
                            inputClasses: Seq[String])
 
   private final class Backend($: BackendScope[Props, State]) {
-    def onChange(e: ReactEventI): Callback = Callback {
-      val newValue = e.target.value
-      for (listener <- $.state.runNow().listeners) {
-        listener.onChange(newValue).runNow()
-      }
-      $.modState(_.withValue(newValue)).runNow()
-    }
-
     def render(props: Props, state: State) = LoggingUtils.logExceptions {
       <.div(
         ^^.classes("form-group", props.errorMessage.map(_ => "has-error") getOrElse ""),
@@ -110,6 +107,14 @@ object TextInput {
           }
         )
       )
+    }
+
+    private def onChange(e: ReactEventI): Callback = Callback {
+      val newValue = e.target.value
+      for (listener <- $.state.runNow().listeners) {
+        listener.onChange(newValue, directUserChange = true).runNow()
+      }
+      $.modState(_.withValue(newValue)).runNow()
     }
   }
 }

@@ -80,16 +80,18 @@ private[transactiongroupform] object InputWithDefaultFromReference {
     }
 
     private object InputValueListener extends InputBase.Listener {
-      override def onChange(newInputValue: String) = Callback {
+      override def onChange(newInputValue: String, directUserChange: Boolean) = Callback {
         LoggingUtils.logExceptions {
-          val defaultValue = $.props.runNow().defaultValueProxy().value
-          $.setState(ConnectionState(isConnected = defaultValue == newInputValue)).runNow()
+          if (directUserChange) {
+            val defaultValue = $.props.runNow().defaultValueProxy().value
+            $.setState(ConnectionState(isConnected = defaultValue == newInputValue)).runNow()
+          }
         }
       }
     }
 
     private object DefaultValueListener extends InputBase.Listener {
-      override def onChange(newDefaultValue: String) = Callback {
+      override def onChange(newDefaultValue: String, directUserChange: Boolean) = Callback {
         LoggingUtils.logExceptions {
           val inputProxy = $.props.runNow().inputElementRef($)
           val inputValue = inputProxy.value
