@@ -12,9 +12,8 @@ import scala.collection.immutable.Seq
 
 private[transactiongroupform] object TransactionPanel {
 
-  private val price1Ref = uielements.bootstrap.TextInput.ref("price1")
+  private val price1Ref = InputWithDefaultFromReference.ref("price1")
   private val price2Ref = InputWithDefaultFromReference.ref("price2")
-  private val price3Ref = InputWithDefaultFromReference.ref("price3")
   private val component = ReactComponentB[Props](getClass.getSimpleName)
     .renderBackend[Backend]
     .build
@@ -41,7 +40,8 @@ private[transactiongroupform] object TransactionPanel {
   }
 
   final class Proxy private[TransactionPanel](private val componentProvider: () => ReactComponentU[Props, State, Backend, _ <: TopNode]) {
-    def price: InputBase.Proxy = price2Ref(componentScope)
+    def price1: InputBase.Proxy = price1Ref(componentScope)
+    def price2: InputBase.Proxy = price2Ref(componentScope)
 
     private def componentScope: BackendScope[Props, State] = componentProvider().backend.$
   }
@@ -61,28 +61,32 @@ private[transactiongroupform] object TransactionPanel {
       HalfPanel(
         title = <.span(props.title),
         closeButtonCallback = props.deleteButtonCallback)(
-        uielements.bootstrap.TextInput(ref = price1Ref, label = "price 1"),
         InputWithDefaultFromReference(
-          ref = price2Ref,
-          defaultValueProxy = price1Ref($),
+          ref = price1Ref,
+          defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.price1),
           nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)) {
           extraProps =>
             uielements.bootstrap.TextInput(
               ref = extraProps.ref, label = "price 2", inputClasses = extraProps.inputClasses)
         },
         InputWithDefaultFromReference(
-          ref = price3Ref,
-          defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.price),
-          nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)) {
-          extraProps =>
-            uielements.bootstrap.TextInput(
-              ref = extraProps.ref, label = "price 3", inputClasses = extraProps.inputClasses)
+          ref = price2Ref,
+          defaultValueProxy = price1Ref($),
+          nameToDelegateRef = InputWithDefaultFromReference.ref(_)) {
+          extraProps1 =>
+            InputWithDefaultFromReference(
+              ref = extraProps1.ref,
+              defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.price2),
+              nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)) {
+              extraProps2 =>
+                uielements.bootstrap.TextInput(
+                  ref = extraProps2.ref, label = "price 3", inputClasses = extraProps1.inputClasses ++ extraProps2.inputClasses)
+            }
         },
         <.button(
           ^.onClick --> Callback {
             println("  Price 1:" + price1Ref($).value)
             println("  Price 2:" + price2Ref($).value)
-            println("  Price 3:" + price3Ref($).value)
           },
           "Test button"
         )

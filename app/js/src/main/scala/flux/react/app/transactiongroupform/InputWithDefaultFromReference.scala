@@ -90,11 +90,15 @@ private[transactiongroupform] object InputWithDefaultFromReference {
     type State = ConnectionState
 
     final class Backend(val $: BackendScope[Props.any, State]) {
+      private var currentInputValue = ""
+      private var currentDefaultValue = ""
 
       def didMount(props: Props.any): Callback = Callback {
         LoggingUtils.logExceptions {
           props.inputElementRef($).registerListener(InputValueListener)
           props.defaultValueProxy.get().registerListener(DefaultValueListener)
+          currentInputValue = props.inputElementRef($).value
+          currentDefaultValue = props.defaultValueProxy.get().value
         }
       }
 
@@ -116,10 +120,9 @@ private[transactiongroupform] object InputWithDefaultFromReference {
       private object InputValueListener extends InputBase.Listener {
         override def onChange(newInputValue: String, directUserChange: Boolean) = Callback {
           LoggingUtils.logExceptions {
-            if (directUserChange) {
-              val defaultValue = $.props.runNow().defaultValueProxy.get().value
-              $.setState(ConnectionState(isConnected = defaultValue == newInputValue)).runNow()
-            }
+            currentInputValue = newInputValue
+
+            $.setState(ConnectionState(isConnected = currentDefaultValue == newInputValue)).runNow()
           }
         }
       }
@@ -127,12 +130,13 @@ private[transactiongroupform] object InputWithDefaultFromReference {
       private object DefaultValueListener extends InputBase.Listener {
         override def onChange(newDefaultValue: String, directUserChange: Boolean) = Callback {
           LoggingUtils.logExceptions {
+            currentDefaultValue = newDefaultValue
+
             val inputProxy = $.props.runNow().inputElementRef($)
-            val inputValue = inputProxy.value
             if ($.state.runNow().isConnected) {
               inputProxy.setValue(newDefaultValue)
             } else {
-              $.setState(ConnectionState(isConnected = newDefaultValue == inputValue)).runNow()
+              $.setState(ConnectionState(isConnected = newDefaultValue == currentInputValue)).runNow()
             }
           }
         }
