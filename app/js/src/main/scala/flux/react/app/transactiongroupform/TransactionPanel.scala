@@ -65,29 +65,24 @@ private[transactiongroupform] object TransactionPanel {
         InputWithDefaultFromReference(
           ref = price2Ref,
           defaultValueProxy = price1Ref($),
-          nameToDelegateRef = uielements.bootstrap.TextInput.ref) {
+          nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)) {
           extraProps =>
             uielements.bootstrap.TextInput(
               ref = extraProps.ref, label = "price 2", inputClasses = extraProps.inputClasses)
         },
-        <<.ifThen(props.defaultPanel) { panelProxy =>
-          InputWithDefaultFromReference(
-            ref = price3Ref,
-            defaultValueProxy = panelProxy.price,
-            nameToDelegateRef = uielements.bootstrap.TextInput.ref) {
-            extraProps =>
-              uielements.bootstrap.TextInput(
-                ref = extraProps.ref, label = "price 3", inputClasses = extraProps.inputClasses)
-          }
+        InputWithDefaultFromReference(
+          ref = price3Ref,
+          defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.price),
+          nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)) {
+          extraProps =>
+            uielements.bootstrap.TextInput(
+              ref = extraProps.ref, label = "price 3", inputClasses = extraProps.inputClasses)
         },
         <.button(
           ^.onClick --> Callback {
             println("  Price 1:" + price1Ref($).value)
             println("  Price 2:" + price2Ref($).value)
-            for (panel <- props.defaultPanel) {
-              println("  Price 3:" + price3Ref($).value)
-              println("  Panel.price:" + panel.price.value)
-            }
+            println("  Price 3:" + price3Ref($).value)
           },
           "Test button"
         )
