@@ -2,6 +2,7 @@
 //
 //import java.util.NoSuchElementException
 //
+//import flux.react.uielements.bootstrap.InputComponent.{InputRenderer, Props}
 //import flux.react.uielements.InputBase
 //import common.LoggingUtils
 //import japgolly.scalajs.react._
@@ -13,12 +14,25 @@
 //
 //import scala.collection.immutable.Seq
 //
-//object TextInput {
+//object SelectInput {
 //
-//  private val component = ReactComponentB[Props](getClass.getSimpleName)
-//    .initialState_P[State](props => State(value = props.defaultValue))
-//    .renderBackend[Backend]
-//    .build
+//  private val component = InputComponent.create(
+//    name = getClass.getSimpleName,
+//    inputRenderer = new InputRenderer[ExtraProps] {
+//      override def renderInput(classes: Seq[String],
+//                               name: String,
+//                               value: String,
+//                               onChange: ReactEventI => Callback,
+//                               extraProps: ExtraProps) = {
+//        require(extraProps.optionIdToName.contains(value), s"Value '$value' is not a a valid option (${extraProps.optionIdToName.keys})")
+//
+//        <.select(
+//          ^^.classes(classes),
+//          ^.name := name,
+//          ^.onChange ==> onChange)
+//      }
+//    }
+//  )
 //
 //  // **************** API ****************//
 //  def apply(ref: Reference,
@@ -26,100 +40,25 @@
 //            defaultValue: String = "",
 //            help: String = null,
 //            errorMessage: String = null,
-//            inputClasses: Seq[String] = Seq()): ReactElement = {
+//            inputClasses: Seq[String] = Seq(),
+//            optionIdToName: Map[String, String]): ReactElement = {
 //    val props = Props(
 //      label = label,
 //      name = ref.name,
 //      defaultValue = defaultValue,
 //      help = Option(help),
 //      errorMessage = Option(errorMessage),
-//      inputClasses = inputClasses)
-//    if (ref == null) {
-//      component(props)
-//    } else {
-//      component.withRef(ref.name)(props)
-//    }
+//      inputClasses = inputClasses,
+//      ExtraProps(optionIdToName))
+//    component.withRef(ref.name)(props)
 //  }
 //
 //  def ref(name: String): Reference = new Reference(Ref.to(component, name))
 //
 //  // **************** Public inner types ****************//
-//  final class Reference private[TextInput](refComp: ThisRefComp) extends InputBase.Reference {
-//    override def apply($: BackendScope[_, _]): InputBase.Proxy = new Proxy(() => refComp($).get)
-//    override def name = refComp.name
-//  }
+//  final class Reference private[SelectInput](refComp: InputComponent.ThisRefComp)
+//    extends InputComponent.Reference(refComp)
 //
 //  // **************** Private inner types ****************//
-//  private type ThisRefComp = RefComp[Props, State, Backend, _ <: TopNode]
-//  private type ThisComponentU = ReactComponentU[Props, State, Backend, _ <: TopNode]
-//
-//
-//  private final class Proxy(val componentProvider: () => ThisComponentU) extends InputBase.Proxy {
-//    override def value = componentProvider().state.value
-//    override def setValue(string: String) = {
-//      componentProvider().modState(_.withValue(string))
-//      for (listener <- componentProvider().state.listeners) {
-//        listener.onChange(string, directUserChange = false).runNow()
-//      }
-//    }
-//    override def registerListener(listener: InputBase.Listener) = componentProvider().modState(_.withListener(listener))
-//    override def deregisterListener(listener: InputBase.Listener) = {
-//      try {
-//        componentProvider().modState(_.withoutListener(listener))
-//      } catch {
-//        case _: NoSuchElementException => // Ignore the case this component no longer exists
-//      }
-//    }
-//  }
-//
-//  private case class State(value: String, listeners: Seq[InputBase.Listener] = Seq()) {
-//    def withValue(newValue: String): State = copy(value = newValue)
-//    def withListener(listener: InputBase.Listener): State = copy(listeners = listeners :+ listener)
-//    def withoutListener(listener: InputBase.Listener): State = copy(listeners = listeners.filter(_ != listener))
-//  }
-//
-//  private case class Props(label: String,
-//                           name: String,
-//                           defaultValue: String,
-//                           help: Option[String],
-//                           errorMessage: Option[String],
-//                           inputClasses: Seq[String])
-//
-//  private final class Backend($: BackendScope[Props, State]) {
-//    def render(props: Props, state: State) = LoggingUtils.logExceptions {
-//      <.div(
-//        ^^.classes(Seq("form-group") ++ props.errorMessage.map(_ => "has-error")),
-//        <.label(
-//          ^.className := "col-sm-4 control-label",
-//          props.label),
-//        <.div(
-//          ^.className := "col-sm-8",
-//          <.select(
-//            ^^.classes("form-control" +: props.inputClasses),
-//            ^.name := props.name,
-//            ^.value := state.value,
-//            ^.onChange ==> onChange,
-//            <.option())
-//          // props.for((optionId, optionName) - optionIdToNameMap) {
-//          //   <.option( id="props.optionId" value="props.optionId" props.if(field.value.getOrElse("") == optionId){selected}
-//          //       props.toHtmlArgs(optionArgs(optionId)),props.optionName)
-//          // }
-//        ),
-//        <<.ifThen(props.help) { msg =>
-//          <.span(^.className := "help-block", msg)
-//        },
-//        <<.ifThen(props.errorMessage) { msg =>
-//          <.span(^.className := "help-block", msg)
-//        }
-//      )
-//    }
-//
-//    private def onChange(e: ReactEventI): Callback = Callback {
-//      val newValue = e.target.value
-//      for (listener <- $.state.runNow().listeners) {
-//        listener.onChange(newValue, directUserChange = true).runNow()
-//      }
-//      $.modState(_.withValue(newValue)).runNow()
-//    }
-//  }
+//  private case class ExtraProps(optionIdToName: Map[String, String])
 //}

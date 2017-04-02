@@ -48,19 +48,15 @@ object TextInput {
       help = Option(help),
       errorMessage = Option(errorMessage),
       inputClasses = inputClasses)
-    if (ref == null) {
-      component(props)
-    } else {
-      component.withRef(ref.name)(props)
-    }
+    component.withRef(ref.name)(props)
   }
 
   def ref(name: String): Reference = new Reference(Ref.to(component, name))
 
   // **************** Public inner types ****************//
-  final class Reference private[TextInput](refComp: InputComponent.ThisRefComp)
+  final class Reference private[TextInput](refComp: InputComponent.ThisRefComp[ExtraProps])
     extends InputComponent.Reference(refComp)
 
   // **************** Private inner types ****************//
-  private type ExtraProps = Unit.type
+  private type ExtraProps = Unit
 }
