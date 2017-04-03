@@ -9,7 +9,7 @@ import flux.stores.AllEntriesStoreFactory
 import flux.stores.entries.GeneralEntry
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
-import models.EntityAccess
+import models.{EntityAccess, User}
 import models.accounting.config.Config
 import models.accounting.money.ExchangeRateManager
 
@@ -18,7 +18,9 @@ import scala.collection.immutable.Seq
 final class TransactionGroupForm(implicit accountingConfig: Config,
                                  clock: Clock,
                                  exchangeRateManager: ExchangeRateManager,
-                                 i18n: I18n) {
+                                 i18n: I18n,
+                                 user: User,
+                                 entityAccess: EntityAccess) {
 
   private val component = ReactComponentB[Props](getClass.getSimpleName)
     .initialState[State](State(panelIndices = Seq(0, 1)))

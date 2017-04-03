@@ -9,7 +9,7 @@ import models.accounting._
 import models.accounting.config.Config
 import models.accounting.money._
 
-final class Module(implicit i18n: I18n, accountingConfig: Config) {
+final class Module(implicit i18n: I18n, accountingConfig: Config, user: User) {
 
   import com.softwaremill.macwire._
   import common.time.Module._
