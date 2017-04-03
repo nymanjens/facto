@@ -12,7 +12,7 @@ import japgolly.scalajs.react.ReactComponentC.ReqProps
 import org.scalajs.dom.raw.HTMLInputElement
 import japgolly.scalajs.react.TopNode
 
-import scala.collection.immutable.{ListMap, Seq}
+import scala.collection.immutable.Seq
 
 object SelectInput {
 
@@ -24,16 +24,15 @@ object SelectInput {
                                value: String,
                                onChange: ReactEventI => Callback,
                                extraProps: ExtraProps) = {
-        require(extraProps.optionValueToName.contains(value), s"Value '$value' is not a a valid option (${extraProps.optionValueToName.keys})")
-
         <.select(
           ^^.classes(classes),
           ^.name := name,
+          ^.value := value,
           ^.onChange ==> onChange,
           for ((optionValue, optionName) <- extraProps.optionValueToName) yield {
             <.option(
               ^.value := optionValue,
-              ^.selected := value == optionValue,
+              ^.key := optionValue,
               optionName
             )
           }
@@ -49,7 +48,7 @@ object SelectInput {
             help: String = null,
             errorMessage: String = null,
             inputClasses: Seq[String] = Seq(),
-            optionValueToName: ListMap[String, String]): ReactElement = {
+            optionValueToName: Map[String, String]): ReactElement = {
     val props = Props(
       label = label,
       name = ref.name,
@@ -68,7 +67,7 @@ object SelectInput {
   final class Reference private[SelectInput](refComp: InputComponent.ThisRefComp[ExtraProps])
     extends InputComponent.Reference[ExtraProps](refComp)
 
-  case class ExtraProps(optionValueToName: ListMap[String, String])
+  case class ExtraProps(optionValueToName: Map[String, String])
 
   // **************** Private inner types ****************//
   private object ValueCleaner extends InputComponent.ValueCleaner[ExtraProps] {
