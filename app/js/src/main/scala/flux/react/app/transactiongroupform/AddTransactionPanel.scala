@@ -3,12 +3,14 @@ package flux.react.app.transactiongroupform
 import common.I18n
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
-import flux.react.ReactVdomUtils.{^^, <<}
+import flux.react.ReactVdomUtils.{<<, ^^}
+import models.{EntityAccess, User}
+import models.accounting.config.Config
 
 import scala.collection.immutable.Seq
 
 private[transactiongroupform] object AddTransactionPanel {
-  private case class Props(onClick: Callback, i18n: I18n)
+
   private val component = ReactComponentB[Props](getClass.getSimpleName)
     .renderP((_, props) =>
       HalfPanel(
@@ -34,7 +36,11 @@ private[transactiongroupform] object AddTransactionPanel {
       )
     ).build
 
+  // **************** API ****************//
   def apply(onClick: Callback)(implicit i18n: I18n): ReactElement = {
     component(Props(onClick, i18n))
   }
+
+  // **************** Private inner types ****************//
+  private case class Props(onClick: Callback, i18n: I18n)
 }
