@@ -1,5 +1,7 @@
 package spatutorial.client
 
+import scala.async.Async.{async, await}
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import flux.FactoAppModule
 import japgolly.scalajs.react.ReactDOM
 import org.scalajs.dom
@@ -12,7 +14,7 @@ import scala.scalajs.js.annotation.JSExport
 object SPAMain extends js.JSApp {
 
   @JSExport
-  def main(): Unit = {
+  def main(): Unit = async {
     println("  Application starting")
     // send log messages also to the server
     //    log.enableServerLogging("/logging")
@@ -21,15 +23,18 @@ object SPAMain extends js.JSApp {
     // create stylesheet
     //    GlobalStyles.addToDocument()
 
-    api.Module.scalaJsApiClient.getInitialData() map { implicit response =>
-      implicit val globalModule = new FactoAppModule()
+    val initialDataResponseFuture = api.Module.scalaJsApiClient.getInitialData()
+    val remoteDatabaseProxyFuture = models.access.Module.remoteDatabaseProxy
 
-      // create the router
-      val router = globalModule.routerFactory.createRouter()
+    implicit val initialDataResponse = await(initialDataResponseFuture)
+    implicit val remoteDatabaseProxy = await(remoteDatabaseProxyFuture)
 
-      // tell React to render the router in the document body
-      ReactDOM.render(router(), dom.document.getElementById("root"))
-    }
+    implicit val globalModule = new FactoAppModule()
 
+    // create the router
+    val router = globalModule.routerFactory.createRouter()
+
+    // tell React to render the router in the document body
+    ReactDOM.render(router(), dom.document.getElementById("root"))
   }
 }

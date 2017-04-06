@@ -3,9 +3,11 @@ package flux
 import api.ScalaJsApi.GetInitialDataResponse
 import flux.react.router.RouterFactory
 import models.User
+import models.access.RemoteDatabaseProxy
 import models.accounting.config.Config
 
-final class FactoAppModule(implicit getInitialDataResponse: GetInitialDataResponse) {
+final class FactoAppModule(implicit getInitialDataResponse: GetInitialDataResponse,
+                           remoteDatabaseProxy: RemoteDatabaseProxy) {
 
   implicit private val accountingConfig: Config = getInitialDataResponse.accountingConfig
   implicit private val user: User = getInitialDataResponse.user

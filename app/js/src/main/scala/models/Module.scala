@@ -1,13 +1,13 @@
 package models
 
 import common.time.LocalDateTime
+import models.access.RemoteDatabaseProxy
 import models.accounting._
 import models.accounting.money._
 
-object Module {
+final class Module(implicit remoteDatabaseProxy: RemoteDatabaseProxy) {
 
   import com.softwaremill.macwire._
-  import models.access.Module._
 
   implicit lazy val jsUserManager = wire[JsUserManager]
   implicit lazy val jsTransactionManager = wire[JsTransactionManager]

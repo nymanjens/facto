@@ -36,6 +36,37 @@ object RemoteDatabaseProxy {
 
   private val localDatabaseAndEntityVersion = "1.0"
 
+  private[access] def create(apiClient: ScalaJsApiClient,
+                             possiblyEmptyLocalDatabase: LocalDatabase): Future[RemoteDatabaseProxy] = async {
+    val db = possiblyEmptyLocalDatabase
+    val populatedDb = {
+      if (db.isEmpty() || !db.getSingletonValue(VersionKey).contains(localDatabaseAndEntityVersion)) {
+        // Reset database
+        await(db.clear())
+
+        // Set version
+        db.setSingletonValue(VersionKey, localDatabaseAndEntityVersion)
+
+        // Add all entities
+        val allEntitiesResponse = await(apiClient.getAllEntities(EntityType.values))
+        for (entityType <- allEntitiesResponse.entityTypes) {
+          def addAllToDb[E <: Entity](implicit entityType: EntityType[E]) =
+            db.addAll(allEntitiesResponse.entities(entityType))
+          addAllToDb(entityType)
+        }
+        db.setSingletonValue(NextUpdateTokenKey, allEntitiesResponse.nextUpdateToken)
+
+        // Await because we don't want to save unpersisted modifications that can be made as soon as
+        // the database becomes valid.
+        await(db.save())
+        db
+      } else {
+        db
+      }
+    }
+    new Impl(apiClient, populatedDb)
+  }
+
   trait Listener {
     /**
       * Called when the local database was updated with a modification due to a local change request. This change is not
@@ -43,44 +74,22 @@ object RemoteDatabaseProxy {
       */
     def addedLocally(modifications: Seq[EntityModification]): Unit
 
-    /**
-      * Called when a remote entity was changed, either due to a change request from this or another client.
-      *
-      * Note that a preceding `addedLocally()` call may have been made earlier for the same modifications, but this is
-      * not always the case.
-      */
     def localModificationPersistedRemotely(modifications: Seq[EntityModification]): Unit = {}
 
-    /**
-      *
-      */
     def addedRemotely(modifications: Seq[EntityModification]): Unit
-
-    /**
-      * Called after the initial loading or reloading of the database. This also gets called when the database is
-      * cleared.
-      */
-    def loadedDatabase(): Unit
   }
 
-  private[access] final class Impl(apiClient: ScalaJsApiClient,
-                                   possiblyEmptyLocalDatabase: Future[LocalDatabase]) extends RemoteDatabaseProxy {
+  private final class Impl(apiClient: ScalaJsApiClient,
+                           localDatabase: LocalDatabase) extends RemoteDatabaseProxy {
 
-    private val localDatabase: Future[LocalDatabase] = possiblyEmptyLocalDatabase flatMap toValidDatabase
     private var listeners: Seq[Listener] = Seq()
     private val localAddModificationIds: Map[EntityType.any, mutable.Set[Long]] =
       EntityType.values.map(t => t -> mutable.Set[Long]()).toMap
     private var isCallingListeners: Boolean = false
 
-    @visibleForTesting private[access] val completelyLoaded: Future[_] = async {
-      await(localDatabase)
-      await(invokeListenersAsync(_.loadedDatabase()))
-    }
-
     // **************** Getters ****************//
     override def newQuery[E <: Entity : EntityType](): Loki.ResultSet[E] = {
-      val maybeDb = localDatabase.value.flatMap(_.toOption)
-      maybeDb.map(_.newQuery[E]()) getOrElse Loki.ResultSet.empty[E]
+      localDatabase.newQuery[E]()
     }
 
     override def hasLocalAddModifications[E <: Entity : EntityType](entity: E): Boolean = {
@@ -91,8 +100,7 @@ object RemoteDatabaseProxy {
     override def persistModifications(modifications: Seq[EntityModification]): Future[Unit] = async {
       require(!isCallingListeners)
 
-      val db = await(localDatabase)
-      db.applyModifications(modifications)
+      localDatabase.applyModifications(modifications)
 
       for {
         modification <- modifications
@@ -115,10 +123,7 @@ object RemoteDatabaseProxy {
     override def clearLocalDatabase(): Future[Unit] = async {
       require(!isCallingListeners)
 
-      val db = await(localDatabase)
-      await(db.clear())
-
-      await(invokeListenersAsync(_.loadedDatabase()))
+      await(localDatabase.clear())
     }
 
     // **************** Other ****************//
@@ -152,40 +157,13 @@ object RemoteDatabaseProxy {
       }
     }
 
-    private def toValidDatabase(db: LocalDatabase): Future[LocalDatabase] = async {
-      if (db.isEmpty() || !db.getSingletonValue(VersionKey).contains(localDatabaseAndEntityVersion)) {
-        // Reset database
-        await(db.clear())
-
-        // Set version
-        db.setSingletonValue(VersionKey, localDatabaseAndEntityVersion)
-
-        // Add all entities
-        val allEntitiesResponse = await(apiClient.getAllEntities(EntityType.values))
-        for (entityType <- allEntitiesResponse.entityTypes) {
-          def addAllToDb[E <: Entity](implicit entityType: EntityType[E]) =
-            db.addAll(allEntitiesResponse.entities(entityType))
-          addAllToDb(entityType)
-        }
-        db.setSingletonValue(NextUpdateTokenKey, allEntitiesResponse.nextUpdateToken)
-
-        // Await because we don't want to save unpersisted modifications that can be made as soon as
-        // the database becomes valid.
-        await(db.save())
-        db
-      } else {
-        db
-      }
-    }
-
     @visibleForTesting private[access] def updateModifiedEntities(): Future[Unit] = async {
-      val db = await(localDatabase)
-      val response = await(apiClient.getEntityModifications(db.getSingletonValue(NextUpdateTokenKey).get))
-      db.setSingletonValue(NextUpdateTokenKey, response.nextUpdateToken)
+      val response = await(apiClient.getEntityModifications(localDatabase.getSingletonValue(NextUpdateTokenKey).get))
       if (response.modifications.nonEmpty) {
-        db.applyModifications(response.modifications)
+        localDatabase.applyModifications(response.modifications)
         await(invokeListenersAsync(_.addedRemotely(response.modifications)))
       }
+      localDatabase.setSingletonValue(NextUpdateTokenKey, response.nextUpdateToken)
     }
   }
 }

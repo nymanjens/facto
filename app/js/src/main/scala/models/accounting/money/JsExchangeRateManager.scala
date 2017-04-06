@@ -63,10 +63,6 @@ final class JsExchangeRateManager(implicit database: RemoteDatabaseProxy)
       addedModifications(modifications)
     }
 
-    override def loadedDatabase(): Unit = {
-      measurementsCache.clear()
-    }
-
     private def addedModifications(modifications: Seq[EntityModification]): Unit = {
       for (modification <- modifications) {
         modification match {
