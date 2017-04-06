@@ -1,26 +1,14 @@
 package flux.react.app.transactiongroupform
 
-import common.Formatting._
 import common.{I18n, LoggingUtils}
-import common.time.Clock
-import flux.react.uielements
-import flux.react.uielements.EntriesListTable.NumEntriesStrategy
-import flux.stores.AllEntriesStoreFactory
-import flux.stores.entries.GeneralEntry
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
-import models.{EntityAccess, User}
-import models.accounting.config.Config
-import models.accounting.money.ExchangeRateManager
 
 import scala.collection.immutable.Seq
 
-final class TransactionGroupForm(implicit accountingConfig: Config,
-                                 clock: Clock,
-                                 exchangeRateManager: ExchangeRateManager,
-                                 i18n: I18n,
-                                 user: User,
-                                 entityAccess: EntityAccess) {
+final class TransactionGroupForm(implicit i18n: I18n,
+                                 transactionPanel: TransactionPanel,
+                                 addTransactionPanel: AddTransactionPanel) {
 
   private val component = ReactComponentB[Props](getClass.getSimpleName)
     .initialState[State](State(panelIndices = Seq(0, 1)))
@@ -33,7 +21,7 @@ final class TransactionGroupForm(implicit accountingConfig: Config,
   }
 
   // **************** Private helper methods ****************//
-  private def panelRef(panelIndex: Int): TransactionPanel.Reference = TransactionPanel.ref(s"panel_$panelIndex")
+  private def panelRef(panelIndex: Int): transactionPanel.Reference = transactionPanel.ref(s"panel_$panelIndex")
 
   // **************** Private inner types ****************//
   private case class State(panelIndices: Seq[Int]) {
@@ -50,7 +38,7 @@ final class TransactionGroupForm(implicit accountingConfig: Config,
         ^.className := "transaction-group-form",
         for ((panelIndex, i) <- state.panelIndices.zipWithIndex) yield {
           val firstPanel = state.panelIndices.head
-          TransactionPanel(
+          transactionPanel(
             key = panelIndex,
             ref = panelRef(panelIndex),
             title = i18n("facto.transaction") + " " + (i + 1),
@@ -58,11 +46,11 @@ final class TransactionGroupForm(implicit accountingConfig: Config,
             closeButtonCallback = if (panelIndex == firstPanel) None else Some(removeTransactionPanel(panelIndex))
           )
         },
-        AddTransactionPanel(onClick = addTransactionPanel())
+        addTransactionPanel(onClick = addTransactionPanelCallback())
       )
     }
 
-    private def addTransactionPanel(): Callback = Callback {
+    private def addTransactionPanelCallback(): Callback = Callback {
       LoggingUtils.logExceptions {
         $.modState(_.plusPanel()).runNow()
       }

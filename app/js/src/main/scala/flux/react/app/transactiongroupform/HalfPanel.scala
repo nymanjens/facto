@@ -7,7 +7,6 @@ import flux.react.ReactVdomUtils.{^^, <<}
 import scala.collection.immutable.Seq
 
 private[transactiongroupform] object HalfPanel {
-  private case class Props(title: ReactElement, panelClasses: Seq[String], closeButtonCallback: Option[Callback])
   private val component = ReactComponentB[Props](getClass.getSimpleName)
     .renderPC((_, props, children) =>
       <.div(^^.classes("col-lg-6" +: props.panelClasses),
@@ -35,9 +34,15 @@ private[transactiongroupform] object HalfPanel {
       )
     ).build
 
+  // **************** API ****************//
   def apply(title: ReactElement,
             panelClasses: Seq[String] = Seq(),
             closeButtonCallback: Option[Callback] = None)(children: ReactNode*): ReactElement = {
     component(Props(title, panelClasses, closeButtonCallback), children: _*)
   }
+
+  // **************** Private inner types ****************//
+  private case class Props(title: ReactElement,
+                           panelClasses: Seq[String],
+                           closeButtonCallback: Option[Callback])
 }

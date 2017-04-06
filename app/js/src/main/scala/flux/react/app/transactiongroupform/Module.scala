@@ -1,4 +1,4 @@
-package flux.react.app
+package flux.react.app.transactiongroupform
 
 import api.ScalaJsApi.GetInitialDataResponse
 import common.I18n
@@ -14,18 +14,14 @@ final class Module(implicit i18n: I18n,
                    accountingConfig: Config,
                    user: User,
                    remoteDatabaseProxy: RemoteDatabaseProxy) {
-
   private val modelsModule = new models.Module
-  private val fluxStoresModule = new flux.stores.Module
-  private val transactionGroupFormModule = new flux.react.app.transactiongroupform.Module
 
   import com.softwaremill.macwire._
   import common.time.Module._
   import modelsModule.entityAccess
   import modelsModule.exchangeRateManager
-  import fluxStoresModule.allEntriesStoreFactory
 
-  implicit lazy val menu: Menu = wire[Menu]
-  implicit lazy val everything: Everything = wire[Everything]
-  implicit lazy val transactionGroupForm: TransactionGroupForm = transactionGroupFormModule.transactionGroupForm
+  implicit private lazy val transactionPanel: TransactionPanel = wire[TransactionPanel]
+  implicit private lazy val addTransactionPanel: AddTransactionPanel = wire[AddTransactionPanel]
+  implicit lazy val transactionGroupForm: TransactionGroupForm = wire[TransactionGroupForm]
 }

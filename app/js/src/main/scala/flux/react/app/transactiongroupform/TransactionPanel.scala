@@ -13,7 +13,10 @@ import org.scalajs.dom.raw.HTMLInputElement
 
 import scala.collection.immutable.Seq
 
-private[transactiongroupform] object TransactionPanel {
+private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
+                                                           accountingConfig: Config,
+                                                           user: User,
+                                                           entityAccess: EntityAccess) {
 
   private val price1Ref = InputWithDefaultFromReference.ref("price1")
   private val price2Ref = InputWithDefaultFromReference.ref("price2")
@@ -22,8 +25,7 @@ private[transactiongroupform] object TransactionPanel {
 
   private val component = {
     def calculateInitialState(props: Props): State = LoggingUtils.logExceptions {
-      State(beneficiaryAccount =
-        props.accountingConfig.personallySortedAccounts(props.user, props.entityAccess).head)
+      State(beneficiaryAccount = accountingConfig.personallySortedAccounts.head)
     }
     ReactComponentB[Props](getClass.getSimpleName)
       .initialState_P[State](calculateInitialState)
@@ -36,18 +38,12 @@ private[transactiongroupform] object TransactionPanel {
             ref: Reference,
             title: String,
             defaultPanel: Option[Proxy],
-            closeButtonCallback: Option[Callback] = None)(implicit i18n: I18n,
-                                                          accountingConfig: Config,
-                                                          user: User,
-                                                          entityAccess: EntityAccess): ReactElement = {
+            closeButtonCallback: Option[Callback] = None): ReactElement = {
     val props = Props(
       title,
       defaultPanel = defaultPanel,
-      closeButtonCallback,
-      i18n,
-      accountingConfig,
-      user,
-      entityAccess)
+      closeButtonCallback
+    )
     component.withKey(key).withRef(ref.refComp)(props)
   }
 
@@ -73,19 +69,11 @@ private[transactiongroupform] object TransactionPanel {
 
   private case class Props(title: String,
                            defaultPanel: Option[Proxy],
-                           deleteButtonCallback: Option[Callback],
-                           i18n: I18n,
-                           accountingConfig: Config,
-                           user: User,
-                           entityAccess: EntityAccess)
+                           deleteButtonCallback: Option[Callback])
 
   private class Backend(val $: BackendScope[Props, State]) {
 
     def render(props: Props, state: State) = LoggingUtils.logExceptions {
-      implicit val i18n = props.i18n
-      implicit val user = props.user
-      implicit val entityAccess = props.entityAccess
-
       HalfPanel(
         title = <.span(props.title),
         closeButtonCallback = props.deleteButtonCallback)(
@@ -121,7 +109,7 @@ private[transactiongroupform] object TransactionPanel {
               label = i18n("facto.beneficiary"),
               inputClasses = extraProps.inputClasses,
               optionValueToName = toListMap(
-                props.accountingConfig.personallySortedAccounts.map(acc => (acc.code, acc.longName))))
+                accountingConfig.personallySortedAccounts.map(acc => (acc.code, acc.longName))))
         },
         InputWithDefaultFromReference(
           ref = categoryCodeRef,

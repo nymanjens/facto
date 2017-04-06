@@ -9,12 +9,12 @@ import models.accounting.config.Config
 
 import scala.collection.immutable.Seq
 
-private[transactiongroupform] object AddTransactionPanel {
+private[transactiongroupform] final class AddTransactionPanel(implicit i18n: I18n) {
 
   private val component = ReactComponentB[Props](getClass.getSimpleName)
     .renderP((_, props) =>
       HalfPanel(
-        title = <.span(props.i18n("facto.new-transaction")),
+        title = <.span(i18n("facto.new-transaction")),
         panelClasses = Seq("add-transaction-button-holder"))(
         <.table(
           <.tbody(
@@ -37,10 +37,10 @@ private[transactiongroupform] object AddTransactionPanel {
     ).build
 
   // **************** API ****************//
-  def apply(onClick: Callback)(implicit i18n: I18n): ReactElement = {
-    component(Props(onClick, i18n))
+  def apply(onClick: Callback): ReactElement = {
+    component(Props(onClick))
   }
 
   // **************** Private inner types ****************//
-  private case class Props(onClick: Callback, i18n: I18n)
+  private case class Props(onClick: Callback)
 }
