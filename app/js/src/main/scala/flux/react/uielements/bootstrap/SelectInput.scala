@@ -48,7 +48,8 @@ object SelectInput {
             help: String = null,
             errorMessage: String = null,
             inputClasses: Seq[String] = Seq(),
-            optionValueToName: Map[String, String]): ReactElement = {
+            optionValueToName: Map[String, String],
+            listener: InputBase.Listener = InputBase.Listener.nullInstance): ReactElement = {
     val props = Props(
       label = label,
       name = ref.name,
@@ -56,6 +57,7 @@ object SelectInput {
       help = Option(help),
       errorMessage = Option(errorMessage),
       inputClasses = inputClasses,
+      listener = listener,
       extra = ExtraProps(optionValueToName),
       valueCleaner = ValueCleaner)
     component.withRef(ref.name)(props)

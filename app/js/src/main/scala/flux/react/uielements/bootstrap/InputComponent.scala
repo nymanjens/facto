@@ -18,7 +18,7 @@ private[bootstrap] object InputComponent {
   def create[ExtraProps](name: String,
                          inputRenderer: InputRenderer[ExtraProps]) = {
     ReactComponentB[Props[ExtraProps]](name)
-      .initialState_P[State](props => State(value = props.defaultValue))
+      .initialState_P[State](props => State(value = props.defaultValue, listeners = Seq(props.listener)))
       .renderPS((context, props, state) => LoggingUtils.logExceptions {
         def onChange(e: ReactEventI): Callback = Callback {
           LoggingUtils.logExceptions {
@@ -110,6 +110,7 @@ private[bootstrap] object InputComponent {
                                help: Option[String],
                                errorMessage: Option[String],
                                inputClasses: Seq[String],
+                               listener: InputBase.Listener,
                                extra: ExtraProps = (): Unit,
                                valueCleaner: ValueCleaner[ExtraProps] = ValueCleaner.nullInstance)
 

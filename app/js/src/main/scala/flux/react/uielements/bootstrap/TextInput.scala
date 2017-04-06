@@ -40,14 +40,16 @@ object TextInput {
             defaultValue: String = "",
             help: String = null,
             errorMessage: String = null,
-            inputClasses: Seq[String] = Seq()): ReactElement = {
+            inputClasses: Seq[String] = Seq(),
+            listener: InputBase.Listener = InputBase.Listener.nullInstance): ReactElement = {
     val props = Props(
       label = label,
       name = ref.name,
       defaultValue = defaultValue,
       help = Option(help),
       errorMessage = Option(errorMessage),
-      inputClasses = inputClasses)
+      inputClasses = inputClasses,
+      listener = listener)
     component.withRef(ref.name)(props)
   }
 
