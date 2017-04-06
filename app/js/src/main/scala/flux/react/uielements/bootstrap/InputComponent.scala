@@ -84,7 +84,7 @@ private[bootstrap] object InputComponent {
                     extraProps: ExtraProps): ReactNode
   }
 
-  trait ValueCleaner[ExtraProps] {
+  trait ValueCleaner[-ExtraProps] {
     /**
       * Returns the value as it should be seen via `InputBase.Proxy.value` or as listener (i.e. the listener will
       * only listen to changes to the cleaned value, rather than the internal value).
@@ -110,27 +110,8 @@ private[bootstrap] object InputComponent {
                                help: Option[String],
                                errorMessage: Option[String],
                                inputClasses: Seq[String],
-                               extra: ExtraProps,
-                               valueCleaner: ValueCleaner[ExtraProps])
-  object Props {
-    def apply(label: String,
-              name: String,
-              defaultValue: String,
-              help: Option[String],
-              errorMessage: Option[String],
-              inputClasses: Seq[String],
-              valueCleaner: ValueCleaner[Unit] = ValueCleaner.nullInstance): Props[Unit] = {
-      new Props(
-        label = label,
-        name = name,
-        defaultValue = defaultValue,
-        help = help,
-        errorMessage = errorMessage,
-        inputClasses = inputClasses,
-        extra = (): Unit,
-        valueCleaner = valueCleaner)
-    }
-  }
+                               extra: ExtraProps = (): Unit,
+                               valueCleaner: ValueCleaner[ExtraProps] = ValueCleaner.nullInstance)
 
   case class State(value: String,
                    listeners: Seq[InputBase.Listener] = Seq()) {
