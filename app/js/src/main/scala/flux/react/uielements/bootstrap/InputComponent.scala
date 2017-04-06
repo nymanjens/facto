@@ -119,7 +119,7 @@ private[bootstrap] object InputComponent {
               help: Option[String],
               errorMessage: Option[String],
               inputClasses: Seq[String],
-              valueCleaner: ValueCleaner[Unit] = ValueCleaner.nullInstance): Props[Unit] =
+              valueCleaner: ValueCleaner[Unit] = ValueCleaner.nullInstance): Props[Unit] = {
       new Props(
         label = label,
         name = name,
@@ -127,8 +127,9 @@ private[bootstrap] object InputComponent {
         help = help,
         errorMessage = errorMessage,
         inputClasses = inputClasses,
-        extra = null,
+        extra = (): Unit,
         valueCleaner = valueCleaner)
+    }
   }
 
   case class State(value: String,

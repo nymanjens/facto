@@ -3,7 +3,6 @@ package flux.react.app.transactiongroupform
 import api.ScalaJsApi.GetInitialDataResponse
 import common.I18n
 import common.testing.TestObjects
-import flux.react.app.transactiongroupform.TransactionGroupForm
 import models.User
 import models.access.RemoteDatabaseProxy
 import models.accounting._
