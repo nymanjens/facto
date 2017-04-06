@@ -37,7 +37,7 @@ object RemoteDatabaseProxy {
   private val localDatabaseAndEntityVersion = "1.0"
 
   private[access] def create(apiClient: ScalaJsApiClient,
-                             possiblyEmptyLocalDatabase: LocalDatabase): Future[RemoteDatabaseProxy] = async {
+                             possiblyEmptyLocalDatabase: LocalDatabase): Future[RemoteDatabaseProxy.Impl] = async {
     val db = possiblyEmptyLocalDatabase
     val populatedDb = {
       if (db.isEmpty() || !db.getSingletonValue(VersionKey).contains(localDatabaseAndEntityVersion)) {
@@ -79,7 +79,7 @@ object RemoteDatabaseProxy {
     def addedRemotely(modifications: Seq[EntityModification]): Unit
   }
 
-  private final class Impl(apiClient: ScalaJsApiClient,
+  private[access] final class Impl(apiClient: ScalaJsApiClient,
                            localDatabase: LocalDatabase) extends RemoteDatabaseProxy {
 
     private var listeners: Seq[Listener] = Seq()

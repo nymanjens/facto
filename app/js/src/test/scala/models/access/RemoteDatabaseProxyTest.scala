@@ -25,8 +25,7 @@ object RemoteDatabaseProxyTest extends TestSuite {
     "loads initial data if db is empty" - async {
       fakeApiClient.persistEntityModifications(Seq(testModification))
 
-      val remoteDatabaseProxy = new RemoteDatabaseProxy.Impl(fakeApiClient, Future.successful(fakeLocalDatabase))
-      await(remoteDatabaseProxy.completelyLoaded)
+      val remoteDatabaseProxy = await(RemoteDatabaseProxy.create(fakeApiClient, fakeLocalDatabase))
 
       fakeLocalDatabase.allModifications ==> Seq(testModification)
     }
@@ -35,43 +34,37 @@ object RemoteDatabaseProxyTest extends TestSuite {
       fakeLocalDatabase.applyModifications(Seq(testModificationA))
       fakeApiClient.persistEntityModifications(Seq(testModificationB))
 
-      val remoteDatabaseProxy = new RemoteDatabaseProxy.Impl(fakeApiClient, Future.successful(fakeLocalDatabase))
-      await(remoteDatabaseProxy.completelyLoaded)
+      val remoteDatabaseProxy = await(RemoteDatabaseProxy.create(fakeApiClient, fakeLocalDatabase))
 
       fakeLocalDatabase.allModifications ==> Seq(testModificationB)
     }
 
     "does not load initial data if db is non-empty with right version" - async {
       fakeApiClient.persistEntityModifications(Seq(testModificationA))
-      val remoteDatabaseProxy1 = new RemoteDatabaseProxy.Impl(fakeApiClient, Future.successful(fakeLocalDatabase))
-      await(remoteDatabaseProxy1.completelyLoaded)
+      val remoteDatabaseProxy1 = await(RemoteDatabaseProxy.create(fakeApiClient, fakeLocalDatabase))
       fakeApiClient.persistEntityModifications(Seq(testModificationB))
 
-      val remoteDatabaseProxy2 = new RemoteDatabaseProxy.Impl(fakeApiClient, Future.successful(fakeLocalDatabase))
-      await(remoteDatabaseProxy2.completelyLoaded)
+      val remoteDatabaseProxy2 = await(RemoteDatabaseProxy.create(fakeApiClient, fakeLocalDatabase))
 
       fakeLocalDatabase.allModifications ==> Seq(testModificationA)
     }
 
     "newQuery()" - async {
-      val remoteDatabaseProxy = new RemoteDatabaseProxy.Impl(fakeApiClient, Future.successful(fakeLocalDatabase))
-      await(remoteDatabaseProxy.completelyLoaded)
+      val remoteDatabaseProxy = await(RemoteDatabaseProxy.create(fakeApiClient, fakeLocalDatabase))
       fakeLocalDatabase.addAll(Seq(testTransactionWithId))
 
       remoteDatabaseProxy.newQuery[Transaction].data() ==> Seq(testTransactionWithId)
     }
 
     "hasLocalAddModifications()" - async {
-      val remoteDatabaseProxy = new RemoteDatabaseProxy.Impl(fakeApiClient, Future.successful(fakeLocalDatabase))
-      await(remoteDatabaseProxy.completelyLoaded)
+      val remoteDatabaseProxy = await(RemoteDatabaseProxy.create(fakeApiClient, fakeLocalDatabase))
       await(remoteDatabaseProxy.persistModifications(Seq(EntityModification.Add(testTransactionWithId))))
 
       remoteDatabaseProxy.hasLocalAddModifications(testTransactionWithId) ==> false
     }
 
     "persistModifications()" - async {
-      val remoteDatabaseProxy = new RemoteDatabaseProxy.Impl(fakeApiClient, Future.successful(fakeLocalDatabase))
-      await(remoteDatabaseProxy.completelyLoaded)
+      val remoteDatabaseProxy = await(RemoteDatabaseProxy.create(fakeApiClient, fakeLocalDatabase))
 
       await(remoteDatabaseProxy.persistModifications(Seq(testModification)))
 
@@ -80,8 +73,7 @@ object RemoteDatabaseProxyTest extends TestSuite {
     }
 
     "persistModifications(): calls listeners" - async {
-      val remoteDatabaseProxy = new RemoteDatabaseProxy.Impl(fakeApiClient, Future.successful(fakeLocalDatabase))
-      await(remoteDatabaseProxy.completelyLoaded)
+      val remoteDatabaseProxy = await(RemoteDatabaseProxy.create(fakeApiClient, fakeLocalDatabase))
       val listener = new FakeProxyListener()
       remoteDatabaseProxy.registerListener(listener)
 
@@ -90,12 +82,10 @@ object RemoteDatabaseProxyTest extends TestSuite {
       listener.locallyAdded ==> Seq(Seq(testModification))
       listener.persistedRemotely ==> Seq(Seq(testModification))
       listener.remotelyAdded ==> Seq()
-      listener.loadedDatabaseCount ==> 0
     }
 
     "clearLocalDatabase()" - async {
-      val remoteDatabaseProxy = new RemoteDatabaseProxy.Impl(fakeApiClient, Future.successful(fakeLocalDatabase))
-      await(remoteDatabaseProxy.completelyLoaded)
+      val remoteDatabaseProxy = await(RemoteDatabaseProxy.create(fakeApiClient, fakeLocalDatabase))
       await(remoteDatabaseProxy.persistModifications(Seq(testModification)))
 
       await(remoteDatabaseProxy.clearLocalDatabase())
@@ -103,24 +93,8 @@ object RemoteDatabaseProxyTest extends TestSuite {
       fakeLocalDatabase.isEmpty() ==> true
     }
 
-
-    "clearLocalDatabase(): calls listeners" - async {
-      val remoteDatabaseProxy = new RemoteDatabaseProxy.Impl(fakeApiClient, Future.successful(fakeLocalDatabase))
-      await(remoteDatabaseProxy.completelyLoaded)
-      val listener = new FakeProxyListener()
-      remoteDatabaseProxy.registerListener(listener)
-
-      await(remoteDatabaseProxy.clearLocalDatabase())
-
-      listener.locallyAdded ==> Seq()
-      listener.persistedRemotely ==> Seq()
-      listener.remotelyAdded ==> Seq()
-      listener.loadedDatabaseCount ==> 1
-    }
-
     "updateModifiedEntities()" - async {
-      val remoteDatabaseProxy = new RemoteDatabaseProxy.Impl(fakeApiClient, Future.successful(fakeLocalDatabase))
-      await(remoteDatabaseProxy.completelyLoaded)
+      val remoteDatabaseProxy = await(RemoteDatabaseProxy.create(fakeApiClient, fakeLocalDatabase))
       val nextUpdateToken = await(fakeApiClient.getAllEntities(Seq(TransactionType))).nextUpdateToken
       fakeApiClient.persistEntityModifications(Seq(testModification))
       fakeLocalDatabase.allModifications ==> Seq() // sanity check
@@ -131,8 +105,7 @@ object RemoteDatabaseProxyTest extends TestSuite {
     }
 
     "updateModifiedEntities(): calls listeners" - async {
-      val remoteDatabaseProxy = new RemoteDatabaseProxy.Impl(fakeApiClient, Future.successful(fakeLocalDatabase))
-      await(remoteDatabaseProxy.completelyLoaded)
+      val remoteDatabaseProxy = await(RemoteDatabaseProxy.create(fakeApiClient, fakeLocalDatabase))
       val nextUpdateToken = await(fakeApiClient.getAllEntities(Seq(TransactionType))).nextUpdateToken
       val listener = new FakeProxyListener()
       remoteDatabaseProxy.registerListener(listener)
@@ -143,7 +116,6 @@ object RemoteDatabaseProxyTest extends TestSuite {
       listener.locallyAdded ==> Seq()
       listener.persistedRemotely ==> Seq()
       listener.remotelyAdded ==> Seq(Seq(testModification))
-      listener.loadedDatabaseCount ==> 0
     }
   }
 
@@ -187,7 +159,6 @@ object RemoteDatabaseProxyTest extends TestSuite {
     private val _locallyAdded: mutable.Buffer[Seq[EntityModification]] = mutable.Buffer()
     private val _persistedRemotely: mutable.Buffer[Seq[EntityModification]] = mutable.Buffer()
     private val _remotelyAdded: mutable.Buffer[Seq[EntityModification]] = mutable.Buffer()
-    var loadedDatabaseCount: Int = 0
 
     override def addedLocally(modifications: Seq[EntityModification]) = {
       _locallyAdded += modifications
@@ -199,10 +170,6 @@ object RemoteDatabaseProxyTest extends TestSuite {
 
     override def addedRemotely(modifications: Seq[EntityModification]) = {
       _remotelyAdded += modifications
-    }
-
-    override def loadedDatabase() = {
-      loadedDatabaseCount += 1;
     }
 
     def locallyAdded: Seq[Seq[EntityModification]] = _locallyAdded.toList
