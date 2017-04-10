@@ -2,6 +2,7 @@ package flux.react.uielements.bootstrap
 
 import java.util.NoSuchElementException
 
+import common.LoggingUtils.logExceptions
 import flux.react.uielements.InputBase
 import common.LoggingUtils
 import japgolly.scalajs.react.{ReactEventI, TopNode, _}
@@ -19,9 +20,9 @@ private[bootstrap] object InputComponent {
                          inputRenderer: InputRenderer[ExtraProps]) = {
     ReactComponentB[Props[ExtraProps]](name)
       .initialState_P[State](props => State(value = props.defaultValue, listeners = Seq(props.listener)))
-      .renderPS((context, props, state) => LoggingUtils.logExceptions {
+      .renderPS((context, props, state) => logExceptions {
         def onChange(e: ReactEventI): Callback = Callback {
-          LoggingUtils.logExceptions {
+          logExceptions {
             val newValue = e.target.value
             val cleanedNewValue = ValueCleaner.cleanupValue(newValue, props)
             val cleanedOldValue = ValueCleaner.cleanupValue(state.value, props)
@@ -57,7 +58,7 @@ private[bootstrap] object InputComponent {
         )
       })
       .componentWillReceiveProps(scope => Callback {
-        LoggingUtils.logExceptions {
+        logExceptions {
           // If the props have changed, the cleaned value may have changed. If this happens, the listeners should
           // be notified.
           val value = scope.currentState.value

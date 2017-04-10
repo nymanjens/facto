@@ -1,5 +1,6 @@
 package flux.react.app.transactiongroupform
 
+import common.LoggingUtils.logExceptions
 import common.{I18n, LoggingUtils}
 import common.CollectionUtils.toListMap
 import japgolly.scalajs.react._
@@ -24,7 +25,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   private val categoryCodeRef = InputWithDefaultFromReference.ref("categoryCode")
 
   private val component = {
-    def calculateInitialState(props: Props): State = LoggingUtils.logExceptions {
+    def calculateInitialState(props: Props): State = logExceptions {
       State(beneficiaryAccount = accountingConfig.personallySortedAccounts.head)
     }
     ReactComponentB[Props](getClass.getSimpleName)
@@ -73,7 +74,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
 
   private class Backend(val $: BackendScope[Props, State]) {
 
-    def render(props: Props, state: State) = LoggingUtils.logExceptions {
+    def render(props: Props, state: State) = logExceptions {
       HalfPanel(
         title = <.span(props.title),
         closeButtonCallback = props.deleteButtonCallback)(
@@ -142,7 +143,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
 
     private object BeneficiaryAccountListener extends InputBase.Listener {
       override def onChange(newValue: String, directUserChange: Boolean) = Callback {
-        LoggingUtils.logExceptions {
+        logExceptions {
           $.modState(_.copy(beneficiaryAccount = accountingConfig.accounts(newValue))).runNow()
         }
       }

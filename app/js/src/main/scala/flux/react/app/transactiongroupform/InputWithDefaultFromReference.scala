@@ -1,6 +1,6 @@
 package flux.react.app.transactiongroupform
 
-import common.LoggingUtils
+import common.LoggingUtils.logExceptions
 import flux.react.uielements.InputBase
 import japgolly.scalajs.react.{TopNode, _}
 
@@ -69,7 +69,7 @@ private[transactiongroupform] object InputWithDefaultFromReference {
   }
 
   private final class Backend(val $: BackendScope[Props.any, State]) {
-    def render(props: Props.any, state: State) = LoggingUtils.logExceptions {
+    def render(props: Props.any, state: State) = logExceptions {
       props.defaultValueProxy match {
         case Some(_) => Impl.component.withRef(Impl.ref)(props)
         case None => Dummy.component.withRef(Dummy.ref)(props)
@@ -94,7 +94,7 @@ private[transactiongroupform] object InputWithDefaultFromReference {
       private var currentDefaultValue = ""
 
       def didMount(props: Props.any): Callback = Callback {
-        LoggingUtils.logExceptions {
+        logExceptions {
           props.inputElementRef($).registerListener(InputValueListener)
           props.defaultValueProxy.get().registerListener(DefaultValueListener)
           currentInputValue = props.inputElementRef($).value
@@ -103,13 +103,13 @@ private[transactiongroupform] object InputWithDefaultFromReference {
       }
 
       def willUnmount(props: Props.any): Callback = Callback {
-        LoggingUtils.logExceptions {
+        logExceptions {
           props.inputElementRef($).deregisterListener(InputValueListener)
           props.defaultValueProxy.get().deregisterListener(DefaultValueListener)
         }
       }
 
-      def render(props: Props.any, state: State) = LoggingUtils.logExceptions {
+      def render(props: Props.any, state: State) = logExceptions {
         def renderInternal[DelegateRef <: InputBase.Reference](props: Props[DelegateRef]) = {
           val inputClasses = if (state.isConnected) Seq("bound-until-change") else Seq()
           props.inputElementFactory(InputElementExtraProps(props.inputElementRef, inputClasses))
@@ -119,7 +119,7 @@ private[transactiongroupform] object InputWithDefaultFromReference {
 
       private object InputValueListener extends InputBase.Listener {
         override def onChange(newInputValue: String, directUserChange: Boolean) = Callback {
-          LoggingUtils.logExceptions {
+          logExceptions {
             currentInputValue = newInputValue
 
             $.setState(ConnectionState(isConnected = currentDefaultValue == newInputValue)).runNow()
@@ -129,7 +129,7 @@ private[transactiongroupform] object InputWithDefaultFromReference {
 
       private object DefaultValueListener extends InputBase.Listener {
         override def onChange(newDefaultValue: String, directUserChange: Boolean) = Callback {
-          LoggingUtils.logExceptions {
+          logExceptions {
             currentDefaultValue = newDefaultValue
 
             val inputProxy = $.props.runNow().inputElementRef($)
@@ -159,7 +159,7 @@ private[transactiongroupform] object InputWithDefaultFromReference {
     type State = Unit
 
     final class Backend(val $: BackendScope[Props.any, State]) {
-      def render(props: Props.any, state: State) = LoggingUtils.logExceptions {
+      def render(props: Props.any, state: State) = logExceptions {
         def renderInternal[DelegateRef <: InputBase.Reference](props: Props[DelegateRef]) = {
           props.inputElementFactory(InputElementExtraProps(props.inputElementRef, inputClasses = Seq()))
         }

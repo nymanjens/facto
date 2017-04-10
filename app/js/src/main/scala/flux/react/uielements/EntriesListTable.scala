@@ -1,5 +1,6 @@
 package flux.react.uielements
 
+import common.LoggingUtils.logExceptions
 import common.{I18n, LoggingUtils}
 import flux.react.uielements
 import flux.react.uielements.EntriesListTable.NumEntriesStrategy
@@ -53,7 +54,7 @@ private final class EntriesListTable[Entry, Props](tableTitle: String,
       $.modState(state => state.withEntriesFrom(entriesStore)).runNow()
     }
 
-    def render(props: Props, state: State) = LoggingUtils.logExceptions {
+    def render(props: Props, state: State) = logExceptions {
       uielements.Table(
         title = tableTitle,
         tableClasses = tableClasses,
