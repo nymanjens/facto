@@ -1,6 +1,6 @@
 package flux.react.uielements
 
-import common.LoggingUtils.logExceptions
+import common.LoggingUtils.{logExceptions, LogExceptionsCallback}
 import common.{I18n, LoggingUtils}
 import flux.react.uielements
 import flux.react.uielements.EntriesListTable.NumEntriesStrategy
@@ -39,13 +39,13 @@ private final class EntriesListTable[Entry, Props](tableTitle: String,
   private class Backend($: BackendScope[Props, State]) extends EntriesStore.Listener {
     private var entriesStore: entriesStoreFactory.Store = null
 
-    def willMount(state: State): Callback = Callback {
+    def willMount(state: State): Callback = LogExceptionsCallback {
       entriesStore = entriesStoreFactory.get(entriesStoreFactory.Input(maxNumEntries = state.maxNumEntries, props))
       entriesStore.register(this)
       $.modState(state => state.withEntriesFrom(entriesStore)).runNow()
     }
 
-    def willUnmount(): Callback = Callback {
+    def willUnmount(): Callback = LogExceptionsCallback {
       entriesStore.deregister(this)
       entriesStore = null
     }
@@ -65,7 +65,7 @@ private final class EntriesListTable[Entry, Props](tableTitle: String,
       )
     }
 
-    private def expandMaxNumEntries(state: State): Callback = Callback {
+    private def expandMaxNumEntries(state: State): Callback = LogExceptionsCallback {
       def updateMaxNumEntries(maxNumEntries: Int) = {
         entriesStore.deregister(this)
         entriesStore = entriesStoreFactory.get(entriesStoreFactory.Input(maxNumEntries = maxNumEntries, props))

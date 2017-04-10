@@ -1,6 +1,6 @@
 package flux.react.app.transactiongroupform
 
-import common.LoggingUtils.logExceptions
+import common.LoggingUtils.{logExceptions, LogExceptionsCallback}
 import common.I18n
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
@@ -51,16 +51,12 @@ final class TransactionGroupForm(implicit i18n: I18n,
       )
     }
 
-    private def addTransactionPanelCallback(): Callback = Callback {
-      logExceptions {
-        $.modState(_.plusPanel()).runNow()
-      }
+    private def addTransactionPanelCallback(): Callback = LogExceptionsCallback {
+      $.modState(_.plusPanel()).runNow()
     }
 
-    private def removeTransactionPanel(index: Int): Callback = Callback {
-      logExceptions {
-        $.modState(_.minusPanelIndex(index)).runNow()
-      }
+    private def removeTransactionPanel(index: Int): Callback = LogExceptionsCallback {
+      $.modState(_.minusPanelIndex(index)).runNow()
     }
   }
 }

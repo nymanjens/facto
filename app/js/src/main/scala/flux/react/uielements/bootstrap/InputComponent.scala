@@ -2,7 +2,7 @@ package flux.react.uielements.bootstrap
 
 import java.util.NoSuchElementException
 
-import common.LoggingUtils.logExceptions
+import common.LoggingUtils.{logExceptions, LogExceptionsCallback}
 import flux.react.uielements.InputBase
 import common.LoggingUtils
 import japgolly.scalajs.react.{ReactEventI, TopNode, _}
@@ -21,18 +21,16 @@ private[bootstrap] object InputComponent {
     ReactComponentB[Props[ExtraProps]](name)
       .initialState_P[State](props => State(value = props.defaultValue, listeners = Seq(props.listener)))
       .renderPS((context, props, state) => logExceptions {
-        def onChange(e: ReactEventI): Callback = Callback {
-          logExceptions {
-            val newValue = e.target.value
-            val cleanedNewValue = ValueCleaner.cleanupValue(newValue, props)
-            val cleanedOldValue = ValueCleaner.cleanupValue(state.value, props)
-            if (cleanedOldValue != cleanedNewValue) {
-              for (listener <- context.state.listeners) {
-                listener.onChange(cleanedNewValue, directUserChange = true).runNow()
-              }
+        def onChange(e: ReactEventI): Callback = LogExceptionsCallback {
+          val newValue = e.target.value
+          val cleanedNewValue = ValueCleaner.cleanupValue(newValue, props)
+          val cleanedOldValue = ValueCleaner.cleanupValue(state.value, props)
+          if (cleanedOldValue != cleanedNewValue) {
+            for (listener <- context.state.listeners) {
+              listener.onChange(cleanedNewValue, directUserChange = true).runNow()
             }
-            context.modState(_.withValue(newValue)).runNow()
           }
+          context.modState(_.withValue(newValue)).runNow()
         }
 
         <.div(
@@ -57,17 +55,15 @@ private[bootstrap] object InputComponent {
           )
         )
       })
-      .componentWillReceiveProps(scope => Callback {
-        logExceptions {
-          // If the props have changed, the cleaned value may have changed. If this happens, the listeners should
-          // be notified.
-          val value = scope.currentState.value
-          val currentCleanedValue = ValueCleaner.cleanupValue(value, scope.currentProps)
-          val newCleanedValue = ValueCleaner.cleanupValue(value, scope.nextProps)
-          if (currentCleanedValue != newCleanedValue) {
-            for (listener <- scope.currentState.listeners) {
-              listener.onChange(newCleanedValue, directUserChange = false).runNow()
-            }
+      .componentWillReceiveProps(scope => LogExceptionsCallback {
+        // If the props have changed, the cleaned value may have changed. If this happens, the listeners should
+        // be notified.
+        val value = scope.currentState.value
+        val currentCleanedValue = ValueCleaner.cleanupValue(value, scope.currentProps)
+        val newCleanedValue = ValueCleaner.cleanupValue(value, scope.nextProps)
+        if (currentCleanedValue != newCleanedValue) {
+          for (listener <- scope.currentState.listeners) {
+            listener.onChange(newCleanedValue, directUserChange = false).runNow()
           }
         }
       })

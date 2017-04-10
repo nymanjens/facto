@@ -4,7 +4,7 @@ import scala.async.Async.{async, await}
 import scala.concurrent.duration._
 import scala.scalajs.js
 import api.ScalaJsApiClient
-import common.LoggingUtils.logExceptions
+import common.LoggingUtils.{logExceptions, LogExceptionsCallback}
 import common.ScalaUtils.visibleForTesting
 import jsfacades.Loki
 import models.access.SingletonKey._

@@ -1,6 +1,6 @@
 package flux.react.app.transactiongroupform
 
-import common.LoggingUtils.logExceptions
+import common.LoggingUtils.{logExceptions, LogExceptionsCallback}
 import common.{I18n, LoggingUtils}
 import common.CollectionUtils.toListMap
 import japgolly.scalajs.react._
@@ -130,7 +130,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                   })))
         },
         <.button(
-          ^.onClick --> Callback {
+          ^.onClick --> LogExceptionsCallback {
             println("  Price 1:" + price1Ref($).value)
             println("  Price 2:" + price2Ref($).value)
             println("  BeneficiaryAccountCode:" + beneficiaryAccountCodeRef($).value)
@@ -142,10 +142,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
     }
 
     private object BeneficiaryAccountListener extends InputBase.Listener {
-      override def onChange(newValue: String, directUserChange: Boolean) = Callback {
-        logExceptions {
-          $.modState(_.copy(beneficiaryAccount = accountingConfig.accounts(newValue))).runNow()
-        }
+      override def onChange(newValue: String, directUserChange: Boolean) = LogExceptionsCallback {
+        $.modState(_.copy(beneficiaryAccount = accountingConfig.accounts(newValue))).runNow()
       }
     }
   }

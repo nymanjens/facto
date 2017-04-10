@@ -1,7 +1,7 @@
 
 package flux.action
 
-import common.LoggingUtils.logExceptions
+import common.LoggingUtils.{logExceptions, LogExceptionsCallback}
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable

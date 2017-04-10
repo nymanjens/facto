@@ -1,6 +1,6 @@
 package flux.react.app.transactiongroupform
 
-import common.LoggingUtils.logExceptions
+import common.LoggingUtils.{logExceptions, LogExceptionsCallback}
 import flux.react.uielements.InputBase
 import japgolly.scalajs.react.{TopNode, _}
 
@@ -93,20 +93,16 @@ private[transactiongroupform] object InputWithDefaultFromReference {
       private var currentInputValue = ""
       private var currentDefaultValue = ""
 
-      def didMount(props: Props.any): Callback = Callback {
-        logExceptions {
-          props.inputElementRef($).registerListener(InputValueListener)
-          props.defaultValueProxy.get().registerListener(DefaultValueListener)
-          currentInputValue = props.inputElementRef($).value
-          currentDefaultValue = props.defaultValueProxy.get().value
-        }
+      def didMount(props: Props.any): Callback = LogExceptionsCallback {
+        props.inputElementRef($).registerListener(InputValueListener)
+        props.defaultValueProxy.get().registerListener(DefaultValueListener)
+        currentInputValue = props.inputElementRef($).value
+        currentDefaultValue = props.defaultValueProxy.get().value
       }
 
-      def willUnmount(props: Props.any): Callback = Callback {
-        logExceptions {
-          props.inputElementRef($).deregisterListener(InputValueListener)
-          props.defaultValueProxy.get().deregisterListener(DefaultValueListener)
-        }
+      def willUnmount(props: Props.any): Callback = LogExceptionsCallback {
+        props.inputElementRef($).deregisterListener(InputValueListener)
+        props.defaultValueProxy.get().deregisterListener(DefaultValueListener)
       }
 
       def render(props: Props.any, state: State) = logExceptions {
@@ -118,26 +114,22 @@ private[transactiongroupform] object InputWithDefaultFromReference {
       }
 
       private object InputValueListener extends InputBase.Listener {
-        override def onChange(newInputValue: String, directUserChange: Boolean) = Callback {
-          logExceptions {
-            currentInputValue = newInputValue
+        override def onChange(newInputValue: String, directUserChange: Boolean) = LogExceptionsCallback {
+          currentInputValue = newInputValue
 
-            $.setState(ConnectionState(isConnected = currentDefaultValue == newInputValue)).runNow()
-          }
+          $.setState(ConnectionState(isConnected = currentDefaultValue == newInputValue)).runNow()
         }
       }
 
       private object DefaultValueListener extends InputBase.Listener {
-        override def onChange(newDefaultValue: String, directUserChange: Boolean) = Callback {
-          logExceptions {
-            currentDefaultValue = newDefaultValue
+        override def onChange(newDefaultValue: String, directUserChange: Boolean) = LogExceptionsCallback {
+          currentDefaultValue = newDefaultValue
 
-            val inputProxy = $.props.runNow().inputElementRef($)
-            if ($.state.runNow().isConnected) {
-              currentInputValue = inputProxy.setValue(newDefaultValue)
-            }
-            $.setState(ConnectionState(isConnected = newDefaultValue == currentInputValue)).runNow()
+          val inputProxy = $.props.runNow().inputElementRef($)
+          if ($.state.runNow().isConnected) {
+            currentInputValue = inputProxy.setValue(newDefaultValue)
           }
+          $.setState(ConnectionState(isConnected = newDefaultValue == currentInputValue)).runNow()
         }
       }
     }

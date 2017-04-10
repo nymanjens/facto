@@ -1,5 +1,7 @@
 package common
 
+import japgolly.scalajs.react.{Callback, CallbackTo}
+
 object LoggingUtils {
 
   def logExceptions[T](codeBlock: => T): T = {
@@ -11,5 +13,9 @@ object LoggingUtils {
         t.printStackTrace()
         throw t
     }
+  }
+
+  def LogExceptionsCallback[T](codeBlock: => T): CallbackTo[T] = {
+    CallbackTo(logExceptions(codeBlock))
   }
 }
