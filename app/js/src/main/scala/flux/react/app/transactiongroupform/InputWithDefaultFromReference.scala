@@ -134,10 +134,9 @@ private[transactiongroupform] object InputWithDefaultFromReference {
 
             val inputProxy = $.props.runNow().inputElementRef($)
             if ($.state.runNow().isConnected) {
-              inputProxy.setValue(newDefaultValue)
-            } else {
-              $.setState(ConnectionState(isConnected = newDefaultValue == currentInputValue)).runNow()
+              currentInputValue = inputProxy.setValue(newDefaultValue)
             }
+            $.setState(ConnectionState(isConnected = newDefaultValue == currentInputValue)).runNow()
           }
         }
       }

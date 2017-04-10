@@ -1,16 +1,6 @@
 package flux.react.uielements
 
-import java.util.NoSuchElementException
-
-import common.LoggingUtils
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.prefix_<^._
-import flux.react.ReactVdomUtils.{^^, <<}
-import japgolly.scalajs.react.ReactComponentC.ReqProps
-import org.scalajs.dom.raw.HTMLInputElement
-import japgolly.scalajs.react.TopNode
-
-import scala.collection.immutable.Seq
 
 object InputBase {
 
@@ -21,7 +11,11 @@ object InputBase {
 
   trait Proxy {
     def value: String
-    def setValue(string: String): Unit
+    /**
+      * Returns the value after this change. This may be different from the input if the input is
+      * invalid for this field.
+      */
+    def setValue(string: String): String
     def registerListener(listener: Listener): Unit
     def deregisterListener(listener: Listener): Unit
   }
@@ -31,7 +25,7 @@ object InputBase {
 
     private final class ForwardingImpl(delegateProvider: () => Proxy) extends Proxy {
       override def value: String = delegateProvider().value
-      override def setValue(string: String): Unit = delegateProvider().setValue(string)
+      override def setValue(string: String) = delegateProvider().setValue(string)
       override def registerListener(listener: Listener): Unit = delegateProvider().registerListener(listener)
       override def deregisterListener(listener: Listener): Unit = delegateProvider().deregisterListener(listener)
     }

@@ -138,9 +138,11 @@ private[bootstrap] object InputComponent {
         for (listener <- componentProvider().state.listeners) {
           listener.onChange(string, directUserChange = false).runNow()
         }
+        string
       } else {
         println(s"  Setting a value ('$string') that is different when cleaned up (cleaned up value = '${cleanupValue(string)}'). " +
           s"Will ignore this setter.")
+        componentProvider().state.value
       }
     }
     override def registerListener(listener: InputBase.Listener) = componentProvider().modState(_.withListener(listener))
