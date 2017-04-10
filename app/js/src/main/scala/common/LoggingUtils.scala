@@ -1,8 +1,5 @@
 package common
 
-import scala.annotation.StaticAnnotation
-import scala.concurrent._
-
 object LoggingUtils {
 
   def logExceptions[T](codeBlock: => T): T = {
