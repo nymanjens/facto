@@ -109,7 +109,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
               label = i18n("facto.beneficiary"),
               inputClasses = extraProps.inputClasses,
               optionValueToName = toListMap(
-                accountingConfig.personallySortedAccounts.map(acc => (acc.code, acc.longName))))
+                accountingConfig.personallySortedAccounts.map(acc => (acc.code, acc.longName))),
+              listener = BeneficiaryAccountListener)
         },
         InputWithDefaultFromReference(
           ref = categoryCodeRef,
@@ -137,6 +138,14 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           "Test button"
         )
       )
+    }
+
+    private object BeneficiaryAccountListener extends InputBase.Listener {
+      override def onChange(newValue: String, directUserChange: Boolean) = Callback {
+        LoggingUtils.logExceptions {
+          $.modState(_.copy(beneficiaryAccount = accountingConfig.accounts(newValue))).runNow()
+        }
+      }
     }
   }
 }
