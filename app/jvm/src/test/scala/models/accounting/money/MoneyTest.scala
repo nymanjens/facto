@@ -8,6 +8,8 @@ import models._
 import play.api.test.WithApplication
 import play.twirl.api.Html
 
+import scala.collection.immutable.Seq
+
 class MoneyTest extends CacheClearingSpecification {
 
   @Inject implicit private val clock: Clock = null
@@ -27,6 +29,49 @@ class MoneyTest extends CacheClearingSpecification {
       Money.floatToCents(81.234) mustEqual 8123
       Money.floatToCents(-1.234) mustEqual -123
       Money.floatToCents(0.236) mustEqual 24
+    }
+
+    "floatStringToCents" in {
+      case class Case(input: String, output: Option[Long]) {
+        def negated: Case = Case("-" + input, output.map(cents => -cents))
+        def withPlusSignPrefix: Case = Case("+" + input, output)
+
+        def test = {
+          val resultTry = Money.tryFloatStringToCents(input)
+          if (resultTry.toOption != output) {
+            throw new AssertionError(s"Money.tryFloatStringToCents('$input') = $resultTry, but expected $output")
+          }
+          resultTry.toOption mustEqual output
+        }
+      }
+      val testCases = Seq(
+        Case("1.23", Option(123)),
+        Case("1.2", Option(120)),
+        Case("1,23", Option(123)),
+        Case("1,2", Option(120)),
+        Case("12345.", Option(1234500)),
+        Case(".12", Option(12)),
+        Case(",12", Option(12)),
+        Case("12,", Option(1200)),
+        Case("12.", Option(1200)),
+        Case("1,234,567.8", Option(123456780)),
+        Case("1,234,567", Option(123456700)),
+        Case("1,234", Option(123400)),
+        Case("1 234", Option(123400)),
+        Case(" 1 , 234 . 56 ", Option(123456)),
+        Case("1.2.3", None),
+        Case("", None),
+        Case("--1", None),
+        Case(".", None),
+        Case(",", None),
+        Case(".123", None),
+        Case(",123", None))
+
+      for (testCase <- testCases) yield {
+        testCase.test
+        testCase.negated.test
+        testCase.withPlusSignPrefix.test
+      }
     }
   }
 
