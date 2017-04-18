@@ -1,6 +1,6 @@
 package flux.react.app.transactiongroupform
 
-import common.LoggingUtils.{logExceptions, LogExceptionsCallback}
+import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.{I18n, LoggingUtils}
 import common.CollectionUtils.toListMap
 import japgolly.scalajs.react._
@@ -9,7 +9,8 @@ import japgolly.scalajs.react.vdom.prefix_<^._
 import flux.react.ReactVdomUtils.{<<, ^^}
 import flux.react.uielements
 import models.{EntityAccess, User}
-import models.accounting.config.{Account, Config}
+import models.accounting.config.{Account, Config, MoneyReservoir}
+import models.accounting.money.Currency
 import org.scalajs.dom.raw.HTMLInputElement
 
 import scala.collection.immutable.Seq
@@ -21,12 +22,15 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
 
   private val price1Ref = InputWithDefaultFromReference.ref("price1")
   private val price2Ref = InputWithDefaultFromReference.ref("price2")
-  private val beneficiaryAccountCodeRef = InputWithDefaultFromReference.ref("beneficiaryAccountCode")
+  private val moneyReservoirCodeRef = InputWithDefaultFromReference.ref("moneyReservoir")
+  private val beneficiaryAccountCodeRef = InputWithDefaultFromReference.ref("beneficiaryAccount")
   private val categoryCodeRef = InputWithDefaultFromReference.ref("categoryCode")
 
   private val component = {
     def calculateInitialState(props: Props): State = logExceptions {
-      State(beneficiaryAccount = accountingConfig.personallySortedAccounts.head)
+      State(
+        beneficiaryAccount = accountingConfig.personallySortedAccounts.head,
+        moneyReservoir = selectableReservoirs().head)
     }
     ReactComponentB[Props](getClass.getSimpleName)
       .initialState_P[State](calculateInitialState)
@@ -50,6 +54,13 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
 
   def ref(name: String): Reference = new Reference(Ref.to(component, name))
 
+  // **************** Private methods ****************//
+  private def selectableReservoirs(currentReservoir: MoneyReservoir = null): Seq[MoneyReservoir] = {
+    accountingConfig.moneyReservoirs(includeNullReservoir = false, includeHidden = true)
+      .filter(r => r == currentReservoir || !r.hidden) ++
+      Seq(MoneyReservoir.NullMoneyReservoir)
+  }
+
   // **************** Public inner types ****************//
   final class Reference private[TransactionPanel](private[TransactionPanel] val refComp: RefComp[Props, State, Backend, _ <: TopNode]) {
     def apply($: BackendScope[_, _]): Proxy = new Proxy(() => refComp($).get)
@@ -59,6 +70,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
     def price1: InputBase.Proxy = price1Ref(componentScope)
     def price2: InputBase.Proxy = price2Ref(componentScope)
     def beneficiaryAccountCode: InputBase.Proxy = beneficiaryAccountCodeRef(componentScope)
+    def moneyReservoirCode: InputBase.Proxy = moneyReservoirCodeRef(componentScope)
     def categoryCode: InputBase.Proxy = categoryCodeRef(componentScope)
 
     private def componentScope: BackendScope[Props, State] = componentProvider().backend.$
@@ -66,7 +78,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
 
 
   // **************** Private inner types ****************//
-  private case class State(beneficiaryAccount: Account)
+  private case class State(beneficiaryAccount: Account,
+                           moneyReservoir: MoneyReservoir)
 
   private case class Props(title: String,
                            defaultPanel: Option[Proxy],
@@ -94,11 +107,30 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             InputWithDefaultFromReference(
               ref = extraProps1.ref,
               defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.price2),
-              nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)) {
+              nameToDelegateRef = uielements.bootstrap.MoneyInput.ref(_)) {
               extraProps2 =>
-                uielements.bootstrap.TextInput(
-                  ref = extraProps2.ref, label = "price 2", inputClasses = extraProps1.inputClasses ++ extraProps2.inputClasses)
+                uielements.bootstrap.MoneyInput(
+                  ref = extraProps2.ref,
+                  label = "price 2",
+                  inputClasses = extraProps1.inputClasses ++ extraProps2.inputClasses,
+                  currency = state.moneyReservoir.currency
+                )
             }
+        },
+        InputWithDefaultFromReference(
+          ref = moneyReservoirCodeRef,
+          defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.moneyReservoirCode),
+          nameToDelegateRef = uielements.bootstrap.SelectInput.ref(_)) {
+          extraProps =>
+            uielements.bootstrap.SelectInput(
+              ref = extraProps.ref,
+              label = i18n("facto.reservoir"),
+              defaultValue = state.moneyReservoir.code,
+              inputClasses = extraProps.inputClasses,
+              optionValueToName = toListMap(
+                selectableReservoirs(state.moneyReservoir)
+                  .map(reservoir => reservoir.code -> reservoir.name)),
+              listener = MoneyReservoirListener)
         },
         InputWithDefaultFromReference(
           ref = beneficiaryAccountCodeRef,
@@ -108,6 +140,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             uielements.bootstrap.SelectInput(
               ref = extraProps.ref,
               label = i18n("facto.beneficiary"),
+              defaultValue = state.beneficiaryAccount.code,
               inputClasses = extraProps.inputClasses,
               optionValueToName = toListMap(
                 accountingConfig.personallySortedAccounts.map(acc => (acc.code, acc.longName))),
@@ -121,6 +154,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             uielements.bootstrap.SelectInput(
               ref = extraProps.ref,
               label = i18n("facto.category"),
+              defaultValue = "",
               inputClasses = extraProps.inputClasses,
               optionValueToName = toListMap(
                 state.beneficiaryAccount.categories
@@ -144,6 +178,19 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
     private object BeneficiaryAccountListener extends InputBase.Listener {
       override def onChange(newValue: String, directUserChange: Boolean) = LogExceptionsCallback {
         $.modState(_.copy(beneficiaryAccount = accountingConfig.accounts(newValue))).runNow()
+      }
+    }
+
+    private object MoneyReservoirListener extends InputBase.Listener {
+      override def onChange(newValue: String, directUserChange: Boolean) = LogExceptionsCallback {
+        val newReservoir = {
+          if(newValue == MoneyReservoir.NullMoneyReservoir.code) {
+            MoneyReservoir.NullMoneyReservoir
+          } else {
+            accountingConfig.moneyReservoirsMap(newValue)
+          }
+        }
+        $.modState(_.copy(moneyReservoir = newReservoir)).runNow()
       }
     }
   }

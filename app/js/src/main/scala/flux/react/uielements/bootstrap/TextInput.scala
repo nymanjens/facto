@@ -29,7 +29,8 @@ object TextInput {
           ^^.classes(classes),
           ^.name := name,
           ^.value := value,
-          ^.onChange ==> onChange)
+          ^.onChange ==> onChange
+        )
       }
     }
   )
