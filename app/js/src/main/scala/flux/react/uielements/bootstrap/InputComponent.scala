@@ -2,7 +2,7 @@ package flux.react.uielements.bootstrap
 
 import java.util.NoSuchElementException
 
-import common.LoggingUtils.{logExceptions, LogExceptionsCallback}
+import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import flux.react.uielements.InputBase
 import common.LoggingUtils
 import japgolly.scalajs.react.{ReactEventI, TopNode, _}
@@ -12,6 +12,7 @@ import japgolly.scalajs.react.ReactComponentC.ReqProps
 import org.scalajs.dom.raw.HTMLInputElement
 
 import scala.collection.immutable.Seq
+import scala.util.{Success, Failure, Try}
 
 private[bootstrap] object InputComponent {
 
@@ -141,18 +142,29 @@ private[bootstrap] object InputComponent {
     override def value = ValueTransformer.stringToValue(componentProvider().state.valueString, props)
     override def valueOrDefault = ValueTransformer.stringToValueOrDefault(componentProvider().state.valueString, props)
     override def setValue(newValue: Value) = {
-      val stringValue = ValueTransformer.valueToString(newValue, props)
-      val valueThroughTransformer = ValueTransformer.stringToValueOrDefault(stringValue, props)
-      if (newValue == valueThroughTransformer) {
+      def setValueInternal(newValue: Value): Value = {
+        val stringValue = ValueTransformer.valueToString(newValue, props)
         componentProvider().modState(_.withValueString(stringValue))
         for (listener <- componentProvider().state.listeners) {
           listener.onChange(newValue, directUserChange = false).runNow()
         }
         newValue
-      } else {
-        println(s"  Setting a value ('$newValue') that is different when transformed to string and back to value " +
-          s"(valueThroughTransformer = '$valueThroughTransformer'). Will ignore this setter.")
-        this.valueOrDefault
+      }
+      val maybeStringValue = Try(ValueTransformer.valueToString(newValue, props))
+      maybeStringValue match {
+        case Success(stringValue) =>
+          val valueThroughTransformer = ValueTransformer.stringToValueOrDefault(stringValue, props)
+          if (newValue == valueThroughTransformer) {
+            setValueInternal(newValue)
+          } else {
+            println(s"  Setting a value ('$newValue') that is different when transformed to string and back to value " +
+              s"(valueThroughTransformer = '$valueThroughTransformer'). Will ignore this setter.")
+            this.valueOrDefault
+          }
+        case Failure(_) =>
+          println(s"  Failed to get the String value for ${newValue}. This may be intended if the valid options for " +
+            s"this input are different from the reference one.")
+          setValueInternal(props.defaultValue)
       }
     }
     override def registerListener(listener: InputBase.Listener[Value]) = componentProvider().modState(_.withListener(listener))
