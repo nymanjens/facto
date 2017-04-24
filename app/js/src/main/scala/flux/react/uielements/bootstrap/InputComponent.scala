@@ -16,21 +16,26 @@ import scala.collection.immutable.Seq
 private[bootstrap] object InputComponent {
 
   // **************** API ****************//
-  def create[ExtraProps](name: String,
-                         inputRenderer: InputRenderer[ExtraProps]) = {
-    ReactComponentB[Props[ExtraProps]](name)
-      .initialState_P[State](props => State(value = props.defaultValue, listeners = Seq(props.listener)))
+  def create[Value, ExtraProps](name: String,
+                                inputRenderer: InputRenderer[ExtraProps]) = {
+    def calculateInitialState(props: Props[Value, ExtraProps]): State[Value] = logExceptions {
+      State(
+        valueString = ValueTransformer.valueToString(props.defaultValue, props),
+        listeners = Seq(props.listener))
+    }
+    ReactComponentB[Props[Value, ExtraProps]](name)
+      .initialState_P[State[Value]](calculateInitialState)
       .renderPS((context, props, state) => logExceptions {
         def onChange(e: ReactEventI): Callback = LogExceptionsCallback {
-          val newValue = e.target.value
-          val cleanedNewValue = ValueCleaner.cleanupValue(newValue, props)
-          val cleanedOldValue = ValueCleaner.cleanupValue(state.value, props)
-          if (cleanedOldValue != cleanedNewValue) {
+          val newString = e.target.value
+          val newValue = ValueTransformer.stringToValueOrDefault(newString, props)
+          val oldValue = ValueTransformer.stringToValueOrDefault(state.valueString, props)
+          if (oldValue != newValue) {
             for (listener <- context.state.listeners) {
-              listener.onChange(cleanedNewValue, directUserChange = true).runNow()
+              listener.onChange(newValue, directUserChange = true).runNow()
             }
           }
-          context.modState(_.withValue(newValue)).runNow()
+          context.modState(_.withValueString(newString)).runNow()
         }
 
         <.div(
@@ -43,7 +48,7 @@ private[bootstrap] object InputComponent {
             inputRenderer.renderInput(
               classes = "form-control" +: props.inputClasses,
               name = props.name,
-              value = state.value,
+              valueString = state.valueString,
               onChange = onChange,
               extraProps = props.extra),
             <<.ifThen(props.help) { msg =>
@@ -56,14 +61,14 @@ private[bootstrap] object InputComponent {
         )
       })
       .componentWillReceiveProps(scope => LogExceptionsCallback {
-        // If the props have changed, the cleaned value may have changed. If this happens, the listeners should
+        // If the props have changed, the transformed value may have changed. If this happens, the listeners should
         // be notified.
-        val value = scope.currentState.value
-        val currentCleanedValue = ValueCleaner.cleanupValue(value, scope.currentProps)
-        val newCleanedValue = ValueCleaner.cleanupValue(value, scope.nextProps)
-        if (currentCleanedValue != newCleanedValue) {
+        val valueString = scope.currentState.valueString
+        val currentValue = ValueTransformer.stringToValueOrDefault(valueString, scope.currentProps)
+        val newValue = ValueTransformer.stringToValueOrDefault(valueString, scope.nextProps)
+        if (currentValue != newValue) {
           for (listener <- scope.currentState.listeners) {
-            listener.onChange(newCleanedValue, directUserChange = false).runNow()
+            listener.onChange(newValue, directUserChange = false).runNow()
           }
         }
       })
@@ -71,79 +76,87 @@ private[bootstrap] object InputComponent {
   }
 
   // **************** Public inner types ****************//
-  type ThisRefComp[ExtraProps] = RefComp[Props[ExtraProps], State, Backend, _ <: TopNode]
+  type ThisRefComp[Value, ExtraProps] = RefComp[Props[Value, ExtraProps], State[Value], Backend, _ <: TopNode]
 
   trait InputRenderer[ExtraProps] {
     def renderInput(classes: Seq[String],
                     name: String,
-                    value: String,
+                    valueString: String,
                     onChange: ReactEventI => Callback,
                     extraProps: ExtraProps): ReactNode
   }
 
-  trait ValueCleaner[-ExtraProps] {
-    /**
-      * Returns the value as it should be seen via `InputBase.Proxy.value` or as listener (i.e. the listener will
-      * only listen to changes to the cleaned value, rather than the internal value).
-      *
-      * Note: This does not influence the possible values the input can have internally (in `state.value`).
-      */
-    def cleanupValue(internalValue: String, extraProps: ExtraProps): String
+  trait ValueTransformer[Value, -ExtraProps] {
+    def stringToValue(string: String, extraProps: ExtraProps): Option[Value]
+    def valueToString(value: Value, extraProps: ExtraProps): String
   }
 
-  object ValueCleaner {
-    def nullInstance[ExtraProps] = new ValueCleaner[ExtraProps] {
-      override def cleanupValue(internalValue: String, extraProps: ExtraProps) = internalValue
+  object ValueTransformer {
+    def nullInstance[ExtraProps]: ValueTransformer[String, ExtraProps] = new ValueTransformer[String, ExtraProps] {
+      override def stringToValue(string: String, extraProps: ExtraProps) = Some(string)
+      override def valueToString(value: String, extraProps: ExtraProps) = value
     }
 
-    def cleanupValue[ExtraProps](internalValue: String, props: Props[ExtraProps]): String = {
-      props.valueCleaner.cleanupValue(internalValue, props.extra)
+    def stringToValue[Value, ExtraProps](string: String, props: Props[Value, ExtraProps]): Option[Value] = {
+      props.valueTransformer.stringToValue(string, props.extra)
+    }
+
+    def stringToValueOrDefault[Value, ExtraProps](string: String, props: Props[Value, ExtraProps]): Value = {
+      val maybeValue = stringToValue(string, props)
+      maybeValue getOrElse props.defaultValue
+    }
+
+    def valueToString[Value, ExtraProps](value: Value, props: Props[Value, ExtraProps]): String = {
+      props.valueTransformer.valueToString(value, props.extra)
     }
   }
 
-  case class Props[ExtraProps](label: String,
-                               name: String,
-                               defaultValue: String,
-                               help: Option[String],
-                               errorMessage: Option[String],
-                               inputClasses: Seq[String],
-                               listener: InputBase.Listener,
-                               extra: ExtraProps = (): Unit,
-                               valueCleaner: ValueCleaner[ExtraProps] = ValueCleaner.nullInstance)
+  case class Props[Value, ExtraProps](label: String,
+                                      name: String,
+                                      defaultValue: Value,
+                                      help: Option[String],
+                                      errorMessage: Option[String],
+                                      inputClasses: Seq[String],
+                                      listener: InputBase.Listener[Value],
+                                      extra: ExtraProps = (): Unit,
+                                      valueTransformer: ValueTransformer[Value, ExtraProps])
 
-  case class State(value: String,
-                   listeners: Seq[InputBase.Listener] = Seq()) {
-    def withValue(newValue: String): State = copy(value = newValue)
-    def withListener(listener: InputBase.Listener): State = copy(listeners = listeners :+ listener)
-    def withoutListener(listener: InputBase.Listener): State = copy(listeners = listeners.filter(_ != listener))
+  case class State[Value](valueString: String,
+                          listeners: Seq[InputBase.Listener[Value]] = Seq()) {
+    def withValueString(newString: String): State[Value] = copy(valueString = newString)
+    def withListener(listener: InputBase.Listener[Value]): State[Value] = copy(listeners = listeners :+ listener)
+    def withoutListener(listener: InputBase.Listener[Value]): State[Value] = copy(listeners = listeners.filter(_ != listener))
   }
 
-  abstract class Reference[ExtraProps](refComp: ThisRefComp[ExtraProps]) extends InputBase.Reference {
-    override final def apply($: BackendScope[_, _]): InputBase.Proxy = new Proxy[ExtraProps](() => refComp($).get)
+  abstract class Reference[Value, ExtraProps](refComp: ThisRefComp[Value, ExtraProps]) extends InputBase.Reference[Value] {
+    override final def apply($: BackendScope[_, _]): InputBase.Proxy[Value] = new Proxy[Value, ExtraProps](() => refComp($).get)
     override final def name = refComp.name
   }
 
   // **************** Private inner types ****************//
   private type Backend = Unit
-  private type ThisComponentU[ExtraProps] = ReactComponentU[Props[ExtraProps], State, Backend, _ <: TopNode]
+  private type ThisComponentU[Value, ExtraProps] = ReactComponentU[Props[Value, ExtraProps], State[Value], Backend, _ <: TopNode]
 
-  private final class Proxy[ExtraProps](val componentProvider: () => ThisComponentU[ExtraProps]) extends InputBase.Proxy {
-    override def value = cleanupValue(componentProvider().state.value)
-    override def setValue(string: String) = {
-      if (string == cleanupValue(string)) {
-        componentProvider().modState(_.withValue(string))
+  private final class Proxy[Value, ExtraProps](val componentProvider: () => ThisComponentU[Value, ExtraProps]) extends InputBase.Proxy[Value] {
+    override def value = ValueTransformer.stringToValue(componentProvider().state.valueString, props)
+    override def valueOrDefault = ValueTransformer.stringToValueOrDefault(componentProvider().state.valueString, props)
+    override def setValue(newValue: Value) = {
+      val stringValue = ValueTransformer.valueToString(newValue, props)
+      val valueThroughTransformer = ValueTransformer.stringToValueOrDefault(stringValue, props)
+      if (newValue == valueThroughTransformer) {
+        componentProvider().modState(_.withValueString(stringValue))
         for (listener <- componentProvider().state.listeners) {
-          listener.onChange(string, directUserChange = false).runNow()
+          listener.onChange(newValue, directUserChange = false).runNow()
         }
-        string
+        newValue
       } else {
-        println(s"  Setting a value ('$string') that is different when cleaned up (cleaned up value = '${cleanupValue(string)}'). " +
-          s"Will ignore this setter.")
-        componentProvider().state.value
+        println(s"  Setting a value ('$newValue') that is different when transformed to string and back to value " +
+          s"(valueThroughTransformer = '$valueThroughTransformer'). Will ignore this setter.")
+        this.valueOrDefault
       }
     }
-    override def registerListener(listener: InputBase.Listener) = componentProvider().modState(_.withListener(listener))
-    override def deregisterListener(listener: InputBase.Listener) = {
+    override def registerListener(listener: InputBase.Listener[Value]) = componentProvider().modState(_.withListener(listener))
+    override def deregisterListener(listener: InputBase.Listener[Value]) = {
       try {
         componentProvider().modState(_.withoutListener(listener))
       } catch {
@@ -151,8 +164,6 @@ private[bootstrap] object InputComponent {
       }
     }
 
-    private def cleanupValue(internalValue: String): String = {
-      ValueCleaner.cleanupValue(internalValue, componentProvider().props)
-    }
+    private def props: Props[Value, ExtraProps] = componentProvider().props
   }
 }

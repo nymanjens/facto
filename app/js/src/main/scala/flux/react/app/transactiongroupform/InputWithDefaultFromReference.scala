@@ -1,32 +1,42 @@
 package flux.react.app.transactiongroupform
 
+import common.CollectionUtils.toListMap
+import common.GuavaReplacement.Iterables.getOnlyElement
+import flux.react.ReactVdomUtils.^^
+import flux.react.uielements.InputBase
+import japgolly.scalajs.react._
+import japgolly.scalajs.react.vdom.prefix_<^._
+
+import scala.collection.immutable.Seq
+import scala.collection.mutable
+import scala.reflect.ClassTag
 import common.LoggingUtils.{logExceptions, LogExceptionsCallback}
 import flux.react.uielements.InputBase
 import japgolly.scalajs.react.{TopNode, _}
 
 import scala.collection.immutable.Seq
 
-private[transactiongroupform] object InputWithDefaultFromReference {
+private[transactiongroupform] class InputWithDefaultFromReference[Value] private() {
 
   private val component = ReactComponentB[Props.any]("InputWithDefaultFromReferenceWrapper")
     .renderBackend[Backend]
     .build
 
   // **************** API ****************//
-  def apply[DelegateRef <: InputBase.Reference](ref: Reference,
-                                                defaultValueProxy: Option[() => InputBase.Proxy],
-                                                nameToDelegateRef: String => DelegateRef
-                                               )(inputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement): ReactElement = {
+  def apply[DelegateRef <: InputBase.Reference[Value]](ref: Reference,
+                                                       defaultValueProxy: Option[() => InputBase.Proxy[Value]],
+                                                       nameToDelegateRef: String => DelegateRef
+                                                      )(inputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement): ReactElement = {
     component.withRef(ref.name)(Props(
       inputElementRef = nameToDelegateRef("delegate"),
       defaultValueProxy = defaultValueProxy,
       inputElementFactory = inputElementFactory))
   }
 
-  def apply[DelegateRef <: InputBase.Reference](ref: Reference,
-                                                defaultValueProxy: => InputBase.Proxy,
-                                                nameToDelegateRef: String => DelegateRef
-                                               )(inputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement): ReactElement = {
+  def apply[DelegateRef <: InputBase.Reference[Value]](ref: Reference,
+                                                       defaultValueProxy: => InputBase.Proxy[Value],
+                                                       nameToDelegateRef: String => DelegateRef
+                                                      )(inputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement): ReactElement = {
     apply(
       ref = ref,
       defaultValueProxy = Some(() => defaultValueProxy),
@@ -37,10 +47,10 @@ private[transactiongroupform] object InputWithDefaultFromReference {
   def ref(name: String): Reference = new Reference(Ref.to(component, name))
 
   // **************** Public inner types ****************//
-  case class InputElementExtraProps[DelegateRef <: InputBase.Reference](ref: DelegateRef,
-                                                                        inputClasses: Seq[String])
+  case class InputElementExtraProps[DelegateRef <: InputBase.Reference[Value]](ref: DelegateRef,
+                                                                               inputClasses: Seq[String])
 
-  final class Reference private[InputWithDefaultFromReference](refComp: ThisRefComp) extends InputBase.Reference {
+  final class Reference private[InputWithDefaultFromReference](refComp: ThisRefComp) extends InputBase.Reference[Value] {
     override def apply($: BackendScope[_, _]) = {
       InputBase.Proxy.forwardingTo {
         val component = refComp($).get
@@ -61,11 +71,11 @@ private[transactiongroupform] object InputWithDefaultFromReference {
   private type ThisRefComp = RefComp[Props.any, State, Backend, _ <: TopNode]
   private type State = Unit
 
-  private case class Props[DelegateRef <: InputBase.Reference](inputElementRef: DelegateRef,
-                                                               defaultValueProxy: Option[() => InputBase.Proxy],
-                                                               inputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement)
+  private case class Props[DelegateRef <: InputBase.Reference[Value]](inputElementRef: DelegateRef,
+                                                                      defaultValueProxy: Option[() => InputBase.Proxy[Value]],
+                                                                      inputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement)
   private object Props {
-    type any = Props[_ <: InputBase.Reference]
+    type any = Props[_ <: InputBase.Reference[Value]]
   }
 
   private final class Backend(val $: BackendScope[Props.any, State]) {
@@ -90,14 +100,14 @@ private[transactiongroupform] object InputWithDefaultFromReference {
     type State = ConnectionState
 
     final class Backend(val $: BackendScope[Props.any, State]) {
-      private var currentInputValue = ""
-      private var currentDefaultValue = ""
+      private var currentInputValue: Value = null.asInstanceOf[Value]
+      private var currentDefaultValue: Value = null.asInstanceOf[Value]
 
       def didMount(props: Props.any): Callback = LogExceptionsCallback {
         props.inputElementRef($).registerListener(InputValueListener)
         props.defaultValueProxy.get().registerListener(DefaultValueListener)
-        currentInputValue = props.inputElementRef($).value
-        currentDefaultValue = props.defaultValueProxy.get().value
+        currentInputValue = props.inputElementRef($).valueOrDefault
+        currentDefaultValue = props.defaultValueProxy.get().valueOrDefault
       }
 
       def willUnmount(props: Props.any): Callback = LogExceptionsCallback {
@@ -106,23 +116,23 @@ private[transactiongroupform] object InputWithDefaultFromReference {
       }
 
       def render(props: Props.any, state: State) = logExceptions {
-        def renderInternal[DelegateRef <: InputBase.Reference](props: Props[DelegateRef]) = {
+        def renderInternal[DelegateRef <: InputBase.Reference[Value]](props: Props[DelegateRef]) = {
           val inputClasses = if (state.isConnected) Seq("bound-until-change") else Seq()
           props.inputElementFactory(InputElementExtraProps(props.inputElementRef, inputClasses))
         }
         renderInternal(props)
       }
 
-      private object InputValueListener extends InputBase.Listener {
-        override def onChange(newInputValue: String, directUserChange: Boolean) = LogExceptionsCallback {
+      private object InputValueListener extends InputBase.Listener[Value] {
+        override def onChange(newInputValue: Value, directUserChange: Boolean) = LogExceptionsCallback {
           currentInputValue = newInputValue
 
           $.setState(ConnectionState(isConnected = currentDefaultValue == newInputValue)).runNow()
         }
       }
 
-      private object DefaultValueListener extends InputBase.Listener {
-        override def onChange(newDefaultValue: String, directUserChange: Boolean) = LogExceptionsCallback {
+      private object DefaultValueListener extends InputBase.Listener[Value] {
+        override def onChange(newDefaultValue: Value, directUserChange: Boolean) = LogExceptionsCallback {
           currentDefaultValue = newDefaultValue
 
           val inputProxy = $.props.runNow().inputElementRef($)
@@ -152,11 +162,23 @@ private[transactiongroupform] object InputWithDefaultFromReference {
 
     final class Backend(val $: BackendScope[Props.any, State]) {
       def render(props: Props.any, state: State) = logExceptions {
-        def renderInternal[DelegateRef <: InputBase.Reference](props: Props[DelegateRef]) = {
+        def renderInternal[DelegateRef <: InputBase.Reference[Value]](props: Props[DelegateRef]) = {
           props.inputElementFactory(InputElementExtraProps(props.inputElementRef, inputClasses = Seq()))
         }
         renderInternal(props)
       }
     }
+  }
+}
+
+private[transactiongroupform] object InputWithDefaultFromReference {
+  private val typeToInstance: mutable.Map[Class[_], InputWithDefaultFromReference[_]] = mutable.Map()
+
+  def forType[Value: ClassTag]: InputWithDefaultFromReference[Value] = {
+    val clazz = implicitly[ClassTag[Value]].runtimeClass
+    if (!(typeToInstance contains clazz)) {
+      typeToInstance.put(clazz, new InputWithDefaultFromReference[Value]())
+    }
+    typeToInstance(clazz).asInstanceOf[InputWithDefaultFromReference[Value]]
   }
 }

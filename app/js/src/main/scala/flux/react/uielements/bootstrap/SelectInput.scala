@@ -1,39 +1,37 @@
 package flux.react.uielements.bootstrap
 
-import java.util.NoSuchElementException
-
-import flux.react.uielements.bootstrap.InputComponent.{InputRenderer, Props}
+import common.CollectionUtils.toListMap
+import common.GuavaReplacement.Iterables.getOnlyElement
+import flux.react.ReactVdomUtils.^^
 import flux.react.uielements.InputBase
-import common.LoggingUtils
+import flux.react.uielements.bootstrap.InputComponent.{InputRenderer, Props}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
-import flux.react.ReactVdomUtils.{<<, ^^}
-import japgolly.scalajs.react.ReactComponentC.ReqProps
-import org.scalajs.dom.raw.HTMLInputElement
-import japgolly.scalajs.react.TopNode
 
 import scala.collection.immutable.Seq
+import scala.collection.mutable
+import scala.reflect.ClassTag
 
-object SelectInput {
+class SelectInput[Value] private(implicit valueTag: ClassTag[Value]) {
 
-  private val component = InputComponent.create(
-    name = getClass.getSimpleName,
+  private val component = InputComponent.create[Value, ExtraProps](
+    name = s"${getClass.getSimpleName}_${valueTag.runtimeClass.getSimpleName}",
     inputRenderer = new InputRenderer[ExtraProps] {
       override def renderInput(classes: Seq[String],
                                name: String,
-                               value: String,
+                               valueString: String,
                                onChange: ReactEventI => Callback,
                                extraProps: ExtraProps) = {
         <.select(
           ^^.classes(classes),
           ^.name := name,
-          ^.value := value,
+          ^.value := valueString,
           ^.onChange ==> onChange,
-          for ((optionValue, optionName) <- extraProps.optionValueToName) yield {
+          for ((optionId, option) <- extraProps.idToOptionMap) yield {
             <.option(
-              ^.value := optionValue,
-              ^.key := optionValue,
-              optionName
+              ^.value := optionId,
+              ^.key := optionId,
+              option.name
             )
           }
         )
@@ -44,41 +42,71 @@ object SelectInput {
   // **************** API ****************//
   def apply(ref: Reference,
             label: String,
-            defaultValue: String = "",
             help: String = null,
             errorMessage: String = null,
+            defaultValue: Value = null.asInstanceOf[Value],
             inputClasses: Seq[String] = Seq(),
-            optionValueToName: Map[String, String],
-            listener: InputBase.Listener = InputBase.Listener.nullInstance): ReactElement = {
+            options: Seq[Value],
+            valueToId: Value => String,
+            valueToName: Value => String,
+            listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance): ReactElement = {
     val props = Props(
       label = label,
       name = ref.name,
-      defaultValue = defaultValue,
+      defaultValue = Option(defaultValue) getOrElse options.head,
       help = Option(help),
       errorMessage = Option(errorMessage),
       inputClasses = inputClasses,
       listener = listener,
-      extra = ExtraProps(optionValueToName),
-      valueCleaner = ValueCleaner)
+      extra = ExtraProps.create(options, valueToId = valueToId, valueToName = valueToName),
+      valueTransformer = ValueTransformer)
     component.withRef(ref.name)(props)
   }
 
   def ref(name: String): Reference = new Reference(Ref.to(component, name))
 
   // **************** Public inner types ****************//
-  final class Reference private[SelectInput](refComp: InputComponent.ThisRefComp[ExtraProps])
-    extends InputComponent.Reference[ExtraProps](refComp)
+  final class Reference private[SelectInput](refComp: InputComponent.ThisRefComp[Value, ExtraProps])
+    extends InputComponent.Reference[Value, ExtraProps](refComp)
 
-  case class ExtraProps(optionValueToName: Map[String, String])
+  case class ExtraProps private(idToOptionMap: Map[String, ExtraProps.ValueAndName])
+  object ExtraProps {
+    private[SelectInput] def create(options: Seq[Value],
+                                    valueToId: Value => String,
+                                    valueToName: Value => String): ExtraProps = {
+      ExtraProps(
+        idToOptionMap = toListMap {
+          for (option <- options) yield {
+            valueToId(option) -> ValueAndName(value = option, name = valueToName(option))
+          }
+        }
+      )
+    }
+
+    case class ValueAndName private(value: Value, name: String)
+  }
 
   // **************** Private inner types ****************//
-  private object ValueCleaner extends InputComponent.ValueCleaner[ExtraProps] {
-    override def cleanupValue(internalValue: String, extraProps: ExtraProps) = {
-      if (extraProps.optionValueToName.contains(internalValue)) {
-        internalValue
-      } else {
-        extraProps.optionValueToName.keys.headOption getOrElse ""
-      }
+  private object ValueTransformer extends InputComponent.ValueTransformer[Value, ExtraProps] {
+    override def stringToValue(string: String, extraProps: ExtraProps) = {
+      extraProps.idToOptionMap.get(string) map (_.value)
     }
+
+    override def valueToString(value: Value, extraProps: ExtraProps) = {
+      getOnlyElement(
+        extraProps.idToOptionMap.filter { case (id, option) => option.value == value }.keys)
+    }
+  }
+}
+
+object SelectInput {
+  private val typeToInstance: mutable.Map[Class[_], SelectInput[_]] = mutable.Map()
+
+  def forType[Value: ClassTag]: SelectInput[Value] = {
+    val clazz = implicitly[ClassTag[Value]].runtimeClass
+    if (!(typeToInstance contains clazz)) {
+      typeToInstance.put(clazz, new SelectInput[Value]())
+    }
+    typeToInstance(clazz).asInstanceOf[SelectInput[Value]]
   }
 }
