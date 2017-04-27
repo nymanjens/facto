@@ -31,9 +31,9 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
 
   private val price1Ref = moneyInputWithDefault.ref("price1")
   private val price2Ref = moneyInputWithDefault.ref("price2")
-  private val moneyReservoirCodeRef = reservoirInputWithDefault.ref("moneyReservoir")
-  private val beneficiaryAccountCodeRef = accountInputWithDefault.ref("beneficiaryAccount")
-  private val categoryCodeRef = categoryInputWithDefault.ref("category")
+  private val moneyReservoirRef = reservoirInputWithDefault.ref("moneyReservoir")
+  private val beneficiaryAccountRef = accountInputWithDefault.ref("beneficiaryAccount")
+  private val categoryRef = categoryInputWithDefault.ref("category")
 
   private val component = {
     def calculateInitialState(props: Props): State = logExceptions {
@@ -78,9 +78,9 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   final class Proxy private[TransactionPanel](private val componentProvider: () => ReactComponentU[Props, State, Backend, _ <: TopNode]) {
     def price1: InputBase.Proxy[Long] = price1Ref(componentScope)
     def price2: InputBase.Proxy[Long] = price2Ref(componentScope)
-    def beneficiaryAccountCode: InputBase.Proxy[Account] = beneficiaryAccountCodeRef(componentScope)
-    def moneyReservoirCode: InputBase.Proxy[MoneyReservoir] = moneyReservoirCodeRef(componentScope)
-    def categoryCode: InputBase.Proxy[Category] = categoryCodeRef(componentScope)
+    def beneficiaryAccountCode: InputBase.Proxy[Account] = beneficiaryAccountRef(componentScope)
+    def moneyReservoirCode: InputBase.Proxy[MoneyReservoir] = moneyReservoirRef(componentScope)
+    def categoryCode: InputBase.Proxy[Category] = categoryRef(componentScope)
 
     private def componentScope: BackendScope[Props, State] = componentProvider().backend.$
   }
@@ -131,7 +131,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             }
         },
         reservoirInputWithDefault.forOption(
-          ref = moneyReservoirCodeRef,
+          ref = moneyReservoirRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.moneyReservoirCode),
           nameToDelegateRef = reservoirSelectInput.ref(_)) {
           extraProps =>
@@ -147,7 +147,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             )
         },
         accountInputWithDefault.forOption(
-          ref = beneficiaryAccountCodeRef,
+          ref = beneficiaryAccountRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.beneficiaryAccountCode),
           directUserChangeOnly = true,
           nameToDelegateRef = accountSelectInput.ref(_)) {
@@ -164,7 +164,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             )
         },
         categoryInputWithDefault.forOption(
-          ref = categoryCodeRef,
+          ref = categoryRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.categoryCode),
           directUserChangeOnly = true,
           nameToDelegateRef = categorySelectInput.ref(_)) {
@@ -182,8 +182,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ^.onClick --> LogExceptionsCallback {
             println("  Price 1:" + price1Ref($).value)
             println("  Price 2:" + price2Ref($).value)
-            println("  BeneficiaryAccountCode:" + beneficiaryAccountCodeRef($).value)
-            println("  CategoryCode:" + categoryCodeRef($).value)
+            println("  BeneficiaryAccountCode:" + beneficiaryAccountRef($).value)
+            println("  CategoryCode:" + categoryRef($).value)
           },
           "Test button"
         )
