@@ -89,6 +89,11 @@ private[bootstrap] object InputComponent {
   }
 
   trait ValueTransformer[Value, -ExtraProps] {
+
+    /**
+      * Returns the Value that corresponds to the given String or None iff the current value is
+      * invalid.
+      */
     def stringToValue(string: String, extraProps: ExtraProps): Option[Value]
 
     /**

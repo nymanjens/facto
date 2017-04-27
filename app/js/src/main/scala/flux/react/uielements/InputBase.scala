@@ -20,6 +20,9 @@ object InputBase {
       * invalid for this field. May return the default value if there is no valid value to return.
       */
     def setValue(string: Value): Value
+
+    final def valueIsValid: Boolean = value.isDefined
+
     def registerListener(listener: Listener[Value]): Unit
     def deregisterListener(listener: Listener[Value]): Unit
   }
