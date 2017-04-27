@@ -5,7 +5,7 @@ import flux.react.uielements.InputBase
 import flux.react.uielements.bootstrap.InputComponent.{InputRenderer, Props}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
-import models.accounting.money.{Currency, Money, MoneyWithGeneralCurrency}
+import models.accounting.money.{Currency, Money}
 
 import scala.collection.immutable.Seq
 
@@ -50,10 +50,10 @@ object MoneyInput {
             inputClasses: Seq[String] = Seq(),
             currency: Currency,
             listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance): ReactElement = {
-    val props = Props(
+    val props = Props[Value, ExtraProps](
       label = label,
       name = ref.name,
-      defaultValue = MoneyWithGeneralCurrency(0, currency),
+      defaultValue = 0,
       help = Option(help),
       errorMessage = Option(errorMessage),
       inputClasses = inputClasses,
@@ -72,17 +72,16 @@ object MoneyInput {
   case class ExtraProps(currency: Currency)
 
   // **************** Private inner types ****************//
-  type Value = MoneyWithGeneralCurrency
+  /** Number of cents. */
+  type Value = Long
 
   private object ValueTransformer extends InputComponent.ValueTransformer[Value, ExtraProps] {
     override def stringToValue(string: String, extraProps: ExtraProps) = {
-      Money.floatStringToCents(string) map {
-        cents => MoneyWithGeneralCurrency(cents, extraProps.currency)
-      }
+      Money.floatStringToCents(string)
     }
 
-    override def valueToString(value: MoneyWithGeneralCurrency, extraProps: ExtraProps) = {
-      value.formatFloat
+    override def valueToString(cents: Long, extraProps: ExtraProps) = {
+      Money.centsToFloatString(cents)
     }
   }
 }

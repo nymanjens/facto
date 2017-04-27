@@ -21,7 +21,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                                                            user: User,
                                                            entityAccess: EntityAccess) {
 
-  private val moneyInputWithDefault = InputWithDefaultFromReference.forType[MoneyWithGeneralCurrency]
+  private val moneyInputWithDefault = InputWithDefaultFromReference.forType[Long]
   private val reservoirInputWithDefault = InputWithDefaultFromReference.forType[MoneyReservoir]
   private val accountInputWithDefault = InputWithDefaultFromReference.forType[Account]
   private val categoryInputWithDefault = InputWithDefaultFromReference.forType[Category]
@@ -76,8 +76,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   }
 
   final class Proxy private[TransactionPanel](private val componentProvider: () => ReactComponentU[Props, State, Backend, _ <: TopNode]) {
-    def price1: InputBase.Proxy[MoneyWithGeneralCurrency] = price1Ref(componentScope)
-    def price2: InputBase.Proxy[MoneyWithGeneralCurrency] = price2Ref(componentScope)
+    def price1: InputBase.Proxy[Long] = price1Ref(componentScope)
+    def price2: InputBase.Proxy[Long] = price2Ref(componentScope)
     def beneficiaryAccountCode: InputBase.Proxy[Account] = beneficiaryAccountCodeRef(componentScope)
     def moneyReservoirCode: InputBase.Proxy[MoneyReservoir] = moneyReservoirCodeRef(componentScope)
     def categoryCode: InputBase.Proxy[Category] = categoryCodeRef(componentScope)
