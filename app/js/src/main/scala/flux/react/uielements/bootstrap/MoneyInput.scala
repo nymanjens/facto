@@ -5,18 +5,18 @@ import flux.react.uielements.InputBase
 import flux.react.uielements.bootstrap.InputComponent.{InputRenderer, Props}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
-import models.accounting.money.{Currency, Money}
+import models.accounting.money.{Currency, Money, MoneyWithGeneralCurrency}
 
 import scala.collection.immutable.Seq
 
 object MoneyInput {
 
-  private val component = InputComponent.create(
+  private val component = InputComponent.create[Value, ExtraProps](
     name = getClass.getSimpleName,
     inputRenderer = new InputRenderer[ExtraProps] {
       override def renderInput(classes: Seq[String],
                                name: String,
-                               value: String,
+                               valueString: String,
                                onChange: ReactEventI => Callback,
                                extraProps: ExtraProps) = {
         <.div(^.className := "input-group",
@@ -29,7 +29,7 @@ object MoneyInput {
             ^.autoComplete := "off",
             ^^.classes(classes),
             ^.name := name,
-            ^.value := value,
+            ^.value := valueString,
             ^.onChange ==> onChange
           ),
           <.span(
@@ -45,37 +45,44 @@ object MoneyInput {
   // **************** API ****************//
   def apply(ref: Reference,
             label: String,
-            defaultValue: String = "",
             help: String = null,
             errorMessage: String = null,
             inputClasses: Seq[String] = Seq(),
             currency: Currency,
-            listener: InputBase.Listener = InputBase.Listener.nullInstance): ReactElement = {
+            listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance): ReactElement = {
     val props = Props(
       label = label,
       name = ref.name,
-      defaultValue = defaultValue,
+      defaultValue = MoneyWithGeneralCurrency(0, currency),
       help = Option(help),
       errorMessage = Option(errorMessage),
       inputClasses = inputClasses,
       listener = listener,
-      extra = ExtraProps(currency))
+      extra = ExtraProps(currency),
+      valueTransformer = ValueTransformer)
     component.withRef(ref.name)(props)
   }
 
   def ref(name: String): Reference = new Reference(Ref.to(component, name))
 
   // **************** Public inner types ****************//
-  final class Reference private[MoneyInput](refComp: InputComponent.ThisRefComp[ExtraProps])
+  final class Reference private[MoneyInput](refComp: InputComponent.ThisRefComp[Value, ExtraProps])
     extends InputComponent.Reference(refComp)
 
   case class ExtraProps(currency: Currency)
 
   // **************** Private inner types ****************//
-  private object ValueCleaner extends InputComponent.ValueCleaner[ExtraProps] {
-    override def cleanupValue(internalValue: String, extraProps: ExtraProps) = {
-      val longValue = Money.floatStringToCents(internalValue) getOrElse 0L
-      longValue.toString
+  type Value = MoneyWithGeneralCurrency
+
+  private object ValueTransformer extends InputComponent.ValueTransformer[Value, ExtraProps] {
+    override def stringToValue(string: String, extraProps: ExtraProps) = {
+      Money.floatStringToCents(string) map {
+        cents => MoneyWithGeneralCurrency(cents, extraProps.currency)
+      }
+    }
+
+    override def valueToString(value: MoneyWithGeneralCurrency, extraProps: ExtraProps) = {
+      value.formatFloat
     }
   }
 }
