@@ -90,6 +90,12 @@ private[bootstrap] object InputComponent {
 
   trait ValueTransformer[Value, -ExtraProps] {
     def stringToValue(string: String, extraProps: ExtraProps): Option[Value]
+
+    /**
+      * Returns the string value of given value.
+      *
+      * @throws Exception (any) if the given value is invalid for given props
+      */
     def valueToString(value: Value, extraProps: ExtraProps): String
   }
 
