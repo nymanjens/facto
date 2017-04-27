@@ -68,6 +68,7 @@ private[bootstrap] object InputComponent {
         val currentValue = ValueTransformer.stringToValueOrDefault(valueString, scope.currentProps)
         val newValue = ValueTransformer.stringToValueOrDefault(valueString, scope.nextProps)
         if (currentValue != newValue) {
+          scope.$.modState(_.withValueString(ValueTransformer.valueToString(newValue, scope.nextProps))).runNow()
           for (listener <- scope.currentState.listeners) {
             listener.onChange(newValue, directUserChange = false).runNow()
           }
