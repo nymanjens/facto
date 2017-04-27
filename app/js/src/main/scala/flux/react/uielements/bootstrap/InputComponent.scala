@@ -68,6 +68,7 @@ private[bootstrap] object InputComponent {
         val currentValue = ValueTransformer.stringToValueOrDefault(valueString, scope.currentProps)
         val newValue = ValueTransformer.stringToValueOrDefault(valueString, scope.nextProps)
         if (currentValue != newValue) {
+          scope.$.modState(_.withValueString(ValueTransformer.valueToString(newValue, scope.nextProps))).runNow()
           for (listener <- scope.currentState.listeners) {
             listener.onChange(newValue, directUserChange = false).runNow()
           }
@@ -89,6 +90,12 @@ private[bootstrap] object InputComponent {
 
   trait ValueTransformer[Value, -ExtraProps] {
     def stringToValue(string: String, extraProps: ExtraProps): Option[Value]
+
+    /**
+      * Returns the string value of given value.
+      *
+      * @throws Exception (any) if the given value is invalid for given props
+      */
     def valueToString(value: Value, extraProps: ExtraProps): String
   }
 
@@ -163,8 +170,8 @@ private[bootstrap] object InputComponent {
           }
         case Failure(_) =>
           println(s"  Failed to get the String value for ${newValue}. This may be intended if the valid options for " +
-            s"this input are different from the reference one.")
-          setValueInternal(props.defaultValue)
+            s"this input change. Will ignore this setter.")
+          this.valueOrDefault
       }
     }
     override def registerListener(listener: InputBase.Listener[Value]) = componentProvider().modState(_.withListener(listener))

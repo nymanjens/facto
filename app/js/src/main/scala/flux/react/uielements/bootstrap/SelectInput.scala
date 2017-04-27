@@ -31,7 +31,7 @@ class SelectInput[Value] private(implicit valueTag: ClassTag[Value]) {
             <.option(
               ^.value := optionId,
               ^.key := optionId,
-              option.name
+              option.name + s" (${(valueString)})"
             )
           }
         )

@@ -23,24 +23,28 @@ private[transactiongroupform] class InputWithDefaultFromReference[Value] private
     .build
 
   // **************** API ****************//
-  def apply[DelegateRef <: InputBase.Reference[Value]](ref: Reference,
+  def forOption[DelegateRef <: InputBase.Reference[Value]](ref: Reference,
                                                        defaultValueProxy: Option[() => InputBase.Proxy[Value]],
+                                                       directUserChangeOnly: Boolean = false,
                                                        nameToDelegateRef: String => DelegateRef
                                                       )(inputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement): ReactElement = {
     component.withRef(ref.name)(Props(
       inputElementRef = nameToDelegateRef("delegate"),
       defaultValueProxy = defaultValueProxy,
-      inputElementFactory = inputElementFactory))
+      inputElementFactory = inputElementFactory,
+      directUserChangeOnly = directUserChangeOnly))
   }
 
   def apply[DelegateRef <: InputBase.Reference[Value]](ref: Reference,
                                                        defaultValueProxy: => InputBase.Proxy[Value],
+                                                       directUserChangeOnly: Boolean = false,
                                                        nameToDelegateRef: String => DelegateRef
                                                       )(inputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement): ReactElement = {
-    apply(
+    forOption(
       ref = ref,
       defaultValueProxy = Some(() => defaultValueProxy),
-      nameToDelegateRef = nameToDelegateRef)(
+      nameToDelegateRef = nameToDelegateRef,
+      directUserChangeOnly = directUserChangeOnly)(
       inputElementFactory)
   }
 
@@ -73,7 +77,8 @@ private[transactiongroupform] class InputWithDefaultFromReference[Value] private
 
   private case class Props[DelegateRef <: InputBase.Reference[Value]](inputElementRef: DelegateRef,
                                                                       defaultValueProxy: Option[() => InputBase.Proxy[Value]],
-                                                                      inputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement)
+                                                                      inputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement,
+                                                                      directUserChangeOnly: Boolean)
   private object Props {
     type any = Props[_ <: InputBase.Reference[Value]]
   }
@@ -136,7 +141,7 @@ private[transactiongroupform] class InputWithDefaultFromReference[Value] private
           currentDefaultValue = newDefaultValue
 
           val inputProxy = $.props.runNow().inputElementRef($)
-          if ($.state.runNow().isConnected) {
+          if ($.state.runNow().isConnected && (directUserChange || !$.props.runNow().directUserChangeOnly)) {
             currentInputValue = inputProxy.setValue(newDefaultValue)
           }
           $.setState(ConnectionState(isConnected = newDefaultValue == currentInputValue)).runNow()

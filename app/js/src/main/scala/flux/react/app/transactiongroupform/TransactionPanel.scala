@@ -100,7 +100,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
       HalfPanel(
         title = <.span(props.title),
         closeButtonCallback = props.deleteButtonCallback)(
-        moneyInputWithDefault(
+        moneyInputWithDefault.forOption(
           ref = price1Ref,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.price1),
           nameToDelegateRef = uielements.bootstrap.MoneyInput.ref(_)) {
@@ -117,7 +117,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           defaultValueProxy = price1Ref($),
           nameToDelegateRef = moneyInputWithDefault.ref(_)) {
           extraProps1 =>
-            moneyInputWithDefault(
+            moneyInputWithDefault.forOption(
               ref = extraProps1.ref,
               defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.price2),
               nameToDelegateRef = uielements.bootstrap.MoneyInput.ref(_)) {
@@ -130,7 +130,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                 )
             }
         },
-        reservoirInputWithDefault(
+        reservoirInputWithDefault.forOption(
           ref = moneyReservoirCodeRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.moneyReservoirCode),
           nameToDelegateRef = reservoirSelectInput.ref(_)) {
@@ -146,9 +146,10 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
               listener = MoneyReservoirListener
             )
         },
-        accountInputWithDefault(
+        accountInputWithDefault.forOption(
           ref = beneficiaryAccountCodeRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.beneficiaryAccountCode),
+          directUserChangeOnly = true,
           nameToDelegateRef = accountSelectInput.ref(_)) {
           extraProps =>
             accountSelectInput(
@@ -162,9 +163,10 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
               listener = BeneficiaryAccountListener
             )
         },
-        categoryInputWithDefault(
+        categoryInputWithDefault.forOption(
           ref = categoryCodeRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.categoryCode),
+          directUserChangeOnly = true,
           nameToDelegateRef = categorySelectInput.ref(_)) {
           extraProps =>
             categorySelectInput(
