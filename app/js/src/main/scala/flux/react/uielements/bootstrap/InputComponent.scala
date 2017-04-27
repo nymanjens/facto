@@ -170,8 +170,8 @@ private[bootstrap] object InputComponent {
           }
         case Failure(_) =>
           println(s"  Failed to get the String value for ${newValue}. This may be intended if the valid options for " +
-            s"this input are different from the reference one.")
-          setValueInternal(props.defaultValue)
+            s"this input change. Will ignore this setter.")
+          this.valueOrDefault
       }
     }
     override def registerListener(listener: InputBase.Listener[Value]) = componentProvider().modState(_.withListener(listener))
