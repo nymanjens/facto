@@ -1,14 +1,16 @@
 package flux.react.app.transactiongroupform
 
+import java.time.LocalDate
+
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.{I18n, LoggingUtils}
 import common.CollectionUtils.toListMap
+import common.time.Clock
 import japgolly.scalajs.react._
 import flux.react.uielements.InputBase
 import japgolly.scalajs.react.vdom.prefix_<^._
 import flux.react.ReactVdomUtils.{<<, ^^}
 import flux.react.uielements
-import flux.react.uielements.bootstrap.SelectInput
 import models.{EntityAccess, User}
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.accounting.money.{Currency, ExchangeRateManager, MoneyWithGeneralCurrency}
@@ -20,21 +22,26 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                                                            accountingConfig: Config,
                                                            user: User,
                                                            entityAccess: EntityAccess,
-                                                           exchangeRateManager: ExchangeRateManager) {
+                                                           exchangeRateManager: ExchangeRateManager,
+                                                           clock: Clock) {
 
-  private val moneyInputWithDefault = InputWithDefaultFromReference.forType[Long]
+  private val dateInputWithDefault = InputWithDefaultFromReference.forType[LocalDate]
   private val reservoirInputWithDefault = InputWithDefaultFromReference.forType[MoneyReservoir]
   private val accountInputWithDefault = InputWithDefaultFromReference.forType[Account]
   private val categoryInputWithDefault = InputWithDefaultFromReference.forType[Category]
-  private val reservoirSelectInput = SelectInput.forType[MoneyReservoir]
-  private val accountSelectInput = SelectInput.forType[Account]
-  private val categorySelectInput = SelectInput.forType[Category]
+  private val stringWithDefault = InputWithDefaultFromReference.forType[String]
 
-  private val price1Ref = moneyInputWithDefault.ref("price1")
-  private val price2Ref = moneyInputWithDefault.ref("price2")
+  private val reservoirSelectInput = uielements.bootstrap.SelectInput.forType[MoneyReservoir]
+  private val accountSelectInput = uielements.bootstrap.SelectInput.forType[Account]
+  private val categorySelectInput = uielements.bootstrap.SelectInput.forType[Category]
+
+  private val transactionDateRef = dateInputWithDefault.ref("transactionDate")
+  private val consumedDateRef = dateInputWithDefault.ref("consumedDate")
   private val moneyReservoirRef = reservoirInputWithDefault.ref("moneyReservoir")
   private val beneficiaryAccountRef = accountInputWithDefault.ref("beneficiaryAccount")
   private val categoryRef = categoryInputWithDefault.ref("category")
+  private val descriptionRef = stringWithDefault.ref("description")
+  private val flowRef = uielements.bootstrap.MoneyInput.ref("flow")
 
   private val component = {
     def calculateInitialState(props: Props): State = logExceptions {
@@ -77,11 +84,13 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   }
 
   final class Proxy private[TransactionPanel](private val componentProvider: () => ReactComponentU[Props, State, Backend, _ <: TopNode]) {
-    def price1: InputBase.Proxy[Long] = price1Ref(componentScope)
-    def price2: InputBase.Proxy[Long] = price2Ref(componentScope)
+    def transactionDate: InputBase.Proxy[LocalDate] = transactionDateRef(componentScope)
+    def consumedDate: InputBase.Proxy[LocalDate] = consumedDateRef(componentScope)
     def beneficiaryAccountCode: InputBase.Proxy[Account] = beneficiaryAccountRef(componentScope)
     def moneyReservoirCode: InputBase.Proxy[MoneyReservoir] = moneyReservoirRef(componentScope)
     def categoryCode: InputBase.Proxy[Category] = categoryRef(componentScope)
+    def description: InputBase.Proxy[String] = descriptionRef(componentScope)
+    def flow: InputBase.Proxy[Long] = flowRef(componentScope)
 
     private def componentScope: BackendScope[Props, State] = componentProvider().backend.$
   }
@@ -101,35 +110,34 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
       HalfPanel(
         title = <.span(props.title),
         closeButtonCallback = props.deleteButtonCallback)(
-        moneyInputWithDefault.forOption(
-          ref = price1Ref,
-          defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.price1),
-          nameToDelegateRef = uielements.bootstrap.MoneyInput.ref(_)) {
+
+        dateInputWithDefault.forOption(
+          ref = transactionDateRef,
+          defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.transactionDate),
+          nameToDelegateRef = uielements.bootstrap.TextInput.forDate.ref(_)) {
           extraProps =>
-            uielements.bootstrap.MoneyInput(
+            uielements.bootstrap.TextInput.forDate(
               ref = extraProps.ref,
-              label = "price 1",
-              inputClasses = extraProps.inputClasses,
-              currency = state.moneyReservoir.currency,
-              dateProxy = null
+              label = i18n("facto.date-payed"),
+              defaultValue = clock.now.toLocalDate,
+              inputClasses = extraProps.inputClasses
             )
         },
-        moneyInputWithDefault(
-          ref = price2Ref,
-          defaultValueProxy = price1Ref($),
-          nameToDelegateRef = moneyInputWithDefault.ref(_)) {
+        dateInputWithDefault(
+          ref = consumedDateRef,
+          defaultValueProxy = transactionDateRef($),
+          nameToDelegateRef = dateInputWithDefault.ref(_)) {
           extraProps1 =>
-            moneyInputWithDefault.forOption(
+            dateInputWithDefault.forOption(
               ref = extraProps1.ref,
-              defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.price2),
-              nameToDelegateRef = uielements.bootstrap.MoneyInput.ref(_)) {
+              defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.consumedDate),
+              nameToDelegateRef = uielements.bootstrap.TextInput.forDate.ref(_)) {
               extraProps2 =>
-                uielements.bootstrap.MoneyInput(
+                uielements.bootstrap.TextInput.forDate(
                   ref = extraProps2.ref,
-                  label = "price 2",
-                  inputClasses = extraProps1.inputClasses ++ extraProps2.inputClasses,
-                  currency = state.moneyReservoir.currency,
-                  dateProxy = null
+                  label = i18n("facto.date-consumed"),
+                  defaultValue = clock.now.toLocalDate,
+                  inputClasses = extraProps1.inputClasses ++ extraProps2.inputClasses
                 )
             }
         },
@@ -181,12 +189,32 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
               valueToName = category => if (category.helpText.isEmpty) category.name else s"${category.name} (${category.helpText})"
             )
         },
+        stringWithDefault.forOption(
+          ref = descriptionRef,
+          defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.description),
+          nameToDelegateRef = uielements.bootstrap.TextInput.general.ref(_)) {
+          extraProps =>
+            uielements.bootstrap.TextInput.general(
+              ref = extraProps.ref,
+              label = i18n("facto.description"),
+              defaultValue = "",
+              inputClasses = extraProps.inputClasses
+            )
+        },
+        uielements.bootstrap.MoneyInput(
+          ref = flowRef,
+          label = i18n("facto.flow"),
+          currency = state.moneyReservoir.currency,
+          dateProxy = null
+        ),
         <.button(
           ^.onClick --> LogExceptionsCallback {
-            println("  Price 1:" + price1Ref($).value)
-            println("  Price 2:" + price2Ref($).value)
+            println("  Transaction date:" + transactionDateRef($).value)
+            println("  Consumed date:" + consumedDateRef($).value)
             println("  BeneficiaryAccountCode:" + beneficiaryAccountRef($).value)
             println("  CategoryCode:" + categoryRef($).value)
+            println("  Description:" + descriptionRef($).value)
+            println("  Flow:" + flowRef($).value)
           },
           "Test button"
         )
