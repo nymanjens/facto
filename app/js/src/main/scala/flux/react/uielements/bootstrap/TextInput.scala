@@ -75,9 +75,11 @@ object TextInput {
 
   private object LocalDateTransformer extends ValueTransformer[LocalDate, Unit] {
     override def stringToValue(string: String, extraProps: Unit) = {
-      Try {
-        TimeUtils.parseDateString(string).toLocalDate
-      }.toOption
+      try {
+        Some(TimeUtils.parseDateString(string).toLocalDate)
+      } catch {
+        case _: IllegalArgumentException => None
+      }
     }
     override def valueToString(value: LocalDate, extraProps: Unit) = value.toString
   }
