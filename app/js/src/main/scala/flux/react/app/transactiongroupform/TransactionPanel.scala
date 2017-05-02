@@ -46,6 +46,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   private val component = {
     def calculateInitialState(props: Props): State = logExceptions {
       State(
+        transactionDate = clock.now.toLocalDate,
         beneficiaryAccount = accountingConfig.personallySortedAccounts.head,
         moneyReservoir = selectableReservoirs().head)
     }
@@ -97,7 +98,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
 
 
   // **************** Private inner types ****************//
-  private case class State(beneficiaryAccount: Account,
+  private case class State(transactionDate: LocalDate,
+                           beneficiaryAccount: Account,
                            moneyReservoir: MoneyReservoir)
 
   private case class Props(title: String,
@@ -120,7 +122,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
               ref = extraProps.ref,
               label = i18n("facto.date-payed"),
               defaultValue = clock.now.toLocalDate,
-              inputClasses = extraProps.inputClasses
+              inputClasses = extraProps.inputClasses,
+              listener = TransactionDateListener
             )
         },
         dateInputWithDefault(
@@ -205,7 +208,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ref = flowRef,
           label = i18n("facto.flow"),
           currency = state.moneyReservoir.currency,
-          dateProxy = null
+          date = state.transactionDate
         ),
         <.button(
           ^.onClick --> LogExceptionsCallback {
@@ -221,12 +224,16 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
       )
     }
 
+    private object TransactionDateListener extends InputBase.Listener[LocalDate] {
+      override def onChange(newValue: LocalDate, directUserChange: Boolean) = LogExceptionsCallback {
+        $.modState(_.copy(transactionDate = newValue)).runNow()
+      }
+    }
     private object BeneficiaryAccountListener extends InputBase.Listener[Account] {
       override def onChange(newValue: Account, directUserChange: Boolean) = LogExceptionsCallback {
         $.modState(_.copy(beneficiaryAccount = newValue)).runNow()
       }
     }
-
     private object MoneyReservoirListener extends InputBase.Listener[MoneyReservoir] {
       override def onChange(newReservoir: MoneyReservoir, directUserChange: Boolean) = LogExceptionsCallback {
         $.modState(_.copy(moneyReservoir = newReservoir)).runNow()

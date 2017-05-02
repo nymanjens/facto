@@ -1,6 +1,6 @@
 package flux.react.uielements.bootstrap
 
-import java.time.LocalDate
+import java.time.{LocalDate, LocalTime}
 
 import common.time.LocalDateTime
 import flux.react.ReactVdomUtils.^^
@@ -8,7 +8,7 @@ import flux.react.uielements.InputBase
 import flux.react.uielements.bootstrap.InputComponent.{InputRenderer, Props}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
-import models.accounting.money.{Currency, ExchangeRateManager, Money}
+import models.accounting.money.{Currency, DatedMoney, ExchangeRateManager, Money}
 
 import scala.collection.immutable.Seq
 
@@ -22,6 +22,14 @@ object MoneyInput {
                                valueString: String,
                                onChange: ReactEventI => Callback,
                                extraProps: ExtraProps) = {
+        val referenceMoney = {
+          val datedMoney = {
+            val cents = ValueTransformer.stringToValue(valueString, extraProps) getOrElse 0L
+            val date = LocalDateTime.of(extraProps.date, LocalTime.MIN)
+            DatedMoney(cents, extraProps.currency, date)
+          }
+          datedMoney.exchangedForReferenceCurrency(extraProps.exchangeRateManager)
+        }
         <.div(^.className := "input-group",
           <.span(
             ^.className := "input-group-addon currency-indicator",
@@ -38,7 +46,7 @@ object MoneyInput {
           <.span(
             ^.className := "input-group-addon",
             <.i(^.className := Currency.default.iconClass),
-            <.span("0.00")
+            <.span(referenceMoney.formatFloat)
           )
         )
       }
@@ -52,7 +60,7 @@ object MoneyInput {
             errorMessage: String = null,
             inputClasses: Seq[String] = Seq(),
             currency: Currency,
-            dateProxy: => InputBase.Proxy[LocalDate],
+            date: LocalDate,
             listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance)(
              implicit exchangeRateManager: ExchangeRateManager): ReactElement = {
     val props = Props[Value, ExtraProps](
@@ -65,7 +73,7 @@ object MoneyInput {
       listener = listener,
       extra = ExtraProps(
         currency,
-        () => dateProxy),
+        date),
       valueTransformer = ValueTransformer)
     component.withRef(ref.name)(props)
   }
@@ -77,8 +85,8 @@ object MoneyInput {
     extends InputComponent.Reference(refComp)
 
   case class ExtraProps(currency: Currency,
-                        dateProxy: () => InputBase.Proxy[LocalDate])(
-                         implicit exchangeRateManager: ExchangeRateManager)
+                        date: LocalDate)(
+                         implicit val exchangeRateManager: ExchangeRateManager)
 
   // **************** Private inner types ****************//
   /** Number of cents. */
