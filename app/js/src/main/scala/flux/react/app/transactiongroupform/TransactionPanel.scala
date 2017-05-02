@@ -11,7 +11,7 @@ import flux.react.uielements
 import flux.react.uielements.bootstrap.SelectInput
 import models.{EntityAccess, User}
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
-import models.accounting.money.{Currency, MoneyWithGeneralCurrency}
+import models.accounting.money.{Currency, ExchangeRateManager, MoneyWithGeneralCurrency}
 import org.scalajs.dom.raw.HTMLInputElement
 
 import scala.collection.immutable.Seq
@@ -19,7 +19,8 @@ import scala.collection.immutable.Seq
 private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                                                            accountingConfig: Config,
                                                            user: User,
-                                                           entityAccess: EntityAccess) {
+                                                           entityAccess: EntityAccess,
+                                                           exchangeRateManager: ExchangeRateManager) {
 
   private val moneyInputWithDefault = InputWithDefaultFromReference.forType[Long]
   private val reservoirInputWithDefault = InputWithDefaultFromReference.forType[MoneyReservoir]
@@ -109,7 +110,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
               ref = extraProps.ref,
               label = "price 1",
               inputClasses = extraProps.inputClasses,
-              currency = state.moneyReservoir.currency
+              currency = state.moneyReservoir.currency,
+              dateProxy = null
             )
         },
         moneyInputWithDefault(
@@ -126,7 +128,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                   ref = extraProps2.ref,
                   label = "price 2",
                   inputClasses = extraProps1.inputClasses ++ extraProps2.inputClasses,
-                  currency = state.moneyReservoir.currency
+                  currency = state.moneyReservoir.currency,
+                  dateProxy = null
                 )
             }
         },
