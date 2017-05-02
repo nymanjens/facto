@@ -1,11 +1,8 @@
-package flux.react.uielements.bootstrap
+package flux.react.uielements
 
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
-import flux.react.uielements.InputBase
-import flux.react.uielements.bootstrap.InputComponent.ValueTransformer
 import japgolly.scalajs.react.{TopNode, _}
 
-import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.reflect.ClassTag
 
