@@ -28,7 +28,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   private val reservoirInputWithDefault = InputWithDefaultFromReference.forType[MoneyReservoir]
   private val accountInputWithDefault = InputWithDefaultFromReference.forType[Account]
   private val categoryInputWithDefault = InputWithDefaultFromReference.forType[Category]
-  private val stringWithDefault = InputWithDefaultFromReference.forType[String]
+  private val stringInputWithDefault = InputWithDefaultFromReference.forType[String]
 
   private val dateMappedInput = uielements.MappedInput.forTypes[String, LocalDate]
 
@@ -43,7 +43,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   private val moneyReservoirRef = reservoirInputWithDefault.ref("moneyReservoir")
   private val beneficiaryAccountRef = accountInputWithDefault.ref("beneficiaryAccount")
   private val categoryRef = categoryInputWithDefault.ref("category")
-  private val descriptionRef = stringWithDefault.ref("description")
+  private val descriptionRef = stringInputWithDefault.ref("description")
   private val flowRef = uielements.bootstrap.MoneyInput.ref("flow")
 
   private val component = {
@@ -123,9 +123,9 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           defaultValue = clock.now.toLocalDate,
           valueTransformer = uielements.MappedInput.ValueTransformer.StringToLocalDate,
           listener = TransactionDateListener,
-          nameToDelegateRef = stringWithDefault.ref) {
+          nameToDelegateRef = stringInputWithDefault.ref) {
           mappedExtraProps =>
-            stringWithDefault.forOption(
+            stringInputWithDefault.forOption(
               ref = mappedExtraProps.ref,
               defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawTransactionDate),
               nameToDelegateRef = uielements.bootstrap.TextInput.general.ref(_)) {
@@ -142,14 +142,14 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ref = consumedDateRef,
           defaultValue = clock.now.toLocalDate,
           valueTransformer = uielements.MappedInput.ValueTransformer.StringToLocalDate,
-          nameToDelegateRef = stringWithDefault.ref) {
+          nameToDelegateRef = stringInputWithDefault.ref) {
           mappedExtraProps =>
-            stringWithDefault(
+            stringInputWithDefault(
               ref = mappedExtraProps.ref,
               defaultValueProxy = rawTransactionDateRef($),
-              nameToDelegateRef = stringWithDefault.ref) {
+              nameToDelegateRef = stringInputWithDefault.ref) {
               extraProps1 =>
-                stringWithDefault.forOption(
+                stringInputWithDefault.forOption(
                   ref = extraProps1.ref,
                   defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawConsumedDate),
                   nameToDelegateRef = uielements.bootstrap.TextInput.general.ref(_)) {
@@ -211,7 +211,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
               valueToName = category => if (category.helpText.isEmpty) category.name else s"${category.name} (${category.helpText})"
             )
         },
-        stringWithDefault.forOption(
+        stringInputWithDefault.forOption(
           ref = descriptionRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.description),
           nameToDelegateRef = uielements.bootstrap.TextInput.general.ref(_)) {
