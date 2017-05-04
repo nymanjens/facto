@@ -25,18 +25,21 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                                                            exchangeRateManager: ExchangeRateManager,
                                                            clock: Clock) {
 
-  private val dateInputWithDefault = InputWithDefaultFromReference.forType[LocalDate]
   private val reservoirInputWithDefault = InputWithDefaultFromReference.forType[MoneyReservoir]
   private val accountInputWithDefault = InputWithDefaultFromReference.forType[Account]
   private val categoryInputWithDefault = InputWithDefaultFromReference.forType[Category]
   private val stringWithDefault = InputWithDefaultFromReference.forType[String]
 
+  private val dateMappedInput = uielements.MappedInput.forTypes[String, LocalDate]
+
   private val reservoirSelectInput = uielements.bootstrap.SelectInput.forType[MoneyReservoir]
   private val accountSelectInput = uielements.bootstrap.SelectInput.forType[Account]
   private val categorySelectInput = uielements.bootstrap.SelectInput.forType[Category]
 
-  private val transactionDateRef = dateInputWithDefault.ref("transactionDate")
-  private val consumedDateRef = dateInputWithDefault.ref("consumedDate")
+  private val transactionDateRef = dateMappedInput.ref("transactionDate")
+  private val consumedDateRef = dateMappedInput.ref("consumedDate")
+  private val rawTransactionDateRef = dateMappedInput.delegateRef(transactionDateRef)
+  private val rawConsumedDateRef = dateMappedInput.delegateRef(consumedDateRef)
   private val moneyReservoirRef = reservoirInputWithDefault.ref("moneyReservoir")
   private val beneficiaryAccountRef = accountInputWithDefault.ref("beneficiaryAccount")
   private val categoryRef = categoryInputWithDefault.ref("category")
@@ -85,6 +88,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   }
 
   final class Proxy private[TransactionPanel](private val componentProvider: () => ReactComponentU[Props, State, Backend, _ <: TopNode]) {
+    def rawTransactionDate: InputBase.Proxy[String] = rawTransactionDateRef(componentScope)
+    def rawConsumedDate: InputBase.Proxy[String] = rawConsumedDateRef(componentScope)
     def transactionDate: InputBase.Proxy[LocalDate] = transactionDateRef(componentScope)
     def consumedDate: InputBase.Proxy[LocalDate] = consumedDateRef(componentScope)
     def beneficiaryAccountCode: InputBase.Proxy[Account] = beneficiaryAccountRef(componentScope)
@@ -113,35 +118,49 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         title = <.span(props.title),
         closeButtonCallback = props.deleteButtonCallback)(
 
-        dateInputWithDefault.forOption(
+        dateMappedInput(
           ref = transactionDateRef,
-          defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.transactionDate),
-          nameToDelegateRef = uielements.bootstrap.TextInput.forDate.ref(_)) {
-          extraProps =>
-            uielements.bootstrap.TextInput.forDate(
-              ref = extraProps.ref,
-              label = i18n("facto.date-payed"),
-              defaultValue = clock.now.toLocalDate,
-              inputClasses = extraProps.inputClasses,
-              listener = TransactionDateListener
-            )
-        },
-        dateInputWithDefault(
-          ref = consumedDateRef,
-          defaultValueProxy = transactionDateRef($),
-          nameToDelegateRef = dateInputWithDefault.ref(_)) {
-          extraProps1 =>
-            dateInputWithDefault.forOption(
-              ref = extraProps1.ref,
-              defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.consumedDate),
-              nameToDelegateRef = uielements.bootstrap.TextInput.forDate.ref(_)) {
-              extraProps2 =>
-                uielements.bootstrap.TextInput.forDate(
-                  ref = extraProps2.ref,
-                  label = i18n("facto.date-consumed"),
-                  defaultValue = clock.now.toLocalDate,
-                  inputClasses = extraProps1.inputClasses ++ extraProps2.inputClasses
+          defaultValue = clock.now.toLocalDate,
+          valueTransformer = uielements.MappedInput.ValueTransformer.StringToLocalDate,
+          listener = TransactionDateListener,
+          nameToDelegateRef = stringWithDefault.ref) {
+          mappedExtraProps =>
+            stringWithDefault.forOption(
+              ref = mappedExtraProps.ref,
+              defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawTransactionDate),
+              nameToDelegateRef = uielements.bootstrap.TextInput.general.ref(_)) {
+              extraProps =>
+                uielements.bootstrap.TextInput.general(
+                  ref = extraProps.ref,
+                  label = i18n("facto.date-payed"),
+                  defaultValue = mappedExtraProps.defaultValue,
+                  inputClasses = extraProps.inputClasses
                 )
+            }
+        },
+        dateMappedInput(
+          ref = consumedDateRef,
+          defaultValue = clock.now.toLocalDate,
+          valueTransformer = uielements.MappedInput.ValueTransformer.StringToLocalDate,
+          nameToDelegateRef = stringWithDefault.ref) {
+          mappedExtraProps =>
+            stringWithDefault(
+              ref = mappedExtraProps.ref,
+              defaultValueProxy = rawTransactionDateRef($),
+              nameToDelegateRef = stringWithDefault.ref) {
+              extraProps1 =>
+                stringWithDefault.forOption(
+                  ref = extraProps1.ref,
+                  defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawConsumedDate),
+                  nameToDelegateRef = uielements.bootstrap.TextInput.general.ref(_)) {
+                  extraProps2 =>
+                    uielements.bootstrap.TextInput.general(
+                      ref = extraProps2.ref,
+                      label = i18n("facto.date-consumed"),
+                      defaultValue = mappedExtraProps.defaultValue,
+                      inputClasses = extraProps1.inputClasses ++ extraProps2.inputClasses
+                    )
+                }
             }
         },
         reservoirInputWithDefault.forOption(
