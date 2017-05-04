@@ -6,9 +6,12 @@ import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.time.TimeUtils
 import flux.react.uielements.MappedInput.ValueTransformer
 import japgolly.scalajs.react.{TopNode, _}
+import models.accounting.Tag
 
 import scala.collection.mutable
 import scala.reflect.ClassTag
+
+import scala.collection.immutable.Seq
 
 class MappedInput[DelegateValue, Value] private(implicit delegateValueTag: ClassTag[DelegateValue],
                                                 valueTag: ClassTag[Value]) {
@@ -160,6 +163,18 @@ object MappedInput {
         }
       }
       override def backward(value: LocalDate) = value.toString
+    }
+
+    object StringToTags extends ValueTransformer[String, Seq[Tag]] {
+      override def forward(string: String) = {
+        val tags = Tag.parseTagsString(string)
+        if (tags.map(_.name).filterNot(Tag.isValidTagName).isEmpty) {
+          Some(tags)
+        } else {
+          None
+        }
+      }
+      override def backward(value: Seq[Tag]) = value.map(_.name).reduceOption(_ + ", " + _) getOrElse ""
     }
   }
 }

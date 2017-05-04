@@ -1,7 +1,7 @@
 package models.accounting
 
-import math.abs
 import scala.collection.immutable.Seq
+import scala.math.abs
 import scala.util.matching.Regex
 
 case class Tag(name: String) {
@@ -23,6 +23,6 @@ object Tag {
   }
 
   def parseTagsString(tagsString: String): Seq[Tag] = {
-    tagsString.split(",").map(_.trim).filter(!_.isEmpty).map(Tag.apply).toVector
+    tagsString.split(",").map(_.trim).filter(_.nonEmpty).map(Tag.apply).toVector
   }
 }
