@@ -18,10 +18,10 @@ import scala.collection.immutable.Seq
 import scala.reflect.ClassTag
 import scala.util.Try
 
-class TextInput[Value] private(valueTransformer: ValueTransformer[Value, Unit])(implicit valueTag: ClassTag[Value]) {
+object TextInput {
 
   private val component = InputComponent.create[Value, ExtraProps](
-    name = s"${getClass.getSimpleName}_${valueTag.runtimeClass.getSimpleName}",
+    name = getClass.getSimpleName,
     inputRenderer = new InputRenderer[ExtraProps] {
       override def renderInput(classes: Seq[String],
                                name: String,
@@ -42,11 +42,11 @@ class TextInput[Value] private(valueTransformer: ValueTransformer[Value, Unit])(
   // **************** API ****************//
   def apply(ref: Reference,
             label: String,
-            defaultValue: Value,
+            defaultValue: String = "",
             help: String = null,
             errorMessage: String = null,
             inputClasses: Seq[String] = Seq(),
-            listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance): ReactElement = {
+            listener: InputBase.Listener[String] = InputBase.Listener.nullInstance): ReactElement = {
     val props = Props(
       label = label,
       name = ref.name,
@@ -55,7 +55,7 @@ class TextInput[Value] private(valueTransformer: ValueTransformer[Value, Unit])(
       errorMessage = Option(errorMessage),
       inputClasses = inputClasses,
       listener = listener,
-      valueTransformer = valueTransformer)
+      valueTransformer = ValueTransformer.nullInstance)
     component.withRef(ref.name)(props)
   }
 
@@ -67,20 +67,5 @@ class TextInput[Value] private(valueTransformer: ValueTransformer[Value, Unit])(
 
   // **************** Private inner types ****************//
   private type ExtraProps = Unit
-}
-
-object TextInput {
-  val general = new TextInput[String](ValueTransformer.nullInstance)
-  val forDate = new TextInput[LocalDate](LocalDateTransformer)
-
-  private object LocalDateTransformer extends ValueTransformer[LocalDate, Unit] {
-    override def stringToValue(string: String, extraProps: Unit) = {
-      try {
-        Some(TimeUtils.parseDateString(string).toLocalDate)
-      } catch {
-        case _: IllegalArgumentException => None
-      }
-    }
-    override def valueToString(value: LocalDate, extraProps: Unit) = value.toString
-  }
+  private type Value = String
 }

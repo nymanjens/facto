@@ -128,9 +128,9 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             stringInputWithDefault.forOption(
               ref = mappedExtraProps.ref,
               defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawTransactionDate),
-              nameToDelegateRef = uielements.bootstrap.TextInput.general.ref(_)) {
+              nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)) {
               extraProps =>
-                uielements.bootstrap.TextInput.general(
+                uielements.bootstrap.TextInput(
                   ref = extraProps.ref,
                   label = i18n("facto.date-payed"),
                   defaultValue = mappedExtraProps.defaultValue,
@@ -152,9 +152,9 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                 stringInputWithDefault.forOption(
                   ref = extraProps1.ref,
                   defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawConsumedDate),
-                  nameToDelegateRef = uielements.bootstrap.TextInput.general.ref(_)) {
+                  nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)) {
                   extraProps2 =>
-                    uielements.bootstrap.TextInput.general(
+                    uielements.bootstrap.TextInput(
                       ref = extraProps2.ref,
                       label = i18n("facto.date-consumed"),
                       defaultValue = mappedExtraProps.defaultValue,
@@ -214,12 +214,11 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         stringInputWithDefault.forOption(
           ref = descriptionRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.description),
-          nameToDelegateRef = uielements.bootstrap.TextInput.general.ref(_)) {
+          nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)) {
           extraProps =>
-            uielements.bootstrap.TextInput.general(
+            uielements.bootstrap.TextInput(
               ref = extraProps.ref,
               label = i18n("facto.description"),
-              defaultValue = "",
               inputClasses = extraProps.inputClasses
             )
         },
