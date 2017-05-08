@@ -18,18 +18,10 @@ private[transactiongroupform] final class TotalFlowRestrictionInput(implicit i18
         <.label(
           ^^.classes(Seq("btn", "btn-default", "btn-sm")
             ++ (if (state == totalFlowRestriction) Seq("active") else Seq())),
-          <.input(
-            ^.tpe := "radio",
-            ^.autoComplete := "off",
-            ^^.ifThen(state == totalFlowRestriction) {
-              ^.checked := true
-            },
-            ^.onChange --> Callback(),
-            ^.onClick --> LogExceptionsCallback {
-              $.setState(totalFlowRestriction).runNow()
-              props.onChange(totalFlowRestriction)
-            }
-          ),
+          ^.onClick --> LogExceptionsCallback {
+            $.setState(totalFlowRestriction).runNow()
+            props.onChange(totalFlowRestriction)
+          },
           label
         )
       }
