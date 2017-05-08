@@ -1,11 +1,12 @@
 package flux.react.app.transactiongroupform
 
-import java.time.LocalDate
+import java.time.{LocalDate, LocalTime}
+import java.util.NoSuchElementException
 
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.{I18n, LoggingUtils}
 import common.CollectionUtils.toListMap
-import common.time.Clock
+import common.time.{Clock, LocalDateTime}
 import japgolly.scalajs.react._
 import flux.react.uielements.InputBase
 import japgolly.scalajs.react.vdom.prefix_<^._
@@ -14,7 +15,7 @@ import flux.react.uielements
 import models.accounting.Tag
 import models.{EntityAccess, User}
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
-import models.accounting.money.{Currency, ExchangeRateManager, MoneyWithGeneralCurrency}
+import models.accounting.money.{Currency, DatedMoney, ExchangeRateManager, MoneyWithGeneralCurrency}
 import org.scalajs.dom.raw.HTMLInputElement
 
 import scala.collection.immutable.Seq
@@ -89,24 +90,55 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
 
   // **************** Public inner types ****************//
   final class Reference private[TransactionPanel](private[TransactionPanel] val refComp: RefComp[Props, State, Backend, _ <: TopNode]) {
-    def apply($: BackendScope[_, _]): Proxy = new Proxy(() => refComp($).get)
+    def apply($: BackendScope[_, _]): Proxy = new Proxy(() => refComp($).get.backend.$)
   }
 
-  final class Proxy private[TransactionPanel](private val componentProvider: () => ReactComponentU[Props, State, Backend, _ <: TopNode]) {
-    def rawTransactionDate: InputBase.Proxy[String] = rawTransactionDateRef(componentScope)
-    def rawConsumedDate: InputBase.Proxy[String] = rawConsumedDateRef(componentScope)
-    def beneficiaryAccountCode: InputBase.Proxy[Account] = beneficiaryAccountRef(componentScope)
-    def moneyReservoirCode: InputBase.Proxy[MoneyReservoir] = moneyReservoirRef(componentScope)
-    def categoryCode: InputBase.Proxy[Category] = categoryRef(componentScope)
-    def description: InputBase.Proxy[String] = descriptionRef(componentScope)
-    def detailDescription: InputBase.Proxy[String] = detailDescriptionRef(componentScope)
-    def rawTags: InputBase.Proxy[String] = rawTagsRef(componentScope)
+  final class Proxy private[TransactionPanel](private val componentScope: () => BackendScope[Props, State]) {
+    def rawTransactionDate: InputBase.Proxy[String] = rawTransactionDateRef($)
+    def rawConsumedDate: InputBase.Proxy[String] = rawConsumedDateRef($)
+    def beneficiaryAccountCode: InputBase.Proxy[Account] = beneficiaryAccountRef($)
+    def moneyReservoirCode: InputBase.Proxy[MoneyReservoir] = moneyReservoirRef($)
+    def categoryCode: InputBase.Proxy[Category] = categoryRef($)
+    def description: InputBase.Proxy[String] = descriptionRef($)
+    def detailDescription: InputBase.Proxy[String] = detailDescriptionRef($)
+    def rawTags: InputBase.Proxy[String] = rawTagsRef($)
 
-    private def componentScope: BackendScope[Props, State] = componentProvider().backend.$
+    def flowValueOrDefault: DatedMoney = DatedMoney(
+      cents = flowRef($).valueOrDefault,
+      currency = moneyReservoirRef($).valueOrDefault.currency,
+      date = LocalDateTime.of(transactionDateRef($).valueOrDefault, LocalTime.MIN))
+
+    def data: Option[Data] = try {
+      Some(
+        Data(
+          transactionDate = transactionDateRef($).value.get,
+          consumedDate = consumedDateRef($).value.get,
+          moneyReservoir = moneyReservoirRef($).value.get,
+          beneficiaryAccount = beneficiaryAccountRef($).value.get,
+          category = categoryRef($).value.get,
+          description = descriptionRef($).value.get,
+          flow = DatedMoney(
+            cents = flowRef($).value.get,
+            currency = moneyReservoirRef($).value.get.currency,
+            date = LocalDateTime.of(transactionDateRef($).value.get, LocalTime.MIN)),
+          detailDescription = detailDescriptionRef($).value.get,
+          tags = tagsRef($).value.get))
+    } catch {
+      case _: NoSuchElementException => None
+    }
+
+    private def $ = componentScope()
   }
 
-  // TODO
-  case class Data()
+  case class Data(transactionDate: LocalDate,
+                  consumedDate: LocalDate,
+                  moneyReservoir: MoneyReservoir,
+                  beneficiaryAccount: Account,
+                  category: Category,
+                  description: String,
+                  flow: DatedMoney,
+                  detailDescription: String,
+                  tags: Seq[Tag])
 
   // **************** Private inner types ****************//
   private case class State(transactionDate: LocalDate,
