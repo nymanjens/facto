@@ -44,11 +44,56 @@ final class TransactionGroupForm(implicit i18n: I18n,
   private final class Backend(val $: BackendScope[Props, State]) {
 
     def render(props: Props, state: State) = logExceptions {
-      <.div(^.className := "transaction-group-form",
+      <.div(
+        ^.className := "transaction-group-form",
         <.div(
-          state.totalFlow.toString,
-          state.totalFlowExceptLast.toString
+          ^.className := "row",
+          <.div(
+            ^.className := "col-lg-12",
+            <.h1(
+              ^.className := "page-header",
+              <.i(^.className := "icon-new-empty"),
+              i18n("facto.new-transaction"),
+              // TODO: Add delete action here
+              <.span(
+                ^.className := "total-transaction-flow-box",
+                <.span(
+                  ^.className := "total-flow-text",
+                  i18n("facto.total") + ":",
+                  <.span(
+                    ^.className := "total-transaction-flow",
+                    state.totalFlow.toString
+                  )
+                ),
+                <.div(
+                  ^.className := "btn-group",
+                  ReactAttr("data-toggle") := "buttons",
+                  <.label(
+                    ^.className := "btn btn-default btn-sm",
+                    <.input(
+                      ^.tpe := "radio",
+                      ^.name := "zeroSum",
+                      ^.value := "false",
+                      ^.autoComplete := "off"
+                    ),
+                    i18n("facto.any-total")
+                  ),
+                  <.label(
+                    ^.className := "btn btn-default btn-sm",
+                    <.input(
+                      ^.tpe := "radio",
+                      ^.name := "zeroSum",
+                      ^.value := "true",
+                      ^.autoComplete := "off"
+                    ),
+                    i18n("facto.zero-sum")
+                  )
+                )
+              )
+            )
+          )
         ),
+
         // TODO: Add global form errors here
         //for (error <- (transGroupForm.globalErrors) yield {
         //  <.div(^.className := "alert alert-danger",
