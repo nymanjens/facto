@@ -1,7 +1,5 @@
 package flux.react.uielements.bootstrap
 
-import java.time.{LocalDate, LocalTime}
-
 import common.time.LocalDateTime
 import flux.react.ReactVdomUtils.^^
 import flux.react.uielements.InputBase
@@ -25,8 +23,7 @@ object MoneyInput {
         val referenceMoney = {
           val datedMoney = {
             val cents = ValueTransformer.stringToValue(valueString, extraProps) getOrElse 0L
-            val date = LocalDateTime.of(extraProps.date, LocalTime.MIN)
-            DatedMoney(cents, extraProps.currency, date)
+            DatedMoney(cents, extraProps.currency, extraProps.date)
           }
           datedMoney.exchangedForReferenceCurrency(extraProps.exchangeRateManager)
         }
@@ -60,7 +57,7 @@ object MoneyInput {
             errorMessage: String = null,
             inputClasses: Seq[String] = Seq(),
             currency: Currency,
-            date: LocalDate,
+            date: LocalDateTime,
             listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance)(
              implicit exchangeRateManager: ExchangeRateManager): ReactElement = {
     val props = Props[Value, ExtraProps](
@@ -85,7 +82,7 @@ object MoneyInput {
     extends InputComponent.Reference(refComp)
 
   case class ExtraProps(currency: Currency,
-                        date: LocalDate)(
+                        date: LocalDateTime)(
                          implicit val exchangeRateManager: ExchangeRateManager)
 
   // **************** Private inner types ****************//

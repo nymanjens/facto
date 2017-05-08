@@ -1,12 +1,11 @@
 package flux.react.app.transactiongroupform
 
-import java.time.{LocalDate, LocalTime}
 import java.util.NoSuchElementException
 
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.{I18n, LoggingUtils, SinglePendingTaskQueue}
 import common.CollectionUtils.toListMap
-import common.time.{Clock, LocalDateTime}
+import common.time.{Clock, LocalDateTime, LocalDateTimes}
 import japgolly.scalajs.react._
 import flux.react.uielements.InputBase
 import japgolly.scalajs.react.vdom.prefix_<^._
@@ -36,7 +35,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   private val categoryInputWithDefault = InputWithDefaultFromReference.forType[Category]
   private val stringInputWithDefault = InputWithDefaultFromReference.forType[String]
 
-  private val dateMappedInput = uielements.MappedInput.forTypes[String, LocalDate]
+  private val dateMappedInput = uielements.MappedInput.forTypes[String, LocalDateTime]
   private val tagsMappedInput = uielements.MappedInput.forTypes[String, Seq[Tag]]
 
   private val reservoirSelectInput = uielements.bootstrap.SelectInput.forType[MoneyReservoir]
@@ -59,7 +58,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   private val component = {
     def calculateInitialState(props: Props): State = logExceptions {
       State(
-        transactionDate = clock.now.toLocalDate,
+        transactionDate = LocalDateTimes.toStartOfDay(clock.now),
         beneficiaryAccount = accountingConfig.personallySortedAccounts.head,
         moneyReservoir = selectableReservoirs().head)
     }
@@ -112,7 +111,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
     def flowValueOrDefault: DatedMoney = DatedMoney(
       cents = flowRef($).valueOrDefault,
       currency = moneyReservoirRef($).valueOrDefault.currency,
-      date = LocalDateTime.of(transactionDateRef($).valueOrDefault, LocalTime.MIN))
+      date = transactionDateRef($).valueOrDefault)
 
     def data: Option[Data] = try {
       Some(
@@ -126,7 +125,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           flow = DatedMoney(
             cents = flowRef($).value.get,
             currency = moneyReservoirRef($).value.get.currency,
-            date = LocalDateTime.of(transactionDateRef($).value.get, LocalTime.MIN)),
+            date = transactionDateRef($).value.get),
           detailDescription = detailDescriptionRef($).value.get,
           tags = tagsRef($).value.get))
     } catch {
@@ -136,8 +135,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
     private def $ = componentScope()
   }
 
-  case class Data(transactionDate: LocalDate,
-                  consumedDate: LocalDate,
+  case class Data(transactionDate: LocalDateTime,
+                  consumedDate: LocalDateTime,
                   moneyReservoir: MoneyReservoir,
                   beneficiaryAccount: Account,
                   category: Category,
@@ -147,7 +146,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                   tags: Seq[Tag])
 
   // **************** Private inner types ****************//
-  private case class State(transactionDate: LocalDate,
+  private case class State(transactionDate: LocalDateTime,
                            beneficiaryAccount: Account,
                            moneyReservoir: MoneyReservoir)
 
@@ -165,8 +164,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
 
         dateMappedInput(
           ref = transactionDateRef,
-          defaultValue = clock.now.toLocalDate,
-          valueTransformer = uielements.MappedInput.ValueTransformer.StringToLocalDate,
+          defaultValue = LocalDateTimes.toStartOfDay(clock.now),
+          valueTransformer = uielements.MappedInput.ValueTransformer.StringToLocalDateTime,
           listener = TransactionDateListener,
           nameToDelegateRef = stringInputWithDefault.ref) {
           mappedExtraProps =>
@@ -185,8 +184,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         },
         dateMappedInput(
           ref = consumedDateRef,
-          defaultValue = clock.now.toLocalDate,
-          valueTransformer = uielements.MappedInput.ValueTransformer.StringToLocalDate,
+          defaultValue = LocalDateTimes.toStartOfDay(clock.now),
+          valueTransformer = uielements.MappedInput.ValueTransformer.StringToLocalDateTime,
           nameToDelegateRef = stringInputWithDefault.ref,
           listener = AnythingChangedListener) {
           mappedExtraProps =>
@@ -323,8 +322,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
       )
     }
 
-    private object TransactionDateListener extends InputBase.Listener[LocalDate] {
-      override def onChange(newValue: LocalDate, directUserChange: Boolean) = LogExceptionsCallback {
+    private object TransactionDateListener extends InputBase.Listener[LocalDateTime] {
+      override def onChange(newValue: LocalDateTime, directUserChange: Boolean) = LogExceptionsCallback {
         $.modState(_.copy(transactionDate = newValue)).runNow()
         AnythingChangedListener.onChange(newValue, directUserChange).runNow()
       }

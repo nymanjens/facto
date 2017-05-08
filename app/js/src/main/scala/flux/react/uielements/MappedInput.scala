@@ -1,16 +1,14 @@
 package flux.react.uielements
 
-import java.time.LocalDate
 
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
-import common.time.TimeUtils
+import common.time.{LocalDateTime, TimeUtils}
 import flux.react.uielements.MappedInput.ValueTransformer
 import japgolly.scalajs.react.{TopNode, _}
 import models.accounting.Tag
 
 import scala.collection.mutable
 import scala.reflect.ClassTag
-
 import scala.collection.immutable.Seq
 
 class MappedInput[DelegateValue, Value] private(implicit delegateValueTag: ClassTag[DelegateValue],
@@ -154,15 +152,15 @@ object MappedInput {
   }
 
   object ValueTransformer {
-    object StringToLocalDate extends ValueTransformer[String, LocalDate] {
+    object StringToLocalDateTime extends ValueTransformer[String, LocalDateTime] {
       override def forward(string: String) = {
         try {
-          Some(TimeUtils.parseDateString(string).toLocalDate)
+          Some(TimeUtils.parseDateString(string))
         } catch {
           case _: IllegalArgumentException => None
         }
       }
-      override def backward(value: LocalDate) = value.toString
+      override def backward(value: LocalDateTime) = value.toLocalDate.toString
     }
 
     object StringToTags extends ValueTransformer[String, Seq[Tag]] {

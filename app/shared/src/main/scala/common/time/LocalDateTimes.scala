@@ -1,6 +1,6 @@
 package common.time
 
-import java.time.Month
+import java.time.{LocalTime, Month}
 
 /**
   * Extension of `LocalDateTime`, which should keep the same API as `java.time.LocalDateTime`.
@@ -13,5 +13,9 @@ object LocalDateTimes {
 
   def createDateTime(year: Int, month: Month, dayOfMonth: Int): LocalDateTime = {
     LocalDateTime.of(year, month, dayOfMonth, 0, 0)
+  }
+
+  def toStartOfDay(localDateTime: LocalDateTime): LocalDateTime = {
+    LocalDateTime.of(localDateTime.toLocalDate, LocalTime.MIN)
   }
 }
