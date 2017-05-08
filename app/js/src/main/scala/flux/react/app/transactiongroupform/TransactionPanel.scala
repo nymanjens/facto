@@ -187,7 +187,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ref = consumedDateRef,
           defaultValue = clock.now.toLocalDate,
           valueTransformer = uielements.MappedInput.ValueTransformer.StringToLocalDate,
-          nameToDelegateRef = stringInputWithDefault.ref) {
+          nameToDelegateRef = stringInputWithDefault.ref,
+          listener = AnythingChangedListener) {
           mappedExtraProps =>
             stringInputWithDefault(
               ref = mappedExtraProps.ref,
@@ -253,7 +254,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
               inputClasses = extraProps.inputClasses,
               options = state.beneficiaryAccount.categories,
               valueToId = _.code,
-              valueToName = category => if (category.helpText.isEmpty) category.name else s"${category.name} (${category.helpText})"
+              valueToName = category => if (category.helpText.isEmpty) category.name else s"${category.name} (${category.helpText})",
+              listener = AnythingChangedListener
             )
         },
         stringInputWithDefault.forOption(
@@ -264,7 +266,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             uielements.bootstrap.TextInput(
               ref = extraProps.ref,
               label = i18n("facto.description"),
-              inputClasses = extraProps.inputClasses
+              inputClasses = extraProps.inputClasses,
+              listener = AnythingChangedListener
             )
         },
         uielements.bootstrap.MoneyInput(
@@ -282,14 +285,16 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             uielements.bootstrap.TextInput(
               ref = extraProps.ref,
               label = i18n("facto.more-info"),
-              inputClasses = extraProps.inputClasses
+              inputClasses = extraProps.inputClasses,
+              listener = AnythingChangedListener
             )
         },
         tagsMappedInput(
           ref = tagsRef,
           defaultValue = Seq(),
           valueTransformer = uielements.MappedInput.ValueTransformer.StringToTags,
-          nameToDelegateRef = stringInputWithDefault.ref) {
+          nameToDelegateRef = stringInputWithDefault.ref,
+          listener = AnythingChangedListener) {
           mappedExtraProps =>
             stringInputWithDefault.forOption(
               ref = mappedExtraProps.ref,
