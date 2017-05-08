@@ -1,11 +1,10 @@
 package flux.react.app.transactiongroupform
 
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import java.time.{LocalDate, LocalTime}
 import java.util.NoSuchElementException
 
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
-import common.{I18n, LoggingUtils}
+import common.{I18n, LoggingUtils, SinglePendingTaskQueue}
 import common.CollectionUtils.toListMap
 import common.time.{Clock, LocalDateTime}
 import japgolly.scalajs.react._
@@ -30,7 +29,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                                                            exchangeRateManager: ExchangeRateManager,
                                                            clock: Clock) {
 
-  //private val anythingChangedQueue = JSExecutionContext.queue.
+  private val anythingChangedQueue = SinglePendingTaskQueue.create()
 
   private val reservoirInputWithDefault = InputWithDefaultFromReference.forType[MoneyReservoir]
   private val accountInputWithDefault = InputWithDefaultFromReference.forType[Account]
@@ -341,7 +340,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
       override def onChange(newValue: Any, directUserChange: Boolean) = LogExceptionsCallback {
         // Schedule in future because querying the values of TransactionPanel.Proxy would yield
         // outdated values at the moment.
-        Future {
+        anythingChangedQueue.execute {
           logExceptions {
             $.props.runNow().onFormChange()
           }
