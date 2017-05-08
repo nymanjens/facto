@@ -13,46 +13,34 @@ private[transactiongroupform] final class TotalFlowRestrictionInput(implicit i18
 
   private val component = ReactComponentB[Props](getClass.getSimpleName)
     .initialState_P[State](props => props.defaultValue)
-    .renderPS(($, props, state) =>
+    .renderPS(($, props, state) => {
+      def button(totalFlowRestriction: TotalFlowRestriction, label: String) = {
+        <.label(
+          ^^.classes(Seq("btn", "btn-default", "btn-sm")
+            ++ (if (state == totalFlowRestriction) Seq("active") else Seq())),
+          <.input(
+            ^.tpe := "radio",
+            ^.autoComplete := "off",
+            ^^.ifThen(state == totalFlowRestriction) {
+              ^.checked := true
+            },
+            ^.onChange --> Callback(),
+            ^.onClick --> LogExceptionsCallback {
+              $.setState(totalFlowRestriction).runNow()
+              props.onChange(totalFlowRestriction)
+            }
+          ),
+          label
+        )
+      }
       <.div(
         ^.className := "btn-group",
         ReactAttr("data-toggle") := "buttons",
-        <.label(
-          ^^.classes(Seq("btn", "btn-default", "btn-sm")
-            ++ (if (state == TotalFlowRestriction.AnyTotal) Seq("active") else Seq())),
-          <.input(
-            ^.tpe := "radio",
-            ^.autoComplete := "off",
-            ^^.ifThen(state == TotalFlowRestriction.AnyTotal) {
-              ^.checked := true
-            },
-            ^.onChange --> Callback(),
-            ^.onClick --> LogExceptionsCallback {
-              $.setState(TotalFlowRestriction.AnyTotal).runNow()
-              props.onChange(TotalFlowRestriction.AnyTotal)
-            }
-          ),
-          i18n("facto.any-total")
-        ),
-        <.label(
-          ^^.classes(Seq("btn", "btn-default", "btn-sm")
-            ++ (if (state == TotalFlowRestriction.ZeroSum) Seq("active") else Seq())),
-          <.input(
-            ^.tpe := "radio",
-            ^.autoComplete := "off",
-            ^^.ifThen(state == TotalFlowRestriction.ZeroSum) {
-              ^.checked := true
-            },
-            ^.onChange --> Callback(),
-            ^.onClick --> LogExceptionsCallback {
-              $.setState(TotalFlowRestriction.ZeroSum).runNow()
-              props.onChange(TotalFlowRestriction.ZeroSum)
-            }
-          ),
-          i18n("facto.zero-sum")
-        )
+        button(TotalFlowRestriction.AnyTotal, i18n("facto.any-total")),
+        button(TotalFlowRestriction.ChooseTotal, i18n("facto.choose-total")),
+        button(TotalFlowRestriction.ZeroSum, i18n("facto.zero-sum"))
       )
-    ).build
+    }).build
 
   // **************** API ****************//
   def apply(defaultValue: TotalFlowRestriction, onChange: TotalFlowRestriction => Unit): ReactElement = {
@@ -69,6 +57,7 @@ object TotalFlowRestrictionInput {
   sealed trait TotalFlowRestriction
   object TotalFlowRestriction {
     object AnyTotal extends TotalFlowRestriction
+    object ChooseTotal extends TotalFlowRestriction
     object ZeroSum extends TotalFlowRestriction
   }
 }

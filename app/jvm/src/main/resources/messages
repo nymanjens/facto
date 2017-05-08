@@ -116,6 +116,7 @@ facto.delete=Delete
 facto.balance-check=Balance Check
 facto.total=Total
 facto.any-total=Any Total
+facto.choose-total=Choose Total
 facto.zero-sum=Zero Sum
 facto.transaction=Transaction
 facto.new-transaction=New Transaction
