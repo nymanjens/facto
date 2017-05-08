@@ -44,36 +44,44 @@ final class TransactionGroupForm(implicit i18n: I18n,
   private final class Backend(val $: BackendScope[Props, State]) {
 
     def render(props: Props, state: State) = logExceptions {
-      <.div(
+      <.div(^.className := "transaction-group-form",
         <.div(
           state.totalFlow.toString,
           state.totalFlowExceptLast.toString
         ),
+        // TODO: Add global form errors here
+        //for (error <- (transGroupForm.globalErrors) yield {
+        //  <.div(^.className := "alert alert-danger",
+        //    error.message
+        //  )
+        //},
         <.form(
           ^.className := "form-horizontal",
-          <.div(
-            ^.className := "transaction-group-form",
-            for ((panelIndex, i) <- state.panelIndices.zipWithIndex) yield {
-              val firstPanel = state.panelIndices.head
-              transactionPanel(
-                key = panelIndex,
-                ref = panelRef(panelIndex),
-                title = i18n("facto.transaction") + " " + (i + 1),
-                defaultPanel = if (panelIndex == firstPanel) None else Some(panelRef(panelIndex = firstPanel)($)),
-                closeButtonCallback = if (panelIndex == firstPanel) None else Some(removeTransactionPanel(panelIndex)),
-                onFormChange = this.onFormChange
-              )
-            },
-            addTransactionPanel(onClick = addTransactionPanelCallback())
-          ),
-          <.div(
-            ^.className := "form-group",
+          <.div(^.className := "row",
             <.div(
-              ^.className := "col-sm-offset-2 col-sm-10",
-              <.button(
-                ^.tpe := "submit",
-                ^.className := "btn btn-default",
-                i18n("facto.ok"))
+              ^.className := "transaction-group-form",
+              for ((panelIndex, i) <- state.panelIndices.zipWithIndex) yield {
+                val firstPanel = state.panelIndices.head
+                transactionPanel(
+                  key = panelIndex,
+                  ref = panelRef(panelIndex),
+                  title = i18n("facto.transaction") + " " + (i + 1),
+                  defaultPanel = if (panelIndex == firstPanel) None else Some(panelRef(panelIndex = firstPanel)($)),
+                  closeButtonCallback = if (panelIndex == firstPanel) None else Some(removeTransactionPanel(panelIndex)),
+                  onFormChange = this.onFormChange
+                )
+              },
+              addTransactionPanel(onClick = addTransactionPanelCallback())
+            ),
+            <.div(
+              ^.className := "form-group",
+              <.div(
+                ^.className := "col-sm-offset-2 col-sm-10",
+                <.button(
+                  ^.tpe := "submit",
+                  ^.className := "btn btn-default",
+                  i18n("facto.ok"))
+              )
             )
           )
         )
