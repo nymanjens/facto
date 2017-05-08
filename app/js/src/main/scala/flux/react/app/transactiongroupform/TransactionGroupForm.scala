@@ -84,7 +84,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
       $.modState(_.copy(
         totalFlow = flows.sum,
-        totalFlowExceptLast = flows.takeRight(1).sum)).runNow()
+        totalFlowExceptLast = flows.dropRight(1).sum)).runNow()
     }
   }
 }
