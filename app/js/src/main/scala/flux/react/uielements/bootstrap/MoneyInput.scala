@@ -29,7 +29,7 @@ object MoneyInput {
         }
         <.div(^.className := "input-group",
           <.span(
-            ^.className := "input-group-addon currency-indicator",
+            ^.className := "input-group-addon",
             <.i(^.className := extraProps.currency.iconClass)
           ),
           <.input(

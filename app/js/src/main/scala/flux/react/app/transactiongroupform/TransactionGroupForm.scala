@@ -3,9 +3,10 @@ package flux.react.app.transactiongroupform
 import flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
+import flux.react.ReactVdomUtils.^^
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
-import models.accounting.money.{ExchangeRateManager, ReferenceMoney}
+import models.accounting.money.{Currency, ExchangeRateManager, ReferenceMoney}
 
 import scala.collection.immutable.Seq
 
@@ -66,7 +67,29 @@ final class TransactionGroupForm(implicit i18n: I18n,
                   i18n("facto.total") + ":",
                   <.span(
                     ^.className := "total-transaction-flow",
-                    state.totalFlow.toString
+                    if (state.totalFlowRestriction == TotalFlowRestriction.ChooseTotal) {
+                      <.span(
+                        ^.className := "form-inline",
+                        <.div(^.className := "input-group",
+                          <.span(
+                            ^.className := "input-group-addon",
+                            <.i(^.className := Currency.default.iconClass)
+                          ),
+                          <.input(
+                            ^.tpe := "text",
+                            ^.className := "form-control",
+                            ^.autoComplete := "off",
+                            ^.value := "0.00",
+                            ^.onChange --> Callback((): Unit)
+                          )
+                        )
+                      )
+                    } else {
+                      Seq[TagMod](
+                        <.i(^.className := Currency.default.iconClass),
+                        state.totalFlow.formatFloat
+                      )
+                    }
                   )
                 ),
                 totalFlowRestrictionInput(defaultValue = TotalFlowRestriction.AnyTotal, onChange = updateTotalFlowRestriction)
