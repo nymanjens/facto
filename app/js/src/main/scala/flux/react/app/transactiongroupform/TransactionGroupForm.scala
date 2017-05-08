@@ -44,7 +44,10 @@ final class TransactionGroupForm(implicit i18n: I18n,
             ref = panelRef(panelIndex),
             title = i18n("facto.transaction") + " " + (i + 1),
             defaultPanel = if (panelIndex == firstPanel) None else Some(panelRef(panelIndex = firstPanel)($)),
-            closeButtonCallback = if (panelIndex == firstPanel) None else Some(removeTransactionPanel(panelIndex))
+            closeButtonCallback = if (panelIndex == firstPanel) None else Some(removeTransactionPanel(panelIndex)),
+            onFormChange = () => {
+              println("onFormChange(): flowValueOrDefault = " + panelRef(panelIndex)($).flowValueOrDefault)
+            }
           )
         },
         addTransactionPanel(onClick = addTransactionPanelCallback())

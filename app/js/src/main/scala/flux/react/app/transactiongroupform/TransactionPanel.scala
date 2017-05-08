@@ -1,5 +1,6 @@
 package flux.react.app.transactiongroupform
 
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import java.time.{LocalDate, LocalTime}
 import java.util.NoSuchElementException
 
@@ -19,6 +20,8 @@ import models.accounting.money.{Currency, DatedMoney, ExchangeRateManager, Money
 import org.scalajs.dom.raw.HTMLInputElement
 
 import scala.collection.immutable.Seq
+import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext
 
 private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                                                            accountingConfig: Config,
@@ -26,6 +29,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                                                            entityAccess: EntityAccess,
                                                            exchangeRateManager: ExchangeRateManager,
                                                            clock: Clock) {
+
+  //private val anythingChangedQueue = JSExecutionContext.queue.
 
   private val reservoirInputWithDefault = InputWithDefaultFromReference.forType[MoneyReservoir]
   private val accountInputWithDefault = InputWithDefaultFromReference.forType[Account]
@@ -70,11 +75,13 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             ref: Reference,
             title: String,
             defaultPanel: Option[Proxy],
-            closeButtonCallback: Option[Callback] = None): ReactElement = {
+            closeButtonCallback: Option[Callback] = None,
+            onFormChange: () => Unit): ReactElement = {
     val props = Props(
       title,
       defaultPanel = defaultPanel,
-      closeButtonCallback
+      closeButtonCallback,
+      onFormChange
     )
     component.withKey(key).withRef(ref.refComp)(props)
   }
@@ -147,7 +154,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
 
   private case class Props(title: String,
                            defaultPanel: Option[Proxy],
-                           deleteButtonCallback: Option[Callback])
+                           deleteButtonCallback: Option[Callback],
+                           onFormChange: () => Unit)
 
   private class Backend(val $: BackendScope[Props, State]) {
 
@@ -264,7 +272,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ref = flowRef,
           label = i18n("facto.flow"),
           currency = state.moneyReservoir.currency,
-          date = state.transactionDate
+          date = state.transactionDate,
+          listener = AnythingChangedListener
         ),
         stringInputWithDefault.forOption(
           ref = detailDescriptionRef,
@@ -313,16 +322,30 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
     private object TransactionDateListener extends InputBase.Listener[LocalDate] {
       override def onChange(newValue: LocalDate, directUserChange: Boolean) = LogExceptionsCallback {
         $.modState(_.copy(transactionDate = newValue)).runNow()
+        AnythingChangedListener.onChange(newValue, directUserChange).runNow()
       }
     }
     private object BeneficiaryAccountListener extends InputBase.Listener[Account] {
       override def onChange(newValue: Account, directUserChange: Boolean) = LogExceptionsCallback {
         $.modState(_.copy(beneficiaryAccount = newValue)).runNow()
+        AnythingChangedListener.onChange(newValue, directUserChange).runNow()
       }
     }
     private object MoneyReservoirListener extends InputBase.Listener[MoneyReservoir] {
       override def onChange(newReservoir: MoneyReservoir, directUserChange: Boolean) = LogExceptionsCallback {
         $.modState(_.copy(moneyReservoir = newReservoir)).runNow()
+        AnythingChangedListener.onChange(newReservoir, directUserChange).runNow()
+      }
+    }
+    private object AnythingChangedListener extends InputBase.Listener[Any] {
+      override def onChange(newValue: Any, directUserChange: Boolean) = LogExceptionsCallback {
+        // Schedule in future because querying the values of TransactionPanel.Proxy would yield
+        // outdated values at the moment.
+        Future {
+          logExceptions {
+            $.props.runNow().onFormChange()
+          }
+        }
       }
     }
   }

@@ -39,7 +39,7 @@ object InputBase {
     }
   }
 
-  trait Listener[Value] {
+  trait Listener[-Value] {
     /** Gets called every time this field gets updated. This includes updates that are not done by the user. */
     def onChange(newValue: Value, directUserChange: Boolean): Callback
   }
