@@ -1,6 +1,6 @@
 package flux.react.app.transactiongroupform
 
-import flux.react.app.transactiongroupform.ZeroSumToggleInput.ZeroSumState
+import flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import japgolly.scalajs.react._
@@ -13,14 +13,14 @@ final class TransactionGroupForm(implicit i18n: I18n,
                                  exchangeRateManager: ExchangeRateManager,
                                  transactionPanel: TransactionPanel,
                                  addTransactionPanel: AddTransactionPanel,
-                                 zeroSumToggleInput: ZeroSumToggleInput) {
+                                 totalFlowRestrictionInput: TotalFlowRestrictionInput) {
 
   private val component = ReactComponentB[Props](getClass.getSimpleName)
     .initialState[State](
     State(
       // TODO: Update these when updating an existing TransactionGroup.
       panelIndices = Seq(0, 1),
-      zeroSumState = ZeroSumState.AnyTotal,
+      totalFlowRestriction = TotalFlowRestriction.AnyTotal,
       totalFlow = ReferenceMoney(0),
       totalFlowExceptLast = ReferenceMoney(0)))
     .renderBackend[Backend]
@@ -36,7 +36,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
   // **************** Private inner types ****************//
   private case class State(panelIndices: Seq[Int],
-                           zeroSumState: ZeroSumState,
+                           totalFlowRestriction: TotalFlowRestriction,
                            totalFlow: ReferenceMoney,
                            totalFlowExceptLast: ReferenceMoney) {
     def plusPanel(): State = copy(panelIndices = panelIndices :+ panelIndices.max + 1)
@@ -69,7 +69,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
                     state.totalFlow.toString
                   )
                 ),
-                zeroSumToggleInput(defaultValue = ZeroSumState.AnyTotal, onChange = updateZeroSumState)
+                totalFlowRestrictionInput(defaultValue = TotalFlowRestriction.AnyTotal, onChange = updateTotalFlowRestriction)
               )
             )
           )
@@ -122,8 +122,8 @@ final class TransactionGroupForm(implicit i18n: I18n,
       $.modState(_.minusPanelIndex(index)).runNow()
     }
 
-    private def updateZeroSumState(zeroSumState: ZeroSumState): Unit = {
-      $.modState(_.copy(zeroSumState=zeroSumState)).runNow()
+    private def updateTotalFlowRestriction(totalFlowRestriction: TotalFlowRestriction): Unit = {
+      $.modState(_.copy(totalFlowRestriction = totalFlowRestriction)).runNow()
     }
 
     private def onFormChange(): Unit = {
