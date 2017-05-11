@@ -22,6 +22,7 @@ final class Module(implicit i18n: I18n,
 
   implicit private lazy val transactionPanel: TransactionPanel = wire[TransactionPanel]
   implicit private lazy val addTransactionPanel: AddTransactionPanel = wire[AddTransactionPanel]
-  implicit private lazy val zeroSumToggleInput: TotalFlowRestrictionInput = wire[TotalFlowRestrictionInput]
+  implicit private lazy val totalFlowRestrictionInput: TotalFlowRestrictionInput = wire[TotalFlowRestrictionInput]
+  implicit private lazy val totalFlowInput: TotalFlowInput = wire[TotalFlowInput]
   implicit lazy val transactionGroupForm: TransactionGroupForm = wire[TransactionGroupForm]
 }

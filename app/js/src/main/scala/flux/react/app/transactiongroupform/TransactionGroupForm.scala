@@ -14,6 +14,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
                                  exchangeRateManager: ExchangeRateManager,
                                  transactionPanel: TransactionPanel,
                                  addTransactionPanel: AddTransactionPanel,
+                                 totalFlowInput: TotalFlowInput,
                                  totalFlowRestrictionInput: TotalFlowRestrictionInput) {
 
   private val component = ReactComponentB[Props](getClass.getSimpleName)
@@ -62,28 +63,16 @@ final class TransactionGroupForm(implicit i18n: I18n,
               // TODO: Add delete action here
               <.span(
                 ^.className := "total-transaction-flow-box",
-                <.span(
-                  ^.className := "total-flow-form form-inline",
-                  <.div(^.className := "input-group",
-                    <.span(
-                      ^.className := "input-group-addon",
-                      i18n("facto.total") + ":"
-                    ),
-                    <.span(
-                      ^.className := "input-group-addon",
-                      <.i(^.className := Currency.default.iconClass)
-                    ),
-                    <.input(
-                      ^.tpe := "text",
-                      ^.className := "form-control",
-                      ^.autoComplete := "off",
-                      ^.value := state.totalFlow.formatFloat,
-                      ^.disabled := state.totalFlowRestriction != TotalFlowRestriction.ChooseTotal,
-                      ^.onChange --> Callback((): Unit)
-                    )
-                  )
+                totalFlowInput(
+                  forceValue =
+                    if (state.totalFlowRestriction == TotalFlowRestriction.ChooseTotal) None else Some(state.totalFlow),
+                  foreignCurrency = None, // TODO
+                  onChange = updateTotalFlow
                 ),
-                totalFlowRestrictionInput(defaultValue = TotalFlowRestriction.AnyTotal, onChange = updateTotalFlowRestriction)
+                totalFlowRestrictionInput(
+                  defaultValue = TotalFlowRestriction.AnyTotal,
+                  onChange = updateTotalFlowRestriction
+                )
               )
             )
           )
@@ -139,8 +128,15 @@ final class TransactionGroupForm(implicit i18n: I18n,
       $.modState(_.minusPanelIndex(index)).runNow()
     }
 
+    private def updateTotalFlow(totalFlow: ReferenceMoney): Unit = {
+      $.modState(_.copy(totalFlow = totalFlow)).runNow()
+    }
+
     private def updateTotalFlowRestriction(totalFlowRestriction: TotalFlowRestriction): Unit = {
       $.modState(_.copy(totalFlowRestriction = totalFlowRestriction)).runNow()
+      if (totalFlowRestriction == TotalFlowRestriction.ZeroSum) {
+        $.modState(_.copy(totalFlow = ReferenceMoney(0))).runNow()
+      }
     }
 
     private def onFormChange(): Unit = {
@@ -150,9 +146,10 @@ final class TransactionGroupForm(implicit i18n: I18n,
         datedMoney.exchangedForReferenceCurrency
       }
 
-      $.modState(_.copy(
-        totalFlow = flows.sum,
-        totalFlowExceptLast = flows.dropRight(1).sum)).runNow()
+      $.modState(_.copy(totalFlowExceptLast = flows.dropRight(1).sum)).runNow()
+      if (state.totalFlowRestriction == TotalFlowRestriction.AnyTotal) {
+        $.modState(_.copy(totalFlow = flows.sum)).runNow()
+      }
     }
   }
 }

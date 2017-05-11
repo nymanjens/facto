@@ -1,7 +1,7 @@
 package flux.react.app.transactiongroupform
 
 import common.I18n
-import common.LoggingUtils.LogExceptionsCallback
+import common.LoggingUtils.{logExceptions, LogExceptionsCallback}
 import flux.react.ReactVdomUtils.^^
 import flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
 import japgolly.scalajs.react._
@@ -13,14 +13,14 @@ private[transactiongroupform] final class TotalFlowRestrictionInput(implicit i18
 
   private val component = ReactComponentB[Props](getClass.getSimpleName)
     .initialState_P[State](props => props.defaultValue)
-    .renderPS(($, props, state) => {
+    .renderPS(($, props, state) => logExceptions {
       def button(totalFlowRestriction: TotalFlowRestriction, label: String) = {
         <.label(
           ^^.classes(Seq("btn", "btn-default", "btn-sm")
             ++ (if (state == totalFlowRestriction) Seq("active") else Seq())),
           ^.onClick --> LogExceptionsCallback {
             $.setState(totalFlowRestriction).runNow()
-            props.onChange(totalFlowRestriction)
+            props.onChangeListener(totalFlowRestriction)
           },
           label
         )
@@ -40,7 +40,8 @@ private[transactiongroupform] final class TotalFlowRestrictionInput(implicit i18
   }
 
   // **************** Private inner types ****************//
-  private case class Props(defaultValue: TotalFlowRestriction, onChange: TotalFlowRestriction => Unit)
+  private case class Props(defaultValue: TotalFlowRestriction,
+                           onChangeListener: TotalFlowRestriction => Unit)
   private type State = TotalFlowRestriction
 }
 
