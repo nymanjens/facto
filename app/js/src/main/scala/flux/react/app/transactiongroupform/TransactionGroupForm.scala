@@ -63,33 +63,24 @@ final class TransactionGroupForm(implicit i18n: I18n,
               <.span(
                 ^.className := "total-transaction-flow-box",
                 <.span(
-                  ^.className := "total-flow-text",
-                  i18n("facto.total") + ":",
-                  <.span(
-                    ^.className := "total-transaction-flow",
-                    if (state.totalFlowRestriction == TotalFlowRestriction.ChooseTotal) {
-                      <.span(
-                        ^.className := "form-inline",
-                        <.div(^.className := "input-group",
-                          <.span(
-                            ^.className := "input-group-addon",
-                            <.i(^.className := Currency.default.iconClass)
-                          ),
-                          <.input(
-                            ^.tpe := "text",
-                            ^.className := "form-control",
-                            ^.autoComplete := "off",
-                            ^.value := "0.00",
-                            ^.onChange --> Callback((): Unit)
-                          )
-                        )
-                      )
-                    } else {
-                      Seq[TagMod](
-                        <.i(^.className := Currency.default.iconClass),
-                        state.totalFlow.formatFloat
-                      )
-                    }
+                  ^.className := "total-flow-form form-inline",
+                  <.div(^.className := "input-group",
+                    <.span(
+                      ^.className := "input-group-addon",
+                      i18n("facto.total") + ":"
+                    ),
+                    <.span(
+                      ^.className := "input-group-addon",
+                      <.i(^.className := Currency.default.iconClass)
+                    ),
+                    <.input(
+                      ^.tpe := "text",
+                      ^.className := "form-control",
+                      ^.autoComplete := "off",
+                      ^.value := state.totalFlow.formatFloat,
+                      ^.disabled := state.totalFlowRestriction != TotalFlowRestriction.ChooseTotal,
+                      ^.onChange --> Callback((): Unit)
+                    )
                   )
                 ),
                 totalFlowRestrictionInput(defaultValue = TotalFlowRestriction.AnyTotal, onChange = updateTotalFlowRestriction)
