@@ -27,6 +27,7 @@ object MoneyInput {
           }
           datedMoney.exchangedForReferenceCurrency(extraProps.exchangeRateManager)
         }
+
         <.div(^.className := "input-group",
           <.span(
             ^.className := "input-group-addon",
@@ -40,11 +41,13 @@ object MoneyInput {
             ^.value := valueString,
             ^.onChange ==> onChange
           ),
-          <.span(
-            ^.className := "input-group-addon",
-            <.i(^.className := Currency.default.iconClass),
-            <.span(referenceMoney.formatFloat)
-          )
+          ^^.ifThen(extraProps.currency.isForeign) {
+            <.span(
+              ^.className := "input-group-addon",
+              <.i(^.className := Currency.default.iconClass),
+              <.span(referenceMoney.formatFloat)
+            )
+          }
         )
       }
     }
