@@ -18,10 +18,13 @@ private[bootstrap] object InputComponent {
 
   // **************** API ****************//
   def create[Value, ExtraProps](name: String,
+                                valueChangeForPropsChange: (Props[Value, ExtraProps], Value) => Value = (_: Props[Value, ExtraProps], oldValue: Value) => oldValue,
                                 inputRenderer: InputRenderer[ExtraProps]) = {
     def calculateInitialState(props: Props[Value, ExtraProps]): State[Value] = logExceptions {
+      // Calling valueChangeForPropsChange() to make sure there is no discrepancy between init and update.
+      val value = valueChangeForPropsChange(props, props.defaultValue)
       State(
-        valueString = ValueTransformer.valueToString(props.defaultValue, props),
+        valueString = ValueTransformer.valueToString(value, props),
         listeners = Seq(props.listener))
     }
     ReactComponentB[Props[Value, ExtraProps]](name)
@@ -66,7 +69,10 @@ private[bootstrap] object InputComponent {
         // be notified.
         val valueString = scope.currentState.valueString
         val currentValue = ValueTransformer.stringToValueOrDefault(valueString, scope.currentProps)
-        val newValue = ValueTransformer.stringToValueOrDefault(valueString, scope.nextProps)
+        val newValue = {
+          val transformedValue = ValueTransformer.stringToValueOrDefault(valueString, scope.nextProps)
+          valueChangeForPropsChange(scope.nextProps, transformedValue)
+        }
         if (currentValue != newValue) {
           scope.$.modState(_.withValueString(ValueTransformer.valueToString(newValue, scope.nextProps))).runNow()
           for (listener <- scope.currentState.listeners) {

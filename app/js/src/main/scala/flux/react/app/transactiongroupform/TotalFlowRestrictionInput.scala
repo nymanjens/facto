@@ -46,10 +46,18 @@ private[transactiongroupform] final class TotalFlowRestrictionInput(implicit i18
 
 object TotalFlowRestrictionInput {
   // **************** Public inner types ****************//
-  sealed trait TotalFlowRestriction
+  sealed trait TotalFlowRestriction {
+    def userSetsTotal: Boolean
+  }
   object TotalFlowRestriction {
-    object AnyTotal extends TotalFlowRestriction
-    object ChooseTotal extends TotalFlowRestriction
-    object ZeroSum extends TotalFlowRestriction
+    object AnyTotal extends TotalFlowRestriction {
+      override def userSetsTotal = false
+    }
+    object ChooseTotal extends TotalFlowRestriction {
+      override def userSetsTotal = true
+    }
+    object ZeroSum extends TotalFlowRestriction {
+      override def userSetsTotal = true
+    }
   }
 }

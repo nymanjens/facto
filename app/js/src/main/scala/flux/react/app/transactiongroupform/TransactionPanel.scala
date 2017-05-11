@@ -72,11 +72,13 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   def apply(key: Int,
             ref: Reference,
             title: String,
+            forceFlowValue: Option[Long] = None,
             defaultPanel: Option[Proxy],
             closeButtonCallback: Option[Callback] = None,
             onFormChange: () => Unit): ReactElement = {
     val props = Props(
       title,
+      forceFlowValue,
       defaultPanel = defaultPanel,
       closeButtonCallback,
       onFormChange
@@ -151,6 +153,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                            moneyReservoir: MoneyReservoir)
 
   private case class Props(title: String,
+                           forceFlowValue: Option[Long],
                            defaultPanel: Option[Proxy],
                            deleteButtonCallback: Option[Callback],
                            onFormChange: () => Unit)
@@ -272,6 +275,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         uielements.bootstrap.MoneyInput(
           ref = flowRef,
           label = i18n("facto.flow"),
+          forceValue = props.forceFlowValue,
           currency = state.moneyReservoir.currency,
           date = state.transactionDate,
           listener = AnythingChangedListener

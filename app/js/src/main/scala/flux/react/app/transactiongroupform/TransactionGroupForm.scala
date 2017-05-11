@@ -101,13 +101,16 @@ final class TransactionGroupForm(implicit i18n: I18n,
             <.div(
               ^.className := "transaction-group-form",
               for ((panelIndex, i) <- state.panelIndices.zipWithIndex) yield {
-                val firstPanel = state.panelIndices.head
+                val firstPanel = panelIndex == state.panelIndices.head
+                val lastPanel = panelIndex == state.panelIndices.last
                 transactionPanel(
                   key = panelIndex,
                   ref = panelRef(panelIndex),
                   title = i18n("facto.transaction") + " " + (i + 1),
-                  defaultPanel = if (panelIndex == firstPanel) None else Some(panelRef(panelIndex = firstPanel)($)),
-                  closeButtonCallback = if (panelIndex == firstPanel) None else Some(removeTransactionPanel(panelIndex)),
+                  forceFlowValue =
+                    if (lastPanel && state.totalFlowRestriction.userSetsTotal) Some((state.totalFlow - state.totalFlowExceptLast).cents) else None,
+                  defaultPanel = if (firstPanel) None else Some(panelRef(panelIndex = state.panelIndices.head)($)),
+                  closeButtonCallback = if (firstPanel) None else Some(removeTransactionPanel(panelIndex)),
                   onFormChange = this.onFormChange
                 )
               },

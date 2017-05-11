@@ -14,6 +14,12 @@ object MoneyInput {
 
   private val component = InputComponent.create[Value, ExtraProps](
     name = getClass.getSimpleName,
+    valueChangeForPropsChange = (newProps, oldValue) => {
+      newProps.extra.forceValue match {
+        case Some(forceValue) => forceValue
+        case None => oldValue
+      }
+    },
     inputRenderer = new InputRenderer[ExtraProps] {
       override def renderInput(classes: Seq[String],
                                name: String,
@@ -39,6 +45,7 @@ object MoneyInput {
             ^^.classes(classes),
             ^.name := name,
             ^.value := valueString,
+            ^.disabled := extraProps.forceValue.isDefined,
             ^.onChange ==> onChange
           ),
           ^^.ifThen(extraProps.currency.isForeign) {
@@ -59,6 +66,7 @@ object MoneyInput {
             help: String = null,
             errorMessage: String = null,
             inputClasses: Seq[String] = Seq(),
+            forceValue: Option[Long] = None,
             currency: Currency,
             date: LocalDateTime,
             listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance)(
@@ -72,8 +80,9 @@ object MoneyInput {
       inputClasses = inputClasses,
       listener = listener,
       extra = ExtraProps(
-        currency,
-        date),
+        forceValue = forceValue,
+        currency = currency,
+        date = date),
       valueTransformer = ValueTransformer)
     component.withRef(ref.name)(props)
   }
@@ -84,7 +93,8 @@ object MoneyInput {
   final class Reference private[MoneyInput](refComp: InputComponent.ThisRefComp[Value, ExtraProps])
     extends InputComponent.Reference(refComp)
 
-  case class ExtraProps(currency: Currency,
+  case class ExtraProps(forceValue: Option[Long],
+                        currency: Currency,
                         date: LocalDateTime)(
                          implicit val exchangeRateManager: ExchangeRateManager)
 
