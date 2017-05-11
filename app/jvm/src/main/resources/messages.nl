@@ -70,6 +70,7 @@ facto.delete=Verwijderen
 facto.balance-check=Balans instellen
 facto.total=Totaal
 facto.any-total=Restrictieloos totaal
+facto.choose-total=Kies totaal
 facto.zero-sum=Zero sum
 facto.transaction=Inboeking
 facto.new-transaction=Nieuwe inboeking
