@@ -24,10 +24,10 @@ private[transactiongroupform] class InputWithDefaultFromReference[Value] private
 
   // **************** API ****************//
   def forOption[DelegateRef <: InputBase.Reference[Value]](ref: Reference,
-                                                       defaultValueProxy: Option[() => InputBase.Proxy[Value]],
-                                                       directUserChangeOnly: Boolean = false,
-                                                       nameToDelegateRef: String => DelegateRef
-                                                      )(inputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement): ReactElement = {
+                                                           defaultValueProxy: Option[() => InputBase.Proxy[Value]],
+                                                           directUserChangeOnly: Boolean = false,
+                                                           nameToDelegateRef: String => DelegateRef
+                                                          )(inputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement): ReactElement = {
     component.withRef(ref.name)(Props(
       inputElementRef = nameToDelegateRef("delegate"),
       defaultValueProxy = defaultValueProxy,
@@ -116,8 +116,11 @@ private[transactiongroupform] class InputWithDefaultFromReference[Value] private
       }
 
       def willUnmount(props: Props.any): Callback = LogExceptionsCallback {
-        props.inputElementRef($).deregisterListener(InputValueListener)
-        props.defaultValueProxy.get().deregisterListener(DefaultValueListener)
+        try {
+          props.defaultValueProxy.get().deregisterListener(DefaultValueListener)
+        } catch {
+          case _: NoSuchElementException => // This is OK because the default value input is probably already unmounted.
+        }
       }
 
       def render(props: Props.any, state: State) = logExceptions {
