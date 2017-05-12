@@ -155,7 +155,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
         datedMoney.exchangedForReferenceCurrency
       }
       val currencies = for (panelIndex <- state.panelIndices) yield {
-        panelRef(panelIndex)($).moneyReservoirCode.valueOrDefault.currency
+        panelRef(panelIndex)($).moneyReservoir.valueOrDefault.currency
       }
 
       $.modState(_.copy(foreignCurrency = currencies.filter(_.isForeign).headOption)).runNow()

@@ -103,9 +103,9 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   final class Proxy private[TransactionPanel](private val componentScope: () => BackendScope[Props, State]) {
     def rawTransactionDate: InputBase.Proxy[String] = rawTransactionDateRef($)
     def rawConsumedDate: InputBase.Proxy[String] = rawConsumedDateRef($)
-    def beneficiaryAccountCode: InputBase.Proxy[Account] = beneficiaryAccountRef($)
-    def moneyReservoirCode: InputBase.Proxy[MoneyReservoir] = moneyReservoirRef($)
-    def categoryCode: InputBase.Proxy[Category] = categoryRef($)
+    def beneficiaryAccount: InputBase.Proxy[Account] = beneficiaryAccountRef($)
+    def moneyReservoir: InputBase.Proxy[MoneyReservoir] = moneyReservoirRef($)
+    def category: InputBase.Proxy[Category] = categoryRef($)
     def description: InputBase.Proxy[String] = descriptionRef($)
     def detailDescription: InputBase.Proxy[String] = detailDescriptionRef($)
     def rawTags: InputBase.Proxy[String] = rawTagsRef($)
@@ -213,7 +213,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         },
         reservoirInputWithDefault.forOption(
           ref = moneyReservoirRef,
-          defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.moneyReservoirCode),
+          defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.moneyReservoir),
           nameToDelegateRef = reservoirSelectInput.ref(_)) {
           extraProps =>
             reservoirSelectInput(
@@ -229,7 +229,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         },
         accountInputWithDefault.forOption(
           ref = beneficiaryAccountRef,
-          defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.beneficiaryAccountCode),
+          defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.beneficiaryAccount),
           directUserChangeOnly = true,
           nameToDelegateRef = accountSelectInput.ref(_)) {
           extraProps =>
@@ -246,7 +246,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         },
         categoryInputWithDefault.forOption(
           ref = categoryRef,
-          defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.categoryCode),
+          defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.category),
           directUserChangeOnly = true,
           nameToDelegateRef = categorySelectInput.ref(_)) {
           extraProps =>
