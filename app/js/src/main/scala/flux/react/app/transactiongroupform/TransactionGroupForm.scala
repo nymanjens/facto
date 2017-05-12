@@ -22,6 +22,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
     State(
       // TODO: Update these when updating an existing TransactionGroup.
       panelIndices = Seq(0, 1),
+      foreignCurrency = None,
       totalFlowRestriction = TotalFlowRestriction.AnyTotal,
       totalFlow = ReferenceMoney(0),
       totalFlowExceptLast = ReferenceMoney(0)))
@@ -37,7 +38,12 @@ final class TransactionGroupForm(implicit i18n: I18n,
   private def panelRef(panelIndex: Int): transactionPanel.Reference = transactionPanel.ref(s"panel_$panelIndex")
 
   // **************** Private inner types ****************//
+  /**
+    * @param foreignCurrency Any foreign currency of any of the selected money reservoirs. If there are multiple,
+    *                        this can by any of these.
+    */
   private case class State(panelIndices: Seq[Int],
+                           foreignCurrency: Option[Currency],
                            totalFlowRestriction: TotalFlowRestriction,
                            totalFlow: ReferenceMoney,
                            totalFlowExceptLast: ReferenceMoney) {
@@ -66,7 +72,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
                 totalFlowInput(
                   forceValue =
                     if (state.totalFlowRestriction == TotalFlowRestriction.ChooseTotal) None else Some(state.totalFlow),
-                  foreignCurrency = None, // TODO
+                  foreignCurrency = state.foreignCurrency,
                   onChange = updateTotalFlow
                 ),
                 totalFlowRestrictionInput(
@@ -145,6 +151,11 @@ final class TransactionGroupForm(implicit i18n: I18n,
         val datedMoney = panelRef(panelIndex)($).flowValueOrDefault
         datedMoney.exchangedForReferenceCurrency
       }
+      val currencies = for (panelIndex <- state.panelIndices) yield {
+        panelRef(panelIndex)($).moneyReservoirCode.valueOrDefault.currency
+      }
+
+      $.modState(_.copy(foreignCurrency = currencies.filter(_.isForeign).headOption)).runNow()
 
       $.modState(_.copy(totalFlowExceptLast = flows.dropRight(1).sum)).runNow()
       if (state.totalFlowRestriction == TotalFlowRestriction.AnyTotal) {

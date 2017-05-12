@@ -52,7 +52,7 @@ object MoneyInput {
             <.span(
               ^.className := "input-group-addon",
               <.i(^.className := Currency.default.iconClass),
-              <.span(referenceMoney.formatFloat)
+              <.span(" " + referenceMoney.formatFloat)
             )
           }
         )
