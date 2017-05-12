@@ -1,14 +1,15 @@
 package flux.react.app.transactiongroupform
 
-import flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
-import flux.react.ReactVdomUtils.^^
+import flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import models.accounting.money.{Currency, ExchangeRateManager, ReferenceMoney}
 
 import scala.collection.immutable.Seq
+import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 final class TransactionGroupForm(implicit i18n: I18n,
                                  exchangeRateManager: ExchangeRateManager,
@@ -128,10 +129,12 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
     private def addTransactionPanelCallback(): Callback = LogExceptionsCallback {
       $.modState(_.plusPanel()).runNow()
+      Future(onFormChange()) // Make sure the state is updated after this
     }
 
     private def removeTransactionPanel(index: Int): Callback = LogExceptionsCallback {
       $.modState(_.minusPanelIndex(index)).runNow()
+      Future(onFormChange()) // Make sure the state is updated after this
     }
 
     private def updateTotalFlow(totalFlow: ReferenceMoney): Unit = {
