@@ -14,7 +14,7 @@ import flux.react.uielements
 import models.accounting.Tag
 import models.{EntityAccess, User}
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
-import models.accounting.money.{Currency, DatedMoney, ExchangeRateManager, MoneyWithGeneralCurrency}
+import models.accounting.money._
 import org.scalajs.dom.raw.HTMLInputElement
 
 import scala.collection.immutable.Seq
@@ -72,7 +72,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   def apply(key: Int,
             ref: Reference,
             title: String,
-            forceFlowValue: Option[Long] = None,
+            forceFlowValue: Option[ReferenceMoney] = None,
             defaultPanel: Option[Proxy],
             closeButtonCallback: Option[Callback] = None,
             onFormChange: () => Unit): ReactElement = {
@@ -153,7 +153,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                            moneyReservoir: MoneyReservoir)
 
   private case class Props(title: String,
-                           forceFlowValue: Option[Long],
+                           forceFlowValue: Option[ReferenceMoney],
                            defaultPanel: Option[Proxy],
                            deleteButtonCallback: Option[Callback],
                            onFormChange: () => Unit)
@@ -275,7 +275,10 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         uielements.bootstrap.MoneyInput(
           ref = flowRef,
           label = i18n("facto.flow"),
-          forceValue = props.forceFlowValue,
+          forceValue = props.forceFlowValue.map(
+            _.withDate(state.transactionDate)
+              .exchangedForCurrency(state.moneyReservoir.currency)
+              .cents),
           currency = state.moneyReservoir.currency,
           date = state.transactionDate,
           listener = AnythingChangedListener
