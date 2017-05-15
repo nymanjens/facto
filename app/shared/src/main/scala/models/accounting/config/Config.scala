@@ -1,6 +1,6 @@
 package models.accounting.config
 
-import collection.immutable.Seq
+import collection.immutable.{ListMap, Seq}
 import common.Require.requireNonNull
 import models._
 import models.accounting.config.MoneyReservoir.NullMoneyReservoir
@@ -11,9 +11,9 @@ import models.accounting.config.MoneyReservoir.NullMoneyReservoir
   * @param accounts   Maps code to account
   * @param categories Maps code to category
   */
-case class Config(accounts: Map[String, Account],
-                  categories: Map[String, Category],
-                  moneyReservoirsMap: Map[String, MoneyReservoir],
+case class Config(accounts: ListMap[String, Account],
+                  categories: ListMap[String, Category],
+                  moneyReservoirsMap: ListMap[String, MoneyReservoir],
                   templates: Seq[Template],
                   constants: Constants) {
   requireNonNull(accounts, categories, moneyReservoirsMap, templates, constants)
