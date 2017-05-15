@@ -63,8 +63,8 @@ object MoneyInput {
   // **************** API ****************//
   def apply(ref: Reference,
             label: String,
-            help: String = null,
-            errorMessage: String = null,
+            defaultIsValid: Boolean = true,
+            showErrorMessage: Boolean,
             inputClasses: Seq[String] = Seq(),
             forceValue: Option[Long] = None,
             currency: Currency,
@@ -75,8 +75,8 @@ object MoneyInput {
       label = label,
       name = ref.name,
       defaultValue = 0,
-      help = Option(help),
-      errorMessage = Option(errorMessage),
+      defaultIsValid = defaultIsValid,
+      showErrorMessage = showErrorMessage,
       inputClasses = inputClasses,
       listener = listener,
       extra = ExtraProps(

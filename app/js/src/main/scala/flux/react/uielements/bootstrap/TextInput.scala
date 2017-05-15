@@ -43,16 +43,16 @@ object TextInput {
   def apply(ref: Reference,
             label: String,
             defaultValue: String = "",
-            help: String = null,
-            errorMessage: String = null,
+            defaultIsValid: Boolean = true,
+            showErrorMessage: Boolean,
             inputClasses: Seq[String] = Seq(),
             listener: InputBase.Listener[String] = InputBase.Listener.nullInstance): ReactElement = {
     val props = Props(
       label = label,
       name = ref.name,
       defaultValue = defaultValue,
-      help = Option(help),
-      errorMessage = Option(errorMessage),
+      defaultIsValid = defaultIsValid,
+      showErrorMessage = showErrorMessage,
       inputClasses = inputClasses,
       listener = listener,
       valueTransformer = ValueTransformer.nullInstance)

@@ -73,15 +73,17 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             ref: Reference,
             title: String,
             forceFlowValue: Option[ReferenceMoney] = None,
+            showErrorMessages: Boolean,
             defaultPanel: Option[Proxy],
             closeButtonCallback: Option[Callback] = None,
             onFormChange: () => Unit): ReactElement = {
     val props = Props(
-      title,
-      forceFlowValue,
+      title = title,
+      forceFlowValue = forceFlowValue,
+      showErrorMessages = showErrorMessages,
       defaultPanel = defaultPanel,
-      closeButtonCallback,
-      onFormChange
+      deleteButtonCallback = closeButtonCallback,
+      onFormChange = onFormChange
     )
     component.withKey(key).withRef(ref.refComp)(props)
   }
@@ -154,6 +156,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
 
   private case class Props(title: String,
                            forceFlowValue: Option[ReferenceMoney],
+                           showErrorMessages: Boolean,
                            defaultPanel: Option[Proxy],
                            deleteButtonCallback: Option[Callback],
                            onFormChange: () => Unit)
@@ -181,6 +184,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                   ref = extraProps.ref,
                   label = i18n("facto.date-payed"),
                   defaultValue = mappedExtraProps.defaultValue,
+                  defaultIsValid = true,
+                  showErrorMessage = props.showErrorMessages,
                   inputClasses = extraProps.inputClasses
                 )
             }
@@ -206,6 +211,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                       ref = extraProps2.ref,
                       label = i18n("facto.date-consumed"),
                       defaultValue = mappedExtraProps.defaultValue,
+                      defaultIsValid = true,
+                      showErrorMessage = props.showErrorMessages,
                       inputClasses = extraProps1.inputClasses ++ extraProps2.inputClasses
                     )
                 }
@@ -268,6 +275,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             uielements.bootstrap.TextInput(
               ref = extraProps.ref,
               label = i18n("facto.description"),
+              defaultIsValid = false,
+              showErrorMessage = props.showErrorMessages,
               inputClasses = extraProps.inputClasses,
               listener = AnythingChangedListener
             )
@@ -275,6 +284,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         uielements.bootstrap.MoneyInput(
           ref = flowRef,
           label = i18n("facto.flow"),
+          defaultIsValid = false,
+          showErrorMessage = props.showErrorMessages,
           forceValue = props.forceFlowValue.map(
             _.withDate(state.transactionDate)
               .exchangedForCurrency(state.moneyReservoir.currency)
@@ -291,6 +302,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             uielements.bootstrap.TextInput(
               ref = extraProps.ref,
               label = i18n("facto.more-info"),
+              defaultIsValid = true,
+              showErrorMessage = props.showErrorMessages,
               inputClasses = extraProps.inputClasses,
               listener = AnythingChangedListener
             )
@@ -310,6 +323,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                 uielements.bootstrap.TextInput(
                   ref = extraProps.ref,
                   label = i18n("facto.tags"),
+                  defaultIsValid = true,
+                  showErrorMessage = props.showErrorMessages,
                   defaultValue = mappedExtraProps.defaultValue,
                   inputClasses = extraProps.inputClasses
                 )

@@ -42,8 +42,6 @@ class SelectInput[Value] private(implicit valueTag: ClassTag[Value]) {
   // **************** API ****************//
   def apply(ref: Reference,
             label: String,
-            help: String = null,
-            errorMessage: String = null,
             defaultValue: Value = null.asInstanceOf[Value],
             inputClasses: Seq[String] = Seq(),
             options: Seq[Value],
@@ -54,8 +52,8 @@ class SelectInput[Value] private(implicit valueTag: ClassTag[Value]) {
       label = label,
       name = ref.name,
       defaultValue = Option(defaultValue) getOrElse options.head,
-      help = Option(help),
-      errorMessage = Option(errorMessage),
+      defaultIsValid = true,
+      showErrorMessage = true, // Should never happen
       inputClasses = inputClasses,
       listener = listener,
       extra = ExtraProps.create(options, valueToId = valueToId, valueToName = valueToName),

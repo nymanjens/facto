@@ -41,9 +41,10 @@ private[bootstrap] object InputComponent {
           }
           context.modState(_.withValueString(newString)).runNow()
         }
+        val errorMessage = generateErrorMessage(state, props)
 
         <.div(
-          ^^.classes(Seq("form-group") ++ props.errorMessage.map(_ => "has-error")),
+          ^^.classes(Seq("form-group") ++ errorMessage.map(_ => "has-error")),
           <.label(
             ^.className := "col-sm-4 control-label",
             props.label),
@@ -55,10 +56,7 @@ private[bootstrap] object InputComponent {
               valueString = state.valueString,
               onChange = onChange,
               extraProps = props.extra),
-            <<.ifThen(props.help) { msg =>
-              <.span(^.className := "help-block", msg)
-            },
-            <<.ifThen(props.errorMessage) { msg =>
+            <<.ifThen(errorMessage) { msg =>
               <.span(^.className := "help-block", msg)
             }
           )
@@ -83,6 +81,19 @@ private[bootstrap] object InputComponent {
       .build
   }
 
+  // **************** Private methods ****************//
+  def generateErrorMessage[Value, ExtraProps](state: State[Value], props: Props[Value, ExtraProps]): Option[String] = {
+    if (props.showErrorMessage) {
+      ValueTransformer.stringToValue(state.valueString, props) match {
+        case None => Some("Invalid value")
+        case Some(props.defaultValue) if !props.defaultIsValid => Some("Please change this value")
+        case _ => None
+      }
+    } else {
+      None
+    }
+  }
+
   // **************** Public inner types ****************//
   type ThisRefComp[Value, ExtraProps] = RefComp[Props[Value, ExtraProps], State[Value], Backend, _ <: TopNode]
 
@@ -98,7 +109,7 @@ private[bootstrap] object InputComponent {
 
     /**
       * Returns the Value that corresponds to the given String or None iff the current value is
-      * invalid.
+      * invalid (excluding the case where the default value is invalid).
       */
     def stringToValue(string: String, extraProps: ExtraProps): Option[Value]
 
@@ -133,8 +144,8 @@ private[bootstrap] object InputComponent {
   case class Props[Value, ExtraProps](label: String,
                                       name: String,
                                       defaultValue: Value,
-                                      help: Option[String],
-                                      errorMessage: Option[String],
+                                      defaultIsValid: Boolean,
+                                      showErrorMessage: Boolean,
                                       inputClasses: Seq[String],
                                       listener: InputBase.Listener[Value],
                                       extra: ExtraProps = (): Unit,
@@ -157,7 +168,13 @@ private[bootstrap] object InputComponent {
   private type ThisComponentU[Value, ExtraProps] = ReactComponentU[Props[Value, ExtraProps], State[Value], Backend, _ <: TopNode]
 
   private final class Proxy[Value, ExtraProps](val componentProvider: () => ThisComponentU[Value, ExtraProps]) extends InputBase.Proxy[Value] {
-    override def value = ValueTransformer.stringToValue(componentProvider().state.valueString, props)
+    override def value = {
+      val defaultValue = props.defaultValue
+      ValueTransformer.stringToValue(componentProvider().state.valueString, props) match {
+        case Some(defaultValue) if !props.defaultIsValid => None
+        case other => other
+      }
+    }
     override def valueOrDefault = ValueTransformer.stringToValueOrDefault(componentProvider().state.valueString, props)
     override def setValue(newValue: Value) = {
       def setValueInternal(newValue: Value): Value = {

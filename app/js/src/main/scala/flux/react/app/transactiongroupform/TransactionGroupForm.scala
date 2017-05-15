@@ -44,6 +44,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
     *                        this can by any of these.
     */
   private case class State(panelIndices: Seq[Int],
+                           showErrorMessages: Boolean = false,
                            foreignCurrency: Option[Currency],
                            totalFlowRestriction: TotalFlowRestriction,
                            totalFlow: ReferenceMoney,
@@ -105,6 +106,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
                   title = i18n("facto.transaction") + " " + (i + 1),
                   forceFlowValue =
                     if (lastPanel && state.totalFlowRestriction.userSetsTotal) Some(state.totalFlow - state.totalFlowExceptLast) else None,
+                  showErrorMessages = state.showErrorMessages,
                   defaultPanel = if (firstPanel) None else Some(panelRef(panelIndex = state.panelIndices.head)($)),
                   closeButtonCallback = if (firstPanel) None else Some(removeTransactionPanel(panelIndex)),
                   onFormChange = this.onFormChange
@@ -176,6 +178,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
       for (panelIndex <- state.panelIndices) {
         println("   - " + panelRef(panelIndex)($).data)
       }
+      $.modState(_.copy(showErrorMessages = true)).runNow()
     }
   }
 }
