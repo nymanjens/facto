@@ -169,9 +169,8 @@ private[bootstrap] object InputComponent {
 
   private final class Proxy[Value, ExtraProps](val componentProvider: () => ThisComponentU[Value, ExtraProps]) extends InputBase.Proxy[Value] {
     override def value = {
-      val defaultValue = props.defaultValue
       ValueTransformer.stringToValue(componentProvider().state.valueString, props) match {
-        case Some(defaultValue) if !props.defaultIsValid => None
+        case Some(value) if value == props.defaultValue && !props.defaultIsValid => None
         case other => other
       }
     }
