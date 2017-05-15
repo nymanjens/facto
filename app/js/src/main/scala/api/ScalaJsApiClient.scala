@@ -12,7 +12,7 @@ import models.manager.{Entity, EntityModification, EntityType}
 import org.scalajs.dom
 
 import scala.collection.immutable.Seq
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.concurrent.Future
 import scala.scalajs.js.typedarray._
 
