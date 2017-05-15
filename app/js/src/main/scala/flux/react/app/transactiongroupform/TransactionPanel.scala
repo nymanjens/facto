@@ -314,18 +314,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                   inputClasses = extraProps.inputClasses
                 )
             }
-        },
-        <.button(
-          ^.onClick --> LogExceptionsCallback {
-            println("  Transaction date:" + transactionDateRef($).value)
-            println("  Consumed date:" + consumedDateRef($).value)
-            println("  BeneficiaryAccountCode:" + beneficiaryAccountRef($).value)
-            println("  CategoryCode:" + categoryRef($).value)
-            println("  Description:" + descriptionRef($).value)
-            println("  Flow:" + flowRef($).value)
-          },
-          "Test button"
-        )
+        }
       )
     }
 

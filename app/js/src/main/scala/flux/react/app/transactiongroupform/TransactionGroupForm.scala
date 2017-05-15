@@ -119,7 +119,9 @@ final class TransactionGroupForm(implicit i18n: I18n,
                 <.button(
                   ^.tpe := "submit",
                   ^.className := "btn btn-default",
-                  i18n("facto.ok"))
+                  ^.onClick ==> onSubmit,
+                  i18n("facto.ok")
+                )
               )
             )
           )
@@ -163,6 +165,16 @@ final class TransactionGroupForm(implicit i18n: I18n,
       $.modState(_.copy(totalFlowExceptLast = flows.dropRight(1).sum)).runNow()
       if (state.totalFlowRestriction == TotalFlowRestriction.AnyTotal) {
         $.modState(_.copy(totalFlow = flows.sum)).runNow()
+      }
+    }
+
+    private def onSubmit(e: ReactEventI): Callback = LogExceptionsCallback {
+      e.preventDefault()
+
+      val state = $.state.runNow()
+      println("  onSubmit:")
+      for (panelIndex <- state.panelIndices) {
+        println("   - " + panelRef(panelIndex)($).data)
       }
     }
   }
