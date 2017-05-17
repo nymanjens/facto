@@ -2,9 +2,13 @@ package flux.react.app.transactiongroupform
 
 import common.{I18n, SinglePendingTaskQueue}
 import common.LoggingUtils.{LogExceptionsCallback, LogExceptionsFuture, logExceptions}
+import common.time.{Clock, LocalDateTime}
+import flux.action.{Action, Dispatcher}
 import flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
+import models.User
+import models.accounting.{Tag, Transaction}
 import models.accounting.money.{Currency, ExchangeRateManager, ReferenceMoney}
 
 import scala.collection.immutable.Seq
@@ -12,7 +16,10 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 final class TransactionGroupForm(implicit i18n: I18n,
+                                 clock: Clock,
+                                 user: User,
                                  exchangeRateManager: ExchangeRateManager,
+                                 dispatcher: Dispatcher,
                                  transactionPanel: TransactionPanel,
                                  addTransactionPanel: AddTransactionPanel,
                                  totalFlowInput: TotalFlowInput,
@@ -22,7 +29,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
     .initialState[State](
     State(
       // TODO: Update these when updating an existing TransactionGroup.
-      panelIndices = Seq(0, 1),
+      panelIndices = Seq(0),
       foreignCurrency = None,
       totalFlowRestriction = TotalFlowRestriction.AnyTotal,
       totalFlow = ReferenceMoney(0),
@@ -179,11 +186,37 @@ final class TransactionGroupForm(implicit i18n: I18n,
       e.preventDefault()
 
       val state = $.state.runNow()
+      $.modState(_.copy(showErrorMessages = true)).runNow()
+
       println("  onSubmit:")
       for (panelIndex <- state.panelIndices) {
         println("   - " + panelRef(panelIndex)($).data)
       }
-      $.modState(_.copy(showErrorMessages = true)).runNow()
+
+      val maybeDatas = for (panelIndex <- state.panelIndices) yield panelRef(panelIndex)($).data
+      if (maybeDatas forall (_.isDefined)) {
+        val datas = maybeDatas map (_.get)
+        dispatcher.dispatch(
+          Action.AddTransactionGroup(
+            transactionsWithoutIdProvider = group => {
+              for (data <- datas) yield Transaction(
+                transactionGroupId = group.id,
+                issuerId = user.id,
+                beneficiaryAccountCode = data.beneficiaryAccount.code,
+                moneyReservoirCode = data.moneyReservoir.code,
+                categoryCode = data.category.code,
+                description = data.description,
+                flowInCents = data.flow.cents,
+                detailDescription = data.detailDescription,
+                tagsString = Tag.serializeToString(data.tags),
+                createdDate = clock.now,
+                transactionDate = data.transactionDate,
+                consumedDate = data.consumedDate
+              )
+            }
+          )
+        )
+      }
     }
   }
 }

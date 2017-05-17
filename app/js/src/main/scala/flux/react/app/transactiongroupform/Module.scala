@@ -17,6 +17,7 @@ final class Module(implicit i18n: I18n,
 
   import com.softwaremill.macwire._
   import common.time.Module._
+  import flux.action.Module._
   import modelsModule.entityAccess
   import modelsModule.exchangeRateManager
 

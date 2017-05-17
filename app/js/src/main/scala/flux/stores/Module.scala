@@ -13,6 +13,6 @@ final class Module(implicit remoteDatabaseProxy: RemoteDatabaseProxy) {
   import flux.action.Module._
   import modelsModule._
 
-  implicit lazy val allEntriesStoreFactory = wire[AllEntriesStoreFactory]
-  implicit lazy val transactionAndGroupStore = wire[TransactionAndGroupStore]
+  implicit val allEntriesStoreFactory = wire[AllEntriesStoreFactory]
+  implicit val transactionAndGroupStore = wire[TransactionAndGroupStore]
 }

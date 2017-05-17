@@ -21,6 +21,7 @@ final class TransactionAndGroupStore(implicit database: RemoteDatabaseProxy,
       val transactionsWithoutId = transactionsWithoutIdProvider(group)
       val transactionAdditions = transactionsWithoutId map (EntityModification.createAddWithRandomId(_))
       database.persistModifications(groupAddition +: transactionAdditions)
+      println("  TransactionAndGroupStore: Added transaction group: " + group.id)
 
     case UpdateTransactionGroup(group, transactionsWithoutId) =>
       val transactionDeletions = group.transactions map (EntityModification.createDelete(_))

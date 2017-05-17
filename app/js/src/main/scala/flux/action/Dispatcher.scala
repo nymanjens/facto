@@ -37,6 +37,7 @@ object Dispatcher {
         logExceptions {
           require(!isDispatching)
           isDispatching = true
+          println(s"  Dispatcher: Dispatching action ${action.getClass.getSimpleName}")
           callbacks.foreach(_.apply(action))
           isDispatching = false
         }
