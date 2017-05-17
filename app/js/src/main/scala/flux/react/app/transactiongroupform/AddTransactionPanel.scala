@@ -1,18 +1,16 @@
 package flux.react.app.transactiongroupform
 
 import common.I18n
+import common.LoggingUtils.logExceptions
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
-import flux.react.ReactVdomUtils.{<<, ^^}
-import models.{EntityAccess, User}
-import models.accounting.config.Config
 
 import scala.collection.immutable.Seq
 
 private[transactiongroupform] final class AddTransactionPanel(implicit i18n: I18n) {
 
   private val component = ReactComponentB[Props](getClass.getSimpleName)
-    .renderP((_, props) =>
+    .renderP((_, props) => logExceptions {
       HalfPanel(
         title = <.span(i18n("facto.new-transaction")),
         panelClasses = Seq("add-transaction-button-holder"))(
@@ -34,7 +32,7 @@ private[transactiongroupform] final class AddTransactionPanel(implicit i18n: I18
           )
         )
       )
-    ).build
+    }).build
 
   // **************** API ****************//
   def apply(onClick: Callback): ReactElement = {
