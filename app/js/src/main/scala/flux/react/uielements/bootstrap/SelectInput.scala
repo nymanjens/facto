@@ -2,6 +2,7 @@ package flux.react.uielements.bootstrap
 
 import common.CollectionUtils.toListMap
 import common.GuavaReplacement.Iterables.getOnlyElement
+import common.I18n
 import flux.react.ReactVdomUtils.^^
 import flux.react.uielements.InputBase
 import flux.react.uielements.bootstrap.InputComponent.{InputRenderer, Props}
@@ -47,7 +48,8 @@ class SelectInput[Value] private(implicit valueTag: ClassTag[Value]) {
             options: Seq[Value],
             valueToId: Value => String,
             valueToName: Value => String,
-            listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance): ReactElement = {
+            listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance)(
+             implicit i18n: I18n): ReactElement = {
     val props = Props(
       label = label,
       name = ref.name,

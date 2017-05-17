@@ -4,7 +4,7 @@ import java.util.NoSuchElementException
 
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import flux.react.uielements.InputBase
-import common.LoggingUtils
+import common.{I18n, LoggingUtils}
 import japgolly.scalajs.react.{ReactEventI, TopNode, _}
 import japgolly.scalajs.react.vdom.prefix_<^._
 import flux.react.ReactVdomUtils.{<<, ^^}
@@ -12,7 +12,7 @@ import japgolly.scalajs.react.ReactComponentC.ReqProps
 import org.scalajs.dom.raw.HTMLInputElement
 
 import scala.collection.immutable.Seq
-import scala.util.{Success, Failure, Try}
+import scala.util.{Failure, Success, Try}
 
 private[bootstrap] object InputComponent {
 
@@ -85,8 +85,8 @@ private[bootstrap] object InputComponent {
   def generateErrorMessage[Value, ExtraProps](state: State[Value], props: Props[Value, ExtraProps]): Option[String] = {
     if (props.showErrorMessage) {
       ValueTransformer.stringToValue(state.valueString, props) match {
-        case None => Some("Invalid value")
-        case Some(props.defaultValue) if !props.defaultIsValid => Some("Please change this value")
+        case None => Some(props.i18n("error.invalid"))
+        case Some(props.defaultValue) if !props.defaultIsValid => Some(props.i18n("error.required"))
         case _ => None
       }
     } else {
@@ -149,7 +149,8 @@ private[bootstrap] object InputComponent {
                                       inputClasses: Seq[String],
                                       listener: InputBase.Listener[Value],
                                       extra: ExtraProps = (): Unit,
-                                      valueTransformer: ValueTransformer[Value, ExtraProps])
+                                      valueTransformer: ValueTransformer[Value, ExtraProps])(
+                                       implicit val i18n: I18n)
 
   case class State[Value](valueString: String,
                           listeners: Seq[InputBase.Listener[Value]] = Seq()) {

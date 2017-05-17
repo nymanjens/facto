@@ -5,7 +5,7 @@ import java.util.NoSuchElementException
 
 import flux.react.uielements.bootstrap.InputComponent.{InputRenderer, Props, ValueTransformer}
 import flux.react.uielements.InputBase
-import common.LoggingUtils
+import common.{I18n, LoggingUtils}
 import common.time.TimeUtils
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
@@ -46,7 +46,8 @@ object TextInput {
             defaultIsValid: Boolean = true,
             showErrorMessage: Boolean,
             inputClasses: Seq[String] = Seq(),
-            listener: InputBase.Listener[String] = InputBase.Listener.nullInstance): ReactElement = {
+            listener: InputBase.Listener[String] = InputBase.Listener.nullInstance)(
+             implicit i18n: I18n): ReactElement = {
     val props = Props(
       label = label,
       name = ref.name,

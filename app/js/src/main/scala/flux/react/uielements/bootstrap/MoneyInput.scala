@@ -1,5 +1,6 @@
 package flux.react.uielements.bootstrap
 
+import common.I18n
 import common.time.LocalDateTime
 import flux.react.ReactVdomUtils.^^
 import flux.react.uielements.InputBase
@@ -70,7 +71,7 @@ object MoneyInput {
             currency: Currency,
             date: LocalDateTime,
             listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance)(
-             implicit exchangeRateManager: ExchangeRateManager): ReactElement = {
+             implicit exchangeRateManager: ExchangeRateManager, i18n: I18n): ReactElement = {
     val props = Props[Value, ExtraProps](
       label = label,
       name = ref.name,
