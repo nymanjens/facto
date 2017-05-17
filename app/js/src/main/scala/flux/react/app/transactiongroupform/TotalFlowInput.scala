@@ -66,19 +66,13 @@ private[transactiongroupform] final class TotalFlowInput(implicit i18n: I18n,
       )
     })
     .componentWillReceiveProps(scope => LogExceptionsCallback {
-      // If the props have changed, the transformed value may have changed. If this happens, the listeners should
-      // be notified.
-      val currentValue = scope.currentState.parsedValueOrDefault
-      val newValue = {
-        scope.nextProps.forceValue match {
-          case Some(forceValue) => forceValue
-          case None => currentValue
-        }
+      scope.nextProps.forceValue match {
+        case Some(forceValue) =>
+          scope.$.modState(_.copy(valueString = forceValue.formatFloat)).runNow()
+        case None =>
       }
-      if (currentValue != newValue) {
-        scope.$.modState(_.copy(valueString = newValue.formatFloat)).runNow()
-        scope.nextProps.onChangeListener(newValue)
-      }
+      // Not calling listener here because we only have a listener in the props. The parent
+      // component doesn't need to be notified of changes it made to the props.
     })
     .build
 
