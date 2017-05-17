@@ -112,7 +112,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
                   onFormChange = this.onFormChange
                 )
               },
-              addTransactionPanel(onClick = addTransactionPanelCallback())
+              addTransactionPanel(onClick = addTransactionPanelCallback)
             ),
             <.div(
               ^.className := "form-group",
@@ -131,7 +131,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
       )
     }
 
-    private def addTransactionPanelCallback(): Callback = LogExceptionsCallback {
+    private val addTransactionPanelCallback: Callback = LogExceptionsCallback {
       $.modState(_.plusPanel()).runNow()
       LogExceptionsFuture(onFormChange()) // Make sure the state is updated after this
     }
@@ -146,28 +146,33 @@ final class TransactionGroupForm(implicit i18n: I18n,
     }
 
     private def updateTotalFlowRestriction(totalFlowRestriction: TotalFlowRestriction): Unit = {
-      $.modState(_.copy(totalFlowRestriction = totalFlowRestriction)).runNow()
-      if (totalFlowRestriction == TotalFlowRestriction.ZeroSum) {
-        $.modState(_.copy(totalFlow = ReferenceMoney(0))).runNow()
-      }
+      $.modState { state =>
+        var newState = state.copy(totalFlowRestriction = totalFlowRestriction)
+        if (totalFlowRestriction == TotalFlowRestriction.ZeroSum) {
+          newState = newState.copy(totalFlow = ReferenceMoney(0))
+        }
+        newState
+      }.runNow()
     }
 
     private def onFormChange(): Unit = {
-      val state = $.state.runNow()
-      val flows = for (panelIndex <- state.panelIndices) yield {
-        val datedMoney = panelRef(panelIndex)($).flowValueOrDefault
-        datedMoney.exchangedForReferenceCurrency
-      }
-      val currencies = for (panelIndex <- state.panelIndices) yield {
-        panelRef(panelIndex)($).moneyReservoir.valueOrDefault.currency
-      }
+      $.modState { state =>
+        val flows = for (panelIndex <- state.panelIndices) yield {
+          val datedMoney = panelRef(panelIndex)($).flowValueOrDefault
+          datedMoney.exchangedForReferenceCurrency
+        }
+        val currencies = for (panelIndex <- state.panelIndices) yield {
+          panelRef(panelIndex)($).moneyReservoir.valueOrDefault.currency
+        }
 
-      $.modState(_.copy(foreignCurrency = currencies.filter(_.isForeign).headOption)).runNow()
-
-      $.modState(_.copy(totalFlowExceptLast = flows.dropRight(1).sum)).runNow()
-      if (state.totalFlowRestriction == TotalFlowRestriction.AnyTotal) {
-        $.modState(_.copy(totalFlow = flows.sum)).runNow()
-      }
+        var newState = state.copy(
+          foreignCurrency = currencies.filter(_.isForeign).headOption,
+          totalFlowExceptLast = flows.dropRight(1).sum)
+        if (state.totalFlowRestriction == TotalFlowRestriction.AnyTotal) {
+          newState = newState.copy(totalFlow = flows.sum)
+        }
+        newState
+      }.runNow()
     }
 
     private def onSubmit(e: ReactEventI): Callback = LogExceptionsCallback {
