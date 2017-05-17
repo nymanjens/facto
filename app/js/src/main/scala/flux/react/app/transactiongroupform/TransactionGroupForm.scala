@@ -1,7 +1,7 @@
 package flux.react.app.transactiongroupform
 
-import common.I18n
-import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
+import common.{I18n, SinglePendingTaskQueue}
+import common.LoggingUtils.{LogExceptionsCallback, LogExceptionsFuture, logExceptions}
 import flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
@@ -133,12 +133,12 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
     private def addTransactionPanelCallback(): Callback = LogExceptionsCallback {
       $.modState(_.plusPanel()).runNow()
-      Future(onFormChange()) // Make sure the state is updated after this
+      LogExceptionsFuture(onFormChange()) // Make sure the state is updated after this
     }
 
     private def removeTransactionPanel(index: Int): Callback = LogExceptionsCallback {
       $.modState(_.minusPanelIndex(index)).runNow()
-      Future(onFormChange()) // Make sure the state is updated after this
+      LogExceptionsFuture(onFormChange()) // Make sure the state is updated after this
     }
 
     private def updateTotalFlow(totalFlow: ReferenceMoney): Unit = {

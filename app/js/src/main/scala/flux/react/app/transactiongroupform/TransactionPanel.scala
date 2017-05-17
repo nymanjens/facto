@@ -356,9 +356,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         // Schedule in future because querying the values of TransactionPanel.Proxy would yield
         // outdated values at the moment.
         anythingChangedQueue.execute {
-          logExceptions {
-            $.props.runNow().onFormChange()
-          }
+          $.props.runNow().onFormChange()
         }
       }
     }
