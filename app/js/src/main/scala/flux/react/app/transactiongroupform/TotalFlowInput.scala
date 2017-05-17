@@ -17,7 +17,6 @@ private[transactiongroupform] final class TotalFlowInput(implicit i18n: I18n,
       State(valueString = props.forceValue match {
         case Some(forceValue) => forceValue.formatFloat
         case None => props.defaultValue.formatFloat
-
       })
     })
     .renderPS(($, props, state) => logExceptions {
