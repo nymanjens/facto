@@ -80,7 +80,7 @@ object RemoteDatabaseProxy {
   }
 
   private[access] final class Impl(apiClient: ScalaJsApiClient,
-                           localDatabase: LocalDatabase) extends RemoteDatabaseProxy {
+                                   localDatabase: LocalDatabase) extends RemoteDatabaseProxy {
 
     private var listeners: Seq[Listener] = Seq()
     private val localAddModificationIds: Map[EntityType.any, mutable.Set[Long]] =
@@ -161,9 +161,11 @@ object RemoteDatabaseProxy {
       val response = await(apiClient.getEntityModifications(localDatabase.getSingletonValue(NextUpdateTokenKey).get))
       if (response.modifications.nonEmpty) {
         localDatabase.applyModifications(response.modifications)
+        localDatabase.setSingletonValue(NextUpdateTokenKey, response.nextUpdateToken)
+        await(localDatabase.save())
+
         await(invokeListenersAsync(_.addedRemotely(response.modifications)))
       }
-      localDatabase.setSingletonValue(NextUpdateTokenKey, response.nextUpdateToken)
     }
   }
 }
