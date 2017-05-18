@@ -13,7 +13,10 @@ object Module {
   implicit val remoteDatabaseProxy: Future[RemoteDatabaseProxy] = async {
     val db = await(localDatabase)
     val proxy = await(RemoteDatabaseProxy.create(scalaJsApiClient, db))
+
     //    proxy.startSchedulingModifiedEntityUpdates() // Disabled for testing
+    await(proxy.updateModifiedEntities()) // REMOVE THIS IN PROD (slows down startup for no good reason)
+
     proxy
   }
 }
