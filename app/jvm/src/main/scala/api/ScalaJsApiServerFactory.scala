@@ -49,7 +49,7 @@ final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
 
       val modifications = {
         val modificationEntities = dbRun(entityModificationManager.newQuery
-          .filter(_.date >= nextUpdateToken)
+          .filter(_.date >= updateToken)
           .sortBy(_.date))
         modificationEntities.toStream.map(_.modification).toVector
       }

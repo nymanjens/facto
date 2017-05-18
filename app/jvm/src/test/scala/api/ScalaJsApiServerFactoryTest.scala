@@ -22,6 +22,7 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
   private val date1 = localDateTimeOfEpochMilli(999000111)
   private val date2 = localDateTimeOfEpochMilli(999000222)
   private val date3 = localDateTimeOfEpochMilli(999000333)
+  private val date4 = localDateTimeOfEpochMilli(999000444)
 
   implicit private val user = testUser
 
@@ -55,7 +56,7 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
   }
 
   "getEntityModifications()" in new WithApplication {
-    fakeClock.setTime(date3)
+    fakeClock.setTime(date4)
     modificationEntityManager.add(EntityModificationEntity(
       userId = testUser.id,
       modification = testModificationA,
@@ -68,7 +69,7 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
     val response = serverFactory.create().getEntityModifications(updateToken = date2)
 
     response.modifications mustEqual Seq(testModificationB)
-    response.nextUpdateToken mustEqual date3
+    response.nextUpdateToken mustEqual date4
   }
 
   "persistEntityModifications()" in new WithApplication {
