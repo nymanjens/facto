@@ -2,8 +2,8 @@ package flux.react.app
 
 import common.I18n
 import common.time.Clock
-import flux.react.ReactVdomUtils.{^^, <<}
-import flux.react.router.RouterFactory.Page
+import flux.react.ReactVdomUtils.{<<, ^^}
+import flux.react.router.Page
 import flux.stores.AllEntriesStoreFactory
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.RouterCtl

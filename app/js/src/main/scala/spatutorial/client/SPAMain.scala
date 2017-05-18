@@ -31,10 +31,7 @@ object SPAMain extends js.JSApp {
 
     implicit val globalModule = new FactoAppModule()
 
-    // create the router
-    val router = globalModule.routerFactory.createRouter()
-
     // tell React to render the router in the document body
-    ReactDOM.render(router(), dom.document.getElementById("root"))
+    ReactDOM.render(globalModule.router(), dom.document.getElementById("root"))
   }
 }
