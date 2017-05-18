@@ -23,6 +23,8 @@ trait Money {
     DatedMoney(cents, currency, date)
   }
 
+  final def isZero: Boolean = cents == 0
+
   override def toString = s"${currency.symbol} ${Money.centsToFloatString(cents)}"
 }
 

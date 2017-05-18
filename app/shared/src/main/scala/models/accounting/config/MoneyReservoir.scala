@@ -18,6 +18,8 @@ case class MoneyReservoir(code: String,
     case Some(code) => Currency.of(code)
     case None => Currency.default
   }
+
+  def isNullReservoir: Boolean = this.code.isEmpty
 }
 
 object MoneyReservoir {

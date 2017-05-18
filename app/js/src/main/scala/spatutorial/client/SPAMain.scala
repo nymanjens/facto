@@ -17,11 +17,11 @@ object SPAMain extends js.JSApp {
   def main(): Unit = async {
     println("  Application starting")
     // send log messages also to the server
-    //    log.enableServerLogging("/logging")
-    //    log.info("This message goes to server as well")
+    //log.enableServerLogging("/logging")
+    //log.info("This message goes to server as well")
 
     // create stylesheet
-    //    GlobalStyles.addToDocument()
+    //GlobalStyles.addToDocument()
 
     val initialDataResponseFuture = api.Module.scalaJsApiClient.getInitialData()
     val remoteDatabaseProxyFuture = models.access.Module.remoteDatabaseProxy

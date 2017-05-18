@@ -3,7 +3,9 @@ package flux.react.app.transactiongroupform
 import common.{I18n, SinglePendingTaskQueue}
 import common.LoggingUtils.{LogExceptionsCallback, LogExceptionsFuture, logExceptions}
 import common.time.{Clock, LocalDateTime}
+import common.time.JavaTimeImplicits._
 import flux.action.{Action, Dispatcher}
+import flux.react.ReactVdomUtils.^^
 import flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
@@ -52,6 +54,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
     */
   private case class State(panelIndices: Seq[Int],
                            showErrorMessages: Boolean = false,
+                           globalErrorMessage: Option[String] = None,
                            foreignCurrency: Option[Currency],
                            totalFlowRestriction: TotalFlowRestriction,
                            totalFlow: ReferenceMoney,
@@ -93,14 +96,16 @@ final class TransactionGroupForm(implicit i18n: I18n,
           )
         ),
 
-        // TODO: Add global form errors here
-        //for (error <- (transGroupForm.globalErrors) yield {
-        //  <.div(^.className := "alert alert-danger",
-        //    error.message
-        //  )
-        //},
+        ^^.ifThen(state.globalErrorMessage) { errorMessage =>
+          <.div(
+            ^.className := "alert alert-danger",
+            errorMessage
+          )
+        },
+
         <.form(
           ^.className := "form-horizontal",
+          ^.key := "main-form",
           <.div(^.className := "row",
             <.div(
               ^.className := "transaction-group-form",
@@ -183,40 +188,87 @@ final class TransactionGroupForm(implicit i18n: I18n,
     }
 
     private def onSubmit(e: ReactEventI): Callback = LogExceptionsCallback {
+      def getErrorMessage(datas: Seq[transactionPanel.Data], state: State): Option[String] = {
+        def invalidMoneyReservoirsError: Option[String] = {
+          val containsEmptyReservoirCodes = datas.exists(_.moneyReservoir.isNullReservoir)
+          val allReservoirCodesAreEmpty = datas.forall(_.moneyReservoir.isNullReservoir)
+
+          datas.size match {
+            case 0 => throw new AssertionError("Should not be possible")
+            case 1 if containsEmptyReservoirCodes => Some(i18n("facto.error.noReservoir.atLeast2"))
+            case _ =>
+              if (containsEmptyReservoirCodes) {
+                if (allReservoirCodesAreEmpty) {
+                  if (state.totalFlow.isZero) {
+                    None
+                  } else {
+                    Some(i18n("facto.error.noReservoir.zeroSum"))
+                  }
+                } else {
+                  Some(i18n("facto.error.noReservoir.notAllTheSame"))
+                }
+              } else {
+                None
+              }
+          }
+        }
+
+        // Don't allow future transactions in a foreign currency because we don't know what the exchange rate
+        // to the default currency will be. Future fluctuations might break the immutability of the conversion.
+        def noFutureForeignTransactionsError: Option[String] = {
+          val futureForeignTransactionsExist = datas.exists { data =>
+            val foreignCurrency = data.moneyReservoir.currency.isForeign
+            val dateInFuture = data.transactionDate > clock.now
+            foreignCurrency && dateInFuture
+          }
+          if (futureForeignTransactionsExist) {
+            Some(i18n("facto.error.foreignReservoirInFuture"))
+          } else {
+            None
+          }
+        }
+        invalidMoneyReservoirsError orElse noFutureForeignTransactionsError
+      }
+
       e.preventDefault()
 
-      val state = $.state.runNow()
-      $.modState(_.copy(showErrorMessages = true)).runNow()
+      $.modState { state =>
+        var newState = state.copy(showErrorMessages = true)
 
-      println("  onSubmit:")
-      for (panelIndex <- state.panelIndices) {
-        println("   - " + panelRef(panelIndex)($).data)
-      }
+        val maybeDatas = for (panelIndex <- state.panelIndices) yield panelRef(panelIndex)($).data
+        if (maybeDatas forall (_.isDefined)) {
+          val datas = maybeDatas map (_.get)
 
-      val maybeDatas = for (panelIndex <- state.panelIndices) yield panelRef(panelIndex)($).data
-      if (maybeDatas forall (_.isDefined)) {
-        val datas = maybeDatas map (_.get)
-        dispatcher.dispatch(
-          Action.AddTransactionGroup(
-            transactionsWithoutIdProvider = group => {
-              for (data <- datas) yield Transaction(
-                transactionGroupId = group.id,
-                issuerId = user.id,
-                beneficiaryAccountCode = data.beneficiaryAccount.code,
-                moneyReservoirCode = data.moneyReservoir.code,
-                categoryCode = data.category.code,
-                description = data.description,
-                flowInCents = data.flow.cents,
-                detailDescription = data.detailDescription,
-                tagsString = Tag.serializeToString(data.tags),
-                createdDate = clock.now,
-                transactionDate = data.transactionDate,
-                consumedDate = data.consumedDate
+          getErrorMessage(datas, state) match {
+            case Some(errorMessage) =>
+              newState = newState.copy(globalErrorMessage = Some(errorMessage))
+
+            case None =>
+              dispatcher.dispatch(
+                Action.AddTransactionGroup(
+                  transactionsWithoutIdProvider = group => {
+                    for (data <- datas) yield Transaction(
+                      transactionGroupId = group.id,
+                      issuerId = user.id,
+                      beneficiaryAccountCode = data.beneficiaryAccount.code,
+                      moneyReservoirCode = data.moneyReservoir.code,
+                      categoryCode = data.category.code,
+                      description = data.description,
+                      flowInCents = data.flow.cents,
+                      detailDescription = data.detailDescription,
+                      tagsString = Tag.serializeToString(data.tags),
+                      createdDate = clock.now,
+                      transactionDate = data.transactionDate,
+                      consumedDate = data.consumedDate
+                    )
+                  }
+                )
               )
-            }
-          )
-        )
-      }
+          }
+        }
+
+        newState
+      }.runNow()
     }
   }
 }
