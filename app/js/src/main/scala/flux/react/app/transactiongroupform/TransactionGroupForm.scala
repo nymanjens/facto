@@ -7,7 +7,9 @@ import common.time.JavaTimeImplicits._
 import flux.action.{Action, Dispatcher}
 import flux.react.ReactVdomUtils.^^
 import flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
+import flux.react.router.Page
 import japgolly.scalajs.react._
+import japgolly.scalajs.react.extra.router.RouterCtl
 import japgolly.scalajs.react.vdom.prefix_<^._
 import models.User
 import models.accounting.{Tag, Transaction}
@@ -40,8 +42,8 @@ final class TransactionGroupForm(implicit i18n: I18n,
     .build
 
   // **************** API ****************//
-  def apply(): ReactElement = {
-    component(Props())
+  def apply(router: RouterCtl[Page]): ReactElement = {
+    component(Props(router))
   }
 
   // **************** Private helper methods ****************//
@@ -63,7 +65,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
     def minusPanelIndex(index: Int): State = copy(panelIndices = panelIndices.filter(_ != index))
   }
 
-  private case class Props()
+  private case class Props(router: RouterCtl[Page])
 
   private final class Backend(val $: BackendScope[Props, State]) {
 
@@ -264,6 +266,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
                   }
                 )
               )
+              $.props.runNow().router.set(Page.EverythingPage).runNow()
           }
         }
 

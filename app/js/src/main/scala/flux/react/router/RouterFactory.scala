@@ -17,7 +17,7 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
       // wrap/connect components to the circuit
       (staticRoute(root, EverythingPage) ~> renderR(ctl => reactAppModule.everything())
         | staticRoute("#everything", EverythingPage2) ~> renderR(ctl => <.div(reactAppModule.everything(), reactAppModule.everything(), reactAppModule.everything()))
-        | staticRoute("#new", NewTransactionGroupPage) ~> renderR(ctl => reactAppModule.transactionGroupForm())
+        | staticRoute("#new", NewTransactionGroupPage) ~> renderR(ctl => reactAppModule.transactionGroupForm(ctl))
         | staticRoute("#test", TestPage) ~> renderR(ctl => reactAppModule.menu(TestPage, ctl))
         ).notFound(redirectToPage(EverythingPage)(Redirect.Replace))
     }.renderWith(layout)
