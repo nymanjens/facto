@@ -12,7 +12,7 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.RouterCtl
 import japgolly.scalajs.react.vdom.prefix_<^._
 import models.User
-import models.accounting.{Tag, Transaction}
+import models.accounting.{Tag, Transaction, TransactionGroup}
 import models.accounting.money.{Currency, ExchangeRateManager, ReferenceMoney}
 
 import scala.collection.immutable.Seq
@@ -22,6 +22,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 final class TransactionGroupForm(implicit i18n: I18n,
                                  clock: Clock,
                                  user: User,
+                                 transactionGroupManager: TransactionGroup.Manager,
                                  exchangeRateManager: ExchangeRateManager,
                                  dispatcher: Dispatcher,
                                  transactionPanel: TransactionPanel,
@@ -43,17 +44,29 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
   // **************** API ****************//
   def forCreate(router: RouterCtl[Page]): ReactElement = {
-    component(Props(router))
+    component(
+      Props(
+        OperationMeta.AddNew,
+        router))
   }
 
   def forEdit(transactionGroupId: Long, router: RouterCtl[Page]): ReactElement = {
-    component(Props(router))
+    component(
+      Props(
+        OperationMeta.Edit(transactionGroupManager.findById(transactionGroupId)),
+        router))
   }
 
   // **************** Private helper methods ****************//
   private def panelRef(panelIndex: Int): transactionPanel.Reference = transactionPanel.ref(s"panel_$panelIndex")
 
   // **************** Private inner types ****************//
+  private sealed trait OperationMeta
+  private object OperationMeta {
+    case object AddNew extends OperationMeta
+    case class Edit(group: TransactionGroup) extends OperationMeta
+  }
+
   /**
     * @param foreignCurrency Any foreign currency of any of the selected money reservoirs. If there are multiple,
     *                        this can by any of these.
@@ -69,7 +82,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
     def minusPanelIndex(index: Int): State = copy(panelIndices = panelIndices.filter(_ != index))
   }
 
-  private case class Props(router: RouterCtl[Page])
+  private case class Props(operationMeta: OperationMeta, router: RouterCtl[Page])
 
   private final class Backend(val $: BackendScope[Props, State]) {
 

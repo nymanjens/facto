@@ -18,6 +18,11 @@ final class Module(implicit i18n: I18n,
   import com.softwaremill.macwire._
   import common.time.Module._
   import flux.action.Module._
+  import modelsModule.jsUserManager
+  import modelsModule.jsTransactionManager
+  import modelsModule.jsTransactionGroupManager
+  import modelsModule.jsBalanceCheckManager
+  import modelsModule.jsExchangeRateMeasurementManager
   import modelsModule.entityAccess
   import modelsModule.exchangeRateManager
 
