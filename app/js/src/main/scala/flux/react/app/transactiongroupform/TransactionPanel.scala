@@ -261,6 +261,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             categorySelectInput(
               ref = extraProps.ref,
               label = i18n("facto.category"),
+              defaultValue = props.defaultValues.map(_.category) getOrElse state.beneficiaryAccount.categories.head,
               inputClasses = extraProps.inputClasses,
               options = state.beneficiaryAccount.categories,
               valueToId = _.code,
