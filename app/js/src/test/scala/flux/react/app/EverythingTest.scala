@@ -1,7 +1,7 @@
 package flux.react.app
 
 import common.testing.TestObjects._
-import common.testing.{ReactTestWrapper, TestModule}
+import common.testing.{FakeRouterCtl, ReactTestWrapper, TestModule}
 import flux.stores.AllEntriesStoreFactory
 import japgolly.scalajs.react._
 import models.accounting._
@@ -18,11 +18,12 @@ object EverythingTest extends TestSuite {
     implicit val clock = testModule.fakeClock
     implicit val dispatcher = testModule.fakeDispatcher
     implicit val entityAccess = testModule.entityAccess
+    val router = new FakeRouterCtl()
 
     val everything = testModule.everything
 
     "empty" - {
-      val tester = new ComponentTester(everything())
+      val tester = new ComponentTester(everything(router))
 
       tester.expandButton.isPresent ==> false
       tester.countDataRows ==> 0
@@ -32,7 +33,7 @@ object EverythingTest extends TestSuite {
       database.addRemotelyAddedEntities(uniqueTransactions(4))
       database.addRemotelyAddedEntities(testUser)
 
-      val tester = new ComponentTester(everything())
+      val tester = new ComponentTester(everything(router))
 
       tester.expandButton.isPresent ==> false
       tester.countDataRows ==> 4
@@ -42,7 +43,7 @@ object EverythingTest extends TestSuite {
       database.addRemotelyAddedEntities(uniqueTransactions(35))
       database.addRemotelyAddedEntities(testUser)
 
-      val tester = new ComponentTester(everything())
+      val tester = new ComponentTester(everything(router))
 
       tester.expandButton.isPresent ==> true
       tester.countDataRows ==> 5
