@@ -42,7 +42,11 @@ final class TransactionGroupForm(implicit i18n: I18n,
     .build
 
   // **************** API ****************//
-  def apply(router: RouterCtl[Page]): ReactElement = {
+  def forCreate(router: RouterCtl[Page]): ReactElement = {
+    component(Props(router))
+  }
+
+  def forEdit(transactionGroupId: Long, router: RouterCtl[Page]): ReactElement = {
     component(Props(router))
   }
 
