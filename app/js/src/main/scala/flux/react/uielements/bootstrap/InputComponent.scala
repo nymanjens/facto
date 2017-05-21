@@ -86,7 +86,7 @@ private[bootstrap] object InputComponent {
     if (props.showErrorMessage) {
       ValueTransformer.stringToValue(state.valueString, props) match {
         case None => Some(props.i18n("error.invalid"))
-        case Some(props.defaultValue) if !props.defaultIsValid => Some(props.i18n("error.required"))
+        case Some(value) if props.required && value == props.valueTransformer.emptyValue => Some(props.i18n("error.required"))
         case _ => None
       }
     } else {
@@ -119,12 +119,16 @@ private[bootstrap] object InputComponent {
       * @throws Exception (any) if the given value is invalid for given props
       */
     def valueToString(value: Value, extraProps: ExtraProps): String
+
+    /** A required field with this value will be considered invalid. */
+    def emptyValue: Value
   }
 
   object ValueTransformer {
     def nullInstance[ExtraProps]: ValueTransformer[String, ExtraProps] = new ValueTransformer[String, ExtraProps] {
       override def stringToValue(string: String, extraProps: ExtraProps) = Some(string)
       override def valueToString(value: String, extraProps: ExtraProps) = value
+      override def emptyValue = ""
     }
 
     def stringToValue[Value, ExtraProps](string: String, props: Props[Value, ExtraProps]): Option[Value] = {
@@ -144,7 +148,7 @@ private[bootstrap] object InputComponent {
   case class Props[Value, ExtraProps](label: String,
                                       name: String,
                                       defaultValue: Value,
-                                      defaultIsValid: Boolean,
+                                      required: Boolean,
                                       showErrorMessage: Boolean,
                                       inputClasses: Seq[String],
                                       listener: InputBase.Listener[Value],
@@ -171,7 +175,7 @@ private[bootstrap] object InputComponent {
   private final class Proxy[Value, ExtraProps](val componentProvider: () => ThisComponentU[Value, ExtraProps]) extends InputBase.Proxy[Value] {
     override def value = {
       ValueTransformer.stringToValue(componentProvider().state.valueString, props) match {
-        case Some(value) if value == props.defaultValue && !props.defaultIsValid => None
+        case Some(value) if props.required && value == props.valueTransformer.emptyValue => None
         case other => other
       }
     }

@@ -187,7 +187,6 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                   ref = extraProps.ref,
                   label = i18n("facto.date-payed"),
                   defaultValue = mappedExtraProps.defaultValue,
-                  defaultIsValid = true,
                   showErrorMessage = props.showErrorMessages,
                   inputClasses = extraProps.inputClasses
                 )
@@ -214,7 +213,6 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                       ref = extraProps2.ref,
                       label = i18n("facto.date-consumed"),
                       defaultValue = mappedExtraProps.defaultValue,
-                      defaultIsValid = true,
                       showErrorMessage = props.showErrorMessages,
                       inputClasses = extraProps1.inputClasses ++ extraProps2.inputClasses
                     )
@@ -279,7 +277,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
               ref = extraProps.ref,
               label = i18n("facto.description"),
               defaultValue = props.defaultValues.map(_.description) getOrElse "",
-              defaultIsValid = false,
+              required = true,
               showErrorMessage = props.showErrorMessages,
               inputClasses = extraProps.inputClasses,
               listener = AnythingChangedListener
@@ -289,7 +287,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ref = flowRef,
           label = i18n("facto.flow"),
           defaultValue = props.defaultValues.map(_.flowInCents) getOrElse 0,
-          defaultIsValid = false,
+          required = true,
           showErrorMessage = props.showErrorMessages,
           forceValue = props.forceFlowValue.map(
             _.withDate(state.transactionDate)
@@ -308,7 +306,6 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
               ref = extraProps.ref,
               label = i18n("facto.more-info"),
               defaultValue = props.defaultValues.map(_.detailDescription) getOrElse "",
-              defaultIsValid = true,
               showErrorMessage = props.showErrorMessages,
               inputClasses = extraProps.inputClasses,
               listener = AnythingChangedListener
@@ -329,7 +326,6 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                 uielements.bootstrap.TextInput(
                   ref = extraProps.ref,
                   label = i18n("facto.tags"),
-                  defaultIsValid = true,
                   showErrorMessage = props.showErrorMessages,
                   defaultValue = mappedExtraProps.defaultValue,
                   inputClasses = extraProps.inputClasses

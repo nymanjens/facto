@@ -43,7 +43,7 @@ object TextInput {
   def apply(ref: Reference,
             label: String,
             defaultValue: String = "",
-            defaultIsValid: Boolean = true,
+            required: Boolean = false,
             showErrorMessage: Boolean,
             inputClasses: Seq[String] = Seq(),
             listener: InputBase.Listener[String] = InputBase.Listener.nullInstance)(
@@ -52,7 +52,7 @@ object TextInput {
       label = label,
       name = ref.name,
       defaultValue = defaultValue,
-      defaultIsValid = defaultIsValid,
+      required = required,
       showErrorMessage = showErrorMessage,
       inputClasses = inputClasses,
       listener = listener,

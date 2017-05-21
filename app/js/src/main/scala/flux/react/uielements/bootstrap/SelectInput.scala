@@ -54,7 +54,7 @@ class SelectInput[Value] private(implicit valueTag: ClassTag[Value]) {
       label = label,
       name = ref.name,
       defaultValue = Option(defaultValue) getOrElse options.head,
-      defaultIsValid = true,
+      required = false,
       showErrorMessage = true, // Should never happen
       inputClasses = inputClasses,
       listener = listener,
@@ -96,6 +96,8 @@ class SelectInput[Value] private(implicit valueTag: ClassTag[Value]) {
       getOnlyElement(
         extraProps.idToOptionMap.filter { case (id, option) => option.value == value }.keys)
     }
+
+    override def emptyValue = ???
   }
 }
 

@@ -65,7 +65,7 @@ object MoneyInput {
   def apply(ref: Reference,
             label: String,
             defaultValue: Long,
-            defaultIsValid: Boolean = true,
+            required: Boolean = false,
             showErrorMessage: Boolean,
             inputClasses: Seq[String] = Seq(),
             forceValue: Option[Long] = None,
@@ -77,7 +77,7 @@ object MoneyInput {
       label = label,
       name = ref.name,
       defaultValue = defaultValue,
-      defaultIsValid = defaultIsValid,
+      required = required,
       showErrorMessage = showErrorMessage,
       inputClasses = inputClasses,
       listener = listener,
@@ -112,5 +112,7 @@ object MoneyInput {
     override def valueToString(cents: Long, extraProps: ExtraProps) = {
       Money.centsToFloatString(cents)
     }
+
+    override def emptyValue = 0
   }
 }
