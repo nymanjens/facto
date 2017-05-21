@@ -30,7 +30,9 @@ final class Menu(implicit entriesStoreFactory: AllEntriesStoreFactory,
     .render_P { props =>
       <.div(<.b("Menu:"),
         for ((item, i) <- Menu.menuItems.zipWithIndex) yield {
-          <.span(^.key := i, (props.currentPage == item.page) ?= (^.className := "active"),
+          <.span(
+            ^.key := i,
+            (props.currentPage == item.page) ?= (^.className := "active"),
             props.router.link(item.page)(
               <.i(^^.classes(item.iconClass)),
               " ",

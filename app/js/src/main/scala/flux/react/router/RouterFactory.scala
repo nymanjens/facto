@@ -15,9 +15,10 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
       import dsl._
 
       // wrap/connect components to the circuit
-      (staticRoute(root, EverythingPage) ~> renderR(ctl => reactAppModule.everything())
-        | staticRoute("#everything", EverythingPage2) ~> renderR(ctl => <.div(reactAppModule.everything(), reactAppModule.everything(), reactAppModule.everything()))
-        | staticRoute("#new", NewTransactionGroupPage) ~> renderR(ctl => reactAppModule.transactionGroupForm(ctl))
+      (staticRoute(root, EverythingPage) ~> renderR(ctl => reactAppModule.everything(ctl))
+        | staticRoute("#everything", EverythingPage2) ~> renderR(ctl => <.div(reactAppModule.everything(ctl), reactAppModule.everything(ctl), reactAppModule.everything(ctl)))
+        | staticRoute("#newTransactionGroup", NewTransactionGroupPage) ~> renderR(ctl => reactAppModule.transactionGroupForm(ctl))
+        | dynamicRouteCT("#editTransactionGroup" / long.caseClass[EditTransactionGroupPage]) ~> renderR(ctl => reactAppModule.transactionGroupForm(ctl))
         | staticRoute("#test", TestPage) ~> renderR(ctl => reactAppModule.menu(TestPage, ctl))
         ).notFound(redirectToPage(EverythingPage)(Redirect.Replace))
     }.renderWith(layout)

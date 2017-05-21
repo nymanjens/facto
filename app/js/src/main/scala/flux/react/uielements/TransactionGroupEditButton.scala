@@ -1,17 +1,19 @@
 package flux.react.uielements
 
 import common.I18n
-import flux.react.ReactVdomUtils.{^^, <<}
+import flux.react.ReactVdomUtils.{<<, ^^}
+import flux.react.router.Page
 import flux.stores.entries.GroupedTransactions
 import japgolly.scalajs.react._
+import japgolly.scalajs.react.extra.router.RouterCtl
 import japgolly.scalajs.react.vdom.prefix_<^._
 
 object TransactionGroupEditButton {
-  private case class Props(groupId: Long, i18n: I18n)
+
   private val component = ReactComponentB[Props](getClass.getSimpleName)
     .renderP((_, props) => {
       <.a(^^.classes("btn", "btn-default", "btn-xs"),
-        ^.href := "#",
+        ^.href := props.router.pathFor(Page.EditTransactionGroupPage(props.groupId)).value,
         ^.role := "button",
         <.i(^^.classes("fa", "fa-pencil", "fa-fw")),
         props.i18n("facto.edit")
@@ -19,7 +21,15 @@ object TransactionGroupEditButton {
     }
     ).build
 
-  def apply(groupId: Long)(implicit i18n: I18n): ReactElement = {
-    component(Props(groupId, i18n))
+  // **************** API ****************//
+  def apply(groupId: Long,
+            router: RouterCtl[Page])(
+             implicit i18n: I18n): ReactElement = {
+    component(Props(groupId, router))
   }
+
+  // **************** Private inner types ****************//
+  private case class Props(groupId: Long,
+                           router: RouterCtl[Page])(
+                            implicit val i18n: I18n)
 }

@@ -3,16 +3,19 @@ package flux.react.app
 import common.Formatting._
 import common.I18n
 import common.time.Clock
+import flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
+import flux.react.router.Page
 import flux.react.uielements
 import flux.react.uielements.{EntriesListTable, MoneyWithCurrency}
 import flux.react.uielements.EntriesListTable.NumEntriesStrategy
 import flux.stores.AllEntriesStoreFactory
 import flux.stores.entries.GeneralEntry
 import japgolly.scalajs.react._
+import japgolly.scalajs.react.extra.router.RouterCtl
 import japgolly.scalajs.react.vdom.prefix_<^._
 import models.EntityAccess
 import models.accounting.config.Config
-import models.accounting.money.ExchangeRateManager
+import models.accounting.money.{Currency, ExchangeRateManager, ReferenceMoney}
 
 import scala.collection.immutable.Seq
 
@@ -23,8 +26,8 @@ final class Everything(implicit entriesStoreFactory: AllEntriesStoreFactory,
                        exchangeRateManager: ExchangeRateManager,
                        i18n: I18n) {
 
-  private val component = ReactComponentB[Unit](getClass.getSimpleName)
-    .renderP((_, _) =>
+  private val component = ReactComponentB[Props](getClass.getSimpleName)
+    .renderP((_, props) =>
       uielements.Panel(i18n("facto.genral-information-about-all-entries"))(
         uielements.EntriesListTable[GeneralEntry, Unit](
           tableTitle = i18n("facto.all"),
@@ -53,13 +56,18 @@ final class Everything(implicit entriesStoreFactory: AllEntriesStoreFactory,
               <.td(entry.categories.map(_.name).mkString(", ")),
               <.td(uielements.DescriptionWithEntryCount(entry)),
               <.td(uielements.MoneyWithCurrency(entry.flow)),
-              <.td(uielements.TransactionGroupEditButton(entry.groupId))
+              <.td(uielements.TransactionGroupEditButton(entry.groupId, props.router))
             )
         )
       )
     ).build
 
-  def apply(): ReactElement = {
-    component()
+  // **************** API ****************//
+  def apply(router: RouterCtl[Page]): ReactElement = {
+    component(Props(router))
   }
+
+
+  // **************** Private inner types ****************//
+  private case class Props(router: RouterCtl[Page])
 }
