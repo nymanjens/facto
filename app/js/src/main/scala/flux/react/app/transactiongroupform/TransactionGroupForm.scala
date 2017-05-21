@@ -11,7 +11,7 @@ import flux.react.router.Page
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.RouterCtl
 import japgolly.scalajs.react.vdom.prefix_<^._
-import models.User
+import models.{EntityAccess, User}
 import models.accounting.{Tag, Transaction, TransactionGroup}
 import models.accounting.money.{Currency, ExchangeRateManager, ReferenceMoney}
 
@@ -23,6 +23,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
                                  clock: Clock,
                                  user: User,
                                  transactionGroupManager: TransactionGroup.Manager,
+                                 entityAccess: EntityAccess,
                                  exchangeRateManager: ExchangeRateManager,
                                  dispatcher: Dispatcher,
                                  transactionPanel: TransactionPanel,
@@ -30,17 +31,25 @@ final class TransactionGroupForm(implicit i18n: I18n,
                                  totalFlowInput: TotalFlowInput,
                                  totalFlowRestrictionInput: TotalFlowRestrictionInput) {
 
-  private val component = ReactComponentB[Props](getClass.getSimpleName)
-    .initialState[State](
-    State(
-      // TODO: Update these when updating an existing TransactionGroup.
-      panelIndices = Seq(0),
-      foreignCurrency = None,
-      totalFlowRestriction = TotalFlowRestriction.AnyTotal,
-      totalFlow = ReferenceMoney(0),
-      totalFlowExceptLast = ReferenceMoney(0)))
-    .renderBackend[Backend]
-    .build
+  private val component = {
+    ReactComponentB[Props](getClass.getSimpleName)
+      .initialState_P(props => logExceptions {
+        val numberOfTransactions = props.operationMeta match {
+          case OperationMeta.AddNew => 1
+          case OperationMeta.Edit(group) => group.transactions.length
+        }
+        State(
+          panelIndices = 0 until numberOfTransactions,
+          nextPanelIndex = numberOfTransactions,
+          // The following fields are updated by onFormChange() when the component is mounted
+          foreignCurrency = None,
+          totalFlow = ReferenceMoney(0),
+          totalFlowExceptLast = ReferenceMoney(0))
+      })
+      .renderBackend[Backend]
+      .componentDidMount(scope => LogExceptionsCallback(scope.backend.onFormChange()))
+      .build
+  }
 
   // **************** API ****************//
   def forCreate(router: RouterCtl[Page]): ReactElement = {
@@ -72,13 +81,16 @@ final class TransactionGroupForm(implicit i18n: I18n,
     *                        this can by any of these.
     */
   private case class State(panelIndices: Seq[Int],
+                           nextPanelIndex: Int,
                            showErrorMessages: Boolean = false,
                            globalErrorMessage: Option[String] = None,
                            foreignCurrency: Option[Currency],
-                           totalFlowRestriction: TotalFlowRestriction,
+                           totalFlowRestriction: TotalFlowRestriction = TotalFlowRestriction.AnyTotal,
                            totalFlow: ReferenceMoney,
                            totalFlowExceptLast: ReferenceMoney) {
-    def plusPanel(): State = copy(panelIndices = panelIndices :+ panelIndices.max + 1)
+    def plusPanel(): State = copy(
+      panelIndices = panelIndices :+ nextPanelIndex,
+      nextPanelIndex = nextPanelIndex + 1)
     def minusPanelIndex(index: Int): State = copy(panelIndices = panelIndices.filter(_ != index))
   }
 
@@ -96,7 +108,10 @@ final class TransactionGroupForm(implicit i18n: I18n,
             <.h1(
               ^.className := "page-header",
               <.i(^.className := "icon-new-empty"),
-              i18n("facto.new-transaction"),
+              props.operationMeta match {
+                case OperationMeta.AddNew => i18n("facto.new-transaction")
+                case OperationMeta.Edit(_) => i18n("facto.edit-transaction")
+              },
               // TODO: Add delete action here
               <.span(
                 ^.className := "total-transaction-flow-box",
@@ -131,10 +146,16 @@ final class TransactionGroupForm(implicit i18n: I18n,
               for ((panelIndex, i) <- state.panelIndices.zipWithIndex) yield {
                 val firstPanel = panelIndex == state.panelIndices.head
                 val lastPanel = panelIndex == state.panelIndices.last
+                val transaction = props.operationMeta match {
+                  case OperationMeta.Edit(group) if panelIndex < group.transactions.length =>
+                    Some(group.transactions.apply(panelIndex))
+                  case _ => None
+                }
                 transactionPanel(
                   key = panelIndex,
                   ref = panelRef(panelIndex),
                   title = i18n("facto.transaction") + " " + (i + 1),
+                  defaultValues = transaction,
                   forceFlowValue =
                     if (lastPanel && state.totalFlowRestriction.userSetsTotal) Some(state.totalFlow - state.totalFlowExceptLast) else None,
                   showErrorMessages = state.showErrorMessages,
@@ -163,12 +184,12 @@ final class TransactionGroupForm(implicit i18n: I18n,
     }
 
     private val addTransactionPanelCallback: Callback = LogExceptionsCallback {
-      $.modState(_.plusPanel()).runNow()
+      $.modState(logExceptions(_.plusPanel())).runNow()
       LogExceptionsFuture(onFormChange()) // Make sure the state is updated after this
     }
 
     private def removeTransactionPanel(index: Int): Callback = LogExceptionsCallback {
-      $.modState(_.minusPanelIndex(index)).runNow()
+      $.modState(logExceptions(_.minusPanelIndex(index))).runNow()
       LogExceptionsFuture(onFormChange()) // Make sure the state is updated after this
     }
 
@@ -177,17 +198,17 @@ final class TransactionGroupForm(implicit i18n: I18n,
     }
 
     private def updateTotalFlowRestriction(totalFlowRestriction: TotalFlowRestriction): Unit = {
-      $.modState { state =>
+      $.modState(logExceptions { state =>
         var newState = state.copy(totalFlowRestriction = totalFlowRestriction)
         if (totalFlowRestriction == TotalFlowRestriction.ZeroSum) {
           newState = newState.copy(totalFlow = ReferenceMoney(0))
         }
         newState
-      }.runNow()
+      }).runNow()
     }
 
-    private def onFormChange(): Unit = {
-      $.modState { state =>
+    def onFormChange(): Unit = {
+      $.modState(state => logExceptions {
         val flows = for (panelIndex <- state.panelIndices) yield {
           val datedMoney = panelRef(panelIndex)($).flowValueOrDefault
           datedMoney.exchangedForReferenceCurrency
@@ -203,7 +224,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
           newState = newState.copy(totalFlow = flows.sum)
         }
         newState
-      }.runNow()
+      }).runNow()
     }
 
     private def onSubmit(e: ReactEventI): Callback = LogExceptionsCallback {
@@ -251,7 +272,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
       e.preventDefault()
 
-      $.modState { state =>
+      $.modState(state => logExceptions {
         var newState = state.copy(showErrorMessages = true)
 
         val maybeDatas = for (panelIndex <- state.panelIndices) yield panelRef(panelIndex)($).data
@@ -288,7 +309,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
         }
 
         newState
-      }.runNow()
+      }).runNow()
     }
   }
 }

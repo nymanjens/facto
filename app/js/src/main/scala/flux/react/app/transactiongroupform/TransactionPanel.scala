@@ -11,7 +11,7 @@ import flux.react.uielements.InputBase
 import japgolly.scalajs.react.vdom.prefix_<^._
 import flux.react.ReactVdomUtils.{<<, ^^}
 import flux.react.uielements
-import models.accounting.Tag
+import models.accounting.{Tag, Transaction}
 import models.{EntityAccess, User}
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.accounting.money._
@@ -58,9 +58,9 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   private val component = {
     def calculateInitialState(props: Props): State = logExceptions {
       State(
-        transactionDate = LocalDateTimes.toStartOfDay(clock.now),
-        beneficiaryAccount = accountingConfig.personallySortedAccounts.head,
-        moneyReservoir = selectableReservoirs().head)
+        transactionDate = props.defaultValues.map(_.transactionDate) getOrElse LocalDateTimes.toStartOfDay(clock.now),
+        beneficiaryAccount = props.defaultValues.map(_.beneficiary) getOrElse accountingConfig.personallySortedAccounts.head,
+        moneyReservoir = props.defaultValues.map(_.moneyReservoir) getOrElse selectableReservoirs().head)
     }
     ReactComponentB[Props](getClass.getSimpleName)
       .initialState_P[State](calculateInitialState)
@@ -72,6 +72,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   def apply(key: Int,
             ref: Reference,
             title: String,
+            defaultValues: Option[Transaction],
             forceFlowValue: Option[ReferenceMoney] = None,
             showErrorMessages: Boolean,
             defaultPanel: Option[Proxy],
@@ -79,6 +80,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             onFormChange: () => Unit): ReactElement = {
     val props = Props(
       title = title,
+      defaultValues = defaultValues,
       forceFlowValue = forceFlowValue,
       showErrorMessages = showErrorMessages,
       defaultPanel = defaultPanel,
@@ -155,6 +157,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                            moneyReservoir: MoneyReservoir)
 
   private case class Props(title: String,
+                           defaultValues: Option[Transaction],
                            forceFlowValue: Option[ReferenceMoney],
                            showErrorMessages: Boolean,
                            defaultPanel: Option[Proxy],
@@ -170,7 +173,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
 
         dateMappedInput(
           ref = transactionDateRef,
-          defaultValue = LocalDateTimes.toStartOfDay(clock.now),
+          defaultValue = state.transactionDate,
           valueTransformer = uielements.MappedInput.ValueTransformer.StringToLocalDateTime,
           listener = TransactionDateListener,
           nameToDelegateRef = stringInputWithDefault.ref) {
@@ -192,7 +195,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         },
         dateMappedInput(
           ref = consumedDateRef,
-          defaultValue = LocalDateTimes.toStartOfDay(clock.now),
+          defaultValue = props.defaultValues.map(_.consumedDate) getOrElse LocalDateTimes.toStartOfDay(clock.now),
           valueTransformer = uielements.MappedInput.ValueTransformer.StringToLocalDateTime,
           nameToDelegateRef = stringInputWithDefault.ref,
           listener = AnythingChangedListener) {
@@ -275,6 +278,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             uielements.bootstrap.TextInput(
               ref = extraProps.ref,
               label = i18n("facto.description"),
+              defaultValue = props.defaultValues.map(_.description) getOrElse "",
               defaultIsValid = false,
               showErrorMessage = props.showErrorMessages,
               inputClasses = extraProps.inputClasses,
@@ -284,6 +288,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         uielements.bootstrap.MoneyInput(
           ref = flowRef,
           label = i18n("facto.flow"),
+          defaultValue = props.defaultValues.map(_.flowInCents) getOrElse 0,
           defaultIsValid = false,
           showErrorMessage = props.showErrorMessages,
           forceValue = props.forceFlowValue.map(
@@ -302,6 +307,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             uielements.bootstrap.TextInput(
               ref = extraProps.ref,
               label = i18n("facto.more-info"),
+              defaultValue = props.defaultValues.map(_.detailDescription) getOrElse "",
               defaultIsValid = true,
               showErrorMessage = props.showErrorMessages,
               inputClasses = extraProps.inputClasses,
@@ -310,7 +316,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         },
         tagsMappedInput(
           ref = tagsRef,
-          defaultValue = Seq(),
+          defaultValue = props.defaultValues.map(_.tags) getOrElse Seq(),
           valueTransformer = uielements.MappedInput.ValueTransformer.StringToTags,
           nameToDelegateRef = stringInputWithDefault.ref,
           listener = AnythingChangedListener) {

@@ -64,6 +64,7 @@ object MoneyInput {
   // **************** API ****************//
   def apply(ref: Reference,
             label: String,
+            defaultValue: Long,
             defaultIsValid: Boolean = true,
             showErrorMessage: Boolean,
             inputClasses: Seq[String] = Seq(),
@@ -75,7 +76,7 @@ object MoneyInput {
     val props = Props[Value, ExtraProps](
       label = label,
       name = ref.name,
-      defaultValue = 0,
+      defaultValue = defaultValue,
       defaultIsValid = defaultIsValid,
       showErrorMessage = showErrorMessage,
       inputClasses = inputClasses,
