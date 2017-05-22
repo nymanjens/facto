@@ -10,6 +10,6 @@ final class JsTransactionManager(implicit database: RemoteDatabaseProxy)
     with Transaction.Manager {
 
   override def findByGroupId(groupId: Long): Seq[Transaction] = {
-    database.newQuery[Transaction]().find("transactionGroupId" -> groupId.toString).data()
+    database.newQuery[Transaction]().find("transactionGroupId" -> groupId.toString).sort("id").data()
   }
 }

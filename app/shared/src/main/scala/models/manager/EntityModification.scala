@@ -20,7 +20,13 @@ object EntityModification {
   def createAddWithRandomId[E <: Entity : EntityType](entityWithoutId: E): Add[E] = {
     require(entityWithoutId.idOption.isEmpty, entityWithoutId)
 
-    val id = abs(Random.nextLong)
+    val entityWithId = entityWithoutId.withId(generateRandomId()).asInstanceOf[E]
+    Add(entityWithId)
+  }
+
+  def createAddWithId[E <: Entity : EntityType](entityWithoutId: E, id: Long): Add[E] = {
+    require(entityWithoutId.idOption.isEmpty, entityWithoutId)
+
     val entityWithId = entityWithoutId.withId(id).asInstanceOf[E]
     Add(entityWithId)
   }
@@ -30,6 +36,8 @@ object EntityModification {
 
     Remove[E](entityWithId.id)
   }
+
+  def generateRandomId(): Long = abs(Random.nextLong)
 
   case class Add[E <: Entity : EntityType](entity: E) extends EntityModification {
     require(entity.idOption.isDefined)
