@@ -26,5 +26,5 @@ object Tag {
     tagsString.split(",").map(_.trim).filter(_.nonEmpty).map(Tag.apply).toVector
   }
 
-  def serializeToString(tags: Iterable[Tag]): String = tags.mkString(",")
+  def serializeToString(tags: Iterable[Tag]): String = tags.map(_.name).mkString(",")
 }
