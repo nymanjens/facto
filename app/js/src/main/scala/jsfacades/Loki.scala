@@ -2,14 +2,16 @@ package jsfacades
 
 import common.GuavaReplacement.Iterables.getOnlyElement
 import common.ScalaUtils
+import jsfacades.Loki.Sorting.{MustSetOrder, PropNameWithDirection}
 
 import scala.collection.immutable.Seq
+import scala.collection.mutable
 import scala.concurrent.Future
 import scala.scalajs.js
-import scala.scalajs.js.Any
 import scala.scalajs.js.annotation.JSName
-import scala2js.Scala2Js
+import scala.scalajs.js.JSConverters._
 import scala2js.Converters._
+import scala2js.Scala2Js
 
 object Loki {
   @JSName("loki")
@@ -94,7 +96,7 @@ object Loki {
 
     // **************** Intermediary operations **************** //
     def find(filter: js.Dictionary[js.Any], firstOnly: Boolean = false): ResultSetFacade = js.native
-    def simplesort(propName: String, isDesc: Boolean = false): ResultSetFacade = js.native
+    def compoundsort(properties: js.Array[js.Array[js.Any]]): ResultSetFacade = js.native
     def limit(quantity: Int): ResultSetFacade = js.native
 
     // **************** Terminal operations **************** //
@@ -106,10 +108,10 @@ object Loki {
     // **************** Intermediary operations **************** //
     def find(filter: (String, js.Any)*): ResultSet[E]
     /**
-      * Loose evaluation for user to sort based on a property name. (chainable). Sorting based on the same lt/gt helper
+      * Loose evaluation for user to sort based on a property names. Sorting based on the same lt/gt helper
       * functions used for binary indices.
       */
-    def sort(propName: String, isDesc: Boolean = false): ResultSet[E]
+    def sort(sorting: Loki.Sorting): ResultSet[E]
     def limit(quantity: Int): ResultSet[E]
 
     // **************** Terminal operations **************** //
@@ -118,7 +120,29 @@ object Loki {
     def count(): Int
   }
 
+  case class Sorting private(private[Loki] val propNamesWithDirection: Seq[Sorting.PropNameWithDirection]) {
+    def thenBy(propName: String): MustSetOrder = MustSetOrder(
+      alreadyConfiguredSorting = this,
+      nextPropName = propName)
+  }
+  object Sorting {
+    def by(propName: String): MustSetOrder = MustSetOrder(
+      alreadyConfiguredSorting = Sorting(Seq()),
+      nextPropName = propName)
+
+    case class MustSetOrder private(private[Loki] val alreadyConfiguredSorting: Sorting,
+                                    private[Loki] val nextPropName: String) {
+      def asc(): Sorting = setIsDescending(false)
+      def desc(): Sorting = setIsDescending(true)
+      def setIsDescending(isDesc: Boolean): Sorting = Sorting(
+        alreadyConfiguredSorting.propNamesWithDirection :+ PropNameWithDirection(nextPropName, isDesc = isDesc))
+    }
+
+    private[Loki] case class PropNameWithDirection(propName: String, isDesc: Boolean)
+  }
+
   object ResultSet {
+
     def empty[E: Scala2Js.MapConverter]: ResultSet[E] = new ResultSet.Fake(Seq())
 
     private[jsfacades] final class Impl[E: Scala2Js.MapConverter](facade: ResultSetFacade) extends ResultSet[E] {
@@ -128,8 +152,13 @@ object Loki {
         new ResultSet.Impl[E](facade.find(js.Dictionary(filter: _*)))
       }
 
-      override def sort(propName: String, isDesc: Boolean) = {
-        new ResultSet.Impl[E](facade.simplesort(propName, isDesc))
+      override def sort(sorting: Loki.Sorting) = {
+        val properties: js.Array[js.Array[js.Any]] = {
+          val result: Seq[js.Array[js.Any]] = sorting.propNamesWithDirection map
+            (nameWithDirection => js.Array[js.Any](nameWithDirection.propName, nameWithDirection.isDesc))
+          result.toJSArray
+        }
+        new ResultSet.Impl[E](facade.compoundsort(properties))
       }
 
       override def limit(quantity: Int) = {
@@ -156,8 +185,7 @@ object Loki {
     }
 
 
-    final class Fake[E: Scala2Js.MapConverter](entities: Seq[E],
-                                               previousSorts: Seq[(String, Boolean)] = Seq()) extends ResultSet[E] {
+    final class Fake[E: Scala2Js.MapConverter](entities: Seq[E]) extends ResultSet[E] {
 
       implicit private val jsValueOrdering: Ordering[js.Any] = {
         new Ordering[js.Any] {
@@ -181,14 +209,13 @@ object Loki {
         }
       )
 
-      override def sort(propName: String, isDesc: Boolean) = {
-        val sorts = previousSorts ++ Seq((propName, isDesc))
+      override def sort(sorting: Loki.Sorting) = {
         val newData: Seq[E] = {
           entities.sortWith(lt = (lhs, rhs) => {
             val lhsMap = Scala2Js.toJsMap(lhs)
             val rhsMap = Scala2Js.toJsMap(rhs)
             val results = for {
-              (propName, isDesc) <- sorts
+              Sorting.PropNameWithDirection(propName, isDesc) <- sorting.propNamesWithDirection
               if !jsValueOrdering.equiv(lhsMap(propName), rhsMap(propName))
             } yield {
               if (jsValueOrdering.lt(lhsMap(propName), rhsMap(propName))) {
@@ -200,7 +227,7 @@ object Loki {
             results.headOption getOrElse false
           })
         }
-        new ResultSet.Fake(newData, previousSorts = sorts)
+        new ResultSet.Fake(newData)
       }
 
       override def limit(quantity: Int) = new ResultSet.Fake(

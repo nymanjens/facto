@@ -1,6 +1,7 @@
 package flux.stores
 
 import flux.stores.entries.GeneralEntry
+import jsfacades.Loki
 import models.access.RemoteDatabaseProxy
 import models.accounting.Transaction
 import models.manager.{EntityModification, EntityType}
@@ -14,8 +15,9 @@ final class AllEntriesStoreFactory(implicit database: RemoteDatabaseProxy)
     override protected def calculateState() = {
       val transactions: Seq[Transaction] =
         database.newQuery[Transaction]()
-          .sort("transactionDate", isDesc = true)
-          .sort("createdDate", isDesc = true)
+          .sort(Loki.Sorting.by("transactionDate").desc()
+            .thenBy("createdDate").desc()
+            .thenBy("id").asc())
           .limit(3 * maxNumEntries)
           .data()
           .reverse

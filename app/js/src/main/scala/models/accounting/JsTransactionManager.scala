@@ -1,5 +1,6 @@
 package models.accounting
 
+import jsfacades.Loki
 import models.access.RemoteDatabaseProxy
 import models.manager.BaseJsEntityManager
 
@@ -10,6 +11,9 @@ final class JsTransactionManager(implicit database: RemoteDatabaseProxy)
     with Transaction.Manager {
 
   override def findByGroupId(groupId: Long): Seq[Transaction] = {
-    database.newQuery[Transaction]().find("transactionGroupId" -> groupId.toString).sort("id").data()
+    database.newQuery[Transaction]()
+      .find("transactionGroupId" -> groupId.toString)
+      .sort(Loki.Sorting.by("id").asc())
+      .data()
   }
 }
