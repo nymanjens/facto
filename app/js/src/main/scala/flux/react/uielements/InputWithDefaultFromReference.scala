@@ -104,6 +104,8 @@ class InputWithDefaultFromReference[Value] private() {
         props.defaultValueProxy.get().registerListener(DefaultValueListener)
         currentInputValue = props.inputElementRef($).valueOrDefault
         currentDefaultValue = props.defaultValueProxy.get().valueOrDefault
+
+        $.setState(ConnectionState(isConnected = currentDefaultValue == currentInputValue)).runNow()
       }
 
       def willUnmount(props: Props.any): Callback = LogExceptionsCallback {
