@@ -18,4 +18,13 @@ object GuavaReplacement {
       Math.round(x)
     }
   }
+
+  object Preconditions {
+    def checkNotNull[T](value: T): T = {
+      if(value == null) {
+        throw new NullPointerException()
+      }
+      value
+    }
+  }
 }

@@ -33,20 +33,24 @@ final class ReactTestWrapper(private val componentM: ComponentM) {
     }
   }
 
+  def attribute(name: String): String = {
+    Option(componentM.getDOMNode().getAttribute(name)) getOrElse ""
+  }
+
   def click(): Unit = {
     ReactTestUtils.Simulate click componentM
   }
 
-  private def classes: Seq[String] = {
+  def classes: Seq[String] = {
     val classString = Option(componentM.getDOMNode().getAttribute("class")) getOrElse ""
     classString.toLowerCase.split(' ').toVector
   }
 
-  private def tagName: String = {
+  def tagName: String = {
     componentM.getDOMNode().tagName.toLowerCase
   }
 
-  private def typeAttribute: String = {
+  def typeAttribute: String = {
     val attrib = Option(componentM.getDOMNode().getAttribute("type")) getOrElse ""
     attrib.toLowerCase
   }
