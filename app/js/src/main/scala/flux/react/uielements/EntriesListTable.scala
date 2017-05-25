@@ -42,7 +42,7 @@ private final class EntriesListTable[Entry, Props](tableTitle: String,
     def willMount(state: State): Callback = LogExceptionsCallback {
       entriesStore = entriesStoreFactory.get(entriesStoreFactory.Input(maxNumEntries = state.maxNumEntries, props))
       entriesStore.register(this)
-      $.modState(state => state.withEntriesFrom(entriesStore)).runNow()
+      $.modState(state => logExceptions(state.withEntriesFrom(entriesStore))).runNow()
     }
 
     def willUnmount(): Callback = LogExceptionsCallback {
@@ -51,7 +51,7 @@ private final class EntriesListTable[Entry, Props](tableTitle: String,
     }
 
     override def onStateUpdate() = {
-      $.modState(state => state.withEntriesFrom(entriesStore)).runNow()
+      $.modState(state => logExceptions(state.withEntriesFrom(entriesStore))).runNow()
     }
 
     def render(props: Props, state: State) = logExceptions {
@@ -70,7 +70,7 @@ private final class EntriesListTable[Entry, Props](tableTitle: String,
         entriesStore.deregister(this)
         entriesStore = entriesStoreFactory.get(entriesStoreFactory.Input(maxNumEntries = maxNumEntries, props))
         entriesStore.register(this)
-        $.modState(state => state.withEntriesFrom(entriesStore).copy(maxNumEntries = maxNumEntries)).runNow()
+        $.modState(state => logExceptions(state.withEntriesFrom(entriesStore).copy(maxNumEntries = maxNumEntries))).runNow()
       }
 
       val nextMaxNumEntries = {
