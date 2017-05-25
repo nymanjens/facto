@@ -7,7 +7,7 @@ import common.{I18n, LoggingUtils, SinglePendingTaskQueue}
 import common.CollectionUtils.toListMap
 import common.time.{Clock, LocalDateTime, LocalDateTimes}
 import japgolly.scalajs.react._
-import flux.react.uielements.InputBase
+import flux.react.uielements.{InputBase, InputWithDefaultFromReference}
 import japgolly.scalajs.react.vdom.prefix_<^._
 import flux.react.ReactVdomUtils.{<<, ^^}
 import flux.react.uielements

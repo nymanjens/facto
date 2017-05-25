@@ -1,22 +1,13 @@
-package flux.react.app.transactiongroupform
+package flux.react.uielements
 
-import common.CollectionUtils.toListMap
-import common.GuavaReplacement.Iterables.getOnlyElement
-import flux.react.ReactVdomUtils.^^
-import flux.react.uielements.InputBase
-import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.prefix_<^._
+import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
+import japgolly.scalajs.react.{TopNode, _}
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.reflect.ClassTag
-import common.LoggingUtils.{logExceptions, LogExceptionsCallback}
-import flux.react.uielements.InputBase
-import japgolly.scalajs.react.{TopNode, _}
 
-import scala.collection.immutable.Seq
-
-private[transactiongroupform] class InputWithDefaultFromReference[Value] private() {
+class InputWithDefaultFromReference[Value] private() {
 
   private val component = ReactComponentB[Props.any]("InputWithDefaultFromReferenceWrapper")
     .renderBackend[Backend]
@@ -179,7 +170,7 @@ private[transactiongroupform] class InputWithDefaultFromReference[Value] private
   }
 }
 
-private[transactiongroupform] object InputWithDefaultFromReference {
+object InputWithDefaultFromReference {
   private val typeToInstance: mutable.Map[Class[_], InputWithDefaultFromReference[_]] = mutable.Map()
 
   def forType[Value: ClassTag]: InputWithDefaultFromReference[Value] = {
