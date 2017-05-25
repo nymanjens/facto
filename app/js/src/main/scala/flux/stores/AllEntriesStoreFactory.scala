@@ -17,7 +17,7 @@ final class AllEntriesStoreFactory(implicit database: RemoteDatabaseProxy)
         database.newQuery[Transaction]()
           .sort(Loki.Sorting.by("transactionDate").desc()
             .thenBy("createdDate").desc()
-            .thenBy("id").asc())
+            .thenBy("id").desc())
           .limit(3 * maxNumEntries)
           .data()
           .reverse

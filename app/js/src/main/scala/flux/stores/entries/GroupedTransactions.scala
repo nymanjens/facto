@@ -10,6 +10,10 @@ import models.accounting.{Tag, Transaction}
 import scala.collection.immutable.Seq
 
 abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
+  require(
+    transactions.map(_.transactionGroupId).distinct.size == 1,
+    s"More than one transaction group: S{transactions.map(_.transactionGroupId).distinct}")
+
   def groupId = transactions.head.transactionGroupId
   def issuer(implicit entityAccess: EntityAccess): User = transactions.head.issuer
   def transactionDates: Seq[LocalDateTime] = transactions.map(_.transactionDate).distinct
