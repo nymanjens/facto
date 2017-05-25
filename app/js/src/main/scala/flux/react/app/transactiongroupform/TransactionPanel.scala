@@ -181,6 +181,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             stringInputWithDefault.forOption(
               ref = mappedExtraProps.ref,
               defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawTransactionDate),
+              startWithDefault = props.defaultValues.isEmpty,
               nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)) {
               extraProps =>
                 uielements.bootstrap.TextInput(
@@ -207,6 +208,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                 stringInputWithDefault.forOption(
                   ref = extraProps1.ref,
                   defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawConsumedDate),
+                  startWithDefault = props.defaultValues.isEmpty,
                   nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)) {
                   extraProps2 =>
                     uielements.bootstrap.TextInput(
@@ -222,6 +224,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         reservoirInputWithDefault.forOption(
           ref = moneyReservoirRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.moneyReservoir),
+          startWithDefault = props.defaultValues.isEmpty,
           nameToDelegateRef = reservoirSelectInput.ref(_)) {
           extraProps =>
             reservoirSelectInput(
@@ -238,6 +241,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         accountInputWithDefault.forOption(
           ref = beneficiaryAccountRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.beneficiaryAccount),
+          startWithDefault = props.defaultValues.isEmpty,
           directUserChangeOnly = true,
           nameToDelegateRef = accountSelectInput.ref(_)) {
           extraProps =>
@@ -255,6 +259,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         categoryInputWithDefault.forOption(
           ref = categoryRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.category),
+          startWithDefault = props.defaultValues.isEmpty,
           directUserChangeOnly = true,
           nameToDelegateRef = categorySelectInput.ref(_)) {
           extraProps =>
@@ -272,6 +277,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         stringInputWithDefault.forOption(
           ref = descriptionRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.description),
+          startWithDefault = props.defaultValues.isEmpty,
           nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)) {
           extraProps =>
             uielements.bootstrap.TextInput(
@@ -301,6 +307,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         stringInputWithDefault.forOption(
           ref = detailDescriptionRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.detailDescription),
+          startWithDefault = props.defaultValues.isEmpty,
           nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)) {
           extraProps =>
             uielements.bootstrap.TextInput(
@@ -322,6 +329,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             stringInputWithDefault.forOption(
               ref = mappedExtraProps.ref,
               defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawTags),
+              startWithDefault = props.defaultValues.isEmpty,
               nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)) {
               extraProps =>
                 uielements.bootstrap.TextInput(

@@ -16,24 +16,28 @@ class InputWithDefaultFromReference[Value] private() {
   // **************** API ****************//
   def forOption[DelegateRef <: InputBase.Reference[Value]](ref: Reference,
                                                            defaultValueProxy: Option[() => InputBase.Proxy[Value]],
+                                                           startWithDefault: Boolean = false,
                                                            directUserChangeOnly: Boolean = false,
                                                            nameToDelegateRef: String => DelegateRef
                                                           )(inputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement): ReactElement = {
     component.withRef(ref.name)(Props(
       inputElementRef = nameToDelegateRef("delegate"),
       defaultValueProxy = defaultValueProxy,
+      startWithDefault = startWithDefault,
       inputElementFactory = inputElementFactory,
       directUserChangeOnly = directUserChangeOnly))
   }
 
   def apply[DelegateRef <: InputBase.Reference[Value]](ref: Reference,
                                                        defaultValueProxy: => InputBase.Proxy[Value],
+                                                       startWithDefault: Boolean = false,
                                                        directUserChangeOnly: Boolean = false,
                                                        nameToDelegateRef: String => DelegateRef
                                                       )(inputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement): ReactElement = {
     forOption(
       ref = ref,
       defaultValueProxy = Some(() => defaultValueProxy),
+      startWithDefault = startWithDefault,
       nameToDelegateRef = nameToDelegateRef,
       directUserChangeOnly = directUserChangeOnly)(
       inputElementFactory)
@@ -68,6 +72,7 @@ class InputWithDefaultFromReference[Value] private() {
 
   private case class Props[DelegateRef <: InputBase.Reference[Value]](inputElementRef: DelegateRef,
                                                                       defaultValueProxy: Option[() => InputBase.Proxy[Value]],
+                                                                      startWithDefault: Boolean,
                                                                       inputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement,
                                                                       directUserChangeOnly: Boolean)
   private object Props {
@@ -102,10 +107,15 @@ class InputWithDefaultFromReference[Value] private() {
       def didMount(props: Props.any): Callback = LogExceptionsCallback {
         props.inputElementRef($).registerListener(InputValueListener)
         props.defaultValueProxy.get().registerListener(DefaultValueListener)
-        currentInputValue = props.inputElementRef($).valueOrDefault
-        currentDefaultValue = props.defaultValueProxy.get().valueOrDefault
 
-        $.setState(ConnectionState(isConnected = currentDefaultValue == currentInputValue)).runNow()
+        currentDefaultValue = props.defaultValueProxy.get().valueOrDefault
+        if (props.startWithDefault) {
+          currentInputValue = currentDefaultValue
+          props.inputElementRef($).setValue(currentDefaultValue)
+        } else {
+          currentInputValue = props.inputElementRef($).valueOrDefault
+          $.setState(ConnectionState(isConnected = currentDefaultValue == currentInputValue)).runNow()
+        }
       }
 
       def willUnmount(props: Props.any): Callback = LogExceptionsCallback {
