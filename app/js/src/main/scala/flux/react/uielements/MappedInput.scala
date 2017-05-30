@@ -29,7 +29,7 @@ class MappedInput[DelegateValue, Value] private(implicit delegateValueTag: Class
                                                                nameToDelegateRef: String => DelegateRef
                                                               )(delegateInputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement): ReactElement = {
     component.withRef(ref.name)(Props(
-      delegateRef = nameToDelegateRef("delegate"),
+      delegateRef = nameToDelegateRef(ref.name),
       valueTransformer,
       defaultValue,
       listener,
