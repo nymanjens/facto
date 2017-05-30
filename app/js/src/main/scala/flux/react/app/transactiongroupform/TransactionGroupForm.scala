@@ -270,6 +270,37 @@ final class TransactionGroupForm(implicit i18n: I18n,
         invalidMoneyReservoirsError orElse noFutureForeignTransactionsError
       }
 
+      def submitValid(datas: Seq[transactionPanel.Data], state: State) = {
+        def transactionsWithoutIdProvider(group: TransactionGroup) = {
+          for (data <- datas) yield Transaction(
+            transactionGroupId = group.id,
+            issuerId = user.id,
+            beneficiaryAccountCode = data.beneficiaryAccount.code,
+            moneyReservoirCode = data.moneyReservoir.code,
+            categoryCode = data.category.code,
+            description = data.description,
+            flowInCents = data.flow.cents,
+            detailDescription = data.detailDescription,
+            tagsString = Tag.serializeToString(data.tags),
+            createdDate = group.createdDate,
+            transactionDate = data.transactionDate,
+            consumedDate = data.consumedDate
+          )
+        }
+
+        val action = $.props.runNow().operationMeta match {
+          case OperationMeta.AddNew =>
+            Action.AddTransactionGroup(transactionsWithoutIdProvider = transactionsWithoutIdProvider)
+          case OperationMeta.Edit(group) =>
+            Action.UpdateTransactionGroup(
+              transactionGroupWithId = group,
+              transactionsWithoutId = transactionsWithoutIdProvider(group)
+            )
+        }
+
+        dispatcher.dispatch(action)
+      }
+
       e.preventDefault()
 
       $.modState(state => logExceptions {
@@ -284,26 +315,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
               newState = newState.copy(globalErrorMessage = Some(errorMessage))
 
             case None =>
-              dispatcher.dispatch(
-                Action.AddTransactionGroup(
-                  transactionsWithoutIdProvider = group => {
-                    for (data <- datas) yield Transaction(
-                      transactionGroupId = group.id,
-                      issuerId = user.id,
-                      beneficiaryAccountCode = data.beneficiaryAccount.code,
-                      moneyReservoirCode = data.moneyReservoir.code,
-                      categoryCode = data.category.code,
-                      description = data.description,
-                      flowInCents = data.flow.cents,
-                      detailDescription = data.detailDescription,
-                      tagsString = Tag.serializeToString(data.tags),
-                      createdDate = clock.now,
-                      transactionDate = data.transactionDate,
-                      consumedDate = data.consumedDate
-                    )
-                  }
-                )
-              )
+              submitValid(datas, state)
               $.props.runNow().router.set(Page.EverythingPage).runNow()
           }
         }
