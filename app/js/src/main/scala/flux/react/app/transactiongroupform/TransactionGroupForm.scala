@@ -53,20 +53,24 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
   // **************** API ****************//
   def forCreate(router: RouterCtl[Page]): ReactElement = {
-    component(
+    create(
       Props(
         OperationMeta.AddNew,
         router))
   }
 
   def forEdit(transactionGroupId: Long, router: RouterCtl[Page]): ReactElement = {
-    component(
+    create(
       Props(
         OperationMeta.Edit(transactionGroupManager.findById(transactionGroupId)),
         router))
   }
 
   // **************** Private helper methods ****************//
+  private def create(props: Props): ReactElement = {
+    component.withKey(props.operationMeta.toString).apply(props)
+  }
+
   private def panelRef(panelIndex: Int): transactionPanel.Reference = transactionPanel.ref(s"panel_$panelIndex")
 
   // **************** Private inner types ****************//
