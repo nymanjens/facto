@@ -13,9 +13,7 @@ final class TransactionAndGroupStore(implicit database: RemoteDatabaseProxy,
                                      entityAccess: EntityAccess,
                                      clock: Clock,
                                      dispatcher: Dispatcher) {
-  dispatcher.register(actionCallback)
-
-  private def actionCallback: PartialFunction[Action, Unit] = {
+  dispatcher.registerPartial {
     case AddTransactionGroup(transactionsWithoutIdProvider) =>
       val groupAddition = EntityModification.createAddWithRandomId(TransactionGroup(createdDate = clock.now))
       val group = groupAddition.entity
@@ -25,7 +23,6 @@ final class TransactionAndGroupStore(implicit database: RemoteDatabaseProxy,
           EntityModification.createAddWithId(transactionWithoutId, id)
         }
       database.persistModifications(groupAddition +: transactionAdditions)
-      println("  TransactionAndGroupStore: Added transaction group: " + group.id)
 
     case UpdateTransactionGroup(group, transactionsWithoutId) =>
       val transactionDeletions = group.transactions map (EntityModification.createDelete(_))

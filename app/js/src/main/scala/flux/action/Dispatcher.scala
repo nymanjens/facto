@@ -16,11 +16,18 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 trait Dispatcher {
 
   def register(callback: Action => Unit): Unit
+  final def registerPartial(callback: PartialFunction[Action, Unit]): Unit = {
+    register(callback orElse Dispatcher.fallbackCallback)
+  }
 
   def dispatch(action: Action): Future[Unit]
 }
 
 object Dispatcher {
+  private def fallbackCallback: PartialFunction[Action, Unit] = {
+    case _ =>
+  }
+
   private[flux] final class Impl extends Dispatcher {
     private var callbacks: Set[Action => Unit] = Set()
     private var isDispatching: Boolean = false
@@ -31,7 +38,7 @@ object Dispatcher {
     }
 
     def dispatch(action: Action) = {
-      require(!isDispatching)
+      require(!isDispatching, s"Dispatch triggered action $action")
 
       Future {
         logExceptions {
@@ -39,6 +46,7 @@ object Dispatcher {
           isDispatching = true
           println(s"  Dispatcher: Dispatching action ${action.getClass.getSimpleName}")
           callbacks.foreach(_.apply(action))
+          callbacks.foreach(_.apply(Action.Done(action)))
           isDispatching = false
         }
       }
