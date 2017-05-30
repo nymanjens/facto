@@ -14,12 +14,12 @@ import models.accounting.money.ExchangeRateManager
 
 import scala.collection.immutable.Seq
 
-final class Menu(implicit entriesStoreFactory: AllEntriesStoreFactory,
-                 entityAccess: EntityAccess,
-                 clock: Clock,
-                 accountingConfig: Config,
-                 exchangeRateManager: ExchangeRateManager,
-                 i18n: I18n) {
+private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFactory,
+                              entityAccess: EntityAccess,
+                              clock: Clock,
+                              accountingConfig: Config,
+                              exchangeRateManager: ExchangeRateManager,
+                              i18n: I18n) {
 
   def apply(currentPage: Page, router: RouterCtl[Page]): ReactElement = {
     component(Menu.Props(currentPage, router))
@@ -46,14 +46,12 @@ final class Menu(implicit entriesStoreFactory: AllEntriesStoreFactory,
     .build
 }
 
-object Menu {
+private[app] object Menu {
 
   private val menuItems = Seq(
     MenuItem("Everything", "fa fa-money", Page.EverythingPage),
     MenuItem("Everything2", "fa fa-money", Page.EverythingPage2),
-    MenuItem("New", "icon-new-empty", Page.NewTransactionGroupPage),
-    MenuItem("Test", "fa fa-money", Page.TestPage)
-  )
+    MenuItem("New", "icon-new-empty", Page.NewTransactionGroupPage))
 
   private case class Props(currentPage: Page, router: RouterCtl[Page])
   private case class MenuItem(labelKey: String, iconClass: String, page: Page)

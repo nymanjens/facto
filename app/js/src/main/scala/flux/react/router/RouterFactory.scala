@@ -29,17 +29,11 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
         | dynamicRouteCT("#editTransactionGroup" / long.caseClass[EditTransactionGroupPage])
         ~> dynRenderR { case (page, ctl) => reactAppModule.transactionGroupForm.forEdit(page.transactionGroupId, ctl) }
 
-        | staticRoute("#test", TestPage)
-        ~> renderR(ctl => reactAppModule.menu(TestPage, ctl))
-
         ).notFound(redirectToPage(EverythingPage)(Redirect.Replace))
     }.renderWith(layout)
   }
 
-  private def layout(c: RouterCtl[Page], r: Resolution[Page])(implicit reactAppModule: flux.react.app.Module) = {
-    <.div(
-      reactAppModule.menu(r.page, c),
-      r.render()
-    )
+  private def layout(routerCtl: RouterCtl[Page], resolution: Resolution[Page])(implicit reactAppModule: flux.react.app.Module) = {
+    reactAppModule.layout(routerCtl, resolution.page)(resolution.render())
   }
 }
