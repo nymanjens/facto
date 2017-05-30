@@ -21,7 +21,7 @@ class InputWithDefaultFromReference[Value] private() {
                                                            nameToDelegateRef: String => DelegateRef
                                                           )(inputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement): ReactElement = {
     component.withRef(ref.name)(Props(
-      inputElementRef = nameToDelegateRef("delegate"),
+      inputElementRef = nameToDelegateRef(ref.name),
       defaultValueProxy = defaultValueProxy,
       startWithDefault = startWithDefault,
       inputElementFactory = inputElementFactory,

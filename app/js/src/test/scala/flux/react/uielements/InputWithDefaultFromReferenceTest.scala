@@ -65,6 +65,7 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
       tester.showsBoundUntilChange ==> true
 
     }
+
     "Binds again if defaultValueProxy changes to own value" - {
       val tester = new ComponentTester(ReactTestComponent.component(ReactTestComponent.Props(defaultValueProxy)))
       tester.valueProxy.setValue("value2")
@@ -72,6 +73,12 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
 
       tester.valueProxy.valueOrDefault ==> "value2"
       tester.showsBoundUntilChange ==> true
+    }
+
+
+    "Input name is given ref name" - {
+      val tester = new ComponentTester(ReactTestComponent.component(ReactTestComponent.Props(defaultValueProxy)))
+      tester.inputName ==> "testRef"
     }
   }
 
@@ -135,6 +142,10 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
 
     def showsBoundUntilChange: Boolean = {
       wrappedComponent.child(tagName = "input").classes contains "bound-until-change"
+    }
+
+    def inputName: String = {
+      wrappedComponent.child(tagName = "input").attribute("name")
     }
   }
 }
