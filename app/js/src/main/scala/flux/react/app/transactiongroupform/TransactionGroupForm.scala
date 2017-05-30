@@ -117,7 +117,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
                 case OperationMeta.Edit(_) => i18n("facto.edit-transaction")
               },
               props.operationMeta.isInstanceOf[OperationMeta.Edit] ?= <.a(
-                ^.className := "btn btn-default",
+                ^.className := "btn btn-default delete-button",
                 <.i(^.className := "fa fa-times"),
                 i18n("facto.delete"),
                 ^.onClick --> onDelete
