@@ -17,14 +17,14 @@ trait Dispatcher {
 
   def register(callback: Action => Unit): Unit
   final def registerPartial(callback: PartialFunction[Action, Unit]): Unit = {
-    register(callback orElse Dispatcher.fallbackCallback)
+    register(callback orElse Dispatcher.nullCallback)
   }
 
   def dispatch(action: Action): Future[Unit]
 }
 
 object Dispatcher {
-  private def fallbackCallback: PartialFunction[Action, Unit] = {
+  private def nullCallback: PartialFunction[Action, Unit] = {
     case _ =>
   }
 
