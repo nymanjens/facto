@@ -116,7 +116,12 @@ final class TransactionGroupForm(implicit i18n: I18n,
                 case OperationMeta.AddNew => i18n("facto.new-transaction")
                 case OperationMeta.Edit(_) => i18n("facto.edit-transaction")
               },
-              // TODO: Add delete action here
+              props.operationMeta.isInstanceOf[OperationMeta.Edit] ?= <.a(
+                ^.className := "btn btn-default",
+                <.i(^.className := "fa fa-times"),
+                i18n("facto.delete"),
+                ^.onClick --> onDelete
+              ),
               <.span(
                 ^.className := "total-transaction-flow-box",
                 totalFlowInput(
@@ -326,6 +331,15 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
         newState
       }).runNow()
+    }
+
+    private def onDelete: Callback = LogExceptionsCallback {
+      $.props.runNow().operationMeta match {
+        case OperationMeta.AddNew => throw new AssertionError("Should never happen")
+        case OperationMeta.Edit(group) =>
+          dispatcher.dispatch(Action.RemoveTransactionGroup(transactionGroupWithId = group))
+          $.props.runNow().router.set(Page.EverythingPage).runNow()
+      }
     }
   }
 }
