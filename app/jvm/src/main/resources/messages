@@ -184,3 +184,4 @@ facto.search-results-for=Search Results for {0}
 facto.num-results={0} results
 facto.one-result=1 result
 facto.robot=Robot
+facto.sending-data-to-server=Sending data to server...
