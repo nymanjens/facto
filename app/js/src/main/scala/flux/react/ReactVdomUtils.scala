@@ -15,7 +15,7 @@ object ReactVdomUtils {
       if (cond) {
         thenElement
       } else {
-        Seq()
+        EmptyTag
       }
     }
     def ifThen[T](option: Option[T])(thenElement: T => TagMod): TagMod = {

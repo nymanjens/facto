@@ -27,6 +27,7 @@ final class Module(implicit i18n: I18n,
   import fluxStoresModule.globalMessagesStore
 
   implicit private lazy val menu: Menu = wire[Menu]
+  implicit private lazy val globalMessages: GlobalMessages = wire[GlobalMessages]
   implicit lazy val layout: Layout = wire[Layout]
   implicit lazy val everything: Everything = wire[Everything]
   implicit lazy val transactionGroupForm: TransactionGroupForm = transactionGroupFormModule.transactionGroupForm

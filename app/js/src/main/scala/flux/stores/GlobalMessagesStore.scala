@@ -4,10 +4,9 @@ import common.I18n
 import common.time.Clock
 import flux.action.Action.{AddTransactionGroup, RemoveTransactionGroup, UpdateTransactionGroup}
 import flux.action.{Action, Dispatcher}
+import flux.stores.GlobalMessagesStore.Message
 import models.EntityAccess
-import models.access.RemoteDatabaseProxy
 import models.accounting._
-import models.manager.EntityModification
 
 import scala.collection.immutable.Seq
 
@@ -36,10 +35,6 @@ final class GlobalMessagesStore(implicit i18n: I18n,
 
     stateUpdateListeners = stateUpdateListeners.filter(_ != listener)
   }
-
-  // **************** Public inner types ****************//
-  case class Message(string: String,
-                     isWorking: Boolean)
 
   // **************** Private dispatcher methods ****************//
   private def dispatcherListener: PartialFunction[Action, Unit] = {
@@ -91,6 +86,9 @@ final class GlobalMessagesStore(implicit i18n: I18n,
 }
 
 object GlobalMessagesStore {
+  case class Message(string: String,
+                     isWorking: Boolean)
+
   trait Listener {
     def onStateUpdate(): Unit
   }

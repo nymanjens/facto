@@ -9,12 +9,13 @@ import japgolly.scalajs.react.extra.router.{Resolution, RouterCtl}
 
 import scala.collection.immutable.Seq
 
-final class Layout(implicit globalMessagesStore: GlobalMessagesStore, menu: Menu) {
+final class Layout(implicit globalMessages: GlobalMessages, menu: Menu) {
 
   private val component = ReactComponentB[Props](getClass.getSimpleName)
     .renderPC((_, props, children) =>
       <.div(
         menu(props.page, props.routerCtl),
+        globalMessages(),
         children
       )
     ).build
