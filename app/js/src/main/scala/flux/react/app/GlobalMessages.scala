@@ -1,17 +1,11 @@
 package flux.react.app
 
-import flux.react.ReactVdomUtils.{<<, ^^}
-import japgolly.scalajs.react.{ReactElement, ReactNode}
-import japgolly.scalajs.react.vdom.TagMod
-import japgolly.scalajs.react.vdom.prefix_<^._
-import common.LoggingUtils.{logExceptions, LogExceptionsCallback}
-import flux.react.router.Page
+import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import flux.stores.GlobalMessagesStore
-import japgolly.scalajs.react._
-import japgolly.scalajs.react.extra.router.RouterCtl
+import japgolly.scalajs.react.{ReactElement, _}
 import japgolly.scalajs.react.vdom.prefix_<^._
 
-import scala.collection.immutable.Seq
+import scala.scalajs.js
 
 private[app] final class GlobalMessages(implicit globalMessagesStore: GlobalMessagesStore, menu: Menu) {
 
@@ -53,7 +47,12 @@ private[app] final class GlobalMessages(implicit globalMessagesStore: GlobalMess
     def render(props: Props, state: State): ReactElement = logExceptions {
       state.maybeMessage match {
         case None => <.span()
-        case Some(message) => <.div(message.string)
+        case Some(message) =>
+          <.div(
+            ^.className := "alert alert-info",
+            ^.style := js.Dictionary("marginTop" -> "20px"),
+            message.string
+          )
       }
     }
   }
