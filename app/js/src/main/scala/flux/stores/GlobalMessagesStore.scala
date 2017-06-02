@@ -1,5 +1,6 @@
 package flux.stores
 
+import common.LoggingUtils.{logExceptions, LogExceptionsCallback}
 import common.I18n
 import common.time.Clock
 import flux.action.Action.{AddTransactionGroup, RemoveTransactionGroup, UpdateTransactionGroup}
@@ -8,7 +9,10 @@ import flux.stores.GlobalMessagesStore.Message
 import models.EntityAccess
 import models.accounting._
 
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.collection.immutable.Seq
+import scala.concurrent.duration._
+import scala.scalajs.js
 
 final class GlobalMessagesStore(implicit i18n: I18n,
                                 clock: Clock,
@@ -16,8 +20,9 @@ final class GlobalMessagesStore(implicit i18n: I18n,
                                 dispatcher: Dispatcher) {
   dispatcher.registerPartial(dispatcherListener)
 
-
   private var _state: Option[Message] = None
+  /** Gets incremented whenever _state is updated. */
+  private var stateChangedCounter: Long = 0
   private var stateUpdateListeners: Seq[GlobalMessagesStore.Listener] = Seq()
   private var isCallingListeners: Boolean = false
 
@@ -45,7 +50,15 @@ final class GlobalMessagesStore(implicit i18n: I18n,
       getCompletionMessage.lift.apply(action) match {
         case Some(message) =>
           setState(Some(Message(string = message, isWorking = false)))
-        // TODO: Set timer
+
+          // Clear this message after some delay
+          val counterWhenCreatedMessage = stateChangedCounter
+          js.timers.setTimeout(2.minutes)(logExceptions {
+            if (stateChangedCounter == counterWhenCreatedMessage) {
+              // state has remained unchanged since start of timer
+              setState(None)
+            }
+          })
         case None =>
       }
   }
@@ -74,6 +87,7 @@ final class GlobalMessagesStore(implicit i18n: I18n,
   // **************** Private state helper methods ****************//
   private def setState(state: Option[Message]): Unit = {
     _state = state
+    stateChangedCounter += 1
     invokeListeners()
   }
 
