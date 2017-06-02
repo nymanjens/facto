@@ -11,6 +11,7 @@ import flux.react.router.Page
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.RouterCtl
 import japgolly.scalajs.react.vdom.prefix_<^._
+import models.accounting.config.Config
 import models.{EntityAccess, User}
 import models.accounting.{Tag, Transaction, TransactionGroup}
 import models.accounting.money.{Currency, ExchangeRateManager, ReferenceMoney}
@@ -21,6 +22,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 final class TransactionGroupForm(implicit i18n: I18n,
                                  clock: Clock,
+                                 accountingConfig: Config,
                                  user: User,
                                  transactionGroupManager: TransactionGroup.Manager,
                                  entityAccess: EntityAccess,
@@ -38,11 +40,16 @@ final class TransactionGroupForm(implicit i18n: I18n,
           case OperationMeta.AddNew => 1
           case OperationMeta.Edit(group) => group.transactions.length
         }
+        val totalFlowRestriction = props.operationMeta match {
+          case OperationMeta.Edit(group) if group.isZeroSum => TotalFlowRestriction.ZeroSum
+          case _ => TotalFlowRestriction.AnyTotal
+        }
         State(
           panelIndices = 0 until numberOfTransactions,
           nextPanelIndex = numberOfTransactions,
           // The following fields are updated by onFormChange() when the component is mounted
           foreignCurrency = None,
+          totalFlowRestriction = totalFlowRestriction,
           totalFlow = ReferenceMoney(0),
           totalFlowExceptLast = ReferenceMoney(0))
       })
@@ -89,7 +96,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
                            showErrorMessages: Boolean = false,
                            globalErrorMessage: Option[String] = None,
                            foreignCurrency: Option[Currency],
-                           totalFlowRestriction: TotalFlowRestriction = TotalFlowRestriction.AnyTotal,
+                           totalFlowRestriction: TotalFlowRestriction,
                            totalFlow: ReferenceMoney,
                            totalFlowExceptLast: ReferenceMoney) {
     def plusPanel(): State = copy(
@@ -131,7 +138,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
                   onChange = updateTotalFlow
                 ),
                 totalFlowRestrictionInput(
-                  defaultValue = TotalFlowRestriction.AnyTotal,
+                  defaultValue = state.totalFlowRestriction,
                   onChange = updateTotalFlowRestriction
                 )
               )
