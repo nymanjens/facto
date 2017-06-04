@@ -168,10 +168,11 @@ final class TransactionGroupForm(implicit i18n: I18n,
                   ref = panelRef(panelIndex),
                   title = i18n("facto.transaction") + " " + (i + 1),
                   defaultValues = transaction,
-                  forceFlowValue =
-                    if (lastPanel && state.totalFlowRestriction.userSetsTotal)
-                      Some(state.totalFlow - state.totalFlowExceptLast)
-                    else None,
+                  forceFlowValue = if (lastPanel && state.totalFlowRestriction.userSetsTotal) {
+                    Some(state.totalFlow - state.totalFlowExceptLast)
+                  } else {
+                    None
+                  },
                   showErrorMessages = state.showErrorMessages,
                   defaultPanel =
                     if (firstPanel) None else Some(panelRef(panelIndex = state.panelIndices.head)($)),
