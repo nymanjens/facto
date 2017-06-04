@@ -9,15 +9,17 @@ import scala.collection.immutable.Seq
   *                         entries is enough to calculate the latest value of `State`. Example: Int.
   */
 abstract class EntriesListStoreFactory[Entry, AdditionalInput](implicit database: RemoteDatabaseProxy)
-  extends EntriesStoreFactory[EntriesListStoreFactory.State[Entry]] {
+    extends EntriesStoreFactory[EntriesListStoreFactory.State[Entry]] {
 
   // **************** Abstract methods/types ****************//
   protected def createNew(maxNumEntries: Int, input: AdditionalInput): Store
 
   // **************** Implementation of EntriesStoreFactory methods/types ****************//
-  override protected final def createNew(input: Input) = createNew(input.maxNumEntries, input.additionalInput)
+  override protected final def createNew(input: Input) =
+    createNew(input.maxNumEntries, input.additionalInput)
 
-  /* override */ case class Input(maxNumEntries: Int, additionalInput: AdditionalInput)
+  /* override */
+  case class Input(maxNumEntries: Int, additionalInput: AdditionalInput)
 }
 
 object EntriesListStoreFactory {

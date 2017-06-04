@@ -18,58 +18,57 @@ final class GeneralActions @Inject()(implicit val messagesApi: MessagesApi,
                                      entityAccess: SlickEntityAccess,
                                      generalEntries: GeneralEntries,
                                      i18n: I18n,
-                                     env: play.api.Environment) extends Controller with I18nSupport {
+                                     env: play.api.Environment)
+    extends Controller
+    with I18nSupport {
 
   // ********** actions ********** //
-  def searchMostRelevant(q: String) = AuthenticatedAction { implicit user =>
-    implicit request =>
-      search(q, numEntriesToShow = 200)
+  def searchMostRelevant(q: String) = AuthenticatedAction { implicit user => implicit request =>
+    search(q, numEntriesToShow = 200)
   }
 
-  def searchAll(q: String) = AuthenticatedAction { implicit user =>
-    implicit request =>
-      search(q)
+  def searchAll(q: String) = AuthenticatedAction { implicit user => implicit request =>
+    search(q)
   }
 
-  def updateLogsLatest = AuthenticatedAction { implicit user =>
-    implicit request =>
-      updateLogs(numEntriesToShow = 400)
+  def updateLogsLatest = AuthenticatedAction { implicit user => implicit request =>
+    updateLogs(numEntriesToShow = 400)
   }
 
-  def updateLogsAll = AuthenticatedAction { implicit user =>
-    implicit request =>
-      updateLogs()
+  def updateLogsAll = AuthenticatedAction { implicit user => implicit request =>
+    updateLogs()
   }
 
-  def templateList = AuthenticatedAction { implicit user =>
-    implicit request =>
-      Ok(views.html.accounting.templatelist(
+  def templateList = AuthenticatedAction { implicit user => implicit request =>
+    Ok(
+      views.html.accounting.templatelist(
         templates = accountingConfig.templatesToShowFor(Template.Placement.TemplateList, user)))
   }
 
   // ********** private helper controllers ********** //
-  private def search(query: String, numEntriesToShow: Int = 100000)
-                    (implicit request: Request[AnyContent], user: User): Result = {
+  private def search(query: String, numEntriesToShow: Int = 100000)(implicit request: Request[AnyContent],
+                                                                    user: User): Result = {
     // get entries
     val allEntries = generalEntries.search(query)
     val entries = allEntries.take(numEntriesToShow + 1)
 
     // render
-    Ok(views.html.accounting.search(
-      query = query,
-      totalNumResults = allEntries.size,
-      entries = entries,
-      numEntriesToShow = numEntriesToShow,
-      templatesInNavbar = accountingConfig.templatesToShowFor(Template.Placement.SearchView, user)))
+    Ok(
+      views.html.accounting.search(
+        query = query,
+        totalNumResults = allEntries.size,
+        entries = entries,
+        numEntriesToShow = numEntriesToShow,
+        templatesInNavbar = accountingConfig.templatesToShowFor(Template.Placement.SearchView, user)
+      ))
   }
 
-  private def updateLogs(numEntriesToShow: Int = 100000)(implicit request: Request[AnyContent], user: User): Result = {
+  private def updateLogs(numEntriesToShow: Int = 100000)(implicit request: Request[AnyContent],
+                                                         user: User): Result = {
     // get entries
     val entries = entityAccess.updateLogManager.fetchLastNEntries(numEntriesToShow + 1)
 
     // render
-    Ok(views.html.accounting.updateLogs(
-      entries = entries,
-      numEntriesToShow = numEntriesToShow))
+    Ok(views.html.accounting.updateLogs(entries = entries, numEntriesToShow = numEntriesToShow))
   }
 }

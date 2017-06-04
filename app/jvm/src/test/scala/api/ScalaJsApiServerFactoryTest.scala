@@ -57,14 +57,10 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
 
   "getEntityModifications()" in new WithApplication {
     fakeClock.setTime(date4)
-    modificationEntityManager.add(EntityModificationEntity(
-      userId = testUser.id,
-      modification = testModificationA,
-      date = date1))
-    modificationEntityManager.add(EntityModificationEntity(
-      userId = testUser.id,
-      modification = testModificationB,
-      date = date3))
+    modificationEntityManager.add(
+      EntityModificationEntity(userId = testUser.id, modification = testModificationA, date = date1))
+    modificationEntityManager.add(
+      EntityModificationEntity(userId = testUser.id, modification = testModificationB, date = date3))
 
     val response = serverFactory.create().getEntityModifications(updateToken = date2)
 

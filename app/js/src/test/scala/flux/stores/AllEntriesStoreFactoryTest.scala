@@ -32,7 +32,8 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       database.addRemotelyAddedEntities(testTransactionWithId)
 
-      store.state ==> EntriesListStoreFactory.State(Seq(GeneralEntry(Seq(testTransactionWithId))), hasMore = false)
+      store.state ==> EntriesListStoreFactory
+        .State(Seq(GeneralEntry(Seq(testTransactionWithId))), hasMore = false)
     }
 
     "store state is updated upon local update" - {
@@ -40,7 +41,8 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       database.persistModifications(Seq(EntityModification.Add(testTransactionWithId)))
 
-      store.state ==> EntriesListStoreFactory.State(Seq(GeneralEntry(Seq(testTransactionWithId))), hasMore = false)
+      store.state ==> EntriesListStoreFactory
+        .State(Seq(GeneralEntry(Seq(testTransactionWithId))), hasMore = false)
     }
 
     "store calls listeners" - {
@@ -63,32 +65,44 @@ object AllEntriesStoreFactoryTest extends TestSuite {
     }
 
     "combines consecutive transactions" - {
-      val trans1 = testTransactionWithIdA.copy(idOption = Some(11), transactionGroupId = 122, createdDate = createDateTime(2012, JANUARY, 1))
-      val trans2 = testTransactionWithIdA.copy(idOption = Some(22), transactionGroupId = 122, createdDate = createDateTime(2012, JANUARY, 2))
-      val trans3 = testTransactionWithIdA.copy(idOption = Some(33), transactionGroupId = 133, createdDate = createDateTime(2012, JANUARY, 3))
+      val trans1 = testTransactionWithIdA
+        .copy(idOption = Some(11), transactionGroupId = 122, createdDate = createDateTime(2012, JANUARY, 1))
+      val trans2 = testTransactionWithIdA
+        .copy(idOption = Some(22), transactionGroupId = 122, createdDate = createDateTime(2012, JANUARY, 2))
+      val trans3 = testTransactionWithIdA
+        .copy(idOption = Some(33), transactionGroupId = 133, createdDate = createDateTime(2012, JANUARY, 3))
 
       database.addRemotelyAddedEntities(trans1, trans2, trans3)
 
-      store.state ==> EntriesListStoreFactory.State(Seq(
-        GeneralEntry(Seq(trans1, trans2)),
-        GeneralEntry(Seq(trans3))),
-        hasMore = false)
+      store.state ==> EntriesListStoreFactory
+        .State(Seq(GeneralEntry(Seq(trans1, trans2)), GeneralEntry(Seq(trans3))), hasMore = false)
     }
 
     "sorts entries on transaction date first and then created date" - {
       def transaction(id: Long, transactionDate: LocalDateTime, createdDate: LocalDateTime): Transaction = {
-        testTransactionWithIdA.copy(idOption = Some(id), transactionGroupId = id, createdDate = createdDate, transactionDate = transactionDate)
+        testTransactionWithIdA.copy(
+          idOption = Some(id),
+          transactionGroupId = id,
+          createdDate = createdDate,
+          transactionDate = transactionDate)
       }
-      val trans1 = transaction(111, transactionDate = createDateTime(2012, JANUARY, 2), createdDate = createDateTime(2012, JANUARY, 3))
-      val trans2 = transaction(222, transactionDate = createDateTime(2012, JANUARY, 3), createdDate = createDateTime(2012, JANUARY, 1))
-      val trans3 = transaction(333, transactionDate = createDateTime(2012, JANUARY, 3), createdDate = createDateTime(2012, JANUARY, 2))
+      val trans1 = transaction(
+        111,
+        transactionDate = createDateTime(2012, JANUARY, 2),
+        createdDate = createDateTime(2012, JANUARY, 3))
+      val trans2 = transaction(
+        222,
+        transactionDate = createDateTime(2012, JANUARY, 3),
+        createdDate = createDateTime(2012, JANUARY, 1))
+      val trans3 = transaction(
+        333,
+        transactionDate = createDateTime(2012, JANUARY, 3),
+        createdDate = createDateTime(2012, JANUARY, 2))
 
       database.addRemotelyAddedEntities(trans3, trans2, trans1)
 
-      store.state ==> EntriesListStoreFactory.State(Seq(
-        GeneralEntry(Seq(trans1)),
-        GeneralEntry(Seq(trans2)),
-        GeneralEntry(Seq(trans3))),
+      store.state ==> EntriesListStoreFactory.State(
+        Seq(GeneralEntry(Seq(trans1)), GeneralEntry(Seq(trans2)), GeneralEntry(Seq(trans3))),
         hasMore = false)
     }
 
@@ -103,10 +117,8 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       database.addRemotelyAddedEntities(trans1, trans2, trans3, trans4)
 
-      store.state ==> EntriesListStoreFactory.State(Seq(
-        GeneralEntry(Seq(trans2)),
-        GeneralEntry(Seq(trans3)),
-        GeneralEntry(Seq(trans4))),
+      store.state ==> EntriesListStoreFactory.State(
+        Seq(GeneralEntry(Seq(trans2)), GeneralEntry(Seq(trans3)), GeneralEntry(Seq(trans4))),
         hasMore = true)
     }
   }

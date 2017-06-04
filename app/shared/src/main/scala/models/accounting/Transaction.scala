@@ -25,7 +25,8 @@ case class Transaction(transactionGroupId: Long,
                        createdDate: LocalDateTime,
                        transactionDate: LocalDateTime,
                        consumedDate: LocalDateTime,
-                       idOption: Option[Long] = None) extends Entity {
+                       idOption: Option[Long] = None)
+    extends Entity {
   require(transactionGroupId > 0)
   require(issuerId > 0)
   require(!beneficiaryAccountCode.isEmpty)
@@ -35,16 +36,21 @@ case class Transaction(transactionGroupId: Long,
 
   override def withId(id: Long) = copy(idOption = Some(id))
 
-  def transactionGroup(implicit entityAccess: EntityAccess): TransactionGroup = entityAccess.transactionGroupManager.findById(transactionGroupId)
+  def transactionGroup(implicit entityAccess: EntityAccess): TransactionGroup =
+    entityAccess.transactionGroupManager.findById(transactionGroupId)
   def issuer(implicit entityAccess: EntityAccess): User = entityAccess.userManager.findById(issuerId)
-  def beneficiary(implicit accountingConfig: Config): Account = accountingConfig.accounts(beneficiaryAccountCode)
-  def moneyReservoir(implicit accountingConfig: Config): MoneyReservoir = accountingConfig.moneyReservoir(moneyReservoirCode)
+  def beneficiary(implicit accountingConfig: Config): Account =
+    accountingConfig.accounts(beneficiaryAccountCode)
+  def moneyReservoir(implicit accountingConfig: Config): MoneyReservoir =
+    accountingConfig.moneyReservoir(moneyReservoirCode)
   def category(implicit accountingConfig: Config): Category = accountingConfig.categories(categoryCode)
-  def flow(implicit accountingConfig: Config): DatedMoney = DatedMoney(flowInCents, moneyReservoir.currency, transactionDate)
+  def flow(implicit accountingConfig: Config): DatedMoney =
+    DatedMoney(flowInCents, moneyReservoir.currency, transactionDate)
   lazy val tags: Seq[Tag] = Tag.parseTagsString(tagsString)
 
   /** Returns None if the consumed date is the same as the transaction date (and thus carries no further information. */
-  def consumedDateOption: Option[LocalDateTime] = if (consumedDate == transactionDate) None else Some(consumedDate)
+  def consumedDateOption: Option[LocalDateTime] =
+    if (consumedDate == transactionDate) None else Some(consumedDate)
 
   override def toString = {
     s"Transaction(group=$transactionGroupId, issuer=${issuerId}, $beneficiaryAccountCode, $moneyReservoirCode, $categoryCode, flowInCents=$flowInCents, $description)"

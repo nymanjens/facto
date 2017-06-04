@@ -14,11 +14,13 @@ import models.accounting.BalanceCheck
 
 import SlickBalanceCheckManager.{BalanceChecks, tableName}
 
-final class SlickBalanceCheckManager extends ImmutableEntityManager[BalanceCheck, BalanceChecks](
-  SlickEntityManager.create[BalanceCheck, BalanceChecks](
-    tag => new BalanceChecks(tag),
-    tableName = tableName
-  )) with BalanceCheck.Manager
+final class SlickBalanceCheckManager
+    extends ImmutableEntityManager[BalanceCheck, BalanceChecks](
+      SlickEntityManager.create[BalanceCheck, BalanceChecks](
+        tag => new BalanceChecks(tag),
+        tableName = tableName
+      ))
+    with BalanceCheck.Manager
 
 object SlickBalanceCheckManager {
   private val tableName: String = "BALANCE_CHECKS"
@@ -30,6 +32,7 @@ object SlickBalanceCheckManager {
     def createdDate = column[LocalDateTime]("createdDate")
     def checkDate = column[LocalDateTime]("checkDate")
 
-    override def * = (issuerId, moneyReservoirCode, balance, createdDate, checkDate, id.?) <> (BalanceCheck.tupled, BalanceCheck.unapply)
+    override def * =
+      (issuerId, moneyReservoirCode, balance, createdDate, checkDate, id.?) <> (BalanceCheck.tupled, BalanceCheck.unapply)
   }
 }

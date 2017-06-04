@@ -23,7 +23,8 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
     defaultValueProxy.setValue("startvalue")
 
     "Starts with same value as defaultValueProxy" - {
-      val tester = new ComponentTester(ReactTestComponent.component(ReactTestComponent.Props(defaultValueProxy)))
+      val tester =
+        new ComponentTester(ReactTestComponent.component(ReactTestComponent.Props(defaultValueProxy)))
 
       tester.valueProxy.valueOrDefault ==> "startvalue"
       tester.showsBoundUntilChange ==> true
@@ -32,14 +33,16 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
     "Starts with non-empty different from defaultValueProxy" - {
       defaultValueProxy.setValue("othervalue")
 
-      val tester = new ComponentTester(ReactTestComponent.component(ReactTestComponent.Props(defaultValueProxy)))
+      val tester =
+        new ComponentTester(ReactTestComponent.component(ReactTestComponent.Props(defaultValueProxy)))
 
       tester.valueProxy.valueOrDefault ==> "startvalue"
       tester.showsBoundUntilChange ==> false
     }
 
     "Updates value if defaultValueProxy changes" - {
-      val tester = new ComponentTester(ReactTestComponent.component(ReactTestComponent.Props(defaultValueProxy)))
+      val tester =
+        new ComponentTester(ReactTestComponent.component(ReactTestComponent.Props(defaultValueProxy)))
 
       defaultValueProxy.setValue("value2")
 
@@ -48,7 +51,8 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
     }
 
     "No longer bound if own value changes" - {
-      val tester = new ComponentTester(ReactTestComponent.component(ReactTestComponent.Props(defaultValueProxy)))
+      val tester =
+        new ComponentTester(ReactTestComponent.component(ReactTestComponent.Props(defaultValueProxy)))
 
       tester.valueProxy.setValue("value2")
 
@@ -57,7 +61,8 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
     }
 
     "Binds again if own value changes to defaultValueProxy" - {
-      val tester = new ComponentTester(ReactTestComponent.component(ReactTestComponent.Props(defaultValueProxy)))
+      val tester =
+        new ComponentTester(ReactTestComponent.component(ReactTestComponent.Props(defaultValueProxy)))
       tester.valueProxy.setValue("value2")
       tester.valueProxy.setValue("startvalue")
 
@@ -67,7 +72,8 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
     }
 
     "Binds again if defaultValueProxy changes to own value" - {
-      val tester = new ComponentTester(ReactTestComponent.component(ReactTestComponent.Props(defaultValueProxy)))
+      val tester =
+        new ComponentTester(ReactTestComponent.component(ReactTestComponent.Props(defaultValueProxy)))
       tester.valueProxy.setValue("value2")
       defaultValueProxy.setValue("value2")
 
@@ -75,9 +81,9 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
       tester.showsBoundUntilChange ==> true
     }
 
-
     "Input name is given ref name" - {
-      val tester = new ComponentTester(ReactTestComponent.component(ReactTestComponent.Props(defaultValueProxy)))
+      val tester =
+        new ComponentTester(ReactTestComponent.component(ReactTestComponent.Props(defaultValueProxy)))
       tester.inputName ==> "testRef"
     }
   }
@@ -92,20 +98,19 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
 
     case class Props(proxy: InputBase.Proxy[String])
 
-    class Backend(val $: BackendScope[Props, _]) {
+    class Backend(val $ : BackendScope[Props, _]) {
       def render(props: Props) = logExceptions {
         stringInputWithDefault(
           ref = testRef,
           defaultValueProxy = props.proxy,
-          nameToDelegateRef = uielements.bootstrap.TextInput.ref) {
-          extraProps =>
-            uielements.bootstrap.TextInput(
-              ref = extraProps.ref,
-              label = "label",
-              defaultValue = "startvalue",
-              showErrorMessage = false,
-              inputClasses = extraProps.inputClasses
-            )
+          nameToDelegateRef = uielements.bootstrap.TextInput.ref) { extraProps =>
+          uielements.bootstrap.TextInput(
+            ref = extraProps.ref,
+            label = "label",
+            defaultValue = "startvalue",
+            showErrorMessage = false,
+            inputClasses = extraProps.inputClasses
+          )
         }
       }
     }
@@ -132,7 +137,8 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
     }
   }
 
-  private final class ComponentTester(unrenderedComponent: ReactComponentU[_, _, ReactTestComponent.Backend, _ <: TopNode]) {
+  private final class ComponentTester(
+      unrenderedComponent: ReactComponentU[_, _, ReactTestComponent.Backend, _ <: TopNode]) {
     private val renderedComponent = ReactTestUtils.renderIntoDocument(unrenderedComponent)
     private val wrappedComponent = new ReactTestWrapper(renderedComponent)
 

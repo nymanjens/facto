@@ -8,8 +8,11 @@ import common.time.JavaTimeImplicits._
   * Represents a continuous (possibly empty) range of dated months in time space.
   */
 case class MonthRange(start: LocalDate, startOfNextMonth: LocalDate) {
-  require(start <= startOfNextMonth, s"The start date ($start) should never be older than the start date of the next " +
-    s"month ($startOfNextMonth). Use equal dates to represent an empty range.")
+  require(
+    start <= startOfNextMonth,
+    s"The start date ($start) should never be older than the start date of the next " +
+      s"month ($startOfNextMonth). Use equal dates to represent an empty range."
+  )
   TimeUtils.requireStartOfMonth(start)
   TimeUtils.requireStartOfMonth(startOfNextMonth)
 
@@ -54,7 +57,8 @@ object MonthRange {
   def atLeast(start: LocalDate): MonthRange = MonthRange(start, lastPossibleStartOfMonth)
   def atLeast(datedMonth: DatedMonth): MonthRange = atLeast(datedMonth.startDate)
 
-  def lessThan(startOfNextMonth: LocalDate): MonthRange = MonthRange(firstStartOfMonthSinceEpoch, startOfNextMonth)
+  def lessThan(startOfNextMonth: LocalDate): MonthRange =
+    MonthRange(firstStartOfMonthSinceEpoch, startOfNextMonth)
   def lessThan(datedMonth: DatedMonth): MonthRange = lessThan(datedMonth.startDate)
 
 }

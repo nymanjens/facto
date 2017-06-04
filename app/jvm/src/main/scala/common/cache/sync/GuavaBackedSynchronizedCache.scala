@@ -9,14 +9,16 @@ import common.cache.CacheRegistry
 import org.apache.http.annotation.GuardedBy
 import java.time.Duration
 
-private[sync] final class GuavaBackedSynchronizedCache[K <: Object, V <: Object](expireAfterAccess: Duration, maximumSize: Long)
-  extends SynchronizedCache[K, V] {
+private[sync] final class GuavaBackedSynchronizedCache[K <: Object, V <: Object](expireAfterAccess: Duration,
+                                                                                 maximumSize: Long)
+    extends SynchronizedCache[K, V] {
   CacheRegistry.registerCache(
     doMaintenance = () => guavaCache.cleanUp(),
     resetForTests = () => guavaCache.invalidateAll())
 
   @GuardedBy("lock (all reads and writes)")
-  private val guavaCache: Cache[K, V] = CacheBuilder.newBuilder()
+  private val guavaCache: Cache[K, V] = CacheBuilder
+    .newBuilder()
     .maximumSize(maximumSize)
     .expireAfterAccess(expireAfterAccess.getNano, NANOSECONDS)
     .build[K, V]()
@@ -42,8 +44,10 @@ private[sync] final class GuavaBackedSynchronizedCache[K <: Object, V <: Object]
   }
 
   override def foreachWithLock(f: V => Unit): Unit = lock synchronized {
-    guavaCache.asMap().forEach(new BiConsumer[K, V]() {
-      override def accept(key: K, value: V) = f(value)
-    })
+    guavaCache
+      .asMap()
+      .forEach(new BiConsumer[K, V]() {
+        override def accept(key: K, value: V) = f(value)
+      })
   }
 }

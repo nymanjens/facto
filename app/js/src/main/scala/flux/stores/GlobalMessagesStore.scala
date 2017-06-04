@@ -21,6 +21,7 @@ final class GlobalMessagesStore(implicit i18n: I18n,
   dispatcher.registerPartial(dispatcherListener)
 
   private var _state: Option[Message] = None
+
   /** Gets incremented whenever _state is updated. */
   private var stateChangedCounter: Long = 0
   private var stateUpdateListeners: Seq[GlobalMessagesStore.Listener] = Seq()
@@ -100,8 +101,7 @@ final class GlobalMessagesStore(implicit i18n: I18n,
 }
 
 object GlobalMessagesStore {
-  case class Message(string: String,
-                     isWorking: Boolean)
+  case class Message(string: String, isWorking: Boolean)
 
   trait Listener {
     def onStateUpdate(): Unit

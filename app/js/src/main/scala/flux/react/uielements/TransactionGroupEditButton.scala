@@ -12,24 +12,21 @@ object TransactionGroupEditButton {
 
   private val component = ReactComponentB[Props](getClass.getSimpleName)
     .renderP((_, props) => {
-      <.a(^^.classes("btn", "btn-default", "btn-xs"),
+      <.a(
+        ^^.classes("btn", "btn-default", "btn-xs"),
         ^.href := props.router.pathFor(Page.EditTransactionGroupPage(props.groupId)).value,
         ^.role := "button",
         <.i(^^.classes("fa", "fa-pencil", "fa-fw")),
         props.i18n("facto.edit")
       )
-    }
-    ).build
+    })
+    .build
 
   // **************** API ****************//
-  def apply(groupId: Long,
-            router: RouterCtl[Page])(
-             implicit i18n: I18n): ReactElement = {
+  def apply(groupId: Long, router: RouterCtl[Page])(implicit i18n: I18n): ReactElement = {
     component(Props(groupId, router))
   }
 
   // **************** Private inner types ****************//
-  private case class Props(groupId: Long,
-                           router: RouterCtl[Page])(
-                            implicit val i18n: I18n)
+  private case class Props(groupId: Long, router: RouterCtl[Page])(implicit val i18n: I18n)
 }

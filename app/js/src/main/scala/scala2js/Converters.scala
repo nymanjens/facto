@@ -20,7 +20,7 @@ import scala.collection.mutable
 object Converters {
 
   // **************** Non-implicits **************** //
-  implicit def entityTypeToConverter[E <: Entity : EntityType]: Scala2Js.MapConverter[E] = {
+  implicit def entityTypeToConverter[E <: Entity: EntityType]: Scala2Js.MapConverter[E] = {
     val entityType: EntityType[E] = implicitly[EntityType[E]]
     val converter: Scala2Js.MapConverter[_ <: Entity] = entityType match {
       case EntityType.UserType => UserConverter
@@ -74,9 +74,7 @@ object Converters {
       val combinedInt = value.asInstanceOf[Int]
       val epochDay = combinedInt / secondsInDay
       val secondOfDay = combinedInt % secondsInDay
-      LocalDateTime.of(
-        LocalDate.ofEpochDay(epochDay),
-        LocalTime.ofSecondOfDay(secondOfDay))
+      LocalDateTime.of(LocalDate.ofEpochDay(epochDay), LocalTime.ofSecondOfDay(secondOfDay))
     }
   }
 
@@ -135,7 +133,8 @@ object Converters {
         "tagsString" -> transaction.tagsString,
         "createdDate" -> Scala2Js.toJs(transaction.createdDate),
         "transactionDate" -> Scala2Js.toJs(transaction.transactionDate),
-        "consumedDate" -> Scala2Js.toJs(transaction.consumedDate))
+        "consumedDate" -> Scala2Js.toJs(transaction.consumedDate)
+      )
     }
     override def toScalaWithoutId(dict: js.Dictionary[js.Any]) = {
       def getRequired[T: Scala2Js.Converter](key: String) = getRequiredValueFromDict[T](dict)(key)
@@ -152,7 +151,8 @@ object Converters {
         tagsString = getRequired[String]("tagsString"),
         createdDate = getRequired[LocalDateTime]("createdDate"),
         transactionDate = getRequired[LocalDateTime]("transactionDate"),
-        consumedDate = getRequired[LocalDateTime]("consumedDate"))
+        consumedDate = getRequired[LocalDateTime]("consumedDate")
+      )
     }
   }
 
@@ -174,7 +174,8 @@ object Converters {
         "moneyReservoirCode" -> balanceCheck.moneyReservoirCode,
         "balanceInCents" -> balanceCheck.balanceInCents.toString,
         "createdDate" -> Scala2Js.toJs(balanceCheck.createdDate),
-        "checkDate" -> Scala2Js.toJs(balanceCheck.checkDate))
+        "checkDate" -> Scala2Js.toJs(balanceCheck.checkDate)
+      )
     }
     override def toScalaWithoutId(dict: js.Dictionary[js.Any]) = {
       def getRequired[T: Scala2Js.Converter](key: String) = getRequiredValueFromDict[T](dict)(key)
@@ -184,7 +185,8 @@ object Converters {
         moneyReservoirCode = getRequired[String]("moneyReservoirCode"),
         balanceInCents = getRequired[String]("balanceInCents").toLong,
         createdDate = getRequired[LocalDateTime]("createdDate"),
-        checkDate = getRequired[LocalDateTime]("checkDate"))
+        checkDate = getRequired[LocalDateTime]("checkDate")
+      )
     }
   }
 
@@ -193,7 +195,8 @@ object Converters {
       js.Dictionary[js.Any](
         "date" -> Scala2Js.toJs(exchangeRateMeasurement.date),
         "foreignCurrencyCode" -> exchangeRateMeasurement.foreignCurrencyCode,
-        "ratioReferenceToForeignCurrency" -> exchangeRateMeasurement.ratioReferenceToForeignCurrency)
+        "ratioReferenceToForeignCurrency" -> exchangeRateMeasurement.ratioReferenceToForeignCurrency
+      )
     }
     override def toScalaWithoutId(dict: js.Dictionary[js.Any]) = {
       def getRequired[T: Scala2Js.Converter](key: String) = getRequiredValueFromDict[T](dict)(key)
@@ -201,7 +204,8 @@ object Converters {
       ExchangeRateMeasurement(
         date = getRequired[LocalDateTime]("date"),
         foreignCurrencyCode = getRequired[String]("foreignCurrencyCode"),
-        ratioReferenceToForeignCurrency = getRequired[Double]("ratioReferenceToForeignCurrency"))
+        ratioReferenceToForeignCurrency = getRequired[Double]("ratioReferenceToForeignCurrency")
+      )
     }
   }
 }

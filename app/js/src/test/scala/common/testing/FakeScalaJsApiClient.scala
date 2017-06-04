@@ -7,7 +7,6 @@ import models.manager.{Entity, EntityModification, EntityType}
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 
-
 final class FakeScalaJsApiClient extends ScalaJsApiClient {
 
   private val modificationsBuffer: ModificationsBuffer = new ModificationsBuffer()
@@ -24,7 +23,8 @@ final class FakeScalaJsApiClient extends ScalaJsApiClient {
           entityType -> modificationsBuffer.getAllEntitiesOfType(entityType)
         }
       }.toMap,
-      nextUpdateToken = modificationsBuffer.nextUpdateToken)
+      nextUpdateToken = modificationsBuffer.nextUpdateToken
+    )
   }
 
   override def getEntityModifications(updateToken: UpdateToken) = Future.successful {
@@ -39,7 +39,7 @@ final class FakeScalaJsApiClient extends ScalaJsApiClient {
   }
 
   // **************** Additional methods for tests ****************//
-  def addEntities[E <: Entity : EntityType](entities: E*): Unit = {
+  def addEntities[E <: Entity: EntityType](entities: E*): Unit = {
     modificationsBuffer.addEntities(entities.toVector)
   }
 

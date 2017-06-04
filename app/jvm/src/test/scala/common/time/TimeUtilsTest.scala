@@ -13,7 +13,19 @@ class TimeUtilsTest extends Specification {
   }
 
   "allMonths" in {
-    TimeUtils.allMonths mustEqual Seq(JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER)
+    TimeUtils.allMonths mustEqual Seq(
+      JANUARY,
+      FEBRUARY,
+      MARCH,
+      APRIL,
+      MAY,
+      JUNE,
+      JULY,
+      AUGUST,
+      SEPTEMBER,
+      OCTOBER,
+      NOVEMBER,
+      DECEMBER)
   }
 
   "parseDateString" in {

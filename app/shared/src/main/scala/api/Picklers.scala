@@ -55,13 +55,13 @@ object Picklers {
     override def unpickle(implicit state: UnpickleState): LocalDateTime = logExceptions {
       LocalDateTime.of(
         LocalDate.of(
-          state.unpickle[Int] /* year */ ,
-          state.unpickle[Int] /* month */ ,
+          state.unpickle[Int] /* year */,
+          state.unpickle[Int] /* month */,
           state.unpickle[Int] /* dayOfMonth */
         ),
         LocalTime.of(
-          state.unpickle[Int] /* hour */ ,
-          state.unpickle[Int] /* minute */ ,
+          state.unpickle[Int] /* hour */,
+          state.unpickle[Int] /* minute */,
           state.unpickle[Int] /* second */
         )
       )
@@ -90,31 +90,32 @@ object Picklers {
     }
   }
 
-  implicit val entityPickler = compositePickler[Entity].
-    addConcreteType[User].
-    addConcreteType[Transaction].
-    addConcreteType[TransactionGroup].
-    addConcreteType[BalanceCheck].
-    addConcreteType[ExchangeRateMeasurement]
+  implicit val entityPickler = compositePickler[Entity]
+    .addConcreteType[User]
+    .addConcreteType[Transaction]
+    .addConcreteType[TransactionGroup]
+    .addConcreteType[BalanceCheck]
+    .addConcreteType[ExchangeRateMeasurement]
 
   implicit object EntityModificationPickler extends Pickler[EntityModification] {
     val addNumber = 1
     val removeNumber = 2
 
-    override def pickle(modification: EntityModification)(implicit state: PickleState): Unit = logExceptions {
-      state.pickle[EntityType.any](modification.entityType)
-      // Pickle number
-      state.pickle(modification match {
-        case _: EntityModification.Add[_] => addNumber
-        case _: EntityModification.Remove[_] => removeNumber
-      })
-      modification match {
-        case EntityModification.Add(entity) =>
-          state.pickle(entity)
-        case EntityModification.Remove(entityId) =>
-          state.pickle(entityId)
+    override def pickle(modification: EntityModification)(implicit state: PickleState): Unit =
+      logExceptions {
+        state.pickle[EntityType.any](modification.entityType)
+        // Pickle number
+        state.pickle(modification match {
+          case _: EntityModification.Add[_] => addNumber
+          case _: EntityModification.Remove[_] => removeNumber
+        })
+        modification match {
+          case EntityModification.Add(entity) =>
+            state.pickle(entity)
+          case EntityModification.Remove(entityId) =>
+            state.pickle(entityId)
+        }
       }
-    }
     override def unpickle(implicit state: UnpickleState): EntityModification = logExceptions {
       val entityType = state.unpickle[EntityType.any]
       state.unpickle[Int] match {

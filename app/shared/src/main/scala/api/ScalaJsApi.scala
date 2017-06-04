@@ -1,7 +1,12 @@
 package api
 
 import api.Picklers._
-import api.ScalaJsApi.{GetAllEntitiesResponse, GetEntityModificationsResponse, GetInitialDataResponse, UpdateToken}
+import api.ScalaJsApi.{
+  GetAllEntitiesResponse,
+  GetEntityModificationsResponse,
+  GetInitialDataResponse,
+  UpdateToken
+}
 import common.time.LocalDateTime
 import models.User
 import models.accounting.config.Config

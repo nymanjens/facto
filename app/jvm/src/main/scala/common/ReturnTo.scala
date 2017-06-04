@@ -19,7 +19,8 @@ trait ReturnTo extends GetParameter {
 
 object ReturnTo {
 
-  def apply(returnUrl: String): ReturnTo = new GetParameter.Impl(key = "returnTo", value = returnUrl) with ReturnTo {
-    override def url = returnUrl
-  }
+  def apply(returnUrl: String): ReturnTo =
+    new GetParameter.Impl(key = "returnTo", value = returnUrl) with ReturnTo {
+      override def url = returnUrl
+    }
 }

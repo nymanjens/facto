@@ -8,7 +8,13 @@ import common.time.JavaTimeImplicits._
 import models._
 import models.accounting.{Tag, Transaction}
 import models.accounting.config.{Account, Category, MoneyReservoir, Config}
-import models.accounting.money.{DatedMoney, Money, MoneyWithGeneralCurrency, ReferenceMoney, ExchangeRateManager}
+import models.accounting.money.{
+  DatedMoney,
+  Money,
+  MoneyWithGeneralCurrency,
+  ReferenceMoney,
+  ExchangeRateManager
+}
 
 abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
   def groupId = transactions(0).transactionGroupId
@@ -25,13 +31,13 @@ abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
   def mostRecentTransaction: Transaction = transactions.sortBy(_.transactionDate).last
   def tags: Seq[Tag] = transactions.flatMap(_.tags).distinct
 
-  def flow(implicit exchangeRateManager: ExchangeRateManager,
-           accountingConfig: Config): Money = {
+  def flow(implicit exchangeRateManager: ExchangeRateManager, accountingConfig: Config): Money = {
     val currencies = transactions.map(_.flow.currency).distinct
     currencies match {
       case Seq(currency) => // All transactions have the same currency
         val dates = transactions.map(_.transactionDate).distinct
-        val flow: MoneyWithGeneralCurrency = transactions.map(_.flow).sum(MoneyWithGeneralCurrency.numeric(currency))
+        val flow: MoneyWithGeneralCurrency =
+          transactions.map(_.flow).sum(MoneyWithGeneralCurrency.numeric(currency))
         if (dates.size == 1) {
           // All transactions have the same date, so this should be a DatedMoney
           flow.withDate(dates(0))
@@ -46,7 +52,8 @@ abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
 }
 
 object GroupedTransactions {
-  def combineConsecutiveOfSameGroup[T <: GroupedTransactions](entries: Seq[T])(combine: (T, T) => T): List[T] = {
+  def combineConsecutiveOfSameGroup[T <: GroupedTransactions](entries: Seq[T])(
+      combine: (T, T) => T): List[T] = {
     // recursion does not lead to growing stack because of Stream
     def combineToStream(nextEntries: List[T]): Stream[T] = nextEntries match {
       case x :: y :: rest if (x.groupId == y.groupId) =>

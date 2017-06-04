@@ -17,21 +17,21 @@ sealed trait EntityModification {
 }
 
 object EntityModification {
-  def createAddWithRandomId[E <: Entity : EntityType](entityWithoutId: E): Add[E] = {
+  def createAddWithRandomId[E <: Entity: EntityType](entityWithoutId: E): Add[E] = {
     require(entityWithoutId.idOption.isEmpty, entityWithoutId)
 
     val entityWithId = entityWithoutId.withId(generateRandomId()).asInstanceOf[E]
     Add(entityWithId)
   }
 
-  def createAddWithId[E <: Entity : EntityType](entityWithoutId: E, id: Long): Add[E] = {
+  def createAddWithId[E <: Entity: EntityType](entityWithoutId: E, id: Long): Add[E] = {
     require(entityWithoutId.idOption.isEmpty, entityWithoutId)
 
     val entityWithId = entityWithoutId.withId(id).asInstanceOf[E]
     Add(entityWithId)
   }
 
-  def createDelete[E <: Entity : EntityType](entityWithId: E): Remove[E] = {
+  def createDelete[E <: Entity: EntityType](entityWithId: E): Remove[E] = {
     require(entityWithId.idOption.isDefined, entityWithId)
 
     Remove[E](entityWithId.id)
@@ -39,7 +39,7 @@ object EntityModification {
 
   def generateRandomId(): Long = abs(Random.nextLong)
 
-  case class Add[E <: Entity : EntityType](entity: E) extends EntityModification {
+  case class Add[E <: Entity: EntityType](entity: E) extends EntityModification {
     require(entity.idOption.isDefined)
     entityType.checkRightType(entity)
 
@@ -47,7 +47,7 @@ object EntityModification {
     override def entityId: Long = entity.id
   }
 
-  case class Remove[E <: Entity : EntityType](override val entityId: Long) extends EntityModification {
+  case class Remove[E <: Entity: EntityType](override val entityId: Long) extends EntityModification {
     override def entityType: EntityType[E] = implicitly[EntityType[E]]
   }
 }

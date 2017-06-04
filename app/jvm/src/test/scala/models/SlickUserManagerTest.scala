@@ -24,7 +24,8 @@ class SlickUserManagerTest extends HookedSpecification {
 
   "test the User model" in new WithApplication {
 
-    val user1 = userManager.add(SlickUserManager.createUser(loginName = "alice", password = "j", name = "Alice"))
+    val user1 =
+      userManager.add(SlickUserManager.createUser(loginName = "alice", password = "j", name = "Alice"))
     userManager.fetchAll() mustEqual Seq(user1)
 
     userManager.authenticate(loginName = "alice", password = "j") mustEqual true

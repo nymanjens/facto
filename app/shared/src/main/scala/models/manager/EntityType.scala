@@ -33,5 +33,6 @@ object EntityType {
   implicit object ExchangeRateMeasurementType extends EntityType[ExchangeRateMeasurement] { override def entityClass = classOf[ExchangeRateMeasurement] }
   // @formatter:on
 
-  val values: Seq[EntityType.any] = Seq(UserType, TransactionType, TransactionGroupType, BalanceCheckType, ExchangeRateMeasurementType)
+  val values: Seq[EntityType.any] =
+    Seq(UserType, TransactionType, TransactionGroupType, BalanceCheckType, ExchangeRateMeasurementType)
 }

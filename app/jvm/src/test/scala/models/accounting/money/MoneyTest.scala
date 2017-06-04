@@ -39,7 +39,8 @@ class MoneyTest extends CacheClearingSpecification {
         def test = {
           val resultTry = Money.tryFloatStringToCents(input)
           if (resultTry.toOption != output) {
-            throw new AssertionError(s"Money.tryFloatStringToCents('$input') = $resultTry, but expected $output")
+            throw new AssertionError(
+              s"Money.tryFloatStringToCents('$input') = $resultTry, but expected $output")
           }
           resultTry.toOption mustEqual output
         }
@@ -65,7 +66,8 @@ class MoneyTest extends CacheClearingSpecification {
         Case(".", None),
         Case(",", None),
         Case(".123", None),
-        Case(",123", None))
+        Case(",123", None)
+      )
 
       for (testCase <- testCases) yield {
         testCase.test
@@ -91,10 +93,12 @@ class MoneyTest extends CacheClearingSpecification {
 
     "withDate" in {
       val date = clock.now
-      ReferenceMoney(-987).withDate(date) mustEqual DatedMoney(cents = -987, currency = Currency.default, date = date)
+      ReferenceMoney(-987).withDate(date) mustEqual DatedMoney(
+        cents = -987,
+        currency = Currency.default,
+        date = date)
     }
   }
-
 
   "MoneyWithGeneralCurrency" should {
     "numeric" in {

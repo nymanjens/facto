@@ -6,9 +6,10 @@ import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
 import play.api.Logger
 
-private[manager] final class DatabaseBackedEntityManager[E <: Entity, T <: EntityTable[E]](cons: Tag => T,
-                                                                                           val tableName: String)
-  extends SlickEntityManager[E, T] {
+private[manager] final class DatabaseBackedEntityManager[E <: Entity, T <: EntityTable[E]](
+    cons: Tag => T,
+    val tableName: String)
+    extends SlickEntityManager[E, T] {
 
   // ********** Implementation of SlickEntityManager interface - Management methods ********** //
   override def createTable(): Unit = {
@@ -26,7 +27,9 @@ private[manager] final class DatabaseBackedEntityManager[E <: Entity, T <: Entit
   override def addWithId(entity: E): E = {
     require(entity.idOption.isDefined, s"This entity has no id ($entity)")
     val existingEntities = dbRun(newQuery.filter(_.id === entity.id).result)
-    require(existingEntities.isEmpty, s"There is already an entity with given id ${entity.id}: $existingEntities")
+    require(
+      existingEntities.isEmpty,
+      s"There is already an entity with given id ${entity.id}: $existingEntities")
 
     mustAffectOneSingleRow {
       dbRun(newQuery.forceInsert(entity))

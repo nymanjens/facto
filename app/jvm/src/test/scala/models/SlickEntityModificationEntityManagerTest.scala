@@ -25,10 +25,8 @@ class SlickEntityModificationEntityManagerTest extends HookedSpecification {
 
   "test the EntityModificationEntity model" in new WithApplication {
     userManager.addWithId(testUser)
-    val modificationEntity = modificationEntityManager.add(EntityModificationEntity(
-      userId = testUser.id,
-      modification = testModification,
-      date = testDate))
+    val modificationEntity = modificationEntityManager.add(
+      EntityModificationEntity(userId = testUser.id, modification = testModification, date = testDate))
 
     modificationEntity.user mustEqual testUser
     modificationEntityManager.fetchAll() mustEqual Seq(modificationEntity)

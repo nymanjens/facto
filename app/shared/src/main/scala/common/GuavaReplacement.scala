@@ -21,7 +21,7 @@ object GuavaReplacement {
 
   object Preconditions {
     def checkNotNull[T](value: T): T = {
-      if(value == null) {
+      if (value == null) {
         throw new NullPointerException()
       }
       value

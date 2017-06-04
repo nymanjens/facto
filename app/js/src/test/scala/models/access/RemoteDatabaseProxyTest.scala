@@ -124,7 +124,7 @@ object RemoteDatabaseProxyTest extends TestSuite {
     private val singletonMap: mutable.Map[SingletonKey[_], js.Any] = mutable.Map()
 
     // **************** Getters ****************//
-    override def newQuery[E <: Entity : EntityType]() = {
+    override def newQuery[E <: Entity: EntityType]() = {
       new Loki.ResultSet.Fake(modificationsBuffer.getAllEntitiesOfType[E])
     }
     override def getSingletonValue[V](key: SingletonKey[V]) = {
@@ -138,7 +138,7 @@ object RemoteDatabaseProxyTest extends TestSuite {
     override def applyModifications(modifications: Seq[EntityModification]) = {
       modificationsBuffer.addModifications(modifications)
     }
-    override def addAll[E <: Entity : EntityType](entities: Seq[E]) = {
+    override def addAll[E <: Entity: EntityType](entities: Seq[E]) = {
       modificationsBuffer.addEntities(entities)
     }
     override def setSingletonValue[V](key: SingletonKey[V], value: V) = {

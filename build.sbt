@@ -68,8 +68,8 @@ lazy val server = (project in file("app/jvm"))
   .dependsOn(sharedJVM)
 
 // Command for building a release
-lazy val ReleaseCmd = Command.command("release") {
-  state => "set elideOptions in client := Seq(\"-Xelide-below\", \"WARNING\")" ::
+lazy val ReleaseCmd = Command.command("release") { state =>
+  "set elideOptions in client := Seq(\"-Xelide-below\", \"WARNING\")" ::
     "client/clean" ::
     "client/test" ::
     "server/clean" ::

@@ -31,7 +31,6 @@ object LocalDatabaseTest extends ManualTestSuite {
         db.isEmpty() ==> false
       }
     },
-
     ManualTest("setSingletonValue") {
       async {
         val db = await(LocalDatabase.createInMemoryForTests())
@@ -44,7 +43,6 @@ object LocalDatabaseTest extends ManualTestSuite {
         db.getSingletonValue(NextUpdateTokenKey).get ==> testDate
       }
     },
-
     ManualTest("save") {
       async {
         val db = await(LocalDatabase.createStoredForTests())
@@ -60,7 +58,6 @@ object LocalDatabaseTest extends ManualTestSuite {
         otherDb.getSingletonValue(VersionKey).get ==> "testVersion"
       }
     },
-
     ManualTest("newQuery(): Lookup by ID works") {
       async {
         val db = await(LocalDatabase.createInMemoryForTests())
@@ -71,7 +68,6 @@ object LocalDatabaseTest extends ManualTestSuite {
         db.newQuery[Transaction]().findOne("id" -> "99992") ==> Some(transaction2)
       }
     },
-
     ManualTest("clear") {
       async {
         val db = await(LocalDatabase.createInMemoryForTests())
@@ -83,7 +79,6 @@ object LocalDatabaseTest extends ManualTestSuite {
         db.isEmpty() ==> true
       }
     },
-
     ManualTest("addAll") {
       async {
         val db = await(LocalDatabase.createInMemoryForTests())
@@ -100,7 +95,6 @@ object LocalDatabaseTest extends ManualTestSuite {
         db.newQuery[ExchangeRateMeasurement]().data() ==> Seq(testExchangeRateMeasurementWithId)
       }
     },
-
     ManualTest("addAll: Inserts no duplicates IDs") {
       async {
         val db = await(LocalDatabase.createInMemoryForTests())
@@ -112,22 +106,21 @@ object LocalDatabaseTest extends ManualTestSuite {
         db.newQuery[Transaction]().data() ==> Seq(testTransactionWithId)
       }
     },
-
     ManualTest("applyModifications") {
       async {
         val db = await(LocalDatabase.createInMemoryForTests())
         val transaction2 = testTransactionWithId.copy(idOption = Some(99992))
         db.addAll(Seq(testTransactionWithId))
 
-        db.applyModifications(Seq(
-          EntityModification.Add(transaction2),
-          EntityModification.createDelete(testTransactionWithId)
-        ))
+        db.applyModifications(
+          Seq(
+            EntityModification.Add(transaction2),
+            EntityModification.createDelete(testTransactionWithId)
+          ))
 
         db.newQuery[Transaction]().data() ==> Seq(transaction2)
       }
     },
-
     ManualTest("applyModifications: Is idempotent") {
       async {
         val db = await(LocalDatabase.createInMemoryForTests())
@@ -135,15 +128,16 @@ object LocalDatabaseTest extends ManualTestSuite {
         val transaction2 = testTransactionWithId.copy(idOption = Some(99992))
         val transaction3 = testTransactionWithId.copy(idOption = Some(99993))
 
-        db.applyModifications(Seq(
-          EntityModification.Add(testTransactionWithId),
-          EntityModification.Add(testTransactionWithId),
-          EntityModification.Add(transactionWithSameId),
-          EntityModification.Add(transaction2),
-          EntityModification.createDelete(transaction2),
-          EntityModification.createDelete(transaction2),
-          EntityModification.createDelete(transaction3)
-        ))
+        db.applyModifications(
+          Seq(
+            EntityModification.Add(testTransactionWithId),
+            EntityModification.Add(testTransactionWithId),
+            EntityModification.Add(transactionWithSameId),
+            EntityModification.Add(transaction2),
+            EntityModification.createDelete(transaction2),
+            EntityModification.createDelete(transaction2),
+            EntityModification.createDelete(transaction3)
+          ))
 
         db.newQuery[Transaction]().data() ==> Seq(testTransactionWithId)
       }

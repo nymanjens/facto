@@ -1,4 +1,3 @@
-
 package controllers.accounting
 
 import scala.collection.JavaConverters._
@@ -28,77 +27,70 @@ final class Views @Inject()(implicit val messagesApi: MessagesApi,
                             exchangeRateManager: ExchangeRateManager,
                             entityAccess: EntityAccess,
                             i18n: I18n,
-                            env: play.api.Environment) extends Controller with I18nSupport {
+                            env: play.api.Environment)
+    extends Controller
+    with I18nSupport {
 
   // ********** actions - views ********** //
-  def everythingLatest = AuthenticatedAction { implicit user =>
-    implicit request =>
-      everything(numEntriesToShow = 400)
+  def everythingLatest = AuthenticatedAction { implicit user => implicit request =>
+    everything(numEntriesToShow = 400)
   }
 
-  def everythingAll = AuthenticatedAction { implicit user =>
-    implicit request =>
-      everything()
+  def everythingAll = AuthenticatedAction { implicit user => implicit request =>
+    everything()
   }
 
-  def cashFlowOfAll = AuthenticatedAction { implicit user =>
-    implicit request =>
-      cashFlow(
-        reservoirs = accountingConfig.visibleReservoirs,
-        numEntriesShownByDefaultToShow = 10,
-        expandedNumEntriesToShow = 30)
+  def cashFlowOfAll = AuthenticatedAction { implicit user => implicit request =>
+    cashFlow(
+      reservoirs = accountingConfig.visibleReservoirs,
+      numEntriesShownByDefaultToShow = 10,
+      expandedNumEntriesToShow = 30)
   }
 
-  def cashFlowOfSingle(reservoirCode: String) = AuthenticatedAction { implicit user =>
-    implicit request =>
-      cashFlow(
-        reservoirs = Seq(accountingConfig.moneyReservoir(reservoirCode)))
+  def cashFlowOfSingle(reservoirCode: String) = AuthenticatedAction { implicit user => implicit request =>
+    cashFlow(reservoirs = Seq(accountingConfig.moneyReservoir(reservoirCode)))
   }
 
-  def cashFlowOfHidden = AuthenticatedAction { implicit user =>
-    implicit request =>
-      cashFlow(
-        reservoirs = accountingConfig.moneyReservoirs(includeHidden = true).filter(_.hidden),
-        numEntriesShownByDefaultToShow = 10,
-        expandedNumEntriesToShow = 30)
+  def cashFlowOfHidden = AuthenticatedAction { implicit user => implicit request =>
+    cashFlow(
+      reservoirs = accountingConfig.moneyReservoirs(includeHidden = true).filter(_.hidden),
+      numEntriesShownByDefaultToShow = 10,
+      expandedNumEntriesToShow = 30)
   }
 
-  def liquidationOfAll = AuthenticatedAction { implicit user =>
-    implicit request =>
-      val allCombinations: Seq[AccountPair] =
-        for {
-          (acc1, i1) <- accountingConfig.personallySortedAccounts.zipWithIndex
-          (acc2, i2) <- accountingConfig.personallySortedAccounts.zipWithIndex
-          if i1 < i2
-        } yield AccountPair(acc1, acc2)
+  def liquidationOfAll = AuthenticatedAction { implicit user => implicit request =>
+    val allCombinations: Seq[AccountPair] =
+      for {
+        (acc1, i1) <- accountingConfig.personallySortedAccounts.zipWithIndex
+        (acc2, i2) <- accountingConfig.personallySortedAccounts.zipWithIndex
+        if i1 < i2
+      } yield AccountPair(acc1, acc2)
+    liquidation(
+      accountPairs = allCombinations,
+      numEntriesShownByDefaultToShow = 10,
+      expandedNumEntriesToShow = 30)
+  }
+
+  def liquidationOfSingle(accountCode1: String, accountCode2: String) = AuthenticatedAction {
+    implicit user => implicit request =>
       liquidation(
-        accountPairs = allCombinations,
-        numEntriesShownByDefaultToShow = 10,
-        expandedNumEntriesToShow = 30)
+        accountPairs =
+          Seq(AccountPair(accountingConfig.accounts(accountCode1), accountingConfig.accounts(accountCode2))))
   }
 
-  def liquidationOfSingle(accountCode1: String, accountCode2: String) = AuthenticatedAction { implicit user =>
-    implicit request =>
-      liquidation(
-        accountPairs = Seq(AccountPair(accountingConfig.accounts(accountCode1), accountingConfig.accounts(accountCode2))))
+  def endowmentsOfAll = AuthenticatedAction { implicit user => implicit request =>
+    endowments(
+      accounts = accountingConfig.personallySortedAccounts,
+      numEntriesShownByDefaultToShow = 30,
+      expandedNumEntriesToShow = 100)
   }
 
-  def endowmentsOfAll = AuthenticatedAction { implicit user =>
-    implicit request =>
-      endowments(
-        accounts = accountingConfig.personallySortedAccounts,
-        numEntriesShownByDefaultToShow = 30,
-        expandedNumEntriesToShow = 100)
+  def endowmentsOfSingle(accountCode: String) = AuthenticatedAction { implicit user => implicit request =>
+    endowments(accounts = Seq(accountingConfig.accounts(accountCode)))
   }
 
-  def endowmentsOfSingle(accountCode: String) = AuthenticatedAction { implicit user =>
-    implicit request =>
-      endowments(
-        accounts = Seq(accountingConfig.accounts(accountCode)))
-  }
-
-  def summaryForCurrentYear(tags: String = "", toggleTag: String = "") = AuthenticatedAction { implicit user =>
-    implicit request =>
+  def summaryForCurrentYear(tags: String = "", toggleTag: String = "") = AuthenticatedAction {
+    implicit user => implicit request =>
       summary(
         accounts = accountingConfig.personallySortedAccounts,
         expandedYear = clock.now.getYear,
@@ -106,8 +98,8 @@ final class Views @Inject()(implicit val messagesApi: MessagesApi,
         toggleTag = toggleTag)
   }
 
-  def summaryFor(expandedYear: Int, tags: String, toggleTag: String) = AuthenticatedAction { implicit user =>
-    implicit request =>
+  def summaryFor(expandedYear: Int, tags: String, toggleTag: String) = AuthenticatedAction {
+    implicit user => implicit request =>
       summary(
         accounts = accountingConfig.personallySortedAccounts,
         expandedYear,
@@ -116,21 +108,23 @@ final class Views @Inject()(implicit val messagesApi: MessagesApi,
   }
 
   // ********** private helper controllers ********** //
-  private def everything(numEntriesToShow: Int = 100000)(implicit request: Request[AnyContent], user: User): Result = {
+  private def everything(numEntriesToShow: Int = 100000)(implicit request: Request[AnyContent],
+                                                         user: User): Result = {
     // get entries
     val entries = generalEntries.fetchLastNEntries(numEntriesToShow + 1)
 
     // render
-    Ok(views.html.accounting.everything(
-      entries = entries,
-      numEntriesToShow = numEntriesToShow,
-      templatesInNavbar = accountingConfig.templatesToShowFor(Template.Placement.EverythingView, user)))
+    Ok(
+      views.html.accounting.everything(
+        entries = entries,
+        numEntriesToShow = numEntriesToShow,
+        templatesInNavbar = accountingConfig.templatesToShowFor(Template.Placement.EverythingView, user)))
   }
 
-  private def cashFlow(reservoirs: Iterable[MoneyReservoir],
-                       numEntriesShownByDefaultToShow: Int = 100000,
-                       expandedNumEntriesToShow: Int = 100000)
-                      (implicit request: Request[AnyContent], user: User): Result = {
+  private def cashFlow(
+      reservoirs: Iterable[MoneyReservoir],
+      numEntriesShownByDefaultToShow: Int = 100000,
+      expandedNumEntriesToShow: Int = 100000)(implicit request: Request[AnyContent], user: User): Result = {
     // get reservoirToEntries
     val reservoirToEntries = toListMap {
       for (res <- reservoirs) yield {
@@ -145,51 +139,59 @@ final class Views @Inject()(implicit val messagesApi: MessagesApi,
         yield (acc, accountToReservoirs(acc)))
 
     // render
-    Ok(views.html.accounting.cashflow(
-      accountToReservoirs = sortedAccountToReservoirs,
-      reservoirToEntries = reservoirToEntries,
-      numEntriesShownByDefault = numEntriesShownByDefaultToShow,
-      expandedNumEntries = expandedNumEntriesToShow,
-      templatesInNavbar = accountingConfig.templatesToShowFor(Template.Placement.CashFlowView, user)))
+    Ok(
+      views.html.accounting.cashflow(
+        accountToReservoirs = sortedAccountToReservoirs,
+        reservoirToEntries = reservoirToEntries,
+        numEntriesShownByDefault = numEntriesShownByDefaultToShow,
+        expandedNumEntries = expandedNumEntriesToShow,
+        templatesInNavbar = accountingConfig.templatesToShowFor(Template.Placement.CashFlowView, user)
+      ))
   }
 
-
-  private def liquidation(accountPairs: Seq[AccountPair],
-                          numEntriesShownByDefaultToShow: Int = 100000,
-                          expandedNumEntriesToShow: Int = 100000)
-                         (implicit request: Request[AnyContent], user: User): Result = {
+  private def liquidation(
+      accountPairs: Seq[AccountPair],
+      numEntriesShownByDefaultToShow: Int = 100000,
+      expandedNumEntriesToShow: Int = 100000)(implicit request: Request[AnyContent], user: User): Result = {
     // get pairsToEntries
     val pairsToEntries = toListMap(
       for (accountPair <- accountPairs)
-        yield (accountPair, liquidationEntries.fetchLastNEntries(accountPair, n = expandedNumEntriesToShow + 1)))
+        yield
+          (accountPair, liquidationEntries.fetchLastNEntries(accountPair, n = expandedNumEntriesToShow + 1)))
 
     // render
-    Ok(views.html.accounting.liquidation(
-      pairsToEntries = pairsToEntries,
-      numEntriesShownByDefault = numEntriesShownByDefaultToShow,
-      expandedNumEntries = expandedNumEntriesToShow,
-      templatesInNavbar = accountingConfig.templatesToShowFor(Template.Placement.LiquidationView, user)))
+    Ok(
+      views.html.accounting.liquidation(
+        pairsToEntries = pairsToEntries,
+        numEntriesShownByDefault = numEntriesShownByDefaultToShow,
+        expandedNumEntries = expandedNumEntriesToShow,
+        templatesInNavbar = accountingConfig.templatesToShowFor(Template.Placement.LiquidationView, user)
+      ))
   }
 
-  private def endowments(accounts: Iterable[Account],
-                         numEntriesShownByDefaultToShow: Int = 100000,
-                         expandedNumEntriesToShow: Int = 100000)
-                        (implicit request: Request[AnyContent], user: User): Result = {
+  private def endowments(
+      accounts: Iterable[Account],
+      numEntriesShownByDefaultToShow: Int = 100000,
+      expandedNumEntriesToShow: Int = 100000)(implicit request: Request[AnyContent], user: User): Result = {
     // get accountToEntries
     val accountToEntries = toListMap {
-      for (account <- accounts) yield account -> generalEntries.fetchLastNEndowments(account, n = expandedNumEntriesToShow + 1)
+      for (account <- accounts)
+        yield account -> generalEntries.fetchLastNEndowments(account, n = expandedNumEntriesToShow + 1)
     }
 
     // render
-    Ok(views.html.accounting.endowments(
-      accountToEntries = accountToEntries,
-      numEntriesShownByDefault = numEntriesShownByDefaultToShow,
-      expandedNumEntries = expandedNumEntriesToShow,
-      templatesInNavbar = accountingConfig.templatesToShowFor(Template.Placement.EndowmentsView, user)))
+    Ok(
+      views.html.accounting.endowments(
+        accountToEntries = accountToEntries,
+        numEntriesShownByDefault = numEntriesShownByDefaultToShow,
+        expandedNumEntries = expandedNumEntriesToShow,
+        templatesInNavbar = accountingConfig.templatesToShowFor(Template.Placement.EndowmentsView, user)
+      ))
   }
 
-  private def summary(accounts: Iterable[Account], expandedYear: Int, tagsString: String, toggleTag: String)
-                     (implicit request: Request[AnyContent], user: User): Result = {
+  private def summary(accounts: Iterable[Account], expandedYear: Int, tagsString: String, toggleTag: String)(
+      implicit request: Request[AnyContent],
+      user: User): Result = {
     val tags = Tag.parseTagsString(tagsString)
 
     if (toggleTag != "") {
@@ -214,12 +216,14 @@ final class Views @Inject()(implicit val messagesApi: MessagesApi,
       }
 
       // render
-      Ok(views.html.accounting.summary(
-        accountToSummary,
-        expandedYear,
-        templatesInNavbar = accountingConfig.templatesToShowFor(Template.Placement.SummaryView, user),
-        tags = tags,
-        tagsString = tagsString))
+      Ok(
+        views.html.accounting.summary(
+          accountToSummary,
+          expandedYear,
+          templatesInNavbar = accountingConfig.templatesToShowFor(Template.Placement.SummaryView, user),
+          tags = tags,
+          tagsString = tagsString
+        ))
     }
   }
 }

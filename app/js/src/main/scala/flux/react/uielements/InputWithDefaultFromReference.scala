@@ -7,40 +7,43 @@ import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.reflect.ClassTag
 
-class InputWithDefaultFromReference[Value] private() {
+class InputWithDefaultFromReference[Value] private () {
 
   private val component = ReactComponentB[Props.any]("InputWithDefaultFromReferenceWrapper")
     .renderBackend[Backend]
     .build
 
   // **************** API ****************//
-  def forOption[DelegateRef <: InputBase.Reference[Value]](ref: Reference,
-                                                           defaultValueProxy: Option[() => InputBase.Proxy[Value]],
-                                                           startWithDefault: Boolean = false,
-                                                           directUserChangeOnly: Boolean = false,
-                                                           nameToDelegateRef: String => DelegateRef
-                                                          )(inputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement): ReactElement = {
-    component.withRef(ref.name)(Props(
-      inputElementRef = nameToDelegateRef(ref.name),
-      defaultValueProxy = defaultValueProxy,
-      startWithDefault = startWithDefault,
-      inputElementFactory = inputElementFactory,
-      directUserChangeOnly = directUserChangeOnly))
+  def forOption[DelegateRef <: InputBase.Reference[Value]](
+      ref: Reference,
+      defaultValueProxy: Option[() => InputBase.Proxy[Value]],
+      startWithDefault: Boolean = false,
+      directUserChangeOnly: Boolean = false,
+      nameToDelegateRef: String => DelegateRef)(
+      inputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement): ReactElement = {
+    component.withRef(ref.name)(
+      Props(
+        inputElementRef = nameToDelegateRef(ref.name),
+        defaultValueProxy = defaultValueProxy,
+        startWithDefault = startWithDefault,
+        inputElementFactory = inputElementFactory,
+        directUserChangeOnly = directUserChangeOnly
+      ))
   }
 
   def apply[DelegateRef <: InputBase.Reference[Value]](ref: Reference,
                                                        defaultValueProxy: => InputBase.Proxy[Value],
                                                        startWithDefault: Boolean = false,
                                                        directUserChangeOnly: Boolean = false,
-                                                       nameToDelegateRef: String => DelegateRef
-                                                      )(inputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement): ReactElement = {
+                                                       nameToDelegateRef: String => DelegateRef)(
+      inputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement): ReactElement = {
     forOption(
       ref = ref,
       defaultValueProxy = Some(() => defaultValueProxy),
       startWithDefault = startWithDefault,
       nameToDelegateRef = nameToDelegateRef,
-      directUserChangeOnly = directUserChangeOnly)(
-      inputElementFactory)
+      directUserChangeOnly = directUserChangeOnly
+    )(inputElementFactory)
   }
 
   def ref(name: String): Reference = new Reference(Ref.to(component, name))
@@ -49,8 +52,9 @@ class InputWithDefaultFromReference[Value] private() {
   case class InputElementExtraProps[DelegateRef <: InputBase.Reference[Value]](ref: DelegateRef,
                                                                                inputClasses: Seq[String])
 
-  final class Reference private[InputWithDefaultFromReference](refComp: ThisRefComp) extends InputBase.Reference[Value] {
-    override def apply($: BackendScope[_, _]) = {
+  final class Reference private[InputWithDefaultFromReference] (refComp: ThisRefComp)
+      extends InputBase.Reference[Value] {
+    override def apply($ : BackendScope[_, _]) = {
       InputBase.Proxy.forwardingTo {
         val component = refComp($).get
         val wrapperComponentScope = component.backend.$
@@ -70,16 +74,17 @@ class InputWithDefaultFromReference[Value] private() {
   private type ThisRefComp = RefComp[Props.any, State, Backend, _ <: TopNode]
   private type State = Unit
 
-  private case class Props[DelegateRef <: InputBase.Reference[Value]](inputElementRef: DelegateRef,
-                                                                      defaultValueProxy: Option[() => InputBase.Proxy[Value]],
-                                                                      startWithDefault: Boolean,
-                                                                      inputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement,
-                                                                      directUserChangeOnly: Boolean)
+  private case class Props[DelegateRef <: InputBase.Reference[Value]](
+      inputElementRef: DelegateRef,
+      defaultValueProxy: Option[() => InputBase.Proxy[Value]],
+      startWithDefault: Boolean,
+      inputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement,
+      directUserChangeOnly: Boolean)
   private object Props {
     type any = Props[_ <: InputBase.Reference[Value]]
   }
 
-  private final class Backend(val $: BackendScope[Props.any, State]) {
+  private final class Backend(val $ : BackendScope[Props.any, State]) {
     def render(props: Props.any, state: State) = logExceptions {
       props.defaultValueProxy match {
         case Some(_) => Impl.component.withRef(Impl.ref)(props)
@@ -100,7 +105,7 @@ class InputWithDefaultFromReference[Value] private() {
 
     type State = ConnectionState
 
-    final class Backend(val $: BackendScope[Props.any, State]) {
+    final class Backend(val $ : BackendScope[Props.any, State]) {
       private var currentInputValue: Value = null.asInstanceOf[Value]
       private var currentDefaultValue: Value = null.asInstanceOf[Value]
 
@@ -147,7 +152,9 @@ class InputWithDefaultFromReference[Value] private() {
           currentDefaultValue = newDefaultValue
 
           val inputProxy = $.props.runNow().inputElementRef($)
-          if ($.state.runNow().isConnected && (directUserChange || !$.props.runNow().directUserChangeOnly)) {
+          if ($.state
+                .runNow()
+                .isConnected && (directUserChange || ! $.props.runNow().directUserChangeOnly)) {
             currentInputValue = inputProxy.setValue(newDefaultValue)
           }
           $.setState(ConnectionState(isConnected = newDefaultValue == currentInputValue)).runNow()
@@ -171,7 +178,7 @@ class InputWithDefaultFromReference[Value] private() {
 
     type State = Unit
 
-    final class Backend(val $: BackendScope[Props.any, State]) {
+    final class Backend(val $ : BackendScope[Props.any, State]) {
       def render(props: Props.any, state: State) = logExceptions {
         def renderInternal[DelegateRef <: InputBase.Reference[Value]](props: Props[DelegateRef]) = {
           props.inputElementFactory(InputElementExtraProps(props.inputElementRef, inputClasses = Seq()))

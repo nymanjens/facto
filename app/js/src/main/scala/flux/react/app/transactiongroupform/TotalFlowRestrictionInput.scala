@@ -13,26 +13,28 @@ private[transactiongroupform] final class TotalFlowRestrictionInput(implicit i18
 
   private val component = ReactComponentB[Props](getClass.getSimpleName)
     .initialState_P[State](props => props.defaultValue)
-    .renderPS(($, props, state) => logExceptions {
-      def button(totalFlowRestriction: TotalFlowRestriction, label: String) = {
-        <.label(
-          ^^.classes(Seq("btn", "btn-default", "btn-sm")
-            ++ (if (state == totalFlowRestriction) Seq("active") else Seq())),
-          ^.onClick --> LogExceptionsCallback {
-            $.setState(totalFlowRestriction).runNow()
-            props.onChangeListener(totalFlowRestriction)
-          },
-          label
+    .renderPS(($, props, state) =>
+      logExceptions {
+        def button(totalFlowRestriction: TotalFlowRestriction, label: String) = {
+          <.label(
+            ^^.classes(Seq("btn", "btn-default", "btn-sm")
+              ++ (if (state == totalFlowRestriction) Seq("active") else Seq())),
+            ^.onClick --> LogExceptionsCallback {
+              $.setState(totalFlowRestriction).runNow()
+              props.onChangeListener(totalFlowRestriction)
+            },
+            label
+          )
+        }
+        <.div(
+          ^.className := "btn-group",
+          ReactAttr("data-toggle") := "buttons",
+          button(TotalFlowRestriction.AnyTotal, i18n("facto.any-total")),
+          button(TotalFlowRestriction.ChooseTotal, i18n("facto.choose-total")),
+          button(TotalFlowRestriction.ZeroSum, i18n("facto.zero-sum"))
         )
-      }
-      <.div(
-        ^.className := "btn-group",
-        ReactAttr("data-toggle") := "buttons",
-        button(TotalFlowRestriction.AnyTotal, i18n("facto.any-total")),
-        button(TotalFlowRestriction.ChooseTotal, i18n("facto.choose-total")),
-        button(TotalFlowRestriction.ZeroSum, i18n("facto.zero-sum"))
-      )
-    }).build
+    })
+    .build
 
   // **************** API ****************//
   def apply(defaultValue: TotalFlowRestriction, onChange: TotalFlowRestriction => Unit): ReactElement = {

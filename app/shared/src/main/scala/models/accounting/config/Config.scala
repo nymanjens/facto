@@ -25,7 +25,8 @@ case class Config(accounts: ListMap[String, Account],
     case _ => moneyReservoirsMap.get(code)
   }
 
-  def moneyReservoirs(includeNullReservoir: Boolean = false, includeHidden: Boolean = false): Seq[MoneyReservoir] = {
+  def moneyReservoirs(includeNullReservoir: Boolean = false,
+                      includeHidden: Boolean = false): Seq[MoneyReservoir] = {
     var result = moneyReservoirsMap.values.toVector
     if (!includeHidden) {
       result = result.filter(!_.hidden)
@@ -42,8 +43,9 @@ case class Config(accounts: ListMap[String, Account],
   def visibleReservoirs(includeNullReservoir: Boolean = false): Seq[MoneyReservoir] =
     moneyReservoirs(includeNullReservoir = includeNullReservoir)
 
-  def templatesToShowFor(location: Template.Placement, user: User)(implicit accountingConfig: Config,
-                                                                   entityAccess: EntityAccess): Seq[Template] =
+  def templatesToShowFor(location: Template.Placement, user: User)(
+      implicit accountingConfig: Config,
+      entityAccess: EntityAccess): Seq[Template] =
     templates filter (_.showFor(location, user))
 
   def templateWithCode(code: String): Template = {
@@ -56,8 +58,7 @@ case class Config(accounts: ListMap[String, Account],
   def accountOf(user: User)(implicit entityAccess: EntityAccess): Option[Account] =
     accounts.values.filter(_.user == Some(user)).headOption
 
-  def personallySortedAccounts(implicit user: User,
-                               entityAccess: EntityAccess): Seq[Account] = {
+  def personallySortedAccounts(implicit user: User, entityAccess: EntityAccess): Seq[Account] = {
     val myAccount = accountOf(user)
     val otherAccounts = for {
       acc <- accounts.values

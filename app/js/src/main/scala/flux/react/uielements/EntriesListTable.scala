@@ -9,14 +9,13 @@ import japgolly.scalajs.react._
 
 import scala.collection.immutable.Seq
 
-private final class EntriesListTable[Entry, Props](tableTitle: String,
-                                                   tableClasses: Seq[String],
-                                                   numEntriesStrategy: NumEntriesStrategy,
-                                                   tableHeaders: Seq[ReactElement],
-                                                   calculateTableData: Entry => Seq[ReactElement],
-                                                   props: Props)(
-                                                    implicit entriesStoreFactory: EntriesListStoreFactory[Entry, Props],
-                                                    i18n: I18n) {
+private final class EntriesListTable[Entry, Props](
+    tableTitle: String,
+    tableClasses: Seq[String],
+    numEntriesStrategy: NumEntriesStrategy,
+    tableHeaders: Seq[ReactElement],
+    calculateTableData: Entry => Seq[ReactElement],
+    props: Props)(implicit entriesStoreFactory: EntriesListStoreFactory[Entry, Props], i18n: I18n) {
 
   private val component = ReactComponentB[Props](getClass.getSimpleName)
     .initialState(State(EntriesListStoreFactory.State.empty, maxNumEntries = numEntriesStrategy.start))
@@ -36,11 +35,12 @@ private final class EntriesListTable[Entry, Props](tableTitle: String,
       copy(entries = store.state)
   }
 
-  private class Backend($: BackendScope[Props, State]) extends EntriesStore.Listener {
+  private class Backend($ : BackendScope[Props, State]) extends EntriesStore.Listener {
     private var entriesStore: entriesStoreFactory.Store = null
 
     def willMount(state: State): Callback = LogExceptionsCallback {
-      entriesStore = entriesStoreFactory.get(entriesStoreFactory.Input(maxNumEntries = state.maxNumEntries, props))
+      entriesStore =
+        entriesStoreFactory.get(entriesStoreFactory.Input(maxNumEntries = state.maxNumEntries, props))
       entriesStore.register(this)
       $.modState(state => logExceptions(state.withEntriesFrom(entriesStore))).runNow()
     }
@@ -58,8 +58,7 @@ private final class EntriesListTable[Entry, Props](tableTitle: String,
       uielements.Table(
         title = tableTitle,
         tableClasses = tableClasses,
-        expandNumEntriesCallback =
-          if (state.entries.hasMore) Some(expandMaxNumEntries(state)) else None,
+        expandNumEntriesCallback = if (state.entries.hasMore) Some(expandMaxNumEntries(state)) else None,
         tableHeaders = tableHeaders,
         tableDatas = state.entries.entries.reverse.map(calculateTableData)
       )
@@ -68,9 +67,11 @@ private final class EntriesListTable[Entry, Props](tableTitle: String,
     private def expandMaxNumEntries(state: State): Callback = LogExceptionsCallback {
       def updateMaxNumEntries(maxNumEntries: Int) = {
         entriesStore.deregister(this)
-        entriesStore = entriesStoreFactory.get(entriesStoreFactory.Input(maxNumEntries = maxNumEntries, props))
+        entriesStore =
+          entriesStoreFactory.get(entriesStoreFactory.Input(maxNumEntries = maxNumEntries, props))
         entriesStore.register(this)
-        $.modState(state => logExceptions(state.withEntriesFrom(entriesStore).copy(maxNumEntries = maxNumEntries))).runNow()
+        $.modState(state =>
+          logExceptions(state.withEntriesFrom(entriesStore).copy(maxNumEntries = maxNumEntries))).runNow()
       }
 
       val nextMaxNumEntries = {
@@ -92,8 +93,8 @@ object EntriesListTable {
                           tableHeaders: Seq[ReactElement],
                           calculateTableData: Entry => Seq[ReactElement],
                           props: Props = (): Unit)(
-                           implicit entriesStoreFactory: EntriesListStoreFactory[Entry, Props],
-                           i18n: I18n): ReactElement = {
+      implicit entriesStoreFactory: EntriesListStoreFactory[Entry, Props],
+      i18n: I18n): ReactElement = {
     new EntriesListTable(
       tableTitle,
       tableClasses,

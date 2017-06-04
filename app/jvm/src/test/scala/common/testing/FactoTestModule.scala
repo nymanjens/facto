@@ -25,9 +25,10 @@ final class FactoTestModule extends AbstractModule {
 
   @Provides()
   private[testing] def playConfiguration(): play.api.Configuration = {
-    play.api.Configuration.from(Map(
-      "facto.accounting.configYamlFilePath" -> "/test-accounting-config.yml"
-    ))
+    play.api.Configuration.from(
+      Map(
+        "facto.accounting.configYamlFilePath" -> "/test-accounting-config.yml"
+      ))
   }
 
   private def bindSingleton[T](interface: Class[T], implementation: Class[_ <: T]): Unit = {

@@ -11,12 +11,15 @@ final class ReactTestWrapper(private val componentM: ComponentM) {
 
   /** Will return all children that comply to both the tagName, class and type filter (active if non-empty). */
   def children(tagName: String = "", clazz: String = "", tpe: String = ""): Seq[ReactTestWrapper] = {
-    val childComponentMs = ReactTestUtils.findAllInRenderedTree(componentM, toJsFunction(childComponent => {
-      val child = new ReactTestWrapper(childComponent)
-      (clazz.isEmpty || child.classes.contains(clazz.toLowerCase)) &&
+    val childComponentMs = ReactTestUtils.findAllInRenderedTree(
+      componentM,
+      toJsFunction(childComponent => {
+        val child = new ReactTestWrapper(childComponent)
+        (clazz.isEmpty || child.classes.contains(clazz.toLowerCase)) &&
         (tagName.isEmpty || child.tagName == tagName.toLowerCase) &&
         (tpe.isEmpty || child.typeAttribute == tpe.toLowerCase)
-    }))
+      })
+    )
     childComponentMs.toVector.map(new ReactTestWrapper(_))
   }
 

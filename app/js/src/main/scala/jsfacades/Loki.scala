@@ -50,17 +50,12 @@ object Loki {
 
   object Database {
     def persistent(dbName: String): Database = {
-      new Database(
-        new DatabaseFacade(
-          dbName, js.Dictionary("adapter" -> new IndexedAdapter(dbName))))
+      new Database(new DatabaseFacade(dbName, js.Dictionary("adapter" -> new IndexedAdapter(dbName))))
     }
 
     def inMemoryForTests(dbName: String): Database = {
       new Database(
-        new DatabaseFacade(
-          dbName, js.Dictionary(
-            "adapter" -> new MemoryAdapter(),
-            "env" -> "BROWSER")))
+        new DatabaseFacade(dbName, js.Dictionary("adapter" -> new MemoryAdapter(), "env" -> "BROWSER")))
     }
   }
 
@@ -107,6 +102,7 @@ object Loki {
   trait ResultSet[E] {
     // **************** Intermediary operations **************** //
     def find(filter: (String, js.Any)*): ResultSet[E]
+
     /**
       * Loose evaluation for user to sort based on a property names. Sorting based on the same lt/gt helper
       * functions used for binary indices.
@@ -120,22 +116,23 @@ object Loki {
     def count(): Int
   }
 
-  case class Sorting private(private[Loki] val propNamesWithDirection: Seq[Sorting.PropNameWithDirection]) {
-    def thenBy(propName: String): MustSetOrder = MustSetOrder(
-      alreadyConfiguredSorting = this,
-      nextPropName = propName)
+  case class Sorting private (private[Loki] val propNamesWithDirection: Seq[Sorting.PropNameWithDirection]) {
+    def thenBy(propName: String): MustSetOrder =
+      MustSetOrder(alreadyConfiguredSorting = this, nextPropName = propName)
   }
   object Sorting {
-    def by(propName: String): MustSetOrder = MustSetOrder(
-      alreadyConfiguredSorting = Sorting(Seq()),
-      nextPropName = propName)
+    def by(propName: String): MustSetOrder =
+      MustSetOrder(alreadyConfiguredSorting = Sorting(Seq()), nextPropName = propName)
 
-    case class MustSetOrder private(private[Loki] val alreadyConfiguredSorting: Sorting,
-                                    private[Loki] val nextPropName: String) {
+    case class MustSetOrder private (private[Loki] val alreadyConfiguredSorting: Sorting,
+                                     private[Loki] val nextPropName: String) {
       def asc(): Sorting = setIsDescending(false)
       def desc(): Sorting = setIsDescending(true)
-      def setIsDescending(isDesc: Boolean): Sorting = Sorting(
-        alreadyConfiguredSorting.propNamesWithDirection :+ PropNameWithDirection(nextPropName, isDesc = isDesc))
+      def setIsDescending(isDesc: Boolean): Sorting =
+        Sorting(
+          alreadyConfiguredSorting.propNamesWithDirection :+ PropNameWithDirection(
+            nextPropName,
+            isDesc = isDesc))
     }
 
     private[Loki] case class PropNameWithDirection(propName: String, isDesc: Boolean)
@@ -145,7 +142,8 @@ object Loki {
 
     def empty[E: Scala2Js.MapConverter]: ResultSet[E] = new ResultSet.Fake(Seq())
 
-    private[jsfacades] final class Impl[E: Scala2Js.MapConverter](facade: ResultSetFacade) extends ResultSet[E] {
+    private[jsfacades] final class Impl[E: Scala2Js.MapConverter](facade: ResultSetFacade)
+        extends ResultSet[E] {
 
       // **************** Intermediary operations **************** //
       override def find(filter: (String, js.Any)*) = {
@@ -183,7 +181,6 @@ object Loki {
         facade.count()
       }
     }
-
 
     final class Fake[E: Scala2Js.MapConverter](entities: Seq[E]) extends ResultSet[E] {
 

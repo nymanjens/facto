@@ -12,22 +12,25 @@ import models.manager.{EntityModification, EntityTable, ImmutableEntityManager, 
 import boopickle.Default._
 import api.Picklers._
 
-final class SlickEntityModificationEntityManager extends ImmutableEntityManager[EntityModificationEntity, EntityModificationEntities](
-  SlickEntityManager.create[EntityModificationEntity, EntityModificationEntities](
-    tag => new EntityModificationEntities(tag),
-    tableName = tableName
-  )) with EntityModificationEntity.Manager {
-}
+final class SlickEntityModificationEntityManager
+    extends ImmutableEntityManager[EntityModificationEntity, EntityModificationEntities](
+      SlickEntityManager.create[EntityModificationEntity, EntityModificationEntities](
+        tag => new EntityModificationEntities(tag),
+        tableName = tableName
+      ))
+    with EntityModificationEntity.Manager {}
 
 object SlickEntityModificationEntityManager {
   private val tableName: String = "ENTITY_MODIFICATION_ENTITY"
 
-  final class EntityModificationEntities(tag: SlickTag) extends EntityTable[EntityModificationEntity](tag, tableName) {
+  final class EntityModificationEntities(tag: SlickTag)
+      extends EntityTable[EntityModificationEntity](tag, tableName) {
     def userId = column[Long]("userId")
     def change = column[EntityModification]("modification")
     def date = column[LocalDateTime]("date")
 
-    override def * = (userId, change, date, id.?) <> (EntityModificationEntity.tupled, EntityModificationEntity.unapply)
+    override def * =
+      (userId, change, date, id.?) <> (EntityModificationEntity.tupled, EntityModificationEntity.unapply)
   }
 
   implicit val entityModificationToBytesMapper: ColumnType[EntityModification] = {

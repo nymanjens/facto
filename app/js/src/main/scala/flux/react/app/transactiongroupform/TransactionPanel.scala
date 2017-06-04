@@ -58,9 +58,12 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   private val component = {
     def calculateInitialState(props: Props): State = logExceptions {
       State(
-        transactionDate = props.defaultValues.map(_.transactionDate) getOrElse LocalDateTimes.toStartOfDay(clock.now),
-        beneficiaryAccount = props.defaultValues.map(_.beneficiary) getOrElse accountingConfig.personallySortedAccounts.head,
-        moneyReservoir = props.defaultValues.map(_.moneyReservoir) getOrElse selectableReservoirs().head)
+        transactionDate = props.defaultValues.map(_.transactionDate) getOrElse LocalDateTimes.toStartOfDay(
+          clock.now),
+        beneficiaryAccount = props.defaultValues
+          .map(_.beneficiary) getOrElse accountingConfig.personallySortedAccounts.head,
+        moneyReservoir = props.defaultValues.map(_.moneyReservoir) getOrElse selectableReservoirs().head
+      )
     }
     ReactComponentB[Props](getClass.getSimpleName)
       .initialState_P[State](calculateInitialState)
@@ -94,17 +97,19 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
 
   // **************** Private methods ****************//
   private def selectableReservoirs(currentReservoir: MoneyReservoir = null): Seq[MoneyReservoir] = {
-    accountingConfig.moneyReservoirs(includeNullReservoir = false, includeHidden = true)
+    accountingConfig
+      .moneyReservoirs(includeNullReservoir = false, includeHidden = true)
       .filter(r => r == currentReservoir || !r.hidden) ++
       Seq(MoneyReservoir.NullMoneyReservoir)
   }
 
   // **************** Public inner types ****************//
-  final class Reference private[TransactionPanel](private[TransactionPanel] val refComp: RefComp[Props, State, Backend, _ <: TopNode]) {
-    def apply($: BackendScope[_, _]): Proxy = new Proxy(() => refComp($).get.backend.$)
+  final class Reference private[TransactionPanel] (
+      private[TransactionPanel] val refComp: RefComp[Props, State, Backend, _ <: TopNode]) {
+    def apply($ : BackendScope[_, _]): Proxy = new Proxy(() => refComp($).get.backend.$)
   }
 
-  final class Proxy private[TransactionPanel](private val componentScope: () => BackendScope[Props, State]) {
+  final class Proxy private[TransactionPanel] (private val componentScope: () => BackendScope[Props, State]) {
     def rawTransactionDate: InputBase.Proxy[String] = rawTransactionDateRef($)
     def rawConsumedDate: InputBase.Proxy[String] = rawConsumedDateRef($)
     def beneficiaryAccount: InputBase.Proxy[Account] = beneficiaryAccountRef($)
@@ -114,29 +119,32 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
     def detailDescription: InputBase.Proxy[String] = detailDescriptionRef($)
     def rawTags: InputBase.Proxy[String] = rawTagsRef($)
 
-    def flowValueOrDefault: DatedMoney = DatedMoney(
-      cents = flowRef($).valueOrDefault,
-      currency = moneyReservoirRef($).valueOrDefault.currency,
-      date = transactionDateRef($).valueOrDefault)
+    def flowValueOrDefault: DatedMoney =
+      DatedMoney(
+        cents = flowRef($).valueOrDefault,
+        currency = moneyReservoirRef($).valueOrDefault.currency,
+        date = transactionDateRef($).valueOrDefault)
 
-    def data: Option[Data] = try {
-      Some(
-        Data(
-          transactionDate = transactionDateRef($).value.get,
-          consumedDate = consumedDateRef($).value.get,
-          moneyReservoir = moneyReservoirRef($).value.get,
-          beneficiaryAccount = beneficiaryAccountRef($).value.get,
-          category = categoryRef($).value.get,
-          description = descriptionRef($).value.get,
-          flow = DatedMoney(
-            cents = flowRef($).value.get,
-            currency = moneyReservoirRef($).value.get.currency,
-            date = transactionDateRef($).value.get),
-          detailDescription = detailDescriptionRef($).value.get,
-          tags = tagsRef($).value.get))
-    } catch {
-      case _: NoSuchElementException => None
-    }
+    def data: Option[Data] =
+      try {
+        Some(
+          Data(
+            transactionDate = transactionDateRef($).value.get,
+            consumedDate = consumedDateRef($).value.get,
+            moneyReservoir = moneyReservoirRef($).value.get,
+            beneficiaryAccount = beneficiaryAccountRef($).value.get,
+            category = categoryRef($).value.get,
+            description = descriptionRef($).value.get,
+            flow = DatedMoney(
+              cents = flowRef($).value.get,
+              currency = moneyReservoirRef($).value.get.currency,
+              date = transactionDateRef($).value.get),
+            detailDescription = detailDescriptionRef($).value.get,
+            tags = tagsRef($).value.get
+          ))
+      } catch {
+        case _: NoSuchElementException => None
+      }
 
     private def $ = componentScope()
   }
@@ -164,131 +172,131 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                            deleteButtonCallback: Option[Callback],
                            onFormChange: () => Unit)
 
-  private class Backend(val $: BackendScope[Props, State]) {
+  private class Backend(val $ : BackendScope[Props, State]) {
 
     def render(props: Props, state: State) = logExceptions {
-      HalfPanel(
-        title = <.span(props.title),
-        closeButtonCallback = props.deleteButtonCallback)(
-
+      HalfPanel(title = <.span(props.title), closeButtonCallback = props.deleteButtonCallback)(
         dateMappedInput(
           ref = transactionDateRef,
           defaultValue = state.transactionDate,
           valueTransformer = uielements.MappedInput.ValueTransformer.StringToLocalDateTime,
           listener = TransactionDateListener,
-          nameToDelegateRef = stringInputWithDefault.ref) {
-          mappedExtraProps =>
-            stringInputWithDefault.forOption(
-              ref = mappedExtraProps.ref,
-              defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawTransactionDate),
-              startWithDefault = props.defaultValues.isEmpty,
-              nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)) {
-              extraProps =>
-                uielements.bootstrap.TextInput(
-                  ref = extraProps.ref,
-                  label = i18n("facto.date-payed"),
-                  defaultValue = mappedExtraProps.defaultValue,
-                  showErrorMessage = props.showErrorMessages,
-                  inputClasses = extraProps.inputClasses
-                )
-            }
+          nameToDelegateRef = stringInputWithDefault.ref
+        ) { mappedExtraProps =>
+          stringInputWithDefault.forOption(
+            ref = mappedExtraProps.ref,
+            defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawTransactionDate),
+            startWithDefault = props.defaultValues.isEmpty,
+            nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)
+          ) { extraProps =>
+            uielements.bootstrap.TextInput(
+              ref = extraProps.ref,
+              label = i18n("facto.date-payed"),
+              defaultValue = mappedExtraProps.defaultValue,
+              showErrorMessage = props.showErrorMessages,
+              inputClasses = extraProps.inputClasses
+            )
+          }
         },
         dateMappedInput(
           ref = consumedDateRef,
-          defaultValue = props.defaultValues.map(_.consumedDate) getOrElse LocalDateTimes.toStartOfDay(clock.now),
+          defaultValue = props.defaultValues.map(_.consumedDate) getOrElse LocalDateTimes.toStartOfDay(
+            clock.now),
           valueTransformer = uielements.MappedInput.ValueTransformer.StringToLocalDateTime,
           nameToDelegateRef = stringInputWithDefault.ref,
-          listener = AnythingChangedListener) {
-          mappedExtraProps =>
-            stringInputWithDefault(
-              ref = mappedExtraProps.ref,
-              defaultValueProxy = rawTransactionDateRef($),
-              nameToDelegateRef = stringInputWithDefault.ref) {
-              extraProps1 =>
-                stringInputWithDefault.forOption(
-                  ref = extraProps1.ref,
-                  defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawConsumedDate),
-                  startWithDefault = props.defaultValues.isEmpty,
-                  nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)) {
-                  extraProps2 =>
-                    uielements.bootstrap.TextInput(
-                      ref = extraProps2.ref,
-                      label = i18n("facto.date-consumed"),
-                      defaultValue = mappedExtraProps.defaultValue,
-                      showErrorMessage = props.showErrorMessages,
-                      inputClasses = extraProps1.inputClasses ++ extraProps2.inputClasses
-                    )
-                }
-            }
+          listener = AnythingChangedListener
+        ) { mappedExtraProps =>
+          stringInputWithDefault(
+            ref = mappedExtraProps.ref,
+            defaultValueProxy = rawTransactionDateRef($),
+            nameToDelegateRef = stringInputWithDefault.ref) {
+            extraProps1 =>
+              stringInputWithDefault.forOption(
+                ref = extraProps1.ref,
+                defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawConsumedDate),
+                startWithDefault = props.defaultValues.isEmpty,
+                nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)
+              ) { extraProps2 =>
+                uielements.bootstrap.TextInput(
+                  ref = extraProps2.ref,
+                  label = i18n("facto.date-consumed"),
+                  defaultValue = mappedExtraProps.defaultValue,
+                  showErrorMessage = props.showErrorMessages,
+                  inputClasses = extraProps1.inputClasses ++ extraProps2.inputClasses
+                )
+              }
+          }
         },
         reservoirInputWithDefault.forOption(
           ref = moneyReservoirRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.moneyReservoir),
           startWithDefault = props.defaultValues.isEmpty,
-          nameToDelegateRef = reservoirSelectInput.ref(_)) {
-          extraProps =>
-            reservoirSelectInput(
-              ref = extraProps.ref,
-              label = i18n("facto.payed-with-to"),
-              defaultValue = state.moneyReservoir,
-              inputClasses = extraProps.inputClasses,
-              options = selectableReservoirs(state.moneyReservoir),
-              valueToId = _.code,
-              valueToName = _.name,
-              listener = MoneyReservoirListener
-            )
+          nameToDelegateRef = reservoirSelectInput.ref(_)
+        ) { extraProps =>
+          reservoirSelectInput(
+            ref = extraProps.ref,
+            label = i18n("facto.payed-with-to"),
+            defaultValue = state.moneyReservoir,
+            inputClasses = extraProps.inputClasses,
+            options = selectableReservoirs(state.moneyReservoir),
+            valueToId = _.code,
+            valueToName = _.name,
+            listener = MoneyReservoirListener
+          )
         },
         accountInputWithDefault.forOption(
           ref = beneficiaryAccountRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.beneficiaryAccount),
           startWithDefault = props.defaultValues.isEmpty,
           directUserChangeOnly = true,
-          nameToDelegateRef = accountSelectInput.ref(_)) {
-          extraProps =>
-            accountSelectInput(
-              ref = extraProps.ref,
-              label = i18n("facto.beneficiary"),
-              defaultValue = state.beneficiaryAccount,
-              inputClasses = extraProps.inputClasses,
-              options = accountingConfig.personallySortedAccounts,
-              valueToId = _.code,
-              valueToName = _.longName,
-              listener = BeneficiaryAccountListener
-            )
+          nameToDelegateRef = accountSelectInput.ref(_)
+        ) { extraProps =>
+          accountSelectInput(
+            ref = extraProps.ref,
+            label = i18n("facto.beneficiary"),
+            defaultValue = state.beneficiaryAccount,
+            inputClasses = extraProps.inputClasses,
+            options = accountingConfig.personallySortedAccounts,
+            valueToId = _.code,
+            valueToName = _.longName,
+            listener = BeneficiaryAccountListener
+          )
         },
         categoryInputWithDefault.forOption(
           ref = categoryRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.category),
           startWithDefault = props.defaultValues.isEmpty,
           directUserChangeOnly = true,
-          nameToDelegateRef = categorySelectInput.ref(_)) {
-          extraProps =>
-            categorySelectInput(
-              ref = extraProps.ref,
-              label = i18n("facto.category"),
-              defaultValue = props.defaultValues.map(_.category) getOrElse state.beneficiaryAccount.categories.head,
-              inputClasses = extraProps.inputClasses,
-              options = state.beneficiaryAccount.categories,
-              valueToId = _.code,
-              valueToName = category => if (category.helpText.isEmpty) category.name else s"${category.name} (${category.helpText})",
-              listener = AnythingChangedListener
-            )
+          nameToDelegateRef = categorySelectInput.ref(_)
+        ) { extraProps =>
+          categorySelectInput(
+            ref = extraProps.ref,
+            label = i18n("facto.category"),
+            defaultValue = props.defaultValues
+              .map(_.category) getOrElse state.beneficiaryAccount.categories.head,
+            inputClasses = extraProps.inputClasses,
+            options = state.beneficiaryAccount.categories,
+            valueToId = _.code,
+            valueToName = category =>
+              if (category.helpText.isEmpty) category.name else s"${category.name} (${category.helpText})",
+            listener = AnythingChangedListener
+          )
         },
         stringInputWithDefault.forOption(
           ref = descriptionRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.description),
           startWithDefault = props.defaultValues.isEmpty,
-          nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)) {
-          extraProps =>
-            uielements.bootstrap.TextInput(
-              ref = extraProps.ref,
-              label = i18n("facto.description"),
-              defaultValue = props.defaultValues.map(_.description) getOrElse "",
-              required = true,
-              showErrorMessage = props.showErrorMessages,
-              inputClasses = extraProps.inputClasses,
-              listener = AnythingChangedListener
-            )
+          nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)
+        ) { extraProps =>
+          uielements.bootstrap.TextInput(
+            ref = extraProps.ref,
+            label = i18n("facto.description"),
+            defaultValue = props.defaultValues.map(_.description) getOrElse "",
+            required = true,
+            showErrorMessage = props.showErrorMessages,
+            inputClasses = extraProps.inputClasses,
+            listener = AnythingChangedListener
+          )
         },
         uielements.bootstrap.MoneyInput(
           ref = flowRef,
@@ -308,38 +316,38 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ref = detailDescriptionRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.detailDescription),
           startWithDefault = props.defaultValues.isEmpty,
-          nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)) {
-          extraProps =>
-            uielements.bootstrap.TextInput(
-              ref = extraProps.ref,
-              label = i18n("facto.more-info"),
-              defaultValue = props.defaultValues.map(_.detailDescription) getOrElse "",
-              showErrorMessage = props.showErrorMessages,
-              inputClasses = extraProps.inputClasses,
-              listener = AnythingChangedListener
-            )
+          nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)
+        ) { extraProps =>
+          uielements.bootstrap.TextInput(
+            ref = extraProps.ref,
+            label = i18n("facto.more-info"),
+            defaultValue = props.defaultValues.map(_.detailDescription) getOrElse "",
+            showErrorMessage = props.showErrorMessages,
+            inputClasses = extraProps.inputClasses,
+            listener = AnythingChangedListener
+          )
         },
         tagsMappedInput(
           ref = tagsRef,
           defaultValue = props.defaultValues.map(_.tags) getOrElse Seq(),
           valueTransformer = uielements.MappedInput.ValueTransformer.StringToTags,
           nameToDelegateRef = stringInputWithDefault.ref,
-          listener = AnythingChangedListener) {
-          mappedExtraProps =>
-            stringInputWithDefault.forOption(
-              ref = mappedExtraProps.ref,
-              defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawTags),
-              startWithDefault = props.defaultValues.isEmpty,
-              nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)) {
-              extraProps =>
-                uielements.bootstrap.TextInput(
-                  ref = extraProps.ref,
-                  label = i18n("facto.tags"),
-                  showErrorMessage = props.showErrorMessages,
-                  defaultValue = mappedExtraProps.defaultValue,
-                  inputClasses = extraProps.inputClasses
-                )
-            }
+          listener = AnythingChangedListener
+        ) { mappedExtraProps =>
+          stringInputWithDefault.forOption(
+            ref = mappedExtraProps.ref,
+            defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawTags),
+            startWithDefault = props.defaultValues.isEmpty,
+            nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)
+          ) { extraProps =>
+            uielements.bootstrap.TextInput(
+              ref = extraProps.ref,
+              label = i18n("facto.tags"),
+              showErrorMessage = props.showErrorMessages,
+              defaultValue = mappedExtraProps.defaultValue,
+              inputClasses = extraProps.inputClasses
+            )
+          }
         }
       )
     }
@@ -357,10 +365,11 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
       }
     }
     private object MoneyReservoirListener extends InputBase.Listener[MoneyReservoir] {
-      override def onChange(newReservoir: MoneyReservoir, directUserChange: Boolean) = LogExceptionsCallback {
-        $.modState(_.copy(moneyReservoir = newReservoir)).runNow()
-        AnythingChangedListener.onChange(newReservoir, directUserChange).runNow()
-      }
+      override def onChange(newReservoir: MoneyReservoir, directUserChange: Boolean) =
+        LogExceptionsCallback {
+          $.modState(_.copy(moneyReservoir = newReservoir)).runNow()
+          AnythingChangedListener.onChange(newReservoir, directUserChange).runNow()
+        }
     }
     private object AnythingChangedListener extends InputBase.Listener[Any] {
       override def onChange(newValue: Any, directUserChange: Boolean) = LogExceptionsCallback {

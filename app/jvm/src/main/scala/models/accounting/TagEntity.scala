@@ -10,9 +10,7 @@ import scala.collection.immutable.{ListMap, Seq}
   * - TagEntities should only be updated by the Transaction.Manager
   * - TagEntities are immutable. Just delete and create a new one when updating.
   */
-case class TagEntity(name: String,
-                     transactionId: Long,
-                     idOption: Option[Long] = None) extends Entity {
+case class TagEntity(name: String, transactionId: Long, idOption: Option[Long] = None) extends Entity {
   require(!name.isEmpty)
   require(transactionId > 0)
   for (idVal <- idOption) require(idVal > 0)

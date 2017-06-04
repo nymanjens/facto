@@ -102,8 +102,8 @@ object Money {
       } else if (string contains ",") {
         val commaParts = string.split(",")
         if (!string.startsWith(",")
-          && commaParts.nonEmpty
-          && commaParts.tail.map(_.length).toSet == Set(3)) {
+            && commaParts.nonEmpty
+            && commaParts.tail.map(_.length).toSet == Set(3)) {
           parseNonCents(string.replace(",", ""))
         } else {
           parseDelimitedBy(",", string)

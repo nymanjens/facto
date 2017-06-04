@@ -30,5 +30,6 @@ final class Module(implicit i18n: I18n,
   implicit private lazy val globalMessages: GlobalMessages = wire[GlobalMessages]
   implicit lazy val layout: Layout = wire[Layout]
   implicit lazy val everything: Everything = wire[Everything]
-  implicit lazy val transactionGroupForm: TransactionGroupForm = transactionGroupFormModule.transactionGroupForm
+  implicit lazy val transactionGroupForm: TransactionGroupForm =
+    transactionGroupFormModule.transactionGroupForm
 }

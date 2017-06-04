@@ -35,7 +35,8 @@ object MoneyInput {
           datedMoney.exchangedForReferenceCurrency(extraProps.exchangeRateManager)
         }
 
-        <.div(^.className := "input-group",
+        <.div(
+          ^.className := "input-group",
           <.span(
             ^.className := "input-group-addon",
             <.i(^.className := extraProps.currency.iconClass)
@@ -72,7 +73,8 @@ object MoneyInput {
             currency: Currency,
             date: LocalDateTime,
             listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance)(
-             implicit exchangeRateManager: ExchangeRateManager, i18n: I18n): ReactElement = {
+      implicit exchangeRateManager: ExchangeRateManager,
+      i18n: I18n): ReactElement = {
     val props = Props[Value, ExtraProps](
       label = label,
       name = ref.name,
@@ -81,24 +83,20 @@ object MoneyInput {
       showErrorMessage = showErrorMessage,
       inputClasses = inputClasses,
       listener = listener,
-      extra = ExtraProps(
-        forceValue = forceValue,
-        currency = currency,
-        date = date),
-      valueTransformer = ValueTransformer)
+      extra = ExtraProps(forceValue = forceValue, currency = currency, date = date),
+      valueTransformer = ValueTransformer
+    )
     component.withRef(ref.name)(props)
   }
 
   def ref(name: String): Reference = new Reference(Ref.to(component, name))
 
   // **************** Public inner types ****************//
-  final class Reference private[MoneyInput](refComp: InputComponent.ThisRefComp[Value, ExtraProps])
-    extends InputComponent.Reference(refComp)
+  final class Reference private[MoneyInput] (refComp: InputComponent.ThisRefComp[Value, ExtraProps])
+      extends InputComponent.Reference(refComp)
 
-  case class ExtraProps(forceValue: Option[Long],
-                        currency: Currency,
-                        date: LocalDateTime)(
-                         implicit val exchangeRateManager: ExchangeRateManager)
+  case class ExtraProps(forceValue: Option[Long], currency: Currency, date: LocalDateTime)(
+      implicit val exchangeRateManager: ExchangeRateManager)
 
   // **************** Private inner types ****************//
   /** Number of cents. */

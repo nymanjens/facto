@@ -19,11 +19,13 @@ import scala.collection.immutable.ListMap
 
 import SlickExchangeRateMeasurementManager.{ExchangeRateMeasurements, tableName}
 
-final class SlickExchangeRateMeasurementManager extends ImmutableEntityManager[ExchangeRateMeasurement, ExchangeRateMeasurements](
-  SlickEntityManager.create[ExchangeRateMeasurement, ExchangeRateMeasurements](
-    tag => new ExchangeRateMeasurements(tag),
-    tableName = tableName
-  )) with ExchangeRateMeasurement.Manager {
+final class SlickExchangeRateMeasurementManager
+    extends ImmutableEntityManager[ExchangeRateMeasurement, ExchangeRateMeasurements](
+      SlickEntityManager.create[ExchangeRateMeasurement, ExchangeRateMeasurements](
+        tag => new ExchangeRateMeasurements(tag),
+        tableName = tableName
+      ))
+    with ExchangeRateMeasurement.Manager {
 
   type AdditionListener = ExchangeRateMeasurement => Unit
   @volatile private var listeners: Vector[AdditionListener] = Vector.empty
@@ -54,11 +56,13 @@ final class SlickExchangeRateMeasurementManager extends ImmutableEntityManager[E
 object SlickExchangeRateMeasurementManager {
   private val tableName: String = "EXCHANGE_RATE_MEASUREMENT"
 
-  final class ExchangeRateMeasurements(tag: SlickTag) extends EntityTable[ExchangeRateMeasurement](tag, tableName) {
+  final class ExchangeRateMeasurements(tag: SlickTag)
+      extends EntityTable[ExchangeRateMeasurement](tag, tableName) {
     def date = column[LocalDateTime]("date")
     def foreignCurrencyCode = column[String]("foreignCurrencyCode")
     def ratioReferenceToForeignCurrency = column[Double]("ratioReferenceToForeignCurrency")
 
-    override def * = (date, foreignCurrencyCode, ratioReferenceToForeignCurrency, id.?) <> (ExchangeRateMeasurement.tupled, ExchangeRateMeasurement.unapply)
+    override def * =
+      (date, foreignCurrencyCode, ratioReferenceToForeignCurrency, id.?) <> (ExchangeRateMeasurement.tupled, ExchangeRateMeasurement.unapply)
   }
 }

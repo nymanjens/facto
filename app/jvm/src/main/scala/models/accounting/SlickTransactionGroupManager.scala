@@ -13,11 +13,13 @@ import models.manager.{Entity, SlickEntityManager, EntityTable, ImmutableEntityM
 
 import SlickTransactionGroupManager.{TransactionGroups, tableName}
 
-final class SlickTransactionGroupManager extends ImmutableEntityManager[TransactionGroup, TransactionGroups](
-  SlickEntityManager.create[TransactionGroup, TransactionGroups](
-    tag => new TransactionGroups(tag),
-    tableName = tableName
-  )) with TransactionGroup.Manager
+final class SlickTransactionGroupManager
+    extends ImmutableEntityManager[TransactionGroup, TransactionGroups](
+      SlickEntityManager.create[TransactionGroup, TransactionGroups](
+        tag => new TransactionGroups(tag),
+        tableName = tableName
+      ))
+    with TransactionGroup.Manager
 
 object SlickTransactionGroupManager {
   private val tableName: String = "TRANSACTION_GROUPS"

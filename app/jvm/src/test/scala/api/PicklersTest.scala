@@ -39,15 +39,15 @@ class PicklersTest extends HookedSpecification {
   }
 
   "GetAllEntitiesResponse" in {
-    testPickleAndUnpickle[GetAllEntitiesResponse](GetAllEntitiesResponse(
-      entitiesMap = Map(EntityType.TransactionType -> Seq(testTransactionWithId)),
-      nextUpdateToken = testDate))
+    testPickleAndUnpickle[GetAllEntitiesResponse](
+      GetAllEntitiesResponse(
+        entitiesMap = Map(EntityType.TransactionType -> Seq(testTransactionWithId)),
+        nextUpdateToken = testDate))
   }
 
   "GetEntityModificationsResponse" in {
-    testPickleAndUnpickle[GetEntityModificationsResponse](GetEntityModificationsResponse(
-      modifications = Seq(testModification),
-      nextUpdateToken = testDate))
+    testPickleAndUnpickle[GetEntityModificationsResponse](
+      GetEntityModificationsResponse(modifications = Seq(testModification), nextUpdateToken = testDate))
   }
 
   private def testPickleAndUnpickle[T: Pickler](value: T) = {

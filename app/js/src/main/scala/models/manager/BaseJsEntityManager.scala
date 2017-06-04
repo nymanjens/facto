@@ -4,7 +4,8 @@ import models.access.RemoteDatabaseProxy
 
 import scala.collection.immutable.Seq
 
-abstract class BaseJsEntityManager[E <: Entity : EntityType](implicit database: RemoteDatabaseProxy) extends EntityManager[E] {
+abstract class BaseJsEntityManager[E <: Entity: EntityType](implicit database: RemoteDatabaseProxy)
+    extends EntityManager[E] {
 
   // **************** Implementation of EntityManager ****************//
   override final def findById(id: Long): E = {

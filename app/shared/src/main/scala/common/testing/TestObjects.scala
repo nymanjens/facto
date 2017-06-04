@@ -25,10 +25,8 @@ object TestObjects {
     veryShortName = "Common",
     defaultElectronicReservoirCode = "CARD_COMMON",
     categories = Seq(testCategoryA, testCategoryB),
-    summaryTotalRows = Seq(
-      SummaryTotalRowDef(
-        rowTitleHtml = "<b>Total</b>",
-        categoriesToIgnore = Set())))
+    summaryTotalRows = Seq(SummaryTotalRowDef(rowTitleHtml = "<b>Total</b>", categoriesToIgnore = Set()))
+  )
   val testAccountA: Account = Account(
     code = "ACC_A",
     longName = "Account A",
@@ -39,12 +37,12 @@ object TestObjects {
     defaultElectronicReservoirCode = "CARD_A",
     categories = Seq(testCategoryA, testCategoryB),
     summaryTotalRows = Seq(
-      SummaryTotalRowDef(
-        rowTitleHtml = "<b>Total</b>",
-        categoriesToIgnore = Set()),
+      SummaryTotalRowDef(rowTitleHtml = "<b>Total</b>", categoriesToIgnore = Set()),
       SummaryTotalRowDef(
         rowTitleHtml = "<b>Total</b> (without catA)",
-        categoriesToIgnore = Set(testCategoryA))))
+        categoriesToIgnore = Set(testCategoryA))
+    )
+  )
   val testAccountB: Account = Account(
     code = "ACC_B",
     longName = "Account B",
@@ -54,12 +52,9 @@ object TestObjects {
     defaultCashReservoirCode = Some("CASH_B"),
     defaultElectronicReservoirCode = "CARD_B",
     categories = Seq(testCategoryB),
-    summaryTotalRows = Seq(
-      SummaryTotalRowDef(
-        rowTitleHtml = "<b>Total</b>",
-        categoriesToIgnore = Set())))
+    summaryTotalRows = Seq(SummaryTotalRowDef(rowTitleHtml = "<b>Total</b>", categoriesToIgnore = Set()))
+  )
   def testAccount: Account = testAccountA
-
 
   val testReservoirCashCommon = MoneyReservoir(
     code = "CASH_COMMON",
@@ -131,23 +126,23 @@ object TestObjects {
         beneficiaryCodeTpl = Some("${account.code}"),
         moneyReservoirCodeTpl = Some(""),
         categoryCodeTpl = Some("CAT_A"),
-        descriptionTpl = "Endowment for ${account.longName}")))
+        descriptionTpl = "Endowment for ${account.longName}"
+      )
+    )
+  )
 
   val testConstants = Constants(
     commonAccount = testAccountCommon,
     accountingCategory = testCategoryA,
     endowmentCategory = testCategoryB,
     liquidationDescription = "Liquidation",
-    zoneId = "Europe/Brussels")
+    zoneId = "Europe/Brussels"
+  )
 
   val testAccountingConfig: Config = Config(
-    accounts = createListMap(
-      "ACC_COMMON" -> testAccountCommon,
-      "ACC_A" -> testAccountA,
-      "ACC_B" -> testAccountB),
-    categories = createListMap(
-      "CAT_B" -> testCategoryB,
-      "CAT_A" -> testCategoryA),
+    accounts =
+      createListMap("ACC_COMMON" -> testAccountCommon, "ACC_A" -> testAccountA, "ACC_B" -> testAccountB),
+    categories = createListMap("CAT_B" -> testCategoryB, "CAT_A" -> testCategoryA),
     moneyReservoirsMap = createListMap(
       "CASH_COMMON" -> testReservoirCashCommon,
       "CARD_COMMON" -> testReservoirCardCommon,
@@ -156,9 +151,11 @@ object TestObjects {
       "CASH_B" -> testReservoirCashB,
       "CARD_B" -> testReservoirCardB,
       "HIDDEN" -> testReservoirHidden,
-      "CASH_GBP" -> testReservoirCashGbp),
+      "CASH_GBP" -> testReservoirCashGbp
+    ),
     templates = Seq(testTemplate),
-    constants = testConstants)
+    constants = testConstants
+  )
 
   private def createListMap[K, V](elems: (K, V)*): ListMap[K, V] = {
     val resultBuilder = ListMap.newBuilder[K, V]
@@ -168,14 +165,16 @@ object TestObjects {
 
   def testUserA: User = User(
     loginName = "testUserA",
-    passwordHash = "be196838736ddfd0007dd8b2e8f46f22d440d4c5959925cb49135abc9cdb01e84961aa43dd0ddb6ee59975eb649280d9f44088840af37451828a6412b9b574fc",
+    passwordHash =
+      "be196838736ddfd0007dd8b2e8f46f22d440d4c5959925cb49135abc9cdb01e84961aa43dd0ddb6ee59975eb649280d9f44088840af37451828a6412b9b574fc",
     // = sha512("pw")
     name = "Test User A",
     idOption = Option(918273)
   )
   val testUserB: User = User(
     loginName = "testUserB",
-    passwordHash = "be196838736ddfd0007dd8b2e8f46f22d440d4c5959925cb49135abc9cdb01e84961aa43dd0ddb6ee59975eb649280d9f44088840af37451828a6412b9b574fc",
+    passwordHash =
+      "be196838736ddfd0007dd8b2e8f46f22d440d4c5959925cb49135abc9cdb01e84961aa43dd0ddb6ee59975eb649280d9f44088840af37451828a6412b9b574fc",
     // = sha512("pw")
     name = "Test User B",
     idOption = Option(918274)
@@ -183,9 +182,8 @@ object TestObjects {
   def testUser: User = testUserA
 
   val testDate: LocalDateTime = LocalDateTimes.createDateTime(2008, MARCH, 13)
-  val testTransactionGroupWithId: TransactionGroup = TransactionGroup(
-    createdDate = testDate,
-    idOption = Some(129874444))
+  val testTransactionGroupWithId: TransactionGroup =
+    TransactionGroup(createdDate = testDate, idOption = Some(129874444))
   val testTransactionWithIdA: Transaction = Transaction(
     transactionGroupId = testTransactionGroupWithId.id,
     issuerId = testUserA.id,
@@ -197,7 +195,8 @@ object TestObjects {
     createdDate = testDate,
     transactionDate = testDate,
     consumedDate = testDate,
-    idOption = Some(721309875))
+    idOption = Some(721309875)
+  )
   val testTransactionWithIdB: Transaction = Transaction(
     transactionGroupId = testTransactionGroupWithId.id,
     issuerId = testUserB.id,
@@ -209,7 +208,8 @@ object TestObjects {
     createdDate = testDate,
     transactionDate = testDate,
     consumedDate = testDate,
-    idOption = Some(4371098))
+    idOption = Some(4371098)
+  )
   def testTransactionWithId: Transaction = testTransactionWithIdA
   val testBalanceCheckWithId: BalanceCheck = BalanceCheck(
     issuerId = testUser.id,

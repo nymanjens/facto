@@ -26,7 +26,8 @@ final class ExternalApi @Inject()(implicit val messagesApi: MessagesApi,
                                   accountingConfig: Config,
                                   userManager: SlickUserManager,
                                   entityAccess: SlickEntityAccess)
-  extends Controller with I18nSupport {
+    extends Controller
+    with I18nSupport {
 
   // ********** actions ********** //
   def doCacheManagement(applicationSecret: String) = Action { implicit request =>
@@ -54,26 +55,27 @@ final class ExternalApi @Inject()(implicit val messagesApi: MessagesApi,
     Ok("OK")
   }
 
-  def addTransactionFromTemplate(templateCode: String, applicationSecret: String) = Action { implicit request =>
-    validateApplicationSecret(applicationSecret)
+  def addTransactionFromTemplate(templateCode: String, applicationSecret: String) = Action {
+    implicit request =>
+      validateApplicationSecret(applicationSecret)
 
-    val template = accountingConfig.templateWithCode(templateCode)
-    val partial = template.toPartial(Account.nullInstance)
-    val issuer = getOrCreateRobotUser()
+      val template = accountingConfig.templateWithCode(templateCode)
+      val partial = template.toPartial(Account.nullInstance)
+      val issuer = getOrCreateRobotUser()
 
-    // Add group
-    val group = entityAccess.transactionGroupManager.add(TransactionGroup(createdDate = clock.now))
+      // Add group
+      val group = entityAccess.transactionGroupManager.add(TransactionGroup(createdDate = clock.now))
 
-    // Add transactions
-    for (transPartial <- partial.transactions) {
-      val transaction = transactionPartialToTransaction(transPartial, group, issuer)
-      entityAccess.transactionManager.add(transaction)
-    }
+      // Add transactions
+      for (transPartial <- partial.transactions) {
+        val transaction = transactionPartialToTransaction(transPartial, group, issuer)
+        entityAccess.transactionManager.add(transaction)
+      }
 
-    // Add log
-    entityAccess.updateLogManager.addLog(issuer, UpdateLog.AddNew, group)
+      // Add log
+      entityAccess.updateLogManager.addLog(issuer, UpdateLog.AddNew, group)
 
-    Ok("OK")
+      Ok("OK")
   }
 
   def addExchangeRateMeasurement(dateString: String,
@@ -85,10 +87,11 @@ final class ExternalApi @Inject()(implicit val messagesApi: MessagesApi,
     val date = TimeUtils.parseDateString(dateString)
     require(Currency.of(foreignCurrencyCode).isForeign)
 
-    entityAccess.exchangeRateMeasurementManager.add(ExchangeRateMeasurement(
-      date = date,
-      foreignCurrencyCode = foreignCurrencyCode,
-      ratioReferenceToForeignCurrency = ratioReferenceToForeignCurrency))
+    entityAccess.exchangeRateMeasurementManager.add(
+      ExchangeRateMeasurement(
+        date = date,
+        foreignCurrencyCode = foreignCurrencyCode,
+        ratioReferenceToForeignCurrency = ratioReferenceToForeignCurrency))
     Ok("OK")
   }
 
@@ -116,7 +119,9 @@ final class ExternalApi @Inject()(implicit val messagesApi: MessagesApi,
     }
   }
 
-  private def transactionPartialToTransaction(partial: Transaction.Partial, transactionGroup: TransactionGroup, issuer: User): Transaction = {
+  private def transactionPartialToTransaction(partial: Transaction.Partial,
+                                              transactionGroup: TransactionGroup,
+                                              issuer: User): Transaction = {
     def checkNotEmpty(s: String): String = {
       require(!s.isEmpty)
       s
@@ -133,6 +138,7 @@ final class ExternalApi @Inject()(implicit val messagesApi: MessagesApi,
       tagsString = partial.tagsString,
       createdDate = clock.now,
       transactionDate = clock.now,
-      consumedDate = clock.now)
+      consumedDate = clock.now
+    )
   }
 }

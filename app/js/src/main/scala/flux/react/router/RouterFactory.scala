@@ -11,29 +11,37 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
   }
 
   private def routerConfig(implicit reactAppModule: flux.react.app.Module) = {
-    RouterConfigDsl[Page].buildConfig { dsl =>
-      import dsl._
+    RouterConfigDsl[Page]
+      .buildConfig { dsl =>
+        import dsl._
 
-      // wrap/connect components to the circuit
-      (emptyRule
+        // wrap/connect components to the circuit
+        (emptyRule
 
-        | staticRoute(root, EverythingPage)
-        ~> renderR(ctl => reactAppModule.everything(ctl))
+          | staticRoute(root, EverythingPage)
+            ~> renderR(ctl => reactAppModule.everything(ctl))
 
-        | staticRoute("#everything", EverythingPage2)
-        ~> renderR(ctl => <.div(reactAppModule.everything(ctl), reactAppModule.everything(ctl), reactAppModule.everything(ctl)))
+          | staticRoute("#everything", EverythingPage2)
+            ~> renderR(
+              ctl =>
+                <.div(
+                  reactAppModule.everything(ctl),
+                  reactAppModule.everything(ctl),
+                  reactAppModule.everything(ctl)))
 
-        | staticRoute("#newTransactionGroup", NewTransactionGroupPage)
-        ~> renderR(ctl => reactAppModule.transactionGroupForm.forCreate(ctl))
+          | staticRoute("#newTransactionGroup", NewTransactionGroupPage)
+            ~> renderR(ctl => reactAppModule.transactionGroupForm.forCreate(ctl))
 
-        | dynamicRouteCT("#editTransactionGroup" / long.caseClass[EditTransactionGroupPage])
-        ~> dynRenderR { case (page, ctl) => reactAppModule.transactionGroupForm.forEdit(page.transactionGroupId, ctl) }
-
-        ).notFound(redirectToPage(EverythingPage)(Redirect.Replace))
-    }.renderWith(layout)
+          | dynamicRouteCT("#editTransactionGroup" / long.caseClass[EditTransactionGroupPage])
+            ~> dynRenderR {
+              case (page, ctl) => reactAppModule.transactionGroupForm.forEdit(page.transactionGroupId, ctl)
+            }).notFound(redirectToPage(EverythingPage)(Redirect.Replace))
+      }
+      .renderWith(layout)
   }
 
-  private def layout(routerCtl: RouterCtl[Page], resolution: Resolution[Page])(implicit reactAppModule: flux.react.app.Module) = {
+  private def layout(routerCtl: RouterCtl[Page], resolution: Resolution[Page])(
+      implicit reactAppModule: flux.react.app.Module) = {
     reactAppModule.layout(routerCtl, resolution.page)(resolution.render())
   }
 }

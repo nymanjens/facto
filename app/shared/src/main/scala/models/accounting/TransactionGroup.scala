@@ -10,8 +10,7 @@ import models.manager.{Entity, EntityManager}
 import models.EntityAccess
 
 /** Transaction groups should be treated as immutable. */
-case class TransactionGroup(createdDate: LocalDateTime,
-                            idOption: Option[Long] = None) extends Entity {
+case class TransactionGroup(createdDate: LocalDateTime, idOption: Option[Long] = None) extends Entity {
 
   override def withId(id: Long) = copy(idOption = Some(id))
 
@@ -29,6 +28,5 @@ object TransactionGroup {
 
   trait Manager extends EntityManager[TransactionGroup]
 
-  case class Partial(transactions: Seq[Transaction.Partial],
-                     zeroSum: Boolean = false)
+  case class Partial(transactions: Seq[Transaction.Partial], zeroSum: Boolean = false)
 }

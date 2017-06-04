@@ -5,11 +5,12 @@ import japgolly.scalajs.react._
 object InputBase {
 
   trait Reference[Value] {
-    def apply($: BackendScope[_, _]): Proxy[Value]
+    def apply($ : BackendScope[_, _]): Proxy[Value]
     def name: String
   }
 
   trait Proxy[Value] {
+
     /** Returns None if this field is invalidly formatted. */
     def value: Option[Value]
 
@@ -34,12 +35,15 @@ object InputBase {
       override def value = delegateProvider().value
       override def valueOrDefault = delegateProvider().valueOrDefault
       override def setValue(string: Value) = delegateProvider().setValue(string)
-      override def registerListener(listener: Listener[Value]) = delegateProvider().registerListener(listener)
-      override def deregisterListener(listener: Listener[Value]) = delegateProvider().deregisterListener(listener)
+      override def registerListener(listener: Listener[Value]) =
+        delegateProvider().registerListener(listener)
+      override def deregisterListener(listener: Listener[Value]) =
+        delegateProvider().deregisterListener(listener)
     }
   }
 
   trait Listener[-Value] {
+
     /** Gets called every time this field gets updated. This includes updates that are not done by the user. */
     def onChange(newValue: Value, directUserChange: Boolean): Callback
   }

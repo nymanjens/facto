@@ -26,12 +26,14 @@ class ConfigTest extends HookedSpecification {
     // check keys
     config.accounts.keys.toList must beEqualTo(List("ACC_COMMON", "ACC_A", "ACC_B"))
     config.categories.keys.toList must beEqualTo(List("CAT_B", "CAT_A"))
-    config.visibleReservoirs.map(_.code) must beEqualTo(List("CASH_COMMON", "CARD_COMMON", "CASH_A", "CARD_A", "CASH_B", "CARD_B"))
+    config.visibleReservoirs.map(_.code) must beEqualTo(
+      List("CASH_COMMON", "CARD_COMMON", "CASH_A", "CARD_A", "CASH_B", "CARD_B"))
 
     // check content by samples
     config.accounts("ACC_A").code must beEqualTo("ACC_A")
     config.accounts("ACC_A").longName must beEqualTo("Account A")
-    config.accounts("ACC_A").categories must beEqualTo(List(config.categories("CAT_A"), config.categories("CAT_B")))
+    config.accounts("ACC_A").categories must beEqualTo(
+      List(config.categories("CAT_A"), config.categories("CAT_B")))
     config.accounts("ACC_A").user mustEqual Some(testUserA)
     config.accounts("ACC_COMMON").user mustEqual None
 
@@ -51,7 +53,8 @@ class ConfigTest extends HookedSpecification {
   "config.accountOf()" in new WithApplication {
     userManager.addWithId(testUserA)
     userManager.addWithId(testUserB)
-    val userOther = userManager.add(SlickUserManager.createUser(loginName = "other", password = "other", name = "Other"))
+    val userOther =
+      userManager.add(SlickUserManager.createUser(loginName = "other", password = "other", name = "Other"))
 
     config.accountOf(testUserA) must beEqualTo(Some(config.accounts("ACC_A")))
     config.accountOf(testUserB) must beEqualTo(Some(config.accounts("ACC_B")))
@@ -67,7 +70,6 @@ class ConfigTest extends HookedSpecification {
     config.accounts("ACC_B").isMineOrCommon(testUserA, config, entityAccess) mustEqual false
   }
 
-
   "config.personallySortedAccounts()" in new WithApplication {
     // get vars
     val accCommon = config.constants.commonAccount
@@ -77,7 +79,8 @@ class ConfigTest extends HookedSpecification {
     // make sure all required users exist
     userManager.addWithId(testUserA)
     userManager.addWithId(testUserB)
-    val userOther = userManager.add(SlickUserManager.createUser(loginName = "other", password = "other", name = "Other"))
+    val userOther =
+      userManager.add(SlickUserManager.createUser(loginName = "other", password = "other", name = "Other"))
 
     // call personallySortedAccounts()
     config.personallySortedAccounts(testUserA, entityAccess) mustEqual Seq(accCommon, accA, accB)

@@ -12,6 +12,7 @@ trait SlickEntityManager[E <: Entity, T <: AbstractTable[E]] extends EntityManag
   // ********** Management methods ********** //
   /** Initializes this manager. This is called once at the start of the application. */
   def initialize(): Unit = {}
+
   /** Creates the persisted database table for this manager. */
   def createTable(): Unit
   def tableName: String
@@ -51,8 +52,7 @@ object SlickEntityManager {
     */
   def create[E <: Entity, T <: EntityTable[E]](cons: Tag => T,
                                                tableName: String,
-                                               cached: Boolean = false
-                                              ): SlickEntityManager[E, T] = {
+                                               cached: Boolean = false): SlickEntityManager[E, T] = {
     var result: SlickEntityManager[E, T] = new DatabaseBackedEntityManager[E, T](cons, tableName)
     if (cached) {
       result = new CachingEntityManager[E, T](result)

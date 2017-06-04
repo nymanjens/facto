@@ -5,10 +5,11 @@ import models.access.RemoteDatabaseProxy
 import models.manager.BaseJsEntityManager
 
 final class JsExchangeRateMeasurementManager(implicit database: RemoteDatabaseProxy)
-  extends BaseJsEntityManager[ExchangeRateMeasurement]
+    extends BaseJsEntityManager[ExchangeRateMeasurement]
     with ExchangeRateMeasurement.Manager {
   override def fetchAll(currency: Currency) = {
-    database.newQuery[ExchangeRateMeasurement]()
+    database
+      .newQuery[ExchangeRateMeasurement]()
       .find("foreignCurrencyCode" -> currency.code)
       .sort(Loki.Sorting.by("date").asc())
       .data()

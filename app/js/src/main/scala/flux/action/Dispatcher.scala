@@ -1,4 +1,3 @@
-
 package flux.action
 
 import common.LoggingUtils.{logExceptions, LogExceptionsCallback}

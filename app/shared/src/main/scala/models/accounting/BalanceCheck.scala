@@ -14,15 +14,18 @@ case class BalanceCheck(issuerId: Long,
                         balanceInCents: Long,
                         createdDate: LocalDateTime,
                         checkDate: LocalDateTime,
-                        idOption: Option[Long] = None) extends Entity {
+                        idOption: Option[Long] = None)
+    extends Entity {
 
   override def withId(id: Long) = copy(idOption = Some(id))
 
   override def toString = s"BalanceCheck(issuer=$issuerId, $moneyReservoirCode)"
 
   def issuer(implicit entityAccess: EntityAccess): User = entityAccess.userManager.findById(issuerId)
-  def moneyReservoir(implicit accountingConfig: Config): MoneyReservoir = accountingConfig.moneyReservoir(moneyReservoirCode)
-  def balance(implicit accountingConfig: Config): DatedMoney = DatedMoney(balanceInCents, moneyReservoir.currency, checkDate)
+  def moneyReservoir(implicit accountingConfig: Config): MoneyReservoir =
+    accountingConfig.moneyReservoir(moneyReservoirCode)
+  def balance(implicit accountingConfig: Config): DatedMoney =
+    DatedMoney(balanceInCents, moneyReservoir.currency, checkDate)
 }
 
 object BalanceCheck {

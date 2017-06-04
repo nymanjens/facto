@@ -10,11 +10,10 @@ import org.apache.http.annotation.GuardedBy
 import common.cache.CacheRegistry
 
 /** Caching decorator for an SlickEntityManager that loads all data in memory and keeps it in sync with all updates. */
-private[manager] final class CachingEntityManager[E <: Entity, T <: AbstractTable[E]](delegate: SlickEntityManager[E, T])
-  extends ForwardingEntityManager[E, T](delegate) {
-  CacheRegistry.registerCache(
-    verifyConsistency = verifyConsistency,
-    resetForTests = resetForTests)
+private[manager] final class CachingEntityManager[E <: Entity, T <: AbstractTable[E]](
+    delegate: SlickEntityManager[E, T])
+    extends ForwardingEntityManager[E, T](delegate) {
+  CacheRegistry.registerCache(verifyConsistency = verifyConsistency, resetForTests = resetForTests)
 
   @GuardedBy("lock")
   private val cache: mutable.Map[Long, E] = mutable.Map[Long, E]()
@@ -23,7 +22,9 @@ private[manager] final class CachingEntityManager[E <: Entity, T <: AbstractTabl
   // ********** Implementation of SlickEntityManager interface: Management methods ********** //
   override def initialize(): Unit = lock.synchronized {
     cache.clear()
-    delegate.fetchAll() foreach { e => cache.put(e.id, e) }
+    delegate.fetchAll() foreach { e =>
+      cache.put(e.id, e)
+    }
   }
 
   // ********** Implementation of SlickEntityManager interface: Mutators ********** //

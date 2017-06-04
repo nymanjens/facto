@@ -21,11 +21,12 @@ import scala.util.Try
 import SlickTransactionManager.{Transactions, tableName}
 
 final class SlickTransactionManager @Inject()(tagEntityManager: SlickTagEntityManager)
-  extends ImmutableEntityManager[Transaction, Transactions](
-    SlickEntityManager.create[Transaction, Transactions](
-      tag => new Transactions(tag),
-      tableName = tableName
-    )) with Transaction.Manager {
+    extends ImmutableEntityManager[Transaction, Transactions](
+      SlickEntityManager.create[Transaction, Transactions](
+        tag => new Transactions(tag),
+        tableName = tableName
+      ))
+    with Transaction.Manager {
 
   override def findByGroupId(groupId: Long): Seq[Transaction] =
     dbRun(newQuery.filter(_.transactionGroupId === groupId)).toList
@@ -37,10 +38,7 @@ final class SlickTransactionManager @Inject()(tagEntityManager: SlickTagEntityMa
 
     // Add tagEntityManager to database
     for (tag <- persistedTransaction.tags) {
-      tagEntityManager.add(
-        TagEntity(
-          name = tag.name,
-          transactionId = persistedTransaction.id))
+      tagEntityManager.add(TagEntity(name = tag.name, transactionId = persistedTransaction.id))
     }
 
     persistedTransaction
@@ -56,7 +54,6 @@ final class SlickTransactionManager @Inject()(tagEntityManager: SlickTagEntityMa
     super.delete(transaction)
   }
 }
-
 
 object SlickTransactionManager {
   private val tableName: String = "TRANSACTIONS"
@@ -75,7 +72,20 @@ object SlickTransactionManager {
     def transactionDate = column[LocalDateTime]("transactionDate")
     def consumedDate = column[LocalDateTime]("consumedDate")
 
-    override def * = (transactionGroupId, issuerId, beneficiaryAccountCode, moneyReservoirCode, categoryCode, description, flow,
-      detailDescription, tagsString, createdDate, transactionDate, consumedDate, id.?) <> (Transaction.tupled, Transaction.unapply)
+    override def * =
+      (
+        transactionGroupId,
+        issuerId,
+        beneficiaryAccountCode,
+        moneyReservoirCode,
+        categoryCode,
+        description,
+        flow,
+        detailDescription,
+        tagsString,
+        createdDate,
+        transactionDate,
+        consumedDate,
+        id.?) <> (Transaction.tupled, Transaction.unapply)
   }
 }

@@ -15,7 +15,7 @@ import models.EntityAccess
   * @param debt The debt of the first account to the second (may be negative).
   */
 case class LiquidationEntry(override val transactions: Seq[Transaction], debt: ReferenceMoney)
-  extends GroupedTransactions(transactions)
+    extends GroupedTransactions(transactions)
 
 final class LiquidationEntries @Inject()(implicit accountingConfig: Config,
                                          exchangeRateManager: ExchangeRateManager,
@@ -35,7 +35,8 @@ final class LiquidationEntries @Inject()(implicit accountingConfig: Config,
         } yield transaction
 
       // convert to entries (recursion does not lead to growing stack because of Stream)
-      def convertToEntries(nextTransactions: List[Transaction], currentDebt: ReferenceMoney): Stream[LiquidationEntry] =
+      def convertToEntries(nextTransactions: List[Transaction],
+                           currentDebt: ReferenceMoney): Stream[LiquidationEntry] =
         nextTransactions match {
           case trans :: rest =>
             val addsTo1To2Debt = trans.beneficiary == accountPair.account2
@@ -45,10 +46,12 @@ final class LiquidationEntries @Inject()(implicit accountingConfig: Config,
           case Nil =>
             Stream.empty
         }
-      var entries = convertToEntries(relevantTransactions, ReferenceMoney(0) /* initial debt */).toList
+      var entries = convertToEntries(relevantTransactions, ReferenceMoney(0) /* initial debt */ ).toList
 
       entries = GroupedTransactions.combineConsecutiveOfSameGroup(entries) {
-        /* combine */ (first, last) => LiquidationEntry(first.transactions ++ last.transactions, last.debt)
+        /* combine */
+        (first, last) =>
+          LiquidationEntry(first.transactions ++ last.transactions, last.debt)
       }
 
       entries.takeRight(n)
@@ -66,7 +69,8 @@ final class LiquidationEntries @Inject()(implicit accountingConfig: Config,
     accountPair.toSet == involvedAccounts
   }
 
-  private case class FetchLastNEntries(accountPair: AccountPair, n: Int) extends CacheIdentifier[Seq[LiquidationEntry]] {
+  private case class FetchLastNEntries(accountPair: AccountPair, n: Int)
+      extends CacheIdentifier[Seq[LiquidationEntry]] {
     protected override def invalidateWhenUpdating = {
       case transaction: Transaction => isRelevantForAccounts(transaction, accountPair)
     }

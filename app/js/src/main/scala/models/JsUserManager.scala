@@ -6,7 +6,7 @@ import models.manager.BaseJsEntityManager
 import scala.collection.immutable.Seq
 
 final class JsUserManager(implicit database: RemoteDatabaseProxy)
-  extends BaseJsEntityManager[User]
+    extends BaseJsEntityManager[User]
     with User.Manager {
 
   override def findByLoginName(loginName: String) = {

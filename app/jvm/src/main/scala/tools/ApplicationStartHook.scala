@@ -80,10 +80,11 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
   private def loadCsvDummyData(csvDataFolder: Path) = {
     csvImportTool.importTransactions(assertExists(csvDataFolder resolve "transactions.csv"))
     csvImportTool.importBalanceChecks(assertExists(csvDataFolder resolve "balancechecks.csv"))
-    entityAccess.exchangeRateMeasurementManager.add(ExchangeRateMeasurement(
-      date = LocalDateTime.of(LocalDate.of(1990, JANUARY, 1), LocalTime.MIN),
-      foreignCurrencyCode = "GBP",
-      ratioReferenceToForeignCurrency = 1.2))
+    entityAccess.exchangeRateMeasurementManager.add(
+      ExchangeRateMeasurement(
+        date = LocalDateTime.of(LocalDate.of(1990, JANUARY, 1), LocalTime.MIN),
+        foreignCurrencyCode = "GBP",
+        ratioReferenceToForeignCurrency = 1.2))
   }
 
   private def assertExists(path: Path): Path = {

@@ -25,25 +25,23 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
     component(Menu.Props(currentPage, router))
   }
 
-
-  private val component = ReactComponentB[Menu.Props](getClass.getSimpleName)
-    .render_P { props =>
-      <.div(<.b("Menu:"),
-        for ((item, i) <- Menu.menuItems.zipWithIndex) yield {
-          <.span(
-            ^.key := i,
-            (props.currentPage == item.page) ?= (^.className := "active"),
-            props.router.link(item.page)(
-              <.i(^^.classes(item.iconClass)),
-              " ",
-              i18n(item.labelKey)
-            ),
-            " - "
-          )
-        }
-      )
-    }
-    .build
+  private val component = ReactComponentB[Menu.Props](getClass.getSimpleName).render_P { props =>
+    <.div(
+      <.b("Menu:"),
+      for ((item, i) <- Menu.menuItems.zipWithIndex) yield {
+        <.span(
+          ^.key := i,
+          (props.currentPage == item.page) ?= (^.className := "active"),
+          props.router.link(item.page)(
+            <.i(^^.classes(item.iconClass)),
+            " ",
+            i18n(item.labelKey)
+          ),
+          " - "
+        )
+      }
+    )
+  }.build
 }
 
 private[app] object Menu {
@@ -51,7 +49,8 @@ private[app] object Menu {
   private val menuItems = Seq(
     MenuItem("Everything", "fa fa-money", Page.EverythingPage),
     MenuItem("Everything2", "fa fa-money", Page.EverythingPage2),
-    MenuItem("New", "icon-new-empty", Page.NewTransactionGroupPage))
+    MenuItem("New", "icon-new-empty", Page.NewTransactionGroupPage)
+  )
 
   private case class Props(currentPage: Page, router: RouterCtl[Page])
   private case class MenuItem(labelKey: String, iconClass: String, page: Page)

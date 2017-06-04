@@ -9,12 +9,14 @@ import models.manager.{EntityTable, Entity, SlickEntityManager, ForwardingEntity
 
 import SlickUserManager.{Users, tableName}
 
-final class SlickUserManager extends ForwardingEntityManager[User, Users](
-  SlickEntityManager.create[User, Users](
-    tag => new Users(tag),
-    tableName = tableName,
-    cached = true
-  )) with User.Manager {
+final class SlickUserManager
+    extends ForwardingEntityManager[User, Users](
+      SlickEntityManager.create[User, Users](
+        tag => new Users(tag),
+        tableName = tableName,
+        cached = true
+      ))
+    with User.Manager {
 
   override def findByLoginName(loginName: String): Option[User] = {
     val users: Seq[User] = dbRun(newQuery.filter(u => u.loginName === loginName).result)

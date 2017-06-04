@@ -9,15 +9,21 @@ import models.manager.{EntityModification, EntityType}
 import scala.collection.immutable.Seq
 
 final class AllEntriesStoreFactory(implicit database: RemoteDatabaseProxy)
-  extends EntriesListStoreFactory[GeneralEntry, Unit] {
+    extends EntriesListStoreFactory[GeneralEntry, Unit] {
 
   override protected def createNew(maxNumEntries: Int, input: Unit) = new Store {
     override protected def calculateState() = {
       val transactions: Seq[Transaction] =
-        database.newQuery[Transaction]()
-          .sort(Loki.Sorting.by("transactionDate").desc()
-            .thenBy("createdDate").desc()
-            .thenBy("id").desc())
+        database
+          .newQuery[Transaction]()
+          .sort(
+            Loki.Sorting
+              .by("transactionDate")
+              .desc()
+              .thenBy("createdDate")
+              .desc()
+              .thenBy("id")
+              .desc())
           .limit(3 * maxNumEntries)
           .data()
           .reverse
@@ -29,7 +35,8 @@ final class AllEntriesStoreFactory(implicit database: RemoteDatabaseProxy)
       EntriesListStoreFactory.State(entries.takeRight(maxNumEntries), hasMore = entries.size > maxNumEntries)
     }
 
-    override protected def modificationImpactsState(entityModification: EntityModification, state: State): Boolean = {
+    override protected def modificationImpactsState(entityModification: EntityModification,
+                                                    state: State): Boolean = {
       entityModification.entityType == EntityType.TransactionType
     }
   }

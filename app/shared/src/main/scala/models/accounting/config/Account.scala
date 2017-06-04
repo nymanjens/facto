@@ -16,8 +16,15 @@ case class Account(code: String,
                    categories: Seq[Category] = Nil,
                    summaryTotalRows: Seq[SummaryTotalRowDef] = Nil) {
   requireNonNull(
-    code, longName, shorterName, veryShortName, userLoginName, defaultCashReservoirCode,
-    defaultCashReservoirCode, categories, summaryTotalRows)
+    code,
+    longName,
+    shorterName,
+    veryShortName,
+    userLoginName,
+    defaultCashReservoirCode,
+    defaultCashReservoirCode,
+    categories,
+    summaryTotalRows)
 
   private[config] def validateCodes(moneyReservoirs: Iterable[MoneyReservoir]): Unit = {
     def requireValidCode(code: String): Unit = {
@@ -31,11 +38,10 @@ case class Account(code: String,
   override def toString = s"Account($code)"
 
   def user(implicit entityAccess: EntityAccess): Option[User] = {
-    userLoginName.map {
-      loginName =>
-        val user = entityAccess.userManager.findByLoginName(loginName)
-        require(user.isDefined, s"No user exists with loginName '$loginName'")
-        user.get
+    userLoginName.map { loginName =>
+      val user = entityAccess.userManager.findByLoginName(loginName)
+      require(user.isDefined, s"No user exists with loginName '$loginName'")
+      user.get
     }
   }
 
@@ -48,10 +54,9 @@ case class Account(code: String,
   def visibleReservoirs(implicit accountingConfig: Config): Seq[MoneyReservoir] =
     accountingConfig.visibleReservoirs.filter(_.owner == this).toList
 
-  def isMineOrCommon(implicit user: User,
-                     accountingConfig: Config,
-                     entityAccess: EntityAccess): Boolean =
-    Set(accountingConfig.accountOf(user), Some(accountingConfig.constants.commonAccount)).flatten.contains(this)
+  def isMineOrCommon(implicit user: User, accountingConfig: Config, entityAccess: EntityAccess): Boolean =
+    Set(accountingConfig.accountOf(user), Some(accountingConfig.constants.commonAccount)).flatten
+      .contains(this)
 }
 
 object Account {

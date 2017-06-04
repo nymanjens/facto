@@ -18,6 +18,7 @@ object ScalaUtils {
 
   /** Scala version of com.google.common.annotations.VisibleForTesting. */
   class visibleForTesting extends StaticAnnotation
+
   /** Scala version of javax.annotations.Nullable. */
   class nullable extends StaticAnnotation
 }

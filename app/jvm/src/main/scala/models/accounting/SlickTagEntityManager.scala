@@ -14,11 +14,13 @@ import scala.collection.immutable.ListMap
 
 import SlickTagEntityManager.{TagEntities, tableName}
 
-final class SlickTagEntityManager extends ImmutableEntityManager[TagEntity, TagEntities](
-  SlickEntityManager.create[TagEntity, TagEntities](
-    tag => new TagEntities(tag),
-    tableName = tableName
-  )) with TagEntity.Manager {
+final class SlickTagEntityManager
+    extends ImmutableEntityManager[TagEntity, TagEntities](
+      SlickEntityManager.create[TagEntity, TagEntities](
+        tag => new TagEntities(tag),
+        tableName = tableName
+      ))
+    with TagEntity.Manager {
 
   // Validates the tag name at creation time
   override def add(tagEntity: TagEntity): TagEntity = {
@@ -26,7 +28,8 @@ final class SlickTagEntityManager extends ImmutableEntityManager[TagEntity, TagE
     super.add(tagEntity)
   }
 
-  override def usageAndReccomendations(selectedTags: Seq[Tag], maxNumRecommendations: Int): ListMap[Tag, Int] = {
+  override def usageAndReccomendations(selectedTags: Seq[Tag],
+                                       maxNumRecommendations: Int): ListMap[Tag, Int] = {
     val tagToUsagePairs: Seq[(Tag, Int)] = {
       val allTagNames = dbRun(newQuery.map(_.name))
       val multiset = ImmutableMultiset.copyOf(allTagNames.asJava)
@@ -37,10 +40,9 @@ final class SlickTagEntityManager extends ImmutableEntityManager[TagEntity, TagE
     val tagToUsageMap: Map[Tag, Int] = tagToUsagePairs.toMap withDefault (_ => 0)
 
     val selectedTagsMap: ListMap[Tag, Int] = {
-      toListMap(
-        for (tag <- selectedTags) yield {
-          (tag, tagToUsageMap(tag))
-        })
+      toListMap(for (tag <- selectedTags) yield {
+        (tag, tagToUsageMap(tag))
+      })
     }
     val recommendedTagsMap: ListMap[Tag, Int] = {
       val numRecommendations = maxNumRecommendations - selectedTags.size
@@ -48,7 +50,8 @@ final class SlickTagEntityManager extends ImmutableEntityManager[TagEntity, TagE
         toListMap(Seq())
       } else {
         toListMap(
-          tagToUsagePairs.sortBy(-_._2)
+          tagToUsagePairs
+            .sortBy(-_._2)
             .filter { case (tag, usage) => !selectedTagsMap.contains(tag) }
             .take(numRecommendations))
       }
@@ -68,4 +71,3 @@ object SlickTagEntityManager {
     override def * = (name, transactionId, id.?) <> (TagEntity.tupled, TagEntity.unapply)
   }
 }
-

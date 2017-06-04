@@ -3,7 +3,12 @@ package api
 import java.nio.ByteBuffer
 
 import api.Picklers._
-import api.ScalaJsApi.{GetAllEntitiesResponse, GetEntityModificationsResponse, GetInitialDataResponse, UpdateToken}
+import api.ScalaJsApi.{
+  GetAllEntitiesResponse,
+  GetEntityModificationsResponse,
+  GetInitialDataResponse,
+  UpdateToken
+}
 import autowire._
 import boopickle.Default._
 import models.User
@@ -46,12 +51,14 @@ object ScalaJsApiClient {
 
   private object AutowireClient extends autowire.Client[ByteBuffer, Pickler, Pickler] {
     override def doCall(req: Request): Future[ByteBuffer] = {
-      dom.ext.Ajax.post(
-        url = "/scalajsapi/" + req.path.last,
-        data = Pickle.intoBytes(req.args),
-        responseType = "arraybuffer",
-        headers = Map("Content-Type" -> "application/octet-stream")
-      ).map(r => TypedArrayBuffer.wrap(r.response.asInstanceOf[ArrayBuffer]))
+      dom.ext.Ajax
+        .post(
+          url = "/scalajsapi/" + req.path.last,
+          data = Pickle.intoBytes(req.args),
+          responseType = "arraybuffer",
+          headers = Map("Content-Type" -> "application/octet-stream")
+        )
+        .map(r => TypedArrayBuffer.wrap(r.response.asInstanceOf[ArrayBuffer]))
     }
 
     override def read[Result: Pickler](p: ByteBuffer) = Unpickle[Result].fromBytes(p)

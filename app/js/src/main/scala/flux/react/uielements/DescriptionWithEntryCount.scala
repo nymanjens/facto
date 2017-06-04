@@ -13,9 +13,8 @@ object DescriptionWithEntryCount {
   private val component = ReactComponentB[Props](getClass.getSimpleName)
     .renderP((_, props) => {
       val entry = props.entry
-      val tagIndications = entry.tags.map(tag =>
-        <.span(^^.classes("label", s"label-${tag.bootstrapClassSuffix}"), tag.name)
-      )
+      val tagIndications =
+        entry.tags.map(tag => <.span(^^.classes("label", s"label-${tag.bootstrapClassSuffix}"), tag.name))
 
       if (entry.transactions.size == 1) {
         <.span(
@@ -23,13 +22,12 @@ object DescriptionWithEntryCount {
           entry.descriptions
         )
       } else {
-        UpperRightCorner(cornerContent = s"(${entry.transactions.size})")(centralContent =
-          tagIndications,
-          entry.descriptions.mkString(", ")
-        )
+        UpperRightCorner(cornerContent = s"(${entry.transactions.size})")(
+          centralContent = tagIndications,
+          entry.descriptions.mkString(", "))
       }
-    }
-    ).build
+    })
+    .build
 
   def apply(entry: GroupedTransactions): ReactElement = {
     component(Props(entry))

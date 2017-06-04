@@ -5,6 +5,7 @@ import scala.math.abs
 import scala.util.matching.Regex
 
 case class Tag(name: String) {
+
   /** Returns the Bootstrap label class for this Tag. **/
   def bootstrapClassSuffix: String = {
     val index = abs(name.hashCode) % Tag.bootstrapClassSuffixOptions.size

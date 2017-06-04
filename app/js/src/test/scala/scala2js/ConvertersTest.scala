@@ -63,7 +63,6 @@ object ConvertersTest extends TestSuite {
     }
   }
 
-
   private def testToJsAndBack[T: Scala2Js.Converter](value: T) = {
     val jsValue = Scala2Js.toJs[T](value)
     val generated = Scala2Js.toScala[T](jsValue)

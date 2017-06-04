@@ -30,8 +30,8 @@ object LocalDateTime {
     LocalDateTime.of(date, time)
   }
 
-  private case class LocalDateTimeImpl(private val date: LocalDate,
-                                       private val time: LocalTime) extends LocalDateTime {
+  private case class LocalDateTimeImpl(private val date: LocalDate, private val time: LocalTime)
+      extends LocalDateTime {
     requireNonNull(date, time)
 
     override def toLocalDate = date
@@ -40,7 +40,7 @@ object LocalDateTime {
     override def getMonth = date.getMonth
 
     override def plus(duration: Duration) = {
-      val millisInDay = 1000 * 60 * 60 *24
+      val millisInDay = 1000 * 60 * 60 * 24
       val durationMillis = duration.toMillis
       val timeMillis = time.toNanoOfDay / 1000 / 1000
       val dateMillis = date.toEpochDay * millisInDay

@@ -45,8 +45,7 @@ final class Summaries @Inject()(implicit accountingConfig: Config,
         transactionManager.newQuery
           .filter(_.beneficiaryAccountCode === account.code)
           .sortBy(_.consumedDate)
-          .take(1))
-        .headOption
+          .take(1)).headOption
       oldestTransaction.map(_.consumedDate) match {
         case Some(firstDateTime) =>
           val firstDate = firstDateTime.toLocalDate
@@ -83,10 +82,12 @@ final class Summaries @Inject()(implicit accountingConfig: Config,
     }
 }
 
-private case class GetSummaryYears(account: Account, expandedYear: Int, thisYear: Int) extends CacheIdentifier[Seq[Int]] {
+private case class GetSummaryYears(account: Account, expandedYear: Int, thisYear: Int)
+    extends CacheIdentifier[Seq[Int]] {
   protected override def invalidateWhenUpdatingEntity(oldYears: Seq[Int]) = {
     case transaction: Transaction =>
-      transaction.beneficiaryAccountCode == account.code && !oldYears.contains(transaction.consumedDate.getYear)
+      transaction.beneficiaryAccountCode == account.code && !oldYears.contains(
+        transaction.consumedDate.getYear)
   }
 }
 
@@ -111,18 +112,22 @@ case class SummaryForYear(cells: ImmutableTable[Category, DatedMonth, SummaryCel
 
 object SummaryForYear {
 
-  private[accounting] def fetch(account: Account, monthRangeForAverages: MonthRange, year: Int, tags: Seq[Tag])(implicit accountingConfig: Config,
-                                                                                                                exchangeRateManager: ExchangeRateManager,
-                                                                                                                entityAccess: SlickEntityAccess): SummaryForYear =
+  private[accounting] def fetch(account: Account,
+                                monthRangeForAverages: MonthRange,
+                                year: Int,
+                                tags: Seq[Tag])(implicit accountingConfig: Config,
+                                                exchangeRateManager: ExchangeRateManager,
+                                                entityAccess: SlickEntityAccess): SummaryForYear =
     ControllerHelperCache.cached(GetSummaryForYear(account, monthRangeForAverages, year, tags)) {
       val transactions: Seq[Transaction] = {
         val yearRange = MonthRange.forYear(year)
-        val allTransactions = dbRun(entityAccess.transactionManager.newQuery
-          .filter(_.beneficiaryAccountCode === account.code)
-          .filter(_.consumedDate >= LocalDateTimes.ofJavaLocalDateTime(yearRange.start.atStartOfDay()))
-          .filter(_.consumedDate < LocalDateTimes.ofJavaLocalDateTime(yearRange.startOfNextMonth.atStartOfDay()))
-          .sortBy(r => (r.consumedDate, r.createdDate)))
-          .toList
+        val allTransactions = dbRun(
+          entityAccess.transactionManager.newQuery
+            .filter(_.beneficiaryAccountCode === account.code)
+            .filter(_.consumedDate >= LocalDateTimes.ofJavaLocalDateTime(yearRange.start.atStartOfDay()))
+            .filter(
+              _.consumedDate < LocalDateTimes.ofJavaLocalDateTime(yearRange.startOfNextMonth.atStartOfDay()))
+            .sortBy(r => (r.consumedDate, r.createdDate))).toList
         if (tags.isEmpty) {
           allTransactions // don't filter
         } else {
@@ -138,15 +143,20 @@ object SummaryForYear {
       summaryBuilder.result
     }
 
-  private case class GetSummaryForYear(account: Account, monthRangeForAverages: MonthRange, year: Int, tags: Seq[Tag]) extends CacheIdentifier[SummaryForYear] {
+  private case class GetSummaryForYear(account: Account,
+                                       monthRangeForAverages: MonthRange,
+                                       year: Int,
+                                       tags: Seq[Tag])
+      extends CacheIdentifier[SummaryForYear] {
     protected override def invalidateWhenUpdating = {
       case transaction: Transaction =>
         transaction.beneficiaryAccountCode == account.code && transaction.consumedDate.getYear == year
     }
   }
 
-  private class Builder(account: Account, monthRangeForAverages: MonthRange, year: Int)(implicit accountingConfig: Config,
-                                                                                        exchangeRateManager: ExchangeRateManager) {
+  private class Builder(account: Account, monthRangeForAverages: MonthRange, year: Int)(
+      implicit accountingConfig: Config,
+      exchangeRateManager: ExchangeRateManager) {
     private val cellBuilders: ImmutableTable[Category, DatedMonth, SummaryCell.Builder] = {
       val tableBuilder = ImmutableTable.builder[Category, DatedMonth, SummaryCell.Builder]()
       for (category <- account.categories) {
@@ -161,13 +171,16 @@ object SummaryForYear {
 
     def addTransaction(transaction: Transaction): Builder = {
       if (account.categories contains transaction.category) {
-        cellBuilders.get(transaction.category, DatedMonth.containing(transaction.consumedDate)).addTransaction(transaction)
+        cellBuilders
+          .get(transaction.category, DatedMonth.containing(transaction.consumedDate))
+          .addTransaction(transaction)
         if (monthRangeForAverages contains transaction.consumedDate) {
           categoryToTransactions.put(transaction.category, transaction)
         }
       } else {
-        Logger.warn(s"There was a transaction with category ${transaction.category.name}, but this account " +
-          s"(${account.longName}) doesn't or no longer contains this category")
+        Logger.warn(
+          s"There was a transaction with category ${transaction.category.name}, but this account " +
+            s"(${account.longName}) doesn't or no longer contains this category")
       }
       this
     }
@@ -225,20 +238,24 @@ object SummaryCell {
   }
 }
 
-case class SummaryTotalRow(rowTitleHtml: String, monthToTotal: Map[DatedMonth, ReferenceMoney], yearlyAverage: ReferenceMoney)
+case class SummaryTotalRow(rowTitleHtml: String,
+                           monthToTotal: Map[DatedMonth, ReferenceMoney],
+                           yearlyAverage: ReferenceMoney)
 
 object SummaryTotalRow {
   def calculate(totalRowDef: SummaryTotalRowDef,
                 cells: Table[Category, DatedMonth, SummaryCell],
-                categoryToAverages: Map[Category, ReferenceMoney])(implicit exchangeRateManager: ExchangeRateManager,
-                                                                   accountingConfig: Config): SummaryTotalRow = {
+                categoryToAverages: Map[Category, ReferenceMoney])(
+      implicit exchangeRateManager: ExchangeRateManager,
+      accountingConfig: Config): SummaryTotalRow = {
     def sumNonIgnoredCategories(categoryToMoney: Map[Category, ReferenceMoney]): ReferenceMoney = {
       categoryToMoney.filter { case (cat, _) => !totalRowDef.categoriesToIgnore.contains(cat) }.values.sum
     }
     val monthToTotal: Map[DatedMonth, ReferenceMoney] = toListMap {
       for ((month, categoryToCell) <- cells.columnMap().asScala.toSeq.sortBy(_._1))
-        yield month -> sumNonIgnoredCategories(
-          categoryToMoney = categoryToCell.asScala.toMap.mapValues(_.totalFlow))
+        yield
+          month -> sumNonIgnoredCategories(
+            categoryToMoney = categoryToCell.asScala.toMap.mapValues(_.totalFlow))
     }
     val yearlyAverage: ReferenceMoney = sumNonIgnoredCategories(categoryToAverages)
     SummaryTotalRow(

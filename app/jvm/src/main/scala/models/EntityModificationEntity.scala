@@ -12,7 +12,8 @@ import models.manager.{Entity, EntityManager, EntityModification}
 case class EntityModificationEntity(userId: Long,
                                     modification: EntityModification,
                                     date: LocalDateTime,
-                                    idOption: Option[Long] = None) extends Entity {
+                                    idOption: Option[Long] = None)
+    extends Entity {
   require(userId > 0)
   for (idVal <- idOption) require(idVal > 0)
 
@@ -20,7 +21,6 @@ case class EntityModificationEntity(userId: Long,
 
   def user(implicit entityAccess: EntityAccess): User = entityAccess.userManager.findById(userId)
 }
-
 
 object EntityModificationEntity {
   def tupled = (this.apply _).tupled

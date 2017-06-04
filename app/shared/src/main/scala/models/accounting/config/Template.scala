@@ -4,7 +4,10 @@ import scala.collection.immutable.{Seq, Set}
 import common.Require.requireNonNull
 import models.accounting.money.Money
 import models._
-import models.accounting.{TransactionGroup => AccountingTransactionGroup, Transaction => AccountingTransaction}
+import models.accounting.{
+  TransactionGroup => AccountingTransactionGroup,
+  Transaction => AccountingTransaction
+}
 import models.accounting.config.Template.Transaction
 
 // Every field ending with "Tpl" may contain $-prefixed placeholders.
@@ -40,8 +43,11 @@ case class Template(code: String,
       loginNameOption.map { loginName =>
         val user = entityAccess.userManager.findByLoginName(loginName)
         require(user.isDefined, s"No user exists with loginName '$loginName'")
-        require(accountingConfig.accountOf(user.get).isDefined, s"Only user names that have an associated account can be used in templates " +
-          s"(user = '$loginName', template = '$name')")
+        require(
+          accountingConfig.accountOf(user.get).isDefined,
+          s"Only user names that have an associated account can be used in templates " +
+            s"(user = '$loginName', template = '$name')"
+        )
         user.get
       }
     }
@@ -79,7 +85,11 @@ object Template {
                          flowInCents: Long = 0,
                          tagsString: String = "") {
     requireNonNull(
-      beneficiaryCodeTpl, moneyReservoirCodeTpl, categoryCodeTpl, descriptionTpl, flowInCents,
+      beneficiaryCodeTpl,
+      moneyReservoirCodeTpl,
+      categoryCodeTpl,
+      descriptionTpl,
+      flowInCents,
       tagsString)
 
     def toPartial(account: Account)(implicit accountingConfig: Config): AccountingTransaction.Partial = {
@@ -88,7 +98,8 @@ object Template {
           "${account.code}" -> account.code,
           "${account.longName}" -> account.longName,
           "${account.defaultCashReservoir.code}" -> account.defaultCashReservoir.map(_.code).getOrElse(""),
-          "${account.defaultElectronicReservoir.code}" -> account.defaultElectronicReservoir.code)
+          "${account.defaultElectronicReservoir.code}" -> account.defaultElectronicReservoir.code
+        )
         var result = string
         for ((placeholder, replacement) <- placeholderToReplacement) {
           result = result.replace(placeholder, replacement)
@@ -106,7 +117,8 @@ object Template {
         description = fillInPlaceholders(descriptionTpl),
         flowInCents = flowInCents,
         detailDescription = "",
-        tagsString = tagsString)
+        tagsString = tagsString
+      )
     }
   }
 }

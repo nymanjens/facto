@@ -17,10 +17,10 @@ final class FakeRemoteDatabaseProxy extends RemoteDatabaseProxy {
   private val listeners: mutable.Buffer[Listener] = mutable.Buffer()
 
   // **************** Implementation of ScalaJsApiClient trait ****************//
-  override def newQuery[E <: Entity : EntityType]() = {
+  override def newQuery[E <: Entity: EntityType]() = {
     new Loki.ResultSet.Fake(modificationsBuffer.getAllEntitiesOfType[E])
   }
-  override def hasLocalAddModifications[E <: Entity : EntityType](entity: E) = {
+  override def hasLocalAddModifications[E <: Entity: EntityType](entity: E) = {
     localModificationIds contains entity.id
   }
   override def persistModifications(modifications: Seq[EntityModification]): Future[Unit] = {
@@ -45,11 +45,11 @@ final class FakeRemoteDatabaseProxy extends RemoteDatabaseProxy {
     listeners.foreach(_.addedRemotely(modifications))
   }
 
-  def addRemotelyAddedEntities[E <: Entity : EntityType](entities: E*): Unit = {
+  def addRemotelyAddedEntities[E <: Entity: EntityType](entities: E*): Unit = {
     addRemotelyAddedEntities(entities.toVector)
   }
 
-  def addRemotelyAddedEntities[E <: Entity : EntityType](entities: Seq[E]): Unit = {
+  def addRemotelyAddedEntities[E <: Entity: EntityType](entities: Seq[E]): Unit = {
     addRemoteModifications(entities map (e => EntityModification.Add(e)))
   }
 

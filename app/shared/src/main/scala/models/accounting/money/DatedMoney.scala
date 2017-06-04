@@ -15,12 +15,14 @@ import scala.collection.JavaConverters._
   *
   * The date allows the instance to be converted into other currences with the exchange rate of that day.
   */
-case class DatedMoney(override val cents: Long, override val currency: Currency, date: LocalDateTime) extends MoneyWithGeneralCurrency {
+case class DatedMoney(override val cents: Long, override val currency: Currency, date: LocalDateTime)
+    extends MoneyWithGeneralCurrency {
 
   def exchangedForReferenceCurrency(implicit exchangeRateManager: ExchangeRateManager): ReferenceMoney =
     ReferenceMoney(exchangedForCurrency(Currency.default).cents)
 
-  def exchangedForCurrency(otherCurrency: Currency)(implicit exchangeRateManager: ExchangeRateManager): DatedMoney = {
+  def exchangedForCurrency(otherCurrency: Currency)(
+      implicit exchangeRateManager: ExchangeRateManager): DatedMoney = {
     val ratio = exchangeRateManager.getRatioSecondToFirstCurrency(currency, otherCurrency, date)
     val centsInOtherCurrency = roundToLong(ratio * cents)
     DatedMoney(centsInOtherCurrency, otherCurrency, date)

@@ -21,7 +21,8 @@ object MoneyWithGeneralCurrency {
     MoneyWithGeneralCurrencyImpl(cents, currency)
   }
 
-  def numeric(currency: Currency): Numeric[MoneyWithGeneralCurrency] = new CentOperationsNumeric[MoneyWithGeneralCurrency] {
-    override def fromInt(x: Int): MoneyWithGeneralCurrency = MoneyWithGeneralCurrencyImpl(0, currency)
-  }
+  def numeric(currency: Currency): Numeric[MoneyWithGeneralCurrency] =
+    new CentOperationsNumeric[MoneyWithGeneralCurrency] {
+      override def fromInt(x: Int): MoneyWithGeneralCurrency = MoneyWithGeneralCurrencyImpl(0, currency)
+    }
 }

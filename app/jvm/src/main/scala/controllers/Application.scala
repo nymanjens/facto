@@ -30,86 +30,84 @@ final class Application @Inject()(implicit val messagesApi: MessagesApi,
                                   userManager: SlickUserManager,
                                   entityAccess: SlickEntityAccess,
                                   scalaJsApiServerFactory: ScalaJsApiServerFactory,
-                                  env: play.api.Environment) extends Controller with I18nSupport {
+                                  env: play.api.Environment)
+    extends Controller
+    with I18nSupport {
 
   // ********** actions ********** //
-  def index() = AuthenticatedAction { implicit user =>
-    implicit request =>
-      Redirect(controllers.accounting.routes.Views.cashFlowOfAll)
+  def index() = AuthenticatedAction { implicit user => implicit request =>
+    Redirect(controllers.accounting.routes.Views.cashFlowOfAll)
   }
 
-  def profile() = AuthenticatedAction { implicit user =>
-    implicit request =>
-      val initialData = ChangePasswordData(user.loginName)
-      Ok(views.html.profile(Forms.changePasswordForm.fill(initialData)))
+  def profile() = AuthenticatedAction { implicit user => implicit request =>
+    val initialData = ChangePasswordData(user.loginName)
+    Ok(views.html.profile(Forms.changePasswordForm.fill(initialData)))
   }
 
-  def changePassword = AuthenticatedAction { implicit user =>
-    implicit request =>
-      Forms.changePasswordForm.bindFromRequest.fold(
-        formWithErrors => BadRequest(views.html.profile(formWithErrors)),
-        formData => formData match {
+  def changePassword = AuthenticatedAction { implicit user => implicit request =>
+    Forms.changePasswordForm.bindFromRequest.fold(
+      formWithErrors => BadRequest(views.html.profile(formWithErrors)),
+      formData =>
+        formData match {
           case ChangePasswordData(loginName, _, password, _) =>
             require(loginName == user.loginName)
             userManager.update(SlickUserManager.copyUserWithPassword(user, password))
             val message = Messages("facto.successfully-updated-password")
             Redirect(routes.Application.profile).flashing("message" -> message)
-        }
-      )
+      }
+    )
   }
 
-  def administration() = AuthenticatedAction.requireAdminUser { implicit user =>
-    implicit request =>
-      Ok(views.html.administration(users = userManager.fetchAll(), Forms.addUserForm))
+  def administration() = AuthenticatedAction.requireAdminUser { implicit user => implicit request =>
+    Ok(views.html.administration(users = userManager.fetchAll(), Forms.addUserForm))
   }
 
-  def addUser() = AuthenticatedAction.requireAdminUser { implicit user =>
-    implicit request =>
-      Forms.addUserForm.bindFromRequest.fold(
-        formWithErrors => BadRequest(views.html.administration(users = userManager.fetchAll(), formWithErrors)),
-        formData => formData match {
+  def addUser() = AuthenticatedAction.requireAdminUser { implicit user => implicit request =>
+    Forms.addUserForm.bindFromRequest.fold(
+      formWithErrors =>
+        BadRequest(views.html.administration(users = userManager.fetchAll(), formWithErrors)),
+      formData =>
+        formData match {
           case AddUserData(loginName, name, password, _) =>
             userManager.add(SlickUserManager.createUser(loginName, password, name))
             val message = Messages("facto.successfully-added-user", name)
             Redirect(routes.Application.administration).flashing("message" -> message)
-        }
-      )
+      }
+    )
   }
 
   // Note: This action manually implements what autowire normally does automatically. Unfortunately, autowire
   // doesn't seem to work for some reason.
-  def scalaJsApi(path: String) = AuthenticatedAction(parse.raw) { implicit user =>
-    implicit request =>
-      // Get the scalaJsApiServer
-      val scalaJsApiServer = scalaJsApiServerFactory.create()
+  def scalaJsApi(path: String) = AuthenticatedAction(parse.raw) { implicit user => implicit request =>
+    // Get the scalaJsApiServer
+    val scalaJsApiServer = scalaJsApiServerFactory.create()
 
-      // get the request body as ByteBuffer
-      val requestBuffer: ByteBuffer = request.body.asBytes(parse.UNLIMITED).get.asByteBuffer
-      val argsMap = Unpickle[Map[String, ByteBuffer]].fromBytes(requestBuffer)
+    // get the request body as ByteBuffer
+    val requestBuffer: ByteBuffer = request.body.asBytes(parse.UNLIMITED).get.asByteBuffer
+    val argsMap = Unpickle[Map[String, ByteBuffer]].fromBytes(requestBuffer)
 
-      val responseBuffer = path match {
-        case "getInitialData" =>
-          Pickle.intoBytes(scalaJsApiServer.getInitialData())
-        case "getAllEntities" =>
-          val types = Unpickle[Seq[EntityType.any]].fromBytes(argsMap("types"))
-          Pickle.intoBytes(scalaJsApiServer.getAllEntities(types))
-        case "getEntityModifications" =>
-          val updateToken = Unpickle[UpdateToken].fromBytes(argsMap("updateToken"))
-          Pickle.intoBytes(scalaJsApiServer.getEntityModifications(updateToken))
-        case "persistEntityModifications" =>
-          val modifications = Unpickle[Seq[EntityModification]].fromBytes(argsMap("modifications"))
-          Pickle.intoBytes(scalaJsApiServer.persistEntityModifications(modifications))
-      }
+    val responseBuffer = path match {
+      case "getInitialData" =>
+        Pickle.intoBytes(scalaJsApiServer.getInitialData())
+      case "getAllEntities" =>
+        val types = Unpickle[Seq[EntityType.any]].fromBytes(argsMap("types"))
+        Pickle.intoBytes(scalaJsApiServer.getAllEntities(types))
+      case "getEntityModifications" =>
+        val updateToken = Unpickle[UpdateToken].fromBytes(argsMap("updateToken"))
+        Pickle.intoBytes(scalaJsApiServer.getEntityModifications(updateToken))
+      case "persistEntityModifications" =>
+        val modifications = Unpickle[Seq[EntityModification]].fromBytes(argsMap("modifications"))
+        Pickle.intoBytes(scalaJsApiServer.persistEntityModifications(modifications))
+    }
 
-      // Serialize response in HTTP response
-      val data = Array.ofDim[Byte](responseBuffer.remaining())
-      responseBuffer.get(data)
-      Ok(data)
+    // Serialize response in HTTP response
+    val data = Array.ofDim[Byte](responseBuffer.remaining())
+    responseBuffer.get(data)
+    Ok(data)
   }
 
-  def manualTests() = AuthenticatedAction { implicit user =>
-    implicit request =>
-      Ok(views.html.manualTests())
+  def manualTests() = AuthenticatedAction { implicit user => implicit request =>
+    Ok(views.html.manualTests())
   }
 }
 
@@ -128,10 +126,13 @@ object Application {
         "oldPassword" -> nonEmptyText,
         "password" -> nonEmptyText,
         "passwordVerification" -> nonEmptyText
-      )(ChangePasswordData.apply)(ChangePasswordData.unapply) verifying("facto.error.old-password-is-incorrect", result => result match {
-        case ChangePasswordData(loginName, oldPassword, _, _) => entityAccess.userManager.authenticate(loginName, oldPassword)
-      }) verifying("facto.error.passwords-should-match", result => result match {
-        case ChangePasswordData(_, _, password, passwordVerification) => password == passwordVerification
+      )(ChangePasswordData.apply)(ChangePasswordData.unapply) verifying ("facto.error.old-password-is-incorrect", result =>
+        result match {
+          case ChangePasswordData(loginName, oldPassword, _, _) =>
+            entityAccess.userManager.authenticate(loginName, oldPassword)
+      }) verifying ("facto.error.passwords-should-match", result =>
+        result match {
+          case ChangePasswordData(_, _, password, passwordVerification) => password == passwordVerification
       })
     )
 
@@ -146,8 +147,9 @@ object Application {
         "name" -> nonEmptyText,
         "password" -> nonEmptyText,
         "passwordVerification" -> nonEmptyText
-      )(AddUserData.apply)(AddUserData.unapply) verifying("facto.error.passwords-should-match", result => result match {
-        case AddUserData(_, _, password, passwordVerification) => password == passwordVerification
+      )(AddUserData.apply)(AddUserData.unapply) verifying ("facto.error.passwords-should-match", result =>
+        result match {
+          case AddUserData(_, _, password, passwordVerification) => password == passwordVerification
       })
     )
   }

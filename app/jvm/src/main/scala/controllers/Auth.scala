@@ -10,7 +10,9 @@ import play.api.mvc._
 
 final class Auth @Inject()(implicit val messagesApi: MessagesApi,
                            entityAccess: SlickEntityAccess,
-                           env: play.api.Environment) extends Controller with I18nSupport {
+                           env: play.api.Environment)
+    extends Controller
+    with I18nSupport {
 
   // ********** actions ********** //
   def login = Action { implicit request =>
@@ -35,12 +37,13 @@ object Auth {
   // ********** forms ********** //
   object Forms {
 
-    def  loginForm(implicit entityAccess: SlickEntityAccess) = Form(
+    def loginForm(implicit entityAccess: SlickEntityAccess) = Form(
       tuple(
         "loginName" -> nonEmptyText,
         "password" -> text
-      ) verifying("facto.error.invalid-username-or-password", result => result match {
-        case (loginName, password) => entityAccess.userManager.authenticate(loginName, password)
+      ) verifying ("facto.error.invalid-username-or-password", result =>
+        result match {
+          case (loginName, password) => entityAccess.userManager.authenticate(loginName, password)
       })
     )
   }

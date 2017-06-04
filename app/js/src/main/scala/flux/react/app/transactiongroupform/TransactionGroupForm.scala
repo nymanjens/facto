@@ -35,23 +35,25 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
   private val component = {
     ReactComponentB[Props](getClass.getSimpleName)
-      .initialState_P(props => logExceptions {
-        val numberOfTransactions = props.operationMeta match {
-          case OperationMeta.AddNew => 1
-          case OperationMeta.Edit(group) => group.transactions.length
-        }
-        val totalFlowRestriction = props.operationMeta match {
-          case OperationMeta.Edit(group) if group.isZeroSum => TotalFlowRestriction.ZeroSum
-          case _ => TotalFlowRestriction.AnyTotal
-        }
-        State(
-          panelIndices = 0 until numberOfTransactions,
-          nextPanelIndex = numberOfTransactions,
-          // The following fields are updated by onFormChange() when the component is mounted
-          foreignCurrency = None,
-          totalFlowRestriction = totalFlowRestriction,
-          totalFlow = ReferenceMoney(0),
-          totalFlowExceptLast = ReferenceMoney(0))
+      .initialState_P(props =>
+        logExceptions {
+          val numberOfTransactions = props.operationMeta match {
+            case OperationMeta.AddNew => 1
+            case OperationMeta.Edit(group) => group.transactions.length
+          }
+          val totalFlowRestriction = props.operationMeta match {
+            case OperationMeta.Edit(group) if group.isZeroSum => TotalFlowRestriction.ZeroSum
+            case _ => TotalFlowRestriction.AnyTotal
+          }
+          State(
+            panelIndices = 0 until numberOfTransactions,
+            nextPanelIndex = numberOfTransactions,
+            // The following fields are updated by onFormChange() when the component is mounted
+            foreignCurrency = None,
+            totalFlowRestriction = totalFlowRestriction,
+            totalFlow = ReferenceMoney(0),
+            totalFlowExceptLast = ReferenceMoney(0)
+          )
       })
       .renderBackend[Backend]
       .componentDidMount(scope => LogExceptionsCallback(scope.backend.onFormChange()))
@@ -60,17 +62,11 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
   // **************** API ****************//
   def forCreate(router: RouterCtl[Page]): ReactElement = {
-    create(
-      Props(
-        OperationMeta.AddNew,
-        router))
+    create(Props(OperationMeta.AddNew, router))
   }
 
   def forEdit(transactionGroupId: Long, router: RouterCtl[Page]): ReactElement = {
-    create(
-      Props(
-        OperationMeta.Edit(transactionGroupManager.findById(transactionGroupId)),
-        router))
+    create(Props(OperationMeta.Edit(transactionGroupManager.findById(transactionGroupId)), router))
   }
 
   // **************** Private helper methods ****************//
@@ -78,7 +74,8 @@ final class TransactionGroupForm(implicit i18n: I18n,
     component.withKey(props.operationMeta.toString).apply(props)
   }
 
-  private def panelRef(panelIndex: Int): transactionPanel.Reference = transactionPanel.ref(s"panel_$panelIndex")
+  private def panelRef(panelIndex: Int): transactionPanel.Reference =
+    transactionPanel.ref(s"panel_$panelIndex")
 
   // **************** Private inner types ****************//
   private sealed trait OperationMeta
@@ -99,15 +96,14 @@ final class TransactionGroupForm(implicit i18n: I18n,
                            totalFlowRestriction: TotalFlowRestriction,
                            totalFlow: ReferenceMoney,
                            totalFlowExceptLast: ReferenceMoney) {
-    def plusPanel(): State = copy(
-      panelIndices = panelIndices :+ nextPanelIndex,
-      nextPanelIndex = nextPanelIndex + 1)
+    def plusPanel(): State =
+      copy(panelIndices = panelIndices :+ nextPanelIndex, nextPanelIndex = nextPanelIndex + 1)
     def minusPanelIndex(index: Int): State = copy(panelIndices = panelIndices.filter(_ != index))
   }
 
   private case class Props(operationMeta: OperationMeta, router: RouterCtl[Page])
 
-  private final class Backend(val $: BackendScope[Props, State]) {
+  private final class Backend(val $ : BackendScope[Props, State]) {
 
     def render(props: Props, state: State) = logExceptions {
       <.div(
@@ -133,7 +129,8 @@ final class TransactionGroupForm(implicit i18n: I18n,
                 ^.className := "total-transaction-flow-box",
                 totalFlowInput(
                   forceValue =
-                    if (state.totalFlowRestriction == TotalFlowRestriction.ChooseTotal) None else Some(state.totalFlow),
+                    if (state.totalFlowRestriction == TotalFlowRestriction.ChooseTotal) None
+                    else Some(state.totalFlow),
                   foreignCurrency = state.foreignCurrency,
                   onChange = updateTotalFlow
                 ),
@@ -145,18 +142,17 @@ final class TransactionGroupForm(implicit i18n: I18n,
             )
           )
         ),
-
         ^^.ifThen(state.globalErrorMessage) { errorMessage =>
           <.div(
             ^.className := "alert alert-danger",
             errorMessage
           )
         },
-
         <.form(
           ^.className := "form-horizontal",
           ^.key := "main-form",
-          <.div(^.className := "row",
+          <.div(
+            ^.className := "row",
             <.div(
               ^.className := "transaction-group-form",
               for ((panelIndex, i) <- state.panelIndices.zipWithIndex) yield {
@@ -173,9 +169,12 @@ final class TransactionGroupForm(implicit i18n: I18n,
                   title = i18n("facto.transaction") + " " + (i + 1),
                   defaultValues = transaction,
                   forceFlowValue =
-                    if (lastPanel && state.totalFlowRestriction.userSetsTotal) Some(state.totalFlow - state.totalFlowExceptLast) else None,
+                    if (lastPanel && state.totalFlowRestriction.userSetsTotal)
+                      Some(state.totalFlow - state.totalFlowExceptLast)
+                    else None,
                   showErrorMessages = state.showErrorMessages,
-                  defaultPanel = if (firstPanel) None else Some(panelRef(panelIndex = state.panelIndices.head)($)),
+                  defaultPanel =
+                    if (firstPanel) None else Some(panelRef(panelIndex = state.panelIndices.head)($)),
                   closeButtonCallback = if (firstPanel) None else Some(removeTransactionPanel(panelIndex)),
                   onFormChange = this.onFormChange
                 )
@@ -224,22 +223,23 @@ final class TransactionGroupForm(implicit i18n: I18n,
     }
 
     def onFormChange(): Unit = {
-      $.modState(state => logExceptions {
-        val flows = for (panelIndex <- state.panelIndices) yield {
-          val datedMoney = panelRef(panelIndex)($).flowValueOrDefault
-          datedMoney.exchangedForReferenceCurrency
-        }
-        val currencies = for (panelIndex <- state.panelIndices) yield {
-          panelRef(panelIndex)($).moneyReservoir.valueOrDefault.currency
-        }
+      $.modState(state =>
+        logExceptions {
+          val flows = for (panelIndex <- state.panelIndices) yield {
+            val datedMoney = panelRef(panelIndex)($).flowValueOrDefault
+            datedMoney.exchangedForReferenceCurrency
+          }
+          val currencies = for (panelIndex <- state.panelIndices) yield {
+            panelRef(panelIndex)($).moneyReservoir.valueOrDefault.currency
+          }
 
-        var newState = state.copy(
-          foreignCurrency = currencies.filter(_.isForeign).headOption,
-          totalFlowExceptLast = flows.dropRight(1).sum)
-        if (state.totalFlowRestriction == TotalFlowRestriction.AnyTotal) {
-          newState = newState.copy(totalFlow = flows.sum)
-        }
-        newState
+          var newState = state.copy(
+            foreignCurrency = currencies.filter(_.isForeign).headOption,
+            totalFlowExceptLast = flows.dropRight(1).sum)
+          if (state.totalFlowRestriction == TotalFlowRestriction.AnyTotal) {
+            newState = newState.copy(totalFlow = flows.sum)
+          }
+          newState
       }).runNow()
     }
 
@@ -288,20 +288,22 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
       def submitValid(datas: Seq[transactionPanel.Data], state: State) = {
         def transactionsWithoutIdProvider(group: TransactionGroup) = {
-          for (data <- datas) yield Transaction(
-            transactionGroupId = group.id,
-            issuerId = user.id,
-            beneficiaryAccountCode = data.beneficiaryAccount.code,
-            moneyReservoirCode = data.moneyReservoir.code,
-            categoryCode = data.category.code,
-            description = data.description,
-            flowInCents = data.flow.cents,
-            detailDescription = data.detailDescription,
-            tagsString = Tag.serializeToString(data.tags),
-            createdDate = group.createdDate,
-            transactionDate = data.transactionDate,
-            consumedDate = data.consumedDate
-          )
+          for (data <- datas)
+            yield
+              Transaction(
+                transactionGroupId = group.id,
+                issuerId = user.id,
+                beneficiaryAccountCode = data.beneficiaryAccount.code,
+                moneyReservoirCode = data.moneyReservoir.code,
+                categoryCode = data.category.code,
+                description = data.description,
+                flowInCents = data.flow.cents,
+                detailDescription = data.detailDescription,
+                tagsString = Tag.serializeToString(data.tags),
+                createdDate = group.createdDate,
+                transactionDate = data.transactionDate,
+                consumedDate = data.consumedDate
+              )
         }
 
         val action = $.props.runNow().operationMeta match {
@@ -319,24 +321,25 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
       e.preventDefault()
 
-      $.modState(state => logExceptions {
-        var newState = state.copy(showErrorMessages = true)
+      $.modState(state =>
+        logExceptions {
+          var newState = state.copy(showErrorMessages = true)
 
-        val maybeDatas = for (panelIndex <- state.panelIndices) yield panelRef(panelIndex)($).data
-        if (maybeDatas forall (_.isDefined)) {
-          val datas = maybeDatas map (_.get)
+          val maybeDatas = for (panelIndex <- state.panelIndices) yield panelRef(panelIndex)($).data
+          if (maybeDatas forall (_.isDefined)) {
+            val datas = maybeDatas map (_.get)
 
-          getErrorMessage(datas, state) match {
-            case Some(errorMessage) =>
-              newState = newState.copy(globalErrorMessage = Some(errorMessage))
+            getErrorMessage(datas, state) match {
+              case Some(errorMessage) =>
+                newState = newState.copy(globalErrorMessage = Some(errorMessage))
 
-            case None =>
-              submitValid(datas, state)
-              $.props.runNow().router.set(Page.EverythingPage).runNow()
+              case None =>
+                submitValid(datas, state)
+                $.props.runNow().router.set(Page.EverythingPage).runNow()
+            }
           }
-        }
 
-        newState
+          newState
       }).runNow()
     }
 

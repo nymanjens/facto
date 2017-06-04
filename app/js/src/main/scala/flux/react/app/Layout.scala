@@ -12,22 +12,20 @@ import scala.collection.immutable.Seq
 final class Layout(implicit globalMessages: GlobalMessages, menu: Menu) {
 
   private val component = ReactComponentB[Props](getClass.getSimpleName)
-    .renderPC((_, props, children) =>
-      <.div(
-        menu(props.page, props.routerCtl),
-        globalMessages(),
-        children
-      )
-    ).build
+    .renderPC(
+      (_, props, children) =>
+        <.div(
+          menu(props.page, props.routerCtl),
+          globalMessages(),
+          children
+      ))
+    .build
 
   // **************** API ****************//
-  def apply(routerCtl: RouterCtl[Page],
-            page: Page)(
-             children: ReactNode*): ReactElement = {
+  def apply(routerCtl: RouterCtl[Page], page: Page)(children: ReactNode*): ReactElement = {
     component(Props(routerCtl, page), children: _*)
   }
 
   // **************** Private inner types ****************//
-  private case class Props(routerCtl: RouterCtl[Page],
-                           page: Page)
+  private case class Props(routerCtl: RouterCtl[Page], page: Page)
 }

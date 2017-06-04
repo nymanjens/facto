@@ -4,8 +4,9 @@ import slick.lifted.{AbstractTable, TableQuery}
 import scala.collection.immutable.Seq
 
 /** SlickEntityManager base implementation that forwards all calls to a given delegate. */
-abstract class ForwardingEntityManager[E <: Entity, T <: AbstractTable[E]](delegate: SlickEntityManager[E, T])
-  extends SlickEntityManager[E, T] {
+abstract class ForwardingEntityManager[E <: Entity, T <: AbstractTable[E]](
+    delegate: SlickEntityManager[E, T])
+    extends SlickEntityManager[E, T] {
 
   // ********** Management methods ********** //
   override def initialize(): Unit = delegate.initialize()

@@ -16,9 +16,10 @@ final class ModificationsBuffer {
   private val buffer: mutable.Buffer[ModificationWithToken] = mutable.Buffer()
 
   // **************** Getters ****************//
-  def getModifications(updateToken: UpdateToken = ModificationsBuffer.startToken): Seq[EntityModification] = Seq({
-    for (m <- buffer if m.updateToken >= updateToken) yield m.modification
-  }: _*)
+  def getModifications(updateToken: UpdateToken = ModificationsBuffer.startToken): Seq[EntityModification] =
+    Seq({
+      for (m <- buffer if m.updateToken >= updateToken) yield m.modification
+    }: _*)
 
   def getAllEntitiesOfType[E <: Entity](implicit entityType: EntityType[E]): Seq[E] = {
     val entitiesMap = mutable.LinkedHashMap[Long, E]()
@@ -48,7 +49,7 @@ final class ModificationsBuffer {
     }
   }
 
-  def addEntities[E <: Entity : EntityType](entities: Seq[E]): Unit = {
+  def addEntities[E <: Entity: EntityType](entities: Seq[E]): Unit = {
     addModifications(entities.map(e => EntityModification.Add(e)))
   }
 

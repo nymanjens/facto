@@ -35,8 +35,7 @@ object Formatting {
     SUNDAY -> "facto.date.dayofweek.sun.abbrev"
   )
 
-  def formatDate(dateTime: LocalDateTime)
-                (implicit i18n: I18n, clock: Clock): String = {
+  def formatDate(dateTime: LocalDateTime)(implicit i18n: I18n, clock: Clock): String = {
     val now = clock.now.toLocalDate
     val date = dateTime.toLocalDate
 
@@ -66,21 +65,18 @@ object Formatting {
     }
   }
 
-  def formatDateTime(dateTime: LocalDateTime)
-                    (implicit i18n: I18n): String = {
+  def formatDateTime(dateTime: LocalDateTime)(implicit i18n: I18n): String = {
     val date = dateTime.toLocalDate
     val monthString = formatMonth(date)
     val timeString = dateTime.toLocalTime.toString take 5 // hack to get time in format "HH:mm"
     s"${date.getDayOfMonth} $monthString ${date.getYear}, $timeString"
   }
 
-  private def formatMonth(date: LocalDate)
-                         (implicit i18n: I18n): String = {
+  private def formatMonth(date: LocalDate)(implicit i18n: I18n): String = {
     i18n(monthToMessageKey(date.getMonth))
   }
 
-  private def formatDayOfWeek(date: LocalDate)
-                             (implicit i18n: I18n): String = {
+  private def formatDayOfWeek(date: LocalDate)(implicit i18n: I18n): String = {
     i18n(dayOfWeekToMessageKey(date.getDayOfWeek))
   }
 }

@@ -7,10 +7,8 @@ import models.manager.{Entity, EntityManager}
 import scala.collection.immutable.Seq
 
 /** UpdateLog entities are immutable. */
-case class UpdateLog(userId: Long,
-                     change: String,
-                     date: LocalDateTime,
-                     idOption: Option[Long] = None) extends Entity {
+case class UpdateLog(userId: Long, change: String, date: LocalDateTime, idOption: Option[Long] = None)
+    extends Entity {
   require(userId > 0)
   require(!change.isEmpty)
   for (idVal <- idOption) require(idVal > 0)
@@ -20,7 +18,6 @@ case class UpdateLog(userId: Long,
   def user(implicit entityAccess: EntityAccess): User = entityAccess.userManager.findById(userId)
 }
 
-
 object UpdateLog {
   def tupled = (this.apply _).tupled
 
@@ -28,9 +25,11 @@ object UpdateLog {
     /* Returns most recent n entries sorted from old to new. */
     def fetchLastNEntries(n: Int): Seq[UpdateLog]
 
-    def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: TransactionGroup)(implicit entityAccess: EntityAccess)
+    def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: TransactionGroup)(
+        implicit entityAccess: EntityAccess)
 
-    def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: BalanceCheck)(implicit entityAccess: EntityAccess)
+    def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: BalanceCheck)(
+        implicit entityAccess: EntityAccess)
 
   }
 

@@ -29,27 +29,30 @@ class SlickBalanceCheckManagerTest extends HookedSpecification {
     userManager.addWithId(testUserB)
 
     // get and persist dummy balanceCheckManager
-    val checkA1 = balanceCheckManager.add(BalanceCheck(
-      issuerId = testUserA.id,
-      moneyReservoirCode = "ACC_A",
-      balanceInCents = 999,
-      createdDate = clock.now,
-      checkDate = localDateTimeOfEpochMilli(1000)
-    ))
-    val checkA2 = balanceCheckManager.add(BalanceCheck(
-      issuerId = testUserA.id,
-      moneyReservoirCode = "ACC_A",
-      balanceInCents = 1000,
-      createdDate = clock.now,
-      checkDate = localDateTimeOfEpochMilli(2000)
-    ))
-    val checkB = balanceCheckManager.add(BalanceCheck(
-      issuerId = testUserB.id,
-      moneyReservoirCode = "ACC_B",
-      balanceInCents = 999,
-      createdDate = clock.now,
-      checkDate = clock.now
-    ))
+    val checkA1 = balanceCheckManager.add(
+      BalanceCheck(
+        issuerId = testUserA.id,
+        moneyReservoirCode = "ACC_A",
+        balanceInCents = 999,
+        createdDate = clock.now,
+        checkDate = localDateTimeOfEpochMilli(1000)
+      ))
+    val checkA2 = balanceCheckManager.add(
+      BalanceCheck(
+        issuerId = testUserA.id,
+        moneyReservoirCode = "ACC_A",
+        balanceInCents = 1000,
+        createdDate = clock.now,
+        checkDate = localDateTimeOfEpochMilli(2000)
+      ))
+    val checkB = balanceCheckManager.add(
+      BalanceCheck(
+        issuerId = testUserB.id,
+        moneyReservoirCode = "ACC_B",
+        balanceInCents = 999,
+        createdDate = clock.now,
+        checkDate = clock.now
+      ))
 
     // do basic checks
     checkA1.issuer mustEqual testUserA
@@ -61,27 +64,29 @@ class SlickBalanceCheckManagerTest extends HookedSpecification {
     userManager.addWithId(testUser)
 
     val id = 12345
-    val bc = balanceCheckManager.addWithId(BalanceCheck(
-      issuerId = testUser.id,
-      moneyReservoirCode = testReservoir.code,
-      balanceInCents = 999,
-      createdDate = clock.now,
-      checkDate = localDateTimeOfEpochMilli(1000),
-      idOption = Option(id)
-    ))
+    val bc = balanceCheckManager.addWithId(
+      BalanceCheck(
+        issuerId = testUser.id,
+        moneyReservoirCode = testReservoir.code,
+        balanceInCents = 999,
+        createdDate = clock.now,
+        checkDate = localDateTimeOfEpochMilli(1000),
+        idOption = Option(id)
+      ))
 
     bc.id mustEqual id
     balanceCheckManager.fetchAll() must haveSize(1)
     getOnlyElement(balanceCheckManager.fetchAll()).id mustEqual id
     balanceCheckManager.fetchAll() mustEqual Seq(bc)
 
-    balanceCheckManager.addWithId(BalanceCheck(
-      issuerId = testUser.id,
-      moneyReservoirCode = testReservoir.code,
-      balanceInCents = 888888,
-      createdDate = clock.now,
-      checkDate = localDateTimeOfEpochMilli(1005),
-      idOption = Option(id)
-    )) must throwA[IllegalArgumentException]
+    balanceCheckManager.addWithId(
+      BalanceCheck(
+        issuerId = testUser.id,
+        moneyReservoirCode = testReservoir.code,
+        balanceInCents = 888888,
+        createdDate = clock.now,
+        checkDate = localDateTimeOfEpochMilli(1005),
+        idOption = Option(id)
+      )) must throwA[IllegalArgumentException]
   }
 }

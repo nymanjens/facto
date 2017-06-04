@@ -25,8 +25,10 @@ class SlickTransactionManagerTest extends HookedSpecification {
   "test the Transaction and TransactionGroup models" in new WithApplication {
 
     // prepare users
-    val user1 = userManager.add(SlickUserManager.createUser(loginName = "tester", password = "x", name = "Tester"))
-    val user2 = userManager.add(SlickUserManager.createUser(loginName = "tester2", password = "x", name = "Tester2"))
+    val user1 =
+      userManager.add(SlickUserManager.createUser(loginName = "tester", password = "x", name = "Tester"))
+    val user2 =
+      userManager.add(SlickUserManager.createUser(loginName = "tester2", password = "x", name = "Tester2"))
 
     // get and persist dummy transaction groups
     val transGrp1 = transactionGroupManager.add(TransactionGroup(createdDate = clock.now))
@@ -34,42 +36,45 @@ class SlickTransactionManagerTest extends HookedSpecification {
     val transGrp3 = transactionGroupManager.add(TransactionGroup(createdDate = clock.now))
 
     // get and persist dummy transactions
-    val trans1A = transactionManager.add(Transaction(
-      transactionGroupId = transGrp1.id,
-      issuerId = user1.id,
-      beneficiaryAccountCode = "ACC_A",
-      moneyReservoirCode = "CASH",
-      categoryCode = "CAT_A",
-      description = "description 1A",
-      flowInCents = 300,
-      createdDate = clock.now,
-      transactionDate = clock.now,
-      consumedDate = clock.now
-    ))
-    val trans1B = transactionManager.add(Transaction(
-      transactionGroupId = transGrp1.id,
-      issuerId = user1.id,
-      beneficiaryAccountCode = "ACC_A",
-      moneyReservoirCode = "CASH",
-      categoryCode = "CAT_A",
-      description = "description 1B",
-      flowInCents = 600,
-      createdDate = clock.now,
-      transactionDate = clock.now,
-      consumedDate = clock.now
-    ))
-    val trans2 = transactionManager.add(Transaction(
-      transactionGroupId = transGrp2.id,
-      issuerId = user2.id,
-      beneficiaryAccountCode = "ACC_A",
-      moneyReservoirCode = "CASH",
-      categoryCode = "CAT_A",
-      description = "description 2",
-      flowInCents = 600,
-      createdDate = clock.now,
-      transactionDate = clock.now,
-      consumedDate = clock.now
-    ))
+    val trans1A = transactionManager.add(
+      Transaction(
+        transactionGroupId = transGrp1.id,
+        issuerId = user1.id,
+        beneficiaryAccountCode = "ACC_A",
+        moneyReservoirCode = "CASH",
+        categoryCode = "CAT_A",
+        description = "description 1A",
+        flowInCents = 300,
+        createdDate = clock.now,
+        transactionDate = clock.now,
+        consumedDate = clock.now
+      ))
+    val trans1B = transactionManager.add(
+      Transaction(
+        transactionGroupId = transGrp1.id,
+        issuerId = user1.id,
+        beneficiaryAccountCode = "ACC_A",
+        moneyReservoirCode = "CASH",
+        categoryCode = "CAT_A",
+        description = "description 1B",
+        flowInCents = 600,
+        createdDate = clock.now,
+        transactionDate = clock.now,
+        consumedDate = clock.now
+      ))
+    val trans2 = transactionManager.add(
+      Transaction(
+        transactionGroupId = transGrp2.id,
+        issuerId = user2.id,
+        beneficiaryAccountCode = "ACC_A",
+        moneyReservoirCode = "CASH",
+        categoryCode = "CAT_A",
+        description = "description 2",
+        flowInCents = 600,
+        createdDate = clock.now,
+        transactionDate = clock.now,
+        consumedDate = clock.now
+      ))
 
     // do checks
     transGrp1.transactions mustEqual Seq(trans1A, trans1B)

@@ -34,19 +34,20 @@ object FormUtils {
     }
   }
 
-  def validTagsString = Constraint[String]({ (tagsString: String) =>
-    if (tagsString == "") {
-      Valid
-    } else {
-      val tags = Splitter.on(",").split(tagsString).asScala.toList
-      val anyInvalid = tags.exists(tag => !Tag.isValidTagName(tag))
-      if (anyInvalid) {
-        invalidWithMessageCode("error.invalid")
-      } else {
+  def validTagsString =
+    Constraint[String]({ (tagsString: String) =>
+      if (tagsString == "") {
         Valid
+      } else {
+        val tags = Splitter.on(",").split(tagsString).asScala.toList
+        val anyInvalid = tags.exists(tag => !Tag.isValidTagName(tag))
+        if (anyInvalid) {
+          invalidWithMessageCode("error.invalid")
+        } else {
+          Valid
+        }
       }
-    }
-  })
+    })
 
   def flowAsFloatStringToCents(string: String): Long = {
     val normalizedString = normalizeMoneyString(string)
@@ -58,13 +59,14 @@ object FormUtils {
 
   def invalidWithMessageCode(code: String) = Invalid(Seq(ValidationError(code)))
 
-  private def oneOf(options: Iterable[String]) = Constraint[String]({ (input: String) =>
-    if (options.toSet.contains(input)) {
-      Valid
-    } else {
-      invalidWithMessageCode("error.invalid")
-    }
-  })
+  private def oneOf(options: Iterable[String]) =
+    Constraint[String]({ (input: String) =>
+      if (options.toSet.contains(input)) {
+        Valid
+      } else {
+        invalidWithMessageCode("error.invalid")
+      }
+    })
 
   /**
     * Trims the given string and only keeps the last punctuation (',' or '.').
@@ -74,10 +76,12 @@ object FormUtils {
     * "  1.000," --> "1000.".
     */
   private def normalizeMoneyString(s: String): String = {
-    val parts = Splitter.onPattern("""[\.,]""")
+    val parts = Splitter
+      .onPattern("""[\.,]""")
       .trimResults()
       .split(s)
-      .asScala.toList
+      .asScala
+      .toList
     def dotBetweenLastElements(list: List[String]): String = list match {
       case s :: Nil => s
       case first :: last :: Nil => s"$first.$last"

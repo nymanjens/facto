@@ -18,19 +18,23 @@ import models.accounting.config.{Category, Account, MoneyReservoir}
 import UpdateLog.UpdateOperation
 import SlickUpdateLogManager.{UpdateLogs, tableName}
 
-final class SlickUpdateLogManager @Inject()(implicit accountingConfig: Config,
-                                            clock: Clock) extends ImmutableEntityManager[UpdateLog, UpdateLogs](
-  SlickEntityManager.create[UpdateLog, UpdateLogs](
-    tag => new UpdateLogs(tag),
-    tableName = tableName
-  )) with UpdateLog.Manager {
+final class SlickUpdateLogManager @Inject()(implicit accountingConfig: Config, clock: Clock)
+    extends ImmutableEntityManager[UpdateLog, UpdateLogs](
+      SlickEntityManager.create[UpdateLog, UpdateLogs](
+        tag => new UpdateLogs(tag),
+        tableName = tableName
+      ))
+    with UpdateLog.Manager {
 
   override def fetchLastNEntries(n: Int): Seq[UpdateLog] = {
     dbRun(newQuery.sortBy(_.date.desc).take(n)).reverse.toList
   }
 
-  override def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: TransactionGroup)(implicit entityAccess: EntityAccess): Unit = {
-    require(newOrDeletedValue.idOption.isDefined, s"Given value must be persisted before logging it: ${newOrDeletedValue}")
+  override def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: TransactionGroup)(
+      implicit entityAccess: EntityAccess): Unit = {
+    require(
+      newOrDeletedValue.idOption.isDefined,
+      s"Given value must be persisted before logging it: ${newOrDeletedValue}")
     def fullyDescriptiveTransaction(t: Transaction): String = {
       s"Transaction(id=${t.id}, issuer=${t.issuer.loginName}, beneficiaryAccount=${t.beneficiaryAccountCode}, " +
         s"moneyReservoir=${t.moneyReservoirCode}, category=${t.categoryCode}, flow=${t.flow}, " +
@@ -44,8 +48,11 @@ final class SlickUpdateLogManager @Inject()(implicit accountingConfig: Config,
     addLog(user, operation, fullyDescriptiveString(newOrDeletedValue))
   }
 
-  override def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: BalanceCheck)(implicit entityAccess: EntityAccess): Unit = {
-    require(newOrDeletedValue.idOption.isDefined, s"Given value must be persisted before logging it: ${newOrDeletedValue}")
+  override def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: BalanceCheck)(
+      implicit entityAccess: EntityAccess): Unit = {
+    require(
+      newOrDeletedValue.idOption.isDefined,
+      s"Given value must be persisted before logging it: ${newOrDeletedValue}")
     def fullyDescriptiveString(bc: BalanceCheck): String = {
       s"BalanceCheck(id=${bc.id}, issuer=${bc.issuer.loginName}, moneyReservoir=${bc.moneyReservoirCode}, " +
         s"balance=${bc.balance}, createdDate=${bc.createdDate}, checkDate=${bc.checkDate})"

@@ -13,7 +13,7 @@ import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.reflect.ClassTag
 
-class SelectInput[Value] private(implicit valueTag: ClassTag[Value]) {
+class SelectInput[Value] private (implicit valueTag: ClassTag[Value]) {
 
   private val component = InputComponent.create[Value, ExtraProps](
     name = s"${getClass.getSimpleName}_${valueTag.runtimeClass.getSimpleName}",
@@ -49,7 +49,7 @@ class SelectInput[Value] private(implicit valueTag: ClassTag[Value]) {
             valueToId: Value => String,
             valueToName: Value => String,
             listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance)(
-             implicit i18n: I18n): ReactElement = {
+      implicit i18n: I18n): ReactElement = {
     val props = Props(
       label = label,
       name = ref.name,
@@ -59,17 +59,18 @@ class SelectInput[Value] private(implicit valueTag: ClassTag[Value]) {
       inputClasses = inputClasses,
       listener = listener,
       extra = ExtraProps.create(options, valueToId = valueToId, valueToName = valueToName),
-      valueTransformer = ValueTransformer)
+      valueTransformer = ValueTransformer
+    )
     component.withRef(ref.name)(props)
   }
 
   def ref(name: String): Reference = new Reference(Ref.to(component, name))
 
   // **************** Public inner types ****************//
-  final class Reference private[SelectInput](refComp: InputComponent.ThisRefComp[Value, ExtraProps])
-    extends InputComponent.Reference[Value, ExtraProps](refComp)
+  final class Reference private[SelectInput] (refComp: InputComponent.ThisRefComp[Value, ExtraProps])
+      extends InputComponent.Reference[Value, ExtraProps](refComp)
 
-  case class ExtraProps private(idToOptionMap: Map[String, ExtraProps.ValueAndName])
+  case class ExtraProps private (idToOptionMap: Map[String, ExtraProps.ValueAndName])
   object ExtraProps {
     private[SelectInput] def create(options: Seq[Value],
                                     valueToId: Value => String,
@@ -83,7 +84,7 @@ class SelectInput[Value] private(implicit valueTag: ClassTag[Value]) {
       )
     }
 
-    case class ValueAndName private(value: Value, name: String)
+    case class ValueAndName private (value: Value, name: String)
   }
 
   // **************** Private inner types ****************//
@@ -93,8 +94,7 @@ class SelectInput[Value] private(implicit valueTag: ClassTag[Value]) {
     }
 
     override def valueToString(value: Value, extraProps: ExtraProps) = {
-      getOnlyElement(
-        extraProps.idToOptionMap.filter { case (id, option) => option.value == value }.keys)
+      getOnlyElement(extraProps.idToOptionMap.filter { case (id, option) => option.value == value }.keys)
     }
 
     override def emptyValue = ???

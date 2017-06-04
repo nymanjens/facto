@@ -29,7 +29,7 @@ private[app] final class GlobalMessages(implicit globalMessagesStore: GlobalMess
     }
   }
 
-  private class Backend($: BackendScope[Props, State]) extends GlobalMessagesStore.Listener {
+  private class Backend($ : BackendScope[Props, State]) extends GlobalMessagesStore.Listener {
 
     def willMount(state: State): Callback = LogExceptionsCallback {
       globalMessagesStore.register(this)

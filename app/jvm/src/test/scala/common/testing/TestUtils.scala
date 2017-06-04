@@ -28,41 +28,46 @@ object TestUtils {
       groupId
     }
     val actualDate = if (timestamp == -1) date else localDateTimeOfEpochMilli(timestamp)
-    entityAccess.transactionManager.add(Transaction(
-      transactionGroupId = actualGroupId,
-      issuerId = 1,
-      beneficiaryAccountCode = account.code,
-      moneyReservoirCode = reservoir.code,
-      categoryCode = category.code,
-      description = description,
-      detailDescription = detailDescription,
-      flowInCents = flowInCents,
-      tagsString = tagsString,
-      createdDate = actualDate,
-      transactionDate = actualDate,
-      consumedDate = actualDate
-    ))
+    entityAccess.transactionManager.add(
+      Transaction(
+        transactionGroupId = actualGroupId,
+        issuerId = 1,
+        beneficiaryAccountCode = account.code,
+        moneyReservoirCode = reservoir.code,
+        categoryCode = category.code,
+        description = description,
+        detailDescription = detailDescription,
+        flowInCents = flowInCents,
+        tagsString = tagsString,
+        createdDate = actualDate,
+        transactionDate = actualDate,
+        consumedDate = actualDate
+      ))
   }
 
-  def persistBalanceCheck(balanceInCents: Long = 0,
-                          date: LocalDateTime = FakeClock.defaultTime,
-                          timestamp: Long = -1,
-                          reservoir: MoneyReservoir = testReservoir)(implicit entityAccess: SlickEntityAccess): BalanceCheck = {
+  def persistBalanceCheck(
+      balanceInCents: Long = 0,
+      date: LocalDateTime = FakeClock.defaultTime,
+      timestamp: Long = -1,
+      reservoir: MoneyReservoir = testReservoir)(implicit entityAccess: SlickEntityAccess): BalanceCheck = {
     val actualDate = if (timestamp == -1) date else localDateTimeOfEpochMilli(timestamp)
-    entityAccess.balanceCheckManager.add(BalanceCheck(
-      issuerId = 2,
-      moneyReservoirCode = reservoir.code,
-      balanceInCents = balanceInCents,
-      createdDate = actualDate,
-      checkDate = actualDate
-    ))
+    entityAccess.balanceCheckManager.add(
+      BalanceCheck(
+        issuerId = 2,
+        moneyReservoirCode = reservoir.code,
+        balanceInCents = balanceInCents,
+        createdDate = actualDate,
+        checkDate = actualDate
+      ))
   }
 
-  def persistGbpMeasurement(millisSinceEpoch: Long, ratio: Double)(implicit entityAccess: SlickEntityAccess): Unit = {
-    entityAccess.exchangeRateMeasurementManager.add(ExchangeRateMeasurement(
-      date = localDateTimeOfEpochMilli(millisSinceEpoch),
-      foreignCurrencyCode = Gbp.code,
-      ratioReferenceToForeignCurrency = ratio))
+  def persistGbpMeasurement(millisSinceEpoch: Long, ratio: Double)(
+      implicit entityAccess: SlickEntityAccess): Unit = {
+    entityAccess.exchangeRateMeasurementManager.add(
+      ExchangeRateMeasurement(
+        date = localDateTimeOfEpochMilli(millisSinceEpoch),
+        foreignCurrencyCode = Gbp.code,
+        ratioReferenceToForeignCurrency = ratio))
   }
 
   def localDateTimeOfEpochMilli(milli: Long): LocalDateTime = {

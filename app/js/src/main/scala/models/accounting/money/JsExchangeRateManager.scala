@@ -7,8 +7,7 @@ import models.manager.{EntityModification, EntityType}
 
 import scala.collection.{SortedMap, mutable}
 
-final class JsExchangeRateManager(implicit database: RemoteDatabaseProxy)
-  extends ExchangeRateManager {
+final class JsExchangeRateManager(implicit database: RemoteDatabaseProxy) extends ExchangeRateManager {
   database.registerListener(RemoteDatabaseProxyListener)
 
   /**
@@ -20,7 +19,9 @@ final class JsExchangeRateManager(implicit database: RemoteDatabaseProxy)
   private val measurementsCache: mutable.Map[Currency, SortedMap[LocalDateTime, Double]] = mutable.Map()
 
   // **************** Implementation of ExchangeRateManager trait ****************//
-  override def getRatioSecondToFirstCurrency(firstCurrency: Currency, secondCurrency: Currency, date: LocalDateTime): Double = {
+  override def getRatioSecondToFirstCurrency(firstCurrency: Currency,
+                                             secondCurrency: Currency,
+                                             date: LocalDateTime): Double = {
     (firstCurrency, secondCurrency) match {
       case (Currency.default, Currency.default) => 1.0
       case (foreignCurrency, Currency.default) =>
@@ -28,8 +29,9 @@ final class JsExchangeRateManager(implicit database: RemoteDatabaseProxy)
       case (Currency.default, foreignCurrency) =>
         1 / getRatioSecondToFirstCurrency(secondCurrency, firstCurrency, date)
       case _ =>
-        throw new UnsupportedOperationException(s"Exchanging from non-reference to non-reference currency is not " +
-          s"supported ($firstCurrency -> $secondCurrency)")
+        throw new UnsupportedOperationException(
+          s"Exchanging from non-reference to non-reference currency is not " +
+            s"supported ($firstCurrency -> $secondCurrency)")
     }
   }
 
@@ -47,7 +49,10 @@ final class JsExchangeRateManager(implicit database: RemoteDatabaseProxy)
 
   private def fetchSortedMap(currency: Currency): SortedMap[LocalDateTime, Double] = {
     val mapBuilder = TreeMap.newBuilder[LocalDateTime, Double]
-    for (measurement <- database.newQuery[ExchangeRateMeasurement]().find("foreignCurrencyCode" -> currency.code).data()) {
+    for (measurement <- database
+           .newQuery[ExchangeRateMeasurement]()
+           .find("foreignCurrencyCode" -> currency.code)
+           .data()) {
       mapBuilder += (measurement.date -> measurement.ratioReferenceToForeignCurrency)
     }
     mapBuilder.result()
@@ -69,7 +74,8 @@ final class JsExchangeRateManager(implicit database: RemoteDatabaseProxy)
           case EntityModification.Add(m: ExchangeRateMeasurement) =>
             // This happens infrequently so clearing the whole cache is not too expensive
             measurementsCache.clear()
-          case EntityModification.Remove(_) if modification.entityType == EntityType.ExchangeRateMeasurementType =>
+          case EntityModification.Remove(_)
+              if modification.entityType == EntityType.ExchangeRateMeasurementType =>
             // Measurements are normally not removed, but clearing the cache will make sure the cache gets updated later
             measurementsCache.clear()
           case _ => // do nothing

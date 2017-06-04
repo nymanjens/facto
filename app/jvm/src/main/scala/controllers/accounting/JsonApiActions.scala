@@ -20,12 +20,15 @@ final class JsonApi @Inject()(implicit val messagesApi: MessagesApi,
                               clock: Clock,
                               entityAccess: SlickEntityAccess,
                               exchangeRateManager: ExchangeRateManager)
-  extends Controller with I18nSupport {
+    extends Controller
+    with I18nSupport {
 
   // ********** actions ********** //
-  def filterDescriptions(beneficiaryCode: String, reservoirCode: String, categoryCode: String, query: String) =
-  AuthenticatedAction { implicit user =>
-    implicit request =>
+  def filterDescriptions(beneficiaryCode: String,
+                         reservoirCode: String,
+                         categoryCode: String,
+                         query: String) =
+    AuthenticatedAction { implicit user => implicit request =>
       val descriptions = dbRun(
         entityAccess.transactionManager.newQuery
           .filter(_.beneficiaryAccountCode === beneficiaryCode)
@@ -34,24 +37,21 @@ final class JsonApi @Inject()(implicit val messagesApi: MessagesApi,
           .filter(_.description.toLowerCase startsWith query.toLowerCase)
           .sortBy(r => (r.createdDate.desc))
           .map(_.description)
-          .take(50))
-        .distinct
+          .take(50)).distinct
         .take(10)
       Ok(Json.toJson(descriptions))
-  }
+    }
 
-  def getAllTags = AuthenticatedAction { implicit user =>
-    implicit request =>
-      val tagNames = entityAccess.tagEntityManager.fetchAll().map(_.tag.name).toSet
-      Ok(Json.toJson(tagNames))
+  def getAllTags = AuthenticatedAction { implicit user => implicit request =>
+    val tagNames = entityAccess.tagEntityManager.fetchAll().map(_.tag.name).toSet
+    Ok(Json.toJson(tagNames))
   }
 
   def exchangeMoney(fromCents: Long, fromCurrencyCode: String, dateString: String, toCurrencyCode: String) =
-    AuthenticatedAction { implicit user =>
-      implicit request =>
-        val date = TimeUtils.parseDateString(dateString)
-        val fromMoney = DatedMoney(fromCents, Currency.of(fromCurrencyCode), date)
-        val toMoney = fromMoney.exchangedForCurrency(Currency.of(toCurrencyCode))
-        Ok(Json.toJson(toMoney.cents))
+    AuthenticatedAction { implicit user => implicit request =>
+      val date = TimeUtils.parseDateString(dateString)
+      val fromMoney = DatedMoney(fromCents, Currency.of(fromCurrencyCode), date)
+      val toMoney = fromMoney.exchangedForCurrency(Currency.of(toCurrencyCode))
+      Ok(Json.toJson(toMoney.cents))
     }
 }

@@ -33,7 +33,7 @@ object ManualTests {
         }
       }
     }
-    nextFuture map {_ =>
+    nextFuture map { _ =>
       println(s"  All tests finished")
     }
   }

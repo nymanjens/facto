@@ -27,7 +27,12 @@ object MoneyReservoir {
     code = "",
     name = "N/A",
     shorterName = "N/A",
-    owner = Account(code = "UNKNOWN", longName = "UNKNOWN", shorterName = "UNKNOWN", veryShortName = "UNKNOWN", defaultElectronicReservoirCode = ""),
-    hidden = true)
+    owner = Account(
+      code = "UNKNOWN",
+      longName = "UNKNOWN",
+      shorterName = "UNKNOWN",
+      veryShortName = "UNKNOWN",
+      defaultElectronicReservoirCode = ""),
+    hidden = true
+  )
 }
-

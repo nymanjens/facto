@@ -14,9 +14,7 @@ import models.manager.Entity
   * that yields the same result until the database is updated.
   */
 object ControllerHelperCache {
-  CacheRegistry.registerCache(
-    verifyConsistency = verifyConsistency,
-    invalidateCache = invalidateCache)
+  CacheRegistry.registerCache(verifyConsistency = verifyConsistency, invalidateCache = invalidateCache)
 
   private val cache: SynchronizedCache[CacheIdentifier[_], CacheEntry[_]] =
     SynchronizedCache(expireAfterAccess = Duration.ofHours(32))
@@ -60,7 +58,8 @@ object ControllerHelperCache {
     */
   trait CacheIdentifier[R] {
     protected def invalidateWhenUpdating: PartialFunction[Any, Boolean] = PartialFunction.empty
-    protected def invalidateWhenUpdatingEntity(oldValue: R): PartialFunction[Any, Boolean] = PartialFunction.empty
+    protected def invalidateWhenUpdatingEntity(oldValue: R): PartialFunction[Any, Boolean] =
+      PartialFunction.empty
 
     private[helpers] def combinedInvalidateWhenUpdating(oldValue: R, entity: Entity): Boolean = {
       val combinedInvalidate = invalidateWhenUpdating orElse invalidateWhenUpdatingEntity(oldValue)
@@ -68,9 +67,7 @@ object ControllerHelperCache {
     }
   }
 
-  private case class CacheEntry[R](identifier: CacheIdentifier[R],
-                                   value: R,
-                                   expensiveFunction: () => R) {
+  private case class CacheEntry[R](identifier: CacheIdentifier[R], value: R, expensiveFunction: () => R) {
     def recalculated(): CacheEntry[R] = CacheEntry.calculate(identifier, expensiveFunction)
 
     private[helpers] def invalidateWhenUpdating(entity: Entity): Boolean =

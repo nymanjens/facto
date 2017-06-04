@@ -31,7 +31,9 @@ final class ConfigModule extends AbstractModule {
         if (Files.exists(Paths.get(configLocation))) {
           scala.io.Source.fromFile(configLocation).mkString
         } else {
-          require(ResourceFiles.exists(configLocation), s"Could not find $configLocation as file or as resource")
+          require(
+            ResourceFiles.exists(configLocation),
+            s"Could not find $configLocation as file or as resource")
           ResourceFiles.read(configLocation)
         }
       }

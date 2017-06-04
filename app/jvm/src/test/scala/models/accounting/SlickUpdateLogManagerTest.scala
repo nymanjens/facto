@@ -62,18 +62,19 @@ class SlickUpdateLogManagerTest extends HookedSpecification {
     // add logs
     fakeClock.setTime(createDateTime(2016, APRIL, 1))
     val transGrp = transactionGroupManager.add(TransactionGroup(createdDate = fakeClock.now))
-    transactionManager.add(Transaction(
-      transactionGroupId = transGrp.id,
-      issuerId = testUser.id,
-      beneficiaryAccountCode = testAccount.code,
-      moneyReservoirCode = testReservoir.code,
-      categoryCode = testCategory.code,
-      description = "test description",
-      flowInCents = 9199,
-      createdDate = createDateTime(2016, APRIL, 1),
-      transactionDate = createDateTime(2014, APRIL, 1),
-      consumedDate = createDateTime(2015, APRIL, 1)
-    ))
+    transactionManager.add(
+      Transaction(
+        transactionGroupId = transGrp.id,
+        issuerId = testUser.id,
+        beneficiaryAccountCode = testAccount.code,
+        moneyReservoirCode = testReservoir.code,
+        categoryCode = testCategory.code,
+        description = "test description",
+        flowInCents = 9199,
+        createdDate = createDateTime(2016, APRIL, 1),
+        transactionDate = createDateTime(2014, APRIL, 1),
+        consumedDate = createDateTime(2015, APRIL, 1)
+      ))
     updateLogManager.addLog(testUser, UpdateLog.AddNew, transGrp)
 
     // fetch logs
@@ -114,11 +115,12 @@ class SlickUpdateLogManagerTest extends HookedSpecification {
   }
 
   private def balanceCheck(balance: Long): BalanceCheck = {
-    balanceCheckManager.add(BalanceCheck(
-      issuerId = testUser.id,
-      moneyReservoirCode = testReservoir.code,
-      balanceInCents = balance,
-      createdDate = fakeClock.now,
-      checkDate = fakeClock.now))
+    balanceCheckManager.add(
+      BalanceCheck(
+        issuerId = testUser.id,
+        moneyReservoirCode = testReservoir.code,
+        balanceInCents = balance,
+        createdDate = fakeClock.now,
+        checkDate = fakeClock.now))
   }
 }

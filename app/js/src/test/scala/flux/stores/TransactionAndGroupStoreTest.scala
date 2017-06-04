@@ -34,15 +34,13 @@ object TransactionAndGroupStoreTest extends TestSuite {
       fakeDatabase.allModifications.size ==> 2
       val Seq(addGroup, addTransaction) = fakeDatabase.allModifications
 
-      addGroup ==> EntityModification.Add(TransactionGroup(
-        idOption = Some(groupId),
-        createdDate = fakeClock.now))
+      addGroup ==> EntityModification.Add(
+        TransactionGroup(idOption = Some(groupId), createdDate = fakeClock.now))
 
       addTransaction match {
         case EntityModification.Add(transaction: Transaction) =>
-          transaction ==> testTransactionWithId.copy(
-            idOption = Some(transaction.id),
-            transactionGroupId = groupId)
+          transaction ==> testTransactionWithId
+            .copy(idOption = Some(transaction.id), transactionGroupId = groupId)
         case _ => throw new java.lang.AssertionError(addTransaction)
       }
     }
@@ -51,11 +49,12 @@ object TransactionAndGroupStoreTest extends TestSuite {
       fakeDatabase.addRemotelyAddedEntities(testTransactionGroupWithId)
       fakeDatabase.addRemotelyAddedEntities(testTransactionWithId)
       val initialModifications = fakeDatabase.allModifications
-      fakeDispatcher.dispatch(Action.UpdateTransactionGroup(
-        transactionGroupWithId = testTransactionGroupWithId,
-        transactionsWithoutId = Seq(
-          testTransactionWithIdB.copy(idOption = None)
-        )))
+      fakeDispatcher.dispatch(
+        Action.UpdateTransactionGroup(
+          transactionGroupWithId = testTransactionGroupWithId,
+          transactionsWithoutId = Seq(
+            testTransactionWithIdB.copy(idOption = None)
+          )))
 
       fakeDatabase.allModifications.size - initialModifications.size ==> 2
       val Seq(removeTransaction, addTransaction) = fakeDatabase.allModifications takeRight 2
@@ -64,9 +63,8 @@ object TransactionAndGroupStoreTest extends TestSuite {
 
       addTransaction match {
         case EntityModification.Add(transaction: Transaction) =>
-          transaction ==> testTransactionWithIdB.copy(
-            idOption = Some(transaction.id),
-            transactionGroupId = testTransactionGroupWithId.id)
+          transaction ==> testTransactionWithIdB
+            .copy(idOption = Some(transaction.id), transactionGroupId = testTransactionGroupWithId.id)
         case _ => throw new java.lang.AssertionError(addTransaction)
       }
     }

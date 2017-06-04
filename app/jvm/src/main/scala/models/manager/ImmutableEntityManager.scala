@@ -7,7 +7,7 @@ import slick.lifted.{AbstractTable, TableQuery}
   * an UnsupportedOperationException.
   */
 abstract class ImmutableEntityManager[E <: Entity, T <: AbstractTable[E]](delegate: SlickEntityManager[E, T])
-  extends ForwardingEntityManager[E, T](delegate) {
+    extends ForwardingEntityManager[E, T](delegate) {
 
   // ********** Mutators ********** //
   override final def update(entity: E): E = throw new UnsupportedOperationException()
