@@ -1,6 +1,6 @@
 package flux.stores
 
-import common.LoggingUtils.{logExceptions, LogExceptionsCallback}
+import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.I18n
 import common.time.Clock
 import flux.action.Action.{AddTransactionGroup, RemoveTransactionGroup, UpdateTransactionGroup}
@@ -11,6 +11,7 @@ import models.accounting._
 
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.collection.immutable.Seq
+import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.scalajs.js
 
@@ -18,7 +19,7 @@ final class GlobalMessagesStore(implicit i18n: I18n,
                                 clock: Clock,
                                 entityAccess: EntityAccess,
                                 dispatcher: Dispatcher) {
-  dispatcher.registerPartial(dispatcherListener)
+  dispatcher.registerPartialSync(dispatcherListener)
 
   private var _state: Option[Message] = None
 

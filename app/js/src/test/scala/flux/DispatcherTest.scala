@@ -27,7 +27,7 @@ object DispatcherTest extends TestSuite {
 
     "dispatches actions to listeners, including Done action" - async {
       val dispatchedActions: mutable.Buffer[Action] = mutable.Buffer()
-      dispatcher.register(action => {
+      dispatcher.registerAsync(action => {
         dispatchedActions += action
       })
 
@@ -38,7 +38,7 @@ object DispatcherTest extends TestSuite {
 
     "does not allow dispatching during a callback" - async {
       var dispatched = false
-      dispatcher.register(action => {
+      dispatcher.registerAsync(action => {
         try {
           dispatcher.dispatch(testAction)
           throw new java.lang.AssertionError("expected IllegalArgumentException")

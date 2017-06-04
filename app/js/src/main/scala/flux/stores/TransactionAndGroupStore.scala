@@ -13,7 +13,7 @@ final class TransactionAndGroupStore(implicit database: RemoteDatabaseProxy,
                                      entityAccess: EntityAccess,
                                      clock: Clock,
                                      dispatcher: Dispatcher) {
-  dispatcher.registerPartial {
+  dispatcher.registerPartialAsync {
     case AddTransactionGroup(transactionsWithoutIdProvider) =>
       val groupAddition = EntityModification.createAddWithRandomId(TransactionGroup(createdDate = clock.now))
       val group = groupAddition.entity
