@@ -29,6 +29,7 @@ object DispatcherTest extends TestSuite {
       val dispatchedActions: mutable.Buffer[Action] = mutable.Buffer()
       dispatcher.registerAsync(action => {
         dispatchedActions += action
+        Future.successful((): Unit)
       })
 
       await(dispatcher.dispatch(testAction))
@@ -36,7 +37,7 @@ object DispatcherTest extends TestSuite {
       dispatchedActions ==> mutable.Buffer(testAction, Action.Done(testAction))
     }
 
-    "does not allow dispatching during a callback" - async {
+    "does not allow dispatching during the sync part of a callback" - async {
       var dispatched = false
       dispatcher.registerAsync(action => {
         try {
@@ -46,6 +47,7 @@ object DispatcherTest extends TestSuite {
           case e: IllegalArgumentException => // expected
         }
         dispatched = true
+        Future.successful((): Unit)
       })
 
       await(dispatcher.dispatch(testAction))
