@@ -25,7 +25,7 @@ object DispatcherTest extends TestSuite {
     val dispatcher: Dispatcher.Impl = new Dispatcher.Impl()
     val testAction = Action.RemoveTransactionGroup(testTransactionGroupWithId)
 
-    "dispatches actions to listeners" - async {
+    "dispatches actions to listeners, including Done action" - async {
       val dispatchedActions: mutable.Buffer[Action] = mutable.Buffer()
       dispatcher.register(action => {
         dispatchedActions += action
@@ -33,7 +33,7 @@ object DispatcherTest extends TestSuite {
 
       await(dispatcher.dispatch(testAction))
 
-      dispatchedActions ==> mutable.Buffer(testAction)
+      dispatchedActions ==> mutable.Buffer(testAction, Action.Done(testAction))
     }
 
     "does not allow dispatching during a callback" - async {
