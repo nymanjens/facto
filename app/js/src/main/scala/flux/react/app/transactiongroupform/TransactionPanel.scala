@@ -320,9 +320,9 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ref = detailDescriptionRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.detailDescription),
           startWithDefault = props.defaultValues.isEmpty,
-          nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)
+          nameToDelegateRef = uielements.bootstrap.TextAreaInput.ref(_)
         ) { extraProps =>
-          uielements.bootstrap.TextInput(
+          uielements.bootstrap.TextAreaInput(
             ref = extraProps.ref,
             label = i18n("facto.more-info"),
             defaultValue = props.defaultValues.map(_.detailDescription) getOrElse "",
