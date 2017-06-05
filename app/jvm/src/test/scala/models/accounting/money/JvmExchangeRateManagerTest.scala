@@ -13,12 +13,12 @@ import play.twirl.api.Html
 import models._
 import common.testing.TestUtils._
 
-class ExchangeRateManagerTest extends CacheClearingSpecification {
+class JvmExchangeRateManagerTest extends CacheClearingSpecification {
 
   @Inject implicit private val clock: Clock = null
   @Inject implicit private val entityAccess: SlickEntityAccess = null
 
-  @Inject private val exchangeRateManager: ExchangeRateManager = null
+  @Inject private val exchangeRateManager: JvmExchangeRateManager = null
 
   override def beforeEveryTest() = {
     Guice.createInjector(new FactoTestModule).injectMembers(this)

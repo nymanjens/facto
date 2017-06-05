@@ -15,7 +15,7 @@ class TestModule {
   import com.softwaremill.macwire._
 
   // ******************* Fake implementations ******************* //
-  implicit lazy val fakeRemoteDataProxy = wire[FakeRemoteDatabaseProxy]
+  implicit lazy val fakeRemoteDatabaseProxy = wire[FakeRemoteDatabaseProxy]
   implicit lazy val fakeClock = wire[FakeClock]
   implicit lazy val fakeDispatcher = wire[Dispatcher.FakeSynchronous]
   implicit lazy val fakeI18n = wire[FakeI18n]
