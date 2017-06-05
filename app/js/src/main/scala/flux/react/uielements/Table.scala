@@ -25,7 +25,10 @@ object Table {
             <.tr(props.tableHeaders)
           ),
           <.tbody(
-            props.tableDatas.map(tableData => <.tr(^.className := "data-row", tableData)),
+            props.tableDatas.zipWithIndex
+              .map {
+                case (tableData, index) => <.tr(^.key := s"row-$index", ^.className := "data-row", tableData)
+              },
             if (props.tableDatas.isEmpty) {
               <.tr(
                 <.td(^.colSpan := props.colSpan, ^^.classes("no-entries"), props.i18n("facto.no-entries"))
