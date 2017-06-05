@@ -1,30 +1,25 @@
 package flux.react.uielements
 
-import common.LoggingUtils.logExceptions
-import common.testing.TestObjects._
-import common.testing.{FakeRouterCtl, ReactTestWrapper, TestModule}
+import common.testing.{ReactTestWrapper, TestComponentWithBackendScope, TestModule}
 import flux.react.uielements
 import flux.react.uielements.InputBase.Listener
-import flux.stores.AllEntriesStoreFactory
-import japgolly.scalajs.react._
 import japgolly.scalajs.react.test.ReactTestUtils
-import models.accounting._
 import utest._
 
-import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala2js.Converters._
 
 object InputWithDefaultFromReferenceTest extends TestSuite {
-  implicit val fake18n = new TestModule().fakeI18n
+  implicit private val fake18n = new TestModule().fakeI18n
+  private val stringInputWithDefault = InputWithDefaultFromReference.forType[String]
+  private val testRef = stringInputWithDefault.ref("testRef")
 
   override def tests = TestSuite {
     val defaultValueProxy: InputBase.Proxy[String] = new FakeProxy()
     defaultValueProxy.setValue("startvalue")
 
     "Starts with same value as defaultValueProxy" - {
-      val tester =
-        new ComponentTester(ReactTestComponent.component(ReactTestComponent.Props(defaultValueProxy)))
+      val tester = createTestComponent(defaultValueProxy)
 
       tester.valueProxy.valueOrDefault ==> "startvalue"
       tester.showsBoundUntilChange ==> true
@@ -33,16 +28,14 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
     "Starts with non-empty different from defaultValueProxy" - {
       defaultValueProxy.setValue("othervalue")
 
-      val tester =
-        new ComponentTester(ReactTestComponent.component(ReactTestComponent.Props(defaultValueProxy)))
+      val tester = createTestComponent(defaultValueProxy)
 
       tester.valueProxy.valueOrDefault ==> "startvalue"
       tester.showsBoundUntilChange ==> false
     }
 
     "Updates value if defaultValueProxy changes" - {
-      val tester =
-        new ComponentTester(ReactTestComponent.component(ReactTestComponent.Props(defaultValueProxy)))
+      val tester = createTestComponent(defaultValueProxy)
 
       defaultValueProxy.setValue("value2")
 
@@ -51,8 +44,7 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
     }
 
     "No longer bound if own value changes" - {
-      val tester =
-        new ComponentTester(ReactTestComponent.component(ReactTestComponent.Props(defaultValueProxy)))
+      val tester = createTestComponent(defaultValueProxy)
 
       tester.valueProxy.setValue("value2")
 
@@ -61,8 +53,7 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
     }
 
     "Binds again if own value changes to defaultValueProxy" - {
-      val tester =
-        new ComponentTester(ReactTestComponent.component(ReactTestComponent.Props(defaultValueProxy)))
+      val tester = createTestComponent(defaultValueProxy)
       tester.valueProxy.setValue("value2")
       tester.valueProxy.setValue("startvalue")
 
@@ -72,8 +63,7 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
     }
 
     "Binds again if defaultValueProxy changes to own value" - {
-      val tester =
-        new ComponentTester(ReactTestComponent.component(ReactTestComponent.Props(defaultValueProxy)))
+      val tester = createTestComponent(defaultValueProxy)
       tester.valueProxy.setValue("value2")
       defaultValueProxy.setValue("value2")
 
@@ -82,38 +72,26 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
     }
 
     "Input name is given ref name" - {
-      val tester =
-        new ComponentTester(ReactTestComponent.component(ReactTestComponent.Props(defaultValueProxy)))
+      val tester = createTestComponent(defaultValueProxy)
       tester.inputName ==> "testRef"
     }
   }
 
-  object ReactTestComponent {
-    val stringInputWithDefault = InputWithDefaultFromReference.forType[String]
-    val testRef = stringInputWithDefault.ref("testRef")
-
-    val component = ReactComponentB[Props](getClass.getSimpleName)
-      .renderBackend[Backend]
-      .build
-
-    case class Props(proxy: InputBase.Proxy[String])
-
-    class Backend(val $ : BackendScope[Props, _]) {
-      def render(props: Props) = logExceptions {
-        stringInputWithDefault(
-          ref = testRef,
-          defaultValueProxy = props.proxy,
-          nameToDelegateRef = uielements.bootstrap.TextInput.ref) { extraProps =>
-          uielements.bootstrap.TextInput(
-            ref = extraProps.ref,
-            label = "label",
-            defaultValue = "startvalue",
-            showErrorMessage = false,
-            inputClasses = extraProps.inputClasses
-          )
-        }
+  private def createTestComponent(proxy: InputBase.Proxy[String]): ComponentTester = {
+    new ComponentTester(TestComponentWithBackendScope {
+      stringInputWithDefault(
+        ref = testRef,
+        defaultValueProxy = proxy,
+        nameToDelegateRef = uielements.bootstrap.TextInput.ref) { extraProps =>
+        uielements.bootstrap.TextInput(
+          ref = extraProps.ref,
+          label = "label",
+          defaultValue = "startvalue",
+          showErrorMessage = false,
+          inputClasses = extraProps.inputClasses
+        )
       }
-    }
+    })
   }
 
   private final class FakeProxy extends InputBase.Proxy[String] {
@@ -137,13 +115,12 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
     }
   }
 
-  private final class ComponentTester(
-      unrenderedComponent: ReactComponentU[_, _, ReactTestComponent.Backend, _ <: TopNode]) {
+  private final class ComponentTester(unrenderedComponent: TestComponentWithBackendScope.ComponentU) {
     private val renderedComponent = ReactTestUtils.renderIntoDocument(unrenderedComponent)
     private val wrappedComponent = new ReactTestWrapper(renderedComponent)
 
     def valueProxy: InputBase.Proxy[String] = {
-      ReactTestComponent.testRef(renderedComponent.backend.$)
+      testRef(renderedComponent.backend.$)
     }
 
     def showsBoundUntilChange: Boolean = {
