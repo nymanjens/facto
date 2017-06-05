@@ -79,6 +79,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             forceFlowValue: Option[ReferenceMoney] = None,
             showErrorMessages: Boolean,
             defaultPanel: Option[Proxy],
+            focusOnMount: Boolean,
             closeButtonCallback: Option[Callback] = None,
             onFormChange: () => Unit): ReactElement = {
     val props = Props(
@@ -87,6 +88,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
       forceFlowValue = forceFlowValue,
       showErrorMessages = showErrorMessages,
       defaultPanel = defaultPanel,
+      focusOnMount = focusOnMount,
       deleteButtonCallback = closeButtonCallback,
       onFormChange = onFormChange
     )
@@ -169,6 +171,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                            forceFlowValue: Option[ReferenceMoney],
                            showErrorMessages: Boolean,
                            defaultPanel: Option[Proxy],
+                           focusOnMount: Boolean,
                            deleteButtonCallback: Option[Callback],
                            onFormChange: () => Unit)
 
@@ -194,7 +197,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
               label = i18n("facto.date-payed"),
               defaultValue = mappedExtraProps.defaultValue,
               showErrorMessage = props.showErrorMessages,
-              inputClasses = extraProps.inputClasses
+              inputClasses = extraProps.inputClasses,
+              focusOnMount = props.focusOnMount
             )
           }
         },

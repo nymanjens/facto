@@ -9,7 +9,7 @@ import japgolly.scalajs.react.{ReactEventI, TopNode, _}
 import japgolly.scalajs.react.vdom.prefix_<^._
 import flux.react.ReactVdomUtils.{<<, ^^}
 import japgolly.scalajs.react.ReactComponentC.ReqProps
-import org.scalajs.dom.raw.HTMLInputElement
+import org.scalajs.dom.raw.{HTMLElement, HTMLInputElement}
 
 import scala.collection.immutable.Seq
 import scala.util.{Failure, Success, Try}
@@ -21,13 +21,13 @@ private[bootstrap] object InputComponent {
                                 valueChangeForPropsChange: (Props[Value, ExtraProps], Value) => Value =
                                   (_: Props[Value, ExtraProps], oldValue: Value) => oldValue,
                                 inputRenderer: InputRenderer[ExtraProps]) = {
-    def calculateInitialState(props: Props[Value, ExtraProps]): State[Value] = logExceptions {
-      // Calling valueChangeForPropsChange() to make sure there is no discrepancy between init and update.
-      val value = valueChangeForPropsChange(props, props.defaultValue)
-      State(valueString = ValueTransformer.valueToString(value, props), listeners = Seq(props.listener))
-    }
     ReactComponentB[Props[Value, ExtraProps]](name)
-      .initialState_P[State[Value]](calculateInitialState)
+      .initialState_P[State[Value]](props =>
+        logExceptions {
+          // Calling valueChangeForPropsChange() to make sure there is no discrepancy between init and update.
+          val value = valueChangeForPropsChange(props, props.defaultValue)
+          State(valueString = ValueTransformer.valueToString(value, props), listeners = Seq(props.listener))
+      })
       .renderPS((context, props, state) =>
         logExceptions {
           def onChange(e: ReactEventI): Callback = LogExceptionsCallback {
@@ -76,6 +76,13 @@ private[bootstrap] object InputComponent {
             for (listener <- scope.currentState.listeners) {
               listener.onChange(newValue, directUserChange = false).runNow()
             }
+          }
+      })
+      .componentDidMount(scope =>
+        LogExceptionsCallback {
+          scope.props.focusOnMount match {
+            case Some(inputRef) => inputRef(scope).get.focus()
+            case None =>
           }
       })
       .build
@@ -156,6 +163,7 @@ private[bootstrap] object InputComponent {
       required: Boolean,
       showErrorMessage: Boolean,
       inputClasses: Seq[String],
+      focusOnMount: Option[RefSimple[HTMLElement]] = None,
       listener: InputBase.Listener[Value],
       extra: ExtraProps = (): Unit,
       valueTransformer: ValueTransformer[Value, ExtraProps])(implicit val i18n: I18n)

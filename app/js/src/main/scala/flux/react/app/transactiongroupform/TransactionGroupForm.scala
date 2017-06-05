@@ -176,6 +176,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
                   showErrorMessages = state.showErrorMessages,
                   defaultPanel =
                     if (firstPanel) None else Some(panelRef(panelIndex = state.panelIndices.head)($)),
+                  focusOnMount = firstPanel,
                   closeButtonCallback = if (firstPanel) None else Some(removeTransactionPanel(panelIndex)),
                   onFormChange = this.onFormChange
                 )

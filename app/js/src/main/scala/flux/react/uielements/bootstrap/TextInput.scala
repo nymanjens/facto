@@ -11,14 +11,17 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
 import flux.react.ReactVdomUtils.{<<, ^^}
 import japgolly.scalajs.react.ReactComponentC.ReqProps
-import org.scalajs.dom.raw.HTMLInputElement
+import org.scalajs.dom.raw.{HTMLElement, HTMLInputElement}
 import japgolly.scalajs.react.TopNode
+import org.scalajs.dom.html
 
 import scala.collection.immutable.Seq
 import scala.reflect.ClassTag
 import scala.util.Try
 
 object TextInput {
+
+  private val inputRef: RefSimple[HTMLElement] = Ref[HTMLElement]("inputRef")
 
   private val component = InputComponent.create[Value, ExtraProps](
     name = getClass.getSimpleName,
@@ -33,7 +36,8 @@ object TextInput {
           ^^.classes(classes),
           ^.name := name,
           ^.value := valueString,
-          ^.onChange ==> onChange
+          ^.onChange ==> onChange,
+          ^.ref := inputRef
         )
       }
     }
@@ -46,6 +50,7 @@ object TextInput {
             required: Boolean = false,
             showErrorMessage: Boolean,
             inputClasses: Seq[String] = Seq(),
+            focusOnMount: Boolean = false,
             listener: InputBase.Listener[String] = InputBase.Listener.nullInstance)(
       implicit i18n: I18n): ReactElement = {
     val props = Props(
@@ -55,6 +60,7 @@ object TextInput {
       required = required,
       showErrorMessage = showErrorMessage,
       inputClasses = inputClasses,
+      focusOnMount = if (focusOnMount) Some(inputRef) else None,
       listener = listener,
       valueTransformer = ValueTransformer.nullInstance
     )
