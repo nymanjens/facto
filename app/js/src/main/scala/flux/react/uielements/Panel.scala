@@ -1,14 +1,15 @@
 package flux.react.uielements
 
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.prefix_<^._
+import japgolly.scalajs.react.vdom._
+import japgolly.scalajs.react.vdom.html_<^._
 import flux.react.ReactVdomUtils.{^^, <<}
 
 import scala.collection.immutable.Seq
 
 object Panel {
   private case class Props(title: String, panelClasses: Seq[String])
-  private val component = ReactComponentB[Props](getClass.getSimpleName)
+  private val component = ScalaComponent.builder[Props](getClass.getSimpleName)
     .renderPC(
       (_, props, children) =>
         <.div(
@@ -23,7 +24,7 @@ object Panel {
       ))
     .build
 
-  def apply(title: String, panelClasses: Seq[String] = Seq())(children: ReactNode*): ReactElement = {
+  def apply(title: String, panelClasses: Seq[String] = Seq())(children: VdomNode*): VdomElement = {
     component(Props(title, panelClasses), children: _*)
   }
 }

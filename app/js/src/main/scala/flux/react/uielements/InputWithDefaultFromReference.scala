@@ -9,7 +9,7 @@ import scala.reflect.ClassTag
 
 class InputWithDefaultFromReference[Value] private () {
 
-  private val component = ReactComponentB[Props.any]("InputWithDefaultFromReferenceWrapper")
+  private val component = ScalaComponent.builder[Props.any]("InputWithDefaultFromReferenceWrapper")
     .renderBackend[Backend]
     .build
 
@@ -20,7 +20,7 @@ class InputWithDefaultFromReference[Value] private () {
       startWithDefault: Boolean = false,
       directUserChangeOnly: Boolean = false,
       nameToDelegateRef: String => DelegateRef)(
-      inputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement): ReactElement = {
+      inputElementFactory: InputElementExtraProps[DelegateRef] => VdomElement): VdomElement = {
     component.withRef(ref.name)(
       Props(
         inputElementRef = nameToDelegateRef(ref.name),
@@ -36,7 +36,7 @@ class InputWithDefaultFromReference[Value] private () {
                                                        startWithDefault: Boolean = false,
                                                        directUserChangeOnly: Boolean = false,
                                                        nameToDelegateRef: String => DelegateRef)(
-      inputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement): ReactElement = {
+      inputElementFactory: InputElementExtraProps[DelegateRef] => VdomElement): VdomElement = {
     forOption(
       ref = ref,
       defaultValueProxy = Some(() => defaultValueProxy),
@@ -78,7 +78,7 @@ class InputWithDefaultFromReference[Value] private () {
       inputElementRef: DelegateRef,
       defaultValueProxy: Option[() => InputBase.Proxy[Value]],
       startWithDefault: Boolean,
-      inputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement,
+      inputElementFactory: InputElementExtraProps[DelegateRef] => VdomElement,
       directUserChangeOnly: Boolean)
   private object Props {
     type any = Props[_ <: InputBase.Reference[Value]]
@@ -95,7 +95,7 @@ class InputWithDefaultFromReference[Value] private () {
 
   private object Impl {
 
-    val component = ReactComponentB[Props.any]("InputWithDefaultFromReferenceImpl")
+    val component = ScalaComponent.builder[Props.any]("InputWithDefaultFromReferenceImpl")
       .initialState[State](ConnectionState.connectedToDefault)
       .renderBackend[Backend]
       .componentDidMount(scope => scope.backend.didMount(scope.props))
@@ -171,7 +171,7 @@ class InputWithDefaultFromReference[Value] private () {
 
   private object Dummy {
 
-    val component = ReactComponentB[Props.any]("DummyInputWithDefaultFromReference")
+    val component = ScalaComponent.builder[Props.any]("DummyInputWithDefaultFromReference")
       .renderBackend[Backend]
       .build
     val ref = Ref.to(component, "delegate")

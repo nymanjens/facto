@@ -3,14 +3,15 @@ package flux.react.uielements
 import scala.scalajs.js
 import common.I18n
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.prefix_<^._
+import japgolly.scalajs.react.vdom._
+import japgolly.scalajs.react.vdom.html_<^._
 import flux.react.ReactVdomUtils.{^^, <<}
 
 import scala.collection.immutable.Seq
 
 object Table {
 
-  private val component = ReactComponentB[Props](getClass.getSimpleName)
+  private val component = ScalaComponent.builder[Props](getClass.getSimpleName)
     .renderP(
       (_, props) =>
         <.table(
@@ -56,16 +57,16 @@ object Table {
   def apply(title: String,
             tableClasses: Seq[String] = Seq(),
             expandNumEntriesCallback: Option[Callback] = None,
-            tableHeaders: Seq[ReactElement],
-            tableDatas: Seq[Seq[ReactElement]])(implicit i18n: I18n): ReactElement = {
+            tableHeaders: Seq[VdomElement],
+            tableDatas: Seq[Seq[VdomElement]])(implicit i18n: I18n): VdomElement = {
     component(Props(title, tableClasses, expandNumEntriesCallback, tableHeaders, tableDatas, i18n))
   }
 
   private case class Props(title: String,
                            tableClasses: Seq[String],
                            expandNumEntriesCallback: Option[Callback],
-                           tableHeaders: Seq[ReactElement],
-                           tableDatas: Seq[Seq[ReactElement]],
+                           tableHeaders: Seq[VdomElement],
+                           tableDatas: Seq[Seq[VdomElement]],
                            i18n: I18n) {
     def colSpan: Int = tableHeaders.size
   }

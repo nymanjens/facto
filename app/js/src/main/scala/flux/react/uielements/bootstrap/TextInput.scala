@@ -8,7 +8,8 @@ import flux.react.uielements.InputBase
 import common.{I18n, LoggingUtils}
 import common.time.TimeUtils
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.prefix_<^._
+import japgolly.scalajs.react.vdom._
+import japgolly.scalajs.react.vdom.html_<^._
 import flux.react.ReactVdomUtils.{<<, ^^}
 import japgolly.scalajs.react.ReactComponentC.ReqProps
 import org.scalajs.dom.raw.{HTMLElement, HTMLInputElement}
@@ -29,7 +30,7 @@ object TextInput {
       override def renderInput(classes: Seq[String],
                                name: String,
                                valueString: String,
-                               onChange: ReactEventI => Callback,
+                               onChange: ReactEventFromInput => Callback,
                                extraProps: ExtraProps) = {
         <.input(
           ^.tpe := "text",
@@ -52,7 +53,7 @@ object TextInput {
             inputClasses: Seq[String] = Seq(),
             focusOnMount: Boolean = false,
             listener: InputBase.Listener[String] = InputBase.Listener.nullInstance)(
-      implicit i18n: I18n): ReactElement = {
+      implicit i18n: I18n): VdomElement = {
     val props = Props(
       label = label,
       name = ref.name,

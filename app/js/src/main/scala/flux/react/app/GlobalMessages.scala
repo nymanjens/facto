@@ -2,14 +2,17 @@ package flux.react.app
 
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import flux.stores.GlobalMessagesStore
-import japgolly.scalajs.react.{ReactElement, _}
-import japgolly.scalajs.react.vdom.prefix_<^._
+import japgolly.scalajs.react._
+import japgolly.scalajs.react.vdom._
+import japgolly.scalajs.react.vdom.html_<^._
+import flux.react.ReactVdomUtils.{<<, ^^}
 
 import scala.scalajs.js
 
 private[app] final class GlobalMessages(implicit globalMessagesStore: GlobalMessagesStore, menu: Menu) {
 
-  private val component = ReactComponentB[Props](getClass.getSimpleName)
+  private val component = ScalaComponent
+    .builder[Props](getClass.getSimpleName)
     .initialState[State](State(maybeMessage = None))
     .renderBackend[Backend]
     .componentWillMount(scope => scope.backend.willMount(scope.state))
@@ -17,7 +20,7 @@ private[app] final class GlobalMessages(implicit globalMessagesStore: GlobalMess
     .build
 
   // **************** API ****************//
-  def apply(): ReactElement = {
+  def apply(): VdomElement = {
     component()
   }
 
@@ -44,16 +47,18 @@ private[app] final class GlobalMessages(implicit globalMessagesStore: GlobalMess
       $.modState(state => logExceptions(state.withUpdatedMessage)).runNow()
     }
 
-    def render(props: Props, state: State): ReactElement = logExceptions {
+    def render(props: Props, state: State): VdomElement = logExceptions {
       state.maybeMessage match {
         case None => <.span()
         case Some(message) =>
           <.div(
             ^.className := "alert alert-info",
             ^.style := js.Dictionary("marginTop" -> "20px"),
-            message.isWorking ?= <.i(
-              ^.className := "fa fa-circle-o-notch fa-spin",
-              ^.style := js.Dictionary("marginRight" -> "11px")),
+            ^^.ifThen(message.isWorking) {
+              <.i(
+                ^.className := "fa fa-circle-o-notch fa-spin",
+                ^.style := js.Dictionary("marginRight" -> "11px"))
+            },
             message.string
           )
       }

@@ -7,8 +7,9 @@ import common.{I18n, LoggingUtils, SinglePendingTaskQueue}
 import common.CollectionUtils.toListMap
 import common.time.{Clock, LocalDateTime, LocalDateTimes}
 import japgolly.scalajs.react._
+import japgolly.scalajs.react.vdom._
 import flux.react.uielements.{InputBase, InputWithDefaultFromReference}
-import japgolly.scalajs.react.vdom.prefix_<^._
+import japgolly.scalajs.react.vdom.html_<^._
 import flux.react.ReactVdomUtils.{<<, ^^}
 import flux.react.uielements
 import models.accounting.{Tag, Transaction}
@@ -56,8 +57,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   private val rawTagsRef = tagsMappedInput.delegateRef(tagsRef)
 
   private val component = {
-    ReactComponentB[Props](getClass.getSimpleName)
-      .initialState_P[State](props =>
+    ScalaComponent.builder[Props](getClass.getSimpleName)
+      .initialStateFromProps[State](props =>
         logExceptions {
           State(
             transactionDate = props.defaultValues.map(_.transactionDate) getOrElse LocalDateTimes
@@ -81,7 +82,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             defaultPanel: Option[Proxy],
             focusOnMount: Boolean,
             closeButtonCallback: Option[Callback] = None,
-            onFormChange: () => Unit): ReactElement = {
+            onFormChange: () => Unit): VdomElement = {
     val props = Props(
       title = title,
       defaultValues = defaultValues,

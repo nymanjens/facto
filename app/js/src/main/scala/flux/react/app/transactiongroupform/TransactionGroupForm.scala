@@ -9,8 +9,10 @@ import flux.react.ReactVdomUtils.^^
 import flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
 import flux.react.router.Page
 import japgolly.scalajs.react._
+import japgolly.scalajs.react.vdom._
 import japgolly.scalajs.react.extra.router.RouterCtl
-import japgolly.scalajs.react.vdom.prefix_<^._
+import japgolly.scalajs.react.vdom.html_<^._
+import flux.react.ReactVdomUtils.{<<, ^^}
 import models.accounting.config.Config
 import models.{EntityAccess, User}
 import models.accounting.{Tag, Transaction, TransactionGroup}
@@ -34,8 +36,8 @@ final class TransactionGroupForm(implicit i18n: I18n,
                                  totalFlowRestrictionInput: TotalFlowRestrictionInput) {
 
   private val component = {
-    ReactComponentB[Props](getClass.getSimpleName)
-      .initialState_P(props =>
+    ScalaComponent.builder[Props](getClass.getSimpleName)
+      .initialStateFromProps(props =>
         logExceptions {
           val numberOfTransactions = props.operationMeta match {
             case OperationMeta.AddNew => 1
@@ -61,16 +63,16 @@ final class TransactionGroupForm(implicit i18n: I18n,
   }
 
   // **************** API ****************//
-  def forCreate(router: RouterCtl[Page]): ReactElement = {
+  def forCreate(router: RouterCtl[Page]): VdomElement = {
     create(Props(OperationMeta.AddNew, router))
   }
 
-  def forEdit(transactionGroupId: Long, router: RouterCtl[Page]): ReactElement = {
+  def forEdit(transactionGroupId: Long, router: RouterCtl[Page]): VdomElement = {
     create(Props(OperationMeta.Edit(transactionGroupManager.findById(transactionGroupId)), router))
   }
 
   // **************** Private helper methods ****************//
-  private def create(props: Props): ReactElement = {
+  private def create(props: Props): VdomElement = {
     component.withKey(props.operationMeta.toString).apply(props)
   }
 
@@ -119,12 +121,12 @@ final class TransactionGroupForm(implicit i18n: I18n,
                 case OperationMeta.AddNew => i18n("facto.new-transaction")
                 case OperationMeta.Edit(_) => i18n("facto.edit-transaction")
               },
-              props.operationMeta.isInstanceOf[OperationMeta.Edit] ?= <.a(
+              ^^.ifThen(props.operationMeta.isInstanceOf[OperationMeta.Edit]){<.a(
                 ^.className := "btn btn-default delete-button",
                 <.i(^.className := "fa fa-times"),
                 i18n("facto.delete"),
                 ^.onClick --> onDelete
-              ),
+              )},
               <.span(
                 ^.className := "total-transaction-flow-box",
                 totalFlowInput(
@@ -245,7 +247,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
       }).runNow()
     }
 
-    private def onSubmit(e: ReactEventI): Callback = LogExceptionsCallback {
+    private def onSubmit(e: ReactEventFromInput): Callback = LogExceptionsCallback {
       def getErrorMessage(datas: Seq[transactionPanel.Data], state: State): Option[String] = {
         def invalidMoneyReservoirsError: Option[String] = {
           val containsEmptyReservoirCodes = datas.exists(_.moneyReservoir.isNullReservoir)

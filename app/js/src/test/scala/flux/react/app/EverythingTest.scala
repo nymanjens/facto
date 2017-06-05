@@ -4,6 +4,7 @@ import common.testing.TestObjects._
 import common.testing.{FakeRouterCtl, ReactTestWrapper, TestModule}
 import flux.stores.AllEntriesStoreFactory
 import japgolly.scalajs.react._
+import japgolly.scalajs.react.vdom._
 import models.accounting._
 import utest._
 
@@ -71,7 +72,7 @@ object EverythingTest extends TestSuite {
     for (_ <- 1 to num) yield uniqueTransaction()
   }
 
-  private final class ComponentTester(unrenderedComponent: ReactElement) {
+  private final class ComponentTester(unrenderedComponent: VdomElement) {
     val component = ReactTestWrapper.renderComponent(unrenderedComponent)
 
     def expandButton = new ExpandButton

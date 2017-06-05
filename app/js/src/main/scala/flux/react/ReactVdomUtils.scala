@@ -1,8 +1,9 @@
 package flux.react
 
-import japgolly.scalajs.react.ReactNode
+import japgolly.scalajs.react.vdom.VdomNode
 import japgolly.scalajs.react.vdom.TagMod
-import japgolly.scalajs.react.vdom.prefix_<^._
+import japgolly.scalajs.react.vdom.html_<^._
+import japgolly.scalajs.react.vdom.Implicits._
 
 import scala.collection.immutable.Seq
 
@@ -15,7 +16,7 @@ object ReactVdomUtils {
       if (cond) {
         thenElement
       } else {
-        EmptyTag
+        EmptyVdom
       }
     }
     def ifThen[T](option: Option[T])(thenElement: T => TagMod): TagMod = {
@@ -24,15 +25,15 @@ object ReactVdomUtils {
   }
 
   object << {
-    def ifThen(cond: Boolean)(thenElement: => ReactNode): ReactNode = {
+    def ifThen(cond: Boolean)(thenElement: => VdomNode): VdomNode = {
       if (cond) {
         thenElement
       } else {
-        Seq()
+        VdomArray.empty()
       }
     }
 
-    def ifThen[T](option: Option[T])(thenElement: T => ReactNode): ReactNode = {
+    def ifThen[T](option: Option[T])(thenElement: T => VdomNode): VdomNode = {
       ifThen(option.isDefined)(thenElement(option.get))
     }
   }

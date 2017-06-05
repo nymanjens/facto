@@ -1,6 +1,6 @@
 package common.testing
 
-import japgolly.scalajs.react.ReactElement
+import japgolly.scalajs.react.VdomElement
 import japgolly.scalajs.react.test.{ComponentM, ReactTestUtils}
 import org.scalajs.dom.raw.DOMList
 import scala.scalajs.js.{Function1, isUndefined}
@@ -37,24 +37,24 @@ final class ReactTestWrapper(private val componentM: ComponentM) {
   }
 
   def attribute(name: String): String = {
-    Option(componentM.getDOMNode().getAttribute(name)) getOrElse ""
+    Option(componentM.getDOMNode.getAttribute(name)) getOrElse ""
   }
 
   def click(): Unit = {
-    ReactTestUtils.Simulate click componentM
+    Simulate click componentM
   }
 
   def classes: Seq[String] = {
-    val classString = Option(componentM.getDOMNode().getAttribute("class")) getOrElse ""
+    val classString = Option(componentM.getDOMNode.getAttribute("class")) getOrElse ""
     classString.toLowerCase.split(' ').toVector
   }
 
   def tagName: String = {
-    componentM.getDOMNode().tagName.toLowerCase
+    componentM.getDOMNode.tagName.toLowerCase
   }
 
   def typeAttribute: String = {
-    val attrib = Option(componentM.getDOMNode().getAttribute("type")) getOrElse ""
+    val attrib = Option(componentM.getDOMNode.getAttribute("type")) getOrElse ""
     attrib.toLowerCase
   }
 
@@ -62,7 +62,7 @@ final class ReactTestWrapper(private val componentM: ComponentM) {
 }
 
 object ReactTestWrapper {
-  def renderComponent(component: ReactElement): ReactTestWrapper = {
+  def renderComponent(component: VdomElement): ReactTestWrapper = {
     new ReactTestWrapper(ReactTestUtils renderIntoDocument component)
   }
 }

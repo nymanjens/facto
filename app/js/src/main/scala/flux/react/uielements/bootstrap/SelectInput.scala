@@ -7,7 +7,8 @@ import flux.react.ReactVdomUtils.^^
 import flux.react.uielements.InputBase
 import flux.react.uielements.bootstrap.InputComponent.{InputRenderer, Props}
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.prefix_<^._
+import japgolly.scalajs.react.vdom._
+import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
@@ -21,7 +22,7 @@ class SelectInput[Value] private (implicit valueTag: ClassTag[Value]) {
       override def renderInput(classes: Seq[String],
                                name: String,
                                valueString: String,
-                               onChange: ReactEventI => Callback,
+                               onChange: ReactEventFromInput => Callback,
                                extraProps: ExtraProps) = {
         <.select(
           ^^.classes(classes),
@@ -49,7 +50,7 @@ class SelectInput[Value] private (implicit valueTag: ClassTag[Value]) {
             valueToId: Value => String,
             valueToName: Value => String,
             listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance)(
-      implicit i18n: I18n): ReactElement = {
+      implicit i18n: I18n): VdomElement = {
     val props = Props(
       label = label,
       name = ref.name,

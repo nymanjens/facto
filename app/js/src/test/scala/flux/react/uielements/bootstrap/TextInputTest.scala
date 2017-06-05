@@ -5,7 +5,7 @@ import common.testing.{ReactTestWrapper, TestComponentWithBackendScope, TestModu
 import flux.react.uielements
 import flux.react.uielements.InputBase
 import flux.react.uielements.InputBase.Listener
-import japgolly.scalajs.react.{ReactElement, _}
+import japgolly.scalajs.react.{VdomElement, _}
 import japgolly.scalajs.react.test.ReactTestUtils
 import utest._
 

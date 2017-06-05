@@ -6,6 +6,8 @@ import flux.react.uielements
 import flux.react.uielements.EntriesListTable.NumEntriesStrategy
 import flux.stores.{EntriesStore, EntriesListStoreFactory}
 import japgolly.scalajs.react._
+import japgolly.scalajs.react.vdom._
+import japgolly.scalajs.react.vdom._
 
 import scala.collection.immutable.Seq
 
@@ -13,11 +15,11 @@ private final class EntriesListTable[Entry, Props](
     tableTitle: String,
     tableClasses: Seq[String],
     numEntriesStrategy: NumEntriesStrategy,
-    tableHeaders: Seq[ReactElement],
-    calculateTableData: Entry => Seq[ReactElement],
+    tableHeaders: Seq[VdomElement],
+    calculateTableData: Entry => Seq[VdomElement],
     props: Props)(implicit entriesStoreFactory: EntriesListStoreFactory[Entry, Props], i18n: I18n) {
 
-  private val component = ReactComponentB[Props](getClass.getSimpleName)
+  private val component = ScalaComponent.builder[Props](getClass.getSimpleName)
     .initialState(State(EntriesListStoreFactory.State.empty, maxNumEntries = numEntriesStrategy.start))
     .renderBackend[Backend]
     .componentWillMount(scope => scope.backend.willMount(scope.state))
@@ -25,7 +27,7 @@ private final class EntriesListTable[Entry, Props](
     .build
 
   // **************** API ****************//
-  def apply(): ReactElement = {
+  def apply(): VdomElement = {
     component(props)
   }
 
@@ -90,11 +92,11 @@ object EntriesListTable {
   def apply[Entry, Props](tableTitle: String,
                           tableClasses: Seq[String] = Seq(),
                           numEntriesStrategy: NumEntriesStrategy,
-                          tableHeaders: Seq[ReactElement],
-                          calculateTableData: Entry => Seq[ReactElement],
+                          tableHeaders: Seq[VdomElement],
+                          calculateTableData: Entry => Seq[VdomElement],
                           props: Props = (): Unit)(
       implicit entriesStoreFactory: EntriesListStoreFactory[Entry, Props],
-      i18n: I18n): ReactElement = {
+      i18n: I18n): VdomElement = {
     new EntriesListTable(
       tableTitle,
       tableClasses,

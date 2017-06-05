@@ -13,7 +13,7 @@ import scala.collection.immutable.Seq
 class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: ClassTag[DelegateValue],
                                                  valueTag: ClassTag[Value]) {
 
-  private val component = ReactComponentB[Props.any](
+  private val component = ScalaComponent.builder[Props.any](
     s"${getClass.getSimpleName}_${delegateValueTag.runtimeClass.getSimpleName}_${valueTag.runtimeClass.getSimpleName}")
     .renderBackend[Backend]
     .componentDidMount(scope => scope.backend.didMount(scope.props))
@@ -27,7 +27,7 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
       valueTransformer: ValueTransformer[DelegateValue, Value],
       listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance,
       nameToDelegateRef: String => DelegateRef)(
-      delegateInputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement): ReactElement = {
+      delegateInputElementFactory: InputElementExtraProps[DelegateRef] => VdomElement): VdomElement = {
     component.withRef(ref.name)(
       Props(
         delegateRef = nameToDelegateRef(ref.name),
@@ -116,7 +116,7 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
       valueTransformer: ValueTransformer[DelegateValue, Value],
       defaultValue: Value,
       listener: InputBase.Listener[Value],
-      delegateElementFactory: InputElementExtraProps[DelegateRef] => ReactElement)
+      delegateElementFactory: InputElementExtraProps[DelegateRef] => VdomElement)
   private object Props {
     type any = Props[_ <: InputBase.Reference[DelegateValue]]
   }

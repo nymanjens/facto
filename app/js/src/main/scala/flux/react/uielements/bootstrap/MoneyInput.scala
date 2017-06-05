@@ -6,7 +6,8 @@ import flux.react.ReactVdomUtils.^^
 import flux.react.uielements.InputBase
 import flux.react.uielements.bootstrap.InputComponent.{InputRenderer, Props}
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.prefix_<^._
+import japgolly.scalajs.react.vdom._
+import japgolly.scalajs.react.vdom.html_<^._
 import models.accounting.money.{Currency, DatedMoney, ExchangeRateManager, Money}
 
 import scala.collection.immutable.Seq
@@ -25,7 +26,7 @@ object MoneyInput {
       override def renderInput(classes: Seq[String],
                                name: String,
                                valueString: String,
-                               onChange: ReactEventI => Callback,
+                               onChange: ReactEventFromInput => Callback,
                                extraProps: ExtraProps) = {
         val referenceMoney = {
           val datedMoney = {
@@ -74,7 +75,7 @@ object MoneyInput {
             date: LocalDateTime,
             listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance)(
       implicit exchangeRateManager: ExchangeRateManager,
-      i18n: I18n): ReactElement = {
+      i18n: I18n): VdomElement = {
     val props = Props[Value, ExtraProps](
       label = label,
       name = ref.name,

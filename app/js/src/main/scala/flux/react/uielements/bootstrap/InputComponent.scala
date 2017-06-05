@@ -5,8 +5,8 @@ import java.util.NoSuchElementException
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import flux.react.uielements.InputBase
 import common.{I18n, LoggingUtils}
-import japgolly.scalajs.react.{ReactEventI, TopNode, _}
-import japgolly.scalajs.react.vdom.prefix_<^._
+import japgolly.scalajs.react.{ReactEventFromInput, TopNode, _}
+import japgolly.scalajs.react.vdom.html_<^._
 import flux.react.ReactVdomUtils.{<<, ^^}
 import japgolly.scalajs.react.ReactComponentC.ReqProps
 import org.scalajs.dom.raw.{HTMLElement, HTMLInputElement}
@@ -21,8 +21,8 @@ private[bootstrap] object InputComponent {
                                 valueChangeForPropsChange: (Props[Value, ExtraProps], Value) => Value =
                                   (_: Props[Value, ExtraProps], oldValue: Value) => oldValue,
                                 inputRenderer: InputRenderer[ExtraProps]) = {
-    ReactComponentB[Props[Value, ExtraProps]](name)
-      .initialState_P[State[Value]](props =>
+    ScalaComponent.builder[Props[Value, ExtraProps]](name)
+      .initialStateFromProps[State[Value]](props =>
         logExceptions {
           // Calling valueChangeForPropsChange() to make sure there is no discrepancy between init and update.
           val value = valueChangeForPropsChange(props, props.defaultValue)
@@ -30,7 +30,7 @@ private[bootstrap] object InputComponent {
       })
       .renderPS((context, props, state) =>
         logExceptions {
-          def onChange(e: ReactEventI): Callback = LogExceptionsCallback {
+          def onChange(e: ReactEventFromInput): Callback = LogExceptionsCallback {
             val newString = e.target.value
             val newValue = ValueTransformer.stringToValueOrDefault(newString, props)
             val oldValue = ValueTransformer.stringToValueOrDefault(state.valueString, props)
@@ -111,8 +111,8 @@ private[bootstrap] object InputComponent {
     def renderInput(classes: Seq[String],
                     name: String,
                     valueString: String,
-                    onChange: ReactEventI => Callback,
-                    extraProps: ExtraProps): ReactNode
+                    onChange: ReactEventFromInput => Callback,
+                    extraProps: ExtraProps): VdomNode
   }
 
   trait ValueTransformer[Value, -ExtraProps] {
