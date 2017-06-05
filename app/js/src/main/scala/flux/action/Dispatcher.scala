@@ -82,7 +82,7 @@ object Dispatcher {
       println(s"  Dispatcher: Dispatching action ${action.getClass.getSimpleName}")
       _callbacks.foreach(_.apply(action))
       println(s"  Dispatcher: Dispatching action Action.Done(${action.getClass.getSimpleName})")
-      _callbacks.foreach(_.apply(action))
+      _callbacks.foreach(_.apply(Action.Done(action)))
       isDispatching = false
 
       _dispatchedActions += action
