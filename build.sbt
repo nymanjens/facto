@@ -53,6 +53,7 @@ lazy val server = (project in file("app/jvm"))
     scalaVersion := Settings.versions.scala,
     scalacOptions ++= Settings.scalacOptions,
     libraryDependencies ++= Settings.jvmDependencies.value,
+    libraryDependencies += guice,
     commands += ReleaseCmd,
     javaOptions := Seq("-Dconfig.file=conf/application.conf"),
     javaOptions in Test := Seq("-Dconfig.resource=test-application.conf"),

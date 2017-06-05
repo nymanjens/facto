@@ -6,7 +6,7 @@ import java.util.function.BiConsumer
 
 import com.google.common.cache.{Cache, CacheBuilder}
 import common.cache.CacheRegistry
-import org.apache.http.annotation.GuardedBy
+import net.jcip.annotations.GuardedBy
 import java.time.Duration
 
 private[sync] final class GuavaBackedSynchronizedCache[K <: Object, V <: Object](expireAfterAccess: Duration,

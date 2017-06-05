@@ -24,7 +24,7 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
     processFlags()
 
     // Set up database if necessary
-    if (Set(Mode.Test, Mode.Dev) contains app.mode) {
+    if (app.mode == Mode.Test || app.mode == Mode.Dev) {
       if (AppConfigHelper.dropAndCreateNewDb) {
         generalImportTool.dropAndCreateNewDb()
       }
@@ -36,7 +36,7 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
     }
 
     // Populate the database with dummy data
-    if (Set(Mode.Test, Mode.Dev) contains app.mode) {
+    if (app.mode == Mode.Test || app.mode == Mode.Dev) {
       if (AppConfigHelper.loadDummyUsers) {
         loadDummyUsers()
       }

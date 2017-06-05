@@ -15,18 +15,20 @@ object Settings {
 
   /** Options for the scala compiler */
   val scalacOptions = Seq(
-    "-Xlint",
-    "-unchecked",
     "-deprecation",
-    "-feature"
+    "-feature",
+    "-unchecked",
+    // "-Xfatal-warnings",
+    "-Xlint:-unused,_",
+    "-Ywarn-unused:-imports"
   )
 
   /** Declare global dependency versions here to avoid mismatches in multi part dependencies */
   object versions {
-    val scala = "2.11.8"
-    val play = "2.5.9" // Must be the same as the Play sbt-plugin in plugins.sbt
+    val scala = "2.12.2" // Must be the same as in .travis.yml
+    val play = "2.6.0-RC2" // Must be the same as the Play sbt-plugin in plugins.sbt
 
-    val uTest = "0.4.3"
+    val uTest = "0.4.7"
     val scalajsReact = "0.11.1"
     val diode = "1.0.0"
     val jQuery = "2.2.4"
@@ -48,7 +50,7 @@ object Settings {
     val react = "org.webjars.bower" % "react" % "15.1.0"
     val sha1 = "org.webjars.bower" % "SHA-1" % "0.1.1"
     val typeaheadJs = "org.webjars" % "typeaheadjs" % "0.11.1"
-    val webjarsPlay = "org.webjars" %% "webjars-play" % "2.4.0-2"
+    val webjarsPlay = "org.webjars" %% "webjars-play" % "2.6.0-M1"
   }
 
   /**
@@ -58,25 +60,26 @@ object Settings {
   val sharedDependencies = Def.setting(
     Seq(
       "org.scala-lang.modules" %% "scala-async" % "0.9.6",
-      "com.lihaoyi" %%% "autowire" % "0.2.5",
-      "me.chrons" %%% "boopickle" % "1.2.4"
+      "com.lihaoyi" %%% "autowire" % "0.2.6",
+      "me.chrons" %%% "boopickle" % "1.2.5"
     ))
 
   /** Dependencies only used by the JVM project */
   val jvmDependencies = Def.setting(
     Seq(
-      "com.vmunier" %% "play-scalajs-scripts" % "0.5.0",
+      "com.vmunier" %% "scalajs-scripts" % "1.1.0",
       "com.lihaoyi" %% "utest" % versions.uTest % Test,
       "com.typesafe.play" %% "play-jdbc" % versions.play,
       "com.typesafe.play" %% "play-cache" % versions.play,
       "com.typesafe.play" %% "play-ws" % versions.play,
       "com.typesafe.play" %% "play-specs2" % versions.play % Test,
       "org.yaml" % "snakeyaml" % "1.14",
-      "com.typesafe.slick" %% "slick" % "3.0.0",
+      "com.typesafe.slick" %% "slick" % "3.2.0",
       "commons-lang" % "commons-lang" % "2.6",
       "mysql" % "mysql-connector-java" % "5.1.36",
       "org.xerial" % "sqlite-jdbc" % "3.8.11.2",
       "com.google.code.findbugs" % "jsr305" % "1.3.9",
+      "net.jcip" % "jcip-annotations" % "1.0",
       webjarDeps.bootstrap,
       webjarDeps.webjarsPlay,
       webjarDeps.fontAwesome,

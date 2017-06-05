@@ -5,7 +5,7 @@ import scala.collection.mutable
 import scala.util.Sorting
 
 import slick.lifted.AbstractTable
-import org.apache.http.annotation.GuardedBy
+import net.jcip.annotations.GuardedBy
 
 import common.cache.CacheRegistry
 

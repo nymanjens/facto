@@ -4,7 +4,7 @@ import com.google.inject.{Inject, Singleton}
 import java.util.{NavigableMap, TreeMap}
 
 import common.cache.CacheRegistry
-import org.apache.http.annotation.GuardedBy
+import net.jcip.annotations.GuardedBy
 import common.time.LocalDateTime
 
 import scala.collection.mutable
