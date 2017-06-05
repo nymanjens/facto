@@ -47,7 +47,7 @@ object Settings {
     val lokijs = "org.webjars.bower" % "lokijs" % "1.4.2"
     val metisMenu = "org.webjars" % "metisMenu" % "1.1.3"
     val mousetrap = "org.webjars" % "mousetrap" % "1.5.3-1"
-    val react = "org.webjars.bower" % "react" % "15.1.0"
+    val react = "org.webjars.bower" % "react" % "15.3.2"
     val sha1 = "org.webjars.bower" % "SHA-1" % "0.1.1"
     val typeaheadJs = "org.webjars" % "typeaheadjs" % "0.11.1"
     val webjarsPlay = "org.webjars" %% "webjars-play" % "2.6.0-M1"
