@@ -157,7 +157,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
             ^.className := "row",
             <.div(
               ^.className := "transaction-group-form",
-              for ((panelIndex, i) <- state.panelIndices.zipWithIndex) yield {
+              (for ((panelIndex, i) <- state.panelIndices.zipWithIndex) yield {
                 val firstPanel = panelIndex == state.panelIndices.head
                 val lastPanel = panelIndex == state.panelIndices.last
                 val transaction = props.operationMeta match {
@@ -182,7 +182,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
                   closeButtonCallback = if (firstPanel) None else Some(removeTransactionPanel(panelIndex)),
                   onFormChange = this.onFormChange
                 )
-              },
+              }).toVdomArray,
               addTransactionPanel(onClick = addTransactionPanelCallback)
             ),
             <.div(

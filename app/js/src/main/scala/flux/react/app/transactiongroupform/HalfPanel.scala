@@ -41,7 +41,7 @@ private[transactiongroupform] object HalfPanel {
   def apply(title: VdomElement,
             panelClasses: Seq[String] = Seq(),
             closeButtonCallback: Option[Callback] = None)(children: VdomNode*): VdomElement = {
-    component(Props(title, panelClasses, closeButtonCallback), children: _*)
+    component(Props(title, panelClasses, closeButtonCallback))(children: _*)
   }
 
   // **************** Private inner types ****************//

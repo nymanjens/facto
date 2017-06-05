@@ -1,11 +1,12 @@
 package flux.react.uielements.bootstrap
 
+import japgolly.scalajs.react.component.Scala.MutableRef
 import java.util.NoSuchElementException
 
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import flux.react.uielements.InputBase
 import common.{I18n, LoggingUtils}
-import japgolly.scalajs.react.{ReactEventFromInput, TopNode, _}
+import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import flux.react.ReactVdomUtils.{<<, ^^}
 import japgolly.scalajs.react.ReactComponentC.ReqProps
@@ -21,7 +22,8 @@ private[bootstrap] object InputComponent {
                                 valueChangeForPropsChange: (Props[Value, ExtraProps], Value) => Value =
                                   (_: Props[Value, ExtraProps], oldValue: Value) => oldValue,
                                 inputRenderer: InputRenderer[ExtraProps]) = {
-    ScalaComponent.builder[Props[Value, ExtraProps]](name)
+    ScalaComponent
+      .builder[Props[Value, ExtraProps]](name)
       .initialStateFromProps[State[Value]](props =>
         logExceptions {
           // Calling valueChangeForPropsChange() to make sure there is no discrepancy between init and update.
@@ -71,7 +73,8 @@ private[bootstrap] object InputComponent {
             valueChangeForPropsChange(scope.nextProps, transformedValue)
           }
           if (currentValue != newValue) {
-            scope.$.modState(_.withValueString(ValueTransformer.valueToString(newValue, scope.nextProps)))
+            scope
+              .modState(_.withValueString(ValueTransformer.valueToString(newValue, scope.nextProps)))
               .runNow()
             for (listener <- scope.currentState.listeners) {
               listener.onChange(newValue, directUserChange = false).runNow()
@@ -104,8 +107,8 @@ private[bootstrap] object InputComponent {
   }
 
   // **************** Public inner types ****************//
-  type ThisRefComp[Value, ExtraProps] =
-    RefComp[Props[Value, ExtraProps], State[Value], Backend, _ <: TopNode]
+  type ThisMutableRef[Value, ExtraProps] =
+    MutableRef[Props[Value, ExtraProps], State[Value], Backend, CtorType]
 
   trait InputRenderer[ExtraProps] {
     def renderInput(classes: Seq[String],
@@ -176,17 +179,17 @@ private[bootstrap] object InputComponent {
       copy(listeners = listeners.filter(_ != listener))
   }
 
-  abstract class Reference[Value, ExtraProps](refComp: ThisRefComp[Value, ExtraProps])
+  abstract class Reference[Value, ExtraProps](mutableRef: ThisMutableRef[Value, ExtraProps])
       extends InputBase.Reference[Value] {
     override final def apply($ : BackendScope[_, _]): InputBase.Proxy[Value] =
-      new Proxy[Value, ExtraProps](() => refComp($).get)
-    override final def name = refComp.name
+      new Proxy[Value, ExtraProps](() => mutableRef($).get)
+    override final def name = mutableRef.name
   }
 
   // **************** Private inner types ****************//
   private type Backend = Unit
   private type ThisComponentU[Value, ExtraProps] =
-    ReactComponentU[Props[Value, ExtraProps], State[Value], Backend, _ <: TopNode]
+    ReactComponentU[Props[Value, ExtraProps], State[Value], Backend, _]
 
   private final class Proxy[Value, ExtraProps](
       val componentProvider: () => ThisComponentU[Value, ExtraProps])

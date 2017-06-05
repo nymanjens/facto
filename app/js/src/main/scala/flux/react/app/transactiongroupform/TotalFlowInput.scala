@@ -73,7 +73,7 @@ private[transactiongroupform] final class TotalFlowInput(implicit i18n: I18n,
       LogExceptionsCallback {
         scope.nextProps.forceValue match {
           case Some(forceValue) =>
-            scope.$.modState(_.copy(valueString = forceValue.formatFloat)).runNow()
+            scope.modState(_.copy(valueString = forceValue.formatFloat)).runNow()
           case None =>
         }
         // Not calling listener here because we only have a listener in the props. The parent

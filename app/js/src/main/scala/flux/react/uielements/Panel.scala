@@ -25,6 +25,6 @@ object Panel {
     .build
 
   def apply(title: String, panelClasses: Seq[String] = Seq())(children: VdomNode*): VdomElement = {
-    component(Props(title, panelClasses), children: _*)
+    component(Props(title, panelClasses))(children: _*)
   }
 }

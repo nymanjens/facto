@@ -1,5 +1,6 @@
 package flux.react.uielements.bootstrap
 
+import japgolly.scalajs.react.component.Scala.MutableRef
 import common.I18n
 import common.time.LocalDateTime
 import flux.react.ReactVdomUtils.^^
@@ -87,14 +88,14 @@ object MoneyInput {
       extra = ExtraProps(forceValue = forceValue, currency = currency, date = date),
       valueTransformer = ValueTransformer
     )
-    component.withRef(ref.name)(props)
+    ref.mutableRef.component(props)
   }
 
-  def ref(name: String): Reference = new Reference(Ref.to(component, name))
+  def ref(name: String): Reference = new Reference(ScalaComponent.mutableRefTo(component))
 
   // **************** Public inner types ****************//
-  final class Reference private[MoneyInput] (refComp: InputComponent.ThisRefComp[Value, ExtraProps])
-      extends InputComponent.Reference(refComp)
+  final class Reference private[MoneyInput] (mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps])
+      extends InputComponent.Reference(mutableRef)
 
   case class ExtraProps(forceValue: Option[Long], currency: Currency, date: LocalDateTime)(
       implicit val exchangeRateManager: ExchangeRateManager)

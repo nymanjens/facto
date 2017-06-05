@@ -1,5 +1,5 @@
 package flux.react.app.transactiongroupform
-
+import japgolly.scalajs.react.component.Scala.MutableRef
 import java.util.NoSuchElementException
 
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
@@ -83,6 +83,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             focusOnMount: Boolean,
             closeButtonCallback: Option[Callback] = None,
             onFormChange: () => Unit): VdomElement = {
+
     val props = Props(
       title = title,
       defaultValues = defaultValues,
@@ -93,10 +94,10 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
       deleteButtonCallback = closeButtonCallback,
       onFormChange = onFormChange
     )
-    component.withKey(key).withRef(ref.refComp)(props)
+    ref.mutableRef.component.withKey(key)(props)
   }
 
-  def ref(name: String): Reference = new Reference(Ref.to(component, name))
+  def ref(name: String): Reference = new Reference(ScalaComponent.mutableRefTo(component))
 
   // **************** Private methods ****************//
   private def selectableReservoirs(currentReservoir: MoneyReservoir = null): Seq[MoneyReservoir] = {
@@ -108,8 +109,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
 
   // **************** Public inner types ****************//
   final class Reference private[TransactionPanel] (
-      private[TransactionPanel] val refComp: RefComp[Props, State, Backend, _ <: TopNode]) {
-    def apply($ : BackendScope[_, _]): Proxy = new Proxy(() => refComp($).get.backend.$)
+      private[TransactionPanel] val mutableRef: MutableRef[Props, State, Backend, CtorType]) {
+    def apply($ : BackendScope[_, _]): Proxy = new Proxy(() => mutableRef.value.backend.$)
   }
 
   final class Proxy private[TransactionPanel] (private val componentScope: () => BackendScope[Props, State]) {

@@ -1,5 +1,6 @@
 package flux.react.uielements.bootstrap
 
+import japgolly.scalajs.react.component.Scala.MutableRef
 import java.time.LocalDate
 import java.util.NoSuchElementException
 
@@ -13,7 +14,7 @@ import japgolly.scalajs.react.vdom.html_<^._
 import flux.react.ReactVdomUtils.{<<, ^^}
 import japgolly.scalajs.react.ReactComponentC.ReqProps
 import org.scalajs.dom.raw.{HTMLElement, HTMLInputElement}
-import japgolly.scalajs.react.TopNode
+
 import org.scalajs.dom.html
 
 import scala.collection.immutable.Seq
@@ -65,14 +66,14 @@ object TextInput {
       listener = listener,
       valueTransformer = ValueTransformer.nullInstance
     )
-    component.withRef(ref.name)(props)
+    ref.mutableRef.component(props)
   }
 
-  def ref(name: String): Reference = new Reference(Ref.to(component, name))
+  def ref(name: String): Reference = new Reference(ScalaComponent.mutableRefTo(component))
 
   // **************** Public inner types ****************//
-  final class Reference private[TextInput] (refComp: InputComponent.ThisRefComp[Value, ExtraProps])
-      extends InputComponent.Reference(refComp)
+  final class Reference private[TextInput] (mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps])
+      extends InputComponent.Reference(mutableRef)
 
   // **************** Private inner types ****************//
   private type ExtraProps = Unit

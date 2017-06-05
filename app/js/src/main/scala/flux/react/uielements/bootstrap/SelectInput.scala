@@ -1,5 +1,6 @@
 package flux.react.uielements.bootstrap
 
+import japgolly.scalajs.react.component.Scala.MutableRef
 import common.CollectionUtils.toListMap
 import common.GuavaReplacement.Iterables.getOnlyElement
 import common.I18n
@@ -62,14 +63,14 @@ class SelectInput[Value] private (implicit valueTag: ClassTag[Value]) {
       extra = ExtraProps.create(options, valueToId = valueToId, valueToName = valueToName),
       valueTransformer = ValueTransformer
     )
-    component.withRef(ref.name)(props)
+    ref.mutableRef.component(props)
   }
 
-  def ref(name: String): Reference = new Reference(Ref.to(component, name))
+  def ref(name: String): Reference = new Reference(ScalaComponent.mutableRefTo(component))
 
   // **************** Public inner types ****************//
-  final class Reference private[SelectInput] (refComp: InputComponent.ThisRefComp[Value, ExtraProps])
-      extends InputComponent.Reference[Value, ExtraProps](refComp)
+  final class Reference private[SelectInput] (mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps])
+      extends InputComponent.Reference[Value, ExtraProps](mutableRef)
 
   case class ExtraProps private (idToOptionMap: Map[String, ExtraProps.ValueAndName])
   object ExtraProps {

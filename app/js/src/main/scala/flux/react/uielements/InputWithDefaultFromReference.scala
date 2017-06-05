@@ -1,7 +1,9 @@
 package flux.react.uielements
 
+import japgolly.scalajs.react.component.Scala.MutableRef
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
-import japgolly.scalajs.react.{TopNode, _}
+import japgolly.scalajs.react._
+import japgolly.scalajs.react.vdom._
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
@@ -21,7 +23,7 @@ class InputWithDefaultFromReference[Value] private () {
       directUserChangeOnly: Boolean = false,
       nameToDelegateRef: String => DelegateRef)(
       inputElementFactory: InputElementExtraProps[DelegateRef] => VdomElement): VdomElement = {
-    component.withRef(ref.name)(
+    ref.mutableRef.component(
       Props(
         inputElementRef = nameToDelegateRef(ref.name),
         defaultValueProxy = defaultValueProxy,
@@ -46,17 +48,17 @@ class InputWithDefaultFromReference[Value] private () {
     )(inputElementFactory)
   }
 
-  def ref(name: String): Reference = new Reference(Ref.to(component, name))
+  def ref(name: String): Reference = new Reference(ScalaComponent.mutableRefTo(component))
 
   // **************** Public inner types ****************//
   case class InputElementExtraProps[DelegateRef <: InputBase.Reference[Value]](ref: DelegateRef,
                                                                                inputClasses: Seq[String])
 
-  final class Reference private[InputWithDefaultFromReference] (refComp: ThisRefComp)
+  final class Reference private[InputWithDefaultFromReference] (mutableRef: ThisMutableRef)
       extends InputBase.Reference[Value] {
     override def apply($ : BackendScope[_, _]) = {
       InputBase.Proxy.forwardingTo {
-        val component = refComp($).get
+        val component = mutableRef($).get
         val wrapperComponentScope = component.backend.$
         val props = component.props
 
@@ -67,11 +69,11 @@ class InputWithDefaultFromReference[Value] private () {
         props.inputElementRef(implComponentScope)
       }
     }
-    override def name = refComp.name
+    override def name = mutableRef.name
   }
 
   // **************** Private inner types ****************//
-  private type ThisRefComp = RefComp[Props.any, State, Backend, _ <: TopNode]
+  private type ThisMutableRef = MutableRef[Props.any, State, Backend, _]
   private type State = Unit
 
   private case class Props[DelegateRef <: InputBase.Reference[Value]](

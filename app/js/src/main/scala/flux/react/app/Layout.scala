@@ -24,7 +24,7 @@ final class Layout(implicit globalMessages: GlobalMessages, menu: Menu) {
 
   // **************** API ****************//
   def apply(routerCtl: RouterCtl[Page], page: Page)(children: VdomNode*): VdomElement = {
-    component(Props(routerCtl, page), children: _*)
+    component(Props(routerCtl, page))(children: _*)
   }
 
   // **************** Private inner types ****************//

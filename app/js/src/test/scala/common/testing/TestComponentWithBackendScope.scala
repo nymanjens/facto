@@ -1,7 +1,8 @@
 package common.testing
 
+import japgolly.scalajs.react.component.Scala.MutableRef
 import common.LoggingUtils.logExceptions
-import japgolly.scalajs.react.{BackendScope, ReactComponentB, ReactComponentU, VdomElement, TopNode}
+import japgolly.scalajs.react._
 
 object TestComponentWithBackendScope {
   private val component = ScalaComponent.builder[Props](getClass.getSimpleName)
@@ -14,7 +15,7 @@ object TestComponentWithBackendScope {
   }
 
   // **************** public inner types **************** //
-  type ComponentU = ReactComponentU[_, _, TestComponentWithBackendScope.Backend, _ <: TopNode]
+  type ComponentU = ReactComponentU[_, _, TestComponentWithBackendScope.Backend, _]
   final class Backend(scope: BackendScope[Props, _]) {
     def render(props: Props): VdomElement = logExceptions {
       props.render()
