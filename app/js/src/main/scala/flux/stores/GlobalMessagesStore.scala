@@ -76,10 +76,8 @@ final class GlobalMessagesStore(implicit i18n: I18n,
     case UpdateTransactionGroup(group, transactions) =>
       i18n("facto.successfully-edited-transactions", transactions.size)
 
-    case RemoveTransactionGroup(group) if group.transactions.size == 1 =>
-      i18n("facto.successfully-deleted-1-transaction")
     case RemoveTransactionGroup(group) =>
-      i18n("facto.successfully-deleted-transactions", group.transactions.size)
+      i18n("facto.successfully-deleted-transactions")
   }
 
   private def numTransactions(transactionsProvider: TransactionGroup => Seq[Transaction]): Int = {
