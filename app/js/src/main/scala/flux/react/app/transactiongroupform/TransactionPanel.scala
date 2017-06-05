@@ -56,17 +56,17 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   private val rawTagsRef = tagsMappedInput.delegateRef(tagsRef)
 
   private val component = {
-    def calculateInitialState(props: Props): State = logExceptions {
-      State(
-        transactionDate = props.defaultValues.map(_.transactionDate) getOrElse LocalDateTimes.toStartOfDay(
-          clock.now),
-        beneficiaryAccount = props.defaultValues
-          .map(_.beneficiary) getOrElse accountingConfig.personallySortedAccounts.head,
-        moneyReservoir = props.defaultValues.map(_.moneyReservoir) getOrElse selectableReservoirs().head
-      )
-    }
     ReactComponentB[Props](getClass.getSimpleName)
-      .initialState_P[State](calculateInitialState)
+      .initialState_P[State](props =>
+        logExceptions {
+          State(
+            transactionDate = props.defaultValues.map(_.transactionDate) getOrElse LocalDateTimes
+              .toStartOfDay(clock.now),
+            beneficiaryAccount = props.defaultValues
+              .map(_.beneficiary) getOrElse accountingConfig.personallySortedAccounts.head,
+            moneyReservoir = props.defaultValues.map(_.moneyReservoir) getOrElse selectableReservoirs().head
+          )
+      })
       .renderBackend[Backend]
       .build
   }
