@@ -6,7 +6,7 @@
   users: Seq[User],
   addUserForm: Form[AddUserData]
 )(
-  implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash, env: play.api.Environment
+  implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash, env: play.api.Environment, webJarAssets: controllers.WebJarAssets
 )
 
 @Main(Messages("facto.user-administration")) {

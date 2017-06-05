@@ -29,8 +29,8 @@ object Settings {
     val play = "2.6.0-RC2" // Must be the same as the Play sbt-plugin in plugins.sbt
 
     val uTest = "0.4.7"
-    val scalajsReact = "0.11.1"
-    val diode = "1.0.0"
+    val scalajsReact = "1.0.0"
+    val diode = "1.1.0"
     val jQuery = "2.2.4"
     val bootstrap = "3.3.6"
   }
@@ -94,7 +94,7 @@ object Settings {
       "com.github.japgolly.scalajs-react" %%% "core" % versions.scalajsReact,
       "com.github.japgolly.scalajs-react" %%% "extra" % versions.scalajsReact,
       "com.github.japgolly.scalajs-react" %%% "test" % versions.scalajsReact % Test,
-      "com.github.japgolly.scalacss" %%% "ext-react" % "0.4.1",
+      "com.github.japgolly.scalacss" %%% "ext-react" % "0.5.3",
       "me.chrons" %%% "diode" % versions.diode,
       "me.chrons" %%% "diode-react" % versions.diode,
       "org.scala-js" %%% "scalajs-dom" % "0.9.1",

@@ -18,7 +18,7 @@ final class GeneralActions @Inject()(implicit val messagesApi: MessagesApi,
                                      entityAccess: SlickEntityAccess,
                                      generalEntries: GeneralEntries,
                                      i18n: I18n,
-                                     env: play.api.Environment)
+                                     env: play.api.Environment, webJarAssets: controllers.WebJarAssets)
     extends Controller
     with I18nSupport {
 

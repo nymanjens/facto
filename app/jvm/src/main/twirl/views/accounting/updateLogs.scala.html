@@ -8,7 +8,7 @@
   entries: Seq[UpdateLog],
   numEntriesToShow: Int
 )(
-  implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash, entityAccess: EntityAccess, i18n: I18n, env: play.api.Environment
+  implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash, entityAccess: EntityAccess, i18n: I18n, env: play.api.Environment, webJarAssets: controllers.WebJarAssets
 )
 
 @Main(Messages("facto.update-logs")) {

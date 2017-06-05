@@ -1,6 +1,6 @@
 package flux.react
 
-import japgolly.scalajs.react.{ReactElement, ReactNode}
+import japgolly.scalajs.react.ReactNode
 import japgolly.scalajs.react.vdom.TagMod
 import japgolly.scalajs.react.vdom.prefix_<^._
 
