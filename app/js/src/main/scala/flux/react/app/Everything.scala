@@ -27,7 +27,8 @@ final class Everything(implicit entriesStoreFactory: AllEntriesStoreFactory,
                        exchangeRateManager: ExchangeRateManager,
                        i18n: I18n) {
 
-  private val component = ScalaComponent.builder[Props](getClass.getSimpleName)
+  private val component = ScalaComponent
+    .builder[Props](getClass.getSimpleName)
     .renderP(
       (_, props) =>
         uielements.Panel(i18n("facto.genral-information-about-all-entries"))(

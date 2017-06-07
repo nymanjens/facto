@@ -9,19 +9,19 @@ import scala.collection.immutable.Seq
 
 object Panel {
   private case class Props(title: String, panelClasses: Seq[String])
-  private val component = ScalaComponent.builder[Props](getClass.getSimpleName)
-    .renderPC(
-      (_, props, children) =>
+  private val component = ScalaComponent
+    .builder[Props](getClass.getSimpleName)
+    .renderPC((_, props, children) =>
+      <.div(
+        ^^.classes("row" +: props.panelClasses),
         <.div(
-          ^^.classes("row" +: props.panelClasses),
+          ^^.classes("col-lg-12"),
           <.div(
-            ^^.classes("col-lg-12"),
-            <.div(
-              ^^.classes("panel panel-default"),
-              <.div(^^.classes("panel-heading"), props.title),
-              <.div(^^.classes("panel-body"), children))
-          )
-      ))
+            ^^.classes("panel panel-default"),
+            <.div(^^.classes("panel-heading"), props.title),
+            <.div(^^.classes("panel-body"), children))
+        )
+    ))
     .build
 
   def apply(title: String, panelClasses: Seq[String] = Seq())(children: VdomNode*): VdomElement = {

@@ -10,7 +10,8 @@ import scala.collection.immutable.Seq
 
 private[transactiongroupform] final class AddTransactionPanel(implicit i18n: I18n) {
 
-  private val component = ScalaComponent.builder[Props](getClass.getSimpleName)
+  private val component = ScalaComponent
+    .builder[Props](getClass.getSimpleName)
     .renderP((_, props) =>
       logExceptions {
         HalfPanel(

@@ -30,7 +30,8 @@ final class Application @Inject()(implicit val messagesApi: MessagesApi,
                                   userManager: SlickUserManager,
                                   entityAccess: SlickEntityAccess,
                                   scalaJsApiServerFactory: ScalaJsApiServerFactory,
-                                  env: play.api.Environment, webJarAssets: controllers.WebJarAssets)
+                                  env: play.api.Environment,
+                                  webJarAssets: controllers.WebJarAssets)
     extends Controller
     with I18nSupport {
 

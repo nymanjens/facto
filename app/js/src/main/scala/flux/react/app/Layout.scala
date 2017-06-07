@@ -12,7 +12,8 @@ import scala.collection.immutable.Seq
 
 final class Layout(implicit globalMessages: GlobalMessages, menu: Menu) {
 
-  private val component = ScalaComponent.builder[Props](getClass.getSimpleName)
+  private val component = ScalaComponent
+    .builder[Props](getClass.getSimpleName)
     .renderPC(
       (_, props, children) =>
         <.div(

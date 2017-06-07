@@ -5,7 +5,8 @@ import common.LoggingUtils.logExceptions
 import japgolly.scalajs.react._
 
 object TestComponentWithBackendScope {
-  private val component = ScalaComponent.builder[Props](getClass.getSimpleName)
+  private val component = ScalaComponent
+    .builder[Props](getClass.getSimpleName)
     .renderBackend[Backend]
     .build
 

@@ -10,7 +10,8 @@ import scala.collection.immutable.Seq
 
 object MoneyWithCurrency {
   private case class Props(money: Money, exchangeRateManager: ExchangeRateManager)
-  private val component = ScalaComponent.builder[Props](getClass.getSimpleName)
+  private val component = ScalaComponent
+    .builder[Props](getClass.getSimpleName)
     .renderP((_, props) => {
       props.money match {
         case money: DatedMoney if money.currency != Currency.default =>

@@ -24,7 +24,8 @@ object TextInputTest extends TestSuite {
     }
 
     "Does not show error message if valid value" - {
-      val tester = createTestComponent(defaultValue = "valid value", required = true, showErrorMessage = true)
+      val tester =
+        createTestComponent(defaultValue = "valid value", required = true, showErrorMessage = true)
 
       tester.hasError ==> false
     }
@@ -42,15 +43,16 @@ object TextInputTest extends TestSuite {
     }
 
     "Shows error message after value change" - {
-      val tester = createTestComponent(defaultValue = "valid value", required = true, showErrorMessage = true)
+      val tester =
+        createTestComponent(defaultValue = "valid value", required = true, showErrorMessage = true)
       tester.valueProxy.setValue("")
       tester.hasError ==> true
     }
   }
 
   private def createTestComponent(defaultValue: String = "",
-                              required: Boolean = false,
-                              showErrorMessage: Boolean = false): ComponentTester = {
+                                  required: Boolean = false,
+                                  showErrorMessage: Boolean = false): ComponentTester = {
     new ComponentTester(TestComponentWithBackendScope {
       uielements.bootstrap.TextInput(
         ref = testRef,

@@ -10,7 +10,8 @@ import play.api.mvc._
 
 final class Auth @Inject()(implicit val messagesApi: MessagesApi,
                            entityAccess: SlickEntityAccess,
-                           env: play.api.Environment, webJarAssets: controllers.WebJarAssets)
+                           env: play.api.Environment,
+                           webJarAssets: controllers.WebJarAssets)
     extends Controller
     with I18nSupport {
 

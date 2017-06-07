@@ -13,7 +13,8 @@ private[transactiongroupform] final class TotalFlowInput(implicit i18n: I18n,
                                                          clock: Clock,
                                                          exchangeRateManager: ExchangeRateManager) {
 
-  private val component = ScalaComponent.builder[Props](getClass.getSimpleName)
+  private val component = ScalaComponent
+    .builder[Props](getClass.getSimpleName)
     .initialStateFromProps(props =>
       logExceptions {
         State(valueString = props.forceValue match {

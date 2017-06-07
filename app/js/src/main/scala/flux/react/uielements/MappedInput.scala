@@ -15,8 +15,9 @@ import scala.collection.immutable.Seq
 class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: ClassTag[DelegateValue],
                                                  valueTag: ClassTag[Value]) {
 
-  private val component = ScalaComponent.builder[Props.any](
-    s"${getClass.getSimpleName}_${delegateValueTag.runtimeClass.getSimpleName}_${valueTag.runtimeClass.getSimpleName}")
+  private val component = ScalaComponent
+    .builder[Props.any](
+      s"${getClass.getSimpleName}_${delegateValueTag.runtimeClass.getSimpleName}_${valueTag.runtimeClass.getSimpleName}")
     .renderBackend[Backend]
     .componentDidMount(scope => scope.backend.didMount(scope.props))
     .componentWillUnmount(scope => scope.backend.willUnmount(scope.props))
@@ -47,7 +48,8 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
       ref: DelegateRef,
       defaultValue: DelegateValue)
 
-  final class Reference private[MappedInput] (mutableRef: ThisMutableRef) extends InputBase.Reference[Value] {
+  final class Reference private[MappedInput] (mutableRef: ThisMutableRef)
+      extends InputBase.Reference[Value] {
     override def apply($ : BackendScope[_, _]): InputBase.Proxy[Value] = new Proxy(() => mutableRef($).get)
     override def name = mutableRef.name
   }

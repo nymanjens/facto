@@ -36,7 +36,8 @@ final class TransactionGroupForm(implicit i18n: I18n,
                                  totalFlowRestrictionInput: TotalFlowRestrictionInput) {
 
   private val component = {
-    ScalaComponent.builder[Props](getClass.getSimpleName)
+    ScalaComponent
+      .builder[Props](getClass.getSimpleName)
       .initialStateFromProps(props =>
         logExceptions {
           val numberOfTransactions = props.operationMeta match {
@@ -121,12 +122,14 @@ final class TransactionGroupForm(implicit i18n: I18n,
                 case OperationMeta.AddNew => i18n("facto.new-transaction")
                 case OperationMeta.Edit(_) => i18n("facto.edit-transaction")
               },
-              ^^.ifThen(props.operationMeta.isInstanceOf[OperationMeta.Edit]){<.a(
-                ^.className := "btn btn-default delete-button",
-                <.i(^.className := "fa fa-times"),
-                i18n("facto.delete"),
-                ^.onClick --> onDelete
-              )},
+              ^^.ifThen(props.operationMeta.isInstanceOf[OperationMeta.Edit]) {
+                <.a(
+                  ^.className := "btn btn-default delete-button",
+                  <.i(^.className := "fa fa-times"),
+                  i18n("facto.delete"),
+                  ^.onClick --> onDelete
+                )
+              },
               <.span(
                 ^.className := "total-transaction-flow-box",
                 totalFlowInput(

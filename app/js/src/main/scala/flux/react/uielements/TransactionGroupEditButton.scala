@@ -11,7 +11,8 @@ import japgolly.scalajs.react.vdom.html_<^._
 
 object TransactionGroupEditButton {
 
-  private val component = ScalaComponent.builder[Props](getClass.getSimpleName)
+  private val component = ScalaComponent
+    .builder[Props](getClass.getSimpleName)
     .renderP((_, props) => {
       <.a(
         ^^.classes("btn", "btn-default", "btn-xs"),

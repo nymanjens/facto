@@ -11,47 +11,43 @@ import scala.collection.immutable.Seq
 
 object Table {
 
-  private val component = ScalaComponent.builder[Props](getClass.getSimpleName)
-    .renderP(
-      (_, props) =>
-        <.table(
-          ^^.classes(Seq(
-            "table",
-            "table-bordered",
-            "table-hover",
-            "table-condensed",
-            "table-overflow-elipsis") ++ props.tableClasses),
-          <.thead(
-            <.tr(^^.classes("info"), <.th(^.colSpan := props.colSpan, props.title)),
-            <.tr(props.tableHeaders)
-          ),
-          <.tbody(
-            props.tableDatas.zipWithIndex
-              .map {
-                case (tableData, index) => <.tr(^.key := s"row-$index", ^.className := "data-row", tableData)
-              },
-            if (props.tableDatas.isEmpty) {
-              <.tr(
-                <.td(^.colSpan := props.colSpan, ^^.classes("no-entries"), props.i18n("facto.no-entries"))
-              )
-            } else if (props.expandNumEntriesCallback.isDefined) {
-              <.tr(
-                <.td(
-                  ^.colSpan := props.colSpan,
-                  ^.style := js.Dictionary("textAlign" -> "center"),
-                  <.a(
-                    ^.onClick --> props.expandNumEntriesCallback.get,
-                    ^.tpe := "button",
-                    ^^.classes("btn", "btn-sm", "btn-default", "btn-circle", "expand-num-entries"),
-                    <.i(^^.classes("fa", "fa-ellipsis-h"))
-                  )
+  private val component = ScalaComponent
+    .builder[Props](getClass.getSimpleName)
+    .renderP((_, props) =>
+      <.table(
+        ^^.classes(
+          Seq("table", "table-bordered", "table-hover", "table-condensed", "table-overflow-elipsis") ++ props.tableClasses),
+        <.thead(
+          <.tr(^^.classes("info"), <.th(^.colSpan := props.colSpan, props.title)),
+          <.tr(props.tableHeaders)
+        ),
+        <.tbody(
+          props.tableDatas.zipWithIndex
+            .map {
+              case (tableData, index) => <.tr(^.key := s"row-$index", ^.className := "data-row", tableData)
+            },
+          if (props.tableDatas.isEmpty) {
+            <.tr(
+              <.td(^.colSpan := props.colSpan, ^^.classes("no-entries"), props.i18n("facto.no-entries"))
+            )
+          } else if (props.expandNumEntriesCallback.isDefined) {
+            <.tr(
+              <.td(
+                ^.colSpan := props.colSpan,
+                ^.style := js.Dictionary("textAlign" -> "center"),
+                <.a(
+                  ^.onClick --> props.expandNumEntriesCallback.get,
+                  ^.tpe := "button",
+                  ^^.classes("btn", "btn-sm", "btn-default", "btn-circle", "expand-num-entries"),
+                  <.i(^^.classes("fa", "fa-ellipsis-h"))
                 )
               )
-            } else {
-              Seq()
-            }
-          )
-      ))
+            )
+          } else {
+            Seq()
+          }
+        )
+    ))
     .build
 
   def apply(title: String,

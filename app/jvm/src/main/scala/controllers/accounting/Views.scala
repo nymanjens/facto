@@ -27,7 +27,8 @@ final class Views @Inject()(implicit val messagesApi: MessagesApi,
                             exchangeRateManager: ExchangeRateManager,
                             entityAccess: EntityAccess,
                             i18n: I18n,
-                            env: play.api.Environment, webJarAssets: controllers.WebJarAssets)
+                            env: play.api.Environment,
+                            webJarAssets: controllers.WebJarAssets)
     extends Controller
     with I18nSupport {
 
