@@ -3,6 +3,7 @@ package flux.react.uielements
 import japgolly.scalajs.react.component.Scala.MutableRef
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import japgolly.scalajs.react._
+import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom._
 
 import scala.collection.immutable.Seq
@@ -11,7 +12,8 @@ import scala.reflect.ClassTag
 
 class InputWithDefaultFromReference[Value] private () {
 
-  private val component = ScalaComponent.builder[Props.any]("InputWithDefaultFromReferenceWrapper")
+  private val component = ScalaComponent
+    .builder[Props.any]("InputWithDefaultFromReferenceWrapper")
     .renderBackend[Backend]
     .build
 
@@ -58,22 +60,15 @@ class InputWithDefaultFromReference[Value] private () {
       extends InputBase.Reference[Value] {
     override def apply($ : BackendScope[_, _]) = {
       InputBase.Proxy.forwardingTo {
-        val component = mutableRef($).get
-        val wrapperComponentScope = component.backend.$
-        val props = component.props
-
-        val implComponentScope = props.defaultValueProxy match {
-          case Some(_) => Impl.ref(wrapperComponentScope).get.backend.$
-          case None => Dummy.ref(wrapperComponentScope).get.backend.$
-        }
-        props.inputElementRef(implComponentScope)
+        mutableRef.value.props.inputElementRef(null)
       }
     }
-    override def name = mutableRef.name
+    override def name = ???
   }
 
   // **************** Private inner types ****************//
-  private type ThisMutableRef = MutableRef[Props.any, State, Backend, _]
+  private type ThisCtorSummoner = CtorType.Summoner.Aux[Box[Props.any], Children.None, CtorType.Props]
+  private type ThisMutableRef = MutableRef[Props.any, State, Backend, ThisCtorSummoner#CT]
   private type State = Unit
 
   private case class Props[DelegateRef <: InputBase.Reference[Value]](
@@ -89,21 +84,22 @@ class InputWithDefaultFromReference[Value] private () {
   private final class Backend(val $ : BackendScope[Props.any, State]) {
     def render(props: Props.any, state: State) = logExceptions {
       props.defaultValueProxy match {
-        case Some(_) => Impl.component.withRef(Impl.ref)(props)
-        case None => Dummy.component.withRef(Dummy.ref)(props)
+        case Some(_) => Impl.ref.component(props)
+        case None => Dummy.ref.component(props)
       }
     }
   }
 
   private object Impl {
 
-    val component = ScalaComponent.builder[Props.any]("InputWithDefaultFromReferenceImpl")
+    val component = ScalaComponent
+      .builder[Props.any]("InputWithDefaultFromReferenceImpl")
       .initialState[State](ConnectionState.connectedToDefault)
       .renderBackend[Backend]
       .componentDidMount(scope => scope.backend.didMount(scope.props))
       .componentWillUnmount(scope => scope.backend.willUnmount(scope.props))
       .build
-    val ref = Ref.to(component, "delegate")
+    val ref = ScalaComponent.mutableRefTo(component)
 
     type State = ConnectionState
 
@@ -173,10 +169,11 @@ class InputWithDefaultFromReference[Value] private () {
 
   private object Dummy {
 
-    val component = ScalaComponent.builder[Props.any]("DummyInputWithDefaultFromReference")
+    val component = ScalaComponent
+      .builder[Props.any]("DummyInputWithDefaultFromReference")
       .renderBackend[Backend]
       .build
-    val ref = Ref.to(component, "delegate")
+    val ref = ScalaComponent.mutableRefTo(component)
 
     type State = Unit
 

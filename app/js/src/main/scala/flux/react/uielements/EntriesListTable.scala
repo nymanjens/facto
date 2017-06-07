@@ -19,7 +19,8 @@ private final class EntriesListTable[Entry, Props](
     calculateTableData: Entry => Seq[VdomElement],
     props: Props)(implicit entriesStoreFactory: EntriesListStoreFactory[Entry, Props], i18n: I18n) {
 
-  private val component = ScalaComponent.builder[Props](getClass.getSimpleName)
+  private val component = ScalaComponent
+    .builder[Props](getClass.getSimpleName)
     .initialState(State(EntriesListStoreFactory.State.empty, maxNumEntries = numEntriesStrategy.start))
     .renderBackend[Backend]
     .componentWillMount(scope => scope.backend.willMount(scope.state))

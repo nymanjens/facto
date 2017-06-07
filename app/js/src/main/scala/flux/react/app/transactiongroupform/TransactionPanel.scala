@@ -12,6 +12,9 @@ import flux.react.uielements.{InputBase, InputWithDefaultFromReference}
 import japgolly.scalajs.react.vdom.html_<^._
 import flux.react.ReactVdomUtils.{<<, ^^}
 import flux.react.uielements
+import japgolly.scalajs.react.CtorType.Props
+import japgolly.scalajs.react.component.Scala
+import japgolly.scalajs.react.internal.Box
 import models.accounting.{Tag, Transaction}
 import models.{EntityAccess, User}
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
@@ -57,7 +60,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   private val rawTagsRef = tagsMappedInput.delegateRef(tagsRef)
 
   private val component = {
-    ScalaComponent.builder[Props](getClass.getSimpleName)
+    ScalaComponent
+      .builder[Props](getClass.getSimpleName)
       .initialStateFromProps[State](props =>
         logExceptions {
           State(
@@ -94,7 +98,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
       deleteButtonCallback = closeButtonCallback,
       onFormChange = onFormChange
     )
-    ref.mutableRef.component.withKey(key)(props)
+    ref.mutableRef.component.withKey(key.toString).apply(props)
   }
 
   def ref(name: String): Reference = new Reference(ScalaComponent.mutableRefTo(component))
@@ -109,7 +113,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
 
   // **************** Public inner types ****************//
   final class Reference private[TransactionPanel] (
-      private[TransactionPanel] val mutableRef: MutableRef[Props, State, Backend, CtorType]) {
+      private[TransactionPanel] val mutableRef: MutableRef[Props, State, Backend, ThisCtorSummoner#CT]) {
     def apply($ : BackendScope[_, _]): Proxy = new Proxy(() => mutableRef.value.backend.$)
   }
 
@@ -164,6 +168,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                   tags: Seq[Tag])
 
   // **************** Private inner types ****************//
+  private type ThisCtorSummoner = CtorType.Summoner.Aux[Box[Props], Children.None, CtorType.Props]
   private case class State(transactionDate: LocalDateTime,
                            beneficiaryAccount: Account,
                            moneyReservoir: MoneyReservoir)

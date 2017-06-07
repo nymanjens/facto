@@ -1,26 +1,26 @@
 package flux.react.uielements
 
+import flux.react.ReactVdomUtils.^^
 import flux.stores.entries.GroupedTransactions
-import flux.react.ReactVdomUtils.{^^, <<}
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom._
 import japgolly.scalajs.react.vdom.html_<^._
-import common.GuavaReplacement.Iterables.getOnlyElement
-
-import scala.collection.immutable.Seq
 
 object DescriptionWithEntryCount {
   private case class Props(entry: GroupedTransactions)
-  private val component = ScalaComponent.builder[Props](getClass.getSimpleName)
+  private val component = ScalaComponent
+    .builder[Props](getClass.getSimpleName)
     .renderP((_, props) => {
       val entry = props.entry
       val tagIndications =
-        entry.tags.map(tag => <.span(^^.classes("label", s"label-${tag.bootstrapClassSuffix}"), tag.name))
+        entry.tags
+          .map(tag =>
+            <.span(^^.classes("label", s"label-${tag.bootstrapClassSuffix}"), ^.key := tag.name, tag.name))
+          .toVdomArray
 
       if (entry.transactions.size == 1) {
         <.span(
           tagIndications,
-          entry.descriptions
+          entry.descriptions.toTagMod
         )
       } else {
         UpperRightCorner(cornerContent = s"(${entry.transactions.size})")(
