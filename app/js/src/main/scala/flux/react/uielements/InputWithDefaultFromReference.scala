@@ -25,14 +25,16 @@ class InputWithDefaultFromReference[Value] private () {
       directUserChangeOnly: Boolean = false,
       nameToDelegateRef: String => DelegateRef)(
       inputElementFactory: InputElementExtraProps[DelegateRef] => VdomElement): VdomElement = {
-    ref.mutableRef.component(
-      Props(
-        inputElementRef = nameToDelegateRef(ref.name),
-        defaultValueProxy = defaultValueProxy,
-        startWithDefault = startWithDefault,
-        inputElementFactory = inputElementFactory,
-        directUserChangeOnly = directUserChangeOnly
-      ))
+    ref.mutableRef
+      .component(
+        Props(
+          inputElementRef = nameToDelegateRef(ref.name),
+          defaultValueProxy = defaultValueProxy,
+          startWithDefault = startWithDefault,
+          inputElementFactory = inputElementFactory,
+          directUserChangeOnly = directUserChangeOnly
+        ))
+      .vdomElement
   }
 
   def apply[DelegateRef <: InputBase.Reference[Value]](ref: Reference,
@@ -85,8 +87,8 @@ class InputWithDefaultFromReference[Value] private () {
   private final class Backend(val $ : BackendScope[Props.any, State]) {
     def render(props: Props.any, state: State) = logExceptions {
       props.defaultValueProxy match {
-        case Some(_) => Impl.ref.component(props)
-        case None => Dummy.ref.component(props)
+        case Some(_) => Impl.ref.component(props).vdomElement
+        case None => Dummy.ref.component(props).vdomElement
       }
     }
   }

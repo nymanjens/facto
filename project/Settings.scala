@@ -75,6 +75,7 @@ object Settings {
       "com.typesafe.play" %% "play-specs2" % versions.play % Test,
       "org.yaml" % "snakeyaml" % "1.14",
       "com.typesafe.slick" %% "slick" % "3.2.0",
+      "com.typesafe.slick" %% "slick-hikaricp" % "3.2.0",
       "commons-lang" % "commons-lang" % "2.6",
       "mysql" % "mysql-connector-java" % "5.1.36",
       "org.xerial" % "sqlite-jdbc" % "3.8.11.2",

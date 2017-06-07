@@ -1,25 +1,22 @@
 package flux.react.app.transactiongroupform
 
-import common.{I18n, SinglePendingTaskQueue}
+import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, LogExceptionsFuture, logExceptions}
-import common.time.{Clock, LocalDateTime}
+import common.time.Clock
 import common.time.JavaTimeImplicits._
 import flux.action.{Action, Dispatcher}
 import flux.react.ReactVdomUtils.^^
 import flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
 import flux.react.router.Page
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom._
 import japgolly.scalajs.react.extra.router.RouterCtl
 import japgolly.scalajs.react.vdom.html_<^._
-import flux.react.ReactVdomUtils.{<<, ^^}
 import models.accounting.config.Config
-import models.{EntityAccess, User}
-import models.accounting.{Tag, Transaction, TransactionGroup}
 import models.accounting.money.{Currency, ExchangeRateManager, ReferenceMoney}
+import models.accounting.{Tag, Transaction, TransactionGroup}
+import models.{EntityAccess, User}
 
 import scala.collection.immutable.Seq
-import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 final class TransactionGroupForm(implicit i18n: I18n,
