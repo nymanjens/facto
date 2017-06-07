@@ -1,29 +1,15 @@
 package flux.react.uielements.bootstrap
 
-import japgolly.scalajs.react.component.Scala.MutableRef
-import java.time.LocalDate
-import java.util.NoSuchElementException
-
-import flux.react.uielements.bootstrap.InputComponent.{InputRenderer, Props, ValueTransformer}
+import common.I18n
+import flux.react.ReactVdomUtils.^^
 import flux.react.uielements.InputBase
-import common.{I18n, LoggingUtils}
-import common.time.TimeUtils
+import flux.react.uielements.bootstrap.InputComponent.{InputRenderer, Props, ValueTransformer}
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom._
 import japgolly.scalajs.react.vdom.html_<^._
-import flux.react.ReactVdomUtils.{<<, ^^}
-import japgolly.scalajs.react.ReactComponentC.ReqProps
-import org.scalajs.dom.raw.{HTMLElement, HTMLInputElement}
-
-import org.scalajs.dom.html
 
 import scala.collection.immutable.Seq
-import scala.reflect.ClassTag
-import scala.util.Try
 
 object TextInput {
-
-  private val inputRef: RefSimple[HTMLElement] = Ref[HTMLElement]("inputRef")
 
   private val component = InputComponent.create[Value, ExtraProps](
     name = getClass.getSimpleName,
@@ -38,8 +24,7 @@ object TextInput {
           ^^.classes(classes),
           ^.name := name,
           ^.value := valueString,
-          ^.onChange ==> onChange,
-          ^.ref := inputRef
+          ^.onChange ==> onChange
         )
       }
     }
@@ -62,7 +47,7 @@ object TextInput {
       required = required,
       showErrorMessage = showErrorMessage,
       inputClasses = inputClasses,
-      focusOnMount = if (focusOnMount) Some(inputRef) else None,
+      focusOnMount = focusOnMount,
       listener = listener,
       valueTransformer = ValueTransformer.nullInstance
     )
@@ -72,7 +57,8 @@ object TextInput {
   def ref(name: String): Reference = new Reference(ScalaComponent.mutableRefTo(component))
 
   // **************** Public inner types ****************//
-  final class Reference private[TextInput] (mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps])
+  final class Reference private[TextInput] (
+      private[TextInput] val mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps])
       extends InputComponent.Reference(mutableRef)
 
   // **************** Private inner types ****************//

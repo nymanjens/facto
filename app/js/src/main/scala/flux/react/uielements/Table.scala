@@ -1,13 +1,12 @@
 package flux.react.uielements
 
-import scala.scalajs.js
 import common.I18n
+import flux.react.ReactVdomUtils.^^
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom._
 import japgolly.scalajs.react.vdom.html_<^._
-import flux.react.ReactVdomUtils.{^^, <<}
 
 import scala.collection.immutable.Seq
+import scala.scalajs.js
 
 object Table {
 
@@ -19,13 +18,13 @@ object Table {
           Seq("table", "table-bordered", "table-hover", "table-condensed", "table-overflow-elipsis") ++ props.tableClasses),
         <.thead(
           <.tr(^^.classes("info"), <.th(^.colSpan := props.colSpan, props.title)),
-          <.tr(props.tableHeaders)
+          <.tr(props.tableHeaders.toTagMod)
         ),
         <.tbody(
-          props.tableDatas.zipWithIndex
-            .map {
-              case (tableData, index) => <.tr(^.key := s"row-$index", ^.className := "data-row", tableData)
-            },
+          props.tableDatas.zipWithIndex.map {
+            case (tableData, index) =>
+              <.tr(^.key := s"row-$index", ^.className := "data-row", tableData.toTagMod)
+          }.toVdomArray,
           if (props.tableDatas.isEmpty) {
             <.tr(
               <.td(^.colSpan := props.colSpan, ^^.classes("no-entries"), props.i18n("facto.no-entries"))
@@ -44,7 +43,7 @@ object Table {
               )
             )
           } else {
-            Seq()
+            EmptyVdom
           }
         )
     ))

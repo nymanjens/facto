@@ -1,16 +1,15 @@
 package flux.react.uielements.bootstrap
 
-import japgolly.scalajs.react.component.Scala.MutableRef
 import java.util.NoSuchElementException
 
+import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
-import flux.react.uielements.InputBase
-import common.{I18n, LoggingUtils}
-import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.html_<^._
 import flux.react.ReactVdomUtils.{<<, ^^}
-import japgolly.scalajs.react.ReactComponentC.ReqProps
-import org.scalajs.dom.raw.{HTMLElement, HTMLInputElement}
+import flux.react.uielements.InputBase
+import japgolly.scalajs.react._
+import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
+import japgolly.scalajs.react.internal.Box
+import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
 import scala.util.{Failure, Success, Try}
@@ -66,7 +65,7 @@ private[bootstrap] object InputComponent {
         LogExceptionsCallback {
           // If the props have changed, the transformed value may have changed. If this happens, the listeners should
           // be notified.
-          val valueString = scope.currentState.valueString
+          val valueString = scope.state.valueString
           val currentValue = ValueTransformer.stringToValueOrDefault(valueString, scope.currentProps)
           val newValue = {
             val transformedValue = ValueTransformer.stringToValueOrDefault(valueString, scope.nextProps)
@@ -76,16 +75,9 @@ private[bootstrap] object InputComponent {
             scope
               .modState(_.withValueString(ValueTransformer.valueToString(newValue, scope.nextProps)))
               .runNow()
-            for (listener <- scope.currentState.listeners) {
+            for (listener <- scope.state.listeners) {
               listener.onChange(newValue, directUserChange = false).runNow()
             }
-          }
-      })
-      .componentDidMount(scope =>
-        LogExceptionsCallback {
-          scope.props.focusOnMount match {
-            case Some(inputRef) => inputRef(scope).get.focus()
-            case None =>
           }
       })
       .build
@@ -107,8 +99,10 @@ private[bootstrap] object InputComponent {
   }
 
   // **************** Public inner types ****************//
+  private type ThisCtorSummoner[Value, ExtraProps] =
+    CtorType.Summoner.Aux[Box[Props[Value, ExtraProps]], Children.None, CtorType.Props]
   type ThisMutableRef[Value, ExtraProps] =
-    MutableRef[Props[Value, ExtraProps], State[Value], Backend, CtorType]
+    MutableRef[Props[Value, ExtraProps], State[Value], Backend, ThisCtorSummoner[Value, ExtraProps]#CT]
 
   trait InputRenderer[ExtraProps] {
     def renderInput(classes: Seq[String],
@@ -166,7 +160,7 @@ private[bootstrap] object InputComponent {
       required: Boolean,
       showErrorMessage: Boolean,
       inputClasses: Seq[String],
-      focusOnMount: Option[RefSimple[HTMLElement]] = None,
+      focusOnMount: Boolean = false,
       listener: InputBase.Listener[Value],
       extra: ExtraProps = (): Unit,
       valueTransformer: ValueTransformer[Value, ExtraProps])(implicit val i18n: I18n)
@@ -182,14 +176,14 @@ private[bootstrap] object InputComponent {
   abstract class Reference[Value, ExtraProps](mutableRef: ThisMutableRef[Value, ExtraProps])
       extends InputBase.Reference[Value] {
     override final def apply($ : BackendScope[_, _]): InputBase.Proxy[Value] =
-      new Proxy[Value, ExtraProps](() => mutableRef($).get)
-    override final def name = mutableRef.name
+      new Proxy[Value, ExtraProps](() => mutableRef.value)
+    override final def name = ???
   }
 
   // **************** Private inner types ****************//
   private type Backend = Unit
   private type ThisComponentU[Value, ExtraProps] =
-    ReactComponentU[Props[Value, ExtraProps], State[Value], Backend, _]
+    MountedImpure[Props[Value, ExtraProps], State[Value], Backend]
 
   private final class Proxy[Value, ExtraProps](
       val componentProvider: () => ThisComponentU[Value, ExtraProps])

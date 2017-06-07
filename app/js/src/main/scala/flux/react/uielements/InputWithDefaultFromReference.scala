@@ -56,7 +56,8 @@ class InputWithDefaultFromReference[Value] private () {
   case class InputElementExtraProps[DelegateRef <: InputBase.Reference[Value]](ref: DelegateRef,
                                                                                inputClasses: Seq[String])
 
-  final class Reference private[InputWithDefaultFromReference] (mutableRef: ThisMutableRef)
+  final class Reference private[InputWithDefaultFromReference] (
+      private[InputWithDefaultFromReference] val mutableRef: ThisMutableRef)
       extends InputBase.Reference[Value] {
     override def apply($ : BackendScope[_, _]) = {
       InputBase.Proxy.forwardingTo {

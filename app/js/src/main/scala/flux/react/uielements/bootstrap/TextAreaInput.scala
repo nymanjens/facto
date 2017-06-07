@@ -1,25 +1,13 @@
 package flux.react.uielements.bootstrap
 
-import japgolly.scalajs.react.component.Scala.MutableRef
-import java.time.LocalDate
-import java.util.NoSuchElementException
-
-import flux.react.uielements.bootstrap.InputComponent.{InputRenderer, Props, ValueTransformer}
+import common.I18n
+import flux.react.ReactVdomUtils.^^
 import flux.react.uielements.InputBase
-import common.{I18n, LoggingUtils}
-import common.time.TimeUtils
+import flux.react.uielements.bootstrap.InputComponent.{InputRenderer, Props, ValueTransformer}
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom._
 import japgolly.scalajs.react.vdom.html_<^._
-import flux.react.ReactVdomUtils.{<<, ^^}
-import japgolly.scalajs.react.ReactComponentC.ReqProps
-import org.scalajs.dom.raw.{HTMLElement, HTMLInputElement}
-
-import org.scalajs.dom.html
 
 import scala.collection.immutable.Seq
-import scala.reflect.ClassTag
-import scala.util.Try
 
 object TextAreaInput {
 
@@ -67,7 +55,8 @@ object TextAreaInput {
   def ref(name: String): Reference = new Reference(ScalaComponent.mutableRefTo(component))
 
   // **************** Public inner types ****************//
-  final class Reference private[TextAreaInput] (mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps])
+  final class Reference private[TextAreaInput] (
+      private[TextAreaInput] val mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps])
       extends InputComponent.Reference(mutableRef)
 
   // **************** Private inner types ****************//

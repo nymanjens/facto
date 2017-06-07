@@ -20,8 +20,8 @@ object UpperRightCorner {
         // the td borders when td has position:relative, so instead
         // a div is added that has position:relative (a relative
         // reference is needed for the upper-right-corner to work).
-        props.centralContent,
-        <.div(^^.classes("upper-right-corner"), props.cornerContent)
+        props.centralContent.toTagMod,
+        <.div(^^.classes("upper-right-corner"), props.cornerContent.toTagMod)
     ))
     .build
 

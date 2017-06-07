@@ -1,6 +1,5 @@
 package flux.react.uielements.bootstrap
 
-import japgolly.scalajs.react.component.Scala.MutableRef
 import common.CollectionUtils.toListMap
 import common.GuavaReplacement.Iterables.getOnlyElement
 import common.I18n
@@ -8,7 +7,6 @@ import flux.react.ReactVdomUtils.^^
 import flux.react.uielements.InputBase
 import flux.react.uielements.bootstrap.InputComponent.{InputRenderer, Props}
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom._
 import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
@@ -29,14 +27,15 @@ class SelectInput[Value] private (implicit valueTag: ClassTag[Value]) {
           ^^.classes(classes),
           ^.name := name,
           ^.value := valueString,
-          ^.onChange ==> onChange,
-          for ((optionId, option) <- extraProps.idToOptionMap) yield {
-            <.option(
-              ^.value := optionId,
-              ^.key := optionId,
-              option.name
-            )
-          }
+          ^.onChange ==> onChange, {
+            for ((optionId, option) <- extraProps.idToOptionMap) yield {
+              <.option(
+                ^.value := optionId,
+                ^.key := optionId,
+                option.name
+              )
+            }
+          }.toVdomArray
         )
       }
     }
@@ -69,7 +68,8 @@ class SelectInput[Value] private (implicit valueTag: ClassTag[Value]) {
   def ref(name: String): Reference = new Reference(ScalaComponent.mutableRefTo(component))
 
   // **************** Public inner types ****************//
-  final class Reference private[SelectInput] (mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps])
+  final class Reference private[SelectInput] (
+      private[SelectInput] val mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps])
       extends InputComponent.Reference[Value, ExtraProps](mutableRef)
 
   case class ExtraProps private (idToOptionMap: Map[String, ExtraProps.ValueAndName])

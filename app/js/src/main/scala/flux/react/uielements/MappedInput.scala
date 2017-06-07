@@ -1,6 +1,7 @@
 package flux.react.uielements
 
-import japgolly.scalajs.react.component.Scala.MutableRef
+import japgolly.scalajs.react.internal.Box
+import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.time.{LocalDateTime, TimeUtils}
 import flux.react.uielements.MappedInput.ValueTransformer
@@ -31,42 +32,46 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
       listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance,
       nameToDelegateRef: String => DelegateRef)(
       delegateInputElementFactory: InputElementExtraProps[DelegateRef] => VdomElement): VdomElement = {
-    ref.mutableRef.component(
-      Props(
-        delegateRef = nameToDelegateRef(ref.name),
-        valueTransformer,
-        defaultValue,
-        listener,
-        delegateElementFactory = delegateInputElementFactory))
+    ref.mutableRef
+      .component(
+        Props(
+          delegateRef = nameToDelegateRef(ref.name),
+          valueTransformer,
+          defaultValue,
+          listener,
+          delegateElementFactory = delegateInputElementFactory))
+      .vdomElement
   }
 
   def ref(name: String): Reference = new Reference(ScalaComponent.mutableRefTo(component))
-  def delegateRef(ref: Reference): DelegateReference = new DelegateReference(Ref.to(component, ref.name))
+  def delegateRef(ref: Reference): DelegateReference =
+    new DelegateReference(ScalaComponent.mutableRefTo(component))
 
   // **************** Public inner types ****************//
   case class InputElementExtraProps[DelegateRef <: InputBase.Reference[DelegateValue]](
       ref: DelegateRef,
       defaultValue: DelegateValue)
 
-  final class Reference private[MappedInput] (mutableRef: ThisMutableRef)
+  final class Reference private[MappedInput] (private[MappedInput] val mutableRef: ThisMutableRef)
       extends InputBase.Reference[Value] {
-    override def apply($ : BackendScope[_, _]): InputBase.Proxy[Value] = new Proxy(() => mutableRef($).get)
-    override def name = mutableRef.name
+    override def apply($ : BackendScope[_, _]): InputBase.Proxy[Value] = new Proxy(() => mutableRef.value)
+    override def name = ???
   }
 
   final class DelegateReference private[MappedInput] (mutableRef: ThisMutableRef)
       extends InputBase.Reference[DelegateValue] {
     override def apply($ : BackendScope[_, _]): InputBase.Proxy[DelegateValue] = {
-      val component = mutableRef($).get
+      val component = mutableRef.value
       component.props.delegateRef(component.backend.$)
     }
-    override def name = mutableRef.name
+    override def name = ???
   }
 
   // **************** Private inner types ****************//
   private type State = Unit
-  private type ThisMutableRef = MutableRef[Props.any, State, Backend, _]
-  private type ThisComponentU = ReactComponentU[Props.any, State, Backend, _]
+  private type ThisCtorSummoner = CtorType.Summoner.Aux[Box[Props.any], Children.None, CtorType.Props]
+  private type ThisMutableRef = MutableRef[Props.any, State, Backend, ThisCtorSummoner#CT]
+  private type ThisComponentU = MountedImpure[Props.any, State, Backend]
 
   private final class Proxy(val componentProvider: () => ThisComponentU) extends InputBase.Proxy[Value] {
     override def value = delegateProxy.value flatMap props.valueTransformer.forward

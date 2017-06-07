@@ -1,13 +1,13 @@
 package flux.react.uielements
 
-import common.LoggingUtils.{logExceptions, LogExceptionsCallback}
+import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.{I18n, LoggingUtils}
 import flux.react.uielements
 import flux.react.uielements.EntriesListTable.NumEntriesStrategy
-import flux.stores.{EntriesStore, EntriesListStoreFactory}
+import flux.stores.{EntriesListStoreFactory, EntriesStore}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom._
-import japgolly.scalajs.react.vdom._
+import japgolly.scalajs.react.vdom.html_<^.VdomElement
 
 import scala.collection.immutable.Seq
 
@@ -29,7 +29,7 @@ private final class EntriesListTable[Entry, Props](
 
   // **************** API ****************//
   def apply(): VdomElement = {
-    component(props)
+    component(props).vdomElement
   }
 
   // **************** Private types ****************//
