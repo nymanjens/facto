@@ -5,8 +5,10 @@ jdk:
   - oraclejdk8
 
 before_script:
-  - "npm install -g jshint"
-  - "npm install jsdom@9.12.0"
+  - nvm install 6
+  - nvm use 6
+  - npm install -g jshint
+  - npm install jsdom@9.12.0
 
 script:
   - sbt test
