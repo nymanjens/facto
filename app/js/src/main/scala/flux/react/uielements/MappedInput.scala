@@ -35,7 +35,7 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
     ref.mutableRef
       .component(
         Props(
-          delegateRef = nameToDelegateRef(ref.name),
+          nameToDelegateRef = nameToDelegateRef,
           valueTransformer,
           defaultValue,
           listener,
@@ -62,7 +62,7 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
       extends InputBase.Reference[DelegateValue] {
     override def apply($ : BackendScope[_, _]): InputBase.Proxy[DelegateValue] = {
       val component = mutableRef.value
-      component.props.delegateRef(component.backend.$)
+      component.backend.delegateRef(component.backend.$)
     }
     override def name = "dummy-reference-name"
   }
@@ -91,7 +91,7 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
     private def props: Props.any = componentProvider().props
     private def delegateProxy: InputBase.Proxy[DelegateValue] = {
       val context = componentProvider().backend.$
-      props.delegateRef(context)
+      componentProvider().backend.delegateRef(context)
     }
   }
 
@@ -121,7 +121,7 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
   }
 
   private case class Props[DelegateRef <: InputBase.Reference[DelegateValue]](
-      delegateRef: DelegateRef,
+      nameToDelegateRef: String => DelegateRef,
       valueTransformer: ValueTransformer[DelegateValue, Value],
       defaultValue: Value,
       listener: InputBase.Listener[Value],
@@ -131,18 +131,22 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
   }
 
   private final class Backend(val $ : BackendScope[Props.any, State]) {
+    private[MappedInput] lazy val delegateRef: InputBase.Reference[DelegateValue] =
+      $.props.runNow().nameToDelegateRef("foo")
+
     def didMount(props: Props.any): Callback = LogExceptionsCallback {
-      props.delegateRef($).registerListener(Proxy.toDelegateListener(props.listener, props))
+      delegateRef($).registerListener(Proxy.toDelegateListener(props.listener, props))
     }
 
     def willUnmount(props: Props.any): Callback = LogExceptionsCallback {
-      props.delegateRef($).deregisterListener(Proxy.toDelegateListener(props.listener, props))
+      delegateRef($).deregisterListener(Proxy.toDelegateListener(props.listener, props))
     }
 
     def render(props: Props.any, state: State) = logExceptions {
       def renderInternal[DelegateRef <: InputBase.Reference[DelegateValue]](props: Props[DelegateRef]) = {
         val defaultDelegateValue = props.valueTransformer.backward(props.defaultValue)
-        props.delegateElementFactory(InputElementExtraProps(props.delegateRef, defaultDelegateValue))
+        props.delegateElementFactory(
+          InputElementExtraProps(delegateRef.asInstanceOf[DelegateRef], defaultDelegateValue))
       }
       renderInternal(props)
     }
