@@ -1,9 +1,10 @@
 package flux.react.uielements
 
-import common.testing.{ReactTestWrapper, TestComponentWithBackendScope, TestModule}
+import common.testing.{ReactTestWrapper, TestModule}
 import flux.react.uielements
 import flux.react.uielements.InputBase.Listener
 import japgolly.scalajs.react.test.ReactTestUtils
+import japgolly.scalajs.react.vdom.VdomElement
 import utest._
 
 import scala.collection.mutable
@@ -78,7 +79,7 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
   }
 
   private def createTestComponent(proxy: InputBase.Proxy[String]): ComponentTester = {
-    new ComponentTester(TestComponentWithBackendScope {
+    new ComponentTester(
       stringInputWithDefault(
         ref = testRef,
         defaultValueProxy = proxy,
@@ -91,7 +92,7 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
           inputClasses = extraProps.inputClasses
         )
       }
-    })
+    )
   }
 
   private final class FakeProxy extends InputBase.Proxy[String] {
@@ -115,12 +116,12 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
     }
   }
 
-  private final class ComponentTester(unrenderedComponent: TestComponentWithBackendScope.ComponentU) {
+  private final class ComponentTester(unrenderedComponent: VdomElement) {
     private val renderedComponent = ReactTestUtils.renderIntoDocument(unrenderedComponent)
     private val wrappedComponent = new ReactTestWrapper(renderedComponent)
 
     def valueProxy: InputBase.Proxy[String] = {
-      testRef(renderedComponent.backend.$)
+      testRef(null)
     }
 
     def showsBoundUntilChange: Boolean = {

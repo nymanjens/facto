@@ -1,26 +1,26 @@
 package common.testing
 
-import japgolly.scalajs.react.VdomElement
-import japgolly.scalajs.react.test.{ComponentM, ReactTestUtils}
-import org.scalajs.dom.raw.DOMList
-import scala.scalajs.js.{Function1, isUndefined}
+import japgolly.scalajs.react.test.ReactTestUtils
+import japgolly.scalajs.react.test.ReactTestUtils.MountedOutput
+import japgolly.scalajs.react.test.raw.ReactAddonsTestUtils
+import japgolly.scalajs.react.vdom.VdomElement
 
 import scala.collection.immutable.Seq
 
-final class ReactTestWrapper(private val componentM: ComponentM) {
+final class ReactTestWrapper(private val componentM: MountedOutput) {
 
   /** Will return all children that comply to both the tagName, class and type filter (active if non-empty). */
   def children(tagName: String = "", clazz: String = "", tpe: String = ""): Seq[ReactTestWrapper] = {
     val childComponentMs = ReactTestUtils.findAllInRenderedTree(
       componentM,
-      toJsFunction(childComponent => {
+      childComponent => {
         val child = new ReactTestWrapper(childComponent)
         (clazz.isEmpty || child.classes.contains(clazz.toLowerCase)) &&
         (tagName.isEmpty || child.tagName == tagName.toLowerCase) &&
         (tpe.isEmpty || child.typeAttribute == tpe.toLowerCase)
-      })
+      }
     )
-    childComponentMs.toVector.map(new ReactTestWrapper(_))
+    childComponentMs.map(new ReactTestWrapper(_))
   }
 
   def child(tagName: String = "", clazz: String = "", tpe: String = ""): ReactTestWrapper = {
@@ -41,7 +41,7 @@ final class ReactTestWrapper(private val componentM: ComponentM) {
   }
 
   def click(): Unit = {
-    Simulate click componentM
+    ReactAddonsTestUtils.Simulate.click(componentM.getDOMNode)
   }
 
   def classes: Seq[String] = {
@@ -57,8 +57,6 @@ final class ReactTestWrapper(private val componentM: ComponentM) {
     val attrib = Option(componentM.getDOMNode.getAttribute("type")) getOrElse ""
     attrib.toLowerCase
   }
-
-  private def toJsFunction[T, R](f: T => R): Function1[T, R] = f
 }
 
 object ReactTestWrapper {

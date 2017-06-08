@@ -87,7 +87,7 @@ object EverythingTest extends TestSuite {
       def isPresent: Boolean = maybeComponent.isDefined
 
       def press(): Unit = {
-        maybeComponent.get.click
+        maybeComponent.get.click()
       }
 
       private def maybeComponent: Option[ReactTestWrapper] = {

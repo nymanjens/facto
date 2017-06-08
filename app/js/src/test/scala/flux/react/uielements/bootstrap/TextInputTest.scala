@@ -1,15 +1,12 @@
 package flux.react.uielements.bootstrap
 
-import common.LoggingUtils.logExceptions
-import common.testing.{ReactTestWrapper, TestComponentWithBackendScope, TestModule}
+import common.testing.{ReactTestWrapper, TestModule}
 import flux.react.uielements
 import flux.react.uielements.InputBase
-import flux.react.uielements.InputBase.Listener
-import japgolly.scalajs.react.{VdomElement, _}
 import japgolly.scalajs.react.test.ReactTestUtils
+import japgolly.scalajs.react.vdom._
 import utest._
 
-import scala.collection.mutable
 import scala2js.Converters._
 
 object TextInputTest extends TestSuite {
@@ -53,7 +50,7 @@ object TextInputTest extends TestSuite {
   private def createTestComponent(defaultValue: String = "",
                                   required: Boolean = false,
                                   showErrorMessage: Boolean = false): ComponentTester = {
-    new ComponentTester(TestComponentWithBackendScope {
+    new ComponentTester(
       uielements.bootstrap.TextInput(
         ref = testRef,
         label = "label",
@@ -62,15 +59,15 @@ object TextInputTest extends TestSuite {
         showErrorMessage = showErrorMessage,
         focusOnMount = true
       )
-    })
+    )
   }
 
-  private final class ComponentTester(unrenderedComponent: TestComponentWithBackendScope.ComponentU) {
+  private final class ComponentTester(unrenderedComponent: VdomElement) {
     private val renderedComponent = ReactTestUtils.renderIntoDocument(unrenderedComponent)
     private val wrappedComponent = new ReactTestWrapper(renderedComponent)
 
     def valueProxy: InputBase.Proxy[String] = {
-      testRef(renderedComponent.backend.$)
+      testRef(null)
     }
 
     def inputName: String = {
