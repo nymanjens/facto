@@ -10,8 +10,7 @@ install:
   - nvm use 7
   - export NODE_PATH="$(npm config get prefix)"/lib/node_modules
   - npm install
-  - npm install jsdom@9.12.0
-  - npm install source-map-support
+  - npm install jsdom source-map-support
   - npm install -g jshint
 
 script:
