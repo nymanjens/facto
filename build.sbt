@@ -64,6 +64,7 @@ lazy val server = (project in file("app/jvm"))
     LessKeys.compress in Assets := true
   )
   .enablePlugins(PlayScala)
+  .disablePlugins(PlayFilters) // Don't use the default filters
   .disablePlugins(PlayLayoutPlugin) // use the standard directory layout instead of Play's custom
   .aggregate(clients.map(projectToRef): _*)
   .dependsOn(sharedJVM)

@@ -55,7 +55,7 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
   final class Reference private[MappedInput] (private[MappedInput] val mutableRef: ThisMutableRef)
       extends InputBase.Reference[Value] {
     override def apply($ : BackendScope[_, _]): InputBase.Proxy[Value] = new Proxy(() => mutableRef.value)
-    override def name = ???
+    override def name = "dummy-reference-name"
   }
 
   final class DelegateReference private[MappedInput] (mutableRef: ThisMutableRef)
@@ -64,7 +64,7 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
       val component = mutableRef.value
       component.props.delegateRef(component.backend.$)
     }
-    override def name = ???
+    override def name = "dummy-reference-name"
   }
 
   // **************** Private inner types ****************//

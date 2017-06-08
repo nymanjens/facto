@@ -66,7 +66,7 @@ class InputWithDefaultFromReference[Value] private () {
         mutableRef.value.props.inputElementRef(null)
       }
     }
-    override def name = ???
+    override def name = "dummy-reference-name"
   }
 
   // **************** Private inner types ****************//
