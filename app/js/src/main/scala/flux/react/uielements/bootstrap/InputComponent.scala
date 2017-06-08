@@ -177,7 +177,7 @@ private[bootstrap] object InputComponent {
       extends InputBase.Reference[Value] {
     override final def apply($ : BackendScope[_, _]): InputBase.Proxy[Value] =
       new Proxy[Value, ExtraProps](() => mutableRef.value)
-    override final def name = ???
+    override final def name = "dummy ref name"
   }
 
   // **************** Private inner types ****************//
