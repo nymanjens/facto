@@ -44,8 +44,7 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
   }
 
   def ref(): Reference = new Reference(ScalaComponent.mutableRefTo(component))
-  def delegateRef(ref: Reference): DelegateReference =
-    new DelegateReference(ScalaComponent.mutableRefTo(component))
+  def delegateRef(ref: Reference): DelegateReference = new DelegateReference(ref.mutableRef)
 
   // **************** Public inner types ****************//
   case class InputElementExtraProps[DelegateRef <: InputBase.Reference[DelegateValue]](
