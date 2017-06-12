@@ -151,7 +151,9 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             tags = tagsRef().value.get
           ))
       } catch {
-        case _: NoSuchElementException => None
+        case e: Throwable => // TODO: Make this more narrow
+            println("!!!!!!!!!!!!!! Ignoring exception: " + e.getMessage)
+            None
       }
 
     private def $ = componentScope()

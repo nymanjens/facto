@@ -28,7 +28,7 @@ class InputWithDefaultFromReference[Value] private () {
     ref.mutableRef
       .component(
         Props(
-          inputElementRef = delegateRefFactory(),
+          delegateRefFactory = delegateRefFactory,
           defaultValueProxy = defaultValueProxy,
           startWithDefault = startWithDefault,
           inputElementFactory = inputElementFactory,
@@ -63,7 +63,11 @@ class InputWithDefaultFromReference[Value] private () {
       extends InputBase.Reference[Value] {
     override def apply() = {
       InputBase.Proxy.forwardingTo {
-        mutableRef.value.props.inputElementRef()
+        val backend = mutableRef.value.backend
+        mutableRef.value.props.defaultValueProxy match {
+          case Some(_) => backend.implRef.value.backend.inputElementRef()
+          case None => backend.dummyRef.value.backend.inputElementRef()
+        }
       }
     }
   }
@@ -74,7 +78,7 @@ class InputWithDefaultFromReference[Value] private () {
   private type State = Unit
 
   private case class Props[DelegateRef <: InputBase.Reference[Value]](
-      inputElementRef: DelegateRef,
+      delegateRefFactory: () => DelegateRef,
       defaultValueProxy: Option[() => InputBase.Proxy[Value]],
       startWithDefault: Boolean,
       inputElementFactory: InputElementExtraProps[DelegateRef] => VdomElement,
@@ -84,10 +88,13 @@ class InputWithDefaultFromReference[Value] private () {
   }
 
   private final class Backend(val $ : BackendScope[Props.any, State]) {
+    val implRef = ScalaComponent.mutableRefTo(Impl.component)
+    val dummyRef = ScalaComponent.mutableRefTo(Dummy.component)
+
     def render(props: Props.any, state: State) = logExceptions {
       props.defaultValueProxy match {
-        case Some(_) => Impl.ref.component(props).vdomElement
-        case None => Dummy.ref.component(props).vdomElement
+        case Some(_) => implRef.component(props).vdomElement
+        case None => dummyRef.component(props).vdomElement
       }
     }
   }
@@ -101,24 +108,24 @@ class InputWithDefaultFromReference[Value] private () {
       .componentDidMount(scope => scope.backend.didMount(scope.props))
       .componentWillUnmount(scope => scope.backend.willUnmount(scope.props))
       .build
-    val ref = ScalaComponent.mutableRefTo(component)
 
     type State = ConnectionState
 
     final class Backend(val $ : BackendScope[Props.any, State]) {
       private var currentInputValue: Value = null.asInstanceOf[Value]
       private var currentDefaultValue: Value = null.asInstanceOf[Value]
+      private[InputWithDefaultFromReference] lazy val inputElementRef = $.props.runNow().delegateRefFactory()
 
       def didMount(props: Props.any): Callback = LogExceptionsCallback {
-        props.inputElementRef().registerListener(InputValueListener)
+        inputElementRef().registerListener(InputValueListener)
         props.defaultValueProxy.get().registerListener(DefaultValueListener)
 
         currentDefaultValue = props.defaultValueProxy.get().valueOrDefault
         if (props.startWithDefault) {
           currentInputValue = currentDefaultValue
-          props.inputElementRef().setValue(currentDefaultValue)
+          inputElementRef().setValue(currentDefaultValue)
         } else {
-          currentInputValue = props.inputElementRef().valueOrDefault
+          currentInputValue = inputElementRef().valueOrDefault
           $.setState(ConnectionState(isConnected = currentDefaultValue == currentInputValue)).runNow()
         }
       }
@@ -127,14 +134,16 @@ class InputWithDefaultFromReference[Value] private () {
         try {
           props.defaultValueProxy.get().deregisterListener(DefaultValueListener)
         } catch {
-          case _: NoSuchElementException => // This is OK because the default value input is probably already unmounted.
+          case e: Throwable => // TODO: Make this more narrow
+            println("!!!!!!!!!!!!!! Ignoring exception: " + e.getMessage)
         }
       }
 
       def render(props: Props.any, state: State) = logExceptions {
         def renderInternal[DelegateRef <: InputBase.Reference[Value]](props: Props[DelegateRef]) = {
           val inputClasses = if (state.isConnected) Seq("bound-until-change") else Seq()
-          props.inputElementFactory(InputElementExtraProps(props.inputElementRef, inputClasses))
+          props.inputElementFactory(
+            InputElementExtraProps(inputElementRef.asInstanceOf[DelegateRef], inputClasses))
         }
         renderInternal(props)
       }
@@ -151,7 +160,7 @@ class InputWithDefaultFromReference[Value] private () {
         override def onChange(newDefaultValue: Value, directUserChange: Boolean) = LogExceptionsCallback {
           currentDefaultValue = newDefaultValue
 
-          val inputProxy = $.props.runNow().inputElementRef()
+          val inputProxy = inputElementRef()
           if ($.state
                 .runNow()
                 .isConnected && (directUserChange || ! $.props.runNow().directUserChangeOnly)) {
@@ -175,14 +184,16 @@ class InputWithDefaultFromReference[Value] private () {
       .builder[Props.any]("DummyInputWithDefaultFromReference")
       .renderBackend[Backend]
       .build
-    val ref = ScalaComponent.mutableRefTo(component)
 
     type State = Unit
 
     final class Backend(val $ : BackendScope[Props.any, State]) {
+      private[InputWithDefaultFromReference] lazy val inputElementRef = $.props.runNow().delegateRefFactory()
+
       def render(props: Props.any, state: State) = logExceptions {
         def renderInternal[DelegateRef <: InputBase.Reference[Value]](props: Props[DelegateRef]) = {
-          props.inputElementFactory(InputElementExtraProps(props.inputElementRef, inputClasses = Seq()))
+          props.inputElementFactory(
+            InputElementExtraProps(inputElementRef.asInstanceOf[DelegateRef], inputClasses = Seq()))
         }
         renderInternal(props)
       }
