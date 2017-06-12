@@ -17,6 +17,7 @@ import models.accounting.{Tag, Transaction, TransactionGroup}
 import models.{EntityAccess, User}
 
 import scala.collection.immutable.Seq
+import scala.collection.mutable
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 final class TransactionGroupForm(implicit i18n: I18n,
@@ -74,9 +75,6 @@ final class TransactionGroupForm(implicit i18n: I18n,
     component.withKey(props.operationMeta.toString).apply(props)
   }
 
-  private def panelRef(panelIndex: Int): transactionPanel.Reference =
-    transactionPanel.ref()
-
   // **************** Private inner types ****************//
   private sealed trait OperationMeta
   private object OperationMeta {
@@ -104,6 +102,8 @@ final class TransactionGroupForm(implicit i18n: I18n,
   private case class Props(operationMeta: OperationMeta, router: RouterCtl[Page])
 
   private final class Backend(val $ : BackendScope[Props, State]) {
+
+    private val _panelRefs: mutable.Seq[transactionPanel.Reference] = mutable.Seq(transactionPanel.ref())
 
     def render(props: Props, state: State) = logExceptions {
       <.div(
@@ -200,6 +200,13 @@ final class TransactionGroupForm(implicit i18n: I18n,
           )
         )
       )
+    }
+
+    private def panelRef(panelIndex: Int): transactionPanel.Reference = {
+      while (panelIndex >= _panelRefs.size) {
+        _panelRefs :+ transactionPanel.ref()
+      }
+      _panelRefs(panelIndex)
     }
 
     private val addTransactionPanelCallback: Callback = LogExceptionsCallback {
