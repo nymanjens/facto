@@ -8,7 +8,8 @@ import play.api.data._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
 
-final class Auth @Inject()(implicit override val messagesApi: MessagesApi,components: ControllerComponents,
+final class Auth @Inject()(implicit override val messagesApi: MessagesApi,
+                           components: ControllerComponents,
                            entityAccess: SlickEntityAccess,
                            playConfiguration: play.api.Configuration,
                            env: play.api.Environment,

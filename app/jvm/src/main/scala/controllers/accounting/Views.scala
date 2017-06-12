@@ -16,7 +16,8 @@ import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 
-final class Views @Inject()(implicit override val messagesApi: MessagesApi,components: ControllerComponents,
+final class Views @Inject()(implicit override val messagesApi: MessagesApi,
+                            components: ControllerComponents,
                             clock: Clock,
                             accountingConfig: Config,
                             generalEntries: GeneralEntries,

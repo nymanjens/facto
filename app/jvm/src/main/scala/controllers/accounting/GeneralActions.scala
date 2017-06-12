@@ -12,7 +12,8 @@ import models.accounting.UpdateLog
 import models.accounting.config.{Config, Template}
 import controllers.helpers.AuthenticatedAction
 
-final class GeneralActions @Inject()(implicit override val messagesApi: MessagesApi,components: ControllerComponents,
+final class GeneralActions @Inject()(implicit override val messagesApi: MessagesApi,
+                                     components: ControllerComponents,
                                      clock: Clock,
                                      accountingConfig: Config,
                                      entityAccess: SlickEntityAccess,

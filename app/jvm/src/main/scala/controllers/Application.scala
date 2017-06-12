@@ -26,7 +26,8 @@ import controllers.helpers.{AuthenticatedAction, ControllerHelperCache}
 import controllers.Application.Forms
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 
-final class Application @Inject()(implicit override val messagesApi: MessagesApi,components: ControllerComponents,
+final class Application @Inject()(implicit override val messagesApi: MessagesApi,
+                                  components: ControllerComponents,
                                   userManager: SlickUserManager,
                                   entityAccess: SlickEntityAccess,
                                   scalaJsApiServerFactory: ScalaJsApiServerFactory,

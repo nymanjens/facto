@@ -19,7 +19,8 @@ import controllers.accounting.Views
 import controllers.helpers.{AuthenticatedAction, ControllerHelperCache}
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 
-final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi,components: ControllerComponents,
+final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi,
+                                  components: ControllerComponents,
                                   clock: Clock,
                                   viewsController: Views,
                                   playConfiguration: play.api.Configuration,
