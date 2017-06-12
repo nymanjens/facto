@@ -12,7 +12,7 @@ import scala.collection.mutable
 final class JvmExchangeRateManager @Inject()(
     implicit exchangeRateMeasurementManager: SlickExchangeRateMeasurementManager)
     extends ExchangeRateManager {
-  CacheRegistry.registerCache(verifyConsistency = verifyConsistency, resetForTests = resetForTests)
+  CacheRegistry.registerCache(verifyConsistency = verifyConsistency _, resetForTests = resetForTests _)
   exchangeRateMeasurementManager.addListener(measurementWasAdded)
 
   @GuardedBy("lock")

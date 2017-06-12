@@ -14,7 +14,7 @@ import models.manager.Entity
   * that yields the same result until the database is updated.
   */
 object ControllerHelperCache {
-  CacheRegistry.registerCache(verifyConsistency = verifyConsistency, invalidateCache = invalidateCache)
+  CacheRegistry.registerCache(verifyConsistency = verifyConsistency _, invalidateCache = invalidateCache _)
 
   private val cache: SynchronizedCache[CacheIdentifier[_], CacheEntry[_]] =
     SynchronizedCache(expireAfterAccess = Duration.ofHours(32))

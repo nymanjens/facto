@@ -13,7 +13,7 @@ import common.cache.CacheRegistry
 private[manager] final class CachingEntityManager[E <: Entity, T <: AbstractTable[E]](
     delegate: SlickEntityManager[E, T])
     extends ForwardingEntityManager[E, T](delegate) {
-  CacheRegistry.registerCache(verifyConsistency = verifyConsistency, resetForTests = resetForTests)
+  CacheRegistry.registerCache(verifyConsistency = verifyConsistency _, resetForTests = resetForTests _)
 
   @GuardedBy("lock")
   private val cache: mutable.Map[Long, E] = mutable.Map[Long, E]()
