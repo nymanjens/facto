@@ -23,12 +23,12 @@ class InputWithDefaultFromReference[Value] private () {
       defaultValueProxy: Option[() => InputBase.Proxy[Value]],
       startWithDefault: Boolean = false,
       directUserChangeOnly: Boolean = false,
-      nameToDelegateRef: String => DelegateRef)(
+      delegateRefFactory: String => DelegateRef)(
       inputElementFactory: InputElementExtraProps[DelegateRef] => VdomElement): VdomElement = {
     ref.mutableRef
       .component(
         Props(
-          inputElementRef = nameToDelegateRef(ref.name),
+          inputElementRef = delegateRefFactory(ref.name),
           defaultValueProxy = defaultValueProxy,
           startWithDefault = startWithDefault,
           inputElementFactory = inputElementFactory,
@@ -41,13 +41,13 @@ class InputWithDefaultFromReference[Value] private () {
                                                        defaultValueProxy: => InputBase.Proxy[Value],
                                                        startWithDefault: Boolean = false,
                                                        directUserChangeOnly: Boolean = false,
-                                                       nameToDelegateRef: String => DelegateRef)(
+                                                       delegateRefFactory: String => DelegateRef)(
       inputElementFactory: InputElementExtraProps[DelegateRef] => VdomElement): VdomElement = {
     forOption(
       ref = ref,
       defaultValueProxy = Some(() => defaultValueProxy),
       startWithDefault = startWithDefault,
-      nameToDelegateRef = nameToDelegateRef,
+      delegateRefFactory = delegateRefFactory,
       directUserChangeOnly = directUserChangeOnly
     )(inputElementFactory)
   }

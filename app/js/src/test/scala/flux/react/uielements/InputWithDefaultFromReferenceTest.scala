@@ -83,7 +83,7 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
       stringInputWithDefault(
         ref = testRef,
         defaultValueProxy = proxy,
-        nameToDelegateRef = uielements.bootstrap.TextInput.ref) { extraProps =>
+        delegateRefFactory = uielements.bootstrap.TextInput.ref) { extraProps =>
         uielements.bootstrap.TextInput(
           ref = extraProps.ref,
           label = "label",

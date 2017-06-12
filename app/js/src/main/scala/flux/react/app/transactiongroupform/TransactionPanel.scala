@@ -191,13 +191,13 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           defaultValue = state.transactionDate,
           valueTransformer = uielements.MappedInput.ValueTransformer.StringToLocalDateTime,
           listener = TransactionDateListener,
-          nameToDelegateRef = stringInputWithDefault.ref
+          delegateRefFactory = stringInputWithDefault.ref
         ) { mappedExtraProps =>
           stringInputWithDefault.forOption(
             ref = mappedExtraProps.ref,
             defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawTransactionDate),
             startWithDefault = props.defaultValues.isEmpty,
-            nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)
+            delegateRefFactory = uielements.bootstrap.TextInput.ref(_)
           ) { extraProps =>
             uielements.bootstrap.TextInput(
               ref = extraProps.ref,
@@ -214,19 +214,19 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           defaultValue = props.defaultValues.map(_.consumedDate) getOrElse LocalDateTimes.toStartOfDay(
             clock.now),
           valueTransformer = uielements.MappedInput.ValueTransformer.StringToLocalDateTime,
-          nameToDelegateRef = stringInputWithDefault.ref,
+          delegateRefFactory = stringInputWithDefault.ref,
           listener = AnythingChangedListener
         ) { mappedExtraProps =>
           stringInputWithDefault(
             ref = mappedExtraProps.ref,
             defaultValueProxy = rawTransactionDateRef($),
-            nameToDelegateRef = stringInputWithDefault.ref) {
+            delegateRefFactory = stringInputWithDefault.ref) {
             extraProps1 =>
               stringInputWithDefault.forOption(
                 ref = extraProps1.ref,
                 defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawConsumedDate),
                 startWithDefault = props.defaultValues.isEmpty,
-                nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)
+                delegateRefFactory = uielements.bootstrap.TextInput.ref(_)
               ) { extraProps2 =>
                 uielements.bootstrap.TextInput(
                   ref = extraProps2.ref,
@@ -242,7 +242,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ref = moneyReservoirRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.moneyReservoir),
           startWithDefault = props.defaultValues.isEmpty,
-          nameToDelegateRef = reservoirSelectInput.ref(_)
+          delegateRefFactory = reservoirSelectInput.ref(_)
         ) { extraProps =>
           reservoirSelectInput(
             ref = extraProps.ref,
@@ -260,7 +260,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.beneficiaryAccount),
           startWithDefault = props.defaultValues.isEmpty,
           directUserChangeOnly = true,
-          nameToDelegateRef = accountSelectInput.ref(_)
+          delegateRefFactory = accountSelectInput.ref(_)
         ) { extraProps =>
           accountSelectInput(
             ref = extraProps.ref,
@@ -278,7 +278,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.category),
           startWithDefault = props.defaultValues.isEmpty,
           directUserChangeOnly = true,
-          nameToDelegateRef = categorySelectInput.ref(_)
+          delegateRefFactory = categorySelectInput.ref(_)
         ) { extraProps =>
           categorySelectInput(
             ref = extraProps.ref,
@@ -297,7 +297,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ref = descriptionRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.description),
           startWithDefault = props.defaultValues.isEmpty,
-          nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)
+          delegateRefFactory = uielements.bootstrap.TextInput.ref(_)
         ) { extraProps =>
           uielements.bootstrap.TextInput(
             ref = extraProps.ref,
@@ -327,7 +327,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ref = detailDescriptionRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.detailDescription),
           startWithDefault = props.defaultValues.isEmpty,
-          nameToDelegateRef = uielements.bootstrap.TextAreaInput.ref(_)
+          delegateRefFactory = uielements.bootstrap.TextAreaInput.ref(_)
         ) { extraProps =>
           uielements.bootstrap.TextAreaInput(
             ref = extraProps.ref,
@@ -342,14 +342,14 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ref = tagsRef,
           defaultValue = props.defaultValues.map(_.tags) getOrElse Seq(),
           valueTransformer = uielements.MappedInput.ValueTransformer.StringToTags,
-          nameToDelegateRef = stringInputWithDefault.ref,
+          delegateRefFactory = stringInputWithDefault.ref,
           listener = AnythingChangedListener
         ) { mappedExtraProps =>
           stringInputWithDefault.forOption(
             ref = mappedExtraProps.ref,
             defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawTags),
             startWithDefault = props.defaultValues.isEmpty,
-            nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)
+            delegateRefFactory = uielements.bootstrap.TextInput.ref(_)
           ) { extraProps =>
             uielements.bootstrap.TextInput(
               ref = extraProps.ref,
