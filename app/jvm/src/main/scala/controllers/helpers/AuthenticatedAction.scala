@@ -54,7 +54,7 @@ object AuthenticatedAction {
       implicit entityAccess: EntityAccess,
       controllerComponents: ControllerComponents,
       playConfiguration: play.api.Configuration): AuthenticatedAction[AnyContent] = {
-    apply(BodyParsers.parse.default)(userAndRequestToResult)
+    apply(controllerComponents.parsers.defaultBodyParser)(userAndRequestToResult)
   }
 
   def requireAdminUser(userAndRequestToResult: UserAndRequestToResult[AnyContent])(
