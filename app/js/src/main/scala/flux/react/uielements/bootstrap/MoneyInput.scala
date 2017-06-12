@@ -77,7 +77,7 @@ object MoneyInput {
       i18n: I18n): VdomElement = {
     val props = Props[Value, ExtraProps](
       label = label,
-      name = ref.name,
+      name = "TODO: add name parameter to MoneyInput",
       defaultValue = defaultValue,
       required = required,
       showErrorMessage = showErrorMessage,

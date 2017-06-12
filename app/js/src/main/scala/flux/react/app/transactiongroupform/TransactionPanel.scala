@@ -114,41 +114,41 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   // **************** Public inner types ****************//
   final class Reference private[TransactionPanel] (
       private[TransactionPanel] val mutableRef: MutableRef[Props, State, Backend, ThisCtorSummoner#CT]) {
-    def apply($ : BackendScope[_, _]): Proxy = new Proxy(() => mutableRef.value.backend.$)
+    def apply(): Proxy = new Proxy(() => mutableRef.value.backend.$)
   }
 
   final class Proxy private[TransactionPanel] (private val componentScope: () => BackendScope[Props, State]) {
-    def rawTransactionDate: InputBase.Proxy[String] = rawTransactionDateRef($)
-    def rawConsumedDate: InputBase.Proxy[String] = rawConsumedDateRef($)
-    def beneficiaryAccount: InputBase.Proxy[Account] = beneficiaryAccountRef($)
-    def moneyReservoir: InputBase.Proxy[MoneyReservoir] = moneyReservoirRef($)
-    def category: InputBase.Proxy[Category] = categoryRef($)
-    def description: InputBase.Proxy[String] = descriptionRef($)
-    def detailDescription: InputBase.Proxy[String] = detailDescriptionRef($)
-    def rawTags: InputBase.Proxy[String] = rawTagsRef($)
+    def rawTransactionDate: InputBase.Proxy[String] = rawTransactionDateRef()
+    def rawConsumedDate: InputBase.Proxy[String] = rawConsumedDateRef()
+    def beneficiaryAccount: InputBase.Proxy[Account] = beneficiaryAccountRef()
+    def moneyReservoir: InputBase.Proxy[MoneyReservoir] = moneyReservoirRef()
+    def category: InputBase.Proxy[Category] = categoryRef()
+    def description: InputBase.Proxy[String] = descriptionRef()
+    def detailDescription: InputBase.Proxy[String] = detailDescriptionRef()
+    def rawTags: InputBase.Proxy[String] = rawTagsRef()
 
     def flowValueOrDefault: DatedMoney =
       DatedMoney(
-        cents = flowRef($).valueOrDefault,
-        currency = moneyReservoirRef($).valueOrDefault.currency,
-        date = transactionDateRef($).valueOrDefault)
+        cents = flowRef().valueOrDefault,
+        currency = moneyReservoirRef().valueOrDefault.currency,
+        date = transactionDateRef().valueOrDefault)
 
     def data: Option[Data] =
       try {
         Some(
           Data(
-            transactionDate = transactionDateRef($).value.get,
-            consumedDate = consumedDateRef($).value.get,
-            moneyReservoir = moneyReservoirRef($).value.get,
-            beneficiaryAccount = beneficiaryAccountRef($).value.get,
-            category = categoryRef($).value.get,
-            description = descriptionRef($).value.get,
+            transactionDate = transactionDateRef().value.get,
+            consumedDate = consumedDateRef().value.get,
+            moneyReservoir = moneyReservoirRef().value.get,
+            beneficiaryAccount = beneficiaryAccountRef().value.get,
+            category = categoryRef().value.get,
+            description = descriptionRef().value.get,
             flow = DatedMoney(
-              cents = flowRef($).value.get,
-              currency = moneyReservoirRef($).value.get.currency,
-              date = transactionDateRef($).value.get),
-            detailDescription = detailDescriptionRef($).value.get,
-            tags = tagsRef($).value.get
+              cents = flowRef().value.get,
+              currency = moneyReservoirRef().value.get.currency,
+              date = transactionDateRef().value.get),
+            detailDescription = detailDescriptionRef().value.get,
+            tags = tagsRef().value.get
           ))
       } catch {
         case _: NoSuchElementException => None
@@ -219,7 +219,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         ) { mappedExtraProps =>
           stringInputWithDefault(
             ref = mappedExtraProps.ref,
-            defaultValueProxy = rawTransactionDateRef($),
+            defaultValueProxy = rawTransactionDateRef(),
             delegateRefFactory = stringInputWithDefault.ref _) {
             extraProps1 =>
               stringInputWithDefault.forOption(

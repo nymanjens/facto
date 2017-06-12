@@ -42,7 +42,7 @@ object TextInput {
       implicit i18n: I18n): VdomElement = {
     val props = Props(
       label = label,
-      name = ref.name,
+      name = "TODO: add name parameter to TextInput",
       defaultValue = defaultValue,
       required = required,
       showErrorMessage = showErrorMessage,

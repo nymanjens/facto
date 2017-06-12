@@ -54,17 +54,15 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
 
   final class Reference private[MappedInput] (private[MappedInput] val mutableRef: ThisMutableRef)
       extends InputBase.Reference[Value] {
-    override def apply($ : BackendScope[_, _]): InputBase.Proxy[Value] = new Proxy(() => mutableRef.value)
-    override def name = "dummy-reference-name"
+    override def apply(): InputBase.Proxy[Value] = new Proxy(() => mutableRef.value)
   }
 
   final class DelegateReference private[MappedInput] (mutableRef: ThisMutableRef)
       extends InputBase.Reference[DelegateValue] {
-    override def apply($ : BackendScope[_, _]): InputBase.Proxy[DelegateValue] = {
+    override def apply(): InputBase.Proxy[DelegateValue] = {
       val component = mutableRef.value
-      component.backend.delegateRef(component.backend.$)
+      component.backend.delegateRef()
     }
-    override def name = "dummy-reference-name"
   }
 
   // **************** Private inner types ****************//
@@ -90,8 +88,7 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
 
     private def props: Props.any = componentProvider().props
     private def delegateProxy: InputBase.Proxy[DelegateValue] = {
-      val context = componentProvider().backend.$
-      componentProvider().backend.delegateRef(context)
+      componentProvider().backend.delegateRef()
     }
   }
 
@@ -135,11 +132,11 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
       $.props.runNow().delegateRefFactory()
 
     def didMount(props: Props.any): Callback = LogExceptionsCallback {
-      delegateRef($).registerListener(Proxy.toDelegateListener(props.listener, props))
+      delegateRef().registerListener(Proxy.toDelegateListener(props.listener, props))
     }
 
     def willUnmount(props: Props.any): Callback = LogExceptionsCallback {
-      delegateRef($).deregisterListener(Proxy.toDelegateListener(props.listener, props))
+      delegateRef().deregisterListener(Proxy.toDelegateListener(props.listener, props))
     }
 
     def render(props: Props.any, state: State) = logExceptions {

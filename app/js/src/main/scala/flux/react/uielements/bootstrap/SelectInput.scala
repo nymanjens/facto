@@ -53,7 +53,7 @@ class SelectInput[Value] private (implicit valueTag: ClassTag[Value]) {
       implicit i18n: I18n): VdomElement = {
     val props = Props(
       label = label,
-      name = ref.name,
+      name = "TODO: add name parameter to SelectInput",
       defaultValue = Option(defaultValue) getOrElse options.head,
       required = false,
       showErrorMessage = true, // Should never happen

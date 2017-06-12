@@ -61,12 +61,11 @@ class InputWithDefaultFromReference[Value] private () {
   final class Reference private[InputWithDefaultFromReference] (
       private[InputWithDefaultFromReference] val mutableRef: ThisMutableRef)
       extends InputBase.Reference[Value] {
-    override def apply($ : BackendScope[_, _]) = {
+    override def apply() = {
       InputBase.Proxy.forwardingTo {
-        mutableRef.value.props.inputElementRef(null)
+        mutableRef.value.props.inputElementRef()
       }
     }
-    override def name = "dummy-reference-name"
   }
 
   // **************** Private inner types ****************//
@@ -111,15 +110,15 @@ class InputWithDefaultFromReference[Value] private () {
       private var currentDefaultValue: Value = null.asInstanceOf[Value]
 
       def didMount(props: Props.any): Callback = LogExceptionsCallback {
-        props.inputElementRef($).registerListener(InputValueListener)
+        props.inputElementRef().registerListener(InputValueListener)
         props.defaultValueProxy.get().registerListener(DefaultValueListener)
 
         currentDefaultValue = props.defaultValueProxy.get().valueOrDefault
         if (props.startWithDefault) {
           currentInputValue = currentDefaultValue
-          props.inputElementRef($).setValue(currentDefaultValue)
+          props.inputElementRef().setValue(currentDefaultValue)
         } else {
-          currentInputValue = props.inputElementRef($).valueOrDefault
+          currentInputValue = props.inputElementRef().valueOrDefault
           $.setState(ConnectionState(isConnected = currentDefaultValue == currentInputValue)).runNow()
         }
       }
@@ -152,7 +151,7 @@ class InputWithDefaultFromReference[Value] private () {
         override def onChange(newDefaultValue: Value, directUserChange: Boolean) = LogExceptionsCallback {
           currentDefaultValue = newDefaultValue
 
-          val inputProxy = $.props.runNow().inputElementRef($)
+          val inputProxy = $.props.runNow().inputElementRef()
           if ($.state
                 .runNow()
                 .isConnected && (directUserChange || ! $.props.runNow().directUserChangeOnly)) {

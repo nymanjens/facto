@@ -6,8 +6,7 @@ import japgolly.scalajs.react.vdom._
 object InputBase {
 
   trait Reference[Value] {
-    def apply($ : BackendScope[_, _]): Proxy[Value]
-    def name: String
+    def apply(): Proxy[Value]
   }
 
   trait Proxy[Value] {

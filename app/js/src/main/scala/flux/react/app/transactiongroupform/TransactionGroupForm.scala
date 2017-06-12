@@ -177,7 +177,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
                   },
                   showErrorMessages = state.showErrorMessages,
                   defaultPanel =
-                    if (firstPanel) None else Some(panelRef(panelIndex = state.panelIndices.head)($)),
+                    if (firstPanel) None else Some(panelRef(panelIndex = state.panelIndices.head)()),
                   focusOnMount = firstPanel,
                   closeButtonCallback = if (firstPanel) None else Some(removeTransactionPanel(panelIndex)),
                   onFormChange = this.onFormChange _
@@ -230,11 +230,11 @@ final class TransactionGroupForm(implicit i18n: I18n,
       $.modState(state =>
         logExceptions {
           val flows = for (panelIndex <- state.panelIndices) yield {
-            val datedMoney = panelRef(panelIndex)($).flowValueOrDefault
+            val datedMoney = panelRef(panelIndex).apply().flowValueOrDefault
             datedMoney.exchangedForReferenceCurrency
           }
           val currencies = for (panelIndex <- state.panelIndices) yield {
-            panelRef(panelIndex)($).moneyReservoir.valueOrDefault.currency
+            panelRef(panelIndex).apply().moneyReservoir.valueOrDefault.currency
           }
 
           var newState = state.copy(
@@ -329,7 +329,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
         logExceptions {
           var newState = state.copy(showErrorMessages = true)
 
-          val maybeDatas = for (panelIndex <- state.panelIndices) yield panelRef(panelIndex)($).data
+          val maybeDatas = for (panelIndex <- state.panelIndices) yield panelRef(panelIndex).apply().data
           if (maybeDatas forall (_.isDefined)) {
             val datas = maybeDatas map (_.get)
 
