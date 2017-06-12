@@ -115,10 +115,10 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
       app.configuration.getBoolean(cfgPath) getOrElse false
 
     private def getString(cfgPath: String): Option[String] =
-      app.configuration.getString(cfgPath)
+      app.configuration.getOptional[String](cfgPath)
 
     private def getExistingPath(cfgPath: String): Path = assertExists {
-      Paths.get(app.configuration.getString(cfgPath).get)
+      Paths.get(app.configuration.get[String](cfgPath))
     }
   }
 }

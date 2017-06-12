@@ -26,13 +26,14 @@ import controllers.helpers.{AuthenticatedAction, ControllerHelperCache}
 import controllers.Application.Forms
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 
-final class Application @Inject()(implicit val messagesApi: MessagesApi,
+final class Application @Inject()(implicit override val messagesApi: MessagesApi,components: ControllerComponents,
                                   userManager: SlickUserManager,
                                   entityAccess: SlickEntityAccess,
                                   scalaJsApiServerFactory: ScalaJsApiServerFactory,
+                                  playConfiguration: play.api.Configuration,
                                   env: play.api.Environment,
                                   webJarAssets: controllers.WebJarAssets)
-    extends Controller
+    extends AbstractController(components)
     with I18nSupport {
 
   // ********** actions ********** //

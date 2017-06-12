@@ -8,9 +8,9 @@ import org.scalajs.dom
 
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSExport
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
-@JSExport("SPAMain")
+@JSExportTopLevel("SPAMain")
 object SPAMain extends js.JSApp {
 
   @JSExport

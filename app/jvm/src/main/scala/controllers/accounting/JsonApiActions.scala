@@ -16,11 +16,12 @@ import controllers.helpers.AuthenticatedAction
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{localDateTimeToSqlDateMapper, dbRun}
 
-final class JsonApi @Inject()(implicit val messagesApi: MessagesApi,
+final class JsonApi @Inject()(implicit override val messagesApi: MessagesApi,components: ControllerComponents,
                               clock: Clock,
                               entityAccess: SlickEntityAccess,
+                              playConfiguration: play.api.Configuration,
                               exchangeRateManager: ExchangeRateManager)
-    extends Controller
+    extends AbstractController(components)
     with I18nSupport {
 
   // ********** actions ********** //

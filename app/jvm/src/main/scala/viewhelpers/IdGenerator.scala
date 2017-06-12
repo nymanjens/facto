@@ -3,13 +3,12 @@ package viewhelpers
 import scala.collection.mutable
 import scala.collection.Set
 import scala.annotation.tailrec
-import collection.JavaConversions._
 import com.google.common.collect.Sets
 import java.text.Normalizer
 
 object IdGenerator {
 
-  private val reservedIds: mutable.Set[String] = Sets.newConcurrentHashSet[String]()
+  private val reservedIds: java.util.Set[String] = Sets.newConcurrentHashSet[String]()
 
   /**
     * Generates a unique string id, suitable for use as HTML tag ID. The suggestion string may contain any characters,
@@ -17,7 +16,7 @@ object IdGenerator {
     */
   def uniqueId(suggestion: String): String = {
     val uniqueId = generateUniqueSlug(slugify(suggestion), reservedIds)
-    reservedIds += uniqueId
+    reservedIds.add(uniqueId)
     uniqueId
   }
 
@@ -28,7 +27,7 @@ object IdGenerator {
 
   // source: https://github.com/julienrf/chooze/blob/master/app/util/Util.scala
   @tailrec
-  private def generateUniqueSlug(slug: String, existingSlugs: Set[String]): String = {
+  private def generateUniqueSlug(slug: String, existingSlugs: java.util.Set[String]): String = {
     if (!(existingSlugs contains slug)) {
       slug
     } else {

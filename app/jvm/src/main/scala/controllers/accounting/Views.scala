@@ -3,7 +3,7 @@ package controllers.accounting
 import scala.collection.JavaConverters._
 import com.google.common.base.Joiner
 import com.google.inject.Inject
-import play.api.mvc.{AnyContent, Controller, Flash, Request, Result}
+import play.api.mvc._
 import common.{GetParameter, I18n}
 import common.time.{Clock, TimeUtils}
 import common.CollectionUtils.toListMap
@@ -16,7 +16,7 @@ import controllers.helpers.AuthenticatedAction
 import controllers.helpers.accounting._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 
-final class Views @Inject()(implicit val messagesApi: MessagesApi,
+final class Views @Inject()(implicit override val messagesApi: MessagesApi,components: ControllerComponents,
                             clock: Clock,
                             accountingConfig: Config,
                             generalEntries: GeneralEntries,
@@ -27,9 +27,10 @@ final class Views @Inject()(implicit val messagesApi: MessagesApi,
                             exchangeRateManager: ExchangeRateManager,
                             entityAccess: EntityAccess,
                             i18n: I18n,
+                            playConfiguration: play.api.Configuration,
                             env: play.api.Environment,
                             webJarAssets: controllers.WebJarAssets)
-    extends Controller
+    extends AbstractController(components)
     with I18nSupport {
 
   // ********** actions - views ********** //

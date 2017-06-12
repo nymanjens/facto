@@ -8,11 +8,12 @@ import play.api.data._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
 
-final class Auth @Inject()(implicit val messagesApi: MessagesApi,
+final class Auth @Inject()(implicit override val messagesApi: MessagesApi,components: ControllerComponents,
                            entityAccess: SlickEntityAccess,
+                           playConfiguration: play.api.Configuration,
                            env: play.api.Environment,
                            webJarAssets: controllers.WebJarAssets)
-    extends Controller
+    extends AbstractController(components)
     with I18nSupport {
 
   // ********** actions ********** //
@@ -23,7 +24,7 @@ final class Auth @Inject()(implicit val messagesApi: MessagesApi,
   def authenticate = Action { implicit request =>
     Forms.loginForm.bindFromRequest.fold(
       formWithErrors => BadRequest(views.html.login(formWithErrors)),
-      user => Redirect(routes.Application.index).withSession(Security.username -> user._1)
+      user => Redirect(routes.Application.index).withSession(usernameFromConfig -> user._1)
     )
   }
 
@@ -31,6 +32,11 @@ final class Auth @Inject()(implicit val messagesApi: MessagesApi,
     Redirect(routes.Auth.login).withNewSession.flashing(
       "message" -> Messages("facto.you-are-now-logged-out")
     )
+  }
+
+  // **************** private helper methods **************** //
+  private def usernameFromConfig: String = {
+    playConfiguration.get[String]("session.username")
   }
 }
 
