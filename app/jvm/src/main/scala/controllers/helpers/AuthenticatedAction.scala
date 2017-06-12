@@ -25,11 +25,7 @@ abstract class AuthenticatedAction[A](bodyParser: BodyParser[A])(implicit entity
   def calculateResult(implicit user: User, request: Request[A]): Result
 
   // **************** private helper methods **************** //
-  private def username(request: RequestHeader): Option[String] = request.session.get(usernameFromConfig)
-
-  private def usernameFromConfig: String = {
-    playConfiguration.get[String]("session.username")
-  }
+  private def username(request: RequestHeader): Option[String] = request.session.get("username")
 
   private def onUnauthorized(request: RequestHeader): Result =
     Results.Redirect(controllers.routes.Auth.login)

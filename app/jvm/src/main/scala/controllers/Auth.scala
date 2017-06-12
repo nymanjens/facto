@@ -24,7 +24,7 @@ final class Auth @Inject()(implicit override val messagesApi: MessagesApi,compon
   def authenticate = Action { implicit request =>
     Forms.loginForm.bindFromRequest.fold(
       formWithErrors => BadRequest(views.html.login(formWithErrors)),
-      user => Redirect(routes.Application.index).withSession(usernameFromConfig -> user._1)
+      user => Redirect(routes.Application.index).withSession("username" -> user._1)
     )
   }
 
@@ -32,11 +32,6 @@ final class Auth @Inject()(implicit override val messagesApi: MessagesApi,compon
     Redirect(routes.Auth.login).withNewSession.flashing(
       "message" -> Messages("facto.you-are-now-logged-out")
     )
-  }
-
-  // **************** private helper methods **************** //
-  private def usernameFromConfig: String = {
-    playConfiguration.get[String]("session.username")
   }
 }
 
