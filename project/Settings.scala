@@ -18,7 +18,7 @@ object Settings {
     "-deprecation",
     "-feature",
     "-unchecked",
-    // "-Xfatal-warnings",
+    "-Xfatal-warnings",
     "-Xlint:-unused,_",
     "-Ywarn-unused:-imports"
   )
