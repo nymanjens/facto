@@ -65,8 +65,8 @@ class InputWithDefaultFromReference[Value] private () {
       InputBase.Proxy.forwardingTo {
         val backend = mutableRef.value.backend
         mutableRef.value.props.defaultValueProxy match {
-          case Some(_) => backend.implRef.value.backend.inputElementRef()
-          case None => backend.dummyRef.value.backend.inputElementRef()
+          case Some(_) => backend.implRef.value.backend.delegateRef()
+          case None => backend.dummyRef.value.backend.delegateRef()
         }
       }
     }
@@ -114,18 +114,18 @@ class InputWithDefaultFromReference[Value] private () {
     final class Backend(val $ : BackendScope[Props.any, State]) {
       private var currentInputValue: Value = null.asInstanceOf[Value]
       private var currentDefaultValue: Value = null.asInstanceOf[Value]
-      private[InputWithDefaultFromReference] lazy val inputElementRef = $.props.runNow().delegateRefFactory()
+      private[InputWithDefaultFromReference] lazy val delegateRef = $.props.runNow().delegateRefFactory()
 
       def didMount(props: Props.any): Callback = LogExceptionsCallback {
-        inputElementRef().registerListener(InputValueListener)
+        delegateRef().registerListener(InputValueListener)
         props.defaultValueProxy.get().registerListener(DefaultValueListener)
 
         currentDefaultValue = props.defaultValueProxy.get().valueOrDefault
         if (props.startWithDefault) {
           currentInputValue = currentDefaultValue
-          inputElementRef().setValue(currentDefaultValue)
+          delegateRef().setValue(currentDefaultValue)
         } else {
-          currentInputValue = inputElementRef().valueOrDefault
+          currentInputValue = delegateRef().valueOrDefault
           $.setState(ConnectionState(isConnected = currentDefaultValue == currentInputValue)).runNow()
         }
       }
@@ -143,7 +143,7 @@ class InputWithDefaultFromReference[Value] private () {
         def renderInternal[DelegateRef <: InputBase.Reference[Value]](props: Props[DelegateRef]) = {
           val inputClasses = if (state.isConnected) Seq("bound-until-change") else Seq()
           props.inputElementFactory(
-            InputElementExtraProps(inputElementRef.asInstanceOf[DelegateRef], inputClasses))
+            InputElementExtraProps(delegateRef.asInstanceOf[DelegateRef], inputClasses))
         }
         renderInternal(props)
       }
@@ -160,7 +160,7 @@ class InputWithDefaultFromReference[Value] private () {
         override def onChange(newDefaultValue: Value, directUserChange: Boolean) = LogExceptionsCallback {
           currentDefaultValue = newDefaultValue
 
-          val inputProxy = inputElementRef()
+          val inputProxy = delegateRef()
           if ($.state
                 .runNow()
                 .isConnected && (directUserChange || ! $.props.runNow().directUserChangeOnly)) {
@@ -188,12 +188,12 @@ class InputWithDefaultFromReference[Value] private () {
     type State = Unit
 
     final class Backend(val $ : BackendScope[Props.any, State]) {
-      private[InputWithDefaultFromReference] lazy val inputElementRef = $.props.runNow().delegateRefFactory()
+      private[InputWithDefaultFromReference] lazy val delegateRef = $.props.runNow().delegateRefFactory()
 
       def render(props: Props.any, state: State) = logExceptions {
         def renderInternal[DelegateRef <: InputBase.Reference[Value]](props: Props[DelegateRef]) = {
           props.inputElementFactory(
-            InputElementExtraProps(inputElementRef.asInstanceOf[DelegateRef], inputClasses = Seq()))
+            InputElementExtraProps(delegateRef.asInstanceOf[DelegateRef], inputClasses = Seq()))
         }
         renderInternal(props)
       }

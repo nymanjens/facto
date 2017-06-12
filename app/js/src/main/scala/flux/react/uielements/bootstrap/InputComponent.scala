@@ -231,7 +231,7 @@ private[bootstrap] object InputComponent {
       } catch {
         case _: NoSuchElementException => // Ignore the case this component no longer exists
         case e: Throwable => // TODO: Make this more narrow
-            println("!!!!!!!!!!!!!! Ignoring exception: " + e.getMessage)
+          println("!!!!!!!!!!!!!! Ignoring exception: " + e.getMessage)
       }
     }
 

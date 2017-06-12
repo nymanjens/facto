@@ -103,7 +103,8 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
   private final class Backend(val $ : BackendScope[Props, State]) {
 
-    private val _panelRefs: mutable.Buffer[transactionPanel.Reference] = mutable.Buffer(transactionPanel.ref())
+    private val _panelRefs: mutable.Buffer[transactionPanel.Reference] =
+      mutable.Buffer(transactionPanel.ref())
 
     def render(props: Props, state: State) = logExceptions {
       <.div(
