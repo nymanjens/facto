@@ -112,7 +112,7 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
     def defaultPassword: Option[String] = getString("facto.setup.defaultPassword")
 
     private def getBoolean(cfgPath: String): Boolean =
-      app.configuration.getBoolean(cfgPath) getOrElse false
+      app.configuration.getOptional[Boolean](cfgPath) getOrElse false
 
     private def getString(cfgPath: String): Option[String] =
       app.configuration.getOptional[String](cfgPath)
