@@ -11,7 +11,7 @@ import scala2js.Converters._
 
 object TextInputTest extends TestSuite {
   implicit private val fake18n = new TestModule().fakeI18n
-  private val testRef = TextInput.ref("testRef")
+  private val testRef = TextInput.ref()
 
   override def tests = TestSuite {
     "Starts with default value" - {

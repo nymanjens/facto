@@ -75,7 +75,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
   }
 
   private def panelRef(panelIndex: Int): transactionPanel.Reference =
-    transactionPanel.ref(s"panel_$panelIndex")
+    transactionPanel.ref()
 
   // **************** Private inner types ****************//
   private sealed trait OperationMeta

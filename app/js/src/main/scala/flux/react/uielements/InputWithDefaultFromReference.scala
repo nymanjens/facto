@@ -23,12 +23,12 @@ class InputWithDefaultFromReference[Value] private () {
       defaultValueProxy: Option[() => InputBase.Proxy[Value]],
       startWithDefault: Boolean = false,
       directUserChangeOnly: Boolean = false,
-      delegateRefFactory: String => DelegateRef)(
+      delegateRefFactory: () => DelegateRef)(
       inputElementFactory: InputElementExtraProps[DelegateRef] => VdomElement): VdomElement = {
     ref.mutableRef
       .component(
         Props(
-          inputElementRef = delegateRefFactory(ref.name),
+          inputElementRef = delegateRefFactory(),
           defaultValueProxy = defaultValueProxy,
           startWithDefault = startWithDefault,
           inputElementFactory = inputElementFactory,
@@ -41,7 +41,7 @@ class InputWithDefaultFromReference[Value] private () {
                                                        defaultValueProxy: => InputBase.Proxy[Value],
                                                        startWithDefault: Boolean = false,
                                                        directUserChangeOnly: Boolean = false,
-                                                       delegateRefFactory: String => DelegateRef)(
+                                                       delegateRefFactory: () => DelegateRef)(
       inputElementFactory: InputElementExtraProps[DelegateRef] => VdomElement): VdomElement = {
     forOption(
       ref = ref,
@@ -52,7 +52,7 @@ class InputWithDefaultFromReference[Value] private () {
     )(inputElementFactory)
   }
 
-  def ref(name: String): Reference = new Reference(ScalaComponent.mutableRefTo(component))
+  def ref(): Reference = new Reference(ScalaComponent.mutableRefTo(component))
 
   // **************** Public inner types ****************//
   case class InputElementExtraProps[DelegateRef <: InputBase.Reference[Value]](ref: DelegateRef,

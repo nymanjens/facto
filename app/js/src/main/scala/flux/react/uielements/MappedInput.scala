@@ -30,7 +30,7 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
       defaultValue: Value,
       valueTransformer: ValueTransformer[DelegateValue, Value],
       listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance,
-      delegateRefFactory: String => DelegateRef)(
+      delegateRefFactory: () => DelegateRef)(
       delegateInputElementFactory: InputElementExtraProps[DelegateRef] => VdomElement): VdomElement = {
     ref.mutableRef
       .component(
@@ -43,7 +43,7 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
       .vdomElement
   }
 
-  def ref(name: String): Reference = new Reference(ScalaComponent.mutableRefTo(component))
+  def ref(): Reference = new Reference(ScalaComponent.mutableRefTo(component))
   def delegateRef(ref: Reference): DelegateReference =
     new DelegateReference(ScalaComponent.mutableRefTo(component))
 
@@ -121,7 +121,7 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
   }
 
   private case class Props[DelegateRef <: InputBase.Reference[DelegateValue]](
-      delegateRefFactory: String => DelegateRef,
+      delegateRefFactory: () => DelegateRef,
       valueTransformer: ValueTransformer[DelegateValue, Value],
       defaultValue: Value,
       listener: InputBase.Listener[Value],
@@ -132,7 +132,7 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
 
   private final class Backend(val $ : BackendScope[Props.any, State]) {
     private[MappedInput] lazy val delegateRef: InputBase.Reference[DelegateValue] =
-      $.props.runNow().delegateRefFactory("foo")
+      $.props.runNow().delegateRefFactory()
 
     def didMount(props: Props.any): Callback = LogExceptionsCallback {
       delegateRef($).registerListener(Proxy.toDelegateListener(props.listener, props))

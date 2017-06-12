@@ -46,17 +46,17 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   private val accountSelectInput = uielements.bootstrap.SelectInput.forType[Account]
   private val categorySelectInput = uielements.bootstrap.SelectInput.forType[Category]
 
-  private val transactionDateRef = dateMappedInput.ref("transactionDate")
-  private val consumedDateRef = dateMappedInput.ref("consumedDate")
+  private val transactionDateRef = dateMappedInput.ref()
+  private val consumedDateRef = dateMappedInput.ref()
   private val rawTransactionDateRef = dateMappedInput.delegateRef(transactionDateRef)
   private val rawConsumedDateRef = dateMappedInput.delegateRef(consumedDateRef)
-  private val moneyReservoirRef = reservoirInputWithDefault.ref("moneyReservoir")
-  private val beneficiaryAccountRef = accountInputWithDefault.ref("beneficiaryAccount")
-  private val categoryRef = categoryInputWithDefault.ref("category")
-  private val descriptionRef = stringInputWithDefault.ref("description")
-  private val flowRef = uielements.bootstrap.MoneyInput.ref("flow")
-  private val detailDescriptionRef = stringInputWithDefault.ref("detailDescription")
-  private val tagsRef = tagsMappedInput.ref("tags")
+  private val moneyReservoirRef = reservoirInputWithDefault.ref()
+  private val beneficiaryAccountRef = accountInputWithDefault.ref()
+  private val categoryRef = categoryInputWithDefault.ref()
+  private val descriptionRef = stringInputWithDefault.ref()
+  private val flowRef = uielements.bootstrap.MoneyInput.ref()
+  private val detailDescriptionRef = stringInputWithDefault.ref()
+  private val tagsRef = tagsMappedInput.ref()
   private val rawTagsRef = tagsMappedInput.delegateRef(tagsRef)
 
   private val component = {
@@ -101,7 +101,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
     ref.mutableRef.component.withKey(key.toString).apply(props)
   }
 
-  def ref(name: String): Reference = new Reference(ScalaComponent.mutableRefTo(component))
+  def ref(): Reference = new Reference(ScalaComponent.mutableRefTo(component))
 
   // **************** Private methods ****************//
   private def selectableReservoirs(currentReservoir: MoneyReservoir = null): Seq[MoneyReservoir] = {
@@ -191,13 +191,13 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           defaultValue = state.transactionDate,
           valueTransformer = uielements.MappedInput.ValueTransformer.StringToLocalDateTime,
           listener = TransactionDateListener,
-          delegateRefFactory = stringInputWithDefault.ref
+          delegateRefFactory = stringInputWithDefault.ref _
         ) { mappedExtraProps =>
           stringInputWithDefault.forOption(
             ref = mappedExtraProps.ref,
             defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawTransactionDate),
             startWithDefault = props.defaultValues.isEmpty,
-            delegateRefFactory = uielements.bootstrap.TextInput.ref(_)
+            delegateRefFactory = uielements.bootstrap.TextInput.ref _
           ) { extraProps =>
             uielements.bootstrap.TextInput(
               ref = extraProps.ref,
@@ -214,19 +214,19 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           defaultValue = props.defaultValues.map(_.consumedDate) getOrElse LocalDateTimes.toStartOfDay(
             clock.now),
           valueTransformer = uielements.MappedInput.ValueTransformer.StringToLocalDateTime,
-          delegateRefFactory = stringInputWithDefault.ref,
+          delegateRefFactory = stringInputWithDefault.ref _,
           listener = AnythingChangedListener
         ) { mappedExtraProps =>
           stringInputWithDefault(
             ref = mappedExtraProps.ref,
             defaultValueProxy = rawTransactionDateRef($),
-            delegateRefFactory = stringInputWithDefault.ref) {
+            delegateRefFactory = stringInputWithDefault.ref _) {
             extraProps1 =>
               stringInputWithDefault.forOption(
                 ref = extraProps1.ref,
                 defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawConsumedDate),
                 startWithDefault = props.defaultValues.isEmpty,
-                delegateRefFactory = uielements.bootstrap.TextInput.ref(_)
+                delegateRefFactory = uielements.bootstrap.TextInput.ref _
               ) { extraProps2 =>
                 uielements.bootstrap.TextInput(
                   ref = extraProps2.ref,
@@ -242,7 +242,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ref = moneyReservoirRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.moneyReservoir),
           startWithDefault = props.defaultValues.isEmpty,
-          delegateRefFactory = reservoirSelectInput.ref(_)
+          delegateRefFactory = reservoirSelectInput.ref _
         ) { extraProps =>
           reservoirSelectInput(
             ref = extraProps.ref,
@@ -260,7 +260,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.beneficiaryAccount),
           startWithDefault = props.defaultValues.isEmpty,
           directUserChangeOnly = true,
-          delegateRefFactory = accountSelectInput.ref(_)
+          delegateRefFactory = accountSelectInput.ref _
         ) { extraProps =>
           accountSelectInput(
             ref = extraProps.ref,
@@ -278,7 +278,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.category),
           startWithDefault = props.defaultValues.isEmpty,
           directUserChangeOnly = true,
-          delegateRefFactory = categorySelectInput.ref(_)
+          delegateRefFactory = categorySelectInput.ref _
         ) { extraProps =>
           categorySelectInput(
             ref = extraProps.ref,
@@ -297,7 +297,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ref = descriptionRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.description),
           startWithDefault = props.defaultValues.isEmpty,
-          delegateRefFactory = uielements.bootstrap.TextInput.ref(_)
+          delegateRefFactory = uielements.bootstrap.TextInput.ref _
         ) { extraProps =>
           uielements.bootstrap.TextInput(
             ref = extraProps.ref,
@@ -327,7 +327,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ref = detailDescriptionRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.detailDescription),
           startWithDefault = props.defaultValues.isEmpty,
-          delegateRefFactory = uielements.bootstrap.TextAreaInput.ref(_)
+          delegateRefFactory = uielements.bootstrap.TextAreaInput.ref _
         ) { extraProps =>
           uielements.bootstrap.TextAreaInput(
             ref = extraProps.ref,
@@ -342,14 +342,14 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ref = tagsRef,
           defaultValue = props.defaultValues.map(_.tags) getOrElse Seq(),
           valueTransformer = uielements.MappedInput.ValueTransformer.StringToTags,
-          delegateRefFactory = stringInputWithDefault.ref,
+          delegateRefFactory = stringInputWithDefault.ref _,
           listener = AnythingChangedListener
         ) { mappedExtraProps =>
           stringInputWithDefault.forOption(
             ref = mappedExtraProps.ref,
             defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawTags),
             startWithDefault = props.defaultValues.isEmpty,
-            delegateRefFactory = uielements.bootstrap.TextInput.ref(_)
+            delegateRefFactory = uielements.bootstrap.TextInput.ref _
           ) { extraProps =>
             uielements.bootstrap.TextInput(
               ref = extraProps.ref,

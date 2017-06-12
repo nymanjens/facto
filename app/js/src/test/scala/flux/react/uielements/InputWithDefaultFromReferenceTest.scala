@@ -13,7 +13,7 @@ import scala2js.Converters._
 object InputWithDefaultFromReferenceTest extends TestSuite {
   implicit private val fake18n = new TestModule().fakeI18n
   private val stringInputWithDefault = InputWithDefaultFromReference.forType[String]
-  private val testRef = stringInputWithDefault.ref("testRef")
+  private val testRef = stringInputWithDefault.ref()
 
   override def tests = TestSuite {
     val defaultValueProxy: InputBase.Proxy[String] = new FakeProxy()
@@ -83,7 +83,7 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
       stringInputWithDefault(
         ref = testRef,
         defaultValueProxy = proxy,
-        delegateRefFactory = uielements.bootstrap.TextInput.ref) { extraProps =>
+        delegateRefFactory = uielements.bootstrap.TextInput.ref _) { extraProps =>
         uielements.bootstrap.TextInput(
           ref = extraProps.ref,
           label = "label",
