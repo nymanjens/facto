@@ -2,6 +2,7 @@ package flux.react.app.transactiongroupform
 import japgolly.scalajs.react.component.Scala.MutableRef
 import java.util.NoSuchElementException
 
+import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.{I18n, LoggingUtils, SinglePendingTaskQueue}
 import common.CollectionUtils.toListMap
@@ -45,19 +46,6 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   private val reservoirSelectInput = uielements.bootstrap.SelectInput.forType[MoneyReservoir]
   private val accountSelectInput = uielements.bootstrap.SelectInput.forType[Account]
   private val categorySelectInput = uielements.bootstrap.SelectInput.forType[Category]
-
-  private val transactionDateRef = dateMappedInput.ref()
-  private val consumedDateRef = dateMappedInput.ref()
-  private val rawTransactionDateRef = dateMappedInput.delegateRef(transactionDateRef)
-  private val rawConsumedDateRef = dateMappedInput.delegateRef(consumedDateRef)
-  private val moneyReservoirRef = reservoirInputWithDefault.ref()
-  private val beneficiaryAccountRef = accountInputWithDefault.ref()
-  private val categoryRef = categoryInputWithDefault.ref()
-  private val descriptionRef = stringInputWithDefault.ref()
-  private val flowRef = uielements.bootstrap.MoneyInput.ref()
-  private val detailDescriptionRef = stringInputWithDefault.ref()
-  private val tagsRef = tagsMappedInput.ref()
-  private val rawTagsRef = tagsMappedInput.delegateRef(tagsRef)
 
   private val component = {
     ScalaComponent
@@ -114,41 +102,41 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   // **************** Public inner types ****************//
   final class Reference private[TransactionPanel] (
       private[TransactionPanel] val mutableRef: MutableRef[Props, State, Backend, ThisCtorSummoner#CT]) {
-    def apply(): Proxy = new Proxy(() => mutableRef.value.backend.$)
+    def apply(): Proxy = new Proxy(() => mutableRef.value)
   }
 
-  final class Proxy private[TransactionPanel] (private val componentScope: () => BackendScope[Props, State]) {
-    def rawTransactionDate: InputBase.Proxy[String] = rawTransactionDateRef()
-    def rawConsumedDate: InputBase.Proxy[String] = rawConsumedDateRef()
-    def beneficiaryAccount: InputBase.Proxy[Account] = beneficiaryAccountRef()
-    def moneyReservoir: InputBase.Proxy[MoneyReservoir] = moneyReservoirRef()
-    def category: InputBase.Proxy[Category] = categoryRef()
-    def description: InputBase.Proxy[String] = descriptionRef()
-    def detailDescription: InputBase.Proxy[String] = detailDescriptionRef()
-    def rawTags: InputBase.Proxy[String] = rawTagsRef()
+  final class Proxy private[TransactionPanel] (private val componentProvider: () => ThisComponentU) {
+    def rawTransactionDate: InputBase.Proxy[String] = backend.rawTransactionDateRef()
+    def rawConsumedDate: InputBase.Proxy[String] = backend.rawConsumedDateRef()
+    def beneficiaryAccount: InputBase.Proxy[Account] = backend.beneficiaryAccountRef()
+    def moneyReservoir: InputBase.Proxy[MoneyReservoir] = backend.moneyReservoirRef()
+    def category: InputBase.Proxy[Category] = backend.categoryRef()
+    def description: InputBase.Proxy[String] = backend.descriptionRef()
+    def detailDescription: InputBase.Proxy[String] = backend.detailDescriptionRef()
+    def rawTags: InputBase.Proxy[String] = backend.rawTagsRef()
 
     def flowValueOrDefault: DatedMoney =
       DatedMoney(
-        cents = flowRef().valueOrDefault,
-        currency = moneyReservoirRef().valueOrDefault.currency,
-        date = transactionDateRef().valueOrDefault)
+        cents =  backend.flowRef().valueOrDefault,
+        currency = backend.moneyReservoirRef().valueOrDefault.currency,
+        date = backend.transactionDateRef().valueOrDefault)
 
     def data: Option[Data] =
       try {
         Some(
           Data(
-            transactionDate = transactionDateRef().value.get,
-            consumedDate = consumedDateRef().value.get,
-            moneyReservoir = moneyReservoirRef().value.get,
-            beneficiaryAccount = beneficiaryAccountRef().value.get,
-            category = categoryRef().value.get,
-            description = descriptionRef().value.get,
+            transactionDate = backend.transactionDateRef().value.get,
+            consumedDate = backend.consumedDateRef().value.get,
+            moneyReservoir = backend.moneyReservoirRef().value.get,
+            beneficiaryAccount = backend.beneficiaryAccountRef().value.get,
+            category = backend.categoryRef().value.get,
+            description = backend.descriptionRef().value.get,
             flow = DatedMoney(
-              cents = flowRef().value.get,
-              currency = moneyReservoirRef().value.get.currency,
-              date = transactionDateRef().value.get),
-            detailDescription = detailDescriptionRef().value.get,
-            tags = tagsRef().value.get
+              cents = backend.flowRef().value.get,
+              currency = backend.moneyReservoirRef().value.get.currency,
+              date = backend.transactionDateRef().value.get),
+            detailDescription = backend.detailDescriptionRef().value.get,
+            tags = backend.tagsRef().value.get
           ))
       } catch {
         case e: Throwable => // TODO: Make this more narrow
@@ -156,7 +144,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           None
       }
 
-    private def $ = componentScope()
+    private def backend = componentProvider().backend
   }
 
   case class Data(transactionDate: LocalDateTime,
@@ -171,6 +159,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
 
   // **************** Private inner types ****************//
   private type ThisCtorSummoner = CtorType.Summoner.Aux[Box[Props], Children.None, CtorType.Props]
+  private type ThisComponentU = MountedImpure[Props, State, Backend]
   private case class State(transactionDate: LocalDateTime,
                            beneficiaryAccount: Account,
                            moneyReservoir: MoneyReservoir)
@@ -185,6 +174,19 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                            onFormChange: () => Unit)
 
   private class Backend(val $ : BackendScope[Props, State]) {
+
+    val transactionDateRef = dateMappedInput.ref()
+     val consumedDateRef = dateMappedInput.ref()
+     val rawTransactionDateRef = dateMappedInput.delegateRef(transactionDateRef)
+     val rawConsumedDateRef = dateMappedInput.delegateRef(consumedDateRef)
+     val moneyReservoirRef = reservoirInputWithDefault.ref()
+     val beneficiaryAccountRef = accountInputWithDefault.ref()
+     val categoryRef = categoryInputWithDefault.ref()
+     val descriptionRef = stringInputWithDefault.ref()
+     val flowRef = uielements.bootstrap.MoneyInput.ref()
+     val detailDescriptionRef = stringInputWithDefault.ref()
+     val tagsRef = tagsMappedInput.ref()
+     val rawTagsRef = tagsMappedInput.delegateRef(tagsRef)
 
     def render(props: Props, state: State) = logExceptions {
       HalfPanel(title = <.span(props.title), closeButtonCallback = props.deleteButtonCallback)(
