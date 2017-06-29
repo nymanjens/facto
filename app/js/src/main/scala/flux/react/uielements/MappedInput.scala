@@ -53,14 +53,15 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
 
   final class Reference private[MappedInput] (private[MappedInput] val mutableRef: ThisMutableRef)
       extends InputBase.Reference[Value] {
-    override def apply(): InputBase.Proxy[Value] =
-      InputBase.Proxy.lazyProxy(Option(mutableRef.value), ref => new Proxy(ref))
+    override def apply(): InputBase.Proxy[Value] = {
+      Option(mutableRef.value) map (new Proxy(_)) getOrElse InputBase.Proxy.nullObject()
+    }
   }
 
   final class DelegateReference private[MappedInput] (mutableRef: ThisMutableRef)
       extends InputBase.Reference[DelegateValue] {
     override def apply(): InputBase.Proxy[DelegateValue] = {
-      Option(mutableRef.value).map(_.backend.delegateRef()) getOrElse InputBase.Proxy.nullObject()
+      Option(mutableRef.value) map (_.backend.delegateRef()) getOrElse InputBase.Proxy.nullObject()
     }
   }
 

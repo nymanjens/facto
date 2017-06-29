@@ -1,7 +1,6 @@
 package flux.react.uielements.bootstrap
 
 import java.util.NoSuchElementException
-import flux.react.ReactExceptionUtils.valueOrThrow
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import flux.react.ReactVdomUtils.{<<, ^^}
@@ -175,8 +174,9 @@ private[bootstrap] object InputComponent {
 
   abstract class Reference[Value, ExtraProps](mutableRef: ThisMutableRef[Value, ExtraProps])
       extends InputBase.Reference[Value] {
-    override final def apply(): InputBase.Proxy[Value] =
-      new Proxy[Value, ExtraProps](() => valueOrThrow(mutableRef))
+    override final def apply(): InputBase.Proxy[Value] = {
+      Option(mutableRef.value) map (new Proxy(_)) getOrElse InputBase.Proxy.nullObject()
+    }
   }
 
   // **************** Private inner types ****************//
@@ -184,22 +184,21 @@ private[bootstrap] object InputComponent {
   private type ThisComponentU[Value, ExtraProps] =
     MountedImpure[Props[Value, ExtraProps], State[Value], Backend]
 
-  private final class Proxy[Value, ExtraProps](
-      val componentProvider: () => ThisComponentU[Value, ExtraProps])
+  private final class Proxy[Value, ExtraProps](val component: ThisComponentU[Value, ExtraProps])
       extends InputBase.Proxy[Value] {
     override def value = {
-      ValueTransformer.stringToValue(componentProvider().state.valueString, props) match {
+      ValueTransformer.stringToValue(component.state.valueString, props) match {
         case Some(value) if props.required && value == props.valueTransformer.emptyValue => None
         case other => other
       }
     }
     override def valueOrDefault =
-      ValueTransformer.stringToValueOrDefault(componentProvider().state.valueString, props)
+      ValueTransformer.stringToValueOrDefault(component.state.valueString, props)
     override def setValue(newValue: Value) = {
       def setValueInternal(newValue: Value): Value = {
         val stringValue = ValueTransformer.valueToString(newValue, props)
-        componentProvider().modState(_.withValueString(stringValue))
-        for (listener <- componentProvider().state.listeners) {
+        component.modState(_.withValueString(stringValue))
+        for (listener <- component.state.listeners) {
           listener.onChange(newValue, directUserChange = false).runNow()
         }
         newValue
@@ -224,17 +223,11 @@ private[bootstrap] object InputComponent {
       }
     }
     override def registerListener(listener: InputBase.Listener[Value]) =
-      componentProvider().modState(_.withListener(listener))
+      component.modState(_.withListener(listener))
     override def deregisterListener(listener: InputBase.Listener[Value]) = {
-      try {
-        componentProvider().modState(_.withoutListener(listener))
-      } catch {
-        case _: NoSuchElementException => // Ignore the case this component no longer exists
-        case e: Throwable => // TODO: Make this more narrow
-          println(s"!!!!!!!!!!!!!! Ignoring exception: ${e.getMessage} of type ${e.getClass}"); e.printStackTrace()
-      }
+      component.modState(_.withoutListener(listener))
     }
 
-    private def props: Props[Value, ExtraProps] = componentProvider().props
+    private def props: Props[Value, ExtraProps] = component.props
   }
 }

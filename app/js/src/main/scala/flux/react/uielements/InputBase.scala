@@ -30,16 +30,6 @@ object InputBase {
 
   object Proxy {
     def nullObject[Value](): Proxy[Value] = new NullObject
-    def forwardingTo[Value](delegate: => Proxy[Value]): Proxy[Value] = new ForwardingImpl(() => delegate)
-    def lazyProxy[Args, Value](maybeArgs: => Option[Args],
-                               proxyFactory: Args => Proxy[Value]): Proxy[Value] = {
-      forwardingTo {
-        maybeArgs match {
-          case Some(args) => proxyFactory(args)
-          case None => nullObject()
-        }
-      }
-    }
 
     private final class NullObject[Value]() extends Proxy[Value] {
       override def value = None
@@ -47,16 +37,6 @@ object InputBase {
       override def setValue(value: Value) = value
       override def registerListener(listener: Listener[Value]) = {}
       override def deregisterListener(listener: Listener[Value]) = {}
-    }
-
-    private final class ForwardingImpl[Value](delegateProvider: () => Proxy[Value]) extends Proxy[Value] {
-      override def value = delegateProvider().value
-      override def valueOrDefault = delegateProvider().valueOrDefault
-      override def setValue(value: Value) = delegateProvider().setValue(value)
-      override def registerListener(listener: Listener[Value]) =
-        delegateProvider().registerListener(listener)
-      override def deregisterListener(listener: Listener[Value]) =
-        delegateProvider().deregisterListener(listener)
     }
   }
 

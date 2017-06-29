@@ -2,7 +2,6 @@ package flux.react.app.transactiongroupform
 import japgolly.scalajs.react.component.Scala.MutableRef
 import java.util.NoSuchElementException
 
-import flux.react.ReactExceptionUtils.valueOrThrow
 import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.{I18n, LoggingUtils, SinglePendingTaskQueue}
@@ -103,10 +102,10 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   // **************** Public inner types ****************//
   final class Reference private[TransactionPanel] (
       private[TransactionPanel] val mutableRef: MutableRef[Props, State, Backend, ThisCtorSummoner#CT]) {
-    def apply(): Proxy = new Proxy(() => valueOrThrow(mutableRef))
+    def apply(): Proxy = new Proxy(Option(mutableRef.value).orNull)
   }
 
-  final class Proxy private[TransactionPanel] (private val componentProvider: () => ThisComponentU) {
+  final class Proxy private[TransactionPanel] (private val component: ThisComponentU) {
     def rawTransactionDate: InputBase.Proxy[String] = backend.rawTransactionDateRef()
     def rawConsumedDate: InputBase.Proxy[String] = backend.rawConsumedDateRef()
     def beneficiaryAccount: InputBase.Proxy[Account] = backend.beneficiaryAccountRef()
@@ -118,7 +117,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
 
     def flowValueOrDefault: DatedMoney =
       DatedMoney(
-        cents =  backend.flowRef().valueOrDefault,
+        cents = backend.flowRef().valueOrDefault,
         currency = backend.moneyReservoirRef().valueOrDefault.currency,
         date = backend.transactionDateRef().valueOrDefault)
 
@@ -140,12 +139,10 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             tags = backend.tagsRef().value.get
           ))
       } catch {
-        case e: Throwable => // TODO: Make this more narrow
-          println(s"!!!!!!!!!!!!!! Ignoring exception: ${e.getMessage} of type ${e.getClass}"); e.printStackTrace()
-          None
+        case e: NoSuchElementException => None
       }
 
-    private def backend = componentProvider().backend
+    private def backend = component.backend
   }
 
   case class Data(transactionDate: LocalDateTime,
@@ -177,17 +174,17 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   private class Backend(val $ : BackendScope[Props, State]) {
 
     val transactionDateRef = dateMappedInput.ref()
-     val consumedDateRef = dateMappedInput.ref()
-     val rawTransactionDateRef = dateMappedInput.delegateRef(transactionDateRef)
-     val rawConsumedDateRef = dateMappedInput.delegateRef(consumedDateRef)
-     val moneyReservoirRef = reservoirInputWithDefault.ref()
-     val beneficiaryAccountRef = accountInputWithDefault.ref()
-     val categoryRef = categoryInputWithDefault.ref()
-     val descriptionRef = stringInputWithDefault.ref()
-     val flowRef = uielements.bootstrap.MoneyInput.ref()
-     val detailDescriptionRef = stringInputWithDefault.ref()
-     val tagsRef = tagsMappedInput.ref()
-     val rawTagsRef = tagsMappedInput.delegateRef(tagsRef)
+    val consumedDateRef = dateMappedInput.ref()
+    val rawTransactionDateRef = dateMappedInput.delegateRef(transactionDateRef)
+    val rawConsumedDateRef = dateMappedInput.delegateRef(consumedDateRef)
+    val moneyReservoirRef = reservoirInputWithDefault.ref()
+    val beneficiaryAccountRef = accountInputWithDefault.ref()
+    val categoryRef = categoryInputWithDefault.ref()
+    val descriptionRef = stringInputWithDefault.ref()
+    val flowRef = uielements.bootstrap.MoneyInput.ref()
+    val detailDescriptionRef = stringInputWithDefault.ref()
+    val tagsRef = tagsMappedInput.ref()
+    val rawTagsRef = tagsMappedInput.delegateRef(tagsRef)
 
     def render(props: Props, state: State) = logExceptions {
       HalfPanel(title = <.span(props.title), closeButtonCallback = props.deleteButtonCallback)(
