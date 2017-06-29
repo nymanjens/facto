@@ -121,7 +121,7 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
     private val wrappedComponent = new ReactTestWrapper(renderedComponent)
 
     def valueProxy: InputBase.Proxy[String] = {
-      testRef(null)
+      testRef()
     }
 
     def showsBoundUntilChange: Boolean = {
