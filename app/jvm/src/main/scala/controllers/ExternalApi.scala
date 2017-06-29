@@ -98,7 +98,7 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
 
   // ********** private helper methods ********** //
   private def validateApplicationSecret(applicationSecret: String) = {
-    val realApplicationSecret: String = playConfiguration.get[String]("play.crypto.secret")
+    val realApplicationSecret: String = playConfiguration.get[String]("play.http.secret.key")
     require(
       applicationSecret == realApplicationSecret,
       s"Invalid application secret. Found '$applicationSecret' but should be '$realApplicationSecret'")
