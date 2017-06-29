@@ -1,6 +1,5 @@
 package flux.react.uielements.bootstrap
 
-import java.util.NoSuchElementException
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import flux.react.ReactVdomUtils.{<<, ^^}
