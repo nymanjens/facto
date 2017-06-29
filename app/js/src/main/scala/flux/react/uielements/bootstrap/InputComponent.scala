@@ -1,7 +1,7 @@
 package flux.react.uielements.bootstrap
 
 import java.util.NoSuchElementException
-
+import flux.react.ReactExceptionUtils.valueOrThrow
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import flux.react.ReactVdomUtils.{<<, ^^}
@@ -176,7 +176,7 @@ private[bootstrap] object InputComponent {
   abstract class Reference[Value, ExtraProps](mutableRef: ThisMutableRef[Value, ExtraProps])
       extends InputBase.Reference[Value] {
     override final def apply(): InputBase.Proxy[Value] =
-      new Proxy[Value, ExtraProps](() => mutableRef.value)
+      new Proxy[Value, ExtraProps](() => valueOrThrow(mutableRef))
   }
 
   // **************** Private inner types ****************//
@@ -231,7 +231,7 @@ private[bootstrap] object InputComponent {
       } catch {
         case _: NoSuchElementException => // Ignore the case this component no longer exists
         case e: Throwable => // TODO: Make this more narrow
-          println("!!!!!!!!!!!!!! Ignoring exception: " + e.getMessage)
+          println(s"!!!!!!!!!!!!!! Ignoring exception: ${e.getMessage} of type ${e.getClass}"); e.printStackTrace()
       }
     }
 

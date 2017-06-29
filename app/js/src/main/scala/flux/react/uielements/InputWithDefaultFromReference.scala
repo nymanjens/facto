@@ -1,5 +1,6 @@
 package flux.react.uielements
 
+import flux.react.ReactExceptionUtils.valueOrThrow
 import japgolly.scalajs.react.component.Scala.MutableRef
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import japgolly.scalajs.react._
@@ -63,10 +64,10 @@ class InputWithDefaultFromReference[Value] private () {
       extends InputBase.Reference[Value] {
     override def apply() = {
       InputBase.Proxy.forwardingTo {
-        val backend = mutableRef.value.backend
-        mutableRef.value.props.defaultValueProxy match {
-          case Some(_) => backend.implRef.value.backend.delegateRef()
-          case None => backend.dummyRef.value.backend.delegateRef()
+        val backend = valueOrThrow(mutableRef).backend
+        valueOrThrow(mutableRef).props.defaultValueProxy match {
+          case Some(_) => valueOrThrow(backend.implRef).backend.delegateRef()
+          case None => valueOrThrow(backend.dummyRef).backend.delegateRef()
         }
       }
     }
@@ -135,7 +136,7 @@ class InputWithDefaultFromReference[Value] private () {
           props.defaultValueProxy.get().deregisterListener(DefaultValueListener)
         } catch {
           case e: Throwable => // TODO: Make this more narrow
-            println("!!!!!!!!!!!!!! Ignoring exception: " + e.getMessage)
+            println(s"!!!!!!!!!!!!!! Ignoring exception: ${e.getMessage} of type ${e.getClass}"); e.printStackTrace()
         }
       }
 

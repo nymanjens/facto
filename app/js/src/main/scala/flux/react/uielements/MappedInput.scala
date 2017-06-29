@@ -1,5 +1,6 @@
 package flux.react.uielements
 
+import flux.react.ReactExceptionUtils.valueOrThrow
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
@@ -11,6 +12,7 @@ import models.accounting.Tag
 
 import scala.collection.mutable
 import scala.reflect.ClassTag
+import scala.scalajs.js
 import scala.collection.immutable.Seq
 
 class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: ClassTag[DelegateValue],
@@ -53,13 +55,13 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
 
   final class Reference private[MappedInput] (private[MappedInput] val mutableRef: ThisMutableRef)
       extends InputBase.Reference[Value] {
-    override def apply(): InputBase.Proxy[Value] = new Proxy(() => mutableRef.value)
+    override def apply(): InputBase.Proxy[Value] = new Proxy(() => valueOrThrow(mutableRef))
   }
 
   final class DelegateReference private[MappedInput] (mutableRef: ThisMutableRef)
       extends InputBase.Reference[DelegateValue] {
     override def apply(): InputBase.Proxy[DelegateValue] = {
-      val component = mutableRef.value
+      val component = valueOrThrow(mutableRef)
       component.backend.delegateRef()
     }
   }

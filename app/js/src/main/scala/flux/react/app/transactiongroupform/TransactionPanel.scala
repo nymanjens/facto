@@ -2,6 +2,7 @@ package flux.react.app.transactiongroupform
 import japgolly.scalajs.react.component.Scala.MutableRef
 import java.util.NoSuchElementException
 
+import flux.react.ReactExceptionUtils.valueOrThrow
 import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.{I18n, LoggingUtils, SinglePendingTaskQueue}
@@ -102,7 +103,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   // **************** Public inner types ****************//
   final class Reference private[TransactionPanel] (
       private[TransactionPanel] val mutableRef: MutableRef[Props, State, Backend, ThisCtorSummoner#CT]) {
-    def apply(): Proxy = new Proxy(() => mutableRef.value)
+    def apply(): Proxy = new Proxy(() => valueOrThrow(mutableRef))
   }
 
   final class Proxy private[TransactionPanel] (private val componentProvider: () => ThisComponentU) {
@@ -140,7 +141,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ))
       } catch {
         case e: Throwable => // TODO: Make this more narrow
-          println("!!!!!!!!!!!!!! Ignoring exception: " + e.getMessage)
+          println(s"!!!!!!!!!!!!!! Ignoring exception: ${e.getMessage} of type ${e.getClass}"); e.printStackTrace()
           None
       }
 
