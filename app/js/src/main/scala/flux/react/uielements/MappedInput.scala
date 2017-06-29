@@ -1,6 +1,5 @@
 package flux.react.uielements
 
-import flux.react.ReactExceptionUtils.valueOrThrow
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
@@ -12,7 +11,6 @@ import models.accounting.Tag
 
 import scala.collection.mutable
 import scala.reflect.ClassTag
-import scala.scalajs.js
 import scala.collection.immutable.Seq
 
 class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: ClassTag[DelegateValue],
@@ -55,14 +53,14 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
 
   final class Reference private[MappedInput] (private[MappedInput] val mutableRef: ThisMutableRef)
       extends InputBase.Reference[Value] {
-    override def apply(): InputBase.Proxy[Value] = new Proxy(() => valueOrThrow(mutableRef))
+    override def apply(): InputBase.Proxy[Value] =
+      InputBase.Proxy.lazyProxy(Option(mutableRef.value), ref => new Proxy(ref))
   }
 
   final class DelegateReference private[MappedInput] (mutableRef: ThisMutableRef)
       extends InputBase.Reference[DelegateValue] {
     override def apply(): InputBase.Proxy[DelegateValue] = {
-      val component = valueOrThrow(mutableRef)
-      component.backend.delegateRef()
+      Option(mutableRef.value).map(_.backend.delegateRef()) getOrElse InputBase.Proxy.nullObject()
     }
   }
 
@@ -72,7 +70,7 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
   private type ThisMutableRef = MutableRef[Props.any, State, Backend, ThisCtorSummoner#CT]
   private type ThisComponentU = MountedImpure[Props.any, State, Backend]
 
-  private final class Proxy(val componentProvider: () => ThisComponentU) extends InputBase.Proxy[Value] {
+  private final class Proxy(private val component: ThisComponentU) extends InputBase.Proxy[Value] {
     override def value = delegateProxy.value flatMap props.valueTransformer.forward
     override def valueOrDefault =
       props.valueTransformer.forward(delegateProxy.valueOrDefault) getOrElse props.defaultValue
@@ -87,9 +85,9 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
       delegateProxy.deregisterListener(Proxy.toDelegateListener(listener, props))
     }
 
-    private def props: Props.any = componentProvider().props
+    private def props: Props.any = component.props
     private def delegateProxy: InputBase.Proxy[DelegateValue] = {
-      componentProvider().backend.delegateRef()
+      component.backend.delegateRef()
     }
   }
 
