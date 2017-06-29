@@ -72,10 +72,10 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
       tester.showsBoundUntilChange ==> true
     }
 
-    // "Input name is given ref name" - {
-    //   val tester = createTestComponent(defaultValueProxy)
-    //   tester.inputName ==> "testRef"
-    // }
+    "Input name is given name" - {
+      val tester = createTestComponent(defaultValueProxy)
+      tester.inputName ==> "dummy-name"
+    }
   }
 
   private def createTestComponent(proxy: InputBase.Proxy[String]): ComponentTester = {
@@ -86,6 +86,7 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
         delegateRefFactory = uielements.bootstrap.TextInput.ref _) { extraProps =>
         uielements.bootstrap.TextInput(
           ref = extraProps.ref,
+          name = "dummy-name",
           label = "label",
           defaultValue = "startvalue",
           showErrorMessage = false,

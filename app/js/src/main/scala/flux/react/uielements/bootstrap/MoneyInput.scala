@@ -64,6 +64,7 @@ object MoneyInput {
 
   // **************** API ****************//
   def apply(ref: Reference,
+            name: String,
             label: String,
             defaultValue: Long,
             required: Boolean = false,
@@ -77,7 +78,7 @@ object MoneyInput {
       i18n: I18n): VdomElement = {
     val props = Props[Value, ExtraProps](
       label = label,
-      name = "TODO: add name parameter to MoneyInput",
+      name = name,
       defaultValue = defaultValue,
       required = required,
       showErrorMessage = showErrorMessage,

@@ -43,6 +43,7 @@ class SelectInput[Value] private (implicit valueTag: ClassTag[Value]) {
 
   // **************** API ****************//
   def apply(ref: Reference,
+            name: String,
             label: String,
             defaultValue: Value = null.asInstanceOf[Value],
             inputClasses: Seq[String] = Seq(),
@@ -53,7 +54,7 @@ class SelectInput[Value] private (implicit valueTag: ClassTag[Value]) {
       implicit i18n: I18n): VdomElement = {
     val props = Props(
       label = label,
-      name = "TODO: add name parameter to SelectInput",
+      name = name,
       defaultValue = Option(defaultValue) getOrElse options.head,
       required = false,
       showErrorMessage = true, // Should never happen

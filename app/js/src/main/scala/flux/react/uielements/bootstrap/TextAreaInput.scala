@@ -32,6 +32,7 @@ object TextAreaInput {
 
   // **************** API ****************//
   def apply(ref: Reference,
+            name: String,
             label: String,
             defaultValue: String = "",
             required: Boolean = false,
@@ -41,7 +42,7 @@ object TextAreaInput {
       implicit i18n: I18n): VdomElement = {
     val props = Props(
       label = label,
-      name = "TODO: add name parameter to TextAreaInput",
+      name = name,
       defaultValue = defaultValue,
       required = required,
       showErrorMessage = showErrorMessage,

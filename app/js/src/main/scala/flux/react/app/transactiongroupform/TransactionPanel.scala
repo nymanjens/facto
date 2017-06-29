@@ -212,6 +212,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ) { extraProps =>
             uielements.bootstrap.TextInput(
               ref = extraProps.ref,
+              name = "transaction-date",
               label = i18n("facto.date-payed"),
               defaultValue = mappedExtraProps.defaultValue,
               showErrorMessage = props.showErrorMessages,
@@ -241,6 +242,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
               ) { extraProps2 =>
                 uielements.bootstrap.TextInput(
                   ref = extraProps2.ref,
+                  name = "date-consumed",
                   label = i18n("facto.date-consumed"),
                   defaultValue = mappedExtraProps.defaultValue,
                   showErrorMessage = props.showErrorMessages,
@@ -257,6 +259,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         ) { extraProps =>
           reservoirSelectInput(
             ref = extraProps.ref,
+            name = "payed-with-to",
             label = i18n("facto.payed-with-to"),
             defaultValue = state.moneyReservoir,
             inputClasses = extraProps.inputClasses,
@@ -275,6 +278,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         ) { extraProps =>
           accountSelectInput(
             ref = extraProps.ref,
+            name = "beneficiary",
             label = i18n("facto.beneficiary"),
             defaultValue = state.beneficiaryAccount,
             inputClasses = extraProps.inputClasses,
@@ -293,6 +297,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         ) { extraProps =>
           categorySelectInput(
             ref = extraProps.ref,
+            name = "category",
             label = i18n("facto.category"),
             defaultValue = props.defaultValues
               .map(_.category) getOrElse state.beneficiaryAccount.categories.head,
@@ -312,6 +317,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         ) { extraProps =>
           uielements.bootstrap.TextInput(
             ref = extraProps.ref,
+            name = "description",
             label = i18n("facto.description"),
             defaultValue = props.defaultValues.map(_.description) getOrElse "",
             required = true,
@@ -322,6 +328,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         },
         uielements.bootstrap.MoneyInput(
           ref = flowRef,
+          name = "flow",
           label = i18n("facto.flow"),
           defaultValue = props.defaultValues.map(_.flowInCents) getOrElse 0,
           required = true,
@@ -342,6 +349,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         ) { extraProps =>
           uielements.bootstrap.TextAreaInput(
             ref = extraProps.ref,
+            name = "more-info",
             label = i18n("facto.more-info"),
             defaultValue = props.defaultValues.map(_.detailDescription) getOrElse "",
             showErrorMessage = props.showErrorMessages,
@@ -364,6 +372,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ) { extraProps =>
             uielements.bootstrap.TextInput(
               ref = extraProps.ref,
+              name = "tags",
               label = i18n("facto.tags"),
               showErrorMessage = props.showErrorMessages,
               defaultValue = mappedExtraProps.defaultValue,

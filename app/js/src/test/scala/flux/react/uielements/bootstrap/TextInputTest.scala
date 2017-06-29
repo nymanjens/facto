@@ -45,6 +45,11 @@ object TextInputTest extends TestSuite {
       tester.valueProxy.setValue("")
       tester.hasError ==> true
     }
+
+    "Input name is given name" - {
+      val tester = createTestComponent()
+      tester.inputName ==> "dummy-name"
+    }
   }
 
   private def createTestComponent(defaultValue: String = "",
@@ -53,6 +58,7 @@ object TextInputTest extends TestSuite {
     new ComponentTester(
       uielements.bootstrap.TextInput(
         ref = testRef,
+        name = "dummy-name",
         label = "label",
         required = required,
         defaultValue = defaultValue,

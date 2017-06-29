@@ -32,6 +32,7 @@ object TextInput {
 
   // **************** API ****************//
   def apply(ref: Reference,
+            name: String,
             label: String,
             defaultValue: String = "",
             required: Boolean = false,
@@ -42,7 +43,7 @@ object TextInput {
       implicit i18n: I18n): VdomElement = {
     val props = Props(
       label = label,
-      name = "TODO: add name parameter to TextInput",
+      name = name,
       defaultValue = defaultValue,
       required = required,
       showErrorMessage = showErrorMessage,
