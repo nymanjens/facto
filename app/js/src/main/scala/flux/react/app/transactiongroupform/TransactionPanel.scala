@@ -102,26 +102,30 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   // **************** Public inner types ****************//
   final class Reference private[TransactionPanel] (
       private[TransactionPanel] val mutableRef: MutableRef[Props, State, Backend, ThisCtorSummoner#CT]) {
-    def apply(): Proxy = new Proxy(Option(mutableRef.value).orNull)
+    def apply(): Proxy = new Proxy(Option(mutableRef.value))
   }
 
-  final class Proxy private[TransactionPanel] (private val component: ThisComponentU) {
-    def rawTransactionDate: InputBase.Proxy[String] = backend.rawTransactionDateRef()
-    def rawConsumedDate: InputBase.Proxy[String] = backend.rawConsumedDateRef()
-    def beneficiaryAccount: InputBase.Proxy[Account] = backend.beneficiaryAccountRef()
-    def moneyReservoir: InputBase.Proxy[MoneyReservoir] = backend.moneyReservoirRef()
-    def category: InputBase.Proxy[Category] = backend.categoryRef()
-    def description: InputBase.Proxy[String] = backend.descriptionRef()
-    def detailDescription: InputBase.Proxy[String] = backend.detailDescriptionRef()
-    def rawTags: InputBase.Proxy[String] = backend.rawTagsRef()
+  final class Proxy private[TransactionPanel] (private val maybeComponent: Option[ThisComponentU]) {
+    def rawTransactionDate: InputBase.Proxy[String] = fromBackendOrNull(_.rawTransactionDateRef())
+    def rawConsumedDate: InputBase.Proxy[String] = fromBackendOrNull(_.rawConsumedDateRef())
+    def beneficiaryAccount: InputBase.Proxy[Account] = fromBackendOrNull(_.beneficiaryAccountRef())
+    def moneyReservoir: InputBase.Proxy[MoneyReservoir] = fromBackendOrNull(_.moneyReservoirRef())
+    def category: InputBase.Proxy[Category] = fromBackendOrNull(_.categoryRef())
+    def description: InputBase.Proxy[String] = fromBackendOrNull(_.descriptionRef())
+    def detailDescription: InputBase.Proxy[String] = fromBackendOrNull(_.detailDescriptionRef())
+    def rawTags: InputBase.Proxy[String] = fromBackendOrNull(_.rawTagsRef())
 
-    def flowValueOrDefault: DatedMoney =
-      DatedMoney(
-        cents = backend.flowRef().valueOrDefault,
-        currency = backend.moneyReservoirRef().valueOrDefault.currency,
-        date = backend.transactionDateRef().valueOrDefault)
+    def flowValueOrDefault: DatedMoney = maybeBackend match {
+      case Some(backend) =>
+        DatedMoney(
+          cents = backend.flowRef().valueOrDefault,
+          currency = backend.moneyReservoirRef().valueOrDefault.currency,
+          date = backend.transactionDateRef().valueOrDefault)
+      case None => DatedMoney(0, Currency.default, clock.now)
 
-    def data: Option[Data] =
+    }
+
+    def data: Option[Data] = maybeBackend flatMap { backend =>
       try {
         Some(
           Data(
@@ -141,8 +145,13 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
       } catch {
         case e: NoSuchElementException => None
       }
+    }
 
-    private def backend = component.backend
+    private def fromBackendOrNull[Value](
+        backendToProxy: Backend => InputBase.Proxy[Value]): InputBase.Proxy[Value] = {
+      maybeBackend map (backendToProxy(_)) getOrElse InputBase.Proxy.nullObject()
+    }
+    private def maybeBackend: Option[Backend] = maybeComponent map (_.backend)
   }
 
   case class Data(transactionDate: LocalDateTime,
