@@ -21,12 +21,12 @@ object Settings {
     "-unchecked", // Enable additional warnings where generated code depends on assumptions
 
     "-Xfatal-warnings", // Make warnings behave like errors
-    "-Xfuture" // Warn of changes to future major Scala version
+    "-Xfuture", // Warn of changes to future major Scala version
     "-Xlint:-unused,_",
 
     "-Yno-adapted-args", // Do not adapt an argument list (either by inserting () or creating a tuple) to match the receiver.
     "-Ywarn-dead-code",
-    "-Ywarn-unused:-imports",
+    "-Ywarn-unused:-imports"
     // "-Ywarn-value-discard" // Warning for value discard bugs (see
                               // http://underscore.io/blog/posts/2016/11/24/value-discard.html)
                               // Disabled because some cases (e.g. Guice modules) actually
