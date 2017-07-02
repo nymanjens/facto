@@ -1,9 +1,12 @@
 package flux.react.uielements
 
+import japgolly.scalajs.react.internal.Box
+import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.time.{LocalDateTime, TimeUtils}
 import flux.react.uielements.MappedInput.ValueTransformer
-import japgolly.scalajs.react.{TopNode, _}
+import japgolly.scalajs.react._
+import japgolly.scalajs.react.vdom._
 import models.accounting.Tag
 
 import scala.collection.mutable
@@ -13,8 +16,9 @@ import scala.collection.immutable.Seq
 class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: ClassTag[DelegateValue],
                                                  valueTag: ClassTag[Value]) {
 
-  private val component = ReactComponentB[Props.any](
-    s"${getClass.getSimpleName}_${delegateValueTag.runtimeClass.getSimpleName}_${valueTag.runtimeClass.getSimpleName}")
+  private val component = ScalaComponent
+    .builder[Props.any](
+      s"${getClass.getSimpleName}_${delegateValueTag.runtimeClass.getSimpleName}_${valueTag.runtimeClass.getSimpleName}")
     .renderBackend[Backend]
     .componentDidMount(scope => scope.backend.didMount(scope.props))
     .componentWillUnmount(scope => scope.backend.willUnmount(scope.props))
@@ -26,45 +30,48 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
       defaultValue: Value,
       valueTransformer: ValueTransformer[DelegateValue, Value],
       listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance,
-      nameToDelegateRef: String => DelegateRef)(
-      delegateInputElementFactory: InputElementExtraProps[DelegateRef] => ReactElement): ReactElement = {
-    component.withRef(ref.name)(
-      Props(
-        delegateRef = nameToDelegateRef(ref.name),
-        valueTransformer,
-        defaultValue,
-        listener,
-        delegateElementFactory = delegateInputElementFactory))
+      delegateRefFactory: () => DelegateRef)(
+      delegateInputElementFactory: InputElementExtraProps[DelegateRef] => VdomElement): VdomElement = {
+    ref.mutableRef
+      .component(
+        Props(
+          delegateRefFactory = delegateRefFactory,
+          valueTransformer,
+          defaultValue,
+          listener,
+          delegateElementFactory = delegateInputElementFactory))
+      .vdomElement
   }
 
-  def ref(name: String): Reference = new Reference(Ref.to(component, name))
-  def delegateRef(ref: Reference): DelegateReference = new DelegateReference(Ref.to(component, ref.name))
+  def ref(): Reference = new Reference(ScalaComponent.mutableRefTo(component))
+  def delegateRef(ref: Reference): DelegateReference = new DelegateReference(ref.mutableRef)
 
   // **************** Public inner types ****************//
   case class InputElementExtraProps[DelegateRef <: InputBase.Reference[DelegateValue]](
       ref: DelegateRef,
       defaultValue: DelegateValue)
 
-  final class Reference private[MappedInput] (refComp: ThisRefComp) extends InputBase.Reference[Value] {
-    override def apply($ : BackendScope[_, _]): InputBase.Proxy[Value] = new Proxy(() => refComp($).get)
-    override def name = refComp.name
+  final class Reference private[MappedInput] (private[MappedInput] val mutableRef: ThisMutableRef)
+      extends InputBase.Reference[Value] {
+    override def apply(): InputBase.Proxy[Value] = {
+      Option(mutableRef.value) map (new Proxy(_)) getOrElse InputBase.Proxy.nullObject()
+    }
   }
 
-  final class DelegateReference private[MappedInput] (refComp: ThisRefComp)
+  final class DelegateReference private[MappedInput] (mutableRef: ThisMutableRef)
       extends InputBase.Reference[DelegateValue] {
-    override def apply($ : BackendScope[_, _]): InputBase.Proxy[DelegateValue] = {
-      val component = refComp($).get
-      component.props.delegateRef(component.backend.$)
+    override def apply(): InputBase.Proxy[DelegateValue] = {
+      Option(mutableRef.value) map (_.backend.delegateRef()) getOrElse InputBase.Proxy.nullObject()
     }
-    override def name = refComp.name
   }
 
   // **************** Private inner types ****************//
   private type State = Unit
-  private type ThisRefComp = RefComp[Props.any, State, Backend, _ <: TopNode]
-  private type ThisComponentU = ReactComponentU[Props.any, State, Backend, _ <: TopNode]
+  private type ThisCtorSummoner = CtorType.Summoner.Aux[Box[Props.any], Children.None, CtorType.Props]
+  private type ThisMutableRef = MutableRef[Props.any, State, Backend, ThisCtorSummoner#CT]
+  private type ThisComponentU = MountedImpure[Props.any, State, Backend]
 
-  private final class Proxy(val componentProvider: () => ThisComponentU) extends InputBase.Proxy[Value] {
+  private final class Proxy(private val component: ThisComponentU) extends InputBase.Proxy[Value] {
     override def value = delegateProxy.value flatMap props.valueTransformer.forward
     override def valueOrDefault =
       props.valueTransformer.forward(delegateProxy.valueOrDefault) getOrElse props.defaultValue
@@ -79,10 +86,9 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
       delegateProxy.deregisterListener(Proxy.toDelegateListener(listener, props))
     }
 
-    private def props: Props.any = componentProvider().props
+    private def props: Props.any = component.props
     private def delegateProxy: InputBase.Proxy[DelegateValue] = {
-      val context = componentProvider().backend.$
-      props.delegateRef(context)
+      component.backend.delegateRef()
     }
   }
 
@@ -112,28 +118,32 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
   }
 
   private case class Props[DelegateRef <: InputBase.Reference[DelegateValue]](
-      delegateRef: DelegateRef,
+      delegateRefFactory: () => DelegateRef,
       valueTransformer: ValueTransformer[DelegateValue, Value],
       defaultValue: Value,
       listener: InputBase.Listener[Value],
-      delegateElementFactory: InputElementExtraProps[DelegateRef] => ReactElement)
+      delegateElementFactory: InputElementExtraProps[DelegateRef] => VdomElement)
   private object Props {
     type any = Props[_ <: InputBase.Reference[DelegateValue]]
   }
 
   private final class Backend(val $ : BackendScope[Props.any, State]) {
+    private[MappedInput] lazy val delegateRef: InputBase.Reference[DelegateValue] =
+      $.props.runNow().delegateRefFactory()
+
     def didMount(props: Props.any): Callback = LogExceptionsCallback {
-      props.delegateRef($).registerListener(Proxy.toDelegateListener(props.listener, props))
+      delegateRef().registerListener(Proxy.toDelegateListener(props.listener, props))
     }
 
     def willUnmount(props: Props.any): Callback = LogExceptionsCallback {
-      props.delegateRef($).deregisterListener(Proxy.toDelegateListener(props.listener, props))
+      delegateRef().deregisterListener(Proxy.toDelegateListener(props.listener, props))
     }
 
     def render(props: Props.any, state: State) = logExceptions {
       def renderInternal[DelegateRef <: InputBase.Reference[DelegateValue]](props: Props[DelegateRef]) = {
         val defaultDelegateValue = props.valueTransformer.backward(props.defaultValue)
-        props.delegateElementFactory(InputElementExtraProps(props.delegateRef, defaultDelegateValue))
+        props.delegateElementFactory(
+          InputElementExtraProps(delegateRef.asInstanceOf[DelegateRef], defaultDelegateValue))
       }
       renderInternal(props)
     }

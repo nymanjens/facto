@@ -2,15 +2,10 @@ package common.testing
 
 import api.ScalaJsApiModule
 import com.google.inject._
-
-import collection.immutable.Seq
-import play.api.test.FakeApplication
-import play.api.test.Helpers._
-import common.time._
 import common._
-import models.accounting.config.{Account, Category, Config, ConfigModule, MoneyReservoir}
-import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
+import common.time._
 import models.ModelsModule
+import models.accounting.config.ConfigModule
 
 final class FactoTestModule extends AbstractModule {
 

@@ -11,7 +11,7 @@
 )(
   content: Html
 )(
-  implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash, env: play.api.Environment
+  implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash, env: play.api.Environment, webJarAssets: controllers.WebJarAssets
 )
 @returnTo = @{returnToOption getOrElse ReturnTo(request.uri)}
 

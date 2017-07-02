@@ -6,7 +6,7 @@ import flux.react.ReactVdomUtils.^^
 import flux.react.uielements.InputBase
 import flux.react.uielements.bootstrap.InputComponent.{InputRenderer, Props}
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.prefix_<^._
+import japgolly.scalajs.react.vdom.html_<^._
 import models.accounting.money.{Currency, DatedMoney, ExchangeRateManager, Money}
 
 import scala.collection.immutable.Seq
@@ -25,7 +25,7 @@ object MoneyInput {
       override def renderInput(classes: Seq[String],
                                name: String,
                                valueString: String,
-                               onChange: ReactEventI => Callback,
+                               onChange: ReactEventFromInput => Callback,
                                extraProps: ExtraProps) = {
         val referenceMoney = {
           val datedMoney = {
@@ -64,6 +64,7 @@ object MoneyInput {
 
   // **************** API ****************//
   def apply(ref: Reference,
+            name: String,
             label: String,
             defaultValue: Long,
             required: Boolean = false,
@@ -74,10 +75,10 @@ object MoneyInput {
             date: LocalDateTime,
             listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance)(
       implicit exchangeRateManager: ExchangeRateManager,
-      i18n: I18n): ReactElement = {
+      i18n: I18n): VdomElement = {
     val props = Props[Value, ExtraProps](
       label = label,
-      name = ref.name,
+      name = name,
       defaultValue = defaultValue,
       required = required,
       showErrorMessage = showErrorMessage,
@@ -86,14 +87,15 @@ object MoneyInput {
       extra = ExtraProps(forceValue = forceValue, currency = currency, date = date),
       valueTransformer = ValueTransformer
     )
-    component.withRef(ref.name)(props)
+    ref.mutableRef.component(props)
   }
 
-  def ref(name: String): Reference = new Reference(Ref.to(component, name))
+  def ref(): Reference = new Reference(ScalaComponent.mutableRefTo(component))
 
   // **************** Public inner types ****************//
-  final class Reference private[MoneyInput] (refComp: InputComponent.ThisRefComp[Value, ExtraProps])
-      extends InputComponent.Reference(refComp)
+  final class Reference private[MoneyInput] (
+      private[MoneyInput] val mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps])
+      extends InputComponent.Reference(mutableRef)
 
   case class ExtraProps(forceValue: Option[Long], currency: Currency, date: LocalDateTime)(
       implicit val exchangeRateManager: ExchangeRateManager)

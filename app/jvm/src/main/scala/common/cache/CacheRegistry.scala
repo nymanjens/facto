@@ -20,10 +20,10 @@ object CacheRegistry {
   private val resetForTestsFunctions: List[() => Unit] = new CopyOnWriteArrayList
 
   /** Registers given functions so that they are called when their respective events are triggered. */
-  def registerCache(doMaintenance: () => Unit = doNothing,
-                    verifyConsistency: () => Unit = doNothing,
-                    invalidateCache: Entity => Unit = doNothing,
-                    resetForTests: () => Unit = doNothing): Unit = {
+  def registerCache(doMaintenance: () => Unit = doNothing _,
+                    verifyConsistency: () => Unit = doNothing _,
+                    invalidateCache: Entity => Unit = doNothing _,
+                    resetForTests: () => Unit = doNothing _): Unit = {
     doMaintenanceFunctions.add(doMaintenance)
     verifyConsistencyFunctions.add(verifyConsistency)
     invalidateCacheFunctions.add(invalidateCache)

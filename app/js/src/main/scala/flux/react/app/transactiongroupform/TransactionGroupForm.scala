@@ -1,8 +1,8 @@
 package flux.react.app.transactiongroupform
 
-import common.{I18n, SinglePendingTaskQueue}
+import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, LogExceptionsFuture, logExceptions}
-import common.time.{Clock, LocalDateTime}
+import common.time.Clock
 import common.time.JavaTimeImplicits._
 import flux.action.{Action, Dispatcher}
 import flux.react.ReactVdomUtils.^^
@@ -10,14 +10,14 @@ import flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRe
 import flux.react.router.Page
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.RouterCtl
-import japgolly.scalajs.react.vdom.prefix_<^._
+import japgolly.scalajs.react.vdom.html_<^._
 import models.accounting.config.Config
-import models.{EntityAccess, User}
-import models.accounting.{Tag, Transaction, TransactionGroup}
 import models.accounting.money.{Currency, ExchangeRateManager, ReferenceMoney}
+import models.accounting.{Tag, Transaction, TransactionGroup}
+import models.{EntityAccess, User}
 
 import scala.collection.immutable.Seq
-import scala.concurrent.Future
+import scala.collection.mutable
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 final class TransactionGroupForm(implicit i18n: I18n,
@@ -34,8 +34,9 @@ final class TransactionGroupForm(implicit i18n: I18n,
                                  totalFlowRestrictionInput: TotalFlowRestrictionInput) {
 
   private val component = {
-    ReactComponentB[Props](getClass.getSimpleName)
-      .initialState_P(props =>
+    ScalaComponent
+      .builder[Props](getClass.getSimpleName)
+      .initialStateFromProps(props =>
         logExceptions {
           val numberOfTransactions = props.operationMeta match {
             case OperationMeta.AddNew => 1
@@ -61,21 +62,18 @@ final class TransactionGroupForm(implicit i18n: I18n,
   }
 
   // **************** API ****************//
-  def forCreate(router: RouterCtl[Page]): ReactElement = {
+  def forCreate(router: RouterCtl[Page]): VdomElement = {
     create(Props(OperationMeta.AddNew, router))
   }
 
-  def forEdit(transactionGroupId: Long, router: RouterCtl[Page]): ReactElement = {
+  def forEdit(transactionGroupId: Long, router: RouterCtl[Page]): VdomElement = {
     create(Props(OperationMeta.Edit(transactionGroupManager.findById(transactionGroupId)), router))
   }
 
   // **************** Private helper methods ****************//
-  private def create(props: Props): ReactElement = {
+  private def create(props: Props): VdomElement = {
     component.withKey(props.operationMeta.toString).apply(props)
   }
-
-  private def panelRef(panelIndex: Int): transactionPanel.Reference =
-    transactionPanel.ref(s"panel_$panelIndex")
 
   // **************** Private inner types ****************//
   private sealed trait OperationMeta
@@ -105,6 +103,9 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
   private final class Backend(val $ : BackendScope[Props, State]) {
 
+    private val _panelRefs: mutable.Buffer[transactionPanel.Reference] =
+      mutable.Buffer(transactionPanel.ref())
+
     def render(props: Props, state: State) = logExceptions {
       <.div(
         ^.className := "transaction-group-form",
@@ -119,12 +120,14 @@ final class TransactionGroupForm(implicit i18n: I18n,
                 case OperationMeta.AddNew => i18n("facto.new-transaction")
                 case OperationMeta.Edit(_) => i18n("facto.edit-transaction")
               },
-              props.operationMeta.isInstanceOf[OperationMeta.Edit] ?= <.a(
-                ^.className := "btn btn-default delete-button",
-                <.i(^.className := "fa fa-times"),
-                i18n("facto.delete"),
-                ^.onClick --> onDelete
-              ),
+              ^^.ifThen(props.operationMeta.isInstanceOf[OperationMeta.Edit]) {
+                <.a(
+                  ^.className := "btn btn-default delete-button",
+                  <.i(^.className := "fa fa-times"),
+                  i18n("facto.delete"),
+                  ^.onClick --> onDelete
+                )
+              },
               <.span(
                 ^.className := "total-transaction-flow-box",
                 totalFlowInput(
@@ -155,7 +158,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
             ^.className := "row",
             <.div(
               ^.className := "transaction-group-form",
-              for ((panelIndex, i) <- state.panelIndices.zipWithIndex) yield {
+              (for ((panelIndex, i) <- state.panelIndices.zipWithIndex) yield {
                 val firstPanel = panelIndex == state.panelIndices.head
                 val lastPanel = panelIndex == state.panelIndices.last
                 val transaction = props.operationMeta match {
@@ -175,12 +178,12 @@ final class TransactionGroupForm(implicit i18n: I18n,
                   },
                   showErrorMessages = state.showErrorMessages,
                   defaultPanel =
-                    if (firstPanel) None else Some(panelRef(panelIndex = state.panelIndices.head)($)),
+                    if (firstPanel) None else Some(panelRef(panelIndex = state.panelIndices.head)()),
                   focusOnMount = firstPanel,
                   closeButtonCallback = if (firstPanel) None else Some(removeTransactionPanel(panelIndex)),
-                  onFormChange = this.onFormChange
+                  onFormChange = this.onFormChange _
                 )
-              },
+              }).toVdomArray,
               addTransactionPanel(onClick = addTransactionPanelCallback)
             ),
             <.div(
@@ -198,6 +201,13 @@ final class TransactionGroupForm(implicit i18n: I18n,
           )
         )
       )
+    }
+
+    private def panelRef(panelIndex: Int): transactionPanel.Reference = {
+      while (panelIndex >= _panelRefs.size) {
+        _panelRefs += transactionPanel.ref()
+      }
+      _panelRefs(panelIndex)
     }
 
     private val addTransactionPanelCallback: Callback = LogExceptionsCallback {
@@ -228,11 +238,11 @@ final class TransactionGroupForm(implicit i18n: I18n,
       $.modState(state =>
         logExceptions {
           val flows = for (panelIndex <- state.panelIndices) yield {
-            val datedMoney = panelRef(panelIndex)($).flowValueOrDefault
+            val datedMoney = panelRef(panelIndex).apply().flowValueOrDefault
             datedMoney.exchangedForReferenceCurrency
           }
           val currencies = for (panelIndex <- state.panelIndices) yield {
-            panelRef(panelIndex)($).moneyReservoir.valueOrDefault.currency
+            panelRef(panelIndex).apply().moneyReservoir.valueOrDefault.currency
           }
 
           var newState = state.copy(
@@ -245,7 +255,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
       }).runNow()
     }
 
-    private def onSubmit(e: ReactEventI): Callback = LogExceptionsCallback {
+    private def onSubmit(e: ReactEventFromInput): Callback = LogExceptionsCallback {
       def getErrorMessage(datas: Seq[transactionPanel.Data], state: State): Option[String] = {
         def invalidMoneyReservoirsError: Option[String] = {
           val containsEmptyReservoirCodes = datas.exists(_.moneyReservoir.isNullReservoir)
@@ -327,7 +337,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
         logExceptions {
           var newState = state.copy(showErrorMessages = true)
 
-          val maybeDatas = for (panelIndex <- state.panelIndices) yield panelRef(panelIndex)($).data
+          val maybeDatas = for (panelIndex <- state.panelIndices) yield panelRef(panelIndex).apply().data
           if (maybeDatas forall (_.isDefined)) {
             val datas = maybeDatas map (_.get)
 

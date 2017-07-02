@@ -4,7 +4,7 @@ import com.google.inject.{Inject, Singleton}
 import java.util.{NavigableMap, TreeMap}
 
 import common.cache.CacheRegistry
-import org.apache.http.annotation.GuardedBy
+import net.jcip.annotations.GuardedBy
 import common.time.LocalDateTime
 
 import scala.collection.mutable
@@ -12,7 +12,7 @@ import scala.collection.mutable
 final class JvmExchangeRateManager @Inject()(
     implicit exchangeRateMeasurementManager: SlickExchangeRateMeasurementManager)
     extends ExchangeRateManager {
-  CacheRegistry.registerCache(verifyConsistency = verifyConsistency, resetForTests = resetForTests)
+  CacheRegistry.registerCache(verifyConsistency = verifyConsistency _, resetForTests = resetForTests _)
   exchangeRateMeasurementManager.addListener(measurementWasAdded)
 
   @GuardedBy("lock")

@@ -3,7 +3,7 @@ package models.manager
 import scala.collection.mutable
 
 import slick.lifted.{AbstractTable, TableQuery}
-import org.apache.http.annotation.GuardedBy
+import net.jcip.annotations.GuardedBy
 
 import common.cache.CacheRegistry
 import controllers.helpers.ControllerHelperCache

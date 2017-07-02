@@ -24,7 +24,7 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
     processFlags()
 
     // Set up database if necessary
-    if (Set(Mode.Test, Mode.Dev) contains app.mode) {
+    if (app.mode == Mode.Test || app.mode == Mode.Dev) {
       if (AppConfigHelper.dropAndCreateNewDb) {
         generalImportTool.dropAndCreateNewDb()
       }
@@ -36,7 +36,7 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
     }
 
     // Populate the database with dummy data
-    if (Set(Mode.Test, Mode.Dev) contains app.mode) {
+    if (app.mode == Mode.Test || app.mode == Mode.Dev) {
       if (AppConfigHelper.loadDummyUsers) {
         loadDummyUsers()
       }
@@ -112,13 +112,13 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
     def defaultPassword: Option[String] = getString("facto.setup.defaultPassword")
 
     private def getBoolean(cfgPath: String): Boolean =
-      app.configuration.getBoolean(cfgPath) getOrElse false
+      app.configuration.getOptional[Boolean](cfgPath) getOrElse false
 
     private def getString(cfgPath: String): Option[String] =
-      app.configuration.getString(cfgPath)
+      app.configuration.getOptional[String](cfgPath)
 
     private def getExistingPath(cfgPath: String): Path = assertExists {
-      Paths.get(app.configuration.getString(cfgPath).get)
+      Paths.get(app.configuration.get[String](cfgPath))
     }
   }
 }

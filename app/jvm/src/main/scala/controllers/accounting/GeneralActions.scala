@@ -12,14 +12,17 @@ import models.accounting.UpdateLog
 import models.accounting.config.{Config, Template}
 import controllers.helpers.AuthenticatedAction
 
-final class GeneralActions @Inject()(implicit val messagesApi: MessagesApi,
+final class GeneralActions @Inject()(implicit override val messagesApi: MessagesApi,
+                                     components: ControllerComponents,
                                      clock: Clock,
                                      accountingConfig: Config,
                                      entityAccess: SlickEntityAccess,
+                                     playConfiguration: play.api.Configuration,
                                      generalEntries: GeneralEntries,
                                      i18n: I18n,
-                                     env: play.api.Environment)
-    extends Controller
+                                     env: play.api.Environment,
+                                     webJarAssets: controllers.WebJarAssets)
+    extends AbstractController(components)
     with I18nSupport {
 
   // ********** actions ********** //

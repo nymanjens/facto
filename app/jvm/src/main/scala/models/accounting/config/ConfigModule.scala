@@ -24,7 +24,7 @@ final class ConfigModule extends AbstractModule {
   private[config] def config(playConfiguration: play.api.Configuration): Config = {
     try {
       // get configLocation
-      val configLocation = playConfiguration.getString("facto.accounting.configYamlFilePath").get
+      val configLocation = playConfiguration.get[String]("facto.accounting.configYamlFilePath")
 
       // get data
       val stringData = {

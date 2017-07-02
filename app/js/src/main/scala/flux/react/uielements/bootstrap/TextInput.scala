@@ -1,27 +1,15 @@
 package flux.react.uielements.bootstrap
 
-import java.time.LocalDate
-import java.util.NoSuchElementException
-
-import flux.react.uielements.bootstrap.InputComponent.{InputRenderer, Props, ValueTransformer}
+import common.I18n
+import flux.react.ReactVdomUtils.^^
 import flux.react.uielements.InputBase
-import common.{I18n, LoggingUtils}
-import common.time.TimeUtils
+import flux.react.uielements.bootstrap.InputComponent.{InputRenderer, Props, ValueTransformer}
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.prefix_<^._
-import flux.react.ReactVdomUtils.{<<, ^^}
-import japgolly.scalajs.react.ReactComponentC.ReqProps
-import org.scalajs.dom.raw.{HTMLElement, HTMLInputElement}
-import japgolly.scalajs.react.TopNode
-import org.scalajs.dom.html
+import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
-import scala.reflect.ClassTag
-import scala.util.Try
 
 object TextInput {
-
-  private val inputRef: RefSimple[HTMLElement] = Ref[HTMLElement]("inputRef")
 
   private val component = InputComponent.create[Value, ExtraProps](
     name = getClass.getSimpleName,
@@ -29,7 +17,7 @@ object TextInput {
       override def renderInput(classes: Seq[String],
                                name: String,
                                valueString: String,
-                               onChange: ReactEventI => Callback,
+                               onChange: ReactEventFromInput => Callback,
                                extraProps: ExtraProps) = {
         <.input(
           ^.tpe := "text",
@@ -37,7 +25,7 @@ object TextInput {
           ^.name := name,
           ^.value := valueString,
           ^.onChange ==> onChange,
-          ^.ref := inputRef
+          ^.autoFocus := extraProps.focusOnMount
         )
       }
     }
@@ -45,6 +33,7 @@ object TextInput {
 
   // **************** API ****************//
   def apply(ref: Reference,
+            name: String,
             label: String,
             defaultValue: String = "",
             required: Boolean = false,
@@ -52,28 +41,30 @@ object TextInput {
             inputClasses: Seq[String] = Seq(),
             focusOnMount: Boolean = false,
             listener: InputBase.Listener[String] = InputBase.Listener.nullInstance)(
-      implicit i18n: I18n): ReactElement = {
+      implicit i18n: I18n): VdomElement = {
     val props = Props(
       label = label,
-      name = ref.name,
+      name = name,
       defaultValue = defaultValue,
       required = required,
       showErrorMessage = showErrorMessage,
       inputClasses = inputClasses,
-      focusOnMount = if (focusOnMount) Some(inputRef) else None,
       listener = listener,
-      valueTransformer = ValueTransformer.nullInstance
+      valueTransformer = ValueTransformer.nullInstance,
+      extra = ExtraProps(focusOnMount = focusOnMount)
     )
-    component.withRef(ref.name)(props)
+    ref.mutableRef.component(props)
   }
 
-  def ref(name: String): Reference = new Reference(Ref.to(component, name))
+  def ref(): Reference = new Reference(ScalaComponent.mutableRefTo(component))
 
   // **************** Public inner types ****************//
-  final class Reference private[TextInput] (refComp: InputComponent.ThisRefComp[Value, ExtraProps])
-      extends InputComponent.Reference(refComp)
+  final class Reference private[TextInput] (
+      private[TextInput] val mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps])
+      extends InputComponent.Reference(mutableRef)
+
+  case class ExtraProps private[TextInput] (private[TextInput] focusOnMount: Boolean)
 
   // **************** Private inner types ****************//
-  private type ExtraProps = Unit
   private type Value = String
 }

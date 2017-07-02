@@ -3,13 +3,15 @@ package flux.react.app.transactiongroupform
 import common.I18n
 import common.LoggingUtils.logExceptions
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.prefix_<^._
+import japgolly.scalajs.react.vdom._
+import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
 
 private[transactiongroupform] final class AddTransactionPanel(implicit i18n: I18n) {
 
-  private val component = ReactComponentB[Props](getClass.getSimpleName)
+  private val component = ScalaComponent
+    .builder[Props](getClass.getSimpleName)
     .renderP((_, props) =>
       logExceptions {
         HalfPanel(
@@ -37,7 +39,7 @@ private[transactiongroupform] final class AddTransactionPanel(implicit i18n: I18
     .build
 
   // **************** API ****************//
-  def apply(onClick: Callback): ReactElement = {
+  def apply(onClick: Callback): VdomElement = {
     component(Props(onClick))
   }
 

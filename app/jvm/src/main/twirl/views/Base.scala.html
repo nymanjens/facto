@@ -4,7 +4,7 @@
 )(
   content: Html
 )(
-  implicit env: play.api.Environment
+  implicit env: play.api.Environment, webJarAssets: controllers.WebJarAssets
 )
 
 <!DOCTYPE html>
@@ -26,13 +26,13 @@
     <link href="@routes.Assets.versioned("lib/bootstrap/css/bootstrap.min.css")" rel="stylesheet">
 
     @* Bootstrap Tags Input *@
-    <link href="@routes.WebJarAssets.at(WebJarAssets.locate("dist/bootstrap-tagsinput.css"))" rel="stylesheet">
-    <link href="@routes.WebJarAssets.at(WebJarAssets.locate("dist/bootstrap-tagsinput-typeahead.css"))" rel="stylesheet">
+    <link href="@routes.WebJarAssets.at(webJarAssets.locate("dist/bootstrap-tagsinput.css"))" rel="stylesheet">
+    <link href="@routes.WebJarAssets.at(webJarAssets.locate("dist/bootstrap-tagsinput-typeahead.css"))" rel="stylesheet">
     @* Bootstrap Tags Input *@
-    <link href="@routes.WebJarAssets.at(WebJarAssets.locate("dist/ladda-themeless.min.css"))" rel="stylesheet">
+    <link href="@routes.WebJarAssets.at(webJarAssets.locate("dist/ladda-themeless.min.css"))" rel="stylesheet">
 
     @* Custom Fonts *@
-    <link href="@routes.WebJarAssets.at(WebJarAssets.locate("font-awesome.min.css"))" rel="stylesheet">
+    <link href="@routes.WebJarAssets.at(webJarAssets.locate("font-awesome.min.css"))" rel="stylesheet">
     <link href="@routes.Assets.versioned("lib/fontello/css/fontello.css")" rel="stylesheet">
 
     @* HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries *@
@@ -55,9 +55,10 @@
 
     @* ************ JAVASCRIPT ************ *@
     @* Bundled JavaScript deps and the compiled scala.js code *@
-    @playscalajs.html.jsdeps(
+    @scalajs.html.jsdeps(
         projectName = "client",
-        assets = path => routes.Assets.versioned(path).toString)
+        assets = path => routes.Assets.versioned(path).toString,
+        resourceExists = name => getClass.getResource(s"/public/$name") != null)
 
     @* startbootstrap-sb-admin-2 JavaScript *@
     <script src="@routes.Assets.versioned("bower_components/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js")"></script>

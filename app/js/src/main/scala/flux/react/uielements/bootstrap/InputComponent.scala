@@ -1,15 +1,13 @@
 package flux.react.uielements.bootstrap
 
-import java.util.NoSuchElementException
-
+import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
-import flux.react.uielements.InputBase
-import common.{I18n, LoggingUtils}
-import japgolly.scalajs.react.{ReactEventI, TopNode, _}
-import japgolly.scalajs.react.vdom.prefix_<^._
 import flux.react.ReactVdomUtils.{<<, ^^}
-import japgolly.scalajs.react.ReactComponentC.ReqProps
-import org.scalajs.dom.raw.{HTMLElement, HTMLInputElement}
+import flux.react.uielements.InputBase
+import japgolly.scalajs.react._
+import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
+import japgolly.scalajs.react.internal.Box
+import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
 import scala.util.{Failure, Success, Try}
@@ -21,8 +19,9 @@ private[bootstrap] object InputComponent {
                                 valueChangeForPropsChange: (Props[Value, ExtraProps], Value) => Value =
                                   (_: Props[Value, ExtraProps], oldValue: Value) => oldValue,
                                 inputRenderer: InputRenderer[ExtraProps]) = {
-    ReactComponentB[Props[Value, ExtraProps]](name)
-      .initialState_P[State[Value]](props =>
+    ScalaComponent
+      .builder[Props[Value, ExtraProps]](name)
+      .initialStateFromProps[State[Value]](props =>
         logExceptions {
           // Calling valueChangeForPropsChange() to make sure there is no discrepancy between init and update.
           val value = valueChangeForPropsChange(props, props.defaultValue)
@@ -30,7 +29,7 @@ private[bootstrap] object InputComponent {
       })
       .renderPS((context, props, state) =>
         logExceptions {
-          def onChange(e: ReactEventI): Callback = LogExceptionsCallback {
+          def onChange(e: ReactEventFromInput): Callback = LogExceptionsCallback {
             val newString = e.target.value
             val newValue = ValueTransformer.stringToValueOrDefault(newString, props)
             val oldValue = ValueTransformer.stringToValueOrDefault(state.valueString, props)
@@ -64,25 +63,19 @@ private[bootstrap] object InputComponent {
         LogExceptionsCallback {
           // If the props have changed, the transformed value may have changed. If this happens, the listeners should
           // be notified.
-          val valueString = scope.currentState.valueString
+          val valueString = scope.state.valueString
           val currentValue = ValueTransformer.stringToValueOrDefault(valueString, scope.currentProps)
           val newValue = {
             val transformedValue = ValueTransformer.stringToValueOrDefault(valueString, scope.nextProps)
             valueChangeForPropsChange(scope.nextProps, transformedValue)
           }
           if (currentValue != newValue) {
-            scope.$.modState(_.withValueString(ValueTransformer.valueToString(newValue, scope.nextProps)))
+            scope
+              .modState(_.withValueString(ValueTransformer.valueToString(newValue, scope.nextProps)))
               .runNow()
-            for (listener <- scope.currentState.listeners) {
+            for (listener <- scope.state.listeners) {
               listener.onChange(newValue, directUserChange = false).runNow()
             }
-          }
-      })
-      .componentDidMount(scope =>
-        LogExceptionsCallback {
-          scope.props.focusOnMount match {
-            case Some(inputRef) => inputRef(scope).get.focus()
-            case None =>
           }
       })
       .build
@@ -104,15 +97,17 @@ private[bootstrap] object InputComponent {
   }
 
   // **************** Public inner types ****************//
-  type ThisRefComp[Value, ExtraProps] =
-    RefComp[Props[Value, ExtraProps], State[Value], Backend, _ <: TopNode]
+  private type ThisCtorSummoner[Value, ExtraProps] =
+    CtorType.Summoner.Aux[Box[Props[Value, ExtraProps]], Children.None, CtorType.Props]
+  type ThisMutableRef[Value, ExtraProps] =
+    MutableRef[Props[Value, ExtraProps], State[Value], Backend, ThisCtorSummoner[Value, ExtraProps]#CT]
 
   trait InputRenderer[ExtraProps] {
     def renderInput(classes: Seq[String],
                     name: String,
                     valueString: String,
-                    onChange: ReactEventI => Callback,
-                    extraProps: ExtraProps): ReactNode
+                    onChange: ReactEventFromInput => Callback,
+                    extraProps: ExtraProps): VdomNode
   }
 
   trait ValueTransformer[Value, -ExtraProps] {
@@ -163,7 +158,6 @@ private[bootstrap] object InputComponent {
       required: Boolean,
       showErrorMessage: Boolean,
       inputClasses: Seq[String],
-      focusOnMount: Option[RefSimple[HTMLElement]] = None,
       listener: InputBase.Listener[Value],
       extra: ExtraProps = (): Unit,
       valueTransformer: ValueTransformer[Value, ExtraProps])(implicit val i18n: I18n)
@@ -176,34 +170,33 @@ private[bootstrap] object InputComponent {
       copy(listeners = listeners.filter(_ != listener))
   }
 
-  abstract class Reference[Value, ExtraProps](refComp: ThisRefComp[Value, ExtraProps])
+  abstract class Reference[Value, ExtraProps](mutableRef: ThisMutableRef[Value, ExtraProps])
       extends InputBase.Reference[Value] {
-    override final def apply($ : BackendScope[_, _]): InputBase.Proxy[Value] =
-      new Proxy[Value, ExtraProps](() => refComp($).get)
-    override final def name = refComp.name
+    override final def apply(): InputBase.Proxy[Value] = {
+      Option(mutableRef.value) map (new Proxy(_)) getOrElse InputBase.Proxy.nullObject()
+    }
   }
 
   // **************** Private inner types ****************//
   private type Backend = Unit
   private type ThisComponentU[Value, ExtraProps] =
-    ReactComponentU[Props[Value, ExtraProps], State[Value], Backend, _ <: TopNode]
+    MountedImpure[Props[Value, ExtraProps], State[Value], Backend]
 
-  private final class Proxy[Value, ExtraProps](
-      val componentProvider: () => ThisComponentU[Value, ExtraProps])
+  private final class Proxy[Value, ExtraProps](val component: ThisComponentU[Value, ExtraProps])
       extends InputBase.Proxy[Value] {
     override def value = {
-      ValueTransformer.stringToValue(componentProvider().state.valueString, props) match {
+      ValueTransformer.stringToValue(component.state.valueString, props) match {
         case Some(value) if props.required && value == props.valueTransformer.emptyValue => None
         case other => other
       }
     }
     override def valueOrDefault =
-      ValueTransformer.stringToValueOrDefault(componentProvider().state.valueString, props)
+      ValueTransformer.stringToValueOrDefault(component.state.valueString, props)
     override def setValue(newValue: Value) = {
       def setValueInternal(newValue: Value): Value = {
         val stringValue = ValueTransformer.valueToString(newValue, props)
-        componentProvider().modState(_.withValueString(stringValue))
-        for (listener <- componentProvider().state.listeners) {
+        component.modState(_.withValueString(stringValue))
+        for (listener <- component.state.listeners) {
           listener.onChange(newValue, directUserChange = false).runNow()
         }
         newValue
@@ -228,15 +221,11 @@ private[bootstrap] object InputComponent {
       }
     }
     override def registerListener(listener: InputBase.Listener[Value]) =
-      componentProvider().modState(_.withListener(listener))
+      component.modState(_.withListener(listener))
     override def deregisterListener(listener: InputBase.Listener[Value]) = {
-      try {
-        componentProvider().modState(_.withoutListener(listener))
-      } catch {
-        case _: NoSuchElementException => // Ignore the case this component no longer exists
-      }
+      component.modState(_.withoutListener(listener))
     }
 
-    private def props: Props[Value, ExtraProps] = componentProvider().props
+    private def props: Props[Value, ExtraProps] = component.props
   }
 }

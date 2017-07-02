@@ -1,20 +1,17 @@
 package flux.react.uielements.bootstrap
 
-import common.LoggingUtils.logExceptions
-import common.testing.{ReactTestWrapper, TestComponentWithBackendScope, TestModule}
+import common.testing.{ReactTestWrapper, TestModule}
 import flux.react.uielements
 import flux.react.uielements.InputBase
-import flux.react.uielements.InputBase.Listener
-import japgolly.scalajs.react.{ReactElement, _}
 import japgolly.scalajs.react.test.ReactTestUtils
+import japgolly.scalajs.react.vdom._
 import utest._
 
-import scala.collection.mutable
 import scala2js.Converters._
 
 object TextInputTest extends TestSuite {
   implicit private val fake18n = new TestModule().fakeI18n
-  private val testRef = TextInput.ref("testRef")
+  private val testRef = TextInput.ref()
 
   override def tests = TestSuite {
     "Starts with default value" - {
@@ -24,7 +21,8 @@ object TextInputTest extends TestSuite {
     }
 
     "Does not show error message if valid value" - {
-      val tester = createTestComponent(defaultValue = "valid value", required = true, showErrorMessage = true)
+      val tester =
+        createTestComponent(defaultValue = "valid value", required = true, showErrorMessage = true)
 
       tester.hasError ==> false
     }
@@ -42,33 +40,40 @@ object TextInputTest extends TestSuite {
     }
 
     "Shows error message after value change" - {
-      val tester = createTestComponent(defaultValue = "valid value", required = true, showErrorMessage = true)
+      val tester =
+        createTestComponent(defaultValue = "valid value", required = true, showErrorMessage = true)
       tester.valueProxy.setValue("")
       tester.hasError ==> true
+    }
+
+    "Input name is given name" - {
+      val tester = createTestComponent()
+      tester.inputName ==> "dummy-name"
     }
   }
 
   private def createTestComponent(defaultValue: String = "",
-                              required: Boolean = false,
-                              showErrorMessage: Boolean = false): ComponentTester = {
-    new ComponentTester(TestComponentWithBackendScope {
+                                  required: Boolean = false,
+                                  showErrorMessage: Boolean = false): ComponentTester = {
+    new ComponentTester(
       uielements.bootstrap.TextInput(
         ref = testRef,
+        name = "dummy-name",
         label = "label",
         required = required,
         defaultValue = defaultValue,
         showErrorMessage = showErrorMessage,
         focusOnMount = true
       )
-    })
+    )
   }
 
-  private final class ComponentTester(unrenderedComponent: TestComponentWithBackendScope.ComponentU) {
+  private final class ComponentTester(unrenderedComponent: VdomElement) {
     private val renderedComponent = ReactTestUtils.renderIntoDocument(unrenderedComponent)
     private val wrappedComponent = new ReactTestWrapper(renderedComponent)
 
     def valueProxy: InputBase.Proxy[String] = {
-      testRef(renderedComponent.backend.$)
+      testRef()
     }
 
     def inputName: String = {

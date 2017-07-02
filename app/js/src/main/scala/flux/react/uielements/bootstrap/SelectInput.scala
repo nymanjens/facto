@@ -7,7 +7,7 @@ import flux.react.ReactVdomUtils.^^
 import flux.react.uielements.InputBase
 import flux.react.uielements.bootstrap.InputComponent.{InputRenderer, Props}
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.prefix_<^._
+import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
@@ -21,20 +21,21 @@ class SelectInput[Value] private (implicit valueTag: ClassTag[Value]) {
       override def renderInput(classes: Seq[String],
                                name: String,
                                valueString: String,
-                               onChange: ReactEventI => Callback,
+                               onChange: ReactEventFromInput => Callback,
                                extraProps: ExtraProps) = {
         <.select(
           ^^.classes(classes),
           ^.name := name,
           ^.value := valueString,
-          ^.onChange ==> onChange,
-          for ((optionId, option) <- extraProps.idToOptionMap) yield {
-            <.option(
-              ^.value := optionId,
-              ^.key := optionId,
-              option.name
-            )
-          }
+          ^.onChange ==> onChange, {
+            for ((optionId, option) <- extraProps.idToOptionMap) yield {
+              <.option(
+                ^.value := optionId,
+                ^.key := optionId,
+                option.name
+              )
+            }
+          }.toVdomArray
         )
       }
     }
@@ -42,6 +43,7 @@ class SelectInput[Value] private (implicit valueTag: ClassTag[Value]) {
 
   // **************** API ****************//
   def apply(ref: Reference,
+            name: String,
             label: String,
             defaultValue: Value = null.asInstanceOf[Value],
             inputClasses: Seq[String] = Seq(),
@@ -49,10 +51,10 @@ class SelectInput[Value] private (implicit valueTag: ClassTag[Value]) {
             valueToId: Value => String,
             valueToName: Value => String,
             listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance)(
-      implicit i18n: I18n): ReactElement = {
+      implicit i18n: I18n): VdomElement = {
     val props = Props(
       label = label,
-      name = ref.name,
+      name = name,
       defaultValue = Option(defaultValue) getOrElse options.head,
       required = false,
       showErrorMessage = true, // Should never happen
@@ -61,14 +63,15 @@ class SelectInput[Value] private (implicit valueTag: ClassTag[Value]) {
       extra = ExtraProps.create(options, valueToId = valueToId, valueToName = valueToName),
       valueTransformer = ValueTransformer
     )
-    component.withRef(ref.name)(props)
+    ref.mutableRef.component(props)
   }
 
-  def ref(name: String): Reference = new Reference(Ref.to(component, name))
+  def ref(): Reference = new Reference(ScalaComponent.mutableRefTo(component))
 
   // **************** Public inner types ****************//
-  final class Reference private[SelectInput] (refComp: InputComponent.ThisRefComp[Value, ExtraProps])
-      extends InputComponent.Reference[Value, ExtraProps](refComp)
+  final class Reference private[SelectInput] (
+      private[SelectInput] val mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps])
+      extends InputComponent.Reference[Value, ExtraProps](mutableRef)
 
   case class ExtraProps private (idToOptionMap: Map[String, ExtraProps.ValueAndName])
   object ExtraProps {

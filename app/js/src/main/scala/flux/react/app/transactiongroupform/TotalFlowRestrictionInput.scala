@@ -5,14 +5,16 @@ import common.LoggingUtils.{logExceptions, LogExceptionsCallback}
 import flux.react.ReactVdomUtils.^^
 import flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.prefix_<^._
+import japgolly.scalajs.react.vdom._
+import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
 
 private[transactiongroupform] final class TotalFlowRestrictionInput(implicit i18n: I18n) {
 
-  private val component = ReactComponentB[Props](getClass.getSimpleName)
-    .initialState_P[State](props => props.defaultValue)
+  private val component = ScalaComponent
+    .builder[Props](getClass.getSimpleName)
+    .initialStateFromProps[State](props => props.defaultValue)
     .renderPS(($, props, state) =>
       logExceptions {
         def button(totalFlowRestriction: TotalFlowRestriction, label: String) = {
@@ -28,7 +30,7 @@ private[transactiongroupform] final class TotalFlowRestrictionInput(implicit i18
         }
         <.div(
           ^.className := "btn-group",
-          ReactAttr("data-toggle") := "buttons",
+          VdomAttr("data-toggle") := "buttons",
           button(TotalFlowRestriction.AnyTotal, i18n("facto.any-total")),
           button(TotalFlowRestriction.ChooseTotal, i18n("facto.choose-total")),
           button(TotalFlowRestriction.ZeroSum, i18n("facto.zero-sum"))
@@ -37,7 +39,7 @@ private[transactiongroupform] final class TotalFlowRestrictionInput(implicit i18
     .build
 
   // **************** API ****************//
-  def apply(defaultValue: TotalFlowRestriction, onChange: TotalFlowRestriction => Unit): ReactElement = {
+  def apply(defaultValue: TotalFlowRestriction, onChange: TotalFlowRestriction => Unit): VdomElement = {
     component(Props(defaultValue, onChange))
   }
 

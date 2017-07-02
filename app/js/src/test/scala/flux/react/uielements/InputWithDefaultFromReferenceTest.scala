@@ -1,9 +1,10 @@
 package flux.react.uielements
 
-import common.testing.{ReactTestWrapper, TestComponentWithBackendScope, TestModule}
+import common.testing.{ReactTestWrapper, TestModule}
 import flux.react.uielements
 import flux.react.uielements.InputBase.Listener
 import japgolly.scalajs.react.test.ReactTestUtils
+import japgolly.scalajs.react.vdom.VdomElement
 import utest._
 
 import scala.collection.mutable
@@ -12,7 +13,7 @@ import scala2js.Converters._
 object InputWithDefaultFromReferenceTest extends TestSuite {
   implicit private val fake18n = new TestModule().fakeI18n
   private val stringInputWithDefault = InputWithDefaultFromReference.forType[String]
-  private val testRef = stringInputWithDefault.ref("testRef")
+  private val testRef = stringInputWithDefault.ref()
 
   override def tests = TestSuite {
     val defaultValueProxy: InputBase.Proxy[String] = new FakeProxy()
@@ -71,27 +72,28 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
       tester.showsBoundUntilChange ==> true
     }
 
-    "Input name is given ref name" - {
+    "Input name is given name" - {
       val tester = createTestComponent(defaultValueProxy)
-      tester.inputName ==> "testRef"
+      tester.inputName ==> "dummy-name"
     }
   }
 
   private def createTestComponent(proxy: InputBase.Proxy[String]): ComponentTester = {
-    new ComponentTester(TestComponentWithBackendScope {
+    new ComponentTester(
       stringInputWithDefault(
         ref = testRef,
         defaultValueProxy = proxy,
-        nameToDelegateRef = uielements.bootstrap.TextInput.ref) { extraProps =>
+        delegateRefFactory = uielements.bootstrap.TextInput.ref _) { extraProps =>
         uielements.bootstrap.TextInput(
           ref = extraProps.ref,
+          name = "dummy-name",
           label = "label",
           defaultValue = "startvalue",
           showErrorMessage = false,
           inputClasses = extraProps.inputClasses
         )
       }
-    })
+    )
   }
 
   private final class FakeProxy extends InputBase.Proxy[String] {
@@ -115,12 +117,12 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
     }
   }
 
-  private final class ComponentTester(unrenderedComponent: TestComponentWithBackendScope.ComponentU) {
+  private final class ComponentTester(unrenderedComponent: VdomElement) {
     private val renderedComponent = ReactTestUtils.renderIntoDocument(unrenderedComponent)
     private val wrappedComponent = new ReactTestWrapper(renderedComponent)
 
     def valueProxy: InputBase.Proxy[String] = {
-      testRef(renderedComponent.backend.$)
+      testRef()
     }
 
     def showsBoundUntilChange: Boolean = {

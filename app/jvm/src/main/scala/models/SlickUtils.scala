@@ -3,8 +3,8 @@ package models
 import java.time.{ZoneId, LocalDateTime => JavaLocalDateTime}
 
 import common.time.{LocalDateTime, LocalDateTimes}
-import slick.backend.DatabaseConfig
-import slick.driver.JdbcDriver
+import slick.basic.DatabaseConfig
+import slick.jdbc.JdbcProfile
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -13,8 +13,8 @@ import scala.language.higherKinds
 object SlickUtils {
 
   // ********** db helpers ********** //
-  val dbConfig: DatabaseConfig[JdbcDriver] = DatabaseConfig.forConfig("db.default.slick")
-  val dbApi = dbConfig.driver.api
+  val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("db.default.slick")
+  val dbApi = dbConfig.profile.api
 
   import dbApi._
 

@@ -1,14 +1,33 @@
 language: scala
 scala:
-   - 2.11.6
+   - 2.12.2
 jdk:
   - oraclejdk8
 
-before_script:
-  - "npm install -g jshint"
+install:
+  - . $HOME/.nvm/nvm.sh
+  - nvm install 7
+  - nvm use 7
+  - export NODE_PATH="$(npm config get prefix)"/lib/node_modules
+  - npm install
+  - npm install jsdom source-map-support
+  - npm install -g jshint
 
 script:
-  - sbt test
+  - sbt ++$TRAVIS_SCALA_VERSION test:fastOptJS test:fullOptJS
+  - sbt ++$TRAVIS_SCALA_VERSION 'set parallelExecution in ThisBuild := false' test
+  - sbt ++$TRAVIS_SCALA_VERSION 'set parallelExecution in ThisBuild := false' 'set scalaJSStage in ThisBuild := FullOptStage' test
   - sbt scalastyle
   - sbt test:scalastyle # run scalastyle in test code
   - jshint app/jvm/src/main/assets/javascripts
+
+# Taken from https://github.com/typelevel/cats/blob/master/.travis.yml
+before_cache:
+  - find $HOME/.sbt -name "*.lock" -type f -delete
+  - find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete
+cache:
+  directories:
+    - $HOME/.sbt/0.13/dependency
+    - $HOME/.sbt/boot/scala*
+    - $HOME/.sbt/launchers
+    - $HOME/.ivy2/cache

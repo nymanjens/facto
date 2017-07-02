@@ -11,8 +11,9 @@ import flux.react.uielements.EntriesListTable.NumEntriesStrategy
 import flux.stores.AllEntriesStoreFactory
 import flux.stores.entries.GeneralEntry
 import japgolly.scalajs.react._
+import japgolly.scalajs.react.vdom._
 import japgolly.scalajs.react.extra.router.RouterCtl
-import japgolly.scalajs.react.vdom.prefix_<^._
+import japgolly.scalajs.react.vdom.html_<^._
 import models.EntityAccess
 import models.accounting.config.Config
 import models.accounting.money.{Currency, ExchangeRateManager, ReferenceMoney}
@@ -26,7 +27,8 @@ final class Everything(implicit entriesStoreFactory: AllEntriesStoreFactory,
                        exchangeRateManager: ExchangeRateManager,
                        i18n: I18n) {
 
-  private val component = ReactComponentB[Props](getClass.getSimpleName)
+  private val component = ScalaComponent
+    .builder[Props](getClass.getSimpleName)
     .renderP(
       (_, props) =>
         uielements.Panel(i18n("facto.genral-information-about-all-entries"))(
@@ -46,7 +48,7 @@ final class Everything(implicit entriesStoreFactory: AllEntriesStoreFactory,
               <.th("")
             ),
             calculateTableData = entry =>
-              Seq[ReactElement](
+              Seq[VdomElement](
                 <.td(entry.issuer.name),
                 <.td(entry.transactionDates.map(formatDate).mkString(", ")),
                 <.td(entry.consumedDates.map(formatDate).mkString(", ")),
@@ -62,7 +64,7 @@ final class Everything(implicit entriesStoreFactory: AllEntriesStoreFactory,
     .build
 
   // **************** API ****************//
-  def apply(router: RouterCtl[Page]): ReactElement = {
+  def apply(router: RouterCtl[Page]): VdomElement = {
     component(Props(router))
   }
 

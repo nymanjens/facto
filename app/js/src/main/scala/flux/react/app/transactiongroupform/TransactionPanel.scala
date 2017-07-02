@@ -1,16 +1,21 @@
 package flux.react.app.transactiongroupform
-
+import japgolly.scalajs.react.component.Scala.MutableRef
 import java.util.NoSuchElementException
 
+import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.{I18n, LoggingUtils, SinglePendingTaskQueue}
 import common.CollectionUtils.toListMap
 import common.time.{Clock, LocalDateTime, LocalDateTimes}
 import japgolly.scalajs.react._
+import japgolly.scalajs.react.vdom._
 import flux.react.uielements.{InputBase, InputWithDefaultFromReference}
-import japgolly.scalajs.react.vdom.prefix_<^._
+import japgolly.scalajs.react.vdom.html_<^._
 import flux.react.ReactVdomUtils.{<<, ^^}
 import flux.react.uielements
+import japgolly.scalajs.react.CtorType.Props
+import japgolly.scalajs.react.component.Scala
+import japgolly.scalajs.react.internal.Box
 import models.accounting.{Tag, Transaction}
 import models.{EntityAccess, User}
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
@@ -42,22 +47,10 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   private val accountSelectInput = uielements.bootstrap.SelectInput.forType[Account]
   private val categorySelectInput = uielements.bootstrap.SelectInput.forType[Category]
 
-  private val transactionDateRef = dateMappedInput.ref("transactionDate")
-  private val consumedDateRef = dateMappedInput.ref("consumedDate")
-  private val rawTransactionDateRef = dateMappedInput.delegateRef(transactionDateRef)
-  private val rawConsumedDateRef = dateMappedInput.delegateRef(consumedDateRef)
-  private val moneyReservoirRef = reservoirInputWithDefault.ref("moneyReservoir")
-  private val beneficiaryAccountRef = accountInputWithDefault.ref("beneficiaryAccount")
-  private val categoryRef = categoryInputWithDefault.ref("category")
-  private val descriptionRef = stringInputWithDefault.ref("description")
-  private val flowRef = uielements.bootstrap.MoneyInput.ref("flow")
-  private val detailDescriptionRef = stringInputWithDefault.ref("detailDescription")
-  private val tagsRef = tagsMappedInput.ref("tags")
-  private val rawTagsRef = tagsMappedInput.delegateRef(tagsRef)
-
   private val component = {
-    ReactComponentB[Props](getClass.getSimpleName)
-      .initialState_P[State](props =>
+    ScalaComponent
+      .builder[Props](getClass.getSimpleName)
+      .initialStateFromProps[State](props =>
         logExceptions {
           State(
             transactionDate = props.defaultValues.map(_.transactionDate) getOrElse LocalDateTimes
@@ -81,7 +74,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             defaultPanel: Option[Proxy],
             focusOnMount: Boolean,
             closeButtonCallback: Option[Callback] = None,
-            onFormChange: () => Unit): ReactElement = {
+            onFormChange: () => Unit): VdomElement = {
+
     val props = Props(
       title = title,
       defaultValues = defaultValues,
@@ -92,10 +86,10 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
       deleteButtonCallback = closeButtonCallback,
       onFormChange = onFormChange
     )
-    component.withKey(key).withRef(ref.refComp)(props)
+    ref.mutableRef.component.withKey(key.toString).apply(props)
   }
 
-  def ref(name: String): Reference = new Reference(Ref.to(component, name))
+  def ref(): Reference = new Reference(ScalaComponent.mutableRefTo(component))
 
   // **************** Private methods ****************//
   private def selectableReservoirs(currentReservoir: MoneyReservoir = null): Seq[MoneyReservoir] = {
@@ -107,48 +101,57 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
 
   // **************** Public inner types ****************//
   final class Reference private[TransactionPanel] (
-      private[TransactionPanel] val refComp: RefComp[Props, State, Backend, _ <: TopNode]) {
-    def apply($ : BackendScope[_, _]): Proxy = new Proxy(() => refComp($).get.backend.$)
+      private[TransactionPanel] val mutableRef: MutableRef[Props, State, Backend, ThisCtorSummoner#CT]) {
+    def apply(): Proxy = new Proxy(Option(mutableRef.value))
   }
 
-  final class Proxy private[TransactionPanel] (private val componentScope: () => BackendScope[Props, State]) {
-    def rawTransactionDate: InputBase.Proxy[String] = rawTransactionDateRef($)
-    def rawConsumedDate: InputBase.Proxy[String] = rawConsumedDateRef($)
-    def beneficiaryAccount: InputBase.Proxy[Account] = beneficiaryAccountRef($)
-    def moneyReservoir: InputBase.Proxy[MoneyReservoir] = moneyReservoirRef($)
-    def category: InputBase.Proxy[Category] = categoryRef($)
-    def description: InputBase.Proxy[String] = descriptionRef($)
-    def detailDescription: InputBase.Proxy[String] = detailDescriptionRef($)
-    def rawTags: InputBase.Proxy[String] = rawTagsRef($)
+  final class Proxy private[TransactionPanel] (private val maybeComponent: Option[ThisComponentU]) {
+    def rawTransactionDate: InputBase.Proxy[String] = fromBackendOrNull(_.rawTransactionDateRef())
+    def rawConsumedDate: InputBase.Proxy[String] = fromBackendOrNull(_.rawConsumedDateRef())
+    def beneficiaryAccount: InputBase.Proxy[Account] = fromBackendOrNull(_.beneficiaryAccountRef())
+    def moneyReservoir: InputBase.Proxy[MoneyReservoir] = fromBackendOrNull(_.moneyReservoirRef())
+    def category: InputBase.Proxy[Category] = fromBackendOrNull(_.categoryRef())
+    def description: InputBase.Proxy[String] = fromBackendOrNull(_.descriptionRef())
+    def detailDescription: InputBase.Proxy[String] = fromBackendOrNull(_.detailDescriptionRef())
+    def rawTags: InputBase.Proxy[String] = fromBackendOrNull(_.rawTagsRef())
 
-    def flowValueOrDefault: DatedMoney =
-      DatedMoney(
-        cents = flowRef($).valueOrDefault,
-        currency = moneyReservoirRef($).valueOrDefault.currency,
-        date = transactionDateRef($).valueOrDefault)
+    def flowValueOrDefault: DatedMoney = maybeBackend match {
+      case Some(backend) =>
+        DatedMoney(
+          cents = backend.flowRef().valueOrDefault,
+          currency = backend.moneyReservoirRef().valueOrDefault.currency,
+          date = backend.transactionDateRef().valueOrDefault)
+      case None => DatedMoney(0, Currency.default, clock.now)
 
-    def data: Option[Data] =
+    }
+
+    def data: Option[Data] = maybeBackend flatMap { backend =>
       try {
         Some(
           Data(
-            transactionDate = transactionDateRef($).value.get,
-            consumedDate = consumedDateRef($).value.get,
-            moneyReservoir = moneyReservoirRef($).value.get,
-            beneficiaryAccount = beneficiaryAccountRef($).value.get,
-            category = categoryRef($).value.get,
-            description = descriptionRef($).value.get,
+            transactionDate = backend.transactionDateRef().value.get,
+            consumedDate = backend.consumedDateRef().value.get,
+            moneyReservoir = backend.moneyReservoirRef().value.get,
+            beneficiaryAccount = backend.beneficiaryAccountRef().value.get,
+            category = backend.categoryRef().value.get,
+            description = backend.descriptionRef().value.get,
             flow = DatedMoney(
-              cents = flowRef($).value.get,
-              currency = moneyReservoirRef($).value.get.currency,
-              date = transactionDateRef($).value.get),
-            detailDescription = detailDescriptionRef($).value.get,
-            tags = tagsRef($).value.get
+              cents = backend.flowRef().value.get,
+              currency = backend.moneyReservoirRef().value.get.currency,
+              date = backend.transactionDateRef().value.get),
+            detailDescription = backend.detailDescriptionRef().value.get,
+            tags = backend.tagsRef().value.get
           ))
       } catch {
-        case _: NoSuchElementException => None
+        case e: NoSuchElementException => None
       }
+    }
 
-    private def $ = componentScope()
+    private def fromBackendOrNull[Value](
+        backendToProxy: Backend => InputBase.Proxy[Value]): InputBase.Proxy[Value] = {
+      maybeBackend map (backendToProxy(_)) getOrElse InputBase.Proxy.nullObject()
+    }
+    private def maybeBackend: Option[Backend] = maybeComponent map (_.backend)
   }
 
   case class Data(transactionDate: LocalDateTime,
@@ -162,6 +165,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                   tags: Seq[Tag])
 
   // **************** Private inner types ****************//
+  private type ThisCtorSummoner = CtorType.Summoner.Aux[Box[Props], Children.None, CtorType.Props]
+  private type ThisComponentU = MountedImpure[Props, State, Backend]
   private case class State(transactionDate: LocalDateTime,
                            beneficiaryAccount: Account,
                            moneyReservoir: MoneyReservoir)
@@ -177,6 +182,19 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
 
   private class Backend(val $ : BackendScope[Props, State]) {
 
+    val transactionDateRef = dateMappedInput.ref()
+    val consumedDateRef = dateMappedInput.ref()
+    val rawTransactionDateRef = dateMappedInput.delegateRef(transactionDateRef)
+    val rawConsumedDateRef = dateMappedInput.delegateRef(consumedDateRef)
+    val moneyReservoirRef = reservoirInputWithDefault.ref()
+    val beneficiaryAccountRef = accountInputWithDefault.ref()
+    val categoryRef = categoryInputWithDefault.ref()
+    val descriptionRef = stringInputWithDefault.ref()
+    val flowRef = uielements.bootstrap.MoneyInput.ref()
+    val detailDescriptionRef = stringInputWithDefault.ref()
+    val tagsRef = tagsMappedInput.ref()
+    val rawTagsRef = tagsMappedInput.delegateRef(tagsRef)
+
     def render(props: Props, state: State) = logExceptions {
       HalfPanel(title = <.span(props.title), closeButtonCallback = props.deleteButtonCallback)(
         dateMappedInput(
@@ -184,16 +202,17 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           defaultValue = state.transactionDate,
           valueTransformer = uielements.MappedInput.ValueTransformer.StringToLocalDateTime,
           listener = TransactionDateListener,
-          nameToDelegateRef = stringInputWithDefault.ref
+          delegateRefFactory = stringInputWithDefault.ref _
         ) { mappedExtraProps =>
           stringInputWithDefault.forOption(
             ref = mappedExtraProps.ref,
             defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawTransactionDate),
             startWithDefault = props.defaultValues.isEmpty,
-            nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)
+            delegateRefFactory = uielements.bootstrap.TextInput.ref _
           ) { extraProps =>
             uielements.bootstrap.TextInput(
               ref = extraProps.ref,
+              name = "transaction-date",
               label = i18n("facto.date-payed"),
               defaultValue = mappedExtraProps.defaultValue,
               showErrorMessage = props.showErrorMessages,
@@ -207,22 +226,23 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           defaultValue = props.defaultValues.map(_.consumedDate) getOrElse LocalDateTimes.toStartOfDay(
             clock.now),
           valueTransformer = uielements.MappedInput.ValueTransformer.StringToLocalDateTime,
-          nameToDelegateRef = stringInputWithDefault.ref,
+          delegateRefFactory = stringInputWithDefault.ref _,
           listener = AnythingChangedListener
         ) { mappedExtraProps =>
           stringInputWithDefault(
             ref = mappedExtraProps.ref,
-            defaultValueProxy = rawTransactionDateRef($),
-            nameToDelegateRef = stringInputWithDefault.ref) {
+            defaultValueProxy = rawTransactionDateRef(),
+            delegateRefFactory = stringInputWithDefault.ref _) {
             extraProps1 =>
               stringInputWithDefault.forOption(
                 ref = extraProps1.ref,
                 defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawConsumedDate),
                 startWithDefault = props.defaultValues.isEmpty,
-                nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)
+                delegateRefFactory = uielements.bootstrap.TextInput.ref _
               ) { extraProps2 =>
                 uielements.bootstrap.TextInput(
                   ref = extraProps2.ref,
+                  name = "date-consumed",
                   label = i18n("facto.date-consumed"),
                   defaultValue = mappedExtraProps.defaultValue,
                   showErrorMessage = props.showErrorMessages,
@@ -235,10 +255,11 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ref = moneyReservoirRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.moneyReservoir),
           startWithDefault = props.defaultValues.isEmpty,
-          nameToDelegateRef = reservoirSelectInput.ref(_)
+          delegateRefFactory = reservoirSelectInput.ref _
         ) { extraProps =>
           reservoirSelectInput(
             ref = extraProps.ref,
+            name = "payed-with-to",
             label = i18n("facto.payed-with-to"),
             defaultValue = state.moneyReservoir,
             inputClasses = extraProps.inputClasses,
@@ -253,10 +274,11 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.beneficiaryAccount),
           startWithDefault = props.defaultValues.isEmpty,
           directUserChangeOnly = true,
-          nameToDelegateRef = accountSelectInput.ref(_)
+          delegateRefFactory = accountSelectInput.ref _
         ) { extraProps =>
           accountSelectInput(
             ref = extraProps.ref,
+            name = "beneficiary",
             label = i18n("facto.beneficiary"),
             defaultValue = state.beneficiaryAccount,
             inputClasses = extraProps.inputClasses,
@@ -271,10 +293,11 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.category),
           startWithDefault = props.defaultValues.isEmpty,
           directUserChangeOnly = true,
-          nameToDelegateRef = categorySelectInput.ref(_)
+          delegateRefFactory = categorySelectInput.ref _
         ) { extraProps =>
           categorySelectInput(
             ref = extraProps.ref,
+            name = "category",
             label = i18n("facto.category"),
             defaultValue = props.defaultValues
               .map(_.category) getOrElse state.beneficiaryAccount.categories.head,
@@ -290,10 +313,11 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ref = descriptionRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.description),
           startWithDefault = props.defaultValues.isEmpty,
-          nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)
+          delegateRefFactory = uielements.bootstrap.TextInput.ref _
         ) { extraProps =>
           uielements.bootstrap.TextInput(
             ref = extraProps.ref,
+            name = "description",
             label = i18n("facto.description"),
             defaultValue = props.defaultValues.map(_.description) getOrElse "",
             required = true,
@@ -304,6 +328,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         },
         uielements.bootstrap.MoneyInput(
           ref = flowRef,
+          name = "flow",
           label = i18n("facto.flow"),
           defaultValue = props.defaultValues.map(_.flowInCents) getOrElse 0,
           required = true,
@@ -320,10 +345,11 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ref = detailDescriptionRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.detailDescription),
           startWithDefault = props.defaultValues.isEmpty,
-          nameToDelegateRef = uielements.bootstrap.TextAreaInput.ref(_)
+          delegateRefFactory = uielements.bootstrap.TextAreaInput.ref _
         ) { extraProps =>
           uielements.bootstrap.TextAreaInput(
             ref = extraProps.ref,
+            name = "more-info",
             label = i18n("facto.more-info"),
             defaultValue = props.defaultValues.map(_.detailDescription) getOrElse "",
             showErrorMessage = props.showErrorMessages,
@@ -335,17 +361,18 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ref = tagsRef,
           defaultValue = props.defaultValues.map(_.tags) getOrElse Seq(),
           valueTransformer = uielements.MappedInput.ValueTransformer.StringToTags,
-          nameToDelegateRef = stringInputWithDefault.ref,
+          delegateRefFactory = stringInputWithDefault.ref _,
           listener = AnythingChangedListener
         ) { mappedExtraProps =>
           stringInputWithDefault.forOption(
             ref = mappedExtraProps.ref,
             defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawTags),
             startWithDefault = props.defaultValues.isEmpty,
-            nameToDelegateRef = uielements.bootstrap.TextInput.ref(_)
+            delegateRefFactory = uielements.bootstrap.TextInput.ref _
           ) { extraProps =>
             uielements.bootstrap.TextInput(
               ref = extraProps.ref,
+              name = "tags",
               label = i18n("facto.tags"),
               showErrorMessage = props.showErrorMessages,
               defaultValue = mappedExtraProps.defaultValue,

@@ -1,12 +1,12 @@
 package flux.react.uielements
 
 import japgolly.scalajs.react._
+import japgolly.scalajs.react.vdom._
 
 object InputBase {
 
   trait Reference[Value] {
-    def apply($ : BackendScope[_, _]): Proxy[Value]
-    def name: String
+    def apply(): Proxy[Value]
   }
 
   trait Proxy[Value] {
@@ -20,7 +20,7 @@ object InputBase {
       * Returns the value after this change. This may be different from the input if the input is
       * invalid for this field. May return the default value if there is no valid value to return.
       */
-    def setValue(string: Value): Value
+    def setValue(value: Value): Value
 
     final def valueIsValid: Boolean = value.isDefined
 
@@ -29,16 +29,14 @@ object InputBase {
   }
 
   object Proxy {
-    def forwardingTo[Value](delegate: => Proxy[Value]): Proxy[Value] = new ForwardingImpl(() => delegate)
+    def nullObject[Value](): Proxy[Value] = new NullObject
 
-    private final class ForwardingImpl[Value](delegateProvider: () => Proxy[Value]) extends Proxy[Value] {
-      override def value = delegateProvider().value
-      override def valueOrDefault = delegateProvider().valueOrDefault
-      override def setValue(string: Value) = delegateProvider().setValue(string)
-      override def registerListener(listener: Listener[Value]) =
-        delegateProvider().registerListener(listener)
-      override def deregisterListener(listener: Listener[Value]) =
-        delegateProvider().deregisterListener(listener)
+    private final class NullObject[Value]() extends Proxy[Value] {
+      override def value = None
+      override def valueOrDefault = null.asInstanceOf[Value]
+      override def setValue(value: Value) = value
+      override def registerListener(listener: Listener[Value]) = {}
+      override def deregisterListener(listener: Listener[Value]) = {}
     }
   }
 

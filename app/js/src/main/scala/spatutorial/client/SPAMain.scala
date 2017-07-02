@@ -8,9 +8,9 @@ import org.scalajs.dom
 
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSExport
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
-@JSExport("SPAMain")
+@JSExportTopLevel("SPAMain")
 object SPAMain extends js.JSApp {
 
   @JSExport
@@ -32,6 +32,6 @@ object SPAMain extends js.JSApp {
     implicit val globalModule = new FactoAppModule()
 
     // tell React to render the router in the document body
-    ReactDOM.render(globalModule.router(), dom.document.getElementById("root"))
+    globalModule.router().renderIntoDOM(dom.document.getElementById("root"))
   }
 }

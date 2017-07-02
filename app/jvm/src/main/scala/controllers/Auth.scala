@@ -8,10 +8,13 @@ import play.api.data._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
 
-final class Auth @Inject()(implicit val messagesApi: MessagesApi,
+final class Auth @Inject()(implicit override val messagesApi: MessagesApi,
+                           components: ControllerComponents,
                            entityAccess: SlickEntityAccess,
-                           env: play.api.Environment)
-    extends Controller
+                           playConfiguration: play.api.Configuration,
+                           env: play.api.Environment,
+                           webJarAssets: controllers.WebJarAssets)
+    extends AbstractController(components)
     with I18nSupport {
 
   // ********** actions ********** //
@@ -22,7 +25,7 @@ final class Auth @Inject()(implicit val messagesApi: MessagesApi,
   def authenticate = Action { implicit request =>
     Forms.loginForm.bindFromRequest.fold(
       formWithErrors => BadRequest(views.html.login(formWithErrors)),
-      user => Redirect(routes.Application.index).withSession(Security.username -> user._1)
+      user => Redirect(routes.Application.index).withSession("username" -> user._1)
     )
   }
 

@@ -2,7 +2,7 @@ package flux.react.router
 
 import flux.react.router.Page._
 import japgolly.scalajs.react.extra.router._
-import japgolly.scalajs.react.vdom.prefix_<^._
+import japgolly.scalajs.react.vdom.html_<^._
 
 private[router] final class RouterFactory(implicit reactAppModule: flux.react.app.Module) {
 

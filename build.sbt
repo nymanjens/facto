@@ -34,8 +34,8 @@ lazy val client: Project = (project in file("app/js"))
     // yes, we want to package JS dependencies
     skip in packageJSDependencies := false,
     // use Scala.js provided launcher code to start the client app
-    persistLauncher := true,
-    persistLauncher in Test := false,
+    scalaJSUseMainModuleInitializer := true,
+    scalaJSUseMainModuleInitializer in Test := false,
     // use uTest framework for tests
     testFrameworks += new TestFramework("utest.runner.Framework")
   )
@@ -53,6 +53,7 @@ lazy val server = (project in file("app/jvm"))
     scalaVersion := Settings.versions.scala,
     scalacOptions ++= Settings.scalacOptions,
     libraryDependencies ++= Settings.jvmDependencies.value,
+    libraryDependencies += guice,
     commands += ReleaseCmd,
     javaOptions := Seq("-Dconfig.file=conf/application.conf"),
     javaOptions in Test := Seq("-Dconfig.resource=test-application.conf"),
@@ -63,6 +64,7 @@ lazy val server = (project in file("app/jvm"))
     LessKeys.compress in Assets := true
   )
   .enablePlugins(PlayScala)
+  .disablePlugins(PlayFilters) // Don't use the default filters
   .disablePlugins(PlayLayoutPlugin) // use the standard directory layout instead of Play's custom
   .aggregate(clients.map(projectToRef): _*)
   .dependsOn(sharedJVM)

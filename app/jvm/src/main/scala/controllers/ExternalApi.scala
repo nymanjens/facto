@@ -19,14 +19,15 @@ import controllers.accounting.Views
 import controllers.helpers.{AuthenticatedAction, ControllerHelperCache}
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 
-final class ExternalApi @Inject()(implicit val messagesApi: MessagesApi,
+final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi,
+                                  components: ControllerComponents,
                                   clock: Clock,
                                   viewsController: Views,
                                   playConfiguration: play.api.Configuration,
                                   accountingConfig: Config,
                                   userManager: SlickUserManager,
                                   entityAccess: SlickEntityAccess)
-    extends Controller
+    extends AbstractController(components)
     with I18nSupport {
 
   // ********** actions ********** //
@@ -97,13 +98,13 @@ final class ExternalApi @Inject()(implicit val messagesApi: MessagesApi,
 
   // ********** private helper methods ********** //
   private def validateApplicationSecret(applicationSecret: String) = {
-    val realApplicationSecret: String = playConfiguration.getString("play.crypto.secret").get
+    val realApplicationSecret: String = playConfiguration.get[String]("play.http.secret.key")
     require(
       applicationSecret == realApplicationSecret,
       s"Invalid application secret. Found '$applicationSecret' but should be '$realApplicationSecret'")
   }
 
-  private def getOrCreateRobotUser(): User = {
+  private def getOrCreateRobotUser()(implicit request: Request[_]): User = {
     val loginName = "robot"
     def hash(s: String) = Hashing.sha512().hashString(s, Charsets.UTF_8).toString()
 

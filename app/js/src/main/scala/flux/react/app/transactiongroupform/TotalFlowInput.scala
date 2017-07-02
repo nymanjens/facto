@@ -5,15 +5,17 @@ import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.time.Clock
 import flux.react.ReactVdomUtils.^^
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.prefix_<^._
+import japgolly.scalajs.react.vdom._
+import japgolly.scalajs.react.vdom.html_<^._
 import models.accounting.money._
 
 private[transactiongroupform] final class TotalFlowInput(implicit i18n: I18n,
                                                          clock: Clock,
                                                          exchangeRateManager: ExchangeRateManager) {
 
-  private val component = ReactComponentB[Props](getClass.getSimpleName)
-    .initialState_P(props =>
+  private val component = ScalaComponent
+    .builder[Props](getClass.getSimpleName)
+    .initialStateFromProps(props =>
       logExceptions {
         State(valueString = props.forceValue match {
           case Some(forceValue) => forceValue.formatFloat
@@ -22,7 +24,7 @@ private[transactiongroupform] final class TotalFlowInput(implicit i18n: I18n,
     })
     .renderPS(($, props, state) =>
       logExceptions {
-        def onChange(e: ReactEventI): Callback = LogExceptionsCallback {
+        def onChange(e: ReactEventFromInput): Callback = LogExceptionsCallback {
           val newString = e.target.value
           val newValue = ReferenceMoney(Money.floatStringToCents(newString) getOrElse 0)
           val oldValue = state.parsedValueOrDefault
@@ -72,7 +74,7 @@ private[transactiongroupform] final class TotalFlowInput(implicit i18n: I18n,
       LogExceptionsCallback {
         scope.nextProps.forceValue match {
           case Some(forceValue) =>
-            scope.$.modState(_.copy(valueString = forceValue.formatFloat)).runNow()
+            scope.modState(_.copy(valueString = forceValue.formatFloat)).runNow()
           case None =>
         }
         // Not calling listener here because we only have a listener in the props. The parent
@@ -84,7 +86,7 @@ private[transactiongroupform] final class TotalFlowInput(implicit i18n: I18n,
   def apply(defaultValue: ReferenceMoney = ReferenceMoney(0),
             forceValue: Option[ReferenceMoney],
             foreignCurrency: Option[Currency],
-            onChange: ReferenceMoney => Unit): ReactElement = {
+            onChange: ReferenceMoney => Unit): VdomElement = {
     component(Props(defaultValue, forceValue, foreignCurrency, onChange))
   }
 
