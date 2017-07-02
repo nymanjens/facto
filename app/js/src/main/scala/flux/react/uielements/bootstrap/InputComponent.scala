@@ -158,7 +158,6 @@ private[bootstrap] object InputComponent {
       required: Boolean,
       showErrorMessage: Boolean,
       inputClasses: Seq[String],
-      focusOnMount: Boolean = false,
       listener: InputBase.Listener[Value],
       extra: ExtraProps = (): Unit,
       valueTransformer: ValueTransformer[Value, ExtraProps])(implicit val i18n: I18n)

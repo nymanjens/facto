@@ -24,7 +24,8 @@ object TextInput {
           ^^.classes(classes),
           ^.name := name,
           ^.value := valueString,
-          ^.onChange ==> onChange
+          ^.onChange ==> onChange,
+          ^.autoFocus := extraProps.focusOnMount
         )
       }
     }
@@ -48,9 +49,9 @@ object TextInput {
       required = required,
       showErrorMessage = showErrorMessage,
       inputClasses = inputClasses,
-      focusOnMount = focusOnMount,
       listener = listener,
-      valueTransformer = ValueTransformer.nullInstance
+      valueTransformer = ValueTransformer.nullInstance,
+      extra = ExtraProps(focusOnMount = focusOnMount)
     )
     ref.mutableRef.component(props)
   }
@@ -62,7 +63,8 @@ object TextInput {
       private[TextInput] val mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps])
       extends InputComponent.Reference(mutableRef)
 
+  case class ExtraProps private[TextInput] (private[TextInput] focusOnMount: Boolean)
+
   // **************** Private inner types ****************//
-  private type ExtraProps = Unit
   private type Value = String
 }
