@@ -26,10 +26,10 @@ object UpdateLog {
     def fetchLastNEntries(n: Int): Seq[UpdateLog]
 
     def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: TransactionGroup)(
-        implicit entityAccess: EntityAccess)
+        implicit entityAccess: EntityAccess): Unit
 
     def addLog(user: User, operation: UpdateOperation, newOrDeletedValue: BalanceCheck)(
-        implicit entityAccess: EntityAccess)
+        implicit entityAccess: EntityAccess): Unit
 
   }
 
