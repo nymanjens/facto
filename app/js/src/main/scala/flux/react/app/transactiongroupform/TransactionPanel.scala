@@ -102,10 +102,10 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   // **************** Public inner types ****************//
   final class Reference private[TransactionPanel] (
       private[TransactionPanel] val mutableRef: MutableRef[Props, State, Backend, ThisCtorSummoner#CT]) {
-    def apply(): Proxy = new Proxy(Option(mutableRef.value))
+    def apply(): Proxy = new Proxy(() => Option(mutableRef.value))
   }
 
-  final class Proxy private[TransactionPanel] (private val maybeComponent: Option[ThisComponentU]) {
+  final class Proxy private[TransactionPanel] (private val maybeComponentFactory: () => Option[ThisComponentU]) {
     def rawTransactionDate: InputBase.Proxy[String] = fromBackendOrNull(_.rawTransactionDateRef())
     def rawConsumedDate: InputBase.Proxy[String] = fromBackendOrNull(_.rawConsumedDateRef())
     def beneficiaryAccount: InputBase.Proxy[Account] = fromBackendOrNull(_.beneficiaryAccountRef())
@@ -151,7 +151,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         backendToProxy: Backend => InputBase.Proxy[Value]): InputBase.Proxy[Value] = {
       maybeBackend map (backendToProxy(_)) getOrElse InputBase.Proxy.nullObject()
     }
-    private def maybeBackend: Option[Backend] = maybeComponent map (_.backend)
+    private def maybeBackend: Option[Backend] = maybeComponentFactory() map (_.backend)
   }
 
   case class Data(transactionDate: LocalDateTime,
