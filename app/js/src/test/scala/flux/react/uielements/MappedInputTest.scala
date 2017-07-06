@@ -1,0 +1,91 @@
+package flux.react.uielements
+import java.time.Month.{APRIL, MAY}
+
+import common.testing.{ReactTestWrapper, TestModule}
+import common.time.LocalDateTime
+import common.time.LocalDateTimes.createDateTime
+import flux.react.uielements
+import japgolly.scalajs.react.test.ReactTestUtils
+import japgolly.scalajs.react.vdom.VdomElement
+import models.accounting.Tag
+import utest._
+
+import scala.collection.immutable.Seq
+import scala2js.Converters._
+
+object MappedInputTest extends TestSuite {
+  implicit private val fake18n = new TestModule().fakeI18n
+  private val dateMappedInput = MappedInput.forTypes[String, LocalDateTime]
+
+  private val defaultDate = createDateTime(2017, APRIL, 3)
+
+  override def tests = TestSuite {
+    val testRef: dateMappedInput.Reference = dateMappedInput.ref()
+
+    "Starts with given default value" - {
+      val tester = createTestComponent(testRef)
+
+      testRef().valueOrDefault ==> defaultDate
+      tester.inputValue() ==> "2017-04-03"
+    }
+
+    "Updates input if value is set" - {
+      val tester = createTestComponent(testRef)
+      testRef().setValue(createDateTime(2017, MAY, 20))
+
+      tester.inputValue() ==> "2017-05-20"
+    }
+
+    "ValueTransformer.StringToLocalDateTime.forward() works" - {
+      val stringToLocalDateTime = MappedInput.ValueTransformer.StringToLocalDateTime
+      stringToLocalDateTime.forward("2017-04-03") ==> Some(createDateTime(2017, APRIL, 3))
+      stringToLocalDateTime.forward("2017-04-0333") ==> None
+    }
+
+    "ValueTransformer.StringToLocalDateTime.backward() works" - {
+      val stringToLocalDateTime = MappedInput.ValueTransformer.StringToLocalDateTime
+      stringToLocalDateTime.backward(createDateTime(2017, APRIL, 3)) ==> "2017-04-03"
+    }
+
+    "ValueTransformer.StringToTags.forward() works" - {
+      val stringToTags = MappedInput.ValueTransformer.StringToTags
+      stringToTags.forward("tag1, tag-2") ==> Some(Seq(Tag("tag1"), Tag("tag-2")))
+      stringToTags.forward("") ==> Some(Seq())
+      stringToTags.forward("a,]") ==> None
+      stringToTags.forward("]") ==> None
+    }
+
+    "ValueTransformer.StringToTags.backward() works" - {
+      val stringToTags = MappedInput.ValueTransformer.StringToTags
+      stringToTags.backward(Seq(Tag("tag1"), Tag("tag-2"))) ==> "tag1, tag-2"
+    }
+  }
+
+  private def createTestComponent(ref: dateMappedInput.Reference): ComponentTester = {
+    new ComponentTester(
+      dateMappedInput(
+        ref = ref,
+        defaultValue = defaultDate,
+        valueTransformer = MappedInput.ValueTransformer.StringToLocalDateTime,
+        delegateRefFactory = uielements.bootstrap.TextInput.ref _
+      ) { extraProps =>
+        uielements.bootstrap.TextInput(
+          ref = extraProps.ref,
+          name = "dummy-name",
+          label = "label",
+          defaultValue = extraProps.defaultValue,
+          showErrorMessage = false
+        )
+      }
+    )
+  }
+
+  private final class ComponentTester(unrenderedComponent: VdomElement) {
+    private val renderedComponent = ReactTestUtils.renderIntoDocument(unrenderedComponent)
+    private val wrappedComponent = new ReactTestWrapper(renderedComponent)
+
+    def inputValue(): String = {
+      wrappedComponent.child(tagName = "input").attribute("value")
+    }
+  }
+}
