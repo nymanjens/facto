@@ -29,7 +29,7 @@ private[transactionviews] final class EntriesListTable[Entry, Props](
 
   // **************** API ****************//
   def apply(): VdomElement = {
-    component(props).vdomElement
+    component.withKey(key).apply(props).vdomElement
   }
 
   // **************** Private types ****************//
@@ -61,7 +61,6 @@ private[transactionviews] final class EntriesListTable[Entry, Props](
       uielements.Table(
         title = tableTitle,
         tableClasses = tableClasses,
-        key,
         expandNumEntriesCallback = if (state.entries.hasMore) Some(expandMaxNumEntries(state)) else None,
         tableHeaders = tableHeaders,
         tableDatas = state.entries.entries.reverse.map(calculateTableData)
