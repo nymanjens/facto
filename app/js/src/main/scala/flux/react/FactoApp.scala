@@ -1,17 +1,15 @@
-package spatutorial.client
+package flux.react
 
-import scala.async.Async.{async, await}
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import flux.FactoAppModule
-import japgolly.scalajs.react.ReactDOM
 import org.scalajs.dom
 
+import scala.async.Async.{async, await}
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
-@JSExportTopLevel("SPAMain")
-object SPAMain extends js.JSApp {
+@JSExportTopLevel("FactoApp")
+object FactoApp extends js.JSApp {
 
   @JSExport
   def main(): Unit = async {
