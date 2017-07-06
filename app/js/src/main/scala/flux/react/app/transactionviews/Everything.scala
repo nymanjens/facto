@@ -1,22 +1,19 @@
-package flux.react.app
+package flux.react.app.transactionviews
 
 import common.Formatting._
 import common.I18n
 import common.time.Clock
-import flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
 import flux.react.router.Page
 import flux.react.uielements
-import flux.react.uielements.{EntriesListTable, MoneyWithCurrency}
-import flux.react.uielements.EntriesListTable.NumEntriesStrategy
+import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import flux.stores.AllEntriesStoreFactory
 import flux.stores.entries.GeneralEntry
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom._
 import japgolly.scalajs.react.extra.router.RouterCtl
 import japgolly.scalajs.react.vdom.html_<^._
 import models.EntityAccess
 import models.accounting.config.Config
-import models.accounting.money.{Currency, ExchangeRateManager, ReferenceMoney}
+import models.accounting.money.ExchangeRateManager
 
 import scala.collection.immutable.Seq
 
@@ -32,7 +29,7 @@ final class Everything(implicit entriesStoreFactory: AllEntriesStoreFactory,
     .renderP(
       (_, props) =>
         uielements.Panel(i18n("facto.genral-information-about-all-entries"))(
-          uielements.EntriesListTable[GeneralEntry, Unit](
+          EntriesListTable[GeneralEntry, Unit](
             tableTitle = i18n("facto.all"),
             tableClasses = Seq("table-everything"),
             numEntriesStrategy = NumEntriesStrategy(start = 5, intermediateBeforeInf = Seq(30)),

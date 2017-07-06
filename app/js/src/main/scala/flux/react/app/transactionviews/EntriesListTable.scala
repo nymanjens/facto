@@ -1,17 +1,16 @@
-package flux.react.uielements
+package flux.react.app.transactionviews
 
+import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
-import common.{I18n, LoggingUtils}
+import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import flux.react.uielements
-import flux.react.uielements.EntriesListTable.NumEntriesStrategy
 import flux.stores.{EntriesListStoreFactory, EntriesStore}
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom._
 import japgolly.scalajs.react.vdom.html_<^.VdomElement
 
 import scala.collection.immutable.Seq
 
-private final class EntriesListTable[Entry, Props](
+private[transactionviews] final class EntriesListTable[Entry, Props](
     tableTitle: String,
     tableClasses: Seq[String],
     numEntriesStrategy: NumEntriesStrategy,
@@ -88,7 +87,7 @@ private final class EntriesListTable[Entry, Props](
   }
 }
 
-object EntriesListTable {
+private[transactionviews] object EntriesListTable {
 
   def apply[Entry, Props](tableTitle: String,
                           tableClasses: Seq[String] = Seq(),
