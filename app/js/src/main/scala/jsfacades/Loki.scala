@@ -82,7 +82,7 @@ object Loki {
     def chain(): ResultSet[E] = new ResultSet.Impl[E](facade.chain())
 
     def insert(obj: E): Unit = facade.insert(Scala2Js.toJsMap(obj))
-    def findAndRemove(filter: (String, js.Any)*): Unit = facade.findAndRemove(js.Dictionary(filter: _*))
+    def findAndRemove(filter: (String, js.Any)): Unit = facade.findAndRemove(js.Dictionary(filter))
     def clear(): Unit = facade.clear()
   }
 
@@ -101,7 +101,7 @@ object Loki {
 
   trait ResultSet[E] {
     // **************** Intermediary operations **************** //
-    def find(filter: (String, js.Any)*): ResultSet[E]
+    def find(filter: (String, js.Any)): ResultSet[E]
 
     /**
       * Loose evaluation for user to sort based on a property names. Sorting based on the same lt/gt helper
@@ -111,7 +111,7 @@ object Loki {
     def limit(quantity: Int): ResultSet[E]
 
     // **************** Terminal operations **************** //
-    def findOne(filter: (String, js.Any)*): Option[E]
+    def findOne(filter: (String, js.Any)): Option[E]
     def data(): Seq[E]
     def count(): Int
   }
@@ -146,8 +146,8 @@ object Loki {
         extends ResultSet[E] {
 
       // **************** Intermediary operations **************** //
-      override def find(filter: (String, js.Any)*) = {
-        new ResultSet.Impl[E](facade.find(js.Dictionary(filter: _*)))
+      override def find(filter: (String, js.Any)) = {
+        new ResultSet.Impl[E](facade.find(js.Dictionary(filter)))
       }
 
       override def sort(sorting: Loki.Sorting) = {
@@ -164,8 +164,8 @@ object Loki {
       }
 
       // **************** Terminal operations **************** //
-      override def findOne(filter: (String, js.Any)*) = {
-        val data = facade.find(js.Dictionary(filter: _*), firstOnly = true).data()
+      override def findOne(filter: (String, js.Any)) = {
+        val data = facade.find(js.Dictionary(filter), firstOnly = true).data()
         if (data.length >= 1) {
           Option(Scala2Js.toScala[E](getOnlyElement(data)))
         } else {
@@ -199,10 +199,12 @@ object Loki {
       }
 
       // **************** Intermediary operations **************** //
-      override def find(filters: (String, js.Any)*) = new ResultSet.Fake(
-        entities filter { entity =>
+      override def find(filter: (String, js.Any)) = new ResultSet.Fake(
+        entities.filter { entity =>
           val jsMap = Scala2Js.toJsMap(entity)
-          filters.filter { case (k, v) => jsMap(k) != v }.isEmpty
+          filter match {
+            case (k, v) => jsMap(k) == v
+          }
         }
       )
 
@@ -234,7 +236,7 @@ object Loki {
       // **************** Terminal operations **************** //
       override def data() = entities
 
-      override def findOne(filters: (String, js.Any)*) = find(filters: _*).limit(1).data() match {
+      override def findOne(filter: (String, js.Any)) = find(filter).limit(1).data() match {
         case Seq(e) => Some(e)
         case Seq() => None
       }
