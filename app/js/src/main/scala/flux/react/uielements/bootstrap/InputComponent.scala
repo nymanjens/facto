@@ -12,6 +12,10 @@ import japgolly.scalajs.react.vdom.html_<^._
 import scala.collection.immutable.Seq
 import scala.util.{Failure, Success, Try}
 
+/**
+  * ReactScala component that can be used as building block for input components that fit
+  * in a Bootstrap row.
+  */
 private[bootstrap] object InputComponent {
 
   // **************** API ****************//
@@ -82,7 +86,7 @@ private[bootstrap] object InputComponent {
   }
 
   // **************** Private methods ****************//
-  def generateErrorMessage[Value, ExtraProps](state: State[Value],
+  private def generateErrorMessage[Value, ExtraProps](state: State[Value],
                                               props: Props[Value, ExtraProps]): Option[String] = {
     if (props.showErrorMessage) {
       ValueTransformer.stringToValue(state.valueString, props) match {
@@ -110,6 +114,7 @@ private[bootstrap] object InputComponent {
                     extraProps: ExtraProps): VdomNode
   }
 
+  /** Convertor between String and Value. */
   trait ValueTransformer[Value, -ExtraProps] {
 
     /**
