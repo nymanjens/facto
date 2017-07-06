@@ -13,75 +13,76 @@ import scala2js.Converters._
 object InputWithDefaultFromReferenceTest extends TestSuite {
   implicit private val fake18n = new TestModule().fakeI18n
   private val stringInputWithDefault = InputWithDefaultFromReference.forType[String]
-  private val testRef = stringInputWithDefault.ref()
 
   override def tests = TestSuite {
+    val testRef: stringInputWithDefault.Reference = stringInputWithDefault.ref()
     val defaultValueProxy: InputBase.Proxy[String] = new FakeProxy()
     defaultValueProxy.setValue("startvalue")
 
     "Starts with same value as defaultValueProxy" - {
-      val tester = createTestComponent(defaultValueProxy)
+      val tester = createTestComponent(testRef, defaultValueProxy)
 
-      tester.valueProxy.valueOrDefault ==> "startvalue"
+      testRef().valueOrDefault ==> "startvalue"
       tester.showsBoundUntilChange ==> true
     }
 
     "Starts with non-empty different from defaultValueProxy" - {
       defaultValueProxy.setValue("othervalue")
 
-      val tester = createTestComponent(defaultValueProxy)
+      val tester = createTestComponent(testRef, defaultValueProxy)
 
-      tester.valueProxy.valueOrDefault ==> "startvalue"
+      testRef().valueOrDefault ==> "startvalue"
       tester.showsBoundUntilChange ==> false
     }
 
     "Updates value if defaultValueProxy changes" - {
-      val tester = createTestComponent(defaultValueProxy)
+      val tester = createTestComponent(testRef, defaultValueProxy)
 
       defaultValueProxy.setValue("value2")
 
-      tester.valueProxy.valueOrDefault ==> "value2"
+      testRef().valueOrDefault ==> "value2"
       tester.showsBoundUntilChange ==> true
     }
 
     "No longer bound if own value changes" - {
-      val tester = createTestComponent(defaultValueProxy)
+      val tester = createTestComponent(testRef, defaultValueProxy)
 
-      tester.valueProxy.setValue("value2")
+      testRef().setValue("value2")
 
-      tester.valueProxy.valueOrDefault ==> "value2"
+      testRef().valueOrDefault ==> "value2"
       tester.showsBoundUntilChange ==> false
     }
 
     "Binds again if own value changes to defaultValueProxy" - {
-      val tester = createTestComponent(defaultValueProxy)
-      tester.valueProxy.setValue("value2")
-      tester.valueProxy.setValue("startvalue")
+      val tester = createTestComponent(testRef, defaultValueProxy)
+      testRef().setValue("value2")
+      testRef().setValue("startvalue")
 
-      tester.valueProxy.valueOrDefault ==> "startvalue"
+      testRef().valueOrDefault ==> "startvalue"
       tester.showsBoundUntilChange ==> true
 
     }
 
     "Binds again if defaultValueProxy changes to own value" - {
-      val tester = createTestComponent(defaultValueProxy)
-      tester.valueProxy.setValue("value2")
+      val tester = createTestComponent(testRef, defaultValueProxy)
+      testRef().setValue("value2")
       defaultValueProxy.setValue("value2")
 
-      tester.valueProxy.valueOrDefault ==> "value2"
+      testRef().valueOrDefault ==> "value2"
       tester.showsBoundUntilChange ==> true
     }
 
     "Input name is given name" - {
-      val tester = createTestComponent(defaultValueProxy)
+      val tester = createTestComponent(testRef, defaultValueProxy)
       tester.inputName ==> "dummy-name"
     }
   }
 
-  private def createTestComponent(proxy: InputBase.Proxy[String]): ComponentTester = {
+  private def createTestComponent(ref: stringInputWithDefault.Reference,
+                                  proxy: InputBase.Proxy[String]): ComponentTester = {
     new ComponentTester(
       stringInputWithDefault(
-        ref = testRef,
+        ref = ref,
         defaultValueProxy = proxy,
         delegateRefFactory = uielements.bootstrap.TextInput.ref _) { extraProps =>
         uielements.bootstrap.TextInput(
@@ -120,10 +121,6 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
   private final class ComponentTester(unrenderedComponent: VdomElement) {
     private val renderedComponent = ReactTestUtils.renderIntoDocument(unrenderedComponent)
     private val wrappedComponent = new ReactTestWrapper(renderedComponent)
-
-    def valueProxy: InputBase.Proxy[String] = {
-      testRef()
-    }
 
     def showsBoundUntilChange: Boolean = {
       wrappedComponent.child(tagName = "input").classes contains "bound-until-change"
