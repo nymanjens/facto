@@ -13,6 +13,7 @@ import scala.collection.immutable.Seq
 private[transactionviews] final class EntriesListTable[Entry, Props](
     tableTitle: String,
     tableClasses: Seq[String],
+    key: String,
     numEntriesStrategy: NumEntriesStrategy,
     tableHeaders: Seq[VdomElement],
     calculateTableData: Entry => Seq[VdomElement],
@@ -60,6 +61,7 @@ private[transactionviews] final class EntriesListTable[Entry, Props](
       uielements.Table(
         title = tableTitle,
         tableClasses = tableClasses,
+        key,
         expandNumEntriesCallback = if (state.entries.hasMore) Some(expandMaxNumEntries(state)) else None,
         tableHeaders = tableHeaders,
         tableDatas = state.entries.entries.reverse.map(calculateTableData)
@@ -91,15 +93,17 @@ private[transactionviews] object EntriesListTable {
 
   def apply[Entry, Props](tableTitle: String,
                           tableClasses: Seq[String] = Seq(),
+                          key: String = "",
                           numEntriesStrategy: NumEntriesStrategy,
+                          props: Props = (): Unit,
                           tableHeaders: Seq[VdomElement],
-                          calculateTableData: Entry => Seq[VdomElement],
-                          props: Props = (): Unit)(
+                          calculateTableData: Entry => Seq[VdomElement])(
       implicit entriesStoreFactory: EntriesListStoreFactory[Entry, Props],
       i18n: I18n): VdomElement = {
     new EntriesListTable(
       tableTitle,
       tableClasses,
+      key,
       numEntriesStrategy,
       tableHeaders,
       calculateTableData,

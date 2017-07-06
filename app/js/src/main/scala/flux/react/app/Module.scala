@@ -33,5 +33,6 @@ final class Module(implicit i18n: I18n,
   implicit lazy val layout: Layout = wire[Layout]
   implicit lazy val transactionGroupForm: TransactionGroupForm =
     transactionGroupFormModule.transactionGroupForm
-  implicit lazy val everything: Everything = transactionViewsModule.everything
+  implicit lazy val everything = transactionViewsModule.everything
+  implicit lazy val endowments = transactionViewsModule.endowments
 }

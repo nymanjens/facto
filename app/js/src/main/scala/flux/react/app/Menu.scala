@@ -53,6 +53,7 @@ private[app] object Menu {
 
   private val menuItems = Seq(
     MenuItem("Everything", "fa fa-money", Page.EverythingPage),
+    MenuItem("Endowments", "icon-crown", Page.EndowmentsPage),
     MenuItem("Everything2", "fa fa-money", Page.EverythingPage2),
     MenuItem("New", "icon-new-empty", Page.NewTransactionGroupPage)
   )
