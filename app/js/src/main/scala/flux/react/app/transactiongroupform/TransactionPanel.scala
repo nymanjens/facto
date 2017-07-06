@@ -13,6 +13,8 @@ import flux.react.uielements.{InputBase, InputWithDefaultFromReference}
 import japgolly.scalajs.react.vdom.html_<^._
 import flux.react.ReactVdomUtils.{<<, ^^}
 import flux.react.uielements
+import flux.react.uielements.input.bootstrap
+import flux.react.uielements.input.bootstrap.{MoneyInput, SelectInput, TextAreaInput, TextInput}
 import japgolly.scalajs.react.CtorType.Props
 import japgolly.scalajs.react.component.Scala
 import japgolly.scalajs.react.internal.Box
@@ -43,9 +45,9 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   private val dateMappedInput = uielements.MappedInput.forTypes[String, LocalDateTime]
   private val tagsMappedInput = uielements.MappedInput.forTypes[String, Seq[Tag]]
 
-  private val reservoirSelectInput = uielements.bootstrap.SelectInput.forType[MoneyReservoir]
-  private val accountSelectInput = uielements.bootstrap.SelectInput.forType[Account]
-  private val categorySelectInput = uielements.bootstrap.SelectInput.forType[Category]
+  private val reservoirSelectInput = SelectInput.forType[MoneyReservoir]
+  private val accountSelectInput = bootstrap.SelectInput.forType[Account]
+  private val categorySelectInput = bootstrap.SelectInput.forType[Category]
 
   private val component = {
     ScalaComponent
@@ -105,7 +107,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
     def apply(): Proxy = new Proxy(() => Option(mutableRef.value))
   }
 
-  final class Proxy private[TransactionPanel] (private val maybeComponentFactory: () => Option[ThisComponentU]) {
+  final class Proxy private[TransactionPanel] (
+      private val maybeComponentFactory: () => Option[ThisComponentU]) {
     def rawTransactionDate: InputBase.Proxy[String] = fromBackendOrNull(_.rawTransactionDateRef())
     def rawConsumedDate: InputBase.Proxy[String] = fromBackendOrNull(_.rawConsumedDateRef())
     def beneficiaryAccount: InputBase.Proxy[Account] = fromBackendOrNull(_.beneficiaryAccountRef())
@@ -190,7 +193,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
     val beneficiaryAccountRef = accountInputWithDefault.ref()
     val categoryRef = categoryInputWithDefault.ref()
     val descriptionRef = stringInputWithDefault.ref()
-    val flowRef = uielements.bootstrap.MoneyInput.ref()
+    val flowRef = MoneyInput.ref()
     val detailDescriptionRef = stringInputWithDefault.ref()
     val tagsRef = tagsMappedInput.ref()
     val rawTagsRef = tagsMappedInput.delegateRef(tagsRef)
@@ -208,9 +211,9 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             ref = mappedExtraProps.ref,
             defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawTransactionDate),
             startWithDefault = props.defaultValues.isEmpty,
-            delegateRefFactory = uielements.bootstrap.TextInput.ref _
+            delegateRefFactory = TextInput.ref _
           ) { extraProps =>
-            uielements.bootstrap.TextInput(
+            bootstrap.TextInput(
               ref = extraProps.ref,
               name = "transaction-date",
               label = i18n("facto.date-payed"),
@@ -238,9 +241,9 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                 ref = extraProps1.ref,
                 defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawConsumedDate),
                 startWithDefault = props.defaultValues.isEmpty,
-                delegateRefFactory = uielements.bootstrap.TextInput.ref _
+                delegateRefFactory = bootstrap.TextInput.ref _
               ) { extraProps2 =>
-                uielements.bootstrap.TextInput(
+                bootstrap.TextInput(
                   ref = extraProps2.ref,
                   name = "date-consumed",
                   label = i18n("facto.date-consumed"),
@@ -313,9 +316,9 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ref = descriptionRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.description),
           startWithDefault = props.defaultValues.isEmpty,
-          delegateRefFactory = uielements.bootstrap.TextInput.ref _
+          delegateRefFactory = bootstrap.TextInput.ref _
         ) { extraProps =>
-          uielements.bootstrap.TextInput(
+          bootstrap.TextInput(
             ref = extraProps.ref,
             name = "description",
             label = i18n("facto.description"),
@@ -326,7 +329,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             listener = AnythingChangedListener
           )
         },
-        uielements.bootstrap.MoneyInput(
+        bootstrap.MoneyInput(
           ref = flowRef,
           name = "flow",
           label = i18n("facto.flow"),
@@ -345,9 +348,9 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ref = detailDescriptionRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.detailDescription),
           startWithDefault = props.defaultValues.isEmpty,
-          delegateRefFactory = uielements.bootstrap.TextAreaInput.ref _
+          delegateRefFactory = TextAreaInput.ref _
         ) { extraProps =>
-          uielements.bootstrap.TextAreaInput(
+          bootstrap.TextAreaInput(
             ref = extraProps.ref,
             name = "more-info",
             label = i18n("facto.more-info"),
@@ -368,9 +371,9 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             ref = mappedExtraProps.ref,
             defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawTags),
             startWithDefault = props.defaultValues.isEmpty,
-            delegateRefFactory = uielements.bootstrap.TextInput.ref _
+            delegateRefFactory = bootstrap.TextInput.ref _
           ) { extraProps =>
-            uielements.bootstrap.TextInput(
+            bootstrap.TextInput(
               ref = extraProps.ref,
               name = "tags",
               label = i18n("facto.tags"),

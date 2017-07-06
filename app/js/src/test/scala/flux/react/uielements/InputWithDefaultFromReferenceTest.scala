@@ -3,6 +3,8 @@ package flux.react.uielements
 import common.testing.{ReactTestWrapper, TestModule}
 import flux.react.uielements
 import flux.react.uielements.InputBase.Listener
+import flux.react.uielements.input.bootstrap
+import flux.react.uielements.input.bootstrap.TextInput
 import japgolly.scalajs.react.test.ReactTestUtils
 import japgolly.scalajs.react.vdom.VdomElement
 import utest._
@@ -81,18 +83,16 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
   private def createTestComponent(ref: stringInputWithDefault.Reference,
                                   proxy: InputBase.Proxy[String]): ComponentTester = {
     new ComponentTester(
-      stringInputWithDefault(
-        ref = ref,
-        defaultValueProxy = proxy,
-        delegateRefFactory = uielements.bootstrap.TextInput.ref _) { extraProps =>
-        uielements.bootstrap.TextInput(
-          ref = extraProps.ref,
-          name = "dummy-name",
-          label = "label",
-          defaultValue = "startvalue",
-          showErrorMessage = false,
-          inputClasses = extraProps.inputClasses
-        )
+      stringInputWithDefault(ref = ref, defaultValueProxy = proxy, delegateRefFactory = TextInput.ref _) {
+        extraProps =>
+          bootstrap.TextInput(
+            ref = extraProps.ref,
+            name = "dummy-name",
+            label = "label",
+            defaultValue = "startvalue",
+            showErrorMessage = false,
+            inputClasses = extraProps.inputClasses
+          )
       }
     )
   }

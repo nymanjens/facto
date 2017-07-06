@@ -1,10 +1,10 @@
-package flux.react.uielements.bootstrap
+package flux.react.uielements.input.bootstrap
 
 import common.I18n
 import common.time.LocalDateTime
 import flux.react.ReactVdomUtils.^^
 import flux.react.uielements.InputBase
-import flux.react.uielements.bootstrap.InputComponent.{InputRenderer, Props}
+import InputComponent.{InputRenderer, Props}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import models.accounting.money.{Currency, DatedMoney, ExchangeRateManager, Money}

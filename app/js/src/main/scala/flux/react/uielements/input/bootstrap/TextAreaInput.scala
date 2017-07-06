@@ -1,9 +1,9 @@
-package flux.react.uielements.bootstrap
+package flux.react.uielements.input.bootstrap
 
 import common.I18n
 import flux.react.ReactVdomUtils.^^
 import flux.react.uielements.InputBase
-import flux.react.uielements.bootstrap.InputComponent.{InputRenderer, Props, ValueTransformer}
+import InputComponent.{InputRenderer, Props, ValueTransformer}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 

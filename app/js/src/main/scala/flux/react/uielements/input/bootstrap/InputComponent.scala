@@ -1,4 +1,4 @@
-package flux.react.uielements.bootstrap
+package flux.react.uielements.input.bootstrap
 
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
@@ -87,7 +87,7 @@ private[bootstrap] object InputComponent {
 
   // **************** Private methods ****************//
   private def generateErrorMessage[Value, ExtraProps](state: State[Value],
-                                              props: Props[Value, ExtraProps]): Option[String] = {
+                                                      props: Props[Value, ExtraProps]): Option[String] = {
     if (props.showErrorMessage) {
       ValueTransformer.stringToValue(state.valueString, props) match {
         case None => Some(props.i18n("error.invalid"))

@@ -1,8 +1,9 @@
-package flux.react.uielements.bootstrap
+package flux.react.uielements.input.bootstrap
 
 import common.testing.{ReactTestWrapper, TestModule}
 import flux.react.uielements
 import flux.react.uielements.InputBase
+import flux.react.uielements.input.bootstrap
 import japgolly.scalajs.react.test.ReactTestUtils
 import japgolly.scalajs.react.vdom._
 import utest._
@@ -56,7 +57,7 @@ object TextInputTest extends TestSuite {
                                   required: Boolean = false,
                                   showErrorMessage: Boolean = false): ComponentTester = {
     new ComponentTester(
-      uielements.bootstrap.TextInput(
+      bootstrap.TextInput(
         ref = testRef,
         name = "dummy-name",
         label = "label",
