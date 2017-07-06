@@ -1,8 +1,8 @@
-package flux.react.uielements
+package flux.react.uielements.input
 
-import japgolly.scalajs.react.component.Scala.MutableRef
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import japgolly.scalajs.react._
+import japgolly.scalajs.react.component.Scala.MutableRef
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom._
 

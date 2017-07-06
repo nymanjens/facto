@@ -1,32 +1,21 @@
 package flux.react.app.transactiongroupform
-import japgolly.scalajs.react.component.Scala.MutableRef
 import java.util.NoSuchElementException
 
-import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
-import common.{I18n, LoggingUtils, SinglePendingTaskQueue}
-import common.CollectionUtils.toListMap
 import common.time.{Clock, LocalDateTime, LocalDateTimes}
-import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom._
-import flux.react.uielements.{InputBase, InputWithDefaultFromReference}
-import japgolly.scalajs.react.vdom.html_<^._
-import flux.react.ReactVdomUtils.{<<, ^^}
-import flux.react.uielements
-import flux.react.uielements.input.bootstrap
+import common.{I18n, SinglePendingTaskQueue}
 import flux.react.uielements.input.bootstrap.{MoneyInput, SelectInput, TextAreaInput, TextInput}
-import japgolly.scalajs.react.CtorType.Props
-import japgolly.scalajs.react.component.Scala
+import flux.react.uielements.input.{InputBase, InputWithDefaultFromReference, MappedInput, bootstrap}
+import japgolly.scalajs.react._
+import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
 import japgolly.scalajs.react.internal.Box
-import models.accounting.{Tag, Transaction}
-import models.{EntityAccess, User}
+import japgolly.scalajs.react.vdom.html_<^._
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.accounting.money._
-import org.scalajs.dom.raw.HTMLInputElement
+import models.accounting.{Tag, Transaction}
+import models.{EntityAccess, User}
 
 import scala.collection.immutable.Seq
-import scala.concurrent.Future
-import scala.scalajs.concurrent.JSExecutionContext
 
 private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                                                            accountingConfig: Config,
@@ -42,8 +31,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   private val categoryInputWithDefault = InputWithDefaultFromReference.forType[Category]
   private val stringInputWithDefault = InputWithDefaultFromReference.forType[String]
 
-  private val dateMappedInput = uielements.MappedInput.forTypes[String, LocalDateTime]
-  private val tagsMappedInput = uielements.MappedInput.forTypes[String, Seq[Tag]]
+  private val dateMappedInput = MappedInput.forTypes[String, LocalDateTime]
+  private val tagsMappedInput = MappedInput.forTypes[String, Seq[Tag]]
 
   private val reservoirSelectInput = SelectInput.forType[MoneyReservoir]
   private val accountSelectInput = bootstrap.SelectInput.forType[Account]
@@ -203,7 +192,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         dateMappedInput(
           ref = transactionDateRef,
           defaultValue = state.transactionDate,
-          valueTransformer = uielements.MappedInput.ValueTransformer.StringToLocalDateTime,
+          valueTransformer = MappedInput.ValueTransformer.StringToLocalDateTime,
           listener = TransactionDateListener,
           delegateRefFactory = stringInputWithDefault.ref _
         ) { mappedExtraProps =>
@@ -228,7 +217,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ref = consumedDateRef,
           defaultValue = props.defaultValues.map(_.consumedDate) getOrElse LocalDateTimes.toStartOfDay(
             clock.now),
-          valueTransformer = uielements.MappedInput.ValueTransformer.StringToLocalDateTime,
+          valueTransformer = MappedInput.ValueTransformer.StringToLocalDateTime,
           delegateRefFactory = stringInputWithDefault.ref _,
           listener = AnythingChangedListener
         ) { mappedExtraProps =>
@@ -363,7 +352,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         tagsMappedInput(
           ref = tagsRef,
           defaultValue = props.defaultValues.map(_.tags) getOrElse Seq(),
-          valueTransformer = uielements.MappedInput.ValueTransformer.StringToTags,
+          valueTransformer = MappedInput.ValueTransformer.StringToTags,
           delegateRefFactory = stringInputWithDefault.ref _,
           listener = AnythingChangedListener
         ) { mappedExtraProps =>

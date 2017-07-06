@@ -1,4 +1,4 @@
-package flux.react.uielements
+package flux.react.uielements.input
 
 import japgolly.scalajs.react._
 

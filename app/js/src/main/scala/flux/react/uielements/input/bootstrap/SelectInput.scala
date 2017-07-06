@@ -4,7 +4,7 @@ import common.CollectionUtils.toListMap
 import common.GuavaReplacement.Iterables.getOnlyElement
 import common.I18n
 import flux.react.ReactVdomUtils.^^
-import flux.react.uielements.InputBase
+import flux.react.uielements.input.InputBase
 import flux.react.uielements.input.bootstrap.InputComponent.{InputRenderer, Props}
 import flux.react.uielements.input.bootstrap.InputComponent.InputRenderer
 import japgolly.scalajs.react._
