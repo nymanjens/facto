@@ -10,6 +10,10 @@ import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.reflect.ClassTag
 
+/**
+  * Wrapper component around a given input component that provides a dynamic default value for
+  * that component.
+  */
 class InputWithDefaultFromReference[Value] private () {
 
   private val component = ScalaComponent
