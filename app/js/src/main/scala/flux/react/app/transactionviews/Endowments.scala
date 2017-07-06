@@ -36,6 +36,7 @@ final class Endowments(implicit entriesStoreFactory: EndowmentEntriesStoreFactor
               EntriesListTable[GeneralEntry, Account](
                 tableTitle = i18n("facto.endowments-of", account.longName),
                 tableClasses = Seq("table-endowments"),
+                key = account.code,
                 numEntriesStrategy = NumEntriesStrategy(start = 30, intermediateBeforeInf = Seq(100)),
                 props = account,
                 tableHeaders = Seq(
