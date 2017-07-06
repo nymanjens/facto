@@ -1,24 +1,33 @@
 package flux.react.uielements
 
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom._
 
+/**
+  * Contains base traits to be used by input components that describe a single value.
+  *
+  * Aggregate input values are not supported.
+  */
 object InputBase {
 
+  /** A reference to an input component. */
   trait Reference[Value] {
     def apply(): Proxy[Value]
   }
 
+  /** Proxy that allows client code of an input component to interact with its value. */
   trait Proxy[Value] {
 
-    /** Returns None if this field is invalidly formatted. */
+    /** Returns the current value or None if this field is invalidly formatted. */
     def value: Option[Value]
 
+    /** Returns the current value or the default if this field is invalidly formatted. */
     def valueOrDefault: Value
 
     /**
-      * Returns the value after this change. This may be different from the input if the input is
-      * invalid for this field. May return the default value if there is no valid value to return.
+      * Sets the value of the input component and returns the value after this change.
+      *
+      * The return value may be different from the input if the input is invalid for this
+      * field.
       */
     def setValue(value: Value): Value
 
