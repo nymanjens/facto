@@ -25,7 +25,8 @@ object TextInput {
           ^.name := name,
           ^.value := valueString,
           ^.onChange ==> onChange,
-          ^.autoFocus := extraProps.focusOnMount
+          ^.autoFocus := extraProps.focusOnMount,
+          ^.disabled := extraProps.disabled
         )
       }
     }
@@ -37,9 +38,10 @@ object TextInput {
             label: String,
             defaultValue: String = "",
             required: Boolean = false,
-            showErrorMessage: Boolean,
+            showErrorMessage: Boolean = false,
             inputClasses: Seq[String] = Seq(),
             focusOnMount: Boolean = false,
+            disabled: Boolean = false,
             listener: InputBase.Listener[String] = InputBase.Listener.nullInstance)(
       implicit i18n: I18n): VdomElement = {
     val props = Props(
@@ -51,7 +53,7 @@ object TextInput {
       inputClasses = inputClasses,
       listener = listener,
       valueTransformer = ValueTransformer.nullInstance,
-      extra = ExtraProps(focusOnMount = focusOnMount)
+      extra = ExtraProps(focusOnMount = focusOnMount, disabled: Boolean)
     )
     ref.mutableRef.component(props)
   }
@@ -63,7 +65,7 @@ object TextInput {
       private[TextInput] val mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps])
       extends InputComponent.Reference(mutableRef)
 
-  case class ExtraProps private[TextInput] (private[TextInput] focusOnMount: Boolean)
+  case class ExtraProps private[TextInput] (focusOnMount: Boolean, disabled: Boolean)
 
   // **************** Private inner types ****************//
   private type Value = String

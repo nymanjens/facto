@@ -4,6 +4,7 @@ import java.util.NoSuchElementException
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.time.{Clock, LocalDateTime, LocalDateTimes}
 import common.{I18n, SinglePendingTaskQueue}
+import flux.react.ReactVdomUtils.<<
 import flux.react.uielements.input.bootstrap.{MoneyInput, SelectInput, TextAreaInput, TextInput}
 import flux.react.uielements.input.{InputBase, InputWithDefaultFromReference, MappedInput, bootstrap}
 import japgolly.scalajs.react._
@@ -178,6 +179,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
     val consumedDateRef = dateMappedInput.ref()
     val rawTransactionDateRef = dateMappedInput.delegateRef(transactionDateRef)
     val rawConsumedDateRef = dateMappedInput.delegateRef(consumedDateRef)
+    val issuerRef = bootstrap.TextInput.ref()
     val moneyReservoirRef = reservoirInputWithDefault.ref()
     val beneficiaryAccountRef = accountInputWithDefault.ref()
     val categoryRef = categoryInputWithDefault.ref()
@@ -242,6 +244,15 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                 )
               }
           }
+        },
+        <<.ifThen(props.defaultValues.isDefined && props.defaultValues.get.issuer != user) {
+          bootstrap.TextInput(
+            ref = issuerRef,
+            name = "issuer",
+            label = i18n("facto.issuer"),
+            defaultValue = props.defaultValues.get.issuer.name,
+            disabled = true
+          )
         },
         reservoirInputWithDefault.forOption(
           ref = moneyReservoirRef,
