@@ -5,6 +5,7 @@ import java.time.Month.JANUARY
 import common.testing.TestObjects._
 import common.testing.{FakeRemoteDatabaseProxy, TestModule}
 import common.time.LocalDateTimes.createDateTime
+import models.access.RemoteDatabaseProxy
 import models.accounting._
 import models.accounting.config.{Account, Category}
 import utest._
@@ -14,11 +15,12 @@ import scala.util.Random
 import scala2js.Converters._
 
 object EndowmentEntriesStoreFactoryTest extends TestSuite {
-  implicit private val database = new FakeRemoteDatabaseProxy()
   implicit private val accountingConfig = new TestModule().accountingConfig
-  private val factory: EndowmentEntriesStoreFactory = new EndowmentEntriesStoreFactory()
 
   override def tests = TestSuite {
+    implicit val database = new FakeRemoteDatabaseProxy()
+    val factory: EndowmentEntriesStoreFactory = new EndowmentEntriesStoreFactory()
+
     val trans1 = persistTransaction(id = 1, consumedDay = 1, account = testAccountA)
     val trans2 = persistTransaction(id = 2, consumedDay = 2, account = testAccountA)
     val trans3 = persistTransaction(id = 3, consumedDay = 3, createdDay = 1, account = testAccountA)
@@ -41,12 +43,12 @@ object EndowmentEntriesStoreFactoryTest extends TestSuite {
     }
   }
 
-  private def persistTransaction(
-      id: Long,
-      consumedDay: Int,
-      createdDay: Int = 1,
-      account: Account = testAccountA,
-      category: Category = accountingConfig.constants.endowmentCategory): Transaction = {
+  private def persistTransaction(id: Long,
+                                 consumedDay: Int,
+                                 createdDay: Int = 1,
+                                 account: Account = testAccountA,
+                                 category: Category = accountingConfig.constants.endowmentCategory)(
+      implicit database: FakeRemoteDatabaseProxy): Transaction = {
     val transaction = testTransactionWithIdA.copy(
       idOption = Some(id),
       transactionGroupId = id,

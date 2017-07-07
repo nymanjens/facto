@@ -15,11 +15,11 @@ import scala2js.Converters._
 
 /** Test test also tests `EntriesStoreFactory` and `EntriesStore`. */
 object AllEntriesStoreFactoryTest extends TestSuite {
-  implicit private val database = new FakeRemoteDatabaseProxy()
-  private val factory: AllEntriesStoreFactory = new AllEntriesStoreFactory()
-  private val store: factory.Store = factory.get(maxNumEntries = 3)
 
   override def tests = TestSuite {
+    implicit val database = new FakeRemoteDatabaseProxy()
+    val factory: AllEntriesStoreFactory = new AllEntriesStoreFactory()
+    val store: factory.Store = factory.get(maxNumEntries = 3)
 
     "factory result is cached" - {
       factory.get(maxNumEntries = 3) ==> store
