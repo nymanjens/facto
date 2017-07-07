@@ -4,7 +4,8 @@ import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import flux.react.uielements
-import flux.stores.{EntriesListStoreFactory, EntriesStore}
+import flux.stores.entries.EntriesStore
+import flux.stores.entries.{EntriesListStoreFactory, EntriesStore}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^.VdomElement
 

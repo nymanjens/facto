@@ -1,6 +1,5 @@
-package flux.stores
+package flux.stores.entries
 
-import flux.stores.entries.GeneralEntry
 import models.access.RemoteDatabaseProxy
 import models.accounting.Transaction
 

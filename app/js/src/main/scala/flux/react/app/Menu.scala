@@ -4,12 +4,12 @@ import common.I18n
 import common.time.Clock
 import flux.react.ReactVdomUtils.{<<, ^^}
 import flux.react.router.Page
-import flux.stores.AllEntriesStoreFactory
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom._
 import japgolly.scalajs.react.extra.router.RouterCtl
 import japgolly.scalajs.react.vdom.html_<^._
 import flux.react.ReactVdomUtils.{<<, ^^}
+import flux.stores.entries.AllEntriesStoreFactory
 import models.EntityAccess
 import models.accounting.config.Config
 import models.accounting.money.ExchangeRateManager

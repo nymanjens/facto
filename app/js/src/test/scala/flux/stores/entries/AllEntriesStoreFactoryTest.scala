@@ -1,4 +1,4 @@
-package flux.stores
+package flux.stores.entries
 
 import java.time.Month.JANUARY
 
@@ -6,7 +6,6 @@ import common.testing.FakeRemoteDatabaseProxy
 import common.testing.TestObjects._
 import common.time.LocalDateTime
 import common.time.LocalDateTimes.createDateTime
-import flux.stores.entries.GeneralEntry
 import models.accounting._
 import models.manager.EntityModification
 import utest._

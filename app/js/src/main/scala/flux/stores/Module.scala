@@ -1,6 +1,7 @@
 package flux.stores
 
 import common.I18n
+import flux.stores.entries.{AllEntriesStoreFactory, EndowmentEntriesStoreFactory}
 import models.access.RemoteDatabaseProxy
 import models.accounting._
 import models.accounting.config.Config

@@ -6,8 +6,7 @@ import common.time.Clock
 import flux.react.router.Page
 import flux.react.uielements
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
-import flux.stores.AllEntriesStoreFactory
-import flux.stores.entries.GeneralEntry
+import flux.stores.entries.{AllEntriesStoreFactory, GeneralEntry}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.RouterCtl
 import japgolly.scalajs.react.vdom.html_<^._

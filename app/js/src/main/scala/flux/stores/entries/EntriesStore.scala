@@ -1,11 +1,9 @@
-package flux.stores
+package flux.stores.entries
 
 import models.access.RemoteDatabaseProxy
 import models.manager.EntityModification
 
 import scala.collection.immutable.Seq
-import scala.concurrent.Future
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 /**
   * General purpose flux store that maintains a state derived from data in the `RemoteDatabaseProxy`
