@@ -16,11 +16,11 @@ import scala2js.Converters._
 
 /** Test test also tests `EntriesStoreFactory` and `EntriesStore`. */
 object AllEntriesStoreFactoryTest extends TestSuite {
+  implicit private val database = new FakeRemoteDatabaseProxy()
+  private val factory: AllEntriesStoreFactory = new AllEntriesStoreFactory()
+  private val store: factory.Store = factory.get(maxNumEntries = 3)
 
   override def tests = TestSuite {
-    implicit val database = new FakeRemoteDatabaseProxy()
-    val factory: AllEntriesStoreFactory = new AllEntriesStoreFactory()
-    val store: factory.Store = factory.get(maxNumEntries = 3)
 
     "factory result is cached" - {
       factory.get(maxNumEntries = 3) ==> store
@@ -32,8 +32,8 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       database.addRemotelyAddedEntities(testTransactionWithId)
 
-      store.state ==> EntriesListStoreFactory
-        .State(Seq(GeneralEntry(Seq(testTransactionWithId))), hasMore = false)
+      store.state ==> EntriesListStoreFactory.State
+        .withGeneralEntries(hasMore = false, Seq(testTransactionWithId))
     }
 
     "store state is updated upon local update" - {
@@ -41,8 +41,8 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       database.persistModifications(Seq(EntityModification.Add(testTransactionWithId)))
 
-      store.state ==> EntriesListStoreFactory
-        .State(Seq(GeneralEntry(Seq(testTransactionWithId))), hasMore = false)
+      store.state ==> EntriesListStoreFactory.State
+        .withGeneralEntries(hasMore = false, Seq(testTransactionWithId))
     }
 
     "store calls listeners" - {
@@ -74,8 +74,8 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       database.addRemotelyAddedEntities(trans1, trans2, trans3)
 
-      store.state ==> EntriesListStoreFactory
-        .State(Seq(GeneralEntry(Seq(trans1, trans2)), GeneralEntry(Seq(trans3))), hasMore = false)
+      store.state ==> EntriesListStoreFactory.State
+        .withGeneralEntries(hasMore = false, Seq(trans1, trans2), Seq(trans3))
     }
 
     "sorts entries on transaction date first and then created date" - {
@@ -101,9 +101,8 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       database.addRemotelyAddedEntities(trans3, trans2, trans1)
 
-      store.state ==> EntriesListStoreFactory.State(
-        Seq(GeneralEntry(Seq(trans1)), GeneralEntry(Seq(trans2)), GeneralEntry(Seq(trans3))),
-        hasMore = false)
+      store.state ==> EntriesListStoreFactory.State
+        .withGeneralEntries(hasMore = false, Seq(trans1), Seq(trans2), Seq(trans3))
     }
 
     "respects maxNumEntries" - {
@@ -117,9 +116,8 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       database.addRemotelyAddedEntities(trans1, trans2, trans3, trans4)
 
-      store.state ==> EntriesListStoreFactory.State(
-        Seq(GeneralEntry(Seq(trans2)), GeneralEntry(Seq(trans3)), GeneralEntry(Seq(trans4))),
-        hasMore = true)
+      store.state ==> EntriesListStoreFactory.State
+        .withGeneralEntries(hasMore = true, Seq(trans2), Seq(trans3), Seq(trans4))
     }
   }
 }

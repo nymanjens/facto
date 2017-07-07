@@ -1,6 +1,8 @@
 package flux.stores
 
+import flux.stores.entries.GeneralEntry
 import models.access.RemoteDatabaseProxy
+import models.accounting.Transaction
 
 import scala.collection.immutable.Seq
 
@@ -30,5 +32,10 @@ object EntriesListStoreFactory {
   case class State[Entry](entries: Seq[Entry], hasMore: Boolean)
   object State {
     def empty[Entry]: State[Entry] = State(Seq(), false)
+    def withGeneralEntries(hasMore: Boolean, generalEntryContents: Seq[Transaction]*): State[GeneralEntry] =
+      State(
+        entries = generalEntryContents.map(GeneralEntry(_)).toVector,
+        hasMore = hasMore
+      )
   }
 }
