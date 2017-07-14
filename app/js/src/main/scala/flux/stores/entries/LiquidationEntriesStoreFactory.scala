@@ -61,9 +61,9 @@ final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProx
       EntriesListStoreFactory.State(entries.takeRight(maxNumEntries), hasMore = entries.size > maxNumEntries)
     }
 
-    override protected def modificationImpactsState(entityModification: EntityModification,
+    override protected def transactionModificationImpactsState(transaction: Transaction,
                                                     state: State): Boolean = {
-      entityModification.entityType == EntityType.TransactionType
+      isRelevantForAccounts(transaction, accountPair)
     }
 
     private def isRelevantForAccounts(transaction: Transaction, accountPair: AccountPair): Boolean = {

@@ -37,9 +37,9 @@ final class EndowmentEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
       EntriesListStoreFactory.State(entries.takeRight(maxNumEntries), hasMore = entries.size > maxNumEntries)
     }
 
-    override protected def modificationImpactsState(entityModification: EntityModification,
-                                                    state: State): Boolean = {
-      entityModification.entityType == EntityType.TransactionType
+    override protected def transactionModificationImpactsState(transaction: Transaction,
+                                                               state: State): Boolean = {
+      transaction.category == accountingConfig.constants.endowmentCategory && transaction.beneficiary == account
     }
   }
 

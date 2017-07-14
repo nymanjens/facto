@@ -1,7 +1,8 @@
 package flux.stores.entries
 
 import models.access.RemoteDatabaseProxy
-import models.manager.EntityModification
+import models.accounting.Transaction
+import models.manager.{EntityModification, EntityType}
 
 import scala.collection.immutable.Seq
 
@@ -42,7 +43,7 @@ abstract class EntriesStore[State](implicit database: RemoteDatabaseProxy) {
   // **************** Abstract methods ****************//
   protected def calculateState(): State
 
-  protected def modificationImpactsState(entityModification: EntityModification, state: State): Boolean
+  protected def transactionModificationImpactsState(transaction: Transaction, state: State): Boolean
 
   // **************** Private helper methods ****************//
   private def updateState(): Unit = {
@@ -51,6 +52,27 @@ abstract class EntriesStore[State](implicit database: RemoteDatabaseProxy) {
 
   private def impactsState(modifications: Seq[EntityModification]): Boolean =
     modifications.toStream.filter(m => modificationImpactsState(m, state)).take(1).nonEmpty
+
+  private def modificationImpactsState(entityModification: EntityModification, state: State): Boolean = {
+    entityModification.entityType match {
+      case EntityType.UserType => true // Almost never happens and likely to change entries
+      case EntityType.BalanceCheckType => true // TODO: This is not always true, change this
+      case EntityType.ExchangeRateMeasurementType =>
+        false // In normal circumstances, no entries should be changed retroactively
+      case EntityType.TransactionGroupType =>
+        entityModification match {
+          case EntityModification.Add(_) => false // Always gets updated alongside Transaction
+          case EntityModification.Remove(_) => true // Non-trivial to find out what changed
+        }
+      case EntityType.TransactionType =>
+        entityModification match {
+          case EntityModification.Add(transaction) =>
+            transactionModificationImpactsState(transaction.asInstanceOf[Transaction], state)
+          case EntityModification.Remove(transactionId) =>
+            false // Removal always happens alongside Group removal or entity modification (cases handled separately)
+        }
+    }
+  }
 
   private def invokeListeners(): Unit = {
     require(!isCallingListeners)
