@@ -9,7 +9,7 @@ import utest.{TestSuite, _}
 
 import scala2js.Converters._
 
-class JsExchangeRateManagerTest extends TestSuite {
+object JsExchangeRateManagerTest extends TestSuite {
 
   override def tests = TestSuite {
     val testModule = new TestModule()
