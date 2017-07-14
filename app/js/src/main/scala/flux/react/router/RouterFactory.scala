@@ -24,6 +24,9 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
           | staticRoute("#endowments", EndowmentsPage)
             ~> renderR(ctl => reactAppModule.endowments(ctl))
 
+          | staticRoute("#liquidation", LiquidationPage)
+            ~> renderR(ctl => reactAppModule.liquidation(ctl))
+
           | staticRoute("#everything", EverythingPage2)
             ~> renderR(
               ctl =>

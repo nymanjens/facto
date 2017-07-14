@@ -35,4 +35,5 @@ final class Module(implicit i18n: I18n,
     transactionGroupFormModule.transactionGroupForm
   implicit lazy val everything = transactionViewsModule.everything
   implicit lazy val endowments = transactionViewsModule.endowments
+  implicit lazy val liquidation = transactionViewsModule.liquidation
 }

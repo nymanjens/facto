@@ -21,7 +21,9 @@ final class Module(implicit i18n: I18n,
   import modelsModule.exchangeRateManager
   import fluxStoresModule.allEntriesStoreFactory
   import fluxStoresModule.endowmentEntriesStoreFactory
+  import fluxStoresModule.liquidationEntriesStoreFactory
 
   implicit lazy val everything = wire[Everything]
   implicit lazy val endowments = wire[Endowments]
+  implicit lazy val liquidation = wire[Liquidation]
 }

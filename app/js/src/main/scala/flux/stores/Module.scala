@@ -1,7 +1,7 @@
 package flux.stores
 
 import common.I18n
-import flux.stores.entries.{AllEntriesStoreFactory, EndowmentEntriesStoreFactory}
+import flux.stores.entries.{AllEntriesStoreFactory, EndowmentEntriesStoreFactory, LiquidationEntriesStoreFactory}
 import models.access.RemoteDatabaseProxy
 import models.accounting._
 import models.accounting.config.Config
@@ -18,6 +18,7 @@ final class Module(implicit i18n: I18n, remoteDatabaseProxy: RemoteDatabaseProxy
 
   implicit val allEntriesStoreFactory = wire[AllEntriesStoreFactory]
   implicit val endowmentEntriesStoreFactory = wire[EndowmentEntriesStoreFactory]
+  implicit val liquidationEntriesStoreFactory = wire[LiquidationEntriesStoreFactory]
   implicit val transactionAndGroupStore = wire[TransactionAndGroupStore]
   implicit val globalMessagesStore = wire[GlobalMessagesStore]
 }
