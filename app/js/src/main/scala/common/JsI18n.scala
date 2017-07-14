@@ -20,7 +20,7 @@ private[common] final class JsI18n(i18nMessages: Map[String, String]) extends I1
     * @param messageWithPlaceholders e.g. "Debt of {0} to {1}".
     * @param args                    Arguments to insert into message.
     */
-  @visibleForTesting private[common] def messageFormat(messageWithPlaceholders: String, args: Any*): String = {
+  private def messageFormat(messageWithPlaceholders: String, args: Any*): String = {
     var result = messageWithPlaceholders
     for ((arg, i) <- args.zipWithIndex) {
       result = result.replaceAllLiterally(s"{$i}", arg.toString)
