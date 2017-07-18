@@ -1,6 +1,6 @@
 package common.time
 
-object Module {
+final class Module {
 
   import com.softwaremill.macwire._
 

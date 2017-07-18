@@ -1,13 +1,12 @@
 package models.access
 
+import api.ScalaJsApiClient
+
 import scala.async.Async.{async, await}
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.concurrent.Future
 
-object Module {
-
-  import com.softwaremill.macwire._
-  import api.Module._
+final class Module(implicit scalaJsApiClient: ScalaJsApiClient) {
 
   private lazy val localDatabase: Future[LocalDatabase] = LocalDatabase.createFuture()
   implicit val remoteDatabaseProxy: Future[RemoteDatabaseProxy] = async {

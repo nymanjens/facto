@@ -55,7 +55,6 @@ final class FakeRemoteDatabaseProxy extends RemoteDatabaseProxy {
     entity
   }
 
-
   def addRemotelyAddedEntities[E <: Entity: EntityType](entities: Seq[E]): Unit = {
     addRemoteModifications(entities map (e => EntityModification.Add(e)))
   }

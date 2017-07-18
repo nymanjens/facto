@@ -62,7 +62,7 @@ final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProx
     }
 
     override protected def transactionModificationImpactsState(transaction: Transaction,
-                                                    state: State): Boolean = {
+                                                               state: State): Boolean = {
       isRelevantForAccounts(transaction, accountPair)
     }
 

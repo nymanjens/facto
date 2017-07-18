@@ -21,8 +21,12 @@ object FactoApp extends js.JSApp {
     // create stylesheet
     //GlobalStyles.addToDocument()
 
-    val initialDataResponseFuture = api.Module.scalaJsApiClient.getInitialData()
-    val remoteDatabaseProxyFuture = models.access.Module.remoteDatabaseProxy
+    val apiModule = new api.Module
+    implicit val scalaJsApiClient = apiModule.scalaJsApiClient
+    val modelsAccessModule = new models.access.Module
+
+    val initialDataResponseFuture = scalaJsApiClient.getInitialData()
+    val remoteDatabaseProxyFuture = modelsAccessModule.remoteDatabaseProxy
 
     implicit val initialDataResponse = await(initialDataResponseFuture)
     implicit val remoteDatabaseProxy = await(remoteDatabaseProxyFuture)

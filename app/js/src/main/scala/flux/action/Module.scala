@@ -1,6 +1,6 @@
 package flux.action
 
-object Module {
+final class Module {
 
   import com.softwaremill.macwire._
 
