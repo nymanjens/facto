@@ -70,6 +70,17 @@ final class TransactionGroupForm(implicit i18n: I18n,
     create(Props(OperationMeta.Edit(transactionGroupManager.findById(transactionGroupId)), router))
   }
 
+  def forTemplate(templateCode: String, router: RouterCtl[Page]): VdomElement = {
+    ???
+  }
+
+  def forRepayment(accountCode1: String,
+                   accountCode2: String,
+                   amountInCents: Long,
+                   router: RouterCtl[Page]): VdomElement = {
+    ???
+  }
+
   // **************** Private helper methods ****************//
   private def create(props: Props): VdomElement = {
     component.withKey(props.operationMeta.toString).apply(props)

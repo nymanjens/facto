@@ -1,5 +1,6 @@
 package flux.react.router
 
+import common.LoggingUtils.logExceptions
 import flux.react.router.Page._
 import japgolly.scalajs.react.extra.router._
 import japgolly.scalajs.react.vdom.html_<^._
@@ -14,6 +15,7 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
     RouterConfigDsl[Page]
       .buildConfig { dsl =>
         import dsl._
+        val codeString = string("[a-zA-Z0-9_-]+")
 
         // wrap/connect components to the circuit
         (emptyRule
@@ -22,20 +24,35 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
             ~> redirectToPage(EverythingPage)(Redirect.Replace)
 
           | staticRoute("#everything", EverythingPage)
-            ~> renderR(ctl => reactAppModule.everything(ctl))
+            ~> renderR(ctl => logExceptions(reactAppModule.everything(ctl)))
 
           | staticRoute("#endowments", EndowmentsPage)
-            ~> renderR(ctl => reactAppModule.endowments(ctl))
+            ~> renderR(ctl => logExceptions(reactAppModule.endowments(ctl)))
 
           | staticRoute("#liquidation", LiquidationPage)
-            ~> renderR(ctl => reactAppModule.liquidation(ctl))
+            ~> renderR(ctl => logExceptions(reactAppModule.liquidation(ctl)))
 
           | staticRoute("#newTransactionGroup", NewTransactionGroupPage)
-            ~> renderR(ctl => reactAppModule.transactionGroupForm.forCreate(ctl))
+            ~> renderR(ctl => logExceptions(reactAppModule.transactionGroupForm.forCreate(ctl)))
 
           | dynamicRouteCT("#editTransactionGroup" / long.caseClass[EditTransactionGroupPage])
             ~> dynRenderR {
-              case (page, ctl) => reactAppModule.transactionGroupForm.forEdit(page.transactionGroupId, ctl)
+              case (page, ctl) =>
+                logExceptions(reactAppModule.transactionGroupForm.forEdit(page.transactionGroupId, ctl))
+            }
+
+          | dynamicRouteCT("#newFromTemplate" / codeString.caseClass[NewFromTemplatePage])
+            ~> dynRenderR {
+              case (page, ctl) =>
+                logExceptions(reactAppModule.transactionGroupForm.forTemplate(page.templateCode, ctl))
+            }
+
+          | dynamicRouteCT(
+            "#newForRepayment" / (codeString / codeString / long).caseClass[NewForRepaymentPage])
+            ~> dynRenderR {
+              case (page, ctl) =>
+                logExceptions(reactAppModule.transactionGroupForm
+                  .forRepayment(page.accountCode1, page.accountCode2, page.amountInCents, ctl))
             }
 
         // Fallback
