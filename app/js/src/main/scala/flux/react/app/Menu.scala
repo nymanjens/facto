@@ -55,7 +55,6 @@ private[app] object Menu {
     MenuItem("Everything", "fa fa-money", Page.EverythingPage),
     MenuItem("Endowments", "icon-crown", Page.EndowmentsPage),
     MenuItem("Liquidation", "icon-balance-scale", Page.LiquidationPage),
-    MenuItem("Everything2", "fa fa-money", Page.EverythingPage2),
     MenuItem("New", "icon-new-empty", Page.NewTransactionGroupPage)
   )
 

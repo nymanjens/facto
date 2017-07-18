@@ -18,7 +18,10 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
         // wrap/connect components to the circuit
         (emptyRule
 
-          | staticRoute(root, EverythingPage)
+          | staticRoute(root, RootPage)
+            ~> redirectToPage(EverythingPage)(Redirect.Replace)
+
+          | staticRoute("#everything", EverythingPage)
             ~> renderR(ctl => reactAppModule.everything(ctl))
 
           | staticRoute("#endowments", EndowmentsPage)
@@ -27,21 +30,16 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
           | staticRoute("#liquidation", LiquidationPage)
             ~> renderR(ctl => reactAppModule.liquidation(ctl))
 
-          | staticRoute("#everything", EverythingPage2)
-            ~> renderR(
-              ctl =>
-                <.div(
-                  reactAppModule.everything(ctl),
-                  reactAppModule.everything(ctl),
-                  reactAppModule.everything(ctl)))
-
           | staticRoute("#newTransactionGroup", NewTransactionGroupPage)
             ~> renderR(ctl => reactAppModule.transactionGroupForm.forCreate(ctl))
 
           | dynamicRouteCT("#editTransactionGroup" / long.caseClass[EditTransactionGroupPage])
             ~> dynRenderR {
               case (page, ctl) => reactAppModule.transactionGroupForm.forEdit(page.transactionGroupId, ctl)
-            }).notFound(redirectToPage(EverythingPage)(Redirect.Replace))
+            }
+
+        // Fallback
+        ).notFound(redirectToPage(EverythingPage)(Redirect.Replace))
       }
       .renderWith(layout)
   }
