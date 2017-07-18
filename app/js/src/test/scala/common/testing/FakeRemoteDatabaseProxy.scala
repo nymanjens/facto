@@ -49,6 +49,13 @@ final class FakeRemoteDatabaseProxy extends RemoteDatabaseProxy {
     addRemotelyAddedEntities(entities.toVector)
   }
 
+  def addWithRandomId[E <: Entity: EntityType](entityWithoutId: E): E = {
+    val entity = entityWithoutId.withId(EntityModification.generateRandomId()).asInstanceOf[E]
+    addRemotelyAddedEntities(entity)
+    entity
+  }
+
+
   def addRemotelyAddedEntities[E <: Entity: EntityType](entities: Seq[E]): Unit = {
     addRemoteModifications(entities map (e => EntityModification.Add(e)))
   }

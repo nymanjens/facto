@@ -40,7 +40,7 @@ object EntityModification {
   def generateRandomId(): Long = abs(Random.nextLong)
 
   case class Add[E <: Entity: EntityType](entity: E) extends EntityModification {
-    require(entity.idOption.isDefined)
+    require(entity.idOption.isDefined, s"Entity ID must be defined (for entity $entity)")
     entityType.checkRightType(entity)
 
     override def entityType: EntityType[E] = implicitly[EntityType[E]]

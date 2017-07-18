@@ -44,7 +44,7 @@ object JsExchangeRateManagerTest extends TestSuite {
     }
 
     def persistGbpMeasurement(date: LocalDateTime, ratio: Double): Unit = {
-      remoteDatabaseProxy.addRemotelyAddedEntities(
+      remoteDatabaseProxy.addWithRandomId(
         ExchangeRateMeasurement(
           date = date,
           foreignCurrencyCode = Gbp.code,
