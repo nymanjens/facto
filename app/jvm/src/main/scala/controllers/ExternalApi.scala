@@ -5,7 +5,7 @@ import com.google.common.hash.Hashing
 import com.google.inject.Inject
 import common.time.{Clock, TimeUtils}
 import models.accounting._
-import models.accounting.config.{Account, Config}
+import models.accounting.config.{Account, Config, Template}
 import models.accounting.money.{Currency, ExchangeRateMeasurement}
 
 import scala.collection.immutable.Seq
@@ -61,15 +61,13 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
       validateApplicationSecret(applicationSecret)
 
       val template = accountingConfig.templateWithCode(templateCode)
-      val partial = template.toPartial(Account.nullInstance)
       val issuer = getOrCreateRobotUser()
 
       // Add group
       val group = entityAccess.transactionGroupManager.add(TransactionGroup(createdDate = clock.now))
 
       // Add transactions
-      for (transPartial <- partial.transactions) {
-        val transaction = transactionPartialToTransaction(transPartial, group, issuer)
+      for (transaction <- toTransactions(template, group, issuer)) {
         entityAccess.transactionManager.add(transaction)
       }
 
@@ -120,26 +118,29 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
     }
   }
 
-  private def transactionPartialToTransaction(partial: Transaction.Partial,
-                                              transactionGroup: TransactionGroup,
-                                              issuer: User): Transaction = {
+  private def toTransactions(template: Template,
+                             transactionGroup: TransactionGroup,
+                             issuer: User): Seq[Transaction] = {
     def checkNotEmpty(s: String): String = {
       require(!s.isEmpty)
       s
     }
-    Transaction(
-      transactionGroupId = transactionGroup.id,
-      issuerId = issuer.id,
-      beneficiaryAccountCode = checkNotEmpty(partial.beneficiary.get.code),
-      moneyReservoirCode = checkNotEmpty(partial.moneyReservoir.get.code),
-      categoryCode = checkNotEmpty(partial.category.get.code),
-      description = checkNotEmpty(partial.description),
-      flowInCents = partial.flowInCents,
-      detailDescription = partial.detailDescription,
-      tagsString = partial.tagsString,
-      createdDate = clock.now,
-      transactionDate = clock.now,
-      consumedDate = clock.now
-    )
+    val groupPartial = template.toPartial(Account.nullInstance)
+    for (partial <- groupPartial.transactions)
+      yield
+        Transaction(
+          transactionGroupId = transactionGroup.id,
+          issuerId = issuer.id,
+          beneficiaryAccountCode = checkNotEmpty(partial.beneficiary.get.code),
+          moneyReservoirCode = checkNotEmpty(partial.moneyReservoir.get.code),
+          categoryCode = checkNotEmpty(partial.category.get.code),
+          description = checkNotEmpty(partial.description),
+          flowInCents = partial.flowInCents,
+          detailDescription = partial.detailDescription,
+          tagsString = partial.tagsString,
+          createdDate = clock.now,
+          transactionDate = clock.now,
+          consumedDate = clock.now
+        )
   }
 }
