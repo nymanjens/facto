@@ -63,30 +63,66 @@ object Transaction {
     def findByGroupId(groupId: Long): Seq[Transaction]
   }
 
-  case class Partial(beneficiary: Option[Account],
-                     moneyReservoir: Option[MoneyReservoir],
-                     category: Option[Category],
-                     description: String,
-                     flowInCents: Long,
+  /** Same as Transaction, except all fields are optional. */
+  case class Partial(transactionGroupId: Option[Long] = None,
+                     issuerId: Option[Long] = None,
+                     beneficiary: Option[Account] = None,
+                     moneyReservoir: Option[MoneyReservoir] = None,
+                     category: Option[Category] = None,
+                     description: String = "",
+                     flowInCents: Long = 0,
                      detailDescription: String = "",
-                     tagsString: String = "")
+                     tagsString: String = "",
+                     createdDate: Option[LocalDateTime] = None,
+                     transactionDate: Option[LocalDateTime] = None,
+                     consumedDate: Option[LocalDateTime] = None,
+                     idOption: Option[Long] = None)
 
   object Partial {
-    def from(beneficiary: Account = null,
+    def from(transactionGroupId: Long = 0,
+             issuerId: Long = 0,
+             beneficiary: Account = null,
              moneyReservoir: MoneyReservoir = null,
              category: Category = null,
              description: String = "",
              flowInCents: Long = 0,
              detailDescription: String = "",
-             tagsString: String = ""): Partial =
+             tagsString: String = "",
+             createdDate: LocalDateTime = null,
+             transactionDate: LocalDateTime = null,
+             consumedDate: LocalDateTime = null,
+             idOption: Option[Long] = None): Partial =
       Partial(
-        Option(beneficiary),
-        Option(moneyReservoir),
-        Option(category),
-        description,
-        flowInCents,
-        detailDescription,
-        tagsString
+        transactionGroupId = if (transactionGroupId == 0) None else Some(transactionGroupId),
+        issuerId = if (issuerId == 0) None else Some(issuerId),
+        beneficiary = Option(beneficiary),
+        moneyReservoir = Option(moneyReservoir),
+        category = Option(category),
+        description = description,
+        flowInCents = flowInCents,
+        detailDescription = detailDescription,
+        tagsString = tagsString,
+        createdDate = Option(createdDate),
+        transactionDate = Option(transactionDate),
+        consumedDate = Option(consumedDate),
+        idOption = idOption
+      )
+
+    def from(transaction: Transaction)(implicit accountingConfig: Config): Partial =
+      from(
+        transactionGroupId = transaction.transactionGroupId,
+        issuerId = transaction.issuerId,
+        beneficiary = transaction.beneficiary,
+        moneyReservoir = transaction.moneyReservoir,
+        category = transaction.category,
+        description = transaction.description,
+        flowInCents = transaction.flowInCents,
+        detailDescription = transaction.detailDescription,
+        tagsString = transaction.tagsString,
+        createdDate = transaction.createdDate,
+        transactionDate = transaction.transactionDate,
+        consumedDate = transaction.consumedDate,
+        idOption = transaction.idOption
       )
   }
 }

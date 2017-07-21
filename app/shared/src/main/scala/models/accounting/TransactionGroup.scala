@@ -28,5 +28,12 @@ object TransactionGroup {
 
   trait Manager extends EntityManager[TransactionGroup]
 
-  case class Partial(transactions: Seq[Transaction.Partial], zeroSum: Boolean = false)
+  /**
+    * Same as TransactionGroup, except all fields are optional, plus an additional `transactions` and `zeroSum` which
+    * a `TransactionGroup` stores implicitly.
+    */
+  case class Partial(transactions: Seq[Transaction.Partial],
+                     zeroSum: Boolean = false,
+                     createdDate: Option[LocalDateTime] = None,
+                     idOption: Option[Long] = None)
 }
