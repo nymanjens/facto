@@ -36,4 +36,15 @@ object TransactionGroup {
                      zeroSum: Boolean = false,
                      createdDate: Option[LocalDateTime] = None,
                      idOption: Option[Long] = None)
+  object Partial {
+    def from(transactionGroup: TransactionGroup)(implicit entityAccess: EntityAccess,
+                                                 accountingConfig: Config,
+                                                 exchangeRateManager: ExchangeRateManager): Partial =
+      Partial(
+        transactions = transactionGroup.transactions.map(Transaction.Partial.from(_)),
+        zeroSum = transactionGroup.isZeroSum,
+        createdDate = Some(transactionGroup.createdDate),
+        idOption = transactionGroup.idOption
+      )
+  }
 }
