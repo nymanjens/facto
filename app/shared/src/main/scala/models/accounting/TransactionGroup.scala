@@ -37,6 +37,8 @@ object TransactionGroup {
                      createdDate: Option[LocalDateTime] = None,
                      idOption: Option[Long] = None)
   object Partial {
+    val withSingleEmptyTransaction: Partial = Partial(transactions = Seq(Transaction.Partial.empty))
+
     def from(transactionGroup: TransactionGroup)(implicit entityAccess: EntityAccess,
                                                  accountingConfig: Config,
                                                  exchangeRateManager: ExchangeRateManager): Partial =

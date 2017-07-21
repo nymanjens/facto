@@ -38,14 +38,9 @@ final class TransactionGroupForm(implicit i18n: I18n,
       .builder[Props](getClass.getSimpleName)
       .initialStateFromProps(props =>
         logExceptions {
-          val numberOfTransactions = props.operationMeta match {
-            case OperationMeta.AddNew(None) => 1
-            case OperationMeta.AddNew(Some(partial)) => partial.transactions.length
-            case OperationMeta.Edit(group) => group.transactions.length
-          }
-          val totalFlowRestriction = props.operationMeta match {
-            case OperationMeta.AddNew(Some(partial)) if partial.zeroSum => TotalFlowRestriction.ZeroSum
-            case OperationMeta.Edit(group) if group.isZeroSum => TotalFlowRestriction.ZeroSum
+          val numberOfTransactions = props.groupPartial.transactions.length
+          val totalFlowRestriction = props.groupPartial match {
+            case partial if partial.zeroSum => TotalFlowRestriction.ZeroSum
             case _ => TotalFlowRestriction.AnyTotal
           }
           State(
@@ -65,11 +60,16 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
   // **************** API ****************//
   def forCreate(router: RouterCtl[Page]): VdomElement = {
-    create(Props(OperationMeta.AddNew(None), router))
+    forCreate(TransactionGroup.Partial.withSingleEmptyTransaction, router)
   }
 
   def forEdit(transactionGroupId: Long, router: RouterCtl[Page]): VdomElement = {
-    create(Props(OperationMeta.Edit(transactionGroupManager.findById(transactionGroupId)), router))
+    val group = transactionGroupManager.findById(transactionGroupId)
+    create(
+      Props(
+        operationMeta = OperationMeta.Edit(group),
+        groupPartial = TransactionGroup.Partial.from(group),
+        router = router))
   }
 
   def forTemplate(templateCode: String, router: RouterCtl[Page]): VdomElement = {
@@ -123,7 +123,8 @@ final class TransactionGroupForm(implicit i18n: I18n,
   // **************** Private helper methods ****************//
   private def forCreate(transactionGroupPartial: TransactionGroup.Partial,
                         router: RouterCtl[Page]): VdomElement = {
-    create(Props(OperationMeta.AddNew(Some(transactionGroupPartial)), router))
+    create(
+      Props(operationMeta = OperationMeta.AddNew, groupPartial = transactionGroupPartial, router = router))
   }
 
   private def create(props: Props): VdomElement = {
@@ -133,7 +134,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
   // **************** Private inner types ****************//
   private sealed trait OperationMeta
   private object OperationMeta {
-    case class AddNew(partial: Option[TransactionGroup.Partial]) extends OperationMeta
+    case object AddNew extends OperationMeta
     case class Edit(group: TransactionGroup) extends OperationMeta
   }
 
@@ -154,7 +155,9 @@ final class TransactionGroupForm(implicit i18n: I18n,
     def minusPanelIndex(index: Int): State = copy(panelIndices = panelIndices.filter(_ != index))
   }
 
-  private case class Props(operationMeta: OperationMeta, router: RouterCtl[Page])
+  private case class Props(operationMeta: OperationMeta,
+                           groupPartial: TransactionGroup.Partial,
+                           router: RouterCtl[Page])
 
   private final class Backend(val $ : BackendScope[Props, State]) {
 
@@ -172,7 +175,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
               ^.className := "page-header",
               <.i(^.className := "icon-new-empty"),
               props.operationMeta match {
-                case OperationMeta.AddNew(_) => i18n("facto.new-transaction")
+                case OperationMeta.AddNew => i18n("facto.new-transaction")
                 case OperationMeta.Edit(_) => i18n("facto.edit-transaction")
               },
               ^^.ifThen(props.operationMeta.isInstanceOf[OperationMeta.Edit]) {
@@ -216,16 +219,16 @@ final class TransactionGroupForm(implicit i18n: I18n,
               (for ((panelIndex, i) <- state.panelIndices.zipWithIndex) yield {
                 val firstPanel = panelIndex == state.panelIndices.head
                 val lastPanel = panelIndex == state.panelIndices.last
-                val transaction = props.operationMeta match {
-                  case OperationMeta.Edit(group) if panelIndex < group.transactions.length =>
-                    Some(group.transactions.apply(panelIndex))
-                  case _ => None
+                val transactionPartial = props.groupPartial.transactions match {
+                  case transactions if panelIndex < transactions.size =>
+                    transactions.apply(panelIndex)
+                  case _ => Transaction.Partial.empty
                 }
                 transactionPanel(
                   key = panelIndex,
                   ref = panelRef(panelIndex),
                   title = i18n("facto.transaction") + " " + (i + 1),
-                  defaultValues = transaction,
+                  defaultValues = transactionPartial,
                   forceFlowValue = if (lastPanel && state.totalFlowRestriction.userSetsTotal) {
                     Some(state.totalFlow - state.totalFlowExceptLast)
                   } else {
@@ -374,7 +377,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
         }
 
         val action = $.props.runNow().operationMeta match {
-          case OperationMeta.AddNew(_) =>
+          case OperationMeta.AddNew =>
             Action.AddTransactionGroup(transactionsWithoutIdProvider = transactionsWithoutIdProvider)
           case OperationMeta.Edit(group) =>
             Action.UpdateTransactionGroup(
@@ -412,7 +415,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
     private def onDelete: Callback = LogExceptionsCallback {
       $.props.runNow().operationMeta match {
-        case OperationMeta.AddNew(_) => throw new AssertionError("Should never happen")
+        case OperationMeta.AddNew => throw new AssertionError("Should never happen")
         case OperationMeta.Edit(group) =>
           dispatcher.dispatch(Action.RemoveTransactionGroup(transactionGroupWithId = group))
           $.props.runNow().router.set(Page.EverythingPage).runNow()

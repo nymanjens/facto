@@ -45,11 +45,10 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
       .initialStateFromProps[State](props =>
         logExceptions {
           State(
-            transactionDate = props.defaultValues.map(_.transactionDate) getOrElse LocalDateTimes
+            transactionDate = props.defaultValues.transactionDate getOrElse LocalDateTimes
               .toStartOfDay(clock.now),
-            beneficiaryAccount = props.defaultValues
-              .map(_.beneficiary) getOrElse accountingConfig.personallySortedAccounts.head,
-            moneyReservoir = props.defaultValues.map(_.moneyReservoir) getOrElse selectableReservoirs().head
+            beneficiaryAccount = props.defaultValues.beneficiary getOrElse accountingConfig.personallySortedAccounts.head,
+            moneyReservoir = props.defaultValues.moneyReservoir getOrElse selectableReservoirs().head
           )
       })
       .renderBackend[Backend]
@@ -60,7 +59,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   def apply(key: Int,
             ref: Reference,
             title: String,
-            defaultValues: Option[Transaction],
+            defaultValues: Transaction.Partial,
             forceFlowValue: Option[ReferenceMoney] = None,
             showErrorMessages: Boolean,
             defaultPanel: Option[Proxy],
@@ -165,7 +164,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                            moneyReservoir: MoneyReservoir)
 
   private case class Props(title: String,
-                           defaultValues: Option[Transaction],
+                           defaultValues: Transaction.Partial,
                            forceFlowValue: Option[ReferenceMoney],
                            showErrorMessages: Boolean,
                            defaultPanel: Option[Proxy],
@@ -217,8 +216,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         },
         dateMappedInput(
           ref = consumedDateRef,
-          defaultValue = props.defaultValues.map(_.consumedDate) getOrElse LocalDateTimes.toStartOfDay(
-            clock.now),
+          defaultValue = props.defaultValues.consumedDate getOrElse LocalDateTimes.toStartOfDay(clock.now),
           valueTransformer = MappedInput.ValueTransformer.StringToLocalDateTime,
           delegateRefFactory = stringInputWithDefault.ref _,
           listener = AnythingChangedListener
@@ -245,12 +243,12 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
               }
           }
         },
-        <<.ifThen(props.defaultValues.isDefined && props.defaultValues.get.issuer != user) {
+        <<.ifThen(props.defaultValues.issuer.isDefined && props.defaultValues.issuer.get != user) {
           bootstrap.TextInput(
             ref = issuerRef,
             name = "issuer",
             label = i18n("facto.issuer"),
-            defaultValue = props.defaultValues.get.issuer.name,
+            defaultValue = props.defaultValues.issuer.get.name,
             disabled = true
           )
         },
@@ -302,8 +300,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             ref = extraProps.ref,
             name = "category",
             label = i18n("facto.category"),
-            defaultValue = props.defaultValues
-              .map(_.category) getOrElse state.beneficiaryAccount.categories.head,
+            defaultValue = props.defaultValues.category getOrElse state.beneficiaryAccount.categories.head,
             inputClasses = extraProps.inputClasses,
             options = state.beneficiaryAccount.categories,
             valueToId = _.code,
@@ -322,7 +319,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             ref = extraProps.ref,
             name = "description",
             label = i18n("facto.description"),
-            defaultValue = props.defaultValues.map(_.description) getOrElse "",
+            defaultValue = props.defaultValues.description,
             required = true,
             showErrorMessage = props.showErrorMessages,
             inputClasses = extraProps.inputClasses,
@@ -333,7 +330,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ref = flowRef,
           name = "flow",
           label = i18n("facto.flow"),
-          defaultValue = props.defaultValues.map(_.flowInCents) getOrElse 0,
+          defaultValue = props.defaultValues.flowInCents,
           required = true,
           showErrorMessage = props.showErrorMessages,
           forceValue = props.forceFlowValue.map(
@@ -354,7 +351,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             ref = extraProps.ref,
             name = "more-info",
             label = i18n("facto.more-info"),
-            defaultValue = props.defaultValues.map(_.detailDescription) getOrElse "",
+            defaultValue = props.defaultValues.detailDescription,
             showErrorMessage = props.showErrorMessages,
             inputClasses = extraProps.inputClasses,
             listener = AnythingChangedListener
@@ -362,7 +359,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         },
         tagsMappedInput(
           ref = tagsRef,
-          defaultValue = props.defaultValues.map(_.tags) getOrElse Seq(),
+          defaultValue = props.defaultValues.tags,
           valueTransformer = MappedInput.ValueTransformer.StringToTags,
           delegateRefFactory = stringInputWithDefault.ref _,
           listener = AnythingChangedListener

@@ -76,9 +76,16 @@ object Transaction {
                      createdDate: Option[LocalDateTime] = None,
                      transactionDate: Option[LocalDateTime] = None,
                      consumedDate: Option[LocalDateTime] = None,
-                     idOption: Option[Long] = None)
+                     idOption: Option[Long] = None) {
+    def tags: Seq[Tag] = Tag.parseTagsString(tagsString)
+    def issuer(implicit entityAccess: EntityAccess): Option[User] =
+      issuerId.map(entityAccess.userManager.findById(_))
+    def isEmpty: Boolean = this == Partial.empty
+  }
 
   object Partial {
+    val empty: Partial = Partial()
+
     def from(transactionGroupId: Long = 0,
              issuerId: Long = 0,
              beneficiary: Account = null,
