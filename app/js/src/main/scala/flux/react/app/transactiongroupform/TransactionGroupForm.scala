@@ -11,8 +11,8 @@ import flux.react.router.Page
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.RouterCtl
 import japgolly.scalajs.react.vdom.html_<^._
-import models.accounting.config.Config
-import models.accounting.money.{Currency, ExchangeRateManager, ReferenceMoney}
+import models.accounting.config.{Account, Config}
+import models.accounting.money.{Currency, DatedMoney, ExchangeRateManager, ReferenceMoney}
 import models.accounting.{Tag, Transaction, TransactionGroup}
 import models.{EntityAccess, User}
 
@@ -39,10 +39,12 @@ final class TransactionGroupForm(implicit i18n: I18n,
       .initialStateFromProps(props =>
         logExceptions {
           val numberOfTransactions = props.operationMeta match {
-            case OperationMeta.AddNew => 1
+            case OperationMeta.AddNew(None) => 1
+            case OperationMeta.AddNew(Some(partial)) => partial.transactions.length
             case OperationMeta.Edit(group) => group.transactions.length
           }
           val totalFlowRestriction = props.operationMeta match {
+            case OperationMeta.AddNew(Some(partial)) if partial.zeroSum => TotalFlowRestriction.ZeroSum
             case OperationMeta.Edit(group) if group.isZeroSum => TotalFlowRestriction.ZeroSum
             case _ => TotalFlowRestriction.AnyTotal
           }
@@ -63,7 +65,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
   // **************** API ****************//
   def forCreate(router: RouterCtl[Page]): VdomElement = {
-    create(Props(OperationMeta.AddNew, router))
+    create(Props(OperationMeta.AddNew(None), router))
   }
 
   def forEdit(transactionGroupId: Long, router: RouterCtl[Page]): VdomElement = {
@@ -71,17 +73,59 @@ final class TransactionGroupForm(implicit i18n: I18n,
   }
 
   def forTemplate(templateCode: String, router: RouterCtl[Page]): VdomElement = {
-    ???
+    val template = accountingConfig.templateWithCode(templateCode)
+    // If this user is not associated with an account, it should not see any templates.
+    val userAccount = accountingConfig.accountOf(user).get
+    forCreate(template.toPartial(userAccount), router)
   }
 
   def forRepayment(accountCode1: String,
                    accountCode2: String,
                    amountInCents: Long,
                    router: RouterCtl[Page]): VdomElement = {
-    ???
+    if (amountInCents < 0) {
+      forRepayment(accountCode2, accountCode1, -amountInCents, router)
+    } else {
+      val account1 = accountingConfig.accounts(accountCode1)
+      val account2 = accountingConfig.accounts(accountCode2)
+      def getAbsoluteFlowForAccountCurrency(account: Account): DatedMoney = {
+        val amount = ReferenceMoney(amountInCents)
+        val currency = account.defaultElectronicReservoir.currency
+        // Using current date because the repayment takes place today.
+        amount.withDate(clock.now).exchangedForCurrency(currency)
+      }
+
+      forCreate(
+        TransactionGroup.Partial(
+          Seq(
+            Transaction.Partial.from(
+              beneficiary = account1,
+              moneyReservoir = account1.defaultElectronicReservoir,
+              category = accountingConfig.constants.accountingCategory,
+              description = accountingConfig.constants.liquidationDescription,
+              flowInCents = -getAbsoluteFlowForAccountCurrency(account1).cents
+            ),
+            Transaction.Partial.from(
+              beneficiary = account1,
+              moneyReservoir = account2.defaultElectronicReservoir,
+              category = accountingConfig.constants.accountingCategory,
+              description = accountingConfig.constants.liquidationDescription,
+              flowInCents = getAbsoluteFlowForAccountCurrency(account2).cents
+            )
+          ),
+          zeroSum = true
+        ),
+        router
+      )
+    }
   }
 
   // **************** Private helper methods ****************//
+  private def forCreate(transactionGroupPartial: TransactionGroup.Partial,
+                        router: RouterCtl[Page]): VdomElement = {
+    create(Props(OperationMeta.AddNew(Some(transactionGroupPartial)), router))
+  }
+
   private def create(props: Props): VdomElement = {
     component.withKey(props.operationMeta.toString).apply(props)
   }
@@ -89,7 +133,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
   // **************** Private inner types ****************//
   private sealed trait OperationMeta
   private object OperationMeta {
-    case object AddNew extends OperationMeta
+    case class AddNew(partial: Option[TransactionGroup.Partial]) extends OperationMeta
     case class Edit(group: TransactionGroup) extends OperationMeta
   }
 
@@ -128,7 +172,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
               ^.className := "page-header",
               <.i(^.className := "icon-new-empty"),
               props.operationMeta match {
-                case OperationMeta.AddNew => i18n("facto.new-transaction")
+                case OperationMeta.AddNew(_) => i18n("facto.new-transaction")
                 case OperationMeta.Edit(_) => i18n("facto.edit-transaction")
               },
               ^^.ifThen(props.operationMeta.isInstanceOf[OperationMeta.Edit]) {
@@ -257,7 +301,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
           }
 
           var newState = state.copy(
-            foreignCurrency = currencies.filter(_.isForeign).headOption,
+            foreignCurrency = currencies.find(_.isForeign),
             totalFlowExceptLast = flows.dropRight(1).sum)
           if (state.totalFlowRestriction == TotalFlowRestriction.AnyTotal) {
             newState = newState.copy(totalFlow = flows.sum)
@@ -330,7 +374,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
         }
 
         val action = $.props.runNow().operationMeta match {
-          case OperationMeta.AddNew =>
+          case OperationMeta.AddNew(_) =>
             Action.AddTransactionGroup(transactionsWithoutIdProvider = transactionsWithoutIdProvider)
           case OperationMeta.Edit(group) =>
             Action.UpdateTransactionGroup(
@@ -368,7 +412,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
     private def onDelete: Callback = LogExceptionsCallback {
       $.props.runNow().operationMeta match {
-        case OperationMeta.AddNew => throw new AssertionError("Should never happen")
+        case OperationMeta.AddNew(_) => throw new AssertionError("Should never happen")
         case OperationMeta.Edit(group) =>
           dispatcher.dispatch(Action.RemoveTransactionGroup(transactionGroupWithId = group))
           $.props.runNow().router.set(Page.EverythingPage).runNow()
