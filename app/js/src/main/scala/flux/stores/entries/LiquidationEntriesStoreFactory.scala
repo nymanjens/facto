@@ -23,12 +23,9 @@ final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProx
           .newQuery[Transaction]()
           .sort(
             Loki.Sorting
-              .by("transactionDate")
-              .asc()
-              .thenBy("createdDate")
-              .asc()
-              .thenBy("id")
-              .asc())
+              .ascBy("transactionDate")
+              .thenAscBy("createdDate")
+              .thenAscBy("id"))
           .data()
 
       val relevantTransactions =

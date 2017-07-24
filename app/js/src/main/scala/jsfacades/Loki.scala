@@ -2,7 +2,7 @@ package jsfacades
 
 import common.GuavaReplacement.Iterables.getOnlyElement
 import common.ScalaUtils
-import jsfacades.Loki.Sorting.{MustSetOrder, PropNameWithDirection}
+import jsfacades.Loki.Sorting.PropNameWithDirection
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
@@ -117,23 +117,16 @@ object Loki {
   }
 
   case class Sorting private (private[Loki] val propNamesWithDirection: Seq[Sorting.PropNameWithDirection]) {
-    def thenBy(propName: String): MustSetOrder =
-      MustSetOrder(alreadyConfiguredSorting = this, nextPropName = propName)
+    def thenAscBy(propName: String): Sorting = thenBy(propName, isDesc = false)
+    def thenDescBy(propName: String): Sorting = thenBy(propName, isDesc = true)
+    def thenBy(propName: String, isDesc: Boolean): Sorting =
+      Sorting(propNamesWithDirection :+ PropNameWithDirection(propName, isDesc = isDesc))
   }
   object Sorting {
-    def by(propName: String): MustSetOrder =
-      MustSetOrder(alreadyConfiguredSorting = Sorting(Seq()), nextPropName = propName)
-
-    case class MustSetOrder private (private[Loki] val alreadyConfiguredSorting: Sorting,
-                                     private[Loki] val nextPropName: String) {
-      def asc(): Sorting = setIsDescending(false)
-      def desc(): Sorting = setIsDescending(true)
-      def setIsDescending(isDesc: Boolean): Sorting =
-        Sorting(
-          alreadyConfiguredSorting.propNamesWithDirection :+ PropNameWithDirection(
-            nextPropName,
-            isDesc = isDesc))
-    }
+    def ascBy(propName: String): Sorting = by(propName, isDesc = false)
+    def descBy(propName: String): Sorting = by(propName, isDesc = true)
+    def by(propName: String, isDesc: Boolean): Sorting =
+      Sorting(Seq(PropNameWithDirection(propName, isDesc = isDesc)))
 
     private[Loki] case class PropNameWithDirection(propName: String, isDesc: Boolean)
   }

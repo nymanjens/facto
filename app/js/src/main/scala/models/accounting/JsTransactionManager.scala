@@ -14,7 +14,7 @@ final class JsTransactionManager(implicit database: RemoteDatabaseProxy)
     database
       .newQuery[Transaction]()
       .find("transactionGroupId" -> groupId.toString)
-      .sort(Loki.Sorting.by("id").asc())
+      .sort(Loki.Sorting.ascBy("id"))
       .data()
   }
 }

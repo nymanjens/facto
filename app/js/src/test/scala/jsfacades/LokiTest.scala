@@ -30,13 +30,13 @@ object LokiTest extends TestSuite {
         resultSet.find("categoryCode" -> "catB").data().toSet ==> Set(transaction2, transaction3)
       }
       "sort()" - {
-        resultSet.sort(Loki.Sorting.by("id").asc()).data() ==> Seq(transaction1, transaction2, transaction3)
-        resultSet.sort(Loki.Sorting.by("id").desc()).data() ==> Seq(transaction3, transaction2, transaction1)
-        resultSet.sort(Loki.Sorting.by("categoryCode").asc().thenBy("id").desc()).data() ==>
+        resultSet.sort(Loki.Sorting.ascBy("id")).data() ==> Seq(transaction1, transaction2, transaction3)
+        resultSet.sort(Loki.Sorting.descBy("id")).data() ==> Seq(transaction3, transaction2, transaction1)
+        resultSet.sort(Loki.Sorting.ascBy("categoryCode").thenDescBy("id")).data() ==>
           Seq(transaction1, transaction3, transaction2)
       }
       "limit()" - {
-        resultSet.sort(Loki.Sorting.by("id").asc()).limit(2).data() ==> Seq(transaction1, transaction2)
+        resultSet.sort(Loki.Sorting.ascBy("id")).limit(2).data() ==> Seq(transaction1, transaction2)
       }
       "findOne()" - {
         resultSet.findOne("id" -> "2") ==> Some(transaction2)

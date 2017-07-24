@@ -20,12 +20,9 @@ final class EndowmentEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
           .find("beneficiaryAccountCode" -> account.code)
           .sort(
             Loki.Sorting
-              .by("consumedDate")
-              .desc()
-              .thenBy("createdDate")
-              .desc()
-              .thenBy("id")
-              .desc())
+              .descBy("consumedDate")
+              .thenDescBy("createdDate")
+              .thenDescBy("id"))
           .limit(3 * maxNumEntries)
           .data()
           .reverse
