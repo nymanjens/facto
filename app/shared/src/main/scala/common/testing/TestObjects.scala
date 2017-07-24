@@ -139,7 +139,7 @@ object TestObjects {
     zoneId = "Europe/Brussels"
   )
 
-  val testAccountingConfig: Config = Config(
+  implicit val testAccountingConfig: Config = Config(
     accounts =
       createListMap("ACC_COMMON" -> testAccountCommon, "ACC_A" -> testAccountA, "ACC_B" -> testAccountB),
     categories = createListMap("CAT_B" -> testCategoryB, "CAT_A" -> testCategoryA),

@@ -15,7 +15,6 @@ import scala.util.Random
 import scala2js.Converters._
 
 object EndowmentEntriesStoreFactoryTest extends TestSuite {
-  implicit private val accountingConfig = new TestModule().accountingConfig
 
   override def tests = TestSuite {
     implicit val database = new FakeRemoteDatabaseProxy()
@@ -47,7 +46,7 @@ object EndowmentEntriesStoreFactoryTest extends TestSuite {
                                  consumedDay: Int,
                                  createdDay: Int = 1,
                                  account: Account = testAccountA,
-                                 category: Category = accountingConfig.constants.endowmentCategory)(
+                                 category: Category = testAccountingConfig.constants.endowmentCategory)(
       implicit database: FakeRemoteDatabaseProxy): Transaction = {
     val transaction = testTransactionWithIdA.copy(
       idOption = Some(id),
