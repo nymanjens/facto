@@ -101,6 +101,10 @@ object Loki {
 
   trait ResultSet[E] {
     // **************** Intermediary operations **************** //
+    /**
+      * Finds an exact match for plain filter values or applies other kinds of matching
+      * when modifiers are used (see `ResultSet`).
+      */
     def find(filter: (String, js.Any)): ResultSet[E]
 
     /**
@@ -111,6 +115,10 @@ object Loki {
     def limit(quantity: Int): ResultSet[E]
 
     // **************** Terminal operations **************** //
+    /**
+      * Finds an exact match for plain filter values or applies other kinds of matching
+      * when modifiers are used (see `ResultSet`).
+      */
     def findOne(filter: (String, js.Any)): Option[E]
     def data(): Seq[E]
     def count(): Int
@@ -134,6 +142,12 @@ object Loki {
   object ResultSet {
 
     def empty[E: Scala2Js.MapConverter]: ResultSet[E] = new ResultSet.Fake(Seq())
+
+    /** To be used as ResultSet find values, e.g. `.find("createdDate" -> greaterThan(myDate))`. */
+    def greaterThan[T: Scala2Js.Converter](value: T): js.Dictionary[js.Any] =
+      js.Dictionary("$gt" -> Scala2Js.toJs(value))
+    def lessThan[T: Scala2Js.Converter](value: T): js.Dictionary[js.Any] =
+      js.Dictionary("$lt" -> Scala2Js.toJs(value))
 
     private[jsfacades] final class Impl[E: Scala2Js.MapConverter](facade: ResultSetFacade)
         extends ResultSet[E] {
