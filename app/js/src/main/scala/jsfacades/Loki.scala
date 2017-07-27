@@ -196,7 +196,7 @@ object Loki {
         new Ordering[js.Any] {
           override def compare(x: js.Any, y: js.Any): Int = {
             if (x.getClass == classOf[String]) {
-              x.asInstanceOf[String] compareTo y.asInstanceOf[String]
+              x.asInstanceOf[String] compareTo y.toString
             } else if (x.isInstanceOf[Int]) {
               x.asInstanceOf[Int] compareTo y.asInstanceOf[Int]
             } else {
@@ -210,18 +210,9 @@ object Loki {
       override def find(filter: (String, js.Any)) = new ResultSet.Fake(
         entities.filter { entity =>
           def compare(val1: js.Any, val2: js.Any, func: String): Boolean = {
-            if (val1.getClass == classOf[String]) {
-              func match {
-                case "$lt" => val1.asInstanceOf[String] < val2.toString
-                case "$gt" => val1.asInstanceOf[String] > val2.toString
-              }
-            } else if (val1.isInstanceOf[Int]) {
-              func match {
-                case "$lt" => val1.asInstanceOf[Int] < val2.asInstanceOf[Int]
-                case "$gt" => val1.asInstanceOf[Int] > val2.asInstanceOf[Int]
-              }
-            } else {
-              ???
+            func match {
+              case "$lt" => jsValueOrdering.lt(val1, val2)
+              case "$gt" => jsValueOrdering.gt(val1, val2)
             }
           }
           val jsMap = Scala2Js.toJsMap(entity)
