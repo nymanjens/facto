@@ -73,7 +73,7 @@ object LocalDatabaseTest extends ManualTestSuite {
         db.newQuery[Transaction]().findOne("id" -> "99992") ==> Some(transaction2)
       }
     },
-    ManualTest("newQuery(): Lookup by comparison works") {
+    ManualTest("newQuery(): Lookup with lessThan filter") {
       async {
         implicit val db = await(LocalDatabase.createInMemoryForTests())
         val transaction1 = persistTransaction(day = 1)
@@ -87,6 +87,22 @@ object LocalDatabaseTest extends ManualTestSuite {
           .data()
 
         data ==> Vector(transaction1, transaction2)
+      }
+    },
+    ManualTest("newQuery(): Lookup with greaterThan filter") {
+      async {
+        implicit val db = await(LocalDatabase.createInMemoryForTests())
+        val transaction1 = persistTransaction(day = 1)
+        val transaction2 = persistTransaction(day = 2)
+        val transaction3 = persistTransaction(day = 3)
+
+        val data = db
+          .newQuery[Transaction]()
+          .find("createdDate" -> Loki.ResultSet.greaterThan(transaction1.createdDate))
+          .sort(Loki.Sorting.ascBy("createdDate"))
+          .data()
+
+        data ==> Vector(transaction2, transaction3)
       }
     },
     ManualTest("newQuery(): Sorts values") {
