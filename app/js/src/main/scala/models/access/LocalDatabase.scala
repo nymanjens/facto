@@ -9,8 +9,10 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala2js.Converters._
 import scala2js.Scala2Js
+import common.ScalaUtils.visibleForTesting
 
-private[access] trait LocalDatabase {
+@visibleForTesting
+trait LocalDatabase {
   // **************** Getters ****************//
   def newQuery[E <: Entity: EntityType](): Loki.ResultSet[E]
   def getSingletonValue[V](key: SingletonKey[V]): Option[V]
@@ -29,7 +31,8 @@ private[access] trait LocalDatabase {
   def clear(): Future[Unit]
 }
 
-private[access] object LocalDatabase {
+@visibleForTesting
+object LocalDatabase {
 
   def createFuture(): Future[LocalDatabase] = {
     val lokiDb: Loki.Database = Loki.Database.persistent("facto-db")

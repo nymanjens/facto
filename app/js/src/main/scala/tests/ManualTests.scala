@@ -1,7 +1,5 @@
 package tests
 
-import models.access.LocalDatabaseTest
-
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
@@ -38,7 +36,7 @@ object ManualTests {
     }
   }
 
-  private val allTestSuites: Seq[ManualTestSuite] = Seq(LocalDatabaseTest)
+  private val allTestSuites: Seq[ManualTestSuite] = Seq(LocalDatabaseTest, LokiResultSetTest)
 
   trait ManualTestSuite {
     def tests: Seq[ManualTest]
