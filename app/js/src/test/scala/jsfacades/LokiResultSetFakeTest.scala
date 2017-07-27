@@ -17,7 +17,7 @@ import scala2js.Converters._
 import scala2js.ConvertersTest._
 import scala2js.Scala2Js
 
-object LokiTest extends TestSuite {
+object LokiResultSetFakeTest extends TestSuite {
 
   override def tests = TestSuite {
     "Loki.ResultSet.Fake" - {
