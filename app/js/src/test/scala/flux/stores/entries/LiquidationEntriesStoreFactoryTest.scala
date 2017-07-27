@@ -16,12 +16,19 @@ import scala2js.Converters._
 
 object LiquidationEntriesStoreFactoryTest extends TestSuite {
 
+  val pair = AccountPair(testAccountA, testAccountB)
+
   override def tests = TestSuite {
     val testModule = new TestModule()
     implicit val database = testModule.fakeRemoteDatabaseProxy
     implicit val exchangeRateManager = testModule.exchangeRateManager
     implicit val entityAccess = testModule.entityAccess
     val factory: LiquidationEntriesStoreFactory = new LiquidationEntriesStoreFactory()
+
+    "empty result" - {
+      factory.get(pair, maxNumEntries = 10000).state.entries ==> Seq()
+      factory.get(pair, maxNumEntries = 10000).state.hasMore ==> false
+    }
 
     "gives correct results" - {
       val trans1 = persistTransaction(
@@ -71,17 +78,19 @@ object LiquidationEntriesStoreFactoryTest extends TestSuite {
       )
 
       // Run tests
-      val pair = AccountPair(testAccountA, testAccountB)
-      for (i <- 1 to expectedEntries.size) {
-        val subList = expectedEntries.takeRight(i)
+      "Increasing number of entries" - {
+        for (i <- 1 to expectedEntries.size) {
+          val subList = expectedEntries.takeRight(i)
 
-        factory.get(pair, maxNumEntries = subList.size).state.entries ==> subList
-        factory.get(pair, maxNumEntries = subList.size).state.hasMore ==> (i < expectedEntries.size)
+          factory.get(pair, maxNumEntries = subList.size).state.entries ==> subList
+          factory.get(pair, maxNumEntries = subList.size).state.hasMore ==> (i < expectedEntries.size)
+        }
       }
 
-      // test when n > num entries
-      factory.get(pair, maxNumEntries = 10000).state.entries ==> expectedEntries
-      factory.get(pair, maxNumEntries = 10000).state.hasMore ==> false
+      "All entries" - {
+        factory.get(pair, maxNumEntries = 10000).state.entries ==> expectedEntries
+        factory.get(pair, maxNumEntries = 10000).state.hasMore ==> false
+      }
     }
   }
 
