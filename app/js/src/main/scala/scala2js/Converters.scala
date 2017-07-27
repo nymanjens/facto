@@ -48,6 +48,11 @@ object Converters {
     override def toScala(value: js.Any) = value.asInstanceOf[Int]
   }
 
+  implicit object LongConverter extends Scala2Js.Converter[Long] {
+    override def toJs(long: Long) = "%022d".format(long)
+    override def toScala(value: js.Any) = value.asInstanceOf[String].toLong
+  }
+
   implicit object DoubleConverter extends Scala2Js.Converter[Double] {
     override def toJs(double: Double) = double
     override def toScala(value: js.Any) = value.asInstanceOf[Double]
@@ -83,14 +88,14 @@ object Converters {
     override final def toJs(entity: E) = {
       val result = toJsWithoutId(entity)
       for (id <- entity.idOption) {
-        result.update("id", id.toString)
+        result.update("id", Scala2Js.toJs(id))
       }
       result
     }
 
     override final def toScala(dict: js.Dictionary[js.Any]) = {
       val entityWithoutId = toScalaWithoutId(dict)
-      val idOption = getOptionalValueFromDict[String](dict)("id").map(_.toLong)
+      val idOption = getOptionalValueFromDict[String](dict)("id").map(Scala2Js.toScala[Long]( _))
       if (idOption.isDefined) {
         entityWithoutId.withId(idOption.get).asInstanceOf[E]
       } else {
@@ -122,13 +127,13 @@ object Converters {
   implicit object TransactionConverter extends EntityConverter[Transaction] {
     override def toJsWithoutId(transaction: Transaction) = {
       js.Dictionary[js.Any](
-        "transactionGroupId" -> transaction.transactionGroupId.toString,
-        "issuerId" -> transaction.issuerId.toString,
+        "transactionGroupId" -> Scala2Js.toJs(transaction.transactionGroupId),
+        "issuerId" -> Scala2Js.toJs(transaction.issuerId),
         "beneficiaryAccountCode" -> transaction.beneficiaryAccountCode,
         "moneyReservoirCode" -> transaction.moneyReservoirCode,
         "categoryCode" -> transaction.categoryCode,
         "description" -> transaction.description,
-        "flowInCents" -> transaction.flowInCents.toString,
+        "flowInCents" -> Scala2Js.toJs(transaction.flowInCents),
         "detailDescription" -> transaction.detailDescription,
         "tagsString" -> transaction.tagsString,
         "createdDate" -> Scala2Js.toJs(transaction.createdDate),
@@ -140,13 +145,13 @@ object Converters {
       def getRequired[T: Scala2Js.Converter](key: String) = getRequiredValueFromDict[T](dict)(key)
 
       Transaction(
-        transactionGroupId = getRequired[String]("transactionGroupId").toLong,
-        issuerId = getRequired[String]("issuerId").toLong,
+        transactionGroupId = getRequired[Long]("transactionGroupId"),
+        issuerId = getRequired[Long]("issuerId"),
         beneficiaryAccountCode = getRequired[String]("beneficiaryAccountCode"),
         moneyReservoirCode = getRequired[String]("moneyReservoirCode"),
         categoryCode = getRequired[String]("categoryCode"),
         description = getRequired[String]("description"),
-        flowInCents = getRequired[String]("flowInCents").toLong,
+        flowInCents = getRequired[Long]("flowInCents"),
         detailDescription = getRequired[String]("detailDescription"),
         tagsString = getRequired[String]("tagsString"),
         createdDate = getRequired[LocalDateTime]("createdDate"),
@@ -170,9 +175,9 @@ object Converters {
   implicit object BalanceCheckConverter extends EntityConverter[BalanceCheck] {
     override def toJsWithoutId(balanceCheck: BalanceCheck) = {
       js.Dictionary[js.Any](
-        "issuerId" -> balanceCheck.issuerId.toString,
+        "issuerId" -> Scala2Js.toJs(balanceCheck.issuerId),
         "moneyReservoirCode" -> balanceCheck.moneyReservoirCode,
-        "balanceInCents" -> balanceCheck.balanceInCents.toString,
+        "balanceInCents" -> Scala2Js.toJs(balanceCheck.balanceInCents),
         "createdDate" -> Scala2Js.toJs(balanceCheck.createdDate),
         "checkDate" -> Scala2Js.toJs(balanceCheck.checkDate)
       )
@@ -181,9 +186,9 @@ object Converters {
       def getRequired[T: Scala2Js.Converter](key: String) = getRequiredValueFromDict[T](dict)(key)
 
       BalanceCheck(
-        issuerId = getRequired[String]("issuerId").toLong,
+        issuerId = getRequired[Long]("issuerId"),
         moneyReservoirCode = getRequired[String]("moneyReservoirCode"),
-        balanceInCents = getRequired[String]("balanceInCents").toLong,
+        balanceInCents = getRequired[Long]("balanceInCents"),
         createdDate = getRequired[LocalDateTime]("createdDate"),
         checkDate = getRequired[LocalDateTime]("checkDate")
       )

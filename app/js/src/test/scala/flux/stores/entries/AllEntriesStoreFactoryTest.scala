@@ -64,12 +64,9 @@ object AllEntriesStoreFactoryTest extends TestSuite {
     }
 
     "combines consecutive transactions" - {
-      val trans1 = testTransactionWithIdA
-        .copy(idOption = Some(11), transactionGroupId = 122, createdDate = createDateTime(2012, JANUARY, 1))
-      val trans2 = testTransactionWithIdA
-        .copy(idOption = Some(22), transactionGroupId = 122, createdDate = createDateTime(2012, JANUARY, 2))
-      val trans3 = testTransactionWithIdA
-        .copy(idOption = Some(33), transactionGroupId = 133, createdDate = createDateTime(2012, JANUARY, 3))
+      val trans1 = testTransactionWithIdA.copy(idOption = Some(91), transactionGroupId = 122)
+      val trans2 = testTransactionWithIdA.copy(idOption = Some(501), transactionGroupId = 122)
+      val trans3 = testTransactionWithIdA.copy(idOption = Some(1234567890), transactionGroupId = 133)
 
       database.addRemotelyAddedEntities(trans1, trans2, trans3)
 
