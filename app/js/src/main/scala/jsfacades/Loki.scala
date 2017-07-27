@@ -10,6 +10,7 @@ import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSGlobal, JSName}
 import scala.scalajs.js.JSConverters._
+import scala.util.{Try, Success, Failure}
 import scala2js.Converters._
 import scala2js.Scala2Js
 
@@ -208,9 +209,32 @@ object Loki {
       // **************** Intermediary operations **************** //
       override def find(filter: (String, js.Any)) = new ResultSet.Fake(
         entities.filter { entity =>
+          def compare(val1: js.Any, val2: js.Any, func: String): Boolean = {
+            if (val1.getClass == classOf[String]) {
+              func match {
+                case "$lt" => val1.asInstanceOf[String] < val2.toString
+                case "$gt" => val1.asInstanceOf[String] > val2.toString
+              }
+            } else if (val1.isInstanceOf[Int]) {
+              func match {
+                case "$lt" => val1.asInstanceOf[Int] < val2.asInstanceOf[Int]
+                case "$gt" => val1.asInstanceOf[Int] > val2.asInstanceOf[Int]
+              }
+            } else {
+              ???
+            }
+          }
           val jsMap = Scala2Js.toJsMap(entity)
           filter match {
-            case (k, v) => jsMap(k) == v
+            case (k, v) =>
+              Try(v.asInstanceOf[js.Dictionary[js.Any]].keys) match {
+                case Success(keys) if keys.size == 1 && getOnlyElement(keys).startsWith("$") =>
+                  compare(
+                    jsMap(k),
+                    getOnlyElement(v.asInstanceOf[js.Dictionary[js.Any]].values),
+                    getOnlyElement(v.asInstanceOf[js.Dictionary[js.Any]].keys))
+                case _ => jsMap(k) == v
+              }
           }
         }
       )
