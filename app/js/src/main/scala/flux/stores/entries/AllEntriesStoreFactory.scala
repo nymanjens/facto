@@ -31,8 +31,8 @@ final class AllEntriesStoreFactory(implicit database: RemoteDatabaseProxy)
       EntriesListStoreFactory.State(entries.takeRight(maxNumEntries), hasMore = entries.size > maxNumEntries)
     }
 
-    override protected def transactionModificationImpactsState(transaction: Transaction,
-                                                               state: State): Boolean = true
+    override protected def transactionUpsertImpactsState(transaction: Transaction, state: State): Boolean =
+      true
   }
 
   def get(maxNumEntries: Int): Store = get(Input(maxNumEntries = maxNumEntries, additionalInput = (): Unit))

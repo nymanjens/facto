@@ -43,7 +43,7 @@ abstract class EntriesStore[State](implicit database: RemoteDatabaseProxy) {
   // **************** Abstract methods ****************//
   protected def calculateState(): State
 
-  protected def transactionModificationImpactsState(transaction: Transaction, state: State): Boolean
+  protected def transactionUpsertImpactsState(transaction: Transaction, state: State): Boolean
 
   // **************** Private helper methods ****************//
   private def updateState(): Unit = {
@@ -67,7 +67,7 @@ abstract class EntriesStore[State](implicit database: RemoteDatabaseProxy) {
       case EntityType.TransactionType =>
         entityModification match {
           case EntityModification.Add(transaction) =>
-            transactionModificationImpactsState(transaction.asInstanceOf[Transaction], state)
+            transactionUpsertImpactsState(transaction.asInstanceOf[Transaction], state)
           case EntityModification.Remove(transactionId) =>
             false // Removal always happens alongside Group removal or entity modification (cases handled separately)
         }
