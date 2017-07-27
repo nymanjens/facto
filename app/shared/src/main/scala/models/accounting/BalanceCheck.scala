@@ -19,7 +19,7 @@ case class BalanceCheck(issuerId: Long,
 
   override def withId(id: Long) = copy(idOption = Some(id))
 
-  override def toString = s"BalanceCheck(issuer=$issuerId, $moneyReservoirCode)"
+  override def toString = s"BalanceCheck(id=$idOption, issuer=$issuerId, $moneyReservoirCode)"
 
   def issuer(implicit entityAccess: EntityAccess): User = entityAccess.userManager.findById(issuerId)
   def moneyReservoir(implicit accountingConfig: Config): MoneyReservoir =

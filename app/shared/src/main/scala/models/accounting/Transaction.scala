@@ -53,7 +53,7 @@ case class Transaction(transactionGroupId: Long,
     if (consumedDate == transactionDate) None else Some(consumedDate)
 
   override def toString = {
-    s"Transaction(group=$transactionGroupId, issuer=${issuerId}, $beneficiaryAccountCode, $moneyReservoirCode, $categoryCode, flowInCents=$flowInCents, $description)"
+    s"Transaction(id=$idOption, group=$transactionGroupId, issuer=${issuerId}, $beneficiaryAccountCode, $moneyReservoirCode, $categoryCode, flowInCents=$flowInCents, $description)"
   }
 }
 object Transaction {
