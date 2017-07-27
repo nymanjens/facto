@@ -1,7 +1,10 @@
 package models.access
 
-import scala.async.Async.{async, await}
+import java.time.Month.JANUARY
+
 import common.testing.TestObjects._
+import common.time.LocalDateTimes.createDateTime
+import jsfacades.Loki
 import models.User
 import models.access.SingletonKey.{NextUpdateTokenKey, VersionKey}
 import models.accounting.money.ExchangeRateMeasurement
@@ -9,8 +12,10 @@ import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 import models.manager.EntityModification
 import tests.ManualTests.{ManualTest, ManualTestSuite}
 
+import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala2js.Converters._
 
 // Note that this is a manual test because the Rhino javascript engine used for tests
 // is incompatible with Loki.
@@ -66,6 +71,37 @@ object LocalDatabaseTest extends ManualTestSuite {
         db.addAll(Seq(testTransactionWithId, transaction2, transaction3))
 
         db.newQuery[Transaction]().findOne("id" -> "99992") ==> Some(transaction2)
+      }
+    },
+    ManualTest("newQuery(): Lookup by comparison works") {
+      async {
+        implicit val db = await(LocalDatabase.createInMemoryForTests())
+        val transaction1 = persistTransaction(day = 1)
+        val transaction2 = persistTransaction(day = 2)
+        val transaction3 = persistTransaction(day = 3)
+
+        val data = db
+          .newQuery[Transaction]()
+          .find("createdDate" -> Loki.ResultSet.lessThan(transaction3.createdDate))
+          .sort(Loki.Sorting.ascBy("createdDate"))
+          .data()
+
+        data ==> Vector(transaction1, transaction2)
+      }
+    },
+    ManualTest("newQuery(): Sorts values") {
+      async {
+        implicit val db = await(LocalDatabase.createInMemoryForTests())
+        val transaction1 = persistTransaction(groupId = 1, day = 2)
+        val transaction2 = persistTransaction(groupId = 1, day = 3)
+        val transaction3 = persistTransaction(groupId = 2, day = 1)
+
+        val data = db
+          .newQuery[Transaction]()
+          .sort(Loki.Sorting.descBy("groupId").thenAscBy("createdDate"))
+          .data()
+
+        data ==> Vector(transaction3, transaction1, transaction2)
       }
     },
     ManualTest("clear") {
@@ -143,4 +179,16 @@ object LocalDatabaseTest extends ManualTestSuite {
       }
     }
   )
+
+  private def persistTransaction(groupId: Long = 1, day: Int = 1)(implicit db: LocalDatabase): Transaction = {
+    val transaction = testTransactionWithIdA.copy(
+      idOption = Some(EntityModification.generateRandomId()),
+      transactionGroupId = groupId,
+      createdDate = createDateTime(2012, JANUARY, day),
+      transactionDate = createDateTime(2012, JANUARY, day),
+      consumedDate = createDateTime(2012, JANUARY, day)
+    )
+    db.addAll(Seq(transaction))
+    transaction
+  }
 }
