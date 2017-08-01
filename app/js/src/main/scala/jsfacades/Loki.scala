@@ -83,7 +83,8 @@ object Loki {
     def chain(): ResultSet[E] = new ResultSet.Impl[E](facade.chain())
 
     def insert(obj: E): Unit = facade.insert(Scala2Js.toJsMap(obj))
-    def findAndRemove(filter: (String, js.Any)): Unit = facade.findAndRemove(js.Dictionary(filter))
+    def findAndRemove[V: Scala2Js.Converter](key: Scala2Js.Key[V], value: V): Unit =
+      facade.findAndRemove(js.Dictionary(Scala2Js.Key.toJsPair(key -> value)))
     def clear(): Unit = facade.clear()
   }
 
@@ -102,25 +103,15 @@ object Loki {
 
   trait ResultSet[E] {
     // **************** Intermediary operations **************** //
-    /**
-      * Finds an exact match for plain filter values or applies other kinds of matching
-      * when modifiers are used (see `ResultSet`).
-      */
-    def find(filter: (String, js.Any)): ResultSet[E]
+    def filter[V: Scala2Js.Converter](key: Scala2Js.Key[V], value: V): ResultSet[E]
+    def filterGreaterThan[V: Scala2Js.Converter](key: Scala2Js.Key[V], value: V): ResultSet[E]
+    def filterLessThan[V: Scala2Js.Converter](key: Scala2Js.Key[V], value: V): ResultSet[E]
 
-    /**
-      * Loose evaluation for user to sort based on a property names. Sorting based on the same lt/gt helper
-      * functions used for binary indices.
-      */
     def sort(sorting: Loki.Sorting): ResultSet[E]
     def limit(quantity: Int): ResultSet[E]
 
     // **************** Terminal operations **************** //
-    /**
-      * Finds an exact match for plain filter values or applies other kinds of matching
-      * when modifiers are used (see `ResultSet`).
-      */
-    def findOne(filter: (String, js.Any)): Option[E]
+    def findOne[V: Scala2Js.Converter](key: Scala2Js.Key[V], value: V): Option[E]
     def data(): Seq[E]
     def count(): Int
   }
@@ -144,19 +135,17 @@ object Loki {
 
     def empty[E: Scala2Js.MapConverter]: ResultSet[E] = new ResultSet.Fake(Seq())
 
-    /** To be used as ResultSet find values, e.g. `.find("createdDate" -> greaterThan(myDate))`. */
-    def greaterThan[T: Scala2Js.Converter](value: T): js.Dictionary[js.Any] =
-      js.Dictionary("$gt" -> Scala2Js.toJs(value))
-    def lessThan[T: Scala2Js.Converter](value: T): js.Dictionary[js.Any] =
-      js.Dictionary("$lt" -> Scala2Js.toJs(value))
-
     private[jsfacades] final class Impl[E: Scala2Js.MapConverter](facade: ResultSetFacade)
         extends ResultSet[E] {
 
       // **************** Intermediary operations **************** //
-      override def find(filter: (String, js.Any)) = {
-        new ResultSet.Impl[E](facade.find(js.Dictionary(filter)))
+      override def filter[V: Scala2Js.Converter](key: Scala2Js.Key[V], value: V) = {
+        new ResultSet.Impl[E](facade.find(js.Dictionary(Scala2Js.Key.toJsPair(key -> value))))
       }
+
+      override def filterGreaterThan[V: Scala2Js.Converter](key: Scala2Js.Key[V], value: V): ResultSet[E] =
+        ???
+      override def filterLessThan[V: Scala2Js.Converter](key: Scala2Js.Key[V], value: V): ResultSet[E] = ???
 
       override def sort(sorting: Loki.Sorting) = {
         val properties: js.Array[js.Array[js.Any]] = {
@@ -172,8 +161,8 @@ object Loki {
       }
 
       // **************** Terminal operations **************** //
-      override def findOne(filter: (String, js.Any)) = {
-        val data = facade.find(js.Dictionary(filter), firstOnly = true).data()
+      override def findOne[V: Scala2Js.Converter](key: Scala2Js.Key[V], value: V) = {
+        val data = facade.find(js.Dictionary(Scala2Js.Key.toJsPair(key -> value)), firstOnly = true).data()
         if (data.length >= 1) {
           Option(Scala2Js.toScala[E](getOnlyElement(data)))
         } else {
@@ -207,28 +196,15 @@ object Loki {
       }
 
       // **************** Intermediary operations **************** //
-      override def find(filter: (String, js.Any)) = new ResultSet.Fake(
-        entities.filter { entity =>
-          def compare(val1: js.Any, val2: js.Any, func: String): Boolean = {
-            func match {
-              case "$lt" => jsValueOrdering.lt(val1, val2)
-              case "$gt" => jsValueOrdering.gt(val1, val2)
-            }
-          }
+      override def filter[V: Scala2Js.Converter](key: Scala2Js.Key[V], value: V) =
+        new ResultSet.Fake(entities.filter { entity =>
           val jsMap = Scala2Js.toJsMap(entity)
-          filter match {
-            case (k, v) =>
-              Try(v.asInstanceOf[js.Dictionary[js.Any]].keys) match {
-                case Success(keys) if keys.size == 1 && getOnlyElement(keys).startsWith("$") =>
-                  compare(
-                    jsMap(k),
-                    getOnlyElement(v.asInstanceOf[js.Dictionary[js.Any]].values),
-                    getOnlyElement(v.asInstanceOf[js.Dictionary[js.Any]].keys))
-                case _ => jsMap(k) == v
-              }
-          }
-        }
-      )
+          jsMap(key.name) == Scala2Js.toJs(value)
+        })
+
+      override def filterGreaterThan[V: Scala2Js.Converter](key: Scala2Js.Key[V], value: V): ResultSet[E] =
+        ???
+      override def filterLessThan[V: Scala2Js.Converter](key: Scala2Js.Key[V], value: V): ResultSet[E] = ???
 
       override def sort(sorting: Loki.Sorting) = {
         val newData: Seq[E] = {
@@ -258,10 +234,11 @@ object Loki {
       // **************** Terminal operations **************** //
       override def data() = entities
 
-      override def findOne(filter: (String, js.Any)) = find(filter).limit(1).data() match {
-        case Seq(e) => Some(e)
-        case Seq() => None
-      }
+      override def findOne[V: Scala2Js.Converter](key: Scala2Js.Key[V], value: V) =
+        filter(key, value).limit(1).data() match {
+          case Seq(e) => Some(e)
+          case Seq() => None
+        }
 
       override def count() = entities.length
     }

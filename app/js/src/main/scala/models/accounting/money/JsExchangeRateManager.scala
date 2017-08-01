@@ -1,11 +1,12 @@
 package models.accounting.money
-
+import scala2js.Converters._
 import scala.collection.immutable.{Seq, TreeMap}
 import common.time.LocalDateTime
 import models.access.RemoteDatabaseProxy
 import models.manager.{EntityModification, EntityType}
 
 import scala.collection.{SortedMap, mutable}
+import scala2js.Keys
 
 final class JsExchangeRateManager(implicit database: RemoteDatabaseProxy) extends ExchangeRateManager {
   database.registerListener(RemoteDatabaseProxyListener)
@@ -51,7 +52,7 @@ final class JsExchangeRateManager(implicit database: RemoteDatabaseProxy) extend
     val mapBuilder = TreeMap.newBuilder[LocalDateTime, Double]
     for (measurement <- database
            .newQuery[ExchangeRateMeasurement]()
-           .find("foreignCurrencyCode" -> currency.code)
+           .filter(Keys.ExchangeRateMeasurement.foreignCurrencyCode, currency.code)
            .data()) {
       mapBuilder += (measurement.date -> measurement.ratioReferenceToForeignCurrency)
     }

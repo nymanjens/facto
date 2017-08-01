@@ -15,15 +15,21 @@ object Scala2Js {
     def toScala(value: js.Dictionary[js.Any]): T
 
     // **************** Protected helper methods **************** //
-    protected final def getRequiredValueFromDict[V: Converter](value: js.Dictionary[js.Any])(
-        key: String): V = {
-      require(value.contains(key), s"Key $key is missing from ${js.JSON.stringify(value)}")
-      Scala2Js.toScala[V](value(key))
+    protected final def getRequiredValueFromDict[V: Converter](dict: js.Dictionary[js.Any])(key: Key[V]): V = {
+      require(dict.contains(key.name), s"Key ${key.name} is missing from ${js.JSON.stringify(dict)}")
+      Scala2Js.toScala[V](dict(key.name))
     }
 
     protected final def getOptionalValueFromDict[V: Converter](value: js.Dictionary[js.Any])(
         key: String): Option[V] = {
       value.get(key) map Scala2Js.toScala[V]
+    }
+  }
+
+  case class Key[V: Converter](name: String)
+  object Key {
+    def toJsPair[V: Converter](keyValuePair: (Key[V], V)): (String, js.Any) = keyValuePair match {
+      case (key, value) => key.name -> toJs(value)
     }
   }
 

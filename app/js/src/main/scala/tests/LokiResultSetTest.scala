@@ -14,6 +14,7 @@ import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
+import scala2js.Keys
 
 // Note that this is a manual test because the Rhino javascript engine used for tests
 // is incompatible with Loki.
@@ -27,7 +28,7 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
         val transaction3 = testTransactionWithId.copy(idOption = Some(99993))
         db.addAll(Seq(testTransactionWithId, transaction2, transaction3))
 
-        db.newQuery[Transaction]().findOne("id" -> "99992") ==> Some(transaction2)
+        db.newQuery[Transaction]().findOne(Keys.id , 99992L) ==> Some(transaction2)
       }
     },
     ManualTest("newQuery(): Lookup with lessThan filter") {
@@ -39,7 +40,7 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
 
         val data = db
           .newQuery[Transaction]()
-          .find("createdDate" -> Loki.ResultSet.lessThan(transaction3.createdDate))
+          .filterLessThan(Keys.Transaction.createdDate , transaction3.createdDate)
           .sort(Loki.Sorting.ascBy("createdDate"))
           .data()
 
@@ -55,7 +56,7 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
 
         val data = db
           .newQuery[Transaction]()
-          .find("createdDate" -> Loki.ResultSet.greaterThan(transaction1.createdDate))
+          .filterGreaterThan(Keys.Transaction.createdDate , transaction1.createdDate)
           .sort(Loki.Sorting.ascBy("createdDate"))
           .data()
 

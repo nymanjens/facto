@@ -5,7 +5,8 @@ import models.access.RemoteDatabaseProxy
 import models.accounting.Transaction
 import models.accounting.config.{Account, Config}
 import models.manager.{EntityModification, EntityType}
-
+import scala2js.Converters._
+import scala2js.Keys
 import scala.collection.immutable.Seq
 
 final class EndowmentEntriesStoreFactory(implicit database: RemoteDatabaseProxy, accountingConfig: Config)
@@ -16,8 +17,8 @@ final class EndowmentEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
       val transactions: Seq[Transaction] =
         database
           .newQuery[Transaction]()
-          .find("categoryCode" -> accountingConfig.constants.endowmentCategory.code)
-          .find("beneficiaryAccountCode" -> account.code)
+          .filter(Keys.Transaction.categoryCode, accountingConfig.constants.endowmentCategory.code)
+          .filter(Keys.Transaction.beneficiaryAccountCode, account.code)
           .sort(
             Loki.Sorting
               .descBy("consumedDate")
