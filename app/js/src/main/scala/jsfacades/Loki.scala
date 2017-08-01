@@ -203,8 +203,16 @@ object Loki {
         })
 
       override def filterGreaterThan[V: Scala2Js.Converter](key: Scala2Js.Key[V], value: V): ResultSet[E] =
-        ???
-      override def filterLessThan[V: Scala2Js.Converter](key: Scala2Js.Key[V], value: V): ResultSet[E] = ???
+        new ResultSet.Fake(entities.filter { entity =>
+          val jsMap = Scala2Js.toJsMap(entity)
+          jsValueOrdering.gt(jsMap(key.name), Scala2Js.toJs(value))
+        })
+
+      override def filterLessThan[V: Scala2Js.Converter](key: Scala2Js.Key[V], value: V): ResultSet[E] =
+        new ResultSet.Fake(entities.filter { entity =>
+          val jsMap = Scala2Js.toJsMap(entity)
+          jsValueOrdering.lt(jsMap(key.name), Scala2Js.toJs(value))
+        })
 
       override def sort(sorting: Loki.Sorting) = {
         val newData: Seq[E] = {
