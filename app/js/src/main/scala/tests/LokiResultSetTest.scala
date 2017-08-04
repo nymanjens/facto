@@ -28,7 +28,7 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
         val transaction3 = testTransactionWithId.copy(idOption = Some(99993))
         db.addAll(Seq(testTransactionWithId, transaction2, transaction3))
 
-        db.newQuery[Transaction]().findOne(Keys.id , 99992L) ==> Some(transaction2)
+        db.newQuery[Transaction]().findOne(Keys.id, 99992L) ==> Some(transaction2)
       }
     },
     ManualTest("newQuery(): Lookup with lessThan filter") {
@@ -40,7 +40,7 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
 
         val data = db
           .newQuery[Transaction]()
-          .filterLessThan(Keys.Transaction.createdDate , transaction3.createdDate)
+          .filterLessThan(Keys.Transaction.createdDate, transaction3.createdDate)
           .sort(Loki.Sorting.ascBy("createdDate"))
           .data()
 
@@ -56,7 +56,7 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
 
         val data = db
           .newQuery[Transaction]()
-          .filterGreaterThan(Keys.Transaction.createdDate , transaction1.createdDate)
+          .filterGreaterThan(Keys.Transaction.createdDate, transaction1.createdDate)
           .sort(Loki.Sorting.ascBy("createdDate"))
           .data()
 

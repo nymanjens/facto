@@ -144,8 +144,15 @@ object Loki {
       }
 
       override def filterGreaterThan[V: Scala2Js.Converter](key: Scala2Js.Key[V], value: V): ResultSet[E] =
-        ???
-      override def filterLessThan[V: Scala2Js.Converter](key: Scala2Js.Key[V], value: V): ResultSet[E] = ???
+        filterWithModifier("$gt", key, value)
+      override def filterLessThan[V: Scala2Js.Converter](key: Scala2Js.Key[V], value: V): ResultSet[E] =
+        filterWithModifier("$lt", key, value)
+      private def filterWithModifier[V: Scala2Js.Converter](modifier: String,
+                                                            key: Scala2Js.Key[V],
+                                                            value: V): ResultSet[E] = {
+        val pair = Scala2Js.Key.toJsPair(key -> value)
+        new ResultSet.Impl[E](facade.find(js.Dictionary(pair._1 -> js.Dictionary(modifier -> pair._2))))
+      }
 
       override def sort(sorting: Loki.Sorting) = {
         val properties: js.Array[js.Array[js.Any]] = {
