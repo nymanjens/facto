@@ -2,7 +2,7 @@ package jsfacades
 
 import common.GuavaReplacement.Iterables.getOnlyElement
 import common.ScalaUtils
-import jsfacades.Loki.Sorting.PropNameWithDirection
+import jsfacades.Loki.Sorting.KeyWithDirection
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
@@ -107,7 +107,7 @@ object Loki {
     def filterGreaterThan[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): ResultSet[E]
     def filterLessThan[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): ResultSet[E]
 
-    def sort(sorting: Loki.Sorting): ResultSet[E]
+    def sort(sorting: Loki.Sorting[E]): ResultSet[E]
     def limit(quantity: Int): ResultSet[E]
 
     // **************** Terminal operations **************** //
@@ -116,19 +116,19 @@ object Loki {
     def count(): Int
   }
 
-  case class Sorting private (private[Loki] val propNamesWithDirection: Seq[Sorting.PropNameWithDirection]) {
-    def thenAscBy(propName: String): Sorting = thenBy(propName, isDesc = false)
-    def thenDescBy(propName: String): Sorting = thenBy(propName, isDesc = true)
-    def thenBy(propName: String, isDesc: Boolean): Sorting =
-      Sorting(propNamesWithDirection :+ PropNameWithDirection(propName, isDesc = isDesc))
+  case class Sorting[E] private (private[Loki] val keysWithDirection: Seq[Sorting.KeyWithDirection[E]]) {
+    def thenAscBy[V: Ordering](key: Scala2Js.Key[V, E]): Sorting[E] = thenBy(key, isDesc = false)
+    def thenDescBy[V: Ordering](key: Scala2Js.Key[V, E]): Sorting[E] = thenBy(key, isDesc = true)
+    def thenBy[V: Ordering](key: Scala2Js.Key[V, E], isDesc: Boolean): Sorting[E] =
+      Sorting(keysWithDirection :+ KeyWithDirection(key, isDesc = isDesc))
   }
   object Sorting {
-    def ascBy(propName: String): Sorting = by(propName, isDesc = false)
-    def descBy(propName: String): Sorting = by(propName, isDesc = true)
-    def by(propName: String, isDesc: Boolean): Sorting =
-      Sorting(Seq(PropNameWithDirection(propName, isDesc = isDesc)))
+    def ascBy[V: Ordering, E](key: Scala2Js.Key[V, E]): Sorting[E] = by(key, isDesc = false)
+    def descBy[V: Ordering, E](key: Scala2Js.Key[V, E]): Sorting[E] = by(key, isDesc = true)
+    def by[V: Ordering, E](key: Scala2Js.Key[V, E], isDesc: Boolean): Sorting[E] =
+      Sorting(Seq(KeyWithDirection(key, isDesc = isDesc)))
 
-    private[Loki] case class PropNameWithDirection(propName: String, isDesc: Boolean)
+    private[Loki] case class KeyWithDirection[E](key: Scala2Js.Key[_, E], isDesc: Boolean)
   }
 
   object ResultSet {
@@ -155,10 +155,10 @@ object Loki {
         new ResultSet.Impl[E](facade.find(js.Dictionary(pair._1 -> js.Dictionary(modifier -> pair._2))))
       }
 
-      override def sort(sorting: Loki.Sorting) = {
+      override def sort(sorting: Loki.Sorting[E]) = {
         val properties: js.Array[js.Array[js.Any]] = {
-          val result: Seq[js.Array[js.Any]] = sorting.propNamesWithDirection map
-            (nameWithDirection => js.Array[js.Any](nameWithDirection.propName, nameWithDirection.isDesc))
+          val result: Seq[js.Array[js.Any]] = sorting.keysWithDirection map
+            (keyWithDirection => js.Array[js.Any](keyWithDirection.key.name, keyWithDirection.isDesc))
           result.toJSArray
         }
         new ResultSet.Impl[E](facade.compoundsort(properties))
@@ -223,16 +223,16 @@ object Loki {
           jsValueOrdering.lt(jsMap(key.name), Scala2Js.toJs(value))
         })
 
-      override def sort(sorting: Loki.Sorting) = {
+      override def sort(sorting: Loki.Sorting[E]) = {
         val newData: Seq[E] = {
           entities.sortWith(lt = (lhs, rhs) => {
             val lhsMap = Scala2Js.toJsMap(lhs)
             val rhsMap = Scala2Js.toJsMap(rhs)
             val results = for {
-              Sorting.PropNameWithDirection(propName, isDesc) <- sorting.propNamesWithDirection
-              if !jsValueOrdering.equiv(lhsMap(propName), rhsMap(propName))
+              Sorting.KeyWithDirection(key, isDesc) <- sorting.keysWithDirection
+              if !jsValueOrdering.equiv(lhsMap(key.name), rhsMap(key.name))
             } yield {
-              if (jsValueOrdering.lt(lhsMap(propName), rhsMap(propName))) {
+              if (jsValueOrdering.lt(lhsMap(key.name), rhsMap(key.name))) {
                 !isDesc
               } else {
                 isDesc

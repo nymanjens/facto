@@ -41,7 +41,7 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
         val data = db
           .newQuery[Transaction]()
           .filterLessThan(Keys.Transaction.createdDate, transaction3.createdDate)
-          .sort(Loki.Sorting.ascBy("createdDate"))
+          .sort(Loki.Sorting.ascBy(Keys.Transaction.createdDate))
           .data()
 
         data ==> Vector(transaction1, transaction2)
@@ -57,7 +57,7 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
         val data = db
           .newQuery[Transaction]()
           .filterGreaterThan(Keys.Transaction.createdDate, transaction1.createdDate)
-          .sort(Loki.Sorting.ascBy("createdDate"))
+          .sort(Loki.Sorting.ascBy(Keys.Transaction.createdDate))
           .data()
 
         data ==> Vector(transaction2, transaction3)
@@ -72,7 +72,8 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
 
         val data = db
           .newQuery[Transaction]()
-          .sort(Loki.Sorting.descBy("groupId").thenAscBy("createdDate"))
+          .sort(
+            Loki.Sorting.descBy(Keys.Transaction.transactionGroupId).thenAscBy(Keys.Transaction.createdDate))
           .data()
 
         data ==> Vector(transaction3, transaction1, transaction2)

@@ -37,15 +37,15 @@ object LokiResultSetFakeTest extends TestSuite {
           Set(transaction3)
       }
       "sort()" - {
-        resultSet.sort(Loki.Sorting.ascBy("id")).data() ==> Seq(transaction1, transaction2, transaction3)
-        resultSet.sort(Loki.Sorting.descBy("id")).data() ==> Seq(transaction3, transaction2, transaction1)
-        resultSet.sort(Loki.Sorting.ascBy("categoryCode").thenDescBy("id")).data() ==>
+        resultSet.sort(Loki.Sorting.ascBy(Keys.id)).data() ==> Seq(transaction1, transaction2, transaction3)
+        resultSet.sort(Loki.Sorting.descBy(Keys.id)).data() ==> Seq(transaction3, transaction2, transaction1)
+        resultSet.sort(Loki.Sorting.ascBy(Keys.Transaction.categoryCode).thenDescBy(Keys.id)).data() ==>
           Seq(transaction1, transaction3, transaction2)
-        resultSet.sort(Loki.Sorting.ascBy("createdDate")).data() ==>
+        resultSet.sort(Loki.Sorting.ascBy(Keys.Transaction.createdDate)).data() ==>
           Seq(transaction3, transaction2, transaction1)
       }
       "limit()" - {
-        resultSet.sort(Loki.Sorting.ascBy("id")).limit(2).data() ==> Seq(transaction1, transaction2)
+        resultSet.sort(Loki.Sorting.ascBy(Keys.id)).limit(2).data() ==> Seq(transaction1, transaction2)
       }
       "findOne()" - {
         resultSet.findOne(Keys.id, 22L) ==> Some(transaction2)

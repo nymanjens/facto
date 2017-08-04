@@ -41,9 +41,9 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
               .filter(Keys.Transaction.moneyReservoirCode, moneyReservoir.code)
               .sort(
                 Loki.Sorting
-                  .descBy("transactionDate")
-                  .thenDescBy("createdDate")
-                  .thenDescBy("id"))
+                  .descBy(Keys.Transaction.transactionDate)
+                  .thenDescBy(Keys.Transaction.createdDate)
+                  .thenDescBy(Keys.id))
               .limit(numTransactionsToFetch)
               .data()
               .last
@@ -57,9 +57,9 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
               .filterLessThan(Keys.BalanceCheck.checkDate, oldestTransDate)
               .sort(
                 Loki.Sorting
-                  .descBy("checkDate")
-                  .thenDescBy("createdDate")
-                  .thenDescBy("id"))
+                  .descBy(Keys.BalanceCheck.checkDate)
+                  .thenDescBy(Keys.BalanceCheck.createdDate)
+                  .thenDescBy(Keys.id))
               .limit(1)
               .data()
               .headOption
@@ -74,12 +74,12 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
         database
           .newQuery[BalanceCheck]()
           .filter(Keys.BalanceCheck.moneyReservoirCode, moneyReservoir.code)
-          .filterGreaterThan( Keys.BalanceCheck.checkDate,  oldestBalanceDate)
+          .filterGreaterThan(Keys.BalanceCheck.checkDate, oldestBalanceDate)
           .sort(
             Loki.Sorting
-              .ascBy("checkDate")
-              .thenAscBy("createdDate")
-              .thenAscBy("id"))
+              .ascBy(Keys.BalanceCheck.checkDate)
+              .thenAscBy(Keys.BalanceCheck.createdDate)
+              .thenAscBy(Keys.id))
           .data()
 
       // get relevant transactions
@@ -90,9 +90,9 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
           .filterGreaterThan(Keys.Transaction.transactionDate, oldestBalanceDate)
           .sort(
             Loki.Sorting
-              .ascBy("transactionDate")
-              .thenAscBy("createdDate")
-              .thenAscBy("id"))
+              .ascBy(Keys.Transaction.transactionDate)
+              .thenAscBy(Keys.Transaction.createdDate)
+              .thenAscBy(Keys.id))
           .data()
 
       // merge the two (recursion does not lead to growing stack because of Stream)

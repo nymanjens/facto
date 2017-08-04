@@ -14,7 +14,7 @@ final class JsExchangeRateMeasurementManager(implicit database: RemoteDatabasePr
     database
       .newQuery[ExchangeRateMeasurement]()
       .filter(Keys.ExchangeRateMeasurement.foreignCurrencyCode, currency.code)
-      .sort(Loki.Sorting.ascBy("date"))
+      .sort(Loki.Sorting.ascBy(Keys.ExchangeRateMeasurement.date))
       .data()
   }
 }
