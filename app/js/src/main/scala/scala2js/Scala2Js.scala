@@ -15,7 +15,8 @@ object Scala2Js {
     def toScala(value: js.Dictionary[js.Any]): T
 
     // **************** Protected helper methods **************** //
-    protected final def getRequiredValueFromDict[V: Converter](dict: js.Dictionary[js.Any])(key: Key[V]): V = {
+    protected final def getRequiredValueFromDict[V: Converter](dict: js.Dictionary[js.Any])(
+        key: Key[V, _]): V = {
       require(dict.contains(key.name), s"Key ${key.name} is missing from ${js.JSON.stringify(dict)}")
       Scala2Js.toScala[V](dict(key.name))
     }
@@ -26,11 +27,17 @@ object Scala2Js {
     }
   }
 
-  case class Key[V: Converter](name: String)
+  /**
+    * @param name The name of this key in a js dictionary
+    * @tparam V The scala type of the values
+    * @tparam E The scala type corresponding to the js dictionary of which this key is a part
+    */
+  case class Key[V: Converter, E](name: String)
   object Key {
-    def toJsPair[V: Converter](keyValuePair: (Key[V], V)): (String, js.Any) = keyValuePair match {
-      case (key, value) => key.name -> toJs(value)
-    }
+    def toJsPair[V: Converter, E](keyValuePair: (Key[V, E], V)): (String, js.Any) =
+      keyValuePair match {
+        case (key, value) => key.name -> toJs(value)
+      }
   }
 
   def toJs[T: Converter](value: T): js.Any = {

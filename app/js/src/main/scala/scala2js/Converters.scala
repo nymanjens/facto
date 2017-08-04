@@ -124,7 +124,8 @@ object Converters {
       )
     }
     override def toScalaWithoutId(dict: js.Dictionary[js.Any]) = {
-      def getRequired[T: Scala2Js.Converter](key: Scala2Js.Key[T]) = getRequiredValueFromDict(dict)(key)
+      def getRequired[T: Scala2Js.Converter](key: Scala2Js.Key[T, User]) =
+        getRequiredValueFromDict(dict)(key)
 
       User(
         loginName = getRequired(Keys.User.loginName),
@@ -151,7 +152,8 @@ object Converters {
       )
     }
     override def toScalaWithoutId(dict: js.Dictionary[js.Any]) = {
-      def getRequired[T: Scala2Js.Converter](key: Scala2Js.Key[T]) = getRequiredValueFromDict(dict)(key)
+      def getRequired[T: Scala2Js.Converter](key: Scala2Js.Key[T, Transaction]) =
+        getRequiredValueFromDict(dict)(key)
 
       Transaction(
         transactionGroupId = getRequired(Keys.Transaction.transactionGroupId),
@@ -175,7 +177,8 @@ object Converters {
       js.Dictionary[js.Any](Scala2Js.Key.toJsPair(Keys.TransactionGroup.createdDate -> entity.createdDate))
     }
     override def toScalaWithoutId(dict: js.Dictionary[js.Any]) = {
-      def getRequired[T: Scala2Js.Converter](key: Scala2Js.Key[T]) = getRequiredValueFromDict(dict)(key)
+      def getRequired[T: Scala2Js.Converter](key: Scala2Js.Key[T, TransactionGroup]) =
+        getRequiredValueFromDict(dict)(key)
 
       TransactionGroup(createdDate = getRequired(Keys.TransactionGroup.createdDate))
     }
@@ -192,7 +195,8 @@ object Converters {
       )
     }
     override def toScalaWithoutId(dict: js.Dictionary[js.Any]) = {
-      def getRequired[T: Scala2Js.Converter](key: Scala2Js.Key[T]) = getRequiredValueFromDict(dict)(key)
+      def getRequired[T: Scala2Js.Converter](key: Scala2Js.Key[T, BalanceCheck]) =
+        getRequiredValueFromDict(dict)(key)
 
       BalanceCheck(
         issuerId = getRequired(Keys.BalanceCheck.issuerId),
@@ -215,7 +219,8 @@ object Converters {
       )
     }
     override def toScalaWithoutId(dict: js.Dictionary[js.Any]) = {
-      def getRequired[T: Scala2Js.Converter](key: Scala2Js.Key[T]) = getRequiredValueFromDict(dict)(key)
+      def getRequired[T: Scala2Js.Converter](key: Scala2Js.Key[T, ExchangeRateMeasurement]) =
+        getRequiredValueFromDict(dict)(key)
 
       ExchangeRateMeasurement(
         date = getRequired(Keys.ExchangeRateMeasurement.date),

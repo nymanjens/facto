@@ -1,48 +1,59 @@
 package scala2js
 
+import models.manager.Entity
 import common.time.LocalDateTime
 
 import scala2js.Converters._
 
 object Keys {
-  val id = Scala2Js.Key[Long]("id")
+  def id[E <: Entity]: Scala2Js.Key[Long, E] = Scala2Js.Key[Long, E]("id")
 
   object User {
-    val loginName = Scala2Js.Key[String]("loginName")
-    val passwordHash = Scala2Js.Key[String]("passwordHash")
-    val name = Scala2Js.Key[String]("name")
+    private type E = models.User
+
+    val loginName = Scala2Js.Key[String, E]("loginName")
+    val passwordHash = Scala2Js.Key[String, E]("passwordHash")
+    val name = Scala2Js.Key[String, E]("name")
   }
 
   object Transaction {
-    val transactionGroupId = Scala2Js.Key[Long]("transactionGroupId")
-    val issuerId = Scala2Js.Key[Long]("issuerId")
-    val beneficiaryAccountCode = Scala2Js.Key[String]("beneficiaryAccountCode")
-    val moneyReservoirCode = Scala2Js.Key[String]("moneyReservoirCode")
-    val categoryCode = Scala2Js.Key[String]("categoryCode")
-    val description = Scala2Js.Key[String]("description")
-    val flowInCents = Scala2Js.Key[Long]("flowInCents")
-    val detailDescription = Scala2Js.Key[String]("detailDescription")
-    val tagsString = Scala2Js.Key[String]("tagsString")
-    val createdDate = Scala2Js.Key[LocalDateTime]("createdDate")
-    val transactionDate = Scala2Js.Key[LocalDateTime]("transactionDate")
-    val consumedDate = Scala2Js.Key[LocalDateTime]("consumedDate")
+    private type E = models.accounting.Transaction
+
+    val transactionGroupId = Scala2Js.Key[Long, E]("transactionGroupId")
+    val issuerId = Scala2Js.Key[Long, E]("issuerId")
+    val beneficiaryAccountCode = Scala2Js.Key[String, E]("beneficiaryAccountCode")
+    val moneyReservoirCode = Scala2Js.Key[String, E]("moneyReservoirCode")
+    val categoryCode = Scala2Js.Key[String, E]("categoryCode")
+    val description = Scala2Js.Key[String, E]("description")
+    val flowInCents = Scala2Js.Key[Long, E]("flowInCents")
+    val detailDescription = Scala2Js.Key[String, E]("detailDescription")
+    val tagsString = Scala2Js.Key[String, E]("tagsString")
+    val createdDate = Scala2Js.Key[LocalDateTime, E]("createdDate")
+    val transactionDate = Scala2Js.Key[LocalDateTime, E]("transactionDate")
+    val consumedDate = Scala2Js.Key[LocalDateTime, E]("consumedDate")
   }
 
   object TransactionGroup {
-    val createdDate = Scala2Js.Key[LocalDateTime]("createdDate")
+    private type E = models.accounting.TransactionGroup
+
+    val createdDate = Scala2Js.Key[LocalDateTime, E]("createdDate")
   }
 
   object BalanceCheck {
-    val issuerId = Scala2Js.Key[Long]("issuerId")
-    val moneyReservoirCode = Scala2Js.Key[String]("moneyReservoirCode")
-    val balanceInCents = Scala2Js.Key[Long]("balanceInCents")
-    val createdDate = Scala2Js.Key[LocalDateTime]("createdDate")
-    val checkDate = Scala2Js.Key[LocalDateTime]("checkDate")
+    private type E = models.accounting.BalanceCheck
+
+    val issuerId = Scala2Js.Key[Long, E]("issuerId")
+    val moneyReservoirCode = Scala2Js.Key[String, E]("moneyReservoirCode")
+    val balanceInCents = Scala2Js.Key[Long, E]("balanceInCents")
+    val createdDate = Scala2Js.Key[LocalDateTime, E]("createdDate")
+    val checkDate = Scala2Js.Key[LocalDateTime, E]("checkDate")
   }
 
   object ExchangeRateMeasurement {
-    val date = Scala2Js.Key[LocalDateTime]("date")
-    val foreignCurrencyCode = Scala2Js.Key[String]("foreignCurrencyCode")
-    val ratioReferenceToForeignCurrency = Scala2Js.Key[Double]("ratioReferenceToForeignCurrency")
+    private type E = models.accounting.money.ExchangeRateMeasurement
+
+    val date = Scala2Js.Key[LocalDateTime, E]("date")
+    val foreignCurrencyCode = Scala2Js.Key[String, E]("foreignCurrencyCode")
+    val ratioReferenceToForeignCurrency = Scala2Js.Key[Double, E]("ratioReferenceToForeignCurrency")
   }
 }

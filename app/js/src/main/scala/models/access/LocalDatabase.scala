@@ -59,14 +59,15 @@ object LocalDatabase {
           Scala2Js.Key.toJsPair(Scala2JsKeys.value -> singleton.value))
       }
       override def toScala(dict: js.Dictionary[js.Any]) = {
-        def getRequired[T: Scala2Js.Converter](key: Scala2Js.Key[T]) = getRequiredValueFromDict(dict)(key)
+        def getRequired[T: Scala2Js.Converter](key: Scala2Js.Key[T, Singleton]) =
+          getRequiredValueFromDict(dict)(key)
         Singleton(key = getRequired(Scala2JsKeys.key), value = getRequired(Scala2JsKeys.value))
       }
     }
 
     object Scala2JsKeys {
-      val key = Scala2Js.Key[String]("key")
-      val value = Scala2Js.Key[js.Any]("value")
+      val key = Scala2Js.Key[String, Singleton]("key")
+      val value = Scala2Js.Key[js.Any, Singleton]("value")
     }
   }
 
