@@ -42,7 +42,22 @@ object RemoteDatabaseProxy {
     async {
       val db = possiblyEmptyLocalDatabase
       val populatedDb = {
-        if (db.isEmpty() || !db.getSingletonValue(VersionKey).contains(localDatabaseAndEntityVersion)) {
+        val populateIsNecessary = {
+          if (db.isEmpty()) {
+            println(s"  Database is empty")
+            true
+          } else if (!db.getSingletonValue(VersionKey).contains(localDatabaseAndEntityVersion)) {
+            println(
+              s"  The database version ${db.getSingletonValue(VersionKey) getOrElse "<empty>"} no longer matches " +
+                s"the newest version $localDatabaseAndEntityVersion")
+            true
+          } else {
+            false
+          }
+        }
+        if (populateIsNecessary) {
+          println(s"  Populating database...")
+
           // Reset database
           await(db.clear())
 
@@ -61,6 +76,7 @@ object RemoteDatabaseProxy {
           // Await because we don't want to save unpersisted modifications that can be made as soon as
           // the database becomes valid.
           await(db.save())
+          println(s"  Population done!")
           db
         } else {
           db

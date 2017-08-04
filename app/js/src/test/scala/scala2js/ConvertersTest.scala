@@ -12,12 +12,30 @@ import models.User
 
 import scala.collection.immutable.Seq
 import scala.scalajs.js
+import scala.scalajs.runtime.RuntimeLong
 import scala2js.Converters._
 
 object ConvertersTest extends TestSuite {
   val dateTime = LocalDateTime.of(2022, MARCH, 13, 12, 13)
 
   override def tests = TestSuite {
+    "LongConverter" - {
+      "to JS and back" - {
+        testToJsAndBack[Long](1L)
+        testToJsAndBack[Long](0L)
+        testToJsAndBack[Long](-1L)
+        testToJsAndBack[Long](-12392913292L)
+        testToJsAndBack[Long](911427549585351L) // 15 digits, which is the maximal javascript precision
+        testToJsAndBack[Long](6886911427549585129L)
+        testToJsAndBack[Long](-6886911427549585129L)
+      }
+      "Produces ordered results" - {
+        val lower = Scala2Js.toJs(999L).asInstanceOf[String]
+        val higher = Scala2Js.toJs(1000L).asInstanceOf[String]
+        (lower < higher) ==> true
+      }
+    }
+
     "entityTypeToConverter" - {
       entityTypeToConverter(EntityType.UserType) ==> UserConverter
       entityTypeToConverter(EntityType.TransactionType) ==> TransactionConverter

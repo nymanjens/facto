@@ -2,15 +2,13 @@ package jsfacades
 
 import common.GuavaReplacement.Iterables.getOnlyElement
 import common.ScalaUtils
-import jsfacades.Loki.Sorting.PropNameWithDirection
+import jsfacades.Loki.Sorting.KeyWithDirection
 
 import scala.collection.immutable.Seq
-import scala.collection.mutable
 import scala.concurrent.Future
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSGlobal, JSName}
 import scala.scalajs.js.JSConverters._
-import scala.util.{Try, Success, Failure}
+import scala.scalajs.js.annotation.JSGlobal
 import scala2js.Converters._
 import scala2js.Scala2Js
 
@@ -83,7 +81,8 @@ object Loki {
     def chain(): ResultSet[E] = new ResultSet.Impl[E](facade.chain())
 
     def insert(obj: E): Unit = facade.insert(Scala2Js.toJsMap(obj))
-    def findAndRemove(filter: (String, js.Any)): Unit = facade.findAndRemove(js.Dictionary(filter))
+    def findAndRemove[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): Unit =
+      facade.findAndRemove(js.Dictionary(Scala2Js.Key.toJsPair(key -> value)))
     def clear(): Unit = facade.clear()
   }
 
@@ -102,66 +101,62 @@ object Loki {
 
   trait ResultSet[E] {
     // **************** Intermediary operations **************** //
-    /**
-      * Finds an exact match for plain filter values or applies other kinds of matching
-      * when modifiers are used (see `ResultSet`).
-      */
-    def find(filter: (String, js.Any)): ResultSet[E]
+    def filter[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): ResultSet[E]
+    def filterGreaterThan[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): ResultSet[E]
+    def filterLessThan[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): ResultSet[E]
 
-    /**
-      * Loose evaluation for user to sort based on a property names. Sorting based on the same lt/gt helper
-      * functions used for binary indices.
-      */
-    def sort(sorting: Loki.Sorting): ResultSet[E]
+    def sort(sorting: Loki.Sorting[E]): ResultSet[E]
     def limit(quantity: Int): ResultSet[E]
 
     // **************** Terminal operations **************** //
-    /**
-      * Finds an exact match for plain filter values or applies other kinds of matching
-      * when modifiers are used (see `ResultSet`).
-      */
-    def findOne(filter: (String, js.Any)): Option[E]
+    def findOne[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): Option[E]
     def data(): Seq[E]
     def count(): Int
   }
 
-  case class Sorting private (private[Loki] val propNamesWithDirection: Seq[Sorting.PropNameWithDirection]) {
-    def thenAscBy(propName: String): Sorting = thenBy(propName, isDesc = false)
-    def thenDescBy(propName: String): Sorting = thenBy(propName, isDesc = true)
-    def thenBy(propName: String, isDesc: Boolean): Sorting =
-      Sorting(propNamesWithDirection :+ PropNameWithDirection(propName, isDesc = isDesc))
+  case class Sorting[E] private (private[Loki] val keysWithDirection: Seq[Sorting.KeyWithDirection[E]]) {
+    def thenAscBy[V: Ordering](key: Scala2Js.Key[V, E]): Sorting[E] = thenBy(key, isDesc = false)
+    def thenDescBy[V: Ordering](key: Scala2Js.Key[V, E]): Sorting[E] = thenBy(key, isDesc = true)
+    def thenBy[V: Ordering](key: Scala2Js.Key[V, E], isDesc: Boolean): Sorting[E] =
+      Sorting(keysWithDirection :+ KeyWithDirection(key, isDesc = isDesc))
   }
   object Sorting {
-    def ascBy(propName: String): Sorting = by(propName, isDesc = false)
-    def descBy(propName: String): Sorting = by(propName, isDesc = true)
-    def by(propName: String, isDesc: Boolean): Sorting =
-      Sorting(Seq(PropNameWithDirection(propName, isDesc = isDesc)))
+    def ascBy[V: Ordering, E](key: Scala2Js.Key[V, E]): Sorting[E] = by(key, isDesc = false)
+    def descBy[V: Ordering, E](key: Scala2Js.Key[V, E]): Sorting[E] = by(key, isDesc = true)
+    def by[V: Ordering, E](key: Scala2Js.Key[V, E], isDesc: Boolean): Sorting[E] =
+      Sorting(Seq(KeyWithDirection(key, isDesc = isDesc)))
 
-    private[Loki] case class PropNameWithDirection(propName: String, isDesc: Boolean)
+    private[Loki] case class KeyWithDirection[E](key: Scala2Js.Key[_, E], isDesc: Boolean)
   }
 
   object ResultSet {
 
     def empty[E: Scala2Js.MapConverter]: ResultSet[E] = new ResultSet.Fake(Seq())
 
-    /** To be used as ResultSet find values, e.g. `.find("createdDate" -> greaterThan(myDate))`. */
-    def greaterThan[T: Scala2Js.Converter](value: T): js.Dictionary[js.Any] =
-      js.Dictionary("$gt" -> Scala2Js.toJs(value))
-    def lessThan[T: Scala2Js.Converter](value: T): js.Dictionary[js.Any] =
-      js.Dictionary("$lt" -> Scala2Js.toJs(value))
-
     private[jsfacades] final class Impl[E: Scala2Js.MapConverter](facade: ResultSetFacade)
         extends ResultSet[E] {
 
       // **************** Intermediary operations **************** //
-      override def find(filter: (String, js.Any)) = {
-        new ResultSet.Impl[E](facade.find(js.Dictionary(filter)))
+      override def filter[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V) = {
+        new ResultSet.Impl[E](facade.find(js.Dictionary(Scala2Js.Key.toJsPair(key -> value))))
       }
 
-      override def sort(sorting: Loki.Sorting) = {
+      override def filterGreaterThan[V: Scala2Js.Converter](key: Scala2Js.Key[V, E],
+                                                            value: V): ResultSet[E] =
+        filterWithModifier("$gt", key, value)
+      override def filterLessThan[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): ResultSet[E] =
+        filterWithModifier("$lt", key, value)
+      private def filterWithModifier[V: Scala2Js.Converter](modifier: String,
+                                                            key: Scala2Js.Key[V, E],
+                                                            value: V): ResultSet[E] = {
+        val pair = Scala2Js.Key.toJsPair(key -> value)
+        new ResultSet.Impl[E](facade.find(js.Dictionary(pair._1 -> js.Dictionary(modifier -> pair._2))))
+      }
+
+      override def sort(sorting: Loki.Sorting[E]) = {
         val properties: js.Array[js.Array[js.Any]] = {
-          val result: Seq[js.Array[js.Any]] = sorting.propNamesWithDirection map
-            (nameWithDirection => js.Array[js.Any](nameWithDirection.propName, nameWithDirection.isDesc))
+          val result: Seq[js.Array[js.Any]] = sorting.keysWithDirection map
+            (keyWithDirection => js.Array[js.Any](keyWithDirection.key.name, keyWithDirection.isDesc))
           result.toJSArray
         }
         new ResultSet.Impl[E](facade.compoundsort(properties))
@@ -172,8 +167,8 @@ object Loki {
       }
 
       // **************** Terminal operations **************** //
-      override def findOne(filter: (String, js.Any)) = {
-        val data = facade.find(js.Dictionary(filter), firstOnly = true).data()
+      override def findOne[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V) = {
+        val data = facade.find(js.Dictionary(Scala2Js.Key.toJsPair(key -> value)), firstOnly = true).data()
         if (data.length >= 1) {
           Option(Scala2Js.toScala[E](getOnlyElement(data)))
         } else {
@@ -192,54 +187,46 @@ object Loki {
 
     final class Fake[E: Scala2Js.MapConverter](entities: Seq[E]) extends ResultSet[E] {
 
-      implicit private val jsValueOrdering: Ordering[js.Any] = {
-        new Ordering[js.Any] {
-          override def compare(x: js.Any, y: js.Any): Int = {
-            if (x.getClass == classOf[String]) {
-              x.asInstanceOf[String] compareTo y.toString
-            } else if (x.isInstanceOf[Int]) {
-              x.asInstanceOf[Int] compareTo y.asInstanceOf[Int]
-            } else {
-              ???
-            }
-          }
+      implicit private val jsValueOrdering: Ordering[js.Any] = (x, y) => {
+        if (x.getClass == classOf[String]) {
+          x.asInstanceOf[String] compareTo y.toString
+        } else if (x.isInstanceOf[Int]) {
+          x.asInstanceOf[Int] compareTo y.asInstanceOf[Int]
+        } else {
+          ???
         }
       }
 
       // **************** Intermediary operations **************** //
-      override def find(filter: (String, js.Any)) = new ResultSet.Fake(
-        entities.filter { entity =>
-          def compare(val1: js.Any, val2: js.Any, func: String): Boolean = {
-            func match {
-              case "$lt" => jsValueOrdering.lt(val1, val2)
-              case "$gt" => jsValueOrdering.gt(val1, val2)
-            }
-          }
+      override def filter[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V) =
+        new ResultSet.Fake(entities.filter { entity =>
           val jsMap = Scala2Js.toJsMap(entity)
-          filter match {
-            case (k, v) =>
-              Try(v.asInstanceOf[js.Dictionary[js.Any]].keys) match {
-                case Success(keys) if keys.size == 1 && getOnlyElement(keys).startsWith("$") =>
-                  compare(
-                    jsMap(k),
-                    getOnlyElement(v.asInstanceOf[js.Dictionary[js.Any]].values),
-                    getOnlyElement(v.asInstanceOf[js.Dictionary[js.Any]].keys))
-                case _ => jsMap(k) == v
-              }
-          }
-        }
-      )
+          jsMap(key.name) == Scala2Js.toJs(value)
+        })
 
-      override def sort(sorting: Loki.Sorting) = {
+      override def filterGreaterThan[V: Scala2Js.Converter](key: Scala2Js.Key[V, E],
+                                                            value: V): ResultSet[E] =
+        new ResultSet.Fake(entities.filter { entity =>
+          val jsMap = Scala2Js.toJsMap(entity)
+          jsValueOrdering.gt(jsMap(key.name), Scala2Js.toJs(value))
+        })
+
+      override def filterLessThan[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): ResultSet[E] =
+        new ResultSet.Fake(entities.filter { entity =>
+          val jsMap = Scala2Js.toJsMap(entity)
+          jsValueOrdering.lt(jsMap(key.name), Scala2Js.toJs(value))
+        })
+
+      override def sort(sorting: Loki.Sorting[E]) = {
         val newData: Seq[E] = {
           entities.sortWith(lt = (lhs, rhs) => {
             val lhsMap = Scala2Js.toJsMap(lhs)
             val rhsMap = Scala2Js.toJsMap(rhs)
             val results = for {
-              Sorting.PropNameWithDirection(propName, isDesc) <- sorting.propNamesWithDirection
-              if !jsValueOrdering.equiv(lhsMap(propName), rhsMap(propName))
+              Sorting.KeyWithDirection(key, isDesc) <- sorting.keysWithDirection
+              if !jsValueOrdering.equiv(lhsMap(key.name), rhsMap(key.name))
             } yield {
-              if (jsValueOrdering.lt(lhsMap(propName), rhsMap(propName))) {
+              if (jsValueOrdering.lt(lhsMap(key.name), rhsMap(key.name))) {
                 !isDesc
               } else {
                 isDesc
@@ -258,10 +245,11 @@ object Loki {
       // **************** Terminal operations **************** //
       override def data() = entities
 
-      override def findOne(filter: (String, js.Any)) = find(filter).limit(1).data() match {
-        case Seq(e) => Some(e)
-        case Seq() => None
-      }
+      override def findOne[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V) =
+        filter(key, value).limit(1).data() match {
+          case Seq(e) => Some(e)
+          case Seq() => None
+        }
 
       override def count() = entities.length
     }

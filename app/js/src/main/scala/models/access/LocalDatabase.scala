@@ -1,14 +1,14 @@
 package models.access
 
 import jsfacades.Loki
-import models.manager.{Entity, EntityType, EntityModification}
-
+import models.manager.{Entity, EntityModification, EntityType}
+import scala2js.Converters._
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala2js.Converters._
-import scala2js.Scala2Js
+import scala2js.{Keys, Scala2Js}
 import common.ScalaUtils.visibleForTesting
 
 @visibleForTesting
@@ -54,12 +54,20 @@ object LocalDatabase {
   private object Singleton {
     implicit object Converter extends Scala2Js.MapConverter[Singleton] {
       override def toJs(singleton: Singleton) = {
-        js.Dictionary[js.Any]("key" -> singleton.key, "value" -> singleton.value)
+        js.Dictionary[js.Any](
+          Scala2Js.Key.toJsPair(Scala2JsKeys.key -> singleton.key),
+          Scala2Js.Key.toJsPair(Scala2JsKeys.value -> singleton.value))
       }
       override def toScala(dict: js.Dictionary[js.Any]) = {
-        def getRequired[T: Scala2Js.Converter](key: String) = getRequiredValueFromDict[T](dict)(key)
-        Singleton(key = getRequired[String]("key"), value = getRequired[js.Any]("value"))
+        def getRequired[T: Scala2Js.Converter](key: Scala2Js.Key[T, Singleton]) =
+          getRequiredValueFromDict(dict)(key)
+        Singleton(key = getRequired(Scala2JsKeys.key), value = getRequired(Scala2JsKeys.value))
       }
+    }
+
+    object Scala2JsKeys {
+      val key = Scala2Js.Key[String, Singleton]("key")
+      val value = Scala2Js.Key[js.Any, Singleton]("value")
     }
   }
 
@@ -83,7 +91,7 @@ object LocalDatabase {
 
     override def getSingletonValue[V](key: SingletonKey[V]): Option[V] = {
       implicit val converter = key.valueConverter
-      val value = singletonCollection.chain().findOne("key" -> key.name)
+      val value = singletonCollection.chain().findOne(Singleton.Scala2JsKeys.key, key.name)
       value.map(v => Scala2Js.toScala[V](v.value))
     }
 
@@ -98,7 +106,7 @@ object LocalDatabase {
           case addModification: EntityModification.Add[_] =>
             def add[E <: Entity](modification: EntityModification.Add[E]): Unit = {
               implicit val _ = modification.entityType
-              newQuery[E]().findOne("id" -> modification.entity.id.toString) match {
+              newQuery[E]().findOne(Keys.id, modification.entity.id) match {
                 case Some(entity) => // do nothing
                 case None => entityCollectionForImplicitType[E].insert(modification.entity)
               }
@@ -107,9 +115,9 @@ object LocalDatabase {
           case removeModification: EntityModification.Remove[_] =>
             def remove[E <: Entity](modification: EntityModification.Remove[E]): Unit = {
               implicit val _ = modification.entityType
-              newQuery[E]().findOne("id" -> modification.entityId.toString) match {
+              newQuery[E]().findOne(Keys.id, modification.entityId) match {
                 case Some(entity) =>
-                  entityCollectionForImplicitType.findAndRemove("id" -> modification.entityId.toString)
+                  entityCollectionForImplicitType.findAndRemove(Keys.id, modification.entityId)
                 case None => // do nothing
               }
             }
@@ -120,7 +128,7 @@ object LocalDatabase {
 
     override def addAll[E <: Entity: EntityType](entities: Seq[E]): Unit = {
       for (entity <- entities) {
-        newQuery[E]().findOne("id" -> entity.id.toString) match {
+        newQuery[E]().findOne(Keys.id, entity.id) match {
           case Some(entity) => // do nothing
           case None => entityCollectionForImplicitType.insert(entity)
         }
@@ -129,7 +137,7 @@ object LocalDatabase {
 
     override def setSingletonValue[V](key: SingletonKey[V], value: V): Unit = {
       implicit val converter = key.valueConverter
-      singletonCollection.findAndRemove("key" -> key.name)
+      singletonCollection.findAndRemove(Singleton.Scala2JsKeys.key, key.name)
       singletonCollection.insert(
         Singleton(
           key = key.name,

@@ -1,21 +1,17 @@
 package scala2js
 
-import java.time.Month.AUGUST
 import java.time.{LocalDate, LocalTime}
 
-import models.manager.EntityType
-
-import scala.scalajs.js
-import models.accounting._
 import common.time.LocalDateTime
 import models._
+import models.accounting._
 import models.accounting.money.ExchangeRateMeasurement
-import models.manager._
+import models.manager.{EntityType, _}
 
 import scala.collection.immutable.Seq
+import scala.scalajs.js
+import scala.scalajs.js.JSConverters._
 import scala2js.Scala2Js.Converter
-import js.JSConverters._
-import scala.collection.mutable
 
 object Converters {
 
@@ -49,7 +45,18 @@ object Converters {
   }
 
   implicit object LongConverter extends Scala2Js.Converter[Long] {
-    override def toJs(long: Long) = "%022d".format(long)
+    override def toJs(long: Long) = {
+      // Note: It would be easier to implement this by `"%022d".format(long)`
+      // but that transforms the given long to a javascript number (double precision)
+      // causing the least significatant long digits sometimes to become zero
+      // (e.g. 6886911427549585292 becomes 6886911427549585000)
+      val signChar = if (long < 0) "-" else ""
+      val stringWithoutSign = Math.abs(long).toString
+
+      val numZerosToPrepend = 22 - stringWithoutSign.size
+      require(numZerosToPrepend > 0)
+      signChar + ("0" * numZerosToPrepend) + stringWithoutSign
+    }
     override def toScala(value: js.Any) = value.asInstanceOf[String].toLong
   }
 
@@ -88,14 +95,15 @@ object Converters {
     override final def toJs(entity: E) = {
       val result = toJsWithoutId(entity)
       for (id <- entity.idOption) {
-        result.update("id", Scala2Js.toJs(id))
+        val pair = Scala2Js.Key.toJsPair(Keys.id -> id)
+        result.update(pair._1, pair._2)
       }
       result
     }
 
     override final def toScala(dict: js.Dictionary[js.Any]) = {
       val entityWithoutId = toScalaWithoutId(dict)
-      val idOption = getOptionalValueFromDict[String](dict)("id").map(Scala2Js.toScala[Long]( _))
+      val idOption = getOptionalValueFromDict[String](dict)("id").map(Scala2Js.toScala[Long](_))
       if (idOption.isDefined) {
         entityWithoutId.withId(idOption.get).asInstanceOf[E]
       } else {
@@ -108,108 +116,117 @@ object Converters {
   }
 
   implicit object UserConverter extends EntityConverter[User] {
-    override def toJsWithoutId(user: User) = {
+    override def toJsWithoutId(entity: User) = {
       js.Dictionary[js.Any](
-        "loginName" -> user.loginName,
-        "passwordHash" -> user.passwordHash,
-        "name" -> user.name)
+        Scala2Js.Key.toJsPair(Keys.User.loginName -> entity.loginName),
+        Scala2Js.Key.toJsPair(Keys.User.passwordHash -> entity.passwordHash),
+        Scala2Js.Key.toJsPair(Keys.User.name -> entity.name)
+      )
     }
     override def toScalaWithoutId(dict: js.Dictionary[js.Any]) = {
-      def getRequired[T: Scala2Js.Converter](key: String) = getRequiredValueFromDict[T](dict)(key)
+      def getRequired[T: Scala2Js.Converter](key: Scala2Js.Key[T, User]) =
+        getRequiredValueFromDict(dict)(key)
 
       User(
-        loginName = getRequired[String]("loginName"),
-        passwordHash = getRequired[String]("passwordHash"),
-        name = getRequired[String]("name"))
+        loginName = getRequired(Keys.User.loginName),
+        passwordHash = getRequired(Keys.User.passwordHash),
+        name = getRequired(Keys.User.name))
     }
   }
 
   implicit object TransactionConverter extends EntityConverter[Transaction] {
-    override def toJsWithoutId(transaction: Transaction) = {
+    override def toJsWithoutId(entity: Transaction) = {
       js.Dictionary[js.Any](
-        "transactionGroupId" -> Scala2Js.toJs(transaction.transactionGroupId),
-        "issuerId" -> Scala2Js.toJs(transaction.issuerId),
-        "beneficiaryAccountCode" -> transaction.beneficiaryAccountCode,
-        "moneyReservoirCode" -> transaction.moneyReservoirCode,
-        "categoryCode" -> transaction.categoryCode,
-        "description" -> transaction.description,
-        "flowInCents" -> Scala2Js.toJs(transaction.flowInCents),
-        "detailDescription" -> transaction.detailDescription,
-        "tagsString" -> transaction.tagsString,
-        "createdDate" -> Scala2Js.toJs(transaction.createdDate),
-        "transactionDate" -> Scala2Js.toJs(transaction.transactionDate),
-        "consumedDate" -> Scala2Js.toJs(transaction.consumedDate)
+        Scala2Js.Key.toJsPair(Keys.Transaction.transactionGroupId -> entity.transactionGroupId),
+        Scala2Js.Key.toJsPair(Keys.Transaction.issuerId -> entity.issuerId),
+        Scala2Js.Key.toJsPair(Keys.Transaction.beneficiaryAccountCode -> entity.beneficiaryAccountCode),
+        Scala2Js.Key.toJsPair(Keys.Transaction.moneyReservoirCode -> entity.moneyReservoirCode),
+        Scala2Js.Key.toJsPair(Keys.Transaction.categoryCode -> entity.categoryCode),
+        Scala2Js.Key.toJsPair(Keys.Transaction.description -> entity.description),
+        Scala2Js.Key.toJsPair(Keys.Transaction.flowInCents -> entity.flowInCents),
+        Scala2Js.Key.toJsPair(Keys.Transaction.detailDescription -> entity.detailDescription),
+        Scala2Js.Key.toJsPair(Keys.Transaction.tagsString -> entity.tagsString),
+        Scala2Js.Key.toJsPair(Keys.Transaction.createdDate -> entity.createdDate),
+        Scala2Js.Key.toJsPair(Keys.Transaction.transactionDate -> entity.transactionDate),
+        Scala2Js.Key.toJsPair(Keys.Transaction.consumedDate -> entity.consumedDate)
       )
     }
     override def toScalaWithoutId(dict: js.Dictionary[js.Any]) = {
-      def getRequired[T: Scala2Js.Converter](key: String) = getRequiredValueFromDict[T](dict)(key)
+      def getRequired[T: Scala2Js.Converter](key: Scala2Js.Key[T, Transaction]) =
+        getRequiredValueFromDict(dict)(key)
 
       Transaction(
-        transactionGroupId = getRequired[Long]("transactionGroupId"),
-        issuerId = getRequired[Long]("issuerId"),
-        beneficiaryAccountCode = getRequired[String]("beneficiaryAccountCode"),
-        moneyReservoirCode = getRequired[String]("moneyReservoirCode"),
-        categoryCode = getRequired[String]("categoryCode"),
-        description = getRequired[String]("description"),
-        flowInCents = getRequired[Long]("flowInCents"),
-        detailDescription = getRequired[String]("detailDescription"),
-        tagsString = getRequired[String]("tagsString"),
-        createdDate = getRequired[LocalDateTime]("createdDate"),
-        transactionDate = getRequired[LocalDateTime]("transactionDate"),
-        consumedDate = getRequired[LocalDateTime]("consumedDate")
+        transactionGroupId = getRequired(Keys.Transaction.transactionGroupId),
+        issuerId = getRequired(Keys.Transaction.issuerId),
+        beneficiaryAccountCode = getRequired(Keys.Transaction.beneficiaryAccountCode),
+        moneyReservoirCode = getRequired(Keys.Transaction.moneyReservoirCode),
+        categoryCode = getRequired(Keys.Transaction.categoryCode),
+        description = getRequired(Keys.Transaction.description),
+        flowInCents = getRequired(Keys.Transaction.flowInCents),
+        detailDescription = getRequired(Keys.Transaction.detailDescription),
+        tagsString = getRequired(Keys.Transaction.tagsString),
+        createdDate = getRequired(Keys.Transaction.createdDate),
+        transactionDate = getRequired(Keys.Transaction.transactionDate),
+        consumedDate = getRequired(Keys.Transaction.consumedDate)
       )
     }
   }
 
   implicit object TransactionGroupConverter extends EntityConverter[TransactionGroup] {
-    override def toJsWithoutId(transactionGroup: TransactionGroup) = {
-      js.Dictionary[js.Any]("createdDate" -> Scala2Js.toJs(transactionGroup.createdDate))
+    override def toJsWithoutId(entity: TransactionGroup) = {
+      js.Dictionary[js.Any](Scala2Js.Key.toJsPair(Keys.TransactionGroup.createdDate -> entity.createdDate))
     }
     override def toScalaWithoutId(dict: js.Dictionary[js.Any]) = {
-      def getRequired[T: Scala2Js.Converter](key: String) = getRequiredValueFromDict[T](dict)(key)
+      def getRequired[T: Scala2Js.Converter](key: Scala2Js.Key[T, TransactionGroup]) =
+        getRequiredValueFromDict(dict)(key)
 
-      TransactionGroup(createdDate = getRequired[LocalDateTime]("createdDate"))
+      TransactionGroup(createdDate = getRequired(Keys.TransactionGroup.createdDate))
     }
   }
 
   implicit object BalanceCheckConverter extends EntityConverter[BalanceCheck] {
-    override def toJsWithoutId(balanceCheck: BalanceCheck) = {
+    override def toJsWithoutId(entity: BalanceCheck) = {
       js.Dictionary[js.Any](
-        "issuerId" -> Scala2Js.toJs(balanceCheck.issuerId),
-        "moneyReservoirCode" -> balanceCheck.moneyReservoirCode,
-        "balanceInCents" -> Scala2Js.toJs(balanceCheck.balanceInCents),
-        "createdDate" -> Scala2Js.toJs(balanceCheck.createdDate),
-        "checkDate" -> Scala2Js.toJs(balanceCheck.checkDate)
+        Scala2Js.Key.toJsPair(Keys.BalanceCheck.issuerId -> entity.issuerId),
+        Scala2Js.Key.toJsPair(Keys.BalanceCheck.moneyReservoirCode -> entity.moneyReservoirCode),
+        Scala2Js.Key.toJsPair(Keys.BalanceCheck.balanceInCents -> entity.balanceInCents),
+        Scala2Js.Key.toJsPair(Keys.BalanceCheck.createdDate -> entity.createdDate),
+        Scala2Js.Key.toJsPair(Keys.BalanceCheck.checkDate -> entity.checkDate)
       )
     }
     override def toScalaWithoutId(dict: js.Dictionary[js.Any]) = {
-      def getRequired[T: Scala2Js.Converter](key: String) = getRequiredValueFromDict[T](dict)(key)
+      def getRequired[T: Scala2Js.Converter](key: Scala2Js.Key[T, BalanceCheck]) =
+        getRequiredValueFromDict(dict)(key)
 
       BalanceCheck(
-        issuerId = getRequired[Long]("issuerId"),
-        moneyReservoirCode = getRequired[String]("moneyReservoirCode"),
-        balanceInCents = getRequired[Long]("balanceInCents"),
-        createdDate = getRequired[LocalDateTime]("createdDate"),
-        checkDate = getRequired[LocalDateTime]("checkDate")
+        issuerId = getRequired(Keys.BalanceCheck.issuerId),
+        moneyReservoirCode = getRequired(Keys.BalanceCheck.moneyReservoirCode),
+        balanceInCents = getRequired(Keys.BalanceCheck.balanceInCents),
+        createdDate = getRequired(Keys.BalanceCheck.createdDate),
+        checkDate = getRequired(Keys.BalanceCheck.checkDate)
       )
     }
   }
 
   implicit object ExchangeRateMeasurementConverter extends EntityConverter[ExchangeRateMeasurement] {
-    override def toJsWithoutId(exchangeRateMeasurement: ExchangeRateMeasurement) = {
+    override def toJsWithoutId(entity: ExchangeRateMeasurement) = {
       js.Dictionary[js.Any](
-        "date" -> Scala2Js.toJs(exchangeRateMeasurement.date),
-        "foreignCurrencyCode" -> exchangeRateMeasurement.foreignCurrencyCode,
-        "ratioReferenceToForeignCurrency" -> exchangeRateMeasurement.ratioReferenceToForeignCurrency
+        Scala2Js.Key.toJsPair(Keys.ExchangeRateMeasurement.date -> entity.date),
+        Scala2Js.Key.toJsPair(
+          Keys.ExchangeRateMeasurement.foreignCurrencyCode -> entity.foreignCurrencyCode),
+        Scala2Js.Key.toJsPair(
+          Keys.ExchangeRateMeasurement.ratioReferenceToForeignCurrency -> entity.ratioReferenceToForeignCurrency)
       )
     }
     override def toScalaWithoutId(dict: js.Dictionary[js.Any]) = {
-      def getRequired[T: Scala2Js.Converter](key: String) = getRequiredValueFromDict[T](dict)(key)
+      def getRequired[T: Scala2Js.Converter](key: Scala2Js.Key[T, ExchangeRateMeasurement]) =
+        getRequiredValueFromDict(dict)(key)
 
       ExchangeRateMeasurement(
-        date = getRequired[LocalDateTime]("date"),
-        foreignCurrencyCode = getRequired[String]("foreignCurrencyCode"),
-        ratioReferenceToForeignCurrency = getRequired[Double]("ratioReferenceToForeignCurrency")
+        date = getRequired(Keys.ExchangeRateMeasurement.date),
+        foreignCurrencyCode = getRequired(Keys.ExchangeRateMeasurement.foreignCurrencyCode),
+        ratioReferenceToForeignCurrency =
+          getRequired(Keys.ExchangeRateMeasurement.ratioReferenceToForeignCurrency)
       )
     }
   }

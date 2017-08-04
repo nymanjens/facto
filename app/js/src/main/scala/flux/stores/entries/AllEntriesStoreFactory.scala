@@ -6,6 +6,7 @@ import models.accounting.Transaction
 import models.manager.{EntityModification, EntityType}
 
 import scala.collection.immutable.Seq
+import scala2js.Keys
 
 final class AllEntriesStoreFactory(implicit database: RemoteDatabaseProxy)
     extends EntriesListStoreFactory[GeneralEntry, Unit] {
@@ -17,9 +18,9 @@ final class AllEntriesStoreFactory(implicit database: RemoteDatabaseProxy)
           .newQuery[Transaction]()
           .sort(
             Loki.Sorting
-              .descBy("transactionDate")
-              .thenDescBy("createdDate")
-              .thenDescBy("id"))
+              .descBy(Keys.Transaction.transactionDate)
+              .thenDescBy(Keys.Transaction.createdDate)
+              .thenDescBy(Keys.id))
           .limit(3 * maxNumEntries)
           .data()
           .reverse

@@ -6,9 +6,9 @@ import models.access.RemoteDatabaseProxy
 import models.accounting.Transaction
 import models.accounting.config.{Account, Config}
 import models.accounting.money.{ExchangeRateManager, ReferenceMoney}
-import models.manager.{EntityModification, EntityType}
 
 import scala.collection.immutable.Seq
+import scala2js.Keys
 
 final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
                                            accountingConfig: Config,
@@ -23,9 +23,9 @@ final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProx
           .newQuery[Transaction]()
           .sort(
             Loki.Sorting
-              .ascBy("transactionDate")
-              .thenAscBy("createdDate")
-              .thenAscBy("id"))
+              .ascBy(Keys.Transaction.transactionDate)
+              .thenAscBy(Keys.Transaction.createdDate)
+              .thenAscBy(Keys.id))
           .data()
 
       val relevantTransactions =
