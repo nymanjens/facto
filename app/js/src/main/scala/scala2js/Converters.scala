@@ -45,7 +45,18 @@ object Converters {
   }
 
   implicit object LongConverter extends Scala2Js.Converter[Long] {
-    override def toJs(long: Long) = "%022d".format(long)
+    override def toJs(long: Long) = {
+      // Note: It would be easier to implement this by `"%022d".format(long)`
+      // but that transforms the given long to a javascript number (double precision)
+      // causing the least significatant long digits sometimes to become zero
+      // (e.g. 6886911427549585292 becomes 6886911427549585000)
+      val signChar = if (long < 0) "-" else ""
+      val stringWithoutSign = Math.abs(long).toString
+
+      val numZerosToPrepend = 22 - stringWithoutSign.size
+      require(numZerosToPrepend > 0)
+      signChar + ("0" * numZerosToPrepend) + stringWithoutSign
+    }
     override def toScala(value: js.Any) = value.asInstanceOf[String].toLong
   }
 
