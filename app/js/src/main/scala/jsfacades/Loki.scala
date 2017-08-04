@@ -5,12 +5,10 @@ import common.ScalaUtils
 import jsfacades.Loki.Sorting.KeyWithDirection
 
 import scala.collection.immutable.Seq
-import scala.collection.mutable
 import scala.concurrent.Future
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSGlobal, JSName}
 import scala.scalajs.js.JSConverters._
-import scala.util.{Try, Success, Failure}
+import scala.scalajs.js.annotation.JSGlobal
 import scala2js.Converters._
 import scala2js.Scala2Js
 
@@ -189,17 +187,13 @@ object Loki {
 
     final class Fake[E: Scala2Js.MapConverter](entities: Seq[E]) extends ResultSet[E] {
 
-      implicit private val jsValueOrdering: Ordering[js.Any] = {
-        new Ordering[js.Any] {
-          override def compare(x: js.Any, y: js.Any): Int = {
-            if (x.getClass == classOf[String]) {
-              x.asInstanceOf[String] compareTo y.toString
-            } else if (x.isInstanceOf[Int]) {
-              x.asInstanceOf[Int] compareTo y.asInstanceOf[Int]
-            } else {
-              ???
-            }
-          }
+      implicit private val jsValueOrdering: Ordering[js.Any] = (x, y) => {
+        if (x.getClass == classOf[String]) {
+          x.asInstanceOf[String] compareTo y.toString
+        } else if (x.isInstanceOf[Int]) {
+          x.asInstanceOf[Int] compareTo y.asInstanceOf[Int]
+        } else {
+          ???
         }
       }
 
