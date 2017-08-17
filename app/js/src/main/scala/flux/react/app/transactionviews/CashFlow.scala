@@ -115,9 +115,6 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
                                         router: RouterCtl[Page]): VdomElement = {
     <.button(
       ^.className := "btn btn-info btn-xs",
-      ^.onClick --> LogExceptionsCallback {
-        ???
-      },
       ^.role := "button",
       <.i(^.className := "fa fa-check-square-o fa-fw"))
   }
