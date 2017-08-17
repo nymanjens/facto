@@ -26,6 +26,9 @@ trait RemoteDatabaseProxy {
 
   // **************** Setters ****************//
   def persistModifications(modifications: Seq[EntityModification]): Future[Unit]
+  final def persistModifications(modifications: EntityModification*): Future[Unit] =
+    persistModifications(modifications.toVector)
+
   def clearLocalDatabase(): Future[Unit]
 
   // **************** Other ****************//
