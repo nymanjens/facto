@@ -24,7 +24,12 @@ object Panel {
     ))
     .build
 
-  def apply(title: String, panelClasses: Seq[String] = Seq())(children: VdomNode*): VdomElement = {
-    component(Props(title, panelClasses))(children: _*)
+  def apply(title: String, panelClasses: Seq[String] = Seq(), key: String = null)(
+      children: VdomNode*): VdomElement = {
+    if (key == null) {
+      component(Props(title, panelClasses))(children: _*)
+    } else {
+      component.withKey(key).apply(Props(title, panelClasses))(children: _*)
+    }
   }
 }

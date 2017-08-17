@@ -17,7 +17,7 @@ private[transactionviews] final class EntriesListTable[Entry, Props](
     key: String,
     numEntriesStrategy: NumEntriesStrategy,
     tableHeaders: Seq[VdomElement],
-    calculateTableData: Entry => Seq[VdomElement],
+    calculateTableDataFromEntryAndRowNum: (Entry, Int) => Seq[VdomElement],
     props: Props)(implicit entriesStoreFactory: EntriesListStoreFactory[Entry, Props], i18n: I18n) {
 
   private val component = ScalaComponent
@@ -64,7 +64,10 @@ private[transactionviews] final class EntriesListTable[Entry, Props](
         tableClasses = tableClasses,
         expandNumEntriesCallback = if (state.entries.hasMore) Some(expandMaxNumEntries(state)) else None,
         tableHeaders = tableHeaders,
-        tableDatas = state.entries.entries.reverse.map(calculateTableData)
+        tableDatas = state.entries.entries.reverse.zipWithIndex.map {
+          case (entry, index) =>
+            calculateTableDataFromEntryAndRowNum(entry, index)
+        }
       )
     }
 
@@ -100,13 +103,37 @@ private[transactionviews] object EntriesListTable {
                           calculateTableData: Entry => Seq[VdomElement])(
       implicit entriesStoreFactory: EntriesListStoreFactory[Entry, Props],
       i18n: I18n): VdomElement = {
+    withRowNumber[Entry, Props](
+      tableTitle = tableTitle,
+      tableClasses = tableClasses,
+      key = key,
+      numEntriesStrategy = numEntriesStrategy,
+      props = props,
+      tableHeaders = tableHeaders,
+      calculateTableDataFromEntryAndRowNum = (entry, rowNum) => calculateTableData(entry)
+    )
+  }
+
+  /**
+    * @param calculateTableDataFromEntryAndRowNum Returns an a seq of table datas from an entry and the number of the
+    *                                             row. The first row is zero.
+    */
+  def withRowNumber[Entry, Props](tableTitle: String,
+                                  tableClasses: Seq[String] = Seq(),
+                                  key: String = "",
+                                  numEntriesStrategy: NumEntriesStrategy,
+                                  props: Props = (): Unit,
+                                  tableHeaders: Seq[VdomElement],
+                                  calculateTableDataFromEntryAndRowNum: (Entry, Int) => Seq[VdomElement])(
+      implicit entriesStoreFactory: EntriesListStoreFactory[Entry, Props],
+      i18n: I18n): VdomElement = {
     new EntriesListTable(
       tableTitle,
       tableClasses,
       key,
       numEntriesStrategy,
       tableHeaders,
-      calculateTableData,
+      calculateTableDataFromEntryAndRowNum,
       props).apply()
   }
 

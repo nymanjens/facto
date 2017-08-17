@@ -26,11 +26,17 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
           | staticRoute("#everything", EverythingPage)
             ~> renderR(ctl => logExceptions(reactAppModule.everything(ctl)))
 
-          | staticRoute("#endowments", EndowmentsPage)
-            ~> renderR(ctl => logExceptions(reactAppModule.endowments(ctl)))
+          | staticRoute("#cashFlow", CashFlowPage)
+            ~> renderR(ctl => logExceptions(reactAppModule.cashFlow(ctl, includeHiddenReservoirs = false)))
+
+          | staticRoute("#cashFlowWithHidden", CashFlowHiddenPage)
+            ~> renderR(ctl => logExceptions(reactAppModule.cashFlow(ctl, includeHiddenReservoirs = true)))
 
           | staticRoute("#liquidation", LiquidationPage)
             ~> renderR(ctl => logExceptions(reactAppModule.liquidation(ctl)))
+
+          | staticRoute("#endowments", EndowmentsPage)
+            ~> renderR(ctl => logExceptions(reactAppModule.endowments(ctl)))
 
           | staticRoute("#newTransactionGroup", NewTransactionGroupPage)
             ~> renderR(ctl => logExceptions(reactAppModule.transactionGroupForm.forCreate(ctl)))

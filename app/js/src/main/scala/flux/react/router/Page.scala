@@ -7,8 +7,10 @@ object Page {
 
   // Accounting data views
   case object EverythingPage extends Page
-  case object EndowmentsPage extends Page
+  case object CashFlowPage extends Page
+  case object CashFlowHiddenPage extends Page
   case object LiquidationPage extends Page
+  case object EndowmentsPage extends Page
 
   // Accounting forms - transactions
   case object NewTransactionGroupPage extends Page

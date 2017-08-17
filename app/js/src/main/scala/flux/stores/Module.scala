@@ -5,6 +5,7 @@ import common.time.Clock
 import flux.action.Dispatcher
 import flux.stores.entries.{
   AllEntriesStoreFactory,
+  CashFlowEntriesStoreFactory,
   EndowmentEntriesStoreFactory,
   LiquidationEntriesStoreFactory
 }
@@ -25,8 +26,9 @@ final class Module(implicit i18n: I18n,
   import com.softwaremill.macwire._
 
   implicit val allEntriesStoreFactory = wire[AllEntriesStoreFactory]
-  implicit val endowmentEntriesStoreFactory = wire[EndowmentEntriesStoreFactory]
+  implicit val cashFlowEntriesStoreFactory = wire[CashFlowEntriesStoreFactory]
   implicit val liquidationEntriesStoreFactory = wire[LiquidationEntriesStoreFactory]
+  implicit val endowmentEntriesStoreFactory = wire[EndowmentEntriesStoreFactory]
   implicit val transactionAndGroupStore = wire[TransactionAndGroupStore]
   implicit val globalMessagesStore = wire[GlobalMessagesStore]
 }

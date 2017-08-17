@@ -8,11 +8,7 @@ import flux.action.Dispatcher
 import flux.react.app.transactiongroupform.TransactionGroupForm
 import flux.react.app.transactionviews.Everything
 import flux.stores.GlobalMessagesStore
-import flux.stores.entries.{
-  AllEntriesStoreFactory,
-  EndowmentEntriesStoreFactory,
-  LiquidationEntriesStoreFactory
-}
+import flux.stores.entries.{AllEntriesStoreFactory, CashFlowEntriesStoreFactory, EndowmentEntriesStoreFactory, LiquidationEntriesStoreFactory}
 import models.{EntityAccess, User}
 import models.access.RemoteDatabaseProxy
 import models.accounting._
@@ -27,8 +23,9 @@ final class Module(implicit i18n: I18n,
                    exchangeRateManager: ExchangeRateManager,
                    transactionGroupManager: TransactionGroup.Manager,
                    allEntriesStoreFactory: AllEntriesStoreFactory,
-                   endowmentEntriesStoreFactory: EndowmentEntriesStoreFactory,
+                   cashFlowEntriesStoreFactory: CashFlowEntriesStoreFactory,
                    liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory,
+                   endowmentEntriesStoreFactory: EndowmentEntriesStoreFactory,
                    globalMessagesStore: GlobalMessagesStore,
                    dispatcher: Dispatcher,
                    clock: Clock) {
@@ -46,6 +43,7 @@ final class Module(implicit i18n: I18n,
   implicit lazy val transactionGroupForm: TransactionGroupForm =
     transactionGroupFormModule.transactionGroupForm
   implicit lazy val everything = transactionViewsModule.everything
-  implicit lazy val endowments = transactionViewsModule.endowments
+  implicit lazy val cashFlow = transactionViewsModule.cashFlow
   implicit lazy val liquidation = transactionViewsModule.liquidation
+  implicit lazy val endowments = transactionViewsModule.endowments
 }

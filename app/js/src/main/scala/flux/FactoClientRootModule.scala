@@ -2,6 +2,7 @@ package flux
 
 import api.ScalaJsApi.GetInitialDataResponse
 import flux.react.router.Page
+import flux.stores.entries.CashFlowEntriesStoreFactory
 import japgolly.scalajs.react.extra.router.Router
 import models.User
 import models.access.RemoteDatabaseProxy
@@ -33,6 +34,7 @@ final class FactoAppModule(implicit getInitialDataResponse: GetInitialDataRespon
   // Create and unpack Flux store module
   private val fluxStoresModule = new flux.stores.Module
   implicit private val allEntriesStoreFactory = fluxStoresModule.allEntriesStoreFactory
+  implicit private val cashFlowEntriesStoreFactory = fluxStoresModule.cashFlowEntriesStoreFactory
   implicit private val liquidationEntriesStoreFactory = fluxStoresModule.liquidationEntriesStoreFactory
   implicit private val endowmentEntriesStoreFactory = fluxStoresModule.endowmentEntriesStoreFactory
   implicit private val globalMessagesStore = fluxStoresModule.globalMessagesStore
