@@ -1,5 +1,5 @@
 package flux.react.app.transactionviews
-
+import scala.scalajs.js
 import flux.react.ReactVdomUtils.<<
 import common.Formatting._
 import common.I18n
@@ -12,6 +12,7 @@ import flux.stores.entries.{AccountPair, CashFlowEntriesStoreFactory, CashFlowEn
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.RouterCtl
 import japgolly.scalajs.react.vdom.html_<^._
+import models.accounting.BalanceCheck
 import models.accounting.config.{Account, Config, MoneyReservoir}
 import models.accounting.money.{ExchangeRateManager, ReferenceMoney}
 import models.{EntityAccess, User}
@@ -75,7 +76,16 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
                             ),
                             <.td(uielements.TransactionGroupEditButton(entry.groupId, props.router))
                           )
-                        case entry: CashFlowEntry.BalanceCorrection => ???
+                        case CashFlowEntry.BalanceCorrection(balanceCorrection) =>
+                          Seq[VdomElement](
+                            <.td(formatDate(balanceCorrection.checkDate)),
+                            <.td(
+                              ^.colSpan := 5,
+                              ^.style := js.Dictionary("fontWeight" -> "bold"),
+                              i18n("facto.balance-correction") + ":"),
+                            <.td(uielements.MoneyWithCurrency(balanceCorrection.balance)),
+                            <.td(balanceCheckEditButton(balanceCorrection, props.router))
+                          )
                     }
                   )
                 }
@@ -110,6 +120,14 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
         ^.role := "button",
         <.i(^.className := "fa fa-check-square-o fa-fw"))
     )
+  }
+
+  def balanceCheckEditButton(balanceCorrection: BalanceCheck, router: RouterCtl[Page]): VdomElement = {
+    <.a(
+      ^.className := "btn btn-default btn-xs",
+      ^.role := "button",
+      <.i(^.className := "fa fa-pencil fa-fw"),
+      i18n("facto.edit"))
   }
 
   // **************** Private inner types ****************//
