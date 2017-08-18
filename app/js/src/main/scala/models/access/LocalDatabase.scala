@@ -19,8 +19,12 @@ trait LocalDatabase {
   def isEmpty(): Boolean
 
   // **************** Setters ****************//
-  /** Applies given modification in memory but doesn't persist it in the browser's storage (call `save()` to do this). */
-  def applyModifications(modifications: Seq[EntityModification]): Unit
+  /**
+    * Applies given modification in memory but doesn't persist it in the browser's storage (call `save()` to do this).
+    *
+    * @return true if the in memory database changed as a result of this method
+    */
+  def applyModifications(modifications: Seq[EntityModification]): Boolean
   def addAll[E <: Entity: EntityType](entities: Seq[E]): Unit
 
   /** Sets given singleton value in memory but doesn't persist it in the browser's storage (call `save()` to do this). */
@@ -100,30 +104,35 @@ object LocalDatabase {
     }
 
     // **************** Setters ****************//
-    override def applyModifications(modifications: Seq[EntityModification]): Unit = {
-      for (modification <- modifications) {
-        modification match {
-          case addModification: EntityModification.Add[_] =>
-            def add[E <: Entity](modification: EntityModification.Add[E]): Unit = {
-              implicit val _ = modification.entityType
-              newQuery[E]().findOne(Keys.id, modification.entity.id) match {
-                case Some(entity) => // do nothing
-                case None => entityCollectionForImplicitType[E].insert(modification.entity)
+    override def applyModifications(modifications: Seq[EntityModification]): Boolean = {
+      val modificationsCausedChange =
+        for (modification <- modifications) yield {
+          modification match {
+            case addModification: EntityModification.Add[_] =>
+              def add[E <: Entity](modification: EntityModification.Add[E]): Boolean = {
+                implicit val _ = modification.entityType
+                newQuery[E]().findOne(Keys.id, modification.entity.id) match {
+                  case Some(entity) => false // do nothing
+                  case None =>
+                    entityCollectionForImplicitType[E].insert(modification.entity)
+                    true
+                }
               }
-            }
-            add(addModification)
-          case removeModification: EntityModification.Remove[_] =>
-            def remove[E <: Entity](modification: EntityModification.Remove[E]): Unit = {
-              implicit val _ = modification.entityType
-              newQuery[E]().findOne(Keys.id, modification.entityId) match {
-                case Some(entity) =>
-                  entityCollectionForImplicitType.findAndRemove(Keys.id, modification.entityId)
-                case None => // do nothing
+              add(addModification)
+            case removeModification: EntityModification.Remove[_] =>
+              def remove[E <: Entity](modification: EntityModification.Remove[E]): Boolean = {
+                implicit val _ = modification.entityType
+                newQuery[E]().findOne(Keys.id, modification.entityId) match {
+                  case Some(entity) =>
+                    entityCollectionForImplicitType.findAndRemove(Keys.id, modification.entityId)
+                    true
+                  case None => false // do nothing
+                }
               }
-            }
-            remove(removeModification)
+              remove(removeModification)
+          }
         }
-      }
+      modificationsCausedChange contains true
     }
 
     override def addAll[E <: Entity: EntityType](entities: Seq[E]): Unit = {

@@ -183,11 +183,13 @@ object RemoteDatabaseProxy {
       val response =
         await(apiClient.getEntityModifications(localDatabase.getSingletonValue(NextUpdateTokenKey).get))
       if (response.modifications.nonEmpty) {
-        localDatabase.applyModifications(response.modifications)
+        val somethingChanged = localDatabase.applyModifications(response.modifications)
         localDatabase.setSingletonValue(NextUpdateTokenKey, response.nextUpdateToken)
         await(localDatabase.save())
 
-        await(invokeListenersAsync(_.addedRemotely(response.modifications)))
+        if (somethingChanged) {
+          await(invokeListenersAsync(_.addedRemotely(response.modifications)))
+        }
       }
     }
   }

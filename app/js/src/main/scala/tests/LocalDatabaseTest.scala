@@ -111,7 +111,7 @@ private[tests] object LocalDatabaseTest extends ManualTestSuite {
           Seq(
             EntityModification.Add(transaction2),
             EntityModification.createDelete(testTransactionWithId)
-          ))
+          )) ==> true
 
         db.newQuery[Transaction]().data() ==> Seq(transaction2)
       }
@@ -132,9 +132,17 @@ private[tests] object LocalDatabaseTest extends ManualTestSuite {
             EntityModification.createDelete(transaction2),
             EntityModification.createDelete(transaction2),
             EntityModification.createDelete(transaction3)
-          ))
+          )) ==> true
 
         db.newQuery[Transaction]().data() ==> Seq(testTransactionWithId)
+      }
+    },
+    ManualTest("applyModifications: Returns false if no change") {
+      async {
+        val db = await(LocalDatabase.createInMemoryForTests())
+        db.applyModifications(Seq(EntityModification.Add(testTransactionWithId))) ==> true
+
+        db.applyModifications(Seq(EntityModification.Add(testTransactionWithId))) ==> false
       }
     }
   )
