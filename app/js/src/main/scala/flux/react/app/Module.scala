@@ -8,7 +8,12 @@ import flux.action.Dispatcher
 import flux.react.app.transactiongroupform.TransactionGroupForm
 import flux.react.app.transactionviews.Everything
 import flux.stores.GlobalMessagesStore
-import flux.stores.entries.{AllEntriesStoreFactory, CashFlowEntriesStoreFactory, EndowmentEntriesStoreFactory, LiquidationEntriesStoreFactory}
+import flux.stores.entries.{
+  AllEntriesStoreFactory,
+  CashFlowEntriesStoreFactory,
+  EndowmentEntriesStoreFactory,
+  LiquidationEntriesStoreFactory
+}
 import models.{EntityAccess, User}
 import models.access.RemoteDatabaseProxy
 import models.accounting._
