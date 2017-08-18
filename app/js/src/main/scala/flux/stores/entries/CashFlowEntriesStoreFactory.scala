@@ -158,8 +158,12 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
       EntriesListStoreFactory.State(entries.takeRight(maxNumEntries), hasMore = entries.size > maxNumEntries)
     }
 
-    override protected def transactionUpsertImpactsState(transaction: Transaction, state: State): Boolean = {
+    override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) = {
       transaction.moneyReservoir == moneyReservoir
+    }
+
+    override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) = {
+      balanceCheck.moneyReservoir == moneyReservoir
     }
   }
 

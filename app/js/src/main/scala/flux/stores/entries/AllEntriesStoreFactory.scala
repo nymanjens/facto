@@ -2,7 +2,7 @@ package flux.stores.entries
 
 import jsfacades.Loki
 import models.access.RemoteDatabaseProxy
-import models.accounting.Transaction
+import models.accounting.{BalanceCheck, Transaction}
 import models.manager.{EntityModification, EntityType}
 
 import scala.collection.immutable.Seq
@@ -32,8 +32,8 @@ final class AllEntriesStoreFactory(implicit database: RemoteDatabaseProxy)
       EntriesListStoreFactory.State(entries.takeRight(maxNumEntries), hasMore = entries.size > maxNumEntries)
     }
 
-    override protected def transactionUpsertImpactsState(transaction: Transaction, state: State): Boolean =
-      true
+    override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) = true
+    override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) = false
   }
 
   def get(maxNumEntries: Int): Store = get(Input(maxNumEntries = maxNumEntries, additionalInput = (): Unit))

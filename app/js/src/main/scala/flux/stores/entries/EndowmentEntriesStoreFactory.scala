@@ -2,12 +2,12 @@ package flux.stores.entries
 
 import jsfacades.Loki
 import models.access.RemoteDatabaseProxy
-import models.accounting.Transaction
+import models.accounting.{BalanceCheck, Transaction}
 import models.accounting.config.{Account, Config}
-import models.manager.{EntityModification, EntityType}
+
+import scala.collection.immutable.Seq
 import scala2js.Converters._
 import scala2js.Keys
-import scala.collection.immutable.Seq
 
 final class EndowmentEntriesStoreFactory(implicit database: RemoteDatabaseProxy, accountingConfig: Config)
     extends EntriesListStoreFactory[GeneralEntry, Account] {
@@ -35,9 +35,10 @@ final class EndowmentEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
       EntriesListStoreFactory.State(entries.takeRight(maxNumEntries), hasMore = entries.size > maxNumEntries)
     }
 
-    override protected def transactionUpsertImpactsState(transaction: Transaction, state: State): Boolean = {
+    override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) = {
       transaction.category == accountingConfig.constants.endowmentCategory && transaction.beneficiary == account
     }
+    override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) = false
   }
 
   def get(account: Account, maxNumEntries: Int): Store =

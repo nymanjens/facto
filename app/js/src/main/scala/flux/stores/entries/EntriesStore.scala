@@ -1,7 +1,7 @@
 package flux.stores.entries
 
 import models.access.RemoteDatabaseProxy
-import models.accounting.Transaction
+import models.accounting.{BalanceCheck, Transaction}
 import models.manager.{EntityModification, EntityType}
 
 import scala.collection.immutable.Seq
@@ -44,6 +44,7 @@ abstract class EntriesStore[State](implicit database: RemoteDatabaseProxy) {
   protected def calculateState(): State
 
   protected def transactionUpsertImpactsState(transaction: Transaction, state: State): Boolean
+  protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State): Boolean
 
   // **************** Private helper methods ****************//
   private def updateState(): Unit = {
@@ -56,7 +57,13 @@ abstract class EntriesStore[State](implicit database: RemoteDatabaseProxy) {
   private def modificationImpactsState(entityModification: EntityModification, state: State): Boolean = {
     entityModification.entityType match {
       case EntityType.UserType => true // Almost never happens and likely to change entries
-      case EntityType.BalanceCheckType => true // TODO: This is not always true, change this
+      case EntityType.BalanceCheckType =>
+        entityModification match {
+          case EntityModification.Add(bc) =>
+            balanceCheckUpsertImpactsState(bc.asInstanceOf[BalanceCheck], state)
+          case EntityModification.Remove(bcId) =>
+            true // Could be a removal or an update, but we can't get more info about the deleted entry
+        }
       case EntityType.ExchangeRateMeasurementType =>
         false // In normal circumstances, no entries should be changed retroactively
       case EntityType.TransactionGroupType =>

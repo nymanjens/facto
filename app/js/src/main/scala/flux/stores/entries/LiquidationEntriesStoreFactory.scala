@@ -3,7 +3,7 @@ package flux.stores.entries
 import jsfacades.Loki
 import models.EntityAccess
 import models.access.RemoteDatabaseProxy
-import models.accounting.Transaction
+import models.accounting.{BalanceCheck, Transaction}
 import models.accounting.config.{Account, Config}
 import models.accounting.money.{ExchangeRateManager, ReferenceMoney}
 
@@ -58,9 +58,11 @@ final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProx
       EntriesListStoreFactory.State(entries.takeRight(maxNumEntries), hasMore = entries.size > maxNumEntries)
     }
 
-    override protected def transactionUpsertImpactsState(transaction: Transaction, state: State): Boolean = {
+    override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) = {
       isRelevantForAccounts(transaction, accountPair)
     }
+
+    override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) = false
 
     private def isRelevantForAccounts(transaction: Transaction, accountPair: AccountPair): Boolean = {
       val moneyReservoirOwner = transaction.moneyReservoirCode match {
