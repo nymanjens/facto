@@ -137,6 +137,7 @@ object RemoteDatabaseProxyTest extends TestSuite {
     // **************** Setters ****************//
     override def applyModifications(modifications: Seq[EntityModification]) = {
       modificationsBuffer.addModifications(modifications)
+      true
     }
     override def addAll[E <: Entity: EntityType](entities: Seq[E]) = {
       modificationsBuffer.addEntities(entities)
