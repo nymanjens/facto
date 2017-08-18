@@ -9,10 +9,10 @@ import models.accounting._
 import models.manager.EntityModification
 import scala.collection.immutable.Seq
 
-final class TransactionAndGroupStore(implicit database: RemoteDatabaseProxy,
-                                     entityAccess: EntityAccess,
-                                     clock: Clock,
-                                     dispatcher: Dispatcher) {
+private[stores] final class TransactionAndGroupStore(implicit database: RemoteDatabaseProxy,
+                                                     entityAccess: EntityAccess,
+                                                     clock: Clock,
+                                                     dispatcher: Dispatcher) {
   dispatcher.registerPartialAsync {
     case AddTransactionGroup(transactionsWithoutIdProvider) =>
       val groupAddition = EntityModification.createAddWithRandomId(TransactionGroup(createdDate = clock.now))

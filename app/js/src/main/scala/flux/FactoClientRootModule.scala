@@ -38,7 +38,6 @@ final class FactoAppModule(implicit getInitialDataResponse: GetInitialDataRespon
   implicit private val liquidationEntriesStoreFactory = fluxStoresModule.liquidationEntriesStoreFactory
   implicit private val endowmentEntriesStoreFactory = fluxStoresModule.endowmentEntriesStoreFactory
   implicit private val globalMessagesStore = fluxStoresModule.globalMessagesStore
-  implicit private val transactionAndGroupStore = fluxStoresModule.transactionAndGroupStore
 
   // Create other Flux modules
   implicit private val reactAppModule = new flux.react.app.Module

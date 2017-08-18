@@ -25,10 +25,12 @@ final class Module(implicit i18n: I18n,
 
   import com.softwaremill.macwire._
 
+  wire[TransactionAndGroupStore]
+  wire[BalanceCheckStore]
+
   implicit val allEntriesStoreFactory = wire[AllEntriesStoreFactory]
   implicit val cashFlowEntriesStoreFactory = wire[CashFlowEntriesStoreFactory]
   implicit val liquidationEntriesStoreFactory = wire[LiquidationEntriesStoreFactory]
   implicit val endowmentEntriesStoreFactory = wire[EndowmentEntriesStoreFactory]
-  implicit val transactionAndGroupStore = wire[TransactionAndGroupStore]
   implicit val globalMessagesStore = wire[GlobalMessagesStore]
 }

@@ -5,9 +5,11 @@ import common.Formatting._
 import common.I18n
 import common.LoggingUtils.LogExceptionsCallback
 import common.time.Clock
+import flux.action.{Action, Dispatcher}
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import flux.react.router.Page
 import flux.react.uielements
+import flux.stores.BalanceCheckStore
 import flux.stores.entries.{AccountPair, CashFlowEntriesStoreFactory, CashFlowEntry}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.RouterCtl
@@ -20,6 +22,7 @@ import models.{EntityAccess, User}
 import scala.collection.immutable.Seq
 
 final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
+                     dispatcher: Dispatcher,
                      entityAccess: EntityAccess,
                      clock: Clock,
                      accountingConfig: Config,
@@ -116,7 +119,18 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
     <.button(
       ^.className := "btn btn-info btn-xs",
       ^.role := "button",
-      <.i(^.className := "fa fa-check-square-o fa-fw"))
+      ^.onClick --> LogExceptionsCallback {
+        dispatcher.dispatch(
+          Action.AddBalanceCheck(BalanceCheck(
+            issuerId = user.id,
+            moneyReservoirCode = reservoir.code,
+            balanceInCents = entry.balance.cents,
+            createdDate = clock.now,
+            checkDate = entry.mostRecentTransaction.transactionDate
+          )))
+      }.void,
+      <.i(^.className := "fa fa-check-square-o fa-fw")
+    )
   }
 
   def balanceCheckEditButton(balanceCorrection: BalanceCheck, router: RouterCtl[Page]): VdomElement = {

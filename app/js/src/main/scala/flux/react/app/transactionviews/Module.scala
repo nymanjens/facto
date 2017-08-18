@@ -2,6 +2,7 @@ package flux.react.app.transactionviews
 
 import common.I18n
 import common.time.Clock
+import flux.action.Dispatcher
 import flux.stores.GlobalMessagesStore
 import flux.stores.entries.{AllEntriesStoreFactory, CashFlowEntriesStoreFactory, EndowmentEntriesStoreFactory, LiquidationEntriesStoreFactory}
 import models.access.RemoteDatabaseProxy
@@ -14,6 +15,7 @@ final class Module(implicit i18n: I18n,
                    user: User,
                    remoteDatabaseProxy: RemoteDatabaseProxy,
                    entityAccess: EntityAccess,
+                   dispatcher:Dispatcher,
                    exchangeRateManager: ExchangeRateManager,
                    allEntriesStoreFactory: AllEntriesStoreFactory,
                    cashFlowEntriesStoreFactory: CashFlowEntriesStoreFactory,

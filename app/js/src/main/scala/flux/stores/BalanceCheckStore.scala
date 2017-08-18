@@ -7,8 +7,7 @@ import models.EntityAccess
 import models.access.RemoteDatabaseProxy
 import models.manager.EntityModification
 
-final class BalanceCheckStore(implicit database: RemoteDatabaseProxy,
-                              dispatcher: Dispatcher) {
+private[stores] final class BalanceCheckStore(implicit database: RemoteDatabaseProxy, dispatcher: Dispatcher) {
   dispatcher.registerPartialAsync {
     case AddBalanceCheck(balanceCheckWithoutId) =>
       database.persistModifications(EntityModification.createAddWithRandomId(balanceCheckWithoutId))
