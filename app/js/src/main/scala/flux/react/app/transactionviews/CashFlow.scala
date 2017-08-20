@@ -32,76 +32,87 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
-    .renderP(
-      (_, props) =>
-        <.span({
-          for (account <- accountingConfig.personallySortedAccounts) yield {
-            uielements.Panel(i18n("facto.account-of", account.longName), key = account.code) {
-              {
-                for {
-                  reservoir <- accountingConfig
-                    .moneyReservoirs(
-                      includeNullReservoir = false,
-                      includeHidden = props.includeHiddenReservoirs)
-                  if reservoir.owner == account
-                } yield {
-                  EntriesListTable.withRowNumber[CashFlowEntry, MoneyReservoir](
-                    tableTitle = reservoir.name,
-                    tableClasses = Seq("table-cashflow"),
-                    key = reservoir.code,
-                    numEntriesStrategy = NumEntriesStrategy(start = 10, intermediateBeforeInf = Seq(30)),
-                    props = reservoir,
-                    tableHeaders = Seq(
-                      <.th(i18n("facto.payed")),
-                      <.th(i18n("facto.consumed")),
-                      <.th(i18n("facto.beneficiary")),
-                      <.th(i18n("facto.category")),
-                      <.th(i18n("facto.description")),
-                      <.th(i18n("facto.flow")),
-                      <.th(i18n("facto.balance")),
-                      <.th(balanceCheckAddNewButton(reservoir, router = props.router))
-                    ),
-                    calculateTableDataFromEntryAndRowNum = (cashFlowEntry, rowNumber) =>
-                      cashFlowEntry match {
-                        case entry: CashFlowEntry.RegularEntry =>
-                          Seq[VdomElement](
-                            <.td(entry.transactionDates.map(formatDate).mkString(", ")),
-                            <.td(entry.consumedDates.map(formatDate).mkString(", ")),
-                            <.td(entry.beneficiaries.map(_.shorterName).mkString(", ")),
-                            <.td(entry.categories.map(_.name).mkString(", ")),
-                            <.td(uielements.DescriptionWithEntryCount(entry)),
-                            <.td(uielements.MoneyWithCurrency(entry.flow)),
-                            <.td(
-                              uielements.MoneyWithCurrency(entry.balance),
-                              <<.ifThen(entry.balanceVerified)(<.i(^.className := "fa fa-check fa-fw")),
-                              <<.ifThen(!entry.balanceVerified && rowNumber == 0)(
-                                balanceCheckConfirmButton(reservoir, entry, props.router))
-                            ),
-                            <.td(uielements.TransactionGroupEditButton(entry.groupId, props.router))
-                          )
-                        case CashFlowEntry.BalanceCorrection(balanceCorrection) =>
-                          Seq[VdomElement](
-                            <.td(formatDate(balanceCorrection.checkDate)),
-                            <.td(
-                              ^.colSpan := 5,
-                              ^.style := js.Dictionary("fontWeight" -> "bold"),
-                              i18n("facto.balance-correction") + ":"),
-                            <.td(uielements.MoneyWithCurrency(balanceCorrection.balance)),
-                            <.td(balanceCheckEditButton(balanceCorrection, props.router))
-                          )
-                    }
-                  )
-                }
-              }.toVdomArray
+    .initialState(State(includeHiddenReservoirs = false))
+    .renderPS(
+      ($, props, state) =>
+        <.span(
+          {
+            for (account <- accountingConfig.personallySortedAccounts) yield {
+              uielements.Panel(i18n("facto.account-of", account.longName), key = account.code) {
+                {
+                  for {
+                    reservoir <- accountingConfig
+                      .moneyReservoirs(
+                        includeNullReservoir = false,
+                        includeHidden = state.includeHiddenReservoirs)
+                    if reservoir.owner == account
+                  } yield {
+                    EntriesListTable.withRowNumber[CashFlowEntry, MoneyReservoir](
+                      tableTitle = reservoir.name,
+                      tableClasses = Seq("table-cashflow"),
+                      key = reservoir.code,
+                      numEntriesStrategy = NumEntriesStrategy(start = 10, intermediateBeforeInf = Seq(30)),
+                      props = reservoir,
+                      tableHeaders = Seq(
+                        <.th(i18n("facto.payed")),
+                        <.th(i18n("facto.consumed")),
+                        <.th(i18n("facto.beneficiary")),
+                        <.th(i18n("facto.category")),
+                        <.th(i18n("facto.description")),
+                        <.th(i18n("facto.flow")),
+                        <.th(i18n("facto.balance")),
+                        <.th(balanceCheckAddNewButton(reservoir, router = props.router))
+                      ),
+                      calculateTableDataFromEntryAndRowNum = (cashFlowEntry, rowNumber) =>
+                        cashFlowEntry match {
+                          case entry: CashFlowEntry.RegularEntry =>
+                            Seq[VdomElement](
+                              <.td(entry.transactionDates.map(formatDate).mkString(", ")),
+                              <.td(entry.consumedDates.map(formatDate).mkString(", ")),
+                              <.td(entry.beneficiaries.map(_.shorterName).mkString(", ")),
+                              <.td(entry.categories.map(_.name).mkString(", ")),
+                              <.td(uielements.DescriptionWithEntryCount(entry)),
+                              <.td(uielements.MoneyWithCurrency(entry.flow)),
+                              <.td(
+                                uielements.MoneyWithCurrency(entry.balance),
+                                <<.ifThen(entry.balanceVerified)(<.i(^.className := "fa fa-check fa-fw")),
+                                <<.ifThen(!entry.balanceVerified && rowNumber == 0)(
+                                  balanceCheckConfirmButton(reservoir, entry, props.router))
+                              ),
+                              <.td(uielements.TransactionGroupEditButton(entry.groupId, props.router))
+                            )
+                          case CashFlowEntry.BalanceCorrection(balanceCorrection) =>
+                            Seq[VdomElement](
+                              <.td(formatDate(balanceCorrection.checkDate)),
+                              <.td(
+                                ^.colSpan := 5,
+                                ^.style := js.Dictionary("fontWeight" -> "bold"),
+                                i18n("facto.balance-correction") + ":"),
+                              <.td(uielements.MoneyWithCurrency(balanceCorrection.balance)),
+                              <.td(balanceCheckEditButton(balanceCorrection, props.router))
+                            )
+                      }
+                    )
+                  }
+                }.toVdomArray
+              }
             }
-          }
-        }.toVdomArray)
+          }.toVdomArray,
+          // includeHiddenReservoirs toggle button
+          <.a(
+            ^.className := "btn btn-info btn-lg btn-block",
+            ^.onClick --> LogExceptionsCallback(
+              $.modState(s => s.copy(includeHiddenReservoirs = !s.includeHiddenReservoirs)).runNow()),
+            if (state.includeHiddenReservoirs) i18n("facto.hide-hidden-reservoirs")
+            else i18n("facto.show-hidden-reservoirs")
+          )
+      )
     )
     .build
 
   // **************** API ****************//
-  def apply(router: RouterCtl[Page], includeHiddenReservoirs: Boolean): VdomElement = {
-    component(Props(includeHiddenReservoirs, router))
+  def apply(router: RouterCtl[Page]): VdomElement = {
+    component(Props(router))
   }
 
   // **************** Private helper methods ****************//
@@ -142,5 +153,6 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
   }
 
   // **************** Private inner types ****************//
-  private case class Props(includeHiddenReservoirs: Boolean, router: RouterCtl[Page])
+  private case class Props(router: RouterCtl[Page])
+  private case class State(includeHiddenReservoirs: Boolean)
 }

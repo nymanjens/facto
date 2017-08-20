@@ -85,6 +85,7 @@ facto.set=instellen
 facto.show-other-accounts=Toon andere accounts
 facto.hide-other-accounts=Verberg andere accounts
 facto.show-hidden-reservoirs=Toon verborgen reservoirs
+facto.hide-hidden-reservoirs=Verberg verborgen reservoirs
 facto.no-entries=Geen inboekingen
 facto.liquidation=Vereffening
 facto.cash-flow=Cash Flow

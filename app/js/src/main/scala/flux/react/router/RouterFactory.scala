@@ -27,10 +27,7 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
             ~> renderR(ctl => logExceptions(reactAppModule.everything(ctl)))
 
           | staticRoute("#cashFlow", CashFlowPage)
-            ~> renderR(ctl => logExceptions(reactAppModule.cashFlow(ctl, includeHiddenReservoirs = false)))
-
-          | staticRoute("#cashFlowWithHidden", CashFlowHiddenPage)
-            ~> renderR(ctl => logExceptions(reactAppModule.cashFlow(ctl, includeHiddenReservoirs = true)))
+            ~> renderR(ctl => logExceptions(reactAppModule.cashFlow(ctl)))
 
           | staticRoute("#liquidation", LiquidationPage)
             ~> renderR(ctl => logExceptions(reactAppModule.liquidation(ctl)))

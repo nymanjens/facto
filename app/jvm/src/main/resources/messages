@@ -131,6 +131,7 @@ facto.set=set
 facto.show-other-accounts=Show other accounts
 facto.hide-other-accounts=Hide other accounts
 facto.show-hidden-reservoirs=Show hidden reservoirs
+facto.hide-hidden-reservoirs=Hide hidden reservoirs
 facto.no-entries=No Entries
 facto.liquidation=Liquidation
 facto.cash-flow=Cash Flow
