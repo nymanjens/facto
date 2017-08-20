@@ -98,7 +98,7 @@ class SelectInput[Value] private (implicit valueTag: ClassTag[Value]) {
       getOnlyElement(extraProps.idToOptionMap.filter { case (id, option) => option.value == value }.keys)
     }
 
-    override def emptyValue = ???
+    override def isEmptyValue(value: Value) = false
   }
 }
 

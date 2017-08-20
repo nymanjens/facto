@@ -2,7 +2,7 @@ package flux.react.uielements.input.bootstrap
 
 import common.I18n
 import flux.react.ReactVdomUtils.^^
-import flux.react.uielements.input.InputBase
+import flux.react.uielements.input.{InputBase, InputValidator}
 import flux.react.uielements.input.bootstrap.InputComponent.{Props, ValueTransformer}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
@@ -37,6 +37,7 @@ object TextInput {
             defaultValue: String = "",
             required: Boolean = false,
             showErrorMessage: Boolean = false,
+            additionalValidator: InputValidator[String] = InputValidator.alwaysValid,
             inputClasses: Seq[String] = Seq(),
             focusOnMount: Boolean = false,
             disabled: Boolean = false,
@@ -48,6 +49,7 @@ object TextInput {
       defaultValue = defaultValue,
       required = required,
       showErrorMessage = showErrorMessage,
+      additionalValidator = additionalValidator,
       inputClasses = inputClasses,
       listener = listener,
       valueTransformer = ValueTransformer.nullInstance,

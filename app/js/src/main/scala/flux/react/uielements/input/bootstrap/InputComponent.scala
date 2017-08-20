@@ -3,7 +3,7 @@ package flux.react.uielements.input.bootstrap
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import flux.react.ReactVdomUtils.{<<, ^^}
-import flux.react.uielements.input.InputBase
+import flux.react.uielements.input.{InputBase, InputValidator}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
 import japgolly.scalajs.react.internal.Box
@@ -89,10 +89,14 @@ private[bootstrap] object InputComponent {
   private def generateErrorMessage[Value, ExtraProps](state: State[Value],
                                                       props: Props[Value, ExtraProps]): Option[String] = {
     if (props.showErrorMessage) {
+      def isEmpty(value: Value): Boolean = props.valueTransformer.isEmptyValue(value)
+
       ValueTransformer.stringToValue(state.valueString, props) match {
         case None => Some(props.i18n("error.invalid"))
-        case Some(value) if props.required && value == props.valueTransformer.emptyValue =>
+        case Some(value) if props.required && isEmpty(value) =>
           Some(props.i18n("error.required"))
+        case Some(value) if !isEmpty(value) && !props.additionalValidator.isValid(value) =>
+          Some(props.i18n("error.invalid"))
         case _ => None
       }
     } else {
@@ -114,7 +118,7 @@ private[bootstrap] object InputComponent {
                     extraProps: ExtraProps): VdomNode
   }
 
-  /** Convertor between String and Value. */
+  /** Converter between String and Value. */
   trait ValueTransformer[Value, -ExtraProps] {
 
     /**
@@ -130,8 +134,8 @@ private[bootstrap] object InputComponent {
       */
     def valueToString(value: Value, extraProps: ExtraProps): String
 
-    /** A required field with this value will be considered invalid. */
-    def emptyValue: Value
+    /** Return true if the given value represents an empty input. */
+    def isEmptyValue(value: Value): Boolean
   }
 
   object ValueTransformer {
@@ -139,7 +143,7 @@ private[bootstrap] object InputComponent {
       new ValueTransformer[String, ExtraProps] {
         override def stringToValue(string: String, extraProps: ExtraProps) = Some(string)
         override def valueToString(value: String, extraProps: ExtraProps) = value
-        override def emptyValue = ""
+        override def isEmptyValue(value: String) = value == ""
       }
 
     def stringToValue[Value, ExtraProps](string: String, props: Props[Value, ExtraProps]): Option[Value] = {
@@ -162,6 +166,7 @@ private[bootstrap] object InputComponent {
       defaultValue: Value,
       required: Boolean,
       showErrorMessage: Boolean,
+      additionalValidator: InputValidator[Value] = InputValidator.alwaysValid[Value],
       inputClasses: Seq[String],
       listener: InputBase.Listener[Value],
       extra: ExtraProps = (): Unit,
@@ -191,7 +196,7 @@ private[bootstrap] object InputComponent {
       extends InputBase.Proxy[Value] {
     override def value = {
       ValueTransformer.stringToValue(component.state.valueString, props) match {
-        case Some(value) if props.required && value == props.valueTransformer.emptyValue => None
+        case Some(value) if props.required && props.valueTransformer.isEmptyValue(value) => None
         case other => other
       }
     }
@@ -220,7 +225,7 @@ private[bootstrap] object InputComponent {
           }
         case Failure(_) =>
           println(
-            s"  Failed to get the String value for ${newValue}. This may be intended if the valid options for " +
+            s"  Failed to get the String value for $newValue. This may be intended if the valid options for " +
               s"this input change. Will ignore this setter.")
           this.valueOrDefault
       }

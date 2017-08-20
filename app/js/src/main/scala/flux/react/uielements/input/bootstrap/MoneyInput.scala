@@ -111,6 +111,6 @@ object MoneyInput {
       Money.centsToFloatString(cents)
     }
 
-    override def emptyValue = 0
+    override def isEmptyValue(value: Long) = value == 0
   }
 }
