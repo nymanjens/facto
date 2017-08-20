@@ -46,6 +46,13 @@ object TextInputTest extends TestSuite {
       tester.hasError ==> true
     }
 
+
+    "Shows error message if additional validator indicates an invalid value" - {
+      val tester = createTestComponent(defaultValue = "INVALID_VALUE", showErrorMessage = true)
+
+      tester.hasError ==> true
+    }
+
     "Input name is given name" - {
       val tester = createTestComponent()
       tester.inputName ==> "dummy-name"
@@ -63,6 +70,7 @@ object TextInputTest extends TestSuite {
         required = required,
         defaultValue = defaultValue,
         showErrorMessage = showErrorMessage,
+        additionalValidator = _ != "INVALID_VALUE",
         focusOnMount = true
       )
     )

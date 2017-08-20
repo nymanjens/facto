@@ -37,6 +37,12 @@ object MappedInputTest extends TestSuite {
       tester.inputValue() ==> "2017-05-20"
     }
 
+    "Shows error if invalid value" - {
+      val tester = createTestComponent(testRef, initialValue = "2017-02-40", showErrorMessage = true)
+
+      tester.hasError ==> true
+    }
+
     "ValueTransformer.StringToLocalDateTime.forward() works" - {
       val stringToLocalDateTime = MappedInput.ValueTransformer.StringToLocalDateTime
       stringToLocalDateTime.forward("2017-04-03") ==> Some(createDateTime(2017, APRIL, 3))
@@ -62,7 +68,9 @@ object MappedInputTest extends TestSuite {
     }
   }
 
-  private def createTestComponent(ref: dateMappedInput.Reference): ComponentTester = {
+  private def createTestComponent(ref: dateMappedInput.Reference,
+                                  showErrorMessage: Boolean = false,
+                                  initialValue: String = null): ComponentTester = {
     new ComponentTester(
       dateMappedInput(
         ref = ref,
@@ -74,8 +82,9 @@ object MappedInputTest extends TestSuite {
           ref = extraProps.ref,
           name = "dummy-name",
           label = "label",
-          defaultValue = extraProps.defaultValue,
-          showErrorMessage = false
+          defaultValue = Option(initialValue) getOrElse extraProps.defaultValue,
+          showErrorMessage = showErrorMessage,
+          additionalValidator = extraProps.additionalValidator
         )
       }
     )
@@ -87,6 +96,10 @@ object MappedInputTest extends TestSuite {
 
     def inputValue(): String = {
       wrappedComponent.child(tagName = "input").attribute("value")
+    }
+
+    def hasError: Boolean = {
+      wrappedComponent.classes contains "has-error"
     }
   }
 }
