@@ -5,8 +5,7 @@ import common.GuavaReplacement.Iterables.getOnlyElement
 import common.I18n
 import flux.react.ReactVdomUtils.^^
 import flux.react.uielements.input.InputBase
-import flux.react.uielements.input.bootstrap.InputComponent.{InputRenderer, Props}
-import flux.react.uielements.input.bootstrap.InputComponent.InputRenderer
+import flux.react.uielements.input.bootstrap.InputComponent.Props
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
@@ -18,27 +17,25 @@ class SelectInput[Value] private (implicit valueTag: ClassTag[Value]) {
 
   private val component = InputComponent.create[Value, ExtraProps](
     name = s"${getClass.getSimpleName}_${valueTag.runtimeClass.getSimpleName}",
-    inputRenderer = new InputRenderer[ExtraProps] {
-      override def renderInput(classes: Seq[String],
-                               name: String,
-                               valueString: String,
-                               onChange: ReactEventFromInput => Callback,
-                               extraProps: ExtraProps) = {
-        <.select(
-          ^^.classes(classes),
-          ^.name := name,
-          ^.value := valueString,
-          ^.onChange ==> onChange, {
-            for ((optionId, option) <- extraProps.idToOptionMap) yield {
-              <.option(
-                ^.value := optionId,
-                ^.key := optionId,
-                option.name
-              )
-            }
-          }.toVdomArray
-        )
-      }
+    inputRenderer = (classes: Seq[String],
+                     name: String,
+                     valueString: String,
+                     onChange: ReactEventFromInput => Callback,
+                     extraProps: ExtraProps) => {
+      <.select(
+        ^^.classes(classes),
+        ^.name := name,
+        ^.value := valueString,
+        ^.onChange ==> onChange, {
+          for ((optionId, option) <- extraProps.idToOptionMap) yield {
+            <.option(
+              ^.value := optionId,
+              ^.key := optionId,
+              option.name
+            )
+          }
+        }.toVdomArray
+      )
     }
   )
 

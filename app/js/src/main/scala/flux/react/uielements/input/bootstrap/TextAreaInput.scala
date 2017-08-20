@@ -2,8 +2,8 @@ package flux.react.uielements.input.bootstrap
 
 import common.I18n
 import flux.react.ReactVdomUtils.^^
-import InputComponent.{InputRenderer, Props, ValueTransformer}
 import flux.react.uielements.input.InputBase
+import flux.react.uielements.input.bootstrap.InputComponent.{Props, ValueTransformer}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
@@ -13,20 +13,18 @@ object TextAreaInput {
 
   private val component = InputComponent.create[Value, ExtraProps](
     name = getClass.getSimpleName,
-    inputRenderer = new InputRenderer[ExtraProps] {
-      override def renderInput(classes: Seq[String],
-                               name: String,
-                               valueString: String,
-                               onChange: ReactEventFromInput => Callback,
-                               extraProps: ExtraProps) = {
-        <.textarea(
-          ^^.classes(classes),
-          ^.name := name,
-          ^.value := valueString,
-          ^.rows := 2,
-          ^.onChange ==> onChange
-        )
-      }
+    inputRenderer = (classes: Seq[String],
+                     name: String,
+                     valueString: String,
+                     onChange: ReactEventFromInput => Callback,
+                     extraProps: ExtraProps) => {
+      <.textarea(
+        ^^.classes(classes),
+        ^.name := name,
+        ^.value := valueString,
+        ^.rows := 2,
+        ^.onChange ==> onChange
+      )
     }
   )
 

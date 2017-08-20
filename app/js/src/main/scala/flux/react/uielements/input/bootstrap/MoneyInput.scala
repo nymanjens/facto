@@ -4,7 +4,7 @@ import common.I18n
 import common.time.LocalDateTime
 import flux.react.ReactVdomUtils.^^
 import flux.react.uielements.input.InputBase
-import InputComponent.{InputRenderer, Props}
+import flux.react.uielements.input.bootstrap.InputComponent.Props
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import models.accounting.money.{Currency, DatedMoney, ExchangeRateManager, Money}
@@ -21,44 +21,42 @@ object MoneyInput {
         case None => oldValue
       }
     },
-    inputRenderer = new InputRenderer[ExtraProps] {
-      override def renderInput(classes: Seq[String],
-                               name: String,
-                               valueString: String,
-                               onChange: ReactEventFromInput => Callback,
-                               extraProps: ExtraProps) = {
-        val referenceMoney = {
-          val datedMoney = {
-            val cents = ValueTransformer.stringToValue(valueString, extraProps) getOrElse 0L
-            DatedMoney(cents, extraProps.currency, extraProps.date)
-          }
-          datedMoney.exchangedForReferenceCurrency(extraProps.exchangeRateManager)
+    inputRenderer = (classes: Seq[String],
+                     name: String,
+                     valueString: String,
+                     onChange: ReactEventFromInput => Callback,
+                     extraProps: ExtraProps) => {
+      val referenceMoney = {
+        val datedMoney = {
+          val cents = ValueTransformer.stringToValue(valueString, extraProps) getOrElse 0L
+          DatedMoney(cents, extraProps.currency, extraProps.date)
         }
+        datedMoney.exchangedForReferenceCurrency(extraProps.exchangeRateManager)
+      }
 
-        <.div(
-          ^.className := "input-group",
+      <.div(
+        ^.className := "input-group",
+        <.span(
+          ^.className := "input-group-addon",
+          <.i(^.className := extraProps.currency.iconClass)
+        ),
+        <.input(
+          ^.tpe := "text",
+          ^.autoComplete := "off",
+          ^^.classes(classes),
+          ^.name := name,
+          ^.value := valueString,
+          ^.disabled := extraProps.forceValue.isDefined,
+          ^.onChange ==> onChange
+        ),
+        ^^.ifThen(extraProps.currency.isForeign) {
           <.span(
             ^.className := "input-group-addon",
-            <.i(^.className := extraProps.currency.iconClass)
-          ),
-          <.input(
-            ^.tpe := "text",
-            ^.autoComplete := "off",
-            ^^.classes(classes),
-            ^.name := name,
-            ^.value := valueString,
-            ^.disabled := extraProps.forceValue.isDefined,
-            ^.onChange ==> onChange
-          ),
-          ^^.ifThen(extraProps.currency.isForeign) {
-            <.span(
-              ^.className := "input-group-addon",
-              <.i(^.className := Currency.default.iconClass),
-              <.span(" " + referenceMoney.formatFloat)
-            )
-          }
-        )
-      }
+            <.i(^.className := Currency.default.iconClass),
+            <.span(" " + referenceMoney.formatFloat)
+          )
+        }
+      )
     }
   )
 
