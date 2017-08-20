@@ -202,17 +202,19 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawTransactionDate),
             startWithDefault = props.defaultValues.isEmpty,
             delegateRefFactory = TextInput.ref _
-          ) { extraProps =>
-            bootstrap.TextInput(
-              ref = extraProps.ref,
-              name = "transaction-date",
-              label = i18n("facto.date-payed"),
-              defaultValue = mappedExtraProps.defaultValue,
-              required = true,
-              showErrorMessage = props.showErrorMessages,
-              inputClasses = extraProps.inputClasses,
-              focusOnMount = props.focusOnMount
-            )
+          ) {
+            extraProps =>
+              bootstrap.TextInput(
+                ref = extraProps.ref,
+                name = "transaction-date",
+                label = i18n("facto.date-payed"),
+                defaultValue = mappedExtraProps.defaultValue,
+                required = true,
+                showErrorMessage = props.showErrorMessages,
+                additionalValidator = mappedExtraProps.additionalValidator,
+                inputClasses = extraProps.inputClasses,
+                focusOnMount = props.focusOnMount
+              )
           }
         },
         dateMappedInput(
@@ -240,6 +242,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                   defaultValue = mappedExtraProps.defaultValue,
                   required = true,
                   showErrorMessage = props.showErrorMessages,
+                  additionalValidator = mappedExtraProps.additionalValidator,
                   inputClasses = extraProps1.inputClasses ++ extraProps2.inputClasses
                 )
               }
@@ -377,6 +380,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
               name = "tags",
               label = i18n("facto.tags"),
               showErrorMessage = props.showErrorMessages,
+              additionalValidator = mappedExtraProps.additionalValidator,
               defaultValue = mappedExtraProps.defaultValue,
               inputClasses = extraProps.inputClasses
             )

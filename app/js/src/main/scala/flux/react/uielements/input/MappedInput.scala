@@ -49,7 +49,8 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
   // **************** Public inner types ****************//
   case class InputElementExtraProps[DelegateRef <: InputBase.Reference[DelegateValue]](
       ref: DelegateRef,
-      defaultValue: DelegateValue)
+      defaultValue: DelegateValue,
+      additionalValidator: InputValidator[DelegateValue])
 
   final class Reference private[MappedInput] (private[MappedInput] val mutableRef: ThisMutableRef)
       extends InputBase.Reference[Value] {
@@ -143,7 +144,11 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
       def renderInternal[DelegateRef <: InputBase.Reference[DelegateValue]](props: Props[DelegateRef]) = {
         val defaultDelegateValue = props.valueTransformer.backward(props.defaultValue)
         props.delegateElementFactory(
-          InputElementExtraProps(delegateRef.asInstanceOf[DelegateRef], defaultDelegateValue))
+          InputElementExtraProps(
+            ref = delegateRef.asInstanceOf[DelegateRef],
+            defaultValue = defaultDelegateValue,
+            additionalValidator = value => props.valueTransformer.forward(value).isDefined
+          ))
       }
       renderInternal(props)
     }
