@@ -208,6 +208,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
               name = "transaction-date",
               label = i18n("facto.date-payed"),
               defaultValue = mappedExtraProps.defaultValue,
+              required = true,
               showErrorMessage = props.showErrorMessages,
               inputClasses = extraProps.inputClasses,
               focusOnMount = props.focusOnMount
@@ -237,6 +238,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                   name = "date-consumed",
                   label = i18n("facto.date-consumed"),
                   defaultValue = mappedExtraProps.defaultValue,
+                  required = true,
                   showErrorMessage = props.showErrorMessages,
                   inputClasses = extraProps1.inputClasses ++ extraProps2.inputClasses
                 )

@@ -178,7 +178,7 @@ object MappedInput {
     object StringToLocalDateTime extends ValueTransformer[String, LocalDateTime] {
       override def forward(string: String) = {
         try {
-          Some(TimeUtils.parseDateString(string))
+          Some(TimeUtils.parseDateString(string.trim))
         } catch {
           case _: IllegalArgumentException => None
         }
@@ -188,7 +188,7 @@ object MappedInput {
 
     object StringToTags extends ValueTransformer[String, Seq[Tag]] {
       override def forward(string: String) = {
-        val tags = Tag.parseTagsString(string)
+        val tags = Tag.parseTagsString(string.trim)
         if (tags.map(_.name).filterNot(Tag.isValidTagName).isEmpty) {
           Some(tags)
         } else {
