@@ -6,7 +6,7 @@ import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
 
-private[transactiongroupform] object HalfPanel {
+object HalfPanel {
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
     .renderPC((_, props, children) =>
