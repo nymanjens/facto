@@ -26,10 +26,10 @@ object MoneyInput {
                      valueString: String,
                      onChange: ReactEventFromInput => Callback,
                      extraProps: ExtraProps) => {
-      def referenceMoney = {
+      def referenceMoney(currency: Currency, date: LocalDateTime) = {
         val datedMoney = {
           val cents = ValueTransformer.stringToValue(valueString, extraProps) getOrElse 0L
-          DatedMoney(cents, extraProps.currency, extraProps.dateForCurrencyConversion)
+          DatedMoney(cents, currency, date)
         }
         datedMoney.exchangedForReferenceCurrency(extraProps.exchangeRateManager)
       }
@@ -53,7 +53,8 @@ object MoneyInput {
           <.span(
             ^.className := "input-group-addon",
             <.i(^.className := Currency.default.iconClass),
-            <.span(" " + referenceMoney.formatFloat)
+            <.span(
+              " " + referenceMoney(extraProps.currency, extraProps.dateForCurrencyConversion.get).formatFloat)
           )
         }
       )
