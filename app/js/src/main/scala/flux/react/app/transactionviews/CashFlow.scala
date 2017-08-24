@@ -32,12 +32,15 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
-    .initialState(State(includeHiddenReservoirs = false))
+    .initialState(State(includeUnrelatedReservoirs = false, includeHiddenReservoirs = false))
     .renderPS(
       ($, props, state) =>
         <.span(
           {
-            for (account <- accountingConfig.personallySortedAccounts) yield {
+            for {
+              account <- accountingConfig.personallySortedAccounts
+              if state.includeUnrelatedReservoirs || account.isMineOrCommon
+            } yield {
               uielements.Panel(i18n("facto.account-of", account.longName), key = account.code) {
                 {
                   for {
@@ -98,14 +101,24 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
               }
             }
           }.toVdomArray,
-          // includeHiddenReservoirs toggle button
+          // includeUnrelatedReservoirs toggle button
           <.a(
             ^.className := "btn btn-info btn-lg btn-block",
             ^.onClick --> LogExceptionsCallback(
-              $.modState(s => s.copy(includeHiddenReservoirs = !s.includeHiddenReservoirs)).runNow()),
-            if (state.includeHiddenReservoirs) i18n("facto.hide-hidden-reservoirs")
-            else i18n("facto.show-hidden-reservoirs")
-          )
+              $.modState(s => s.copy(includeUnrelatedReservoirs = !s.includeUnrelatedReservoirs)).runNow()),
+            if (state.includeUnrelatedReservoirs) i18n("facto.hide-other-accounts")
+            else i18n("facto.show-other-accounts")
+          ),
+          // includeHiddenReservoirs toggle button
+          <<.ifThen(state.includeHiddenReservoirs || state.includeUnrelatedReservoirs) {
+            <.a(
+              ^.className := "btn btn-info btn-lg btn-block",
+              ^.onClick --> LogExceptionsCallback(
+                $.modState(s => s.copy(includeHiddenReservoirs = !s.includeHiddenReservoirs)).runNow()),
+              if (state.includeHiddenReservoirs) i18n("facto.hide-hidden-reservoirs")
+              else i18n("facto.show-hidden-reservoirs")
+            )
+          }
       )
     )
     .build
@@ -154,5 +167,5 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
 
   // **************** Private inner types ****************//
   private case class Props(router: RouterCtl[Page])
-  private case class State(includeHiddenReservoirs: Boolean)
+  private case class State(includeUnrelatedReservoirs: Boolean, includeHiddenReservoirs: Boolean)
 }
