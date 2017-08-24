@@ -332,7 +332,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             listener = AnythingChangedListener
           )
         },
-        bootstrap.MoneyInput(
+        bootstrap.MoneyInput.withCurrencyConversion(
           ref = flowRef,
           name = "flow",
           label = i18n("facto.flow"),
