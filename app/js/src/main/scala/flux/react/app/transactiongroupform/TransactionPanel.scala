@@ -5,6 +5,7 @@ import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.time.{Clock, LocalDateTime, LocalDateTimes}
 import common.{I18n, SinglePendingTaskQueue}
 import flux.react.ReactVdomUtils.<<
+import flux.react.uielements.HalfPanel
 import flux.react.uielements.input.bootstrap.{MoneyInput, SelectInput, TextAreaInput, TextInput}
 import flux.react.uielements.input.{InputBase, InputWithDefaultFromReference, MappedInput, bootstrap}
 import japgolly.scalajs.react._

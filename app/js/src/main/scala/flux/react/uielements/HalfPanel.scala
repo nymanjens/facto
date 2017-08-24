@@ -1,9 +1,8 @@
-package flux.react.app.transactiongroupform
+package flux.react.uielements
 
+import flux.react.ReactVdomUtils.{<<, ^^}
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom._
 import japgolly.scalajs.react.vdom.html_<^._
-import flux.react.ReactVdomUtils.{^^, <<}
 
 import scala.collection.immutable.Seq
 
