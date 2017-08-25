@@ -12,9 +12,9 @@ private[stores] final class BalanceCheckStore(implicit database: RemoteDatabaseP
     case AddBalanceCheck(balanceCheckWithoutId) =>
       database.persistModifications(EntityModification.createAddWithRandomId(balanceCheckWithoutId))
 
-    case UpdateBalanceCheck(balanceCheckWithId) =>
-      val bcDeletion = EntityModification.createDelete(balanceCheckWithId)
-      val bcAddition = EntityModification.createAddWithRandomId(balanceCheckWithId.copy(idOption = None))
+    case UpdateBalanceCheck(existingBalanceCheck, newBalanceCheckWithoutId) =>
+      val bcDeletion = EntityModification.createDelete(existingBalanceCheck)
+      val bcAddition = EntityModification.createAddWithRandomId(newBalanceCheckWithoutId)
       database.persistModifications(bcDeletion, bcAddition)
 
     case RemoveBalanceCheck(balanceCheckWithId) =>

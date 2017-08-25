@@ -30,9 +30,9 @@ object BalanceCheckStoreTest extends TestSuite {
     "Listens to Action.UpdateBalanceCheck" - {
       fakeDatabase.addRemotelyAddedEntities(testBalanceCheckWithId)
       val initialModifications = fakeDatabase.allModifications
-      val newBalanceCheck = testBalanceCheckWithId.copy(balanceInCents = 39877)
+      val newBalanceCheck = testBalanceCheckWithId.copy(balanceInCents = 39877, idOption = None)
 
-      fakeDispatcher.dispatch(Action.UpdateBalanceCheck(newBalanceCheck))
+      fakeDispatcher.dispatch(Action.UpdateBalanceCheck(testBalanceCheckWithId, newBalanceCheck))
 
       fakeDatabase.allModifications.size - initialModifications.size ==> 2
       val Seq(removeBc, addBc) = fakeDatabase.allModifications takeRight 2

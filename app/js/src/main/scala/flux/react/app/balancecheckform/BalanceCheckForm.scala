@@ -172,7 +172,9 @@ final class BalanceCheckForm(implicit i18n: I18n,
           case OperationMeta.AddNew(_) =>
             Action.AddBalanceCheck(balanceCheckWithoutId)
           case OperationMeta.Edit(existingBalanceCheck) =>
-            Action.UpdateBalanceCheck(balanceCheckWithoutId.withId(existingBalanceCheck.id))
+            Action.UpdateBalanceCheck(
+              existingBalanceCheck = existingBalanceCheck,
+              newBalanceCheckWithoutId = balanceCheckWithoutId)
         }
 
         dispatcher.dispatch(action)
@@ -210,7 +212,7 @@ final class BalanceCheckForm(implicit i18n: I18n,
       $.props.runNow().operationMeta match {
         case OperationMeta.AddNew(_) => throw new AssertionError("Should never happen")
         case OperationMeta.Edit(balanceCheck) =>
-          dispatcher.dispatch(Action.RemoveBalanceCheck(balanceCheckWithId = balanceCheck))
+          dispatcher.dispatch(Action.RemoveBalanceCheck(existingBalanceCheck = balanceCheck))
           $.props.runNow().router.set(Page.EverythingPage).runNow()
       }
     }

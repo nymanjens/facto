@@ -18,8 +18,8 @@ object Action {
 
   // **************** BalanceCheck-related actions **************** //
   case class AddBalanceCheck(balanceCheckWithoutId: BalanceCheck) extends Action
-  case class UpdateBalanceCheck(balanceCheckWithId: BalanceCheck) extends Action
-  case class RemoveBalanceCheck(balanceCheckWithId: BalanceCheck) extends Action
+  case class UpdateBalanceCheck(existingBalanceCheck: BalanceCheck, newBalanceCheckWithoutId: BalanceCheck) extends Action
+  case class RemoveBalanceCheck(existingBalanceCheck: BalanceCheck) extends Action
 
   /** Special action that gets sent to the dispatcher's callbacks after they processed the contained action. */
   case class Done private[action] (action: Action) extends Action
