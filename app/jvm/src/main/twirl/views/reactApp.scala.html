@@ -1,0 +1,25 @@
+@import helper._
+
+@(
+)(
+  implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash, env: play.api.Environment, webJarAssets: controllers.WebJarAssets
+)
+
+@extrascript = {
+  @* The compiled scala.js code *@
+  @scalajs.html.selectScript(
+      projectName = "client",
+      assets = path => routes.Assets.versioned(path).toString,
+      resourceExists = name => getClass.getResource(s"/public/$name") != null)
+  @* Launches the main method of the JSApp *@
+  @scalajs.html.launcher(
+      projectName = "client",
+      assets = path => routes.Assets.versioned(path).toString,
+      resourceExists = name => getClass.getResource(s"/public/$name") != null)
+}
+
+@Main("React App", extrascript = extrascript) {
+  <div>
+    !!!<div id="root"></div>===
+  </div>
+}
