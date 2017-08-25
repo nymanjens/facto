@@ -19,6 +19,6 @@ object Page {
       extends Page
 
   // Accounting forms - balance checks
-  case object NewBalanceCheckPage extends Page
+  case class NewBalanceCheckPage(reservoirCode: String) extends Page
   case class EditBalanceCheckPage(balanceCheckId: Long) extends Page
 }

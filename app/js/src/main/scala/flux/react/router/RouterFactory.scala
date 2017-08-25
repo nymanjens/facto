@@ -58,6 +58,18 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
                   .forRepayment(page.accountCode1, page.accountCode2, page.amountInCents, ctl))
             }
 
+          | dynamicRouteCT("#newBalanceCheck" / codeString.caseClass[NewBalanceCheckPage])
+            ~> dynRenderR {
+              case (page, ctl) =>
+                logExceptions(reactAppModule.balanceCheckForm.forCreate(page.reservoirCode, ctl))
+            }
+
+          | dynamicRouteCT("#editBalanceCheck" / long.caseClass[EditBalanceCheckPage])
+            ~> dynRenderR {
+              case (page, ctl) =>
+                logExceptions(reactAppModule.balanceCheckForm.forEdit(page.balanceCheckId, ctl))
+            }
+
         // Fallback
         ).notFound(redirectToPage(EverythingPage)(Redirect.Replace))
       }
