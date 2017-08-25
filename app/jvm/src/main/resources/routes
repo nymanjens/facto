@@ -5,6 +5,8 @@
 # General
 GET  /                                 controllers.Application.index
 GET  /manualtests/                     controllers.Application.manualTests
+GET  /app/                             controllers.Application.reactAppRoot
+GET  /app/*anyString                   controllers.Application.reactApp(anyString)
 
 # External API
 GET  /externalapi/docachemanagement/:appSecret/              controllers.ExternalApi.doCacheManagement(appSecret)

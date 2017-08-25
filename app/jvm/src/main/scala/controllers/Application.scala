@@ -79,6 +79,11 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
     )
   }
 
+  def reactAppRoot = AuthenticatedAction { implicit user => implicit request =>
+    Ok(views.html.reactApp())
+  }
+  def reactApp(anyString: String) = reactAppRoot
+
   // Note: This action manually implements what autowire normally does automatically. Unfortunately, autowire
   // doesn't seem to work for some reason.
   def scalaJsApi(path: String) = AuthenticatedAction(parse.raw) { implicit user => implicit request =>
