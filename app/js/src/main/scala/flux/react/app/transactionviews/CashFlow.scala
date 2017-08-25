@@ -133,8 +133,12 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
     <.a(
       ^.className := "btn btn-info btn-xs",
       ^.role := "button",
+      ^.onClick --> LogExceptionsCallback {
+        router.set(Page.NewBalanceCheckPage(reservoir.code)).runNow()
+      },
       <.i(^.className := "fa fa-check-square-o fa-fw"),
-      i18n("facto.set"))
+      i18n("facto.set")
+    )
   }
 
   private def balanceCheckConfirmButton(reservoir: MoneyReservoir,
@@ -161,8 +165,12 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
     <.a(
       ^.className := "btn btn-default btn-xs",
       ^.role := "button",
+      ^.onClick --> LogExceptionsCallback {
+        router.set(Page.EditBalanceCheckPage(balanceCorrection.id)).runNow()
+      },
       <.i(^.className := "fa fa-pencil fa-fw"),
-      i18n("facto.edit"))
+      i18n("facto.edit")
+    )
   }
 
   // **************** Private inner types ****************//
