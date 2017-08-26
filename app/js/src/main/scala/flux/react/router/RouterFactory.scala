@@ -10,10 +10,8 @@ import scala.reflect.ClassTag
 
 private[router] final class RouterFactory(implicit reactAppModule: flux.react.app.Module) {
 
-  private val pathPrefix = "/app/"
-
   def createRouter(): Router[Page] = {
-    Router(BaseUrl.until(pathPrefix), routerConfig)
+    Router(BaseUrl.until(RouterFactory.pathPrefix), routerConfig)
   }
 
   private def routerConfig(implicit reactAppModule: flux.react.app.Module) = {
@@ -21,14 +19,15 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
       .buildConfig { dsl =>
         import dsl._
         val codeString = string("[a-zA-Z0-9_-]+")
+        val returnToPath = "?returnto=" / string(".+")
 
         def staticRuleFromPage(page: Page, renderer: RouterCtl[Page] => VdomElement): dsl.Rule = {
-          val path = pathPrefix + page.getClass.getSimpleName.stripSuffix("Page").toLowerCase
+          val path = RouterFactory.pathPrefix + page.getClass.getSimpleName.stripSuffix("Page").toLowerCase
           staticRoute(path, page) ~> renderR(ctl => logExceptions(renderer(ctl)))
         }
         def dynamicRuleFromPage[P <: Page](dynamicPart: String => RouteB[P])(
             renderer: (P, RouterCtl[Page]) => VdomElement)(implicit pageClass: ClassTag[P]): dsl.Rule = {
-          val staticPathPart = pathPrefix + pageClass.runtimeClass.getSimpleName
+          val staticPathPart = RouterFactory.pathPrefix + pageClass.runtimeClass.getSimpleName
             .stripSuffix("Page")
             .toLowerCase
           val path = dynamicPart(staticPathPart)
@@ -66,12 +65,13 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
                 .forRepayment(page.accountCode1, page.accountCode2, page.amountInCents, ctl)
           }
 
-          | dynamicRuleFromPage(_ / codeString.caseClass[NewBalanceCheckPage]) { (page, ctl) =>
-            reactAppModule.balanceCheckForm.forCreate(page.reservoirCode, ctl)
+          | dynamicRuleFromPage(_ / (codeString / returnToPath).caseClass[NewBalanceCheckPage]) {
+            (page, ctl) =>
+              reactAppModule.balanceCheckForm.forCreate(page.reservoirCode, page.returnToPath, ctl)
           }
 
-          | dynamicRuleFromPage(_ / long.caseClass[EditBalanceCheckPage]) { (page, ctl) =>
-            reactAppModule.balanceCheckForm.forEdit(page.balanceCheckId, ctl)
+          | dynamicRuleFromPage(_ / (long / returnToPath).caseClass[EditBalanceCheckPage]) { (page, ctl) =>
+            reactAppModule.balanceCheckForm.forEdit(page.balanceCheckId, page.returnToPath, ctl)
           }
 
         // Fallback
@@ -84,4 +84,7 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
       implicit reactAppModule: flux.react.app.Module) = {
     reactAppModule.layout(routerCtl, resolution.page)(resolution.render())
   }
+}
+private[router] object RouterFactory {
+  val pathPrefix = "/app/"
 }

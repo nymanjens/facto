@@ -10,7 +10,7 @@ import flux.react.uielements.HalfPanel
 import flux.react.uielements.input.bootstrap.MoneyInput
 import flux.react.uielements.input.{MappedInput, bootstrap}
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.extra.router.RouterCtl
+import japgolly.scalajs.react.extra.router.{Path, RouterCtl}
 import japgolly.scalajs.react.vdom.html_<^._
 import models.accounting.BalanceCheck
 import models.accounting.config.{Config, MoneyReservoir}
@@ -37,13 +37,13 @@ final class BalanceCheckForm(implicit i18n: I18n,
   }
 
   // **************** API ****************//
-  def forCreate(reservoirCode: String, router: RouterCtl[Page]): VdomElement = {
-    create(Props(OperationMeta.AddNew(accountingConfig.moneyReservoir(reservoirCode)), router))
+  def forCreate(reservoirCode: String, returnToPath: Path, router: RouterCtl[Page]): VdomElement = {
+    create(Props(OperationMeta.AddNew(accountingConfig.moneyReservoir(reservoirCode)), returnToPath, router))
   }
 
-  def forEdit(balanceCheckId: Long, router: RouterCtl[Page]): VdomElement = {
+  def forEdit(balanceCheckId: Long, returnToPath: Path, router: RouterCtl[Page]): VdomElement = {
     val balanceCheck = balanceCheckManager.findById(balanceCheckId)
-    create(Props(OperationMeta.Edit(balanceCheck), router))
+    create(Props(OperationMeta.Edit(balanceCheck), returnToPath, router))
   }
 
   // **************** Private helper methods ****************//
@@ -74,7 +74,7 @@ final class BalanceCheckForm(implicit i18n: I18n,
 
   private case class State(showErrorMessages: Boolean)
 
-  private case class Props(operationMeta: OperationMeta, router: RouterCtl[Page])
+  private case class Props(operationMeta: OperationMeta, returnToPath: Path, router: RouterCtl[Page])
 
   private final class Backend(val $ : BackendScope[Props, State]) {
     val checkDateRef = dateMappedInput.ref()
@@ -167,8 +167,10 @@ final class BalanceCheckForm(implicit i18n: I18n,
     }
 
     private def onSubmit(e: ReactEventFromInput): Callback = LogExceptionsCallback {
+      val props = $.props.runNow()
+
       def submitValid(balanceCheckWithoutId: BalanceCheck) = {
-        val action = $.props.runNow().operationMeta match {
+        val action = props.operationMeta match {
           case OperationMeta.AddNew(_) =>
             Action.AddBalanceCheck(balanceCheckWithoutId)
           case OperationMeta.Edit(existingBalanceCheck) =>
@@ -184,7 +186,6 @@ final class BalanceCheckForm(implicit i18n: I18n,
 
       $.modState(state =>
         logExceptions {
-          val props = $.props.runNow()
           var newState = state.copy(showErrorMessages = true)
 
           val maybeBalanceCheck = for {
@@ -201,7 +202,7 @@ final class BalanceCheckForm(implicit i18n: I18n,
           maybeBalanceCheck match {
             case Some(balanceCheckWithoutId) =>
               submitValid(balanceCheckWithoutId)
-              $.props.runNow().router.set(Page.EverythingPage).runNow()
+              props.router.byPath.set(props.returnToPath).runNow()
             case None =>
           }
           newState
@@ -209,11 +210,12 @@ final class BalanceCheckForm(implicit i18n: I18n,
     }
 
     private def onDelete: Callback = LogExceptionsCallback {
-      $.props.runNow().operationMeta match {
+      val props = $.props.runNow()
+      props.operationMeta match {
         case OperationMeta.AddNew(_) => throw new AssertionError("Should never happen")
         case OperationMeta.Edit(balanceCheck) =>
           dispatcher.dispatch(Action.RemoveBalanceCheck(existingBalanceCheck = balanceCheck))
-          $.props.runNow().router.set(Page.EverythingPage).runNow()
+          props.router.byPath.set(props.returnToPath).runNow()
       }
     }
   }
