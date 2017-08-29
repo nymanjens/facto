@@ -2,14 +2,11 @@ package flux.react.app
 
 import common.I18n
 import common.time.Clock
-import flux.react.ReactVdomUtils.{<<, ^^}
-import flux.react.router.Page
-import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom._
-import japgolly.scalajs.react.extra.router.RouterCtl
-import japgolly.scalajs.react.vdom.html_<^._
-import flux.react.ReactVdomUtils.{<<, ^^}
+import flux.react.ReactVdomUtils.^^
+import flux.react.router.{Page, RouterContext}
 import flux.stores.entries.AllEntriesStoreFactory
+import japgolly.scalajs.react._
+import japgolly.scalajs.react.vdom.html_<^._
 import models.EntityAccess
 import models.accounting.config.Config
 import models.accounting.money.ExchangeRateManager
@@ -23,8 +20,8 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
                               exchangeRateManager: ExchangeRateManager,
                               i18n: I18n) {
 
-  def apply(currentPage: Page, router: RouterCtl[Page]): VdomElement = {
-    component(Menu.Props(currentPage, router))
+  def apply(router: RouterContext): VdomElement = {
+    component(Menu.Props(router))
   }
 
   private val component = ScalaComponent
@@ -32,11 +29,11 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
     .render_P { props =>
       <.div(
         <.b("Menu:"),
-        (for ((item, i) <- Menu.menuItems.zipWithIndex) yield {
+        (for ((item, i) <- Menu.menuItems(props.router).zipWithIndex) yield {
           <.span(
             ^.key := i,
-            ^^.ifThen(props.currentPage == item.page) { ^.className := "active" },
-            props.router.link(item.page)(
+            ^^.ifThen(props.router.currentPage == item.page) { ^.className := "active" },
+            props.router.anchorWithHrefTo(item.page)(
               <.i(^^.classes(item.iconClass)),
               " ",
               i18n(item.labelKey)
@@ -51,7 +48,7 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
 
 private[app] object Menu {
 
-  private val menuItems = Seq(
+  private def menuItems(implicit routerContext: RouterContext) = Seq(
     MenuItem("Everything", "fa fa-money", Page.Everything),
     MenuItem("CashFlow", "icon-money", Page.CashFlow),
     MenuItem("Liquidation", "icon-balance-scale", Page.Liquidation),
@@ -59,6 +56,6 @@ private[app] object Menu {
     MenuItem("New", "icon-new-empty", Page.NewTransactionGroup())
   )
 
-  private case class Props(currentPage: Page, router: RouterCtl[Page])
+  private case class Props(router: RouterContext)
   private case class MenuItem(labelKey: String, iconClass: String, page: Page)
 }

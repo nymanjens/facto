@@ -5,6 +5,7 @@ import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.time.{Clock, LocalDateTime}
 import flux.action.{Action, Dispatcher}
 import flux.react.ReactVdomUtils.^^
+import flux.react.router.RouterContext
 import flux.react.router.Page
 import flux.react.uielements.HalfPanel
 import flux.react.uielements.input.bootstrap.MoneyInput
@@ -37,11 +38,11 @@ final class BalanceCheckForm(implicit i18n: I18n,
   }
 
   // **************** API ****************//
-  def forCreate(reservoirCode: String, returnToPath: Path, router: RouterCtl[Page]): VdomElement = {
+  def forCreate(reservoirCode: String, returnToPath: Path, router: RouterContext): VdomElement = {
     create(Props(OperationMeta.AddNew(accountingConfig.moneyReservoir(reservoirCode)), returnToPath, router))
   }
 
-  def forEdit(balanceCheckId: Long, returnToPath: Path, router: RouterCtl[Page]): VdomElement = {
+  def forEdit(balanceCheckId: Long, returnToPath: Path, router: RouterContext): VdomElement = {
     val balanceCheck = balanceCheckManager.findById(balanceCheckId)
     create(Props(OperationMeta.Edit(balanceCheck), returnToPath, router))
   }
@@ -74,7 +75,7 @@ final class BalanceCheckForm(implicit i18n: I18n,
 
   private case class State(showErrorMessages: Boolean)
 
-  private case class Props(operationMeta: OperationMeta, returnToPath: Path, router: RouterCtl[Page])
+  private case class Props(operationMeta: OperationMeta, returnToPath: Path, router: RouterContext)
 
   private final class Backend(val $ : BackendScope[Props, State]) {
     val checkDateRef = dateMappedInput.ref()
@@ -202,7 +203,7 @@ final class BalanceCheckForm(implicit i18n: I18n,
           maybeBalanceCheck match {
             case Some(balanceCheckWithoutId) =>
               submitValid(balanceCheckWithoutId)
-              props.router.byPath.set(props.returnToPath).runNow()
+              props.router.setPath(props.returnToPath)
             case None =>
           }
           newState
@@ -215,7 +216,7 @@ final class BalanceCheckForm(implicit i18n: I18n,
         case OperationMeta.AddNew(_) => throw new AssertionError("Should never happen")
         case OperationMeta.Edit(balanceCheck) =>
           dispatcher.dispatch(Action.RemoveBalanceCheck(existingBalanceCheck = balanceCheck))
-          props.router.byPath.set(props.returnToPath).runNow()
+          props.router.setPath(props.returnToPath)
       }
     }
   }

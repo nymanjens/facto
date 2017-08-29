@@ -1,5 +1,6 @@
 package flux.react.app.transactionviews
 
+import flux.react.router.RouterContext
 import common.Formatting._
 import common.I18n
 import common.time.Clock
@@ -84,7 +85,7 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
     .build
 
   // **************** API ****************//
-  def apply(router: RouterCtl[Page]): VdomElement = {
+  def apply(router: RouterContext): VdomElement = {
     component(Props(router))
   }
 
@@ -92,12 +93,11 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
   private def repayButton(account1: Account,
                           account2: Account,
                           amount: ReferenceMoney,
-                          router: RouterCtl[Page]): VdomElement = {
+                          router: RouterContext): VdomElement = {
     <.a(
       ^.className := "btn btn-info btn-xs",
-      ^.href := router
-        .pathFor(Page.NewForRepayment(account1 = account1, account2 = account2, amount = amount))
-        .value,
+      ^.href := router.toHref(
+        Page.NewForRepayment(account1 = account1, account2 = account2, amount = amount)),
       ^.role := "button",
       <.i(^.className := "fa fa-check-square-o fa-fw"),
       i18n("facto.repay")
@@ -106,5 +106,5 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
   }
 
   // **************** Private inner types ****************//
-  private case class Props(router: RouterCtl[Page])
+  private case class Props(router: RouterContext)
 }

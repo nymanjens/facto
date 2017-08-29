@@ -1,4 +1,6 @@
 package flux.react.app.transactionviews
+
+import flux.react.router.RouterContext
 import scala.scalajs.js
 import flux.react.ReactVdomUtils.<<
 import common.Formatting._
@@ -124,16 +126,16 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
     .build
 
   // **************** API ****************//
-  def apply(router: RouterCtl[Page]): VdomElement = {
+  def apply(router: RouterContext): VdomElement = {
     component(Props(router))
   }
 
   // **************** Private helper methods ****************//
-  private def balanceCheckAddNewButton(reservoir: MoneyReservoir, router: RouterCtl[Page]): VdomElement = {
+  private def balanceCheckAddNewButton(reservoir: MoneyReservoir, router: RouterContext): VdomElement = {
     <.a(
       ^.className := "btn btn-info btn-xs",
       ^.role := "button",
-      ^.href := router.pathFor(Page.NewBalanceCheck(reservoir)).value,
+      ^.href := router.toHref(Page.NewBalanceCheck(reservoir)),
       <.i(^.className := "fa fa-check-square-o fa-fw"),
       i18n("facto.set")
     )
@@ -141,7 +143,7 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
 
   private def balanceCheckConfirmButton(reservoir: MoneyReservoir,
                                         entry: CashFlowEntry.RegularEntry,
-                                        router: RouterCtl[Page]): VdomElement = {
+                                        router: RouterContext): VdomElement = {
     <.button(
       ^.className := "btn btn-info btn-xs",
       ^.role := "button",
@@ -159,17 +161,17 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
     )
   }
 
-  def balanceCheckEditButton(balanceCorrection: BalanceCheck, router: RouterCtl[Page]): VdomElement = {
+  def balanceCheckEditButton(balanceCorrection: BalanceCheck, router: RouterContext): VdomElement = {
     <.a(
       ^.className := "btn btn-default btn-xs",
       ^.role := "button",
-      ^.href := router.pathFor(Page.EditBalanceCheck(balanceCorrection)).value,
+      ^.href := router.toHref(Page.EditBalanceCheck(balanceCorrection)),
       <.i(^.className := "fa fa-pencil fa-fw"),
       i18n("facto.edit")
     )
   }
 
   // **************** Private inner types ****************//
-  private case class Props(router: RouterCtl[Page])
+  private case class Props(router: RouterContext)
   private case class State(includeUnrelatedReservoirs: Boolean, includeHiddenReservoirs: Boolean)
 }

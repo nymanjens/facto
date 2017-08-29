@@ -15,6 +15,13 @@ object Page {
   object HasReturnTo {
     def getDomPathWithoutPrefix: Option[String] =
       Some(dom.window.location.pathname.stripPrefix(RouterFactory.pathPrefix))
+    def getDomPathWithoutPrefix2(implicit routerContext: RouterContext): Option[String] =
+      Some(
+        routerContext
+          .toPath(routerContext.currentPage)
+          .removePrefix(RouterFactory.pathPrefix)
+          .get
+          .value)
   }
 
   case object Root extends Page
@@ -30,7 +37,8 @@ object Page {
       extends HasReturnTo(returnToWithoutPrefix)
       with Page
   object NewTransactionGroup {
-    def apply(): NewTransactionGroup = NewTransactionGroup(HasReturnTo.getDomPathWithoutPrefix)
+    def apply()(implicit routerContext: RouterContext): NewTransactionGroup =
+      NewTransactionGroup(HasReturnTo.getDomPathWithoutPrefix)
   }
   case class EditTransactionGroup private (transactionGroupId: Long, returnToWithoutPrefix: Option[String])
       extends HasReturnTo(returnToWithoutPrefix)

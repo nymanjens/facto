@@ -7,9 +7,9 @@ import common.time.JavaTimeImplicits._
 import flux.action.{Action, Dispatcher}
 import flux.react.ReactVdomUtils.^^
 import flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
-import flux.react.router.Page
+import flux.react.router.RouterContext
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.extra.router.{Path, RouterCtl}
+import japgolly.scalajs.react.extra.router.Path
 import japgolly.scalajs.react.vdom.html_<^._
 import models.accounting.config.{Account, Config}
 import models.accounting.money.{Currency, DatedMoney, ExchangeRateManager, ReferenceMoney}
@@ -59,11 +59,11 @@ final class TransactionGroupForm(implicit i18n: I18n,
   }
 
   // **************** API ****************//
-  def forCreate(returnToPath: Path, router: RouterCtl[Page]): VdomElement = {
+  def forCreate(returnToPath: Path, router: RouterContext): VdomElement = {
     forCreate(TransactionGroup.Partial.withSingleEmptyTransaction, returnToPath, router)
   }
 
-  def forEdit(transactionGroupId: Long, returnToPath: Path, router: RouterCtl[Page]): VdomElement = {
+  def forEdit(transactionGroupId: Long, returnToPath: Path, router: RouterContext): VdomElement = {
     val group = transactionGroupManager.findById(transactionGroupId)
     create(
       Props(
@@ -73,7 +73,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
         router = router))
   }
 
-  def forTemplate(templateCode: String, returnToPath: Path, router: RouterCtl[Page]): VdomElement = {
+  def forTemplate(templateCode: String, returnToPath: Path, router: RouterContext): VdomElement = {
     val template = accountingConfig.templateWithCode(templateCode)
     // If this user is not associated with an account, it should not see any templates.
     val userAccount = accountingConfig.accountOf(user).get
@@ -84,7 +84,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
                    accountCode2: String,
                    amountInCents: Long,
                    returnToPath: Path,
-                   router: RouterCtl[Page]): VdomElement = {
+                   router: RouterContext): VdomElement = {
     if (amountInCents < 0) {
       forRepayment(accountCode2, accountCode1, -amountInCents, returnToPath, router)
     } else {
@@ -126,7 +126,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
   // **************** Private helper methods ****************//
   private def forCreate(transactionGroupPartial: TransactionGroup.Partial,
                         returnToPath: Path,
-                        router: RouterCtl[Page]): VdomElement = {
+                        router: RouterContext): VdomElement = {
     create(
       Props(
         operationMeta = OperationMeta.AddNew,
@@ -166,7 +166,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
   private case class Props(operationMeta: OperationMeta,
                            groupPartial: TransactionGroup.Partial,
                            returnToPath: Path,
-                           router: RouterCtl[Page])
+                           router: RouterContext)
 
   private final class Backend(val $ : BackendScope[Props, State]) {
 
@@ -416,7 +416,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
               case None =>
                 submitValid(datas, state)
-                props.router.byPath.set(props.returnToPath).runNow()
+                props.router.setPath(props.returnToPath)
             }
           }
 
@@ -431,7 +431,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
         case OperationMeta.AddNew => throw new AssertionError("Should never happen")
         case OperationMeta.Edit(group) =>
           dispatcher.dispatch(Action.RemoveTransactionGroup(transactionGroupWithId = group))
-          props.router.byPath.set(props.returnToPath).runNow()
+          props.router.setPath(props.returnToPath)
       }
     }
   }

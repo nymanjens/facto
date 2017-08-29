@@ -20,16 +20,16 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
         val codeString: RouteB[String] = string("[a-zA-Z0-9_-]+")
         val returnToPath: RouteB[Option[String]] = ("?returnto=" ~ string(".+")).option
 
-        def staticRuleFromPage(page: Page, renderer: RouterCtl[Page] => VdomElement): dsl.Rule = {
+        def staticRuleFromPage(page: Page, renderer: RouterContext => VdomElement): dsl.Rule = {
           val path = RouterFactory.pathPrefix + page.getClass.getSimpleName.toLowerCase
-          staticRoute(path, page) ~> renderR(ctl => logExceptions(renderer(ctl)))
+          staticRoute(path, page) ~> renderR(ctl => logExceptions(renderer(RouterContext(page, ctl))))
         }
         def dynamicRuleFromPage[P <: Page](dynamicPart: String => RouteB[P])(
-            renderer: (P, RouterCtl[Page]) => VdomElement)(implicit pageClass: ClassTag[P]): dsl.Rule = {
+            renderer: (P, RouterContext) => VdomElement)(implicit pageClass: ClassTag[P]): dsl.Rule = {
           val staticPathPart = RouterFactory.pathPrefix + pageClass.runtimeClass.getSimpleName.toLowerCase
           val path = dynamicPart(staticPathPart)
           dynamicRouteCT(path) ~> dynRenderR {
-            case (page, ctl) => logExceptions(renderer(page, ctl))
+            case (page, ctl) => logExceptions(renderer(page, RouterContext(page, ctl)))
           }
         }
 
@@ -90,7 +90,7 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
 
   private def layout(routerCtl: RouterCtl[Page], resolution: Resolution[Page])(
       implicit reactAppModule: flux.react.app.Module) = {
-    reactAppModule.layout(routerCtl, resolution.page)(resolution.render())
+    reactAppModule.layout(RouterContext(resolution.page, routerCtl))(resolution.render())
   }
 }
 private[router] object RouterFactory {

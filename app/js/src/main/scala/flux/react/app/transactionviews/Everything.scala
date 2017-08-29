@@ -1,5 +1,6 @@
 package flux.react.app.transactionviews
 
+import flux.react.router.RouterContext
 import common.Formatting._
 import common.I18n
 import common.time.Clock
@@ -60,10 +61,10 @@ final class Everything(implicit entriesStoreFactory: AllEntriesStoreFactory,
     .build
 
   // **************** API ****************//
-  def apply(router: RouterCtl[Page]): VdomElement = {
+  def apply(router: RouterContext): VdomElement = {
     component(Props(router))
   }
 
   // **************** Private inner types ****************//
-  private case class Props(router: RouterCtl[Page])
+  private case class Props(router: RouterContext)
 }

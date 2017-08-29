@@ -1,5 +1,6 @@
 package flux.react.app.transactionviews
 
+import flux.react.router.RouterContext
 import japgolly.scalajs.react._
 import common.Formatting._
 import common.I18n
@@ -67,10 +68,10 @@ final class Endowments(implicit entriesStoreFactory: EndowmentEntriesStoreFactor
     .build
 
   // **************** API ****************//
-  def apply(router: RouterCtl[Page]): VdomElement = {
+  def apply(router: RouterContext): VdomElement = {
     component(Props(router))
   }
 
   // **************** Private inner types ****************//
-  private case class Props(router: RouterCtl[Page])
+  private case class Props(router: RouterContext)
 }
