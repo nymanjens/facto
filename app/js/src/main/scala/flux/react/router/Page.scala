@@ -9,11 +9,12 @@ import org.scalajs.dom
 sealed trait Page
 object Page {
 
-  abstract class HasReturnTo(private val returnToWithoutPrefix: String) {
-    def returnToPath: Path = Path(RouterFactory.pathPrefix + returnToWithoutPrefix)
+  abstract class HasReturnTo(private val returnToWithoutPrefix: Option[String]) {
+    def returnToPath: Path = Path(RouterFactory.pathPrefix + (returnToWithoutPrefix getOrElse ""))
   }
   object HasReturnTo {
-    def getDomPathWithoutPrefix: String = dom.window.location.pathname.stripPrefix(RouterFactory.pathPrefix)
+    def getDomPathWithoutPrefix: Option[String] =
+      Some(dom.window.location.pathname.stripPrefix(RouterFactory.pathPrefix))
   }
 
   case object Root extends Page
@@ -25,13 +26,13 @@ object Page {
   case object Endowments extends Page
 
   // Accounting forms - transactions
-  case class NewTransactionGroup private (returnToWithoutPrefix: String)
+  case class NewTransactionGroup private (returnToWithoutPrefix: Option[String])
       extends HasReturnTo(returnToWithoutPrefix)
       with Page
   object NewTransactionGroup {
     def apply(): NewTransactionGroup = NewTransactionGroup(HasReturnTo.getDomPathWithoutPrefix)
   }
-  case class EditTransactionGroup private (transactionGroupId: Long, returnToWithoutPrefix: String)
+  case class EditTransactionGroup private (transactionGroupId: Long, returnToWithoutPrefix: Option[String])
       extends HasReturnTo(returnToWithoutPrefix)
       with Page
   object EditTransactionGroup {
@@ -39,7 +40,7 @@ object Page {
     def apply(transactionGroupId: Long): EditTransactionGroup =
       EditTransactionGroup(transactionGroupId, HasReturnTo.getDomPathWithoutPrefix)
   }
-  case class NewFromTemplate private (templateCode: String, returnToWithoutPrefix: String)
+  case class NewFromTemplate private (templateCode: String, returnToWithoutPrefix: Option[String])
       extends HasReturnTo(returnToWithoutPrefix)
       with Page
   object NewFromTemplate {
@@ -49,7 +50,7 @@ object Page {
   case class NewForRepayment private (accountCode1: String,
                                       accountCode2: String,
                                       amountInCents: Long,
-                                      returnToWithoutPrefix: String)
+                                      returnToWithoutPrefix: Option[String])
       extends HasReturnTo(returnToWithoutPrefix)
       with Page
   object NewForRepayment {
@@ -58,7 +59,7 @@ object Page {
   }
 
   // Accounting forms - balance checks
-  case class NewBalanceCheck private (reservoirCode: String, returnToWithoutPrefix: String)
+  case class NewBalanceCheck private (reservoirCode: String, returnToWithoutPrefix: Option[String])
       extends HasReturnTo(returnToWithoutPrefix)
       with Page
   object NewBalanceCheck {
@@ -66,7 +67,7 @@ object Page {
       NewBalanceCheck(reservoir.code, HasReturnTo.getDomPathWithoutPrefix)
   }
 
-  case class EditBalanceCheck private (balanceCheckId: Long, returnToWithoutPrefix: String)
+  case class EditBalanceCheck private (balanceCheckId: Long, returnToWithoutPrefix: Option[String])
       extends HasReturnTo(returnToWithoutPrefix)
       with Page
   object EditBalanceCheck {

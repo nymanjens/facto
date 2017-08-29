@@ -17,8 +17,8 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
     RouterConfigDsl[Page]
       .buildConfig { dsl =>
         import dsl._
-        val codeString = string("[a-zA-Z0-9_-]+")
-        val returnToPath = "?returnto=" / string(".+")
+        val codeString: RouteB[String] = string("[a-zA-Z0-9_-]+")
+        val returnToPath: RouteB[Option[String]] = ("?returnto=" ~ string(".+")).option
 
         def staticRuleFromPage(page: Page, renderer: RouterCtl[Page] => VdomElement): dsl.Rule = {
           val path = RouterFactory.pathPrefix + page.getClass.getSimpleName.toLowerCase
@@ -47,22 +47,22 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
 
           | staticRuleFromPage(Page.Endowments, reactAppModule.endowments.apply _)
 
-          | dynamicRuleFromPage(_ / returnToPath.caseClass[Page.NewTransactionGroup]) { (page, ctl) =>
+          | dynamicRuleFromPage(_ ~ returnToPath.caseClass[Page.NewTransactionGroup]) { (page, ctl) =>
             reactAppModule.transactionGroupForm.forCreate(page.returnToPath, ctl)
           }
 
-          | dynamicRuleFromPage(_ / (long / returnToPath).caseClass[Page.EditTransactionGroup]) {
+          | dynamicRuleFromPage(_ / (long ~ returnToPath).caseClass[Page.EditTransactionGroup]) {
             (page, ctl) =>
               reactAppModule.transactionGroupForm.forEdit(page.transactionGroupId, page.returnToPath, ctl)
           }
 
-          | dynamicRuleFromPage(_ / (codeString / returnToPath).caseClass[Page.NewFromTemplate]) {
+          | dynamicRuleFromPage(_ / (codeString ~ returnToPath).caseClass[Page.NewFromTemplate]) {
             (page, ctl) =>
               reactAppModule.transactionGroupForm.forTemplate(page.templateCode, page.returnToPath, ctl)
           }
 
           | dynamicRuleFromPage(
-            _ / (codeString / codeString / long / returnToPath).caseClass[Page.NewForRepayment]) {
+            _ / ((codeString / codeString / long) ~ returnToPath).caseClass[Page.NewForRepayment]) {
             (page, ctl) =>
               reactAppModule.transactionGroupForm
                 .forRepayment(
@@ -73,12 +73,12 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
                   ctl)
           }
 
-          | dynamicRuleFromPage(_ / (codeString / returnToPath).caseClass[Page.NewBalanceCheck]) {
+          | dynamicRuleFromPage(_ / (codeString ~ returnToPath).caseClass[Page.NewBalanceCheck]) {
             (page, ctl) =>
               reactAppModule.balanceCheckForm.forCreate(page.reservoirCode, page.returnToPath, ctl)
           }
 
-          | dynamicRuleFromPage(_ / (long / returnToPath).caseClass[Page.EditBalanceCheck]) { (page, ctl) =>
+          | dynamicRuleFromPage(_ / (long ~ returnToPath).caseClass[Page.EditBalanceCheck]) { (page, ctl) =>
             reactAppModule.balanceCheckForm.forEdit(page.balanceCheckId, page.returnToPath, ctl)
           }
 
