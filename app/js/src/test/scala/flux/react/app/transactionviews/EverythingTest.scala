@@ -1,7 +1,7 @@
 package flux.react.app.transactionviews
 
 import common.testing.TestObjects._
-import common.testing.{FakeRouterCtl, ReactTestWrapper, TestModule}
+import common.testing.{FakeRouterContext, ReactTestWrapper, TestModule}
 import flux.stores.entries.AllEntriesStoreFactory
 import japgolly.scalajs.react.vdom._
 import models.accounting._
@@ -18,7 +18,7 @@ object EverythingTest extends TestSuite {
     implicit val clock = testModule.fakeClock
     implicit val dispatcher = testModule.fakeDispatcher
     implicit val entityAccess = testModule.entityAccess
-    val router = new FakeRouterCtl()
+    val router = new FakeRouterContext()
 
     val everything = testModule.everything
 
