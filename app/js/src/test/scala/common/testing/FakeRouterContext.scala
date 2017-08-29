@@ -13,14 +13,15 @@ import scala.collection.mutable
 
 class FakeRouterContext extends RouterContext {
   private val allowedPagesToNavigateTo: mutable.Set[Page] = mutable.Set()
+  private var _currentPage: Page = Page.Everything
 
-  // **************** Getters **************** //
-  override def currentPage = ???
-  override def toPath(page: Page): Path = ???
+  // **************** API implementation: Getters **************** //
+  override def currentPage = _currentPage
+  override def toPath(page: Page): Path = Path(page.getClass.getSimpleName)
   override def anchorWithHrefTo(page: Page): VdomTagOf[html.Anchor] =
     <.a(^.onClick --> LogExceptionsCallback(setPage(page)))
 
-  // **************** Setters **************** //
+  // **************** API implementation: Setters **************** //
   override def setPath(path: Path): Unit = ???
   override def setPage(target: Page) = {
     if (!(allowedPagesToNavigateTo contains target)) {
@@ -28,7 +29,12 @@ class FakeRouterContext extends RouterContext {
     }
   }
 
-  def allowNavigationTo(page: Page) = {
+  // **************** Helper methods for tests **************** //
+  def allowNavigationTo(page: Page): Unit = {
     allowedPagesToNavigateTo.add(page)
+  }
+
+  def setCurrentPage(page: Page): Unit = {
+    _currentPage = page
   }
 }
