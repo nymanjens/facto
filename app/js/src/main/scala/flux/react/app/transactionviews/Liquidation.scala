@@ -97,11 +97,7 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
       ^.className := "btn btn-info btn-xs",
       ^.onClick --> LogExceptionsCallback {
         router
-          .set(
-            Page.NewForRepaymentPage(
-              accountCode1 = account1.code,
-              accountCode2 = account2.code,
-              amountInCents = amount.cents))
+          .set(Page.NewForRepaymentPage(account1 = account1, account2 = account2, amount = amount))
           .runNow()
       },
       ^.role := "button",

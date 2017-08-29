@@ -49,20 +49,30 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
 
           | staticRuleFromPage(EndowmentsPage, reactAppModule.endowments.apply _)
 
-          | staticRuleFromPage(NewTransactionGroupPage, reactAppModule.transactionGroupForm.forCreate _)
-
-          | dynamicRuleFromPage(_ / long.caseClass[EditTransactionGroupPage]) { (page, ctl) =>
-            reactAppModule.transactionGroupForm.forEdit(page.transactionGroupId, ctl)
+          | dynamicRuleFromPage(_ / returnToPath.caseClass[NewTransactionGroupPage]) { (page, ctl) =>
+            reactAppModule.transactionGroupForm.forCreate(page.returnToPath, ctl)
           }
 
-          | dynamicRuleFromPage(_ / codeString.caseClass[NewFromTemplatePage]) { (page, ctl) =>
-            reactAppModule.transactionGroupForm.forTemplate(page.templateCode, ctl)
+          | dynamicRuleFromPage(_ / (long / returnToPath).caseClass[EditTransactionGroupPage]) {
+            (page, ctl) =>
+              reactAppModule.transactionGroupForm.forEdit(page.transactionGroupId, page.returnToPath, ctl)
           }
 
-          | dynamicRuleFromPage(_ / (codeString / codeString / long).caseClass[NewForRepaymentPage]) {
+          | dynamicRuleFromPage(_ / (codeString / returnToPath).caseClass[NewFromTemplatePage]) {
+            (page, ctl) =>
+              reactAppModule.transactionGroupForm.forTemplate(page.templateCode, page.returnToPath, ctl)
+          }
+
+          | dynamicRuleFromPage(
+            _ / (codeString / codeString / long / returnToPath).caseClass[NewForRepaymentPage]) {
             (page, ctl) =>
               reactAppModule.transactionGroupForm
-                .forRepayment(page.accountCode1, page.accountCode2, page.amountInCents, ctl)
+                .forRepayment(
+                  page.accountCode1,
+                  page.accountCode2,
+                  page.amountInCents,
+                  page.returnToPath,
+                  ctl)
           }
 
           | dynamicRuleFromPage(_ / (codeString / returnToPath).caseClass[NewBalanceCheckPage]) {

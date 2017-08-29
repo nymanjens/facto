@@ -9,7 +9,7 @@ import flux.react.ReactVdomUtils.^^
 import flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
 import flux.react.router.Page
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.extra.router.RouterCtl
+import japgolly.scalajs.react.extra.router.{Path, RouterCtl}
 import japgolly.scalajs.react.vdom.html_<^._
 import models.accounting.config.{Account, Config}
 import models.accounting.money.{Currency, DatedMoney, ExchangeRateManager, ReferenceMoney}
@@ -59,32 +59,34 @@ final class TransactionGroupForm(implicit i18n: I18n,
   }
 
   // **************** API ****************//
-  def forCreate(router: RouterCtl[Page]): VdomElement = {
-    forCreate(TransactionGroup.Partial.withSingleEmptyTransaction, router)
+  def forCreate(returnToPath: Path, router: RouterCtl[Page]): VdomElement = {
+    forCreate(TransactionGroup.Partial.withSingleEmptyTransaction, returnToPath, router)
   }
 
-  def forEdit(transactionGroupId: Long, router: RouterCtl[Page]): VdomElement = {
+  def forEdit(transactionGroupId: Long, returnToPath: Path, router: RouterCtl[Page]): VdomElement = {
     val group = transactionGroupManager.findById(transactionGroupId)
     create(
       Props(
         operationMeta = OperationMeta.Edit(group),
         groupPartial = TransactionGroup.Partial.from(group),
+        returnToPath = returnToPath,
         router = router))
   }
 
-  def forTemplate(templateCode: String, router: RouterCtl[Page]): VdomElement = {
+  def forTemplate(templateCode: String, returnToPath: Path, router: RouterCtl[Page]): VdomElement = {
     val template = accountingConfig.templateWithCode(templateCode)
     // If this user is not associated with an account, it should not see any templates.
     val userAccount = accountingConfig.accountOf(user).get
-    forCreate(template.toPartial(userAccount), router)
+    forCreate(template.toPartial(userAccount), returnToPath, router)
   }
 
   def forRepayment(accountCode1: String,
                    accountCode2: String,
                    amountInCents: Long,
+                   returnToPath: Path,
                    router: RouterCtl[Page]): VdomElement = {
     if (amountInCents < 0) {
-      forRepayment(accountCode2, accountCode1, -amountInCents, router)
+      forRepayment(accountCode2, accountCode1, -amountInCents, returnToPath, router)
     } else {
       val account1 = accountingConfig.accounts(accountCode1)
       val account2 = accountingConfig.accounts(accountCode2)
@@ -115,6 +117,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
           ),
           zeroSum = true
         ),
+        returnToPath,
         router
       )
     }
@@ -122,9 +125,14 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
   // **************** Private helper methods ****************//
   private def forCreate(transactionGroupPartial: TransactionGroup.Partial,
+                        returnToPath: Path,
                         router: RouterCtl[Page]): VdomElement = {
     create(
-      Props(operationMeta = OperationMeta.AddNew, groupPartial = transactionGroupPartial, router = router))
+      Props(
+        operationMeta = OperationMeta.AddNew,
+        groupPartial = transactionGroupPartial,
+        returnToPath = returnToPath,
+        router = router))
   }
 
   private def create(props: Props): VdomElement = {
@@ -157,6 +165,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
   private case class Props(operationMeta: OperationMeta,
                            groupPartial: TransactionGroup.Partial,
+                           returnToPath: Path,
                            router: RouterCtl[Page])
 
   private final class Backend(val $ : BackendScope[Props, State]) {
@@ -314,6 +323,8 @@ final class TransactionGroupForm(implicit i18n: I18n,
     }
 
     private def onSubmit(e: ReactEventFromInput): Callback = LogExceptionsCallback {
+      val props = $.props.runNow()
+
       def getErrorMessage(datas: Seq[transactionPanel.Data], state: State): Option[String] = {
         def invalidMoneyReservoirsError: Option[String] = {
           val containsEmptyReservoirCodes = datas.exists(_.moneyReservoir.isNullReservoir)
@@ -376,7 +387,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
               )
         }
 
-        val action = $.props.runNow().operationMeta match {
+        val action = props.operationMeta match {
           case OperationMeta.AddNew =>
             Action.AddTransactionGroup(transactionsWithoutIdProvider = transactionsWithoutIdProvider)
           case OperationMeta.Edit(group) =>
@@ -405,7 +416,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
               case None =>
                 submitValid(datas, state)
-                $.props.runNow().router.set(Page.EverythingPage).runNow()
+                props.router.byPath.set(props.returnToPath).runNow()
             }
           }
 
@@ -414,11 +425,13 @@ final class TransactionGroupForm(implicit i18n: I18n,
     }
 
     private def onDelete: Callback = LogExceptionsCallback {
-      $.props.runNow().operationMeta match {
+      val props = $.props.runNow()
+
+      props.operationMeta match {
         case OperationMeta.AddNew => throw new AssertionError("Should never happen")
         case OperationMeta.Edit(group) =>
           dispatcher.dispatch(Action.RemoveTransactionGroup(transactionGroupWithId = group))
-          $.props.runNow().router.set(Page.EverythingPage).runNow()
+          props.router.byPath.set(props.returnToPath).runNow()
       }
     }
   }

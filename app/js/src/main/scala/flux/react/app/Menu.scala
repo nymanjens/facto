@@ -56,7 +56,7 @@ private[app] object Menu {
     MenuItem("CashFlow", "icon-money", Page.CashFlowPage),
     MenuItem("Liquidation", "icon-balance-scale", Page.LiquidationPage),
     MenuItem("Endowments", "icon-crown", Page.EndowmentsPage),
-    MenuItem("New", "icon-new-empty", Page.NewTransactionGroupPage)
+    MenuItem("New", "icon-new-empty", Page.NewTransactionGroupPage())
   )
 
   private case class Props(currentPage: Page, router: RouterCtl[Page])
