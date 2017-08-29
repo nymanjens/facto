@@ -95,11 +95,9 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
                           router: RouterCtl[Page]): VdomElement = {
     <.a(
       ^.className := "btn btn-info btn-xs",
-      ^.onClick --> LogExceptionsCallback {
-        router
-          .set(Page.NewForRepayment(account1 = account1, account2 = account2, amount = amount))
-          .runNow()
-      },
+      ^.href := router
+        .pathFor(Page.NewForRepayment(account1 = account1, account2 = account2, amount = amount))
+        .value,
       ^.role := "button",
       <.i(^.className := "fa fa-check-square-o fa-fw"),
       i18n("facto.repay")

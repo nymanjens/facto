@@ -133,9 +133,7 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
     <.a(
       ^.className := "btn btn-info btn-xs",
       ^.role := "button",
-      ^.onClick --> LogExceptionsCallback {
-        router.set(Page.NewBalanceCheck(reservoir)).runNow()
-      },
+      ^.href := router.pathFor(Page.NewBalanceCheck(reservoir)).value,
       <.i(^.className := "fa fa-check-square-o fa-fw"),
       i18n("facto.set")
     )
@@ -165,9 +163,7 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
     <.a(
       ^.className := "btn btn-default btn-xs",
       ^.role := "button",
-      ^.onClick --> LogExceptionsCallback {
-        router.set(Page.EditBalanceCheck(balanceCorrection)).runNow()
-      },
+      ^.href := router.pathFor(Page.EditBalanceCheck(balanceCorrection)).value,
       <.i(^.className := "fa fa-pencil fa-fw"),
       i18n("facto.edit")
     )
