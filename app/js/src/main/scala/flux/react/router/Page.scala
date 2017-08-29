@@ -16,61 +16,61 @@ object Page {
     def getDomPathWithoutPrefix: String = dom.window.location.pathname.stripPrefix(RouterFactory.pathPrefix)
   }
 
-  case object RootPage extends Page
+  case object Root extends Page
 
   // Accounting data views
-  case object EverythingPage extends Page
-  case object CashFlowPage extends Page
-  case object LiquidationPage extends Page
-  case object EndowmentsPage extends Page
+  case object Everything extends Page
+  case object CashFlow extends Page
+  case object Liquidation extends Page
+  case object Endowments extends Page
 
   // Accounting forms - transactions
-  case class NewTransactionGroupPage private (returnToWithoutPrefix: String)
+  case class NewTransactionGroup private (returnToWithoutPrefix: String)
       extends HasReturnTo(returnToWithoutPrefix)
       with Page
-  object NewTransactionGroupPage {
-    def apply(): NewTransactionGroupPage = NewTransactionGroupPage(HasReturnTo.getDomPathWithoutPrefix)
+  object NewTransactionGroup {
+    def apply(): NewTransactionGroup = NewTransactionGroup(HasReturnTo.getDomPathWithoutPrefix)
   }
-  case class EditTransactionGroupPage private (transactionGroupId: Long, returnToWithoutPrefix: String)
+  case class EditTransactionGroup private (transactionGroupId: Long, returnToWithoutPrefix: String)
       extends HasReturnTo(returnToWithoutPrefix)
       with Page
-  object EditTransactionGroupPage {
+  object EditTransactionGroup {
     // Note: Getting ID here rather than TransactionGroup because we may not have fetched the TransactionGroup.
-    def apply(transactionGroupId: Long): EditTransactionGroupPage =
-      EditTransactionGroupPage(transactionGroupId, HasReturnTo.getDomPathWithoutPrefix)
+    def apply(transactionGroupId: Long): EditTransactionGroup =
+      EditTransactionGroup(transactionGroupId, HasReturnTo.getDomPathWithoutPrefix)
   }
-  case class NewFromTemplatePage private (templateCode: String, returnToWithoutPrefix: String)
+  case class NewFromTemplate private (templateCode: String, returnToWithoutPrefix: String)
       extends HasReturnTo(returnToWithoutPrefix)
       with Page
-  object NewFromTemplatePage {
-    def apply(template: Template): NewFromTemplatePage =
-      NewFromTemplatePage(template.code, HasReturnTo.getDomPathWithoutPrefix)
+  object NewFromTemplate {
+    def apply(template: Template): NewFromTemplate =
+      NewFromTemplate(template.code, HasReturnTo.getDomPathWithoutPrefix)
   }
-  case class NewForRepaymentPage private (accountCode1: String,
-                                          accountCode2: String,
-                                          amountInCents: Long,
-                                          returnToWithoutPrefix: String)
+  case class NewForRepayment private (accountCode1: String,
+                                      accountCode2: String,
+                                      amountInCents: Long,
+                                      returnToWithoutPrefix: String)
       extends HasReturnTo(returnToWithoutPrefix)
       with Page
-  object NewForRepaymentPage {
-    def apply(account1: Account, account2: Account, amount: ReferenceMoney): NewForRepaymentPage =
-      NewForRepaymentPage(account1.code, account2.code, amount.cents, HasReturnTo.getDomPathWithoutPrefix)
+  object NewForRepayment {
+    def apply(account1: Account, account2: Account, amount: ReferenceMoney): NewForRepayment =
+      NewForRepayment(account1.code, account2.code, amount.cents, HasReturnTo.getDomPathWithoutPrefix)
   }
 
   // Accounting forms - balance checks
-  case class NewBalanceCheckPage private (reservoirCode: String, returnToWithoutPrefix: String)
+  case class NewBalanceCheck private (reservoirCode: String, returnToWithoutPrefix: String)
       extends HasReturnTo(returnToWithoutPrefix)
       with Page
-  object NewBalanceCheckPage {
-    def apply(reservoir: MoneyReservoir): NewBalanceCheckPage =
-      NewBalanceCheckPage(reservoir.code, HasReturnTo.getDomPathWithoutPrefix)
+  object NewBalanceCheck {
+    def apply(reservoir: MoneyReservoir): NewBalanceCheck =
+      NewBalanceCheck(reservoir.code, HasReturnTo.getDomPathWithoutPrefix)
   }
 
-  case class EditBalanceCheckPage private (balanceCheckId: Long, returnToWithoutPrefix: String)
+  case class EditBalanceCheck private (balanceCheckId: Long, returnToWithoutPrefix: String)
       extends HasReturnTo(returnToWithoutPrefix)
       with Page
-  object EditBalanceCheckPage {
-    def apply(balanceCheck: BalanceCheck): EditBalanceCheckPage =
-      EditBalanceCheckPage(balanceCheck.id, HasReturnTo.getDomPathWithoutPrefix)
+  object EditBalanceCheck {
+    def apply(balanceCheck: BalanceCheck): EditBalanceCheck =
+      EditBalanceCheck(balanceCheck.id, HasReturnTo.getDomPathWithoutPrefix)
   }
 }

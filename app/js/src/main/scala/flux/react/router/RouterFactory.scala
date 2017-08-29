@@ -1,8 +1,7 @@
 package flux.react.router
 
 import common.LoggingUtils.logExceptions
-import flux.react.router.Page._
-import japgolly.scalajs.react.extra.router.StaticDsl.{DynamicRouteB, RouteB, StaticRouteB}
+import japgolly.scalajs.react.extra.router.StaticDsl.RouteB
 import japgolly.scalajs.react.extra.router._
 import japgolly.scalajs.react.vdom.html_<^._
 
@@ -22,14 +21,12 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
         val returnToPath = "?returnto=" / string(".+")
 
         def staticRuleFromPage(page: Page, renderer: RouterCtl[Page] => VdomElement): dsl.Rule = {
-          val path = RouterFactory.pathPrefix + page.getClass.getSimpleName.stripSuffix("Page").toLowerCase
+          val path = RouterFactory.pathPrefix + page.getClass.getSimpleName.toLowerCase
           staticRoute(path, page) ~> renderR(ctl => logExceptions(renderer(ctl)))
         }
         def dynamicRuleFromPage[P <: Page](dynamicPart: String => RouteB[P])(
             renderer: (P, RouterCtl[Page]) => VdomElement)(implicit pageClass: ClassTag[P]): dsl.Rule = {
-          val staticPathPart = RouterFactory.pathPrefix + pageClass.runtimeClass.getSimpleName
-            .stripSuffix("Page")
-            .toLowerCase
+          val staticPathPart = RouterFactory.pathPrefix + pageClass.runtimeClass.getSimpleName.toLowerCase
           val path = dynamicPart(staticPathPart)
           dynamicRouteCT(path) ~> dynRenderR {
             case (page, ctl) => logExceptions(renderer(page, ctl))
@@ -39,32 +36,33 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
         // wrap/connect components to the circuit
         (emptyRule
 
-          | staticRoute("/app/", RootPage) ~> redirectToPage(CashFlowPage)(Redirect.Replace)
+          | staticRoute(RouterFactory.pathPrefix, Page.Root)
+            ~> redirectToPage(Page.CashFlow)(Redirect.Replace)
 
-          | staticRuleFromPage(EverythingPage, reactAppModule.everything.apply _)
+          | staticRuleFromPage(Page.Everything, reactAppModule.everything.apply _)
 
-          | staticRuleFromPage(CashFlowPage, reactAppModule.cashFlow.apply _)
+          | staticRuleFromPage(Page.CashFlow, reactAppModule.cashFlow.apply _)
 
-          | staticRuleFromPage(LiquidationPage, reactAppModule.liquidation.apply _)
+          | staticRuleFromPage(Page.Liquidation, reactAppModule.liquidation.apply _)
 
-          | staticRuleFromPage(EndowmentsPage, reactAppModule.endowments.apply _)
+          | staticRuleFromPage(Page.Endowments, reactAppModule.endowments.apply _)
 
-          | dynamicRuleFromPage(_ / returnToPath.caseClass[NewTransactionGroupPage]) { (page, ctl) =>
+          | dynamicRuleFromPage(_ / returnToPath.caseClass[Page.NewTransactionGroup]) { (page, ctl) =>
             reactAppModule.transactionGroupForm.forCreate(page.returnToPath, ctl)
           }
 
-          | dynamicRuleFromPage(_ / (long / returnToPath).caseClass[EditTransactionGroupPage]) {
+          | dynamicRuleFromPage(_ / (long / returnToPath).caseClass[Page.EditTransactionGroup]) {
             (page, ctl) =>
               reactAppModule.transactionGroupForm.forEdit(page.transactionGroupId, page.returnToPath, ctl)
           }
 
-          | dynamicRuleFromPage(_ / (codeString / returnToPath).caseClass[NewFromTemplatePage]) {
+          | dynamicRuleFromPage(_ / (codeString / returnToPath).caseClass[Page.NewFromTemplate]) {
             (page, ctl) =>
               reactAppModule.transactionGroupForm.forTemplate(page.templateCode, page.returnToPath, ctl)
           }
 
           | dynamicRuleFromPage(
-            _ / (codeString / codeString / long / returnToPath).caseClass[NewForRepaymentPage]) {
+            _ / (codeString / codeString / long / returnToPath).caseClass[Page.NewForRepayment]) {
             (page, ctl) =>
               reactAppModule.transactionGroupForm
                 .forRepayment(
@@ -75,17 +73,17 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
                   ctl)
           }
 
-          | dynamicRuleFromPage(_ / (codeString / returnToPath).caseClass[NewBalanceCheckPage]) {
+          | dynamicRuleFromPage(_ / (codeString / returnToPath).caseClass[Page.NewBalanceCheck]) {
             (page, ctl) =>
               reactAppModule.balanceCheckForm.forCreate(page.reservoirCode, page.returnToPath, ctl)
           }
 
-          | dynamicRuleFromPage(_ / (long / returnToPath).caseClass[EditBalanceCheckPage]) { (page, ctl) =>
+          | dynamicRuleFromPage(_ / (long / returnToPath).caseClass[Page.EditBalanceCheck]) { (page, ctl) =>
             reactAppModule.balanceCheckForm.forEdit(page.balanceCheckId, page.returnToPath, ctl)
           }
 
         // Fallback
-        ).notFound(redirectToPage(CashFlowPage)(Redirect.Replace))
+        ).notFound(redirectToPage(Page.CashFlow)(Redirect.Replace))
       }
       .renderWith(layout)
   }

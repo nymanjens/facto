@@ -16,7 +16,7 @@ object TransactionGroupEditButton {
     .renderP((_, props) => {
       <.a(
         ^^.classes("btn", "btn-default", "btn-xs"),
-        ^.href := props.router.pathFor(Page.EditTransactionGroupPage(props.groupId)).value,
+        ^.href := props.router.pathFor(Page.EditTransactionGroup(props.groupId)).value,
         ^.role := "button",
         <.i(^^.classes("fa", "fa-pencil", "fa-fw")),
         props.i18n("facto.edit")

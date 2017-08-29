@@ -52,11 +52,11 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
 private[app] object Menu {
 
   private val menuItems = Seq(
-    MenuItem("Everything", "fa fa-money", Page.EverythingPage),
-    MenuItem("CashFlow", "icon-money", Page.CashFlowPage),
-    MenuItem("Liquidation", "icon-balance-scale", Page.LiquidationPage),
-    MenuItem("Endowments", "icon-crown", Page.EndowmentsPage),
-    MenuItem("New", "icon-new-empty", Page.NewTransactionGroupPage())
+    MenuItem("Everything", "fa fa-money", Page.Everything),
+    MenuItem("CashFlow", "icon-money", Page.CashFlow),
+    MenuItem("Liquidation", "icon-balance-scale", Page.Liquidation),
+    MenuItem("Endowments", "icon-crown", Page.Endowments),
+    MenuItem("New", "icon-new-empty", Page.NewTransactionGroup())
   )
 
   private case class Props(currentPage: Page, router: RouterCtl[Page])
