@@ -17,7 +17,7 @@ class FakeRouterContext extends RouterContext {
 
   // **************** API implementation: Getters **************** //
   override def currentPage = _currentPage
-  override def toPath(page: Page): Path = Path(page.getClass.getSimpleName)
+  override def toPath(page: Page): Path = Path("/app/" + page.getClass.getSimpleName)
   override def anchorWithHrefTo(page: Page): VdomTagOf[html.Anchor] =
     <.a(^.onClick --> LogExceptionsCallback(setPage(page)))
 
