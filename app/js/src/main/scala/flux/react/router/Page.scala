@@ -13,9 +13,7 @@ object Page {
     def returnToPath: Path = Path(RouterFactory.pathPrefix + (returnToWithoutPrefix getOrElse ""))
   }
   object HasReturnTo {
-    def getDomPathWithoutPrefix: Option[String] =
-      Some(dom.window.location.pathname.stripPrefix(RouterFactory.pathPrefix))
-    def getDomPathWithoutPrefix2(implicit routerContext: RouterContext): Option[String] =
+    def getCurrentPathWithoutPrefix(implicit routerContext: RouterContext): Option[String] =
       Some(
         routerContext
           .toPath(routerContext.currentPage)
@@ -38,22 +36,22 @@ object Page {
       with Page
   object NewTransactionGroup {
     def apply()(implicit routerContext: RouterContext): NewTransactionGroup =
-      NewTransactionGroup(HasReturnTo.getDomPathWithoutPrefix)
+      NewTransactionGroup(HasReturnTo.getCurrentPathWithoutPrefix)
   }
   case class EditTransactionGroup private (transactionGroupId: Long, returnToWithoutPrefix: Option[String])
       extends HasReturnTo(returnToWithoutPrefix)
       with Page
   object EditTransactionGroup {
     // Note: Getting ID here rather than TransactionGroup because we may not have fetched the TransactionGroup.
-    def apply(transactionGroupId: Long): EditTransactionGroup =
-      EditTransactionGroup(transactionGroupId, HasReturnTo.getDomPathWithoutPrefix)
+    def apply(transactionGroupId: Long)(implicit routerContext: RouterContext): EditTransactionGroup =
+      EditTransactionGroup(transactionGroupId, HasReturnTo.getCurrentPathWithoutPrefix)
   }
   case class NewFromTemplate private (templateCode: String, returnToWithoutPrefix: Option[String])
       extends HasReturnTo(returnToWithoutPrefix)
       with Page
   object NewFromTemplate {
-    def apply(template: Template): NewFromTemplate =
-      NewFromTemplate(template.code, HasReturnTo.getDomPathWithoutPrefix)
+    def apply(template: Template)(implicit routerContext: RouterContext): NewFromTemplate =
+      NewFromTemplate(template.code, HasReturnTo.getCurrentPathWithoutPrefix)
   }
   case class NewForRepayment private (accountCode1: String,
                                       accountCode2: String,
@@ -62,8 +60,9 @@ object Page {
       extends HasReturnTo(returnToWithoutPrefix)
       with Page
   object NewForRepayment {
-    def apply(account1: Account, account2: Account, amount: ReferenceMoney): NewForRepayment =
-      NewForRepayment(account1.code, account2.code, amount.cents, HasReturnTo.getDomPathWithoutPrefix)
+    def apply(account1: Account, account2: Account, amount: ReferenceMoney)(
+        implicit routerContext: RouterContext): NewForRepayment =
+      NewForRepayment(account1.code, account2.code, amount.cents, HasReturnTo.getCurrentPathWithoutPrefix)
   }
 
   // Accounting forms - balance checks
@@ -71,15 +70,15 @@ object Page {
       extends HasReturnTo(returnToWithoutPrefix)
       with Page
   object NewBalanceCheck {
-    def apply(reservoir: MoneyReservoir): NewBalanceCheck =
-      NewBalanceCheck(reservoir.code, HasReturnTo.getDomPathWithoutPrefix)
+    def apply(reservoir: MoneyReservoir)(implicit routerContext: RouterContext): NewBalanceCheck =
+      NewBalanceCheck(reservoir.code, HasReturnTo.getCurrentPathWithoutPrefix)
   }
 
   case class EditBalanceCheck private (balanceCheckId: Long, returnToWithoutPrefix: Option[String])
       extends HasReturnTo(returnToWithoutPrefix)
       with Page
   object EditBalanceCheck {
-    def apply(balanceCheck: BalanceCheck): EditBalanceCheck =
-      EditBalanceCheck(balanceCheck.id, HasReturnTo.getDomPathWithoutPrefix)
+    def apply(balanceCheck: BalanceCheck)(implicit routerContext: RouterContext): EditBalanceCheck =
+      EditBalanceCheck(balanceCheck.id, HasReturnTo.getCurrentPathWithoutPrefix)
   }
 }

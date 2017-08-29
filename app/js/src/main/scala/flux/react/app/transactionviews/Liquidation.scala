@@ -29,7 +29,8 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
     .renderP(
-      (_, props) =>
+      (_, props) => {
+        implicit val router = props.router
         uielements.Panel(i18n("facto.all-combinations")) {
           {
             for {
@@ -62,8 +63,7 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
                       .state
                       .entries
                       .lastOption
-                      .map(_.debt) getOrElse ReferenceMoney(0),
-                    router = props.router
+                      .map(_.debt) getOrElse ReferenceMoney(0)
                   ))
                 ),
                 calculateTableData = entry =>
@@ -75,11 +75,12 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
                     <.td(uielements.DescriptionWithEntryCount(entry)),
                     <.td(uielements.MoneyWithCurrency(entry.flow)),
                     <.td(uielements.MoneyWithCurrency(entry.debt)),
-                    <.td(uielements.TransactionGroupEditButton(entry.groupId, props.router))
+                    <.td(uielements.TransactionGroupEditButton(entry.groupId))
                 )
               )
             }
           }.toVdomArray
+        }
       }
     )
     .build
@@ -90,10 +91,8 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
   }
 
   // **************** Private helper methods ****************//
-  private def repayButton(account1: Account,
-                          account2: Account,
-                          amount: ReferenceMoney,
-                          router: RouterContext): VdomElement = {
+  private def repayButton(account1: Account, account2: Account, amount: ReferenceMoney)(
+      implicit router: RouterContext): VdomElement = {
     <.a(
       ^.className := "btn btn-info btn-xs",
       ^.href := router.toHref(

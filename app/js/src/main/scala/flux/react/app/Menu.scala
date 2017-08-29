@@ -48,7 +48,7 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
 
 private[app] object Menu {
 
-  private def menuItems(implicit routerContext: RouterContext) = Seq(
+  private def menuItems(implicit router: RouterContext) = Seq(
     MenuItem("Everything", "fa fa-money", Page.Everything),
     MenuItem("CashFlow", "icon-money", Page.CashFlow),
     MenuItem("Liquidation", "icon-balance-scale", Page.Liquidation),

@@ -36,7 +36,8 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
     .builder[Props](getClass.getSimpleName)
     .initialState(State(includeUnrelatedReservoirs = false, includeHiddenReservoirs = false))
     .renderPS(
-      ($, props, state) =>
+      ($, props, state) => {
+        implicit val routerContext = props.router
         <.span(
           {
             for {
@@ -66,7 +67,7 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
                         <.th(i18n("facto.description")),
                         <.th(i18n("facto.flow")),
                         <.th(i18n("facto.balance")),
-                        <.th(balanceCheckAddNewButton(reservoir, router = props.router))
+                        <.th(balanceCheckAddNewButton(reservoir))
                       ),
                       calculateTableDataFromEntryAndRowNum = (cashFlowEntry, rowNumber) =>
                         cashFlowEntry match {
@@ -82,9 +83,9 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
                                 uielements.MoneyWithCurrency(entry.balance),
                                 <<.ifThen(entry.balanceVerified)(<.i(^.className := "fa fa-check fa-fw")),
                                 <<.ifThen(!entry.balanceVerified && rowNumber == 0)(
-                                  balanceCheckConfirmButton(reservoir, entry, props.router))
+                                  balanceCheckConfirmButton(reservoir, entry))
                               ),
-                              <.td(uielements.TransactionGroupEditButton(entry.groupId, props.router))
+                              <.td(uielements.TransactionGroupEditButton(entry.groupId))
                             )
                           case CashFlowEntry.BalanceCorrection(balanceCorrection) =>
                             Seq[VdomElement](
@@ -94,7 +95,7 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
                                 ^.style := js.Dictionary("fontWeight" -> "bold"),
                                 i18n("facto.balance-correction") + ":"),
                               <.td(uielements.MoneyWithCurrency(balanceCorrection.balance)),
-                              <.td(balanceCheckEditButton(balanceCorrection, props.router))
+                              <.td(balanceCheckEditButton(balanceCorrection))
                             )
                       }
                     )
@@ -121,7 +122,8 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
               else i18n("facto.show-hidden-reservoirs")
             )
           }
-      )
+        )
+      }
     )
     .build
 
@@ -131,7 +133,8 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
   }
 
   // **************** Private helper methods ****************//
-  private def balanceCheckAddNewButton(reservoir: MoneyReservoir, router: RouterContext): VdomElement = {
+  private def balanceCheckAddNewButton(reservoir: MoneyReservoir)(
+      implicit router: RouterContext): VdomElement = {
     <.a(
       ^.className := "btn btn-info btn-xs",
       ^.role := "button",
@@ -141,9 +144,8 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
     )
   }
 
-  private def balanceCheckConfirmButton(reservoir: MoneyReservoir,
-                                        entry: CashFlowEntry.RegularEntry,
-                                        router: RouterContext): VdomElement = {
+  private def balanceCheckConfirmButton(reservoir: MoneyReservoir, entry: CashFlowEntry.RegularEntry)(
+      implicit router: RouterContext): VdomElement = {
     <.button(
       ^.className := "btn btn-info btn-xs",
       ^.role := "button",
@@ -161,7 +163,7 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
     )
   }
 
-  def balanceCheckEditButton(balanceCorrection: BalanceCheck, router: RouterContext): VdomElement = {
+  def balanceCheckEditButton(balanceCorrection: BalanceCheck)(implicit router: RouterContext): VdomElement = {
     <.a(
       ^.className := "btn btn-default btn-xs",
       ^.role := "button",

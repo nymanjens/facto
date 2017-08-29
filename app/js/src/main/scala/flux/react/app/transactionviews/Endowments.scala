@@ -29,7 +29,8 @@ final class Endowments(implicit entriesStoreFactory: EndowmentEntriesStoreFactor
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
     .renderP(
-      (_, props) =>
+      (_, props) => {
+        implicit val router = props.router
         uielements.Panel(i18n("facto.all-accounts")) {
           {
             for (account <- accountingConfig.personallySortedAccounts) yield {
@@ -58,11 +59,12 @@ final class Endowments(implicit entriesStoreFactory: EndowmentEntriesStoreFactor
                     <.td(entry.categories.map(_.name).mkString(", ")),
                     <.td(uielements.DescriptionWithEntryCount(entry)),
                     <.td(uielements.MoneyWithCurrency(entry.flow)),
-                    <.td(uielements.TransactionGroupEditButton(entry.groupId, props.router))
+                    <.td(uielements.TransactionGroupEditButton(entry.groupId))
                 )
               )
             }
           }.toVdomArray
+        }
       }
     )
     .build

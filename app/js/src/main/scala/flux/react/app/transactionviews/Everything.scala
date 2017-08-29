@@ -27,7 +27,8 @@ final class Everything(implicit entriesStoreFactory: AllEntriesStoreFactory,
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
     .renderP(
-      (_, props) =>
+      (_, props) => {
+        implicit val router = props.router
         uielements.Panel(i18n("facto.genral-information-about-all-entries"))(
           EntriesListTable[GeneralEntry, Unit](
             tableTitle = i18n("facto.all"),
@@ -54,10 +55,12 @@ final class Everything(implicit entriesStoreFactory: AllEntriesStoreFactory,
                 <.td(entry.categories.map(_.name).mkString(", ")),
                 <.td(uielements.DescriptionWithEntryCount(entry)),
                 <.td(uielements.MoneyWithCurrency(entry.flow)),
-                <.td(uielements.TransactionGroupEditButton(entry.groupId, props.router))
+                <.td(uielements.TransactionGroupEditButton(entry.groupId))
             )
           )
-      ))
+        )
+      }
+    )
     .build
 
   // **************** API ****************//

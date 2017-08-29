@@ -11,9 +11,10 @@ object TransactionGroupEditButton {
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
     .renderP((_, props) => {
+      implicit val router = props.router
       <.a(
         ^^.classes("btn", "btn-default", "btn-xs"),
-        ^.href := props.router.toHref(Page.EditTransactionGroup(props.groupId)),
+        ^.href := router.toHref(Page.EditTransactionGroup(props.groupId)),
         ^.role := "button",
         <.i(^^.classes("fa", "fa-pencil", "fa-fw")),
         props.i18n("facto.edit")
@@ -22,10 +23,10 @@ object TransactionGroupEditButton {
     .build
 
   // **************** API ****************//
-  def apply(groupId: Long, router: RouterContext)(implicit i18n: I18n): VdomElement = {
-    component(Props(groupId, router))
+  def apply(groupId: Long)(implicit router: RouterContext, i18n: I18n): VdomElement = {
+    component(Props(groupId))
   }
 
   // **************** Private inner types ****************//
-  private case class Props(groupId: Long, router: RouterContext)(implicit val i18n: I18n)
+  private case class Props(groupId: Long)(implicit val router: RouterContext, val i18n: I18n)
 }
