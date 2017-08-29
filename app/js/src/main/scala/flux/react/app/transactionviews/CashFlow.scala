@@ -1,27 +1,24 @@
 package flux.react.app.transactionviews
 
-import flux.react.router.RouterContext
-import scala.scalajs.js
-import flux.react.ReactVdomUtils.<<
 import common.Formatting._
 import common.I18n
 import common.LoggingUtils.LogExceptionsCallback
 import common.time.Clock
 import flux.action.{Action, Dispatcher}
+import flux.react.ReactVdomUtils.<<
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
-import flux.react.router.Page
+import flux.react.router.{Page, RouterContext}
 import flux.react.uielements
-import flux.stores.BalanceCheckStore
-import flux.stores.entries.{AccountPair, CashFlowEntriesStoreFactory, CashFlowEntry}
+import flux.stores.entries.{CashFlowEntriesStoreFactory, CashFlowEntry}
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.extra.router.RouterCtl
 import japgolly.scalajs.react.vdom.html_<^._
 import models.accounting.BalanceCheck
-import models.accounting.config.{Account, Config, MoneyReservoir}
-import models.accounting.money.{ExchangeRateManager, ReferenceMoney}
+import models.accounting.config.{Config, MoneyReservoir}
+import models.accounting.money.ExchangeRateManager
 import models.{EntityAccess, User}
 
 import scala.collection.immutable.Seq
+import scala.scalajs.js
 
 final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
                      dispatcher: Dispatcher,
@@ -135,10 +132,9 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
   // **************** Private helper methods ****************//
   private def balanceCheckAddNewButton(reservoir: MoneyReservoir)(
       implicit router: RouterContext): VdomElement = {
-    <.a(
+    router.anchorWithHrefTo(Page.NewBalanceCheck(reservoir))(
       ^.className := "btn btn-info btn-xs",
       ^.role := "button",
-      ^.href := router.toHref(Page.NewBalanceCheck(reservoir)),
       <.i(^.className := "fa fa-check-square-o fa-fw"),
       i18n("facto.set")
     )
@@ -164,10 +160,9 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
   }
 
   def balanceCheckEditButton(balanceCorrection: BalanceCheck)(implicit router: RouterContext): VdomElement = {
-    <.a(
+    router.anchorWithHrefTo(Page.EditBalanceCheck(balanceCorrection))(
       ^.className := "btn btn-default btn-xs",
       ^.role := "button",
-      ^.href := router.toHref(Page.EditBalanceCheck(balanceCorrection)),
       <.i(^.className := "fa fa-pencil fa-fw"),
       i18n("facto.edit")
     )

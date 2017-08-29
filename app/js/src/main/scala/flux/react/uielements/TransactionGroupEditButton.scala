@@ -12,9 +12,8 @@ object TransactionGroupEditButton {
     .builder[Props](getClass.getSimpleName)
     .renderP((_, props) => {
       implicit val router = props.router
-      <.a(
+      router.anchorWithHrefTo(Page.EditTransactionGroup(props.groupId))(
         ^^.classes("btn", "btn-default", "btn-xs"),
-        ^.href := router.toHref(Page.EditTransactionGroup(props.groupId)),
         ^.role := "button",
         <.i(^^.classes("fa", "fa-pencil", "fa-fw")),
         props.i18n("facto.edit")

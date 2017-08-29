@@ -93,10 +93,8 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
   // **************** Private helper methods ****************//
   private def repayButton(account1: Account, account2: Account, amount: ReferenceMoney)(
       implicit router: RouterContext): VdomElement = {
-    <.a(
+    router.anchorWithHrefTo(Page.NewForRepayment(account1 = account1, account2 = account2, amount = amount))(
       ^.className := "btn btn-info btn-xs",
-      ^.href := router.toHref(
-        Page.NewForRepayment(account1 = account1, account2 = account2, amount = amount)),
       ^.role := "button",
       <.i(^.className := "fa fa-check-square-o fa-fw"),
       i18n("facto.repay")
