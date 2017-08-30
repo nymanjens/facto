@@ -40,6 +40,9 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
 
     def render(props: Props, state: State) = logExceptions {
       implicit val router = props.router
+      def menuItem(label: String, iconClass: String, page: Page): VdomElement =
+        router
+          .anchorWithHrefTo(page)(<.i(^.className := iconClass), <.span(^.dangerouslySetInnerHtml := label))
 
       <.ul(
         ^.className := "nav",
@@ -68,27 +71,15 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
             ))
         ),
         <.li(
-          props.router.anchorWithHrefTo(Page.Everything)(
-            <.i(^.className := "icon-list"),
-            i18n("facto.everything.html")),
-          props.router
-            .anchorWithHrefTo(Page.CashFlow)(<.i(^.className := "icon-money"), i18n("facto.cash-flow.html")),
-          props.router.anchorWithHrefTo(Page.Liquidation)(
-            <.i(^.className := "icon-balance-scale"),
-            i18n("facto.liquidation.html")),
-          props.router.anchorWithHrefTo(Page.Endowments)(
-            <.i(^.className := "icon-crown"),
-            i18n("facto.endowments.html")),
-          props.router
-            .anchorWithHrefTo(Page.Everything)(<.i(^.className := "icon-table"), i18n("facto.summary.html"))
+          menuItem(i18n("facto.everything.html"), "icon-list", Page.Everything),
+          menuItem(i18n("facto.cash-flow.html"), "icon-money", Page.CashFlow),
+          menuItem(i18n("facto.liquidation.html"), "icon-balance-scale", Page.Liquidation),
+          menuItem(i18n("facto.endowments.html"), "icon-crown", Page.Endowments),
+          menuItem(i18n("facto.summary.html"), "icon-table", Page.Everything)
         ),
         <.li(
-          props.router.anchorWithHrefTo(Page.NewTransactionGroup())(
-            <.i(^.className := "icon-new-empty"),
-            i18n("facto.new-entry.html")),
-          props.router.anchorWithHrefTo(Page.Everything)(
-            <.i(^.className := "icon-template"),
-            i18n("facto.templates.html"))
+          menuItem(i18n("facto.new-entry.html"), "icon-new-empty", Page.NewTransactionGroup()),
+          menuItem(i18n("facto.templates.html"), "icon-template", Page.Everything)
         )
       )
     }
