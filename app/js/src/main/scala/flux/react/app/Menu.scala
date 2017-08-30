@@ -1,9 +1,12 @@
 package flux.react.app
 
+import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.I18n
+import common.LoggingUtils.logExceptions
 import common.time.Clock
 import flux.react.ReactVdomUtils.^^
 import flux.react.router.{Page, RouterContext}
+import flux.react.uielements
 import flux.stores.entries.AllEntriesStoreFactory
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
@@ -20,34 +23,17 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
                               exchangeRateManager: ExchangeRateManager,
                               i18n: I18n) {
 
+  private val component = ScalaComponent
+    .builder[Props](getClass.getSimpleName)
+    .renderBackend[Backend]
+    .build
+
+  // **************** API ****************//
   def apply(router: RouterContext): VdomElement = {
-    component(Menu.Props(router))
+    component(Props(router))
   }
 
-  private val component = ScalaComponent
-    .builder[Menu.Props](getClass.getSimpleName)
-    .render_P { props =>
-      <.div(
-        <.b("Menu:"),
-        (for ((item, i) <- Menu.menuItems(props.router).zipWithIndex) yield {
-          <.span(
-            ^.key := i,
-            ^^.ifThen(props.router.currentPage == item.page) { ^.className := "active" },
-            props.router.anchorWithHrefTo(item.page)(
-              <.i(^^.classes(item.iconClass)),
-              " ",
-              i18n(item.labelKey)
-            ),
-            " - "
-          )
-        }).toVdomArray
-      )
-    }
-    .build
-}
-
-private[app] object Menu {
-
+  // **************** Private helper methods ****************//
   private def menuItems(implicit router: RouterContext) = Seq(
     MenuItem("Everything", "fa fa-money", Page.Everything),
     MenuItem("CashFlow", "icon-money", Page.CashFlow),
@@ -56,6 +42,48 @@ private[app] object Menu {
     MenuItem("New", "icon-new-empty", Page.NewTransactionGroup())
   )
 
+  // **************** Private inner types ****************//
+  private type State = Unit
+  private class Backend(val $ : BackendScope[Props, State]) {
+    val searchInputRef = uielements.input.TextInput.ref()
+
+    def render(props: Props, state: State) = logExceptions {
+      <.ul(
+        ^.className := "nav",
+        <.li(
+          ^.className := "sidebar-search",
+          <.form(
+            <.div(
+              ^.className := "input-group custom-search-form",
+              uielements.input
+                .TextInput(ref = searchInputRef, name = "query", placeholder = i18n("facto.search")),
+              <.span(
+                ^.className := "input-group-btn",
+                <.button(
+                  ^.className := "btn btn-default",
+                  ^.tpe := "submit",
+                  ^.onClick ==> { (e: ReactEventFromInput) =>
+                    LogExceptionsCallback {
+                      e.preventDefault()
+
+                      props.router.setPage(Page.Everything)
+                    }
+                  },
+                  <.i(^.className := "fa fa-search")
+                )
+              )
+            ))
+        ),
+        <.li(
+          (for ((item, i) <- menuItems(props.router).zipWithIndex) yield {
+            props.router
+              .anchorWithHrefTo(item.page)(^.key := i, <.i(^.className := item.iconClass), item.label)
+          }).toVdomArray
+        )
+      )
+    }
+  }
+
   private case class Props(router: RouterContext)
-  private case class MenuItem(labelKey: String, iconClass: String, page: Page)
+  private case class MenuItem(label: String, iconClass: String, page: Page)
 }

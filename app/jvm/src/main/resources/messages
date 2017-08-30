@@ -178,6 +178,7 @@ facto.username=Username
 facto.today=Today
 facto.yesterday=Yesterday
 facto.tomorrow=Tomorrow
+facto.search=Search...
 facto.search-results=Search Results
 facto.search-results-for=Search Results for {0}
 facto.num-results={0} results
