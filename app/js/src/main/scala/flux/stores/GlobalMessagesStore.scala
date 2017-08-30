@@ -3,11 +3,12 @@ package flux.stores
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.I18n
 import common.time.Clock
-import flux.action.Action.{AddTransactionGroup, RemoveTransactionGroup, UpdateTransactionGroup}
+import flux.action.Action._
 import flux.action.{Action, Dispatcher}
 import flux.stores.GlobalMessagesStore.Message
 import models.EntityAccess
 import models.accounting._
+import models.accounting.config.Config
 
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.collection.immutable.Seq
@@ -18,6 +19,7 @@ import scala.scalajs.js
 final class GlobalMessagesStore(implicit i18n: I18n,
                                 clock: Clock,
                                 entityAccess: EntityAccess,
+                                accountingConfig: Config,
                                 dispatcher: Dispatcher) {
   dispatcher.registerPartialSync(dispatcherListener)
 
@@ -29,15 +31,15 @@ final class GlobalMessagesStore(implicit i18n: I18n,
   private var isCallingListeners: Boolean = false
 
   // **************** Public API ****************//
-  final def state: Option[Message] = _state
+  def state: Option[Message] = _state
 
-  final def register(listener: GlobalMessagesStore.Listener): Unit = {
+  def register(listener: GlobalMessagesStore.Listener): Unit = {
     require(!isCallingListeners)
 
     stateUpdateListeners = stateUpdateListeners :+ listener
   }
 
-  final def deregister(listener: GlobalMessagesStore.Listener): Unit = {
+  def deregister(listener: GlobalMessagesStore.Listener): Unit = {
     require(!isCallingListeners)
 
     stateUpdateListeners = stateUpdateListeners.filter(_ != listener)
@@ -66,6 +68,7 @@ final class GlobalMessagesStore(implicit i18n: I18n,
   }
 
   private def getCompletionMessage: PartialFunction[Action, String] = {
+    // **************** Transaction[Group]-related actions **************** //
     case AddTransactionGroup(transactionsProvider) if numTransactions(transactionsProvider) == 1 =>
       i18n("facto.successfully-created-1-transaction")
     case AddTransactionGroup(transactionsProvider) =>
@@ -78,6 +81,14 @@ final class GlobalMessagesStore(implicit i18n: I18n,
 
     case RemoveTransactionGroup(group) =>
       i18n("facto.successfully-deleted-transactions")
+
+    // **************** BalanceCheck-related actions **************** //
+    case AddBalanceCheck(balanceCheck) =>
+      i18n("facto.successfully-created-a-balance-check-for", balanceCheck.moneyReservoir.name)
+    case UpdateBalanceCheck(existingBalanceCheck, newBalanceCheck) =>
+      i18n("facto.successfully-edited-a-balance-check-for", newBalanceCheck.moneyReservoir.name)
+    case RemoveBalanceCheck(existingBalanceCheck) =>
+      i18n("facto.successfully-deleted-balance-check-for", existingBalanceCheck.moneyReservoir.name)
   }
 
   private def numTransactions(transactionsProvider: TransactionGroup => Seq[Transaction]): Int = {
