@@ -145,7 +145,7 @@ final class BalanceCheckForm(implicit i18n: I18n,
                 name = "balance",
                 label = i18n("facto.balance"),
                 defaultValue = props.operationMeta.balanceInCents,
-                required = true,
+                required = false, // not required to be different from 0.0
                 showErrorMessage = state.showErrorMessages,
                 currency = props.operationMeta.reservoir.currency
               )
