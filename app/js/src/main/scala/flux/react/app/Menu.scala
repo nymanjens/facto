@@ -33,21 +33,14 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
     component(Props(router))
   }
 
-  // **************** Private helper methods ****************//
-  private def menuItems(implicit router: RouterContext) = Seq(
-    MenuItem("Everything", "fa fa-money", Page.Everything),
-    MenuItem("CashFlow", "icon-money", Page.CashFlow),
-    MenuItem("Liquidation", "icon-balance-scale", Page.Liquidation),
-    MenuItem("Endowments", "icon-crown", Page.Endowments),
-    MenuItem("New", "icon-new-empty", Page.NewTransactionGroup())
-  )
-
   // **************** Private inner types ****************//
   private type State = Unit
   private class Backend(val $ : BackendScope[Props, State]) {
     val searchInputRef = uielements.input.TextInput.ref()
 
     def render(props: Props, state: State) = logExceptions {
+      implicit val router = props.router
+
       <.ul(
         ^.className := "nav",
         <.li(
@@ -75,15 +68,31 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
             ))
         ),
         <.li(
-          (for ((item, i) <- menuItems(props.router).zipWithIndex) yield {
-            props.router
-              .anchorWithHrefTo(item.page)(^.key := i, <.i(^.className := item.iconClass), item.label)
-          }).toVdomArray
+          props.router.anchorWithHrefTo(Page.Everything)(
+            <.i(^.className := "icon-list"),
+            i18n("facto.everything.html")),
+          props.router
+            .anchorWithHrefTo(Page.CashFlow)(<.i(^.className := "icon-money"), i18n("facto.cash-flow.html")),
+          props.router.anchorWithHrefTo(Page.Liquidation)(
+            <.i(^.className := "icon-balance-scale"),
+            i18n("facto.liquidation.html")),
+          props.router.anchorWithHrefTo(Page.Endowments)(
+            <.i(^.className := "icon-crown"),
+            i18n("facto.endowments.html")),
+          props.router
+            .anchorWithHrefTo(Page.Everything)(<.i(^.className := "icon-table"), i18n("facto.summary.html"))
+        ),
+        <.li(
+          props.router.anchorWithHrefTo(Page.NewTransactionGroup())(
+            <.i(^.className := "icon-new-empty"),
+            i18n("facto.new-entry.html")),
+          props.router.anchorWithHrefTo(Page.Everything)(
+            <.i(^.className := "icon-template"),
+            i18n("facto.templates.html"))
         )
       )
     }
   }
 
   private case class Props(router: RouterContext)
-  private case class MenuItem(label: String, iconClass: String, page: Page)
 }
