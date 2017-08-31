@@ -5,7 +5,6 @@ import java.time.Month.{APRIL, MAY}
 import common.testing.{ReactTestWrapper, TestModule}
 import common.time.LocalDateTime
 import common.time.LocalDateTimes.createDateTime
-import flux.react.uielements.input.bootstrap.TextInput
 import japgolly.scalajs.react.test.ReactTestUtils
 import japgolly.scalajs.react.vdom.VdomElement
 import models.accounting.Tag
@@ -76,7 +75,7 @@ object MappedInputTest extends TestSuite {
         ref = ref,
         defaultValue = defaultDate,
         valueTransformer = MappedInput.ValueTransformer.StringToLocalDateTime,
-        delegateRefFactory = TextInput.ref _
+        delegateRefFactory = bootstrap.TextInput.ref _
       ) { extraProps =>
         bootstrap.TextInput(
           ref = extraProps.ref,
