@@ -1,7 +1,6 @@
 package flux.react.uielements.input
 
 import common.testing.{ReactTestWrapper, TestModule}
-import flux.react.uielements.input.bootstrap
 import flux.react.uielements.input.InputBase.Listener
 import japgolly.scalajs.react.test.ReactTestUtils
 import japgolly.scalajs.react.vdom.VdomElement
