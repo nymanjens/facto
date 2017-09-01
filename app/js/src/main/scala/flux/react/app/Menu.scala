@@ -11,6 +11,7 @@ import flux.stores.entries.AllEntriesStoreFactory
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import models.EntityAccess
+import flux.react.ReactVdomUtils.{<<, ^^}
 import models.accounting.config.Config
 import models.accounting.money.ExchangeRateManager
 
@@ -42,7 +43,10 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
       implicit val router = props.router
       def menuItem(label: String, iconClass: String, page: Page): VdomElement =
         router
-          .anchorWithHrefTo(page)(<.i(^.className := iconClass), <.span(^.dangerouslySetInnerHtml := label))
+          .anchorWithHrefTo(page)(
+            ^^.ifThen(page == props.router.currentPage) { ^.className := "active" },
+            <.i(^.className := iconClass),
+            <.span(^.dangerouslySetInnerHtml := label))
 
       <.ul(
         ^.className := "nav",
