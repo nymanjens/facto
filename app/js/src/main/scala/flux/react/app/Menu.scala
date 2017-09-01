@@ -27,6 +27,7 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
     .renderBackend[Backend]
+    .componentWillReceiveProps(scope => scope.backend.componentWillReceiveProps(scope.nextProps))
     .build
 
   // **************** API ****************//
@@ -44,9 +45,10 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
       def menuItem(label: String, iconClass: String, page: Page): VdomElement =
         router
           .anchorWithHrefTo(page)(
-            ^^.ifThen(page == props.router.currentPage) { ^.className := "active" },
+            ^^.ifThen(page.getClass == props.router.currentPage.getClass) { ^.className := "active" },
             <.i(^.className := iconClass),
-            <.span(^.dangerouslySetInnerHtml := label))
+            <.span(^.dangerouslySetInnerHtml := label)
+          )
 
       <.ul(
         ^.className := "nav",
@@ -86,6 +88,25 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
           menuItem(i18n("facto.templates.html"), "icon-template", Page.Everything)
         )
       )
+    }
+
+    def componentWillReceiveProps(nextProps: Props): Callback = LogExceptionsCallback {
+      implicit val router = nextProps.router
+      def bind(shortcut: String, runnable: () => Unit): Unit = {
+        ???
+      }
+      def bindToPage(shortcut: String, page: Page): Unit = bind(shortcut, () => router.setPage(page))
+
+      bindToPage("shift+alt+e", Page.Everything)
+      bindToPage("shift+alt+a", Page.Everything)
+      bindToPage("shift+alt+c", Page.CashFlow)
+      bindToPage("shift+alt+l", Page.Liquidation)
+      bindToPage("shift+alt+v", Page.Liquidation)
+      bindToPage("shift+alt+d", Page.Endowments)
+//      bindToPage("shift+alt+s", Page.Summary)
+//      bindToPage("shift+alt+t", Page.Templates)
+//      bindToPage("shift+alt+j", Page.Templates)
+      bindToPage("shift+alt+n", Page.NewTransactionGroup())
     }
   }
 
