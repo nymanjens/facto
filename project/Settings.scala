@@ -55,7 +55,7 @@ object Settings {
     val log4Javascript = "org.webjars" % "log4javascript" % "1.4.10"
     val lokijs = "org.webjars.bower" % "lokijs" % "1.4.2"
     val metisMenu = "org.webjars" % "metisMenu" % "1.1.3"
-    val mousetrap = "org.webjars" % "mousetrap" % "1.5.3-1"
+    val mousetrap = "org.webjars.npm" % "mousetrap" % "1.6.1"
     val react = "org.webjars.bower" % "react" % "15.3.2"
     val sha1 = "org.webjars.bower" % "SHA-1" % "0.1.1"
     val typeaheadJs = "org.webjars" % "typeaheadjs" % "0.11.1"
@@ -131,6 +131,7 @@ object Settings {
       webjarDeps.bootstrap / files.bootstrap dependsOn files.jQuery,
       webjarDeps.metisMenu / "metisMenu.min.js" dependsOn files.bootstrap,
       webjarDeps.mousetrap / "mousetrap.min.js",
+      webjarDeps.mousetrap / "plugins/global-bind/mousetrap-global-bind.min.js",
       webjarDeps.bootstrapTagsinput / "bootstrap-tagsinput.min.js" dependsOn files.bootstrap,
       webjarDeps.typeaheadJs / "typeahead.bundle.min.js" dependsOn files.bootstrap,
       webjarDeps.sha1 / "sha1.js",
