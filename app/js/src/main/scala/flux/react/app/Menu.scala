@@ -12,6 +12,7 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import models.EntityAccess
 import flux.react.ReactVdomUtils.{<<, ^^}
+import jsfacades.Mousetrap
 import models.accounting.config.Config
 import models.accounting.money.ExchangeRateManager
 
@@ -93,7 +94,10 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
     def componentWillReceiveProps(nextProps: Props): Callback = LogExceptionsCallback {
       implicit val router = nextProps.router
       def bind(shortcut: String, runnable: () => Unit): Unit = {
-        ???
+        Mousetrap.bindGlobal(shortcut, e => {
+          e.preventDefault()
+          runnable()
+        })
       }
       def bindToPage(shortcut: String, page: Page): Unit = bind(shortcut, () => router.setPage(page))
 
@@ -107,6 +111,8 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
 //      bindToPage("shift+alt+t", Page.Templates)
 //      bindToPage("shift+alt+j", Page.Templates)
       bindToPage("shift+alt+n", Page.NewTransactionGroup())
+
+      bind("shift+alt+f", () => searchInputRef().focus())
     }
   }
 
