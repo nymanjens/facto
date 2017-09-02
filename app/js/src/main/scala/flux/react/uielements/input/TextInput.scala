@@ -5,26 +5,14 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom.html_<^._
+import org.scalajs.dom.html
 
 object TextInput {
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
     .initialState(State(value = ""))
-    .renderPS((context, props, state) =>
-      logExceptions {
-        <.input(
-          ^.tpe := "text",
-          ^.name := props.name,
-          ^.value := state.value,
-          ^.onChange ==> { (e: ReactEventFromInput) =>
-            LogExceptionsCallback {
-              val newString = e.target.value
-              context.modState(_.withValue(newString)).runNow()
-            }
-          }
-        )
-    })
+    .renderBackend[Backend]
     .build
 
   // **************** API ****************//
@@ -51,7 +39,6 @@ object TextInput {
 
   private type ThisCtorSummoner = CtorType.Summoner.Aux[Box[Props], Children.None, CtorType.Props]
   private type ThisMutableRef = MutableRef[Props, State, Backend, ThisCtorSummoner#CT]
-  private type Backend = Unit
   private type ThisComponentU = MountedImpure[Props, State, Backend]
 
   private final class Proxy(val component: ThisComponentU) extends InputBase.Proxy[String] {
@@ -67,5 +54,27 @@ object TextInput {
 
     override def registerListener(listener: InputBase.Listener[String]) = ???
     override def deregisterListener(listener: InputBase.Listener[String]) = ???
+
+    override def focus(): Unit = {
+      component.backend.theInput.focus()
+    }
+  }
+
+  private class Backend($ : BackendScope[Props, State]) {
+    var theInput: html.Input = _
+
+    def render(props: Props, state: State) = logExceptions {
+      <.input(
+        ^.tpe := "text",
+        ^.name := props.name,
+        ^.value := state.value,
+        ^.onChange ==> { (e: ReactEventFromInput) =>
+          LogExceptionsCallback {
+            val newString = e.target.value
+            $.modState(_.withValue(newString)).runNow()
+          }
+        }
+      ).ref(theInput = _)
+    }
   }
 }

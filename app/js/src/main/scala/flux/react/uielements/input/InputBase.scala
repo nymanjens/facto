@@ -33,6 +33,9 @@ object InputBase {
 
     final def valueIsValid: Boolean = value.isDefined
 
+    /** Focuses the input field. */
+    def focus(): Unit = ???
+
     def registerListener(listener: Listener[Value]): Unit
     def deregisterListener(listener: Listener[Value]): Unit
   }
