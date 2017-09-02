@@ -48,8 +48,7 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
           .anchorWithHrefTo(page)(
             ^^.ifThen(page.getClass == props.router.currentPage.getClass) { ^.className := "active" },
             <.i(^.className := iconClass),
-            <.span(^.dangerouslySetInnerHtml := label),
-            ^.onClick --> LogExceptionsCallback { searchInputRef().setValue("") }.void
+            <.span(^.dangerouslySetInnerHtml := label)
           )
 
       <.ul(
@@ -101,7 +100,6 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
       }
       def bindToPage(shortcut: String, page: Page): Unit =
         bind(shortcut, () => {
-          searchInputRef().setValue("")
           router.setPage(page)
         })
 
