@@ -2,7 +2,6 @@ package flux.react.app
 
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.I18n
-import common.LoggingUtils.logExceptions
 import common.time.Clock
 import flux.react.ReactVdomUtils.^^
 import flux.react.router.{Page, RouterContext}
@@ -28,7 +27,8 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
     .renderBackend[Backend]
-    .componentWillReceiveProps(scope => scope.backend.componentWillReceiveProps(scope.nextProps))
+    .componentWillMount(scope => scope.backend.configureKeyboardShortcuts(scope.props.router))
+    .componentWillReceiveProps(scope => scope.backend.configureKeyboardShortcuts(scope.nextProps.router))
     .build
 
   // **************** API ****************//
@@ -48,7 +48,8 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
           .anchorWithHrefTo(page)(
             ^^.ifThen(page.getClass == props.router.currentPage.getClass) { ^.className := "active" },
             <.i(^.className := iconClass),
-            <.span(^.dangerouslySetInnerHtml := label)
+            <.span(^.dangerouslySetInnerHtml := label),
+            ^.onClick --> LogExceptionsCallback { searchInputRef().setValue("") }.void
           )
 
       <.ul(
@@ -91,15 +92,18 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
       )
     }
 
-    def componentWillReceiveProps(nextProps: Props): Callback = LogExceptionsCallback {
-      implicit val router = nextProps.router
+    def configureKeyboardShortcuts(implicit router: RouterContext): Callback = LogExceptionsCallback {
       def bind(shortcut: String, runnable: () => Unit): Unit = {
         Mousetrap.bindGlobal(shortcut, e => {
           e.preventDefault()
           runnable()
         })
       }
-      def bindToPage(shortcut: String, page: Page): Unit = bind(shortcut, () => router.setPage(page))
+      def bindToPage(shortcut: String, page: Page): Unit =
+        bind(shortcut, () => {
+          searchInputRef().setValue("")
+          router.setPage(page)
+        })
 
       bindToPage("shift+alt+e", Page.Everything)
       bindToPage("shift+alt+a", Page.Everything)
