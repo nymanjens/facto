@@ -53,17 +53,17 @@ object MappedInputTest extends TestSuite {
       stringToLocalDateTime.backward(createDateTime(2017, APRIL, 3)) ==> "2017-04-03"
     }
 
-    "ValueTransformer.StringToTags.forward() works" - {
-      val stringToTags = MappedInput.ValueTransformer.StringToTags
-      stringToTags.forward("tag1, tag-2") ==> Some(Seq(Tag("tag1"), Tag("tag-2")))
-      stringToTags.forward("") ==> Some(Seq())
-      stringToTags.forward("a,]") ==> None
-      stringToTags.forward("]") ==> None
+    "ValueTransformer.StringSeqToTagSeq.forward() works" - {
+      val stringsToTags = MappedInput.ValueTransformer.StringSeqToTagSeq
+      stringsToTags.forward(Seq("tag1", "tag-2")) ==> Some(Seq(Tag("tag1"), Tag("tag-2")))
+      stringsToTags.forward(Seq("")) ==> Some(Seq())
+      stringsToTags.forward(Seq("a", "]")) ==> None
+      stringsToTags.forward(Seq("]")) ==> None
     }
 
-    "ValueTransformer.StringToTags.backward() works" - {
-      val stringToTags = MappedInput.ValueTransformer.StringToTags
-      stringToTags.backward(Seq(Tag("tag1"), Tag("tag-2"))) ==> "tag1, tag-2"
+    "ValueTransformer.StringSeqToTagSeq.backward() works" - {
+      val stringsToTags = MappedInput.ValueTransformer.StringSeqToTagSeq
+      stringsToTags.backward(Seq(Tag("tag1"), Tag("tag-2"))) ==> Seq("tag1", "tag-2")
     }
   }
 

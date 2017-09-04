@@ -191,16 +191,15 @@ object MappedInput {
       override def backward(value: LocalDateTime) = value.toLocalDate.toString
     }
 
-    object StringToTags extends ValueTransformer[String, Seq[Tag]] {
-      override def forward(string: String) = {
-        val tags = Tag.parseTagsString(string.trim)
-        if (tags.map(_.name).filterNot(Tag.isValidTagName).isEmpty) {
-          Some(tags)
+    object StringSeqToTagSeq extends ValueTransformer[Seq[String], Seq[Tag]] {
+      override def forward(stringSeq: Seq[String]) = {
+        if (stringSeq.forall(Tag.isValidTagName)) {
+          Some(stringSeq.map(Tag.apply))
         } else {
           None
         }
       }
-      override def backward(value: Seq[Tag]) = value.map(_.name).reduceOption(_ + ", " + _) getOrElse ""
+      override def backward(value: Seq[Tag]) = value.map(_.name)
     }
   }
 }
