@@ -47,7 +47,7 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
 
           | staticRuleFromPage(Page.Endowments, reactAppModule.endowments.apply _)
 
-          | staticRuleFromPage(Page.Summarygs, reactAppModule.everything.apply _)
+          | staticRuleFromPage(Page.Summary, reactAppModule.everything.apply _)
 
           | staticRuleFromPage(Page.TemplateList, reactAppModule.everything.apply _)
 
