@@ -18,11 +18,11 @@ object ReactTagInput {
     val component = JsComponent[js.Object, Children.None, Null](js.Dynamic.global.ReactTags.WithContext)
     component(
       Props(
-        tags = tags.map(toTagObject _).toJSArray,
+        tags = tags.map(toTagObject).toJSArray,
         suggestions = suggestions.toJSArray,
         handleAddition = handleAddition,
         handleDelete = handleDelete,
-        handleDrag = handleDrag.onDragged(_, _, _)
+        handleDrag = handleDrag.onDragged
       ).toJsObject)
   }
 
