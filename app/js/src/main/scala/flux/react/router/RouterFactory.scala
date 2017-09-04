@@ -47,6 +47,10 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
 
           | staticRuleFromPage(Page.Endowments, reactAppModule.endowments.apply _)
 
+          | staticRuleFromPage(Page.Summarygs, reactAppModule.everything.apply _)
+
+          | staticRuleFromPage(Page.TemplateList, reactAppModule.everything.apply _)
+
           | dynamicRuleFromPage(_ ~ returnToPath.caseClass[Page.NewTransactionGroup]) { (page, ctl) =>
             reactAppModule.transactionGroupForm.forCreate(page.returnToPath, ctl)
           }
