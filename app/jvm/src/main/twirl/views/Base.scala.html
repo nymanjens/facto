@@ -60,10 +60,6 @@
         assets = path => routes.Assets.versioned(path).toString,
         resourceExists = name => getClass.getResource(s"/public/$name") != null)
 
-    @* react-tag-input JavaScript and its dependencies *@
-    <script src="@routes.Assets.versioned("bower_components/react-dnd/dist/ReactDnD.min.js")"></script>
-    <script src="@routes.Assets.versioned("bower_components/react-tag-input/dist/ReactTags.min.js")"></script>
-
     @* startbootstrap-sb-admin-2 JavaScript *@
     <script src="@routes.Assets.versioned("bower_components/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js")"></script>
 

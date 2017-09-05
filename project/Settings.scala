@@ -49,6 +49,7 @@ object Settings {
     val bootstrap = "org.webjars" % "bootstrap" % versions.bootstrap
 
     val bootstrapTagsinput = "org.webjars.bower" % "bootstrap-tagsinput" % "0.8.0"
+    val reactTagInput = "org.webjars.npm" % "react-tag-input" % "4.7.2"
     val chartJs = "org.webjars" % "chartjs" % "2.1.3"
     val fontAwesome = "org.webjars" % "font-awesome" % "4.6.2"
     val laddaBootstrap = "org.webjars.bower" % "ladda-bootstrap" % "0.1.0"
@@ -119,6 +120,7 @@ object Settings {
     val bootstrap = s"${versions.bootstrap}/js/bootstrap.min.js"
     val reactWithAddons = "react-with-addons.js"
     val reactDom = "react-dom.js"
+    val reactDnd = "ReactDnD.min.js"
   }
 
   /** Dependencies for external JS libs that are bundled into a single .js file according to dependency order */
@@ -133,6 +135,8 @@ object Settings {
       webjarDeps.mousetrap / "mousetrap.min.js",
       webjarDeps.mousetrap / "plugins/global-bind/mousetrap-global-bind.min.js",
       webjarDeps.bootstrapTagsinput / "bootstrap-tagsinput.min.js" dependsOn files.bootstrap,
+      webjarDeps.reactTagInput / files.reactDnd,
+      webjarDeps.reactTagInput / "ReactTags.min.js" dependsOn files.reactDnd,
       webjarDeps.typeaheadJs / "typeahead.bundle.min.js" dependsOn files.bootstrap,
       webjarDeps.sha1 / "sha1.js",
       webjarDeps.laddaBootstrap / "spin.min.js",
