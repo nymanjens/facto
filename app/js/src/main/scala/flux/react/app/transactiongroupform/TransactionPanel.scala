@@ -32,9 +32,10 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   private val accountInputWithDefault = InputWithDefaultFromReference.forType[Account]
   private val categoryInputWithDefault = InputWithDefaultFromReference.forType[Category]
   private val stringInputWithDefault = InputWithDefaultFromReference.forType[String]
+  private val tagsInputWithDefault = InputWithDefaultFromReference.forType[Seq[String]]
 
   private val dateMappedInput = MappedInput.forTypes[String, LocalDateTime]
-  private val tagsMappedInput = MappedInput.forTypes[String, Seq[Tag]]
+  private val tagsMappedInput = MappedInput.forTypes[Seq[String], Seq[Tag]]
 
   private val reservoirSelectInput = SelectInput.forType[MoneyReservoir]
   private val accountSelectInput = bootstrap.SelectInput.forType[Account]
@@ -106,7 +107,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
     def category: InputBase.Proxy[Category] = fromBackendOrNull(_.categoryRef())
     def description: InputBase.Proxy[String] = fromBackendOrNull(_.descriptionRef())
     def detailDescription: InputBase.Proxy[String] = fromBackendOrNull(_.detailDescriptionRef())
-    def rawTags: InputBase.Proxy[String] = fromBackendOrNull(_.rawTagsRef())
+    def rawTags: InputBase.Proxy[Seq[String]] = fromBackendOrNull(_.rawTagsRef())
 
     def flowValueOrDefault: DatedMoney = maybeBackend match {
       case Some(backend) =>
@@ -366,20 +367,21 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         tagsMappedInput(
           ref = tagsRef,
           defaultValue = props.defaultValues.tags,
-          valueTransformer = MappedInput.ValueTransformer.StringToTags,
-          delegateRefFactory = stringInputWithDefault.ref _,
+          valueTransformer = MappedInput.ValueTransformer.StringSeqToTagSeq,
+          delegateRefFactory = tagsInputWithDefault.ref _,
           listener = AnythingChangedListener
         ) { mappedExtraProps =>
-          stringInputWithDefault.forOption(
+          tagsInputWithDefault.forOption(
             ref = mappedExtraProps.ref,
             defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawTags),
             startWithDefault = props.defaultValues.isEmpty,
-            delegateRefFactory = bootstrap.TextInput.ref _
+            delegateRefFactory = bootstrap.TagInput.ref _
           ) { extraProps =>
-            bootstrap.TextInput(
+            bootstrap.TagInput(
               ref = extraProps.ref,
               name = "tags",
               label = i18n("facto.tags"),
+              suggestions = Seq("abc", "abe", "xxe"),
               showErrorMessage = props.showErrorMessages,
               additionalValidator = mappedExtraProps.additionalValidator,
               defaultValue = mappedExtraProps.defaultValue,
