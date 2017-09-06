@@ -56,7 +56,8 @@ object MappedInputTest extends TestSuite {
     "ValueTransformer.StringSeqToTagSeq.forward() works" - {
       val stringsToTags = MappedInput.ValueTransformer.StringSeqToTagSeq
       stringsToTags.forward(Seq("tag1", "tag-2")) ==> Some(Seq(Tag("tag1"), Tag("tag-2")))
-      stringsToTags.forward(Seq("")) ==> Some(Seq())
+      stringsToTags.forward(Seq()) ==> Some(Seq())
+      stringsToTags.forward(Seq("")) ==> None
       stringsToTags.forward(Seq("a", "]")) ==> None
       stringsToTags.forward(Seq("]")) ==> None
     }
