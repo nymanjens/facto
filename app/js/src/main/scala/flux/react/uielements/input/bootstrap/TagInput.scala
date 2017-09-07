@@ -113,7 +113,8 @@ object TagInput {
             handleDelete = (pos, tag) => handleDelete(tag),
             handleDrag = handleDrag(_, _, _),
             delimiters = Seq(KeyCode.Enter, KeyCode.Tab, KeyCode.Space, /* comma */ 188, /* dot */ 190),
-            minQueryLength = 1
+            minQueryLength = 1,
+            classNames = Map("tagInputField" -> "form-control")
           ),
           <<.ifThen(errorMessage) { msg =>
             <.span(^.className := "help-block", msg)

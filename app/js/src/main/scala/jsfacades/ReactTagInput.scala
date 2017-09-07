@@ -17,7 +17,8 @@ object ReactTagInput {
             handleDelete: DeleteHandler,
             handleDrag: DragHandler,
             delimiters: Seq[Int] = Seq(KeyCode.Enter, KeyCode.Tab),
-            minQueryLength: Int = 2) = {
+            minQueryLength: Int = 2,
+            classNames: Map[String, String] = Map()) = {
     val component = JsComponent[js.Object, Children.None, Null](js.Dynamic.global.ReactTags.WithContext)
     component(
       Props(
@@ -27,7 +28,8 @@ object ReactTagInput {
         handleDelete = pos => handleDelete.onDeleted(pos, tags(pos)),
         handleDrag = handleDrag.onDragged,
         delimiters = delimiters.toJSArray,
-        minQueryLength = minQueryLength
+        minQueryLength = minQueryLength,
+        classNames = classNames.toJSDictionary
       ).toJsObject)
   }
 
@@ -48,7 +50,8 @@ object ReactTagInput {
                            handleDelete: js.Function1[Int, Unit],
                            handleDrag: js.Function3[String, Int, Int, Unit],
                            delimiters: js.Array[Int],
-                           minQueryLength: Int) {
+                           minQueryLength: Int,
+                           classNames: js.Dictionary[String]) {
     def toJsObject: js.Object =
       js.Dynamic.literal(
         tags = tags,
@@ -57,7 +60,8 @@ object ReactTagInput {
         handleDelete = handleDelete,
         handleDrag = handleDrag,
         delimiters = delimiters,
-        minQueryLength = minQueryLength
+        minQueryLength = minQueryLength,
+        classNames = classNames
       )
   }
 }
