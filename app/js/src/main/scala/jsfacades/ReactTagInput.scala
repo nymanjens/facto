@@ -22,11 +22,12 @@ object ReactTagInput {
     val component = JsComponent[js.Object, Children.None, Null](js.Dynamic.global.ReactTags.WithContext)
     component(
       Props(
-        tags = tags.map(toTagObject).toJSArray,
+        tags = tags.zipWithIndex.map { case (tag, i) => TagObject(i, tag) }.toJSArray,
         suggestions = suggestions.toJSArray,
         handleAddition = handleAddition,
         handleDelete = pos => handleDelete.onDeleted(pos, tags(pos)),
-        handleDrag = handleDrag.onDragged,
+        handleDrag = (tagObject, currentPos, newPos) =>
+          handleDrag.onDragged(tagObject.text, currentPos, newPos),
         delimiters = delimiters.toJSArray,
         minQueryLength = minQueryLength,
         classNames = classNames.toJSDictionary
@@ -41,14 +42,21 @@ object ReactTagInput {
     def onDragged(tag: String, currentPos: Int, newPos: Int): Unit
   }
 
-  private def toTagObject(tag: String): js.Object = js.Dynamic.literal(id = tag, text = tag)
-
   // **************** Private inner types ****************//
+  @js.native
+  private trait TagObject extends js.Object {
+    def id: Int = js.native
+    def text: String = js.native
+  }
+  private object TagObject {
+    def apply(id: Int, tag: String): js.Object = js.Dynamic.literal(id = id, text = tag)
+  }
+
   private case class Props(tags: js.Array[js.Object],
                            suggestions: js.Array[String],
                            handleAddition: js.Function1[String, Unit],
                            handleDelete: js.Function1[Int, Unit],
-                           handleDrag: js.Function3[String, Int, Int, Unit],
+                           handleDrag: js.Function3[TagObject, Int, Int, Unit],
                            delimiters: js.Array[Int],
                            minQueryLength: Int,
                            classNames: js.Dictionary[String]) {
