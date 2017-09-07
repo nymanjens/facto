@@ -9,6 +9,7 @@ import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom.html_<^._
 import jsfacades.ReactTagInput
+import org.scalajs.dom.ext.KeyCode
 
 import scala.collection.immutable.Seq
 
@@ -110,7 +111,10 @@ object TagInput {
             suggestions = props.suggestions,
             handleAddition = handleAddition,
             handleDelete = (pos, tag) => handleDelete(tag),
-            handleDrag = handleDrag(_, _, _)),
+            handleDrag = handleDrag(_, _, _),
+            delimiters = Seq(KeyCode.Enter, KeyCode.Tab, KeyCode.Space, /* comma */ 188, /* dot */ 190),
+            minQueryLength = 1
+          ),
           <<.ifThen(errorMessage) { msg =>
             <.span(^.className := "help-block", msg)
           }

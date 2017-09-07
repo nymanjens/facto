@@ -1,6 +1,7 @@
 package jsfacades
 
 import japgolly.scalajs.react.{Children, JsComponent}
+import org.scalajs.dom.ext.KeyCode
 
 import scala.collection.immutable.Seq
 import scala.scalajs.js
@@ -14,7 +15,9 @@ object ReactTagInput {
             suggestions: Seq[String],
             handleAddition: String => Unit,
             handleDelete: DeleteHandler,
-            handleDrag: DragHandler) = {
+            handleDrag: DragHandler,
+            delimiters: Seq[Int] = Seq(KeyCode.Enter, KeyCode.Tab),
+            minQueryLength: Int = 2) = {
     val component = JsComponent[js.Object, Children.None, Null](js.Dynamic.global.ReactTags.WithContext)
     component(
       Props(
@@ -22,7 +25,9 @@ object ReactTagInput {
         suggestions = suggestions.toJSArray,
         handleAddition = handleAddition,
         handleDelete = pos => handleDelete.onDeleted(pos, tags(pos)),
-        handleDrag = handleDrag.onDragged
+        handleDrag = handleDrag.onDragged,
+        delimiters = delimiters.toJSArray,
+        minQueryLength = minQueryLength
       ).toJsObject)
   }
 
@@ -41,13 +46,18 @@ object ReactTagInput {
                            suggestions: js.Array[String],
                            handleAddition: js.Function1[String, Unit],
                            handleDelete: js.Function1[Int, Unit],
-                           handleDrag: js.Function3[String, Int, Int, Unit]) {
+                           handleDrag: js.Function3[String, Int, Int, Unit],
+                           delimiters: js.Array[Int],
+                           minQueryLength: Int) {
     def toJsObject: js.Object =
       js.Dynamic.literal(
         tags = tags,
         suggestions = suggestions,
         handleAddition = handleAddition,
         handleDelete = handleDelete,
-        handleDrag = handleDrag)
+        handleDrag = handleDrag,
+        delimiters = delimiters,
+        minQueryLength = minQueryLength
+      )
   }
 }
