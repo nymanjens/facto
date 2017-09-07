@@ -109,7 +109,7 @@ object TagInput {
             tags = state.tags,
             suggestions = props.suggestions,
             handleAddition = handleAddition,
-            handleDelete = handleDelete,
+            handleDelete = (pos, tag) => handleDelete(tag),
             handleDrag = handleDrag(_, _, _)),
           <<.ifThen(errorMessage) { msg =>
             <.span(^.className := "help-block", msg)
