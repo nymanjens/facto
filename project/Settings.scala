@@ -135,7 +135,7 @@ object Settings {
       webjarDeps.mousetrap / "mousetrap.min.js",
       webjarDeps.mousetrap / "plugins/global-bind/mousetrap-global-bind.min.js",
       webjarDeps.bootstrapTagsinput / "bootstrap-tagsinput.min.js" dependsOn files.bootstrap,
-      webjarDeps.reactTagInput / files.reactDnd,
+      webjarDeps.reactTagInput / files.reactDnd dependsOn files.reactDom,
       webjarDeps.reactTagInput / "ReactTags.min.js" dependsOn files.reactDnd,
       webjarDeps.typeaheadJs / "typeahead.bundle.min.js" dependsOn files.bootstrap,
       webjarDeps.sha1 / "sha1.js",
