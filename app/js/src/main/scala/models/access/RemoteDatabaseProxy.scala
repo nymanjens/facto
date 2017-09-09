@@ -123,6 +123,7 @@ object RemoteDatabaseProxy {
       require(!isCallingListeners)
 
       localDatabase.applyModifications(modifications)
+      val saveFuture = localDatabase.save()
 
       for {
         modification <- modifications
@@ -130,7 +131,10 @@ object RemoteDatabaseProxy {
       } localAddModificationIds(modification.entityType) += modification.entityId
       val listeners1 = invokeListenersAsync(_.addedLocally(modifications))
 
-      await(apiClient.persistEntityModifications(modifications))
+      val apiFuture = apiClient.persistEntityModifications(modifications)
+
+      await(saveFuture)
+      await(apiFuture)
 
       for {
         modification <- modifications
