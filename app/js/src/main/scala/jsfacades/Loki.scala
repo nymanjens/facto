@@ -72,11 +72,11 @@ object Loki {
 
   @JSGlobal("LokiIndexedAdapter")
   @js.native
-  final class IndexedAdapter(name: String) extends Adapter
+  private final class IndexedAdapter(name: String) extends Adapter
 
   @JSGlobal("loki.LokiMemoryAdapter")
   @js.native
-  final class MemoryAdapter() extends Adapter
+  private final class MemoryAdapter() extends Adapter
 
   private def cryptoDecoratorAdapter(adapter: Adapter): js.Object = js.Dynamic.literal(
     saveDatabase = (dbName: String, dbString: String, callback: js.Function0[Unit]) => {
