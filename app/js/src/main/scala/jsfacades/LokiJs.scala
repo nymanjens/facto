@@ -1,8 +1,9 @@
 package jsfacades
 
+import common.LoggingUtils.logExceptions
 import common.GuavaReplacement.Iterables.getOnlyElement
 import common.ScalaUtils
-import jsfacades.Loki.Sorting.KeyWithDirection
+import jsfacades.LokiJs.Sorting.KeyWithDirection
 
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
@@ -12,7 +13,7 @@ import scala.scalajs.js.annotation.JSGlobal
 import scala2js.Converters._
 import scala2js.Scala2Js
 
-object Loki {
+object LokiJs {
   @JSGlobal("loki")
   @js.native
   private final class DatabaseFacade(dbName: String, args: js.Dictionary[js.Any] = null) extends js.Object {
@@ -48,23 +49,83 @@ object Loki {
   }
 
   object Database {
-    def persistent(dbName: String): Database = {
-      new Database(new DatabaseFacade(dbName, js.Dictionary("adapter" -> new IndexedAdapter(dbName))))
+    def persistent(dbName: String,
+                   persistedStringCodex: PersistedStringCodex = PersistedStringCodex.NullCodex): Database = {
+      new Database(
+        new DatabaseFacade(
+          dbName,
+          js.Dictionary("adapter" -> Adapter
+            .toAdapterDecorator(persistedStringCodex, new Adapter.IndexedAdapter(dbName)))))
     }
 
-    def inMemoryForTests(dbName: String): Database = {
+    def inMemoryForTests(
+        dbName: String,
+        persistedStringCodex: PersistedStringCodex = PersistedStringCodex.NullCodex): Database = {
       new Database(
-        new DatabaseFacade(dbName, js.Dictionary("adapter" -> new MemoryAdapter(), "env" -> "BROWSER")))
+        new DatabaseFacade(
+          dbName,
+          js.Dictionary(
+            "adapter" -> Adapter.toAdapterDecorator(persistedStringCodex, new Adapter.MemoryAdapter()),
+            "env" -> "BROWSER")))
     }
   }
 
-  @JSGlobal("LokiIndexedAdapter")
-  @js.native
-  final class IndexedAdapter(name: String) extends js.Object
+  trait PersistedStringCodex {
+    def encodeBeforeSave(dbString: String): String
+    def decodeAfterLoad(encodedString: String): Option[String]
+  }
+  object PersistedStringCodex {
+    object NullCodex extends PersistedStringCodex {
+      override def encodeBeforeSave(dbString: String) = dbString
+      override def decodeAfterLoad(encodedString: String) = Some(encodedString)
+    }
+  }
 
-  @JSGlobal("loki.LokiMemoryAdapter")
   @js.native
-  final class MemoryAdapter() extends js.Object
+  private trait Adapter extends js.Object {
+    def saveDatabase(dbName: String, dbString: String, callback: js.Function0[Unit]): Unit = js.native
+    def loadDatabase(dbName: String, callback: js.Function1[js.Any, Unit]): Unit = js.native
+  }
+  private object Adapter {
+    @JSGlobal("LokiIndexedAdapter")
+    @js.native
+    final class IndexedAdapter(name: String) extends Adapter
+
+    @JSGlobal("loki.LokiMemoryAdapter")
+    @js.native
+    final class MemoryAdapter() extends Adapter
+
+    def toAdapterDecorator(codex: PersistedStringCodex, delegate: Adapter): Adapter =
+      js.Dynamic
+        .literal(
+          saveDatabase = (dbName: String, dbString: String, callback: js.Function0[Unit]) =>
+            logExceptions {
+              delegate.saveDatabase(dbName, codex.encodeBeforeSave(dbString), callback)
+          },
+          loadDatabase = (dbName: String, callback: js.Function1[js.Any, Unit]) =>
+            logExceptions {
+              delegate.loadDatabase(
+                dbName,
+                callback = result => {
+                  result match {
+                    case null =>
+                      callback(result)
+                    case _ if result.getClass == classOf[String] =>
+                      val encodedDbString = result.asInstanceOf[String]
+
+                      codex.decodeAfterLoad(encodedDbString) match {
+                        case Some(dbString) => callback(dbString)
+                        case None => callback(null)
+                      }
+                    case _ =>
+                      callback(result)
+                  }
+                }
+              )
+          }
+        )
+        .asInstanceOf[Adapter]
+  }
 
   @js.native
   private trait CollectionFacade extends js.Object {
@@ -105,7 +166,7 @@ object Loki {
     def filterGreaterThan[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): ResultSet[E]
     def filterLessThan[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): ResultSet[E]
 
-    def sort(sorting: Loki.Sorting[E]): ResultSet[E]
+    def sort(sorting: LokiJs.Sorting[E]): ResultSet[E]
     def limit(quantity: Int): ResultSet[E]
 
     // **************** Terminal operations **************** //
@@ -114,7 +175,7 @@ object Loki {
     def count(): Int
   }
 
-  case class Sorting[E] private (private[Loki] val keysWithDirection: Seq[Sorting.KeyWithDirection[E]]) {
+  case class Sorting[E] private (private[LokiJs$] val keysWithDirection: Seq[Sorting.KeyWithDirection[E]]) {
     def thenAscBy[V: Ordering](key: Scala2Js.Key[V, E]): Sorting[E] = thenBy(key, isDesc = false)
     def thenDescBy[V: Ordering](key: Scala2Js.Key[V, E]): Sorting[E] = thenBy(key, isDesc = true)
     def thenBy[V: Ordering](key: Scala2Js.Key[V, E], isDesc: Boolean): Sorting[E] =
@@ -126,7 +187,7 @@ object Loki {
     def by[V: Ordering, E](key: Scala2Js.Key[V, E], isDesc: Boolean): Sorting[E] =
       Sorting(Seq(KeyWithDirection(key, isDesc = isDesc)))
 
-    private[Loki] case class KeyWithDirection[E](key: Scala2Js.Key[_, E], isDesc: Boolean)
+    private[LokiJs$] case class KeyWithDirection[E](key: Scala2Js.Key[_, E], isDesc: Boolean)
   }
 
   object ResultSet {
@@ -153,7 +214,7 @@ object Loki {
         new ResultSet.Impl[E](facade.find(js.Dictionary(pair._1 -> js.Dictionary(modifier -> pair._2))))
       }
 
-      override def sort(sorting: Loki.Sorting[E]) = {
+      override def sort(sorting: LokiJs.Sorting[E]) = {
         val properties: js.Array[js.Array[js.Any]] = {
           val result: Seq[js.Array[js.Any]] = sorting.keysWithDirection map
             (keyWithDirection => js.Array[js.Any](keyWithDirection.key.name, keyWithDirection.isDesc))
@@ -217,7 +278,7 @@ object Loki {
           jsValueOrdering.lt(jsMap(key.name), Scala2Js.toJs(value))
         })
 
-      override def sort(sorting: Loki.Sorting[E]) = {
+      override def sort(sorting: LokiJs.Sorting[E]) = {
         val newData: Seq[E] = {
           entities.sortWith(lt = (lhs, rhs) => {
             val lhsMap = Scala2Js.toJsMap(lhs)

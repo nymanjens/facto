@@ -2,12 +2,12 @@ package models
 
 import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
-
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
-import models.manager.{EntityTable, Entity, SlickEntityManager, ForwardingEntityManager}
-
+import models.manager.{Entity, EntityTable, ForwardingEntityManager, SlickEntityManager}
 import SlickUserManager.{Users, tableName}
+
+import scala.util.Random
 
 final class SlickUserManager
     extends ForwardingEntityManager[User, Users](
@@ -37,9 +37,12 @@ final class SlickUserManager
 object SlickUserManager {
   private val tableName: String = "USERS"
 
-  def createUser(loginName: String, password: String, name: String): User = {
-    User(loginName, SlickUserManager.hash(password), name)
-  }
+  def createUser(loginName: String, password: String, name: String): User =
+    User(
+      loginName = loginName,
+      passwordHash = SlickUserManager.hash(password),
+      name = name,
+      databaseEncryptionKey = Random.alphanumeric.take(100).mkString(""))
 
   def copyUserWithPassword(user: User, password: String): User = {
     user.copy(passwordHash = hash(password))
@@ -54,6 +57,9 @@ object SlickUserManager {
 
     def name = column[String]("name")
 
-    override def * = (loginName, passwordHash, name, id.?) <> (User.tupled, User.unapply)
+    def databaseEncryptionKey = column[String]("databaseEncryptionKey")
+
+    override def * =
+      (loginName, passwordHash, name, databaseEncryptionKey, id.?) <> (User.tupled, User.unapply)
   }
 }

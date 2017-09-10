@@ -1,6 +1,6 @@
 package flux.stores.entries
 
-import jsfacades.Loki
+import jsfacades.LokiJs
 import models.access.RemoteDatabaseProxy
 import models.accounting.{BalanceCheck, Transaction}
 import models.accounting.config.{Account, Config}
@@ -20,7 +20,7 @@ final class EndowmentEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
           .filter(Keys.Transaction.categoryCode, accountingConfig.constants.endowmentCategory.code)
           .filter(Keys.Transaction.beneficiaryAccountCode, account.code)
           .sort(
-            Loki.Sorting
+            LokiJs.Sorting
               .descBy(Keys.Transaction.consumedDate)
               .thenDescBy(Keys.Transaction.createdDate)
               .thenDescBy(Keys.id))

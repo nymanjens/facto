@@ -5,7 +5,7 @@ import scala2js.Keys
 import common.time.JavaTimeImplicits._
 import common.time.LocalDateTime
 import flux.stores.entries.CashFlowEntry.{BalanceCorrection, RegularEntry}
-import jsfacades.Loki
+import jsfacades.LokiJs
 import models.EntityAccess
 import models.access.RemoteDatabaseProxy
 import models.accounting.config.{Config, MoneyReservoir}
@@ -40,7 +40,7 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
               .newQuery[Transaction]()
               .filter(Keys.Transaction.moneyReservoirCode, moneyReservoir.code)
               .sort(
-                Loki.Sorting
+                LokiJs.Sorting
                   .descBy(Keys.Transaction.transactionDate)
                   .thenDescBy(Keys.Transaction.createdDate)
                   .thenDescBy(Keys.id))
@@ -56,7 +56,7 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
               .filter(Keys.BalanceCheck.moneyReservoirCode, moneyReservoir.code)
               .filterLessThan(Keys.BalanceCheck.checkDate, oldestTransDate)
               .sort(
-                Loki.Sorting
+                LokiJs.Sorting
                   .descBy(Keys.BalanceCheck.checkDate)
                   .thenDescBy(Keys.BalanceCheck.createdDate)
                   .thenDescBy(Keys.id))
@@ -76,7 +76,7 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
           .filter(Keys.BalanceCheck.moneyReservoirCode, moneyReservoir.code)
           .filterGreaterThan(Keys.BalanceCheck.checkDate, oldestBalanceDate)
           .sort(
-            Loki.Sorting
+            LokiJs.Sorting
               .ascBy(Keys.BalanceCheck.checkDate)
               .thenAscBy(Keys.BalanceCheck.createdDate)
               .thenAscBy(Keys.id))
@@ -89,7 +89,7 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
           .filter(Keys.Transaction.moneyReservoirCode, moneyReservoir.code)
           .filterGreaterThan(Keys.Transaction.transactionDate, oldestBalanceDate)
           .sort(
-            Loki.Sorting
+            LokiJs.Sorting
               .ascBy(Keys.Transaction.transactionDate)
               .thenAscBy(Keys.Transaction.createdDate)
               .thenAscBy(Keys.id))

@@ -4,7 +4,7 @@ import java.time.Month.JANUARY
 
 import common.testing.TestObjects._
 import common.time.LocalDateTimes.createDateTime
-import jsfacades.Loki
+import jsfacades.LokiJs
 import models.access.LocalDatabase
 import models.accounting.Transaction
 import models.manager.EntityModification
@@ -41,7 +41,7 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
         val data = db
           .newQuery[Transaction]()
           .filterLessThan(Keys.Transaction.createdDate, transaction3.createdDate)
-          .sort(Loki.Sorting.ascBy(Keys.Transaction.createdDate))
+          .sort(LokiJs.Sorting.ascBy(Keys.Transaction.createdDate))
           .data()
 
         data ==> Vector(transaction1, transaction2)
@@ -57,7 +57,7 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
         val data = db
           .newQuery[Transaction]()
           .filterGreaterThan(Keys.Transaction.createdDate, transaction1.createdDate)
-          .sort(Loki.Sorting.ascBy(Keys.Transaction.createdDate))
+          .sort(LokiJs.Sorting.ascBy(Keys.Transaction.createdDate))
           .data()
 
         data ==> Vector(transaction2, transaction3)
@@ -73,7 +73,9 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
         val data = db
           .newQuery[Transaction]()
           .sort(
-            Loki.Sorting.descBy(Keys.Transaction.transactionGroupId).thenAscBy(Keys.Transaction.createdDate))
+            LokiJs.Sorting
+              .descBy(Keys.Transaction.transactionGroupId)
+              .thenAscBy(Keys.Transaction.createdDate))
           .data()
 
         data ==> Vector(transaction3, transaction1, transaction2)

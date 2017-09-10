@@ -14,6 +14,7 @@ object Keys {
     val loginName = Scala2Js.Key[String, E]("loginName")
     val passwordHash = Scala2Js.Key[String, E]("passwordHash")
     val name = Scala2Js.Key[String, E]("name")
+    val databaseEncryptionKey = Scala2Js.Key[String, E]("databaseEncryptionKey")
   }
 
   object Transaction {

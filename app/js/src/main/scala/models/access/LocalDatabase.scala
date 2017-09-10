@@ -1,7 +1,9 @@
 package models.access
 
-import jsfacades.Loki
+import scala.async.Async.{async, await}
+import jsfacades.{CryptoJs, LokiJs}
 import models.manager.{Entity, EntityModification, EntityType}
+
 import scala2js.Converters._
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
@@ -14,9 +16,9 @@ import common.ScalaUtils.visibleForTesting
 @visibleForTesting
 trait LocalDatabase {
   // **************** Getters ****************//
-  def newQuery[E <: Entity: EntityType](): Loki.ResultSet[E]
+  def newQuery[E <: Entity: EntityType](): LokiJs.ResultSet[E]
   def getSingletonValue[V](key: SingletonKey[V]): Option[V]
-  def isEmpty(): Boolean
+  def isEmpty: Boolean
 
   // **************** Setters ****************//
   /**
@@ -38,19 +40,35 @@ trait LocalDatabase {
 @visibleForTesting
 object LocalDatabase {
 
-  def createFuture(): Future[LocalDatabase] = {
-    val lokiDb: Loki.Database = Loki.Database.persistent("facto-db")
-    lokiDb.loadDatabase() map (_ => new Impl(lokiDb))
+  def createFuture(encryptionSecret: String = ""): Future[LocalDatabase] = async {
+    val lokiDb: LokiJs.Database = LokiJs.Database.persistent(
+      "facto-db",
+      persistedStringCodex =
+        if (encryptionSecret.isEmpty) LokiJs.PersistedStringCodex.NullCodex
+        else new EncryptingCodex(encryptionSecret))
+    await(lokiDb.loadDatabase())
+    new Impl(lokiDb)
   }
 
-  def createStoredForTests(): Future[LocalDatabase] = {
-    val lokiDb: Loki.Database = Loki.Database.persistent("test-db")
-    lokiDb.loadDatabase() map (_ => new Impl(lokiDb))
+  def createStoredForTests(encryptionSecret: String = ""): Future[LocalDatabase] = async {
+    val lokiDb: LokiJs.Database = LokiJs.Database.persistent(
+      "test-db",
+      persistedStringCodex =
+        if (encryptionSecret.isEmpty) LokiJs.PersistedStringCodex.NullCodex
+        else new EncryptingCodex(encryptionSecret))
+    await(lokiDb.loadDatabase())
+    new Impl(lokiDb)
   }
 
-  def createInMemoryForTests(): Future[LocalDatabase] = {
-    val lokiDb: Loki.Database = Loki.Database.inMemoryForTests("facto-db")
-    lokiDb.loadDatabase() map (_ => new Impl(lokiDb))
+  def createInMemoryForTests(encryptionSecret: String = ""): Future[LocalDatabase] = async {
+    val lokiDb: LokiJs.Database =
+      LokiJs.Database.inMemoryForTests(
+        "facto-db",
+        persistedStringCodex =
+          if (encryptionSecret.isEmpty) LokiJs.PersistedStringCodex.NullCodex
+          else new EncryptingCodex(encryptionSecret))
+    await(lokiDb.loadDatabase())
+    new Impl(lokiDb)
   }
 
   private case class Singleton(key: String, value: js.Any)
@@ -75,9 +93,47 @@ object LocalDatabase {
     }
   }
 
-  private final class Impl(val lokiDb: Loki.Database) extends LocalDatabase {
-    val entityCollections: Map[EntityType.any, Loki.Collection[_]] = {
-      def getOrAddCollection[E <: Entity](implicit entityType: EntityType[E]): Loki.Collection[E] = {
+  private final class EncryptingCodex(secret: String) extends LokiJs.PersistedStringCodex {
+    private val decodedPrefix = "DECODED"
+
+    override def encodeBeforeSave(dbString: String) = {
+      val millis1 = System.currentTimeMillis()
+      println(s"  Encrypting ${dbString.length / 1e6}Mb String...")
+      val result =
+        CryptoJs.RC4Drop.encrypt(stringToEncrypt = decodedPrefix + dbString, password = secret).toString()
+      val millis2 = System.currentTimeMillis()
+      println(s"  Encrypting ${dbString.length / 1e6}Mb String: Done after ${(millis2 - millis1) / 1e3}s")
+      result
+    }
+
+    override def decodeAfterLoad(encodedString: String) = {
+      val millis1 = System.currentTimeMillis()
+      println(s"  Decrypting ${encodedString.length / 1e6}Mb String...")
+      val decoded =
+        try {
+          CryptoJs.RC4Drop
+            .decrypt(stringToDecrypt = encodedString, password = secret)
+            .toString(CryptoJs.Encoding.Utf8)
+        } catch {
+          case t: Throwable =>
+            println(s"  Caught exception while decoding database string: $t")
+            ""
+        }
+      val millis2 = System.currentTimeMillis()
+      println(
+        s"  Decrypting ${encodedString.length / 1e6}Mb String: Done after ${(millis2 - millis1) / 1e3}s")
+      if (decoded.startsWith(decodedPrefix)) {
+        Some(decoded.substring(decodedPrefix.length))
+      } else {
+        println(s"  Failed to decode database string: ${encodedString.substring(0, 10)}")
+        None
+      }
+    }
+  }
+
+  private final class Impl(val lokiDb: LokiJs.Database) extends LocalDatabase {
+    val entityCollections: Map[EntityType.any, LokiJs.Collection[_]] = {
+      def getOrAddCollection[E <: Entity](implicit entityType: EntityType[E]): LokiJs.Collection[E] = {
         // TODO: Add primary indices
         lokiDb.getOrAddCollection[E](s"entities_${entityType.name}")
       }
@@ -86,10 +142,11 @@ object LocalDatabase {
       }
     }.toMap
     // TODO: Add primary index on key
-    val singletonCollection: Loki.Collection[Singleton] = lokiDb.getOrAddCollection[Singleton](s"singletons")
+    val singletonCollection: LokiJs.Collection[Singleton] =
+      lokiDb.getOrAddCollection[Singleton](s"singletons")
 
     // **************** Getters ****************//
-    override def newQuery[E <: Entity: EntityType](): Loki.ResultSet[E] = {
+    override def newQuery[E <: Entity: EntityType](): LokiJs.ResultSet[E] = {
       entityCollectionForImplicitType.chain()
     }
 
@@ -99,7 +156,7 @@ object LocalDatabase {
       value.map(v => Scala2Js.toScala[V](v.value))
     }
 
-    override def isEmpty(): Boolean = {
+    override def isEmpty: Boolean = {
       allCollections.toStream.filter(_.chain().count() != 0).isEmpty
     }
 
@@ -138,7 +195,7 @@ object LocalDatabase {
     override def addAll[E <: Entity: EntityType](entities: Seq[E]): Unit = {
       for (entity <- entities) {
         newQuery[E]().findOne(Keys.id, entity.id) match {
-          case Some(entity) => // do nothing
+          case Some(_) => // do nothing
           case None => entityCollectionForImplicitType.insert(entity)
         }
       }
@@ -154,23 +211,27 @@ object LocalDatabase {
         ))
     }
 
-    override def save(): Future[Unit] = {
-      lokiDb.saveDatabase()
+    override def save(): Future[Unit] = async {
+      println("  Saving database...")
+      await(lokiDb.saveDatabase())
+      println("  Saving database done.")
     }
 
-    override def clear(): Future[Unit] = {
+    override def clear(): Future[Unit] = async {
+      println("  Clearing database...")
       for (collection <- allCollections) {
         collection.clear()
       }
-      lokiDb.saveDatabase()
+      await(lokiDb.saveDatabase())
+      println("  Clearing database done.")
     }
 
     // **************** Private helper methods ****************//
-    private def allCollections: Seq[Loki.Collection[_]] =
+    private def allCollections: Seq[LokiJs.Collection[_]] =
       entityCollections.values.toList :+ singletonCollection
 
-    private def entityCollectionForImplicitType[E <: Entity: EntityType]: Loki.Collection[E] = {
-      entityCollections(implicitly[EntityType[E]]).asInstanceOf[Loki.Collection[E]]
+    private def entityCollectionForImplicitType[E <: Entity: EntityType]: LokiJs.Collection[E] = {
+      entityCollections(implicitly[EntityType[E]]).asInstanceOf[LokiJs.Collection[E]]
     }
   }
 }

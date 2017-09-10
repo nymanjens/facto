@@ -1,15 +1,16 @@
 package flux
 
 import api.ScalaJsApi.GetInitialDataResponse
+import api.ScalaJsApiClient
 import flux.react.router.Page
-import flux.stores.entries.CashFlowEntriesStoreFactory
 import japgolly.scalajs.react.extra.router.Router
 import models.User
 import models.access.RemoteDatabaseProxy
 import models.accounting.config.Config
 
 final class FactoAppModule(implicit getInitialDataResponse: GetInitialDataResponse,
-                           remoteDatabaseProxy: RemoteDatabaseProxy) {
+                           remoteDatabaseProxy: RemoteDatabaseProxy,
+                           scalaJsApiClient: ScalaJsApiClient) {
 
   // Unpack arguments
   implicit private val accountingConfig: Config = getInitialDataResponse.accountingConfig
