@@ -83,7 +83,7 @@ private[tests] object LocalDatabaseTest extends ManualTestSuite {
         db.addAll(Seq(testBalanceCheckWithId))
         db.addAll(Seq(testExchangeRateMeasurementWithId))
 
-        db.newQuery[User]().data() ==> Seq(testUser)
+        db.newQuery[User]().data() ==> Seq(testUser.copy(passwordHash = "<redacted>"))
         db.newQuery[Transaction]().data() ==> Seq(testTransactionWithId)
         db.newQuery[TransactionGroup]().data() ==> Seq(testTransactionGroupWithId)
         db.newQuery[BalanceCheck]().data() ==> Seq(testBalanceCheckWithId)
