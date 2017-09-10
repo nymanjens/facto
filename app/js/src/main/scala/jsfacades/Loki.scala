@@ -51,16 +51,14 @@ object Loki {
   object Database {
     def persistent(dbName: String): Database = {
       new Database(
-        new DatabaseFacade(
-          dbName,
-          js.Dictionary("adapter" -> cryptoDecoratorAdapter(new IndexedAdapter(dbName)))))
+        new DatabaseFacade(dbName, js.Dictionary("adapter" -> cryptoDecorator(new IndexedAdapter(dbName)))))
     }
 
     def inMemoryForTests(dbName: String): Database = {
       new Database(
         new DatabaseFacade(
           dbName,
-          js.Dictionary("adapter" -> cryptoDecoratorAdapter(new MemoryAdapter()), "env" -> "BROWSER")))
+          js.Dictionary("adapter" -> cryptoDecorator(new MemoryAdapter()), "env" -> "BROWSER")))
     }
   }
 
@@ -78,7 +76,8 @@ object Loki {
   @js.native
   private final class MemoryAdapter() extends Adapter
 
-  private def cryptoDecoratorAdapter(adapter: Adapter): js.Object = js.Dynamic.literal(
+  /** Returns an adapter that is a decorator for the given adapter that encrypts and decrypts the database. */
+  private def cryptoDecorator(adapter: Adapter): js.Object = js.Dynamic.literal(
     saveDatabase = (dbName: String, dbString: String, callback: js.Function0[Unit]) => {
       println(s"****** saved $dbName: <<<<<${dbString.substring(0, 10)}... ${dbString.length} chars>>>>> ")
       adapter.saveDatabase(dbName, "XXX" + dbString, callback)
