@@ -1,6 +1,6 @@
 package models.accounting.money
 
-import jsfacades.Loki
+import jsfacades.LokiJs
 import models.access.RemoteDatabaseProxy
 import models.manager.BaseJsEntityManager
 
@@ -14,7 +14,7 @@ final class JsExchangeRateMeasurementManager(implicit database: RemoteDatabasePr
     database
       .newQuery[ExchangeRateMeasurement]()
       .filter(Keys.ExchangeRateMeasurement.foreignCurrencyCode, currency.code)
-      .sort(Loki.Sorting.ascBy(Keys.ExchangeRateMeasurement.date))
+      .sort(LokiJs.Sorting.ascBy(Keys.ExchangeRateMeasurement.date))
       .data()
   }
 }

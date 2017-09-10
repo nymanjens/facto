@@ -1,7 +1,7 @@
 package models.access
 
 import scala.async.Async.{async, await}
-import jsfacades.{CryptoJs, Loki}
+import jsfacades.{CryptoJs, LokiJs}
 import models.manager.{Entity, EntityModification, EntityType}
 
 import scala2js.Converters._
@@ -16,7 +16,7 @@ import common.ScalaUtils.visibleForTesting
 @visibleForTesting
 trait LocalDatabase {
   // **************** Getters ****************//
-  def newQuery[E <: Entity: EntityType](): Loki.ResultSet[E]
+  def newQuery[E <: Entity: EntityType](): LokiJs.ResultSet[E]
   def getSingletonValue[V](key: SingletonKey[V]): Option[V]
   def isEmpty: Boolean
 
@@ -41,31 +41,31 @@ trait LocalDatabase {
 object LocalDatabase {
 
   def createFuture(encryptionSecret: String = ""): Future[LocalDatabase] = async {
-    val lokiDb: Loki.Database = Loki.Database.persistent(
+    val lokiDb: LokiJs.Database = LokiJs.Database.persistent(
       "facto-db",
       persistedStringCodex =
-        if (encryptionSecret.isEmpty) Loki.PersistedStringCodex.NullCodex
+        if (encryptionSecret.isEmpty) LokiJs.PersistedStringCodex.NullCodex
         else new EncryptingCodex(encryptionSecret))
     await(lokiDb.loadDatabase())
     new Impl(lokiDb)
   }
 
   def createStoredForTests(encryptionSecret: String = ""): Future[LocalDatabase] = async {
-    val lokiDb: Loki.Database = Loki.Database.persistent(
+    val lokiDb: LokiJs.Database = LokiJs.Database.persistent(
       "test-db",
       persistedStringCodex =
-        if (encryptionSecret.isEmpty) Loki.PersistedStringCodex.NullCodex
+        if (encryptionSecret.isEmpty) LokiJs.PersistedStringCodex.NullCodex
         else new EncryptingCodex(encryptionSecret))
     await(lokiDb.loadDatabase())
     new Impl(lokiDb)
   }
 
   def createInMemoryForTests(encryptionSecret: String = ""): Future[LocalDatabase] = async {
-    val lokiDb: Loki.Database =
-      Loki.Database.inMemoryForTests(
+    val lokiDb: LokiJs.Database =
+      LokiJs.Database.inMemoryForTests(
         "facto-db",
         persistedStringCodex =
-          if (encryptionSecret.isEmpty) Loki.PersistedStringCodex.NullCodex
+          if (encryptionSecret.isEmpty) LokiJs.PersistedStringCodex.NullCodex
           else new EncryptingCodex(encryptionSecret))
     await(lokiDb.loadDatabase())
     new Impl(lokiDb)
@@ -93,7 +93,7 @@ object LocalDatabase {
     }
   }
 
-  private final class EncryptingCodex(secret: String) extends Loki.PersistedStringCodex {
+  private final class EncryptingCodex(secret: String) extends LokiJs.PersistedStringCodex {
     private val decodedPrefix = "DECODED"
 
     override def encodeBeforeSave(dbString: String) = {
@@ -131,9 +131,9 @@ object LocalDatabase {
     }
   }
 
-  private final class Impl(val lokiDb: Loki.Database) extends LocalDatabase {
-    val entityCollections: Map[EntityType.any, Loki.Collection[_]] = {
-      def getOrAddCollection[E <: Entity](implicit entityType: EntityType[E]): Loki.Collection[E] = {
+  private final class Impl(val lokiDb: LokiJs.Database) extends LocalDatabase {
+    val entityCollections: Map[EntityType.any, LokiJs.Collection[_]] = {
+      def getOrAddCollection[E <: Entity](implicit entityType: EntityType[E]): LokiJs.Collection[E] = {
         // TODO: Add primary indices
         lokiDb.getOrAddCollection[E](s"entities_${entityType.name}")
       }
@@ -142,10 +142,11 @@ object LocalDatabase {
       }
     }.toMap
     // TODO: Add primary index on key
-    val singletonCollection: Loki.Collection[Singleton] = lokiDb.getOrAddCollection[Singleton](s"singletons")
+    val singletonCollection: LokiJs.Collection[Singleton] =
+      lokiDb.getOrAddCollection[Singleton](s"singletons")
 
     // **************** Getters ****************//
-    override def newQuery[E <: Entity: EntityType](): Loki.ResultSet[E] = {
+    override def newQuery[E <: Entity: EntityType](): LokiJs.ResultSet[E] = {
       entityCollectionForImplicitType.chain()
     }
 
@@ -226,11 +227,11 @@ object LocalDatabase {
     }
 
     // **************** Private helper methods ****************//
-    private def allCollections: Seq[Loki.Collection[_]] =
+    private def allCollections: Seq[LokiJs.Collection[_]] =
       entityCollections.values.toList :+ singletonCollection
 
-    private def entityCollectionForImplicitType[E <: Entity: EntityType]: Loki.Collection[E] = {
-      entityCollections(implicitly[EntityType[E]]).asInstanceOf[Loki.Collection[E]]
+    private def entityCollectionForImplicitType[E <: Entity: EntityType]: LokiJs.Collection[E] = {
+      entityCollections(implicitly[EntityType[E]]).asInstanceOf[LokiJs.Collection[E]]
     }
   }
 }

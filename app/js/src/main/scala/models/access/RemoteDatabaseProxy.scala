@@ -6,7 +6,7 @@ import scala.scalajs.js
 import api.ScalaJsApiClient
 import common.LoggingUtils.{logExceptions, LogExceptionsCallback}
 import common.ScalaUtils.visibleForTesting
-import jsfacades.Loki
+import jsfacades.LokiJs
 import models.access.SingletonKey._
 import models.manager.{Entity, EntityModification, EntityType}
 
@@ -19,7 +19,7 @@ import scala2js.Converters._
 trait RemoteDatabaseProxy {
 
   // **************** Getters ****************//
-  def newQuery[E <: Entity: EntityType](): Loki.ResultSet[E]
+  def newQuery[E <: Entity: EntityType](): LokiJs.ResultSet[E]
 
   /** Returns true if there are local pending `Add` modifications for the given entity. Note that only its id is used. */
   def hasLocalAddModifications[E <: Entity: EntityType](entity: E): Boolean
@@ -111,7 +111,7 @@ object RemoteDatabaseProxy {
     private var isCallingListeners: Boolean = false
 
     // **************** Getters ****************//
-    override def newQuery[E <: Entity: EntityType](): Loki.ResultSet[E] = {
+    override def newQuery[E <: Entity: EntityType](): LokiJs.ResultSet[E] = {
       localDatabase.newQuery[E]()
     }
 

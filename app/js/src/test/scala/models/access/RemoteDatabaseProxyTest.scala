@@ -2,7 +2,7 @@ package models.access
 
 import common.testing.TestObjects._
 import common.testing.{FakeScalaJsApiClient, ModificationsBuffer}
-import jsfacades.Loki
+import jsfacades.LokiJs
 import models.accounting.Transaction
 import models.manager.EntityType.TransactionType
 import models.manager.{Entity, EntityModification, EntityType}
@@ -125,7 +125,7 @@ object RemoteDatabaseProxyTest extends TestSuite {
 
     // **************** Getters ****************//
     override def newQuery[E <: Entity: EntityType]() = {
-      new Loki.ResultSet.Fake(modificationsBuffer.getAllEntitiesOfType[E])
+      new LokiJs.ResultSet.Fake(modificationsBuffer.getAllEntitiesOfType[E])
     }
     override def getSingletonValue[V](key: SingletonKey[V]) = {
       singletonMap.get(key) map key.valueConverter.toScala

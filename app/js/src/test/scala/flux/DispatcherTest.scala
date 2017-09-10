@@ -5,7 +5,7 @@ import java.lang
 import common.testing.TestObjects._
 import common.testing.{FakeScalaJsApiClient, ModificationsBuffer}
 import flux.action.{Action, Dispatcher}
-import jsfacades.Loki
+import jsfacades.LokiJs
 import models.accounting.Transaction
 import models.manager.EntityType.TransactionType
 import models.manager.{Entity, EntityModification, EntityType}

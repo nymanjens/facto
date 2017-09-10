@@ -1,6 +1,6 @@
 package flux.stores.entries
 
-import jsfacades.Loki
+import jsfacades.LokiJs
 import models.EntityAccess
 import models.access.RemoteDatabaseProxy
 import models.accounting.{BalanceCheck, Transaction}
@@ -22,7 +22,7 @@ final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProx
         database
           .newQuery[Transaction]()
           .sort(
-            Loki.Sorting
+            LokiJs.Sorting
               .ascBy(Keys.Transaction.transactionDate)
               .thenAscBy(Keys.Transaction.createdDate)
               .thenAscBy(Keys.id))

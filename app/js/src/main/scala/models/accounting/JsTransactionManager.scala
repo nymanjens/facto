@@ -1,6 +1,6 @@
 package models.accounting
 
-import jsfacades.Loki
+import jsfacades.LokiJs
 import models.access.RemoteDatabaseProxy
 import models.manager.BaseJsEntityManager
 import scala2js.Converters._
@@ -15,7 +15,7 @@ final class JsTransactionManager(implicit database: RemoteDatabaseProxy)
     database
       .newQuery[Transaction]()
       .filter(Keys.Transaction.transactionGroupId, groupId)
-      .sort(Loki.Sorting.ascBy(Keys.id))
+      .sort(LokiJs.Sorting.ascBy(Keys.id))
       .data()
   }
 }

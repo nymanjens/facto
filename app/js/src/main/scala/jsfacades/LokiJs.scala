@@ -3,7 +3,7 @@ package jsfacades
 import common.LoggingUtils.logExceptions
 import common.GuavaReplacement.Iterables.getOnlyElement
 import common.ScalaUtils
-import jsfacades.Loki.Sorting.KeyWithDirection
+import jsfacades.LokiJs.Sorting.KeyWithDirection
 
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
@@ -13,7 +13,7 @@ import scala.scalajs.js.annotation.JSGlobal
 import scala2js.Converters._
 import scala2js.Scala2Js
 
-object Loki {
+object LokiJs {
   @JSGlobal("loki")
   @js.native
   private final class DatabaseFacade(dbName: String, args: js.Dictionary[js.Any] = null) extends js.Object {
@@ -166,7 +166,7 @@ object Loki {
     def filterGreaterThan[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): ResultSet[E]
     def filterLessThan[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): ResultSet[E]
 
-    def sort(sorting: Loki.Sorting[E]): ResultSet[E]
+    def sort(sorting: LokiJs.Sorting[E]): ResultSet[E]
     def limit(quantity: Int): ResultSet[E]
 
     // **************** Terminal operations **************** //
@@ -175,7 +175,7 @@ object Loki {
     def count(): Int
   }
 
-  case class Sorting[E] private (private[Loki] val keysWithDirection: Seq[Sorting.KeyWithDirection[E]]) {
+  case class Sorting[E] private (private[LokiJs$] val keysWithDirection: Seq[Sorting.KeyWithDirection[E]]) {
     def thenAscBy[V: Ordering](key: Scala2Js.Key[V, E]): Sorting[E] = thenBy(key, isDesc = false)
     def thenDescBy[V: Ordering](key: Scala2Js.Key[V, E]): Sorting[E] = thenBy(key, isDesc = true)
     def thenBy[V: Ordering](key: Scala2Js.Key[V, E], isDesc: Boolean): Sorting[E] =
@@ -187,7 +187,7 @@ object Loki {
     def by[V: Ordering, E](key: Scala2Js.Key[V, E], isDesc: Boolean): Sorting[E] =
       Sorting(Seq(KeyWithDirection(key, isDesc = isDesc)))
 
-    private[Loki] case class KeyWithDirection[E](key: Scala2Js.Key[_, E], isDesc: Boolean)
+    private[LokiJs$] case class KeyWithDirection[E](key: Scala2Js.Key[_, E], isDesc: Boolean)
   }
 
   object ResultSet {
@@ -214,7 +214,7 @@ object Loki {
         new ResultSet.Impl[E](facade.find(js.Dictionary(pair._1 -> js.Dictionary(modifier -> pair._2))))
       }
 
-      override def sort(sorting: Loki.Sorting[E]) = {
+      override def sort(sorting: LokiJs.Sorting[E]) = {
         val properties: js.Array[js.Array[js.Any]] = {
           val result: Seq[js.Array[js.Any]] = sorting.keysWithDirection map
             (keyWithDirection => js.Array[js.Any](keyWithDirection.key.name, keyWithDirection.isDesc))
@@ -278,7 +278,7 @@ object Loki {
           jsValueOrdering.lt(jsMap(key.name), Scala2Js.toJs(value))
         })
 
-      override def sort(sorting: Loki.Sorting[E]) = {
+      override def sort(sorting: LokiJs.Sorting[E]) = {
         val newData: Seq[E] = {
           entities.sortWith(lt = (lhs, rhs) => {
             val lhsMap = Scala2Js.toJsMap(lhs)

@@ -15,11 +15,11 @@ import scala2js.Keys
 object LokiResultSetFakeTest extends TestSuite {
 
   override def tests = TestSuite {
-    "Loki.ResultSet.Fake" - {
+    "LokiJs.ResultSet.Fake" - {
       val transaction1 = createTransaction(id = 1, categoryCode = "catA", day = 19)
       val transaction2 = createTransaction(id = 22, categoryCode = "catB", day = 18)
       val transaction3 = createTransaction(id = 33, categoryCode = "catB", day = 7)
-      val resultSet = new Loki.ResultSet.Fake(Seq(transaction3, transaction1, transaction2))
+      val resultSet = new LokiJs.ResultSet.Fake(Seq(transaction3, transaction1, transaction2))
 
       "filter()" - {
         resultSet.filter(Keys.Transaction.categoryCode, "catB").data().toSet ==> Set(
@@ -37,15 +37,21 @@ object LokiResultSetFakeTest extends TestSuite {
           Set(transaction3)
       }
       "sort()" - {
-        resultSet.sort(Loki.Sorting.ascBy(Keys.id)).data() ==> Seq(transaction1, transaction2, transaction3)
-        resultSet.sort(Loki.Sorting.descBy(Keys.id)).data() ==> Seq(transaction3, transaction2, transaction1)
-        resultSet.sort(Loki.Sorting.ascBy(Keys.Transaction.categoryCode).thenDescBy(Keys.id)).data() ==>
+        resultSet.sort(LokiJs.Sorting.ascBy(Keys.id)).data() ==> Seq(
+          transaction1,
+          transaction2,
+          transaction3)
+        resultSet.sort(LokiJs.Sorting.descBy(Keys.id)).data() ==> Seq(
+          transaction3,
+          transaction2,
+          transaction1)
+        resultSet.sort(LokiJs.Sorting.ascBy(Keys.Transaction.categoryCode).thenDescBy(Keys.id)).data() ==>
           Seq(transaction1, transaction3, transaction2)
-        resultSet.sort(Loki.Sorting.ascBy(Keys.Transaction.createdDate)).data() ==>
+        resultSet.sort(LokiJs.Sorting.ascBy(Keys.Transaction.createdDate)).data() ==>
           Seq(transaction3, transaction2, transaction1)
       }
       "limit()" - {
-        resultSet.sort(Loki.Sorting.ascBy(Keys.id)).limit(2).data() ==> Seq(transaction1, transaction2)
+        resultSet.sort(LokiJs.Sorting.ascBy(Keys.id)).limit(2).data() ==> Seq(transaction1, transaction2)
       }
       "findOne()" - {
         resultSet.findOne(Keys.id, 22L) ==> Some(transaction2)
