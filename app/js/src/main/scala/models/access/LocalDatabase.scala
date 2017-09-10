@@ -39,17 +39,18 @@ trait LocalDatabase {
 object LocalDatabase {
 
   def createFuture(): Future[LocalDatabase] = {
-    val lokiDb: Loki.Database = Loki.Database.persistent("facto-db")
+    val lokiDb: Loki.Database = Loki.Database.persistent("facto-db", persistedStringCodex = EncryptingCodex)
     lokiDb.loadDatabase() map (_ => new Impl(lokiDb))
   }
 
   def createStoredForTests(): Future[LocalDatabase] = {
-    val lokiDb: Loki.Database = Loki.Database.persistent("test-db")
+    val lokiDb: Loki.Database = Loki.Database.persistent("test-db", persistedStringCodex = EncryptingCodex)
     lokiDb.loadDatabase() map (_ => new Impl(lokiDb))
   }
 
   def createInMemoryForTests(): Future[LocalDatabase] = {
-    val lokiDb: Loki.Database = Loki.Database.inMemoryForTests("facto-db")
+    val lokiDb: Loki.Database =
+      Loki.Database.inMemoryForTests("facto-db", persistedStringCodex = EncryptingCodex)
     lokiDb.loadDatabase() map (_ => new Impl(lokiDb))
   }
 
@@ -72,6 +73,21 @@ object LocalDatabase {
     object Scala2JsKeys {
       val key = Scala2Js.Key[String, Singleton]("key")
       val value = Scala2Js.Key[js.Any, Singleton]("value")
+    }
+  }
+
+  private object EncryptingCodex extends Loki.PersistedStringCodex {
+    private val decodedPrefix = "DECODED"
+
+    override def encodeBeforeSave(dbString: String) = {
+      decodedPrefix + dbString
+    }
+    override def decodeAfterLoad(encodedString: String) = {
+      if (encodedString.startsWith(decodedPrefix)) {
+        Some(encodedString.substring(decodedPrefix.length))
+      } else {
+        None
+      }
     }
   }
 
