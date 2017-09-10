@@ -175,7 +175,7 @@ object LokiJs {
     def count(): Int
   }
 
-  case class Sorting[E] private (private[LokiJs$] val keysWithDirection: Seq[Sorting.KeyWithDirection[E]]) {
+  case class Sorting[E] private (private[LokiJs] val keysWithDirection: Seq[KeyWithDirection[E]]) {
     def thenAscBy[V: Ordering](key: Scala2Js.Key[V, E]): Sorting[E] = thenBy(key, isDesc = false)
     def thenDescBy[V: Ordering](key: Scala2Js.Key[V, E]): Sorting[E] = thenBy(key, isDesc = true)
     def thenBy[V: Ordering](key: Scala2Js.Key[V, E], isDesc: Boolean): Sorting[E] =
@@ -187,7 +187,7 @@ object LokiJs {
     def by[V: Ordering, E](key: Scala2Js.Key[V, E], isDesc: Boolean): Sorting[E] =
       Sorting(Seq(KeyWithDirection(key, isDesc = isDesc)))
 
-    private[LokiJs$] case class KeyWithDirection[E](key: Scala2Js.Key[_, E], isDesc: Boolean)
+    private[LokiJs] case class KeyWithDirection[E](key: Scala2Js.Key[_, E], isDesc: Boolean)
   }
 
   object ResultSet {
@@ -284,7 +284,7 @@ object LokiJs {
             val lhsMap = Scala2Js.toJsMap(lhs)
             val rhsMap = Scala2Js.toJsMap(rhs)
             val results = for {
-              Sorting.KeyWithDirection(key, isDesc) <- sorting.keysWithDirection
+              KeyWithDirection(key, isDesc) <- sorting.keysWithDirection
               if !jsValueOrdering.equiv(lhsMap(key.name), rhsMap(key.name))
             } yield {
               if (jsValueOrdering.lt(lhsMap(key.name), rhsMap(key.name))) {
