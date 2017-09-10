@@ -163,6 +163,7 @@ object LokiJs {
   trait ResultSet[E] {
     // **************** Intermediary operations **************** //
     def filter[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): ResultSet[E]
+    def filterNot[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): ResultSet[E]
     def filterGreaterThan[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): ResultSet[E]
     def filterLessThan[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): ResultSet[E]
 
@@ -201,6 +202,9 @@ object LokiJs {
       override def filter[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V) = {
         new ResultSet.Impl[E](facade.find(js.Dictionary(Scala2Js.Key.toJsPair(key -> value))))
       }
+
+      override def filterNot[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): ResultSet[E] =
+        filterWithModifier("$ne", key, value)
 
       override def filterGreaterThan[V: Scala2Js.Converter](key: Scala2Js.Key[V, E],
                                                             value: V): ResultSet[E] =
@@ -261,6 +265,11 @@ object LokiJs {
       // **************** Intermediary operations **************** //
       override def filter[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V) =
         new ResultSet.Fake(entities.filter { entity =>
+          val jsMap = Scala2Js.toJsMap(entity)
+          jsMap(key.name) == Scala2Js.toJs(value)
+        })
+      override def filterNot[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V) =
+        new ResultSet.Fake(entities.filterNot { entity =>
           val jsMap = Scala2Js.toJsMap(entity)
           jsMap(key.name) == Scala2Js.toJs(value)
         })

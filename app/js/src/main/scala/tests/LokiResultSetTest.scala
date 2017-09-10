@@ -31,6 +31,16 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
         db.newQuery[Transaction]().findOne(Keys.id, 99992L) ==> Some(transaction2)
       }
     },
+    ManualTest("newQuery(): filterNot() works") {
+      async {
+        val db = await(LocalDatabase.createInMemoryForTests())
+        val transaction1 = testTransactionWithId.copy(idOption = Some(99992))
+        val transaction2 = testTransactionWithId.copy(idOption = Some(99993))
+        db.addAll(Seq(transaction1, transaction2))
+
+        db.newQuery[Transaction]().filterNot(Keys.id, 99992L).data() ==> Vector(transaction2)
+      }
+    },
     ManualTest("newQuery(): Lookup with lessThan filter") {
       async {
         implicit val db = await(LocalDatabase.createInMemoryForTests())

@@ -1,5 +1,8 @@
 package common
 
+import scala.collection.immutable.Seq
+import scala.collection.mutable
+
 /**
   * Replaces some Guava-provided functionality that is no longer usable with scala.js.
   */
@@ -25,6 +28,31 @@ object GuavaReplacement {
         throw new NullPointerException()
       }
       value
+    }
+  }
+
+  final class ImmutableSetMultimap[A, B](backingMap: Map[A, Set[B]]) {
+    def get(key: A): Set[B] = backingMap.getOrElse(key, Set())
+  }
+  object ImmutableSetMultimap {
+    def builder[A, B](): Builder[A, B] = new Builder[A, B]()
+    def of[A, B](): ImmutableSetMultimap[A, B] = new Builder[A, B]().build()
+
+    final class Builder[A, B] private[ImmutableSetMultimap] () {
+      private val backingMap = mutable.Map[A, Set[B]]()
+
+      def put(key: A, value: B): Builder[A, B] = {
+        val existingList = backingMap.getOrElse(key, Set())
+        backingMap.put(key, existingList + value)
+        this
+      }
+      def putAll(key: A, values: B*): Builder[A, B] = {
+        val existingList = backingMap.getOrElse(key, Set())
+        backingMap.put(key, existingList ++ values)
+        this
+      }
+
+      def build(): ImmutableSetMultimap[A, B] = new ImmutableSetMultimap(backingMap.toMap)
     }
   }
 }

@@ -2,7 +2,7 @@ package flux.stores.entries
 
 import scala.collection.mutable
 
-private[stores] abstract class EntriesStoreFactory[StateT] {
+private[entries] abstract class EntriesStoreFactory[StateT] {
 
   private val cache: mutable.Map[Input, Store] = mutable.Map()
 

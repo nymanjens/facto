@@ -26,6 +26,9 @@ object LokiResultSetFakeTest extends TestSuite {
           transaction2,
           transaction3)
       }
+      "filterNot()" - {
+        resultSet.filterNot(Keys.Transaction.categoryCode, "catB").data().toSet ==> Set(transaction1)
+      }
       "filterGreaterThan() with greaterThan" - {
         resultSet.filterGreaterThan(Keys.id, 1L).data().toSet ==> Set(transaction2, transaction3)
         resultSet.filterGreaterThan(Keys.Transaction.createdDate, transaction3.createdDate).data().toSet ==>
