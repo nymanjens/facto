@@ -7,7 +7,6 @@ import jsfacades.Loki.Sorting.KeyWithDirection
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.js
-import scala.scalajs.js.Function0
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.JSGlobal
 import scala2js.Converters._
@@ -49,16 +48,35 @@ object Loki {
   }
 
   object Database {
-    def persistent(dbName: String): Database = {
-      new Database(
-        new DatabaseFacade(dbName, js.Dictionary("adapter" -> cryptoDecorator(new IndexedAdapter(dbName)))))
-    }
-
-    def inMemoryForTests(dbName: String): Database = {
+    def persistent(dbName: String,
+                   persistedStringCodex: PersistedStringCodex = PersistedStringCodex.NullCodex): Database = {
       new Database(
         new DatabaseFacade(
           dbName,
-          js.Dictionary("adapter" -> cryptoDecorator(new MemoryAdapter()), "env" -> "BROWSER")))
+          js.Dictionary("adapter" -> Adapter
+            .toAdapterDecorator(persistedStringCodex, new Adapter.IndexedAdapter(dbName)))))
+    }
+
+    def inMemoryForTests(
+        dbName: String,
+        persistedStringCodex: PersistedStringCodex = PersistedStringCodex.NullCodex): Database = {
+      new Database(
+        new DatabaseFacade(
+          dbName,
+          js.Dictionary(
+            "adapter" -> Adapter.toAdapterDecorator(persistedStringCodex, new Adapter.MemoryAdapter()),
+            "env" -> "BROWSER")))
+    }
+  }
+
+  trait PersistedStringCodex {
+    def encodeBeforeSave(dbString: String): String
+    def decodeAfterLoad(encodedString: String): Option[String]
+  }
+  object PersistedStringCodex {
+    object NullCodex extends PersistedStringCodex {
+      override def encodeBeforeSave(dbString: String) = dbString
+      override def decodeAfterLoad(encodedString: String) = Some(encodedString)
     }
   }
 
@@ -67,45 +85,51 @@ object Loki {
     def saveDatabase(dbName: String, dbString: String, callback: js.Function0[Unit]): Unit = js.native
     def loadDatabase(dbName: String, callback: js.Function1[js.Any, Unit]): Unit = js.native
   }
+  private object Adapter {
+    @JSGlobal("LokiIndexedAdapter")
+    @js.native
+    final class IndexedAdapter(name: String) extends Adapter
 
-  @JSGlobal("LokiIndexedAdapter")
-  @js.native
-  private final class IndexedAdapter(name: String) extends Adapter
+    @JSGlobal("loki.LokiMemoryAdapter")
+    @js.native
+    final class MemoryAdapter() extends Adapter
 
-  @JSGlobal("loki.LokiMemoryAdapter")
-  @js.native
-  private final class MemoryAdapter() extends Adapter
+    def toAdapterDecorator(codex: PersistedStringCodex, delegate: Adapter): Adapter =
+      js.Dynamic
+        .literal(
+          saveDatabase = (dbName: String, dbString: String, callback: js.Function0[Unit]) => {
+            println(
+              s"****** saved $dbName: <<<<<${dbString.substring(0, 10)}... ${dbString.length} chars>>>>> ")
+            delegate.saveDatabase(dbName, codex.encodeBeforeSave(dbString), callback)
+          },
+          loadDatabase = (dbName: String, callback: js.Function1[js.Any, Unit]) => {
+            println("****** loading " + dbName)
+            delegate.loadDatabase(
+              dbName,
+              callback = result => {
+                result match {
+                  case null =>
+                    println(s"****** loaded $dbName: <<<<<$result>>>>> ")
+                    callback(result)
+                  case _ if result.getClass == classOf[String] =>
+                    val encodedDbString = result.asInstanceOf[String]
+                    println(
+                      s"****** loaded $dbName: <<<<<${encodedDbString.substring(0, 10)}... ${encodedDbString.length} chars>>>>> ")
 
-  /** Returns an adapter that is a decorator for the given adapter that encrypts and decrypts the database. */
-  private def cryptoDecorator(adapter: Adapter): js.Object = js.Dynamic.literal(
-    saveDatabase = (dbName: String, dbString: String, callback: js.Function0[Unit]) => {
-      println(s"****** saved $dbName: <<<<<${dbString.substring(0, 10)}... ${dbString.length} chars>>>>> ")
-      adapter.saveDatabase(dbName, "XXX" + dbString, callback)
-    },
-    loadDatabase = (dbName: String, callback: js.Function1[js.Any, Unit]) => {
-      println("****** loading " + dbName)
-      adapter.loadDatabase(
-        dbName,
-        callback = result => {
-          result match {
-            case null =>
-              println(s"****** loaded $dbName: <<<<<$result>>>>> ")
-              callback(result)
-            case _ if result.getClass == classOf[String] =>
-              val dbString = result.asInstanceOf[String]
-              println(
-                s"****** loaded $dbName: <<<<<${dbString.substring(0, 10)}... ${dbString.length} chars>>>>> ")
-              require(dbString.startsWith("XXX"))
-              val newDbString = dbString.substring(3)
-              callback(newDbString)
-            case _ =>
-              println(s"****** loaded $dbName: <<<<<$result>>>>> ")
-              callback(result)
+                    codex.decodeAfterLoad(encodedDbString) match {
+                      case Some(dbString) => callback(dbString)
+                      case None => callback(null)
+                    }
+                  case _ =>
+                    println(s"****** loaded $dbName: <<<<<$result>>>>> ")
+                    callback(result)
+                }
+              }
+            )
           }
-        }
-      )
-    }
-  )
+        )
+        .asInstanceOf[Adapter]
+  }
 
   @js.native
   private trait CollectionFacade extends js.Object {
