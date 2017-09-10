@@ -37,7 +37,6 @@ object GuavaReplacement {
     override def toString = backingMap.toString
 
     override def equals(that: scala.Any) = that match {
-//    override def equals(that: Object) = that match {
       case that: ImmutableSetMultimap[A, B] => backingMap == that.backingMap
       case _ => false
     }
