@@ -119,7 +119,7 @@ object Converters {
     override def toJsWithoutId(entity: User) = {
       js.Dictionary[js.Any](
         Scala2Js.Key.toJsPair(Keys.User.loginName -> entity.loginName),
-        Scala2Js.Key.toJsPair(Keys.User.passwordHash -> entity.passwordHash),
+        Scala2Js.Key.toJsPair(Keys.User.passwordHash -> "<Redacted>"),
         Scala2Js.Key.toJsPair(Keys.User.name -> entity.name)
       )
     }
