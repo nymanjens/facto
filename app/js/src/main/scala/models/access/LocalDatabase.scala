@@ -40,21 +40,33 @@ trait LocalDatabase {
 @visibleForTesting
 object LocalDatabase {
 
-  def createFuture(): Future[LocalDatabase] = async {
-    val lokiDb: Loki.Database = Loki.Database.persistent("facto-db", persistedStringCodex = EncryptingCodex)
+  def createFuture(encryptionSecret: String = ""): Future[LocalDatabase] = async {
+    val lokiDb: Loki.Database = Loki.Database.persistent(
+      "facto-db",
+      persistedStringCodex =
+        if (encryptionSecret.isEmpty) Loki.PersistedStringCodex.NullCodex
+        else new EncryptingCodex(encryptionSecret))
     await(lokiDb.loadDatabase())
     new Impl(lokiDb)
   }
 
-  def createStoredForTests(): Future[LocalDatabase] = async {
-    val lokiDb: Loki.Database = Loki.Database.persistent("test-db", persistedStringCodex = EncryptingCodex)
+  def createStoredForTests(encryptionSecret: String = ""): Future[LocalDatabase] = async {
+    val lokiDb: Loki.Database = Loki.Database.persistent(
+      "test-db",
+      persistedStringCodex =
+        if (encryptionSecret.isEmpty) Loki.PersistedStringCodex.NullCodex
+        else new EncryptingCodex(encryptionSecret))
     await(lokiDb.loadDatabase())
     new Impl(lokiDb)
   }
 
-  def createInMemoryForTests(): Future[LocalDatabase] = async {
+  def createInMemoryForTests(encryptionSecret: String = ""): Future[LocalDatabase] = async {
     val lokiDb: Loki.Database =
-      Loki.Database.inMemoryForTests("facto-db", persistedStringCodex = EncryptingCodex)
+      Loki.Database.inMemoryForTests(
+        "facto-db",
+        persistedStringCodex =
+          if (encryptionSecret.isEmpty) Loki.PersistedStringCodex.NullCodex
+          else new EncryptingCodex(encryptionSecret))
     await(lokiDb.loadDatabase())
     new Impl(lokiDb)
   }
@@ -81,23 +93,25 @@ object LocalDatabase {
     }
   }
 
-  private object EncryptingCodex extends Loki.PersistedStringCodex {
+  private final class EncryptingCodex(secret: String) extends Loki.PersistedStringCodex {
     private val decodedPrefix = "DECODED"
-    private val secret = "TODO: Change this to a user based secret"
 
     override def encodeBeforeSave(dbString: String) = {
-      println(s"  Encrypting ${dbString.length / 1000}kb String...")
+      val millis1 = System.currentTimeMillis()
+      println(s"  Encrypting ${dbString.length / 1e6}Mb String...")
       val result =
-        CryptoJs.AES.encrypt(stringToEncrypt = decodedPrefix + dbString, password = secret).toString()
-      println(s"  Encrypting ${dbString.length / 1000}kb String: Done")
+        CryptoJs.RC4Drop.encrypt(stringToEncrypt = decodedPrefix + dbString, password = secret).toString()
+      val millis2 = System.currentTimeMillis()
+      println(s"  Encrypting ${dbString.length / 1e6}Mb String: Done after ${(millis2 - millis1) / 1e3}s")
       result
     }
 
     override def decodeAfterLoad(encodedString: String) = {
-      println(s"  Decrypting ${encodedString.length / 1000}kb String...")
+      val millis1 = System.currentTimeMillis()
+      println(s"  Decrypting ${encodedString.length / 1e6}Mb String...")
       val decoded =
         try {
-          CryptoJs.AES
+          CryptoJs.RC4Drop
             .decrypt(stringToDecrypt = encodedString, password = secret)
             .toString(CryptoJs.Encoding.Utf8)
         } catch {
@@ -105,7 +119,9 @@ object LocalDatabase {
             println(s"  Caught exception while decoding database string: $t")
             ""
         }
-      println(s"  Decrypting ${encodedString.length / 1000}kb String: Done")
+      val millis2 = System.currentTimeMillis()
+      println(
+        s"  Decrypting ${encodedString.length / 1e6}Mb String: Done after ${(millis2 - millis1) / 1e3}s")
       if (decoded.startsWith(decodedPrefix)) {
         Some(decoded.substring(decodedPrefix.length))
       } else {

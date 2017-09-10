@@ -6,9 +6,9 @@ import scala2js.Converters._
 
 object CryptoJs {
 
-  @JSGlobal("CryptoJS.AES")
+  @JSGlobal("CryptoJS.RC4Drop")
   @js.native
-  object AES extends js.Object {
+  object RC4Drop extends js.Object {
     def encrypt(stringToEncrypt: String, password: String): EncryptResult = js.native
     def decrypt(stringToDecrypt: String, password: String): DecryptResult = js.native
   }

@@ -144,6 +144,6 @@ object Settings {
       webjarDeps.log4Javascript / "js/log4javascript.js",
       webjarDeps.lokiJs / "lokijs.min.js",
       webjarDeps.lokiJs / "loki-indexed-adapter.min.js",
-      webjarDeps.cryptoJs / "rollups/aes.js"
+      webjarDeps.cryptoJs / "rollups/rc4.js"
     ))
 }

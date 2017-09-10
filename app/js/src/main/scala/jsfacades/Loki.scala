@@ -1,5 +1,6 @@
 package jsfacades
 
+import common.LoggingUtils.logExceptions
 import common.GuavaReplacement.Iterables.getOnlyElement
 import common.ScalaUtils
 import jsfacades.Loki.Sorting.KeyWithDirection
@@ -97,28 +98,30 @@ object Loki {
     def toAdapterDecorator(codex: PersistedStringCodex, delegate: Adapter): Adapter =
       js.Dynamic
         .literal(
-          saveDatabase = (dbName: String, dbString: String, callback: js.Function0[Unit]) => {
-            delegate.saveDatabase(dbName, codex.encodeBeforeSave(dbString), callback)
+          saveDatabase = (dbName: String, dbString: String, callback: js.Function0[Unit]) =>
+            logExceptions {
+              delegate.saveDatabase(dbName, codex.encodeBeforeSave(dbString), callback)
           },
-          loadDatabase = (dbName: String, callback: js.Function1[js.Any, Unit]) => {
-            delegate.loadDatabase(
-              dbName,
-              callback = result => {
-                result match {
-                  case null =>
-                    callback(result)
-                  case _ if result.getClass == classOf[String] =>
-                    val encodedDbString = result.asInstanceOf[String]
+          loadDatabase = (dbName: String, callback: js.Function1[js.Any, Unit]) =>
+            logExceptions {
+              delegate.loadDatabase(
+                dbName,
+                callback = result => {
+                  result match {
+                    case null =>
+                      callback(result)
+                    case _ if result.getClass == classOf[String] =>
+                      val encodedDbString = result.asInstanceOf[String]
 
-                    codex.decodeAfterLoad(encodedDbString) match {
-                      case Some(dbString) => callback(dbString)
-                      case None => callback(null)
-                    }
-                  case _ =>
-                    callback(result)
+                      codex.decodeAfterLoad(encodedDbString) match {
+                        case Some(dbString) => callback(dbString)
+                        case None => callback(null)
+                      }
+                    case _ =>
+                      callback(result)
+                  }
                 }
-              }
-            )
+              )
           }
         )
         .asInstanceOf[Adapter]

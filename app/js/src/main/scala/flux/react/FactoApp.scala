@@ -23,13 +23,10 @@ object FactoApp extends js.JSApp {
 
     val apiModule = new api.Module
     implicit val scalaJsApiClient = apiModule.scalaJsApiClient
-    val modelsAccessModule = new models.access.Module
+    implicit val initialDataResponse = await(scalaJsApiClient.getInitialData())
 
-    val initialDataResponseFuture = scalaJsApiClient.getInitialData()
-    val remoteDatabaseProxyFuture = modelsAccessModule.remoteDatabaseProxy
-
-    implicit val initialDataResponse = await(initialDataResponseFuture)
-    implicit val remoteDatabaseProxy = await(remoteDatabaseProxyFuture)
+    val modelsAccessModule = new models.access.Module(initialDataResponse.user)
+    implicit val remoteDatabaseProxy = await(modelsAccessModule.remoteDatabaseProxy)
 
     implicit val globalModule = new FactoAppModule()
 
