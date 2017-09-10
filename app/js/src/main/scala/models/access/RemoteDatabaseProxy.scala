@@ -46,7 +46,7 @@ object RemoteDatabaseProxy {
       val db = possiblyEmptyLocalDatabase
       val populatedDb = {
         val populateIsNecessary = {
-          if (db.isEmpty()) {
+          if (db.isEmpty) {
             println(s"  Database is empty")
             true
           } else if (!db.getSingletonValue(VersionKey).contains(localDatabaseAndEntityVersion)) {

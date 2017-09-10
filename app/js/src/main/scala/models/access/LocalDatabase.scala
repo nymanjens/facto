@@ -16,7 +16,7 @@ trait LocalDatabase {
   // **************** Getters ****************//
   def newQuery[E <: Entity: EntityType](): Loki.ResultSet[E]
   def getSingletonValue[V](key: SingletonKey[V]): Option[V]
-  def isEmpty(): Boolean
+  def isEmpty: Boolean
 
   // **************** Setters ****************//
   /**
@@ -99,7 +99,7 @@ object LocalDatabase {
       value.map(v => Scala2Js.toScala[V](v.value))
     }
 
-    override def isEmpty(): Boolean = {
+    override def isEmpty: Boolean = {
       allCollections.toStream.filter(_.chain().count() != 0).isEmpty
     }
 
@@ -138,7 +138,7 @@ object LocalDatabase {
     override def addAll[E <: Entity: EntityType](entities: Seq[E]): Unit = {
       for (entity <- entities) {
         newQuery[E]().findOne(Keys.id, entity.id) match {
-          case Some(entity) => // do nothing
+          case Some(_) => // do nothing
           case None => entityCollectionForImplicitType.insert(entity)
         }
       }

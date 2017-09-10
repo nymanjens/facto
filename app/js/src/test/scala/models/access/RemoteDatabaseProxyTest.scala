@@ -90,7 +90,7 @@ object RemoteDatabaseProxyTest extends TestSuite {
 
       await(remoteDatabaseProxy.clearLocalDatabase())
 
-      fakeLocalDatabase.isEmpty() ==> true
+      fakeLocalDatabase.isEmpty ==> true
     }
 
     "updateModifiedEntities()" - async {
@@ -130,7 +130,7 @@ object RemoteDatabaseProxyTest extends TestSuite {
     override def getSingletonValue[V](key: SingletonKey[V]) = {
       singletonMap.get(key) map key.valueConverter.toScala
     }
-    override def isEmpty() = {
+    override def isEmpty = {
       modificationsBuffer.isEmpty && singletonMap.isEmpty
     }
 

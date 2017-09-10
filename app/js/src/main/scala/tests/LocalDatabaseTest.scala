@@ -25,15 +25,15 @@ private[tests] object LocalDatabaseTest extends ManualTestSuite {
     ManualTest("isEmpty") {
       async {
         val db = await(LocalDatabase.createInMemoryForTests())
-        db.isEmpty() ==> true
+        db.isEmpty ==> true
         db.addAll(Seq(testTransactionWithId))
-        db.isEmpty() ==> false
+        db.isEmpty ==> false
 
         await(db.clear())
 
-        db.isEmpty() ==> true
+        db.isEmpty ==> true
         db.setSingletonValue(NextUpdateTokenKey, testDate)
-        db.isEmpty() ==> false
+        db.isEmpty ==> false
       }
     },
     ManualTest("setSingletonValue") {
@@ -71,7 +71,7 @@ private[tests] object LocalDatabaseTest extends ManualTestSuite {
 
         await(db.clear())
 
-        db.isEmpty() ==> true
+        db.isEmpty ==> true
       }
     },
     ManualTest("addAll") {
