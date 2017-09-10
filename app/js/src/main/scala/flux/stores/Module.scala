@@ -3,12 +3,7 @@ package flux.stores
 import common.I18n
 import common.time.Clock
 import flux.action.Dispatcher
-import flux.stores.entries.{
-  AllEntriesStoreFactory,
-  CashFlowEntriesStoreFactory,
-  EndowmentEntriesStoreFactory,
-  LiquidationEntriesStoreFactory
-}
+import flux.stores.entries._
 import models.access.RemoteDatabaseProxy
 import models.accounting.config.Config
 import models.accounting.money._
@@ -32,5 +27,6 @@ final class Module(implicit i18n: I18n,
   implicit val cashFlowEntriesStoreFactory = wire[CashFlowEntriesStoreFactory]
   implicit val liquidationEntriesStoreFactory = wire[LiquidationEntriesStoreFactory]
   implicit val endowmentEntriesStoreFactory = wire[EndowmentEntriesStoreFactory]
+  implicit val tagsStoreFactory = wire[TagsStoreFactory]
   implicit val globalMessagesStore = wire[GlobalMessagesStore]
 }

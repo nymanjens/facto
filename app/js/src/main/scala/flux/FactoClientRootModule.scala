@@ -39,6 +39,7 @@ final class FactoAppModule(implicit getInitialDataResponse: GetInitialDataRespon
   implicit private val cashFlowEntriesStoreFactory = fluxStoresModule.cashFlowEntriesStoreFactory
   implicit private val liquidationEntriesStoreFactory = fluxStoresModule.liquidationEntriesStoreFactory
   implicit private val endowmentEntriesStoreFactory = fluxStoresModule.endowmentEntriesStoreFactory
+  implicit private val tagsStoreFactory = fluxStoresModule.tagsStoreFactory
   implicit private val globalMessagesStore = fluxStoresModule.globalMessagesStore
 
   // Create other Flux modules

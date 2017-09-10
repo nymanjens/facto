@@ -4,6 +4,7 @@ import common.I18n
 import common.time.Clock
 import flux.action.Dispatcher
 import flux.stores.GlobalMessagesStore
+import flux.stores.entries.TagsStoreFactory
 import models.access.RemoteDatabaseProxy
 import models.accounting.TransactionGroup
 import models.accounting.config.Config
@@ -17,6 +18,7 @@ final class Module(implicit i18n: I18n,
                    entityAccess: EntityAccess,
                    exchangeRateManager: ExchangeRateManager,
                    globalMessagesStore: GlobalMessagesStore,
+                   tagsStoreFactory: TagsStoreFactory,
                    transactionGroupManager: TransactionGroup.Manager,
                    dispatcher: Dispatcher,
                    clock: Clock) {

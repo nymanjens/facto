@@ -6,12 +6,7 @@ import flux.action.Dispatcher
 import flux.react.app.balancecheckform.BalanceCheckForm
 import flux.react.app.transactiongroupform.TransactionGroupForm
 import flux.stores.GlobalMessagesStore
-import flux.stores.entries.{
-  AllEntriesStoreFactory,
-  CashFlowEntriesStoreFactory,
-  EndowmentEntriesStoreFactory,
-  LiquidationEntriesStoreFactory
-}
+import flux.stores.entries._
 import models.access.RemoteDatabaseProxy
 import models.accounting._
 import models.accounting.config.Config
@@ -31,6 +26,7 @@ final class Module(implicit i18n: I18n,
                    liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory,
                    endowmentEntriesStoreFactory: EndowmentEntriesStoreFactory,
                    globalMessagesStore: GlobalMessagesStore,
+                   tagsStoreFactory: TagsStoreFactory,
                    dispatcher: Dispatcher,
                    clock: Clock) {
 

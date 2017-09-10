@@ -33,6 +33,7 @@ object GuavaReplacement {
 
   final class ImmutableSetMultimap[A, B](private val backingMap: Map[A, Set[B]]) {
     def get(key: A): Set[B] = backingMap.getOrElse(key, Set())
+    def keySet: Set[A] = backingMap.keySet
 
     override def toString = backingMap.toString
 

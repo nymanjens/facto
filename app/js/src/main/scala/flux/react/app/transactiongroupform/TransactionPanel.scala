@@ -8,6 +8,7 @@ import flux.react.ReactVdomUtils.<<
 import flux.react.uielements.HalfPanel
 import flux.react.uielements.input.bootstrap.{MoneyInput, SelectInput, TextAreaInput, TextInput}
 import flux.react.uielements.input.{InputBase, InputWithDefaultFromReference, MappedInput, bootstrap}
+import flux.stores.entries.TagsStoreFactory
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
 import japgolly.scalajs.react.internal.Box
@@ -24,7 +25,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                                                            user: User,
                                                            entityAccess: EntityAccess,
                                                            exchangeRateManager: ExchangeRateManager,
-                                                           clock: Clock) {
+                                                           clock: Clock,
+                                                           tagsStoreFactory: TagsStoreFactory) {
 
   private val anythingChangedQueue = SinglePendingTaskQueue.create()
 
@@ -376,17 +378,23 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawTags),
             startWithDefault = props.defaultValues.isEmpty,
             delegateRefFactory = bootstrap.TagInput.ref _
-          ) { extraProps =>
-            bootstrap.TagInput(
-              ref = extraProps.ref,
-              name = "tags",
-              label = i18n("facto.tags"),
-              suggestions = Seq("abc", "abe", "xxe"),
-              showErrorMessage = props.showErrorMessages,
-              additionalValidator = mappedExtraProps.additionalValidator,
-              defaultValue = mappedExtraProps.defaultValue,
-              inputClasses = extraProps.inputClasses
-            )
+          ) {
+            extraProps =>
+              bootstrap.TagInput(
+                ref = extraProps.ref,
+                name = "tags",
+                label = i18n("facto.tags"),
+                suggestions =
+                  // Note: This is not strictly correct because we are using changing state from outside
+                  // this component without putting it into the state (and listening to the tagsStore for
+                  // changes. This is because being up-to-date is not really necessary but would introduce
+                  // a lot of code.
+                  tagsStoreFactory.get().state.tagToTransactionIds.keySet.map(_.name).toVector,
+                showErrorMessage = props.showErrorMessages,
+                additionalValidator = mappedExtraProps.additionalValidator,
+                defaultValue = mappedExtraProps.defaultValue,
+                inputClasses = extraProps.inputClasses
+              )
           }
         }
       )
