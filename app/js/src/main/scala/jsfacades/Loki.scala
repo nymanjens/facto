@@ -98,30 +98,23 @@ object Loki {
       js.Dynamic
         .literal(
           saveDatabase = (dbName: String, dbString: String, callback: js.Function0[Unit]) => {
-            println(
-              s"****** saved $dbName: <<<<<${dbString.substring(0, 10)}... ${dbString.length} chars>>>>> ")
             delegate.saveDatabase(dbName, codex.encodeBeforeSave(dbString), callback)
           },
           loadDatabase = (dbName: String, callback: js.Function1[js.Any, Unit]) => {
-            println("****** loading " + dbName)
             delegate.loadDatabase(
               dbName,
               callback = result => {
                 result match {
                   case null =>
-                    println(s"****** loaded $dbName: <<<<<$result>>>>> ")
                     callback(result)
                   case _ if result.getClass == classOf[String] =>
                     val encodedDbString = result.asInstanceOf[String]
-                    println(
-                      s"****** loaded $dbName: <<<<<${encodedDbString.substring(0, 10)}... ${encodedDbString.length} chars>>>>> ")
 
                     codex.decodeAfterLoad(encodedDbString) match {
                       case Some(dbString) => callback(dbString)
                       case None => callback(null)
                     }
                   case _ =>
-                    println(s"****** loaded $dbName: <<<<<$result>>>>> ")
                     callback(result)
                 }
               }

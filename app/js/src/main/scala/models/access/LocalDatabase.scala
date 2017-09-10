@@ -85,10 +85,16 @@ object LocalDatabase {
     private val decodedPrefix = "DECODED"
     private val secret = "TODO: Change this to a user based secret"
 
-    override def encodeBeforeSave(dbString: String) =
-      CryptoJs.AES.encrypt(stringToEncrypt = decodedPrefix + dbString, password = secret).toString()
+    override def encodeBeforeSave(dbString: String) = {
+      println(s"  Encrypting ${dbString.length / 1000}kb String...")
+      val result =
+        CryptoJs.AES.encrypt(stringToEncrypt = decodedPrefix + dbString, password = secret).toString()
+      println(s"  Encrypting ${dbString.length / 1000}kb String: Done")
+      result
+    }
 
     override def decodeAfterLoad(encodedString: String) = {
+      println(s"  Decrypting ${encodedString.length / 1000}kb String...")
       val decoded =
         try {
           CryptoJs.AES
@@ -99,6 +105,7 @@ object LocalDatabase {
             println(s"  Caught exception while decoding database string: $t")
             ""
         }
+      println(s"  Decrypting ${encodedString.length / 1000}kb String: Done")
       if (decoded.startsWith(decodedPrefix)) {
         Some(decoded.substring(decodedPrefix.length))
       } else {
