@@ -1,7 +1,9 @@
 package models.access
 
-import jsfacades.Loki
+import scala.async.Async.{async, await}
+import jsfacades.{CryptoJs, Loki}
 import models.manager.{Entity, EntityModification, EntityType}
+
 import scala2js.Converters._
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
@@ -38,20 +40,23 @@ trait LocalDatabase {
 @visibleForTesting
 object LocalDatabase {
 
-  def createFuture(): Future[LocalDatabase] = {
+  def createFuture(): Future[LocalDatabase] = async {
     val lokiDb: Loki.Database = Loki.Database.persistent("facto-db", persistedStringCodex = EncryptingCodex)
-    lokiDb.loadDatabase() map (_ => new Impl(lokiDb))
+    await(lokiDb.loadDatabase())
+    new Impl(lokiDb)
   }
 
-  def createStoredForTests(): Future[LocalDatabase] = {
+  def createStoredForTests(): Future[LocalDatabase] = async {
     val lokiDb: Loki.Database = Loki.Database.persistent("test-db", persistedStringCodex = EncryptingCodex)
-    lokiDb.loadDatabase() map (_ => new Impl(lokiDb))
+    await(lokiDb.loadDatabase())
+    new Impl(lokiDb)
   }
 
-  def createInMemoryForTests(): Future[LocalDatabase] = {
+  def createInMemoryForTests(): Future[LocalDatabase] = async {
     val lokiDb: Loki.Database =
       Loki.Database.inMemoryForTests("facto-db", persistedStringCodex = EncryptingCodex)
-    lokiDb.loadDatabase() map (_ => new Impl(lokiDb))
+    await(lokiDb.loadDatabase())
+    new Impl(lokiDb)
   }
 
   private case class Singleton(key: String, value: js.Any)
@@ -78,14 +83,26 @@ object LocalDatabase {
 
   private object EncryptingCodex extends Loki.PersistedStringCodex {
     private val decodedPrefix = "DECODED"
+    private val secret = "TODO: Change this to a user based secret"
 
-    override def encodeBeforeSave(dbString: String) = {
-      decodedPrefix + dbString
-    }
+    override def encodeBeforeSave(dbString: String) =
+      CryptoJs.AES.encrypt(stringToEncrypt = decodedPrefix + dbString, password = secret).toString()
+
     override def decodeAfterLoad(encodedString: String) = {
-      if (encodedString.startsWith(decodedPrefix)) {
-        Some(encodedString.substring(decodedPrefix.length))
+      val decoded =
+        try {
+          CryptoJs.AES
+            .decrypt(stringToDecrypt = encodedString, password = secret)
+            .toString(CryptoJs.Encoding.Utf8)
+        } catch {
+          case t: Throwable =>
+            println(s"  Caught exception while decoding database string: $t")
+            ""
+        }
+      if (decoded.startsWith(decodedPrefix)) {
+        Some(decoded.substring(decodedPrefix.length))
       } else {
+        println(s"  Failed to decode database string: ${encodedString.substring(0, 10)}")
         None
       }
     }
@@ -170,15 +187,19 @@ object LocalDatabase {
         ))
     }
 
-    override def save(): Future[Unit] = {
-      lokiDb.saveDatabase()
+    override def save(): Future[Unit] = async {
+      println("  Saving database...")
+      await(lokiDb.saveDatabase())
+      println("  Saving database done.")
     }
 
-    override def clear(): Future[Unit] = {
+    override def clear(): Future[Unit] = async {
+      println("  Clearing database...")
       for (collection <- allCollections) {
         collection.clear()
       }
-      lokiDb.saveDatabase()
+      await(lokiDb.saveDatabase())
+      println("  Clearing database done.")
     }
 
     // **************** Private helper methods ****************//

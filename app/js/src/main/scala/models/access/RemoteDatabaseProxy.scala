@@ -55,6 +55,7 @@ object RemoteDatabaseProxy {
                 s"the newest version $localDatabaseAndEntityVersion")
             true
           } else {
+            println(s"  Database was loaded successfully. No need for a full repopulation.")
             false
           }
         }
