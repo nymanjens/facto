@@ -31,8 +31,17 @@ object GuavaReplacement {
     }
   }
 
-  final class ImmutableSetMultimap[A, B](backingMap: Map[A, Set[B]]) {
+  final class ImmutableSetMultimap[A, B](private val backingMap: Map[A, Set[B]]) {
     def get(key: A): Set[B] = backingMap.getOrElse(key, Set())
+
+    override def toString = backingMap.toString
+
+    override def equals(that: scala.Any) = that match {
+//    override def equals(that: Object) = that match {
+      case that: ImmutableSetMultimap[A, B] => backingMap == that.backingMap
+      case _ => false
+    }
+    override def hashCode() = backingMap.hashCode()
   }
   object ImmutableSetMultimap {
     def builder[A, B](): Builder[A, B] = new Builder[A, B]()
