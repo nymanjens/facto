@@ -25,8 +25,7 @@ private[app] final class TemplateList(implicit user: User,
           title = i18n("facto.templates"),
           panelClasses = Seq("templates-panel")
         ) {
-          val templates = accountingConfig.templatesToShowFor(Template.Placement.EverythingView, user)
-
+          val templates = accountingConfig.templatesToShowFor(Template.Placement.TemplateList, user)
           (
             for (template <- templates)
               yield
