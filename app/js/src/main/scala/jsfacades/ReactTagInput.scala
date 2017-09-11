@@ -18,7 +18,8 @@ object ReactTagInput {
             handleDrag: DragHandler,
             delimiters: Seq[Int] = Seq(KeyCode.Enter, KeyCode.Tab),
             minQueryLength: Int = 2,
-            classNames: Map[String, String] = Map()) = {
+            classNames: Map[String, String] = Map(),
+            autoFocus: Boolean = false) = {
     val component = JsComponent[js.Object, Children.None, Null](js.Dynamic.global.ReactTags.WithContext)
     component(
       Props(
@@ -30,7 +31,8 @@ object ReactTagInput {
           handleDrag.onDragged(tagObject.text, currentPos, newPos),
         delimiters = delimiters.toJSArray,
         minQueryLength = minQueryLength,
-        classNames = classNames.toJSDictionary
+        classNames = classNames.toJSDictionary,
+        autoFocus: Boolean
       ).toJsObject)
   }
 
@@ -59,7 +61,8 @@ object ReactTagInput {
                            handleDrag: js.Function3[TagObject, Int, Int, Unit],
                            delimiters: js.Array[Int],
                            minQueryLength: Int,
-                           classNames: js.Dictionary[String]) {
+                           classNames: js.Dictionary[String],
+                           autoFocus: Boolean) {
     def toJsObject: js.Object =
       js.Dynamic.literal(
         tags = tags,
@@ -69,7 +72,8 @@ object ReactTagInput {
         handleDrag = handleDrag,
         delimiters = delimiters,
         minQueryLength = minQueryLength,
-        classNames = classNames
+        classNames = classNames,
+        autofocus = autoFocus
       )
   }
 }
