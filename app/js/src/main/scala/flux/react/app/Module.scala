@@ -32,20 +32,23 @@ final class Module(implicit i18n: I18n,
 
   import com.softwaremill.macwire._
 
-  implicit private lazy val menu: Menu = wire[Menu]
-  implicit private lazy val globalMessages: GlobalMessages = wire[GlobalMessages]
-  implicit lazy val layout: Layout = wire[Layout]
-
   // Configuration of submodules
   private val transactionGroupFormModule = new flux.react.app.transactiongroupform.Module
   private val balanceCheckFormModule = new flux.react.app.balancecheckform.Module
   private val transactionViewsModule = new flux.react.app.transactionviews.Module
 
+  implicit private lazy val menu: Menu = wire[Menu]
+  implicit private lazy val globalMessages: GlobalMessages = wire[GlobalMessages]
+  implicit lazy val layout: Layout = wire[Layout]
+  implicit lazy val templateList = wire[TemplateList]
+
   implicit lazy val transactionGroupForm: TransactionGroupForm =
     transactionGroupFormModule.transactionGroupForm
   implicit lazy val balanceCheckForm: BalanceCheckForm = balanceCheckFormModule.balanceCheckForm
+
   implicit lazy val everything = transactionViewsModule.everything
   implicit lazy val cashFlow = transactionViewsModule.cashFlow
   implicit lazy val liquidation = transactionViewsModule.liquidation
   implicit lazy val endowments = transactionViewsModule.endowments
+
 }

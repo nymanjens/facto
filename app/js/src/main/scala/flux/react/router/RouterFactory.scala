@@ -39,17 +39,17 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
           | staticRoute(RouterFactory.pathPrefix, Page.Root)
             ~> redirectToPage(Page.CashFlow)(Redirect.Replace)
 
-          | staticRuleFromPage(Page.Everything, reactAppModule.everything.apply _)
+          | staticRuleFromPage(Page.Everything, reactAppModule.everything.apply)
 
-          | staticRuleFromPage(Page.CashFlow, reactAppModule.cashFlow.apply _)
+          | staticRuleFromPage(Page.CashFlow, reactAppModule.cashFlow.apply)
 
-          | staticRuleFromPage(Page.Liquidation, reactAppModule.liquidation.apply _)
+          | staticRuleFromPage(Page.Liquidation, reactAppModule.liquidation.apply)
 
-          | staticRuleFromPage(Page.Endowments, reactAppModule.endowments.apply _)
+          | staticRuleFromPage(Page.Endowments, reactAppModule.endowments.apply)
 
-          | staticRuleFromPage(Page.Summary, reactAppModule.everything.apply _)
+          | staticRuleFromPage(Page.Summary, reactAppModule.everything.apply)
 
-          | staticRuleFromPage(Page.TemplateList, reactAppModule.everything.apply _)
+          | staticRuleFromPage(Page.TemplateList, reactAppModule.templateList.apply)
 
           | dynamicRuleFromPage(_ ~ returnToPath.caseClass[Page.NewTransactionGroup]) { (page, ctl) =>
             reactAppModule.transactionGroupForm.forCreate(page.returnToPath, ctl)
