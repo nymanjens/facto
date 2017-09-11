@@ -39,7 +39,7 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
 
   // ********** actions ********** //
   def index() = AuthenticatedAction { implicit user => implicit request =>
-    Redirect(controllers.accounting.routes.Views.cashFlowOfAll)
+    Redirect(controllers.routes.Application.reactAppRoot)
   }
 
   def profile() = AuthenticatedAction { implicit user => implicit request =>
