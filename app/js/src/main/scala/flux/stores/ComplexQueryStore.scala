@@ -43,7 +43,7 @@ final class ComplexQueryStore(implicit database: RemoteDatabaseProxy) {
         nextPart.clear()
         negated = false
       case ' ' if currentQuote.isEmpty && nextPart.isEmpty =>
-        // do nothing
+      // do nothing
       case _ =>
         nextPart += char
     }

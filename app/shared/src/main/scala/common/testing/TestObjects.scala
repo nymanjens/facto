@@ -182,6 +182,7 @@ object TestObjects {
     idOption = Option(918274)
   )
   def testUser: User = testUserA
+  def testUserRedacted: User = testUser.copy(passwordHash = "<redacted>")
 
   val testDate: LocalDateTime = LocalDateTimes.createDateTime(2008, MARCH, 13)
   val testTransactionGroupWithId: TransactionGroup =

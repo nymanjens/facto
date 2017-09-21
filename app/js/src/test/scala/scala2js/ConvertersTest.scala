@@ -61,7 +61,7 @@ object ConvertersTest extends TestSuite {
     }
 
     "UserConverter: testToJsAndBack" - {
-      testToJsAndBack[User](testUser.copy(passwordHash = "<redacted>"))
+      testToJsAndBack[User](testUserRedacted)
     }
 
     "TransactionConverter: testToJsAndBack" - {

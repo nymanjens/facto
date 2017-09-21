@@ -25,7 +25,7 @@ class PicklersTest extends HookedSpecification {
   }
 
   "EntityModification" in {
-    testPickleAndUnpickle[EntityModification](EntityModification.Add(testUser))
+    testPickleAndUnpickle[EntityModification](EntityModification.Add(testUserRedacted))
     testPickleAndUnpickle[EntityModification](EntityModification.Add(testTransactionWithId))
     testPickleAndUnpickle[EntityModification](EntityModification.Add(testTransactionGroupWithId))
     testPickleAndUnpickle[EntityModification](EntityModification.Add(testBalanceCheckWithId))
@@ -35,7 +35,7 @@ class PicklersTest extends HookedSpecification {
 
   "GetInitialDataResponse" in {
     testPickleAndUnpickle[GetInitialDataResponse](
-      GetInitialDataResponse(testAccountingConfig, testUser, i18nMessages = Map("abc" -> "def")))
+      GetInitialDataResponse(testAccountingConfig, testUserRedacted, i18nMessages = Map("abc" -> "def")))
   }
 
   "GetAllEntitiesResponse" in {
