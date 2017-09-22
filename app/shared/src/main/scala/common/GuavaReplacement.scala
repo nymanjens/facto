@@ -31,6 +31,26 @@ object GuavaReplacement {
     }
   }
 
+  final class Splitter(separator: Char) {
+    def split(string: String): Seq[String] = {
+      val parts = mutable.Buffer[String]()
+      val nextPart = new StringBuilder
+
+      for (char <- string) char match {
+        case `separator` =>
+          parts += nextPart.result()
+          nextPart.clear()
+        case _ =>
+          nextPart += char
+      }
+      parts += nextPart.result()
+      Seq(parts: _*)
+    }
+  }
+  object Splitter {
+    def on(separator: Char): Splitter = new Splitter(separator)
+  }
+
   final class ImmutableSetMultimap[A, B](private val backingMap: Map[A, Set[B]]) {
     def get(key: A): Set[B] = backingMap.getOrElse(key, Set())
     def keySet: Set[A] = backingMap.keySet
