@@ -16,6 +16,7 @@ object TestObjects {
 
   val testCategoryA: Category = Category(code = "CAT_A", name = "Category A")
   val testCategoryB: Category = Category(code = "CAT_B", name = "Category B", helpText = "b-help")
+  val testCategoryC: Category = Category(code = "CAT_C", name = "Category C")
   def testCategory: Category = testCategoryA
 
   val testAccountCommon: Account = Account(

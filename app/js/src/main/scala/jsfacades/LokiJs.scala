@@ -13,6 +13,8 @@ import scala.scalajs.js.annotation.JSGlobal
 import scala2js.Converters._
 import scala2js.Scala2Js
 import scala.collection.immutable.Seq
+import scala.util.matching.Regex
+import scala2js.Scala2Js.{Converter, Key}
 
 object LokiJs {
   @JSGlobal("loki")
@@ -222,11 +224,20 @@ object LokiJs {
         filterWithModifier("$gt", key, value)
       override def filterLessThan[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): ResultSet[E] =
         filterWithModifier("$lt", key, value)
+      override def filterAnyOf[V: Converter](key: Key[V, E], values: Seq[V]) =
+        filterWithModifier("$in", key, values)
+      override def filterNoneOf[V: Converter](key: Key[V, E], values: Seq[V]) =
+        filterWithModifier("$nin", key, values)
+      override def filterContainsIgnoreCase(key: Key[String, E], substring: String) =
+        filterWithModifier("$regex", key, Seq(Regex.quote(substring), "i"))
+      override def filterDoesntContainIgnoreCase(key: Key[String, E], substring: String): ResultSet[E] =
+        filterWithModifier("$regex", key, Seq(s"""^((?!${Regex.quote(substring)})[\\s\\S])*$$""", "i"))
+
       private def filterWithModifier[V: Scala2Js.Converter](modifier: String,
-                                                            key: Scala2Js.Key[V, E],
+                                                            key: Scala2Js.Key[_, E],
                                                             value: V): ResultSet[E] = {
-        val pair = Scala2Js.Key.toJsPair(key -> value)
-        new ResultSet.Impl[E](facade.find(js.Dictionary(pair._1 -> js.Dictionary(modifier -> pair._2))))
+        new ResultSet.Impl[E](
+          facade.find(js.Dictionary(key.name -> js.Dictionary(modifier -> Scala2Js.toJs(value)))))
       }
 
       override def sort(sorting: LokiJs.Sorting[E]) = {
