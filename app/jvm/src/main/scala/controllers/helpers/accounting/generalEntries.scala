@@ -122,7 +122,6 @@ private object QueryScore {
       val searchableParts: Seq[String] = Seq(
         transaction.description,
         transaction.detailDescription,
-        transaction.tagsString,
         transaction.beneficiary.longName,
         transaction.moneyReservoir.name,
         transaction.category.name

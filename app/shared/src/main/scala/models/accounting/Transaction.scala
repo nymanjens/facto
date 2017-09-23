@@ -43,7 +43,6 @@ case class Transaction(transactionGroupId: Long,
   def category(implicit accountingConfig: Config): Category = accountingConfig.categories(categoryCode)
   def flow(implicit accountingConfig: Config): DatedMoney =
     DatedMoney(flowInCents, moneyReservoir.currency, transactionDate)
-  def tagsString: String = Tags.serializeToString(tags)
 
   /** Returns None if the consumed date is the same as the transaction date (and thus carries no further information. */
   def consumedDateOption: Option[LocalDateTime] =

@@ -28,7 +28,7 @@ class SlickTagEntityManagerTest extends HookedSpecification {
     val transGrp = transactionGroupManager.add(TransactionGroup(createdDate = clock.now))
 
     // Add dummy transaction
-    val trans = TestUtils.persistTransaction(tagsString = "a,b")
+    val trans = TestUtils.persistTransaction(tags = Seq("a","b"))
 
     // Do checks
     val tagEntities = tagEntityManager.fetchAll()
