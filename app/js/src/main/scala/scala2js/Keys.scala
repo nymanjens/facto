@@ -2,6 +2,7 @@ package scala2js
 
 import models.manager.Entity
 import common.time.LocalDateTime
+import scala.collection.immutable.Seq
 
 import scala2js.Converters._
 
@@ -28,7 +29,8 @@ object Keys {
     val description = Scala2Js.Key[String, E]("description")
     val flowInCents = Scala2Js.Key[Long, E]("flowInCents")
     val detailDescription = Scala2Js.Key[String, E]("detailDescription")
-    val tagsString = Scala2Js.Key[String, E]("tagsString")
+    val tagsString = Scala2Js.Key[String, E]("tagsString") // TODO: Delete
+    val tags = Scala2Js.Key[Seq[String], E]("tags")
     val createdDate = Scala2Js.Key[LocalDateTime, E]("createdDate")
     val transactionDate = Scala2Js.Key[LocalDateTime, E]("transactionDate")
     val consumedDate = Scala2Js.Key[LocalDateTime, E]("consumedDate")

@@ -12,6 +12,7 @@ import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.JSGlobal
 import scala2js.Converters._
 import scala2js.Scala2Js
+import scala.collection.immutable.Seq
 
 object LokiJs {
   @JSGlobal("loki")
@@ -166,6 +167,15 @@ object LokiJs {
     def filterNot[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): ResultSet[E]
     def filterGreaterThan[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): ResultSet[E]
     def filterLessThan[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): ResultSet[E]
+    def filterAnyOf[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], values: Seq[V]): ResultSet[E] = ???
+    def filterNoneOf[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], values: Seq[V]): ResultSet[E] = ???
+    def filterContainsIgnoreCase(key: Scala2Js.Key[String, E], substring: String): ResultSet[E] =
+      filterAnyContainsIgnoreCase(Seq(key), substring)
+    def filterDoesntContainIgnoreCase(key: Scala2Js.Key[String, E], substring: String): ResultSet[E] = ???
+    def filterAnyContainsIgnoreCase(keys: Seq[Scala2Js.Key[String, E]], substring: String): ResultSet[E] =
+      ???
+    def filterSeqContains(key: Scala2Js.Key[Seq[String], E], value: String): ResultSet[E] = ???
+    def filterSeqDoesntContain(key: Scala2Js.Key[Seq[String], E], value: String): ResultSet[E] = ???
 
     def sort(sorting: LokiJs.Sorting[E]): ResultSet[E]
     def limit(quantity: Int): ResultSet[E]

@@ -5,13 +5,20 @@ import common.ScalaUtils.visibleForTesting
 import flux.stores.ComplexQueryStore.{CombinedQueryFilter, Prefix, QueryFilter, QueryPart}
 import jsfacades.LokiJs
 import jsfacades.LokiJs.ResultSet
+import models.User
 import models.access.RemoteDatabaseProxy
 import models.accounting._
+import models.accounting.config.Config
+import models.accounting.money.Money
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
+import scala2js.{Keys, Scala2Js}
+import scala2js.Converters._
 
-final class ComplexQueryStore(implicit database: RemoteDatabaseProxy) {
+final class ComplexQueryStore(implicit database: RemoteDatabaseProxy,
+                              userManager: User.Manager,
+                              accountingConfig: Config) {
 
   // **************** Public API **************** //
   def getMatchingTransactions(query: String): Seq[Transaction] = {
@@ -23,14 +30,72 @@ final class ComplexQueryStore(implicit database: RemoteDatabaseProxy) {
     CombinedQueryFilter {
       splitInParts(query) map {
         case QueryPart(string, negated) =>
-          val prefixAndSuffix = parsePrefixAndSuffix(string)
+          val positiveFilter = createPositiveFilter(singlePartWithoutNegation = string)
 
-          string match {
-            case _ => ???
+          if (negated) {
+            QueryFilter.not(positiveFilter)
+          } else {
+            positiveFilter
           }
       }
     }
   }
+
+  private def createPositiveFilter(singlePartWithoutNegation: String): QueryFilter = {
+    trait FilterCreator[T] {
+      def createFieldFilter[V: Scala2Js.Converter](key: Scala2Js.Key[V, Transaction])(
+          keyFunc: T => V): QueryFilter
+    }
+    def fromOptions[T](inputString: String, options: Seq[T])(nameFunc: T => String): FilterCreator[T] =
+      new FilterCreator[T] {
+        override def createFieldFilter[V: Scala2Js.Converter](key: Scala2Js.Key[V, Transaction])(
+            keyFunc: T => V) = {
+          val chosenOptions =
+            options.filter(option => nameFunc(option).toLowerCase contains inputString.toLowerCase)
+          QueryFilter.anyOf(key, chosenOptions.map(keyFunc))
+        }
+      }
+    def filterOptions[T](inputString: String, options: Seq[T])(nameFunc: T => String): Seq[T] =
+      options.filter(option => nameFunc(option).toLowerCase contains inputString.toLowerCase)
+
+    parsePrefixAndSuffix(singlePartWithoutNegation) match {
+      case Some((prefix, suffix)) =>
+        prefix match {
+          case Prefix.Issuer =>
+            QueryFilter.anyOf(
+              Keys.Transaction.issuerId,
+              filterOptions(suffix, userManager.fetchAll())(_.name).map(_.id))
+          case Prefix.Beneficiary =>
+            QueryFilter.anyOf(
+              Keys.Transaction.beneficiaryAccountCode,
+              filterOptions(suffix, accountingConfig.accountsSeq)(_.longName).map(_.code))
+          case Prefix.Reservoir =>
+            QueryFilter.anyOf(
+              Keys.Transaction.moneyReservoirCode,
+              filterOptions(suffix, accountingConfig.moneyReservoirs(includeHidden = true))(_.name)
+                .map(_.code))
+          case Prefix.Category =>
+            QueryFilter.anyOf(
+              Keys.Transaction.categoryCode,
+              filterOptions(suffix, accountingConfig.categoriesSeq)(_.name).map(_.code))
+          case Prefix.Description =>
+            QueryFilter.containsIgnoreCase(Keys.Transaction.description, suffix)
+          case Prefix.Flow =>
+            Money.floatStringToCents(suffix).map { flowInCents =>
+              QueryFilter.isEqualTo(Keys.Transaction.flowInCents, flowInCents)
+            } getOrElse QueryFilter.nullFilter
+          case Prefix.Detail =>
+            QueryFilter.containsIgnoreCase(Keys.Transaction.detailDescription, suffix)
+          case Prefix.Tag =>
+            QueryFilter.seqContains(Keys.Transaction.tags, suffix)
+        }
+      case None =>
+        QueryFilter.anyContainsIgnoreCase(
+          Seq(Keys.Transaction.description, Keys.Transaction.detailDescription),
+          singlePartWithoutNegation)
+    }
+  }
+
   @visibleForTesting private[stores] def parsePrefixAndSuffix(string: String): Option[(Prefix, String)] = {
     val prefixStringToPrefix: Map[String, Prefix] = {
       for {
@@ -86,23 +151,75 @@ final class ComplexQueryStore(implicit database: RemoteDatabaseProxy) {
 
 object ComplexQueryStore {
   private trait QueryFilter {
-    def applyWithOperator(resultSet: LokiJs.ResultSet[Transaction], invert: Boolean = false): Unit = {}
-    def applyWithFunction(resultSet: LokiJs.ResultSet[Transaction], invert: Boolean = false): Unit = {}
+    def apply(resultSet: LokiJs.ResultSet[Transaction], invert: Boolean = false): Unit
+    def estimatedExecutionCost: Int
+  }
+
+  private object QueryFilter {
+    val nullFilter: QueryFilter =
+      from(estimatedExecutionCost = 0, positiveApply = _ => {}, negativeApply = _ => {})
+
+    private def from(estimatedExecutionCost: Int,
+                     positiveApply: LokiJs.ResultSet[Transaction] => Unit,
+                     negativeApply: LokiJs.ResultSet[Transaction] => Unit): QueryFilter = new QueryFilter {
+      val estimatedExecutionCostArg = estimatedExecutionCost
+      override def apply(resultSet: ResultSet[Transaction], invert: Boolean) = {
+        if (invert) {
+          negativeApply(resultSet)
+        } else {
+          positiveApply(resultSet)
+        }
+      }
+      override def estimatedExecutionCost = estimatedExecutionCostArg
+    }
+
+    def not(delegate: QueryFilter): QueryFilter = new QueryFilter {
+      override def apply(resultSet: ResultSet[Transaction], invert: Boolean) =
+        delegate(resultSet, invert = !invert)
+      override def estimatedExecutionCost = delegate.estimatedExecutionCost
+    }
+
+    def isEqualTo[V: Scala2Js.Converter](key: Scala2Js.Key[V, Transaction], value: V): QueryFilter =
+      anyOf(key, Seq(value))
+
+    def anyOf[V: Scala2Js.Converter](key: Scala2Js.Key[V, Transaction], values: Seq[V]): QueryFilter =
+      values match {
+        case Seq() => nullFilter
+        case Seq(value) =>
+          from(
+            estimatedExecutionCost = 1,
+            positiveApply = _.filter(key, value),
+            negativeApply = _.filterNot(key, value))
+        case _ =>
+          from(
+            estimatedExecutionCost = 2,
+            positiveApply = _.filterAnyOf(key, values),
+            negativeApply = _.filterNoneOf(key, values))
+      }
+
+    def containsIgnoreCase(key: Scala2Js.Key[String, Transaction], substring: String): QueryFilter =
+      from(
+        estimatedExecutionCost = 3,
+        positiveApply = _.filterContainsIgnoreCase(key, substring),
+        negativeApply = _.filterDoesntContainIgnoreCase(key, substring))
+
+    def anyContainsIgnoreCase(keys: Seq[Scala2Js.Key[String, Transaction]], substring: String): QueryFilter =
+      from(
+        estimatedExecutionCost = 4,
+        positiveApply = _.filterAnyContainsIgnoreCase(keys, substring),
+        negativeApply =
+          resultSet => for (key <- keys) resultSet.filterDoesntContainIgnoreCase(key, substring)
+      )
+    def seqContains(key: Scala2Js.Key[Seq[String], Transaction], value: String): QueryFilter =
+      from(
+        estimatedExecutionCost = 3,
+        positiveApply = _.filterSeqContains(key, value),
+        negativeApply = _.filterSeqDoesntContain(key, value))
   }
 
   private case class CombinedQueryFilter(delegates: Seq[QueryFilter]) {
     def apply(resultSet: ResultSet[Transaction]): Unit = {
-      delegates.foreach(_.applyWithOperator(resultSet))
-      delegates.foreach(_.applyWithFunction(resultSet))
-    }
-  }
-
-  private object QueryFilter {
-    case class Negated(delegate: QueryFilter) extends QueryFilter {
-      override def applyWithOperator(resultSet: ResultSet[Transaction], invert: Boolean) =
-        delegate.applyWithOperator(resultSet, invert = !invert)
-      override def applyWithFunction(resultSet: ResultSet[Transaction], invert: Boolean) =
-        delegate.applyWithFunction(resultSet, invert = !invert)
+      delegates.sortBy(_.estimatedExecutionCost).foreach(_.apply(resultSet))
     }
   }
 
@@ -111,12 +228,12 @@ object ComplexQueryStore {
     def not(unquotedString: String): QueryPart = QueryPart(unquotedString, negated = true)
   }
 
-  @visibleForTesting private[stores] sealed case class Prefix(prefixStrings: Seq[String]) {
+  @visibleForTesting private[stores] sealed abstract class Prefix private (val prefixStrings: Seq[String]) {
     override def toString = getClass.getSimpleName
   }
   @visibleForTesting private[stores] object Prefix {
     def all: Seq[Prefix] =
-      Seq(Issuer, Beneficiary, Reservoir, Category, Description, Flow, Detail, Tag, Date)
+      Seq(Issuer, Beneficiary, Reservoir, Category, Description, Flow, Detail, Tag)
 
     object Issuer extends Prefix(Seq("issuer", "i"))
     object Beneficiary extends Prefix(Seq("beneficiary", "b"))
@@ -126,6 +243,5 @@ object ComplexQueryStore {
     object Flow extends Prefix(Seq("flow", "amount", "a"))
     object Detail extends Prefix(Seq("detail"))
     object Tag extends Prefix(Seq("tag", "t"))
-    object Date extends Prefix(Seq("date", "d"))
   }
 }

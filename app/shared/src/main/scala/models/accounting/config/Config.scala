@@ -66,4 +66,7 @@ case class Config(accounts: ListMap[String, Account],
     } yield acc
     Seq(List(constants.commonAccount), myAccount.toList, otherAccounts).flatten
   }
+
+  def accountsSeq: Seq[Account] = accounts.values.toVector
+  def categoriesSeq: Seq[Category] = categories.values.toVector
 }
