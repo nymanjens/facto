@@ -129,7 +129,7 @@ object SummaryForYear {
             .filter(
               _.consumedDate < LocalDateTimes.ofJavaLocalDateTime(yearRange.startOfNextMonth.atStartOfDay()))
             .sortBy(r => (r.consumedDate, r.createdDate))).toList
-        if (tags.isEmpty) {
+        if (tags .isEmpty) {
           allTransactions // don't filter
         } else {
           def containsAnyTag(seq: Seq[Tag]): Boolean = !seq.filter(tags.contains).isEmpty
