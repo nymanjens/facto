@@ -12,6 +12,7 @@ import common.time.LocalDateTime
 import common.time.LocalDateTimes
 import java.time.Instant
 import common.ResourceFiles
+import scala.collection.immutable.Seq
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
 import models._
@@ -48,7 +49,7 @@ final class CsvImportTool @Inject()(implicit userManager: SlickUserManager,
               categoryCode = categoryCode,
               description = description,
               flowInCents = Money.floatToCents(flowAsFloat.toDouble),
-              tagsString = s"csv-import-$beneficiaryAccountCode",
+              tags = Seq(s"csv-import-$beneficiaryAccountCode"),
               createdDate = epochSecondsToDateTime(createdDateStamp.toLong),
               transactionDate = epochSecondsToDateTime(transactionDateStamp.toLong),
               consumedDate = epochSecondsToDateTime(

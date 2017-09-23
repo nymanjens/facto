@@ -8,7 +8,7 @@ import java.util.Locale
 
 import com.google.common.base.Splitter
 import com.google.common.collect.Iterables
-import common.accounting.Tag
+import common.accounting.Tags
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 import models.accounting.config.Config
 import models.accounting.money.Money
@@ -40,7 +40,7 @@ object FormUtils {
         Valid
       } else {
         val tags = Splitter.on(",").split(tagsString).asScala.toList
-        val anyInvalid = tags.exists(tag => !Tag.isValidTagName(tag))
+        val anyInvalid = tags.exists(tag => !Tags.isValidTag(tag))
         if (anyInvalid) {
           invalidWithMessageCode("error.invalid")
         } else {

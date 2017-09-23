@@ -2,7 +2,6 @@ package flux.react.app.transactiongroupform
 
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, LogExceptionsFuture, logExceptions}
-import common.accounting.Tag
 import common.time.Clock
 import common.time.JavaTimeImplicits._
 import flux.action.{Action, Dispatcher}
@@ -381,7 +380,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
                 description = data.description,
                 flowInCents = data.flow.cents,
                 detailDescription = data.detailDescription,
-                tagsString = Tag.serializeToString(data.tags),
+                tags = data.tags,
                 createdDate = group.createdDate,
                 transactionDate = data.transactionDate,
                 consumedDate = data.consumedDate

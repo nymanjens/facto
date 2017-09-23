@@ -2,7 +2,7 @@ package flux.react.app.transactiongroupform
 import java.util.NoSuchElementException
 
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
-import common.accounting.Tag
+import common.accounting.Tags
 import common.time.{Clock, LocalDateTime, LocalDateTimes}
 import common.{I18n, SinglePendingTaskQueue}
 import flux.react.ReactVdomUtils.<<
@@ -38,7 +38,6 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   private val tagsInputWithDefault = InputWithDefaultFromReference.forType[Seq[String]]
 
   private val dateMappedInput = MappedInput.forTypes[String, LocalDateTime]
-  private val tagsMappedInput = MappedInput.forTypes[Seq[String], Seq[Tag]]
 
   private val reservoirSelectInput = SelectInput.forType[MoneyReservoir]
   private val accountSelectInput = bootstrap.SelectInput.forType[Account]
@@ -110,7 +109,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
     def category: InputBase.Proxy[Category] = fromBackendOrNull(_.categoryRef())
     def description: InputBase.Proxy[String] = fromBackendOrNull(_.descriptionRef())
     def detailDescription: InputBase.Proxy[String] = fromBackendOrNull(_.detailDescriptionRef())
-    def rawTags: InputBase.Proxy[Seq[String]] = fromBackendOrNull(_.rawTagsRef())
+    def tags: InputBase.Proxy[Seq[String]] = fromBackendOrNull(_.tagsRef())
 
     def flowValueOrDefault: DatedMoney = maybeBackend match {
       case Some(backend) =>
@@ -159,7 +158,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                   description: String,
                   flow: DatedMoney,
                   detailDescription: String,
-                  tags: Seq[Tag])
+                  tags: Seq[String])
 
   // **************** Private inner types ****************//
   private type ThisCtorSummoner = CtorType.Summoner.Aux[Box[Props], Children.None, CtorType.Props]
@@ -190,8 +189,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
     val descriptionRef = stringInputWithDefault.ref()
     val flowRef = MoneyInput.ref()
     val detailDescriptionRef = stringInputWithDefault.ref()
-    val tagsRef = tagsMappedInput.ref()
-    val rawTagsRef = tagsMappedInput.delegateRef(tagsRef)
+    val tagsRef = tagsInputWithDefault.ref()
 
     def render(props: Props, state: State) = logExceptions {
       HalfPanel(title = <.span(props.title), closeButtonCallback = props.deleteButtonCallback)(
@@ -367,36 +365,28 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             listener = AnythingChangedListener
           )
         },
-        tagsMappedInput(
+        tagsInputWithDefault.forOption(
           ref = tagsRef,
-          defaultValue = props.defaultValues.tags,
-          valueTransformer = MappedInput.ValueTransformer.StringSeqToTagSeq,
-          delegateRefFactory = tagsInputWithDefault.ref _,
-          listener = AnythingChangedListener
-        ) { mappedExtraProps =>
-          tagsInputWithDefault.forOption(
-            ref = mappedExtraProps.ref,
-            defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawTags),
-            startWithDefault = props.defaultValues.isEmpty,
-            delegateRefFactory = bootstrap.TagInput.ref _
-          ) {
-            extraProps =>
-              bootstrap.TagInput(
-                ref = extraProps.ref,
-                name = "tags",
-                label = i18n("facto.tags"),
-                suggestions =
-                  // Note: This is not strictly correct because we are using changing state from outside
-                  // this component without putting it into the state (and listening to the tagsStore for
-                  // changes. This is because being up-to-date is not really necessary but would introduce
-                  // a lot of code.
-                  tagsStoreFactory.get().state.tagToTransactionIds.keySet.map(_.name).toVector,
-                showErrorMessage = props.showErrorMessages,
-                additionalValidator = mappedExtraProps.additionalValidator,
-                defaultValue = mappedExtraProps.defaultValue,
-                inputClasses = extraProps.inputClasses
-              )
-          }
+          defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.tags),
+          startWithDefault = props.defaultValues.isEmpty,
+          delegateRefFactory = bootstrap.TagInput.ref _
+        ) { extraProps =>
+          bootstrap.TagInput(
+            ref = extraProps.ref,
+            name = "tags",
+            label = i18n("facto.tags"),
+            suggestions =
+              // Note: This is not strictly correct because we are using changing state from outside
+              // this component without putting it into the state (and listening to the tagsStore for
+              // changes. This is because being up-to-date is not really necessary but would introduce
+              // a lot of code.
+              tagsStoreFactory.get().state.tagToTransactionIds.keySet.toVector,
+            showErrorMessage = props.showErrorMessages,
+            additionalValidator = _.forall(Tags.isValidTag),
+            defaultValue = props.defaultValues.tags,
+            inputClasses = extraProps.inputClasses,
+            listener = AnythingChangedListener
+          )
         }
       )
     }

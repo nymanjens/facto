@@ -83,14 +83,14 @@ object Template {
                          categoryCodeTpl: Option[String] = None,
                          descriptionTpl: String = "",
                          flowInCents: Long = 0,
-                         tagsString: String = "") {
+                         tags: Seq[String] = Seq()) {
     requireNonNull(
       beneficiaryCodeTpl,
       moneyReservoirCodeTpl,
       categoryCodeTpl,
       descriptionTpl,
       flowInCents,
-      tagsString)
+      tags)
 
     def toPartial(account: Account)(implicit accountingConfig: Config): AccountingTransaction.Partial = {
       def fillInPlaceholders(string: String): String = {
@@ -117,7 +117,7 @@ object Template {
         description = fillInPlaceholders(descriptionTpl),
         flowInCents = flowInCents,
         detailDescription = "",
-        tagsString = tagsString
+        tags = tags
       )
     }
   }

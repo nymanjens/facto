@@ -148,7 +148,7 @@ object Converters {
         Scala2Js.Key.toJsPair(Keys.Transaction.description -> entity.description),
         Scala2Js.Key.toJsPair(Keys.Transaction.flowInCents -> entity.flowInCents),
         Scala2Js.Key.toJsPair(Keys.Transaction.detailDescription -> entity.detailDescription),
-        Scala2Js.Key.toJsPair(Keys.Transaction.tagsString -> entity.tagsString),
+        Scala2Js.Key.toJsPair(Keys.Transaction.tags -> entity.tags),
         Scala2Js.Key.toJsPair(Keys.Transaction.createdDate -> entity.createdDate),
         Scala2Js.Key.toJsPair(Keys.Transaction.transactionDate -> entity.transactionDate),
         Scala2Js.Key.toJsPair(Keys.Transaction.consumedDate -> entity.consumedDate)
@@ -167,7 +167,7 @@ object Converters {
         description = getRequired(Keys.Transaction.description),
         flowInCents = getRequired(Keys.Transaction.flowInCents),
         detailDescription = getRequired(Keys.Transaction.detailDescription),
-        tagsString = getRequired(Keys.Transaction.tagsString),
+        tags = getRequired(Keys.Transaction.tags),
         createdDate = getRequired(Keys.Transaction.createdDate),
         transactionDate = getRequired(Keys.Transaction.transactionDate),
         consumedDate = getRequired(Keys.Transaction.consumedDate)

@@ -13,7 +13,6 @@ import common.time.JavaTimeImplicits._
 import common.time.{Clock, DatedMonth, LocalDateTimes, MonthRange, TimeUtils}
 import common.CollectionUtils.toListMap
 import common.GuavaUtils.asGuava
-import common.accounting.Tag
 import models.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}
 import models.accounting.{SlickTransactionManager, Transaction}
 import models.accounting.config.{Account, Category, Config}
@@ -37,7 +36,7 @@ final class Summaries @Inject()(implicit accountingConfig: Config,
                                 entityAccess: SlickEntityAccess,
                                 exchangeRateManager: ExchangeRateManager,
                                 transactionManager: SlickTransactionManager) {
-  def fetchSummary(account: Account, expandedYear: Int, tags: Seq[Tag] = Seq()): Summary = {
+  def fetchSummary(account: Account, expandedYear: Int, tags: Seq[String] = Seq()): Summary = {
     val now = clock.now.toLocalDate
 
     val years: Seq[Int] = getSummaryYears(account, expandedYear, now.getYear)
@@ -116,9 +115,9 @@ object SummaryForYear {
   private[accounting] def fetch(account: Account,
                                 monthRangeForAverages: MonthRange,
                                 year: Int,
-                                tags: Seq[Tag])(implicit accountingConfig: Config,
-                                                exchangeRateManager: ExchangeRateManager,
-                                                entityAccess: SlickEntityAccess): SummaryForYear =
+                                tags: Seq[String])(implicit accountingConfig: Config,
+                                                   exchangeRateManager: ExchangeRateManager,
+                                                   entityAccess: SlickEntityAccess): SummaryForYear =
     ControllerHelperCache.cached(GetSummaryForYear(account, monthRangeForAverages, year, tags)) {
       val transactions: Seq[Transaction] = {
         val yearRange = MonthRange.forYear(year)
@@ -129,10 +128,10 @@ object SummaryForYear {
             .filter(
               _.consumedDate < LocalDateTimes.ofJavaLocalDateTime(yearRange.startOfNextMonth.atStartOfDay()))
             .sortBy(r => (r.consumedDate, r.createdDate))).toList
-        if (tags .isEmpty) {
+        if (tags.isEmpty) {
           allTransactions // don't filter
         } else {
-          def containsAnyTag(seq: Seq[Tag]): Boolean = !seq.filter(tags.contains).isEmpty
+          def containsAnyTag(seq: Seq[String]): Boolean = !seq.filter(tags.contains).isEmpty
           allTransactions.filter(trans => containsAnyTag(trans.tags))
         }
       }
@@ -147,7 +146,7 @@ object SummaryForYear {
   private case class GetSummaryForYear(account: Account,
                                        monthRangeForAverages: MonthRange,
                                        year: Int,
-                                       tags: Seq[Tag])
+                                       tags: Seq[String])
       extends CacheIdentifier[SummaryForYear] {
     protected override def invalidateWhenUpdating = {
       case transaction: Transaction =>

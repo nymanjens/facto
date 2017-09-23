@@ -4,6 +4,7 @@ import com.google.inject._
 import com.google.common.base.Splitter
 import com.google.common.hash.{HashCode, Hashing}
 import common.time.Clock
+import common.accounting.Tags
 import models.SlickUtils.localDateTimeToSqlDateMapper
 import models.SlickUtils.dbRun
 import models.SlickUtils.dbApi._
@@ -38,7 +39,7 @@ final class SlickTransactionManager @Inject()(tagEntityManager: SlickTagEntityMa
 
     // Add tagEntityManager to database
     for (tag <- persistedTransaction.tags) {
-      tagEntityManager.add(TagEntity(name = tag.name, transactionId = persistedTransaction.id))
+      tagEntityManager.add(TagEntity(name = tag, transactionId = persistedTransaction.id))
     }
 
     persistedTransaction
@@ -58,6 +59,10 @@ final class SlickTransactionManager @Inject()(tagEntityManager: SlickTagEntityMa
 object SlickTransactionManager {
   private val tableName: String = "TRANSACTIONS"
 
+  private implicit val tagsSeqToStringMapper: ColumnType[Seq[String]] = {
+    MappedColumnType.base[Seq[String], String](Tags.serializeToString, Tags.parseTagsString)
+  }
+
   final class Transactions(tag: SlickTag) extends EntityTable[Transaction](tag, tableName) {
     def transactionGroupId = column[Long]("transactionGroupId")
     def issuerId = column[Long]("issuerId")
@@ -67,7 +72,7 @@ object SlickTransactionManager {
     def description = column[String]("description")
     def flow = column[Long]("flow")
     def detailDescription = column[String]("detailDescription")
-    def tagsString = column[String]("tagsString")
+    def tags = column[Seq[String]]("tagsString")(tagsSeqToStringMapper)
     def createdDate = column[LocalDateTime]("createdDate")
     def transactionDate = column[LocalDateTime]("transactionDate")
     def consumedDate = column[LocalDateTime]("consumedDate")
@@ -82,7 +87,7 @@ object SlickTransactionManager {
         description,
         flow,
         detailDescription,
-        tagsString,
+        tags,
         createdDate,
         transactionDate,
         consumedDate,

@@ -2,7 +2,7 @@ package flux.react.uielements.input
 
 import java.time.Month.{APRIL, MAY}
 
-import common.accounting.Tag
+import common.accounting.Tags
 import common.testing.{ReactTestWrapper, TestModule}
 import common.time.LocalDateTime
 import common.time.LocalDateTimes.createDateTime
@@ -51,20 +51,6 @@ object MappedInputTest extends TestSuite {
     "ValueTransformer.StringToLocalDateTime.backward() works" - {
       val stringToLocalDateTime = MappedInput.ValueTransformer.StringToLocalDateTime
       stringToLocalDateTime.backward(createDateTime(2017, APRIL, 3)) ==> "2017-04-03"
-    }
-
-    "ValueTransformer.StringSeqToTagSeq.forward() works" - {
-      val stringsToTags = MappedInput.ValueTransformer.StringSeqToTagSeq
-      stringsToTags.forward(Seq("tag1", "tag-2")) ==> Some(Seq(Tag("tag1"), Tag("tag-2")))
-      stringsToTags.forward(Seq()) ==> Some(Seq())
-      stringsToTags.forward(Seq("")) ==> None
-      stringsToTags.forward(Seq("a", "]")) ==> None
-      stringsToTags.forward(Seq("]")) ==> None
-    }
-
-    "ValueTransformer.StringSeqToTagSeq.backward() works" - {
-      val stringsToTags = MappedInput.ValueTransformer.StringSeqToTagSeq
-      stringsToTags.backward(Seq(Tag("tag1"), Tag("tag-2"))) ==> Seq("tag1", "tag-2")
     }
   }
 

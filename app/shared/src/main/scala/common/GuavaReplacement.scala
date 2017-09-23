@@ -32,6 +32,19 @@ object GuavaReplacement {
   }
 
   final class Splitter(separator: Char) {
+    private var _omitEmptyStrings: Boolean = false
+    private var _trimResults: Boolean = false
+
+    def omitEmptyStrings(): this.type = {
+      _omitEmptyStrings = true
+      this
+    }
+
+    def trimResults(): this.type = {
+      _trimResults = true
+      this
+    }
+
     def split(string: String): Seq[String] = {
       val parts = mutable.Buffer[String]()
       val nextPart = new StringBuilder
@@ -44,7 +57,14 @@ object GuavaReplacement {
           nextPart += char
       }
       parts += nextPart.result()
-      Seq(parts: _*)
+      var result = Seq(parts: _*)
+      if (_trimResults) {
+        result = result.map(_.trim)
+      }
+      if (_omitEmptyStrings) {
+        result = result.filter(_.nonEmpty)
+      }
+      result
     }
   }
   object Splitter {

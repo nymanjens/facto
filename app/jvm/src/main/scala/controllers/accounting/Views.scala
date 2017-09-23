@@ -7,7 +7,7 @@ import play.api.mvc._
 import common.{GetParameter, I18n}
 import common.time.{Clock, TimeUtils}
 import common.CollectionUtils.toListMap
-import common.accounting.Tag
+import common.accounting.Tags
 import models._
 import models.accounting.TagEntity
 import models.accounting.config.Config
@@ -196,38 +196,6 @@ final class Views @Inject()(implicit override val messagesApi: MessagesApi,
   private def summary(accounts: Iterable[Account], expandedYear: Int, tagsString: String, toggleTag: String)(
       implicit request: Request[AnyContent],
       user: User): Result = {
-    val tags = Tag.parseTagsString(tagsString)
-
-    if (toggleTag != "") {
-      // Redirect to the same page with the toggled tag in tagsString
-      val newTags = {
-        val newTag = Tag(toggleTag)
-        if (tags contains newTag) {
-          tags.filter(_ != newTag)
-        } else if (Tag.isValidTagName(toggleTag)) {
-          tags ++ Seq(newTag)
-        } else {
-          tags
-        }
-      }
-      val newTagsString = Joiner.on(",").join(newTags.map(_.name).asJava)
-      Redirect(controllers.accounting.routes.Views.summaryFor(expandedYear, newTagsString, toggleTag = ""))
-
-    } else {
-      // get accountToEntries
-      val accountToSummary = toListMap {
-        for (account <- accounts) yield account -> summaries.fetchSummary(account, expandedYear, tags)
-      }
-
-      // render
-      Ok(
-        views.html.accounting.summary(
-          accountToSummary,
-          expandedYear,
-          templatesInNavbar = accountingConfig.templatesToShowFor(Template.Placement.SummaryView, user),
-          tags = tags,
-          tagsString = tagsString
-        ))
-    }
+    ???
   }
 }

@@ -1,7 +1,7 @@
 package models.accounting.config
 
 import scala.collection.JavaConverters._
-import scala.collection.immutable.ListMap
+import scala.collection.immutable.{ListMap, Seq}
 import java.util.Collections
 
 import com.google.common.base.Preconditions.checkNotNull
@@ -149,8 +149,8 @@ object Parsable {
                            categoryCode: String @nullable,
                            description: String,
                            flowAsFloat: Double,
-                           tagsString: String) {
-      def this() = this(null, null, null, description = "", flowAsFloat = 0, tagsString = "")
+                           tags: java.util.List[String] @nullable) {
+      def this() = this(null, null, null, description = "", flowAsFloat = 0, tags = null)
 
       def parse(accounts: Map[String, ParsedAccount],
                 reservoirs: Map[String, ParsedMoneyReservoir],
@@ -169,7 +169,7 @@ object Parsable {
           categoryCodeTpl = Option(categoryCode) map validateCode(categories.keySet),
           descriptionTpl = description,
           flowInCents = (flowAsFloat.toDouble * 100).round,
-          tagsString = tagsString
+          tags = Option(tags).map(_.asScala.toList).getOrElse(Seq())
         )
       }
     }

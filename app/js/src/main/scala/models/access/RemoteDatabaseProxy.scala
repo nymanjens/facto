@@ -38,7 +38,7 @@ trait RemoteDatabaseProxy {
 
 object RemoteDatabaseProxy {
 
-  private val localDatabaseAndEntityVersion = "1.0"
+  private val localDatabaseAndEntityVersion = "1.1"
 
   private[access] def create(apiClient: ScalaJsApiClient,
                              possiblyEmptyLocalDatabase: LocalDatabase): Future[RemoteDatabaseProxy.Impl] =

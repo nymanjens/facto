@@ -1,7 +1,7 @@
 package flux.stores.entries
 
 import common.GuavaReplacement.ImmutableSetMultimap
-import common.accounting.Tag
+import common.accounting.Tags
 import common.testing.TestObjects._
 import common.testing.{FakeRemoteDatabaseProxy, TestModule}
 import models.accounting._
@@ -28,20 +28,17 @@ object TagsStoreFactoryTest extends TestSuite {
 
       factory.get().state.tagToTransactionIds ==>
         ImmutableSetMultimap
-          .builder[Tag, Long]()
-          .putAll(Tag("aa"), 101, 102)
-          .putAll(Tag("bb"), 101, 103)
-          .putAll(Tag("cc"), 103)
+          .builder[TagsStoreFactory.Tag, TagsStoreFactory.TransactionId]()
+          .putAll("aa", 101, 102)
+          .putAll("bb", 101, 103)
+          .putAll("cc", 103)
           .build()
     }
   }
 
   private def persistTransaction(id: Long, tags: Seq[String])(
       implicit database: FakeRemoteDatabaseProxy): Transaction = {
-    val transaction = testTransactionWithIdA.copy(
-      idOption = Some(id),
-      tagsString = Tag.serializeToString(tags.map(Tag.apply))
-    )
+    val transaction = testTransactionWithIdA.copy(idOption = Some(id), tags = tags)
     database.addRemotelyAddedEntities(transaction)
     transaction
   }

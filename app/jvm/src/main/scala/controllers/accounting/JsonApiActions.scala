@@ -45,8 +45,7 @@ final class JsonApi @Inject()(implicit override val messagesApi: MessagesApi,
     }
 
   def getAllTags = AuthenticatedAction { implicit user => implicit request =>
-    val tagNames = entityAccess.tagEntityManager.fetchAll().map(_.tag.name).toSet
-    Ok(Json.toJson(tagNames))
+    ???
   }
 
   def exchangeMoney(fromCents: Long, fromCurrencyCode: String, dateString: String, toCurrencyCode: String) =

@@ -1,13 +1,12 @@
 package flux.stores.entries
 
-import scala2js.Converters._
 import common.GuavaReplacement.ImmutableSetMultimap
-import common.accounting.Tag
 import flux.stores.entries.TagsStoreFactory.State
 import models.access.RemoteDatabaseProxy
 import models.accounting.{BalanceCheck, Transaction}
 
 import scala.collection.immutable.Seq
+import scala2js.Converters._
 import scala2js.Keys
 
 final class TagsStoreFactory(implicit database: RemoteDatabaseProxy) extends EntriesStoreFactory[State] {
@@ -19,9 +18,10 @@ final class TagsStoreFactory(implicit database: RemoteDatabaseProxy) extends Ent
   override protected def createNew(input: Input) = new Store {
     override protected def calculateState() = {
       val transactionsWithTags: Seq[Transaction] =
-        database.newQuery[Transaction]().filterNot(Keys.Transaction.tagsString, "").data()
+        database.newQuery[Transaction]().filterNot(Keys.Transaction.tags, Seq()).data()
 
-      val tagToTransactionIdsBuilder = ImmutableSetMultimap.builder[Tag, Long]()
+      val tagToTransactionIdsBuilder =
+        ImmutableSetMultimap.builder[TagsStoreFactory.Tag, TagsStoreFactory.TransactionId]()
       for {
         transaction <- transactionsWithTags
         tag <- transaction.tags
@@ -40,5 +40,7 @@ final class TagsStoreFactory(implicit database: RemoteDatabaseProxy) extends Ent
 }
 
 object TagsStoreFactory {
-  case class State(tagToTransactionIds: ImmutableSetMultimap[Tag, Long])
+  type Tag = String
+  type TransactionId = Long
+  case class State(tagToTransactionIds: ImmutableSetMultimap[Tag, TransactionId])
 }

@@ -1,12 +1,11 @@
 package flux.stores.entries
 
-import common.accounting.Tag
 import common.time.JavaTimeImplicits._
 import common.time.LocalDateTime
 import models._
+import models.accounting.Transaction
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.accounting.money.{ExchangeRateManager, Money, MoneyWithGeneralCurrency}
-import models.accounting.Transaction
 
 import scala.collection.immutable.Seq
 
@@ -27,7 +26,7 @@ abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
     transactions.map(_.category).distinct
   def descriptions: Seq[String] = transactions.map(_.description).distinct
   def mostRecentTransaction: Transaction = transactions.sortBy(_.transactionDate).last
-  def tags: Seq[Tag] = transactions.flatMap(_.tags).distinct
+  def tags: Seq[String] = transactions.flatMap(_.tags).distinct
 
   def flow(implicit exchangeRateManager: ExchangeRateManager, accountingConfig: Config): Money = {
     val currencies = transactions.map(_.flow.currency).distinct

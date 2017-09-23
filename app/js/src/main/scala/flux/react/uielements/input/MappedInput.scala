@@ -1,7 +1,7 @@
 package flux.react.uielements.input
 
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
-import common.accounting.Tag
+import common.accounting.Tags
 import common.time.{LocalDateTime, TimeUtils}
 import flux.react.uielements.input.MappedInput.ValueTransformer
 import japgolly.scalajs.react._
@@ -189,17 +189,6 @@ object MappedInput {
         }
       }
       override def backward(value: LocalDateTime) = value.toLocalDate.toString
-    }
-
-    object StringSeqToTagSeq extends ValueTransformer[Seq[String], Seq[Tag]] {
-      override def forward(stringSeq: Seq[String]) = {
-        if (stringSeq.forall(Tag.isValidTagName)) {
-          Some(stringSeq.map(Tag.apply))
-        } else {
-          None
-        }
-      }
-      override def backward(value: Seq[Tag]) = value.map(_.name)
     }
   }
 }

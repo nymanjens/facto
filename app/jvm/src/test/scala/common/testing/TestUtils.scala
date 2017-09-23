@@ -9,19 +9,21 @@ import models.accounting.config.{Account, Category, MoneyReservoir}
 import models.accounting.money.Currency.Gbp
 import models.accounting.money.ExchangeRateMeasurement
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
+import scala.collection.immutable.Seq
 
 object TestUtils {
 
-  def persistTransaction(groupId: Long = -1,
-                         flowInCents: Long = 0,
-                         date: LocalDateTime = FakeClock.defaultTime,
-                         timestamp: Long = -1,
-                         account: Account = testAccount,
-                         category: Category = testCategory,
-                         reservoir: MoneyReservoir = testReservoir,
-                         description: String = "description",
-                         detailDescription: String = "detailDescription",
-                         tagsString: String = "")(implicit entityAccess: SlickEntityAccess): Transaction = {
+  def persistTransaction(
+      groupId: Long = -1,
+      flowInCents: Long = 0,
+      date: LocalDateTime = FakeClock.defaultTime,
+      timestamp: Long = -1,
+      account: Account = testAccount,
+      category: Category = testCategory,
+      reservoir: MoneyReservoir = testReservoir,
+      description: String = "description",
+      detailDescription: String = "detailDescription",
+      tags: Seq[String] = Seq())(implicit entityAccess: SlickEntityAccess): Transaction = {
     val actualGroupId = if (groupId == -1) {
       entityAccess.transactionGroupManager.add(TransactionGroup(createdDate = FakeClock.defaultTime)).id
     } else {
@@ -38,7 +40,7 @@ object TestUtils {
         description = description,
         detailDescription = detailDescription,
         flowInCents = flowInCents,
-        tagsString = tagsString,
+        tags = tags,
         createdDate = actualDate,
         transactionDate = actualDate,
         consumedDate = actualDate

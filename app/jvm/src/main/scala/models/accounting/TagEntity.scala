@@ -1,6 +1,6 @@
 package models.accounting
 
-import common.accounting.Tag
+import common.accounting.Tags
 import models.EntityAccess
 import models.manager.{Entity, EntityManager}
 
@@ -18,7 +18,7 @@ case class TagEntity(name: String, transactionId: Long, idOption: Option[Long] =
 
   override def withId(id: Long) = copy(idOption = Some(id))
 
-  def tag: Tag = Tag(name)
+  def tag: String = name
   def transaction(implicit entityAccess: EntityAccess): Transaction =
     entityAccess.transactionManager.findById(transactionId)
 
@@ -39,6 +39,6 @@ object TagEntity {
       * @return an map with a fixed iteration order (most used first), mapping the Tag to the number of transactions
       *         it is used in
       */
-    def usageAndReccomendations(selectedTags: Seq[Tag], maxNumRecommendations: Int): ListMap[Tag, Int]
+    def usageAndReccomendations(selectedTags: Seq[String], maxNumRecommendations: Int): ListMap[String, Int]
   }
 }

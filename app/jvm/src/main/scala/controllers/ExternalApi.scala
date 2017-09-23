@@ -137,7 +137,7 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
           description = checkNotEmpty(partial.description),
           flowInCents = partial.flowInCents,
           detailDescription = partial.detailDescription,
-          tagsString = partial.tagsString,
+          tags = partial.tags,
           createdDate = clock.now,
           transactionDate = clock.now,
           consumedDate = clock.now

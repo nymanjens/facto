@@ -1,18 +1,15 @@
 package models.accounting
 
-import com.google.common.collect.{ImmutableMultiset, Multiset}
+import com.google.common.collect.ImmutableMultiset
 import common.CollectionUtils.toListMap
+import common.accounting.Tags
+import models.SlickUtils.dbApi.{Tag => SlickTag, _}
 import models.SlickUtils.dbRun
-import models.SlickUtils.dbApi._
-import models.SlickUtils.dbApi.{Tag => SlickTag}
-import models.SlickUtils.localDateTimeToSqlDateMapper
-import models.manager.{Entity, EntityTable, ImmutableEntityManager, SlickEntityManager}
+import models.accounting.SlickTagEntityManager.{TagEntities, tableName}
+import models.manager.{EntityTable, ImmutableEntityManager, SlickEntityManager}
 
 import scala.collection.JavaConverters._
-import scala.collection.immutable.Seq
-import scala.collection.immutable.ListMap
-import SlickTagEntityManager.{TagEntities, tableName}
-import common.accounting.Tag
+import scala.collection.immutable.{ListMap, Seq}
 
 final class SlickTagEntityManager
     extends ImmutableEntityManager[TagEntity, TagEntities](
@@ -24,27 +21,27 @@ final class SlickTagEntityManager
 
   // Validates the tag name at creation time
   override def add(tagEntity: TagEntity): TagEntity = {
-    Tag.isValidTagName(tagEntity.name)
+    Tags.isValidTag(tagEntity.name)
     super.add(tagEntity)
   }
 
-  override def usageAndReccomendations(selectedTags: Seq[Tag],
-                                       maxNumRecommendations: Int): ListMap[Tag, Int] = {
-    val tagToUsagePairs: Seq[(Tag, Int)] = {
+  override def usageAndReccomendations(selectedTags: Seq[String],
+                                       maxNumRecommendations: Int): ListMap[String, Int] = {
+    val tagToUsagePairs: Seq[(String, Int)] = {
       val allTagNames = dbRun(newQuery.map(_.name))
       val multiset = ImmutableMultiset.copyOf(allTagNames.asJava)
       for (tagName <- multiset.elementSet.asScala.toList) yield {
-        Tag(tagName) -> multiset.count(tagName)
+        tagName -> multiset.count(tagName)
       }
     }
-    val tagToUsageMap: Map[Tag, Int] = tagToUsagePairs.toMap withDefault (_ => 0)
+    val tagToUsageMap: Map[String, Int] = tagToUsagePairs.toMap withDefault (_ => 0)
 
-    val selectedTagsMap: ListMap[Tag, Int] = {
+    val selectedTagsMap: ListMap[String, Int] = {
       toListMap(for (tag <- selectedTags) yield {
         (tag, tagToUsageMap(tag))
       })
     }
-    val recommendedTagsMap: ListMap[Tag, Int] = {
+    val recommendedTagsMap: ListMap[String, Int] = {
       val numRecommendations = maxNumRecommendations - selectedTags.size
       if (numRecommendations <= 0) {
         toListMap(Seq())

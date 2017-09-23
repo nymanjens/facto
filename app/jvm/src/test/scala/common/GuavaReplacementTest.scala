@@ -15,5 +15,9 @@ class GuavaReplacementTest extends HookedSpecification {
   "Splitter" in {
     Splitter.on(' ').split(" a b  c ") mustEqual Seq("", "a", "b", "", "c", "")
     Splitter.on(':').split(" a:b: c :") mustEqual Seq(" a", "b", " c ", "")
+    Splitter.on(',').omitEmptyStrings().split(",,,") mustEqual Seq()
+    Splitter.on(',').omitEmptyStrings().split(",,a,b") mustEqual Seq("a", "b")
+    Splitter.on(',').trimResults().split(" a ,b ") mustEqual Seq("a", "b")
+    Splitter.on(',').omitEmptyStrings().trimResults().split(" a ,b ,  ") mustEqual Seq("a", "b")
   }
 }

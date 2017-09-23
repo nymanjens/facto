@@ -1,17 +1,13 @@
 package models.accounting
 
-import common.accounting.Tag
-import models.manager.EntityType
-import common.time.Clock
-import models.accounting.config.{Account, Category, Config, MoneyReservoir}
-import models.accounting.money.{DatedMoney, Money}
-import models.manager.{Entity, EntityManager}
-import models._
+import common.accounting.Tags
 import common.time.LocalDateTime
+import models._
+import models.accounting.config.{Account, Category, Config, MoneyReservoir}
+import models.accounting.money.DatedMoney
+import models.manager.{Entity, EntityManager}
 
-import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
-import scala.util.Try
 
 /** Transaction entities are immutable. Just delete and create a new one when updating. */
 case class Transaction(transactionGroupId: Long,
@@ -22,7 +18,7 @@ case class Transaction(transactionGroupId: Long,
                        description: String,
                        flowInCents: Long,
                        detailDescription: String = "",
-                       tagsString: String = "",
+                       tags: Seq[String] = Seq(),
                        createdDate: LocalDateTime,
                        transactionDate: LocalDateTime,
                        consumedDate: LocalDateTime,
@@ -47,7 +43,7 @@ case class Transaction(transactionGroupId: Long,
   def category(implicit accountingConfig: Config): Category = accountingConfig.categories(categoryCode)
   def flow(implicit accountingConfig: Config): DatedMoney =
     DatedMoney(flowInCents, moneyReservoir.currency, transactionDate)
-  lazy val tags: Seq[Tag] = Tag.parseTagsString(tagsString)
+  def tagsString: String = Tags.serializeToString(tags)
 
   /** Returns None if the consumed date is the same as the transaction date (and thus carries no further information. */
   def consumedDateOption: Option[LocalDateTime] =
@@ -74,12 +70,11 @@ object Transaction {
                      description: String = "",
                      flowInCents: Long = 0,
                      detailDescription: String = "",
-                     tagsString: String = "",
+                     tags: Seq[String] = Seq(),
                      createdDate: Option[LocalDateTime] = None,
                      transactionDate: Option[LocalDateTime] = None,
                      consumedDate: Option[LocalDateTime] = None,
                      idOption: Option[Long] = None) {
-    def tags: Seq[Tag] = Tag.parseTagsString(tagsString)
     def issuer(implicit entityAccess: EntityAccess): Option[User] =
       issuerId.map(entityAccess.userManager.findById(_))
     def isEmpty: Boolean = this == Partial.empty
@@ -96,7 +91,7 @@ object Transaction {
              description: String = "",
              flowInCents: Long = 0,
              detailDescription: String = "",
-             tagsString: String = "",
+             tags: Seq[String] = Seq(),
              createdDate: LocalDateTime = null,
              transactionDate: LocalDateTime = null,
              consumedDate: LocalDateTime = null,
@@ -110,7 +105,7 @@ object Transaction {
         description = description,
         flowInCents = flowInCents,
         detailDescription = detailDescription,
-        tagsString = tagsString,
+        tags = tags,
         createdDate = Option(createdDate),
         transactionDate = Option(transactionDate),
         consumedDate = Option(consumedDate),
@@ -127,7 +122,7 @@ object Transaction {
         description = transaction.description,
         flowInCents = transaction.flowInCents,
         detailDescription = transaction.detailDescription,
-        tagsString = transaction.tagsString,
+        tags = transaction.tags,
         createdDate = transaction.createdDate,
         transactionDate = transaction.transactionDate,
         consumedDate = transaction.consumedDate,
