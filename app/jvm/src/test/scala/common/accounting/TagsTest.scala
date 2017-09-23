@@ -1,10 +1,8 @@
-package models.accounting
+package common.accounting
 
-import common.accounting.Tag
 import org.specs2.mutable._
-import play.api.test.WithApplication
 
-class TagTest extends Specification {
+class TagsTest extends Specification {
 
   "isValidTagName" in {
     Tag.isValidTagName("") mustEqual false
