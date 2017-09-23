@@ -1,5 +1,6 @@
 package flux.stores
 
+import common.testing.TestObjects
 import utest._
 
 import scala.collection.immutable.Seq
@@ -13,6 +14,8 @@ object ComplexQueryStoreTest extends TestSuite {
     val testModule = new common.testing.TestModule
 
     implicit val fakeDatabase = testModule.fakeRemoteDatabaseProxy
+    implicit val userManager = testModule.entityAccess.userManager
+    implicit val testAccountingConfig = testModule.testAccountingConfig
 
     val complexQueryStore = new ComplexQueryStore()
 
