@@ -1,13 +1,13 @@
 package flux.react.uielements.input
 
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
+import common.accounting.Tag
 import common.time.{LocalDateTime, TimeUtils}
 import flux.react.uielements.input.MappedInput.ValueTransformer
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom._
-import models.accounting.Tag
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable

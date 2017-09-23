@@ -2,12 +2,12 @@ package flux.react.uielements.input
 
 import java.time.Month.{APRIL, MAY}
 
+import common.accounting.Tag
 import common.testing.{ReactTestWrapper, TestModule}
 import common.time.LocalDateTime
 import common.time.LocalDateTimes.createDateTime
 import japgolly.scalajs.react.test.ReactTestUtils
 import japgolly.scalajs.react.vdom.VdomElement
-import models.accounting.Tag
 import utest._
 
 import scala.collection.immutable.Seq

@@ -2,24 +2,25 @@ package controllers.helpers.accounting
 
 import com.google.inject.{Inject, Singleton}
 import java.time.{LocalDate, Month}
+
 import scala.collection.immutable.Seq
 import scala.collection.JavaConverters._
 import com.google.common.collect.{HashMultimap, ImmutableTable, Multimap, Range, Table, Tables}
 import models.SlickUtils.dbApi._
-
 import play.api.Logger
 import common.time.LocalDateTime
 import common.time.JavaTimeImplicits._
-import common.time.{Clock, DatedMonth, MonthRange, TimeUtils, LocalDateTimes}
+import common.time.{Clock, DatedMonth, LocalDateTimes, MonthRange, TimeUtils}
 import common.CollectionUtils.toListMap
 import common.GuavaUtils.asGuava
-import models.SlickUtils.{localDateTimeToSqlDateMapper, dbRun}
-import models.accounting.{Tag, Transaction, SlickTransactionManager}
+import common.accounting.Tag
+import models.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}
+import models.accounting.{SlickTransactionManager, Transaction}
 import models.accounting.config.{Account, Category, Config}
 import models.accounting.config.Account.SummaryTotalRowDef
 import controllers.helpers.ControllerHelperCache
 import controllers.helpers.ControllerHelperCache.CacheIdentifier
-import models.accounting.money.{ReferenceMoney, ExchangeRateManager}
+import models.accounting.money.{ExchangeRateManager, ReferenceMoney}
 import models.SlickEntityAccess
 
 case class Summary(yearToSummary: Map[Int, SummaryForYear],

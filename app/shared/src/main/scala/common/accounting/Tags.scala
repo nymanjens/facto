@@ -1,4 +1,4 @@
-package models.accounting
+package common.accounting
 
 import scala.collection.immutable.Seq
 import scala.math.abs

@@ -1,5 +1,6 @@
 package models.accounting
 
+import common.accounting.Tag
 import models.EntityAccess
 import models.manager.{Entity, EntityManager}
 

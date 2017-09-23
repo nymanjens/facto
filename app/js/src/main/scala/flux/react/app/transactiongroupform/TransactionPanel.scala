@@ -2,6 +2,7 @@ package flux.react.app.transactiongroupform
 import java.util.NoSuchElementException
 
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
+import common.accounting.Tag
 import common.time.{Clock, LocalDateTime, LocalDateTimes}
 import common.{I18n, SinglePendingTaskQueue}
 import flux.react.ReactVdomUtils.<<
@@ -15,7 +16,7 @@ import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom.html_<^._
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.accounting.money._
-import models.accounting.{Tag, Transaction}
+import models.accounting.Transaction
 import models.{EntityAccess, User}
 
 import scala.collection.immutable.Seq

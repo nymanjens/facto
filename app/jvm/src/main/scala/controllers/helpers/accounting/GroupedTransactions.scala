@@ -1,19 +1,20 @@
 package controllers.helpers.accounting
 
-import collection.immutable.Seq
+import common.accounting.Tag
 
+import collection.immutable.Seq
 import common.time.LocalDateTime
 import common.time.Clock
 import common.time.JavaTimeImplicits._
 import models._
-import models.accounting.{Tag, Transaction}
-import models.accounting.config.{Account, Category, MoneyReservoir, Config}
+import models.accounting.Transaction
+import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.accounting.money.{
   DatedMoney,
+  ExchangeRateManager,
   Money,
   MoneyWithGeneralCurrency,
-  ReferenceMoney,
-  ExchangeRateManager
+  ReferenceMoney
 }
 
 abstract class GroupedTransactions(val transactions: Seq[Transaction]) {

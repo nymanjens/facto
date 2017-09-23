@@ -6,13 +6,13 @@ import models.SlickUtils.dbRun
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbApi.{Tag => SlickTag}
 import models.SlickUtils.localDateTimeToSqlDateMapper
-import models.manager.{Entity, SlickEntityManager, EntityTable, ImmutableEntityManager}
+import models.manager.{Entity, EntityTable, ImmutableEntityManager, SlickEntityManager}
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
 import scala.collection.immutable.ListMap
-
 import SlickTagEntityManager.{TagEntities, tableName}
+import common.accounting.Tag
 
 final class SlickTagEntityManager
     extends ImmutableEntityManager[TagEntity, TagEntities](

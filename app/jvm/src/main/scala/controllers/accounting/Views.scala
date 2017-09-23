@@ -7,8 +7,9 @@ import play.api.mvc._
 import common.{GetParameter, I18n}
 import common.time.{Clock, TimeUtils}
 import common.CollectionUtils.toListMap
+import common.accounting.Tag
 import models._
-import models.accounting.{Tag, TagEntity}
+import models.accounting.TagEntity
 import models.accounting.config.Config
 import models.accounting.money.ExchangeRateManager
 import models.accounting.config.{Account, Category, MoneyReservoir, Template}

@@ -1,11 +1,12 @@
 package flux.stores.entries
 
+import common.accounting.Tag
 import common.time.JavaTimeImplicits._
 import common.time.LocalDateTime
 import models._
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.accounting.money.{ExchangeRateManager, Money, MoneyWithGeneralCurrency}
-import models.accounting.{Tag, Transaction}
+import models.accounting.Transaction
 
 import scala.collection.immutable.Seq
 

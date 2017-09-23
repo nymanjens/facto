@@ -2,9 +2,10 @@ package flux.stores.entries
 
 import scala2js.Converters._
 import common.GuavaReplacement.ImmutableSetMultimap
+import common.accounting.Tag
 import flux.stores.entries.TagsStoreFactory.State
 import models.access.RemoteDatabaseProxy
-import models.accounting.{BalanceCheck, Tag, Transaction}
+import models.accounting.{BalanceCheck, Transaction}
 
 import scala.collection.immutable.Seq
 import scala2js.Keys

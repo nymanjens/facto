@@ -8,8 +8,8 @@ import java.util.Locale
 
 import com.google.common.base.Splitter
 import com.google.common.collect.Iterables
+import common.accounting.Tag
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
-import models.accounting.Tag
 import models.accounting.config.Config
 import models.accounting.money.Money
 

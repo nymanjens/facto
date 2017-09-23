@@ -1,6 +1,7 @@
 package flux.stores.entries
 
 import common.GuavaReplacement.ImmutableSetMultimap
+import common.accounting.Tag
 import common.testing.TestObjects._
 import common.testing.{FakeRemoteDatabaseProxy, TestModule}
 import models.accounting._
