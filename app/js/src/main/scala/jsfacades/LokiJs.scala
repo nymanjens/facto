@@ -174,8 +174,9 @@ object LokiJs {
     def filterDoesntContainIgnoreCase(key: Scala2Js.Key[String, E], substring: String): ResultSet[E] = ???
     def filterAnyContainsIgnoreCase(keys: Seq[Scala2Js.Key[String, E]], substring: String): ResultSet[E] =
       ???
-    def filterSeqContains(key: Scala2Js.Key[Seq[String], E], value: String): ResultSet[E] = ???
-    def filterSeqDoesntContain(key: Scala2Js.Key[Seq[String], E], value: String): ResultSet[E] = ???
+    def filterSeqContains[V: Scala2Js.Converter](key: Scala2Js.Key[Seq[V], E], value: V): ResultSet[E] = ???
+    def filterSeqDoesntContain[V: Scala2Js.Converter](key: Scala2Js.Key[Seq[V], E], value: V): ResultSet[E] =
+      ???
 
     def sort(sorting: LokiJs.Sorting[E]): ResultSet[E]
     def limit(quantity: Int): ResultSet[E]
