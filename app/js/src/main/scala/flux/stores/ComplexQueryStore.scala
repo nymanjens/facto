@@ -90,9 +90,7 @@ final class ComplexQueryStore(implicit database: RemoteDatabaseProxy,
             QueryFilter.seqContains(Keys.Transaction.tags, suffix)
         }
       case None =>
-        QueryFilter.anyContainsIgnoreCase(
-          Seq(Keys.Transaction.description, Keys.Transaction.detailDescription),
-          singlePartWithoutNegation)
+        QueryFilter.containsIgnoreCase(Keys.Transaction.detailDescription, singlePartWithoutNegation)
     }
   }
 
@@ -203,13 +201,6 @@ object ComplexQueryStore {
         positiveApply = _.filterContainsIgnoreCase(key, substring),
         negativeApply = _.filterDoesntContainIgnoreCase(key, substring))
 
-    def anyContainsIgnoreCase(keys: Seq[Scala2Js.Key[String, Transaction]], substring: String): QueryFilter =
-      from(
-        estimatedExecutionCost = 4,
-        positiveApply = _.filterAnyContainsIgnoreCase(keys, substring),
-        negativeApply =
-          resultSet => for (key <- keys) resultSet.filterDoesntContainIgnoreCase(key, substring)
-      )
     def seqContains(key: Scala2Js.Key[Seq[String], Transaction], value: String): QueryFilter =
       from(
         estimatedExecutionCost = 3,

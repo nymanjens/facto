@@ -171,11 +171,8 @@ object LokiJs {
     def filterLessThan[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): ResultSet[E]
     def filterAnyOf[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], values: Seq[V]): ResultSet[E] = ???
     def filterNoneOf[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], values: Seq[V]): ResultSet[E] = ???
-    def filterContainsIgnoreCase(key: Scala2Js.Key[String, E], substring: String): ResultSet[E] =
-      filterAnyContainsIgnoreCase(Seq(key), substring)
+    def filterContainsIgnoreCase(key: Scala2Js.Key[String, E], substring: String): ResultSet[E] = ???
     def filterDoesntContainIgnoreCase(key: Scala2Js.Key[String, E], substring: String): ResultSet[E] = ???
-    def filterAnyContainsIgnoreCase(keys: Seq[Scala2Js.Key[String, E]], substring: String): ResultSet[E] =
-      ???
     def filterSeqContains[V: Scala2Js.Converter](key: Scala2Js.Key[Seq[V], E], value: V): ResultSet[E] = ???
     def filterSeqDoesntContain[V: Scala2Js.Converter](key: Scala2Js.Key[Seq[V], E], value: V): ResultSet[E] =
       ???
