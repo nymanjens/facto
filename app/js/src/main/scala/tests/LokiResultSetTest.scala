@@ -137,6 +137,38 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
         data ==> Vector(transaction3)
       }
     },
+    ManualTest("newQuery().filterSeqContains()") {
+      async {
+        implicit val db = await(LocalDatabase.createInMemoryForTests())
+        val transaction1 = persistTransaction(day = 1, tags = Seq("tagA", "tagB", "tag"))
+        val transaction2 = persistTransaction(day = 2, tags = Seq("tagA", "tagB"))
+        val transaction3 = persistTransaction(day = 3, tags = Seq("tag"))
+
+        val data = db
+          .newQuery[Transaction]()
+          .filterSeqContains(Keys.Transaction.tags, "tag")
+          .sort(LokiJs.Sorting.ascBy(Keys.Transaction.createdDate))
+          .data()
+
+        data.map(_.tags) ==> Vector(transaction1.tags,transaction3.tags)
+        data ==> Vector(transaction1, transaction3)
+      }
+    },
+    ManualTest("newQuery().filterSeqDoesntContain()") {
+      async {
+        implicit val db = await(LocalDatabase.createInMemoryForTests())
+        val transaction1 = persistTransaction(day = 1, tags = Seq("tagA", "tagB", "tag"))
+        val transaction2 = persistTransaction(day = 2, tags = Seq("tagA", "tagB"))
+        val transaction3 = persistTransaction(day = 3, tags = Seq("tag"))
+
+        val data = db
+          .newQuery[Transaction]()
+          .filterSeqDoesntContain(Keys.Transaction.tags, "tag")
+          .data()
+
+        data ==> Vector(transaction2)
+      }
+    },
     ManualTest("newQuery().sort()") {
       async {
         implicit val db = await(LocalDatabase.createInMemoryForTests())
@@ -195,13 +227,15 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
       day: Int = 1,
       category: Category = testCategory,
       description: String = "some description",
-      detailDescription: String = "some detail description")(implicit db: LocalDatabase): Transaction = {
+      detailDescription: String = "some detail description",
+      tags: Seq[String] = Seq("some-tag"))(implicit db: LocalDatabase): Transaction = {
     val transaction = testTransactionWithIdA.copy(
       idOption = Some(EntityModification.generateRandomId()),
       transactionGroupId = groupId,
       categoryCode = category.code,
       description = description,
       detailDescription = detailDescription,
+      tags = tags,
       createdDate = createDateTime(2012, JANUARY, day),
       transactionDate = createDateTime(2012, JANUARY, day),
       consumedDate = createDateTime(2012, JANUARY, day)

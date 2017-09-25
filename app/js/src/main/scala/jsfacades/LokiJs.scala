@@ -229,6 +229,10 @@ object LokiJs {
         filterWithModifier("$regex", key, Seq(Regex.quote(substring), "i"))
       override def filterDoesntContainIgnoreCase(key: Key[String, E], substring: String): ResultSet[E] =
         filterWithModifier("$regex", key, Seq(s"""^((?!${Regex.quote(substring)})[\\s\\S])*$$""", "i"))
+      override def filterSeqContains[V: Converter](key: Key[Seq[V], E], value: V) =
+        filterWithModifier("$contains", key, value)
+      override def filterSeqDoesntContain[V: Converter](key: Key[Seq[V], E], value: V): ResultSet[E] =
+        filterWithModifier("$containsNone", key, Seq(value))
 
       private def filterWithModifier[V: Scala2Js.Converter](modifier: String,
                                                             key: Scala2Js.Key[_, E],
