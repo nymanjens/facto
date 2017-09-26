@@ -1,10 +1,12 @@
 package tests
 
+import scala.language.reflectiveCalls
 import java.time.Month.JANUARY
 
 import common.testing.TestObjects._
 import common.time.LocalDateTimes.createDateTime
 import jsfacades.LokiJs
+import jsfacades.LokiJs.ResultSet
 import models.access.LocalDatabase
 import models.accounting.Transaction
 import models.accounting.config.Category
@@ -13,6 +15,7 @@ import tests.ManualTests.{ManualTest, ManualTestSuite}
 
 import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
+import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 import scala2js.Keys
@@ -23,213 +26,153 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
 
   override def tests = Seq(
     ManualTest("newQuery().filter()") {
-      async {
-        val db = await(LocalDatabase.createInMemoryForTests())
-        val transaction2 = testTransactionWithId.copy(idOption = Some(99992))
-        val transaction3 = testTransactionWithId.copy(idOption = Some(99993))
-        db.addAll(Seq(testTransactionWithId, transaction2, transaction3))
+      val transaction1 = createTransaction()
+      val transaction2 = createTransaction()
+      val transaction3 = createTransaction()
 
-        db.newQuery[Transaction]().filter(Keys.id, 99992L).data() ==> Seq(transaction2)
-      }
+      withTransactions(transaction1, transaction2, transaction3)
+        .assertThat(_.filter(Keys.id, transaction2.id).data())
+        .containsExactly(transaction2)
     },
     ManualTest("newQuery().filterNot()") {
-      async {
-        val db = await(LocalDatabase.createInMemoryForTests())
-        val transaction1 = testTransactionWithId.copy(idOption = Some(99992))
-        val transaction2 = testTransactionWithId.copy(idOption = Some(99993))
-        db.addAll(Seq(transaction1, transaction2))
+      val transaction1 = createTransaction()
+      val transaction2 = createTransaction()
+      val transaction3 = createTransaction()
 
-        db.newQuery[Transaction]().filterNot(Keys.id, 99992L).data() ==> Vector(transaction2)
-      }
+      withTransactions(transaction1, transaction2, transaction3)
+        .assertThat(_.filterNot(Keys.id, transaction2.id).data())
+        .containsExactly(transaction1, transaction3)
     },
     ManualTest("newQuery().filterLessThan()") {
-      async {
-        implicit val db = await(LocalDatabase.createInMemoryForTests())
-        val transaction1 = persistTransaction(day = 1)
-        val transaction2 = persistTransaction(day = 2)
-        val transaction3 = persistTransaction(day = 3)
+      val transaction1 = createTransaction(day = 1)
+      val transaction2 = createTransaction(day = 2)
+      val transaction3 = createTransaction(day = 3)
 
-        val data = db
-          .newQuery[Transaction]()
-          .filterLessThan(Keys.Transaction.createdDate, transaction3.createdDate)
-          .sort(LokiJs.Sorting.ascBy(Keys.Transaction.createdDate))
-          .data()
-
-        data ==> Vector(transaction1, transaction2)
-      }
+      withTransactions(transaction1, transaction2, transaction3)
+        .assertThat(_.filterLessThan(Keys.Transaction.createdDate, transaction3.createdDate).data())
+        .containsExactly(transaction1, transaction2)
     },
     ManualTest("newQuery().filterGreaterThan()") {
-      async {
-        implicit val db = await(LocalDatabase.createInMemoryForTests())
-        val transaction1 = persistTransaction(day = 1)
-        val transaction2 = persistTransaction(day = 2)
-        val transaction3 = persistTransaction(day = 3)
+      val transaction1 = createTransaction(day = 1)
+      val transaction2 = createTransaction(day = 2)
+      val transaction3 = createTransaction(day = 3)
 
-        val data = db
-          .newQuery[Transaction]()
-          .filterGreaterThan(Keys.Transaction.createdDate, transaction1.createdDate)
-          .sort(LokiJs.Sorting.ascBy(Keys.Transaction.createdDate))
-          .data()
-
-        data ==> Vector(transaction2, transaction3)
-      }
+      withTransactions(transaction1, transaction2, transaction3)
+        .assertThat(_.filterGreaterThan(Keys.Transaction.createdDate, transaction1.createdDate)
+          .data())
+        .containsExactly(transaction2, transaction3)
     },
     ManualTest("newQuery().filterAnyOf()") {
-      async {
-        implicit val db = await(LocalDatabase.createInMemoryForTests())
-        val transaction1 = persistTransaction(day = 1, category = testCategoryA)
-        val transaction2 = persistTransaction(day = 2, category = testCategoryB)
-        persistTransaction(day = 3, category = testCategoryC)
+      val transaction1 = createTransaction(category = testCategoryA)
+      val transaction2 = createTransaction(category = testCategoryB)
+      val transaction3 = createTransaction(category = testCategoryC)
 
-        val data = db
-          .newQuery[Transaction]()
-          .filterAnyOf(Keys.Transaction.categoryCode, Seq(testCategoryA.code, testCategoryB.code))
-          .sort(LokiJs.Sorting.ascBy(Keys.Transaction.createdDate))
-          .data()
-
-        data ==> Vector(transaction1, transaction2)
-      }
+      withTransactions(transaction1, transaction2, transaction3)
+        .assertThat(_.filterAnyOf(Keys.Transaction.categoryCode, Seq(testCategoryA.code, testCategoryB.code))
+          .data())
+        .containsExactly(transaction1, transaction2)
     },
     ManualTest("newQuery().filterNoneOf()") {
-      async {
-        implicit val db = await(LocalDatabase.createInMemoryForTests())
-        persistTransaction(day = 1, category = testCategoryA)
-        persistTransaction(day = 2, category = testCategoryB)
-        val transaction3 = persistTransaction(day = 3, category = testCategoryC)
+      val transaction1 = createTransaction(category = testCategoryA)
+      val transaction2 = createTransaction(category = testCategoryB)
+      val transaction3 = createTransaction(category = testCategoryC)
 
-        val data = db
-          .newQuery[Transaction]()
-          .filterNoneOf(Keys.Transaction.categoryCode, Seq(testCategoryA.code, testCategoryB.code))
-          .data()
-
-        data ==> Vector(transaction3)
-      }
+      withTransactions(transaction1, transaction2, transaction3)
+        .assertThat(
+          _.filterNoneOf(Keys.Transaction.categoryCode, Seq(testCategoryA.code, testCategoryB.code))
+            .data())
+        .containsExactly(transaction3)
     },
     ManualTest("newQuery().filterContainsIgnoreCase()") {
-      async {
-        implicit val db = await(LocalDatabase.createInMemoryForTests())
-        val transaction1 = persistTransaction(day = 1, description = "prefix\nAAAA_bbbb.*CCCC_dddd\nsuffix")
-        val transaction2 = persistTransaction(day = 2, description = "BBBB.*cccc")
-        persistTransaction(day = 3, description = "prefix\nBBBBcccc\nsuffix")
+      val transaction1 = createTransaction(description = "prefix\nAAAA_bbbb.*CCCC_dddd\nsuffix")
+      val transaction2 = createTransaction(description = "BBBB.*cccc")
+      val transaction3 = createTransaction(description = "prefix\nBBBBcccc\nsuffix")
 
-        val data = db
-          .newQuery[Transaction]()
-          .filterContainsIgnoreCase(Keys.Transaction.description, "BBBB.*cccc")
-          .sort(LokiJs.Sorting.ascBy(Keys.Transaction.createdDate))
-          .data()
-
-        data ==> Vector(transaction1, transaction2)
-      }
+      withTransactions(transaction1, transaction2, transaction3)
+        .assertThat(_.filterContainsIgnoreCase(Keys.Transaction.description, "BBBB.*cccc")
+          .data())
+        .containsExactly(transaction1, transaction2)
     },
     ManualTest("newQuery().filterDoesntContainIgnoreCase()") {
-      async {
-        implicit val db = await(LocalDatabase.createInMemoryForTests())
-        persistTransaction(day = 1, description = "prefix\nAAAA_bbbb.*CCCC_dddd\nsuffix")
-        persistTransaction(day = 2, description = "BBBB.*cccc")
-        val transaction3 = persistTransaction(day = 3, description = "prefix\nBBBBcccc\nsuffix")
+      val transaction1 = createTransaction(description = "prefix\nAAAA_bbbb.*CCCC_dddd\nsuffix")
+      val transaction2 = createTransaction(description = "BBBB.*cccc")
+      val transaction3 = createTransaction(description = "prefix\nBBBBcccc\nsuffix")
 
-        val data = db
-          .newQuery[Transaction]()
-          .filterDoesntContainIgnoreCase(Keys.Transaction.description, "BBBB.*cccc")
-          .data()
-
-        data.map(_.description) ==> Vector(transaction3.description)
-        data ==> Vector(transaction3)
-      }
+      withTransactions(transaction1, transaction2, transaction3)
+        .assertThat(_.filterDoesntContainIgnoreCase(Keys.Transaction.description, "BBBB.*cccc")
+          .data())
+        .containsExactly(transaction3)
     },
     ManualTest("newQuery().filterSeqContains()") {
-      async {
-        implicit val db = await(LocalDatabase.createInMemoryForTests())
-        val transaction1 = persistTransaction(day = 1, tags = Seq("tagA", "tagB", "tag"))
-        val transaction2 = persistTransaction(day = 2, tags = Seq("tagA", "tagB"))
-        val transaction3 = persistTransaction(day = 3, tags = Seq("tag"))
+      val transaction1 = createTransaction(tags = Seq("tagA", "tagB", "tag"))
+      val transaction2 = createTransaction(tags = Seq("tagA", "tagB"))
+      val transaction3 = createTransaction(tags = Seq("tag"))
 
-        val data = db
-          .newQuery[Transaction]()
-          .filterSeqContains(Keys.Transaction.tags, "tag")
-          .sort(LokiJs.Sorting.ascBy(Keys.Transaction.createdDate))
-          .data()
-
-        data.map(_.tags) ==> Vector(transaction1.tags,transaction3.tags)
-        data ==> Vector(transaction1, transaction3)
-      }
+      withTransactions(transaction1, transaction2, transaction3)
+        .assertThat(_.filterSeqContains(Keys.Transaction.tags, "tag")
+          .data())
+        .containsExactly(transaction1, transaction3)
     },
     ManualTest("newQuery().filterSeqDoesntContain()") {
-      async {
-        implicit val db = await(LocalDatabase.createInMemoryForTests())
-        val transaction1 = persistTransaction(day = 1, tags = Seq("tagA", "tagB", "tag"))
-        val transaction2 = persistTransaction(day = 2, tags = Seq("tagA", "tagB"))
-        val transaction3 = persistTransaction(day = 3, tags = Seq("tag"))
+      val transaction1 = createTransaction(tags = Seq("tagA", "tagB", "tag"))
+      val transaction2 = createTransaction(tags = Seq("tagA", "tagB"))
+      val transaction3 = createTransaction(tags = Seq("tag"))
 
-        val data = db
-          .newQuery[Transaction]()
-          .filterSeqDoesntContain(Keys.Transaction.tags, "tag")
-          .data()
-
-        data ==> Vector(transaction2)
-      }
+      withTransactions(transaction1, transaction2, transaction3)
+        .assertThat(_.filterSeqDoesntContain(Keys.Transaction.tags, "tag")
+          .data())
+        .containsExactly(transaction2)
     },
     ManualTest("newQuery().sort()") {
-      async {
-        implicit val db = await(LocalDatabase.createInMemoryForTests())
-        val transaction1 = persistTransaction(groupId = 1, day = 2)
-        val transaction2 = persistTransaction(groupId = 1, day = 3)
-        val transaction3 = persistTransaction(groupId = 2, day = 1)
+      val transaction1 = createTransaction(groupId = 1, day = 2)
+      val transaction2 = createTransaction(groupId = 1, day = 3)
+      val transaction3 = createTransaction(groupId = 2, day = 1)
 
-        val data = db
-          .newQuery[Transaction]()
-          .sort(
-            LokiJs.Sorting
-              .descBy(Keys.Transaction.transactionGroupId)
-              .thenAscBy(Keys.Transaction.createdDate))
-          .data()
-
-        data ==> Vector(transaction3, transaction1, transaction2)
-      }
+      withTransactions(transaction1, transaction2, transaction3)
+        .assertThat(
+          _.sort(LokiJs.Sorting
+            .descBy(Keys.Transaction.transactionGroupId)
+            .thenAscBy(Keys.Transaction.createdDate))
+            .data())
+        .containsExactlyInOrder(transaction3, transaction1, transaction2)
     },
     ManualTest("newQuery().limit()") {
-      async {
-        implicit val db = await(LocalDatabase.createInMemoryForTests())
-        val transaction1 = persistTransaction(day = 1)
-        val transaction2 = persistTransaction(day = 2)
-        persistTransaction(day = 3)
+      val transaction1 = createTransaction(day = 1)
+      val transaction2 = createTransaction(day = 2)
+      val transaction3 = createTransaction(day = 3)
 
-        db.newQuery[Transaction]()
-          .sort(LokiJs.Sorting.ascBy(Keys.Transaction.createdDate))
-          .limit(2)
-          .data() ==> Seq(transaction1, transaction2)
-      }
+      withTransactions(transaction1, transaction2, transaction3)
+        .assertThat(
+          _.sort(LokiJs.Sorting.ascBy(Keys.Transaction.createdDate))
+            .limit(2)
+            .data())
+        .containsExactlyInOrder(transaction1, transaction2)
     },
     ManualTest("newQuery().findOne()") {
-      async {
-        val db = await(LocalDatabase.createInMemoryForTests())
-        val transaction2 = testTransactionWithId.copy(idOption = Some(99992))
-        val transaction3 = testTransactionWithId.copy(idOption = Some(99993))
-        db.addAll(Seq(testTransactionWithId, transaction2, transaction3))
+      val transaction1 = createTransaction()
+      val transaction2 = createTransaction()
+      val transaction3 = createTransaction()
 
-        db.newQuery[Transaction]().findOne(Keys.id, 99992L) ==> Some(transaction2)
-      }
+      withTransactions(transaction1, transaction2, transaction3)
+        .assertThat(_.findOne(Keys.id, transaction2.id))
+        .isEqualTo(Some(transaction2))
     },
     ManualTest("newQuery().count()") {
-      async {
-        val db = await(LocalDatabase.createInMemoryForTests())
-        val transaction2 = testTransactionWithId.copy(idOption = Some(99992))
-        val transaction3 = testTransactionWithId.copy(idOption = Some(99993))
-        db.addAll(Seq(testTransactionWithId, transaction2, transaction3))
+      val transaction1 = createTransaction()
+      val transaction2 = createTransaction()
+      val transaction3 = createTransaction()
 
-        db.newQuery[Transaction]().count() ==> 3
-      }
+      withTransactions(transaction1, transaction2, transaction3).assertThat(_.count()).isEqualTo(3)
     }
   )
 
-  private def persistTransaction(
-      groupId: Long = 1,
-      day: Int = 1,
-      category: Category = testCategory,
-      description: String = "some description",
-      detailDescription: String = "some detail description",
-      tags: Seq[String] = Seq("some-tag"))(implicit db: LocalDatabase): Transaction = {
-    val transaction = testTransactionWithIdA.copy(
+  private def createTransaction(groupId: Long = 1273984,
+                                day: Int = 25,
+                                category: Category = testCategory,
+                                description: String = "some description",
+                                detailDescription: String = "some detail description",
+                                tags: Seq[String] = Seq("some-tag")): Transaction = {
+    testTransactionWithId.copy(
       idOption = Some(EntityModification.generateRandomId()),
       transactionGroupId = groupId,
       categoryCode = category.code,
@@ -240,7 +183,44 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
       transactionDate = createDateTime(2012, JANUARY, day),
       consumedDate = createDateTime(2012, JANUARY, day)
     )
-    db.addAll(Seq(transaction))
-    transaction
+  }
+  private def withTransactions(transactions: Transaction*) = new Object {
+    def assertThat(resultSetFunc: ResultSet[Transaction] => Any) = new Object {
+      def containsExactly(expected: Transaction*): Future[Unit] = async {
+        val db = await(LocalDatabase.createInMemoryForTests())
+        db.addAll(transactions.toVector)
+        resultSetFunc(db.newQuery[Transaction]()) match {
+          case seq: Seq[_] => assertEqualIterables(seq.toSet, expected.toSet)
+        }
+      }
+
+      def containsExactlyInOrder(expected: Transaction*): Future[Unit] = async {
+        val db = await(LocalDatabase.createInMemoryForTests())
+        db.addAll(transactions.toVector)
+        resultSetFunc(db.newQuery[Transaction]()) match {
+          case seq: Seq[_] => assertEqualIterables(seq, expected.toVector)
+        }
+      }
+
+      def isEqualTo(expected: Any): Future[Unit] = async {
+        val db = await(LocalDatabase.createInMemoryForTests())
+        db.addAll(transactions.toVector)
+        resultSetFunc(db.newQuery[Transaction]()) ==> expected
+      }
+    }
+
+    private def assertEqualIterables(iterable1: Iterable[_], iterable2: Iterable[Transaction]): Unit = {
+      def assertProperty(propertyFunc: Transaction => Any): Unit = {
+        iterable1.map(_.asInstanceOf[Transaction]).map(propertyFunc) ==> iterable2.map(propertyFunc)
+      }
+      assertProperty(_.description)
+      assertProperty(_.detailDescription)
+      assertProperty(_.categoryCode)
+      assertProperty(_.tags.mkString(","))
+      assertProperty(_.createdDate)
+      assertProperty(_.transactionGroupId)
+      assertProperty(_.id)
+      iterable1 ==> iterable2
+    }
   }
 }
