@@ -105,7 +105,9 @@ private[stores] final class ComplexQueryFilter(implicit userManager: User.Manage
     for (char <- query) char match {
       case '-' if nextPart.isEmpty && currentQuote.isEmpty && !negated =>
         negated = true
-      case _ if (quotes contains char) && (nextPart.isEmpty  || nextPart.endsWith(":")) && currentQuote.isEmpty =>
+      case _
+          if (quotes contains char) && (nextPart.isEmpty || nextPart
+            .endsWith(":")) && currentQuote.isEmpty =>
         currentQuote = Some(char)
       case _ if currentQuote contains char =>
         currentQuote = None
