@@ -16,7 +16,7 @@ import scala.collection.mutable
 import scala2js.Converters._
 import scala2js.{Keys, Scala2Js}
 
-final class ComplexQueryFilter(implicit database: RemoteDatabaseProxy,
+private[stores] final class ComplexQueryFilter(implicit database: RemoteDatabaseProxy,
                                userManager: User.Manager,
                                accountingConfig: Config) {
 
