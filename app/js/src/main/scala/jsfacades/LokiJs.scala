@@ -5,7 +5,6 @@ import common.GuavaReplacement.Iterables.getOnlyElement
 import common.ScalaUtils
 import jsfacades.LokiJs.Sorting.KeyWithDirection
 
-import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
@@ -109,20 +108,18 @@ object LokiJs {
             logExceptions {
               delegate.loadDatabase(
                 dbName,
-                callback = result => {
-                  result match {
-                    case null =>
-                      callback(result)
-                    case _ if result.getClass == classOf[String] =>
-                      val encodedDbString = result.asInstanceOf[String]
+                callback = {
+                  case result @ null =>
+                    callback(result)
+                  case result: AnyRef if result.getClass == classOf[String] =>
+                    val encodedDbString = result.asInstanceOf[String]
 
-                      codex.decodeAfterLoad(encodedDbString) match {
-                        case Some(dbString) => callback(dbString)
-                        case None => callback(null)
-                      }
-                    case _ =>
-                      callback(result)
-                  }
+                    codex.decodeAfterLoad(encodedDbString) match {
+                      case Some(dbString) => callback(dbString)
+                      case None => callback(null)
+                    }
+                  case result =>
+                    callback(result)
                 }
               )
           }
