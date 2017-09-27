@@ -6,7 +6,6 @@ import flux.stores.entries.ComplexQueryFilter.{CombinedQueryFilter, Prefix, Quer
 import jsfacades.LokiJs
 import jsfacades.LokiJs.ResultSet
 import models.User
-import models.access.RemoteDatabaseProxy
 import models.accounting._
 import models.accounting.config.Config
 import models.accounting.money.Money
@@ -16,14 +15,10 @@ import scala.collection.mutable
 import scala2js.Converters._
 import scala2js.{Keys, Scala2Js}
 
-private[stores] final class ComplexQueryFilter(implicit database: RemoteDatabaseProxy,
-                               userManager: User.Manager,
-                               accountingConfig: Config) {
+private[stores] final class ComplexQueryFilter(implicit userManager: User.Manager, accountingConfig: Config) {
 
   // **************** Public API **************** //
-  def getMatchingTransactions(query: String): Seq[Transaction] = {
-    ???
-  }
+  def fromQuery(query: String): ResultSet[Transaction] => ResultSet[Transaction] = parseQuery(query).apply
 
   // **************** Private helper methods **************** //
   private def parseQuery(query: String): CombinedQueryFilter = {
@@ -46,15 +41,6 @@ private[stores] final class ComplexQueryFilter(implicit database: RemoteDatabase
       def createFieldFilter[V: Scala2Js.Converter](key: Scala2Js.Key[V, Transaction])(
           keyFunc: T => V): QueryFilter
     }
-    def fromOptions[T](inputString: String, options: Seq[T])(nameFunc: T => String): FilterCreator[T] =
-      new FilterCreator[T] {
-        override def createFieldFilter[V: Scala2Js.Converter](key: Scala2Js.Key[V, Transaction])(
-            keyFunc: T => V) = {
-          val chosenOptions =
-            options.filter(option => nameFunc(option).toLowerCase contains inputString.toLowerCase)
-          QueryFilter.anyOf(key, chosenOptions.map(keyFunc))
-        }
-      }
     def filterOptions[T](inputString: String, options: Seq[T])(nameFunc: T => String): Seq[T] =
       options.filter(option => nameFunc(option).toLowerCase contains inputString.toLowerCase)
 
@@ -90,7 +76,7 @@ private[stores] final class ComplexQueryFilter(implicit database: RemoteDatabase
             QueryFilter.seqContains(Keys.Transaction.tags, suffix)
         }
       case None =>
-        QueryFilter.containsIgnoreCase(Keys.Transaction.detailDescription, singlePartWithoutNegation)
+        QueryFilter.containsIgnoreCase(Keys.Transaction.description, singlePartWithoutNegation)
     }
   }
 
@@ -119,7 +105,7 @@ private[stores] final class ComplexQueryFilter(implicit database: RemoteDatabase
     for (char <- query) char match {
       case '-' if nextPart.isEmpty && currentQuote.isEmpty && !negated =>
         negated = true
-      case _ if (quotes contains char) && nextPart.isEmpty && currentQuote.isEmpty =>
+      case _ if (quotes contains char) && (nextPart.isEmpty  || nextPart.endsWith(":")) && currentQuote.isEmpty =>
         currentQuote = Some(char)
       case _ if currentQuote contains char =>
         currentQuote = None
@@ -137,39 +123,33 @@ private[stores] final class ComplexQueryFilter(implicit database: RemoteDatabase
     }
     Seq(parts: _*)
   }
-
-  // **************** Private inner classes **************** //
-//  private case class Query(descriptionSubstrings: Seq[Query.Negatable[String]],
-//                           reservoir: Seq[Query.Negatable[MoneyReservoir]],
-//                           category: Seq[Query.Negatable[Category]])
-//  private object Query {
-//    private case class Negatable[T](query: T, isNegated: Boolean)
-//  }
 }
 
 object ComplexQueryFilter {
   private trait QueryFilter {
-    def apply(resultSet: LokiJs.ResultSet[Transaction], invert: Boolean = false): Unit
+    def apply(resultSet: LokiJs.ResultSet[Transaction], invert: Boolean = false): ResultSet[Transaction]
     def estimatedExecutionCost: Int
   }
 
   private object QueryFilter {
     val nullFilter: QueryFilter =
-      from(estimatedExecutionCost = 0, positiveApply = _ => {}, negativeApply = _ => {})
+      from(estimatedExecutionCost = 0, positiveApply = r => r, negativeApply = r => r)
 
-    private def from(estimatedExecutionCost: Int,
-                     positiveApply: LokiJs.ResultSet[Transaction] => Unit,
-                     negativeApply: LokiJs.ResultSet[Transaction] => Unit): QueryFilter = new QueryFilter {
-      val estimatedExecutionCostArg = estimatedExecutionCost
-      override def apply(resultSet: ResultSet[Transaction], invert: Boolean) = {
-        if (invert) {
-          negativeApply(resultSet)
-        } else {
-          positiveApply(resultSet)
+    private def from(
+        estimatedExecutionCost: Int,
+        positiveApply: LokiJs.ResultSet[Transaction] => LokiJs.ResultSet[Transaction],
+        negativeApply: LokiJs.ResultSet[Transaction] => LokiJs.ResultSet[Transaction]): QueryFilter =
+      new QueryFilter {
+        val estimatedExecutionCostArg: Int = estimatedExecutionCost
+        override def apply(resultSet: ResultSet[Transaction], invert: Boolean) = {
+          if (invert) {
+            negativeApply(resultSet)
+          } else {
+            positiveApply(resultSet)
+          }
         }
+        override def estimatedExecutionCost = estimatedExecutionCostArg
       }
-      override def estimatedExecutionCost = estimatedExecutionCostArg
-    }
 
     def not(delegate: QueryFilter): QueryFilter = new QueryFilter {
       override def apply(resultSet: ResultSet[Transaction], invert: Boolean) =
@@ -209,8 +189,12 @@ object ComplexQueryFilter {
   }
 
   private case class CombinedQueryFilter(delegates: Seq[QueryFilter]) {
-    def apply(resultSet: ResultSet[Transaction]): Unit = {
-      delegates.sortBy(_.estimatedExecutionCost).foreach(_.apply(resultSet))
+    def apply(resultSet: ResultSet[Transaction]): ResultSet[Transaction] = {
+      var newResultSet = resultSet
+      for (filter <- delegates.sortBy(_.estimatedExecutionCost)) {
+        newResultSet = filter(newResultSet)
+      }
+      newResultSet
     }
   }
 
@@ -226,7 +210,7 @@ object ComplexQueryFilter {
     def all: Seq[Prefix] =
       Seq(Issuer, Beneficiary, Reservoir, Category, Description, Flow, Detail, Tag)
 
-    object Issuer extends Prefix(Seq("issuer", "i"))
+    object Issuer extends Prefix(Seq("issuer", "i", "u", "user"))
     object Beneficiary extends Prefix(Seq("beneficiary", "b"))
     object Reservoir extends Prefix(Seq("reservoir", "r"))
     object Category extends Prefix(Seq("category", "c"))
