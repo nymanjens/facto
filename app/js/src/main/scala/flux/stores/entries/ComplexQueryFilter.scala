@@ -16,9 +16,9 @@ import scala.collection.mutable
 import scala2js.Converters._
 import scala2js.{Keys, Scala2Js}
 
-private[entries] final class ComplexQueryFilter(implicit database: RemoteDatabaseProxy,
-                                                userManager: User.Manager,
-                                                accountingConfig: Config) {
+final class ComplexQueryFilter(implicit database: RemoteDatabaseProxy,
+                               userManager: User.Manager,
+                               accountingConfig: Config) {
 
   // **************** Public API **************** //
   def getMatchingTransactions(query: String): Seq[Transaction] = {
