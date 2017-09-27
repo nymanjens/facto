@@ -1,6 +1,6 @@
-package flux.stores
+package flux.stores.entries
 
-import flux.stores.ComplexQueryFilter.{Prefix, QueryPart}
+import flux.stores.entries.ComplexQueryFilter.{Prefix, QueryPart}
 import utest._
 
 import scala.collection.immutable.Seq

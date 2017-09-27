@@ -1,8 +1,8 @@
-package flux.stores
+package flux.stores.entries
 
 import common.GuavaReplacement.Splitter
 import common.ScalaUtils.visibleForTesting
-import flux.stores.ComplexQueryFilter.{CombinedQueryFilter, Prefix, QueryFilter, QueryPart}
+import flux.stores.entries.ComplexQueryFilter.{CombinedQueryFilter, Prefix, QueryFilter, QueryPart}
 import jsfacades.LokiJs
 import jsfacades.LokiJs.ResultSet
 import models.User
@@ -13,8 +13,8 @@ import models.accounting.money.Money
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
-import scala2js.{Keys, Scala2Js}
 import scala2js.Converters._
+import scala2js.{Keys, Scala2Js}
 
 final class ComplexQueryFilter(implicit database: RemoteDatabaseProxy,
                                userManager: User.Manager,
