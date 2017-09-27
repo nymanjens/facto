@@ -1,20 +1,14 @@
 package flux.stores.entries
 
-import java.time.Month.JANUARY
-
-import scala.language.reflectiveCalls
-import common.testing.TestObjects.{testCategory, testTransactionWithId, _}
-import common.time.LocalDateTimes.createDateTime
+import common.testing.TestObjects.{testCategory, _}
 import flux.stores.entries.ComplexQueryFilter.{Prefix, QueryPart}
 import jsfacades.LokiJs
-import jsfacades.LokiJs.ResultSet
-import models.{EntityAccess, User}
+import models.EntityAccess
 import models.accounting.Transaction
-import models.accounting.config.{Account, Category, MoneyReservoir}
-import models.manager.EntityModification
 import utest._
 
 import scala.collection.immutable.Seq
+import scala.language.reflectiveCalls
 import scala2js.Converters._
 
 object ComplexQueryFilterTest extends TestSuite {
@@ -203,33 +197,6 @@ object ComplexQueryFilterTest extends TestSuite {
         complexQueryFilter.splitInParts("-don't won't") ==> Seq(QueryPart.not("don't"), QueryPart("won't"))
       }
     }
-  }
-
-  private def createTransaction(groupId: Long = 1273984,
-                                issuer: User = testUserA,
-                                beneficiary: Account = testAccountA,
-                                reservoir: MoneyReservoir = null,
-                                day: Int = 25,
-                                category: Category = testCategory,
-                                description: String = "some description",
-                                flow: Double = -12.34,
-                                detailDescription: String = "some detail description",
-                                tags: Seq[String] = Seq("some-tag")): Transaction = {
-    testTransactionWithId.copy(
-      idOption = Some(EntityModification.generateRandomId()),
-      transactionGroupId = groupId,
-      issuerId = issuer.id,
-      beneficiaryAccountCode = beneficiary.code,
-      moneyReservoirCode = Option(reservoir).map(_.code) getOrElse "",
-      categoryCode = category.code,
-      description = description,
-      flowInCents = (flow * 100).toLong,
-      detailDescription = detailDescription,
-      tags = tags,
-      createdDate = createDateTime(2012, JANUARY, day),
-      transactionDate = createDateTime(2012, JANUARY, day),
-      consumedDate = createDateTime(2012, JANUARY, day)
-    )
   }
 
   private def withTransactions(transactions: Transaction*)(implicit complexQueryFilter: ComplexQueryFilter,

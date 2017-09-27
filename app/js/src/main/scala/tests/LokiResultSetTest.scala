@@ -166,24 +166,6 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
     }
   )
 
-  private def createTransaction(groupId: Long = 1273984,
-                                day: Int = 25,
-                                category: Category = testCategory,
-                                description: String = "some description",
-                                detailDescription: String = "some detail description",
-                                tags: Seq[String] = Seq("some-tag")): Transaction = {
-    testTransactionWithId.copy(
-      idOption = Some(EntityModification.generateRandomId()),
-      transactionGroupId = groupId,
-      categoryCode = category.code,
-      description = description,
-      detailDescription = detailDescription,
-      tags = tags,
-      createdDate = createDateTime(2012, JANUARY, day),
-      transactionDate = createDateTime(2012, JANUARY, day),
-      consumedDate = createDateTime(2012, JANUARY, day)
-    )
-  }
   private def withTransactions(transactions: Transaction*) = new Object {
     def assertThat(resultSetFunc: ResultSet[Transaction] => Any) = new Object {
       def containsExactly(expected: Transaction*): Future[Unit] = async {

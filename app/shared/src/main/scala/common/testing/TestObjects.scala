@@ -2,8 +2,9 @@ package common.testing
 
 import common.time.{LocalDateTime, LocalDateTimes}
 import models.User
-import java.time.Month.MARCH
+import java.time.Month.{JANUARY, MARCH}
 
+import common.time.LocalDateTimes.createDateTime
 import models.accounting.config.Account.SummaryTotalRowDef
 import models.accounting.config._
 import models.accounting.money.ExchangeRateMeasurement
@@ -231,4 +232,32 @@ object TestObjects {
   val testModificationA: EntityModification = EntityModification.Add(testTransactionWithIdA)
   val testModificationB: EntityModification = EntityModification.Add(testTransactionWithIdB)
   def testModification: EntityModification = testModificationA
+
+  def createTransaction(id: Long = -1,
+                        groupId: Long = 1273984,
+                        issuer: User = testUserA,
+                        beneficiary: Account = testAccountA,
+                        reservoir: MoneyReservoir = null,
+                        day: Int = 25,
+                        category: Category = testCategory,
+                        description: String = "some description",
+                        flow: Double = -12.34,
+                        detailDescription: String = "some detail description",
+                        tags: Seq[String] = Seq("some-tag")): Transaction = {
+    testTransactionWithId.copy(
+      idOption = Some(if (id == -1) EntityModification.generateRandomId() else id),
+      transactionGroupId = groupId,
+      issuerId = issuer.id,
+      beneficiaryAccountCode = beneficiary.code,
+      moneyReservoirCode = Option(reservoir).map(_.code) getOrElse "",
+      categoryCode = category.code,
+      description = description,
+      flowInCents = (flow * 100).toLong,
+      detailDescription = detailDescription,
+      tags = tags,
+      createdDate = createDateTime(2012, JANUARY, day),
+      transactionDate = createDateTime(2012, JANUARY, day),
+      consumedDate = createDateTime(2012, JANUARY, day)
+    )
+  }
 }
