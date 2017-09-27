@@ -18,7 +18,7 @@ final class FakeRemoteDatabaseProxy extends RemoteDatabaseProxy {
 
   // **************** Implementation of ScalaJsApiClient trait ****************//
   override def newQuery[E <: Entity: EntityType]() = {
-    new LokiJs.ResultSet.Fake(modificationsBuffer.getAllEntitiesOfType[E])
+    LokiJs.ResultSet.fake(modificationsBuffer.getAllEntitiesOfType[E])
   }
   override def hasLocalAddModifications[E <: Entity: EntityType](entity: E) = {
     localModificationIds contains entity.id

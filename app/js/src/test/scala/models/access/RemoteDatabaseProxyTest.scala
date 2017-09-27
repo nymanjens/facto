@@ -125,7 +125,7 @@ object RemoteDatabaseProxyTest extends TestSuite {
 
     // **************** Getters ****************//
     override def newQuery[E <: Entity: EntityType]() = {
-      new LokiJs.ResultSet.Fake(modificationsBuffer.getAllEntitiesOfType[E])
+      LokiJs.ResultSet.fake(modificationsBuffer.getAllEntitiesOfType[E])
     }
     override def getSingletonValue[V](key: SingletonKey[V]) = {
       singletonMap.get(key) map key.valueConverter.toScala

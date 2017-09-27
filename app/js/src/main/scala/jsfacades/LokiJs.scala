@@ -205,6 +205,8 @@ object LokiJs {
 
     def empty[E: Scala2Js.MapConverter]: ResultSet[E] = new ResultSet.Fake(Seq())
 
+    def fake[E: Scala2Js.MapConverter](entities: Seq[E]): ResultSet[E] = new ResultSet.Fake(entities)
+
     private[jsfacades] final class Impl[E: Scala2Js.MapConverter](facade: ResultSetFacade)
         extends ResultSet[E] {
 
@@ -287,27 +289,31 @@ object LokiJs {
 
       // **************** Intermediary operations **************** //
       override def filter[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V) =
-        new ResultSet.Fake(entities.filter { entity =>
-          val jsMap = Scala2Js.toJsMap(entity)
-          jsMap(key.name) == Scala2Js.toJs(value)
-        })
+        filteredFake(key)(_ == Scala2Js.toJs(value))
       override def filterNot[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V) =
-        new ResultSet.Fake(entities.filterNot { entity =>
-          val jsMap = Scala2Js.toJsMap(entity)
-          jsMap(key.name) == Scala2Js.toJs(value)
-        })
-
+        filteredFake(key)(_ != Scala2Js.toJs(value))
       override def filterGreaterThan[V: Scala2Js.Converter](key: Scala2Js.Key[V, E],
                                                             value: V): ResultSet[E] =
-        new ResultSet.Fake(entities.filter { entity =>
-          val jsMap = Scala2Js.toJsMap(entity)
-          jsValueOrdering.gt(jsMap(key.name), Scala2Js.toJs(value))
-        })
-
+        filteredFake(key)(jsValueOrdering.gt(_, Scala2Js.toJs(value)))
       override def filterLessThan[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): ResultSet[E] =
+        filteredFake(key)(jsValueOrdering.lt(_, Scala2Js.toJs(value)))
+      override def filterAnyOf[V: Converter](key: Key[V, E], values: Seq[V]) =
+        filteredFake(key)(jsValue => values.map(Scala2Js.toJs[V]).contains(jsValue))
+      override def filterNoneOf[V: Converter](key: Key[V, E], values: Seq[V]) =
+        filteredFake(key)(jsValue => !values.map(Scala2Js.toJs[V]).contains(jsValue))
+      override def filterContainsIgnoreCase(key: Key[String, E], substring: String) =
+        filteredFake(key)(_.toString.toLowerCase.contains(substring.toLowerCase))
+      override def filterDoesntContainIgnoreCase(key: Key[String, E], substring: String): ResultSet[E] =
+        filteredFake(key)(!_.toString.toLowerCase.contains(substring.toLowerCase))
+      override def filterSeqContains[V: Converter](key: Key[Seq[V], E], value: V) =
+        filteredFake(key)(_.asInstanceOf[js.Array[js.Any]].toSet.contains(Scala2Js.toJs(value)))
+      override def filterSeqDoesntContain[V: Converter](key: Key[Seq[V], E], value: V): ResultSet[E] =
+        filteredFake(key)(!_.asInstanceOf[js.Array[js.Any]].toSet.contains(Scala2Js.toJs(value)))
+
+      private def filteredFake(key: Scala2Js.Key[_, E])(filterFunc: js.Any => Boolean): ResultSet[E] =
         new ResultSet.Fake(entities.filter { entity =>
           val jsMap = Scala2Js.toJsMap(entity)
-          jsValueOrdering.lt(jsMap(key.name), Scala2Js.toJs(value))
+          filterFunc(jsMap(key.name))
         })
 
       override def sort(sorting: LokiJs.Sorting[E]) = {
