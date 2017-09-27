@@ -1,13 +1,12 @@
 package flux.stores
 
-import common.testing.TestObjects
+import flux.stores.ComplexQueryFilter.{Prefix, QueryPart}
 import utest._
 
 import scala.collection.immutable.Seq
 import scala2js.Converters._
-import flux.stores.ComplexQueryStore.{Prefix, QueryPart}
 
-object ComplexQueryStoreTest extends TestSuite {
+object ComplexQueryFilterTest extends TestSuite {
 
   override def tests = TestSuite {
 
@@ -17,7 +16,7 @@ object ComplexQueryStoreTest extends TestSuite {
     implicit val userManager = testModule.entityAccess.userManager
     implicit val testAccountingConfig = testModule.testAccountingConfig
 
-    val complexQueryStore = new ComplexQueryStore()
+    val complexQueryStore = new ComplexQueryFilter()
 
     "parsePrefixAndSuffix()" - {
       "single colon" - {

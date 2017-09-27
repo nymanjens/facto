@@ -2,7 +2,7 @@ package flux.stores
 
 import common.GuavaReplacement.Splitter
 import common.ScalaUtils.visibleForTesting
-import flux.stores.ComplexQueryStore.{CombinedQueryFilter, Prefix, QueryFilter, QueryPart}
+import flux.stores.ComplexQueryFilter.{CombinedQueryFilter, Prefix, QueryFilter, QueryPart}
 import jsfacades.LokiJs
 import jsfacades.LokiJs.ResultSet
 import models.User
@@ -16,9 +16,9 @@ import scala.collection.mutable
 import scala2js.{Keys, Scala2Js}
 import scala2js.Converters._
 
-final class ComplexQueryStore(implicit database: RemoteDatabaseProxy,
-                              userManager: User.Manager,
-                              accountingConfig: Config) {
+final class ComplexQueryFilter(implicit database: RemoteDatabaseProxy,
+                               userManager: User.Manager,
+                               accountingConfig: Config) {
 
   // **************** Public API **************** //
   def getMatchingTransactions(query: String): Seq[Transaction] = {
@@ -147,7 +147,7 @@ final class ComplexQueryStore(implicit database: RemoteDatabaseProxy,
 //  }
 }
 
-object ComplexQueryStore {
+object ComplexQueryFilter {
   private trait QueryFilter {
     def apply(resultSet: LokiJs.ResultSet[Transaction], invert: Boolean = false): Unit
     def estimatedExecutionCost: Int
