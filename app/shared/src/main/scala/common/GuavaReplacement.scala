@@ -1,5 +1,7 @@
 package common
 
+import java.time.Duration
+
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 
@@ -69,6 +71,19 @@ object GuavaReplacement {
   }
   object Splitter {
     def on(separator: Char): Splitter = new Splitter(separator)
+  }
+
+  final class Stopwatch private () {
+    private val startTimeMillis = System.currentTimeMillis
+
+    def elapsed(): Duration = {
+      val nowMillis = System.currentTimeMillis
+      Duration.ofMillis(nowMillis - startTimeMillis)
+    }
+  }
+
+  object Stopwatch {
+    def createStarted(): Stopwatch = new Stopwatch()
   }
 
   final class ImmutableSetMultimap[A, B](private val backingMap: Map[A, Set[B]]) {
