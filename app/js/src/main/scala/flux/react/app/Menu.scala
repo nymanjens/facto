@@ -39,7 +39,7 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
   // **************** Private inner types ****************//
   private type State = Unit
   private class Backend(val $ : BackendScope[Props, State]) {
-    val searchInputRef = uielements.input.TextInput.ref()
+    val queryInputRef = uielements.input.TextInput.ref()
 
     def render(props: Props, state: State) = logExceptions {
       implicit val router = props.router
@@ -59,7 +59,7 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
             <.div(
               ^.className := "input-group custom-search-form",
               uielements.input
-                .TextInput(ref = searchInputRef, name = "query", placeholder = i18n("facto.search")),
+                .TextInput(ref = queryInputRef, name = "query", placeholder = i18n("facto.search")),
               <.span(
                 ^.className := "input-group-btn",
                 <.button(
@@ -69,7 +69,10 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
                     LogExceptionsCallback {
                       e.preventDefault()
 
-                      props.router.setPage(Page.Everything)
+                      queryInputRef().value match {
+                        case Some(query) => props.router.setPage(Page.Search(query))
+                        case None =>
+                      }
                     }
                   },
                   <.i(^.className := "fa fa-search")
@@ -114,7 +117,7 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
       bindToPage("shift+alt+j", Page.TemplateList)
       bindToPage("shift+alt+n", Page.NewTransactionGroup())
 
-      bind("shift+alt+f", () => searchInputRef().focus())
+      bind("shift+alt+f", () => queryInputRef().focus())
     }
   }
 
