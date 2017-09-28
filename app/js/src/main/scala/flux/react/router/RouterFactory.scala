@@ -19,6 +19,7 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
         import dsl._
         val codeString: RouteB[String] = string("[a-zA-Z0-9_-]+")
         val returnToPath: RouteB[Option[String]] = ("?returnto=" ~ string(".+")).option
+        val query: RouteB[String] = "?q=" ~ string(".+")
 
         def staticRuleFromPage(page: Page, renderer: RouterContext => VdomElement): dsl.Rule = {
           val path = RouterFactory.pathPrefix + page.getClass.getSimpleName.toLowerCase
@@ -50,6 +51,10 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
           | staticRuleFromPage(Page.Summary, reactAppModule.everything.apply)
 
           | staticRuleFromPage(Page.TemplateList, reactAppModule.templateList.apply)
+
+          | dynamicRuleFromPage(_ ~ query.caseClass[Page.Search]) { (page, ctl) =>
+            reactAppModule.searchResults(page.query, ctl)
+          }
 
           | dynamicRuleFromPage(_ ~ returnToPath.caseClass[Page.NewTransactionGroup]) { (page, ctl) =>
             reactAppModule.transactionGroupForm.forCreate(page.returnToPath, ctl)

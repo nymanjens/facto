@@ -26,6 +26,7 @@ final class FactoAppModule(implicit getInitialDataResponse: GetInitialDataRespon
   private val modelsModule = new models.Module
   implicit private val entityAccess = modelsModule.entityAccess
   implicit private val exchangeRateManager = modelsModule.exchangeRateManager
+  implicit private val userManager = modelsModule.jsUserManager
   implicit private val transactionGroupManager = modelsModule.jsTransactionGroupManager
   implicit private val balanceCheckManager = modelsModule.jsBalanceCheckManager
 
@@ -40,6 +41,7 @@ final class FactoAppModule(implicit getInitialDataResponse: GetInitialDataRespon
   implicit private val liquidationEntriesStoreFactory = fluxStoresModule.liquidationEntriesStoreFactory
   implicit private val endowmentEntriesStoreFactory = fluxStoresModule.endowmentEntriesStoreFactory
   implicit private val tagsStoreFactory = fluxStoresModule.tagsStoreFactory
+  implicit private val complexQueryStoreFactory = fluxStoresModule.complexQueryStoreFactory
   implicit private val globalMessagesStore = fluxStoresModule.globalMessagesStore
 
   // Create other Flux modules

@@ -135,7 +135,5 @@ facto.tomorrow=Morgen
 facto.search=Zoeken...
 facto.search-results=Zoekresultaten
 facto.search-results-for=Zoekresultaten voor {0}
-facto.num-results={0} resultaten
-facto.one-result=1 resultaat
 facto.robot=Robot
 facto.sending-data-to-server=Data aan het versturen...

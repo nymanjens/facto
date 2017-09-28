@@ -13,6 +13,7 @@ final class Module(implicit i18n: I18n,
                    accountingConfig: Config,
                    user: User,
                    remoteDatabaseProxy: RemoteDatabaseProxy,
+                   userManager: User.Manager,
                    entityAccess: EntityAccess,
                    exchangeRateManager: ExchangeRateManager,
                    dispatcher: Dispatcher,
@@ -23,10 +24,13 @@ final class Module(implicit i18n: I18n,
   wire[TransactionAndGroupStore]
   wire[BalanceCheckStore]
 
+  implicit private val complexQueryFilter = wire[ComplexQueryFilter]
+
   implicit val allEntriesStoreFactory = wire[AllEntriesStoreFactory]
   implicit val cashFlowEntriesStoreFactory = wire[CashFlowEntriesStoreFactory]
   implicit val liquidationEntriesStoreFactory = wire[LiquidationEntriesStoreFactory]
   implicit val endowmentEntriesStoreFactory = wire[EndowmentEntriesStoreFactory]
   implicit val tagsStoreFactory = wire[TagsStoreFactory]
+  implicit val complexQueryStoreFactory = wire[ComplexQueryStoreFactory]
   implicit val globalMessagesStore = wire[GlobalMessagesStore]
 }

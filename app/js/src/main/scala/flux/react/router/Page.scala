@@ -1,10 +1,9 @@
 package flux.react.router
 
 import japgolly.scalajs.react.extra.router.Path
-import models.accounting.{BalanceCheck, TransactionGroup}
+import models.accounting.BalanceCheck
 import models.accounting.config.{Account, MoneyReservoir, Template}
 import models.accounting.money.ReferenceMoney
-import org.scalajs.dom
 
 sealed trait Page
 object Page {
@@ -24,15 +23,16 @@ object Page {
 
   case object Root extends Page
 
-  // Accounting data views
+  // **************** Accounting data views **************** //
   case object Everything extends Page
   case object CashFlow extends Page
   case object Liquidation extends Page
   case object Endowments extends Page
   case object Summary extends Page
   case object TemplateList extends Page
+  case class Search(query: String) extends Page
 
-  // Accounting forms - transactions
+  // **************** Accounting forms - transactions **************** //
   case class NewTransactionGroup private (returnToWithoutPrefix: Option[String])
       extends HasReturnTo(returnToWithoutPrefix)
       with Page
@@ -40,6 +40,7 @@ object Page {
     def apply()(implicit routerContext: RouterContext): NewTransactionGroup =
       NewTransactionGroup(HasReturnTo.getCurrentPathWithoutPrefix)
   }
+
   case class EditTransactionGroup private (transactionGroupId: Long, returnToWithoutPrefix: Option[String])
       extends HasReturnTo(returnToWithoutPrefix)
       with Page
@@ -48,6 +49,7 @@ object Page {
     def apply(transactionGroupId: Long)(implicit routerContext: RouterContext): EditTransactionGroup =
       EditTransactionGroup(transactionGroupId, HasReturnTo.getCurrentPathWithoutPrefix)
   }
+
   case class NewFromTemplate private (templateCode: String, returnToWithoutPrefix: Option[String])
       extends HasReturnTo(returnToWithoutPrefix)
       with Page
@@ -55,6 +57,7 @@ object Page {
     def apply(template: Template)(implicit routerContext: RouterContext): NewFromTemplate =
       NewFromTemplate(template.code, HasReturnTo.getCurrentPathWithoutPrefix)
   }
+
   case class NewForRepayment private (accountCode1: String,
                                       accountCode2: String,
                                       amountInCents: Long,
@@ -67,7 +70,7 @@ object Page {
       NewForRepayment(account1.code, account2.code, amount.cents, HasReturnTo.getCurrentPathWithoutPrefix)
   }
 
-  // Accounting forms - balance checks
+  // **************** Accounting forms - balance checks **************** //
   case class NewBalanceCheck private (reservoirCode: String, returnToWithoutPrefix: Option[String])
       extends HasReturnTo(returnToWithoutPrefix)
       with Page

@@ -4,12 +4,7 @@ import common.I18n
 import common.time.Clock
 import flux.action.Dispatcher
 import flux.stores.GlobalMessagesStore
-import flux.stores.entries.{
-  AllEntriesStoreFactory,
-  CashFlowEntriesStoreFactory,
-  EndowmentEntriesStoreFactory,
-  LiquidationEntriesStoreFactory
-}
+import flux.stores.entries._
 import models.access.RemoteDatabaseProxy
 import models.accounting.config.Config
 import models.accounting.money.ExchangeRateManager
@@ -26,6 +21,7 @@ final class Module(implicit i18n: I18n,
                    cashFlowEntriesStoreFactory: CashFlowEntriesStoreFactory,
                    liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory,
                    endowmentEntriesStoreFactory: EndowmentEntriesStoreFactory,
+                   complexQueryStoreFactory: ComplexQueryStoreFactory,
                    globalMessagesStore: GlobalMessagesStore,
                    clock: Clock) {
 
@@ -35,4 +31,5 @@ final class Module(implicit i18n: I18n,
   implicit lazy val cashFlow = wire[CashFlow]
   implicit lazy val liquidation = wire[Liquidation]
   implicit lazy val endowments = wire[Endowments]
+  implicit lazy val searchResults = wire[SearchResults]
 }
