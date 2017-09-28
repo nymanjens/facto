@@ -1,7 +1,5 @@
 package flux.stores.entries
 
-import scala2js.Converters._
-import scala2js.Keys
 import common.time.JavaTimeImplicits._
 import common.time.LocalDateTime
 import flux.stores.entries.CashFlowEntry.{BalanceCorrection, RegularEntry}
@@ -13,6 +11,7 @@ import models.accounting.money.{ExchangeRateManager, MoneyWithGeneralCurrency}
 import models.accounting.{Transaction, _}
 
 import scala2js.Converters._
+import scala2js.Keys
 
 final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
                                         accountingConfig: Config,
@@ -158,13 +157,28 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
       EntriesListStoreFactory.State(entries.takeRight(maxNumEntries), hasMore = entries.size > maxNumEntries)
     }
 
-    override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) = {
+    override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) =
       transaction.moneyReservoir == moneyReservoir
-    }
 
-    override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) = {
+    override protected def transactionRemovalImpactsState(transactionId: Long, state: State) =
+      state.entries.toStream
+        .flatMap {
+          case entry: RegularEntry => entry.transactions
+          case entry: BalanceCorrection => Seq()
+        }
+        .map(_.id)
+        .contains(transactionId)
+
+    override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) =
       balanceCheck.moneyReservoir == moneyReservoir
-    }
+
+    override protected def balanceCheckRemovalImpactsState(balanceCheckId: Long, state: State) =
+      state.entries.toStream
+        .flatMap {
+          case entry: RegularEntry => Seq()
+          case entry: BalanceCorrection => Seq(entry.balanceCheck.id)
+        }
+        .contains(balanceCheckId)
   }
 
   def get(moneyReservoir: MoneyReservoir, maxNumEntries: Int): Store =

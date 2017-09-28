@@ -12,7 +12,7 @@ import scala2js.Keys
 final class EndowmentEntriesStoreFactory(implicit database: RemoteDatabaseProxy, accountingConfig: Config)
     extends EntriesListStoreFactory[GeneralEntry, Account] {
 
-  override protected def createNew(maxNumEntries: Int, account: Account) = new Store {
+  override protected def createNew(maxNumEntries: Int, account: Account) = new TransactionsListStore[GeneralEntry] {
     override protected def calculateState() = {
       val transactions: Seq[Transaction] =
         database
@@ -35,10 +35,8 @@ final class EndowmentEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
       EntriesListStoreFactory.State(entries.takeRight(maxNumEntries), hasMore = entries.size > maxNumEntries)
     }
 
-    override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) = {
+    override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) =
       transaction.category == accountingConfig.constants.endowmentCategory && transaction.beneficiary == account
-    }
-    override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) = false
   }
 
   def get(account: Account, maxNumEntries: Int): Store =

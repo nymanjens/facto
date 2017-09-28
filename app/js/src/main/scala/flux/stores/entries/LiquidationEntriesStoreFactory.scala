@@ -16,7 +16,7 @@ final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProx
                                            entityAccess: EntityAccess)
     extends EntriesListStoreFactory[LiquidationEntry, AccountPair] {
 
-  override protected def createNew(maxNumEntries: Int, accountPair: AccountPair) = new Store {
+  override protected def createNew(maxNumEntries: Int, accountPair: AccountPair) = new TransactionsListStore[LiquidationEntry] {
     override protected def calculateState() = {
       val allTransactions: Seq[Transaction] =
         database
@@ -58,11 +58,8 @@ final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProx
       EntriesListStoreFactory.State(entries.takeRight(maxNumEntries), hasMore = entries.size > maxNumEntries)
     }
 
-    override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) = {
+    override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) =
       isRelevantForAccounts(transaction, accountPair)
-    }
-
-    override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) = false
 
     private def isRelevantForAccounts(transaction: Transaction, accountPair: AccountPair): Boolean = {
       val moneyReservoirOwner = transaction.moneyReservoirCode match {

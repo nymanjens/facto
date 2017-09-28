@@ -29,10 +29,12 @@ final class TagsStoreFactory(implicit database: RemoteDatabaseProxy) extends Ent
       State(tagToTransactionIdsBuilder.build())
     }
 
-    override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) = {
+    override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) =
       transaction.tags.nonEmpty
-    }
+    override protected def transactionRemovalImpactsState(transactionId: Long, state: State) =
+      state.tagToTransactionIds containsValue transactionId
     override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) = false
+    override protected def balanceCheckRemovalImpactsState(balanceCheckId: Long, state: State) = false
   }
 
   /* override */

@@ -12,7 +12,7 @@ final class ComplexQueryStoreFactory(implicit database: RemoteDatabaseProxy,
                                      complexQueryFilter: ComplexQueryFilter)
     extends EntriesListStoreFactory[GeneralEntry, ComplexQueryStoreFactory.Query] {
 
-  override protected def createNew(maxNumEntries: Int, query: String) = new Store {
+  override protected def createNew(maxNumEntries: Int, query: String) = new TransactionsListStore[GeneralEntry] {
     private val filter = complexQueryFilter.fromQuery(query)
 
     override protected def calculateState() = {
@@ -30,10 +30,8 @@ final class ComplexQueryStoreFactory(implicit database: RemoteDatabaseProxy,
       EntriesListStoreFactory.State(entries.takeRight(maxNumEntries), hasMore = entries.size > maxNumEntries)
     }
 
-    override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) = {
+    override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) =
       filter(LokiJs.ResultSet.fake(Seq(transaction))).count() > 0
-    }
-    override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) = false
   }
 
   def get(query: String, maxNumEntries: Int): Store =

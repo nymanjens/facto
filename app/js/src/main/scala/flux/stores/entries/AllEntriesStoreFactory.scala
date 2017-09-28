@@ -11,7 +11,7 @@ import scala2js.Keys
 final class AllEntriesStoreFactory(implicit database: RemoteDatabaseProxy)
     extends EntriesListStoreFactory[GeneralEntry, Unit] {
 
-  override protected def createNew(maxNumEntries: Int, input: Unit) = new Store {
+  override protected def createNew(maxNumEntries: Int, input: Unit) = new TransactionsListStore[GeneralEntry] {
     override protected def calculateState() = {
       val transactions: Seq[Transaction] =
         database
@@ -33,7 +33,6 @@ final class AllEntriesStoreFactory(implicit database: RemoteDatabaseProxy)
     }
 
     override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) = true
-    override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) = false
   }
 
   def get(maxNumEntries: Int): Store = get(Input(maxNumEntries = maxNumEntries, additionalInput = (): Unit))

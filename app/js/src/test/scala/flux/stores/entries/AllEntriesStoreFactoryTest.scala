@@ -44,6 +44,16 @@ object AllEntriesStoreFactoryTest extends TestSuite {
         .withGeneralEntries(hasMore = false, Seq(testTransactionWithId))
     }
 
+    "store state is updated upon local removal" - {
+      database.persistModifications(Seq(EntityModification.Add(testTransactionWithId)))
+      store.state ==> EntriesListStoreFactory.State
+        .withGeneralEntries(hasMore = false, Seq(testTransactionWithId))
+
+      database.persistModifications(Seq(EntityModification.Remove[Transaction](testTransactionWithId.id)))
+
+      store.state ==> EntriesListStoreFactory.State.empty
+    }
+
     "store calls listeners" - {
       var onStateUpdateCount = 0
       store.register(new EntriesStore.Listener {

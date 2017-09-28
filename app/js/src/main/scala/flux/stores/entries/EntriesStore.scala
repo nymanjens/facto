@@ -44,7 +44,9 @@ abstract class EntriesStore[State](implicit database: RemoteDatabaseProxy) {
   protected def calculateState(): State
 
   protected def transactionUpsertImpactsState(transaction: Transaction, state: State): Boolean
+  protected def transactionRemovalImpactsState(transactionId: Long, state: State): Boolean
   protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State): Boolean
+  protected def balanceCheckRemovalImpactsState(balanceCheckId: Long, state: State): Boolean
 
   // **************** Private helper methods ****************//
   private def updateState(): Unit = {
@@ -57,26 +59,26 @@ abstract class EntriesStore[State](implicit database: RemoteDatabaseProxy) {
   private def modificationImpactsState(entityModification: EntityModification, state: State): Boolean = {
     entityModification.entityType match {
       case EntityType.UserType => true // Almost never happens and likely to change entries
-      case EntityType.BalanceCheckType =>
-        entityModification match {
-          case EntityModification.Add(bc) =>
-            balanceCheckUpsertImpactsState(bc.asInstanceOf[BalanceCheck], state)
-          case EntityModification.Remove(bcId) =>
-            true // Could be a removal or an update, but we can't get more info about the deleted entry
-        }
       case EntityType.ExchangeRateMeasurementType =>
         false // In normal circumstances, no entries should be changed retroactively
       case EntityType.TransactionGroupType =>
         entityModification match {
-          case EntityModification.Add(_) => false // Always gets updated alongside Transaction
-          case EntityModification.Remove(_) => true // Non-trivial to find out what changed
+          case EntityModification.Add(_) => false // Always gets added alongside Transaction additions
+          case EntityModification.Remove(_) => false // Always gets removed alongside Transaction removals
         }
       case EntityType.TransactionType =>
         entityModification match {
           case EntityModification.Add(transaction) =>
             transactionUpsertImpactsState(transaction.asInstanceOf[Transaction], state)
           case EntityModification.Remove(transactionId) =>
-            false // Removal always happens alongside Group removal or entity modification (cases handled separately)
+            transactionRemovalImpactsState(transactionId, state)
+        }
+      case EntityType.BalanceCheckType =>
+        entityModification match {
+          case EntityModification.Add(bc) =>
+            balanceCheckUpsertImpactsState(bc.asInstanceOf[BalanceCheck], state)
+          case EntityModification.Remove(bcId) =>
+            balanceCheckRemovalImpactsState(bcId, state)
         }
     }
   }

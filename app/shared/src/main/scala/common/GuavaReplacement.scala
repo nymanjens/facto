@@ -74,6 +74,7 @@ object GuavaReplacement {
   final class ImmutableSetMultimap[A, B](private val backingMap: Map[A, Set[B]]) {
     def get(key: A): Set[B] = backingMap.getOrElse(key, Set())
     def keySet: Set[A] = backingMap.keySet
+    def containsValue(value: B): Boolean = backingMap.values.toStream.flatten.contains(value)
 
     override def toString = backingMap.toString
 
