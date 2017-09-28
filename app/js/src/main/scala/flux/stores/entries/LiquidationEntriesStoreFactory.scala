@@ -16,63 +16,66 @@ final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProx
                                            entityAccess: EntityAccess)
     extends EntriesListStoreFactory[LiquidationEntry, AccountPair] {
 
-  override protected def createNew(maxNumEntries: Int, accountPair: AccountPair) = new TransactionsListStore[LiquidationEntry] {
-    override protected def calculateState() = {
-      val allTransactions: Seq[Transaction] =
-        database
-          .newQuery[Transaction]()
-          .sort(
-            LokiJs.Sorting
-              .ascBy(Keys.Transaction.transactionDate)
-              .thenAscBy(Keys.Transaction.createdDate)
-              .thenAscBy(Keys.id))
-          .data()
+  override protected def createNew(maxNumEntries: Int, accountPair: AccountPair) =
+    new TransactionsListStore[LiquidationEntry] {
+      override protected def calculateState() = {
+        val allTransactions: Seq[Transaction] =
+          database
+            .newQuery[Transaction]()
+            .sort(
+              LokiJs.Sorting
+                .ascBy(Keys.Transaction.transactionDate)
+                .thenAscBy(Keys.Transaction.createdDate)
+                .thenAscBy(Keys.id))
+            .data()
 
-      val relevantTransactions =
-        for {
-          transaction <- allTransactions
-          if isRelevantForAccounts(transaction, accountPair)
-        } yield transaction
+        val relevantTransactions =
+          for {
+            transaction <- allTransactions
+            if isRelevantForAccounts(transaction, accountPair)
+          } yield transaction
 
-      // convert to entries (recursion does not lead to growing stack because of Stream)
-      def convertToEntries(nextTransactions: List[Transaction],
-                           currentDebt: ReferenceMoney): Stream[LiquidationEntry] =
-        nextTransactions match {
-          case trans :: rest =>
-            val addsTo1To2Debt = trans.beneficiary == accountPair.account2
-            val flow = trans.flow.exchangedForReferenceCurrency
-            val newDebt = if (addsTo1To2Debt) currentDebt + flow else currentDebt - flow
-            LiquidationEntry(Seq(trans), newDebt) #:: convertToEntries(rest, newDebt)
-          case Nil =>
-            Stream.empty
+        // convert to entries (recursion does not lead to growing stack because of Stream)
+        def convertToEntries(nextTransactions: List[Transaction],
+                             currentDebt: ReferenceMoney): Stream[LiquidationEntry] =
+          nextTransactions match {
+            case trans :: rest =>
+              val addsTo1To2Debt = trans.beneficiary == accountPair.account2
+              val flow = trans.flow.exchangedForReferenceCurrency
+              val newDebt = if (addsTo1To2Debt) currentDebt + flow else currentDebt - flow
+              LiquidationEntry(Seq(trans), newDebt) #:: convertToEntries(rest, newDebt)
+            case Nil =>
+              Stream.empty
+          }
+        var entries =
+          convertToEntries(relevantTransactions.toList, ReferenceMoney(0) /* initial debt */ ).toList
+
+        entries = GroupedTransactions.combineConsecutiveOfSameGroup(entries) {
+          /* combine */
+          (first, last) =>
+            LiquidationEntry(first.transactions ++ last.transactions, last.debt)
         }
-      var entries =
-        convertToEntries(relevantTransactions.toList, ReferenceMoney(0) /* initial debt */ ).toList
 
-      entries = GroupedTransactions.combineConsecutiveOfSameGroup(entries) {
-        /* combine */
-        (first, last) =>
-          LiquidationEntry(first.transactions ++ last.transactions, last.debt)
+        EntriesListStoreFactory.State(
+          entries.takeRight(maxNumEntries),
+          hasMore = entries.size > maxNumEntries)
       }
 
-      EntriesListStoreFactory.State(entries.takeRight(maxNumEntries), hasMore = entries.size > maxNumEntries)
-    }
+      override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) =
+        isRelevantForAccounts(transaction, accountPair)
 
-    override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) =
-      isRelevantForAccounts(transaction, accountPair)
-
-    private def isRelevantForAccounts(transaction: Transaction, accountPair: AccountPair): Boolean = {
-      val moneyReservoirOwner = transaction.moneyReservoirCode match {
-        case "" =>
-          // Pick the first beneficiary in the group. This simulates that the zero sum transaction was physically
-          // performed on an actual reservoir, which is needed for the liquidation calculator to work.
-          transaction.transactionGroup.transactions.head.beneficiary
-        case _ => transaction.moneyReservoir.owner
+      private def isRelevantForAccounts(transaction: Transaction, accountPair: AccountPair): Boolean = {
+        val moneyReservoirOwner = transaction.moneyReservoirCode match {
+          case "" =>
+            // Pick the first beneficiary in the group. This simulates that the zero sum transaction was physically
+            // performed on an actual reservoir, which is needed for the liquidation calculator to work.
+            transaction.transactionGroup.transactions.head.beneficiary
+          case _ => transaction.moneyReservoir.owner
+        }
+        val involvedAccounts: Set[Account] = Set(transaction.beneficiary, moneyReservoirOwner)
+        accountPair.toSet == involvedAccounts
       }
-      val involvedAccounts: Set[Account] = Set(transaction.beneficiary, moneyReservoirOwner)
-      accountPair.toSet == involvedAccounts
     }
-  }
 
   def get(accountPair: AccountPair, maxNumEntries: Int): Store =
     get(Input(maxNumEntries = maxNumEntries, additionalInput = accountPair))
