@@ -4,6 +4,7 @@ import common.LoggingUtils.logExceptions
 import japgolly.scalajs.react.extra.router.StaticDsl.RouteB
 import japgolly.scalajs.react.extra.router._
 import japgolly.scalajs.react.vdom.html_<^._
+import scala.scalajs.js
 
 import scala.reflect.ClassTag
 
@@ -53,7 +54,7 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
           | staticRuleFromPage(Page.TemplateList, reactAppModule.templateList.apply)
 
           | dynamicRuleFromPage(_ ~ query.caseClass[Page.Search]) { (page, ctl) =>
-            reactAppModule.searchResults(page.query, ctl)
+            reactAppModule.searchResults(js.URIUtils.decodeURI(page.query), ctl)
           }
 
           | dynamicRuleFromPage(_ ~ returnToPath.caseClass[Page.NewTransactionGroup]) { (page, ctl) =>
