@@ -68,6 +68,7 @@ object TextInput {
         ^.tpe := "text",
         ^.name := props.name,
         ^.value := state.value,
+        ^.placeholder := props.placeholder,
         ^.onChange ==> { (e: ReactEventFromInput) =>
           LogExceptionsCallback {
             val newString = e.target.value
