@@ -33,7 +33,7 @@ final class Everything(implicit entriesStoreFactory: AllEntriesStoreFactory,
           EntriesListTable[GeneralEntry, Unit](
             tableTitle = i18n("facto.all"),
             tableClasses = Seq("table-everything"),
-            numEntriesStrategy = NumEntriesStrategy(start = 5, intermediateBeforeInf = Seq(30)),
+            numEntriesStrategy = NumEntriesStrategy(start = 400),
             tableHeaders = Seq(
               <.th(i18n("facto.issuer")),
               <.th(i18n("facto.payed")),
