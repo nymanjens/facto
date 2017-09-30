@@ -74,11 +74,15 @@ object GuavaReplacement {
   }
 
   final class Stopwatch private () {
-    private val startTimeMillis = System.currentTimeMillis
+    private var startTimeMillis = System.currentTimeMillis
 
-    def elapsed(): Duration = {
+    def elapsed: Duration = {
       val nowMillis = System.currentTimeMillis
       Duration.ofMillis(nowMillis - startTimeMillis)
+    }
+
+    def reset(): Unit = {
+      startTimeMillis = System.currentTimeMillis
     }
   }
 
