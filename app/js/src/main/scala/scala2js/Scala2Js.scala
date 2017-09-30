@@ -1,6 +1,7 @@
 package scala2js
 
 import scala.scalajs.js
+import scala.scalajs.js.JSConverters._
 
 object Scala2Js {
 
@@ -42,6 +43,10 @@ object Scala2Js {
 
   def toJs[T: Converter](value: T): js.Any = {
     implicitly[Converter[T]].toJs(value)
+  }
+
+  def toJs[T: Converter](values: Iterable[T]): js.Array[js.Any] = {
+    values.map(implicitly[Converter[T]].toJs).toJSArray
   }
 
   def toJsMap[T: MapConverter](value: T): js.Dictionary[js.Any] = {
