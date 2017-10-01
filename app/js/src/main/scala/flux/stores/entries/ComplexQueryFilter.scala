@@ -17,22 +17,27 @@ import scala2js.{Keys, Scala2Js}
 private[stores] final class ComplexQueryFilter(implicit userManager: User.Manager, accountingConfig: Config) {
 
   // **************** Public API **************** //
-  def fromQuery(query: String): LokiJs.ResultSet.Filter[Transaction] =
-    LokiJs.ResultSet.Filter.and(
-      splitInParts(query)
-        .map {
-          case QueryPart(string, negated) =>
-            val filterPair = createFilterPair(singlePartWithoutNegation = string)
+  def fromQuery(query: String): LokiJs.ResultSet.Filter[Transaction] = {
+    if (query.trim.isEmpty) {
+      LokiJs.ResultSet.Filter.nullFilter
+    } else {
+      LokiJs.ResultSet.Filter.and(
+        splitInParts(query)
+          .map {
+            case QueryPart(string, negated) =>
+              val filterPair = createFilterPair(singlePartWithoutNegation = string)
 
-            if (negated) {
-              filterPair.negated
-            } else {
-              filterPair
-            }
-        }
-        .sortBy(_.estimatedExecutionCost)
-        .map(_.positiveFilter): _*
-    )
+              if (negated) {
+                filterPair.negated
+              } else {
+                filterPair
+              }
+          }
+          .sortBy(_.estimatedExecutionCost)
+          .map(_.positiveFilter): _*
+      )
+    }
+  }
 
   // **************** Private helper methods **************** //
   private def createFilterPair(singlePartWithoutNegation: String): QueryFilterPair = {

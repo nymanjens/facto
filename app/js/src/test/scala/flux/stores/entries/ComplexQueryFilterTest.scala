@@ -26,6 +26,15 @@ object ComplexQueryFilterTest extends TestSuite {
     implicit val complexQueryFilter = new ComplexQueryFilter()
 
     "fromQuery()" - {
+      "empty filter" - {
+        val transaction1 = createTransaction(issuer = testUserA)
+        val transaction2 = createTransaction(issuer = testUserB)
+        val transaction3 = createTransaction(issuer = testUserB)
+
+        withTransactions(transaction1, transaction2, transaction3)
+          .assertThatQuery(s""" """)
+          .containsExactly(transaction1, transaction2, transaction3)
+      }
       "issuer filter" - {
         val transaction1 = createTransaction(issuer = testUserA)
         val transaction2 = createTransaction(issuer = testUserB)
