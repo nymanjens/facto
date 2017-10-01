@@ -60,7 +60,7 @@
   </parameters>
   <customMessage>Only println statements with a string starting with a space are allowed. All others are considered debug printlns.</customMessage>
  </check>
- <check level="error" class="org.scalastyle.scalariform.NumberOfTypesChecker" enabled="true">
+ <check level="error" class="org.scalastyle.scalariform.NumberOfTypesChecker" enabled="false">
   <parameters>
    <parameter name="maxTypes"><![CDATA[30]]></parameter>
   </parameters>
