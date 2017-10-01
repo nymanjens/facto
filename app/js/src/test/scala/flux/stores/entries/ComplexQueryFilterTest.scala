@@ -204,10 +204,12 @@ object ComplexQueryFilterTest extends TestSuite {
     new Object {
       def assertThatQuery(query: String) = new Object {
         def containsExactly(expected: Transaction*): Unit = {
-          val result = complexQueryFilter
-            .fromQuery(query)
-            .apply(LokiJs.ResultSet.fake(transactions.toVector))
-            .data()
+          val result =
+            LokiJs.ResultSet
+              .fake(transactions.toVector)
+              .filter(complexQueryFilter
+                .fromQuery(query))
+              .data()
           assertEqualIterables(result.toSet, expected.toSet)
         }
       }

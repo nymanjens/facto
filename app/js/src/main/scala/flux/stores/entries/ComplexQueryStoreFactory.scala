@@ -2,7 +2,7 @@ package flux.stores.entries
 
 import jsfacades.LokiJs
 import models.access.RemoteDatabaseProxy
-import models.accounting.{BalanceCheck, Transaction}
+import models.accounting.Transaction
 
 import scala.collection.immutable.Seq
 import scala2js.Converters._
@@ -14,11 +14,13 @@ final class ComplexQueryStoreFactory(implicit database: RemoteDatabaseProxy,
 
   override protected def createNew(maxNumEntries: Int, query: String) =
     new TransactionsListStore[GeneralEntry] {
-      private val filter = complexQueryFilter.fromQuery(query)
+      private val filterFromQuery: LokiJs.ResultSet.Filter[Transaction] = complexQueryFilter.fromQuery(query)
 
       override protected def calculateState() = {
         val transactions: Seq[Transaction] =
-          filter(database.newQuery[Transaction]())
+          database
+            .newQuery[Transaction]()
+            .filter(filterFromQuery)
             .sort(LokiJs.Sorting.descBy(Keys.Transaction.createdDate).thenDescBy(Keys.id))
             .limit(3 * maxNumEntries)
             .data()
@@ -34,7 +36,7 @@ final class ComplexQueryStoreFactory(implicit database: RemoteDatabaseProxy,
       }
 
       override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) =
-        filter(LokiJs.ResultSet.fake(Seq(transaction))).count() > 0
+        LokiJs.ResultSet.fake(Seq(transaction)).filter(filterFromQuery).count() > 0
     }
 
   def get(query: String, maxNumEntries: Int): Store =
