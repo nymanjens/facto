@@ -40,23 +40,18 @@ object EverythingTest extends TestSuite {
     }
 
     "with expand button" - {
-      database.addRemotelyAddedEntities(uniqueTransactions(35))
+      database.addRemotelyAddedEntities(uniqueTransactions(435))
       database.addRemotelyAddedEntities(testUser)
 
       val tester = new ComponentTester(everything(router))
 
       tester.expandButton.isPresent ==> true
-      tester.countDataRows ==> 5
-
-      tester.expandButton.press()
-
-      tester.expandButton.isPresent ==> true
-      tester.countDataRows ==> 30
+      tester.countDataRows ==> 400
 
       tester.expandButton.press()
 
       tester.expandButton.isPresent ==> false
-      tester.countDataRows ==> 35
+      tester.countDataRows ==> 435
     }
   }
 
