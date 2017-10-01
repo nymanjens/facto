@@ -52,7 +52,7 @@ final class JsExchangeRateManager(implicit database: RemoteDatabaseProxy) extend
     val mapBuilder = TreeMap.newBuilder[LocalDateTime, Double]
     for (measurement <- database
            .newQuery[ExchangeRateMeasurement]()
-           .filter(Keys.ExchangeRateMeasurement.foreignCurrencyCode, currency.code)
+           .filterEqual(Keys.ExchangeRateMeasurement.foreignCurrencyCode, currency.code)
            .data()) {
       mapBuilder += (measurement.date -> measurement.ratioReferenceToForeignCurrency)
     }

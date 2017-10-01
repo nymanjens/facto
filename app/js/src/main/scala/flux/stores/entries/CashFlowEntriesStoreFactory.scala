@@ -26,7 +26,7 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
         val totalNumTransactions =
           database
             .newQuery[Transaction]()
-            .filter(Keys.Transaction.moneyReservoirCode, moneyReservoir.code)
+            .filterEqual(Keys.Transaction.moneyReservoirCode, moneyReservoir.code)
             .count()
 
         if (totalNumTransactions < numTransactionsToFetch) {
@@ -37,7 +37,7 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
           val oldestTransDate =
             database
               .newQuery[Transaction]()
-              .filter(Keys.Transaction.moneyReservoirCode, moneyReservoir.code)
+              .filterEqual(Keys.Transaction.moneyReservoirCode, moneyReservoir.code)
               .sort(
                 LokiJs.Sorting
                   .descBy(Keys.Transaction.transactionDate)
@@ -52,7 +52,7 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
           val oldestBC =
             database
               .newQuery[BalanceCheck]()
-              .filter(Keys.BalanceCheck.moneyReservoirCode, moneyReservoir.code)
+              .filterEqual(Keys.BalanceCheck.moneyReservoirCode, moneyReservoir.code)
               .filter(LokiJs.ResultSet.Filter.lessThan(Keys.BalanceCheck.checkDate, oldestTransDate))
               .sort(
                 LokiJs.Sorting
@@ -72,7 +72,7 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
       val balanceChecks: Seq[BalanceCheck] =
         database
           .newQuery[BalanceCheck]()
-          .filter(Keys.BalanceCheck.moneyReservoirCode, moneyReservoir.code)
+          .filterEqual(Keys.BalanceCheck.moneyReservoirCode, moneyReservoir.code)
           .filter(LokiJs.ResultSet.Filter.greaterThan(Keys.BalanceCheck.checkDate, oldestBalanceDate))
           .sort(
             LokiJs.Sorting
@@ -85,7 +85,7 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
       val transactions: Seq[Transaction] =
         database
           .newQuery[Transaction]()
-          .filter(Keys.Transaction.moneyReservoirCode, moneyReservoir.code)
+          .filterEqual(Keys.Transaction.moneyReservoirCode, moneyReservoir.code)
           .filter(LokiJs.ResultSet.Filter.greaterThan(Keys.Transaction.transactionDate, oldestBalanceDate))
           .sort(
             LokiJs.Sorting

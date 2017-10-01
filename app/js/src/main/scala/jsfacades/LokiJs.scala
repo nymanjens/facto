@@ -163,7 +163,7 @@ object LokiJs {
 
   trait ResultSet[E] {
     // **************** Intermediary operations **************** //
-    final def filter[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): ResultSet[E] =
+    final def filterEqual[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): ResultSet[E] =
       filter(Filter.equal(key, value))
     def filter(filter: Filter[E]): ResultSet[E]
 
@@ -366,7 +366,7 @@ object LokiJs {
       override def data() = entities
 
       override def findOne[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V) =
-        filter(key, value).limit(1).data() match {
+        filterEqual(key, value).limit(1).data() match {
           case Seq(e) => Some(e)
           case Seq() => None
         }

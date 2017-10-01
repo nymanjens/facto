@@ -13,7 +13,7 @@ final class JsExchangeRateMeasurementManager(implicit database: RemoteDatabasePr
   override def fetchAll(currency: Currency) = {
     database
       .newQuery[ExchangeRateMeasurement]()
-      .filter(Keys.ExchangeRateMeasurement.foreignCurrencyCode, currency.code)
+      .filterEqual(Keys.ExchangeRateMeasurement.foreignCurrencyCode, currency.code)
       .sort(LokiJs.Sorting.ascBy(Keys.ExchangeRateMeasurement.date))
       .data()
   }
