@@ -22,6 +22,15 @@ object LokiResultSetFakeTest extends TestSuite {
   override def tests = TestSuite {
     "LokiJs.ResultSet.Fake" - {
       // **************** Regular filter tests **************** //
+      "newQuery().filter(nullFilter)" - {
+        val transaction1 = createTransaction()
+        val transaction2 = createTransaction()
+        val transaction3 = createTransaction()
+
+        withTransactions(transaction1, transaction2, transaction3)
+          .assertFilteredWith(Filter.nullFilter)
+          .containsExactly(transaction1, transaction2, transaction3)
+      }
       "newQuery().filter(equal)" - {
         val transaction1 = createTransaction()
         val transaction2 = createTransaction()
