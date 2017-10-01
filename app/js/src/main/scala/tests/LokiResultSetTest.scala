@@ -22,6 +22,15 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
 
   override def tests = Seq(
     // **************** Regular filter tests **************** //
+    ManualTest("newQuery().filter(nullFilter)") {
+      val transaction1 = createTransaction()
+      val transaction2 = createTransaction()
+      val transaction3 = createTransaction()
+
+      withTransactions(transaction1, transaction2, transaction3)
+        .assertFilteredWith(Filter.nullFilter)
+        .containsExactly(transaction1, transaction2, transaction3)
+    },
     ManualTest("newQuery().filter(equal)") {
       val transaction1 = createTransaction()
       val transaction2 = createTransaction()

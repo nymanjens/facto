@@ -199,6 +199,7 @@ object LokiJs {
 
     sealed trait Filter[E]
     object Filter {
+      def nullFilter[E]: Filter[E] = NullFilter[E]()
       def equal[E, V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): Filter[E] =
         Equal(key.name, Scala2Js.toJs(value))
       def notEqual[E, V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): Filter[E] =
@@ -222,6 +223,7 @@ object LokiJs {
       def or[E](filters: Filter[E]*): Filter[E] = Or(Seq(filters: _*))
       def and[E](filters: Filter[E]*): Filter[E] = And(Seq(filters: _*))
 
+      private[ResultSet] case class NullFilter[E]() extends Filter[E]
       private[ResultSet] case class Equal[E](keyName: String, value: js.Any) extends Filter[E]
       private[ResultSet] case class NotEqual[E](keyName: String, value: js.Any) extends Filter[E]
       private[ResultSet] case class GreaterThan[E](keyName: String, value: js.Any) extends Filter[E]
@@ -247,6 +249,7 @@ object LokiJs {
           js.Dictionary(keyName -> js.Dictionary(modifier -> value))
         }
         def toFilterDictionary(filter: Filter[E]): js.Dictionary[js.Any] = filter match {
+          case Filter.NullFilter() => js.Dictionary()
           case Filter.Equal(key, value) => withModifier("$eq", key, value)
           case Filter.NotEqual(key, value) => withModifier("$ne", key, value)
           case Filter.GreaterThan(key, value) => withModifier("$gt", key, value)
@@ -313,6 +316,7 @@ object LokiJs {
       // **************** Intermediary operations **************** //
       override def filter(filter: Filter[E]) = {
         def applyFilter(jsMap: js.Dictionary[js.Any], filter: Filter[E]): Boolean = filter match {
+          case Filter.NullFilter() => true
           case Filter.Equal(key, value) => jsMap(key) == value
           case Filter.NotEqual(key, value) => jsMap(key) != value
           case Filter.GreaterThan(key, value) => jsValueOrdering.gt(jsMap(key), value)
