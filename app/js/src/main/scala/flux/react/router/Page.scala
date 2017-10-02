@@ -28,9 +28,9 @@ object Page {
   case object CashFlow extends Page
   case object Liquidation extends Page
   case object Endowments extends Page
-  case object Summary extends Page
-  case object TemplateList extends Page
+  case class Summary(query: String = "") extends Page
   case class Search(query: String) extends Page
+  case object TemplateList extends Page
 
   // **************** Accounting forms - transactions **************** //
   case class NewTransactionGroup private (returnToWithoutPrefix: Option[String])

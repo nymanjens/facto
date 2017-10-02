@@ -22,6 +22,8 @@ final class Module(implicit i18n: I18n,
                    liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory,
                    endowmentEntriesStoreFactory: EndowmentEntriesStoreFactory,
                    complexQueryStoreFactory: ComplexQueryStoreFactory,
+                   summaryForYearStoreFactory: SummaryForYearStoreFactory,
+                   summaryYearsStoreFactory: SummaryYearsStoreFactory,
                    globalMessagesStore: GlobalMessagesStore,
                    clock: Clock) {
 
@@ -32,4 +34,5 @@ final class Module(implicit i18n: I18n,
   implicit lazy val liquidation = wire[Liquidation]
   implicit lazy val endowments = wire[Endowments]
   implicit lazy val searchResults = wire[SearchResults]
+  implicit lazy val summary = wire[Summary]
 }
