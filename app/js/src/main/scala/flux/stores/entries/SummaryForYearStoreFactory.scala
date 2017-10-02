@@ -134,10 +134,15 @@ object SummaryForYearStoreFactory {
     }
   }
 
-  case class SummaryCell(transactions: Seq[Transaction])(implicit exchangeRateManager: ExchangeRateManager,
-                                                         accountingConfig: Config) {
-    val totalFlow: ReferenceMoney = {
-      transactions.map(_.flow.exchangedForReferenceCurrency).sum
+  case class SummaryCell(transactions: Seq[Transaction]) {
+    @volatile private var _totalFlow: ReferenceMoney = null
+
+    def totalFlow(implicit exchangeRateManager: ExchangeRateManager,
+                  accountingConfig: Config): ReferenceMoney = {
+      if (_totalFlow == null) {
+        _totalFlow = transactions.map(_.flow.exchangedForReferenceCurrency).sum
+      }
+      _totalFlow
     }
   }
   object SummaryCell {
