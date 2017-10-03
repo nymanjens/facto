@@ -70,8 +70,8 @@ final class SummaryForYearStoreFactory(implicit database: RemoteDatabaseProxy,
   private def filterInYear[E](key: Key[LocalDateTime, E], year: Int): LokiJs.ResultSet.Filter[E] = {
     val yearRange = MonthRange.forYear(year)
     LokiJs.ResultSet.Filter.and(
-      LokiJs.ResultSet.Filter.greaterThan(key, LocalDateTime.of(yearRange.start, LocalTime.MIN)),
-      LokiJs.ResultSet.Filter.lessThan(key, LocalDateTime.of(yearRange.startOfNextMonth, LocalTime.MIN))
+      LokiJs.ResultSet.Filter.greaterThan(key, yearRange.startTime),
+      LokiJs.ResultSet.Filter.lessThan(key, yearRange.startOfNextMonth)
     )
   }
 }

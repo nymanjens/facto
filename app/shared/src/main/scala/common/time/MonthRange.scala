@@ -1,6 +1,6 @@
 package common.time
 
-import java.time.{LocalDate, Month, Period}
+import java.time.{LocalDate, LocalTime, Month, Period}
 
 import common.time.JavaTimeImplicits._
 
@@ -35,6 +35,9 @@ case class MonthRange(start: LocalDate, startOfNextMonth: LocalDate) {
   def contains(month: DatedMonth): Boolean = contains(month.startDate)
 
   def contains(dateTime: LocalDateTime): Boolean = contains(dateTime.toLocalDate)
+
+  def startTime: LocalDateTime = LocalDateTime.of(start, LocalTime.MIN)
+  def startTimeOfNextMonth: LocalDateTime = LocalDateTime.of(startOfNextMonth, LocalTime.MIN)
 }
 
 object MonthRange {
