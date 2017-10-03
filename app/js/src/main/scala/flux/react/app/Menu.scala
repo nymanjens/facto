@@ -111,7 +111,7 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
       bindToPage("shift+alt+c", Page.CashFlow)
       bindToPage("shift+alt+l", Page.Liquidation)
       bindToPage("shift+alt+v", Page.Liquidation)
-      bindToPage("shift+alt+d", Page.Endcowments)
+      bindToPage("shift+alt+d", Page.Endowments)
       bindToPage("shift+alt+s", Page.Summary())
       bindToPage("shift+alt+t", Page.TemplateList)
       bindToPage("shift+alt+j", Page.TemplateList)
