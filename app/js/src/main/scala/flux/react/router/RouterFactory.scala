@@ -49,10 +49,7 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
 
           | staticRuleFromPage(Page.Endowments, reactAppModule.endowments.apply)
 
-          | staticRuleFromPage(Page.Summary(), ctl => reactAppModule.summary(query = "", ctl))
-          | dynamicRuleFromPage(_ ~ query.caseClass[Page.Summary]) { (page, ctl) =>
-            reactAppModule.summary(js.URIUtils.decodeURI(page.query), ctl)
-          }
+          | staticRuleFromPage(Page.Summary, reactAppModule.summary.apply)
 
           | dynamicRuleFromPage(_ ~ query.caseClass[Page.Search]) { (page, ctl) =>
             reactAppModule.searchResults(js.URIUtils.decodeURI(page.query), ctl)

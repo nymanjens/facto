@@ -31,7 +31,12 @@ final class Summary(implicit summaryForYearStoreFactory: SummaryForYearStoreFact
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
-    .initialState(State(includeUnrelatedAccounts = false))
+    .initialState(
+      State(
+        includeUnrelatedAccounts = false,
+        query = "",
+        hideColumnsOlderThanYear = clock.now.getYear - 1,
+        expandedYear = clock.now.getYear))
     .renderPS(
       ($, props, state) => {
         implicit val router = props.router
@@ -42,7 +47,7 @@ final class Summary(implicit summaryForYearStoreFactory: SummaryForYearStoreFact
               if state.includeUnrelatedAccounts || account.isMineOrCommon
             } yield {
               uielements.Panel(account.longName, key = account.code) {
-                <.span(props.query)
+                <.span(state.query)
               }
             }
           }.toVdomArray
@@ -52,11 +57,14 @@ final class Summary(implicit summaryForYearStoreFactory: SummaryForYearStoreFact
     .build
 
   // **************** API ****************//
-  def apply(query: String, router: RouterContext): VdomElement = {
-    component(Props(router, query = query))
+  def apply(router: RouterContext): VdomElement = {
+    component(Props(router))
   }
 
   // **************** Private inner types ****************//
-  private case class Props(router: RouterContext, query: String)
-  private case class State(includeUnrelatedAccounts: Boolean)
+  private case class Props(router: RouterContext)
+  private case class State(includeUnrelatedAccounts: Boolean,
+                           query: String,
+                           hideColumnsOlderThanYear: Int,
+                           expandedYear: Int)
 }

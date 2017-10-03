@@ -85,7 +85,7 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
           menuItem(i18n("facto.cash-flow.html"), "icon-money", Page.CashFlow),
           menuItem(i18n("facto.liquidation.html"), "icon-balance-scale", Page.Liquidation),
           menuItem(i18n("facto.endowments.html"), "icon-crown", Page.Endowments),
-          menuItem(i18n("facto.summary.html"), "icon-table", Page.Summary())
+          menuItem(i18n("facto.summary.html"), "icon-table", Page.Summary)
         ),
         <.li(
           menuItem(i18n("facto.new-entry.html"), "icon-new-empty", Page.NewTransactionGroup()),
@@ -112,7 +112,7 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
       bindToPage("shift+alt+l", Page.Liquidation)
       bindToPage("shift+alt+v", Page.Liquidation)
       bindToPage("shift+alt+d", Page.Endowments)
-      bindToPage("shift+alt+s", Page.Summary())
+      bindToPage("shift+alt+s", Page.Summary)
       bindToPage("shift+alt+t", Page.TemplateList)
       bindToPage("shift+alt+j", Page.TemplateList)
       bindToPage("shift+alt+n", Page.NewTransactionGroup())
