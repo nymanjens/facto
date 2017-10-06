@@ -18,6 +18,7 @@ case class MonthRange(start: LocalDate, startOfNextMonth: LocalDate) {
 
   def completelyBefore(that: MonthRange): Boolean = this.startOfNextMonth <= that.start
   def completelyAfter(that: MonthRange): Boolean = this.start >= that.startOfNextMonth
+  def isEmpty: Boolean = start == startOfNextMonth
 
   def intersection(that: MonthRange): MonthRange = (this, that) match {
     case _ if this completelyBefore that => MonthRange.empty
@@ -26,6 +27,17 @@ case class MonthRange(start: LocalDate, startOfNextMonth: LocalDate) {
       val newStart = Set(this.start, that.start).max
       val newStartOfNextMonth = Set(this.startOfNextMonth, that.startOfNextMonth).min
       MonthRange(newStart, newStartOfNextMonth)
+  }
+
+  def months: Seq[DatedMonth] = {
+    def nextMonths(start: LocalDate): Stream[DatedMonth] = {
+      if (start == startOfNextMonth) {
+        Stream.empty
+      } else {
+        DatedMonth(start) #:: nextMonths(start.plusMonths(1))
+      }
+    }
+    nextMonths(start).toVector
   }
 
   def countMonths: Int = Period.between(start, startOfNextMonth).toTotalMonths.toInt

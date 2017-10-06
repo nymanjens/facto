@@ -1,6 +1,6 @@
 package common.time
 
-import java.time.{LocalDate, Month}
+import java.time.{LocalDate, LocalTime, Month}
 
 import common.I18n
 
@@ -18,6 +18,15 @@ case class DatedMonth(startDate: LocalDate) extends Ordered[DatedMonth] {
   def contains(date: LocalDateTime): Boolean = {
     date.getYear == startDate.getYear && date.getMonth == startDate.getMonth
   }
+
+  def startDateOfNextMonth: LocalDate = {
+    val result = startDate.plusMonths(1)
+    TimeUtils.requireStartOfMonth(result)
+    result
+  }
+
+  def startTime: LocalDateTime = LocalDateTime.of(startDate, LocalTime.MIN)
+  def startTimeOfNextMonth: LocalDateTime = LocalDateTime.of(startDateOfNextMonth, LocalTime.MIN)
 
   override def compare(that: DatedMonth): Int = this.startDate compareTo that.startDate
 }
