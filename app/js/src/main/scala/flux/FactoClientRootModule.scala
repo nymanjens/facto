@@ -44,7 +44,8 @@ final class FactoAppModule(implicit getInitialDataResponse: GetInitialDataRespon
   implicit private val complexQueryStoreFactory = fluxStoresModule.complexQueryStoreFactory
   implicit private val summaryForYearStoreFactory = fluxStoresModule.summaryForYearStoreFactory
   implicit private val summaryYearsStoreFactory = fluxStoresModule.summaryYearsStoreFactory
-  implicit private val summaryExchangeRateGainsStoreFactory = fluxStoresModule.summaryExchangeRateGainsStoreFactory
+  implicit private val summaryExchangeRateGainsStoreFactory =
+    fluxStoresModule.summaryExchangeRateGainsStoreFactory
   implicit private val globalMessagesStore = fluxStoresModule.globalMessagesStore
 
   // Create other Flux modules
