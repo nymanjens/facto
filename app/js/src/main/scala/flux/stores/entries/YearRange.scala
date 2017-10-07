@@ -8,6 +8,16 @@ import scala.collection.immutable.Seq
   * Example.: YearRange(2014, 2017) consists of the years [2014, 2015, 2016].
   */
 case class YearRange private (private val startYearInlusive: Int, private val endYearExclusive: Int) {
+  def firstYear: Int = {
+    require(!this.isEmpty)
+    startYearInlusive
+  }
+
+  def lastYear: Int = {
+    require(!this.isEmpty)
+    endYearExclusive - 1
+  }
+
   def toSeq: Seq[Int] = startYearInlusive until endYearExclusive
   def contains(year: Int): Boolean = startYearInlusive <= year && year < endYearExclusive
   def isEmpty: Boolean = this == YearRange.empty

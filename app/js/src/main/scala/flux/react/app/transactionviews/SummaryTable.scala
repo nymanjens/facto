@@ -66,28 +66,28 @@ private[transactionviews] final class SummaryTable(
 
   private case class State(allYearsData: AllYearsData)
 
-  private case class AllYearsData(yearsToData: ListMap[Long, AllYearsData.YearData]) {
+  private case class AllYearsData(allTransactionsYearRange: YearRange,
+                                  yearsToData: ListMap[Int, AllYearsData.YearData]) {
     def categories: Seq[Category] = ???
+    def years: Seq[Int] = yearsToData.keys.toVector
   }
   private object AllYearsData {
-    val empty: AllYearsData = AllYearsData(ListMap())
+    val empty: AllYearsData =
+      AllYearsData(allTransactionsYearRange = YearRange.single(clock.now.getYear), yearsToData = ListMap())
 
-    def builder(): Builder = new Builder
+    def builder(allTransactionsYearRange: YearRange): Builder = new Builder(allTransactionsYearRange)
 
-    final class YearData(summaryForYear: SummaryForYear, gainsForYear: GainsForYear) {
-//      def monthsToData: Map[DatedMonth, Month
-      def months(implicit props: Props): Seq[DatedMonth] = ???
-    }
+    final class YearData(summaryForYear: SummaryForYear, gainsForYear: GainsForYear)
 
-    final class Builder {
-      val yearsToData: mutable.ListMap[Long, AllYearsData.YearData] = mutable.ListMap()
+    final class Builder(allTransactionsYearRange: YearRange) {
+      val yearsToData: mutable.ListMap[Int, AllYearsData.YearData] = mutable.ListMap()
 
-      def addYear(year: Long, summaryForYear: SummaryForYear, gainsForYear: GainsForYear): Builder = {
+      def addYear(year: Int, summaryForYear: SummaryForYear, gainsForYear: GainsForYear): Builder = {
         yearsToData.put(year, new YearData(summaryForYear, gainsForYear))
         this
       }
 
-      def result: AllYearsData = AllYearsData(ListMap(yearsToData.toVector: _*))
+      def result: AllYearsData = AllYearsData(allTransactionsYearRange, ListMap(yearsToData.toVector: _*))
     }
   }
 
@@ -121,11 +121,11 @@ private[transactionviews] final class SummaryTable(
         <.thead(
           <.tr(
             <.th(Currency.default.symbol), {
-              for ((year, summaryForYear) <- summary.yearsToData) yield {
+              for (year <- summary.years) yield {
                 <.th(
                   ^.key := year,
                   ^.colSpan := {
-                    if (year == props.expandedYear) summaryForYear.months.size + 1 else 1
+                    if (year == props.expandedYear) 13 else 1
                   },
                   <.a(^.href := "#TODO", year)
                 )
@@ -204,12 +204,13 @@ private[transactionviews] final class SummaryTable(
     private def doStateUpdate(props: Props): Unit = {
       val (data, usedStores): (AllYearsData, Set[EntriesStore[_]]) = {
         val yearsStore = summaryYearsStoreFactory.get(props.account)
-        val yearRange = yearsStore.state
+        val allTransactionsYearRange = yearsStore.state
+        val yearRange = allTransactionsYearRange
           .copyIncluding(clock.now.getYear)
           .copyWithLowerBound(props.hideColumnsOlderThanYear)
           .copyIncluding(props.expandedYear)
 
-        val dataBuilder = AllYearsData.builder()
+        val dataBuilder = AllYearsData.builder(allTransactionsYearRange)
         val usedStores: mutable.Set[EntriesStore[_]] = mutable.Set(yearsStore)
         for (year <- yearRange.toSeq) {
           val summaryForYearStore =
