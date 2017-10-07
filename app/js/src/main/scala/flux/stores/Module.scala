@@ -34,5 +34,6 @@ final class Module(implicit i18n: I18n,
   implicit val complexQueryStoreFactory = wire[ComplexQueryStoreFactory]
   implicit val summaryForYearStoreFactory = wire[SummaryForYearStoreFactory]
   implicit val summaryYearsStoreFactory = wire[SummaryYearsStoreFactory]
+  implicit val summaryExchangeRateGainsStoreFactory = wire[SummaryExchangeRateGainsStoreFactory]
   implicit val globalMessagesStore = wire[GlobalMessagesStore]
 }

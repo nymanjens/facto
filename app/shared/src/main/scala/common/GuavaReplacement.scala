@@ -124,4 +124,26 @@ object GuavaReplacement {
       def build(): ImmutableSetMultimap[A, B] = new ImmutableSetMultimap(backingMap.toMap)
     }
   }
+
+  final class LoadingCache[K, V](loader: K => V) {
+    private val backingMap: mutable.Map[K, V] = mutable.Map()
+
+    def get(key: K): V = this.synchronized {
+      if (backingMap contains key) {
+        backingMap(key)
+      } else {
+        val value = loader(key)
+        backingMap.put(key, value)
+        value
+      }
+    }
+
+    def asMap(): Map[K, V] = this.synchronized {
+      backingMap.toMap
+    }
+  }
+
+  object LoadingCache {
+    def fromLoader[K, V](loader: K => V): LoadingCache[K, V] = new LoadingCache(loader)
+  }
 }

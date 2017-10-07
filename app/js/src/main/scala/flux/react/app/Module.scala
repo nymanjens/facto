@@ -29,6 +29,7 @@ final class Module(implicit i18n: I18n,
                    complexQueryStoreFactory: ComplexQueryStoreFactory,
                    summaryForYearStoreFactory: SummaryForYearStoreFactory,
                    summaryYearsStoreFactory: SummaryYearsStoreFactory,
+                   summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
                    globalMessagesStore: GlobalMessagesStore,
                    dispatcher: Dispatcher,
                    clock: Clock) {

@@ -17,7 +17,7 @@ import scala2js.Keys
   * The calculated range is guaranteed to contain at least all years there are transactions for but may also contain
   * more (although unlikely).
   */
-final class SummaryYearsStoreFactory(implicit database: RemoteDatabaseProxy, clock: Clock)
+final class SummaryYearsStoreFactory(implicit database: RemoteDatabaseProxy)
     extends EntriesStoreFactory[YearRange] {
 
   // **************** Implementation of EntriesStoreFactory methods/types ****************//
@@ -41,7 +41,7 @@ final class SummaryYearsStoreFactory(implicit database: RemoteDatabaseProxy, clo
         latest <- getFirstAfterSorting(LokiJs.Sorting.descBy(Keys.Transaction.consumedDate))
       } yield YearRange.closed(earliest.consumedDate.getYear, latest.consumedDate.getYear)
 
-      rangeOption getOrElse YearRange.single(clock.now.getYear)
+      rangeOption getOrElse YearRange.empty
     }
 
     override protected def transactionUpsertImpactsState(transaction: Transaction, oldYears: YearRange) =

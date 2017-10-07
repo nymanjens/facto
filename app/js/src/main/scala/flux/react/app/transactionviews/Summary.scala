@@ -20,8 +20,7 @@ import models.accounting.money.ExchangeRateManager
 
 import scala.collection.immutable.Seq
 
-final class Summary(implicit summaryForYearStoreFactory: SummaryForYearStoreFactory,
-                    summaryYearsStoreFactory: SummaryYearsStoreFactory,
+final class Summary(implicit summaryTable: SummaryTable,
                     entityAccess: EntityAccess,
                     user: User,
                     clock: Clock,
@@ -47,7 +46,11 @@ final class Summary(implicit summaryForYearStoreFactory: SummaryForYearStoreFact
               if state.includeUnrelatedAccounts || account.isMineOrCommon
             } yield {
               uielements.Panel(account.longName, key = account.code) {
-                <.span(state.query)
+                summaryTable(
+                  account = account,
+                  query = state.query,
+                  hideColumnsOlderThanYear = state.hideColumnsOlderThanYear,
+                  expandedYear = state.expandedYear)
               }
             }
           }.toVdomArray
