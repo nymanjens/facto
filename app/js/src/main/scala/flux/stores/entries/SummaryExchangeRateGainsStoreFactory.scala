@@ -136,7 +136,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
                 .sum
             gainFromIntialMoney + gainFromUpdates
           }
-          month -> GainsForMonth(Map(reservoir -> gain))
+          month -> GainsForMonth.forSingle(reservoir, gain)
         }.toMap,
         impactingTransactionIds = transactions.map(_.id).toSet,
         impactingBalanceCheckIds = balanceChecks.map(_.id).toSet
@@ -209,14 +209,27 @@ object SummaryExchangeRateGainsStoreFactory {
     )
   }
 
-  case class GainsForMonth(private val reservoirToGains: Map[MoneyReservoir, ReferenceMoney]) {
-    lazy val total: ReferenceMoney = reservoirToGains.values.sum
+  case class GainsForMonth private (private val _reservoirToGains: Map[MoneyReservoir, ReferenceMoney]) {
+    _reservoirToGains.values.foreach(gain => require(!gain.isZero))
+
+    lazy val total: ReferenceMoney = _reservoirToGains.values.sum
+    def reservoirToGains: Map[MoneyReservoir, ReferenceMoney] =
+      _reservoirToGains.withDefault(_ => ReferenceMoney(0))
   }
   object GainsForMonth {
     val empty: GainsForMonth = GainsForMonth(Map())
 
+    def forSingle(reservoir: MoneyReservoir, gain: ReferenceMoney): GainsForMonth = {
+      if (gain.isZero) {
+        empty
+      } else {
+        GainsForMonth(Map(reservoir -> gain))
+      }
+    }
+
     def sum(gains: Seq[GainsForMonth]): GainsForMonth =
-      GainsForMonth(reservoirToGains = combineMapValues(gains.map(_.reservoirToGains))(_.sum))
+      GainsForMonth(
+        _reservoirToGains = combineMapValues(gains.map(_._reservoirToGains))(_.sum).filterNot(_._2.isZero))
   }
 
   private[SummaryExchangeRateGainsStoreFactory] final class DateToBalanceFunction(
