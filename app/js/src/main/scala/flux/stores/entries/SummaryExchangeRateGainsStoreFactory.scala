@@ -184,7 +184,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
 object SummaryExchangeRateGainsStoreFactory {
 
   private def combineMapValues[K, V](maps: Seq[Map[K, V]])(valueCombiner: Seq[V] => V): Map[K, V] = {
-    val keys = maps.map(_.keySet).reduce(_ union _)
+    val keys = maps.map(_.keySet).reduceOption(_ union _) getOrElse Set()
     keys.map(key => key -> valueCombiner(maps.filter(_ contains key).map(_.apply(key)))).toMap
   }
 
@@ -204,8 +204,9 @@ object SummaryExchangeRateGainsStoreFactory {
 
     def sum(gains: Seq[GainsForYear]): GainsForYear = GainsForYear(
       monthToGains = combineMapValues(gains.map(_.monthToGains))(GainsForMonth.sum),
-      impactingTransactionIds = gains.map(_.impactingTransactionIds).reduce(_ union _),
-      impactingBalanceCheckIds = gains.map(_.impactingBalanceCheckIds).reduce(_ union _)
+      impactingTransactionIds = gains.map(_.impactingTransactionIds).reduceOption(_ union _) getOrElse Set(),
+      impactingBalanceCheckIds =
+        gains.map(_.impactingBalanceCheckIds).reduceOption(_ union _) getOrElse Set()
     )
   }
 
