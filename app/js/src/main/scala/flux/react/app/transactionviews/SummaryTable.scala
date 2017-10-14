@@ -17,7 +17,7 @@ import japgolly.scalajs.react.vdom.VdomNode
 import japgolly.scalajs.react.vdom.html_<^._
 import models.accounting.TransactionGroup
 import models.accounting.config.{Account, Category, Config}
-import models.accounting.money.{Currency, ExchangeRateManager}
+import models.accounting.money.{Currency, ExchangeRateManager, ReferenceMoney}
 import models.{EntityAccess, User}
 
 import scala.collection.immutable.{ListMap, Seq}
@@ -67,10 +67,41 @@ private[transactionviews] final class SummaryTable(
 
   private case class State(allYearsData: AllYearsData)
 
-  private case class AllYearsData(allTransactionsYearRange: YearRange,
-                                  yearsToData: ListMap[Int, AllYearsData.YearData]) {
-    def categories: Seq[Category] = ???
-    def years: Seq[Int] = yearsToData.keys.toVector.sorted
+  private case class AllYearsData(private val allTransactionsYearRange: YearRange,
+                                  private val yearsToData: ListMap[Int, AllYearsData.YearData]) {
+
+    /**
+      * Returns the categories of the transactions in the order configured for this account.
+      *
+      * If any transactions are not part of the configured seq, their categories are appended at the end. This should
+      * normally not happen.
+      */
+    def categories(implicit props: Props): Seq[Category] = {
+      props.account.categories.filter(categoriesSet) ++
+        categoriesSet.filterNot(props.account.categories.contains)
+    }
+    def years: Seq[Int] = yearsToData.toVector.map(_._1)
+    def yearlyAverage(year: Int, category: Category): ReferenceMoney = {
+      val yearData = yearsToData(year)
+      monthsForAverage(year) match {
+        case Seq() => ReferenceMoney(0)
+        case months =>
+          val totalFlow = months.map(yearData.summaryForYear.cell(category, _).totalFlow).sum
+          totalFlow / months.size
+      }
+    }
+
+    private def monthsForAverage(year: Int): Seq[DatedMonth] = {
+      // TODO: None in future, none before first transaction ever
+      DatedMonth.allMonthsIn(year)
+    }
+
+    private lazy val categoriesSet: Set[Category] = {
+      for {
+        yearData <- yearsToData.values
+        category <- yearData.summaryForYear.categories
+      } yield category
+    }.toSet
   }
   private object AllYearsData {
     val empty: AllYearsData =
@@ -78,7 +109,7 @@ private[transactionviews] final class SummaryTable(
 
     def builder(allTransactionsYearRange: YearRange): Builder = new Builder(allTransactionsYearRange)
 
-    final class YearData(summaryForYear: SummaryForYear, gainsForYear: GainsForYear)
+    case class YearData(summaryForYear: SummaryForYear, gainsForYear: GainsForYear)
 
     final class Builder(allTransactionsYearRange: YearRange) {
       val yearsToData: mutable.ListMap[Int, AllYearsData.YearData] = mutable.ListMap()
@@ -138,42 +169,50 @@ private[transactionviews] final class SummaryTable(
                   columnsForYear(year, expandedYear = props.expandedYear).map {
                     case MonthColumn(month) =>
                       <.th(^.key := s"$year-${month.abbreviation}", month.abbreviation)
-                    case AverageColumn => <.th(i18n("facto.avg"), ^.key := s"avg-$year")
+                    case AverageColumn => <.th(^.key := s"avg-$year", i18n("facto.avg"))
                   }.toVdomArray
             }.toVdomArray
           )
-        )
-//        ,
-//        <.tbody(
-//          for (category <- summary.categories) yield {
-//            <.tr(
-//              ^.key := category.code,
-//              <.td(category.name),
-//              for (year <- summary.years) yield {
-//              for ((year, summaryForYear) <- summary.yearsToData) yield {
-//                if (year == expandedYear) {
-//                  for (month <- summaryForYear.months) yield {
-//                    <.td(
-//                      ^^.classes(
-//                        Seq("cell") ++ ifThenSeq(month.contains(clock.now), "current-month") ++ ifThenSeq(
-//                          summary.monthRangeForAverages.contains(month),
-//                          "month-for-averages")),
-//                      uielements.UpperRightCorner(
-//                        ^^.ifThen(summaryForYear.cell(category, month).entries.isEmpty)(
-//                          s"(${entry.transactions.size})")) {
-//                        {
-//                          summaryForYear.cell(category, month).totalFlow match {
-//                            case flow if summaryForYear.cell(category, month).entries.isEmpty => ""
-//                            case flow => flow.formatFloat
-//                          }
-//                        }
-//                      }
-//                    )
-//                  }
-//                }
-//              } :+ <.td(^.className := "average", summaryForYear.categoryToAverages(category).formatFloat)
-//            )
-//          }
+        ),
+        <.tbody(
+          {
+            for (category <- summary.categories) yield {
+              <.tr(
+                ^.key := category.code,
+                <.td(category.name), {
+                  for (year <- summary.years)
+                    yield
+                      columnsForYear(year, expandedYear = props.expandedYear).map {
+                        case MonthColumn(month) =>
+                          <.td(
+                            ^.key := s"avg-${category.code}-$year-${month.month}",
+                            //                    ^^.classes(
+                            //                      Seq("cell") ++ ifThenSeq(month.contains(clock.now), "current-month") ++ ifThenSeq(
+                            //                        summary.monthRangeForAverages.contains(month),
+                            //                        "month-for-averages"))
+                            //                    ,
+                            //                    uielements.UpperRightCorner(
+                            //                      ^^.ifThen(summaryForYear.cell(category, month).entries.isEmpty)(
+                            //                        s"(${entry.transactions.size})")) {
+                            //                      {
+                            //                        summaryForYear.cell(category, month).totalFlow match {
+                            //                          case flow if summaryForYear.cell(category, month).entries.isEmpty => ""
+                            //                          case flow => flow.formatFloat
+                            //                        }
+                            //                      }
+                            //                    }
+                            "test"
+                          )
+                        case AverageColumn =>
+                          <.td(
+                            ^.key := s"avg-${category.code}-$year",
+                            ^.className := "average",
+                            summary.yearlyAverage(year, category).formatFloat)
+                      }.toVdomArray
+                }.toVdomArray
+              )
+            }
+          }.toVdomArray
 //          ,
 //          for ((totalRowTitle, rowIndex) <- summary.totalRowTitles.zipWithIndex) yield {
 //            <.tr(
@@ -195,7 +234,7 @@ private[transactionviews] final class SummaryTable(
 //              }
 //            )
 //          }
-//        )
+        )
       )
     }
 

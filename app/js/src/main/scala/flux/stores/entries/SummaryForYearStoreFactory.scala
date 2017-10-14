@@ -82,6 +82,8 @@ object SummaryForYearStoreFactory {
 
     def cell(category: Category, month: DatedMonth): SummaryCell = cells(category)(month)
 
+    def categories: Set[Category] = cells.keySet
+
     private[SummaryForYearStoreFactory] def containsTransactionId(id: Long): Boolean =
       transactionIds contains id
 
@@ -139,7 +141,7 @@ object SummaryForYearStoreFactory {
 
     def totalFlow(implicit exchangeRateManager: ExchangeRateManager,
                   accountingConfig: Config): ReferenceMoney = {
-      if (_totalFlow == null) {
+      if (_totalFlow eq null) {
         _totalFlow = transactions.map(_.flow.exchangedForReferenceCurrency).sum
       }
       _totalFlow
