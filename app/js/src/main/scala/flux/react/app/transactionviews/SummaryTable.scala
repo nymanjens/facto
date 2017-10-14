@@ -13,6 +13,7 @@ import flux.stores.entries.SummaryForYearStoreFactory.SummaryForYear
 import flux.stores.entries._
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.Path
+import japgolly.scalajs.react.vdom.VdomNode
 import japgolly.scalajs.react.vdom.html_<^._
 import models.accounting.TransactionGroup
 import models.accounting.config.{Account, Category, Config}
@@ -69,7 +70,7 @@ private[transactionviews] final class SummaryTable(
   private case class AllYearsData(allTransactionsYearRange: YearRange,
                                   yearsToData: ListMap[Int, AllYearsData.YearData]) {
     def categories: Seq[Category] = ???
-    def years: Seq[Int] = yearsToData.keys.toVector
+    def years: Seq[Int] = yearsToData.keys.toVector.sorted
   }
   private object AllYearsData {
     val empty: AllYearsData =
@@ -131,19 +132,22 @@ private[transactionviews] final class SummaryTable(
                 )
               }
             }.toVdomArray
+          ),
+          <.tr(
+            <.th(i18n("facto.category")), {
+              for (year <- summary.years) yield {
+                val months = if (year == props.expandedYear) {
+                  DatedMonth
+                    .allMonthsIn(year)
+                    .map(month => <.th(^.key := s"$year-${month.abbreviation}", month.abbreviation))
+                } else {
+                  Seq()
+                }
+                val avg = <.th(i18n("facto.avg"), ^.key := s"avg-$year")
+                (months :+ avg).toVdomArray
+              }
+            }.toVdomArray
           )
-//          ,
-//          <.tr(
-//            <.th(i18n("facto.category")), {
-//              for ((year, summaryForYear) <- summary.yearsToData) yield {
-//                ifThenSeq(year == expandedYear, {
-//                  for (month <- summaryForYear.months) yield {
-//                    <.th(^.key := s"$year-${month.abbreviation}", month.abbreviation)
-//                  }
-//                }) :+ <.th(i18n("facto.avg"), ^.key := s"avg-$year")
-//              }
-//            }
-//          )
         )
 //        ,
 //        <.tbody(
