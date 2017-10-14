@@ -125,9 +125,7 @@ private[transactionviews] final class SummaryTable(
               for (year <- summary.years) yield {
                 <.th(
                   ^.key := year,
-                  ^.colSpan := {
-                    if (year == props.expandedYear) 13 else 1
-                  },
+                  ^.colSpan := columnsForYear(year, expandedYear = props.expandedYear).size,
                   <.a(^.href := "#TODO", year)
                 )
               }
@@ -135,17 +133,13 @@ private[transactionviews] final class SummaryTable(
           ),
           <.tr(
             <.th(i18n("facto.category")), {
-              for (year <- summary.years) yield {
-                val months = if (year == props.expandedYear) {
-                  DatedMonth
-                    .allMonthsIn(year)
-                    .map(month => <.th(^.key := s"$year-${month.abbreviation}", month.abbreviation))
-                } else {
-                  Seq()
-                }
-                val avg = <.th(i18n("facto.avg"), ^.key := s"avg-$year")
-                (months :+ avg).toVdomArray
-              }
+              for (year <- summary.years)
+                yield
+                  columnsForYear(year, expandedYear = props.expandedYear).map {
+                    case MonthColumn(month) =>
+                      <.th(^.key := s"$year-${month.abbreviation}", month.abbreviation)
+                    case AverageColumn => <.th(i18n("facto.avg"), ^.key := s"avg-$year")
+                  }.toVdomArray
             }.toVdomArray
           )
         )
@@ -155,6 +149,7 @@ private[transactionviews] final class SummaryTable(
 //            <.tr(
 //              ^.key := category.code,
 //              <.td(category.name),
+//              for (year <- summary.years) yield {
 //              for ((year, summaryForYear) <- summary.yearsToData) yield {
 //                if (year == expandedYear) {
 //                  for (month <- summaryForYear.months) yield {
@@ -178,7 +173,8 @@ private[transactionviews] final class SummaryTable(
 //                }
 //              } :+ <.td(^.className := "average", summaryForYear.categoryToAverages(category).formatFloat)
 //            )
-//          },
+//          }
+//          ,
 //          for ((totalRowTitle, rowIndex) <- summary.totalRowTitles.zipWithIndex) yield {
 //            <.tr(
 //              ^.className := "total total-$rowIndex",
@@ -232,6 +228,17 @@ private[transactionviews] final class SummaryTable(
       usedStores.filterNot(allRegisteredStores).foreach(_.register(this))
       allRegisteredStores.filterNot(usedStores).foreach(_.deregister(this))
       allRegisteredStores = usedStores
+    }
+
+    private sealed trait Column
+    private case class MonthColumn(month: DatedMonth) extends Column
+    private case object AverageColumn extends Column
+    private def columnsForYear(year: Int, expandedYear: Int): Seq[Column] = {
+      if (year == expandedYear) {
+        DatedMonth.allMonthsIn(year).map(MonthColumn) :+ AverageColumn
+      } else {
+        Seq(AverageColumn)
+      }
     }
   }
 }
