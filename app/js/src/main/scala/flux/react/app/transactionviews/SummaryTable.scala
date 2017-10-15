@@ -9,7 +9,7 @@ import flux.react.router.RouterContext
 import flux.react.ReactVdomUtils._
 import flux.react.uielements
 import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.GainsForYear
-import flux.stores.entries.SummaryForYearStoreFactory.SummaryForYear
+import flux.stores.entries.SummaryForYearStoreFactory.{SummaryCell, SummaryForYear}
 import flux.stores.entries._
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.Path
@@ -20,7 +20,7 @@ import models.accounting.config.{Account, Category, Config}
 import models.accounting.money.{Currency, ExchangeRateManager, ReferenceMoney}
 import models.{EntityAccess, User}
 
-import scala.collection.immutable.{ListMap, Seq}
+import scala.collection.immutable.{ListMap,Seq}
 import scala.collection.mutable
 
 private[transactionviews] final class SummaryTable(
@@ -80,6 +80,10 @@ private[transactionviews] final class SummaryTable(
       props.account.categories.filter(categoriesSet) ++
         categoriesSet.filterNot(props.account.categories.contains)
     }
+
+    def cell(category: Category, year: Int, month: DatedMonth): SummaryCell =
+      yearsToData(year).summaryForYear.cell(category, month)
+
     def years: Seq[Int] = yearsToData.toVector.map(_._1)
     def yearlyAverage(year: Int, category: Category): ReferenceMoney = {
       val yearData = yearsToData(year)
@@ -119,14 +123,14 @@ private[transactionviews] final class SummaryTable(
     case class YearData(summaryForYear: SummaryForYear, gainsForYear: GainsForYear)
 
     final class Builder(allTransactionsYearRange: YearRange) {
-      val yearsToData: mutable.ListMap[Int, AllYearsData.YearData] = mutable.ListMap()
+      val yearsToData: mutable.LinkedHashMap[Int, AllYearsData.YearData] = mutable.LinkedHashMap()
 
       def addYear(year: Int, summaryForYear: SummaryForYear, gainsForYear: GainsForYear): Builder = {
         yearsToData.put(year, new YearData(summaryForYear, gainsForYear))
         this
       }
 
-      def result: AllYearsData = AllYearsData(allTransactionsYearRange, ListMap(yearsToData.toVector: _*))
+      def result: AllYearsData = AllYearsData(allTransactionsYearRange, ListMap(yearsToData.toSeq: _*))
     }
   }
 
@@ -191,24 +195,20 @@ private[transactionviews] final class SummaryTable(
                     yield
                       columnsForYear(year, expandedYear = props.expandedYear).map {
                         case MonthColumn(month) =>
+                          val cellData = summary.cell(category, year, month)
                           <.td(
                             ^.key := s"avg-${category.code}-$year-${month.month}",
-//                                                ^^.classes(
-//                                                  Seq("cell") ++ ifThenSeq(month.contains(clock.now), "current-month") ++ ifThenSeq(
-//                                                    summary.monthsForAverage.contains(month),
-//                                                    "month-for-averages"))
-//                                                ,
-//                                                uielements.UpperRightCorner(
-//                                                  ^^.ifThen(summaryForYear.cell(category, month).entries.isEmpty)(
-//                                                    s"(${entry.transactions.size})")) {
-//                                                  {
-//                                                    summaryForYear.cell(category, month).totalFlow match {
-//                                                      case flow if summaryForYear.cell(category, month).entries.isEmpty => ""
-//                                                      case flow => flow.formatFloat
-//                                                    }
-//                                                  }
-//                                                }
-                            "test"
+                            ^^.classes(
+                              Seq("cell") ++
+                                ifThenSeq(month.contains(clock.now), "current-month") ++
+                                ifThenSeq(
+                                  summary.monthsForAverage(year).contains(month),
+                                  "month-for-averages")),
+                            uielements.UpperRightCorner(cornerContent =
+                              ^^.ifThen(cellData.transactions.nonEmpty)(s"(${cellData.transactions.size})"))(
+                              centralContent =
+                                if (cellData.transactions.isEmpty) "" else cellData.totalFlow.formatFloat
+                            )
                           )
                         case AverageColumn =>
                           <.td(
