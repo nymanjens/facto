@@ -137,3 +137,4 @@ facto.search-results=Zoekresultaten
 facto.search-results-for=Zoekresultaten voor {0}
 facto.robot=Robot
 facto.sending-data-to-server=Data aan het versturen...
+facto.exchange-rate-gains=Wisselkoerswinst

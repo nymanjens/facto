@@ -95,6 +95,8 @@ object SummaryForYearStoreFactory {
   case class SummaryCell(transactions: Seq[Transaction]) {
     private var _totalFlow: ReferenceMoney = _
 
+    def nonEmpty: Boolean = transactions.nonEmpty
+
     def totalFlow(implicit exchangeRateManager: ExchangeRateManager,
                   accountingConfig: Config): ReferenceMoney = {
       if (_totalFlow eq null) {

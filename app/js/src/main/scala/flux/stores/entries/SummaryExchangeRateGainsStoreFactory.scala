@@ -197,6 +197,7 @@ object SummaryExchangeRateGainsStoreFactory {
       impactingBalanceCheckIds contains id
 
     def gainsForMonth(month: DatedMonth): GainsForMonth = monthToGains.getOrElse(month, GainsForMonth.empty)
+    def nonEmpty: Boolean = this != GainsForYear.empty
   }
 
   object GainsForYear {
@@ -214,6 +215,7 @@ object SummaryExchangeRateGainsStoreFactory {
     _reservoirToGains.values.foreach(gain => require(!gain.isZero))
 
     lazy val total: ReferenceMoney = _reservoirToGains.values.sum
+    def nonEmpty: Boolean = _reservoirToGains.nonEmpty
     def reservoirToGains: Map[MoneyReservoir, ReferenceMoney] =
       _reservoirToGains.withDefault(_ => ReferenceMoney(0))
   }

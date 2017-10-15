@@ -8,7 +8,7 @@ import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import flux.react.router.RouterContext
 import flux.react.ReactVdomUtils._
 import flux.react.uielements
-import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.GainsForYear
+import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.{GainsForMonth, GainsForYear}
 import flux.stores.entries.SummaryForYearStoreFactory.{SummaryCell, SummaryForYear}
 import flux.stores.entries._
 import japgolly.scalajs.react._
@@ -123,6 +123,12 @@ private[transactionviews] final class SummaryTable(
       }
     }
 
+    lazy val hasExchangeRateGains: Boolean = yearsToData.values.exists(_.exchangeRateGains.nonEmpty)
+    def exchangeRateGains(month: DatedMonth): GainsForMonth =
+      yearsToData(month.year).exchangeRateGains.gainsForMonth(month)
+    def averageExchangeRateGains(year: Int): ReferenceMoney =
+      DatedMonth.allMonthsIn(year).map(exchangeRateGains(_).total).sum
+
     private lazy val categoriesSet: Set[Category] = {
       for {
         yearData <- yearsToData.values
@@ -178,6 +184,7 @@ private[transactionviews] final class SummaryTable(
       <.table(
         ^.className := "table table-bordered table-hover table-condensed table-summary",
         <.thead(
+          // **************** Year header **************** //
           <.tr(
             <.th(Currency.default.symbol), {
               for (year <- data.years) yield {
@@ -189,6 +196,7 @@ private[transactionviews] final class SummaryTable(
               }
             }.toVdomArray
           ),
+          // **************** Month header **************** //
           <.tr(
             <.th(i18n("facto.category")), {
               for (year <- data.years)
@@ -202,6 +210,7 @@ private[transactionviews] final class SummaryTable(
           )
         ),
         <.tbody(
+          // **************** Categories data **************** //
           {
             for (category <- data.categories) yield {
               <.tr(
@@ -216,9 +225,8 @@ private[transactionviews] final class SummaryTable(
                             ^.key := s"avg-${category.code}-$year-${month.month}",
                             ^^.classes(cellClasses(month)),
                             uielements.UpperRightCorner(cornerContent =
-                              <<.ifThen(cellData.transactions.nonEmpty)(s"(${cellData.transactions.size})"))(
-                              centralContent =
-                                if (cellData.transactions.isEmpty) "" else cellData.totalFlow.formatFloat
+                              <<.ifThen(cellData.nonEmpty)(s"(${cellData.transactions.size})"))(
+                              centralContent = if (cellData.nonEmpty) cellData.totalFlow.formatFloat else ""
                             )
                           )
                         case AverageColumn =>
@@ -231,6 +239,34 @@ private[transactionviews] final class SummaryTable(
               )
             }
           }.toVdomArray,
+          // **************** Exchange rate gains data **************** //
+          ^^.ifThen(data.hasExchangeRateGains) {
+            <.tr(
+              ^.key := "exchange-rate-gains",
+              <.td(i18n("facto.exchange-rate-gains")), {
+                for (year <- data.years)
+                  yield
+                    columnsForYear(year, expandedYear = props.expandedYear).map {
+                      case MonthColumn(month) =>
+                        val cellData = data.exchangeRateGains(month)
+                        <.td(
+                          ^.key := s"gain-${month.month}",
+                          ^^.classes(cellClasses(month)),
+                          uielements.UpperRightCorner(cornerContent =
+                            <<.ifThen(cellData.nonEmpty)(s"(${cellData.reservoirToGains.size})"))(
+                            centralContent = if (cellData.nonEmpty) cellData.total.formatFloat else ""
+                          )
+                        )
+                      case AverageColumn =>
+                        <.td(
+                          ^.key := s"avg-$year",
+                          ^.className := "average",
+                          data.averageExchangeRateGains(year).formatFloat)
+                    }.toVdomArray
+              }.toVdomArray
+            )
+          },
+          // **************** Total rows **************** //
           props.account.summaryTotalRows.zipWithIndex.map {
             case (SummaryTotalRowDef(rowTitleHtml, categoriesToIgnore), rowIndex) =>
               <.tr(
@@ -257,8 +293,6 @@ private[transactionviews] final class SummaryTable(
         )
       )
     }
-
-    private def ifThenSeq[V](condition: Boolean, value: V): Seq[V] = if (condition) Seq(value) else Seq()
 
     private def doStateUpdate(props: Props): Unit = {
       val (data, usedStores): (AllYearsData, Set[EntriesStore[_]]) = {
@@ -288,6 +322,8 @@ private[transactionviews] final class SummaryTable(
       allRegisteredStores.filterNot(usedStores).foreach(_.deregister(this))
       allRegisteredStores = usedStores
     }
+
+    private def ifThenSeq[V](condition: Boolean, value: V): Seq[V] = if (condition) Seq(value) else Seq()
 
     private def cellClasses(month: DatedMonth)(implicit data: AllYearsData): Seq[String] =
       Seq("cell") ++
