@@ -97,7 +97,7 @@ object SummaryForYearStoreFactory {
 
   object SummaryForYear {
     private[SummaryForYearStoreFactory] class Builder(implicit accountingConfig: Config) {
-      private val cells: mutable.Map[Category, mutable.Map[DatedMonth, mutable.Seq[Transaction]]] =
+      private val cells: mutable.Map[Category, mutable.Map[DatedMonth, mutable.Buffer[Transaction]]] =
         mutable.Map()
       private val transactionIds: mutable.Set[Long] = mutable.Set()
 
@@ -112,8 +112,8 @@ object SummaryForYearStoreFactory {
         val month = DatedMonth.containing(transaction.consumedDate)
 
         putIfMissing(cells, category)(mutable.Map())
-        putIfMissing(cells(category), month)(mutable.Seq())
-        cells(transaction.category)(month) :+ transaction
+        putIfMissing(cells(category), month)(mutable.Buffer())
+        cells(transaction.category)(month) += transaction
 
         transactionIds.add(transaction.id)
         this
