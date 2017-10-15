@@ -91,9 +91,16 @@ private[transactionviews] final class SummaryTable(
       }
     }
 
-    private def monthsForAverage(year: Int): Seq[DatedMonth] = {
-      // TODO: None in future, none before first transaction ever
-      DatedMonth.allMonthsIn(year)
+    def monthsForAverage(year: Int): Seq[DatedMonth] = {
+      val pastMonths = DatedMonth.allMonthsIn(year).filter(_ < DatedMonth.containing(clock.now))
+      if (allTransactionsYearRange.isEmpty) {
+        Seq()
+      } else if (allTransactionsYearRange.firstYear == year) {
+        pastMonths.filter(
+          _ >= DatedMonth.containing(yearsToData(year).summaryForYear.earliestTransaction.consumedDate))
+      } else {
+        pastMonths
+      }
     }
 
     private lazy val categoriesSet: Set[Category] = {
@@ -105,7 +112,7 @@ private[transactionviews] final class SummaryTable(
   }
   private object AllYearsData {
     val empty: AllYearsData =
-      AllYearsData(allTransactionsYearRange = YearRange.single(clock.now.getYear), yearsToData = ListMap())
+      AllYearsData(allTransactionsYearRange = YearRange.empty, yearsToData = ListMap())
 
     def builder(allTransactionsYearRange: YearRange): Builder = new Builder(allTransactionsYearRange)
 
@@ -186,21 +193,21 @@ private[transactionviews] final class SummaryTable(
                         case MonthColumn(month) =>
                           <.td(
                             ^.key := s"avg-${category.code}-$year-${month.month}",
-                            //                    ^^.classes(
-                            //                      Seq("cell") ++ ifThenSeq(month.contains(clock.now), "current-month") ++ ifThenSeq(
-                            //                        summary.monthRangeForAverages.contains(month),
-                            //                        "month-for-averages"))
-                            //                    ,
-                            //                    uielements.UpperRightCorner(
-                            //                      ^^.ifThen(summaryForYear.cell(category, month).entries.isEmpty)(
-                            //                        s"(${entry.transactions.size})")) {
-                            //                      {
-                            //                        summaryForYear.cell(category, month).totalFlow match {
-                            //                          case flow if summaryForYear.cell(category, month).entries.isEmpty => ""
-                            //                          case flow => flow.formatFloat
-                            //                        }
-                            //                      }
-                            //                    }
+//                                                ^^.classes(
+//                                                  Seq("cell") ++ ifThenSeq(month.contains(clock.now), "current-month") ++ ifThenSeq(
+//                                                    summary.monthsForAverage.contains(month),
+//                                                    "month-for-averages"))
+//                                                ,
+//                                                uielements.UpperRightCorner(
+//                                                  ^^.ifThen(summaryForYear.cell(category, month).entries.isEmpty)(
+//                                                    s"(${entry.transactions.size})")) {
+//                                                  {
+//                                                    summaryForYear.cell(category, month).totalFlow match {
+//                                                      case flow if summaryForYear.cell(category, month).entries.isEmpty => ""
+//                                                      case flow => flow.formatFloat
+//                                                    }
+//                                                  }
+//                                                }
                             "test"
                           )
                         case AverageColumn =>

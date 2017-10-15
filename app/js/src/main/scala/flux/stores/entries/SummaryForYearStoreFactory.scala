@@ -84,6 +84,9 @@ object SummaryForYearStoreFactory {
 
     def categories: Set[Category] = cells.keySet
 
+    lazy val earliestTransaction: Transaction =
+      cells.values.toStream.flatMap(_.values).flatMap(_.transactions).minBy(_.consumedDate)
+
     private[SummaryForYearStoreFactory] def containsTransactionId(id: Long): Boolean =
       transactionIds contains id
 
