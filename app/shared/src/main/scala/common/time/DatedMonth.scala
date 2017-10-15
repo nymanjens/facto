@@ -16,6 +16,7 @@ case class DatedMonth(startDate: LocalDate) extends Ordered[DatedMonth] {
   }
 
   def month: Month = startDate.getMonth
+  def year: Int = startDate.getYear
 
   def contains(date: LocalDateTime): Boolean = {
     date.getYear == startDate.getYear && date.getMonth == startDate.getMonth

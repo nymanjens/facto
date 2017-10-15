@@ -1,17 +1,14 @@
 package flux.stores.entries
 
-import java.time.LocalTime
-
 import common.time.{DatedMonth, LocalDateTime, MonthRange}
 import flux.stores.entries.SummaryForYearStoreFactory.SummaryForYear
 import jsfacades.LokiJs
 import models.access.RemoteDatabaseProxy
-import models.accounting.{BalanceCheck, Transaction}
 import models.accounting.config.{Account, Category, Config}
 import models.accounting.money.{ExchangeRateManager, ReferenceMoney}
+import models.accounting.{BalanceCheck, Transaction}
 
 import scala.collection.immutable.Seq
-import scala.collection.mutable
 import scala2js.Converters._
 import scala2js.Keys
 import scala2js.Scala2Js.Key
@@ -46,11 +43,7 @@ final class SummaryForYearStoreFactory(implicit database: RemoteDatabaseProxy,
               .thenAscBy(Keys.id))
           .data()
 
-      val resultBuilder = new SummaryForYear.Builder
-      for (transaction <- transactions) {
-        resultBuilder.addTransaction(transaction)
-      }
-      resultBuilder.result
+      new SummaryForYear(transactions)
     }
 
     override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) =
@@ -77,70 +70,30 @@ final class SummaryForYearStoreFactory(implicit database: RemoteDatabaseProxy,
 }
 
 object SummaryForYearStoreFactory {
-  case class SummaryForYear(private val cells: Map[Category, Map[DatedMonth, SummaryCell]],
-                            private val transactionIds: Set[Long]) {
+  class SummaryForYear(transactions: Seq[Transaction])(implicit accountingConfig: Config) {
+    private val transactionIds: Set[Long] = transactions.toStream.map(_.id).toSet
 
-    def cell(category: Category, month: DatedMonth): SummaryCell = cells(category)(month)
+    private val cells: Map[Category, Map[DatedMonth, SummaryCell]] =
+      transactions
+        .groupBy(_.category)
+        .mapValues(_.groupBy(t => DatedMonth.containing(t.consumedDate)).mapValues(SummaryCell.apply))
 
+    /** All months for which there is at least one transaction. */
+    val months: Set[DatedMonth] =
+      transactions.toStream.map(t => DatedMonth.containing(t.consumedDate)).toSet
+
+    /** All categories for which there is at least one transaction. */
     def categories: Set[Category] = cells.keySet
 
-    lazy val earliestTransaction: Transaction =
-      cells.values.toStream.flatMap(_.values).flatMap(_.transactions).minBy(_.consumedDate)
+    def cell(category: Category, month: DatedMonth): SummaryCell =
+      cells.get(category).flatMap(_.get(month)) getOrElse SummaryCell.empty
 
     private[SummaryForYearStoreFactory] def containsTransactionId(id: Long): Boolean =
       transactionIds contains id
-
-    def hasEntries(category: Category): Boolean = {
-      cells(category).nonEmpty
-    }
-  }
-
-  object SummaryForYear {
-    private[SummaryForYearStoreFactory] class Builder(implicit accountingConfig: Config) {
-      private val cells: mutable.Map[Category, mutable.Map[DatedMonth, mutable.Buffer[Transaction]]] =
-        mutable.Map()
-      private val transactionIds: mutable.Set[Long] = mutable.Set()
-
-      def addTransaction(transaction: Transaction): Builder = {
-        def putIfMissing[K, V](map: mutable.Map[K, V], key: K)(value: => V): Unit = {
-          if (!(map contains key)) {
-            map.put(key, value)
-          }
-        }
-
-        val category = transaction.category
-        val month = DatedMonth.containing(transaction.consumedDate)
-
-        putIfMissing(cells, category)(mutable.Map())
-        putIfMissing(cells(category), month)(mutable.Buffer())
-        cells(transaction.category)(month) += transaction
-
-        transactionIds.add(transaction.id)
-        this
-      }
-
-      def result: SummaryForYear = {
-        SummaryForYear(
-          cells = cells.toStream
-            .map {
-              case (category, monthToTransactions) =>
-                category -> monthToTransactions.toStream
-                  .map {
-                    case (month, transactions) => month -> SummaryCell(transactions.toVector)
-                  }
-                  .toMap
-                  .withDefaultValue(SummaryCell.empty)
-            }
-            .toMap
-            .withDefaultValue(Map().withDefaultValue(SummaryCell.empty)),
-          transactionIds = transactionIds.toSet
-        )
-      }
-    }
   }
 
   case class SummaryCell(transactions: Seq[Transaction]) {
-    @volatile private var _totalFlow: ReferenceMoney = null
+    private var _totalFlow: ReferenceMoney = _
 
     def totalFlow(implicit exchangeRateManager: ExchangeRateManager,
                   accountingConfig: Config): ReferenceMoney = {
