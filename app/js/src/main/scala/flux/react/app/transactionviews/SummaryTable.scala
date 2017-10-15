@@ -172,7 +172,7 @@ private[transactionviews] final class SummaryTable(
     }
 
     def render(implicit props: Props, state: State) = logExceptions {
-      implicit val summary = state.allYearsData // TODO: Rename val to `data`
+      implicit val data = state.allYearsData
       implicit val router = props.router
 
       <.table(
@@ -180,7 +180,7 @@ private[transactionviews] final class SummaryTable(
         <.thead(
           <.tr(
             <.th(Currency.default.symbol), {
-              for (year <- summary.years) yield {
+              for (year <- data.years) yield {
                 <.th(
                   ^.key := year,
                   ^.colSpan := columnsForYear(year, expandedYear = props.expandedYear).size,
@@ -191,7 +191,7 @@ private[transactionviews] final class SummaryTable(
           ),
           <.tr(
             <.th(i18n("facto.category")), {
-              for (year <- summary.years)
+              for (year <- data.years)
                 yield
                   columnsForYear(year, expandedYear = props.expandedYear).map {
                     case MonthColumn(month) =>
@@ -203,15 +203,15 @@ private[transactionviews] final class SummaryTable(
         ),
         <.tbody(
           {
-            for (category <- summary.categories) yield {
+            for (category <- data.categories) yield {
               <.tr(
                 ^.key := category.code,
                 <.td(category.name), {
-                  for (year <- summary.years)
+                  for (year <- data.years)
                     yield
                       columnsForYear(year, expandedYear = props.expandedYear).map {
                         case MonthColumn(month) =>
-                          val cellData = summary.cell(category, month)
+                          val cellData = data.cell(category, month)
                           <.td(
                             ^.key := s"avg-${category.code}-$year-${month.month}",
                             ^^.classes(cellClasses(month)),
@@ -225,7 +225,7 @@ private[transactionviews] final class SummaryTable(
                           <.td(
                             ^.key := s"avg-${category.code}-$year",
                             ^.className := "average",
-                            summary.yearlyAverage(year, category).formatFloat)
+                            data.yearlyAverage(year, category).formatFloat)
                       }.toVdomArray
                 }.toVdomArray
               )
@@ -237,11 +237,11 @@ private[transactionviews] final class SummaryTable(
                 ^.key := s"total-$rowIndex",
                 ^.className := s"total total-$rowIndex",
                 <.td(^.className := "title", ^.dangerouslySetInnerHtml := rowTitleHtml), {
-                  for (year <- summary.years)
+                  for (year <- data.years)
                     yield
                       columnsForYear(year, expandedYear = props.expandedYear).map {
                         case MonthColumn(month) =>
-                          val total = summary.totalWithoutCategories(categoriesToIgnore, month)
+                          val total = data.totalWithoutCategories(categoriesToIgnore, month)
                           <.td(
                             ^^.classes(cellClasses(month)),
                             <<.ifThen(total.nonZero) { total.formatFloat }
@@ -249,7 +249,7 @@ private[transactionviews] final class SummaryTable(
                         case AverageColumn =>
                           <.td(
                             ^.className := "average",
-                            summary.averageWithoutCategories(categoriesToIgnore, year).formatFloat)
+                            data.averageWithoutCategories(categoriesToIgnore, year).formatFloat)
                       }.toVdomArray
                 }.toVdomArray
               )
