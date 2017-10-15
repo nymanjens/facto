@@ -198,14 +198,13 @@ private[transactionviews] final class SummaryTable(
           ),
           // **************** Month header **************** //
           <.tr(
-            <.th(i18n("facto.category")), {
-              for (year <- data.years)
-                yield
-                  columnsForYear(year, expandedYear = props.expandedYear).map {
-                    case MonthColumn(month) =>
-                      <.th(^.key := s"$year-${month.abbreviation}", month.abbreviation)
-                    case AverageColumn => <.th(^.key := s"avg-$year", i18n("facto.avg"))
-                  }.toVdomArray
+            columns.map {
+              case TitleColumn =>
+                <.th(^.key := "title", i18n("facto.category"))
+              case MonthColumn(month) =>
+                <.th(^.key := s"${month.year}-${month.month}", month.abbreviation)
+              case AverageColumn(year) =>
+                <.th(^.key := s"avg-$year", i18n("facto.avg"))
             }.toVdomArray
           )
         ),
@@ -215,26 +214,24 @@ private[transactionviews] final class SummaryTable(
             for (category <- data.categories) yield {
               <.tr(
                 ^.key := category.code,
-                <.td(category.name), {
-                  for (year <- data.years)
-                    yield
-                      columnsForYear(year, expandedYear = props.expandedYear).map {
-                        case MonthColumn(month) =>
-                          val cellData = data.cell(category, month)
-                          <.td(
-                            ^.key := s"avg-${category.code}-$year-${month.month}",
-                            ^^.classes(cellClasses(month)),
-                            uielements.UpperRightCorner(cornerContent =
-                              <<.ifThen(cellData.nonEmpty)(s"(${cellData.transactions.size})"))(
-                              centralContent = if (cellData.nonEmpty) cellData.totalFlow.formatFloat else ""
-                            )
-                          )
-                        case AverageColumn =>
-                          <.td(
-                            ^.key := s"avg-${category.code}-$year",
-                            ^.className := "average",
-                            data.yearlyAverage(year, category).formatFloat)
-                      }.toVdomArray
+                columns.map {
+                  case TitleColumn =>
+                    <.td(^.key := "title", category.name)
+                  case MonthColumn(month) =>
+                    val cellData = data.cell(category, month)
+                    <.td(
+                      ^.key := s"avg-${category.code}-${month.year}-${month.month}",
+                      ^^.classes(cellClasses(month)),
+                      uielements.UpperRightCorner(
+                        cornerContent = <<.ifThen(cellData.nonEmpty)(s"(${cellData.transactions.size})"))(
+                        centralContent = if (cellData.nonEmpty) cellData.totalFlow.formatFloat else ""
+                      )
+                    )
+                  case AverageColumn(year) =>
+                    <.td(
+                      ^.key := s"avg-${category.code}-$year",
+                      ^.className := "average",
+                      data.yearlyAverage(year, category).formatFloat)
                 }.toVdomArray
               )
             }
@@ -243,26 +240,24 @@ private[transactionviews] final class SummaryTable(
           ^^.ifThen(data.hasExchangeRateGains) {
             <.tr(
               ^.key := "exchange-rate-gains",
-              <.td(i18n("facto.exchange-rate-gains")), {
-                for (year <- data.years)
-                  yield
-                    columnsForYear(year, expandedYear = props.expandedYear).map {
-                      case MonthColumn(month) =>
-                        val cellData = data.exchangeRateGains(month)
-                        <.td(
-                          ^.key := s"gain-${month.month}",
-                          ^^.classes(cellClasses(month)),
-                          uielements.UpperRightCorner(cornerContent =
-                            <<.ifThen(cellData.nonEmpty)(s"(${cellData.reservoirToGains.size})"))(
-                            centralContent = if (cellData.nonEmpty) cellData.total.formatFloat else ""
-                          )
-                        )
-                      case AverageColumn =>
-                        <.td(
-                          ^.key := s"avg-$year",
-                          ^.className := "average",
-                          data.averageExchangeRateGains(year).formatFloat)
-                    }.toVdomArray
+              columns.map {
+                case TitleColumn =>
+                  <.td(^.key := "title", i18n("facto.exchange-rate-gains"))
+                case MonthColumn(month) =>
+                  val cellData = data.exchangeRateGains(month)
+                  <.td(
+                    ^.key := s"gain-${month.year}-${month.month}",
+                    ^^.classes(cellClasses(month)),
+                    uielements.UpperRightCorner(
+                      cornerContent = <<.ifThen(cellData.nonEmpty)(s"(${cellData.reservoirToGains.size})"))(
+                      centralContent = if (cellData.nonEmpty) cellData.total.formatFloat else ""
+                    )
+                  )
+                case AverageColumn(year) =>
+                  <.td(
+                    ^.key := s"avg-$year",
+                    ^.className := "average",
+                    data.averageExchangeRateGains(year).formatFloat)
               }.toVdomArray
             )
           },
@@ -272,21 +267,21 @@ private[transactionviews] final class SummaryTable(
               <.tr(
                 ^.key := s"total-$rowIndex",
                 ^.className := s"total total-$rowIndex",
-                <.td(^.className := "title", ^.dangerouslySetInnerHtml := rowTitleHtml), {
-                  for (year <- data.years)
-                    yield
-                      columnsForYear(year, expandedYear = props.expandedYear).map {
-                        case MonthColumn(month) =>
-                          val total = data.totalWithoutCategories(categoriesToIgnore, month)
-                          <.td(
-                            ^^.classes(cellClasses(month)),
-                            <<.ifThen(total.nonZero) { total.formatFloat }
-                          )
-                        case AverageColumn =>
-                          <.td(
-                            ^.className := "average",
-                            data.averageWithoutCategories(categoriesToIgnore, year).formatFloat)
-                      }.toVdomArray
+                columns.map {
+                  case TitleColumn =>
+                    <.td(^.key := "title", ^.className := "title", ^.dangerouslySetInnerHtml := rowTitleHtml)
+                  case MonthColumn(month) =>
+                    val total = data.totalWithoutCategories(categoriesToIgnore, month)
+                    <.td(
+                      ^.key := s"total-$rowIndex-${month.year}-${month.month}",
+                      ^^.classes(cellClasses(month)),
+                      <<.ifThen(total.nonZero) { total.formatFloat }
+                    )
+                  case AverageColumn(year) =>
+                    <.td(
+                      ^.key := s"average-$rowIndex-$year",
+                      ^.className := "average",
+                      data.averageWithoutCategories(categoriesToIgnore, year).formatFloat)
                 }.toVdomArray
               )
           }.toVdomArray
@@ -331,14 +326,19 @@ private[transactionviews] final class SummaryTable(
         ifThenSeq(data.monthsForAverage(month.year).contains(month), "month-for-averages")
 
     private sealed trait Column
+    private case object TitleColumn extends Column
     private case class MonthColumn(month: DatedMonth) extends Column
-    private case object AverageColumn extends Column
+    private case class AverageColumn(year: Int) extends Column
     private def columnsForYear(year: Int, expandedYear: Int): Seq[Column] = {
       if (year == expandedYear) {
-        DatedMonth.allMonthsIn(year).map(MonthColumn) :+ AverageColumn
+        DatedMonth.allMonthsIn(year).map(MonthColumn) :+ AverageColumn(year)
       } else {
-        Seq(AverageColumn)
+        Seq(AverageColumn(year))
       }
+    }
+    private def columns(implicit props: Props, data: AllYearsData): Seq[Column] = {
+      TitleColumn +:
+        data.years.flatMap(year => columnsForYear(year = year, expandedYear = props.expandedYear))
     }
   }
 }
