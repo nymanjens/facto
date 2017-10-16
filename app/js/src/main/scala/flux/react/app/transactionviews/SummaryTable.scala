@@ -112,11 +112,10 @@ private[transactionviews] final class SummaryTable(
 
     def years: Seq[Int] = yearsToData.toVector.map(_._1)
     def yearlyAverage(year: Int, category: Category): ReferenceMoney = {
-      val yearData = yearsToData(year)
       monthsForAverage(year) match {
         case Seq() => ReferenceMoney(0)
         case months =>
-          val totalFlow = months.map(yearData.summary.cell(category, _).totalFlow).sum
+          val totalFlow = months.map(yearsToData(year).summary.cell(category, _).totalFlow).sum
           totalFlow / months.size
       }
     }
@@ -135,8 +134,13 @@ private[transactionviews] final class SummaryTable(
     lazy val hasExchangeRateGains: Boolean = yearsToData.values.exists(_.exchangeRateGains.nonEmpty)
     def exchangeRateGains(month: DatedMonth): GainsForMonth =
       yearsToData(month.year).exchangeRateGains.gainsForMonth(month)
-    def averageExchangeRateGains(year: Int): ReferenceMoney =
-      DatedMonth.allMonthsIn(year).map(exchangeRateGains(_).total).sum
+    def averageExchangeRateGains(year: Int): ReferenceMoney = {
+      monthsForAverage(year) match {
+        case Seq() => ReferenceMoney(0)
+        case months =>
+          DatedMonth.allMonthsIn(year).map(exchangeRateGains(_).total).sum / months.size
+      }
+    }
 
     private lazy val categoriesSet: Set[Category] = {
       for {
@@ -202,7 +206,10 @@ private[transactionviews] final class SummaryTable(
                 Some(
                   <.th(
                     ^.key := "omitted-years",
-                    <.a(^.onClick --> props.onShowHiddenYears, yearRange.firstYear, <<.ifThen(yearRange.size > 1)("-"))))
+                    <.a(
+                      ^.onClick --> props.onShowHiddenYears,
+                      yearRange.firstYear,
+                      <<.ifThen(yearRange.size > 1)("-"))))
               case MonthColumn(month) =>
                 None
               case AverageColumn(year) =>
@@ -221,7 +228,9 @@ private[transactionviews] final class SummaryTable(
               case OmittedYearsColumn(yearRange) =>
                 <.th(
                   ^.key := "omitted-years",
-                  <.a(^.onClick --> props.onShowHiddenYears, <<.ifThen(yearRange.size > 1)(yearRange.lastYear)))
+                  <.a(
+                    ^.onClick --> props.onShowHiddenYears,
+                    <<.ifThen(yearRange.size > 1)(yearRange.lastYear)))
               case MonthColumn(month) =>
                 <.th(^.key := s"${month.year}-${month.month}", month.abbreviation)
               case AverageColumn(year) =>
