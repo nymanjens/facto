@@ -1,24 +1,14 @@
 package flux.react.app.transactionviews
 
-import common.Formatting._
 import common.I18n
 import common.time.Clock
-import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import flux.react.router.RouterContext
 import flux.react.uielements
-import flux.stores.entries.{
-  AllEntriesStoreFactory,
-  GeneralEntry,
-  SummaryForYearStoreFactory,
-  SummaryYearsStoreFactory
-}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
-import models.{EntityAccess, User}
 import models.accounting.config.Config
 import models.accounting.money.ExchangeRateManager
-
-import scala.collection.immutable.Seq
+import models.{EntityAccess, User}
 
 final class Summary(implicit summaryTable: SummaryTable,
                     entityAccess: EntityAccess,
@@ -56,7 +46,14 @@ final class Summary(implicit summaryTable: SummaryTable,
                 )
               }
             }
-          }.toVdomArray
+          }.toVdomArray,
+          // includeUnrelatedAccounts toggle button
+          <.a(
+            ^.className := "btn btn-info btn-lg btn-block",
+            ^.onClick --> $.modState(s => s.copy(includeUnrelatedAccounts = !s.includeUnrelatedAccounts)),
+            if (state.includeUnrelatedAccounts) i18n("facto.hide-other-accounts")
+            else i18n("facto.show-other-accounts")
+          )
         )
       }
     )
