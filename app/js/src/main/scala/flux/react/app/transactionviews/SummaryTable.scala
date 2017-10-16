@@ -68,7 +68,7 @@ private[transactionviews] final class SummaryTable(
 
   private case class State(allYearsData: AllYearsData)
 
-  private case class AllYearsData(private val allTransactionsYearRange: YearRange,
+  private case class AllYearsData(allTransactionsYearRange: YearRange,
                                   private val yearsToData: ListMap[Int, AllYearsData.YearData]) {
 
     /**
@@ -186,14 +186,22 @@ private[transactionviews] final class SummaryTable(
         <.thead(
           // **************** Year header **************** //
           <.tr(
-            <.th(Currency.default.symbol), {
-              for (year <- data.years) yield {
-                <.th(
-                  ^.key := year,
-                  ^.colSpan := columnsForYear(year, expandedYear = props.expandedYear).size,
-                  <.a(^.href := "#TODO", year)
-                )
-              }
+            columns.flatMap {
+              case TitleColumn =>
+                Some(<.th(^.key := "title", Currency.default.symbol))
+              case OmittedYearsColumn(yearRange) =>
+                Some(
+                  <.th(
+                    ^.key := "omitted-years",
+                    <.a(^.href := "#TODO", yearRange.firstYear, <<.ifThen(yearRange.size > 1)("-"))))
+              case MonthColumn(month) =>
+                None
+              case AverageColumn(year) =>
+                Some(
+                  <.th(
+                    ^.key := year,
+                    ^.colSpan := columnsForYear(year, expandedYear = props.expandedYear).size,
+                    <.a(^.href := "#TODO", year)))
             }.toVdomArray
           ),
           // **************** Month header **************** //
@@ -201,6 +209,10 @@ private[transactionviews] final class SummaryTable(
             columns.map {
               case TitleColumn =>
                 <.th(^.key := "title", i18n("facto.category"))
+              case OmittedYearsColumn(yearRange) =>
+                <.th(
+                  ^.key := "omitted-years",
+                  <.a(^.href := "#TODO", <<.ifThen(yearRange.size > 1)(yearRange.lastYear)))
               case MonthColumn(month) =>
                 <.th(^.key := s"${month.year}-${month.month}", month.abbreviation)
               case AverageColumn(year) =>
@@ -217,6 +229,8 @@ private[transactionviews] final class SummaryTable(
                 columns.map {
                   case TitleColumn =>
                     <.td(^.key := "title", category.name)
+                  case OmittedYearsColumn(_) =>
+                    <.td(^.key := "omitted-years")
                   case MonthColumn(month) =>
                     val cellData = data.cell(category, month)
                     <.td(
@@ -243,6 +257,8 @@ private[transactionviews] final class SummaryTable(
               columns.map {
                 case TitleColumn =>
                   <.td(^.key := "title", i18n("facto.exchange-rate-gains"))
+                case OmittedYearsColumn(_) =>
+                  <.td(^.key := "omitted-years")
                 case MonthColumn(month) =>
                   val cellData = data.exchangeRateGains(month)
                   <.td(
@@ -270,6 +286,8 @@ private[transactionviews] final class SummaryTable(
                 columns.map {
                   case TitleColumn =>
                     <.td(^.key := "title", ^.className := "title", ^.dangerouslySetInnerHtml := rowTitleHtml)
+                  case OmittedYearsColumn(_) =>
+                    <.td(^.key := "omitted-years")
                   case MonthColumn(month) =>
                     val total = data.totalWithoutCategories(categoriesToIgnore, month)
                     <.td(
@@ -327,6 +345,7 @@ private[transactionviews] final class SummaryTable(
 
     private sealed trait Column
     private case object TitleColumn extends Column
+    private case class OmittedYearsColumn(yearRange: YearRange) extends Column
     private case class MonthColumn(month: DatedMonth) extends Column
     private case class AverageColumn(year: Int) extends Column
     private def columnsForYear(year: Int, expandedYear: Int): Seq[Column] = {
@@ -337,7 +356,10 @@ private[transactionviews] final class SummaryTable(
       }
     }
     private def columns(implicit props: Props, data: AllYearsData): Seq[Column] = {
-      TitleColumn +:
+      val omittedYears = data.allTransactionsYearRange.copyLessThan(data.years.min)
+
+      Seq(TitleColumn) ++
+        ifThenSeq(omittedYears.nonEmpty, OmittedYearsColumn(omittedYears)) ++
         data.years.flatMap(year => columnsForYear(year = year, expandedYear = props.expandedYear))
     }
   }
