@@ -37,7 +37,7 @@ object Money {
     val integerPart = {
       val positiveInteger = roundToLong(abs(cents) / 100)
       if (positiveInteger < 1000) {
-        // Optimization for most common case that needs no special treatement
+        // Optimization for most common case that needs no special treatment
         positiveInteger.toString
       } else {
         positiveInteger.toString.reverseIterator.grouped(3).map(_.mkString("")).mkString(",").reverse
