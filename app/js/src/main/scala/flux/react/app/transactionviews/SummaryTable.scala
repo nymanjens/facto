@@ -230,7 +230,7 @@ private[transactionviews] final class SummaryTable(
                   case TitleColumn =>
                     <.td(^.key := "title", category.name)
                   case OmittedYearsColumn(_) =>
-                    <.td(^.key := "omitted-years")
+                    <.td(^.key := "omitted-years", "...")
                   case MonthColumn(month) =>
                     val cellData = data.cell(category, month)
                     <.td(
@@ -258,7 +258,7 @@ private[transactionviews] final class SummaryTable(
                 case TitleColumn =>
                   <.td(^.key := "title", i18n("facto.exchange-rate-gains"))
                 case OmittedYearsColumn(_) =>
-                  <.td(^.key := "omitted-years")
+                  <.td(^.key := "omitted-years", "...")
                 case MonthColumn(month) =>
                   val cellData = data.exchangeRateGains(month)
                   <.td(
@@ -287,7 +287,7 @@ private[transactionviews] final class SummaryTable(
                   case TitleColumn =>
                     <.td(^.key := "title", ^.className := "title", ^.dangerouslySetInnerHtml := rowTitleHtml)
                   case OmittedYearsColumn(_) =>
-                    <.td(^.key := "omitted-years")
+                    <.td(^.key := "omitted-years", "...")
                   case MonthColumn(month) =>
                     val total = data.totalWithoutCategories(categoriesToIgnore, month)
                     <.td(
