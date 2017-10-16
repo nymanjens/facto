@@ -34,7 +34,7 @@ final class Summary(implicit summaryTable: SummaryTable,
       State(
         includeUnrelatedAccounts = false,
         query = "",
-        hideColumnsOlderThanYear = clock.now.getYear - 1,
+        yearLowerBound = clock.now.getYear - 1,
         expandedYear = clock.now.getYear))
     .renderPS(
       ($, props, state) => {
@@ -49,7 +49,7 @@ final class Summary(implicit summaryTable: SummaryTable,
                 summaryTable(
                   account = account,
                   query = state.query,
-                  hideColumnsOlderThanYear = state.hideColumnsOlderThanYear,
+                  yearLowerBound = state.yearLowerBound,
                   expandedYear = state.expandedYear)
               }
             }
@@ -68,6 +68,6 @@ final class Summary(implicit summaryTable: SummaryTable,
   private case class Props(router: RouterContext)
   private case class State(includeUnrelatedAccounts: Boolean,
                            query: String,
-                           hideColumnsOlderThanYear: Int,
+                           yearLowerBound: Int,
                            expandedYear: Int)
 }

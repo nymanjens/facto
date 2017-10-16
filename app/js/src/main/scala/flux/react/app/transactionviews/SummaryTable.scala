@@ -47,13 +47,13 @@ private[transactionviews] final class SummaryTable(
   }
 
   // **************** API ****************//
-  def apply(account: Account, query: String, hideColumnsOlderThanYear: Int, expandedYear: Int)(
+  def apply(account: Account, query: String, yearLowerBound: Int, expandedYear: Int)(
       implicit router: RouterContext): VdomElement = {
     component(
       Props(
         account = account,
         query = query,
-        hideColumnsOlderThanYear = hideColumnsOlderThanYear,
+        yearLowerBound = yearLowerBound,
         expandedYear = expandedYear,
         router = router)).vdomElement
   }
@@ -62,7 +62,7 @@ private[transactionviews] final class SummaryTable(
 
   private case class Props(account: Account,
                            query: String,
-                           hideColumnsOlderThanYear: Int,
+                           yearLowerBound: Int,
                            expandedYear: Int,
                            router: RouterContext)
 
@@ -313,7 +313,7 @@ private[transactionviews] final class SummaryTable(
         val allTransactionsYearRange = yearsStore.state
         val yearRange = allTransactionsYearRange
           .copyIncluding(clock.now.getYear)
-          .copyWithLowerBound(props.hideColumnsOlderThanYear)
+          .copyWithLowerBound(props.yearLowerBound)
           .copyIncluding(props.expandedYear)
 
         val dataBuilder = AllYearsData.builder(allTransactionsYearRange)
