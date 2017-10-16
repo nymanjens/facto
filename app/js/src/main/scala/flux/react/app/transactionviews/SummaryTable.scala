@@ -207,6 +207,7 @@ private[transactionviews] final class SummaryTable(
                   <.th(
                     ^.key := "omitted-years",
                     <.a(
+                      ^.href := "javascript:void(0)",
                       ^.onClick --> props.onShowHiddenYears,
                       yearRange.firstYear,
                       <<.ifThen(yearRange.size > 1)("-"))))
@@ -217,7 +218,8 @@ private[transactionviews] final class SummaryTable(
                   <.th(
                     ^.key := year,
                     ^.colSpan := columnsForYear(year, expandedYear = props.expandedYear).size,
-                    <.a(^.onClick --> props.onSetExpandedYear(year), year)))
+                    <.a(^.href := "javascript:void(0)", ^.onClick --> props.onSetExpandedYear(year), year)
+                  ))
             }.toVdomArray
           ),
           // **************** Month header **************** //
@@ -229,6 +231,7 @@ private[transactionviews] final class SummaryTable(
                 <.th(
                   ^.key := "omitted-years",
                   <.a(
+                    ^.href := "javascript:void(0)",
                     ^.onClick --> props.onShowHiddenYears,
                     <<.ifThen(yearRange.size > 1)(yearRange.lastYear)))
               case MonthColumn(month) =>
