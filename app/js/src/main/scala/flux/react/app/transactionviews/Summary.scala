@@ -50,7 +50,10 @@ final class Summary(implicit summaryTable: SummaryTable,
                   account = account,
                   query = state.query,
                   yearLowerBound = state.yearLowerBound,
-                  expandedYear = state.expandedYear)
+                  expandedYear = state.expandedYear,
+                  onShowHiddenYears = $.modState(_.copy(yearLowerBound = Int.MinValue)),
+                  onSetExpandedYear = year => $.modState(_.copy(expandedYear = year))
+                )
               }
             }
           }.toVdomArray

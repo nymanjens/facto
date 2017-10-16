@@ -47,15 +47,22 @@ private[transactionviews] final class SummaryTable(
   }
 
   // **************** API ****************//
-  def apply(account: Account, query: String, yearLowerBound: Int, expandedYear: Int)(
-      implicit router: RouterContext): VdomElement = {
+  def apply(account: Account,
+            query: String,
+            yearLowerBound: Int,
+            expandedYear: Int,
+            onShowHiddenYears: Callback,
+            onSetExpandedYear: Int => Callback)(implicit router: RouterContext): VdomElement = {
     component(
       Props(
         account = account,
         query = query,
         yearLowerBound = yearLowerBound,
         expandedYear = expandedYear,
-        router = router)).vdomElement
+        onShowHiddenYears = onShowHiddenYears,
+        onSetExpandedYear = onSetExpandedYear,
+        router = router
+      )).vdomElement
   }
 
   // **************** Private types ****************//
@@ -64,6 +71,8 @@ private[transactionviews] final class SummaryTable(
                            query: String,
                            yearLowerBound: Int,
                            expandedYear: Int,
+                           onShowHiddenYears: Callback,
+                           onSetExpandedYear: Int => Callback,
                            router: RouterContext)
 
   private case class State(allYearsData: AllYearsData)
@@ -193,7 +202,7 @@ private[transactionviews] final class SummaryTable(
                 Some(
                   <.th(
                     ^.key := "omitted-years",
-                    <.a(^.href := "#TODO", yearRange.firstYear, <<.ifThen(yearRange.size > 1)("-"))))
+                    <.a(^.onClick --> props.onShowHiddenYears, yearRange.firstYear, <<.ifThen(yearRange.size > 1)("-"))))
               case MonthColumn(month) =>
                 None
               case AverageColumn(year) =>
@@ -201,7 +210,7 @@ private[transactionviews] final class SummaryTable(
                   <.th(
                     ^.key := year,
                     ^.colSpan := columnsForYear(year, expandedYear = props.expandedYear).size,
-                    <.a(^.href := "#TODO", year)))
+                    <.a(^.onClick --> props.onSetExpandedYear(year), year)))
             }.toVdomArray
           ),
           // **************** Month header **************** //
@@ -212,7 +221,7 @@ private[transactionviews] final class SummaryTable(
               case OmittedYearsColumn(yearRange) =>
                 <.th(
                   ^.key := "omitted-years",
-                  <.a(^.href := "#TODO", <<.ifThen(yearRange.size > 1)(yearRange.lastYear)))
+                  <.a(^.onClick --> props.onShowHiddenYears, <<.ifThen(yearRange.size > 1)(yearRange.lastYear)))
               case MonthColumn(month) =>
                 <.th(^.key := s"${month.year}-${month.month}", month.abbreviation)
               case AverageColumn(year) =>
