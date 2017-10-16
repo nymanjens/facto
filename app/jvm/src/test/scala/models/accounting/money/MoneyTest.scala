@@ -89,6 +89,9 @@ class MoneyTest extends CacheClearingSpecification {
       ReferenceMoney(-987).formatFloat mustEqual "-9.87"
       ReferenceMoney(-87).formatFloat mustEqual "-0.87"
       ReferenceMoney(-8701).formatFloat mustEqual "-87.01"
+      ReferenceMoney(123456).formatFloat mustEqual "1,234.56"
+      ReferenceMoney(-12345678).formatFloat mustEqual "-123,456.78"
+      ReferenceMoney(-1234567890).formatFloat mustEqual "-12,345,678.90"
     }
 
     "withDate" in {

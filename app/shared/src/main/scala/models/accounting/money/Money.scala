@@ -33,8 +33,16 @@ object Money {
 
   def centsToFloatString(cents: Long): String = {
     val sign = if (cents < 0) "-" else ""
-    val integerPart = roundToLong(abs(cents) / 100)
     val centsPart = abs(cents % 100)
+    val integerPart = {
+      val positiveInteger = roundToLong(abs(cents) / 100)
+      if (positiveInteger < 1000) {
+        // Optimization for most common case that needs no special treatement
+        positiveInteger.toString
+      } else {
+        positiveInteger.toString.reverseIterator.grouped(3).map(_.mkString("")).mkString(",").reverse
+      }
+    }
     "%s%s.%02d".format(sign, integerPart, centsPart)
   }
 
