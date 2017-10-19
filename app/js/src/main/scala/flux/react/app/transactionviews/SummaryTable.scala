@@ -377,7 +377,7 @@ private[transactionviews] final class SummaryTable(
       }
     }
     private def columns(implicit props: Props, data: AllYearsData): Seq[Column] = {
-      val omittedYears = data.allTransactionsYearRange.copyLessThan(data.years.min)
+      val omittedYears = data.allTransactionsYearRange.copyLessThan(props.yearLowerBound)
 
       Seq(TitleColumn) ++
         ifThenSeq(omittedYears.nonEmpty, OmittedYearsColumn(omittedYears)) ++
