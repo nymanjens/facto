@@ -122,7 +122,7 @@ private[transactionviews] final class SummaryTable(
 
     def monthsForAverage(year: Int): Seq[DatedMonth] = {
       val pastMonths = DatedMonth.allMonthsIn(year).filter(_ < DatedMonth.containing(clock.now))
-      if (allTransactionsYearRange.isEmpty) {
+      if (allTransactionsYearRange.isEmpty || yearsToData(year).summary.months.isEmpty) {
         Seq()
       } else if (allTransactionsYearRange.firstYear == year) {
         pastMonths.filter(_ >= yearsToData(year).summary.months.min)
@@ -271,6 +271,21 @@ private[transactionviews] final class SummaryTable(
               )
             }
           }.toVdomArray,
+          ^^.ifThen(data.categories.isEmpty) {
+            <.tr(
+              ^.key := "empty",
+              columns.map {
+                case TitleColumn =>
+                  <.td(^.key := "empty-title", i18n("facto.empty"))
+                case OmittedYearsColumn(_) =>
+                  <.td(^.key := "empty-omitted-years", "...")
+                case MonthColumn(month) =>
+                  <.td(^.key := s"empty-avg-${month.year}-${month.month}", ^.className := "cell")
+                case AverageColumn(year) =>
+                  <.td(^.key := s"empty-avg-$year", ^.className := "average")
+              }.toVdomArray
+            )
+          },
           // **************** Exchange rate gains data **************** //
           ^^.ifThen(data.hasExchangeRateGains && props.query.isEmpty) {
             <.tr(
@@ -299,31 +314,38 @@ private[transactionviews] final class SummaryTable(
             )
           },
           // **************** Total rows **************** //
-          props.account.summaryTotalRows.zipWithIndex.map {
-            case (SummaryTotalRowDef(rowTitleHtml, categoriesToIgnore), rowIndex) =>
-              <.tr(
-                ^.key := s"total-$rowIndex",
-                ^.className := s"total total-$rowIndex",
-                columns.map {
-                  case TitleColumn =>
-                    <.td(^.key := "title", ^.className := "title", ^.dangerouslySetInnerHtml := rowTitleHtml)
-                  case OmittedYearsColumn(_) =>
-                    <.td(^.key := "omitted-years", "...")
-                  case MonthColumn(month) =>
-                    val total = data.totalWithoutCategories(categoriesToIgnore, month)
-                    <.td(
-                      ^.key := s"total-$rowIndex-${month.year}-${month.month}",
-                      ^^.classes(cellClasses(month)),
-                      <<.ifThen(total.nonZero) { total.formatFloat }
-                    )
-                  case AverageColumn(year) =>
-                    <.td(
-                      ^.key := s"average-$rowIndex-$year",
-                      ^.className := "average",
-                      data.averageWithoutCategories(categoriesToIgnore, year).formatFloat)
-                }.toVdomArray
-              )
-          }.toVdomArray
+          ^^.ifThen(props.query.isEmpty) {
+            props.account.summaryTotalRows.zipWithIndex.map {
+              case (SummaryTotalRowDef(rowTitleHtml, categoriesToIgnore), rowIndex) =>
+                <.tr(
+                  ^.key := s"total-$rowIndex",
+                  ^.className := s"total total-$rowIndex",
+                  columns.map {
+                    case TitleColumn =>
+                      <.td(
+                        ^.key := "title",
+                        ^.className := "title",
+                        ^.dangerouslySetInnerHtml := rowTitleHtml)
+                    case OmittedYearsColumn(_) =>
+                      <.td(^.key := "omitted-years", "...")
+                    case MonthColumn(month) =>
+                      val total = data.totalWithoutCategories(categoriesToIgnore, month)
+                      <.td(
+                        ^.key := s"total-$rowIndex-${month.year}-${month.month}",
+                        ^^.classes(cellClasses(month)),
+                        <<.ifThen(total.nonZero) {
+                          total.formatFloat
+                        }
+                      )
+                    case AverageColumn(year) =>
+                      <.td(
+                        ^.key := s"average-$rowIndex-$year",
+                        ^.className := "average",
+                        data.averageWithoutCategories(categoriesToIgnore, year).formatFloat)
+                  }.toVdomArray
+                )
+            }.toVdomArray
+          }
         )
       )
     }
