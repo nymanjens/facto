@@ -138,3 +138,4 @@ facto.search-results-for=Zoekresultaten voor {0}
 facto.robot=Robot
 facto.sending-data-to-server=Data aan het versturen...
 facto.exchange-rate-gains=Wisselkoerswinst
+facto.example-query=drank b:gemeensch c:plezier a:-2.1 -t:vakantie-2017

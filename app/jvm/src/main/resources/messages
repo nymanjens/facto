@@ -184,3 +184,4 @@ facto.search-results-for=Search Results for {0}
 facto.robot=Robot
 facto.sending-data-to-server=Sending data to server...
 facto.exchange-rate-gains=Exchange rate gains
+facto.example-query=pub b:common c:fun a:-2.1 -t:vaction-2017

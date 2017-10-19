@@ -272,7 +272,7 @@ private[transactionviews] final class SummaryTable(
             }
           }.toVdomArray,
           // **************** Exchange rate gains data **************** //
-          ^^.ifThen(data.hasExchangeRateGains) {
+          ^^.ifThen(data.hasExchangeRateGains && props.query.isEmpty) {
             <.tr(
               ^.key := "exchange-rate-gains",
               columns.map {
