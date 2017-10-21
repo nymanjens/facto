@@ -1,7 +1,7 @@
 package flux.stores.entries
 
 import common.time.JavaTimeImplicits._
-import common.time.{DatedMonth, LocalDateTime, MonthRange}
+import common.time.{DatedMonth, LocalDateTime}
 import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.{
   DateToBalanceFunction,
   GainsForMonth,
@@ -54,14 +54,15 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
 
     // **************** Private helper methods ****************//
     private def calculateGainsForYear(reservoir: MoneyReservoir): GainsForYear = {
-      val yearRange = MonthRange.forYear(input.year)
+      val monthsInYear = DatedMonth.allMonthsIn(input.year)
 
       val (oldestBalanceDate, initialBalance): (LocalDateTime, MoneyWithGeneralCurrency) = {
         val oldestRelevantBc =
           database
             .newQuery[BalanceCheck]()
             .filterEqual(Keys.BalanceCheck.moneyReservoirCode, reservoir.code)
-            .filter(LokiJs.ResultSet.Filter.lessThan(Keys.BalanceCheck.checkDate, yearRange.startTime))
+            .filter(
+              LokiJs.ResultSet.Filter.lessThan(Keys.BalanceCheck.checkDate, monthsInYear.head.startTime))
             .sort(
               LokiJs.Sorting
                 .descBy(Keys.BalanceCheck.checkDate)
@@ -81,7 +82,10 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
           .newQuery[BalanceCheck]()
           .filterEqual(Keys.BalanceCheck.moneyReservoirCode, reservoir.code)
           .filter(
-            filterInRange(Keys.BalanceCheck.checkDate, oldestBalanceDate, yearRange.startTimeOfNextMonth))
+            filterInRange(
+              Keys.BalanceCheck.checkDate,
+              oldestBalanceDate,
+              monthsInYear.last.startTimeOfNextMonth))
           .sort(
             LokiJs.Sorting
               .ascBy(Keys.BalanceCheck.checkDate)
@@ -97,7 +101,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
             filterInRange(
               Keys.Transaction.transactionDate,
               oldestBalanceDate,
-              yearRange.startTimeOfNextMonth))
+              monthsInYear.last.startTimeOfNextMonth))
           .sort(
             LokiJs.Sorting
               .ascBy(Keys.Transaction.transactionDate)
@@ -117,7 +121,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
       }
 
       GainsForYear(
-        monthToGains = yearRange.months.map { month =>
+        monthToGains = monthsInYear.map { month =>
           val gain: ReferenceMoney = {
             def gainFromMoney(date: LocalDateTime, amount: MoneyWithGeneralCurrency): ReferenceMoney = {
               val valueAtDate = amount.withDate(date).exchangedForReferenceCurrency

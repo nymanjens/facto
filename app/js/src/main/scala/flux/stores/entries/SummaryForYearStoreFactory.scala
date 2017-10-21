@@ -1,6 +1,6 @@
 package flux.stores.entries
 
-import common.time.{DatedMonth, LocalDateTime, MonthRange}
+import common.time.{DatedMonth, LocalDateTime}
 import flux.stores.entries.SummaryForYearStoreFactory.SummaryForYear
 import jsfacades.LokiJs
 import models.access.RemoteDatabaseProxy
@@ -61,10 +61,10 @@ final class SummaryForYearStoreFactory(implicit database: RemoteDatabaseProxy,
 
   // **************** Private helper methods ****************//
   private def filterInYear[E](key: Key[LocalDateTime, E], year: Int): LokiJs.ResultSet.Filter[E] = {
-    val yearRange = MonthRange.forYear(year)
+    val months = DatedMonth.allMonthsIn(year)
     LokiJs.ResultSet.Filter.and(
-      LokiJs.ResultSet.Filter.greaterThan(key, yearRange.startTime),
-      LokiJs.ResultSet.Filter.lessThan(key, yearRange.startTimeOfNextMonth)
+      LokiJs.ResultSet.Filter.greaterThan(key, months.head.startTime),
+      LokiJs.ResultSet.Filter.lessThan(key, months.last.startTimeOfNextMonth)
     )
   }
 }
