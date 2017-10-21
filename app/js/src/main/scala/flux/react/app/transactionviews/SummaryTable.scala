@@ -3,7 +3,7 @@ package flux.react.app.transactionviews
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.CollectionUtils.asMap
-import common.time.{Clock, DatedMonth}
+import common.time.{Clock, DatedMonth, YearRange}
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import flux.react.router.RouterContext
 import flux.react.ReactVdomUtils._

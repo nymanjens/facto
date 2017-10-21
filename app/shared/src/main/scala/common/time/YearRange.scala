@@ -1,4 +1,4 @@
-package flux.stores.entries
+package common.time
 
 import scala.collection.immutable.Seq
 

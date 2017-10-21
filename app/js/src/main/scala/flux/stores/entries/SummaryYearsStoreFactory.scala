@@ -1,6 +1,6 @@
 package flux.stores.entries
 
-import common.time.Clock
+import common.time.{Clock, YearRange}
 import jsfacades.LokiJs
 import jsfacades.LokiJs.Sorting
 import models.access.RemoteDatabaseProxy
