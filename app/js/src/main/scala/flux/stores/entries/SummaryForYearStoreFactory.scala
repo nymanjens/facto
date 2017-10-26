@@ -43,7 +43,7 @@ final class SummaryForYearStoreFactory(implicit database: RemoteDatabaseProxy,
               .thenAscBy(Keys.id))
           .data()
 
-      new SummaryForYear(transactions)
+      SummaryForYear(transactions)
     }
 
     override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) =
@@ -70,7 +70,7 @@ final class SummaryForYearStoreFactory(implicit database: RemoteDatabaseProxy,
 }
 
 object SummaryForYearStoreFactory {
-  class SummaryForYear(transactions: Seq[Transaction])(implicit accountingConfig: Config) {
+  case class SummaryForYear(private val transactions: Seq[Transaction])(implicit accountingConfig: Config) {
     private val transactionIds: Set[Long] = transactions.toStream.map(_.id).toSet
 
     private val cells: Map[Category, Map[DatedMonth, SummaryCell]] =
@@ -90,6 +90,10 @@ object SummaryForYearStoreFactory {
 
     private[SummaryForYearStoreFactory] def containsTransactionId(id: Long): Boolean =
       transactionIds contains id
+  }
+
+  object SummaryForYear {
+    def empty(implicit accountingConfig: Config): SummaryForYear = SummaryForYear(Seq())
   }
 
   case class SummaryCell(transactions: Seq[Transaction]) {

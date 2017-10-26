@@ -32,7 +32,7 @@ object SummaryYearsStoreFactoryTest extends TestSuite {
 
       factory.get(testAccountA).state ==> YearRange.single(2012)
     }
-    "transactions in different years" - {
+    "transactions in multiple years" - {
       persistTransaction(2010)
       persistTransaction(2012)
       persistTransaction(2015)
@@ -41,7 +41,7 @@ object SummaryYearsStoreFactoryTest extends TestSuite {
 
       factory.get(testAccountA).state ==> YearRange.closed(2010, 2018)
     }
-    "irrelevant transaction" - {
+    "transaction for different account" - {
       persistTransaction(2012, beneficiary = testAccountB)
 
       factory.get(testAccountA).state ==> YearRange.empty
@@ -50,8 +50,6 @@ object SummaryYearsStoreFactoryTest extends TestSuite {
 
   private def persistTransaction(year: Int, beneficiary: Account = testAccountA)(
       implicit database: FakeRemoteDatabaseProxy): Unit = {
-    database.addRemotelyAddedEntities(
-      createTransaction(beneficiary = beneficiary)
-        .copy(consumedDate = LocalDateTimes.createDateTime(year, Month.AUGUST, 29)))
+    database.addRemotelyAddedEntities(createTransaction(beneficiary = beneficiary, year = year))
   }
 }

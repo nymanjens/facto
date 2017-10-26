@@ -1,5 +1,7 @@
 package common.testing
 
+import java.time.Month
+
 import common.time.{LocalDateTime, LocalDateTimes}
 import models.User
 import java.time.Month.{JANUARY, MARCH}
@@ -238,6 +240,8 @@ object TestObjects {
                         issuer: User = testUserA,
                         beneficiary: Account = testAccountA,
                         reservoir: MoneyReservoir = null,
+                        year: Int = 2012,
+                        month: Month = MARCH,
                         day: Int = 25,
                         category: Category = testCategory,
                         description: String = "some description",
@@ -255,9 +259,9 @@ object TestObjects {
       flowInCents = (flow * 100).toLong,
       detailDescription = detailDescription,
       tags = tags,
-      createdDate = createDateTime(2012, JANUARY, day),
-      transactionDate = createDateTime(2012, JANUARY, day),
-      consumedDate = createDateTime(2012, JANUARY, day)
+      createdDate = createDateTime(year, month, day),
+      transactionDate = createDateTime(year, month, day),
+      consumedDate = createDateTime(year, month, day)
     )
   }
 }
