@@ -61,8 +61,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
           database
             .newQuery[BalanceCheck]()
             .filterEqual(Keys.BalanceCheck.moneyReservoirCode, reservoir.code)
-            .filter(
-              LokiJs.Filter.lessThan(Keys.BalanceCheck.checkDate, monthsInYear.head.startTime))
+            .filter(LokiJs.Filter.lessThan(Keys.BalanceCheck.checkDate, monthsInYear.head.startTime))
             .sort(
               LokiJs.Sorting
                 .descBy(Keys.BalanceCheck.checkDate)

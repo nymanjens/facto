@@ -225,7 +225,8 @@ object LokiJs {
     private[LokiJs] case class AnyOf[E](keyName: String, values: js.Array[js.Any]) extends Filter[E]
     private[LokiJs] case class NoneOf[E](keyName: String, values: js.Array[js.Any]) extends Filter[E]
     private[LokiJs] case class ContainsIgnoreCase[E](keyName: String, substring: String) extends Filter[E]
-    private[LokiJs] case class DoesntContainIgnoreCase[E](keyName: String, substring: String)        extends Filter[E]
+    private[LokiJs] case class DoesntContainIgnoreCase[E](keyName: String, substring: String)
+        extends Filter[E]
     private[LokiJs] case class SeqContains[E](keyName: String, value: js.Any) extends Filter[E]
     private[LokiJs] case class SeqDoesntContain[E](keyName: String, value: js.Any) extends Filter[E]
     private[LokiJs] case class Or[E](filters: Seq[Filter[E]]) extends Filter[E]
