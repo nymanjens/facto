@@ -38,7 +38,7 @@ case class YearRange private (private val years: Set[Int]) {
 object YearRange {
   val empty = YearRange(Set())
   def closed(startYear: Int, endYear: Int): YearRange = {
-    require(startYear < endYear)
+    require(startYear <= endYear, s"startYear=$startYear should not be later than endYear=$endYear")
     YearRange((startYear to endYear).toSet)
   }
   def single(year: Int): YearRange = YearRange(Set(year))

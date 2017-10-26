@@ -8,6 +8,7 @@ class YearRangeTest extends Specification {
 
   "closed" in {
     YearRange.closed(2007, 2010).toSeq mustEqual Seq(2007, 2008, 2009, 2010)
+    YearRange.closed(2007, 2007).toSeq mustEqual Seq(2007)
     YearRange.closed(2009, 2008).toSeq must throwA[IllegalArgumentException]
   }
   "single" in {
