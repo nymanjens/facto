@@ -5,7 +5,7 @@ import java.time.Month.JANUARY
 import common.testing.TestObjects._
 import common.time.LocalDateTimes.createDateTime
 import jsfacades.LokiJs.ResultSet
-import jsfacades.LokiJs.ResultSet.Filter
+import jsfacades.LokiJs.Filter
 import models.accounting.Transaction
 import models.accounting.config.Category
 import models.manager.EntityModification

@@ -62,7 +62,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
             .newQuery[BalanceCheck]()
             .filterEqual(Keys.BalanceCheck.moneyReservoirCode, reservoir.code)
             .filter(
-              LokiJs.ResultSet.Filter.lessThan(Keys.BalanceCheck.checkDate, monthsInYear.head.startTime))
+              LokiJs.Filter.lessThan(Keys.BalanceCheck.checkDate, monthsInYear.head.startTime))
             .sort(
               LokiJs.Sorting
                 .descBy(Keys.BalanceCheck.checkDate)
@@ -152,10 +152,10 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
 
     private def filterInRange[E](key: Key[LocalDateTime, E],
                                  start: LocalDateTime,
-                                 end: LocalDateTime): LokiJs.ResultSet.Filter[E] = {
-      LokiJs.ResultSet.Filter.and(
-        LokiJs.ResultSet.Filter.greaterThan(key, start),
-        LokiJs.ResultSet.Filter.lessThan(key, end)
+                                 end: LocalDateTime): LokiJs.Filter[E] = {
+      LokiJs.Filter.and(
+        LokiJs.Filter.greaterThan(key, start),
+        LokiJs.Filter.lessThan(key, end)
       )
     }
 

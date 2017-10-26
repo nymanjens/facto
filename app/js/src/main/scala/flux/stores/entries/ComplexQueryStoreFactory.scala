@@ -14,7 +14,7 @@ final class ComplexQueryStoreFactory(implicit database: RemoteDatabaseProxy,
 
   override protected def createNew(maxNumEntries: Int, query: String) =
     new TransactionsListStore[GeneralEntry] {
-      private val filterFromQuery: LokiJs.ResultSet.Filter[Transaction] = complexQueryFilter.fromQuery(query)
+      private val filterFromQuery: LokiJs.Filter[Transaction] = complexQueryFilter.fromQuery(query)
 
       override protected def calculateState() = {
         val transactions: Seq[Transaction] =

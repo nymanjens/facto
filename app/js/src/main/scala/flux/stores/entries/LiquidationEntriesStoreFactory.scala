@@ -58,24 +58,24 @@ final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProx
 
         val transactions = database
           .newQuery[Transaction]()
-          .filter(LokiJs.ResultSet.Filter.or(
-            LokiJs.ResultSet.Filter.and(
-              LokiJs.ResultSet.Filter.anyOf(
+          .filter(LokiJs.Filter.or(
+            LokiJs.Filter.and(
+              LokiJs.Filter.anyOf(
                 Keys.Transaction.moneyReservoirCode,
                 reservoirsOwnedBy(accountPair.account1).map(_.code)),
-              LokiJs.ResultSet.Filter
+              LokiJs.Filter
                 .equal(Keys.Transaction.beneficiaryAccountCode, accountPair.account2.code)
             ),
-            LokiJs.ResultSet.Filter.and(
-              LokiJs.ResultSet.Filter.anyOf(
+            LokiJs.Filter.and(
+              LokiJs.Filter.anyOf(
                 Keys.Transaction.moneyReservoirCode,
                 reservoirsOwnedBy(accountPair.account2).map(_.code)),
-              LokiJs.ResultSet.Filter
+              LokiJs.Filter
                 .equal(Keys.Transaction.beneficiaryAccountCode, accountPair.account1.code)
             ),
-            LokiJs.ResultSet.Filter.and(
-              LokiJs.ResultSet.Filter.equal(Keys.Transaction.moneyReservoirCode, ""),
-              LokiJs.ResultSet.Filter
+            LokiJs.Filter.and(
+              LokiJs.Filter.equal(Keys.Transaction.moneyReservoirCode, ""),
+              LokiJs.Filter
                 .anyOf(Keys.Transaction.beneficiaryAccountCode, accountPair.toSet.map(_.code).toVector)
             )
           ))

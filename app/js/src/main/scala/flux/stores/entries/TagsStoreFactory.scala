@@ -21,7 +21,7 @@ final class TagsStoreFactory(implicit database: RemoteDatabaseProxy) extends Ent
       val transactionsWithTags: Seq[Transaction] =
         database
           .newQuery[Transaction]()
-          .filter(LokiJs.ResultSet.Filter.notEqual(Keys.Transaction.tags, Seq()))
+          .filter(LokiJs.Filter.notEqual(Keys.Transaction.tags, Seq()))
           .data()
 
       val tagToTransactionIdsBuilder =

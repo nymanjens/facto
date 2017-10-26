@@ -24,9 +24,9 @@ final class SummaryForYearStoreFactory(implicit database: RemoteDatabaseProxy,
 
   // **************** Implementation of EntriesStoreFactory methods/types ****************//
   override protected def createNew(input: Input) = new Store {
-    private val combinedFilter: LokiJs.ResultSet.Filter[Transaction] = LokiJs.ResultSet.Filter
+    private val combinedFilter: LokiJs.Filter[Transaction] = LokiJs.Filter
       .and(
-        LokiJs.ResultSet.Filter.equal(Keys.Transaction.beneficiaryAccountCode, input.account.code),
+        LokiJs.Filter.equal(Keys.Transaction.beneficiaryAccountCode, input.account.code),
         filterInYear(Keys.Transaction.consumedDate, input.year),
         complexQueryFilter.fromQuery(input.query)
       )
@@ -60,11 +60,11 @@ final class SummaryForYearStoreFactory(implicit database: RemoteDatabaseProxy,
   protected case class Input(account: Account, year: Int, query: String = "")
 
   // **************** Private helper methods ****************//
-  private def filterInYear[E](key: Key[LocalDateTime, E], year: Int): LokiJs.ResultSet.Filter[E] = {
+  private def filterInYear[E](key: Key[LocalDateTime, E], year: Int): LokiJs.Filter[E] = {
     val months = DatedMonth.allMonthsIn(year)
-    LokiJs.ResultSet.Filter.and(
-      LokiJs.ResultSet.Filter.greaterThan(key, months.head.startTime),
-      LokiJs.ResultSet.Filter.lessThan(key, months.last.startTimeOfNextMonth)
+    LokiJs.Filter.and(
+      LokiJs.Filter.greaterThan(key, months.head.startTime),
+      LokiJs.Filter.lessThan(key, months.last.startTimeOfNextMonth)
     )
   }
 }
