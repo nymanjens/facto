@@ -3,6 +3,7 @@ package common.time
 import java.time.{LocalDate, LocalTime, Month}
 
 import common.I18n
+import common.time.LocalDateTimes.createDateTime
 
 import scala.collection.immutable.Seq
 
@@ -50,6 +51,8 @@ object DatedMonth {
     Month.NOVEMBER -> "facto.date.month.nov.abbrev",
     Month.DECEMBER -> "facto.date.month.dec.abbrev"
   )
+
+  def of(year: Int, month: Month): DatedMonth = DatedMonth(LocalDate.of(year, month, 1))
 
   def containing(date: LocalDate): DatedMonth = {
     DatedMonth(startOfMonthContaining(date))
