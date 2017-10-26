@@ -10,6 +10,7 @@ import scala.collection.mutable
   */
 object GuavaReplacement {
 
+  // **************** Iterables **************** //
   object Iterables {
     def getOnlyElement[T](traversable: Traversable[T]): T = {
       val list = traversable.toList
@@ -18,12 +19,14 @@ object GuavaReplacement {
     }
   }
 
+  // **************** DoubleMath **************** //
   object DoubleMath {
     def roundToLong(x: Double): Long = {
       Math.round(x)
     }
   }
 
+  // **************** Preconditions **************** //
   object Preconditions {
     def checkNotNull[T](value: T): T = {
       if (value == null) {
@@ -33,6 +36,7 @@ object GuavaReplacement {
     }
   }
 
+  // **************** Splitter **************** //
   final class Splitter(separator: Char) {
     private var _omitEmptyStrings: Boolean = false
     private var _trimResults: Boolean = false
@@ -73,6 +77,7 @@ object GuavaReplacement {
     def on(separator: Char): Splitter = new Splitter(separator)
   }
 
+  // **************** Stopwatch **************** //
   final class Stopwatch private () {
     private var startTimeMillis = System.currentTimeMillis
 
@@ -90,6 +95,7 @@ object GuavaReplacement {
     def createStarted(): Stopwatch = new Stopwatch()
   }
 
+  // **************** Multimap **************** //
   final class ImmutableSetMultimap[A, B](private val backingMap: Map[A, Set[B]]) {
     def get(key: A): Set[B] = backingMap.getOrElse(key, Set())
     def keySet: Set[A] = backingMap.keySet
@@ -125,6 +131,7 @@ object GuavaReplacement {
     }
   }
 
+  // **************** LoadingCache **************** //
   final class LoadingCache[K, V](loader: K => V) {
     private val backingMap: mutable.Map[K, V] = mutable.Map()
 
