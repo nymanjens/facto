@@ -8,7 +8,7 @@ import common.testing.TestObjects._
 import common.time.LocalDateTimes.createDateTime
 import common.time.{DatedMonth, LocalDateTimes, YearRange}
 import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.{GainsForMonth, GainsForYear}
-import flux.stores.entries.SummaryForYearStoreFactory.SummaryForYear
+import flux.stores.entries.SummaryForYearStoreFactory.{SummaryCell, SummaryForYear}
 import models.accounting._
 import models.accounting.money.ReferenceMoney
 import utest._
@@ -58,7 +58,11 @@ object SummaryTableTest extends TestSuite {
         allYearsData.categories ==> Seq(testCategoryB, testCategoryA, testCategoryC)
       }
       "cell" - {
-        //
+        val cell = allYearsData.cell(testCategoryA, DatedMonth.of(2012, JUNE))
+        cell.transactions.size ==> 1
+        cell.transactions(0).flow.cents ==> 120
+
+        // Note: The SummaryCell methods are tested in SummaryForYearStoreFactoryTest
       }
       "totalWithoutCategories" - {
         allYearsData
