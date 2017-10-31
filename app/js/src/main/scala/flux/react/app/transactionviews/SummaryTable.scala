@@ -138,8 +138,7 @@ private[transactionviews] final class SummaryTable(
     def averageExchangeRateGains(year: Int): ReferenceMoney = {
       monthsForAverage(year) match {
         case Seq() => ReferenceMoney(0)
-        case months =>
-          DatedMonth.allMonthsIn(year).map(exchangeRateGains(_).total).sum / months.size
+        case months => months.map(exchangeRateGains(_).total).sum / months.size
       }
     }
 

@@ -117,22 +117,57 @@ object SummaryTableTest extends TestSuite {
         }
       }
       "monthsForAverage" - {
-        //
+        "full year" - {
+          allYearsData.monthsForAverage(2012) ==> DatedMonth.allMonthsIn(2012)
+        }
+        "only before June" - {
+          fakeClock.setTime(createDateTime(2012, JUNE, 2))
+          allYearsData.monthsForAverage(2012) ==>
+            Seq(
+              DatedMonth.of(2012, JANUARY),
+              DatedMonth.of(2012, FEBRUARY),
+              DatedMonth.of(2012, MARCH),
+              DatedMonth.of(2012, APRIL),
+              DatedMonth.of(2012, MAY))
+        }
+        "only after first transaction of year (April)" - {
+          val newAllYearsData = allYearsData.copy(allTransactionsYearRange = YearRange.closed(2012, 2013))
+
+          newAllYearsData.monthsForAverage(2012) ==>
+            Seq(
+              DatedMonth.of(2012, APRIL),
+              DatedMonth.of(2012, MAY),
+              DatedMonth.of(2012, JUNE),
+              DatedMonth.of(2012, JULY),
+              DatedMonth.of(2012, AUGUST),
+              DatedMonth.of(2012, SEPTEMBER),
+              DatedMonth.of(2012, OCTOBER),
+              DatedMonth.of(2012, NOVEMBER),
+              DatedMonth.of(2012, DECEMBER)
+            )
+        }
       }
       "hasExchangeRateGains" - {
-        //
+        allYearsData.hasExchangeRateGains ==> true
       }
       "exchangeRateGains" - {
-        //
+        allYearsData.exchangeRateGains(DatedMonth.of(2012, JUNE)) ==>
+          GainsForMonth.forSingle(testReservoirCashGbp, ReferenceMoney(123))
+        allYearsData.exchangeRateGains(DatedMonth.of(2012, AUGUST)) ==>
+          GainsForMonth.empty
       }
       "averageExchangeRateGains" - {
-        //
-      }
-      "cell" - {
-        //
-      }
-      "cell" - {
-        //
+        "full year" - {
+          allYearsData.averageExchangeRateGains(2012) ==> ReferenceMoney(roundToLong(123 / 12))
+        }
+        "only before June" - {
+          fakeClock.setTime(createDateTime(2012, JUNE, 2))
+          allYearsData.averageExchangeRateGains(2012) ==> ReferenceMoney(0)
+        }
+        "only after first transaction of year (April)" - {
+          val newAllYearsData = allYearsData.copy(allTransactionsYearRange = YearRange.closed(2012, 2013))
+          newAllYearsData.averageExchangeRateGains(2012) ==> ReferenceMoney(roundToLong(123.0 / 9))
+        }
       }
     }
   }
