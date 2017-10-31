@@ -25,7 +25,7 @@ class ConfigTest extends HookedSpecification {
 
     // check keys
     config.accounts.keys.toList must beEqualTo(List("ACC_COMMON", "ACC_A", "ACC_B"))
-    config.categories.keys.toList must beEqualTo(List("CAT_B", "CAT_A"))
+    config.categories.keys.toList must beEqualTo(List("CAT_B", "CAT_A", "CAT_C"))
     config.visibleReservoirs.map(_.code) must beEqualTo(
       List("CASH_COMMON", "CARD_COMMON", "CASH_A", "CARD_A", "CASH_B", "CARD_B"))
 
