@@ -20,6 +20,7 @@ class TestModule {
   implicit lazy val fakeDispatcher = wire[Dispatcher.FakeSynchronous]
   implicit lazy val fakeI18n = wire[FakeI18n]
   implicit lazy val testAccountingConfig = TestObjects.testAccountingConfig
+  implicit lazy val testUser = TestObjects.testUser
 
   // ******************* Non-fake implementations ******************* //
   implicit lazy val jsUserManager = wire[JsUserManager]

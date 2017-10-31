@@ -1,12 +1,6 @@
 package models.accounting.money
 
-import java.lang.Math.{abs, round}
 import common.GuavaReplacement.DoubleMath.roundToLong
-import java.util.Locale
-
-import models.accounting.config.Config
-
-import scala.collection.JavaConverters._
 
 /**
   * Can be mixed in a type that has cents to add some arithmetic operations.

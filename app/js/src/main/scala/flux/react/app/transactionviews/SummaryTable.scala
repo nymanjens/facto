@@ -3,6 +3,7 @@ package flux.react.app.transactionviews
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.CollectionUtils.asMap
+import common.ScalaUtils.visibleForTesting
 import common.time.{Clock, DatedMonth, YearRange}
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import flux.react.router.RouterContext
@@ -77,8 +78,9 @@ private[transactionviews] final class SummaryTable(
 
   private case class State(allYearsData: AllYearsData)
 
-  private case class AllYearsData(allTransactionsYearRange: YearRange,
-                                  private val yearsToData: ListMap[Int, AllYearsData.YearData]) {
+  @visibleForTesting private[transactionviews] case class AllYearsData(
+      allTransactionsYearRange: YearRange,
+      private val yearsToData: ListMap[Int, AllYearsData.YearData]) {
 
     /**
       * Returns the categories of the transactions in the order configured for this account.
@@ -86,9 +88,8 @@ private[transactionviews] final class SummaryTable(
       * If any transactions are not part of the configured seq, their categories are appended at the end. This should
       * normally not happen.
       */
-    def categories(implicit props: Props): Seq[Category] = {
-      props.account.categories.filter(categoriesSet) ++
-        categoriesSet.filterNot(props.account.categories.contains)
+    def categories(implicit account: Account): Seq[Category] = {
+      account.categories.filter(categoriesSet) ++ categoriesSet.filterNot(account.categories.contains)
     }
 
     def cell(category: Category, month: DatedMonth): SummaryCell =
@@ -149,7 +150,7 @@ private[transactionviews] final class SummaryTable(
       } yield category
     }.toSet
   }
-  private object AllYearsData {
+  @visibleForTesting private[transactionviews] object AllYearsData {
     val empty: AllYearsData =
       AllYearsData(allTransactionsYearRange = YearRange.empty, yearsToData = ListMap())
 
@@ -192,6 +193,7 @@ private[transactionviews] final class SummaryTable(
 
     def render(implicit props: Props, state: State) = logExceptions {
       implicit val data = state.allYearsData
+      implicit val account = props.account
       implicit val router = props.router
 
       <.table(

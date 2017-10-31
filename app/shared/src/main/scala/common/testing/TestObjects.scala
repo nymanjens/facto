@@ -146,7 +146,7 @@ object TestObjects {
   implicit val testAccountingConfig: Config = Config(
     accounts =
       createListMap("ACC_COMMON" -> testAccountCommon, "ACC_A" -> testAccountA, "ACC_B" -> testAccountB),
-    categories = createListMap("CAT_B" -> testCategoryB, "CAT_A" -> testCategoryA),
+    categories = createListMap("CAT_B" -> testCategoryB, "CAT_A" -> testCategoryA, "CAT_C" -> testCategoryC),
     moneyReservoirsMap = createListMap(
       "CASH_COMMON" -> testReservoirCashCommon,
       "CARD_COMMON" -> testReservoirCardCommon,
