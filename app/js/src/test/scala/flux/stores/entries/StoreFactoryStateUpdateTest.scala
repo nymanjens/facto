@@ -18,25 +18,8 @@ object StoreFactoryStateUpdateTest extends TestSuite {
   override def tests = TestSuite {
     implicit val database = new FakeRemoteDatabaseProxy()
     val factory: AllEntriesStoreFactory = new AllEntriesStoreFactory()
-    val store: factory.Store = factory.get(maxNumEntries = 3)
 
-    val updatesWithImpact: ListMap[EntityModification, StateImpact] = ListMap(
-      // Add Transactions
-      EntityModification.Add(createTransaction(day = 10, id = 10)) -> StateImpact.Change,
-      EntityModification.Add(createTransaction(day = 9, id = 9)) -> StateImpact.Change,
-      EntityModification.Add(createTransaction(day = 8, id = 8)) -> StateImpact.Change,
-      EntityModification.Add(createTransaction(day = 7, id = 7)) -> StateImpact.Undefined,
-      EntityModification.Add(createTransaction(day = 6, id = 6)) -> StateImpact.Undefined,
-      // Remove Transactions
-      EntityModification.Remove[Transaction](6) -> StateImpact.NoChange,
-      EntityModification.Remove[Transaction](10) -> StateImpact.Change,
-      // Add BalanceChecks
-      EntityModification.Add(createBalanceCheck(id = 91)) -> StateImpact.NoChange,
-      // Remove BalanceChecks
-      EntityModification.Remove[BalanceCheck](91) -> StateImpact.NoChange
-    )
-
-    "local update" - {
+    def runTest(store: EntriesStore[_], updatesWithImpact: ListMap[EntityModification, StateImpact]): Unit = {
       var lastState = store.state
 
       for ((update, stateImpact) <- updatesWithImpact) {
@@ -50,11 +33,26 @@ object StoreFactoryStateUpdateTest extends TestSuite {
 
         lastState = store.state
       }
+    }
 
-    }
-    "remote update" - {
-      // TODO
-    }
+    "AllEntriesStoreFactory" - runTest(
+      store = factory.get(maxNumEntries = 3),
+      updatesWithImpact = ListMap(
+        // Add Transactions
+        EntityModification.Add(createTransaction(day = 10, id = 10)) -> StateImpact.Change,
+        EntityModification.Add(createTransaction(day = 9, id = 9)) -> StateImpact.Change,
+        EntityModification.Add(createTransaction(day = 8, id = 8)) -> StateImpact.Change,
+        EntityModification.Add(createTransaction(day = 7, id = 7)) -> StateImpact.Undefined,
+        EntityModification.Add(createTransaction(day = 6, id = 6)) -> StateImpact.Undefined,
+        // Remove Transactions
+        EntityModification.Remove[Transaction](6) -> StateImpact.NoChange,
+        EntityModification.Remove[Transaction](10) -> StateImpact.Change,
+        // Add BalanceChecks
+        EntityModification.Add(createBalanceCheck(id = 91)) -> StateImpact.NoChange,
+        // Remove BalanceChecks
+        EntityModification.Remove[BalanceCheck](91) -> StateImpact.NoChange
+      )
+    )
   }
 
   private sealed trait StateImpact
