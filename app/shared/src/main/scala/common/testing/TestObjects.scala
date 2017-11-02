@@ -236,7 +236,7 @@ object TestObjects {
   def testModification: EntityModification = testModificationA
 
   def createTransaction(id: Long = -1,
-                        groupId: Long = 1273984,
+                        groupId: Long = -1,
                         issuer: User = testUserA,
                         beneficiary: Account = testAccountA,
                         reservoir: MoneyReservoir = null,
@@ -250,7 +250,7 @@ object TestObjects {
                         tags: Seq[String] = Seq("some-tag")): Transaction = {
     testTransactionWithId.copy(
       idOption = Some(if (id == -1) EntityModification.generateRandomId() else id),
-      transactionGroupId = groupId,
+      transactionGroupId = if (id == -1) EntityModification.generateRandomId() else id,
       issuerId = issuer.id,
       beneficiaryAccountCode = beneficiary.code,
       moneyReservoirCode = Option(reservoir).map(_.code) getOrElse "",
@@ -266,7 +266,6 @@ object TestObjects {
   }
 
   def createBalanceCheck(id: Long = -1,
-                         groupId: Long = 1273984,
                          issuer: User = testUserA,
                          reservoir: MoneyReservoir = testReservoir,
                          year: Int = 2012,
