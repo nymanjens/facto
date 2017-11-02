@@ -4,7 +4,7 @@ import java.time.Month
 
 import common.time.{LocalDateTime, LocalDateTimes}
 import models.User
-import java.time.Month.{JANUARY, MARCH}
+import java.time.Month._
 
 import common.time.LocalDateTimes.createDateTime
 import models.accounting.config.Account.SummaryTotalRowDef
@@ -262,6 +262,24 @@ object TestObjects {
       createdDate = createDateTime(year, month, day),
       transactionDate = createDateTime(year, month, day),
       consumedDate = createDateTime(year, month, day)
+    )
+  }
+
+  def createBalanceCheck(id: Long = -1,
+                         groupId: Long = 1273984,
+                         issuer: User = testUserA,
+                         reservoir: MoneyReservoir = testReservoir,
+                         year: Int = 2012,
+                         month: Month = MARCH,
+                         day: Int = 25,
+                         balance: Double = 998): BalanceCheck = {
+    BalanceCheck(
+      idOption = Some(if (id == -1) EntityModification.generateRandomId() else id),
+      moneyReservoirCode = testReservoir.code,
+      balanceInCents = (balance * 100).toLong,
+      issuerId = issuer.id,
+      createdDate = createDateTime(year, month, day),
+      checkDate = createDateTime(year, month, day)
     )
   }
 }
