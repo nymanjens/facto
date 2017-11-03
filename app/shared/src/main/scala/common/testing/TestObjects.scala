@@ -250,7 +250,7 @@ object TestObjects {
                         tags: Seq[String] = Seq("some-tag")): Transaction = {
     testTransactionWithId.copy(
       idOption = Some(if (id == -1) EntityModification.generateRandomId() else id),
-      transactionGroupId = if (id == -1) EntityModification.generateRandomId() else id,
+      transactionGroupId = if (groupId == -1) EntityModification.generateRandomId() else groupId,
       issuerId = issuer.id,
       beneficiaryAccountCode = beneficiary.code,
       moneyReservoirCode = Option(reservoir).map(_.code) getOrElse "",
