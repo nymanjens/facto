@@ -1,11 +1,11 @@
 package flux.stores.entries
 
-import common.time.{Clock, YearRange}
+import common.time.YearRange
+import flux.stores.entries.SummaryYearsStoreFactory.State
 import jsfacades.LokiJs
-import jsfacades.LokiJs.Sorting
 import models.access.RemoteDatabaseProxy
-import models.accounting.{BalanceCheck, Transaction}
 import models.accounting.config.Account
+import models.accounting.{BalanceCheck, Transaction}
 
 import scala.collection.immutable.Seq
 import scala2js.Converters._
@@ -18,7 +18,7 @@ import scala2js.Keys
   * more (although unlikely).
   */
 final class SummaryYearsStoreFactory(implicit database: RemoteDatabaseProxy)
-    extends EntriesStoreFactory[YearRange] {
+    extends EntriesStoreFactory[State] {
 
   // **************** Implementation of EntriesStoreFactory methods/types ****************//
   override protected def createNew(account: Account) = new Store {
@@ -41,11 +41,11 @@ final class SummaryYearsStoreFactory(implicit database: RemoteDatabaseProxy)
         latest <- getFirstAfterSorting(LokiJs.Sorting.descBy(Keys.Transaction.consumedDate))
       } yield YearRange.closed(earliest.consumedDate.getYear, latest.consumedDate.getYear)
 
-      rangeOption getOrElse YearRange.empty
+      State(rangeOption getOrElse YearRange.empty)
     }
 
-    override protected def transactionUpsertImpactsState(transaction: Transaction, oldYears: YearRange) =
-      transaction.beneficiaryAccountCode == account.code && !oldYears.contains(
+    override protected def transactionUpsertImpactsState(transaction: Transaction, oldState: State) =
+      transaction.beneficiaryAccountCode == account.code && !oldState.yearRange.contains(
         transaction.consumedDate.getYear)
     override protected def transactionRemovalImpactsState(transactionId: Long, state: State) = {
       // This is a heuristic because showing too many years unlikely to be an issue and generally unlikely to happen
@@ -58,4 +58,8 @@ final class SummaryYearsStoreFactory(implicit database: RemoteDatabaseProxy)
 
   /* override */
   protected type Input = Account
+}
+
+object SummaryYearsStoreFactory {
+  case class State(yearRange: YearRange)
 }

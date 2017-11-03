@@ -354,7 +354,7 @@ private[transactionviews] final class SummaryTable(
     private def doStateUpdate(props: Props): Unit = {
       val (data, usedStores): (AllYearsData, Set[EntriesStore[_]]) = {
         val yearsStore = summaryYearsStoreFactory.get(props.account)
-        val allTransactionsYearRange = yearsStore.state
+        val allTransactionsYearRange = yearsStore.state.yearRange
         val yearRange = allTransactionsYearRange
           .copyIncluding(clock.now.getYear)
           .copyWithLowerBound(props.yearLowerBound)
