@@ -31,7 +31,8 @@ object EndowmentEntriesStoreFactoryTest extends TestSuite {
       val store = factory.get(testAccountA, maxNumEntries = 5)
 
       store.state.hasMore ==> false
-      store.state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(trans1), Seq(trans2), Seq(trans3), Seq(trans4))
+      store.state.entries ==> GeneralEntry
+        .toGeneralEntrySeq(Seq(trans1), Seq(trans2), Seq(trans3), Seq(trans4))
     }
 
     "respects maxNumEntries" - {
