@@ -8,6 +8,7 @@ import common.time.LocalDateTime
 import common.time.LocalDateTimes.createDateTime
 import models.accounting._
 import models.manager.EntityModification
+import models.manager.EntityModification._
 import utest._
 
 import scala.collection.immutable.{ListMap, Seq}
@@ -17,43 +18,24 @@ object StoreFactoryStateUpdateTest extends TestSuite {
 
   override def tests = TestSuite {
     val testModule = new ThisTestModule()
-    val database = testModule.fakeRemoteDatabaseProxy
-
-    def runTest(store: EntriesStore[_], updatesWithImpact: ListMap[EntityModification, StateImpact]): Unit = {
-      var lastState = store.state
-
-      for ((update, stateImpact) <- updatesWithImpact) {
-        database.persistModifications(update)
-
-        stateImpact match {
-          case StateImpact.NoChange =>
-            store.state ==> lastState
-          case StateImpact.Change =>
-            val storeState = store.state
-            assert(storeState != lastState)
-          case StateImpact.Undefined =>
-        }
-
-        lastState = store.state
-      }
-    }
+    implicit val database = testModule.fakeRemoteDatabaseProxy
 
     "AllEntriesStoreFactory" - runTest(
       store = testModule.allEntriesStoreFactory.get(maxNumEntries = 3),
       updatesWithImpact = ListMap(
         // Add Transactions
-        EntityModification.Add(createTransaction(day = 10, id = 10)) -> StateImpact.Change,
-        EntityModification.Add(createTransaction(day = 9, id = 9)) -> StateImpact.Change,
-        EntityModification.Add(createTransaction(day = 8, id = 8)) -> StateImpact.Change,
-        EntityModification.Add(createTransaction(day = 7, id = 7)) -> StateImpact.Change,
-        EntityModification.Add(createTransaction(day = 6, id = 6)) -> StateImpact.NoChange,
+        Add(createTransaction(day = 10, id = 10)) -> StateImpact.Change,
+        Add(createTransaction(day = 9, id = 9)) -> StateImpact.Change,
+        Add(createTransaction(day = 8, id = 8)) -> StateImpact.Change,
+        Add(createTransaction(day = 7, id = 7)) -> StateImpact.Change,
+        Add(createTransaction(day = 6, id = 6)) -> StateImpact.NoChange,
         // Remove Transactions
-        EntityModification.Remove[Transaction](6) -> StateImpact.NoChange,
-        EntityModification.Remove[Transaction](10) -> StateImpact.Change,
+        Remove[Transaction](6) -> StateImpact.NoChange,
+        Remove[Transaction](10) -> StateImpact.Change,
         // Add BalanceChecks
-        EntityModification.Add(createBalanceCheck(id = 91)) -> StateImpact.NoChange,
+        Add(createBalanceCheck(id = 91)) -> StateImpact.NoChange,
         // Remove BalanceChecks
-        EntityModification.Remove[BalanceCheck](91) -> StateImpact.NoChange
+        Remove[BalanceCheck](91) -> StateImpact.NoChange
       )
     )
 
@@ -62,26 +44,63 @@ object StoreFactoryStateUpdateTest extends TestSuite {
         testModule.cashFlowEntriesStoreFactory.get(moneyReservoir = testReservoirCardA, maxNumEntries = 2),
       updatesWithImpact = ListMap(
         // Add Transactions and BalanceChecks
-        EntityModification
-          .Add(createTransaction(day = 10, id = 10, reservoir = testReservoirCardA)) -> StateImpact.Change,
-        EntityModification
-          .Add(createTransaction(day = 9, id = 9, reservoir = testReservoirCardA)) -> StateImpact.Change,
-        EntityModification
-          .Add(createTransaction(day = 8, id = 8, reservoir = testReservoirCardA)) -> StateImpact.Change,
-        EntityModification
-          .Add(createTransaction(day = 7, id = 7, reservoir = testReservoirCardB)) -> StateImpact.Change,
-        EntityModification
-          .Add(createBalanceCheck(day = 6, id = 96, reservoir = testReservoirCardB)) -> StateImpact.Change,
-        EntityModification
-          .Add(createTransaction(day = 5, id = 5, reservoir = testReservoirCardB)) -> StateImpact.NoChange,
-        EntityModification
-          .Add(createBalanceCheck(day = 4, id = 94, reservoir = testReservoirCardB)) -> StateImpact.NoChange,
+        Add(createTransaction(day = 10, id = 10, reservoir = testReservoirCardA)) -> StateImpact.Change,
+        Add(createTransaction(day = 9, id = 9, reservoir = testReservoirCardA)) -> StateImpact.Change,
+        Add(createTransaction(day = 8, id = 8, reservoir = testReservoirCardA)) -> StateImpact.Change,
+        Add(createTransaction(day = 7, id = 7, reservoir = testReservoirCardA)) -> StateImpact.Change,
+        Add(createBalanceCheck(day = 6, id = 6, reservoir = testReservoirCardA)) -> StateImpact.Change,
+        Add(createTransaction(day = 5, id = 5, reservoir = testReservoirCardA)) -> StateImpact.NoChange,
+        Add(createBalanceCheck(day = 4, id = 4, reservoir = testReservoirCardA)) -> StateImpact.NoChange,
+        // Adding irrelevant Transactions and BalanceChecks
+        Add(createTransaction(day = 11, id = 11, reservoir = testReservoirCardB)) -> StateImpact.NoChange,
+        Add(createBalanceCheck(day = 12, id = 12, reservoir = testReservoirCardB)) -> StateImpact.NoChange,
         // Remove Transactions and BalanceChecks
-        EntityModification.Remove[Transaction](5) -> StateImpact.NoChange,
-        EntityModification.Remove[Transaction](6) -> StateImpact.Change,
-        EntityModification.Remove[Transaction](4) -> StateImpact.Change
+        Remove[Transaction](5) -> StateImpact.NoChange,
+        Remove[BalanceCheck](6) -> StateImpact.Change,
+        Remove[BalanceCheck](4) -> StateImpact.Change,
+        // Removing irrelevant Transactions and BalanceChecks
+        Remove[Transaction](11) -> StateImpact.NoChange,
+        Remove[BalanceCheck](12) -> StateImpact.NoChange
       )
     )
+  }
+
+  private def runTest(store: EntriesStore[_], updatesWithImpact: ListMap[EntityModification, StateImpact])(
+      implicit database: FakeRemoteDatabaseProxy): Unit = {
+    var lastState = store.state
+
+    for ((update, stateImpact) <- updatesWithImpact) {
+      database.persistModifications(update)
+
+      stateImpact match {
+        case StateImpact.NoChange =>
+          Predef.assert(
+            removeImpactingIds(store.state) == removeImpactingIds(lastState),
+            s"For update $update:\n" +
+              s"Expected states to be the same (ignoring impacting IDs).\n" +
+              s"Previous: ${lastState}\n" +
+              s"Current:  ${store.state}\n"
+          )
+        case StateImpact.Change =>
+          Predef.assert(
+            removeImpactingIds(store.state) != removeImpactingIds(lastState),
+            s"For update $update:\n" +
+              s"Expected states to be different (ignoring impacting IDs).\n" +
+              s"Previous: ${lastState}\n" +
+              s"Current:  ${store.state}\n"
+          )
+        case StateImpact.Undefined =>
+      }
+
+      lastState = store.state
+    }
+  }
+
+  private def removeImpactingIds(state: Any): EntriesStore.StateTrait = {
+    state match {
+      case s: EntriesListStoreFactory.State[_] =>
+        s.copy(impactingTransactionIds = Set(), impactingBalanceCheckIds = Set())
+    }
   }
 
   private sealed trait StateImpact
