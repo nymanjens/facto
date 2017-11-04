@@ -43,8 +43,12 @@ final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProx
           LiquidationEntry(first.transactions ++ last.transactions, last.debt)
       }
 
-      EntriesListStoreFactory.State
-        .withImpactingIdsInEntries(entries.takeRight(maxNumEntries), hasMore = entries.size > maxNumEntries)
+      EntriesListStoreFactory.State(
+        entries.takeRight(maxNumEntries),
+        hasMore = entries.size > maxNumEntries,
+        impactingTransactionIds = relevantTransactions.toStream.map(_.id).toSet,
+        impactingBalanceCheckIds = Set()
+      )
     }
 
     override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) =
