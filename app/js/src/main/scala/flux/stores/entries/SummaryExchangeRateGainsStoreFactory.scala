@@ -45,12 +45,8 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
 
     override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) =
       isRelevantReservoir(transaction.moneyReservoir) && transaction.transactionDate.getYear <= input.year
-    override protected def transactionRemovalImpactsState(transactionId: Long, state: GainsForYear) =
-      state.impactedByTransactionId(transactionId)
     override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) =
       isRelevantReservoir(balanceCheck.moneyReservoir) && balanceCheck.checkDate.getYear <= input.year
-    override protected def balanceCheckRemovalImpactsState(balanceCheckId: Long, state: State) =
-      state.impactedByBalanceCheckId(balanceCheckId)
 
     // **************** Private helper methods ****************//
     private def calculateGainsForYear(reservoir: MoneyReservoir): GainsForYear = {
@@ -192,13 +188,9 @@ object SummaryExchangeRateGainsStoreFactory {
   }
 
   case class GainsForYear(private val monthToGains: Map[DatedMonth, GainsForMonth],
-                          private val impactingTransactionIds: Set[Long],
-                          private val impactingBalanceCheckIds: Set[Long]) {
-    private[SummaryExchangeRateGainsStoreFactory] def impactedByTransactionId(id: Long): Boolean =
-      impactingTransactionIds contains id
-    private[SummaryExchangeRateGainsStoreFactory] def impactedByBalanceCheckId(id: Long): Boolean =
-      impactingBalanceCheckIds contains id
-
+                          protected override val impactingTransactionIds: Set[Long],
+                          protected override val impactingBalanceCheckIds: Set[Long])
+      extends EntriesStore.StateTrait {
     def gainsForMonth(month: DatedMonth): GainsForMonth = monthToGains.getOrElse(month, GainsForMonth.empty)
     def nonEmpty: Boolean = this != GainsForYear.empty
   }

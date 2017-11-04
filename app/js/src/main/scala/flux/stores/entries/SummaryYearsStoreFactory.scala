@@ -39,21 +39,18 @@ final class SummaryYearsStoreFactory(implicit database: RemoteDatabaseProxy)
       val rangeOption = for {
         earliest <- getFirstAfterSorting(LokiJs.Sorting.ascBy(Keys.Transaction.consumedDate))
         latest <- getFirstAfterSorting(LokiJs.Sorting.descBy(Keys.Transaction.consumedDate))
-      } yield YearRange.closed(earliest.consumedDate.getYear, latest.consumedDate.getYear)
+      } yield
+        State(
+          YearRange.closed(earliest.consumedDate.getYear, latest.consumedDate.getYear),
+          impactingTransactionIds = Set(earliest.id, latest.id))
 
-      State(rangeOption getOrElse YearRange.empty)
+      rangeOption getOrElse State.empty
     }
 
     override protected def transactionUpsertImpactsState(transaction: Transaction, oldState: State) =
       transaction.beneficiaryAccountCode == account.code && !oldState.yearRange.contains(
         transaction.consumedDate.getYear)
-    override protected def transactionRemovalImpactsState(transactionId: Long, state: State) = {
-      // This is a heuristic because showing too many years unlikely to be an issue and generally unlikely to happen
-      // anyway.
-      false
-    }
     override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) = false
-    override protected def balanceCheckRemovalImpactsState(balanceCheckId: Long, state: State) = false
   }
 
   /* override */
@@ -61,5 +58,11 @@ final class SummaryYearsStoreFactory(implicit database: RemoteDatabaseProxy)
 }
 
 object SummaryYearsStoreFactory {
-  case class State(yearRange: YearRange)
+  case class State(yearRange: YearRange, protected override val impactingTransactionIds: Set[Long])
+      extends EntriesStore.StateTrait {
+    protected override def impactingBalanceCheckIds = Set()
+  }
+  object State {
+    def empty: State = State(YearRange.empty, impactingTransactionIds = Set())
+  }
 }

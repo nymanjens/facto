@@ -154,31 +154,19 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
       }
       entries = mergeValidatingBCs(entries).toList
 
-      EntriesListStoreFactory.State(entries.takeRight(maxNumEntries), hasMore = entries.size > maxNumEntries)
+      // TODO: Populate impactingTransactionIds and impactingBalanceCheckIds
+      EntriesListStoreFactory.State(
+        entries.takeRight(maxNumEntries),
+        hasMore = entries.size > maxNumEntries,
+        impactingTransactionIds = Set(),
+        impactingBalanceCheckIds = Set())
     }
 
     override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) =
       transaction.moneyReservoir == moneyReservoir
 
-    override protected def transactionRemovalImpactsState(transactionId: Long, state: State) =
-      state.entries.toStream
-        .flatMap {
-          case entry: RegularEntry => entry.transactions
-          case entry: BalanceCorrection => Seq()
-        }
-        .map(_.id)
-        .contains(transactionId)
-
     override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) =
       balanceCheck.moneyReservoir == moneyReservoir
-
-    override protected def balanceCheckRemovalImpactsState(balanceCheckId: Long, state: State) =
-      state.entries.toStream
-        .flatMap {
-          case entry: RegularEntry => Seq()
-          case entry: BalanceCorrection => Seq(entry.balanceCheck.id)
-        }
-        .contains(balanceCheckId)
   }
 
   def get(moneyReservoir: MoneyReservoir, maxNumEntries: Int): Store =

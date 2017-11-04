@@ -31,8 +31,8 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       database.addRemotelyAddedEntities(testTransactionWithId)
 
-      store.state ==> EntriesListStoreFactory.State
-        .withGeneralEntries(hasMore = false, Seq(testTransactionWithId))
+      store.state.hasMore ==> false
+      store.state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(testTransactionWithId))
     }
 
     "store state is updated upon local update" - {
@@ -40,14 +40,14 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       database.persistModifications(Seq(EntityModification.Add(testTransactionWithId)))
 
-      store.state ==> EntriesListStoreFactory.State
-        .withGeneralEntries(hasMore = false, Seq(testTransactionWithId))
+      store.state.hasMore ==> false
+      store.state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(testTransactionWithId))
     }
 
     "store state is updated upon local removal" - {
       database.persistModifications(Seq(EntityModification.Add(testTransactionWithId)))
-      store.state ==> EntriesListStoreFactory.State
-        .withGeneralEntries(hasMore = false, Seq(testTransactionWithId))
+      store.state.hasMore ==> false
+      store.state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(testTransactionWithId))
 
       database.persistModifications(Seq(EntityModification.Remove[Transaction](testTransactionWithId.id)))
 
@@ -80,8 +80,8 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       database.addRemotelyAddedEntities(trans1, trans2, trans3)
 
-      store.state ==> EntriesListStoreFactory.State
-        .withGeneralEntries(hasMore = false, Seq(trans1, trans2), Seq(trans3))
+      store.state.hasMore ==> false
+      store.state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(trans1, trans2), Seq(trans3))
     }
 
     "sorts entries on transaction date first and then created date" - {
@@ -107,8 +107,8 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       database.addRemotelyAddedEntities(trans3, trans2, trans1)
 
-      store.state ==> EntriesListStoreFactory.State
-        .withGeneralEntries(hasMore = false, Seq(trans1), Seq(trans2), Seq(trans3))
+      store.state.hasMore ==> false
+      store.state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(trans1), Seq(trans2), Seq(trans3))
     }
 
     "respects maxNumEntries" - {
@@ -122,8 +122,8 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       database.addRemotelyAddedEntities(trans1, trans2, trans3, trans4)
 
-      store.state ==> EntriesListStoreFactory.State
-        .withGeneralEntries(hasMore = true, Seq(trans2), Seq(trans3), Seq(trans4))
+      store.state.hasMore ==> true
+      store.state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(trans2), Seq(trans3), Seq(trans4))
     }
   }
 }

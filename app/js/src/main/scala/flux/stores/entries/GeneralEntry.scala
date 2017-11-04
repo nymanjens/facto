@@ -15,4 +15,7 @@ object GeneralEntry {
         GeneralEntry(first.transactions ++ last.transactions)
     }
   }
+
+  def toGeneralEntrySeq(transactionSeqs: Seq[Transaction]*): Seq[GeneralEntry] =
+    transactionSeqs.map(GeneralEntry.apply).toVector
 }

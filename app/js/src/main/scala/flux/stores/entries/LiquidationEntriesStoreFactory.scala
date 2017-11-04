@@ -44,8 +44,9 @@ final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProx
             LiquidationEntry(first.transactions ++ last.transactions, last.debt)
         }
 
-        EntriesListStoreFactory
-          .State(entries.takeRight(maxNumEntries), hasMore = entries.size > maxNumEntries)
+        EntriesListStoreFactory.State.withImpactingIdsInEntries(
+          entries.takeRight(maxNumEntries),
+          hasMore = entries.size > maxNumEntries)
       }
 
       override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) =

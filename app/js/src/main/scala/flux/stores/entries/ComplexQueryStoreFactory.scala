@@ -30,7 +30,7 @@ final class ComplexQueryStoreFactory(implicit database: RemoteDatabaseProxy,
 
         entries = GeneralEntry.combineConsecutiveOfSameGroup(entries)
 
-        EntriesListStoreFactory.State(
+        EntriesListStoreFactory.State.withImpactingIdsInEntries(
           entries.takeRight(maxNumEntries),
           hasMore = entries.size > maxNumEntries)
       }
