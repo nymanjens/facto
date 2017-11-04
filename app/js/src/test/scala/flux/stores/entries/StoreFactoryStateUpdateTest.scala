@@ -77,6 +77,7 @@ object StoreFactoryStateUpdateTest extends TestSuite {
         Remove[BalanceCheck](11) -> StateImpact.NoChange
       )
     )
+
     "EndowmentEntriesStoreFactory" - runTest(
       store = testModule.endowmentEntriesStoreFactory.get(account = testAccountA, maxNumEntries = 3),
       updatesWithImpact = ListMap(
@@ -92,6 +93,28 @@ object StoreFactoryStateUpdateTest extends TestSuite {
         Remove[Transaction](10) -> StateImpact.Change,
         Remove[Transaction](9) -> StateImpact.NoChange,
         Remove[Transaction](8) -> StateImpact.NoChange,
+        // Add BalanceChecks
+        Add(createBalanceCheck(id = 11)) -> StateImpact.NoChange,
+        // Remove BalanceChecks
+        Remove[BalanceCheck](11) -> StateImpact.NoChange
+      )
+    )
+
+    "LiquidationEntriesStoreFactory" - runTest(
+      store = testModule.liquidationEntriesStoreFactory
+        .get(accountPair = AccountPair(testAccountA, testAccountB), maxNumEntries = 2),
+      updatesWithImpact = ListMap(
+        // Add Transactions
+        Add(createTransaction(id = 10, beneficiary = testAccountA, reservoir = testReservoirCardB)) -> StateImpact.Change,
+        Add(createTransaction(id = 9, beneficiary = testAccountA, reservoir = testReservoirCardA)) -> StateImpact.NoChange,
+        Add(createTransaction(id = 8, beneficiary = testAccountA, reservoir = testReservoirCardB)) -> StateImpact.Change,
+        Add(createTransaction(id = 7, beneficiary = testAccountA, reservoir = testReservoirCardB)) -> StateImpact.Change,
+        Add(createTransaction(id = 6, beneficiary = testAccountA, reservoir = testReservoirCardB)) -> StateImpact.Change,
+        Add(createTransaction(id = 5, beneficiary = testAccountA, reservoir = testReservoirCardB)) -> StateImpact.Change,
+        // Remove Transactions
+        Remove[Transaction](5) -> StateImpact.Change,
+        Remove[Transaction](9) -> StateImpact.NoChange,
+        Remove[Transaction](10) -> StateImpact.Change,
         // Add BalanceChecks
         Add(createBalanceCheck(id = 11)) -> StateImpact.NoChange,
         // Remove BalanceChecks
