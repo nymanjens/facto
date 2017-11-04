@@ -59,6 +59,22 @@ object StoreFactoryStateUpdateTest extends TestSuite {
         Remove[BalanceCheck](12) -> StateImpact.NoChange
       )
     )
+
+    "ComplexQueryStoreFactory" - runTest(
+      store = testModule.complexQueryStoreFactory.get(query = "ABCD", maxNumEntries = 3),
+      updatesWithImpact = ListMap(
+        // Add Transactions
+        Add(createTransaction(description = "ABCDE", id = 10)) -> StateImpact.Change,
+        Add(createTransaction(description = "XXYZ", id = 9)) -> StateImpact.NoChange,
+        // Remove Transactions
+        Remove[Transaction](6) -> StateImpact.NoChange,
+        Remove[Transaction](10) -> StateImpact.Change,
+        // Add BalanceChecks
+        Add(createBalanceCheck(id = 11)) -> StateImpact.NoChange,
+        // Remove BalanceChecks
+        Remove[BalanceCheck](11) -> StateImpact.NoChange
+      )
+    )
   }
 
   private def runTest(store: EntriesStore[_], updatesWithImpact: ListMap[EntityModification, StateImpact])(
