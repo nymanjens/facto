@@ -1,17 +1,13 @@
 package flux.stores.entries
 
-import java.time.Month.JANUARY
-
-import common.testing.{FakeRemoteDatabaseProxy, TestModule}
 import common.testing.TestObjects._
-import common.time.LocalDateTime
-import common.time.LocalDateTimes.createDateTime
+import common.testing.{FakeRemoteDatabaseProxy, TestModule}
 import models.accounting._
 import models.manager.EntityModification
 import models.manager.EntityModification._
 import utest._
 
-import scala.collection.immutable.{ListMap, Seq}
+import scala.collection.immutable.ListMap
 import scala2js.Converters._
 
 object StoreFactoryStateUpdateTest extends TestSuite {
@@ -78,7 +74,7 @@ object StoreFactoryStateUpdateTest extends TestSuite {
             removeImpactingIds(store.state) == removeImpactingIds(lastState),
             s"For update $update:\n" +
               s"Expected states to be the same (ignoring impacting IDs).\n" +
-              s"Previous: ${lastState}\n" +
+              s"Previous: $lastState\n" +
               s"Current:  ${store.state}\n"
           )
         case StateImpact.Change =>
@@ -86,7 +82,7 @@ object StoreFactoryStateUpdateTest extends TestSuite {
             removeImpactingIds(store.state) != removeImpactingIds(lastState),
             s"For update $update:\n" +
               s"Expected states to be different (ignoring impacting IDs).\n" +
-              s"Previous: ${lastState}\n" +
+              s"Previous: $lastState\n" +
               s"Current:  ${store.state}\n"
           )
         case StateImpact.Undefined =>
