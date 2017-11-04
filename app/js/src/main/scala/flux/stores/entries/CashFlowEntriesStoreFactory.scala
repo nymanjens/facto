@@ -21,7 +21,7 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
 
   override protected def createNew(maxNumEntries: Int, moneyReservoir: MoneyReservoir) = new Store {
     override protected def calculateState() = {
-      val (oldestBalanceDate, initialBalance): (LocalDateTime, MoneyWithGeneralCurrency) = {
+      val oldestBalanceCheck: Option[BalanceCheck] = {
         val numTransactionsToFetch = 3 * maxNumEntries
         val totalNumTransactions =
           database
@@ -30,7 +30,7 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
             .count()
 
         if (totalNumTransactions < numTransactionsToFetch) {
-          (LocalDateTime.MIN, MoneyWithGeneralCurrency(0, moneyReservoir.currency)) // get all entries
+          None // get all entries
 
         } else {
           // get oldest oldestTransDate
@@ -49,25 +49,24 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
               .transactionDate
 
           // get relevant balance checks
-          val oldestBC =
-            database
-              .newQuery[BalanceCheck]()
-              .filterEqual(Keys.BalanceCheck.moneyReservoirCode, moneyReservoir.code)
-              .filter(LokiJs.Filter.lessThan(Keys.BalanceCheck.checkDate, oldestTransDate))
-              .sort(
-                LokiJs.Sorting
-                  .descBy(Keys.BalanceCheck.checkDate)
-                  .thenDescBy(Keys.BalanceCheck.createdDate)
-                  .thenDescBy(Keys.id))
-              .limit(1)
-              .data()
-              .headOption
-          val oldestBalanceDate = oldestBC.map(_.checkDate).getOrElse(LocalDateTime.MIN)
-          val initialBalance =
-            oldestBC.map(_.balance).getOrElse(MoneyWithGeneralCurrency(0, moneyReservoir.currency))
-          (oldestBalanceDate, initialBalance)
+          database
+            .newQuery[BalanceCheck]()
+            .filterEqual(Keys.BalanceCheck.moneyReservoirCode, moneyReservoir.code)
+            .filter(LokiJs.Filter.lessThan(Keys.BalanceCheck.checkDate, oldestTransDate))
+            .sort(
+              LokiJs.Sorting
+                .descBy(Keys.BalanceCheck.checkDate)
+                .thenDescBy(Keys.BalanceCheck.createdDate)
+                .thenDescBy(Keys.id))
+            .limit(1)
+            .data()
+            .headOption
         }
       }
+
+      val oldestBalanceDate = oldestBalanceCheck.map(_.checkDate).getOrElse(LocalDateTime.MIN)
+      val initialBalance =
+        oldestBalanceCheck.map(_.balance).getOrElse(MoneyWithGeneralCurrency(0, moneyReservoir.currency))
 
       val balanceChecks: Seq[BalanceCheck] =
         database
@@ -154,12 +153,12 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
       }
       entries = mergeValidatingBCs(entries).toList
 
-      // TODO: Populate impactingTransactionIds and impactingBalanceCheckIds
       EntriesListStoreFactory.State(
         entries.takeRight(maxNumEntries),
         hasMore = entries.size > maxNumEntries,
-        impactingTransactionIds = Set(),
-        impactingBalanceCheckIds = Set())
+        impactingTransactionIds = transactions.toStream.map(_.id).toSet,
+        impactingBalanceCheckIds = (balanceChecks.toStream ++ oldestBalanceCheck).map(_.id).toSet
+      )
     }
 
     override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) =
