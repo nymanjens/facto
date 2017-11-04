@@ -110,7 +110,16 @@ object StoreFactoryStateUpdateTest extends TestSuite {
 
     import com.softwaremill.macwire._
 
-    implicit val allEntriesStoreFactory: AllEntriesStoreFactory = wire[AllEntriesStoreFactory]
-    implicit val cashFlowEntriesStoreFactory: CashFlowEntriesStoreFactory = wire[CashFlowEntriesStoreFactory]
+    implicit private val complexQueryFilter = wire[ComplexQueryFilter]
+
+    val allEntriesStoreFactory = wire[AllEntriesStoreFactory]
+    val cashFlowEntriesStoreFactory = wire[CashFlowEntriesStoreFactory]
+    val complexQueryStoreFactory = wire[ComplexQueryStoreFactory]
+    val endowmentEntriesStoreFactory = wire[EndowmentEntriesStoreFactory]
+    val liquidationEntriesStoreFactory = wire[LiquidationEntriesStoreFactory]
+    val summaryExchangeRateGainsStoreFactory = wire[SummaryExchangeRateGainsStoreFactory]
+    val summaryForYearStoreFactory = wire[SummaryForYearStoreFactory]
+    val summaryYearsStoreFactory = wire[SummaryYearsStoreFactory]
+    val tagsStoreFactory = wire[TagsStoreFactory]
   }
 }
