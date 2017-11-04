@@ -33,6 +33,7 @@ case class DatedMonth(startDate: LocalDate) extends Ordered[DatedMonth] {
   def startTimeOfNextMonth: LocalDateTime = LocalDateTime.of(startDateOfNextMonth, LocalTime.MIN)
 
   override def compare(that: DatedMonth): Int = this.startDate compareTo that.startDate
+  override def toString = s"$month $year"
 }
 
 object DatedMonth {

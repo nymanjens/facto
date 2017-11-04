@@ -21,7 +21,7 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
 
   override protected def createNew(maxNumEntries: Int, moneyReservoir: MoneyReservoir) = new Store {
     override protected def calculateState() = {
-      val oldestBalanceCheck: Option[BalanceCheck] = {
+      val oldestRelevantBalanceCheck: Option[BalanceCheck] = {
         val numTransactionsToFetch = 3 * maxNumEntries
         val totalNumTransactions =
           database
@@ -64,9 +64,11 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
         }
       }
 
-      val oldestBalanceDate = oldestBalanceCheck.map(_.checkDate).getOrElse(LocalDateTime.MIN)
+      val oldestBalanceDate = oldestRelevantBalanceCheck.map(_.checkDate).getOrElse(LocalDateTime.MIN)
       val initialBalance =
-        oldestBalanceCheck.map(_.balance).getOrElse(MoneyWithGeneralCurrency(0, moneyReservoir.currency))
+        oldestRelevantBalanceCheck
+          .map(_.balance)
+          .getOrElse(MoneyWithGeneralCurrency(0, moneyReservoir.currency))
 
       val balanceChecks: Seq[BalanceCheck] =
         database
@@ -157,7 +159,7 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
         entries.takeRight(maxNumEntries),
         hasMore = entries.size > maxNumEntries,
         impactingTransactionIds = transactions.toStream.map(_.id).toSet,
-        impactingBalanceCheckIds = (balanceChecks.toStream ++ oldestBalanceCheck).map(_.id).toSet
+        impactingBalanceCheckIds = (balanceChecks.toStream ++ oldestRelevantBalanceCheck).map(_.id).toSet
       )
     }
 

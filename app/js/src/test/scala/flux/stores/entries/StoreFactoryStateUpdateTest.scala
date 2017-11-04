@@ -1,8 +1,12 @@
 package flux.stores.entries
 
+import java.time.Month._
 import common.testing.TestObjects._
 import common.testing.{FakeRemoteDatabaseProxy, TestModule}
+import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.GainsForYear
+import flux.stores.entries.SummaryForYearStoreFactory.SummaryForYear
 import models.accounting._
+import models.accounting.money.ExchangeRateMeasurement
 import models.manager.{EntityManager, EntityModification, EntityType}
 import models.manager.EntityModification._
 import utest._
@@ -121,6 +125,43 @@ object StoreFactoryStateUpdateTest extends TestSuite {
         Remove[BalanceCheck](11) -> StateImpact.NoChange
       )
     )
+
+    "SummaryExchangeRateGainsStoreFactory" - runTest(
+      store = testModule.summaryExchangeRateGainsStoreFactory.get(account = testAccountA, year = 2015),
+      updatesWithImpact = ListMap(
+        // Seed random fluctuating prices
+        Add(createExchangeRateMeasurement(year = 2014)) -> StateImpact.NoChange,
+        Add(createExchangeRateMeasurement(year = 2015, month = FEBRUARY)) -> StateImpact.NoChange,
+        Add(createExchangeRateMeasurement(year = 2015, month = JULY)) -> StateImpact.NoChange,
+        // Add Transactions and BalanceChecks
+        Add(
+          createTransaction(
+            id = 10,
+            year = 2015,
+            beneficiary = testAccountB, // Shouldn't matter
+            reservoir = testReservoirCashGbp
+          )) -> StateImpact.Change,
+        Add(createTransaction(id = 9, year = 2015, reservoir = testReservoirCashGbp)) -> StateImpact.Change,
+        Add(createTransaction(id = 1, year = 2001, reservoir = testReservoirCashGbp)) -> StateImpact.Change,
+        Add(createTransaction(id = 8, year = 2014, reservoir = testReservoirCashGbp)) -> StateImpact.Change,
+        Add(createBalanceCheck(id = 7, year = 2013, reservoir = testReservoirCashGbp)) -> StateImpact.Change,
+        Add(createTransaction(id = 6, year = 2012, reservoir = testReservoirCashGbp)) -> StateImpact.NoChange,
+        Add(createTransaction(id = 5, year = 2012, reservoir = testReservoirCashGbp)) -> StateImpact.NoChange,
+        Add(createBalanceCheck(id = 4, year = 2011, reservoir = testReservoirCashGbp)) -> StateImpact.NoChange,
+        // Adding irrelevant Transactions and BalanceChecks
+        Add(createTransaction(id = 11, year = 2015)) -> StateImpact.NoChange,
+        Add(createBalanceCheck(id = 12, year = 2014)) -> StateImpact.NoChange,
+        // Remove Transactions and BalanceChecks
+        Remove[Transaction](1) -> StateImpact.NoChange,
+        Remove[Transaction](6) -> StateImpact.NoChange,
+        Remove[BalanceCheck](7) -> StateImpact.Change,
+        Remove[Transaction](5) -> StateImpact.Change,
+        Remove[BalanceCheck](4) -> StateImpact.Change,
+        // Removing irrelevant Transactions and BalanceChecks
+        Remove[Transaction](11) -> StateImpact.NoChange,
+        Remove[BalanceCheck](12) -> StateImpact.NoChange
+      )
+    )
   }
 
   private def runTest(store: EntriesStore[_], updatesWithImpact: ListMap[EntityModification, StateImpact])(
@@ -183,6 +224,10 @@ object StoreFactoryStateUpdateTest extends TestSuite {
     state match {
       case s: EntriesListStoreFactory.State[_] =>
         s.copy(impactingTransactionIds = Set(), impactingBalanceCheckIds = Set())
+      case s: GainsForYear =>
+        s.copy(impactingTransactionIds = Set(), impactingBalanceCheckIds = Set())
+      case s: SummaryForYear =>
+        s
     }
   }
 

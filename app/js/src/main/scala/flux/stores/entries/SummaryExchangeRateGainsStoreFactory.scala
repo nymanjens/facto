@@ -52,25 +52,22 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
     private def calculateGainsForYear(reservoir: MoneyReservoir): GainsForYear = {
       val monthsInYear = DatedMonth.allMonthsIn(input.year)
 
-      val (oldestBalanceDate, initialBalance): (LocalDateTime, MoneyWithGeneralCurrency) = {
-        val oldestRelevantBc =
-          database
-            .newQuery[BalanceCheck]()
-            .filterEqual(Keys.BalanceCheck.moneyReservoirCode, reservoir.code)
-            .filter(LokiJs.Filter.lessThan(Keys.BalanceCheck.checkDate, monthsInYear.head.startTime))
-            .sort(
-              LokiJs.Sorting
-                .descBy(Keys.BalanceCheck.checkDate)
-                .thenDescBy(Keys.BalanceCheck.createdDate)
-                .thenDescBy(Keys.id))
-            .limit(1)
-            .data()
-            .headOption
-        val oldestBalanceDate = oldestRelevantBc.map(_.checkDate).getOrElse(LocalDateTime.MIN)
-        val initialBalance =
-          oldestRelevantBc.map(_.balance).getOrElse(MoneyWithGeneralCurrency(0, reservoir.currency))
-        (oldestBalanceDate, initialBalance)
-      }
+      val oldestRelevantBalanceCheck: Option[BalanceCheck] =
+        database
+          .newQuery[BalanceCheck]()
+          .filterEqual(Keys.BalanceCheck.moneyReservoirCode, reservoir.code)
+          .filter(LokiJs.Filter.lessThan(Keys.BalanceCheck.checkDate, monthsInYear.head.startTime))
+          .sort(
+            LokiJs.Sorting
+              .descBy(Keys.BalanceCheck.checkDate)
+              .thenDescBy(Keys.BalanceCheck.createdDate)
+              .thenDescBy(Keys.id))
+          .limit(1)
+          .data()
+          .headOption
+      val oldestBalanceDate = oldestRelevantBalanceCheck.map(_.checkDate).getOrElse(LocalDateTime.MIN)
+      val initialBalance =
+        oldestRelevantBalanceCheck.map(_.balance).getOrElse(MoneyWithGeneralCurrency(0, reservoir.currency))
 
       val balanceChecks: Seq[BalanceCheck] =
         database
@@ -137,8 +134,8 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
           }
           month -> GainsForMonth.forSingle(reservoir, gain)
         }.toMap,
-        impactingTransactionIds = transactions.map(_.id).toSet,
-        impactingBalanceCheckIds = balanceChecks.map(_.id).toSet
+        impactingTransactionIds = transactions.toStream.map(_.id).toSet,
+        impactingBalanceCheckIds = (balanceChecks.toStream ++ oldestRelevantBalanceCheck).map(_.id).toSet
       )
     }
 

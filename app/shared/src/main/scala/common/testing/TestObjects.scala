@@ -283,4 +283,18 @@ object TestObjects {
       checkDate = createDateTime(year, month, day)
     )
   }
+
+  def createExchangeRateMeasurement(id: Long = -1,
+                                    year: Int = 2012,
+                                    month: Month = MARCH,
+                                    day: Int = 25,
+                                    foreignCurrencyCode: String = "GBP",
+                                    ratio: Double = unsetDouble): ExchangeRateMeasurement = {
+    ExchangeRateMeasurement(
+      idOption = Some(if (id == -1) EntityModification.generateRandomId() else id),
+      date = createDateTime(year, month, day),
+      foreignCurrencyCode = foreignCurrencyCode,
+      ratioReferenceToForeignCurrency = if (ratio == unsetDouble) Random.nextDouble() else ratio
+    )
+  }
 }
