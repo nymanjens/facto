@@ -9,11 +9,11 @@ final class Module(implicit remoteDatabaseProxy: RemoteDatabaseProxy) {
 
   import com.softwaremill.macwire._
 
-  implicit lazy val jsUserManager = wire[JsUserManager]
-  implicit lazy val jsTransactionManager = wire[JsTransactionManager]
-  implicit lazy val jsTransactionGroupManager = wire[JsTransactionGroupManager]
-  implicit lazy val jsBalanceCheckManager = wire[JsBalanceCheckManager]
-  implicit lazy val jsExchangeRateMeasurementManager = wire[JsExchangeRateMeasurementManager]
+  implicit lazy val userManager = wire[JsUserManager]
+  implicit lazy val transactionManager = wire[JsTransactionManager]
+  implicit lazy val transactionGroupManager = wire[JsTransactionGroupManager]
+  implicit lazy val balanceCheckManager = wire[JsBalanceCheckManager]
+  implicit lazy val exchangeRateMeasurementManager = wire[JsExchangeRateMeasurementManager]
 
   implicit lazy val entityAccess: EntityAccess = wire[JsEntityAccess]
   implicit lazy val exchangeRateManager: ExchangeRateManager = wire[JsExchangeRateManager]

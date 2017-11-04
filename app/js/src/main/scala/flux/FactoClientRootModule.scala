@@ -26,9 +26,9 @@ final class FactoAppModule(implicit getInitialDataResponse: GetInitialDataRespon
   private val modelsModule = new models.Module
   implicit private val entityAccess = modelsModule.entityAccess
   implicit private val exchangeRateManager = modelsModule.exchangeRateManager
-  implicit private val userManager = modelsModule.jsUserManager
-  implicit private val transactionGroupManager = modelsModule.jsTransactionGroupManager
-  implicit private val balanceCheckManager = modelsModule.jsBalanceCheckManager
+  implicit private val userManager = modelsModule.userManager
+  implicit private val transactionGroupManager = modelsModule.transactionGroupManager
+  implicit private val balanceCheckManager = modelsModule.balanceCheckManager
 
   // Create and unpack Flux action module
   private val fluxActionModule = new flux.action.Module

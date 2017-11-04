@@ -3,7 +3,7 @@ package flux.stores.entries
 import common.testing.TestObjects._
 import common.testing.{FakeRemoteDatabaseProxy, TestModule}
 import models.accounting._
-import models.manager.EntityModification
+import models.manager.{EntityManager, EntityModification, EntityType}
 import models.manager.EntityModification._
 import utest._
 
@@ -15,23 +15,25 @@ object StoreFactoryStateUpdateTest extends TestSuite {
   override def tests = TestSuite {
     val testModule = new ThisTestModule()
     implicit val database = testModule.fakeRemoteDatabaseProxy
+    implicit val transactionManager = testModule.transactionManager
+    implicit val balanceCheckManager = testModule.balanceCheckManager
 
     "AllEntriesStoreFactory" - runTest(
       store = testModule.allEntriesStoreFactory.get(maxNumEntries = 3),
       updatesWithImpact = ListMap(
         // Add Transactions
-        Add(createTransaction(day = 10, id = 10)) -> StateImpact.Change,
-        Add(createTransaction(day = 9, id = 9)) -> StateImpact.Change,
-        Add(createTransaction(day = 8, id = 8)) -> StateImpact.Change,
-        Add(createTransaction(day = 7, id = 7)) -> StateImpact.Change,
-        Add(createTransaction(day = 6, id = 6)) -> StateImpact.NoChange,
+        Add(createTransaction(id = 10, day = 10)) -> StateImpact.Change,
+        Add(createTransaction(id = 9, day = 9)) -> StateImpact.Change,
+        Add(createTransaction(id = 8, day = 8)) -> StateImpact.Change,
+        Add(createTransaction(id = 7, day = 7)) -> StateImpact.Change,
+        Add(createTransaction(id = 6, day = 6)) -> StateImpact.NoChange,
         // Remove Transactions
         Remove[Transaction](6) -> StateImpact.NoChange,
         Remove[Transaction](10) -> StateImpact.Change,
         // Add BalanceChecks
-        Add(createBalanceCheck(id = 91)) -> StateImpact.NoChange,
+        Add(createBalanceCheck(id = 11)) -> StateImpact.NoChange,
         // Remove BalanceChecks
-        Remove[BalanceCheck](91) -> StateImpact.NoChange
+        Remove[BalanceCheck](11) -> StateImpact.NoChange
       )
     )
 
@@ -40,16 +42,16 @@ object StoreFactoryStateUpdateTest extends TestSuite {
         testModule.cashFlowEntriesStoreFactory.get(moneyReservoir = testReservoirCardA, maxNumEntries = 2),
       updatesWithImpact = ListMap(
         // Add Transactions and BalanceChecks
-        Add(createTransaction(day = 10, id = 10, reservoir = testReservoirCardA)) -> StateImpact.Change,
-        Add(createTransaction(day = 9, id = 9, reservoir = testReservoirCardA)) -> StateImpact.Change,
-        Add(createTransaction(day = 8, id = 8, reservoir = testReservoirCardA)) -> StateImpact.Change,
-        Add(createTransaction(day = 7, id = 7, reservoir = testReservoirCardA)) -> StateImpact.Change,
-        Add(createBalanceCheck(day = 6, id = 6, reservoir = testReservoirCardA)) -> StateImpact.Change,
-        Add(createTransaction(day = 5, id = 5, reservoir = testReservoirCardA)) -> StateImpact.NoChange,
-        Add(createBalanceCheck(day = 4, id = 4, reservoir = testReservoirCardA)) -> StateImpact.NoChange,
+        Add(createTransaction(id = 10, day = 10, reservoir = testReservoirCardA)) -> StateImpact.Change,
+        Add(createTransaction(id = 9, day = 9, reservoir = testReservoirCardA)) -> StateImpact.Change,
+        Add(createTransaction(id = 8, day = 8, reservoir = testReservoirCardA)) -> StateImpact.Change,
+        Add(createTransaction(id = 7, day = 7, reservoir = testReservoirCardA)) -> StateImpact.Change,
+        Add(createBalanceCheck(id = 6, day = 6, reservoir = testReservoirCardA)) -> StateImpact.Change,
+        Add(createTransaction(id = 5, day = 5, reservoir = testReservoirCardA)) -> StateImpact.NoChange,
+        Add(createBalanceCheck(id = 4, day = 4, reservoir = testReservoirCardA)) -> StateImpact.NoChange,
         // Adding irrelevant Transactions and BalanceChecks
-        Add(createTransaction(day = 11, id = 11, reservoir = testReservoirCardB)) -> StateImpact.NoChange,
-        Add(createBalanceCheck(day = 12, id = 12, reservoir = testReservoirCardB)) -> StateImpact.NoChange,
+        Add(createTransaction(id = 11, day = 11, reservoir = testReservoirCardB)) -> StateImpact.NoChange,
+        Add(createBalanceCheck(id = 12, day = 12, reservoir = testReservoirCardB)) -> StateImpact.NoChange,
         // Remove Transactions and BalanceChecks
         Remove[Transaction](5) -> StateImpact.NoChange,
         Remove[BalanceCheck](6) -> StateImpact.Change,
@@ -64,11 +66,32 @@ object StoreFactoryStateUpdateTest extends TestSuite {
       store = testModule.complexQueryStoreFactory.get(query = "ABCD", maxNumEntries = 3),
       updatesWithImpact = ListMap(
         // Add Transactions
-        Add(createTransaction(description = "ABCDE", id = 10)) -> StateImpact.Change,
-        Add(createTransaction(description = "XXYZ", id = 9)) -> StateImpact.NoChange,
+        Add(createTransaction(id = 10, description = "ABCDE")) -> StateImpact.Change,
+        Add(createTransaction(id = 9, description = "XXYZ")) -> StateImpact.NoChange,
         // Remove Transactions
-        Remove[Transaction](6) -> StateImpact.NoChange,
         Remove[Transaction](10) -> StateImpact.Change,
+        Remove[Transaction](9) -> StateImpact.NoChange,
+        // Add BalanceChecks
+        Add(createBalanceCheck(id = 11)) -> StateImpact.NoChange,
+        // Remove BalanceChecks
+        Remove[BalanceCheck](11) -> StateImpact.NoChange
+      )
+    )
+    "EndowmentEntriesStoreFactory" - runTest(
+      store = testModule.endowmentEntriesStoreFactory.get(account = testAccountA, maxNumEntries = 3),
+      updatesWithImpact = ListMap(
+        // Add Transactions
+        Add(
+          createTransaction(id = 10, beneficiary = testAccountA, category = testConstants.endowmentCategory))
+          -> StateImpact.Change,
+        Add(createTransaction(id = 9, beneficiary = testAccountA)) -> StateImpact.NoChange,
+        Add(
+          createTransaction(id = 8, beneficiary = testAccountB, category = testConstants.endowmentCategory))
+          -> StateImpact.NoChange,
+        // Remove Transactions
+        Remove[Transaction](10) -> StateImpact.Change,
+        Remove[Transaction](9) -> StateImpact.NoChange,
+        Remove[Transaction](8) -> StateImpact.NoChange,
         // Add BalanceChecks
         Add(createBalanceCheck(id = 11)) -> StateImpact.NoChange,
         // Remove BalanceChecks
@@ -78,10 +101,35 @@ object StoreFactoryStateUpdateTest extends TestSuite {
   }
 
   private def runTest(store: EntriesStore[_], updatesWithImpact: ListMap[EntityModification, StateImpact])(
-      implicit database: FakeRemoteDatabaseProxy): Unit = {
+      implicit database: FakeRemoteDatabaseProxy,
+      transactionManager: Transaction.Manager,
+      balanceCheckManager: BalanceCheck.Manager): Unit = {
+    def checkRemovingExistingEntity(update: EntityModification): Unit = {
+      def checkIfIdExists(id: Long, manager: EntityManager[_]): Unit = {
+        try {
+          manager.findById(id) // throws if not found
+        } catch {
+          case e: Exception =>
+            throw new java.lang.AssertionError(
+              s"Could not find entity of ${update.entityType} with id $id",
+              e)
+        }
+      }
+
+      update match {
+        case Remove(id) if update.entityType == EntityType.TransactionType =>
+          checkIfIdExists(id, transactionManager)
+        case Remove(id) if update.entityType == EntityType.BalanceCheckType =>
+          checkIfIdExists(id, balanceCheckManager)
+        case _ => // Do nothing
+      }
+    }
+
     var lastState = store.state
 
     for ((update, stateImpact) <- updatesWithImpact) {
+      checkRemovingExistingEntity(update)
+
       database.persistModifications(update)
 
       stateImpact match {
