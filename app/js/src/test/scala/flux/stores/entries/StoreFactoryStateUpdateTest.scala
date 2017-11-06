@@ -162,6 +162,25 @@ object StoreFactoryStateUpdateTest extends TestSuite {
         Remove[BalanceCheck](12) -> StateImpact.NoChange
       )
     )
+
+    "SummaryForYearStoreFactory" - runTest(
+      store = testModule.summaryForYearStoreFactory.get(account = testAccountA, year = 2015),
+      updatesWithImpact = ListMap(
+        // Add Transactions
+        Add(createTransaction(id = 10, year = 2015, beneficiary = testAccountA)) -> StateImpact.Change,
+        // Add irrelevant Transactions
+        Add(createTransaction(id = 9, year = 2014, beneficiary = testAccountA)) -> StateImpact.NoChange,
+        Add(createTransaction(id = 8, year = 2015, beneficiary = testAccountB)) -> StateImpact.NoChange,
+        // Remove Transactions
+        Remove[Transaction](10) -> StateImpact.Change,
+        // Remove irrelevant Transactions
+        Remove[Transaction](8) -> StateImpact.NoChange,
+        // Add BalanceChecks
+        Add(createBalanceCheck(id = 11)) -> StateImpact.NoChange,
+        // Remove BalanceChecks
+        Remove[BalanceCheck](11) -> StateImpact.NoChange
+      )
+    )
   }
 
   private def runTest(store: EntriesStore[_], updatesWithImpact: ListMap[EntityModification, StateImpact])(
