@@ -168,13 +168,35 @@ object StoreFactoryStateUpdateTest extends TestSuite {
       updatesWithImpact = ListMap(
         // Add Transactions
         Add(createTransaction(id = 10, year = 2015, beneficiary = testAccountA)) -> StateImpact.Change,
+        Add(createTransaction(id = 9, year = 2015, beneficiary = testAccountA)) -> StateImpact.Change,
         // Add irrelevant Transactions
-        Add(createTransaction(id = 9, year = 2014, beneficiary = testAccountA)) -> StateImpact.NoChange,
-        Add(createTransaction(id = 8, year = 2015, beneficiary = testAccountB)) -> StateImpact.NoChange,
+        Add(createTransaction(id = 8, year = 2014, beneficiary = testAccountA)) -> StateImpact.NoChange,
+        Add(createTransaction(id = 7, year = 2015, beneficiary = testAccountB)) -> StateImpact.NoChange,
         // Remove Transactions
         Remove[Transaction](10) -> StateImpact.Change,
         // Remove irrelevant Transactions
+        Remove[Transaction](7) -> StateImpact.NoChange,
+        // Add BalanceChecks
+        Add(createBalanceCheck(id = 11)) -> StateImpact.NoChange,
+        // Remove BalanceChecks
+        Remove[BalanceCheck](11) -> StateImpact.NoChange
+      )
+    )
+
+    "SummaryYearsStoreFactory" - runTest(
+      store = testModule.summaryYearsStoreFactory.get(testAccountA),
+      updatesWithImpact = ListMap(
+        // Add Transactions
+        Add(createTransaction(id = 10, year = 2015, month = DECEMBER, beneficiary = testAccountA)) -> StateImpact.Change,
+        Add(createTransaction(id = 9, year = 2015, month = MARCH, beneficiary = testAccountA)) -> StateImpact.NoChange,
+        Add(createTransaction(id = 8, year = 2015, month = JANUARY, beneficiary = testAccountA)) -> StateImpact.NoChange,
+        Add(createTransaction(id = 7, year = 2013, beneficiary = testAccountA)) -> StateImpact.Change,
+        Add(createTransaction(id = 6, year = 2014, beneficiary = testAccountB)) -> StateImpact.NoChange,
+        // Remove Transactions
+        Remove[Transaction](6) -> StateImpact.NoChange,
+        Remove[Transaction](10) -> StateImpact.NoChange,
         Remove[Transaction](8) -> StateImpact.NoChange,
+        Remove[Transaction](9) -> StateImpact.Change,
         // Add BalanceChecks
         Add(createBalanceCheck(id = 11)) -> StateImpact.NoChange,
         // Remove BalanceChecks
@@ -247,6 +269,8 @@ object StoreFactoryStateUpdateTest extends TestSuite {
         s.copy(impactingTransactionIds = Set(), impactingBalanceCheckIds = Set())
       case s: SummaryForYear =>
         s
+      case s: SummaryYearsStoreFactory.State =>
+        s.copy(impactingTransactionIds = Set())
     }
   }
 
