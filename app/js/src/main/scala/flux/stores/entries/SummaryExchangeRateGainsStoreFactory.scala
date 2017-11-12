@@ -189,6 +189,7 @@ object SummaryExchangeRateGainsStoreFactory {
                           protected override val impactingBalanceCheckIds: Set[Long])
       extends EntriesStore.StateTrait {
     def gainsForMonth(month: DatedMonth): GainsForMonth = monthToGains.getOrElse(month, GainsForMonth.empty)
+    def currencies: Seq[Currency] = monthToGains.values.toStream.flatMap(_.currencies).distinct.toVector
     def nonEmpty: Boolean = this != GainsForYear.empty
   }
 
@@ -208,8 +209,9 @@ object SummaryExchangeRateGainsStoreFactory {
 
     lazy val total: ReferenceMoney = reservoirToGains.values.sum
     def nonEmpty: Boolean = reservoirToGains.nonEmpty
-    def currencyToGains: Map[Currency, ReferenceMoney] =
-      reservoirToGains.groupBy(_._1.currency).mapValues(_.map(_._2).sum)
+    def currencies: Seq[Currency] = reservoirToGains.keys.toStream.map(_.currency).distinct.toVector
+    def gains(currency: Currency): ReferenceMoney =
+      reservoirToGains.toStream.filter(_._1.currency == currency).map(_._2).sum
   }
   object GainsForMonth {
     val empty: GainsForMonth = GainsForMonth(Map())

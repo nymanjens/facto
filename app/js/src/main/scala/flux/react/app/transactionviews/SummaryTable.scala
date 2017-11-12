@@ -133,13 +133,14 @@ private[transactionviews] final class SummaryTable(
       }
     }
 
-    lazy val hasExchangeRateGains: Boolean = yearsToData.values.exists(_.exchangeRateGains.nonEmpty)
-    def exchangeRateGains(month: DatedMonth): GainsForMonth =
-      yearsToData(month.year).exchangeRateGains.gainsForMonth(month)
-    def averageExchangeRateGains(year: Int): ReferenceMoney = {
+    lazy val currenciesWithExchangeRateGains: Seq[Currency] =
+      yearsToData.values.toStream.flatMap(_.exchangeRateGains.currencies).distinct.toVector
+    def exchangeRateGains(currency: Currency, month: DatedMonth): ReferenceMoney =
+      yearsToData(month.year).exchangeRateGains.gainsForMonth(month).gains(currency)
+    def averageExchangeRateGains(currency: Currency, year: Int): ReferenceMoney = {
       monthsForAverage(year) match {
         case Seq() => ReferenceMoney(0)
-        case months => months.map(exchangeRateGains(_).total).sum / months.size
+        case months => months.map(exchangeRateGains(currency, _)).sum / months.size
       }
     }
 
@@ -314,39 +315,29 @@ private[transactionviews] final class SummaryTable(
             )
           },
           // **************** Exchange rate gains data **************** //
-          ^^.ifThen(data.hasExchangeRateGains && props.query.isEmpty) {
-            <.tr(
-              ^.key := "exchange-rate-gains",
-              columns.map {
-                case TitleColumn =>
-                  <.td(^.key := "title", i18n("facto.exchange-rate-gains"))
-                case OmittedYearsColumn(_) =>
-                  <.td(^.key := "omitted-years", "...")
-                case MonthColumn(month) =>
-                  val cellData = data.exchangeRateGains(month)
-                  <.td(
-                    ^.key := s"gain-${month.year}-${month.month}",
-                    ^^.classes(cellClasses(month)),
-                    uielements.UpperRightCorner(
-                      cornerContent = <<.ifThen(cellData.nonEmpty)(s"(${cellData.currencyToGains.size})"))(
-                      centralContent = if (cellData.nonEmpty) cellData.total.formatFloat else ""
-                    ),
-                    ^^.ifThen(cellData.nonEmpty) {
-                      <.div(
-                        ^.className := "entries",
-                        (for ((currency, gains) <- cellData.currencyToGains) yield {
-                          <.div(^.key := currency.code, s"${currency.code}: $gains")
-                        }).toVdomArray
-                      )
-                    }
-                  )
-                case AverageColumn(year) =>
-                  <.td(
-                    ^.key := s"avg-$year",
-                    ^.className := "average",
-                    data.averageExchangeRateGains(year).formatFloat)
-              }.toVdomArray
-            )
+          ^^.ifThen(props.query.isEmpty) {
+            (for (currency <- data.currenciesWithExchangeRateGains) yield {
+              <.tr(
+                ^.key := s"exchange-rate-gains-${currency.code}",
+                columns.map {
+                  case TitleColumn =>
+                    <.td(^.key := "title", i18n("facto.exchange-rate-gains"), " ", currency.code)
+                  case OmittedYearsColumn(_) =>
+                    <.td(^.key := "omitted-years", "...")
+                  case MonthColumn(month) =>
+                    <.td(
+                      ^.key := s"gain-${currency.code}-${month.year}-${month.month}",
+                      ^^.classes(cellClasses(month)),
+                      data.exchangeRateGains(currency, month).formatFloat
+                    )
+                  case AverageColumn(year) =>
+                    <.td(
+                      ^.key := s"avg-$year",
+                      ^.className := "average",
+                      data.averageExchangeRateGains(currency, year).formatFloat)
+                }.toVdomArray
+              )
+            }).toVdomArray
           },
           // **************** Total rows **************** //
           ^^.ifThen(props.query.isEmpty) {
