@@ -10,7 +10,7 @@ import common.time.{DatedMonth, LocalDateTimes, YearRange}
 import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.{GainsForMonth, GainsForYear}
 import flux.stores.entries.SummaryForYearStoreFactory.{SummaryCell, SummaryForYear}
 import models.accounting._
-import models.accounting.money.ReferenceMoney
+import models.accounting.money.{Currency, ReferenceMoney}
 import utest._
 
 import scala.collection.immutable.{ListMap, Seq}
@@ -151,26 +151,25 @@ object SummaryTableTest extends TestSuite {
             )
         }
       }
-      "hasExchangeRateGains" - {
-        allYearsData.hasExchangeRateGains ==> true
+      "currenciesWithExchangeRateGains" - {
+        allYearsData.currenciesWithExchangeRateGains ==> Seq(Currency.Gbp)
       }
       "exchangeRateGains" - {
-        allYearsData.exchangeRateGains(DatedMonth.of(2012, JUNE)) ==>
-          GainsForMonth.forSingle(testReservoirCashGbp, ReferenceMoney(123))
-        allYearsData.exchangeRateGains(DatedMonth.of(2012, AUGUST)) ==>
-          GainsForMonth.empty
+        allYearsData.exchangeRateGains(Currency.Gbp, DatedMonth.of(2012, JUNE)) ==> ReferenceMoney(123)
+        allYearsData.exchangeRateGains(Currency.Gbp, DatedMonth.of(2012, AUGUST)) ==> ReferenceMoney(0)
       }
       "averageExchangeRateGains" - {
         "full year" - {
-          allYearsData.averageExchangeRateGains(2012) ==> ReferenceMoney(roundToLong(123 / 12))
+          allYearsData.averageExchangeRateGains(Currency.Gbp, 2012) ==> ReferenceMoney(roundToLong(123 / 12))
         }
         "only before June" - {
           fakeClock.setTime(createDateTime(2012, JUNE, 2))
-          allYearsData.averageExchangeRateGains(2012) ==> ReferenceMoney(0)
+          allYearsData.averageExchangeRateGains(Currency.Gbp, 2012) ==> ReferenceMoney(0)
         }
         "only after first transaction of year (April)" - {
           val newAllYearsData = allYearsData.copy(allTransactionsYearRange = YearRange.closed(2012, 2013))
-          newAllYearsData.averageExchangeRateGains(2012) ==> ReferenceMoney(roundToLong(123.0 / 9))
+          newAllYearsData.averageExchangeRateGains(Currency.Gbp, 2012) ==>
+            ReferenceMoney(roundToLong(123.0 / 9))
         }
       }
     }
