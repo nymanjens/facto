@@ -100,6 +100,7 @@ object GuavaReplacement {
     def get(key: A): Set[B] = backingMap.getOrElse(key, Set())
     def keySet: Set[A] = backingMap.keySet
     def containsValue(value: B): Boolean = backingMap.values.toStream.flatten.contains(value)
+    def values: Iterable[B] = backingMap.values.toStream.flatMap(set => set)
 
     override def toString = backingMap.toString
 

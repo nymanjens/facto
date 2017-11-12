@@ -48,11 +48,7 @@ final class SummaryForYearStoreFactory(implicit database: RemoteDatabaseProxy,
 
     override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) =
       LokiJs.ResultSet.fake(Seq(transaction)).filter(combinedFilter).count() > 0
-    override protected def transactionRemovalImpactsState(transactionId: Long, state: SummaryForYear) =
-      state.containsTransactionId(transactionId)
     override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) =
-      false
-    override protected def balanceCheckRemovalImpactsState(balanceCheckId: Long, state: State) =
       false
   }
 
@@ -70,9 +66,8 @@ final class SummaryForYearStoreFactory(implicit database: RemoteDatabaseProxy,
 }
 
 object SummaryForYearStoreFactory {
-  case class SummaryForYear(private val transactions: Seq[Transaction])(implicit accountingConfig: Config) {
-    private val transactionIds: Set[Long] = transactions.toStream.map(_.id).toSet
-
+  case class SummaryForYear(private val transactions: Seq[Transaction])(implicit accountingConfig: Config)
+      extends EntriesStore.StateTrait {
     private val cells: Map[Category, Map[DatedMonth, SummaryCell]] =
       transactions
         .groupBy(_.category)
@@ -88,8 +83,8 @@ object SummaryForYearStoreFactory {
     def cell(category: Category, month: DatedMonth): SummaryCell =
       cells.get(category).flatMap(_.get(month)) getOrElse SummaryCell.empty
 
-    private[SummaryForYearStoreFactory] def containsTransactionId(id: Long): Boolean =
-      transactionIds contains id
+    override protected val impactingTransactionIds = transactions.toStream.map(_.id).toSet
+    override protected def impactingBalanceCheckIds = Set()
   }
 
   object SummaryForYear {

@@ -28,14 +28,15 @@ object ComplexQueryStoreFactoryTest extends TestSuite {
     "filters and sorts entries correctly" - {
       val store = factory.get("cats", maxNumEntries = 2)
 
-      store.state ==> EntriesListStoreFactory.State
-        .withGeneralEntries(hasMore = false, Seq(trans1, trans3), Seq(trans4, trans5))
+      store.state.hasMore ==> false
+      store.state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(trans1, trans3), Seq(trans4, trans5))
     }
 
     "respects maxNumEntries" - {
       val store = factory.get("cats", maxNumEntries = 1)
 
-      store.state ==> EntriesListStoreFactory.State.withGeneralEntries(hasMore = true, Seq(trans4, trans5))
+      store.state.hasMore ==> true
+      store.state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(trans4, trans5))
     }
   }
 }

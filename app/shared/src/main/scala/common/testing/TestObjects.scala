@@ -14,6 +14,7 @@ import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 import models.manager.EntityModification
 
 import scala.collection.immutable.{ListMap, Seq}
+import scala.util.Random
 
 object TestObjects {
 
@@ -235,6 +236,7 @@ object TestObjects {
   val testModificationB: EntityModification = EntityModification.Add(testTransactionWithIdB)
   def testModification: EntityModification = testModificationA
 
+  private val unsetDouble: Double = -387461.19
   def createTransaction(id: Long = -1,
                         groupId: Long = -1,
                         issuer: User = testUserA,
@@ -245,7 +247,7 @@ object TestObjects {
                         day: Int = 25,
                         category: Category = testCategory,
                         description: String = "some description",
-                        flow: Double = -12.34,
+                        flow: Double = unsetDouble,
                         detailDescription: String = "some detail description",
                         tags: Seq[String] = Seq("some-tag")): Transaction = {
     testTransactionWithId.copy(
@@ -256,7 +258,7 @@ object TestObjects {
       moneyReservoirCode = Option(reservoir).map(_.code) getOrElse "",
       categoryCode = category.code,
       description = description,
-      flowInCents = (flow * 100).toLong,
+      flowInCents = if (flow == unsetDouble) Random.nextLong() % 10000 else (flow * 100).toLong,
       detailDescription = detailDescription,
       tags = tags,
       createdDate = createDateTime(year, month, day),
@@ -271,14 +273,28 @@ object TestObjects {
                          year: Int = 2012,
                          month: Month = MARCH,
                          day: Int = 25,
-                         balance: Double = 998): BalanceCheck = {
+                         balance: Double = unsetDouble): BalanceCheck = {
     BalanceCheck(
       idOption = Some(if (id == -1) EntityModification.generateRandomId() else id),
-      moneyReservoirCode = testReservoir.code,
-      balanceInCents = (balance * 100).toLong,
+      moneyReservoirCode = reservoir.code,
+      balanceInCents = if (balance == unsetDouble) Random.nextLong() % 10000 else (balance * 100).toLong,
       issuerId = issuer.id,
       createdDate = createDateTime(year, month, day),
       checkDate = createDateTime(year, month, day)
+    )
+  }
+
+  def createExchangeRateMeasurement(id: Long = -1,
+                                    year: Int = 2012,
+                                    month: Month = MARCH,
+                                    day: Int = 25,
+                                    foreignCurrencyCode: String = "GBP",
+                                    ratio: Double = unsetDouble): ExchangeRateMeasurement = {
+    ExchangeRateMeasurement(
+      idOption = Some(if (id == -1) EntityModification.generateRandomId() else id),
+      date = createDateTime(year, month, day),
+      foreignCurrencyCode = foreignCurrencyCode,
+      ratioReferenceToForeignCurrency = if (ratio == unsetDouble) Random.nextDouble() else ratio
     )
   }
 }

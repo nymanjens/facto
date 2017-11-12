@@ -45,36 +45,29 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
 
     override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) =
       isRelevantReservoir(transaction.moneyReservoir) && transaction.transactionDate.getYear <= input.year
-    override protected def transactionRemovalImpactsState(transactionId: Long, state: GainsForYear) =
-      state.impactedByTransactionId(transactionId)
     override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) =
       isRelevantReservoir(balanceCheck.moneyReservoir) && balanceCheck.checkDate.getYear <= input.year
-    override protected def balanceCheckRemovalImpactsState(balanceCheckId: Long, state: State) =
-      state.impactedByBalanceCheckId(balanceCheckId)
 
     // **************** Private helper methods ****************//
     private def calculateGainsForYear(reservoir: MoneyReservoir): GainsForYear = {
       val monthsInYear = DatedMonth.allMonthsIn(input.year)
 
-      val (oldestBalanceDate, initialBalance): (LocalDateTime, MoneyWithGeneralCurrency) = {
-        val oldestRelevantBc =
-          database
-            .newQuery[BalanceCheck]()
-            .filterEqual(Keys.BalanceCheck.moneyReservoirCode, reservoir.code)
-            .filter(LokiJs.Filter.lessThan(Keys.BalanceCheck.checkDate, monthsInYear.head.startTime))
-            .sort(
-              LokiJs.Sorting
-                .descBy(Keys.BalanceCheck.checkDate)
-                .thenDescBy(Keys.BalanceCheck.createdDate)
-                .thenDescBy(Keys.id))
-            .limit(1)
-            .data()
-            .headOption
-        val oldestBalanceDate = oldestRelevantBc.map(_.checkDate).getOrElse(LocalDateTime.MIN)
-        val initialBalance =
-          oldestRelevantBc.map(_.balance).getOrElse(MoneyWithGeneralCurrency(0, reservoir.currency))
-        (oldestBalanceDate, initialBalance)
-      }
+      val oldestRelevantBalanceCheck: Option[BalanceCheck] =
+        database
+          .newQuery[BalanceCheck]()
+          .filterEqual(Keys.BalanceCheck.moneyReservoirCode, reservoir.code)
+          .filter(LokiJs.Filter.lessThan(Keys.BalanceCheck.checkDate, monthsInYear.head.startTime))
+          .sort(
+            LokiJs.Sorting
+              .descBy(Keys.BalanceCheck.checkDate)
+              .thenDescBy(Keys.BalanceCheck.createdDate)
+              .thenDescBy(Keys.id))
+          .limit(1)
+          .data()
+          .headOption
+      val oldestBalanceDate = oldestRelevantBalanceCheck.map(_.checkDate).getOrElse(LocalDateTime.MIN)
+      val initialBalance =
+        oldestRelevantBalanceCheck.map(_.balance).getOrElse(MoneyWithGeneralCurrency(0, reservoir.currency))
 
       val balanceChecks: Seq[BalanceCheck] =
         database
@@ -141,8 +134,8 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
           }
           month -> GainsForMonth.forSingle(reservoir, gain)
         }.toMap,
-        impactingTransactionIds = transactions.map(_.id).toSet,
-        impactingBalanceCheckIds = balanceChecks.map(_.id).toSet
+        impactingTransactionIds = transactions.toStream.map(_.id).toSet,
+        impactingBalanceCheckIds = (balanceChecks.toStream ++ oldestRelevantBalanceCheck).map(_.id).toSet
       )
     }
 
@@ -192,13 +185,9 @@ object SummaryExchangeRateGainsStoreFactory {
   }
 
   case class GainsForYear(private val monthToGains: Map[DatedMonth, GainsForMonth],
-                          private val impactingTransactionIds: Set[Long],
-                          private val impactingBalanceCheckIds: Set[Long]) {
-    private[SummaryExchangeRateGainsStoreFactory] def impactedByTransactionId(id: Long): Boolean =
-      impactingTransactionIds contains id
-    private[SummaryExchangeRateGainsStoreFactory] def impactedByBalanceCheckId(id: Long): Boolean =
-      impactingBalanceCheckIds contains id
-
+                          protected override val impactingTransactionIds: Set[Long],
+                          protected override val impactingBalanceCheckIds: Set[Long])
+      extends EntriesStore.StateTrait {
     def gainsForMonth(month: DatedMonth): GainsForMonth = monthToGains.getOrElse(month, GainsForMonth.empty)
     def nonEmpty: Boolean = this != GainsForYear.empty
   }

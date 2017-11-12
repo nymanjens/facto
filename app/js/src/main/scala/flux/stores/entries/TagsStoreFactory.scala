@@ -35,10 +35,7 @@ final class TagsStoreFactory(implicit database: RemoteDatabaseProxy) extends Ent
 
     override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) =
       transaction.tags.nonEmpty
-    override protected def transactionRemovalImpactsState(transactionId: Long, state: State) =
-      state.tagToTransactionIds containsValue transactionId
     override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) = false
-    override protected def balanceCheckRemovalImpactsState(balanceCheckId: Long, state: State) = false
   }
 
   /* override */
@@ -49,4 +46,8 @@ object TagsStoreFactory {
   type Tag = String
   type TransactionId = Long
   case class State(tagToTransactionIds: ImmutableSetMultimap[Tag, TransactionId])
+      extends EntriesStore.StateTrait {
+    protected override lazy val impactingTransactionIds = tagToTransactionIds.values.toSet
+    protected override def impactingBalanceCheckIds = Set()
+  }
 }

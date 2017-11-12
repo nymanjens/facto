@@ -30,15 +30,16 @@ object EndowmentEntriesStoreFactoryTest extends TestSuite {
     "filters and sorts entries correctly" - {
       val store = factory.get(testAccountA, maxNumEntries = 5)
 
-      store.state ==> EntriesListStoreFactory.State
-        .withGeneralEntries(hasMore = false, Seq(trans1), Seq(trans2), Seq(trans3), Seq(trans4))
+      store.state.hasMore ==> false
+      store.state.entries ==> GeneralEntry
+        .toGeneralEntrySeq(Seq(trans1), Seq(trans2), Seq(trans3), Seq(trans4))
     }
 
     "respects maxNumEntries" - {
       val store = factory.get(testAccountA, maxNumEntries = 3)
 
-      store.state ==> EntriesListStoreFactory.State
-        .withGeneralEntries(hasMore = true, Seq(trans2), Seq(trans3), Seq(trans4))
+      store.state.hasMore ==> true
+      store.state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(trans2), Seq(trans3), Seq(trans4))
     }
   }
 

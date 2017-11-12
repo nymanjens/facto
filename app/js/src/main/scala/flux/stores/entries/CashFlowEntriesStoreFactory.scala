@@ -21,7 +21,7 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
 
   override protected def createNew(maxNumEntries: Int, moneyReservoir: MoneyReservoir) = new Store {
     override protected def calculateState() = {
-      val (oldestBalanceDate, initialBalance): (LocalDateTime, MoneyWithGeneralCurrency) = {
+      val oldestRelevantBalanceCheck: Option[BalanceCheck] = {
         val numTransactionsToFetch = 3 * maxNumEntries
         val totalNumTransactions =
           database
@@ -30,7 +30,7 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
             .count()
 
         if (totalNumTransactions < numTransactionsToFetch) {
-          (LocalDateTime.MIN, MoneyWithGeneralCurrency(0, moneyReservoir.currency)) // get all entries
+          None // get all entries
 
         } else {
           // get oldest oldestTransDate
@@ -49,25 +49,26 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
               .transactionDate
 
           // get relevant balance checks
-          val oldestBC =
-            database
-              .newQuery[BalanceCheck]()
-              .filterEqual(Keys.BalanceCheck.moneyReservoirCode, moneyReservoir.code)
-              .filter(LokiJs.Filter.lessThan(Keys.BalanceCheck.checkDate, oldestTransDate))
-              .sort(
-                LokiJs.Sorting
-                  .descBy(Keys.BalanceCheck.checkDate)
-                  .thenDescBy(Keys.BalanceCheck.createdDate)
-                  .thenDescBy(Keys.id))
-              .limit(1)
-              .data()
-              .headOption
-          val oldestBalanceDate = oldestBC.map(_.checkDate).getOrElse(LocalDateTime.MIN)
-          val initialBalance =
-            oldestBC.map(_.balance).getOrElse(MoneyWithGeneralCurrency(0, moneyReservoir.currency))
-          (oldestBalanceDate, initialBalance)
+          database
+            .newQuery[BalanceCheck]()
+            .filterEqual(Keys.BalanceCheck.moneyReservoirCode, moneyReservoir.code)
+            .filter(LokiJs.Filter.lessThan(Keys.BalanceCheck.checkDate, oldestTransDate))
+            .sort(
+              LokiJs.Sorting
+                .descBy(Keys.BalanceCheck.checkDate)
+                .thenDescBy(Keys.BalanceCheck.createdDate)
+                .thenDescBy(Keys.id))
+            .limit(1)
+            .data()
+            .headOption
         }
       }
+
+      val oldestBalanceDate = oldestRelevantBalanceCheck.map(_.checkDate).getOrElse(LocalDateTime.MIN)
+      val initialBalance =
+        oldestRelevantBalanceCheck
+          .map(_.balance)
+          .getOrElse(MoneyWithGeneralCurrency(0, moneyReservoir.currency))
 
       val balanceChecks: Seq[BalanceCheck] =
         database
@@ -154,31 +155,19 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
       }
       entries = mergeValidatingBCs(entries).toList
 
-      EntriesListStoreFactory.State(entries.takeRight(maxNumEntries), hasMore = entries.size > maxNumEntries)
+      EntriesListStoreFactory.State(
+        entries.takeRight(maxNumEntries),
+        hasMore = entries.size > maxNumEntries,
+        impactingTransactionIds = transactions.toStream.map(_.id).toSet,
+        impactingBalanceCheckIds = (balanceChecks.toStream ++ oldestRelevantBalanceCheck).map(_.id).toSet
+      )
     }
 
     override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) =
       transaction.moneyReservoir == moneyReservoir
 
-    override protected def transactionRemovalImpactsState(transactionId: Long, state: State) =
-      state.entries.toStream
-        .flatMap {
-          case entry: RegularEntry => entry.transactions
-          case entry: BalanceCorrection => Seq()
-        }
-        .map(_.id)
-        .contains(transactionId)
-
     override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) =
       balanceCheck.moneyReservoir == moneyReservoir
-
-    override protected def balanceCheckRemovalImpactsState(balanceCheckId: Long, state: State) =
-      state.entries.toStream
-        .flatMap {
-          case entry: RegularEntry => Seq()
-          case entry: BalanceCorrection => Seq(entry.balanceCheck.id)
-        }
-        .contains(balanceCheckId)
   }
 
   def get(moneyReservoir: MoneyReservoir, maxNumEntries: Int): Store =
