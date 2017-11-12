@@ -39,6 +39,12 @@ class GuavaReplacementTest extends HookedSpecification {
     multimap.containsValue(2) mustEqual true
     multimap.containsValue(4) mustEqual false
   }
+  "ImmutableSetMultimap.values" in {
+    val multimap =
+      ImmutableSetMultimap.builder[String, Int]().put("a", 1).putAll("b", 2, 3).build()
+
+    multimap.values.toSet mustEqual Set(1, 2, 3)
+  }
   "ImmutableSetMultimap.equals" in {
     val multimap1 =
       ImmutableSetMultimap.builder[String, Int]().put("a", 1).putAll("b", 2, 3).build()
