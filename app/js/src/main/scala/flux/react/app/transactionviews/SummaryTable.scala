@@ -328,9 +328,17 @@ private[transactionviews] final class SummaryTable(
                     ^.key := s"gain-${month.year}-${month.month}",
                     ^^.classes(cellClasses(month)),
                     uielements.UpperRightCorner(
-                      cornerContent = <<.ifThen(cellData.nonEmpty)(s"(${cellData.reservoirToGains.size})"))(
+                      cornerContent = <<.ifThen(cellData.nonEmpty)(s"(${cellData.currencyToGains.size})"))(
                       centralContent = if (cellData.nonEmpty) cellData.total.formatFloat else ""
-                    )
+                    ),
+                    ^^.ifThen(cellData.nonEmpty) {
+                      <.div(
+                        ^.className := "entries",
+                        (for ((currency, gains) <- cellData.currencyToGains) yield {
+                          <.div(^.key := currency.code, s"${currency.code}: $gains")
+                        }).toVdomArray
+                      )
+                    }
                   )
                 case AverageColumn(year) =>
                   <.td(

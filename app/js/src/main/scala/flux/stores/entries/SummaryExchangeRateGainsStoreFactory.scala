@@ -10,7 +10,7 @@ import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.{
 import jsfacades.LokiJs
 import models.access.RemoteDatabaseProxy
 import models.accounting.config.{Account, Config, MoneyReservoir}
-import models.accounting.money.{ExchangeRateManager, MoneyWithGeneralCurrency, ReferenceMoney}
+import models.accounting.money.{Currency, ExchangeRateManager, MoneyWithGeneralCurrency, ReferenceMoney}
 import models.accounting.{BalanceCheck, Transaction}
 
 import scala.collection.immutable.{Seq, SortedMap}
@@ -203,13 +203,13 @@ object SummaryExchangeRateGainsStoreFactory {
     )
   }
 
-  case class GainsForMonth private (private val _reservoirToGains: Map[MoneyReservoir, ReferenceMoney]) {
-    _reservoirToGains.values.foreach(gain => require(!gain.isZero))
+  case class GainsForMonth private (private val reservoirToGains: Map[MoneyReservoir, ReferenceMoney]) {
+    reservoirToGains.values.foreach(gain => require(!gain.isZero))
 
-    lazy val total: ReferenceMoney = _reservoirToGains.values.sum
-    def nonEmpty: Boolean = _reservoirToGains.nonEmpty
-    def reservoirToGains: Map[MoneyReservoir, ReferenceMoney] =
-      _reservoirToGains.withDefault(_ => ReferenceMoney(0))
+    lazy val total: ReferenceMoney = reservoirToGains.values.sum
+    def nonEmpty: Boolean = reservoirToGains.nonEmpty
+    def currencyToGains: Map[Currency, ReferenceMoney] =
+      reservoirToGains.groupBy(_._1.currency).mapValues(_.map(_._2).sum)
   }
   object GainsForMonth {
     val empty: GainsForMonth = GainsForMonth(Map())
@@ -224,7 +224,7 @@ object SummaryExchangeRateGainsStoreFactory {
 
     def sum(gains: Seq[GainsForMonth]): GainsForMonth =
       GainsForMonth(
-        _reservoirToGains = combineMapValues(gains.map(_._reservoirToGains))(_.sum).filterNot(_._2.isZero))
+        reservoirToGains = combineMapValues(gains.map(_.reservoirToGains))(_.sum).filterNot(_._2.isZero))
   }
 
   private[SummaryExchangeRateGainsStoreFactory] final class DateToBalanceFunction(
