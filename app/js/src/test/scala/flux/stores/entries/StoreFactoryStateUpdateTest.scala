@@ -1,17 +1,17 @@
 package flux.stores.entries
 
 import java.time.Month._
+
 import common.testing.TestObjects._
 import common.testing.{FakeRemoteDatabaseProxy, TestModule}
 import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.GainsForYear
 import flux.stores.entries.SummaryForYearStoreFactory.SummaryForYear
 import models.accounting._
-import models.accounting.money.ExchangeRateMeasurement
-import models.manager.{EntityManager, EntityModification, EntityType}
 import models.manager.EntityModification._
+import models.manager.{EntityManager, EntityModification, EntityType}
 import utest._
 
-import scala.collection.immutable.ListMap
+import scala.collection.immutable.{ListMap, Seq}
 import scala2js.Converters._
 
 object StoreFactoryStateUpdateTest extends TestSuite {
@@ -203,6 +203,27 @@ object StoreFactoryStateUpdateTest extends TestSuite {
         Remove[BalanceCheck](11) -> StateImpact.NoChange
       )
     )
+
+    "TagsStoreFactory" - runTest(
+      store = testModule.tagsStoreFactory.get(),
+      updatesWithImpact = ListMap(
+        // Add Transactions
+        Add(createTransaction(id = 10, tags = Seq())) -> StateImpact.NoChange,
+        Add(createTransaction(id = 9, tags = Seq("a"))) -> StateImpact.Change,
+        Add(createTransaction(id = 8, tags = Seq("a"))) -> StateImpact.Change,
+        Add(createTransaction(id = 7, tags = Seq("b"))) -> StateImpact.Change,
+        Add(createTransaction(id = 6, tags = Seq())) -> StateImpact.NoChange,
+        // Remove Transactions
+        Remove[Transaction](6) -> StateImpact.NoChange,
+        Remove[Transaction](9) -> StateImpact.Change,
+        Remove[Transaction](8) -> StateImpact.Change,
+        Remove[Transaction](10) -> StateImpact.NoChange,
+        // Add BalanceChecks
+        Add(createBalanceCheck(id = 11)) -> StateImpact.NoChange,
+        // Remove BalanceChecks
+        Remove[BalanceCheck](11) -> StateImpact.NoChange
+      )
+    )
   }
 
   private def runTest(store: EntriesStore[_], updatesWithImpact: ListMap[EntityModification, StateImpact])(
@@ -271,6 +292,8 @@ object StoreFactoryStateUpdateTest extends TestSuite {
         s
       case s: SummaryYearsStoreFactory.State =>
         s.copy(impactingTransactionIds = Set())
+      case s: TagsStoreFactory.State =>
+        s
     }
   }
 
