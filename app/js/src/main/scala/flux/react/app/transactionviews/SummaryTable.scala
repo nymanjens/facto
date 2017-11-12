@@ -4,9 +4,10 @@ import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.CollectionUtils.asMap
 import common.ScalaUtils.visibleForTesting
+import common.accounting.Tags
 import common.time.{Clock, DatedMonth, YearRange}
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
-import flux.react.router.RouterContext
+import flux.react.router.{Page, RouterContext}
 import flux.react.ReactVdomUtils._
 import flux.react.uielements
 import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.{GainsForMonth, GainsForYear}
@@ -260,7 +261,32 @@ private[transactionviews] final class SummaryTable(
                       ^^.classes(cellClasses(month)),
                       uielements.UpperRightCorner(
                         cornerContent = <<.ifThen(cellData.nonEmpty)(s"(${cellData.transactions.size})"))(
-                        centralContent = if (cellData.nonEmpty) cellData.totalFlow.formatFloat else ""
+                        /* centralContent = */
+                        if (cellData.nonEmpty) cellData.totalFlow.formatFloat else "",
+                        ^^.ifThen(cellData.nonEmpty) {
+                          <.div(
+                            ^.className := "entries",
+                            (for (transaction <- cellData.transactions) yield {
+                              <.div(
+                                ^.key := transaction.id,
+                                router.anchorWithHrefTo(
+                                  Page.EditTransactionGroup(transaction.transactionGroupId))(
+                                  uielements.MoneyWithCurrency(transaction.flow),
+                                  " - ",
+                                  <<.joinWithSpaces(
+                                    transaction.tags
+                                      .map(tag =>
+                                        <.span(
+                                          ^^.classes("label", s"label-${Tags.getBootstrapClassSuffix(tag)}"),
+                                          ^.key := tag,
+                                          tag))),
+                                  " ",
+                                  transaction.description
+                                )
+                              )
+                            }).toVdomArray
+                          )
+                        }
                       )
                     )
                   case AverageColumn(year) =>
