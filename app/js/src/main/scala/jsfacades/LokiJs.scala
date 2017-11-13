@@ -200,6 +200,8 @@ object LokiJs {
       NotEqual(key.name, Scala2Js.toJs(value))
     def greaterThan[E, V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): Filter[E] =
       GreaterThan(key.name, Scala2Js.toJs(value))
+    def greaterOrEqualThan[E, V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): Filter[E] =
+      GreaterOrEqualThan(key.name, Scala2Js.toJs(value))
     def lessThan[E, V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): Filter[E] =
       LessThan(key.name, Scala2Js.toJs(value))
     def anyOf[E, V: Scala2Js.Converter](key: Scala2Js.Key[V, E], values: Seq[V]): Filter[E] =
@@ -221,6 +223,7 @@ object LokiJs {
     private[LokiJs] case class Equal[E](keyName: String, value: js.Any) extends Filter[E]
     private[LokiJs] case class NotEqual[E](keyName: String, value: js.Any) extends Filter[E]
     private[LokiJs] case class GreaterThan[E](keyName: String, value: js.Any) extends Filter[E]
+    private[LokiJs] case class GreaterOrEqualThan[E](keyName: String, value: js.Any) extends Filter[E]
     private[LokiJs] case class LessThan[E](keyName: String, value: js.Any) extends Filter[E]
     private[LokiJs] case class AnyOf[E](keyName: String, values: js.Array[js.Any]) extends Filter[E]
     private[LokiJs] case class NoneOf[E](keyName: String, values: js.Array[js.Any]) extends Filter[E]
@@ -252,6 +255,7 @@ object LokiJs {
           case Filter.Equal(key, value) => withModifier("$eq", key, value)
           case Filter.NotEqual(key, value) => withModifier("$ne", key, value)
           case Filter.GreaterThan(key, value) => withModifier("$gt", key, value)
+          case Filter.GreaterOrEqualThan(key, value) => withModifier("$gte", key, value)
           case Filter.LessThan(key, value) => withModifier("$lt", key, value)
           case Filter.AnyOf(key, values) => withModifier("$in", key, values)
           case Filter.NoneOf(key, values) => withModifier("$nin", key, values)
@@ -319,6 +323,7 @@ object LokiJs {
           case Filter.Equal(key, value) => jsMap(key) == value
           case Filter.NotEqual(key, value) => jsMap(key) != value
           case Filter.GreaterThan(key, value) => jsValueOrdering.gt(jsMap(key), value)
+          case Filter.GreaterOrEqualThan(key, value) => jsValueOrdering.gteq(jsMap(key), value)
           case Filter.LessThan(key, value) => jsValueOrdering.lt(jsMap(key), value)
           case Filter.AnyOf(key, values) => values.contains(jsMap(key))
           case Filter.NoneOf(key, values) => !(values contains jsMap(key))
