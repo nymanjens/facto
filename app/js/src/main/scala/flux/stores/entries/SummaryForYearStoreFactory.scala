@@ -59,7 +59,7 @@ final class SummaryForYearStoreFactory(implicit database: RemoteDatabaseProxy,
   private def filterInYear[E](key: Key[LocalDateTime, E], year: Int): LokiJs.Filter[E] = {
     val months = DatedMonth.allMonthsIn(year)
     LokiJs.Filter.and(
-      LokiJs.Filter.greaterThan(key, months.head.startTime),
+      LokiJs.Filter.greaterOrEqualThan(key, months.head.startTime),
       LokiJs.Filter.lessThan(key, months.last.startTimeOfNextMonth)
     )
   }

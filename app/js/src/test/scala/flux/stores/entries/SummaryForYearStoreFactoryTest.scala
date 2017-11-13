@@ -37,9 +37,9 @@ object SummaryForYearStoreFactoryTest extends TestSuite {
       factory.get(testAccountA, 2012, query = "abc").state ==> SummaryForYear(Seq(transaction))
     }
     "multiple transactions" - {
-      val transaction1 = persistTransaction(day = 1)
-      val transaction2 = persistTransaction(day = 2)
-      val transaction3 = persistTransaction(day = 3)
+      val transaction1 = persistTransaction(day = 1, month = JANUARY)
+      val transaction2 = persistTransaction(day = 2, month = JANUARY)
+      val transaction3 = persistTransaction(day = 3, month = JANUARY)
 
       factory.get(testAccountA, 2012, query = "abc").state ==>
         SummaryForYear(Seq(transaction1, transaction2, transaction3))
@@ -109,11 +109,17 @@ object SummaryForYearStoreFactoryTest extends TestSuite {
 
   private def persistTransaction(
       year: Int = 2012,
+      month: Month = MARCH,
       day: Int = 20,
       beneficiary: Account = testAccountA,
       description: String = "abcdefg")(implicit database: FakeRemoteDatabaseProxy): Transaction = {
     val transaction =
-      createTransaction(beneficiary = beneficiary, description = description, year = year, day = day)
+      createTransaction(
+        beneficiary = beneficiary,
+        description = description,
+        year = year,
+        month = month,
+        day = day)
     database.addRemotelyAddedEntities(transaction)
     transaction
   }
