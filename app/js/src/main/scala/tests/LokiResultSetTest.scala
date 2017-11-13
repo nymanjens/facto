@@ -3,7 +3,7 @@ package tests
 import common.testing.TestObjects._
 import jsfacades.LokiJs
 import jsfacades.LokiJs.ResultSet
-import jsfacades.LokiJs.ResultSet.Filter
+import jsfacades.LokiJs.Filter
 import models.access.LocalDatabase
 import models.accounting.Transaction
 import tests.ManualTests.{ManualTest, ManualTestSuite}
@@ -65,6 +65,16 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
 
       withTransactions(transaction1, transaction2, transaction3)
         .assertFilteredWith(Filter.greaterThan(Keys.Transaction.createdDate, transaction1.createdDate))
+        .containsExactly(transaction2, transaction3)
+    },
+    ManualTest("newQuery().filter(greaterOrEqualThan)") {
+      val transaction1 = createTransaction(day = 1)
+      val transaction2 = createTransaction(day = 2)
+      val transaction3 = createTransaction(day = 3)
+
+      withTransactions(transaction1, transaction2, transaction3)
+        .assertFilteredWith(
+          Filter.greaterOrEqualThan(Keys.Transaction.createdDate, transaction2.createdDate))
         .containsExactly(transaction2, transaction3)
     },
     ManualTest("newQuery().filter(anyOf)") {

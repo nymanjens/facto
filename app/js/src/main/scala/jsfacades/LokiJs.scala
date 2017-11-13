@@ -3,7 +3,7 @@ package jsfacades
 import common.LoggingUtils.logExceptions
 import common.GuavaReplacement.Iterables.getOnlyElement
 import common.ScalaUtils
-import jsfacades.LokiJs.ResultSet.Filter
+import jsfacades.LokiJs.Filter
 import jsfacades.LokiJs.Sorting.KeyWithDirection
 
 import scala.concurrent.Future
@@ -191,54 +191,56 @@ object LokiJs {
     private[LokiJs] case class KeyWithDirection[E](key: Scala2Js.Key[_, E], isDesc: Boolean)
   }
 
+  sealed trait Filter[E]
+  object Filter {
+    def nullFilter[E]: Filter[E] = NullFilter[E]()
+    def equal[E, V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): Filter[E] =
+      Equal(key.name, Scala2Js.toJs(value))
+    def notEqual[E, V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): Filter[E] =
+      NotEqual(key.name, Scala2Js.toJs(value))
+    def greaterThan[E, V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): Filter[E] =
+      GreaterThan(key.name, Scala2Js.toJs(value))
+    def greaterOrEqualThan[E, V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): Filter[E] =
+      GreaterOrEqualThan(key.name, Scala2Js.toJs(value))
+    def lessThan[E, V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): Filter[E] =
+      LessThan(key.name, Scala2Js.toJs(value))
+    def anyOf[E, V: Scala2Js.Converter](key: Scala2Js.Key[V, E], values: Seq[V]): Filter[E] =
+      AnyOf(key.name, Scala2Js.toJs(values))
+    def noneOf[E, V: Scala2Js.Converter](key: Scala2Js.Key[V, E], values: Seq[V]): Filter[E] =
+      NoneOf(key.name, Scala2Js.toJs(values))
+    def containsIgnoreCase[E](key: Scala2Js.Key[String, E], substring: String): Filter[E] =
+      ContainsIgnoreCase(key.name, substring)
+    def doesntContainIgnoreCase[E](key: Scala2Js.Key[String, E], substring: String): Filter[E] =
+      DoesntContainIgnoreCase(key.name, substring)
+    def seqContains[E, V: Scala2Js.Converter](key: Scala2Js.Key[Seq[V], E], value: V): Filter[E] =
+      SeqContains(key.name, Scala2Js.toJs(value))
+    def seqDoesntContain[E, V: Scala2Js.Converter](key: Scala2Js.Key[Seq[V], E], value: V): Filter[E] =
+      SeqDoesntContain(key.name, Scala2Js.toJs(value))
+    def or[E](filters: Filter[E]*): Filter[E] = Or(Seq(filters: _*))
+    def and[E](filters: Filter[E]*): Filter[E] = And(Seq(filters: _*))
+
+    private[LokiJs] case class NullFilter[E]() extends Filter[E]
+    private[LokiJs] case class Equal[E](keyName: String, value: js.Any) extends Filter[E]
+    private[LokiJs] case class NotEqual[E](keyName: String, value: js.Any) extends Filter[E]
+    private[LokiJs] case class GreaterThan[E](keyName: String, value: js.Any) extends Filter[E]
+    private[LokiJs] case class GreaterOrEqualThan[E](keyName: String, value: js.Any) extends Filter[E]
+    private[LokiJs] case class LessThan[E](keyName: String, value: js.Any) extends Filter[E]
+    private[LokiJs] case class AnyOf[E](keyName: String, values: js.Array[js.Any]) extends Filter[E]
+    private[LokiJs] case class NoneOf[E](keyName: String, values: js.Array[js.Any]) extends Filter[E]
+    private[LokiJs] case class ContainsIgnoreCase[E](keyName: String, substring: String) extends Filter[E]
+    private[LokiJs] case class DoesntContainIgnoreCase[E](keyName: String, substring: String)
+        extends Filter[E]
+    private[LokiJs] case class SeqContains[E](keyName: String, value: js.Any) extends Filter[E]
+    private[LokiJs] case class SeqDoesntContain[E](keyName: String, value: js.Any) extends Filter[E]
+    private[LokiJs] case class Or[E](filters: Seq[Filter[E]]) extends Filter[E]
+    private[LokiJs] case class And[E](filters: Seq[Filter[E]]) extends Filter[E]
+  }
+
   object ResultSet {
 
     def empty[E: Scala2Js.MapConverter]: ResultSet[E] = new ResultSet.Fake(Seq())
 
     def fake[E: Scala2Js.MapConverter](entities: Seq[E]): ResultSet[E] = new ResultSet.Fake(entities)
-
-    sealed trait Filter[E]
-    object Filter {
-      def nullFilter[E]: Filter[E] = NullFilter[E]()
-      def equal[E, V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): Filter[E] =
-        Equal(key.name, Scala2Js.toJs(value))
-      def notEqual[E, V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): Filter[E] =
-        NotEqual(key.name, Scala2Js.toJs(value))
-      def greaterThan[E, V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): Filter[E] =
-        GreaterThan(key.name, Scala2Js.toJs(value))
-      def lessThan[E, V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): Filter[E] =
-        LessThan(key.name, Scala2Js.toJs(value))
-      def anyOf[E, V: Scala2Js.Converter](key: Scala2Js.Key[V, E], values: Seq[V]): Filter[E] =
-        AnyOf(key.name, Scala2Js.toJs(values))
-      def noneOf[E, V: Scala2Js.Converter](key: Scala2Js.Key[V, E], values: Seq[V]): Filter[E] =
-        NoneOf(key.name, Scala2Js.toJs(values))
-      def containsIgnoreCase[E](key: Scala2Js.Key[String, E], substring: String): Filter[E] =
-        ContainsIgnoreCase(key.name, substring)
-      def doesntContainIgnoreCase[E](key: Scala2Js.Key[String, E], substring: String): Filter[E] =
-        DoesntContainIgnoreCase(key.name, substring)
-      def seqContains[E, V: Scala2Js.Converter](key: Scala2Js.Key[Seq[V], E], value: V): Filter[E] =
-        SeqContains(key.name, Scala2Js.toJs(value))
-      def seqDoesntContain[E, V: Scala2Js.Converter](key: Scala2Js.Key[Seq[V], E], value: V): Filter[E] =
-        SeqDoesntContain(key.name, Scala2Js.toJs(value))
-      def or[E](filters: Filter[E]*): Filter[E] = Or(Seq(filters: _*))
-      def and[E](filters: Filter[E]*): Filter[E] = And(Seq(filters: _*))
-
-      private[ResultSet] case class NullFilter[E]() extends Filter[E]
-      private[ResultSet] case class Equal[E](keyName: String, value: js.Any) extends Filter[E]
-      private[ResultSet] case class NotEqual[E](keyName: String, value: js.Any) extends Filter[E]
-      private[ResultSet] case class GreaterThan[E](keyName: String, value: js.Any) extends Filter[E]
-      private[ResultSet] case class LessThan[E](keyName: String, value: js.Any) extends Filter[E]
-      private[ResultSet] case class AnyOf[E](keyName: String, values: js.Array[js.Any]) extends Filter[E]
-      private[ResultSet] case class NoneOf[E](keyName: String, values: js.Array[js.Any]) extends Filter[E]
-      private[ResultSet] case class ContainsIgnoreCase[E](keyName: String, substring: String)
-          extends Filter[E]
-      private[ResultSet] case class DoesntContainIgnoreCase[E](keyName: String, substring: String)
-          extends Filter[E]
-      private[ResultSet] case class SeqContains[E](keyName: String, value: js.Any) extends Filter[E]
-      private[ResultSet] case class SeqDoesntContain[E](keyName: String, value: js.Any) extends Filter[E]
-      private[ResultSet] case class Or[E](filters: Seq[Filter[E]]) extends Filter[E]
-      private[ResultSet] case class And[E](filters: Seq[Filter[E]]) extends Filter[E]
-    }
 
     private[jsfacades] final class Impl[E: Scala2Js.MapConverter](facade: ResultSetFacade)
         extends ResultSet[E] {
@@ -253,6 +255,7 @@ object LokiJs {
           case Filter.Equal(key, value) => withModifier("$eq", key, value)
           case Filter.NotEqual(key, value) => withModifier("$ne", key, value)
           case Filter.GreaterThan(key, value) => withModifier("$gt", key, value)
+          case Filter.GreaterOrEqualThan(key, value) => withModifier("$gte", key, value)
           case Filter.LessThan(key, value) => withModifier("$lt", key, value)
           case Filter.AnyOf(key, values) => withModifier("$in", key, values)
           case Filter.NoneOf(key, values) => withModifier("$nin", key, values)
@@ -320,6 +323,7 @@ object LokiJs {
           case Filter.Equal(key, value) => jsMap(key) == value
           case Filter.NotEqual(key, value) => jsMap(key) != value
           case Filter.GreaterThan(key, value) => jsValueOrdering.gt(jsMap(key), value)
+          case Filter.GreaterOrEqualThan(key, value) => jsValueOrdering.gteq(jsMap(key), value)
           case Filter.LessThan(key, value) => jsValueOrdering.lt(jsMap(key), value)
           case Filter.AnyOf(key, values) => values.contains(jsMap(key))
           case Filter.NoneOf(key, values) => !(values contains jsMap(key))

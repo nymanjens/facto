@@ -1,7 +1,6 @@
 package flux.react
 
-import japgolly.scalajs.react.vdom.VdomNode
-import japgolly.scalajs.react.vdom.TagMod
+import japgolly.scalajs.react.vdom.{TagMod, VdomArray, VdomNode}
 import japgolly.scalajs.react.vdom.html_<^._
 import japgolly.scalajs.react.vdom.Implicits._
 
@@ -35,6 +34,11 @@ object ReactVdomUtils {
 
     def ifThen[T](option: Option[T])(thenElement: T => VdomNode): VdomNode = {
       ifThen(option.isDefined)(thenElement(option.get))
+    }
+
+    def joinWithSpaces[A](elems: TraversableOnce[A])(implicit f: A => VdomNode,
+                                                     stringF: String => VdomNode): VdomArray = {
+      VdomArray.empty() ++= elems.flatMap(a => Seq(f(a), stringF(" ")))
     }
   }
 }

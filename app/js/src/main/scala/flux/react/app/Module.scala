@@ -27,6 +27,9 @@ final class Module(implicit i18n: I18n,
                    endowmentEntriesStoreFactory: EndowmentEntriesStoreFactory,
                    tagsStoreFactory: TagsStoreFactory,
                    complexQueryStoreFactory: ComplexQueryStoreFactory,
+                   summaryForYearStoreFactory: SummaryForYearStoreFactory,
+                   summaryYearsStoreFactory: SummaryYearsStoreFactory,
+                   summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
                    globalMessagesStore: GlobalMessagesStore,
                    dispatcher: Dispatcher,
                    clock: Clock) {
@@ -52,5 +55,6 @@ final class Module(implicit i18n: I18n,
   implicit lazy val liquidation = transactionViewsModule.liquidation
   implicit lazy val endowments = transactionViewsModule.endowments
   implicit lazy val searchResults = transactionViewsModule.searchResults
+  implicit lazy val summary = transactionViewsModule.summary
 
 }

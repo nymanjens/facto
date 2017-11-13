@@ -28,13 +28,21 @@ object EntriesListStoreFactory {
   /**
     * @param entries the latest `maxNumEntries` entries sorted from old to new.
     */
-  case class State[Entry](entries: Seq[Entry], hasMore: Boolean)
+  case class State[Entry](entries: Seq[Entry],
+                          hasMore: Boolean,
+                          override val impactingTransactionIds: Set[Long],
+                          override val impactingBalanceCheckIds: Set[Long])
+      extends EntriesStore.StateTrait
   object State {
-    def empty[Entry]: State[Entry] = State(Seq(), hasMore = false)
-    def withGeneralEntries(hasMore: Boolean, generalEntryContents: Seq[Transaction]*): State[GeneralEntry] =
+    def empty[Entry]: State[Entry] =
+      State(Seq(), hasMore = false, impactingTransactionIds = Set(), impactingBalanceCheckIds = Set())
+
+    def withImpactingIdsInEntries[Entry <: GroupedTransactions](entries: Seq[Entry],
+                                                                hasMore: Boolean): State[Entry] =
       State(
-        entries = generalEntryContents.map(GeneralEntry(_)).toVector,
-        hasMore = hasMore
-      )
+        entries,
+        hasMore = hasMore,
+        impactingTransactionIds = entries.toStream.flatMap(_.transactions).map(_.id).toSet,
+        impactingBalanceCheckIds = Set())
   }
 }

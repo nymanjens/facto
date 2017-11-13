@@ -17,11 +17,11 @@ import scala2js.{Keys, Scala2Js}
 private[stores] final class ComplexQueryFilter(implicit userManager: User.Manager, accountingConfig: Config) {
 
   // **************** Public API **************** //
-  def fromQuery(query: String): LokiJs.ResultSet.Filter[Transaction] = {
+  def fromQuery(query: String): LokiJs.Filter[Transaction] = {
     if (query.trim.isEmpty) {
-      LokiJs.ResultSet.Filter.nullFilter
+      LokiJs.Filter.nullFilter
     } else {
-      LokiJs.ResultSet.Filter.and(
+      LokiJs.Filter.and(
         splitInParts(query)
           .map {
             case QueryPart(string, negated) =>
@@ -129,8 +129,8 @@ private[stores] final class ComplexQueryFilter(implicit userManager: User.Manage
 }
 
 object ComplexQueryFilter {
-  private case class QueryFilterPair(positiveFilter: LokiJs.ResultSet.Filter[Transaction],
-                                     negativeFilter: LokiJs.ResultSet.Filter[Transaction],
+  private case class QueryFilterPair(positiveFilter: LokiJs.Filter[Transaction],
+                                     negativeFilter: LokiJs.Filter[Transaction],
                                      estimatedExecutionCost: Int) {
     def negated: QueryFilterPair =
       QueryFilterPair(
@@ -148,27 +148,27 @@ object ComplexQueryFilter {
         case Seq(value) =>
           QueryFilterPair(
             estimatedExecutionCost = 1,
-            positiveFilter = LokiJs.ResultSet.Filter.equal(key, value),
-            negativeFilter = LokiJs.ResultSet.Filter.notEqual(key, value))
+            positiveFilter = LokiJs.Filter.equal(key, value),
+            negativeFilter = LokiJs.Filter.notEqual(key, value))
         case _ =>
           QueryFilterPair(
             estimatedExecutionCost = 2,
-            positiveFilter = LokiJs.ResultSet.Filter.anyOf(key, values),
-            negativeFilter = LokiJs.ResultSet.Filter.noneOf(key, values))
+            positiveFilter = LokiJs.Filter.anyOf(key, values),
+            negativeFilter = LokiJs.Filter.noneOf(key, values))
       }
 
     def containsIgnoreCase(key: Scala2Js.Key[String, Transaction], substring: String): QueryFilterPair =
       QueryFilterPair(
         estimatedExecutionCost = 3,
-        positiveFilter = LokiJs.ResultSet.Filter.containsIgnoreCase(key, substring),
-        negativeFilter = LokiJs.ResultSet.Filter.doesntContainIgnoreCase(key, substring)
+        positiveFilter = LokiJs.Filter.containsIgnoreCase(key, substring),
+        negativeFilter = LokiJs.Filter.doesntContainIgnoreCase(key, substring)
       )
 
     def seqContains(key: Scala2Js.Key[Seq[String], Transaction], value: String): QueryFilterPair =
       QueryFilterPair(
         estimatedExecutionCost = 3,
-        positiveFilter = LokiJs.ResultSet.Filter.seqContains(key, value),
-        negativeFilter = LokiJs.ResultSet.Filter.seqDoesntContain(key, value)
+        positiveFilter = LokiJs.Filter.seqContains(key, value),
+        negativeFilter = LokiJs.Filter.seqDoesntContain(key, value)
       )
   }
 

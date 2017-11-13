@@ -5,7 +5,7 @@ import java.time.Month.JANUARY
 import common.testing.TestObjects._
 import common.time.LocalDateTimes.createDateTime
 import jsfacades.LokiJs.ResultSet
-import jsfacades.LokiJs.ResultSet.Filter
+import jsfacades.LokiJs.Filter
 import models.accounting.Transaction
 import models.accounting.config.Category
 import models.manager.EntityModification
@@ -65,6 +65,16 @@ object LokiResultSetFakeTest extends TestSuite {
 
         withTransactions(transaction1, transaction2, transaction3)
           .assertFilteredWith(Filter.greaterThan(Keys.Transaction.createdDate, transaction1.createdDate))
+          .containsExactly(transaction2, transaction3)
+      }
+      "newQuery().filter(greaterOrEqualThan)" - {
+        val transaction1 = createTransaction(day = 1)
+        val transaction2 = createTransaction(day = 2)
+        val transaction3 = createTransaction(day = 3)
+
+        withTransactions(transaction1, transaction2, transaction3)
+          .assertFilteredWith(
+            Filter.greaterOrEqualThan(Keys.Transaction.createdDate, transaction2.createdDate))
           .containsExactly(transaction2, transaction3)
       }
       "newQuery().filter(anyOf)" - {

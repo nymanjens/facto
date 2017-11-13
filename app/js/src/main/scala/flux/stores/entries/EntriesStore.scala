@@ -12,7 +12,7 @@ import scala.collection.immutable.Seq
   *
   * @tparam State Any immutable type that contains all state maintained by this store
   */
-abstract class EntriesStore[State](implicit database: RemoteDatabaseProxy) {
+abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database: RemoteDatabaseProxy) {
   database.registerListener(RemoteDatabaseProxyListener)
 
   private var _state: Option[State] = None
@@ -44,9 +44,7 @@ abstract class EntriesStore[State](implicit database: RemoteDatabaseProxy) {
   protected def calculateState(): State
 
   protected def transactionUpsertImpactsState(transaction: Transaction, state: State): Boolean
-  protected def transactionRemovalImpactsState(transactionId: Long, state: State): Boolean
   protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State): Boolean
-  protected def balanceCheckRemovalImpactsState(balanceCheckId: Long, state: State): Boolean
 
   // **************** Private helper methods ****************//
   private def updateState(): Unit = {
@@ -71,14 +69,14 @@ abstract class EntriesStore[State](implicit database: RemoteDatabaseProxy) {
           case EntityModification.Add(transaction) =>
             transactionUpsertImpactsState(transaction.asInstanceOf[Transaction], state)
           case EntityModification.Remove(transactionId) =>
-            transactionRemovalImpactsState(transactionId, state)
+            state.impactedByTransactionId(transactionId)
         }
       case EntityType.BalanceCheckType =>
         entityModification match {
           case EntityModification.Add(bc) =>
             balanceCheckUpsertImpactsState(bc.asInstanceOf[BalanceCheck], state)
           case EntityModification.Remove(bcId) =>
-            balanceCheckRemovalImpactsState(bcId, state)
+            state.impactedByBalanceCheckId(bcId)
         }
     }
   }
@@ -130,6 +128,17 @@ abstract class EntriesStore[State](implicit database: RemoteDatabaseProxy) {
 }
 
 object EntriesStore {
+
+  trait StateTrait {
+    protected def impactingTransactionIds: Set[Long]
+    protected def impactingBalanceCheckIds: Set[Long]
+
+    private[entries] final def impactedByTransactionId(id: Long): Boolean =
+      impactingTransactionIds contains id
+    private[entries] final def impactedByBalanceCheckId(id: Long): Boolean =
+      impactingBalanceCheckIds contains id
+  }
+
   trait Listener {
     def onStateUpdate(): Unit
   }

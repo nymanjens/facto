@@ -49,13 +49,12 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
 
           | staticRuleFromPage(Page.Endowments, reactAppModule.endowments.apply)
 
-          | staticRuleFromPage(Page.Summary, reactAppModule.everything.apply)
-
-          | staticRuleFromPage(Page.TemplateList, reactAppModule.templateList.apply)
+          | staticRuleFromPage(Page.Summary, reactAppModule.summary.apply)
 
           | dynamicRuleFromPage(_ ~ query.caseClass[Page.Search]) { (page, ctl) =>
             reactAppModule.searchResults(js.URIUtils.decodeURI(page.query), ctl)
           }
+          | staticRuleFromPage(Page.TemplateList, reactAppModule.templateList.apply)
 
           | dynamicRuleFromPage(_ ~ returnToPath.caseClass[Page.NewTransactionGroup]) { (page, ctl) =>
             reactAppModule.transactionGroupForm.forCreate(page.returnToPath, ctl)

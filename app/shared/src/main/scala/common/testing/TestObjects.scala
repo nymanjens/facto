@@ -1,8 +1,10 @@
 package common.testing
 
+import java.time.Month
+
 import common.time.{LocalDateTime, LocalDateTimes}
 import models.User
-import java.time.Month.{JANUARY, MARCH}
+import java.time.Month._
 
 import common.time.LocalDateTimes.createDateTime
 import models.accounting.config.Account.SummaryTotalRowDef
@@ -12,6 +14,7 @@ import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 import models.manager.EntityModification
 
 import scala.collection.immutable.{ListMap, Seq}
+import scala.util.Random
 
 object TestObjects {
 
@@ -144,7 +147,7 @@ object TestObjects {
   implicit val testAccountingConfig: Config = Config(
     accounts =
       createListMap("ACC_COMMON" -> testAccountCommon, "ACC_A" -> testAccountA, "ACC_B" -> testAccountB),
-    categories = createListMap("CAT_B" -> testCategoryB, "CAT_A" -> testCategoryA),
+    categories = createListMap("CAT_B" -> testCategoryB, "CAT_A" -> testCategoryA, "CAT_C" -> testCategoryC),
     moneyReservoirsMap = createListMap(
       "CASH_COMMON" -> testReservoirCashCommon,
       "CARD_COMMON" -> testReservoirCardCommon,
@@ -233,31 +236,65 @@ object TestObjects {
   val testModificationB: EntityModification = EntityModification.Add(testTransactionWithIdB)
   def testModification: EntityModification = testModificationA
 
+  private val unsetDouble: Double = -387461.19
   def createTransaction(id: Long = -1,
-                        groupId: Long = 1273984,
+                        groupId: Long = -1,
                         issuer: User = testUserA,
                         beneficiary: Account = testAccountA,
                         reservoir: MoneyReservoir = null,
+                        year: Int = 2012,
+                        month: Month = MARCH,
                         day: Int = 25,
                         category: Category = testCategory,
                         description: String = "some description",
-                        flow: Double = -12.34,
+                        flow: Double = unsetDouble,
                         detailDescription: String = "some detail description",
                         tags: Seq[String] = Seq("some-tag")): Transaction = {
     testTransactionWithId.copy(
       idOption = Some(if (id == -1) EntityModification.generateRandomId() else id),
-      transactionGroupId = groupId,
+      transactionGroupId = if (groupId == -1) EntityModification.generateRandomId() else groupId,
       issuerId = issuer.id,
       beneficiaryAccountCode = beneficiary.code,
       moneyReservoirCode = Option(reservoir).map(_.code) getOrElse "",
       categoryCode = category.code,
       description = description,
-      flowInCents = (flow * 100).toLong,
+      flowInCents = if (flow == unsetDouble) Random.nextLong() % 10000 else (flow * 100).toLong,
       detailDescription = detailDescription,
       tags = tags,
-      createdDate = createDateTime(2012, JANUARY, day),
-      transactionDate = createDateTime(2012, JANUARY, day),
-      consumedDate = createDateTime(2012, JANUARY, day)
+      createdDate = createDateTime(year, month, day),
+      transactionDate = createDateTime(year, month, day),
+      consumedDate = createDateTime(year, month, day)
+    )
+  }
+
+  def createBalanceCheck(id: Long = -1,
+                         issuer: User = testUserA,
+                         reservoir: MoneyReservoir = testReservoir,
+                         year: Int = 2012,
+                         month: Month = MARCH,
+                         day: Int = 25,
+                         balance: Double = unsetDouble): BalanceCheck = {
+    BalanceCheck(
+      idOption = Some(if (id == -1) EntityModification.generateRandomId() else id),
+      moneyReservoirCode = reservoir.code,
+      balanceInCents = if (balance == unsetDouble) Random.nextLong() % 10000 else (balance * 100).toLong,
+      issuerId = issuer.id,
+      createdDate = createDateTime(year, month, day),
+      checkDate = createDateTime(year, month, day)
+    )
+  }
+
+  def createExchangeRateMeasurement(id: Long = -1,
+                                    year: Int = 2012,
+                                    month: Month = MARCH,
+                                    day: Int = 25,
+                                    foreignCurrencyCode: String = "GBP",
+                                    ratio: Double = unsetDouble): ExchangeRateMeasurement = {
+    ExchangeRateMeasurement(
+      idOption = Some(if (id == -1) EntityModification.generateRandomId() else id),
+      date = createDateTime(year, month, day),
+      foreignCurrencyCode = foreignCurrencyCode,
+      ratioReferenceToForeignCurrency = if (ratio == unsetDouble) Random.nextDouble() else ratio
     )
   }
 }

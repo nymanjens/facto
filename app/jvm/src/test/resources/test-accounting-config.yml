@@ -7,6 +7,9 @@ categories:
   - &catA
       code: CAT_A
       name: "Category A"
+  - &catC
+      code: CAT_C
+      name: "Category C"
 
 accounts:
   - &accCommon
