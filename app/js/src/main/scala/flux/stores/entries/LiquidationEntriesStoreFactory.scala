@@ -61,29 +61,22 @@ final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProx
         accountingConfig.moneyReservoirs(includeHidden = true).filter(r => r.owner == account)
       }
 
+      val account1ReservoirCodes = reservoirsOwnedBy(accountPair.account1).map(_.code)
+      val account2ReservoirCodes = reservoirsOwnedBy(accountPair.account2).map(_.code)
       val transactions = database
         .newQuery[Transaction]()
-        .filter(LokiJs.Filter.or(
-          LokiJs.Filter.and(
-            LokiJs.Filter.anyOf(
-              Keys.Transaction.moneyReservoirCode,
-              reservoirsOwnedBy(accountPair.account1).map(_.code)),
-            LokiJs.Filter
-              .equal(Keys.Transaction.beneficiaryAccountCode, accountPair.account2.code)
-          ),
-          LokiJs.Filter.and(
-            LokiJs.Filter.anyOf(
-              Keys.Transaction.moneyReservoirCode,
-              reservoirsOwnedBy(accountPair.account2).map(_.code)),
-            LokiJs.Filter
-              .equal(Keys.Transaction.beneficiaryAccountCode, accountPair.account1.code)
-          ),
-          LokiJs.Filter.and(
-            Keys.Transaction.moneyReservoirCode isEqualTo "",
-            LokiJs.Filter
-              .anyOf(Keys.Transaction.beneficiaryAccountCode, accountPair.toSet.map(_.code).toVector)
-          )
-        ))
+        .filter(
+          LokiJs.Filter.nullFilter[Transaction]
+            ||
+              ((Keys.Transaction.moneyReservoirCode isAnyOf account1ReservoirCodes) &&
+                (Keys.Transaction.beneficiaryAccountCode isEqualTo accountPair.account2.code))
+            ||
+              ((Keys.Transaction.moneyReservoirCode isAnyOf account2ReservoirCodes) &&
+                (Keys.Transaction.beneficiaryAccountCode isEqualTo accountPair.account1.code))
+            ||
+              ((Keys.Transaction.moneyReservoirCode isEqualTo "") &&
+                (Keys.Transaction.beneficiaryAccountCode isAnyOf accountPair.toSet.map(_.code).toVector))
+        )
         .sort(
           LokiJs.Sorting
             .ascBy(Keys.Transaction.transactionDate)
