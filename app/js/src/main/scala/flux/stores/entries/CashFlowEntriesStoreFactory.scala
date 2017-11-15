@@ -4,6 +4,7 @@ import common.time.JavaTimeImplicits._
 import common.time.LocalDateTime
 import flux.stores.entries.CashFlowEntry.{BalanceCorrection, RegularEntry}
 import jsfacades.LokiJs
+import jsfacades.LokiJsImplicits._
 import models.EntityAccess
 import models.access.RemoteDatabaseProxy
 import models.accounting.config.{Config, MoneyReservoir}
@@ -51,8 +52,8 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
           // get relevant balance checks
           database
             .newQuery[BalanceCheck]()
-            .filterEqual(Keys.BalanceCheck.moneyReservoirCode, moneyReservoir.code)
-            .filter(LokiJs.Filter.lessThan(Keys.BalanceCheck.checkDate, oldestTransDate))
+            .filter(Keys.BalanceCheck.moneyReservoirCode isEqualTo moneyReservoir.code)
+            .filter(Keys.BalanceCheck.checkDate < oldestTransDate)
             .sort(
               LokiJs.Sorting
                 .descBy(Keys.BalanceCheck.checkDate)
@@ -74,7 +75,7 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
         database
           .newQuery[BalanceCheck]()
           .filterEqual(Keys.BalanceCheck.moneyReservoirCode, moneyReservoir.code)
-          .filter(LokiJs.Filter.greaterOrEqualThan(Keys.BalanceCheck.checkDate, oldestBalanceDate))
+          .filter(Keys.BalanceCheck.checkDate >= oldestBalanceDate)
           .data()
 
       // get relevant transactions
@@ -82,7 +83,7 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
         database
           .newQuery[Transaction]()
           .filterEqual(Keys.Transaction.moneyReservoirCode, moneyReservoir.code)
-          .filter(LokiJs.Filter.greaterOrEqualThan(Keys.Transaction.transactionDate, oldestBalanceDate))
+          .filter(Keys.Transaction.transactionDate >= oldestBalanceDate)
           .data()
 
       // merge the two

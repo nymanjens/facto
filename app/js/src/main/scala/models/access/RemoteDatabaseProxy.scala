@@ -7,6 +7,7 @@ import api.ScalaJsApiClient
 import common.LoggingUtils.{logExceptions, LogExceptionsCallback}
 import common.ScalaUtils.visibleForTesting
 import jsfacades.LokiJs
+import jsfacades.LokiJsImplicits._
 import models.access.SingletonKey._
 import models.manager.{Entity, EntityModification, EntityType}
 

@@ -1,6 +1,7 @@
 package models.accounting
 
 import jsfacades.LokiJs
+import jsfacades.LokiJsImplicits._
 import models.access.RemoteDatabaseProxy
 import models.manager.BaseJsEntityManager
 import scala2js.Converters._

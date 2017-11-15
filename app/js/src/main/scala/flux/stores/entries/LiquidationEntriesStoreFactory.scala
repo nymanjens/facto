@@ -2,6 +2,7 @@ package flux.stores.entries
 
 import common.LoggingUtils.logExceptions
 import jsfacades.LokiJs
+import jsfacades.LokiJsImplicits._
 import models.EntityAccess
 import models.access.RemoteDatabaseProxy
 import models.accounting.{BalanceCheck, Transaction}
@@ -78,7 +79,7 @@ final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProx
               .equal(Keys.Transaction.beneficiaryAccountCode, accountPair.account1.code)
           ),
           LokiJs.Filter.and(
-            LokiJs.Filter.equal(Keys.Transaction.moneyReservoirCode, ""),
+            Keys.Transaction.moneyReservoirCode isEqualTo "",
             LokiJs.Filter
               .anyOf(Keys.Transaction.beneficiaryAccountCode, accountPair.toSet.map(_.code).toVector)
           )

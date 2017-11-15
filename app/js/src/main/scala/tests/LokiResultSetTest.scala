@@ -2,6 +2,7 @@ package tests
 
 import common.testing.TestObjects._
 import jsfacades.LokiJs
+import jsfacades.LokiJsImplicits._
 import jsfacades.LokiJs.ResultSet
 import jsfacades.LokiJs.Filter
 import models.access.LocalDatabase

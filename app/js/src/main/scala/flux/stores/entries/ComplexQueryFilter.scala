@@ -4,6 +4,7 @@ import common.GuavaReplacement.Splitter
 import common.ScalaUtils.visibleForTesting
 import flux.stores.entries.ComplexQueryFilter.{Prefix, QueryFilterPair, QueryPart}
 import jsfacades.LokiJs
+import jsfacades.LokiJsImplicits._
 import models.User
 import models.accounting._
 import models.accounting.config.Config
@@ -148,27 +149,26 @@ object ComplexQueryFilter {
         case Seq(value) =>
           QueryFilterPair(
             estimatedExecutionCost = 1,
-            positiveFilter = LokiJs.Filter.equal(key, value),
-            negativeFilter = LokiJs.Filter.notEqual(key, value))
+            positiveFilter = key isEqualTo value,
+            negativeFilter = key isNotEqualTo value)
         case _ =>
           QueryFilterPair(
             estimatedExecutionCost = 2,
-            positiveFilter = LokiJs.Filter.anyOf(key, values),
-            negativeFilter = LokiJs.Filter.noneOf(key, values))
+            positiveFilter = key isAnyOf values,
+            negativeFilter = key isNoneOf values)
       }
 
     def containsIgnoreCase(key: Scala2Js.Key[String, Transaction], substring: String): QueryFilterPair =
       QueryFilterPair(
         estimatedExecutionCost = 3,
-        positiveFilter = LokiJs.Filter.containsIgnoreCase(key, substring),
-        negativeFilter = LokiJs.Filter.doesntContainIgnoreCase(key, substring)
-      )
+        positiveFilter = key containsIgnoreCase substring,
+        negativeFilter = key doesntContainIgnoreCase substring)
 
     def seqContains(key: Scala2Js.Key[Seq[String], Transaction], value: String): QueryFilterPair =
       QueryFilterPair(
         estimatedExecutionCost = 3,
-        positiveFilter = LokiJs.Filter.seqContains(key, value),
-        negativeFilter = LokiJs.Filter.seqDoesntContain(key, value)
+        positiveFilter = key contains value,
+        negativeFilter = key doesntContain value
       )
   }
 

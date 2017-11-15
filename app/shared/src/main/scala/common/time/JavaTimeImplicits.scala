@@ -15,7 +15,6 @@ object JavaTimeImplicits {
     override def compare(x: LocalDateTime, y: LocalDateTime): Int = x compareTo y
   }
   implicit class LocalDateTimeWrapper(thisDate: LocalDateTime) extends BaseWrapper[LocalDateTime](thisDate) {
-
     def -(other: LocalDateTime): Duration = {
       // Heuristic because scala.js doesn't support Duration.between(LocalDate, LocalDate)
       val localDateDayDiff = thisDate.toLocalDate.toEpochDay - other.toLocalDate.toEpochDay

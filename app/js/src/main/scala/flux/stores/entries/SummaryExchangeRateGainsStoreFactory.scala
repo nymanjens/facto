@@ -8,6 +8,7 @@ import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.{
   GainsForYear
 }
 import jsfacades.LokiJs
+import jsfacades.LokiJsImplicits._
 import models.access.RemoteDatabaseProxy
 import models.accounting.config.{Account, Config, MoneyReservoir}
 import models.accounting.money.{Currency, ExchangeRateManager, MoneyWithGeneralCurrency, ReferenceMoney}

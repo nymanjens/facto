@@ -3,6 +3,7 @@ package flux.stores.entries
 import common.time.YearRange
 import flux.stores.entries.SummaryYearsStoreFactory.State
 import jsfacades.LokiJs
+import jsfacades.LokiJsImplicits._
 import models.access.RemoteDatabaseProxy
 import models.accounting.config.Account
 import models.accounting.{BalanceCheck, Transaction}
