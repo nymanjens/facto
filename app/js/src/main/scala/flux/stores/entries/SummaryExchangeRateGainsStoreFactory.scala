@@ -140,7 +140,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
                                  start: LocalDateTime,
                                  end: LocalDateTime): LokiJs.Filter[E] = {
       LokiJs.Filter.and(
-        LokiJs.Filter.greaterThan(key, start),
+        LokiJs.Filter.greaterOrEqualThan(key, start),
         LokiJs.Filter.lessThan(key, end)
       )
     }

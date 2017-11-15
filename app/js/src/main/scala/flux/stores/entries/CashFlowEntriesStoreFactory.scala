@@ -74,7 +74,7 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
         database
           .newQuery[BalanceCheck]()
           .filterEqual(Keys.BalanceCheck.moneyReservoirCode, moneyReservoir.code)
-          .filter(LokiJs.Filter.greaterThan(Keys.BalanceCheck.checkDate, oldestBalanceDate))
+          .filter(LokiJs.Filter.greaterOrEqualThan(Keys.BalanceCheck.checkDate, oldestBalanceDate))
           .data()
 
       // get relevant transactions
@@ -82,7 +82,7 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
         database
           .newQuery[Transaction]()
           .filterEqual(Keys.Transaction.moneyReservoirCode, moneyReservoir.code)
-          .filter(LokiJs.Filter.greaterThan(Keys.Transaction.transactionDate, oldestBalanceDate))
+          .filter(LokiJs.Filter.greaterOrEqualThan(Keys.Transaction.transactionDate, oldestBalanceDate))
           .data()
 
       // merge the two
