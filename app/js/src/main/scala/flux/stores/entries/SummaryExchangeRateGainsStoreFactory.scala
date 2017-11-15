@@ -78,11 +78,6 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
               Keys.BalanceCheck.checkDate,
               oldestBalanceDate,
               monthsInYear.last.startTimeOfNextMonth))
-          .sort(
-            LokiJs.Sorting
-              .ascBy(Keys.BalanceCheck.checkDate)
-              .thenAscBy(Keys.BalanceCheck.createdDate)
-              .thenAscBy(Keys.id))
           .data()
 
       val transactions: Seq[Transaction] =
@@ -94,16 +89,15 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
               Keys.Transaction.transactionDate,
               oldestBalanceDate,
               monthsInYear.last.startTimeOfNextMonth))
-          .sort(
-            LokiJs.Sorting
-              .ascBy(Keys.Transaction.transactionDate)
-              .thenAscBy(Keys.Transaction.createdDate)
-              .thenAscBy(Keys.id))
           .data()
 
       val dateToBalanceFunction: DateToBalanceFunction = {
         val builder = new DateToBalanceFunction.Builder(oldestBalanceDate, initialBalance)
-        mergeTransactionsAndBalanceChecks(transactions, balanceChecks).foreach {
+        val mergedRows = (transactions ++ balanceChecks).sortBy {
+          case trans: Transaction => (trans.transactionDate, trans.createdDate)
+          case bc: BalanceCheck => (bc.checkDate, bc.createdDate)
+        }
+        mergedRows.foreach {
           case transaction: Transaction =>
             builder.incrementLatestBalance(transaction.transactionDate, transaction.flow)
           case balanceCheck: BalanceCheck =>
@@ -149,27 +143,6 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
         LokiJs.Filter.greaterThan(key, start),
         LokiJs.Filter.lessThan(key, end)
       )
-    }
-
-    private def mergeTransactionsAndBalanceChecks(transactions: Seq[Transaction],
-                                                  balanceChecks: Seq[BalanceCheck]): List[AnyRef] = {
-      // merge the two (recursion does not lead to growing stack because of Stream)
-      def merge(nextTransactions: List[Transaction], nextBalanceChecks: List[BalanceCheck]): Stream[AnyRef] = {
-        (nextTransactions, nextBalanceChecks) match {
-          case (trans :: otherTrans, bc :: otherBCs) if trans.transactionDate < bc.checkDate =>
-            trans #:: merge(otherTrans, nextBalanceChecks)
-          case (trans :: otherTrans, bc :: otherBCs)
-              if (trans.transactionDate == bc.checkDate) && (trans.createdDate < bc.createdDate) =>
-            trans #:: merge(otherTrans, nextBalanceChecks)
-          case (trans :: otherTrans, Nil) =>
-            trans #:: merge(otherTrans, nextBalanceChecks)
-          case (_, bc :: otherBCs) =>
-            bc #:: merge(nextTransactions, otherBCs)
-          case (Nil, Nil) =>
-            Stream.empty
-        }
-      }
-      merge(transactions.toList, balanceChecks.toList).toList
     }
   }
 
