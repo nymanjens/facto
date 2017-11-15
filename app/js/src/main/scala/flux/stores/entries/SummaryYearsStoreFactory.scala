@@ -27,7 +27,7 @@ final class SummaryYearsStoreFactory(implicit database: RemoteDatabaseProxy)
       def getFirstAfterSorting(sorting: LokiJs.Sorting[Transaction]): Option[Transaction] = {
         val data = database
           .newQuery[Transaction]()
-          .filterEqual(Keys.Transaction.beneficiaryAccountCode, account.code)
+          .filter(Keys.Transaction.beneficiaryAccountCode isEqualTo account.code)
           .sort(sorting)
           .limit(1)
           .data()

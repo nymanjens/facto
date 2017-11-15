@@ -18,8 +18,8 @@ final class EndowmentEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
       val transactions: Seq[Transaction] =
         database
           .newQuery[Transaction]()
-          .filterEqual(Keys.Transaction.categoryCode, accountingConfig.constants.endowmentCategory.code)
-          .filterEqual(Keys.Transaction.beneficiaryAccountCode, account.code)
+          .filter(Keys.Transaction.categoryCode isEqualTo accountingConfig.constants.endowmentCategory.code)
+          .filter(Keys.Transaction.beneficiaryAccountCode isEqualTo account.code)
           .sort(
             LokiJs.Sorting
               .descBy(Keys.Transaction.consumedDate)

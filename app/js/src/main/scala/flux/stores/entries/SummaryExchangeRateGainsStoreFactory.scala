@@ -56,7 +56,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
       val oldestRelevantBalanceCheck: Option[BalanceCheck] =
         database
           .newQuery[BalanceCheck]()
-          .filterEqual(Keys.BalanceCheck.moneyReservoirCode, reservoir.code)
+          .filter(Keys.BalanceCheck.moneyReservoirCode isEqualTo reservoir.code)
           .filter(LokiJs.Filter.lessThan(Keys.BalanceCheck.checkDate, monthsInYear.head.startTime))
           .sort(
             LokiJs.Sorting
@@ -73,7 +73,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
       val balanceChecks: Seq[BalanceCheck] =
         database
           .newQuery[BalanceCheck]()
-          .filterEqual(Keys.BalanceCheck.moneyReservoirCode, reservoir.code)
+          .filter(Keys.BalanceCheck.moneyReservoirCode isEqualTo reservoir.code)
           .filter(
             filterInRange(
               Keys.BalanceCheck.checkDate,
@@ -84,7 +84,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
       val transactions: Seq[Transaction] =
         database
           .newQuery[Transaction]()
-          .filterEqual(Keys.Transaction.moneyReservoirCode, reservoir.code)
+          .filter(Keys.Transaction.moneyReservoirCode isEqualTo reservoir.code)
           .filter(
             filterInRange(
               Keys.Transaction.transactionDate,

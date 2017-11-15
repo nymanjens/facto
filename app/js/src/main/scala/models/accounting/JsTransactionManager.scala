@@ -15,7 +15,7 @@ final class JsTransactionManager(implicit database: RemoteDatabaseProxy)
   override def findByGroupId(groupId: Long): Seq[Transaction] = {
     database
       .newQuery[Transaction]()
-      .filterEqual(Keys.Transaction.transactionGroupId, groupId)
+      .filter(Keys.Transaction.transactionGroupId isEqualTo groupId)
       .sort(LokiJs.Sorting.ascBy(Keys.id))
       .data()
   }
