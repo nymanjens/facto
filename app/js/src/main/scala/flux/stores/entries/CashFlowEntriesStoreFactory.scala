@@ -75,11 +75,6 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
           .newQuery[BalanceCheck]()
           .filterEqual(Keys.BalanceCheck.moneyReservoirCode, moneyReservoir.code)
           .filter(LokiJs.Filter.greaterThan(Keys.BalanceCheck.checkDate, oldestBalanceDate))
-          .sort(
-            LokiJs.Sorting
-              .ascBy(Keys.BalanceCheck.checkDate)
-              .thenAscBy(Keys.BalanceCheck.createdDate)
-              .thenAscBy(Keys.id))
           .data()
 
       // get relevant transactions
@@ -88,30 +83,13 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
           .newQuery[Transaction]()
           .filterEqual(Keys.Transaction.moneyReservoirCode, moneyReservoir.code)
           .filter(LokiJs.Filter.greaterThan(Keys.Transaction.transactionDate, oldestBalanceDate))
-          .sort(
-            LokiJs.Sorting
-              .ascBy(Keys.Transaction.transactionDate)
-              .thenAscBy(Keys.Transaction.createdDate)
-              .thenAscBy(Keys.id))
           .data()
 
-      // merge the two (recursion does not lead to growing stack because of Stream)
-      def merge(nextTransactions: List[Transaction], nextBalanceChecks: List[BalanceCheck]): Stream[AnyRef] = {
-        (nextTransactions, nextBalanceChecks) match {
-          case (trans :: otherTrans, bc :: otherBCs) if trans.transactionDate < bc.checkDate =>
-            trans #:: merge(otherTrans, nextBalanceChecks)
-          case (trans :: otherTrans, bc :: otherBCs)
-              if (trans.transactionDate == bc.checkDate) && (trans.createdDate < bc.createdDate) =>
-            trans #:: merge(otherTrans, nextBalanceChecks)
-          case (trans :: otherTrans, Nil) =>
-            trans #:: merge(otherTrans, nextBalanceChecks)
-          case (_, bc :: otherBCs) =>
-            bc #:: merge(nextTransactions, otherBCs)
-          case (Nil, Nil) =>
-            Stream.empty
-        }
+      // merge the two
+      val mergedRows = (transactions ++ balanceChecks).sortBy {
+        case trans: Transaction => (trans.transactionDate, trans.createdDate)
+        case bc: BalanceCheck => (bc.checkDate, bc.createdDate)
       }
-      val mergedRows = merge(transactions.toList, balanceChecks.toList).toList
 
       // convert to entries (recursion does not lead to growing stack because of Stream)
       def convertToEntries(nextRows: List[AnyRef],
@@ -127,7 +105,7 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
           case Nil =>
             Stream.empty
         }
-      var entries = convertToEntries(mergedRows, initialBalance).toList
+      var entries = convertToEntries(mergedRows.toList, initialBalance).toList
 
       // combine entries of same group and merge BC's with same balance (recursion does not lead to growing stack because of Stream)
       def combineSimilar(nextEntries: List[CashFlowEntry]): Stream[CashFlowEntry] = nextEntries match {
