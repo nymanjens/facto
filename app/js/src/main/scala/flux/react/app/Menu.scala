@@ -28,8 +28,8 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
     .componentDidMount(scope =>
       LogExceptionsCallback {
         scope.props.router.currentPage match {
-          case Page.Search(query) => {
-            scope.backend.queryInputRef().setValue(query)
+          case page: Page.Search => {
+            scope.backend.queryInputRef().setValue(page.query)
           }
           case _ =>
         }
