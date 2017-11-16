@@ -28,6 +28,15 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
     .builder[Props](getClass.getSimpleName)
     .renderBackend[Backend]
     .componentWillMount(scope => scope.backend.configureKeyboardShortcuts(scope.props.router))
+    .componentDidMount(scope =>
+      LogExceptionsCallback {
+        scope.props.router.currentPage match {
+          case Page.Search(query) => {
+            scope.backend.queryInputRef().setValue(query)
+          }
+          case _ =>
+        }
+    })
     .componentWillReceiveProps(scope => scope.backend.configureKeyboardShortcuts(scope.nextProps.router))
     .build
 
