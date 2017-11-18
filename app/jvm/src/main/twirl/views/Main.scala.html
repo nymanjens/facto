@@ -44,7 +44,6 @@
             @if(user.loginName == "admin") {
               <li><a href="@routes.Application.administration"><i class="fa fa-cogs fa-fw"></i> @Messages("facto.user-administration")</a></li>
             }
-            <li><a href="@controllers.accounting.routes.GeneralActions.updateLogsLatest"><i class="fa fa-archive fa-fw"></i> @Messages("facto.update-logs")</a></li>
             <li class="divider"></li>
             <li><a href="@routes.Auth.logout"><i class="fa fa-sign-out fa-fw"></i> @Messages("facto.logout")</a>
             </li>
