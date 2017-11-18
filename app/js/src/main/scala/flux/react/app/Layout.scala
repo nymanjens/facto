@@ -76,13 +76,13 @@ final class Layout(implicit globalMessages: GlobalMessages, menu: Menu, user: Us
                     i18n("facto.logout")))
               )
             )
+          ),
+          <.div(
+            ^.className := "navbar-default sidebar",
+            ^.role := "navigation",
+            <.div(^.className := "sidebar-nav navbar-collapse", menu(props.router))
           )
         ),
-        <.div(
-          ^.className := "navbar-default sidebar",
-          ^.role := "navigation",
-          <.div(^.className := "sidebar-nav navbar-collapse"),
-          menu(props.router)),
         // Page Content
         <.div(
           ^.id := "page-wrapper",

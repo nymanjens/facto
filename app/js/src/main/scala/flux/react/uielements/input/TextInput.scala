@@ -1,11 +1,14 @@
 package flux.react.uielements.input
 
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
+import flux.react.ReactVdomUtils.^^
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom.html_<^._
 import org.scalajs.dom.html
+
+import scala.collection.immutable.Seq
 
 object TextInput {
 
@@ -16,8 +19,11 @@ object TextInput {
     .build
 
   // **************** API ****************//
-  def apply(ref: Reference, name: String, placeholder: String = ""): VdomElement = {
-    val props = Props(name = name, placeholder = placeholder)
+  def apply(ref: Reference,
+            name: String,
+            placeholder: String = "",
+            classes: Seq[String] = Seq()): VdomElement = {
+    val props = Props(name = name, placeholder = placeholder, classes = classes)
     ref.mutableRef.component(props)
   }
 
@@ -32,7 +38,7 @@ object TextInput {
   }
 
   // **************** Private inner types ****************//
-  private case class Props private[TextInput] (name: String, placeholder: String)
+  private case class Props private[TextInput] (name: String, placeholder: String, classes: Seq[String])
   private case class State(value: String) {
     def withValue(newValue: String): State = copy(value = newValue)
   }
@@ -67,6 +73,7 @@ object TextInput {
       <.input(
         ^.tpe := "text",
         ^.name := props.name,
+        ^^.classes(props.classes),
         ^.value := state.value,
         ^.placeholder := props.placeholder,
         ^.onChange ==> { (e: ReactEventFromInput) =>

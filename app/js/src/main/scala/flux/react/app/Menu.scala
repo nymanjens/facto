@@ -14,6 +14,8 @@ import models.EntityAccess
 import models.accounting.config.Config
 import models.accounting.money.ExchangeRateManager
 
+import scala.collection.immutable.Seq
+
 private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFactory,
                               entityAccess: EntityAccess,
                               clock: Clock,
@@ -66,7 +68,11 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
             <.div(
               ^.className := "input-group custom-search-form",
               uielements.input
-                .TextInput(ref = queryInputRef, name = "query", placeholder = i18n("facto.search")),
+                .TextInput(
+                  ref = queryInputRef,
+                  name = "query",
+                  placeholder = i18n("facto.search"),
+                  classes = Seq("form-control")),
               <.span(
                 ^.className := "input-group-btn",
                 <.button(
