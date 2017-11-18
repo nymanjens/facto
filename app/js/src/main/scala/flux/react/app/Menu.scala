@@ -56,6 +56,7 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
           .anchorWithHrefTo(page)(
             ^^.ifThen(page.getClass == props.router.currentPage.getClass) { ^.className := "active" },
             <.i(^.className := iconClass),
+            " ",
             <.span(^.dangerouslySetInnerHtml := label)
           )
 
