@@ -53,14 +53,14 @@ final class Layout(implicit globalMessages: GlobalMessages, menu: Menu, user: Us
                 ^.className := "dropdown-menu dropdown-user",
                 <.li(
                   <.a(
-                    ^.href := "@routes.Application.profile",
+                    ^.href := "/profile/",
                     <.i(^.className := "fa fa-user fa-fw"),
                     " ",
                     i18n("facto.user-profile"))),
                 ^^.ifThen(user.loginName == "admin") {
                   <.li(
                     <.a(
-                      ^.href := "@routes.Application.administration",
+                      ^.href := "/administration/",
                       <.i(^.className := "fa fa-cogs fa-fw"),
                       " ",
                       i18n("facto.user-administration")))
@@ -68,7 +68,7 @@ final class Layout(implicit globalMessages: GlobalMessages, menu: Menu, user: Us
                 <.li(^.className := "divider"),
                 <.li(
                   <.a(
-                    ^.href := "@routes.Auth.logout",
+                    ^.href := "/logout/",
                     " ",
                     <.i(^.className := "fa fa-sign-out fa-fw"),
                     i18n("facto.logout")))
