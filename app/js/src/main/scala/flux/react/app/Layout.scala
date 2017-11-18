@@ -2,7 +2,7 @@ package flux.react.app
 
 import common.I18n
 import flux.react.ReactVdomUtils.^^
-import flux.react.router.RouterContext
+import flux.react.router.{Page, RouterContext}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.PackageBase.VdomAttr
 import japgolly.scalajs.react.vdom.html_<^._
@@ -14,7 +14,8 @@ final class Layout(implicit globalMessages: GlobalMessages, menu: Menu, user: Us
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
-    .renderPC((_, props, children) =>
+    .renderPC { (_, props, children) =>
+      val router = props.router
       <.div(
         ^.id := "wrapper",
         // Navigation
@@ -34,10 +35,7 @@ final class Layout(implicit globalMessages: GlobalMessages, menu: Menu, user: Us
               <.span(^.className := "icon-bar"),
               <.span(^.className := "icon-bar")
             ),
-            <.a(
-              ^.className := "navbar-brand",
-              ^.href := "@routes.Application.index",
-              "Family Accounting Tool")
+            router.anchorWithHrefTo(Page.Root)(^.className := "navbar-brand", "Family Accounting Tool")
           ),
           <.ul(
             ^.className := "nav navbar-top-links navbar-right",
@@ -80,7 +78,7 @@ final class Layout(implicit globalMessages: GlobalMessages, menu: Menu, user: Us
           <.div(
             ^.className := "navbar-default sidebar",
             ^.role := "navigation",
-            <.div(^.className := "sidebar-nav navbar-collapse", menu(props.router))
+            <.div(^.className := "sidebar-nav navbar-collapse", menu(router))
           )
         ),
         // Page Content
@@ -99,7 +97,8 @@ final class Layout(implicit globalMessages: GlobalMessages, menu: Menu, user: Us
                 " 2016 Jens Nyman"))
           )
         )
-    ))
+      )
+    }
     .build
 
   // **************** API ****************//
