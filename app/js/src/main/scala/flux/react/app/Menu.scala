@@ -59,6 +59,7 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
 
       <.ul(
         ^.className := "nav",
+        ^.id := "side-menu",
         <.li(
           ^.className := "sidebar-search",
           <.form(

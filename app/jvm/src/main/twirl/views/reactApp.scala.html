@@ -2,7 +2,7 @@
 
 @(
 )(
-  implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash, env: play.api.Environment, webJarAssets: controllers.WebJarAssets
+  implicit env: play.api.Environment, webJarAssets: controllers.WebJarAssets
 )
 
 @extrascript = {
@@ -18,8 +18,6 @@
       resourceExists = name => getClass.getResource(s"/public/$name") != null)
 }
 
-@Main("React App", extrascript = extrascript) {
-  <div>
-    !!!<div id="root"></div>===
-  </div>
+@Base("Facto", extrascript = extrascript) {
+  <div id="root"></div>
 }
