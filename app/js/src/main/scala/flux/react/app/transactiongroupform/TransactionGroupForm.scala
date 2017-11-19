@@ -187,6 +187,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
                 <.a(
                   ^.className := "btn btn-default delete-button",
                   <.i(^.className := "fa fa-times"),
+                  " ",
                   i18n("facto.delete"),
                   ^.onClick --> onDelete
                 )

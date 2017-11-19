@@ -91,12 +91,15 @@ final class BalanceCheckForm(implicit i18n: I18n,
             ^.className := "col-lg-12",
             uielements.PageHeader.withExtension(router.currentPage)(
               <<.ifThen(props.operationMeta.isInstanceOf[OperationMeta.Edit]) {
-                <.a(
-                  ^.className := "btn btn-default delete-button",
-                  <.i(^.className := "fa fa-times"),
-                  i18n("facto.delete"),
-                  ^.onClick --> onDelete
-                )
+                <.span(
+                  " ",
+                  <.a(
+                    ^.className := "btn btn-default delete-button",
+                    <.i(^.className := "fa fa-times"),
+                    " ",
+                    i18n("facto.delete"),
+                    ^.onClick --> onDelete
+                  ))
               }
             )
           )
