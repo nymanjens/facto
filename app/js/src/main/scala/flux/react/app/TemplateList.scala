@@ -2,6 +2,7 @@ package flux.react.app
 
 import common.I18n
 import common.LoggingUtils.logExceptions
+import flux.react.ReactVdomUtils.<<
 import flux.react.router.{Page, RouterContext}
 import flux.react.uielements
 import flux.react.uielements.Panel
@@ -29,16 +30,17 @@ private[app] final class TemplateList(implicit user: User,
             panelClasses = Seq("templates-panel")
           ) {
             val templates = accountingConfig.templatesToShowFor(Template.Placement.TemplateList, user)
-            (
+            <<.joinWithSpaces(
               for (template <- templates)
                 yield
                   router.anchorWithHrefTo(Page.NewFromTemplate(template))(
                     ^.key := template.code,
                     ^.className := "btn btn-info btn-lg",
                     <.i(^.className := template.iconClass),
+                    " ",
                     template.name
                   )
-            ).toVdomArray
+            )
           }
         )
     })

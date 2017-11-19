@@ -16,6 +16,7 @@ object TransactionGroupEditButton {
         ^^.classes("btn", "btn-default", "btn-xs"),
         ^.role := "button",
         <.i(^^.classes("fa", "fa-pencil", "fa-fw")),
+        " ",
         props.i18n("facto.edit")
       )
     })

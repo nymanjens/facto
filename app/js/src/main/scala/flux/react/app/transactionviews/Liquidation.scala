@@ -100,6 +100,7 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
       ^.className := "btn btn-info btn-xs",
       ^.role := "button",
       <.i(^.className := "fa fa-check-square-o fa-fw"),
+      " ",
       i18n("facto.repay")
     )
 

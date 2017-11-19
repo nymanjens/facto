@@ -53,8 +53,8 @@ object MoneyInput {
           <.span(
             ^.className := "input-group-addon",
             <.i(^.className := Currency.default.iconClass),
-            <.span(
-              " " + referenceMoney(extraProps.currency, extraProps.dateForCurrencyConversion.get).formatFloat)
+            " ",
+            referenceMoney(extraProps.currency, extraProps.dateForCurrencyConversion.get).formatFloat
           )
         }
       )

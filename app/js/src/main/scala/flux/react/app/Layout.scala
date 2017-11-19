@@ -69,8 +69,8 @@ final class Layout(implicit globalMessages: GlobalMessages, menu: Menu, user: Us
                 <.li(
                   <.a(
                     ^.href := "/logout/",
-                    " ",
                     <.i(^.className := "fa fa-sign-out fa-fw"),
+                    " ",
                     i18n("facto.logout")))
               )
             )

@@ -55,9 +55,11 @@ private[app] final class GlobalMessages(implicit globalMessagesStore: GlobalMess
             ^.className := "alert alert-info",
             ^.style := js.Dictionary("marginTop" -> "20px"),
             ^^.ifThen(message.isWorking) {
-              <.i(
-                ^.className := "fa fa-circle-o-notch fa-spin",
-                ^.style := js.Dictionary("marginRight" -> "11px"))
+              <.span(
+                <.i(
+                  ^.className := "fa fa-circle-o-notch fa-spin",
+                  ^.style := js.Dictionary("marginRight" -> "11px")),
+                " ")
             },
             message.string
           )
