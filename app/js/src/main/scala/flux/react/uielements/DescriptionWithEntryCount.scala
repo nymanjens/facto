@@ -19,7 +19,7 @@ object DescriptionWithEntryCount {
           .map(tag =>
             <.span(^^.classes("label", s"label-${Tags.getBootstrapClassSuffix(tag)}"), ^.key := tag, tag)) ++
           // Add empty span to force space after non-empty label list
-          Seq(<.span()))
+          Seq(<.span(key="empty-span-for-space")))
 
       if (entry.transactions.size == 1) {
         <.span(
