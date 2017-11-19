@@ -11,6 +11,8 @@ import models.accounting.config.Config
 import models.accounting.money.ExchangeRateManager
 import models.{EntityAccess, User}
 
+import scala.collection.immutable.Seq
+
 final class Summary(implicit summaryTable: SummaryTable,
                     entityAccess: EntityAccess,
                     user: User,
@@ -48,24 +50,30 @@ final class Summary(implicit summaryTable: SummaryTable,
     def render(props: Props, state: State) = logExceptions {
       implicit val router = props.router
       <.span(
-        uielements.PageHeader(router.currentPage),
-        <.form(
-          <.div(
-            ^.className := "input-group custom-search-form",
-            uielements.input
-              .TextInput(ref = queryInputRef, name = "query", placeholder = i18n("facto.example-query")),
-            <.span(
-              ^.className := "input-group-btn",
-              <.button(
-                ^.className := "btn btn-default",
-                ^.tpe := "submit",
-                ^.onClick ==> { (e: ReactEventFromInput) =>
-                  LogExceptionsCallback {
-                    e.preventDefault()
-                    $.modState(_.copy(query = queryInputRef().value getOrElse "")).runNow()
-                  }
-                },
-                <.i(^.className := "fa fa-search")
+        uielements.PageHeader.withExtension(router.currentPage)(
+          <.form(
+            ^.className := "form-inline summary-query-filter",
+            <.div(
+              ^.className := "input-group",
+              uielements.input
+                .TextInput(
+                  ref = queryInputRef,
+                  name = "query",
+                  placeholder = i18n("facto.example-query"),
+                  classes = Seq("form-control")),
+              <.span(
+                ^.className := "input-group-btn",
+                <.button(
+                  ^.className := "btn btn-default",
+                  ^.tpe := "submit",
+                  ^.onClick ==> { (e: ReactEventFromInput) =>
+                    LogExceptionsCallback {
+                      e.preventDefault()
+                      $.modState(_.copy(query = queryInputRef().value getOrElse "")).runNow()
+                    }
+                  },
+                  <.i(^.className := "fa fa-search")
+                )
               )
             )
           )), {

@@ -24,7 +24,7 @@ final class Layout(implicit globalMessages: GlobalMessages, menu: Menu, user: Us
         <.nav(
           ^.className := "navbar navbar-default navbar-static-top",
           ^.role := "navigation",
-          ^.style := js.Dictionary("margin-bottom" -> 0),
+          ^.style := js.Dictionary("marginBottom" -> 0),
           <.div(
             ^.className := "navbar-header",
             <.button(
