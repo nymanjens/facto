@@ -27,6 +27,25 @@ select:-moz-focusring { // Remove outline from select box in FF: http://stackove
     text-shadow: 0 0 0 #000;
 }
 
+/****** copied from Bootstrap dataTables ******/
+table.table-bordered {
+  thead th, thead td {
+    border-left-width: 0;
+    border-top-width: 0;
+  }
+  tbody th, tbody td {
+    border-left-width: 0;
+    border-bottom-width: 0;
+  }
+  tfoot th, tfoot td {
+    border-left-width: 0;
+    border-bottom-width: 0;
+  }
+  th:last-child, td:last-child {
+    border-right-width: 0;
+  }
+}
+
 /****** upper-right-corner ******/
 .upper-right-corner-holder {
   position: relative;
