@@ -11,6 +11,7 @@ import flux.react.router.{Page, RouterContext}
 import flux.react.uielements
 import flux.stores.entries.{CashFlowEntriesStoreFactory, CashFlowEntry}
 import japgolly.scalajs.react._
+import japgolly.scalajs.react.vdom.VdomArray
 import japgolly.scalajs.react.vdom.html_<^._
 import models.accounting.BalanceCheck
 import models.accounting.config.{Config, MoneyReservoir}
@@ -78,9 +79,12 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
                               <.td(uielements.MoneyWithCurrency(entry.flow)),
                               <.td(
                                 uielements.MoneyWithCurrency(entry.balance),
-                                <<.ifThen(entry.balanceVerified)(<.i(^.className := "fa fa-check fa-fw")),
-                                <<.ifThen(!entry.balanceVerified && rowNumber == 0)(
-                                  balanceCheckConfirmButton(reservoir, entry))
+                                entry.balanceVerified match {
+                                  case true => <.span(" ", <.i(^.className := "fa fa-check fa-fw"))
+                                  case false if rowNumber == 0 =>
+                                    <.span(" ", balanceCheckConfirmButton(reservoir, entry))
+                                  case _ => VdomArray.empty()
+                                }
                               ),
                               <.td(uielements.TransactionGroupEditButton(entry.groupId))
                             )
