@@ -1,11 +1,12 @@
 package flux.react.app.transactiongroupform
 
+import flux.react.uielements
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, LogExceptionsFuture, logExceptions}
 import common.time.Clock
 import common.time.JavaTimeImplicits._
 import flux.action.{Action, Dispatcher}
-import flux.react.ReactVdomUtils.^^
+import flux.react.ReactVdomUtils.{<<, ^^}
 import flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
 import flux.react.router.RouterContext
 import japgolly.scalajs.react._
@@ -174,20 +175,15 @@ final class TransactionGroupForm(implicit i18n: I18n,
       mutable.Buffer(transactionPanel.ref())
 
     def render(props: Props, state: State) = logExceptions {
+      implicit val router = props.router
       <.div(
         ^.className := "transaction-group-form",
         <.div(
           ^.className := "row",
           <.div(
             ^.className := "col-lg-12",
-            <.h1(
-              ^.className := "page-header",
-              <.i(^.className := "icon-new-empty"),
-              props.operationMeta match {
-                case OperationMeta.AddNew => i18n("facto.new-transaction")
-                case OperationMeta.Edit(_) => i18n("facto.edit-transaction")
-              },
-              ^^.ifThen(props.operationMeta.isInstanceOf[OperationMeta.Edit]) {
+            uielements.PageHeader.withExtension(router.currentPage)(
+              <<.ifThen(props.operationMeta.isInstanceOf[OperationMeta.Edit]) {
                 <.a(
                   ^.className := "btn btn-default delete-button",
                   <.i(^.className := "fa fa-times"),

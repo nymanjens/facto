@@ -4,9 +4,10 @@ import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.time.{Clock, LocalDateTime}
 import flux.action.{Action, Dispatcher}
-import flux.react.ReactVdomUtils.^^
+import flux.react.ReactVdomUtils.{<<, ^^}
 import flux.react.router.RouterContext
 import flux.react.router.Page
+import flux.react.uielements
 import flux.react.uielements.HalfPanel
 import flux.react.uielements.input.bootstrap.MoneyInput
 import flux.react.uielements.input.{MappedInput, bootstrap}
@@ -82,19 +83,14 @@ final class BalanceCheckForm(implicit i18n: I18n,
     val balanceRef = MoneyInput.ref()
 
     def render(props: Props, state: State) = logExceptions {
+      implicit val router = props.router
       <.div(
         <.div(
           ^.className := "row",
           <.div(
             ^.className := "col-lg-12",
-            <.h1(
-              ^.className := "page-header",
-              <.i(^.className := "icon-new-empty"),
-              props.operationMeta match {
-                case OperationMeta.AddNew(_) => i18n("facto.new-balance-check")
-                case OperationMeta.Edit(_) => i18n("facto.edit-balance-check")
-              },
-              ^^.ifThen(props.operationMeta.isInstanceOf[OperationMeta.Edit]) {
+            uielements.PageHeader.withExtension(router.currentPage)(
+              <<.ifThen(props.operationMeta.isInstanceOf[OperationMeta.Edit]) {
                 <.a(
                   ^.className := "btn btn-default delete-button",
                   <.i(^.className := "fa fa-times"),
