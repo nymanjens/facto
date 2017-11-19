@@ -31,40 +31,43 @@ final class Endowments(implicit entriesStoreFactory: EndowmentEntriesStoreFactor
     .renderP(
       (_, props) => {
         implicit val router = props.router
-        uielements.Panel(i18n("facto.all-accounts")) {
-          {
-            for (account <- accountingConfig.personallySortedAccounts) yield {
-              EntriesListTable[GeneralEntry, Account](
-                tableTitle = i18n("facto.endowments-of", account.longName),
-                tableClasses = Seq("table-endowments"),
-                key = account.code,
-                numEntriesStrategy = NumEntriesStrategy(start = 30, intermediateBeforeInf = Seq(100)),
-                props = account,
-                tableHeaders = Seq(
-                  <.th(i18n("facto.payed")),
-                  <.th(i18n("facto.consumed")),
-                  <.th(i18n("facto.beneficiary")),
-                  <.th(i18n("facto.payed-with-to")),
-                  <.th(i18n("facto.category")),
-                  <.th(i18n("facto.description")),
-                  <.th(i18n("facto.flow")),
-                  <.th("")
-                ),
-                calculateTableData = entry =>
-                  Seq[VdomElement](
-                    <.td(entry.transactionDates.map(formatDate).mkString(", ")),
-                    <.td(entry.consumedDates.map(formatDate).mkString(", ")),
-                    <.td(entry.beneficiaries.map(_.shorterName).mkString(", ")),
-                    <.td(entry.moneyReservoirs.map(_.shorterName).mkString(", ")),
-                    <.td(entry.categories.map(_.name).mkString(", ")),
-                    <.td(uielements.DescriptionWithEntryCount(entry)),
-                    <.td(uielements.MoneyWithCurrency(entry.flow)),
-                    <.td(uielements.TransactionGroupEditButton(entry.groupId))
+        <.span(
+          uielements.PageHeader(router.currentPage),
+          uielements.Panel(i18n("facto.all-accounts")) {
+            {
+              for (account <- accountingConfig.personallySortedAccounts) yield {
+                EntriesListTable[GeneralEntry, Account](
+                  tableTitle = i18n("facto.endowments-of", account.longName),
+                  tableClasses = Seq("table-endowments"),
+                  key = account.code,
+                  numEntriesStrategy = NumEntriesStrategy(start = 30, intermediateBeforeInf = Seq(100)),
+                  props = account,
+                  tableHeaders = Seq(
+                    <.th(i18n("facto.payed")),
+                    <.th(i18n("facto.consumed")),
+                    <.th(i18n("facto.beneficiary")),
+                    <.th(i18n("facto.payed-with-to")),
+                    <.th(i18n("facto.category")),
+                    <.th(i18n("facto.description")),
+                    <.th(i18n("facto.flow")),
+                    <.th("")
+                  ),
+                  calculateTableData = entry =>
+                    Seq[VdomElement](
+                      <.td(entry.transactionDates.map(formatDate).mkString(", ")),
+                      <.td(entry.consumedDates.map(formatDate).mkString(", ")),
+                      <.td(entry.beneficiaries.map(_.shorterName).mkString(", ")),
+                      <.td(entry.moneyReservoirs.map(_.shorterName).mkString(", ")),
+                      <.td(entry.categories.map(_.name).mkString(", ")),
+                      <.td(uielements.DescriptionWithEntryCount(entry)),
+                      <.td(uielements.MoneyWithCurrency(entry.flow)),
+                      <.td(uielements.TransactionGroupEditButton(entry.groupId))
+                  )
                 )
-              )
-            }
-          }.toVdomArray
-        }
+              }
+            }.toVdomArray
+          }
+        )
       }
     )
     .build

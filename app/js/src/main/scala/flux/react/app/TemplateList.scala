@@ -3,6 +3,7 @@ package flux.react.app
 import common.I18n
 import common.LoggingUtils.logExceptions
 import flux.react.router.{Page, RouterContext}
+import flux.react.uielements
 import flux.react.uielements.Panel
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
@@ -21,22 +22,25 @@ private[app] final class TemplateList(implicit user: User,
     .renderP(($, props) =>
       logExceptions {
         implicit val router = props.router
-        Panel(
-          title = i18n("facto.templates"),
-          panelClasses = Seq("templates-panel")
-        ) {
-          val templates = accountingConfig.templatesToShowFor(Template.Placement.TemplateList, user)
-          (
-            for (template <- templates)
-              yield
-                router.anchorWithHrefTo(Page.NewFromTemplate(template))(
-                  ^.key := template.code,
-                  ^.className := "btn btn-info btn-lg",
-                  <.i(^.className := template.iconClass),
-                  template.name
-                )
-          ).toVdomArray
-        }
+        <.span(
+          uielements.PageHeader(router.currentPage),
+          Panel(
+            title = i18n("facto.templates"),
+            panelClasses = Seq("templates-panel")
+          ) {
+            val templates = accountingConfig.templatesToShowFor(Template.Placement.TemplateList, user)
+            (
+              for (template <- templates)
+                yield
+                  router.anchorWithHrefTo(Page.NewFromTemplate(template))(
+                    ^.key := template.code,
+                    ^.className := "btn btn-info btn-lg",
+                    <.i(^.className := template.iconClass),
+                    template.name
+                  )
+            ).toVdomArray
+          }
+        )
     })
     .build
 

@@ -31,56 +31,59 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
     .renderP(
       (_, props) => {
         implicit val router = props.router
-        uielements.Panel(i18n("facto.all-combinations")) {
-          {
-            for {
-              (account1, i1) <- accountingConfig.personallySortedAccounts.zipWithIndex
-              (account2, i2) <- accountingConfig.personallySortedAccounts.zipWithIndex
-              if i1 < i2
-            } yield {
-              val accountPair = AccountPair(account1, account2)
-              val startNumEntries = 10
-              EntriesListTable[LiquidationEntry, AccountPair](
-                tableTitle = i18n("facto.debt-of", account1.longName, account2.longName),
-                tableClasses = Seq("table-liquidation"),
-                key = s"${account1.code}_${account2.code}",
-                numEntriesStrategy =
-                  NumEntriesStrategy(start = startNumEntries, intermediateBeforeInf = Seq(30)),
-                props = accountPair,
-                tableHeaders = Seq(
-                  <.th(i18n("facto.payed")),
-                  <.th(i18n("facto.beneficiary")),
-                  <.th(i18n("facto.payed-with-to")),
-                  <.th(i18n("facto.category")),
-                  <.th(i18n("facto.description")),
-                  <.th(i18n("facto.flow")),
-                  <.th(s"${account1.veryShortName} -> ${account2.veryShortName}"),
-                  <.th(repayButton(
-                    account1 = account1,
-                    account2 = account2,
-                    amount = entriesStoreFactory
-                      .get(accountPair = accountPair, maxNumEntries = startNumEntries)
-                      .state
-                      .entries
-                      .lastOption
-                      .map(_.debt) getOrElse ReferenceMoney(0)
-                  ))
-                ),
-                calculateTableData = entry =>
-                  Seq[VdomElement](
-                    <.td(entry.transactionDates.map(formatDate).mkString(", ")),
-                    <.td(entry.beneficiaries.map(_.shorterName).mkString(", ")),
-                    <.td(entry.moneyReservoirs.map(_.shorterName).mkString(", ")),
-                    <.td(entry.categories.map(_.name).mkString(", ")),
-                    <.td(uielements.DescriptionWithEntryCount(entry)),
-                    <.td(uielements.MoneyWithCurrency(entry.flow)),
-                    <.td(uielements.MoneyWithCurrency(entry.debt)),
-                    <.td(uielements.TransactionGroupEditButton(entry.groupId))
+        <.span(
+          uielements.PageHeader(router.currentPage),
+          uielements.Panel(i18n("facto.all-combinations")) {
+            {
+              for {
+                (account1, i1) <- accountingConfig.personallySortedAccounts.zipWithIndex
+                (account2, i2) <- accountingConfig.personallySortedAccounts.zipWithIndex
+                if i1 < i2
+              } yield {
+                val accountPair = AccountPair(account1, account2)
+                val startNumEntries = 10
+                EntriesListTable[LiquidationEntry, AccountPair](
+                  tableTitle = i18n("facto.debt-of", account1.longName, account2.longName),
+                  tableClasses = Seq("table-liquidation"),
+                  key = s"${account1.code}_${account2.code}",
+                  numEntriesStrategy =
+                    NumEntriesStrategy(start = startNumEntries, intermediateBeforeInf = Seq(30)),
+                  props = accountPair,
+                  tableHeaders = Seq(
+                    <.th(i18n("facto.payed")),
+                    <.th(i18n("facto.beneficiary")),
+                    <.th(i18n("facto.payed-with-to")),
+                    <.th(i18n("facto.category")),
+                    <.th(i18n("facto.description")),
+                    <.th(i18n("facto.flow")),
+                    <.th(s"${account1.veryShortName} -> ${account2.veryShortName}"),
+                    <.th(repayButton(
+                      account1 = account1,
+                      account2 = account2,
+                      amount = entriesStoreFactory
+                        .get(accountPair = accountPair, maxNumEntries = startNumEntries)
+                        .state
+                        .entries
+                        .lastOption
+                        .map(_.debt) getOrElse ReferenceMoney(0)
+                    ))
+                  ),
+                  calculateTableData = entry =>
+                    Seq[VdomElement](
+                      <.td(entry.transactionDates.map(formatDate).mkString(", ")),
+                      <.td(entry.beneficiaries.map(_.shorterName).mkString(", ")),
+                      <.td(entry.moneyReservoirs.map(_.shorterName).mkString(", ")),
+                      <.td(entry.categories.map(_.name).mkString(", ")),
+                      <.td(uielements.DescriptionWithEntryCount(entry)),
+                      <.td(uielements.MoneyWithCurrency(entry.flow)),
+                      <.td(uielements.MoneyWithCurrency(entry.debt)),
+                      <.td(uielements.TransactionGroupEditButton(entry.groupId))
+                  )
                 )
-              )
-            }
-          }.toVdomArray
-        }
+              }
+            }.toVdomArray
+          }
+        )
       }
     )
     .build

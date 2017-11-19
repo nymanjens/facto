@@ -48,6 +48,7 @@ final class Summary(implicit summaryTable: SummaryTable,
     def render(props: Props, state: State) = logExceptions {
       implicit val router = props.router
       <.span(
+        uielements.PageHeader(router.currentPage),
         <.form(
           <.div(
             ^.className := "input-group custom-search-form",

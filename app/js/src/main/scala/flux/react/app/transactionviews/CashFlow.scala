@@ -34,9 +34,9 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
     .initialState(State(includeUnrelatedReservoirs = false, includeHiddenReservoirs = false))
     .renderPS(
       ($, props, state) => {
-        implicit val routerContext = props.router
+        implicit val router = props.router
         <.span(
-          {
+          uielements.PageHeader(router.currentPage), {
             for {
               account <- accountingConfig.personallySortedAccounts
               if state.includeUnrelatedReservoirs || account.isMineOrCommon

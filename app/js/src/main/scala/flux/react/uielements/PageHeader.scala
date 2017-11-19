@@ -16,6 +16,7 @@ object PageHeader {
       <.h1(
         ^.className := "page-header",
         <.i(^.className := props.page.iconClass),
+        " ",
         props.page.title(props.i18n),
         children
       )
