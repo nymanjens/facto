@@ -51,11 +51,11 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
 
     def render(props: Props, state: State) = logExceptions {
       implicit val router = props.router
-      def menuItem(label: String, iconClass: String, page: Page): VdomElement =
+      def menuItem(label: String, page: Page): VdomElement =
         router
           .anchorWithHrefTo(page)(
             ^^.ifThen(page.getClass == props.router.currentPage.getClass) { ^.className := "active" },
-            <.i(^.className := iconClass),
+            <.i(^.className := page.iconClass),
             " ",
             <.span(^.dangerouslySetInnerHtml := label)
           )
@@ -95,15 +95,15 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
             ))
         ),
         <.li(
-          menuItem(i18n("facto.everything.html"), "icon-list", Page.Everything),
-          menuItem(i18n("facto.cash-flow.html"), "icon-money", Page.CashFlow),
-          menuItem(i18n("facto.liquidation.html"), "icon-balance-scale", Page.Liquidation),
-          menuItem(i18n("facto.endowments.html"), "icon-crown", Page.Endowments),
-          menuItem(i18n("facto.summary.html"), "icon-table", Page.Summary)
+          menuItem(i18n("facto.everything.html"), Page.Everything),
+          menuItem(i18n("facto.cash-flow.html"), Page.CashFlow),
+          menuItem(i18n("facto.liquidation.html"), Page.Liquidation),
+          menuItem(i18n("facto.endowments.html"), Page.Endowments),
+          menuItem(i18n("facto.summary.html"), Page.Summary)
         ),
         <.li(
-          menuItem(i18n("facto.new-entry.html"), "icon-new-empty", Page.NewTransactionGroup()),
-          menuItem(i18n("facto.templates.html"), "icon-template", Page.TemplateList)
+          menuItem(i18n("facto.new-entry.html"), Page.NewTransactionGroup()),
+          menuItem(i18n("facto.templates.html"), Page.TemplateList)
         )
       )
     }
