@@ -7,8 +7,10 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.PackageBase.VdomAttr
 import japgolly.scalajs.react.vdom.html_<^._
 import models.User
+import org.scalajs.dom
 
 import scala.scalajs.js
+import scala.collection.immutable.Seq
 
 final class Layout(implicit globalMessages: GlobalMessages, menu: Menu, user: User, i18n: I18n) {
 
@@ -78,12 +80,15 @@ final class Layout(implicit globalMessages: GlobalMessages, menu: Menu, user: Us
           <.div(
             ^.className := "navbar-default sidebar",
             ^.role := "navigation",
-            <.div(^.className := "sidebar-nav navbar-collapse", menu(router))
+            <.div(
+              ^^.classes(Seq("sidebar-nav", "navbar-collapse") ++ ifThenSeq(navbarCollapsed, "collapse")),
+              menu(router))
           )
         ),
         // Page Content
         <.div(
           ^.id := "page-wrapper",
+          ^.style := js.Dictionary("minHeight" -> s"${pageWrapperHeight}px"),
           <.div(
             ^.className := "container-fluid",
             <.div(
@@ -105,6 +110,22 @@ final class Layout(implicit globalMessages: GlobalMessages, menu: Menu, user: Us
   def apply(router: RouterContext)(children: VdomNode*): VdomElement = {
     component(Props(router))(children: _*)
   }
+
+  // **************** Private helper methods ****************//
+  def navbarCollapsed: Boolean = {
+    // Based on Start Bootstrap code in bower_components/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js
+    val width = if (dom.window.innerWidth > 0) dom.window.innerWidth else dom.window.screen.width
+    width < 768
+  }
+  def pageWrapperHeight: Int = {
+    // Based on Start Bootstrap code in bower_components/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js
+    val topOffset = if (navbarCollapsed) 100 else 50
+
+    val windowHeight = if (dom.window.innerHeight > 0) dom.window.innerHeight else dom.window.screen.height
+    windowHeight.toInt - 1 - topOffset
+  }
+
+  private def ifThenSeq[V](condition: Boolean, value: V): Seq[V] = if (condition) Seq(value) else Seq()
 
   // **************** Private inner types ****************//
   private case class Props(router: RouterContext)
