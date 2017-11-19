@@ -1,5 +1,6 @@
 package flux.react.router
 
+import common.I18n
 import common.LoggingUtils.logExceptions
 import japgolly.scalajs.react.extra.router.StaticDsl.RouteB
 import japgolly.scalajs.react.extra.router._
@@ -7,7 +8,7 @@ import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.reflect.ClassTag
 
-private[router] final class RouterFactory(implicit reactAppModule: flux.react.app.Module) {
+private[router] final class RouterFactory(implicit reactAppModule: flux.react.app.Module, i18n: I18n) {
 
   def createRouter(): Router[Page] = {
     Router(BaseUrl.until(RouterFactory.pathPrefix), routerConfig)
@@ -92,6 +93,7 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
 
         // Fallback
         ).notFound(redirectToPage(Page.CashFlow)(Redirect.Replace))
+          .setTitle(page => s"${page.title} | Facto")
       }
       .renderWith(layout)
   }
