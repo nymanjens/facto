@@ -64,7 +64,8 @@ private[transactiongroupform] final class TotalFlowInput(implicit i18n: I18n,
               <.span(
                 ^.className := "input-group-addon",
                 <.i(^.className := money.currency.iconClass),
-                " ", money.formatFloat
+                " ",
+                money.formatFloat
               )
             }
           )

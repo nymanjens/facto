@@ -24,7 +24,7 @@ object HalfPanel {
                   ^.tpe := "button",
                   ^.className := "btn btn-default btn-xs",
                   ^.onClick --> props.closeButtonCallback.get,
-                  <.i(                    ^.className := "fa  fa-times fa-fw"                  )
+                  <.i(^.className := "fa  fa-times fa-fw")
                 )
               )
             }
