@@ -1,10 +1,12 @@
 package flux.react.uielements
 
 import common.accounting.Tags
-import flux.react.ReactVdomUtils.^^
+import flux.react.ReactVdomUtils.{<<, ^^}
 import flux.stores.entries.GroupedTransactions
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
+
+import scala.collection.immutable.Seq
 
 object DescriptionWithEntryCount {
   private case class Props(entry: GroupedTransactions)
@@ -13,10 +15,11 @@ object DescriptionWithEntryCount {
     .renderP((_, props) => {
       val entry = props.entry
       val tagIndications =
-        entry.tags
+        <<.joinWithSpaces(entry.tags
           .map(tag =>
-            <.span(^^.classes("label", s"label-${Tags.getBootstrapClassSuffix(tag)}"), ^.key := tag, tag))
-          .toVdomArray
+            <.span(^^.classes("label", s"label-${Tags.getBootstrapClassSuffix(tag)}"), ^.key := tag, tag)) ++
+          // Add empty span to force space after non-empty label list
+          Seq(<.span()))
 
       if (entry.transactions.size == 1) {
         <.span(
