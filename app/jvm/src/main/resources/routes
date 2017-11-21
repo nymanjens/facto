@@ -32,11 +32,6 @@ GET  /acc/logs/                        controllers.accounting.GeneralActions.upd
 GET  /acc/logs/all/                    controllers.accounting.GeneralActions.updateLogsAll
 GET  /acc/templates/                   controllers.accounting.GeneralActions.templateList
 
-# Accounting - JSON API
-GET  /jsonapi/acc/descriptions/:beneficiaryCode/:reservoirCode/:categoryCode/  controllers.accounting.JsonApi.filterDescriptions(beneficiaryCode, reservoirCode, categoryCode, q ?= "")
-GET  /jsonapi/acc/tags/all/            controllers.accounting.JsonApi.getAllTags
-POST /jsonapi/acc/money/exchange/:fromCents/:fromCurrency/:date/:toCurrency/  controllers.accounting.JsonApi.exchangeMoney(fromCents: Long, fromCurrency, date, toCurrency)
-
 # Accounting - views
 GET  /acc/everything/                  controllers.accounting.Views.everythingLatest
 GET  /acc/everything/all/              controllers.accounting.Views.everythingAll
