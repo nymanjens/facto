@@ -49,7 +49,6 @@ object Settings {
     val bootstrap = "org.webjars" % "bootstrap" % versions.bootstrap
 
     val reactTagInput = "org.webjars.npm" % "react-tag-input" % "4.7.2"
-    val chartJs = "org.webjars" % "chartjs" % "2.1.3"
     val fontAwesome = "org.webjars" % "font-awesome" % "4.6.2"
     val lokiJs = "org.webjars.bower" % "lokijs" % "1.4.2"
     val cryptoJs = "org.webjars" % "cryptojs" % "3.1.2"
@@ -127,7 +126,6 @@ object Settings {
       webjarDeps.mousetrap / "plugins/global-bind/mousetrap-global-bind.min.js",
       webjarDeps.reactTagInput / files.reactDnd dependsOn files.reactDom,
       webjarDeps.reactTagInput / "ReactTags.min.js" dependsOn files.reactDnd,
-      webjarDeps.chartJs / "Chart.min.js",
       webjarDeps.lokiJs / "lokijs.min.js",
       webjarDeps.lokiJs / "loki-indexed-adapter.min.js",
       webjarDeps.cryptoJs / "rollups/rc4.js"
