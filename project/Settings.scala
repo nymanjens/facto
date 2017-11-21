@@ -54,7 +54,6 @@ object Settings {
     val log4Javascript = "org.webjars" % "log4javascript" % "1.4.10"
     val lokiJs = "org.webjars.bower" % "lokijs" % "1.4.2"
     val cryptoJs = "org.webjars" % "cryptojs" % "3.1.2"
-    val metisMenu = "org.webjars" % "metisMenu" % "1.1.3"
     val mousetrap = "org.webjars.npm" % "mousetrap" % "1.6.1"
     val react = "org.webjars.bower" % "react" % "15.3.2"
     val webjarsPlay = "org.webjars" %% "webjars-play" % "2.6.0-M1"
@@ -125,7 +124,6 @@ object Settings {
       webjarDeps.react % Test / "react-dom-server.js" minified "react-dom-server.min.js" dependsOn files.reactDom commonJSName "ReactDOMServer",
       webjarDeps.jQuery / files.jQuery,
       webjarDeps.bootstrap / files.bootstrap dependsOn files.jQuery,
-      webjarDeps.metisMenu / "metisMenu.min.js" dependsOn files.bootstrap,
       webjarDeps.mousetrap / "mousetrap.min.js",
       webjarDeps.mousetrap / "plugins/global-bind/mousetrap-global-bind.min.js",
       webjarDeps.reactTagInput / files.reactDnd dependsOn files.reactDom,
