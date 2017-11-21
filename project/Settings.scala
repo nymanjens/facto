@@ -51,7 +51,6 @@ object Settings {
     val reactTagInput = "org.webjars.npm" % "react-tag-input" % "4.7.2"
     val chartJs = "org.webjars" % "chartjs" % "2.1.3"
     val fontAwesome = "org.webjars" % "font-awesome" % "4.6.2"
-    val laddaBootstrap = "org.webjars.bower" % "ladda-bootstrap" % "0.1.0"
     val log4Javascript = "org.webjars" % "log4javascript" % "1.4.10"
     val lokiJs = "org.webjars.bower" % "lokijs" % "1.4.2"
     val cryptoJs = "org.webjars" % "cryptojs" % "3.1.2"
@@ -92,8 +91,7 @@ object Settings {
       "net.jcip" % "jcip-annotations" % "1.0",
       webjarDeps.bootstrap,
       webjarDeps.webjarsPlay,
-      webjarDeps.fontAwesome,
-      webjarDeps.laddaBootstrap
+      webjarDeps.fontAwesome
     ))
 
   /** Dependencies only used by the JS project (note the use of %%% instead of %%) */
@@ -132,8 +130,6 @@ object Settings {
       webjarDeps.mousetrap / "plugins/global-bind/mousetrap-global-bind.min.js",
       webjarDeps.reactTagInput / files.reactDnd dependsOn files.reactDom,
       webjarDeps.reactTagInput / "ReactTags.min.js" dependsOn files.reactDnd,
-      webjarDeps.laddaBootstrap / "spin.min.js",
-      webjarDeps.laddaBootstrap / "ladda.min.js",
       webjarDeps.chartJs / "Chart.min.js",
       webjarDeps.log4Javascript / "js/log4javascript.js",
       webjarDeps.lokiJs / "lokijs.min.js",
