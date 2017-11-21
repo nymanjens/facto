@@ -58,7 +58,6 @@ object Settings {
     val metisMenu = "org.webjars" % "metisMenu" % "1.1.3"
     val mousetrap = "org.webjars.npm" % "mousetrap" % "1.6.1"
     val react = "org.webjars.bower" % "react" % "15.3.2"
-    val typeaheadJs = "org.webjars" % "typeaheadjs" % "0.11.1"
     val webjarsPlay = "org.webjars" %% "webjars-play" % "2.6.0-M1"
   }
 
@@ -94,8 +93,7 @@ object Settings {
       webjarDeps.bootstrap,
       webjarDeps.webjarsPlay,
       webjarDeps.fontAwesome,
-      webjarDeps.laddaBootstrap,
-      webjarDeps.typeaheadJs
+      webjarDeps.laddaBootstrap
     ))
 
   /** Dependencies only used by the JS project (note the use of %%% instead of %%) */
@@ -134,7 +132,6 @@ object Settings {
       webjarDeps.mousetrap / "plugins/global-bind/mousetrap-global-bind.min.js",
       webjarDeps.reactTagInput / files.reactDnd dependsOn files.reactDom,
       webjarDeps.reactTagInput / "ReactTags.min.js" dependsOn files.reactDnd,
-      webjarDeps.typeaheadJs / "typeahead.bundle.min.js" dependsOn files.bootstrap,
       webjarDeps.laddaBootstrap / "spin.min.js",
       webjarDeps.laddaBootstrap / "ladda.min.js",
       webjarDeps.chartJs / "Chart.min.js",
