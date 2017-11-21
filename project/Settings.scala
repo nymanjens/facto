@@ -48,7 +48,6 @@ object Settings {
     val jQuery = "org.webjars" % "jquery" % versions.jQuery
     val bootstrap = "org.webjars" % "bootstrap" % versions.bootstrap
 
-    val bootstrapTagsinput = "org.webjars.bower" % "bootstrap-tagsinput" % "0.8.0"
     val reactTagInput = "org.webjars.npm" % "react-tag-input" % "4.7.2"
     val chartJs = "org.webjars" % "chartjs" % "2.1.3"
     val fontAwesome = "org.webjars" % "font-awesome" % "4.6.2"
@@ -95,7 +94,6 @@ object Settings {
       webjarDeps.bootstrap,
       webjarDeps.webjarsPlay,
       webjarDeps.fontAwesome,
-      webjarDeps.bootstrapTagsinput,
       webjarDeps.laddaBootstrap,
       webjarDeps.typeaheadJs
     ))
@@ -134,7 +132,6 @@ object Settings {
       webjarDeps.metisMenu / "metisMenu.min.js" dependsOn files.bootstrap,
       webjarDeps.mousetrap / "mousetrap.min.js",
       webjarDeps.mousetrap / "plugins/global-bind/mousetrap-global-bind.min.js",
-      webjarDeps.bootstrapTagsinput / "bootstrap-tagsinput.min.js" dependsOn files.bootstrap,
       webjarDeps.reactTagInput / files.reactDnd dependsOn files.reactDom,
       webjarDeps.reactTagInput / "ReactTags.min.js" dependsOn files.reactDnd,
       webjarDeps.typeaheadJs / "typeahead.bundle.min.js" dependsOn files.bootstrap,
