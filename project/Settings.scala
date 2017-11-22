@@ -89,7 +89,8 @@ object Settings {
       "net.jcip" % "jcip-annotations" % "1.0",
       webjarDeps.bootstrap,
       webjarDeps.webjarsPlay,
-      webjarDeps.fontAwesome
+      webjarDeps.fontAwesome,
+      webjarDeps.metisMenu
     ))
 
   /** Dependencies only used by the JS project (note the use of %%% instead of %%) */
