@@ -13,8 +13,7 @@ final class SlickUserManager
     extends ForwardingEntityManager[User, Users](
       SlickEntityManager.create[User, Users](
         tag => new Users(tag),
-        tableName = tableName,
-        cached = true
+        tableName = tableName
       ))
     with User.Manager {
 
