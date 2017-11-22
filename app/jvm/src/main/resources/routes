@@ -25,26 +25,6 @@ POST  /profile/changepassword/         controllers.Application.changePassword
 GET   /administration/                 controllers.Application.administration
 POST  /profile/adduser/                controllers.Application.addUser
 
-# Accounting - general
-GET  /acc/search/                      controllers.accounting.GeneralActions.searchMostRelevant(q ?= "")
-GET  /acc/search/all/                  controllers.accounting.GeneralActions.searchAll(q ?= "")
-GET  /acc/logs/                        controllers.accounting.GeneralActions.updateLogsLatest
-GET  /acc/logs/all/                    controllers.accounting.GeneralActions.updateLogsAll
-GET  /acc/templates/                   controllers.accounting.GeneralActions.templateList
-
-# Accounting - views
-GET  /acc/everything/                  controllers.accounting.Views.everythingLatest
-GET  /acc/everything/all/              controllers.accounting.Views.everythingAll
-GET  /acc/cashflow/                    controllers.accounting.Views.cashFlowOfAll
-GET  /acc/cashflow/r/:reservoirCode/   controllers.accounting.Views.cashFlowOfSingle(reservoirCode)
-GET  /acc/cashflow/hidden/             controllers.accounting.Views.cashFlowOfHidden
-GET  /acc/liquidation/                 controllers.accounting.Views.liquidationOfAll
-GET  /acc/liquidation/:accountCode1/:accountCode2/  controllers.accounting.Views.liquidationOfSingle(accountCode1, accountCode2)
-GET  /acc/endowments/                  controllers.accounting.Views.endowmentsOfAll
-GET  /acc/endowments/:accountCode/     controllers.accounting.Views.endowmentsOfSingle(accountCode)
-GET  /acc/summary/                     controllers.accounting.Views.summaryForCurrentYear(tags ?= "", toggleTag ?= "")
-GET  /acc/summary/:expandedyear/       controllers.accounting.Views.summaryFor(expandedyear: Int, tags ?= "", toggleTag ?= "")
-
 # Autowire calls
 POST /scalajsapi/*path                 controllers.Application.scalaJsApi(path: String)
 

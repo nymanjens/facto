@@ -15,14 +15,12 @@ import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import common.cache.CacheRegistry
 import models._
-import controllers.accounting.Views
 import controllers.helpers.{AuthenticatedAction, ControllerHelperCache}
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 
 final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi,
                                   components: ControllerComponents,
                                   clock: Clock,
-                                  viewsController: Views,
                                   playConfiguration: play.api.Configuration,
                                   accountingConfig: Config,
                                   userManager: SlickUserManager,
@@ -40,18 +38,6 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
   /** Warms up caches by rendering the most used views. */
   def warmUpCaches(applicationSecret: String) = Action { implicit request =>
     validateApplicationSecret(applicationSecret)
-
-    val admin: User = userManager.findByLoginName("admin").get
-    val actions: Seq[AuthenticatedAction[AnyContent]] = Seq(
-      viewsController.everythingLatest,
-      viewsController.cashFlowOfAll,
-      viewsController.liquidationOfAll,
-      viewsController.endowmentsOfAll,
-      viewsController.summaryForCurrentYear()
-    )
-    for (action <- actions) {
-      action.calculateResult(admin, request)
-    }
 
     Ok("OK")
   }

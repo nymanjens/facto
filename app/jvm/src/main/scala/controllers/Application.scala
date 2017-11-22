@@ -21,7 +21,6 @@ import api.{ScalaJsApi, ScalaJsApiServerFactory}
 import models.manager.{Entity, EntityModification, EntityType}
 import common.cache.CacheRegistry
 import models.{EntityAccess, SlickEntityAccess, SlickUserManager, User}
-import controllers.accounting.Views
 import controllers.helpers.{AuthenticatedAction, ControllerHelperCache}
 import controllers.Application.Forms
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
