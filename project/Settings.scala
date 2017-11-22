@@ -52,7 +52,7 @@ object Settings {
     val fontAwesome = "org.webjars" % "font-awesome" % "4.6.2"
     val lokiJs = "org.webjars.bower" % "lokijs" % "1.4.2"
     val cryptoJs = "org.webjars" % "cryptojs" % "3.1.2"
-    val metisMenu = "org.webjars" % "metisMenu" % "1.1.3"
+    val metisMenu = "org.webjars" % "metisMenu" % "1.1.3" // Used by Start Bootstrap
     val mousetrap = "org.webjars.npm" % "mousetrap" % "1.6.1"
     val react = "org.webjars.bower" % "react" % "15.3.2"
     val webjarsPlay = "org.webjars" %% "webjars-play" % "2.6.0-M1"
