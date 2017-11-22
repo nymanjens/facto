@@ -15,7 +15,7 @@ import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import common.cache.CacheRegistry
 import models._
-import controllers.helpers.{AuthenticatedAction, ControllerHelperCache}
+import controllers.helpers.AuthenticatedAction
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 
 final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi,
@@ -56,9 +56,6 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
       for (transaction <- toTransactions(template, group, issuer)) {
         entityAccess.transactionManager.add(transaction)
       }
-
-      // Add log
-      entityAccess.updateLogManager.addLog(issuer, UpdateLog.AddNew, group)
 
       Ok("OK")
   }

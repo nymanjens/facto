@@ -12,7 +12,6 @@ import common.PlayI18n
 import common.time.Clock
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}
-import models.accounting.{SlickUpdateLogManager, UpdateLog}
 import models.accounting.config.Config
 import models.manager.EntityType._
 import models.manager._
@@ -24,7 +23,6 @@ final class ScalaJsApiServerFactory @Inject()(
     implicit accountingConfig: Config,
     clock: Clock,
     entityAccess: SlickEntityAccess,
-    updateLogManager: SlickUpdateLogManager,
     i18n: PlayI18n,
     entityModificationManager: SlickEntityModificationEntityManager) {
 
