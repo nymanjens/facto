@@ -15,8 +15,6 @@ final class ModelsModule extends AbstractModule {
     bindSingleton(classOf[TransactionGroup.Manager], classOf[SlickTransactionGroupManager])
     bindSingleton(classOf[ExchangeRateMeasurement.Manager], classOf[SlickExchangeRateMeasurementManager])
     bindSingleton(classOf[EntityModificationEntity.Manager], classOf[SlickEntityModificationEntityManager])
-
-    bindSingleton(classOf[ExchangeRateManager], classOf[JvmExchangeRateManager])
   }
 
   private def bindSingleton[T](interface: Class[T], implementation: Class[_ <: T]): Unit = {
