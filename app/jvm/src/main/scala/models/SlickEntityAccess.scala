@@ -13,7 +13,6 @@ final class SlickEntityAccess @Inject()(
     override val transactionGroupManager: SlickTransactionGroupManager,
     override val exchangeRateMeasurementManager: SlickExchangeRateMeasurementManager,
     val entityModificationEntityManager: SlickEntityModificationEntityManager,
-    val tagEntityManager: SlickTagEntityManager,
     val updateLogManager: SlickUpdateLogManager)
     extends EntityAccess {
 
@@ -25,7 +24,6 @@ final class SlickEntityAccess @Inject()(
       balanceCheckManager,
       exchangeRateMeasurementManager,
       entityModificationEntityManager,
-      tagEntityManager,
       updateLogManager
     )
 }

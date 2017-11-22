@@ -11,7 +11,6 @@ final class ModelsModule extends AbstractModule {
 
     bindSingleton(classOf[User.Manager], classOf[SlickUserManager])
     bindSingleton(classOf[BalanceCheck.Manager], classOf[SlickBalanceCheckManager])
-    bindSingleton(classOf[TagEntity.Manager], classOf[SlickTagEntityManager])
     bindSingleton(classOf[Transaction.Manager], classOf[SlickTransactionManager])
     bindSingleton(classOf[TransactionGroup.Manager], classOf[SlickTransactionGroupManager])
     bindSingleton(classOf[UpdateLog.Manager], classOf[SlickUpdateLogManager])

@@ -21,7 +21,7 @@ import scala.util.Try
 
 import SlickTransactionManager.{Transactions, tableName}
 
-final class SlickTransactionManager @Inject()(tagEntityManager: SlickTagEntityManager)
+final class SlickTransactionManager @Inject()()
     extends ImmutableEntityManager[Transaction, Transactions](
       SlickEntityManager.create[Transaction, Transactions](
         tag => new Transactions(tag),
@@ -31,29 +31,6 @@ final class SlickTransactionManager @Inject()(tagEntityManager: SlickTagEntityMa
 
   override def findByGroupId(groupId: Long): Seq[Transaction] =
     dbRun(newQuery.filter(_.transactionGroupId === groupId)).toList
-
-  // ********** Mutators ********** //
-  // Overriding mutators to update the tagEntityManager table
-  override def add(transaction: Transaction): Transaction = {
-    val persistedTransaction = super.add(transaction)
-
-    // Add tagEntityManager to database
-    for (tag <- persistedTransaction.tags) {
-      tagEntityManager.add(TagEntity(name = tag, transactionId = persistedTransaction.id))
-    }
-
-    persistedTransaction
-  }
-
-  override def delete(transaction: Transaction): Unit = {
-    // Remove tagEntityManager from database
-    val tags = dbRun(tagEntityManager.newQuery.filter(_.transactionId === transaction.id))
-    for (tag <- tags) {
-      tagEntityManager.delete(tag)
-    }
-
-    super.delete(transaction)
-  }
 }
 
 object SlickTransactionManager {
