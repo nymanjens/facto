@@ -2,7 +2,6 @@ package controllers.helpers
 
 import models._
 import play.api.mvc._
-import controllers.helpers.AuthenticatedAction.UserAndRequestToResult
 
 abstract class AuthenticatedAction[A](bodyParser: BodyParser[A])(implicit entityAccess: EntityAccess,
                                                                  controllerComponents: ControllerComponents,
