@@ -46,6 +46,17 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
     }
   }
 
+  private def dropAndCreateNewDb() = {
+    println("  Creating tables...")
+
+    for (entityManager <- entityAccess.allEntityManagers) {
+      dbRun(sqlu"""DROP TABLE IF EXISTS #${entityManager.tableName}""")
+      entityManager.createTable()
+    }
+
+    println("   done")
+  }
+
   private def processFlags() = {
     if (CommandLineFlags.dropAndCreateNewDb()) {
       println("")
