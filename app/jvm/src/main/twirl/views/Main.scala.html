@@ -1,19 +1,16 @@
 @import scala.collection.immutable.Seq
-@import common.ReturnTo
 @import models.accounting.config.Template
 
 @(
   title: String,
   extrascript: Html = Html(""),
   templatesInNavbar: Seq[Template] = Seq(),
-  returnToOption: Option[ReturnTo] = None,
   generateToc: Boolean = false
 )(
   content: Html
 )(
   implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash, env: play.api.Environment, webJarAssets: controllers.WebJarAssets
 )
-@returnTo = @{returnToOption getOrElse ReturnTo(request.uri)}
 
 @Base(title, extrascript = extrascript) {
 
