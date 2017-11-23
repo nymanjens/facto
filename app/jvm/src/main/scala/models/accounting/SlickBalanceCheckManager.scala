@@ -1,18 +1,11 @@
 package models
 
-import com.google.common.hash.{HashCode, Hashing}
-import common.time.Clock
 import common.time.LocalDateTime
-import models.SlickUtils.dbApi._
-import models.SlickUtils.dbApi.{Tag => SlickTag}
+import models.SlickBalanceCheckManager.{BalanceChecks, tableName}
+import models.SlickUtils.dbApi.{Tag => SlickTag, _}
 import models.SlickUtils.localDateTimeToSqlDateMapper
-import models.accounting.config.{Config, MoneyReservoir}
-import models.accounting.money.{DatedMoney, Money}
-import models._
-import models.manager.{EntityTable, Entity, SlickEntityManager, ImmutableEntityManager}
 import models.accounting.BalanceCheck
-
-import SlickBalanceCheckManager.{BalanceChecks, tableName}
+import models.manager.{EntityTable, ImmutableEntityManager, SlickEntityManager}
 
 final class SlickBalanceCheckManager
     extends ImmutableEntityManager[BalanceCheck, BalanceChecks](

@@ -1,13 +1,13 @@
 package models.accounting.config
 
-import scala.collection.JavaConverters._
-import scala.collection.immutable.{ListMap, Seq}
 import java.util.Collections
 
 import com.google.common.base.Preconditions.checkNotNull
 import com.google.common.collect.ImmutableList
 import common.Require.requireNonNull
 import common.ScalaUtils.nullable
+import models.accounting.config.Account.{SummaryTotalRowDef => ParsedSummaryTotalRowDef}
+import models.accounting.config.MoneyReservoir.NullMoneyReservoir
 import models.accounting.config.{
   Account => ParsedAccount,
   Category => ParsedCategory,
@@ -16,9 +16,9 @@ import models.accounting.config.{
   MoneyReservoir => ParsedMoneyReservoir,
   Template => ParsedTemplate
 }
-import models.accounting.config.Account.{SummaryTotalRowDef => ParsedSummaryTotalRowDef}
-import models.accounting.config.MoneyReservoir.NullMoneyReservoir
-import models.accounting.money.Money
+
+import scala.collection.JavaConverters._
+import scala.collection.immutable.{ListMap, Seq}
 
 object Parsable {
 

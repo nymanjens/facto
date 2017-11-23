@@ -1,20 +1,14 @@
 package models.accounting.config
 
-import com.google.inject.{AbstractModule, Provides}
-import collection.immutable.Seq
 import java.nio.file.{Files, Paths}
 
-import play.api.Logger
-import common.ResourceFiles
-
 import com.google.common.base.Throwables
+import com.google.inject.{AbstractModule, Provides}
+import common.ResourceFiles
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor
 import org.yaml.snakeyaml.introspector.BeanAccess
-
-import common.Require.requireNonNull
-import models.User
-import models.accounting.config.MoneyReservoir.NullMoneyReservoir
+import play.api.Logger
 
 final class ConfigModule extends AbstractModule {
 

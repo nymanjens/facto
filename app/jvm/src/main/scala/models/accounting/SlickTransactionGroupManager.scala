@@ -1,17 +1,10 @@
 package models.accounting
 
-import scala.collection.immutable.Seq
 import common.time.LocalDateTime
-import common.time.Clock
-import models.SlickUtils.dbApi._
-import models.SlickUtils.dbApi.{Tag => SlickTag}
-import models.SlickUtils.dbRun
+import models.SlickUtils.dbApi.{Tag => SlickTag, _}
 import models.SlickUtils.localDateTimeToSqlDateMapper
-import models.accounting.money.{Money, ReferenceMoney}
-import models.accounting.config.Config
-import models.manager.{Entity, SlickEntityManager, EntityTable, ImmutableEntityManager}
-
-import SlickTransactionGroupManager.{TransactionGroups, tableName}
+import models.accounting.SlickTransactionGroupManager.{TransactionGroups, tableName}
+import models.manager.{EntityTable, ImmutableEntityManager, SlickEntityManager}
 
 final class SlickTransactionGroupManager
     extends ImmutableEntityManager[TransactionGroup, TransactionGroups](

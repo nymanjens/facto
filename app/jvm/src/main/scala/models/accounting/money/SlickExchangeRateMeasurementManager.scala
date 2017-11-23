@@ -1,23 +1,12 @@
 package models.accounting.money
 
-import java.util.concurrent.CopyOnWriteArrayList
-import java.util.function.Consumer
-
-import com.google.common.collect.{ImmutableMultiset, Multiset}
-import common.time.Clock
-import common.CollectionUtils.toListMap
-import models.SlickUtils.dbRun
-import models.SlickUtils.dbApi._
-import models.SlickUtils.dbApi.{Tag => SlickTag}
-import models.SlickUtils.localDateTimeToSqlDateMapper
-import models.manager.{Entity, SlickEntityManager, EntityTable, ImmutableEntityManager}
 import common.time.LocalDateTime
+import models.SlickUtils.dbApi.{Tag => SlickTag, _}
+import models.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}
+import models.accounting.money.SlickExchangeRateMeasurementManager.{ExchangeRateMeasurements, tableName}
+import models.manager.{EntityTable, ImmutableEntityManager, SlickEntityManager}
 
-import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
-import scala.collection.immutable.ListMap
-
-import SlickExchangeRateMeasurementManager.{ExchangeRateMeasurements, tableName}
 
 final class SlickExchangeRateMeasurementManager
     extends ImmutableEntityManager[ExchangeRateMeasurement, ExchangeRateMeasurements](

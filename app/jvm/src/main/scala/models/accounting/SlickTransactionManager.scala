@@ -1,25 +1,14 @@
 package models.accounting
 
 import com.google.inject._
-import com.google.common.base.Splitter
-import com.google.common.hash.{HashCode, Hashing}
-import common.time.Clock
 import common.accounting.Tags
-import models.SlickUtils.localDateTimeToSqlDateMapper
-import models.SlickUtils.dbRun
-import models.SlickUtils.dbApi._
-import models.SlickUtils.dbApi.{Tag => SlickTag}
-import models.accounting.config.{Account, Category, Config, MoneyReservoir}
-import models.accounting.money.{DatedMoney, Money}
-import models.manager.{Entity, SlickEntityManager, EntityTable, ImmutableEntityManager}
-import models._
 import common.time.LocalDateTime
+import models.SlickUtils.dbApi.{Tag => SlickTag, _}
+import models.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}
+import models.accounting.SlickTransactionManager.{Transactions, tableName}
+import models.manager.{EntityTable, ImmutableEntityManager, SlickEntityManager}
 
-import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
-import scala.util.Try
-
-import SlickTransactionManager.{Transactions, tableName}
 
 final class SlickTransactionManager @Inject()()
     extends ImmutableEntityManager[Transaction, Transactions](
