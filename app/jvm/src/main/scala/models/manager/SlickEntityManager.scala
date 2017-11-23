@@ -39,11 +39,7 @@ trait SlickEntityManager[E <: Entity, T <: AbstractTable[E]] extends EntityManag
 
 object SlickEntityManager {
 
-  /**
-    * Factory method for creating a database backed SlickEntityManager.
-    *
-    * @param cached if true, the manager is decorated with a caching layer that loads all data in memory.
-    */
+  /** Factory method for creating a database backed SlickEntityManager. */
   def create[E <: Entity, T <: EntityTable[E]](cons: Tag => T, tableName: String): SlickEntityManager[E, T] = {
     new DatabaseBackedEntityManager[E, T](cons, tableName)
   }
