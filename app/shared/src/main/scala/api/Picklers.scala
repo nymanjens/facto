@@ -6,10 +6,10 @@ import boopickle.Default._
 import common.time.LocalDateTime
 import models.User
 import models.accounting.config._
-import models.accounting.money.ExchangeRateMeasurement
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 import models.manager.EntityType._
 import models.manager.{Entity, EntityModification, EntityType}
+import models.money.ExchangeRateMeasurement
 
 import scala.collection.immutable.{Seq, Set}
 

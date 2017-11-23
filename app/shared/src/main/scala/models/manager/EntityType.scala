@@ -3,7 +3,7 @@ package models.manager
 import common.ScalaUtils
 import models.User
 import models.accounting._
-import models.accounting.money.ExchangeRateMeasurement
+import models.money.ExchangeRateMeasurement
 
 import scala.collection.immutable.Seq
 

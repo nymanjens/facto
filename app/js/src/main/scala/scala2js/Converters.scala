@@ -5,8 +5,8 @@ import java.time.{LocalDate, LocalTime}
 import common.time.LocalDateTime
 import models._
 import models.accounting._
-import models.accounting.money.ExchangeRateMeasurement
 import models.manager.{EntityType, _}
+import models.money.ExchangeRateMeasurement
 
 import scala.collection.immutable.Seq
 import scala.scalajs.js

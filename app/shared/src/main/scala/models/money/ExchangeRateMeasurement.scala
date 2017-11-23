@@ -1,4 +1,4 @@
-package models.accounting.money
+package models.money
 
 import common.money.Currency
 import common.time.LocalDateTime

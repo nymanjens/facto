@@ -7,7 +7,7 @@ import common.time.Clock
 import flux.react.ReactVdomUtils.^^
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
-import models.accounting.money._
+import models.money._
 
 private[transactiongroupform] final class TotalFlowInput(implicit i18n: I18n,
                                                          clock: Clock,

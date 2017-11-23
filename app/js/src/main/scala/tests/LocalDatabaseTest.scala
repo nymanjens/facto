@@ -4,9 +4,9 @@ import common.testing.TestObjects._
 import models.User
 import models.access.LocalDatabase
 import models.access.SingletonKey.{NextUpdateTokenKey, VersionKey}
-import models.accounting.money.ExchangeRateMeasurement
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 import models.manager.EntityModification
+import models.money.ExchangeRateMeasurement
 import tests.ManualTests.{ManualTest, ManualTestSuite}
 
 import scala.async.Async.{async, await}

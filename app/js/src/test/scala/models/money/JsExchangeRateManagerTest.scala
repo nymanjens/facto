@@ -1,10 +1,10 @@
-package models.accounting.money
+package models.money
 
 import java.time.Duration
 
+import common.money.Currency.{Eur, Gbp, Usd}
 import common.testing.TestModule
 import common.time.LocalDateTime
-import common.money.Currency.{Eur, Gbp, Usd}
 import utest.{TestSuite, _}
 
 import scala2js.Converters._

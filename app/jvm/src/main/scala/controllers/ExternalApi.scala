@@ -8,7 +8,7 @@ import common.time.{Clock, TimeUtils}
 import models._
 import models.accounting._
 import models.accounting.config.{Account, Config, Template}
-import models.accounting.money.ExchangeRateMeasurement
+import models.money.ExchangeRateMeasurement
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
 

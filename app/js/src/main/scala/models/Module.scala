@@ -3,7 +3,8 @@ package models
 import common.money.ExchangeRateManager
 import models.access.RemoteDatabaseProxy
 import models.accounting._
-import models.accounting.money._
+import models.money._
+import models.money.{JsExchangeRateManager, JsExchangeRateMeasurementManager}
 
 final class Module(implicit remoteDatabaseProxy: RemoteDatabaseProxy) {
 

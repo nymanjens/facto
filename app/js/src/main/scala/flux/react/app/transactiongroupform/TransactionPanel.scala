@@ -17,7 +17,7 @@ import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom.html_<^._
 import models.accounting.Transaction
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
-import models.accounting.money._
+import models.money._
 import models.{EntityAccess, User}
 
 import scala.collection.immutable.Seq

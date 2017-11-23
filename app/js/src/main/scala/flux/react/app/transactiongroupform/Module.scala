@@ -9,7 +9,7 @@ import flux.stores.entries.TagsStoreFactory
 import models.access.RemoteDatabaseProxy
 import models.accounting.TransactionGroup
 import models.accounting.config.Config
-import models.accounting.money._
+import models.money._
 import models.{EntityAccess, User}
 
 final class Module(implicit i18n: I18n,

@@ -10,7 +10,7 @@ import common.time.LocalDateTime
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
 import models._
-import models.accounting.money.ExchangeRateMeasurement
+import models.money.ExchangeRateMeasurement
 import play.api.{Application, Mode}
 
 import scala.collection.JavaConverters._

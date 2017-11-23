@@ -2,8 +2,8 @@ package models
 
 import com.google.inject._
 import models.accounting._
-import models.accounting.money.SlickExchangeRateMeasurementManager
 import models.manager.SlickEntityManager
+import models.money.SlickExchangeRateMeasurementManager
 
 import scala.collection.immutable.Seq
 

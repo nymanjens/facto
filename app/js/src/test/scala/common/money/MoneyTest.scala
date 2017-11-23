@@ -1,11 +1,11 @@
-package models.accounting.money
+package common.money
 
 import java.time.Duration
 
-import common.money._
+import common.money.Currency.Gbp
 import common.testing.{FakeRemoteDatabaseProxy, TestModule}
 import common.time.Clock
-import common.money.Currency.Gbp
+import models.money.{ExchangeRateMeasurement, JsExchangeRateManager}
 import utest.{TestSuite, _}
 
 import scala.collection.immutable.Seq

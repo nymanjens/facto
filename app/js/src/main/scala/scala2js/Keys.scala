@@ -2,6 +2,7 @@ package scala2js
 
 import common.time.LocalDateTime
 import models.manager.Entity
+import models.money.ExchangeRateMeasurement
 
 import scala.collection.immutable.Seq
 import scala2js.Converters._
@@ -52,7 +53,7 @@ object Keys {
   }
 
   object ExchangeRateMeasurement {
-    private type E = models.accounting.money.ExchangeRateMeasurement
+    private type E = ExchangeRateMeasurement
 
     val date = Scala2Js.Key[LocalDateTime, E]("date")
     val foreignCurrencyCode = Scala2Js.Key[String, E]("foreignCurrencyCode")
