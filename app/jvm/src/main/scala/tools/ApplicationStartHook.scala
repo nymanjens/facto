@@ -31,11 +31,6 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
       }
     }
 
-    // Initialize table managers (notably the caching ones)
-    for (entityManager <- entityAccess.allEntityManagers) {
-      entityManager.initialize()
-    }
-
     // Populate the database with dummy data
     if (app.mode == Mode.Test || app.mode == Mode.Dev) {
       if (AppConfigHelper.loadDummyUsers) {

@@ -10,7 +10,6 @@ abstract class ForwardingEntityManager[E <: Entity, T <: AbstractTable[E]](
     extends SlickEntityManager[E, T] {
 
   // ********** Management methods ********** //
-  override def initialize(): Unit = delegate.initialize()
   override def createTable(): Unit = delegate.createTable
   override def tableName: String = delegate.tableName
 

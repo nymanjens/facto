@@ -7,9 +7,6 @@ import slick.lifted.{AbstractTable, TableQuery}
 trait SlickEntityManager[E <: Entity, T <: AbstractTable[E]] extends EntityManager[E] {
 
   // ********** Management methods ********** //
-  /** Initializes this manager. This is called once at the start of the application. */
-  def initialize(): Unit = {}
-
   /** Creates the persisted database table for this manager. */
   def createTable(): Unit
   def tableName: String
