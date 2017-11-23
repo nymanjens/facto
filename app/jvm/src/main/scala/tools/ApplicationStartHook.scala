@@ -7,6 +7,8 @@ import java.time.{LocalDate, LocalTime}
 import com.google.inject.Inject
 import common.ResourceFiles
 import common.time.LocalDateTime
+import models.SlickUtils.dbApi._
+import models.SlickUtils.dbRun
 import models._
 import models.accounting.money.ExchangeRateMeasurement
 import play.api.{Application, Mode}
@@ -16,7 +18,6 @@ import scala.collection.JavaConverters._
 final class ApplicationStartHook @Inject()(implicit app: Application,
                                            userManager: SlickUserManager,
                                            entityAccess: SlickEntityAccess,
-                                           generalImportTool: GeneralImportTool,
                                            csvImportTool: CsvImportTool) {
   onStart()
 
@@ -26,7 +27,7 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
     // Set up database if necessary
     if (app.mode == Mode.Test || app.mode == Mode.Dev) {
       if (AppConfigHelper.dropAndCreateNewDb) {
-        generalImportTool.dropAndCreateNewDb()
+        dropAndCreateNewDb()
       }
     }
 
@@ -46,28 +47,17 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
     }
   }
 
-  private def dropAndCreateNewDb() = {
-    println("  Creating tables...")
-
-    for (entityManager <- entityAccess.allEntityManagers) {
-      dbRun(sqlu"""DROP TABLE IF EXISTS #${entityManager.tableName}""")
-      entityManager.createTable()
-    }
-
-    println("   done")
-  }
-
-  private def processFlags() = {
-    if (CommandLineFlags.dropAndCreateNewDb()) {
+  private def processFlags(): Unit = {
+    if (CommandLineFlags.dropAndCreateNewDb) {
       println("")
       println("  Dropping the database tables (if present) and creating new ones...")
-      generalImportTool.dropAndCreateNewDb()
+      dropAndCreateNewDb()
       println("  Done. Exiting.")
 
       System.exit(0)
     }
 
-    if (CommandLineFlags.createAdminUser()) {
+    if (CommandLineFlags.createAdminUser) {
       val loginName = "admin"
       val password = AppConfigHelper.defaultPassword getOrElse "changeme"
 
@@ -80,6 +70,17 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
 
       System.exit(0)
     }
+  }
+
+  private def dropAndCreateNewDb(): Unit = {
+    println("  Creating tables...")
+
+    for (entityManager <- entityAccess.allEntityManagers) {
+      dbRun(sqlu"""DROP TABLE IF EXISTS #${entityManager.tableName}""")
+      entityManager.createTable()
+    }
+
+    println("   done")
   }
 
   private def loadDummyUsers() = {
@@ -106,8 +107,8 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
   private object CommandLineFlags {
     private val properties = System.getProperties.asScala
 
-    def dropAndCreateNewDb(): Boolean = getBoolean("dropAndCreateNewDb")
-    def createAdminUser(): Boolean = getBoolean("createAdminUser")
+    def dropAndCreateNewDb: Boolean = getBoolean("dropAndCreateNewDb")
+    def createAdminUser: Boolean = getBoolean("createAdminUser")
 
     private def getBoolean(name: String): Boolean = properties.get(name).isDefined
 
