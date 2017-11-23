@@ -9,8 +9,6 @@ GET  /app/                             controllers.Application.reactAppRoot
 GET  /app/*anyString                   controllers.Application.reactApp(anyString)
 
 # External API
-GET  /externalapi/docachemanagement/:appSecret/              controllers.ExternalApi.doCacheManagement(appSecret)
-GET  /externalapi/warmupcaches/:appSecret/                   controllers.ExternalApi.warmUpCaches(appSecret)
 GET  /externalapi/acc/trans/addfromtpl/:tplCode/:appSecret/  controllers.ExternalApi.addTransactionFromTemplate(tplCode, appSecret)
 GET  /externalapi/acc/money/xchgmeasurement/:date/:currency/:ratio/:appSecret/  controllers.ExternalApi.addExchangeRateMeasurement(date, currency, ratio: Double, appSecret)
 

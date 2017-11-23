@@ -28,18 +28,6 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
     with I18nSupport {
 
   // ********** actions ********** //
-  def doCacheManagement(applicationSecret: String) = Action { implicit request =>
-    validateApplicationSecret(applicationSecret)
-    Ok("OK")
-  }
-
-  /** Warms up caches by rendering the most used views. */
-  def warmUpCaches(applicationSecret: String) = Action { implicit request =>
-    validateApplicationSecret(applicationSecret)
-
-    Ok("OK")
-  }
-
   def addTransactionFromTemplate(templateCode: String, applicationSecret: String) = Action {
     implicit request =>
       validateApplicationSecret(applicationSecret)
