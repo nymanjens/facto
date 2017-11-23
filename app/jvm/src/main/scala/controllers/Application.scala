@@ -11,7 +11,8 @@ import controllers.Application.Forms
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 import controllers.helpers.AuthenticatedAction
 import models.manager.{EntityModification, EntityType}
-import models.{SlickEntityAccess, SlickUserManager}
+import models.SlickEntityAccess
+import models.user.SlickUserManager
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}

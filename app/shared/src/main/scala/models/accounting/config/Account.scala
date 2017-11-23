@@ -3,6 +3,7 @@ package models.accounting.config
 import common.Require.requireNonNull
 import models._
 import models.accounting.config.Account.SummaryTotalRowDef
+import models.user.User
 
 import scala.collection.immutable.Seq
 

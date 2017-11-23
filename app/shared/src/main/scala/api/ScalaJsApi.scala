@@ -8,9 +8,9 @@ import api.ScalaJsApi.{
   UpdateToken
 }
 import common.time.LocalDateTime
-import models.User
 import models.accounting.config.Config
 import models.manager.{Entity, EntityModification, EntityType}
+import models.user.User
 
 import scala.collection.immutable.Seq
 

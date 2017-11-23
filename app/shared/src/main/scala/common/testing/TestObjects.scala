@@ -5,12 +5,12 @@ import java.time.Month._
 
 import common.time.LocalDateTimes.createDateTime
 import common.time.{LocalDateTime, LocalDateTimes}
-import models.User
 import models.accounting.config.Account.SummaryTotalRowDef
 import models.accounting.config._
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 import models.manager.EntityModification
 import models.money.ExchangeRateMeasurement
+import models.user.User
 
 import scala.collection.immutable.{ListMap, Seq}
 import scala.util.Random

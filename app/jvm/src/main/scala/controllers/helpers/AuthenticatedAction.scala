@@ -1,6 +1,7 @@
 package controllers.helpers
 
 import models._
+import models.user.User
 import play.api.mvc._
 
 abstract class AuthenticatedAction[A](bodyParser: BodyParser[A])(implicit entityAccess: EntityAccess,

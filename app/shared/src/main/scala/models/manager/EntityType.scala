@@ -1,9 +1,9 @@
 package models.manager
 
 import common.ScalaUtils
-import models.User
 import models.accounting._
 import models.money.ExchangeRateMeasurement
+import models.user.User
 
 import scala.collection.immutable.Seq
 

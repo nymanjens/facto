@@ -4,6 +4,7 @@ import com.google.inject.AbstractModule
 import models.accounting._
 import models.money._
 import models.money.{ExchangeRateMeasurement, SlickExchangeRateMeasurementManager}
+import models.user.{SlickUserManager, User}
 
 final class ModelsModule extends AbstractModule {
   override def configure() = {

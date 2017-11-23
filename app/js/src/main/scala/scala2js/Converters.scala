@@ -7,6 +7,7 @@ import models._
 import models.accounting._
 import models.manager.{EntityType, _}
 import models.money.ExchangeRateMeasurement
+import models.user.User
 
 import scala.collection.immutable.Seq
 import scala.scalajs.js

@@ -2,6 +2,7 @@ package models
 
 import common.time.LocalDateTime
 import models.manager.{Entity, EntityManager, EntityModification}
+import models.user.User
 
 /**
   * Symbolises a modification to an entity.

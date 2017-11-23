@@ -9,7 +9,8 @@ import flux.react.uielements
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import models.accounting.config.Config
-import models.{EntityAccess, User}
+import models.EntityAccess
+import models.user.User
 
 import scala.collection.immutable.Seq
 

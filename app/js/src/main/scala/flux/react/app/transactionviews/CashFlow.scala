@@ -16,7 +16,8 @@ import japgolly.scalajs.react.vdom.VdomArray
 import japgolly.scalajs.react.vdom.html_<^._
 import models.accounting.BalanceCheck
 import models.accounting.config.{Config, MoneyReservoir}
-import models.{EntityAccess, User}
+import models.EntityAccess
+import models.user.User
 
 import scala.collection.immutable.Seq
 import scala.scalajs.js

@@ -4,12 +4,12 @@ import java.time.{LocalDate, LocalTime}
 
 import boopickle.Default._
 import common.time.LocalDateTime
-import models.User
 import models.accounting.config._
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 import models.manager.EntityType._
 import models.manager.{Entity, EntityModification, EntityType}
 import models.money.ExchangeRateMeasurement
+import models.user.User
 
 import scala.collection.immutable.{Seq, Set}
 

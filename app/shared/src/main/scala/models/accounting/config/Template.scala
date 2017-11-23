@@ -6,6 +6,7 @@ import models.accounting.{
   Transaction => AccountingTransaction,
   TransactionGroup => AccountingTransactionGroup
 }
+import models.user.User
 
 import scala.collection.immutable.{Seq, Set}
 

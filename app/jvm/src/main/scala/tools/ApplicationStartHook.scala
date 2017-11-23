@@ -11,6 +11,7 @@ import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
 import models._
 import models.money.ExchangeRateMeasurement
+import models.user.SlickUserManager
 import play.api.{Application, Mode}
 
 import scala.collection.JavaConverters._

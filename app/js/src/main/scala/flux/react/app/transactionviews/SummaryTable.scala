@@ -17,7 +17,9 @@ import japgolly.scalajs.react.vdom.html_<^._
 import models.accounting.config.Account.SummaryTotalRowDef
 import models.accounting.config.{Account, Category, Config}
 import common.money.Currency
-import models.{EntityAccess, User}
+import models.user.User
+import models.EntityAccess
+import models.user.User
 
 import scala.collection.immutable.{ListMap, Seq}
 import scala.collection.mutable

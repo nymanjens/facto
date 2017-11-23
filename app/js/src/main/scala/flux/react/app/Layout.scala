@@ -6,7 +6,7 @@ import flux.react.router.{Page, RouterContext}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.PackageBase.VdomAttr
 import japgolly.scalajs.react.vdom.html_<^._
-import models.User
+import models.user.User
 import org.scalajs.dom
 
 import scala.collection.immutable.Seq

@@ -4,10 +4,10 @@ import java.time.Month.MARCH
 
 import common.testing.TestObjects._
 import common.time.LocalDateTime
-import models.User
 import models.accounting._
 import models.manager.EntityType
 import models.money.ExchangeRateMeasurement
+import models.user.User
 import utest._
 
 import scala.collection.immutable.Seq

@@ -1,7 +1,7 @@
 package models.access
 
 import api.ScalaJsApiClient
-import models.User
+import models.user.User
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future

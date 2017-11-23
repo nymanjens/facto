@@ -10,6 +10,7 @@ import common.money.Money
 import common.time.{Clock, LocalDateTime, LocalDateTimes}
 import models._
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
+import models.user.SlickUserManager
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq

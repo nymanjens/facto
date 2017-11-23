@@ -4,9 +4,9 @@ import api.ScalaJsApi.GetInitialDataResponse
 import api.ScalaJsApiClient
 import flux.react.router.Page
 import japgolly.scalajs.react.extra.router.Router
-import models.User
 import models.access.RemoteDatabaseProxy
 import models.accounting.config.Config
+import models.user.User
 
 final class FactoAppModule(implicit getInitialDataResponse: GetInitialDataResponse,
                            remoteDatabaseProxy: RemoteDatabaseProxy,

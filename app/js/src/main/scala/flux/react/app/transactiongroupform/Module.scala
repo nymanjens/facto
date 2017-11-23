@@ -10,7 +10,8 @@ import models.access.RemoteDatabaseProxy
 import models.accounting.TransactionGroup
 import models.accounting.config.Config
 import models.money._
-import models.{EntityAccess, User}
+import models.EntityAccess
+import models.user.User
 
 final class Module(implicit i18n: I18n,
                    accountingConfig: Config,

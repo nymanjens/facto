@@ -3,6 +3,7 @@ package models.accounting.config
 import common.Require.requireNonNull
 import models._
 import models.accounting.config.MoneyReservoir.NullMoneyReservoir
+import models.user.User
 
 import scala.collection.immutable.{ListMap, Seq}
 

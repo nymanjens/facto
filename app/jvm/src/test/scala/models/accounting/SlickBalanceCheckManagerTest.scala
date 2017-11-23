@@ -7,6 +7,7 @@ import common.testing.TestUtils._
 import common.testing._
 import common.time.Clock
 import models._
+import models.user.SlickUserManager
 import org.junit.runner._
 import org.specs2.runner._
 import play.api.test._

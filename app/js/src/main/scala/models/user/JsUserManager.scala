@@ -1,4 +1,4 @@
-package models
+package models.user
 
 import jsfacades.LokiJsImplicits._
 import models.access.RemoteDatabaseProxy

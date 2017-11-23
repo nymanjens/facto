@@ -16,7 +16,9 @@ import japgolly.scalajs.react.extra.router.Path
 import japgolly.scalajs.react.vdom.html_<^._
 import models.accounting.BalanceCheck
 import models.accounting.config.{Config, MoneyReservoir}
-import models.{EntityAccess, User}
+import models.user.User
+import models.EntityAccess
+import models.user.User
 
 final class BalanceCheckForm(implicit i18n: I18n,
                              clock: Clock,

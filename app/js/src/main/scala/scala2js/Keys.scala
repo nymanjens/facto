@@ -3,6 +3,7 @@ package scala2js
 import common.time.LocalDateTime
 import models.manager.Entity
 import models.money.ExchangeRateMeasurement
+import models.user.User
 
 import scala.collection.immutable.Seq
 import scala2js.Converters._
@@ -11,7 +12,7 @@ object Keys {
   def id[E <: Entity]: Scala2Js.Key[Long, E] = Scala2Js.Key[Long, E]("id")
 
   object User {
-    private type E = models.User
+    private type E = User
 
     val loginName = Scala2Js.Key[String, E]("loginName")
     val passwordHash = Scala2Js.Key[String, E]("passwordHash")

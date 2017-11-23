@@ -4,6 +4,7 @@ import com.google.inject._
 import models.accounting._
 import models.manager.SlickEntityManager
 import models.money.SlickExchangeRateMeasurementManager
+import models.user.SlickUserManager
 
 import scala.collection.immutable.Seq
 

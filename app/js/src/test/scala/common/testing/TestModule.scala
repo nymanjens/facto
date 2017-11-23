@@ -4,7 +4,8 @@ import flux.action.Dispatcher
 import models.money.JsExchangeRateMeasurementManager
 import models.accounting.{JsBalanceCheckManager, JsTransactionGroupManager, JsTransactionManager}
 import models.money.{JsExchangeRateManager, JsExchangeRateMeasurementManager}
-import models.{JsEntityAccess, JsUserManager}
+import models.JsEntityAccess
+import models.user.JsUserManager
 
 class TestModule {
 

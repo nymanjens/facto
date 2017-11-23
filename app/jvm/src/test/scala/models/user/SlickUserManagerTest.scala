@@ -1,4 +1,4 @@
-package models
+package models.user
 
 import com.google.inject._
 import common.testing._

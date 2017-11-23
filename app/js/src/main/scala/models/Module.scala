@@ -5,6 +5,7 @@ import models.access.RemoteDatabaseProxy
 import models.accounting._
 import models.money._
 import models.money.{JsExchangeRateManager, JsExchangeRateMeasurementManager}
+import models.user.JsUserManager
 
 final class Module(implicit remoteDatabaseProxy: RemoteDatabaseProxy) {
 

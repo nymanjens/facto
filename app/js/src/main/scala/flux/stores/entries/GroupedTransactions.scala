@@ -6,6 +6,7 @@ import common.time.LocalDateTime
 import models._
 import models.accounting.Transaction
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
+import models.user.User
 
 import scala.collection.immutable.Seq
 

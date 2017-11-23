@@ -6,9 +6,9 @@ import common.money.Money
 import flux.stores.entries.ComplexQueryFilter.{Prefix, QueryFilterPair, QueryPart}
 import jsfacades.LokiJs
 import jsfacades.LokiJsImplicits._
-import models.User
 import models.accounting._
 import models.accounting.config.Config
+import models.user.User
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
