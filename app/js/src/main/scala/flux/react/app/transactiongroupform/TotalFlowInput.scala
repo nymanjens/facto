@@ -2,6 +2,7 @@ package flux.react.app.transactiongroupform
 
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
+import common.money.{Currency, ExchangeRateManager, Money, ReferenceMoney}
 import common.time.Clock
 import flux.react.ReactVdomUtils.^^
 import japgolly.scalajs.react._

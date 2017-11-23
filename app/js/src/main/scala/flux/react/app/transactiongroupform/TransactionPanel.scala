@@ -3,6 +3,7 @@ import java.util.NoSuchElementException
 
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.accounting.Tags
+import common.money.{Currency, DatedMoney, ExchangeRateManager, ReferenceMoney}
 import common.time.{Clock, LocalDateTime, LocalDateTimes}
 import common.{I18n, SinglePendingTaskQueue}
 import flux.react.ReactVdomUtils.<<

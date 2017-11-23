@@ -1,8 +1,8 @@
 package models.accounting
 
+import common.money.DatedMoney
 import common.time.LocalDateTime
 import models.accounting.config.{Config, MoneyReservoir}
-import models.accounting.money.DatedMoney
 import models.manager.{Entity, EntityManager}
 import models.{EntityAccess, User}
 

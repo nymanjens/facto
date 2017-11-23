@@ -2,6 +2,7 @@ package flux.react.app.balancecheckform
 
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
+import common.money.ExchangeRateManager
 import common.time.{Clock, LocalDateTime}
 import flux.action.{Action, Dispatcher}
 import flux.react.ReactVdomUtils.<<
@@ -15,7 +16,6 @@ import japgolly.scalajs.react.extra.router.Path
 import japgolly.scalajs.react.vdom.html_<^._
 import models.accounting.BalanceCheck
 import models.accounting.config.{Config, MoneyReservoir}
-import models.accounting.money.ExchangeRateManager
 import models.{EntityAccess, User}
 
 final class BalanceCheckForm(implicit i18n: I18n,

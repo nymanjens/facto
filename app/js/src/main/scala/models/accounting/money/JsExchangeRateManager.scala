@@ -1,4 +1,5 @@
 package models.accounting.money
+import common.money.{Currency, ExchangeRateManager}
 import common.time.LocalDateTime
 import jsfacades.LokiJsImplicits._
 import models.access.RemoteDatabaseProxy

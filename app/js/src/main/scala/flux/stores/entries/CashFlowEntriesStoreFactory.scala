@@ -1,5 +1,6 @@
 package flux.stores.entries
 
+import common.money.{ExchangeRateManager, MoneyWithGeneralCurrency}
 import common.time.JavaTimeImplicits._
 import common.time.LocalDateTime
 import flux.stores.entries.CashFlowEntry.{BalanceCorrection, RegularEntry}
@@ -8,7 +9,6 @@ import jsfacades.LokiJsImplicits._
 import models.EntityAccess
 import models.access.RemoteDatabaseProxy
 import models.accounting.config.{Config, MoneyReservoir}
-import models.accounting.money.{ExchangeRateManager, MoneyWithGeneralCurrency}
 import models.accounting.{Transaction, _}
 
 import scala2js.Converters._

@@ -2,6 +2,7 @@ package flux.react.app.transactionviews
 
 import common.Formatting._
 import common.I18n
+import common.money.{ExchangeRateManager, ReferenceMoney}
 import common.time.Clock
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import flux.react.router.{Page, RouterContext}
@@ -10,7 +11,6 @@ import flux.stores.entries.{AccountPair, LiquidationEntriesStoreFactory, Liquida
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import models.accounting.config.{Account, Config}
-import models.accounting.money.{ExchangeRateManager, ReferenceMoney}
 import models.{EntityAccess, User}
 
 import scala.collection.immutable.Seq

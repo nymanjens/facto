@@ -1,6 +1,6 @@
-package models.accounting.money
+package common.money
 
-import models.accounting.money.CentOperations.CentOperationsNumeric
+import common.money.CentOperations.CentOperationsNumeric
 
 /**
   * Base class for an amount of money with an arbitrary currency.

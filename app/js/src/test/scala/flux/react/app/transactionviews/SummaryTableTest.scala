@@ -3,6 +3,7 @@ package flux.react.app.transactionviews
 import java.time.Month._
 
 import common.GuavaReplacement.DoubleMath.roundToLong
+import common.money.{Currency, ReferenceMoney}
 import common.testing.TestModule
 import common.testing.TestObjects._
 import common.time.LocalDateTimes.createDateTime
@@ -10,7 +11,6 @@ import common.time.{DatedMonth, YearRange}
 import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.{GainsForMonth, GainsForYear}
 import flux.stores.entries.SummaryForYearStoreFactory.SummaryForYear
 import models.accounting._
-import models.accounting.money.{Currency, ReferenceMoney}
 import utest._
 
 import scala.collection.immutable.{ListMap, Seq}

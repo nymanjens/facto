@@ -1,6 +1,6 @@
-package models.accounting.money
+package common.money
 
-import models.accounting.money.CentOperations.CentOperationsNumeric
+import common.money.CentOperations.CentOperationsNumeric
 
 /**
   * Represents an amount of money in the (default) reference currency.

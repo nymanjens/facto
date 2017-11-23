@@ -1,5 +1,6 @@
 package flux.stores.entries
 
+import common.money.{Currency, ExchangeRateManager, MoneyWithGeneralCurrency, ReferenceMoney}
 import common.time.JavaTimeImplicits._
 import common.time.{DatedMonth, LocalDateTime}
 import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.{
@@ -11,7 +12,7 @@ import jsfacades.LokiJs
 import jsfacades.LokiJsImplicits._
 import models.access.RemoteDatabaseProxy
 import models.accounting.config.{Account, Config, MoneyReservoir}
-import models.accounting.money.{Currency, ExchangeRateManager, MoneyWithGeneralCurrency, ReferenceMoney}
+import common.money.Currency
 import models.accounting.{BalanceCheck, Transaction}
 
 import scala.collection.immutable.{Seq, SortedMap}

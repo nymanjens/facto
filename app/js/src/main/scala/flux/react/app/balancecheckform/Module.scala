@@ -1,6 +1,7 @@
 package flux.react.app.balancecheckform
 
 import common.I18n
+import common.money.ExchangeRateManager
 import common.time.Clock
 import flux.action.Dispatcher
 import flux.stores.GlobalMessagesStore

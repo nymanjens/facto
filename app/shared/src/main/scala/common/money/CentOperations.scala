@@ -1,4 +1,4 @@
-package models.accounting.money
+package common.money
 
 import common.GuavaReplacement.DoubleMath.roundToLong
 

@@ -1,5 +1,6 @@
 package models.accounting.money
 
+import common.money.Currency
 import common.time.LocalDateTime
 import models.SlickUtils.dbApi.{Tag => SlickTag, _}
 import models.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}

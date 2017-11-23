@@ -1,4 +1,4 @@
-package models.accounting.money
+package common.money
 
 /**
   * Represents an amount of money with an arbitrary currency.

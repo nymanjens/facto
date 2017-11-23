@@ -2,6 +2,7 @@ package flux.react.app
 
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
+import common.money.ExchangeRateManager
 import common.time.Clock
 import flux.react.ReactVdomUtils.^^
 import flux.react.router.{Page, RouterContext}
@@ -12,7 +13,6 @@ import japgolly.scalajs.react.vdom.html_<^._
 import jsfacades.Mousetrap
 import models.EntityAccess
 import models.accounting.config.Config
-import models.accounting.money.ExchangeRateManager
 
 import scala.collection.immutable.Seq
 

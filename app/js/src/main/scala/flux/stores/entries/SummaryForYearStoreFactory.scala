@@ -1,12 +1,12 @@
 package flux.stores.entries
 
+import common.money.{ExchangeRateManager, ReferenceMoney}
 import common.time.{DatedMonth, LocalDateTime}
 import flux.stores.entries.SummaryForYearStoreFactory.SummaryForYear
 import jsfacades.LokiJs
 import jsfacades.LokiJsImplicits._
 import models.access.RemoteDatabaseProxy
 import models.accounting.config.{Account, Category, Config}
-import models.accounting.money.{ExchangeRateManager, ReferenceMoney}
 import models.accounting.{BalanceCheck, Transaction}
 
 import scala.collection.immutable.Seq

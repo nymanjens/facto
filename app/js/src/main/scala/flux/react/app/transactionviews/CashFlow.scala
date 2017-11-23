@@ -3,6 +3,7 @@ package flux.react.app.transactionviews
 import common.Formatting._
 import common.I18n
 import common.LoggingUtils.LogExceptionsCallback
+import common.money.ExchangeRateManager
 import common.time.Clock
 import flux.action.{Action, Dispatcher}
 import flux.react.ReactVdomUtils.<<
@@ -15,7 +16,6 @@ import japgolly.scalajs.react.vdom.VdomArray
 import japgolly.scalajs.react.vdom.html_<^._
 import models.accounting.BalanceCheck
 import models.accounting.config.{Config, MoneyReservoir}
-import models.accounting.money.ExchangeRateManager
 import models.{EntityAccess, User}
 
 import scala.collection.immutable.Seq

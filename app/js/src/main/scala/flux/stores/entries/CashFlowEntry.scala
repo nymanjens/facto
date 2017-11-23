@@ -1,6 +1,6 @@
 package flux.stores.entries
 
-import models.accounting.money.{DatedMoney, MoneyWithGeneralCurrency}
+import common.money.{DatedMoney, MoneyWithGeneralCurrency}
 import models.accounting.{Transaction, _}
 
 import scala.collection.immutable.Seq

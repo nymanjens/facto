@@ -1,12 +1,12 @@
 package flux.stores.entries
 
 import common.LoggingUtils.logExceptions
+import common.money.{ExchangeRateManager, ReferenceMoney}
 import jsfacades.LokiJs
 import jsfacades.LokiJsImplicits._
 import models.EntityAccess
 import models.access.RemoteDatabaseProxy
 import models.accounting.config.{Account, Config, MoneyReservoir}
-import models.accounting.money.{ExchangeRateManager, ReferenceMoney}
 import models.accounting.{BalanceCheck, Transaction}
 
 import scala.collection.immutable.Seq

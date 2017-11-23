@@ -2,9 +2,10 @@ package models.accounting.money
 
 import java.time.Duration
 
+import common.money._
 import common.testing.{FakeRemoteDatabaseProxy, TestModule}
 import common.time.Clock
-import models.accounting.money.Currency.Gbp
+import common.money.Currency.Gbp
 import utest.{TestSuite, _}
 
 import scala.collection.immutable.Seq

@@ -1,7 +1,7 @@
 package flux.stores.entries
 
+import common.money.ReferenceMoney
 import models.accounting.Transaction
-import models.accounting.money.ReferenceMoney
 
 import scala.collection.immutable.Seq
 

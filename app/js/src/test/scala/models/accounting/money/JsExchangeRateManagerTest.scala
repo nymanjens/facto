@@ -4,7 +4,7 @@ import java.time.Duration
 
 import common.testing.TestModule
 import common.time.LocalDateTime
-import models.accounting.money.Currency.{Eur, Gbp, Usd}
+import common.money.Currency.{Eur, Gbp, Usd}
 import utest.{TestSuite, _}
 
 import scala2js.Converters._

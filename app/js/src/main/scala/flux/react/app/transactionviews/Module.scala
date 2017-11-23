@@ -1,13 +1,13 @@
 package flux.react.app.transactionviews
 
 import common.I18n
+import common.money.ExchangeRateManager
 import common.time.Clock
 import flux.action.Dispatcher
 import flux.stores.GlobalMessagesStore
 import flux.stores.entries._
 import models.access.RemoteDatabaseProxy
 import models.accounting.config.Config
-import models.accounting.money.ExchangeRateManager
 import models.{EntityAccess, User}
 
 final class Module(implicit i18n: I18n,

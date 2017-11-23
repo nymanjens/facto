@@ -4,6 +4,7 @@ import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.ScalaUtils.visibleForTesting
 import common.accounting.Tags
+import common.money.{Currency, ExchangeRateManager, ReferenceMoney}
 import common.time.{Clock, DatedMonth, YearRange}
 import flux.react.ReactVdomUtils._
 import flux.react.router.{Page, RouterContext}
@@ -15,7 +16,7 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import models.accounting.config.Account.SummaryTotalRowDef
 import models.accounting.config.{Account, Category, Config}
-import models.accounting.money.{Currency, ExchangeRateManager, ReferenceMoney}
+import common.money.Currency
 import models.{EntityAccess, User}
 
 import scala.collection.immutable.{ListMap, Seq}

@@ -2,12 +2,12 @@ package flux.stores.entries
 
 import java.time.Month.JANUARY
 
+import common.money.ReferenceMoney
 import common.testing.TestObjects._
 import common.testing.{FakeRemoteDatabaseProxy, TestModule}
 import common.time.LocalDateTimes.createDateTime
 import models.accounting._
 import models.accounting.config.{Account, MoneyReservoir}
-import models.accounting.money.ReferenceMoney
 import models.manager.EntityModification
 import utest._
 

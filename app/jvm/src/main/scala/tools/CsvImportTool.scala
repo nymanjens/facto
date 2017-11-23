@@ -6,9 +6,9 @@ import java.time.Instant
 import com.google.common.base.Splitter
 import com.google.inject.Inject
 import common.ResourceFiles
+import common.money.Money
 import common.time.{Clock, LocalDateTime, LocalDateTimes}
 import models._
-import models.accounting.money.Money
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 
 import scala.collection.JavaConverters._

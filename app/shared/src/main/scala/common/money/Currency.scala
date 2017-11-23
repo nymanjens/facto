@@ -1,4 +1,4 @@
-package models.accounting.money
+package common.money
 
 /**
   * @param code The three letter symbol.
