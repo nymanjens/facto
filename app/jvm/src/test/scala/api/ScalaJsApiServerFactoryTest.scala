@@ -1,11 +1,10 @@
 package api
 
-import common.GuavaReplacement.Iterables.getOnlyElement
 import com.google.inject._
+import common.GuavaReplacement.Iterables.getOnlyElement
 import common.testing.TestObjects._
 import common.testing.TestUtils._
 import common.testing._
-import common.time.Clock
 import models._
 import models.accounting.SlickTransactionManager
 import models.accounting.config._

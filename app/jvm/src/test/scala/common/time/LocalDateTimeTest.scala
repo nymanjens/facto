@@ -1,6 +1,6 @@
 package common.time
 
-import java.time.{Duration, LocalDate}
+import java.time.Duration
 import java.time.Month._
 
 import common.testing.TestUtils._

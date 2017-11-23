@@ -1,17 +1,10 @@
 package models
 
 import com.google.inject._
-import org.specs2.mutable._
-import org.specs2.runner._
-import org.junit.runner._
-
-import play.api.test._
-
-import models.SlickUtils.dbApi._
-import common.testing.TestObjects._
-import common.testing.TestUtils._
 import common.testing._
-import models.SlickUtils.dbRun
+import org.junit.runner._
+import org.specs2.runner._
+import play.api.test._
 
 @RunWith(classOf[JUnitRunner])
 class SlickUserManagerTest extends HookedSpecification {
