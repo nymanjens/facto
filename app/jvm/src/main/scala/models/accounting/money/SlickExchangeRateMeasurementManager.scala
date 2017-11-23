@@ -27,29 +27,12 @@ final class SlickExchangeRateMeasurementManager
       ))
     with ExchangeRateMeasurement.Manager {
 
-  type AdditionListener = ExchangeRateMeasurement => Unit
-  @volatile private var listeners: Vector[AdditionListener] = Vector.empty
-
-  override def add(measurement: ExchangeRateMeasurement): ExchangeRateMeasurement = {
-    val added = super.add(measurement)
-
-    // Call addition listeners
-    for (additionListener <- listeners) {
-      additionListener(measurement)
-    }
-    added
-  }
-
   override def fetchAll(currency: Currency): Seq[ExchangeRateMeasurement] = {
     dbRun(
       newQuery
         .filter(_.foreignCurrencyCode === currency.code)
         .sortBy(m => m.date)
     ).toList
-  }
-
-  def addListener(measurementAddedListener: AdditionListener): Unit = {
-    listeners :+= measurementAddedListener
   }
 }
 

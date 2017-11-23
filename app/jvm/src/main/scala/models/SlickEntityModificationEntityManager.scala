@@ -18,7 +18,7 @@ final class SlickEntityModificationEntityManager
         tag => new EntityModificationEntities(tag),
         tableName = tableName
       ))
-    with EntityModificationEntity.Manager {}
+    with EntityModificationEntity.Manager
 
 object SlickEntityModificationEntityManager {
   private val tableName: String = "ENTITY_MODIFICATION_ENTITY"
