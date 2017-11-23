@@ -15,7 +15,6 @@ object JsExchangeRateManagerTest extends TestSuite {
     val testModule = new TestModule()
     val clock = testModule.fakeClock
     val remoteDatabaseProxy = testModule.fakeRemoteDatabaseProxy
-
     val exchangeRateManager: JsExchangeRateManager = testModule.exchangeRateManager
 
     "getRatioSecondToFirstCurrency()" - {

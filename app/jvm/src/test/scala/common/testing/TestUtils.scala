@@ -63,15 +63,6 @@ object TestUtils {
       ))
   }
 
-  def persistGbpMeasurement(millisSinceEpoch: Long, ratio: Double)(
-      implicit entityAccess: SlickEntityAccess): Unit = {
-    entityAccess.exchangeRateMeasurementManager.add(
-      ExchangeRateMeasurement(
-        date = localDateTimeOfEpochMilli(millisSinceEpoch),
-        foreignCurrencyCode = Gbp.code,
-        ratioReferenceToForeignCurrency = ratio))
-  }
-
   def localDateTimeOfEpochMilli(milli: Long): LocalDateTime = {
     val instant = Instant.ofEpochMilli(milli).atZone(ZoneId.of("Europe/Paris"))
     LocalDateTime.of(
