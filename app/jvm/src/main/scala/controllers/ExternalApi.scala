@@ -69,7 +69,7 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
 
   private def getOrCreateRobotUser()(implicit request: Request[_]): User = {
     val loginName = "robot"
-    def hash(s: String) = Hashing.sha512().hashString(s, Charsets.UTF_8).toString()
+    def hash(s: String) = Hashing.sha512().hashString(s, Charsets.UTF_8).toString
 
     userManager.findByLoginName(loginName) match {
       case Some(user) => user

@@ -32,7 +32,7 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
 
   // ********** actions ********** //
   def index() = AuthenticatedAction { implicit user => implicit request =>
-    Redirect(controllers.routes.Application.reactAppRoot)
+    Redirect(controllers.routes.Application.reactAppRoot())
   }
 
   def profile() = AuthenticatedAction { implicit user => implicit request =>
@@ -42,14 +42,12 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
 
   def changePassword = AuthenticatedAction { implicit user => implicit request =>
     Forms.changePasswordForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(views.html.profile(formWithErrors)),
-      formData =>
-        formData match {
-          case ChangePasswordData(loginName, _, password, _) =>
-            require(loginName == user.loginName)
-            userManager.update(SlickUserManager.copyUserWithPassword(user, password))
-            val message = Messages("facto.successfully-updated-password")
-            Redirect(routes.Application.profile).flashing("message" -> message)
+      formWithErrors => BadRequest(views.html.profile(formWithErrors)), {
+        case ChangePasswordData(loginName, _, password, _) =>
+          require(loginName == user.loginName)
+          userManager.update(SlickUserManager.copyUserWithPassword(user, password))
+          val message = Messages("facto.successfully-updated-password")
+          Redirect(routes.Application.profile()).flashing("message" -> message)
       }
     )
   }
@@ -61,13 +59,11 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
   def addUser() = AuthenticatedAction.requireAdminUser { implicit user => implicit request =>
     Forms.addUserForm.bindFromRequest.fold(
       formWithErrors =>
-        BadRequest(views.html.administration(users = userManager.fetchAll(), formWithErrors)),
-      formData =>
-        formData match {
-          case AddUserData(loginName, name, password, _) =>
-            userManager.add(SlickUserManager.createUser(loginName, password, name))
-            val message = Messages("facto.successfully-added-user", name)
-            Redirect(routes.Application.administration).flashing("message" -> message)
+        BadRequest(views.html.administration(users = userManager.fetchAll(), formWithErrors)), {
+        case AddUserData(loginName, name, password, _) =>
+          userManager.add(SlickUserManager.createUser(loginName, password, name))
+          val message = Messages("facto.successfully-added-user", name)
+          Redirect(routes.Application.administration()).flashing("message" -> message)
       }
     )
   }
