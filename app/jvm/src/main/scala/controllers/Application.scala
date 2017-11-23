@@ -2,27 +2,22 @@ package controllers
 
 import java.nio.ByteBuffer
 
-import scala.concurrent.Await
-import scala.concurrent.duration._
-import boopickle.Default._
 import api.Picklers._
 import api.ScalaJsApi.UpdateToken
-
-import scala.concurrent.ExecutionContext.Implicits.global
+import api.ScalaJsApiServerFactory
+import boopickle.Default._
 import com.google.inject.Inject
-
-import scala.collection.immutable.Seq
-import play.api.data.Form
-import play.api.mvc._
-import play.api.data.Forms._
-import play.Play.application
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import api.{ScalaJsApi, ScalaJsApiServerFactory}
-import models.manager.{Entity, EntityModification, EntityType}
-import models.{EntityAccess, SlickEntityAccess, SlickUserManager, User}
-import controllers.helpers.AuthenticatedAction
 import controllers.Application.Forms
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
+import controllers.helpers.AuthenticatedAction
+import models.manager.{EntityModification, EntityType}
+import models.{SlickEntityAccess, SlickUserManager}
+import play.api.data.Form
+import play.api.data.Forms._
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.mvc._
+
+import scala.collection.immutable.Seq
 
 final class Application @Inject()(implicit override val messagesApi: MessagesApi,
                                   components: ControllerComponents,

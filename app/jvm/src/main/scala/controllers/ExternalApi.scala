@@ -4,18 +4,14 @@ import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
 import com.google.inject.Inject
 import common.time.{Clock, TimeUtils}
+import models._
 import models.accounting._
 import models.accounting.config.{Account, Config, Template}
 import models.accounting.money.{Currency, ExchangeRateMeasurement}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.mvc._
 
 import scala.collection.immutable.Seq
-import play.api.data.Form
-import play.api.mvc._
-import play.api.data.Forms._
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import models._
-import controllers.helpers.AuthenticatedAction
-import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 
 final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi,
                                   components: ControllerComponents,
