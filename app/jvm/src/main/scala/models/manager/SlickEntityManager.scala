@@ -1,10 +1,7 @@
 package models.manager
 
-import scala.collection.immutable.Seq
-
-import slick.lifted.{AbstractTable, TableQuery}
-
 import models.SlickUtils.dbApi._
+import slick.lifted.{AbstractTable, TableQuery}
 
 /** Provides access to persisted entries using the Slick API. */
 trait SlickEntityManager[E <: Entity, T <: AbstractTable[E]] extends EntityManager[E] {

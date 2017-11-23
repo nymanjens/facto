@@ -1,6 +1,6 @@
 package models.manager
 
-import slick.lifted.{AbstractTable, TableQuery}
+import slick.lifted.AbstractTable
 
 /**
   * SlickEntityManager base implementation that forwards all calls to a given delegate except for update(), which throws

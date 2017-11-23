@@ -2,10 +2,10 @@ package models
 
 import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
+import models.SlickUserManager.{Users, tableName}
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
-import models.manager.{Entity, EntityTable, ForwardingEntityManager, SlickEntityManager}
-import SlickUserManager.{Users, tableName}
+import models.manager.{EntityTable, ForwardingEntityManager, SlickEntityManager}
 
 import scala.util.Random
 

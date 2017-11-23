@@ -1,6 +1,7 @@
 package models.manager
 
 import slick.lifted.{AbstractTable, TableQuery}
+
 import scala.collection.immutable.Seq
 
 /** SlickEntityManager base implementation that forwards all calls to a given delegate. */

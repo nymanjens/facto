@@ -1,10 +1,10 @@
 package models.manager
 
-import scala.util.{Failure, Success, Try}
-import scala.collection.immutable.Seq
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
 import play.api.Logger
+
+import scala.collection.immutable.Seq
 
 private[manager] final class DatabaseBackedEntityManager[E <: Entity, T <: EntityTable[E]](
     cons: Tag => T,

@@ -2,15 +2,13 @@ package models
 
 import java.nio.ByteBuffer
 
-import com.google.inject._
-import common.time.{Clock, LocalDateTime}
-import models.SlickEntityModificationEntityManager.{EntityModificationEntities, tableName}
-import models.SlickUtils.localDateTimeToSqlDateMapper
-import models.SlickUtils.dbApi.{Tag => SlickTag, _}
-import models.accounting.config.Config
-import models.manager.{EntityModification, EntityTable, ImmutableEntityManager, SlickEntityManager}
-import boopickle.Default._
 import api.Picklers._
+import boopickle.Default._
+import common.time.LocalDateTime
+import models.SlickEntityModificationEntityManager.{EntityModificationEntities, tableName}
+import models.SlickUtils.dbApi.{Tag => SlickTag, _}
+import models.SlickUtils.localDateTimeToSqlDateMapper
+import models.manager.{EntityModification, EntityTable, ImmutableEntityManager, SlickEntityManager}
 
 final class SlickEntityModificationEntityManager
     extends ImmutableEntityManager[EntityModificationEntity, EntityModificationEntities](

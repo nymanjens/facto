@@ -1,10 +1,10 @@
 package viewhelpers
 
-import scala.collection.mutable
-import scala.collection.Set
-import scala.annotation.tailrec
-import com.google.common.collect.Sets
 import java.text.Normalizer
+
+import com.google.common.collect.Sets
+
+import scala.annotation.tailrec
 
 object IdGenerator {
 

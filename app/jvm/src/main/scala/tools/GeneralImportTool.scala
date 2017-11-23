@@ -1,11 +1,10 @@
 package tools
 
-import play.api.Logger
-
 import com.google.inject.Inject
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
 import models._
+import play.api.Logger
 
 final class GeneralImportTool @Inject()(implicit userManager: User.Manager, entityAccess: SlickEntityAccess) {
 

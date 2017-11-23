@@ -1,7 +1,6 @@
 package models
 
 import com.google.inject.AbstractModule
-import tools.ApplicationStartHook
 import models.accounting._
 import models.accounting.money._
 

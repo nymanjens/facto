@@ -1,23 +1,18 @@
 package tools
 
-import scala.io.Source
-import scala.collection.JavaConverters._
 import java.nio.file.Path
-
-import common.time.Clock
-import com.google.inject.Inject
-import play.api.Logger
-import com.google.common.base.Splitter
-import common.time.LocalDateTime
-import common.time.LocalDateTimes
 import java.time.Instant
+
+import com.google.common.base.Splitter
+import com.google.inject.Inject
 import common.ResourceFiles
-import scala.collection.immutable.Seq
-import models.SlickUtils.dbApi._
-import models.SlickUtils.dbRun
+import common.time.{Clock, LocalDateTime, LocalDateTimes}
 import models._
 import models.accounting.money.Money
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
+
+import scala.collection.JavaConverters._
+import scala.collection.immutable.Seq
 
 final class CsvImportTool @Inject()(implicit userManager: SlickUserManager,
                                     clock: Clock,
