@@ -1,10 +1,10 @@
 package models.accounting.config
 
-import collection.immutable.Seq
-
 import common.Require.requireNonNull
 import models._
-import Account.SummaryTotalRowDef
+import models.accounting.config.Account.SummaryTotalRowDef
+
+import scala.collection.immutable.Seq
 
 case class Account(code: String,
                    longName: String,

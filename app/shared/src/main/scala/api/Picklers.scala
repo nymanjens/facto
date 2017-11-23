@@ -1,16 +1,15 @@
 package api
 
-import java.nio.ByteBuffer
 import java.time.{LocalDate, LocalTime}
 
-import models.manager.{Entity, EntityModification, EntityType}
-import models.manager.EntityType._
 import boopickle.Default._
 import common.time.LocalDateTime
 import models.User
-import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 import models.accounting.config._
 import models.accounting.money.ExchangeRateMeasurement
+import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
+import models.manager.EntityType._
+import models.manager.{Entity, EntityModification, EntityType}
 
 import scala.collection.immutable.{Seq, Set}
 

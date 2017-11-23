@@ -1,14 +1,13 @@
 package models.accounting.config
 
-import scala.collection.immutable.{Seq, Set}
 import common.Require.requireNonNull
-import models.accounting.money.Money
 import models._
 import models.accounting.{
-  TransactionGroup => AccountingTransactionGroup,
-  Transaction => AccountingTransaction
+  Transaction => AccountingTransaction,
+  TransactionGroup => AccountingTransactionGroup
 }
-import models.accounting.config.Template.Transaction
+
+import scala.collection.immutable.{Seq, Set}
 
 // Every field ending with "Tpl" may contain $-prefixed placeholders.
 // Example: descriptionTpl = "Endowment for ${account.longName}"

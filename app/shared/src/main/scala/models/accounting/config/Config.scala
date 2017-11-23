@@ -1,9 +1,10 @@
 package models.accounting.config
 
-import collection.immutable.{ListMap, Seq}
 import common.Require.requireNonNull
 import models._
 import models.accounting.config.MoneyReservoir.NullMoneyReservoir
+
+import scala.collection.immutable.{ListMap, Seq}
 
 /**
   * Contains the accountin configuration of this application. This is assumed to remain constant.

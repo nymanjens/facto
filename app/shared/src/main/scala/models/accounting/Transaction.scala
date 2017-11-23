@@ -1,6 +1,5 @@
 package models.accounting
 
-import common.accounting.Tags
 import common.time.LocalDateTime
 import models._
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}

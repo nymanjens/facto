@@ -5,9 +5,7 @@ import java.time.Duration
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 
-/**
-  * Replaces some Guava-provided functionality that is no longer usable with scala.js.
-  */
+/** Replaces some Guava-provided functionality that is not usable with scala.js. */
 object GuavaReplacement {
 
   // **************** Iterables **************** //

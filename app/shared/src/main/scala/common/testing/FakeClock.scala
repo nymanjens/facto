@@ -1,6 +1,7 @@
 package common.testing
 
 import java.time.Month.JANUARY
+
 import common.time.{Clock, LocalDateTime}
 
 final class FakeClock extends Clock {

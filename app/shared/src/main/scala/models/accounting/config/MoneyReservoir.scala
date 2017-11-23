@@ -2,7 +2,6 @@ package models.accounting.config
 
 import common.Require.requireNonNull
 import models.accounting.money.Currency
-import models.accounting.money.Money
 
 case class MoneyReservoir(code: String,
                           name: String,

@@ -3,7 +3,6 @@ package common.time
 import java.time.{LocalDate, LocalTime, Month}
 
 import common.I18n
-import common.time.LocalDateTimes.createDateTime
 
 import scala.collection.immutable.Seq
 

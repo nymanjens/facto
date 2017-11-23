@@ -1,14 +1,7 @@
 package models.accounting.money
 
-import scala.collection.immutable.Seq
-import java.lang.Math.{abs, round}
-
-import models.accounting.config.Config
-import models.accounting.money.CentOperations.CentOperationsNumeric
-import common.time.LocalDateTime
 import common.GuavaReplacement.DoubleMath.roundToLong
-
-import scala.collection.JavaConverters._
+import common.time.LocalDateTime
 
 /**
   * Represents an amount of money that was spent or gained at a given date.

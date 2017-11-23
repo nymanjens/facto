@@ -1,6 +1,7 @@
 package models.manager
 
 import java.lang.Math.abs
+
 import scala.util.Random
 
 /**

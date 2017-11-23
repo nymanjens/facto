@@ -1,8 +1,7 @@
 package models.accounting.money
 
-import models.manager.EntityType
-import models.manager.{Entity, EntityManager}
 import common.time.LocalDateTime
+import models.manager.{Entity, EntityManager}
 
 import scala.collection.immutable.Seq
 

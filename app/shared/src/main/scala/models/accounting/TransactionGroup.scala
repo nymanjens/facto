@@ -1,13 +1,12 @@
 package models.accounting
 
-import models.manager.EntityType
+import common.time.LocalDateTime
+import models.EntityAccess
+import models.accounting.config.Config
+import models.accounting.money.{ExchangeRateManager, ReferenceMoney}
+import models.manager.{Entity, EntityManager}
 
 import scala.collection.immutable.Seq
-import common.time.LocalDateTime
-import models.accounting.money.{ExchangeRateManager, Money, ReferenceMoney}
-import models.accounting.config.Config
-import models.manager.{Entity, EntityManager}
-import models.EntityAccess
 
 /** Transaction groups should be treated as immutable. */
 case class TransactionGroup(createdDate: LocalDateTime, idOption: Option[Long] = None) extends Entity {

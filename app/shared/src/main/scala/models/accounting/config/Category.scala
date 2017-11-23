@@ -2,7 +2,7 @@ package models.accounting.config
 
 import common.Require.requireNonNull
 
-import collection.immutable.Seq
+import scala.collection.immutable.Seq
 
 case class Category(code: String, name: String, helpText: String = "") {
   requireNonNull(code, name, helpText)

@@ -1,11 +1,11 @@
 package common
 
 import java.lang.Math.abs
-import java.time.Month._
 import java.time.DayOfWeek._
-import common.time.LocalDateTime
-import java.time.{LocalDate, Month, DayOfWeek}
-import common.time.Clock
+import java.time.Month._
+import java.time.{DayOfWeek, LocalDate, Month}
+
+import common.time.{Clock, LocalDateTime}
 
 object Formatting {
   // Note: Cannot use DateTimeFormatter as it isn't supported by scala.js

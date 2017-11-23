@@ -1,6 +1,5 @@
 package models
 
-import models.manager.EntityType
 import models.manager.{Entity, EntityManager}
 
 case class User(loginName: String,

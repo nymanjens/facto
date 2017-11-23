@@ -1,6 +1,6 @@
 package common
 
-import scala.annotation.{StaticAnnotation, tailrec}
+import scala.annotation.StaticAnnotation
 import scala.concurrent._
 
 object ScalaUtils {
