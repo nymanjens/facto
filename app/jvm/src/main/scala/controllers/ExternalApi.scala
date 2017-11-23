@@ -13,7 +13,6 @@ import play.api.data.Form
 import play.api.mvc._
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import common.cache.CacheRegistry
 import models._
 import controllers.helpers.AuthenticatedAction
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
@@ -31,7 +30,6 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
   // ********** actions ********** //
   def doCacheManagement(applicationSecret: String) = Action { implicit request =>
     validateApplicationSecret(applicationSecret)
-    CacheRegistry.doMaintenanceAndVerifyConsistency()
     Ok("OK")
   }
 

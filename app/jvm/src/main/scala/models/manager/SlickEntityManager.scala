@@ -51,8 +51,6 @@ object SlickEntityManager {
     * @param cached if true, the manager is decorated with a caching layer that loads all data in memory.
     */
   def create[E <: Entity, T <: EntityTable[E]](cons: Tag => T, tableName: String): SlickEntityManager[E, T] = {
-    var result: SlickEntityManager[E, T] = new DatabaseBackedEntityManager[E, T](cons, tableName)
-    result = new InvalidatingEntityManager[E, T](result)
-    result
+    new DatabaseBackedEntityManager[E, T](cons, tableName)
   }
 }
