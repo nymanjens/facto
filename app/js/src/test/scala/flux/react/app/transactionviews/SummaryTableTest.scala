@@ -6,9 +6,9 @@ import common.GuavaReplacement.DoubleMath.roundToLong
 import common.testing.TestModule
 import common.testing.TestObjects._
 import common.time.LocalDateTimes.createDateTime
-import common.time.{DatedMonth, LocalDateTimes, YearRange}
+import common.time.{DatedMonth, YearRange}
 import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.{GainsForMonth, GainsForYear}
-import flux.stores.entries.SummaryForYearStoreFactory.{SummaryCell, SummaryForYear}
+import flux.stores.entries.SummaryForYearStoreFactory.SummaryForYear
 import models.accounting._
 import models.accounting.money.{Currency, ReferenceMoney}
 import utest._

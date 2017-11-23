@@ -1,13 +1,10 @@
 package common.testing
 
+import common.LoggingUtils.LogExceptionsCallback
 import flux.react.router.{Page, RouterContext}
-import japgolly.scalajs.react.Callback
-import common.LoggingUtils.{logExceptions, LogExceptionsCallback}
-import japgolly.scalajs.react.extra.router.{BaseUrl, Path, RouterCtl}
-import japgolly.scalajs.react.vdom.html_<^.VdomTagOf
+import japgolly.scalajs.react.extra.router.Path
+import japgolly.scalajs.react.vdom.html_<^.{VdomTagOf, _}
 import org.scalajs.dom.html
-import org.scalajs.dom.html.Anchor
-import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.mutable
 

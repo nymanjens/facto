@@ -4,15 +4,14 @@ import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.time.{Clock, LocalDateTime}
 import flux.action.{Action, Dispatcher}
-import flux.react.ReactVdomUtils.{<<, ^^}
+import flux.react.ReactVdomUtils.<<
 import flux.react.router.RouterContext
-import flux.react.router.Page
 import flux.react.uielements
 import flux.react.uielements.HalfPanel
 import flux.react.uielements.input.bootstrap.MoneyInput
 import flux.react.uielements.input.{MappedInput, bootstrap}
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.extra.router.{Path, RouterCtl}
+import japgolly.scalajs.react.extra.router.Path
 import japgolly.scalajs.react.vdom.html_<^._
 import models.accounting.BalanceCheck
 import models.accounting.config.{Config, MoneyReservoir}

@@ -4,8 +4,7 @@ import java.time.Month.JANUARY
 
 import common.testing.TestObjects._
 import common.time.LocalDateTimes.createDateTime
-import jsfacades.LokiJs.ResultSet
-import jsfacades.LokiJs.Filter
+import jsfacades.LokiJs.{Filter, ResultSet}
 import models.accounting.Transaction
 import models.accounting.config.Category
 import models.manager.EntityModification
@@ -14,7 +13,6 @@ import utest._
 import scala.collection.immutable.Seq
 import scala.language.reflectiveCalls
 import scala2js.Converters._
-import scala2js.ConvertersTest._
 import scala2js.Keys
 
 object LokiResultSetFakeTest extends TestSuite {

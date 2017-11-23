@@ -1,11 +1,10 @@
 package flux.react.app.transactiongroupform
 
 import common.I18n
-import common.LoggingUtils.{logExceptions, LogExceptionsCallback}
+import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import flux.react.ReactVdomUtils.^^
 import flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom._
 import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq

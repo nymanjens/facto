@@ -2,7 +2,7 @@ package common
 
 import common.LoggingUtils.logExceptions
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 import scala.scalajs.concurrent.JSExecutionContext
 import scala.scalajs.js.timers._
 

@@ -2,7 +2,6 @@ package flux.react.uielements.input
 
 import java.time.Month.{APRIL, MAY}
 
-import common.accounting.Tags
 import common.testing.{ReactTestWrapper, TestModule}
 import common.time.LocalDateTime
 import common.time.LocalDateTimes.createDateTime
@@ -10,7 +9,6 @@ import japgolly.scalajs.react.test.ReactTestUtils
 import japgolly.scalajs.react.vdom.VdomElement
 import utest._
 
-import scala.collection.immutable.Seq
 import scala2js.Converters._
 
 object MappedInputTest extends TestSuite {

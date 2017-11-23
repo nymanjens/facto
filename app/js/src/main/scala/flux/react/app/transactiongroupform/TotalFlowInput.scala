@@ -5,7 +5,6 @@ import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.time.Clock
 import flux.react.ReactVdomUtils.^^
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom._
 import japgolly.scalajs.react.vdom.html_<^._
 import models.accounting.money._
 

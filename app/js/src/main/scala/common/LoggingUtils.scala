@@ -1,6 +1,6 @@
 package common
 
-import japgolly.scalajs.react.{Callback, CallbackTo}
+import japgolly.scalajs.react.CallbackTo
 
 import scala.concurrent.{ExecutionContext, Future}
 

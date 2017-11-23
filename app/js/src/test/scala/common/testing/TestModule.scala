@@ -1,14 +1,9 @@
 package common.testing
 
 import flux.action.Dispatcher
-import models.{EntityAccess, JsEntityAccess, JsUserManager}
-import models.accounting.money.{JsExchangeRateMeasurementManager, JsExchangeRateManager}
-import models.accounting.{
-  JsBalanceCheckManager,
-  JsTransactionGroupManager,
-  JsTransactionManager,
-  Transaction
-}
+import models.accounting.money.{JsExchangeRateManager, JsExchangeRateMeasurementManager}
+import models.accounting.{JsBalanceCheckManager, JsTransactionGroupManager, JsTransactionManager}
+import models.{JsEntityAccess, JsUserManager}
 
 class TestModule {
 

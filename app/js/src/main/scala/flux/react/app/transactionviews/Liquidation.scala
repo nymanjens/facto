@@ -1,16 +1,13 @@
 package flux.react.app.transactionviews
 
-import flux.react.router.RouterContext
 import common.Formatting._
 import common.I18n
 import common.time.Clock
-import common.LoggingUtils.LogExceptionsCallback
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
-import flux.react.router.Page
+import flux.react.router.{Page, RouterContext}
 import flux.react.uielements
 import flux.stores.entries.{AccountPair, LiquidationEntriesStoreFactory, LiquidationEntry}
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.extra.router.RouterCtl
 import japgolly.scalajs.react.vdom.html_<^._
 import models.accounting.config.{Account, Config}
 import models.accounting.money.{ExchangeRateManager, ReferenceMoney}

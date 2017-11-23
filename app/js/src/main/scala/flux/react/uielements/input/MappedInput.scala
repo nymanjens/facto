@@ -1,7 +1,6 @@
 package flux.react.uielements.input
 
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
-import common.accounting.Tags
 import common.time.{LocalDateTime, TimeUtils}
 import flux.react.uielements.input.MappedInput.ValueTransformer
 import japgolly.scalajs.react._
@@ -9,7 +8,6 @@ import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom._
 
-import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.reflect.ClassTag
 

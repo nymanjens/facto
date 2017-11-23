@@ -2,10 +2,9 @@ package flux.stores.entries
 
 import java.time.Month.JANUARY
 
+import common.testing.FakeRemoteDatabaseProxy
 import common.testing.TestObjects._
-import common.testing.{FakeRemoteDatabaseProxy, TestModule}
 import common.time.LocalDateTimes.createDateTime
-import models.access.RemoteDatabaseProxy
 import models.accounting._
 import models.accounting.config.{Account, Category}
 import utest._

@@ -1,20 +1,18 @@
 package jsfacades
 
-import common.LoggingUtils.logExceptions
 import common.GuavaReplacement.Iterables.getOnlyElement
+import common.LoggingUtils.logExceptions
 import common.ScalaUtils
-import jsfacades.LokiJs.Filter
 import jsfacades.LokiJs.Sorting.KeyWithDirection
 
+import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.JSGlobal
+import scala.util.matching.Regex
 import scala2js.Converters._
 import scala2js.Scala2Js
-import scala.collection.immutable.Seq
-import scala.util.matching.Regex
-import scala2js.Scala2Js.{Converter, Key}
 
 object LokiJs {
   @JSGlobal("loki")

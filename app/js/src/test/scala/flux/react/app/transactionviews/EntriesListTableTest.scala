@@ -1,14 +1,6 @@
 package flux.react.app.transactionviews
 
-import java.lang
-
-import common.testing.TestObjects._
-import common.testing.{ReactTestWrapper, TestModule}
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
-import flux.stores.entries.AllEntriesStoreFactory
-import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom._
-import models.accounting._
 import utest._
 
 import scala.collection.immutable.Seq

@@ -1,17 +1,16 @@
 package models.access
 
-import scala.async.Async.{async, await}
+import common.ScalaUtils.visibleForTesting
 import jsfacades.{CryptoJs, LokiJs}
 import models.manager.{Entity, EntityModification, EntityType}
 
-import scala2js.Converters._
+import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala2js.Converters._
 import scala2js.{Keys, Scala2Js}
-import common.ScalaUtils.visibleForTesting
 
 @visibleForTesting
 trait LocalDatabase {

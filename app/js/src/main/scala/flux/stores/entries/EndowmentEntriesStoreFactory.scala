@@ -3,8 +3,8 @@ package flux.stores.entries
 import jsfacades.LokiJs
 import jsfacades.LokiJsImplicits._
 import models.access.RemoteDatabaseProxy
-import models.accounting.{BalanceCheck, Transaction}
 import models.accounting.config.{Account, Config}
+import models.accounting.{BalanceCheck, Transaction}
 
 import scala.collection.immutable.Seq
 import scala2js.Converters._

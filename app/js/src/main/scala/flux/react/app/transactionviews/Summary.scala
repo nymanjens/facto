@@ -3,7 +3,7 @@ package flux.react.app.transactionviews
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.time.Clock
-import flux.react.router.{Page, RouterContext}
+import flux.react.router.RouterContext
 import flux.react.uielements
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._

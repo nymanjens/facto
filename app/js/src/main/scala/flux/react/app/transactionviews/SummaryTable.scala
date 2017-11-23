@@ -2,22 +2,17 @@ package flux.react.app.transactionviews
 
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
-import common.CollectionUtils.asMap
 import common.ScalaUtils.visibleForTesting
 import common.accounting.Tags
 import common.time.{Clock, DatedMonth, YearRange}
-import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
-import flux.react.router.{Page, RouterContext}
 import flux.react.ReactVdomUtils._
+import flux.react.router.{Page, RouterContext}
 import flux.react.uielements
-import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.{GainsForMonth, GainsForYear}
+import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.GainsForYear
 import flux.stores.entries.SummaryForYearStoreFactory.{SummaryCell, SummaryForYear}
 import flux.stores.entries._
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.extra.router.Path
-import japgolly.scalajs.react.vdom.VdomNode
 import japgolly.scalajs.react.vdom.html_<^._
-import models.accounting.TransactionGroup
 import models.accounting.config.Account.SummaryTotalRowDef
 import models.accounting.config.{Account, Category, Config}
 import models.accounting.money.{Currency, ExchangeRateManager, ReferenceMoney}

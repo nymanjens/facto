@@ -1,9 +1,9 @@
 package scala2js
 
-import models.manager.Entity
 import common.time.LocalDateTime
-import scala.collection.immutable.Seq
+import models.manager.Entity
 
+import scala.collection.immutable.Seq
 import scala2js.Converters._
 
 object Keys {

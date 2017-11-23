@@ -1,20 +1,19 @@
 package models.access
 
-import scala.async.Async.{async, await}
-import scala.concurrent.duration._
-import scala.scalajs.js
 import api.ScalaJsApiClient
-import common.LoggingUtils.{logExceptions, LogExceptionsCallback}
+import common.LoggingUtils.logExceptions
 import common.ScalaUtils.visibleForTesting
 import jsfacades.LokiJs
-import jsfacades.LokiJsImplicits._
 import models.access.SingletonKey._
 import models.manager.{Entity, EntityModification, EntityType}
 
+import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.concurrent.Future
+import scala.concurrent.duration._
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.scalajs.js
 import scala2js.Converters._
 
 trait RemoteDatabaseProxy {

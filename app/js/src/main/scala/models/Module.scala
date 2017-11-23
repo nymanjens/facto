@@ -1,6 +1,5 @@
 package models
 
-import common.time.LocalDateTime
 import models.access.RemoteDatabaseProxy
 import models.accounting._
 import models.accounting.money._

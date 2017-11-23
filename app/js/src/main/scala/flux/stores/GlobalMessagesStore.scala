@@ -1,7 +1,7 @@
 package flux.stores
 
-import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.I18n
+import common.LoggingUtils.logExceptions
 import common.time.Clock
 import flux.action.Action._
 import flux.action.{Action, Dispatcher}
@@ -10,9 +10,7 @@ import models.EntityAccess
 import models.accounting._
 import models.accounting.config.Config
 
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.collection.immutable.Seq
-import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.scalajs.js
 

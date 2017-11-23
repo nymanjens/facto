@@ -1,7 +1,6 @@
 package flux.stores.entries
 
 import models.access.RemoteDatabaseProxy
-import models.accounting.Transaction
 
 import scala.collection.immutable.Seq
 

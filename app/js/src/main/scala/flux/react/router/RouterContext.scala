@@ -1,6 +1,5 @@
 package flux.react.router
 
-import japgolly.scalajs.react.Callback
 import japgolly.scalajs.react.extra.router.{Path, RouterCtl}
 import japgolly.scalajs.react.vdom.html_<^.VdomTagOf
 import org.scalajs.dom.html

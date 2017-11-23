@@ -2,9 +2,7 @@ package tests
 
 import common.testing.TestObjects._
 import jsfacades.LokiJs
-import jsfacades.LokiJsImplicits._
-import jsfacades.LokiJs.ResultSet
-import jsfacades.LokiJs.Filter
+import jsfacades.LokiJs.{Filter, ResultSet}
 import models.access.LocalDatabase
 import models.accounting.Transaction
 import tests.ManualTests.{ManualTest, ManualTestSuite}

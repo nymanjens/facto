@@ -9,8 +9,8 @@ import japgolly.scalajs.react.vdom.html_<^._
 import models.User
 import org.scalajs.dom
 
-import scala.scalajs.js
 import scala.collection.immutable.Seq
+import scala.scalajs.js
 
 final class Layout(implicit globalMessages: GlobalMessages, menu: Menu, user: User, i18n: I18n) {
 

@@ -1,7 +1,5 @@
 package common
 
-import common.ScalaUtils.visibleForTesting
-
 /**
   * @param i18nMessages Maps key to the message with placeholders.
   */

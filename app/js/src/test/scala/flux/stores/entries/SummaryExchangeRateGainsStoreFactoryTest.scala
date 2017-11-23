@@ -3,12 +3,11 @@ package flux.stores.entries
 import java.time.LocalDate
 import java.time.Month._
 
+import common.testing.TestObjects._
 import common.testing.{FakeRemoteDatabaseProxy, TestModule}
 import common.time.LocalDateTimes.createDateTime
-import common.testing.TestObjects._
-import common.time.{DatedMonth, LocalDateTime, LocalDateTimes}
+import common.time.{DatedMonth, LocalDateTime}
 import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.GainsForMonth
-import models.access.RemoteDatabaseProxy
 import models.accounting.config.MoneyReservoir
 import models.accounting.money.ReferenceMoney
 import models.manager.EntityModification

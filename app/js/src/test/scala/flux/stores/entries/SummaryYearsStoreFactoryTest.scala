@@ -1,19 +1,11 @@
 package flux.stores.entries
 
-import java.time.Month
-import java.time.Month.JANUARY
-
-import common.testing.{FakeRemoteDatabaseProxy, TestModule}
 import common.testing.TestObjects._
-import common.time.{LocalDateTime, LocalDateTimes, YearRange}
-import common.time.LocalDateTimes.createDateTime
-import models.accounting._
-import models.accounting.config.{Account, MoneyReservoir}
-import models.accounting.money.ReferenceMoney
-import models.manager.EntityModification
+import common.testing.{FakeRemoteDatabaseProxy, TestModule}
+import common.time.YearRange
+import models.accounting.config.Account
 import utest._
 
-import scala.collection.immutable.Seq
 import scala2js.Converters._
 
 object SummaryYearsStoreFactoryTest extends TestSuite {

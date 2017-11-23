@@ -11,14 +11,12 @@ import api.ScalaJsApi.{
 }
 import autowire._
 import boopickle.Default._
-import models.User
-import models.accounting.config.Config
-import models.manager.{Entity, EntityModification, EntityType}
+import models.manager.{EntityModification, EntityType}
 import org.scalajs.dom
 
 import scala.collection.immutable.Seq
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js.typedarray._
 
 trait ScalaJsApiClient {

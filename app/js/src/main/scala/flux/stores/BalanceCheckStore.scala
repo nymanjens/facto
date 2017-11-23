@@ -1,9 +1,7 @@
 package flux.stores
 
-import common.time.Clock
 import flux.action.Action.{AddBalanceCheck, RemoveBalanceCheck, UpdateBalanceCheck}
 import flux.action.Dispatcher
-import models.EntityAccess
 import models.access.RemoteDatabaseProxy
 import models.manager.EntityModification
 

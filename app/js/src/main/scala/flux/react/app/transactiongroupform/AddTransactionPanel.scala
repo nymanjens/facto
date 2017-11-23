@@ -4,7 +4,6 @@ import common.I18n
 import common.LoggingUtils.logExceptions
 import flux.react.uielements.HalfPanel
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom._
 import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq

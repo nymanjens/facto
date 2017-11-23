@@ -1,6 +1,6 @@
 package common.testing
 
-import java.time.{Duration, Month}
+import java.time.Duration
 import java.time.Month.JANUARY
 
 import api.ScalaJsApi.UpdateToken

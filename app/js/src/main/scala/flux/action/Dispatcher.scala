@@ -1,11 +1,11 @@
 package flux.action
 
-import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
-import scala.concurrent.duration._
+import common.LoggingUtils.logExceptions
+
 import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
 import scala.collection.mutable
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 /**

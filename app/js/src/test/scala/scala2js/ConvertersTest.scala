@@ -2,17 +2,16 @@ package scala2js
 
 import java.time.Month.MARCH
 
+import common.testing.TestObjects._
 import common.time.LocalDateTime
+import models.User
 import models.accounting._
 import models.accounting.money.ExchangeRateMeasurement
 import models.manager.EntityType
 import utest._
-import common.testing.TestObjects._
-import models.User
 
 import scala.collection.immutable.Seq
 import scala.scalajs.js
-import scala.scalajs.runtime.RuntimeLong
 import scala2js.Converters._
 
 object ConvertersTest extends TestSuite {

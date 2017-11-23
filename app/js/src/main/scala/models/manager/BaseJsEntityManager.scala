@@ -2,8 +2,8 @@ package models.manager
 
 import models.access.RemoteDatabaseProxy
 
-import scala2js.Converters._
 import scala.collection.immutable.Seq
+import scala2js.Converters._
 import scala2js.Keys
 
 abstract class BaseJsEntityManager[E <: Entity: EntityType](implicit database: RemoteDatabaseProxy)

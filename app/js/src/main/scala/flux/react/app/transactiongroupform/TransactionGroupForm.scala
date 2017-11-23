@@ -1,6 +1,5 @@
 package flux.react.app.transactiongroupform
 
-import flux.react.uielements
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, LogExceptionsFuture, logExceptions}
 import common.time.Clock
@@ -9,6 +8,7 @@ import flux.action.{Action, Dispatcher}
 import flux.react.ReactVdomUtils.{<<, ^^}
 import flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
 import flux.react.router.RouterContext
+import flux.react.uielements
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.Path
 import japgolly.scalajs.react.vdom.html_<^._
