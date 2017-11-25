@@ -9,7 +9,7 @@ import scala.util.Random
 /**
   * Indicates an idempotent addition or removal of an immutable entity.
   *
-  * This modification may used for desired modifications (not yet persisted) or to indicate an already changed state.
+  * This modification may be used for desired modifications (not yet persisted) or to indicate an already changed state.
   *
   * It is important that these modifications are created and treated as idempotent modifications, i.e. applying a
   * modification a seconds time is a no-op.

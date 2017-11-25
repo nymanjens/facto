@@ -20,6 +20,7 @@ object Picklers {
   implicit object UserPickler extends Pickler[User] {
     override def pickle(user: User)(implicit state: PickleState): Unit = logExceptions {
       state.pickle(user.loginName)
+      // Password redacted
       state.pickle(user.name)
       state.pickle(user.databaseEncryptionKey)
       state.pickle(user.idOption)
