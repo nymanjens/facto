@@ -16,16 +16,7 @@ final class SlickExchangeRateMeasurementManager
         tag => new ExchangeRateMeasurements(tag),
         tableName = tableName
       ))
-    with ExchangeRateMeasurement.Manager {
-
-  override def fetchAll(currency: Currency): Seq[ExchangeRateMeasurement] = {
-    dbRun(
-      newQuery
-        .filter(_.foreignCurrencyCode === currency.code)
-        .sortBy(m => m.date)
-    ).toList
-  }
-}
+    with ExchangeRateMeasurement.Manager
 
 object SlickExchangeRateMeasurementManager {
   private val tableName: String = "EXCHANGE_RATE_MEASUREMENT"

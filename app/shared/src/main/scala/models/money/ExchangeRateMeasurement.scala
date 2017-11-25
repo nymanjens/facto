@@ -32,8 +32,5 @@ case class ExchangeRateMeasurement(date: LocalDateTime,
 object ExchangeRateMeasurement {
   def tupled = (this.apply _).tupled
 
-  trait Manager extends EntityManager[ExchangeRateMeasurement] {
-
-    def fetchAll(currency: Currency): Seq[ExchangeRateMeasurement]
-  }
+  trait Manager extends EntityManager[ExchangeRateMeasurement]
 }
