@@ -7,9 +7,8 @@ import common.time.LocalDateTime
 import models.Entity
 import models.accounting.config._
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
+import models.modification.{EntityModification, EntityType}
 import models.modification.EntityType._
-import models.modification.EntityType
-import models.modification.EntityModification
 import models.money.ExchangeRateMeasurement
 import models.user.User
 
