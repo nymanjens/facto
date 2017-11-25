@@ -4,7 +4,7 @@ import common.money.DatedMoney
 import common.time.LocalDateTime
 import models._
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
-import models.manager.{Entity, EntityManager}
+import models.manager.EntityManager
 import models.user.User
 
 import scala.collection.immutable.Seq

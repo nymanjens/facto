@@ -4,8 +4,8 @@ import api.ScalaJsApiClient
 import common.LoggingUtils.logExceptions
 import common.ScalaUtils.visibleForTesting
 import jsfacades.LokiJs
+import models.Entity
 import models.access.SingletonKey._
-import models.manager.Entity
 import models.modification.EntityType
 import models.modification.EntityModification
 

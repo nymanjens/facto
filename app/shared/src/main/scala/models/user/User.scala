@@ -1,6 +1,7 @@
 package models.user
 
-import models.manager.{Entity, EntityManager}
+import models.Entity
+import models.manager.EntityManager
 
 case class User(loginName: String,
                 passwordHash: String,

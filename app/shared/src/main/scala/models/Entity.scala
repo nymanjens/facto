@@ -1,4 +1,4 @@
-package models.manager
+package models
 
 // Based on active-slick (https://github.com/strongtyped/active-slick)
 

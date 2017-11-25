@@ -3,9 +3,9 @@ package models.accounting
 import common.money.DatedMoney
 import common.time.LocalDateTime
 import models.accounting.config.{Config, MoneyReservoir}
-import models.manager.{Entity, EntityManager}
+import models.manager.EntityManager
 import models.user.User
-import models.EntityAccess
+import models.{Entity, EntityAccess}
 import models.user.User
 
 /** BalanceCheck entities are immutable. Just delete and create a new one when updating. */

@@ -1,5 +1,6 @@
 package models.manager
 
+import models.Entity
 import models.access.RemoteDatabaseProxy
 import models.modification.EntityType
 

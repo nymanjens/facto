@@ -1,6 +1,6 @@
 package models.manager
 
-import models.EntityTable
+import models.{Entity, EntityTable}
 import models.SlickUtils.dbApi._
 import slick.lifted.{AbstractTable, TableQuery}
 

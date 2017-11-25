@@ -8,8 +8,8 @@ import api.ScalaJsApi.{
   UpdateToken
 }
 import common.time.LocalDateTime
+import models.Entity
 import models.accounting.config.Config
-import models.manager.Entity
 import models.modification.EntityType
 import models.modification.EntityModification
 import models.user.User

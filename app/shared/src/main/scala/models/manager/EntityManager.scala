@@ -1,5 +1,7 @@
 package models.manager
 
+import models.Entity
+
 import scala.collection.immutable.Seq
 
 /** Provides access to persisted entries. */

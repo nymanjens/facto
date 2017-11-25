@@ -2,7 +2,7 @@ package common.testing
 
 import api.ScalaJsApi.{GetAllEntitiesResponse, GetEntityModificationsResponse, UpdateToken}
 import api.ScalaJsApiClient
-import models.manager.Entity
+import models.Entity
 import models.modification.EntityType
 import models.modification.EntityModification
 

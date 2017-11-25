@@ -1,5 +1,6 @@
 package models.manager
 
+import models.Entity
 import slick.lifted.AbstractTable
 
 /**

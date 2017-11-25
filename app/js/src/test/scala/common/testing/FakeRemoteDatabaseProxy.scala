@@ -1,9 +1,9 @@
 package common.testing
 
 import jsfacades.LokiJs
+import models.Entity
 import models.access.RemoteDatabaseProxy
 import models.access.RemoteDatabaseProxy.Listener
-import models.manager.Entity
 import models.modification.EntityType
 import models.modification.EntityModification
 

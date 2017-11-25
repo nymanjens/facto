@@ -6,7 +6,7 @@ import java.time.Month.JANUARY
 import api.ScalaJsApi.UpdateToken
 import common.time.JavaTimeImplicits._
 import common.time.LocalDateTime
-import models.manager.Entity
+import models.Entity
 import models.modification.EntityType
 import models.modification.EntityModification
 

@@ -2,9 +2,9 @@ package models.accounting
 
 import common.money.{ExchangeRateManager, ReferenceMoney}
 import common.time.LocalDateTime
-import models.EntityAccess
+import models.{Entity, EntityAccess}
 import models.accounting.config.Config
-import models.manager.{Entity, EntityManager}
+import models.manager.EntityManager
 
 import scala.collection.immutable.Seq
 

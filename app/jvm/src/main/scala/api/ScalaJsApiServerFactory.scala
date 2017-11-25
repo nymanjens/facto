@@ -22,7 +22,7 @@ import models.modification.{
   SlickEntityModificationEntityManager
 }
 import models.user.User
-import models.SlickEntityAccess
+import models.{Entity, SlickEntityAccess}
 
 import scala.collection.immutable.Seq
 

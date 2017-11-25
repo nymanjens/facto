@@ -2,7 +2,8 @@ package models.money
 
 import common.money.Currency
 import common.time.LocalDateTime
-import models.manager.{Entity, EntityManager}
+import models.Entity
+import models.manager.EntityManager
 
 import scala.collection.immutable.Seq
 

@@ -1,7 +1,7 @@
 package scala2js
 
 import common.time.LocalDateTime
-import models.manager.Entity
+import models.Entity
 import models.money.ExchangeRateMeasurement
 import models.user.User
 
