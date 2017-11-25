@@ -1,15 +1,15 @@
-package models
+package models.modification
 
 import java.nio.ByteBuffer
 
 import api.Picklers._
 import boopickle.Default._
 import common.time.LocalDateTime
-import models.SlickEntityModificationEntityManager.{EntityModificationEntities, tableName}
+import models.EntityTable
 import models.SlickUtils.dbApi.{Tag => SlickTag, _}
 import models.SlickUtils.localDateTimeToSqlDateMapper
 import models.manager.{ImmutableEntityManager, SlickEntityManager}
-import models.modification.EntityModification
+import models.modification.SlickEntityModificationEntityManager.{EntityModificationEntities, tableName}
 
 final class SlickEntityModificationEntityManager
     extends ImmutableEntityManager[EntityModificationEntity, EntityModificationEntities](

@@ -3,6 +3,7 @@ package models
 import com.google.inject._
 import models.accounting._
 import models.manager.SlickEntityManager
+import models.modification.SlickEntityModificationEntityManager
 import models.money.SlickExchangeRateMeasurementManager
 import models.user.SlickUserManager
 

@@ -2,6 +2,7 @@ package models
 
 import com.google.inject.AbstractModule
 import models.accounting._
+import models.modification.{EntityModificationEntity, SlickEntityModificationEntityManager}
 import models.money._
 import models.money.{ExchangeRateMeasurement, SlickExchangeRateMeasurementManager}
 import models.user.{SlickUserManager, User}

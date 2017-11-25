@@ -8,7 +8,7 @@ import common.testing._
 import models._
 import models.accounting.SlickTransactionManager
 import models.accounting.config._
-import models.modification.EntityType
+import models.modification.{EntityModificationEntity, EntityType, SlickEntityModificationEntityManager}
 import models.user.SlickUserManager
 import org.junit.runner._
 import org.specs2.runner._

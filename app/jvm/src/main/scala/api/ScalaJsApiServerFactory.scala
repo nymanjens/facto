@@ -15,10 +15,14 @@ import models.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}
 import models.accounting.config.Config
 import models.modification.EntityType._
 import models.manager._
-import models.modification.EntityModification
-import models.modification.EntityType
+import models.modification.{
+  EntityModification,
+  EntityModificationEntity,
+  EntityType,
+  SlickEntityModificationEntityManager
+}
 import models.user.User
-import models.{EntityModificationEntity, SlickEntityAccess, SlickEntityModificationEntityManager}
+import models.SlickEntityAccess
 
 import scala.collection.immutable.Seq
 

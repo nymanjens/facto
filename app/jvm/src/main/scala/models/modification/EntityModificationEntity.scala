@@ -1,8 +1,8 @@
-package models
+package models.modification
 
 import common.time.LocalDateTime
+import models.EntityAccess
 import models.manager.{Entity, EntityManager}
-import models.modification.EntityModification
 import models.user.User
 
 /**
