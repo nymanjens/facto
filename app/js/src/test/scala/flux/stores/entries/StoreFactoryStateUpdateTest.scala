@@ -7,8 +7,9 @@ import common.testing.{FakeRemoteDatabaseProxy, TestModule}
 import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.GainsForYear
 import flux.stores.entries.SummaryForYearStoreFactory.SummaryForYear
 import models.accounting._
-import models.manager.EntityModification._
-import models.manager.{EntityManager, EntityModification, EntityType}
+import models.manager.EntityManager
+import models.modification.EntityModification._
+import models.modification._
 import utest._
 
 import scala.collection.immutable.{ListMap, Seq}

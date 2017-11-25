@@ -8,7 +8,7 @@ import common.testing.{FakeRemoteDatabaseProxy, TestModule}
 import common.time.LocalDateTimes.createDateTime
 import models.accounting._
 import models.accounting.config.{Account, MoneyReservoir}
-import models.manager.EntityModification
+import models.modification.EntityModification
 import utest._
 
 import scala.collection.immutable.Seq

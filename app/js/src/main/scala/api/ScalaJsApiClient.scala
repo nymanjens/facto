@@ -11,7 +11,8 @@ import api.ScalaJsApi.{
 }
 import autowire._
 import boopickle.Default._
-import models.manager.{EntityModification, EntityType}
+import models.modification.EntityType
+import models.modification.EntityModification
 import org.scalajs.dom
 
 import scala.collection.immutable.Seq

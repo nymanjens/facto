@@ -5,7 +5,7 @@ import java.time.Month.MARCH
 import common.testing.TestObjects._
 import common.time.LocalDateTime
 import models.accounting._
-import models.manager.EntityType
+import models.modification.EntityType
 import models.money.ExchangeRateMeasurement
 import models.user.User
 import utest._

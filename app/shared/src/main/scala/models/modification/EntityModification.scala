@@ -1,6 +1,8 @@
-package models.manager
+package models.modification
 
 import java.lang.Math.abs
+
+import models.manager.Entity
 
 import scala.util.Random
 

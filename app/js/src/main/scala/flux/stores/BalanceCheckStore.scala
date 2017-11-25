@@ -3,7 +3,7 @@ package flux.stores
 import flux.action.Action.{AddBalanceCheck, RemoveBalanceCheck, UpdateBalanceCheck}
 import flux.action.Dispatcher
 import models.access.RemoteDatabaseProxy
-import models.manager.EntityModification
+import models.modification.EntityModification
 
 private[stores] final class BalanceCheckStore(implicit database: RemoteDatabaseProxy, dispatcher: Dispatcher) {
   dispatcher.registerPartialAsync {

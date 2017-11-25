@@ -9,6 +9,7 @@ import common.testing._
 import models.accounting.Transaction
 import models.accounting.config.Config
 import models.manager._
+import models.modification.{EntityModification, EntityType}
 import org.junit.runner._
 import org.specs2.runner._
 

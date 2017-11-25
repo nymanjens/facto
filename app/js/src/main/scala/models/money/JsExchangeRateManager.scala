@@ -4,7 +4,8 @@ import common.money.{Currency, ExchangeRateManager}
 import common.time.LocalDateTime
 import jsfacades.LokiJsImplicits._
 import models.access.RemoteDatabaseProxy
-import models.manager.{EntityModification, EntityType}
+import models.modification.EntityType
+import models.modification.EntityModification
 
 import scala.collection.immutable.{Seq, TreeMap}
 import scala.collection.{SortedMap, mutable}

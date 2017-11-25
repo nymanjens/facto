@@ -5,7 +5,9 @@ import common.LoggingUtils.logExceptions
 import common.ScalaUtils.visibleForTesting
 import jsfacades.LokiJs
 import models.access.SingletonKey._
-import models.manager.{Entity, EntityModification, EntityType}
+import models.manager.Entity
+import models.modification.EntityType
+import models.modification.EntityModification
 
 import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq

@@ -11,7 +11,7 @@ import flux.stores.entries.CashFlowEntry.{BalanceCorrection, RegularEntry}
 import models.accounting._
 import models.accounting.config.MoneyReservoir
 import common.money.Currency
-import models.manager.EntityModification
+import models.modification.EntityModification
 import utest._
 
 import scala.collection.immutable.Seq

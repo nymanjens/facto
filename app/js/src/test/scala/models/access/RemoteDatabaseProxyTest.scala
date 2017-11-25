@@ -4,8 +4,10 @@ import common.testing.TestObjects._
 import common.testing.{FakeScalaJsApiClient, ModificationsBuffer}
 import jsfacades.LokiJs
 import models.accounting.Transaction
-import models.manager.EntityType.TransactionType
-import models.manager.{Entity, EntityModification, EntityType}
+import models.modification.EntityType.TransactionType
+import models.manager.Entity
+import models.modification.EntityType
+import models.modification.EntityModification
 import utest._
 
 import scala.async.Async.{async, await}

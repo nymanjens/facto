@@ -5,7 +5,8 @@ import java.time.{LocalDate, LocalTime}
 import common.time.LocalDateTime
 import models._
 import models.accounting._
-import models.manager.{EntityType, _}
+import models.manager._
+import models.modification._
 import models.money.ExchangeRateMeasurement
 import models.user.User
 

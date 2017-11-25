@@ -7,7 +7,7 @@ import common.testing.TestObjects._
 import common.time.LocalDateTime
 import common.time.LocalDateTimes.createDateTime
 import models.accounting._
-import models.manager.EntityModification
+import models.modification.EntityModification
 import utest._
 
 import scala.collection.immutable.Seq

@@ -10,7 +10,7 @@ import common.time.LocalDateTimes.createDateTime
 import common.time.{DatedMonth, LocalDateTime}
 import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.GainsForMonth
 import models.accounting.config.MoneyReservoir
-import models.manager.EntityModification
+import models.modification.EntityModification
 import utest._
 
 import scala2js.Converters._

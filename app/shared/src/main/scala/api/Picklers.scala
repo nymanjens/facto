@@ -6,8 +6,10 @@ import boopickle.Default._
 import common.time.LocalDateTime
 import models.accounting.config._
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
-import models.manager.EntityType._
-import models.manager.{Entity, EntityModification, EntityType}
+import models.modification.EntityType._
+import models.modification.EntityType
+import models.manager.Entity
+import models.modification.EntityModification
 import models.money.ExchangeRateMeasurement
 import models.user.User
 

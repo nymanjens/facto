@@ -1,7 +1,8 @@
-package models.manager
+package models.modification
 
 import common.ScalaUtils
 import models.accounting._
+import models.manager.Entity
 import models.money.ExchangeRateMeasurement
 import models.user.User
 

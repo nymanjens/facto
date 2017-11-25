@@ -2,7 +2,8 @@ package flux.stores.entries
 
 import models.access.RemoteDatabaseProxy
 import models.accounting.{BalanceCheck, Transaction}
-import models.manager.{EntityModification, EntityType}
+import models.modification.EntityType
+import models.modification.EntityModification
 
 import scala.collection.immutable.Seq
 

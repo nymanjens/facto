@@ -10,8 +10,9 @@ import com.google.inject.Inject
 import controllers.Application.Forms
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 import controllers.helpers.AuthenticatedAction
-import models.manager.{EntityModification, EntityType}
+import models.modification.EntityType
 import models.SlickEntityAccess
+import models.modification.EntityModification
 import models.user.SlickUserManager
 import play.api.data.Form
 import play.api.data.Forms._

@@ -13,8 +13,10 @@ import common.time.Clock
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}
 import models.accounting.config.Config
-import models.manager.EntityType._
+import models.modification.EntityType._
 import models.manager._
+import models.modification.EntityModification
+import models.modification.EntityType
 import models.user.User
 import models.{EntityModificationEntity, SlickEntityAccess, SlickEntityModificationEntityManager}
 

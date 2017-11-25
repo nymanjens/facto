@@ -2,7 +2,9 @@ package models.access
 
 import common.ScalaUtils.visibleForTesting
 import jsfacades.{CryptoJs, LokiJs}
-import models.manager.{Entity, EntityModification, EntityType}
+import models.manager.Entity
+import models.modification.EntityType
+import models.modification.EntityModification
 
 import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq

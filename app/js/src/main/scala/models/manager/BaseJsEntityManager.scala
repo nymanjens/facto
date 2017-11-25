@@ -1,6 +1,7 @@
 package models.manager
 
 import models.access.RemoteDatabaseProxy
+import models.modification.EntityType
 
 import scala.collection.immutable.Seq
 import scala2js.Converters._

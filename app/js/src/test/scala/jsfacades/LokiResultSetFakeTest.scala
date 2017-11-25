@@ -7,7 +7,7 @@ import common.time.LocalDateTimes.createDateTime
 import jsfacades.LokiJs.{Filter, ResultSet}
 import models.accounting.Transaction
 import models.accounting.config.Category
-import models.manager.EntityModification
+import models.modification.EntityModification
 import utest._
 
 import scala.collection.immutable.Seq

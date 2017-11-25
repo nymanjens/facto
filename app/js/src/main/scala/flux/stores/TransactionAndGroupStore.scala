@@ -6,7 +6,7 @@ import flux.action.Dispatcher
 import models.EntityAccess
 import models.access.RemoteDatabaseProxy
 import models.accounting._
-import models.manager.EntityModification
+import models.modification.EntityModification
 
 import scala.collection.immutable.Seq
 

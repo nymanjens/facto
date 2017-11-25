@@ -3,7 +3,7 @@ package flux.stores
 import common.testing.TestObjects._
 import flux.action.Action
 import models.accounting._
-import models.manager.EntityModification
+import models.modification.EntityModification
 import utest._
 
 import scala.collection.immutable.Seq

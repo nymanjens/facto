@@ -9,7 +9,9 @@ import api.ScalaJsApi.{
 }
 import common.time.LocalDateTime
 import models.accounting.config.Config
-import models.manager.{Entity, EntityModification, EntityType}
+import models.manager.Entity
+import models.modification.EntityType
+import models.modification.EntityModification
 import models.user.User
 
 import scala.collection.immutable.Seq
