@@ -8,7 +8,7 @@ import common.time.LocalDateTime
 import models.SlickEntityModificationEntityManager.{EntityModificationEntities, tableName}
 import models.SlickUtils.dbApi.{Tag => SlickTag, _}
 import models.SlickUtils.localDateTimeToSqlDateMapper
-import models.manager.{EntityModification, EntityTable, ImmutableEntityManager, SlickEntityManager}
+import models.manager.{EntityModification, ImmutableEntityManager, SlickEntityManager}
 
 final class SlickEntityModificationEntityManager
     extends ImmutableEntityManager[EntityModificationEntity, EntityModificationEntities](

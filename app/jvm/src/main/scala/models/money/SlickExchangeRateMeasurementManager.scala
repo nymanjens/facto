@@ -2,9 +2,10 @@ package models.money
 
 import common.money.Currency
 import common.time.LocalDateTime
+import models.EntityTable
 import models.SlickUtils.dbApi.{Tag => SlickTag, _}
 import models.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}
-import models.manager.{EntityTable, ImmutableEntityManager, SlickEntityManager}
+import models.manager.{ImmutableEntityManager, SlickEntityManager}
 import models.money.SlickExchangeRateMeasurementManager.{ExchangeRateMeasurements, tableName}
 
 import scala.collection.immutable.Seq

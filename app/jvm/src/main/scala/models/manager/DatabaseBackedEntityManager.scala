@@ -1,5 +1,6 @@
 package models.manager
 
+import models.EntityTable
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
 import play.api.Logger

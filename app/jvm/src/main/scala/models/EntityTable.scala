@@ -1,6 +1,7 @@
-package models.manager
+package models
 
 import models.SlickUtils.dbApi._
+import models.manager.Entity
 
 // Based on active-slick (https://github.com/strongtyped/active-slick)
 

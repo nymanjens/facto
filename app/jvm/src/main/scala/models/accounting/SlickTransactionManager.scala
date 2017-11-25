@@ -3,10 +3,11 @@ package models.accounting
 import com.google.inject._
 import common.accounting.Tags
 import common.time.LocalDateTime
+import models.EntityTable
 import models.SlickUtils.dbApi.{Tag => SlickTag, _}
 import models.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}
 import models.accounting.SlickTransactionManager.{Transactions, tableName}
-import models.manager.{EntityTable, ImmutableEntityManager, SlickEntityManager}
+import models.manager.{ImmutableEntityManager, SlickEntityManager}
 
 import scala.collection.immutable.Seq
 

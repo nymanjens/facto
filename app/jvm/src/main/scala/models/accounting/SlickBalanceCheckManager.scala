@@ -5,7 +5,7 @@ import models.SlickBalanceCheckManager.{BalanceChecks, tableName}
 import models.SlickUtils.dbApi.{Tag => SlickTag, _}
 import models.SlickUtils.localDateTimeToSqlDateMapper
 import models.accounting.BalanceCheck
-import models.manager.{EntityTable, ImmutableEntityManager, SlickEntityManager}
+import models.manager.{ImmutableEntityManager, SlickEntityManager}
 
 final class SlickBalanceCheckManager
     extends ImmutableEntityManager[BalanceCheck, BalanceChecks](
