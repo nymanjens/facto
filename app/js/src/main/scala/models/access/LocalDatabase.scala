@@ -182,7 +182,9 @@ object LocalDatabase {
                 implicit val _ = modification.entityType
                 newQuery[E]().findOne(Keys.id, modification.updatedEntity.id) match {
                   case Some(_) =>
-                    entityCollectionForImplicitType[E].update(modification.updatedEntity)
+                    // Not using collection.update() because it requires a sync
+                    entityCollectionForImplicitType[E].findAndRemove(Keys.id, modification.updatedEntity.id)
+                    entityCollectionForImplicitType[E].insert(modification.updatedEntity)
                     true
                   case None => false // do nothing
                 }

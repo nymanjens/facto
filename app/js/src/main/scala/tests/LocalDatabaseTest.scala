@@ -100,40 +100,92 @@ private[tests] object LocalDatabaseTest extends ManualTestSuite {
         db.newQuery[Transaction]().data() ==> Seq(testTransactionWithId)
       }
     },
-    ManualTest("applyModifications") {
+    ManualTest("applyModifications: Add") {
       async {
         val db = await(LocalDatabase.createInMemoryForTests(encryptionSecret))
-        val transaction2 = testTransactionWithId.copy(idOption = Some(99992))
-        db.addAll(Seq(testTransactionWithId))
+        val transaction1 = createTransaction()
 
-        db.applyModifications(
-          Seq(
-            EntityModification.Add(transaction2),
-            EntityModification.createDelete(testTransactionWithId)
-          )) ==> true
+        db.applyModifications(Seq(EntityModification.Add(transaction1))) ==> true
 
-        db.newQuery[Transaction]().data() ==> Seq(transaction2)
+        db.newQuery[Transaction]().data() ==> Seq(transaction1)
       }
     },
-    ManualTest("applyModifications: Is idempotent") {
+    ManualTest("applyModifications: Update") {
       async {
         val db = await(LocalDatabase.createInMemoryForTests(encryptionSecret))
-        val transactionWithSameId = testTransactionWithId.copy(categoryCode = "codeA")
-        val transaction2 = testTransactionWithId.copy(idOption = Some(99992))
-        val transaction3 = testTransactionWithId.copy(idOption = Some(99993))
+        val transaction1 = createTransaction()
+        val updatedTransaction1 = transaction1.copy(flowInCents = 19191)
+        db.addAll(Seq(transaction1))
+
+        db.applyModifications(Seq(EntityModification.createUpdate(updatedTransaction1))) ==> true
+
+        db.newQuery[Transaction]().data() ==> Seq(updatedTransaction1)
+      }
+    },
+    ManualTest("applyModifications: Delete") {
+      async {
+        val db = await(LocalDatabase.createInMemoryForTests(encryptionSecret))
+        val transaction1 = createTransaction()
+        db.addAll(Seq(transaction1))
+
+        db.applyModifications(Seq(EntityModification.createDelete(transaction1))) ==> true
+
+        db.newQuery[Transaction]().data() ==> Seq()
+      }
+    },
+    ManualTest("applyModifications: Add is idempotent") {
+      async {
+        val db = await(LocalDatabase.createInMemoryForTests(encryptionSecret))
+        val transaction1 = createTransaction()
+        val updatedTransaction1 = transaction1.copy(flowInCents = 198237)
+        val transaction2 = createTransaction()
+        val transaction3 = createTransaction()
 
         db.applyModifications(
           Seq(
-            EntityModification.Add(testTransactionWithId),
-            EntityModification.Add(testTransactionWithId),
-            EntityModification.Add(transactionWithSameId),
-            EntityModification.Add(transaction2),
+            EntityModification.Add(transaction1),
+            EntityModification.Add(transaction1),
+            EntityModification.Add(updatedTransaction1),
+            EntityModification.Add(transaction2)
+          )) ==> true
+
+        db.newQuery[Transaction]().data() ==> Seq(transaction1, transaction2)
+      }
+    },
+    ManualTest("applyModifications: Update is idempotent") {
+      async {
+        val db = await(LocalDatabase.createInMemoryForTests(encryptionSecret))
+        val transaction1 = createTransaction()
+        val updatedTransaction1 = transaction1.copy(flowInCents = 198237)
+        val transaction2 = createTransaction()
+        db.addAll(Seq(transaction1))
+
+        db.applyModifications(
+          Seq(
+            EntityModification.Update(updatedTransaction1),
+            EntityModification.Update(updatedTransaction1),
+            EntityModification.Update(transaction2)
+          )) ==> true
+
+        db.newQuery[Transaction]().data() ==> Seq(updatedTransaction1)
+      }
+    },
+    ManualTest("applyModifications: Delete is idempotent") {
+      async {
+        val db = await(LocalDatabase.createInMemoryForTests(encryptionSecret))
+        val transaction1 = createTransaction()
+        val transaction2 = createTransaction()
+        val transaction3 = createTransaction()
+        db.addAll(Seq(transaction1, transaction2))
+
+        db.applyModifications(
+          Seq(
             EntityModification.createDelete(transaction2),
             EntityModification.createDelete(transaction2),
             EntityModification.createDelete(transaction3)
           )) ==> true
 
-        db.newQuery[Transaction]().data() ==> Seq(testTransactionWithId)
+        db.newQuery[Transaction]().data() ==> Seq(transaction1)
       }
     },
     ManualTest("applyModifications: Returns false if no change") {
