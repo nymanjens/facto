@@ -75,15 +75,19 @@ final class JsExchangeRateManager(implicit database: RemoteDatabaseProxy) extend
 
     private def addedModifications(modifications: Seq[EntityModification]): Unit = {
       for (modification <- modifications) {
-        modification match {
-          case EntityModification.Add(m: ExchangeRateMeasurement) =>
-            // This happens infrequently so clearing the whole cache is not too expensive
-            measurementsCache.clear()
-          case EntityModification.Remove(_)
-              if modification.entityType == EntityType.ExchangeRateMeasurementType =>
-            // Measurements are normally not removed, but clearing the cache will make sure the cache gets updated later
-            measurementsCache.clear()
-          case _ => // do nothing
+        modification.entityType match {
+          case EntityType.ExchangeRateMeasurementType =>
+            modification match {
+              case EntityModification.Add(_) =>
+                // This happens infrequently so clearing the whole cache is not too expensive
+                measurementsCache.clear()
+              case EntityModification.Update(_) =>
+                throw new UnsupportedOperationException("Immutable entity")
+              case EntityModification.Remove(_) =>
+                // Measurements are normally not removed, but clearing the cache will make sure the cache gets updated later
+                measurementsCache.clear()
+            }
+          case _ => false // do nothing
         }
       }
     }

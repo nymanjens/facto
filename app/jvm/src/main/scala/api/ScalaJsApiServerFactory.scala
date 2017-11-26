@@ -77,6 +77,8 @@ final class ScalaJsApiServerFactory @Inject()(
         modification match {
           case EntityModification.Add(entity) =>
             getManager(entityType).addWithId(entity.asInstanceOf[entityType.get])
+          case EntityModification.Update(entity) =>
+            getManager(entityType).update(entity.asInstanceOf[entityType.get])
           case EntityModification.Remove(entityId) =>
             getManager(entityType).delete(getManager(entityType).findById(entityId))
         }

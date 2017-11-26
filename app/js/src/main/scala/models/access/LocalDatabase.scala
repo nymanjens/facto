@@ -177,6 +177,17 @@ object LocalDatabase {
                 }
               }
               add(addModification)
+            case updateModification: EntityModification.Update[_] =>
+              def update[E <: Entity](modification: EntityModification.Update[E]): Boolean = {
+                implicit val _ = modification.entityType
+                newQuery[E]().findOne(Keys.id, modification.updatedEntity.id) match {
+                  case Some(_) =>
+                    entityCollectionForImplicitType[E].update(modification.updatedEntity)
+                    true
+                  case None => false // do nothing
+                }
+              }
+              update(updateModification)
             case removeModification: EntityModification.Remove[_] =>
               def remove[E <: Entity](modification: EntityModification.Remove[E]): Boolean = {
                 implicit val _ = modification.entityType

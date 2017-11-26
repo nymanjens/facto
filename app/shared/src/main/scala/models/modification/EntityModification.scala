@@ -7,12 +7,12 @@ import models.Entity
 import scala.util.Random
 
 /**
-  * Indicates an idempotent addition or removal of an immutable entity.
+  * Indicates an idempotent addition, update or removal of an entity.
   *
   * This modification may be used for desired modifications (not yet persisted) or to indicate an already changed state.
   *
   * It is important that these modifications are created and treated as idempotent modifications, i.e. applying a
-  * modification a seconds time is a no-op.
+  * modification a second time is a no-op.
   */
 sealed trait EntityModification {
   def entityType: EntityType.any
@@ -34,6 +34,8 @@ object EntityModification {
     Add(entityWithId)
   }
 
+  def createUpdate[E <: Entity: EntityType](entity: E): Update[E] = Update(entity)
+
   def createDelete[E <: Entity: EntityType](entityWithId: E): Remove[E] = {
     require(entityWithId.idOption.isDefined, entityWithId)
 
@@ -48,6 +50,14 @@ object EntityModification {
 
     override def entityType: EntityType[E] = implicitly[EntityType[E]]
     override def entityId: Long = entity.id
+  }
+
+  case class Update[E <: Entity: EntityType](updatedEntity: E) extends EntityModification {
+    require(updatedEntity.idOption.isDefined, s"Entity ID must be defined (for entity $updatedEntity)")
+    entityType.checkRightType(updatedEntity)
+
+    override def entityType: EntityType[E] = implicitly[EntityType[E]]
+    override def entityId: Long = updatedEntity.id
   }
 
   case class Remove[E <: Entity: EntityType](override val entityId: Long) extends EntityModification {

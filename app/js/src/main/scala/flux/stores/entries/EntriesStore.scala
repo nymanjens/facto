@@ -63,12 +63,14 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database:
       case EntityType.TransactionGroupType =>
         entityModification match {
           case EntityModification.Add(_) => false // Always gets added alongside Transaction additions
+          case EntityModification.Update(_) => throw new UnsupportedOperationException("Immutable entity")
           case EntityModification.Remove(_) => false // Always gets removed alongside Transaction removals
         }
       case EntityType.TransactionType =>
         entityModification match {
           case EntityModification.Add(transaction) =>
             transactionUpsertImpactsState(transaction.asInstanceOf[Transaction], state)
+          case EntityModification.Update(_) => throw new UnsupportedOperationException("Immutable entity")
           case EntityModification.Remove(transactionId) =>
             state.impactedByTransactionId(transactionId)
         }
@@ -76,6 +78,7 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database:
         entityModification match {
           case EntityModification.Add(bc) =>
             balanceCheckUpsertImpactsState(bc.asInstanceOf[BalanceCheck], state)
+          case EntityModification.Update(_) => throw new UnsupportedOperationException("Immutable entity")
           case EntityModification.Remove(bcId) =>
             state.impactedByBalanceCheckId(bcId)
         }

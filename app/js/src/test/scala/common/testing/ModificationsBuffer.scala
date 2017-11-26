@@ -28,6 +28,8 @@ final class ModificationsBuffer {
     for (m <- buffer if m.modification.entityType == entityType) {
       m.modification match {
         case EntityModification.Add(entity) => entitiesMap.put(entity.id, entityType.checkRightType(entity))
+        case EntityModification.Update(entity) =>
+          entitiesMap.put(entity.id, entityType.checkRightType(entity))
         case EntityModification.Remove(entityId) => entitiesMap.remove(entityId)
       }
     }

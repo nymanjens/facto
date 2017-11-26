@@ -132,6 +132,7 @@ object LokiJs {
     def chain(): ResultSetFacade = js.native
 
     def insert(obj: js.Dictionary[js.Any]): Unit = js.native
+    def update(obj: js.Dictionary[js.Any]): Unit = js.native
     def findAndRemove(filter: js.Dictionary[js.Any]): Unit = js.native
     def clear(): Unit = js.native
   }
@@ -141,6 +142,7 @@ object LokiJs {
     def chain(): ResultSet[E] = new ResultSet.Impl[E](facade.chain())
 
     def insert(obj: E): Unit = facade.insert(Scala2Js.toJsMap(obj))
+    def update(obj: E): Unit = facade.update(Scala2Js.toJsMap(obj))
     def findAndRemove[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): Unit =
       facade.findAndRemove(js.Dictionary(Scala2Js.Key.toJsPair(key -> value)))
     def clear(): Unit = facade.clear()
