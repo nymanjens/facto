@@ -32,6 +32,11 @@ class PicklersTest extends HookedSpecification {
     testPickleAndUnpickle[EntityModification](EntityModification.Add(testTransactionGroupWithId))
     testPickleAndUnpickle[EntityModification](EntityModification.Add(testBalanceCheckWithId))
     testPickleAndUnpickle[EntityModification](EntityModification.Add(testExchangeRateMeasurementWithId))
+    testPickleAndUnpickle[EntityModification](EntityModification.Update(testUserRedacted))
+    testPickleAndUnpickle[EntityModification](EntityModification.Update(testTransactionWithId))
+    testPickleAndUnpickle[EntityModification](EntityModification.Update(testTransactionGroupWithId))
+    testPickleAndUnpickle[EntityModification](EntityModification.Update(testBalanceCheckWithId))
+    testPickleAndUnpickle[EntityModification](EntityModification.Update(testExchangeRateMeasurementWithId))
     testPickleAndUnpickle[EntityModification](EntityModification.Remove[Transaction](123054))
   }
 
