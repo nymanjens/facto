@@ -29,6 +29,10 @@ trait SlickEntityManager[E <: Entity, T <: AbstractTable[E]] extends EntityManag
   /** Deletes an existing entity from the database. */
   def delete(entity: E): Unit
 
+  def addIfNew(entityWithId: E): Unit
+  def updateIfExists(entityWithId: E): Unit
+  def deleteIfExists(entityId: Long): Unit
+
   // ********** Getters ********** //
   /**
     * Returns a new query that should be run by models.SlickUtils.dbRun. Don't run any mutating operations using these queries!

@@ -51,6 +51,25 @@ private[manager] final class DatabaseBackedEntityManager[E <: Entity, T <: Entit
     }
   }
 
+  override def addIfNew(entityWithId: E) = {
+    require(entityWithId.idOption.isDefined, s"This entity has no id ($entityWithId)")
+    val existingEntities = dbRun(newQuery.filter(_.id === entityWithId.id).result)
+
+    if (existingEntities.isEmpty) {
+      mustAffectOneSingleRow {
+        dbRun(newQuery.forceInsert(entityWithId))
+      }
+    }
+  }
+
+  override def updateIfExists(entityWithId: E) = {
+    dbRun(newQuery.filter(_.id === entityWithId.id).update(entityWithId))
+  }
+
+  override def deleteIfExists(entityId: Long) = {
+    dbRun(newQuery.filter(_.id === entityId).delete)
+  }
+
   // ********** Implementation of SlickEntityManager interface - Getters ********** //
   override def findById(id: Long): E = {
     dbRun(newQuery.filter(_.id === id).result) match {

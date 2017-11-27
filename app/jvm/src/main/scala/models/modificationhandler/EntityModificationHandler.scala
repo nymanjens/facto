@@ -37,11 +37,11 @@ final class EntityModificationHandler @Inject()(
       val entityType = modification.entityType
       modification match {
         case EntityModification.Add(entity) =>
-          getManager(entityType).addWithId(entity.asInstanceOf[entityType.get])
+          getManager(entityType).addIfNew(entity.asInstanceOf[entityType.get])
         case EntityModification.Update(entity) =>
-          getManager(entityType).update(entity.asInstanceOf[entityType.get])
+          getManager(entityType).updateIfExists(entity.asInstanceOf[entityType.get])
         case EntityModification.Remove(entityId) =>
-          getManager(entityType).delete(getManager(entityType).findById(entityId))
+          getManager(entityType).deleteIfExists(entityId)
       }
 
       // Add modification
