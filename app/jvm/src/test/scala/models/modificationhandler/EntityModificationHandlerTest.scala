@@ -120,6 +120,15 @@ class EntityModificationHandlerTest extends HookedSpecification {
 
       transactionManager.fetchAll() mustEqual Seq(transaction1)
     }
+
+    "EntityModification.Update throws for immutable entities" in new WithApplication {
+      val transaction1 = createTransaction()
+      val updatedTransaction1 = transaction1.copy(flowInCents = 19191)
+      transactionManager.addWithId(transaction1)
+
+      handler.persistEntityModifications(Seq(EntityModification.createUpdate(updatedTransaction1))) must
+        throwA[Exception]
+    }
   }
 
   private def createUser(): User = testUser.copy(idOption = Some(EntityModification.generateRandomId()))
