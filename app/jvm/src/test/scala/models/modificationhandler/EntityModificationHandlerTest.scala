@@ -7,6 +7,7 @@ import common.testing._
 import models._
 import models.accounting.SlickTransactionManager
 import models.modification.{EntityModification, SlickEntityModificationEntityManager}
+import models.user.{SlickUserManager, User}
 import org.junit.runner._
 import org.specs2.runner._
 import play.api.test._
@@ -21,6 +22,7 @@ class EntityModificationHandlerTest extends HookedSpecification {
   @Inject implicit private val fakeClock: FakeClock = null
   @Inject implicit private val entityAccess: SlickEntityAccess = null
   @Inject private val transactionManager: SlickTransactionManager = null
+  @Inject private val userManager: SlickUserManager = null
   @Inject private val modificationEntityManager: SlickEntityModificationEntityManager = null
 
   @Inject private val handler: EntityModificationHandler = null
@@ -51,18 +53,18 @@ class EntityModificationHandlerTest extends HookedSpecification {
     }
 
     "EntityModification.Update" in new WithApplication {
-      val transaction1 = createTransaction()
-      val updatedTransaction1 = transaction1.copy(flowInCents = 19191)
-      transactionManager.addWithId(transaction1)
+      val user1 = createUser()
+      val updatedUser1 = user1.copy(name = "other nme")
+      userManager.addIfNew(user1)
 
-      handler.persistEntityModifications(Seq(EntityModification.createUpdate(updatedTransaction1)))
+      handler.persistEntityModifications(Seq(EntityModification.createUpdate(updatedUser1)))
 
-      transactionManager.fetchAll() mustEqual Seq(updatedTransaction1)
+      userManager.fetchAll() mustEqual Seq(updatedUser1)
     }
 
     "EntityModification.Delete" in new WithApplication {
       val transaction1 = createTransaction()
-      transactionManager.addWithId(transaction1)
+      transactionManager.addIfNew(transaction1)
 
       handler.persistEntityModifications(Seq(EntityModification.createDelete(transaction1)))
 
@@ -87,27 +89,27 @@ class EntityModificationHandlerTest extends HookedSpecification {
     }
 
     "EntityModification.Update is idempotent" in new WithApplication {
-      val transaction1 = createTransaction()
-      val updatedTransaction1 = transaction1.copy(flowInCents = 198237)
-      val transaction2 = createTransaction()
-      transactionManager.addWithId(transaction1)
+      val user1 = createUser()
+      val updatedUser1 = user1.copy(name = "other nme")
+      val user2 = createUser()
+      userManager.addIfNew(user1)
 
       handler.persistEntityModifications(
         Seq(
-          EntityModification.Update(updatedTransaction1),
-          EntityModification.Update(updatedTransaction1),
-          EntityModification.Update(transaction2)
+          EntityModification.Update(updatedUser1),
+          EntityModification.Update(updatedUser1),
+          EntityModification.Update(user2)
         ))
 
-      transactionManager.fetchAll() mustEqual Seq(updatedTransaction1)
+      userManager.fetchAll() mustEqual Seq(updatedUser1)
     }
 
     "EntityModification.Delete is idempotent" in new WithApplication {
       val transaction1 = createTransaction()
       val transaction2 = createTransaction()
       val transaction3 = createTransaction()
-      transactionManager.addWithId(transaction1)
-      transactionManager.addWithId(transaction2)
+      transactionManager.addIfNew(transaction1)
+      transactionManager.addIfNew(transaction2)
 
       handler.persistEntityModifications(
         Seq(
@@ -119,4 +121,6 @@ class EntityModificationHandlerTest extends HookedSpecification {
       transactionManager.fetchAll() mustEqual Seq(transaction1)
     }
   }
+
+  private def createUser(): User = testUser.copy(idOption = Some(EntityModification.generateRandomId()))
 }
