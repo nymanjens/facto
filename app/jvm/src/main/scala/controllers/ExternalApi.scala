@@ -33,8 +33,8 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
     implicit request =>
       validateApplicationSecret(applicationSecret)
 
+      implicit val issuer = getOrCreateRobotUser()
       val template = accountingConfig.templateWithCode(templateCode)
-      val issuer = getOrCreateRobotUser()
 
       val groupAddition = EntityModification.createAddWithRandomId(TransactionGroup(createdDate = clock.now))
       val transactionAdditions =
@@ -53,14 +53,16 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
                                  applicationSecret: String) = Action { implicit request =>
     validateApplicationSecret(applicationSecret)
 
+    implicit val issuer = getOrCreateRobotUser()
     val date = TimeUtils.parseDateString(dateString)
     require(Currency.of(foreignCurrencyCode).isForeign)
 
-    entityAccess.exchangeRateMeasurementManager.add(
-      ExchangeRateMeasurement(
-        date = date,
-        foreignCurrencyCode = foreignCurrencyCode,
-        ratioReferenceToForeignCurrency = ratioReferenceToForeignCurrency))
+    entityModificationHandler.persistEntityModifications(
+      EntityModification.createAddWithRandomId(
+        ExchangeRateMeasurement(
+          date = date,
+          foreignCurrencyCode = foreignCurrencyCode,
+          ratioReferenceToForeignCurrency = ratioReferenceToForeignCurrency)))
     Ok("OK")
   }
 
@@ -84,7 +86,8 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
           password = hash(clock.now.toString),
           name = Messages("facto.robot")
         )
-        entityModificationHandler.persistEntityModifications(EntityModification.createAddWithRandomId(user))
+        val userAddition = EntityModification.createAddWithRandomId(user)
+        entityModificationHandler.persistEntityModifications(userAddition)(user = userAddition.entity)
         userManager.findByLoginName(loginName).get
     }
   }
