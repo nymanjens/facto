@@ -7,6 +7,7 @@ import common.testing.TestUtils._
 import common.testing._
 import common.time.Clock
 import models._
+import models.modificationhandler.EntityModificationHandler
 import models.user.SlickUserManager
 import org.junit.runner._
 import org.specs2.runner._
@@ -17,6 +18,7 @@ class SlickBalanceCheckManagerTest extends HookedSpecification {
 
   @Inject implicit private val clock: Clock = null
   @Inject implicit private val entityAccess: SlickEntityAccess = null
+  @Inject implicit private val entityModificationHandler: EntityModificationHandler = null
   @Inject private val userManager: SlickUserManager = null
 
   @Inject private val balanceCheckManager: SlickBalanceCheckManager = null
@@ -26,11 +28,11 @@ class SlickBalanceCheckManagerTest extends HookedSpecification {
   }
 
   "test the BalanceCheck model" in new WithApplication {
-    userManager.addWithId(testUserA)
-    userManager.addWithId(testUserB)
+    TestUtils.persist(testUserA)
+    TestUtils.persist(testUserB)
 
     // get and persist dummy balanceCheckManager
-    val checkA1 = balanceCheckManager.add(
+    val checkA1 = TestUtils.persist(
       BalanceCheck(
         issuerId = testUserA.id,
         moneyReservoirCode = "ACC_A",
@@ -38,7 +40,7 @@ class SlickBalanceCheckManagerTest extends HookedSpecification {
         createdDate = clock.now,
         checkDate = localDateTimeOfEpochMilli(1000)
       ))
-    val checkA2 = balanceCheckManager.add(
+    val checkA2 = TestUtils.persist(
       BalanceCheck(
         issuerId = testUserA.id,
         moneyReservoirCode = "ACC_A",
@@ -46,7 +48,7 @@ class SlickBalanceCheckManagerTest extends HookedSpecification {
         createdDate = clock.now,
         checkDate = localDateTimeOfEpochMilli(2000)
       ))
-    val checkB = balanceCheckManager.add(
+    val checkB = TestUtils.persist(
       BalanceCheck(
         issuerId = testUserB.id,
         moneyReservoirCode = "ACC_B",
@@ -62,10 +64,10 @@ class SlickBalanceCheckManagerTest extends HookedSpecification {
   }
 
   "test inserting a BC with ID" in new WithApplication {
-    userManager.addWithId(testUser)
+    TestUtils.persist(testUser)
 
     val id = 12345
-    val bc = balanceCheckManager.addWithId(
+    val bc =
       BalanceCheck(
         issuerId = testUser.id,
         moneyReservoirCode = testReservoir.code,
@@ -73,21 +75,12 @@ class SlickBalanceCheckManagerTest extends HookedSpecification {
         createdDate = clock.now,
         checkDate = localDateTimeOfEpochMilli(1000),
         idOption = Option(id)
-      ))
+      )
+    balanceCheckManager.addIfNew(bc)
 
     bc.id mustEqual id
     balanceCheckManager.fetchAll() must haveSize(1)
     getOnlyElement(balanceCheckManager.fetchAll()).id mustEqual id
     balanceCheckManager.fetchAll() mustEqual Seq(bc)
-
-    balanceCheckManager.addWithId(
-      BalanceCheck(
-        issuerId = testUser.id,
-        moneyReservoirCode = testReservoir.code,
-        balanceInCents = 888888,
-        createdDate = clock.now,
-        checkDate = localDateTimeOfEpochMilli(1005),
-        idOption = Option(id)
-      )) must throwA[IllegalArgumentException]
   }
 }

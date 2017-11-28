@@ -2,6 +2,7 @@ package models.user
 
 import com.google.inject._
 import common.testing._
+import models.modification.EntityModification
 import org.junit.runner._
 import org.specs2.runner._
 import play.api.test._
@@ -17,8 +18,10 @@ class SlickUserManagerTest extends HookedSpecification {
 
   "test the User model" in new WithApplication {
 
-    val user1 =
-      userManager.add(SlickUserManager.createUser(loginName = "alice", password = "j", name = "Alice"))
+    val user1 = SlickUserManager
+      .createUser(loginName = "alice", password = "j", name = "Alice")
+      .copy(idOption = Some(EntityModification.generateRandomId()))
+    userManager.addIfNew(user1)
     userManager.fetchAll() mustEqual Seq(user1)
 
     userManager.authenticate(loginName = "alice", password = "j") mustEqual true

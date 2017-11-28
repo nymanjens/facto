@@ -8,7 +8,13 @@ import common.testing._
 import models._
 import models.accounting.SlickTransactionManager
 import models.accounting.config._
-import models.modification.{EntityModificationEntity, EntityType, SlickEntityModificationEntityManager}
+import models.modification.{
+  EntityModification,
+  EntityModificationEntity,
+  EntityType,
+  SlickEntityModificationEntityManager
+}
+import models.modificationhandler.EntityModificationHandler
 import models.user.SlickUserManager
 import org.junit.runner._
 import org.specs2.runner._
@@ -29,6 +35,7 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
   @Inject implicit private val fakeClock: FakeClock = null
   @Inject implicit private val entityAccess: SlickEntityAccess = null
   @Inject implicit private val accountingConfig: Config = null
+  @Inject implicit private val entityModificationHandler: EntityModificationHandler = null
   @Inject private val userManager: SlickUserManager = null
   @Inject private val transactionManager: SlickTransactionManager = null
   @Inject private val modificationEntityManager: SlickEntityModificationEntityManager = null
@@ -47,7 +54,7 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
 
   "getAllEntities()" in new WithApplication {
     fakeClock.setTime(testDate)
-    transactionManager.addWithId(testTransactionWithId)
+    TestUtils.persist(testTransactionWithId)
 
     val response = serverFactory.create().getAllEntities(Seq(EntityType.TransactionType))
 
@@ -57,10 +64,18 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
 
   "getEntityModifications()" in new WithApplication {
     fakeClock.setTime(date4)
-    modificationEntityManager.add(
-      EntityModificationEntity(userId = testUser.id, modification = testModificationA, date = date1))
-    modificationEntityManager.add(
-      EntityModificationEntity(userId = testUser.id, modification = testModificationB, date = date3))
+    modificationEntityManager.addIfNew(
+      EntityModificationEntity(
+        idOption = Some(EntityModification.generateRandomId()),
+        userId = testUser.id,
+        modification = testModificationA,
+        date = date1))
+    modificationEntityManager.addIfNew(
+      EntityModificationEntity(
+        idOption = Some(EntityModification.generateRandomId()),
+        userId = testUser.id,
+        modification = testModificationB,
+        date = date3))
 
     val response = serverFactory.create().getEntityModifications(updateToken = date2)
 

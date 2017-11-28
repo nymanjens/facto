@@ -4,6 +4,7 @@ import com.google.inject._
 import common.testing._
 import common.time.Clock
 import models._
+import models.modificationhandler.EntityModificationHandler
 import models.user.SlickUserManager
 import org.junit.runner._
 import org.specs2.runner._
@@ -14,6 +15,7 @@ class SlickTransactionManagerTest extends HookedSpecification {
 
   @Inject implicit private val clock: Clock = null
   @Inject implicit private val entityAccess: EntityAccess = null
+  @Inject implicit private val entityModificationHandler: EntityModificationHandler = null
   @Inject private val userManager: SlickUserManager = null
 
   @Inject private val transactionManager: SlickTransactionManager = null
@@ -27,17 +29,17 @@ class SlickTransactionManagerTest extends HookedSpecification {
 
     // prepare users
     val user1 =
-      userManager.add(SlickUserManager.createUser(loginName = "tester", password = "x", name = "Tester"))
+      TestUtils.persist(SlickUserManager.createUser(loginName = "tester", password = "x", name = "Tester"))
     val user2 =
-      userManager.add(SlickUserManager.createUser(loginName = "tester2", password = "x", name = "Tester2"))
+      TestUtils.persist(SlickUserManager.createUser(loginName = "tester2", password = "x", name = "Tester2"))
 
     // get and persist dummy transaction groups
-    val transGrp1 = transactionGroupManager.add(TransactionGroup(createdDate = clock.now))
-    val transGrp2 = transactionGroupManager.add(TransactionGroup(createdDate = clock.now))
-    val transGrp3 = transactionGroupManager.add(TransactionGroup(createdDate = clock.now))
+    val transGrp1 = TestUtils.persist(TransactionGroup(createdDate = clock.now))
+    val transGrp2 = TestUtils.persist(TransactionGroup(createdDate = clock.now))
+    val transGrp3 = TestUtils.persist(TransactionGroup(createdDate = clock.now))
 
     // get and persist dummy transactions
-    val trans1A = transactionManager.add(
+    val trans1A = TestUtils.persist(
       Transaction(
         transactionGroupId = transGrp1.id,
         issuerId = user1.id,
@@ -50,7 +52,7 @@ class SlickTransactionManagerTest extends HookedSpecification {
         transactionDate = clock.now,
         consumedDate = clock.now
       ))
-    val trans1B = transactionManager.add(
+    val trans1B = TestUtils.persist(
       Transaction(
         transactionGroupId = transGrp1.id,
         issuerId = user1.id,
@@ -63,7 +65,7 @@ class SlickTransactionManagerTest extends HookedSpecification {
         transactionDate = clock.now,
         consumedDate = clock.now
       ))
-    val trans2 = transactionManager.add(
+    val trans2 = TestUtils.persist(
       Transaction(
         transactionGroupId = transGrp2.id,
         issuerId = user2.id,

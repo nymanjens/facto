@@ -4,7 +4,12 @@ import com.google.inject._
 import common.testing.TestObjects._
 import common.testing._
 import common.time.Clock
-import models.modification.{EntityModificationEntity, SlickEntityModificationEntityManager}
+import models.modification.{
+  EntityModification,
+  EntityModificationEntity,
+  SlickEntityModificationEntityManager
+}
+import models.modificationhandler.EntityModificationHandler
 import models.user.SlickUserManager
 import org.junit.runner._
 import org.specs2.runner._
@@ -15,6 +20,7 @@ class SlickEntityModificationEntityManagerTest extends HookedSpecification {
 
   @Inject implicit private val clock: Clock = null
   @Inject implicit private val entityAccess: SlickEntityAccess = null
+  @Inject implicit private val entityModificationHandler: EntityModificationHandler = null
   @Inject private val userManager: SlickUserManager = null
 
   @Inject private val modificationEntityManager: SlickEntityModificationEntityManager = null
@@ -24,9 +30,15 @@ class SlickEntityModificationEntityManagerTest extends HookedSpecification {
   }
 
   "test the EntityModificationEntity model" in new WithApplication {
-    userManager.addWithId(testUser)
-    val modificationEntity = modificationEntityManager.add(
-      EntityModificationEntity(userId = testUser.id, modification = testModification, date = testDate))
+    TestUtils.persist(testUser)
+
+    val modificationEntity =
+      EntityModificationEntity(
+        idOption = Some(EntityModification.generateRandomId()),
+        userId = testUser.id,
+        modification = testModification,
+        date = testDate)
+    modificationEntityManager.addIfNew(modificationEntity)
 
     modificationEntity.user mustEqual testUser
     modificationEntityManager.fetchAll() mustEqual Seq(modificationEntity)
