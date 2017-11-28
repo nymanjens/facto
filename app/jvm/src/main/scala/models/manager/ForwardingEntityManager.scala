@@ -15,10 +15,6 @@ abstract class ForwardingEntityManager[E <: Entity, T <: AbstractTable[E]](
   override def tableName: String = delegate.tableName
 
   // ********** Mutators ********** //
-  override def add(entity: E): E = delegate.add(entity)
-  override def addWithId(entity: E): E = delegate.addWithId(entity)
-  override def update(entity: E): E = delegate.update(entity)
-  override def delete(entity: E): Unit = delegate.delete(entity)
   override def addIfNew(entityWithId: E) = delegate.addIfNew(entityWithId)
   override def updateIfExists(entityWithId: E) = delegate.updateIfExists(entityWithId)
   override def deleteIfExists(entityId: Long) = delegate.deleteIfExists(entityId)
