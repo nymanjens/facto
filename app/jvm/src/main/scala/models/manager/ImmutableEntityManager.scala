@@ -11,5 +11,5 @@ abstract class ImmutableEntityManager[E <: Entity, T <: AbstractTable[E]](delega
     extends ForwardingEntityManager[E, T](delegate) {
 
   // ********** Mutators ********** //
-  override def updateIfExists(entityWithId: E) = throw new UnsupportedOperationException()
+  override private[models] def updateIfExists(entityWithId: E) = throw new UnsupportedOperationException()
 }

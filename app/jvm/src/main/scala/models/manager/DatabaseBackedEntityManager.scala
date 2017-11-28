@@ -19,7 +19,7 @@ private[manager] final class DatabaseBackedEntityManager[E <: Entity, T <: Entit
   }
 
   // ********** Implementation of SlickEntityManager interface - Mutators ********** //
-  override def addIfNew(entityWithId: E) = {
+  override private[models] def addIfNew(entityWithId: E) = {
     require(entityWithId.idOption.isDefined, s"This entity has no id ($entityWithId)")
     val existingEntities = dbRun(newQuery.filter(_.id === entityWithId.id).result)
 
@@ -30,11 +30,11 @@ private[manager] final class DatabaseBackedEntityManager[E <: Entity, T <: Entit
     }
   }
 
-  override def updateIfExists(entityWithId: E) = {
+  override private[models] def updateIfExists(entityWithId: E) = {
     dbRun(newQuery.filter(_.id === entityWithId.id).update(entityWithId))
   }
 
-  override def deleteIfExists(entityId: Long) = {
+  override private[models] def deleteIfExists(entityId: Long) = {
     dbRun(newQuery.filter(_.id === entityId).delete)
   }
 

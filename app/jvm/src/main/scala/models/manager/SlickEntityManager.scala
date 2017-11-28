@@ -14,13 +14,13 @@ trait SlickEntityManager[E <: Entity, T <: AbstractTable[E]] extends EntityManag
 
   // ********** Mutators ********** //
   /** Persists a new entity (with ID) or does nothing if an entity with that ID already exists. */
-  def addIfNew(entityWithId: E): Unit
+  private[models] def addIfNew(entityWithId: E): Unit
 
   /** Updates an existing entity or does nothing if no entity with that ID exists. */
-  def updateIfExists(entityWithId: E): Unit
+  private[models] def updateIfExists(entityWithId: E): Unit
 
   /** Deletes an existing entity or does nothing if no entity with that ID exists. */
-  def deleteIfExists(entityId: Long): Unit
+  private[models] def deleteIfExists(entityId: Long): Unit
 
   // ********** Getters ********** //
   /**
