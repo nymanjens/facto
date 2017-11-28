@@ -1,5 +1,6 @@
 package flux.react
 
+import common.LoggingUtils.logExceptions
 import flux.FactoAppModule
 import org.scalajs.dom
 
@@ -31,6 +32,8 @@ object FactoApp extends js.JSApp {
     implicit val globalModule = new FactoAppModule()
 
     // tell React to render the router in the document body
-    globalModule.router().renderIntoDOM(dom.document.getElementById("root"))
+    logExceptions {
+      globalModule.router().renderIntoDOM(dom.document.getElementById("root"))
+    }
   }
 }
