@@ -58,7 +58,7 @@ case class Config(accounts: ListMap[String, Account],
   }
 
   def accountOf(user: User)(implicit entityAccess: EntityAccess): Option[Account] =
-    accounts.values.filter(_.user == Some(user)).headOption
+    accounts.values.filter(_.userLoginName == Some(user.loginName)).headOption
 
   def personallySortedAccounts(implicit user: User, entityAccess: EntityAccess): Seq[Account] = {
     val myAccount = accountOf(user)
