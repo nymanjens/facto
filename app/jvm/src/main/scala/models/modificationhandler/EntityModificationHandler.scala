@@ -37,11 +37,11 @@ final class EntityModificationHandler @Inject()(
       val entityType = modification.entityType
       modification match {
         case EntityModification.Add(entity) =>
-          getManager(entityType).addIfNew(entity.asInstanceOf[entityType.get])
+          entityAccess.getManager(entityType).addIfNew(entity.asInstanceOf[entityType.get])
         case EntityModification.Update(entity) =>
-          getManager(entityType).updateIfExists(entity.asInstanceOf[entityType.get])
+          entityAccess.getManager(entityType).updateIfExists(entity.asInstanceOf[entityType.get])
         case EntityModification.Remove(entityId) =>
-          getManager(entityType).deleteIfExists(entityId)
+          entityAccess.getManager(entityType).deleteIfExists(entityId)
       }
 
       // Add modification
@@ -52,16 +52,5 @@ final class EntityModificationHandler @Inject()(
           date = clock.now
         ))
     }
-  }
-
-  private def getManager(entityType: EntityType.any): SlickEntityManager[entityType.get, _] = {
-    val manager = entityType match {
-      case UserType => entityAccess.userManager
-      case TransactionType => entityAccess.transactionManager
-      case TransactionGroupType => entityAccess.transactionGroupManager
-      case BalanceCheckType => entityAccess.balanceCheckManager
-      case ExchangeRateMeasurementType => entityAccess.exchangeRateMeasurementManager
-    }
-    manager.asInstanceOf[SlickEntityManager[entityType.get, _]]
   }
 }

@@ -13,14 +13,8 @@ import common.time.Clock
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}
 import models.accounting.config.Config
-import models.modification.EntityType._
-import models.manager._
-import models.modification.{
-  EntityModification,
-  EntityModificationEntity,
-  EntityType,
-  SlickEntityModificationEntityManager
-}
+import models.modification.{EntityModification, EntityType, SlickEntityModificationEntityManager}
+import models.modificationhandler.EntityModificationHandler
 import models.user.User
 import models.{Entity, SlickEntityAccess}
 
@@ -31,6 +25,7 @@ final class ScalaJsApiServerFactory @Inject()(
     clock: Clock,
     entityAccess: SlickEntityAccess,
     i18n: PlayI18n,
+    entityModificationHandler: EntityModificationHandler,
     entityModificationManager: SlickEntityModificationEntityManager) {
 
   def create()(implicit user: User): ScalaJsApi = new ScalaJsApi() {
@@ -47,7 +42,7 @@ final class ScalaJsApiServerFactory @Inject()(
       val entitiesMap: Map[EntityType.any, Seq[Entity]] = {
         types
           .map(entityType => {
-            entityType -> getManager(entityType).fetchAll()
+            entityType -> entityAccess.getManager(entityType).fetchAll()
           })
           .toMap
       }
@@ -71,37 +66,7 @@ final class ScalaJsApiServerFactory @Inject()(
     }
 
     override def persistEntityModifications(modifications: Seq[EntityModification]): Unit = {
-      for (modification <- modifications) {
-        // Apply modification
-        val entityType = modification.entityType
-        modification match {
-          case EntityModification.Add(entity) =>
-            getManager(entityType).addWithId(entity.asInstanceOf[entityType.get])
-          case EntityModification.Update(entity) =>
-            getManager(entityType).update(entity.asInstanceOf[entityType.get])
-          case EntityModification.Remove(entityId) =>
-            getManager(entityType).delete(getManager(entityType).findById(entityId))
-        }
-
-        // Add modification
-        entityModificationManager.add(
-          EntityModificationEntity(
-            userId = user.id,
-            modification = modification,
-            date = clock.now
-          ))
-      }
-    }
-
-    private def getManager(entityType: EntityType.any): SlickEntityManager[entityType.get, _] = {
-      val manager = entityType match {
-        case UserType => entityAccess.userManager
-        case TransactionType => entityAccess.transactionManager
-        case TransactionGroupType => entityAccess.transactionGroupManager
-        case BalanceCheckType => entityAccess.balanceCheckManager
-        case ExchangeRateMeasurementType => entityAccess.exchangeRateMeasurementManager
-      }
-      manager.asInstanceOf[SlickEntityManager[entityType.get, _]]
+      entityModificationHandler.persistEntityModifications(modifications)
     }
   }
 }

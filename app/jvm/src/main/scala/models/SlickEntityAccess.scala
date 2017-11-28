@@ -3,7 +3,14 @@ package models
 import com.google.inject._
 import models.accounting._
 import models.manager.SlickEntityManager
-import models.modification.SlickEntityModificationEntityManager
+import models.modification.EntityType.{
+  BalanceCheckType,
+  ExchangeRateMeasurementType,
+  TransactionGroupType,
+  TransactionType,
+  UserType
+}
+import models.modification.{EntityType, SlickEntityModificationEntityManager}
 import models.money.SlickExchangeRateMeasurementManager
 import models.user.SlickUserManager
 
@@ -27,4 +34,15 @@ final class SlickEntityAccess @Inject()(
       exchangeRateMeasurementManager,
       entityModificationEntityManager
     )
+
+  def getManager(entityType: EntityType.any): SlickEntityManager[entityType.get, _] = {
+    val manager = entityType match {
+      case UserType => userManager
+      case TransactionType => transactionManager
+      case TransactionGroupType => transactionGroupManager
+      case BalanceCheckType => balanceCheckManager
+      case ExchangeRateMeasurementType => exchangeRateMeasurementManager
+    }
+    manager.asInstanceOf[SlickEntityManager[entityType.get, _]]
+  }
 }
