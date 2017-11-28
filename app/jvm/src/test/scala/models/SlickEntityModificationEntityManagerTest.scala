@@ -20,7 +20,6 @@ class SlickEntityModificationEntityManagerTest extends HookedSpecification {
 
   @Inject implicit private val clock: Clock = null
   @Inject implicit private val entityAccess: SlickEntityAccess = null
-  @Inject implicit private val entityModificationHandler: EntityModificationHandler = null
   @Inject private val userManager: SlickUserManager = null
 
   @Inject private val modificationEntityManager: SlickEntityModificationEntityManager = null
@@ -30,7 +29,7 @@ class SlickEntityModificationEntityManagerTest extends HookedSpecification {
   }
 
   "test the EntityModificationEntity model" in new WithApplication {
-    TestUtils.persist(testUser)
+    userManager.addIfNew(testUser)
 
     val modificationEntity =
       EntityModificationEntity(

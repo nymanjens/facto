@@ -92,6 +92,6 @@ class SlickTransactionManagerTest extends HookedSpecification {
     trans1B.issuer mustEqual user1
     trans2.issuer mustEqual user2
 
-    transactionManager.fetchAll() mustEqual Seq(trans1A, trans1B, trans2)
+    transactionManager.fetchAll().toSet mustEqual Set(trans1A, trans1B, trans2)
   }
 }
