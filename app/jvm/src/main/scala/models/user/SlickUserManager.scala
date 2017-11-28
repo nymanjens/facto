@@ -2,11 +2,14 @@ package models.user
 
 import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
-import models.EntityTable
+import common.time.Clock
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
 import models.manager.{ForwardingEntityManager, SlickEntityManager}
+import models.modification.EntityModification
+import models.modificationhandler.EntityModificationHandler
 import models.user.SlickUserManager.{Users, tableName}
+import models.{EntityAccess, EntityTable}
 
 import scala.util.Random
 
@@ -46,6 +49,27 @@ object SlickUserManager {
 
   def copyUserWithPassword(user: User, password: String): User = {
     user.copy(passwordHash = hash(password))
+  }
+
+  def getOrCreateRobotUser()(implicit entityAccess: EntityAccess,
+                             entityModificationHandler: EntityModificationHandler,
+                             clock: Clock): User = {
+    val loginName = "robot"
+    def hash(s: String) = Hashing.sha512().hashString(s, Charsets.UTF_8).toString
+
+    entityAccess.userManager.findByLoginName(loginName) match {
+      case Some(user) => user
+      case None =>
+        val userAddition = EntityModification.createAddWithRandomId(
+          SlickUserManager.createUser(
+            loginName = loginName,
+            password = hash(clock.now.toString),
+            name = "Robot"
+          ))
+        val userWithId = userAddition.entity
+        entityModificationHandler.persistEntityModifications(userAddition)(user = userWithId)
+        userWithId
+    }
   }
 
   private def hash(password: String) = Hashing.sha512().hashString(password, Charsets.UTF_8).toString()

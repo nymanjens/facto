@@ -49,8 +49,9 @@ final class EntityModificationHandler @Inject()(
       }
 
       // Add modification
-      entityModificationManager.add(
+      entityModificationManager.addIfNew(
         EntityModificationEntity(
+          idOption = Some(EntityModification.generateRandomId()),
           userId = user.id,
           modification = modification,
           date = clock.now

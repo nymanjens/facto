@@ -6,23 +6,27 @@ import java.time.{LocalDate, LocalTime}
 
 import com.google.inject.Inject
 import common.ResourceFiles
-import common.time.LocalDateTime
+import common.time.{Clock, LocalDateTime}
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
 import models._
+import models.modification.EntityModification
+import models.modificationhandler.EntityModificationHandler
 import models.money.ExchangeRateMeasurement
-import models.user.SlickUserManager
+import models.user.{SlickUserManager, User}
 import play.api.{Application, Mode}
 
 import scala.collection.JavaConverters._
 
 final class ApplicationStartHook @Inject()(implicit app: Application,
-                                           userManager: SlickUserManager,
                                            entityAccess: SlickEntityAccess,
-                                           csvImportTool: CsvImportTool) {
+                                           csvImportTool: CsvImportTool,
+                                           entityModificationHandler: EntityModificationHandler,
+                                           clock: Clock) {
   onStart()
 
   private def onStart(): Unit = {
+    implicit val user = SlickUserManager.getOrCreateRobotUser()
     processFlags()
 
     // Set up database if necessary
@@ -43,7 +47,7 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
     }
   }
 
-  private def processFlags(): Unit = {
+  private def processFlags()(implicit user: User): Unit = {
     if (CommandLineFlags.dropAndCreateNewDb) {
       println("")
       println("  Dropping the database tables (if present) and creating new ones...")
@@ -61,7 +65,9 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
       println("  Createing admin user...")
       println(s"    loginName: $loginName")
       println(s"    password: $password")
-      userManager.add(SlickUserManager.createUser(loginName, password, name = "Admin"))
+      entityModificationHandler.persistEntityModifications(
+        EntityModification.createAddWithRandomId(
+          SlickUserManager.createUser(loginName, password, name = "Admin")))
       println("  Done. Exiting.")
 
       System.exit(0)
@@ -79,20 +85,26 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
     println("   done")
   }
 
-  private def loadDummyUsers() = {
-    userManager.add(SlickUserManager.createUser(loginName = "admin", password = "a", name = "Admin"))
-    userManager.add(SlickUserManager.createUser(loginName = "alice", password = "a", name = "Alice"))
-    userManager.add(SlickUserManager.createUser(loginName = "bob", password = "b", name = "Bob"))
+  private def loadDummyUsers()(implicit user: User): Unit = {
+    entityModificationHandler.persistEntityModifications(
+      EntityModification.createAddWithRandomId(
+        SlickUserManager.createUser(loginName = "admin", password = "a", name = "Admin")),
+      EntityModification.createAddWithRandomId(
+        SlickUserManager.createUser(loginName = "alice", password = "a", name = "Alice")),
+      EntityModification.createAddWithRandomId(
+        SlickUserManager.createUser(loginName = "bob", password = "b", name = "Bob"))
+    )
   }
 
-  private def loadCsvDummyData(csvDataFolder: Path) = {
+  private def loadCsvDummyData(csvDataFolder: Path)(implicit user: User): Unit = {
     csvImportTool.importTransactions(assertExists(csvDataFolder resolve "transactions.csv"))
     csvImportTool.importBalanceChecks(assertExists(csvDataFolder resolve "balancechecks.csv"))
-    entityAccess.exchangeRateMeasurementManager.add(
-      ExchangeRateMeasurement(
-        date = LocalDateTime.of(LocalDate.of(1990, JANUARY, 1), LocalTime.MIN),
-        foreignCurrencyCode = "GBP",
-        ratioReferenceToForeignCurrency = 1.2))
+    entityModificationHandler.persistEntityModifications(
+      EntityModification.createAddWithRandomId(
+        ExchangeRateMeasurement(
+          date = LocalDateTime.of(LocalDate.of(1990, JANUARY, 1), LocalTime.MIN),
+          foreignCurrencyCode = "GBP",
+          ratioReferenceToForeignCurrency = 1.2)))
   }
 
   private def assertExists(path: Path): Path = {
