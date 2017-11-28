@@ -8,6 +8,8 @@ import common.time.{Clock, TimeUtils}
 import models._
 import models.accounting._
 import models.accounting.config.{Account, Config, Template}
+import models.modification.EntityModification
+import models.modificationhandler.EntityModificationHandler
 import models.money.ExchangeRateMeasurement
 import models.user.{SlickUserManager, User}
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
@@ -18,6 +20,7 @@ import scala.collection.immutable.Seq
 final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi,
                                   components: ControllerComponents,
                                   clock: Clock,
+                                  entityModificationHandler: EntityModificationHandler,
                                   playConfiguration: play.api.Configuration,
                                   accountingConfig: Config,
                                   userManager: SlickUserManager,
@@ -33,13 +36,13 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
       val template = accountingConfig.templateWithCode(templateCode)
       val issuer = getOrCreateRobotUser()
 
-      // Add group
-      val group = entityAccess.transactionGroupManager.add(TransactionGroup(createdDate = clock.now))
-
-      // Add transactions
-      for (transaction <- toTransactions(template, group, issuer)) {
-        entityAccess.transactionManager.add(transaction)
-      }
+      val groupAddition = EntityModification.createAddWithRandomId(TransactionGroup(createdDate = clock.now))
+      val transactionAdditions =
+        toTransactions(template, transactionGroup = groupAddition.entity, issuer)
+          .map(EntityModification.createAddWithRandomId(_))
+      entityModificationHandler.persistEntityModifications(
+        groupAddition +: transactionAdditions
+      )
 
       Ok("OK")
   }
@@ -81,7 +84,8 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
           password = hash(clock.now.toString),
           name = Messages("facto.robot")
         )
-        userManager.add(user)
+        entityModificationHandler.persistEntityModifications(EntityModification.createAddWithRandomId(user))
+        userManager.findByLoginName(loginName).get
     }
   }
 
