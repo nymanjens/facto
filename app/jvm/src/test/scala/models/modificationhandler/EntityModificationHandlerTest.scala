@@ -35,7 +35,7 @@ class EntityModificationHandlerTest extends HookedSpecification {
     "Persists EntityModification" in new WithApplication {
       fakeClock.setTime(testDate)
 
-      handler.persistEntityModifications(Seq(testModification))
+      handler.persistEntityModifications(testModification)
 
       modificationEntityManager.fetchAll() must haveSize(1)
       val modificationEntity = getOnlyElement(modificationEntityManager.fetchAll())
@@ -47,7 +47,7 @@ class EntityModificationHandlerTest extends HookedSpecification {
     "EntityModification.Add" in new WithApplication {
       val transaction = createTransaction()
 
-      handler.persistEntityModifications(Seq(EntityModification.Add(transaction)))
+      handler.persistEntityModifications(EntityModification.Add(transaction))
 
       transactionManager.fetchAll() mustEqual Seq(transaction)
     }
@@ -57,7 +57,7 @@ class EntityModificationHandlerTest extends HookedSpecification {
       val updatedUser1 = user1.copy(name = "other nme")
       userManager.addIfNew(user1)
 
-      handler.persistEntityModifications(Seq(EntityModification.createUpdate(updatedUser1)))
+      handler.persistEntityModifications(EntityModification.createUpdate(updatedUser1))
 
       userManager.fetchAll() mustEqual Seq(updatedUser1)
     }
@@ -66,7 +66,7 @@ class EntityModificationHandlerTest extends HookedSpecification {
       val transaction1 = createTransaction()
       transactionManager.addIfNew(transaction1)
 
-      handler.persistEntityModifications(Seq(EntityModification.createDelete(transaction1)))
+      handler.persistEntityModifications(EntityModification.createDelete(transaction1))
 
       transactionManager.fetchAll() mustEqual Seq()
     }
@@ -78,12 +78,11 @@ class EntityModificationHandlerTest extends HookedSpecification {
       val transaction3 = createTransaction()
 
       handler.persistEntityModifications(
-        Seq(
-          EntityModification.Add(transaction1),
-          EntityModification.Add(transaction1),
-          EntityModification.Add(updatedTransaction1),
-          EntityModification.Add(transaction2)
-        ))
+        EntityModification.Add(transaction1),
+        EntityModification.Add(transaction1),
+        EntityModification.Add(updatedTransaction1),
+        EntityModification.Add(transaction2)
+      )
 
       transactionManager.fetchAll() mustEqual Seq(transaction1, transaction2)
     }
@@ -95,11 +94,10 @@ class EntityModificationHandlerTest extends HookedSpecification {
       userManager.addIfNew(user1)
 
       handler.persistEntityModifications(
-        Seq(
-          EntityModification.Update(updatedUser1),
-          EntityModification.Update(updatedUser1),
-          EntityModification.Update(user2)
-        ))
+        EntityModification.Update(updatedUser1),
+        EntityModification.Update(updatedUser1),
+        EntityModification.Update(user2)
+      )
 
       userManager.fetchAll() mustEqual Seq(updatedUser1)
     }
@@ -112,11 +110,10 @@ class EntityModificationHandlerTest extends HookedSpecification {
       transactionManager.addIfNew(transaction2)
 
       handler.persistEntityModifications(
-        Seq(
-          EntityModification.createDelete(transaction2),
-          EntityModification.createDelete(transaction2),
-          EntityModification.createDelete(transaction3)
-        ))
+        EntityModification.createDelete(transaction2),
+        EntityModification.createDelete(transaction2),
+        EntityModification.createDelete(transaction3)
+      )
 
       transactionManager.fetchAll() mustEqual Seq(transaction1)
     }
@@ -126,7 +123,7 @@ class EntityModificationHandlerTest extends HookedSpecification {
       val updatedTransaction1 = transaction1.copy(flowInCents = 19191)
       transactionManager.addWithId(transaction1)
 
-      handler.persistEntityModifications(Seq(EntityModification.createUpdate(updatedTransaction1))) must
+      handler.persistEntityModifications(EntityModification.createUpdate(updatedTransaction1)) must
         throwA[Exception]
     }
   }

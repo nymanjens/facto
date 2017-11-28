@@ -31,6 +31,10 @@ final class EntityModificationHandler @Inject()(
     entityAccess: SlickEntityAccess,
     entityModificationManager: SlickEntityModificationEntityManager) {
 
+  def persistEntityModifications(modifications: EntityModification*)(implicit user: User): Unit = {
+    persistEntityModifications(modifications.toVector)
+  }
+
   def persistEntityModifications(modifications: Seq[EntityModification])(implicit user: User): Unit = {
     for (modification <- modifications) {
       // Apply modification

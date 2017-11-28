@@ -13,6 +13,7 @@ import controllers.helpers.AuthenticatedAction
 import models.modification.EntityType
 import models.SlickEntityAccess
 import models.modification.EntityModification
+import models.modificationhandler.EntityModificationHandler
 import models.user.SlickUserManager
 import play.api.data.Form
 import play.api.data.Forms._
@@ -26,6 +27,7 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
                                   userManager: SlickUserManager,
                                   entityAccess: SlickEntityAccess,
                                   scalaJsApiServerFactory: ScalaJsApiServerFactory,
+                                  entityModificationHandler: EntityModificationHandler,
                                   playConfiguration: play.api.Configuration,
                                   env: play.api.Environment,
                                   webJarAssets: controllers.WebJarAssets)
@@ -47,7 +49,8 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
       formWithErrors => BadRequest(views.html.profile(formWithErrors)), {
         case ChangePasswordData(loginName, _, password, _) =>
           require(loginName == user.loginName)
-          userManager.update(SlickUserManager.copyUserWithPassword(user, password))
+          entityModificationHandler.persistEntityModifications(
+            EntityModification.createUpdate(SlickUserManager.copyUserWithPassword(user, password)))
           val message = Messages("facto.successfully-updated-password")
           Redirect(routes.Application.profile()).flashing("message" -> message)
       }
@@ -63,7 +66,8 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
       formWithErrors =>
         BadRequest(views.html.administration(users = userManager.fetchAll(), formWithErrors)), {
         case AddUserData(loginName, name, password, _) =>
-          userManager.add(SlickUserManager.createUser(loginName, password, name))
+          entityModificationHandler.persistEntityModifications(
+            EntityModification.createAddWithRandomId(SlickUserManager.createUser(loginName, password, name)))
           val message = Messages("facto.successfully-added-user", name)
           Redirect(routes.Application.administration()).flashing("message" -> message)
       }
