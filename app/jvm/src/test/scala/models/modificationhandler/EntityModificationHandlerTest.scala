@@ -75,7 +75,6 @@ class EntityModificationHandlerTest extends HookedSpecification {
       val transaction1 = createTransaction()
       val updatedTransaction1 = transaction1.copy(flowInCents = 198237)
       val transaction2 = createTransaction()
-      val transaction3 = createTransaction()
 
       handler.persistEntityModifications(
         EntityModification.Add(transaction1),
@@ -84,7 +83,7 @@ class EntityModificationHandlerTest extends HookedSpecification {
         EntityModification.Add(transaction2)
       )
 
-      transactionManager.fetchAll() mustEqual Seq(transaction1, transaction2)
+      transactionManager.fetchAll().toSet mustEqual Set(transaction1, transaction2)
     }
 
     "EntityModification.Update is idempotent" in new WithApplication {
