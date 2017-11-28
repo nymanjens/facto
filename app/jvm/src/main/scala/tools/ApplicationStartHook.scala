@@ -26,7 +26,6 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
   onStart()
 
   private def onStart(): Unit = {
-    implicit val user = SlickUserManager.getOrCreateRobotUser()
     processFlags()
 
     // Set up database if necessary
@@ -47,7 +46,7 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
     }
   }
 
-  private def processFlags()(implicit user: User): Unit = {
+  private def processFlags(): Unit = {
     if (CommandLineFlags.dropAndCreateNewDb) {
       println("")
       println("  Dropping the database tables (if present) and creating new ones...")
@@ -58,6 +57,8 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
     }
 
     if (CommandLineFlags.createAdminUser) {
+      implicit val user = SlickUserManager.getOrCreateRobotUser()
+
       val loginName = "admin"
       val password = AppConfigHelper.defaultPassword getOrElse "changeme"
 
@@ -85,7 +86,9 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
     println("   done")
   }
 
-  private def loadDummyUsers()(implicit user: User): Unit = {
+  private def loadDummyUsers(): Unit = {
+    implicit val user = SlickUserManager.getOrCreateRobotUser()
+
     entityModificationHandler.persistEntityModifications(
       EntityModification.createAddWithRandomId(
         SlickUserManager.createUser(loginName = "admin", password = "a", name = "Admin")),
@@ -96,7 +99,9 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
     )
   }
 
-  private def loadCsvDummyData(csvDataFolder: Path)(implicit user: User): Unit = {
+  private def loadCsvDummyData(csvDataFolder: Path): Unit = {
+    implicit val user = SlickUserManager.getOrCreateRobotUser()
+
     csvImportTool.importTransactions(assertExists(csvDataFolder resolve "transactions.csv"))
     csvImportTool.importBalanceChecks(assertExists(csvDataFolder resolve "balancechecks.csv"))
     entityModificationHandler.persistEntityModifications(
