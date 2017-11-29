@@ -80,7 +80,7 @@ class SlickTransactionManagerTest extends HookedSpecification {
       ))
 
     // do checks
-    transGrp1.transactions mustEqual Seq(trans1A, trans1B)
+    transGrp1.transactions.toSet mustEqual Set(trans1A, trans1B)
     transGrp2.transactions mustEqual Seq(trans2)
     transGrp3.transactions mustEqual Seq()
 

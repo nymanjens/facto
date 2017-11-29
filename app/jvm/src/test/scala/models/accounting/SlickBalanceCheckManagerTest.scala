@@ -60,7 +60,7 @@ class SlickBalanceCheckManagerTest extends HookedSpecification {
     // do basic checks
     checkA1.issuer mustEqual testUserA
     checkA2.moneyReservoirCode mustEqual "ACC_A"
-    balanceCheckManager.fetchAll() mustEqual Seq(checkA1, checkA2, checkB)
+    balanceCheckManager.fetchAll().toSet mustEqual Set(checkA1, checkA2, checkB)
   }
 
   "test inserting a BC with ID" in new WithApplication {
