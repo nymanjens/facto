@@ -5,11 +5,9 @@ import common.money.ExchangeRateManager
 import common.time.Clock
 import flux.action.Dispatcher
 import flux.stores.entries._
+import models.EntityAccess
 import models.access.RemoteDatabaseProxy
 import models.accounting.config.Config
-import models.money._
-import models.user.User
-import models.EntityAccess
 import models.user.User
 
 final class Module(implicit i18n: I18n,
@@ -39,4 +37,5 @@ final class Module(implicit i18n: I18n,
   implicit val summaryYearsStoreFactory = wire[SummaryYearsStoreFactory]
   implicit val summaryExchangeRateGainsStoreFactory = wire[SummaryExchangeRateGainsStoreFactory]
   implicit val globalMessagesStore = wire[GlobalMessagesStore]
+  implicit val pageLoadingStateStore = wire[PageLoadingStateStore]
 }

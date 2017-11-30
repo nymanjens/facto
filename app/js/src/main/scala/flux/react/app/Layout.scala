@@ -12,7 +12,11 @@ import org.scalajs.dom
 import scala.collection.immutable.Seq
 import scala.scalajs.js
 
-final class Layout(implicit globalMessages: GlobalMessages, menu: Menu, user: User, i18n: I18n) {
+final class Layout(implicit globalMessages: GlobalMessages,
+                   pageLoadingSpinner: PageLoadingSpinner,
+                   menu: Menu,
+                   user: User,
+                   i18n: I18n) {
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
@@ -37,7 +41,9 @@ final class Layout(implicit globalMessages: GlobalMessages, menu: Menu, user: Us
               <.span(^.className := "icon-bar"),
               <.span(^.className := "icon-bar")
             ),
-            router.anchorWithHrefTo(Page.Root)(^.className := "navbar-brand", "Family Accounting Tool")
+            router.anchorWithHrefTo(Page.Root)(^.className := "navbar-brand", "Family Accounting Tool"),
+            " ",
+            pageLoadingSpinner()
           ),
           <.ul(
             ^.className := "nav navbar-top-links navbar-right",
