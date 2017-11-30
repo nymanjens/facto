@@ -22,6 +22,9 @@ object Action {
       extends Action
   case class RemoveBalanceCheck(existingBalanceCheck: BalanceCheck) extends Action
 
+  // **************** Other actions **************** //
+  case class SetPageLoadingState(isLoading: Boolean) extends Action
+
   /** Special action that gets sent to the dispatcher's callbacks after they processed the contained action. */
   case class Done private[action] (action: Action) extends Action
 }
