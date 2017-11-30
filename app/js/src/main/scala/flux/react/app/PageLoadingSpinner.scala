@@ -45,7 +45,7 @@ private[app] final class PageLoadingSpinner(implicit pageLoadingStateStore: Page
     def render(props: Props, state: State): VdomElement = logExceptions {
       state.isLoading match {
         case true =>
-          <.i(^.className := "fa fa-circle-o-notch fa-spin")
+          <.span(^.className := "navbar-brand", <.i(^.className := "fa fa-circle-o-notch fa-spin"))
         case false =>
           <.span()
       }
