@@ -4,7 +4,7 @@ import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.money.ExchangeRateManager
 import common.time.Clock
-import flux.react.ReactVdomUtils.^^
+import flux.react.ReactVdomUtils.{<<, ^^}
 import flux.react.router.{Page, RouterContext}
 import flux.react.uielements
 import flux.stores.entries.AllEntriesStoreFactory
@@ -12,12 +12,15 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import jsfacades.Mousetrap
 import models.EntityAccess
-import models.accounting.config.Config
+import models.accounting.config.Template.Placement
+import models.accounting.config.{Config, Template}
+import models.user.User
 
 import scala.collection.immutable.Seq
 
 private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFactory,
                               entityAccess: EntityAccess,
+                              user: User,
                               clock: Clock,
                               accountingConfig: Config,
                               exchangeRateManager: ExchangeRateManager,
@@ -51,11 +54,12 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
 
     def render(props: Props, state: State) = logExceptions {
       implicit val router = props.router
-      def menuItem(label: String, page: Page): VdomElement =
+      def menuItem(label: String, page: Page, iconClass: String = null): VdomElement =
         router
           .anchorWithHrefTo(page)(
             ^^.ifThen(page.getClass == props.router.currentPage.getClass) { ^.className := "active" },
-            <.i(^.className := page.iconClass),
+            ^.key := label,
+            <.i(^.className := Option(iconClass) getOrElse page.iconClass),
             " ",
             <.span(^.dangerouslySetInnerHtml := label)
           )
@@ -102,9 +106,15 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
           menuItem(i18n("facto.summary.html"), Page.Summary)
         ),
         <.li(
-          menuItem(i18n("facto.new-entry.html"), Page.NewTransactionGroup()),
-          menuItem(i18n("facto.templates.html"), Page.TemplateList)
-        )
+          menuItem(i18n("facto.templates.html"), Page.TemplateList),
+          menuItem(i18n("facto.new-entry.html"), Page.NewTransactionGroup())
+        ),
+        <<.ifThen(newEntryTemplates.nonEmpty) {
+          <.li({
+            for (template <- newEntryTemplates)
+              yield menuItem(template.name, Page.NewFromTemplate(template), iconClass = template.iconClass)
+          }.toVdomArray)
+        }
       )
     }
 
@@ -132,6 +142,22 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
       bindToPage("shift+alt+n", Page.NewTransactionGroup())
 
       bind("shift+alt+f", () => queryInputRef().focus())
+    }
+
+    private def newEntryTemplates(implicit router: RouterContext): Seq[Template] = {
+      def templatesForPlacement(placement: Template.Placement): Seq[Template] =
+        accountingConfig.templatesToShowFor(placement, user)
+
+      router.currentPage match {
+        case Page.Everything => templatesForPlacement(Template.Placement.EverythingView)
+        case Page.CashFlow => templatesForPlacement(Template.Placement.CashFlowView)
+        case Page.Liquidation => templatesForPlacement(Template.Placement.LiquidationView)
+        case Page.Endowments => templatesForPlacement(Template.Placement.EndowmentsView)
+        case Page.Summary => templatesForPlacement(Template.Placement.SummaryView)
+        case _: Page.Search => templatesForPlacement(Template.Placement.SearchView)
+        case page: Page.NewFromTemplate => Seq(accountingConfig.templateWithCode(page.templateCode))
+        case _ => Seq()
+      }
     }
   }
 

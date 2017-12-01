@@ -46,9 +46,10 @@ case class Config(accounts: ListMap[String, Account],
     moneyReservoirs(includeNullReservoir = includeNullReservoir)
 
   def templatesToShowFor(location: Template.Placement, user: User)(
-      implicit accountingConfig: Config,
-      entityAccess: EntityAccess): Seq[Template] =
+      implicit entityAccess: EntityAccess): Seq[Template] = {
+    implicit val accountingConfig = this
     templates filter (_.showFor(location, user))
+  }
 
   def templateWithCode(code: String): Template = {
     val codeToTemplate = {
