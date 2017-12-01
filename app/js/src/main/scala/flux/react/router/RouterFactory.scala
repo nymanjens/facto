@@ -105,7 +105,8 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
 
   private def layout(routerCtl: RouterCtl[Page], resolution: Resolution[Page])(
       implicit reactAppModule: flux.react.app.Module) = {
-    reactAppModule.layout(RouterContext(resolution.page, routerCtl))(resolution.render())
+    reactAppModule.layout(RouterContext(resolution.page, routerCtl))(
+      <.div(^.key := resolution.page.toString, resolution.render()))
   }
 }
 private[router] object RouterFactory {
