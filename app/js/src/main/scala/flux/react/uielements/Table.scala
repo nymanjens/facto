@@ -50,6 +50,7 @@ object Table {
     ))
     .build
 
+  // **************** API ****************//
   def apply(title: String,
             tableClasses: Seq[String] = Seq(),
             key: String = "",
@@ -59,6 +60,7 @@ object Table {
     component(Props(title, tableClasses, key, expandNumEntriesCallback, tableHeaders, tableDatas, i18n))
   }
 
+  // **************** Private inner types ****************//
   private case class Props(title: String,
                            tableClasses: Seq[String],
                            key: String,
