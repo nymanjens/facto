@@ -1,11 +1,14 @@
 package flux.stores.entries
 
 import common.money.{DatedMoney, MoneyWithGeneralCurrency}
+import models.accounting.config.Config
 import models.accounting.{Transaction, _}
 
 import scala.collection.immutable.Seq
 
-sealed trait CashFlowEntry
+sealed trait CashFlowEntry {
+  def balance(implicit accountingConfig: Config): DatedMoney
+}
 
 object CashFlowEntry {
 
@@ -15,11 +18,13 @@ object CashFlowEntry {
       extends GroupedTransactions(transactions)
       with CashFlowEntry {
 
-    def balance: DatedMoney = {
+    override def balance(implicit accountingConfig: Config) = {
       val latestDate = transactions.map(_.transactionDate).max
       nonDatedBalance.withDate(latestDate)
     }
   }
 
-  case class BalanceCorrection(balanceCheck: BalanceCheck) extends CashFlowEntry
+  case class BalanceCorrection(balanceCheck: BalanceCheck) extends CashFlowEntry {
+    override def balance(implicit accountingConfig: Config) = balanceCheck.balance
+  }
 }

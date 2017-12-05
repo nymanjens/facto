@@ -9,6 +9,7 @@ import flux.react.uielements
 import flux.stores.entries.{EntriesListStoreFactory, EntriesStore}
 import japgolly.scalajs.react.{Callback, _}
 import japgolly.scalajs.react.vdom.html_<^.VdomElement
+import scala.scalajs.js
 
 import scala.collection.immutable.Seq
 
@@ -32,6 +33,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
             numEntriesStrategy: NumEntriesStrategy,
             setExpanded: Unique[Boolean] = null,
             additionalInput: AdditionalInput,
+            latestEntryToTableTitleExtra: Entry => String = null,
             tableHeaders: Seq[VdomElement],
             calculateTableData: Entry => Seq[VdomElement]): VdomElement = {
     withRowNumber(
@@ -41,6 +43,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
       numEntriesStrategy = numEntriesStrategy,
       setExpanded = setExpanded,
       additionalInput = additionalInput,
+      latestEntryToTableTitleExtra = latestEntryToTableTitleExtra,
       tableHeaders = tableHeaders,
       calculateTableDataFromEntryAndRowNum = (entry, rowNum) => calculateTableData(entry)
     )
@@ -56,6 +59,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
                     numEntriesStrategy: NumEntriesStrategy,
                     setExpanded: Unique[Boolean] = null,
                     additionalInput: AdditionalInput,
+                    latestEntryToTableTitleExtra: Entry => String = null,
                     tableHeaders: Seq[VdomElement],
                     calculateTableDataFromEntryAndRowNum: (Entry, Int) => Seq[VdomElement]): VdomElement = {
     component
@@ -66,9 +70,11 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
           tableClasses,
           numEntriesStrategy,
           setExpanded = Option(setExpanded),
+          latestEntryToTableTitleExtra = Option(latestEntryToTableTitleExtra),
           tableHeaders,
           calculateTableDataFromEntryAndRowNum,
-          additionalInput))
+          additionalInput
+        ))
       .vdomElement
   }
 
@@ -77,6 +83,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
                            tableClasses: Seq[String],
                            numEntriesStrategy: NumEntriesStrategy,
                            setExpanded: Option[Unique[Boolean]],
+                           latestEntryToTableTitleExtra: Option[Entry => String],
                            tableHeaders: Seq[VdomElement],
                            calculateTableDataFromEntryAndRowNum: (Entry, Int) => Seq[VdomElement],
                            additionalInput: AdditionalInput)
@@ -123,7 +130,14 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
 
     def tableTitleExtra(props: Props, state: State): VdomElement = {
       val numEntries = state.entries.entries.size + (if (state.entries.hasMore) "+" else "")
-      <.span(i18n("facto.n-entries", numEntries))
+      <.span(
+        <<.ifThen(props.latestEntryToTableTitleExtra) { latestEntryToTableTitleExtra =>
+          <<.ifThen(state.entries.entries.lastOption) { latestEntry =>
+            <.span(latestEntryToTableTitleExtra(latestEntry), " ")
+          }
+        },
+        <.span(^.style := js.Dictionary("color" -> "#999"), s"(${i18n("facto.n-entries", numEntries)})")
+      )
     }
 
     private def expandMaxNumEntries(props: Props, state: State): Callback = LogExceptionsCallback {

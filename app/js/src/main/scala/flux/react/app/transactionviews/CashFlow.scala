@@ -61,6 +61,8 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
                       numEntriesStrategy = NumEntriesStrategy(start = 10, intermediateBeforeInf = Seq(30)),
                       setExpanded = Unique(false),
                       additionalInput = reservoir,
+                      latestEntryToTableTitleExtra =
+                        latestEntry => s"${i18n("facto.balance")}: ${latestEntry.balance}",
                       tableHeaders = Seq(
                         <.th(i18n("facto.payed")),
                         <.th(i18n("facto.consumed")),
