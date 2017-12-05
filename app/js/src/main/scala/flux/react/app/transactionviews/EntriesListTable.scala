@@ -1,11 +1,11 @@
 package flux.react.app.transactionviews
 
-import common.I18n
+import common.{I18n, Unique}
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import flux.react.uielements
 import flux.stores.entries.{EntriesListStoreFactory, EntriesStore}
-import japgolly.scalajs.react._
+import japgolly.scalajs.react.{Callback, _}
 import japgolly.scalajs.react.vdom.html_<^.VdomElement
 
 import scala.collection.immutable.Seq
@@ -16,9 +16,14 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
-    .initialStateFromProps(props =>
-      State(EntriesListStoreFactory.State.empty, maxNumEntries = props.numEntriesStrategy.start))
+    .initialStateFromProps(
+      props =>
+        State(
+          EntriesListStoreFactory.State.empty,
+          maxNumEntries = props.numEntriesStrategy.start,
+          expanded = props.setExpanded.map(_.get) getOrElse true))
     .renderBackend[Backend]
+    .componentWillReceiveProps(scope => scope.backend.willReceiveProps(scope.currentProps, scope.nextProps))
     .componentWillMount(scope => scope.backend.willMount(scope.props, scope.state))
     .componentWillUnmount(scope => scope.backend.willUnmount())
     .build
@@ -28,6 +33,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
             tableClasses: Seq[String] = Seq(),
             key: String = "",
             numEntriesStrategy: NumEntriesStrategy,
+            setExpanded: Unique[Boolean] = null,
             additionalInput: AdditionalInput,
             tableHeaders: Seq[VdomElement],
             calculateTableData: Entry => Seq[VdomElement]): VdomElement = {
@@ -36,6 +42,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
       tableClasses = tableClasses,
       key = key,
       numEntriesStrategy = numEntriesStrategy,
+      setExpanded = setExpanded,
       additionalInput = additionalInput,
       tableHeaders = tableHeaders,
       calculateTableDataFromEntryAndRowNum = (entry, rowNum) => calculateTableData(entry)
@@ -50,6 +57,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
                     tableClasses: Seq[String] = Seq(),
                     key: String = "",
                     numEntriesStrategy: NumEntriesStrategy,
+                    setExpanded: Unique[Boolean] = null,
                     additionalInput: AdditionalInput,
                     tableHeaders: Seq[VdomElement],
                     calculateTableDataFromEntryAndRowNum: (Entry, Int) => Seq[VdomElement]): VdomElement = {
@@ -60,6 +68,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
           tableTitle,
           tableClasses,
           numEntriesStrategy,
+          setExpanded = Option(setExpanded),
           tableHeaders,
           calculateTableDataFromEntryAndRowNum,
           additionalInput))
@@ -70,17 +79,24 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
   private case class Props(tableTitle: String,
                            tableClasses: Seq[String],
                            numEntriesStrategy: NumEntriesStrategy,
+                           setExpanded: Option[Unique[Boolean]],
                            tableHeaders: Seq[VdomElement],
                            calculateTableDataFromEntryAndRowNum: (Entry, Int) => Seq[VdomElement],
                            additionalInput: AdditionalInput)
 
-  private case class State(entries: entriesStoreFactory.State, maxNumEntries: Int) {
+  private case class State(entries: entriesStoreFactory.State, maxNumEntries: Int, expanded: Boolean) {
     def withEntriesFrom(store: entriesStoreFactory.Store): State =
       copy(entries = store.state)
   }
 
   private class Backend($ : BackendScope[Props, State]) extends EntriesStore.Listener {
     private var entriesStore: entriesStoreFactory.Store = _
+
+    def willReceiveProps(currentProps: Props, nextProps: Props): Callback = LogExceptionsCallback {
+      if (nextProps.setExpanded.isDefined && currentProps.setExpanded != nextProps.setExpanded) {
+        $.modState(_.copy(expanded = nextProps.setExpanded.get.get)).runNow()
+      }
+    }
 
     def willMount(props: Props, state: State): Callback = LogExceptionsCallback {
       entriesStore = entriesStoreFactory.get(

@@ -16,7 +16,6 @@ object Table {
       <.table(
         ^^.classes(
           Seq("table", "table-bordered", "table-hover", "table-condensed", "table-overflow-elipsis") ++ props.tableClasses),
-        ^.key := props.key,
         <.thead(
           <.tr(^^.classes("info"), <.th(^.colSpan := props.colSpan, props.title)),
           <.tr(props.tableHeaders.toTagMod)
@@ -53,17 +52,15 @@ object Table {
   // **************** API ****************//
   def apply(title: String,
             tableClasses: Seq[String] = Seq(),
-            key: String = "",
             expandNumEntriesCallback: Option[Callback] = None,
             tableHeaders: Seq[VdomElement],
             tableDatas: Seq[Seq[VdomElement]])(implicit i18n: I18n): VdomElement = {
-    component(Props(title, tableClasses, key, expandNumEntriesCallback, tableHeaders, tableDatas, i18n))
+    component(Props(title, tableClasses, expandNumEntriesCallback, tableHeaders, tableDatas, i18n))
   }
 
   // **************** Private inner types ****************//
   private case class Props(title: String,
                            tableClasses: Seq[String],
-                           key: String,
                            expandNumEntriesCallback: Option[Callback],
                            tableHeaders: Seq[VdomElement],
                            tableDatas: Seq[Seq[VdomElement]],
