@@ -10,40 +10,81 @@ import japgolly.scalajs.react.vdom.html_<^.VdomElement
 
 import scala.collection.immutable.Seq
 
-private[transactionviews] final class EntriesListTable[Entry, Props](
-    tableTitle: String,
-    tableClasses: Seq[String],
-    key: String,
-    numEntriesStrategy: NumEntriesStrategy,
-    tableHeaders: Seq[VdomElement],
-    calculateTableDataFromEntryAndRowNum: (Entry, Int) => Seq[VdomElement],
-    props: Props)(implicit entriesStoreFactory: EntriesListStoreFactory[Entry, Props], i18n: I18n) {
+private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
+    implicit entriesStoreFactory: EntriesListStoreFactory[Entry, AdditionalInput],
+    i18n: I18n) {
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
-    .initialState(State(EntriesListStoreFactory.State.empty, maxNumEntries = numEntriesStrategy.start))
+    .initialStateFromProps(props =>
+      State(EntriesListStoreFactory.State.empty, maxNumEntries = props.numEntriesStrategy.start))
     .renderBackend[Backend]
-    .componentWillMount(scope => scope.backend.willMount(scope.state))
+    .componentWillMount(scope => scope.backend.willMount(scope.props, scope.state))
     .componentWillUnmount(scope => scope.backend.willUnmount())
     .build
 
   // **************** API ****************//
-  def apply(): VdomElement = {
-    component.withKey(key).apply(props).vdomElement
+  def apply(tableTitle: String,
+            tableClasses: Seq[String] = Seq(),
+            key: String = "",
+            numEntriesStrategy: NumEntriesStrategy,
+            additionalInput: AdditionalInput,
+            tableHeaders: Seq[VdomElement],
+            calculateTableData: Entry => Seq[VdomElement]): VdomElement = {
+    withRowNumber(
+      tableTitle = tableTitle,
+      tableClasses = tableClasses,
+      key = key,
+      numEntriesStrategy = numEntriesStrategy,
+      additionalInput = additionalInput,
+      tableHeaders = tableHeaders,
+      calculateTableDataFromEntryAndRowNum = (entry, rowNum) => calculateTableData(entry)
+    )
+  }
+
+  /**
+    * @param calculateTableDataFromEntryAndRowNum Returns an a seq of table datas from an entry and the number of the
+    *                                             row. The first row is zero.
+    */
+  def withRowNumber(tableTitle: String,
+                    tableClasses: Seq[String] = Seq(),
+                    key: String = "",
+                    numEntriesStrategy: NumEntriesStrategy,
+                    additionalInput: AdditionalInput,
+                    tableHeaders: Seq[VdomElement],
+                    calculateTableDataFromEntryAndRowNum: (Entry, Int) => Seq[VdomElement]): VdomElement = {
+    component
+      .withKey(key)
+      .apply(
+        Props(
+          tableTitle,
+          tableClasses,
+          numEntriesStrategy,
+          tableHeaders,
+          calculateTableDataFromEntryAndRowNum,
+          additionalInput))
+      .vdomElement
   }
 
   // **************** Private types ****************//
+  private case class Props(tableTitle: String,
+                           tableClasses: Seq[String],
+                           numEntriesStrategy: NumEntriesStrategy,
+                           tableHeaders: Seq[VdomElement],
+                           calculateTableDataFromEntryAndRowNum: (Entry, Int) => Seq[VdomElement],
+                           additionalInput: AdditionalInput)
+
   private case class State(entries: entriesStoreFactory.State, maxNumEntries: Int) {
     def withEntriesFrom(store: entriesStoreFactory.Store): State =
       copy(entries = store.state)
   }
 
   private class Backend($ : BackendScope[Props, State]) extends EntriesStore.Listener {
-    private var entriesStore: entriesStoreFactory.Store = null
+    private var entriesStore: entriesStoreFactory.Store = _
 
-    def willMount(state: State): Callback = LogExceptionsCallback {
-      entriesStore =
-        entriesStoreFactory.get(entriesStoreFactory.Input(maxNumEntries = state.maxNumEntries, props))
+    def willMount(props: Props, state: State): Callback = LogExceptionsCallback {
+      entriesStore = entriesStoreFactory.get(
+        entriesStoreFactory.Input(maxNumEntries = state.maxNumEntries, props.additionalInput))
       entriesStore.register(this)
       $.modState(state => logExceptions(state.withEntriesFrom(entriesStore))).runNow()
     }
@@ -59,29 +100,30 @@ private[transactionviews] final class EntriesListTable[Entry, Props](
 
     def render(props: Props, state: State) = logExceptions {
       uielements.Table(
-        title = tableTitle,
-        tableClasses = tableClasses,
-        expandNumEntriesCallback = if (state.entries.hasMore) Some(expandMaxNumEntries(state)) else None,
-        tableHeaders = tableHeaders,
+        title = props.tableTitle,
+        tableClasses = props.tableClasses,
+        expandNumEntriesCallback =
+          if (state.entries.hasMore) Some(expandMaxNumEntries(props, state)) else None,
+        tableHeaders = props.tableHeaders,
         tableDatas = state.entries.entries.reverse.zipWithIndex.map {
           case (entry, index) =>
-            calculateTableDataFromEntryAndRowNum(entry, index)
+            props.calculateTableDataFromEntryAndRowNum(entry, index)
         }
       )
     }
 
-    private def expandMaxNumEntries(state: State): Callback = LogExceptionsCallback {
-      def updateMaxNumEntries(maxNumEntries: Int) = {
+    private def expandMaxNumEntries(props: Props, state: State): Callback = LogExceptionsCallback {
+      def updateMaxNumEntries(maxNumEntries: Int): Unit = {
         entriesStore.deregister(this)
-        entriesStore =
-          entriesStoreFactory.get(entriesStoreFactory.Input(maxNumEntries = maxNumEntries, props))
+        entriesStore = entriesStoreFactory.get(
+          entriesStoreFactory.Input(maxNumEntries = maxNumEntries, props.additionalInput))
         entriesStore.register(this)
         $.modState(state =>
           logExceptions(state.withEntriesFrom(entriesStore).copy(maxNumEntries = maxNumEntries))).runNow()
       }
 
       val nextMaxNumEntries = {
-        val nextNCandidates = numEntriesStrategy.intermediateBeforeInf :+ Int.MaxValue
+        val nextNCandidates = props.numEntriesStrategy.intermediateBeforeInf :+ Int.MaxValue
         nextNCandidates.filter(_ > state.maxNumEntries).head
       }
       println(s"  Expanding #entries from ${state.maxNumEntries} to $nextMaxNumEntries")
@@ -92,49 +134,6 @@ private[transactionviews] final class EntriesListTable[Entry, Props](
 }
 
 private[transactionviews] object EntriesListTable {
-
-  def apply[Entry, Props](tableTitle: String,
-                          tableClasses: Seq[String] = Seq(),
-                          key: String = "",
-                          numEntriesStrategy: NumEntriesStrategy,
-                          props: Props = (): Unit,
-                          tableHeaders: Seq[VdomElement],
-                          calculateTableData: Entry => Seq[VdomElement])(
-      implicit entriesStoreFactory: EntriesListStoreFactory[Entry, Props],
-      i18n: I18n): VdomElement = {
-    withRowNumber[Entry, Props](
-      tableTitle = tableTitle,
-      tableClasses = tableClasses,
-      key = key,
-      numEntriesStrategy = numEntriesStrategy,
-      props = props,
-      tableHeaders = tableHeaders,
-      calculateTableDataFromEntryAndRowNum = (entry, rowNum) => calculateTableData(entry)
-    )
-  }
-
-  /**
-    * @param calculateTableDataFromEntryAndRowNum Returns an a seq of table datas from an entry and the number of the
-    *                                             row. The first row is zero.
-    */
-  def withRowNumber[Entry, Props](tableTitle: String,
-                                  tableClasses: Seq[String] = Seq(),
-                                  key: String = "",
-                                  numEntriesStrategy: NumEntriesStrategy,
-                                  props: Props = (): Unit,
-                                  tableHeaders: Seq[VdomElement],
-                                  calculateTableDataFromEntryAndRowNum: (Entry, Int) => Seq[VdomElement])(
-      implicit entriesStoreFactory: EntriesListStoreFactory[Entry, Props],
-      i18n: I18n): VdomElement = {
-    new EntriesListTable(
-      tableTitle,
-      tableClasses,
-      key,
-      numEntriesStrategy,
-      tableHeaders,
-      calculateTableDataFromEntryAndRowNum,
-      props).apply()
-  }
 
   case class NumEntriesStrategy(start: Int, intermediateBeforeInf: Seq[Int] = Seq()) {
     // Argument validation

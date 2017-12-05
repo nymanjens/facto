@@ -31,6 +31,8 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
                      exchangeRateManager: ExchangeRateManager,
                      i18n: I18n) {
 
+  private val entriesListTable: EntriesListTable[CashFlowEntry, MoneyReservoir] = new EntriesListTable
+
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
     .initialState(State(includeUnrelatedReservoirs = false, includeHiddenReservoirs = false))
@@ -52,12 +54,12 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
                         includeHidden = state.includeHiddenReservoirs)
                     if reservoir.owner == account
                   } yield {
-                    EntriesListTable.withRowNumber[CashFlowEntry, MoneyReservoir](
+                    entriesListTable.withRowNumber(
                       tableTitle = reservoir.name,
                       tableClasses = Seq("table-cashflow"),
                       key = reservoir.code,
                       numEntriesStrategy = NumEntriesStrategy(start = 10, intermediateBeforeInf = Seq(30)),
-                      props = reservoir,
+                      additionalInput = reservoir,
                       tableHeaders = Seq(
                         <.th(i18n("facto.payed")),
                         <.th(i18n("facto.consumed")),

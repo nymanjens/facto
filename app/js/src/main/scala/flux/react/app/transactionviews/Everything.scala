@@ -22,6 +22,8 @@ final class Everything(implicit entriesStoreFactory: AllEntriesStoreFactory,
                        exchangeRateManager: ExchangeRateManager,
                        i18n: I18n) {
 
+  private val entriesListTable: EntriesListTable[GeneralEntry, Unit] = new EntriesListTable
+
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
     .renderP(
@@ -30,10 +32,11 @@ final class Everything(implicit entriesStoreFactory: AllEntriesStoreFactory,
         <.span(
           uielements.PageHeader(router.currentPage),
           uielements.Panel(i18n("facto.genral-information-about-all-entries"))(
-            EntriesListTable[GeneralEntry, Unit](
+            entriesListTable(
               tableTitle = i18n("facto.all"),
               tableClasses = Seq("table-everything"),
               numEntriesStrategy = NumEntriesStrategy(start = 400),
+              additionalInput = (): Unit,
               tableHeaders = Seq(
                 <.th(i18n("facto.issuer")),
                 <.th(i18n("facto.payed")),

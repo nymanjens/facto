@@ -24,6 +24,8 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
                         exchangeRateManager: ExchangeRateManager,
                         i18n: I18n) {
 
+  private val entriesListTable: EntriesListTable[LiquidationEntry, AccountPair] = new EntriesListTable
+
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
     .renderP(
@@ -40,13 +42,13 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
               } yield {
                 val accountPair = AccountPair(account1, account2)
                 val startNumEntries = 10
-                EntriesListTable[LiquidationEntry, AccountPair](
+                entriesListTable(
                   tableTitle = i18n("facto.debt-of", account1.longName, account2.longName),
                   tableClasses = Seq("table-liquidation"),
                   key = s"${account1.code}_${account2.code}",
                   numEntriesStrategy =
                     NumEntriesStrategy(start = startNumEntries, intermediateBeforeInf = Seq(30)),
-                  props = accountPair,
+                  additionalInput = accountPair,
                   tableHeaders = Seq(
                     <.th(i18n("facto.payed")),
                     <.th(i18n("facto.beneficiary")),

@@ -24,6 +24,8 @@ final class Endowments(implicit entriesStoreFactory: EndowmentEntriesStoreFactor
                        exchangeRateManager: ExchangeRateManager,
                        i18n: I18n) {
 
+  private val entriesListTable: EntriesListTable[GeneralEntry, Account] = new EntriesListTable
+
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
     .renderP(
@@ -34,12 +36,12 @@ final class Endowments(implicit entriesStoreFactory: EndowmentEntriesStoreFactor
           uielements.Panel(i18n("facto.all-accounts")) {
             {
               for (account <- accountingConfig.personallySortedAccounts) yield {
-                EntriesListTable[GeneralEntry, Account](
+                entriesListTable(
                   tableTitle = i18n("facto.endowments-of", account.longName),
                   tableClasses = Seq("table-endowments"),
                   key = account.code,
                   numEntriesStrategy = NumEntriesStrategy(start = 30, intermediateBeforeInf = Seq(100)),
-                  props = account,
+                  additionalInput = account,
                   tableHeaders = Seq(
                     <.th(i18n("facto.payed")),
                     <.th(i18n("facto.consumed")),

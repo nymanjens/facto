@@ -22,6 +22,9 @@ final class SearchResults(implicit complexQueryStoreFactory: ComplexQueryStoreFa
                           exchangeRateManager: ExchangeRateManager,
                           i18n: I18n) {
 
+  private val entriesListTable: EntriesListTable[GeneralEntry, ComplexQueryStoreFactory.Query] =
+    new EntriesListTable
+
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
     .renderP(
@@ -30,11 +33,11 @@ final class SearchResults(implicit complexQueryStoreFactory: ComplexQueryStoreFa
         <.span(
           uielements.PageHeader(router.currentPage),
           uielements.Panel(i18n("facto.search-results"))(
-            EntriesListTable[GeneralEntry, ComplexQueryStoreFactory.Query](
+            entriesListTable(
               tableTitle = i18n("facto.all"),
               tableClasses = Seq("table-search"),
               numEntriesStrategy = NumEntriesStrategy(start = 500),
-              props = props.query,
+              additionalInput = props.query,
               tableHeaders = Seq(
                 <.th(i18n("facto.issuer")),
                 <.th(i18n("facto.payed")),
