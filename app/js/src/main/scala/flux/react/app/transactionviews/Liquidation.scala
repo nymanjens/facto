@@ -49,6 +49,7 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
                   numEntriesStrategy =
                     NumEntriesStrategy(start = startNumEntries, intermediateBeforeInf = Seq(30)),
                   additionalInput = accountPair,
+                  latestEntryToTableTitleExtra = latestEntry => latestEntry.debt.toString,
                   tableHeaders = Seq(
                     <.th(i18n("facto.payed")),
                     <.th(i18n("facto.beneficiary")),
