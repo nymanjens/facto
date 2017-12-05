@@ -1,5 +1,7 @@
 package flux.react.app.transactionviews
 
+import flux.react.ReactVdomUtils.{<<, ^^}
+import japgolly.scalajs.react.vdom.html_<^._
 import common.{I18n, Unique}
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
@@ -110,12 +112,18 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
         setExpanded = props.setExpanded,
         expandNumEntriesCallback =
           if (state.entries.hasMore) Some(expandMaxNumEntries(props, state)) else None,
+        tableTitleExtra = tableTitleExtra(props, state),
         tableHeaders = props.tableHeaders,
         tableDatas = state.entries.entries.reverse.zipWithIndex.map {
           case (entry, index) =>
             props.calculateTableDataFromEntryAndRowNum(entry, index)
         }
       )
+    }
+
+    def tableTitleExtra(props: Props, state: State): VdomElement = {
+      val numEntries = state.entries.entries.size + (if (state.entries.hasMore) "+" else "")
+      <.span(i18n("facto.n-entries", numEntries))
     }
 
     private def expandMaxNumEntries(props: Props, state: State): Callback = LogExceptionsCallback {

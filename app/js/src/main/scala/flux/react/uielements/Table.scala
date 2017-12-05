@@ -21,7 +21,13 @@ object Table {
         <.thead(
           <.tr(
             ^^.classes("info", "expand-on-click"),
-            <.th(^.colSpan := props.colSpan, props.title),
+            <.th(
+              ^.colSpan := props.colSpan,
+              <.span(^.style := js.Dictionary("minWidth" -> "230px", "float" -> "left"), props.title),
+              <<.ifThen(props.tableTitleExtra) { extra =>
+                <.span(^.style := js.Dictionary("fontWeight" -> "normal", "paddingLeft" -> "20px"), extra)
+              }
+            ),
             ^.onClick -->
               $.modState(_.copy(expanded = !state.expanded))
           ),
@@ -71,10 +77,19 @@ object Table {
             tableClasses: Seq[String] = Seq(),
             setExpanded: Option[Unique[Boolean]] = None,
             expandNumEntriesCallback: Option[Callback] = None,
+            tableTitleExtra: VdomElement = null,
             tableHeaders: Seq[VdomElement],
             tableDatas: Seq[Seq[VdomElement]])(implicit i18n: I18n): VdomElement = {
     component(
-      Props(title, tableClasses, setExpanded, expandNumEntriesCallback, tableHeaders, tableDatas, i18n))
+      Props(
+        title = title,
+        tableClasses = tableClasses,
+        setExpanded = setExpanded,
+        expandNumEntriesCallback = expandNumEntriesCallback,
+        tableTitleExtra = Option(tableTitleExtra),
+        tableHeaders = tableHeaders,
+        tableDatas = tableDatas
+      ))
   }
 
   // **************** Private inner types ****************//
@@ -82,9 +97,9 @@ object Table {
                            tableClasses: Seq[String],
                            setExpanded: Option[Unique[Boolean]],
                            expandNumEntriesCallback: Option[Callback],
+                           tableTitleExtra: Option[VdomElement],
                            tableHeaders: Seq[VdomElement],
-                           tableDatas: Seq[Seq[VdomElement]],
-                           i18n: I18n) {
+                           tableDatas: Seq[Seq[VdomElement]])(implicit val i18n: I18n) {
     def colSpan: Int = tableHeaders.size
   }
   private case class State(expanded: Boolean)
