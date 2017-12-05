@@ -16,14 +16,9 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
-    .initialStateFromProps(
-      props =>
-        State(
-          EntriesListStoreFactory.State.empty,
-          maxNumEntries = props.numEntriesStrategy.start,
-          expanded = props.setExpanded.map(_.get) getOrElse true))
+    .initialStateFromProps(props =>
+      State(EntriesListStoreFactory.State.empty, maxNumEntries = props.numEntriesStrategy.start))
     .renderBackend[Backend]
-    .componentWillReceiveProps(scope => scope.backend.willReceiveProps(scope.currentProps, scope.nextProps))
     .componentWillMount(scope => scope.backend.willMount(scope.props, scope.state))
     .componentWillUnmount(scope => scope.backend.willUnmount())
     .build
@@ -84,19 +79,13 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
                            calculateTableDataFromEntryAndRowNum: (Entry, Int) => Seq[VdomElement],
                            additionalInput: AdditionalInput)
 
-  private case class State(entries: entriesStoreFactory.State, maxNumEntries: Int, expanded: Boolean) {
+  private case class State(entries: entriesStoreFactory.State, maxNumEntries: Int) {
     def withEntriesFrom(store: entriesStoreFactory.Store): State =
       copy(entries = store.state)
   }
 
   private class Backend($ : BackendScope[Props, State]) extends EntriesStore.Listener {
     private var entriesStore: entriesStoreFactory.Store = _
-
-    def willReceiveProps(currentProps: Props, nextProps: Props): Callback = LogExceptionsCallback {
-      if (nextProps.setExpanded.isDefined && currentProps.setExpanded != nextProps.setExpanded) {
-        $.modState(_.copy(expanded = nextProps.setExpanded.get.get)).runNow()
-      }
-    }
 
     def willMount(props: Props, state: State): Callback = LogExceptionsCallback {
       entriesStore = entriesStoreFactory.get(
@@ -118,6 +107,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
       uielements.Table(
         title = props.tableTitle,
         tableClasses = props.tableClasses,
+        setExpanded = props.setExpanded,
         expandNumEntriesCallback =
           if (state.entries.hasMore) Some(expandMaxNumEntries(props, state)) else None,
         tableHeaders = props.tableHeaders,

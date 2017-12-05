@@ -1,6 +1,7 @@
 package flux.react.uielements
 
-import common.I18n
+import common.LoggingUtils.LogExceptionsCallback
+import common.{I18n, Unique}
 import flux.react.ReactVdomUtils.{<<, ^^}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
@@ -12,17 +13,18 @@ object Table {
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
-    .renderP((_, props) =>
+    .initialStateFromProps(props => State(expanded = props.setExpanded.map(_.get) getOrElse true))
+    .renderPS((_, props, state) =>
       <.table(
         ^^.classes(
           Seq("table", "table-bordered", "table-hover", "table-condensed", "table-overflow-elipsis") ++ props.tableClasses),
         <.thead(
           <.tr(^^.classes("info"), <.th(^.colSpan := props.colSpan, props.title)),
-          <<.ifThen(props.expanded) {
+          <<.ifThen(state.expanded) {
             <.tr(props.tableHeaders.toTagMod)
           }
         ),
-        <<.ifThen(props.expanded) {
+        <<.ifThen(state.expanded) {
           <.tbody(
             props.tableDatas.zipWithIndex.map {
               case (tableData, index) =>
@@ -51,26 +53,34 @@ object Table {
           )
         }
     ))
+    .componentWillReceiveProps($ =>
+      LogExceptionsCallback {
+        if ($.nextProps.setExpanded.isDefined && $.currentProps.setExpanded != $.nextProps.setExpanded) {
+          $.modState(_.copy(expanded = $.nextProps.setExpanded.get.get)).runNow()
+        }
+    })
     .build
 
   // **************** API ****************//
   def apply(title: String,
             tableClasses: Seq[String] = Seq(),
-            expanded: Boolean,
+            setExpanded: Option[Unique[Boolean]] = None,
             expandNumEntriesCallback: Option[Callback] = None,
             tableHeaders: Seq[VdomElement],
             tableDatas: Seq[Seq[VdomElement]])(implicit i18n: I18n): VdomElement = {
-    component(Props(title, tableClasses, expanded, expandNumEntriesCallback, tableHeaders, tableDatas, i18n))
+    component(
+      Props(title, tableClasses, setExpanded, expandNumEntriesCallback, tableHeaders, tableDatas, i18n))
   }
 
   // **************** Private inner types ****************//
   private case class Props(title: String,
                            tableClasses: Seq[String],
-                           expanded: Boolean,
+                           setExpanded: Option[Unique[Boolean]],
                            expandNumEntriesCallback: Option[Callback],
                            tableHeaders: Seq[VdomElement],
                            tableDatas: Seq[Seq[VdomElement]],
                            i18n: I18n) {
     def colSpan: Int = tableHeaders.size
   }
+  private case class State(expanded: Boolean)
 }
