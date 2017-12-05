@@ -14,12 +14,17 @@ object Table {
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
     .initialStateFromProps(props => State(expanded = props.setExpanded.map(_.get) getOrElse true))
-    .renderPS((_, props, state) =>
+    .renderPS(($, props, state) =>
       <.table(
         ^^.classes(
           Seq("table", "table-bordered", "table-hover", "table-condensed", "table-overflow-elipsis") ++ props.tableClasses),
         <.thead(
-          <.tr(^^.classes("info"), <.th(^.colSpan := props.colSpan, props.title)),
+          <.tr(
+            ^^.classes("info", "expand-on-click"),
+            <.th(^.colSpan := props.colSpan, props.title),
+            ^.onClick -->
+              $.modState(_.copy(expanded = !state.expanded))
+          ),
           <<.ifThen(state.expanded) {
             <.tr(props.tableHeaders.toTagMod)
           }
