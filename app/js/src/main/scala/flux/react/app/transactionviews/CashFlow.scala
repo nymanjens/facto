@@ -1,7 +1,7 @@
 package flux.react.app.transactionviews
 
 import common.Formatting._
-import common.I18n
+import common.{I18n, Unique}
 import common.LoggingUtils.LogExceptionsCallback
 import common.money.ExchangeRateManager
 import common.time.Clock
@@ -59,6 +59,7 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
                       tableClasses = Seq("table-cashflow"),
                       key = reservoir.code,
                       numEntriesStrategy = NumEntriesStrategy(start = 10, intermediateBeforeInf = Seq(30)),
+                      setExpanded = Unique(false),
                       additionalInput = reservoir,
                       tableHeaders = Seq(
                         <.th(i18n("facto.payed")),
