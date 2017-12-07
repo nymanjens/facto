@@ -53,13 +53,13 @@ object CashFlowEntriesStoreFactoryTest extends TestSuite {
       // get expectations
       val expectedEntries = Vector(
         RegularEntry(Seq(trans1), MoneyWithGeneralCurrency(200, Currency.default), balanceVerified = false),
-        BalanceCorrection(bc1),
+        BalanceCorrection(bc1, MoneyWithGeneralCurrency(200, Currency.default)),
         RegularEntry(
           Seq(trans2, trans3),
           MoneyWithGeneralCurrency(420, Currency.default),
           balanceVerified = false),
-        BalanceCorrection(bc2),
-        BalanceCorrection(bc3),
+        BalanceCorrection(bc2, MoneyWithGeneralCurrency(420, Currency.default)),
+        BalanceCorrection(bc3, MoneyWithGeneralCurrency(20, Currency.default)),
         RegularEntry(Seq(trans4), MoneyWithGeneralCurrency(-170, Currency.default), balanceVerified = true),
         RegularEntry(Seq(trans5), MoneyWithGeneralCurrency(-220, Currency.default), balanceVerified = false),
         RegularEntry(Seq(trans6), MoneyWithGeneralCurrency(-250, Currency.default), balanceVerified = true)
@@ -101,13 +101,13 @@ object CashFlowEntriesStoreFactoryTest extends TestSuite {
 
       val expectedEntries = Vector(
         RegularEntry(Seq(trans1), MoneyWithGeneralCurrency(200, Currency.default), balanceVerified = false),
-        BalanceCorrection(bc1),
+        BalanceCorrection(bc1, MoneyWithGeneralCurrency(200, Currency.default)),
         RegularEntry(
           Seq(trans2, trans3),
           MoneyWithGeneralCurrency(420, Currency.default),
           balanceVerified = false),
-        BalanceCorrection(bc2),
-        BalanceCorrection(bc3),
+        BalanceCorrection(bc2, MoneyWithGeneralCurrency(420, Currency.default)),
+        BalanceCorrection(bc3, MoneyWithGeneralCurrency(20, Currency.default)),
         RegularEntry(Seq(trans4), MoneyWithGeneralCurrency(-170, Currency.default), balanceVerified = true),
         RegularEntry(Seq(trans5), MoneyWithGeneralCurrency(-220, Currency.default), balanceVerified = false),
         RegularEntry(Seq(trans6), MoneyWithGeneralCurrency(-250, Currency.default), balanceVerified = true)
