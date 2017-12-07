@@ -24,7 +24,11 @@ object CashFlowEntry {
     }
   }
 
-  case class BalanceCorrection(balanceCheck: BalanceCheck) extends CashFlowEntry {
+  case class BalanceCorrection(balanceCheck: BalanceCheck, expectedAmount: MoneyWithGeneralCurrency)
+      extends CashFlowEntry {
     override def balance(implicit accountingConfig: Config) = balanceCheck.balance
+
+    def balanceIncrease(implicit accountingConfig: Config): MoneyWithGeneralCurrency =
+      balanceCheck.balance - expectedAmount
   }
 }

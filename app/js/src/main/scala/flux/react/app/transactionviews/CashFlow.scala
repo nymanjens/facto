@@ -101,14 +101,24 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
                               ),
                               <.td(uielements.TransactionGroupEditButton(entry.groupId))
                             )
-                          case CashFlowEntry.BalanceCorrection(balanceCorrection) =>
+                          case entry @ CashFlowEntry.BalanceCorrection(balanceCorrection, expectedAmount) =>
                             Seq[VdomElement](
                               <.td(formatDate(balanceCorrection.checkDate)),
                               <.td(
-                                ^.colSpan := 5,
+                                ^.colSpan := 4,
                                 ^.style := js.Dictionary("fontWeight" -> "bold"),
                                 i18n("facto.balance-correction") + ":"),
-                              <.td(uielements.MoneyWithCurrency(balanceCorrection.balance)),
+                              <.td(
+                                ^.style := js.Dictionary("fontWeight" -> "bold"),
+                                if (entry.balanceIncrease.cents > 0) "+" else "-",
+                                " ",
+                                uielements.MoneyWithCurrency(
+                                  if (entry.balanceIncrease.cents > 0) entry.balanceIncrease
+                                  else entry.balanceIncrease.negated)
+                              ),
+                              <.td(
+                                ^.style := js.Dictionary("fontWeight" -> "bold"),
+                                uielements.MoneyWithCurrency(balanceCorrection.balance)),
                               <.td(balanceCheckEditButton(balanceCorrection))
                             )
                       }

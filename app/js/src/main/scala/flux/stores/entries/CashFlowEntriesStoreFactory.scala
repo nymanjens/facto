@@ -102,7 +102,7 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
               rest,
               newBalance)
           case (bc: BalanceCheck) :: rest =>
-            BalanceCorrection(bc) #:: convertToEntries(rest, bc.balance)
+            BalanceCorrection(bc, expectedAmount = currentBalance) #:: convertToEntries(rest, bc.balance)
           case Nil =>
             Stream.empty
         }
@@ -125,7 +125,7 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
 
       // merge validating BalanceCorrections into RegularEntries (recursion does not lead to growing stack because of Stream)
       def mergeValidatingBCs(nextEntries: List[CashFlowEntry]): Stream[CashFlowEntry] = nextEntries match {
-        case (regular: RegularEntry) :: BalanceCorrection(bc) :: rest if regular.balance == bc.balance =>
+        case (regular: RegularEntry) :: BalanceCorrection(bc, _) :: rest if regular.balance == bc.balance =>
           mergeValidatingBCs(regular.copy(balanceVerified = true) :: rest)
         case entry :: rest =>
           entry #:: mergeValidatingBCs(rest)
