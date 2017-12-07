@@ -83,6 +83,7 @@ object Template {
                          categoryCodeTpl: Option[String] = None,
                          descriptionTpl: String = "",
                          flowInCents: Long = 0,
+                         detailDescription: String = "",
                          tags: Seq[String] = Seq()) {
     requireNonNull(
       beneficiaryCodeTpl,
@@ -116,7 +117,7 @@ object Template {
         category = categoryCodeTpl map fillInPlaceholders map accountingConfig.categories,
         description = fillInPlaceholders(descriptionTpl),
         flowInCents = flowInCents,
-        detailDescription = "",
+        detailDescription = detailDescription,
         tags = tags
       )
     }

@@ -149,8 +149,10 @@ object Parsable {
                            categoryCode: String @nullable,
                            description: String,
                            flowAsFloat: Double,
+                           detailDescription: String,
                            tags: java.util.List[String] @nullable) {
-      def this() = this(null, null, null, description = "", flowAsFloat = 0, tags = null)
+      def this() =
+        this(null, null, null, description = "", flowAsFloat = 0, detailDescription = "", tags = null)
 
       def parse(accounts: Map[String, ParsedAccount],
                 reservoirs: Map[String, ParsedMoneyReservoir],
@@ -169,6 +171,7 @@ object Parsable {
           categoryCodeTpl = Option(categoryCode) map validateCode(categories.keySet),
           descriptionTpl = description,
           flowInCents = (flowAsFloat.toDouble * 100).round,
+          detailDescription = detailDescription,
           tags = Option(tags).map(_.asScala.toList).getOrElse(Seq())
         )
       }
