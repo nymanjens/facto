@@ -16,7 +16,7 @@ object CollapseAllExpandAllButtons {
           ^^.classes("btn", "btn-default"),
           ^.role := "button",
           ^.onClick --> Callback(props.setExpandedCallback(Unique(false)).runNow()),
-          <.i(^^.classes("fa", "fa-minus", "fa-fw")),
+          <.i(^^.classes("fa", "fa-angle-double-right")),
           " ",
           props.i18n("facto.collapse-all")
         ),
@@ -25,7 +25,7 @@ object CollapseAllExpandAllButtons {
           ^^.classes("btn", "btn-default"),
           ^.role := "button",
           ^.onClick --> Callback(props.setExpandedCallback(Unique(true)).runNow()),
-          <.i(^^.classes("fa", "fa-plus", "fa-fw")),
+          <.i(^^.classes("fa", "fa-angle-double-down")),
           " ",
           props.i18n("facto.expand-all")
         )
