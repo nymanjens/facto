@@ -23,7 +23,14 @@ object Table {
             ^^.classes("info", "expand-on-click"),
             <.th(
               ^.colSpan := props.colSpan,
-              <.span(^.style := js.Dictionary("minWidth" -> "230px", "float" -> "left"), props.title),
+              <.span(
+                ^.style := js.Dictionary("minWidth" -> "242px", "float" -> "left"),
+                <.i(
+                  ^.className := s"fa fa-angle-${if (state.expanded) "down" else "right"}",
+                  ^.style := js.Dictionary("width" -> "12px")),
+                " ",
+                props.title
+              ),
               <<.ifThen(props.tableTitleExtra) { extra =>
                 <.span(^.style := js.Dictionary("fontWeight" -> "normal", "paddingLeft" -> "20px"), extra)
               }
