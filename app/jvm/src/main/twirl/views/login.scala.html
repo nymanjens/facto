@@ -1,5 +1,6 @@
 @(
-  loginForm: Form[(String,String)]
+  loginForm: Form[(String,String)],
+  returnTo: String
 )(
   implicit request: Request[AnyContent], messages: Messages, flash: Flash, env: play.api.Environment, webJarAssets: controllers.WebJarAssets
 )
@@ -15,7 +16,7 @@
             <h3 class="panel-title">@Messages("facto.please-sign-in")</h3>
           </div>
           <div class="panel-body">
-            @form(routes.Auth.authenticate()) {
+            @form(routes.Auth.authenticate(returnTo)) {
               @for(flashMessage <- flash.get("message")) {
                 <div class="alert alert-info" role="alert">
                     @flashMessage

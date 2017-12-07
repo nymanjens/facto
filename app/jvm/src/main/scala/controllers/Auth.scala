@@ -18,19 +18,19 @@ final class Auth @Inject()(implicit override val messagesApi: MessagesApi,
     with I18nSupport {
 
   // ********** actions ********** //
-  def login = Action { implicit request =>
-    Ok(views.html.login(Forms.loginForm))
+  def login(returnTo: String) = Action { implicit request =>
+    Ok(views.html.login(Forms.loginForm, returnTo))
   }
 
-  def authenticate = Action { implicit request =>
+  def authenticate(returnTo: String) = Action { implicit request =>
     Forms.loginForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(views.html.login(formWithErrors)),
-      user => Redirect(routes.Application.index).withSession("username" -> user._1)
+      formWithErrors => BadRequest(views.html.login(formWithErrors, returnTo)),
+      user => Redirect(returnTo).withSession("username" -> user._1)
     )
   }
 
   def logout = Action { implicit request =>
-    Redirect(routes.Auth.login).withNewSession.flashing(
+    Redirect(routes.Auth.login("/")).withNewSession.flashing(
       "message" -> Messages("facto.you-are-now-logged-out")
     )
   }

@@ -28,7 +28,7 @@ abstract class AuthenticatedAction[A](bodyParser: BodyParser[A])(implicit entity
   private def username(request: RequestHeader): Option[String] = request.session.get("username")
 
   private def onUnauthorized(request: RequestHeader): Result =
-    Results.Redirect(controllers.routes.Auth.login)
+    Results.Redirect(controllers.routes.Auth.login(request.uri))
 }
 
 object AuthenticatedAction {

@@ -13,8 +13,8 @@ GET  /externalapi/acc/trans/addfromtpl/:tplCode/:appSecret/  controllers.Externa
 GET  /externalapi/acc/money/xchgmeasurement/:date/:currency/:ratio/:appSecret/  controllers.ExternalApi.addExchangeRateMeasurement(date, currency, ratio: Double, appSecret)
 
 # Auth
-GET  /login/                           controllers.Auth.login
-POST /login/                           controllers.Auth.authenticate
+GET  /login/                           controllers.Auth.login(returnTo ?= "/")
+POST /login/                           controllers.Auth.authenticate(returnTo ?= "/")
 GET  /logout/                          controllers.Auth.logout
 
 # User
