@@ -1,7 +1,7 @@
 package flux.react.app.transactionviews
 
 import common.Formatting._
-import common.I18n
+import common.{I18n, Unique}
 import common.money.{ExchangeRateManager, ReferenceMoney}
 import common.time.Clock
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
@@ -28,11 +28,15 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
-    .renderP(
-      (_, props) => {
+    .initialState(State(setExpanded = Unique(true)))
+    .renderPS(
+      ($, props, state) => {
         implicit val router = props.router
         <.span(
-          uielements.PageHeader(router.currentPage),
+          uielements.PageHeader.withExtension(router.currentPage) {
+            uielements.CollapseAllExpandAllButtons(setExpanded =>
+              $.modState(_.copy(setExpanded = setExpanded)))
+          },
           uielements.Panel(i18n("facto.all-combinations")) {
             {
               for {
@@ -48,6 +52,7 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
                   key = s"${account1.code}_${account2.code}",
                   numEntriesStrategy =
                     NumEntriesStrategy(start = startNumEntries, intermediateBeforeInf = Seq(30)),
+                  setExpanded = state.setExpanded,
                   additionalInput = accountPair,
                   latestEntryToTableTitleExtra = latestEntry => latestEntry.debt.toString,
                   tableHeaders = Seq(
@@ -109,4 +114,5 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
 
   // **************** Private inner types ****************//
   private case class Props(router: RouterContext)
+  private case class State(setExpanded: Unique[Boolean])
 }

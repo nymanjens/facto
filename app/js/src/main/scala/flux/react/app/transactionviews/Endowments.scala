@@ -1,7 +1,7 @@
 package flux.react.app.transactionviews
 
 import common.Formatting._
-import common.I18n
+import common.{I18n, Unique}
 import common.money.ExchangeRateManager
 import common.time.Clock
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
@@ -28,11 +28,15 @@ final class Endowments(implicit entriesStoreFactory: EndowmentEntriesStoreFactor
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
-    .renderP(
-      (_, props) => {
+    .initialState(State(setExpanded = Unique(true)))
+    .renderPS(
+      ($, props, state) => {
         implicit val router = props.router
         <.span(
-          uielements.PageHeader(router.currentPage),
+          uielements.PageHeader.withExtension(router.currentPage) {
+            uielements.CollapseAllExpandAllButtons(setExpanded =>
+              $.modState(_.copy(setExpanded = setExpanded)))
+          },
           uielements.Panel(i18n("facto.all-accounts")) {
             {
               for (account <- accountingConfig.personallySortedAccounts) yield {
@@ -41,6 +45,7 @@ final class Endowments(implicit entriesStoreFactory: EndowmentEntriesStoreFactor
                   tableClasses = Seq("table-endowments"),
                   key = account.code,
                   numEntriesStrategy = NumEntriesStrategy(start = 30, intermediateBeforeInf = Seq(100)),
+                  setExpanded = state.setExpanded,
                   additionalInput = account,
                   tableHeaders = Seq(
                     <.th(i18n("facto.payed")),
@@ -79,4 +84,5 @@ final class Endowments(implicit entriesStoreFactory: EndowmentEntriesStoreFactor
 
   // **************** Private inner types ****************//
   private case class Props(router: RouterContext)
+  private case class State(setExpanded: Unique[Boolean])
 }
