@@ -366,12 +366,12 @@ final class TransactionGroupForm(implicit i18n: I18n,
       }
 
       def submitValid(datas: Seq[transactionPanel.Data], state: State) = {
-        def transactionsWithoutIdProvider(group: TransactionGroup) = {
+        def transactionsWithoutIdProvider(group: TransactionGroup, issuerId: Option[Long] = None) = {
           for (data <- datas)
             yield
               Transaction(
                 transactionGroupId = group.id,
-                issuerId = user.id,
+                issuerId = issuerId getOrElse user.id,
                 beneficiaryAccountCode = data.beneficiaryAccount.code,
                 moneyReservoirCode = data.moneyReservoir.code,
                 categoryCode = data.category.code,
@@ -387,11 +387,12 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
         val action = props.operationMeta match {
           case OperationMeta.AddNew =>
-            Action.AddTransactionGroup(transactionsWithoutIdProvider = transactionsWithoutIdProvider)
+            Action.AddTransactionGroup(transactionsWithoutIdProvider = transactionsWithoutIdProvider(_))
           case OperationMeta.Edit(group) =>
             Action.UpdateTransactionGroup(
               transactionGroupWithId = group,
-              transactionsWithoutId = transactionsWithoutIdProvider(group)
+              transactionsWithoutId =
+                transactionsWithoutIdProvider(group, Some(group.transactions.head.issuerId))
             )
         }
 
