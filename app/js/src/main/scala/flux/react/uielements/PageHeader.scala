@@ -14,6 +14,7 @@ object PageHeader {
         <.i(^.className := props.page.iconClass),
         " ",
         props.page.title(props.i18n),
+        " ",
         children
       )
     }

@@ -35,12 +35,19 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
-    .initialState(State(includeUnrelatedReservoirs = false, includeHiddenReservoirs = false))
+    .initialState(
+      State(
+        includeUnrelatedReservoirs = false,
+        includeHiddenReservoirs = false,
+        setExpanded = Unique(false)))
     .renderPS(
       ($, props, state) => {
         implicit val router = props.router
         <.span(
-          uielements.PageHeader(router.currentPage), {
+          uielements.PageHeader.withExtension(router.currentPage) {
+            uielements.CollapseAllExpandAllButtons(setExpanded =>
+              $.modState(_.copy(setExpanded = setExpanded)))
+          }, {
             for {
               account <- accountingConfig.personallySortedAccounts
               if state.includeUnrelatedReservoirs || account.isMineOrCommon
@@ -59,7 +66,7 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
                       tableClasses = Seq("table-cashflow"),
                       key = reservoir.code,
                       numEntriesStrategy = NumEntriesStrategy(start = 10, intermediateBeforeInf = Seq(30)),
-                      setExpanded = Unique(false),
+                      setExpanded = state.setExpanded,
                       additionalInput = reservoir,
                       latestEntryToTableTitleExtra =
                         latestEntry => s"${i18n("facto.balance")}: ${latestEntry.balance}",
@@ -182,5 +189,7 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
 
   // **************** Private inner types ****************//
   private case class Props(router: RouterContext)
-  private case class State(includeUnrelatedReservoirs: Boolean, includeHiddenReservoirs: Boolean)
+  private case class State(includeUnrelatedReservoirs: Boolean,
+                           includeHiddenReservoirs: Boolean,
+                           setExpanded: Unique[Boolean])
 }

@@ -140,3 +140,5 @@ facto.exchange-rate-gains=Winst
 facto.example-query=drank b:gemeensch c:plezier a:-2.1 -t:vakantie-2017
 facto.empty=Leeg
 facto.n-entries={0} inboekingen
+facto.collapse-all=Allen inklappen
+facto.expand-all=Allen uitklappen
