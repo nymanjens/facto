@@ -7,6 +7,7 @@ case class User(loginName: String,
                 passwordHash: String,
                 name: String,
                 databaseEncryptionKey: String,
+                expandCashFlowTablesByDefault: Boolean,
                 idOption: Option[Long] = None)
     extends Entity {
 

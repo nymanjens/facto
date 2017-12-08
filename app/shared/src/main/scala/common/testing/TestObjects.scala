@@ -177,6 +177,7 @@ object TestObjects {
     // = sha512("pw")
     name = "Test User A",
     databaseEncryptionKey = "QLvqUFDMmHek6o7yQhl79OA5Havq6u",
+    expandCashFlowTablesByDefault = true,
     idOption = Option(918273)
   )
   val testUserB: User = User(
@@ -186,6 +187,7 @@ object TestObjects {
     // = sha512("pw")
     name = "Test User B",
     databaseEncryptionKey = "DhzRU47mYWqf0PeXtZxEhPpyTVk8Gh",
+    expandCashFlowTablesByDefault = true,
     idOption = Option(918274)
   )
   def testUser: User = testUserA

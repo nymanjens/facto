@@ -41,6 +41,11 @@ object Converters {
     override def toScala(value: js.Any) = value.asInstanceOf[String]
   }
 
+  implicit object BooleanConverter extends Scala2Js.Converter[Boolean] {
+    override def toJs(bool: Boolean) = bool
+    override def toScala(value: js.Any) = value.asInstanceOf[Boolean]
+  }
+
   implicit object IntConverter extends Scala2Js.Converter[Int] {
     override def toJs(int: Int) = int
     override def toScala(value: js.Any) = value.asInstanceOf[Int]
@@ -123,7 +128,9 @@ object Converters {
         Scala2Js.Key.toJsPair(Keys.User.loginName -> entity.loginName),
         Scala2Js.Key.toJsPair(Keys.User.passwordHash -> "<redacted>"),
         Scala2Js.Key.toJsPair(Keys.User.name -> entity.name),
-        Scala2Js.Key.toJsPair(Keys.User.databaseEncryptionKey -> entity.databaseEncryptionKey)
+        Scala2Js.Key.toJsPair(Keys.User.databaseEncryptionKey -> entity.databaseEncryptionKey),
+        Scala2Js.Key.toJsPair(
+          Keys.User.expandCashFlowTablesByDefault -> entity.expandCashFlowTablesByDefault)
       )
     }
     override def toScalaWithoutId(dict: js.Dictionary[js.Any]) = {
@@ -134,7 +141,8 @@ object Converters {
         loginName = getRequired(Keys.User.loginName),
         passwordHash = getRequired(Keys.User.passwordHash),
         name = getRequired(Keys.User.name),
-        databaseEncryptionKey = getRequired(Keys.User.databaseEncryptionKey)
+        databaseEncryptionKey = getRequired(Keys.User.databaseEncryptionKey),
+        expandCashFlowTablesByDefault = getRequired(Keys.User.expandCashFlowTablesByDefault)
       )
     }
   }

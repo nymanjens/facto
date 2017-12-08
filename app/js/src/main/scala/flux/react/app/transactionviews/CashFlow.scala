@@ -39,7 +39,7 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
       State(
         includeUnrelatedReservoirs = false,
         includeHiddenReservoirs = false,
-        setExpanded = Unique(false)))
+        setExpanded = Unique(user.expandCashFlowTablesByDefault)))
     .renderPS(
       ($, props, state) => {
         implicit val router = props.router

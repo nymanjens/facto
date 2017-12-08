@@ -45,7 +45,9 @@ object SlickUserManager {
       loginName = loginName,
       passwordHash = SlickUserManager.hash(password),
       name = name,
-      databaseEncryptionKey = Random.alphanumeric.take(100).mkString(""))
+      databaseEncryptionKey = Random.alphanumeric.take(100).mkString(""),
+      expandCashFlowTablesByDefault = true
+    )
 
   def copyUserWithPassword(user: User, password: String): User = {
     user.copy(passwordHash = hash(password))
@@ -83,7 +85,10 @@ object SlickUserManager {
 
     def databaseEncryptionKey = column[String]("databaseEncryptionKey")
 
+    def expandCashFlowTablesByDefault = column[Boolean]("expandCashFlowTablesByDefault")
+
     override def * =
-      (loginName, passwordHash, name, databaseEncryptionKey, id.?) <> (User.tupled, User.unapply)
+      (loginName, passwordHash, name, databaseEncryptionKey, expandCashFlowTablesByDefault, id.?) <>
+        (User.tupled, User.unapply)
   }
 }

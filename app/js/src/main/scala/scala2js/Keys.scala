@@ -18,6 +18,7 @@ object Keys {
     val passwordHash = Scala2Js.Key[String, E]("passwordHash")
     val name = Scala2Js.Key[String, E]("name")
     val databaseEncryptionKey = Scala2Js.Key[String, E]("databaseEncryptionKey")
+    val expandCashFlowTablesByDefault = Scala2Js.Key[Boolean, E]("expandCashFlowTablesByDefault")
   }
 
   object Transaction {
