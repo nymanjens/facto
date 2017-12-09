@@ -54,6 +54,7 @@ object Settings {
     val cryptoJs = "org.webjars" % "cryptojs" % "3.1.2"
     val metisMenu = "org.webjars" % "metisMenu" % "1.1.3" // Used by Start Bootstrap
     val mousetrap = "org.webjars.npm" % "mousetrap" % "1.6.1"
+    val reactAutosuggest = "org.webjars.npm" % "react-autosuggest" % "9.3.2"
     val react = "org.webjars.bower" % "react" % "15.3.2"
     val webjarsPlay = "org.webjars" %% "webjars-play" % "2.6.0-M1"
   }
@@ -129,6 +130,7 @@ object Settings {
       webjarDeps.mousetrap / "plugins/global-bind/mousetrap-global-bind.min.js",
       webjarDeps.reactTagInput / files.reactDnd dependsOn files.reactDom,
       webjarDeps.reactTagInput / "ReactTags.min.js" dependsOn files.reactDnd,
+      webjarDeps.reactAutosuggest / "dist/standalone/autosuggest.min.js" dependsOn files.reactDom,
       webjarDeps.lokiJs / "lokijs.min.js",
       webjarDeps.lokiJs / "loki-indexed-adapter.min.js",
       webjarDeps.cryptoJs / "rollups/rc4.js"
