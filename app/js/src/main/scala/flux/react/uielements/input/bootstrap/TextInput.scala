@@ -16,14 +16,14 @@ object TextInput {
     inputRenderer = (classes: Seq[String],
                      name: String,
                      valueString: String,
-                     onChange: ReactEventFromInput => Callback,
+                     onChange: String => Callback,
                      extraProps: ExtraProps) => {
       <.input(
         ^.tpe := "text",
         ^^.classes(classes),
         ^.name := name,
         ^.value := valueString,
-        ^.onChange ==> onChange,
+        ^.onChange ==> ((event: ReactEventFromInput) => onChange(event.target.value)),
         ^.autoFocus := extraProps.focusOnMount,
         ^.disabled := extraProps.disabled
       )

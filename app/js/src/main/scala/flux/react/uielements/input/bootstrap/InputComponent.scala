@@ -33,8 +33,7 @@ private[bootstrap] object InputComponent {
       })
       .renderPS((context, props, state) =>
         logExceptions {
-          def onChange(e: ReactEventFromInput): Callback = LogExceptionsCallback {
-            val newString = e.target.value
+          def onChange(newString: String): Callback = LogExceptionsCallback {
             val newValue = ValueTransformer.stringToValueOrDefault(newString, props)
             val oldValue = ValueTransformer.stringToValueOrDefault(state.valueString, props)
             if (oldValue != newValue) {
@@ -114,7 +113,7 @@ private[bootstrap] object InputComponent {
     def renderInput(classes: Seq[String],
                     name: String,
                     valueString: String,
-                    onChange: ReactEventFromInput => Callback,
+                    onChange: String => Callback,
                     extraProps: ExtraProps): VdomNode
   }
 

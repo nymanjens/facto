@@ -25,7 +25,7 @@ object MoneyInput {
     inputRenderer = (classes: Seq[String],
                      name: String,
                      valueString: String,
-                     onChange: ReactEventFromInput => Callback,
+                     onChange: String => Callback,
                      extraProps: ExtraProps) => {
       def referenceMoney(currency: Currency, date: LocalDateTime) = {
         val datedMoney = {
@@ -48,7 +48,7 @@ object MoneyInput {
           ^.name := name,
           ^.value := valueString,
           ^.disabled := extraProps.forceValue.isDefined,
-          ^.onChange ==> onChange
+          ^.onChange ==> ((event: ReactEventFromInput) => onChange(event.target.value))
         ),
         ^^.ifThen(extraProps.currency.isForeign && extraProps.dateForCurrencyConversion.isDefined) {
           <.span(

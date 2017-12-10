@@ -16,14 +16,14 @@ object TextAreaInput {
     inputRenderer = (classes: Seq[String],
                      name: String,
                      valueString: String,
-                     onChange: ReactEventFromInput => Callback,
+                     onChange: String => Callback,
                      extraProps: ExtraProps) => {
       <.textarea(
         ^^.classes(classes),
         ^.name := name,
         ^.value := valueString,
         ^.rows := 2,
-        ^.onChange ==> onChange
+        ^.onChange ==> ((event: ReactEventFromInput) => onChange(event.target.value))
       )
     }
   )

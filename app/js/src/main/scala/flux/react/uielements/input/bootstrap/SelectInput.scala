@@ -20,13 +20,13 @@ class SelectInput[Value] private (implicit valueTag: ClassTag[Value]) {
     inputRenderer = (classes: Seq[String],
                      name: String,
                      valueString: String,
-                     onChange: ReactEventFromInput => Callback,
+                     onChange: String => Callback,
                      extraProps: ExtraProps) => {
       <.select(
         ^^.classes(classes),
         ^.name := name,
         ^.value := valueString,
-        ^.onChange ==> onChange, {
+        ^.onChange ==> ((event: ReactEventFromInput) => onChange(event.target.value)), {
           for ((optionId, option) <- extraProps.idToOptionMap) yield {
             <.option(
               ^.value := optionId,
