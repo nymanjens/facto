@@ -22,13 +22,15 @@ object ReactAutosuggest {
     component(
       Props(
         suggestions = suggestions.toJSArray,
-        onSuggestionsFetchRequested = onSuggestionsFetchRequested,
+        onSuggestionsFetchRequested = params =>
+          onSuggestionsFetchRequested(params.value.asInstanceOf[String]),
         onSuggestionsClearRequested = onSuggestionsClearRequested,
         getSuggestionValue = s => s,
         renderSuggestion = renderSuggestion,
         inputProps = js.Dynamic.literal(
           value = inputProps.value,
-          onChange = (event: js.Any, params: js.Dynamic) => inputProps.onChange(params.newValue.toString)),
+          onChange = (event: js.Any, params: js.Dynamic) =>
+            inputProps.onChange(params.newValue.asInstanceOf[String])),
         theme = js.Dynamic.literal(
           container = theme.container,
           input = theme.input,
@@ -52,7 +54,7 @@ object ReactAutosuggest {
 
   // **************** Private inner types ****************//
   private case class Props(suggestions: js.Array[String],
-                           onSuggestionsFetchRequested: js.Function1[String, Unit],
+                           onSuggestionsFetchRequested: js.Function1[js.Dynamic, Unit],
                            onSuggestionsClearRequested: js.Function0[Unit],
                            getSuggestionValue: js.Function1[String, String],
                            renderSuggestion: js.Function1[String, VdomElement],
