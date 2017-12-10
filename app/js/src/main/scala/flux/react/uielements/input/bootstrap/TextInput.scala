@@ -53,7 +53,7 @@ object TextInput {
       inputClasses = inputClasses,
       listener = listener,
       valueTransformer = ValueTransformer.nullInstance,
-      extra = ExtraProps(focusOnMount = focusOnMount, disabled: Boolean)
+      extra = ExtraProps(focusOnMount = focusOnMount, disabled = disabled)
     )
     ref.mutableRef.component(props)
   }
