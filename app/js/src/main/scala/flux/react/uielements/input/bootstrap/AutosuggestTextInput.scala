@@ -13,6 +13,8 @@ import jsfacades.ReactAutosuggest.{InputProps, Theme}
 import scala.collection.immutable.Seq
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 
+import scala.scalajs.js
+
 object AutosuggestTextInput {
 
   private val component = InputComponent.create[Value, ExtraProps](
@@ -26,10 +28,11 @@ object AutosuggestTextInput {
         suggestions = extraProps.suggestions,
         onSuggestionsFetchRequested = extraProps.onSuggestionsFetchRequested,
         onSuggestionsClearRequested = extraProps.onSuggestionsClearRequested,
-        renderSuggestion = suggestion => <.a(suggestion),
+        renderSuggestion = suggestion => js.Dynamic.global.React.createElement("a", null, suggestion),
         inputProps = ReactAutosuggest.InputProps(
           value = valueString,
-          onChange = newString => LogExceptionsCallback(onChange(newString))),
+          onChange = newString => onChange(newString).runNow()
+        ),
         theme = ReactAutosuggest.Theme(
           container = "autosuggest",
           input = "form-control",

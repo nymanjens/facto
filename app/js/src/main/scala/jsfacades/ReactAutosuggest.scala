@@ -15,7 +15,7 @@ object ReactAutosuggest {
   def apply(suggestions: Seq[String],
             onSuggestionsFetchRequested: String => Unit,
             onSuggestionsClearRequested: () => Unit,
-            renderSuggestion: String => VdomElement,
+            renderSuggestion: String => js.Any,
             inputProps: InputProps,
             theme: Theme) = {
     val component = JsComponent[js.Object, Children.None, Null](js.Dynamic.global.Autosuggest)
@@ -57,7 +57,7 @@ object ReactAutosuggest {
                            onSuggestionsFetchRequested: js.Function1[js.Dynamic, Unit],
                            onSuggestionsClearRequested: js.Function0[Unit],
                            getSuggestionValue: js.Function1[String, String],
-                           renderSuggestion: js.Function1[String, VdomElement],
+                           renderSuggestion: js.Function1[String, js.Any],
                            inputProps: js.Object,
                            theme: js.Object) {
     def toJsObject: js.Object =
