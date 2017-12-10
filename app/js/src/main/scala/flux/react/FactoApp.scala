@@ -13,7 +13,7 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 object FactoApp extends js.JSApp {
 
   @JSExport
-  def main(): Unit = async {
+  override def main(): Unit = async {
     println("  Application starting")
     // send log messages also to the server
     //log.enableServerLogging("/logging")

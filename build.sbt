@@ -34,7 +34,7 @@ lazy val client: Project = (project in file("app/js"))
     // yes, we want to package JS dependencies
     skip in packageJSDependencies := false,
     // use Scala.js provided launcher code to start the client app
-    scalaJSUseMainModuleInitializer := true,
+    scalaJSUseMainModuleInitializer := false,
     scalaJSUseMainModuleInitializer in Test := false,
     // use uTest framework for tests
     testFrameworks += new TestFramework("utest.runner.Framework")

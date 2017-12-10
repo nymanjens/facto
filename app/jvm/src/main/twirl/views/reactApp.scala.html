@@ -11,11 +11,10 @@
       projectName = "client",
       assets = path => routes.Assets.versioned(path).toString,
       resourceExists = name => getClass.getResource(s"/public/$name") != null)
-  @* Launches the main method of the JSApp *@
-  @scalajs.html.launcher(
-      projectName = "client",
-      assets = path => routes.Assets.versioned(path).toString,
-      resourceExists = name => getClass.getResource(s"/public/$name") != null)
+
+  <script>
+    FactoApp.main()
+  </script>
 }
 
 @Base("Facto", extrascript = extrascript) {
