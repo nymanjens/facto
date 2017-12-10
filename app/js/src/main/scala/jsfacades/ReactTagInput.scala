@@ -32,7 +32,7 @@ object ReactTagInput {
         delimiters = delimiters.toJSArray,
         minQueryLength = minQueryLength,
         classNames = classNames.toJSDictionary,
-        autoFocus: Boolean
+        autoFocus
       ).toJsObject)
   }
 
