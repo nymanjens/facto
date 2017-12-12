@@ -2,7 +2,7 @@ package flux.stores
 
 import java.time.Instant
 
-import common.I18n
+import common.{I18n, Unique}
 import common.LoggingUtils.logExceptions
 import common.time.{Clock, LocalDateTime}
 import common.time.JavaTimeImplicits._
@@ -24,15 +24,13 @@ final class GlobalMessagesStore(implicit i18n: I18n,
                                 dispatcher: Dispatcher) {
   dispatcher.registerPartialSync(dispatcherListener)
 
-  private var _state: Option[Message] = None
+  private var _state: Option[Unique[Message]] = None
 
-  /** Gets incremented whenever _state is updated. */
-  private var stateChangedCounter: Long = 0
   private var stateUpdateListeners: Seq[GlobalMessagesStore.Listener] = Seq()
   private var isCallingListeners: Boolean = false
 
   // **************** Public API ****************//
-  def state: Option[Message] = _state
+  def state: Option[Message] = _state.map(_.get)
 
   def register(listener: GlobalMessagesStore.Listener): Unit = {
     require(!isCallingListeners)
@@ -57,9 +55,9 @@ final class GlobalMessagesStore(implicit i18n: I18n,
           setState(Some(Message(string = message, isWorking = false)))
 
           // Clear this message after some delay
-          val counterWhenCreatedMessage = stateChangedCounter
+          val uniqueStateWhenCreatedMessage = _state
           js.timers.setTimeout(2.minutes)(logExceptions {
-            if (stateChangedCounter == counterWhenCreatedMessage) {
+            if (_state == uniqueStateWhenCreatedMessage) {
               // state has remained unchanged since start of timer
               setState(None)
             }
@@ -103,8 +101,7 @@ final class GlobalMessagesStore(implicit i18n: I18n,
 
   // **************** Private state helper methods ****************//
   private def setState(state: Option[Message]): Unit = {
-    _state = state
-    stateChangedCounter += 1
+    _state = state.map(Unique.apply)
     invokeListeners()
   }
 
