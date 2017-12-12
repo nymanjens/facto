@@ -24,7 +24,7 @@ object Table {
             <.th(
               ^.colSpan := props.colSpan,
               <.span(
-                ^.style := js.Dictionary("minWidth" -> "242px", "float" -> "left"),
+                ^.style := js.Dictionary("minWidth" -> "246px", "float" -> "left"),
                 <.i(
                   ^.className := s"fa fa-angle-${if (state.expanded) "down" else "right"}",
                   ^.style := js.Dictionary("width" -> "12px")),
