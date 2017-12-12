@@ -28,6 +28,7 @@ private[transactionviews] final class SummaryTable(
     implicit summaryYearsStoreFactory: SummaryYearsStoreFactory,
     summaryForYearStoreFactory: SummaryForYearStoreFactory,
     summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
+    cashFlowEntriesStoreFactory: CashFlowEntriesStoreFactory,
     entityAccess: EntityAccess,
     user: User,
     clock: Clock,
@@ -79,7 +80,8 @@ private[transactionviews] final class SummaryTable(
 
   @visibleForTesting private[transactionviews] case class AllYearsData(
       allTransactionsYearRange: YearRange,
-      private val yearsToData: ListMap[Int, AllYearsData.YearData]) {
+      private val yearsToData: ListMap[Int, AllYearsData.YearData],
+      netWorth: ReferenceMoney) {
 
     /**
       * Returns the categories of the transactions in the order configured for this account.
@@ -151,13 +153,17 @@ private[transactionviews] final class SummaryTable(
   }
   @visibleForTesting private[transactionviews] object AllYearsData {
     val empty: AllYearsData =
-      AllYearsData(allTransactionsYearRange = YearRange.empty, yearsToData = ListMap())
+      AllYearsData(
+        allTransactionsYearRange = YearRange.empty,
+        yearsToData = ListMap(),
+        netWorth = ReferenceMoney(0))
 
     def builder(allTransactionsYearRange: YearRange): Builder = new Builder(allTransactionsYearRange)
 
     case class YearData(summary: SummaryForYear, exchangeRateGains: GainsForYear)
 
     final class Builder(allTransactionsYearRange: YearRange) {
+      var netWorth: ReferenceMoney = ReferenceMoney(0)
       val yearsToData: mutable.LinkedHashMap[Int, AllYearsData.YearData] = mutable.LinkedHashMap()
 
       def addYear(year: Int, summary: SummaryForYear, exchangeRateGains: GainsForYear): Builder = {
@@ -165,7 +171,13 @@ private[transactionviews] final class SummaryTable(
         this
       }
 
-      def result: AllYearsData = AllYearsData(allTransactionsYearRange, ListMap(yearsToData.toSeq: _*))
+      def addToNetWorth(money: ReferenceMoney): Builder = {
+        netWorth = netWorth + money
+        this
+      }
+
+      def result: AllYearsData =
+        AllYearsData(allTransactionsYearRange, ListMap(yearsToData.toSeq: _*), netWorth)
     }
   }
 
@@ -393,6 +405,15 @@ private[transactionviews] final class SummaryTable(
 
           dataBuilder.addYear(year, summaryForYearStore.state, exchangeRateGainsStore.state)
           usedStores ++= Seq(summaryForYearStore, exchangeRateGainsStore)
+        }
+        for (reservoir <- accountingConfig.visibleReservoirs) {
+          if (reservoir.owner == props.account) {
+            val store = cashFlowEntriesStoreFactory.get(moneyReservoir = reservoir, maxNumEntries = 10)
+
+            dataBuilder.addToNetWorth(store.state.entries.lastOption
+              .map(_.balance.withDate(clock.now).exchangedForReferenceCurrency) getOrElse ReferenceMoney(0))
+            usedStores += store
+          }
         }
         (dataBuilder.result, usedStores.toSet)
       }
