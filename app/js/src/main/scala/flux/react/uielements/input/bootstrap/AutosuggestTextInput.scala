@@ -31,7 +31,9 @@ object AutosuggestTextInput {
         renderSuggestion = suggestion => js.Dynamic.global.React.createElement("a", null, suggestion),
         inputProps = ReactAutosuggest.InputProps(
           value = valueString,
-          onChange = newString => onChange(newString).runNow()
+          onChange = newString => onChange(newString).runNow(),
+          name = name,
+          classes = classes
         ),
         theme = ReactAutosuggest.Theme(
           container = "autosuggest",

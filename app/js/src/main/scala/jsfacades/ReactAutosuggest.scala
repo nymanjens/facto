@@ -1,8 +1,6 @@
 package jsfacades
 
-import japgolly.scalajs.react.vdom.VdomElement
 import japgolly.scalajs.react.{Children, JsComponent}
-import org.scalajs.dom.ext.KeyCode
 
 import scala.collection.immutable.Seq
 import scala.scalajs.js
@@ -30,7 +28,10 @@ object ReactAutosuggest {
         inputProps = js.Dynamic.literal(
           value = inputProps.value,
           onChange = (event: js.Any, params: js.Dynamic) =>
-            inputProps.onChange(params.newValue.asInstanceOf[String])),
+            inputProps.onChange(params.newValue.asInstanceOf[String]),
+          name = inputProps.name,
+          className = inputProps.classes.mkString(" ")
+        ),
         theme = js.Dynamic.literal(
           container = theme.container,
           input = theme.input,
@@ -43,7 +44,7 @@ object ReactAutosuggest {
   }
 
   // **************** Public inner types ****************//
-  case class InputProps(value: String, onChange: String => Unit)
+  case class InputProps(value: String, onChange: String => Unit, name: String, classes: Seq[String])
 
   case class Theme(container: String,
                    input: String,
