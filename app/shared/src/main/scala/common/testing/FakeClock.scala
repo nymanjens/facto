@@ -1,5 +1,6 @@
 package common.testing
 
+import java.time.Instant
 import java.time.Month.JANUARY
 
 import common.time.{Clock, LocalDateTime}
@@ -9,6 +10,7 @@ final class FakeClock extends Clock {
   @volatile private var currentTime: LocalDateTime = FakeClock.defaultTime
 
   override def now = currentTime
+  override def nowInstant = ???
 
   def setTime(time: LocalDateTime) = {
     currentTime = time

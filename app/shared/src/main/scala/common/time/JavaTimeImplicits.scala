@@ -27,4 +27,9 @@ object JavaTimeImplicits {
     override def compare(x: LocalDate, y: LocalDate): Int = x compareTo y
   }
   implicit class LocalDateWrapper(thisDate: LocalDate) extends BaseWrapper[LocalDate](thisDate)
+
+  implicit object DurationOrdering extends Ordering[Duration] {
+    override def compare(x: Duration, y: Duration): Int = x compareTo y
+  }
+  implicit class DurationWrapper(thisDuration: Duration) extends BaseWrapper[Duration](thisDuration)
 }

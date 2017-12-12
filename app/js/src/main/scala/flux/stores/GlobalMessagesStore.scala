@@ -1,8 +1,11 @@
 package flux.stores
 
+import java.time.Instant
+
 import common.I18n
 import common.LoggingUtils.logExceptions
-import common.time.Clock
+import common.time.{Clock, LocalDateTime}
+import common.time.JavaTimeImplicits._
 import flux.action.Action._
 import flux.action.{Action, Dispatcher}
 import flux.stores.GlobalMessagesStore.Message
@@ -63,6 +66,11 @@ final class GlobalMessagesStore(implicit i18n: I18n,
           })
         case None =>
       }
+
+    case Action.SetPageLoadingState( /* isLoading = */ false) =>
+      if (state.isDefined && state.get.age > java.time.Duration.ofSeconds(3)) {
+        setState(None)
+      }
   }
 
   private def getCompletionMessage: PartialFunction[Action, String] = {
@@ -109,7 +117,15 @@ final class GlobalMessagesStore(implicit i18n: I18n,
 }
 
 object GlobalMessagesStore {
-  case class Message(string: String, isWorking: Boolean)
+  case class Message private (string: String, isWorking: Boolean, private val createTime: Instant) {
+    private[GlobalMessagesStore] def age(implicit clock: Clock): java.time.Duration =
+      java.time.Duration.between(createTime, clock.nowInstant)
+  }
+
+  private[GlobalMessagesStore] object Message {
+    def apply(string: String, isWorking: Boolean)(implicit clock: Clock): Message =
+      Message(string = string, isWorking = isWorking, createTime = clock.nowInstant)
+  }
 
   trait Listener {
     def onStateUpdate(): Unit
