@@ -15,13 +15,17 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom.html_<^._
+import jsfacades.LokiJs
+import jsfacades.LokiJsImplicits._
+import models.EntityAccess
+import models.access.RemoteDatabaseProxy
 import models.accounting.Transaction
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
-import models.money._
-import models.EntityAccess
 import models.user.User
 
 import scala.collection.immutable.Seq
+import scala2js.Converters._
+import scala2js.Keys
 
 private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                                                            accountingConfig: Config,
@@ -29,6 +33,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                                                            entityAccess: EntityAccess,
                                                            exchangeRateManager: ExchangeRateManager,
                                                            clock: Clock,
+                                                           remoteDatabaseProxy: RemoteDatabaseProxy,
                                                            tagsStoreFactory: TagsStoreFactory) {
 
   private val anythingChangedQueue = SinglePendingTaskQueue.create()
@@ -167,7 +172,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   private type ThisComponentU = MountedImpure[Props, State, Backend]
   private case class State(transactionDate: LocalDateTime,
                            beneficiaryAccount: Account,
-                           moneyReservoir: MoneyReservoir)
+                           moneyReservoir: MoneyReservoir,
+                           descriptionSuggestions: Seq[String] = Seq())
 
   private case class Props(title: String,
                            defaultValues: Transaction.Partial,
@@ -323,9 +329,9 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ref = descriptionRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.description),
           startWithDefault = props.defaultValues.isEmpty,
-          delegateRefFactory = bootstrap.TextInput.ref _
+          delegateRefFactory = bootstrap.AutosuggestTextInput.ref _
         ) { extraProps =>
-          bootstrap.TextInput(
+          bootstrap.AutosuggestTextInput(
             ref = extraProps.ref,
             name = "description",
             label = i18n("facto.description"),
@@ -333,6 +339,11 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             required = true,
             showErrorMessage = props.showErrorMessages,
             inputClasses = extraProps.inputClasses,
+            suggestions = state.descriptionSuggestions,
+            onSuggestionsFetchRequested = value =>
+              $.modState(_.copy(descriptionSuggestions = getDescriptionSuggestions(value)))
+                .runNow(),
+            onSuggestionsClearRequested = () => $.modState(_.copy(descriptionSuggestions = Seq())).runNow(),
             listener = AnythingChangedListener
           )
         },
@@ -391,6 +402,26 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           )
         }
       )
+    }
+
+    private def getDescriptionSuggestions(enteredValue: String): Seq[String] = {
+      if (enteredValue.length < 2) {
+        Seq()
+      } else {
+        val category = categoryRef().value.get
+        val transactions = remoteDatabaseProxy
+          .newQuery[Transaction]()
+          .filter(Keys.Transaction.categoryCode isEqualTo category.code)
+          .filter(Keys.Transaction.description containsIgnoreCase enteredValue)
+          .sort(LokiJs.Sorting
+            .descBy(Keys.Transaction.createdDate))
+          .limit(20)
+          .data()
+        transactions.toStream
+          .map(_.description)
+          .distinct
+          .toVector
+      }
     }
 
     private object TransactionDateListener extends InputBase.Listener[LocalDateTime] {
