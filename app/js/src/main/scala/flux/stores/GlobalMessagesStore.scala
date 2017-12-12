@@ -55,6 +55,9 @@ final class GlobalMessagesStore(implicit i18n: I18n,
           setState(Some(Message(string = message, isWorking = false)))
 
           // Clear this message after some delay
+          // Note: The delay is large because we don't want everything on the page to suddenly move up one row
+          // while it is being used. This is expected to trigger when a user has left the page open while doing
+          // something else.
           val uniqueStateWhenCreatedMessage = _state
           js.timers.setTimeout(2.minutes)(logExceptions {
             if (_state == uniqueStateWhenCreatedMessage) {
