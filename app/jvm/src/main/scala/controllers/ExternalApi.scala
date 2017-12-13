@@ -27,6 +27,10 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
     with I18nSupport {
 
   // ********** actions ********** //
+  def healthCheck = Action { implicit request =>
+    Ok("OK")
+  }
+
   def addTransactionFromTemplate(templateCode: String, applicationSecret: String) = Action {
     implicit request =>
       validateApplicationSecret(applicationSecret)

@@ -9,6 +9,7 @@ GET  /app/                             controllers.Application.reactAppRoot
 GET  /app/*anyString                   controllers.Application.reactApp(anyString)
 
 # External API
+GET  /externalapi/healthcheck/         controllers.ExternalApi.healthCheck
 GET  /externalapi/acc/trans/addfromtpl/:tplCode/:appSecret/  controllers.ExternalApi.addTransactionFromTemplate(tplCode, appSecret)
 GET  /externalapi/acc/money/xchgmeasurement/:date/:currency/:ratio/:appSecret/  controllers.ExternalApi.addExchangeRateMeasurement(date, currency, ratio: Double, appSecret)
 
