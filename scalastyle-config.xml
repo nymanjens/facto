@@ -17,10 +17,10 @@
  </check>
  <check level="error" class="org.scalastyle.scalariform.ClassNamesChecker" enabled="true">
   <parameters>
-   <parameter name="regex"><![CDATA[[A-Z][A-Za-z]*]]></parameter>
+   <parameter name="regex"><![CDATA[[A-Za-z]+]]></parameter>
   </parameters>
  </check>
- <check level="error" class="org.scalastyle.scalariform.ObjectNamesChecker" enabled="true">
+ <check level="error" class="org.scalastyle.scalariform.ObjectNamesChecker" enabled="false">
   <parameters>
    <parameter name="regex"><![CDATA[[A-Z][A-Za-z]*]]></parameter>
   </parameters>
@@ -36,7 +36,7 @@
    <parameter name="illegalImports"><![CDATA[sun._,java.awt._]]></parameter>
   </parameters>
  </check>
- <check level="error" class="org.scalastyle.scalariform.ParameterNumberChecker" enabled="true">
+ <check level="error" class="org.scalastyle.scalariform.ParameterNumberChecker" enabled="false">
   <parameters>
    <parameter name="maxParameters"><![CDATA[11]]></parameter>
   </parameters>
@@ -60,7 +60,7 @@
   </parameters>
   <customMessage>Only println statements with a string starting with a space are allowed. All others are considered debug printlns.</customMessage>
  </check>
- <check level="error" class="org.scalastyle.scalariform.NumberOfTypesChecker" enabled="true">
+ <check level="error" class="org.scalastyle.scalariform.NumberOfTypesChecker" enabled="false">
   <parameters>
    <parameter name="maxTypes"><![CDATA[30]]></parameter>
   </parameters>
@@ -75,7 +75,7 @@
  <check level="error" class="org.scalastyle.scalariform.IfBraceChecker" enabled="true">
   <parameters>
    <parameter name="singleLineAllowed"><![CDATA[true]]></parameter>
-   <parameter name="doubleLineAllowed"><![CDATA[false]]></parameter>
+   <parameter name="doubleLineAllowed"><![CDATA[true]]></parameter>
   </parameters>
  </check>
  <check level="error" class="org.scalastyle.scalariform.MethodLengthChecker" enabled="false">
@@ -83,14 +83,14 @@
    <parameter name="maxLength"><![CDATA[50]]></parameter>
   </parameters>
  </check>
- <check level="error" class="org.scalastyle.scalariform.MethodNamesChecker" enabled="true">
+ <check level="error" class="org.scalastyle.scalariform.MethodNamesChecker" enabled="false">
   <parameters>
    <parameter name="regex"><![CDATA[^[A-Za-z0-9+-:]*$]]></parameter>
    <parameter name="ignoreOverride">true</parameter>
    <parameter name="ignoreRegex">^([+-\\*/>&lt;]|==|&lt;=|>=|Action[A-Za-z0-9]*)$</parameter>
   </parameters>
  </check>
- <check level="error" class="org.scalastyle.scalariform.NumberOfMethodsInTypeChecker" enabled="true">
+ <check level="error" class="org.scalastyle.scalariform.NumberOfMethodsInTypeChecker" enabled="false">
   <parameters>
    <parameter name="maxMethods"><![CDATA[30]]></parameter>
   </parameters>

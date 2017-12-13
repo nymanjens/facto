@@ -1,0 +1,31 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# General
+GET  /                                 controllers.Application.index
+GET  /manualtests/                     controllers.Application.manualTests
+GET  /app/                             controllers.Application.reactAppRoot
+GET  /app/*anyString                   controllers.Application.reactApp(anyString)
+
+# External API
+GET  /externalapi/acc/trans/addfromtpl/:tplCode/:appSecret/  controllers.ExternalApi.addTransactionFromTemplate(tplCode, appSecret)
+GET  /externalapi/acc/money/xchgmeasurement/:date/:currency/:ratio/:appSecret/  controllers.ExternalApi.addExchangeRateMeasurement(date, currency, ratio: Double, appSecret)
+
+# Auth
+GET  /login/                           controllers.Auth.login(returnTo ?= "/")
+POST /login/                           controllers.Auth.authenticate(returnTo ?= "/")
+GET  /logout/                          controllers.Auth.logout
+
+# User
+GET   /profile/                        controllers.Application.profile
+POST  /profile/changepassword/         controllers.Application.changePassword
+GET   /administration/                 controllers.Application.administration
+POST  /profile/adduser/                controllers.Application.addUser
+
+# Autowire calls
+POST /scalajsapi/*path                 controllers.Application.scalaJsApi(path: String)
+
+# Map static resources from the /public folder to the /assets URL path
+GET  /assets/*file                     controllers.Assets.versioned(path="/public", file: Asset)
+GET  /webjars/*file                    controllers.WebJarAssets.at(file)

@@ -1,0 +1,65 @@
+@(
+  title: String,
+  extrascript: Html = Html("")
+)(
+  content: Html
+)(
+  implicit env: play.api.Environment, webJarAssets: controllers.WebJarAssets
+)
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>@title</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Family Accounting Tool">
+    <meta name="author" content="Jens Nyman">
+    <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
+
+    @* ************ CSS ************ *@
+    @* Bootstrap Core CSS *@
+    @* Note: Not using WebJarAssets.locate() because there are bootstrap files packaged with other libraries. *@
+    <link href="@routes.Assets.versioned("lib/bootstrap/css/bootstrap.min.css")" rel="stylesheet">
+
+    @* Metis menu (used by Start Bootstrap) *@
+    <link href="@routes.WebJarAssets.at("metisMenu/1.1.3/metisMenu.min.css")" rel="stylesheet">
+
+    @* Custom Fonts *@
+    <link href="@routes.WebJarAssets.at("font-awesome/4.6.2/css/font-awesome.min.css")" rel="stylesheet">
+    <link href="@routes.Assets.versioned("lib/fontello/css/fontello.css")" rel="stylesheet">
+
+    @* HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries *@
+    @* WARNING: Respond.js doesn't work if you view the page via file:// *@
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    @* startbootstrap-sb-admin-2 CSS *@
+    <link href="@routes.Assets.versioned("bower_components/startbootstrap-sb-admin-2/dist/css/sb-admin-2.css")" rel="stylesheet">
+
+    @* Custom CSS *@
+    <link href="@routes.Assets.versioned("stylesheets/main.min.css")" rel="stylesheet">
+
+  </head>
+  <body>
+
+    @content
+
+    @* ************ JAVASCRIPT ************ *@
+    @* Bundled JavaScript deps and the compiled scala.js code *@
+    @scalajs.html.jsdeps(
+        projectName = "client",
+        assets = path => routes.Assets.versioned(path).toString,
+        resourceExists = name => getClass.getResource(s"/public/$name") != null)
+
+    @* startbootstrap-sb-admin-2 JavaScript *@
+    <script src="@routes.Assets.versioned("bower_components/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js")"></script>
+
+    @extrascript
+  </body>
+</html>

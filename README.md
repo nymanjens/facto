@@ -43,10 +43,6 @@ Familiy Accounting Tool keeps track of every transaction your family makes. Its 
     bin/facto -DcreateAdminUser
     rm RUNNING_PID
 
-    # (Optional) Import Facto v1 backups
-    bin/facto -DloadFactoV1DataFromPath=path/to/backup.sql
-    rm RUNNING_PID
-
     # Run application
     bin/facto
     ```
@@ -113,11 +109,3 @@ You should:
 - You can re-count your cash and see if it matches the calculated value.
   If it does, you can use the checkbox button to mark this.
   If it doesn't, you have made an error or lost money.
-
-## Regular cache management
-Some of Facto's caches need to be regularly cleaned up, to avoid memory leaks. You can do this
-by setting up following crontab:
-
-```
-0 2 * * *  curl http://localhost/externalapi/docachemanagement/<application_secret>/
-```

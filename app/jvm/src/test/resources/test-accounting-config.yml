@@ -1,0 +1,108 @@
+!!models.accounting.config.Parsable$Config
+categories:
+  - &catB
+      code: CAT_B
+      name: "Category B"
+      helpText: "b-help"
+  - &catA
+      code: CAT_A
+      name: "Category A"
+  - &catC
+      code: CAT_C
+      name: "Category C"
+
+accounts:
+  - &accCommon
+      code: ACC_COMMON
+      longName: Account Common
+      shorterName: Acc.Common
+      veryShortName: Common
+      defaultElectronicReservoirCode: CARD_COMMON
+      categories:
+        - *catA
+        - *catB
+  - &accA
+      code: ACC_A
+      longName: Account A
+      shorterName: Acc.A
+      veryShortName: A
+      userLoginName: testUserA
+      defaultCashReservoirCode: CASH_A
+      defaultElectronicReservoirCode: CARD_A
+      categories:
+        - *catA
+        - *catB
+      summaryTotalRows:
+        - rowTitleHtml: <b>Total</b>
+          categoriesToIgnore: []
+        - rowTitleHtml: <b>Total</b> (without catA)
+          categoriesToIgnore: [*catA]
+  - &accB
+      code: ACC_B
+      longName: Account B
+      shorterName: Acc.B
+      veryShortName: B
+      userLoginName: testUserB
+      defaultCashReservoirCode: CASH_B
+      defaultElectronicReservoirCode: CARD_B
+      categories:
+        - *catB
+
+moneyReservoirs:
+  - &reservoirCashCommon
+      code: CASH_COMMON
+      name: Cash Common
+      owner: *accCommon
+  - &reservoirCardCommon
+      code: CARD_COMMON
+      name: Card Common
+      owner: *accCommon
+  - &reservoirCashA
+      code: CASH_A
+      name: Cash A
+      owner: *accA
+  - &reservoirCardA
+      code: CARD_A
+      name: Card A
+      owner: *accA
+  - &reservoirCashB
+      code: CASH_B
+      name: Cash B
+      owner: *accB
+  - &reservoirCardB
+      code: CARD_B
+      name: Card B
+      owner: *accB
+  - &reservoirHidden
+      code: HIDDEN
+      name: Card Hidden
+      owner: *accB
+      hidden: true
+  - &reservoirCashGbp
+      code: CASH_GBP
+      name: Cash GBP
+      owner: *accA
+      currency: GBP
+      hidden: true
+
+templates:
+  - code: new-endowment
+    name: New Endowment
+    placement: [ENDOWMENTS_VIEW]
+    zeroSum: true
+    transactions:
+      - beneficiaryCode: ACC_COMMON
+        moneyReservoirCode: "" # N/A
+        categoryCode: CAT_A
+        description: Endowment for ${account.longName}
+        detailDescription: "These are the details."
+      - beneficiaryCode: ${account.code}
+        moneyReservoirCode: "" # N/A
+        categoryCode: CAT_A
+        description: Endowment for ${account.longName}
+        detailDescription: "These are the details."
+
+constants:
+    commonAccount: *accCommon
+    accountingCategory: *catA
+    endowmentCategory: *catB

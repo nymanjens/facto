@@ -1,0 +1,27 @@
+@import helper._
+
+@(
+)(
+  implicit env: play.api.Environment, webJarAssets: controllers.WebJarAssets
+)
+
+@extrascript = {
+  @* The compiled scala.js code *@
+  @scalajs.html.selectScript(
+      projectName = "client",
+      assets = path => routes.Assets.versioned(path).toString,
+      resourceExists = name => getClass.getResource(s"/public/$name") != null)
+
+  <script>
+    FactoApp.main()
+  </script>
+}
+
+@Base("Facto", extrascript = extrascript) {
+  <div id="root">
+    <div class="loading">
+      <div class="loading-icon"><i class="fa fa-circle-o-notch fa-spin"></i></div>
+      <div class="loading-message">Loading....</div>
+    </div>
+  </div>
+}

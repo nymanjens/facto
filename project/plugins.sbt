@@ -1,17 +1,20 @@
-resolvers += "Typesafe repository" at "https://repo.typesafe.com/typesafe/releases/"
+// repository for Typesafe plugins
+resolvers += "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/"
 
 // The Play plugin
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.5.9") // Must be the same as Settings.versions.play
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.6.0-RC2") // Must be the same as Settings.versions.play
+addSbtPlugin("com.vmunier" % "sbt-play-scalajs" % "0.3.1")
+
+// scala.js plugins
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.17")
 
 // Web plugins
-addSbtPlugin("com.typesafe.sbt" % "sbt-coffeescript" % "1.0.0")
-addSbtPlugin("com.typesafe.sbt" % "sbt-less" % "1.0.0")
-addSbtPlugin("com.typesafe.sbt" % "sbt-traceur" % "1.0.1") // ES6->ES5
+addSbtPlugin("com.typesafe.sbt" % "sbt-less" % "1.0.6")
 addSbtPlugin("com.typesafe.sbt" % "sbt-rjs" % "1.0.1")
-addSbtPlugin("com.typesafe.sbt" % "sbt-digest" % "1.0.0")
-
-// Eclipse plugin
-addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "4.0.0-RC2")
+addSbtPlugin("com.typesafe.sbt" % "sbt-digest" % "1.1.0")
+addSbtPlugin("com.typesafe.sbt" % "sbt-mocha" % "1.1.0")
 
 // Other
+addSbtPlugin("com.typesafe.sbt" % "sbt-gzip" % "1.0.0")
+addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.0.0")
 addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.8.0")

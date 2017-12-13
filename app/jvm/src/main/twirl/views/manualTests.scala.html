@@ -1,0 +1,21 @@
+@import helper._
+
+@(
+)(
+  implicit request: Request[AnyContent], messages: Messages, flash: Flash, env: play.api.Environment, webJarAssets: controllers.WebJarAssets
+)
+
+@extrascript = {
+  @* The compiled scala.js code *@
+  @scalajs.html.selectScript(
+      projectName = "client",
+      assets = path => routes.Assets.versioned(path).toString,
+      resourceExists = name => getClass.getResource(s"/public/$name") != null)
+
+  <script>
+    ManualTests.run()
+  </script>
+}
+
+@Base("Manual Tests", extrascript = extrascript) {
+}

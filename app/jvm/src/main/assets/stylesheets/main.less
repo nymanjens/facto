@@ -1,0 +1,270 @@
+/****** general ******/
+.table {
+  &.table-overflow-elipsis {
+    td, th {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 350px;
+    }
+  }
+  .no-entries {
+    font-style: italic;
+  }
+  .expand-on-click {
+    cursor: pointer;
+  }
+}
+
+.btn-huge {
+    padding: 38px 48px;
+    font-size: 50px;
+    line-height: normal;
+    -webkit-border-radius: 8px;
+       -moz-border-radius: 8px;
+            border-radius: 8px;
+}
+
+select:-moz-focusring { // Remove outline from select box in FF: http://stackoverflow.com/a/18853002/1218058
+    color: transparent;
+    text-shadow: 0 0 0 #000;
+}
+
+/****** copied from Bootstrap dataTables ******/
+table.table-bordered {
+  thead th, thead td {
+    border-left-width: 0;
+    border-top-width: 0;
+  }
+  tbody th, tbody td {
+    border-left-width: 0;
+    border-bottom-width: 0;
+  }
+  tfoot th, tfoot td {
+    border-left-width: 0;
+    border-bottom-width: 0;
+  }
+  th:last-child, td:last-child {
+    border-right-width: 0;
+  }
+}
+
+/****** upper-right-corner ******/
+.upper-right-corner-holder {
+  position: relative;
+  margin-right: -4px;
+  margin-top: -5px;
+  padding-top: 5px;
+
+  .upper-right-corner {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+
+    font-size: 9px;
+    color: #999;
+  }
+}
+
+/****** Money ******/
+.reference-currency {
+  color: #AAA;
+  font-size: 11px;
+  &:before { content: "(" }
+  &:after { content: ")" }
+}
+
+/****** loading page ******/
+.loading {
+  text-align: center;
+
+  .loading-icon {
+    font-size: 100px;
+  }
+  .loading-message {
+    font-size: 30px;
+  }
+}
+
+/****** transactiongroup-form css ******/
+.transaction-group-form {
+  .delete-button {
+    margin-left: 10px;
+  }
+  .total-transaction-flow-box {
+    .total-flow-form {
+      .input-group {
+        font-size: 17px;
+        padding-left: 15px;
+        padding-right: 20px;
+        input {
+          width: 100px;
+        }
+      }
+    }
+  }
+  .add-transaction-button-holder {
+      .panel-body {
+          height: 350px;
+      }
+      table {
+          width: 100%;
+          height: 100%;
+          td {
+              vertical-align: middle;
+              text-align: center;
+          }
+      }
+  }
+  .bound-until-change {
+      background-color: #EFE;
+  }
+}
+
+/****** summary ******/
+.summary-query-filter {
+  padding-top: 7px;
+  font-size: 13px;
+  float: right;
+  width: auto;
+  input {
+    width: 400px !important;
+  }
+}
+.table-summary {
+  td.average {
+    background-color: #F6F6FF;
+  }
+  td.cell {
+    &.month-for-averages {
+      background-color: #FFFAF6;
+    }
+    &.current-month {
+      background-color: #FFF0F0;
+    }
+    &:hover {
+      .entries {
+        display: block; // unhide entries
+      }
+    }
+
+    .entries {
+      display: none;
+
+      position: absolute;
+      width: auto;
+      max-width: 400px;
+      float: left;
+      border: 1px dotted #50503D;
+      background-color: #F6F6FF;
+      margin: 0 0 0 20px;
+      padding: 5px 10px;
+      z-index: 9999;
+
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis; // doesn't work
+    }
+  }
+
+  // background colors on hover
+  tr:hover td {
+    &.cell {
+      &.month-for-averages {
+        background-color: #F6F6F6;
+      }
+      &.current-month {
+        background-color: #F6F6F6;
+      }
+      &:hover {
+        background-color: white;
+      }
+    }
+  }
+
+  tr.total {
+    &.total-0 { // first row
+      td {
+        border-top: 1px solid;
+      }
+    }
+    td.title {
+      small {
+        font-size: 10px;
+      }
+    }
+  }
+}
+
+/****** templates ******/
+.templates-panel {
+  max-width: 600px;
+
+  .btn {
+    margin-bottom: 10px;
+  }
+}
+
+/****** react-tag-input ******/
+div.ReactTags__tags {
+    position: relative;
+}
+
+/* Styles for the input */
+div.ReactTags__tagInput {
+    width: 200px;
+    border-radius: 2px;
+    display: inline-block;
+}
+div.ReactTags__tagInput input.ReactTags__tagInputField,
+div.ReactTags__tagInput input.ReactTags__tagInputField:focus {
+    height: 31px;
+    margin: 0;
+    font-size: 12px;
+    width: 100%;
+    border: 1px solid #eee;
+}
+
+/* Styles for selected tags */
+div.ReactTags__selected span.ReactTags__tag {
+    border: 1px solid #ddd;
+    background: #eee;
+    font-size: 12px;
+    display: inline-block;
+    padding: 5px;
+    margin: 0 5px;
+    cursor: move;
+    border-radius: 2px;
+}
+div.ReactTags__selected a.ReactTags__remove {
+    color: #aaa;
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+/* Styles for suggestions */
+div.ReactTags__suggestions {
+    position: absolute;
+    z-index: 999;
+}
+div.ReactTags__suggestions ul {
+    list-style-type: none;
+    box-shadow: .05em .01em .5em rgba(0,0,0,.2);
+    background: white;
+    width: 200px;
+    padding: 0;
+}
+div.ReactTags__suggestions li {
+    border-bottom: 1px solid #ddd;
+    padding: 5px 10px;
+    margin: 0;
+}
+div.ReactTags__suggestions li mark {
+    text-decoration: underline;
+    background: none;
+    font-weight: 600;
+}
+div.ReactTags__suggestions ul li.ReactTags__activeSuggestion {
+    background: #b7cfe0;
+    cursor: pointer;
+}

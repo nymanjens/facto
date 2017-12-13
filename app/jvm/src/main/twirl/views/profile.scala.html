@@ -1,0 +1,39 @@
+@import helper._
+@import controllers.Application.Forms.ChangePasswordData
+@import views.html.utils.bootstrap3
+@import models.user.User
+
+@(
+  changePasswordForm: Form[ChangePasswordData]
+)(
+  implicit user: User, request: Request[AnyContent], messages: Messages, flash: Flash, env: play.api.Environment, webJarAssets: controllers.WebJarAssets
+)
+
+@Main(Messages("facto.profile")) {
+  <h1 class="page-header"><i class="fa fa-user fa-fw"></i> @Messages("facto.profile-of") @user.name</h1>
+
+
+  @form(action = routes.Application.changePassword(), 'class ->  "form-horizontal") {
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <span class="panel-heading-title">@Messages("facto.change-password")</span>
+          </div>
+          <div class="panel-body">
+            @for(error <- changePasswordForm.globalErrors) {
+              <div class="alert alert-danger" role="alert">
+                @Messages(error.message)
+              </div>
+            }
+            @bootstrap3.Text(changePasswordForm("loginName"), Messages("facto.login-name"), args=Map('readonly -> "readonly"))
+            @bootstrap3.Password(changePasswordForm("oldPassword"), Messages("facto.old-password"))
+            @bootstrap3.Password(changePasswordForm("password"), Messages("facto.password"))
+            @bootstrap3.Password(changePasswordForm("passwordVerification"), Messages("facto.retype-password"))
+            <button type="submit" class="btn btn-default">@Messages("facto.ok")</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+}

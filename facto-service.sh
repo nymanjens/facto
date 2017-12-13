@@ -62,7 +62,7 @@ case "$1" in
 
     echo "Starting facto..." && echo
 
-    su pi -c "cd $FACTO_ROOT && bin/facto" > /tmp/facto-logs 2>&1 &
+    su pi -c "cd $FACTO_ROOT && bin/server" > /tmp/facto-logs 2>&1 &
 
     echo "Waiting for $RUNNING_PID to appear"
     for i in `seq 1 20`; do
