@@ -16,18 +16,18 @@ import utest._
 import scala.collection.immutable.{ListMap, Seq}
 import scala2js.Converters._
 
-object SummaryPanelTest extends TestSuite {
+object SummaryTableTest extends TestSuite {
 
   override def tests = TestSuite {
     val testModule = new ThisTestModule()
-    implicit val summaryPanel = testModule.summaryPanel
+    implicit val summaryTable = testModule.summaryTable
     implicit val fakeClock = testModule.fakeClock
     fakeClock.setTime(createDateTime(2013, JANUARY, 2))
 
-    val allYearsData = summaryPanel.AllYearsData(
+    val allYearsData = summaryTable.AllYearsData(
       allTransactionsYearRange = YearRange.closed(2010, 2013),
       yearsToData = ListMap(
-        2012 -> summaryPanel.AllYearsData.YearData(
+        2012 -> summaryTable.AllYearsData.YearData(
           SummaryForYear(
             Seq(
               createTransaction(year = 2012, month = APRIL, flow = 22, category = testCategoryA),
@@ -41,7 +41,7 @@ object SummaryPanelTest extends TestSuite {
             impactingBalanceCheckIds = Set()
           )
         ),
-        2013 -> summaryPanel.AllYearsData.YearData(
+        2013 -> summaryTable.AllYearsData.YearData(
           SummaryForYear(
             Seq(
               createTransaction(year = 2013, category = testCategoryA),
@@ -176,14 +176,14 @@ object SummaryPanelTest extends TestSuite {
   }
 
   private def createAllYearsData(yearToTransactions: (Int, Seq[Transaction])*)(
-      implicit summaryPanel: SummaryPanel): summaryPanel.AllYearsData = {
+      implicit summaryTable: SummaryTable): summaryTable.AllYearsData = {
     val yearToTransactionsMap = Map(yearToTransactions: _*)
-    summaryPanel.AllYearsData(
+    summaryTable.AllYearsData(
       allTransactionsYearRange =
         YearRange.closed(yearToTransactionsMap.keys.min, yearToTransactionsMap.keys.max),
       yearsToData = ListMap(yearToTransactions.map {
         case (year, transactions) =>
-          year -> summaryPanel.AllYearsData.YearData(SummaryForYear(transactions), GainsForYear.empty)
+          year -> summaryTable.AllYearsData.YearData(SummaryForYear(transactions), GainsForYear.empty)
       }: _*)
     )
   }
@@ -198,6 +198,6 @@ object SummaryPanelTest extends TestSuite {
     implicit val summaryForYearStoreFactory = storesModule.summaryForYearStoreFactory
     implicit val summaryExchangeRateGainsStoreFactory = storesModule.summaryExchangeRateGainsStoreFactory
 
-    val summaryPanel: SummaryPanel = wire[SummaryPanel]
+    val summaryTable: SummaryTable = wire[SummaryTable]
   }
 }

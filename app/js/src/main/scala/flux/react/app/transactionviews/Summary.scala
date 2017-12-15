@@ -14,7 +14,7 @@ import models.user.User
 
 import scala.collection.immutable.Seq
 
-final class Summary(implicit summaryPanel: SummaryPanel,
+final class Summary(implicit summaryTable: SummaryTable,
                     entityAccess: EntityAccess,
                     user: User,
                     clock: Clock,
@@ -83,7 +83,7 @@ final class Summary(implicit summaryPanel: SummaryPanel,
             if state.includeUnrelatedAccounts || account.isMineOrCommon
           } yield {
             uielements.Panel(account.longName, key = account.code) {
-              summaryPanel(
+              summaryTable(
                 account = account,
                 query = state.query,
                 yearLowerBound = state.yearLowerBound,

@@ -24,7 +24,7 @@ import models.user.User
 import scala.collection.immutable.{ListMap, Seq}
 import scala.collection.mutable
 
-private[transactionviews] final class SummaryPanel(
+private[transactionviews] final class SummaryTable(
     implicit summaryYearsStoreFactory: SummaryYearsStoreFactory,
     summaryForYearStoreFactory: SummaryForYearStoreFactory,
     summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
