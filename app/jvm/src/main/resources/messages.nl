@@ -142,3 +142,4 @@ facto.empty=Leeg
 facto.n-entries={0} inboekingen
 facto.collapse-all=Allen inklappen
 facto.expand-all=Allen uitklappen
+facto.net-worth=Netto vermogen
