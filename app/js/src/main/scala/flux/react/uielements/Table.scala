@@ -24,7 +24,7 @@ object Table {
             <.th(
               ^.colSpan := props.colSpan,
               <.span(
-                ^.style := js.Dictionary("minWidth" -> "246px", "float" -> "left"),
+                ^.className := "primary-title",
                 <.i(
                   ^.className := s"fa fa-angle-${if (state.expanded) "down" else "right"}",
                   ^.style := js.Dictionary("width" -> "12px")),
@@ -32,7 +32,7 @@ object Table {
                 props.title
               ),
               <<.ifThen(props.tableTitleExtra) { extra =>
-                <.span(^.style := js.Dictionary("fontWeight" -> "normal", "paddingLeft" -> "20px"), extra)
+                <.span(^.className := "secondary-title", extra)
               }
             ),
             ^.onClick -->
