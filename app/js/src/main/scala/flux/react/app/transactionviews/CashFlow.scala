@@ -65,7 +65,9 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
                       tableTitle = reservoir.name,
                       tableClasses = Seq("table-cashflow"),
                       key = reservoir.code,
-                      numEntriesStrategy = NumEntriesStrategy(start = 10, intermediateBeforeInf = Seq(30)),
+                      numEntriesStrategy = NumEntriesStrategy(
+                        start = CashFlow.minNumEntriesPerReservoir,
+                        intermediateBeforeInf = Seq(30)),
                       setExpanded = state.setExpanded,
                       additionalInput = reservoir,
                       latestEntryToTableTitleExtra =
@@ -202,4 +204,8 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
   private case class State(includeUnrelatedReservoirs: Boolean,
                            includeHiddenReservoirs: Boolean,
                            setExpanded: Unique[Boolean])
+}
+
+object CashFlow {
+  val minNumEntriesPerReservoir: Int = 10
 }

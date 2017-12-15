@@ -422,7 +422,9 @@ private[transactionviews] final class SummaryTable(
         }
         for (reservoir <- accountingConfig.visibleReservoirs) {
           if (reservoir.owner == props.account) {
-            val store = cashFlowEntriesStoreFactory.get(moneyReservoir = reservoir, maxNumEntries = 10)
+            val store = cashFlowEntriesStoreFactory.get(
+              moneyReservoir = reservoir,
+              maxNumEntries = CashFlow.minNumEntriesPerReservoir)
 
             dataBuilder.addToNetWorth(store.state.entries.lastOption
               .map(_.balance.withDate(clock.now).exchangedForReferenceCurrency) getOrElse ReferenceMoney(0))
