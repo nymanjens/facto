@@ -48,7 +48,8 @@ object SummaryTableTest extends TestSuite {
               createTransaction(year = 2013, category = testCategoryB))),
           GainsForYear.empty
         )
-      )
+      ),
+      netWorth = ReferenceMoney(23737373)
     )
 
     "AllYearsData" - {
@@ -175,19 +176,6 @@ object SummaryTableTest extends TestSuite {
     }
   }
 
-  private def createAllYearsData(yearToTransactions: (Int, Seq[Transaction])*)(
-      implicit summaryTable: SummaryTable): summaryTable.AllYearsData = {
-    val yearToTransactionsMap = Map(yearToTransactions: _*)
-    summaryTable.AllYearsData(
-      allTransactionsYearRange =
-        YearRange.closed(yearToTransactionsMap.keys.min, yearToTransactionsMap.keys.max),
-      yearsToData = ListMap(yearToTransactions.map {
-        case (year, transactions) =>
-          year -> summaryTable.AllYearsData.YearData(SummaryForYear(transactions), GainsForYear.empty)
-      }: _*)
-    )
-  }
-
   private final class ThisTestModule extends TestModule {
 
     import com.softwaremill.macwire._
@@ -197,6 +185,7 @@ object SummaryTableTest extends TestSuite {
     implicit val summaryYearsStoreFactory = storesModule.summaryYearsStoreFactory
     implicit val summaryForYearStoreFactory = storesModule.summaryForYearStoreFactory
     implicit val summaryExchangeRateGainsStoreFactory = storesModule.summaryExchangeRateGainsStoreFactory
+    implicit val cashFlowEntriesStoreFactory = storesModule.cashFlowEntriesStoreFactory
 
     val summaryTable: SummaryTable = wire[SummaryTable]
   }
