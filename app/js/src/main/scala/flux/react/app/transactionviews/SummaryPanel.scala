@@ -202,12 +202,7 @@ private[transactionviews] final class SummaryPanel(
       doStateUpdate($.props.runNow())
     }
 
-    def render(props: Props, state: State) = logExceptions {
-      uielements.Panel(props.account.longName, key = props.account.code) {
-        renderTable(props, state)
-      }
-    }
-    def renderTable(implicit props: Props, state: State): VdomElement = {
+    def render(implicit props: Props, state: State) = logExceptions {
       implicit val data = state.allYearsData
       implicit val account = props.account
       implicit val router = props.router

@@ -82,14 +82,16 @@ final class Summary(implicit summaryPanel: SummaryPanel,
             account <- accountingConfig.personallySortedAccounts
             if state.includeUnrelatedAccounts || account.isMineOrCommon
           } yield {
-            summaryPanel(
-              account = account,
-              query = state.query,
-              yearLowerBound = state.yearLowerBound,
-              expandedYear = state.expandedYear,
-              onShowHiddenYears = $.modState(_.copy(yearLowerBound = Int.MinValue)),
-              onSetExpandedYear = year => $.modState(_.copy(expandedYear = year))
-            )
+            uielements.Panel(account.longName, key = account.code) {
+              summaryPanel(
+                account = account,
+                query = state.query,
+                yearLowerBound = state.yearLowerBound,
+                expandedYear = state.expandedYear,
+                onShowHiddenYears = $.modState(_.copy(yearLowerBound = Int.MinValue)),
+                onSetExpandedYear = year => $.modState(_.copy(expandedYear = year))
+              )
+            }
           }
         }.toVdomArray,
         // includeUnrelatedAccounts toggle button
