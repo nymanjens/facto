@@ -8,6 +8,7 @@ import models.accounting.Transaction
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.user.User
 
+import scala.annotation.tailrec
 import scala.collection.immutable.Seq
 
 abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
@@ -15,7 +16,7 @@ abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
     transactions.map(_.transactionGroupId).distinct.size == 1,
     s"More than one transaction group: ${transactions.map(_.transactionGroupId).distinct}")
 
-  def groupId = transactions.head.transactionGroupId
+  def groupId: Long = transactions.head.transactionGroupId
   def issuer(implicit entityAccess: EntityAccess): User = transactions.head.issuer
   def transactionDates: Seq[LocalDateTime] = transactions.map(_.transactionDate).distinct
   def consumedDates: Seq[LocalDateTime] = transactions.flatMap(_.consumedDateOption).distinct
@@ -25,8 +26,24 @@ abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
     transactions.map(_.moneyReservoir).distinct
   def categories(implicit accountingConfig: Config): Seq[Category] =
     transactions.map(_.category).distinct
-  def descriptions: Seq[String] = transactions.map(_.description).distinct
-  def mostRecentTransaction: Transaction = transactions.sortBy(_.transactionDate).last
+  def description: String = {
+    val descriptions = transactions.map(_.description).distinct
+    val prefix = {
+      val rawPrefix = longestCommonPrefix(descriptions)
+      if (descriptions contains rawPrefix) rawPrefix else removeRightWord(rawPrefix)
+    }
+
+    descriptions match {
+      case Seq(description) => description
+
+      case _ if prefix.nonEmpty =>
+        val suffixes = descriptions.toStream.map(_.substring(prefix.length)).filter(_.nonEmpty).toVector
+        s"$prefix{${suffixes.mkString(", ")}}"
+
+      case _ => descriptions.mkString(", ")
+    }
+  }
+  def mostRecentTransaction: Transaction = transactions.maxBy(_.transactionDate)
   def tags: Seq[String] = transactions.flatMap(_.tags).distinct
 
   def flow(implicit exchangeRateManager: ExchangeRateManager, accountingConfig: Config): Money = {
@@ -45,6 +62,29 @@ abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
         }
       case _ => // Multiple currencies --> only show reference currency
         transactions.map(_.flow.exchangedForReferenceCurrency).sum
+    }
+  }
+
+  @tailrec
+  private def longestCommonPrefix(strings: Seq[String], nextIndex: Int = 0): String = {
+    val nextChars = strings.toStream
+      .map {
+        case s if nextIndex < s.length => Some(s(nextIndex))
+        case _ => None
+      }
+      .distinct
+      .toVector
+    nextChars match {
+      case Vector(Some(_)) => longestCommonPrefix(strings, nextIndex = nextIndex + 1)
+      case _ => (strings.headOption getOrElse "").substring(0, nextIndex)
+    }
+  }
+
+  @tailrec
+  private def removeRightWord(string: String): String = {
+    string.lastOption match {
+      case Some(c) if c.isLetterOrDigit => removeRightWord(string.substring(0, string.length - 1))
+      case _ => string
     }
   }
 }

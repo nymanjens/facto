@@ -22,14 +22,11 @@ object DescriptionWithEntryCount {
           Seq(<.span(^.key := "empty-span-for-space")))
 
       if (entry.transactions.size == 1) {
-        <.span(
-          tagIndications,
-          entry.descriptions.toTagMod
-        )
+        <.span(tagIndications, entry.description)
       } else {
         UpperRightCorner(cornerContent = s"(${entry.transactions.size})")(
           centralContent = tagIndications,
-          entry.descriptions.mkString(", "))
+          entry.description)
       }
     })
     .build
