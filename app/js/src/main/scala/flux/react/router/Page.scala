@@ -79,6 +79,19 @@ object Page {
       EditTransactionGroup(transactionGroupId, HasReturnTo.getCurrentEncodedPath)
   }
 
+  case class NewTransactionGroupFromReservoir private (reservoirCode: String,
+                                                       encodedReturnTo: Option[String])
+      extends HasReturnTo(encodedReturnTo)
+      with Page {
+    override def title(implicit i18n: I18n) = i18n("facto.new-transaction")
+    override def iconClass = "icon-new-empty"
+  }
+  object NewTransactionGroupFromReservoir {
+    def apply(reservoir: MoneyReservoir)(
+        implicit routerContext: RouterContext): NewTransactionGroupFromReservoir =
+      NewTransactionGroupFromReservoir(reservoir.code, HasReturnTo.getCurrentEncodedPath)
+  }
+
   case class NewFromTemplate private (templateCode: String, encodedReturnTo: Option[String])
       extends HasReturnTo(encodedReturnTo)
       with Page {

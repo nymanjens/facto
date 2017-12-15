@@ -79,8 +79,8 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
                         <.th(i18n("facto.category")),
                         <.th(i18n("facto.description")),
                         <.th(i18n("facto.flow")),
-                        <.th(i18n("facto.balance")),
-                        <.th(balanceCheckAddNewButton(reservoir))
+                        <.th(i18n("facto.balance"), " ", balanceCheckAddNewButton(reservoir)),
+                        <.th(transactionGroupAddButton(reservoir))
                       ),
                       calculateTableDataFromEntryAndRowNum = (cashFlowEntry, rowNumber) =>
                         cashFlowEntry match {
@@ -164,9 +164,17 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
     router.anchorWithHrefTo(Page.NewBalanceCheck(reservoir))(
       ^.className := "btn btn-info btn-xs",
       ^.role := "button",
-      <.i(^.className := "fa fa-check-square-o fa-fw"),
+      <.i(^.className := "fa fa-check-square-o fa-fw")
+    )
+  }
+  private def transactionGroupAddButton(reservoir: MoneyReservoir)(
+      implicit router: RouterContext): VdomElement = {
+    router.anchorWithHrefTo(Page.NewTransactionGroupFromReservoir(reservoir))(
+      ^.className := "btn btn-info btn-xs",
+      ^.role := "button",
+      <.i(^.className := "icon-new-empty"),
       " ",
-      i18n("facto.set")
+      i18n("facto.add-new")
     )
   }
 

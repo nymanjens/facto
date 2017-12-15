@@ -68,6 +68,12 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
               reactAppModule.transactionGroupForm.forEdit(page.transactionGroupId, page.returnToPath, ctl)
           }
 
+          | dynamicRuleFromPage(
+            _ / (codeString ~ returnToPath).caseClass[Page.NewTransactionGroupFromReservoir]) {
+            (page, ctl) =>
+              reactAppModule.transactionGroupForm.forReservoir(page.reservoirCode, page.returnToPath, ctl)
+          }
+
           | dynamicRuleFromPage(_ / (codeString ~ returnToPath).caseClass[Page.NewFromTemplate]) {
             (page, ctl) =>
               reactAppModule.transactionGroupForm.forTemplate(page.templateCode, page.returnToPath, ctl)

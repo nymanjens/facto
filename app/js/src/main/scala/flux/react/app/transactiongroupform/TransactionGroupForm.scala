@@ -75,6 +75,22 @@ final class TransactionGroupForm(implicit i18n: I18n,
         router = router))
   }
 
+  def forReservoir(reservoirCode: String, returnToPath: Path, router: RouterContext): VdomElement = {
+    val reservoir = accountingConfig.moneyReservoir(reservoirCode)
+    forCreate(
+      TransactionGroup.Partial(
+        Seq(
+          Transaction.Partial.from(
+            beneficiary = reservoir.owner,
+            moneyReservoir = reservoir
+          )
+        )
+      ),
+      returnToPath,
+      router
+    )
+  }
+
   def forTemplate(templateCode: String, returnToPath: Path, router: RouterContext): VdomElement = {
     val template = accountingConfig.templateWithCode(templateCode)
     // If this user is not associated with an account, it should not see any templates.
