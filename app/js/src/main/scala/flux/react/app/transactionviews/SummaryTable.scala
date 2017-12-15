@@ -23,6 +23,7 @@ import models.user.User
 
 import scala.collection.immutable.{ListMap, Seq}
 import scala.collection.mutable
+import scala.scalajs.js
 
 private[transactionviews] final class SummaryTable(
     implicit summaryYearsStoreFactory: SummaryYearsStoreFactory,
@@ -48,22 +49,26 @@ private[transactionviews] final class SummaryTable(
   }
 
   // **************** API ****************//
-  def apply(account: Account,
+  def apply(key: String,
+            account: Account,
             query: String,
             yearLowerBound: Int,
             expandedYear: Int,
             onShowHiddenYears: Callback,
             onSetExpandedYear: Int => Callback)(implicit router: RouterContext): VdomElement = {
-    component(
-      Props(
-        account = account,
-        query = query,
-        yearLowerBound = yearLowerBound,
-        expandedYear = expandedYear,
-        onShowHiddenYears = onShowHiddenYears,
-        onSetExpandedYear = onSetExpandedYear,
-        router = router
-      )).vdomElement
+    component
+      .withKey(key)
+      .apply(
+        Props(
+          account = account,
+          query = query,
+          yearLowerBound = yearLowerBound,
+          expandedYear = expandedYear,
+          onShowHiddenYears = onShowHiddenYears,
+          onSetExpandedYear = onSetExpandedYear,
+          router = router
+        ))
+      .vdomElement
   }
 
   // **************** Private types ****************//
@@ -210,6 +215,15 @@ private[transactionviews] final class SummaryTable(
       <.table(
         ^.className := "table table-bordered table-hover table-condensed table-summary",
         <.thead(
+          // **************** Title header **************** //
+          <.tr(
+            ^.className := "info",
+            <.th(
+              ^.colSpan := columns.size,
+              <.span(^.className := "primary-title", account.longName),
+              <.span(^.className := "secondary-title", i18n("facto.net-worth"), " ", data.netWorth.toString)
+            )
+          ),
           // **************** Year header **************** //
           <.tr(
             columns.flatMap {
