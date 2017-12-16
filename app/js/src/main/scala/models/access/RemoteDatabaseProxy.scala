@@ -24,14 +24,14 @@ trait RemoteDatabaseProxy {
   def newQuery[E <: Entity: EntityType](): LokiJs.ResultSet[E]
 
   /** Returns true if there are local pending `Add` modifications for the given entity. Note that only its id is used. */
-  def hasLocalAddModifications[E <: Entity: EntityType](entity: E): Boolean
+  @Deprecated def hasLocalAddModifications[E <: Entity: EntityType](entity: E): Boolean
 
   // **************** Setters ****************//
   def persistModifications(modifications: Seq[EntityModification]): Future[Unit]
   final def persistModifications(modifications: EntityModification*): Future[Unit] =
     persistModifications(modifications.toVector)
 
-  def clearLocalDatabase(): Future[Unit]
+  @Deprecated def clearLocalDatabase(): Future[Unit]
 
   // **************** Other ****************//
   def registerListener(listener: RemoteDatabaseProxy.Listener): Unit
