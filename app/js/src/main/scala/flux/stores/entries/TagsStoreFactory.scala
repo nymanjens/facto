@@ -3,6 +3,8 @@ package flux.stores.entries
 import common.GuavaReplacement.ImmutableSetMultimap
 import flux.stores.entries.TagsStoreFactory.State
 import jsfacades.LokiJsImplicits._
+import scala.async.Async.{async, await}
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import models.access.RemoteDatabaseProxy
 import models.accounting.{BalanceCheck, Transaction}
 
@@ -17,12 +19,13 @@ final class TagsStoreFactory(implicit database: RemoteDatabaseProxy) extends Ent
 
   // **************** Implementation of EntriesStoreFactory methods/types ****************//
   override protected def createNew(input: Input) = new Store {
-    override protected def calculateState() = {
+    override protected def calculateState() = async {
       val transactionsWithTags: Seq[Transaction] =
-        database
-          .newQuery[Transaction]()
-          .filter(Keys.Transaction.tags isNotEqualTo Seq())
-          .data()
+        await(
+          database
+            .newQuery[Transaction]()
+            .filter(Keys.Transaction.tags isNotEqualTo Seq())
+            .data())
 
       val tagToTransactionIdsBuilder =
         ImmutableSetMultimap.builder[TagsStoreFactory.Tag, TagsStoreFactory.TransactionId]()

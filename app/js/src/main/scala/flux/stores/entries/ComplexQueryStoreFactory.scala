@@ -1,5 +1,7 @@
 package flux.stores.entries
 
+import scala.async.Async.{async, await}
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import jsfacades.LokiJs
 import models.access.RemoteDatabaseProxy
 import models.accounting.{BalanceCheck, Transaction}
@@ -15,15 +17,15 @@ final class ComplexQueryStoreFactory(implicit database: RemoteDatabaseProxy,
   override protected def createNew(maxNumEntries: Int, query: String) = new Store {
     private val filterFromQuery: LokiJs.Filter[Transaction] = complexQueryFilter.fromQuery(query)
 
-    override protected def calculateState() = {
+    override protected def calculateState() = async {
       val transactions: Seq[Transaction] =
-        database
-          .newQuery[Transaction]()
-          .filter(filterFromQuery)
-          .sort(LokiJs.Sorting.descBy(Keys.Transaction.createdDate).thenDescBy(Keys.id))
-          .limit(3 * maxNumEntries)
-          .data()
-          .reverse
+        await(
+          database
+            .newQuery[Transaction]()
+            .filter(filterFromQuery)
+            .sort(LokiJs.Sorting.descBy(Keys.Transaction.createdDate).thenDescBy(Keys.id))
+            .limit(3 * maxNumEntries)
+            .data()).reverse
 
       var entries = transactions.map(t => GeneralEntry(Seq(t)))
 
@@ -34,7 +36,7 @@ final class ComplexQueryStoreFactory(implicit database: RemoteDatabaseProxy,
     }
 
     override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) =
-      LokiJs.ResultSet.fake(Seq(transaction)).filter(filterFromQuery).count() > 0
+      LokiJs.ResultSet.fake(Seq(transaction)).filter(filterFromQuery).count().value.get.get > 0
     override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) = false
   }
 

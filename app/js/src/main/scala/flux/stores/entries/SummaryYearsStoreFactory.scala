@@ -9,6 +9,9 @@ import models.accounting.config.Account
 import models.accounting.{BalanceCheck, Transaction}
 
 import scala.collection.immutable.Seq
+import scala.async.Async.{async, await}
+import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 import scala2js.Keys
 
@@ -23,23 +26,14 @@ final class SummaryYearsStoreFactory(implicit database: RemoteDatabaseProxy)
 
   // **************** Implementation of EntriesStoreFactory methods/types ****************//
   override protected def createNew(account: Account) = new Store {
-    override protected def calculateState() = {
-      def getFirstAfterSorting(sorting: LokiJs.Sorting[Transaction]): Option[Transaction] = {
-        val data = database
-          .newQuery[Transaction]()
-          .filter(Keys.Transaction.beneficiaryAccountCode isEqualTo account.code)
-          .sort(sorting)
-          .limit(1)
-          .data()
-        data match {
-          case Seq() => None
-          case Seq(t) => Some(t)
-        }
-      }
+    override protected def calculateState() = async {
+      val earliestFuture = getFirstAfterSorting(LokiJs.Sorting.ascBy(Keys.Transaction.consumedDate))
+      val latestFuture = getFirstAfterSorting(LokiJs.Sorting.descBy(Keys.Transaction.consumedDate))
+      val (maybeEarliest, maybeLatest) = (await(earliestFuture), await(latestFuture))
 
       val rangeOption = for {
-        earliest <- getFirstAfterSorting(LokiJs.Sorting.ascBy(Keys.Transaction.consumedDate))
-        latest <- getFirstAfterSorting(LokiJs.Sorting.descBy(Keys.Transaction.consumedDate))
+        earliest <- maybeEarliest
+        latest <- maybeLatest
       } yield
         State(
           YearRange.closed(earliest.consumedDate.getYear, latest.consumedDate.getYear),
@@ -52,6 +46,21 @@ final class SummaryYearsStoreFactory(implicit database: RemoteDatabaseProxy)
       transaction.beneficiaryAccountCode == account.code && !oldState.yearRange.contains(
         transaction.consumedDate.getYear)
     override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) = false
+
+    private def getFirstAfterSorting(sorting: LokiJs.Sorting[Transaction]): Future[Option[Transaction]] =
+      async {
+        val data = await(
+          database
+            .newQuery[Transaction]()
+            .filter(Keys.Transaction.beneficiaryAccountCode isEqualTo account.code)
+            .sort(sorting)
+            .limit(1)
+            .data())
+        data match {
+          case Seq() => None
+          case Seq(t) => Some(t)
+        }
+      }
   }
 
   /* override */

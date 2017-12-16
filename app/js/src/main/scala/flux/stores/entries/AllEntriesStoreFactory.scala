@@ -1,6 +1,8 @@
 package flux.stores.entries
 
 import jsfacades.LokiJs
+import scala.async.Async.{async, await}
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import models.access.RemoteDatabaseProxy
 import models.accounting.{BalanceCheck, Transaction}
 
@@ -11,18 +13,18 @@ final class AllEntriesStoreFactory(implicit database: RemoteDatabaseProxy)
     extends EntriesListStoreFactory[GeneralEntry, Unit] {
 
   override protected def createNew(maxNumEntries: Int, input: Unit) = new Store {
-    override protected def calculateState() = {
+    override protected def calculateState() = async {
       val transactions: Seq[Transaction] =
-        database
-          .newQuery[Transaction]()
-          .sort(
-            LokiJs.Sorting
-              .descBy(Keys.Transaction.transactionDate)
-              .thenDescBy(Keys.Transaction.createdDate)
-              .thenDescBy(Keys.id))
-          .limit(3 * maxNumEntries)
-          .data()
-          .reverse
+        await(
+          database
+            .newQuery[Transaction]()
+            .sort(
+              LokiJs.Sorting
+                .descBy(Keys.Transaction.transactionDate)
+                .thenDescBy(Keys.Transaction.createdDate)
+                .thenDescBy(Keys.id))
+            .limit(3 * maxNumEntries)
+            .data()).reverse
 
       var entries = transactions.map(t => GeneralEntry(Seq(t)))
 

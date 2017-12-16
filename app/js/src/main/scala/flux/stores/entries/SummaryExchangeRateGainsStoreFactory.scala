@@ -8,6 +8,9 @@ import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.{
   GainsForMonth,
   GainsForYear
 }
+
+import scala.async.Async.{async, await}
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import jsfacades.LokiJs
 import jsfacades.LokiJsImplicits._
 import models.access.RemoteDatabaseProxy
@@ -17,6 +20,7 @@ import models.accounting.{BalanceCheck, Transaction}
 
 import scala.collection.immutable.{Seq, SortedMap}
 import scala.collection.mutable
+import scala.concurrent.Future
 import scala2js.Converters._
 import scala2js.Keys
 import scala2js.Scala2Js.Key
@@ -36,12 +40,14 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
 
   // **************** Implementation of EntriesStoreFactory methods/types ****************//
   override protected def createNew(input: Input) = new Store {
-    override protected def calculateState() = {
+    override protected def calculateState() = async {
       GainsForYear.sum {
-        for {
+        val futures = for {
           reservoir <- accountingConfig.moneyReservoirs(includeHidden = true)
           if isRelevantReservoir(reservoir)
         } yield calculateGainsForYear(reservoir)
+
+        await(Future.sequence(futures))
       }
     }
 
@@ -51,27 +57,26 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
       isRelevantReservoir(balanceCheck.moneyReservoir) && balanceCheck.checkDate.getYear <= input.year
 
     // **************** Private helper methods ****************//
-    private def calculateGainsForYear(reservoir: MoneyReservoir): GainsForYear = {
+    private def calculateGainsForYear(reservoir: MoneyReservoir): Future[GainsForYear] = async {
       val monthsInYear = DatedMonth.allMonthsIn(input.year)
 
       val oldestRelevantBalanceCheck: Option[BalanceCheck] =
-        database
-          .newQuery[BalanceCheck]()
-          .filter(Keys.BalanceCheck.moneyReservoirCode isEqualTo reservoir.code)
-          .filter(Keys.BalanceCheck.checkDate < monthsInYear.head.startTime)
-          .sort(
-            LokiJs.Sorting
+        await(
+          database
+            .newQuery[BalanceCheck]()
+            .filter(Keys.BalanceCheck.moneyReservoirCode isEqualTo reservoir.code)
+            .filter(Keys.BalanceCheck.checkDate < monthsInYear.head.startTime)
+            .sort(LokiJs.Sorting
               .descBy(Keys.BalanceCheck.checkDate)
               .thenDescBy(Keys.BalanceCheck.createdDate)
               .thenDescBy(Keys.id))
-          .limit(1)
-          .data()
-          .headOption
+            .limit(1)
+            .data()).headOption
       val oldestBalanceDate = oldestRelevantBalanceCheck.map(_.checkDate).getOrElse(LocalDateTime.MIN)
       val initialBalance =
         oldestRelevantBalanceCheck.map(_.balance).getOrElse(MoneyWithGeneralCurrency(0, reservoir.currency))
 
-      val balanceChecks: Seq[BalanceCheck] =
+      val balanceChecksFuture: Future[Seq[BalanceCheck]] =
         database
           .newQuery[BalanceCheck]()
           .filter(Keys.BalanceCheck.moneyReservoirCode isEqualTo reservoir.code)
@@ -82,7 +87,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
               monthsInYear.last.startTimeOfNextMonth))
           .data()
 
-      val transactions: Seq[Transaction] =
+      val transactionsFuture: Future[Seq[Transaction]] =
         database
           .newQuery[Transaction]()
           .filter(Keys.Transaction.moneyReservoirCode isEqualTo reservoir.code)
@@ -92,6 +97,8 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
               oldestBalanceDate,
               monthsInYear.last.startTimeOfNextMonth))
           .data()
+      val balanceChecks: Seq[BalanceCheck] = await(balanceChecksFuture)
+      val transactions: Seq[Transaction] = await(transactionsFuture)
 
       val dateToBalanceFunction: DateToBalanceFunction = {
         val builder = new DateToBalanceFunction.Builder(oldestBalanceDate, initialBalance)

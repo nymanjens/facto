@@ -1,11 +1,13 @@
 package flux.stores.entries
 
+import flux.stores.entries.EntriesStore.StateWithMeta
 import models.access.RemoteDatabaseProxy
 import models.accounting.{BalanceCheck, Transaction}
-import models.modification.EntityType
-import models.modification.EntityModification
+import models.modification.{EntityModification, EntityType}
 
 import scala.collection.immutable.Seq
+import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 /**
   * General purpose flux store that maintains a state derived from data in the `RemoteDatabaseProxy`
@@ -17,22 +19,26 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database:
   database.registerListener(RemoteDatabaseProxyListener)
 
   private var _state: Option[State] = None
+  private var stateVersion: Int = 1
+  private var stateVersionInFlight: Int = stateVersion
+  private var pendingModifications: Seq[EntityModification] = Seq()
+
   private var stateUpdateListeners: Seq[EntriesStore.Listener] = Seq()
   private var isCallingListeners: Boolean = false
 
   // **************** Public API ****************//
-  final def state: State = {
-    if (_state.isEmpty) {
-      updateState()
-    }
-
-    _state.get
+  final def state: StateWithMeta[State] = _state match {
+    case None => StateWithMeta.Empty()
+    case Some(s) => StateWithMeta.WithValue(s, isStale = stateUpdateInFlight)
   }
 
   final def register(listener: EntriesStore.Listener): Unit = {
     require(!isCallingListeners)
 
     stateUpdateListeners = stateUpdateListeners :+ listener
+    if (_state.isEmpty && !stateUpdateInFlight) {
+      startStateUpdate()
+    }
   }
 
   final def deregister(listener: EntriesStore.Listener): Unit = {
@@ -42,17 +48,43 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database:
   }
 
   // **************** Abstract methods ****************//
-  protected def calculateState(): State
+  protected def calculateState(): Future[State]
 
   protected def transactionUpsertImpactsState(transaction: Transaction, state: State): Boolean
   protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State): Boolean
 
   // **************** Private helper methods ****************//
-  private def updateState(): Unit = {
-    _state = Some(calculateState())
+  private def stateUpdateInFlight: Boolean = stateVersion != stateVersionInFlight
+
+  private def startStateUpdate(): Unit = {
+    stateVersionInFlight += 1
+    val newStateVersion = stateVersionInFlight
+    calculateState().map { calculatedState =>
+      if (stateVersion >= newStateVersion) {
+        // This response is no longer relevant, do nothing
+      } else {
+        stateVersion = newStateVersion
+        if (_state != Some(calculatedState)) {
+          _state = Some(calculatedState)
+          invokeListeners()
+        }
+        revisitPendingModifications()
+      }
+    }
   }
 
-  private def impactsState(modifications: Seq[EntityModification]): Boolean =
+  private def revisitPendingModifications(): Unit = {
+    if (!stateUpdateInFlight) {
+      if (_state.isDefined) {
+        if (impactsState(pendingModifications, _state.get)) {
+          startStateUpdate()
+        }
+      }
+      pendingModifications = Seq()
+    }
+  }
+
+  private def impactsState(modifications: Seq[EntityModification], state: State): Boolean =
     modifications.toStream.filter(m => modificationImpactsState(m, state)).take(1).nonEmpty
 
   private def modificationImpactsState(entityModification: EntityModification, state: State): Boolean = {
@@ -103,7 +135,7 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database:
 
       if (_state.isDefined) {
         if (stateUpdateListeners.nonEmpty) {
-          if (impactsState(modifications)) {
+          if (impactsState(modifications, _state.get)) {
             invokeListeners()
           }
         }
@@ -118,12 +150,12 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database:
       require(!isCallingListeners)
 
       if (_state.isDefined) {
-        if (impactsState(modifications)) {
-          if (stateUpdateListeners.isEmpty) {
+        if (stateUpdateListeners.nonEmpty) {
+          pendingModifications = pendingModifications ++ modifications
+          revisitPendingModifications()
+        } else { // No listeners
+          if (impactsState(modifications, _state.get)) {
             _state = None
-          } else {
-            updateState()
-            invokeListeners()
           }
         }
       }
@@ -145,5 +177,24 @@ object EntriesStore {
 
   trait Listener {
     def onStateUpdate(): Unit
+  }
+
+  sealed trait StateWithMeta[State] {
+    def hasState: Boolean
+    def state: State
+    def isStale: Boolean
+
+    final def stateOption: Option[State] = if (hasState) Some(state) else None
+  }
+  object StateWithMeta {
+    case class Empty[State]() extends StateWithMeta[State] {
+      override def hasState = false
+      override def state = throw new IllegalArgumentException("Empty state")
+      override def isStale = true
+    }
+    case class WithValue[State](override val state: State, override val isStale: Boolean)
+        extends StateWithMeta[State] {
+      override def hasState = true
+    }
   }
 }

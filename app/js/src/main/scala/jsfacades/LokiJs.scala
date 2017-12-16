@@ -7,6 +7,7 @@ import jsfacades.LokiJs.Sorting.KeyWithDirection
 
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.JSGlobal
@@ -169,9 +170,9 @@ object LokiJs {
     def limit(quantity: Int): ResultSet[E]
 
     // **************** Terminal operations **************** //
-    def findOne[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): Option[E]
-    def data(): Seq[E]
-    def count(): Int
+    def findOne[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): Future[Option[E]]
+    def data(): Future[Seq[E]]
+    def count(): Future[Int]
   }
 
   case class Sorting[E] private (private[LokiJs] val keysWithDirection: Seq[KeyWithDirection[E]]) {
@@ -284,7 +285,7 @@ object LokiJs {
       }
 
       // **************** Terminal operations **************** //
-      override def findOne[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V) = {
+      override def findOne[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V) = Future.successful {
         val data = facade.find(js.Dictionary(Scala2Js.Key.toJsPair(key -> value)), firstOnly = true).data()
         if (data.length >= 1) {
           Option(Scala2Js.toScala[E](getOnlyElement(data)))
@@ -293,11 +294,11 @@ object LokiJs {
         }
       }
 
-      override def data() = {
+      override def data() = Future.successful {
         Scala2Js.toScala[Seq[E]](facade.data())
       }
 
-      override def count() = {
+      override def count() = Future.successful {
         facade.count()
       }
     }
@@ -369,15 +370,15 @@ object LokiJs {
       )
 
       // **************** Terminal operations **************** //
-      override def data() = entities
+      override def data() = Future.successful(entities)
 
       override def findOne[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V) =
-        filter(Filter.equal(key, value)).limit(1).data() match {
+        filter(Filter.equal(key, value)).limit(1).data().map {
           case Seq(e) => Some(e)
           case Seq() => None
         }
 
-      override def count() = entities.length
+      override def count() = Future.successful(entities.length)
     }
   }
 }

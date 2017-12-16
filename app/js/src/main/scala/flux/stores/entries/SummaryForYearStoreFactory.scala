@@ -8,6 +8,8 @@ import jsfacades.LokiJsImplicits._
 import models.access.RemoteDatabaseProxy
 import models.accounting.config.{Account, Category, Config}
 import models.accounting.{BalanceCheck, Transaction}
+import scala.async.Async.{async, await}
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 import scala.collection.immutable.Seq
 import scala2js.Converters._
@@ -30,23 +32,24 @@ final class SummaryForYearStoreFactory(implicit database: RemoteDatabaseProxy,
         filterInYear(Keys.Transaction.consumedDate, input.year) &&
         complexQueryFilter.fromQuery(input.query)
 
-    override protected def calculateState() = {
+    override protected def calculateState() = async {
       val transactions: Seq[Transaction] =
-        database
-          .newQuery[Transaction]()
-          .filter(combinedFilter)
-          .sort(
-            LokiJs.Sorting
-              .ascBy(Keys.Transaction.consumedDate)
-              .thenAscBy(Keys.Transaction.createdDate)
-              .thenAscBy(Keys.id))
-          .data()
+        await(
+          database
+            .newQuery[Transaction]()
+            .filter(combinedFilter)
+            .sort(
+              LokiJs.Sorting
+                .ascBy(Keys.Transaction.consumedDate)
+                .thenAscBy(Keys.Transaction.createdDate)
+                .thenAscBy(Keys.id))
+            .data())
 
       SummaryForYear(transactions)
     }
 
     override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) =
-      LokiJs.ResultSet.fake(Seq(transaction)).filter(combinedFilter).count() > 0
+      LokiJs.ResultSet.fake(Seq(transaction)).filter(combinedFilter).count().value.get.get > 0
     override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) =
       false
   }

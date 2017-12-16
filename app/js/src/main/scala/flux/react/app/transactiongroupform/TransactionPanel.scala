@@ -393,7 +393,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
               // this component without putting it into the state (and listening to the tagsStore for
               // changes. This is because being up-to-date is not really necessary but would introduce
               // a lot of code.
-              tagsStoreFactory.get().state.tagToTransactionIds.keySet.toVector,
+              // tagsStoreFactory.get().state.tagToTransactionIds.keySet.toVector,
+              Seq(),
             showErrorMessage = props.showErrorMessages,
             additionalValidator = _.forall(Tags.isValidTag),
             defaultValue = props.defaultValues.tags,
@@ -405,23 +406,24 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
     }
 
     private def getDescriptionSuggestions(enteredValue: String): Seq[String] = {
-      if (enteredValue.length < 2) {
-        Seq()
-      } else {
-        val category = categoryRef().value.get
-        val transactions = remoteDatabaseProxy
-          .newQuery[Transaction]()
-          .filter(Keys.Transaction.categoryCode isEqualTo category.code)
-          .filter(Keys.Transaction.description containsIgnoreCase enteredValue)
-          .sort(LokiJs.Sorting
-            .descBy(Keys.Transaction.createdDate))
-          .limit(20)
-          .data()
-        transactions.toStream
-          .map(_.description)
-          .distinct
-          .toVector
-      }
+      Seq()
+//      if (enteredValue.length < 2) {
+//        Seq()
+//      } else {
+//        val category = categoryRef().value.get
+//        val transactions = remoteDatabaseProxy
+//          .newQuery[Transaction]()
+//          .filter(Keys.Transaction.categoryCode isEqualTo category.code)
+//          .filter(Keys.Transaction.description containsIgnoreCase enteredValue)
+//          .sort(LokiJs.Sorting
+//            .descBy(Keys.Transaction.createdDate))
+//          .limit(20)
+//          .data()
+//        transactions.toStream
+//          .map(_.description)
+//          .distinct
+//          .toVector
+//      }
     }
 
     private object TransactionDateListener extends InputBase.Listener[LocalDateTime] {
