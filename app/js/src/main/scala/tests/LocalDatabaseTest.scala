@@ -149,7 +149,7 @@ private[tests] object LocalDatabaseTest extends ManualTestSuite {
             EntityModification.Add(transaction2)
           )) ==> true
 
-        db.newQuery[Transaction]().data().toSet ==> Set(transaction1, transaction2)
+        await(db.newQuery[Transaction]().data()).toSet ==> Set(transaction1, transaction2)
       }
     },
     ManualTest("applyModifications: Update is idempotent") {

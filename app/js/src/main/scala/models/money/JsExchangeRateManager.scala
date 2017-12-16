@@ -53,14 +53,16 @@ final class JsExchangeRateManager(implicit database: RemoteDatabaseProxy) extend
   }
 
   private def fetchSortedMap(currency: Currency): SortedMap[LocalDateTime, Double] = {
-    val mapBuilder = TreeMap.newBuilder[LocalDateTime, Double]
-    for (measurement <- database
-           .newQuery[ExchangeRateMeasurement]()
-           .filter(Keys.ExchangeRateMeasurement.foreignCurrencyCode isEqualTo currency.code)
-           .data()) {
-      mapBuilder += (measurement.date -> measurement.ratioReferenceToForeignCurrency)
-    }
-    mapBuilder.result()
+    ???
+    // val mapBuilder = TreeMap.newBuilder[LocalDateTime, Double]
+    // for (measurement <-
+    //        database
+    //          .newQuery[ExchangeRateMeasurement]()
+    //          .filter(Keys.ExchangeRateMeasurement.foreignCurrencyCode isEqualTo currency.code)
+    //          .data()) {
+    //   mapBuilder += (measurement.date -> measurement.ratioReferenceToForeignCurrency)
+    // }
+    // mapBuilder.result()
   }
 
   // **************** Inner type definitions ****************//

@@ -13,9 +13,10 @@ final class JsUserManager(implicit database: RemoteDatabaseProxy)
     with User.Manager {
 
   override def findByLoginName(loginName: String) = {
-    database.newQuery[User]().filter(Keys.User.loginName isEqualTo loginName).data() match {
-      case Seq(user) => Option(user)
-      case Seq() => None
-    }
+    ???
+    //   database.newQuery[User]().filter(Keys.User.loginName isEqualTo loginName).data() match {
+    //   case Seq(user) => Option(user)
+    //   case Seq() => None
+    // }
   }
 }

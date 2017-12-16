@@ -13,10 +13,12 @@ abstract class BaseJsEntityManager[E <: Entity: EntityType](implicit database: R
 
   // **************** Implementation of EntityManager ****************//
   override final def findById(id: Long): E = {
-    database.newQuery().findOne(Keys.id, id).get
+    ???
+    // database.newQuery().findOne(Keys.id, id).get
   }
 
   override final def fetchAll(): Seq[E] = {
-    database.newQuery().data()
+    ???
+    // database.newQuery().data()
   }
 }
