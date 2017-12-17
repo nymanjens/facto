@@ -13,7 +13,7 @@ final class Module(user: User)(implicit scalaJsApiClient: ScalaJsApiClient) {
     LocalDatabase.createFuture(encryptionSecret = user.databaseEncryptionKey)
   implicit val remoteDatabaseProxy: Future[RemoteDatabaseProxy] = async {
     val db = await(localDatabase)
-    val proxy = await(RemoteDatabaseProxy.create(scalaJsApiClient, db))
+    val proxy = await(LocallyClonedRemoteDatabaseProxy.create(scalaJsApiClient, db))
 
     proxy.startSchedulingModifiedEntityUpdates()
 
