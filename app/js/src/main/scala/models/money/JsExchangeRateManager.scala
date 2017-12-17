@@ -2,26 +2,21 @@ package models.money
 
 import common.money.{Currency, ExchangeRateManager}
 import common.time.LocalDateTime
-import jsfacades.LokiJsImplicits._
 import models.access.RemoteDatabaseProxy
-import models.modification.EntityType
-import models.modification.EntityModification
+import models.modification.{EntityModification, EntityType}
 
-import scala.collection.immutable.{Seq, TreeMap}
-import scala.collection.{SortedMap, mutable}
+import scala.collection.SortedMap
+import scala.collection.immutable.Seq
 import scala2js.Converters._
-import scala2js.Keys
 
-final class JsExchangeRateManager(implicit database: RemoteDatabaseProxy) extends ExchangeRateManager {
+final class JsExchangeRateManager(
+    ratioReferenceToForeignCurrency: Map[Currency, SortedMap[LocalDateTime, Double]])(
+    implicit database: RemoteDatabaseProxy)
+    extends ExchangeRateManager {
   database.registerListener(RemoteDatabaseProxyListener)
 
-  /**
-    * Cache for the `ExchangeRateMeasurement` entries in the database to improve performance of
-    * `getRatioSecondToFirstCurrency()`.
-    *
-    * If this map has no entry for a currency, that means it has not been initialized yet.
-    */
-  private val measurementsCache: mutable.Map[Currency, SortedMap[LocalDateTime, Double]] = mutable.Map()
+  private var measurementsCache: Map[Currency, SortedMap[LocalDateTime, Double]] =
+    ratioReferenceToForeignCurrency
 
   // **************** Implementation of ExchangeRateManager trait ****************//
   override def getRatioSecondToFirstCurrency(firstCurrency: Currency,
@@ -42,27 +37,10 @@ final class JsExchangeRateManager(implicit database: RemoteDatabaseProxy) extend
 
   // **************** Private helper methods ****************//
   private def ratioReferenceToForeignCurrency(currency: Currency, date: LocalDateTime): Double = {
-    if (!(measurementsCache contains currency)) {
-      measurementsCache.put(currency, fetchSortedMap(currency))
-    }
-
     measurementsCache(currency).to(date).lastOption match {
       case Some((lastDate, lastRatio)) => lastRatio
       case None => 1.0
     }
-  }
-
-  private def fetchSortedMap(currency: Currency): SortedMap[LocalDateTime, Double] = {
-    ???
-    // val mapBuilder = TreeMap.newBuilder[LocalDateTime, Double]
-    // for (measurement <-
-    //        database
-    //          .newQuery[ExchangeRateMeasurement]()
-    //          .filter(Keys.ExchangeRateMeasurement.foreignCurrencyCode isEqualTo currency.code)
-    //          .data()) {
-    //   mapBuilder += (measurement.date -> measurement.ratioReferenceToForeignCurrency)
-    // }
-    // mapBuilder.result()
   }
 
   // **************** Inner type definitions ****************//
@@ -81,13 +59,13 @@ final class JsExchangeRateManager(implicit database: RemoteDatabaseProxy) extend
           case EntityType.ExchangeRateMeasurementType =>
             modification match {
               case EntityModification.Add(_) =>
-                // This happens infrequently so clearing the whole cache is not too expensive
-                measurementsCache.clear()
+              // This happens infrequently
+              // TODO: Update cache
               case EntityModification.Update(_) =>
                 throw new UnsupportedOperationException("Immutable entity")
               case EntityModification.Remove(_) =>
-                // Measurements are normally not removed, but clearing the cache will make sure the cache gets updated later
-                measurementsCache.clear()
+              // Measurements are normally not removed
+              // TODO: Update cache
             }
           case _ => false // do nothing
         }

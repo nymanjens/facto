@@ -71,13 +71,15 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
   def forEdit(transactionGroupId: Long, returnToPath: Path, router: RouterContext): VdomElement =
     create(async {
-      val group = await(transactionGroupManager.findById(transactionGroupId).withTransactions)
+      val group = await(transactionGroupManager.findById(transactionGroupId))
+      val groupWithTransactions = await(group.withTransactions)
 
       Props(
-        operationMeta = OperationMeta.Edit(group),
-        groupPartial = TransactionGroup.Partial.from(group),
+        operationMeta = OperationMeta.Edit(groupWithTransactions),
+        groupPartial = TransactionGroup.Partial.from(groupWithTransactions),
         returnToPath = returnToPath,
-        router = router)
+        router = router
+      )
     })
 
   def forReservoir(reservoirCode: String, returnToPath: Path, router: RouterContext): VdomElement = {

@@ -58,13 +58,13 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
   }
 
   def administration() = AuthenticatedAction.requireAdminUser { implicit user => implicit request =>
-    Ok(views.html.administration(users = userManager.fetchAll(), Forms.addUserForm))
+    Ok(views.html.administration(users = userManager.fetchAllSync(), Forms.addUserForm))
   }
 
   def addUser() = AuthenticatedAction.requireAdminUser { implicit user => implicit request =>
     Forms.addUserForm.bindFromRequest.fold(
       formWithErrors =>
-        BadRequest(views.html.administration(users = userManager.fetchAll(), formWithErrors)), {
+        BadRequest(views.html.administration(users = userManager.fetchAllSync(), formWithErrors)), {
         case AddUserData(loginName, name, password, _) =>
           entityModificationHandler.persistEntityModifications(
             EntityModification.createAddWithRandomId(SlickUserManager.createUser(loginName, password, name)))

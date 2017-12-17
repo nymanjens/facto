@@ -9,7 +9,8 @@ import api.ScalaJsApi.{
 }
 import com.google.inject._
 import common.PlayI18n
-import common.time.Clock
+import common.money.Currency
+import common.time.{Clock, LocalDateTime}
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}
 import models.accounting.config.Config
@@ -18,7 +19,8 @@ import models.modificationhandler.EntityModificationHandler
 import models.user.User
 import models.{Entity, SlickEntityAccess}
 
-import scala.collection.immutable.Seq
+import scala.collection.immutable.{Seq, TreeMap}
+import scala.collection.mutable
 
 final class ScalaJsApiServerFactory @Inject()(
     implicit accountingConfig: Config,
@@ -34,7 +36,20 @@ final class ScalaJsApiServerFactory @Inject()(
       GetInitialDataResponse(
         accountingConfig = accountingConfig,
         user = user,
-        i18nMessages = i18n.allI18nMessages)
+        i18nMessages = i18n.allI18nMessages,
+        ratioReferenceToForeignCurrency = {
+          val mapBuilder =
+            mutable.Map[Currency, mutable.Builder[(LocalDateTime, Double), TreeMap[LocalDateTime, Double]]]()
+          for (measurement <- entityAccess.exchangeRateMeasurementManager.fetchAllSync()) {
+            val currency = measurement.foreignCurrency
+            if (!(mapBuilder contains currency)) {
+              mapBuilder(currency) = TreeMap.newBuilder[LocalDateTime, Double]
+            }
+            mapBuilder(currency) += (measurement.date -> measurement.ratioReferenceToForeignCurrency)
+          }
+          mapBuilder.toStream.map { case (k, v) => k -> v.result() }.toMap
+        }
+      )
 
     override def getAllEntities(types: Seq[EntityType.any]) = {
       // All modifications are idempotent so we can use the time when we started getting the entities as next update token.
@@ -42,7 +57,7 @@ final class ScalaJsApiServerFactory @Inject()(
       val entitiesMap: Map[EntityType.any, Seq[Entity]] = {
         types
           .map(entityType => {
-            entityType -> entityAccess.getManager(entityType).fetchAll()
+            entityType -> entityAccess.getManager(entityType).fetchAllSync()
           })
           .toMap
       }

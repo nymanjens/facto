@@ -20,7 +20,7 @@ case class BalanceCheck(issuerId: Long,
 
   override def toString = s"BalanceCheck(id=$idOption, issuer=$issuerId, $moneyReservoirCode)"
 
-  def issuer(implicit entityAccess: EntityAccess): User = entityAccess.userManager.findById(issuerId)
+  def issuer(implicit entityAccess: EntityAccess): User = entityAccess.userManager.findByIdSync(issuerId)
   def moneyReservoir(implicit accountingConfig: Config): MoneyReservoir =
     accountingConfig.moneyReservoir(moneyReservoirCode)
   def balance(implicit accountingConfig: Config): DatedMoney =

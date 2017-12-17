@@ -2,6 +2,7 @@ package models.user
 
 import models.Entity
 import models.manager.EntityManager
+import scala.collection.immutable.Seq
 
 case class User(loginName: String,
                 passwordHash: String,
@@ -18,6 +19,8 @@ object User {
   def tupled = (this.apply _).tupled
 
   trait Manager extends EntityManager[User] {
+    def findByIdSync(id: Long): User
+    def fetchAllSync(): Seq[User]
     def findByLoginName(loginName: String): Option[User]
   }
 }

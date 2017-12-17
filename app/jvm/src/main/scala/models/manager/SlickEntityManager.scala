@@ -4,6 +4,10 @@ import models.{Entity, EntityTable}
 import models.SlickUtils.dbApi._
 import slick.lifted.{AbstractTable, TableQuery}
 
+import scala.collection.immutable.Seq
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
+
 /** Provides access to persisted entries using the Slick API. */
 trait SlickEntityManager[E <: Entity, T <: AbstractTable[E]] extends EntityManager[E] {
 
@@ -29,6 +33,12 @@ trait SlickEntityManager[E <: Entity, T <: AbstractTable[E]] extends EntityManag
     * Don't run any mutating operations using these queries!
     */
   def newQuery: TableQuery[T]
+
+  /** Returns the entity with given ID or throws an exception. */
+  final def findByIdSync(id: Long): E = Await.result(findById(id), Duration.Inf)
+
+  /** Returns all stored entities. */
+  final def fetchAllSync(): Seq[E] = Await.result(fetchAll(), Duration.Inf)
 }
 
 object SlickEntityManager {

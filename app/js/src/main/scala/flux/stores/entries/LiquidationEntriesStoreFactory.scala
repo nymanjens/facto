@@ -98,7 +98,8 @@ final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProx
           case "" =>
             // Pick the first beneficiary in the group. This simulates that the zero sum transaction was physically
             // performed on an actual reservoir, which is needed for the liquidation calculator to work.
-            await(transaction.transactionGroup.withTransactions).transactions.head.beneficiary
+            val group = await(transaction.transactionGroup)
+            await(group.withTransactions).transactions.head.beneficiary
           case _ => transaction.moneyReservoir.owner
         }
         val involvedAccounts: Set[Account] = Set(transaction.beneficiary, moneyReservoirOwner)

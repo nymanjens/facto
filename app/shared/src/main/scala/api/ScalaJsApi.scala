@@ -7,12 +7,14 @@ import api.ScalaJsApi.{
   GetInitialDataResponse,
   UpdateToken
 }
+import common.money.Currency
 import common.time.LocalDateTime
 import models.Entity
 import models.accounting.config.Config
 import models.modification.{EntityModification, EntityType}
 import models.user.User
 
+import scala.collection.SortedMap
 import scala.collection.immutable.Seq
 
 trait ScalaJsApi {
@@ -34,7 +36,11 @@ object ScalaJsApi {
   /**
     * @param i18nMessages Maps key to the message with placeholders.
     */
-  case class GetInitialDataResponse(accountingConfig: Config, user: User, i18nMessages: Map[String, String])
+  case class GetInitialDataResponse(
+      accountingConfig: Config,
+      user: User,
+      i18nMessages: Map[String, String],
+      ratioReferenceToForeignCurrency: Map[Currency, SortedMap[LocalDateTime, Double]])
 
   case class GetAllEntitiesResponse(entitiesMap: Map[EntityType.any, Seq[Entity]],
                                     nextUpdateToken: UpdateToken) {

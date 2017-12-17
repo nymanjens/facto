@@ -53,7 +53,7 @@ private[stores] final class ComplexQueryFilter(implicit userManager: User.Manage
           case Prefix.Issuer =>
             QueryFilterPair.anyOf(
               Keys.Transaction.issuerId,
-              filterOptions(suffix, userManager.fetchAll())(_.name).map(_.id))
+              filterOptions(suffix, userManager.fetchAllSync())(_.name).map(_.id))
           case Prefix.Beneficiary =>
             QueryFilterPair.anyOf(
               Keys.Transaction.beneficiaryAccountCode,

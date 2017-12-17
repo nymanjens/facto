@@ -1,8 +1,11 @@
 package models.manager
 
+import scala.async.Async.{async, await}
+
+import scala.concurrent.ExecutionContext.Implicits.global
 import models.{Entity, EntityTable}
 import models.SlickUtils.dbApi._
-import models.SlickUtils.dbRun
+import models.SlickUtils.{dbRun, database}
 import play.api.Logger
 
 import scala.collection.immutable.Seq
@@ -39,15 +42,15 @@ private[manager] final class DatabaseBackedEntityManager[E <: Entity, T <: Entit
   }
 
   // ********** Implementation of SlickEntityManager interface - Getters ********** //
-  override def findById(id: Long): E = {
-    dbRun(newQuery.filter(_.id === id).result) match {
+  override def findById(id: Long) = async {
+    await(database.run(newQuery.filter(_.id === id).result)) match {
       case Seq(x) => x
       case Seq() => throw new IllegalArgumentException(s"Could not find entry with id=$id")
     }
   }
 
-  override def fetchAll(): List[E] = {
-    dbRun(newQuery.result).toList
+  override def fetchAll() = async {
+    await(database.run(newQuery.result)).toList
   }
 
   // ********** Implementation of SlickEntityManager interface ********** //

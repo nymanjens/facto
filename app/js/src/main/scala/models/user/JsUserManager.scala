@@ -12,11 +12,16 @@ final class JsUserManager(implicit database: RemoteDatabaseProxy)
     extends BaseJsEntityManager[User]
     with User.Manager {
 
+  override def findByIdSync(id: Long) = {
+    database.newQuery[User]().findOne(Keys.id, id).value.get.get.get
+  }
+  override def fetchAllSync() = {
+    database.newQuery[User]().data().value.get.get
+  }
   override def findByLoginName(loginName: String) = {
-    ???
-    //   database.newQuery[User]().filter(Keys.User.loginName isEqualTo loginName).data() match {
-    //   case Seq(user) => Option(user)
-    //   case Seq() => None
-    // }
+    database.newQuery[User]().filter(Keys.User.loginName isEqualTo loginName).data().value.get.get match {
+      case Seq(user) => Option(user)
+      case Seq() => None
+    }
   }
 }
