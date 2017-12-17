@@ -8,6 +8,7 @@ import models.manager.EntityManager
 import models.user.User
 
 import scala.collection.immutable.Seq
+import scala.concurrent.Future
 
 /** Transaction entities are immutable. Just delete and create a new one when updating. */
 case class Transaction(transactionGroupId: Long,
@@ -57,7 +58,7 @@ object Transaction {
   def tupled = (this.apply _).tupled
 
   trait Manager extends EntityManager[Transaction] {
-    def findByGroupId(groupId: Long): Seq[Transaction]
+    def findByGroupId(groupId: Long): Future[Seq[Transaction]]
   }
 
   /** Same as Transaction, except all fields are optional. */

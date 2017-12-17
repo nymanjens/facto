@@ -57,7 +57,7 @@ final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProx
     }
 
     override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) =
-      isRelevantForAccounts(transaction, accountPair)
+      isRelevantForAccountsSync(transaction, accountPair)
     override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) = false
 
     private def getRelevantTransactions(): Future[Seq[Transaction]] = async {
@@ -88,19 +88,31 @@ final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProx
             .thenAscBy(Keys.id))
           .data())
 
-      transactions.filter(isRelevantForAccounts(_, accountPair))
+      val isRelevantSeq = await(Future.sequence(transactions.map(isRelevantForAccounts(_, accountPair))))
+      (isRelevantSeq zip transactions).filter(_._1).map(_._2)
     }
 
-    private def isRelevantForAccounts(transaction: Transaction, accountPair: AccountPair): Boolean = {
-      val moneyReservoirOwner = transaction.moneyReservoirCode match {
-        case "" =>
-          // Pick the first beneficiary in the group. This simulates that the zero sum transaction was physically
-          // performed on an actual reservoir, which is needed for the liquidation calculator to work.
-          transaction.transactionGroup.transactions.head.beneficiary
-        case _ => transaction.moneyReservoir.owner
+    private def isRelevantForAccounts(transaction: Transaction, accountPair: AccountPair): Future[Boolean] =
+      async {
+        val moneyReservoirOwner = transaction.moneyReservoirCode match {
+          case "" =>
+            // Pick the first beneficiary in the group. This simulates that the zero sum transaction was physically
+            // performed on an actual reservoir, which is needed for the liquidation calculator to work.
+            await(transaction.transactionGroup.withTransactions).transactions.head.beneficiary
+          case _ => transaction.moneyReservoir.owner
+        }
+        val involvedAccounts: Set[Account] = Set(transaction.beneficiary, moneyReservoirOwner)
+        accountPair.toSet == involvedAccounts
       }
-      val involvedAccounts: Set[Account] = Set(transaction.beneficiary, moneyReservoirOwner)
-      accountPair.toSet == involvedAccounts
+
+    private def isRelevantForAccountsSync(transaction: Transaction, accountPair: AccountPair): Boolean = {
+      if (transaction.moneyReservoirCode == "") {
+        true // Heuristic
+      } else {
+        val moneyReservoirOwner = transaction.moneyReservoir.owner
+        val involvedAccounts: Set[Account] = Set(transaction.beneficiary, moneyReservoirOwner)
+        accountPair.toSet == involvedAccounts
+      }
     }
   }
 

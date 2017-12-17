@@ -10,6 +10,7 @@ import models.accounting.SlickTransactionManager.{Transactions, tableName}
 import models.manager.{ImmutableEntityManager, SlickEntityManager}
 
 import scala.collection.immutable.Seq
+import scala.concurrent.Future
 
 final class SlickTransactionManager @Inject()()
     extends ImmutableEntityManager[Transaction, Transactions](
@@ -19,8 +20,8 @@ final class SlickTransactionManager @Inject()()
       ))
     with Transaction.Manager {
 
-  override def findByGroupId(groupId: Long): Seq[Transaction] =
-    dbRun(newQuery.filter(_.transactionGroupId === groupId)).toList
+  override def findByGroupId(groupId: Long) =
+    Future.successful(dbRun(newQuery.filter(_.transactionGroupId === groupId)).toList)
 }
 
 object SlickTransactionManager {
