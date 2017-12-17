@@ -5,23 +5,17 @@ import models.access.RemoteDatabaseProxy
 import models.manager.BaseJsEntityManager
 
 import scala.collection.immutable.Seq
+import scala.concurrent.Future
 import scala2js.Converters._
 import scala2js.Keys
 
-final class JsUserManager(implicit database: RemoteDatabaseProxy)
+final class JsUserManager(allUsers: Seq[User])(implicit database: RemoteDatabaseProxy)
     extends BaseJsEntityManager[User]
     with User.Manager {
+  private val idToUser: Map[Long, User] = allUsers.map(u => u.id -> u).toMap
 
-  override def findByIdSync(id: Long) = {
-    database.newQuery[User]().findOne(Keys.id, id).value.get.get.get
-  }
-  override def fetchAllSync() = {
-    database.newQuery[User]().data().value.get.get
-  }
-  override def findByLoginName(loginName: String) = {
-    database.newQuery[User]().filter(Keys.User.loginName isEqualTo loginName).data().value.get.get match {
-      case Seq(user) => Option(user)
-      case Seq() => None
-    }
-  }
+  override def findByIdSync(id: Long) = idToUser(id)
+  override def fetchAllSync() = allUsers
+
+  override def findByLoginName(loginName: String) = allUsers.find(_.loginName == loginName)
 }

@@ -39,6 +39,7 @@ object ScalaJsApi {
   case class GetInitialDataResponse(
       accountingConfig: Config,
       user: User,
+      allUsers: Seq[User],
       i18nMessages: Map[String, String],
       ratioReferenceToForeignCurrency: Map[Currency, SortedMap[LocalDateTime, Double]])
 

@@ -36,6 +36,7 @@ final class ScalaJsApiServerFactory @Inject()(
       GetInitialDataResponse(
         accountingConfig = accountingConfig,
         user = user,
+        allUsers = entityAccess.userManager.fetchAllSync(),
         i18nMessages = i18n.allI18nMessages,
         ratioReferenceToForeignCurrency = {
           val mapBuilder =
