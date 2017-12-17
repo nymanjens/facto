@@ -133,7 +133,11 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
             }
           case StateWithMeta.Empty() =>
             for (i <- 0 until state.maxNumEntries + 1) yield {
-              Seq[VdomElement](<.td(^.colSpan := props.tableHeaders.size, " "))
+              Seq[VdomElement](
+                <.td(
+                  ^.colSpan := props.tableHeaders.size,
+                  ^.style := js.Dictionary("color" -> "white"),
+                  "loading..."))
             }
         }
       )
