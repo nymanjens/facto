@@ -1,10 +1,12 @@
 package models.access
 
+import jsfacades.LokiJs
 import api.ScalaJsApiClient
 import common.LoggingUtils.logExceptions
 import common.ScalaUtils.visibleForTesting
-import jsfacades.LokiJs
 import models.Entity
+import models.access.DbQuery.{Filter, Sorting}
+import models.access.DbQueryImplicits._
 import models.access.SingletonKey._
 import models.modification.EntityType
 import models.modification.EntityModification
@@ -41,6 +43,24 @@ trait RemoteDatabaseProxy {
 object RemoteDatabaseProxy {
 
   private val localDatabaseAndEntityVersion = "1.0"
+
+  trait ResultSet[E] {
+    // **************** Intermediary operations **************** //
+    def filter(filter: Filter[E]): ResultSet[E]
+
+    def sort(sorting: Sorting[E]): ResultSet[E]
+    def limit(quantity: Int): ResultSet[E]
+
+    // **************** Terminal operations **************** //
+    final def findOne[V](field: ModelField[V, E], value: V): Option[E] = {
+      filter(field isEqualTo value).limit(1).data() match {
+        case Seq(e) => Some(e)
+        case Seq() => None
+      }
+    }
+    def data(): Seq[E]
+    def count(): Int
+  }
 
   private[access] def create(apiClient: ScalaJsApiClient,
                              possiblyEmptyLocalDatabase: LocalDatabase): Future[RemoteDatabaseProxy.Impl] =
