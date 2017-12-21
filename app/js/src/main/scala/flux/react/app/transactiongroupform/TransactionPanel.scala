@@ -16,7 +16,8 @@ import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom.html_<^._
 import jsfacades.LokiJs
-import jsfacades.LokiJsImplicits._
+import models.access.DbQuery
+import models.access.DbQueryImplicits._
 import models.EntityAccess
 import models.access.RemoteDatabaseProxy
 import models.accounting.Transaction
@@ -25,7 +26,7 @@ import models.user.User
 
 import scala.collection.immutable.Seq
 import scala2js.Converters._
-import scala2js.Keys
+import models.access.Fields
 
 private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                                                            accountingConfig: Config,
@@ -411,10 +412,10 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         val category = categoryRef().value.get
         val transactions = remoteDatabaseProxy
           .newQuery[Transaction]()
-          .filter(Keys.Transaction.categoryCode isEqualTo category.code)
-          .filter(Keys.Transaction.description containsIgnoreCase enteredValue)
-          .sort(LokiJs.Sorting
-            .descBy(Keys.Transaction.createdDate))
+          .filter(Fields.Transaction.categoryCode isEqualTo category.code)
+          .filter(Fields.Transaction.description containsIgnoreCase enteredValue)
+          .sort(DbQuery.Sorting
+            .descBy(Fields.Transaction.createdDate))
           .limit(20)
           .data()
         transactions.toStream

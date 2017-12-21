@@ -18,15 +18,10 @@ object Scala2Js {
     def toScala(value: js.Dictionary[js.Any]): T
 
     // **************** Protected helper methods **************** //
-    protected final def getRequiredValueFromDict[V: Converter](dict: js.Dictionary[js.Any])(
-        key: Key[V, _]): V = {
-      require(dict.contains(key.name), s"Key ${key.name} is missing from ${js.JSON.stringify(dict)}")
-      Scala2Js.toScala[V](dict(key.name))
-    }
-
-    protected final def getOptionalValueFromDict[V: Converter](value: js.Dictionary[js.Any])(
-        key: String): Option[V] = {
-      value.get(key) map Scala2Js.toScala[V]
+    protected final def getRequiredValueFromDict[V](dict: js.Dictionary[js.Any])(
+        field: ModelField[V, _]): V = {
+      require(dict.contains(field.name), s"Key ${field.name} is missing from ${js.JSON.stringify(dict)}")
+      Scala2Js.toScala[V](dict(field.name))(Converters.fromModelField(field))
     }
   }
 

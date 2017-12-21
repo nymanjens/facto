@@ -76,7 +76,7 @@ private[tests] object LocalDatabaseTest extends ManualTestSuite {
     ManualTest("addAll") {
       async {
         val db = await(LocalDatabase.createInMemoryForTests(encryptionSecret))
-        db.addAll(Seq(testUser))
+        db.addAll(Seq(testUserRedacted))
         db.addAll(Seq(testTransactionWithId))
         db.addAll(Seq(testTransactionGroupWithId))
         db.addAll(Seq(testBalanceCheckWithId))

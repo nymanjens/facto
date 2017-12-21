@@ -1,12 +1,12 @@
 package models.access
 
-import jsfacades.LokiJs
 import api.ScalaJsApiClient
 import common.LoggingUtils.logExceptions
 import common.ScalaUtils.visibleForTesting
 import models.Entity
 import models.access.DbQuery.{Filter, Sorting}
 import models.access.DbQueryImplicits._
+import models.access.RemoteDatabaseProxy.ResultSet
 import models.access.SingletonKey._
 import models.modification.EntityType
 import models.modification.EntityModification
@@ -23,7 +23,7 @@ import scala2js.Converters._
 trait RemoteDatabaseProxy {
 
   // **************** Getters ****************//
-  def newQuery[E <: Entity: EntityType](): LokiJs.ResultSet[E]
+  def newQuery[E <: Entity: EntityType](): ResultSet[E]
 
   /** Returns true if there are local pending `Add` modifications for the given entity. Note that only its id is used. */
   def hasLocalAddModifications[E <: Entity: EntityType](entity: E): Boolean
@@ -133,8 +133,9 @@ object RemoteDatabaseProxy {
     private var isCallingListeners: Boolean = false
 
     // **************** Getters ****************//
-    override def newQuery[E <: Entity: EntityType](): LokiJs.ResultSet[E] = {
-      localDatabase.newQuery[E]()
+    override def newQuery[E <: Entity: EntityType](): ResultSet[E] = {
+      ???
+//      localDatabase.newQuery[E]()
     }
 
     override def hasLocalAddModifications[E <: Entity: EntityType](entity: E): Boolean = {

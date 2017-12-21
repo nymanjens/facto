@@ -2,7 +2,7 @@ package models.money
 
 import common.money.{Currency, ExchangeRateManager}
 import common.time.LocalDateTime
-import jsfacades.LokiJsImplicits._
+import models.access.DbQueryImplicits._
 import models.access.RemoteDatabaseProxy
 import models.modification.EntityType
 import models.modification.EntityModification
@@ -10,7 +10,7 @@ import models.modification.EntityModification
 import scala.collection.immutable.{Seq, TreeMap}
 import scala.collection.{SortedMap, mutable}
 import scala2js.Converters._
-import scala2js.Keys
+import models.access.Fields
 
 final class JsExchangeRateManager(implicit database: RemoteDatabaseProxy) extends ExchangeRateManager {
   database.registerListener(RemoteDatabaseProxyListener)
@@ -56,7 +56,7 @@ final class JsExchangeRateManager(implicit database: RemoteDatabaseProxy) extend
     val mapBuilder = TreeMap.newBuilder[LocalDateTime, Double]
     for (measurement <- database
            .newQuery[ExchangeRateMeasurement]()
-           .filter(Keys.ExchangeRateMeasurement.foreignCurrencyCode isEqualTo currency.code)
+           .filter(Fields.ExchangeRateMeasurement.foreignCurrencyCode isEqualTo currency.code)
            .data()) {
       mapBuilder += (measurement.date -> measurement.ratioReferenceToForeignCurrency)
     }

@@ -3,6 +3,7 @@ package models.access
 import common.testing.TestObjects._
 import common.testing.{FakeScalaJsApiClient, ModificationsBuffer}
 import jsfacades.LokiJs
+import models.access.DbQuery
 import models.Entity
 import models.accounting.Transaction
 import models.modification.EntityType.TransactionType

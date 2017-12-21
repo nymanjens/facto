@@ -4,14 +4,13 @@ import common.money.{ExchangeRateManager, ReferenceMoney}
 import common.time.{DatedMonth, LocalDateTime}
 import flux.stores.entries.SummaryForYearStoreFactory.SummaryForYear
 import jsfacades.LokiJs
-import jsfacades.LokiJsImplicits._
-import models.access.RemoteDatabaseProxy
+import models.access.{DbQuery, Fields, ModelField, RemoteDatabaseProxy}
+import models.access.DbQueryImplicits._
 import models.accounting.config.{Account, Category, Config}
 import models.accounting.{BalanceCheck, Transaction}
 
 import scala.collection.immutable.Seq
 import scala2js.Converters._
-import scala2js.Keys
 import scala2js.Scala2Js.Key
 
 final class SummaryForYearStoreFactory(implicit database: RemoteDatabaseProxy,
@@ -25,9 +24,9 @@ final class SummaryForYearStoreFactory(implicit database: RemoteDatabaseProxy,
 
   // **************** Implementation of EntriesStoreFactory methods/types ****************//
   override protected def createNew(input: Input) = new Store {
-    private val combinedFilter: LokiJs.Filter[Transaction] =
-      (Keys.Transaction.beneficiaryAccountCode isEqualTo input.account.code) &&
-        filterInYear(Keys.Transaction.consumedDate, input.year) &&
+    private val combinedFilter: DbQuery.Filter[Transaction] =
+      (Fields.Transaction.beneficiaryAccountCode isEqualTo input.account.code) &&
+        filterInYear(Fields.Transaction.consumedDate, input.year) &&
         complexQueryFilter.fromQuery(input.query)
 
     override protected def calculateState() = {
@@ -36,17 +35,17 @@ final class SummaryForYearStoreFactory(implicit database: RemoteDatabaseProxy,
           .newQuery[Transaction]()
           .filter(combinedFilter)
           .sort(
-            LokiJs.Sorting
-              .ascBy(Keys.Transaction.consumedDate)
-              .thenAscBy(Keys.Transaction.createdDate)
-              .thenAscBy(Keys.id))
+            DbQuery.Sorting
+              .ascBy(Fields.Transaction.consumedDate)
+              .thenAscBy(Fields.Transaction.createdDate)
+              .thenAscBy(Fields.id))
           .data()
 
       SummaryForYear(transactions)
     }
 
     override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) =
-      LokiJs.ResultSet.fake(Seq(transaction)).filter(combinedFilter).count() > 0
+      combinedFilter(transaction)
     override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) =
       false
   }
@@ -55,9 +54,9 @@ final class SummaryForYearStoreFactory(implicit database: RemoteDatabaseProxy,
   protected case class Input(account: Account, year: Int, query: String = "")
 
   // **************** Private helper methods ****************//
-  private def filterInYear[E](key: Key[LocalDateTime, E], year: Int): LokiJs.Filter[E] = {
+  private def filterInYear[E](field: ModelField[LocalDateTime, E], year: Int): DbQuery.Filter[E] = {
     val months = DatedMonth.allMonthsIn(year)
-    key >= months.head.startTime && key < months.last.startTimeOfNextMonth
+    field >= months.head.startTime && field < months.last.startTimeOfNextMonth
   }
 }
 

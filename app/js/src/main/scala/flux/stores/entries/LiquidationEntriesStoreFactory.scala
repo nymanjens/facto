@@ -3,7 +3,8 @@ package flux.stores.entries
 import common.LoggingUtils.logExceptions
 import common.money.{ExchangeRateManager, ReferenceMoney}
 import jsfacades.LokiJs
-import jsfacades.LokiJsImplicits._
+import models.access.DbQuery
+import models.access.DbQueryImplicits._
 import models.EntityAccess
 import models.access.RemoteDatabaseProxy
 import models.accounting.config.{Account, Config, MoneyReservoir}
@@ -11,7 +12,7 @@ import models.accounting.{BalanceCheck, Transaction}
 
 import scala.collection.immutable.Seq
 import scala2js.Converters._
-import scala2js.Keys
+import models.access.Fields
 
 final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
                                            accountingConfig: Config,
@@ -66,22 +67,22 @@ final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProx
       val transactions = database
         .newQuery[Transaction]()
         .filter(
-          LokiJs.Filter.nullFilter[Transaction]
+          DbQuery.Filter.NullFilter[Transaction]()
             ||
-              ((Keys.Transaction.moneyReservoirCode isAnyOf account1ReservoirCodes) &&
-                (Keys.Transaction.beneficiaryAccountCode isEqualTo accountPair.account2.code))
+              ((Fields.Transaction.moneyReservoirCode isAnyOf account1ReservoirCodes) &&
+                (Fields.Transaction.beneficiaryAccountCode isEqualTo accountPair.account2.code))
             ||
-              ((Keys.Transaction.moneyReservoirCode isAnyOf account2ReservoirCodes) &&
-                (Keys.Transaction.beneficiaryAccountCode isEqualTo accountPair.account1.code))
+              ((Fields.Transaction.moneyReservoirCode isAnyOf account2ReservoirCodes) &&
+                (Fields.Transaction.beneficiaryAccountCode isEqualTo accountPair.account1.code))
             ||
-              ((Keys.Transaction.moneyReservoirCode isEqualTo "") &&
-                (Keys.Transaction.beneficiaryAccountCode isAnyOf accountPair.toSet.map(_.code).toVector))
+              ((Fields.Transaction.moneyReservoirCode isEqualTo "") &&
+                (Fields.Transaction.beneficiaryAccountCode isAnyOf accountPair.toSet.map(_.code).toVector))
         )
         .sort(
-          LokiJs.Sorting
-            .ascBy(Keys.Transaction.transactionDate)
-            .thenAscBy(Keys.Transaction.createdDate)
-            .thenAscBy(Keys.id))
+          DbQuery.Sorting
+            .ascBy(Fields.Transaction.transactionDate)
+            .thenAscBy(Fields.Transaction.createdDate)
+            .thenAscBy(Fields.id))
         .data()
 
       transactions.filter(isRelevantForAccounts(_, accountPair))

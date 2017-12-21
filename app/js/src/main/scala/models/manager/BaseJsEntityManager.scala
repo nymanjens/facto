@@ -6,7 +6,7 @@ import models.modification.EntityType
 
 import scala.collection.immutable.Seq
 import scala2js.Converters._
-import scala2js.Keys
+import models.access.Fields
 
 abstract class BaseJsEntityManager[E <: Entity: EntityType](implicit database: RemoteDatabaseProxy)
     extends EntityManager[E] {

@@ -1,6 +1,7 @@
 package common.testing
 
 import jsfacades.LokiJs
+import models.access.DbQuery
 import models.Entity
 import models.access.RemoteDatabaseProxy
 import models.access.RemoteDatabaseProxy.Listener

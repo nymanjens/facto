@@ -3,6 +3,7 @@ package flux.stores.entries
 import common.testing.TestObjects.{testCategory, _}
 import flux.stores.entries.ComplexQueryFilter.{Prefix, QueryPart}
 import jsfacades.LokiJs
+import models.access.DbQuery
 import models.EntityAccess
 import models.accounting.Transaction
 import utest._

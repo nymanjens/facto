@@ -83,9 +83,11 @@ object LocalDatabase {
           Scala2Js.Key.toJsPair(Scala2JsKeys.value -> singleton.value))
       }
       override def toScala(dict: js.Dictionary[js.Any]) = {
-        def getRequired[T: Scala2Js.Converter](key: Scala2Js.Key[T, Singleton]) =
-          getRequiredValueFromDict(dict)(key)
-        Singleton(key = getRequired(Scala2JsKeys.key), value = getRequired(Scala2JsKeys.value))
+        def getRequired[V: Scala2Js.Converter](fieldName: String) = {
+          require(dict.contains(fieldName), s"Key ${fieldName} is missing from ${js.JSON.stringify(dict)}")
+          Scala2Js.toScala[V](dict(fieldName))
+        }
+        Singleton(key = getRequired[String]("key"), value = getRequired[js.Any]("value"))
       }
     }
 

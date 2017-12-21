@@ -8,18 +8,14 @@ import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.{
   GainsForMonth,
   GainsForYear
 }
-import jsfacades.LokiJs
-import jsfacades.LokiJsImplicits._
-import models.access.RemoteDatabaseProxy
+import models.access.DbQueryImplicits._
+import models.access.{DbQuery, Fields, ModelField, RemoteDatabaseProxy}
 import models.accounting.config.{Account, Config, MoneyReservoir}
-import common.money.Currency
 import models.accounting.{BalanceCheck, Transaction}
 
 import scala.collection.immutable.{Seq, SortedMap}
 import scala.collection.mutable
 import scala2js.Converters._
-import scala2js.Keys
-import scala2js.Scala2Js.Key
 
 /**
   * Store factory that calculates the monthly gains and losses made by exchange rate fluctuations in a given year.
@@ -57,13 +53,13 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
       val oldestRelevantBalanceCheck: Option[BalanceCheck] =
         database
           .newQuery[BalanceCheck]()
-          .filter(Keys.BalanceCheck.moneyReservoirCode isEqualTo reservoir.code)
-          .filter(Keys.BalanceCheck.checkDate < monthsInYear.head.startTime)
+          .filter(Fields.BalanceCheck.moneyReservoirCode isEqualTo reservoir.code)
+          .filter(Fields.BalanceCheck.checkDate < monthsInYear.head.startTime)
           .sort(
-            LokiJs.Sorting
-              .descBy(Keys.BalanceCheck.checkDate)
-              .thenDescBy(Keys.BalanceCheck.createdDate)
-              .thenDescBy(Keys.id))
+            DbQuery.Sorting
+              .descBy(Fields.BalanceCheck.checkDate)
+              .thenDescBy(Fields.BalanceCheck.createdDate)
+              .thenDescBy(Fields.id))
           .limit(1)
           .data()
           .headOption
@@ -74,10 +70,10 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
       val balanceChecks: Seq[BalanceCheck] =
         database
           .newQuery[BalanceCheck]()
-          .filter(Keys.BalanceCheck.moneyReservoirCode isEqualTo reservoir.code)
+          .filter(Fields.BalanceCheck.moneyReservoirCode isEqualTo reservoir.code)
           .filter(
             filterInRange(
-              Keys.BalanceCheck.checkDate,
+              Fields.BalanceCheck.checkDate,
               oldestBalanceDate,
               monthsInYear.last.startTimeOfNextMonth))
           .data()
@@ -85,10 +81,10 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
       val transactions: Seq[Transaction] =
         database
           .newQuery[Transaction]()
-          .filter(Keys.Transaction.moneyReservoirCode isEqualTo reservoir.code)
+          .filter(Fields.Transaction.moneyReservoirCode isEqualTo reservoir.code)
           .filter(
             filterInRange(
-              Keys.Transaction.transactionDate,
+              Fields.Transaction.transactionDate,
               oldestBalanceDate,
               monthsInYear.last.startTimeOfNextMonth))
           .data()
@@ -138,10 +134,10 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
     private def isRelevantReservoir(reservoir: MoneyReservoir): Boolean =
       reservoir.owner == input.account && reservoir.currency.isForeign
 
-    private def filterInRange[E](key: Key[LocalDateTime, E],
+    private def filterInRange[E](field: ModelField[LocalDateTime, E],
                                  start: LocalDateTime,
-                                 end: LocalDateTime): LokiJs.Filter[E] = {
-      (key >= start) && (key < end)
+                                 end: LocalDateTime): DbQuery.Filter[E] = {
+      (field >= start) && (field < end)
     }
   }
 
