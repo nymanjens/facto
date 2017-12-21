@@ -4,6 +4,7 @@ import java.time.Month.MARCH
 
 import common.testing.TestObjects._
 import common.time.LocalDateTime
+import models.access.Fields
 import models.accounting._
 import models.modification.EntityType
 import models.money.ExchangeRateMeasurement
@@ -13,11 +14,16 @@ import utest._
 import scala.collection.immutable.Seq
 import scala.scalajs.js
 import scala2js.Converters._
+import scala2js.Scala2Js.Converter
 
 object ConvertersTest extends TestSuite {
   val dateTime = LocalDateTime.of(2022, MARCH, 13, 12, 13)
 
   override def tests = TestSuite {
+    "fromModelField" - {
+      Converters.fromModelField(Fields.Transaction.categoryCode) ==> Converters.StringConverter
+      Converters.fromModelField(Fields.id[User]) ==> Converters.LongConverter
+    }
     "LongConverter" - {
       "to JS and back" - {
         testToJsAndBack[Long](1L)

@@ -4,6 +4,7 @@ import java.time.{LocalDate, LocalTime}
 
 import common.time.LocalDateTime
 import models._
+import models.access.{Fields, ModelField}
 import models.accounting._
 import models.manager._
 import models.modification._
@@ -28,6 +29,42 @@ object Converters {
       case EntityType.ExchangeRateMeasurementType => ExchangeRateMeasurementConverter
     }
     converter.asInstanceOf[Scala2Js.MapConverter[E]]
+  }
+
+  def fromModelField[V](modelField: ModelField[V, _]): Converter[V] = {
+    def fromField[V2: Converter](modelField: ModelField[V2, _]): Converter[V2] = implicitly[Converter[V2]]
+    val result = modelField match {
+      case Fields.User.loginName => fromField(Fields.User.loginName)
+      case Fields.User.passwordHash => fromField(Fields.User.passwordHash)
+      case Fields.User.name => fromField(Fields.User.name)
+      case Fields.User.databaseEncryptionKey => fromField(Fields.User.databaseEncryptionKey)
+      case Fields.User.expandCashFlowTablesByDefault => fromField(Fields.User.expandCashFlowTablesByDefault)
+      case Fields.Transaction.transactionGroupId => fromField(Fields.Transaction.transactionGroupId)
+      case Fields.Transaction.issuerId => fromField(Fields.Transaction.issuerId)
+      case Fields.Transaction.beneficiaryAccountCode => fromField(Fields.Transaction.beneficiaryAccountCode)
+      case Fields.Transaction.moneyReservoirCode => fromField(Fields.Transaction.moneyReservoirCode)
+      case Fields.Transaction.categoryCode => fromField(Fields.Transaction.categoryCode)
+      case Fields.Transaction.description => fromField(Fields.Transaction.description)
+      case Fields.Transaction.flowInCents => fromField(Fields.Transaction.flowInCents)
+      case Fields.Transaction.detailDescription => fromField(Fields.Transaction.detailDescription)
+      case Fields.Transaction.tags => fromField(Fields.Transaction.tags)
+      case Fields.Transaction.createdDate => fromField(Fields.Transaction.createdDate)
+      case Fields.Transaction.transactionDate => fromField(Fields.Transaction.transactionDate)
+      case Fields.Transaction.consumedDate => fromField(Fields.Transaction.consumedDate)
+      case Fields.TransactionGroup.createdDate => fromField(Fields.TransactionGroup.createdDate)
+      case Fields.BalanceCheck.issuerId => fromField(Fields.BalanceCheck.issuerId)
+      case Fields.BalanceCheck.moneyReservoirCode => fromField(Fields.BalanceCheck.moneyReservoirCode)
+      case Fields.BalanceCheck.balanceInCents => fromField(Fields.BalanceCheck.balanceInCents)
+      case Fields.BalanceCheck.createdDate => fromField(Fields.BalanceCheck.createdDate)
+      case Fields.BalanceCheck.checkDate => fromField(Fields.BalanceCheck.checkDate)
+      case Fields.ExchangeRateMeasurement.date => fromField(Fields.ExchangeRateMeasurement.date)
+      case Fields.ExchangeRateMeasurement.foreignCurrencyCode =>
+        fromField(Fields.ExchangeRateMeasurement.foreignCurrencyCode)
+      case Fields.ExchangeRateMeasurement.ratioReferenceToForeignCurrency =>
+        fromField(Fields.ExchangeRateMeasurement.ratioReferenceToForeignCurrency)
+      case f if f.name == "id" => LongConverter
+    }
+    result.asInstanceOf[Converter[V]]
   }
 
   // **************** General converters **************** //

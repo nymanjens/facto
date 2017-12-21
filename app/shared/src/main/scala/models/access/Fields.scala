@@ -8,7 +8,7 @@ import models.user.User
 import scala.collection.immutable.Seq
 
 object Fields {
-  private def id[E <: Entity]: ModelField[Long, E] = new ModelField("id", _.idOption getOrElse -1)
+  def id[E <: Entity]: ModelField[Long, E] = new ModelField("id", _.idOption getOrElse -1)
 
   object User {
     private type E = User
