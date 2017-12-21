@@ -4,6 +4,7 @@ import common.GuavaReplacement.Iterables.getOnlyElement
 import common.LoggingUtils.logExceptions
 import common.ScalaUtils
 import jsfacades.LokiJs.Sorting.KeyWithDirection
+import models.access.ModelField
 
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
@@ -169,7 +170,7 @@ object LokiJs {
     def limit(quantity: Int): ResultSet[E]
 
     // **************** Terminal operations **************** //
-    def findOne[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): Option[E]
+    def findOne[V](field: ModelField[V, E], value: V): Option[E]
     def data(): Seq[E]
     def count(): Int
   }
@@ -284,8 +285,8 @@ object LokiJs {
       }
 
       // **************** Terminal operations **************** //
-      override def findOne[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V) = {
-        val data = facade.find(js.Dictionary(Scala2Js.Key.toJsPair(key -> value)), firstOnly = true).data()
+      override def findOne[V](field: ModelField[V, E], value: V) = {
+        val data = facade.find(js.Dictionary(Scala2Js.toJsPair(field -> value)), firstOnly = true).data()
         if (data.length >= 1) {
           Option(Scala2Js.toScala[E](getOnlyElement(data)))
         } else {
@@ -371,11 +372,13 @@ object LokiJs {
       // **************** Terminal operations **************** //
       override def data() = entities
 
-      override def findOne[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V) =
-        filter(Filter.equal(key, value)).limit(1).data() match {
-          case Seq(e) => Some(e)
-          case Seq() => None
-        }
+      override def findOne[V](field: ModelField[V, E], value: V) = {
+        val (fieldName, jsValue) = Scala2Js.toJsPair(field -> value)
+        entities.find(entity => {
+          val jsMap = Scala2Js.toJsMap(entity)
+          jsMap(fieldName) == jsValue
+        })
+      }
 
       override def count() = entities.length
     }

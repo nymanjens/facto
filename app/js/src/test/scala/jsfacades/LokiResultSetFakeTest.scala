@@ -5,6 +5,7 @@ import java.time.Month.JANUARY
 import common.testing.TestObjects._
 import common.time.LocalDateTimes.createDateTime
 import jsfacades.LokiJs.{Filter, ResultSet}
+import models.access.Fields
 import models.accounting.Transaction
 import models.accounting.config.Category
 import models.modification.EntityModification
@@ -219,7 +220,7 @@ object LokiResultSetFakeTest extends TestSuite {
         val transaction3 = createTransaction()
 
         withTransactions(transaction1, transaction2, transaction3)
-          .assertThat(_.findOne(Keys.id, transaction2.id))
+          .assertThat(_.findOne(Fields.id, transaction2.id))
           .isEqualTo(Some(transaction2))
       }
       "newQuery().count()" - {

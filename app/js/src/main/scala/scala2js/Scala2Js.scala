@@ -1,5 +1,7 @@
 package scala2js
 
+import models.access.ModelField
+
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 
@@ -56,4 +58,9 @@ object Scala2Js {
   def toScala[T: Converter](value: js.Any): T = {
     implicitly[Converter[T]].toScala(value)
   }
+
+  def toJsPair[V, E](fieldValuePair: (ModelField[V, E], V)): (String, js.Any) =
+    fieldValuePair match {
+      case (field, value) => field.name -> toJs(value)(Converters.fromModelField(field))
+    }
 }
