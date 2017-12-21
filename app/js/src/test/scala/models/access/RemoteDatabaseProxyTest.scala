@@ -3,12 +3,10 @@ package models.access
 import common.testing.TestObjects._
 import common.testing.{FakeScalaJsApiClient, ModificationsBuffer}
 import jsfacades.LokiJs
-import models.access.DbQuery
 import models.Entity
 import models.accounting.Transaction
+import models.modification.{EntityModification, EntityType}
 import models.modification.EntityType.TransactionType
-import models.modification.EntityType
-import models.modification.EntityModification
 import utest._
 
 import scala.async.Async.{async, await}
