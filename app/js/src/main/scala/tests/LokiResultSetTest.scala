@@ -13,7 +13,6 @@ import scala.concurrent.Future
 import scala.language.reflectiveCalls
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
-import scala2js.Keys
 
 // Note that this is a manual test because the Rhino javascript engine used for tests
 // is incompatible with Loki.

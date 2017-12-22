@@ -25,19 +25,6 @@ object Scala2Js {
     }
   }
 
-  /**
-    * @param name The name of this key in a js dictionary
-    * @tparam V The scala type of the values
-    * @tparam E The scala type corresponding to the js dictionary of which this key is a part
-    */
-  case class Key[V: Converter, E](name: String)
-  object Key {
-    def toJsPair[V: Converter, E](keyValuePair: (Key[V, E], V)): (String, js.Any) =
-      keyValuePair match {
-        case (key, value) => key.name -> toJs(value)
-      }
-  }
-
   def toJs[T: Converter](value: T): js.Any = {
     implicitly[Converter[T]].toJs(value)
   }
