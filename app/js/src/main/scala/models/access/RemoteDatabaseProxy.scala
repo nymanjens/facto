@@ -112,8 +112,7 @@ object RemoteDatabaseProxy {
 
     // **************** Getters ****************//
     override def newQuery[E <: Entity: EntityType](): DbResultSet[E] = {
-      ???
-//      localDatabase.newQuery[E]()
+      localDatabase.newQuery[E]()
     }
 
     override def hasLocalAddModifications[E <: Entity: EntityType](entity: E): Boolean = {
