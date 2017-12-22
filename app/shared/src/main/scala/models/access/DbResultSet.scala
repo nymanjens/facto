@@ -1,14 +1,12 @@
 package models.access
 
-import scala.async.Async.{async, await}
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import models.access.DbQuery.{Filter, Operation, Sorting}
 import models.access.DbQuery.{Filter, Sorting}
 import models.access.DbQueryImplicits._
 
+import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
 import scala.collection.mutable
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 final class DbResultSet[E] private (executor: DbQueryExecutor[E]) {

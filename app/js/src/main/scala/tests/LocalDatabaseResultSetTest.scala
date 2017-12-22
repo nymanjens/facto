@@ -1,9 +1,6 @@
 package tests
 
 import common.testing.TestObjects._
-import jsfacades.LokiJs
-import jsfacades.LokiJs.{Filter, ResultSet}
-import models.access.LocalDatabase
 import models.access.DbQuery.Filter
 import models.access.DbQueryImplicits._
 import models.access.{DbQuery, DbResultSet, Fields, LocalDatabase}
@@ -223,7 +220,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction()
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertThat(_.findOne(Keys.id, transaction2.id))
+        .assertThat(_.findOne(Fields.id, transaction2.id))
         .isEqualTo(Some(transaction2))
     },
     ManualTest("newQuery().count()") {

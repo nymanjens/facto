@@ -1,7 +1,5 @@
 package models.access
 
-import scala.scalajs.js
-import scala.scalajs.js.JSConverters._
 import common.ScalaUtils.visibleForTesting
 import jsfacades.LokiJs.Filter.Operation
 import jsfacades.{CryptoJs, LokiJs}
@@ -13,6 +11,7 @@ import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
+import scala.scalajs.js.JSConverters._
 import scala.util.matching.Regex
 import scala2js.Converters._
 import scala2js.Scala2Js
@@ -147,8 +146,8 @@ object LocalDatabase {
     // **************** Getters ****************//
     override def newQuery[E <: Entity: EntityType](): DbResultSet[E] =
       DbResultSet.fromExecutor(new DbQueryExecutor[E] {
-        override def data(dbQuery: DbQuery[E]) = lokiResultSet(dbQuery).data()
-        override def count(dbQuery: DbQuery[E]) = lokiResultSet(dbQuery).count()
+        override def data(dbQuery: DbQuery[E]) = Future.successful(lokiResultSet(dbQuery).data())
+        override def count(dbQuery: DbQuery[E]) = Future.successful(lokiResultSet(dbQuery).count())
 
         private def lokiResultSet(dbQuery: DbQuery[E]): LokiJs.ResultSet[E] = {
           var resultSet = entityCollectionForImplicitType[E].chain()
@@ -222,7 +221,7 @@ object LocalDatabase {
     }
 
     override def isEmpty: Boolean = {
-      allCollections.toStream.filter(_.chain().count().value.get.get != 0).isEmpty
+      allCollections.toStream.filter(_.chain().count() != 0).isEmpty
     }
 
     // **************** Setters ****************//
@@ -233,7 +232,7 @@ object LocalDatabase {
             case addModification: EntityModification.Add[_] =>
               def add[E <: Entity](modification: EntityModification.Add[E]): Boolean = {
                 implicit val _ = modification.entityType
-                newQuery[E]().findOne(Keys.id, modification.entity.id).value.get.get match {
+                newQuery[E]().findOne(Fields.id, modification.entity.id).value.get.get match {
                   case Some(entity) => false // do nothing
                   case None =>
                     entityCollectionForImplicitType[E].insert(modification.entity)
@@ -244,7 +243,7 @@ object LocalDatabase {
             case updateModification: EntityModification.Update[_] =>
               def update[E <: Entity](modification: EntityModification.Update[E]): Boolean = {
                 implicit val _ = modification.entityType
-                newQuery[E]().findOne(Keys.id, modification.updatedEntity.id).value.get.get match {
+                newQuery[E]().findOne(Fields.id, modification.updatedEntity.id).value.get.get match {
                   case Some(_) =>
                     // Not using collection.update() because it requires a sync
                     entityCollectionForImplicitType[E]
@@ -258,7 +257,7 @@ object LocalDatabase {
             case removeModification: EntityModification.Remove[_] =>
               def remove[E <: Entity](modification: EntityModification.Remove[E]): Boolean = {
                 implicit val _ = modification.entityType
-                newQuery[E]().findOne(Keys.id, modification.entityId).value.get.get match {
+                newQuery[E]().findOne(Fields.id, modification.entityId).value.get.get match {
                   case Some(entity) =>
                     entityCollectionForImplicitType.findAndRemove(Fields.id.name, modification.entityId)
                     true
@@ -273,7 +272,7 @@ object LocalDatabase {
 
     override def addAll[E <: Entity: EntityType](entities: Seq[E]): Unit = {
       for (entity <- entities) {
-        newQuery[E]().findOne(Keys.id, entity.id).value.get.get match {
+        newQuery[E]().findOne(Fields.id, entity.id).value.get.get match {
           case Some(_) => // do nothing
           case None => entityCollectionForImplicitType.insert(entity)
         }

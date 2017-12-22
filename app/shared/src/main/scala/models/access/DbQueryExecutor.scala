@@ -1,15 +1,16 @@
 package models.access
 
 import scala.collection.immutable.Seq
+import scala.concurrent.Future
 
 trait DbQueryExecutor[E] {
-  def data(dbQuery: DbQuery[E]): Seq[E]
-  def count(dbQuery: DbQuery[E]): Int
+  def data(dbQuery: DbQuery[E]): Future[Seq[E]]
+  def count(dbQuery: DbQuery[E]): Future[Int]
 }
 object DbQueryExecutor {
   def fromEntities[E](entities: Iterable[E]): DbQueryExecutor[E] = new DbQueryExecutor[E] {
-    override def data(dbQuery: DbQuery[E]) = stream(dbQuery).toVector
-    override def count(dbQuery: DbQuery[E]) = stream(dbQuery).size
+    override def data(dbQuery: DbQuery[E]) = Future.successful(stream(dbQuery).toVector)
+    override def count(dbQuery: DbQuery[E]) = Future.successful(stream(dbQuery).size)
 
     private def stream(dbQuery: DbQuery[E]): Stream[E] = {
       var stream = entities.toStream.filter(dbQuery.filter.apply)
