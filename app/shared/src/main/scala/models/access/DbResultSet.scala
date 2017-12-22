@@ -1,6 +1,6 @@
 package models.access
 
-import models.access.DbQuery.{Filter, Operation, Sorting}
+import models.access.DbQuery.{Filter, Sorting}
 import models.access.DbQueryImplicits._
 import models.access.DbResultSet.DbQueryExecutor
 
@@ -38,10 +38,10 @@ final class DbResultSet[E] private (executor: DbQueryExecutor[E]) {
       case Seq() => None
     }
   }
-  def data(): Seq[E] = executor(dbQuery(Operation.GetDataSeq()))
-  def count(): Int = executor(dbQuery(Operation.Count()))
+  def data(): Seq[E] = executor.data(dbQuery)
+  def count(): Int = executor.count(dbQuery)
 
-  private def dbQuery[ReturnT](operation: Operation[E, ReturnT]): DbQuery[E, ReturnT] =
+  private def dbQuery: DbQuery[E] =
     DbQuery(
       filter = filters.toVector match {
         case Vector() => Filter.NullFilter()
@@ -49,8 +49,7 @@ final class DbResultSet[E] private (executor: DbQueryExecutor[E]) {
         case multipleFilters => Filter.And(multipleFilters)
       },
       sorting = sorting,
-      limit = limit,
-      operation = operation
+      limit = limit
     )
 }
 
@@ -58,6 +57,7 @@ object DbResultSet {
   def fromExecutor[E](executor: DbQueryExecutor[E]): DbResultSet[E] = new DbResultSet(executor)
 
   trait DbQueryExecutor[E] {
-    def apply[ReturnT](query: DbQuery[E, ReturnT]): ReturnT
+    def data(dbQuery: DbQuery[E]): Seq[E]
+    def count(dbQuery: DbQuery[E]): Int
   }
 }

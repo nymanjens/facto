@@ -21,9 +21,9 @@ object DbQueryImplicits {
       Filter.DoesntContainIgnoreCase(field, substring)
   }
 
-  implicit class SeqKeyWrapper[E, V](field: ModelField[Seq[V], E]) {
-    def contains(value: V): Filter[E] = Filter.SeqContains(field, value)
-    def doesntContain(value: V): Filter[E] = Filter.SeqDoesntContain(field, value)
+  implicit class SeqKeyWrapper[E](field: ModelField[Seq[String], E]) {
+    def contains(value: String): Filter[E] = Filter.SeqContains(field, value)
+    def doesntContain(value: String): Filter[E] = Filter.SeqDoesntContain(field, value)
   }
 
   implicit class FilterWrapper[E](thisFilter: Filter[E]) {

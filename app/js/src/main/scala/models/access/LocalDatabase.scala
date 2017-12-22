@@ -1,6 +1,7 @@
 package models.access
 
 import common.ScalaUtils.visibleForTesting
+import jsfacades.LokiJs.Filter.Operation
 import jsfacades.{CryptoJs, LokiJs}
 import models.Entity
 import models.access.DbResultSet.DbQueryExecutor
@@ -11,8 +12,9 @@ import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
+import scala.util.matching.Regex
 import scala2js.Converters._
-import scala2js.{Keys, Scala2Js}
+import scala2js.Scala2Js
 
 @visibleForTesting
 trait LocalDatabase {
@@ -144,11 +146,62 @@ object LocalDatabase {
     // **************** Getters ****************//
     override def newQuery[E <: Entity: EntityType](): DbResultSet[E] =
       DbResultSet.fromExecutor(new DbQueryExecutor[E] {
-        override def apply[ReturnT](query: DbQuery[E, ReturnT]) = query match {
-          case _ => ???
+        override def data(dbQuery: DbQuery[E]) = lokiResultSet(dbQuery).data()
+        override def count(dbQuery: DbQuery[E]) = lokiResultSet(dbQuery).count()
+
+        private def lokiResultSet(dbQuery: DbQuery[E]): LokiJs.ResultSet[E] = {
+          var resultSet = entityCollectionForImplicitType[E].chain()
+          for (filter <- toLokiJsFilter(dbQuery.filter)) {
+            resultSet = resultSet.filter(filter)
+          }
+          for (sorting <- dbQuery.sorting) {
+            resultSet = resultSet.sort(LokiJs.Sorting(sorting.fieldsWithDirection.map {
+              case DbQuery.Sorting.FieldWithDirection(field, isDesc) =>
+                LokiJs.Sorting.KeyWithDirection(field.name, isDesc)
+            }))
+          }
+          for (limit <- dbQuery.limit) {
+            resultSet = resultSet.limit(limit)
+          }
+          resultSet
+        }
+
+        private def toLokiJsFilter(filter: DbQuery.Filter[E]): Option[LokiJs.Filter] = {
+          def keyValueFilter[V](operation: Operation,
+                                field: ModelField[V, E],
+                                value: V): Option[LokiJs.Filter] = {
+            val (fieldName, jsValue) = Scala2Js.toJsPair(field -> value)
+            Some(LokiJs.Filter.KeyValueFilter(operation, fieldName, jsValue))
+          }
+          filter match {
+            case DbQuery.Filter.NullFilter() => None
+            case DbQuery.Filter.Equal(field, value) => keyValueFilter(Operation.Equal, field, value)
+            case DbQuery.Filter.NotEqual(field, value) => keyValueFilter(Operation.NotEqual, field, value)
+            case DbQuery.Filter.GreaterThan(field, value) =>
+              keyValueFilter(Operation.GreaterThan, field, value)
+            case DbQuery.Filter.GreaterOrEqualThan(field, value) =>
+              keyValueFilter(Operation.GreaterOrEqualThan, field, value)
+            case DbQuery.Filter.LessThan(field, value) => keyValueFilter(Operation.LessThan, field, value)
+            case DbQuery.Filter.AnyOf(field, values) => keyValueFilter(Operation.AnyOf, field, values)
+            case DbQuery.Filter.NoneOf(field, values) => keyValueFilter(Operation.NoneOf, field, values)
+            case DbQuery.Filter.ContainsIgnoreCase(field, substring) =>
+              Some(
+                LokiJs.Filter
+                  .KeyValueFilter(Operation.Regex, field.name, js.Array(Regex.quote(substring), "i")))
+            case DbQuery.Filter.DoesntContainIgnoreCase(field, substring) =>
+              Some(LokiJs.Filter.KeyValueFilter(Operation.Regex, field.name, js.Array(s"""^((?!${Regex
+                .quote(substring)})[\\s\\S])*$$""", "i")))
+            case DbQuery.Filter.SeqContains(field, value) =>
+              Some(LokiJs.Filter.KeyValueFilter(Operation.Contains, field.name, Scala2Js.toJs(value)))
+            case DbQuery.Filter.SeqDoesntContain(field, value) =>
+              Some(LokiJs.Filter.KeyValueFilter(Operation.ContainsNone, field.name, Scala2Js.toJs(value)))
+            case DbQuery.Filter.Or(filters) =>
+              Some(LokiJs.Filter.AggregateFilter(Operation.Or, filters.flatMap(toLokiJsFilter)))
+            case DbQuery.Filter.And(filters) =>
+              Some(LokiJs.Filter.AggregateFilter(Operation.And, filters.flatMap(toLokiJsFilter)))
+          }
         }
       })
-//      entityCollectionForImplicitType.chain()
 
     override def getSingletonValue[V](key: SingletonKey[V]): Option[V] = {
       implicit val converter = key.valueConverter
