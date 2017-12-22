@@ -41,8 +41,5 @@ object Scala2Js {
     implicitly[Converter[T]].toScala(value)
   }
 
-  def toJsPair[V, E](fieldValuePair: (ModelField[V, E], V)): (String, js.Any) =
-    fieldValuePair match {
-      case (field, value) => field.name -> toJs(value)(Converters.fromModelField(field))
-    }
+  def toJs[V, E](value: V, field: ModelField[V, E]): js.Any = toJs(value)(Converters.fromModelField(field))
 }

@@ -1,5 +1,7 @@
 package models.access
 
+import scala.scalajs.js
+import scala.scalajs.js.JSConverters._
 import common.ScalaUtils.visibleForTesting
 import jsfacades.LokiJs.Filter.Operation
 import jsfacades.{CryptoJs, LokiJs}
@@ -166,12 +168,15 @@ object LocalDatabase {
         }
 
         private def toLokiJsFilter(filter: DbQuery.Filter[E]): Option[LokiJs.Filter] = {
+          def rawKeyValueFilter(operation: Operation,
+                                field: ModelField[_, E],
+                                jsValue: js.Any): Option[LokiJs.Filter] =
+            Some(LokiJs.Filter.KeyValueFilter(operation, field.name, jsValue))
           def keyValueFilter[V](operation: Operation,
                                 field: ModelField[V, E],
-                                value: V): Option[LokiJs.Filter] = {
-            val (fieldName, jsValue) = Scala2Js.toJsPair(field -> value)
-            Some(LokiJs.Filter.KeyValueFilter(operation, fieldName, jsValue))
-          }
+                                value: V): Option[LokiJs.Filter] =
+            rawKeyValueFilter(operation, field, Scala2Js.toJs(value, field))
+
           filter match {
             case DbQuery.Filter.NullFilter() => None
             case DbQuery.Filter.Equal(field, value) => keyValueFilter(Operation.Equal, field, value)
@@ -181,19 +186,19 @@ object LocalDatabase {
             case DbQuery.Filter.GreaterOrEqualThan(field, value) =>
               keyValueFilter(Operation.GreaterOrEqualThan, field, value)
             case DbQuery.Filter.LessThan(field, value) => keyValueFilter(Operation.LessThan, field, value)
-            case DbQuery.Filter.AnyOf(field, values) => keyValueFilter(Operation.AnyOf, field, values)
-            case DbQuery.Filter.NoneOf(field, values) => keyValueFilter(Operation.NoneOf, field, values)
+            case DbQuery.Filter.AnyOf(field, values) =>
+              rawKeyValueFilter(Operation.AnyOf, field, values.map(Scala2Js.toJs(_, field)).toJSArray)
+            case DbQuery.Filter.NoneOf(field, values) =>
+              rawKeyValueFilter(Operation.NoneOf, field, values.map(Scala2Js.toJs(_, field)).toJSArray)
             case DbQuery.Filter.ContainsIgnoreCase(field, substring) =>
-              Some(
-                LokiJs.Filter
-                  .KeyValueFilter(Operation.Regex, field.name, js.Array(Regex.quote(substring), "i")))
+              rawKeyValueFilter(Operation.Regex, field, js.Array(Regex.quote(substring), "i"))
             case DbQuery.Filter.DoesntContainIgnoreCase(field, substring) =>
-              Some(LokiJs.Filter.KeyValueFilter(Operation.Regex, field.name, js.Array(s"""^((?!${Regex
-                .quote(substring)})[\\s\\S])*$$""", "i")))
+              rawKeyValueFilter(Operation.Regex, field, js.Array(s"""^((?!${Regex
+                .quote(substring)})[\\s\\S])*$$""", "i"))
             case DbQuery.Filter.SeqContains(field, value) =>
-              Some(LokiJs.Filter.KeyValueFilter(Operation.Contains, field.name, Scala2Js.toJs(value)))
+              rawKeyValueFilter(Operation.Contains, field, Scala2Js.toJs(value))
             case DbQuery.Filter.SeqDoesntContain(field, value) =>
-              Some(LokiJs.Filter.KeyValueFilter(Operation.ContainsNone, field.name, Scala2Js.toJs(value)))
+              rawKeyValueFilter(Operation.ContainsNone, field, Scala2Js.toJs(value))
             case DbQuery.Filter.Or(filters) =>
               Some(LokiJs.Filter.AggregateFilter(Operation.Or, filters.flatMap(toLokiJsFilter)))
             case DbQuery.Filter.And(filters) =>
