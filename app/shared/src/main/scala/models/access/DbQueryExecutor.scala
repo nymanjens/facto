@@ -22,14 +22,15 @@ object DbQueryExecutor {
       stream
     }
 
-    private def ordering(sorting: DbQuery.Sorting[E]): Ordering[E] = new Ordering[E] {
-      override def compare(x: E, y: E) = {
-        sorting.fieldsWithDirection.toStream.flatMap {
-          case f @ DbQuery.Sorting.FieldWithDirection(field, isDesc) =>
-            val result = f.valueOrdering.compare(field.get(x), field.get(y))
-            if (result == 0) None else Some(result)
-        }.headOption getOrElse 0
-      }
+    private def ordering(sorting: DbQuery.Sorting[E]): Ordering[E] = (x: E, y: E) => {
+      sorting.fieldsWithDirection.toStream.flatMap {
+        case f @ DbQuery.Sorting.FieldWithDirection(field, isDesc) =>
+          f.valueOrdering.compare(field.get(x), field.get(y)) match {
+            case 0 => None
+            case result if isDesc => Some(-result)
+            case result => Some(result)
+          }
+      }.headOption getOrElse 0
     }
   }
 }

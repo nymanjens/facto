@@ -2,8 +2,6 @@ package models.access
 
 import java.util.Objects
 
-import scala.reflect.ClassTag
-
 /**
   * Represents a field in an model entity.
   *
@@ -14,6 +12,8 @@ import scala.reflect.ClassTag
 final class ModelField[V, E] private[access] (val name: String, accessor: E => V) {
 
   def get(entity: E): V = accessor(entity)
+
+  override def toString = name
 
   override def equals(any: scala.Any) = {
     any match {
