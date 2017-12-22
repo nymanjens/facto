@@ -61,11 +61,11 @@ object DbQuery {
     }
   }
 
-  case class Sorting[E] private (fieldsWithDirection: Seq[FieldWithDirection[E]]) {
+  case class Sorting[E] private (fieldsWithDirection: Seq[FieldWithDirection[_, E]]) {
     def thenAscBy[V: Ordering](field: ModelField[V, E]): Sorting[E] = thenBy(field, isDesc = false)
     def thenDescBy[V: Ordering](field: ModelField[V, E]): Sorting[E] = thenBy(field, isDesc = true)
     def thenBy[V: Ordering](field: ModelField[V, E], isDesc: Boolean): Sorting[E] =
-      Sorting(fieldsWithDirection :+ FieldWithDirection(field, isDesc = isDesc))
+      Sorting(fieldsWithDirection :+ FieldWithDirection[V, E](field, isDesc = isDesc))
   }
   object Sorting {
     def ascBy[V: Ordering, E](field: ModelField[V, E]): Sorting[E] = by(field, isDesc = false)
@@ -73,6 +73,8 @@ object DbQuery {
     def by[V: Ordering, E](field: ModelField[V, E], isDesc: Boolean): Sorting[E] =
       Sorting(Seq(FieldWithDirection(field, isDesc = isDesc)))
 
-    case class FieldWithDirection[E](field: ModelField[_, E], isDesc: Boolean)
+    case class FieldWithDirection[V: Ordering, E](field: ModelField[V, E], isDesc: Boolean) {
+      def valueOrdering: Ordering[V] = implicitly[Ordering[V]]
+    }
   }
 }

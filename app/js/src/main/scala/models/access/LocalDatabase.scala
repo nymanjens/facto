@@ -4,7 +4,6 @@ import common.ScalaUtils.visibleForTesting
 import jsfacades.LokiJs.Filter.Operation
 import jsfacades.{CryptoJs, LokiJs}
 import models.Entity
-import models.access.DbQueryExecutor
 import models.modification.{EntityModification, EntityType}
 
 import scala.async.Async.{async, await}
