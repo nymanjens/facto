@@ -8,6 +8,8 @@ import models.access.{DbQuery, Fields, ModelField, RemoteDatabaseProxy}
 import models.access.DbQueryImplicits._
 import models.accounting.config.{Account, Category, Config}
 import models.accounting.{BalanceCheck, Transaction}
+import scala.async.Async.{async, await}
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 import scala.collection.immutable.Seq
 import scala2js.Converters._
@@ -29,17 +31,18 @@ final class SummaryForYearStoreFactory(implicit database: RemoteDatabaseProxy,
         filterInYear(Fields.Transaction.consumedDate, input.year) &&
         complexQueryFilter.fromQuery(input.query)
 
-    override protected def calculateState() = {
+    override protected def calculateState() = async {
       val transactions: Seq[Transaction] =
-        database
-          .newQuery[Transaction]()
-          .filter(combinedFilter)
-          .sort(
-            DbQuery.Sorting
-              .ascBy(Fields.Transaction.consumedDate)
-              .thenAscBy(Fields.Transaction.createdDate)
-              .thenAscBy(Fields.id))
-          .data()
+        await(
+          database
+            .newQuery[Transaction]()
+            .filter(combinedFilter)
+            .sort(
+              LokiJs.Sorting
+                .ascBy(Fields.Transaction.consumedDate)
+                .thenAscBy(Fields.Transaction.createdDate)
+                .thenAscBy(Fields.id))
+            .data())
 
       SummaryForYear(transactions)
     }

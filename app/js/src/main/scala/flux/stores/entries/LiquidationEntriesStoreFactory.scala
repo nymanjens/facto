@@ -5,12 +5,16 @@ import common.money.{ExchangeRateManager, ReferenceMoney}
 import jsfacades.LokiJs
 import models.access.DbQuery
 import models.access.DbQueryImplicits._
+import scala.async.Async.{async, await}
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import jsfacades.LokiJsImplicits._
 import models.EntityAccess
 import models.access.RemoteDatabaseProxy
 import models.accounting.config.{Account, Config, MoneyReservoir}
 import models.accounting.{BalanceCheck, Transaction}
 
 import scala.collection.immutable.Seq
+import scala.concurrent.Future
 import scala2js.Converters._
 import models.access.Fields
 
@@ -21,8 +25,8 @@ final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProx
     extends EntriesListStoreFactory[LiquidationEntry, AccountPair] {
 
   override protected def createNew(maxNumEntries: Int, accountPair: AccountPair) = new Store {
-    override protected def calculateState() = logExceptions {
-      val relevantTransactions = getRelevantTransactions()
+    override protected def calculateState() = async {
+      val relevantTransactions = await(getRelevantTransactions())
 
       // convert to entries (recursion does not lead to growing stack because of Stream)
       def convertToEntries(nextTransactions: List[Transaction],
@@ -54,50 +58,63 @@ final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProx
     }
 
     override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) =
-      isRelevantForAccounts(transaction, accountPair)
+      isRelevantForAccountsSync(transaction, accountPair)
     override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) = false
 
-    private def getRelevantTransactions() = {
+    private def getRelevantTransactions(): Future[Seq[Transaction]] = async {
       def reservoirsOwnedBy(account: Account): Seq[MoneyReservoir] = {
         accountingConfig.moneyReservoirs(includeHidden = true).filter(r => r.owner == account)
       }
 
       val account1ReservoirCodes = reservoirsOwnedBy(accountPair.account1).map(_.code)
       val account2ReservoirCodes = reservoirsOwnedBy(accountPair.account2).map(_.code)
-      val transactions = database
-        .newQuery[Transaction]()
-        .filter(
-          DbQuery.Filter.NullFilter[Transaction]()
-            ||
-              ((Fields.Transaction.moneyReservoirCode isAnyOf account1ReservoirCodes) &&
-                (Fields.Transaction.beneficiaryAccountCode isEqualTo accountPair.account2.code))
-            ||
-              ((Fields.Transaction.moneyReservoirCode isAnyOf account2ReservoirCodes) &&
-                (Fields.Transaction.beneficiaryAccountCode isEqualTo accountPair.account1.code))
-            ||
-              ((Fields.Transaction.moneyReservoirCode isEqualTo "") &&
-                (Fields.Transaction.beneficiaryAccountCode isAnyOf accountPair.toSet.map(_.code).toVector))
-        )
-        .sort(
-          DbQuery.Sorting
+      val transactions = await(
+        database
+          .newQuery[Transaction]()
+          .filter(
+            LokiJs.Filter.nullFilter[Transaction]
+              ||
+                ((Fields.Transaction.moneyReservoirCode isAnyOf account1ReservoirCodes) &&
+                  (Fields.Transaction.beneficiaryAccountCode isEqualTo accountPair.account2.code))
+              ||
+                ((Fields.Transaction.moneyReservoirCode isAnyOf account2ReservoirCodes) &&
+                  (Fields.Transaction.beneficiaryAccountCode isEqualTo accountPair.account1.code))
+              ||
+                ((Fields.Transaction.moneyReservoirCode isEqualTo "") &&
+                  (Fields.Transaction.beneficiaryAccountCode isAnyOf accountPair.toSet.map(_.code).toVector))
+          )
+          .sort(LokiJs.Sorting
             .ascBy(Fields.Transaction.transactionDate)
             .thenAscBy(Fields.Transaction.createdDate)
             .thenAscBy(Fields.id))
-        .data()
+          .data())
 
-      transactions.filter(isRelevantForAccounts(_, accountPair))
+      val isRelevantSeq = await(Future.sequence(transactions.map(isRelevantForAccounts(_, accountPair))))
+      (isRelevantSeq zip transactions).filter(_._1).map(_._2)
     }
 
-    private def isRelevantForAccounts(transaction: Transaction, accountPair: AccountPair): Boolean = {
-      val moneyReservoirOwner = transaction.moneyReservoirCode match {
-        case "" =>
-          // Pick the first beneficiary in the group. This simulates that the zero sum transaction was physically
-          // performed on an actual reservoir, which is needed for the liquidation calculator to work.
-          transaction.transactionGroup.transactions.head.beneficiary
-        case _ => transaction.moneyReservoir.owner
+    private def isRelevantForAccounts(transaction: Transaction, accountPair: AccountPair): Future[Boolean] =
+      async {
+        val moneyReservoirOwner = transaction.moneyReservoirCode match {
+          case "" =>
+            // Pick the first beneficiary in the group. This simulates that the zero sum transaction was physically
+            // performed on an actual reservoir, which is needed for the liquidation calculator to work.
+            val group = await(transaction.transactionGroup)
+            await(group.withTransactions).transactions.head.beneficiary
+          case _ => transaction.moneyReservoir.owner
+        }
+        val involvedAccounts: Set[Account] = Set(transaction.beneficiary, moneyReservoirOwner)
+        accountPair.toSet == involvedAccounts
       }
-      val involvedAccounts: Set[Account] = Set(transaction.beneficiary, moneyReservoirOwner)
-      accountPair.toSet == involvedAccounts
+
+    private def isRelevantForAccountsSync(transaction: Transaction, accountPair: AccountPair): Boolean = {
+      if (transaction.moneyReservoirCode == "") {
+        true // Heuristic
+      } else {
+        val moneyReservoirOwner = transaction.moneyReservoir.owner
+        val involvedAccounts: Set[Account] = Set(transaction.beneficiary, moneyReservoirOwner)
+        accountPair.toSet == involvedAccounts
+      }
     }
   }
 

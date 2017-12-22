@@ -1,5 +1,7 @@
 package flux.stores
 
+import scala.async.Async.{async, await}
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import common.time.Clock
 import flux.action.Action.{AddTransactionGroup, RemoveTransactionGroup, UpdateTransactionGroup}
 import flux.action.Dispatcher
@@ -16,27 +18,36 @@ private[stores] final class TransactionAndGroupStore(implicit database: RemoteDa
                                                      dispatcher: Dispatcher) {
   dispatcher.registerPartialAsync {
     case AddTransactionGroup(transactionsWithoutIdProvider) =>
-      val groupAddition = EntityModification.createAddWithRandomId(TransactionGroup(createdDate = clock.now))
-      val group = groupAddition.entity
-      val transactionsWithoutId = transactionsWithoutIdProvider(group)
-      val transactionAdditions =
-        for ((transactionWithoutId, id) <- zipWithIncrementingId(transactionsWithoutId)) yield {
-          EntityModification.createAddWithId(transactionWithoutId, id)
-        }
-      database.persistModifications(groupAddition +: transactionAdditions)
+      async {
+        val groupAddition =
+          EntityModification.createAddWithRandomId(TransactionGroup(createdDate = clock.now))
+        val group = groupAddition.entity
+        val transactionsWithoutId = transactionsWithoutIdProvider(group)
+        val transactionAdditions =
+          for ((transactionWithoutId, id) <- zipWithIncrementingId(transactionsWithoutId)) yield {
+            EntityModification.createAddWithId(transactionWithoutId, id)
+          }
+        await(database.persistModifications(groupAddition +: transactionAdditions))
+      }
 
     case UpdateTransactionGroup(group, transactionsWithoutId) =>
-      val transactionDeletions = group.transactions map (EntityModification.createDelete(_))
-      val transactionAdditions =
-        for ((transactionWithoutId, id) <- zipWithIncrementingId(transactionsWithoutId)) yield {
-          EntityModification.createAddWithId(transactionWithoutId, id)
-        }
-      database.persistModifications(transactionDeletions ++ transactionAdditions)
+      async {
+        val transactionDeletions = await(group.withTransactions).transactions map (EntityModification
+          .createDelete(_))
+        val transactionAdditions =
+          for ((transactionWithoutId, id) <- zipWithIncrementingId(transactionsWithoutId)) yield {
+            EntityModification.createAddWithId(transactionWithoutId, id)
+          }
+        await(database.persistModifications(transactionDeletions ++ transactionAdditions))
+      }
 
     case RemoveTransactionGroup(group) =>
-      val transactionDeletions = group.transactions map (EntityModification.createDelete(_))
-      val groupDeletion = EntityModification.createDelete(group)
-      database.persistModifications(transactionDeletions :+ groupDeletion)
+      async {
+        val transactionDeletions = await(group.withTransactions).transactions map (EntityModification
+          .createDelete(_))
+        val groupDeletion = EntityModification.createDelete(group)
+        await(database.persistModifications(transactionDeletions :+ groupDeletion))
+      }
   }
 
   private def zipWithIncrementingId[E](entities: Seq[E]): Seq[(E, Long)] = {

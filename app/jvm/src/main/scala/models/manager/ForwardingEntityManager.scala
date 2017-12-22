@@ -20,7 +20,7 @@ abstract class ForwardingEntityManager[E <: Entity, T <: AbstractTable[E]](
   override private[models] def deleteIfExists(entityId: Long) = delegate.deleteIfExists(entityId)
 
   // ********** Getters ********** //
-  override def findById(id: Long): E = delegate.findById(id)
-  override def fetchAll(): Seq[E] = delegate.fetchAll()
+  override def findById(id: Long) = delegate.findById(id)
+  override def fetchAll() = delegate.fetchAll()
   override def newQuery: TableQuery[T] = delegate.newQuery
 }

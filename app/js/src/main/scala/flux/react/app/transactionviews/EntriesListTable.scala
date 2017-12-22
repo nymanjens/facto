@@ -6,11 +6,12 @@ import common.{I18n, Unique}
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import flux.react.uielements
+import flux.stores.entries.EntriesStore.StateWithMeta
 import flux.stores.entries.{EntriesListStoreFactory, EntriesStore}
 import japgolly.scalajs.react.{Callback, _}
 import japgolly.scalajs.react.vdom.html_<^.VdomElement
-import scala.scalajs.js
 
+import scala.scalajs.js
 import scala.collection.immutable.Seq
 
 private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
@@ -20,7 +21,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
     .initialStateFromProps(props =>
-      State(EntriesListStoreFactory.State.empty, maxNumEntries = props.numEntriesStrategy.start))
+      State(storeState = StateWithMeta.Empty(), maxNumEntries = props.numEntriesStrategy.start))
     .renderBackend[Backend]
     .componentWillMount(scope => scope.backend.willMount(scope.props, scope.state))
     .componentWillUnmount(scope => scope.backend.willUnmount())
@@ -88,9 +89,9 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
                            calculateTableDataFromEntryAndRowNum: (Entry, Int) => Seq[VdomElement],
                            additionalInput: AdditionalInput)
 
-  private case class State(entries: entriesStoreFactory.State, maxNumEntries: Int) {
+  private case class State(storeState: StateWithMeta[entriesStoreFactory.State], maxNumEntries: Int) {
     def withEntriesFrom(store: entriesStoreFactory.Store): State =
-      copy(entries = store.state)
+      copy(storeState = store.state)
   }
 
   private class Backend($ : BackendScope[Props, State]) extends EntriesStore.Listener {
@@ -114,30 +115,51 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
 
     def render(props: Props, state: State) = logExceptions {
       uielements.Table(
-        title = props.tableTitle,
+        title = props.tableTitle + (if (state.storeState.isStale) " <fetching...>" else ""),
         tableClasses = props.tableClasses,
         setExpanded = props.setExpanded,
-        expandNumEntriesCallback =
-          if (state.entries.hasMore) Some(expandMaxNumEntries(props, state)) else None,
+        expandNumEntriesCallback = {
+          if (state.storeState.hasState && state.storeState.state.hasMore) {
+            Some(expandMaxNumEntries(props, state))
+          } else { None }
+        },
         tableTitleExtra = tableTitleExtra(props, state),
         tableHeaders = props.tableHeaders,
-        tableDatas = state.entries.entries.reverse.zipWithIndex.map {
-          case (entry, index) =>
-            props.calculateTableDataFromEntryAndRowNum(entry, index)
+        tableDatas = state.storeState match {
+          case StateWithMeta.WithValue(storeState, _) =>
+            storeState.entries.reverse.zipWithIndex.map {
+              case (entry, index) =>
+                props.calculateTableDataFromEntryAndRowNum(entry, index)
+            }
+          case StateWithMeta.Empty() =>
+            for (i <- 0 until state.maxNumEntries + 1) yield {
+              Seq[VdomElement](
+                <.td(
+                  ^.colSpan := props.tableHeaders.size,
+                  ^.style := js.Dictionary("color" -> "white"),
+                  "loading..."))
+            }
         }
       )
     }
 
     def tableTitleExtra(props: Props, state: State): VdomElement = {
-      val numEntries = state.entries.entries.size + (if (state.entries.hasMore) "+" else "")
-      <.span(
-        <<.ifThen(props.latestEntryToTableTitleExtra) { latestEntryToTableTitleExtra =>
-          <<.ifThen(state.entries.entries.lastOption) { latestEntry =>
-            <.span(latestEntryToTableTitleExtra(latestEntry), " ")
-          }
-        },
-        <.span(^.style := js.Dictionary("color" -> "#999"), s"(${i18n("facto.n-entries", numEntries)})")
-      )
+      state.storeState match {
+        case StateWithMeta.WithValue(storeState, _) =>
+          val numEntries = storeState.entries.size + (if (storeState.hasMore) "+" else "")
+          <.span(
+            <<.ifThen(props.latestEntryToTableTitleExtra) { latestEntryToTableTitleExtra =>
+              <<.ifThen(storeState.entries.lastOption) { latestEntry =>
+                <.span(latestEntryToTableTitleExtra(latestEntry), " ")
+              }
+            },
+            <.span(
+              ^.style := js.Dictionary("color" -> "#999"),
+              s"(${i18n("facto.n-storeState", numEntries)})")
+          )
+        case StateWithMeta.Empty() =>
+          <.span()
+      }
     }
 
     private def expandMaxNumEntries(props: Props, state: State): Callback = LogExceptionsCallback {
@@ -154,7 +176,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
         val nextNCandidates = props.numEntriesStrategy.intermediateBeforeInf :+ Int.MaxValue
         nextNCandidates.filter(_ > state.maxNumEntries).head
       }
-      println(s"  Expanding #entries from ${state.maxNumEntries} to $nextMaxNumEntries")
+      println(s"  Expanding #storeState from ${state.maxNumEntries} to $nextMaxNumEntries")
       updateMaxNumEntries(maxNumEntries = nextMaxNumEntries)
     }
 

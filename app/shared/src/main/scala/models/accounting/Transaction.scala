@@ -8,6 +8,7 @@ import models.manager.EntityManager
 import models.user.User
 
 import scala.collection.immutable.Seq
+import scala.concurrent.Future
 
 /** Transaction entities are immutable. Just delete and create a new one when updating. */
 case class Transaction(transactionGroupId: Long,
@@ -33,9 +34,9 @@ case class Transaction(transactionGroupId: Long,
 
   override def withId(id: Long) = copy(idOption = Some(id))
 
-  def transactionGroup(implicit entityAccess: EntityAccess): TransactionGroup =
+  def transactionGroup(implicit entityAccess: EntityAccess): Future[TransactionGroup] =
     entityAccess.transactionGroupManager.findById(transactionGroupId)
-  def issuer(implicit entityAccess: EntityAccess): User = entityAccess.userManager.findById(issuerId)
+  def issuer(implicit entityAccess: EntityAccess): User = entityAccess.userManager.findByIdSync(issuerId)
   def beneficiary(implicit accountingConfig: Config): Account =
     accountingConfig.accounts(beneficiaryAccountCode)
   def moneyReservoir(implicit accountingConfig: Config): MoneyReservoir =
@@ -57,7 +58,7 @@ object Transaction {
   def tupled = (this.apply _).tupled
 
   trait Manager extends EntityManager[Transaction] {
-    def findByGroupId(groupId: Long): Seq[Transaction]
+    def findByGroupId(groupId: Long): Future[Seq[Transaction]]
   }
 
   /** Same as Transaction, except all fields are optional. */
@@ -75,7 +76,7 @@ object Transaction {
                      consumedDate: Option[LocalDateTime] = None,
                      idOption: Option[Long] = None) {
     def issuer(implicit entityAccess: EntityAccess): Option[User] =
-      issuerId.map(entityAccess.userManager.findById(_))
+      issuerId.map(entityAccess.userManager.findByIdSync(_))
     def isEmpty: Boolean = this == Partial.empty
   }
 

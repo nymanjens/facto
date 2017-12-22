@@ -14,7 +14,7 @@ final class JsTransactionManager(implicit database: RemoteDatabaseProxy)
     extends BaseJsEntityManager[Transaction]
     with Transaction.Manager {
 
-  override def findByGroupId(groupId: Long): Seq[Transaction] = {
+  override def findByGroupId(groupId: Long) = {
     database
       .newQuery[Transaction]()
       .filter(Fields.Transaction.transactionGroupId isEqualTo groupId)

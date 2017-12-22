@@ -1,15 +1,18 @@
 package models.accounting
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.async.Async.{async, await}
 import com.google.inject._
 import common.accounting.Tags
 import common.time.LocalDateTime
 import models.EntityTable
 import models.SlickUtils.dbApi.{Tag => SlickTag, _}
-import models.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}
+import models.SlickUtils.{dbRun, localDateTimeToSqlDateMapper, database}
 import models.accounting.SlickTransactionManager.{Transactions, tableName}
 import models.manager.{ImmutableEntityManager, SlickEntityManager}
 
 import scala.collection.immutable.Seq
+import scala.concurrent.Future
 
 final class SlickTransactionManager @Inject()()
     extends ImmutableEntityManager[Transaction, Transactions](
@@ -19,8 +22,9 @@ final class SlickTransactionManager @Inject()()
       ))
     with Transaction.Manager {
 
-  override def findByGroupId(groupId: Long): Seq[Transaction] =
-    dbRun(newQuery.filter(_.transactionGroupId === groupId)).toList
+  override def findByGroupId(groupId: Long) = async {
+    await(database.run(newQuery.filter(_.transactionGroupId === groupId).result)).toList
+  }
 }
 
 object SlickTransactionManager {

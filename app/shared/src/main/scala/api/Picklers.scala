@@ -3,6 +3,7 @@ package api
 import java.time.{LocalDate, LocalTime}
 
 import boopickle.Default._
+import common.money.Currency
 import common.time.LocalDateTime
 import models.Entity
 import models.accounting.config._
@@ -60,6 +61,15 @@ object Picklers {
         iconClass = state.unpickle[String],
         transactions = state.unpickle[Seq[Template.Transaction]]
       )
+    }
+  }
+
+  implicit object CurrencyPickler extends Pickler[Currency] {
+    override def pickle(currency: Currency)(implicit state: PickleState): Unit = logExceptions {
+      state.pickle(currency.code)
+    }
+    override def unpickle(implicit state: UnpickleState): Currency = logExceptions {
+      Currency.of(state.unpickle[String])
     }
   }
 

@@ -1,5 +1,7 @@
 package flux.react.app.balancecheckform
 
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.async.Async.{async, await}
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.money.ExchangeRateManager
@@ -20,6 +22,8 @@ import models.user.User
 import models.EntityAccess
 import models.user.User
 
+import scala.concurrent.Future
+
 final class BalanceCheckForm(implicit i18n: I18n,
                              clock: Clock,
                              accountingConfig: Config,
@@ -29,6 +33,7 @@ final class BalanceCheckForm(implicit i18n: I18n,
                              exchangeRateManager: ExchangeRateManager,
                              dispatcher: Dispatcher) {
 
+  private val waitForFuture = new uielements.WaitForFuture[Props]
   private val dateMappedInput = MappedInput.forTypes[String, LocalDateTime]
 
   private val component = {
@@ -44,14 +49,18 @@ final class BalanceCheckForm(implicit i18n: I18n,
     create(Props(OperationMeta.AddNew(accountingConfig.moneyReservoir(reservoirCode)), returnToPath, router))
   }
 
-  def forEdit(balanceCheckId: Long, returnToPath: Path, router: RouterContext): VdomElement = {
-    val balanceCheck = balanceCheckManager.findById(balanceCheckId)
-    create(Props(OperationMeta.Edit(balanceCheck), returnToPath, router))
-  }
+  def forEdit(balanceCheckId: Long, returnToPath: Path, router: RouterContext): VdomElement =
+    create(async {
+      val balanceCheck = await(balanceCheckManager.findById(balanceCheckId))
+      Props(OperationMeta.Edit(balanceCheck), returnToPath, router)
+    })
 
   // **************** Private helper methods ****************//
-  private def create(props: Props): VdomElement = {
-    component.withKey(props.operationMeta.toString).apply(props)
+  private def create(props: Props): VdomElement = create(Future.successful(props))
+  private def create(propsFuture: Future[Props]): VdomElement = {
+    waitForFuture(futureInput = propsFuture) { props =>
+      component.withKey(props.operationMeta.toString).apply(props)
+    }
   }
 
   // **************** Private inner types ****************//

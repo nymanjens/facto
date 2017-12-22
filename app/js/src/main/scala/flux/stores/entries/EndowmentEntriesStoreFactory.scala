@@ -6,7 +6,8 @@ import models.access.DbQueryImplicits._
 import models.access.RemoteDatabaseProxy
 import models.accounting.config.{Account, Config}
 import models.accounting.{BalanceCheck, Transaction}
-
+import scala.async.Async.{async, await}
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.collection.immutable.Seq
 import scala2js.Converters._
 import models.access.Fields
@@ -15,20 +16,20 @@ final class EndowmentEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
     extends EntriesListStoreFactory[GeneralEntry, Account] {
 
   override protected def createNew(maxNumEntries: Int, account: Account) = new Store {
-    override protected def calculateState() = {
+    override protected def calculateState() = async {
       val transactions: Seq[Transaction] =
-        database
-          .newQuery[Transaction]()
-          .filter(Fields.Transaction.categoryCode isEqualTo accountingConfig.constants.endowmentCategory.code)
-          .filter(Fields.Transaction.beneficiaryAccountCode isEqualTo account.code)
-          .sort(
-            DbQuery.Sorting
+        await(
+          database
+            .newQuery[Transaction]()
+            .filter(
+              Fields.Transaction.categoryCode isEqualTo accountingConfig.constants.endowmentCategory.code)
+            .filter(Fields.Transaction.beneficiaryAccountCode isEqualTo account.code)
+            .sort(LokiJs.Sorting
               .descBy(Fields.Transaction.consumedDate)
               .thenDescBy(Fields.Transaction.createdDate)
               .thenDescBy(Fields.id))
-          .limit(3 * maxNumEntries)
-          .data()
-          .reverse
+            .limit(3 * maxNumEntries)
+            .data()).reverse
 
       var entries = transactions.map(t => GeneralEntry(Seq(t)))
 

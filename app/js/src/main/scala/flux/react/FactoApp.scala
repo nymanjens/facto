@@ -22,6 +22,9 @@ object FactoApp extends js.JSApp {
     // create stylesheet
     //GlobalStyles.addToDocument()
 
+    val commonTimeModule = new common.time.Module
+    implicit val clock = commonTimeModule.clock
+
     val apiModule = new api.Module
     implicit val scalaJsApiClient = apiModule.scalaJsApiClient
     implicit val initialDataResponse = await(scalaJsApiClient.getInitialData())

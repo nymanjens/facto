@@ -66,12 +66,13 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
                     <.th(repayButton(
                       account1 = account1,
                       account2 = account2,
-                      amount = entriesStoreFactory
-                        .get(accountPair = accountPair, maxNumEntries = startNumEntries)
-                        .state
-                        .entries
-                        .lastOption
-                        .map(_.debt) getOrElse ReferenceMoney(0)
+                      amount = //                        entriesStoreFactory
+//                        .get(accountPair = accountPair, maxNumEntries = startNumEntries)
+//                        .state
+//                        .entries
+//                        .lastOption
+//                        .map(_.debt) getOrElse ReferenceMoney(0)
+                        ReferenceMoney(0)
                     ))
                   ),
                   calculateTableData = entry =>

@@ -156,20 +156,12 @@ object LocalDatabase {
 
     override def getSingletonValue[V](key: SingletonKey[V]): Option[V] = {
       implicit val converter = key.valueConverter
-      val value =
-        singletonCollection
-          .chain()
-          .filter(Singleton.Scala2JsKeys.key isEqualTo key.name)
-          .limit(1)
-          .data() match {
-          case Seq(v) => Some(v)
-          case Seq() => None
-        }
+      val value = singletonCollection.chain().findOne(Singleton.Scala2JsKeys.key, key.name).value.get.get
       value.map(v => Scala2Js.toScala[V](v.value))
     }
 
     override def isEmpty: Boolean = {
-      allCollections.toStream.filter(_.chain().count() != 0).isEmpty
+      allCollections.toStream.filter(_.chain().count().value.get.get != 0).isEmpty
     }
 
     // **************** Setters ****************//
@@ -180,7 +172,7 @@ object LocalDatabase {
             case addModification: EntityModification.Add[_] =>
               def add[E <: Entity](modification: EntityModification.Add[E]): Boolean = {
                 implicit val _ = modification.entityType
-                newQuery[E]().findOne(Fields.id, modification.entity.id) match {
+                newQuery[E]().findOne(Keys.id, modification.entity.id).value.get.get match {
                   case Some(entity) => false // do nothing
                   case None =>
                     entityCollectionForImplicitType[E].insert(modification.entity)
@@ -191,7 +183,7 @@ object LocalDatabase {
             case updateModification: EntityModification.Update[_] =>
               def update[E <: Entity](modification: EntityModification.Update[E]): Boolean = {
                 implicit val _ = modification.entityType
-                newQuery[E]().findOne(Fields.id, modification.updatedEntity.id) match {
+                newQuery[E]().findOne(Keys.id, modification.updatedEntity.id).value.get.get match {
                   case Some(_) =>
                     // Not using collection.update() because it requires a sync
                     entityCollectionForImplicitType[E].findAndRemove(Keys.id, modification.updatedEntity.id)
@@ -204,7 +196,7 @@ object LocalDatabase {
             case removeModification: EntityModification.Remove[_] =>
               def remove[E <: Entity](modification: EntityModification.Remove[E]): Boolean = {
                 implicit val _ = modification.entityType
-                newQuery[E]().findOne(Fields.id, modification.entityId) match {
+                newQuery[E]().findOne(Keys.id, modification.entityId).value.get.get match {
                   case Some(entity) =>
                     entityCollectionForImplicitType.findAndRemove(Keys.id, modification.entityId)
                     true
@@ -219,7 +211,7 @@ object LocalDatabase {
 
     override def addAll[E <: Entity: EntityType](entities: Seq[E]): Unit = {
       for (entity <- entities) {
-        newQuery[E]().findOne(Fields.id, entity.id) match {
+        newQuery[E]().findOne(Keys.id, entity.id).value.get.get match {
           case Some(_) => // do nothing
           case None => entityCollectionForImplicitType.insert(entity)
         }

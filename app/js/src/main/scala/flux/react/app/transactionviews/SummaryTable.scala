@@ -403,7 +403,8 @@ private[transactionviews] final class SummaryTable(
     private def doStateUpdate(props: Props): Unit = {
       val (data, usedStores): (AllYearsData, Set[EntriesStore[_]]) = {
         val yearsStore = summaryYearsStoreFactory.get(props.account)
-        val allTransactionsYearRange = yearsStore.state.yearRange
+        val allTransactionsYearRange = yearsStore.state.stateOption.map(_.yearRange) getOrElse
+          YearRange.closed(props.yearLowerBound, clock.now.getYear)
         val yearRange = allTransactionsYearRange
           .copyIncluding(clock.now.getYear)
           .copyWithLowerBound(props.yearLowerBound)
@@ -417,7 +418,10 @@ private[transactionviews] final class SummaryTable(
           val exchangeRateGainsStore =
             summaryExchangeRateGainsStoreFactory.get(account = props.account, year = year)
 
-          dataBuilder.addYear(year, summaryForYearStore.state, exchangeRateGainsStore.state)
+          dataBuilder.addYear(
+            year,
+            summaryForYearStore.state.stateOption getOrElse SummaryForYear.empty,
+            exchangeRateGainsStore.state.stateOption getOrElse GainsForYear.empty)
           usedStores ++= Seq(summaryForYearStore, exchangeRateGainsStore)
         }
         for (reservoir <- accountingConfig.visibleReservoirs) {
@@ -426,8 +430,13 @@ private[transactionviews] final class SummaryTable(
               moneyReservoir = reservoir,
               maxNumEntries = CashFlow.minNumEntriesPerReservoir)
 
-            dataBuilder.addToNetWorth(store.state.entries.lastOption
-              .map(_.balance.withDate(clock.now).exchangedForReferenceCurrency) getOrElse ReferenceMoney(0))
+            if (store.state.hasState) {
+              dataBuilder.addToNetWorth(
+                store.state.state.entries.lastOption
+                  .map(_.balance.withDate(clock.now).exchangedForReferenceCurrency) getOrElse
+                  ReferenceMoney(0))
+            }
+
             usedStores += store
           }
         }

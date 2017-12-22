@@ -1,5 +1,7 @@
 package flux.react.app.transactiongroupform
 
+import scala.async.Async.{async, await}
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, LogExceptionsFuture, logExceptions}
 import common.money.{Currency, DatedMoney, ExchangeRateManager, ReferenceMoney}
@@ -20,6 +22,7 @@ import models.user.User
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
+import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 final class TransactionGroupForm(implicit i18n: I18n,
@@ -35,6 +38,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
                                  totalFlowInput: TotalFlowInput,
                                  totalFlowRestrictionInput: TotalFlowRestrictionInput) {
 
+  private val waitForFuture = new uielements.WaitForFuture[Props]
   private val component = {
     ScalaComponent
       .builder[Props](getClass.getSimpleName)
@@ -65,15 +69,18 @@ final class TransactionGroupForm(implicit i18n: I18n,
     forCreate(TransactionGroup.Partial.withSingleEmptyTransaction, returnToPath, router)
   }
 
-  def forEdit(transactionGroupId: Long, returnToPath: Path, router: RouterContext): VdomElement = {
-    val group = transactionGroupManager.findById(transactionGroupId)
-    create(
+  def forEdit(transactionGroupId: Long, returnToPath: Path, router: RouterContext): VdomElement =
+    create(async {
+      val group = await(transactionGroupManager.findById(transactionGroupId))
+      val groupWithTransactions = await(group.withTransactions)
+
       Props(
-        operationMeta = OperationMeta.Edit(group),
-        groupPartial = TransactionGroup.Partial.from(group),
+        operationMeta = OperationMeta.Edit(groupWithTransactions),
+        groupPartial = TransactionGroup.Partial.from(groupWithTransactions),
         returnToPath = returnToPath,
-        router = router))
-  }
+        router = router
+      )
+    })
 
   def forReservoir(reservoirCode: String, returnToPath: Path, router: RouterContext): VdomElement = {
     val reservoir = accountingConfig.moneyReservoir(reservoirCode)
@@ -153,15 +160,18 @@ final class TransactionGroupForm(implicit i18n: I18n,
         router = router))
   }
 
-  private def create(props: Props): VdomElement = {
-    component.withKey(props.operationMeta.toString).apply(props)
+  private def create(props: Props): VdomElement = create(Future.successful(props))
+  private def create(propsFuture: Future[Props]): VdomElement = {
+    waitForFuture(futureInput = propsFuture) { props =>
+      component.withKey(props.operationMeta.toString).apply(props)
+    }
   }
 
   // **************** Private inner types ****************//
   private sealed trait OperationMeta
   private object OperationMeta {
     case object AddNew extends OperationMeta
-    case class Edit(group: TransactionGroup) extends OperationMeta
+    case class Edit(group: TransactionGroup.WithTransactions) extends OperationMeta
   }
 
   /**
@@ -406,9 +416,9 @@ final class TransactionGroupForm(implicit i18n: I18n,
             Action.AddTransactionGroup(transactionsWithoutIdProvider = transactionsWithoutIdProvider(_))
           case OperationMeta.Edit(group) =>
             Action.UpdateTransactionGroup(
-              transactionGroupWithId = group,
+              transactionGroupWithId = group.entity,
               transactionsWithoutId =
-                transactionsWithoutIdProvider(group, Some(group.transactions.head.issuerId))
+                transactionsWithoutIdProvider(group.entity, Some(group.transactions.head.issuerId))
             )
         }
 
@@ -445,7 +455,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
       props.operationMeta match {
         case OperationMeta.AddNew => throw new AssertionError("Should never happen")
         case OperationMeta.Edit(group) =>
-          dispatcher.dispatch(Action.RemoveTransactionGroup(transactionGroupWithId = group))
+          dispatcher.dispatch(Action.RemoveTransactionGroup(transactionGroupWithId = group.entity))
           props.router.setPath(props.returnToPath)
       }
     }
