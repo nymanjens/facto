@@ -1,25 +1,25 @@
-//package tests
-//
-//import common.testing.TestObjects._
-//import jsfacades.LokiJs
-//import jsfacades.LokiJs.{Filter, ResultSet}
-//import models.access.{Fields, LocalDatabase}
-//import models.accounting.Transaction
-//import tests.ManualTests.{ManualTest, ManualTestSuite}
-//
-//import scala.async.Async.{async, await}
-//import scala.collection.immutable.Seq
-//import scala.concurrent.Future
-//import scala.language.reflectiveCalls
-//import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-//import scala2js.Converters._
-//import scala2js.Keys
-//
-//// Note that this is a manual test because the Rhino javascript engine used for tests
-//// is incompatible with Loki.
-//private[tests] object LokiResultSetTest extends ManualTestSuite {
-//
-//  override def tests = Seq(
+package tests
+
+import common.testing.TestObjects._
+import jsfacades.LokiJs
+import jsfacades.LokiJs.{Filter, ResultSet}
+import models.access.{Fields, LocalDatabase}
+import models.accounting.Transaction
+import tests.ManualTests.{ManualTest, ManualTestSuite}
+
+import scala.async.Async.{async, await}
+import scala.collection.immutable.Seq
+import scala.concurrent.Future
+import scala.language.reflectiveCalls
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala2js.Converters._
+import scala2js.Keys
+
+// Note that this is a manual test because the Rhino javascript engine used for tests
+// is incompatible with Loki.
+private[tests] object LokiResultSetTest extends ManualTestSuite {
+
+  override def tests = Seq(
 //    // **************** Regular filter tests **************** //
 //    ManualTest("newQuery().filter(nullFilter)") {
 //      val transaction1 = createTransaction()
@@ -228,7 +228,7 @@
 //
 //      withTransactions(transaction1, transaction2, transaction3).assertThat(_.count()).isEqualTo(3)
 //    }
-//  )
+  )
 //
 //  private def withTransactions(transactions: Transaction*) = new Object {
 //    def assertFilteredWith(filter: Filter[Transaction]) = assertThat(_.filter(filter).data())
@@ -271,4 +271,4 @@
 //      iterable1 ==> iterable2
 //    }
 //  }
-//}
+}

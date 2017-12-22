@@ -1,9 +1,9 @@
 package models.access
 
 import common.ScalaUtils.visibleForTesting
-import jsfacades.LokiJsImplicits._
 import jsfacades.{CryptoJs, LokiJs}
 import models.Entity
+import models.access.DbResultSet.DbQueryExecutor
 import models.modification.{EntityModification, EntityType}
 
 import scala.async.Async.{async, await}
@@ -17,7 +17,7 @@ import scala2js.{Keys, Scala2Js}
 @visibleForTesting
 trait LocalDatabase {
   // **************** Getters ****************//
-  def newQuery[E <: Entity: EntityType](): LokiJs.ResultSet[E]
+  def newQuery[E <: Entity: EntityType](): DbResultSet[E]
   def getSingletonValue[V](key: SingletonKey[V]): Option[V]
   def isEmpty: Boolean
 
@@ -77,9 +77,7 @@ object LocalDatabase {
   private object Singleton {
     implicit object Converter extends Scala2Js.MapConverter[Singleton] {
       override def toJs(singleton: Singleton) = {
-        js.Dictionary[js.Any](
-          Scala2Js.Key.toJsPair(Scala2JsKeys.key -> singleton.key),
-          Scala2Js.Key.toJsPair(Scala2JsKeys.value -> singleton.value))
+        js.Dictionary[js.Any]("key" -> singleton.key, "value" -> singleton.value)
       }
       override def toScala(dict: js.Dictionary[js.Any]) = {
         def getRequired[V: Scala2Js.Converter](fieldName: String) = {
@@ -88,11 +86,6 @@ object LocalDatabase {
         }
         Singleton(key = getRequired[String]("key"), value = getRequired[js.Any]("value"))
       }
-    }
-
-    object Scala2JsKeys {
-      val key = Scala2Js.Key[String, Singleton]("key")
-      val value = Scala2Js.Key[js.Any, Singleton]("value")
     }
   }
 
@@ -149,16 +142,20 @@ object LocalDatabase {
       lokiDb.getOrAddCollection[Singleton](s"singletons")
 
     // **************** Getters ****************//
-    override def newQuery[E <: Entity: EntityType](): LokiJs.ResultSet[E] = {
-      entityCollectionForImplicitType.chain()
-    }
+    override def newQuery[E <: Entity: EntityType](): DbResultSet[E] =
+      DbResultSet.fromExecutor(new DbQueryExecutor[E] {
+        override def apply[ReturnT](query: DbQuery[E, ReturnT]) = query match {
+          case _ => ???
+        }
+      })
+//      entityCollectionForImplicitType.chain()
 
     override def getSingletonValue[V](key: SingletonKey[V]): Option[V] = {
       implicit val converter = key.valueConverter
       val value =
         singletonCollection
           .chain()
-          .filter(Singleton.Scala2JsKeys.key isEqualTo key.name)
+          .filter(LokiJs.Filter.KeyValueFilter(LokiJs.Filter.Operation.Equal, "name", key.name))
           .limit(1)
           .data() match {
           case Seq(v) => Some(v)
@@ -193,7 +190,8 @@ object LocalDatabase {
                 newQuery[E]().findOne(Fields.id, modification.updatedEntity.id) match {
                   case Some(_) =>
                     // Not using collection.update() because it requires a sync
-                    entityCollectionForImplicitType[E].findAndRemove(Keys.id, modification.updatedEntity.id)
+                    entityCollectionForImplicitType[E]
+                      .findAndRemove(Fields.id.name, modification.updatedEntity.id)
                     entityCollectionForImplicitType[E].insert(modification.updatedEntity)
                     true
                   case None => false // do nothing
@@ -205,7 +203,7 @@ object LocalDatabase {
                 implicit val _ = modification.entityType
                 newQuery[E]().findOne(Fields.id, modification.entityId) match {
                   case Some(entity) =>
-                    entityCollectionForImplicitType.findAndRemove(Keys.id, modification.entityId)
+                    entityCollectionForImplicitType.findAndRemove(Fields.id.name, modification.entityId)
                     true
                   case None => false // do nothing
                 }
@@ -227,7 +225,7 @@ object LocalDatabase {
 
     override def setSingletonValue[V](key: SingletonKey[V], value: V): Unit = {
       implicit val converter = key.valueConverter
-      singletonCollection.findAndRemove(Singleton.Scala2JsKeys.key, key.name)
+      singletonCollection.findAndRemove("key", key.name)
       singletonCollection.insert(
         Singleton(
           key = key.name,

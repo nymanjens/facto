@@ -141,8 +141,8 @@ object LokiJs {
 
     def insert(obj: E): Unit = facade.insert(Scala2Js.toJsMap(obj))
     def update(obj: E): Unit = facade.update(Scala2Js.toJsMap(obj))
-    def findAndRemove[V: Scala2Js.Converter](key: Scala2Js.Key[V, E], value: V): Unit =
-      facade.findAndRemove(js.Dictionary(Scala2Js.Key.toJsPair(key -> value)))
+    def findAndRemove[V: Scala2Js.Converter](key: String, value: V): Unit =
+      facade.findAndRemove(js.Dictionary(key -> Scala2Js.toJs(value)))
     def clear(): Unit = facade.clear()
   }
 
@@ -159,7 +159,7 @@ object LokiJs {
     def count(): Int = js.native
   }
 
-  final class ResultSet[E](facade: ResultSetFacade) {
+  final class ResultSet[E: Scala2Js.MapConverter](facade: ResultSetFacade) {
     // **************** Intermediary operations **************** //
     def filter(filter: Filter): ResultSet[E] = {
       def toFilterDictionary(filter: Filter): js.Dictionary[js.Any] = filter match {
