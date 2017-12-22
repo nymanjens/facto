@@ -1,7 +1,7 @@
 package common.testing
 
 import models.Entity
-import models.access.RemoteDatabaseProxy
+import models.access.{DbQueryExecutor, DbResultSet, RemoteDatabaseProxy}
 import models.access.RemoteDatabaseProxy.Listener
 import models.modification.{EntityModification, EntityType}
 
@@ -18,8 +18,7 @@ final class FakeRemoteDatabaseProxy extends RemoteDatabaseProxy {
 
   // **************** Implementation of ScalaJsApiClient trait ****************//
   override def newQuery[E <: Entity: EntityType]() = {
-    ???
-//    LokiJs.ResultSet.fake(modificationsBuffer.getAllEntitiesOfType[E])
+    DbResultSet.fromExecutor(DbQueryExecutor.fromEntities(modificationsBuffer.getAllEntitiesOfType[E]))
   }
   override def hasLocalAddModifications[E <: Entity: EntityType](entity: E) = {
     localModificationIds contains entity.id
