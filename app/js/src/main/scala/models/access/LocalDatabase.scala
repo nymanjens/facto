@@ -232,7 +232,7 @@ object LocalDatabase {
             case addModification: EntityModification.Add[_] =>
               def add[E <: Entity](modification: EntityModification.Add[E]): Boolean = {
                 implicit val _ = modification.entityType
-                newQuery[E]().findOne(Fields.id, modification.entity.id).value.get.get match {
+                findById[E](modification.entity.id) match {
                   case Some(entity) => false // do nothing
                   case None =>
                     entityCollectionForImplicitType[E].insert(modification.entity)
@@ -243,7 +243,7 @@ object LocalDatabase {
             case updateModification: EntityModification.Update[_] =>
               def update[E <: Entity](modification: EntityModification.Update[E]): Boolean = {
                 implicit val _ = modification.entityType
-                newQuery[E]().findOne(Fields.id, modification.updatedEntity.id).value.get.get match {
+                findById[E](modification.updatedEntity.id) match {
                   case Some(_) =>
                     // Not using collection.update() because it requires a sync
                     entityCollectionForImplicitType[E]
@@ -257,7 +257,7 @@ object LocalDatabase {
             case removeModification: EntityModification.Remove[_] =>
               def remove[E <: Entity](modification: EntityModification.Remove[E]): Boolean = {
                 implicit val _ = modification.entityType
-                newQuery[E]().findOne(Fields.id, modification.entityId).value.get.get match {
+                findById[E](modification.entityId) match {
                   case Some(entity) =>
                     entityCollectionForImplicitType.findAndRemove(Fields.id.name, modification.entityId)
                     true
@@ -272,7 +272,7 @@ object LocalDatabase {
 
     override def addAll[E <: Entity: EntityType](entities: Seq[E]): Unit = {
       for (entity <- entities) {
-        newQuery[E]().findOne(Fields.id, entity.id).value.get.get match {
+        findById[E](entity.id) match {
           case Some(_) => // do nothing
           case None => entityCollectionForImplicitType.insert(entity)
         }
@@ -305,6 +305,17 @@ object LocalDatabase {
     }
 
     // **************** Private helper methods ****************//
+    private def findById[E <: Entity: EntityType](id: Long): Option[E] = {
+      entityCollectionForImplicitType[E]
+        .chain()
+        .filter(LokiJs.Filter.KeyValueFilter(Operation.Equal, Fields.id.name, Scala2Js.toJs(id)))
+        .limit(1)
+        .data() match {
+        case Seq(e) => Some(e)
+        case Seq() => None
+      }
+    }
+
     private def allCollections: Seq[LokiJs.Collection[_]] =
       entityCollections.values.toList :+ singletonCollection
 
