@@ -16,7 +16,8 @@ import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom.html_<^._
 import models.EntityAccess
-import models.access.RemoteDatabaseProxy
+import models.access.DbQueryImplicits._
+import models.access.{DbQuery, Fields, RemoteDatabaseProxy}
 import models.accounting.Transaction
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.user.User

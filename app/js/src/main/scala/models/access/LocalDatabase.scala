@@ -1,6 +1,7 @@
 package models.access
 
 import common.ScalaUtils.visibleForTesting
+import jsfacades.LokiJsImplicits._
 import jsfacades.{CryptoJs, LokiJs}
 import models.Entity
 import models.modification.{EntityModification, EntityType}
