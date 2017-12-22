@@ -235,11 +235,11 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
   private def withTransactions(transactions: Transaction*) = new Object {
     def assertFilteredWith(filter: Filter[Transaction]) = assertThat(_.filter(filter).data())
 
-    def assertThat(resultSetFunc: DbResultSet[Transaction] => Any) = new Object {
+    def assertThat(resultSetFunc: DbResultSet[Transaction] => Future[Any]) = new Object {
       def containsExactly(expected: Transaction*): Future[Unit] = async {
         val db = await(LocalDatabase.createInMemoryForTests())
         db.addAll(transactions.toVector)
-        resultSetFunc(db.newQuery[Transaction]()) match {
+        await(resultSetFunc(db.newQuery[Transaction]())) match {
           case seq: Seq[_] => assertEqualIterables(seq.toSet, expected.toSet)
         }
       }
@@ -247,7 +247,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
       def containsExactlyInOrder(expected: Transaction*): Future[Unit] = async {
         val db = await(LocalDatabase.createInMemoryForTests())
         db.addAll(transactions.toVector)
-        resultSetFunc(db.newQuery[Transaction]()) match {
+        await(resultSetFunc(db.newQuery[Transaction]())) match {
           case seq: Seq[_] => assertEqualIterables(seq, expected.toVector)
         }
       }
@@ -255,7 +255,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
       def isEqualTo(expected: Any): Future[Unit] = async {
         val db = await(LocalDatabase.createInMemoryForTests())
         db.addAll(transactions.toVector)
-        resultSetFunc(db.newQuery[Transaction]()) ==> expected
+        await(resultSetFunc(db.newQuery[Transaction]())) ==> expected
       }
     }
 
