@@ -208,7 +208,7 @@ object LocalDatabase {
       val value =
         singletonCollection
           .chain()
-          .filter(LokiJs.Filter.KeyValueFilter(LokiJs.Filter.Operation.Equal, "name", key.name))
+          .filter(LokiJs.Filter.KeyValueFilter(LokiJs.Filter.Operation.Equal, "key", key.name))
           .limit(1)
           .data() match {
           case Seq(v) => Some(v)
