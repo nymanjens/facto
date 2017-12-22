@@ -1,14 +1,11 @@
 package flux.react.uielements
 
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import common.LoggingUtils
 import common.LoggingUtils.LogExceptionsCallback
-import flux.react.ReactVdomUtils.{<<, ^^}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
-import scala.collection.immutable.Seq
 import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 final class WaitForFuture[V] {
   private val component = ScalaComponent

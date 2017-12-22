@@ -1,14 +1,11 @@
 package flux.stores.entries
 
-import jsfacades.LokiJs
-import models.access.DbQuery
-import scala.async.Async.{async, await}
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import models.access.RemoteDatabaseProxy
+import models.access.{DbQuery, Fields, RemoteDatabaseProxy}
 import models.accounting.{BalanceCheck, Transaction}
 
+import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
-import models.access.Fields
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 final class AllEntriesStoreFactory(implicit database: RemoteDatabaseProxy)
     extends EntriesListStoreFactory[GeneralEntry, Unit] {

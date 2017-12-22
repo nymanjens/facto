@@ -1,12 +1,9 @@
 package common.testing
 
-import jsfacades.LokiJs
-import models.access.DbQuery
 import models.Entity
 import models.access.RemoteDatabaseProxy
 import models.access.RemoteDatabaseProxy.Listener
-import models.modification.EntityType
-import models.modification.EntityModification
+import models.modification.{EntityModification, EntityType}
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable

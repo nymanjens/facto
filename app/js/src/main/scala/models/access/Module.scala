@@ -4,9 +4,7 @@ import api.ScalaJsApiClient
 import common.time.Clock
 import models.user.User
 
-import scala.async.Async.{async, await}
 import scala.concurrent.Future
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 final class Module(user: User)(implicit scalaJsApiClient: ScalaJsApiClient, clock: Clock) {
 

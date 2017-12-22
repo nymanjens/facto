@@ -12,7 +12,6 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import jsfacades.Mousetrap
 import models.EntityAccess
-import models.accounting.config.Template.Placement
 import models.accounting.config.{Config, Template}
 import models.user.User
 

@@ -10,7 +10,6 @@ import common.time.LocalDateTimes.createDateTime
 import common.time.{DatedMonth, YearRange}
 import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.{GainsForMonth, GainsForYear}
 import flux.stores.entries.SummaryForYearStoreFactory.SummaryForYear
-import models.accounting._
 import utest._
 
 import scala.collection.immutable.{ListMap, Seq}

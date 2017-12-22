@@ -3,8 +3,7 @@ package common.testing
 import api.ScalaJsApi.{GetAllEntitiesResponse, GetEntityModificationsResponse, UpdateToken}
 import api.ScalaJsApiClient
 import models.Entity
-import models.modification.EntityType
-import models.modification.EntityModification
+import models.modification.{EntityModification, EntityType}
 
 import scala.collection.immutable.Seq
 import scala.concurrent.Future

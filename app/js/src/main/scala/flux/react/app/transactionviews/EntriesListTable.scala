@@ -1,18 +1,17 @@
 package flux.react.app.transactionviews
 
-import flux.react.ReactVdomUtils.{<<, ^^}
-import japgolly.scalajs.react.vdom.html_<^._
-import common.{I18n, Unique}
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
+import common.{I18n, Unique}
+import flux.react.ReactVdomUtils.<<
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import flux.react.uielements
 import flux.stores.entries.EntriesStore.StateWithMeta
 import flux.stores.entries.{EntriesListStoreFactory, EntriesStore}
+import japgolly.scalajs.react.vdom.html_<^.{VdomElement, _}
 import japgolly.scalajs.react.{Callback, _}
-import japgolly.scalajs.react.vdom.html_<^.VdomElement
 
-import scala.scalajs.js
 import scala.collection.immutable.Seq
+import scala.scalajs.js
 
 private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
     implicit entriesStoreFactory: EntriesListStoreFactory[Entry, AdditionalInput],

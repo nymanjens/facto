@@ -4,7 +4,6 @@ import common.GuavaReplacement.Iterables.getOnlyElement
 import common.LoggingUtils.logExceptions
 import common.ScalaUtils
 import jsfacades.LokiJs.Sorting.KeyWithDirection
-import models.access.ModelField
 
 import scala.collection.immutable.Seq
 import scala.concurrent.Future

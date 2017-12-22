@@ -1,19 +1,10 @@
 package models.access
 
-import api.ScalaJsApiClient
-import common.LoggingUtils.logExceptions
-import common.ScalaUtils.visibleForTesting
 import models.Entity
-import models.access.SingletonKey._
 import models.modification.{EntityModification, EntityType}
 
-import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
-import scala.collection.mutable
 import scala.concurrent.Future
-import scala.concurrent.duration._
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala.scalajs.js
 import scala2js.Converters._
 
 trait RemoteDatabaseProxy {

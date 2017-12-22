@@ -1,7 +1,5 @@
 package flux.react.app.transactiongroupform
 
-import scala.async.Async.{async, await}
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, LogExceptionsFuture, logExceptions}
 import common.money.{Currency, DatedMoney, ExchangeRateManager, ReferenceMoney}
@@ -15,11 +13,12 @@ import flux.react.uielements
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.Path
 import japgolly.scalajs.react.vdom.html_<^._
+import models.EntityAccess
 import models.accounting.config.{Account, Config}
 import models.accounting.{Transaction, TransactionGroup}
-import models.EntityAccess
 import models.user.User
 
+import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.concurrent.Future

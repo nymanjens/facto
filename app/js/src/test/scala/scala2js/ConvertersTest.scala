@@ -14,7 +14,6 @@ import utest._
 import scala.collection.immutable.Seq
 import scala.scalajs.js
 import scala2js.Converters._
-import scala2js.Scala2Js.Converter
 
 object ConvertersTest extends TestSuite {
   val dateTime = LocalDateTime.of(2022, MARCH, 13, 12, 13)

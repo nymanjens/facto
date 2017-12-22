@@ -1,7 +1,5 @@
 package flux.stores
 
-import scala.async.Async.{async, await}
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import common.time.Clock
 import flux.action.Action.{AddTransactionGroup, RemoveTransactionGroup, UpdateTransactionGroup}
 import flux.action.Dispatcher
@@ -10,7 +8,9 @@ import models.access.RemoteDatabaseProxy
 import models.accounting._
 import models.modification.EntityModification
 
+import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 private[stores] final class TransactionAndGroupStore(implicit database: RemoteDatabaseProxy,
                                                      entityAccess: EntityAccess,

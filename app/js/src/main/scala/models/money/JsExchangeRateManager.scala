@@ -2,14 +2,12 @@ package models.money
 
 import common.money.{Currency, ExchangeRateManager}
 import common.time.LocalDateTime
-import models.access.DbQueryImplicits._
 import models.access.RemoteDatabaseProxy
 import models.modification.{EntityModification, EntityType}
 
 import scala.collection.SortedMap
 import scala.collection.immutable.Seq
 import scala2js.Converters._
-import models.access.Fields
 
 final class JsExchangeRateManager(
     ratioReferenceToForeignCurrency: Map[Currency, SortedMap[LocalDateTime, Double]])(

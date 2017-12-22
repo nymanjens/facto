@@ -5,10 +5,8 @@ import api.ScalaJsApiClient
 import common.LoggingUtils.logExceptions
 import common.ScalaUtils.visibleForTesting
 import common.time.Clock
-import jsfacades.LokiJs
 import models.Entity
 import models.access.RemoteDatabaseProxy.Listener
-import models.access.SingletonKey.{NextUpdateTokenKey, VersionKey}
 import models.modification.{EntityModification, EntityType}
 
 import scala.async.Async.{async, await}

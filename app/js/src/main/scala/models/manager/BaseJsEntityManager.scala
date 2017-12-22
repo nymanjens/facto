@@ -7,7 +7,6 @@ import models.modification.EntityType
 import scala.async.Async.{async, await}
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
-import models.access.Fields
 
 abstract class BaseJsEntityManager[E <: Entity: EntityType](implicit database: RemoteDatabaseProxy)
     extends EntityManager[E] {
