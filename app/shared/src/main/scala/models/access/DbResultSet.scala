@@ -2,7 +2,6 @@ package models.access
 
 import models.access.DbQuery.{Filter, Sorting}
 import models.access.DbQueryImplicits._
-import models.access.DbResultSet.DbQueryExecutor
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
@@ -55,9 +54,4 @@ final class DbResultSet[E] private (executor: DbQueryExecutor[E]) {
 
 object DbResultSet {
   def fromExecutor[E](executor: DbQueryExecutor[E]): DbResultSet[E] = new DbResultSet(executor)
-
-  trait DbQueryExecutor[E] {
-    def data(dbQuery: DbQuery[E]): Seq[E]
-    def count(dbQuery: DbQuery[E]): Int
-  }
 }
