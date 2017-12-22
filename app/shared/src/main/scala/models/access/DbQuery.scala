@@ -1,14 +1,12 @@
 package models.access
 
 import models.access.DbQuery.Sorting.FieldWithDirection
-import models.access.DbQuery.{Filter, Operation, Sorting}
+import models.access.DbQuery.{Filter, Sorting}
+import scala.math.Ordering.Implicits._
 
 import scala.collection.immutable.Seq
 
-case class DbQuery[E, ReturnT](filter: Filter[E],
-                               sorting: Option[Sorting[E]],
-                               limit: Option[Int],
-                               operation: Operation[E, ReturnT])
+case class DbQuery[E](filter: Filter[E], sorting: Option[Sorting[E]], limit: Option[Int])
 
 object DbQuery {
 
@@ -25,17 +23,14 @@ object DbQuery {
     case class NotEqual[V, E](field: ModelField[V, E], value: V) extends Filter[E] {
       override def apply(entity: E) = field.get(entity) != value
     }
-    case class GreaterThan[V, E](field: ModelField[V, E], value: V) extends Filter[E] {
-//      override def apply(entity: E) = field.get(entity) > value
-      override def apply(entity: E) = ???
+    case class GreaterThan[V: Ordering, E](field: ModelField[V, E], value: V) extends Filter[E] {
+      override def apply(entity: E) = field.get(entity) > value
     }
-    case class GreaterOrEqualThan[V, E](field: ModelField[V, E], value: V) extends Filter[E] {
-//      override def apply(entity: E) = field.get(entity) >= value
-      override def apply(entity: E) = ???
+    case class GreaterOrEqualThan[V: Ordering, E](field: ModelField[V, E], value: V) extends Filter[E] {
+      override def apply(entity: E) = field.get(entity) >= value
     }
-    case class LessThan[V, E](field: ModelField[V, E], value: V) extends Filter[E] {
-//      override def apply(entity: E) = field.get(entity) < value
-      override def apply(entity: E) = ???
+    case class LessThan[V: Ordering, E](field: ModelField[V, E], value: V) extends Filter[E] {
+      override def apply(entity: E) = field.get(entity) < value
     }
     case class AnyOf[V, E](field: ModelField[V, E], values: Seq[V]) extends Filter[E] {
       override def apply(entity: E) = values contains field.get(entity)
@@ -52,10 +47,10 @@ object DbQuery {
       private val substringLower = substring.toLowerCase
       override def apply(entity: E) = !(field.get(entity).toLowerCase contains substringLower)
     }
-    case class SeqContains[V, E](field: ModelField[Seq[V], E], value: V) extends Filter[E] {
+    case class SeqContains[E](field: ModelField[Seq[String], E], value: String) extends Filter[E] {
       override def apply(entity: E) = field.get(entity) contains value
     }
-    case class SeqDoesntContain[V, E](field: ModelField[Seq[V], E], value: V) extends Filter[E] {
+    case class SeqDoesntContain[E](field: ModelField[Seq[String], E], value: String) extends Filter[E] {
       override def apply(entity: E) = !(field.get(entity) contains value)
     }
     case class Or[E](filters: Seq[Filter[E]]) extends Filter[E] {
@@ -66,11 +61,11 @@ object DbQuery {
     }
   }
 
-  case class Sorting[E] private (private[DbQuery] val fieldsWithDirection: Seq[FieldWithDirection[E]]) {
+  case class Sorting[E] private (fieldsWithDirection: Seq[FieldWithDirection[_, E]]) {
     def thenAscBy[V: Ordering](field: ModelField[V, E]): Sorting[E] = thenBy(field, isDesc = false)
     def thenDescBy[V: Ordering](field: ModelField[V, E]): Sorting[E] = thenBy(field, isDesc = true)
     def thenBy[V: Ordering](field: ModelField[V, E], isDesc: Boolean): Sorting[E] =
-      Sorting(fieldsWithDirection :+ FieldWithDirection(field, isDesc = isDesc))
+      Sorting(fieldsWithDirection :+ FieldWithDirection[V, E](field, isDesc = isDesc))
   }
   object Sorting {
     def ascBy[V: Ordering, E](field: ModelField[V, E]): Sorting[E] = by(field, isDesc = false)
@@ -78,12 +73,8 @@ object DbQuery {
     def by[V: Ordering, E](field: ModelField[V, E], isDesc: Boolean): Sorting[E] =
       Sorting(Seq(FieldWithDirection(field, isDesc = isDesc)))
 
-    private[DbQuery] case class FieldWithDirection[E](field: ModelField[_, E], isDesc: Boolean)
-  }
-
-  sealed trait Operation[E, ReturnT]
-  object Operation {
-    case class GetDataSeq[E]() extends Operation[E, Seq[E]]
-    case class Count[E]() extends Operation[E, Int]
+    case class FieldWithDirection[V: Ordering, E](field: ModelField[V, E], isDesc: Boolean) {
+      def valueOrdering: Ordering[V] = implicitly[Ordering[V]]
+    }
   }
 }

@@ -4,6 +4,9 @@ import common.testing.TestObjects._
 import jsfacades.LokiJs
 import jsfacades.LokiJs.{Filter, ResultSet}
 import models.access.LocalDatabase
+import models.access.DbQuery.Filter
+import models.access.DbQueryImplicits._
+import models.access.{DbQuery, DbResultSet, Fields, LocalDatabase}
 import models.accounting.Transaction
 import tests.ManualTests.{ManualTest, ManualTestSuite}
 
@@ -13,11 +16,10 @@ import scala.concurrent.Future
 import scala.language.reflectiveCalls
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
-import scala2js.Keys
 
 // Note that this is a manual test because the Rhino javascript engine used for tests
 // is incompatible with Loki.
-private[tests] object LokiResultSetTest extends ManualTestSuite {
+private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
 
   override def tests = Seq(
     // **************** Regular filter tests **************** //
@@ -27,7 +29,7 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction()
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(Filter.nullFilter)
+        .assertFilteredWith(Filter.NullFilter())
         .containsExactly(transaction1, transaction2, transaction3)
     },
     ManualTest("newQuery().filter(equal)") {
@@ -36,7 +38,7 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction()
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(Filter.equal(Keys.id, transaction2.id))
+        .assertFilteredWith(Fields.id[Transaction] isEqualTo transaction2.id)
         .containsExactly(transaction2)
     },
     ManualTest("newQuery().filter(notEqual)") {
@@ -45,7 +47,7 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction()
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(Filter.notEqual(Keys.id, transaction2.id))
+        .assertFilteredWith(Fields.id[Transaction] isNotEqualTo transaction2.id)
         .containsExactly(transaction1, transaction3)
     },
     ManualTest("newQuery().filter(lessThan)") {
@@ -54,7 +56,7 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction(day = 3)
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(Filter.lessThan(Keys.Transaction.createdDate, transaction3.createdDate))
+        .assertFilteredWith(Fields.Transaction.createdDate < transaction3.createdDate)
         .containsExactly(transaction1, transaction2)
     },
     ManualTest("newQuery().filter(greaterThan)") {
@@ -63,7 +65,7 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction(day = 3)
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(Filter.greaterThan(Keys.Transaction.createdDate, transaction1.createdDate))
+        .assertFilteredWith(Fields.Transaction.createdDate > transaction1.createdDate)
         .containsExactly(transaction2, transaction3)
     },
     ManualTest("newQuery().filter(greaterOrEqualThan)") {
@@ -72,8 +74,7 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction(day = 3)
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(
-          Filter.greaterOrEqualThan(Keys.Transaction.createdDate, transaction2.createdDate))
+        .assertFilteredWith(Fields.Transaction.createdDate >= transaction2.createdDate)
         .containsExactly(transaction2, transaction3)
     },
     ManualTest("newQuery().filter(anyOf)") {
@@ -83,7 +84,7 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
 
       withTransactions(transaction1, transaction2, transaction3)
         .assertFilteredWith(
-          Filter.anyOf(Keys.Transaction.categoryCode, Seq(testCategoryA.code, testCategoryB.code)))
+          Fields.Transaction.categoryCode isAnyOf Seq(testCategoryA.code, testCategoryB.code))
         .containsExactly(transaction1, transaction2)
     },
     ManualTest("newQuery().filter(noneOf)") {
@@ -93,7 +94,7 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
 
       withTransactions(transaction1, transaction2, transaction3)
         .assertFilteredWith(
-          Filter.noneOf(Keys.Transaction.categoryCode, Seq(testCategoryA.code, testCategoryB.code)))
+          Fields.Transaction.categoryCode isNoneOf Seq(testCategoryA.code, testCategoryB.code))
         .containsExactly(transaction3)
     },
     ManualTest("newQuery().filter(containsIgnoreCase)") {
@@ -102,7 +103,7 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction(description = "prefix\nBBBBcccc\nsuffix")
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(Filter.containsIgnoreCase(Keys.Transaction.description, "BBBB.*cccc"))
+        .assertFilteredWith(Fields.Transaction.description containsIgnoreCase "BBBB.*cccc")
         .containsExactly(transaction1, transaction2)
     },
     ManualTest("newQuery().filter(doesntContainIgnoreCase)") {
@@ -111,7 +112,7 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction(description = "prefix\nBBBBcccc\nsuffix")
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(Filter.doesntContainIgnoreCase(Keys.Transaction.description, "BBBB.*cccc"))
+        .assertFilteredWith(Fields.Transaction.description doesntContainIgnoreCase "BBBB.*cccc")
         .containsExactly(transaction3)
     },
     ManualTest("newQuery().filter(seqContains)") {
@@ -120,7 +121,7 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction(tags = Seq("tag"))
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(Filter.seqContains(Keys.Transaction.tags, "tag"))
+        .assertFilteredWith(Fields.Transaction.tags contains "tag")
         .containsExactly(transaction1, transaction3)
     },
     ManualTest("newQuery().filter(seqDoesntContain)") {
@@ -129,7 +130,7 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction(tags = Seq("tag"))
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(Filter.seqDoesntContain(Keys.Transaction.tags, "tag"))
+        .assertFilteredWith(Fields.Transaction.tags doesntContain "tag")
         .containsExactly(transaction2)
     },
     // **************** OR / AND filter tests **************** //
@@ -140,10 +141,11 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
       val transaction4 = createTransaction()
 
       withTransactions(transaction1, transaction2, transaction3, transaction4)
-        .assertFilteredWith(
-          Filter.or(
-            Filter.equal(Keys.id, transaction1.id),
-            Filter.anyOf(Keys.id, Seq(transaction2.id, transaction3.id))))
+        .assertFilteredWith({
+          Fields.id[Transaction] isEqualTo transaction1.id
+        } || {
+          Fields.id[Transaction] isAnyOf Seq(transaction2.id, transaction3.id)
+        })
         .containsExactly(transaction1, transaction2, transaction3)
     },
     ManualTest("newQuery().filter(and(equal, equal))") {
@@ -152,10 +154,11 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction(description = "def", category = testCategoryB)
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(
-          Filter.and(
-            Filter.equal(Keys.Transaction.description, "abc"),
-            Filter.equal(Keys.Transaction.categoryCode, testCategoryB.code)))
+        .assertFilteredWith({
+          Fields.Transaction.description isEqualTo "abc"
+        } && {
+          Fields.Transaction.categoryCode isEqualTo testCategoryB.code
+        })
         .containsExactly(transaction2)
     },
     ManualTest("newQuery().filter(and(anyOf, anyOf))") {
@@ -164,10 +167,11 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction()
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(
-          Filter.and(
-            Filter.anyOf(Keys.id, Seq(transaction2.id, transaction3.id)),
-            Filter.anyOf(Keys.id, Seq(transaction1.id, transaction2.id))))
+        .assertFilteredWith({
+          Fields.id[Transaction] isAnyOf Seq(transaction2.id, transaction3.id)
+        } && {
+          Fields.id[Transaction] isAnyOf Seq(transaction1.id, transaction2.id)
+        })
         .containsExactly(transaction2)
     },
     ManualTest("newQuery().filter(or(and(anyOf, anyOf), and(anyOf, anyOf))") {
@@ -176,14 +180,15 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction()
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(Filter.or(
-          Filter.and(
-            Filter.anyOf(Keys.id, Seq(transaction2.id, transaction3.id)),
-            Filter.anyOf(Keys.id, Seq(transaction1.id, transaction2.id))),
-          Filter.and(
-            Filter.anyOf(Keys.id, Seq(transaction1.id, transaction3.id)),
-            Filter.anyOf(Keys.id, Seq(transaction2.id, transaction3.id)))
-        ))
+        .assertFilteredWith(
+          {
+            (Fields.id[Transaction] isAnyOf Seq(transaction2.id, transaction3.id)) &&
+            (Fields.id[Transaction] isAnyOf Seq(transaction1.id, transaction2.id))
+          } || {
+            (Fields.id[Transaction] isAnyOf Seq(transaction1.id, transaction3.id)) &&
+            (Fields.id[Transaction] isAnyOf Seq(transaction2.id, transaction3.id))
+          }
+        )
         .containsExactly(transaction2, transaction3)
     },
     // **************** Non-filter tests **************** //
@@ -194,9 +199,9 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
 
       withTransactions(transaction1, transaction2, transaction3)
         .assertThat(
-          _.sort(LokiJs.Sorting
-            .descBy(Keys.Transaction.transactionGroupId)
-            .thenAscBy(Keys.Transaction.createdDate))
+          _.sort(DbQuery.Sorting
+            .descBy(Fields.Transaction.transactionGroupId)
+            .thenAscBy(Fields.Transaction.createdDate))
             .data())
         .containsExactlyInOrder(transaction3, transaction1, transaction2)
     },
@@ -207,7 +212,7 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
 
       withTransactions(transaction1, transaction2, transaction3)
         .assertThat(
-          _.sort(LokiJs.Sorting.ascBy(Keys.Transaction.createdDate))
+          _.sort(DbQuery.Sorting.ascBy(Fields.Transaction.createdDate))
             .limit(2)
             .data())
         .containsExactlyInOrder(transaction1, transaction2)
@@ -233,7 +238,7 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
   private def withTransactions(transactions: Transaction*) = new Object {
     def assertFilteredWith(filter: Filter[Transaction]) = assertThat(_.filter(filter).data())
 
-    def assertThat(resultSetFunc: ResultSet[Transaction] => Any) = new Object {
+    def assertThat(resultSetFunc: DbResultSet[Transaction] => Any) = new Object {
       def containsExactly(expected: Transaction*): Future[Unit] = async {
         val db = await(LocalDatabase.createInMemoryForTests())
         db.addAll(transactions.toVector)

@@ -4,14 +4,14 @@ import scala.async.Async.{async, await}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import models.access.DbQuery.{Filter, Operation, Sorting}
+import models.access.DbQuery.{Filter, Sorting}
 import models.access.DbQueryImplicits._
-import models.access.DbResultSet.DbQueryExecutor
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.concurrent.Future
 
-final class DbResultSet[E](executor: DbQueryExecutor[E]) {
+final class DbResultSet[E] private (executor: DbQueryExecutor[E]) {
 
   private val filters: mutable.Buffer[Filter[E]] = mutable.Buffer()
   private var sorting: Option[Sorting[E]] = None
@@ -42,10 +42,10 @@ final class DbResultSet[E](executor: DbQueryExecutor[E]) {
       case Seq() => None
     }
   }
-  def data(): Future[Seq[E]] = executor(dbQuery(Operation.GetDataSeq()))
-  def count(): Future[Int] = executor(dbQuery(Operation.Count()))
+  def data(): Future[Seq[E]] = executor.data(dbQuery)
+  def count(): Future[Int] = executor.count(dbQuery)
 
-  private def dbQuery[ReturnT](operation: Operation[E, ReturnT]): DbQuery[E, ReturnT] =
+  private def dbQuery: DbQuery[E] =
     DbQuery(
       filter = filters.toVector match {
         case Vector() => Filter.NullFilter()
@@ -53,13 +53,10 @@ final class DbResultSet[E](executor: DbQueryExecutor[E]) {
         case multipleFilters => Filter.And(multipleFilters)
       },
       sorting = sorting,
-      limit = limit,
-      operation = operation
+      limit = limit
     )
 }
 
 object DbResultSet {
-  trait DbQueryExecutor[E] {
-    def apply[ReturnT](query: DbQuery[E, ReturnT]): Future[ReturnT]
-  }
+  def fromExecutor[E](executor: DbQueryExecutor[E]): DbResultSet[E] = new DbResultSet(executor)
 }

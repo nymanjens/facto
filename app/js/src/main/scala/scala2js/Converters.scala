@@ -139,15 +139,13 @@ object Converters {
       val result = js.Dictionary[js.Any]()
 
       def addField[V](field: ModelField[V, E]): Unit = {
-        val (fieldName, jsValue) = Scala2Js.toJsPair(field -> field.get(entity))
-        result.update(fieldName, jsValue)
+        result.update(field.name, Scala2Js.toJs(field.get(entity), field))
       }
       for (field <- allFieldsWithoutId) {
         addField(field)
       }
       for (id <- entity.idOption) {
-        val (fieldName, jsValue) = Scala2Js.toJsPair(Fields.id -> id)
-        result.update(fieldName, jsValue)
+        result.update(Fields.id.name, Scala2Js.toJs(id, Fields.id))
       }
       result
     }
