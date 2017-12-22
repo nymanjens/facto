@@ -4,12 +4,8 @@ import api.ScalaJsApiClient
 import common.LoggingUtils.logExceptions
 import common.ScalaUtils.visibleForTesting
 import models.Entity
-import models.access.DbQuery.{Filter, Sorting}
-import models.access.DbQueryImplicits._
-import models.access.RemoteDatabaseProxy.ResultSet
 import models.access.SingletonKey._
-import models.modification.EntityType
-import models.modification.EntityModification
+import models.modification.{EntityModification, EntityType}
 
 import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
@@ -23,7 +19,7 @@ import scala2js.Converters._
 trait RemoteDatabaseProxy {
 
   // **************** Getters ****************//
-  def newQuery[E <: Entity: EntityType](): ResultSet[E]
+  def newQuery[E <: Entity: EntityType](): DbResultSet[E]
 
   /** Returns true if there are local pending `Add` modifications for the given entity. Note that only its id is used. */
   def hasLocalAddModifications[E <: Entity: EntityType](entity: E): Boolean
@@ -43,24 +39,6 @@ trait RemoteDatabaseProxy {
 object RemoteDatabaseProxy {
 
   private val localDatabaseAndEntityVersion = "1.0"
-
-  trait ResultSet[E] {
-    // **************** Intermediary operations **************** //
-    def filter(filter: Filter[E]): ResultSet[E]
-
-    def sort(sorting: Sorting[E]): ResultSet[E]
-    def limit(quantity: Int): ResultSet[E]
-
-    // **************** Terminal operations **************** //
-    final def findOne[V](field: ModelField[V, E], value: V): Option[E] = {
-      filter(field isEqualTo value).limit(1).data() match {
-        case Seq(e) => Some(e)
-        case Seq() => None
-      }
-    }
-    def data(): Seq[E]
-    def count(): Int
-  }
 
   private[access] def create(apiClient: ScalaJsApiClient,
                              possiblyEmptyLocalDatabase: LocalDatabase): Future[RemoteDatabaseProxy.Impl] =
@@ -133,7 +111,7 @@ object RemoteDatabaseProxy {
     private var isCallingListeners: Boolean = false
 
     // **************** Getters ****************//
-    override def newQuery[E <: Entity: EntityType](): ResultSet[E] = {
+    override def newQuery[E <: Entity: EntityType](): DbResultSet[E] = {
       ???
 //      localDatabase.newQuery[E]()
     }

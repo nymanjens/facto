@@ -6,8 +6,8 @@ import models.access.DbQuery.{Filter, Operation, Sorting}
 import scala.collection.immutable.Seq
 
 case class DbQuery[E, ReturnT](filter: Filter[E],
-                               sorting: Sorting[E],
-                               limit: Int = Int.MaxValue,
+                               sorting: Option[Sorting[E]],
+                               limit: Option[Int],
                                operation: Operation[E, ReturnT])
 
 object DbQuery {
@@ -83,7 +83,7 @@ object DbQuery {
 
   sealed trait Operation[E, ReturnT]
   object Operation {
-    final class GetDataSeq[E] extends Operation[E, Seq[E]]
-    final class Count[E]() extends Operation[E, Int]
+    case class GetDataSeq[E]() extends Operation[E, Seq[E]]
+    case class Count[E]() extends Operation[E, Int]
   }
 }
