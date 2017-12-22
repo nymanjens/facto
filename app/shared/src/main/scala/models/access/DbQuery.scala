@@ -2,6 +2,7 @@ package models.access
 
 import models.access.DbQuery.Sorting.FieldWithDirection
 import models.access.DbQuery.{Filter, Sorting}
+import scala.math.Ordering.Implicits._
 
 import scala.collection.immutable.Seq
 
@@ -22,17 +23,14 @@ object DbQuery {
     case class NotEqual[V, E](field: ModelField[V, E], value: V) extends Filter[E] {
       override def apply(entity: E) = field.get(entity) != value
     }
-    case class GreaterThan[V, E](field: ModelField[V, E], value: V) extends Filter[E] {
-//      override def apply(entity: E) = field.get(entity) > value
-      override def apply(entity: E) = ???
+    case class GreaterThan[V: Ordering, E](field: ModelField[V, E], value: V) extends Filter[E] {
+      override def apply(entity: E) = field.get(entity) > value
     }
-    case class GreaterOrEqualThan[V, E](field: ModelField[V, E], value: V) extends Filter[E] {
-//      override def apply(entity: E) = field.get(entity) >= value
-      override def apply(entity: E) = ???
+    case class GreaterOrEqualThan[V: Ordering, E](field: ModelField[V, E], value: V) extends Filter[E] {
+      override def apply(entity: E) = field.get(entity) >= value
     }
-    case class LessThan[V, E](field: ModelField[V, E], value: V) extends Filter[E] {
-//      override def apply(entity: E) = field.get(entity) < value
-      override def apply(entity: E) = ???
+    case class LessThan[V: Ordering, E](field: ModelField[V, E], value: V) extends Filter[E] {
+      override def apply(entity: E) = field.get(entity) < value
     }
     case class AnyOf[V, E](field: ModelField[V, E], values: Seq[V]) extends Filter[E] {
       override def apply(entity: E) = values contains field.get(entity)
