@@ -3,15 +3,13 @@ package flux.stores.entries
 import common.money.{ExchangeRateManager, ReferenceMoney}
 import common.time.{DatedMonth, LocalDateTime}
 import flux.stores.entries.SummaryForYearStoreFactory.SummaryForYear
-import jsfacades.LokiJs
-import models.access.{DbQuery, Fields, ModelField, RemoteDatabaseProxy}
 import models.access.DbQueryImplicits._
+import models.access.{DbQuery, Fields, ModelField, RemoteDatabaseProxy}
 import models.accounting.config.{Account, Category, Config}
 import models.accounting.{BalanceCheck, Transaction}
 
 import scala.collection.immutable.Seq
 import scala2js.Converters._
-import scala2js.Scala2Js.Key
 
 final class SummaryForYearStoreFactory(implicit database: RemoteDatabaseProxy,
                                        accountingConfig: Config,

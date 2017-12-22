@@ -1,15 +1,12 @@
 package flux.stores.entries
 
-import jsfacades.LokiJs
-import models.access.DbQuery
 import models.access.DbQueryImplicits._
-import models.access.RemoteDatabaseProxy
+import models.access.{DbQuery, Fields, RemoteDatabaseProxy}
 import models.accounting.config.{Account, Config}
 import models.accounting.{BalanceCheck, Transaction}
 
 import scala.collection.immutable.Seq
 import scala2js.Converters._
-import models.access.Fields
 
 final class EndowmentEntriesStoreFactory(implicit database: RemoteDatabaseProxy, accountingConfig: Config)
     extends EntriesListStoreFactory[GeneralEntry, Account] {
@@ -19,7 +16,8 @@ final class EndowmentEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
       val transactions: Seq[Transaction] =
         database
           .newQuery[Transaction]()
-          .filter(Fields.Transaction.categoryCode isEqualTo accountingConfig.constants.endowmentCategory.code)
+          .filter(
+            Fields.Transaction.categoryCode isEqualTo accountingConfig.constants.endowmentCategory.code)
           .filter(Fields.Transaction.beneficiaryAccountCode isEqualTo account.code)
           .sort(
             DbQuery.Sorting

@@ -1,11 +1,10 @@
 package models.access
 
 import common.ScalaUtils.visibleForTesting
-import jsfacades.{CryptoJs, LokiJs}
 import jsfacades.LokiJsImplicits._
+import jsfacades.{CryptoJs, LokiJs}
 import models.Entity
-import models.modification.EntityType
-import models.modification.EntityModification
+import models.modification.{EntityModification, EntityType}
 
 import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq

@@ -1,12 +1,9 @@
 package flux.react.app
 
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
-import flux.react.ReactVdomUtils.^^
 import flux.stores.PageLoadingStateStore
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
-
-import scala.scalajs.js
 
 private[app] final class PageLoadingSpinner(implicit pageLoadingStateStore: PageLoadingStateStore) {
 

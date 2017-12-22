@@ -3,12 +3,11 @@ package flux.stores.entries
 import common.GuavaReplacement.ImmutableSetMultimap
 import flux.stores.entries.TagsStoreFactory.State
 import models.access.DbQueryImplicits._
-import models.access.RemoteDatabaseProxy
+import models.access.{Fields, RemoteDatabaseProxy}
 import models.accounting.{BalanceCheck, Transaction}
 
 import scala.collection.immutable.Seq
 import scala2js.Converters._
-import models.access.Fields
 
 final class TagsStoreFactory(implicit database: RemoteDatabaseProxy) extends EntriesStoreFactory[State] {
 

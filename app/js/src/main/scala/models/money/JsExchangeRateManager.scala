@@ -3,14 +3,12 @@ package models.money
 import common.money.{Currency, ExchangeRateManager}
 import common.time.LocalDateTime
 import models.access.DbQueryImplicits._
-import models.access.RemoteDatabaseProxy
-import models.modification.EntityType
-import models.modification.EntityModification
+import models.access.{Fields, RemoteDatabaseProxy}
+import models.modification.{EntityModification, EntityType}
 
 import scala.collection.immutable.{Seq, TreeMap}
 import scala.collection.{SortedMap, mutable}
 import scala2js.Converters._
-import models.access.Fields
 
 final class JsExchangeRateManager(implicit database: RemoteDatabaseProxy) extends ExchangeRateManager {
   database.registerListener(RemoteDatabaseProxyListener)

@@ -2,16 +2,13 @@ package flux.stores.entries
 
 import common.time.YearRange
 import flux.stores.entries.SummaryYearsStoreFactory.State
-import jsfacades.LokiJs
-import models.access.DbQuery
 import models.access.DbQueryImplicits._
-import models.access.RemoteDatabaseProxy
+import models.access.{DbQuery, Fields, RemoteDatabaseProxy}
 import models.accounting.config.Account
 import models.accounting.{BalanceCheck, Transaction}
 
 import scala.collection.immutable.Seq
 import scala2js.Converters._
-import models.access.Fields
 
 /**
   * Store factory that calculates the year span of all transactions of an account.

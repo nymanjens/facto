@@ -2,17 +2,14 @@ package flux.stores.entries
 
 import common.LoggingUtils.logExceptions
 import common.money.{ExchangeRateManager, ReferenceMoney}
-import jsfacades.LokiJs
-import models.access.DbQuery
-import models.access.DbQueryImplicits._
 import models.EntityAccess
-import models.access.RemoteDatabaseProxy
+import models.access.DbQueryImplicits._
+import models.access.{DbQuery, Fields, RemoteDatabaseProxy}
 import models.accounting.config.{Account, Config, MoneyReservoir}
 import models.accounting.{BalanceCheck, Transaction}
 
 import scala.collection.immutable.Seq
 import scala2js.Converters._
-import models.access.Fields
 
 final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
                                            accountingConfig: Config,

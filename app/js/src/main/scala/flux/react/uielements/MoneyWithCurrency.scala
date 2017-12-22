@@ -3,7 +3,6 @@ package flux.react.uielements
 import common.money.{Currency, DatedMoney, ExchangeRateManager, Money}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
-import common.money.Currency
 
 object MoneyWithCurrency {
   private case class Props(money: Money, exchangeRateManager: ExchangeRateManager)

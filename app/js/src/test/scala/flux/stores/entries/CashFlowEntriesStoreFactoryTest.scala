@@ -10,7 +10,6 @@ import common.time.LocalDateTimes.createDateTime
 import flux.stores.entries.CashFlowEntry.{BalanceCorrection, RegularEntry}
 import models.accounting._
 import models.accounting.config.MoneyReservoir
-import common.money.Currency
 import models.modification.EntityModification
 import utest._
 

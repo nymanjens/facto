@@ -8,7 +8,6 @@ import flux.react.uielements.input.InputBase
 import flux.react.uielements.input.bootstrap.InputComponent.Props
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
-import common.money.Currency
 
 import scala.collection.immutable.Seq
 

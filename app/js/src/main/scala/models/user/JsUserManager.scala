@@ -1,12 +1,11 @@
 package models.user
 
 import models.access.DbQueryImplicits._
-import models.access.RemoteDatabaseProxy
+import models.access.{Fields, RemoteDatabaseProxy}
 import models.manager.BaseJsEntityManager
 
 import scala.collection.immutable.Seq
 import scala2js.Converters._
-import models.access.Fields
 
 final class JsUserManager(implicit database: RemoteDatabaseProxy)
     extends BaseJsEntityManager[User]
