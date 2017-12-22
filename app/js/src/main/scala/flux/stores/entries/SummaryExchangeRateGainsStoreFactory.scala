@@ -10,18 +10,14 @@ import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.{
 }
 import models.access.DbQueryImplicits._
 import models.access.{DbQuery, Fields, ModelField, RemoteDatabaseProxy}
-
-import scala.async.Async.{async, await}
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import jsfacades.LokiJs
-import jsfacades.LokiJsImplicits._
-import models.access.RemoteDatabaseProxy
 import models.accounting.config.{Account, Config, MoneyReservoir}
 import models.accounting.{BalanceCheck, Transaction}
 
+import scala.async.Async.{async, await}
 import scala.collection.immutable.{Seq, SortedMap}
 import scala.collection.mutable
 import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 
 /**
@@ -65,7 +61,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
             .newQuery[BalanceCheck]()
             .filter(Fields.BalanceCheck.moneyReservoirCode isEqualTo reservoir.code)
             .filter(Fields.BalanceCheck.checkDate < monthsInYear.head.startTime)
-            .sort(LokiJs.Sorting
+            .sort(DbQuery.Sorting
               .descBy(Fields.BalanceCheck.checkDate)
               .thenDescBy(Fields.BalanceCheck.createdDate)
               .thenDescBy(Fields.id))
@@ -158,8 +154,8 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
 object SummaryExchangeRateGainsStoreFactory {
 
   private def combineMapValues[K, V](maps: Seq[Map[K, V]])(valueCombiner: Seq[V] => V): Map[K, V] = {
-    val Fields = maps.map(_.Fieldset).reduceOption(_ union _) getOrElse Set()
-    Fields.map(key => key -> valueCombiner(maps.filter(_ contains key).map(_.apply(key)))).toMap
+    val keys = maps.map(_.keySet).reduceOption(_ union _) getOrElse Set()
+    keys.map(key => key -> valueCombiner(maps.filter(_ contains key).map(_.apply(key)))).toMap
   }
 
   case class GainsForYear(private val monthToGains: Map[DatedMonth, GainsForMonth],
@@ -187,7 +183,7 @@ object SummaryExchangeRateGainsStoreFactory {
 
     lazy val total: ReferenceMoney = reservoirToGains.values.sum
     def nonEmpty: Boolean = reservoirToGains.nonEmpty
-    def currencies: Seq[Currency] = reservoirToGains.Fields.toStream.map(_.currency).distinct.toVector
+    def currencies: Seq[Currency] = reservoirToGains.keys.toStream.map(_.currency).distinct.toVector
     def gains(currency: Currency): ReferenceMoney =
       reservoirToGains.toStream.filter(_._1.currency == currency).map(_._2).sum
   }

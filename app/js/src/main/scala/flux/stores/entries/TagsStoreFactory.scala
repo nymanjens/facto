@@ -3,7 +3,6 @@ package flux.stores.entries
 import common.GuavaReplacement.ImmutableSetMultimap
 import flux.stores.entries.TagsStoreFactory.State
 import models.access.DbQueryImplicits._
-import jsfacades.LokiJsImplicits._
 import scala.async.Async.{async, await}
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import models.access.RemoteDatabaseProxy

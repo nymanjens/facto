@@ -218,7 +218,7 @@ private[tests] object LokiResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction()
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertThat(_.findOne(Fields.id, transaction2.id))
+        .assertThat(_.findOne(Keys.id, transaction2.id))
         .isEqualTo(Some(transaction2))
     },
     ManualTest("newQuery().count()") {

@@ -24,7 +24,7 @@ final class EndowmentEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
             .filter(
               Fields.Transaction.categoryCode isEqualTo accountingConfig.constants.endowmentCategory.code)
             .filter(Fields.Transaction.beneficiaryAccountCode isEqualTo account.code)
-            .sort(LokiJs.Sorting
+            .sort(DbQuery.Sorting
               .descBy(Fields.Transaction.consumedDate)
               .thenDescBy(Fields.Transaction.createdDate)
               .thenDescBy(Fields.id))

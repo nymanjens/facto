@@ -416,7 +416,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
 //          .newQuery[Transaction]()
 //          .filter(Keys.Transaction.categoryCode isEqualTo category.code)
 //          .filter(Keys.Transaction.description containsIgnoreCase enteredValue)
-//          .sort(LokiJs.Sorting
+//          .sort(DbQuery.Sorting
 //            .descBy(Keys.Transaction.createdDate))
 //          .limit(20)
 //          .data()

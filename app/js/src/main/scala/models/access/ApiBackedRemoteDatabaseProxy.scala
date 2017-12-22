@@ -29,7 +29,7 @@ private[access] final class ApiBackedRemoteDatabaseProxy(implicit apiClient: Sca
   private var isCallingListeners: Boolean = false
 
   // **************** Getters ****************//
-  override def newQuery[E <: Entity: EntityType](): LokiJs.ResultSet[E] = {
+  override def newQuery[E <: Entity: EntityType](): DbResultSet[E] = {
     ???
   }
 

@@ -20,7 +20,7 @@ final class AllEntriesStoreFactory(implicit database: RemoteDatabaseProxy)
           database
             .newQuery[Transaction]()
             .sort(
-              LokiJs.Sorting
+              DbQuery.Sorting
                 .descBy(Fields.Transaction.transactionDate)
                 .thenDescBy(Fields.Transaction.createdDate)
                 .thenDescBy(Fields.id))

@@ -27,8 +27,9 @@ private[access] final class LocallyClonedRemoteDatabaseProxy(apiClient: ScalaJsA
   private var isCallingListeners: Boolean = false
 
   // **************** Getters ****************//
-  override def newQuery[E <: Entity: EntityType](): LokiJs.ResultSet[E] = {
-    localDatabase.newQuery[E]()
+  override def newQuery[E <: Entity: EntityType](): DbResultSet[E] = {
+//    localDatabase.newQuery[E]()
+    ???
   }
 
   override def hasLocalAddModifications[E <: Entity: EntityType](entity: E): Boolean = {

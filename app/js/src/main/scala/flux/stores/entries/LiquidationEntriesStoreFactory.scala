@@ -1,22 +1,17 @@
 package flux.stores.entries
 
-import common.LoggingUtils.logExceptions
 import common.money.{ExchangeRateManager, ReferenceMoney}
-import jsfacades.LokiJs
-import models.access.DbQuery
-import models.access.DbQueryImplicits._
-import scala.async.Async.{async, await}
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import jsfacades.LokiJsImplicits._
 import models.EntityAccess
-import models.access.RemoteDatabaseProxy
+import models.access.DbQueryImplicits._
+import models.access.{DbQuery, Fields, RemoteDatabaseProxy}
 import models.accounting.config.{Account, Config, MoneyReservoir}
 import models.accounting.{BalanceCheck, Transaction}
 
+import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
-import models.access.Fields
 
 final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
                                            accountingConfig: Config,
@@ -72,7 +67,7 @@ final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProx
         database
           .newQuery[Transaction]()
           .filter(
-            LokiJs.Filter.nullFilter[Transaction]
+            DbQuery.Filter.NullFilter[Transaction]()
               ||
                 ((Fields.Transaction.moneyReservoirCode isAnyOf account1ReservoirCodes) &&
                   (Fields.Transaction.beneficiaryAccountCode isEqualTo accountPair.account2.code))
@@ -83,7 +78,7 @@ final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProx
                 ((Fields.Transaction.moneyReservoirCode isEqualTo "") &&
                   (Fields.Transaction.beneficiaryAccountCode isAnyOf accountPair.toSet.map(_.code).toVector))
           )
-          .sort(LokiJs.Sorting
+          .sort(DbQuery.Sorting
             .ascBy(Fields.Transaction.transactionDate)
             .thenAscBy(Fields.Transaction.createdDate)
             .thenAscBy(Fields.id))

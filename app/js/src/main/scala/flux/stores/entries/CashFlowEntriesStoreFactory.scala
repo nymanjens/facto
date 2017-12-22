@@ -45,7 +45,7 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
                 .newQuery[Transaction]()
                 .filter(Fields.Transaction.moneyReservoirCode isEqualTo moneyReservoir.code)
                 .sort(
-                  LokiJs.Sorting
+                  DbQuery.Sorting
                     .descBy(Fields.Transaction.transactionDate)
                     .thenDescBy(Fields.Transaction.createdDate)
                     .thenDescBy(Fields.id))
@@ -58,7 +58,7 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
               .newQuery[BalanceCheck]()
               .filter(Fields.BalanceCheck.moneyReservoirCode isEqualTo moneyReservoir.code)
               .filter(Fields.BalanceCheck.checkDate < oldestTransDate)
-              .sort(LokiJs.Sorting
+              .sort(DbQuery.Sorting
                 .descBy(Fields.BalanceCheck.checkDate)
                 .thenDescBy(Fields.BalanceCheck.createdDate)
                 .thenDescBy(Fields.id))

@@ -38,7 +38,7 @@ final class SummaryForYearStoreFactory(implicit database: RemoteDatabaseProxy,
             .newQuery[Transaction]()
             .filter(combinedFilter)
             .sort(
-              LokiJs.Sorting
+              DbQuery.Sorting
                 .ascBy(Fields.Transaction.consumedDate)
                 .thenAscBy(Fields.Transaction.createdDate)
                 .thenAscBy(Fields.id))

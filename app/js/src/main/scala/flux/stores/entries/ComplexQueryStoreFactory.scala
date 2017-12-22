@@ -24,7 +24,7 @@ final class ComplexQueryStoreFactory(implicit database: RemoteDatabaseProxy,
           database
             .newQuery[Transaction]()
             .filter(filterFromQuery)
-            .sort(LokiJs.Sorting.descBy(Fields.Transaction.createdDate).thenDescBy(Fields.id))
+            .sort(DbQuery.Sorting.descBy(Fields.Transaction.createdDate).thenDescBy(Fields.id))
             .limit(3 * maxNumEntries)
             .data()).reverse
 

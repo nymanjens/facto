@@ -28,8 +28,8 @@ final class SummaryYearsStoreFactory(implicit database: RemoteDatabaseProxy)
   // **************** Implementation of EntriesStoreFactory methods/types ****************//
   override protected def createNew(account: Account) = new Store {
     override protected def calculateState() = async {
-      val earliestFuture = getFirstAfterSorting(LokiJs.Sorting.ascBy(Fields.Transaction.consumedDate))
-      val latestFuture = getFirstAfterSorting(LokiJs.Sorting.descBy(Fields.Transaction.consumedDate))
+      val earliestFuture = getFirstAfterSorting(DbQuery.Sorting.ascBy(Fields.Transaction.consumedDate))
+      val latestFuture = getFirstAfterSorting(DbQuery.Sorting.descBy(Fields.Transaction.consumedDate))
       val (maybeEarliest, maybeLatest) = (await(earliestFuture), await(latestFuture))
 
       val rangeOption = for {
@@ -48,7 +48,7 @@ final class SummaryYearsStoreFactory(implicit database: RemoteDatabaseProxy)
         transaction.consumedDate.getYear)
     override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) = false
 
-    private def getFirstAfterSorting(sorting: LokiJs.Sorting[Transaction]): Future[Option[Transaction]] =
+    private def getFirstAfterSorting(sorting: DbQuery.Sorting[Transaction]): Future[Option[Transaction]] =
       async {
         val data = await(
           database
