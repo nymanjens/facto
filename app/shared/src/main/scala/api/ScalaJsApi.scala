@@ -10,6 +10,7 @@ import api.ScalaJsApi.{
 import common.money.Currency
 import common.time.LocalDateTime
 import models.Entity
+import models.access.DbQuery
 import models.accounting.config.Config
 import models.modification.{EntityModification, EntityType}
 import models.user.User
@@ -28,6 +29,9 @@ trait ScalaJsApi {
   def getEntityModifications(updateToken: UpdateToken): GetEntityModificationsResponse
 
   def persistEntityModifications(modifications: Seq[EntityModification]): Unit
+
+//  def executeDataQuery[E](dbQuery: DbQuery[E]): Seq[E]
+//  def executeCountQuery[E](dbQuery: DbQuery[E]): Seq[E]
 }
 
 object ScalaJsApi {

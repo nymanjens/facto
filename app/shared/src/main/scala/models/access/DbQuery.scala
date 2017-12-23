@@ -1,12 +1,16 @@
 package models.access
 
+import models.Entity
 import models.access.DbQuery.Sorting.FieldWithDirection
 import models.access.DbQuery.{Filter, Sorting}
-import scala.math.Ordering.Implicits._
+import models.modification.EntityType
 
+import scala.math.Ordering.Implicits._
 import scala.collection.immutable.Seq
 
-case class DbQuery[E](filter: Filter[E], sorting: Option[Sorting[E]], limit: Option[Int])
+case class DbQuery[E <: Entity: EntityType](filter: Filter[E],
+                                            sorting: Option[Sorting[E]],
+                                            limit: Option[Int])
 
 object DbQuery {
 

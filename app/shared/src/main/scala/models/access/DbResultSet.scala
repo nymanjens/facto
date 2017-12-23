@@ -1,7 +1,9 @@
 package models.access
 
+import models.Entity
 import models.access.DbQuery.{Filter, Sorting}
 import models.access.DbQueryImplicits._
+import models.modification.EntityType
 
 import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
@@ -9,7 +11,7 @@ import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-final class DbResultSet[E] private (executor: DbQueryExecutor[E]) {
+final class DbResultSet[E <: Entity: EntityType] private (executor: DbQueryExecutor[E]) {
 
   private val filters: mutable.Buffer[Filter[E]] = mutable.Buffer()
   private var sorting: Option[Sorting[E]] = None
@@ -56,5 +58,6 @@ final class DbResultSet[E] private (executor: DbQueryExecutor[E]) {
 }
 
 object DbResultSet {
-  def fromExecutor[E](executor: DbQueryExecutor[E]): DbResultSet[E] = new DbResultSet(executor)
+  def fromExecutor[E <: Entity: EntityType](executor: DbQueryExecutor[E]): DbResultSet[E] =
+    new DbResultSet(executor)
 }
