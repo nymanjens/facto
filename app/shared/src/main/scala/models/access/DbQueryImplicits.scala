@@ -1,5 +1,6 @@
 package models.access
 
+import common.time.LocalDateTime
 import models.access.DbQuery.Filter
 
 import scala.collection.immutable.Seq
@@ -11,10 +12,10 @@ object DbQueryImplicits {
     def isAnyOf(values: Seq[V]): Filter[E] = Filter.AnyOf(field, values)
     def isNoneOf(values: Seq[V]): Filter[E] = Filter.NoneOf(field, values)
   }
-  implicit class OrderedKeyWrapper[E, V: Ordering](field: ModelField[V, E]) {
-    def <(value: V): Filter[E] = Filter.LessThan(field, value)
-    def >(value: V): Filter[E] = Filter.GreaterThan(field, value)
-    def >=(value: V): Filter[E] = Filter.GreaterOrEqualThan(field, value)
+  implicit class OrderedKeyWrapper[E](field: ModelField[LocalDateTime, E]) {
+    def <(value: LocalDateTime): Filter[E] = Filter.LessThan(field, value)
+    def >(value: LocalDateTime): Filter[E] = Filter.GreaterThan(field, value)
+    def >=(value: LocalDateTime): Filter[E] = Filter.GreaterOrEqualThan(field, value)
   }
 
   implicit class StringKeyWrapper[E](field: ModelField[String, E]) {

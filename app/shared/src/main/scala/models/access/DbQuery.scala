@@ -6,6 +6,9 @@ import models.access.DbQuery.{Filter, Sorting}
 import models.modification.EntityType
 
 import scala.math.Ordering.Implicits._
+import common.time.JavaTimeImplicits._
+import common.time.LocalDateTime
+
 import scala.collection.immutable.Seq
 
 case class DbQuery[E <: Entity: EntityType](filter: Filter[E],
@@ -14,7 +17,9 @@ case class DbQuery[E <: Entity: EntityType](filter: Filter[E],
 
 object DbQuery {
 
-  trait Filter[E] {
+  type any = DbQuery[_ <: Entity]
+
+  sealed trait Filter[E] {
     def apply(entity: E): Boolean
   }
   object Filter {
@@ -27,13 +32,14 @@ object DbQuery {
     case class NotEqual[V, E](field: ModelField[V, E], value: V) extends Filter[E] {
       override def apply(entity: E) = field.get(entity) != value
     }
-    case class GreaterThan[V: Ordering, E](field: ModelField[V, E], value: V) extends Filter[E] {
+    case class GreaterThan[E](field: ModelField[LocalDateTime, E], value: LocalDateTime) extends Filter[E] {
       override def apply(entity: E) = field.get(entity) > value
     }
-    case class GreaterOrEqualThan[V: Ordering, E](field: ModelField[V, E], value: V) extends Filter[E] {
+    case class GreaterOrEqualThan[E](field: ModelField[LocalDateTime, E], value: LocalDateTime)
+        extends Filter[E] {
       override def apply(entity: E) = field.get(entity) >= value
     }
-    case class LessThan[V: Ordering, E](field: ModelField[V, E], value: V) extends Filter[E] {
+    case class LessThan[E](field: ModelField[LocalDateTime, E], value: LocalDateTime) extends Filter[E] {
       override def apply(entity: E) = field.get(entity) < value
     }
     case class AnyOf[V, E](field: ModelField[V, E], values: Seq[V]) extends Filter[E] {
