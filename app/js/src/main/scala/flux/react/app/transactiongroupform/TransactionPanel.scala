@@ -15,17 +15,15 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom.html_<^._
-import jsfacades.LokiJs
-import jsfacades.LokiJsImplicits._
 import models.EntityAccess
-import models.access.RemoteDatabaseProxy
+import models.access.DbQueryImplicits._
+import models.access.{DbQuery, Fields, RemoteDatabaseProxy}
 import models.accounting.Transaction
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.user.User
 
 import scala.collection.immutable.Seq
 import scala2js.Converters._
-import scala2js.Keys
 
 private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                                                            accountingConfig: Config,
@@ -415,7 +413,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
 //          .newQuery[Transaction]()
 //          .filter(Keys.Transaction.categoryCode isEqualTo category.code)
 //          .filter(Keys.Transaction.description containsIgnoreCase enteredValue)
-//          .sort(LokiJs.Sorting
+//          .sort(DbQuery.Sorting
 //            .descBy(Keys.Transaction.createdDate))
 //          .limit(20)
 //          .data()

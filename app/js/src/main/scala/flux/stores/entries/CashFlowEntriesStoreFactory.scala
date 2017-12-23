@@ -1,20 +1,18 @@
 package flux.stores.entries
-import scala.async.Async.{async, await}
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import common.money.{ExchangeRateManager, MoneyWithGeneralCurrency}
 import common.time.JavaTimeImplicits._
 import common.time.LocalDateTime
 import flux.stores.entries.CashFlowEntry.{BalanceCorrection, RegularEntry}
-import jsfacades.LokiJs
-import jsfacades.LokiJsImplicits._
 import models.EntityAccess
-import models.access.RemoteDatabaseProxy
+import models.access.DbQueryImplicits._
+import models.access.{DbQuery, Fields, RemoteDatabaseProxy}
 import models.accounting.config.{Config, MoneyReservoir}
 import models.accounting.{Transaction, _}
 
+import scala.async.Async.{async, await}
 import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
-import scala2js.Keys
 
 final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
                                         accountingConfig: Config,
@@ -30,7 +28,7 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
           await(
             database
               .newQuery[Transaction]()
-              .filter(Keys.Transaction.moneyReservoirCode isEqualTo moneyReservoir.code)
+              .filter(Fields.Transaction.moneyReservoirCode isEqualTo moneyReservoir.code)
               .count())
 
         if (totalNumTransactions < numTransactionsToFetch) {
@@ -42,12 +40,12 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
             await(
               database
                 .newQuery[Transaction]()
-                .filter(Keys.Transaction.moneyReservoirCode isEqualTo moneyReservoir.code)
+                .filter(Fields.Transaction.moneyReservoirCode isEqualTo moneyReservoir.code)
                 .sort(
-                  LokiJs.Sorting
-                    .descBy(Keys.Transaction.transactionDate)
-                    .thenDescBy(Keys.Transaction.createdDate)
-                    .thenDescBy(Keys.id))
+                  DbQuery.Sorting
+                    .descBy(Fields.Transaction.transactionDate)
+                    .thenDescBy(Fields.Transaction.createdDate)
+                    .thenDescBy(Fields.id))
                 .limit(numTransactionsToFetch)
                 .data()).last.transactionDate
 
@@ -55,12 +53,12 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
           await(
             database
               .newQuery[BalanceCheck]()
-              .filter(Keys.BalanceCheck.moneyReservoirCode isEqualTo moneyReservoir.code)
-              .filter(Keys.BalanceCheck.checkDate < oldestTransDate)
-              .sort(LokiJs.Sorting
-                .descBy(Keys.BalanceCheck.checkDate)
-                .thenDescBy(Keys.BalanceCheck.createdDate)
-                .thenDescBy(Keys.id))
+              .filter(Fields.BalanceCheck.moneyReservoirCode isEqualTo moneyReservoir.code)
+              .filter(Fields.BalanceCheck.checkDate < oldestTransDate)
+              .sort(DbQuery.Sorting
+                .descBy(Fields.BalanceCheck.checkDate)
+                .thenDescBy(Fields.BalanceCheck.createdDate)
+                .thenDescBy(Fields.id))
               .limit(1)
               .data()).headOption
         }
@@ -75,16 +73,16 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
       val balanceChecksFuture: Future[Seq[BalanceCheck]] =
         database
           .newQuery[BalanceCheck]()
-          .filter(Keys.BalanceCheck.moneyReservoirCode isEqualTo moneyReservoir.code)
-          .filter(Keys.BalanceCheck.checkDate >= oldestBalanceDate)
+          .filter(Fields.BalanceCheck.moneyReservoirCode isEqualTo moneyReservoir.code)
+          .filter(Fields.BalanceCheck.checkDate >= oldestBalanceDate)
           .data()
 
       // get relevant transactions
       val transactionsFuture: Future[Seq[Transaction]] =
         database
           .newQuery[Transaction]()
-          .filter(Keys.Transaction.moneyReservoirCode isEqualTo moneyReservoir.code)
-          .filter(Keys.Transaction.transactionDate >= oldestBalanceDate)
+          .filter(Fields.Transaction.moneyReservoirCode isEqualTo moneyReservoir.code)
+          .filter(Fields.Transaction.transactionDate >= oldestBalanceDate)
           .data()
       val balanceChecks: Seq[BalanceCheck] = await(balanceChecksFuture)
       val transactions: Seq[Transaction] = await(transactionsFuture)

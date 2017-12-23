@@ -1,8 +1,6 @@
 package flux.stores.entries
 
 import models.access.RemoteDatabaseProxy
-import scala.async.Async.{async, await}
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 import scala.collection.immutable.Seq
 

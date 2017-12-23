@@ -2,15 +2,14 @@ package flux.stores.entries
 
 import common.GuavaReplacement.ImmutableSetMultimap
 import flux.stores.entries.TagsStoreFactory.State
-import jsfacades.LokiJsImplicits._
-import scala.async.Async.{async, await}
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import models.access.RemoteDatabaseProxy
+import models.access.DbQueryImplicits._
+import models.access.{Fields, RemoteDatabaseProxy}
 import models.accounting.{BalanceCheck, Transaction}
 
+import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
-import scala2js.Keys
 
 final class TagsStoreFactory(implicit database: RemoteDatabaseProxy) extends EntriesStoreFactory[State] {
 
@@ -24,7 +23,7 @@ final class TagsStoreFactory(implicit database: RemoteDatabaseProxy) extends Ent
         await(
           database
             .newQuery[Transaction]()
-            .filter(Keys.Transaction.tags isNotEqualTo Seq())
+            .filter(Fields.Transaction.tags isNotEqualTo Seq())
             .data())
 
       val tagToTransactionIdsBuilder =

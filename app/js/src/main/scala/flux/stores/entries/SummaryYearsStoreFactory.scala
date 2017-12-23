@@ -2,18 +2,16 @@ package flux.stores.entries
 
 import common.time.YearRange
 import flux.stores.entries.SummaryYearsStoreFactory.State
-import jsfacades.LokiJs
-import jsfacades.LokiJsImplicits._
-import models.access.RemoteDatabaseProxy
+import models.access.DbQueryImplicits._
+import models.access.{DbQuery, Fields, RemoteDatabaseProxy}
 import models.accounting.config.Account
 import models.accounting.{BalanceCheck, Transaction}
 
-import scala.collection.immutable.Seq
 import scala.async.Async.{async, await}
+import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
-import scala2js.Keys
 
 /**
   * Store factory that calculates the year span of all transactions of an account.
@@ -27,8 +25,8 @@ final class SummaryYearsStoreFactory(implicit database: RemoteDatabaseProxy)
   // **************** Implementation of EntriesStoreFactory methods/types ****************//
   override protected def createNew(account: Account) = new Store {
     override protected def calculateState() = async {
-      val earliestFuture = getFirstAfterSorting(LokiJs.Sorting.ascBy(Keys.Transaction.consumedDate))
-      val latestFuture = getFirstAfterSorting(LokiJs.Sorting.descBy(Keys.Transaction.consumedDate))
+      val earliestFuture = getFirstAfterSorting(DbQuery.Sorting.ascBy(Fields.Transaction.consumedDate))
+      val latestFuture = getFirstAfterSorting(DbQuery.Sorting.descBy(Fields.Transaction.consumedDate))
       val (maybeEarliest, maybeLatest) = (await(earliestFuture), await(latestFuture))
 
       val rangeOption = for {
@@ -47,12 +45,12 @@ final class SummaryYearsStoreFactory(implicit database: RemoteDatabaseProxy)
         transaction.consumedDate.getYear)
     override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) = false
 
-    private def getFirstAfterSorting(sorting: LokiJs.Sorting[Transaction]): Future[Option[Transaction]] =
+    private def getFirstAfterSorting(sorting: DbQuery.Sorting[Transaction]): Future[Option[Transaction]] =
       async {
         val data = await(
           database
             .newQuery[Transaction]()
-            .filter(Keys.Transaction.beneficiaryAccountCode isEqualTo account.code)
+            .filter(Fields.Transaction.beneficiaryAccountCode isEqualTo account.code)
             .sort(sorting)
             .limit(1)
             .data())

@@ -1,21 +1,17 @@
 package flux.stores.entries
 
-import common.LoggingUtils.logExceptions
 import common.money.{ExchangeRateManager, ReferenceMoney}
-import jsfacades.LokiJs
-
-import scala.async.Async.{async, await}
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import jsfacades.LokiJsImplicits._
 import models.EntityAccess
-import models.access.RemoteDatabaseProxy
+import models.access.DbQueryImplicits._
+import models.access.{DbQuery, Fields, RemoteDatabaseProxy}
 import models.accounting.config.{Account, Config, MoneyReservoir}
 import models.accounting.{BalanceCheck, Transaction}
 
+import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
-import scala2js.Keys
 
 final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
                                            accountingConfig: Config,
@@ -71,21 +67,21 @@ final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProx
         database
           .newQuery[Transaction]()
           .filter(
-            LokiJs.Filter.nullFilter[Transaction]
+            DbQuery.Filter.NullFilter[Transaction]()
               ||
-                ((Keys.Transaction.moneyReservoirCode isAnyOf account1ReservoirCodes) &&
-                  (Keys.Transaction.beneficiaryAccountCode isEqualTo accountPair.account2.code))
+                ((Fields.Transaction.moneyReservoirCode isAnyOf account1ReservoirCodes) &&
+                  (Fields.Transaction.beneficiaryAccountCode isEqualTo accountPair.account2.code))
               ||
-                ((Keys.Transaction.moneyReservoirCode isAnyOf account2ReservoirCodes) &&
-                  (Keys.Transaction.beneficiaryAccountCode isEqualTo accountPair.account1.code))
+                ((Fields.Transaction.moneyReservoirCode isAnyOf account2ReservoirCodes) &&
+                  (Fields.Transaction.beneficiaryAccountCode isEqualTo accountPair.account1.code))
               ||
-                ((Keys.Transaction.moneyReservoirCode isEqualTo "") &&
-                  (Keys.Transaction.beneficiaryAccountCode isAnyOf accountPair.toSet.map(_.code).toVector))
+                ((Fields.Transaction.moneyReservoirCode isEqualTo "") &&
+                  (Fields.Transaction.beneficiaryAccountCode isAnyOf accountPair.toSet.map(_.code).toVector))
           )
-          .sort(LokiJs.Sorting
-            .ascBy(Keys.Transaction.transactionDate)
-            .thenAscBy(Keys.Transaction.createdDate)
-            .thenAscBy(Keys.id))
+          .sort(DbQuery.Sorting
+            .ascBy(Fields.Transaction.transactionDate)
+            .thenAscBy(Fields.Transaction.createdDate)
+            .thenAscBy(Fields.id))
           .data())
 
       val isRelevantSeq = await(Future.sequence(transactions.map(isRelevantForAccounts(_, accountPair))))

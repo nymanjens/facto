@@ -6,8 +6,7 @@ import jsfacades.LokiJs
 import models.Entity
 import models.accounting.Transaction
 import models.modification.EntityType.TransactionType
-import models.modification.EntityType
-import models.modification.EntityModification
+import models.modification.{EntityModification, EntityType}
 import utest._
 
 import scala.async.Async.{async, await}
@@ -127,7 +126,7 @@ object RemoteDatabaseProxyTest extends TestSuite {
 
     // **************** Getters ****************//
     override def newQuery[E <: Entity: EntityType]() = {
-      LokiJs.ResultSet.fake(modificationsBuffer.getAllEntitiesOfType[E])
+      DbResultSet.fromExecutor(DbQueryExecutor.fromEntities(modificationsBuffer.getAllEntitiesOfType[E]))
     }
     override def getSingletonValue[V](key: SingletonKey[V]) = {
       singletonMap.get(key) map key.valueConverter.toScala

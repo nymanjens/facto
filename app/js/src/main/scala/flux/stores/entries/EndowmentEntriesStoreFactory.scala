@@ -1,15 +1,14 @@
 package flux.stores.entries
 
-import jsfacades.LokiJs
-import jsfacades.LokiJsImplicits._
-import models.access.RemoteDatabaseProxy
+import models.access.DbQueryImplicits._
+import models.access.{DbQuery, Fields, RemoteDatabaseProxy}
 import models.accounting.config.{Account, Config}
 import models.accounting.{BalanceCheck, Transaction}
+
 import scala.async.Async.{async, await}
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.collection.immutable.Seq
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
-import scala2js.Keys
 
 final class EndowmentEntriesStoreFactory(implicit database: RemoteDatabaseProxy, accountingConfig: Config)
     extends EntriesListStoreFactory[GeneralEntry, Account] {
@@ -21,12 +20,12 @@ final class EndowmentEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
           database
             .newQuery[Transaction]()
             .filter(
-              Keys.Transaction.categoryCode isEqualTo accountingConfig.constants.endowmentCategory.code)
-            .filter(Keys.Transaction.beneficiaryAccountCode isEqualTo account.code)
-            .sort(LokiJs.Sorting
-              .descBy(Keys.Transaction.consumedDate)
-              .thenDescBy(Keys.Transaction.createdDate)
-              .thenDescBy(Keys.id))
+              Fields.Transaction.categoryCode isEqualTo accountingConfig.constants.endowmentCategory.code)
+            .filter(Fields.Transaction.beneficiaryAccountCode isEqualTo account.code)
+            .sort(DbQuery.Sorting
+              .descBy(Fields.Transaction.consumedDate)
+              .thenDescBy(Fields.Transaction.createdDate)
+              .thenDescBy(Fields.id))
             .limit(3 * maxNumEntries)
             .data()).reverse
 

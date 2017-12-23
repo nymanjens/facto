@@ -1,13 +1,10 @@
 package models.user
 
-import jsfacades.LokiJsImplicits._
 import models.access.RemoteDatabaseProxy
 import models.manager.BaseJsEntityManager
 
 import scala.collection.immutable.Seq
-import scala.concurrent.Future
 import scala2js.Converters._
-import scala2js.Keys
 
 final class JsUserManager(allUsers: Seq[User])(implicit database: RemoteDatabaseProxy)
     extends BaseJsEntityManager[User]

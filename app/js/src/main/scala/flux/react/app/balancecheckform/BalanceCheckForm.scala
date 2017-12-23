@@ -1,7 +1,5 @@
 package flux.react.app.balancecheckform
 
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala.async.Async.{async, await}
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.money.ExchangeRateManager
@@ -16,13 +14,14 @@ import flux.react.uielements.input.{MappedInput, bootstrap}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.Path
 import japgolly.scalajs.react.vdom.html_<^._
+import models.EntityAccess
 import models.accounting.BalanceCheck
 import models.accounting.config.{Config, MoneyReservoir}
 import models.user.User
-import models.EntityAccess
-import models.user.User
 
+import scala.async.Async.{async, await}
 import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 final class BalanceCheckForm(implicit i18n: I18n,
                              clock: Clock,

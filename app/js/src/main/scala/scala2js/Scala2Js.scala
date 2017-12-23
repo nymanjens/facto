@@ -1,5 +1,7 @@
 package scala2js
 
+import models.access.ModelField
+
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 
@@ -16,29 +18,11 @@ object Scala2Js {
     def toScala(value: js.Dictionary[js.Any]): T
 
     // **************** Protected helper methods **************** //
-    protected final def getRequiredValueFromDict[V: Converter](dict: js.Dictionary[js.Any])(
-        key: Key[V, _]): V = {
-      require(dict.contains(key.name), s"Key ${key.name} is missing from ${js.JSON.stringify(dict)}")
-      Scala2Js.toScala[V](dict(key.name))
+    protected final def getRequiredValueFromDict[V](dict: js.Dictionary[js.Any])(
+        field: ModelField[V, _]): V = {
+      require(dict.contains(field.name), s"Key ${field.name} is missing from ${js.JSON.stringify(dict)}")
+      Scala2Js.toScala[V](dict(field.name))(Converters.fromModelField(field))
     }
-
-    protected final def getOptionalValueFromDict[V: Converter](value: js.Dictionary[js.Any])(
-        key: String): Option[V] = {
-      value.get(key) map Scala2Js.toScala[V]
-    }
-  }
-
-  /**
-    * @param name The name of this key in a js dictionary
-    * @tparam V The scala type of the values
-    * @tparam E The scala type corresponding to the js dictionary of which this key is a part
-    */
-  case class Key[V: Converter, E](name: String)
-  object Key {
-    def toJsPair[V: Converter, E](keyValuePair: (Key[V, E], V)): (String, js.Any) =
-      keyValuePair match {
-        case (key, value) => key.name -> toJs(value)
-      }
   }
 
   def toJs[T: Converter](value: T): js.Any = {
@@ -56,4 +40,6 @@ object Scala2Js {
   def toScala[T: Converter](value: js.Any): T = {
     implicitly[Converter[T]].toScala(value)
   }
+
+  def toJs[V, E](value: V, field: ModelField[V, E]): js.Any = toJs(value)(Converters.fromModelField(field))
 }

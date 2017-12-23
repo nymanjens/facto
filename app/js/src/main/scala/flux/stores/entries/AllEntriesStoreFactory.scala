@@ -1,13 +1,11 @@
 package flux.stores.entries
 
-import jsfacades.LokiJs
-import scala.async.Async.{async, await}
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import models.access.RemoteDatabaseProxy
+import models.access.{DbQuery, Fields, RemoteDatabaseProxy}
 import models.accounting.{BalanceCheck, Transaction}
 
+import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
-import scala2js.Keys
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 final class AllEntriesStoreFactory(implicit database: RemoteDatabaseProxy)
     extends EntriesListStoreFactory[GeneralEntry, Unit] {
@@ -19,10 +17,10 @@ final class AllEntriesStoreFactory(implicit database: RemoteDatabaseProxy)
           database
             .newQuery[Transaction]()
             .sort(
-              LokiJs.Sorting
-                .descBy(Keys.Transaction.transactionDate)
-                .thenDescBy(Keys.Transaction.createdDate)
-                .thenDescBy(Keys.id))
+              DbQuery.Sorting
+                .descBy(Fields.Transaction.transactionDate)
+                .thenDescBy(Fields.Transaction.createdDate)
+                .thenDescBy(Fields.id))
             .limit(3 * maxNumEntries)
             .data()).reverse
 

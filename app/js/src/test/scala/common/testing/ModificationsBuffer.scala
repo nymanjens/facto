@@ -7,8 +7,7 @@ import api.ScalaJsApi.UpdateToken
 import common.time.JavaTimeImplicits._
 import common.time.LocalDateTime
 import models.Entity
-import models.modification.EntityType
-import models.modification.EntityModification
+import models.modification.{EntityModification, EntityType}
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable

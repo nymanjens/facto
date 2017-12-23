@@ -14,16 +14,13 @@ import flux.stores.entries.SummaryForYearStoreFactory.{SummaryCell, SummaryForYe
 import flux.stores.entries._
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
+import models.EntityAccess
 import models.accounting.config.Account.SummaryTotalRowDef
 import models.accounting.config.{Account, Category, Config}
-import common.money.Currency
-import models.user.User
-import models.EntityAccess
 import models.user.User
 
 import scala.collection.immutable.{ListMap, Seq}
 import scala.collection.mutable
-import scala.scalajs.js
 
 private[transactionviews] final class SummaryTable(
     implicit summaryYearsStoreFactory: SummaryYearsStoreFactory,

@@ -1,10 +1,8 @@
 package models.access
 
-import scala.concurrent.duration._
 import api.ScalaJsApiClient
 import common.LoggingUtils.logExceptions
 import common.ScalaUtils.visibleForTesting
-import jsfacades.LokiJs
 import models.Entity
 import models.access.RemoteDatabaseProxy.Listener
 import models.access.SingletonKey.{NextUpdateTokenKey, VersionKey}
@@ -14,6 +12,7 @@ import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.concurrent.Future
+import scala.concurrent.duration._
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 
@@ -27,8 +26,9 @@ private[access] final class LocallyClonedRemoteDatabaseProxy(apiClient: ScalaJsA
   private var isCallingListeners: Boolean = false
 
   // **************** Getters ****************//
-  override def newQuery[E <: Entity: EntityType](): LokiJs.ResultSet[E] = {
-    localDatabase.newQuery[E]()
+  override def newQuery[E <: Entity: EntityType](): DbResultSet[E] = {
+//    localDatabase.newQuery[E]()
+    ???
   }
 
   override def hasLocalAddModifications[E <: Entity: EntityType](entity: E): Boolean = {

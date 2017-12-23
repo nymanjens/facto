@@ -6,11 +6,10 @@ import common.time.Clock
 import flux.action.Dispatcher
 import flux.stores.GlobalMessagesStore
 import flux.stores.entries.TagsStoreFactory
+import models.EntityAccess
 import models.access.RemoteDatabaseProxy
 import models.accounting.TransactionGroup
 import models.accounting.config.Config
-import models.money._
-import models.EntityAccess
 import models.user.User
 
 final class Module(implicit i18n: I18n,

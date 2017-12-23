@@ -1,13 +1,10 @@
 package models.accounting
 
-import jsfacades.LokiJs
-import jsfacades.LokiJsImplicits._
-import models.access.RemoteDatabaseProxy
+import models.access.DbQueryImplicits._
+import models.access.{DbQuery, Fields, RemoteDatabaseProxy}
 import models.manager.BaseJsEntityManager
 
-import scala.collection.immutable.Seq
 import scala2js.Converters._
-import scala2js.Keys
 
 final class JsTransactionManager(implicit database: RemoteDatabaseProxy)
     extends BaseJsEntityManager[Transaction]
@@ -16,8 +13,8 @@ final class JsTransactionManager(implicit database: RemoteDatabaseProxy)
   override def findByGroupId(groupId: Long) = {
     database
       .newQuery[Transaction]()
-      .filter(Keys.Transaction.transactionGroupId isEqualTo groupId)
-      .sort(LokiJs.Sorting.ascBy(Keys.id))
+      .filter(Fields.Transaction.transactionGroupId isEqualTo groupId)
+      .sort(DbQuery.Sorting.ascBy(Fields.id))
       .data()
   }
 }

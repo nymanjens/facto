@@ -2,7 +2,6 @@ package flux.stores.entries
 
 import common.testing.TestObjects.{testCategory, _}
 import flux.stores.entries.ComplexQueryFilter.{Prefix, QueryPart}
-import jsfacades.LokiJs
 import models.EntityAccess
 import models.accounting.Transaction
 import utest._
@@ -213,12 +212,7 @@ object ComplexQueryFilterTest extends TestSuite {
     new Object {
       def assertThatQuery(query: String) = new Object {
         def containsExactly(expected: Transaction*): Unit = {
-          val result =
-            LokiJs.ResultSet
-              .fake(transactions.toVector)
-              .filter(complexQueryFilter
-                .fromQuery(query))
-              .data()
+          val result = transactions.filter(complexQueryFilter.fromQuery(query).apply)
           assertEqualIterables(result.toSet, expected.toSet)
         }
       }
