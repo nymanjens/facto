@@ -31,40 +31,14 @@ object Converters {
   }
 
   def fromModelField[V](modelField: ModelField[V, _]): Converter[V] = {
-    def fromField[V2: Converter](modelField: ModelField[V2, _]): Converter[V2] = implicitly[Converter[V2]]
-    val result = modelField match {
-      case ModelField.User.loginName => fromField(ModelField.User.loginName)
-      case ModelField.User.passwordHash => fromField(ModelField.User.passwordHash)
-      case ModelField.User.name => fromField(ModelField.User.name)
-      case ModelField.User.databaseEncryptionKey => fromField(ModelField.User.databaseEncryptionKey)
-      case ModelField.User.expandCashFlowTablesByDefault =>
-        fromField(ModelField.User.expandCashFlowTablesByDefault)
-      case ModelField.Transaction.transactionGroupId => fromField(ModelField.Transaction.transactionGroupId)
-      case ModelField.Transaction.issuerId => fromField(ModelField.Transaction.issuerId)
-      case ModelField.Transaction.beneficiaryAccountCode =>
-        fromField(ModelField.Transaction.beneficiaryAccountCode)
-      case ModelField.Transaction.moneyReservoirCode => fromField(ModelField.Transaction.moneyReservoirCode)
-      case ModelField.Transaction.categoryCode => fromField(ModelField.Transaction.categoryCode)
-      case ModelField.Transaction.description => fromField(ModelField.Transaction.description)
-      case ModelField.Transaction.flowInCents => fromField(ModelField.Transaction.flowInCents)
-      case ModelField.Transaction.detailDescription => fromField(ModelField.Transaction.detailDescription)
-      case ModelField.Transaction.tags => fromField(ModelField.Transaction.tags)
-      case ModelField.Transaction.createdDate => fromField(ModelField.Transaction.createdDate)
-      case ModelField.Transaction.transactionDate => fromField(ModelField.Transaction.transactionDate)
-      case ModelField.Transaction.consumedDate => fromField(ModelField.Transaction.consumedDate)
-      case ModelField.TransactionGroup.createdDate => fromField(ModelField.TransactionGroup.createdDate)
-      case ModelField.BalanceCheck.issuerId => fromField(ModelField.BalanceCheck.issuerId)
-      case ModelField.BalanceCheck.moneyReservoirCode =>
-        fromField(ModelField.BalanceCheck.moneyReservoirCode)
-      case ModelField.BalanceCheck.balanceInCents => fromField(ModelField.BalanceCheck.balanceInCents)
-      case ModelField.BalanceCheck.createdDate => fromField(ModelField.BalanceCheck.createdDate)
-      case ModelField.BalanceCheck.checkDate => fromField(ModelField.BalanceCheck.checkDate)
-      case ModelField.ExchangeRateMeasurement.date => fromField(ModelField.ExchangeRateMeasurement.date)
-      case ModelField.ExchangeRateMeasurement.foreignCurrencyCode =>
-        fromField(ModelField.ExchangeRateMeasurement.foreignCurrencyCode)
-      case ModelField.ExchangeRateMeasurement.ratioReferenceToForeignCurrency =>
-        fromField(ModelField.ExchangeRateMeasurement.ratioReferenceToForeignCurrency)
-      case f if f.name == "id" => LongConverter
+    def fromType[V2: Converter](fieldType: ModelField.FieldType[V2]): Converter[V2] = implicitly
+    val result = modelField.fieldType match {
+      case ModelField.FieldType.BooleanType => fromType(ModelField.FieldType.BooleanType)
+      case ModelField.FieldType.LongType => fromType(ModelField.FieldType.LongType)
+      case ModelField.FieldType.DoubleType => fromType(ModelField.FieldType.DoubleType)
+      case ModelField.FieldType.StringType => fromType(ModelField.FieldType.StringType)
+      case ModelField.FieldType.LocalDateTimeType => fromType(ModelField.FieldType.LocalDateTimeType)
+      case ModelField.FieldType.StringSeqType => fromType(ModelField.FieldType.StringSeqType)
     }
     result.asInstanceOf[Converter[V]]
   }
@@ -137,7 +111,8 @@ object Converters {
   }
 
   // **************** Entity converters **************** //
-  private[scala2js] abstract class EntityConverter[E <: Entity] extends Scala2Js.MapConverter[E] {
+  private[scala2js] abstract class EntityConverter[E <: Entity: EntityType]
+      extends Scala2Js.MapConverter[E] {
     override final def toJs(entity: E) = {
       val result = js.Dictionary[js.Any]()
 
@@ -148,14 +123,14 @@ object Converters {
         addField(field)
       }
       for (id <- entity.idOption) {
-        result.update(ModelField.id.name, Scala2Js.toJs(id, ModelField.id))
+        result.update(ModelField.id[E].name, Scala2Js.toJs(id, ModelField.id[E]))
       }
       result
     }
 
     override final def toScala(dict: js.Dictionary[js.Any]) = {
       val entityWithoutId = toScalaWithoutId(dict)
-      val idOption = dict.get("id").map(Scala2Js.toScala[Long])
+      val idOption = dict.get(ModelField.id[E].name).map(Scala2Js.toScala[Long])
       if (idOption.isDefined) {
         entityWithoutId.withId(idOption.get).asInstanceOf[E]
       } else {

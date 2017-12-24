@@ -247,7 +247,7 @@ object LocalDatabase {
                   case Some(_) =>
                     // Not using collection.update() because it requires a sync
                     entityCollectionForImplicitType[E]
-                      .findAndRemove(ModelField.id.name, modification.updatedEntity.id)
+                      .findAndRemove(ModelField.id[E].name, modification.updatedEntity.id)
                     entityCollectionForImplicitType[E].insert(modification.updatedEntity)
                     true
                   case None => false // do nothing
@@ -259,7 +259,8 @@ object LocalDatabase {
                 implicit val _ = modification.entityType
                 findById[E](modification.entityId) match {
                   case Some(entity) =>
-                    entityCollectionForImplicitType.findAndRemove(ModelField.id.name, modification.entityId)
+                    entityCollectionForImplicitType
+                      .findAndRemove(ModelField.id[E].name, modification.entityId)
                     true
                   case None => false // do nothing
                 }
@@ -308,7 +309,7 @@ object LocalDatabase {
     private def findById[E <: Entity: EntityType](id: Long): Option[E] = {
       entityCollectionForImplicitType[E]
         .chain()
-        .filter(LokiJs.Filter.KeyValueFilter(Operation.Equal, ModelField.id.name, Scala2Js.toJs(id)))
+        .filter(LokiJs.Filter.KeyValueFilter(Operation.Equal, ModelField.id[E].name, Scala2Js.toJs(id)))
         .limit(1)
         .data() match {
         case Seq(e) => Some(e)
