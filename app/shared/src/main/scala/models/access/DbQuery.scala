@@ -17,8 +17,6 @@ case class DbQuery[E <: Entity: EntityType](filter: Filter[E],
 
 object DbQuery {
 
-  type any = DbQuery[_ <: Entity]
-
   sealed trait Filter[E] {
     def apply(entity: E): Boolean
   }
@@ -32,15 +30,24 @@ object DbQuery {
     case class NotEqual[V, E](field: ModelField[V, E], value: V) extends Filter[E] {
       override def apply(entity: E) = field.get(entity) != value
     }
-    case class GreaterThan[E](field: ModelField[LocalDateTime, E], value: LocalDateTime) extends Filter[E] {
-      override def apply(entity: E) = field.get(entity) > value
+    case class GreaterThan[V: PicklableOrdering, E](field: ModelField[V, E], value: V) extends Filter[E] {
+      override def apply(entity: E) = {
+        implicit val ordering = implicitly[PicklableOrdering[V]].toOrdering
+        field.get(entity) > value
+      }
     }
-    case class GreaterOrEqualThan[E](field: ModelField[LocalDateTime, E], value: LocalDateTime)
+    case class GreaterOrEqualThan[V: PicklableOrdering, E](field: ModelField[V, E], value: V)
         extends Filter[E] {
-      override def apply(entity: E) = field.get(entity) >= value
+      override def apply(entity: E) = {
+        implicit val ordering = implicitly[PicklableOrdering[V]].toOrdering
+        field.get(entity) >= value
+      }
     }
-    case class LessThan[E](field: ModelField[LocalDateTime, E], value: LocalDateTime) extends Filter[E] {
-      override def apply(entity: E) = field.get(entity) < value
+    case class LessThan[V: PicklableOrdering, E](field: ModelField[V, E], value: V) extends Filter[E] {
+      override def apply(entity: E) = {
+        implicit val ordering = implicitly[PicklableOrdering[V]].toOrdering
+        field.get(entity) < value
+      }
     }
     case class AnyOf[V, E](field: ModelField[V, E], values: Seq[V]) extends Filter[E] {
       override def apply(entity: E) = values contains field.get(entity)
@@ -72,19 +79,32 @@ object DbQuery {
   }
 
   case class Sorting[E] private (fieldsWithDirection: Seq[FieldWithDirection[_, E]]) {
-    def thenAscBy[V: Ordering](field: ModelField[V, E]): Sorting[E] = thenBy(field, isDesc = false)
-    def thenDescBy[V: Ordering](field: ModelField[V, E]): Sorting[E] = thenBy(field, isDesc = true)
-    def thenBy[V: Ordering](field: ModelField[V, E], isDesc: Boolean): Sorting[E] =
+    def thenAscBy[V: PicklableOrdering](field: ModelField[V, E]): Sorting[E] = thenBy(field, isDesc = false)
+    def thenDescBy[V: PicklableOrdering](field: ModelField[V, E]): Sorting[E] = thenBy(field, isDesc = true)
+    def thenBy[V: PicklableOrdering](field: ModelField[V, E], isDesc: Boolean): Sorting[E] =
       Sorting(fieldsWithDirection :+ FieldWithDirection[V, E](field, isDesc = isDesc))
   }
   object Sorting {
-    def ascBy[V: Ordering, E](field: ModelField[V, E]): Sorting[E] = by(field, isDesc = false)
-    def descBy[V: Ordering, E](field: ModelField[V, E]): Sorting[E] = by(field, isDesc = true)
-    def by[V: Ordering, E](field: ModelField[V, E], isDesc: Boolean): Sorting[E] =
+    def ascBy[V: PicklableOrdering, E](field: ModelField[V, E]): Sorting[E] = by(field, isDesc = false)
+    def descBy[V: PicklableOrdering, E](field: ModelField[V, E]): Sorting[E] = by(field, isDesc = true)
+    def by[V: PicklableOrdering, E](field: ModelField[V, E], isDesc: Boolean): Sorting[E] =
       Sorting(Seq(FieldWithDirection(field, isDesc = isDesc)))
 
-    case class FieldWithDirection[V: Ordering, E](field: ModelField[V, E], isDesc: Boolean) {
-      def valueOrdering: Ordering[V] = implicitly[Ordering[V]]
+    case class FieldWithDirection[V, E](field: ModelField[V, E], isDesc: Boolean)(
+        implicit val picklableValueOrdering: PicklableOrdering[V]) {
+      def valueOrdering: Ordering[V] = picklableValueOrdering.toOrdering
+    }
+  }
+
+  sealed trait PicklableOrdering[T] {
+    def toOrdering: Ordering[T]
+  }
+  object PicklableOrdering {
+    implicit case object LongOrdering extends PicklableOrdering[Long] {
+      override def toOrdering: Ordering[Long] = implicitly[Ordering[Long]]
+    }
+    implicit case object LocalDateTimeOrdering extends PicklableOrdering[LocalDateTime] {
+      override def toOrdering: Ordering[LocalDateTime] = implicitly[Ordering[LocalDateTime]]
     }
   }
 }
