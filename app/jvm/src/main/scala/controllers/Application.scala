@@ -4,14 +4,15 @@ import java.nio.ByteBuffer
 
 import api.Picklers._
 import api.ScalaJsApi.UpdateToken
-import api.ScalaJsApiServerFactory
+import api.{PicklableDbQuery, ScalaJsApiServerFactory}
 import boopickle.Default._
 import com.google.inject.Inject
 import controllers.Application.Forms
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 import controllers.helpers.AuthenticatedAction
 import models.modification.EntityType
-import models.SlickEntityAccess
+import models.{Entity, SlickEntityAccess}
+import models.access.DbQuery
 import models.modification.EntityModification
 import models.modificationhandler.EntityModificationHandler
 import models.user.SlickUserManager
@@ -101,6 +102,12 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
       case "persistEntityModifications" =>
         val modifications = Unpickle[Seq[EntityModification]].fromBytes(argsMap("modifications"))
         Pickle.intoBytes(scalaJsApiServer.persistEntityModifications(modifications))
+      case "executeDataQuery" =>
+        val dbQuery = Unpickle[PicklableDbQuery].fromBytes(argsMap("dbQuery"))
+        Pickle.intoBytes[Seq[Entity]](scalaJsApiServer.executeDataQuery(dbQuery))
+      case "executeCountQuery" =>
+        val dbQuery = Unpickle[PicklableDbQuery].fromBytes(argsMap("dbQuery"))
+        Pickle.intoBytes(scalaJsApiServer.executeCountQuery(dbQuery))
     }
 
     // Serialize response in HTTP response

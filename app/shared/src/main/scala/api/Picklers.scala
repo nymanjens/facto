@@ -2,10 +2,16 @@ package api
 
 import java.time.{LocalDate, LocalTime}
 
+import api.PicklableDbQuery.FieldWithValue
+import api.PicklableDbQuery.Sorting.FieldWithDirection
+import api.ScalaJsApi.{GetAllEntitiesResponse, GetEntityModificationsResponse, GetInitialDataResponse}
+import boopickle.CompositePickler
 import boopickle.Default._
 import common.money.Currency
 import common.time.LocalDateTime
 import models.Entity
+import models.access.DbQuery.PicklableOrdering
+import models.access.{DbQuery, Fields, ModelField}
 import models.accounting.config._
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 import models.modification.{EntityModification, EntityType}
@@ -171,6 +177,22 @@ object Picklers {
           EntityModification.Remove(entityId)(entityType)
       }
     }
+  }
+
+  implicit val fieldWithValuePickler: Pickler[FieldWithValue] =
+    new Pickler[FieldWithValue] {
+      override def pickle(obj: FieldWithValue)(implicit state: PickleState) = {
+        state.pickle(obj.field)
+        //          state.pickle(obj.value)
+      }
+      override def unpickle(implicit state: UnpickleState) = ???
+    }
+
+  implicit val picklableDbQueryPickler: Pickler[PicklableDbQuery] = {
+    implicit val fieldWithDirectionPickler: Pickler[PicklableDbQuery.Sorting.FieldWithDirection] =
+      boopickle.Default.generatePickler
+    implicit val sortingPickler: Pickler[PicklableDbQuery.Sorting] = boopickle.Default.generatePickler
+    boopickle.Default.generatePickler
   }
 
   private def logExceptions[T](codeBlock: => T): T = {

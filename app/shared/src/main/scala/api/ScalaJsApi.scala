@@ -30,8 +30,9 @@ trait ScalaJsApi {
 
   def persistEntityModifications(modifications: Seq[EntityModification]): Unit
 
-//  def executeDataQuery[E](dbQuery: DbQuery[E]): Seq[E]
-//  def executeCountQuery[E](dbQuery: DbQuery[E]): Seq[E]
+  def executeDataQuery(dbQuery: PicklableDbQuery): Seq[Entity]
+
+  def executeCountQuery(dbQuery: PicklableDbQuery): Int
 }
 
 object ScalaJsApi {

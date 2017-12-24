@@ -2,7 +2,6 @@ package api
 
 import java.nio.ByteBuffer
 
-import api.Picklers._
 import api.ScalaJsApi.{
   GetAllEntitiesResponse,
   GetEntityModificationsResponse,
@@ -11,8 +10,11 @@ import api.ScalaJsApi.{
 }
 import autowire._
 import boopickle.Default._
+import models.Entity
+import models.access.DbQuery
 import models.modification.{EntityModification, EntityType}
 import org.scalajs.dom
+import api.Picklers._
 
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
@@ -25,6 +27,8 @@ trait ScalaJsApiClient {
   def getAllEntities(types: Seq[EntityType.any]): Future[GetAllEntitiesResponse]
   def getEntityModifications(updateToken: UpdateToken): Future[GetEntityModificationsResponse]
   def persistEntityModifications(modifications: Seq[EntityModification]): Future[Unit]
+  def executeDataQuery[E <: Entity](dbQuery: DbQuery[E]): Future[Seq[E]]
+  def executeCountQuery(dbQuery: DbQuery[_ <: Entity]): Future[Int]
 }
 
 object ScalaJsApiClient {
@@ -44,6 +48,16 @@ object ScalaJsApiClient {
 
     override def persistEntityModifications(modifications: Seq[EntityModification]) = {
       AutowireClient[ScalaJsApi].persistEntityModifications(modifications).call()
+    }
+
+    override def executeDataQuery[E <: Entity](dbQuery: DbQuery[E]) = {
+      val picklableDbQuery = PicklableDbQuery(null, None, None)
+      AutowireClient[ScalaJsApi].executeDataQuery(picklableDbQuery).call().map(_.asInstanceOf[Seq[E]])
+    }
+
+    override def executeCountQuery(dbQuery: DbQuery[_ <: Entity]) = {
+      val picklableDbQuery = PicklableDbQuery(null, None, None)
+      AutowireClient[ScalaJsApi].executeCountQuery(picklableDbQuery).call()
     }
   }
 
