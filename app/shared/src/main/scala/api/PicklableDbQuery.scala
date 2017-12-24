@@ -2,7 +2,6 @@ package api
 
 import api.PicklableDbQuery.Sorting.FieldWithDirection
 import api.PicklableDbQuery.{Filter, Sorting}
-import boopickle.Default._
 
 import scala.collection.immutable.Seq
 

@@ -3,6 +3,7 @@ package models.access
 import models.modification.EntityType._
 import java.util.Objects
 
+import common.GuavaReplacement.ImmutableBiMap
 import common.time.LocalDateTime
 import models.Entity
 import models.access.ModelField.FieldType
@@ -121,4 +122,44 @@ object ModelField {
     case object ratioReferenceToForeignCurrency
         extends ModelField[Double, E]("ratioReferenceToForeignCurrency", _.ratioReferenceToForeignCurrency)
   }
+
+  // **************** Field numbers **************** //
+  private val fieldToNumberMap: ImmutableBiMap[ModelField[_, _], Int] =
+    ImmutableBiMap
+      .builder[ModelField[_, _], Int]()
+      .put(Transaction.id, 1)
+      .put(User.id, 2)
+      .put(User.loginName, 3)
+      .put(User.passwordHash, 4)
+      .put(User.name, 5)
+      .put(User.databaseEncryptionKey, 6)
+      .put(User.expandCashFlowTablesByDefault, 7)
+      .put(Transaction.id, 8)
+      .put(Transaction.transactionGroupId, 9)
+      .put(Transaction.issuerId, 10)
+      .put(Transaction.beneficiaryAccountCode, 11)
+      .put(Transaction.moneyReservoirCode, 12)
+      .put(Transaction.categoryCode, 13)
+      .put(Transaction.description, 14)
+      .put(Transaction.flowInCents, 15)
+      .put(Transaction.detailDescription, 16)
+      .put(Transaction.tags, 17)
+      .put(Transaction.createdDate, 18)
+      .put(Transaction.transactionDate, 19)
+      .put(Transaction.consumedDate, 20)
+      .put(TransactionGroup.id, 21)
+      .put(TransactionGroup.createdDate, 22)
+      .put(BalanceCheck.id, 23)
+      .put(BalanceCheck.issuerId, 24)
+      .put(BalanceCheck.moneyReservoirCode, 25)
+      .put(BalanceCheck.balanceInCents, 26)
+      .put(BalanceCheck.createdDate, 27)
+      .put(BalanceCheck.checkDate, 28)
+      .put(ExchangeRateMeasurement.id, 29)
+      .put(ExchangeRateMeasurement.date, 30)
+      .put(ExchangeRateMeasurement.foreignCurrencyCode, 31)
+      .put(ExchangeRateMeasurement.ratioReferenceToForeignCurrency, 32)
+      .build()
+  def fieldToNumber(field: ModelField[_, _]): Int = fieldToNumberMap.get(field)
+  def numberToField(number: Int): ModelField[_, _] = fieldToNumberMap.inverse().get(number)
 }
