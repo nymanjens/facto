@@ -3,7 +3,7 @@ package flux.stores.entries
 import common.GuavaReplacement.ImmutableSetMultimap
 import flux.stores.entries.TagsStoreFactory.State
 import models.access.DbQueryImplicits._
-import models.access.{Fields, RemoteDatabaseProxy}
+import models.access.{ModelField, RemoteDatabaseProxy}
 import models.accounting.{BalanceCheck, Transaction}
 
 import scala.async.Async.{async, await}
@@ -23,7 +23,7 @@ final class TagsStoreFactory(implicit database: RemoteDatabaseProxy) extends Ent
         await(
           database
             .newQuery[Transaction]()
-            .filter(Fields.Transaction.tags isNotEqualTo Seq())
+            .filter(ModelField.Transaction.tags isNotEqualTo Seq())
             .data())
 
       val tagToTransactionIdsBuilder =

@@ -1,6 +1,6 @@
 package flux.stores.entries
 
-import models.access.{DbQuery, Fields, RemoteDatabaseProxy}
+import models.access.{DbQuery, ModelField, RemoteDatabaseProxy}
 import models.accounting.{BalanceCheck, Transaction}
 
 import scala.async.Async.{async, await}
@@ -18,9 +18,9 @@ final class AllEntriesStoreFactory(implicit database: RemoteDatabaseProxy)
             .newQuery[Transaction]()
             .sort(
               DbQuery.Sorting
-                .descBy(Fields.Transaction.transactionDate)
-                .thenDescBy(Fields.Transaction.createdDate)
-                .thenDescBy(Fields.id))
+                .descBy(ModelField.Transaction.transactionDate)
+                .thenDescBy(ModelField.Transaction.createdDate)
+                .thenDescBy(ModelField.id))
             .limit(3 * maxNumEntries)
             .data()).reverse
 

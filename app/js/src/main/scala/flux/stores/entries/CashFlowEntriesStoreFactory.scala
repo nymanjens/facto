@@ -5,7 +5,7 @@ import common.time.LocalDateTime
 import flux.stores.entries.CashFlowEntry.{BalanceCorrection, RegularEntry}
 import models.EntityAccess
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, Fields, RemoteDatabaseProxy}
+import models.access.{DbQuery, ModelField, RemoteDatabaseProxy}
 import models.accounting.config.{Config, MoneyReservoir}
 import models.accounting.{Transaction, _}
 
@@ -28,7 +28,7 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
           await(
             database
               .newQuery[Transaction]()
-              .filter(Fields.Transaction.moneyReservoirCode isEqualTo moneyReservoir.code)
+              .filter(ModelField.Transaction.moneyReservoirCode isEqualTo moneyReservoir.code)
               .count())
 
         if (totalNumTransactions < numTransactionsToFetch) {
@@ -40,12 +40,12 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
             await(
               database
                 .newQuery[Transaction]()
-                .filter(Fields.Transaction.moneyReservoirCode isEqualTo moneyReservoir.code)
+                .filter(ModelField.Transaction.moneyReservoirCode isEqualTo moneyReservoir.code)
                 .sort(
                   DbQuery.Sorting
-                    .descBy(Fields.Transaction.transactionDate)
-                    .thenDescBy(Fields.Transaction.createdDate)
-                    .thenDescBy(Fields.id))
+                    .descBy(ModelField.Transaction.transactionDate)
+                    .thenDescBy(ModelField.Transaction.createdDate)
+                    .thenDescBy(ModelField.id))
                 .limit(numTransactionsToFetch)
                 .data()).last.transactionDate
 
@@ -53,12 +53,12 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
           await(
             database
               .newQuery[BalanceCheck]()
-              .filter(Fields.BalanceCheck.moneyReservoirCode isEqualTo moneyReservoir.code)
-              .filter(Fields.BalanceCheck.checkDate < oldestTransDate)
+              .filter(ModelField.BalanceCheck.moneyReservoirCode isEqualTo moneyReservoir.code)
+              .filter(ModelField.BalanceCheck.checkDate < oldestTransDate)
               .sort(DbQuery.Sorting
-                .descBy(Fields.BalanceCheck.checkDate)
-                .thenDescBy(Fields.BalanceCheck.createdDate)
-                .thenDescBy(Fields.id))
+                .descBy(ModelField.BalanceCheck.checkDate)
+                .thenDescBy(ModelField.BalanceCheck.createdDate)
+                .thenDescBy(ModelField.id))
               .limit(1)
               .data()).headOption
         }
@@ -73,16 +73,16 @@ final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
       val balanceChecksFuture: Future[Seq[BalanceCheck]] =
         database
           .newQuery[BalanceCheck]()
-          .filter(Fields.BalanceCheck.moneyReservoirCode isEqualTo moneyReservoir.code)
-          .filter(Fields.BalanceCheck.checkDate >= oldestBalanceDate)
+          .filter(ModelField.BalanceCheck.moneyReservoirCode isEqualTo moneyReservoir.code)
+          .filter(ModelField.BalanceCheck.checkDate >= oldestBalanceDate)
           .data()
 
       // get relevant transactions
       val transactionsFuture: Future[Seq[Transaction]] =
         database
           .newQuery[Transaction]()
-          .filter(Fields.Transaction.moneyReservoirCode isEqualTo moneyReservoir.code)
-          .filter(Fields.Transaction.transactionDate >= oldestBalanceDate)
+          .filter(ModelField.Transaction.moneyReservoirCode isEqualTo moneyReservoir.code)
+          .filter(ModelField.Transaction.transactionDate >= oldestBalanceDate)
           .data()
       val balanceChecks: Seq[BalanceCheck] = await(balanceChecksFuture)
       val transactions: Seq[Transaction] = await(transactionsFuture)

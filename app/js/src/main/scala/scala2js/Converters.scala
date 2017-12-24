@@ -4,7 +4,7 @@ import java.time.{LocalDate, LocalTime}
 
 import common.time.LocalDateTime
 import models._
-import models.access.{Fields, ModelField}
+import models.access.{ModelField}
 import models.accounting._
 import models.modification._
 import models.money.ExchangeRateMeasurement
@@ -33,34 +33,37 @@ object Converters {
   def fromModelField[V](modelField: ModelField[V, _]): Converter[V] = {
     def fromField[V2: Converter](modelField: ModelField[V2, _]): Converter[V2] = implicitly[Converter[V2]]
     val result = modelField match {
-      case Fields.User.loginName => fromField(Fields.User.loginName)
-      case Fields.User.passwordHash => fromField(Fields.User.passwordHash)
-      case Fields.User.name => fromField(Fields.User.name)
-      case Fields.User.databaseEncryptionKey => fromField(Fields.User.databaseEncryptionKey)
-      case Fields.User.expandCashFlowTablesByDefault => fromField(Fields.User.expandCashFlowTablesByDefault)
-      case Fields.Transaction.transactionGroupId => fromField(Fields.Transaction.transactionGroupId)
-      case Fields.Transaction.issuerId => fromField(Fields.Transaction.issuerId)
-      case Fields.Transaction.beneficiaryAccountCode => fromField(Fields.Transaction.beneficiaryAccountCode)
-      case Fields.Transaction.moneyReservoirCode => fromField(Fields.Transaction.moneyReservoirCode)
-      case Fields.Transaction.categoryCode => fromField(Fields.Transaction.categoryCode)
-      case Fields.Transaction.description => fromField(Fields.Transaction.description)
-      case Fields.Transaction.flowInCents => fromField(Fields.Transaction.flowInCents)
-      case Fields.Transaction.detailDescription => fromField(Fields.Transaction.detailDescription)
-      case Fields.Transaction.tags => fromField(Fields.Transaction.tags)
-      case Fields.Transaction.createdDate => fromField(Fields.Transaction.createdDate)
-      case Fields.Transaction.transactionDate => fromField(Fields.Transaction.transactionDate)
-      case Fields.Transaction.consumedDate => fromField(Fields.Transaction.consumedDate)
-      case Fields.TransactionGroup.createdDate => fromField(Fields.TransactionGroup.createdDate)
-      case Fields.BalanceCheck.issuerId => fromField(Fields.BalanceCheck.issuerId)
-      case Fields.BalanceCheck.moneyReservoirCode => fromField(Fields.BalanceCheck.moneyReservoirCode)
-      case Fields.BalanceCheck.balanceInCents => fromField(Fields.BalanceCheck.balanceInCents)
-      case Fields.BalanceCheck.createdDate => fromField(Fields.BalanceCheck.createdDate)
-      case Fields.BalanceCheck.checkDate => fromField(Fields.BalanceCheck.checkDate)
-      case Fields.ExchangeRateMeasurement.date => fromField(Fields.ExchangeRateMeasurement.date)
-      case Fields.ExchangeRateMeasurement.foreignCurrencyCode =>
-        fromField(Fields.ExchangeRateMeasurement.foreignCurrencyCode)
-      case Fields.ExchangeRateMeasurement.ratioReferenceToForeignCurrency =>
-        fromField(Fields.ExchangeRateMeasurement.ratioReferenceToForeignCurrency)
+      case ModelField.User.loginName => fromField(ModelField.User.loginName)
+      case ModelField.User.passwordHash => fromField(ModelField.User.passwordHash)
+      case ModelField.User.name => fromField(ModelField.User.name)
+      case ModelField.User.databaseEncryptionKey => fromField(ModelField.User.databaseEncryptionKey)
+      case ModelField.User.expandCashFlowTablesByDefault =>
+        fromField(ModelField.User.expandCashFlowTablesByDefault)
+      case ModelField.Transaction.transactionGroupId => fromField(ModelField.Transaction.transactionGroupId)
+      case ModelField.Transaction.issuerId => fromField(ModelField.Transaction.issuerId)
+      case ModelField.Transaction.beneficiaryAccountCode =>
+        fromField(ModelField.Transaction.beneficiaryAccountCode)
+      case ModelField.Transaction.moneyReservoirCode => fromField(ModelField.Transaction.moneyReservoirCode)
+      case ModelField.Transaction.categoryCode => fromField(ModelField.Transaction.categoryCode)
+      case ModelField.Transaction.description => fromField(ModelField.Transaction.description)
+      case ModelField.Transaction.flowInCents => fromField(ModelField.Transaction.flowInCents)
+      case ModelField.Transaction.detailDescription => fromField(ModelField.Transaction.detailDescription)
+      case ModelField.Transaction.tags => fromField(ModelField.Transaction.tags)
+      case ModelField.Transaction.createdDate => fromField(ModelField.Transaction.createdDate)
+      case ModelField.Transaction.transactionDate => fromField(ModelField.Transaction.transactionDate)
+      case ModelField.Transaction.consumedDate => fromField(ModelField.Transaction.consumedDate)
+      case ModelField.TransactionGroup.createdDate => fromField(ModelField.TransactionGroup.createdDate)
+      case ModelField.BalanceCheck.issuerId => fromField(ModelField.BalanceCheck.issuerId)
+      case ModelField.BalanceCheck.moneyReservoirCode =>
+        fromField(ModelField.BalanceCheck.moneyReservoirCode)
+      case ModelField.BalanceCheck.balanceInCents => fromField(ModelField.BalanceCheck.balanceInCents)
+      case ModelField.BalanceCheck.createdDate => fromField(ModelField.BalanceCheck.createdDate)
+      case ModelField.BalanceCheck.checkDate => fromField(ModelField.BalanceCheck.checkDate)
+      case ModelField.ExchangeRateMeasurement.date => fromField(ModelField.ExchangeRateMeasurement.date)
+      case ModelField.ExchangeRateMeasurement.foreignCurrencyCode =>
+        fromField(ModelField.ExchangeRateMeasurement.foreignCurrencyCode)
+      case ModelField.ExchangeRateMeasurement.ratioReferenceToForeignCurrency =>
+        fromField(ModelField.ExchangeRateMeasurement.ratioReferenceToForeignCurrency)
       case f if f.name == "id" => LongConverter
     }
     result.asInstanceOf[Converter[V]]
@@ -145,7 +148,7 @@ object Converters {
         addField(field)
       }
       for (id <- entity.idOption) {
-        result.update(Fields.id.name, Scala2Js.toJs(id, Fields.id))
+        result.update(ModelField.id.name, Scala2Js.toJs(id, ModelField.id))
       }
       result
     }
@@ -167,22 +170,23 @@ object Converters {
   implicit object UserConverter extends EntityConverter[User] {
     override def allFieldsWithoutId =
       Seq(
-        Fields.User.loginName,
-        Fields.User.passwordHash,
-        Fields.User.name,
-        Fields.User.databaseEncryptionKey,
-        Fields.User.expandCashFlowTablesByDefault)
+        ModelField.User.loginName,
+        ModelField.User.passwordHash,
+        ModelField.User.name,
+        ModelField.User.databaseEncryptionKey,
+        ModelField.User.expandCashFlowTablesByDefault
+      )
 
     override def toScalaWithoutId(dict: js.Dictionary[js.Any]) = {
       def getRequired[T](field: ModelField[T, User]) =
         getRequiredValueFromDict(dict)(field)
 
       User(
-        loginName = getRequired(Fields.User.loginName),
-        passwordHash = getRequired(Fields.User.passwordHash),
-        name = getRequired(Fields.User.name),
-        databaseEncryptionKey = getRequired(Fields.User.databaseEncryptionKey),
-        expandCashFlowTablesByDefault = getRequired(Fields.User.expandCashFlowTablesByDefault)
+        loginName = getRequired(ModelField.User.loginName),
+        passwordHash = getRequired(ModelField.User.passwordHash),
+        name = getRequired(ModelField.User.name),
+        databaseEncryptionKey = getRequired(ModelField.User.databaseEncryptionKey),
+        expandCashFlowTablesByDefault = getRequired(ModelField.User.expandCashFlowTablesByDefault)
       )
     }
   }
@@ -190,18 +194,18 @@ object Converters {
   implicit object TransactionConverter extends EntityConverter[Transaction] {
     override def allFieldsWithoutId =
       Seq(
-        Fields.Transaction.transactionGroupId,
-        Fields.Transaction.issuerId,
-        Fields.Transaction.beneficiaryAccountCode,
-        Fields.Transaction.moneyReservoirCode,
-        Fields.Transaction.categoryCode,
-        Fields.Transaction.description,
-        Fields.Transaction.flowInCents,
-        Fields.Transaction.detailDescription,
-        Fields.Transaction.tags,
-        Fields.Transaction.createdDate,
-        Fields.Transaction.transactionDate,
-        Fields.Transaction.consumedDate
+        ModelField.Transaction.transactionGroupId,
+        ModelField.Transaction.issuerId,
+        ModelField.Transaction.beneficiaryAccountCode,
+        ModelField.Transaction.moneyReservoirCode,
+        ModelField.Transaction.categoryCode,
+        ModelField.Transaction.description,
+        ModelField.Transaction.flowInCents,
+        ModelField.Transaction.detailDescription,
+        ModelField.Transaction.tags,
+        ModelField.Transaction.createdDate,
+        ModelField.Transaction.transactionDate,
+        ModelField.Transaction.consumedDate
       )
 
     override def toScalaWithoutId(dict: js.Dictionary[js.Any]) = {
@@ -209,51 +213,51 @@ object Converters {
         getRequiredValueFromDict(dict)(field)
 
       Transaction(
-        transactionGroupId = getRequired(Fields.Transaction.transactionGroupId),
-        issuerId = getRequired(Fields.Transaction.issuerId),
-        beneficiaryAccountCode = getRequired(Fields.Transaction.beneficiaryAccountCode),
-        moneyReservoirCode = getRequired(Fields.Transaction.moneyReservoirCode),
-        categoryCode = getRequired(Fields.Transaction.categoryCode),
-        description = getRequired(Fields.Transaction.description),
-        flowInCents = getRequired(Fields.Transaction.flowInCents),
-        detailDescription = getRequired(Fields.Transaction.detailDescription),
-        tags = getRequired(Fields.Transaction.tags),
-        createdDate = getRequired(Fields.Transaction.createdDate),
-        transactionDate = getRequired(Fields.Transaction.transactionDate),
-        consumedDate = getRequired(Fields.Transaction.consumedDate)
+        transactionGroupId = getRequired(ModelField.Transaction.transactionGroupId),
+        issuerId = getRequired(ModelField.Transaction.issuerId),
+        beneficiaryAccountCode = getRequired(ModelField.Transaction.beneficiaryAccountCode),
+        moneyReservoirCode = getRequired(ModelField.Transaction.moneyReservoirCode),
+        categoryCode = getRequired(ModelField.Transaction.categoryCode),
+        description = getRequired(ModelField.Transaction.description),
+        flowInCents = getRequired(ModelField.Transaction.flowInCents),
+        detailDescription = getRequired(ModelField.Transaction.detailDescription),
+        tags = getRequired(ModelField.Transaction.tags),
+        createdDate = getRequired(ModelField.Transaction.createdDate),
+        transactionDate = getRequired(ModelField.Transaction.transactionDate),
+        consumedDate = getRequired(ModelField.Transaction.consumedDate)
       )
     }
   }
 
   implicit object TransactionGroupConverter extends EntityConverter[TransactionGroup] {
-    override def allFieldsWithoutId = Seq(Fields.TransactionGroup.createdDate)
+    override def allFieldsWithoutId = Seq(ModelField.TransactionGroup.createdDate)
     override def toScalaWithoutId(dict: js.Dictionary[js.Any]) = {
       def getRequired[T](field: ModelField[T, TransactionGroup]) =
         getRequiredValueFromDict(dict)(field)
 
-      TransactionGroup(createdDate = getRequired(Fields.TransactionGroup.createdDate))
+      TransactionGroup(createdDate = getRequired(ModelField.TransactionGroup.createdDate))
     }
   }
 
   implicit object BalanceCheckConverter extends EntityConverter[BalanceCheck] {
     override def allFieldsWithoutId =
       Seq(
-        Fields.BalanceCheck.issuerId,
-        Fields.BalanceCheck.moneyReservoirCode,
-        Fields.BalanceCheck.balanceInCents,
-        Fields.BalanceCheck.createdDate,
-        Fields.BalanceCheck.checkDate
+        ModelField.BalanceCheck.issuerId,
+        ModelField.BalanceCheck.moneyReservoirCode,
+        ModelField.BalanceCheck.balanceInCents,
+        ModelField.BalanceCheck.createdDate,
+        ModelField.BalanceCheck.checkDate
       )
     override def toScalaWithoutId(dict: js.Dictionary[js.Any]) = {
       def getRequired[T](field: ModelField[T, BalanceCheck]) =
         getRequiredValueFromDict(dict)(field)
 
       BalanceCheck(
-        issuerId = getRequired(Fields.BalanceCheck.issuerId),
-        moneyReservoirCode = getRequired(Fields.BalanceCheck.moneyReservoirCode),
-        balanceInCents = getRequired(Fields.BalanceCheck.balanceInCents),
-        createdDate = getRequired(Fields.BalanceCheck.createdDate),
-        checkDate = getRequired(Fields.BalanceCheck.checkDate)
+        issuerId = getRequired(ModelField.BalanceCheck.issuerId),
+        moneyReservoirCode = getRequired(ModelField.BalanceCheck.moneyReservoirCode),
+        balanceInCents = getRequired(ModelField.BalanceCheck.balanceInCents),
+        createdDate = getRequired(ModelField.BalanceCheck.createdDate),
+        checkDate = getRequired(ModelField.BalanceCheck.checkDate)
       )
     }
   }
@@ -261,18 +265,19 @@ object Converters {
   implicit object ExchangeRateMeasurementConverter extends EntityConverter[ExchangeRateMeasurement] {
     override def allFieldsWithoutId =
       Seq(
-        Fields.ExchangeRateMeasurement.date,
-        Fields.ExchangeRateMeasurement.foreignCurrencyCode,
-        Fields.ExchangeRateMeasurement.ratioReferenceToForeignCurrency)
+        ModelField.ExchangeRateMeasurement.date,
+        ModelField.ExchangeRateMeasurement.foreignCurrencyCode,
+        ModelField.ExchangeRateMeasurement.ratioReferenceToForeignCurrency
+      )
     override def toScalaWithoutId(dict: js.Dictionary[js.Any]) = {
       def getRequired[T](field: ModelField[T, ExchangeRateMeasurement]) =
         getRequiredValueFromDict(dict)(field)
 
       ExchangeRateMeasurement(
-        date = getRequired(Fields.ExchangeRateMeasurement.date),
-        foreignCurrencyCode = getRequired(Fields.ExchangeRateMeasurement.foreignCurrencyCode),
+        date = getRequired(ModelField.ExchangeRateMeasurement.date),
+        foreignCurrencyCode = getRequired(ModelField.ExchangeRateMeasurement.foreignCurrencyCode),
         ratioReferenceToForeignCurrency =
-          getRequired(Fields.ExchangeRateMeasurement.ratioReferenceToForeignCurrency)
+          getRequired(ModelField.ExchangeRateMeasurement.ratioReferenceToForeignCurrency)
       )
     }
   }

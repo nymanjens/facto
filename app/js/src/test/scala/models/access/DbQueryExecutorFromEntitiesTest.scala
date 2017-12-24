@@ -33,7 +33,7 @@ object DbQueryExecutorFromEntitiesTest extends TestSuite {
       val transaction3 = createTransaction()
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(Fields.id[Transaction] isEqualTo transaction2.id)
+        .assertFilteredWith(ModelField.id[Transaction] isEqualTo transaction2.id)
         .containsExactly(transaction2)
     }
     "filter(notEqual)" - {
@@ -42,7 +42,7 @@ object DbQueryExecutorFromEntitiesTest extends TestSuite {
       val transaction3 = createTransaction()
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(Fields.id[Transaction] isNotEqualTo transaction2.id)
+        .assertFilteredWith(ModelField.id[Transaction] isNotEqualTo transaction2.id)
         .containsExactly(transaction1, transaction3)
     }
     "filter(lessThan)" - {
@@ -51,7 +51,7 @@ object DbQueryExecutorFromEntitiesTest extends TestSuite {
       val transaction3 = createTransaction(day = 3)
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(Fields.Transaction.createdDate < transaction3.createdDate)
+        .assertFilteredWith(ModelField.Transaction.createdDate < transaction3.createdDate)
         .containsExactly(transaction1, transaction2)
     }
     "filter(greaterThan)" - {
@@ -60,7 +60,7 @@ object DbQueryExecutorFromEntitiesTest extends TestSuite {
       val transaction3 = createTransaction(day = 3)
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(Fields.Transaction.createdDate > transaction1.createdDate)
+        .assertFilteredWith(ModelField.Transaction.createdDate > transaction1.createdDate)
         .containsExactly(transaction2, transaction3)
     }
     "filter(greaterOrEqualThan)" - {
@@ -69,7 +69,7 @@ object DbQueryExecutorFromEntitiesTest extends TestSuite {
       val transaction3 = createTransaction(day = 3)
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(Fields.Transaction.createdDate >= transaction2.createdDate)
+        .assertFilteredWith(ModelField.Transaction.createdDate >= transaction2.createdDate)
         .containsExactly(transaction2, transaction3)
     }
     "filter(anyOf)" - {
@@ -79,7 +79,7 @@ object DbQueryExecutorFromEntitiesTest extends TestSuite {
 
       withTransactions(transaction1, transaction2, transaction3)
         .assertFilteredWith(
-          Fields.Transaction.categoryCode isAnyOf Seq(testCategoryA.code, testCategoryB.code))
+          ModelField.Transaction.categoryCode isAnyOf Seq(testCategoryA.code, testCategoryB.code))
         .containsExactly(transaction1, transaction2)
     }
     "filter(noneOf)" - {
@@ -89,7 +89,7 @@ object DbQueryExecutorFromEntitiesTest extends TestSuite {
 
       withTransactions(transaction1, transaction2, transaction3)
         .assertFilteredWith(
-          Fields.Transaction.categoryCode isNoneOf Seq(testCategoryA.code, testCategoryB.code))
+          ModelField.Transaction.categoryCode isNoneOf Seq(testCategoryA.code, testCategoryB.code))
         .containsExactly(transaction3)
     }
     "filter(containsIgnoreCase)" - {
@@ -98,7 +98,7 @@ object DbQueryExecutorFromEntitiesTest extends TestSuite {
       val transaction3 = createTransaction(description = "prefix\nBBBBcccc\nsuffix")
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(Fields.Transaction.description containsIgnoreCase "BBBB.*cccc")
+        .assertFilteredWith(ModelField.Transaction.description containsIgnoreCase "BBBB.*cccc")
         .containsExactly(transaction1, transaction2)
     }
     "filter(doesntContainIgnoreCase)" - {
@@ -107,7 +107,7 @@ object DbQueryExecutorFromEntitiesTest extends TestSuite {
       val transaction3 = createTransaction(description = "prefix\nBBBBcccc\nsuffix")
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(Fields.Transaction.description doesntContainIgnoreCase "BBBB.*cccc")
+        .assertFilteredWith(ModelField.Transaction.description doesntContainIgnoreCase "BBBB.*cccc")
         .containsExactly(transaction3)
     }
     "filter(seqContains)" - {
@@ -116,7 +116,7 @@ object DbQueryExecutorFromEntitiesTest extends TestSuite {
       val transaction3 = createTransaction(tags = Seq("tag"))
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(Fields.Transaction.tags contains "tag")
+        .assertFilteredWith(ModelField.Transaction.tags contains "tag")
         .containsExactly(transaction1, transaction3)
     }
     "filter(seqDoesntContain)" - {
@@ -125,7 +125,7 @@ object DbQueryExecutorFromEntitiesTest extends TestSuite {
       val transaction3 = createTransaction(tags = Seq("tag"))
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(Fields.Transaction.tags doesntContain "tag")
+        .assertFilteredWith(ModelField.Transaction.tags doesntContain "tag")
         .containsExactly(transaction2)
     }
     // **************** OR / AND filter tests **************** //
@@ -137,9 +137,9 @@ object DbQueryExecutorFromEntitiesTest extends TestSuite {
 
       withTransactions(transaction1, transaction2, transaction3, transaction4)
         .assertFilteredWith({
-          Fields.id[Transaction] isEqualTo transaction1.id
+          ModelField.id[Transaction] isEqualTo transaction1.id
         } || {
-          Fields.id[Transaction] isAnyOf Seq(transaction2.id, transaction3.id)
+          ModelField.id[Transaction] isAnyOf Seq(transaction2.id, transaction3.id)
         })
         .containsExactly(transaction1, transaction2, transaction3)
     }
@@ -150,9 +150,9 @@ object DbQueryExecutorFromEntitiesTest extends TestSuite {
 
       withTransactions(transaction1, transaction2, transaction3)
         .assertFilteredWith({
-          Fields.Transaction.description isEqualTo "abc"
+          ModelField.Transaction.description isEqualTo "abc"
         } && {
-          Fields.Transaction.categoryCode isEqualTo testCategoryB.code
+          ModelField.Transaction.categoryCode isEqualTo testCategoryB.code
         })
         .containsExactly(transaction2)
     }
@@ -163,9 +163,9 @@ object DbQueryExecutorFromEntitiesTest extends TestSuite {
 
       withTransactions(transaction1, transaction2, transaction3)
         .assertFilteredWith({
-          Fields.id[Transaction] isAnyOf Seq(transaction2.id, transaction3.id)
+          ModelField.id[Transaction] isAnyOf Seq(transaction2.id, transaction3.id)
         } && {
-          Fields.id[Transaction] isAnyOf Seq(transaction1.id, transaction2.id)
+          ModelField.id[Transaction] isAnyOf Seq(transaction1.id, transaction2.id)
         })
         .containsExactly(transaction2)
     }
@@ -177,11 +177,11 @@ object DbQueryExecutorFromEntitiesTest extends TestSuite {
       withTransactions(transaction1, transaction2, transaction3)
         .assertFilteredWith(
           {
-            (Fields.id[Transaction] isAnyOf Seq(transaction2.id, transaction3.id)) &&
-            (Fields.id[Transaction] isAnyOf Seq(transaction1.id, transaction2.id))
+            (ModelField.id[Transaction] isAnyOf Seq(transaction2.id, transaction3.id)) &&
+            (ModelField.id[Transaction] isAnyOf Seq(transaction1.id, transaction2.id))
           } || {
-            (Fields.id[Transaction] isAnyOf Seq(transaction1.id, transaction3.id)) &&
-            (Fields.id[Transaction] isAnyOf Seq(transaction2.id, transaction3.id))
+            (ModelField.id[Transaction] isAnyOf Seq(transaction1.id, transaction3.id)) &&
+            (ModelField.id[Transaction] isAnyOf Seq(transaction2.id, transaction3.id))
           }
         )
         .containsExactly(transaction2, transaction3)
@@ -195,8 +195,8 @@ object DbQueryExecutorFromEntitiesTest extends TestSuite {
       withTransactions(transaction1, transaction2, transaction3)
         .assertThat(
           _.sort(DbQuery.Sorting
-            .descBy(Fields.Transaction.transactionGroupId)
-            .thenAscBy(Fields.Transaction.createdDate))
+            .descBy(ModelField.Transaction.transactionGroupId)
+            .thenAscBy(ModelField.Transaction.createdDate))
             .data())
         .containsExactlyInOrder(transaction3, transaction1, transaction2)
     }
@@ -207,7 +207,7 @@ object DbQueryExecutorFromEntitiesTest extends TestSuite {
 
       withTransactions(transaction1, transaction2, transaction3)
         .assertThat(
-          _.sort(DbQuery.Sorting.ascBy(Fields.Transaction.createdDate))
+          _.sort(DbQuery.Sorting.ascBy(ModelField.Transaction.createdDate))
             .limit(2)
             .data())
         .containsExactlyInOrder(transaction1, transaction2)
@@ -218,7 +218,7 @@ object DbQueryExecutorFromEntitiesTest extends TestSuite {
       val transaction3 = createTransaction()
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertThat(_.findOne(Fields.id, transaction2.id))
+        .assertThat(_.findOne(ModelField.id, transaction2.id))
         .isEqualTo(Some(transaction2))
     }
     "count()" - {

@@ -1,7 +1,7 @@
 package flux.stores.entries
 
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, Fields, RemoteDatabaseProxy}
+import models.access.{DbQuery, ModelField, RemoteDatabaseProxy}
 import models.accounting.config.{Account, Config}
 import models.accounting.{BalanceCheck, Transaction}
 
@@ -16,18 +16,17 @@ final class EndowmentEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
   override protected def createNew(maxNumEntries: Int, account: Account) = new Store {
     override protected def calculateState() = async {
       val transactions: Seq[Transaction] =
-        await(
-          database
-            .newQuery[Transaction]()
-            .filter(
-              Fields.Transaction.categoryCode isEqualTo accountingConfig.constants.endowmentCategory.code)
-            .filter(Fields.Transaction.beneficiaryAccountCode isEqualTo account.code)
-            .sort(DbQuery.Sorting
-              .descBy(Fields.Transaction.consumedDate)
-              .thenDescBy(Fields.Transaction.createdDate)
-              .thenDescBy(Fields.id))
-            .limit(3 * maxNumEntries)
-            .data()).reverse
+        await(database
+          .newQuery[Transaction]()
+          .filter(
+            ModelField.Transaction.categoryCode isEqualTo accountingConfig.constants.endowmentCategory.code)
+          .filter(ModelField.Transaction.beneficiaryAccountCode isEqualTo account.code)
+          .sort(DbQuery.Sorting
+            .descBy(ModelField.Transaction.consumedDate)
+            .thenDescBy(ModelField.Transaction.createdDate)
+            .thenDescBy(ModelField.id))
+          .limit(3 * maxNumEntries)
+          .data()).reverse
 
       var entries = transactions.map(t => GeneralEntry(Seq(t)))
 

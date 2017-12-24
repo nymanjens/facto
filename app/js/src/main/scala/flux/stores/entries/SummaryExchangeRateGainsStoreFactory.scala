@@ -9,7 +9,7 @@ import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.{
   GainsForYear
 }
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, Fields, ModelField, RemoteDatabaseProxy}
+import models.access.{DbQuery, ModelField, RemoteDatabaseProxy}
 import models.accounting.config.{Account, Config, MoneyReservoir}
 import models.accounting.{BalanceCheck, Transaction}
 
@@ -59,12 +59,12 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
         await(
           database
             .newQuery[BalanceCheck]()
-            .filter(Fields.BalanceCheck.moneyReservoirCode isEqualTo reservoir.code)
-            .filter(Fields.BalanceCheck.checkDate < monthsInYear.head.startTime)
+            .filter(ModelField.BalanceCheck.moneyReservoirCode isEqualTo reservoir.code)
+            .filter(ModelField.BalanceCheck.checkDate < monthsInYear.head.startTime)
             .sort(DbQuery.Sorting
-              .descBy(Fields.BalanceCheck.checkDate)
-              .thenDescBy(Fields.BalanceCheck.createdDate)
-              .thenDescBy(Fields.id))
+              .descBy(ModelField.BalanceCheck.checkDate)
+              .thenDescBy(ModelField.BalanceCheck.createdDate)
+              .thenDescBy(ModelField.id))
             .limit(1)
             .data()).headOption
       val oldestBalanceDate = oldestRelevantBalanceCheck.map(_.checkDate).getOrElse(LocalDateTime.MIN)
@@ -74,10 +74,10 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
       val balanceChecksFuture: Future[Seq[BalanceCheck]] =
         database
           .newQuery[BalanceCheck]()
-          .filter(Fields.BalanceCheck.moneyReservoirCode isEqualTo reservoir.code)
+          .filter(ModelField.BalanceCheck.moneyReservoirCode isEqualTo reservoir.code)
           .filter(
             filterInRange(
-              Fields.BalanceCheck.checkDate,
+              ModelField.BalanceCheck.checkDate,
               oldestBalanceDate,
               monthsInYear.last.startTimeOfNextMonth))
           .data()
@@ -85,10 +85,10 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
       val transactionsFuture: Future[Seq[Transaction]] =
         database
           .newQuery[Transaction]()
-          .filter(Fields.Transaction.moneyReservoirCode isEqualTo reservoir.code)
+          .filter(ModelField.Transaction.moneyReservoirCode isEqualTo reservoir.code)
           .filter(
             filterInRange(
-              Fields.Transaction.transactionDate,
+              ModelField.Transaction.transactionDate,
               oldestBalanceDate,
               monthsInYear.last.startTimeOfNextMonth))
           .data()

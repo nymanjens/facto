@@ -4,7 +4,7 @@ import common.money.{ExchangeRateManager, ReferenceMoney}
 import common.time.{DatedMonth, LocalDateTime}
 import flux.stores.entries.SummaryForYearStoreFactory.SummaryForYear
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, Fields, ModelField, RemoteDatabaseProxy}
+import models.access.{DbQuery, ModelField, RemoteDatabaseProxy}
 import models.accounting.config.{Account, Category, Config}
 import models.accounting.{BalanceCheck, Transaction}
 
@@ -25,8 +25,8 @@ final class SummaryForYearStoreFactory(implicit database: RemoteDatabaseProxy,
   // **************** Implementation of EntriesStoreFactory methods/types ****************//
   override protected def createNew(input: Input) = new Store {
     private val combinedFilter: DbQuery.Filter[Transaction] =
-      (Fields.Transaction.beneficiaryAccountCode isEqualTo input.account.code) &&
-        filterInYear(Fields.Transaction.consumedDate, input.year) &&
+      (ModelField.Transaction.beneficiaryAccountCode isEqualTo input.account.code) &&
+        filterInYear(ModelField.Transaction.consumedDate, input.year) &&
         complexQueryFilter.fromQuery(input.query)
 
     override protected def calculateState() = async {
@@ -37,9 +37,9 @@ final class SummaryForYearStoreFactory(implicit database: RemoteDatabaseProxy,
             .filter(combinedFilter)
             .sort(
               DbQuery.Sorting
-                .ascBy(Fields.Transaction.consumedDate)
-                .thenAscBy(Fields.Transaction.createdDate)
-                .thenAscBy(Fields.id))
+                .ascBy(ModelField.Transaction.consumedDate)
+                .thenAscBy(ModelField.Transaction.createdDate)
+                .thenAscBy(ModelField.id))
             .data())
 
       SummaryForYear(transactions)

@@ -11,7 +11,7 @@ import common.money.Currency
 import common.time.LocalDateTime
 import models.Entity
 import models.access.DbQuery.PicklableOrdering
-import models.access.{DbQuery, Fields, ModelField}
+import models.access.{DbQuery, ModelField}
 import models.accounting.config._
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 import models.modification.{EntityModification, EntityType}

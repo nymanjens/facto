@@ -5,7 +5,7 @@ import common.ScalaUtils.visibleForTesting
 import common.money.Money
 import flux.stores.entries.ComplexQueryFilter.{Prefix, QueryFilterPair, QueryPart}
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, Fields, ModelField}
+import models.access.{DbQuery, ModelField}
 import models.accounting._
 import models.accounting.config.Config
 import models.user.User
@@ -45,38 +45,38 @@ private[stores] final class ComplexQueryFilter(implicit userManager: User.Manage
     def filterOptions[T](inputString: String, options: Seq[T])(nameFunc: T => String): Seq[T] =
       options.filter(option => nameFunc(option).toLowerCase contains inputString.toLowerCase)
     def fallback =
-      QueryFilterPair.containsIgnoreCase(Fields.Transaction.description, singlePartWithoutNegation)
+      QueryFilterPair.containsIgnoreCase(ModelField.Transaction.description, singlePartWithoutNegation)
 
     parsePrefixAndSuffix(singlePartWithoutNegation) match {
       case Some((prefix, suffix)) =>
         prefix match {
           case Prefix.Issuer =>
             QueryFilterPair.anyOf(
-              Fields.Transaction.issuerId,
+              ModelField.Transaction.issuerId,
               filterOptions(suffix, userManager.fetchAllSync())(_.name).map(_.id))
           case Prefix.Beneficiary =>
             QueryFilterPair.anyOf(
-              Fields.Transaction.beneficiaryAccountCode,
+              ModelField.Transaction.beneficiaryAccountCode,
               filterOptions(suffix, accountingConfig.accountsSeq)(_.longName).map(_.code))
           case Prefix.Reservoir =>
             QueryFilterPair.anyOf(
-              Fields.Transaction.moneyReservoirCode,
+              ModelField.Transaction.moneyReservoirCode,
               filterOptions(suffix, accountingConfig.moneyReservoirs(includeHidden = true))(_.name)
                 .map(_.code))
           case Prefix.Category =>
             QueryFilterPair.anyOf(
-              Fields.Transaction.categoryCode,
+              ModelField.Transaction.categoryCode,
               filterOptions(suffix, accountingConfig.categoriesSeq)(_.name).map(_.code))
           case Prefix.Description =>
-            QueryFilterPair.containsIgnoreCase(Fields.Transaction.description, suffix)
+            QueryFilterPair.containsIgnoreCase(ModelField.Transaction.description, suffix)
           case Prefix.Flow =>
             Money.floatStringToCents(suffix).map { flowInCents =>
-              QueryFilterPair.isEqualTo(Fields.Transaction.flowInCents, flowInCents)
+              QueryFilterPair.isEqualTo(ModelField.Transaction.flowInCents, flowInCents)
             } getOrElse fallback
           case Prefix.Detail =>
-            QueryFilterPair.containsIgnoreCase(Fields.Transaction.detailDescription, suffix)
+            QueryFilterPair.containsIgnoreCase(ModelField.Transaction.detailDescription, suffix)
           case Prefix.Tag =>
-            QueryFilterPair.seqContains(Fields.Transaction.tags, suffix)
+            QueryFilterPair.seqContains(ModelField.Transaction.tags, suffix)
         }
       case None => fallback
     }

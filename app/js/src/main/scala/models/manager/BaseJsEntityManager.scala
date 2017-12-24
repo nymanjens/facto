@@ -1,7 +1,7 @@
 package models.manager
 
 import models.Entity
-import models.access.{Fields, RemoteDatabaseProxy}
+import models.access.{ModelField, RemoteDatabaseProxy}
 import models.modification.EntityType
 
 import scala.async.Async.{async, await}
@@ -13,7 +13,7 @@ abstract class BaseJsEntityManager[E <: Entity: EntityType](implicit database: R
 
   // **************** Implementation of EntityManager ****************//
   override final def findById(id: Long) = async {
-    await(database.newQuery().findOne(Fields.id, id)).get
+    await(database.newQuery().findOne(ModelField.id, id)).get
   }
 
   override final def fetchAll() = {

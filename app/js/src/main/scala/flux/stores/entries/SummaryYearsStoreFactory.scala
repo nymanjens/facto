@@ -3,7 +3,7 @@ package flux.stores.entries
 import common.time.YearRange
 import flux.stores.entries.SummaryYearsStoreFactory.State
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, Fields, RemoteDatabaseProxy}
+import models.access.{DbQuery, ModelField, RemoteDatabaseProxy}
 import models.accounting.config.Account
 import models.accounting.{BalanceCheck, Transaction}
 
@@ -25,8 +25,8 @@ final class SummaryYearsStoreFactory(implicit database: RemoteDatabaseProxy)
   // **************** Implementation of EntriesStoreFactory methods/types ****************//
   override protected def createNew(account: Account) = new Store {
     override protected def calculateState() = async {
-      val earliestFuture = getFirstAfterSorting(DbQuery.Sorting.ascBy(Fields.Transaction.consumedDate))
-      val latestFuture = getFirstAfterSorting(DbQuery.Sorting.descBy(Fields.Transaction.consumedDate))
+      val earliestFuture = getFirstAfterSorting(DbQuery.Sorting.ascBy(ModelField.Transaction.consumedDate))
+      val latestFuture = getFirstAfterSorting(DbQuery.Sorting.descBy(ModelField.Transaction.consumedDate))
       val (maybeEarliest, maybeLatest) = (await(earliestFuture), await(latestFuture))
 
       val rangeOption = for {
@@ -50,7 +50,7 @@ final class SummaryYearsStoreFactory(implicit database: RemoteDatabaseProxy)
         val data = await(
           database
             .newQuery[Transaction]()
-            .filter(Fields.Transaction.beneficiaryAccountCode isEqualTo account.code)
+            .filter(ModelField.Transaction.beneficiaryAccountCode isEqualTo account.code)
             .sort(sorting)
             .limit(1)
             .data())

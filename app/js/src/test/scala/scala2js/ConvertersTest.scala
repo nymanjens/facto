@@ -4,7 +4,7 @@ import java.time.Month.MARCH
 
 import common.testing.TestObjects._
 import common.time.LocalDateTime
-import models.access.Fields
+import models.access.ModelField
 import models.accounting._
 import models.modification.EntityType
 import models.money.ExchangeRateMeasurement
@@ -20,8 +20,8 @@ object ConvertersTest extends TestSuite {
 
   override def tests = TestSuite {
     "fromModelField" - {
-      Converters.fromModelField(Fields.Transaction.categoryCode) ==> Converters.StringConverter
-      Converters.fromModelField(Fields.id[User]) ==> Converters.LongConverter
+      Converters.fromModelField(ModelField.Transaction.categoryCode) ==> Converters.StringConverter
+      Converters.fromModelField(ModelField.id[User]) ==> Converters.LongConverter
     }
     "LongConverter" - {
       "to JS and back" - {

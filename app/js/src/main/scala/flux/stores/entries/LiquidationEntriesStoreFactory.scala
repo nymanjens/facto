@@ -3,7 +3,7 @@ package flux.stores.entries
 import common.money.{ExchangeRateManager, ReferenceMoney}
 import models.EntityAccess
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, Fields, RemoteDatabaseProxy}
+import models.access.{DbQuery, ModelField, RemoteDatabaseProxy}
 import models.accounting.config.{Account, Config, MoneyReservoir}
 import models.accounting.{BalanceCheck, Transaction}
 
@@ -69,19 +69,21 @@ final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProx
           .filter(
             DbQuery.Filter.NullFilter[Transaction]()
               ||
-                ((Fields.Transaction.moneyReservoirCode isAnyOf account1ReservoirCodes) &&
-                  (Fields.Transaction.beneficiaryAccountCode isEqualTo accountPair.account2.code))
+                ((ModelField.Transaction.moneyReservoirCode isAnyOf account1ReservoirCodes) &&
+                  (ModelField.Transaction.beneficiaryAccountCode isEqualTo accountPair.account2.code))
               ||
-                ((Fields.Transaction.moneyReservoirCode isAnyOf account2ReservoirCodes) &&
-                  (Fields.Transaction.beneficiaryAccountCode isEqualTo accountPair.account1.code))
+                ((ModelField.Transaction.moneyReservoirCode isAnyOf account2ReservoirCodes) &&
+                  (ModelField.Transaction.beneficiaryAccountCode isEqualTo accountPair.account1.code))
               ||
-                ((Fields.Transaction.moneyReservoirCode isEqualTo "") &&
-                  (Fields.Transaction.beneficiaryAccountCode isAnyOf accountPair.toSet.map(_.code).toVector))
+                ((ModelField.Transaction.moneyReservoirCode isEqualTo "") &&
+                  (ModelField.Transaction.beneficiaryAccountCode isAnyOf accountPair.toSet
+                    .map(_.code)
+                    .toVector))
           )
           .sort(DbQuery.Sorting
-            .ascBy(Fields.Transaction.transactionDate)
-            .thenAscBy(Fields.Transaction.createdDate)
-            .thenAscBy(Fields.id))
+            .ascBy(ModelField.Transaction.transactionDate)
+            .thenAscBy(ModelField.Transaction.createdDate)
+            .thenAscBy(ModelField.id))
           .data())
 
       val isRelevantSeq = await(Future.sequence(transactions.map(isRelevantForAccounts(_, accountPair))))
