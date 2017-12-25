@@ -51,12 +51,12 @@ object ScalaJsApiClient {
     }
 
     override def executeDataQuery[E <: Entity](dbQuery: DbQuery[E]) = {
-      val picklableDbQuery = PicklableDbQuery(null, None, None)
+      val picklableDbQuery = PicklableDbQuery(null, None, None, null)
       AutowireClient[ScalaJsApi].executeDataQuery(picklableDbQuery).call().map(_.asInstanceOf[Seq[E]])
     }
 
     override def executeCountQuery(dbQuery: DbQuery[_ <: Entity]) = {
-      val picklableDbQuery = PicklableDbQuery(null, None, None)
+      val picklableDbQuery = PicklableDbQuery(null, None, None, null)
       AutowireClient[ScalaJsApi].executeCountQuery(picklableDbQuery).call()
     }
   }

@@ -160,6 +160,6 @@ object ModelField {
       .put(ExchangeRateMeasurement.foreignCurrencyCode, 31)
       .put(ExchangeRateMeasurement.ratioReferenceToForeignCurrency, 32)
       .build()
-  def fieldToNumber(field: ModelField[_, _]): Int = fieldToNumberMap.get(field)
-  def numberToField(number: Int): ModelField[_, _] = fieldToNumberMap.inverse().get(number)
+  def toNumber(field: ModelField[_, _]): Int = fieldToNumberMap.get(field)
+  def fromNumber(number: Int): ModelField[_, _] = fieldToNumberMap.inverse().get(number)
 }

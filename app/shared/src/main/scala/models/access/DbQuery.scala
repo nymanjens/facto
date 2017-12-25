@@ -11,9 +11,8 @@ import common.time.LocalDateTime
 
 import scala.collection.immutable.Seq
 
-case class DbQuery[E <: Entity: EntityType](filter: Filter[E],
-                                            sorting: Option[Sorting[E]],
-                                            limit: Option[Int])
+case class DbQuery[E <: Entity](filter: Filter[E], sorting: Option[Sorting[E]], limit: Option[Int])(
+    implicit val entityType: EntityType[E])
 
 object DbQuery {
 
@@ -30,20 +29,25 @@ object DbQuery {
     case class NotEqual[V, E](field: ModelField[V, E], value: V) extends Filter[E] {
       override def apply(entity: E) = field.get(entity) != value
     }
-    case class GreaterThan[V: PicklableOrdering, E](field: ModelField[V, E], value: V) extends Filter[E] {
+    case class GreaterThan[V, E](field: ModelField[V, E], value: V)(
+        implicit val picklableOrdering: PicklableOrdering[V])
+        extends Filter[E] {
       override def apply(entity: E) = {
         implicit val ordering = implicitly[PicklableOrdering[V]].toOrdering
         field.get(entity) > value
       }
     }
-    case class GreaterOrEqualThan[V: PicklableOrdering, E](field: ModelField[V, E], value: V)
+    case class GreaterOrEqualThan[V, E](field: ModelField[V, E], value: V)(
+        implicit val picklableOrdering: PicklableOrdering[V])
         extends Filter[E] {
       override def apply(entity: E) = {
         implicit val ordering = implicitly[PicklableOrdering[V]].toOrdering
         field.get(entity) >= value
       }
     }
-    case class LessThan[V: PicklableOrdering, E](field: ModelField[V, E], value: V) extends Filter[E] {
+    case class LessThan[V, E](field: ModelField[V, E], value: V)(
+        implicit val picklableOrdering: PicklableOrdering[V])
+        extends Filter[E] {
       override def apply(entity: E) = {
         implicit val ordering = implicitly[PicklableOrdering[V]].toOrdering
         field.get(entity) < value
