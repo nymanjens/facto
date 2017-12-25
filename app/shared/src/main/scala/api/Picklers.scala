@@ -182,10 +182,33 @@ object Picklers {
   implicit val fieldWithValuePickler: Pickler[FieldWithValue] =
     new Pickler[FieldWithValue] {
       override def pickle(obj: FieldWithValue)(implicit state: PickleState) = {
-        state.pickle(obj.field)
-        //          state.pickle(obj.value)
+        def internal[E]: Unit = {
+          state.pickle(obj.field)
+          state.pickle(obj.value.asInstanceOf[E])(
+            picklerForField(obj.field.toRegular).asInstanceOf[Pickler[E]])
+        }
+        internal
       }
-      override def unpickle(implicit state: UnpickleState) = ???
+      override def unpickle(implicit state: UnpickleState) = {
+        def internal[E]: FieldWithValue = {
+          val field = state.unpickle[PicklableModelField]
+          val value = state.unpickle[E](picklerForField(field.toRegular).asInstanceOf[Pickler[E]])
+          FieldWithValue(field = field, value = value)
+        }
+        internal
+      }
+
+      private def picklerForField(field: ModelField[_, _]): Pickler[_] = {
+        def fromType[V: Pickler](fieldType: ModelField.FieldType[V]): Pickler[V] = implicitly
+        field.fieldType match {
+          case ModelField.FieldType.BooleanType => fromType(ModelField.FieldType.BooleanType)
+          case ModelField.FieldType.LongType => fromType(ModelField.FieldType.LongType)
+          case ModelField.FieldType.DoubleType => fromType(ModelField.FieldType.DoubleType)
+          case ModelField.FieldType.StringType => fromType(ModelField.FieldType.StringType)
+          case ModelField.FieldType.LocalDateTimeType => fromType(ModelField.FieldType.LocalDateTimeType)
+          case ModelField.FieldType.StringSeqType => fromType(ModelField.FieldType.StringSeqType)
+        }
+      }
     }
 
   implicit val picklableDbQueryPickler: Pickler[PicklableDbQuery] = {
