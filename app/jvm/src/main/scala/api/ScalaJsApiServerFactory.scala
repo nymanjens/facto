@@ -85,8 +85,10 @@ final class ScalaJsApiServerFactory @Inject()(
       entityModificationHandler.persistEntityModifications(modifications)
     }
 
-    override def executeDataQuery(dbQuery: PicklableDbQuery) = ???
+    override def executeDataQuery(dbQuery: PicklableDbQuery) =
+      entityModificationHandler.executeDataQuery(dbQuery.toRegular)
 
-    override def executeCountQuery(dbQuery: PicklableDbQuery) = ???
+    override def executeCountQuery(dbQuery: PicklableDbQuery) =
+      entityModificationHandler.executeCountQuery(dbQuery.toRegular)
   }
 }

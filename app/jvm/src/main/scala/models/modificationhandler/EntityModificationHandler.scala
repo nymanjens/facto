@@ -2,7 +2,8 @@ package models.modificationhandler
 
 import com.google.inject.Inject
 import common.time.Clock
-import models.SlickEntityAccess
+import models.access.{DbQuery, DbQueryExecutor}
+import models.{Entity, SlickEntityAccess}
 import models.manager.SlickEntityManager
 import models.modification.EntityType.{
   BalanceCheckType,
@@ -20,6 +21,9 @@ import models.modification.{
 import models.user.User
 
 import scala.collection.immutable.Seq
+import scala.collection.mutable
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 
 /**
   * Handles storage and application of entity modifications.
@@ -57,5 +61,30 @@ final class EntityModificationHandler @Inject()(
           date = clock.now
         ))
     }
+  }
+
+  private val typeToAllEntities: Map[EntityType.any, mutable.Buffer[Entity]] = {
+    for (entityType <- EntityType.values) yield {
+      entityType -> mutable.Buffer(
+        entityAccess.getManager(entityType).fetchAllSync().asInstanceOf[Seq[Entity]]: _*)
+    }
+  }.toMap
+
+  def executeDataQuery[E <: Entity](dbQuery: DbQuery[E]): Seq[E] = {
+    implicit val entityType = dbQuery.entityType
+    Await.result(
+      DbQueryExecutor
+        .fromEntities(typeToAllEntities(entityType).asInstanceOf[mutable.Buffer[E]])
+        .data(dbQuery),
+      Duration.Inf)
+  }
+
+  def executeCountQuery[E <: Entity](dbQuery: DbQuery[E]): Int = {
+    implicit val entityType = dbQuery.entityType
+    Await.result(
+      DbQueryExecutor
+        .fromEntities(typeToAllEntities(entityType).asInstanceOf[mutable.Buffer[E]])
+        .count(dbQuery),
+      Duration.Inf)
   }
 }
