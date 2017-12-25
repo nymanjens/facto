@@ -116,7 +116,6 @@ object ModelField {
   private val fieldToNumberMap: ImmutableBiMap[ModelField[_, _], Int] =
     ImmutableBiMap
       .builder[ModelField[_, _], Int]()
-      .put(Transaction.id, 1)
       .put(User.id, 2)
       .put(User.loginName, 3)
       .put(User.passwordHash, 4)
