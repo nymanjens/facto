@@ -12,7 +12,7 @@ case class PicklableDbQuery(filter: Filter,
                             sorting: Option[Sorting],
                             limit: Option[Int],
                             entityType: EntityType.any) {
-  def toRegular: DbQuery[_] = {
+  def toRegular: DbQuery[_ <: Entity] = {
     def internal[E <: Entity] =
       DbQuery[E](
         filter = filter.toRegular.asInstanceOf[DbQuery.Filter[E]],
