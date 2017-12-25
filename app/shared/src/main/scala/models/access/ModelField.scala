@@ -24,17 +24,6 @@ sealed abstract class ModelField[V, E] private[access] (val name: String, access
     implicit val fieldType: FieldType[V]) {
 
   def get(entity: E): V = accessor(entity)
-
-  override def toString = name
-
-  override def equals(any: scala.Any) = {
-    any match {
-      case that: ModelField[_, _] => this.name == that.name
-      case _ => false
-    }
-
-  }
-  override def hashCode() = Objects.hash(name)
 }
 
 object ModelField {
