@@ -29,8 +29,8 @@ private[access] final class ApiBackedRemoteDatabaseProxy(implicit apiClient: Sca
   // **************** Getters ****************//
   override def newQuery[E <: Entity: EntityType](): DbResultSet[E] = {
     DbResultSet.fromExecutor(new DbQueryExecutor[E] {
-      override def data(dbQuery: DbQuery[E]) = ???
-      override def count(dbQuery: DbQuery[E]) = ???
+      override def data(dbQuery: DbQuery[E]) = apiClient.executeDataQuery(dbQuery)
+      override def count(dbQuery: DbQuery[E]) = apiClient.executeCountQuery(dbQuery)
     })
   }
 
