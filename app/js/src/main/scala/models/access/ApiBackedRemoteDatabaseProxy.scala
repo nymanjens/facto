@@ -25,12 +25,19 @@ private[access] final class ApiBackedRemoteDatabaseProxy(implicit apiClient: Sca
     EntityType.values.map(t => t -> mutable.Set[Long]()).toMap
   private val allLocallyCreatedModifications: mutable.Set[EntityModification] = mutable.Set()
   private var isCallingListeners: Boolean = false
+  private var lastWriteFuture: Future[Unit] = Future.successful((): Unit)
 
   // **************** Getters ****************//
   override def newQuery[E <: Entity: EntityType](): DbResultSet[E] = {
     DbResultSet.fromExecutor(new DbQueryExecutor[E] {
-      override def data(dbQuery: DbQuery[E]) = apiClient.executeDataQuery(dbQuery)
-      override def count(dbQuery: DbQuery[E]) = apiClient.executeCountQuery(dbQuery)
+      override def data(dbQuery: DbQuery[E]) = async {
+        await(lastWriteFuture)
+        await(apiClient.executeDataQuery(dbQuery))
+      }
+      override def count(dbQuery: DbQuery[E]) = async {
+        await(lastWriteFuture)
+        await(apiClient.executeCountQuery(dbQuery))
+      }
     })
   }
 
@@ -39,29 +46,32 @@ private[access] final class ApiBackedRemoteDatabaseProxy(implicit apiClient: Sca
   }
 
   // **************** Setters ****************//
-  override def persistModifications(modifications: Seq[EntityModification]): Future[Unit] = async {
-    require(!isCallingListeners)
+  override def persistModifications(modifications: Seq[EntityModification]): Future[Unit] = {
+    lastWriteFuture = async {
+      require(!isCallingListeners)
 
-    allLocallyCreatedModifications ++= modifications
+      allLocallyCreatedModifications ++= modifications
 
-    for {
-      modification <- modifications
-      if modification.isInstanceOf[EntityModification.Add[_]]
-    } localAddModificationIds(modification.entityType) += modification.entityId
-    val listeners1 = invokeListenersAsync(_.addedLocally(modifications))
+      for {
+        modification <- modifications
+        if modification.isInstanceOf[EntityModification.Add[_]]
+      } localAddModificationIds(modification.entityType) += modification.entityId
+      val listeners1 = invokeListenersAsync(_.addedLocally(modifications))
 
-    val apiFuture = apiClient.persistEntityModifications(modifications)
+      val apiFuture = apiClient.persistEntityModifications(modifications)
 
-    await(apiFuture)
+      await(apiFuture)
 
-    for {
-      modification <- modifications
-      if modification.isInstanceOf[EntityModification.Add[_]]
-    } localAddModificationIds(modification.entityType) -= modification.entityId
-    val listeners2 = invokeListenersAsync(_.localModificationPersistedRemotely(modifications))
+      for {
+        modification <- modifications
+        if modification.isInstanceOf[EntityModification.Add[_]]
+      } localAddModificationIds(modification.entityType) -= modification.entityId
+      val listeners2 = invokeListenersAsync(_.localModificationPersistedRemotely(modifications))
 
-    await(listeners1)
-    await(listeners2)
+      await(listeners1)
+      await(listeners2)
+    }
+    lastWriteFuture
   }
 
   override def clearLocalDatabase(): Future[Unit] = Future.successful((): Unit)
