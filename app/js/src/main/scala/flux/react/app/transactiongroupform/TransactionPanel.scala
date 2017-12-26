@@ -1,6 +1,8 @@
 package flux.react.app.transactiongroupform
 import java.util.NoSuchElementException
 
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.async.Async.{async, await}
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.accounting.Tags
 import common.money.{Currency, DatedMoney, ExchangeRateManager, ReferenceMoney}
@@ -61,6 +63,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           )
       })
       .renderBackend[Backend]
+      .componentWillMount($ => LogExceptionsCallback($.backend.updateAllDescriptionSuggestionsForCategory()))
       .build
   }
 
@@ -171,7 +174,11 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   private case class State(transactionDate: LocalDateTime,
                            beneficiaryAccount: Account,
                            moneyReservoir: MoneyReservoir,
-                           descriptionSuggestions: Seq[String] = Seq())
+                           descriptionSuggestions: Seq[String] = Seq(),
+                           allDescriptionSuggestionsForCategory: Option[State.CategoryAndSuggestions] = None)
+  private object State {
+    case class CategoryAndSuggestions(category: Category, suggestions: Seq[String])
+  }
 
   private case class Props(title: String,
                            defaultValues: Transaction.Partial,
@@ -403,25 +410,40 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
       )
     }
 
+    def updateAllDescriptionSuggestionsForCategory(): Unit = async {
+      val category = categoryRef().value.get
+      val allSuggestions = $.state.runNow().allDescriptionSuggestionsForCategory
+      if (allSuggestions.isEmpty || allSuggestions.get.category != category) {
+        val transactions = await(
+          remoteDatabaseProxy
+            .newQuery[Transaction]()
+            .filter(ModelField.Transaction.categoryCode isEqualTo category.code)
+            .sort(DbQuery.Sorting.descBy(ModelField.Transaction.createdDate))
+            .limit(300)
+            .data())
+        // Only update if category is still the same
+        if (categoryRef().value.get == category) {
+          val suggestions = transactions.toStream.map(_.description).distinct.toVector
+          $.modState(
+            _.copy(allDescriptionSuggestionsForCategory =
+              Some(State.CategoryAndSuggestions(category, suggestions))))
+            .runNow()
+        }
+      }
+    }
     private def getDescriptionSuggestions(enteredValue: String): Seq[String] = {
-      Seq()
-//      if (enteredValue.length < 2) {
-//        Seq()
-//      } else {
-//        val category = categoryRef().value.get
-//        val transactions = remoteDatabaseProxy
-//          .newQuery[Transaction]()
-//          .filter(Keys.Transaction.categoryCode isEqualTo category.code)
-//          .filter(Keys.Transaction.description containsIgnoreCase enteredValue)
-//          .sort(DbQuery.Sorting
-//            .descBy(Keys.Transaction.createdDate))
-//          .limit(20)
-//          .data()
-//        transactions.toStream
-//          .map(_.description)
-//          .distinct
-//          .toVector
-//      }
+      if (enteredValue.length < 2) {
+        Seq()
+      } else {
+        val category = categoryRef().value.get
+        val allSuggestions = $.state.runNow().allDescriptionSuggestionsForCategory
+        if (allSuggestions.isDefined && allSuggestions.get.category == category) {
+          val enteredValueLower = enteredValue.toLowerCase
+          allSuggestions.get.suggestions.filter(_.toLowerCase contains enteredValueLower)
+        } else {
+          Seq()
+        }
+      }
     }
 
     private object TransactionDateListener extends InputBase.Listener[LocalDateTime] {
@@ -450,6 +472,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         anythingChangedQueue.execute {
           $.props.runNow().onFormChange()
         }
+
+        updateAllDescriptionSuggestionsForCategory()
       }
     }
   }
