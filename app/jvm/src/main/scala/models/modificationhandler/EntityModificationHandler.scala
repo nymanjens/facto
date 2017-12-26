@@ -60,6 +60,8 @@ final class EntityModificationHandler @Inject()(
           modification = modification,
           date = clock.now
         ))
+
+      updateTypeToAllEntities(modification)
     }
   }
 
@@ -86,5 +88,11 @@ final class EntityModificationHandler @Inject()(
         .fromEntities(typeToAllEntities(entityType).asInstanceOf[mutable.Buffer[E]])
         .count(dbQuery),
       Duration.Inf)
+  }
+
+  private def updateTypeToAllEntities(modification: EntityModification): Unit = {
+    val entityType = modification.entityType
+    entityType -> mutable.Buffer(
+      entityAccess.getManager(entityType).fetchAllSync().asInstanceOf[Seq[Entity]]: _*)
   }
 }
