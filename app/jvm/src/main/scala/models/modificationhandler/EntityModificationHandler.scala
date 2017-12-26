@@ -65,18 +65,17 @@ final class EntityModificationHandler @Inject()(
     }
   }
 
-  private val typeToAllEntities: Map[EntityType.any, mutable.Buffer[Entity]] = {
+  private val typeToAllEntities: mutable.Map[EntityType.any, Seq[Entity]] = mutable.Map({
     for (entityType <- EntityType.values) yield {
-      entityType -> mutable.Buffer(
-        entityAccess.getManager(entityType).fetchAllSync().asInstanceOf[Seq[Entity]]: _*)
+      entityType -> entityAccess.getManager(entityType).fetchAllSync()
     }
-  }.toMap
+  }: _*)
 
   def executeDataQuery[E <: Entity](dbQuery: DbQuery[E]): Seq[E] = {
     implicit val entityType = dbQuery.entityType
     Await.result(
       DbQueryExecutor
-        .fromEntities(typeToAllEntities(entityType).asInstanceOf[mutable.Buffer[E]])
+        .fromEntities(typeToAllEntities(entityType).asInstanceOf[Seq[E]])
         .data(dbQuery),
       Duration.Inf)
   }
@@ -85,14 +84,13 @@ final class EntityModificationHandler @Inject()(
     implicit val entityType = dbQuery.entityType
     Await.result(
       DbQueryExecutor
-        .fromEntities(typeToAllEntities(entityType).asInstanceOf[mutable.Buffer[E]])
+        .fromEntities(typeToAllEntities(entityType).asInstanceOf[Seq[E]])
         .count(dbQuery),
       Duration.Inf)
   }
 
   private def updateTypeToAllEntities(modification: EntityModification): Unit = {
     val entityType = modification.entityType
-    entityType -> mutable.Buffer(
-      entityAccess.getManager(entityType).fetchAllSync().asInstanceOf[Seq[Entity]]: _*)
+    typeToAllEntities.put(entityType, entityAccess.getManager(entityType).fetchAllSync())
   }
 }
