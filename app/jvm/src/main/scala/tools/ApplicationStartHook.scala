@@ -66,7 +66,7 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
       println("  Createing admin user...")
       println(s"    loginName: $loginName")
       println(s"    password: $password")
-      entityModificationHandler.persistEntityModifications(
+      entityAccess.persistEntityModifications(
         EntityModification.createAddWithRandomId(
           SlickUserManager.createUser(loginName, password, name = "Admin")))
       println("  Done. Exiting.")
@@ -89,7 +89,7 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
   private def loadDummyUsers(): Unit = {
     implicit val user = SlickUserManager.getOrCreateRobotUser()
 
-    entityModificationHandler.persistEntityModifications(
+    entityAccess.persistEntityModifications(
       EntityModification.createAddWithRandomId(
         SlickUserManager.createUser(loginName = "admin", password = "a", name = "Admin")),
       EntityModification.createAddWithRandomId(
@@ -104,7 +104,7 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
 
     csvImportTool.importTransactions(assertExists(csvDataFolder resolve "transactions.csv"))
     csvImportTool.importBalanceChecks(assertExists(csvDataFolder resolve "balancechecks.csv"))
-    entityModificationHandler.persistEntityModifications(
+    entityAccess.persistEntityModifications(
       EntityModification.createAddWithRandomId(
         ExchangeRateMeasurement(
           date = LocalDateTime.of(LocalDate.of(1990, JANUARY, 1), LocalTime.MIN),

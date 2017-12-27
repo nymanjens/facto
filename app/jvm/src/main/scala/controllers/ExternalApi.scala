@@ -42,7 +42,7 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
       val transactionAdditions =
         toTransactions(template, transactionGroup = groupAddition.entity, issuer)
           .map(EntityModification.createAddWithRandomId(_))
-      entityModificationHandler.persistEntityModifications(
+      entityAccess.persistEntityModifications(
         groupAddition +: transactionAdditions
       )
 
@@ -59,7 +59,7 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
     val date = TimeUtils.parseDateString(dateString)
     require(Currency.of(foreignCurrencyCode).isForeign)
 
-    entityModificationHandler.persistEntityModifications(
+    entityAccess.persistEntityModifications(
       EntityModification.createAddWithRandomId(
         ExchangeRateMeasurement(
           date = date,

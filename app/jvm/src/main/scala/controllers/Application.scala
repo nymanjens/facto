@@ -50,7 +50,7 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
       formWithErrors => BadRequest(views.html.profile(formWithErrors)), {
         case ChangePasswordData(loginName, _, password, _) =>
           require(loginName == user.loginName)
-          entityModificationHandler.persistEntityModifications(
+          entityAccess.persistEntityModifications(
             EntityModification.createUpdate(SlickUserManager.copyUserWithPassword(user, password)))
           val message = Messages("facto.successfully-updated-password")
           Redirect(routes.Application.profile()).flashing("message" -> message)
@@ -67,7 +67,7 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
       formWithErrors =>
         BadRequest(views.html.administration(users = userManager.fetchAllSync(), formWithErrors)), {
         case AddUserData(loginName, name, password, _) =>
-          entityModificationHandler.persistEntityModifications(
+          entityAccess.persistEntityModifications(
             EntityModification.createAddWithRandomId(SlickUserManager.createUser(loginName, password, name)))
           val message = Messages("facto.successfully-added-user", name)
           Redirect(routes.Application.administration()).flashing("message" -> message)

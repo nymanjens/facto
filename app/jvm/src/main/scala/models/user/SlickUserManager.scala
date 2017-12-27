@@ -9,7 +9,7 @@ import models.manager.{ForwardingEntityManager, SlickEntityManager}
 import models.modification.EntityModification
 import models.modificationhandler.EntityModificationHandler
 import models.user.SlickUserManager.{Users, tableName}
-import models.{EntityAccess, EntityTable}
+import models.{EntityAccess, EntityTable, SlickEntityAccess}
 
 import scala.util.Random
 
@@ -53,9 +53,7 @@ object SlickUserManager {
     user.copy(passwordHash = hash(password))
   }
 
-  def getOrCreateRobotUser()(implicit entityAccess: EntityAccess,
-                             entityModificationHandler: EntityModificationHandler,
-                             clock: Clock): User = {
+  def getOrCreateRobotUser()(implicit entityAccess: SlickEntityAccess, clock: Clock): User = {
     val loginName = "robot"
     def hash(s: String) = Hashing.sha512().hashString(s, Charsets.UTF_8).toString
 
@@ -69,7 +67,7 @@ object SlickUserManager {
             name = "Robot"
           ))
         val userWithId = userAddition.entity
-        entityModificationHandler.persistEntityModifications(userAddition)(user = userWithId)
+        entityAccess.persistEntityModifications(userAddition)(user = userWithId)
         userWithId
     }
   }

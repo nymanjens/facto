@@ -59,7 +59,7 @@ final class CsvImportTool @Inject()(implicit userManager: SlickUserManager,
                   if (consumedDateStamp.toLong == 0) transactionDateStamp.toLong
                   else consumedDateStamp.toLong)
               ))
-          entityModificationHandler.persistEntityModifications(groupAddition, transactionAddition)
+          entityAccess.persistEntityModifications(groupAddition, transactionAddition)
       }
     }
   }
@@ -71,7 +71,7 @@ final class CsvImportTool @Inject()(implicit userManager: SlickUserManager,
       val parts = Splitter.on(" :: ").trimResults().split(line).asScala.toList
       parts match {
         case List(issuerId, moneyReservoirCode, balanceAsFloat, checkDateStamp, createdDateStamp) =>
-          entityModificationHandler.persistEntityModifications(
+          entityAccess.persistEntityModifications(
             EntityModification.createAddWithRandomId(BalanceCheck(
               issuerId = issuerId.toInt,
               moneyReservoirCode = moneyReservoirCode,
