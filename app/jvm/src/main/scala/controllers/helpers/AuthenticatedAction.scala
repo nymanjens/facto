@@ -12,7 +12,7 @@ abstract class AuthenticatedAction[A](bodyParser: BodyParser[A])(implicit entity
   private val delegate: EssentialAction = {
     Security.Authenticated(username, onUnauthorized) { username =>
       controllerComponents.actionBuilder(bodyParser) { request =>
-        entityAccess.userManager.findByLoginName(username) match {
+        entityAccess.userManager.findByLoginNameSync(username) match {
           case Some(user) => calculateResult(user, request)
           case None => onUnauthorized(request)
         }

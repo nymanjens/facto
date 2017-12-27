@@ -40,7 +40,7 @@ case class Account(code: String,
 
   def user(implicit entityAccess: EntityAccess): Option[User] = {
     userLoginName.map { loginName =>
-      val user = entityAccess.userManager.findByLoginName(loginName)
+      val user = entityAccess.userManager.findByLoginNameSync(loginName)
       require(user.isDefined, s"No user exists with loginName '$loginName'")
       user.get
     }

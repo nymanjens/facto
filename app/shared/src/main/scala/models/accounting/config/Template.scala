@@ -41,7 +41,7 @@ case class Template(code: String,
                                entityAccess: EntityAccess): Option[Set[User]] = {
     onlyShowForUserLoginNames.map { loginNameOption =>
       loginNameOption.map { loginName =>
-        val user = entityAccess.userManager.findByLoginName(loginName)
+        val user = entityAccess.userManager.findByLoginNameSync(loginName)
         require(user.isDefined, s"No user exists with loginName '$loginName'")
         require(
           accountingConfig.accountOf(user.get).isDefined,

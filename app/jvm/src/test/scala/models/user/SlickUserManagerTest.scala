@@ -28,7 +28,7 @@ class SlickUserManagerTest extends HookedSpecification {
     userManager.authenticate(loginName = "wrong_username", password = "j") mustEqual false
     userManager.authenticate(loginName = "alice", password = "wrong password") mustEqual false
 
-    userManager.findByLoginName(loginName = "alice") mustEqual Option(user1)
-    userManager.findByLoginName(loginName = "wrong_username") mustEqual None
+    userManager.findByLoginNameSync(loginName = "alice") mustEqual Option(user1)
+    userManager.findByLoginNameSync(loginName = "wrong_username") mustEqual None
   }
 }

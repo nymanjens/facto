@@ -21,7 +21,7 @@ final class SlickUserManager
       ))
     with User.Manager {
 
-  override def findByLoginName(loginName: String): Option[User] = {
+  override def findByLoginNameSync(loginName: String): Option[User] = {
     val users: Seq[User] = dbRun(newQuery.filter(u => u.loginName === loginName).result)
     users match {
       case Seq() => None
@@ -30,7 +30,7 @@ final class SlickUserManager
   }
 
   def authenticate(loginName: String, password: String): Boolean = {
-    findByLoginName(loginName) match {
+    findByLoginNameSync(loginName) match {
       case Some(user) if user.passwordHash == SlickUserManager.hash(password) => true
       case _ => false
     }
@@ -59,7 +59,7 @@ object SlickUserManager {
     val loginName = "robot"
     def hash(s: String) = Hashing.sha512().hashString(s, Charsets.UTF_8).toString
 
-    entityAccess.userManager.findByLoginName(loginName) match {
+    entityAccess.userManager.findByLoginNameSync(loginName) match {
       case Some(user) => user
       case None =>
         val userAddition = EntityModification.createAddWithRandomId(

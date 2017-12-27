@@ -14,5 +14,5 @@ final class JsUserManager(allUsers: Seq[User])(implicit database: RemoteDatabase
   override def findByIdSync(id: Long) = idToUser(id)
   override def fetchAllSync() = allUsers
 
-  override def findByLoginName(loginName: String) = allUsers.find(_.loginName == loginName)
+  override def findByLoginNameSync(loginName: String) = allUsers.find(_.loginName == loginName)
 }

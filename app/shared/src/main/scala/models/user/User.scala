@@ -21,6 +21,6 @@ object User {
   trait Manager extends EntityManager[User] {
     def findByIdSync(id: Long): User
     def fetchAllSync(): Seq[User]
-    def findByLoginName(loginName: String): Option[User]
+    def findByLoginNameSync(loginName: String): Option[User]
   }
 }
