@@ -13,21 +13,22 @@ import common.money.Currency
 import common.time.{Clock, LocalDateTime}
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}
+import models.access.DbQuery
 import models.accounting.config.Config
 import models.modification.{EntityModification, EntityType, SlickEntityModificationEntityManager}
-import models.modificationhandler.EntityModificationHandler
 import models.user.User
 import models.{Entity, SlickEntityAccess}
 
 import scala.collection.immutable.{Seq, TreeMap}
 import scala.collection.mutable
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 
 final class ScalaJsApiServerFactory @Inject()(
     implicit accountingConfig: Config,
     clock: Clock,
     entityAccess: SlickEntityAccess,
     i18n: PlayI18n,
-    entityModificationHandler: EntityModificationHandler,
     entityModificationManager: SlickEntityModificationEntityManager) {
 
   def create()(implicit user: User): ScalaJsApi = new ScalaJsApi() {
@@ -82,13 +83,25 @@ final class ScalaJsApiServerFactory @Inject()(
     }
 
     override def persistEntityModifications(modifications: Seq[EntityModification]): Unit = {
-      entityModificationHandler.persistEntityModifications(modifications)
+      entityAccess.persistEntityModifications(modifications)
     }
 
-    override def executeDataQuery(dbQuery: PicklableDbQuery) =
-      entityModificationHandler.executeDataQuery(dbQuery.toRegular)
+    override def executeDataQuery(dbQuery: PicklableDbQuery) = {
+      def internal[E <: Entity] = {
+        val query = dbQuery.toRegular.asInstanceOf[DbQuery[E]]
+        implicit val entityType = query.entityType.asInstanceOf[EntityType[E]]
+        Await.result(entityAccess.newQueryExecutor[E].data(query), Duration.Inf)
+      }
+      internal
+    }
 
-    override def executeCountQuery(dbQuery: PicklableDbQuery) =
-      entityModificationHandler.executeCountQuery(dbQuery.toRegular)
+    override def executeCountQuery(dbQuery: PicklableDbQuery) = {
+      def internal[E <: Entity] = {
+        val query = dbQuery.toRegular.asInstanceOf[DbQuery[E]]
+        implicit val entityType = query.entityType.asInstanceOf[EntityType[E]]
+        Await.result(entityAccess.newQueryExecutor[E].count(query), Duration.Inf)
+      }
+      internal
+    }
   }
 }
