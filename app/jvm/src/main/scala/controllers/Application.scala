@@ -12,6 +12,7 @@ import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 import controllers.helpers.AuthenticatedAction
 import models.modification.EntityType
 import models.{Entity, SlickEntityAccess}
+import akka.stream.scaladsl._
 import models.access.DbQuery
 import models.modification.EntityModification
 import models.user.SlickUserManager
@@ -112,6 +113,15 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
     val data = Array.ofDim[Byte](responseBuffer.remaining())
     responseBuffer.get(data)
     Ok(data)
+  }
+
+  def scalaJsApiWebSocket = WebSocket.accept[Array[Byte], Array[Byte]] { request =>
+    // log the message to stdout and send response back to client
+    Flow[Array[Byte]].map { msg =>
+      val input = new String(msg)
+      val returnValue = "I received your message: " + input
+      returnValue.getBytes()
+    }
   }
 
   def manualTests() = AuthenticatedAction { implicit user => implicit request =>
