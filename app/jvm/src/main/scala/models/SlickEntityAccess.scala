@@ -1,6 +1,8 @@
 package models
 
 import com.google.inject._
+import common.time.Clock
+import models.access.{DbQueryExecutor, DbResultSet}
 import models.accounting._
 import models.manager.SlickEntityManager
 import models.modification.EntityType.{
@@ -10,11 +12,17 @@ import models.modification.EntityType.{
   TransactionType,
   UserType
 }
-import models.modification.{EntityType, SlickEntityModificationEntityManager}
+import models.modification.{
+  EntityModification,
+  EntityModificationEntity,
+  EntityType,
+  SlickEntityModificationEntityManager
+}
 import models.money.SlickExchangeRateMeasurementManager
-import models.user.SlickUserManager
+import models.user.{SlickUserManager, User}
 
 import scala.collection.immutable.Seq
+import scala.collection.mutable
 
 final class SlickEntityAccess @Inject()(
     implicit override val userManager: SlickUserManager,
@@ -22,7 +30,8 @@ final class SlickEntityAccess @Inject()(
     override val transactionManager: SlickTransactionManager,
     override val transactionGroupManager: SlickTransactionGroupManager,
     override val exchangeRateMeasurementManager: SlickExchangeRateMeasurementManager,
-    val entityModificationEntityManager: SlickEntityModificationEntityManager)
+    val entityModificationEntityManager: SlickEntityModificationEntityManager,
+    clock: Clock)
     extends EntityAccess {
 
   val allEntityManagers: Seq[SlickEntityManager[_, _]] =
@@ -44,5 +53,55 @@ final class SlickEntityAccess @Inject()(
       case ExchangeRateMeasurementType => exchangeRateMeasurementManager
     }
     manager.asInstanceOf[SlickEntityManager[entityType.get, _]]
+  }
+
+  // **************** Getters ****************//
+  private val typeToAllEntities: mutable.Map[EntityType.any, Seq[Entity]] = mutable.Map({
+    for (entityType <- EntityType.values) yield {
+      entityType -> getManager(entityType).fetchAllSync()
+    }
+  }: _*)
+
+  override def newQuery[E <: Entity: EntityType]() = {
+    val entityType = implicitly[EntityType[E]]
+    DbResultSet.fromExecutor(
+      DbQueryExecutor
+        .fromEntities(typeToAllEntities(entityType).asInstanceOf[Seq[E]]))
+  }
+
+  private def updateTypeToAllEntities(modification: EntityModification): Unit = {
+    val entityType = modification.entityType
+    typeToAllEntities.put(entityType, getManager(entityType).fetchAllSync())
+  }
+
+  // **************** Setters ****************//
+  def persistEntityModifications(modifications: EntityModification*)(implicit user: User): Unit = {
+    persistEntityModifications(modifications.toVector)
+  }
+
+  def persistEntityModifications(modifications: Seq[EntityModification])(implicit user: User): Unit = {
+    for (modification <- modifications) {
+      // Apply modification
+      val entityType = modification.entityType
+      modification match {
+        case EntityModification.Add(entity) =>
+          getManager(entityType).addIfNew(entity.asInstanceOf[entityType.get])
+        case EntityModification.Update(entity) =>
+          getManager(entityType).updateIfExists(entity.asInstanceOf[entityType.get])
+        case EntityModification.Remove(entityId) =>
+          getManager(entityType).deleteIfExists(entityId)
+      }
+
+      // Add modification
+      entityModificationEntityManager.addIfNew(
+        EntityModificationEntity(
+          idOption = Some(EntityModification.generateRandomId()),
+          userId = user.id,
+          modification = modification,
+          date = clock.now
+        ))
+
+      updateTypeToAllEntities(modification)
+    }
   }
 }
