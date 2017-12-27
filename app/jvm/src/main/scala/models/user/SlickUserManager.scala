@@ -7,7 +7,6 @@ import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
 import models.manager.{ForwardingEntityManager, SlickEntityManager}
 import models.modification.EntityModification
-import models.modificationhandler.EntityModificationHandler
 import models.user.SlickUserManager.{Users, tableName}
 import models.{EntityAccess, EntityTable, SlickEntityAccess}
 

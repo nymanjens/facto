@@ -14,7 +14,6 @@ import models.modification.{
   EntityType,
   SlickEntityModificationEntityManager
 }
-import models.modificationhandler.EntityModificationHandler
 import models.user.SlickUserManager
 import org.junit.runner._
 import org.specs2.runner._
@@ -35,7 +34,6 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
   @Inject implicit private val fakeClock: FakeClock = null
   @Inject implicit private val entityAccess: SlickEntityAccess = null
   @Inject implicit private val accountingConfig: Config = null
-  @Inject implicit private val entityModificationHandler: EntityModificationHandler = null
   @Inject private val userManager: SlickUserManager = null
   @Inject private val transactionManager: SlickTransactionManager = null
   @Inject private val modificationEntityManager: SlickEntityModificationEntityManager = null

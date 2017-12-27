@@ -14,7 +14,6 @@ import models.modification.EntityType
 import models.{Entity, SlickEntityAccess}
 import models.access.DbQuery
 import models.modification.EntityModification
-import models.modificationhandler.EntityModificationHandler
 import models.user.SlickUserManager
 import play.api.data.Form
 import play.api.data.Forms._
@@ -28,7 +27,6 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
                                   userManager: SlickUserManager,
                                   entityAccess: SlickEntityAccess,
                                   scalaJsApiServerFactory: ScalaJsApiServerFactory,
-                                  entityModificationHandler: EntityModificationHandler,
                                   playConfiguration: play.api.Configuration,
                                   env: play.api.Environment,
                                   webJarAssets: controllers.WebJarAssets)

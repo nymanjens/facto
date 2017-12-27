@@ -11,7 +11,6 @@ import common.time.{Clock, LocalDateTime, LocalDateTimes}
 import models._
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 import models.modification.EntityModification
-import models.modificationhandler.EntityModificationHandler
 import models.user.{SlickUserManager, User}
 import play.api.i18n.MessagesApi
 
@@ -20,8 +19,7 @@ import scala.collection.immutable.Seq
 
 final class CsvImportTool @Inject()(implicit userManager: SlickUserManager,
                                     clock: Clock,
-                                    entityAccess: SlickEntityAccess,
-                                    entityModificationHandler: EntityModificationHandler) {
+                                    entityAccess: SlickEntityAccess) {
 
   def importTransactions(csvFilePath: Path)(implicit user: User): Unit = {
     // example of line: "2 :: Common :: LIFE :: CARD_COMMON :: imperdiet Duis  :: -25.04 :: 1425855600 :: 0 :: 1425934823"

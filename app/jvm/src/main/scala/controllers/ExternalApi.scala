@@ -7,7 +7,6 @@ import models._
 import models.accounting._
 import models.accounting.config.{Account, Config, Template}
 import models.modification.EntityModification
-import models.modificationhandler.EntityModificationHandler
 import models.money.ExchangeRateMeasurement
 import models.user.{SlickUserManager, User}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -18,7 +17,6 @@ import scala.collection.immutable.Seq
 final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi,
                                   components: ControllerComponents,
                                   clock: Clock,
-                                  entityModificationHandler: EntityModificationHandler,
                                   playConfiguration: play.api.Configuration,
                                   accountingConfig: Config,
                                   userManager: SlickUserManager,

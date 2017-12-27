@@ -4,7 +4,6 @@ import com.google.inject._
 import common.testing.TestObjects._
 import common.testing._
 import models._
-import models.modificationhandler.EntityModificationHandler
 import models.user.SlickUserManager
 import org.junit.runner._
 import org.specs2.runner._
@@ -15,7 +14,6 @@ class ConfigTest extends HookedSpecification {
 
   @Inject implicit private val config: Config = null
   @Inject implicit private val entityAccess: EntityAccess = null
-  @Inject implicit private val entityModificationHandler: EntityModificationHandler = null
 
   override def before() = {
     Guice.createInjector(new FactoTestModule).injectMembers(this)

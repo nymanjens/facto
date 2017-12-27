@@ -1,4 +1,4 @@
-package models.modificationhandler
+package models.access
 
 import com.google.inject._
 import common.GuavaReplacement.Iterables.getOnlyElement
@@ -7,6 +7,7 @@ import common.testing._
 import models._
 import models.accounting.SlickTransactionManager
 import models.modification.{EntityModification, SlickEntityModificationEntityManager}
+import models.modificationhandler.EntityModificationHandler
 import models.user.{SlickUserManager, User}
 import org.junit.runner._
 import org.specs2.runner._
@@ -15,7 +16,7 @@ import play.api.test._
 import scala.collection.immutable.Seq
 
 @RunWith(classOf[JUnitRunner])
-class EntityModificationHandlerTest extends HookedSpecification {
+class SlickEntityAccessTest extends HookedSpecification {
 
   implicit private val user = testUser
 

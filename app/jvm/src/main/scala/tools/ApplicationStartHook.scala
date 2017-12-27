@@ -11,7 +11,6 @@ import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
 import models._
 import models.modification.EntityModification
-import models.modificationhandler.EntityModificationHandler
 import models.money.ExchangeRateMeasurement
 import models.user.{SlickUserManager, User}
 import play.api.{Application, Mode}
@@ -21,7 +20,6 @@ import scala.collection.JavaConverters._
 final class ApplicationStartHook @Inject()(implicit app: Application,
                                            entityAccess: SlickEntityAccess,
                                            csvImportTool: CsvImportTool,
-                                           entityModificationHandler: EntityModificationHandler,
                                            clock: Clock) {
   onStart()
 

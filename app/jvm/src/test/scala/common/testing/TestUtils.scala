@@ -7,7 +7,6 @@ import common.time.LocalDateTime
 import models.accounting.config.{Account, Category, MoneyReservoir}
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 import models.modification.{EntityModification, EntityType}
-import models.modificationhandler.EntityModificationHandler
 import models.user.User
 import models.{Entity, SlickEntityAccess}
 
