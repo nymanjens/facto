@@ -116,6 +116,8 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
   }
 
   def scalaJsApiWebSocket = WebSocket.accept[Array[Byte], Array[Byte]] { request =>
+    implicit val user = AuthenticatedAction.requireAuthenticatedUser(request)
+
     // Get the scalaJsApiServer
     val scalaJsApiServer = scalaJsApiServerFactory.create()
 

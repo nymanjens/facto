@@ -10,11 +10,11 @@ abstract class AuthenticatedAction[A](bodyParser: BodyParser[A])(implicit entity
     extends EssentialAction {
 
   private val delegate: EssentialAction = {
-    Security.Authenticated(username, onUnauthorized) { username =>
+    Security.Authenticated(AuthenticatedAction.username, AuthenticatedAction.onUnauthorized) { username =>
       controllerComponents.actionBuilder(bodyParser) { request =>
         entityAccess.userManager.findByLoginNameSync(username) match {
           case Some(user) => calculateResult(user, request)
-          case None => onUnauthorized(request)
+          case None => AuthenticatedAction.onUnauthorized(request)
         }
       }
     }
@@ -23,12 +23,6 @@ abstract class AuthenticatedAction[A](bodyParser: BodyParser[A])(implicit entity
   override def apply(requestHeader: RequestHeader) = delegate.apply(requestHeader)
 
   def calculateResult(implicit user: User, request: Request[A]): Result
-
-  // **************** private helper methods **************** //
-  private def username(request: RequestHeader): Option[String] = request.session.get("username")
-
-  private def onUnauthorized(request: RequestHeader): Result =
-    Results.Redirect(controllers.routes.Auth.login(request.uri))
 }
 
 object AuthenticatedAction {
@@ -61,4 +55,18 @@ object AuthenticatedAction {
       require(user.loginName == "admin")
       userAndRequestToResult(user)(request)
     }
+
+  def requireAuthenticatedUser(request: RequestHeader)(implicit entityAccess: EntityAccess): User = {
+    val username = AuthenticatedAction.username(request)
+    require(username.isDefined, "Username not set")
+    val user = entityAccess.userManager.findByLoginNameSync(username.get)
+    require(user.isDefined, s"Could not find username ${username}")
+    user.get
+  }
+
+  // **************** private helper methods **************** //
+  private def username(request: RequestHeader): Option[String] = request.session.get("username")
+
+  private def onUnauthorized(request: RequestHeader): Result =
+    Results.Redirect(controllers.routes.Auth.login(request.uri))
 }
