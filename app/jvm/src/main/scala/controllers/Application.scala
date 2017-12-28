@@ -4,7 +4,7 @@ import java.nio.ByteBuffer
 
 import api.Picklers._
 import api.ScalaJsApi.UpdateToken
-import api.{PicklableDbQuery, ScalaJsApiServerFactory}
+import api.{PicklableDbQuery, ScalaJsApiRequest, ScalaJsApiServerFactory}
 import boopickle.Default._
 import com.google.inject.Inject
 import controllers.Application.Forms
@@ -116,11 +116,38 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
   }
 
   def scalaJsApiWebSocket = WebSocket.accept[Array[Byte], Array[Byte]] { request =>
+    // Get the scalaJsApiServer
+    val scalaJsApiServer = scalaJsApiServerFactory.create()
+
     // log the message to stdout and send response back to client
-    Flow[Array[Byte]].map { msg =>
-      val input = new String(msg)
-      val returnValue = "I received your message: " + input
-      returnValue.getBytes()
+    Flow[Array[Byte]].map { requestBytes =>
+      // get the request body as ByteBuffer
+      val request = Unpickle[ScalaJsApiRequest].fromBytes(ByteBuffer.wrap(requestBytes))
+
+      val responseBuffer = request.path match {
+        case "getInitialData" =>
+          Pickle.intoBytes(scalaJsApiServer.getInitialData())
+        case "getAllEntities" =>
+          val types = Unpickle[Seq[EntityType.any]].fromBytes(request.args("types"))
+          Pickle.intoBytes(scalaJsApiServer.getAllEntities(types))
+        case "getEntityModifications" =>
+          val updateToken = Unpickle[UpdateToken].fromBytes(request.args("updateToken"))
+          Pickle.intoBytes(scalaJsApiServer.getEntityModifications(updateToken))
+        case "persistEntityModifications" =>
+          val modifications = Unpickle[Seq[EntityModification]].fromBytes(request.args("modifications"))
+          Pickle.intoBytes(scalaJsApiServer.persistEntityModifications(modifications))
+        case "executeDataQuery" =>
+          val dbQuery = Unpickle[PicklableDbQuery].fromBytes(request.args("dbQuery"))
+          Pickle.intoBytes[Seq[Entity]](scalaJsApiServer.executeDataQuery(dbQuery))
+        case "executeCountQuery" =>
+          val dbQuery = Unpickle[PicklableDbQuery].fromBytes(request.args("dbQuery"))
+          Pickle.intoBytes(scalaJsApiServer.executeCountQuery(dbQuery))
+      }
+
+      // Serialize response in HTTP response
+      val data = Array.ofDim[Byte](responseBuffer.remaining())
+      responseBuffer.get(data)
+      data
     }
   }
 
