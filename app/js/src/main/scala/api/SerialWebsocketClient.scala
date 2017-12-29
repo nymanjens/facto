@@ -37,6 +37,8 @@ private[api] final class SerialWebsocketClient(websocketPath: String) {
     await(thisMessagePromise.future)
   }
 
+  def backlogSize: Int = responseMessagePromises.size
+
   private def initWebsocket(): (WebSocket, Promise[Unit]) = {
     val protocol = if (dom.window.location.protocol == "https:") "wss:" else "ws:"
     val websocket = new dom.WebSocket(s"${protocol}//${dom.window.location.host}/$websocketPath")
