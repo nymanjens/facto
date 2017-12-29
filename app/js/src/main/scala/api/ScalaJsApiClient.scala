@@ -15,6 +15,7 @@ import models.access.DbQuery
 import models.modification.{EntityModification, EntityType}
 import org.scalajs.dom
 import api.Picklers._
+import common.LoggingUtils.logExceptions
 
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
@@ -34,7 +35,8 @@ trait ScalaJsApiClient {
 object ScalaJsApiClient {
 
   final class Impl extends ScalaJsApiClient {
-    private val serialWebsocketClient: SerialWebsocketClient = new SerialWebsocketClient
+    private val serialWebsocketClient: SerialWebsocketClient = new SerialWebsocketClient(
+      "scalajsapiwebsocket/")
 
     override def getInitialData() = {
       AutowireClient[ScalaJsApi].getInitialData().call()
@@ -63,8 +65,9 @@ object ScalaJsApiClient {
     }
 
     private object AutowireClient extends autowire.Client[ByteBuffer, Pickler, Pickler] {
-      override def doCall(req: Request): Future[ByteBuffer] =
+      override def doCall(req: Request): Future[ByteBuffer] = logExceptions {
         serialWebsocketClient.sendAndReceive(Pickle.intoBytes(ScalaJsApiRequest(req.path.last, req.args)))
+      }
 
       override def read[Result: Pickler](p: ByteBuffer) = Unpickle[Result].fromBytes(p)
       override def write[Result: Pickler](r: Result) = Pickle.intoBytes(r)
