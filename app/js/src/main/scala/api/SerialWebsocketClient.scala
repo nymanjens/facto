@@ -38,7 +38,8 @@ private[api] final class SerialWebsocketClient(websocketPath: String) {
   }
 
   private def initWebsocket(): (WebSocket, Promise[Unit]) = {
-    val websocket = new dom.WebSocket(s"ws://${dom.window.location.host}/$websocketPath")
+    val protocol = if (dom.window.location.protocol == "https:") "wss:" else "ws:"
+    val websocket = new dom.WebSocket(s"${protocol}//${dom.window.location.host}/$websocketPath")
     val websocketReadyPromise: Promise[Unit] = Promise()
 
     websocket.binaryType = "arraybuffer";
