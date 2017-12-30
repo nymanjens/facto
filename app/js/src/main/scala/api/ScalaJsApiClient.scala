@@ -36,7 +36,7 @@ object ScalaJsApiClient {
 
   final class Impl extends ScalaJsApiClient {
     private val serialWebsocketClient: SerialWebsocketClientParallelizer =
-      new SerialWebsocketClientParallelizer(websocketPath = "scalajsapiwebsocket/", numWebsockets = 6)
+      new SerialWebsocketClientParallelizer(websocketPath = "websocket/scalajsapi/", numWebsockets = 6)
 
     override def getInitialData() = {
       AutowireClient[ScalaJsApi].getInitialData().call()
