@@ -3,6 +3,7 @@ package flux.react
 import common.LoggingUtils.logExceptions
 import flux.FactoAppModule
 import org.scalajs.dom
+import org.scalajs.dom.raw.{ErrorEvent, Event}
 
 import scala.async.Async.{async, await}
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
@@ -21,6 +22,13 @@ object FactoApp extends js.JSApp {
 
     // create stylesheet
     //GlobalStyles.addToDocument()
+
+    // Log all uncaught errors
+    dom.window.onerror = (event, url, lineNumber, _) => println(s"  Uncaught error: $event")
+    dom.window.addEventListener("error", (event: Event) => {
+      println(s"  Uncaught error: ${event}")
+      false
+    })
 
     val commonTimeModule = new common.time.Module
     implicit val clock = commonTimeModule.clock
