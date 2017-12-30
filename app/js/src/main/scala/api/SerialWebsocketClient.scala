@@ -101,6 +101,13 @@ private[api] final class SerialWebsocketClient(websocketPath: String) {
     arrayBuffer
   }
 
-  private val websocketName = new Random().nextPrintableChar()
-  private def logLine(line: String): Unit = println(s"  [WebSocketClient-$websocketName] $line")
+  private val websocketNumber: Int = {
+    val result = SerialWebsocketClient.nextWebsocketNumber
+    SerialWebsocketClient.nextWebsocketNumber += 1
+    result
+  }
+  private def logLine(line: String): Unit = println(s"  [WebSocketClient-$websocketNumber] $line")
+}
+object SerialWebsocketClient {
+  private var nextWebsocketNumber: Int = 1
 }
