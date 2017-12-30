@@ -5,7 +5,7 @@ import models.EntityAccess
 import models.access.DbQueryImplicits._
 import models.access.{DbQuery, ModelField, RemoteDatabaseProxy}
 import models.accounting.config.{Account, Config, MoneyReservoir}
-import models.accounting.{BalanceCheck, Transaction}
+import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 
 import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
@@ -96,8 +96,7 @@ final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProx
           case "" =>
             // Pick the first beneficiary in the group. This simulates that the zero sum transaction was physically
             // performed on an actual reservoir, which is needed for the liquidation calculator to work.
-            val group = await(transaction.transactionGroup)
-            await(group.withTransactions).transactions.head.beneficiary
+            await(entityAccess.transactionManager.findByGroupId(transaction.transactionGroupId)).head.beneficiary
           case _ => transaction.moneyReservoir.owner
         }
         val involvedAccounts: Set[Account] = Set(transaction.beneficiary, moneyReservoirOwner)
