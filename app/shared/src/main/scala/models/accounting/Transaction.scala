@@ -34,8 +34,6 @@ case class Transaction(transactionGroupId: Long,
 
   override def withId(id: Long) = copy(idOption = Some(id))
 
-  def transactionGroup(implicit entityAccess: EntityAccess): Future[TransactionGroup] =
-    entityAccess.transactionGroupManager.findById(transactionGroupId)
   def issuer(implicit entityAccess: EntityAccess): User = entityAccess.userManager.findByIdSync(issuerId)
   def beneficiary(implicit accountingConfig: Config): Account =
     accountingConfig.accounts(beneficiaryAccountCode)
