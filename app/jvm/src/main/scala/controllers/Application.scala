@@ -81,40 +81,6 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
 
   // Note: This action manually implements what autowire normally does automatically. Unfortunately, autowire
   // doesn't seem to work for some reason.
-  def scalaJsApi(path: String) = AuthenticatedAction(parse.raw) { implicit user => implicit request =>
-    // Get the scalaJsApiServer
-    val scalaJsApiServer = scalaJsApiServerFactory.create()
-
-    // get the request body as ByteBuffer
-    val requestBuffer: ByteBuffer = request.body.asBytes(parse.UNLIMITED).get.asByteBuffer
-    val argsMap = Unpickle[Map[String, ByteBuffer]].fromBytes(requestBuffer)
-
-    val responseBuffer = path match {
-      case "getInitialData" =>
-        Pickle.intoBytes(scalaJsApiServer.getInitialData())
-      case "getAllEntities" =>
-        val types = Unpickle[Seq[EntityType.any]].fromBytes(argsMap("types"))
-        Pickle.intoBytes(scalaJsApiServer.getAllEntities(types))
-      case "getEntityModifications" =>
-        val updateToken = Unpickle[UpdateToken].fromBytes(argsMap("updateToken"))
-        Pickle.intoBytes(scalaJsApiServer.getEntityModifications(updateToken))
-      case "persistEntityModifications" =>
-        val modifications = Unpickle[Seq[EntityModification]].fromBytes(argsMap("modifications"))
-        Pickle.intoBytes(scalaJsApiServer.persistEntityModifications(modifications))
-      case "executeDataQuery" =>
-        val dbQuery = Unpickle[PicklableDbQuery].fromBytes(argsMap("dbQuery"))
-        Pickle.intoBytes[Seq[Entity]](scalaJsApiServer.executeDataQuery(dbQuery))
-      case "executeCountQuery" =>
-        val dbQuery = Unpickle[PicklableDbQuery].fromBytes(argsMap("dbQuery"))
-        Pickle.intoBytes(scalaJsApiServer.executeCountQuery(dbQuery))
-    }
-
-    // Serialize response in HTTP response
-    val data = Array.ofDim[Byte](responseBuffer.remaining())
-    responseBuffer.get(data)
-    Ok(data)
-  }
-
   def scalaJsApiWebSocket = WebSocket.accept[Array[Byte], Array[Byte]] { request =>
     implicit val user = AuthenticatedAction.requireAuthenticatedUser(request)
 
