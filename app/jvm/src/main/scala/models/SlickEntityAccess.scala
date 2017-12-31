@@ -1,5 +1,7 @@
 package models
 
+import models.SlickUtils.dbApi._
+import models.SlickUtils.dbRun
 import com.google.inject._
 import common.time.Clock
 import models.access.{DbQueryExecutor, DbResultSet}
@@ -102,6 +104,14 @@ final class SlickEntityAccess @Inject()(
         ))
 
       updateTypeToAllEntities(modification)
+    }
+  }
+
+  // ********** Management methods ********** //
+  def dropAndCreateTables(): Unit = {
+    for (entityManager <- allEntityManagers) {
+      dbRun(sqlu"""DROP TABLE IF EXISTS #${entityManager.tableName}""")
+      entityManager.createTable()
     }
   }
 }
