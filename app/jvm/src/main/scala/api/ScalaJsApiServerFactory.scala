@@ -16,6 +16,7 @@ import models.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}
 import models.access.DbQuery
 import models.accounting.config.Config
 import models.modification.{EntityModification, EntityType, SlickEntityModificationEntityManager}
+import models.money.ExchangeRateMeasurement
 import models.user.User
 import models.{Entity, SlickEntityAccess}
 
@@ -37,12 +38,13 @@ final class ScalaJsApiServerFactory @Inject()(
       GetInitialDataResponse(
         accountingConfig = accountingConfig,
         user = user,
-        allUsers = entityAccess.userManager.fetchAllSync(),
+        allUsers = Await.result(entityAccess.newQuery[User]().data(), Duration.Inf),
         i18nMessages = i18n.allI18nMessages,
         ratioReferenceToForeignCurrency = {
           val mapBuilder =
             mutable.Map[Currency, mutable.Builder[(LocalDateTime, Double), TreeMap[LocalDateTime, Double]]]()
-          for (measurement <- entityAccess.exchangeRateMeasurementManager.fetchAllSync()) {
+          for (measurement <- Await
+                 .result(entityAccess.newQuery[ExchangeRateMeasurement]().data(), Duration.Inf)) {
             val currency = measurement.foreignCurrency
             if (!(mapBuilder contains currency)) {
               mapBuilder(currency) = TreeMap.newBuilder[LocalDateTime, Double]
@@ -59,7 +61,7 @@ final class ScalaJsApiServerFactory @Inject()(
       val entitiesMap: Map[EntityType.any, Seq[Entity]] = {
         types
           .map(entityType => {
-            entityType -> entityAccess.getManager(entityType).fetchAllSync()
+            entityType -> Await.result(entityAccess.newQuery()(entityType).data(), Duration.Inf)
           })
           .toMap
       }
