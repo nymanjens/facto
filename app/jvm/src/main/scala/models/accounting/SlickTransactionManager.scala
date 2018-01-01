@@ -20,12 +20,7 @@ final class SlickTransactionManager @Inject()()
         tag => new Transactions(tag),
         tableName = tableName
       ))
-    with Transaction.Manager {
-
-  override def findByGroupId(groupId: Long) = async {
-    await(database.run(newQuery.filter(_.transactionGroupId === groupId).result)).toList
-  }
-}
+    with Transaction.Manager
 
 object SlickTransactionManager {
   private val tableName: String = "TRANSACTIONS"

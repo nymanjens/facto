@@ -18,7 +18,7 @@ case class TransactionGroup(createdDate: LocalDateTime, idOption: Option[Long] =
 
   def withTransactions(implicit entityAccess: EntityAccess): Future[TransactionGroup.WithTransactions] =
     async {
-      val transactions = await(entityAccess.transactionManager.findByGroupId(id))
+      val transactions = await(Transaction.findByGroupId(id))
       TransactionGroup.WithTransactions(entity = this, transactions = transactions)
     }
 }

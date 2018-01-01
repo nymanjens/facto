@@ -1,8 +1,10 @@
 package models.accounting
 
+import models.access.DbQueryImplicits._
 import common.money.DatedMoney
 import common.time.LocalDateTime
 import models._
+import models.access.{DbQuery, ModelField}
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.manager.EntityManager
 import models.user.User
@@ -56,9 +58,15 @@ case class Transaction(transactionGroupId: Long,
 object Transaction {
   def tupled = (this.apply _).tupled
 
-  trait Manager extends EntityManager[Transaction] {
-    def findByGroupId(groupId: Long): Future[Seq[Transaction]]
+  def findByGroupId(groupId: Long)(implicit entityAccess: EntityAccess): Future[Seq[Transaction]] = {
+    entityAccess
+      .newQuery[Transaction]()
+      .filter(ModelField.Transaction.transactionGroupId isEqualTo groupId)
+      .sort(DbQuery.Sorting.ascBy(ModelField.id))
+      .data()
   }
+
+  trait Manager extends EntityManager[Transaction]
 
   /** Same as Transaction, except all fields are optional. */
   case class Partial(transactionGroupId: Option[Long] = None,
