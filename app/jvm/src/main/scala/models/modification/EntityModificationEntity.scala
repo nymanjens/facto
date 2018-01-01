@@ -1,9 +1,8 @@
 package models.modification
 
 import common.time.LocalDateTime
-import models.{Entity, EntityAccess}
-import models.manager.EntityManager
 import models.user.User
+import models.{Entity, EntityAccess}
 
 /**
   * Symbolises a modification to an entity.
@@ -26,6 +25,4 @@ case class EntityModificationEntity(userId: Long,
 
 object EntityModificationEntity {
   def tupled = (this.apply _).tupled
-
-  trait Manager extends EntityManager[EntityModificationEntity]
 }

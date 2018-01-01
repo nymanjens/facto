@@ -2,9 +2,7 @@ package models.accounting
 
 import common.money.DatedMoney
 import common.time.LocalDateTime
-import models.access.ModelField
 import models.accounting.config.{Config, MoneyReservoir}
-import models.manager.EntityManager
 import models.user.User
 import models.{Entity, EntityAccess}
 
@@ -31,6 +29,4 @@ case class BalanceCheck(issuerId: Long,
 
 object BalanceCheck {
   def tupled = (this.apply _).tupled
-
-  trait Manager extends EntityManager[BalanceCheck]
 }

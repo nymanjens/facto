@@ -1,12 +1,11 @@
 package models.accounting
 
-import models.access.DbQueryImplicits._
 import common.money.DatedMoney
 import common.time.LocalDateTime
 import models._
+import models.access.DbQueryImplicits._
 import models.access.{DbQuery, ModelField}
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
-import models.manager.EntityManager
 import models.user.User
 
 import scala.collection.immutable.Seq
@@ -65,8 +64,6 @@ object Transaction {
       .sort(DbQuery.Sorting.ascBy(ModelField.id))
       .data()
   }
-
-  trait Manager extends EntityManager[Transaction]
 
   /** Same as Transaction, except all fields are optional. */
   case class Partial(transactionGroupId: Option[Long] = None,

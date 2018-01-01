@@ -1,14 +1,13 @@
 package models.accounting
 
-import scala.async.Async.{async, await}
-import scala.concurrent.ExecutionContext.Implicits.global
 import common.money.{ExchangeRateManager, ReferenceMoney}
 import common.time.LocalDateTime
 import models.accounting.config.Config
-import models.manager.EntityManager
 import models.{Entity, EntityAccess}
 
+import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 /** Transaction groups should be treated as immutable. */
@@ -25,8 +24,6 @@ case class TransactionGroup(createdDate: LocalDateTime, idOption: Option[Long] =
 
 object TransactionGroup {
   def tupled = (this.apply _).tupled
-
-  trait Manager extends EntityManager[TransactionGroup]
 
   case class WithTransactions(entity: TransactionGroup, transactions: Seq[Transaction]) {
     def isZeroSum(implicit exchangeRateManager: ExchangeRateManager, accountingConfig: Config): Boolean =
