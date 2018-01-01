@@ -34,7 +34,8 @@ case class Transaction(transactionGroupId: Long,
 
   override def withId(id: Long) = copy(idOption = Some(id))
 
-  def issuer(implicit entityAccess: EntityAccess): User = entityAccess.userManager.findByIdSync(issuerId)
+  def issuer(implicit entityAccess: EntityAccess): User =
+    entityAccess.newQuerySyncForUser().findById(issuerId)
   def beneficiary(implicit accountingConfig: Config): Account =
     accountingConfig.accounts(beneficiaryAccountCode)
   def moneyReservoir(implicit accountingConfig: Config): MoneyReservoir =
@@ -74,7 +75,7 @@ object Transaction {
                      consumedDate: Option[LocalDateTime] = None,
                      idOption: Option[Long] = None) {
     def issuer(implicit entityAccess: EntityAccess): Option[User] =
-      issuerId.map(entityAccess.userManager.findByIdSync(_))
+      issuerId.map(entityAccess.newQuerySyncForUser().findById)
     def isEmpty: Boolean = this == Partial.empty
   }
 

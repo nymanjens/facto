@@ -2,6 +2,7 @@ package models.accounting
 
 import common.money.DatedMoney
 import common.time.LocalDateTime
+import models.access.ModelField
 import models.accounting.config.{Config, MoneyReservoir}
 import models.manager.EntityManager
 import models.user.User
@@ -20,7 +21,8 @@ case class BalanceCheck(issuerId: Long,
 
   override def toString = s"BalanceCheck(id=$idOption, issuer=$issuerId, $moneyReservoirCode)"
 
-  def issuer(implicit entityAccess: EntityAccess): User = entityAccess.userManager.findByIdSync(issuerId)
+  def issuer(implicit entityAccess: EntityAccess): User =
+    entityAccess.newQuerySyncForUser().findById(issuerId)
   def moneyReservoir(implicit accountingConfig: Config): MoneyReservoir =
     accountingConfig.moneyReservoir(moneyReservoirCode)
   def balance(implicit accountingConfig: Config): DatedMoney =

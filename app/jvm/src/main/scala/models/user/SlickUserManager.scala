@@ -1,11 +1,9 @@
 package models.user
 
-import models.access.DbQueryImplicits._
 import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
 import common.time.Clock
 import models.SlickUtils.dbApi._
-import models.SlickUtils.dbRun
 import models.access.ModelField
 import models.manager.{ForwardingEntityManager, SlickEntityManager}
 import models.modification.EntityModification
@@ -20,16 +18,7 @@ final class SlickUserManager
         tag => new Users(tag),
         tableName = tableName
       ))
-    with User.Manager {
-
-  override def findByLoginNameSync(loginName: String): Option[User] = {
-    val users: Seq[User] = dbRun(newQuery.filter(u => u.loginName === loginName).result)
-    users match {
-      case Seq() => None
-      case Seq(u) => Option(u)
-    }
-  }
-}
+    with User.Manager
 
 object SlickUserManager {
   private val tableName: String = "USERS"
@@ -51,7 +40,7 @@ object SlickUserManager {
     val loginName = "robot"
     def hash(s: String) = Hashing.sha512().hashString(s, Charsets.UTF_8).toString
 
-    entityAccess.userManager.findByLoginNameSync(loginName) match {
+    entityAccess.newQuerySyncForUser().findOne(ModelField.User.loginName, loginName) match {
       case Some(user) => user
       case None =>
         val userAddition = EntityModification.createAddWithRandomId(
@@ -73,7 +62,7 @@ object SlickUserManager {
     }
   }
 
-  private def hash(password: String) = Hashing.sha512().hashString(password, Charsets.UTF_8).toString()
+  private def hash(password: String) = Hashing.sha512().hashString(password, Charsets.UTF_8).toString
 
   final class Users(tag: Tag) extends EntityTable[User](tag, tableName) {
     def loginName = column[String]("loginName")

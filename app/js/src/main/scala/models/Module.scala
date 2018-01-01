@@ -12,7 +12,7 @@ final class Module(implicit remoteDatabaseProxy: RemoteDatabaseProxy,
 
   import com.softwaremill.macwire._
 
-  implicit lazy val userManager = new JsUserManager(getInitialDataResponse.allUsers)
+  implicit lazy val userManager = wire[JsUserManager]
   implicit lazy val transactionManager = wire[JsTransactionManager]
   implicit lazy val transactionGroupManager = wire[JsTransactionGroupManager]
   implicit lazy val balanceCheckManager = wire[JsBalanceCheckManager]

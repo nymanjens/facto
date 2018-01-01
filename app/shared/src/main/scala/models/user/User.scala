@@ -18,9 +18,5 @@ case class User(loginName: String,
 object User {
   def tupled = (this.apply _).tupled
 
-  trait Manager extends EntityManager[User] {
-    def findByIdSync(id: Long): User
-    def fetchAllSync(): Seq[User]
-    def findByLoginNameSync(loginName: String): Option[User]
-  }
+  trait Manager extends EntityManager[User]
 }

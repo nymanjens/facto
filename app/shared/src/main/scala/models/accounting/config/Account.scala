@@ -2,6 +2,7 @@ package models.accounting.config
 
 import common.Require.requireNonNull
 import models._
+import models.access.ModelField
 import models.accounting.config.Account.SummaryTotalRowDef
 import models.user.User
 
@@ -40,7 +41,7 @@ case class Account(code: String,
 
   def user(implicit entityAccess: EntityAccess): Option[User] = {
     userLoginName.map { loginName =>
-      val user = entityAccess.userManager.findByLoginNameSync(loginName)
+      val user = entityAccess.newQuerySyncForUser().findOne(ModelField.User.loginName, loginName)
       require(user.isDefined, s"No user exists with loginName '$loginName'")
       user.get
     }
