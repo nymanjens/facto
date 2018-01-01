@@ -7,12 +7,10 @@ import java.time.{LocalDate, LocalTime}
 import com.google.inject.Inject
 import common.ResourceFiles
 import common.time.{Clock, LocalDateTime}
-import models.SlickUtils.dbApi._
-import models.SlickUtils.dbRun
 import models._
 import models.modification.EntityModification
 import models.money.ExchangeRateMeasurement
-import models.user.{Users, User}
+import models.user.Users
 import play.api.{Application, Mode}
 
 import scala.collection.JavaConverters._
