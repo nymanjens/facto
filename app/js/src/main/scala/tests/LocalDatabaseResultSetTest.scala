@@ -235,7 +235,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
   private def withTransactions(transactions: Transaction*) = new Object {
     def assertFilteredWith(filter: Filter[Transaction]) = assertThat(_.filter(filter).data())
 
-    def assertThat(resultSetFunc: DbResultSet[Transaction] => Future[Any]) = new Object {
+    def assertThat(resultSetFunc: DbResultSet.Async[Transaction] => Future[Any]) = new Object {
       def containsExactly(expected: Transaction*): Future[Unit] = async {
         val db = await(LocalDatabase.createInMemoryForTests())
         db.addAll(transactions.toVector)

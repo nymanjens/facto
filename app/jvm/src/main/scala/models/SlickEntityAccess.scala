@@ -64,9 +64,11 @@ final class SlickEntityAccess @Inject()(
     }
   }: _*)
 
-  override def newQuery[E <: Entity: EntityType]() = DbResultSet.fromExecutor(newQueryExecutor)
+  override def newQuery[E <: Entity: EntityType]() = DbResultSet.fromExecutor(newQueryExecutor[E].asAsync)
+  def newQuerySync[E <: Entity: EntityType](): DbResultSet.Sync[E] =
+    DbResultSet.fromExecutor(newQueryExecutor)
 
-  def newQueryExecutor[E <: Entity: EntityType]: DbQueryExecutor[E] = {
+  def newQueryExecutor[E <: Entity: EntityType]: DbQueryExecutor.Sync[E] = {
     val entityType = implicitly[EntityType[E]]
     DbQueryExecutor.fromEntities(typeToAllEntities(entityType).asInstanceOf[Seq[E]])
   }

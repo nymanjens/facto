@@ -26,7 +26,7 @@ private[access] final class LocallyClonedRemoteDatabaseProxy(apiClient: ScalaJsA
   private var isCallingListeners: Boolean = false
 
   // **************** Getters ****************//
-  override def newQuery[E <: Entity: EntityType](): DbResultSet[E] = {
+  override def newQuery[E <: Entity: EntityType](): DbResultSet.Async[E] = {
 //    localDatabase.newQuery[E]()
     ???
   }

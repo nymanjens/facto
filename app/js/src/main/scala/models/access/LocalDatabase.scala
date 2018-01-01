@@ -19,7 +19,7 @@ import scala2js.Scala2Js
 @visibleForTesting
 trait LocalDatabase {
   // **************** Getters ****************//
-  def newQuery[E <: Entity: EntityType](): DbResultSet[E]
+  def newQuery[E <: Entity: EntityType](): DbResultSet.Async[E]
   def getSingletonValue[V](key: SingletonKey[V]): Option[V]
   def isEmpty: Boolean
 
@@ -144,10 +144,10 @@ object LocalDatabase {
       lokiDb.getOrAddCollection[Singleton](s"singletons")
 
     // **************** Getters ****************//
-    override def newQuery[E <: Entity: EntityType](): DbResultSet[E] =
-      DbResultSet.fromExecutor(new DbQueryExecutor[E] {
-        override def data(dbQuery: DbQuery[E]) = Future.successful(lokiResultSet(dbQuery).data())
-        override def count(dbQuery: DbQuery[E]) = Future.successful(lokiResultSet(dbQuery).count())
+    override def newQuery[E <: Entity: EntityType](): DbResultSet.Async[E] =
+      DbResultSet.fromExecutor(new DbQueryExecutor.Sync[E] {
+        override def dataSync(dbQuery: DbQuery[E]) = lokiResultSet(dbQuery).data()
+        override def countSync(dbQuery: DbQuery[E]) = lokiResultSet(dbQuery).count()
 
         private def lokiResultSet(dbQuery: DbQuery[E]): LokiJs.ResultSet[E] = {
           var resultSet = entityCollectionForImplicitType[E].chain()
@@ -204,7 +204,7 @@ object LocalDatabase {
               Some(LokiJs.Filter.AggregateFilter(Operation.And, filters.flatMap(toLokiJsFilter)))
           }
         }
-      })
+      }.asAsync)
 
     override def getSingletonValue[V](key: SingletonKey[V]): Option[V] = {
       implicit val converter = key.valueConverter

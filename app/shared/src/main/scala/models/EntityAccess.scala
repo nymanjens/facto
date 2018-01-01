@@ -16,5 +16,5 @@ abstract class EntityAccess(implicit val userManager: User.Manager,
                             val exchangeRateMeasurementManager: ExchangeRateMeasurement.Manager) {
 
   // **************** Getters ****************//
-  def newQuery[E <: Entity: EntityType](): DbResultSet[E]
+  def newQuery[E <: Entity: EntityType](): DbResultSet.Async[E]
 }

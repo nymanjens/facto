@@ -10,7 +10,7 @@ import scala2js.Converters._
 trait RemoteDatabaseProxy {
 
   // **************** Getters ****************//
-  def newQuery[E <: Entity: EntityType](): DbResultSet[E]
+  def newQuery[E <: Entity: EntityType](): DbResultSet.Async[E]
 
   /** Returns true if there are local pending `Add` modifications for the given entity. Note that only its id is used. */
   @Deprecated def hasLocalAddModifications[E <: Entity: EntityType](entity: E): Boolean

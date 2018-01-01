@@ -28,13 +28,13 @@ private[access] final class ApiBackedRemoteDatabaseProxy(implicit apiClient: Sca
   private var lastWriteFuture: Future[Unit] = Future.successful((): Unit)
 
   // **************** Getters ****************//
-  override def newQuery[E <: Entity: EntityType](): DbResultSet[E] = {
-    DbResultSet.fromExecutor(new DbQueryExecutor[E] {
-      override def data(dbQuery: DbQuery[E]) = async {
+  override def newQuery[E <: Entity: EntityType](): DbResultSet.Async[E] = {
+    DbResultSet.fromExecutor(new DbQueryExecutor.Async[E] {
+      override def dataAsync(dbQuery: DbQuery[E]) = async {
         await(lastWriteFuture)
         await(apiClient.executeDataQuery(dbQuery))
       }
-      override def count(dbQuery: DbQuery[E]) = async {
+      override def countAsync(dbQuery: DbQuery[E]) = async {
         await(lastWriteFuture)
         await(apiClient.executeCountQuery(dbQuery))
       }
