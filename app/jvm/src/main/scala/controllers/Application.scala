@@ -15,7 +15,7 @@ import models.{Entity, SlickEntityAccess}
 import akka.stream.scaladsl._
 import models.access.DbQuery
 import models.modification.EntityModification
-import models.user.SlickUserManager
+import models.user.{SlickUserManager, User}
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
@@ -58,13 +58,14 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
   }
 
   def administration() = AuthenticatedAction.requireAdminUser { implicit user => implicit request =>
-    Ok(views.html.administration(users = userManager.fetchAllSync(), Forms.addUserForm))
+    Ok(views.html.administration(users = entityAccess.newQuerySync[User]().data(), Forms.addUserForm))
   }
 
   def addUser() = AuthenticatedAction.requireAdminUser { implicit user => implicit request =>
     Forms.addUserForm.bindFromRequest.fold(
       formWithErrors =>
-        BadRequest(views.html.administration(users = userManager.fetchAllSync(), formWithErrors)), {
+        BadRequest(
+          views.html.administration(users = entityAccess.newQuerySync[User]().data(), formWithErrors)), {
         case AddUserData(loginName, name, password, _) =>
           entityAccess.persistEntityModifications(
             EntityModification.createAddWithRandomId(SlickUserManager.createUser(loginName, password, name)))

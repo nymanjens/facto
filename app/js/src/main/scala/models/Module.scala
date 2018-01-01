@@ -18,7 +18,7 @@ final class Module(implicit remoteDatabaseProxy: RemoteDatabaseProxy,
   implicit lazy val balanceCheckManager = wire[JsBalanceCheckManager]
   implicit lazy val exchangeRateMeasurementManager = wire[JsExchangeRateMeasurementManager]
 
-  implicit lazy val entityAccess: EntityAccess = wire[JsEntityAccess]
+  implicit lazy val entityAccess: JsEntityAccess = wire[JsEntityAccess]
   implicit lazy val exchangeRateManager: ExchangeRateManager =
     new JsExchangeRateManager(getInitialDataResponse.ratioReferenceToForeignCurrency)
 }

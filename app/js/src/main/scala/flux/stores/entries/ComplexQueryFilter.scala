@@ -4,6 +4,7 @@ import common.GuavaReplacement.Splitter
 import common.ScalaUtils.visibleForTesting
 import common.money.Money
 import flux.stores.entries.ComplexQueryFilter.{Prefix, QueryFilterPair, QueryPart}
+import models.JsEntityAccess
 import models.access.DbQueryImplicits._
 import models.access.{DbQuery, ModelField}
 import models.accounting._
@@ -14,7 +15,8 @@ import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala2js.Converters._
 
-private[stores] final class ComplexQueryFilter(implicit userManager: User.Manager, accountingConfig: Config) {
+private[stores] final class ComplexQueryFilter(implicit entityAccess: JsEntityAccess,
+                                               accountingConfig: Config) {
 
   // **************** Public API **************** //
   def fromQuery(query: String): DbQuery.Filter[Transaction] = {
@@ -53,7 +55,7 @@ private[stores] final class ComplexQueryFilter(implicit userManager: User.Manage
           case Prefix.Issuer =>
             QueryFilterPair.anyOf(
               ModelField.Transaction.issuerId,
-              filterOptions(suffix, userManager.fetchAllSync())(_.name).map(_.id))
+              filterOptions(suffix, entityAccess.newQuerySyncForUser().data())(_.name).map(_.id))
           case Prefix.Beneficiary =>
             QueryFilterPair.anyOf(
               ModelField.Transaction.beneficiaryAccountCode,
