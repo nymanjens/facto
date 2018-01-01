@@ -18,12 +18,10 @@ import models.accounting.config.Config
 import models.modification.{EntityModification, EntityModificationEntity, EntityType}
 import models.money.ExchangeRateMeasurement
 import models.user.User
-import models.{Entity, EntityTableDef, SlickEntityAccess}
+import models.{Entity, SlickEntityAccess}
 
 import scala.collection.immutable.{Seq, TreeMap}
 import scala.collection.mutable
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
 
 final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
                                               clock: Clock,
@@ -36,13 +34,12 @@ final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
       GetInitialDataResponse(
         accountingConfig = accountingConfig,
         user = user,
-        allUsers = Await.result(entityAccess.newQuery[User]().data(), Duration.Inf),
+        allUsers = entityAccess.newQuerySync[User]().data(),
         i18nMessages = i18n.allI18nMessages,
         ratioReferenceToForeignCurrency = {
           val mapBuilder =
             mutable.Map[Currency, mutable.Builder[(LocalDateTime, Double), TreeMap[LocalDateTime, Double]]]()
-          for (measurement <- Await
-                 .result(entityAccess.newQuery[ExchangeRateMeasurement]().data(), Duration.Inf)) {
+          for (measurement <- entityAccess.newQuerySync[ExchangeRateMeasurement]().data()) {
             val currency = measurement.foreignCurrency
             if (!(mapBuilder contains currency)) {
               mapBuilder(currency) = TreeMap.newBuilder[LocalDateTime, Double]
@@ -59,7 +56,7 @@ final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
       val entitiesMap: Map[EntityType.any, Seq[Entity]] = {
         types
           .map(entityType => {
-            entityType -> Await.result(entityAccess.newQuery()(entityType).data(), Duration.Inf)
+            entityType -> entityAccess.newQuerySync()(entityType).data()
           })
           .toMap
       }
