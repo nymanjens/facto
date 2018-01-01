@@ -1,6 +1,7 @@
 package models
 
-import models.access.{DbResultSet, RemoteDatabaseProxy}
+import api.ScalaJsApi.GetInitialDataResponse
+import models.access.{DbQueryExecutor, DbResultSet, RemoteDatabaseProxy}
 import models.accounting._
 import models.modification.{EntityModification, EntityType}
 import models.money.JsExchangeRateMeasurementManager
@@ -14,13 +15,15 @@ final class JsEntityAccess(implicit override val userManager: JsUserManager,
                            override val transactionManager: JsTransactionManager,
                            override val transactionGroupManager: JsTransactionGroupManager,
                            override val exchangeRateMeasurementManager: JsExchangeRateMeasurementManager,
-                           remoteDatabaseProxy: RemoteDatabaseProxy)
+                           remoteDatabaseProxy: RemoteDatabaseProxy,
+                           getInitialDataResponse: GetInitialDataResponse)
     extends EntityAccess {
 
   // **************** Getters ****************//
   override def newQuery[E <: Entity: EntityType]() = remoteDatabaseProxy.newQuery()
 
-  override def newQuerySyncForUser() = ???
+  override def newQuerySyncForUser() =
+    DbResultSet.fromExecutor(DbQueryExecutor.fromEntities(getInitialDataResponse.allUsers))
 
   // **************** Setters ****************//
   def persistModifications(modifications: Seq[EntityModification]) =
