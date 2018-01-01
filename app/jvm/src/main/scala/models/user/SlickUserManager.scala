@@ -1,10 +1,12 @@
 package models.user
 
+import models.access.DbQueryImplicits._
 import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
 import common.time.Clock
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
+import models.access.ModelField
 import models.manager.{ForwardingEntityManager, SlickEntityManager}
 import models.modification.EntityModification
 import models.user.SlickUserManager.{Users, tableName}
@@ -25,13 +27,6 @@ final class SlickUserManager
     users match {
       case Seq() => None
       case Seq(u) => Option(u)
-    }
-  }
-
-  def authenticate(loginName: String, password: String): Boolean = {
-    findByLoginNameSync(loginName) match {
-      case Some(user) if user.passwordHash == SlickUserManager.hash(password) => true
-      case _ => false
     }
   }
 }
@@ -68,6 +63,13 @@ object SlickUserManager {
         val userWithId = userAddition.entity
         entityAccess.persistEntityModifications(userAddition)(user = userWithId)
         userWithId
+    }
+  }
+
+  def authenticate(loginName: String, password: String)(implicit entityAccess: EntityAccess): Boolean = {
+    entityAccess.newQuerySyncForUser().findOne(ModelField.User.loginName, loginName) match {
+      case Some(user) if user.passwordHash == hash(password) => true
+      case _ => false
     }
   }
 

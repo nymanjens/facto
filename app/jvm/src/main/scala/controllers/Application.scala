@@ -142,7 +142,7 @@ object Application {
       )(ChangePasswordData.apply)(ChangePasswordData.unapply) verifying ("facto.error.old-password-is-incorrect", result =>
         result match {
           case ChangePasswordData(loginName, oldPassword, _, _) =>
-            entityAccess.userManager.authenticate(loginName, oldPassword)
+            SlickUserManager.authenticate(loginName, oldPassword)
       }) verifying ("facto.error.passwords-should-match", result =>
         result match {
           case ChangePasswordData(_, _, password, passwordVerification) => password == passwordVerification
