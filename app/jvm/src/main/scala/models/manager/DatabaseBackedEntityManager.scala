@@ -42,13 +42,6 @@ private[manager] final class DatabaseBackedEntityManager[E <: Entity, T <: Entit
   }
 
   // ********** Implementation of SlickEntityManager interface - Getters ********** //
-  override def findById(id: Long) = async {
-    await(database.run(newQuery.filter(_.id === id).result)) match {
-      case Seq(x) => x
-      case Seq() => throw new IllegalArgumentException(s"Could not find entry with id=$id")
-    }
-  }
-
   override def fetchAll() = async {
     await(database.run(newQuery.result)).toList
   }

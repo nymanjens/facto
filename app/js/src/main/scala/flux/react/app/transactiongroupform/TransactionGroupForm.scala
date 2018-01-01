@@ -70,7 +70,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
   def forEdit(transactionGroupId: Long, returnToPath: Path, router: RouterContext): VdomElement =
     create(async {
-      val group = await(transactionGroupManager.findById(transactionGroupId))
+      val group = await(entityAccess.newQuery[TransactionGroup]().findById(transactionGroupId))
       val groupWithTransactions = await(group.withTransactions)
 
       Props(

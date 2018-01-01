@@ -34,9 +34,6 @@ trait SlickEntityManager[E <: Entity, T <: AbstractTable[E]] extends EntityManag
     */
   def newQuery: TableQuery[T]
 
-  /** Returns the entity with given ID or throws an exception. */
-  final def findByIdSync(id: Long): E = Await.result(findById(id), Duration.Inf)
-
   /** Returns all stored entities. */
   final def fetchAllSync(): Seq[E] = Await.result(fetchAll(), Duration.Inf)
 }

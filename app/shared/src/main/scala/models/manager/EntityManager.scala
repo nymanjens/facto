@@ -9,9 +9,6 @@ import scala.concurrent.Future
 trait EntityManager[E <: Entity] {
 
   // ********** Getters ********** //
-  /** Returns the entity with given ID or throws an exception. */
-  def findById(id: Long): Future[E]
-
   /** Returns all stored entities. */
   def fetchAll(): Future[Seq[E]]
 }

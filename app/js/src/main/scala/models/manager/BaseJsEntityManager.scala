@@ -12,10 +12,6 @@ abstract class BaseJsEntityManager[E <: Entity: EntityType](implicit database: R
     extends EntityManager[E] {
 
   // **************** Implementation of EntityManager ****************//
-  override final def findById(id: Long) = async {
-    await(database.newQuery().findOne(ModelField.id, id)).get
-  }
-
   override final def fetchAll() = {
     database.newQuery().data()
   }
