@@ -2,20 +2,12 @@ package models
 
 import api.ScalaJsApi.GetInitialDataResponse
 import models.access.{DbQueryExecutor, DbResultSet, RemoteDatabaseProxy}
-import models.accounting._
 import models.modification.{EntityModification, EntityType}
-import models.money.JsExchangeRateMeasurementManager
-import models.user.{JsUserManager, User}
 
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 
-final class JsEntityAccess(implicit override val userManager: JsUserManager,
-                           override val balanceCheckManager: JsBalanceCheckManager,
-                           override val transactionManager: JsTransactionManager,
-                           override val transactionGroupManager: JsTransactionGroupManager,
-                           override val exchangeRateMeasurementManager: JsExchangeRateMeasurementManager,
-                           remoteDatabaseProxy: RemoteDatabaseProxy,
+final class JsEntityAccess(implicit remoteDatabaseProxy: RemoteDatabaseProxy,
                            getInitialDataResponse: GetInitialDataResponse)
     extends EntityAccess {
 

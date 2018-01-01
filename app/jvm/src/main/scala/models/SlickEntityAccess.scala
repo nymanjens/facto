@@ -27,16 +27,16 @@ import scala.collection.immutable.Seq
 import scala.collection.mutable
 
 final class SlickEntityAccess @Inject()(
-    implicit override val userManager: SlickUserManager,
-    override val balanceCheckManager: SlickBalanceCheckManager,
-    override val transactionManager: SlickTransactionManager,
-    override val transactionGroupManager: SlickTransactionGroupManager,
-    override val exchangeRateMeasurementManager: SlickExchangeRateMeasurementManager,
-    val entityModificationEntityManager: SlickEntityModificationEntityManager,
+    implicit userManager: SlickUserManager,
+    balanceCheckManager: SlickBalanceCheckManager,
+    transactionManager: SlickTransactionManager,
+    transactionGroupManager: SlickTransactionGroupManager,
+    exchangeRateMeasurementManager: SlickExchangeRateMeasurementManager,
+    entityModificationEntityManager: SlickEntityModificationEntityManager,
     clock: Clock)
     extends EntityAccess {
 
-  val allEntityManagers: Seq[SlickEntityManager[_, _]] =
+  private val allEntityManagers: Seq[SlickEntityManager[_, _]] =
     Seq(
       userManager,
       transactionManager,
@@ -46,7 +46,7 @@ final class SlickEntityAccess @Inject()(
       entityModificationEntityManager
     )
 
-  def getManager(entityType: EntityType.any): SlickEntityManager[entityType.get, _] = {
+  private def getManager(entityType: EntityType.any): SlickEntityManager[entityType.get, _] = {
     val manager = entityType match {
       case UserType => userManager
       case TransactionType => transactionManager
