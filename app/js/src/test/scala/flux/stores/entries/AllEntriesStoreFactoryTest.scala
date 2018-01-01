@@ -2,7 +2,7 @@ package flux.stores.entries
 
 import java.time.Month.JANUARY
 
-import common.testing.FakeRemoteDatabaseProxy
+import common.testing.FakeJsEntityAccess
 import common.testing.TestObjects._
 import common.time.LocalDateTime
 import common.time.LocalDateTimes.createDateTime
@@ -17,7 +17,7 @@ import scala2js.Converters._
 object AllEntriesStoreFactoryTest extends TestSuite {
 
   override def tests = TestSuite {
-    implicit val database = new FakeRemoteDatabaseProxy()
+    implicit val database = new FakeJsEntityAccess()
     val factory: AllEntriesStoreFactory = new AllEntriesStoreFactory()
     val store: factory.Store = factory.get(maxNumEntries = 3)
 

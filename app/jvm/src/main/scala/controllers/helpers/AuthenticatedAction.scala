@@ -1,20 +1,21 @@
 package controllers.helpers
 
 import models._
+import models.access.ModelField
 import models.user.User
 import play.api.mvc._
 
-abstract class AuthenticatedAction[A](bodyParser: BodyParser[A])(implicit entityAccess: EntityAccess,
+abstract class AuthenticatedAction[A](bodyParser: BodyParser[A])(implicit entityAccess: JvmEntityAccess,
                                                                  controllerComponents: ControllerComponents,
                                                                  playConfiguration: play.api.Configuration)
     extends EssentialAction {
 
   private val delegate: EssentialAction = {
-    Security.Authenticated(username, onUnauthorized) { username =>
+    Security.Authenticated(AuthenticatedAction.username, AuthenticatedAction.onUnauthorized) { username =>
       controllerComponents.actionBuilder(bodyParser) { request =>
-        entityAccess.userManager.findByLoginNameSync(username) match {
+        entityAccess.newQuerySync[User]().findOne(ModelField.User.loginName, username) match {
           case Some(user) => calculateResult(user, request)
-          case None => onUnauthorized(request)
+          case None => AuthenticatedAction.onUnauthorized(request)
         }
       }
     }
@@ -23,12 +24,6 @@ abstract class AuthenticatedAction[A](bodyParser: BodyParser[A])(implicit entity
   override def apply(requestHeader: RequestHeader) = delegate.apply(requestHeader)
 
   def calculateResult(implicit user: User, request: Request[A]): Result
-
-  // **************** private helper methods **************** //
-  private def username(request: RequestHeader): Option[String] = request.session.get("username")
-
-  private def onUnauthorized(request: RequestHeader): Result =
-    Results.Redirect(controllers.routes.Auth.login(request.uri))
 }
 
 object AuthenticatedAction {
@@ -36,7 +31,7 @@ object AuthenticatedAction {
   type UserAndRequestToResult[A] = User => Request[A] => Result
 
   def apply[A](bodyParser: BodyParser[A])(userAndRequestToResult: UserAndRequestToResult[A])(
-      implicit entityAccess: EntityAccess,
+      implicit entityAccess: JvmEntityAccess,
       controllerComponents: ControllerComponents,
       playConfiguration: play.api.Configuration): AuthenticatedAction[A] = {
     new AuthenticatedAction[A](bodyParser) {
@@ -47,18 +42,32 @@ object AuthenticatedAction {
   }
 
   def apply(userAndRequestToResult: UserAndRequestToResult[AnyContent])(
-      implicit entityAccess: EntityAccess,
+      implicit entityAccess: JvmEntityAccess,
       controllerComponents: ControllerComponents,
       playConfiguration: play.api.Configuration): AuthenticatedAction[AnyContent] = {
     apply(controllerComponents.parsers.defaultBodyParser)(userAndRequestToResult)
   }
 
   def requireAdminUser(userAndRequestToResult: UserAndRequestToResult[AnyContent])(
-      implicit entityAccess: EntityAccess,
+      implicit entityAccess: JvmEntityAccess,
       controllerComponents: ControllerComponents,
       playConfiguration: play.api.Configuration): AuthenticatedAction[AnyContent] =
     AuthenticatedAction { user => request =>
       require(user.loginName == "admin")
       userAndRequestToResult(user)(request)
     }
+
+  def requireAuthenticatedUser(request: RequestHeader)(implicit entityAccess: JvmEntityAccess): User = {
+    val username = AuthenticatedAction.username(request)
+    require(username.isDefined, "Username not set")
+    val user = entityAccess.newQuerySync[User]().findOne(ModelField.User.loginName, username.get)
+    require(user.isDefined, s"Could not find username $username")
+    user.get
+  }
+
+  // **************** private helper methods **************** //
+  private def username(request: RequestHeader): Option[String] = request.session.get("username")
+
+  private def onUnauthorized(request: RequestHeader): Result =
+    Results.Redirect(controllers.routes.Auth.login(request.uri))
 }

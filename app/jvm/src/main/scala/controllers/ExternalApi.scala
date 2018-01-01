@@ -7,9 +7,8 @@ import models._
 import models.accounting._
 import models.accounting.config.{Account, Config, Template}
 import models.modification.EntityModification
-import models.modificationhandler.EntityModificationHandler
 import models.money.ExchangeRateMeasurement
-import models.user.{SlickUserManager, User}
+import models.user.{Users, User}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 
@@ -18,11 +17,9 @@ import scala.collection.immutable.Seq
 final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi,
                                   components: ControllerComponents,
                                   clock: Clock,
-                                  entityModificationHandler: EntityModificationHandler,
                                   playConfiguration: play.api.Configuration,
                                   accountingConfig: Config,
-                                  userManager: SlickUserManager,
-                                  entityAccess: SlickEntityAccess)
+                                  entityAccess: JvmEntityAccess)
     extends AbstractController(components)
     with I18nSupport {
 
@@ -35,14 +32,14 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
     implicit request =>
       validateApplicationSecret(applicationSecret)
 
-      implicit val issuer = SlickUserManager.getOrCreateRobotUser()
+      implicit val issuer = Users.getOrCreateRobotUser()
       val template = accountingConfig.templateWithCode(templateCode)
 
       val groupAddition = EntityModification.createAddWithRandomId(TransactionGroup(createdDate = clock.now))
       val transactionAdditions =
         toTransactions(template, transactionGroup = groupAddition.entity, issuer)
           .map(EntityModification.createAddWithRandomId(_))
-      entityModificationHandler.persistEntityModifications(
+      entityAccess.persistEntityModifications(
         groupAddition +: transactionAdditions
       )
 
@@ -55,11 +52,11 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
                                  applicationSecret: String) = Action { implicit request =>
     validateApplicationSecret(applicationSecret)
 
-    implicit val user = SlickUserManager.getOrCreateRobotUser()
+    implicit val user = Users.getOrCreateRobotUser()
     val date = TimeUtils.parseDateString(dateString)
     require(Currency.of(foreignCurrencyCode).isForeign)
 
-    entityModificationHandler.persistEntityModifications(
+    entityAccess.persistEntityModifications(
       EntityModification.createAddWithRandomId(
         ExchangeRateMeasurement(
           date = date,

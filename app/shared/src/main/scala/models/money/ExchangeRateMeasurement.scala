@@ -3,9 +3,6 @@ package models.money
 import common.money.Currency
 import common.time.LocalDateTime
 import models.Entity
-import models.manager.EntityManager
-
-import scala.collection.immutable.Seq
 
 /**
   * Measurements of the exchange rate of the reference currency to another (foreign) currency at a certain point in
@@ -31,6 +28,4 @@ case class ExchangeRateMeasurement(date: LocalDateTime,
 
 object ExchangeRateMeasurement {
   def tupled = (this.apply _).tupled
-
-  trait Manager extends EntityManager[ExchangeRateMeasurement]
 }

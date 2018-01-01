@@ -251,7 +251,7 @@ object DbQueryExecutorFromEntitiesTest extends TestSuite {
   private def withTransactions(transactions: Transaction*) = new Object {
     def assertFilteredWith(filter: Filter[Transaction]) = assertThat(_.filter(filter).data())
 
-    def assertThat(resultSetFunc: DbResultSet[Transaction] => Any) = new Object {
+    def assertThat(resultSetFunc: DbResultSet.Async[Transaction] => Any) = new Object {
       def containsExactly(expected: Transaction*): Unit = {
         resultSetFunc(dbResultSet) match {
           case seq: Seq[_] => assertEqualIterables(seq.toSet, expected.toSet)
@@ -269,7 +269,7 @@ object DbQueryExecutorFromEntitiesTest extends TestSuite {
       }
     }
 
-    private def dbResultSet: DbResultSet[Transaction] =
+    private def dbResultSet: DbResultSet.Async[Transaction] =
       DbResultSet.fromExecutor(DbQueryExecutor.fromEntities(transactions.toVector))
 
     private def assertEqualIterables(iterable1: Iterable[_], iterable2: Iterable[Transaction]): Unit = {

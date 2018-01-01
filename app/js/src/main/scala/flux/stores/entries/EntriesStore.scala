@@ -1,7 +1,7 @@
 package flux.stores.entries
 
 import flux.stores.entries.EntriesStore.StateWithMeta
-import models.access.RemoteDatabaseProxy
+import models.access.JsEntityAccess
 import models.accounting.{BalanceCheck, Transaction}
 import models.modification.{EntityModification, EntityType}
 
@@ -10,12 +10,12 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 /**
-  * General purpose flux store that maintains a state derived from data in the `RemoteDatabaseProxy`
+  * General purpose flux store that maintains a state derived from data in the database
   * and doesn't support mutation operations.
   *
   * @tparam State Any immutable type that contains all state maintained by this store
   */
-abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database: RemoteDatabaseProxy) {
+abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database: JsEntityAccess) {
   database.registerListener(RemoteDatabaseProxyListener)
 
   private var _state: Option[State] = None
@@ -125,7 +125,7 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database:
   }
 
   // **************** Inner type definitions ****************//
-  private object RemoteDatabaseProxyListener extends RemoteDatabaseProxy.Listener {
+  private object RemoteDatabaseProxyListener extends JsEntityAccess.Listener {
     override def addedLocally(modifications: Seq[EntityModification]): Unit = {
       addedModifications(modifications)
     }

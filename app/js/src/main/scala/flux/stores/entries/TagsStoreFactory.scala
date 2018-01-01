@@ -3,7 +3,7 @@ package flux.stores.entries
 import common.GuavaReplacement.ImmutableSetMultimap
 import flux.stores.entries.TagsStoreFactory.State
 import models.access.DbQueryImplicits._
-import models.access.{ModelField, RemoteDatabaseProxy}
+import models.access.{ModelField, JsEntityAccess}
 import models.accounting.{BalanceCheck, Transaction}
 
 import scala.async.Async.{async, await}
@@ -11,7 +11,7 @@ import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 
-final class TagsStoreFactory(implicit database: RemoteDatabaseProxy) extends EntriesStoreFactory[State] {
+final class TagsStoreFactory(implicit database: JsEntityAccess) extends EntriesStoreFactory[State] {
 
   // **************** Public API ****************//
   def get(): Store = get((): Unit)

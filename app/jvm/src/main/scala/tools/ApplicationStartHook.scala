@@ -7,21 +7,17 @@ import java.time.{LocalDate, LocalTime}
 import com.google.inject.Inject
 import common.ResourceFiles
 import common.time.{Clock, LocalDateTime}
-import models.SlickUtils.dbApi._
-import models.SlickUtils.dbRun
 import models._
 import models.modification.EntityModification
-import models.modificationhandler.EntityModificationHandler
 import models.money.ExchangeRateMeasurement
-import models.user.{SlickUserManager, User}
+import models.user.Users
 import play.api.{Application, Mode}
 
 import scala.collection.JavaConverters._
 
 final class ApplicationStartHook @Inject()(implicit app: Application,
-                                           entityAccess: SlickEntityAccess,
+                                           entityAccess: JvmEntityAccess,
                                            csvImportTool: CsvImportTool,
-                                           entityModificationHandler: EntityModificationHandler,
                                            clock: Clock) {
   onStart()
 
@@ -57,7 +53,7 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
     }
 
     if (CommandLineFlags.createAdminUser) {
-      implicit val user = SlickUserManager.getOrCreateRobotUser()
+      implicit val user = Users.getOrCreateRobotUser()
 
       val loginName = "admin"
       val password = AppConfigHelper.defaultPassword getOrElse "changeme"
@@ -66,9 +62,8 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
       println("  Createing admin user...")
       println(s"    loginName: $loginName")
       println(s"    password: $password")
-      entityModificationHandler.persistEntityModifications(
-        EntityModification.createAddWithRandomId(
-          SlickUserManager.createUser(loginName, password, name = "Admin")))
+      entityAccess.persistEntityModifications(
+        EntityModification.createAddWithRandomId(Users.createUser(loginName, password, name = "Admin")))
       println("  Done. Exiting.")
 
       System.exit(0)
@@ -78,33 +73,30 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
   private def dropAndCreateNewDb(): Unit = {
     println("  Creating tables...")
 
-    for (entityManager <- entityAccess.allEntityManagers) {
-      dbRun(sqlu"""DROP TABLE IF EXISTS #${entityManager.tableName}""")
-      entityManager.createTable()
-    }
+    entityAccess.dropAndCreateTables()
 
     println("   done")
   }
 
   private def loadDummyUsers(): Unit = {
-    implicit val user = SlickUserManager.getOrCreateRobotUser()
+    implicit val user = Users.getOrCreateRobotUser()
 
-    entityModificationHandler.persistEntityModifications(
+    entityAccess.persistEntityModifications(
       EntityModification.createAddWithRandomId(
-        SlickUserManager.createUser(loginName = "admin", password = "a", name = "Admin")),
+        Users.createUser(loginName = "admin", password = "a", name = "Admin")),
       EntityModification.createAddWithRandomId(
-        SlickUserManager.createUser(loginName = "alice", password = "a", name = "Alice")),
+        Users.createUser(loginName = "alice", password = "a", name = "Alice")),
       EntityModification.createAddWithRandomId(
-        SlickUserManager.createUser(loginName = "bob", password = "b", name = "Bob"))
+        Users.createUser(loginName = "bob", password = "b", name = "Bob"))
     )
   }
 
   private def loadCsvDummyData(csvDataFolder: Path): Unit = {
-    implicit val user = SlickUserManager.getOrCreateRobotUser()
+    implicit val user = Users.getOrCreateRobotUser()
 
     csvImportTool.importTransactions(assertExists(csvDataFolder resolve "transactions.csv"))
     csvImportTool.importBalanceChecks(assertExists(csvDataFolder resolve "balancechecks.csv"))
-    entityModificationHandler.persistEntityModifications(
+    entityAccess.persistEntityModifications(
       EntityModification.createAddWithRandomId(
         ExchangeRateMeasurement(
           date = LocalDateTime.of(LocalDate.of(1990, JANUARY, 1), LocalTime.MIN),

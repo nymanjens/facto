@@ -3,8 +3,9 @@ package models.accounting
 import common.money.DatedMoney
 import common.time.LocalDateTime
 import models._
+import models.access.DbQueryImplicits._
+import models.access.{DbQuery, ModelField}
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
-import models.manager.EntityManager
 import models.user.User
 
 import scala.collection.immutable.Seq
@@ -34,9 +35,8 @@ case class Transaction(transactionGroupId: Long,
 
   override def withId(id: Long) = copy(idOption = Some(id))
 
-  def transactionGroup(implicit entityAccess: EntityAccess): Future[TransactionGroup] =
-    entityAccess.transactionGroupManager.findById(transactionGroupId)
-  def issuer(implicit entityAccess: EntityAccess): User = entityAccess.userManager.findByIdSync(issuerId)
+  def issuer(implicit entityAccess: EntityAccess): User =
+    entityAccess.newQuerySyncForUser().findById(issuerId)
   def beneficiary(implicit accountingConfig: Config): Account =
     accountingConfig.accounts(beneficiaryAccountCode)
   def moneyReservoir(implicit accountingConfig: Config): MoneyReservoir =
@@ -57,8 +57,12 @@ case class Transaction(transactionGroupId: Long,
 object Transaction {
   def tupled = (this.apply _).tupled
 
-  trait Manager extends EntityManager[Transaction] {
-    def findByGroupId(groupId: Long): Future[Seq[Transaction]]
+  def findByGroupId(groupId: Long)(implicit entityAccess: EntityAccess): Future[Seq[Transaction]] = {
+    entityAccess
+      .newQuery[Transaction]()
+      .filter(ModelField.Transaction.transactionGroupId isEqualTo groupId)
+      .sort(DbQuery.Sorting.ascBy(ModelField.id))
+      .data()
   }
 
   /** Same as Transaction, except all fields are optional. */
@@ -76,7 +80,7 @@ object Transaction {
                      consumedDate: Option[LocalDateTime] = None,
                      idOption: Option[Long] = None) {
     def issuer(implicit entityAccess: EntityAccess): Option[User] =
-      issuerId.map(entityAccess.userManager.findByIdSync(_))
+      issuerId.map(entityAccess.newQuerySyncForUser().findById)
     def isEmpty: Boolean = this == Partial.empty
   }
 

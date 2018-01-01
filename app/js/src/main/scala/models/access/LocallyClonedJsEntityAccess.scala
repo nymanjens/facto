@@ -1,10 +1,11 @@
 package models.access
 
+import api.ScalaJsApi.GetInitialDataResponse
 import api.ScalaJsApiClient
 import common.LoggingUtils.logExceptions
 import common.ScalaUtils.visibleForTesting
 import models.Entity
-import models.access.RemoteDatabaseProxy.Listener
+import models.access.JsEntityAccess.Listener
 import models.access.SingletonKey.{NextUpdateTokenKey, VersionKey}
 import models.modification.{EntityModification, EntityType}
 
@@ -16,9 +17,10 @@ import scala.concurrent.duration._
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 
-private[access] final class LocallyClonedRemoteDatabaseProxy(apiClient: ScalaJsApiClient,
-                                                             localDatabase: LocalDatabase)
-    extends RemoteDatabaseProxy {
+private[access] final class LocallyClonedJsEntityAccess(apiClient: ScalaJsApiClient,
+                                                        localDatabase: LocalDatabase,
+                                                        getInitialDataResponse: GetInitialDataResponse)
+    extends JsEntityAccess {
 
   private var listeners: Seq[Listener] = Seq()
   private val localAddModificationIds: Map[EntityType.any, mutable.Set[Long]] =
@@ -26,10 +28,12 @@ private[access] final class LocallyClonedRemoteDatabaseProxy(apiClient: ScalaJsA
   private var isCallingListeners: Boolean = false
 
   // **************** Getters ****************//
-  override def newQuery[E <: Entity: EntityType](): DbResultSet[E] = {
-//    localDatabase.newQuery[E]()
-    ???
+  override def newQuery[E <: Entity: EntityType](): DbResultSet.Async[E] = {
+    localDatabase.newQuery[E]()
   }
+
+  override def newQuerySyncForUser() =
+    DbResultSet.fromExecutor(DbQueryExecutor.fromEntities(getInitialDataResponse.allUsers))
 
   override def hasLocalAddModifications[E <: Entity: EntityType](entity: E): Boolean = {
     localAddModificationIds(implicitly[EntityType[E]]) contains entity.id
@@ -61,12 +65,6 @@ private[access] final class LocallyClonedRemoteDatabaseProxy(apiClient: ScalaJsA
 
     await(listeners1)
     await(listeners2)
-  }
-
-  override def clearLocalDatabase(): Future[Unit] = async {
-    require(!isCallingListeners)
-
-    await(localDatabase.clear())
   }
 
   // **************** Other ****************//
@@ -116,11 +114,12 @@ private[access] final class LocallyClonedRemoteDatabaseProxy(apiClient: ScalaJsA
   }
 }
 
-private[access] object LocallyClonedRemoteDatabaseProxy {
+private[access] object LocallyClonedJsEntityAccess {
   private val localDatabaseAndEntityVersion = "1.0"
 
   private[access] def create(apiClient: ScalaJsApiClient,
-                             possiblyEmptyLocalDatabase: LocalDatabase): Future[RemoteDatabaseProxy] =
+                             possiblyEmptyLocalDatabase: LocalDatabase,
+                             getInitialDataResponse: GetInitialDataResponse): Future[JsEntityAccess] =
     async {
       val db = possiblyEmptyLocalDatabase
       val populatedDb = {
@@ -165,7 +164,7 @@ private[access] object LocallyClonedRemoteDatabaseProxy {
           db
         }
       }
-      new LocallyClonedRemoteDatabaseProxy(apiClient, populatedDb)
+      new LocallyClonedJsEntityAccess(apiClient, populatedDb, getInitialDataResponse)
     }
 
 }

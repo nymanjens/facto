@@ -14,7 +14,7 @@ object JsExchangeRateManagerTest extends TestSuite {
   override def tests = TestSuite {
     val testModule = new TestModule()
     val clock = testModule.fakeClock
-    val remoteDatabaseProxy = testModule.fakeRemoteDatabaseProxy
+    val entityAccess = testModule.fakeRemoteDatabaseProxy
     val exchangeRateManager: JsExchangeRateManager = testModule.exchangeRateManager
 
     "getRatioSecondToFirstCurrency()" - {
@@ -43,7 +43,7 @@ object JsExchangeRateManagerTest extends TestSuite {
     }
 
     def persistGbpMeasurement(date: LocalDateTime, ratio: Double): Unit = {
-      remoteDatabaseProxy.addWithRandomId(
+      entityAccess.addWithRandomId(
         ExchangeRateMeasurement(
           date = date,
           foreignCurrencyCode = Gbp.code,

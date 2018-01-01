@@ -3,6 +3,7 @@ package controllers
 import com.google.inject.Inject
 import controllers.Auth.Forms
 import models._
+import models.user.Users
 import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
@@ -10,7 +11,7 @@ import play.api.mvc._
 
 final class Auth @Inject()(implicit override val messagesApi: MessagesApi,
                            components: ControllerComponents,
-                           entityAccess: SlickEntityAccess,
+                           entityAccess: JvmEntityAccess,
                            playConfiguration: play.api.Configuration,
                            env: play.api.Environment,
                            webJarAssets: controllers.WebJarAssets)
@@ -40,13 +41,13 @@ object Auth {
   // ********** forms ********** //
   object Forms {
 
-    def loginForm(implicit entityAccess: SlickEntityAccess) = Form(
+    def loginForm(implicit entityAccess: JvmEntityAccess) = Form(
       tuple(
         "loginName" -> nonEmptyText,
         "password" -> text
       ) verifying ("facto.error.invalid-username-or-password", result =>
         result match {
-          case (loginName, password) => entityAccess.userManager.authenticate(loginName, password)
+          case (loginName, password) => Users.authenticate(loginName, password)
       })
     )
   }

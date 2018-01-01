@@ -4,7 +4,7 @@ import common.money.{ExchangeRateManager, ReferenceMoney}
 import common.time.{DatedMonth, LocalDateTime}
 import flux.stores.entries.SummaryForYearStoreFactory.SummaryForYear
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, ModelField, RemoteDatabaseProxy}
+import models.access.{DbQuery, ModelField, JsEntityAccess}
 import models.accounting.config.{Account, Category, Config}
 import models.accounting.{BalanceCheck, Transaction}
 
@@ -13,7 +13,7 @@ import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 
-final class SummaryForYearStoreFactory(implicit database: RemoteDatabaseProxy,
+final class SummaryForYearStoreFactory(implicit database: JsEntityAccess,
                                        accountingConfig: Config,
                                        complexQueryFilter: ComplexQueryFilter)
     extends EntriesStoreFactory[SummaryForYear] {

@@ -1,4 +1,4 @@
-package models.modificationhandler
+package models.access
 
 import com.google.inject._
 import common.GuavaReplacement.Iterables.getOnlyElement
@@ -7,7 +7,8 @@ import common.testing._
 import models._
 import models.accounting.SlickTransactionManager
 import models.modification.{EntityModification, SlickEntityModificationEntityManager}
-import models.user.{SlickUserManager, User}
+import models.modificationhandler.EntityModificationHandler
+import models.user.{Users, User}
 import org.junit.runner._
 import org.specs2.runner._
 import play.api.test._
@@ -15,12 +16,12 @@ import play.api.test._
 import scala.collection.immutable.Seq
 
 @RunWith(classOf[JUnitRunner])
-class EntityModificationHandlerTest extends HookedSpecification {
+class JvmEntityAccessTest extends HookedSpecification {
 
   implicit private val user = testUser
 
   @Inject implicit private val fakeClock: FakeClock = null
-  @Inject implicit private val entityAccess: SlickEntityAccess = null
+  @Inject implicit private val entityAccess: JvmEntityAccess = null
   @Inject private val transactionManager: SlickTransactionManager = null
   @Inject private val userManager: SlickUserManager = null
   @Inject private val modificationEntityManager: SlickEntityModificationEntityManager = null

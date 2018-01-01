@@ -14,8 +14,7 @@ import models.modification.{
   EntityType,
   SlickEntityModificationEntityManager
 }
-import models.modificationhandler.EntityModificationHandler
-import models.user.SlickUserManager
+import models.user.Users
 import org.junit.runner._
 import org.specs2.runner._
 import play.api.test._
@@ -33,9 +32,8 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
   implicit private val user = testUser
 
   @Inject implicit private val fakeClock: FakeClock = null
-  @Inject implicit private val entityAccess: SlickEntityAccess = null
+  @Inject implicit private val entityAccess: JvmEntityAccess = null
   @Inject implicit private val accountingConfig: Config = null
-  @Inject implicit private val entityModificationHandler: EntityModificationHandler = null
   @Inject private val userManager: SlickUserManager = null
   @Inject private val transactionManager: SlickTransactionManager = null
   @Inject private val modificationEntityManager: SlickEntityModificationEntityManager = null
@@ -64,9 +62,9 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
 
   "getEntityModifications()" in new WithApplication {
     fakeClock.setTime(date1)
-    entityModificationHandler.persistEntityModifications(testModificationA)
+    entityAccess.persistEntityModifications(testModificationA)
     fakeClock.setTime(date3)
-    entityModificationHandler.persistEntityModifications(testModificationB)
+    entityAccess.persistEntityModifications(testModificationB)
     fakeClock.setTime(date4)
 
     val response = serverFactory.create().getEntityModifications(updateToken = date2)

@@ -3,7 +3,7 @@ package flux.stores.entries
 import java.time.Month._
 
 import common.testing.TestObjects._
-import common.testing.{FakeRemoteDatabaseProxy, TestModule}
+import common.testing.{FakeJsEntityAccess, TestModule}
 import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.GainsForYear
 import flux.stores.entries.SummaryForYearStoreFactory.SummaryForYear
 import models.accounting._
@@ -228,7 +228,7 @@ object StoreFactoryStateUpdateTest extends TestSuite {
   }
 
   private def runTest(store: EntriesStore[_], updatesWithImpact: ListMap[EntityModification, StateImpact])(
-      implicit database: FakeRemoteDatabaseProxy,
+      implicit database: FakeJsEntityAccess,
       transactionManager: Transaction.Manager,
       balanceCheckManager: BalanceCheck.Manager): Unit = {
     def checkRemovingExistingEntity(update: EntityModification): Unit = {

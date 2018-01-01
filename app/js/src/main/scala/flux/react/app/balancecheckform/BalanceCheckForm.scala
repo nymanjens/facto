@@ -27,7 +27,6 @@ final class BalanceCheckForm(implicit i18n: I18n,
                              clock: Clock,
                              accountingConfig: Config,
                              user: User,
-                             balanceCheckManager: BalanceCheck.Manager,
                              entityAccess: EntityAccess,
                              exchangeRateManager: ExchangeRateManager,
                              dispatcher: Dispatcher) {
@@ -50,7 +49,7 @@ final class BalanceCheckForm(implicit i18n: I18n,
 
   def forEdit(balanceCheckId: Long, returnToPath: Path, router: RouterContext): VdomElement =
     create(async {
-      val balanceCheck = await(balanceCheckManager.findById(balanceCheckId))
+      val balanceCheck = await(entityAccess.newQuery[BalanceCheck]().findById(balanceCheckId))
       Props(OperationMeta.Edit(balanceCheck), returnToPath, router)
     })
 

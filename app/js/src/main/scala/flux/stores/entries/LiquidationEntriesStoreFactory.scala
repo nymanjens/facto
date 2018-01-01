@@ -3,9 +3,9 @@ package flux.stores.entries
 import common.money.{ExchangeRateManager, ReferenceMoney}
 import models.EntityAccess
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, ModelField, RemoteDatabaseProxy}
+import models.access.{DbQuery, ModelField, JsEntityAccess}
 import models.accounting.config.{Account, Config, MoneyReservoir}
-import models.accounting.{BalanceCheck, Transaction}
+import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 
 import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
@@ -13,7 +13,7 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 
-final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
+final class LiquidationEntriesStoreFactory(implicit database: JsEntityAccess,
                                            accountingConfig: Config,
                                            exchangeRateManager: ExchangeRateManager,
                                            entityAccess: EntityAccess)
@@ -96,8 +96,7 @@ final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProx
           case "" =>
             // Pick the first beneficiary in the group. This simulates that the zero sum transaction was physically
             // performed on an actual reservoir, which is needed for the liquidation calculator to work.
-            val group = await(transaction.transactionGroup)
-            await(group.withTransactions).transactions.head.beneficiary
+            await(Transaction.findByGroupId(transaction.transactionGroupId)).head.beneficiary
           case _ => transaction.moneyReservoir.owner
         }
         val involvedAccounts: Set[Account] = Set(transaction.beneficiary, moneyReservoirOwner)

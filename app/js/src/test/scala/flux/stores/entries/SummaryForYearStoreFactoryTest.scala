@@ -4,7 +4,7 @@ import java.time.Month
 import java.time.Month._
 
 import common.money.ReferenceMoney
-import common.testing.FakeRemoteDatabaseProxy
+import common.testing.FakeJsEntityAccess
 import common.testing.TestObjects._
 import common.time.DatedMonth
 import flux.stores.entries.SummaryForYearStoreFactory.SummaryForYear
@@ -112,7 +112,7 @@ object SummaryForYearStoreFactoryTest extends TestSuite {
       month: Month = MARCH,
       day: Int = 20,
       beneficiary: Account = testAccountA,
-      description: String = "abcdefg")(implicit database: FakeRemoteDatabaseProxy): Transaction = {
+      description: String = "abcdefg")(implicit database: FakeJsEntityAccess): Transaction = {
     val transaction =
       createTransaction(
         beneficiary = beneficiary,

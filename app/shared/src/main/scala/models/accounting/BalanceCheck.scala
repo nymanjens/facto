@@ -3,7 +3,6 @@ package models.accounting
 import common.money.DatedMoney
 import common.time.LocalDateTime
 import models.accounting.config.{Config, MoneyReservoir}
-import models.manager.EntityManager
 import models.user.User
 import models.{Entity, EntityAccess}
 
@@ -20,7 +19,8 @@ case class BalanceCheck(issuerId: Long,
 
   override def toString = s"BalanceCheck(id=$idOption, issuer=$issuerId, $moneyReservoirCode)"
 
-  def issuer(implicit entityAccess: EntityAccess): User = entityAccess.userManager.findByIdSync(issuerId)
+  def issuer(implicit entityAccess: EntityAccess): User =
+    entityAccess.newQuerySyncForUser().findById(issuerId)
   def moneyReservoir(implicit accountingConfig: Config): MoneyReservoir =
     accountingConfig.moneyReservoir(moneyReservoirCode)
   def balance(implicit accountingConfig: Config): DatedMoney =
@@ -29,6 +29,4 @@ case class BalanceCheck(issuerId: Long,
 
 object BalanceCheck {
   def tupled = (this.apply _).tupled
-
-  trait Manager extends EntityManager[BalanceCheck]
 }
