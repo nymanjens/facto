@@ -5,7 +5,7 @@ import com.google.common.hash.Hashing
 import common.time.Clock
 import models.access.ModelField
 import models.modification.EntityModification
-import models.{EntityAccess, SlickEntityAccess}
+import models.{EntityAccess, JvmEntityAccess}
 
 import scala.util.Random
 
@@ -24,7 +24,7 @@ object Users {
     user.copy(passwordHash = hash(password))
   }
 
-  def getOrCreateRobotUser()(implicit entityAccess: SlickEntityAccess, clock: Clock): User = {
+  def getOrCreateRobotUser()(implicit entityAccess: JvmEntityAccess, clock: Clock): User = {
     val loginName = "robot"
     def hash(s: String) = Hashing.sha512().hashString(s, Charsets.UTF_8).toString
 

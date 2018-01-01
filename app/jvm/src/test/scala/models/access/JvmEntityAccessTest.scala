@@ -16,12 +16,12 @@ import play.api.test._
 import scala.collection.immutable.Seq
 
 @RunWith(classOf[JUnitRunner])
-class SlickEntityAccessTest extends HookedSpecification {
+class JvmEntityAccessTest extends HookedSpecification {
 
   implicit private val user = testUser
 
   @Inject implicit private val fakeClock: FakeClock = null
-  @Inject implicit private val entityAccess: SlickEntityAccess = null
+  @Inject implicit private val entityAccess: JvmEntityAccess = null
   @Inject private val transactionManager: SlickTransactionManager = null
   @Inject private val userManager: SlickUserManager = null
   @Inject private val modificationEntityManager: SlickEntityModificationEntityManager = null

@@ -4,7 +4,7 @@ import com.google.inject.AbstractModule
 
 final class ModelsModule extends AbstractModule {
   override def configure() = {
-    bindSingleton(classOf[EntityAccess], classOf[SlickEntityAccess])
+    bindSingleton(classOf[EntityAccess], classOf[JvmEntityAccess])
   }
 
   private def bindSingleton[T](interface: Class[T], implementation: Class[_ <: T]): Unit = {

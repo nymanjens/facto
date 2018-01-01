@@ -5,7 +5,7 @@ import models.access.ModelField
 import models.user.User
 import play.api.mvc._
 
-abstract class AuthenticatedAction[A](bodyParser: BodyParser[A])(implicit entityAccess: SlickEntityAccess,
+abstract class AuthenticatedAction[A](bodyParser: BodyParser[A])(implicit entityAccess: JvmEntityAccess,
                                                                  controllerComponents: ControllerComponents,
                                                                  playConfiguration: play.api.Configuration)
     extends EssentialAction {
@@ -31,7 +31,7 @@ object AuthenticatedAction {
   type UserAndRequestToResult[A] = User => Request[A] => Result
 
   def apply[A](bodyParser: BodyParser[A])(userAndRequestToResult: UserAndRequestToResult[A])(
-      implicit entityAccess: SlickEntityAccess,
+      implicit entityAccess: JvmEntityAccess,
       controllerComponents: ControllerComponents,
       playConfiguration: play.api.Configuration): AuthenticatedAction[A] = {
     new AuthenticatedAction[A](bodyParser) {
@@ -42,14 +42,14 @@ object AuthenticatedAction {
   }
 
   def apply(userAndRequestToResult: UserAndRequestToResult[AnyContent])(
-      implicit entityAccess: SlickEntityAccess,
+      implicit entityAccess: JvmEntityAccess,
       controllerComponents: ControllerComponents,
       playConfiguration: play.api.Configuration): AuthenticatedAction[AnyContent] = {
     apply(controllerComponents.parsers.defaultBodyParser)(userAndRequestToResult)
   }
 
   def requireAdminUser(userAndRequestToResult: UserAndRequestToResult[AnyContent])(
-      implicit entityAccess: SlickEntityAccess,
+      implicit entityAccess: JvmEntityAccess,
       controllerComponents: ControllerComponents,
       playConfiguration: play.api.Configuration): AuthenticatedAction[AnyContent] =
     AuthenticatedAction { user => request =>
@@ -57,7 +57,7 @@ object AuthenticatedAction {
       userAndRequestToResult(user)(request)
     }
 
-  def requireAuthenticatedUser(request: RequestHeader)(implicit entityAccess: SlickEntityAccess): User = {
+  def requireAuthenticatedUser(request: RequestHeader)(implicit entityAccess: JvmEntityAccess): User = {
     val username = AuthenticatedAction.username(request)
     require(username.isDefined, "Username not set")
     val user = entityAccess.newQuerySync[User]().findOne(ModelField.User.loginName, username.get)

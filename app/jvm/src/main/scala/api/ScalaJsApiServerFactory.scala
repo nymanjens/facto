@@ -18,14 +18,14 @@ import models.accounting.config.Config
 import models.modification.{EntityModification, EntityModificationEntity, EntityType}
 import models.money.ExchangeRateMeasurement
 import models.user.User
-import models.{Entity, SlickEntityAccess}
+import models.{Entity, JvmEntityAccess}
 
 import scala.collection.immutable.{Seq, TreeMap}
 import scala.collection.mutable
 
 final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
                                               clock: Clock,
-                                              entityAccess: SlickEntityAccess,
+                                              entityAccess: JvmEntityAccess,
                                               i18n: PlayI18n) {
 
   def create()(implicit user: User): ScalaJsApi = new ScalaJsApi() {

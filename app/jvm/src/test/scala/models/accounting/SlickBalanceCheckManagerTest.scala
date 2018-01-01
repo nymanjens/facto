@@ -16,7 +16,7 @@ import play.api.test._
 class SlickBalanceCheckManagerTest extends HookedSpecification {
 
   @Inject implicit private val clock: Clock = null
-  @Inject implicit private val entityAccess: SlickEntityAccess = null
+  @Inject implicit private val entityAccess: JvmEntityAccess = null
   @Inject private val userManager: SlickUserManager = null
 
   @Inject private val balanceCheckManager: SlickBalanceCheckManager = null

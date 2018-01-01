@@ -11,7 +11,7 @@ import play.api.mvc._
 
 final class Auth @Inject()(implicit override val messagesApi: MessagesApi,
                            components: ControllerComponents,
-                           entityAccess: SlickEntityAccess,
+                           entityAccess: JvmEntityAccess,
                            playConfiguration: play.api.Configuration,
                            env: play.api.Environment,
                            webJarAssets: controllers.WebJarAssets)
@@ -41,7 +41,7 @@ object Auth {
   // ********** forms ********** //
   object Forms {
 
-    def loginForm(implicit entityAccess: SlickEntityAccess) = Form(
+    def loginForm(implicit entityAccess: JvmEntityAccess) = Form(
       tuple(
         "loginName" -> nonEmptyText,
         "password" -> text

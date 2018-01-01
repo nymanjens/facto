@@ -16,7 +16,7 @@ import models.user.User
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
 
-final class CsvImportTool @Inject()(implicit clock: Clock, entityAccess: SlickEntityAccess) {
+final class CsvImportTool @Inject()(implicit clock: Clock, entityAccess: JvmEntityAccess) {
 
   def importTransactions(csvFilePath: Path)(implicit user: User): Unit = {
     // example of line: "2 :: Common :: LIFE :: CARD_COMMON :: imperdiet Duis  :: -25.04 :: 1425855600 :: 0 :: 1425934823"

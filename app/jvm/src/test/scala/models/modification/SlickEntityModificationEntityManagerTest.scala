@@ -4,7 +4,7 @@ import com.google.inject._
 import common.testing.TestObjects._
 import common.testing._
 import common.time.Clock
-import models.SlickEntityAccess
+import models.JvmEntityAccess
 import models.user.Users
 import org.junit.runner._
 import org.specs2.runner._
@@ -14,7 +14,7 @@ import play.api.test._
 class SlickEntityModificationEntityManagerTest extends HookedSpecification {
 
   @Inject implicit private val clock: Clock = null
-  @Inject implicit private val entityAccess: SlickEntityAccess = null
+  @Inject implicit private val entityAccess: JvmEntityAccess = null
   @Inject private val userManager: SlickUserManager = null
 
   @Inject private val modificationEntityManager: SlickEntityModificationEntityManager = null

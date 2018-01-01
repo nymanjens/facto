@@ -8,23 +8,22 @@ import models.accounting.config.{Account, Category, MoneyReservoir}
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 import models.modification.{EntityModification, EntityType}
 import models.user.User
-import models.{Entity, SlickEntityAccess}
+import models.{Entity, JvmEntityAccess}
 
 import scala.collection.immutable.Seq
 
 object TestUtils {
 
-  def persistTransaction(
-      groupId: Long = -1,
-      flowInCents: Long = 0,
-      date: LocalDateTime = FakeClock.defaultTime,
-      timestamp: Long = -1,
-      account: Account = testAccount,
-      category: Category = testCategory,
-      reservoir: MoneyReservoir = testReservoir,
-      description: String = "description",
-      detailDescription: String = "detailDescription",
-      tags: Seq[String] = Seq())(implicit entityAccess: SlickEntityAccess): Transaction = {
+  def persistTransaction(groupId: Long = -1,
+                         flowInCents: Long = 0,
+                         date: LocalDateTime = FakeClock.defaultTime,
+                         timestamp: Long = -1,
+                         account: Account = testAccount,
+                         category: Category = testCategory,
+                         reservoir: MoneyReservoir = testReservoir,
+                         description: String = "description",
+                         detailDescription: String = "detailDescription",
+                         tags: Seq[String] = Seq())(implicit entityAccess: JvmEntityAccess): Transaction = {
     val actualGroupId = if (groupId == -1) {
       persist(TransactionGroup(createdDate = FakeClock.defaultTime)).id
     } else {
@@ -52,7 +51,7 @@ object TestUtils {
       balanceInCents: Long = 0,
       date: LocalDateTime = FakeClock.defaultTime,
       timestamp: Long = -1,
-      reservoir: MoneyReservoir = testReservoir)(implicit entityAccess: SlickEntityAccess): BalanceCheck = {
+      reservoir: MoneyReservoir = testReservoir)(implicit entityAccess: JvmEntityAccess): BalanceCheck = {
     val actualDate = if (timestamp == -1) date else localDateTimeOfEpochMilli(timestamp)
     persist(
       BalanceCheck(
@@ -64,7 +63,7 @@ object TestUtils {
       ))
   }
 
-  def persist[E <: Entity: EntityType](entity: E)(implicit entityAccess: SlickEntityAccess): E = {
+  def persist[E <: Entity: EntityType](entity: E)(implicit entityAccess: JvmEntityAccess): E = {
     implicit val user = User(
       idOption = Some(9213982174887321L),
       loginName = "robot",

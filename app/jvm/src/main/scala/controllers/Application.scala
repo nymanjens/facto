@@ -11,7 +11,7 @@ import controllers.Application.Forms
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 import controllers.helpers.AuthenticatedAction
 import models.modification.EntityType
-import models.{Entity, SlickEntityAccess}
+import models.{Entity, JvmEntityAccess}
 import akka.stream.scaladsl._
 import models.access.DbQuery
 import models.modification.EntityModification
@@ -25,7 +25,7 @@ import scala.collection.immutable.Seq
 
 final class Application @Inject()(implicit override val messagesApi: MessagesApi,
                                   components: ControllerComponents,
-                                  entityAccess: SlickEntityAccess,
+                                  entityAccess: JvmEntityAccess,
                                   scalaJsApiServerFactory: ScalaJsApiServerFactory,
                                   playConfiguration: play.api.Configuration,
                                   env: play.api.Environment,
@@ -133,7 +133,7 @@ object Application {
                                   password: String = "",
                                   passwordVerification: String = "")
 
-    def changePasswordForm(implicit entityAccess: SlickEntityAccess) = Form(
+    def changePasswordForm(implicit entityAccess: JvmEntityAccess) = Form(
       mapping(
         "loginName" -> nonEmptyText,
         "oldPassword" -> nonEmptyText,

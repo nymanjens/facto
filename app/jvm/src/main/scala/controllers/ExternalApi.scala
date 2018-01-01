@@ -19,7 +19,7 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
                                   clock: Clock,
                                   playConfiguration: play.api.Configuration,
                                   accountingConfig: Config,
-                                  entityAccess: SlickEntityAccess)
+                                  entityAccess: JvmEntityAccess)
     extends AbstractController(components)
     with I18nSupport {
 

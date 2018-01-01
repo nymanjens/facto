@@ -16,7 +16,7 @@ import play.api.{Application, Mode}
 import scala.collection.JavaConverters._
 
 final class ApplicationStartHook @Inject()(implicit app: Application,
-                                           entityAccess: SlickEntityAccess,
+                                           entityAccess: JvmEntityAccess,
                                            csvImportTool: CsvImportTool,
                                            clock: Clock) {
   onStart()

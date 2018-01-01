@@ -20,7 +20,7 @@ import models.user.User
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 
-final class SlickEntityAccess @Inject()(clock: Clock) extends EntityAccess {
+final class JvmEntityAccess @Inject()(clock: Clock) extends EntityAccess {
 
   // **************** Getters ****************//
   private val typeToAllEntities: mutable.Map[EntityType.any, Seq[Entity]] = mutable.Map({

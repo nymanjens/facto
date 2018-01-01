@@ -32,7 +32,7 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
   implicit private val user = testUser
 
   @Inject implicit private val fakeClock: FakeClock = null
-  @Inject implicit private val entityAccess: SlickEntityAccess = null
+  @Inject implicit private val entityAccess: JvmEntityAccess = null
   @Inject implicit private val accountingConfig: Config = null
   @Inject private val userManager: SlickUserManager = null
   @Inject private val transactionManager: SlickTransactionManager = null
