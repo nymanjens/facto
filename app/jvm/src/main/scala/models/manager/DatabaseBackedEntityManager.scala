@@ -1,17 +1,15 @@
 package models.manager
 
-import scala.async.Async.{async, await}
-
-import scala.concurrent.ExecutionContext.Implicits.global
 import models.{Entity, EntityTable}
-import models.SlickUtils.dbApi._
-import models.SlickUtils.{dbRun, database}
+import models.SlickUtils.dbApi.{Table => SlickTable, Tag => SlickTag, _}
+import models.SlickUtils.{database, dbRun}
 import play.api.Logger
 
-import scala.collection.immutable.Seq
+import scala.async.Async.{async, await}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 private[manager] final class DatabaseBackedEntityManager[E <: Entity, T <: EntityTable[E]](
-    cons: Tag => T,
+    cons: SlickTag => T,
     val tableName: String)
     extends SlickEntityManager[E, T] {
 
