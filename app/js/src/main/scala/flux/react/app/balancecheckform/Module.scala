@@ -18,7 +18,6 @@ final class Module(implicit i18n: I18n,
                    entityAccess: EntityAccess,
                    exchangeRateManager: ExchangeRateManager,
                    globalMessagesStore: GlobalMessagesStore,
-                   balanceCheckManager: BalanceCheck.Manager,
                    dispatcher: Dispatcher,
                    clock: Clock) {
 

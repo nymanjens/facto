@@ -27,7 +27,6 @@ final class BalanceCheckForm(implicit i18n: I18n,
                              clock: Clock,
                              accountingConfig: Config,
                              user: User,
-                             balanceCheckManager: BalanceCheck.Manager,
                              entityAccess: EntityAccess,
                              exchangeRateManager: ExchangeRateManager,
                              dispatcher: Dispatcher) {

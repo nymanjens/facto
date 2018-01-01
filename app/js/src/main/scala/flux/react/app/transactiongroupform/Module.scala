@@ -20,7 +20,6 @@ final class Module(implicit i18n: I18n,
                    exchangeRateManager: ExchangeRateManager,
                    globalMessagesStore: GlobalMessagesStore,
                    tagsStoreFactory: TagsStoreFactory,
-                   transactionGroupManager: TransactionGroup.Manager,
                    dispatcher: Dispatcher,
                    clock: Clock) {
 
