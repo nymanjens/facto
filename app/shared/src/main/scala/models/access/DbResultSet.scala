@@ -44,8 +44,8 @@ object DbResultSet {
         case Seq() => None
       }
     }
-    def data(): Seq[E] = executor.dataSync(helper.dbQuery)
-    def count(): Int = executor.countSync(helper.dbQuery)
+    def data(): Seq[E] = executor.data(helper.dbQuery)
+    def count(): Int = executor.count(helper.dbQuery)
   }
 
   final class Async[E <: Entity: EntityType] private[DbResultSet] (executor: DbQueryExecutor.Async[E]) {
@@ -75,8 +75,8 @@ object DbResultSet {
         case Seq() => None
       }
     }
-    def data(): Future[Seq[E]] = executor.dataAsync(helper.dbQuery)
-    def count(): Future[Int] = executor.countAsync(helper.dbQuery)
+    def data(): Future[Seq[E]] = executor.data(helper.dbQuery)
+    def count(): Future[Int] = executor.count(helper.dbQuery)
   }
 
   private final class Helper[E <: Entity: EntityType] {

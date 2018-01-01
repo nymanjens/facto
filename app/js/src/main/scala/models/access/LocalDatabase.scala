@@ -146,8 +146,8 @@ object LocalDatabase {
     // **************** Getters ****************//
     override def newQuery[E <: Entity: EntityType](): DbResultSet.Async[E] =
       DbResultSet.fromExecutor(new DbQueryExecutor.Sync[E] {
-        override def dataSync(dbQuery: DbQuery[E]) = lokiResultSet(dbQuery).data()
-        override def countSync(dbQuery: DbQuery[E]) = lokiResultSet(dbQuery).count()
+        override def data(dbQuery: DbQuery[E]) = lokiResultSet(dbQuery).data()
+        override def count(dbQuery: DbQuery[E]) = lokiResultSet(dbQuery).count()
 
         private def lokiResultSet(dbQuery: DbQuery[E]): LokiJs.ResultSet[E] = {
           var resultSet = entityCollectionForImplicitType[E].chain()

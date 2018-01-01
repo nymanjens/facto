@@ -92,7 +92,7 @@ final class ScalaJsApiServerFactory @Inject()(
       def internal[E <: Entity] = {
         val query = dbQuery.toRegular.asInstanceOf[DbQuery[E]]
         implicit val entityType = query.entityType.asInstanceOf[EntityType[E]]
-        entityAccess.newQueryExecutor[E].dataSync(query)
+        entityAccess.newQueryExecutor[E].data(query)
       }
       internal
     }
@@ -101,7 +101,7 @@ final class ScalaJsApiServerFactory @Inject()(
       def internal[E <: Entity] = {
         val query = dbQuery.toRegular.asInstanceOf[DbQuery[E]]
         implicit val entityType = query.entityType.asInstanceOf[EntityType[E]]
-        entityAccess.newQueryExecutor[E].countSync(query)
+        entityAccess.newQueryExecutor[E].count(query)
       }
       internal
     }
