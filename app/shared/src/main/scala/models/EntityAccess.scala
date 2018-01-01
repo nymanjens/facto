@@ -17,4 +17,6 @@ abstract class EntityAccess(implicit val userManager: User.Manager,
 
   // **************** Getters ****************//
   def newQuery[E <: Entity: EntityType](): DbResultSet.Async[E]
+
+  def newQuerySyncForUser(): DbResultSet.Sync[User]
 }

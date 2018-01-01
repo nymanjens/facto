@@ -65,6 +65,7 @@ final class SlickEntityAccess @Inject()(
   }: _*)
 
   override def newQuery[E <: Entity: EntityType]() = DbResultSet.fromExecutor(newQueryExecutor[E].asAsync)
+  override def newQuerySyncForUser() = newQuerySync[User]()
   def newQuerySync[E <: Entity: EntityType](): DbResultSet.Sync[E] =
     DbResultSet.fromExecutor(newQueryExecutor)
 

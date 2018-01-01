@@ -4,7 +4,7 @@ import models.access.{DbResultSet, RemoteDatabaseProxy}
 import models.accounting._
 import models.modification.{EntityModification, EntityType}
 import models.money.JsExchangeRateMeasurementManager
-import models.user.JsUserManager
+import models.user.{JsUserManager, User}
 
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
@@ -19,6 +19,8 @@ final class JsEntityAccess(implicit override val userManager: JsUserManager,
 
   // **************** Getters ****************//
   override def newQuery[E <: Entity: EntityType]() = remoteDatabaseProxy.newQuery()
+
+  override def newQuerySyncForUser() = ???
 
   // **************** Setters ****************//
   def persistModifications(modifications: Seq[EntityModification]) =
