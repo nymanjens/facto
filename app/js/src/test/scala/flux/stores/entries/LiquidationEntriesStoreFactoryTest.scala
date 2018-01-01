@@ -4,7 +4,7 @@ import java.time.Month.JANUARY
 
 import common.money.ReferenceMoney
 import common.testing.TestObjects._
-import common.testing.{FakeRemoteDatabaseProxy, TestModule}
+import common.testing.{FakeJsEntityAccess, TestModule}
 import common.time.LocalDateTimes.createDateTime
 import models.accounting._
 import models.accounting.config.{Account, MoneyReservoir}
@@ -99,7 +99,7 @@ object LiquidationEntriesStoreFactoryTest extends TestSuite {
       flowInCents: Long,
       day: Int,
       account: Account = testAccountA,
-      reservoir: MoneyReservoir)(implicit database: FakeRemoteDatabaseProxy): Transaction = {
+      reservoir: MoneyReservoir)(implicit database: FakeJsEntityAccess): Transaction = {
     val transaction = testTransactionWithIdA.copy(
       idOption = Some(EntityModification.generateRandomId()),
       transactionGroupId = groupId,

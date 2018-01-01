@@ -4,12 +4,10 @@ import common.GuavaReplacement.Splitter
 import common.ScalaUtils.visibleForTesting
 import common.money.Money
 import flux.stores.entries.ComplexQueryFilter.{Prefix, QueryFilterPair, QueryPart}
-import models.JsEntityAccess
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, ModelField}
+import models.access.{DbQuery, JsEntityAccess, ModelField}
 import models.accounting._
 import models.accounting.config.Config
-import models.user.User
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable

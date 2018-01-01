@@ -5,7 +5,7 @@ import common.time.LocalDateTime
 import flux.stores.entries.CashFlowEntry.{BalanceCorrection, RegularEntry}
 import models.EntityAccess
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, ModelField, RemoteDatabaseProxy}
+import models.access.{DbQuery, ModelField, JsEntityAccess}
 import models.accounting.config.{Config, MoneyReservoir}
 import models.accounting.{Transaction, _}
 
@@ -14,7 +14,7 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 
-final class CashFlowEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
+final class CashFlowEntriesStoreFactory(implicit database: JsEntityAccess,
                                         accountingConfig: Config,
                                         exchangeRateManager: ExchangeRateManager,
                                         entityAccess: EntityAccess)

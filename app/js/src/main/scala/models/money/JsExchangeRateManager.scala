@@ -2,7 +2,7 @@ package models.money
 
 import common.money.{Currency, ExchangeRateManager}
 import common.time.LocalDateTime
-import models.access.RemoteDatabaseProxy
+import models.access.JsEntityAccess
 import models.modification.{EntityModification, EntityType}
 
 import scala.collection.SortedMap
@@ -11,7 +11,7 @@ import scala2js.Converters._
 
 final class JsExchangeRateManager(
     ratioReferenceToForeignCurrency: Map[Currency, SortedMap[LocalDateTime, Double]])(
-    implicit database: RemoteDatabaseProxy)
+    implicit database: JsEntityAccess)
     extends ExchangeRateManager {
   database.registerListener(RemoteDatabaseProxyListener)
 
@@ -44,7 +44,7 @@ final class JsExchangeRateManager(
   }
 
   // **************** Inner type definitions ****************//
-  private object RemoteDatabaseProxyListener extends RemoteDatabaseProxy.Listener {
+  private object RemoteDatabaseProxyListener extends JsEntityAccess.Listener {
     override def addedLocally(modifications: Seq[EntityModification]): Unit = {
       addedModifications(modifications)
     }

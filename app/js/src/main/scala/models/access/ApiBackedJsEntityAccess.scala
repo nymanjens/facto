@@ -1,12 +1,12 @@
 package models.access
 
-import api.ScalaJsApi.UpdateToken
+import api.ScalaJsApi.{GetInitialDataResponse, UpdateToken}
 import api.ScalaJsApiClient
 import common.LoggingUtils.logExceptions
 import common.ScalaUtils.visibleForTesting
 import common.time.Clock
 import models.Entity
-import models.access.RemoteDatabaseProxy.Listener
+import models.access.JsEntityAccess.Listener
 import models.modification.{EntityModification, EntityType}
 
 import scala.async.Async.{async, await}
@@ -17,8 +17,10 @@ import scala.concurrent.duration._
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 
-private[access] final class ApiBackedRemoteDatabaseProxy(implicit apiClient: ScalaJsApiClient, clock: Clock)
-    extends RemoteDatabaseProxy {
+private[access] final class ApiBackedJsEntityAccess(implicit apiClient: ScalaJsApiClient,
+                                                    clock: Clock,
+                                                    getInitialDataResponse: GetInitialDataResponse)
+    extends JsEntityAccess {
 
   private var listeners: Seq[Listener] = Seq()
   private val localAddModificationIds: Map[EntityType.any, mutable.Set[Long]] =
@@ -40,6 +42,9 @@ private[access] final class ApiBackedRemoteDatabaseProxy(implicit apiClient: Sca
       }
     })
   }
+
+  override def newQuerySyncForUser() =
+    DbResultSet.fromExecutor(DbQueryExecutor.fromEntities(getInitialDataResponse.allUsers))
 
   override def hasLocalAddModifications[E <: Entity: EntityType](entity: E): Boolean = {
     localAddModificationIds(implicitly[EntityType[E]]) contains entity.id
@@ -73,8 +78,6 @@ private[access] final class ApiBackedRemoteDatabaseProxy(implicit apiClient: Sca
     }
     lastWriteFuture
   }
-
-  override def clearLocalDatabase(): Future[Unit] = Future.successful((): Unit)
 
   // **************** Other ****************//
   override def registerListener(listener: Listener): Unit = {

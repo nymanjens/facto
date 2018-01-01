@@ -9,7 +9,7 @@ import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.{
   GainsForYear
 }
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, ModelField, RemoteDatabaseProxy}
+import models.access.{DbQuery, ModelField, JsEntityAccess}
 import models.accounting.config.{Account, Config, MoneyReservoir}
 import models.accounting.{BalanceCheck, Transaction}
 
@@ -23,7 +23,7 @@ import scala2js.Converters._
 /**
   * Store factory that calculates the monthly gains and losses made by exchange rate fluctuations in a given year.
   */
-final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDatabaseProxy,
+final class SummaryExchangeRateGainsStoreFactory(implicit database: JsEntityAccess,
                                                  exchangeRateManager: ExchangeRateManager,
                                                  accountingConfig: Config,
                                                  complexQueryFilter: ComplexQueryFilter)

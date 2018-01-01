@@ -2,7 +2,7 @@ package flux.stores.entries
 
 import common.GuavaReplacement.ImmutableSetMultimap
 import common.testing.TestObjects._
-import common.testing.{FakeRemoteDatabaseProxy, TestModule}
+import common.testing.{FakeJsEntityAccess, TestModule}
 import models.accounting._
 import utest._
 
@@ -36,7 +36,7 @@ object TagsStoreFactoryTest extends TestSuite {
   }
 
   private def persistTransaction(id: Long, tags: Seq[String])(
-      implicit database: FakeRemoteDatabaseProxy): Transaction = {
+      implicit database: FakeJsEntityAccess): Transaction = {
     val transaction = testTransactionWithIdA.copy(idOption = Some(id), tags = tags)
     database.addRemotelyAddedEntities(transaction)
     transaction

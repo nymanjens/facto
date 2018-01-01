@@ -4,7 +4,7 @@ import common.time.Clock
 import flux.action.Action.{AddTransactionGroup, RemoveTransactionGroup, UpdateTransactionGroup}
 import flux.action.Dispatcher
 import models.EntityAccess
-import models.access.RemoteDatabaseProxy
+import models.access.JsEntityAccess
 import models.accounting._
 import models.modification.EntityModification
 
@@ -12,7 +12,7 @@ import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-private[stores] final class TransactionAndGroupStore(implicit database: RemoteDatabaseProxy,
+private[stores] final class TransactionAndGroupStore(implicit database: JsEntityAccess,
                                                      entityAccess: EntityAccess,
                                                      clock: Clock,
                                                      dispatcher: Dispatcher) {

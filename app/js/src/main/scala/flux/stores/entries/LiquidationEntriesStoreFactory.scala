@@ -3,7 +3,7 @@ package flux.stores.entries
 import common.money.{ExchangeRateManager, ReferenceMoney}
 import models.EntityAccess
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, ModelField, RemoteDatabaseProxy}
+import models.access.{DbQuery, ModelField, JsEntityAccess}
 import models.accounting.config.{Account, Config, MoneyReservoir}
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 
@@ -13,7 +13,7 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 
-final class LiquidationEntriesStoreFactory(implicit database: RemoteDatabaseProxy,
+final class LiquidationEntriesStoreFactory(implicit database: JsEntityAccess,
                                            accountingConfig: Config,
                                            exchangeRateManager: ExchangeRateManager,
                                            entityAccess: EntityAccess)

@@ -1,6 +1,6 @@
 package flux.stores.entries
 
-import models.access.{DbQuery, ModelField, RemoteDatabaseProxy}
+import models.access.{DbQuery, ModelField, JsEntityAccess}
 import models.accounting.{BalanceCheck, Transaction}
 
 import scala.async.Async.{async, await}
@@ -8,7 +8,7 @@ import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 
-final class ComplexQueryStoreFactory(implicit database: RemoteDatabaseProxy,
+final class ComplexQueryStoreFactory(implicit database: JsEntityAccess,
                                      complexQueryFilter: ComplexQueryFilter)
     extends EntriesListStoreFactory[GeneralEntry, ComplexQueryStoreFactory.Query] {
 

@@ -1,8 +1,6 @@
 package flux.react.app.transactiongroupform
 import java.util.NoSuchElementException
 
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala.async.Async.{async, await}
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.accounting.Tags
 import common.money.{Currency, DatedMoney, ExchangeRateManager, ReferenceMoney}
@@ -17,23 +15,23 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom.html_<^._
-import models.EntityAccess
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, ModelField, RemoteDatabaseProxy}
+import models.access.{DbQuery, JsEntityAccess, ModelField}
 import models.accounting.Transaction
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.user.User
 
+import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 
 private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                                                            accountingConfig: Config,
                                                            user: User,
-                                                           entityAccess: EntityAccess,
                                                            exchangeRateManager: ExchangeRateManager,
                                                            clock: Clock,
-                                                           remoteDatabaseProxy: RemoteDatabaseProxy,
+                                                           entityAccess: JsEntityAccess,
                                                            tagsStoreFactory: TagsStoreFactory) {
 
   private val anythingChangedQueue = SinglePendingTaskQueue.create()
@@ -415,7 +413,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
       val allSuggestions = $.state.runNow().allDescriptionSuggestionsForCategory
       if (allSuggestions.isEmpty || allSuggestions.get.category != category) {
         val transactions = await(
-          remoteDatabaseProxy
+          entityAccess
             .newQuery[Transaction]()
             .filter(ModelField.Transaction.categoryCode isEqualTo category.code)
             .sort(DbQuery.Sorting.descBy(ModelField.Transaction.createdDate))

@@ -4,12 +4,12 @@ import api.ScalaJsApi.GetInitialDataResponse
 import api.ScalaJsApiClient
 import flux.react.router.Page
 import japgolly.scalajs.react.extra.router.Router
-import models.access.RemoteDatabaseProxy
+import models.access.JsEntityAccess
 import models.accounting.config.Config
 import models.user.User
 
 final class FactoAppModule(implicit getInitialDataResponse: GetInitialDataResponse,
-                           remoteDatabaseProxy: RemoteDatabaseProxy,
+                           entityAccess: JsEntityAccess,
                            scalaJsApiClient: ScalaJsApiClient) {
 
   // Unpack arguments
@@ -24,7 +24,6 @@ final class FactoAppModule(implicit getInitialDataResponse: GetInitialDataRespon
 
   // Create and unpack Models module
   private val modelsModule = new models.Module
-  implicit private val entityAccess = modelsModule.entityAccess
   implicit private val exchangeRateManager = modelsModule.exchangeRateManager
 
   // Create and unpack Flux action module

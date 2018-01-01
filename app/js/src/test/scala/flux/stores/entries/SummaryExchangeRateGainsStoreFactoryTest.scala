@@ -5,7 +5,7 @@ import java.time.Month._
 
 import common.money.ReferenceMoney
 import common.testing.TestObjects._
-import common.testing.{FakeRemoteDatabaseProxy, TestModule}
+import common.testing.{FakeJsEntityAccess, TestModule}
 import common.time.LocalDateTimes.createDateTime
 import common.time.{DatedMonth, LocalDateTime}
 import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.GainsForMonth
@@ -106,12 +106,12 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
   private def persistTransaction(
       flow: Double,
       date: LocalDateTime,
-      reservoir: MoneyReservoir = testReservoirCashGbp)(implicit database: FakeRemoteDatabaseProxy): Unit = {
+      reservoir: MoneyReservoir = testReservoirCashGbp)(implicit database: FakeJsEntityAccess): Unit = {
     database.addRemotelyAddedEntities(
       createTransaction(flow = flow, reservoir = reservoir).copy(transactionDate = date))
   }
   private def persistBalanceCheck(balance: Double, date: LocalDateTime)(
-      implicit database: FakeRemoteDatabaseProxy): Unit = {
+      implicit database: FakeJsEntityAccess): Unit = {
     database.addRemotelyAddedEntities(
       testBalanceCheckWithId.copy(
         idOption = Some(EntityModification.generateRandomId()),
@@ -120,7 +120,7 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
         balanceInCents = (balance * 100).toLong))
   }
   private def persistGbpRate(date: LocalDateTime, ratio: Double)(
-      implicit database: FakeRemoteDatabaseProxy): Unit = {
+      implicit database: FakeJsEntityAccess): Unit = {
     database.addRemotelyAddedEntities(
       testExchangeRateMeasurementWithId.copy(
         idOption = Some(EntityModification.generateRandomId()),

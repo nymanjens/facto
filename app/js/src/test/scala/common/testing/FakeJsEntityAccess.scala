@@ -1,8 +1,8 @@
 package common.testing
 
 import models.Entity
-import models.access.{DbQueryExecutor, DbResultSet, RemoteDatabaseProxy}
-import models.access.RemoteDatabaseProxy.Listener
+import models.access.{DbQueryExecutor, DbResultSet, JsEntityAccess}
+import models.access.JsEntityAccess.Listener
 import models.modification.{EntityModification, EntityType}
 
 import scala.collection.immutable.Seq
@@ -10,7 +10,7 @@ import scala.collection.mutable
 import scala.concurrent.Future
 import scala2js.Converters._
 
-final class FakeRemoteDatabaseProxy extends RemoteDatabaseProxy {
+final class FakeJsEntityAccess extends JsEntityAccess {
 
   private val modificationsBuffer: ModificationsBuffer = new ModificationsBuffer()
   private val localModificationIds: mutable.Buffer[Long] = mutable.Buffer()

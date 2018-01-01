@@ -5,7 +5,7 @@ import java.time.Month.JANUARY
 
 import common.money.{Currency, MoneyWithGeneralCurrency}
 import common.testing.TestObjects._
-import common.testing.{FakeRemoteDatabaseProxy, TestModule}
+import common.testing.{FakeJsEntityAccess, TestModule}
 import common.time.LocalDateTimes.createDateTime
 import flux.stores.entries.CashFlowEntry.{BalanceCorrection, RegularEntry}
 import models.accounting._
@@ -121,7 +121,7 @@ object CashFlowEntriesStoreFactoryTest extends TestSuite {
       flowInCents: Long,
       day: Int,
       reservoir: MoneyReservoir = testReservoir,
-      createIncrement: Int = 0)(implicit database: FakeRemoteDatabaseProxy): Transaction = {
+      createIncrement: Int = 0)(implicit database: FakeJsEntityAccess): Transaction = {
     val transaction = testTransactionWithIdA.copy(
       idOption = Some(EntityModification.generateRandomId()),
       transactionGroupId = groupId,
@@ -138,7 +138,7 @@ object CashFlowEntriesStoreFactoryTest extends TestSuite {
       balanceInCents: Long,
       day: Int,
       reservoir: MoneyReservoir = testReservoir,
-      createIncrement: Int = 0)(implicit database: FakeRemoteDatabaseProxy): BalanceCheck = {
+      createIncrement: Int = 0)(implicit database: FakeJsEntityAccess): BalanceCheck = {
     val balanceCheck = testBalanceCheckWithId.copy(
       idOption = Some(EntityModification.generateRandomId()),
       balanceInCents = balanceInCents,

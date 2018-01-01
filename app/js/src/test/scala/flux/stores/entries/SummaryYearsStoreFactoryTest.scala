@@ -1,7 +1,7 @@
 package flux.stores.entries
 
 import common.testing.TestObjects._
-import common.testing.{FakeRemoteDatabaseProxy, TestModule}
+import common.testing.{FakeJsEntityAccess, TestModule}
 import common.time.YearRange
 import models.accounting.config.Account
 import utest._
@@ -41,7 +41,7 @@ object SummaryYearsStoreFactoryTest extends TestSuite {
   }
 
   private def persistTransaction(year: Int, beneficiary: Account = testAccountA)(
-      implicit database: FakeRemoteDatabaseProxy): Unit = {
+      implicit database: FakeJsEntityAccess): Unit = {
     database.addRemotelyAddedEntities(createTransaction(beneficiary = beneficiary, year = year))
   }
 }
