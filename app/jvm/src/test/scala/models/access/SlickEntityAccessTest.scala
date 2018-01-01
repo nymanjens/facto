@@ -8,7 +8,7 @@ import models._
 import models.accounting.SlickTransactionManager
 import models.modification.{EntityModification, SlickEntityModificationEntityManager}
 import models.modificationhandler.EntityModificationHandler
-import models.user.{SlickUserManager, User}
+import models.user.{Users, User}
 import org.junit.runner._
 import org.specs2.runner._
 import play.api.test._

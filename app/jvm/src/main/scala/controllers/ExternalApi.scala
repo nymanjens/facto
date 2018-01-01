@@ -8,7 +8,7 @@ import models.accounting._
 import models.accounting.config.{Account, Config, Template}
 import models.modification.EntityModification
 import models.money.ExchangeRateMeasurement
-import models.user.{SlickUserManager, User}
+import models.user.{Users, User}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 
@@ -32,7 +32,7 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
     implicit request =>
       validateApplicationSecret(applicationSecret)
 
-      implicit val issuer = SlickUserManager.getOrCreateRobotUser()
+      implicit val issuer = Users.getOrCreateRobotUser()
       val template = accountingConfig.templateWithCode(templateCode)
 
       val groupAddition = EntityModification.createAddWithRandomId(TransactionGroup(createdDate = clock.now))
@@ -52,7 +52,7 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
                                  applicationSecret: String) = Action { implicit request =>
     validateApplicationSecret(applicationSecret)
 
-    implicit val user = SlickUserManager.getOrCreateRobotUser()
+    implicit val user = Users.getOrCreateRobotUser()
     val date = TimeUtils.parseDateString(dateString)
     require(Currency.of(foreignCurrencyCode).isForeign)
 

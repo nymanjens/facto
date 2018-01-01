@@ -5,7 +5,7 @@ import common.testing.TestObjects._
 import common.testing._
 import common.time.Clock
 import models.SlickEntityAccess
-import models.user.SlickUserManager
+import models.user.Users
 import org.junit.runner._
 import org.specs2.runner._
 import play.api.test._

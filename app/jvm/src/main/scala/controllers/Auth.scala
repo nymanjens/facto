@@ -3,7 +3,7 @@ package controllers
 import com.google.inject.Inject
 import controllers.Auth.Forms
 import models._
-import models.user.SlickUserManager
+import models.user.Users
 import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
@@ -47,7 +47,7 @@ object Auth {
         "password" -> text
       ) verifying ("facto.error.invalid-username-or-password", result =>
         result match {
-          case (loginName, password) => SlickUserManager.authenticate(loginName, password)
+          case (loginName, password) => Users.authenticate(loginName, password)
       })
     )
   }

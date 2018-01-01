@@ -9,12 +9,12 @@ import models.{EntityAccess, SlickEntityAccess}
 
 import scala.util.Random
 
-object SlickUserManager {
+object Users {
 
   def createUser(loginName: String, password: String, name: String): User =
     User(
       loginName = loginName,
-      passwordHash = SlickUserManager.hash(password),
+      passwordHash = hash(password),
       name = name,
       databaseEncryptionKey = Random.alphanumeric.take(100).mkString(""),
       expandCashFlowTablesByDefault = true
@@ -32,7 +32,7 @@ object SlickUserManager {
       case Some(user) => user
       case None =>
         val userAddition = EntityModification.createAddWithRandomId(
-          SlickUserManager.createUser(
+          createUser(
             loginName = loginName,
             password = hash(clock.now.toString),
             name = "Robot"

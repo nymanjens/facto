@@ -15,7 +15,7 @@ import models.{Entity, SlickEntityAccess}
 import akka.stream.scaladsl._
 import models.access.DbQuery
 import models.modification.EntityModification
-import models.user.{SlickUserManager, User}
+import models.user.{Users, User}
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
@@ -49,7 +49,7 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
         case ChangePasswordData(loginName, _, password, _) =>
           require(loginName == user.loginName)
           entityAccess.persistEntityModifications(
-            EntityModification.createUpdate(SlickUserManager.copyUserWithPassword(user, password)))
+            EntityModification.createUpdate(Users.copyUserWithPassword(user, password)))
           val message = Messages("facto.successfully-updated-password")
           Redirect(routes.Application.profile()).flashing("message" -> message)
       }
@@ -67,7 +67,7 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
           views.html.administration(users = entityAccess.newQuerySync[User]().data(), formWithErrors)), {
         case AddUserData(loginName, name, password, _) =>
           entityAccess.persistEntityModifications(
-            EntityModification.createAddWithRandomId(SlickUserManager.createUser(loginName, password, name)))
+            EntityModification.createAddWithRandomId(Users.createUser(loginName, password, name)))
           val message = Messages("facto.successfully-added-user", name)
           Redirect(routes.Application.administration()).flashing("message" -> message)
       }
@@ -142,7 +142,7 @@ object Application {
       )(ChangePasswordData.apply)(ChangePasswordData.unapply) verifying ("facto.error.old-password-is-incorrect", result =>
         result match {
           case ChangePasswordData(loginName, oldPassword, _, _) =>
-            SlickUserManager.authenticate(loginName, oldPassword)
+            Users.authenticate(loginName, oldPassword)
       }) verifying ("facto.error.passwords-should-match", result =>
         result match {
           case ChangePasswordData(_, _, password, passwordVerification) => password == passwordVerification

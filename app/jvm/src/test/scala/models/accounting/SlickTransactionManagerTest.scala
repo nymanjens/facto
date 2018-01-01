@@ -4,7 +4,7 @@ import com.google.inject._
 import common.testing._
 import common.time.Clock
 import models._
-import models.user.SlickUserManager
+import models.user.Users
 import org.junit.runner._
 import org.specs2.runner._
 import play.api.test._
@@ -27,9 +27,9 @@ class SlickTransactionManagerTest extends HookedSpecification {
 
     // prepare users
     val user1 =
-      TestUtils.persist(SlickUserManager.createUser(loginName = "tester", password = "x", name = "Tester"))
+      TestUtils.persist(Users.createUser(loginName = "tester", password = "x", name = "Tester"))
     val user2 =
-      TestUtils.persist(SlickUserManager.createUser(loginName = "tester2", password = "x", name = "Tester2"))
+      TestUtils.persist(Users.createUser(loginName = "tester2", password = "x", name = "Tester2"))
 
     // get and persist dummy transaction groups
     val transGrp1 = TestUtils.persist(TransactionGroup(createdDate = clock.now))

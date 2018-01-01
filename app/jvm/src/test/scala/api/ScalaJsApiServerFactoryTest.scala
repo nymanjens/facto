@@ -14,7 +14,7 @@ import models.modification.{
   EntityType,
   SlickEntityModificationEntityManager
 }
-import models.user.SlickUserManager
+import models.user.Users
 import org.junit.runner._
 import org.specs2.runner._
 import play.api.test._

@@ -8,7 +8,7 @@ import org.specs2.runner._
 import play.api.test._
 
 @RunWith(classOf[JUnitRunner])
-class SlickUserManagerTest extends HookedSpecification {
+class UsersTest extends HookedSpecification {
 
   @Inject private val userManager: SlickUserManager = null
 
@@ -18,7 +18,7 @@ class SlickUserManagerTest extends HookedSpecification {
 
   "test the User model" in new WithApplication {
 
-    val user1 = SlickUserManager
+    val user1 = Users
       .createUser(loginName = "alice", password = "j", name = "Alice")
       .copy(idOption = Some(EntityModification.generateRandomId()))
     userManager.addIfNew(user1)

@@ -12,7 +12,7 @@ import models.SlickUtils.dbRun
 import models._
 import models.modification.EntityModification
 import models.money.ExchangeRateMeasurement
-import models.user.{SlickUserManager, User}
+import models.user.{Users, User}
 import play.api.{Application, Mode}
 
 import scala.collection.JavaConverters._
@@ -55,7 +55,7 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
     }
 
     if (CommandLineFlags.createAdminUser) {
-      implicit val user = SlickUserManager.getOrCreateRobotUser()
+      implicit val user = Users.getOrCreateRobotUser()
 
       val loginName = "admin"
       val password = AppConfigHelper.defaultPassword getOrElse "changeme"
@@ -65,8 +65,7 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
       println(s"    loginName: $loginName")
       println(s"    password: $password")
       entityAccess.persistEntityModifications(
-        EntityModification.createAddWithRandomId(
-          SlickUserManager.createUser(loginName, password, name = "Admin")))
+        EntityModification.createAddWithRandomId(Users.createUser(loginName, password, name = "Admin")))
       println("  Done. Exiting.")
 
       System.exit(0)
@@ -82,20 +81,20 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
   }
 
   private def loadDummyUsers(): Unit = {
-    implicit val user = SlickUserManager.getOrCreateRobotUser()
+    implicit val user = Users.getOrCreateRobotUser()
 
     entityAccess.persistEntityModifications(
       EntityModification.createAddWithRandomId(
-        SlickUserManager.createUser(loginName = "admin", password = "a", name = "Admin")),
+        Users.createUser(loginName = "admin", password = "a", name = "Admin")),
       EntityModification.createAddWithRandomId(
-        SlickUserManager.createUser(loginName = "alice", password = "a", name = "Alice")),
+        Users.createUser(loginName = "alice", password = "a", name = "Alice")),
       EntityModification.createAddWithRandomId(
-        SlickUserManager.createUser(loginName = "bob", password = "b", name = "Bob"))
+        Users.createUser(loginName = "bob", password = "b", name = "Bob"))
     )
   }
 
   private def loadCsvDummyData(csvDataFolder: Path): Unit = {
-    implicit val user = SlickUserManager.getOrCreateRobotUser()
+    implicit val user = Users.getOrCreateRobotUser()
 
     csvImportTool.importTransactions(assertExists(csvDataFolder resolve "transactions.csv"))
     csvImportTool.importBalanceChecks(assertExists(csvDataFolder resolve "balancechecks.csv"))
