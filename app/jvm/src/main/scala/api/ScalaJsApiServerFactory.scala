@@ -15,22 +15,20 @@ import models.SlickUtils.dbApi._
 import models.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}
 import models.access.DbQuery
 import models.accounting.config.Config
-import models.modification.{EntityModification, EntityType, SlickEntityModificationEntityManager}
+import models.modification.{EntityModification, EntityModificationEntity, EntityType}
 import models.money.ExchangeRateMeasurement
 import models.user.User
-import models.{Entity, SlickEntityAccess}
+import models.{Entity, EntityTableDef, SlickEntityAccess}
 
 import scala.collection.immutable.{Seq, TreeMap}
 import scala.collection.mutable
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-final class ScalaJsApiServerFactory @Inject()(
-    implicit accountingConfig: Config,
-    clock: Clock,
-    entityAccess: SlickEntityAccess,
-    i18n: PlayI18n,
-    entityModificationManager: SlickEntityModificationEntityManager) {
+final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
+                                              clock: Clock,
+                                              entityAccess: SlickEntityAccess,
+                                              i18n: PlayI18n) {
 
   def create()(implicit user: User): ScalaJsApi = new ScalaJsApi() {
 
@@ -75,7 +73,8 @@ final class ScalaJsApiServerFactory @Inject()(
 
       val modifications = {
         val modificationEntities = dbRun(
-          entityModificationManager.newQuery
+          entityAccess
+            .newSlickQuery[EntityModificationEntity]()
             .filter(_.date >= updateToken)
             .sortBy(_.date))
         modificationEntities.toStream.map(_.modification).toVector

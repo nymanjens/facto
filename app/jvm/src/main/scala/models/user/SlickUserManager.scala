@@ -3,25 +3,13 @@ package models.user
 import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
 import common.time.Clock
-import models.SlickUtils.dbApi._
 import models.access.ModelField
-import models.manager.{ForwardingEntityManager, SlickEntityManager}
 import models.modification.EntityModification
-import models.user.SlickUserManager.{Users, tableName}
-import models.{EntityAccess, EntityTable, SlickEntityAccess}
+import models.{EntityAccess, SlickEntityAccess}
 
 import scala.util.Random
 
-final class SlickUserManager
-    extends ForwardingEntityManager[User, Users](
-      SlickEntityManager.create[User, Users](
-        tag => new Users(tag),
-        tableName = tableName
-      ))
-    with User.Manager
-
 object SlickUserManager {
-  private val tableName: String = "USERS"
 
   def createUser(loginName: String, password: String, name: String): User =
     User(
@@ -63,20 +51,4 @@ object SlickUserManager {
   }
 
   private def hash(password: String) = Hashing.sha512().hashString(password, Charsets.UTF_8).toString
-
-  final class Users(tag: Tag) extends EntityTable[User](tag, tableName) {
-    def loginName = column[String]("loginName")
-
-    def passwordHash = column[String]("passwordHash")
-
-    def name = column[String]("name")
-
-    def databaseEncryptionKey = column[String]("databaseEncryptionKey")
-
-    def expandCashFlowTablesByDefault = column[Boolean]("expandCashFlowTablesByDefault")
-
-    override def * =
-      (loginName, passwordHash, name, databaseEncryptionKey, expandCashFlowTablesByDefault, id.?) <>
-        (User.tupled, User.unapply)
-  }
 }

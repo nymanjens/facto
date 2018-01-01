@@ -39,6 +39,10 @@ final class SlickEntityAccess @Inject()(clock: Clock) extends EntityAccess {
     DbQueryExecutor.fromEntities(typeToAllEntities(entityType).asInstanceOf[Seq[E]])
   }
 
+  def newSlickQuery[E <: Entity]()(
+      implicit entityTableDef: EntityTableDef[E]): TableQuery[entityTableDef.Table] =
+    SlickEntityManager.forType.newQuery.asInstanceOf[TableQuery[entityTableDef.Table]]
+
   private def updateTypeToAllEntities(modification: EntityModification): Unit = {
     val entityType = modification.entityType
     typeToAllEntities.put(entityType, getManager(entityType).fetchAll().asInstanceOf[Seq[Entity]])

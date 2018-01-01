@@ -15,12 +15,13 @@ import models.user.User
 
 import scala.collection.immutable.Seq
 
-sealed private[models] trait EntityTableDef[E <: Entity] {
+sealed trait EntityTableDef[E <: Entity] {
+  type Table <: EntityTableDef.EntityTable[E]
   def tableName: String
-  def table(tag: SlickTag): EntityTableDef.EntityTable[E]
+  def table(tag: SlickTag): Table
 }
 
-private[models] object EntityTableDef {
+object EntityTableDef {
 
   val all: Seq[EntityTableDef[_]] =
     Seq(
@@ -46,8 +47,9 @@ private[models] object EntityTableDef {
   implicit object UserDef extends EntityTableDef[User] {
 
     override val tableName: String = "USERS"
-    override def table(tag: SlickTag): EntityTable[User] = new Table(tag)
+    override def table(tag: SlickTag): Table = new Table(tag)
 
+    /* override */
     final class Table(tag: SlickTag) extends EntityTable[User](tag, tableName) {
       def loginName = column[String]("loginName")
 
@@ -68,12 +70,13 @@ private[models] object EntityTableDef {
   implicit object TransactionDef extends EntityTableDef[Transaction] {
 
     override val tableName: String = "TRANSACTIONS"
-    override def table(tag: SlickTag): EntityTable[Transaction] = new Table(tag)
+    override def table(tag: SlickTag): Table = new Table(tag)
 
     private implicit val tagsSeqToStringMapper: ColumnType[Seq[String]] = {
       MappedColumnType.base[Seq[String], String](Tags.serializeToString, Tags.parseTagsString)
     }
 
+    /* override */
     final class Table(tag: SlickTag) extends EntityTable[Transaction](tag, tableName) {
       def transactionGroupId = column[Long]("transactionGroupId")
       def issuerId = column[Long]("issuerId")
@@ -109,8 +112,9 @@ private[models] object EntityTableDef {
   implicit object TransactionGroupDef extends EntityTableDef[TransactionGroup] {
 
     override val tableName = "TRANSACTION_GROUPS"
-    override def table(tag: SlickTag): EntityTable[TransactionGroup] = new Table(tag)
+    override def table(tag: SlickTag): Table = new Table(tag)
 
+    /* override */
     final class Table(tag: SlickTag) extends EntityTable[TransactionGroup](tag, tableName) {
       def createdDate = column[LocalDateTime]("createdDate")
 
@@ -121,8 +125,9 @@ private[models] object EntityTableDef {
   implicit object BalanceCheckDef extends EntityTableDef[BalanceCheck] {
 
     override val tableName: String = "BALANCE_CHECKS"
-    override def table(tag: SlickTag): EntityTable[BalanceCheck] = new Table(tag)
+    override def table(tag: SlickTag): Table = new Table(tag)
 
+    /* override */
     final class Table(tag: SlickTag) extends EntityTable[BalanceCheck](tag, tableName) {
       def issuerId = column[Long]("issuerId")
       def moneyReservoirCode = column[String]("moneyReservoirCode")
@@ -138,8 +143,9 @@ private[models] object EntityTableDef {
   implicit object ExchangeRateMeasurementDef extends EntityTableDef[ExchangeRateMeasurement] {
 
     override val tableName: String = "EXCHANGE_RATE_MEASUREMENT"
-    override def table(tag: SlickTag): EntityTable[ExchangeRateMeasurement] = new Table(tag)
+    override def table(tag: SlickTag): Table = new Table(tag)
 
+    /* override */
     final class Table(tag: SlickTag) extends EntityTable[ExchangeRateMeasurement](tag, tableName) {
       def date = column[LocalDateTime]("date")
       def foreignCurrencyCode = column[String]("foreignCurrencyCode")
@@ -153,8 +159,9 @@ private[models] object EntityTableDef {
   implicit object EntityModificationEntityDef extends EntityTableDef[EntityModificationEntity] {
 
     override val tableName: String = "ENTITY_MODIFICATION_ENTITY"
-    override def table(tag: SlickTag): EntityTable[EntityModificationEntity] = new Table(tag)
+    override def table(tag: SlickTag): Table = new Table(tag)
 
+    /* override */
     final class Table(tag: SlickTag) extends EntityTable[EntityModificationEntity](tag, tableName) {
       def userId = column[Long]("userId")
       def change = column[EntityModification]("modification")

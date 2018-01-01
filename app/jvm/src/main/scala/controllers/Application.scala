@@ -25,7 +25,6 @@ import scala.collection.immutable.Seq
 
 final class Application @Inject()(implicit override val messagesApi: MessagesApi,
                                   components: ControllerComponents,
-                                  userManager: SlickUserManager,
                                   entityAccess: SlickEntityAccess,
                                   scalaJsApiServerFactory: ScalaJsApiServerFactory,
                                   playConfiguration: play.api.Configuration,

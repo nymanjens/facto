@@ -7,7 +7,7 @@ import play.api.Logger
 import scala.async.Async.{async, await}
 import scala.concurrent.ExecutionContext.Implicits.global
 
-private[models] final class SlickEntityManager[E <: Entity](implicit tableDef: EntityTableDef[E]) {
+private[models] final class SlickEntityManager[E <: Entity](implicit val tableDef: EntityTableDef[E]) {
 
   // ********** Management methods ********** //
   def createTable(): Unit = {
@@ -39,7 +39,7 @@ private[models] final class SlickEntityManager[E <: Entity](implicit tableDef: E
   // ********** Getters ********** //
   def fetchAll(): Seq[E] = dbRun(newQuery).toVector
 
-  def newQuery: TableQuery[EntityTableDef.EntityTable[E]] = new TableQuery(tableDef.table)
+  def newQuery: TableQuery[tableDef.Table] = new TableQuery(tableDef.table)
 
   private def mustAffectOneSingleRow(query: => Int): Unit = {
     val affectedRows = query
