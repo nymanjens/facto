@@ -22,6 +22,16 @@ sealed private[models] trait EntityTableDef[E <: Entity] {
 
 private[models] object EntityTableDef {
 
+  val all: Seq[EntityTableDef[_]] =
+    Seq(
+      UserDef,
+      TransactionDef,
+      TransactionGroupDef,
+      BalanceCheckDef,
+      ExchangeRateMeasurementDef,
+      EntityModificationEntityDef
+    )
+
   /** Table extension to be used with an Entity model. */
   // Based on active-slick (https://github.com/strongtyped/active-slick)
   sealed abstract class EntityTable[E <: Entity](

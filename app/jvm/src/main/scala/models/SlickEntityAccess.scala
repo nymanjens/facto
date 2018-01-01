@@ -1,12 +1,11 @@
 package models
 
-import models.SlickUtils.dbApi._
-import models.SlickUtils.dbRun
 import com.google.inject._
 import common.time.Clock
+import models.SlickUtils.dbApi._
+import models.SlickUtils.dbRun
 import models.access.{DbQueryExecutor, DbResultSet}
 import models.accounting._
-import models.manager.SlickEntityManager
 import models.modification.EntityType.{
   BalanceCheckType,
   ExchangeRateMeasurementType,
@@ -14,53 +13,19 @@ import models.modification.EntityType.{
   TransactionType,
   UserType
 }
-import models.modification.{
-  EntityModification,
-  EntityModificationEntity,
-  EntityType,
-  SlickEntityModificationEntityManager
-}
-import models.money.SlickExchangeRateMeasurementManager
-import models.user.{SlickUserManager, User}
+import models.modification.{EntityModification, EntityModificationEntity, EntityType}
+import models.money.ExchangeRateMeasurement
+import models.user.User
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 
-final class SlickEntityAccess @Inject()(
-    implicit userManager: SlickUserManager,
-    balanceCheckManager: SlickBalanceCheckManager,
-    transactionManager: SlickTransactionManager,
-    transactionGroupManager: SlickTransactionGroupManager,
-    exchangeRateMeasurementManager: SlickExchangeRateMeasurementManager,
-    entityModificationEntityManager: SlickEntityModificationEntityManager,
-    clock: Clock)
-    extends EntityAccess {
-
-  private val allEntityManagers: Seq[SlickEntityManager[_, _]] =
-    Seq(
-      userManager,
-      transactionManager,
-      transactionGroupManager,
-      balanceCheckManager,
-      exchangeRateMeasurementManager,
-      entityModificationEntityManager
-    )
-
-  private def getManager(entityType: EntityType.any): SlickEntityManager[entityType.get, _] = {
-    val manager = entityType match {
-      case UserType => userManager
-      case TransactionType => transactionManager
-      case TransactionGroupType => transactionGroupManager
-      case BalanceCheckType => balanceCheckManager
-      case ExchangeRateMeasurementType => exchangeRateMeasurementManager
-    }
-    manager.asInstanceOf[SlickEntityManager[entityType.get, _]]
-  }
+final class SlickEntityAccess @Inject()(clock: Clock) extends EntityAccess {
 
   // **************** Getters ****************//
   private val typeToAllEntities: mutable.Map[EntityType.any, Seq[Entity]] = mutable.Map({
     for (entityType <- EntityType.values) yield {
-      entityType -> getManager(entityType).fetchAllSync()
+      entityType -> getManager(entityType).fetchAll().asInstanceOf[Seq[Entity]]
     }
   }: _*)
 
@@ -76,7 +41,7 @@ final class SlickEntityAccess @Inject()(
 
   private def updateTypeToAllEntities(modification: EntityModification): Unit = {
     val entityType = modification.entityType
-    typeToAllEntities.put(entityType, getManager(entityType).fetchAllSync())
+    typeToAllEntities.put(entityType, getManager(entityType).fetchAll().asInstanceOf[Seq[Entity]])
   }
 
   // **************** Setters ****************//
@@ -98,13 +63,15 @@ final class SlickEntityAccess @Inject()(
       }
 
       // Add modification
-      entityModificationEntityManager.addIfNew(
-        EntityModificationEntity(
-          idOption = Some(EntityModification.generateRandomId()),
-          userId = user.id,
-          modification = modification,
-          date = clock.now
-        ))
+      SlickEntityManager
+        .forType[EntityModificationEntity]
+        .addIfNew(
+          EntityModificationEntity(
+            idOption = Some(EntityModification.generateRandomId()),
+            userId = user.id,
+            modification = modification,
+            date = clock.now
+          ))
 
       updateTypeToAllEntities(modification)
     }
@@ -112,9 +79,28 @@ final class SlickEntityAccess @Inject()(
 
   // ********** Management methods ********** //
   def dropAndCreateTables(): Unit = {
-    for (entityManager <- allEntityManagers) {
-      dbRun(sqlu"""DROP TABLE IF EXISTS #${entityManager.tableName}""")
-      entityManager.createTable()
+    for (tableDef <- EntityTableDef.all) {
+      def internal[E <: Entity](tableDef: EntityTableDef[E]) = {
+        val entityManager = SlickEntityManager.forType[E](tableDef)
+        dbRun(sqlu"""DROP TABLE IF EXISTS #${tableDef.tableName}""")
+        entityManager.createTable()
+      }
+      internal(tableDef.asInstanceOf[EntityTableDef[Entity]])
     }
+  }
+
+  // ********** Private helper methods ********** //
+  private def getManager(entityType: EntityType.any): SlickEntityManager[entityType.get] =
+    SlickEntityManager.forType(getEntityTableDef(entityType))
+
+  private def getEntityTableDef(entityType: EntityType.any): EntityTableDef[entityType.get] = {
+    val tableDef = entityType match {
+      case UserType => implicitly[EntityTableDef[User]]
+      case TransactionType => implicitly[EntityTableDef[Transaction]]
+      case TransactionGroupType => implicitly[EntityTableDef[TransactionGroup]]
+      case BalanceCheckType => implicitly[EntityTableDef[BalanceCheck]]
+      case ExchangeRateMeasurementType => implicitly[EntityTableDef[ExchangeRateMeasurement]]
+    }
+    tableDef.asInstanceOf[EntityTableDef[entityType.get]]
   }
 }
