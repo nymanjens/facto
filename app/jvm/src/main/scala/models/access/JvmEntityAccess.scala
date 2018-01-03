@@ -23,31 +23,20 @@ import scala.collection.mutable
 
 final class JvmEntityAccess @Inject()(clock: Clock) extends EntityAccess {
 
-  // **************** Getters ****************//
-  private val typeToAllEntities: mutable.Map[EntityType.any, Seq[Entity]] = mutable.Map({
-    for (entityType <- EntityType.values) yield {
-      entityType -> getManager(entityType).fetchAll().asInstanceOf[Seq[Entity]]
-    }
-  }: _*)
+  private val inMemoryEntityDatabase: InMemoryEntityDatabase = new InMemoryEntityDatabase(
+    fetchEntitiesForType = entityType => getManager(entityType).fetchAll().asInstanceOf[Seq[Entity]])
 
+  // **************** Getters ****************//
   override def newQuery[E <: Entity: EntityType]() = DbResultSet.fromExecutor(queryExecutor[E].asAsync)
   override def newQuerySyncForUser() = newQuerySync[User]()
   def newQuerySync[E <: Entity: EntityType](): DbResultSet.Sync[E] =
     DbResultSet.fromExecutor(queryExecutor)
 
-  def queryExecutor[E <: Entity: EntityType]: DbQueryExecutor.Sync[E] = {
-    val entityType = implicitly[EntityType[E]]
-    DbQueryExecutor.fromEntities(typeToAllEntities(entityType).asInstanceOf[Seq[E]])
-  }
+  def queryExecutor[E <: Entity: EntityType]: DbQueryExecutor.Sync[E] = inMemoryEntityDatabase.queryExecutor
 
   def newSlickQuery[E <: Entity]()(
       implicit entityTableDef: SlickEntityTableDef[E]): TableQuery[entityTableDef.Table] =
     SlickEntityManager.forType.newQuery.asInstanceOf[TableQuery[entityTableDef.Table]]
-
-  private def updateTypeToAllEntities(modification: EntityModification): Unit = {
-    val entityType = modification.entityType
-    typeToAllEntities.put(entityType, getManager(entityType).fetchAll().asInstanceOf[Seq[Entity]])
-  }
 
   // **************** Setters ****************//
   def persistEntityModifications(modifications: EntityModification*)(implicit user: User): Unit = {
@@ -78,7 +67,7 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends EntityAccess {
             date = clock.now
           ))
 
-      updateTypeToAllEntities(modification)
+      inMemoryEntityDatabase.update(modification)
     }
   }
 
