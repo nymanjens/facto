@@ -35,11 +35,7 @@ final class SummaryForYearStoreFactory(implicit database: JsEntityAccess,
           database
             .newQuery[Transaction]()
             .filter(combinedFilter)
-            .sort(
-              DbQuery.Sorting
-                .ascBy(ModelField.Transaction.consumedDate)
-                .thenAscBy(ModelField.Transaction.createdDate)
-                .thenAscBy(ModelField.id))
+            .sort(DbQuery.Sorting.Transaction.deterministicallyByConsumedDate)
             .data())
 
       SummaryForYear(transactions)

@@ -40,11 +40,7 @@ final class CashFlowEntriesStoreFactory(implicit database: JsEntityAccess,
               database
                 .newQuery[Transaction]()
                 .filter(ModelField.Transaction.moneyReservoirCode isEqualTo moneyReservoir.code)
-                .sort(
-                  DbQuery.Sorting
-                    .descBy(ModelField.Transaction.transactionDate)
-                    .thenDescBy(ModelField.Transaction.createdDate)
-                    .thenDescBy(ModelField.id))
+                .sort(DbQuery.Sorting.Transaction.deterministicallyByTransactionDate.reversed)
                 .limit(numTransactionsToFetch)
                 .data()).last.transactionDate
 
@@ -54,10 +50,7 @@ final class CashFlowEntriesStoreFactory(implicit database: JsEntityAccess,
               .newQuery[BalanceCheck]()
               .filter(ModelField.BalanceCheck.moneyReservoirCode isEqualTo moneyReservoir.code)
               .filter(ModelField.BalanceCheck.checkDate < oldestTransDate)
-              .sort(DbQuery.Sorting
-                .descBy(ModelField.BalanceCheck.checkDate)
-                .thenDescBy(ModelField.BalanceCheck.createdDate)
-                .thenDescBy(ModelField.id))
+              .sort(DbQuery.Sorting.BalanceCheck.deterministicallyByCheckDate.reversed)
               .limit(1)
               .data()).headOption
         }

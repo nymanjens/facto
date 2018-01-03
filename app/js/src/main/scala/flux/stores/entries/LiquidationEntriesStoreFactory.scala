@@ -79,10 +79,7 @@ final class LiquidationEntriesStoreFactory(implicit database: JsEntityAccess,
                     .map(_.code)
                     .toVector))
           )
-          .sort(DbQuery.Sorting
-            .ascBy(ModelField.Transaction.transactionDate)
-            .thenAscBy(ModelField.Transaction.createdDate)
-            .thenAscBy(ModelField.id))
+          .sort(DbQuery.Sorting.Transaction.deterministicallyByTransactionDate)
           .data())
 
       val isRelevantSeq = await(Future.sequence(transactions.map(isRelevantForAccounts(_, accountPair))))

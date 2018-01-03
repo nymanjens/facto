@@ -18,6 +18,18 @@ case class DbQuery[E <: Entity](filter: Filter[E], sorting: Option[Sorting[E]], 
 
 object DbQuery {
 
+  sealed trait PicklableOrdering[T] {
+    def toOrdering: Ordering[T]
+  }
+  object PicklableOrdering {
+    implicit case object LongOrdering extends PicklableOrdering[Long] {
+      override def toOrdering: Ordering[Long] = implicitly[Ordering[Long]]
+    }
+    implicit case object LocalDateTimeOrdering extends PicklableOrdering[LocalDateTime] {
+      override def toOrdering: Ordering[LocalDateTime] = implicitly[Ordering[LocalDateTime]]
+    }
+  }
+
   sealed trait Filter[E] {
     def apply(entity: E): Boolean
 
@@ -111,6 +123,14 @@ object DbQuery {
           }
       }.headOption getOrElse 0
     }
+
+    def reversed: Sorting[E] =
+      Sorting(fieldsWithDirection.map(field => {
+        def internal[V](field: FieldWithDirection[V, E]): FieldWithDirection[V, E] = {
+          field.copy(isDesc = !field.isDesc)(field.picklableValueOrdering)
+        }
+        internal(field)
+      }))
   }
   object Sorting {
     def ascBy[V: PicklableOrdering, E](field: ModelField[V, E]): Sorting[E] = by(field, isDesc = false)
@@ -141,18 +161,6 @@ object DbQuery {
         .ascBy(ModelField.BalanceCheck.checkDate)
         .thenAscBy(ModelField.BalanceCheck.createdDate)
         .thenAscBy(ModelField.id)
-    }
-  }
-
-  sealed trait PicklableOrdering[T] {
-    def toOrdering: Ordering[T]
-  }
-  object PicklableOrdering {
-    implicit case object LongOrdering extends PicklableOrdering[Long] {
-      override def toOrdering: Ordering[Long] = implicitly[Ordering[Long]]
-    }
-    implicit case object LocalDateTimeOrdering extends PicklableOrdering[LocalDateTime] {
-      override def toOrdering: Ordering[LocalDateTime] = implicitly[Ordering[LocalDateTime]]
     }
   }
 }

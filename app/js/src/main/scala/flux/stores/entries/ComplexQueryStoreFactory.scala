@@ -21,7 +21,7 @@ final class ComplexQueryStoreFactory(implicit database: JsEntityAccess,
           database
             .newQuery[Transaction]()
             .filter(filterFromQuery)
-            .sort(DbQuery.Sorting.descBy(ModelField.Transaction.createdDate).thenDescBy(ModelField.id))
+            .sort(DbQuery.Sorting.Transaction.deterministicallyByCreateDate.reversed)
             .limit(3 * maxNumEntries)
             .data()).reverse
 

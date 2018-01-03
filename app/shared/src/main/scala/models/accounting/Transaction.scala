@@ -61,7 +61,7 @@ object Transaction {
     entityAccess
       .newQuery[Transaction]()
       .filter(ModelField.Transaction.transactionGroupId isEqualTo groupId)
-      .sort(DbQuery.Sorting.ascBy(ModelField.id))
+      .sort(DbQuery.Sorting.Transaction.deterministicallyByCreateDate)
       .data()
   }
 

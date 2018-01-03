@@ -61,10 +61,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: JsEntityAcce
             .newQuery[BalanceCheck]()
             .filter(ModelField.BalanceCheck.moneyReservoirCode isEqualTo reservoir.code)
             .filter(ModelField.BalanceCheck.checkDate < monthsInYear.head.startTime)
-            .sort(DbQuery.Sorting
-              .descBy(ModelField.BalanceCheck.checkDate)
-              .thenDescBy(ModelField.BalanceCheck.createdDate)
-              .thenDescBy(ModelField.id))
+            .sort(DbQuery.Sorting.BalanceCheck.deterministicallyByCheckDate.reversed)
             .limit(1)
             .data()).headOption
       val oldestBalanceDate = oldestRelevantBalanceCheck.map(_.checkDate).getOrElse(LocalDateTime.MIN)
