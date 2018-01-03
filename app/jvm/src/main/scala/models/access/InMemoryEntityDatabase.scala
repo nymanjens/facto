@@ -48,6 +48,7 @@ private[access] object InMemoryEntityDatabase {
 
   private final class EntityCollection[E <: Entity: EntityType](fetchEntities: () => Seq[E])
       extends DbQueryExecutor.Sync[E] {
+
     private val idToEntityMap: ConcurrentMap[Long, E] = {
       val map = new ConcurrentHashMap[Long, E]
       for (entity <- fetchEntities()) {
@@ -56,9 +57,6 @@ private[access] object InMemoryEntityDatabase {
       map
     }
 
-    override def data(dbQuery: DbQuery[E]): Seq[E] = valuesAsStream(dbQuery).toVector
-    override def count(dbQuery: DbQuery[E]): Int = valuesAsStream(dbQuery).size
-
     def update(modification: EntityModification): Unit = {
       modification match {
         case EntityModification.Add(entity) => idToEntityMap.putIfAbsent(entity.id, entity.asInstanceOf[E])
@@ -66,6 +64,10 @@ private[access] object InMemoryEntityDatabase {
         case EntityModification.Remove(entityId) => idToEntityMap.remove(entityId)
       }
     }
+
+    // **************** DbQueryExecutor.Sync **************** //
+    override def data(dbQuery: DbQuery[E]): Seq[E] = valuesAsStream(dbQuery).toVector
+    override def count(dbQuery: DbQuery[E]): Int = valuesAsStream(dbQuery).size
 
     private def valuesAsStream(dbQuery: DbQuery[E]): Stream[E] = {
       var stream = idToEntityMap.values().iterator().asScala.toStream
