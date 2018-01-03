@@ -1,4 +1,4 @@
-package models
+package models.slick
 
 import java.time.{ZoneId, LocalDateTime => JavaLocalDateTime}
 
@@ -6,7 +6,7 @@ import common.time.{LocalDateTime, LocalDateTimes}
 import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.language.higherKinds
 

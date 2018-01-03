@@ -11,8 +11,8 @@ import com.google.inject._
 import common.PlayI18n
 import common.money.Currency
 import common.time.{Clock, LocalDateTime}
-import models.SlickUtils.dbApi._
-import models.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}
+import models.slick.SlickUtils.dbApi._
+import models.slick.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}
 import models.access.{DbQuery, JvmEntityAccess}
 import models.accounting.config.Config
 import models.modification.{EntityModification, EntityModificationEntity, EntityType}

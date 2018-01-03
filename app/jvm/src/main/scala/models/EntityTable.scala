@@ -1,6 +1,6 @@
 package models
 
-import models.SlickUtils.dbApi._
+import models.slick.SlickUtils.dbApi._
 
 // Based on active-slick (https://github.com/strongtyped/active-slick)
 

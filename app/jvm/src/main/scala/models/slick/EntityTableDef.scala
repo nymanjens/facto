@@ -1,4 +1,4 @@
-package models
+package models.slick
 
 import java.nio.ByteBuffer
 
@@ -6,11 +6,12 @@ import api.Picklers._
 import boopickle.Default.{Pickle, Unpickle}
 import common.accounting.Tags
 import common.time.LocalDateTime
-import models.SlickUtils.dbApi.{Table => SlickTable, Tag => SlickTag, _}
-import models.SlickUtils.localDateTimeToSqlDateMapper
+import models.Entity
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 import models.modification.{EntityModification, EntityModificationEntity}
 import models.money.ExchangeRateMeasurement
+import models.slick.SlickUtils.dbApi.{Table => SlickTable, Tag => SlickTag, _}
+import models.slick.SlickUtils.localDateTimeToSqlDateMapper
 import models.user.User
 
 import scala.collection.immutable.Seq

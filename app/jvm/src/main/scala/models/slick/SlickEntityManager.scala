@@ -1,13 +1,12 @@
-package models
+package models.slick
 
-import models.SlickUtils.dbApi.{Table => SlickTable, Tag => SlickTag, _}
-import models.SlickUtils.{database, dbRun}
+import models.Entity
+import models.slick.SlickUtils.dbApi.{Table => SlickTable, Tag => SlickTag, _}
+import models.slick.SlickUtils.dbRun
 import play.api.Logger
 
-import scala.async.Async.{async, await}
-import scala.concurrent.ExecutionContext.Implicits.global
-
-private[models] final class SlickEntityManager[E <: Entity](implicit val tableDef: EntityTableDef[E]) {
+private[models] final class SlickEntityManager[E <: Entity] private (
+    implicit val tableDef: EntityTableDef[E]) {
 
   // ********** Management methods ********** //
   def createTable(): Unit = {
