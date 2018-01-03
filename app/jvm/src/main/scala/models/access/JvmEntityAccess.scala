@@ -24,7 +24,10 @@ import scala.collection.mutable
 final class JvmEntityAccess @Inject()(clock: Clock) extends EntityAccess {
 
   private val inMemoryEntityDatabase: InMemoryEntityDatabase = new InMemoryEntityDatabase(
-    fetchEntitiesForType = entityType => getManager(entityType).fetchAll().asInstanceOf[Seq[Entity]])
+    entitiesFetcher = new InMemoryEntityDatabase.EntitiesFetcher {
+      override def fetch[E <: Entity](entityType: EntityType[E]): Seq[E] =
+        getManager(entityType).fetchAll().asInstanceOf[Seq[E]]
+    })
 
   // **************** Getters ****************//
   override def newQuery[E <: Entity: EntityType]() = DbResultSet.fromExecutor(queryExecutor[E].asAsync)

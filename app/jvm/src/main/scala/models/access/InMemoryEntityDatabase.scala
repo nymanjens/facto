@@ -1,8 +1,12 @@
 package models.access
 
+import scala.collection.JavaConverters._
+import java.util.concurrent.{ConcurrentHashMap, ConcurrentMap}
+
 import com.google.inject._
 import common.time.Clock
 import models.Entity
+import models.access.InMemoryEntityDatabase.EntitiesFetcher
 import models.accounting._
 import models.modification.EntityType.{
   BalanceCheckType,
@@ -21,21 +25,68 @@ import models.user.User
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 
-private[access] final class InMemoryEntityDatabase(fetchEntitiesForType: EntityType.any => Seq[Entity]) {
+private[access] final class InMemoryEntityDatabase(entitiesFetcher: EntitiesFetcher) {
 
-  private val typeToAllEntities: mutable.Map[EntityType.any, Seq[Entity]] = mutable.Map({
-    for (entityType <- EntityType.values) yield {
-      entityType -> fetchEntitiesForType(entityType)
-    }
-  }: _*)
+  private val typeToCollection: InMemoryEntityDatabase.TypeToCollectionMap =
+    new InMemoryEntityDatabase.TypeToCollectionMap(entitiesFetcher)
 
   def queryExecutor[E <: Entity: EntityType]: DbQueryExecutor.Sync[E] = {
     val entityType = implicitly[EntityType[E]]
-    DbQueryExecutor.fromEntities(typeToAllEntities(entityType).asInstanceOf[Seq[E]])
+    typeToCollection(entityType)
   }
 
   def update(modification: EntityModification): Unit = {
     val entityType = modification.entityType
-    typeToAllEntities.put(entityType, fetchEntitiesForType(entityType))
+    typeToCollection(entityType).update(modification)
+  }
+}
+private[access] object InMemoryEntityDatabase {
+
+  trait EntitiesFetcher {
+    def fetch[E <: Entity](entityType: EntityType[E]): Seq[E]
+  }
+
+  private final class EntityCollection[E <: Entity: EntityType](fetchEntities: () => Seq[E])
+      extends DbQueryExecutor.Sync[E] {
+    private val idToEntityMap: ConcurrentMap[Long, E] = {
+      val map = new ConcurrentHashMap[Long, E]
+      for (entity <- fetchEntities()) {
+        map.put(entity.id, entity)
+      }
+      map
+    }
+
+    override def data(dbQuery: DbQuery[E]): Seq[E] = applyQuery(dbQuery).toVector
+    override def count(dbQuery: DbQuery[E]): Int = applyQuery(dbQuery).size
+
+    def update(modification: EntityModification): Unit = {
+      modification match {
+        case EntityModification.Add(entity) => idToEntityMap.putIfAbsent(entity.id, entity.asInstanceOf[E])
+        case EntityModification.Update(entity) => idToEntityMap.replace(entity.id, entity.asInstanceOf[E])
+        case EntityModification.Remove(entityId) => idToEntityMap.remove(entityId)
+      }
+    }
+
+    private def applyQuery(dbQuery: DbQuery[E]): Stream[E] = {
+      DbQueryExecutor.fromEntities(idToEntityMap.values().asScala).data(dbQuery).toStream
+    }
+  }
+  private object EntityCollection {
+    type any = EntityCollection[_ <: Entity]
+  }
+
+  private final class TypeToCollectionMap(entitiesFetcher: EntitiesFetcher) {
+    private val typeToCollection: Map[EntityType.any, EntityCollection.any] = {
+      for (entityType <- EntityType.values) yield {
+        def internal[E <: Entity](
+            implicit entityType: EntityType[E]): (EntityType.any, EntityCollection.any) = {
+          entityType -> new EntityCollection[E](fetchEntities = () => entitiesFetcher.fetch(entityType))
+        }
+        internal(entityType)
+      }
+    }.toMap
+
+    def apply[E <: Entity](entityType: EntityType[E]): EntityCollection[E] =
+      typeToCollection(entityType).asInstanceOf[EntityCollection[E]]
   }
 }
