@@ -67,9 +67,28 @@ private[access] object InMemoryEntityDatabase {
 
     def update(modification: EntityModification): Unit = {
       modification match {
-        case EntityModification.Add(entity) => idToEntityMap.putIfAbsent(entity.id, entity.asInstanceOf[E])
-        case EntityModification.Update(entity) => idToEntityMap.replace(entity.id, entity.asInstanceOf[E])
-        case EntityModification.Remove(entityId) => idToEntityMap.remove(entityId)
+        case EntityModification.Add(entity) =>
+          val previousValue = idToEntityMap.putIfAbsent(entity.id, entity.asInstanceOf[E])
+          if (previousValue == null) {
+            for (set <- sortingToEntities.values) {
+              set.add(entity.asInstanceOf[E])
+            }
+          }
+        case EntityModification.Update(entity) =>
+          val previousValue = idToEntityMap.replace(entity.id, entity.asInstanceOf[E])
+          if (previousValue != null) {
+            for (set <- sortingToEntities.values) {
+              set.remove(previousValue)
+              set.add(entity.asInstanceOf[E])
+            }
+          }
+        case EntityModification.Remove(entityId) =>
+          val previousValue = idToEntityMap.remove(entityId)
+          if (previousValue != null) {
+            for (set <- sortingToEntities.values) {
+              set.remove(previousValue)
+            }
+          }
       }
     }
 
