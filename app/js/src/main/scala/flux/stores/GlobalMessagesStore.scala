@@ -9,7 +9,7 @@ import common.{I18n, Unique}
 import flux.action.Action._
 import flux.action.{Action, Dispatcher}
 import flux.stores.GlobalMessagesStore.Message
-import models.EntityAccess
+import models.access.EntityAccess
 import models.accounting._
 import models.accounting.config.Config
 

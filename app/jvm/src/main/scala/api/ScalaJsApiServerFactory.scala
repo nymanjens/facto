@@ -13,12 +13,12 @@ import common.money.Currency
 import common.time.{Clock, LocalDateTime}
 import models.SlickUtils.dbApi._
 import models.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}
-import models.access.DbQuery
+import models.access.{DbQuery, JvmEntityAccess}
 import models.accounting.config.Config
 import models.modification.{EntityModification, EntityModificationEntity, EntityType}
 import models.money.ExchangeRateMeasurement
 import models.user.User
-import models.{Entity, JvmEntityAccess}
+import models.Entity
 
 import scala.collection.immutable.{Seq, TreeMap}
 import scala.collection.mutable

@@ -3,9 +3,8 @@ import common.money.{ExchangeRateManager, MoneyWithGeneralCurrency}
 import common.time.JavaTimeImplicits._
 import common.time.LocalDateTime
 import flux.stores.entries.CashFlowEntry.{BalanceCorrection, RegularEntry}
-import models.EntityAccess
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, ModelField, JsEntityAccess}
+import models.access.{DbQuery, EntityAccess, JsEntityAccess, ModelField}
 import models.accounting.config.{Config, MoneyReservoir}
 import models.accounting.{Transaction, _}
 

@@ -4,6 +4,7 @@ import common.money.{ExchangeRateManager, Money, MoneyWithGeneralCurrency}
 import common.time.JavaTimeImplicits._
 import common.time.LocalDateTime
 import models._
+import models.access.EntityAccess
 import models.accounting.Transaction
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.user.User

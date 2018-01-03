@@ -2,7 +2,7 @@ package models.access
 
 import models.modification.{EntityModification, EntityType}
 import models.user.User
-import models.{Entity, EntityAccess}
+import models.Entity
 
 import scala.collection.immutable.Seq
 import scala.concurrent.Future

@@ -8,6 +8,7 @@ import com.google.inject.Inject
 import common.ResourceFiles
 import common.time.{Clock, LocalDateTime}
 import models._
+import models.access.JvmEntityAccess
 import models.modification.EntityModification
 import models.money.ExchangeRateMeasurement
 import models.user.Users

@@ -2,7 +2,7 @@ package models.accounting.config
 
 import common.Require.requireNonNull
 import models._
-import models.access.ModelField
+import models.access.{EntityAccess, ModelField}
 import models.accounting.{
   Transaction => AccountingTransaction,
   TransactionGroup => AccountingTransactionGroup

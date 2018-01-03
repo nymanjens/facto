@@ -9,6 +9,7 @@ import common.ResourceFiles
 import common.money.Money
 import common.time.{Clock, LocalDateTime, LocalDateTimes}
 import models._
+import models.access.JvmEntityAccess
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 import models.modification.EntityModification
 import models.user.User

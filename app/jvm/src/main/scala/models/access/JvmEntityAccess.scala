@@ -1,10 +1,9 @@
-package models
+package models.access
 
 import com.google.inject._
 import common.time.Clock
 import models.SlickUtils.dbApi._
 import models.SlickUtils.dbRun
-import models.access.{DbQueryExecutor, DbResultSet}
 import models.accounting._
 import models.modification.EntityType.{
   BalanceCheckType,
@@ -16,6 +15,7 @@ import models.modification.EntityType.{
 import models.modification.{EntityModification, EntityModificationEntity, EntityType}
 import models.money.ExchangeRateMeasurement
 import models.user.User
+import models.{Entity, EntityTableDef, SlickEntityManager}
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable

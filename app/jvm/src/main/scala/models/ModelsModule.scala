@@ -1,6 +1,7 @@
 package models
 
 import com.google.inject.AbstractModule
+import models.access.{EntityAccess, JvmEntityAccess}
 
 final class ModelsModule extends AbstractModule {
   override def configure() = {

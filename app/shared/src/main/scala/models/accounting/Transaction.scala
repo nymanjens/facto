@@ -4,7 +4,7 @@ import common.money.DatedMoney
 import common.time.LocalDateTime
 import models._
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, ModelField}
+import models.access.{DbQuery, EntityAccess, ModelField}
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.user.User
 

@@ -3,9 +3,8 @@ package models.user
 import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
 import common.time.Clock
-import models.access.ModelField
+import models.access.{EntityAccess, JvmEntityAccess, ModelField}
 import models.modification.EntityModification
-import models.{EntityAccess, JvmEntityAccess}
 
 import scala.util.Random
 

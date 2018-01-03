@@ -1,7 +1,7 @@
 package controllers.helpers
 
 import models._
-import models.access.ModelField
+import models.access.{JvmEntityAccess, ModelField}
 import models.user.User
 import play.api.mvc._
 

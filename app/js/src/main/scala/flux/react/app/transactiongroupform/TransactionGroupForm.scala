@@ -13,7 +13,7 @@ import flux.react.uielements
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.Path
 import japgolly.scalajs.react.vdom.html_<^._
-import models.EntityAccess
+import models.access.EntityAccess
 import models.accounting.config.{Account, Config}
 import models.accounting.{Transaction, TransactionGroup}
 import models.user.User

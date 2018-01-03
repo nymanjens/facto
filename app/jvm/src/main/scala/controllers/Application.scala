@@ -11,11 +11,11 @@ import controllers.Application.Forms
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 import controllers.helpers.AuthenticatedAction
 import models.modification.EntityType
-import models.{Entity, JvmEntityAccess}
+import models.Entity
 import akka.stream.scaladsl._
-import models.access.DbQuery
+import models.access.{DbQuery, JvmEntityAccess}
 import models.modification.EntityModification
-import models.user.{Users, User}
+import models.user.{User, Users}
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}

@@ -8,7 +8,8 @@ import models.accounting.config.{Account, Category, MoneyReservoir}
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 import models.modification.{EntityModification, EntityType}
 import models.user.User
-import models.{Entity, JvmEntityAccess}
+import models.Entity
+import models.access.JvmEntityAccess
 
 import scala.collection.immutable.Seq
 

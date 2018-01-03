@@ -3,6 +3,7 @@ package controllers
 import com.google.inject.Inject
 import controllers.Auth.Forms
 import models._
+import models.access.JvmEntityAccess
 import models.user.Users
 import play.api.data.Forms._
 import play.api.data._

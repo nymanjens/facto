@@ -3,7 +3,8 @@ package models.accounting
 import common.money.{ExchangeRateManager, ReferenceMoney}
 import common.time.LocalDateTime
 import models.accounting.config.Config
-import models.{Entity, EntityAccess}
+import models.Entity
+import models.access.EntityAccess
 
 import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq

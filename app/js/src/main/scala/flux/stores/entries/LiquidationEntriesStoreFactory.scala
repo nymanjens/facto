@@ -1,9 +1,8 @@
 package flux.stores.entries
 
 import common.money.{ExchangeRateManager, ReferenceMoney}
-import models.EntityAccess
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, ModelField, JsEntityAccess}
+import models.access.{DbQuery, EntityAccess, JsEntityAccess, ModelField}
 import models.accounting.config.{Account, Config, MoneyReservoir}
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 

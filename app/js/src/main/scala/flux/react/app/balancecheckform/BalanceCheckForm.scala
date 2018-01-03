@@ -14,7 +14,7 @@ import flux.react.uielements.input.{MappedInput, bootstrap}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.Path
 import japgolly.scalajs.react.vdom.html_<^._
-import models.EntityAccess
+import models.access.EntityAccess
 import models.accounting.BalanceCheck
 import models.accounting.config.{Config, MoneyReservoir}
 import models.user.User

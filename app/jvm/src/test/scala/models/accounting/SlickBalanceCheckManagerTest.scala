@@ -7,6 +7,7 @@ import common.testing.TestUtils._
 import common.testing._
 import common.time.Clock
 import models._
+import models.access.JvmEntityAccess
 import models.user.Users
 import org.junit.runner._
 import org.specs2.runner._

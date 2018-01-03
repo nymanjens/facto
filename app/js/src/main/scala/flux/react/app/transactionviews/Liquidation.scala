@@ -10,7 +10,7 @@ import flux.react.uielements
 import flux.stores.entries.{AccountPair, LiquidationEntriesStoreFactory, LiquidationEntry}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
-import models.EntityAccess
+import models.access.EntityAccess
 import models.accounting.config.{Account, Config}
 import models.user.User
 

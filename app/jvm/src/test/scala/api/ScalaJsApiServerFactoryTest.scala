@@ -6,6 +6,7 @@ import common.testing.TestObjects._
 import common.testing.TestUtils._
 import common.testing._
 import models._
+import models.access.JvmEntityAccess
 import models.accounting.SlickTransactionManager
 import models.accounting.config._
 import models.modification.{

@@ -1,6 +1,6 @@
-package models
+package models.access
 
-import models.access.DbResultSet
+import models.Entity
 import models.modification.EntityType
 import models.user.User
 
