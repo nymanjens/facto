@@ -1,7 +1,7 @@
 package models.access
 
 import scala.collection.JavaConverters._
-import java.util.concurrent.{ConcurrentHashMap, ConcurrentMap}
+import java.util.concurrent.{ConcurrentHashMap, ConcurrentMap, ConcurrentSkipListSet}
 
 import com.google.inject._
 import common.time.Clock
@@ -46,7 +46,8 @@ private[access] object InMemoryEntityDatabase {
     def fetch[E <: Entity](entityType: EntityType[E]): Seq[E]
   }
 
-  private final class EntityCollection[E <: Entity: EntityType](fetchEntities: () => Seq[E])
+  private final class EntityCollection[E <: Entity: EntityType](fetchEntities: () => Seq[E],
+                                                                sortings: Set[DbQuery.Sorting[E]])
       extends DbQueryExecutor.Sync[E] {
 
     private val idToEntityMap: ConcurrentMap[Long, E] = {
@@ -56,6 +57,13 @@ private[access] object InMemoryEntityDatabase {
       }
       map
     }
+    private val sortingToEntities: Map[DbQuery.Sorting[E], ConcurrentSkipListSet[E]] = {
+      for (sorting <- sortings) yield {
+        val set = new ConcurrentSkipListSet(sorting.toOrdering)
+        set.addAll(idToEntityMap.values())
+        sorting -> set
+      }
+    }.toMap
 
     def update(modification: EntityModification): Unit = {
       modification match {
@@ -70,15 +78,33 @@ private[access] object InMemoryEntityDatabase {
     override def count(dbQuery: DbQuery[E]): Int = valuesAsStream(dbQuery).size
 
     private def valuesAsStream(dbQuery: DbQuery[E]): Stream[E] = {
-      var stream = idToEntityMap.values().iterator().asScala.toStream
-      stream = stream.filter(dbQuery.filter.apply)
-      for (sorting <- dbQuery.sorting) {
-        stream = stream.sorted(sorting.toOrdering)
+      def applySorting(stream: Stream[E]): Stream[E] = dbQuery.sorting match {
+        case Some(sorting) => stream.sorted(sorting.toOrdering)
+        case None => stream
       }
-      for (limit <- dbQuery.limit) {
-        stream = stream.take(limit)
+      def applyLimit(stream: Stream[E]): Stream[E] = dbQuery.limit match {
+        case Some(limit) => stream.take(limit)
+        case None => stream
       }
-      stream
+
+      dbQuery.sorting match {
+        case Some(sorting) if sortings contains sorting =>
+          var stream = sortingToEntities(sorting).iterator().asScala.toStream
+          stream = stream.filter(dbQuery.filter.apply)
+          stream = applyLimit(stream)
+          stream
+        case Some(sortingReversed) if sortings contains sortingReversed.reversed =>
+          var stream = sortingToEntities(sortingReversed.reversed).descendingIterator().asScala.toStream
+          stream = stream.filter(dbQuery.filter.apply)
+          stream = applyLimit(stream)
+          stream
+        case _ =>
+          var stream = idToEntityMap.values().iterator().asScala.toStream
+          stream = stream.filter(dbQuery.filter.apply)
+          stream = applySorting(stream)
+          stream = applyLimit(stream)
+          stream
+      }
     }
   }
   private object EntityCollection {
@@ -90,7 +116,9 @@ private[access] object InMemoryEntityDatabase {
       for (entityType <- EntityType.values) yield {
         def internal[E <: Entity](
             implicit entityType: EntityType[E]): (EntityType.any, EntityCollection.any) = {
-          entityType -> new EntityCollection[E](fetchEntities = () => entitiesFetcher.fetch(entityType))
+          entityType -> new EntityCollection[E](
+            fetchEntities = () => entitiesFetcher.fetch(entityType),
+            sortings = sortings(entityType).asInstanceOf[Set[DbQuery.Sorting[E]]])
         }
         internal(entityType)
       }
@@ -98,5 +126,16 @@ private[access] object InMemoryEntityDatabase {
 
     def apply[E <: Entity](entityType: EntityType[E]): EntityCollection[E] =
       typeToCollection(entityType).asInstanceOf[EntityCollection[E]]
+
+    private def sortings(entityType: EntityType.any): Set[DbQuery.Sorting[_]] = entityType match {
+      case EntityType.TransactionType =>
+        Set(
+          DbQuery.Sorting.Transaction.deterministicallyByTransactionDate,
+          DbQuery.Sorting.Transaction.deterministicallyByConsumedDate,
+          DbQuery.Sorting.Transaction.deterministicallyByCreateDate
+        )
+      case EntityType.BalanceCheckType => Set(DbQuery.Sorting.BalanceCheck.deterministicallyByCheckDate)
+      case _ => Set()
+    }
   }
 }
