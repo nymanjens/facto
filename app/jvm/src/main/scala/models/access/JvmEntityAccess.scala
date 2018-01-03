@@ -30,12 +30,12 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends EntityAccess {
     }
   }: _*)
 
-  override def newQuery[E <: Entity: EntityType]() = DbResultSet.fromExecutor(newQueryExecutor[E].asAsync)
+  override def newQuery[E <: Entity: EntityType]() = DbResultSet.fromExecutor(queryExecutor[E].asAsync)
   override def newQuerySyncForUser() = newQuerySync[User]()
   def newQuerySync[E <: Entity: EntityType](): DbResultSet.Sync[E] =
-    DbResultSet.fromExecutor(newQueryExecutor)
+    DbResultSet.fromExecutor(queryExecutor)
 
-  def newQueryExecutor[E <: Entity: EntityType]: DbQueryExecutor.Sync[E] = {
+  def queryExecutor[E <: Entity: EntityType]: DbQueryExecutor.Sync[E] = {
     val entityType = implicitly[EntityType[E]]
     DbQueryExecutor.fromEntities(typeToAllEntities(entityType).asInstanceOf[Seq[E]])
   }
