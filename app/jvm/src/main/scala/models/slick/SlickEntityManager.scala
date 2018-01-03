@@ -6,7 +6,7 @@ import models.slick.SlickUtils.dbRun
 import play.api.Logger
 
 private[models] final class SlickEntityManager[E <: Entity] private (
-    implicit val tableDef: EntityTableDef[E]) {
+    implicit val tableDef: SlickEntityTableDef[E]) {
 
   // ********** Management methods ********** //
   def createTable(): Unit = {
@@ -46,5 +46,5 @@ private[models] final class SlickEntityManager[E <: Entity] private (
   }
 }
 private[models] object SlickEntityManager {
-  def forType[E <: Entity: EntityTableDef]: SlickEntityManager[E] = new SlickEntityManager[E]
+  def forType[E <: Entity: SlickEntityTableDef]: SlickEntityManager[E] = new SlickEntityManager[E]
 }

@@ -16,15 +16,15 @@ import models.user.User
 
 import scala.collection.immutable.Seq
 
-sealed trait EntityTableDef[E <: Entity] {
-  type Table <: EntityTableDef.EntityTable[E]
+sealed trait SlickEntityTableDef[E <: Entity] {
+  type Table <: SlickEntityTableDef.EntityTable[E]
   def tableName: String
   def table(tag: SlickTag): Table
 }
 
-object EntityTableDef {
+object SlickEntityTableDef {
 
-  val all: Seq[EntityTableDef[_]] =
+  val all: Seq[SlickEntityTableDef[_]] =
     Seq(
       UserDef,
       TransactionDef,
@@ -45,7 +45,7 @@ object EntityTableDef {
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
   }
 
-  implicit object UserDef extends EntityTableDef[User] {
+  implicit object UserDef extends SlickEntityTableDef[User] {
 
     override val tableName: String = "USERS"
     override def table(tag: SlickTag): Table = new Table(tag)
@@ -68,7 +68,7 @@ object EntityTableDef {
     }
   }
 
-  implicit object TransactionDef extends EntityTableDef[Transaction] {
+  implicit object TransactionDef extends SlickEntityTableDef[Transaction] {
 
     override val tableName: String = "TRANSACTIONS"
     override def table(tag: SlickTag): Table = new Table(tag)
@@ -110,7 +110,7 @@ object EntityTableDef {
     }
   }
 
-  implicit object TransactionGroupDef extends EntityTableDef[TransactionGroup] {
+  implicit object TransactionGroupDef extends SlickEntityTableDef[TransactionGroup] {
 
     override val tableName = "TRANSACTION_GROUPS"
     override def table(tag: SlickTag): Table = new Table(tag)
@@ -123,7 +123,7 @@ object EntityTableDef {
     }
   }
 
-  implicit object BalanceCheckDef extends EntityTableDef[BalanceCheck] {
+  implicit object BalanceCheckDef extends SlickEntityTableDef[BalanceCheck] {
 
     override val tableName: String = "BALANCE_CHECKS"
     override def table(tag: SlickTag): Table = new Table(tag)
@@ -141,7 +141,7 @@ object EntityTableDef {
     }
   }
 
-  implicit object ExchangeRateMeasurementDef extends EntityTableDef[ExchangeRateMeasurement] {
+  implicit object ExchangeRateMeasurementDef extends SlickEntityTableDef[ExchangeRateMeasurement] {
 
     override val tableName: String = "EXCHANGE_RATE_MEASUREMENT"
     override def table(tag: SlickTag): Table = new Table(tag)
@@ -157,7 +157,7 @@ object EntityTableDef {
     }
   }
 
-  implicit object EntityModificationEntityDef extends EntityTableDef[EntityModificationEntity] {
+  implicit object EntityModificationEntityDef extends SlickEntityTableDef[EntityModificationEntity] {
 
     override val tableName: String = "ENTITY_MODIFICATION_ENTITY"
     override def table(tag: SlickTag): Table = new Table(tag)
