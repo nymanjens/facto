@@ -11,6 +11,7 @@ final class Module(user: User)(implicit scalaJsApiClient: ScalaJsApiClient,
                                clock: Clock,
                                getInitialDataResponse: GetInitialDataResponse) {
 
+  // Use LocallyClonedJsEntityAccess
 //  implicit val entityAccess: Future[JsEntityAccess] = async {
 //    val db = await(LocalDatabase.createFuture(encryptionSecret = user.databaseEncryptionKey))
 //    val entityAccess =
@@ -21,6 +22,7 @@ final class Module(user: User)(implicit scalaJsApiClient: ScalaJsApiClient,
 //    entityAccess
 //  }
 
+  // Use ApiBackedJsEntityAccess
   implicit val entityAccess: Future[JsEntityAccess] = {
     val entityAccess = new ApiBackedJsEntityAccess
 
