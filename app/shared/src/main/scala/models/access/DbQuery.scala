@@ -87,6 +87,17 @@ object DbQuery {
     def thenDescBy[V: PicklableOrdering](field: ModelField[V, E]): Sorting[E] = thenBy(field, isDesc = true)
     def thenBy[V: PicklableOrdering](field: ModelField[V, E], isDesc: Boolean): Sorting[E] =
       Sorting(fieldsWithDirection :+ FieldWithDirection[V, E](field, isDesc = isDesc))
+
+    def toOrdering: Ordering[E] = (x: E, y: E) => {
+      fieldsWithDirection.toStream.flatMap {
+        case f @ DbQuery.Sorting.FieldWithDirection(field, isDesc) =>
+          f.valueOrdering.compare(field.get(x), field.get(y)) match {
+            case 0 => None
+            case result if isDesc => Some(-result)
+            case result => Some(result)
+          }
+      }.headOption getOrElse 0
+    }
   }
   object Sorting {
     def ascBy[V: PicklableOrdering, E](field: ModelField[V, E]): Sorting[E] = by(field, isDesc = false)

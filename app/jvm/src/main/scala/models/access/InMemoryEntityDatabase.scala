@@ -56,8 +56,8 @@ private[access] object InMemoryEntityDatabase {
       map
     }
 
-    override def data(dbQuery: DbQuery[E]): Seq[E] = applyQuery(dbQuery).toVector
-    override def count(dbQuery: DbQuery[E]): Int = applyQuery(dbQuery).size
+    override def data(dbQuery: DbQuery[E]): Seq[E] = valuesAsStream(dbQuery).toVector
+    override def count(dbQuery: DbQuery[E]): Int = valuesAsStream(dbQuery).size
 
     def update(modification: EntityModification): Unit = {
       modification match {
@@ -67,8 +67,16 @@ private[access] object InMemoryEntityDatabase {
       }
     }
 
-    private def applyQuery(dbQuery: DbQuery[E]): Stream[E] = {
-      DbQueryExecutor.fromEntities(idToEntityMap.values().asScala).data(dbQuery).toStream
+    private def valuesAsStream(dbQuery: DbQuery[E]): Stream[E] = {
+      var stream = idToEntityMap.values().iterator().asScala.toStream
+      stream = stream.filter(dbQuery.filter.apply)
+      for (sorting <- dbQuery.sorting) {
+        stream = stream.sorted(sorting.toOrdering)
+      }
+      for (limit <- dbQuery.limit) {
+        stream = stream.take(limit)
+      }
+      stream
     }
   }
   private object EntityCollection {
