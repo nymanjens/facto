@@ -8,6 +8,8 @@ import models.modification.EntityType
 import scala.math.Ordering.Implicits._
 import common.time.JavaTimeImplicits._
 import common.time.LocalDateTime
+import models.access.ModelField.BalanceCheck.E
+import models.accounting.{BalanceCheck, Transaction}
 
 import scala.collection.immutable.Seq
 
@@ -119,6 +121,26 @@ object DbQuery {
     case class FieldWithDirection[V, E](field: ModelField[V, E], isDesc: Boolean)(
         implicit val picklableValueOrdering: PicklableOrdering[V]) {
       def valueOrdering: Ordering[V] = picklableValueOrdering.toOrdering
+    }
+
+    object Transaction {
+      val deterministicallyByTransactionDate: Sorting[Transaction] = DbQuery.Sorting
+        .ascBy(ModelField.Transaction.transactionDate)
+        .thenAscBy(ModelField.Transaction.createdDate)
+        .thenAscBy(ModelField.id)
+      val deterministicallyByConsumedDate: Sorting[Transaction] = DbQuery.Sorting
+        .ascBy(ModelField.Transaction.consumedDate)
+        .thenAscBy(ModelField.Transaction.createdDate)
+        .thenAscBy(ModelField.id)
+      val deterministicallyByCreateDate: Sorting[Transaction] = DbQuery.Sorting
+        .ascBy(ModelField.Transaction.createdDate)
+        .thenAscBy(ModelField.id)
+    }
+    object BalanceCheck {
+      val deterministicallyByCheckDate: Sorting[BalanceCheck] = DbQuery.Sorting
+        .ascBy(ModelField.BalanceCheck.checkDate)
+        .thenAscBy(ModelField.BalanceCheck.createdDate)
+        .thenAscBy(ModelField.id)
     }
   }
 
