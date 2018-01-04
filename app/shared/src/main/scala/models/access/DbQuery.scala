@@ -8,6 +8,8 @@ import models.modification.EntityType
 import scala.math.Ordering.Implicits._
 import common.time.JavaTimeImplicits._
 import common.time.LocalDateTime
+import models.access.ModelField.BalanceCheck.E
+import models.accounting.{BalanceCheck, Transaction}
 
 import scala.collection.immutable.Seq
 
@@ -15,6 +17,18 @@ case class DbQuery[E <: Entity](filter: Filter[E], sorting: Option[Sorting[E]], 
     implicit val entityType: EntityType[E])
 
 object DbQuery {
+
+  sealed trait PicklableOrdering[T] {
+    def toOrdering: Ordering[T]
+  }
+  object PicklableOrdering {
+    implicit case object LongOrdering extends PicklableOrdering[Long] {
+      override def toOrdering: Ordering[Long] = implicitly[Ordering[Long]]
+    }
+    implicit case object LocalDateTimeOrdering extends PicklableOrdering[LocalDateTime] {
+      override def toOrdering: Ordering[LocalDateTime] = implicitly[Ordering[LocalDateTime]]
+    }
+  }
 
   sealed trait Filter[E] {
     def apply(entity: E): Boolean
@@ -109,6 +123,14 @@ object DbQuery {
           }
       }.headOption getOrElse 0
     }
+
+    def reversed: Sorting[E] =
+      Sorting(fieldsWithDirection.map(field => {
+        def internal[V](field: FieldWithDirection[V, E]): FieldWithDirection[V, E] = {
+          field.copy(isDesc = !field.isDesc)(field.picklableValueOrdering)
+        }
+        internal(field)
+      }))
   }
   object Sorting {
     def ascBy[V: PicklableOrdering, E](field: ModelField[V, E]): Sorting[E] = by(field, isDesc = false)
@@ -120,17 +142,25 @@ object DbQuery {
         implicit val picklableValueOrdering: PicklableOrdering[V]) {
       def valueOrdering: Ordering[V] = picklableValueOrdering.toOrdering
     }
-  }
 
-  sealed trait PicklableOrdering[T] {
-    def toOrdering: Ordering[T]
-  }
-  object PicklableOrdering {
-    implicit case object LongOrdering extends PicklableOrdering[Long] {
-      override def toOrdering: Ordering[Long] = implicitly[Ordering[Long]]
+    object Transaction {
+      val deterministicallyByTransactionDate: Sorting[Transaction] = DbQuery.Sorting
+        .ascBy(ModelField.Transaction.transactionDate)
+        .thenAscBy(ModelField.Transaction.createdDate)
+        .thenAscBy(ModelField.id)
+      val deterministicallyByConsumedDate: Sorting[Transaction] = DbQuery.Sorting
+        .ascBy(ModelField.Transaction.consumedDate)
+        .thenAscBy(ModelField.Transaction.createdDate)
+        .thenAscBy(ModelField.id)
+      val deterministicallyByCreateDate: Sorting[Transaction] = DbQuery.Sorting
+        .ascBy(ModelField.Transaction.createdDate)
+        .thenAscBy(ModelField.id)
     }
-    implicit case object LocalDateTimeOrdering extends PicklableOrdering[LocalDateTime] {
-      override def toOrdering: Ordering[LocalDateTime] = implicitly[Ordering[LocalDateTime]]
+    object BalanceCheck {
+      val deterministicallyByCheckDate: Sorting[BalanceCheck] = DbQuery.Sorting
+        .ascBy(ModelField.BalanceCheck.checkDate)
+        .thenAscBy(ModelField.BalanceCheck.createdDate)
+        .thenAscBy(ModelField.id)
     }
   }
 }

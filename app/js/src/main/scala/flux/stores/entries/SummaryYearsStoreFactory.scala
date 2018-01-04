@@ -24,8 +24,9 @@ final class SummaryYearsStoreFactory(implicit database: JsEntityAccess) extends 
   // **************** Implementation of EntriesStoreFactory methods/types ****************//
   override protected def createNew(account: Account) = new Store {
     override protected def calculateState() = async {
-      val earliestFuture = getFirstAfterSorting(DbQuery.Sorting.ascBy(ModelField.Transaction.consumedDate))
-      val latestFuture = getFirstAfterSorting(DbQuery.Sorting.descBy(ModelField.Transaction.consumedDate))
+      val earliestFuture = getFirstAfterSorting(DbQuery.Sorting.Transaction.deterministicallyByConsumedDate)
+      val latestFuture =
+        getFirstAfterSorting(DbQuery.Sorting.Transaction.deterministicallyByConsumedDate.reversed)
       val (maybeEarliest, maybeLatest) = (await(earliestFuture), await(latestFuture))
 
       val rangeOption = for {

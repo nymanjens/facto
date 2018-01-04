@@ -16,11 +16,7 @@ final class AllEntriesStoreFactory(implicit database: JsEntityAccess)
         await(
           database
             .newQuery[Transaction]()
-            .sort(
-              DbQuery.Sorting
-                .descBy(ModelField.Transaction.transactionDate)
-                .thenDescBy(ModelField.Transaction.createdDate)
-                .thenDescBy(ModelField.id))
+            .sort(DbQuery.Sorting.Transaction.deterministicallyByTransactionDate.reversed)
             .limit(3 * maxNumEntries)
             .data()).reverse
 

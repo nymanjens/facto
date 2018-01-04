@@ -416,7 +416,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           entityAccess
             .newQuery[Transaction]()
             .filter(ModelField.Transaction.categoryCode isEqualTo category.code)
-            .sort(DbQuery.Sorting.descBy(ModelField.Transaction.createdDate))
+            .sort(DbQuery.Sorting.Transaction.deterministicallyByCreateDate.reversed)
             .limit(300)
             .data())
         // Only update if category is still the same
