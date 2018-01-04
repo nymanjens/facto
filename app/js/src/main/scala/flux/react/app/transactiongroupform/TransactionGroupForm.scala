@@ -45,7 +45,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
           val numberOfTransactions = props.groupPartial.transactions.length
           val totalFlowRestriction = props.groupPartial match {
             case partial if partial.zeroSum => TotalFlowRestriction.ZeroSum
-            case _ => TotalFlowRestriction.AnyTotal
+            case _                          => TotalFlowRestriction.AnyTotal
           }
           State(
             panelIndices = 0 until numberOfTransactions,
@@ -353,7 +353,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
           val allReservoirCodesAreEmpty = datas.forall(_.moneyReservoir.isNullReservoir)
 
           datas.size match {
-            case 0 => throw new AssertionError("Should not be possible")
+            case 0                                => throw new AssertionError("Should not be possible")
             case 1 if containsEmptyReservoirCodes => Some(i18n("facto.error.noReservoir.atLeast2"))
             case _ =>
               if (containsEmptyReservoirCodes) {

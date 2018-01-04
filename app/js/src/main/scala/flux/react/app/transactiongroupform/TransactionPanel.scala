@@ -422,9 +422,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         // Only update if category is still the same
         if (categoryRef().value.get == category) {
           val suggestions = transactions.toStream.map(_.description).distinct.toVector
-          $.modState(
-            _.copy(allDescriptionSuggestionsForCategory =
-              Some(State.CategoryAndSuggestions(category, suggestions))))
+          $.modState(_.copy(
+            allDescriptionSuggestionsForCategory = Some(State.CategoryAndSuggestions(category, suggestions))))
             .runNow()
         }
       }

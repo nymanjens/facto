@@ -21,10 +21,10 @@ object Converters {
   implicit def entityTypeToConverter[E <: Entity: EntityType]: Scala2Js.MapConverter[E] = {
     val entityType: EntityType[E] = implicitly[EntityType[E]]
     val converter: Scala2Js.MapConverter[_ <: Entity] = entityType match {
-      case EntityType.UserType => UserConverter
-      case EntityType.TransactionType => TransactionConverter
-      case EntityType.TransactionGroupType => TransactionGroupConverter
-      case EntityType.BalanceCheckType => BalanceCheckConverter
+      case EntityType.UserType                    => UserConverter
+      case EntityType.TransactionType             => TransactionConverter
+      case EntityType.TransactionGroupType        => TransactionGroupConverter
+      case EntityType.BalanceCheckType            => BalanceCheckConverter
       case EntityType.ExchangeRateMeasurementType => ExchangeRateMeasurementConverter
     }
     converter.asInstanceOf[Scala2Js.MapConverter[E]]
@@ -33,12 +33,12 @@ object Converters {
   def fromModelField[V](modelField: ModelField[V, _]): Converter[V] = {
     def fromType[V2: Converter](fieldType: ModelField.FieldType[V2]): Converter[V2] = implicitly
     val result = modelField.fieldType match {
-      case ModelField.FieldType.BooleanType => fromType(ModelField.FieldType.BooleanType)
-      case ModelField.FieldType.LongType => fromType(ModelField.FieldType.LongType)
-      case ModelField.FieldType.DoubleType => fromType(ModelField.FieldType.DoubleType)
-      case ModelField.FieldType.StringType => fromType(ModelField.FieldType.StringType)
+      case ModelField.FieldType.BooleanType       => fromType(ModelField.FieldType.BooleanType)
+      case ModelField.FieldType.LongType          => fromType(ModelField.FieldType.LongType)
+      case ModelField.FieldType.DoubleType        => fromType(ModelField.FieldType.DoubleType)
+      case ModelField.FieldType.StringType        => fromType(ModelField.FieldType.StringType)
       case ModelField.FieldType.LocalDateTimeType => fromType(ModelField.FieldType.LocalDateTimeType)
-      case ModelField.FieldType.StringSeqType => fromType(ModelField.FieldType.StringSeqType)
+      case ModelField.FieldType.StringSeqType     => fromType(ModelField.FieldType.StringSeqType)
     }
     result.asInstanceOf[Converter[V]]
   }
@@ -111,8 +111,7 @@ object Converters {
   }
 
   // **************** Entity converters **************** //
-  private[scala2js] abstract class EntityConverter[E <: Entity: EntityType]
-      extends Scala2Js.MapConverter[E] {
+  private[scala2js] abstract class EntityConverter[E <: Entity: EntityType] extends Scala2Js.MapConverter[E] {
     override final def toJs(entity: E) = {
       val result = js.Dictionary[js.Any]()
 

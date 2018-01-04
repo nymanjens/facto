@@ -196,7 +196,7 @@ private[bootstrap] object InputComponent {
     override def value = {
       ValueTransformer.stringToValue(component.state.valueString, props) match {
         case Some(value) if props.required && props.valueTransformer.isEmptyValue(value) => None
-        case other => other
+        case other                                                                       => other
       }
     }
     override def valueOrDefault =

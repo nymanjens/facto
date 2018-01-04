@@ -30,9 +30,9 @@ final class ReactTestWrapper(private val componentM: MountedOutput) {
   def maybeChild(tagName: String = "", clazz: String = "", tpe: String = ""): Option[ReactTestWrapper] = {
     val childList = children(tagName, clazz, tpe)
     childList match {
-      case Nil => None
+      case Nil       => None
       case Seq(elem) => Some(elem)
-      case _ => throw new MatchError(childList)
+      case _         => throw new MatchError(childList)
     }
   }
 

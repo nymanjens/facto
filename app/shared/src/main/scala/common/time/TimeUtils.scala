@@ -32,7 +32,7 @@ object TimeUtils {
       )
     } catch {
       case e: NumberFormatException => throw new IllegalArgumentException(e)
-      case e: DateTimeException => throw new IllegalArgumentException(e)
+      case e: DateTimeException     => throw new IllegalArgumentException(e)
     }
   }
 }

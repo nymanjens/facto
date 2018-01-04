@@ -18,7 +18,7 @@ object MoneyInput {
     valueChangeForPropsChange = (newProps, oldValue) => {
       newProps.extra.forceValue match {
         case Some(forceValue) => forceValue
-        case None => oldValue
+        case None             => oldValue
       }
     },
     inputRenderer = (classes: Seq[String],
@@ -151,10 +151,10 @@ object MoneyInput {
       private[MoneyInput] val mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps])
       extends InputComponent.Reference(mutableRef)
 
-  case class ExtraProps(forceValue: Option[Long],
-                        currency: Currency,
-                        dateForCurrencyConversion: Option[LocalDateTime])(
-      implicit val exchangeRateManager: ExchangeRateManager)
+  case class ExtraProps(
+      forceValue: Option[Long],
+      currency: Currency,
+      dateForCurrencyConversion: Option[LocalDateTime])(implicit val exchangeRateManager: ExchangeRateManager)
 
   // **************** Private inner types ****************//
   /** Number of cents. */

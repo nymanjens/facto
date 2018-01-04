@@ -45,7 +45,7 @@ object Users {
   def authenticate(loginName: String, password: String)(implicit entityAccess: EntityAccess): Boolean = {
     entityAccess.newQuerySyncForUser().findOne(ModelField.User.loginName, loginName) match {
       case Some(user) if user.passwordHash == hash(password) => true
-      case _ => false
+      case _                                                 => false
     }
   }
 

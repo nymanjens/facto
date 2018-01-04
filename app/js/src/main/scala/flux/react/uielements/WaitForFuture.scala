@@ -14,7 +14,7 @@ final class WaitForFuture[V] {
     .renderPS((_, props, state) =>
       state.input match {
         case Some(input) => props.inputToElement(input)
-        case None => <.span("loading...")
+        case None        => <.span("loading...")
     })
     .componentWillMount($ =>
       LogExceptionsCallback {

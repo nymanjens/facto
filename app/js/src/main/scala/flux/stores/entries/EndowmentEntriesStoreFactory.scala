@@ -16,14 +16,15 @@ final class EndowmentEntriesStoreFactory(implicit database: JsEntityAccess, acco
   override protected def createNew(maxNumEntries: Int, account: Account) = new Store {
     override protected def calculateState() = async {
       val transactions: Seq[Transaction] =
-        await(database
-          .newQuery[Transaction]()
-          .filter(
-            ModelField.Transaction.categoryCode isEqualTo accountingConfig.constants.endowmentCategory.code)
-          .filter(ModelField.Transaction.beneficiaryAccountCode isEqualTo account.code)
-          .sort(DbQuery.Sorting.Transaction.deterministicallyByConsumedDate.reversed)
-          .limit(3 * maxNumEntries)
-          .data()).reverse
+        await(
+          database
+            .newQuery[Transaction]()
+            .filter(
+              ModelField.Transaction.categoryCode isEqualTo accountingConfig.constants.endowmentCategory.code)
+            .filter(ModelField.Transaction.beneficiaryAccountCode isEqualTo account.code)
+            .sort(DbQuery.Sorting.Transaction.deterministicallyByConsumedDate.reversed)
+            .limit(3 * maxNumEntries)
+            .data()).reverse
 
       var entries = transactions.map(t => GeneralEntry(Seq(t)))
 

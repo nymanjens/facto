@@ -27,7 +27,7 @@ case class Template(code: String,
     val showAtLocation = placement contains location
     val showToUser = onlyShowForUsers match {
       case Some(users) => users contains user
-      case None => true
+      case None        => true
     }
     showAtLocation && showToUser
   }
@@ -69,13 +69,13 @@ object Template {
     object SearchView extends Placement("SEARCH_VIEW")
 
     def fromString(string: String): Placement = string match {
-      case "EVERYTHING_VIEW" => EverythingView
-      case "CASH_FLOW_VIEW" => CashFlowView
+      case "EVERYTHING_VIEW"  => EverythingView
+      case "CASH_FLOW_VIEW"   => CashFlowView
       case "LIQUIDATION_VIEW" => LiquidationView
-      case "ENDOWMENTS_VIEW" => EndowmentsView
-      case "SUMMARY_VIEW" => SummaryView
-      case "TEMPLATE_LIST" => TemplateList
-      case "SEARCH_VIEW" => EverythingView
+      case "ENDOWMENTS_VIEW"  => EndowmentsView
+      case "SUMMARY_VIEW"     => SummaryView
+      case "TEMPLATE_LIST"    => TemplateList
+      case "SEARCH_VIEW"      => EverythingView
     }
   }
 

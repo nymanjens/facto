@@ -41,12 +41,12 @@ object DbResultSet {
     def findOne[V](field: ModelField[V, E], value: V): Option[E] = {
       filter(field isEqualTo value).limit(1).data() match {
         case Seq(e) => Some(e)
-        case Seq() => None
+        case Seq()  => None
       }
     }
     def findById(id: Long): E = findOne(ModelField.id[E], id) match {
       case Some(x) => x
-      case None => throw new IllegalArgumentException(s"Could not find entry with id=$id")
+      case None    => throw new IllegalArgumentException(s"Could not find entry with id=$id")
     }
     def data(): Seq[E] = executor.data(helper.dbQuery)
     def count(): Int = executor.count(helper.dbQuery)
@@ -76,13 +76,13 @@ object DbResultSet {
     def findOne[V](field: ModelField[V, E], value: V): Future[Option[E]] = async {
       await(filter(field isEqualTo value).limit(1).data()) match {
         case Seq(e) => Some(e)
-        case Seq() => None
+        case Seq()  => None
       }
     }
     def findById(id: Long): Future[E] = async {
       await(findOne(ModelField.id[E], id)) match {
         case Some(x) => x
-        case None => throw new IllegalArgumentException(s"Could not find entry with id=$id")
+        case None    => throw new IllegalArgumentException(s"Could not find entry with id=$id")
       }
     }
     def data(): Future[Seq[E]] = executor.data(helper.dbQuery)
@@ -111,8 +111,8 @@ object DbResultSet {
     def dbQuery: DbQuery[E] =
       DbQuery(
         filter = filters.toVector match {
-          case Vector() => Filter.NullFilter()
-          case Vector(filter) => filter
+          case Vector()        => Filter.NullFilter()
+          case Vector(filter)  => filter
           case multipleFilters => Filter.And(multipleFilters)
         },
         sorting = sorting,

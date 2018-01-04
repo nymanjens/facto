@@ -177,8 +177,8 @@ object LocalDatabase {
             rawKeyValueFilter(operation, field, Scala2Js.toJs(value, field))
 
           filter match {
-            case DbQuery.Filter.NullFilter() => None
-            case DbQuery.Filter.Equal(field, value) => keyValueFilter(Operation.Equal, field, value)
+            case DbQuery.Filter.NullFilter()           => None
+            case DbQuery.Filter.Equal(field, value)    => keyValueFilter(Operation.Equal, field, value)
             case DbQuery.Filter.NotEqual(field, value) => keyValueFilter(Operation.NotEqual, field, value)
             case DbQuery.Filter.GreaterThan(field, value) =>
               keyValueFilter(Operation.GreaterThan, field, value)
@@ -215,7 +215,7 @@ object LocalDatabase {
           .limit(1)
           .data() match {
           case Seq(v) => Some(v)
-          case Seq() => None
+          case Seq()  => None
         }
       value.map(v => Scala2Js.toScala[V](v.value))
     }
@@ -275,7 +275,7 @@ object LocalDatabase {
       for (entity <- entities) {
         findById[E](entity.id) match {
           case Some(_) => // do nothing
-          case None => entityCollectionForImplicitType.insert(entity)
+          case None    => entityCollectionForImplicitType.insert(entity)
         }
       }
     }
@@ -313,7 +313,7 @@ object LocalDatabase {
         .limit(1)
         .data() match {
         case Seq(e) => Some(e)
-        case Seq() => None
+        case Seq()  => None
       }
     }
 

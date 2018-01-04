@@ -25,7 +25,7 @@ case class Config(accounts: ListMap[String, Account],
   def moneyReservoir(code: String): MoneyReservoir = moneyReservoirOption(code).get
   def moneyReservoirOption(code: String): Option[MoneyReservoir] = code match {
     case "" => Some(NullMoneyReservoir)
-    case _ => moneyReservoirsMap.get(code)
+    case _  => moneyReservoirsMap.get(code)
   }
 
   def moneyReservoirs(includeNullReservoir: Boolean = false,

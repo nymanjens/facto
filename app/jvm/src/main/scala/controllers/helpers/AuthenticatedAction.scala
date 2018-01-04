@@ -15,7 +15,7 @@ abstract class AuthenticatedAction[A](bodyParser: BodyParser[A])(implicit entity
       controllerComponents.actionBuilder(bodyParser) { request =>
         entityAccess.newQuerySync[User]().findOne(ModelField.User.loginName, username) match {
           case Some(user) => calculateResult(user, request)
-          case None => AuthenticatedAction.onUnauthorized(request)
+          case None       => AuthenticatedAction.onUnauthorized(request)
         }
       }
     }

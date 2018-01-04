@@ -70,7 +70,7 @@ class InputWithDefaultFromReference[Value] private () {
         val backend = proxy.backend
         proxy.props.defaultValueProxy match {
           case Some(_) => Option(backend.implRef.value) map (_.backend.delegateRef())
-          case None => Option(backend.dummyRef.value) map (_.backend.delegateRef())
+          case None    => Option(backend.dummyRef.value) map (_.backend.delegateRef())
         }
       } getOrElse InputBase.Proxy.nullObject()
     }
@@ -98,7 +98,7 @@ class InputWithDefaultFromReference[Value] private () {
     def render(props: Props.any, state: State) = logExceptions {
       props.defaultValueProxy match {
         case Some(_) => implRef.component(props).vdomElement
-        case None => dummyRef.component(props).vdomElement
+        case None    => dummyRef.component(props).vdomElement
       }
     }
   }

@@ -55,7 +55,7 @@ final class SummaryYearsStoreFactory(implicit database: JsEntityAccess) extends 
             .limit(1)
             .data())
         data match {
-          case Seq() => None
+          case Seq()  => None
           case Seq(t) => Some(t)
         }
       }

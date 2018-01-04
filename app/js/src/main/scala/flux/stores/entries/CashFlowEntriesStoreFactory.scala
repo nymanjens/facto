@@ -82,7 +82,7 @@ final class CashFlowEntriesStoreFactory(implicit database: JsEntityAccess,
       // merge the two
       val mergedRows = (transactions ++ balanceChecks).sortBy {
         case trans: Transaction => (trans.transactionDate, trans.createdDate)
-        case bc: BalanceCheck => (bc.checkDate, bc.createdDate)
+        case bc: BalanceCheck   => (bc.checkDate, bc.createdDate)
       }
 
       // convert to entries (recursion does not lead to growing stack because of Stream)

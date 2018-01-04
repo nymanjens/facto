@@ -143,7 +143,7 @@ object TagInput {
         tags.zipWithIndex.map {
           case (_, index) if index == index1 => tag2
           case (_, index) if index == index2 => tag1
-          case (tag, _) => tag
+          case (tag, _)                      => tag
         }
       })
     }

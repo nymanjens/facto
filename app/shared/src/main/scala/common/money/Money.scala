@@ -70,7 +70,7 @@ object Money {
         string match {
           case _ if string.length == 1 => Try(string.toLong * 10)
           case _ if string.length == 2 => Try(string.toLong)
-          case _ => Failure(new Exception(s"string.size == ${string.length}"))
+          case _                       => Failure(new Exception(s"string.size == ${string.length}"))
         }
       }
       def parseNonCents(string: String): Try[Long] = {
@@ -88,8 +88,8 @@ object Money {
         } else {
           (firstPart, secondPart) match {
             case ("", "") => Failure(new Exception(s"Empty string ($string)"))
-            case ("", _) => parseCents(secondPart)
-            case (_, "") => parseNonCents(firstPart)
+            case ("", _)  => parseCents(secondPart)
+            case (_, "")  => parseNonCents(firstPart)
             case _ =>
               for {
                 nonCents <- parseNonCents(firstPart)

@@ -110,10 +110,10 @@ object Picklers {
   implicit object EntityTypePickler extends Pickler[EntityType.any] {
     override def pickle(entityType: EntityType.any)(implicit state: PickleState): Unit = logExceptions {
       val intValue: Int = entityType match {
-        case UserType => 1
-        case TransactionType => 2
-        case TransactionGroupType => 3
-        case BalanceCheckType => 4
+        case UserType                    => 1
+        case TransactionType             => 2
+        case TransactionGroupType        => 3
+        case BalanceCheckType            => 4
         case ExchangeRateMeasurementType => 5
       }
       state.pickle(intValue)
@@ -146,13 +146,13 @@ object Picklers {
         state.pickle[EntityType.any](modification.entityType)
         // Pickle number
         state.pickle(modification match {
-          case _: EntityModification.Add[_] => addNumber
+          case _: EntityModification.Add[_]    => addNumber
           case _: EntityModification.Update[_] => updateNumber
           case _: EntityModification.Remove[_] => removeNumber
         })
         modification match {
-          case EntityModification.Add(entity) => state.pickle(entity)
-          case EntityModification.Update(entity) => state.pickle(entity)
+          case EntityModification.Add(entity)      => state.pickle(entity)
+          case EntityModification.Update(entity)   => state.pickle(entity)
           case EntityModification.Remove(entityId) => state.pickle(entityId)
         }
       }
@@ -201,12 +201,12 @@ object Picklers {
       private def picklerForField(field: ModelField[_, _]): Pickler[_] = {
         def fromType[V: Pickler](fieldType: ModelField.FieldType[V]): Pickler[V] = implicitly
         field.fieldType match {
-          case ModelField.FieldType.BooleanType => fromType(ModelField.FieldType.BooleanType)
-          case ModelField.FieldType.LongType => fromType(ModelField.FieldType.LongType)
-          case ModelField.FieldType.DoubleType => fromType(ModelField.FieldType.DoubleType)
-          case ModelField.FieldType.StringType => fromType(ModelField.FieldType.StringType)
+          case ModelField.FieldType.BooleanType       => fromType(ModelField.FieldType.BooleanType)
+          case ModelField.FieldType.LongType          => fromType(ModelField.FieldType.LongType)
+          case ModelField.FieldType.DoubleType        => fromType(ModelField.FieldType.DoubleType)
+          case ModelField.FieldType.StringType        => fromType(ModelField.FieldType.StringType)
           case ModelField.FieldType.LocalDateTimeType => fromType(ModelField.FieldType.LocalDateTimeType)
-          case ModelField.FieldType.StringSeqType => fromType(ModelField.FieldType.StringSeqType)
+          case ModelField.FieldType.StringSeqType     => fromType(ModelField.FieldType.StringSeqType)
         }
       }
     }

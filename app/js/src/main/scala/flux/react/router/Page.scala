@@ -79,8 +79,7 @@ object Page {
       EditTransactionGroup(transactionGroupId, HasReturnTo.getCurrentEncodedPath)
   }
 
-  case class NewTransactionGroupFromReservoir private (reservoirCode: String,
-                                                       encodedReturnTo: Option[String])
+  case class NewTransactionGroupFromReservoir private (reservoirCode: String, encodedReturnTo: Option[String])
       extends HasReturnTo(encodedReturnTo)
       with Page {
     override def title(implicit i18n: I18n) = i18n("facto.new-transaction")

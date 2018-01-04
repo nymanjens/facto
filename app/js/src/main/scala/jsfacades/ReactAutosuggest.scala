@@ -20,8 +20,7 @@ object ReactAutosuggest {
     component(
       Props(
         suggestions = suggestions.toJSArray,
-        onSuggestionsFetchRequested = params =>
-          onSuggestionsFetchRequested(params.value.asInstanceOf[String]),
+        onSuggestionsFetchRequested = params => onSuggestionsFetchRequested(params.value.asInstanceOf[String]),
         onSuggestionsClearRequested = onSuggestionsClearRequested,
         getSuggestionValue = s => s,
         renderSuggestion = renderSuggestion,

@@ -152,9 +152,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
                 <.span(latestEntryToTableTitleExtra(latestEntry), " ")
               }
             },
-            <.span(
-              ^.style := js.Dictionary("color" -> "#999"),
-              s"(${i18n("facto.n-entries", numEntries)})")
+            <.span(^.style := js.Dictionary("color" -> "#999"), s"(${i18n("facto.n-entries", numEntries)})")
           )
         case StateWithMeta.Empty() =>
           <.span()

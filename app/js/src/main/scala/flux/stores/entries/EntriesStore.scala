@@ -28,7 +28,7 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database:
 
   // **************** Public API ****************//
   final def state: StateWithMeta[State] = _state match {
-    case None => StateWithMeta.Empty()
+    case None    => StateWithMeta.Empty()
     case Some(s) => StateWithMeta.WithValue(s, isStale = stateUpdateInFlight)
   }
 
@@ -94,7 +94,7 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database:
         false // In normal circumstances, no entries should be changed retroactively
       case EntityType.TransactionGroupType =>
         entityModification match {
-          case EntityModification.Add(_) => false // Always gets added alongside Transaction additions
+          case EntityModification.Add(_)    => false // Always gets added alongside Transaction additions
           case EntityModification.Update(_) => throw new UnsupportedOperationException("Immutable entity")
           case EntityModification.Remove(_) => false // Always gets removed alongside Transaction removals
         }

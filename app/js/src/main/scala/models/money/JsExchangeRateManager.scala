@@ -39,7 +39,7 @@ final class JsExchangeRateManager(
   private def ratioReferenceToForeignCurrency(currency: Currency, date: LocalDateTime): Double = {
     measurementsCache(currency).to(date).lastOption match {
       case Some((lastDate, lastRatio)) => lastRatio
-      case None => 1.0
+      case None                        => 1.0
     }
   }
 

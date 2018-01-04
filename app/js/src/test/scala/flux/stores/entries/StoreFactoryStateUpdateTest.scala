@@ -91,8 +91,7 @@ object StoreFactoryStateUpdateTest extends TestSuite {
           createTransaction(id = 10, beneficiary = testAccountA, category = testConstants.endowmentCategory))
           -> StateImpact.Change,
         Add(createTransaction(id = 9, beneficiary = testAccountA)) -> StateImpact.NoChange,
-        Add(
-          createTransaction(id = 8, beneficiary = testAccountB, category = testConstants.endowmentCategory))
+        Add(createTransaction(id = 8, beneficiary = testAccountB, category = testConstants.endowmentCategory))
           -> StateImpact.NoChange,
         // Remove Transactions
         Remove[Transaction](10) -> StateImpact.Change,

@@ -79,8 +79,7 @@ object DbQuery {
       private val substringLower = substring.toLowerCase
       override def apply(entity: E) = field.get(entity).toLowerCase contains substringLower
     }
-    case class DoesntContainIgnoreCase[E](field: ModelField[String, E], substring: String)
-        extends Filter[E] {
+    case class DoesntContainIgnoreCase[E](field: ModelField[String, E], substring: String) extends Filter[E] {
       private val substringLower = substring.toLowerCase
       override def apply(entity: E) = !(field.get(entity).toLowerCase contains substringLower)
     }
@@ -94,15 +93,15 @@ object DbQuery {
       override def apply(entity: E) = filters.toStream.exists(_.apply(entity))
       override def simplified = filters match {
         case Seq(filter) => filter
-        case _ => this
+        case _           => this
       }
     }
     case class And[E](filters: Seq[Filter[E]]) extends Filter[E] {
       override def apply(entity: E) = filters.toStream.forall(_.apply(entity))
       override def simplified = filters match {
-        case Seq() => NullFilter()
+        case Seq()       => NullFilter()
         case Seq(filter) => filter
-        case _ => this
+        case _           => this
       }
     }
   }
@@ -117,9 +116,9 @@ object DbQuery {
       fieldsWithDirection.toStream.flatMap {
         case f @ DbQuery.Sorting.FieldWithDirection(field, isDesc) =>
           f.valueOrdering.compare(field.get(x), field.get(y)) match {
-            case 0 => None
+            case 0                => None
             case result if isDesc => Some(-result)
-            case result => Some(result)
+            case result           => Some(result)
           }
       }.headOption getOrElse 0
     }

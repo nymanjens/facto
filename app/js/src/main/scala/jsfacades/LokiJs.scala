@@ -114,7 +114,7 @@ object LokiJs {
 
                     codex.decodeAfterLoad(encodedDbString) match {
                       case Some(dbString) => callback(dbString)
-                      case None => callback(null)
+                      case None           => callback(null)
                     }
                   case result =>
                     callback(result)

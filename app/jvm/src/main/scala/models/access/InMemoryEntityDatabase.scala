@@ -99,11 +99,11 @@ private[access] object InMemoryEntityDatabase {
     private def valuesAsStream(dbQuery: DbQuery[E]): Stream[E] = {
       def applySorting(stream: Stream[E]): Stream[E] = dbQuery.sorting match {
         case Some(sorting) => stream.sorted(sorting.toOrdering)
-        case None => stream
+        case None          => stream
       }
       def applyLimit(stream: Stream[E]): Stream[E] = dbQuery.limit match {
         case Some(limit) => stream.take(limit)
-        case None => stream
+        case None        => stream
       }
 
       dbQuery.sorting match {
@@ -154,7 +154,7 @@ private[access] object InMemoryEntityDatabase {
           DbQuery.Sorting.Transaction.deterministicallyByCreateDate
         )
       case EntityType.BalanceCheckType => Set(DbQuery.Sorting.BalanceCheck.deterministicallyByCheckDate)
-      case _ => Set()
+      case _                           => Set()
     }
   }
 }

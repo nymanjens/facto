@@ -104,7 +104,7 @@ object GuavaReplacement {
 
     override def equals(that: scala.Any) = that match {
       case that: ImmutableSetMultimap[A, B] => backingMap == that.backingMap
-      case _ => false
+      case _                                => false
     }
     override def hashCode() = backingMap.hashCode()
   }

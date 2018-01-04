@@ -96,7 +96,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: JsEntityAcce
         val builder = new DateToBalanceFunction.Builder(oldestBalanceDate, initialBalance)
         val mergedRows = (transactions ++ balanceChecks).sortBy {
           case trans: Transaction => (trans.transactionDate, trans.createdDate)
-          case bc: BalanceCheck => (bc.checkDate, bc.createdDate)
+          case bc: BalanceCheck   => (bc.checkDate, bc.createdDate)
         }
         mergedRows.foreach {
           case transaction: Transaction =>

@@ -35,8 +35,8 @@ object PicklableDbQuery {
   }
   object Filter {
     def fromRegular(regular: DbQuery.Filter[_]): Filter = regular match {
-      case DbQuery.Filter.NullFilter() => NullFilter()
-      case DbQuery.Filter.Equal(field, value) => Equal(FieldWithValue.fromRegular(field, value))
+      case DbQuery.Filter.NullFilter()           => NullFilter()
+      case DbQuery.Filter.Equal(field, value)    => Equal(FieldWithValue.fromRegular(field, value))
       case DbQuery.Filter.NotEqual(field, value) => NotEqual(FieldWithValue.fromRegular(field, value))
       case f @ DbQuery.Filter.GreaterThan(field, value) =>
         GreaterThan(
@@ -47,9 +47,7 @@ object PicklableDbQuery {
           FieldWithValue.fromRegular(field, value),
           PicklableOrdering.fromRegular(f.picklableOrdering))
       case f @ DbQuery.Filter.LessThan(field, value) =>
-        LessThan(
-          FieldWithValue.fromRegular(field, value),
-          PicklableOrdering.fromRegular(f.picklableOrdering))
+        LessThan(FieldWithValue.fromRegular(field, value), PicklableOrdering.fromRegular(f.picklableOrdering))
       case DbQuery.Filter.AnyOf(field, values) =>
         AnyOf(PicklableModelField.fromRegular(field), values.map(FieldWithValue.fromRegular(field, _)))
       case DbQuery.Filter.NoneOf(field, values) =>
@@ -62,7 +60,7 @@ object PicklableDbQuery {
         SeqContains(PicklableModelField.fromRegular(field), value)
       case DbQuery.Filter.SeqDoesntContain(field, value) =>
         SeqDoesntContain(PicklableModelField.fromRegular(field), value)
-      case DbQuery.Filter.Or(filters) => Or(filters.map(Filter.fromRegular))
+      case DbQuery.Filter.Or(filters)  => Or(filters.map(Filter.fromRegular))
       case DbQuery.Filter.And(filters) => And(filters.map(Filter.fromRegular))
     }
 
@@ -130,9 +128,7 @@ object PicklableDbQuery {
       override def toRegular = {
         def internal[V, E]: DbQuery.Filter[_] =
           DbQuery.Filter
-            .NoneOf[V, E](
-              field.toRegular.asInstanceOf[ModelField[V, E]],
-              values.map(_.value.asInstanceOf[V]))
+            .NoneOf[V, E](field.toRegular.asInstanceOf[ModelField[V, E]], values.map(_.value.asInstanceOf[V]))
         internal
       }
     }
@@ -217,7 +213,7 @@ object PicklableDbQuery {
   sealed abstract class PicklableOrdering(val toRegular: DbQuery.PicklableOrdering[_])
   object PicklableOrdering {
     def fromRegular(regular: DbQuery.PicklableOrdering[_]): PicklableOrdering = regular match {
-      case DbQuery.PicklableOrdering.LongOrdering => LongOrdering
+      case DbQuery.PicklableOrdering.LongOrdering          => LongOrdering
       case DbQuery.PicklableOrdering.LocalDateTimeOrdering => LocalDateTimeOrdering
     }
 
