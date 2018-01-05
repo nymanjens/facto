@@ -8,6 +8,7 @@ import common.time.Clock
 import models.Entity
 import models.access.JsEntityAccess.Listener
 import models.modification.{EntityModification, EntityType}
+import org.scalajs.dom.console
 
 import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
@@ -114,7 +115,7 @@ private[access] final class ApiBackedJsEntityAccess(implicit apiClient: ScalaJsA
       updateToken: UpdateToken): Future[UpdateToken] = async {
     val response = await(apiClient.getEntityModifications(updateToken))
     if (response.modifications.nonEmpty) {
-      println(s"  ${response.modifications.size} remote modifications received")
+      console.log(s"  ${response.modifications.size} remote modifications received")
       val somethingChanged = !response.modifications.forall(allLocallyCreatedModifications)
 
       if (somethingChanged) {

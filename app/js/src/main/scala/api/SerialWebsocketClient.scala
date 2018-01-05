@@ -106,7 +106,7 @@ private[api] final class SerialWebsocketClient(websocketPath: String) {
     SerialWebsocketClient.nextWebsocketNumber += 1
     result
   }
-  private def logLine(line: String): Unit = println(s"  [WebSocketClient-$websocketNumber] $line")
+  private def logLine(line: String): Unit = console.log(s"  [WebSocketClient-$websocketNumber] $line")
 }
 object SerialWebsocketClient {
   private var nextWebsocketNumber: Int = 1

@@ -3,6 +3,7 @@ package flux.react
 import common.LoggingUtils.logExceptions
 import flux.FactoAppModule
 import org.scalajs.dom
+import org.scalajs.dom.console
 import org.scalajs.dom.raw.{ErrorEvent, Event}
 
 import scala.async.Async.{async, await}
@@ -15,7 +16,7 @@ object FactoApp extends js.JSApp {
 
   @JSExport
   override def main(): Unit = async {
-    println("  Application starting")
+    console.log("  Application starting")
     // send log messages also to the server
     //log.enableServerLogging("/logging")
     //log.info("This message goes to server as well")
@@ -24,9 +25,9 @@ object FactoApp extends js.JSApp {
     //GlobalStyles.addToDocument()
 
     // Log all uncaught errors
-    dom.window.onerror = (event, url, lineNumber, _) => println(s"  Uncaught error: $event")
+    dom.window.onerror = (event, url, lineNumber, _) => console.log("  Uncaught error:", event)
     dom.window.addEventListener("error", (event: Event) => {
-      println(s"  Uncaught error: ${event}")
+      console.log("  Uncaught error:", event)
       false
     })
 

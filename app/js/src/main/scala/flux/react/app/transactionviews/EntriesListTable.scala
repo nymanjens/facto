@@ -9,6 +9,7 @@ import flux.stores.entries.EntriesStore.StateWithMeta
 import flux.stores.entries.{EntriesListStoreFactory, EntriesStore}
 import japgolly.scalajs.react.vdom.html_<^.{VdomElement, _}
 import japgolly.scalajs.react.{Callback, _}
+import org.scalajs.dom.console
 
 import scala.collection.immutable.Seq
 import scala.scalajs.js
@@ -173,7 +174,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
         val nextNCandidates = props.numEntriesStrategy.intermediateBeforeInf :+ Int.MaxValue
         nextNCandidates.filter(_ > state.maxNumEntries).head
       }
-      println(s"  Expanding #storeState from ${state.maxNumEntries} to $nextMaxNumEntries")
+      console.log(s"  Expanding #storeState from ${state.maxNumEntries} to $nextMaxNumEntries")
       updateMaxNumEntries(maxNumEntries = nextMaxNumEntries)
     }
 

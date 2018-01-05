@@ -8,6 +8,7 @@ import models.Entity
 import models.access.JsEntityAccess.Listener
 import models.access.SingletonKey.{NextUpdateTokenKey, VersionKey}
 import models.modification.{EntityModification, EntityType}
+import org.scalajs.dom.console
 
 import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
@@ -102,7 +103,7 @@ private[access] final class LocallyClonedJsEntityAccess(apiClient: ScalaJsApiCli
     val response =
       await(apiClient.getEntityModifications(localDatabase.getSingletonValue(NextUpdateTokenKey).get))
     if (response.modifications.nonEmpty) {
-      println(s"  ${response.modifications.size} remote modifications received")
+      console.log(s"  ${response.modifications.size} remote modifications received")
       val somethingChanged = localDatabase.applyModifications(response.modifications)
       localDatabase.setSingletonValue(NextUpdateTokenKey, response.nextUpdateToken)
       await(localDatabase.save())
@@ -125,20 +126,20 @@ private[access] object LocallyClonedJsEntityAccess {
       val populatedDb = {
         val populateIsNecessary = {
           if (db.isEmpty) {
-            println(s"  Database is empty")
+            console.log(s"  Database is empty")
             true
           } else if (!db.getSingletonValue(VersionKey).contains(localDatabaseAndEntityVersion)) {
-            println(
+            console.log(
               s"  The database version ${db.getSingletonValue(VersionKey) getOrElse "<empty>"} no longer matches " +
                 s"the newest version $localDatabaseAndEntityVersion")
             true
           } else {
-            println(s"  Database was loaded successfully. No need for a full repopulation.")
+            console.log(s"  Database was loaded successfully. No need for a full repopulation.")
             false
           }
         }
         if (populateIsNecessary) {
-          println(s"  Populating database...")
+          console.log(s"  Populating database...")
 
           // Reset database
           await(db.clear())
@@ -158,7 +159,7 @@ private[access] object LocallyClonedJsEntityAccess {
           // Await because we don't want to save unpersisted modifications that can be made as soon as
           // the database becomes valid.
           await(db.save())
-          println(s"  Population done!")
+          console.log(s"  Population done!")
           db
         } else {
           db

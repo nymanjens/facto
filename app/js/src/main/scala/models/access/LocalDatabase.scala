@@ -5,6 +5,7 @@ import jsfacades.LokiJs.Filter.Operation
 import jsfacades.{CryptoJs, LokiJs}
 import models.Entity
 import models.modification.{EntityModification, EntityType}
+import org.scalajs.dom.console
 
 import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
@@ -96,17 +97,17 @@ object LocalDatabase {
 
     override def encodeBeforeSave(dbString: String) = {
       val millis1 = System.currentTimeMillis()
-      println(s"  Encrypting ${dbString.length / 1e6}Mb String...")
+      console.log(s"  Encrypting ${dbString.length / 1e6}Mb String...")
       val result =
         CryptoJs.RC4Drop.encrypt(stringToEncrypt = decodedPrefix + dbString, password = secret).toString()
       val millis2 = System.currentTimeMillis()
-      println(s"  Encrypting ${dbString.length / 1e6}Mb String: Done after ${(millis2 - millis1) / 1e3}s")
+      console.log(s"  Encrypting ${dbString.length / 1e6}Mb String: Done after ${(millis2 - millis1) / 1e3}s")
       result
     }
 
     override def decodeAfterLoad(encodedString: String) = {
       val millis1 = System.currentTimeMillis()
-      println(s"  Decrypting ${encodedString.length / 1e6}Mb String...")
+      console.log(s"  Decrypting ${encodedString.length / 1e6}Mb String...")
       val decoded =
         try {
           CryptoJs.RC4Drop
@@ -114,16 +115,16 @@ object LocalDatabase {
             .toString(CryptoJs.Encoding.Utf8)
         } catch {
           case t: Throwable =>
-            println(s"  Caught exception while decoding database string: $t")
+            console.log(s"  Caught exception while decoding database string: $t")
             ""
         }
       val millis2 = System.currentTimeMillis()
-      println(
+      console.log(
         s"  Decrypting ${encodedString.length / 1e6}Mb String: Done after ${(millis2 - millis1) / 1e3}s")
       if (decoded.startsWith(decodedPrefix)) {
         Some(decoded.substring(decodedPrefix.length))
       } else {
-        println(s"  Failed to decode database string: ${encodedString.substring(0, 10)}")
+        console.log(s"  Failed to decode database string: ${encodedString.substring(0, 10)}")
         None
       }
     }
@@ -291,18 +292,18 @@ object LocalDatabase {
     }
 
     override def save(): Future[Unit] = async {
-      println("  Saving database...")
+      console.log("  Saving database...")
       await(lokiDb.saveDatabase())
-      println("  Saving database done.")
+      console.log("  Saving database done.")
     }
 
     override def clear(): Future[Unit] = async {
-      println("  Clearing database...")
+      console.log("  Clearing database...")
       for (collection <- allCollections) {
         collection.clear()
       }
       await(lokiDb.saveDatabase())
-      println("  Clearing database done.")
+      console.log("  Clearing database done.")
     }
 
     // **************** Private helper methods ****************//

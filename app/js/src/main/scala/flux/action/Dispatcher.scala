@@ -1,6 +1,7 @@
 package flux.action
 
 import common.LoggingUtils.logExceptions
+import org.scalajs.dom.console
 
 import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
@@ -44,9 +45,9 @@ object Dispatcher {
       require(!isDispatching, s"Dispatch triggered action $action")
 
       async {
-        println(s"  Dispatcher: Dispatching action ${action.getClass.getSimpleName}")
+        console.log(s"  Dispatcher: Dispatching action ${action.getClass.getSimpleName}")
         await(invokeCallbacks(action))
-        println(s"  Dispatcher: Dispatching action Action.Done(${action.getClass.getSimpleName})")
+        console.log(s"  Dispatcher: Dispatching action Action.Done(${action.getClass.getSimpleName})")
         await(invokeCallbacks(Action.Done(action)))
       }
     }
@@ -79,9 +80,9 @@ object Dispatcher {
       require(!isDispatching)
 
       isDispatching = true
-      println(s"  Dispatcher: Dispatching action ${action.getClass.getSimpleName}")
+      console.log(s"  Dispatcher: Dispatching action ${action.getClass.getSimpleName}")
       _callbacks.foreach(_.apply(action))
-      println(s"  Dispatcher: Dispatching action Action.Done(${action.getClass.getSimpleName})")
+      console.log(s"  Dispatcher: Dispatching action Action.Done(${action.getClass.getSimpleName})")
       _callbacks.foreach(_.apply(Action.Done(action)))
       isDispatching = false
 
