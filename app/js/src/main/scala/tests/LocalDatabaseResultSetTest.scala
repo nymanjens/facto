@@ -35,7 +35,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction()
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(ModelField.id[Transaction] isEqualTo transaction2.id)
+        .assertFilteredWith(ModelField.id[Transaction] === transaction2.id)
         .containsExactly(transaction2)
     },
     ManualTest("newQuery().filter(notEqual)") {
@@ -44,7 +44,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction()
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(ModelField.id[Transaction] isNotEqualTo transaction2.id)
+        .assertFilteredWith(ModelField.id[Transaction] !== transaction2.id)
         .containsExactly(transaction1, transaction3)
     },
     ManualTest("newQuery().filter(lessThan)") {
@@ -139,7 +139,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
 
       withTransactions(transaction1, transaction2, transaction3, transaction4)
         .assertFilteredWith({
-          ModelField.id[Transaction] isEqualTo transaction1.id
+          ModelField.id[Transaction] === transaction1.id
         } || {
           ModelField.id[Transaction] isAnyOf Seq(transaction2.id, transaction3.id)
         })
@@ -152,9 +152,9 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
 
       withTransactions(transaction1, transaction2, transaction3)
         .assertFilteredWith({
-          ModelField.Transaction.description isEqualTo "abc"
+          ModelField.Transaction.description === "abc"
         } && {
-          ModelField.Transaction.categoryCode isEqualTo testCategoryB.code
+          ModelField.Transaction.categoryCode === testCategoryB.code
         })
         .containsExactly(transaction2)
     },

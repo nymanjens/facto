@@ -7,8 +7,8 @@ import scala.collection.immutable.Seq
 
 object DbQueryImplicits {
   implicit class KeyWrapper[V, E](field: ModelField[V, E]) {
-    def isEqualTo(value: V): Filter[E] = Filter.Equal(field, value)
-    def isNotEqualTo(value: V): Filter[E] = Filter.NotEqual(field, value)
+    def ===(value: V): Filter[E] = Filter.Equal(field, value)
+    def !==(value: V): Filter[E] = Filter.NotEqual(field, value)
     def isAnyOf(values: Seq[V]): Filter[E] = Filter.AnyOf(field, values)
     def isNoneOf(values: Seq[V]): Filter[E] = Filter.NoneOf(field, values)
   }

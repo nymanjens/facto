@@ -39,7 +39,7 @@ object DbResultSet {
 
     // **************** Terminal operations **************** //
     def findOne[V](field: ModelField[V, E], value: V): Option[E] = {
-      filter(field isEqualTo value).limit(1).data() match {
+      filter(field === value).limit(1).data() match {
         case Seq(e) => Some(e)
         case Seq()  => None
       }
@@ -74,7 +74,7 @@ object DbResultSet {
 
     // **************** Terminal operations **************** //
     def findOne[V](field: ModelField[V, E], value: V): Future[Option[E]] = async {
-      await(filter(field isEqualTo value).limit(1).data()) match {
+      await(filter(field === value).limit(1).data()) match {
         case Seq(e) => Some(e)
         case Seq()  => None
       }

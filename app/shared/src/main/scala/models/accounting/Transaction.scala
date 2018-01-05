@@ -60,7 +60,7 @@ object Transaction {
   def findByGroupId(groupId: Long)(implicit entityAccess: EntityAccess): Future[Seq[Transaction]] = {
     entityAccess
       .newQuery[Transaction]()
-      .filter(ModelField.Transaction.transactionGroupId isEqualTo groupId)
+      .filter(ModelField.Transaction.transactionGroupId === groupId)
       .sort(DbQuery.Sorting.Transaction.deterministicallyByCreateDate)
       .data()
   }

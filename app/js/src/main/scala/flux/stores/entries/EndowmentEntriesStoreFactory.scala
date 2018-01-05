@@ -19,9 +19,8 @@ final class EndowmentEntriesStoreFactory(implicit database: JsEntityAccess, acco
         await(
           database
             .newQuery[Transaction]()
-            .filter(
-              ModelField.Transaction.categoryCode isEqualTo accountingConfig.constants.endowmentCategory.code)
-            .filter(ModelField.Transaction.beneficiaryAccountCode isEqualTo account.code)
+            .filter(ModelField.Transaction.categoryCode === accountingConfig.constants.endowmentCategory.code)
+            .filter(ModelField.Transaction.beneficiaryAccountCode === account.code)
             .sort(DbQuery.Sorting.Transaction.deterministicallyByConsumedDate.reversed)
             .limit(3 * maxNumEntries)
             .data()).reverse

@@ -50,7 +50,7 @@ final class SummaryYearsStoreFactory(implicit database: JsEntityAccess) extends 
         val data = await(
           database
             .newQuery[Transaction]()
-            .filter(ModelField.Transaction.beneficiaryAccountCode isEqualTo account.code)
+            .filter(ModelField.Transaction.beneficiaryAccountCode === account.code)
             .sort(sorting)
             .limit(1)
             .data())

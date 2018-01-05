@@ -25,7 +25,7 @@ final class SummaryForYearStoreFactory(implicit database: JsEntityAccess,
   // **************** Implementation of EntriesStoreFactory methods/types ****************//
   override protected def createNew(input: Input) = new Store {
     private val combinedFilter: DbQuery.Filter[Transaction] =
-      (ModelField.Transaction.beneficiaryAccountCode isEqualTo input.account.code) &&
+      (ModelField.Transaction.beneficiaryAccountCode === input.account.code) &&
         filterInYear(ModelField.Transaction.consumedDate, input.year) &&
         complexQueryFilter.fromQuery(input.query)
 

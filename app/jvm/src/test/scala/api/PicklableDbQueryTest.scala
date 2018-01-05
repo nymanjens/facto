@@ -34,8 +34,8 @@ class PicklableDbQueryTest extends HookedSpecification {
     }
     "filters" in {
       val filters: Seq[DbQuery.Filter[Transaction]] = Seq(
-        ModelField.Transaction.issuerId isEqualTo 5,
-        ModelField.Transaction.issuerId isNotEqualTo 5,
+        ModelField.Transaction.issuerId === 5,
+        ModelField.Transaction.issuerId !== 5,
         (ModelField.Transaction.issuerId < 5) || (ModelField.Transaction.createdDate > LocalDateTime.MIN),
         (ModelField.Transaction.description containsIgnoreCase "abc") && (ModelField.Transaction.tags contains "abc")
       )

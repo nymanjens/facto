@@ -149,8 +149,8 @@ object ComplexQueryFilter {
         case Seq(value) =>
           QueryFilterPair(
             estimatedExecutionCost = 1,
-            positiveFilter = field isEqualTo value,
-            negativeFilter = field isNotEqualTo value)
+            positiveFilter = field === value,
+            negativeFilter = field !== value)
         case _ =>
           QueryFilterPair(
             estimatedExecutionCost = 2,

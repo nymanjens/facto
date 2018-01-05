@@ -69,12 +69,12 @@ final class LiquidationEntriesStoreFactory(implicit database: JsEntityAccess,
             DbQuery.Filter.NullFilter[Transaction]()
               ||
                 ((ModelField.Transaction.moneyReservoirCode isAnyOf account1ReservoirCodes) &&
-                  (ModelField.Transaction.beneficiaryAccountCode isEqualTo accountPair.account2.code))
+                  (ModelField.Transaction.beneficiaryAccountCode === accountPair.account2.code))
               ||
                 ((ModelField.Transaction.moneyReservoirCode isAnyOf account2ReservoirCodes) &&
-                  (ModelField.Transaction.beneficiaryAccountCode isEqualTo accountPair.account1.code))
+                  (ModelField.Transaction.beneficiaryAccountCode === accountPair.account1.code))
               ||
-                ((ModelField.Transaction.moneyReservoirCode isEqualTo "") &&
+                ((ModelField.Transaction.moneyReservoirCode === "") &&
                   (ModelField.Transaction.beneficiaryAccountCode isAnyOf accountPair.toSet
                     .map(_.code)
                     .toVector))

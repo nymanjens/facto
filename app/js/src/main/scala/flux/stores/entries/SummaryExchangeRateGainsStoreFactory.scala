@@ -59,7 +59,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: JsEntityAcce
         await(
           database
             .newQuery[BalanceCheck]()
-            .filter(ModelField.BalanceCheck.moneyReservoirCode isEqualTo reservoir.code)
+            .filter(ModelField.BalanceCheck.moneyReservoirCode === reservoir.code)
             .filter(ModelField.BalanceCheck.checkDate < monthsInYear.head.startTime)
             .sort(DbQuery.Sorting.BalanceCheck.deterministicallyByCheckDate.reversed)
             .limit(1)
@@ -71,7 +71,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: JsEntityAcce
       val balanceChecksFuture: Future[Seq[BalanceCheck]] =
         database
           .newQuery[BalanceCheck]()
-          .filter(ModelField.BalanceCheck.moneyReservoirCode isEqualTo reservoir.code)
+          .filter(ModelField.BalanceCheck.moneyReservoirCode === reservoir.code)
           .filter(
             filterInRange(
               ModelField.BalanceCheck.checkDate,
@@ -82,7 +82,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: JsEntityAcce
       val transactionsFuture: Future[Seq[Transaction]] =
         database
           .newQuery[Transaction]()
-          .filter(ModelField.Transaction.moneyReservoirCode isEqualTo reservoir.code)
+          .filter(ModelField.Transaction.moneyReservoirCode === reservoir.code)
           .filter(
             filterInRange(
               ModelField.Transaction.transactionDate,

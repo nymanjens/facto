@@ -415,7 +415,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         val transactions = await(
           entityAccess
             .newQuery[Transaction]()
-            .filter(ModelField.Transaction.categoryCode isEqualTo category.code)
+            .filter(ModelField.Transaction.categoryCode === category.code)
             .sort(DbQuery.Sorting.Transaction.deterministicallyByCreateDate.reversed)
             .limit(300)
             .data())

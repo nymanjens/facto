@@ -23,7 +23,7 @@ final class TagsStoreFactory(implicit database: JsEntityAccess) extends EntriesS
         await(
           database
             .newQuery[Transaction]()
-            .filter(ModelField.Transaction.tags isNotEqualTo Seq())
+            .filter(ModelField.Transaction.tags !== Seq())
             .data())
 
       val tagToTransactionIdsBuilder =
