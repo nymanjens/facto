@@ -37,7 +37,7 @@ private[transactionviews] final class SummaryTable(
   private val component = {
     ScalaComponent
       .builder[Props](getClass.getSimpleName)
-      .initialState(State(allYearsData = AllYearsData.empty))
+      .initialState(State(allYearsData = AllYearsData.empty, dataIsLoading = true))
       .renderBackend[Backend]
       .componentWillMount(scope => scope.backend.willMount(scope.props))
       .componentWillUnmount(scope => scope.backend.willUnmount())
@@ -78,7 +78,7 @@ private[transactionviews] final class SummaryTable(
                            onSetExpandedYear: Int => Callback,
                            router: RouterContext)
 
-  private case class State(allYearsData: AllYearsData)
+  private case class State(allYearsData: AllYearsData, dataIsLoading: Boolean)
 
   @visibleForTesting private[transactionviews] case class AllYearsData(
       allTransactionsYearRange: YearRange,
@@ -267,73 +267,78 @@ private[transactionviews] final class SummaryTable(
         ),
         <.tbody(
           // **************** Categories data **************** //
-          {
-            for (category <- data.categories) yield {
-              <.tr(
-                ^.key := category.code,
-                columns.map {
-                  case TitleColumn =>
-                    <.td(^.key := "title", category.name)
-                  case OmittedYearsColumn(_) =>
-                    <.td(^.key := "omitted-years", "...")
-                  case MonthColumn(month) =>
-                    val cellData = data.cell(category, month)
-                    <.td(
-                      ^.key := s"avg-${category.code}-${month.year}-${month.month}",
-                      ^^.classes(cellClasses(month)),
-                      uielements.UpperRightCorner(
-                        cornerContent = <<.ifThen(cellData.nonEmpty)(s"(${cellData.transactions.size})"))(
-                        /* centralContent = */
-                        if (cellData.nonEmpty) cellData.totalFlow.formatFloat else "",
-                        ^^.ifThen(cellData.nonEmpty) {
-                          <.div(
-                            ^.className := "entries",
-                            (for (transaction <- cellData.transactions) yield {
-                              <.div(
-                                ^.key := transaction.id,
-                                router.anchorWithHrefTo(
-                                  Page.EditTransactionGroup(transaction.transactionGroupId))(
-                                  uielements.MoneyWithCurrency(transaction.flow),
-                                  " - ",
-                                  <<.joinWithSpaces(
-                                    transaction.tags
+          if (data.categories.isEmpty || state.dataIsLoading) {
+            // No data or fallback in case data is still loading
+            {
+              for (category <- account.categories) yield {
+                <.tr(
+                  ^.key := category.code,
+                  columns.map {
+                    case TitleColumn =>
+                      <.td(^.key := "title", category.name)
+                    case OmittedYearsColumn(_) =>
+                      <.td(^.key := "empty-omitted-years", "...")
+                    case MonthColumn(month) =>
+                      <.td(^.key := s"empty-avg-${month.year}-${month.month}", ^.className := "cell")
+                    case AverageColumn(year) =>
+                      <.td(^.key := s"empty-avg-$year", ^.className := "average")
+                  }.toVdomArray
+                )
+              }
+            }.toVdomArray
+          } else {
+            {
+              for (category <- data.categories) yield {
+                <.tr(
+                  ^.key := category.code,
+                  columns.map {
+                    case TitleColumn =>
+                      <.td(^.key := "title", category.name)
+                    case OmittedYearsColumn(_) =>
+                      <.td(^.key := "omitted-years", "...")
+                    case MonthColumn(month) =>
+                      val cellData = data.cell(category, month)
+                      <.td(
+                        ^.key := s"avg-${category.code}-${month.year}-${month.month}",
+                        ^^.classes(cellClasses(month)),
+                        uielements.UpperRightCorner(
+                          cornerContent = <<.ifThen(cellData.nonEmpty)(s"(${cellData.transactions.size})"))(
+                          /* centralContent = */
+                          if (cellData.nonEmpty) cellData.totalFlow.formatFloat else "",
+                          ^^.ifThen(cellData.nonEmpty) {
+                            <.div(
+                              ^.className := "entries",
+                              (for (transaction <- cellData.transactions) yield {
+                                <.div(
+                                  ^.key := transaction.id,
+                                  router.anchorWithHrefTo(
+                                    Page.EditTransactionGroup(transaction.transactionGroupId))(
+                                    uielements.MoneyWithCurrency(transaction.flow),
+                                    " - ",
+                                    <<.joinWithSpaces(transaction.tags
                                       .map(tag =>
                                         <.span(
                                           ^^.classes("label", s"label-${Tags.getBootstrapClassSuffix(tag)}"),
                                           ^.key := tag,
                                           tag))),
-                                  " ",
-                                  transaction.description
+                                    " ",
+                                    transaction.description
+                                  )
                                 )
-                              )
-                            }).toVdomArray
-                          )
-                        }
+                              }).toVdomArray
+                            )
+                          }
+                        )
                       )
-                    )
-                  case AverageColumn(year) =>
-                    <.td(
-                      ^.key := s"avg-${category.code}-$year",
-                      ^.className := "average",
-                      data.yearlyAverage(year, category).formatFloat)
-                }.toVdomArray
-              )
-            }
-          }.toVdomArray,
-          ^^.ifThen(data.categories.isEmpty) {
-            <.tr(
-              ^.key := "empty",
-              columns.map {
-                case TitleColumn =>
-                  <.td(^.key := "empty-title", i18n("facto.empty"))
-                case OmittedYearsColumn(_) =>
-                  <.td(^.key := "empty-omitted-years", "...")
-                case MonthColumn(month) =>
-                  <.td(^.key := s"empty-avg-${month.year}-${month.month}", ^.className := "cell")
-                case AverageColumn(year) =>
-                  <.td(^.key := s"empty-avg-$year", ^.className := "average")
-              }.toVdomArray
-            )
+                    case AverageColumn(year) =>
+                      <.td(
+                        ^.key := s"avg-${category.code}-$year",
+                        ^.className := "average",
+                        data.yearlyAverage(year, category).formatFloat)
+                  }.toVdomArray
+                )
+              }
+            }.toVdomArray
           },
           // **************** Exchange rate gains data **************** //
           ^^.ifThen(props.query.isEmpty) {
@@ -440,7 +445,7 @@ private[transactionviews] final class SummaryTable(
         (dataBuilder.result, usedStores.toSet)
       }
 
-      $.modState(_.copy(allYearsData = data)).runNow()
+      $.modState(_.copy(allYearsData = data, dataIsLoading = usedStores.exists(!_.state.hasState))).runNow()
       usedStores.filterNot(allRegisteredStores).foreach(_.register(this))
       allRegisteredStores.filterNot(usedStores).foreach(_.deregister(this))
       allRegisteredStores = usedStores
