@@ -32,8 +32,6 @@ object DbQuery {
 
   sealed trait Filter[E] {
     def apply(entity: E): Boolean
-
-    def simplified: Filter[E] = this
   }
   object Filter {
     case class NullFilter[E]() extends Filter[E] {
@@ -91,18 +89,9 @@ object DbQuery {
     }
     case class Or[E](filters: Seq[Filter[E]]) extends Filter[E] {
       override def apply(entity: E) = filters.toStream.exists(_.apply(entity))
-      override def simplified = filters match {
-        case Seq(filter) => filter
-        case _           => this
-      }
     }
     case class And[E](filters: Seq[Filter[E]]) extends Filter[E] {
       override def apply(entity: E) = filters.toStream.forall(_.apply(entity))
-      override def simplified = filters match {
-        case Seq()       => NullFilter()
-        case Seq(filter) => filter
-        case _           => this
-      }
     }
   }
 
