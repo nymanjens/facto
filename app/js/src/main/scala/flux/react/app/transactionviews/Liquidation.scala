@@ -63,17 +63,7 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
                     <.th(i18n("facto.description")),
                     <.th(i18n("facto.flow")),
                     <.th(s"${account1.veryShortName} -> ${account2.veryShortName}"),
-                    <.th(repayButton(
-                      account1 = account1,
-                      account2 = account2,
-                      amount = //                        entriesStoreFactory
-//                        .get(accountPair = accountPair, maxNumEntries = startNumEntries)
-//                        .state
-//                        .entries
-//                        .lastOption
-//                        .map(_.debt) getOrElse ReferenceMoney(0)
-                        ReferenceMoney(0)
-                    ))
+                    <.th(repayButton(account1 = account1, account2 = account2))
                   ),
                   calculateTableData = entry =>
                     Seq[VdomElement](
@@ -101,9 +91,9 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
   }
 
   // **************** Private helper methods ****************//
-  private def repayButton(account1: Account, account2: Account, amount: ReferenceMoney)(
+  private def repayButton(account1: Account, account2: Account)(
       implicit router: RouterContext): VdomElement = {
-    router.anchorWithHrefTo(Page.NewForRepayment(account1 = account1, account2 = account2, amount = amount))(
+    router.anchorWithHrefTo(Page.NewForRepayment(account1 = account1, account2 = account2))(
       ^.className := "btn btn-info btn-xs",
       ^.role := "button",
       <.i(^.className := "fa fa-check-square-o fa-fw"),

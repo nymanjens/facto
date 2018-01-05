@@ -105,45 +105,32 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
   def forRepayment(accountCode1: String,
                    accountCode2: String,
-                   amountInCents: Long,
                    returnToPath: Path,
                    router: RouterContext): VdomElement = {
-    if (amountInCents < 0) {
-      forRepayment(accountCode2, accountCode1, -amountInCents, returnToPath, router)
-    } else {
-      val account1 = accountingConfig.accounts(accountCode1)
-      val account2 = accountingConfig.accounts(accountCode2)
-      def getAbsoluteFlowForAccountCurrency(account: Account): DatedMoney = {
-        val amount = ReferenceMoney(amountInCents)
-        val currency = account.defaultElectronicReservoir.currency
-        // Using current date because the repayment takes place today.
-        amount.withDate(clock.now).exchangedForCurrency(currency)
-      }
+    val account1 = accountingConfig.accounts(accountCode1)
+    val account2 = accountingConfig.accounts(accountCode2)
 
-      forCreate(
-        TransactionGroup.Partial(
-          Seq(
-            Transaction.Partial.from(
-              beneficiary = account1,
-              moneyReservoir = account1.defaultElectronicReservoir,
-              category = accountingConfig.constants.accountingCategory,
-              description = accountingConfig.constants.liquidationDescription,
-              flowInCents = -getAbsoluteFlowForAccountCurrency(account1).cents
-            ),
-            Transaction.Partial.from(
-              beneficiary = account1,
-              moneyReservoir = account2.defaultElectronicReservoir,
-              category = accountingConfig.constants.accountingCategory,
-              description = accountingConfig.constants.liquidationDescription,
-              flowInCents = getAbsoluteFlowForAccountCurrency(account2).cents
-            )
+    forCreate(
+      TransactionGroup.Partial(
+        Seq(
+          Transaction.Partial.from(
+            beneficiary = account1,
+            moneyReservoir = account1.defaultElectronicReservoir,
+            category = accountingConfig.constants.accountingCategory,
+            description = accountingConfig.constants.liquidationDescription
           ),
-          zeroSum = true
+          Transaction.Partial.from(
+            beneficiary = account1,
+            moneyReservoir = account2.defaultElectronicReservoir,
+            category = accountingConfig.constants.accountingCategory,
+            description = accountingConfig.constants.liquidationDescription
+          )
         ),
-        returnToPath,
-        router
-      )
-    }
+        zeroSum = true
+      ),
+      returnToPath,
+      router
+    )
   }
 
   // **************** Private helper methods ****************//
