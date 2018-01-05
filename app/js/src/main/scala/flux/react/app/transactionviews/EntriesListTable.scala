@@ -115,7 +115,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
 
     def render(props: Props, state: State) = logExceptions {
       uielements.Table(
-        title = props.tableTitle + (if (state.storeState.isStale) " <fetching...>" else ""),
+        title = props.tableTitle,
         tableClasses = props.tableClasses,
         setExpanded = props.setExpanded,
         expandNumEntriesCallback = {
@@ -156,7 +156,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
             <.span(^.style := js.Dictionary("color" -> "#999"), s"(${i18n("facto.n-entries", numEntries)})")
           )
         case StateWithMeta.Empty() =>
-          <.span()
+          <.i(^.className := "fa fa-circle-o-notch fa-spin")
       }
     }
 
