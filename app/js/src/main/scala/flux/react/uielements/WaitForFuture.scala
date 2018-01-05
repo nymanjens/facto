@@ -6,6 +6,7 @@ import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.scalajs.js
 
 final class WaitForFuture[V] {
   private val component = ScalaComponent
@@ -14,7 +15,7 @@ final class WaitForFuture[V] {
     .renderPS((_, props, state) =>
       state.input match {
         case Some(input) => props.inputToElement(input)
-        case None        => <.span("loading...")
+        case None        => <.div(^.style := js.Dictionary("padding" -> "200px 0  500px 60px"), "loading...")
     })
     .componentWillMount($ =>
       LogExceptionsCallback {
