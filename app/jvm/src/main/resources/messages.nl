@@ -143,3 +143,4 @@ facto.collapse-all=Allen inklappen
 facto.expand-all=Allen uitklappen
 facto.net-worth=Netto vermogen
 facto.add-new=toevoegen
+facto.loading=Laden
