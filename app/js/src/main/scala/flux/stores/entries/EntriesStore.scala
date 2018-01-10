@@ -6,7 +6,7 @@ import models.accounting.{BalanceCheck, Transaction}
 import models.modification.{EntityModification, EntityType}
 
 import scala.collection.immutable.Seq
-import scala.concurrent.Future
+import scala.concurrent.{Future, Promise}
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 /**
@@ -30,6 +30,20 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database:
   final def state: StateWithMeta[State] = _state match {
     case None    => StateWithMeta.Empty()
     case Some(s) => StateWithMeta.WithValue(s, isStale = stateUpdateInFlight)
+  }
+
+  final def stateFuture: Future[State] = _state match {
+    case Some(s) => Future.successful(s)
+    case None =>
+      val promise = Promise[State]()
+      val listener: EntriesStore.Listener = () => {
+        if (_state.isDefined) {
+          promise.success(_state.get)
+        }
+      }
+      register(listener)
+      promise.future.map(_ => deregister(listener))
+      promise.future
   }
 
   final def register(listener: EntriesStore.Listener): Unit = {
