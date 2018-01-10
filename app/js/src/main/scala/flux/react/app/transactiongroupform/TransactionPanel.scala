@@ -61,7 +61,18 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           )
       })
       .renderBackend[Backend]
-      .componentWillMount($ => LogExceptionsCallback($.backend.updateAllDescriptionSuggestionsForCategory()))
+      .componentWillMount($ =>
+        LogExceptionsCallback {
+          $.backend.updateAllDescriptionSuggestionsForCategory()
+
+          // Note: This is not strictly correct because we are using changing state from outside
+          // this component without listening to the tagsStore for changes. This is because being
+          // up-to-date is not really necessary but would introduce a lot of code.
+          tagsStoreFactory
+            .get()
+            .stateFuture
+            .map(state => $.modState(_.copy(allTags = state.tagToTransactionIds.keySet.toVector)).runNow())
+      })
       .build
   }
 
@@ -173,7 +184,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                            beneficiaryAccount: Account,
                            moneyReservoir: MoneyReservoir,
                            descriptionSuggestions: Seq[String] = Seq(),
-                           allDescriptionSuggestionsForCategory: Option[State.CategoryAndSuggestions] = None)
+                           allDescriptionSuggestionsForCategory: Option[State.CategoryAndSuggestions] = None,
+                           allTags: Seq[String] = Seq())
   private object State {
     case class CategoryAndSuggestions(category: Category, suggestions: Seq[String])
   }
@@ -391,13 +403,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             ref = extraProps.ref,
             name = "tags",
             label = i18n("facto.tags"),
-            suggestions =
-              // Note: This is not strictly correct because we are using changing state from outside
-              // this component without putting it into the state (and listening to the tagsStore for
-              // changes. This is because being up-to-date is not really necessary but would introduce
-              // a lot of code.
-              // tagsStoreFactory.get().state.tagToTransactionIds.keySet.toVector,
-              Seq(),
+            suggestions = state.allTags,
             showErrorMessage = props.showErrorMessages,
             additionalValidator = _.forall(Tags.isValidTag),
             defaultValue = props.defaultValues.tags,
