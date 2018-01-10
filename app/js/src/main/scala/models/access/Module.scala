@@ -28,6 +28,6 @@ final class Module(user: User)(implicit scalaJsApiClient: ScalaJsApiClient,
 
     entityAccess.startSchedulingModifiedEntityUpdates()
 
-    Future.successful(new ApiBackedJsEntityAccess)
+    Future.successful(entityAccess)
   }
 }
