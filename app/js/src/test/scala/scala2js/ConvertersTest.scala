@@ -40,12 +40,12 @@ object ConvertersTest extends TestSuite {
       }
     }
 
-    "entityTypeToConverter" - {
-      entityTypeToConverter(EntityType.UserType) ==> UserConverter
-      entityTypeToConverter(EntityType.TransactionType) ==> TransactionConverter
-      entityTypeToConverter(EntityType.TransactionGroupType) ==> TransactionGroupConverter
-      entityTypeToConverter(EntityType.BalanceCheckType) ==> BalanceCheckConverter
-      entityTypeToConverter(EntityType.ExchangeRateMeasurementType) ==> ExchangeRateMeasurementConverter
+    "fromEntityType" - {
+      fromEntityType(EntityType.UserType) ==> UserConverter
+      fromEntityType(EntityType.TransactionType) ==> TransactionConverter
+      fromEntityType(EntityType.TransactionGroupType) ==> TransactionGroupConverter
+      fromEntityType(EntityType.BalanceCheckType) ==> BalanceCheckConverter
+      fromEntityType(EntityType.ExchangeRateMeasurementType) ==> ExchangeRateMeasurementConverter
     }
 
     "seqConverter" - {

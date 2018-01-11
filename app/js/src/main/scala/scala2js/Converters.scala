@@ -18,7 +18,7 @@ import scala2js.Scala2Js.Converter
 object Converters {
 
   // **************** Non-implicits **************** //
-  implicit def entityTypeToConverter[E <: Entity: EntityType]: Scala2Js.MapConverter[E] = {
+  implicit def fromEntityType[E <: Entity: EntityType]: Scala2Js.MapConverter[E] = {
     val entityType: EntityType[E] = implicitly[EntityType[E]]
     val converter: Scala2Js.MapConverter[_ <: Entity] = entityType match {
       case EntityType.UserType                    => UserConverter
