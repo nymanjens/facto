@@ -4,7 +4,7 @@ import com.google.inject._
 import common.testing.TestObjects._
 import common.testing._
 import models._
-import models.access.EntityAccess
+import models.access.{EntityAccess, JvmEntityAccess}
 import models.user.Users
 import org.junit.runner._
 import org.specs2.runner._
@@ -14,7 +14,7 @@ import play.api.test._
 class ConfigTest extends HookedSpecification {
 
   @Inject implicit private val config: Config = null
-  @Inject implicit private val entityAccess: EntityAccess = null
+  @Inject implicit private val entityAccess: JvmEntityAccess = null
 
   override def before() = {
     Guice.createInjector(new FactoTestModule).injectMembers(this)
