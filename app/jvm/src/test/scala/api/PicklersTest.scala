@@ -1,18 +1,22 @@
 package api
 
+import java.time.Month._
+
 import api.Picklers._
 import api.ScalaJsApi._
 import boopickle.Default._
 import boopickle.Pickler
+import common.money.Currency
 import common.testing.TestObjects._
 import common.testing._
+import common.time.LocalDateTimes
 import models.accounting.Transaction
 import models.accounting.config.Config
-import models.manager._
 import models.modification.{EntityModification, EntityType}
 import org.junit.runner._
 import org.specs2.runner._
 
+import scala.collection.SortedMap
 import scala.collection.immutable.Seq
 
 @RunWith(classOf[JUnitRunner])
@@ -42,7 +46,14 @@ class PicklersTest extends HookedSpecification {
 
   "GetInitialDataResponse" in {
     testPickleAndUnpickle[GetInitialDataResponse](
-      GetInitialDataResponse(testAccountingConfig, testUserRedacted, i18nMessages = Map("abc" -> "def")))
+      GetInitialDataResponse(
+        accountingConfig = testAccountingConfig,
+        user = testUserRedacted,
+        allUsers = Seq(testUserRedacted),
+        i18nMessages = Map("abc" -> "def"),
+        ratioReferenceToForeignCurrency =
+          Map(Currency.Gbp -> SortedMap(LocalDateTimes.createDateTime(2012, MAY, 2) -> 1.2349291837))
+      ))
   }
 
   "GetAllEntitiesResponse" in {

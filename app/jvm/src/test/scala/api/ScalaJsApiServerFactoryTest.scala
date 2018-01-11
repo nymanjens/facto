@@ -5,17 +5,10 @@ import common.GuavaReplacement.Iterables.getOnlyElement
 import common.testing.TestObjects._
 import common.testing.TestUtils._
 import common.testing._
-import models._
 import models.access.JvmEntityAccess
-import models.accounting.SlickTransactionManager
 import models.accounting.config._
-import models.modification.{
-  EntityModification,
-  EntityModificationEntity,
-  EntityType,
-  SlickEntityModificationEntityManager
-}
-import models.user.Users
+import models.modification.{EntityModificationEntity, EntityType}
+import models.slick.SlickUtils.dbRun
 import org.junit.runner._
 import org.specs2.runner._
 import play.api.test._
@@ -35,9 +28,6 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
   @Inject implicit private val fakeClock: FakeClock = null
   @Inject implicit private val entityAccess: JvmEntityAccess = null
   @Inject implicit private val accountingConfig: Config = null
-  @Inject private val userManager: SlickUserManager = null
-  @Inject private val transactionManager: SlickTransactionManager = null
-  @Inject private val modificationEntityManager: SlickEntityModificationEntityManager = null
 
   @Inject private val serverFactory: ScalaJsApiServerFactory = null
 
@@ -79,8 +69,9 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
 
     serverFactory.create().persistEntityModifications(Seq(testModification))
 
-    modificationEntityManager.fetchAll() must haveSize(1)
-    val modificationEntity = getOnlyElement(modificationEntityManager.fetchAll())
+    val allModifications = dbRun(entityAccess.newSlickQuery[EntityModificationEntity]())
+    allModifications must haveSize(1)
+    val modificationEntity = getOnlyElement(allModifications)
     modificationEntity.userId mustEqual user.id
     modificationEntity.modification mustEqual testModification
     modificationEntity.date mustEqual testDate
