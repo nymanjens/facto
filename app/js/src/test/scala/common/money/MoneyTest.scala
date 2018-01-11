@@ -16,7 +16,7 @@ class MoneyTest extends TestSuite {
   override def tests = TestSuite {
     val testModule = new TestModule()
     implicit val clock = testModule.fakeClock
-    implicit val entityAccess = testModule.fakeRemoteDatabaseProxy
+    implicit val entityAccess = testModule.fakeEntityAccess
     implicit val exchangeRateManager: JsExchangeRateManager = testModule.exchangeRateManager
 
     "Money" - {
