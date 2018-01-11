@@ -69,9 +69,7 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
 
     serverFactory.create().persistEntityModifications(Seq(testModification))
 
-    val allModifications = dbRun(entityAccess.newSlickQuery[EntityModificationEntity]())
-    allModifications must haveSize(1)
-    val modificationEntity = getOnlyElement(allModifications)
+    val modificationEntity = getOnlyElement(dbRun(entityAccess.newSlickQuery[EntityModificationEntity]()))
     modificationEntity.userId mustEqual user.id
     modificationEntity.modification mustEqual testModification
     modificationEntity.date mustEqual testDate
