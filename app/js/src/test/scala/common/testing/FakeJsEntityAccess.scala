@@ -4,6 +4,7 @@ import models.Entity
 import models.access.{DbQueryExecutor, DbResultSet, JsEntityAccess}
 import models.access.JsEntityAccess.Listener
 import models.modification.{EntityModification, EntityType}
+import models.user.User
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
@@ -18,7 +19,11 @@ final class FakeJsEntityAccess extends JsEntityAccess {
 
   // **************** Implementation of ScalaJsApiClient trait ****************//
   override def newQuery[E <: Entity: EntityType]() = {
-    DbResultSet.fromExecutor(DbQueryExecutor.fromEntities(modificationsBuffer.getAllEntitiesOfType[E]))
+    DbResultSet.fromExecutor(
+      DbQueryExecutor.fromEntities(modificationsBuffer.getAllEntitiesOfType[E]).asAsync)
+  }
+  override def newQuerySyncForUser() = {
+    DbResultSet.fromExecutor(DbQueryExecutor.fromEntities(modificationsBuffer.getAllEntitiesOfType[User]))
   }
   override def hasLocalAddModifications[E <: Entity: EntityType](entity: E) = {
     localModificationIds contains entity.id
@@ -27,10 +32,6 @@ final class FakeJsEntityAccess extends JsEntityAccess {
     modificationsBuffer.addModifications(modifications)
     listeners.foreach(_.addedLocally(modifications))
     listeners.foreach(_.localModificationPersistedRemotely(modifications))
-    Future.successful((): Unit)
-  }
-  override def clearLocalDatabase(): Future[Unit] = {
-    modificationsBuffer.clear()
     Future.successful((): Unit)
   }
   override def registerListener(listener: Listener): Unit = {
