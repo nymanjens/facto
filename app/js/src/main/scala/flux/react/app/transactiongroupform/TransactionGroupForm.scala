@@ -70,11 +70,11 @@ final class TransactionGroupForm(implicit i18n: I18n,
   def forEdit(transactionGroupId: Long, returnToPath: Path, router: RouterContext): VdomElement =
     create(async {
       val group = await(entityAccess.newQuery[TransactionGroup]().findById(transactionGroupId))
-      val groupWithTransactions = await(group.withTransactions)
+      val transactions = await(group.transactions)
 
       Props(
-        operationMeta = OperationMeta.Edit(groupWithTransactions),
-        groupPartial = TransactionGroup.Partial.from(groupWithTransactions),
+        operationMeta = OperationMeta.Edit(group, transactions),
+        groupPartial = TransactionGroup.Partial.from(group, transactions),
         returnToPath = returnToPath,
         router = router
       )
@@ -156,7 +156,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
   private sealed trait OperationMeta
   private object OperationMeta {
     case object AddNew extends OperationMeta
-    case class Edit(group: TransactionGroup.WithTransactions) extends OperationMeta
+    case class Edit(group: TransactionGroup, transactions: Seq[Transaction]) extends OperationMeta
   }
 
   /**
@@ -399,11 +399,10 @@ final class TransactionGroupForm(implicit i18n: I18n,
         val action = props.operationMeta match {
           case OperationMeta.AddNew =>
             Action.AddTransactionGroup(transactionsWithoutIdProvider = transactionsWithoutIdProvider(_))
-          case OperationMeta.Edit(group) =>
+          case OperationMeta.Edit(group, transactions) =>
             Action.UpdateTransactionGroup(
-              transactionGroupWithId = group.entity,
-              transactionsWithoutId =
-                transactionsWithoutIdProvider(group.entity, Some(group.transactions.head.issuerId))
+              transactionGroupWithId = group,
+              transactionsWithoutId = transactionsWithoutIdProvider(group, Some(transactions.head.issuerId))
             )
         }
 
@@ -439,8 +438,8 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
       props.operationMeta match {
         case OperationMeta.AddNew => throw new AssertionError("Should never happen")
-        case OperationMeta.Edit(group) =>
-          dispatcher.dispatch(Action.RemoveTransactionGroup(transactionGroupWithId = group.entity))
+        case OperationMeta.Edit(group, transactions) =>
+          dispatcher.dispatch(Action.RemoveTransactionGroup(transactionGroupWithId = group))
           props.router.setPath(props.returnToPath)
       }
     }

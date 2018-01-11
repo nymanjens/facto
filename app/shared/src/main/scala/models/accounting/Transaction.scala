@@ -3,13 +3,11 @@ package models.accounting
 import common.money.DatedMoney
 import common.time.LocalDateTime
 import models._
-import models.access.DbQueryImplicits._
-import models.access.{DbQuery, EntityAccess, ModelField}
+import models.access.EntityAccess
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.user.User
 
 import scala.collection.immutable.Seq
-import scala.concurrent.Future
 
 /** Transaction entities are immutable. Just delete and create a new one when updating. */
 case class Transaction(transactionGroupId: Long,
@@ -56,14 +54,6 @@ case class Transaction(transactionGroupId: Long,
 }
 object Transaction {
   def tupled = (this.apply _).tupled
-
-  def findByGroupId(groupId: Long)(implicit entityAccess: EntityAccess): Future[Seq[Transaction]] = {
-    entityAccess
-      .newQuery[Transaction]()
-      .filter(ModelField.Transaction.transactionGroupId === groupId)
-      .sort(DbQuery.Sorting.Transaction.deterministicallyByCreateDate)
-      .data()
-  }
 
   /** Same as Transaction, except all fields are optional. */
   case class Partial(transactionGroupId: Option[Long] = None,

@@ -1,5 +1,7 @@
 package flux.stores.entries
 
+import common.GuavaReplacement.Iterables
+import common.GuavaReplacement.Iterables.getOnlyElement
 import common.money.{ExchangeRateManager, ReferenceMoney}
 import models.access.DbQueryImplicits._
 import models.access.{DbQuery, EntityAccess, JsEntityAccess, ModelField}
@@ -92,7 +94,14 @@ final class LiquidationEntriesStoreFactory(implicit database: JsEntityAccess,
           case "" =>
             // Pick the first beneficiary in the group. This simulates that the zero sum transaction was physically
             // performed on an actual reservoir, which is needed for the liquidation calculator to work.
-            await(Transaction.findByGroupId(transaction.transactionGroupId)).head.beneficiary
+            getOnlyElement(
+              await(
+                entityAccess
+                  .newQuery[Transaction]()
+                  .filter(ModelField.Transaction.transactionGroupId === transaction.transactionGroupId)
+                  .sort(DbQuery.Sorting.Transaction.deterministicallyByCreateDate)
+                  .limit(1)
+                  .data())).beneficiary
           case _ => transaction.moneyReservoir.owner
         }
         val involvedAccounts: Set[Account] = Set(transaction.beneficiary, moneyReservoirOwner)

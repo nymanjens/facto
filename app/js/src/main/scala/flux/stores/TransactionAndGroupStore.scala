@@ -31,8 +31,7 @@ private[stores] final class TransactionAndGroupStore(implicit database: JsEntity
 
     case UpdateTransactionGroup(group, transactionsWithoutId) =>
       async {
-        val transactionDeletions = await(group.withTransactions).transactions map (EntityModification
-          .createDelete(_))
+        val transactionDeletions = await(group.transactions) map (EntityModification.createDelete(_))
         val transactionAdditions =
           for ((transactionWithoutId, id) <- zipWithIncrementingId(transactionsWithoutId)) yield {
             EntityModification.createAddWithId(transactionWithoutId, id)
@@ -42,8 +41,7 @@ private[stores] final class TransactionAndGroupStore(implicit database: JsEntity
 
     case RemoveTransactionGroup(group) =>
       async {
-        val transactionDeletions = await(group.withTransactions).transactions map (EntityModification
-          .createDelete(_))
+        val transactionDeletions = await(group.transactions) map (EntityModification.createDelete(_))
         val groupDeletion = EntityModification.createDelete(group)
         await(database.persistModifications(transactionDeletions :+ groupDeletion))
       }

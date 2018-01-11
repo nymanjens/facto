@@ -2,13 +2,12 @@ package models.accounting
 
 import common.money.{ExchangeRateManager, ReferenceMoney}
 import common.time.LocalDateTime
-import models.accounting.config.Config
 import models.Entity
-import models.access.EntityAccess
+import models.access.DbQueryImplicits._
+import models.access.{DbQuery, EntityAccess, ModelField}
+import models.accounting.config.Config
 
-import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 /** Transaction groups should be treated as immutable. */
@@ -16,20 +15,17 @@ case class TransactionGroup(createdDate: LocalDateTime, idOption: Option[Long] =
 
   override def withId(id: Long) = copy(idOption = Some(id))
 
-  def withTransactions(implicit entityAccess: EntityAccess): Future[TransactionGroup.WithTransactions] =
-    async {
-      val transactions = await(Transaction.findByGroupId(id))
-      TransactionGroup.WithTransactions(entity = this, transactions = transactions)
-    }
+  def transactions(implicit entityAccess: EntityAccess): Future[Seq[Transaction]] = {
+    entityAccess
+      .newQuery[Transaction]()
+      .filter(ModelField.Transaction.transactionGroupId === id)
+      .sort(DbQuery.Sorting.Transaction.deterministicallyByCreateDate)
+      .data()
+  }
 }
 
 object TransactionGroup {
   def tupled = (this.apply _).tupled
-
-  case class WithTransactions(entity: TransactionGroup, transactions: Seq[Transaction]) {
-    def isZeroSum(implicit exchangeRateManager: ExchangeRateManager, accountingConfig: Config): Boolean =
-      transactions.map(_.flow.exchangedForReferenceCurrency).sum == ReferenceMoney(0)
-  }
 
   /**
     * Same as TransactionGroup, except all fields are optional, plus an additional `transactions` and `zeroSum` which
@@ -42,14 +38,16 @@ object TransactionGroup {
   object Partial {
     val withSingleEmptyTransaction: Partial = Partial(transactions = Seq(Transaction.Partial.empty))
 
-    def from(transactionGroup: TransactionGroup.WithTransactions)(
+    def from(group: TransactionGroup, transactions: Seq[Transaction])(
         implicit accountingConfig: Config,
-        exchangeRateManager: ExchangeRateManager): Partial =
+        exchangeRateManager: ExchangeRateManager): Partial = {
+      val isZeroSum = transactions.map(_.flow.exchangedForReferenceCurrency).sum == ReferenceMoney(0)
       Partial(
-        transactions = transactionGroup.transactions.map(Transaction.Partial.from),
-        zeroSum = transactionGroup.isZeroSum,
-        createdDate = Some(transactionGroup.entity.createdDate),
-        idOption = transactionGroup.entity.idOption
+        transactions = transactions.map(Transaction.Partial.from),
+        zeroSum = isZeroSum,
+        createdDate = Some(group.createdDate),
+        idOption = group.idOption
       )
+    }
   }
 }
