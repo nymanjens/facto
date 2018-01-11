@@ -23,7 +23,8 @@ import scala.collection.mutable
 
 final class JvmEntityAccess @Inject()(clock: Clock) extends EntityAccess {
 
-  private val inMemoryEntityDatabase: InMemoryEntityDatabase = new InMemoryEntityDatabase(
+  // lazy val because dropAndCreateTables() can be called before first fetch
+  private lazy val inMemoryEntityDatabase: InMemoryEntityDatabase = new InMemoryEntityDatabase(
     entitiesFetcher = new InMemoryEntityDatabase.EntitiesFetcher {
       override def fetch[E <: Entity](entityType: EntityType[E]): Seq[E] =
         getManager(entityType).fetchAll().asInstanceOf[Seq[E]]
