@@ -33,7 +33,7 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       database.addRemotelyAddedEntities(testTransactionWithId)
 
-      await(store.stateFuture).hasMore ==> true
+      await(store.stateFuture).hasMore ==> false
       await(store.stateFuture).entries ==> GeneralEntry.toGeneralEntrySeq(Seq(testTransactionWithId))
     }
 
@@ -60,15 +60,15 @@ object AllEntriesStoreFactoryTest extends TestSuite {
       var onStateUpdateCount = 0
       store.register(() => {
         onStateUpdateCount += 1
-        store.state // get state so the store knows of our interest
       })
-      store.state // get state so the store knows of our interest
 
       database.persistModifications(Seq(EntityModification.Add(testTransactionWithIdB)))
+      await(store.stateFuture)
 
       onStateUpdateCount ==> 2 // Once for local modification, once for remote persistence
 
       database.addRemotelyAddedEntities(testTransactionWithIdA)
+      await(store.stateFuture)
 
       onStateUpdateCount ==> 3
     }

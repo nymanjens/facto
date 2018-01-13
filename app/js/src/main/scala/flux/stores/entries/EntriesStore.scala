@@ -32,13 +32,13 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database:
     case Some(s) => StateWithMeta.WithValue(s, isStale = stateUpdateInFlight)
   }
 
-  final def stateFuture: Future[State] = _state match {
-    case Some(s) => Future.successful(s)
-    case None =>
+  final def stateFuture: Future[State] = state match {
+    case StateWithMeta.WithValue(s, /* isStale = */ false) => Future.successful(s)
+    case _ =>
       val promise = Promise[State]()
       val listener: EntriesStore.Listener = () => {
-        if (_state.isDefined) {
-          promise.success(_state.get)
+        if (state.hasState && !state.isStale && !promise.isCompleted) {
+          promise.success(state.state)
         }
       }
       register(listener)
