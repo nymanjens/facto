@@ -18,3 +18,5 @@ project/project
 project/target
 target
 tmp
+node_modules/
+package-lock.json
