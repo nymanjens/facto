@@ -35,6 +35,7 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       await(store.stateFuture).hasMore ==> false
       await(store.stateFuture).entries ==> GeneralEntry.toGeneralEntrySeq(Seq(testTransactionWithId))
+      store.state.state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(testTransactionWithId))
     }
 
     "store state is updated upon local update" - async {
@@ -62,15 +63,18 @@ object AllEntriesStoreFactoryTest extends TestSuite {
         onStateUpdateCount += 1
       })
 
-      database.persistModifications(Seq(EntityModification.Add(testTransactionWithIdB)))
       await(store.stateFuture)
 
-      onStateUpdateCount ==> 2 // Once for local modification, once for remote persistence
+      onStateUpdateCount ==> 1
+
+      database.persistModifications(Seq(EntityModification.Add(testTransactionWithIdB)))
+
+      onStateUpdateCount ==> 3 // Once for local modification, once for remote persistence
 
       database.addRemotelyAddedEntities(testTransactionWithIdA)
       await(store.stateFuture)
 
-      onStateUpdateCount ==> 3
+      onStateUpdateCount ==> 4
     }
 
     "combines consecutive transactions" - async {
