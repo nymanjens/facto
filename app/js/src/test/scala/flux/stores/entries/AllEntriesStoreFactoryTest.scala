@@ -1,5 +1,7 @@
 package flux.stores.entries
 
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.async.Async.{async, await}
 import java.time.Month.JANUARY
 
 import common.testing.FakeJsEntityAccess
@@ -17,50 +19,48 @@ import scala2js.Converters._
 object AllEntriesStoreFactoryTest extends TestSuite {
 
   override def tests = TestSuite {
-    implicit val database = new FakeJsEntityAccess()
+    implicit val database: FakeJsEntityAccess = new FakeJsEntityAccess()
     val factory: AllEntriesStoreFactory = new AllEntriesStoreFactory()
     val store: factory.Store = factory.get(maxNumEntries = 3)
 
-    "factory result is cached" - {
+    "factory result is cached" - async {
       factory.get(maxNumEntries = 3) ==> store
       assert(factory.get(maxNumEntries = 4) != store)
     }
 
-    "store state is updated upon remote update" - {
-      store.state ==> EntriesListStoreFactory.State.empty
+    "store state is updated upon remote update" - async {
+      await(store.stateFuture) ==> EntriesListStoreFactory.State.empty
 
       database.addRemotelyAddedEntities(testTransactionWithId)
 
-      store.state.hasMore ==> false
-      store.state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(testTransactionWithId))
+      await(store.stateFuture).hasMore ==> true
+      await(store.stateFuture).entries ==> GeneralEntry.toGeneralEntrySeq(Seq(testTransactionWithId))
     }
 
-    "store state is updated upon local update" - {
-      store.state ==> EntriesListStoreFactory.State.empty
+    "store state is updated upon local update" - async {
+      await(store.stateFuture) ==> EntriesListStoreFactory.State.empty
 
       database.persistModifications(Seq(EntityModification.Add(testTransactionWithId)))
 
-      store.state.hasMore ==> false
-      store.state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(testTransactionWithId))
+      await(store.stateFuture).hasMore ==> false
+      await(store.stateFuture).entries ==> GeneralEntry.toGeneralEntrySeq(Seq(testTransactionWithId))
     }
 
-    "store state is updated upon local removal" - {
+    "store state is updated upon local removal" - async {
       database.persistModifications(Seq(EntityModification.Add(testTransactionWithId)))
-      store.state.hasMore ==> false
-      store.state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(testTransactionWithId))
+      await(store.stateFuture).hasMore ==> false
+      await(store.stateFuture).entries ==> GeneralEntry.toGeneralEntrySeq(Seq(testTransactionWithId))
 
       database.persistModifications(Seq(EntityModification.Remove[Transaction](testTransactionWithId.id)))
 
-      store.state ==> EntriesListStoreFactory.State.empty
+      await(store.stateFuture) ==> EntriesListStoreFactory.State.empty
     }
 
-    "store calls listeners" - {
+    "store calls listeners" - async {
       var onStateUpdateCount = 0
-      store.register(new EntriesStore.Listener {
-        override def onStateUpdate() = {
-          onStateUpdateCount += 1
-          store.state // get state so the store knows of our interest
-        }
+      store.register(() => {
+        onStateUpdateCount += 1
+        store.state // get state so the store knows of our interest
       })
       store.state // get state so the store knows of our interest
 
@@ -73,18 +73,18 @@ object AllEntriesStoreFactoryTest extends TestSuite {
       onStateUpdateCount ==> 3
     }
 
-    "combines consecutive transactions" - {
+    "combines consecutive transactions" - async {
       val trans1 = testTransactionWithIdA.copy(idOption = Some(91), transactionGroupId = 122)
       val trans2 = testTransactionWithIdA.copy(idOption = Some(501), transactionGroupId = 122)
       val trans3 = testTransactionWithIdA.copy(idOption = Some(1234567890), transactionGroupId = 133)
 
       database.addRemotelyAddedEntities(trans1, trans2, trans3)
 
-      store.state.hasMore ==> false
-      store.state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(trans1, trans2), Seq(trans3))
+      await(store.stateFuture).hasMore ==> false
+      await(store.stateFuture).entries ==> GeneralEntry.toGeneralEntrySeq(Seq(trans1, trans2), Seq(trans3))
     }
 
-    "sorts entries on transaction date first and then created date" - {
+    "sorts entries on transaction date first and then created date" - async {
       def transaction(id: Long, transactionDate: LocalDateTime, createdDate: LocalDateTime): Transaction = {
         testTransactionWithIdA.copy(
           idOption = Some(id),
@@ -107,11 +107,12 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       database.addRemotelyAddedEntities(trans3, trans2, trans1)
 
-      store.state.hasMore ==> false
-      store.state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(trans1), Seq(trans2), Seq(trans3))
+      await(store.stateFuture).hasMore ==> false
+      await(store.stateFuture).entries ==> GeneralEntry
+        .toGeneralEntrySeq(Seq(trans1), Seq(trans2), Seq(trans3))
     }
 
-    "respects maxNumEntries" - {
+    "respects maxNumEntries" - async {
       def transaction(id: Long, date: LocalDateTime): Transaction = {
         testTransactionWithIdA.copy(idOption = Some(id), transactionGroupId = id, createdDate = date)
       }
@@ -122,8 +123,9 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       database.addRemotelyAddedEntities(trans1, trans2, trans3, trans4)
 
-      store.state.hasMore ==> true
-      store.state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(trans2), Seq(trans3), Seq(trans4))
+      await(store.stateFuture).hasMore ==> true
+      await(store.stateFuture).entries ==> GeneralEntry
+        .toGeneralEntrySeq(Seq(trans2), Seq(trans3), Seq(trans4))
     }
   }
 }
