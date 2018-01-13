@@ -32,6 +32,7 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database:
     case Some(s) => StateWithMeta.WithValue(s, isStale = stateUpdateInFlight)
   }
 
+  /** Returns a future that is resolved as soon as `this.state` has a non-stale value. */
   final def stateFuture: Future[State] = state match {
     case StateWithMeta.WithValue(s, /* isStale = */ false) => Future.successful(s)
     case _ =>
