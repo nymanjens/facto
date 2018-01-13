@@ -19,6 +19,10 @@ trait JsEntityAccess extends EntityAccess {
   @Deprecated def hasLocalAddModifications[E <: Entity: EntityType](entity: E): Boolean
 
   // **************** Setters ****************//
+  /**
+    * Note: All read actions that are started after this call is started are postponed until after this write has
+    * completed.
+    */
   def persistModifications(modifications: Seq[EntityModification]): Future[Unit]
   final def persistModifications(modifications: EntityModification*): Future[Unit] =
     persistModifications(modifications.toVector)
