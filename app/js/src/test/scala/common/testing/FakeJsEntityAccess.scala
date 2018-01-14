@@ -19,11 +19,10 @@ final class FakeJsEntityAccess extends JsEntityAccess {
 
   // **************** Implementation of ScalaJsApiClient trait ****************//
   override def newQuery[E <: Entity: EntityType]() = {
-    DbResultSet.fromExecutor(
-      DbQueryExecutor.fromEntities(modificationsBuffer.getAllEntitiesOfType[E]).asAsync)
+    DbResultSet.fromExecutor(queryExecutor[E].asAsync)
   }
   override def newQuerySyncForUser() = {
-    DbResultSet.fromExecutor(DbQueryExecutor.fromEntities(modificationsBuffer.getAllEntitiesOfType[User]))
+    DbResultSet.fromExecutor(queryExecutor[User])
   }
   override def hasLocalAddModifications[E <: Entity: EntityType](entity: E) = {
     localModificationIds contains entity.id
@@ -39,6 +38,8 @@ final class FakeJsEntityAccess extends JsEntityAccess {
   override def startSchedulingModifiedEntityUpdates(): Unit = ???
 
   // **************** Additional methods for tests ****************//
+  def newQuerySync[E <: Entity: EntityType](): DbResultSet.Sync[E] = DbResultSet.fromExecutor(queryExecutor)
+
   // TODO: Add manipulation methods for localModificationIds
   def addRemoteModifications(modifications: Seq[EntityModification]): Unit = {
     modificationsBuffer.addModifications(modifications)
@@ -60,4 +61,7 @@ final class FakeJsEntityAccess extends JsEntityAccess {
   }
 
   def allModifications: Seq[EntityModification] = modificationsBuffer.getModifications()
+
+  def queryExecutor[E <: Entity: EntityType]: DbQueryExecutor.Sync[E] =
+    DbQueryExecutor.fromEntities(modificationsBuffer.getAllEntitiesOfType[E])
 }

@@ -25,8 +25,8 @@ object LiquidationEntriesStoreFactoryTest extends TestSuite {
     val factory: LiquidationEntriesStoreFactory = new LiquidationEntriesStoreFactory()
 
     "empty result" - {
-      factory.get(pair, maxNumEntries = 10000).state.entries ==> Seq()
-      factory.get(pair, maxNumEntries = 10000).state.hasMore ==> false
+      factory.get(pair, maxNumEntries = 10000).state.get.entries ==> Seq()
+      factory.get(pair, maxNumEntries = 10000).state.get.hasMore ==> false
     }
 
     "gives correct results" - {
@@ -81,14 +81,14 @@ object LiquidationEntriesStoreFactoryTest extends TestSuite {
         for (i <- 1 to expectedEntries.size) {
           val subList = expectedEntries.takeRight(i)
 
-          factory.get(pair, maxNumEntries = subList.size).state.entries ==> subList
-          factory.get(pair, maxNumEntries = subList.size).state.hasMore ==> (i < expectedEntries.size)
+          factory.get(pair, maxNumEntries = subList.size).state.get.entries ==> subList
+          factory.get(pair, maxNumEntries = subList.size).state.get.hasMore ==> (i < expectedEntries.size)
         }
       }
 
       "All entries" - {
-        factory.get(pair, maxNumEntries = 10000).state.entries ==> expectedEntries
-        factory.get(pair, maxNumEntries = 10000).state.hasMore ==> false
+        factory.get(pair, maxNumEntries = 10000).state.get.entries ==> expectedEntries
+        factory.get(pair, maxNumEntries = 10000).state.get.hasMore ==> false
       }
     }
   }

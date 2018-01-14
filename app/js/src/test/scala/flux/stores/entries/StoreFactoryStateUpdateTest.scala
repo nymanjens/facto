@@ -1,13 +1,15 @@
 package flux.stores.entries
 
+import models.access.DbQueryImplicits._
 import java.time.Month._
 
 import common.testing.TestObjects._
 import common.testing.{FakeJsEntityAccess, TestModule}
 import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.GainsForYear
 import flux.stores.entries.SummaryForYearStoreFactory.SummaryForYear
+import models.Entity
+import models.access.ModelField
 import models.accounting._
-import models.manager.EntityManager
 import models.modification.EntityModification._
 import models.modification._
 import utest._
@@ -20,8 +22,6 @@ object StoreFactoryStateUpdateTest extends TestSuite {
   override def tests = TestSuite {
     val testModule = new ThisTestModule()
     implicit val database = testModule.fakeEntityAccess
-    implicit val transactionManager = testModule.transactionManager
-    implicit val balanceCheckManager = testModule.balanceCheckManager
 
     "AllEntriesStoreFactory" - runTest(
       store = testModule.allEntriesStoreFactory.get(maxNumEntries = 3),
@@ -227,26 +227,19 @@ object StoreFactoryStateUpdateTest extends TestSuite {
   }
 
   private def runTest(store: EntriesStore[_], updatesWithImpact: ListMap[EntityModification, StateImpact])(
-      implicit database: FakeJsEntityAccess,
-      transactionManager: Transaction.Manager,
-      balanceCheckManager: BalanceCheck.Manager): Unit = {
+      implicit database: FakeJsEntityAccess): Unit = {
     def checkRemovingExistingEntity(update: EntityModification): Unit = {
-      def checkIfIdExists(id: Long, manager: EntityManager[_]): Unit = {
-        try {
-          manager.findById(id) // throws if not found
-        } catch {
-          case e: Exception =>
-            throw new java.lang.AssertionError(
-              s"Could not find entity of ${update.entityType} with id $id",
-              e)
-        }
+
+      def checkIfIdExists[E <: Entity: EntityType](id: Long): Unit = {
+        val existing = database.newQuerySync[E]().findOne(ModelField.id[E], id)
+        require(existing.isDefined, s"Could not find entity of ${update.entityType} with id $id")
       }
 
       update match {
         case Remove(id) if update.entityType == EntityType.TransactionType =>
-          checkIfIdExists(id, transactionManager)
+          checkIfIdExists[Transaction](id)
         case Remove(id) if update.entityType == EntityType.BalanceCheckType =>
-          checkIfIdExists(id, balanceCheckManager)
+          checkIfIdExists[BalanceCheck](id)
         case _ => // Do nothing
       }
     }
