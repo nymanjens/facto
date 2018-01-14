@@ -45,15 +45,7 @@ final class JsExchangeRateManager(
 
   // **************** Inner type definitions ****************//
   private object RemoteDatabaseProxyListener extends JsEntityAccess.Listener {
-    override def addedLocally(modifications: Seq[EntityModification]): Unit = {
-      addedModifications(modifications)
-    }
-
-    override def addedRemotely(modifications: Seq[EntityModification]): Unit = {
-      addedModifications(modifications)
-    }
-
-    private def addedModifications(modifications: Seq[EntityModification]): Unit = {
+    override def modificationsAdded(modifications: Seq[EntityModification]): Unit = {
       for (modification <- modifications) {
         modification.entityType match {
           case EntityType.ExchangeRateMeasurementType =>

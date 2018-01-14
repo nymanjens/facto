@@ -62,7 +62,7 @@ private[access] final class ApiBackedJsEntityAccess(implicit apiClient: ScalaJsA
         modification <- modifications
         if modification.isInstanceOf[EntityModification.Add[_]]
       } localAddModificationIds(modification.entityType) += modification.entityId
-      val listeners1 = invokeListenersAsync(_.addedLocally(modifications))
+      val listeners = invokeListenersAsync(_.modificationsAdded(modifications))
 
       val apiFuture = apiClient.persistEntityModifications(modifications)
 
@@ -72,10 +72,8 @@ private[access] final class ApiBackedJsEntityAccess(implicit apiClient: ScalaJsA
         modification <- modifications
         if modification.isInstanceOf[EntityModification.Add[_]]
       } localAddModificationIds(modification.entityType) -= modification.entityId
-      val listeners2 = invokeListenersAsync(_.localModificationPersistedRemotely(modifications))
 
-      await(listeners1)
-      await(listeners2)
+      await(listeners)
     }
     lastWriteFuture
   }
@@ -119,7 +117,7 @@ private[access] final class ApiBackedJsEntityAccess(implicit apiClient: ScalaJsA
       val somethingChanged = !response.modifications.forall(allLocallyCreatedModifications)
 
       if (somethingChanged) {
-        await(invokeListenersAsync(_.addedRemotely(response.modifications)))
+        await(invokeListenersAsync(_.modificationsAdded(response.modifications)))
       }
     }
     response.nextUpdateToken

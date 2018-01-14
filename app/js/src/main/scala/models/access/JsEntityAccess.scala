@@ -37,13 +37,11 @@ object JsEntityAccess {
   trait Listener {
 
     /**
-      * Called when the local database was updated with a modification due to a local change request. This change is not
-      * yet persisted in the remote database.
+      * Future calls to `newQuery()` will contain the given modifications.
+      *
+      * Note that the modifications could originate from a local update (possibly not yet persisted on the server) or
+      * a remote update.
       */
-    def addedLocally(modifications: Seq[EntityModification]): Unit
-
-    def localModificationPersistedRemotely(modifications: Seq[EntityModification]): Unit = {}
-
-    def addedRemotely(modifications: Seq[EntityModification]): Unit
+    def modificationsAdded(modifications: Seq[EntityModification]): Unit
   }
 }

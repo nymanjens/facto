@@ -51,7 +51,7 @@ private[access] final class LocallyClonedJsEntityAccess(apiClient: ScalaJsApiCli
       modification <- modifications
       if modification.isInstanceOf[EntityModification.Add[_]]
     } localAddModificationIds(modification.entityType) += modification.entityId
-    val listeners1 = invokeListenersAsync(_.addedLocally(modifications))
+    val listeners = invokeListenersAsync(_.modificationsAdded(modifications))
 
     val apiFuture = apiClient.persistEntityModifications(modifications)
 
@@ -62,10 +62,8 @@ private[access] final class LocallyClonedJsEntityAccess(apiClient: ScalaJsApiCli
       modification <- modifications
       if modification.isInstanceOf[EntityModification.Add[_]]
     } localAddModificationIds(modification.entityType) -= modification.entityId
-    val listeners2 = invokeListenersAsync(_.localModificationPersistedRemotely(modifications))
 
-    await(listeners1)
-    await(listeners2)
+    await(listeners)
   }
 
   // **************** Other ****************//
@@ -109,7 +107,7 @@ private[access] final class LocallyClonedJsEntityAccess(apiClient: ScalaJsApiCli
       await(localDatabase.save())
 
       if (somethingChanged) {
-        await(invokeListenersAsync(_.addedRemotely(response.modifications)))
+        await(invokeListenersAsync(_.modificationsAdded(response.modifications)))
       }
     }
   }

@@ -137,27 +137,7 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database:
 
   // **************** Inner type definitions ****************//
   private object RemoteDatabaseProxyListener extends JsEntityAccess.Listener {
-    override def addedLocally(modifications: Seq[EntityModification]): Unit = {
-      addedModifications(modifications)
-    }
-
-    override def localModificationPersistedRemotely(modifications: Seq[EntityModification]): Unit = {
-      require(!isCallingListeners)
-
-      if (_state.isDefined) {
-        if (stateUpdateListeners.nonEmpty) {
-          if (impactsState(modifications, _state.get)) {
-            invokeListeners()
-          }
-        }
-      }
-    }
-
-    override def addedRemotely(modifications: Seq[EntityModification]): Unit = {
-      addedModifications(modifications)
-    }
-
-    private def addedModifications(modifications: Seq[EntityModification]): Unit = {
+    override def modificationsAdded(modifications: Seq[EntityModification]): Unit = {
       require(!isCallingListeners)
 
       if (_state.isDefined) {
