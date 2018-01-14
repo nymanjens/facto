@@ -13,7 +13,7 @@ object TagsStoreFactoryTest extends TestSuite {
 
   override def tests = TestSuite {
     val testModule = new TestModule()
-    implicit val database = testModule.fakeRemoteDatabaseProxy
+    implicit val database = testModule.fakeEntityAccess
     val factory: TagsStoreFactory = new TagsStoreFactory()
 
     "empty result" - {

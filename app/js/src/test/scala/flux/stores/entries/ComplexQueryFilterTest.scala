@@ -16,8 +16,7 @@ object ComplexQueryFilterTest extends TestSuite {
 
     val testModule = new common.testing.TestModule
 
-    implicit val fakeDatabase = testModule.fakeRemoteDatabaseProxy
-    implicit val entityAccess = testModule.entityAccess
+    implicit val fakeDatabase = testModule.fakeEntityAccess
     implicit val userManager = testModule.entityAccess.userManager
     implicit val testAccountingConfig = testModule.testAccountingConfig
     fakeDatabase.addRemotelyAddedEntities(testUserA, testUserB)

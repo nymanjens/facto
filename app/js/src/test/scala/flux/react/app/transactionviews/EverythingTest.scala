@@ -14,10 +14,9 @@ object EverythingTest extends TestSuite {
 
   override def tests = TestSuite {
     val testModule = new ThisTestModule()
-    implicit val database = testModule.fakeRemoteDatabaseProxy
+    implicit val database = testModule.fakeEntityAccess
     implicit val clock = testModule.fakeClock
     implicit val dispatcher = testModule.fakeDispatcher
-    implicit val entityAccess = testModule.entityAccess
     val router = new FakeRouterContext()
 
     val everything = testModule.everything

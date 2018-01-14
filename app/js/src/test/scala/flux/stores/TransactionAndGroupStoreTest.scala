@@ -15,10 +15,9 @@ object TransactionAndGroupStoreTest extends TestSuite {
 
     val testModule = new common.testing.TestModule
 
-    implicit val fakeDatabase = testModule.fakeRemoteDatabaseProxy
+    implicit val fakeDatabase = testModule.fakeEntityAccess
     implicit val fakeClock = testModule.fakeClock
     implicit val fakeDispatcher = testModule.fakeDispatcher
-    implicit val entityAccess = testModule.entityAccess
 
     val transactionAndGroupStore = new TransactionAndGroupStore()
 

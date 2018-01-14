@@ -19,7 +19,7 @@ object StoreFactoryStateUpdateTest extends TestSuite {
 
   override def tests = TestSuite {
     val testModule = new ThisTestModule()
-    implicit val database = testModule.fakeRemoteDatabaseProxy
+    implicit val database = testModule.fakeEntityAccess
     implicit val transactionManager = testModule.transactionManager
     implicit val balanceCheckManager = testModule.balanceCheckManager
 

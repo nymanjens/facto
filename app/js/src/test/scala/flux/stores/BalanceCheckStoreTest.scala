@@ -15,7 +15,7 @@ object BalanceCheckStoreTest extends TestSuite {
 
     val testModule = new common.testing.TestModule
 
-    implicit val fakeDatabase = testModule.fakeRemoteDatabaseProxy
+    implicit val fakeDatabase = testModule.fakeEntityAccess
     implicit val fakeDispatcher = testModule.fakeDispatcher
 
     val balanceCheckStore = new BalanceCheckStore()

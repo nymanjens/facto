@@ -20,14 +20,13 @@ object CashFlowEntriesStoreFactoryTest extends TestSuite {
 
   override def tests = TestSuite {
     val testModule = new TestModule()
-    implicit val database = testModule.fakeRemoteDatabaseProxy
+    implicit val database = testModule.fakeEntityAccess
     implicit val exchangeRateManager = testModule.exchangeRateManager
-    implicit val entityAccess = testModule.entityAccess
     val factory: CashFlowEntriesStoreFactory = new CashFlowEntriesStoreFactory()
 
     "empty result" - {
-      factory.get(testReservoir, maxNumEntries = 10000).state.entries ==> Seq()
-      factory.get(testReservoir, maxNumEntries = 10000).state.hasMore ==> false
+      factory.get(testReservoir, maxNumEntries = 10000).state.get.entries ==> Seq()
+      factory.get(testReservoir, maxNumEntries = 10000).state.get.hasMore ==> false
     }
 
     "gives correct results" - {
@@ -69,17 +68,18 @@ object CashFlowEntriesStoreFactoryTest extends TestSuite {
         for (i <- 1 to expectedEntries.size) {
           val subList = expectedEntries.takeRight(i)
 
-          factory.get(testReservoir, maxNumEntries = subList.size).state.entries ==> subList
+          factory.get(testReservoir, maxNumEntries = subList.size).state.get.entries ==> subList
           factory
             .get(testReservoir, maxNumEntries = subList.size)
             .state
+            .get
             .hasMore ==> (i < expectedEntries.size)
         }
       }
 
       "All entries" - {
-        factory.get(testReservoir, maxNumEntries = 10000).state.entries ==> expectedEntries
-        factory.get(testReservoir, maxNumEntries = 10000).state.hasMore ==> false
+        factory.get(testReservoir, maxNumEntries = 10000).state.get.entries ==> expectedEntries
+        factory.get(testReservoir, maxNumEntries = 10000).state.get.hasMore ==> false
       }
     }
 
@@ -112,7 +112,7 @@ object CashFlowEntriesStoreFactoryTest extends TestSuite {
         RegularEntry(Seq(trans6), MoneyWithGeneralCurrency(-250, Currency.default), balanceVerified = true)
       )
 
-      factory.get(testReservoir, maxNumEntries = 10000).state.entries ==> expectedEntries
+      factory.get(testReservoir, maxNumEntries = 10000).state.get.entries ==> expectedEntries
     }
   }
 

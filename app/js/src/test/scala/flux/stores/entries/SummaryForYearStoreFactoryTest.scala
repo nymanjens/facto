@@ -20,7 +20,7 @@ object SummaryForYearStoreFactoryTest extends TestSuite {
   override def tests = TestSuite {
     val testModule = new common.testing.TestModule
 
-    implicit val database = testModule.fakeRemoteDatabaseProxy
+    implicit val database = testModule.fakeEntityAccess
     implicit val userManager = testModule.entityAccess.userManager
     implicit val testAccountingConfig = testModule.testAccountingConfig
     implicit val complexQueryFilter = new ComplexQueryFilter()
