@@ -81,7 +81,6 @@ final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
     }
 
     override def persistEntityModifications(modifications: Seq[EntityModification]): Unit = {
-      Thread.sleep(5000)
       entityAccess.persistEntityModifications(modifications)
     }
 
