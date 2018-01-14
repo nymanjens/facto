@@ -20,6 +20,8 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database:
   private var _state: Option[State] = None
   private var stateVersion: Int = 1
   private var stateVersionInFlight: Int = stateVersion
+
+  /** Buffer of modifications that were added during the last update. */
   private var pendingModifications: Seq[EntityModification] = Seq()
 
   private var stateUpdateListeners: Seq[EntriesStore.Listener] = Seq()
@@ -75,23 +77,15 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database:
         // This response is no longer relevant, do nothing
       } else {
         stateVersion = newStateVersion
-        if (_state != Some(calculatedState)) {
+        if (impactsState(pendingModifications, calculatedState)) {
+          // Relevant modifications were added since the start of calculation -> recalculate
+          pendingModifications = Seq()
+          startStateUpdate()
+        } else if (_state != Some(calculatedState)) {
           _state = Some(calculatedState)
           invokeListeners()
         }
-        revisitPendingModifications()
       }
-    }
-  }
-
-  private def revisitPendingModifications(): Unit = {
-    if (!stateUpdateInFlight) {
-      if (_state.isDefined) {
-        if (impactsState(pendingModifications, _state.get)) {
-          startStateUpdate()
-        }
-      }
-      pendingModifications = Seq()
     }
   }
 
@@ -140,15 +134,25 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database:
     override def modificationsAdded(modifications: Seq[EntityModification]): Unit = {
       require(!isCallingListeners)
 
-      if (_state.isDefined) {
-        if (stateUpdateListeners.nonEmpty) {
-          pendingModifications = pendingModifications ++ modifications
-          revisitPendingModifications()
-        } else { // No listeners
-          if (impactsState(modifications, _state.get)) {
-            _state = None
+      _state match {
+        case Some(s) if impactsState(modifications, s) =>
+          _state = None
+
+          if (stateUpdateListeners.nonEmpty) {
+            if (stateUpdateInFlight) {
+              pendingModifications = pendingModifications ++ modifications
+            } else {
+              if (impactsState(modifications, s)) {
+                startStateUpdate()
+              }
+            }
           }
-        }
+
+        case None if stateUpdateListeners.nonEmpty =>
+          require(stateUpdateInFlight, s"Expected stateUpdateInFlight = true")
+          pendingModifications = pendingModifications ++ modifications
+
+        case _ =>
       }
     }
   }
