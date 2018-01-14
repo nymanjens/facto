@@ -1,6 +1,5 @@
 package flux.stores.entries
 
-import flux.stores.entries.EntriesStore.StateWithMeta
 import models.access.JsEntityAccess
 import models.accounting.{BalanceCheck, Transaction}
 import models.modification.{EntityModification, EntityType}
@@ -27,19 +26,16 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database:
   private var isCallingListeners: Boolean = false
 
   // **************** Public API ****************//
-  final def state: StateWithMeta[State] = _state match {
-    case None    => StateWithMeta.Empty()
-    case Some(s) => StateWithMeta.WithValue(s, isStale = stateUpdateInFlight)
-  }
+  final def state: Option[State] = _state
 
   /** Returns a future that is resolved as soon as `this.state` has a non-stale value. */
   final def stateFuture: Future[State] = state match {
-    case StateWithMeta.WithValue(s, /* isStale = */ false) => Future.successful(s)
-    case _ =>
+    case Some(s) => Future.successful(s)
+    case None =>
       val promise = Promise[State]()
       val listener: EntriesStore.Listener = () => {
-        if (state.hasState && !state.isStale && !promise.isCompleted) {
-          promise.success(state.state)
+        if (state.isDefined && !promise.isCompleted) {
+          promise.success(state.get)
         }
       }
       register(listener)
@@ -192,24 +188,5 @@ object EntriesStore {
 
   trait Listener {
     def onStateUpdate(): Unit
-  }
-
-  sealed trait StateWithMeta[State] {
-    def hasState: Boolean
-    def state: State
-    def isStale: Boolean
-
-    final def stateOption: Option[State] = if (hasState) Some(state) else None
-  }
-  object StateWithMeta {
-    case class Empty[State]() extends StateWithMeta[State] {
-      override def hasState = false
-      override def state = throw new IllegalArgumentException("Empty state")
-      override def isStale = true
-    }
-    case class WithValue[State](override val state: State, override val isStale: Boolean)
-        extends StateWithMeta[State] {
-      override def hasState = true
-    }
   }
 }

@@ -405,7 +405,7 @@ private[transactionviews] final class SummaryTable(
     private def doStateUpdate(props: Props): Unit = {
       val (data, usedStores): (AllYearsData, Set[EntriesStore[_]]) = {
         val yearsStore = summaryYearsStoreFactory.get(props.account)
-        val allTransactionsYearRange = yearsStore.state.stateOption.map(_.yearRange) getOrElse
+        val allTransactionsYearRange = yearsStore.state.map(_.yearRange) getOrElse
           YearRange.closed(props.yearLowerBound, clock.now.getYear)
         val yearRange = allTransactionsYearRange
           .copyIncluding(clock.now.getYear)
@@ -422,8 +422,8 @@ private[transactionviews] final class SummaryTable(
 
           dataBuilder.addYear(
             year,
-            summaryForYearStore.state.stateOption getOrElse SummaryForYear.empty,
-            exchangeRateGainsStore.state.stateOption getOrElse GainsForYear.empty)
+            summaryForYearStore.state getOrElse SummaryForYear.empty,
+            exchangeRateGainsStore.state getOrElse GainsForYear.empty)
           usedStores ++= Seq(summaryForYearStore, exchangeRateGainsStore)
         }
         for (reservoir <- accountingConfig.visibleReservoirs) {
@@ -432,9 +432,9 @@ private[transactionviews] final class SummaryTable(
               moneyReservoir = reservoir,
               maxNumEntries = CashFlow.minNumEntriesPerReservoir)
 
-            if (store.state.hasState) {
+            if (store.state.isDefined) {
               dataBuilder.addToNetWorth(
-                store.state.state.entries.lastOption
+                store.state.get.entries.lastOption
                   .map(_.balance.withDate(clock.now).exchangedForReferenceCurrency) getOrElse
                   ReferenceMoney(0))
             }
@@ -445,7 +445,7 @@ private[transactionviews] final class SummaryTable(
         (dataBuilder.result, usedStores.toSet)
       }
 
-      $.modState(_.copy(allYearsData = data, dataIsLoading = usedStores.exists(!_.state.hasState))).runNow()
+      $.modState(_.copy(allYearsData = data, dataIsLoading = usedStores.exists(!_.state.isDefined))).runNow()
       usedStores.filterNot(allRegisteredStores).foreach(_.register(this))
       allRegisteredStores.filterNot(usedStores).foreach(_.deregister(this))
       allRegisteredStores = usedStores

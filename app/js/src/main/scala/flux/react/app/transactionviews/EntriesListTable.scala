@@ -5,7 +5,6 @@ import common.{I18n, Unique}
 import flux.react.ReactVdomUtils.<<
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import flux.react.uielements
-import flux.stores.entries.EntriesStore.StateWithMeta
 import flux.stores.entries.{EntriesListStoreFactory, EntriesStore}
 import japgolly.scalajs.react.vdom.html_<^.{VdomElement, _}
 import japgolly.scalajs.react.{Callback, _}
@@ -20,8 +19,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
-    .initialStateFromProps(props =>
-      State(storeState = StateWithMeta.Empty(), maxNumEntries = props.numEntriesStrategy.start))
+    .initialStateFromProps(props => State(storeState = None, maxNumEntries = props.numEntriesStrategy.start))
     .renderBackend[Backend]
     .componentWillMount(scope => scope.backend.willMount(scope.props, scope.state))
     .componentWillUnmount(scope => scope.backend.willUnmount())
@@ -89,7 +87,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
                            calculateTableDataFromEntryAndRowNum: (Entry, Int) => Seq[VdomElement],
                            additionalInput: AdditionalInput)
 
-  private case class State(storeState: StateWithMeta[entriesStoreFactory.State], maxNumEntries: Int) {
+  private case class State(storeState: Option[entriesStoreFactory.State], maxNumEntries: Int) {
     def withEntriesFrom(store: entriesStoreFactory.Store): State =
       copy(storeState = store.state)
   }
@@ -119,19 +117,19 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
         tableClasses = props.tableClasses,
         setExpanded = props.setExpanded,
         expandNumEntriesCallback = {
-          if (state.storeState.hasState && state.storeState.state.hasMore) {
+          if (state.storeState.isDefined && state.storeState.get.hasMore) {
             Some(expandMaxNumEntries(props, state))
           } else { None }
         },
         tableTitleExtra = tableTitleExtra(props, state),
         tableHeaders = props.tableHeaders,
         tableDatas = state.storeState match {
-          case StateWithMeta.WithValue(storeState, _) =>
+          case Some(storeState) =>
             storeState.entries.reverse.zipWithIndex.map {
               case (entry, index) =>
                 props.calculateTableDataFromEntryAndRowNum(entry, index)
             }
-          case StateWithMeta.Empty() =>
+          case None =>
             for (i <- 0 until state.maxNumEntries + 1) yield {
               Seq[VdomElement](
                 <.td(
@@ -145,7 +143,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
 
     def tableTitleExtra(props: Props, state: State): VdomElement = {
       state.storeState match {
-        case StateWithMeta.WithValue(storeState, _) =>
+        case Some(storeState) =>
           val numEntries = storeState.entries.size + (if (storeState.hasMore) "+" else "")
           <.span(
             <<.ifThen(props.latestEntryToTableTitleExtra) { latestEntryToTableTitleExtra =>
@@ -155,7 +153,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
             },
             <.span(^.style := js.Dictionary("color" -> "#999"), s"(${i18n("facto.n-entries", numEntries)})")
           )
-        case StateWithMeta.Empty() =>
+        case None =>
           <.i(^.className := "fa fa-circle-o-notch fa-spin")
       }
     }
