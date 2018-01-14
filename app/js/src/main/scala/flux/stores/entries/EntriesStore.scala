@@ -70,6 +70,9 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database:
   private def stateUpdateInFlight: Boolean = stateVersion != stateVersionInFlight
 
   private def startStateUpdate(): Unit = {
+    require(_state.isEmpty, "State is not empty while starting state update")
+    require(stateUpdateListeners.nonEmpty, "Nobody is listening to the state, so why update it?")
+
     stateVersionInFlight += 1
     val newStateVersion = stateVersionInFlight
     calculateState().map { calculatedState =>
@@ -80,7 +83,9 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database:
         if (impactsState(pendingModifications, calculatedState)) {
           // Relevant modifications were added since the start of calculation -> recalculate
           pendingModifications = Seq()
-          startStateUpdate()
+          if (stateUpdateListeners.nonEmpty) {
+            startStateUpdate()
+          }
         } else if (_state != Some(calculatedState)) {
           _state = Some(calculatedState)
           invokeListeners()
@@ -136,16 +141,11 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database:
 
       _state match {
         case Some(s) if impactsState(modifications, s) =>
+          require(!stateUpdateInFlight, "stateUpdateInFlight is true but _state is non empty")
           _state = None
 
           if (stateUpdateListeners.nonEmpty) {
-            if (stateUpdateInFlight) {
-              pendingModifications = pendingModifications ++ modifications
-            } else {
-              if (impactsState(modifications, s)) {
-                startStateUpdate()
-              }
-            }
+            startStateUpdate()
           }
 
         case None if stateUpdateListeners.nonEmpty =>
