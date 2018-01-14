@@ -28,7 +28,7 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
     "no transactions" - {
       val store = factory.get(testAccountA, year = 2013)
 
-      val gainsForYear = store.state
+      val gainsForYear = store.state.get
       gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2012, DECEMBER, 1))) ==> GainsForMonth.empty
       gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2013, JANUARY, 1))) ==> GainsForMonth.empty
       gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2013, DECEMBER, 1))) ==> GainsForMonth.empty
@@ -38,7 +38,7 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
       persistTransaction(flow = 789, date = createDateTime(2013, JANUARY, 5), reservoir = testReservoirCashA)
 
       val store = factory.get(testAccountA, year = 2013)
-      val gainsForYear = store.state
+      val gainsForYear = store.state.get
 
       gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2013, JANUARY, 1))) ==> GainsForMonth.empty
     }
@@ -72,7 +72,7 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
       persistTransaction(flow = -600, date = createDateTime(2013, MAY, 9)) // Balance = -200
 
       val store = factory.get(testAccountA, year = 2013)
-      val gainsForYear = store.state
+      val gainsForYear = store.state.get
 
       gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2012, JANUARY, 1))) ==> GainsForMonth.empty
       gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2012, NOVEMBER, 1))) ==> GainsForMonth.empty

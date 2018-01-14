@@ -1,5 +1,7 @@
 package flux.stores.entries
 
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.async.Async.{async, await}
 import java.time.Duration
 import java.time.Month.JANUARY
 
@@ -24,9 +26,9 @@ object CashFlowEntriesStoreFactoryTest extends TestSuite {
     implicit val exchangeRateManager = testModule.exchangeRateManager
     val factory: CashFlowEntriesStoreFactory = new CashFlowEntriesStoreFactory()
 
-    "empty result" - {
-      factory.get(testReservoir, maxNumEntries = 10000).state.get.entries ==> Seq()
-      factory.get(testReservoir, maxNumEntries = 10000).state.get.hasMore ==> false
+    "empty result" - async {
+      await(factory.get(testReservoir, maxNumEntries = 10000).stateFuture).entries ==> Seq()
+      await(factory.get(testReservoir, maxNumEntries = 10000).stateFuture).hasMore ==> false
     }
 
     "gives correct results" - {
@@ -68,7 +70,7 @@ object CashFlowEntriesStoreFactoryTest extends TestSuite {
         for (i <- 1 to expectedEntries.size) {
           val subList = expectedEntries.takeRight(i)
 
-          factory.get(testReservoir, maxNumEntries = subList.size).state.get.entries ==> subList
+          await(factory.get(testReservoir, maxNumEntries = subList.size).stateFuture).entries ==> subList
           factory
             .get(testReservoir, maxNumEntries = subList.size)
             .state
@@ -78,8 +80,8 @@ object CashFlowEntriesStoreFactoryTest extends TestSuite {
       }
 
       "All entries" - {
-        factory.get(testReservoir, maxNumEntries = 10000).state.get.entries ==> expectedEntries
-        factory.get(testReservoir, maxNumEntries = 10000).state.get.hasMore ==> false
+        await(factory.get(testReservoir, maxNumEntries = 10000).stateFuture).entries ==> expectedEntries
+        await(factory.get(testReservoir, maxNumEntries = 10000).stateFuture).hasMore ==> false
       }
     }
 
@@ -112,7 +114,7 @@ object CashFlowEntriesStoreFactoryTest extends TestSuite {
         RegularEntry(Seq(trans6), MoneyWithGeneralCurrency(-250, Currency.default), balanceVerified = true)
       )
 
-      factory.get(testReservoir, maxNumEntries = 10000).state.get.entries ==> expectedEntries
+      await(factory.get(testReservoir, maxNumEntries = 10000).stateFuture).entries ==> expectedEntries
     }
   }
 
