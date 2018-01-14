@@ -1,5 +1,7 @@
 package flux.stores.entries
 
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.async.Async.{async, await}
 import java.time.LocalDate
 import java.time.Month._
 
@@ -25,25 +27,25 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
     implicit val complexQueryFilter = new ComplexQueryFilter()
     val factory: SummaryExchangeRateGainsStoreFactory = new SummaryExchangeRateGainsStoreFactory()
 
-    "no transactions" - {
+    "no transactions" - async {
       val store = factory.get(testAccountA, year = 2013)
 
-      val gainsForYear = store.state.get
+      val gainsForYear = await(store.stateFuture)
       gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2012, DECEMBER, 1))) ==> GainsForMonth.empty
       gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2013, JANUARY, 1))) ==> GainsForMonth.empty
       gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2013, DECEMBER, 1))) ==> GainsForMonth.empty
     }
 
-    "domestic reservoir" - {
+    "domestic reservoir" - async {
       persistTransaction(flow = 789, date = createDateTime(2013, JANUARY, 5), reservoir = testReservoirCashA)
 
       val store = factory.get(testAccountA, year = 2013)
-      val gainsForYear = store.state.get
+      val gainsForYear = await(store.stateFuture)
 
       gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2013, JANUARY, 1))) ==> GainsForMonth.empty
     }
 
-    "foreign reservoir" - {
+    "foreign reservoir" - async {
       persistGbpRate(date = createDateTime(2012, JANUARY, 30), ratio = 1.0)
       persistGbpRate(date = createDateTime(2012, DECEMBER, 30), ratio = 1.1)
 
@@ -72,7 +74,7 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
       persistTransaction(flow = -600, date = createDateTime(2013, MAY, 9)) // Balance = -200
 
       val store = factory.get(testAccountA, year = 2013)
-      val gainsForYear = store.state.get
+      val gainsForYear = await(store.stateFuture)
 
       gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2012, JANUARY, 1))) ==> GainsForMonth.empty
       gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2012, NOVEMBER, 1))) ==> GainsForMonth.empty

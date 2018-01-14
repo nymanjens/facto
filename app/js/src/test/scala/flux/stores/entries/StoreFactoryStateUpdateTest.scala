@@ -1,5 +1,7 @@
 package flux.stores.entries
 
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.async.Async.{async, await}
 import models.access.DbQueryImplicits._
 import java.time.Month._
 

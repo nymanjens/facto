@@ -1,5 +1,7 @@
 package flux.stores.entries
 
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.async.Async.{async, await}
 import common.GuavaReplacement.ImmutableSetMultimap
 import common.testing.TestObjects._
 import common.testing.{FakeJsEntityAccess, TestModule}
@@ -16,16 +18,20 @@ object TagsStoreFactoryTest extends TestSuite {
     implicit val database = testModule.fakeEntityAccess
     val factory: TagsStoreFactory = new TagsStoreFactory()
 
-    "empty result" - {
-      factory.get().state.get.tagToTransactionIds ==> ImmutableSetMultimap.of()
+    "empty result" - async {
+      val state = await(factory.get().stateFuture)
+
+      state.tagToTransactionIds ==> ImmutableSetMultimap.of()
     }
 
-    "gives correct results" - {
+    "gives correct results" - async {
       persistTransaction(id = 101, tags = Seq("aa", "bb"))
       persistTransaction(id = 102, tags = Seq("aa"))
       persistTransaction(id = 103, tags = Seq("bb", "cc"))
 
-      factory.get().state.get.tagToTransactionIds ==>
+      val state = await(factory.get().stateFuture)
+
+      state.tagToTransactionIds ==>
         ImmutableSetMultimap
           .builder[TagsStoreFactory.Tag, TagsStoreFactory.TransactionId]()
           .putAll("aa", 101, 102)

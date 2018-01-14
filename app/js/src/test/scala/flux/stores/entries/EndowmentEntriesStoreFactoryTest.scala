@@ -1,5 +1,7 @@
 package flux.stores.entries
 
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.async.Async.{async, await}
 import java.time.Month.JANUARY
 
 import common.testing.FakeJsEntityAccess
@@ -26,19 +28,20 @@ object EndowmentEntriesStoreFactoryTest extends TestSuite {
     persistTransaction(id = 5, consumedDay = 3, account = testAccountB)
     persistTransaction(id = 6, consumedDay = 3, category = testCategory)
 
-    "filters and sorts entries correctly" - {
+    "filters and sorts entries correctly" - async {
       val store = factory.get(testAccountA, maxNumEntries = 5)
+      val state = await(store.stateFuture)
 
-      store.state.get.hasMore ==> false
-      store.state.get.entries ==> GeneralEntry
-        .toGeneralEntrySeq(Seq(trans1), Seq(trans2), Seq(trans3), Seq(trans4))
+      state.hasMore ==> false
+      state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(trans1), Seq(trans2), Seq(trans3), Seq(trans4))
     }
 
-    "respects maxNumEntries" - {
+    "respects maxNumEntries" - async {
       val store = factory.get(testAccountA, maxNumEntries = 3)
+      val state = await(store.stateFuture)
 
-      store.state.get.hasMore ==> true
-      store.state.get.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(trans2), Seq(trans3), Seq(trans4))
+      state.hasMore ==> true
+      state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(trans2), Seq(trans3), Seq(trans4))
     }
   }
 

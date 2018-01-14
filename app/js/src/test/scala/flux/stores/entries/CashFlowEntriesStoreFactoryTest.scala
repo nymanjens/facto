@@ -16,6 +16,7 @@ import models.modification.EntityModification
 import utest._
 
 import scala.collection.immutable.Seq
+import scala.concurrent.Future
 import scala2js.Converters._
 
 object CashFlowEntriesStoreFactoryTest extends TestSuite {
@@ -27,11 +28,13 @@ object CashFlowEntriesStoreFactoryTest extends TestSuite {
     val factory: CashFlowEntriesStoreFactory = new CashFlowEntriesStoreFactory()
 
     "empty result" - async {
-      await(factory.get(testReservoir, maxNumEntries = 10000).stateFuture).entries ==> Seq()
-      await(factory.get(testReservoir, maxNumEntries = 10000).stateFuture).hasMore ==> false
+      val state = await(factory.get(testReservoir, maxNumEntries = 10000).stateFuture)
+
+      state.entries ==> Seq()
+      state.hasMore ==> false
     }
 
-    "gives correct results" - {
+    "gives correct results" - async {
       // get and persist dummy transactions/BCs
       val trans1 = persistTransaction(groupId = 1, flowInCents = 200, day = 1)
       val bc1 = persistBalanceCheck(balanceInCents = 20, day = 2)
@@ -66,26 +69,26 @@ object CashFlowEntriesStoreFactoryTest extends TestSuite {
       )
 
       // Run tests
-      "Increasing number of entries" - {
-        for (i <- 1 to expectedEntries.size) {
-          val subList = expectedEntries.takeRight(i)
+      // Increasing number of entries
+      await(
+        Future.sequence(
+          for (i <- 1 to expectedEntries.size)
+            yield
+              async {
+                val subList = expectedEntries.takeRight(i)
 
-          await(factory.get(testReservoir, maxNumEntries = subList.size).stateFuture).entries ==> subList
-          factory
-            .get(testReservoir, maxNumEntries = subList.size)
-            .state
-            .get
-            .hasMore ==> (i < expectedEntries.size)
-        }
-      }
+                val state = await(factory.get(testReservoir, maxNumEntries = subList.size).stateFuture)
+                state.entries ==> subList
+                state.hasMore ==> (i < expectedEntries.size)
+              }))
 
-      "All entries" - {
-        await(factory.get(testReservoir, maxNumEntries = 10000).stateFuture).entries ==> expectedEntries
-        await(factory.get(testReservoir, maxNumEntries = 10000).stateFuture).hasMore ==> false
-      }
+      // All entries
+      val allEntriesState = await(factory.get(testReservoir, maxNumEntries = 10000).stateFuture)
+      allEntriesState.entries ==> expectedEntries
+      allEntriesState.hasMore ==> false
     }
 
-    "Overlapping days" - {
+    "Overlapping days" - async {
       val trans1 = persistTransaction(groupId = 1, day = 1, flowInCents = 200, createIncrement = 1)
       val bc1 = persistBalanceCheck(balanceInCents = 20, day = 1, createIncrement = 2)
       val trans2 = persistTransaction(groupId = 2, flowInCents = 300, day = 1, createIncrement = 3)
@@ -114,7 +117,8 @@ object CashFlowEntriesStoreFactoryTest extends TestSuite {
         RegularEntry(Seq(trans6), MoneyWithGeneralCurrency(-250, Currency.default), balanceVerified = true)
       )
 
-      await(factory.get(testReservoir, maxNumEntries = 10000).stateFuture).entries ==> expectedEntries
+      val state = await(factory.get(testReservoir, maxNumEntries = 10000).stateFuture)
+      state.entries ==> expectedEntries
     }
   }
 
