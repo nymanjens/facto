@@ -18,8 +18,7 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database:
   database.registerListener(RemoteDatabaseProxyListener)
 
   private var _state: Option[State] = None
-  private var stateVersion: Int = 1
-  private var stateVersionInFlight: Int = stateVersion
+  private var stateUpdateInFlight: Boolean = false
 
   /** Buffer of modifications that were added during the last update. */
   private var pendingModifications: Seq[EntityModification] = Seq()
@@ -67,29 +66,24 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database:
   protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State): Boolean
 
   // **************** Private helper methods ****************//
-  private def stateUpdateInFlight: Boolean = stateVersion != stateVersionInFlight
-
   private def startStateUpdate(): Unit = {
     require(_state.isEmpty, "State is not empty while starting state update")
     require(stateUpdateListeners.nonEmpty, "Nobody is listening to the state, so why update it?")
+    require(!stateUpdateInFlight, "A state update is already in flight. This is not supported.")
 
-    stateVersionInFlight += 1
-    val newStateVersion = stateVersionInFlight
+    stateUpdateInFlight = true
     calculateState().map { calculatedState =>
-      if (stateVersion >= newStateVersion) {
-        // This response is no longer relevant, do nothing
-      } else {
-        stateVersion = newStateVersion
-        if (impactsState(pendingModifications, calculatedState)) {
-          // Relevant modifications were added since the start of calculation -> recalculate
-          pendingModifications = Seq()
-          if (stateUpdateListeners.nonEmpty) {
-            startStateUpdate()
-          }
-        } else if (_state != Some(calculatedState)) {
-          _state = Some(calculatedState)
-          invokeListeners()
+      stateUpdateInFlight = false
+
+      if (impactsState(pendingModifications, calculatedState)) {
+        // Relevant modifications were added since the start of calculation -> recalculate
+        pendingModifications = Seq()
+        if (stateUpdateListeners.nonEmpty) {
+          startStateUpdate()
         }
+      } else if (_state != Some(calculatedState)) {
+        _state = Some(calculatedState)
+        invokeListeners()
       }
     }
   }
