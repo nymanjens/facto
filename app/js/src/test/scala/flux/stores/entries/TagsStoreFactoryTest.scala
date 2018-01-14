@@ -17,7 +17,7 @@ object TagsStoreFactoryTest extends TestSuite {
     val factory: TagsStoreFactory = new TagsStoreFactory()
 
     "empty result" - {
-      factory.get().state.tagToTransactionIds ==> ImmutableSetMultimap.of()
+      factory.get().state.get.tagToTransactionIds ==> ImmutableSetMultimap.of()
     }
 
     "gives correct results" - {
@@ -25,7 +25,7 @@ object TagsStoreFactoryTest extends TestSuite {
       persistTransaction(id = 102, tags = Seq("aa"))
       persistTransaction(id = 103, tags = Seq("bb", "cc"))
 
-      factory.get().state.tagToTransactionIds ==>
+      factory.get().state.get.tagToTransactionIds ==>
         ImmutableSetMultimap
           .builder[TagsStoreFactory.Tag, TagsStoreFactory.TransactionId]()
           .putAll("aa", 101, 102)

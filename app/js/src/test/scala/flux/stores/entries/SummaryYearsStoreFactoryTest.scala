@@ -16,13 +16,13 @@ object SummaryYearsStoreFactoryTest extends TestSuite {
     val factory: SummaryYearsStoreFactory = new SummaryYearsStoreFactory()
 
     "empty result" - {
-      factory.get(testAccountA).state.yearRange ==> YearRange.empty
+      factory.get(testAccountA).state.get.yearRange ==> YearRange.empty
     }
 
     "single transaction" - {
       persistTransaction(2012)
 
-      factory.get(testAccountA).state.yearRange ==> YearRange.single(2012)
+      factory.get(testAccountA).state.get.yearRange ==> YearRange.single(2012)
     }
     "transactions in multiple years" - {
       persistTransaction(2010)
@@ -31,12 +31,12 @@ object SummaryYearsStoreFactoryTest extends TestSuite {
       persistTransaction(2018)
       persistTransaction(2018)
 
-      factory.get(testAccountA).state.yearRange ==> YearRange.closed(2010, 2018)
+      factory.get(testAccountA).state.get.yearRange ==> YearRange.closed(2010, 2018)
     }
     "transaction for different account" - {
       persistTransaction(2012, beneficiary = testAccountB)
 
-      factory.get(testAccountA).state.yearRange ==> YearRange.empty
+      factory.get(testAccountA).state.get.yearRange ==> YearRange.empty
     }
   }
 
