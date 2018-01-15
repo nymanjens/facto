@@ -1,5 +1,7 @@
 package flux.action
 
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.async.Async.{async, await}
 import common.LoggingUtils.logExceptions
 import org.scalajs.dom.console
 
@@ -33,7 +35,7 @@ object Dispatcher {
   }
 
   private[flux] final class Impl extends Dispatcher {
-    private var callbacks: Set[Action => Future[Unit]] = Set()
+    private[flux] var callbacks: Set[Action => Future[Unit]] = Set()
     private var isDispatching: Boolean = false
 
     def registerAsync(callback: Action => Future[Unit]) = {
@@ -66,33 +68,19 @@ object Dispatcher {
   }
 
   final class FakeSynchronous extends Dispatcher {
-    private var _callbacks: Set[Action => Future[Unit]] = Set()
+    private val delegate: Dispatcher.Impl = new Impl
     private val _dispatchedActions: mutable.Buffer[Action] = mutable.Buffer()
-    private var isDispatching: Boolean = false
 
     // ******************* Implementation of Dispatcher interface ******************* //
-    def registerAsync(callback: Action => Future[Unit]) = {
-      require(!isDispatching)
-      _callbacks = _callbacks + callback
-    }
+    override def registerAsync(callback: Action => Future[Unit]): Unit = delegate.registerAsync(callback)
 
-    def dispatch(action: Action) = {
-      require(!isDispatching)
-
-      isDispatching = true
-      console.log(s"  Dispatcher: Dispatching action ${action.getClass.getSimpleName}")
-      _callbacks.foreach(_.apply(action))
-      console.log(s"  Dispatcher: Dispatching action Action.Done(${action.getClass.getSimpleName})")
-      _callbacks.foreach(_.apply(Action.Done(action)))
-      isDispatching = false
-
+    override def dispatch(action: Action): Future[Unit] = async {
+      await(delegate.dispatch(action))
       _dispatchedActions += action
-
-      Future.successful((): Unit)
     }
 
     // ******************* Additional API for testing ******************* //
     def dispatchedActions: Seq[Action] = _dispatchedActions.toVector
-    def callbacks: Seq[Action => Future[Unit]] = _callbacks.toVector
+    def callbacks: Seq[Action => Future[Unit]] = delegate.callbacks.toVector
   }
 }

@@ -1,5 +1,7 @@
 package flux.stores
 
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.async.Async.{async, await}
 import common.testing.TestObjects._
 import flux.action.Action
 import models.accounting._
@@ -21,12 +23,12 @@ object TransactionAndGroupStoreTest extends TestSuite {
 
     val transactionAndGroupStore = new TransactionAndGroupStore()
 
-    "Listens to Action.AddTransactionGroup" - {
+    "Listens to Action.AddTransactionGroup" - async {
       var groupId: Long = -1
-      fakeDispatcher.dispatch(Action.AddTransactionGroup(transactionsWithoutIdProvider = group => {
+      await(fakeDispatcher.dispatch(Action.AddTransactionGroup(transactionsWithoutIdProvider = group => {
         groupId = group.id
         Seq(testTransactionWithId.copy(idOption = None, transactionGroupId = group.id))
-      }))
+      })))
 
       assert(groupId > 0)
 
@@ -44,16 +46,17 @@ object TransactionAndGroupStoreTest extends TestSuite {
       }
     }
 
-    "Listens to Action.UpdateTransactionGroup" - {
+    "Listens to Action.UpdateTransactionGroup" - async {
       fakeDatabase.addRemotelyAddedEntities(testTransactionGroupWithId)
       fakeDatabase.addRemotelyAddedEntities(testTransactionWithId)
       val initialModifications = fakeDatabase.allModifications
-      fakeDispatcher.dispatch(
-        Action.UpdateTransactionGroup(
-          transactionGroupWithId = testTransactionGroupWithId,
-          transactionsWithoutId = Seq(
-            testTransactionWithIdB.copy(idOption = None)
-          )))
+      await(
+        fakeDispatcher.dispatch(
+          Action.UpdateTransactionGroup(
+            transactionGroupWithId = testTransactionGroupWithId,
+            transactionsWithoutId = Seq(
+              testTransactionWithIdB.copy(idOption = None)
+            ))))
 
       fakeDatabase.allModifications.size - initialModifications.size ==> 2
       val Seq(removeTransaction, addTransaction) = fakeDatabase.allModifications takeRight 2
@@ -68,11 +71,11 @@ object TransactionAndGroupStoreTest extends TestSuite {
       }
     }
 
-    "Listens to Action.RemoveTransactionGroup" - {
+    "Listens to Action.RemoveTransactionGroup" - async {
       fakeDatabase.addRemotelyAddedEntities(testTransactionGroupWithId)
       fakeDatabase.addRemotelyAddedEntities(testTransactionWithId)
       val initialModifications = fakeDatabase.allModifications
-      fakeDispatcher.dispatch(Action.RemoveTransactionGroup(testTransactionGroupWithId))
+      await(fakeDispatcher.dispatch(Action.RemoveTransactionGroup(testTransactionGroupWithId)))
 
       fakeDatabase.allModifications.size - initialModifications.size ==> 2
       val Seq(removeTransaction, removeGroup) = fakeDatabase.allModifications takeRight 2
