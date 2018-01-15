@@ -17,6 +17,7 @@ import models.modification._
 import utest._
 
 import scala.collection.immutable.{ListMap, Seq}
+import scala.concurrent.Future
 import scala2js.Converters._
 
 object StoreFactoryStateUpdateTest extends TestSuite {
@@ -229,52 +230,57 @@ object StoreFactoryStateUpdateTest extends TestSuite {
   }
 
   private def runTest(store: EntriesStore[_], updatesWithImpact: ListMap[EntityModification, StateImpact])(
-      implicit database: FakeJsEntityAccess): Unit = {
-    def checkRemovingExistingEntity(update: EntityModification): Unit = {
-
-      def checkIfIdExists[E <: Entity: EntityType](id: Long): Unit = {
-        val existing = database.newQuerySync[E]().findOne(ModelField.id[E], id)
-        require(existing.isDefined, s"Could not find entity of ${update.entityType} with id $id")
-      }
-
-      update match {
-        case Remove(id) if update.entityType == EntityType.TransactionType =>
-          checkIfIdExists[Transaction](id)
-        case Remove(id) if update.entityType == EntityType.BalanceCheckType =>
-          checkIfIdExists[BalanceCheck](id)
-        case _ => // Do nothing
-      }
-    }
-
-    var lastState = store.state
-
-    for ((update, stateImpact) <- updatesWithImpact) {
-      checkRemovingExistingEntity(update)
-
-      database.persistModifications(update)
-
-      stateImpact match {
-        case StateImpact.NoChange =>
-          Predef.assert(
-            removeImpactingIds(store.state) == removeImpactingIds(lastState),
-            s"For update $update:\n" +
-              s"Expected states to be the same (ignoring impacting IDs).\n" +
-              s"Previous: $lastState\n" +
-              s"Current:  ${store.state}\n"
-          )
-        case StateImpact.Change =>
-          Predef.assert(
-            removeImpactingIds(store.state) != removeImpactingIds(lastState),
-            s"For update $update:\n" +
-              s"Expected states to be different (ignoring impacting IDs).\n" +
-              s"Previous: $lastState\n" +
-              s"Current:  ${store.state}\n"
-          )
-        case StateImpact.Undefined =>
-      }
-
-      lastState = store.state
-    }
+      implicit database: FakeJsEntityAccess): Future[Unit] = async {
+//    def checkRemovingExistingEntity(update: EntityModification): Unit = {
+//
+//      def checkIfIdExists[E <: Entity: EntityType](id: Long): Unit = {
+//        val existing = database.newQuerySync[E]().findOne(ModelField.id[E], id)
+//        require(existing.isDefined, s"Could not find entity of ${update.entityType} with id $id")
+//      }
+//
+//      update match {
+//        case Remove(id) if update.entityType == EntityType.TransactionType =>
+//          checkIfIdExists[Transaction](id)
+//        case Remove(id) if update.entityType == EntityType.BalanceCheckType =>
+//          checkIfIdExists[BalanceCheck](id)
+//        case _ => // Do nothing
+//      }
+//    }
+//
+//    var lastState = await(store.stateFuture)
+//
+//    Future.sequence(
+//      for ((update, stateImpact) <- updatesWithImpact)
+//        yield
+//          async {
+//            checkRemovingExistingEntity(update)
+//
+//            database.persistModifications(update)
+//
+//            val newState = await(store.stateFuture)
+//
+//            stateImpact match {
+//              case StateImpact.NoChange =>
+//                Predef.assert(
+//                  removeImpactingIds(newState) == removeImpactingIds(lastState),
+//                  s"For update $update:\n" +
+//                    s"Expected states to be the same (ignoring impacting IDs).\n" +
+//                    s"Previous: $lastState\n" +
+//                    s"Current:  ${newState}\n"
+//                )
+//              case StateImpact.Change =>
+//                Predef.assert(
+//                  removeImpactingIds(newState) != removeImpactingIds(lastState),
+//                  s"For update $update:\n" +
+//                    s"Expected states to be different (ignoring impacting IDs).\n" +
+//                    s"Previous: $lastState\n" +
+//                    s"Current:  ${newState}\n"
+//                )
+//              case StateImpact.Undefined =>
+//            }
+//
+//            lastState = newState
+//          })
   }
 
   private def removeImpactingIds(state: Any): EntriesStore.StateTrait = {
