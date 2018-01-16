@@ -59,7 +59,7 @@ object LocallyClonedJsEntityAccessTest extends TestSuite {
         await(LocallyClonedJsEntityAccess.create(fakeApiClient, fakeLocalDatabase, allUsers = Seq()))
       fakeLocalDatabase.addAll(Seq(testTransactionWithId))
 
-      entityAccess.newQuery[Transaction].data() ==> Seq(testTransactionWithId)
+      await(entityAccess.newQuery[Transaction].data()) ==> Seq(testTransactionWithId)
     }
 
     "hasLocalAddModifications()" - async {
