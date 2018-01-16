@@ -67,7 +67,7 @@ object Dispatcher {
     }
   }
 
-  final class FakeSynchronous extends Dispatcher {
+  final class Fake extends Dispatcher {
     private val delegate: Dispatcher.Impl = new Impl
     private val _dispatchedActions: mutable.Buffer[Action] = mutable.Buffer()
 
