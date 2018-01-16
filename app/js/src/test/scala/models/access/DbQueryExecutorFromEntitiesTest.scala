@@ -270,7 +270,7 @@ object DbQueryExecutorFromEntitiesTest extends TestSuite {
     }
 
     private def dbResultSet: DbResultSet.Async[Transaction] =
-      DbResultSet.fromExecutor(DbQueryExecutor.fromEntities(transactions.toVector))
+      DbResultSet.fromExecutor(DbQueryExecutor.fromEntities(transactions.toVector).asAsync)
 
     private def assertEqualIterables(iterable1: Iterable[_], iterable2: Iterable[Transaction]): Unit = {
       def assertProperty(propertyFunc: Transaction => Any): Unit = {

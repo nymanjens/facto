@@ -163,7 +163,7 @@ private[access] object LocallyClonedJsEntityAccess {
           db
         }
       }
-      new LocallyClonedJsEntityAccess(apiClient, populatedDb, getInitialDataResponse)
+      new LocallyClonedJsEntityAccess(apiClient, populatedDb, allUsers)
     }
 
 }

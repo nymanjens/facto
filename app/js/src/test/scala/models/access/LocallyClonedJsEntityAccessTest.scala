@@ -123,7 +123,8 @@ object LocallyClonedJsEntityAccessTest extends TestSuite {
 
     // **************** Getters ****************//
     override def newQuery[E <: Entity: EntityType]() = {
-      DbResultSet.fromExecutor(DbQueryExecutor.fromEntities(modificationsBuffer.getAllEntitiesOfType[E]))
+      DbResultSet.fromExecutor(
+        DbQueryExecutor.fromEntities(modificationsBuffer.getAllEntitiesOfType[E]).asAsync)
     }
     override def getSingletonValue[V](key: SingletonKey[V]) = {
       singletonMap.get(key) map key.valueConverter.toScala
