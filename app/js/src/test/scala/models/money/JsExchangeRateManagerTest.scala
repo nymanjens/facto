@@ -20,9 +20,11 @@ object JsExchangeRateManagerTest extends TestSuite {
     val exchangeRateManager: JsExchangeRateManager =
       new JsExchangeRateManager(
         ratioReferenceToForeignCurrency = Map(
-          Gbp -> SortedMap(yesterdayPlusMillis(1000) -> 2.0),
-          Gbp -> SortedMap(yesterdayPlusMillis(2000) -> 3.0),
-          Gbp -> SortedMap(yesterdayPlusMillis(3000) -> 0.5),
+          Gbp -> SortedMap(
+            yesterdayPlusMillis(1000) -> 2.0,
+            yesterdayPlusMillis(2000) -> 3.0,
+            yesterdayPlusMillis(3000) -> 0.5
+          ),
         )
       )
 
