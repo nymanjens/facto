@@ -1,6 +1,5 @@
 package models.access
 
-import api.ScalaJsApi.GetInitialDataResponse
 import api.ScalaJsApiClient
 import common.LoggingUtils.logExceptions
 import common.ScalaUtils.visibleForTesting
@@ -8,6 +7,7 @@ import models.Entity
 import models.access.JsEntityAccess.Listener
 import models.access.SingletonKey.{NextUpdateTokenKey, VersionKey}
 import models.modification.{EntityModification, EntityType}
+import models.user.User
 import org.scalajs.dom.console
 
 import scala.async.Async.{async, await}
@@ -20,7 +20,7 @@ import scala.scalajs.js
 
 private[access] final class LocallyClonedJsEntityAccess(apiClient: ScalaJsApiClient,
                                                         localDatabase: LocalDatabase,
-                                                        getInitialDataResponse: GetInitialDataResponse)
+                                                        allUsers: Seq[User])
     extends JsEntityAccess {
 
   private var listeners: Seq[Listener] = Seq()
@@ -34,7 +34,7 @@ private[access] final class LocallyClonedJsEntityAccess(apiClient: ScalaJsApiCli
   }
 
   override def newQuerySyncForUser() =
-    DbResultSet.fromExecutor(DbQueryExecutor.fromEntities(getInitialDataResponse.allUsers))
+    DbResultSet.fromExecutor(DbQueryExecutor.fromEntities(allUsers))
 
   override def hasLocalAddModifications[E <: Entity: EntityType](entity: E): Boolean = {
     localAddModificationIds(implicitly[EntityType[E]]) contains entity.id
@@ -118,7 +118,7 @@ private[access] object LocallyClonedJsEntityAccess {
 
   private[access] def create(apiClient: ScalaJsApiClient,
                              possiblyEmptyLocalDatabase: LocalDatabase,
-                             getInitialDataResponse: GetInitialDataResponse): Future[JsEntityAccess] =
+                             allUsers: Seq[User]): Future[LocallyClonedJsEntityAccess] =
     async {
       val db = possiblyEmptyLocalDatabase
       val populatedDb = {

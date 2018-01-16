@@ -1,6 +1,6 @@
 package models.access
 
-import api.ScalaJsApi.{GetInitialDataResponse, UpdateToken}
+import api.ScalaJsApi.UpdateToken
 import api.ScalaJsApiClient
 import common.LoggingUtils.logExceptions
 import common.ScalaUtils.visibleForTesting
@@ -8,6 +8,7 @@ import common.time.Clock
 import models.Entity
 import models.access.JsEntityAccess.Listener
 import models.modification.{EntityModification, EntityType}
+import models.user.User
 import org.scalajs.dom.console
 
 import scala.async.Async.{async, await}
@@ -18,9 +19,8 @@ import scala.concurrent.duration._
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 
-private[access] final class ApiBackedJsEntityAccess(implicit apiClient: ScalaJsApiClient,
-                                                    clock: Clock,
-                                                    getInitialDataResponse: GetInitialDataResponse)
+private[access] final class ApiBackedJsEntityAccess(allUsers: Seq[User])(implicit apiClient: ScalaJsApiClient,
+                                                                         clock: Clock)
     extends JsEntityAccess {
 
   private var listeners: Seq[Listener] = Seq()
@@ -45,7 +45,7 @@ private[access] final class ApiBackedJsEntityAccess(implicit apiClient: ScalaJsA
   }
 
   override def newQuerySyncForUser() =
-    DbResultSet.fromExecutor(DbQueryExecutor.fromEntities(getInitialDataResponse.allUsers))
+    DbResultSet.fromExecutor(DbQueryExecutor.fromEntities(allUsers))
 
   override def hasLocalAddModifications[E <: Entity: EntityType](entity: E): Boolean = {
     localAddModificationIds(implicitly[EntityType[E]]) contains entity.id

@@ -17,7 +17,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala2js.Converters._
 
-object RemoteDatabaseProxyTest extends TestSuite {
+object LocallyClonedJsEntityAccessTest extends TestSuite {
 
   override def tests = TestSuite {
     val fakeApiClient: FakeScalaJsApiClient = new FakeScalaJsApiClient()
@@ -26,7 +26,8 @@ object RemoteDatabaseProxyTest extends TestSuite {
     "loads initial data if db is empty" - async {
       fakeApiClient.persistEntityModifications(Seq(testModification))
 
-      val entityAccess = await(JsEntityAccess.create(fakeApiClient, fakeLocalDatabase))
+      val entityAccess =
+        await(LocallyClonedJsEntityAccess.create(fakeApiClient, fakeLocalDatabase, allUsers = Seq()))
 
       fakeLocalDatabase.allModifications ==> Seq(testModification)
     }
@@ -35,37 +36,43 @@ object RemoteDatabaseProxyTest extends TestSuite {
       fakeLocalDatabase.applyModifications(Seq(testModificationA))
       fakeApiClient.persistEntityModifications(Seq(testModificationB))
 
-      val entityAccess = await(JsEntityAccess.create(fakeApiClient, fakeLocalDatabase))
+      val entityAccess =
+        await(LocallyClonedJsEntityAccess.create(fakeApiClient, fakeLocalDatabase, allUsers = Seq()))
 
       fakeLocalDatabase.allModifications ==> Seq(testModificationB)
     }
 
     "does not load initial data if db is non-empty with right version" - async {
       fakeApiClient.persistEntityModifications(Seq(testModificationA))
-      val remoteDatabaseProxy1 = await(JsEntityAccess.create(fakeApiClient, fakeLocalDatabase))
+      val remoteDatabaseProxy1 =
+        await(LocallyClonedJsEntityAccess.create(fakeApiClient, fakeLocalDatabase, allUsers = Seq()))
       fakeApiClient.persistEntityModifications(Seq(testModificationB))
 
-      val remoteDatabaseProxy2 = await(JsEntityAccess.create(fakeApiClient, fakeLocalDatabase))
+      val remoteDatabaseProxy2 =
+        await(LocallyClonedJsEntityAccess.create(fakeApiClient, fakeLocalDatabase, allUsers = Seq()))
 
       fakeLocalDatabase.allModifications ==> Seq(testModificationA)
     }
 
     "newQuery()" - async {
-      val entityAccess = await(JsEntityAccess.create(fakeApiClient, fakeLocalDatabase))
+      val entityAccess =
+        await(LocallyClonedJsEntityAccess.create(fakeApiClient, fakeLocalDatabase, allUsers = Seq()))
       fakeLocalDatabase.addAll(Seq(testTransactionWithId))
 
       entityAccess.newQuery[Transaction].data() ==> Seq(testTransactionWithId)
     }
 
     "hasLocalAddModifications()" - async {
-      val entityAccess = await(JsEntityAccess.create(fakeApiClient, fakeLocalDatabase))
+      val entityAccess =
+        await(LocallyClonedJsEntityAccess.create(fakeApiClient, fakeLocalDatabase, allUsers = Seq()))
       await(entityAccess.persistModifications(Seq(EntityModification.Add(testTransactionWithId))))
 
       entityAccess.hasLocalAddModifications(testTransactionWithId) ==> false
     }
 
     "persistModifications()" - async {
-      val entityAccess = await(JsEntityAccess.create(fakeApiClient, fakeLocalDatabase))
+      val entityAccess =
+        await(LocallyClonedJsEntityAccess.create(fakeApiClient, fakeLocalDatabase, allUsers = Seq()))
 
       await(entityAccess.persistModifications(Seq(testModification)))
 
@@ -74,28 +81,19 @@ object RemoteDatabaseProxyTest extends TestSuite {
     }
 
     "persistModifications(): calls listeners" - async {
-      val entityAccess = await(JsEntityAccess.create(fakeApiClient, fakeLocalDatabase))
+      val entityAccess =
+        await(LocallyClonedJsEntityAccess.create(fakeApiClient, fakeLocalDatabase, allUsers = Seq()))
       val listener = new FakeProxyListener()
       entityAccess.registerListener(listener)
 
       await(entityAccess.persistModifications(Seq(testModification)))
 
-      listener.locallyAdded ==> Seq(Seq(testModification))
-      listener.persistedRemotely ==> Seq(Seq(testModification))
-      listener.remotelyAdded ==> Seq()
-    }
-
-    "clearLocalDatabase()" - async {
-      val entityAccess = await(JsEntityAccess.create(fakeApiClient, fakeLocalDatabase))
-      await(entityAccess.persistModifications(Seq(testModification)))
-
-      await(entityAccess.clearLocalDatabase())
-
-      fakeLocalDatabase.isEmpty ==> true
+      listener.modifications ==> Seq(Seq(testModification))
     }
 
     "updateModifiedEntities()" - async {
-      val entityAccess = await(JsEntityAccess.create(fakeApiClient, fakeLocalDatabase))
+      val entityAccess =
+        await(LocallyClonedJsEntityAccess.create(fakeApiClient, fakeLocalDatabase, allUsers = Seq()))
       val nextUpdateToken = await(fakeApiClient.getAllEntities(Seq(TransactionType))).nextUpdateToken
       fakeApiClient.persistEntityModifications(Seq(testModification))
       fakeLocalDatabase.allModifications ==> Seq() // sanity check
@@ -106,7 +104,8 @@ object RemoteDatabaseProxyTest extends TestSuite {
     }
 
     "updateModifiedEntities(): calls listeners" - async {
-      val entityAccess = await(JsEntityAccess.create(fakeApiClient, fakeLocalDatabase))
+      val entityAccess =
+        await(LocallyClonedJsEntityAccess.create(fakeApiClient, fakeLocalDatabase, allUsers = Seq()))
       val nextUpdateToken = await(fakeApiClient.getAllEntities(Seq(TransactionType))).nextUpdateToken
       val listener = new FakeProxyListener()
       entityAccess.registerListener(listener)
@@ -114,9 +113,7 @@ object RemoteDatabaseProxyTest extends TestSuite {
 
       await(entityAccess.updateModifiedEntities())
 
-      listener.locallyAdded ==> Seq()
-      listener.persistedRemotely ==> Seq()
-      listener.remotelyAdded ==> Seq(Seq(testModification))
+      listener.modifications ==> Seq(Seq(testModification))
     }
   }
 
@@ -158,24 +155,12 @@ object RemoteDatabaseProxyTest extends TestSuite {
   }
 
   private final class FakeProxyListener extends JsEntityAccess.Listener {
-    private val _locallyAdded: mutable.Buffer[Seq[EntityModification]] = mutable.Buffer()
-    private val _persistedRemotely: mutable.Buffer[Seq[EntityModification]] = mutable.Buffer()
-    private val _remotelyAdded: mutable.Buffer[Seq[EntityModification]] = mutable.Buffer()
+    private val _modifications: mutable.Buffer[Seq[EntityModification]] = mutable.Buffer()
 
-    override def addedLocally(modifications: Seq[EntityModification]) = {
-      _locallyAdded += modifications
+    override def modificationsAdded(modifications: Seq[EntityModification]) = {
+      _modifications += modifications
     }
 
-    override def localModificationPersistedRemotely(modifications: Seq[EntityModification]) = {
-      _persistedRemotely += modifications
-    }
-
-    override def addedRemotely(modifications: Seq[EntityModification]) = {
-      _remotelyAdded += modifications
-    }
-
-    def locallyAdded: Seq[Seq[EntityModification]] = _locallyAdded.toList
-    def persistedRemotely: Seq[Seq[EntityModification]] = _persistedRemotely.toList
-    def remotelyAdded: Seq[Seq[EntityModification]] = _remotelyAdded.toList
+    def modifications: Seq[Seq[EntityModification]] = _modifications.toVector
   }
 }
