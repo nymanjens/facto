@@ -7,6 +7,7 @@ import models.modification.{EntityModification, EntityType}
 
 import scala.collection.SortedMap
 import scala.collection.immutable.Seq
+import scala.collection.mutable
 import scala2js.Converters._
 
 final class JsExchangeRateManager(
@@ -15,8 +16,8 @@ final class JsExchangeRateManager(
     extends ExchangeRateManager {
   database.registerListener(RemoteDatabaseProxyListener)
 
-  private var measurementsCache: Map[Currency, SortedMap[LocalDateTime, Double]] =
-    ratioReferenceToForeignCurrency
+  private val measurementsCache: mutable.Map[Currency, SortedMap[LocalDateTime, Double]] =
+    mutable.Map(ratioReferenceToForeignCurrency.toVector: _*)
 
   // **************** Implementation of ExchangeRateManager trait ****************//
   override def getRatioSecondToFirstCurrency(firstCurrency: Currency,
@@ -54,15 +55,21 @@ final class JsExchangeRateManager(
         modification.entityType match {
           case EntityType.ExchangeRateMeasurementType =>
             modification match {
-              case EntityModification.Add(_) =>
-              // This happens infrequently
-              // TODO: Update cache
+              case EntityModification.Add(e) =>
+                // This happens infrequently
+                val entity = e.asInstanceOf[ExchangeRateMeasurement]
+                val currency = entity.foreignCurrency
+                measurementsCache.put(
+                  currency,
+                  measurementsCache
+                    .getOrElse(currency, SortedMap[LocalDateTime, Double]()) +
+                    (entity.date -> entity.ratioReferenceToForeignCurrency))
               case EntityModification.Update(_) =>
                 throw new UnsupportedOperationException("Immutable entity")
-              case EntityModification.Remove(_) =>
-              // Measurements are normally not removed
-              // TODO: Update cache
+              case EntityModification.Remove(id) =>
+                throw new UnsupportedOperationException("Measurements are normally not removed")
             }
+
           case _ => false // do nothing
         }
       }
