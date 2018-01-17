@@ -23,7 +23,7 @@ object JsExchangeRateManagerTest extends TestSuite {
             yesterdayPlusMillis(1000) -> 2.0,
             yesterdayPlusMillis(2000) -> 3.0,
             yesterdayPlusMillis(3000) -> 0.5
-          ),
+          )
         )
       )
 
@@ -61,7 +61,6 @@ object JsExchangeRateManagerTest extends TestSuite {
         exchangeRateManager.getRatioSecondToFirstCurrency(Gbp, Eur, clock.now) ==> 4.0
       }
     }
-
   }
 
   def persistGbpMeasurement(date: LocalDateTime, ratio: Double)(
