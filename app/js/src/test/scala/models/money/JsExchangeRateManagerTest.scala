@@ -5,7 +5,6 @@ import java.time.Duration
 import common.money.Currency.{Eur, Gbp, Usd}
 import common.testing.{FakeJsEntityAccess, TestModule}
 import common.time.{Clock, LocalDateTime}
-import models.access.{EntityAccess, JsEntityAccess}
 import utest.{TestSuite, _}
 
 import scala.collection.SortedMap
