@@ -1,12 +1,14 @@
 package api
 
+import models.access.DbQueryImplicits._
 import com.google.inject._
 import common.GuavaReplacement.Iterables.getOnlyElement
 import common.money.Currency
 import common.testing.TestObjects._
 import common.testing.TestUtils._
 import common.testing._
-import models.access.JvmEntityAccess
+import models.access.{DbQuery, JvmEntityAccess, ModelField}
+import models.accounting.Transaction
 import models.accounting.config._
 import models.modification.{EntityModification, EntityModificationEntity, EntityType}
 import models.money.ExchangeRateMeasurement
@@ -86,5 +88,22 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
     modificationEntity.userId mustEqual user.id
     modificationEntity.modification mustEqual testModification
     modificationEntity.date mustEqual testDate
+  }
+
+  "executeDataQuery()" in new WithApplication {
+    val transaction1 = persistTransaction(category = testCategoryA)
+    val transaction2 = persistTransaction(category = testCategoryA)
+    persistTransaction(category = testCategoryB)
+
+    val entities = serverFactory
+      .create()
+      .executeDataQuery(
+        PicklableDbQuery.fromRegular(
+          DbQuery[Transaction](
+            filter = ModelField.Transaction.categoryCode === testCategoryA.code,
+            sorting = None,
+            limit = None)))
+
+    entities.toSet mustEqual Set(transaction1, transaction2)
   }
 }
