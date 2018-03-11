@@ -406,7 +406,7 @@ private[transactionviews] final class SummaryTable(
       val (data, usedStores): (AllYearsData, Set[EntriesStore[_]]) = {
         val yearsStore = summaryYearsStoreFactory.get(props.account)
         val allTransactionsYearRange = yearsStore.state.map(_.yearRange) getOrElse
-          YearRange.closed(props.yearLowerBound, clock.now.getYear)
+          YearRange.closed(clock.now.getYear - 1, clock.now.getYear)
         val yearRange = allTransactionsYearRange
           .copyIncluding(clock.now.getYear)
           .copyWithLowerBound(props.yearLowerBound)
