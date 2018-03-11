@@ -18,11 +18,24 @@ class UsersTest extends HookedSpecification {
     Guice.createInjector(new FactoTestModule).injectMembers(this)
   }
 
+  "createUser()" in new WithApplication {
+    val user = Users.createUser("alice", password = "j", name = "Alice")
+
+    user.loginName mustEqual "alice"
+    user.name mustEqual "Alice"
+  }
+
+  "getOrCreateRobotUser()" in new WithApplication {
+    val robotUser = Users.getOrCreateRobotUser()
+    val secondRobotUser = Users.getOrCreateRobotUser()
+
+    robotUser.loginName mustEqual "robot"
+    secondRobotUser mustEqual robotUser
+    entityAccess.newQuerySync[User]().data() mustEqual Seq(robotUser)
+  }
+
   "authenticate()" in new WithApplication {
-    val user1 = Users
-      .createUser(loginName = "alice", password = "j", name = "Alice")
-      .copy(idOption = Some(EntityModification.generateRandomId()))
-    TestUtils.persist(user1)
+    TestUtils.persist(Users.createUser(loginName = "alice", password = "j", name = "Alice"))
 
     Users.authenticate(loginName = "alice", password = "j") mustEqual true
     Users.authenticate(loginName = "wrong_username", password = "j") mustEqual false
