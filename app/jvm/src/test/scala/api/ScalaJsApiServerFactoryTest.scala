@@ -2,17 +2,20 @@ package api
 
 import com.google.inject._
 import common.GuavaReplacement.Iterables.getOnlyElement
+import common.money.Currency
 import common.testing.TestObjects._
 import common.testing.TestUtils._
 import common.testing._
 import models.access.JvmEntityAccess
 import models.accounting.config._
-import models.modification.{EntityModificationEntity, EntityType}
+import models.modification.{EntityModification, EntityModificationEntity, EntityType}
+import models.money.ExchangeRateMeasurement
 import models.slick.SlickUtils.dbRun
 import org.junit.runner._
 import org.specs2.runner._
 import play.api.test._
 
+import scala.collection.SortedMap
 import scala.collection.immutable.Seq
 
 @RunWith(classOf[JUnitRunner])
@@ -23,7 +26,7 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
   private val date3 = localDateTimeOfEpochMilli(999000333)
   private val date4 = localDateTimeOfEpochMilli(999000444)
 
-  implicit private val user = testUser
+  implicit private val user = testUserA
 
   @Inject implicit private val fakeClock: FakeClock = null
   @Inject implicit private val entityAccess: JvmEntityAccess = null
@@ -36,9 +39,19 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
   }
 
   "getInitialData()" in new WithApplication {
+    entityAccess.persistEntityModifications(
+      EntityModification.Add(testUserA),
+      EntityModification.Add(testUserB),
+      EntityModification.createAddWithRandomId(
+        ExchangeRateMeasurement(date1, "GBP", ratioReferenceToForeignCurrency = 1.3))
+    )
+
     val response = serverFactory.create().getInitialData()
+
     response.accountingConfig mustEqual accountingConfig
     response.user mustEqual user
+    response.allUsers.toSet mustEqual Set(testUserA, testUserB)
+    response.ratioReferenceToForeignCurrency mustEqual Map(Currency.Gbp -> SortedMap(date1 -> 1.3))
   }
 
   "getAllEntities()" in new WithApplication {
