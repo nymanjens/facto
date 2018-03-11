@@ -267,7 +267,7 @@ private[transactionviews] final class SummaryTable(
         ),
         <.tbody(
           // **************** Categories data **************** //
-          if (data.categories.isEmpty || state.dataIsLoading) {
+          if ((data.categories.isEmpty && props.query.isEmpty) || state.dataIsLoading) {
             // No data or fallback in case data is still loading
             {
               for (category <- account.categories) yield {
