@@ -223,10 +223,10 @@ private[bootstrap] object InputComponent {
                 s"(valueThroughTransformer = '$valueThroughTransformer'). Will ignore this setter.")
             this.valueOrDefault
           }
-        case Failure(_) =>
+        case Failure(e) =>
           console.log(
             s"  Failed to get the String value for $newValue. This may be intended if the valid options for " +
-              s"this input change. Will ignore this setter.")
+              s"this input change. Will ignore this setter.\n$e")
           this.valueOrDefault
       }
     }
