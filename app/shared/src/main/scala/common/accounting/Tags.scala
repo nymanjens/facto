@@ -13,7 +13,7 @@ object Tags {
 
   def isValidTag(tag: String): Boolean = tag match {
     case validTagRegex() => true
-    case _ => false
+    case _               => false
   }
 
   /** Parse a comma-separated list of tags that are assumed to be validated already. */

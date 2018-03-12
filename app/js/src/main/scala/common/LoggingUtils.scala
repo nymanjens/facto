@@ -1,6 +1,7 @@
 package common
 
 import japgolly.scalajs.react.CallbackTo
+import org.scalajs.dom.console
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -11,7 +12,7 @@ object LoggingUtils {
       codeBlock
     } catch {
       case t: Throwable =>
-        println(s"  Caught exception: $t")
+        console.log(s"  Caught exception:, $t")
         t.printStackTrace()
         throw t
     }

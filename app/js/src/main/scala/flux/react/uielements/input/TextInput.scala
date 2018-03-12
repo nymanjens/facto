@@ -49,7 +49,7 @@ object TextInput {
 
   private final class Proxy(val component: ThisComponentU) extends InputBase.Proxy[String] {
     override def value = component.state.value match {
-      case "" => None
+      case ""    => None
       case value => Some(value)
     }
     override def valueOrDefault = value getOrElse ""

@@ -3,8 +3,8 @@ package common.testing
 import api.ScalaJsApi.{GetAllEntitiesResponse, GetEntityModificationsResponse, UpdateToken}
 import api.ScalaJsApiClient
 import models.Entity
-import models.modification.EntityType
-import models.modification.EntityModification
+import models.access.DbQuery
+import models.modification.{EntityModification, EntityType}
 
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
@@ -14,9 +14,7 @@ final class FakeScalaJsApiClient extends ScalaJsApiClient {
   private val modificationsBuffer: ModificationsBuffer = new ModificationsBuffer()
 
   // **************** Implementation of ScalaJsApiClient trait ****************//
-  override def getInitialData() = {
-    ???
-  }
+  override def getInitialData() = ???
 
   override def getAllEntities(types: Seq[EntityType.any]) = Future.successful {
     GetAllEntitiesResponse(
@@ -39,6 +37,9 @@ final class FakeScalaJsApiClient extends ScalaJsApiClient {
     modificationsBuffer.addModifications(modifications)
     Future.successful((): Unit)
   }
+
+  override def executeDataQuery[E <: Entity](dbQuery: DbQuery[E]) = ???
+  override def executeCountQuery(dbQuery: DbQuery[_ <: Entity]) = ???
 
   // **************** Additional methods for tests ****************//
   def addEntities[E <: Entity: EntityType](entities: E*): Unit = {

@@ -3,7 +3,7 @@ package common.money
 import java.time.Duration
 
 import common.money.Currency.Gbp
-import common.testing.{FakeRemoteDatabaseProxy, TestModule}
+import common.testing.{FakeJsEntityAccess, TestModule}
 import common.time.Clock
 import models.money.{ExchangeRateMeasurement, JsExchangeRateManager}
 import utest.{TestSuite, _}
@@ -16,7 +16,7 @@ class MoneyTest extends TestSuite {
   override def tests = TestSuite {
     val testModule = new TestModule()
     implicit val clock = testModule.fakeClock
-    implicit val remoteDatabaseProxy = testModule.fakeRemoteDatabaseProxy
+    implicit val entityAccess = testModule.fakeEntityAccess
     implicit val exchangeRateManager: JsExchangeRateManager = testModule.exchangeRateManager
 
     "Money" - {
@@ -139,9 +139,8 @@ class MoneyTest extends TestSuite {
     }
   }
 
-  private def persistGbpMeasurement(daysBeforeNow: Int, ratio: Double)(
-      implicit database: FakeRemoteDatabaseProxy,
-      clock: Clock): Unit = {
+  private def persistGbpMeasurement(daysBeforeNow: Int, ratio: Double)(implicit database: FakeJsEntityAccess,
+                                                                       clock: Clock): Unit = {
     database.addWithRandomId(
       ExchangeRateMeasurement(
         date = clock.now.plus(Duration.ofDays(-daysBeforeNow)),

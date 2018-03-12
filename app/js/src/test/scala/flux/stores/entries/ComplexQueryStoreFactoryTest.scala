@@ -1,5 +1,7 @@
 package flux.stores.entries
 
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.async.Async.{async, await}
 import common.testing.TestObjects._
 import utest._
 
@@ -11,8 +13,7 @@ object ComplexQueryStoreFactoryTest extends TestSuite {
   override def tests = TestSuite {
     val testModule = new common.testing.TestModule
 
-    implicit val database = testModule.fakeRemoteDatabaseProxy
-    implicit val userManager = testModule.entityAccess.userManager
+    implicit val database = testModule.fakeEntityAccess
     implicit val testAccountingConfig = testModule.testAccountingConfig
     implicit val complexQueryFilter = new ComplexQueryFilter()
 
@@ -25,18 +26,20 @@ object ComplexQueryStoreFactoryTest extends TestSuite {
     val trans5 = createTransaction(id = 5, groupId = 2, day = 2, description = "cats cats")
     database.addRemotelyAddedEntities(trans1, trans2, trans3, trans4, trans5)
 
-    "filters and sorts entries correctly" - {
+    "filters and sorts entries correctly" - async {
       val store = factory.get("cats", maxNumEntries = 2)
+      val state = await(store.stateFuture)
 
-      store.state.hasMore ==> false
-      store.state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(trans1, trans3), Seq(trans4, trans5))
+      state.hasMore ==> false
+      state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(trans1, trans3), Seq(trans4, trans5))
     }
 
-    "respects maxNumEntries" - {
+    "respects maxNumEntries" - async {
       val store = factory.get("cats", maxNumEntries = 1)
+      val state = await(store.stateFuture)
 
-      store.state.hasMore ==> true
-      store.state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(trans4, trans5))
+      state.hasMore ==> true
+      state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(trans4, trans5))
     }
   }
 }

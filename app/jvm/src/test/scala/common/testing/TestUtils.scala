@@ -4,12 +4,12 @@ import java.time.{Instant, ZoneId}
 
 import common.testing.TestObjects._
 import common.time.LocalDateTime
-import models.{Entity, SlickEntityAccess}
 import models.accounting.config.{Account, Category, MoneyReservoir}
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 import models.modification.{EntityModification, EntityType}
-import models.modificationhandler.EntityModificationHandler
-import models.user.{SlickUserManager, User}
+import models.user.User
+import models.Entity
+import models.access.JvmEntityAccess
 
 import scala.collection.immutable.Seq
 
@@ -24,8 +24,7 @@ object TestUtils {
                          reservoir: MoneyReservoir = testReservoir,
                          description: String = "description",
                          detailDescription: String = "detailDescription",
-                         tags: Seq[String] = Seq())(
-      implicit entityModificationHandler: EntityModificationHandler): Transaction = {
+                         tags: Seq[String] = Seq())(implicit entityAccess: JvmEntityAccess): Transaction = {
     val actualGroupId = if (groupId == -1) {
       persist(TransactionGroup(createdDate = FakeClock.defaultTime)).id
     } else {
@@ -49,11 +48,11 @@ object TestUtils {
       ))
   }
 
-  def persistBalanceCheck(balanceInCents: Long = 0,
-                          date: LocalDateTime = FakeClock.defaultTime,
-                          timestamp: Long = -1,
-                          reservoir: MoneyReservoir = testReservoir)(
-      implicit entityModificationHandler: EntityModificationHandler): BalanceCheck = {
+  def persistBalanceCheck(
+      balanceInCents: Long = 0,
+      date: LocalDateTime = FakeClock.defaultTime,
+      timestamp: Long = -1,
+      reservoir: MoneyReservoir = testReservoir)(implicit entityAccess: JvmEntityAccess): BalanceCheck = {
     val actualDate = if (timestamp == -1) date else localDateTimeOfEpochMilli(timestamp)
     persist(
       BalanceCheck(
@@ -65,8 +64,7 @@ object TestUtils {
       ))
   }
 
-  def persist[E <: Entity: EntityType](entity: E)(
-      implicit entityModificationHandler: EntityModificationHandler): E = {
+  def persist[E <: Entity: EntityType](entity: E)(implicit entityAccess: JvmEntityAccess): E = {
     implicit val user = User(
       idOption = Some(9213982174887321L),
       loginName = "robot",
@@ -77,7 +75,7 @@ object TestUtils {
     val addition =
       if (entity.idOption.isDefined) EntityModification.Add(entity)
       else EntityModification.createAddWithRandomId(entity)
-    entityModificationHandler.persistEntityModifications(addition)
+    entityAccess.persistEntityModifications(addition)
     addition.entity
   }
 

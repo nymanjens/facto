@@ -2,9 +2,16 @@ package api
 
 import java.time.{LocalDate, LocalTime}
 
+import api.PicklableDbQuery.FieldWithValue
+import api.PicklableDbQuery.Sorting.FieldWithDirection
+import api.ScalaJsApi.{GetAllEntitiesResponse, GetEntityModificationsResponse, GetInitialDataResponse}
+import boopickle.CompositePickler
 import boopickle.Default._
+import common.money.Currency
 import common.time.LocalDateTime
 import models.Entity
+import models.access.DbQuery.PicklableOrdering
+import models.access.{DbQuery, ModelField}
 import models.accounting.config._
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 import models.modification.{EntityModification, EntityType}
@@ -63,6 +70,15 @@ object Picklers {
     }
   }
 
+  implicit object CurrencyPickler extends Pickler[Currency] {
+    override def pickle(currency: Currency)(implicit state: PickleState): Unit = logExceptions {
+      state.pickle(currency.code)
+    }
+    override def unpickle(implicit state: UnpickleState): Currency = logExceptions {
+      Currency.of(state.unpickle[String])
+    }
+  }
+
   implicit object LocalDateTimePickler extends Pickler[LocalDateTime] {
     override def pickle(dateTime: LocalDateTime)(implicit state: PickleState): Unit = logExceptions {
       val date = dateTime.toLocalDate
@@ -94,10 +110,10 @@ object Picklers {
   implicit object EntityTypePickler extends Pickler[EntityType.any] {
     override def pickle(entityType: EntityType.any)(implicit state: PickleState): Unit = logExceptions {
       val intValue: Int = entityType match {
-        case UserType => 1
-        case TransactionType => 2
-        case TransactionGroupType => 3
-        case BalanceCheckType => 4
+        case UserType                    => 1
+        case TransactionType             => 2
+        case TransactionGroupType        => 3
+        case BalanceCheckType            => 4
         case ExchangeRateMeasurementType => 5
       }
       state.pickle(intValue)
@@ -130,13 +146,13 @@ object Picklers {
         state.pickle[EntityType.any](modification.entityType)
         // Pickle number
         state.pickle(modification match {
-          case _: EntityModification.Add[_] => addNumber
+          case _: EntityModification.Add[_]    => addNumber
           case _: EntityModification.Update[_] => updateNumber
           case _: EntityModification.Remove[_] => removeNumber
         })
         modification match {
-          case EntityModification.Add(entity) => state.pickle(entity)
-          case EntityModification.Update(entity) => state.pickle(entity)
+          case EntityModification.Add(entity)      => state.pickle(entity)
+          case EntityModification.Update(entity)   => state.pickle(entity)
           case EntityModification.Remove(entityId) => state.pickle(entityId)
         }
       }
@@ -161,6 +177,45 @@ object Picklers {
           EntityModification.Remove(entityId)(entityType)
       }
     }
+  }
+
+  implicit val fieldWithValuePickler: Pickler[FieldWithValue] =
+    new Pickler[FieldWithValue] {
+      override def pickle(obj: FieldWithValue)(implicit state: PickleState) = {
+        def internal[E]: Unit = {
+          state.pickle(obj.field)
+          state.pickle(obj.value.asInstanceOf[E])(
+            picklerForField(obj.field.toRegular).asInstanceOf[Pickler[E]])
+        }
+        internal
+      }
+      override def unpickle(implicit state: UnpickleState) = {
+        def internal[E]: FieldWithValue = {
+          val field = state.unpickle[PicklableModelField]
+          val value = state.unpickle[E](picklerForField(field.toRegular).asInstanceOf[Pickler[E]])
+          FieldWithValue(field = field, value = value)
+        }
+        internal
+      }
+
+      private def picklerForField(field: ModelField[_, _]): Pickler[_] = {
+        def fromType[V: Pickler](fieldType: ModelField.FieldType[V]): Pickler[V] = implicitly
+        field.fieldType match {
+          case ModelField.FieldType.BooleanType       => fromType(ModelField.FieldType.BooleanType)
+          case ModelField.FieldType.LongType          => fromType(ModelField.FieldType.LongType)
+          case ModelField.FieldType.DoubleType        => fromType(ModelField.FieldType.DoubleType)
+          case ModelField.FieldType.StringType        => fromType(ModelField.FieldType.StringType)
+          case ModelField.FieldType.LocalDateTimeType => fromType(ModelField.FieldType.LocalDateTimeType)
+          case ModelField.FieldType.StringSeqType     => fromType(ModelField.FieldType.StringSeqType)
+        }
+      }
+    }
+
+  implicit val picklableDbQueryPickler: Pickler[PicklableDbQuery] = {
+    implicit val fieldWithDirectionPickler: Pickler[PicklableDbQuery.Sorting.FieldWithDirection] =
+      boopickle.Default.generatePickler
+    implicit val sortingPickler: Pickler[PicklableDbQuery.Sorting] = boopickle.Default.generatePickler
+    boopickle.Default.generatePickler
   }
 
   private def logExceptions[T](codeBlock: => T): T = {

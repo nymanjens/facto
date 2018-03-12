@@ -17,7 +17,7 @@ object Currency {
 
     candidates.toSeq match {
       case Seq(currency) => currency
-      case Seq() => General(code)
+      case Seq()         => General(code)
     }
   }
 

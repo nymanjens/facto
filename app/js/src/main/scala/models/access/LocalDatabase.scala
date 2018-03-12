@@ -1,23 +1,26 @@
 package models.access
 
 import common.ScalaUtils.visibleForTesting
+import jsfacades.LokiJs.Filter.Operation
 import jsfacades.{CryptoJs, LokiJs}
 import models.Entity
-import models.modification.EntityType
-import models.modification.EntityModification
+import models.modification.{EntityModification, EntityType}
+import org.scalajs.dom.console
 
 import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
+import scala.scalajs.js.JSConverters._
+import scala.util.matching.Regex
 import scala2js.Converters._
-import scala2js.{Keys, Scala2Js}
+import scala2js.Scala2Js
 
 @visibleForTesting
 trait LocalDatabase {
   // **************** Getters ****************//
-  def newQuery[E <: Entity: EntityType](): LokiJs.ResultSet[E]
+  def newQuery[E <: Entity: EntityType](): DbResultSet.Async[E]
   def getSingletonValue[V](key: SingletonKey[V]): Option[V]
   def isEmpty: Boolean
 
@@ -77,20 +80,15 @@ object LocalDatabase {
   private object Singleton {
     implicit object Converter extends Scala2Js.MapConverter[Singleton] {
       override def toJs(singleton: Singleton) = {
-        js.Dictionary[js.Any](
-          Scala2Js.Key.toJsPair(Scala2JsKeys.key -> singleton.key),
-          Scala2Js.Key.toJsPair(Scala2JsKeys.value -> singleton.value))
+        js.Dictionary[js.Any]("key" -> singleton.key, "value" -> singleton.value)
       }
       override def toScala(dict: js.Dictionary[js.Any]) = {
-        def getRequired[T: Scala2Js.Converter](key: Scala2Js.Key[T, Singleton]) =
-          getRequiredValueFromDict(dict)(key)
-        Singleton(key = getRequired(Scala2JsKeys.key), value = getRequired(Scala2JsKeys.value))
+        def getRequired[V: Scala2Js.Converter](fieldName: String) = {
+          require(dict.contains(fieldName), s"Key ${fieldName} is missing from ${js.JSON.stringify(dict)}")
+          Scala2Js.toScala[V](dict(fieldName))
+        }
+        Singleton(key = getRequired[String]("key"), value = getRequired[js.Any]("value"))
       }
-    }
-
-    object Scala2JsKeys {
-      val key = Scala2Js.Key[String, Singleton]("key")
-      val value = Scala2Js.Key[js.Any, Singleton]("value")
     }
   }
 
@@ -99,17 +97,17 @@ object LocalDatabase {
 
     override def encodeBeforeSave(dbString: String) = {
       val millis1 = System.currentTimeMillis()
-      println(s"  Encrypting ${dbString.length / 1e6}Mb String...")
+      console.log(s"  Encrypting ${dbString.length / 1e6}Mb String...")
       val result =
         CryptoJs.RC4Drop.encrypt(stringToEncrypt = decodedPrefix + dbString, password = secret).toString()
       val millis2 = System.currentTimeMillis()
-      println(s"  Encrypting ${dbString.length / 1e6}Mb String: Done after ${(millis2 - millis1) / 1e3}s")
+      console.log(s"  Encrypting ${dbString.length / 1e6}Mb String: Done after ${(millis2 - millis1) / 1e3}s")
       result
     }
 
     override def decodeAfterLoad(encodedString: String) = {
       val millis1 = System.currentTimeMillis()
-      println(s"  Decrypting ${encodedString.length / 1e6}Mb String...")
+      console.log(s"  Decrypting ${encodedString.length / 1e6}Mb String...")
       val decoded =
         try {
           CryptoJs.RC4Drop
@@ -117,16 +115,16 @@ object LocalDatabase {
             .toString(CryptoJs.Encoding.Utf8)
         } catch {
           case t: Throwable =>
-            println(s"  Caught exception while decoding database string: $t")
+            console.log(s"  Caught exception while decoding database string: $t")
             ""
         }
       val millis2 = System.currentTimeMillis()
-      println(
+      console.log(
         s"  Decrypting ${encodedString.length / 1e6}Mb String: Done after ${(millis2 - millis1) / 1e3}s")
       if (decoded.startsWith(decodedPrefix)) {
         Some(decoded.substring(decodedPrefix.length))
       } else {
-        println(s"  Failed to decode database string: ${encodedString.substring(0, 10)}")
+        console.log(s"  Failed to decode database string: ${encodedString.substring(0, 10)}")
         None
       }
     }
@@ -147,13 +145,79 @@ object LocalDatabase {
       lokiDb.getOrAddCollection[Singleton](s"singletons")
 
     // **************** Getters ****************//
-    override def newQuery[E <: Entity: EntityType](): LokiJs.ResultSet[E] = {
-      entityCollectionForImplicitType.chain()
-    }
+    override def newQuery[E <: Entity: EntityType](): DbResultSet.Async[E] =
+      DbResultSet.fromExecutor(new DbQueryExecutor.Sync[E] {
+        override def data(dbQuery: DbQuery[E]) = lokiResultSet(dbQuery).data()
+        override def count(dbQuery: DbQuery[E]) = lokiResultSet(dbQuery).count()
+
+        private def lokiResultSet(dbQuery: DbQuery[E]): LokiJs.ResultSet[E] = {
+          var resultSet = entityCollectionForImplicitType[E].chain()
+          for (filter <- toLokiJsFilter(dbQuery.filter)) {
+            resultSet = resultSet.filter(filter)
+          }
+          for (sorting <- dbQuery.sorting) {
+            resultSet = resultSet.sort(LokiJs.Sorting(sorting.fieldsWithDirection.map {
+              case DbQuery.Sorting.FieldWithDirection(field, isDesc) =>
+                LokiJs.Sorting.KeyWithDirection(field.name, isDesc)
+            }))
+          }
+          for (limit <- dbQuery.limit) {
+            resultSet = resultSet.limit(limit)
+          }
+          resultSet
+        }
+
+        private def toLokiJsFilter(filter: DbQuery.Filter[E]): Option[LokiJs.Filter] = {
+          def rawKeyValueFilter(operation: Operation,
+                                field: ModelField[_, E],
+                                jsValue: js.Any): Option[LokiJs.Filter] =
+            Some(LokiJs.Filter.KeyValueFilter(operation, field.name, jsValue))
+          def keyValueFilter[V](operation: Operation,
+                                field: ModelField[V, E],
+                                value: V): Option[LokiJs.Filter] =
+            rawKeyValueFilter(operation, field, Scala2Js.toJs(value, field))
+
+          filter match {
+            case DbQuery.Filter.NullFilter()           => None
+            case DbQuery.Filter.Equal(field, value)    => keyValueFilter(Operation.Equal, field, value)
+            case DbQuery.Filter.NotEqual(field, value) => keyValueFilter(Operation.NotEqual, field, value)
+            case DbQuery.Filter.GreaterThan(field, value) =>
+              keyValueFilter(Operation.GreaterThan, field, value)
+            case DbQuery.Filter.GreaterOrEqualThan(field, value) =>
+              keyValueFilter(Operation.GreaterOrEqualThan, field, value)
+            case DbQuery.Filter.LessThan(field, value) => keyValueFilter(Operation.LessThan, field, value)
+            case DbQuery.Filter.AnyOf(field, values) =>
+              rawKeyValueFilter(Operation.AnyOf, field, values.map(Scala2Js.toJs(_, field)).toJSArray)
+            case DbQuery.Filter.NoneOf(field, values) =>
+              rawKeyValueFilter(Operation.NoneOf, field, values.map(Scala2Js.toJs(_, field)).toJSArray)
+            case DbQuery.Filter.ContainsIgnoreCase(field, substring) =>
+              rawKeyValueFilter(Operation.Regex, field, js.Array(Regex.quote(substring), "i"))
+            case DbQuery.Filter.DoesntContainIgnoreCase(field, substring) =>
+              rawKeyValueFilter(Operation.Regex, field, js.Array(s"""^((?!${Regex
+                .quote(substring)})[\\s\\S])*$$""", "i"))
+            case DbQuery.Filter.SeqContains(field, value) =>
+              rawKeyValueFilter(Operation.Contains, field, Scala2Js.toJs(value))
+            case DbQuery.Filter.SeqDoesntContain(field, value) =>
+              rawKeyValueFilter(Operation.ContainsNone, field, Scala2Js.toJs(value))
+            case DbQuery.Filter.Or(filters) =>
+              Some(LokiJs.Filter.AggregateFilter(Operation.Or, filters.flatMap(toLokiJsFilter)))
+            case DbQuery.Filter.And(filters) =>
+              Some(LokiJs.Filter.AggregateFilter(Operation.And, filters.flatMap(toLokiJsFilter)))
+          }
+        }
+      }.asAsync)
 
     override def getSingletonValue[V](key: SingletonKey[V]): Option[V] = {
       implicit val converter = key.valueConverter
-      val value = singletonCollection.chain().findOne(Singleton.Scala2JsKeys.key, key.name)
+      val value =
+        singletonCollection
+          .chain()
+          .filter(LokiJs.Filter.KeyValueFilter(LokiJs.Filter.Operation.Equal, "key", key.name))
+          .limit(1)
+          .data() match {
+          case Seq(v) => Some(v)
+          case Seq()  => None
+        }
       value.map(v => Scala2Js.toScala[V](v.value))
     }
 
@@ -169,7 +233,7 @@ object LocalDatabase {
             case addModification: EntityModification.Add[_] =>
               def add[E <: Entity](modification: EntityModification.Add[E]): Boolean = {
                 implicit val _ = modification.entityType
-                newQuery[E]().findOne(Keys.id, modification.entity.id) match {
+                findById[E](modification.entity.id) match {
                   case Some(entity) => false // do nothing
                   case None =>
                     entityCollectionForImplicitType[E].insert(modification.entity)
@@ -180,10 +244,11 @@ object LocalDatabase {
             case updateModification: EntityModification.Update[_] =>
               def update[E <: Entity](modification: EntityModification.Update[E]): Boolean = {
                 implicit val _ = modification.entityType
-                newQuery[E]().findOne(Keys.id, modification.updatedEntity.id) match {
+                findById[E](modification.updatedEntity.id) match {
                   case Some(_) =>
                     // Not using collection.update() because it requires a sync
-                    entityCollectionForImplicitType[E].findAndRemove(Keys.id, modification.updatedEntity.id)
+                    entityCollectionForImplicitType[E]
+                      .findAndRemove(ModelField.id[E].name, modification.updatedEntity.id)
                     entityCollectionForImplicitType[E].insert(modification.updatedEntity)
                     true
                   case None => false // do nothing
@@ -193,9 +258,10 @@ object LocalDatabase {
             case removeModification: EntityModification.Remove[_] =>
               def remove[E <: Entity](modification: EntityModification.Remove[E]): Boolean = {
                 implicit val _ = modification.entityType
-                newQuery[E]().findOne(Keys.id, modification.entityId) match {
+                findById[E](modification.entityId) match {
                   case Some(entity) =>
-                    entityCollectionForImplicitType.findAndRemove(Keys.id, modification.entityId)
+                    entityCollectionForImplicitType
+                      .findAndRemove(ModelField.id[E].name, modification.entityId)
                     true
                   case None => false // do nothing
                 }
@@ -208,16 +274,16 @@ object LocalDatabase {
 
     override def addAll[E <: Entity: EntityType](entities: Seq[E]): Unit = {
       for (entity <- entities) {
-        newQuery[E]().findOne(Keys.id, entity.id) match {
+        findById[E](entity.id) match {
           case Some(_) => // do nothing
-          case None => entityCollectionForImplicitType.insert(entity)
+          case None    => entityCollectionForImplicitType.insert(entity)
         }
       }
     }
 
     override def setSingletonValue[V](key: SingletonKey[V], value: V): Unit = {
       implicit val converter = key.valueConverter
-      singletonCollection.findAndRemove(Singleton.Scala2JsKeys.key, key.name)
+      singletonCollection.findAndRemove("key", key.name)
       singletonCollection.insert(
         Singleton(
           key = key.name,
@@ -226,21 +292,32 @@ object LocalDatabase {
     }
 
     override def save(): Future[Unit] = async {
-      println("  Saving database...")
+      console.log("  Saving database...")
       await(lokiDb.saveDatabase())
-      println("  Saving database done.")
+      console.log("  Saving database done.")
     }
 
     override def clear(): Future[Unit] = async {
-      println("  Clearing database...")
+      console.log("  Clearing database...")
       for (collection <- allCollections) {
         collection.clear()
       }
       await(lokiDb.saveDatabase())
-      println("  Clearing database done.")
+      console.log("  Clearing database done.")
     }
 
     // **************** Private helper methods ****************//
+    private def findById[E <: Entity: EntityType](id: Long): Option[E] = {
+      entityCollectionForImplicitType[E]
+        .chain()
+        .filter(LokiJs.Filter.KeyValueFilter(Operation.Equal, ModelField.id[E].name, Scala2Js.toJs(id)))
+        .limit(1)
+        .data() match {
+        case Seq(e) => Some(e)
+        case Seq()  => None
+      }
+    }
+
     private def allCollections: Seq[LokiJs.Collection[_]] =
       entityCollections.values.toList :+ singletonCollection
 

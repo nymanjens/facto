@@ -1,38 +1,56 @@
 package flux.stores.entries
 
-import models.access.RemoteDatabaseProxy
+import models.access.JsEntityAccess
 import models.accounting.{BalanceCheck, Transaction}
-import models.modification.EntityType
-import models.modification.EntityModification
+import models.modification.{EntityModification, EntityType}
 
 import scala.collection.immutable.Seq
+import scala.concurrent.{Future, Promise}
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 /**
-  * General purpose flux store that maintains a state derived from data in the `RemoteDatabaseProxy`
+  * General purpose flux store that maintains a state derived from data in the database
   * and doesn't support mutation operations.
   *
   * @tparam State Any immutable type that contains all state maintained by this store
   */
-abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database: RemoteDatabaseProxy) {
+abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database: JsEntityAccess) {
   database.registerListener(RemoteDatabaseProxyListener)
 
   private var _state: Option[State] = None
+  private var stateUpdateInFlight: Boolean = false
+
+  /** Buffer of modifications that were added during the last update. */
+  private var pendingModifications: Seq[EntityModification] = Seq()
+
   private var stateUpdateListeners: Seq[EntriesStore.Listener] = Seq()
   private var isCallingListeners: Boolean = false
 
   // **************** Public API ****************//
-  final def state: State = {
-    if (_state.isEmpty) {
-      updateState()
-    }
+  final def state: Option[State] = _state
 
-    _state.get
+  /** Returns a future that is resolved as soon as `this.state` has a non-stale value. */
+  final def stateFuture: Future[State] = state match {
+    case Some(s) => Future.successful(s)
+    case None =>
+      val promise = Promise[State]()
+      val listener: EntriesStore.Listener = () => {
+        if (state.isDefined && !promise.isCompleted) {
+          promise.success(state.get)
+        }
+      }
+      register(listener)
+      promise.future.map(_ => deregister(listener))
+      promise.future
   }
 
   final def register(listener: EntriesStore.Listener): Unit = {
     require(!isCallingListeners)
 
     stateUpdateListeners = stateUpdateListeners :+ listener
+    if (_state.isEmpty && !stateUpdateInFlight) {
+      startStateUpdate()
+    }
   }
 
   final def deregister(listener: EntriesStore.Listener): Unit = {
@@ -42,17 +60,35 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database:
   }
 
   // **************** Abstract methods ****************//
-  protected def calculateState(): State
+  protected def calculateState(): Future[State]
 
   protected def transactionUpsertImpactsState(transaction: Transaction, state: State): Boolean
   protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State): Boolean
 
   // **************** Private helper methods ****************//
-  private def updateState(): Unit = {
-    _state = Some(calculateState())
+  private def startStateUpdate(): Unit = {
+    require(_state.isEmpty, "State is not empty while starting state update")
+    require(stateUpdateListeners.nonEmpty, "Nobody is listening to the state, so why update it?")
+    require(!stateUpdateInFlight, "A state update is already in flight. This is not supported.")
+
+    stateUpdateInFlight = true
+    calculateState().map { calculatedState =>
+      stateUpdateInFlight = false
+
+      if (impactsState(pendingModifications, calculatedState)) {
+        // Relevant modifications were added since the start of calculation -> recalculate
+        pendingModifications = Seq()
+        if (stateUpdateListeners.nonEmpty) {
+          startStateUpdate()
+        }
+      } else if (_state != Some(calculatedState)) {
+        _state = Some(calculatedState)
+        invokeListeners()
+      }
+    }
   }
 
-  private def impactsState(modifications: Seq[EntityModification]): Boolean =
+  private def impactsState(modifications: Seq[EntityModification], state: State): Boolean =
     modifications.toStream.filter(m => modificationImpactsState(m, state)).take(1).nonEmpty
 
   private def modificationImpactsState(entityModification: EntityModification, state: State): Boolean = {
@@ -62,7 +98,7 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database:
         false // In normal circumstances, no entries should be changed retroactively
       case EntityType.TransactionGroupType =>
         entityModification match {
-          case EntityModification.Add(_) => false // Always gets added alongside Transaction additions
+          case EntityModification.Add(_)    => false // Always gets added alongside Transaction additions
           case EntityModification.Update(_) => throw new UnsupportedOperationException("Immutable entity")
           case EntityModification.Remove(_) => false // Always gets removed alongside Transaction removals
         }
@@ -93,39 +129,24 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database:
   }
 
   // **************** Inner type definitions ****************//
-  private object RemoteDatabaseProxyListener extends RemoteDatabaseProxy.Listener {
-    override def addedLocally(modifications: Seq[EntityModification]): Unit = {
-      addedModifications(modifications)
-    }
-
-    override def localModificationPersistedRemotely(modifications: Seq[EntityModification]): Unit = {
+  private object RemoteDatabaseProxyListener extends JsEntityAccess.Listener {
+    override def modificationsAdded(modifications: Seq[EntityModification]): Unit = {
       require(!isCallingListeners)
 
-      if (_state.isDefined) {
-        if (stateUpdateListeners.nonEmpty) {
-          if (impactsState(modifications)) {
-            invokeListeners()
+      _state match {
+        case Some(s) if impactsState(modifications, s) =>
+          require(!stateUpdateInFlight, "stateUpdateInFlight is true but _state is non empty")
+          _state = None
+
+          if (stateUpdateListeners.nonEmpty) {
+            startStateUpdate()
           }
-        }
-      }
-    }
 
-    override def addedRemotely(modifications: Seq[EntityModification]): Unit = {
-      addedModifications(modifications)
-    }
+        case None if stateUpdateListeners.nonEmpty =>
+          require(stateUpdateInFlight, s"Expected stateUpdateInFlight = true")
+          pendingModifications = pendingModifications ++ modifications
 
-    private def addedModifications(modifications: Seq[EntityModification]): Unit = {
-      require(!isCallingListeners)
-
-      if (_state.isDefined) {
-        if (impactsState(modifications)) {
-          if (stateUpdateListeners.isEmpty) {
-            _state = None
-          } else {
-            updateState()
-            invokeListeners()
-          }
-        }
+        case _ =>
       }
     }
   }

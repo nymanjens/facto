@@ -8,23 +8,22 @@ import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.{
   GainsForMonth,
   GainsForYear
 }
-import jsfacades.LokiJs
-import jsfacades.LokiJsImplicits._
-import models.access.RemoteDatabaseProxy
+import models.access.DbQueryImplicits._
+import models.access.{DbQuery, ModelField, JsEntityAccess}
 import models.accounting.config.{Account, Config, MoneyReservoir}
-import common.money.Currency
 import models.accounting.{BalanceCheck, Transaction}
 
+import scala.async.Async.{async, await}
 import scala.collection.immutable.{Seq, SortedMap}
 import scala.collection.mutable
+import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
-import scala2js.Keys
-import scala2js.Scala2Js.Key
 
 /**
   * Store factory that calculates the monthly gains and losses made by exchange rate fluctuations in a given year.
   */
-final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDatabaseProxy,
+final class SummaryExchangeRateGainsStoreFactory(implicit database: JsEntityAccess,
                                                  exchangeRateManager: ExchangeRateManager,
                                                  accountingConfig: Config,
                                                  complexQueryFilter: ComplexQueryFilter)
@@ -36,12 +35,14 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
 
   // **************** Implementation of EntriesStoreFactory methods/types ****************//
   override protected def createNew(input: Input) = new Store {
-    override protected def calculateState() = {
+    override protected def calculateState() = async {
       GainsForYear.sum {
-        for {
+        val futures = for {
           reservoir <- accountingConfig.moneyReservoirs(includeHidden = true)
           if isRelevantReservoir(reservoir)
         } yield calculateGainsForYear(reservoir)
+
+        await(Future.sequence(futures))
       }
     }
 
@@ -51,53 +52,51 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
       isRelevantReservoir(balanceCheck.moneyReservoir) && balanceCheck.checkDate.getYear <= input.year
 
     // **************** Private helper methods ****************//
-    private def calculateGainsForYear(reservoir: MoneyReservoir): GainsForYear = {
+    private def calculateGainsForYear(reservoir: MoneyReservoir): Future[GainsForYear] = async {
       val monthsInYear = DatedMonth.allMonthsIn(input.year)
 
       val oldestRelevantBalanceCheck: Option[BalanceCheck] =
-        database
-          .newQuery[BalanceCheck]()
-          .filter(Keys.BalanceCheck.moneyReservoirCode isEqualTo reservoir.code)
-          .filter(Keys.BalanceCheck.checkDate < monthsInYear.head.startTime)
-          .sort(
-            LokiJs.Sorting
-              .descBy(Keys.BalanceCheck.checkDate)
-              .thenDescBy(Keys.BalanceCheck.createdDate)
-              .thenDescBy(Keys.id))
-          .limit(1)
-          .data()
-          .headOption
+        await(
+          database
+            .newQuery[BalanceCheck]()
+            .filter(ModelField.BalanceCheck.moneyReservoirCode === reservoir.code)
+            .filter(ModelField.BalanceCheck.checkDate < monthsInYear.head.startTime)
+            .sort(DbQuery.Sorting.BalanceCheck.deterministicallyByCheckDate.reversed)
+            .limit(1)
+            .data()).headOption
       val oldestBalanceDate = oldestRelevantBalanceCheck.map(_.checkDate).getOrElse(LocalDateTime.MIN)
       val initialBalance =
         oldestRelevantBalanceCheck.map(_.balance).getOrElse(MoneyWithGeneralCurrency(0, reservoir.currency))
 
-      val balanceChecks: Seq[BalanceCheck] =
+      val balanceChecksFuture: Future[Seq[BalanceCheck]] =
         database
           .newQuery[BalanceCheck]()
-          .filter(Keys.BalanceCheck.moneyReservoirCode isEqualTo reservoir.code)
+          .filter(ModelField.BalanceCheck.moneyReservoirCode === reservoir.code)
           .filter(
             filterInRange(
-              Keys.BalanceCheck.checkDate,
+              ModelField.BalanceCheck.checkDate,
               oldestBalanceDate,
               monthsInYear.last.startTimeOfNextMonth))
           .data()
 
-      val transactions: Seq[Transaction] =
+      val transactionsFuture: Future[Seq[Transaction]] =
         database
           .newQuery[Transaction]()
-          .filter(Keys.Transaction.moneyReservoirCode isEqualTo reservoir.code)
+          .filter(ModelField.Transaction.moneyReservoirCode === reservoir.code)
           .filter(
             filterInRange(
-              Keys.Transaction.transactionDate,
+              ModelField.Transaction.transactionDate,
               oldestBalanceDate,
               monthsInYear.last.startTimeOfNextMonth))
           .data()
+      val balanceChecks: Seq[BalanceCheck] = await(balanceChecksFuture)
+      val transactions: Seq[Transaction] = await(transactionsFuture)
 
       val dateToBalanceFunction: DateToBalanceFunction = {
         val builder = new DateToBalanceFunction.Builder(oldestBalanceDate, initialBalance)
         val mergedRows = (transactions ++ balanceChecks).sortBy {
           case trans: Transaction => (trans.transactionDate, trans.createdDate)
-          case bc: BalanceCheck => (bc.checkDate, bc.createdDate)
+          case bc: BalanceCheck   => (bc.checkDate, bc.createdDate)
         }
         mergedRows.foreach {
           case transaction: Transaction =>
@@ -138,10 +137,10 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: RemoteDataba
     private def isRelevantReservoir(reservoir: MoneyReservoir): Boolean =
       reservoir.owner == input.account && reservoir.currency.isForeign
 
-    private def filterInRange[E](key: Key[LocalDateTime, E],
+    private def filterInRange[E](field: ModelField[LocalDateTime, E],
                                  start: LocalDateTime,
-                                 end: LocalDateTime): LokiJs.Filter[E] = {
-      (key >= start) && (key < end)
+                                 end: LocalDateTime): DbQuery.Filter[E] = {
+      (field >= start) && (field < end)
     }
   }
 

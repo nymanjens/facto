@@ -13,20 +13,21 @@ import flux.react.uielements
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.Path
 import japgolly.scalajs.react.vdom.html_<^._
+import models.access.EntityAccess
 import models.accounting.config.{Account, Config}
 import models.accounting.{Transaction, TransactionGroup}
-import models.EntityAccess
 import models.user.User
 
+import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
 import scala.collection.mutable
+import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 final class TransactionGroupForm(implicit i18n: I18n,
                                  clock: Clock,
                                  accountingConfig: Config,
                                  user: User,
-                                 transactionGroupManager: TransactionGroup.Manager,
                                  entityAccess: EntityAccess,
                                  exchangeRateManager: ExchangeRateManager,
                                  dispatcher: Dispatcher,
@@ -35,6 +36,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
                                  totalFlowInput: TotalFlowInput,
                                  totalFlowRestrictionInput: TotalFlowRestrictionInput) {
 
+  private val waitForFuture = new uielements.WaitForFuture[Props]
   private val component = {
     ScalaComponent
       .builder[Props](getClass.getSimpleName)
@@ -43,7 +45,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
           val numberOfTransactions = props.groupPartial.transactions.length
           val totalFlowRestriction = props.groupPartial match {
             case partial if partial.zeroSum => TotalFlowRestriction.ZeroSum
-            case _ => TotalFlowRestriction.AnyTotal
+            case _                          => TotalFlowRestriction.AnyTotal
           }
           State(
             panelIndices = 0 until numberOfTransactions,
@@ -65,15 +67,18 @@ final class TransactionGroupForm(implicit i18n: I18n,
     forCreate(TransactionGroup.Partial.withSingleEmptyTransaction, returnToPath, router)
   }
 
-  def forEdit(transactionGroupId: Long, returnToPath: Path, router: RouterContext): VdomElement = {
-    val group = transactionGroupManager.findById(transactionGroupId)
-    create(
+  def forEdit(transactionGroupId: Long, returnToPath: Path, router: RouterContext): VdomElement =
+    create(async {
+      val group = await(entityAccess.newQuery[TransactionGroup]().findById(transactionGroupId))
+      val transactions = await(group.transactions)
+
       Props(
-        operationMeta = OperationMeta.Edit(group),
-        groupPartial = TransactionGroup.Partial.from(group),
+        operationMeta = OperationMeta.Edit(group, transactions),
+        groupPartial = TransactionGroup.Partial.from(group, transactions),
         returnToPath = returnToPath,
-        router = router))
-  }
+        router = router
+      )
+    })
 
   def forReservoir(reservoirCode: String, returnToPath: Path, router: RouterContext): VdomElement = {
     val reservoir = accountingConfig.moneyReservoir(reservoirCode)
@@ -100,45 +105,32 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
   def forRepayment(accountCode1: String,
                    accountCode2: String,
-                   amountInCents: Long,
                    returnToPath: Path,
                    router: RouterContext): VdomElement = {
-    if (amountInCents < 0) {
-      forRepayment(accountCode2, accountCode1, -amountInCents, returnToPath, router)
-    } else {
-      val account1 = accountingConfig.accounts(accountCode1)
-      val account2 = accountingConfig.accounts(accountCode2)
-      def getAbsoluteFlowForAccountCurrency(account: Account): DatedMoney = {
-        val amount = ReferenceMoney(amountInCents)
-        val currency = account.defaultElectronicReservoir.currency
-        // Using current date because the repayment takes place today.
-        amount.withDate(clock.now).exchangedForCurrency(currency)
-      }
+    val account1 = accountingConfig.accounts(accountCode1)
+    val account2 = accountingConfig.accounts(accountCode2)
 
-      forCreate(
-        TransactionGroup.Partial(
-          Seq(
-            Transaction.Partial.from(
-              beneficiary = account1,
-              moneyReservoir = account1.defaultElectronicReservoir,
-              category = accountingConfig.constants.accountingCategory,
-              description = accountingConfig.constants.liquidationDescription,
-              flowInCents = -getAbsoluteFlowForAccountCurrency(account1).cents
-            ),
-            Transaction.Partial.from(
-              beneficiary = account1,
-              moneyReservoir = account2.defaultElectronicReservoir,
-              category = accountingConfig.constants.accountingCategory,
-              description = accountingConfig.constants.liquidationDescription,
-              flowInCents = getAbsoluteFlowForAccountCurrency(account2).cents
-            )
+    forCreate(
+      TransactionGroup.Partial(
+        Seq(
+          Transaction.Partial.from(
+            beneficiary = account1,
+            moneyReservoir = account1.defaultElectronicReservoir,
+            category = accountingConfig.constants.accountingCategory,
+            description = accountingConfig.constants.liquidationDescription
           ),
-          zeroSum = true
+          Transaction.Partial.from(
+            beneficiary = account1,
+            moneyReservoir = account2.defaultElectronicReservoir,
+            category = accountingConfig.constants.accountingCategory,
+            description = accountingConfig.constants.liquidationDescription
+          )
         ),
-        returnToPath,
-        router
-      )
-    }
+        zeroSum = true
+      ),
+      returnToPath,
+      router
+    )
   }
 
   // **************** Private helper methods ****************//
@@ -153,15 +145,18 @@ final class TransactionGroupForm(implicit i18n: I18n,
         router = router))
   }
 
-  private def create(props: Props): VdomElement = {
-    component.withKey(props.operationMeta.toString).apply(props)
+  private def create(props: Props): VdomElement = create(Future.successful(props))
+  private def create(propsFuture: Future[Props]): VdomElement = {
+    waitForFuture(futureInput = propsFuture) { props =>
+      component.withKey(props.operationMeta.toString).apply(props)
+    }
   }
 
   // **************** Private inner types ****************//
   private sealed trait OperationMeta
   private object OperationMeta {
     case object AddNew extends OperationMeta
-    case class Edit(group: TransactionGroup) extends OperationMeta
+    case class Edit(group: TransactionGroup, transactions: Seq[Transaction]) extends OperationMeta
   }
 
   /**
@@ -345,7 +340,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
           val allReservoirCodesAreEmpty = datas.forall(_.moneyReservoir.isNullReservoir)
 
           datas.size match {
-            case 0 => throw new AssertionError("Should not be possible")
+            case 0                                => throw new AssertionError("Should not be possible")
             case 1 if containsEmptyReservoirCodes => Some(i18n("facto.error.noReservoir.atLeast2"))
             case _ =>
               if (containsEmptyReservoirCodes) {
@@ -404,11 +399,10 @@ final class TransactionGroupForm(implicit i18n: I18n,
         val action = props.operationMeta match {
           case OperationMeta.AddNew =>
             Action.AddTransactionGroup(transactionsWithoutIdProvider = transactionsWithoutIdProvider(_))
-          case OperationMeta.Edit(group) =>
+          case OperationMeta.Edit(group, transactions) =>
             Action.UpdateTransactionGroup(
               transactionGroupWithId = group,
-              transactionsWithoutId =
-                transactionsWithoutIdProvider(group, Some(group.transactions.head.issuerId))
+              transactionsWithoutId = transactionsWithoutIdProvider(group, Some(transactions.head.issuerId))
             )
         }
 
@@ -444,7 +438,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
       props.operationMeta match {
         case OperationMeta.AddNew => throw new AssertionError("Should never happen")
-        case OperationMeta.Edit(group) =>
+        case OperationMeta.Edit(group, transactions) =>
           dispatcher.dispatch(Action.RemoveTransactionGroup(transactionGroupWithId = group))
           props.router.setPath(props.returnToPath)
       }

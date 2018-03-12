@@ -15,25 +15,23 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom.html_<^._
-import jsfacades.LokiJs
-import jsfacades.LokiJsImplicits._
-import models.EntityAccess
-import models.access.RemoteDatabaseProxy
+import models.access.DbQueryImplicits._
+import models.access.{DbQuery, JsEntityAccess, ModelField}
 import models.accounting.Transaction
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.user.User
 
+import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
-import scala2js.Keys
 
 private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                                                            accountingConfig: Config,
                                                            user: User,
-                                                           entityAccess: EntityAccess,
                                                            exchangeRateManager: ExchangeRateManager,
                                                            clock: Clock,
-                                                           remoteDatabaseProxy: RemoteDatabaseProxy,
+                                                           entityAccess: JsEntityAccess,
                                                            tagsStoreFactory: TagsStoreFactory) {
 
   private val anythingChangedQueue = SinglePendingTaskQueue.create()
@@ -63,6 +61,18 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           )
       })
       .renderBackend[Backend]
+      .componentWillMount($ =>
+        LogExceptionsCallback {
+          $.backend.updateAllDescriptionSuggestionsForCategory()
+
+          // Note: This is not strictly correct because we are using changing state from outside
+          // this component without listening to the tagsStore for changes. This is because being
+          // up-to-date is not really necessary but would introduce a lot of code.
+          tagsStoreFactory
+            .get()
+            .stateFuture
+            .map(state => $.modState(_.copy(allTags = state.tagToTransactionIds.keySet.toVector)).runNow())
+      })
       .build
   }
 
@@ -173,7 +183,12 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   private case class State(transactionDate: LocalDateTime,
                            beneficiaryAccount: Account,
                            moneyReservoir: MoneyReservoir,
-                           descriptionSuggestions: Seq[String] = Seq())
+                           descriptionSuggestions: Seq[String] = Seq(),
+                           allDescriptionSuggestionsForCategory: Option[State.CategoryAndSuggestions] = None,
+                           allTags: Seq[String] = Seq())
+  private object State {
+    case class CategoryAndSuggestions(category: Category, suggestions: Seq[String])
+  }
 
   private case class Props(title: String,
                            defaultValues: Transaction.Partial,
@@ -388,12 +403,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             ref = extraProps.ref,
             name = "tags",
             label = i18n("facto.tags"),
-            suggestions =
-              // Note: This is not strictly correct because we are using changing state from outside
-              // this component without putting it into the state (and listening to the tagsStore for
-              // changes. This is because being up-to-date is not really necessary but would introduce
-              // a lot of code.
-              tagsStoreFactory.get().state.tagToTransactionIds.keySet.toVector,
+            suggestions = state.allTags,
             showErrorMessage = props.showErrorMessages,
             additionalValidator = _.forall(Tags.isValidTag),
             defaultValue = props.defaultValues.tags,
@@ -404,23 +414,38 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
       )
     }
 
+    def updateAllDescriptionSuggestionsForCategory(): Unit = async {
+      val category = categoryRef().value.get
+      val allSuggestions = $.state.runNow().allDescriptionSuggestionsForCategory
+      if (allSuggestions.isEmpty || allSuggestions.get.category != category) {
+        val transactions = await(
+          entityAccess
+            .newQuery[Transaction]()
+            .filter(ModelField.Transaction.categoryCode === category.code)
+            .sort(DbQuery.Sorting.Transaction.deterministicallyByCreateDate.reversed)
+            .limit(300)
+            .data())
+        // Only update if category is still the same
+        if (categoryRef().value.get == category) {
+          val suggestions = transactions.toStream.map(_.description).distinct.toVector
+          $.modState(_.copy(
+            allDescriptionSuggestionsForCategory = Some(State.CategoryAndSuggestions(category, suggestions))))
+            .runNow()
+        }
+      }
+    }
     private def getDescriptionSuggestions(enteredValue: String): Seq[String] = {
       if (enteredValue.length < 2) {
         Seq()
       } else {
         val category = categoryRef().value.get
-        val transactions = remoteDatabaseProxy
-          .newQuery[Transaction]()
-          .filter(Keys.Transaction.categoryCode isEqualTo category.code)
-          .filter(Keys.Transaction.description containsIgnoreCase enteredValue)
-          .sort(LokiJs.Sorting
-            .descBy(Keys.Transaction.createdDate))
-          .limit(20)
-          .data()
-        transactions.toStream
-          .map(_.description)
-          .distinct
-          .toVector
+        val allSuggestions = $.state.runNow().allDescriptionSuggestionsForCategory
+        if (allSuggestions.isDefined && allSuggestions.get.category == category) {
+          val enteredValueLower = enteredValue.toLowerCase
+          allSuggestions.get.suggestions.filter(_.toLowerCase contains enteredValueLower)
+        } else {
+          Seq()
+        }
       }
     }
 
@@ -450,6 +475,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         anythingChangedQueue.execute {
           $.props.runNow().onFormChange()
         }
+
+        updateAllDescriptionSuggestionsForCategory()
       }
     }
   }

@@ -3,8 +3,8 @@ package models.accounting
 import common.money.DatedMoney
 import common.time.LocalDateTime
 import models._
+import models.access.EntityAccess
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
-import models.manager.EntityManager
 import models.user.User
 
 import scala.collection.immutable.Seq
@@ -33,9 +33,8 @@ case class Transaction(transactionGroupId: Long,
 
   override def withId(id: Long) = copy(idOption = Some(id))
 
-  def transactionGroup(implicit entityAccess: EntityAccess): TransactionGroup =
-    entityAccess.transactionGroupManager.findById(transactionGroupId)
-  def issuer(implicit entityAccess: EntityAccess): User = entityAccess.userManager.findById(issuerId)
+  def issuer(implicit entityAccess: EntityAccess): User =
+    entityAccess.newQuerySyncForUser().findById(issuerId)
   def beneficiary(implicit accountingConfig: Config): Account =
     accountingConfig.accounts(beneficiaryAccountCode)
   def moneyReservoir(implicit accountingConfig: Config): MoneyReservoir =
@@ -56,10 +55,6 @@ case class Transaction(transactionGroupId: Long,
 object Transaction {
   def tupled = (this.apply _).tupled
 
-  trait Manager extends EntityManager[Transaction] {
-    def findByGroupId(groupId: Long): Seq[Transaction]
-  }
-
   /** Same as Transaction, except all fields are optional. */
   case class Partial(transactionGroupId: Option[Long] = None,
                      issuerId: Option[Long] = None,
@@ -75,7 +70,7 @@ object Transaction {
                      consumedDate: Option[LocalDateTime] = None,
                      idOption: Option[Long] = None) {
     def issuer(implicit entityAccess: EntityAccess): Option[User] =
-      issuerId.map(entityAccess.userManager.findById(_))
+      issuerId.map(entityAccess.newQuerySyncForUser().findById)
     def isEmpty: Boolean = this == Partial.empty
   }
 

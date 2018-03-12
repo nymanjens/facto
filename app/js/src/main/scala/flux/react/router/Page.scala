@@ -79,8 +79,7 @@ object Page {
       EditTransactionGroup(transactionGroupId, HasReturnTo.getCurrentEncodedPath)
   }
 
-  case class NewTransactionGroupFromReservoir private (reservoirCode: String,
-                                                       encodedReturnTo: Option[String])
+  case class NewTransactionGroupFromReservoir private (reservoirCode: String, encodedReturnTo: Option[String])
       extends HasReturnTo(encodedReturnTo)
       with Page {
     override def title(implicit i18n: I18n) = i18n("facto.new-transaction")
@@ -105,7 +104,6 @@ object Page {
 
   case class NewForRepayment private (accountCode1: String,
                                       accountCode2: String,
-                                      amountInCents: Long,
                                       encodedReturnTo: Option[String])
       extends HasReturnTo(encodedReturnTo)
       with Page {
@@ -113,9 +111,8 @@ object Page {
     override def iconClass = "icon-new-empty"
   }
   object NewForRepayment {
-    def apply(account1: Account, account2: Account, amount: ReferenceMoney)(
-        implicit routerContext: RouterContext): NewForRepayment =
-      NewForRepayment(account1.code, account2.code, amount.cents, HasReturnTo.getCurrentEncodedPath)
+    def apply(account1: Account, account2: Account)(implicit routerContext: RouterContext): NewForRepayment =
+      NewForRepayment(account1.code, account2.code, HasReturnTo.getCurrentEncodedPath)
   }
 
   // **************** Accounting forms - balance checks **************** //

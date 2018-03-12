@@ -1,5 +1,9 @@
 package flux.react.app.transactionviews
 
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.async.Async.{async, await}
+import scala.concurrent.duration._
+import api.ScalaJsApi.UpdateToken
 import common.testing.TestObjects._
 import common.testing.{FakeRouterContext, ReactTestWrapper, TestModule}
 import flux.stores.entries.AllEntriesStoreFactory
@@ -8,47 +12,52 @@ import models.accounting._
 import utest._
 
 import scala.collection.immutable.Seq
+import scala.concurrent.{Future, Promise}
+import scala.scalajs.js
 import scala2js.Converters._
 
 object EverythingTest extends TestSuite {
 
   override def tests = TestSuite {
     val testModule = new ThisTestModule()
-    implicit val database = testModule.fakeRemoteDatabaseProxy
+    implicit val database = testModule.fakeEntityAccess
     implicit val clock = testModule.fakeClock
     implicit val dispatcher = testModule.fakeDispatcher
-    implicit val entityAccess = testModule.entityAccess
     val router = new FakeRouterContext()
 
     val everything = testModule.everything
 
-    "empty" - {
+    "empty" - async {
       val tester = new ComponentTester(everything(router))
+      await(tester.waitNoLongerLoading)
 
       tester.expandButton.isPresent ==> false
       tester.countDataRows ==> 0
     }
 
-    "nonempty" - {
+    "nonempty" - async {
       database.addRemotelyAddedEntities(uniqueTransactions(4))
       database.addRemotelyAddedEntities(testUser)
 
       val tester = new ComponentTester(everything(router))
+      await(tester.waitNoLongerLoading)
 
       tester.expandButton.isPresent ==> false
       tester.countDataRows ==> 4
     }
 
-    "with expand button" - {
+    "with expand button" - async {
       database.addRemotelyAddedEntities(uniqueTransactions(435))
       database.addRemotelyAddedEntities(testUser)
 
       val tester = new ComponentTester(everything(router))
+      await(tester.waitNoLongerLoading)
 
       tester.expandButton.isPresent ==> true
       tester.countDataRows ==> 400
 
       tester.expandButton.press()
+      await(tester.waitNoLongerLoading)
 
       tester.expandButton.isPresent ==> false
       tester.countDataRows ==> 435
@@ -72,6 +81,23 @@ object EverythingTest extends TestSuite {
     def expandButton = new ExpandButton
 
     def countDataRows = component.children(clazz = "data-row").length
+
+    def isLoading = component.children(clazz = "fa-spin").nonEmpty
+
+    def waitNoLongerLoading: Future[Unit] = {
+      val promise = Promise[Unit]()
+
+      def cyclicLogic(): Unit = {
+        if (isLoading) {
+          js.timers.setTimeout(20.milliseconds)(cyclicLogic())
+        } else {
+          promise.success((): Unit)
+        }
+      }
+
+      js.timers.setTimeout(0)(cyclicLogic())
+      promise.future
+    }
 
     /** Excludes data rows **/
     //    def numberOfDataRows

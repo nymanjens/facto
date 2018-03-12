@@ -9,19 +9,15 @@ import common.ResourceFiles
 import common.money.Money
 import common.time.{Clock, LocalDateTime, LocalDateTimes}
 import models._
+import models.access.JvmEntityAccess
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 import models.modification.EntityModification
-import models.modificationhandler.EntityModificationHandler
-import models.user.{SlickUserManager, User}
-import play.api.i18n.MessagesApi
+import models.user.User
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
 
-final class CsvImportTool @Inject()(implicit userManager: SlickUserManager,
-                                    clock: Clock,
-                                    entityAccess: SlickEntityAccess,
-                                    entityModificationHandler: EntityModificationHandler) {
+final class CsvImportTool @Inject()(implicit clock: Clock, entityAccess: JvmEntityAccess) {
 
   def importTransactions(csvFilePath: Path)(implicit user: User): Unit = {
     // example of line: "2 :: Common :: LIFE :: CARD_COMMON :: imperdiet Duis  :: -25.04 :: 1425855600 :: 0 :: 1425934823"
@@ -59,7 +55,7 @@ final class CsvImportTool @Inject()(implicit userManager: SlickUserManager,
                   if (consumedDateStamp.toLong == 0) transactionDateStamp.toLong
                   else consumedDateStamp.toLong)
               ))
-          entityModificationHandler.persistEntityModifications(groupAddition, transactionAddition)
+          entityAccess.persistEntityModifications(groupAddition, transactionAddition)
       }
     }
   }
@@ -71,7 +67,7 @@ final class CsvImportTool @Inject()(implicit userManager: SlickUserManager,
       val parts = Splitter.on(" :: ").trimResults().split(line).asScala.toList
       parts match {
         case List(issuerId, moneyReservoirCode, balanceAsFloat, checkDateStamp, createdDateStamp) =>
-          entityModificationHandler.persistEntityModifications(
+          entityAccess.persistEntityModifications(
             EntityModification.createAddWithRandomId(BalanceCheck(
               issuerId = issuerId.toInt,
               moneyReservoirCode = moneyReservoirCode,

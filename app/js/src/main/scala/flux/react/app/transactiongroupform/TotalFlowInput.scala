@@ -7,7 +7,6 @@ import common.time.Clock
 import flux.react.ReactVdomUtils.^^
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
-import models.money._
 
 private[transactiongroupform] final class TotalFlowInput(implicit i18n: I18n,
                                                          clock: Clock,
@@ -19,7 +18,7 @@ private[transactiongroupform] final class TotalFlowInput(implicit i18n: I18n,
       logExceptions {
         State(valueString = props.forceValue match {
           case Some(forceValue) => forceValue.formatFloat
-          case None => props.defaultValue.formatFloat
+          case None             => props.defaultValue.formatFloat
         })
     })
     .renderPS(($, props, state) =>

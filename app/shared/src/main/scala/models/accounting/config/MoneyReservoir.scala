@@ -15,7 +15,7 @@ case class MoneyReservoir(code: String,
 
   lazy val currency: Currency = currencyCode match {
     case Some(code) => Currency.of(code)
-    case None => Currency.default
+    case None       => Currency.default
   }
 
   def isNullReservoir: Boolean = this.code.isEmpty

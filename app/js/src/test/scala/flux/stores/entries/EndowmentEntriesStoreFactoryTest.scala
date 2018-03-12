@@ -1,8 +1,10 @@
 package flux.stores.entries
 
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.async.Async.{async, await}
 import java.time.Month.JANUARY
 
-import common.testing.FakeRemoteDatabaseProxy
+import common.testing.FakeJsEntityAccess
 import common.testing.TestObjects._
 import common.time.LocalDateTimes.createDateTime
 import models.accounting._
@@ -16,7 +18,7 @@ import scala2js.Converters._
 object EndowmentEntriesStoreFactoryTest extends TestSuite {
 
   override def tests = TestSuite {
-    implicit val database = new FakeRemoteDatabaseProxy()
+    implicit val database = new FakeJsEntityAccess()
     val factory: EndowmentEntriesStoreFactory = new EndowmentEntriesStoreFactory()
 
     val trans1 = persistTransaction(id = 1, consumedDay = 1, account = testAccountA)
@@ -26,19 +28,20 @@ object EndowmentEntriesStoreFactoryTest extends TestSuite {
     persistTransaction(id = 5, consumedDay = 3, account = testAccountB)
     persistTransaction(id = 6, consumedDay = 3, category = testCategory)
 
-    "filters and sorts entries correctly" - {
+    "filters and sorts entries correctly" - async {
       val store = factory.get(testAccountA, maxNumEntries = 5)
+      val state = await(store.stateFuture)
 
-      store.state.hasMore ==> false
-      store.state.entries ==> GeneralEntry
-        .toGeneralEntrySeq(Seq(trans1), Seq(trans2), Seq(trans3), Seq(trans4))
+      state.hasMore ==> false
+      state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(trans1), Seq(trans2), Seq(trans3), Seq(trans4))
     }
 
-    "respects maxNumEntries" - {
+    "respects maxNumEntries" - async {
       val store = factory.get(testAccountA, maxNumEntries = 3)
+      val state = await(store.stateFuture)
 
-      store.state.hasMore ==> true
-      store.state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(trans2), Seq(trans3), Seq(trans4))
+      state.hasMore ==> true
+      state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(trans2), Seq(trans3), Seq(trans4))
     }
   }
 
@@ -47,7 +50,7 @@ object EndowmentEntriesStoreFactoryTest extends TestSuite {
                                  createdDay: Int = 1,
                                  account: Account = testAccountA,
                                  category: Category = testAccountingConfig.constants.endowmentCategory)(
-      implicit database: FakeRemoteDatabaseProxy): Transaction = {
+      implicit database: FakeJsEntityAccess): Transaction = {
     val transaction = testTransactionWithIdA.copy(
       idOption = Some(id),
       transactionGroupId = id,

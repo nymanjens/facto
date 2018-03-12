@@ -1,25 +1,23 @@
 package api
 
+import models.access.DbQueryImplicits._
 import com.google.inject._
 import common.GuavaReplacement.Iterables.getOnlyElement
+import common.money.Currency
 import common.testing.TestObjects._
 import common.testing.TestUtils._
 import common.testing._
-import models._
-import models.accounting.SlickTransactionManager
+import models.access.{DbQuery, JvmEntityAccess, ModelField}
+import models.accounting.Transaction
 import models.accounting.config._
-import models.modification.{
-  EntityModification,
-  EntityModificationEntity,
-  EntityType,
-  SlickEntityModificationEntityManager
-}
-import models.modificationhandler.EntityModificationHandler
-import models.user.SlickUserManager
+import models.modification.{EntityModification, EntityModificationEntity, EntityType}
+import models.money.ExchangeRateMeasurement
+import models.slick.SlickUtils.dbRun
 import org.junit.runner._
 import org.specs2.runner._
 import play.api.test._
 
+import scala.collection.SortedMap
 import scala.collection.immutable.Seq
 
 @RunWith(classOf[JUnitRunner])
@@ -30,15 +28,11 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
   private val date3 = localDateTimeOfEpochMilli(999000333)
   private val date4 = localDateTimeOfEpochMilli(999000444)
 
-  implicit private val user = testUser
+  implicit private val user = testUserA
 
   @Inject implicit private val fakeClock: FakeClock = null
-  @Inject implicit private val entityAccess: SlickEntityAccess = null
+  @Inject implicit private val entityAccess: JvmEntityAccess = null
   @Inject implicit private val accountingConfig: Config = null
-  @Inject implicit private val entityModificationHandler: EntityModificationHandler = null
-  @Inject private val userManager: SlickUserManager = null
-  @Inject private val transactionManager: SlickTransactionManager = null
-  @Inject private val modificationEntityManager: SlickEntityModificationEntityManager = null
 
   @Inject private val serverFactory: ScalaJsApiServerFactory = null
 
@@ -47,9 +41,19 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
   }
 
   "getInitialData()" in new WithApplication {
+    entityAccess.persistEntityModifications(
+      EntityModification.Add(testUserA),
+      EntityModification.Add(testUserB),
+      EntityModification.createAddWithRandomId(
+        ExchangeRateMeasurement(date1, "GBP", ratioReferenceToForeignCurrency = 1.3))
+    )
+
     val response = serverFactory.create().getInitialData()
+
     response.accountingConfig mustEqual accountingConfig
     response.user mustEqual user
+    response.allUsers.toSet mustEqual Set(testUserA, testUserB)
+    response.ratioReferenceToForeignCurrency mustEqual Map(Currency.Gbp -> SortedMap(date1 -> 1.3))
   }
 
   "getAllEntities()" in new WithApplication {
@@ -64,9 +68,9 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
 
   "getEntityModifications()" in new WithApplication {
     fakeClock.setTime(date1)
-    entityModificationHandler.persistEntityModifications(testModificationA)
+    entityAccess.persistEntityModifications(testModificationA)
     fakeClock.setTime(date3)
-    entityModificationHandler.persistEntityModifications(testModificationB)
+    entityAccess.persistEntityModifications(testModificationB)
     fakeClock.setTime(date4)
 
     val response = serverFactory.create().getEntityModifications(updateToken = date2)
@@ -80,10 +84,26 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
 
     serverFactory.create().persistEntityModifications(Seq(testModification))
 
-    modificationEntityManager.fetchAll() must haveSize(1)
-    val modificationEntity = getOnlyElement(modificationEntityManager.fetchAll())
+    val modificationEntity = getOnlyElement(dbRun(entityAccess.newSlickQuery[EntityModificationEntity]()))
     modificationEntity.userId mustEqual user.id
     modificationEntity.modification mustEqual testModification
     modificationEntity.date mustEqual testDate
+  }
+
+  "executeDataQuery()" in new WithApplication {
+    val transaction1 = persistTransaction(category = testCategoryA)
+    val transaction2 = persistTransaction(category = testCategoryA)
+    persistTransaction(category = testCategoryB)
+
+    val entities = serverFactory
+      .create()
+      .executeDataQuery(
+        PicklableDbQuery.fromRegular(
+          DbQuery[Transaction](
+            filter = ModelField.Transaction.categoryCode === testCategoryA.code,
+            sorting = None,
+            limit = None)))
+
+    entities.toSet mustEqual Set(transaction1, transaction2)
   }
 }

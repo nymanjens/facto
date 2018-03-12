@@ -58,7 +58,7 @@ private[tests] object LocalDatabaseTest extends ManualTestSuite {
         db.setSingletonValue(VersionKey, "otherTestVersion")
 
         val otherDb = await(LocalDatabase.createStoredForTests(encryptionSecret))
-        otherDb.newQuery[Transaction]().data() ==> Seq(testTransactionWithId)
+        await(otherDb.newQuery[Transaction]().data()) ==> Seq(testTransactionWithId)
         otherDb.getSingletonValue(VersionKey).get ==> "testVersion"
       }
     },
@@ -76,17 +76,17 @@ private[tests] object LocalDatabaseTest extends ManualTestSuite {
     ManualTest("addAll") {
       async {
         val db = await(LocalDatabase.createInMemoryForTests(encryptionSecret))
-        db.addAll(Seq(testUser))
+        db.addAll(Seq(testUserRedacted))
         db.addAll(Seq(testTransactionWithId))
         db.addAll(Seq(testTransactionGroupWithId))
         db.addAll(Seq(testBalanceCheckWithId))
         db.addAll(Seq(testExchangeRateMeasurementWithId))
 
-        db.newQuery[User]().data() ==> Seq(testUserRedacted)
-        db.newQuery[Transaction]().data() ==> Seq(testTransactionWithId)
-        db.newQuery[TransactionGroup]().data() ==> Seq(testTransactionGroupWithId)
-        db.newQuery[BalanceCheck]().data() ==> Seq(testBalanceCheckWithId)
-        db.newQuery[ExchangeRateMeasurement]().data() ==> Seq(testExchangeRateMeasurementWithId)
+        await(db.newQuery[User]().data()) ==> Seq(testUserRedacted)
+        await(db.newQuery[Transaction]().data()) ==> Seq(testTransactionWithId)
+        await(db.newQuery[TransactionGroup]().data()) ==> Seq(testTransactionGroupWithId)
+        await(db.newQuery[BalanceCheck]().data()) ==> Seq(testBalanceCheckWithId)
+        await(db.newQuery[ExchangeRateMeasurement]().data()) ==> Seq(testExchangeRateMeasurementWithId)
       }
     },
     ManualTest("addAll: Inserts no duplicates IDs") {
@@ -97,7 +97,7 @@ private[tests] object LocalDatabaseTest extends ManualTestSuite {
         db.addAll(Seq(testTransactionWithId, transactionWithSameIdA))
         db.addAll(Seq(testTransactionWithId, transactionWithSameIdB))
 
-        db.newQuery[Transaction]().data() ==> Seq(testTransactionWithId)
+        await(db.newQuery[Transaction]().data()) ==> Seq(testTransactionWithId)
       }
     },
     ManualTest("applyModifications: Add") {
@@ -107,7 +107,7 @@ private[tests] object LocalDatabaseTest extends ManualTestSuite {
 
         db.applyModifications(Seq(EntityModification.Add(transaction1))) ==> true
 
-        db.newQuery[Transaction]().data() ==> Seq(transaction1)
+        await(db.newQuery[Transaction]().data()) ==> Seq(transaction1)
       }
     },
     ManualTest("applyModifications: Update") {
@@ -119,7 +119,7 @@ private[tests] object LocalDatabaseTest extends ManualTestSuite {
 
         db.applyModifications(Seq(EntityModification.createUpdate(updatedTransaction1))) ==> true
 
-        db.newQuery[Transaction]().data() ==> Seq(updatedTransaction1)
+        await(db.newQuery[Transaction]().data()) ==> Seq(updatedTransaction1)
       }
     },
     ManualTest("applyModifications: Delete") {
@@ -130,7 +130,7 @@ private[tests] object LocalDatabaseTest extends ManualTestSuite {
 
         db.applyModifications(Seq(EntityModification.createDelete(transaction1))) ==> true
 
-        db.newQuery[Transaction]().data() ==> Seq()
+        await(db.newQuery[Transaction]().data()) ==> Seq()
       }
     },
     ManualTest("applyModifications: Add is idempotent") {
@@ -149,7 +149,7 @@ private[tests] object LocalDatabaseTest extends ManualTestSuite {
             EntityModification.Add(transaction2)
           )) ==> true
 
-        db.newQuery[Transaction]().data().toSet ==> Set(transaction1, transaction2)
+        await(db.newQuery[Transaction]().data()).toSet ==> Set(transaction1, transaction2)
       }
     },
     ManualTest("applyModifications: Update is idempotent") {
@@ -167,7 +167,7 @@ private[tests] object LocalDatabaseTest extends ManualTestSuite {
             EntityModification.Update(transaction2)
           )) ==> true
 
-        db.newQuery[Transaction]().data() ==> Seq(updatedTransaction1)
+        await(db.newQuery[Transaction]().data()) ==> Seq(updatedTransaction1)
       }
     },
     ManualTest("applyModifications: Delete is idempotent") {
@@ -185,7 +185,7 @@ private[tests] object LocalDatabaseTest extends ManualTestSuite {
             EntityModification.createDelete(transaction3)
           )) ==> true
 
-        db.newQuery[Transaction]().data() ==> Seq(transaction1)
+        await(db.newQuery[Transaction]().data()) ==> Seq(transaction1)
       }
     },
     ManualTest("applyModifications: Returns false if no change") {

@@ -104,7 +104,7 @@ object GuavaReplacement {
 
     override def equals(that: scala.Any) = that match {
       case that: ImmutableSetMultimap[A, B] => backingMap == that.backingMap
-      case _ => false
+      case _                                => false
     }
     override def hashCode() = backingMap.hashCode()
   }
@@ -127,6 +127,33 @@ object GuavaReplacement {
       }
 
       def build(): ImmutableSetMultimap[A, B] = new ImmutableSetMultimap(backingMap.toMap)
+    }
+  }
+
+  final class ImmutableBiMap[K, V](private val forwardMap: Map[K, V], private val backwardMap: Map[V, K]) {
+    def get(key: K): V = forwardMap(key)
+    def inverse(): ImmutableBiMap[V, K] = new ImmutableBiMap(backwardMap, forwardMap)
+    def keySet: Set[K] = forwardMap.keySet
+  }
+  object ImmutableBiMap {
+    def builder[K, V](): Builder[K, V] = new Builder[K, V]()
+    def of[K, V](): ImmutableBiMap[K, V] = new Builder[K, V]().build()
+
+    final class Builder[K, V] private[ImmutableBiMap] () {
+      private val forwardMap = mutable.Map[K, V]()
+      private val backwardMap = mutable.Map[V, K]()
+
+      def put(key: K, value: V): Builder[K, V] = {
+        require(!forwardMap.contains(key), s"key $key already exists in keySet ${forwardMap.keySet}")
+        require(
+          !backwardMap.contains(value),
+          s"value $value already exists in valueSet ${backwardMap.keySet}")
+        forwardMap.put(key, value)
+        backwardMap.put(value, key)
+        this
+      }
+
+      def build(): ImmutableBiMap[K, V] = new ImmutableBiMap(forwardMap.toMap, backwardMap.toMap)
     }
   }
 

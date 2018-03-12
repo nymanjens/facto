@@ -8,7 +8,9 @@ import japgolly.scalajs.react.vdom._
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
+import scala.concurrent.Future
 import scala.reflect.ClassTag
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 /**
   * Wrapper component around a given input component that provides a dynamic default value for
@@ -70,7 +72,7 @@ class InputWithDefaultFromReference[Value] private () {
         val backend = proxy.backend
         proxy.props.defaultValueProxy match {
           case Some(_) => Option(backend.implRef.value) map (_.backend.delegateRef())
-          case None => Option(backend.dummyRef.value) map (_.backend.delegateRef())
+          case None    => Option(backend.dummyRef.value) map (_.backend.delegateRef())
         }
       } getOrElse InputBase.Proxy.nullObject()
     }
@@ -98,7 +100,7 @@ class InputWithDefaultFromReference[Value] private () {
     def render(props: Props.any, state: State) = logExceptions {
       props.defaultValueProxy match {
         case Some(_) => implRef.component(props).vdomElement
-        case None => dummyRef.component(props).vdomElement
+        case None    => dummyRef.component(props).vdomElement
       }
     }
   }
@@ -126,8 +128,17 @@ class InputWithDefaultFromReference[Value] private () {
 
         currentDefaultValue = props.defaultValueProxy.get().valueOrDefault
         if (props.startWithDefault) {
-          currentInputValue = currentDefaultValue
-          delegateRef().setValue(currentDefaultValue)
+          currentInputValue = delegateRef().setValue(currentDefaultValue)
+          $.setState(ConnectionState(isConnected = currentDefaultValue == currentInputValue)).runNow()
+          val callSucceeded = currentInputValue == currentDefaultValue
+
+          if (!callSucceeded) {
+            // Try again at a later time. This can happen if there are inputs dependent on each others value
+            Future {
+              currentInputValue = delegateRef().setValue(currentDefaultValue)
+              $.setState(ConnectionState(isConnected = currentDefaultValue == currentInputValue)).runNow()
+            }
+          }
         } else {
           currentInputValue = delegateRef().valueOrDefault
           $.setState(ConnectionState(isConnected = currentDefaultValue == currentInputValue)).runNow()

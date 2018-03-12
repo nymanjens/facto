@@ -1,27 +1,30 @@
 package flux.stores.entries
 
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.async.Async.{async, await}
+import models.access.DbQueryImplicits._
 import java.time.Month._
 
 import common.testing.TestObjects._
-import common.testing.{FakeRemoteDatabaseProxy, TestModule}
+import common.testing.{FakeJsEntityAccess, TestModule}
 import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.GainsForYear
 import flux.stores.entries.SummaryForYearStoreFactory.SummaryForYear
+import models.Entity
+import models.access.ModelField
 import models.accounting._
-import models.manager.EntityManager
 import models.modification.EntityModification._
 import models.modification._
 import utest._
 
 import scala.collection.immutable.{ListMap, Seq}
+import scala.concurrent.Future
 import scala2js.Converters._
 
 object StoreFactoryStateUpdateTest extends TestSuite {
 
   override def tests = TestSuite {
     val testModule = new ThisTestModule()
-    implicit val database = testModule.fakeRemoteDatabaseProxy
-    implicit val transactionManager = testModule.transactionManager
-    implicit val balanceCheckManager = testModule.balanceCheckManager
+    implicit val database = testModule.fakeEntityAccess
 
     "AllEntriesStoreFactory" - runTest(
       store = testModule.allEntriesStoreFactory.get(maxNumEntries = 3),
@@ -91,8 +94,7 @@ object StoreFactoryStateUpdateTest extends TestSuite {
           createTransaction(id = 10, beneficiary = testAccountA, category = testConstants.endowmentCategory))
           -> StateImpact.Change,
         Add(createTransaction(id = 9, beneficiary = testAccountA)) -> StateImpact.NoChange,
-        Add(
-          createTransaction(id = 8, beneficiary = testAccountB, category = testConstants.endowmentCategory))
+        Add(createTransaction(id = 8, beneficiary = testAccountB, category = testConstants.endowmentCategory))
           -> StateImpact.NoChange,
         // Remove Transactions
         Remove[Transaction](10) -> StateImpact.Change,
@@ -228,59 +230,57 @@ object StoreFactoryStateUpdateTest extends TestSuite {
   }
 
   private def runTest(store: EntriesStore[_], updatesWithImpact: ListMap[EntityModification, StateImpact])(
-      implicit database: FakeRemoteDatabaseProxy,
-      transactionManager: Transaction.Manager,
-      balanceCheckManager: BalanceCheck.Manager): Unit = {
+      implicit database: FakeJsEntityAccess): Future[Unit] = async {
     def checkRemovingExistingEntity(update: EntityModification): Unit = {
-      def checkIfIdExists(id: Long, manager: EntityManager[_]): Unit = {
-        try {
-          manager.findById(id) // throws if not found
-        } catch {
-          case e: Exception =>
-            throw new java.lang.AssertionError(
-              s"Could not find entity of ${update.entityType} with id $id",
-              e)
-        }
+
+      def checkIfIdExists[E <: Entity: EntityType](id: Long): Unit = {
+        val existing = database.newQuerySync[E]().findOne(ModelField.id[E], id)
+        require(existing.isDefined, s"Could not find entity of ${update.entityType} with id $id")
       }
 
       update match {
         case Remove(id) if update.entityType == EntityType.TransactionType =>
-          checkIfIdExists(id, transactionManager)
+          checkIfIdExists[Transaction](id)
         case Remove(id) if update.entityType == EntityType.BalanceCheckType =>
-          checkIfIdExists(id, balanceCheckManager)
+          checkIfIdExists[BalanceCheck](id)
         case _ => // Do nothing
       }
     }
 
-    var lastState = store.state
+    var lastState = await(store.stateFuture)
 
-    for ((update, stateImpact) <- updatesWithImpact) {
-      checkRemovingExistingEntity(update)
+    Future.sequence(
+      for ((update, stateImpact) <- updatesWithImpact)
+        yield
+          async {
+            checkRemovingExistingEntity(update)
 
-      database.persistModifications(update)
+            database.persistModifications(update)
 
-      stateImpact match {
-        case StateImpact.NoChange =>
-          Predef.assert(
-            removeImpactingIds(store.state) == removeImpactingIds(lastState),
-            s"For update $update:\n" +
-              s"Expected states to be the same (ignoring impacting IDs).\n" +
-              s"Previous: $lastState\n" +
-              s"Current:  ${store.state}\n"
-          )
-        case StateImpact.Change =>
-          Predef.assert(
-            removeImpactingIds(store.state) != removeImpactingIds(lastState),
-            s"For update $update:\n" +
-              s"Expected states to be different (ignoring impacting IDs).\n" +
-              s"Previous: $lastState\n" +
-              s"Current:  ${store.state}\n"
-          )
-        case StateImpact.Undefined =>
-      }
+            val newState = await(store.stateFuture)
 
-      lastState = store.state
-    }
+            stateImpact match {
+              case StateImpact.NoChange =>
+                Predef.assert(
+                  removeImpactingIds(newState) == removeImpactingIds(lastState),
+                  s"For update $update:\n" +
+                    s"Expected states to be the same (ignoring impacting IDs).\n" +
+                    s"Previous: $lastState\n" +
+                    s"Current:  ${newState}\n"
+                )
+              case StateImpact.Change =>
+                Predef.assert(
+                  removeImpactingIds(newState) != removeImpactingIds(lastState),
+                  s"For update $update:\n" +
+                    s"Expected states to be different (ignoring impacting IDs).\n" +
+                    s"Previous: $lastState\n" +
+                    s"Current:  ${newState}\n"
+                )
+              case StateImpact.Undefined =>
+            }
+
+            lastState = newState
+          })
   }
 
   private def removeImpactingIds(state: Any): EntriesStore.StateTrait = {

@@ -1,5 +1,7 @@
 package flux.stores
 
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.async.Async.{async, await}
 import common.testing.TestObjects._
 import flux.action.Action
 import models.accounting._
@@ -15,24 +17,24 @@ object BalanceCheckStoreTest extends TestSuite {
 
     val testModule = new common.testing.TestModule
 
-    implicit val fakeDatabase = testModule.fakeRemoteDatabaseProxy
+    implicit val fakeDatabase = testModule.fakeEntityAccess
     implicit val fakeDispatcher = testModule.fakeDispatcher
 
     val balanceCheckStore = new BalanceCheckStore()
 
-    "Listens to Action.AddBalanceCheck" - {
-      fakeDispatcher.dispatch(Action.AddBalanceCheck(testBalanceCheckWithoutId))
+    "Listens to Action.AddBalanceCheck" - async {
+      await(fakeDispatcher.dispatch(Action.AddBalanceCheck(testBalanceCheckWithoutId)))
 
       val Seq(addBc) = fakeDatabase.allModifications
       assertAddBalanceCheck(addBc, testBalanceCheckWithoutId)
     }
 
-    "Listens to Action.UpdateBalanceCheck" - {
+    "Listens to Action.UpdateBalanceCheck" - async {
       fakeDatabase.addRemotelyAddedEntities(testBalanceCheckWithId)
       val initialModifications = fakeDatabase.allModifications
       val newBalanceCheck = testBalanceCheckWithId.copy(balanceInCents = 39877, idOption = None)
 
-      fakeDispatcher.dispatch(Action.UpdateBalanceCheck(testBalanceCheckWithId, newBalanceCheck))
+      await(fakeDispatcher.dispatch(Action.UpdateBalanceCheck(testBalanceCheckWithId, newBalanceCheck)))
 
       fakeDatabase.allModifications.size - initialModifications.size ==> 2
       val Seq(removeBc, addBc) = fakeDatabase.allModifications takeRight 2
@@ -40,11 +42,11 @@ object BalanceCheckStoreTest extends TestSuite {
       assertAddBalanceCheck(addBc, newBalanceCheck)
     }
 
-    "Listens to Action.RemoveBalanceCheck" - {
+    "Listens to Action.RemoveBalanceCheck" - async {
       fakeDatabase.addRemotelyAddedEntities(testBalanceCheckWithId)
       val initialModifications = fakeDatabase.allModifications
 
-      fakeDispatcher.dispatch(Action.RemoveBalanceCheck(testBalanceCheckWithId))
+      await(fakeDispatcher.dispatch(Action.RemoveBalanceCheck(testBalanceCheckWithId)))
 
       fakeDatabase.allModifications.size - initialModifications.size ==> 1
       (fakeDatabase.allModifications takeRight 1) ==> Seq(

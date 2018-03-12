@@ -2,10 +2,10 @@ package flux.stores
 
 import flux.action.Action.{AddBalanceCheck, RemoveBalanceCheck, UpdateBalanceCheck}
 import flux.action.Dispatcher
-import models.access.RemoteDatabaseProxy
+import models.access.JsEntityAccess
 import models.modification.EntityModification
 
-private[stores] final class BalanceCheckStore(implicit database: RemoteDatabaseProxy, dispatcher: Dispatcher) {
+private[stores] final class BalanceCheckStore(implicit database: JsEntityAccess, dispatcher: Dispatcher) {
   dispatcher.registerPartialAsync {
     case AddBalanceCheck(balanceCheckWithoutId) =>
       database.persistModifications(EntityModification.createAddWithRandomId(balanceCheckWithoutId))

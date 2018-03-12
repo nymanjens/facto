@@ -166,8 +166,7 @@ object Parsable {
         val reservoirsIncludingNull = reservoirs ++ Map(NullMoneyReservoir.code -> NullMoneyReservoir)
         ParsedTemplate.Transaction(
           beneficiaryCodeTpl = Option(beneficiaryCode) map validateCode(accounts.keySet),
-          moneyReservoirCodeTpl = Option(moneyReservoirCode) map validateCode(
-            reservoirsIncludingNull.keySet),
+          moneyReservoirCodeTpl = Option(moneyReservoirCode) map validateCode(reservoirsIncludingNull.keySet),
           categoryCodeTpl = Option(categoryCode) map validateCode(categories.keySet),
           descriptionTpl = description,
           flowInCents = (flowAsFloat.toDouble * 100).round,

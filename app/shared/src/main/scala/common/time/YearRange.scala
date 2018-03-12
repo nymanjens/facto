@@ -25,10 +25,10 @@ case class YearRange private (private val years: Set[Int]) {
   def size: Int = years.size
 
   def copyIncluding(year: Int): YearRange = year match {
-    case _ if isEmpty => YearRange.single(year)
+    case _ if isEmpty          => YearRange.single(year)
     case _ if year < firstYear => YearRange.closed(year, lastYear)
-    case _ if lastYear < year => YearRange.closed(firstYear, year)
-    case _ if contains(year) => this
+    case _ if lastYear < year  => YearRange.closed(firstYear, year)
+    case _ if contains(year)   => this
   }
 
   def copyWithLowerBound(lowerBoundYear: Int): YearRange = YearRange(years.filter(lowerBoundYear <= _))

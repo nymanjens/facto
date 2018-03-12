@@ -4,6 +4,7 @@ import java.time.Month.MARCH
 
 import common.testing.TestObjects._
 import common.time.LocalDateTime
+import models.access.ModelField
 import models.accounting._
 import models.modification.EntityType
 import models.money.ExchangeRateMeasurement
@@ -18,6 +19,10 @@ object ConvertersTest extends TestSuite {
   val dateTime = LocalDateTime.of(2022, MARCH, 13, 12, 13)
 
   override def tests = TestSuite {
+    "fromModelField" - {
+      Converters.fromModelField(ModelField.Transaction.categoryCode) ==> Converters.StringConverter
+      Converters.fromModelField(ModelField.id[User]) ==> Converters.LongConverter
+    }
     "LongConverter" - {
       "to JS and back" - {
         testToJsAndBack[Long](1L)
@@ -35,12 +40,12 @@ object ConvertersTest extends TestSuite {
       }
     }
 
-    "entityTypeToConverter" - {
-      entityTypeToConverter(EntityType.UserType) ==> UserConverter
-      entityTypeToConverter(EntityType.TransactionType) ==> TransactionConverter
-      entityTypeToConverter(EntityType.TransactionGroupType) ==> TransactionGroupConverter
-      entityTypeToConverter(EntityType.BalanceCheckType) ==> BalanceCheckConverter
-      entityTypeToConverter(EntityType.ExchangeRateMeasurementType) ==> ExchangeRateMeasurementConverter
+    "fromEntityType" - {
+      fromEntityType(EntityType.UserType) ==> UserConverter
+      fromEntityType(EntityType.TransactionType) ==> TransactionConverter
+      fromEntityType(EntityType.TransactionGroupType) ==> TransactionGroupConverter
+      fromEntityType(EntityType.BalanceCheckType) ==> BalanceCheckConverter
+      fromEntityType(EntityType.ExchangeRateMeasurementType) ==> ExchangeRateMeasurementConverter
     }
 
     "seqConverter" - {

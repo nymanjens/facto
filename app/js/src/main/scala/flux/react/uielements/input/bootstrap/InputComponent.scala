@@ -8,6 +8,7 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom.html_<^._
+import org.scalajs.dom.console
 
 import scala.collection.immutable.Seq
 import scala.util.{Failure, Success, Try}
@@ -196,7 +197,7 @@ private[bootstrap] object InputComponent {
     override def value = {
       ValueTransformer.stringToValue(component.state.valueString, props) match {
         case Some(value) if props.required && props.valueTransformer.isEmptyValue(value) => None
-        case other => other
+        case other                                                                       => other
       }
     }
     override def valueOrDefault =
@@ -217,15 +218,15 @@ private[bootstrap] object InputComponent {
           if (newValue == valueThroughTransformer) {
             setValueInternal(newValue)
           } else {
-            println(
+            console.log(
               s"  Setting a value ('$newValue') that is different when transformed to string and back to value " +
                 s"(valueThroughTransformer = '$valueThroughTransformer'). Will ignore this setter.")
             this.valueOrDefault
           }
-        case Failure(_) =>
-          println(
+        case Failure(e) =>
+          console.log(
             s"  Failed to get the String value for $newValue. This may be intended if the valid options for " +
-              s"this input change. Will ignore this setter.")
+              s"this input change. Will ignore this setter.\n$e")
           this.valueOrDefault
       }
     }

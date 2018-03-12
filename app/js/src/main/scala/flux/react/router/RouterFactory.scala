@@ -69,9 +69,8 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
           }
 
           | dynamicRuleFromPage(
-            _ / (codeString ~ returnToPath).caseClass[Page.NewTransactionGroupFromReservoir]) {
-            (page, ctl) =>
-              reactAppModule.transactionGroupForm.forReservoir(page.reservoirCode, page.returnToPath, ctl)
+            _ / (codeString ~ returnToPath).caseClass[Page.NewTransactionGroupFromReservoir]) { (page, ctl) =>
+            reactAppModule.transactionGroupForm.forReservoir(page.reservoirCode, page.returnToPath, ctl)
           }
 
           | dynamicRuleFromPage(_ / (codeString ~ returnToPath).caseClass[Page.NewFromTemplate]) {
@@ -80,15 +79,12 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
           }
 
           | dynamicRuleFromPage(
-            _ / ((codeString / codeString / long) ~ returnToPath).caseClass[Page.NewForRepayment]) {
-            (page, ctl) =>
-              reactAppModule.transactionGroupForm
-                .forRepayment(
-                  page.accountCode1,
-                  page.accountCode2,
-                  page.amountInCents,
-                  page.returnToPath,
-                  ctl)
+            _ / ((codeString / codeString) ~ returnToPath).caseClass[Page.NewForRepayment]) { (page, ctl) =>
+            reactAppModule.transactionGroupForm.forRepayment(
+              page.accountCode1,
+              page.accountCode2,
+              page.returnToPath,
+              ctl)
           }
 
           | dynamicRuleFromPage(_ / (codeString ~ returnToPath).caseClass[Page.NewBalanceCheck]) {

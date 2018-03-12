@@ -43,8 +43,7 @@ private[transactiongroupform] final class TotalFlowRestrictionInput(implicit i18
   }
 
   // **************** Private inner types ****************//
-  private case class Props(defaultValue: TotalFlowRestriction,
-                           onChangeListener: TotalFlowRestriction => Unit)
+  private case class Props(defaultValue: TotalFlowRestriction, onChangeListener: TotalFlowRestriction => Unit)
   private type State = TotalFlowRestriction
 }
 

@@ -4,6 +4,7 @@ import common.money.{ExchangeRateManager, Money, MoneyWithGeneralCurrency}
 import common.time.JavaTimeImplicits._
 import common.time.LocalDateTime
 import models._
+import models.access.EntityAccess
 import models.accounting.Transaction
 import models.accounting.config.{Account, Category, Config, MoneyReservoir}
 import models.user.User
@@ -70,13 +71,13 @@ abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
     val nextChars = strings.toStream
       .map {
         case s if nextIndex < s.length => Some(s(nextIndex))
-        case _ => None
+        case _                         => None
       }
       .distinct
       .toVector
     nextChars match {
       case Vector(Some(_)) => longestCommonPrefix(strings, nextIndex = nextIndex + 1)
-      case _ => (strings.headOption getOrElse "").substring(0, nextIndex)
+      case _               => (strings.headOption getOrElse "").substring(0, nextIndex)
     }
   }
 
@@ -84,7 +85,7 @@ abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
   private def removeRightWord(string: String): String = {
     string.lastOption match {
       case Some(c) if c.isLetterOrDigit => removeRightWord(string.substring(0, string.length - 1))
-      case _ => string
+      case _                            => string
     }
   }
 }

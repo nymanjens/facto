@@ -1,10 +1,10 @@
 package flux.react.app.transactionviews
 
 import common.Formatting._
-import common.{I18n, Unique}
 import common.LoggingUtils.LogExceptionsCallback
 import common.money.ExchangeRateManager
 import common.time.Clock
+import common.{I18n, Unique}
 import flux.action.{Action, Dispatcher}
 import flux.react.ReactVdomUtils.<<
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
@@ -14,9 +14,9 @@ import flux.stores.entries.{CashFlowEntriesStoreFactory, CashFlowEntry}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.VdomArray
 import japgolly.scalajs.react.vdom.html_<^._
+import models.access.EntityAccess
 import models.accounting.BalanceCheck
 import models.accounting.config.{Config, MoneyReservoir}
-import models.EntityAccess
 import models.user.User
 
 import scala.collection.immutable.Seq

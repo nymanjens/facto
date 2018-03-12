@@ -27,11 +27,11 @@ object EntityType {
   type any = EntityType[_ <: Entity]
 
   // @formatter:off
-  implicit object UserType extends EntityType[User] { override def entityClass = classOf[User]}
-  implicit object TransactionType extends EntityType[Transaction] { override def entityClass = classOf[Transaction] }
-  implicit object TransactionGroupType extends EntityType[TransactionGroup] { override def entityClass = classOf[TransactionGroup] }
-  implicit object BalanceCheckType extends EntityType[BalanceCheck] { override def entityClass = classOf[BalanceCheck] }
-  implicit object ExchangeRateMeasurementType extends EntityType[ExchangeRateMeasurement] { override def entityClass = classOf[ExchangeRateMeasurement] }
+  implicit case object UserType extends EntityType[User] { override def entityClass = classOf[User]}
+  implicit case object TransactionType extends EntityType[Transaction] { override def entityClass = classOf[Transaction] }
+  implicit case object TransactionGroupType extends EntityType[TransactionGroup] { override def entityClass = classOf[TransactionGroup] }
+  implicit case object BalanceCheckType extends EntityType[BalanceCheck] { override def entityClass = classOf[BalanceCheck] }
+  implicit case object ExchangeRateMeasurementType extends EntityType[ExchangeRateMeasurement] { override def entityClass = classOf[ExchangeRateMeasurement] }
   // @formatter:on
 
   val values: Seq[EntityType.any] =

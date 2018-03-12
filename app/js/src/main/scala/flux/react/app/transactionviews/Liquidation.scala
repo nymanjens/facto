@@ -1,17 +1,17 @@
 package flux.react.app.transactionviews
 
 import common.Formatting._
-import common.{I18n, Unique}
 import common.money.{ExchangeRateManager, ReferenceMoney}
 import common.time.Clock
+import common.{I18n, Unique}
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import flux.react.router.{Page, RouterContext}
 import flux.react.uielements
 import flux.stores.entries.{AccountPair, LiquidationEntriesStoreFactory, LiquidationEntry}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
+import models.access.EntityAccess
 import models.accounting.config.{Account, Config}
-import models.EntityAccess
 import models.user.User
 
 import scala.collection.immutable.Seq
@@ -63,16 +63,7 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
                     <.th(i18n("facto.description")),
                     <.th(i18n("facto.flow")),
                     <.th(s"${account1.veryShortName} -> ${account2.veryShortName}"),
-                    <.th(repayButton(
-                      account1 = account1,
-                      account2 = account2,
-                      amount = entriesStoreFactory
-                        .get(accountPair = accountPair, maxNumEntries = startNumEntries)
-                        .state
-                        .entries
-                        .lastOption
-                        .map(_.debt) getOrElse ReferenceMoney(0)
-                    ))
+                    <.th(repayButton(account1 = account1, account2 = account2))
                   ),
                   calculateTableData = entry =>
                     Seq[VdomElement](
@@ -100,9 +91,9 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
   }
 
   // **************** Private helper methods ****************//
-  private def repayButton(account1: Account, account2: Account, amount: ReferenceMoney)(
+  private def repayButton(account1: Account, account2: Account)(
       implicit router: RouterContext): VdomElement = {
-    router.anchorWithHrefTo(Page.NewForRepayment(account1 = account1, account2 = account2, amount = amount))(
+    router.anchorWithHrefTo(Page.NewForRepayment(account1 = account1, account2 = account2))(
       ^.className := "btn btn-info btn-xs",
       ^.role := "button",
       <.i(^.className := "fa fa-check-square-o fa-fw"),

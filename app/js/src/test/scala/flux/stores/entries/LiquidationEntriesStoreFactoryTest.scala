@@ -4,14 +4,17 @@ import java.time.Month.JANUARY
 
 import common.money.ReferenceMoney
 import common.testing.TestObjects._
-import common.testing.{FakeRemoteDatabaseProxy, TestModule}
+import common.testing.{FakeJsEntityAccess, TestModule}
 import common.time.LocalDateTimes.createDateTime
 import models.accounting._
 import models.accounting.config.{Account, MoneyReservoir}
 import models.modification.EntityModification
 import utest._
 
+import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
+import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 
 object LiquidationEntriesStoreFactoryTest extends TestSuite {
@@ -20,17 +23,19 @@ object LiquidationEntriesStoreFactoryTest extends TestSuite {
 
   override def tests = TestSuite {
     val testModule = new TestModule()
-    implicit val database = testModule.fakeRemoteDatabaseProxy
+    implicit val database = testModule.fakeEntityAccess
     implicit val exchangeRateManager = testModule.exchangeRateManager
-    implicit val entityAccess = testModule.entityAccess
     val factory: LiquidationEntriesStoreFactory = new LiquidationEntriesStoreFactory()
 
-    "empty result" - {
-      factory.get(pair, maxNumEntries = 10000).state.entries ==> Seq()
-      factory.get(pair, maxNumEntries = 10000).state.hasMore ==> false
+    "empty result" - async {
+      val store = factory.get(pair, maxNumEntries = 10000)
+      val state = await(store.stateFuture)
+
+      state.entries ==> Seq()
+      state.hasMore ==> false
     }
 
-    "gives correct results" - {
+    "gives correct results" - async {
       val trans1 = persistTransaction(
         groupId = 1,
         flowInCents = 201,
@@ -78,19 +83,23 @@ object LiquidationEntriesStoreFactoryTest extends TestSuite {
       )
 
       // Run tests
-      "Increasing number of entries" - {
-        for (i <- 1 to expectedEntries.size) {
-          val subList = expectedEntries.takeRight(i)
+      // Increasing number of entries
+      await(
+        Future.sequence(
+          for (i <- 1 to expectedEntries.size)
+            yield
+              async {
+                val subList = expectedEntries.takeRight(i)
 
-          factory.get(pair, maxNumEntries = subList.size).state.entries ==> subList
-          factory.get(pair, maxNumEntries = subList.size).state.hasMore ==> (i < expectedEntries.size)
-        }
-      }
+                val state = await(factory.get(pair, maxNumEntries = subList.size).stateFuture)
+                state.entries ==> subList
+                state.hasMore ==> (i < expectedEntries.size)
+              }))
 
-      "All entries" - {
-        factory.get(pair, maxNumEntries = 10000).state.entries ==> expectedEntries
-        factory.get(pair, maxNumEntries = 10000).state.hasMore ==> false
-      }
+      // All entries
+      val allEntriesState = await(factory.get(pair, maxNumEntries = 10000).stateFuture)
+      allEntriesState.entries ==> expectedEntries
+      allEntriesState.hasMore ==> false
     }
   }
 
@@ -99,7 +108,7 @@ object LiquidationEntriesStoreFactoryTest extends TestSuite {
       flowInCents: Long,
       day: Int,
       account: Account = testAccountA,
-      reservoir: MoneyReservoir)(implicit database: FakeRemoteDatabaseProxy): Transaction = {
+      reservoir: MoneyReservoir)(implicit database: FakeJsEntityAccess): Transaction = {
     val transaction = testTransactionWithIdA.copy(
       idOption = Some(EntityModification.generateRandomId()),
       transactionGroupId = groupId,

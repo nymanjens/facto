@@ -8,8 +8,8 @@ import flux.react.router.RouterContext
 import flux.react.uielements
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
+import models.access.EntityAccess
 import models.accounting.config.Config
-import models.EntityAccess
 import models.user.User
 
 import scala.collection.immutable.Seq

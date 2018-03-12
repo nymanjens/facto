@@ -4,8 +4,8 @@ import com.google.inject._
 import common.testing.TestObjects._
 import common.testing._
 import models._
-import models.modificationhandler.EntityModificationHandler
-import models.user.SlickUserManager
+import models.access.{EntityAccess, JvmEntityAccess}
+import models.user.Users
 import org.junit.runner._
 import org.specs2.runner._
 import play.api.test._
@@ -14,8 +14,7 @@ import play.api.test._
 class ConfigTest extends HookedSpecification {
 
   @Inject implicit private val config: Config = null
-  @Inject implicit private val entityAccess: EntityAccess = null
-  @Inject implicit private val entityModificationHandler: EntityModificationHandler = null
+  @Inject implicit private val entityAccess: JvmEntityAccess = null
 
   override def before() = {
     Guice.createInjector(new FactoTestModule).injectMembers(this)
@@ -56,7 +55,7 @@ class ConfigTest extends HookedSpecification {
     TestUtils.persist(testUserA)
     TestUtils.persist(testUserB)
     val userOther =
-      TestUtils.persist(SlickUserManager.createUser(loginName = "other", password = "other", name = "Other"))
+      TestUtils.persist(Users.createUser(loginName = "other", password = "other", name = "Other"))
 
     config.accountOf(testUserA) must beEqualTo(Some(config.accounts("ACC_A")))
     config.accountOf(testUserB) must beEqualTo(Some(config.accounts("ACC_B")))
@@ -82,7 +81,7 @@ class ConfigTest extends HookedSpecification {
     TestUtils.persist(testUserA)
     TestUtils.persist(testUserB)
     val userOther =
-      TestUtils.persist(SlickUserManager.createUser(loginName = "other", password = "other", name = "Other"))
+      TestUtils.persist(Users.createUser(loginName = "other", password = "other", name = "Other"))
 
     // call personallySortedAccounts()
     config.personallySortedAccounts(testUserA, entityAccess) mustEqual Seq(accCommon, accA, accB)

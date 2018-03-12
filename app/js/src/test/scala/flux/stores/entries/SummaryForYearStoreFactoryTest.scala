@@ -1,10 +1,12 @@
 package flux.stores.entries
 
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.async.Async.{async, await}
 import java.time.Month
 import java.time.Month._
 
 import common.money.ReferenceMoney
-import common.testing.FakeRemoteDatabaseProxy
+import common.testing.FakeJsEntityAccess
 import common.testing.TestObjects._
 import common.time.DatedMonth
 import flux.stores.entries.SummaryForYearStoreFactory.SummaryForYear
@@ -20,46 +22,61 @@ object SummaryForYearStoreFactoryTest extends TestSuite {
   override def tests = TestSuite {
     val testModule = new common.testing.TestModule
 
-    implicit val database = testModule.fakeRemoteDatabaseProxy
-    implicit val userManager = testModule.entityAccess.userManager
+    implicit val database = testModule.fakeEntityAccess
     implicit val testAccountingConfig = testModule.testAccountingConfig
     implicit val complexQueryFilter = new ComplexQueryFilter()
     implicit val exchangeRateManager = testModule.exchangeRateManager
     val factory: SummaryForYearStoreFactory = new SummaryForYearStoreFactory()
 
-    "empty result" - {
-      factory.get(testAccountA, 2012, query = "abc").state ==> SummaryForYear.empty
-    }
+    "empty result" - async {
+      val store = factory.get(testAccountA, 2012, query = "abc")
+      val state = await(store.stateFuture)
 
-    "single transaction" - {
+      state ==> SummaryForYear.empty
+    }
+    "single transaction" - async {
       val transaction = persistTransaction()
 
-      factory.get(testAccountA, 2012, query = "abc").state ==> SummaryForYear(Seq(transaction))
+      val store = factory.get(testAccountA, 2012, query = "abc")
+      val state = await(store.stateFuture)
+
+      state ==> SummaryForYear(Seq(transaction))
     }
-    "multiple transactions" - {
+    "multiple transactions" - async {
       val transaction1 = persistTransaction(day = 1, month = JANUARY)
       val transaction2 = persistTransaction(day = 2, month = JANUARY)
       val transaction3 = persistTransaction(day = 3, month = JANUARY)
 
-      factory.get(testAccountA, 2012, query = "abc").state ==>
-        SummaryForYear(Seq(transaction1, transaction2, transaction3))
+      val store = factory.get(testAccountA, 2012, query = "abc")
+      val state = await(store.stateFuture)
+
+      state ==> SummaryForYear(Seq(transaction1, transaction2, transaction3))
     }
-    "transaction in different year" - {
+    "transaction in different year" - async {
       persistTransaction(year = 2010)
 
-      factory.get(testAccountA, 2012, query = "abc").state ==> SummaryForYear.empty
+      val store = factory.get(testAccountA, 2012, query = "abc")
+      val state = await(store.stateFuture)
+
+      state ==> SummaryForYear.empty
     }
 
-    "transaction for different account" - {
+    "transaction for different account" - async {
       persistTransaction(beneficiary = testAccountB)
 
-      factory.get(testAccountA, 2012, query = "abc").state ==> SummaryForYear.empty
+      val store = factory.get(testAccountA, 2012, query = "abc")
+      val state = await(store.stateFuture)
+
+      state ==> SummaryForYear.empty
     }
 
-    "transaction outside filter" - {
+    "transaction outside filter" - async {
       persistTransaction(description = "xyz")
 
-      factory.get(testAccountA, 2012, query = "abc").state ==> SummaryForYear.empty
+      val store = factory.get(testAccountA, 2012, query = "abc")
+      val state = await(store.stateFuture)
+
+      state ==> SummaryForYear.empty
     }
     "SummaryForYear" - {
       "months" - {
@@ -112,7 +129,7 @@ object SummaryForYearStoreFactoryTest extends TestSuite {
       month: Month = MARCH,
       day: Int = 20,
       beneficiary: Account = testAccountA,
-      description: String = "abcdefg")(implicit database: FakeRemoteDatabaseProxy): Transaction = {
+      description: String = "abcdefg")(implicit database: FakeJsEntityAccess): Transaction = {
     val transaction =
       createTransaction(
         beneficiary = beneficiary,

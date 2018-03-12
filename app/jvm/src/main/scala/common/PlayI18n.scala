@@ -23,7 +23,7 @@ object PlayI18n {
       messagesApi(key, args)(defaultLang)
     }
 
-    override def allI18nMessages: Map[String, String] = {
+    override val allI18nMessages: Map[String, String] = {
       // defaultLang is extended by "default" in case it didn't overwrite a message key.
       messagesApi.messages("default") ++ messagesApi.messages(defaultLang.code)
     }

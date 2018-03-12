@@ -11,8 +11,7 @@ import flux.stores.entries.AllEntriesStoreFactory
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import jsfacades.Mousetrap
-import models.EntityAccess
-import models.accounting.config.Template.Placement
+import models.access.EntityAccess
 import models.accounting.config.{Config, Template}
 import models.user.User
 
@@ -89,7 +88,7 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
 
                       queryInputRef().value match {
                         case Some(query) => props.router.setPage(Page.Search(query))
-                        case None =>
+                        case None        =>
                       }
                     }
                   },
@@ -149,14 +148,14 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
         accountingConfig.templatesToShowFor(placement, user)
 
       router.currentPage match {
-        case Page.Everything => templatesForPlacement(Template.Placement.EverythingView)
-        case Page.CashFlow => templatesForPlacement(Template.Placement.CashFlowView)
-        case Page.Liquidation => templatesForPlacement(Template.Placement.LiquidationView)
-        case Page.Endowments => templatesForPlacement(Template.Placement.EndowmentsView)
-        case Page.Summary => templatesForPlacement(Template.Placement.SummaryView)
-        case _: Page.Search => templatesForPlacement(Template.Placement.SearchView)
+        case Page.Everything            => templatesForPlacement(Template.Placement.EverythingView)
+        case Page.CashFlow              => templatesForPlacement(Template.Placement.CashFlowView)
+        case Page.Liquidation           => templatesForPlacement(Template.Placement.LiquidationView)
+        case Page.Endowments            => templatesForPlacement(Template.Placement.EndowmentsView)
+        case Page.Summary               => templatesForPlacement(Template.Placement.SummaryView)
+        case _: Page.Search             => templatesForPlacement(Template.Placement.SearchView)
         case page: Page.NewFromTemplate => Seq(accountingConfig.templateWithCode(page.templateCode))
-        case _ => Seq()
+        case _                          => Seq()
       }
     }
   }

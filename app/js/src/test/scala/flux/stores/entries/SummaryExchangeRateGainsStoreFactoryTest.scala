@@ -1,11 +1,13 @@
 package flux.stores.entries
 
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.async.Async.{async, await}
 import java.time.LocalDate
 import java.time.Month._
 
 import common.money.ReferenceMoney
 import common.testing.TestObjects._
-import common.testing.{FakeRemoteDatabaseProxy, TestModule}
+import common.testing.{FakeJsEntityAccess, TestModule}
 import common.time.LocalDateTimes.createDateTime
 import common.time.{DatedMonth, LocalDateTime}
 import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.GainsForMonth
@@ -19,33 +21,31 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
 
   override def tests = TestSuite {
     val testModule = new TestModule()
-    implicit val database = testModule.fakeRemoteDatabaseProxy
+    implicit val database = testModule.fakeEntityAccess
     implicit val exchangeRateManager = testModule.exchangeRateManager
-    implicit val entityAccess = testModule.entityAccess
-    implicit val userManager = testModule.entityAccess.userManager
     implicit val testAccountingConfig = testModule.testAccountingConfig
     implicit val complexQueryFilter = new ComplexQueryFilter()
     val factory: SummaryExchangeRateGainsStoreFactory = new SummaryExchangeRateGainsStoreFactory()
 
-    "no transactions" - {
+    "no transactions" - async {
       val store = factory.get(testAccountA, year = 2013)
 
-      val gainsForYear = store.state
+      val gainsForYear = await(store.stateFuture)
       gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2012, DECEMBER, 1))) ==> GainsForMonth.empty
       gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2013, JANUARY, 1))) ==> GainsForMonth.empty
       gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2013, DECEMBER, 1))) ==> GainsForMonth.empty
     }
 
-    "domestic reservoir" - {
+    "domestic reservoir" - async {
       persistTransaction(flow = 789, date = createDateTime(2013, JANUARY, 5), reservoir = testReservoirCashA)
 
       val store = factory.get(testAccountA, year = 2013)
-      val gainsForYear = store.state
+      val gainsForYear = await(store.stateFuture)
 
       gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2013, JANUARY, 1))) ==> GainsForMonth.empty
     }
 
-    "foreign reservoir" - {
+    "foreign reservoir" - async {
       persistGbpRate(date = createDateTime(2012, JANUARY, 30), ratio = 1.0)
       persistGbpRate(date = createDateTime(2012, DECEMBER, 30), ratio = 1.1)
 
@@ -74,7 +74,7 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
       persistTransaction(flow = -600, date = createDateTime(2013, MAY, 9)) // Balance = -200
 
       val store = factory.get(testAccountA, year = 2013)
-      val gainsForYear = store.state
+      val gainsForYear = await(store.stateFuture)
 
       gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2012, JANUARY, 1))) ==> GainsForMonth.empty
       gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2012, NOVEMBER, 1))) ==> GainsForMonth.empty
@@ -106,12 +106,12 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
   private def persistTransaction(
       flow: Double,
       date: LocalDateTime,
-      reservoir: MoneyReservoir = testReservoirCashGbp)(implicit database: FakeRemoteDatabaseProxy): Unit = {
+      reservoir: MoneyReservoir = testReservoirCashGbp)(implicit database: FakeJsEntityAccess): Unit = {
     database.addRemotelyAddedEntities(
       createTransaction(flow = flow, reservoir = reservoir).copy(transactionDate = date))
   }
   private def persistBalanceCheck(balance: Double, date: LocalDateTime)(
-      implicit database: FakeRemoteDatabaseProxy): Unit = {
+      implicit database: FakeJsEntityAccess): Unit = {
     database.addRemotelyAddedEntities(
       testBalanceCheckWithId.copy(
         idOption = Some(EntityModification.generateRandomId()),
@@ -120,7 +120,7 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
         balanceInCents = (balance * 100).toLong))
   }
   private def persistGbpRate(date: LocalDateTime, ratio: Double)(
-      implicit database: FakeRemoteDatabaseProxy): Unit = {
+      implicit database: FakeJsEntityAccess): Unit = {
     database.addRemotelyAddedEntities(
       testExchangeRateMeasurementWithId.copy(
         idOption = Some(EntityModification.generateRandomId()),
