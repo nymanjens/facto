@@ -18,7 +18,7 @@ import scala2js.Converters._
 object EndowmentEntriesStoreFactoryTest extends TestSuite {
 
   override def tests = TestSuite {
-    implicit val database = new FakeJsEntityAccess()
+    implicit val entityAccess = new FakeJsEntityAccess()
     val factory: EndowmentEntriesStoreFactory = new EndowmentEntriesStoreFactory()
 
     val trans1 = persistTransaction(id = 1, consumedDay = 1, account = testAccountA)
@@ -50,7 +50,7 @@ object EndowmentEntriesStoreFactoryTest extends TestSuite {
                                  createdDay: Int = 1,
                                  account: Account = testAccountA,
                                  category: Category = testAccountingConfig.constants.endowmentCategory)(
-      implicit database: FakeJsEntityAccess): Transaction = {
+      implicit entityAccess: FakeJsEntityAccess): Transaction = {
     val transaction = testTransactionWithIdA.copy(
       idOption = Some(id),
       transactionGroupId = id,
@@ -61,7 +61,7 @@ object EndowmentEntriesStoreFactoryTest extends TestSuite {
       beneficiaryAccountCode = account.code,
       categoryCode = category.code
     )
-    database.addRemotelyAddedEntities(transaction)
+    entityAccess.addRemotelyAddedEntities(transaction)
     transaction
   }
 }

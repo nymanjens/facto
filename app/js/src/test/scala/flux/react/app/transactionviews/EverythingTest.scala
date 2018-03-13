@@ -20,7 +20,7 @@ object EverythingTest extends TestSuite {
 
   override def tests = TestSuite {
     val testModule = new ThisTestModule()
-    implicit val database = testModule.fakeEntityAccess
+    implicit val entityAccess = testModule.fakeEntityAccess
     implicit val clock = testModule.fakeClock
     implicit val dispatcher = testModule.fakeDispatcher
     val router = new FakeRouterContext()
@@ -36,8 +36,8 @@ object EverythingTest extends TestSuite {
     }
 
     "nonempty" - async {
-      database.addRemotelyAddedEntities(uniqueTransactions(4))
-      database.addRemotelyAddedEntities(testUser)
+      entityAccess.addRemotelyAddedEntities(uniqueTransactions(4))
+      entityAccess.addRemotelyAddedEntities(testUser)
 
       val tester = new ComponentTester(everything(router))
       await(tester.waitNoLongerLoading)
@@ -47,8 +47,8 @@ object EverythingTest extends TestSuite {
     }
 
     "with expand button" - async {
-      database.addRemotelyAddedEntities(uniqueTransactions(435))
-      database.addRemotelyAddedEntities(testUser)
+      entityAccess.addRemotelyAddedEntities(uniqueTransactions(435))
+      entityAccess.addRemotelyAddedEntities(testUser)
 
       val tester = new ComponentTester(everything(router))
       await(tester.waitNoLongerLoading)

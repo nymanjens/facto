@@ -8,7 +8,7 @@ import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 
-final class ComplexQueryStoreFactory(implicit database: JsEntityAccess,
+final class ComplexQueryStoreFactory(implicit entityAccess: JsEntityAccess,
                                      complexQueryFilter: ComplexQueryFilter)
     extends EntriesListStoreFactory[GeneralEntry, ComplexQueryStoreFactory.Query] {
 
@@ -18,7 +18,7 @@ final class ComplexQueryStoreFactory(implicit database: JsEntityAccess,
     override protected def calculateState() = async {
       val transactions: Seq[Transaction] =
         await(
-          database
+          entityAccess
             .newQuery[Transaction]()
             .filter(filterFromQuery)
             .sort(DbQuery.Sorting.Transaction.deterministicallyByCreateDate.reversed)

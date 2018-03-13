@@ -13,7 +13,7 @@ import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 
-final class SummaryForYearStoreFactory(implicit database: JsEntityAccess,
+final class SummaryForYearStoreFactory(implicit entityAccess: JsEntityAccess,
                                        accountingConfig: Config,
                                        complexQueryFilter: ComplexQueryFilter)
     extends EntriesStoreFactory[SummaryForYear] {
@@ -32,7 +32,7 @@ final class SummaryForYearStoreFactory(implicit database: JsEntityAccess,
     override protected def calculateState() = async {
       val transactions: Seq[Transaction] =
         await(
-          database
+          entityAccess
             .newQuery[Transaction]()
             .filter(combinedFilter)
             .sort(DbQuery.Sorting.Transaction.deterministicallyByConsumedDate)

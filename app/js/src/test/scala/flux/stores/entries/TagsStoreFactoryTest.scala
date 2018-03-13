@@ -15,7 +15,7 @@ object TagsStoreFactoryTest extends TestSuite {
 
   override def tests = TestSuite {
     val testModule = new TestModule()
-    implicit val database = testModule.fakeEntityAccess
+    implicit val entityAccess = testModule.fakeEntityAccess
     val factory: TagsStoreFactory = new TagsStoreFactory()
 
     "empty result" - async {
@@ -42,9 +42,9 @@ object TagsStoreFactoryTest extends TestSuite {
   }
 
   private def persistTransaction(id: Long, tags: Seq[String])(
-      implicit database: FakeJsEntityAccess): Transaction = {
+      implicit entityAccess: FakeJsEntityAccess): Transaction = {
     val transaction = testTransactionWithIdA.copy(idOption = Some(id), tags = tags)
-    database.addRemotelyAddedEntities(transaction)
+    entityAccess.addRemotelyAddedEntities(transaction)
     transaction
   }
 }

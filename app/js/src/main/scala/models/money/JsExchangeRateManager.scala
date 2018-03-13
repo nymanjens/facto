@@ -12,9 +12,9 @@ import scala2js.Converters._
 
 final class JsExchangeRateManager(
     ratioReferenceToForeignCurrency: Map[Currency, SortedMap[LocalDateTime, Double]])(
-    implicit database: JsEntityAccess)
+    implicit entityAccess: JsEntityAccess)
     extends ExchangeRateManager {
-  database.registerListener(JsEntityAccessListener)
+  entityAccess.registerListener(JsEntityAccessListener)
 
   private val measurementsCache: mutable.Map[Currency, SortedMap[LocalDateTime, Double]] =
     mutable.Map(ratioReferenceToForeignCurrency.toVector: _*)

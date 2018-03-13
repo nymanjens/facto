@@ -13,7 +13,7 @@ object ComplexQueryStoreFactoryTest extends TestSuite {
   override def tests = TestSuite {
     val testModule = new common.testing.TestModule
 
-    implicit val database = testModule.fakeEntityAccess
+    implicit val entityAccess = testModule.fakeEntityAccess
     implicit val testAccountingConfig = testModule.testAccountingConfig
     implicit val complexQueryFilter = new ComplexQueryFilter()
 
@@ -24,7 +24,7 @@ object ComplexQueryStoreFactoryTest extends TestSuite {
     val trans3 = createTransaction(id = 3, groupId = 1, day = 1, description = "snakes and cats")
     val trans4 = createTransaction(id = 4, groupId = 2, day = 2, description = "cats")
     val trans5 = createTransaction(id = 5, groupId = 2, day = 2, description = "cats cats")
-    database.addRemotelyAddedEntities(trans1, trans2, trans3, trans4, trans5)
+    entityAccess.addRemotelyAddedEntities(trans1, trans2, trans3, trans4, trans5)
 
     "filters and sorts entries correctly" - async {
       val store = factory.get("cats", maxNumEntries = 2)

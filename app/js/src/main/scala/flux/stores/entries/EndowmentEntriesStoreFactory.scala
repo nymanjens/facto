@@ -10,14 +10,14 @@ import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 
-final class EndowmentEntriesStoreFactory(implicit database: JsEntityAccess, accountingConfig: Config)
+final class EndowmentEntriesStoreFactory(implicit entityAccess: JsEntityAccess, accountingConfig: Config)
     extends EntriesListStoreFactory[GeneralEntry, Account] {
 
   override protected def createNew(maxNumEntries: Int, account: Account) = new Store {
     override protected def calculateState() = async {
       val transactions: Seq[Transaction] =
         await(
-          database
+          entityAccess
             .newQuery[Transaction]()
             .filter(ModelField.Transaction.categoryCode === accountingConfig.constants.endowmentCategory.code)
             .filter(ModelField.Transaction.beneficiaryAccountCode === account.code)

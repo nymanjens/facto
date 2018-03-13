@@ -24,7 +24,7 @@ object StoreFactoryStateUpdateTest extends TestSuite {
 
   override def tests = TestSuite {
     val testModule = new ThisTestModule()
-    implicit val database = testModule.fakeEntityAccess
+    implicit val entityAccess = testModule.fakeEntityAccess
 
     "AllEntriesStoreFactory" - runTest(
       store = testModule.allEntriesStoreFactory.get(maxNumEntries = 3),
@@ -230,11 +230,11 @@ object StoreFactoryStateUpdateTest extends TestSuite {
   }
 
   private def runTest(store: EntriesStore[_], updatesWithImpact: ListMap[EntityModification, StateImpact])(
-      implicit database: FakeJsEntityAccess): Future[Unit] = async {
+      implicit entityAccess: FakeJsEntityAccess): Future[Unit] = async {
     def checkRemovingExistingEntity(update: EntityModification): Unit = {
 
       def checkIfIdExists[E <: Entity: EntityType](id: Long): Unit = {
-        val existing = database.newQuerySync[E]().findOne(ModelField.id[E], id)
+        val existing = entityAccess.newQuerySync[E]().findOne(ModelField.id[E], id)
         require(existing.isDefined, s"Could not find entity of ${update.entityType} with id $id")
       }
 
@@ -255,7 +255,7 @@ object StoreFactoryStateUpdateTest extends TestSuite {
           async {
             checkRemovingExistingEntity(update)
 
-            database.persistModifications(update)
+            entityAccess.persistModifications(update)
 
             val newState = await(store.stateFuture)
 

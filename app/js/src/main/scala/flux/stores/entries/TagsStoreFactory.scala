@@ -11,7 +11,7 @@ import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 
-final class TagsStoreFactory(implicit database: JsEntityAccess) extends EntriesStoreFactory[State] {
+final class TagsStoreFactory(implicit entityAccess: JsEntityAccess) extends EntriesStoreFactory[State] {
 
   // **************** Public API ****************//
   def get(): Store = get((): Unit)
@@ -21,7 +21,7 @@ final class TagsStoreFactory(implicit database: JsEntityAccess) extends EntriesS
     override protected def calculateState() = async {
       val transactionsWithTags: Seq[Transaction] =
         await(
-          database
+          entityAccess
             .newQuery[Transaction]()
             .filter(ModelField.Transaction.tags !== Seq())
             .data())

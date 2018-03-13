@@ -11,7 +11,7 @@ import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-private[stores] final class TransactionAndGroupStore(implicit database: JsEntityAccess,
+private[stores] final class TransactionAndGroupStore(implicit entityAccess: JsEntityAccess,
                                                      entityAccess: EntityAccess,
                                                      clock: Clock,
                                                      dispatcher: Dispatcher) {
@@ -26,7 +26,7 @@ private[stores] final class TransactionAndGroupStore(implicit database: JsEntity
           for ((transactionWithoutId, id) <- zipWithIncrementingId(transactionsWithoutId)) yield {
             EntityModification.createAddWithId(transactionWithoutId, id)
           }
-        await(database.persistModifications(groupAddition +: transactionAdditions))
+        await(entityAccess.persistModifications(groupAddition +: transactionAdditions))
       }
 
     case UpdateTransactionGroup(group, transactionsWithoutId) =>
@@ -36,14 +36,14 @@ private[stores] final class TransactionAndGroupStore(implicit database: JsEntity
           for ((transactionWithoutId, id) <- zipWithIncrementingId(transactionsWithoutId)) yield {
             EntityModification.createAddWithId(transactionWithoutId, id)
           }
-        await(database.persistModifications(transactionDeletions ++ transactionAdditions))
+        await(entityAccess.persistModifications(transactionDeletions ++ transactionAdditions))
       }
 
     case RemoveTransactionGroup(group) =>
       async {
         val transactionDeletions = await(group.transactions) map (EntityModification.createDelete(_))
         val groupDeletion = EntityModification.createDelete(group)
-        await(database.persistModifications(transactionDeletions :+ groupDeletion))
+        await(entityAccess.persistModifications(transactionDeletions :+ groupDeletion))
       }
   }
 

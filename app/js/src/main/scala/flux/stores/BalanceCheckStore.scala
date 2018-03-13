@@ -5,17 +5,17 @@ import flux.action.Dispatcher
 import models.access.JsEntityAccess
 import models.modification.EntityModification
 
-private[stores] final class BalanceCheckStore(implicit database: JsEntityAccess, dispatcher: Dispatcher) {
+private[stores] final class BalanceCheckStore(implicit entityAccess: JsEntityAccess, dispatcher: Dispatcher) {
   dispatcher.registerPartialAsync {
     case AddBalanceCheck(balanceCheckWithoutId) =>
-      database.persistModifications(EntityModification.createAddWithRandomId(balanceCheckWithoutId))
+      entityAccess.persistModifications(EntityModification.createAddWithRandomId(balanceCheckWithoutId))
 
     case UpdateBalanceCheck(existingBalanceCheck, newBalanceCheckWithoutId) =>
       val bcDeletion = EntityModification.createDelete(existingBalanceCheck)
       val bcAddition = EntityModification.createAddWithRandomId(newBalanceCheckWithoutId)
-      database.persistModifications(bcDeletion, bcAddition)
+      entityAccess.persistModifications(bcDeletion, bcAddition)
 
     case RemoveBalanceCheck(balanceCheckWithId) =>
-      database.persistModifications(EntityModification.createDelete(balanceCheckWithId))
+      entityAccess.persistModifications(EntityModification.createDelete(balanceCheckWithId))
   }
 }

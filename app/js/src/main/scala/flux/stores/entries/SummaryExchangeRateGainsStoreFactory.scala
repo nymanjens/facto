@@ -23,7 +23,7 @@ import scala2js.Converters._
 /**
   * Store factory that calculates the monthly gains and losses made by exchange rate fluctuations in a given year.
   */
-final class SummaryExchangeRateGainsStoreFactory(implicit database: JsEntityAccess,
+final class SummaryExchangeRateGainsStoreFactory(implicit entityAccess: JsEntityAccess,
                                                  exchangeRateManager: ExchangeRateManager,
                                                  accountingConfig: Config,
                                                  complexQueryFilter: ComplexQueryFilter)
@@ -57,7 +57,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: JsEntityAcce
 
       val oldestRelevantBalanceCheck: Option[BalanceCheck] =
         await(
-          database
+          entityAccess
             .newQuery[BalanceCheck]()
             .filter(ModelField.BalanceCheck.moneyReservoirCode === reservoir.code)
             .filter(ModelField.BalanceCheck.checkDate < monthsInYear.head.startTime)
@@ -69,7 +69,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: JsEntityAcce
         oldestRelevantBalanceCheck.map(_.balance).getOrElse(MoneyWithGeneralCurrency(0, reservoir.currency))
 
       val balanceChecksFuture: Future[Seq[BalanceCheck]] =
-        database
+        entityAccess
           .newQuery[BalanceCheck]()
           .filter(ModelField.BalanceCheck.moneyReservoirCode === reservoir.code)
           .filter(
@@ -80,7 +80,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit database: JsEntityAcce
           .data()
 
       val transactionsFuture: Future[Seq[Transaction]] =
-        database
+        entityAccess
           .newQuery[Transaction]()
           .filter(ModelField.Transaction.moneyReservoirCode === reservoir.code)
           .filter(

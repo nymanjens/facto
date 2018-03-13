@@ -22,7 +22,7 @@ object SummaryForYearStoreFactoryTest extends TestSuite {
   override def tests = TestSuite {
     val testModule = new common.testing.TestModule
 
-    implicit val database = testModule.fakeEntityAccess
+    implicit val entityAccess = testModule.fakeEntityAccess
     implicit val testAccountingConfig = testModule.testAccountingConfig
     implicit val complexQueryFilter = new ComplexQueryFilter()
     implicit val exchangeRateManager = testModule.exchangeRateManager
@@ -129,7 +129,7 @@ object SummaryForYearStoreFactoryTest extends TestSuite {
       month: Month = MARCH,
       day: Int = 20,
       beneficiary: Account = testAccountA,
-      description: String = "abcdefg")(implicit database: FakeJsEntityAccess): Transaction = {
+      description: String = "abcdefg")(implicit entityAccess: FakeJsEntityAccess): Transaction = {
     val transaction =
       createTransaction(
         beneficiary = beneficiary,
@@ -137,7 +137,7 @@ object SummaryForYearStoreFactoryTest extends TestSuite {
         year = year,
         month = month,
         day = day)
-    database.addRemotelyAddedEntities(transaction)
+    entityAccess.addRemotelyAddedEntities(transaction)
     transaction
   }
 }

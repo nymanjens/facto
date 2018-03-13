@@ -19,7 +19,7 @@ import scala2js.Converters._
   * The calculated range is guaranteed to contain at least all years there are transactions for but may also contain
   * more (although unlikely).
   */
-final class SummaryYearsStoreFactory(implicit database: JsEntityAccess) extends EntriesStoreFactory[State] {
+final class SummaryYearsStoreFactory(implicit entityAccess: JsEntityAccess) extends EntriesStoreFactory[State] {
 
   // **************** Implementation of EntriesStoreFactory methods/types ****************//
   override protected def createNew(account: Account) = new Store {
@@ -48,7 +48,7 @@ final class SummaryYearsStoreFactory(implicit database: JsEntityAccess) extends 
     private def getFirstAfterSorting(sorting: DbQuery.Sorting[Transaction]): Future[Option[Transaction]] =
       async {
         val data = await(
-          database
+          entityAccess
             .newQuery[Transaction]()
             .filter(ModelField.Transaction.beneficiaryAccountCode === account.code)
             .sort(sorting)

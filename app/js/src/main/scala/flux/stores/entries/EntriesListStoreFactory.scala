@@ -8,7 +8,7 @@ import scala.collection.immutable.Seq
   * @tparam AdditionalInput The (immutable) input type that together with injected dependencies and the max number of
   *                         entries is enough to calculate the latest value of `State`. Example: Int.
   */
-abstract class EntriesListStoreFactory[Entry, AdditionalInput](implicit database: JsEntityAccess)
+abstract class EntriesListStoreFactory[Entry, AdditionalInput](implicit entityAccess: JsEntityAccess)
     extends EntriesStoreFactory[EntriesListStoreFactory.State[Entry]] {
 
   // **************** Abstract methods/types ****************//

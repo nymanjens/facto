@@ -23,7 +23,7 @@ object CashFlowEntriesStoreFactoryTest extends TestSuite {
 
   override def tests = TestSuite {
     val testModule = new TestModule()
-    implicit val database = testModule.fakeEntityAccess
+    implicit val entityAccess = testModule.fakeEntityAccess
     implicit val exchangeRateManager = testModule.exchangeRateManager
     val factory: CashFlowEntriesStoreFactory = new CashFlowEntriesStoreFactory()
 
@@ -127,7 +127,7 @@ object CashFlowEntriesStoreFactoryTest extends TestSuite {
       flowInCents: Long,
       day: Int,
       reservoir: MoneyReservoir = testReservoir,
-      createIncrement: Int = 0)(implicit database: FakeJsEntityAccess): Transaction = {
+      createIncrement: Int = 0)(implicit entityAccess: FakeJsEntityAccess): Transaction = {
     val transaction = testTransactionWithIdA.copy(
       idOption = Some(EntityModification.generateRandomId()),
       transactionGroupId = groupId,
@@ -137,14 +137,14 @@ object CashFlowEntriesStoreFactoryTest extends TestSuite {
       consumedDate = createDateTime(2012, JANUARY, day),
       moneyReservoirCode = reservoir.code
     )
-    database.addRemotelyAddedEntities(transaction)
+    entityAccess.addRemotelyAddedEntities(transaction)
     transaction
   }
   private def persistBalanceCheck(
       balanceInCents: Long,
       day: Int,
       reservoir: MoneyReservoir = testReservoir,
-      createIncrement: Int = 0)(implicit database: FakeJsEntityAccess): BalanceCheck = {
+      createIncrement: Int = 0)(implicit entityAccess: FakeJsEntityAccess): BalanceCheck = {
     val balanceCheck = testBalanceCheckWithId.copy(
       idOption = Some(EntityModification.generateRandomId()),
       balanceInCents = balanceInCents,
@@ -152,7 +152,7 @@ object CashFlowEntriesStoreFactoryTest extends TestSuite {
       checkDate = createDateTime(2012, JANUARY, day),
       moneyReservoirCode = reservoir.code
     )
-    database.addRemotelyAddedEntities(balanceCheck)
+    entityAccess.addRemotelyAddedEntities(balanceCheck)
     balanceCheck
   }
 }

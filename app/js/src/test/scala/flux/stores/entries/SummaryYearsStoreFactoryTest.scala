@@ -14,7 +14,7 @@ object SummaryYearsStoreFactoryTest extends TestSuite {
 
   override def tests = TestSuite {
     val testModule = new TestModule()
-    implicit val database = testModule.fakeEntityAccess
+    implicit val entityAccess = testModule.fakeEntityAccess
     val factory: SummaryYearsStoreFactory = new SummaryYearsStoreFactory()
 
     "empty result" - async {
@@ -51,7 +51,7 @@ object SummaryYearsStoreFactoryTest extends TestSuite {
   }
 
   private def persistTransaction(year: Int, beneficiary: Account = testAccountA)(
-      implicit database: FakeJsEntityAccess): Unit = {
-    database.addRemotelyAddedEntities(createTransaction(beneficiary = beneficiary, year = year))
+      implicit entityAccess: FakeJsEntityAccess): Unit = {
+    entityAccess.addRemotelyAddedEntities(createTransaction(beneficiary = beneficiary, year = year))
   }
 }

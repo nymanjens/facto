@@ -14,8 +14,8 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
   *
   * @tparam State Any immutable type that contains all state maintained by this store
   */
-abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database: JsEntityAccess) {
-  database.registerListener(JsEntityAccessListener)
+abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit entityAccess: JsEntityAccess) {
+  entityAccess.registerListener(JsEntityAccessListener)
 
   private var _state: Option[State] = None
   private var stateUpdateInFlight: Boolean = false

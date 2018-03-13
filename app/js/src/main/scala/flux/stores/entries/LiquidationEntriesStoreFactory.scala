@@ -14,7 +14,7 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 
-final class LiquidationEntriesStoreFactory(implicit database: JsEntityAccess,
+final class LiquidationEntriesStoreFactory(implicit entityAccess: JsEntityAccess,
                                            accountingConfig: Config,
                                            exchangeRateManager: ExchangeRateManager,
                                            entityAccess: EntityAccess)
@@ -65,7 +65,7 @@ final class LiquidationEntriesStoreFactory(implicit database: JsEntityAccess,
       val account1ReservoirCodes = reservoirsOwnedBy(accountPair.account1).map(_.code)
       val account2ReservoirCodes = reservoirsOwnedBy(accountPair.account2).map(_.code)
       val transactions = await(
-        database
+        entityAccess
           .newQuery[Transaction]()
           .filter(
             DbQuery.Filter.NullFilter[Transaction]()

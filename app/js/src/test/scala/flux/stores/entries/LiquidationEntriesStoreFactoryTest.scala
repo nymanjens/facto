@@ -23,7 +23,7 @@ object LiquidationEntriesStoreFactoryTest extends TestSuite {
 
   override def tests = TestSuite {
     val testModule = new TestModule()
-    implicit val database = testModule.fakeEntityAccess
+    implicit val entityAccess = testModule.fakeEntityAccess
     implicit val exchangeRateManager = testModule.exchangeRateManager
     val factory: LiquidationEntriesStoreFactory = new LiquidationEntriesStoreFactory()
 
@@ -108,7 +108,7 @@ object LiquidationEntriesStoreFactoryTest extends TestSuite {
       flowInCents: Long,
       day: Int,
       account: Account = testAccountA,
-      reservoir: MoneyReservoir)(implicit database: FakeJsEntityAccess): Transaction = {
+      reservoir: MoneyReservoir)(implicit entityAccess: FakeJsEntityAccess): Transaction = {
     val transaction = testTransactionWithIdA.copy(
       idOption = Some(EntityModification.generateRandomId()),
       transactionGroupId = groupId,
@@ -119,7 +119,7 @@ object LiquidationEntriesStoreFactoryTest extends TestSuite {
       beneficiaryAccountCode = account.code,
       moneyReservoirCode = reservoir.code
     )
-    database.addRemotelyAddedEntities(transaction)
+    entityAccess.addRemotelyAddedEntities(transaction)
     transaction
   }
 }

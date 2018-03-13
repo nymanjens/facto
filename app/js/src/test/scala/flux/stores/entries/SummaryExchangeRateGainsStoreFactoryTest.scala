@@ -21,7 +21,7 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
 
   override def tests = TestSuite {
     val testModule = new TestModule()
-    implicit val database = testModule.fakeEntityAccess
+    implicit val entityAccess = testModule.fakeEntityAccess
     implicit val exchangeRateManager = testModule.exchangeRateManager
     implicit val testAccountingConfig = testModule.testAccountingConfig
     implicit val complexQueryFilter = new ComplexQueryFilter()
@@ -106,13 +106,13 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
   private def persistTransaction(
       flow: Double,
       date: LocalDateTime,
-      reservoir: MoneyReservoir = testReservoirCashGbp)(implicit database: FakeJsEntityAccess): Unit = {
-    database.addRemotelyAddedEntities(
+      reservoir: MoneyReservoir = testReservoirCashGbp)(implicit entityAccess: FakeJsEntityAccess): Unit = {
+    entityAccess.addRemotelyAddedEntities(
       createTransaction(flow = flow, reservoir = reservoir).copy(transactionDate = date))
   }
   private def persistBalanceCheck(balance: Double, date: LocalDateTime)(
-      implicit database: FakeJsEntityAccess): Unit = {
-    database.addRemotelyAddedEntities(
+      implicit entityAccess: FakeJsEntityAccess): Unit = {
+    entityAccess.addRemotelyAddedEntities(
       testBalanceCheckWithId.copy(
         idOption = Some(EntityModification.generateRandomId()),
         moneyReservoirCode = testReservoirCashGbp.code,
@@ -120,8 +120,8 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
         balanceInCents = (balance * 100).toLong))
   }
   private def persistGbpRate(date: LocalDateTime, ratio: Double)(
-      implicit database: FakeJsEntityAccess): Unit = {
-    database.addRemotelyAddedEntities(
+      implicit entityAccess: FakeJsEntityAccess): Unit = {
+    entityAccess.addRemotelyAddedEntities(
       testExchangeRateMeasurementWithId.copy(
         idOption = Some(EntityModification.generateRandomId()),
         date = date,

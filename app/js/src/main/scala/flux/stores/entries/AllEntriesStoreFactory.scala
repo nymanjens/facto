@@ -7,14 +7,14 @@ import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-final class AllEntriesStoreFactory(implicit database: JsEntityAccess)
+final class AllEntriesStoreFactory(implicit entityAccess: JsEntityAccess)
     extends EntriesListStoreFactory[GeneralEntry, Unit] {
 
   override protected def createNew(maxNumEntries: Int, input: Unit) = new Store {
     override protected def calculateState() = async {
       val transactions: Seq[Transaction] =
         await(
-          database
+          entityAccess
             .newQuery[Transaction]()
             .sort(DbQuery.Sorting.Transaction.deterministicallyByTransactionDate.reversed)
             .limit(3 * maxNumEntries)

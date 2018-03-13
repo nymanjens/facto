@@ -19,7 +19,7 @@ import scala2js.Converters._
 object AllEntriesStoreFactoryTest extends TestSuite {
 
   override def tests = TestSuite {
-    implicit val database: FakeJsEntityAccess = new FakeJsEntityAccess()
+    implicit val entityAccess: FakeJsEntityAccess = new FakeJsEntityAccess()
     val factory: AllEntriesStoreFactory = new AllEntriesStoreFactory()
     val store: factory.Store = factory.get(maxNumEntries = 3)
 
@@ -31,7 +31,7 @@ object AllEntriesStoreFactoryTest extends TestSuite {
     "store state is updated upon remote update" - async {
       await(store.stateFuture) ==> EntriesListStoreFactory.State.empty
 
-      database.addRemotelyAddedEntities(testTransactionWithId)
+      entityAccess.addRemotelyAddedEntities(testTransactionWithId)
 
       await(store.stateFuture).hasMore ==> false
       await(store.stateFuture).entries ==> GeneralEntry.toGeneralEntrySeq(Seq(testTransactionWithId))
@@ -41,18 +41,18 @@ object AllEntriesStoreFactoryTest extends TestSuite {
     "store state is updated upon local update" - async {
       await(store.stateFuture) ==> EntriesListStoreFactory.State.empty
 
-      database.persistModifications(Seq(EntityModification.Add(testTransactionWithId)))
+      entityAccess.persistModifications(Seq(EntityModification.Add(testTransactionWithId)))
 
       await(store.stateFuture).hasMore ==> false
       await(store.stateFuture).entries ==> GeneralEntry.toGeneralEntrySeq(Seq(testTransactionWithId))
     }
 
     "store state is updated upon local removal" - async {
-      database.persistModifications(Seq(EntityModification.Add(testTransactionWithId)))
+      entityAccess.persistModifications(Seq(EntityModification.Add(testTransactionWithId)))
       await(store.stateFuture).hasMore ==> false
       await(store.stateFuture).entries ==> GeneralEntry.toGeneralEntrySeq(Seq(testTransactionWithId))
 
-      database.persistModifications(Seq(EntityModification.Remove[Transaction](testTransactionWithId.id)))
+      entityAccess.persistModifications(Seq(EntityModification.Remove[Transaction](testTransactionWithId.id)))
 
       await(store.stateFuture) ==> EntriesListStoreFactory.State.empty
     }
@@ -67,12 +67,12 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       onStateUpdateCount ==> 1
 
-      database.persistModifications(Seq(EntityModification.Add(testTransactionWithIdB)))
+      entityAccess.persistModifications(Seq(EntityModification.Add(testTransactionWithIdB)))
       await(store.stateFuture)
 
       onStateUpdateCount ==> 2
 
-      database.addRemotelyAddedEntities(testTransactionWithIdA)
+      entityAccess.addRemotelyAddedEntities(testTransactionWithIdA)
       await(store.stateFuture)
 
       onStateUpdateCount ==> 3
@@ -83,7 +83,7 @@ object AllEntriesStoreFactoryTest extends TestSuite {
       val trans2 = testTransactionWithIdA.copy(idOption = Some(501), transactionGroupId = 122)
       val trans3 = testTransactionWithIdA.copy(idOption = Some(1234567890), transactionGroupId = 133)
 
-      database.addRemotelyAddedEntities(trans1, trans2, trans3)
+      entityAccess.addRemotelyAddedEntities(trans1, trans2, trans3)
 
       await(store.stateFuture).hasMore ==> false
       await(store.stateFuture).entries ==> GeneralEntry.toGeneralEntrySeq(Seq(trans1, trans2), Seq(trans3))
@@ -110,7 +110,7 @@ object AllEntriesStoreFactoryTest extends TestSuite {
         transactionDate = createDateTime(2012, JANUARY, 3),
         createdDate = createDateTime(2012, JANUARY, 2))
 
-      database.addRemotelyAddedEntities(trans3, trans2, trans1)
+      entityAccess.addRemotelyAddedEntities(trans3, trans2, trans1)
 
       await(store.stateFuture).hasMore ==> false
       await(store.stateFuture).entries ==> GeneralEntry
@@ -126,7 +126,7 @@ object AllEntriesStoreFactoryTest extends TestSuite {
       val trans3 = transaction(333, createDateTime(2012, JANUARY, 3))
       val trans4 = transaction(444, createDateTime(2012, JANUARY, 4))
 
-      database.addRemotelyAddedEntities(trans1, trans2, trans3, trans4)
+      entityAccess.addRemotelyAddedEntities(trans1, trans2, trans3, trans4)
 
       await(store.stateFuture).hasMore ==> true
       await(store.stateFuture).entries ==> GeneralEntry
