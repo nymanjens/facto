@@ -9,6 +9,7 @@ import models.modification.{EntityModification, EntityType}
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
 
+/** In memory storage class that supports DbQuery operations and EntityModifications. */
 private[access] final class InMemoryEntityDatabase(entitiesFetcher: EntitiesFetcher) {
 
   private val typeToCollection: InMemoryEntityDatabase.TypeToCollectionMap =
