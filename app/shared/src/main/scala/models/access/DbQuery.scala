@@ -1,17 +1,14 @@
 package models.access
 
+import common.time.LocalDateTime
 import models.Entity
 import models.access.DbQuery.Sorting.FieldWithDirection
 import models.access.DbQuery.{Filter, Sorting}
+import models.accounting.{BalanceCheck, Transaction}
 import models.modification.EntityType
 
-import scala.math.Ordering.Implicits._
-import common.time.JavaTimeImplicits._
-import common.time.LocalDateTime
-import models.access.ModelField.BalanceCheck.E
-import models.accounting.{BalanceCheck, Transaction}
-
 import scala.collection.immutable.Seq
+import scala.math.Ordering.Implicits._
 
 case class DbQuery[E <: Entity](filter: Filter[E], sorting: Option[Sorting[E]], limit: Option[Int])(
     implicit val entityType: EntityType[E])
@@ -103,11 +100,10 @@ object DbQuery {
 
     def toOrdering: Ordering[E] = (x: E, y: E) => {
       fieldsWithDirection.toStream.flatMap {
-        case f @ DbQuery.Sorting.FieldWithDirection(field, isDesc) =>
-          f.valueOrdering.compare(field.get(x), field.get(y)) match {
-            case 0                => None
-            case result if isDesc => Some(-result)
-            case result           => Some(result)
+        case f @ DbQuery.Sorting.FieldWithDirection(field, _) =>
+          f.ordering.compare(field.get(x), field.get(y)) match {
+            case 0      => None
+            case result => Some(result)
           }
       }.headOption getOrElse 0
     }
@@ -128,7 +124,10 @@ object DbQuery {
 
     case class FieldWithDirection[V, E](field: ModelField[V, E], isDesc: Boolean)(
         implicit val picklableValueOrdering: PicklableOrdering[V]) {
-      def valueOrdering: Ordering[V] = picklableValueOrdering.toOrdering
+      def ordering: Ordering[V] = {
+        val ascendingOrdering = picklableValueOrdering.toOrdering
+        if (isDesc) ascendingOrdering.reverse else ascendingOrdering
+      }
     }
 
     object Transaction {
