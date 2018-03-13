@@ -29,7 +29,10 @@ object Page {
         .removePrefix(RouterFactory.pathPrefix)
         .get
         .value
-      js.URIUtils.encodeURIComponent(path)
+      js.URIUtils.encodeURIComponent(
+        // Decode path first because routerContext.toPath() seems to produce unnecessarily and
+        // inconsistently escaped strings
+        js.URIUtils.decodeURIComponent(path))
     }
   }
 
