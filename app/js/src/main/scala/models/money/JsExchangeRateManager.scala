@@ -14,7 +14,7 @@ final class JsExchangeRateManager(
     ratioReferenceToForeignCurrency: Map[Currency, SortedMap[LocalDateTime, Double]])(
     implicit database: JsEntityAccess)
     extends ExchangeRateManager {
-  database.registerListener(RemoteDatabaseProxyListener)
+  database.registerListener(JsEntityAccessListener)
 
   private val measurementsCache: mutable.Map[Currency, SortedMap[LocalDateTime, Double]] =
     mutable.Map(ratioReferenceToForeignCurrency.toVector: _*)
@@ -49,7 +49,7 @@ final class JsExchangeRateManager(
   }
 
   // **************** Inner type definitions ****************//
-  private object RemoteDatabaseProxyListener extends JsEntityAccess.Listener {
+  private object JsEntityAccessListener extends JsEntityAccess.Listener {
     override def modificationsAdded(modifications: Seq[EntityModification]): Unit = {
       for (modification <- modifications) {
         modification.entityType match {

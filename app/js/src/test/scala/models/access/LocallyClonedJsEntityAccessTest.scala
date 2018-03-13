@@ -44,11 +44,11 @@ object LocallyClonedJsEntityAccessTest extends TestSuite {
 
     "does not load initial data if db is non-empty with right version" - async {
       fakeApiClient.persistEntityModifications(Seq(testModificationA))
-      val remoteDatabaseProxy1 =
+      val entityAccess1 =
         await(LocallyClonedJsEntityAccess.create(fakeApiClient, fakeLocalDatabase, allUsers = Seq()))
       fakeApiClient.persistEntityModifications(Seq(testModificationB))
 
-      val remoteDatabaseProxy2 =
+      val entityAccess2 =
         await(LocallyClonedJsEntityAccess.create(fakeApiClient, fakeLocalDatabase, allUsers = Seq()))
 
       fakeLocalDatabase.allModifications ==> Seq(testModificationA)

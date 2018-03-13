@@ -15,7 +15,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
   * @tparam State Any immutable type that contains all state maintained by this store
   */
 abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database: JsEntityAccess) {
-  database.registerListener(RemoteDatabaseProxyListener)
+  database.registerListener(JsEntityAccessListener)
 
   private var _state: Option[State] = None
   private var stateUpdateInFlight: Boolean = false
@@ -129,7 +129,7 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit database:
   }
 
   // **************** Inner type definitions ****************//
-  private object RemoteDatabaseProxyListener extends JsEntityAccess.Listener {
+  private object JsEntityAccessListener extends JsEntityAccess.Listener {
     override def modificationsAdded(modifications: Seq[EntityModification]): Unit = {
       require(!isCallingListeners)
 
