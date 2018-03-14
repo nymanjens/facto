@@ -15,8 +15,7 @@ import scala2js.Converters._
 
 final class CashFlowEntriesStoreFactory(implicit entityAccess: JsEntityAccess,
                                         accountingConfig: Config,
-                                        exchangeRateManager: ExchangeRateManager,
-                                        entityAccess: EntityAccess)
+                                        exchangeRateManager: ExchangeRateManager)
     extends EntriesListStoreFactory[CashFlowEntry, MoneyReservoir] {
 
   override protected def createNew(maxNumEntries: Int, moneyReservoir: MoneyReservoir) = new Store {

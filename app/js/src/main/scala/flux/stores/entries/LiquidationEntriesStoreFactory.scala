@@ -16,8 +16,7 @@ import scala2js.Converters._
 
 final class LiquidationEntriesStoreFactory(implicit entityAccess: JsEntityAccess,
                                            accountingConfig: Config,
-                                           exchangeRateManager: ExchangeRateManager,
-                                           entityAccess: EntityAccess)
+                                           exchangeRateManager: ExchangeRateManager)
     extends EntriesListStoreFactory[LiquidationEntry, AccountPair] {
 
   override protected def createNew(maxNumEntries: Int, accountPair: AccountPair) = new Store {

@@ -12,7 +12,6 @@ import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 private[stores] final class TransactionAndGroupStore(implicit entityAccess: JsEntityAccess,
-                                                     entityAccess: EntityAccess,
                                                      clock: Clock,
                                                      dispatcher: Dispatcher) {
   dispatcher.registerPartialAsync {
