@@ -8,6 +8,7 @@ import models.modification.EntityType
 
 import scala.collection.immutable.Seq
 
+/** Fork of DbQuery that is picklable. */
 case class PicklableDbQuery(filter: Filter,
                             sorting: Option[Sorting],
                             limit: Option[Int],

@@ -2,6 +2,7 @@ package api
 
 import models.access.ModelField
 
+/** Fork of ModelField that is picklable. */
 case class PicklableModelField(fieldNumber: Int) {
   def toRegular: ModelField[_, _] = ModelField.fromNumber(fieldNumber)
 }
