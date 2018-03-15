@@ -79,6 +79,20 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
   }
   def reactApp(anyString: String) = reactAppRoot
 
+  def localDatabaseWebWorker = AuthenticatedAction { implicit user => implicit request =>
+    val projectName = "client"
+    val filename =
+      Seq(s"$projectName-opt.js", s"$projectName-fastopt.js")
+        .find(name => getClass.getResource(s"/public/$name") != null)
+        .get
+    val clientScript = routes.Assets.versioned(filename).toString
+
+    Ok(s"""
+        |importScripts("$clientScript");
+        |LocalDatabaseWebWorker.run();
+      """.stripMargin)
+  }
+
   // Note: This action manually implements what autowire normally does automatically. Unfortunately, autowire
   // doesn't seem to work for some reason.
   def scalaJsApiWebSocket = WebSocket.accept[Array[Byte], Array[Byte]] { request =>
