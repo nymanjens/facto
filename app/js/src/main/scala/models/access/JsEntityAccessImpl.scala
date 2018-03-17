@@ -108,7 +108,7 @@ private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
 
   @visibleForTesting private[access] def updateModifiedEntities(
       updateToken: Option[UpdateToken]): Future[UpdateToken] = async {
-    val response = await(remoteDatabaseProxy.updateModifiedEntities(updateToken))
+    val response = await(remoteDatabaseProxy.getAndApplyRemotelyModifiedEntities(updateToken))
     if (response.changes.nonEmpty) {
       console.log(s"  ${response.changes.size} remote modifications received")
       val somethingChanged = !response.changes.forall(allLocallyCreatedModifications)

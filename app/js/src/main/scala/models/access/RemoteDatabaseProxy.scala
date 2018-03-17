@@ -13,7 +13,9 @@ trait RemoteDatabaseProxy {
 
   def persistEntityModifications(modifications: Seq[EntityModification]): Future[Unit]
 
-  def updateModifiedEntities(updateToken: Option[UpdateToken]): Future[UpdateModifiedEntitiesResult]
+  def getAndApplyRemotelyModifiedEntities(
+      updateToken: Option[UpdateToken]): Future[GetRemotelyModifiedEntitiesResponse]
 
-  case class UpdateModifiedEntitiesResult(changes: Seq[EntityModification], nextUpdateToken: UpdateToken)
+  case class GetRemotelyModifiedEntitiesResponse(changes: Seq[EntityModification],
+                                                 nextUpdateToken: UpdateToken)
 }
