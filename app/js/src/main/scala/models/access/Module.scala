@@ -24,7 +24,8 @@ final class Module(user: User)(implicit scalaJsApiClient: ScalaJsApiClient,
 
   // Use ApiBackedJsEntityAccess
   implicit val entityAccess: Future[JsEntityAccess] = {
-    val entityAccess = new ApiBackedJsEntityAccess(getInitialDataResponse.allUsers)
+    implicit val remoteDatabaseProxy = new ApiBackedRemoteDatabaseProxy()
+    val entityAccess = new JsEntityAccessImpl(getInitialDataResponse.allUsers)
 
     entityAccess.startSchedulingModifiedEntityUpdates()
 
