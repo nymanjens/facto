@@ -65,12 +65,11 @@ object LocalDatabase {
   }
 
   def createInMemoryForTests(encryptionSecret: String = ""): Future[LocalDatabase] = async {
-    val lokiDb: LokiJs.Database =
-      LokiJs.Database.inMemoryForTests(
-        "facto-db",
-        persistedStringCodex =
-          if (encryptionSecret.isEmpty) LokiJs.PersistedStringCodex.NullCodex
-          else new EncryptingCodex(encryptionSecret))
+    val lokiDb: LokiJs.Database = LokiJs.Database.inMemoryForTests(
+      "facto-db",
+      persistedStringCodex =
+        if (encryptionSecret.isEmpty) LokiJs.PersistedStringCodex.NullCodex
+        else new EncryptingCodex(encryptionSecret))
     await(lokiDb.loadDatabase())
     new Impl(lokiDb)
   }
