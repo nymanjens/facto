@@ -20,9 +20,9 @@ import scala2js.Scala2Js
 @visibleForTesting
 trait LocalDatabase {
   // **************** Getters ****************//
-  def newQuery[E <: Entity: EntityType](): DbResultSet.Async[E]
-  def getSingletonValue[V](key: SingletonKey[V]): Option[V]
-  def isEmpty: Boolean
+  def queryExecutor[E <: Entity: EntityType](): DbQueryExecutor.Async[E]
+  def getSingletonValue[V](key: SingletonKey[V]): Future[Option[V]]
+  def isEmpty: Future[Boolean]
 
   // **************** Setters ****************//
   /**
@@ -30,11 +30,11 @@ trait LocalDatabase {
     *
     * @return true if the in memory database changed as a result of this method
     */
-  def applyModifications(modifications: Seq[EntityModification]): Boolean
-  def addAll[E <: Entity: EntityType](entities: Seq[E]): Unit
+  def applyModifications(modifications: Seq[EntityModification]): Future[Boolean]
+  def addAll[E <: Entity: EntityType](entities: Seq[E]): Future[Unit]
 
   /** Sets given singleton value in memory but doesn't persist it in the browser's storage (call `save()` to do this). */
-  def setSingletonValue[V](key: SingletonKey[V], value: V): Unit
+  def setSingletonValue[V](key: SingletonKey[V], value: V): Future[Unit]
 
   /** Persists all previously made changes to the browser's storage. */
   def save(): Future[Unit]
