@@ -1,5 +1,6 @@
 package models.access
 
+import java.time.Duration
 import api.ScalaJsApi.UpdateToken
 import api.ScalaJsApiClient
 import common.time.Clock
@@ -16,7 +17,8 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 private[access] final class HybridRemoteDatabaseProxy(localDatabaseFuture: Future[LocalDatabase])(
-    implicit apiClient: ScalaJsApiClient)
+    implicit apiClient: ScalaJsApiClient,
+    clock: Clock)
     extends RemoteDatabaseProxy {
 
   override def queryExecutor[E <: Entity: EntityType]() = {
@@ -47,19 +49,23 @@ private[access] final class HybridRemoteDatabaseProxy(localDatabaseFuture: Futur
   }
 
   override def getAndApplyRemotelyModifiedEntities(maybeUpdateToken: Option[UpdateToken]) = async {
-    val localDatabase = await(localDatabaseFuture)
-    val updateToken: UpdateToken = await {
-      maybeUpdateToken match {
-        case None        => localDatabase.getSingletonValue(NextUpdateTokenKey).map(_.get)
-        case Some(token) => Future.successful(token)
-      }
+    val updateToken: UpdateToken = localDatabaseOption match {
+      // Subtract one day because this is the maximum time zone difference
+      case None => maybeUpdateToken getOrElse clock.now.plus(Duration.ofDays(-1))
+      // Don't use given token because after the database is ready, we want to make sure to update
+      // since the last update
+      case Some(localDatabase) => await(localDatabase.getSingletonValue(NextUpdateTokenKey).map(_.get))
     }
+
     val response = await(apiClient.getEntityModifications(updateToken))
 
-    val somethingChanged = await(localDatabase.applyModifications(response.modifications))
-    if (somethingChanged) {
-      await(localDatabase.setSingletonValue(NextUpdateTokenKey, response.nextUpdateToken))
-      await(localDatabase.save())
+    if (localDatabaseOption.isDefined) {
+      val localDatabase = localDatabaseOption.get
+      val somethingChanged = await(localDatabase.applyModifications(response.modifications))
+      if (somethingChanged) {
+        await(localDatabase.setSingletonValue(NextUpdateTokenKey, response.nextUpdateToken))
+        await(localDatabase.save())
+      }
     }
 
     GetRemotelyModifiedEntitiesResponse(

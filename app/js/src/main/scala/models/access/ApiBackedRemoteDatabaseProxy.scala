@@ -1,23 +1,16 @@
 package models.access
 
+import java.time.Duration
+
 import api.ScalaJsApi.UpdateToken
 import api.ScalaJsApiClient
-import common.LoggingUtils.logExceptions
-import common.ScalaUtils.visibleForTesting
 import common.time.Clock
 import models.Entity
-import models.access.JsEntityAccess.Listener
 import models.modification.{EntityModification, EntityType}
-import models.user.User
-import org.scalajs.dom.console
 
 import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
-import scala.collection.mutable
-import scala.concurrent.Future
-import scala.concurrent.duration._
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala.scalajs.js
 
 private[access] final class ApiBackedRemoteDatabaseProxy(implicit apiClient: ScalaJsApiClient, clock: Clock)
     extends RemoteDatabaseProxy {
@@ -31,7 +24,8 @@ private[access] final class ApiBackedRemoteDatabaseProxy(implicit apiClient: Sca
     apiClient.persistEntityModifications(modifications)
 
   override def getAndApplyRemotelyModifiedEntities(updateToken: Option[UpdateToken]) = async {
-    val response = await(apiClient.getEntityModifications(updateToken getOrElse clock.now))
+    val response =
+      await(apiClient.getEntityModifications(updateToken getOrElse clock.now.plus(Duration.ofDays(-1))))
     GetRemotelyModifiedEntitiesResponse(
       changes = response.modifications,
       nextUpdateToken = response.nextUpdateToken)
