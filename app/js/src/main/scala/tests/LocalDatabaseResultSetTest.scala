@@ -20,7 +20,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
 
   override def tests = Seq(
     // **************** Regular filter tests **************** //
-    ManualTest("newQuery().filter(nullFilter)") {
+    ManualTest("queryExecutor().filter(nullFilter)") {
       val transaction1 = createTransaction()
       val transaction2 = createTransaction()
       val transaction3 = createTransaction()
@@ -29,7 +29,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
         .assertFilteredWith(Filter.NullFilter())
         .containsExactly(transaction1, transaction2, transaction3)
     },
-    ManualTest("newQuery().filter(equal)") {
+    ManualTest("queryExecutor().filter(equal)") {
       val transaction1 = createTransaction()
       val transaction2 = createTransaction()
       val transaction3 = createTransaction()
@@ -38,7 +38,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
         .assertFilteredWith(ModelField.id[Transaction] === transaction2.id)
         .containsExactly(transaction2)
     },
-    ManualTest("newQuery().filter(notEqual)") {
+    ManualTest("queryExecutor().filter(notEqual)") {
       val transaction1 = createTransaction()
       val transaction2 = createTransaction()
       val transaction3 = createTransaction()
@@ -47,7 +47,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
         .assertFilteredWith(ModelField.id[Transaction] !== transaction2.id)
         .containsExactly(transaction1, transaction3)
     },
-    ManualTest("newQuery().filter(lessThan)") {
+    ManualTest("queryExecutor().filter(lessThan)") {
       val transaction1 = createTransaction(day = 1)
       val transaction2 = createTransaction(day = 2)
       val transaction3 = createTransaction(day = 3)
@@ -56,7 +56,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
         .assertFilteredWith(ModelField.Transaction.createdDate < transaction3.createdDate)
         .containsExactly(transaction1, transaction2)
     },
-    ManualTest("newQuery().filter(greaterThan)") {
+    ManualTest("queryExecutor().filter(greaterThan)") {
       val transaction1 = createTransaction(day = 1)
       val transaction2 = createTransaction(day = 2)
       val transaction3 = createTransaction(day = 3)
@@ -65,7 +65,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
         .assertFilteredWith(ModelField.Transaction.createdDate > transaction1.createdDate)
         .containsExactly(transaction2, transaction3)
     },
-    ManualTest("newQuery().filter(greaterOrEqualThan)") {
+    ManualTest("queryExecutor().filter(greaterOrEqualThan)") {
       val transaction1 = createTransaction(day = 1)
       val transaction2 = createTransaction(day = 2)
       val transaction3 = createTransaction(day = 3)
@@ -74,7 +74,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
         .assertFilteredWith(ModelField.Transaction.createdDate >= transaction2.createdDate)
         .containsExactly(transaction2, transaction3)
     },
-    ManualTest("newQuery().filter(anyOf)") {
+    ManualTest("queryExecutor().filter(anyOf)") {
       val transaction1 = createTransaction(category = testCategoryA)
       val transaction2 = createTransaction(category = testCategoryB)
       val transaction3 = createTransaction(category = testCategoryC)
@@ -84,7 +84,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
           ModelField.Transaction.categoryCode isAnyOf Seq(testCategoryA.code, testCategoryB.code))
         .containsExactly(transaction1, transaction2)
     },
-    ManualTest("newQuery().filter(noneOf)") {
+    ManualTest("queryExecutor().filter(noneOf)") {
       val transaction1 = createTransaction(category = testCategoryA)
       val transaction2 = createTransaction(category = testCategoryB)
       val transaction3 = createTransaction(category = testCategoryC)
@@ -94,7 +94,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
           ModelField.Transaction.categoryCode isNoneOf Seq(testCategoryA.code, testCategoryB.code))
         .containsExactly(transaction3)
     },
-    ManualTest("newQuery().filter(containsIgnoreCase)") {
+    ManualTest("queryExecutor().filter(containsIgnoreCase)") {
       val transaction1 = createTransaction(description = "prefix\nAAAA_bbbb.*CCCC_dddd\nsuffix")
       val transaction2 = createTransaction(description = "BBBB.*cccc")
       val transaction3 = createTransaction(description = "prefix\nBBBBcccc\nsuffix")
@@ -103,7 +103,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
         .assertFilteredWith(ModelField.Transaction.description containsIgnoreCase "BBBB.*cccc")
         .containsExactly(transaction1, transaction2)
     },
-    ManualTest("newQuery().filter(doesntContainIgnoreCase)") {
+    ManualTest("queryExecutor().filter(doesntContainIgnoreCase)") {
       val transaction1 = createTransaction(description = "prefix\nAAAA_bbbb.*CCCC_dddd\nsuffix")
       val transaction2 = createTransaction(description = "BBBB.*cccc")
       val transaction3 = createTransaction(description = "prefix\nBBBBcccc\nsuffix")
@@ -112,7 +112,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
         .assertFilteredWith(ModelField.Transaction.description doesntContainIgnoreCase "BBBB.*cccc")
         .containsExactly(transaction3)
     },
-    ManualTest("newQuery().filter(seqContains)") {
+    ManualTest("queryExecutor().filter(seqContains)") {
       val transaction1 = createTransaction(tags = Seq("tagA", "tagB", "tag"))
       val transaction2 = createTransaction(tags = Seq("tagA", "tagB"))
       val transaction3 = createTransaction(tags = Seq("tag"))
@@ -121,7 +121,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
         .assertFilteredWith(ModelField.Transaction.tags contains "tag")
         .containsExactly(transaction1, transaction3)
     },
-    ManualTest("newQuery().filter(seqDoesntContain)") {
+    ManualTest("queryExecutor().filter(seqDoesntContain)") {
       val transaction1 = createTransaction(tags = Seq("tagA", "tagB", "tag"))
       val transaction2 = createTransaction(tags = Seq("tagA", "tagB"))
       val transaction3 = createTransaction(tags = Seq("tag"))
@@ -131,7 +131,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
         .containsExactly(transaction2)
     },
     // **************** OR / AND filter tests **************** //
-    ManualTest("newQuery().filter(or(equal, anyOf))") {
+    ManualTest("queryExecutor().filter(or(equal, anyOf))") {
       val transaction1 = createTransaction()
       val transaction2 = createTransaction()
       val transaction3 = createTransaction()
@@ -145,7 +145,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
         })
         .containsExactly(transaction1, transaction2, transaction3)
     },
-    ManualTest("newQuery().filter(and(equal, equal))") {
+    ManualTest("queryExecutor().filter(and(equal, equal))") {
       val transaction1 = createTransaction(description = "abc", category = testCategoryA)
       val transaction2 = createTransaction(description = "abc", category = testCategoryB)
       val transaction3 = createTransaction(description = "def", category = testCategoryB)
@@ -158,7 +158,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
         })
         .containsExactly(transaction2)
     },
-    ManualTest("newQuery().filter(and(anyOf, anyOf))") {
+    ManualTest("queryExecutor().filter(and(anyOf, anyOf))") {
       val transaction1 = createTransaction()
       val transaction2 = createTransaction()
       val transaction3 = createTransaction()
@@ -171,7 +171,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
         })
         .containsExactly(transaction2)
     },
-    ManualTest("newQuery().filter(or(and(anyOf, anyOf), and(anyOf, anyOf))") {
+    ManualTest("queryExecutor().filter(or(and(anyOf, anyOf), and(anyOf, anyOf))") {
       val transaction1 = createTransaction()
       val transaction2 = createTransaction()
       val transaction3 = createTransaction()
@@ -189,7 +189,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
         .containsExactly(transaction2, transaction3)
     },
     // **************** Non-filter tests **************** //
-    ManualTest("newQuery().sort()") {
+    ManualTest("queryExecutor().sort()") {
       val transaction1 = createTransaction(groupId = 1, day = 2)
       val transaction2 = createTransaction(groupId = 1, day = 3)
       val transaction3 = createTransaction(groupId = 2, day = 1)
@@ -202,7 +202,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
             .data())
         .containsExactlyInOrder(transaction3, transaction1, transaction2)
     },
-    ManualTest("newQuery().limit()") {
+    ManualTest("queryExecutor().limit()") {
       val transaction1 = createTransaction(day = 1)
       val transaction2 = createTransaction(day = 2)
       val transaction3 = createTransaction(day = 3)
@@ -214,7 +214,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
             .data())
         .containsExactlyInOrder(transaction1, transaction2)
     },
-    ManualTest("newQuery().findOne()") {
+    ManualTest("queryExecutor().findOne()") {
       val transaction1 = createTransaction()
       val transaction2 = createTransaction()
       val transaction3 = createTransaction()
@@ -223,7 +223,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
         .assertThat(_.findOne(ModelField.id, transaction2.id))
         .isEqualTo(Some(transaction2))
     },
-    ManualTest("newQuery().count()") {
+    ManualTest("queryExecutor().count()") {
       val transaction1 = createTransaction()
       val transaction2 = createTransaction()
       val transaction3 = createTransaction()
@@ -239,7 +239,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
       def containsExactly(expected: Transaction*): Future[Unit] = async {
         val db = await(LocalDatabase.createInMemoryForTests())
         db.addAll(transactions.toVector)
-        await(resultSetFunc(db.newQuery[Transaction]())) match {
+        await(resultSetFunc(DbResultSet.fromExecutor(db.queryExecutor[Transaction]()))) match {
           case seq: Seq[_] => assertEqualIterables(seq.toSet, expected.toSet)
         }
       }
@@ -247,7 +247,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
       def containsExactlyInOrder(expected: Transaction*): Future[Unit] = async {
         val db = await(LocalDatabase.createInMemoryForTests())
         db.addAll(transactions.toVector)
-        await(resultSetFunc(db.newQuery[Transaction]())) match {
+        await(resultSetFunc(DbResultSet.fromExecutor(db.queryExecutor[Transaction]()))) match {
           case seq: Seq[_] => assertEqualIterables(seq, expected.toVector)
         }
       }
@@ -255,7 +255,7 @@ private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
       def isEqualTo(expected: Any): Future[Unit] = async {
         val db = await(LocalDatabase.createInMemoryForTests())
         db.addAll(transactions.toVector)
-        await(resultSetFunc(db.newQuery[Transaction]())) ==> expected
+        await(resultSetFunc(DbResultSet.fromExecutor(db.queryExecutor[Transaction]()))) ==> expected
       }
     }
 

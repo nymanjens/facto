@@ -145,10 +145,10 @@ object LocalDatabase {
       lokiDb.getOrAddCollection[Singleton](s"singletons")
 
     // **************** Getters ****************//
-    override def newQuery[E <: Entity: EntityType](): DbResultSet.Async[E] =
-      DbResultSet.fromExecutor(new DbQueryExecutor.Sync[E] {
-        override def data(dbQuery: DbQuery[E]) = lokiResultSet(dbQuery).data()
-        override def count(dbQuery: DbQuery[E]) = lokiResultSet(dbQuery).count()
+    def queryExecutor[E <: Entity: EntityType]() =
+      new DbQueryExecutor.Async[E] {
+        override def data(dbQuery: DbQuery[E]) = Future.successful(lokiResultSet(dbQuery).data())
+        override def count(dbQuery: DbQuery[E]) = Future.successful(lokiResultSet(dbQuery).count())
 
         private def lokiResultSet(dbQuery: DbQuery[E]): LokiJs.ResultSet[E] = {
           var resultSet = entityCollectionForImplicitType[E].chain()
@@ -205,9 +205,9 @@ object LocalDatabase {
               Some(LokiJs.Filter.AggregateFilter(Operation.And, filters.flatMap(toLokiJsFilter)))
           }
         }
-      }.asAsync)
+      }
 
-    override def getSingletonValue[V](key: SingletonKey[V]): Option[V] = {
+    override def getSingletonValue[V](key: SingletonKey[V]) = {
       implicit val converter = key.valueConverter
       val value =
         singletonCollection
@@ -218,15 +218,15 @@ object LocalDatabase {
           case Seq(v) => Some(v)
           case Seq()  => None
         }
-      value.map(v => Scala2Js.toScala[V](v.value))
+      Future.successful(value.map(v => Scala2Js.toScala[V](v.value)))
     }
 
-    override def isEmpty: Boolean = {
-      allCollections.toStream.filter(_.chain().count() != 0).isEmpty
+    override def isEmpty = {
+      Future.successful(allCollections.toStream.filter(_.chain().count() != 0).isEmpty)
     }
 
     // **************** Setters ****************//
-    override def applyModifications(modifications: Seq[EntityModification]): Boolean = {
+    override def applyModifications(modifications: Seq[EntityModification]) = {
       val modificationsCausedChange =
         for (modification <- modifications) yield {
           modification match {
@@ -269,19 +269,20 @@ object LocalDatabase {
               remove(removeModification)
           }
         }
-      modificationsCausedChange contains true
+      Future.successful(modificationsCausedChange contains true)
     }
 
-    override def addAll[E <: Entity: EntityType](entities: Seq[E]): Unit = {
+    override def addAll[E <: Entity: EntityType](entities: Seq[E]) = {
       for (entity <- entities) {
         findById[E](entity.id) match {
           case Some(_) => // do nothing
           case None    => entityCollectionForImplicitType.insert(entity)
         }
       }
+      Future.successful((): Unit)
     }
 
-    override def setSingletonValue[V](key: SingletonKey[V], value: V): Unit = {
+    override def setSingletonValue[V](key: SingletonKey[V], value: V) = {
       implicit val converter = key.valueConverter
       singletonCollection.findAndRemove("key", key.name)
       singletonCollection.insert(
@@ -289,6 +290,7 @@ object LocalDatabase {
           key = key.name,
           value = Scala2Js.toJs(value)
         ))
+      Future.successful((): Unit)
     }
 
     override def save(): Future[Unit] = async {
