@@ -1,13 +1,9 @@
 package models.access.webworker
 
-import models.Entity
-import models.access.DbQuery
 import models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
 
-import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.js
-import scala2js.Scala2Js
 
 trait LocalDatabaseWebWorkerApi {
   def create(dbName: String, encryptionSecret: String = "", inMemory: Boolean): Future[Unit]
@@ -22,5 +18,10 @@ object LocalDatabaseWebWorkerApi {
         extends WriteOperation
     case class Clear(collectionName: String) extends WriteOperation
     case object SaveDatabase extends WriteOperation
+  }
+
+  object MethodNumbers {
+    val create = 1
+    val applyWriteOperations = 2
   }
 }
