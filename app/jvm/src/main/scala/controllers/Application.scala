@@ -89,7 +89,7 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
 
     Ok(s"""
         |importScripts("$clientScript");
-        |LocalDatabaseWebWorker.run();
+        |LocalDatabaseWebWorkerScript.run();
       """.stripMargin)
   }
 

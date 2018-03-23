@@ -7,13 +7,13 @@ import scala.collection.immutable.Seq
 import scala.scalajs.js
 import scala2js.Scala2Js
 
-object LocalDatabaseWebWorkerApiConverters {
+private[webworker] object LocalDatabaseWebWorkerApiConverters {
 
   implicit object WriteOperationConverter extends Scala2Js.Converter[WriteOperation] {
-    private val insertNumber = 1
-    private val findAndRemoveNumber = 2
-    private val clearNumber = 3
-    private val saveDatabaseNumber = 4
+    private val insertNumber: Int = 1
+    private val findAndRemoveNumber: Int = 2
+    private val clearNumber: Int = 3
+    private val saveDatabaseNumber: Int = 4
 
     override def toJs(operation: WriteOperation) = {
       operation match {

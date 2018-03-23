@@ -21,7 +21,7 @@ object LocalDatabaseWebWorkerApi {
   }
 
   object MethodNumbers {
-    val create = 1
-    val applyWriteOperations = 2
+    val create: Int = 1
+    val applyWriteOperations: Int = 2
   }
 }

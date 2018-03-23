@@ -16,7 +16,7 @@ import scala.scalajs.js.JSConverters._
 import scala2js.Converters._
 import scala2js.Scala2Js
 
-final class LocalDatabaseWebWorkerApiStub extends LocalDatabaseWebWorkerApi {
+private[webworker] final class LocalDatabaseWebWorkerApiStub extends LocalDatabaseWebWorkerApi {
 
   private val responseMessagePromises: mutable.Buffer[Promise[js.Any]] = mutable.Buffer()
   private val worker: Worker = initializeWebWorker()
@@ -54,7 +54,11 @@ final class LocalDatabaseWebWorkerApiStub extends LocalDatabaseWebWorkerApi {
           throw new AssertionError("First promise in responseMessagePromises is completed. This is a bug!")
         case Some(promise) =>
           responseMessagePromises.remove(0)
-          promise.success(data)
+          if (data == Scala2Js.toJs("FAILED")) {
+            promise.failure(new IllegalStateException("WebWorker invocation failed"))
+          } else {
+            promise.success(data)
+          }
         case None =>
           throw new AssertionError(s"Received unexpected message: $data")
       }
