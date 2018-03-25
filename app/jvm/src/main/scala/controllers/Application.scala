@@ -87,8 +87,9 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
           .get
       routes.Assets.versioned(filename).toString
     }
+    var depsProjectName = "webworker-client-deps"
+    val depsScript = scriptPathFromNames(s"$depsProjectName-jsdeps.min.js", s"$depsProjectName-jsdeps.js")
     val projectName = "client"
-    val depsScript = scriptPathFromNames(s"$projectName-jsdeps.min.js", s"$projectName-jsdeps.js")
     val clientScript = scriptPathFromNames(s"$projectName-opt.js", s"$projectName-fastopt.js")
 
     Ok(s"""

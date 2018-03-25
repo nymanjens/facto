@@ -42,8 +42,26 @@ lazy val client: Project = (project in file("app/js"))
   .enablePlugins(ScalaJSPlugin, ScalaJSPlay)
   .dependsOn(sharedJS)
 
+lazy val webworkerClientDeps: Project = (project in file("app/empty"))
+  .settings(
+    name := "webworker-client-deps",
+    version := Settings.version,
+    scalaVersion := Settings.versions.scala,
+    scalacOptions ++= Settings.scalacOptions,
+    // by default we do development build, no eliding
+    elideOptions := Seq(),
+    scalacOptions ++= elideOptions.value,
+    jsDependencies ++= Settings.webworkerJsDependencies.value,
+    // yes, we want to package JS dependencies
+    skip in packageJSDependencies := false,
+    // use Scala.js provided launcher code to start the client app
+    scalaJSUseMainModuleInitializer := false,
+    scalaJSUseMainModuleInitializer in Test := false
+  )
+  .enablePlugins(ScalaJSPlugin, ScalaJSPlay)
+
 // Client projects (just one in this case)
-lazy val clients = Seq(client)
+lazy val clients = Seq(client, webworkerClientDeps)
 
 // instantiate the JVM project for SBT with some additional settings
 lazy val server = (project in file("app/jvm"))
@@ -74,6 +92,7 @@ lazy val ReleaseCmd = Command.command("release") { state =>
   "set elideOptions in client := Seq(\"-Xelide-below\", \"WARNING\")" ::
     "client/clean" ::
     "client/test" ::
+    "webworkerClientDeps/clean" ::
     "server/clean" ::
     "server/test" ::
     "server/dist" ::
