@@ -80,14 +80,19 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
   def reactApp(anyString: String) = reactAppRoot
 
   def localDatabaseWebWorker = AuthenticatedAction { implicit user => implicit request =>
+    def scriptPathFromNames(filenames: String*): String = {
+      val filename =
+        filenames
+          .find(name => getClass.getResource(s"/public/$name") != null)
+          .get
+      routes.Assets.versioned(filename).toString
+    }
     val projectName = "client"
-    val filename =
-      Seq(s"$projectName-opt.js", s"$projectName-fastopt.js")
-        .find(name => getClass.getResource(s"/public/$name") != null)
-        .get
-    val clientScript = routes.Assets.versioned(filename).toString
+    val depsScript = scriptPathFromNames(s"$projectName-jsdeps.min.js", s"$projectName-jsdeps.js")
+    val clientScript = scriptPathFromNames(s"$projectName-opt.js", s"$projectName-fastopt.js")
 
     Ok(s"""
+        |importScripts("$depsScript");
         |importScripts("$clientScript");
         |LocalDatabaseWebWorkerScript.run();
       """.stripMargin)

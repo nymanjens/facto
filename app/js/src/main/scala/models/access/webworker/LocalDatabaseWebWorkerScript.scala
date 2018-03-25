@@ -52,10 +52,12 @@ object LocalDatabaseWebWorkerScript {
   private def executeMethod(methodNum: Int, args: js.Array[js.Any]): Future[js.Any] = {
     (methodNum, args.toVector) match {
       case (MethodNumbers.create, Seq(dbName, encryptionSecret, inMemory)) =>
-        apiImpl.create(
-          dbName.asInstanceOf[String],
-          encryptionSecret.asInstanceOf[String],
-          inMemory.asInstanceOf[Boolean])
+        apiImpl
+          .create(
+            dbName.asInstanceOf[String],
+            encryptionSecret.asInstanceOf[String],
+            inMemory.asInstanceOf[Boolean])
+          .map(_ => js.undefined)
       case (MethodNumbers.applyWriteOperations, Seq(operations)) =>
         apiImpl.applyWriteOperations(Scala2Js.toScala[Seq[WriteOperation]](operations): _*)
     }
