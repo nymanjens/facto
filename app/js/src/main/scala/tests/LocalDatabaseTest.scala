@@ -20,7 +20,7 @@ import scala2js.Converters._
 // is incompatible with Loki.
 private[tests] object LocalDatabaseTest extends ManualTestSuite {
 
-  implicit private val webWorker: LocalDatabaseWebWorkerApi =
+  implicit private lazy val webWorker: LocalDatabaseWebWorkerApi =
     new models.access.webworker.Module().localDatabaseWebWorkerApiStub
   private val encryptionSecret = "gA5t6NkQaFpOZsBEU45bZgwlwi7Zeb"
 
