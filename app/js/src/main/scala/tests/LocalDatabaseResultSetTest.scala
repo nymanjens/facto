@@ -3,7 +3,8 @@ package tests
 import common.testing.TestObjects._
 import models.access.DbQuery.Filter
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, DbResultSet, ModelField, LocalDatabase}
+import models.access.webworker.LocalDatabaseWebWorkerApi
+import models.access.{DbQuery, DbResultSet, LocalDatabase, ModelField}
 import models.accounting.Transaction
 import tests.ManualTests.{ManualTest, ManualTestSuite}
 
@@ -17,6 +18,9 @@ import scala2js.Converters._
 // Note that this is a manual test because the Rhino javascript engine used for tests
 // is incompatible with Loki.
 private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
+
+  implicit private val webWorker: LocalDatabaseWebWorkerApi =
+    new models.access.webworker.Module().localDatabaseWebWorkerApiStub
 
   override def tests = Seq(
     // **************** Regular filter tests **************** //

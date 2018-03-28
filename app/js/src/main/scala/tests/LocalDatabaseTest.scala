@@ -1,9 +1,10 @@
 package tests
 
-import models.access.{DbQuery, DbResultSet, ModelField, LocalDatabase}
+import models.access.{DbQuery, DbResultSet, LocalDatabase, ModelField}
 import common.testing.TestObjects._
 import models.access.LocalDatabase
 import models.access.SingletonKey.{NextUpdateTokenKey, VersionKey}
+import models.access.webworker.LocalDatabaseWebWorkerApi
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 import models.modification.EntityModification
 import models.money.ExchangeRateMeasurement
@@ -19,6 +20,8 @@ import scala2js.Converters._
 // is incompatible with Loki.
 private[tests] object LocalDatabaseTest extends ManualTestSuite {
 
+  implicit private val webWorker: LocalDatabaseWebWorkerApi =
+    new models.access.webworker.Module().localDatabaseWebWorkerApiStub
   private val encryptionSecret = "gA5t6NkQaFpOZsBEU45bZgwlwi7Zeb"
 
   override def tests = Seq(
