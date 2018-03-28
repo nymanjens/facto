@@ -23,14 +23,4 @@ final class Module(implicit user: User,
 
     entityAccess
   }
-
-  // Use ApiBackedJsEntityAccess
-//  implicit val entityAccess: JsEntityAccess = {
-//    implicit val remoteDatabaseProxy = new ApiBackedRemoteDatabaseProxy()
-//    val entityAccess = new JsEntityAccessImpl(getInitialDataResponse.allUsers)
-//
-//    entityAccess.startSchedulingModifiedEntityUpdates()
-//
-//    entityAccess
-//  }
 }
