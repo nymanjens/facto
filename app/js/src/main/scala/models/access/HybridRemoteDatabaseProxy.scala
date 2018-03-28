@@ -1,6 +1,7 @@
 package models.access
 
 import java.time.Duration
+
 import api.ScalaJsApi.UpdateToken
 import api.ScalaJsApiClient
 import common.time.Clock
@@ -10,6 +11,7 @@ import models.modification.{EntityModification, EntityType}
 import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
 import models.access.SingletonKey.{NextUpdateTokenKey, VersionKey}
+import models.access.webworker.LocalDatabaseWebWorkerApi
 import models.user.User
 import org.scalajs.dom.console
 
@@ -76,57 +78,65 @@ private[access] final class HybridRemoteDatabaseProxy(localDatabaseFuture: Futur
   private def localDatabaseOption: Option[LocalDatabase] = localDatabaseFuture.value.map(_.get)
 }
 
-//private[access] object LocallyClonedJsEntityAccess {
-//  private val localDatabaseAndEntityVersion = "1.0"
-//
-//  private[access] def create(apiClient: ScalaJsApiClient,
-//                             possiblyEmptyLocalDatabase: LocalDatabase,
-//                             allUsers: Seq[User]): Future[LocallyClonedJsEntityAccess] =
-//    async {
-//      val db = possiblyEmptyLocalDatabase
-//      val populatedDb = {
-//        val populateIsNecessary = {
-//          if (db.isEmpty) {
-//            console.log(s"  Database is empty")
-//            true
-//          } else if (!db.getSingletonValue(VersionKey).contains(localDatabaseAndEntityVersion)) {
-//            console.log(
-//              s"  The database version ${db.getSingletonValue(VersionKey) getOrElse "<empty>"} no longer matches " +
-//                s"the newest version $localDatabaseAndEntityVersion")
-//            true
-//          } else {
-//            console.log(s"  Database was loaded successfully. No need for a full repopulation.")
-//            false
-//          }
-//        }
-//        if (populateIsNecessary) {
-//          console.log(s"  Populating database...")
-//
-//          // Reset database
-//          await(db.clear())
-//
-//          // Set version
-//          db.setSingletonValue(VersionKey, localDatabaseAndEntityVersion)
-//
-//          // Add all entities
-//          val allEntitiesResponse = await(apiClient.getAllEntities(EntityType.values))
-//          for (entityType <- allEntitiesResponse.entityTypes) {
-//            def addAllToDb[E <: Entity](implicit entityType: EntityType[E]) =
-//              db.addAll(allEntitiesResponse.entities(entityType))
-//            addAllToDb(entityType)
-//          }
-//          db.setSingletonValue(NextUpdateTokenKey, allEntitiesResponse.nextUpdateToken)
-//
-//          // Await because we don't want to save unpersisted modifications that can be made as soon as
-//          // the database becomes valid.
-//          await(db.save())
-//          console.log(s"  Population done!")
-//          db
-//        } else {
-//          db
-//        }
-//      }
-//      new LocallyClonedJsEntityAccess(apiClient, populatedDb, allUsers)
-//    }
-//
-//}
+private[access] object HybridRemoteDatabaseProxy {
+  private val localDatabaseAndEntityVersion = "1.0"
+
+  private[access] def create()(implicit user: User,
+                               apiClient: ScalaJsApiClient,
+                               clock: Clock,
+                               webWorker: LocalDatabaseWebWorkerApi): RemoteDatabaseProxy = {
+    val dbFuture = async {
+      val db = await(LocalDatabase.create(encryptionSecret = user.databaseEncryptionKey))
+      val populateIsNecessary = {
+        if (await(db.isEmpty)) {
+          console.log(s"  Database is empty")
+          true
+        } else {
+          val dbVersionOption = await(db.getSingletonValue(VersionKey))
+          if (!dbVersionOption.contains(localDatabaseAndEntityVersion)) {
+            console.log(
+              s"  The database version ${dbVersionOption getOrElse "<empty>"} no longer matches " +
+                s"the newest version $localDatabaseAndEntityVersion")
+            true
+          } else {
+            console.log(s"  Database was loaded successfully. No need for a full repopulation.")
+            false
+          }
+        }
+      }
+      if (populateIsNecessary) {
+        console.log(s"  Populating database...")
+
+        // Reset database
+        await(db.clear())
+
+        // Set version
+        await(db.setSingletonValue(VersionKey, localDatabaseAndEntityVersion))
+
+        // Add all entities
+        val allEntitiesResponse = await(apiClient.getAllEntities(EntityType.values))
+        await {
+          Future.sequence {
+            for (entityType <- allEntitiesResponse.entityTypes) yield {
+              def addAllToDb[E <: Entity](implicit entityType: EntityType[E]) =
+                db.addAll(allEntitiesResponse.entities(entityType))
+              addAllToDb(entityType)
+            }
+          }
+        }
+
+        await(db.setSingletonValue(NextUpdateTokenKey, allEntitiesResponse.nextUpdateToken))
+
+        // Await because we don't want to save unpersisted modifications that can be made as soon as
+        // the database becomes valid.
+        await(db.save())
+        console.log(s"  Population done!")
+        db
+      } else {
+        db
+      }
+    }
+    new HybridRemoteDatabaseProxy(dbFuture)
+  }
+
+}

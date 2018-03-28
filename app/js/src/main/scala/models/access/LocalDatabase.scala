@@ -47,7 +47,7 @@ trait LocalDatabase {
 @visibleForTesting
 object LocalDatabase {
 
-  def createFuture(encryptionSecret: String = "")(
+  def create(encryptionSecret: String = "")(
       implicit webWorker: LocalDatabaseWebWorkerApi): Future[LocalDatabase] = async {
     await(webWorker.create(dbName = "facto-db", encryptionSecret = encryptionSecret, inMemory = false))
     new Impl()
