@@ -3,7 +3,7 @@ package models.access.webworker
 import common.LoggingUtils.logExceptions
 import api.Picklers._
 import jsfacades.WebWorker
-import models.access.webworker.LocalDatabaseWebWorkerApi.{MethodNumbers, WriteOperation}
+import models.access.webworker.LocalDatabaseWebWorkerApi.{LokiQuery, MethodNumbers, WriteOperation}
 import models.access.webworker.LocalDatabaseWebWorkerApiConverters._
 import org.scalajs.dom
 import org.scalajs.dom.console
@@ -17,7 +17,7 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.util.Success
 import scala2js.Converters._
 import scala2js.Scala2Js
-import scala.util.{Try, Success, Failure}
+import scala.util.{Failure, Success, Try}
 
 @JSExportTopLevel("LocalDatabaseWebWorkerScript")
 object LocalDatabaseWebWorkerScript {
@@ -58,6 +58,14 @@ object LocalDatabaseWebWorkerScript {
             encryptionSecret.asInstanceOf[String],
             inMemory.asInstanceOf[Boolean])
           .map(_ => js.undefined)
+      case (MethodNumbers.executeDataQuery, Seq(lokiQuery)) =>
+        apiImpl
+          .executeDataQuery(Scala2Js.toScala[LokiQuery](lokiQuery))
+          .map(r => r)
+      case (MethodNumbers.executeCountQuery, Seq(lokiQuery)) =>
+        apiImpl
+          .executeCountQuery(Scala2Js.toScala[LokiQuery](lokiQuery))
+          .map(r => r)
       case (MethodNumbers.applyWriteOperations, Seq(operations)) =>
         apiImpl
           .applyWriteOperations(Scala2Js.toScala[Seq[WriteOperation]](operations))
