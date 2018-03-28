@@ -59,7 +59,9 @@ object LocalDatabaseWebWorkerScript {
             inMemory.asInstanceOf[Boolean])
           .map(_ => js.undefined)
       case (MethodNumbers.applyWriteOperations, Seq(operations)) =>
-        apiImpl.applyWriteOperations(Scala2Js.toScala[Seq[WriteOperation]](operations): _*)
+        apiImpl
+          .applyWriteOperations(Scala2Js.toScala[Seq[WriteOperation]](operations))
+          .map(r => r)
     }
   }
 }

@@ -2,36 +2,32 @@ package jsfacades
 
 import common.LoggingUtils.logExceptions
 import common.ScalaUtils
-import jsfacades.LokiJs.Sorting.KeyWithDirection
 
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.JSGlobal
-import scala2js.Converters._
-import scala2js.Scala2Js
 
 object LokiJs {
   @JSGlobal("loki")
   @js.native
   private final class DatabaseFacade(dbName: String, args: js.Dictionary[js.Any] = null) extends js.Object {
 
-    def addCollection(name: String): CollectionFacade = js.native
-    def getCollection(name: String): CollectionFacade = js.native
+    def addCollection(name: String): Collection = js.native
+    def getCollection(name: String): Collection = js.native
 
     def saveDatabase(callback: js.Function0[Unit]): Unit = js.native
     def loadDatabase(properties: js.Dictionary[js.Any], callback: js.Function0[Unit]): Unit = js.native
   }
 
   final class Database(facade: DatabaseFacade) {
-    def getOrAddCollection[E: Scala2Js.MapConverter](name: String): Collection[E] = {
+    def getOrAddCollection(name: String): Collection = {
       val collection = facade.getCollection(name)
       if (collection == null) {
-        new Collection(facade.addCollection(name))
+        facade.addCollection(name)
       } else {
-        new Collection(collection)
+        collection
       }
     }
 
@@ -126,74 +122,37 @@ object LokiJs {
   }
 
   @js.native
-  private trait CollectionFacade extends js.Object {
+  trait Collection extends js.Object {
 
-    def chain(): ResultSetFacade = js.native
+    def chain(): ResultSet = js.native
 
     def insert(obj: js.Dictionary[js.Any]): Unit = js.native
     def update(obj: js.Dictionary[js.Any]): Unit = js.native
+    // Use FilterFactory to create filters
     def findAndRemove(filter: js.Dictionary[js.Any]): Unit = js.native
     def clear(): Unit = js.native
   }
 
-  final class Collection[E: Scala2Js.MapConverter](facade: CollectionFacade) {
-
-    def chain(): ResultSet[E] = new ResultSet[E](facade.chain())
-
-    def insert(obj: E): Unit = facade.insert(Scala2Js.toJsMap(obj))
-    def update(obj: E): Unit = facade.update(Scala2Js.toJsMap(obj))
-    def findAndRemove[V: Scala2Js.Converter](key: String, value: V): Unit =
-      facade.findAndRemove(js.Dictionary(key -> Scala2Js.toJs(value)))
-    def clear(): Unit = facade.clear()
-  }
-
   @js.native
-  private trait ResultSetFacade extends js.Object {
-
+  trait ResultSet extends js.Object {
     // **************** Intermediary operations **************** //
-    def find(filter: js.Dictionary[js.Any]): ResultSetFacade = js.native
-    def compoundsort(properties: js.Array[js.Array[js.Any]]): ResultSetFacade = js.native
-    def limit(quantity: Int): ResultSetFacade = js.native
+    // Use FilterFactory to create filters
+    def find(filter: js.Dictionary[js.Any]): ResultSet = js.native
+    // Use SortingFactory to create properties
+    def compoundsort(properties: js.Array[js.Array[js.Any]]): ResultSet = js.native
+    def limit(quantity: Int): ResultSet = js.native
 
     // **************** Terminal operations **************** //
     def data(): js.Array[js.Dictionary[js.Any]] = js.native
     def count(): Int = js.native
   }
 
-  final class ResultSet[E: Scala2Js.MapConverter](facade: ResultSetFacade) {
-    // **************** Intermediary operations **************** //
-    def filter(filter: Filter): ResultSet[E] = {
-      def toFilterDictionary(filter: Filter): js.Dictionary[js.Any] = filter match {
-        case Filter.KeyValueFilter(operation, key, value) =>
-          js.Dictionary(key -> js.Dictionary(operation.mongoModifier -> value))
-        case Filter.AggregateFilter(operation, filters) =>
-          js.Dictionary(operation.mongoModifier -> filters.map(toFilterDictionary).toJSArray)
-      }
-      val filterDictionary = toFilterDictionary(filter)
-      new ResultSet[E](facade.find(filterDictionary))
-    }
+  object FilterFactory {
+    def keyValueFilter(operation: Operation, key: String, value: js.Any): js.Dictionary[js.Any] =
+      js.Dictionary(key -> js.Dictionary(operation.mongoModifier -> value))
 
-    def sort(sorting: LokiJs.Sorting): ResultSet[E] = {
-      val properties: js.Array[js.Array[js.Any]] = {
-        val result: Seq[js.Array[js.Any]] = sorting.keysWithDirection map {
-          case KeyWithDirection(key, isDesc) => js.Array[js.Any](key, isDesc)
-        }
-        result.toJSArray
-      }
-      new ResultSet[E](facade.compoundsort(properties))
-    }
-
-    def limit(quantity: Int): ResultSet[E] = new ResultSet[E](facade.limit(quantity))
-
-    // **************** Terminal operations **************** //
-    def data(): Seq[E] = Scala2Js.toScala[Seq[E]](facade.data())
-    def count(): Int = facade.count()
-  }
-
-  sealed trait Filter
-  object Filter {
-    case class KeyValueFilter(operation: Operation, key: String, value: js.Any) extends Filter
-    case class AggregateFilter(operation: Operation, filters: Seq[Filter]) extends Filter
+    def aggregateFilter(operation: Operation, filters: Seq[js.Dictionary[js.Any]]): js.Dictionary[js.Any] =
+      js.Dictionary(operation.mongoModifier -> filters.toJSArray)
 
     sealed abstract class Operation(val mongoModifier: String)
     object Operation {
@@ -212,8 +171,13 @@ object LokiJs {
     }
   }
 
-  case class Sorting(keysWithDirection: Seq[KeyWithDirection])
-  object Sorting {
+  object SortingFactory {
+    def keysWithDirection(keyWithDirection: Seq[KeyWithDirection]): js.Array[js.Array[js.Any]] = {
+      val result: Seq[js.Array[js.Any]] = keyWithDirection map {
+        case KeyWithDirection(key, isDesc) => js.Array[js.Any](key, isDesc)
+      }
+      result.toJSArray
+    }
     case class KeyWithDirection(key: String, isDesc: Boolean)
   }
 }

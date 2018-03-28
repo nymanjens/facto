@@ -11,17 +11,18 @@ private[webworker] object LocalDatabaseWebWorkerApiConverters {
 
   implicit object WriteOperationConverter extends Scala2Js.Converter[WriteOperation] {
     private val insertNumber: Int = 1
-    private val findAndRemoveNumber: Int = 2
-    private val clearNumber: Int = 3
-    private val saveDatabaseNumber: Int = 4
+    private val updateNumber: Int = 2
+    private val removeNumber: Int = 3
+    private val clearNumber: Int = 4
+    private val saveDatabaseNumber: Int = 5
 
     override def toJs(operation: WriteOperation) = {
       operation match {
         case Insert(collectionName, obj) => js.Array[js.Any](insertNumber, collectionName, obj)
-        case FindAndRemove(collectionName, fieldName, fieldValue) =>
-          js.Array[js.Any](findAndRemoveNumber, collectionName, fieldName, fieldValue)
-        case Clear(collectionName) => js.Array[js.Any](clearNumber, collectionName)
-        case SaveDatabase          => js.Array[js.Any](saveDatabaseNumber)
+        case Update(collectionName, obj) => js.Array[js.Any](updateNumber, collectionName, obj)
+        case Remove(collectionName, id)  => js.Array[js.Any](removeNumber, collectionName, id)
+        case Clear(collectionName)       => js.Array[js.Any](clearNumber, collectionName)
+        case SaveDatabase                => js.Array[js.Any](saveDatabaseNumber)
       }
     }
 
@@ -32,8 +33,10 @@ private[webworker] object LocalDatabaseWebWorkerApiConverters {
       (firstElement, seq) match {
         case (`insertNumber`, Seq(_, collectionName, obj)) =>
           Insert(collectionName.asInstanceOf[String], obj.asInstanceOf[js.Dictionary[js.Any]])
-        case (`findAndRemoveNumber`, Seq(_, collectionName, fieldName, fieldValue)) =>
-          FindAndRemove(collectionName.asInstanceOf[String], fieldName.asInstanceOf[String], fieldValue)
+        case (`updateNumber`, Seq(_, collectionName, obj)) =>
+          Update(collectionName.asInstanceOf[String], obj.asInstanceOf[js.Dictionary[js.Any]])
+        case (`removeNumber`, Seq(_, collectionName, id)) =>
+          Remove(collectionName.asInstanceOf[String], id)
         case (`clearNumber`, Seq(_, collectionName)) => Clear(collectionName.asInstanceOf[String])
         case (`saveDatabaseNumber`, Seq(_))          => SaveDatabase
       }

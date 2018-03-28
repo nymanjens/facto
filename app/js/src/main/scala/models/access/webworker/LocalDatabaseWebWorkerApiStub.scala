@@ -8,10 +8,12 @@ import org.scalajs.dom
 import org.scalajs.dom.raw.Worker
 
 import scala.async.Async.{async, await}
+import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
+import scala.scalajs.js.Dictionary
 import scala.scalajs.js.JSConverters._
 import scala2js.Converters._
 import scala2js.Scala2Js
@@ -24,7 +26,15 @@ private[webworker] final class LocalDatabaseWebWorkerApiStub extends LocalDataba
   override def create(dbName: String, encryptionSecret: String, inMemory: Boolean) = {
     sendAndReceive(MethodNumbers.create, dbName, encryptionSecret, inMemory).map(_ => (): Unit)
   }
-  override def applyWriteOperations(operations: LocalDatabaseWebWorkerApi.WriteOperation*) =
+
+  override def executeDataQuery(lokiQuery: LocalDatabaseWebWorkerApi.LokiQuery) =
+    sendAndReceive(MethodNumbers.executeDataQuery, Scala2Js.toJs(lokiQuery))
+      .map(_.asInstanceOf[js.Array[js.Dictionary[js.Any]]].toVector)
+
+  override def executeCountQuery(lokiQuery: LocalDatabaseWebWorkerApi.LokiQuery) =
+    sendAndReceive(MethodNumbers.executeCountQuery, Scala2Js.toJs(lokiQuery)).map(_.asInstanceOf[Int])
+
+  override def applyWriteOperations(operations: Seq[LocalDatabaseWebWorkerApi.WriteOperation]) =
     sendAndReceive(MethodNumbers.applyWriteOperations, Scala2Js.toJs(operations.toList))
       .map(_.asInstanceOf[Boolean])
 
