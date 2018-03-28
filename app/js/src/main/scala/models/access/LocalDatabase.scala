@@ -47,16 +47,22 @@ trait LocalDatabase {
 @visibleForTesting
 object LocalDatabase {
 
-  def createFuture(encryptionSecret: String = ""): Future[LocalDatabase] = async {
-    ???
+  def createFuture(encryptionSecret: String = "")(
+      implicit webWorker: LocalDatabaseWebWorkerApi): Future[LocalDatabase] = async {
+    await(webWorker.create(dbName = "facto-db", encryptionSecret = encryptionSecret, inMemory = false))
+    new Impl()
   }
 
-  def createStoredForTests(encryptionSecret: String = ""): Future[LocalDatabase] = async {
-    ???
+  def createStoredForTests(encryptionSecret: String = "")(
+      implicit webWorker: LocalDatabaseWebWorkerApi): Future[LocalDatabase] = async {
+    await(webWorker.create(dbName = "test-db", encryptionSecret = encryptionSecret, inMemory = false))
+    new Impl()
   }
 
-  def createInMemoryForTests(encryptionSecret: String = ""): Future[LocalDatabase] = async {
-    ???
+  def createInMemoryForTests(encryptionSecret: String = "")(
+      implicit webWorker: LocalDatabaseWebWorkerApi): Future[LocalDatabase] = async {
+    await(webWorker.create(dbName = "facto-db", encryptionSecret = encryptionSecret, inMemory = true))
+    new Impl()
   }
 
   private case class Singleton(key: String, value: js.Any)
@@ -75,7 +81,7 @@ object LocalDatabase {
       }
     }
   }
-  private final class Impl(webWorker: LocalDatabaseWebWorkerApi) extends LocalDatabase {
+  private final class Impl(implicit webWorker: LocalDatabaseWebWorkerApi) extends LocalDatabase {
     // **************** Getters ****************//
     def queryExecutor[E <: Entity: EntityType]() =
       new DbQueryExecutor.Async[E] {
