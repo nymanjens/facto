@@ -115,15 +115,13 @@ private[access] object HybridRemoteDatabaseProxy {
 
         // Add all entities
         val allEntitiesResponse = await(apiClient.getAllEntities(EntityType.values))
-        await {
-          Future.sequence {
-            for (entityType <- allEntitiesResponse.entityTypes) yield {
-              def addAllToDb[E <: Entity](implicit entityType: EntityType[E]) =
-                db.addAll(allEntitiesResponse.entities(entityType))
-              addAllToDb(entityType)
-            }
+        val _ = await(Future.sequence {
+          for (entityType <- allEntitiesResponse.entityTypes) yield {
+            def addAllToDb[E <: Entity](implicit entityType: EntityType[E]) =
+              db.addAll(allEntitiesResponse.entities(entityType))
+            addAllToDb(entityType)
           }
-        }
+        })
 
         await(db.setSingletonValue(NextUpdateTokenKey, allEntitiesResponse.nextUpdateToken))
 
