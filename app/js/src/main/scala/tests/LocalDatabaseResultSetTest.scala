@@ -17,9 +17,9 @@ import scala2js.Converters._
 
 // Note that this is a manual test because the Rhino javascript engine used for tests
 // is incompatible with Loki.
-private[tests] object LocalDatabaseResultSetTest extends ManualTestSuite {
+private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
 
-  implicit private lazy val webWorker: LocalDatabaseWebWorkerApi =
+  implicit private val webWorker: LocalDatabaseWebWorkerApi =
     new models.access.webworker.Module().localDatabaseWebWorkerApiStub
 
   override def tests = Seq(

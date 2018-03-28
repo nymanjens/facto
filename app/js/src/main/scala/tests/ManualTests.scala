@@ -36,7 +36,7 @@ object ManualTests {
     }
   }
 
-  private val allTestSuites: Seq[ManualTestSuite] = Seq(LocalDatabaseTest, LocalDatabaseResultSetTest)
+  private def allTestSuites: Seq[ManualTestSuite] = Seq(new LocalDatabaseTest, new LocalDatabaseResultSetTest)
 
   trait ManualTestSuite {
     def tests: Seq[ManualTest]
