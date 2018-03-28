@@ -16,6 +16,7 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.util.Success
 import scala2js.Converters._
+import js.JSConverters._
 import scala2js.Scala2Js
 import scala.util.{Failure, Success, Try}
 
@@ -61,7 +62,7 @@ object LocalDatabaseWebWorkerScript {
       case (MethodNumbers.executeDataQuery, Seq(lokiQuery)) =>
         apiImpl
           .executeDataQuery(Scala2Js.toScala[LokiQuery](lokiQuery))
-          .map(r => r)
+          .map(r => r.toJSArray)
       case (MethodNumbers.executeCountQuery, Seq(lokiQuery)) =>
         apiImpl
           .executeCountQuery(Scala2Js.toScala[LokiQuery](lokiQuery))
