@@ -38,9 +38,6 @@ object FactoApp extends js.JSApp {
     implicit val scalaJsApiClient = apiModule.scalaJsApiClient
     implicit val initialDataResponse = await(scalaJsApiClient.getInitialData())
 
-    val modelsAccessModule = new models.access.Module(initialDataResponse.user)
-    implicit val entityAccess = await(modelsAccessModule.entityAccess)
-
     implicit val globalModule = new FactoAppModule()
 
     // tell React to render the router in the document body

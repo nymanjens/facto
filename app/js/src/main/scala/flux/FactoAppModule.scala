@@ -8,8 +8,9 @@ import models.access.JsEntityAccess
 import models.accounting.config.Config
 import models.user.User
 
+import scala.async.Async.await
+
 final class FactoAppModule(implicit getInitialDataResponse: GetInitialDataResponse,
-                           entityAccess: JsEntityAccess,
                            scalaJsApiClient: ScalaJsApiClient) {
 
   // Unpack arguments
@@ -21,6 +22,10 @@ final class FactoAppModule(implicit getInitialDataResponse: GetInitialDataRespon
   implicit private val clock = commonTimeModule.clock
   private val commonModule = new common.Module
   implicit private val i18n = commonModule.i18n
+
+  // Create and unpack Models Access module
+  val modelsAccessModule = new models.access.Module
+  implicit val entityAccess = modelsAccessModule.entityAccess
 
   // Create and unpack Models module
   private val modelsModule = new models.Module
