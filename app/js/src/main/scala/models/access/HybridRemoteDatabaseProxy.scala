@@ -4,6 +4,7 @@ import java.time.Duration
 
 import api.ScalaJsApi.UpdateToken
 import api.ScalaJsApiClient
+import common.ScalaUtils.visibleForTesting
 import common.time.Clock
 import models.Entity
 import models.modification.{EntityModification, EntityType}
@@ -75,14 +76,18 @@ private[access] final class HybridRemoteDatabaseProxy(localDatabaseFuture: Futur
       nextUpdateToken = response.nextUpdateToken)
   }
 
+  @visibleForTesting private[access] def localDatabaseReadyFuture: Future[Unit] =
+    localDatabaseFuture.map(_ => (): Unit)
+
   private def localDatabaseOption: Option[LocalDatabase] = localDatabaseFuture.value.map(_.get)
 }
 
 private[access] object HybridRemoteDatabaseProxy {
   private val localDatabaseAndEntityVersion = "1.0"
 
-  private[access] def create(localDatabase: Future[LocalDatabase])(implicit apiClient: ScalaJsApiClient,
-                                                                   clock: Clock): RemoteDatabaseProxy = {
+  private[access] def create(localDatabase: Future[LocalDatabase])(
+      implicit apiClient: ScalaJsApiClient,
+      clock: Clock): HybridRemoteDatabaseProxy = {
     val dbFuture = async {
       val db = await(localDatabase)
       val populateIsNecessary = {

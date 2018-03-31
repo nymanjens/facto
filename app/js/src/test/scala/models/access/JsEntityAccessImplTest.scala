@@ -25,37 +25,41 @@ object JsEntityAccessImplTest extends TestSuite {
     implicit val fakeClock: Clock = new TestModule().fakeClock
     val fakeLocalDatabase: FakeLocalDatabase = new FakeLocalDatabase()
     val localDatabasePromise: Promise[LocalDatabase] = Promise()
-    implicit val remoteDatabaseProxy: RemoteDatabaseProxy =
+    implicit val remoteDatabaseProxy: HybridRemoteDatabaseProxy =
       HybridRemoteDatabaseProxy.create(localDatabasePromise.future)
     val entityAccess = new JsEntityAccessImpl(allUsers = Seq())
 
     "loads initial data if db is empty" - async {
+      await(fakeApiClient.persistEntityModifications(Seq(testModification)))
       localDatabasePromise.success(fakeLocalDatabase)
-      fakeApiClient.persistEntityModifications(Seq(testModification))
+      await(remoteDatabaseProxy.localDatabaseReadyFuture)
 
       fakeLocalDatabase.allModifications ==> Seq(testModification)
     }
 
     "loads initial data if db is non-empty but has wrong version" - async {
-      localDatabasePromise.success(fakeLocalDatabase)
       fakeLocalDatabase.applyModifications(Seq(testModificationA))
       fakeApiClient.persistEntityModifications(Seq(testModificationB))
+      localDatabasePromise.success(fakeLocalDatabase)
+      await(remoteDatabaseProxy.localDatabaseReadyFuture)
 
       fakeLocalDatabase.allModifications ==> Seq(testModificationB)
     }
 
     "does not load initial data if db is non-empty with right version" - async {
-      localDatabasePromise.success(fakeLocalDatabase)
       fakeApiClient.persistEntityModifications(Seq(testModificationA))
+      localDatabasePromise.success(fakeLocalDatabase)
 
       val entityAccess1 = {
         implicit val remoteDatabaseProxy = HybridRemoteDatabaseProxy.create(localDatabasePromise.future)
+        await(remoteDatabaseProxy.localDatabaseReadyFuture)
         new JsEntityAccessImpl(allUsers = Seq())
       }
       fakeApiClient.persistEntityModifications(Seq(testModificationB))
 
       val entityAccess2 = {
         implicit val remoteDatabaseProxy = HybridRemoteDatabaseProxy.create(localDatabasePromise.future)
+        await(remoteDatabaseProxy.localDatabaseReadyFuture)
         new JsEntityAccessImpl(allUsers = Seq())
       }
 
@@ -63,14 +67,17 @@ object JsEntityAccessImplTest extends TestSuite {
     }
 
     "newQuery()" - async {
-      localDatabasePromise.success(fakeLocalDatabase)
       fakeLocalDatabase.addAll(Seq(testTransactionWithId))
+      localDatabasePromise.success(fakeLocalDatabase)
+      await(remoteDatabaseProxy.localDatabaseReadyFuture)
 
       await(entityAccess.newQuery[Transaction].data()) ==> Seq(testTransactionWithId)
     }
 
     "hasLocalAddModifications()" - async {
       localDatabasePromise.success(fakeLocalDatabase)
+      await(remoteDatabaseProxy.localDatabaseReadyFuture)
+
       await(entityAccess.persistModifications(Seq(EntityModification.Add(testTransactionWithId))))
 
       entityAccess.hasLocalAddModifications(testTransactionWithId) ==> false
@@ -78,6 +85,7 @@ object JsEntityAccessImplTest extends TestSuite {
 
     "persistModifications()" - async {
       localDatabasePromise.success(fakeLocalDatabase)
+      await(remoteDatabaseProxy.localDatabaseReadyFuture)
 
       await(entityAccess.persistModifications(Seq(testModification)))
 
@@ -87,6 +95,7 @@ object JsEntityAccessImplTest extends TestSuite {
 
     "persistModifications(): calls listeners" - async {
       localDatabasePromise.success(fakeLocalDatabase)
+      await(remoteDatabaseProxy.localDatabaseReadyFuture)
       val listener = new FakeProxyListener()
       entityAccess.registerListener(listener)
 
@@ -97,6 +106,7 @@ object JsEntityAccessImplTest extends TestSuite {
 
     "updateModifiedEntities()" - async {
       localDatabasePromise.success(fakeLocalDatabase)
+      await(remoteDatabaseProxy.localDatabaseReadyFuture)
       val nextUpdateToken = await(fakeApiClient.getAllEntities(Seq(TransactionType))).nextUpdateToken
       fakeApiClient.persistEntityModifications(Seq(testModification))
       fakeLocalDatabase.allModifications ==> Seq() // sanity check
@@ -108,6 +118,7 @@ object JsEntityAccessImplTest extends TestSuite {
 
     "updateModifiedEntities(): calls listeners" - async {
       localDatabasePromise.success(fakeLocalDatabase)
+      await(remoteDatabaseProxy.localDatabaseReadyFuture)
       val nextUpdateToken = await(fakeApiClient.getAllEntities(Seq(TransactionType))).nextUpdateToken
       val listener = new FakeProxyListener()
       entityAccess.registerListener(listener)
