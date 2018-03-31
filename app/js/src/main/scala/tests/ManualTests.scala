@@ -12,6 +12,8 @@ object ManualTests {
   @JSExport
   def run(): Unit = {
     var nextFuture = Future.successful((): Unit)
+    var successCount = 0
+    var failureCount = 0
     for (testSuite <- allTestSuites) {
       for (test <- testSuite.tests) {
         nextFuture = nextFuture flatMap { _ =>
@@ -19,20 +21,22 @@ object ManualTests {
           println(s"  $prefix  Starting test")
           Future.successful((): Unit) flatMap { _ =>
             test.testCode()
+          } map { _ =>
+            println(s"  $prefix  Finished test")
+            successCount += 1
           } recoverWith {
             case throwable => {
               println(s"  $prefix  Test failed: $throwable")
               throwable.printStackTrace()
+              failureCount += 1
               Future.successful((): Unit)
             }
-          } map { _ =>
-            println(s"  $prefix  Finished test")
           }
         }
       }
     }
     nextFuture map { _ =>
-      println(s"  All tests finished")
+      println(s"  All tests finished. $successCount succeeded, $failureCount failed")
     }
   }
 
