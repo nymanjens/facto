@@ -174,7 +174,7 @@ object LocalDatabase {
           WriteOperation.Update(collectionNameOf(entityType), Scala2Js.toJsMap(updatedEntity))
         case modification @ EntityModification.Remove(id) =>
           val entityType = modification.entityType
-          WriteOperation.Remove(collectionNameOf(entityType), id)
+          WriteOperation.Remove(collectionNameOf(entityType), Scala2Js.toJs(id))
       }))
     }
 
