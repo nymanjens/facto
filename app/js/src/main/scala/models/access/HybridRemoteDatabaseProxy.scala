@@ -81,12 +81,10 @@ private[access] final class HybridRemoteDatabaseProxy(localDatabaseFuture: Futur
 private[access] object HybridRemoteDatabaseProxy {
   private val localDatabaseAndEntityVersion = "1.0"
 
-  private[access] def create()(implicit user: User,
-                               apiClient: ScalaJsApiClient,
-                               clock: Clock,
-                               webWorker: LocalDatabaseWebWorkerApi): RemoteDatabaseProxy = {
+  private[access] def create(localDatabase: Future[LocalDatabase])(implicit apiClient: ScalaJsApiClient,
+                                                                   clock: Clock): RemoteDatabaseProxy = {
     val dbFuture = async {
-      val db = await(LocalDatabase.create(encryptionSecret = user.databaseEncryptionKey))
+      val db = await(localDatabase)
       val populateIsNecessary = {
         if (await(db.isEmpty)) {
           console.log(s"  Database is empty")

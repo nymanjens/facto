@@ -12,11 +12,11 @@ final class Module(implicit user: User,
                    clock: Clock,
                    getInitialDataResponse: GetInitialDataResponse) {
 
-  // Use LocallyClonedJsEntityAccess
   implicit val entityAccess: JsEntityAccess = {
     val webWorkerModule = new models.access.webworker.Module()
     implicit val localDatabaseWebWorkerApiStub = webWorkerModule.localDatabaseWebWorkerApiStub
-    implicit val remoteDatabaseProxy = HybridRemoteDatabaseProxy.create()
+    val localDatabaseFuture = LocalDatabase.create(encryptionSecret = user.databaseEncryptionKey)
+    implicit val remoteDatabaseProxy = HybridRemoteDatabaseProxy.create(localDatabaseFuture)
     val entityAccess = new JsEntityAccessImpl(getInitialDataResponse.allUsers)
 
     entityAccess.startSchedulingModifiedEntityUpdates()
