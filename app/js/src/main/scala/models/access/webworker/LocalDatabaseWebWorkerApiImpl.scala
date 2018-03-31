@@ -18,7 +18,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
 
   override def create(dbName: String, encryptionSecret: String, inMemory: Boolean): Future[Unit] = {
     if (inMemory) {
-      val lokiDb: LokiJs.Database = LokiJs.Database.inMemoryForTests(
+      lokiDb = LokiJs.Database.inMemoryForTests(
         dbName,
         persistedStringCodex =
           if (encryptionSecret.isEmpty) LokiJs.PersistedStringCodex.NullCodex
