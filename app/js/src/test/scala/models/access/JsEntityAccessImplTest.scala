@@ -67,9 +67,9 @@ object JsEntityAccessImplTest extends TestSuite {
     }
 
     "newQuery()" - async {
-      fakeLocalDatabase.addAll(Seq(testTransactionWithId))
       localDatabasePromise.success(fakeLocalDatabase)
       await(remoteDatabaseProxy.localDatabaseReadyFuture)
+      fakeLocalDatabase.addAll(Seq(testTransactionWithId))
 
       await(entityAccess.newQuery[Transaction].data()) ==> Seq(testTransactionWithId)
     }
