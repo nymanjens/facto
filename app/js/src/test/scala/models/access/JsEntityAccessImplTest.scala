@@ -3,7 +3,6 @@ package models.access
 import common.testing.TestObjects._
 import common.testing.{FakeScalaJsApiClient, ModificationsBuffer, TestModule}
 import common.time.Clock
-import jsfacades.LokiJs
 import models.Entity
 import models.accounting.Transaction
 import models.modification.EntityType.TransactionType
@@ -28,6 +27,40 @@ object JsEntityAccessImplTest extends TestSuite {
     implicit val remoteDatabaseProxy: HybridRemoteDatabaseProxy =
       HybridRemoteDatabaseProxy.create(localDatabasePromise.future)
     val entityAccess = new JsEntityAccessImpl(allUsers = Seq())
+
+    "Fake local database not yet loaded" - {
+      "newQuery" - async {
+        fakeApiClient.addEntities(testTransactionWithId)
+
+        await(entityAccess.newQuery[Transaction]().data()) ==> Seq(testTransactionWithId)
+      }
+
+      "persistModifications()" - async {
+        await(entityAccess.persistModifications(Seq(testModification)))
+
+        fakeApiClient.allModifications ==> Seq(testModification)
+      }
+
+      "persistModifications(): calls listeners" - async {
+        val listener = new FakeProxyListener()
+        entityAccess.registerListener(listener)
+
+        await(entityAccess.persistModifications(Seq(testModification)))
+
+        listener.modifications ==> Seq(Seq(testModification))
+      }
+
+      "updateModifiedEntities(): calls listeners" - async {
+        val nextUpdateToken = await(fakeApiClient.getAllEntities(Seq(TransactionType))).nextUpdateToken
+        val listener = new FakeProxyListener()
+        entityAccess.registerListener(listener)
+        fakeApiClient.persistEntityModifications(Seq(testModification))
+
+        await(entityAccess.updateModifiedEntities(Some(nextUpdateToken)))
+
+        listener.modifications ==> Seq(Seq(testModification))
+      }
+    }
 
     "Fake local database loaded" - {
       "loads initial data if db is empty" - async {
@@ -72,7 +105,7 @@ object JsEntityAccessImplTest extends TestSuite {
         await(remoteDatabaseProxy.localDatabaseReadyFuture)
         fakeLocalDatabase.addAll(Seq(testTransactionWithId))
 
-        await(entityAccess.newQuery[Transaction].data()) ==> Seq(testTransactionWithId)
+        await(entityAccess.newQuery[Transaction]().data()) ==> Seq(testTransactionWithId)
       }
 
       "hasLocalAddModifications()" - async {
@@ -112,7 +145,7 @@ object JsEntityAccessImplTest extends TestSuite {
         fakeApiClient.persistEntityModifications(Seq(testModification))
         fakeLocalDatabase.allModifications ==> Seq() // sanity check
 
-        await(entityAccess.updateModifiedEntities(None))
+        await(entityAccess.updateModifiedEntities(Some(nextUpdateToken)))
 
         fakeLocalDatabase.allModifications ==> Seq(testModification)
       }
@@ -125,7 +158,7 @@ object JsEntityAccessImplTest extends TestSuite {
         entityAccess.registerListener(listener)
         fakeApiClient.persistEntityModifications(Seq(testModification))
 
-        await(entityAccess.updateModifiedEntities(None))
+        await(entityAccess.updateModifiedEntities(Some(nextUpdateToken)))
 
         listener.modifications ==> Seq(Seq(testModification))
       }

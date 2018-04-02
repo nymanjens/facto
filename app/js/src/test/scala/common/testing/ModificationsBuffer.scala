@@ -65,5 +65,5 @@ final class ModificationsBuffer {
 }
 
 object ModificationsBuffer {
-  private val startToken = LocalDateTime.of(1990, JANUARY, 1, 0, 0)
+  private val startToken: UpdateToken = LocalDateTime.of(1990, JANUARY, 1, 0, 0)
 }
