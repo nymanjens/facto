@@ -1,10 +1,8 @@
 package models.access
 
 import api.ScalaJsApi.UpdateToken
-import api.ScalaJsApiClient
 import common.LoggingUtils.logExceptions
 import common.ScalaUtils.visibleForTesting
-import common.time.Clock
 import models.Entity
 import models.access.JsEntityAccess.Listener
 import models.modification.{EntityModification, EntityType}
@@ -28,17 +26,21 @@ private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
     EntityType.values.map(t => t -> mutable.Set[Long]()).toMap
   private val allLocallyCreatedModifications: mutable.Set[EntityModification] = mutable.Set()
   private var isCallingListeners: Boolean = false
-  private var lastWriteFuture: Future[Unit] = Future.successful((): Unit)
+  private val writeReadyFutures: mutable.Buffer[Future[Unit]] = mutable.Buffer()
 
   // **************** Getters ****************//
   override def newQuery[E <: Entity: EntityType](): DbResultSet.Async[E] = {
     DbResultSet.fromExecutor(new DbQueryExecutor.Async[E] {
       override def data(dbQuery: DbQuery[E]) = async {
-        await(lastWriteFuture)
+        if (writeReadyFutures.nonEmpty) {
+          await(writeReadyFutures.lastOption.get)
+        }
         await(remoteDatabaseProxy.queryExecutor[E]().data(dbQuery))
       }
       override def count(dbQuery: DbQuery[E]) = async {
-        await(lastWriteFuture)
+        if (writeReadyFutures.nonEmpty) {
+          await(writeReadyFutures.lastOption.get)
+        }
         await(remoteDatabaseProxy.queryExecutor[E]().count(dbQuery))
       }
     })
@@ -53,7 +55,7 @@ private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
 
   // **************** Setters ****************//
   override def persistModifications(modifications: Seq[EntityModification]): Future[Unit] = {
-    lastWriteFuture = async {
+    val writeFuture = async {
       require(!isCallingListeners)
 
       allLocallyCreatedModifications ++= modifications
@@ -73,7 +75,11 @@ private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
 
       await(listeners)
     }
-    lastWriteFuture
+    writeReadyFutures += writeFuture
+    writeFuture map { _ =>
+      writeReadyFutures -= writeFuture
+    }
+    writeFuture
   }
 
   // **************** Other ****************//
