@@ -3,6 +3,7 @@ package models.access.webworker
 import jsfacades.LokiJs.FilterFactory.Operation
 import jsfacades.{CryptoJs, LokiJs}
 import models.Entity
+import models.access.ModelField
 import models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
 import models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation._
 import org.scalajs.dom.console
@@ -12,7 +13,6 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 
-// TODO: Add primary indices
 private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDatabaseWebWorkerApi {
   private var lokiDb: LokiJs.Database = _
 
@@ -44,7 +44,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
     Future.successful(toResultSet(lokiQuery).count())
 
   private def toResultSet(lokiQuery: LocalDatabaseWebWorkerApi.LokiQuery): LokiJs.ResultSet = {
-    val lokiCollection = lokiDb.getOrAddCollection(lokiQuery.collectionName)
+    val lokiCollection = getOrAddCollection(lokiQuery.collectionName)
     var resultSet = lokiCollection.chain()
     for (filter <- lokiQuery.filter) {
       resultSet = resultSet.find(filter)
@@ -62,7 +62,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
     Future
       .sequence(operations map {
         case Insert(collectionName, obj) =>
-          val lokiCollection = lokiDb.getOrAddCollection(collectionName)
+          val lokiCollection = getOrAddCollection(collectionName)
           findById(lokiCollection, obj("id")) match {
             case Some(entity) =>
               Future.successful(false)
@@ -72,7 +72,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
           }
 
         case Update(collectionName, updatedObj) =>
-          val lokiCollection = lokiDb.getOrAddCollection(collectionName)
+          val lokiCollection = getOrAddCollection(collectionName)
           findById(lokiCollection, updatedObj("id")) match {
             case None =>
               Future.successful(false)
@@ -84,7 +84,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
           }
 
         case Remove(collectionName, id) =>
-          val lokiCollection = lokiDb.getOrAddCollection(collectionName)
+          val lokiCollection = getOrAddCollection(collectionName)
           findById(lokiCollection, id) match {
             case None =>
               Future.successful(false)
@@ -113,6 +113,17 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
       .toVector match {
       case Seq(e) => Some(e)
       case Seq()  => None
+    }
+  }
+
+  private def getOrAddCollection(collectionName: String): LokiJs.Collection = {
+    lokiDb.getCollection(collectionName) match {
+      case Some(collection) => collection
+      case None =>
+        lokiDb.addCollection(
+          collectionName,
+          uniqueIndices = Seq("id")
+        )
     }
   }
 }
