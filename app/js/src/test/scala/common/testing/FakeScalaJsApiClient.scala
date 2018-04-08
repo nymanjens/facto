@@ -3,11 +3,13 @@ package common.testing
 import api.ScalaJsApi.{GetAllEntitiesResponse, GetEntityModificationsResponse, UpdateToken}
 import api.ScalaJsApiClient
 import models.Entity
-import models.access.DbQuery
+import models.access.{DbQuery, DbQueryExecutor}
 import models.modification.{EntityModification, EntityType}
 
+import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 final class FakeScalaJsApiClient extends ScalaJsApiClient {
 
@@ -38,8 +40,18 @@ final class FakeScalaJsApiClient extends ScalaJsApiClient {
     Future.successful((): Unit)
   }
 
-  override def executeDataQuery[E <: Entity](dbQuery: DbQuery[E]) = ???
-  override def executeCountQuery(dbQuery: DbQuery[_ <: Entity]) = ???
+  override def executeDataQuery[E <: Entity](dbQuery: DbQuery[E]) =
+    queryExecutor(dbQuery.entityType).map(_.data(dbQuery))
+  override def executeCountQuery(dbQuery: DbQuery[_ <: Entity]) = {
+    def internal[E <: Entity](dbQuery: DbQuery[E]): Future[Int] =
+      queryExecutor(dbQuery.entityType).map(_.count(dbQuery))
+    internal(dbQuery)
+  }
+  private def queryExecutor[E <: Entity](
+      implicit entityType: EntityType[E]): Future[DbQueryExecutor.Sync[E]] = async {
+    val entities = await(getAllEntities(Seq(entityType))).entities(entityType)
+    DbQueryExecutor.fromEntities(entities)
+  }
 
   // **************** Additional methods for tests ****************//
   def addEntities[E <: Entity: EntityType](entities: E*): Unit = {

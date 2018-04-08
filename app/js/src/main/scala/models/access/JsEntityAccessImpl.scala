@@ -1,10 +1,8 @@
 package models.access
 
 import api.ScalaJsApi.UpdateToken
-import api.ScalaJsApiClient
 import common.LoggingUtils.logExceptions
 import common.ScalaUtils.visibleForTesting
-import common.time.Clock
 import models.Entity
 import models.access.JsEntityAccess.Listener
 import models.modification.{EntityModification, EntityType}
@@ -19,8 +17,8 @@ import scala.concurrent.duration._
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 
-private[access] final class ApiBackedJsEntityAccess(allUsers: Seq[User])(implicit apiClient: ScalaJsApiClient,
-                                                                         clock: Clock)
+private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
+    implicit remoteDatabaseProxy: RemoteDatabaseProxy)
     extends JsEntityAccess {
 
   private var listeners: Seq[Listener] = Seq()
@@ -28,18 +26,22 @@ private[access] final class ApiBackedJsEntityAccess(allUsers: Seq[User])(implici
     EntityType.values.map(t => t -> mutable.Set[Long]()).toMap
   private val allLocallyCreatedModifications: mutable.Set[EntityModification] = mutable.Set()
   private var isCallingListeners: Boolean = false
-  private var lastWriteFuture: Future[Unit] = Future.successful((): Unit)
+  private val writeReadyFutures: mutable.Buffer[Future[Unit]] = mutable.Buffer()
 
   // **************** Getters ****************//
   override def newQuery[E <: Entity: EntityType](): DbResultSet.Async[E] = {
     DbResultSet.fromExecutor(new DbQueryExecutor.Async[E] {
       override def data(dbQuery: DbQuery[E]) = async {
-        await(lastWriteFuture)
-        await(apiClient.executeDataQuery(dbQuery))
+        if (writeReadyFutures.nonEmpty) {
+          await(writeReadyFutures.lastOption.get)
+        }
+        await(remoteDatabaseProxy.queryExecutor[E]().data(dbQuery))
       }
       override def count(dbQuery: DbQuery[E]) = async {
-        await(lastWriteFuture)
-        await(apiClient.executeCountQuery(dbQuery))
+        if (writeReadyFutures.nonEmpty) {
+          await(writeReadyFutures.lastOption.get)
+        }
+        await(remoteDatabaseProxy.queryExecutor[E]().count(dbQuery))
       }
     })
   }
@@ -53,7 +55,7 @@ private[access] final class ApiBackedJsEntityAccess(allUsers: Seq[User])(implici
 
   // **************** Setters ****************//
   override def persistModifications(modifications: Seq[EntityModification]): Future[Unit] = {
-    lastWriteFuture = async {
+    val writeFuture = async {
       require(!isCallingListeners)
 
       allLocallyCreatedModifications ++= modifications
@@ -64,9 +66,7 @@ private[access] final class ApiBackedJsEntityAccess(allUsers: Seq[User])(implici
       } localAddModificationIds(modification.entityType) += modification.entityId
       val listeners = invokeListenersAsync(_.modificationsAdded(modifications))
 
-      val apiFuture = apiClient.persistEntityModifications(modifications)
-
-      await(apiFuture)
+      await(remoteDatabaseProxy.persistEntityModifications(modifications))
 
       for {
         modification <- modifications
@@ -75,7 +75,11 @@ private[access] final class ApiBackedJsEntityAccess(allUsers: Seq[User])(implici
 
       await(listeners)
     }
-    lastWriteFuture
+    writeReadyFutures += writeFuture
+    writeFuture map { _ =>
+      writeReadyFutures -= writeFuture
+    }
+    writeFuture
   }
 
   // **************** Other ****************//
@@ -87,14 +91,13 @@ private[access] final class ApiBackedJsEntityAccess(allUsers: Seq[User])(implici
 
   override private[access] def startSchedulingModifiedEntityUpdates(): Unit = {
     var timeout = 5.seconds
-    def cyclicLogic(updateToken: UpdateToken): Unit = {
-      updateModifiedEntities(updateToken) map { nextUpdateToken =>
-        js.timers.setTimeout(timeout)(cyclicLogic(nextUpdateToken))
-        timeout * 1.02
-      }
+    def cyclicLogic(updateToken: Option[UpdateToken]): Unit = async {
+      val nextUpdateToken = await(updateModifiedEntities(updateToken))
+      js.timers.setTimeout(timeout)(cyclicLogic(Some(nextUpdateToken)))
+      timeout * 1.02
     }
 
-    js.timers.setTimeout(0)(cyclicLogic(updateToken = clock.now))
+    js.timers.setTimeout(0)(cyclicLogic(updateToken = None))
   }
 
   // **************** Private helper methods ****************//
@@ -110,14 +113,14 @@ private[access] final class ApiBackedJsEntityAccess(allUsers: Seq[User])(implici
   }
 
   @visibleForTesting private[access] def updateModifiedEntities(
-      updateToken: UpdateToken): Future[UpdateToken] = async {
-    val response = await(apiClient.getEntityModifications(updateToken))
-    if (response.modifications.nonEmpty) {
-      console.log(s"  ${response.modifications.size} remote modifications received")
-      val somethingChanged = !response.modifications.forall(allLocallyCreatedModifications)
+      updateToken: Option[UpdateToken]): Future[UpdateToken] = async {
+    val response = await(remoteDatabaseProxy.getAndApplyRemotelyModifiedEntities(updateToken))
+    if (response.changes.nonEmpty) {
+      console.log(s"  ${response.changes.size} remote modifications received")
+      val somethingChanged = !response.changes.forall(allLocallyCreatedModifications)
 
       if (somethingChanged) {
-        await(invokeListenersAsync(_.modificationsAdded(response.modifications)))
+        await(invokeListenersAsync(_.modificationsAdded(response.changes)))
       }
     }
     response.nextUpdateToken

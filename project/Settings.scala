@@ -135,4 +135,11 @@ object Settings {
       webjarDeps.lokiJs / "loki-indexed-adapter.min.js",
       webjarDeps.cryptoJs / "rollups/rc4.js"
     ))
+
+  val webworkerJsDependencies = Def.setting(
+    Seq(
+      webjarDeps.lokiJs / "lokijs.min.js",
+      webjarDeps.lokiJs / "loki-indexed-adapter.min.js",
+      webjarDeps.cryptoJs / "rollups/rc4.js"
+    ))
 }

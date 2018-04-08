@@ -52,7 +52,8 @@ class PicklersTest extends HookedSpecification {
         allUsers = Seq(testUserRedacted),
         i18nMessages = Map("abc" -> "def"),
         ratioReferenceToForeignCurrency =
-          Map(Currency.Gbp -> SortedMap(LocalDateTimes.createDateTime(2012, MAY, 2) -> 1.2349291837))
+          Map(Currency.Gbp -> SortedMap(LocalDateTimes.createDateTime(2012, MAY, 2) -> 1.2349291837)),
+        nextUpdateToken = testDate
       ))
   }
 

@@ -2,32 +2,21 @@ package models.access
 
 import api.ScalaJsApi.GetInitialDataResponse
 import api.ScalaJsApiClient
-import common.time.Clock
 import models.user.User
 
-import scala.concurrent.Future
+final class Module(implicit user: User,
+                   scalaJsApiClient: ScalaJsApiClient,
+                   getInitialDataResponse: GetInitialDataResponse) {
 
-final class Module(user: User)(implicit scalaJsApiClient: ScalaJsApiClient,
-                               clock: Clock,
-                               getInitialDataResponse: GetInitialDataResponse) {
-
-  // Use LocallyClonedJsEntityAccess
-//  implicit val entityAccess: Future[JsEntityAccess] = async {
-//    val db = await(LocalDatabase.createFuture(encryptionSecret = user.databaseEncryptionKey))
-//    val entityAccess =
-//      await(LocallyClonedJsEntityAccess.create(scalaJsApiClient, db, getInitialDataResponse.allUsers))
-//
-//    entityAccess.startSchedulingModifiedEntityUpdates()
-//
-//    entityAccess
-//  }
-
-  // Use ApiBackedJsEntityAccess
-  implicit val entityAccess: Future[JsEntityAccess] = {
-    val entityAccess = new ApiBackedJsEntityAccess(getInitialDataResponse.allUsers)
+  implicit val entityAccess: JsEntityAccess = {
+    val webWorkerModule = new models.access.webworker.Module()
+    implicit val localDatabaseWebWorkerApiStub = webWorkerModule.localDatabaseWebWorkerApiStub
+    val localDatabaseFuture = LocalDatabase.create(encryptionSecret = user.databaseEncryptionKey)
+    implicit val remoteDatabaseProxy = HybridRemoteDatabaseProxy.create(localDatabaseFuture)
+    val entityAccess = new JsEntityAccessImpl(getInitialDataResponse.allUsers)
 
     entityAccess.startSchedulingModifiedEntityUpdates()
 
-    Future.successful(entityAccess)
+    entityAccess
   }
 }

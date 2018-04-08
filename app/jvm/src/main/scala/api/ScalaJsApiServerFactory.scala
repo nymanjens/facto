@@ -11,14 +11,14 @@ import com.google.inject._
 import common.PlayI18n
 import common.money.Currency
 import common.time.{Clock, LocalDateTime}
-import models.slick.SlickUtils.dbApi._
-import models.slick.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}
+import models.Entity
 import models.access.{DbQuery, JvmEntityAccess}
 import models.accounting.config.Config
 import models.modification.{EntityModification, EntityModificationEntity, EntityType}
 import models.money.ExchangeRateMeasurement
+import models.slick.SlickUtils.dbApi._
+import models.slick.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}
 import models.user.User
-import models.Entity
 
 import scala.collection.immutable.{Seq, TreeMap}
 import scala.collection.mutable
@@ -47,7 +47,8 @@ final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
             mapBuilder(currency) += (measurement.date -> measurement.ratioReferenceToForeignCurrency)
           }
           mapBuilder.toStream.map { case (k, v) => k -> v.result() }.toMap
-        }
+        },
+        nextUpdateToken = clock.now
       )
 
     override def getAllEntities(types: Seq[EntityType.any]) = {
