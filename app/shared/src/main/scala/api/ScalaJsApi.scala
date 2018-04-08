@@ -40,13 +40,15 @@ object ScalaJsApi {
 
   /**
     * @param i18nMessages Maps key to the message with placeholders.
+    * @param nextUpdateToken An update token for all changes since this call
     */
   case class GetInitialDataResponse(
       accountingConfig: Config,
       user: User,
       allUsers: Seq[User],
       i18nMessages: Map[String, String],
-      ratioReferenceToForeignCurrency: Map[Currency, SortedMap[LocalDateTime, Double]])
+      ratioReferenceToForeignCurrency: Map[Currency, SortedMap[LocalDateTime, Double]],
+      nextUpdateToken: UpdateToken)
 
   case class GetAllEntitiesResponse(entitiesMap: Map[EntityType.any, Seq[Entity]],
                                     nextUpdateToken: UpdateToken) {
