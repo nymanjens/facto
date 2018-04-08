@@ -3,6 +3,7 @@ package jsfacades
 import common.LoggingUtils.logExceptions
 import common.ScalaUtils
 
+import org.scalajs.dom.console
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.js
@@ -14,22 +15,27 @@ object LokiJs {
   @js.native
   private final class DatabaseFacade(dbName: String, args: js.Dictionary[js.Any] = null) extends js.Object {
 
-    def addCollection(name: String): Collection = js.native
+    def addCollection(name: String, args: js.Dictionary[js.Any]): Collection = js.native
     def getCollection(name: String): Collection = js.native
+    def removeCollection(name: String): Unit = js.native
 
     def saveDatabase(callback: js.Function0[Unit]): Unit = js.native
     def loadDatabase(properties: js.Dictionary[js.Any], callback: js.Function0[Unit]): Unit = js.native
   }
 
   final class Database(facade: DatabaseFacade) {
-    def getOrAddCollection(name: String): Collection = {
-      val collection = facade.getCollection(name)
-      if (collection == null) {
-        facade.addCollection(name)
-      } else {
-        collection
-      }
+    def addCollection(name: String,
+                      uniqueIndices: Seq[String] = Seq(),
+                      indices: Seq[String] = Seq()): Collection = {
+      facade.addCollection(
+        name,
+        args = js.Dictionary("unique" -> uniqueIndices.toJSArray, "indices" -> indices.toJSArray))
     }
+    def getCollection(name: String): Option[Collection] = facade.getCollection(name) match {
+      case null  => None
+      case value => Some(value)
+    }
+    def removeCollection(name: String): Unit = facade.removeCollection(name)
 
     def saveDatabase(): Future[Unit] = {
       val (callback, future) = ScalaUtils.callbackSettingFuturePair()
