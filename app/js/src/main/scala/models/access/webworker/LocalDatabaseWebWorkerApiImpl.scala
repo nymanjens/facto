@@ -94,8 +94,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
           }
 
         case Clear(collectionName) =>
-          val lokiCollection = lokiDb.getOrAddCollection(collectionName)
-          lokiCollection.clear()
+          lokiDb.removeCollection(collectionName)
           Future.successful(true)
 
         case SaveDatabase =>
