@@ -6,6 +6,7 @@ import utest._
 
 import scala.language.reflectiveCalls
 import scala.scalajs.js
+import scala.collection.immutable.Seq
 import scala2js.Scala2Js
 
 object LocalDatabaseWebWorkerApiConvertersTest extends TestSuite {
@@ -18,6 +19,9 @@ object LocalDatabaseWebWorkerApiConvertersTest extends TestSuite {
       "Update" - { testForwardAndBackward[WriteOperation](WriteOperation.Update("test", testObj)) }
       "Remove" - { testForwardAndBackward[WriteOperation](WriteOperation.Remove("test", "192837")) }
       "Clear" - { testForwardAndBackward[WriteOperation](WriteOperation.Clear("test")) }
+      "AddCollection" - {
+        testForwardAndBackward[WriteOperation](WriteOperation.AddCollection("test", Seq("id"), Seq("code")))
+      }
       "SaveDatabase" - { testForwardAndBackward[WriteOperation](WriteOperation.SaveDatabase) }
     }
 

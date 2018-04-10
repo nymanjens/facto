@@ -93,6 +93,14 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
               Future.successful(true)
           }
 
+        case AddCollection(collectionName, uniqueIndices, indices) =>
+          lokiDb.addCollection(
+            collectionName,
+            uniqueIndices = uniqueIndices,
+            indices = indices
+          )
+          Future.successful(true)
+
         case Clear(collectionName) =>
           lokiDb.removeCollection(collectionName)
           Future.successful(true)

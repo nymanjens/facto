@@ -41,6 +41,8 @@ trait LocalDatabase {
 
   /** Persists all previously made changes to the browser's storage. */
   def save(): Future[Unit]
+
+  /** Removes all data and resets its configuration. */
   def clear(): Future[Unit]
 }
 
@@ -210,7 +212,10 @@ object LocalDatabase {
       console.log("  Clearing database...")
       await(
         webWorker.applyWriteOperations(
-          (for (collectionName <- allCollectionNames) yield WriteOperation.Clear(collectionName)) :+
+          (for (collectionName <- allCollectionNames) yield WriteOperation.Clear(collectionName)) ++
+            (for (collectionName <- allCollectionNames)
+              yield
+                WriteOperation.AddCollection(collectionName, uniqueIndices = Seq("id"), indices = Seq())) :+
             WriteOperation.SaveDatabase))
       console.log("  Clearing database done.")
     }
