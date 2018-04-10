@@ -216,6 +216,8 @@ object LocalDatabase {
             (for (collectionName <- allCollectionNames)
               yield
                 WriteOperation.AddCollection(collectionName, uniqueIndices = Seq("id"), indices = Seq())) :+
+            WriteOperation
+              .AddCollection(singletonsCollectionName, uniqueIndices = Seq("id"), indices = Seq()) :+
             WriteOperation.SaveDatabase))
       console.log("  Clearing database done.")
     }

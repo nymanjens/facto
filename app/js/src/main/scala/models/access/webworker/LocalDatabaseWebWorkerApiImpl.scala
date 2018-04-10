@@ -44,7 +44,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
     Future.successful(toResultSet(lokiQuery).count())
 
   private def toResultSet(lokiQuery: LocalDatabaseWebWorkerApi.LokiQuery): LokiJs.ResultSet = {
-    val lokiCollection = getOrAddCollection(lokiQuery.collectionName)
+    val lokiCollection = getCollection(lokiQuery.collectionName)
     var resultSet = lokiCollection.chain()
     for (filter <- lokiQuery.filter) {
       resultSet = resultSet.find(filter)
@@ -62,7 +62,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
     Future
       .sequence(operations map {
         case Insert(collectionName, obj) =>
-          val lokiCollection = getOrAddCollection(collectionName)
+          val lokiCollection = getCollection(collectionName)
           findById(lokiCollection, obj("id")) match {
             case Some(entity) =>
               Future.successful(false)
@@ -72,7 +72,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
           }
 
         case Update(collectionName, updatedObj) =>
-          val lokiCollection = getOrAddCollection(collectionName)
+          val lokiCollection = getCollection(collectionName)
           findById(lokiCollection, updatedObj("id")) match {
             case None =>
               Future.successful(false)
@@ -84,7 +84,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
           }
 
         case Remove(collectionName, id) =>
-          val lokiCollection = getOrAddCollection(collectionName)
+          val lokiCollection = getCollection(collectionName)
           findById(lokiCollection, id) match {
             case None =>
               Future.successful(false)
@@ -123,15 +123,8 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
     }
   }
 
-  private def getOrAddCollection(collectionName: String): LokiJs.Collection = {
-    lokiDb.getCollection(collectionName) match {
-      case Some(collection) => collection
-      case None =>
-        lokiDb.addCollection(
-          collectionName,
-          uniqueIndices = Seq("id")
-        )
-    }
+  private def getCollection(collectionName: String): LokiJs.Collection = {
+    lokiDb.getCollection(collectionName).get
   }
 }
 object LocalDatabaseWebWorkerApiImpl {
