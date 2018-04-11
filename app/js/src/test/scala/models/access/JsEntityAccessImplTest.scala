@@ -1,5 +1,6 @@
 package models.access
 
+import api.ScalaJsApi.GetInitialDataResponse
 import common.testing.TestObjects._
 import common.testing.{FakeScalaJsApiClient, ModificationsBuffer, TestModule}
 import common.time.Clock
@@ -22,6 +23,7 @@ object JsEntityAccessImplTest extends TestSuite {
   override def tests = TestSuite {
     implicit val fakeApiClient: FakeScalaJsApiClient = new FakeScalaJsApiClient()
     implicit val fakeClock: Clock = new TestModule().fakeClock
+    implicit val getInitialDataResponse = testGetInitialDataResponse
     val fakeLocalDatabase: FakeLocalDatabase = new FakeLocalDatabase()
     val localDatabasePromise: Promise[LocalDatabase] = Promise()
     implicit val remoteDatabaseProxy: HybridRemoteDatabaseProxy =
