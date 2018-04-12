@@ -7,6 +7,13 @@ import jsfacades.{CryptoJs, LokiJs}
 import models.Entity
 import models.access.webworker.LocalDatabaseWebWorkerApi
 import models.access.webworker.LocalDatabaseWebWorkerApi.{LokiQuery, WriteOperation}
+import models.modification.EntityType.{
+  BalanceCheckType,
+  ExchangeRateMeasurementType,
+  TransactionGroupType,
+  TransactionType,
+  UserType
+}
 import models.modification.{EntityModification, EntityType}
 import org.scalajs.dom.console
 
@@ -213,9 +220,12 @@ object LocalDatabase {
       await(
         webWorker.applyWriteOperations(
           (for (collectionName <- allCollectionNames) yield WriteOperation.Clear(collectionName)) ++
-            (for (collectionName <- allCollectionNames)
+            (for (entityType <- EntityType.values)
               yield
-                WriteOperation.AddCollection(collectionName, uniqueIndices = Seq("id"), indices = Seq())) :+
+                WriteOperation.AddCollection(
+                  collectionNameOf(entityType),
+                  uniqueIndices = Seq("id"),
+                  indices = secondaryIndices(entityType).map(_.name))) :+
             WriteOperation
               .AddCollection(singletonsCollectionName, uniqueIndices = Seq("id"), indices = Seq()) :+
             WriteOperation.SaveDatabase))
@@ -227,5 +237,17 @@ object LocalDatabase {
     private val singletonsCollectionName = "singletons"
     private def allCollectionNames: Seq[String] =
       EntityType.values.map(collectionNameOf) :+ singletonsCollectionName
+
+    private def secondaryIndices(entityType: EntityType.any): Seq[ModelField[_, _]] = entityType match {
+      case TransactionType =>
+        Seq(
+          ModelField.Transaction.transactionGroupId,
+          ModelField.Transaction.moneyReservoirCode,
+          ModelField.Transaction.beneficiaryAccountCode)
+      case TransactionGroupType        => Seq()
+      case BalanceCheckType            => Seq()
+      case ExchangeRateMeasurementType => Seq()
+      case UserType                    => Seq()
+    }
   }
 }
