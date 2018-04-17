@@ -196,7 +196,7 @@ object JsEntityAccessImplTest extends TestSuite {
       Future.successful((): Unit)
     }
     override def save() = Future.successful((): Unit)
-    override def clear() = {
+    override def resetAndInitialize() = {
       modificationsBuffer.clear()
       singletonMap.clear()
       Future.successful((): Unit)

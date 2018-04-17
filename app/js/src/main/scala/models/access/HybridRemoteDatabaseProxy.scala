@@ -109,7 +109,7 @@ private[access] object HybridRemoteDatabaseProxy {
         console.log(s"  Populating database...")
 
         // Reset database
-        await(db.clear())
+        await(db.resetAndInitialize())
 
         // Set version
         await(db.setSingletonValue(VersionKey, localDatabaseAndEntityVersion))

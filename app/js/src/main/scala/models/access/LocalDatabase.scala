@@ -50,7 +50,7 @@ trait LocalDatabase {
   def save(): Future[Unit]
 
   /** Removes all data and resets its configuration. */
-  def clear(): Future[Unit]
+  def resetAndInitialize(): Future[Unit]
 }
 
 @visibleForTesting
@@ -215,8 +215,8 @@ object LocalDatabase {
       console.log("  Saving database done.")
     }
 
-    override def clear(): Future[Unit] = async {
-      console.log("  Clearing database...")
+    override def resetAndInitialize(): Future[Unit] = async {
+      console.log("  Resetting database...")
       await(
         webWorker.applyWriteOperations(
           (for (collectionName <- allCollectionNames)
@@ -230,7 +230,7 @@ object LocalDatabase {
             WriteOperation
               .AddCollection(singletonsCollectionName, uniqueIndices = Seq("id"), indices = Seq()) :+
             WriteOperation.SaveDatabase))
-      console.log("  Clearing database done.")
+      console.log("  Resetting database done.")
     }
 
     // **************** Private helper methods ****************//

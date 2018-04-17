@@ -32,7 +32,7 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
         await(db.addAll(Seq(testTransactionWithId)))
         await(db.isEmpty) ==> false
 
-        await(db.clear())
+        await(db.resetAndInitialize())
 
         await(db.isEmpty) ==> true
         await(db.setSingletonValue(NextUpdateTokenKey, testDate))
@@ -54,7 +54,7 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
     ManualTest("save") {
       async {
         val db = await(LocalDatabase.createStoredForTests(encryptionSecret))
-        await(db.clear())
+        await(db.resetAndInitialize())
         await(db.addAll(Seq(testTransactionWithId)))
         await(db.setSingletonValue(VersionKey, "testVersion"))
 
@@ -67,13 +67,13 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
         await(otherDb.getSingletonValue(VersionKey)).get ==> "testVersion"
       }
     },
-    ManualTest("clear") {
+    ManualTest("resetAndInitialize") {
       async {
         val db = await(LocalDatabase.createInMemoryForTests(encryptionSecret))
         await(db.addAll(Seq(testTransactionWithId)))
         db.setSingletonValue(VersionKey, "testVersion")
 
-        await(db.clear())
+        await(db.resetAndInitialize())
 
         await(db.isEmpty) ==> true
       }
