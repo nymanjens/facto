@@ -13,6 +13,7 @@ import tests.ManualTests.{ManualTest, ManualTestSuite}
 
 import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
+import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 
@@ -27,7 +28,7 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
   override def tests = Seq(
     ManualTest("isEmpty") {
       async {
-        val db = await(LocalDatabase.createInMemoryForTests(encryptionSecret))
+        val db = await(createAndInitializeDb())
         await(db.isEmpty) ==> true
         await(db.addAll(Seq(testTransactionWithId)))
         await(db.isEmpty) ==> false
@@ -41,7 +42,7 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
     },
     ManualTest("setSingletonValue") {
       async {
-        val db = await(LocalDatabase.createInMemoryForTests(encryptionSecret))
+        val db = await(createAndInitializeDb())
         await(db.getSingletonValue(VersionKey)).isDefined ==> false
 
         await(db.setSingletonValue(VersionKey, "abc"))
@@ -69,7 +70,7 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
     },
     ManualTest("resetAndInitialize") {
       async {
-        val db = await(LocalDatabase.createInMemoryForTests(encryptionSecret))
+        val db = await(createAndInitializeDb())
         await(db.addAll(Seq(testTransactionWithId)))
         db.setSingletonValue(VersionKey, "testVersion")
 
@@ -80,7 +81,7 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
     },
     ManualTest("addAll") {
       async {
-        val db = await(LocalDatabase.createInMemoryForTests(encryptionSecret))
+        val db = await(createAndInitializeDb())
         await(db.addAll(Seq(testUserRedacted)))
         await(db.addAll(Seq(testTransactionWithId)))
         await(db.addAll(Seq(testTransactionGroupWithId)))
@@ -99,7 +100,7 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
     },
     ManualTest("addAll: Inserts no duplicates IDs") {
       async {
-        val db = await(LocalDatabase.createInMemoryForTests(encryptionSecret))
+        val db = await(createAndInitializeDb())
         val transactionWithSameIdA = testTransactionWithId.copy(categoryCode = "codeA")
         val transactionWithSameIdB = testTransactionWithId.copy(categoryCode = "codeB")
         await(db.addAll(Seq(testTransactionWithId, transactionWithSameIdA)))
@@ -110,7 +111,7 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
     },
     ManualTest("applyModifications: Add") {
       async {
-        val db = await(LocalDatabase.createInMemoryForTests(encryptionSecret))
+        val db = await(createAndInitializeDb())
         val transaction1 = createTransaction()
 
         await(db.applyModifications(Seq(EntityModification.Add(transaction1)))) ==> true
@@ -120,7 +121,7 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
     },
     ManualTest("applyModifications: Update") {
       async {
-        val db = await(LocalDatabase.createInMemoryForTests(encryptionSecret))
+        val db = await(createAndInitializeDb())
         val transaction1 = createTransaction()
         val updatedTransaction1 = transaction1.copy(flowInCents = 19191)
         await(db.addAll(Seq(transaction1)))
@@ -132,7 +133,7 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
     },
     ManualTest("applyModifications: Delete") {
       async {
-        val db = await(LocalDatabase.createInMemoryForTests(encryptionSecret))
+        val db = await(createAndInitializeDb())
         val transaction1 = createTransaction()
         await(db.addAll(Seq(transaction1)))
 
@@ -143,7 +144,7 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
     },
     ManualTest("applyModifications: Add is idempotent") {
       async {
-        val db = await(LocalDatabase.createInMemoryForTests(encryptionSecret))
+        val db = await(createAndInitializeDb())
         val transaction1 = createTransaction()
         val updatedTransaction1 = transaction1.copy(flowInCents = 198237)
         val transaction2 = createTransaction()
@@ -164,7 +165,7 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
     },
     ManualTest("applyModifications: Update is idempotent") {
       async {
-        val db = await(LocalDatabase.createInMemoryForTests(encryptionSecret))
+        val db = await(createAndInitializeDb())
         val transaction1 = createTransaction()
         val updatedTransaction1 = transaction1.copy(flowInCents = 198237)
         val transaction2 = createTransaction()
@@ -183,7 +184,7 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
     },
     ManualTest("applyModifications: Delete is idempotent") {
       async {
-        val db = await(LocalDatabase.createInMemoryForTests(encryptionSecret))
+        val db = await(createAndInitializeDb())
         val transaction1 = createTransaction()
         val transaction2 = createTransaction()
         val transaction3 = createTransaction()
@@ -202,11 +203,17 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
     },
     ManualTest("applyModifications: Returns false if no change") {
       async {
-        val db = await(LocalDatabase.createInMemoryForTests(encryptionSecret))
+        val db = await(createAndInitializeDb())
         await(db.applyModifications(Seq(EntityModification.Add(testTransactionWithId)))) ==> true
 
         await(db.applyModifications(Seq(EntityModification.Add(testTransactionWithId)))) ==> false
       }
     }
   )
+
+  def createAndInitializeDb(): Future[LocalDatabase] = async {
+    val db = await(LocalDatabase.createInMemoryForTests(encryptionSecret))
+    await(db.resetAndInitialize())
+    db
+  }
 }
