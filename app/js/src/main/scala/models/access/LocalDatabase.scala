@@ -219,8 +219,9 @@ object LocalDatabase {
       console.log("  Resetting database...")
       await(
         webWorker.applyWriteOperations(
-          (for (collectionName <- allCollectionNames)
-            yield WriteOperation.RemoveCollection(collectionName)) ++
+          Seq() ++
+            (for (collectionName <- allCollectionNames)
+              yield WriteOperation.RemoveCollection(collectionName)) ++
             (for (entityType <- EntityType.values)
               yield
                 WriteOperation.AddCollection(
@@ -228,8 +229,7 @@ object LocalDatabase {
                   uniqueIndices = Seq("id"),
                   indices = secondaryIndices(entityType).map(_.name))) :+
             WriteOperation
-              .AddCollection(singletonsCollectionName, uniqueIndices = Seq("id"), indices = Seq()) :+
-            WriteOperation.SaveDatabase))
+              .AddCollection(singletonsCollectionName, uniqueIndices = Seq("id"), indices = Seq())))
       console.log("  Resetting database done.")
     }
 
