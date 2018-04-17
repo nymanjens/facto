@@ -33,9 +33,9 @@ object LocalDatabaseWebWorkerApi {
     case class Insert(collectionName: String, obj: js.Dictionary[js.Any]) extends WriteOperation
     case class Update(collectionName: String, updatedObj: js.Dictionary[js.Any]) extends WriteOperation
     case class Remove(collectionName: String, id: js.Any) extends WriteOperation
-    case class Clear(collectionName: String) extends WriteOperation
     case class AddCollection(collectionName: String, uniqueIndices: Seq[String], indices: Seq[String])
         extends WriteOperation
+    case class RemoveCollection(collectionName: String) extends WriteOperation
     case object SaveDatabase extends WriteOperation
   }
 

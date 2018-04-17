@@ -101,7 +101,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
           )
           Future.successful(true)
 
-        case Clear(collectionName) =>
+        case RemoveCollection(collectionName) =>
           lokiDb.removeCollection(collectionName)
           Future.successful(true)
 

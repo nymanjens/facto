@@ -219,7 +219,8 @@ object LocalDatabase {
       console.log("  Clearing database...")
       await(
         webWorker.applyWriteOperations(
-          (for (collectionName <- allCollectionNames) yield WriteOperation.Clear(collectionName)) ++
+          (for (collectionName <- allCollectionNames)
+            yield WriteOperation.RemoveCollection(collectionName)) ++
             (for (entityType <- EntityType.values)
               yield
                 WriteOperation.AddCollection(

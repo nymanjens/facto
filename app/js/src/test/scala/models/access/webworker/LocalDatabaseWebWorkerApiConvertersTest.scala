@@ -18,7 +18,7 @@ object LocalDatabaseWebWorkerApiConvertersTest extends TestSuite {
       "Insert" - { testForwardAndBackward[WriteOperation](WriteOperation.Insert("test", testObj)) }
       "Update" - { testForwardAndBackward[WriteOperation](WriteOperation.Update("test", testObj)) }
       "Remove" - { testForwardAndBackward[WriteOperation](WriteOperation.Remove("test", "192837")) }
-      "Clear" - { testForwardAndBackward[WriteOperation](WriteOperation.Clear("test")) }
+      "Clear" - { testForwardAndBackward[WriteOperation](WriteOperation.RemoveCollection("test")) }
       "AddCollection" - {
         testForwardAndBackward[WriteOperation](WriteOperation.AddCollection("test", Seq("id"), Seq("code")))
       }

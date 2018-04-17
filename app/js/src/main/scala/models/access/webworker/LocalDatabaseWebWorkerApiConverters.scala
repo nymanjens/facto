@@ -15,8 +15,8 @@ private[webworker] object LocalDatabaseWebWorkerApiConverters {
     private val insertNumber: Int = 1
     private val updateNumber: Int = 2
     private val removeNumber: Int = 3
-    private val clearNumber: Int = 4
-    private val addCollectionNumber: Int = 5
+    private val addCollectionNumber: Int = 4
+    private val removeCollectionNumber: Int = 5
     private val saveDatabaseNumber: Int = 6
 
     override def toJs(operation: WriteOperation) = {
@@ -24,10 +24,10 @@ private[webworker] object LocalDatabaseWebWorkerApiConverters {
         case Insert(collectionName, obj) => js.Array[js.Any](insertNumber, collectionName, obj)
         case Update(collectionName, obj) => js.Array[js.Any](updateNumber, collectionName, obj)
         case Remove(collectionName, id)  => js.Array[js.Any](removeNumber, collectionName, id)
-        case Clear(collectionName)       => js.Array[js.Any](clearNumber, collectionName)
         case AddCollection(collectionName, uniqueIndices, indices) =>
           js.Array[js.Any](addCollectionNumber, collectionName, uniqueIndices.toJSArray, indices.toJSArray)
-        case SaveDatabase => js.Array[js.Any](saveDatabaseNumber)
+        case RemoveCollection(collectionName) => js.Array[js.Any](removeCollectionNumber, collectionName)
+        case SaveDatabase                     => js.Array[js.Any](saveDatabaseNumber)
       }
     }
 
@@ -42,25 +42,20 @@ private[webworker] object LocalDatabaseWebWorkerApiConverters {
           Update(collectionName.asInstanceOf[String], obj.asInstanceOf[js.Dictionary[js.Any]])
         case (`removeNumber`, Seq(_, collectionName, id)) =>
           Remove(collectionName.asInstanceOf[String], id)
-        case (`clearNumber`, Seq(_, collectionName)) => Clear(collectionName.asInstanceOf[String])
         case (`addCollectionNumber`, Seq(_, collectionName, uniqueIndices, indices)) =>
           AddCollection(
             collectionName = collectionName.asInstanceOf[String],
             uniqueIndices = uniqueIndices.asInstanceOf[js.Array[String]].toVector,
             indices = indices.asInstanceOf[js.Array[String]].toVector
           )
+        case (`removeCollectionNumber`, Seq(_, collectionName)) =>
+          RemoveCollection(collectionName.asInstanceOf[String])
         case (`saveDatabaseNumber`, Seq(_)) => SaveDatabase
       }
     }
   }
 
   implicit object LokiQueryConverter extends Scala2Js.Converter[LokiQuery] {
-    private val insertNumber: Int = 1
-    private val updateNumber: Int = 2
-    private val removeNumber: Int = 3
-    private val clearNumber: Int = 4
-    private val saveDatabaseNumber: Int = 5
-
     override def toJs(query: LokiQuery) = {
       query match {
         case LokiQuery(collectionName, filter, sorting, limit) =>
