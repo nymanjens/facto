@@ -366,8 +366,18 @@ private[transactionviews] final class SummaryTable(
             }).toVdomArray
           },
           // **************** Total rows **************** //
-          ^^.ifThen(props.query.isEmpty) {
-            props.account.summaryTotalRows.zipWithIndex.map {
+          ^^.ifThen(props.query.isEmpty || data.categories.nonEmpty) {
+            {
+              props.query match {
+                case "" => props.account.summaryTotalRows
+                case _ if data.categories.nonEmpty =>
+                  Seq(
+                    SummaryTotalRowDef(
+                      rowTitleHtml = s"<b>${i18n("facto.total")}</b>",
+                      categoriesToIgnore = Set()))
+                case _ => Seq()
+              }
+            }.zipWithIndex.map {
               case (SummaryTotalRowDef(rowTitleHtml, categoriesToIgnore), rowIndex) =>
                 <.tr(
                   ^.key := s"total-$rowIndex",
@@ -417,14 +427,17 @@ private[transactionviews] final class SummaryTable(
         for (year <- yearRange.toSeq) {
           val summaryForYearStore =
             summaryForYearStoreFactory.get(account = props.account, year = year, query = props.query)
-          val exchangeRateGainsStore =
-            summaryExchangeRateGainsStoreFactory.get(account = props.account, year = year)
+          val exchangeRateGainsStore = props.query match {
+            case "" => Some(summaryExchangeRateGainsStoreFactory.get(account = props.account, year = year))
+            case _  => None
+          }
 
           dataBuilder.addYear(
             year,
             summaryForYearStore.state getOrElse SummaryForYear.empty,
-            exchangeRateGainsStore.state getOrElse GainsForYear.empty)
-          usedStores ++= Seq(summaryForYearStore, exchangeRateGainsStore)
+            exchangeRateGainsStore.flatMap(_.state) getOrElse GainsForYear.empty)
+          usedStores += summaryForYearStore
+          usedStores ++= exchangeRateGainsStore.toSeq
         }
         for (reservoir <- accountingConfig.visibleReservoirs) {
           if (reservoir.owner == props.account) {
