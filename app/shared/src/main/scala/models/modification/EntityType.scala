@@ -8,6 +8,7 @@ import models.user.User
 
 import scala.collection.immutable.Seq
 
+/** Enumeration of all entity types that are transfered between server and client. */
 sealed trait EntityType[E <: Entity] {
   type get = E
 

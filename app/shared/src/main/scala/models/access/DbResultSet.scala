@@ -11,6 +11,7 @@ import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
+/** Helper class that constructs and executes a `DbQuery` via a given `DbQueryExecutor`. */
 object DbResultSet {
   def fromExecutor[E <: Entity: EntityType](executor: DbQueryExecutor.Sync[E]): Sync[E] =
     new Sync[E](executor)

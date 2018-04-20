@@ -27,6 +27,7 @@ import scala.util.matching.Regex
 import scala2js.Converters._
 import scala2js.Scala2Js
 
+/** Client-side persistence layer. */
 @visibleForTesting
 trait LocalDatabase {
   // **************** Getters ****************//

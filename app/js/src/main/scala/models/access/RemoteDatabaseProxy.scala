@@ -8,6 +8,7 @@ import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala2js.Converters._
 
+/** Proxy for the server-side database. */
 trait RemoteDatabaseProxy {
   def queryExecutor[E <: Entity: EntityType](): DbQueryExecutor.Async[E]
 

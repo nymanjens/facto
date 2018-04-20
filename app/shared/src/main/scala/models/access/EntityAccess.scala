@@ -4,6 +4,7 @@ import models.Entity
 import models.modification.EntityType
 import models.user.User
 
+/** Central point of access to the storage layer. */
 trait EntityAccess {
 
   // **************** Getters ****************//

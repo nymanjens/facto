@@ -18,8 +18,10 @@ import models.user.User
 import scala.collection.SortedMap
 import scala.collection.immutable.Seq
 
+/** API for communication between client and server (clients calls server). */
 trait ScalaJsApi {
 
+  /** Returns most information needed to render the first page. */
   def getInitialData(): GetInitialDataResponse
 
   /** Returns a map, mapping the entity type to a sequence of all entities of that type. */
@@ -28,6 +30,7 @@ trait ScalaJsApi {
   /** Returns all modifications that happened after the given update token was returned, ordered from old to new. */
   def getEntityModifications(updateToken: UpdateToken): GetEntityModificationsResponse
 
+  /** Stores the given entity modifications. */
   def persistEntityModifications(modifications: Seq[EntityModification]): Unit
 
   def executeDataQuery(dbQuery: PicklableDbQuery): Seq[Entity]

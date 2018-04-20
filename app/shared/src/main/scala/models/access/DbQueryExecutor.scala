@@ -6,6 +6,7 @@ import models.modification.EntityType
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 
+/** Traits for classes that can take a `DbQuery` and return their result. */
 object DbQueryExecutor {
 
   trait Sync[E <: Entity] {

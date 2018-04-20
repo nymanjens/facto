@@ -10,6 +10,7 @@ import models.modification.EntityType
 import scala.collection.immutable.Seq
 import scala.math.Ordering.Implicits._
 
+/** Represents a simple database query in a portable way. */
 case class DbQuery[E <: Entity](filter: Filter[E], sorting: Option[Sorting[E]], limit: Option[Int])(
     implicit val entityType: EntityType[E])
 
