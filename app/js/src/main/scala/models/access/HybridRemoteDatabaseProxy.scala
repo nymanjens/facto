@@ -63,8 +63,8 @@ private[access] final class HybridRemoteDatabaseProxy(localDatabaseFuture: Futur
 
     if (localDatabaseOption.isDefined) {
       val localDatabase = localDatabaseOption.get
-      val somethingChanged = await(localDatabase.applyModifications(response.modifications))
-      if (somethingChanged) {
+      await(localDatabase.applyModifications(response.modifications))
+      if (response.modifications.nonEmpty) {
         await(localDatabase.setSingletonValue(NextUpdateTokenKey, response.nextUpdateToken))
         await(localDatabase.save())
       }
