@@ -6,7 +6,7 @@ package models
 trait Entity {
 
   /** Returns the Entity ID */
-  final def id: Long = idOption.get
+  final def id: Long = idOption.getOrElse(throw new IllegalStateException(s"This entity has no ID: $this"))
 
   /**
     * The Entity ID wrapped in an Option.

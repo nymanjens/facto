@@ -56,7 +56,11 @@ private[access] final class HybridRemoteDatabaseProxy(localDatabaseFuture: Futur
       case None => maybeUpdateToken getOrElse getInitialDataResponse.nextUpdateToken
       // Don't use given token because after the database is ready, we want to make sure to update
       // since the last update
-      case Some(localDatabase) => await(localDatabase.getSingletonValue(NextUpdateTokenKey).map(_.get))
+      case Some(localDatabase) =>
+        await(
+          localDatabase
+            .getSingletonValue(NextUpdateTokenKey)
+            .map(_.getOrElse(throw new IllegalStateException("NextUpdateTokenKey not found"))))
     }
 
     val response = await(apiClient.getEntityModifications(updateToken))
