@@ -33,13 +33,13 @@ private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
     DbResultSet.fromExecutor(new DbQueryExecutor.Async[E] {
       override def data(dbQuery: DbQuery[E]) = async {
         if (writeReadyFutures.nonEmpty) {
-          await(writeReadyFutures.lastOption.get)
+          await(writeReadyFutures.last)
         }
         await(remoteDatabaseProxy.queryExecutor[E]().data(dbQuery))
       }
       override def count(dbQuery: DbQuery[E]) = async {
         if (writeReadyFutures.nonEmpty) {
-          await(writeReadyFutures.lastOption.get)
+          await(writeReadyFutures.last)
         }
         await(remoteDatabaseProxy.queryExecutor[E]().count(dbQuery))
       }
