@@ -124,7 +124,9 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
   }
 
   private def getCollection(collectionName: String): LokiJs.Collection = {
-    lokiDb.getCollection(collectionName).get
+    lokiDb
+      .getCollection(collectionName)
+      .getOrElse(throw new IllegalArgumentException(s"Could not get collection $collectionName"))
   }
 }
 object LocalDatabaseWebWorkerApiImpl {
