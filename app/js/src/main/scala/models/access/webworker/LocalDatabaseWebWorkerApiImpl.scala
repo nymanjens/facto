@@ -2,8 +2,6 @@ package models.access.webworker
 
 import jsfacades.LokiJs.FilterFactory.Operation
 import jsfacades.{CryptoJs, LokiJs}
-import models.Entity
-import models.access.ModelField
 import models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
 import models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation._
 import org.scalajs.dom.console
@@ -38,24 +36,37 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
 
   override def executeDataQuery(
       lokiQuery: LocalDatabaseWebWorkerApi.LokiQuery): Future[Seq[js.Dictionary[js.Any]]] =
-    Future.successful(toResultSet(lokiQuery).data().toVector)
+    Future.successful(toResultSet(lokiQuery) match {
+      case Some(r) => r.data().toVector
+      case None    => Seq()
+    })
 
   override def executeCountQuery(lokiQuery: LocalDatabaseWebWorkerApi.LokiQuery): Future[Int] =
-    Future.successful(toResultSet(lokiQuery).count())
+    Future.successful(toResultSet(lokiQuery) match {
+      case Some(r) => r.count()
+      case None    => 0
+    })
 
-  private def toResultSet(lokiQuery: LocalDatabaseWebWorkerApi.LokiQuery): LokiJs.ResultSet = {
-    val lokiCollection = getCollection(lokiQuery.collectionName)
-    var resultSet = lokiCollection.chain()
-    for (filter <- lokiQuery.filter) {
-      resultSet = resultSet.find(filter)
+  private def toResultSet(lokiQuery: LocalDatabaseWebWorkerApi.LokiQuery): Option[LokiJs.ResultSet] = {
+    lokiDb.getCollection(lokiQuery.collectionName) match {
+      case None =>
+        console.log(
+          s"  Warning: Tried to query ${lokiQuery.collectionName}, but that collection doesn't exist")
+        None
+
+      case Some(lokiCollection) =>
+        var resultSet = lokiCollection.chain()
+        for (filter <- lokiQuery.filter) {
+          resultSet = resultSet.find(filter)
+        }
+        for (sorting <- lokiQuery.sorting) {
+          resultSet = resultSet.compoundsort(sorting)
+        }
+        for (limit <- lokiQuery.limit) {
+          resultSet = resultSet.limit(limit)
+        }
+        Some(resultSet)
     }
-    for (sorting <- lokiQuery.sorting) {
-      resultSet = resultSet.compoundsort(sorting)
-    }
-    for (limit <- lokiQuery.limit) {
-      resultSet = resultSet.limit(limit)
-    }
-    resultSet
   }
 
   override def applyWriteOperations(operations: Seq[WriteOperation]): Future[Boolean] = {
