@@ -12,7 +12,7 @@ object LoggingUtils {
       codeBlock
     } catch {
       case t: Throwable =>
-        console.log(s"  Caught exception:, $t")
+        console.log(s"  Caught exception: $t")
         t.printStackTrace()
         throw t
     }
