@@ -88,7 +88,7 @@ private[access] object HybridRemoteDatabaseProxy {
   private[access] def create(localDatabase: Future[LocalDatabase])(
       implicit apiClient: ScalaJsApiClient,
       getInitialDataResponse: GetInitialDataResponse): HybridRemoteDatabaseProxy = {
-    val dbFuture = try {
+    val dbFuture =
       async {
         val db = await(localDatabase)
         val populateIsNecessary = {
@@ -138,13 +138,13 @@ private[access] object HybridRemoteDatabaseProxy {
           db
         }
       }
-    } catch {
+    val safeDbFuture = dbFuture.recoverWith {
       case t: Throwable =>
-        console.log(s"  Could not create local databaes: $t")
+        console.log(s"  Could not create local database: $t")
         t.printStackTrace()
         Promise[LocalDatabase]().future
     }
-    new HybridRemoteDatabaseProxy(dbFuture)
+    new HybridRemoteDatabaseProxy(safeDbFuture)
   }
 
 }
