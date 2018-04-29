@@ -142,6 +142,7 @@ private[access] object HybridRemoteDatabaseProxy {
       case t: Throwable =>
         console.log(s"  Could not create local database: $t")
         t.printStackTrace()
+        // Fallback to infinitely running future so that API based lookup is always used as fallback
         Promise[LocalDatabase]().future
     }
     new HybridRemoteDatabaseProxy(safeDbFuture)
