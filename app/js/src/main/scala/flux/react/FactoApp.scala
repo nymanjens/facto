@@ -24,12 +24,8 @@ object FactoApp extends js.JSApp {
     // create stylesheet
     //GlobalStyles.addToDocument()
 
-    // Log all uncaught errors
-    dom.window.onerror = (event, url, lineNumber, _) => console.log("  Uncaught error:", event)
-    dom.window.addEventListener("error", (event: Event) => {
-      console.log("  Uncaught error:", event)
-      false
-    })
+    logUncaughtErrors()
+    setUpServiceWorker()
 
     val commonTimeModule = new common.time.Module
     implicit val clock = commonTimeModule.clock
@@ -43,6 +39,26 @@ object FactoApp extends js.JSApp {
     // tell React to render the router in the document body
     logExceptions {
       globalModule.router().renderIntoDOM(dom.document.getElementById("root"))
+    }
+  }
+
+  private def logUncaughtErrors(): Unit = {
+    dom.window.onerror = (event, url, lineNumber, _) => console.log("  Uncaught error:", event)
+    dom.window.addEventListener("error", (event: Event) => {
+      console.log("  Uncaught error:", event)
+      false
+    })
+  }
+
+  private def setUpServiceWorker(): Unit = logExceptions {
+    val navigator = js.Dynamic.global.navigator
+    if (!js.isUndefined(navigator.serviceWorker)) {
+      navigator.serviceWorker
+        .register("/assets/js/service-worker.js")
+        .`then`(
+          (registration: Any) => {},
+          (err: Any) => println(s"  Installation of service worker failed: ${err}")
+        )
     }
   }
 }
