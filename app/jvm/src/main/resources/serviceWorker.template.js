@@ -1,6 +1,7 @@
 var CACHE_NAME = 'facto-v1';
 var URLS_TO_CACHE = [
-  '/app/',
+  new Request('/app/', {credentials: 'same-origin'}),
+  new Request('/app/cashflow', {credentials: 'same-origin'}),
   '/assets/lib/bootstrap/css/bootstrap.min.css',
 ];
 
@@ -18,7 +19,7 @@ self.addEventListener('fetch', (event) =>
       .then((response) =>
         response ?
             response :
-            fetch(event.request, {credentials: 'include'})
+            fetch(event.request)
     )
   )
 );

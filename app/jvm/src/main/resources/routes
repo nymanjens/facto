@@ -8,6 +8,7 @@ GET  /manualtests/                     controllers.Application.manualTests
 GET  /app/                             controllers.Application.reactAppRoot
 GET  /app/*anyString                   controllers.Application.reactApp(anyString)
 GET  /localDatabaseWebWorker.js        controllers.Application.localDatabaseWebWorker
+GET  /serviceWorker.js                 controllers.Application.serviceWorker
 
 # External API
 GET  /externalapi/healthcheck/         controllers.ExternalApi.healthCheck

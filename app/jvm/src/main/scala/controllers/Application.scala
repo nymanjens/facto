@@ -13,6 +13,7 @@ import controllers.helpers.AuthenticatedAction
 import models.modification.EntityType
 import models.Entity
 import akka.stream.scaladsl._
+import common.ResourceFiles
 import models.access.{DbQuery, JvmEntityAccess}
 import models.modification.EntityModification
 import models.user.{User, Users}
@@ -93,10 +94,15 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
     val clientScript = scriptPathFromNames(s"$projectName-opt.js", s"$projectName-fastopt.js")
 
     Ok(s"""
-        |importScripts("$depsScript");
-        |importScripts("$clientScript");
-        |LocalDatabaseWebWorkerScript.run();
-      """.stripMargin)
+          |importScripts("$depsScript");
+          |importScripts("$clientScript");
+          |LocalDatabaseWebWorkerScript.run();
+      """.stripMargin).as("application/javascript")
+  }
+
+  def serviceWorker = AuthenticatedAction { implicit user => implicit request =>
+    val jsFileContent = ResourceFiles.read("/serviceWorker.template.js")
+    Ok(jsFileContent).as("application/javascript")
   }
 
   // Note: This action manually implements what autowire normally does automatically. Unfortunately, autowire

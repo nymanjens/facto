@@ -54,7 +54,7 @@ object FactoApp extends js.JSApp {
     val navigator = js.Dynamic.global.navigator
     if (!js.isUndefined(navigator.serviceWorker)) {
       navigator.serviceWorker
-        .register("/assets/js/service-worker.js")
+        .register("/serviceWorker.js")
         .`then`(
           (registration: Any) => {},
           (err: Any) => println(s"  Installation of service worker failed: ${err}")
