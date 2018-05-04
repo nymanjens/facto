@@ -85,21 +85,9 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
   }
 
   def localDatabaseWebWorker = Action { implicit request =>
-    def scriptPathFromNames(filenames: String*): String = {
-      val filename =
-        filenames
-          .find(name => getClass.getResource(s"/public/$name") != null)
-          .get
-      routes.Assets.versioned(filename).toString
-    }
-    var depsProjectName = "webworker-client-deps"
-    val depsScript = scriptPathFromNames(s"$depsProjectName-jsdeps.min.js", s"$depsProjectName-jsdeps.js")
-    val projectName = "client"
-    val clientScript = scriptPathFromNames(s"$projectName-opt.js", s"$projectName-fastopt.js")
-
     Ok(s"""
-          |importScripts("$depsScript");
-          |importScripts("$clientScript");
+          |importScripts("${Application.Assets.webworkerDeps}");
+          |importScripts("${Application.Assets.factoAppClient}");
           |LocalDatabaseWebWorkerScript.run();
       """.stripMargin).as("application/javascript")
   }
@@ -155,6 +143,27 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
 }
 
 object Application {
+  // ********** assets ********** //
+  private object Assets {
+    private val factoAppProjectName: String = "client"
+    private val webworkerDepsProjectName: String = "webworker-client-deps"
+
+    val factoAppClient: String =
+      scriptPathFromNames(s"$factoAppProjectName-opt.js", s"$factoAppProjectName-fastopt.js")
+    val factoAppDeps: String =
+      scriptPathFromNames(s"$factoAppProjectName-jsdeps.min.js", s"$factoAppProjectName-jsdeps.js")
+    val webworkerDeps: String =
+      scriptPathFromNames(s"$webworkerDepsProjectName-jsdeps.min.js", s"$webworkerDepsProjectName-jsdeps.js")
+
+    private def scriptPathFromNames(filenames: String*): String = {
+      val filename =
+        filenames
+          .find(name => getClass.getResource(s"/public/$name") != null)
+          .get
+      routes.Assets.versioned(filename).toString
+    }
+  }
+
   // ********** forms ********** //
   object Forms {
 
