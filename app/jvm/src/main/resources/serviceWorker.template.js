@@ -1,12 +1,12 @@
 const CACHE_NAME = 'facto-v2';
-const ROOT_URL = new Request("/").url;
+const ROOT_URL = new Request('/').url;
 const APP_PAGE_PATH = '/appwithoutcreds/';
 const SCRIPT_PATHS_TO_CACHE = [
-  '/assets/lib/bootstrap/css/bootstrap.min.css',
+  %SCRIPT_PATHS_TO_CACHE%
 ];
 
 self.addEventListener('install', (event) => {
-  console.log("  Installing service worker for cache", CACHE_NAME);
+  console.log('  Installing service worker for cache', CACHE_NAME);
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
@@ -19,7 +19,7 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if(event.request.url.startsWith(ROOT_URL + 'app/')) {
-    console.log("  Fetching app at", event.request.url)
+    console.log('  Fetching app at', event.request.url)
     // Check whether we are still logged in
     // If we are offline, return the cached app page.
     event.respondWith(
@@ -35,7 +35,7 @@ self.addEventListener('fetch', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
-  console.log("  Activating service worker for cache", CACHE_NAME);
+  console.log('  Activating service worker for cache', CACHE_NAME);
   event.waitUntil(
     caches.keys().then((cacheNames) =>
       Promise.all(
