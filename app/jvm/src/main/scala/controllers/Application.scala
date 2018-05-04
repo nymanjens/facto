@@ -93,7 +93,9 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
   }
 
   def serviceWorker = Action { implicit request =>
-    val jsFileContent = ResourceFiles.read("/serviceWorker.template.js")
+    val jsFileTemplate = ResourceFiles.read("/serviceWorker.template.js")
+    val scriptPathsJs = Application.Assets.all.map(asset => s"'$asset'").mkString(", ")
+    val jsFileContent = jsFileTemplate.replace("%SCRIPT_PATHS_TO_CACHE%", scriptPathsJs)
     Ok(jsFileContent).as("application/javascript")
   }
 
@@ -143,7 +145,6 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
 }
 
 object Application {
-  // ********** assets ********** //
   private object Assets {
     private val factoAppProjectName: String = "client"
     private val webworkerDepsProjectName: String = "webworker-client-deps"
@@ -155,6 +156,20 @@ object Application {
     val webworkerDeps: String =
       scriptPathFromNames(s"$webworkerDepsProjectName-jsdeps.min.js", s"$webworkerDepsProjectName-jsdeps.js")
 
+    val all = Seq(
+      factoAppClient,
+      factoAppDeps,
+      webworkerDeps,
+      routes.Assets.versioned("images/favicon.png"),
+      routes.Assets.versioned("lib/bootstrap/css/bootstrap.min.css"),
+      routes.WebJarAssets.at("metisMenu/1.1.3/metisMenu.min.css"),
+      routes.WebJarAssets.at("font-awesome/4.6.2/css/font-awesome.min.css"),
+      routes.Assets.versioned("lib/fontello/css/fontello.css"),
+      routes.Assets.versioned("bower_components/startbootstrap-sb-admin-2/dist/css/sb-admin-2.css"),
+      routes.Assets.versioned("stylesheets/main.min.css"),
+      routes.Assets.versioned("bower_components/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js")
+    )
+
     private def scriptPathFromNames(filenames: String*): String = {
       val filename =
         filenames
@@ -164,7 +179,6 @@ object Application {
     }
   }
 
-  // ********** forms ********** //
   object Forms {
 
     case class ChangePasswordData(loginName: String,
