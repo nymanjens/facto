@@ -80,7 +80,11 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
   }
   def reactApp(anyString: String) = reactAppRoot
 
-  def localDatabaseWebWorker = AuthenticatedAction { implicit user => implicit request =>
+  def reactAppWithoutCredentials = Action { implicit request =>
+    Ok(views.html.reactApp())
+  }
+
+  def localDatabaseWebWorker = Action { implicit request =>
     def scriptPathFromNames(filenames: String*): String = {
       val filename =
         filenames
@@ -100,7 +104,7 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
       """.stripMargin).as("application/javascript")
   }
 
-  def serviceWorker = AuthenticatedAction { implicit user => implicit request =>
+  def serviceWorker = Action { implicit request =>
     val jsFileContent = ResourceFiles.read("/serviceWorker.template.js")
     Ok(jsFileContent).as("application/javascript")
   }

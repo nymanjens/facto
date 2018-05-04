@@ -7,6 +7,7 @@ GET  /                                 controllers.Application.index
 GET  /manualtests/                     controllers.Application.manualTests
 GET  /app/                             controllers.Application.reactAppRoot
 GET  /app/*anyString                   controllers.Application.reactApp(anyString)
+GET  /appwithoutcreds/                 controllers.Application.reactAppWithoutCredentials
 GET  /localDatabaseWebWorker.js        controllers.Application.localDatabaseWebWorker
 GET  /serviceWorker.js                 controllers.Application.serviceWorker
 
