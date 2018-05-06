@@ -156,18 +156,23 @@ object Application {
     val webworkerDeps: String =
       scriptPathFromNames(s"$webworkerDepsProjectName-jsdeps.min.js", s"$webworkerDepsProjectName-jsdeps.js")
 
-    val all = Seq(
+    val all: Seq[String] = Seq(
       factoAppClient,
       factoAppDeps,
       webworkerDeps,
-      routes.Assets.versioned("images/favicon.png"),
-      routes.Assets.versioned("lib/bootstrap/css/bootstrap.min.css"),
-      routes.WebJarAssets.at("metisMenu/1.1.3/metisMenu.min.css"),
-      routes.WebJarAssets.at("font-awesome/4.6.2/css/font-awesome.min.css"),
-      routes.Assets.versioned("lib/fontello/css/fontello.css"),
-      routes.Assets.versioned("bower_components/startbootstrap-sb-admin-2/dist/css/sb-admin-2.css"),
-      routes.Assets.versioned("stylesheets/main.min.css"),
-      routes.Assets.versioned("bower_components/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js")
+      routes.WebJarAssets.at("metisMenu/1.1.3/metisMenu.min.css").path(),
+      routes.WebJarAssets.at("font-awesome/4.6.2/css/font-awesome.min.css").path(),
+      routes.WebJarAssets.at("font-awesome/4.6.2/fonts/fontawesome-webfont.woff2?v=4.6.2").path(),
+      routes.WebJarAssets.at("font-awesome/4.6.2/fonts/fontawesome-webfont.woff?v=4.6.2 0").path(),
+      routes.WebJarAssets.at("font-awesome/4.6.2/fonts/fontawesome-webfont.ttf?v=4.6.2").path(),
+      routes.Assets.versioned("images/favicon.png").path(),
+      routes.Assets.versioned("lib/bootstrap/css/bootstrap.min.css").path(),
+      routes.Assets.versioned("lib/fontello/css/fontello.css").path(),
+      "/assets/lib/fontello/font/fontello.woff2?49985636",
+      routes.Assets.versioned("bower_components/startbootstrap-sb-admin-2/dist/css/sb-admin-2.css").path(),
+      routes.Assets.versioned("stylesheets/main.min.css").path(),
+      routes.Assets.versioned("bower_components/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js").path(),
+      routes.Application.localDatabaseWebWorker.path()
     )
 
     private def scriptPathFromNames(filenames: String*): String = {
@@ -175,7 +180,7 @@ object Application {
         filenames
           .find(name => getClass.getResource(s"/public/$name") != null)
           .get
-      routes.Assets.versioned(filename).toString
+      routes.Assets.versioned(filename).path()
     }
   }
 
