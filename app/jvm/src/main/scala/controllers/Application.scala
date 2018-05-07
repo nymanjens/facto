@@ -165,7 +165,7 @@ object Application {
       routes.WebJarAssets.at("font-awesome/4.6.2/fonts/fontawesome-webfont.woff2?v=4.6.2").path(),
       routes.WebJarAssets.at("font-awesome/4.6.2/fonts/fontawesome-webfont.woff?v=4.6.2 0").path(),
       routes.WebJarAssets.at("font-awesome/4.6.2/fonts/fontawesome-webfont.ttf?v=4.6.2").path(),
-      routes.Assets.versioned("images/favicon.png").path(),
+      routes.Assets.versioned("images/favicon192x192.png").path(),
       routes.Assets.versioned("lib/bootstrap/css/bootstrap.min.css").path(),
       routes.Assets.versioned("lib/fontello/css/fontello.css").path(),
       "/assets/lib/fontello/font/fontello.woff2?49985636",
