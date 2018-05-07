@@ -34,7 +34,7 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
     extends AbstractController(components)
     with I18nSupport {
 
-  // ********** actions ********** //
+  // ********** actions: HTTP pages ********** //
   def index() = AuthenticatedAction { implicit user => implicit request =>
     Redirect(controllers.routes.Application.reactAppRoot())
   }
@@ -84,6 +84,11 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
     Ok(views.html.reactApp())
   }
 
+  def manualTests() = AuthenticatedAction { implicit user => implicit request =>
+    Ok(views.html.manualTests())
+  }
+
+  // ********** actions: JS files ********** //
   def localDatabaseWebWorker = Action { implicit request =>
     Ok(s"""
           |importScripts("${Application.Assets.webworkerDeps}");
@@ -99,48 +104,54 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
     Ok(jsFileContent).as("application/javascript")
   }
 
+  // ********** actions: Scala JS API backend ********** //
   // Note: This action manually implements what autowire normally does automatically. Unfortunately, autowire
   // doesn't seem to work for some reason.
+  def scalaJsApi(path: String) = AuthenticatedAction(parse.raw) { implicit user => implicit request =>
+    val requestBuffer: ByteBuffer = request.body.asBytes(parse.UNLIMITED).get.asByteBuffer
+    val argsMap = Unpickle[Map[String, ByteBuffer]].fromBytes(requestBuffer)
+
+    val bytes = doScalaJsApiCall(path, argsMap)
+    Ok(bytes)
+  }
+
   def scalaJsApiWebSocket = WebSocket.accept[Array[Byte], Array[Byte]] { request =>
     implicit val user = AuthenticatedAction.requireAuthenticatedUser(request)
 
-    // Get the scalaJsApiServer
-    val scalaJsApiServer = scalaJsApiServerFactory.create()
-
-    // log the message to stdout and send response back to client
     Flow[Array[Byte]].map { requestBytes =>
-      // get the request body as ByteBuffer
       val request = Unpickle[ScalaJsApiRequest].fromBytes(ByteBuffer.wrap(requestBytes))
 
-      val responseBuffer = request.path match {
-        case "getInitialData" =>
-          Pickle.intoBytes(scalaJsApiServer.getInitialData())
-        case "getAllEntities" =>
-          val types = Unpickle[Seq[EntityType.any]].fromBytes(request.args("types"))
-          Pickle.intoBytes(scalaJsApiServer.getAllEntities(types))
-        case "getEntityModifications" =>
-          val updateToken = Unpickle[UpdateToken].fromBytes(request.args("updateToken"))
-          Pickle.intoBytes(scalaJsApiServer.getEntityModifications(updateToken))
-        case "persistEntityModifications" =>
-          val modifications = Unpickle[Seq[EntityModification]].fromBytes(request.args("modifications"))
-          Pickle.intoBytes(scalaJsApiServer.persistEntityModifications(modifications))
-        case "executeDataQuery" =>
-          val dbQuery = Unpickle[PicklableDbQuery].fromBytes(request.args("dbQuery"))
-          Pickle.intoBytes[Seq[Entity]](scalaJsApiServer.executeDataQuery(dbQuery))
-        case "executeCountQuery" =>
-          val dbQuery = Unpickle[PicklableDbQuery].fromBytes(request.args("dbQuery"))
-          Pickle.intoBytes(scalaJsApiServer.executeCountQuery(dbQuery))
-      }
-
-      // Serialize response in HTTP response
-      val data = Array.ofDim[Byte](responseBuffer.remaining())
-      responseBuffer.get(data)
-      data
+      doScalaJsApiCall(request.path, request.args)
     }
   }
 
-  def manualTests() = AuthenticatedAction { implicit user => implicit request =>
-    Ok(views.html.manualTests())
+  private def doScalaJsApiCall(path: String, argsMap: Map[String, ByteBuffer])(
+      implicit user: User): Array[Byte] = {
+    val scalaJsApiServer = scalaJsApiServerFactory.create()
+
+    val responseBuffer = path match {
+      case "getInitialData" =>
+        Pickle.intoBytes(scalaJsApiServer.getInitialData())
+      case "getAllEntities" =>
+        val types = Unpickle[Seq[EntityType.any]].fromBytes(argsMap("types"))
+        Pickle.intoBytes(scalaJsApiServer.getAllEntities(types))
+      case "getEntityModifications" =>
+        val updateToken = Unpickle[UpdateToken].fromBytes(argsMap("updateToken"))
+        Pickle.intoBytes(scalaJsApiServer.getEntityModifications(updateToken))
+      case "persistEntityModifications" =>
+        val modifications = Unpickle[Seq[EntityModification]].fromBytes(argsMap("modifications"))
+        Pickle.intoBytes(scalaJsApiServer.persistEntityModifications(modifications))
+      case "executeDataQuery" =>
+        val dbQuery = Unpickle[PicklableDbQuery].fromBytes(argsMap("dbQuery"))
+        Pickle.intoBytes[Seq[Entity]](scalaJsApiServer.executeDataQuery(dbQuery))
+      case "executeCountQuery" =>
+        val dbQuery = Unpickle[PicklableDbQuery].fromBytes(argsMap("dbQuery"))
+        Pickle.intoBytes(scalaJsApiServer.executeCountQuery(dbQuery))
+    }
+
+    val data: Array[Byte] = Array.ofDim[Byte](responseBuffer.remaining())
+    responseBuffer.get(data)
+    data
   }
 }
 
