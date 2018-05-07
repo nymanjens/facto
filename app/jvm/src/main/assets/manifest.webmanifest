@@ -1,0 +1,14 @@
+{
+  "name": "Facto",
+  "short_name": "Facto",
+  "start_url": "/app/templatelist",
+  "display": "standalone",
+  "background_color": "#fff",
+  "theme_color": "#f8f8f8",
+  "description": "Family Accounting Tool",
+  "icons": [{
+    "src": "images/favicon.png",
+    "sizes": "48x48 72x72 96x96 144x144 168x168 192x192 512x512",
+    "type": "image/png"
+  }]
+}
