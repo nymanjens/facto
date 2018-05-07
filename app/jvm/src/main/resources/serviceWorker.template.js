@@ -1,4 +1,4 @@
-const CACHE_NAME = 'facto-v2';
+const CACHE_NAME = 'facto-v3';
 const ROOT_URL = new Request('/').url.slice(0, -1);
 const APP_PAGE_PATH = '/appwithoutcreds/';
 const GET_INITIAL_DATA_PATH = '/scalajsapi/getInitialData';
@@ -26,7 +26,12 @@ self.addEventListener('fetch', (event) => {
     // cached app page.
     console.log('  Fetch or cache:', event.request.url)
     event.respondWith(
-      fetch(event.request).catch(() => caches.match(APP_PAGE_PATH))
+      fetch(event.request)
+          .catch(e => {
+            console.log(
+                `Caught exception while fetching ${event.request.url}`, e);
+            return caches.match(APP_PAGE_PATH);
+          })
     );
   } else if(event.request.url == ROOT_URL + GET_INITIAL_DATA_PATH) {
     // Initial data may change, e.g. when logging in. If we are oflfine, return
@@ -35,10 +40,16 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(event.request)
           .then(response =>
-            cache
-                .put(event.request, response.clone())
-                .then(() => reponse))
-          .catch(() => caches.match(APP_PAGE_PATH))
+              caches.open(CACHE_NAME)
+                .then((cache) =>
+                    cache
+                        .put(event.request, response.clone())
+                        .then(() => response)))
+          .catch(e => {
+            console.log(
+                `Caught exception while fetching ${event.request.url}`, e);
+            return caches.match(event.request);
+          })
     );
   } else {
     event.respondWith(
