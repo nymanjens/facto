@@ -37,7 +37,7 @@ object ScalaJsApiClient {
   final class Impl extends ScalaJsApiClient {
 
     override def getInitialData() = {
-      HttpAutowireClient[ScalaJsApi].getInitialData().call()
+      HttpGetAutowireClient[ScalaJsApi].getInitialData().call()
     }
 
     override def getAllEntities(types: Seq[EntityType.any]) = {
@@ -49,7 +49,7 @@ object ScalaJsApiClient {
     }
 
     override def persistEntityModifications(modifications: Seq[EntityModification]) = {
-      HttpAutowireClient[ScalaJsApi].persistEntityModifications(modifications).call()
+      HttpPostAutowireClient[ScalaJsApi].persistEntityModifications(modifications).call()
     }
 
     override def executeDataQuery[E <: Entity](dbQuery: DbQuery[E]) = {
@@ -65,12 +65,28 @@ object ScalaJsApiClient {
       WebsocketAutowireClient[ScalaJsApi].executeCountQuery(picklableDbQuery).call()
     }
 
-    private object HttpAutowireClient extends autowire.Client[ByteBuffer, Pickler, Pickler] {
+    private object HttpPostAutowireClient extends autowire.Client[ByteBuffer, Pickler, Pickler] {
       override def doCall(req: Request): Future[ByteBuffer] = {
         dom.ext.Ajax
           .post(
             url = "/scalajsapi/" + req.path.last,
             data = Pickle.intoBytes(req.args),
+            responseType = "arraybuffer",
+            headers = Map("Content-Type" -> "application/octet-stream")
+          )
+          .map(r => TypedArrayBuffer.wrap(r.response.asInstanceOf[ArrayBuffer]))
+      }
+
+      override def read[Result: Pickler](p: ByteBuffer) = Unpickle[Result].fromBytes(p)
+      override def write[Result: Pickler](r: Result) = Pickle.intoBytes(r)
+    }
+
+    private object HttpGetAutowireClient extends autowire.Client[ByteBuffer, Pickler, Pickler] {
+      override def doCall(req: Request): Future[ByteBuffer] = {
+        require(req.args.isEmpty)
+        dom.ext.Ajax
+          .get(
+            url = "/scalajsapi/" + req.path.last,
             responseType = "arraybuffer",
             headers = Map("Content-Type" -> "application/octet-stream")
           )

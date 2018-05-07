@@ -105,13 +105,16 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
   }
 
   // ********** actions: Scala JS API backend ********** //
-  // Note: This action manually implements what autowire normally does automatically. Unfortunately, autowire
-  // doesn't seem to work for some reason.
-  def scalaJsApi(path: String) = AuthenticatedAction(parse.raw) { implicit user => implicit request =>
+  def scalaJsApiPost(path: String) = AuthenticatedAction(parse.raw) { implicit user => implicit request =>
     val requestBuffer: ByteBuffer = request.body.asBytes(parse.UNLIMITED).get.asByteBuffer
     val argsMap = Unpickle[Map[String, ByteBuffer]].fromBytes(requestBuffer)
 
     val bytes = doScalaJsApiCall(path, argsMap)
+    Ok(bytes)
+  }
+
+  def scalaJsApiGet(path: String) = AuthenticatedAction(parse.raw) { implicit user => implicit request =>
+    val bytes = doScalaJsApiCall(path, argsMap = Map())
     Ok(bytes)
   }
 
@@ -125,6 +128,8 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
     }
   }
 
+  // Note: This action manually implements what autowire normally does automatically. Unfortunately, autowire
+  // doesn't seem to work for some reason.
   private def doScalaJsApiCall(path: String, argsMap: Map[String, ByteBuffer])(
       implicit user: User): Array[Byte] = {
     val scalaJsApiServer = scalaJsApiServerFactory.create()

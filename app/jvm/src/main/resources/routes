@@ -28,7 +28,8 @@ GET   /administration/                 controllers.Application.administration
 POST  /profile/adduser/                controllers.Application.addUser
 
 # Autowire calls
-POST /scalajsapi/*path                 controllers.Application.scalaJsApi(path: String)
+POST /scalajsapi/*path                 controllers.Application.scalaJsApiPost(path: String)
+GET  /scalajsapi/*path                 controllers.Application.scalaJsApiGet(path: String)
 GET  /websocket/scalajsapi/            controllers.Application.scalaJsApiWebSocket
 
 # Map static resources from the /public folder to the /assets URL path
