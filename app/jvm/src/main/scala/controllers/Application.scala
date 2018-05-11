@@ -89,20 +89,21 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
   }
 
   // ********** actions: JS files ********** //
-  def localDatabaseWebWorker = Action { implicit request =>
+  private lazy val localDatabaseWebWorkerResult: Result =
     Ok(s"""
           |importScripts("${Application.Assets.webworkerDeps}");
           |importScripts("${Application.Assets.factoAppClient}");
           |LocalDatabaseWebWorkerScript.run();
       """.stripMargin).as("application/javascript")
-  }
+  def localDatabaseWebWorker = Action(_ => localDatabaseWebWorkerResult)
 
-  def serviceWorker = Action { implicit request =>
+  private lazy val serviceWorkerResult: Result = {
     val jsFileTemplate = ResourceFiles.read("/serviceWorker.template.js")
     val scriptPathsJs = Application.Assets.all.map(asset => s"'$asset'").mkString(", ")
     val jsFileContent = jsFileTemplate.replace("%SCRIPT_PATHS_TO_CACHE%", scriptPathsJs)
     Ok(jsFileContent).as("application/javascript")
   }
+  def serviceWorker = Action(_ => serviceWorkerResult)
 
   // ********** actions: Scala JS API backend ********** //
   def scalaJsApiPost(path: String) = AuthenticatedAction(parse.raw) { implicit user => implicit request =>
