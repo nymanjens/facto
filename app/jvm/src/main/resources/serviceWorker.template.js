@@ -16,7 +16,7 @@ self.addEventListener('install', (event) => {
             new Request(GET_INITIAL_DATA_PATH, {credentials: 'same-origin'}));
         cache.addAll(SCRIPT_PATHS_TO_CACHE);
       })
-  )
+  );
 });
 
 
@@ -24,7 +24,7 @@ self.addEventListener('fetch', (event) => {
   if(event.request.url.startsWith(ROOT_URL + '/app/')) {
     // Check whether we are still logged in. If we are offline, return the
     // cached app page.
-    console.log('  Fetch or cache:', event.request.url)
+    console.log('  Fetch or cache:', event.request.url);
     event.respondWith(
       fetch(event.request)
           .catch(e => {
@@ -36,7 +36,7 @@ self.addEventListener('fetch', (event) => {
   } else if(event.request.url == ROOT_URL + GET_INITIAL_DATA_PATH) {
     // Initial data may change, e.g. when logging in. If we are oflfine, return
     // the cached values.
-    console.log('  (Fetch and cache) or cache:', event.request.url)
+    console.log('  (Fetch and cache) or cache:', event.request.url);
     event.respondWith(
       fetch(event.request)
           .then(response =>
@@ -56,7 +56,7 @@ self.addEventListener('fetch', (event) => {
       caches.match(event.request)
         .then((response) => response ? response : fetch(event.request)
       )
-    )
+    );
   }
 });
 
@@ -70,5 +70,5 @@ self.addEventListener('activate', (event) => {
           .map((cacheName) => caches.delete(cacheName))
       )
     )
-  )
+  );
 });
