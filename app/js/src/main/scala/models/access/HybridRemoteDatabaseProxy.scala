@@ -29,8 +29,31 @@ private[access] final class HybridRemoteDatabaseProxy(localDatabaseFuture: Futur
     localDatabaseOption match {
       case None =>
         new DbQueryExecutor.Async[E] {
-          override def data(dbQuery: DbQuery[E]) = apiClient.executeDataQuery(dbQuery)
-          override def count(dbQuery: DbQuery[E]) = apiClient.executeCountQuery(dbQuery)
+          override def data(dbQuery: DbQuery[E]) =
+            hybridCall(
+              apiClientCall = apiClient.executeDataQuery(dbQuery),
+              localDatabaseCall = _.queryExecutor().data(dbQuery))
+          override def count(dbQuery: DbQuery[E]) =
+            hybridCall(
+              apiClientCall = apiClient.executeCountQuery(dbQuery),
+              localDatabaseCall = _.queryExecutor().count(dbQuery))
+
+          private def hybridCall[R](apiClientCall: => Future[R],
+                                    localDatabaseCall: LocalDatabase => Future[R]): Future[R] = {
+            val resultPromise = Promise[R]()
+
+            for (seq <- apiClientCall) {
+              resultPromise.trySuccess(seq)
+            }
+
+            for {
+              localDatabase <- localDatabaseFuture
+              if !resultPromise.isCompleted
+              seq <- localDatabaseCall(localDatabase)
+            } resultPromise.trySuccess(seq)
+
+            resultPromise.future
+          }
         }
       case Some(localDatabase) => localDatabase.queryExecutor()
     }
