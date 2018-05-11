@@ -3,7 +3,7 @@ const ROOT_URL = new Request('/').url.slice(0, -1);
 const APP_PAGE_PATH = '/appwithoutcreds/';
 const GET_INITIAL_DATA_PATH = '/scalajsapi/getInitialData';
 const SCRIPT_PATHS_TO_CACHE = [
-  %SCRIPT_PATHS_TO_CACHE%
+  $SCRIPT_PATHS_TO_CACHE$
 ];
 
 self.addEventListener('install', (event) => {

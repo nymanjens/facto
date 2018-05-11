@@ -100,7 +100,7 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
   private lazy val serviceWorkerResult: Result = {
     val jsFileTemplate = ResourceFiles.read("/serviceWorker.template.js")
     val scriptPathsJs = Application.Assets.all.map(asset => s"'$asset'").mkString(", ")
-    val jsFileContent = jsFileTemplate.replace("%SCRIPT_PATHS_TO_CACHE%", scriptPathsJs)
+    val jsFileContent = jsFileTemplate.replace("$SCRIPT_PATHS_TO_CACHE$", scriptPathsJs)
     Ok(jsFileContent).as("application/javascript")
   }
   def serviceWorker = Action(_ => serviceWorkerResult)
