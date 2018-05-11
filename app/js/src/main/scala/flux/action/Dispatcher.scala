@@ -47,9 +47,9 @@ object Dispatcher {
       require(!isDispatching, s"Dispatch triggered action $action")
 
       async {
-        console.log(s"  Dispatcher: Dispatching action ${action.getClass.getSimpleName}")
+        // console.log(s"  Dispatcher: Dispatching action ${action.getClass.getSimpleName}")
         await(invokeCallbacks(action))
-        console.log(s"  Dispatcher: Dispatching action Action.Done(${action.getClass.getSimpleName})")
+        // console.log(s"  Dispatcher: Dispatching action Action.Done(${action.getClass.getSimpleName})")
         await(invokeCallbacks(Action.Done(action)))
       }
     }

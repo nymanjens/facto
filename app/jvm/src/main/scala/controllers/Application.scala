@@ -13,6 +13,7 @@ import controllers.helpers.AuthenticatedAction
 import models.modification.EntityType
 import models.Entity
 import akka.stream.scaladsl._
+import common.ResourceFiles
 import models.access.{DbQuery, JvmEntityAccess}
 import models.modification.EntityModification
 import models.user.{User, Users}
@@ -33,7 +34,7 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
     extends AbstractController(components)
     with I18nSupport {
 
-  // ********** actions ********** //
+  // ********** actions: HTTP pages ********** //
   def index() = AuthenticatedAction { implicit user => implicit request =>
     Redirect(controllers.routes.Application.reactAppRoot())
   }
@@ -79,73 +80,127 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
   }
   def reactApp(anyString: String) = reactAppRoot
 
-  def localDatabaseWebWorker = AuthenticatedAction { implicit user => implicit request =>
-    def scriptPathFromNames(filenames: String*): String = {
-      val filename =
-        filenames
-          .find(name => getClass.getResource(s"/public/$name") != null)
-          .get
-      routes.Assets.versioned(filename).toString
-    }
-    var depsProjectName = "webworker-client-deps"
-    val depsScript = scriptPathFromNames(s"$depsProjectName-jsdeps.min.js", s"$depsProjectName-jsdeps.js")
-    val projectName = "client"
-    val clientScript = scriptPathFromNames(s"$projectName-opt.js", s"$projectName-fastopt.js")
-
-    Ok(s"""
-        |importScripts("$depsScript");
-        |importScripts("$clientScript");
-        |LocalDatabaseWebWorkerScript.run();
-      """.stripMargin)
-  }
-
-  // Note: This action manually implements what autowire normally does automatically. Unfortunately, autowire
-  // doesn't seem to work for some reason.
-  def scalaJsApiWebSocket = WebSocket.accept[Array[Byte], Array[Byte]] { request =>
-    implicit val user = AuthenticatedAction.requireAuthenticatedUser(request)
-
-    // Get the scalaJsApiServer
-    val scalaJsApiServer = scalaJsApiServerFactory.create()
-
-    // log the message to stdout and send response back to client
-    Flow[Array[Byte]].map { requestBytes =>
-      // get the request body as ByteBuffer
-      val request = Unpickle[ScalaJsApiRequest].fromBytes(ByteBuffer.wrap(requestBytes))
-
-      val responseBuffer = request.path match {
-        case "getInitialData" =>
-          Pickle.intoBytes(scalaJsApiServer.getInitialData())
-        case "getAllEntities" =>
-          val types = Unpickle[Seq[EntityType.any]].fromBytes(request.args("types"))
-          Pickle.intoBytes(scalaJsApiServer.getAllEntities(types))
-        case "getEntityModifications" =>
-          val updateToken = Unpickle[UpdateToken].fromBytes(request.args("updateToken"))
-          Pickle.intoBytes(scalaJsApiServer.getEntityModifications(updateToken))
-        case "persistEntityModifications" =>
-          val modifications = Unpickle[Seq[EntityModification]].fromBytes(request.args("modifications"))
-          Pickle.intoBytes(scalaJsApiServer.persistEntityModifications(modifications))
-        case "executeDataQuery" =>
-          val dbQuery = Unpickle[PicklableDbQuery].fromBytes(request.args("dbQuery"))
-          Pickle.intoBytes[Seq[Entity]](scalaJsApiServer.executeDataQuery(dbQuery))
-        case "executeCountQuery" =>
-          val dbQuery = Unpickle[PicklableDbQuery].fromBytes(request.args("dbQuery"))
-          Pickle.intoBytes(scalaJsApiServer.executeCountQuery(dbQuery))
-      }
-
-      // Serialize response in HTTP response
-      val data = Array.ofDim[Byte](responseBuffer.remaining())
-      responseBuffer.get(data)
-      data
-    }
+  def reactAppWithoutCredentials = Action { implicit request =>
+    Ok(views.html.reactApp())
   }
 
   def manualTests() = AuthenticatedAction { implicit user => implicit request =>
     Ok(views.html.manualTests())
   }
+
+  // ********** actions: JS files ********** //
+  private lazy val localDatabaseWebWorkerResult: Result =
+    Ok(s"""
+          |importScripts("${Application.Assets.webworkerDeps}");
+          |importScripts("${Application.Assets.factoAppClient}");
+          |LocalDatabaseWebWorkerScript.run();
+      """.stripMargin).as("application/javascript")
+  def localDatabaseWebWorker = Action(_ => localDatabaseWebWorkerResult)
+
+  private lazy val serviceWorkerResult: Result = {
+    val jsFileTemplate = ResourceFiles.read("/serviceWorker.template.js")
+    val scriptPathsJs = Application.Assets.all.map(asset => s"'$asset'").mkString(", ")
+    val jsFileContent = jsFileTemplate.replace("%SCRIPT_PATHS_TO_CACHE%", scriptPathsJs)
+    Ok(jsFileContent).as("application/javascript")
+  }
+  def serviceWorker = Action(_ => serviceWorkerResult)
+
+  // ********** actions: Scala JS API backend ********** //
+  def scalaJsApiPost(path: String) = AuthenticatedAction(parse.raw) { implicit user => implicit request =>
+    val requestBuffer: ByteBuffer = request.body.asBytes(parse.UNLIMITED).get.asByteBuffer
+    val argsMap = Unpickle[Map[String, ByteBuffer]].fromBytes(requestBuffer)
+
+    val bytes = doScalaJsApiCall(path, argsMap)
+    Ok(bytes)
+  }
+
+  def scalaJsApiGet(path: String) = AuthenticatedAction(parse.raw) { implicit user => implicit request =>
+    val bytes = doScalaJsApiCall(path, argsMap = Map())
+    Ok(bytes)
+  }
+
+  def scalaJsApiWebSocket = WebSocket.accept[Array[Byte], Array[Byte]] { request =>
+    implicit val user = AuthenticatedAction.requireAuthenticatedUser(request)
+
+    Flow[Array[Byte]].map { requestBytes =>
+      val request = Unpickle[ScalaJsApiRequest].fromBytes(ByteBuffer.wrap(requestBytes))
+
+      doScalaJsApiCall(request.path, request.args)
+    }
+  }
+
+  // Note: This action manually implements what autowire normally does automatically. Unfortunately, autowire
+  // doesn't seem to work for some reason.
+  private def doScalaJsApiCall(path: String, argsMap: Map[String, ByteBuffer])(
+      implicit user: User): Array[Byte] = {
+    val scalaJsApiServer = scalaJsApiServerFactory.create()
+
+    val responseBuffer = path match {
+      case "getInitialData" =>
+        Pickle.intoBytes(scalaJsApiServer.getInitialData())
+      case "getAllEntities" =>
+        val types = Unpickle[Seq[EntityType.any]].fromBytes(argsMap("types"))
+        Pickle.intoBytes(scalaJsApiServer.getAllEntities(types))
+      case "getEntityModifications" =>
+        val updateToken = Unpickle[UpdateToken].fromBytes(argsMap("updateToken"))
+        Pickle.intoBytes(scalaJsApiServer.getEntityModifications(updateToken))
+      case "persistEntityModifications" =>
+        val modifications = Unpickle[Seq[EntityModification]].fromBytes(argsMap("modifications"))
+        Pickle.intoBytes(scalaJsApiServer.persistEntityModifications(modifications))
+      case "executeDataQuery" =>
+        val dbQuery = Unpickle[PicklableDbQuery].fromBytes(argsMap("dbQuery"))
+        Pickle.intoBytes[Seq[Entity]](scalaJsApiServer.executeDataQuery(dbQuery))
+      case "executeCountQuery" =>
+        val dbQuery = Unpickle[PicklableDbQuery].fromBytes(argsMap("dbQuery"))
+        Pickle.intoBytes(scalaJsApiServer.executeCountQuery(dbQuery))
+    }
+
+    val data: Array[Byte] = Array.ofDim[Byte](responseBuffer.remaining())
+    responseBuffer.get(data)
+    data
+  }
 }
 
 object Application {
-  // ********** forms ********** //
+  private object Assets {
+    private val factoAppProjectName: String = "client"
+    private val webworkerDepsProjectName: String = "webworker-client-deps"
+
+    val factoAppClient: String =
+      scriptPathFromNames(s"$factoAppProjectName-opt.js", s"$factoAppProjectName-fastopt.js")
+    val factoAppDeps: String =
+      scriptPathFromNames(s"$factoAppProjectName-jsdeps.min.js", s"$factoAppProjectName-jsdeps.js")
+    val webworkerDeps: String =
+      scriptPathFromNames(s"$webworkerDepsProjectName-jsdeps.min.js", s"$webworkerDepsProjectName-jsdeps.js")
+
+    val all: Seq[String] = Seq(
+      factoAppClient,
+      factoAppDeps,
+      webworkerDeps,
+      routes.WebJarAssets.at("metisMenu/1.1.3/metisMenu.min.css").path(),
+      routes.WebJarAssets.at("font-awesome/4.6.2/css/font-awesome.min.css").path(),
+      routes.WebJarAssets.at("font-awesome/4.6.2/fonts/fontawesome-webfont.woff2?v=4.6.2").path(),
+      routes.WebJarAssets.at("font-awesome/4.6.2/fonts/fontawesome-webfont.woff?v=4.6.2 0").path(),
+      routes.WebJarAssets.at("font-awesome/4.6.2/fonts/fontawesome-webfont.ttf?v=4.6.2").path(),
+      routes.Assets.versioned("images/favicon192x192.png").path(),
+      routes.Assets.versioned("lib/bootstrap/css/bootstrap.min.css").path(),
+      routes.Assets.versioned("lib/fontello/css/fontello.css").path(),
+      "/assets/lib/fontello/font/fontello.woff2?49985636",
+      routes.Assets.versioned("bower_components/startbootstrap-sb-admin-2/dist/css/sb-admin-2.css").path(),
+      routes.Assets.versioned("stylesheets/main.min.css").path(),
+      routes.Assets.versioned("bower_components/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js").path(),
+      routes.Application.localDatabaseWebWorker.path()
+    )
+
+    private def scriptPathFromNames(filenames: String*): String = {
+      val filename =
+        filenames
+          .find(name => getClass.getResource(s"/public/$name") != null)
+          .get
+      routes.Assets.versioned(filename).path()
+    }
+  }
+
   object Forms {
 
     case class ChangePasswordData(loginName: String,

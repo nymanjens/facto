@@ -59,7 +59,7 @@ private[api] final class SerialWebsocketClient(websocketPath: String) {
     }
     websocket.onopen = (e: Event) => {
       websocketPromise.success(websocket)
-      logLine("Opened")
+      // logLine("Opened")
     }
 
     websocket.onerror = (e: ErrorEvent) => {
@@ -72,7 +72,7 @@ private[api] final class SerialWebsocketClient(websocketPath: String) {
       val errorMessage = s"WebSocket was closed: ${e.reason}"
       websocketPromise.tryFailure(new RuntimeException(errorMessage))
       responseMessagePromises.headOption.map(_.tryFailure(new RuntimeException(errorMessage)))
-      logLine(errorMessage)
+      // logLine(errorMessage)
 
       this.openWebsocketPromise = None
     }
