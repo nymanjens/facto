@@ -27,4 +27,7 @@ object Action {
 
   /** Special action that gets sent to the dispatcher's callbacks after they processed the contained action. */
   case class Done private[action] (action: Action) extends Action
+
+  /** Special action that gets sent to the dispatcher's callbacks after processing an action failed. */
+  case class Failed private[action] (action: Action) extends Action
 }

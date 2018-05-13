@@ -10,6 +10,7 @@ import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.util.{Failure, Success}
 
 /**
   * Dispatcher is used to broadcast payloads to registered callbacks.
@@ -46,12 +47,11 @@ object Dispatcher {
     def dispatch(action: Action) = {
       require(!isDispatching, s"Dispatch triggered action $action")
 
-      async {
-        // console.log(s"  Dispatcher: Dispatching action ${action.getClass.getSimpleName}")
-        await(invokeCallbacks(action))
-        // console.log(s"  Dispatcher: Dispatching action Action.Done(${action.getClass.getSimpleName})")
-        await(invokeCallbacks(Action.Done(action)))
-      }
+      invokeCallbacks(action)
+        .transformWith {
+          case Success(_) => invokeCallbacks(Action.Done(action))
+          case Failure(e) => invokeCallbacks(Action.Failed(action)).map(_ => throw e)
+        }
     }
 
     private def invokeCallbacks(action: Action): Future[Unit] = {
