@@ -47,24 +47,22 @@ final class GlobalMessagesStore(implicit i18n: I18n,
   // **************** Private dispatcher methods ****************//
   private def dispatcherListener: PartialFunction[Action, Unit] = {
     case action if getCompletionMessage.isDefinedAt(action) =>
-      setState(Some(Message(string = i18n("facto.sending-data-to-server"), isWorking = true)))
+      setState(Message(string = i18n("facto.sending-data-to-server"), messageType = Message.Type.Working))
 
     case Action.Done(action) =>
       getCompletionMessage.lift.apply(action) match {
         case Some(message) =>
-          setState(Some(Message(string = message, isWorking = false)))
+          setState(Message(string = message, messageType = Message.Type.Success))
+          clearMessageAfterDelay()
+        case None =>
+      }
 
-          // Clear this message after some delay
-          // Note: The delay is large because we don't want everything on the page to suddenly move up one row
-          // while it is being used. This is expected to trigger when a user has left the page open while doing
-          // something else.
-          val uniqueStateWhenCreatedMessage = _state
-          js.timers.setTimeout(2.minutes)(logExceptions {
-            if (_state == uniqueStateWhenCreatedMessage) {
-              // state has remained unchanged since start of timer
-              setState(None)
-            }
-          })
+    case Action.Failed(action) =>
+      getCompletionMessage.lift.apply(action) match {
+        case Some(message) =>
+          setState(
+            Message(string = i18n("facto.sending-data-to-server-failed"), messageType = Message.Type.Failure))
+          clearMessageAfterDelay()
         case None =>
       }
 
@@ -98,11 +96,28 @@ final class GlobalMessagesStore(implicit i18n: I18n,
       i18n("facto.successfully-deleted-balance-check-for", existingBalanceCheck.moneyReservoir.name)
   }
 
+  /** Clear this message after some delay */
+  private def clearMessageAfterDelay(): Unit = {
+    // Note: The delay is large because we don't want everything on the page to suddenly move up one row
+    // while it is being used. This is expected to trigger when a user has left the page open while doing
+    // something else.
+    val uniqueStateWhenCreatedMessage = _state
+    js.timers.setTimeout(2.minutes)(logExceptions {
+      if (_state == uniqueStateWhenCreatedMessage) {
+        // state has remained unchanged since start of timer
+        setState(None)
+      }
+    })
+  }
+
   private def numTransactions(transactionsProvider: TransactionGroup => Seq[Transaction]): Int = {
     transactionsProvider(TransactionGroup(createdDate = clock.now).withId(1)).size
   }
 
   // **************** Private state helper methods ****************//
+  private def setState(message: Message): Unit = {
+    setState(Some(message))
+  }
   private def setState(state: Option[Message]): Unit = {
     _state = state.map(Unique.apply)
     invokeListeners()
@@ -117,14 +132,21 @@ final class GlobalMessagesStore(implicit i18n: I18n,
 }
 
 object GlobalMessagesStore {
-  case class Message private (string: String, isWorking: Boolean, private val createTime: Instant) {
+  case class Message private (string: String, messageType: Message.Type, private val createTime: Instant) {
     private[GlobalMessagesStore] def age(implicit clock: Clock): java.time.Duration =
       java.time.Duration.between(createTime, clock.nowInstant)
   }
 
-  private[GlobalMessagesStore] object Message {
-    def apply(string: String, isWorking: Boolean)(implicit clock: Clock): Message =
-      Message(string = string, isWorking = isWorking, createTime = clock.nowInstant)
+  object Message {
+    def apply(string: String, messageType: Message.Type)(implicit clock: Clock): Message =
+      Message(string = string, messageType = messageType, createTime = clock.nowInstant)
+
+    sealed trait Type
+    object Type {
+      object Working extends Type
+      object Success extends Type
+      object Failure extends Type
+    }
   }
 
   trait Listener {

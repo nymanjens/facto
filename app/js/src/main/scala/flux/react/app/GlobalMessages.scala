@@ -3,6 +3,7 @@ package flux.react.app
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import flux.react.ReactVdomUtils.^^
 import flux.stores.GlobalMessagesStore
+import flux.stores.GlobalMessagesStore.Message
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
@@ -53,16 +54,20 @@ private[app] final class GlobalMessages(implicit globalMessagesStore: GlobalMess
           <.div(
             ^.className := "alert alert-info",
             ^.style := js.Dictionary("marginTop" -> "20px"),
-            ^^.ifThen(message.isWorking) {
-              <.span(
-                <.i(
-                  ^.className := "fa fa-circle-o-notch fa-spin",
-                  ^.style := js.Dictionary("marginRight" -> "11px")),
-                " ")
-            },
+            <.span(
+              <.i(
+                ^.className := iconClassNames(message.messageType),
+                ^.style := js.Dictionary("marginRight" -> "11px")),
+              " "),
             message.string
           )
       }
+    }
+
+    private def iconClassNames(messageType: Message.Type): String = messageType match {
+      case Message.Type.Working => "fa fa-circle-o-notch fa-spin"
+      case Message.Type.Success => "fa fa-check"
+      case Message.Type.Failure => "fa fa-warning"
     }
   }
 }
