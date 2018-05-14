@@ -21,6 +21,7 @@ import models.Entity
 import models.access.JvmEntityAccess
 import models.modification.{EntityModification, EntityType}
 import models.user.{User, Users}
+import play.api.Mode
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
@@ -93,15 +94,15 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
   }
 
   // ********** actions: JS files ********** //
-  private lazy val localDatabaseWebWorkerResult: Result =
+  private lazy val localDatabaseWebWorkerResultCache: Result =
     Ok(s"""
           |importScripts("${Application.Assets.webworkerDeps.urlPath}");
           |importScripts("${Application.Assets.factoAppClient.urlPath}");
           |LocalDatabaseWebWorkerScript.run();
       """.stripMargin).as("application/javascript")
-  def localDatabaseWebWorker = Action(_ => localDatabaseWebWorkerResult)
+  def localDatabaseWebWorker = Action(_ => localDatabaseWebWorkerResultCache)
 
-  private lazy val serviceWorkerResult: Result = {
+  private def serviceWorkerResultFunc(): Result = {
     val jsFileTemplate = ResourceFiles.read("/serviceWorker.template.js")
     val scriptPathsJs = Application.Assets.all.map(asset => s"'${asset.urlPath}'").mkString(", ")
     val cacheNameSuffix = {
@@ -117,9 +118,11 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
     val jsFileContent = jsFileTemplate
       .replace("$SCRIPT_PATHS_TO_CACHE$", scriptPathsJs)
       .replace("$CACHE_NAME_SUFFIX$", cacheNameSuffix)
-    Ok(jsFileContent).as("application/javascript")
+    Ok(jsFileContent).as("application/javascript").withHeaders("Cache-Control" -> "no-cache")
   }
-  def serviceWorker = Action(_ => serviceWorkerResult)
+  private lazy val serviceWorkerResultCache: Result = serviceWorkerResultFunc()
+  def serviceWorker =
+    Action(_ => if (env.mode == Mode.Dev) serviceWorkerResultFunc() else serviceWorkerResultCache)
 
   // ********** actions: Scala JS API backend ********** //
   def scalaJsApiPost(path: String) = AuthenticatedAction(parse.raw) { implicit user => implicit request =>
