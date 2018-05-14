@@ -1,21 +1,21 @@
 package controllers
 
+import java.net.URL
 import java.nio.ByteBuffer
 
+import akka.stream.scaladsl._
 import api.Picklers._
 import api.ScalaJsApi.UpdateToken
 import api.{PicklableDbQuery, ScalaJsApiRequest, ScalaJsApiServerFactory}
 import boopickle.Default._
 import com.google.inject.Inject
+import common.ResourceFiles
 import controllers.Application.Forms
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 import controllers.helpers.AuthenticatedAction
-import models.modification.EntityType
 import models.Entity
-import akka.stream.scaladsl._
-import common.ResourceFiles
-import models.access.{DbQuery, JvmEntityAccess}
-import models.modification.EntityModification
+import models.access.JvmEntityAccess
+import models.modification.{EntityModification, EntityType}
 import models.user.{User, Users}
 import play.api.data.Form
 import play.api.data.Forms._
@@ -91,15 +91,15 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
   // ********** actions: JS files ********** //
   private lazy val localDatabaseWebWorkerResult: Result =
     Ok(s"""
-          |importScripts("${Application.Assets.webworkerDeps}");
-          |importScripts("${Application.Assets.factoAppClient}");
+          |importScripts("${Application.Assets.webworkerDeps.urlPath}");
+          |importScripts("${Application.Assets.factoAppClient.urlPath}");
           |LocalDatabaseWebWorkerScript.run();
       """.stripMargin).as("application/javascript")
   def localDatabaseWebWorker = Action(_ => localDatabaseWebWorkerResult)
 
   private lazy val serviceWorkerResult: Result = {
     val jsFileTemplate = ResourceFiles.read("/serviceWorker.template.js")
-    val scriptPathsJs = Application.Assets.all.map(asset => s"'$asset'").mkString(", ")
+    val scriptPathsJs = Application.Assets.all.map(asset => s"'${asset.urlPath}'").mkString(", ")
     val jsFileContent = jsFileTemplate.replace("$SCRIPT_PATHS_TO_CACHE$", scriptPathsJs)
     Ok(jsFileContent).as("application/javascript")
   }
@@ -166,38 +166,59 @@ object Application {
     private val factoAppProjectName: String = "client"
     private val webworkerDepsProjectName: String = "webworker-client-deps"
 
-    val factoAppClient: String =
-      scriptPathFromNames(s"$factoAppProjectName-opt.js", s"$factoAppProjectName-fastopt.js")
-    val factoAppDeps: String =
-      scriptPathFromNames(s"$factoAppProjectName-jsdeps.min.js", s"$factoAppProjectName-jsdeps.js")
-    val webworkerDeps: String =
-      scriptPathFromNames(s"$webworkerDepsProjectName-jsdeps.min.js", s"$webworkerDepsProjectName-jsdeps.js")
+    val factoAppClient: Asset =
+      firstExistingVersionedAsset(s"$factoAppProjectName-opt.js", s"$factoAppProjectName-fastopt.js")
+    val factoAppDeps: Asset =
+      firstExistingVersionedAsset(s"$factoAppProjectName-jsdeps.min.js", s"$factoAppProjectName-jsdeps.js")
+    val webworkerDeps: Asset =
+      firstExistingVersionedAsset(
+        s"$webworkerDepsProjectName-jsdeps.min.js",
+        s"$webworkerDepsProjectName-jsdeps.js")
 
-    val all: Seq[String] = Seq(
+    val all: Seq[Asset] = Seq(
       factoAppClient,
       factoAppDeps,
       webworkerDeps,
-      routes.WebJarAssets.at("metisMenu/1.1.3/metisMenu.min.css").path(),
-      routes.WebJarAssets.at("font-awesome/4.6.2/css/font-awesome.min.css").path(),
-      routes.WebJarAssets.at("font-awesome/4.6.2/fonts/fontawesome-webfont.woff2?v=4.6.2").path(),
-      routes.WebJarAssets.at("font-awesome/4.6.2/fonts/fontawesome-webfont.woff?v=4.6.2 0").path(),
-      routes.WebJarAssets.at("font-awesome/4.6.2/fonts/fontawesome-webfont.ttf?v=4.6.2").path(),
-      routes.Assets.versioned("images/favicon192x192.png").path(),
-      routes.Assets.versioned("lib/bootstrap/css/bootstrap.min.css").path(),
-      routes.Assets.versioned("lib/fontello/css/fontello.css").path(),
-      "/assets/lib/fontello/font/fontello.woff2?49985636",
-      routes.Assets.versioned("bower_components/startbootstrap-sb-admin-2/dist/css/sb-admin-2.css").path(),
-      routes.Assets.versioned("stylesheets/main.min.css").path(),
-      routes.Assets.versioned("bower_components/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js").path(),
-      routes.Application.localDatabaseWebWorker.path()
+      WebJarAsset("metisMenu/1.1.3/metisMenu.min.css"),
+      WebJarAsset("font-awesome/4.6.2/css/font-awesome.min.css"),
+      WebJarAsset("font-awesome/4.6.2/fonts/fontawesome-webfont.woff2?v=4.6.2"),
+      WebJarAsset("font-awesome/4.6.2/fonts/fontawesome-webfont.woff?v=4.6.2 0"),
+      WebJarAsset("font-awesome/4.6.2/fonts/fontawesome-webfont.ttf?v=4.6.2"),
+      VersionedAsset("images/favicon192x192.png"),
+      VersionedAsset("lib/bootstrap/css/bootstrap.min.css"),
+      VersionedAsset("lib/fontello/css/fontello.css"),
+      UnversionedAsset("lib/fontello/font/fontello.woff2?49985636"),
+      VersionedAsset("bower_components/startbootstrap-sb-admin-2/dist/css/sb-admin-2.css"),
+      VersionedAsset("stylesheets/main.min.css"),
+      VersionedAsset("bower_components/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js"),
+      DynamicAsset(routes.Application.localDatabaseWebWorker),
     )
 
-    private def scriptPathFromNames(filenames: String*): String = {
-      val filename =
+    private def firstExistingVersionedAsset(filenames: String*): Asset =
+      VersionedAsset(
         filenames
-          .find(name => getClass.getResource(s"/public/$name") != null)
-          .get
-      routes.Assets.versioned(filename).path()
+          .find(name => VersionedAsset(name).localResource.get != null)
+          .get)
+
+    sealed trait Asset {
+      def localResource: Option[URL]
+      def urlPath: String
+    }
+    case class VersionedAsset(relativePath: String) extends Asset {
+      override def localResource = Some(getClass.getResource(s"/public/$relativePath"))
+      override def urlPath = routes.Assets.versioned(relativePath).path()
+    }
+    case class UnversionedAsset(relativePath: String) extends Asset {
+      override def localResource = Some(getClass.getResource(s"/public/$relativePath"))
+      override def urlPath = s"/assets/$relativePath"
+    }
+    case class DynamicAsset(call: Call) extends Asset {
+      override def localResource = None
+      override def urlPath = call.path()
+    }
+    case class WebJarAsset(relativePath: String) extends Asset {
+      override def localResource = None
+      override def urlPath = routes.WebJarAssets.at(relativePath).path()
     }
   }
 
