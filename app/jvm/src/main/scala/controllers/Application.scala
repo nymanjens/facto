@@ -8,7 +8,11 @@ import api.Picklers._
 import api.ScalaJsApi.UpdateToken
 import api.{PicklableDbQuery, ScalaJsApiRequest, ScalaJsApiServerFactory}
 import boopickle.Default._
+import com.google.common.base.Charsets
+import com.google.common.hash.Hashing
+import com.google.common.io.Resources
 import com.google.inject.Inject
+import common.GuavaReplacement.Splitter
 import common.ResourceFiles
 import controllers.Application.Forms
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
@@ -100,7 +104,19 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
   private lazy val serviceWorkerResult: Result = {
     val jsFileTemplate = ResourceFiles.read("/serviceWorker.template.js")
     val scriptPathsJs = Application.Assets.all.map(asset => s"'${asset.urlPath}'").mkString(", ")
-    val jsFileContent = jsFileTemplate.replace("$SCRIPT_PATHS_TO_CACHE$", scriptPathsJs)
+    val cacheNameSuffix = {
+      val hasher = Hashing.murmur3_128().newHasher()
+      for (asset <- Application.Assets.all) {
+        hasher.putString(asset.urlPath, Charsets.UTF_8)
+        for (resource <- asset.maybeLocalResource) {
+          hasher.putBytes(Resources.toByteArray(resource))
+        }
+      }
+      hasher.hash().toString
+    }
+    val jsFileContent = jsFileTemplate
+      .replace("$SCRIPT_PATHS_TO_CACHE$", scriptPathsJs)
+      .replace("$CACHE_NAME_SUFFIX$", cacheNameSuffix)
     Ok(jsFileContent).as("application/javascript")
   }
   def serviceWorker = Action(_ => serviceWorkerResult)
@@ -195,30 +211,32 @@ object Application {
     )
 
     private def firstExistingVersionedAsset(filenames: String*): Asset =
-      VersionedAsset(
-        filenames
-          .find(name => VersionedAsset(name).localResource.get != null)
-          .get)
+      VersionedAsset(filenames.find(name => ResourceFiles.exists(s"/public/$name")).get)
 
     sealed trait Asset {
-      def localResource: Option[URL]
+      def maybeLocalResource: Option[URL]
       def urlPath: String
     }
-    case class VersionedAsset(relativePath: String) extends Asset {
-      override def localResource = Some(getClass.getResource(s"/public/$relativePath"))
+    abstract class ResourceAsset(relativePath: String) extends Asset {
+      // Remove the query parameters to find the local resource path
+      private val resourcePath: String = Splitter.on('?').split(s"/public/$relativePath").head
+      require(ResourceFiles.exists(resourcePath), s"Could not find asset at $resourcePath")
+
+      override final def maybeLocalResource = Some(getClass.getResource(resourcePath))
+    }
+    case class VersionedAsset(relativePath: String) extends ResourceAsset(relativePath) {
       override def urlPath = routes.Assets.versioned(relativePath).path()
     }
-    case class UnversionedAsset(relativePath: String) extends Asset {
-      override def localResource = Some(getClass.getResource(s"/public/$relativePath"))
+    case class UnversionedAsset(relativePath: String) extends ResourceAsset(relativePath) {
       override def urlPath = s"/assets/$relativePath"
     }
-    case class DynamicAsset(call: Call) extends Asset {
-      override def localResource = None
-      override def urlPath = call.path()
-    }
     case class WebJarAsset(relativePath: String) extends Asset {
-      override def localResource = None
+      override def maybeLocalResource = None
       override def urlPath = routes.WebJarAssets.at(relativePath).path()
+    }
+    case class DynamicAsset(call: Call) extends Asset {
+      override def maybeLocalResource = None
+      override def urlPath = call.path()
     }
   }
 
