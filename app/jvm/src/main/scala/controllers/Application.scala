@@ -210,7 +210,7 @@ object Application {
       VersionedAsset("bower_components/startbootstrap-sb-admin-2/dist/css/sb-admin-2.css"),
       VersionedAsset("stylesheets/main.min.css"),
       VersionedAsset("bower_components/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js"),
-      DynamicAsset(routes.Application.localDatabaseWebWorker),
+      DynamicAsset(routes.Application.localDatabaseWebWorker)
     )
 
     private def firstExistingVersionedAsset(filenames: String*): Asset =
