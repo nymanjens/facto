@@ -2,12 +2,96 @@ const CACHE_NAME = 'facto-v3-$CACHE_NAME_SUFFIX$';
 const ROOT_URL = new Request('/').url.slice(0, -1);
 const APP_PAGE_PATH = '/appwithoutcreds/';
 const GET_INITIAL_DATA_PATH = '/scalajsapi/getInitialData';
+const PERSIST_ENTITY_MODIFICATIONS_PATH =
+    '/scalajsapi/persistEntityModifications';
 const SCRIPT_PATHS_TO_CACHE = [
   $SCRIPT_PATHS_TO_CACHE$
 ];
 
+class PersistedMap {
+  static get databaseName_() { return "ServiceWorkerDb"; }
+  static get tableName_() { return "ServiceWorkerDb"; }
+
+  constructor() {
+    this.databasePromise_ = new Promise((promiseResolve, promiseReject) => {
+      const openRequest = indexedDB.open(this.databaseName_, /* version = */ 3);
+
+      openRequest.onupgradeneeded = (event) => {
+        const database = event.target.result;
+        const store =
+            database.createObjectStore(this.tableName_, {keyPath: "key"});
+      };
+
+      openRequest.onerror = (e) => {
+        promiseReject("Error: Opening IndexedDB failed", e);
+      };
+
+      openRequest.onsuccess = (event) => {
+        const database = event.target.result;
+        database.onerror = (event) => {
+          console.log("[SW] Database Error " + event.target.errorCode);
+        };
+        promiseResolve(database);
+      };
+    });
+  }
+
+  /**
+   * @param key string
+   * @param value any
+   * @return Promise<Void>
+   */
+  put(key, value) {
+    return new Promise((promiseResolve, promiseReject) => {
+      this.databasePromise_.then(database => {
+        var tx = database.transaction(this.tableName_, "readwrite");
+        var store = tx.objectStore(this.tableName_);
+        store.put({key, value});
+        tx.oncomplete = promiseResolve;
+      });
+    });
+  }
+
+  /**
+   * @param key string
+   * @return Promise<any>
+   */
+  get(key) {
+    return new Promise((promiseResolve, promiseReject) => {
+      this.databasePromise_.then(database => {
+        var tx = database.transaction(this.tableName_, "readwrite");
+        var store = tx.objectStore(this.tableName_);
+        var query = store.get(key);
+        query.onsuccess = () => {
+          promiseResolve(query.result);
+        };
+      });
+    });
+  }
+
+  /**
+   * @param key string
+   * @return Promise<Void>
+   */
+  delete(key) {
+    return new Promise((promiseResolve, promiseReject) => {
+      this.databasePromise_.then(database => {
+        var tx = database.transaction(this.tableName_, "readwrite");
+        var store = tx.objectStore(this.tableName_);
+        store.delete(key);
+        tx.oncomplete = promiseResolve;
+      });
+    });
+  }
+}
+
+const persistedMap = new PersistedMap();
+
+const generateRandomString = () => Math.random().toString(36).substring(2);
+
+
 self.addEventListener('install', (event) => {
-  console.log('  Installing service worker for cache', CACHE_NAME);
+  console.log('  [SW] Installing service worker for cache', CACHE_NAME);
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
@@ -24,19 +108,19 @@ self.addEventListener('fetch', (event) => {
   if(event.request.url.startsWith(ROOT_URL + '/app/')) {
     // Check whether we are still logged in. If we are offline, return the
     // cached app page.
-    console.log('  Fetch or cache:', event.request.url);
+    console.log('  [SW] Fetch or cache:', event.request.url);
     event.respondWith(
       fetch(event.request)
           .catch(e => {
             console.log(
-                `Caught exception while fetching ${event.request.url}`, e);
+                `[SW] Caught exception while fetching ${event.request.url}`, e);
             return caches.match(APP_PAGE_PATH);
           })
     );
   } else if(event.request.url == ROOT_URL + GET_INITIAL_DATA_PATH) {
     // Initial data may change, e.g. when logging in. If we are oflfine, return
     // the cached values.
-    console.log('  (Fetch and cache) or cache:', event.request.url);
+    console.log('  [SW] (Fetch and cache) or cache:', event.request.url);
     event.respondWith(
       fetch(event.request)
           .then(response =>
@@ -47,10 +131,37 @@ self.addEventListener('fetch', (event) => {
                         .then(() => response)))
           .catch(e => {
             console.log(
-                `Caught exception while fetching ${event.request.url}`, e);
+                `[SW] Caught exception while fetching ${event.request.url}`, e);
             return caches.match(event.request);
           })
     );
+  } else if(event.request.url == ROOT_URL + PERSIST_ENTITY_MODIFICATIONS_PATH) {
+    if('sync' in self.registration) {
+      event.respondWith(new Promise((promiseResolve, promiseReject) => {
+        const key = generateRandomString();
+        console.log(`  [SW] Sending sync(${key})`);
+        event.request.clone().arrayBuffer()
+            .then((arrayBuffer)  => persistedMap.put(key, arrayBuffer))
+            .then(() => self.registration.sync.register(key))
+            .then(() => {
+              // Wait for persisted Map entry to become empty, indicating
+              // completion
+              let timeout = 2;
+              const tryAgain = () => {
+                persistedMap.get(key).then(result => {
+                  if(result) {
+                    setTimeout(tryAgain, ++timeout);
+                  } else {
+                    promiseResolve(new Response());
+                  }
+                });
+              };
+              tryAgain();
+            });
+      }));
+    } else {
+      event.respondWith(fetch(event.request));
+    }
   } else {
     event.respondWith(
       caches.match(event.request)
@@ -61,7 +172,7 @@ self.addEventListener('fetch', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
-  console.log('  Activating service worker for cache', CACHE_NAME);
+  console.log('  [SW] Activating service worker for cache', CACHE_NAME);
   event.waitUntil(
     caches.keys().then((cacheNames) =>
       Promise.all(
@@ -70,5 +181,28 @@ self.addEventListener('activate', (event) => {
           .map((cacheName) => caches.delete(cacheName))
       )
     )
+  );
+});
+
+self.addEventListener('sync', (event) => {
+  // All syncs are requests for sending an entity modification. The tags are
+  // keys in `persistedMap`, where the values in that map are request bodies.
+  // This sync hanlder must remove the `persistedMap` entries when done.
+
+  const key = event.tag;
+  console.log(`  [SW] sync(${key}): Starting processing...`);
+  event.waitUntil(
+      persistedMap.get(key)
+          .then(({value}) =>
+            fetch(
+                new Request(
+                    ROOT_URL + PERSIST_ENTITY_MODIFICATIONS_PATH,
+                    {
+                      method: 'POST',
+                      body: value,
+                      credentials: 'same-origin',
+                    })))
+          .then(() => persistedMap.delete(key))
+          .then(() => console.log(`  [SW] sync(${key}): Done`))
   );
 });
