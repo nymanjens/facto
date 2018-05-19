@@ -59,20 +59,22 @@ private[access] final class HybridRemoteDatabaseProxy(localDatabaseFuture: Futur
     }
   }
 
-  override def persistEntityModifications(modifications: Seq[EntityModification]) = async {
-    val remotePersistFuture = apiClient.persistEntityModifications(modifications)
-    val localPersistFuture = {
-      localDatabaseOption match {
-        case None => Future.successful((): Unit)
-        case Some(localDatabase) =>
-          async {
-            await(localDatabase.applyModifications(modifications))
-            await(localDatabase.save())
-          }
+  override def persistEntityModifications(modifications: Seq[EntityModification]) = {
+    val serverUpdated = apiClient.persistEntityModifications(modifications)
+    val queryReflectsModifications = localDatabaseOption match {
+      case None                => serverUpdated
+      case Some(localDatabase) => localDatabase.applyModifications(modifications).map(_ => (): Unit)
+    }
+    val completelyDone = async {
+      await(serverUpdated)
+      await(queryReflectsModifications)
+      if (localDatabaseOption.isDefined) {
+        await(localDatabaseOption.get.save())
       }
     }
-    await(remotePersistFuture)
-    await(localPersistFuture)
+    PersistEntityModificationsResponse(
+      queryReflectsModifications = queryReflectsModifications,
+      completelyDone = completelyDone)
   }
 
   override def getAndApplyRemotelyModifiedEntities(maybeUpdateToken: Option[UpdateToken]) = async {

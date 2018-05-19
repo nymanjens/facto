@@ -26,20 +26,20 @@ private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
     EntityType.values.map(t => t -> mutable.Set[Long]()).toMap
   private val allLocallyCreatedModifications: mutable.Set[EntityModification] = mutable.Set()
   private var isCallingListeners: Boolean = false
-  private val writeReadyFutures: mutable.Buffer[Future[Unit]] = mutable.Buffer()
+  private val queryBlockingFutures: mutable.Buffer[Future[Unit]] = mutable.Buffer()
 
   // **************** Getters ****************//
   override def newQuery[E <: Entity: EntityType](): DbResultSet.Async[E] = {
     DbResultSet.fromExecutor(new DbQueryExecutor.Async[E] {
       override def data(dbQuery: DbQuery[E]) = async {
-        if (writeReadyFutures.nonEmpty) {
-          await(writeReadyFutures.last)
+        if (queryBlockingFutures.nonEmpty) {
+          await(queryBlockingFutures.last)
         }
         await(remoteDatabaseProxy.queryExecutor[E]().data(dbQuery))
       }
       override def count(dbQuery: DbQuery[E]) = async {
-        if (writeReadyFutures.nonEmpty) {
-          await(writeReadyFutures.last)
+        if (queryBlockingFutures.nonEmpty) {
+          await(queryBlockingFutures.last)
         }
         await(remoteDatabaseProxy.queryExecutor[E]().count(dbQuery))
       }
@@ -55,31 +55,34 @@ private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
 
   // **************** Setters ****************//
   override def persistModifications(modifications: Seq[EntityModification]): Future[Unit] = {
-    val writeFuture = async {
-      require(!isCallingListeners)
+    require(!isCallingListeners)
 
-      allLocallyCreatedModifications ++= modifications
+    allLocallyCreatedModifications ++= modifications
 
-      for {
-        modification <- modifications
-        if modification.isInstanceOf[EntityModification.Add[_]]
-      } localAddModificationIds(modification.entityType) += modification.entityId
-      val listeners = invokeListenersAsync(_.modificationsAdded(modifications))
+    for {
+      modification <- modifications
+      if modification.isInstanceOf[EntityModification.Add[_]]
+    } localAddModificationIds(modification.entityType) += modification.entityId
+    val listenersInvoked = invokeListenersAsync(_.modificationsAdded(modifications))
 
-      await(remoteDatabaseProxy.persistEntityModifications(modifications))
+    val persistResponse = remoteDatabaseProxy.persistEntityModifications(modifications)
+
+    val queryBlockingFuture = persistResponse.queryReflectsModifications
+    queryBlockingFutures += queryBlockingFuture
+    queryBlockingFuture map { _ =>
+      queryBlockingFutures -= queryBlockingFuture
+    }
+
+    async {
+      await(persistResponse.completelyDone)
 
       for {
         modification <- modifications
         if modification.isInstanceOf[EntityModification.Add[_]]
       } localAddModificationIds(modification.entityType) -= modification.entityId
 
-      await(listeners)
+      await(listenersInvoked)
     }
-    writeReadyFutures += writeFuture
-    writeFuture map { _ =>
-      writeReadyFutures -= writeFuture
-    }
-    writeFuture
   }
 
   // **************** Other ****************//

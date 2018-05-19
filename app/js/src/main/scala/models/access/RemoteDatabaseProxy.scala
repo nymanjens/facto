@@ -12,11 +12,13 @@ import scala2js.Converters._
 trait RemoteDatabaseProxy {
   def queryExecutor[E <: Entity: EntityType](): DbQueryExecutor.Async[E]
 
-  def persistEntityModifications(modifications: Seq[EntityModification]): Future[Unit]
+  def persistEntityModifications(modifications: Seq[EntityModification]): PersistEntityModificationsResponse
 
   def getAndApplyRemotelyModifiedEntities(
       updateToken: Option[UpdateToken]): Future[GetRemotelyModifiedEntitiesResponse]
 
+  case class PersistEntityModificationsResponse(queryReflectsModifications: Future[Unit],
+                                                completelyDone: Future[Unit])
   case class GetRemotelyModifiedEntitiesResponse(changes: Seq[EntityModification],
                                                  nextUpdateToken: UpdateToken)
 }
