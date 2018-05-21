@@ -32,6 +32,7 @@ import scala2js.Scala2Js
 trait LocalDatabase {
   // **************** Getters ****************//
   def queryExecutor[E <: Entity: EntityType](): DbQueryExecutor.Async[E]
+  def pendingModifications(): Future[Seq[EntityModification]]
   def getSingletonValue[V](key: SingletonKey[V]): Future[Option[V]]
   def isEmpty: Future[Boolean]
 
@@ -43,6 +44,9 @@ trait LocalDatabase {
     */
   def applyModifications(modifications: Seq[EntityModification]): Future[Boolean]
   def addAll[E <: Entity: EntityType](entities: Seq[E]): Future[Unit]
+
+  def addPendingModifications(modification: Seq[EntityModification]): Future[Unit]
+  def removePendingModifications(modification: Seq[EntityModification]): Future[Unit]
 
   /** Sets given singleton value in memory but doesn't persist it in the browser's storage (call `save()` to do this). */
   def setSingletonValue[V](key: SingletonKey[V], value: V): Future[Unit]
@@ -150,6 +154,8 @@ object LocalDatabase {
         }
       }
 
+    override def pendingModifications(): Future[Seq[EntityModification]] = ???
+
     override def getSingletonValue[V](key: SingletonKey[V]) = async {
       implicit val converter = key.valueConverter
       val results = await(
@@ -195,6 +201,9 @@ object LocalDatabase {
           for (entity <- entities) yield WriteOperation.Insert(collectionName, Scala2Js.toJsMap(entity))
         ))
     }
+
+    override def addPendingModifications(modification: Seq[EntityModification]): Future[Unit] = ???
+    override def removePendingModifications(modification: Seq[EntityModification]): Future[Unit] = ???
 
     override def setSingletonValue[V](key: SingletonKey[V], value: V) = async {
       implicit val converter = key.valueConverter

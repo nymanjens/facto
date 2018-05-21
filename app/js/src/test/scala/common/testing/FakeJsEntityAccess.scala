@@ -29,7 +29,7 @@ final class FakeJsEntityAccess extends JsEntityAccess {
   }
   override def persistModifications(modifications: Seq[EntityModification]): Future[Unit] = {
     modificationsBuffer.addModifications(modifications)
-    listeners.foreach(_.modificationsAdded(modifications))
+    listeners.foreach(_.modificationsAddedOrPendingStateChanged(modifications))
     Future.successful((): Unit)
   }
   override def registerListener(listener: Listener): Unit = {
@@ -43,7 +43,7 @@ final class FakeJsEntityAccess extends JsEntityAccess {
   // TODO: Add manipulation methods for localModificationIds
   def addRemoteModifications(modifications: Seq[EntityModification]): Unit = {
     modificationsBuffer.addModifications(modifications)
-    listeners.foreach(_.modificationsAdded(modifications))
+    listeners.foreach(_.modificationsAddedOrPendingStateChanged(modifications))
   }
 
   def addRemotelyAddedEntities[E <: Entity: EntityType](entities: E*): Unit = {

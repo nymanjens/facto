@@ -15,6 +15,8 @@ trait JsEntityAccess extends EntityAccess {
 
   override def newQuerySyncForUser(): DbResultSet.Sync[User]
 
+  def pendingModifications: PendingModifications
+
   /** Returns true if there are local pending `Add` modifications for the given entity. Note that only its id is used. */
   @Deprecated def hasLocalAddModifications[E <: Entity: EntityType](entity: E): Boolean
 
@@ -37,11 +39,11 @@ object JsEntityAccess {
   trait Listener {
 
     /**
-      * Future calls to `newQuery()` will contain the given modifications.
-      *
-      * Note that the modifications could originate from a local update (possibly not yet persisted on the server) or
-      * a remote update.
+      * Called when a modification is persisted so that:
+      * - Future calls to `newQuery()` will contain the given modifications
+      * OR
+      * - Future calls to `pendingModifications()` will have or no longer have the given modifications
       */
-    def modificationsAdded(modifications: Seq[EntityModification]): Unit
+    def modificationsAddedOrPendingStateChanged(modifications: Seq[EntityModification]): Unit
   }
 }

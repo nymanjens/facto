@@ -209,7 +209,7 @@ object JsEntityAccessImplTest extends TestSuite {
   private final class FakeProxyListener extends JsEntityAccess.Listener {
     private val _modifications: mutable.Buffer[Seq[EntityModification]] = mutable.Buffer()
 
-    override def modificationsAdded(modifications: Seq[EntityModification]) = {
+    override def modificationsAddedOrPendingStateChanged(modifications: Seq[EntityModification]) = {
       _modifications += modifications
     }
 

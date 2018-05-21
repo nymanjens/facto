@@ -130,7 +130,7 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit entityAcc
 
   // **************** Inner type definitions ****************//
   private object JsEntityAccessListener extends JsEntityAccess.Listener {
-    override def modificationsAdded(modifications: Seq[EntityModification]): Unit = {
+    override def modificationsAddedOrPendingStateChanged(modifications: Seq[EntityModification]): Unit = {
       require(!isCallingListeners)
 
       _state match {
