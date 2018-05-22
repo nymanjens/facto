@@ -170,12 +170,12 @@ object Converters {
         implicit val entityType = Scala2Js.toScala[EntityType.any](array.shift()).asInstanceOf[EntityType[E]]
         val modificationTypeNumber = Scala2Js.toScala[Int](array.shift())
 
-        array.toSeq match {
-          case Seq(entity) if modificationTypeNumber == addNumber =>
+        array.toVector match {
+          case Vector(entity) if modificationTypeNumber == addNumber =>
             EntityModification.Add(Scala2Js.toScala[E](entity))
-          case Seq(entity) if modificationTypeNumber == updateNumber =>
+          case Vector(entity) if modificationTypeNumber == updateNumber =>
             EntityModification.Update(Scala2Js.toScala[E](entity))
-          case Seq(entityId) if modificationTypeNumber == removeNumber =>
+          case Vector(entityId) if modificationTypeNumber == removeNumber =>
             EntityModification.Remove(Scala2Js.toScala[Long](entityId))(entityType)
         }
       }
