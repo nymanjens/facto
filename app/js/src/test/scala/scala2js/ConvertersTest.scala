@@ -6,7 +6,7 @@ import common.testing.TestObjects._
 import common.time.LocalDateTime
 import models.access.ModelField
 import models.accounting._
-import models.modification.EntityType
+import models.modification.{EntityModification, EntityType}
 import models.money.ExchangeRateMeasurement
 import models.user.User
 import utest._
@@ -62,6 +62,23 @@ object ConvertersTest extends TestSuite {
 
     "LocalDateTimeConverter: testToJsAndBack" - {
       testToJsAndBack[LocalDateTime](LocalDateTime.of(2022, MARCH, 13, 12, 13))
+    }
+
+    "EntityTypeConverter" - {
+      testToJsAndBack[EntityType.any](EntityType.BalanceCheckType)
+      testToJsAndBack[EntityType.any](EntityType.TransactionType)
+    }
+
+    "EntityModificationConverter" - {
+      "Add" - {
+        testToJsAndBack[EntityModification](EntityModification.Add(testTransactionWithIdA))
+      }
+      "Update" - {
+        testToJsAndBack[EntityModification](EntityModification.Update(testUserA))
+      }
+      "Remove" - {
+        testToJsAndBack[EntityModification](EntityModification.Remove[Transaction](19238))
+      }
     }
 
     "UserConverter: testToJsAndBack" - {
