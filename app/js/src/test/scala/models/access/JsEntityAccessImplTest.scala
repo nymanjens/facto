@@ -175,6 +175,7 @@ object JsEntityAccessImplTest extends TestSuite {
     override def queryExecutor[E <: Entity: EntityType]() = {
       DbQueryExecutor.fromEntities(modificationsBuffer.getAllEntitiesOfType[E]).asAsync
     }
+    override def pendingModifications() = ???
     override def getSingletonValue[V](key: SingletonKey[V]) = {
       Future.successful(singletonMap.get(key) map key.valueConverter.toScala)
     }
@@ -191,6 +192,8 @@ object JsEntityAccessImplTest extends TestSuite {
       modificationsBuffer.addEntities(entities)
       Future.successful((): Unit)
     }
+    override def addPendingModifications(modifications: Seq[EntityModification]) = ???
+    override def removePendingModifications(modifications: Seq[EntityModification]) = ???
     override def setSingletonValue[V](key: SingletonKey[V], value: V) = {
       singletonMap.put(key, key.valueConverter.toJs(value))
       Future.successful((): Unit)
