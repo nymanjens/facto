@@ -127,7 +127,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
           case Some(storeState) =>
             storeState.entries.reverse.zipWithIndex.map {
               case (entry, index) =>
-                props.calculateTableDataFromEntryAndRowNum(entry, index)
+                props.calculateTableDataFromEntryAndRowNum(entry.entry, index)
             }
           case None =>
             for (i <- 0 until state.maxNumEntries + 1) yield {
@@ -148,7 +148,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
           <.span(
             <<.ifThen(props.latestEntryToTableTitleExtra) { latestEntryToTableTitleExtra =>
               <<.ifThen(storeState.entries.lastOption) { latestEntry =>
-                <.span(latestEntryToTableTitleExtra(latestEntry), " ")
+                <.span(latestEntryToTableTitleExtra(latestEntry.entry), " ")
               }
             },
             <.span(^.style := js.Dictionary("color" -> "#999"), s"(${i18n("facto.n-entries", numEntries)})")
