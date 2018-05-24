@@ -15,6 +15,10 @@ trait JsEntityAccess extends EntityAccess {
 
   override def newQuerySyncForUser(): DbResultSet.Sync[User]
 
+  /**
+    * Returns the modifications that are incorporated into the data backing `newQuery()` ,but are not yet persisted
+    * remotely.
+    */
   def pendingModifications: PendingModifications
 
   /** Returns true if there are local pending `Add` modifications for the given entity. Note that only its id is used. */
@@ -22,8 +26,8 @@ trait JsEntityAccess extends EntityAccess {
 
   // **************** Setters ****************//
   /**
-    * Note: All read actions that are started after this call is started are postponed until after this write has
-    * completed.
+    * Note: All read actions that are started after this call is started are postponed until the data backing
+    * `newQuery()` has been updated.
     */
   def persistModifications(modifications: Seq[EntityModification]): Future[Unit]
   final def persistModifications(modifications: EntityModification*): Future[Unit] =
