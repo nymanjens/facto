@@ -32,6 +32,7 @@ import scala2js.Scala2Js
 trait LocalDatabase {
   // **************** Getters ****************//
   def queryExecutor[E <: Entity: EntityType](): DbQueryExecutor.Async[E]
+  def pendingModifications(): Future[Seq[EntityModification]]
   def getSingletonValue[V](key: SingletonKey[V]): Future[Option[V]]
   def isEmpty: Future[Boolean]
 
@@ -43,6 +44,9 @@ trait LocalDatabase {
     */
   def applyModifications(modifications: Seq[EntityModification]): Future[Boolean]
   def addAll[E <: Entity: EntityType](entities: Seq[E]): Future[Unit]
+
+  def addPendingModifications(modifications: Seq[EntityModification]): Future[Unit]
+  def removePendingModifications(modifications: Seq[EntityModification]): Future[Unit]
 
   /** Sets given singleton value in memory but doesn't persist it in the browser's storage (call `save()` to do this). */
   def setSingletonValue[V](key: SingletonKey[V], value: V): Future[Unit]
@@ -91,6 +95,28 @@ object LocalDatabase {
       }
     }
   }
+
+  private case class ModificationWithId(modification: EntityModification) {
+    def id: Long = modification.hashCode()
+  }
+
+  private object ModificationWithId {
+    implicit object Converter extends Scala2Js.MapConverter[ModificationWithId] {
+      override def toJs(modificationWithId: ModificationWithId) = {
+        js.Dictionary[js.Any](
+          "id" -> Scala2Js.toJs(modificationWithId.id),
+          "modification" -> Scala2Js.toJs(modificationWithId.modification))
+      }
+      override def toScala(dict: js.Dictionary[js.Any]) = {
+        def getRequired[V: Scala2Js.Converter](fieldName: String) = {
+          require(dict.contains(fieldName), s"Key ${fieldName} is missing from ${js.JSON.stringify(dict)}")
+          Scala2Js.toScala[V](dict(fieldName))
+        }
+        ModificationWithId(getRequired[EntityModification]("modification"))
+      }
+    }
+  }
+
   private final class Impl(implicit webWorker: LocalDatabaseWebWorkerApi) extends LocalDatabase {
     // **************** Getters ****************//
     def queryExecutor[E <: Entity: EntityType]() =
@@ -150,6 +176,12 @@ object LocalDatabase {
         }
       }
 
+    override def pendingModifications(): Future[Seq[EntityModification]] = async {
+      val allData =
+        await(webWorker.executeDataQuery(LokiQuery(collectionName = pendingModificationsCollectionName)))
+      for (data <- allData) yield Scala2Js.toScala[ModificationWithId](data).modification
+    }
+
     override def getSingletonValue[V](key: SingletonKey[V]) = async {
       implicit val converter = key.valueConverter
       val results = await(
@@ -196,6 +228,30 @@ object LocalDatabase {
         ))
     }
 
+    override def addPendingModifications(modifications: Seq[EntityModification]): Future[Unit] = async {
+      await(
+        webWorker.applyWriteOperations(
+          for (modification <- modifications)
+            yield
+              WriteOperation
+                .Insert(
+                  pendingModificationsCollectionName,
+                  Scala2Js.toJsMap(ModificationWithId(modification)))
+        ))
+    }
+
+    override def removePendingModifications(modifications: Seq[EntityModification]): Future[Unit] = async {
+      await(
+        webWorker.applyWriteOperations(
+          for (modification <- modifications)
+            yield
+              WriteOperation
+                .Remove(
+                  pendingModificationsCollectionName,
+                  Scala2Js.toJs(ModificationWithId(modification).id))
+        ))
+    }
+
     override def setSingletonValue[V](key: SingletonKey[V], value: V) = async {
       implicit val converter = key.valueConverter
       await(
@@ -230,15 +286,18 @@ object LocalDatabase {
                   uniqueIndices = Seq("id"),
                   indices = secondaryIndices(entityType).map(_.name))) :+
             WriteOperation
-              .AddCollection(singletonsCollectionName, uniqueIndices = Seq("id"), indices = Seq())))
+              .AddCollection(singletonsCollectionName, uniqueIndices = Seq("id"), indices = Seq()) :+
+            WriteOperation
+              .AddCollection(pendingModificationsCollectionName, uniqueIndices = Seq("id"), indices = Seq())))
       console.log("  Resetting database done.")
     }
 
     // **************** Private helper methods ****************//
     private def collectionNameOf(entityType: EntityType.any): String = s"entities_${entityType.name}"
     private val singletonsCollectionName = "singletons"
+    private val pendingModificationsCollectionName = "pendingModifications"
     private def allCollectionNames: Seq[String] =
-      EntityType.values.map(collectionNameOf) :+ singletonsCollectionName
+      EntityType.values.map(collectionNameOf) :+ singletonsCollectionName :+ pendingModificationsCollectionName
 
     private def secondaryIndices(entityType: EntityType.any): Seq[ModelField[_, _]] = entityType match {
       case TransactionType =>

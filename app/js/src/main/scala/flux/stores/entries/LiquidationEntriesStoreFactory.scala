@@ -3,6 +3,7 @@ package flux.stores.entries
 import common.GuavaReplacement.Iterables
 import common.GuavaReplacement.Iterables.getOnlyElement
 import common.money.{ExchangeRateManager, ReferenceMoney}
+import flux.stores.entries.WithIsPending.isAnyPending
 import models.access.DbQueryImplicits._
 import models.access.{DbQuery, EntityAccess, JsEntityAccess, ModelField}
 import models.accounting.config.{Account, Config, MoneyReservoir}
@@ -45,7 +46,9 @@ final class LiquidationEntriesStoreFactory(implicit entityAccess: JsEntityAccess
       }
 
       EntriesListStoreFactory.State(
-        entries.takeRight(maxNumEntries),
+        entries
+          .takeRight(maxNumEntries)
+          .map(entry => WithIsPending(entry, isPending = isAnyPending(entry.transactions))),
         hasMore = entries.size > maxNumEntries,
         impactingTransactionIds = relevantTransactions.toStream.map(_.id).toSet,
         impactingBalanceCheckIds = Set()

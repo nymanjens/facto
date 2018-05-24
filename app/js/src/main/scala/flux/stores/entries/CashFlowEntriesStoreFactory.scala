@@ -3,6 +3,7 @@ import common.money.{ExchangeRateManager, MoneyWithGeneralCurrency}
 import common.time.JavaTimeImplicits._
 import common.time.LocalDateTime
 import flux.stores.entries.CashFlowEntry.{BalanceCorrection, RegularEntry}
+import flux.stores.entries.WithIsPending.{isAnyPending, isPending}
 import models.access.DbQueryImplicits._
 import models.access.{DbQuery, EntityAccess, JsEntityAccess, ModelField}
 import models.accounting.config.{Config, MoneyReservoir}
@@ -127,7 +128,7 @@ final class CashFlowEntriesStoreFactory(implicit entityAccess: JsEntityAccess,
       entries = mergeValidatingBCs(entries).toList
 
       EntriesListStoreFactory.State(
-        entries.takeRight(maxNumEntries),
+        entries.takeRight(maxNumEntries).map(addIsPending),
         hasMore = entries.size > maxNumEntries,
         impactingTransactionIds = transactions.toStream.map(_.id).toSet,
         impactingBalanceCheckIds = (balanceChecks.toStream ++ oldestRelevantBalanceCheck).map(_.id).toSet
@@ -139,6 +140,11 @@ final class CashFlowEntriesStoreFactory(implicit entityAccess: JsEntityAccess,
 
     override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) =
       balanceCheck.moneyReservoir == moneyReservoir
+
+    private def addIsPending(entry: CashFlowEntry): WithIsPending[CashFlowEntry] = entry match {
+      case e: RegularEntry      => WithIsPending(e, isPending = isAnyPending(e.transactions))
+      case e: BalanceCorrection => WithIsPending(e, isPending = isPending(e.balanceCheck))
+    }
   }
 
   def get(moneyReservoir: MoneyReservoir, maxNumEntries: Int): Store =

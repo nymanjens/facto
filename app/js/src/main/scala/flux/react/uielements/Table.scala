@@ -44,11 +44,14 @@ object Table {
         ),
         <<.ifThen(state.expanded) {
           <.tbody(
-            props.tableDatas.zipWithIndex.map {
-              case (tableData, index) =>
-                <.tr(^.key := s"row-$index", ^.className := "data-row", tableData.toTagMod)
+            props.tableRowDatas.zipWithIndex.map {
+              case (TableRowData(tableData, deemphasize), index) =>
+                <.tr(
+                  ^.key := s"row-$index",
+                  ^^.classes("data-row" +: ifThenSeq(deemphasize, "deemphasized")),
+                  tableData.toTagMod)
             }.toVdomArray,
-            if (props.tableDatas.isEmpty) {
+            if (props.tableRowDatas.isEmpty) {
               <.tr(
                 <.td(^.colSpan := props.colSpan, ^^.classes("no-entries"), props.i18n("facto.no-entries"))
               )
@@ -86,7 +89,7 @@ object Table {
             expandNumEntriesCallback: Option[Callback] = None,
             tableTitleExtra: VdomElement = null,
             tableHeaders: Seq[VdomElement],
-            tableDatas: Seq[Seq[VdomElement]])(implicit i18n: I18n): VdomElement = {
+            tableRowDatas: Seq[TableRowData])(implicit i18n: I18n): VdomElement = {
     component(
       Props(
         title = title,
@@ -95,9 +98,15 @@ object Table {
         expandNumEntriesCallback = expandNumEntriesCallback,
         tableTitleExtra = Option(tableTitleExtra),
         tableHeaders = tableHeaders,
-        tableDatas = tableDatas
+        tableRowDatas = tableRowDatas
       ))
   }
+
+  // **************** Public inner types ****************//
+  case class TableRowData(cells: Seq[VdomElement], deemphasize: Boolean)
+
+  // **************** Private inner methods ****************//
+  private def ifThenSeq[V](condition: Boolean, value: V): Seq[V] = if (condition) Seq(value) else Seq()
 
   // **************** Private inner types ****************//
   private case class Props(title: String,
@@ -106,7 +115,7 @@ object Table {
                            expandNumEntriesCallback: Option[Callback],
                            tableTitleExtra: Option[VdomElement],
                            tableHeaders: Seq[VdomElement],
-                           tableDatas: Seq[Seq[VdomElement]])(implicit val i18n: I18n) {
+                           tableRowDatas: Seq[TableRowData])(implicit val i18n: I18n) {
     def colSpan: Int = tableHeaders.size
   }
   private case class State(expanded: Boolean)

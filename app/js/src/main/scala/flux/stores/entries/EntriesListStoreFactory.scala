@@ -1,5 +1,6 @@
 package flux.stores.entries
 
+import flux.stores.entries.WithIsPending.isAnyPending
 import models.access.JsEntityAccess
 
 import scala.collection.immutable.Seq
@@ -27,7 +28,7 @@ object EntriesListStoreFactory {
   /**
     * @param entries the latest `maxNumEntries` entries sorted from old to new.
     */
-  case class State[Entry](entries: Seq[Entry],
+  case class State[Entry](entries: Seq[WithIsPending[Entry]],
                           hasMore: Boolean,
                           override val impactingTransactionIds: Set[Long],
                           override val impactingBalanceCheckIds: Set[Long])
@@ -36,12 +37,13 @@ object EntriesListStoreFactory {
     def empty[Entry]: State[Entry] =
       State(Seq(), hasMore = false, impactingTransactionIds = Set(), impactingBalanceCheckIds = Set())
 
-    def withImpactingIdsInEntries[Entry <: GroupedTransactions](entries: Seq[Entry],
-                                                                hasMore: Boolean): State[Entry] =
+    def withImpactingIdsInEntries[Entry <: GroupedTransactions](entries: Seq[Entry], hasMore: Boolean)(
+        implicit entityAccess: JsEntityAccess): State[Entry] =
       State(
-        entries,
+        entries.map(entry => WithIsPending(entry, isPending = isAnyPending(entry.transactions))),
         hasMore = hasMore,
         impactingTransactionIds = entries.toStream.flatMap(_.transactions).map(_.id).toSet,
-        impactingBalanceCheckIds = Set())
+        impactingBalanceCheckIds = Set()
+      )
   }
 }

@@ -2,9 +2,10 @@ package scala2js
 
 import java.time.{LocalDate, LocalTime}
 
+import common.GuavaReplacement.ImmutableBiMap
 import common.time.LocalDateTime
 import models._
-import models.access.{ModelField}
+import models.access.ModelField
 import models.accounting._
 import models.modification._
 import models.money.ExchangeRateMeasurement
@@ -13,21 +14,21 @@ import models.user.User
 import scala.collection.immutable.Seq
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
-import scala2js.Scala2Js.Converter
+import scala2js.Scala2Js.{Converter, MapConverter}
 
 object Converters {
 
-  // **************** Non-implicits **************** //
-  implicit def fromEntityType[E <: Entity: EntityType]: Scala2Js.MapConverter[E] = {
+  // **************** Convertor generators **************** //
+  implicit def fromEntityType[E <: Entity: EntityType]: MapConverter[E] = {
     val entityType: EntityType[E] = implicitly[EntityType[E]]
-    val converter: Scala2Js.MapConverter[_ <: Entity] = entityType match {
+    val converter: MapConverter[_ <: Entity] = entityType match {
       case EntityType.UserType                    => UserConverter
       case EntityType.TransactionType             => TransactionConverter
       case EntityType.TransactionGroupType        => TransactionGroupConverter
       case EntityType.BalanceCheckType            => BalanceCheckConverter
       case EntityType.ExchangeRateMeasurementType => ExchangeRateMeasurementConverter
     }
-    converter.asInstanceOf[Scala2Js.MapConverter[E]]
+    converter.asInstanceOf[MapConverter[E]]
   }
 
   def fromModelField[V](modelField: ModelField[V, _]): Converter[V] = {
@@ -43,28 +44,51 @@ object Converters {
     result.asInstanceOf[Converter[V]]
   }
 
+  def enumConverter[T](values: T*): Converter[T] = {
+    val valueToNumber: ImmutableBiMap[T, Int] = {
+      val builder = ImmutableBiMap.builder[T, Int]()
+      for ((value, number) <- values.zipWithIndex) {
+        builder.put(value, number)
+      }
+      builder.build()
+    }
+
+    new Converter[T] {
+      override def toJs(value: T) = Scala2Js.toJs(valueToNumber.get(value))
+      override def toScala(value: js.Any) = valueToNumber.inverse().get(Scala2Js.toScala[Int](value))
+    }
+  }
+
+  implicit def seqConverter[A: Converter]: Converter[Seq[A]] =
+    new Converter[Seq[A]] {
+      override def toJs(seq: Seq[A]) =
+        seq.toStream.map(Scala2Js.toJs[A]).toJSArray
+      override def toScala(value: js.Any) =
+        value.asInstanceOf[js.Array[js.Any]].toStream.map(Scala2Js.toScala[A]).toVector
+    }
+
   // **************** General converters **************** //
-  implicit object NullConverter extends Scala2Js.Converter[js.Any] {
+  implicit object NullConverter extends Converter[js.Any] {
     override def toJs(obj: js.Any) = obj
     override def toScala(obj: js.Any) = obj
   }
 
-  implicit object StringConverter extends Scala2Js.Converter[String] {
+  implicit object StringConverter extends Converter[String] {
     override def toJs(string: String) = string
     override def toScala(value: js.Any) = value.asInstanceOf[String]
   }
 
-  implicit object BooleanConverter extends Scala2Js.Converter[Boolean] {
+  implicit object BooleanConverter extends Converter[Boolean] {
     override def toJs(bool: Boolean) = bool
     override def toScala(value: js.Any) = value.asInstanceOf[Boolean]
   }
 
-  implicit object IntConverter extends Scala2Js.Converter[Int] {
+  implicit object IntConverter extends Converter[Int] {
     override def toJs(int: Int) = int
     override def toScala(value: js.Any) = value.asInstanceOf[Int]
   }
 
-  implicit object LongConverter extends Scala2Js.Converter[Long] {
+  implicit object LongConverter extends Converter[Long] {
     override def toJs(long: Long) = {
       // Note: It would be easier to implement this by `"%022d".format(long)`
       // but that transforms the given long to a javascript number (double precision)
@@ -80,20 +104,12 @@ object Converters {
     override def toScala(value: js.Any) = value.asInstanceOf[String].toLong
   }
 
-  implicit object DoubleConverter extends Scala2Js.Converter[Double] {
+  implicit object DoubleConverter extends Converter[Double] {
     override def toJs(double: Double) = double
     override def toScala(value: js.Any) = value.asInstanceOf[Double]
   }
 
-  implicit def seqConverter[A: Scala2Js.Converter]: Scala2Js.Converter[Seq[A]] =
-    new Converter[Seq[A]] {
-      override def toJs(seq: Seq[A]) =
-        seq.toStream.map(Scala2Js.toJs[A]).toJSArray
-      override def toScala(value: js.Any) =
-        value.asInstanceOf[js.Array[js.Any]].toStream.map(Scala2Js.toScala[A]).toVector
-    }
-
-  implicit object LocalDateTimeConverter extends Scala2Js.Converter[LocalDateTime] {
+  implicit object LocalDateTimeConverter extends Converter[LocalDateTime] {
 
     private val secondsInDay = 60 * 60 * 24
 
@@ -110,8 +126,65 @@ object Converters {
     }
   }
 
+  implicit val EntityTypeConverter: Converter[EntityType.any] = enumConverter(
+    EntityType.UserType,
+    EntityType.TransactionType,
+    EntityType.TransactionGroupType,
+    EntityType.BalanceCheckType,
+    EntityType.ExchangeRateMeasurementType)
+
+  implicit object EntityModificationConverter extends Converter[EntityModification] {
+    private val addNumber: Int = 1
+    private val updateNumber: Int = 2
+    private val removeNumber: Int = 3
+
+    override def toJs(modification: EntityModification) = {
+      def internal[E <: Entity] = {
+        val result = js.Array[js.Any]()
+
+        result.push(Scala2Js.toJs[EntityType.any](modification.entityType))
+        modification match {
+          case EntityModification.Add(entity) =>
+            result.push(addNumber)
+            result.push(
+              Scala2Js.toJs(entity.asInstanceOf[E])(
+                fromEntityType(modification.entityType.asInstanceOf[EntityType[E]])))
+          case EntityModification.Update(entity) =>
+            result.push(updateNumber)
+            result.push(
+              Scala2Js.toJs(entity.asInstanceOf[E])(
+                fromEntityType(modification.entityType.asInstanceOf[EntityType[E]])))
+          case EntityModification.Remove(entityId) =>
+            result.push(removeNumber)
+            result.push(Scala2Js.toJs(entityId))
+        }
+
+        result
+      }
+      internal
+    }
+
+    override def toScala(value: js.Any) = {
+      def internal[E <: Entity] = {
+        val array = value.asInstanceOf[js.Array[js.Any]]
+        implicit val entityType = Scala2Js.toScala[EntityType.any](array.shift()).asInstanceOf[EntityType[E]]
+        val modificationTypeNumber = Scala2Js.toScala[Int](array.shift())
+
+        array.toVector match {
+          case Vector(entity) if modificationTypeNumber == addNumber =>
+            EntityModification.Add(Scala2Js.toScala[E](entity))
+          case Vector(entity) if modificationTypeNumber == updateNumber =>
+            EntityModification.Update(Scala2Js.toScala[E](entity))
+          case Vector(entityId) if modificationTypeNumber == removeNumber =>
+            EntityModification.Remove(Scala2Js.toScala[Long](entityId))(entityType)
+        }
+      }
+      internal
+    }
+  }
+
   // **************** Entity converters **************** //
-  private[scala2js] abstract class EntityConverter[E <: Entity: EntityType] extends Scala2Js.MapConverter[E] {
+  private[scala2js] abstract class EntityConverter[E <: Entity: EntityType] extends MapConverter[E] {
     override final def toJs(entity: E) = {
       val result = js.Dictionary[js.Any]()
 

@@ -109,6 +109,37 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
         await(DbResultSet.fromExecutor(db.queryExecutor[Transaction]()).data()) ==> Seq(testTransactionWithId)
       }
     },
+    ManualTest("addPendingModifications") {
+      async {
+        val db = await(createAndInitializeDb())
+
+        await(db.addPendingModifications(Seq(testModificationA, testModificationB)))
+        await(db.addPendingModifications(Seq(testModificationB)))
+
+        await(db.pendingModifications()) ==> Seq(testModificationA, testModificationB)
+      }
+    },
+    ManualTest("removePendingModifications: Modification in db") {
+      async {
+        val db = await(createAndInitializeDb())
+        await(db.addPendingModifications(Seq(testModificationA)))
+        await(db.addPendingModifications(Seq(testModificationB)))
+
+        await(db.removePendingModifications(Seq(testModificationA)))
+
+        await(db.pendingModifications()) ==> Seq(testModificationB)
+      }
+    },
+    ManualTest("removePendingModifications: Modification not in db") {
+      async {
+        val db = await(createAndInitializeDb())
+        await(db.addPendingModifications(Seq(testModificationA)))
+
+        await(db.removePendingModifications(Seq(testModificationB)))
+
+        await(db.pendingModifications()) ==> Seq(testModificationA)
+      }
+    },
     ManualTest("applyModifications: Add") {
       async {
         val db = await(createAndInitializeDb())

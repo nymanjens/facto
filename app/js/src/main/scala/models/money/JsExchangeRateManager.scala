@@ -50,7 +50,7 @@ final class JsExchangeRateManager(
 
   // **************** Inner type definitions ****************//
   private object JsEntityAccessListener extends JsEntityAccess.Listener {
-    override def modificationsAdded(modifications: Seq[EntityModification]): Unit = {
+    override def modificationsAddedOrPendingStateChanged(modifications: Seq[EntityModification]): Unit = {
       for (modification <- modifications) {
         modification.entityType match {
           case EntityType.ExchangeRateMeasurementType =>

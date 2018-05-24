@@ -1,7 +1,7 @@
 package common.testing
 
 import models.Entity
-import models.access.{DbQueryExecutor, DbResultSet, JsEntityAccess}
+import models.access.{DbQueryExecutor, DbResultSet, JsEntityAccess, PendingModifications}
 import models.access.JsEntityAccess.Listener
 import models.modification.{EntityModification, EntityType}
 import models.user.User
@@ -14,7 +14,7 @@ import scala2js.Converters._
 final class FakeJsEntityAccess extends JsEntityAccess {
 
   private val modificationsBuffer: ModificationsBuffer = new ModificationsBuffer()
-  private val localModificationIds: mutable.Buffer[Long] = mutable.Buffer()
+  private var _pendingModifications: PendingModifications = PendingModifications(Set())
   private val listeners: mutable.Buffer[Listener] = mutable.Buffer()
 
   // **************** Implementation of ScalaJsApiClient trait ****************//
@@ -24,12 +24,10 @@ final class FakeJsEntityAccess extends JsEntityAccess {
   override def newQuerySyncForUser() = {
     DbResultSet.fromExecutor(queryExecutor[User])
   }
-  override def hasLocalAddModifications[E <: Entity: EntityType](entity: E) = {
-    localModificationIds contains entity.id
-  }
+  override def pendingModifications: PendingModifications = _pendingModifications
   override def persistModifications(modifications: Seq[EntityModification]): Future[Unit] = {
     modificationsBuffer.addModifications(modifications)
-    listeners.foreach(_.modificationsAdded(modifications))
+    listeners.foreach(_.modificationsAddedOrPendingStateChanged(modifications))
     Future.successful((): Unit)
   }
   override def registerListener(listener: Listener): Unit = {
@@ -40,10 +38,10 @@ final class FakeJsEntityAccess extends JsEntityAccess {
   // **************** Additional methods for tests ****************//
   def newQuerySync[E <: Entity: EntityType](): DbResultSet.Sync[E] = DbResultSet.fromExecutor(queryExecutor)
 
-  // TODO: Add manipulation methods for localModificationIds
+  // TODO: Add manipulation methods for _pendingModifications
   def addRemoteModifications(modifications: Seq[EntityModification]): Unit = {
     modificationsBuffer.addModifications(modifications)
-    listeners.foreach(_.modificationsAdded(modifications))
+    listeners.foreach(_.modificationsAddedOrPendingStateChanged(modifications))
   }
 
   def addRemotelyAddedEntities[E <: Entity: EntityType](entities: E*): Unit = {
