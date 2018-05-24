@@ -104,7 +104,7 @@ object LocalDatabase {
     implicit object Converter extends Scala2Js.MapConverter[ModificationWithId] {
       override def toJs(modificationWithId: ModificationWithId) = {
         js.Dictionary[js.Any](
-          "id" -> modificationWithId.id,
+          "id" -> Scala2Js.toJs(modificationWithId.id),
           "modification" -> Scala2Js.toJs(modificationWithId.modification))
       }
       override def toScala(dict: js.Dictionary[js.Any]) = {
