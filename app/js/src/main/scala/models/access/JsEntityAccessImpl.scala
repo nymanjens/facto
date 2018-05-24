@@ -22,8 +22,6 @@ private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
     extends JsEntityAccess {
 
   private var listeners: Seq[Listener] = Seq()
-  private val localAddModificationIds: Map[EntityType.any, mutable.Set[Long]] =
-    EntityType.values.map(t => t -> mutable.Set[Long]()).toMap
   private val allLocallyCreatedModifications: mutable.Set[EntityModification] = mutable.Set()
   private var _pendingModifications: PendingModifications = PendingModifications(Set())
   private var isCallingListeners: Boolean = false
@@ -62,10 +60,6 @@ private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
 
   override def pendingModifications = _pendingModifications
 
-  override def hasLocalAddModifications[E <: Entity: EntityType](entity: E): Boolean = {
-    localAddModificationIds(implicitly[EntityType[E]]) contains entity.id
-  }
-
   // **************** Setters ****************//
   override def persistModifications(modifications: Seq[EntityModification]): Future[Unit] = logExceptions {
     require(!isCallingListeners)
@@ -73,10 +67,6 @@ private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
     allLocallyCreatedModifications ++= modifications
     _pendingModifications ++= modifications
 
-    for {
-      modification <- modifications
-      if modification.isInstanceOf[EntityModification.Add[_]]
-    } localAddModificationIds(modification.entityType) += modification.entityId
     val listenersInvoked = invokeListenersAsync(_.modificationsAddedOrPendingStateChanged(modifications))
 
     val persistResponse = remoteDatabaseProxy.persistEntityModifications(modifications)
@@ -89,12 +79,6 @@ private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
 
     async {
       await(persistResponse.completelyDone)
-
-      for {
-        modification <- modifications
-        if modification.isInstanceOf[EntityModification.Add[_]]
-      } localAddModificationIds(modification.entityType) -= modification.entityId
-
       await(listenersInvoked)
     }
   }

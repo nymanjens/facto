@@ -21,9 +21,6 @@ trait JsEntityAccess extends EntityAccess {
     */
   def pendingModifications: PendingModifications
 
-  /** Returns true if there are local pending `Add` modifications for the given entity. Note that only its id is used. */
-  @Deprecated def hasLocalAddModifications[E <: Entity: EntityType](entity: E): Boolean
-
   // **************** Setters ****************//
   /**
     * Note: All read actions that are started after this call is started are postponed until the data backing

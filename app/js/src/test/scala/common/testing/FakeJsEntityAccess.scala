@@ -15,7 +15,6 @@ final class FakeJsEntityAccess extends JsEntityAccess {
 
   private val modificationsBuffer: ModificationsBuffer = new ModificationsBuffer()
   private var _pendingModifications: PendingModifications = PendingModifications(Set())
-  private val localModificationIds: mutable.Buffer[Long] = mutable.Buffer()
   private val listeners: mutable.Buffer[Listener] = mutable.Buffer()
 
   // **************** Implementation of ScalaJsApiClient trait ****************//
@@ -24,9 +23,6 @@ final class FakeJsEntityAccess extends JsEntityAccess {
   }
   override def newQuerySyncForUser() = {
     DbResultSet.fromExecutor(queryExecutor[User])
-  }
-  override def hasLocalAddModifications[E <: Entity: EntityType](entity: E) = {
-    localModificationIds contains entity.id
   }
   override def pendingModifications: PendingModifications = _pendingModifications
   override def persistModifications(modifications: Seq[EntityModification]): Future[Unit] = {

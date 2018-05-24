@@ -110,15 +110,6 @@ object JsEntityAccessImplTest extends TestSuite {
         await(entityAccess.newQuery[Transaction]().data()) ==> Seq(testTransactionWithId)
       }
 
-      "hasLocalAddModifications()" - async {
-        localDatabasePromise.success(fakeLocalDatabase)
-        await(remoteDatabaseProxy.localDatabaseReadyFuture)
-
-        await(entityAccess.persistModifications(Seq(EntityModification.Add(testTransactionWithId))))
-
-        entityAccess.hasLocalAddModifications(testTransactionWithId) ==> false
-      }
-
       "persistModifications()" - async {
         localDatabasePromise.success(fakeLocalDatabase)
         await(remoteDatabaseProxy.localDatabaseReadyFuture)
