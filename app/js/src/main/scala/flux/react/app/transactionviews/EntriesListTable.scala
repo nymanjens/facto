@@ -5,7 +5,8 @@ import common.{I18n, Unique}
 import flux.react.ReactVdomUtils.<<
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import flux.react.uielements
-import flux.stores.entries.{EntriesListStoreFactory, EntriesStore}
+import flux.react.uielements.Table.TableRowData
+import flux.stores.entries.{EntriesListStoreFactory, EntriesStore, WithIsPending}
 import japgolly.scalajs.react.vdom.html_<^.{VdomElement, _}
 import japgolly.scalajs.react.{Callback, _}
 import org.scalajs.dom.console
@@ -123,19 +124,23 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
         },
         tableTitleExtra = tableTitleExtra(props, state),
         tableHeaders = props.tableHeaders,
-        tableDatas = state.storeState match {
+        tableRowDatas = state.storeState match {
           case Some(storeState) =>
             storeState.entries.reverse.zipWithIndex.map {
-              case (entry, index) =>
-                props.calculateTableDataFromEntryAndRowNum(entry.entry, index)
+              case (WithIsPending(entry, isPending), index) =>
+                TableRowData(
+                  props.calculateTableDataFromEntryAndRowNum(entry, index),
+                  deemphasize = isPending)
             }
           case None =>
             for (i <- 0 until state.maxNumEntries + 1) yield {
-              Seq[VdomElement](
-                <.td(
-                  ^.colSpan := props.tableHeaders.size,
-                  ^.style := js.Dictionary("color" -> "white"),
-                  "loading..."))
+              TableRowData(
+                Seq[VdomElement](
+                  <.td(
+                    ^.colSpan := props.tableHeaders.size,
+                    ^.style := js.Dictionary("color" -> "white"),
+                    "loading...")),
+                deemphasize = false)
             }
         }
       )
