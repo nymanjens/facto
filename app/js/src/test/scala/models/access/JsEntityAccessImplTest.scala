@@ -178,7 +178,7 @@ object JsEntityAccessImplTest extends TestSuite {
     // **************** Setters ****************//
     override def applyModifications(modifications: Seq[EntityModification]) = {
       modificationsBuffer.addModifications(modifications)
-      Future.successful(true)
+      Future.successful((): Unit)
     }
     override def addAll[E <: Entity: EntityType](entities: Seq[E]) = {
       modificationsBuffer.addEntities(entities)
