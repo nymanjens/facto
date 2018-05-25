@@ -92,13 +92,13 @@ object LiquidationEntriesStoreFactoryTest extends TestSuite {
                 val subList = expectedEntries.takeRight(i)
 
                 val state = await(factory.get(pair, maxNumEntries = subList.size).stateFuture)
-                state.entries ==> subList
+                state.entries.map(_.entry) ==> subList
                 state.hasMore ==> (i < expectedEntries.size)
               }))
 
       // All entries
       val allEntriesState = await(factory.get(pair, maxNumEntries = 10000).stateFuture)
-      allEntriesState.entries ==> expectedEntries
+      allEntriesState.entries.map(_.entry) ==> expectedEntries
       allEntriesState.hasMore ==> false
     }
   }

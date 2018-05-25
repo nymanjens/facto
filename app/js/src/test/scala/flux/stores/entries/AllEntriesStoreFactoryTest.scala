@@ -34,8 +34,9 @@ object AllEntriesStoreFactoryTest extends TestSuite {
       entityAccess.addRemotelyAddedEntities(testTransactionWithId)
 
       await(store.stateFuture).hasMore ==> false
-      await(store.stateFuture).entries ==> GeneralEntry.toGeneralEntrySeq(Seq(testTransactionWithId))
-      store.state.get.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(testTransactionWithId))
+      await(store.stateFuture).entries.map(_.entry) ==>
+        GeneralEntry.toGeneralEntrySeq(Seq(testTransactionWithId))
+      store.state.get.entries.map(_.entry) ==> GeneralEntry.toGeneralEntrySeq(Seq(testTransactionWithId))
     }
 
     "store state is updated upon local update" - async {
@@ -44,13 +45,15 @@ object AllEntriesStoreFactoryTest extends TestSuite {
       entityAccess.persistModifications(Seq(EntityModification.Add(testTransactionWithId)))
 
       await(store.stateFuture).hasMore ==> false
-      await(store.stateFuture).entries ==> GeneralEntry.toGeneralEntrySeq(Seq(testTransactionWithId))
+      await(store.stateFuture).entries.map(_.entry) ==>
+        GeneralEntry.toGeneralEntrySeq(Seq(testTransactionWithId))
     }
 
     "store state is updated upon local removal" - async {
       entityAccess.persistModifications(Seq(EntityModification.Add(testTransactionWithId)))
       await(store.stateFuture).hasMore ==> false
-      await(store.stateFuture).entries ==> GeneralEntry.toGeneralEntrySeq(Seq(testTransactionWithId))
+      await(store.stateFuture).entries.map(_.entry) ==>
+        GeneralEntry.toGeneralEntrySeq(Seq(testTransactionWithId))
 
       entityAccess.persistModifications(Seq(EntityModification.Remove[Transaction](testTransactionWithId.id)))
 
@@ -86,7 +89,8 @@ object AllEntriesStoreFactoryTest extends TestSuite {
       entityAccess.addRemotelyAddedEntities(trans1, trans2, trans3)
 
       await(store.stateFuture).hasMore ==> false
-      await(store.stateFuture).entries ==> GeneralEntry.toGeneralEntrySeq(Seq(trans1, trans2), Seq(trans3))
+      await(store.stateFuture).entries.map(_.entry) ==>
+        GeneralEntry.toGeneralEntrySeq(Seq(trans1, trans2), Seq(trans3))
     }
 
     "sorts entries on transaction date first and then created date" - async {
@@ -113,8 +117,8 @@ object AllEntriesStoreFactoryTest extends TestSuite {
       entityAccess.addRemotelyAddedEntities(trans3, trans2, trans1)
 
       await(store.stateFuture).hasMore ==> false
-      await(store.stateFuture).entries ==> GeneralEntry
-        .toGeneralEntrySeq(Seq(trans1), Seq(trans2), Seq(trans3))
+      await(store.stateFuture).entries.map(_.entry) ==>
+        GeneralEntry.toGeneralEntrySeq(Seq(trans1), Seq(trans2), Seq(trans3))
     }
 
     "respects maxNumEntries" - async {
@@ -129,8 +133,8 @@ object AllEntriesStoreFactoryTest extends TestSuite {
       entityAccess.addRemotelyAddedEntities(trans1, trans2, trans3, trans4)
 
       await(store.stateFuture).hasMore ==> true
-      await(store.stateFuture).entries ==> GeneralEntry
-        .toGeneralEntrySeq(Seq(trans2), Seq(trans3), Seq(trans4))
+      await(store.stateFuture).entries.map(_.entry) ==>
+        GeneralEntry.toGeneralEntrySeq(Seq(trans2), Seq(trans3), Seq(trans4))
     }
   }
 }

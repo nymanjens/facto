@@ -31,7 +31,7 @@ object ComplexQueryStoreFactoryTest extends TestSuite {
       val state = await(store.stateFuture)
 
       state.hasMore ==> false
-      state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(trans1, trans3), Seq(trans4, trans5))
+      state.entries.map(_.entry) ==> GeneralEntry.toGeneralEntrySeq(Seq(trans1, trans3), Seq(trans4, trans5))
     }
 
     "respects maxNumEntries" - async {
@@ -39,7 +39,7 @@ object ComplexQueryStoreFactoryTest extends TestSuite {
       val state = await(store.stateFuture)
 
       state.hasMore ==> true
-      state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(trans4, trans5))
+      state.entries.map(_.entry) ==> GeneralEntry.toGeneralEntrySeq(Seq(trans4, trans5))
     }
   }
 }

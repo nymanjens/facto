@@ -33,7 +33,8 @@ object EndowmentEntriesStoreFactoryTest extends TestSuite {
       val state = await(store.stateFuture)
 
       state.hasMore ==> false
-      state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(trans1), Seq(trans2), Seq(trans3), Seq(trans4))
+      state.entries.map(_.entry) ==>
+        GeneralEntry.toGeneralEntrySeq(Seq(trans1), Seq(trans2), Seq(trans3), Seq(trans4))
     }
 
     "respects maxNumEntries" - async {
@@ -41,7 +42,7 @@ object EndowmentEntriesStoreFactoryTest extends TestSuite {
       val state = await(store.stateFuture)
 
       state.hasMore ==> true
-      state.entries ==> GeneralEntry.toGeneralEntrySeq(Seq(trans2), Seq(trans3), Seq(trans4))
+      state.entries.map(_.entry) ==> GeneralEntry.toGeneralEntrySeq(Seq(trans2), Seq(trans3), Seq(trans4))
     }
   }
 
