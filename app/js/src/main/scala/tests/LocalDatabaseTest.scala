@@ -1,6 +1,6 @@
 package tests
 
-import models.access.{DbQuery, DbResultSet, LocalDatabase, ModelField}
+import models.access.{DbQuery, DbResultSet, LocalDatabase, LocalDatabaseImpl, ModelField}
 import common.testing.TestObjects._
 import models.access.LocalDatabase
 import models.access.SingletonKey.{NextUpdateTokenKey, VersionKey}
@@ -54,7 +54,7 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
     },
     ManualTest("save") {
       async {
-        val db = await(LocalDatabase.createStoredForTests(encryptionSecret))
+        val db = await(LocalDatabaseImpl.createStoredForTests(encryptionSecret))
         await(db.resetAndInitialize())
         await(db.addAll(Seq(testTransactionWithId)))
         await(db.setSingletonValue(VersionKey, "testVersion"))
@@ -62,7 +62,7 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
         await(db.save())
         await(db.setSingletonValue(VersionKey, "otherTestVersion"))
 
-        val otherDb = await(LocalDatabase.createStoredForTests(encryptionSecret))
+        val otherDb = await(LocalDatabaseImpl.createStoredForTests(encryptionSecret))
         await(DbResultSet.fromExecutor(otherDb.queryExecutor[Transaction]()).data()) ==>
           Seq(testTransactionWithId)
         await(otherDb.getSingletonValue(VersionKey)).get ==> "testVersion"
@@ -243,7 +243,7 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
   )
 
   def createAndInitializeDb(): Future[LocalDatabase] = async {
-    val db = await(LocalDatabase.createInMemoryForTests(encryptionSecret))
+    val db = await(LocalDatabaseImpl.createInMemoryForTests(encryptionSecret))
     await(db.resetAndInitialize())
     db
   }

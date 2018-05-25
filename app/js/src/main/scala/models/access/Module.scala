@@ -11,7 +11,7 @@ final class Module(implicit user: User,
   implicit val entityAccess: JsEntityAccess = {
     val webWorkerModule = new models.access.webworker.Module()
     implicit val localDatabaseWebWorkerApiStub = webWorkerModule.localDatabaseWebWorkerApiStub
-    val localDatabaseFuture = LocalDatabase.create(encryptionSecret = user.databaseEncryptionKey)
+    val localDatabaseFuture = LocalDatabaseImpl.create(encryptionSecret = user.databaseEncryptionKey)
     implicit val remoteDatabaseProxy = HybridRemoteDatabaseProxy.create(localDatabaseFuture)
     val entityAccess = new JsEntityAccessImpl(getInitialDataResponse.allUsers)
 

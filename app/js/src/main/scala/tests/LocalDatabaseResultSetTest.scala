@@ -4,7 +4,7 @@ import common.testing.TestObjects._
 import models.access.DbQuery.Filter
 import models.access.DbQueryImplicits._
 import models.access.webworker.LocalDatabaseWebWorkerApi
-import models.access.{DbQuery, DbResultSet, LocalDatabase, ModelField}
+import models.access._
 import models.accounting.Transaction
 import tests.ManualTests.{ManualTest, ManualTestSuite}
 
@@ -241,7 +241,7 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
 
     def assertThat(resultSetFunc: DbResultSet.Async[Transaction] => Future[Any]) = new Object {
       def containsExactly(expected: Transaction*): Future[Unit] = async {
-        val db = await(LocalDatabase.createInMemoryForTests())
+        val db = await(LocalDatabaseImpl.createInMemoryForTests())
         await(db.resetAndInitialize())
         await(db.addAll(transactions.toVector))
         await(resultSetFunc(DbResultSet.fromExecutor(db.queryExecutor[Transaction]()))) match {
@@ -250,7 +250,7 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
       }
 
       def containsExactlyInOrder(expected: Transaction*): Future[Unit] = async {
-        val db = await(LocalDatabase.createInMemoryForTests())
+        val db = await(LocalDatabaseImpl.createInMemoryForTests())
         await(db.resetAndInitialize())
         await(db.addAll(transactions.toVector))
         await(resultSetFunc(DbResultSet.fromExecutor(db.queryExecutor[Transaction]()))) match {
@@ -259,7 +259,7 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
       }
 
       def isEqualTo(expected: Any): Future[Unit] = async {
-        val db = await(LocalDatabase.createInMemoryForTests())
+        val db = await(LocalDatabaseImpl.createInMemoryForTests())
         await(db.resetAndInitialize())
         await(db.addAll(transactions.toVector))
         await(resultSetFunc(DbResultSet.fromExecutor(db.queryExecutor[Transaction]()))) ==> expected
