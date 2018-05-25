@@ -145,7 +145,7 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
         val db = await(createAndInitializeDb())
         val transaction1 = createTransaction()
 
-        await(db.applyModifications(Seq(EntityModification.Add(transaction1)))) ==> true
+        await(db.applyModifications(Seq(EntityModification.Add(transaction1))))
 
         await(DbResultSet.fromExecutor(db.queryExecutor[Transaction]()).data()) ==> Seq(transaction1)
       }
@@ -157,7 +157,7 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
         val updatedTransaction1 = transaction1.copy(flowInCents = 19191)
         await(db.addAll(Seq(transaction1)))
 
-        await(db.applyModifications(Seq(EntityModification.createUpdate(updatedTransaction1)))) ==> true
+        await(db.applyModifications(Seq(EntityModification.createUpdate(updatedTransaction1))))
 
         await(DbResultSet.fromExecutor(db.queryExecutor[Transaction]()).data()) ==> Seq(updatedTransaction1)
       }
@@ -168,7 +168,7 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
         val transaction1 = createTransaction()
         await(db.addAll(Seq(transaction1)))
 
-        await(db.applyModifications(Seq(EntityModification.createDelete(transaction1)))) ==> true
+        await(db.applyModifications(Seq(EntityModification.createDelete(transaction1))))
 
         await(DbResultSet.fromExecutor(db.queryExecutor[Transaction]()).data()) ==> Seq()
       }
@@ -187,7 +187,7 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
             EntityModification.Add(transaction1),
             EntityModification.Add(updatedTransaction1),
             EntityModification.Add(transaction2)
-          ))) ==> true
+          )))
 
         await(DbResultSet.fromExecutor(db.queryExecutor[Transaction]()).data()).toSet ==> Set(
           transaction1,
@@ -208,7 +208,7 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
               EntityModification.Update(updatedTransaction1),
               EntityModification.Update(updatedTransaction1),
               EntityModification.Update(transaction2)
-            ))) ==> true
+            )))
 
         await(DbResultSet.fromExecutor(db.queryExecutor[Transaction]()).data()) ==> Seq(updatedTransaction1)
       }
@@ -227,17 +227,9 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
               EntityModification.createDelete(transaction2),
               EntityModification.createDelete(transaction2),
               EntityModification.createDelete(transaction3)
-            ))) ==> true
+            )))
 
         await(DbResultSet.fromExecutor(db.queryExecutor[Transaction]()).data()) ==> Seq(transaction1)
-      }
-    },
-    ManualTest("applyModifications: Returns false if no change") {
-      async {
-        val db = await(createAndInitializeDb())
-        await(db.applyModifications(Seq(EntityModification.Add(testTransactionWithId)))) ==> true
-
-        await(db.applyModifications(Seq(EntityModification.Add(testTransactionWithId)))) ==> false
       }
     }
   )

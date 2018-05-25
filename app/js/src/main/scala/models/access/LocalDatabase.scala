@@ -23,7 +23,7 @@ trait LocalDatabase {
     *
     * @return true if the in memory database changed as a result of this method
     */
-  def applyModifications(modifications: Seq[EntityModification]): Future[Boolean]
+  def applyModifications(modifications: Seq[EntityModification]): Future[Unit]
   def addAll[E <: Entity: EntityType](entities: Seq[E]): Future[Unit]
 
   def addPendingModifications(modifications: Seq[EntityModification]): Future[Unit]

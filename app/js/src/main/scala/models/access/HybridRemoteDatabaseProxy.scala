@@ -98,12 +98,10 @@ private[access] final class HybridRemoteDatabaseProxy(localDatabaseFuture: Futur
 
     if (localDatabaseOption.isDefined) {
       val localDatabase = localDatabaseOption.get
-      val somethingChanged = await(localDatabase.applyModifications(response.modifications))
+      await(localDatabase.applyModifications(response.modifications))
       await(localDatabase.removePendingModifications(response.modifications))
-      if (somethingChanged) {
-        await(localDatabase.setSingletonValue(NextUpdateTokenKey, response.nextUpdateToken))
-        await(localDatabase.save())
-      }
+      await(localDatabase.setSingletonValue(NextUpdateTokenKey, response.nextUpdateToken))
+      await(localDatabase.save())
     }
 
     GetRemotelyModifiedEntitiesResponse(
