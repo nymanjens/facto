@@ -1,11 +1,13 @@
-package flux.stores.entries
+package flux.stores.entries.factories
+
 import common.money.{ExchangeRateManager, MoneyWithGeneralCurrency}
 import common.time.JavaTimeImplicits._
 import common.time.LocalDateTime
 import flux.stores.entries.CashFlowEntry.{BalanceCorrection, RegularEntry}
 import flux.stores.entries.WithIsPending.{isAnyPending, isPending}
+import flux.stores.entries.{CashFlowEntry, WithIsPending}
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, EntityAccess, JsEntityAccess, ModelField}
+import models.access.{DbQuery, JsEntityAccess, ModelField}
 import models.accounting.config.{Config, MoneyReservoir}
 import models.accounting.{Transaction, _}
 

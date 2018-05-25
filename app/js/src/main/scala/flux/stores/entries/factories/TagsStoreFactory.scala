@@ -1,9 +1,10 @@
-package flux.stores.entries
+package flux.stores.entries.factories
 
 import common.GuavaReplacement.ImmutableSetMultimap
-import flux.stores.entries.TagsStoreFactory.State
+import flux.stores.entries.EntriesStore
+import flux.stores.entries.factories.TagsStoreFactory.State
 import models.access.DbQueryImplicits._
-import models.access.{ModelField, JsEntityAccess}
+import models.access.{JsEntityAccess, ModelField}
 import models.accounting.{BalanceCheck, Transaction}
 
 import scala.async.Async.{async, await}

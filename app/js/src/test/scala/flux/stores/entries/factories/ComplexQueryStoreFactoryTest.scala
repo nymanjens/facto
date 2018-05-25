@@ -1,11 +1,12 @@
-package flux.stores.entries
+package flux.stores.entries.factories
 
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala.async.Async.{async, await}
 import common.testing.TestObjects._
+import flux.stores.entries.{ComplexQueryFilter, GeneralEntry}
 import utest._
 
+import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 
 object ComplexQueryStoreFactoryTest extends TestSuite {

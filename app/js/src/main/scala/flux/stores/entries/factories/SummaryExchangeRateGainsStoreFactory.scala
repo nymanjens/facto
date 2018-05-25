@@ -1,15 +1,16 @@
-package flux.stores.entries
+package flux.stores.entries.factories
 
 import common.money.{Currency, ExchangeRateManager, MoneyWithGeneralCurrency, ReferenceMoney}
 import common.time.JavaTimeImplicits._
 import common.time.{DatedMonth, LocalDateTime}
-import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.{
-  DateToBalanceFunction,
+import flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.{
   GainsForMonth,
-  GainsForYear
+  GainsForYear,
+  DateToBalanceFunction
 }
+import flux.stores.entries.{ComplexQueryFilter, EntriesStore}
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, ModelField, JsEntityAccess}
+import models.access.{DbQuery, JsEntityAccess, ModelField}
 import models.accounting.config.{Account, Config, MoneyReservoir}
 import models.accounting.{BalanceCheck, Transaction}
 

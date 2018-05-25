@@ -5,6 +5,7 @@ import common.money.ExchangeRateManager
 import common.time.Clock
 import flux.action.Dispatcher
 import flux.stores.entries._
+import flux.stores.entries.factories._
 import models.access.JsEntityAccess
 import models.accounting.config.Config
 import models.user.User

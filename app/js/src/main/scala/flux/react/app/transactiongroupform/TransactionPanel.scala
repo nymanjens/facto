@@ -10,7 +10,7 @@ import flux.react.ReactVdomUtils.<<
 import flux.react.uielements.HalfPanel
 import flux.react.uielements.input.bootstrap.{MoneyInput, SelectInput, TextAreaInput, TextInput}
 import flux.react.uielements.input.{InputBase, InputWithDefaultFromReference, MappedInput, bootstrap}
-import flux.stores.entries.TagsStoreFactory
+import flux.stores.entries.factories.TagsStoreFactory
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
 import japgolly.scalajs.react.internal.Box

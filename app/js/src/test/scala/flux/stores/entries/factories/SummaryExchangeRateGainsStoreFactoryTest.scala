@@ -1,7 +1,5 @@
-package flux.stores.entries
+package flux.stores.entries.factories
 
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala.async.Async.{async, await}
 import java.time.LocalDate
 import java.time.Month._
 
@@ -10,11 +8,14 @@ import common.testing.TestObjects._
 import common.testing.{FakeJsEntityAccess, TestModule}
 import common.time.LocalDateTimes.createDateTime
 import common.time.{DatedMonth, LocalDateTime}
-import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.GainsForMonth
+import flux.stores.entries.ComplexQueryFilter
+import flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForMonth
 import models.accounting.config.MoneyReservoir
 import models.modification.EntityModification
 import utest._
 
+import scala.async.Async.{async, await}
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 
 object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {

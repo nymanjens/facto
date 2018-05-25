@@ -1,7 +1,5 @@
-package flux.stores.entries
+package flux.stores.entries.factories
 
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala.async.Async.{async, await}
 import java.time.Month
 import java.time.Month._
 
@@ -9,12 +7,15 @@ import common.money.ReferenceMoney
 import common.testing.FakeJsEntityAccess
 import common.testing.TestObjects._
 import common.time.DatedMonth
-import flux.stores.entries.SummaryForYearStoreFactory.SummaryForYear
+import flux.stores.entries.ComplexQueryFilter
+import flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
 import models.accounting.Transaction
 import models.accounting.config.Account
 import utest._
 
+import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 
 object SummaryForYearStoreFactoryTest extends TestSuite {

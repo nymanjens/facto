@@ -9,9 +9,15 @@ import common.time.{Clock, DatedMonth, YearRange}
 import flux.react.ReactVdomUtils._
 import flux.react.router.{Page, RouterContext}
 import flux.react.uielements
-import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.GainsForYear
-import flux.stores.entries.SummaryForYearStoreFactory.{SummaryCell, SummaryForYear}
+import flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForYear
+import flux.stores.entries.factories.SummaryForYearStoreFactory.{SummaryCell, SummaryForYear}
 import flux.stores.entries._
+import flux.stores.entries.factories.{
+  CashFlowEntriesStoreFactory,
+  SummaryExchangeRateGainsStoreFactory,
+  SummaryForYearStoreFactory,
+  SummaryYearsStoreFactory
+}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import models.access.EntityAccess

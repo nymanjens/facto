@@ -1,6 +1,7 @@
-package flux.stores.entries
+package flux.stores.entries.factories
 
 import flux.stores.entries.WithIsPending.isAnyPending
+import flux.stores.entries._
 import models.access.JsEntityAccess
 
 import scala.collection.immutable.Seq

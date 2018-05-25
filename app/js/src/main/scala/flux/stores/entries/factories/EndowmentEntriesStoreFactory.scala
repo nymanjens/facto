@@ -1,7 +1,8 @@
-package flux.stores.entries
+package flux.stores.entries.factories
 
+import flux.stores.entries.GeneralEntry
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, ModelField, JsEntityAccess}
+import models.access.{DbQuery, JsEntityAccess, ModelField}
 import models.accounting.config.{Account, Config}
 import models.accounting.{BalanceCheck, Transaction}
 

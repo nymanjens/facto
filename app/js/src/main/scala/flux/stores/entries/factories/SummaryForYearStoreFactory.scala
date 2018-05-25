@@ -1,10 +1,11 @@
-package flux.stores.entries
+package flux.stores.entries.factories
 
 import common.money.{ExchangeRateManager, ReferenceMoney}
 import common.time.{DatedMonth, LocalDateTime}
-import flux.stores.entries.SummaryForYearStoreFactory.SummaryForYear
+import flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
+import flux.stores.entries.{ComplexQueryFilter, EntriesStore}
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, ModelField, JsEntityAccess}
+import models.access.{DbQuery, JsEntityAccess, ModelField}
 import models.accounting.config.{Account, Category, Config}
 import models.accounting.{BalanceCheck, Transaction}
 

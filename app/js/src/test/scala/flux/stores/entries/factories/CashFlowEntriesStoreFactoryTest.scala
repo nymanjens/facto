@@ -1,7 +1,5 @@
-package flux.stores.entries
+package flux.stores.entries.factories
 
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala.async.Async.{async, await}
 import java.time.Duration
 import java.time.Month.JANUARY
 
@@ -15,8 +13,10 @@ import models.accounting.config.MoneyReservoir
 import models.modification.EntityModification
 import utest._
 
+import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 
 object CashFlowEntriesStoreFactoryTest extends TestSuite {

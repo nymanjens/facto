@@ -1,6 +1,7 @@
-package flux.stores.entries
+package flux.stores.entries.factories
 
-import models.access.{DbQuery, ModelField, JsEntityAccess}
+import flux.stores.entries.GeneralEntry
+import models.access.{DbQuery, JsEntityAccess}
 import models.accounting.{BalanceCheck, Transaction}
 
 import scala.async.Async.{async, await}

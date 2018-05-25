@@ -1,18 +1,19 @@
-package flux.stores.entries
+package flux.stores.entries.factories
 
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala.async.Async.{async, await}
 import java.time.Month.JANUARY
 
 import common.testing.FakeJsEntityAccess
 import common.testing.TestObjects._
 import common.time.LocalDateTime
 import common.time.LocalDateTimes.createDateTime
+import flux.stores.entries.GeneralEntry
 import models.accounting._
 import models.modification.EntityModification
 import utest._
 
+import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 
 /** Test test also tests `EntriesStoreFactory` and `EntriesStore`. */

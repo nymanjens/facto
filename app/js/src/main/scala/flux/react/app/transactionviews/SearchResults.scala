@@ -7,7 +7,8 @@ import common.time.Clock
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import flux.react.router.RouterContext
 import flux.react.uielements
-import flux.stores.entries.{ComplexQueryStoreFactory, GeneralEntry}
+import flux.stores.entries.GeneralEntry
+import flux.stores.entries.factories.ComplexQueryStoreFactory
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import models.access.EntityAccess

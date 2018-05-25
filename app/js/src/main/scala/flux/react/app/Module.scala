@@ -7,6 +7,7 @@ import flux.action.Dispatcher
 import flux.react.app.balancecheckform.BalanceCheckForm
 import flux.react.app.transactiongroupform.TransactionGroupForm
 import flux.stores.entries._
+import flux.stores.entries.factories._
 import flux.stores.{GlobalMessagesStore, PageLoadingStateStore}
 import models.access.JsEntityAccess
 import models.accounting.config.Config

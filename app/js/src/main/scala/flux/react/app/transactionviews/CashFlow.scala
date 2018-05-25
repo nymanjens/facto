@@ -10,7 +10,8 @@ import flux.react.ReactVdomUtils.<<
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import flux.react.router.{Page, RouterContext}
 import flux.react.uielements
-import flux.stores.entries.{CashFlowEntriesStoreFactory, CashFlowEntry}
+import flux.stores.entries.CashFlowEntry
+import flux.stores.entries.factories.CashFlowEntriesStoreFactory
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.VdomArray
 import japgolly.scalajs.react.vdom.html_<^._

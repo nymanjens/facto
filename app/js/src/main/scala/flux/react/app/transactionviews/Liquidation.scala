@@ -7,7 +7,8 @@ import common.{I18n, Unique}
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import flux.react.router.{Page, RouterContext}
 import flux.react.uielements
-import flux.stores.entries.{AccountPair, LiquidationEntriesStoreFactory, LiquidationEntry}
+import flux.stores.entries.factories.LiquidationEntriesStoreFactory
+import flux.stores.entries.{AccountPair, LiquidationEntry}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import models.access.EntityAccess

@@ -1,9 +1,10 @@
-package flux.stores.entries
+package flux.stores.entries.factories
 
 import common.time.YearRange
-import flux.stores.entries.SummaryYearsStoreFactory.State
+import flux.stores.entries.EntriesStore
+import flux.stores.entries.factories.SummaryYearsStoreFactory.State
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, ModelField, JsEntityAccess}
+import models.access.{DbQuery, JsEntityAccess, ModelField}
 import models.accounting.config.Account
 import models.accounting.{BalanceCheck, Transaction}
 

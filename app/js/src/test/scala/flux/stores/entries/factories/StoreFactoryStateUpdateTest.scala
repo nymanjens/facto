@@ -1,14 +1,12 @@
-package flux.stores.entries
+package flux.stores.entries.factories
 
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala.async.Async.{async, await}
-import models.access.DbQueryImplicits._
 import java.time.Month._
 
 import common.testing.TestObjects._
 import common.testing.{FakeJsEntityAccess, TestModule}
-import flux.stores.entries.SummaryExchangeRateGainsStoreFactory.GainsForYear
-import flux.stores.entries.SummaryForYearStoreFactory.SummaryForYear
+import flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForYear
+import flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
+import flux.stores.entries.{AccountPair, ComplexQueryFilter, EntriesStore}
 import models.Entity
 import models.access.ModelField
 import models.accounting._
@@ -16,8 +14,10 @@ import models.modification.EntityModification._
 import models.modification._
 import utest._
 
+import scala.async.Async.{async, await}
 import scala.collection.immutable.{ListMap, Seq}
 import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 
 object StoreFactoryStateUpdateTest extends TestSuite {

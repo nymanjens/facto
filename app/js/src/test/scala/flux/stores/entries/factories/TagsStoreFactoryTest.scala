@@ -1,14 +1,14 @@
-package flux.stores.entries
+package flux.stores.entries.factories
 
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala.async.Async.{async, await}
 import common.GuavaReplacement.ImmutableSetMultimap
 import common.testing.TestObjects._
 import common.testing.{FakeJsEntityAccess, TestModule}
 import models.accounting._
 import utest._
 
+import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 
 object TagsStoreFactoryTest extends TestSuite {
