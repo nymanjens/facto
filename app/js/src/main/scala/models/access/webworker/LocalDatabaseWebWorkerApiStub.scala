@@ -35,8 +35,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiStub extends LocalDataba
     sendAndReceive(MethodNumbers.executeCountQuery, Scala2Js.toJs(lokiQuery)).map(_.asInstanceOf[Int])
 
   override def applyWriteOperations(operations: Seq[LocalDatabaseWebWorkerApi.WriteOperation]) =
-    sendAndReceive(MethodNumbers.applyWriteOperations, Scala2Js.toJs(operations.toList))
-      .map(_.asInstanceOf[Boolean])
+    sendAndReceive(MethodNumbers.applyWriteOperations, Scala2Js.toJs(operations.toList)).map(_ => (): Unit)
 
   private def sendAndReceive(methodNum: Int, args: js.Any*): Future[js.Any] = async {
     val lastMessagePromise: Option[Promise[_]] = responseMessagePromises.lastOption

@@ -69,40 +69,37 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
     }
   }
 
-  override def applyWriteOperations(operations: Seq[WriteOperation]): Future[Boolean] = {
+  override def applyWriteOperations(operations: Seq[WriteOperation]): Future[Unit] = {
     Future
       .sequence(operations map {
         case Insert(collectionName, obj) =>
           val lokiCollection = getCollection(collectionName)
           findById(lokiCollection, obj("id")) match {
             case Some(entity) =>
-              Future.successful(false)
             case None =>
               lokiCollection.insert(obj)
-              Future.successful(true)
           }
+          Future.successful((): Unit)
 
         case Update(collectionName, updatedObj) =>
           val lokiCollection = getCollection(collectionName)
           findById(lokiCollection, updatedObj("id")) match {
             case None =>
-              Future.successful(false)
             case Some(entity) =>
               lokiCollection.findAndRemove(
                 LokiJs.FilterFactory.keyValueFilter(Operation.Equal, "id", updatedObj("id")))
               lokiCollection.insert(updatedObj)
-              Future.successful(true)
           }
+          Future.successful((): Unit)
 
         case Remove(collectionName, id) =>
           val lokiCollection = getCollection(collectionName)
           findById(lokiCollection, id) match {
             case None =>
-              Future.successful(false)
             case Some(entity) =>
               lokiCollection.findAndRemove(LokiJs.FilterFactory.keyValueFilter(Operation.Equal, "id", id))
-              Future.successful(true)
           }
+          Future.successful((): Unit)
 
         case AddCollection(collectionName, uniqueIndices, indices) =>
           lokiDb.addCollection(
@@ -110,16 +107,16 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
             uniqueIndices = uniqueIndices,
             indices = indices
           )
-          Future.successful(true)
+          Future.successful((): Unit)
 
         case RemoveCollection(collectionName) =>
           lokiDb.removeCollection(collectionName)
-          Future.successful(true)
+          Future.successful((): Unit)
 
         case SaveDatabase =>
-          lokiDb.saveDatabase().map(_ => false)
+          lokiDb.saveDatabase()
       })
-      .map(_ contains true)
+      .map(_ => (): Unit)
   }
 
   private def findById(lokiCollection: LokiJs.Collection, id: js.Any): Option[js.Dictionary[js.Any]] = {

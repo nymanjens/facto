@@ -145,8 +145,8 @@ private final class LocalDatabaseImpl(implicit webWorker: LocalDatabaseWebWorker
   }
 
   // **************** Setters ****************//
-  override def applyModifications(modifications: Seq[EntityModification]) = async {
-    await(webWorker.applyWriteOperations(modifications map {
+  override def applyModifications(modifications: Seq[EntityModification]) =
+    webWorker.applyWriteOperations(modifications map {
       case modification @ EntityModification.Add(entity) =>
         implicit val entityType = modification.entityType
         WriteOperation.Insert(collectionNameOf(entityType), Scala2Js.toJsMap(entity))
@@ -156,49 +156,37 @@ private final class LocalDatabaseImpl(implicit webWorker: LocalDatabaseWebWorker
       case modification @ EntityModification.Remove(id) =>
         val entityType = modification.entityType
         WriteOperation.Remove(collectionNameOf(entityType), Scala2Js.toJs(id))
-    }))
-  }
+    })
 
-  override def addAll[E <: Entity: EntityType](entities: Seq[E]) = async {
+  override def addAll[E <: Entity: EntityType](entities: Seq[E]) = {
     val collectionName = collectionNameOf(implicitly[EntityType[E]])
-    await(
-      webWorker.applyWriteOperations(
-        for (entity <- entities) yield WriteOperation.Insert(collectionName, Scala2Js.toJsMap(entity))
-      ))
+    webWorker.applyWriteOperations(
+      for (entity <- entities) yield WriteOperation.Insert(collectionName, Scala2Js.toJsMap(entity)))
   }
 
-  override def addPendingModifications(modifications: Seq[EntityModification]): Future[Unit] = async {
-    await(
-      webWorker.applyWriteOperations(
-        for (modification <- modifications)
-          yield
-            WriteOperation
-              .Insert(pendingModificationsCollectionName, Scala2Js.toJsMap(ModificationWithId(modification)))
-      ))
-  }
+  override def addPendingModifications(modifications: Seq[EntityModification]): Future[Unit] =
+    webWorker.applyWriteOperations(
+      for (modification <- modifications)
+        yield
+          WriteOperation
+            .Insert(pendingModificationsCollectionName, Scala2Js.toJsMap(ModificationWithId(modification))))
 
-  override def removePendingModifications(modifications: Seq[EntityModification]): Future[Unit] = async {
-    await(
-      webWorker.applyWriteOperations(
-        for (modification <- modifications)
-          yield
-            WriteOperation
-              .Remove(pendingModificationsCollectionName, Scala2Js.toJs(ModificationWithId(modification).id))
-      ))
-  }
+  override def removePendingModifications(modifications: Seq[EntityModification]): Future[Unit] =
+    webWorker.applyWriteOperations(
+      for (modification <- modifications)
+        yield
+          WriteOperation
+            .Remove(pendingModificationsCollectionName, Scala2Js.toJs(ModificationWithId(modification).id)))
 
-  override def setSingletonValue[V](key: SingletonKey[V], value: V) = async {
+  override def setSingletonValue[V](key: SingletonKey[V], value: V) = {
     implicit val converter = key.valueConverter
-    await(
-      webWorker.applyWriteOperations(Seq(
+    webWorker.applyWriteOperations(
+      Seq(
         WriteOperation.Remove(singletonsCollectionName, id = key.name),
         WriteOperation.Insert(
           singletonsCollectionName,
-          Scala2Js.toJsMap(Singleton(
-            key = key.name,
-            value = Scala2Js.toJs(value)
-          )))
-      )))
+          Scala2Js.toJsMap(Singleton(key = key.name, value = Scala2Js.toJs(value))))
+      ))
   }
 
   override def save(): Future[Unit] = async {
