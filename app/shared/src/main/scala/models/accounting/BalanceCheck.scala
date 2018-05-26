@@ -18,7 +18,9 @@ case class BalanceCheck(issuerId: Long,
 
   override def withId(id: Long) = copy(idOption = Some(id))
 
-  override def toString = s"BalanceCheck(id=$idOption, issuer=$issuerId, $moneyReservoirCode)"
+  override def toString =
+    s"BalanceCheck(id=$idOption, issuer=$issuerId, $moneyReservoirCode, $balanceInCents, " +
+      s"created=$createdDate, checked=$checkDate)"
 
   def issuer(implicit entityAccess: EntityAccess): User =
     entityAccess.newQuerySyncForUser().findById(issuerId)

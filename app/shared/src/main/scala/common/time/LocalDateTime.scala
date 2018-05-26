@@ -22,7 +22,14 @@ object LocalDateTime {
   val MIN: LocalDateTime = LocalDateTime.of(LocalDate.MIN, LocalTime.MIN);
   val MAX: LocalDateTime = LocalDateTime.of(LocalDate.MAX, LocalTime.MAX);
 
-  def of(localDate: LocalDate, localTime: LocalTime): LocalDateTime = LocalDateTimeImpl(localDate, localTime)
+  def of(localDate: LocalDate, localTime: LocalTime): LocalDateTime = {
+    if (localTime.getNano != 0) {
+      // Reduce precision to second precision
+      LocalDateTimeImpl(localDate, LocalTime.of(localTime.getHour, localTime.getMinute, localTime.getSecond))
+    } else {
+      LocalDateTimeImpl(localDate, localTime)
+    }
+  }
 
   def of(year: Int, month: Month, dayOfMonth: Int, hour: Int, minute: Int): LocalDateTime = {
     val date: LocalDate = LocalDate.of(year, month, dayOfMonth)
