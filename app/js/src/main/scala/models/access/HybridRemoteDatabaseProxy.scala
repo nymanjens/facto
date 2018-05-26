@@ -118,8 +118,7 @@ private[access] final class HybridRemoteDatabaseProxy(localDatabaseFuture: Futur
       nextUpdateToken = response.nextUpdateToken)
   }
 
-  @visibleForTesting private[access] def localDatabaseReadyFuture: Future[Unit] =
-    localDatabaseFuture.map(_ => (): Unit)
+  override def localDatabaseReadyFuture: Future[Unit] = localDatabaseFuture.map(_ => (): Unit)
 
   private def localDatabaseOption: Option[LocalDatabase] = localDatabaseFuture.value.map(_.get)
 }

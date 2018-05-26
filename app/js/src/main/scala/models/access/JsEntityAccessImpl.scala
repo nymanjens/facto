@@ -23,19 +23,28 @@ private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
 
   private var listeners: Seq[Listener] = Seq()
   private val allLocallyCreatedModifications: mutable.Set[EntityModification] = mutable.Set()
-  private var _pendingModifications: PendingModifications = PendingModifications(Set())
+  private var _pendingModifications: PendingModifications =
+    PendingModifications(Set(), persistedLocally = false)
   private var isCallingListeners: Boolean = false
   private val queryBlockingFutures: mutable.Buffer[Future[Unit]] = mutable.Buffer()
 
-  // Call listeners with initially present pending modifications
-  remoteDatabaseProxy
-    .pendingModifications()
-    .map(modifications => {
-      if (modifications.nonEmpty) {
-        _pendingModifications ++= modifications
-        invokeListenersAsync(_.modificationsAddedOrPendingStateChanged(modifications))
-      }
-    })
+  // Attach events to local database loading
+  async {
+    await(remoteDatabaseProxy.localDatabaseReadyFuture)
+    val existingPendingModifications = await(remoteDatabaseProxy.pendingModifications())
+
+    _pendingModifications = _pendingModifications.copy(persistedLocally = true)
+    _pendingModifications ++= existingPendingModifications
+
+    if (existingPendingModifications.nonEmpty) {
+      // Call listeners with initially present pending modifications
+      invokeListenersAsync(_.modificationsAddedOrPendingStateChanged(existingPendingModifications))
+    }
+
+    // Heuristic: When the local database is also loaded and the pending modifications are loaded, pending
+    // modifications will be stored or at least start being stored
+    invokeListenersAsync(_.pendingModificationsPersistedLocally())
+  }
 
   // **************** Getters ****************//
   override def newQuery[E <: Entity: EntityType](): DbResultSet.Async[E] = {

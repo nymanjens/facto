@@ -46,5 +46,8 @@ object JsEntityAccess {
       * - Future calls to `pendingModifications()` will have or no longer have the given modifications
       */
     def modificationsAddedOrPendingStateChanged(modifications: Seq[EntityModification]): Unit
+
+    /** Called when `pendingModifications.persistedLocally` becomes true. */
+    def pendingModificationsPersistedLocally(): Unit = {}
   }
 }

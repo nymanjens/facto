@@ -19,6 +19,12 @@ trait RemoteDatabaseProxy {
   def getAndApplyRemotelyModifiedEntities(
       updateToken: Option[UpdateToken]): Future[GetRemotelyModifiedEntitiesResponse]
 
+  /**
+    * If there is a local database, this future completes when it's finished loading. Otherwise, this future never
+    * completes.
+    */
+  def localDatabaseReadyFuture: Future[Unit]
+
   case class PersistEntityModificationsResponse(queryReflectsModifications: Future[Unit],
                                                 completelyDone: Future[Unit])
   case class GetRemotelyModifiedEntitiesResponse(changes: Seq[EntityModification],
