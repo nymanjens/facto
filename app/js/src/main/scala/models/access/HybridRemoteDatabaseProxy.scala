@@ -96,7 +96,7 @@ private[access] final class HybridRemoteDatabaseProxy(localDatabaseFuture: Futur
 
     val response = await(apiClient.getEntityModifications(updateToken))
 
-    if (localDatabaseOption.isDefined) {
+    if (localDatabaseOption.isDefined && response.modifications.nonEmpty) {
       val localDatabase = localDatabaseOption.get
       await(localDatabase.applyModifications(response.modifications))
       await(localDatabase.removePendingModifications(response.modifications))
