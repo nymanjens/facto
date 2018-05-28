@@ -17,6 +17,13 @@ object LoggingUtils {
         throw t
     }
   }
+  def logFailure[T](future: Future[T])(implicit executor: ExecutionContext): Future[T] = {
+    future.failed.foreach { t =>
+      console.log(s"  Caught exception: $t")
+      t.printStackTrace()
+    }
+    future
+  }
 
   def LogExceptionsCallback[T](codeBlock: => T): CallbackTo[T] = {
     CallbackTo(logExceptions(codeBlock))

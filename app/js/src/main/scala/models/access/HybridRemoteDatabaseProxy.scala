@@ -4,6 +4,7 @@ import java.time.Duration
 
 import api.ScalaJsApi.{GetInitialDataResponse, UpdateToken}
 import api.ScalaJsApiClient
+import common.LoggingUtils.logFailure
 import common.ScalaUtils.visibleForTesting
 import models.Entity
 import models.modification.{EntityModification, EntityType}
@@ -42,14 +43,14 @@ private[access] final class HybridRemoteDatabaseProxy(localDatabaseFuture: Futur
                                     localDatabaseCall: LocalDatabase => Future[R]): Future[R] = {
             val resultPromise = Promise[R]()
 
-            for (seq <- apiClientCall) {
+            for (seq <- logFailure(apiClientCall)) {
               resultPromise.trySuccess(seq)
             }
 
             for {
               localDatabase <- localDatabaseFuture
               if !resultPromise.isCompleted
-              seq <- localDatabaseCall(localDatabase)
+              seq <- logFailure(localDatabaseCall(localDatabase))
             } resultPromise.trySuccess(seq)
 
             resultPromise.future

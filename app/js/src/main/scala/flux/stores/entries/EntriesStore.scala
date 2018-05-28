@@ -1,5 +1,7 @@
 package flux.stores.entries
 
+import common.LoggingUtils
+import common.LoggingUtils.logFailure
 import models.access.JsEntityAccess
 import models.accounting.{BalanceCheck, Transaction}
 import models.modification.{EntityModification, EntityType}
@@ -72,18 +74,20 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit entityAcc
     require(!stateUpdateInFlight, "A state update is already in flight. This is not supported.")
 
     stateUpdateInFlight = true
-    calculateState().map { calculatedState =>
-      stateUpdateInFlight = false
+    logFailure {
+      calculateState().map { calculatedState =>
+        stateUpdateInFlight = false
 
-      if (impactsState(pendingModifications, calculatedState)) {
-        // Relevant modifications were added since the start of calculation -> recalculate
-        pendingModifications = Seq()
-        if (stateUpdateListeners.nonEmpty) {
-          startStateUpdate()
+        if (impactsState(pendingModifications, calculatedState)) {
+          // Relevant modifications were added since the start of calculation -> recalculate
+          pendingModifications = Seq()
+          if (stateUpdateListeners.nonEmpty) {
+            startStateUpdate()
+          }
+        } else if (_state != Some(calculatedState)) {
+          _state = Some(calculatedState)
+          invokeListeners()
         }
-      } else if (_state != Some(calculatedState)) {
-        _state = Some(calculatedState)
-        invokeListeners()
       }
     }
   }
