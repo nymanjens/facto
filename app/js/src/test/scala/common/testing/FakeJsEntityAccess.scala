@@ -14,7 +14,8 @@ import scala2js.Converters._
 final class FakeJsEntityAccess extends JsEntityAccess {
 
   private val modificationsBuffer: ModificationsBuffer = new ModificationsBuffer()
-  private var _pendingModifications: PendingModifications = PendingModifications(Set())
+  private var _pendingModifications: PendingModifications =
+    PendingModifications(Set(), persistedLocally = false)
   private val listeners: mutable.Buffer[Listener] = mutable.Buffer()
 
   // **************** Implementation of ScalaJsApiClient trait ****************//
