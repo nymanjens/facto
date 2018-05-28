@@ -23,10 +23,10 @@ import scala.collection.immutable.Seq
 @RunWith(classOf[JUnitRunner])
 class ScalaJsApiServerFactoryTest extends HookedSpecification {
 
-  private val date1 = localDateTimeOfEpochMilli(999000111)
-  private val date2 = localDateTimeOfEpochMilli(999000222)
-  private val date3 = localDateTimeOfEpochMilli(999000333)
-  private val date4 = localDateTimeOfEpochMilli(999000444)
+  private val date1 = localDateTimeOfEpochSecond(999000111)
+  private val date2 = localDateTimeOfEpochSecond(999000222)
+  private val date3 = localDateTimeOfEpochSecond(999000333)
+  private val date4 = localDateTimeOfEpochSecond(999000444)
 
   implicit private val user = testUserA
 

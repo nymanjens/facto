@@ -9,9 +9,9 @@ import org.specs2.mutable._
 class LocalDateTimeTest extends Specification {
 
   "plus #1" in {
-    val date = localDateTimeOfEpochMilli(1030507)
-    val duration = Duration.ofMillis(204060)
-    (date plus duration) mustEqual localDateTimeOfEpochMilli(1234567)
+    val date = localDateTimeOfEpochSecond(1030507)
+    val duration = Duration.ofSeconds(204060)
+    (date plus duration) mustEqual localDateTimeOfEpochSecond(1234567)
   }
 
   "plus #2" in {

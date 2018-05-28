@@ -30,7 +30,7 @@ object TestUtils {
     } else {
       groupId
     }
-    val actualDate = if (timestamp == -1) date else localDateTimeOfEpochMilli(timestamp)
+    val actualDate = if (timestamp == -1) date else localDateTimeOfEpochSecond(timestamp)
     persist(
       Transaction(
         transactionGroupId = actualGroupId,
@@ -53,7 +53,7 @@ object TestUtils {
       date: LocalDateTime = FakeClock.defaultTime,
       timestamp: Long = -1,
       reservoir: MoneyReservoir = testReservoir)(implicit entityAccess: JvmEntityAccess): BalanceCheck = {
-    val actualDate = if (timestamp == -1) date else localDateTimeOfEpochMilli(timestamp)
+    val actualDate = if (timestamp == -1) date else localDateTimeOfEpochSecond(timestamp)
     persist(
       BalanceCheck(
         issuerId = 2,
@@ -79,8 +79,8 @@ object TestUtils {
     addition.entity
   }
 
-  def localDateTimeOfEpochMilli(milli: Long): LocalDateTime = {
-    val instant = Instant.ofEpochMilli(milli).atZone(ZoneId.of("Europe/Paris"))
+  def localDateTimeOfEpochSecond(milli: Long): LocalDateTime = {
+    val instant = Instant.ofEpochSecond(milli).atZone(ZoneId.of("Europe/Paris"))
     LocalDateTime.of(
       instant.toLocalDate,
       instant.toLocalTime
