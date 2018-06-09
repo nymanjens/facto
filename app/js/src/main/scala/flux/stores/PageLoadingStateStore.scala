@@ -22,7 +22,7 @@ final class PageLoadingStateStore(implicit dispatcher: Dispatcher) extends State
     val originalState = _state
     _state = state
     if (_state != originalState) {
-      invokeListeners()
+      invokeStateUpdateListeners()
     }
   }
 }

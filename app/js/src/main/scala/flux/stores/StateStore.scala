@@ -29,7 +29,7 @@ abstract class StateStore[State] {
   protected def onStateUpdateListenersChange(): Unit = {}
 
   // **************** Protected helper methods ****************//
-  protected final def invokeListeners(): Unit = {
+  protected final def invokeStateUpdateListeners(): Unit = {
     checkNotCallingListeners()
     isCallingListeners = true
     _stateUpdateListeners.foreach(_.onStateUpdate())

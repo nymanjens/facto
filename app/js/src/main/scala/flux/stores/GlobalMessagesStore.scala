@@ -106,7 +106,7 @@ final class GlobalMessagesStore(implicit i18n: I18n,
   }
   private def setState(state: Option[Message]): Unit = {
     _state = state.map(Unique.apply)
-    invokeListeners()
+    invokeStateUpdateListeners()
   }
 }
 

@@ -76,7 +76,7 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit entityAcc
           }
         } else if (_state != Some(calculatedState)) {
           _state = Some(calculatedState)
-          invokeListeners()
+          invokeStateUpdateListeners()
         }
       }
     }
