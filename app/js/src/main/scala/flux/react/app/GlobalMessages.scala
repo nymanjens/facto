@@ -2,7 +2,7 @@ package flux.react.app
 
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import flux.react.ReactVdomUtils.^^
-import flux.stores.GlobalMessagesStore
+import flux.stores.{GlobalMessagesStore, StateStore}
 import flux.stores.GlobalMessagesStore.Message
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
@@ -32,7 +32,7 @@ private[app] final class GlobalMessages(implicit globalMessagesStore: GlobalMess
     }
   }
 
-  private class Backend($ : BackendScope[Props, State]) extends GlobalMessagesStore.Listener {
+  private class Backend($ : BackendScope[Props, State]) extends StateStore.Listener {
 
     def willMount(state: State): Callback = LogExceptionsCallback {
       globalMessagesStore.register(this)

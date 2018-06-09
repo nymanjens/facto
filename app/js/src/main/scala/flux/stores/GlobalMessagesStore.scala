@@ -21,28 +21,14 @@ final class GlobalMessagesStore(implicit i18n: I18n,
                                 clock: Clock,
                                 entityAccess: EntityAccess,
                                 accountingConfig: Config,
-                                dispatcher: Dispatcher) {
+                                dispatcher: Dispatcher)
+    extends StateStore[Option[Message]] {
   dispatcher.registerPartialSync(dispatcherListener)
 
   private var _state: Option[Unique[Message]] = None
 
-  private var stateUpdateListeners: Seq[GlobalMessagesStore.Listener] = Seq()
-  private var isCallingListeners: Boolean = false
-
   // **************** Public API ****************//
-  def state: Option[Message] = _state.map(_.get)
-
-  def register(listener: GlobalMessagesStore.Listener): Unit = {
-    require(!isCallingListeners)
-
-    stateUpdateListeners = stateUpdateListeners :+ listener
-  }
-
-  def deregister(listener: GlobalMessagesStore.Listener): Unit = {
-    require(!isCallingListeners)
-
-    stateUpdateListeners = stateUpdateListeners.filter(_ != listener)
-  }
+  override def state: Option[Message] = _state.map(_.get)
 
   // **************** Private dispatcher methods ****************//
   private def dispatcherListener: PartialFunction[Action, Unit] = {
@@ -122,13 +108,6 @@ final class GlobalMessagesStore(implicit i18n: I18n,
     _state = state.map(Unique.apply)
     invokeListeners()
   }
-
-  private def invokeListeners(): Unit = {
-    require(!isCallingListeners)
-    isCallingListeners = true
-    stateUpdateListeners.foreach(_.onStateUpdate())
-    isCallingListeners = false
-  }
 }
 
 object GlobalMessagesStore {
@@ -147,9 +126,5 @@ object GlobalMessagesStore {
       object Success extends Type
       object Failure extends Type
     }
-  }
-
-  trait Listener {
-    def onStateUpdate(): Unit
   }
 }
