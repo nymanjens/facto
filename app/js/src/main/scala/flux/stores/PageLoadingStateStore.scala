@@ -3,30 +3,13 @@ package flux.stores
 import flux.action.{Action, Dispatcher}
 import flux.stores.PageLoadingStateStore.State
 
-import scala.collection.immutable.Seq
-
-final class PageLoadingStateStore(implicit dispatcher: Dispatcher) {
+final class PageLoadingStateStore(implicit dispatcher: Dispatcher) extends StateStore[State] {
   dispatcher.registerPartialSync(dispatcherListener)
 
   private var _state: State = State(isLoading = false)
 
-  private var stateUpdateListeners: Seq[PageLoadingStateStore.Listener] = Seq()
-  private var isCallingListeners: Boolean = false
-
   // **************** Public API ****************//
-  def state: State = _state
-
-  def register(listener: PageLoadingStateStore.Listener): Unit = {
-    require(!isCallingListeners)
-
-    stateUpdateListeners = stateUpdateListeners :+ listener
-  }
-
-  def deregister(listener: PageLoadingStateStore.Listener): Unit = {
-    require(!isCallingListeners)
-
-    stateUpdateListeners = stateUpdateListeners.filter(_ != listener)
-  }
+  override def state: State = _state
 
   // **************** Private dispatcher methods ****************//
   private def dispatcherListener: PartialFunction[Action, Unit] = {
@@ -42,19 +25,8 @@ final class PageLoadingStateStore(implicit dispatcher: Dispatcher) {
       invokeListeners()
     }
   }
-
-  private def invokeListeners(): Unit = {
-    require(!isCallingListeners)
-    isCallingListeners = true
-    stateUpdateListeners.foreach(_.onStateUpdate())
-    isCallingListeners = false
-  }
 }
 
 object PageLoadingStateStore {
   case class State(isLoading: Boolean)
-
-  trait Listener {
-    def onStateUpdate(): Unit
-  }
 }

@@ -1,7 +1,7 @@
 package flux.react.app
 
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
-import flux.stores.PageLoadingStateStore
+import flux.stores.{PageLoadingStateStore, StateStore}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
@@ -24,7 +24,7 @@ private[app] final class PageLoadingSpinner(implicit pageLoadingStateStore: Page
   private type Props = Unit
   private case class State(isLoading: Boolean)
 
-  private class Backend($ : BackendScope[Props, State]) extends PageLoadingStateStore.Listener {
+  private class Backend($ : BackendScope[Props, State]) extends StateStore.Listener {
 
     def willMount(state: State): Callback = LogExceptionsCallback {
       pageLoadingStateStore.register(this)
