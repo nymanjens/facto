@@ -32,7 +32,7 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit entityAcc
   final def state: Option[State] = _state
 
   /** Returns a future that is resolved as soon as `this.state` has a non-stale value. */
-  final lazy val stateFuture: Future[State] = _state match {
+  final def stateFuture: Future[State] = state match {
     case Some(s) => Future.successful(s)
     case None =>
       val promise = Promise[State]()
