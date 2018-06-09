@@ -1,7 +1,7 @@
 package flux.stores.entries
 
-import common.LoggingUtils
 import common.LoggingUtils.logFailure
+import flux.stores.StateStore
 import models.access.JsEntityAccess
 import models.accounting.{BalanceCheck, Transaction}
 import models.modification.{EntityModification, EntityType}
@@ -16,7 +16,8 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
   *
   * @tparam State Any immutable type that contains all state maintained by this store
   */
-abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit entityAccess: JsEntityAccess) {
+abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit entityAccess: JsEntityAccess)
+    extends StateStore[Option[State]] {
   entityAccess.registerListener(JsEntityAccessListener)
 
   private var _state: Option[State] = None
@@ -25,18 +26,15 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit entityAcc
   /** Buffer of modifications that were added during the last update. */
   private var pendingModifications: Seq[EntityModification] = Seq()
 
-  private var stateUpdateListeners: Seq[EntriesStore.Listener] = Seq()
-  private var isCallingListeners: Boolean = false
-
   // **************** Public API ****************//
-  final def state: Option[State] = _state
+  override final def state: Option[State] = _state
 
   /** Returns a future that is resolved as soon as `this.state` has a non-stale value. */
   final lazy val stateFuture: Future[State] = _state match {
     case Some(s) => Future.successful(s)
     case None =>
       val promise = Promise[State]()
-      val listener: EntriesStore.Listener = () => {
+      val listener: StateStore.Listener = () => {
         if (state.isDefined && !promise.isCompleted) {
           promise.success(state.get)
         }
@@ -46,26 +44,18 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit entityAcc
       promise.future
   }
 
-  final def register(listener: EntriesStore.Listener): Unit = {
-    require(!isCallingListeners)
-
-    stateUpdateListeners = stateUpdateListeners :+ listener
-    if (_state.isEmpty && !stateUpdateInFlight) {
-      startStateUpdate()
-    }
-  }
-
-  final def deregister(listener: EntriesStore.Listener): Unit = {
-    require(!isCallingListeners)
-
-    stateUpdateListeners = stateUpdateListeners.filter(_ != listener)
-  }
-
   // **************** Abstract methods ****************//
   protected def calculateState(): Future[State]
 
   protected def transactionUpsertImpactsState(transaction: Transaction, state: State): Boolean
   protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State): Boolean
+
+  // **************** StateStore hooks ****************//
+  override protected final def onStateUpdateListenersChange(): Unit = {
+    if (stateUpdateListeners.nonEmpty && _state.isEmpty && !stateUpdateInFlight) {
+      startStateUpdate()
+    }
+  }
 
   // **************** Private helper methods ****************//
   private def startStateUpdate(): Unit = {
@@ -125,17 +115,10 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit entityAcc
     }
   }
 
-  private def invokeListeners(): Unit = {
-    require(!isCallingListeners)
-    isCallingListeners = true
-    stateUpdateListeners.foreach(_.onStateUpdate())
-    isCallingListeners = false
-  }
-
   // **************** Inner type definitions ****************//
   private object JsEntityAccessListener extends JsEntityAccess.Listener {
     override def modificationsAddedOrPendingStateChanged(modifications: Seq[EntityModification]): Unit = {
-      require(!isCallingListeners)
+      checkNotCallingListeners()
 
       _state match {
         case Some(s) if impactsState(modifications, s) =>
@@ -166,9 +149,5 @@ object EntriesStore {
       impactingTransactionIds contains id
     private[entries] final def impactedByBalanceCheckId(id: Long): Boolean =
       impactingBalanceCheckIds contains id
-  }
-
-  trait Listener {
-    def onStateUpdate(): Unit
   }
 }

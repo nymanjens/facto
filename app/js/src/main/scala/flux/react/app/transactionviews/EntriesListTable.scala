@@ -6,6 +6,7 @@ import flux.react.ReactVdomUtils.<<
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import flux.react.uielements
 import flux.react.uielements.Table.TableRowData
+import flux.stores.StateStore
 import flux.stores.entries.factories.EntriesListStoreFactory
 import flux.stores.entries.{EntriesStore, WithIsPending}
 import japgolly.scalajs.react.vdom.html_<^.{VdomElement, _}
@@ -94,7 +95,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
       copy(storeState = store.state)
   }
 
-  private class Backend($ : BackendScope[Props, State]) extends EntriesStore.Listener {
+  private class Backend($ : BackendScope[Props, State]) extends StateStore.Listener {
     private var entriesStore: entriesStoreFactory.Store = _
 
     def willMount(props: Props, state: State): Callback = LogExceptionsCallback {
