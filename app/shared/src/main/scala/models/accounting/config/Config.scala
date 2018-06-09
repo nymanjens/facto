@@ -22,7 +22,10 @@ case class Config(accounts: ListMap[String, Account],
   requireNonNull(accounts, categories, moneyReservoirsMap, templates, constants)
 
   // Not exposing moneyReservoirs because it's too easy to accidentally show hidden reservoirs
-  def moneyReservoir(code: String): MoneyReservoir = moneyReservoirOption(code).get
+  def moneyReservoir(code: String): MoneyReservoir = {
+    require(moneyReservoirsMap contains code, s"Could not find MoneyReservoir with code '${code}'")
+    moneyReservoirOption(code).get
+  }
   def moneyReservoirOption(code: String): Option[MoneyReservoir] = code match {
     case "" => Some(NullMoneyReservoir)
     case _  => moneyReservoirsMap.get(code)
