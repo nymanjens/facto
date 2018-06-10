@@ -31,6 +31,7 @@ final class FakeJsEntityAccess extends JsEntityAccess {
     listeners.foreach(_.modificationsAddedOrPendingStateChanged(modifications))
     Future.successful((): Unit)
   }
+  override def clearLocalDatabase(): Future[Unit] = ???
   override def registerListener(listener: Listener): Unit = {
     listeners += listener
   }
