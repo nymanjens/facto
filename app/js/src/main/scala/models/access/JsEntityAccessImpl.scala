@@ -22,7 +22,6 @@ private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
     extends JsEntityAccess {
 
   private var listeners: Seq[Listener] = Seq()
-  private val allLocallyCreatedModifications: mutable.Set[EntityModification] = mutable.Set()
   private var _pendingModifications: PendingModifications =
     PendingModifications(Set(), persistedLocally = false)
   private var isCallingListeners: Boolean = false
@@ -34,16 +33,14 @@ private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
     val existingPendingModifications = await(remoteDatabaseProxy.pendingModifications())
 
     _pendingModifications = _pendingModifications.copy(persistedLocally = true)
-    _pendingModifications ++= existingPendingModifications
-
-    if (existingPendingModifications.nonEmpty) {
-      // Call listeners with initially present pending modifications
-      invokeListenersAsync(_.modificationsAddedOrPendingStateChanged(existingPendingModifications))
-    }
 
     // Heuristic: When the local database is also loaded and the pending modifications are loaded, pending
     // modifications will be stored or at least start being stored
     invokeListenersAsync(_.pendingModificationsPersistedLocally())
+
+    if (existingPendingModifications.nonEmpty) {
+      await(persistModifications(existingPendingModifications))
+    }
   }
 
   // **************** Getters ****************//
@@ -73,7 +70,6 @@ private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
   override def persistModifications(modifications: Seq[EntityModification]): Future[Unit] = logExceptions {
     require(!isCallingListeners)
 
-    allLocallyCreatedModifications ++= modifications
     _pendingModifications ++= modifications
 
     val listenersInvoked = invokeListenersAsync(_.modificationsAddedOrPendingStateChanged(modifications))
