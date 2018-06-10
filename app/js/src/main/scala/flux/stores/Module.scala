@@ -36,4 +36,5 @@ final class Module(implicit i18n: I18n,
   implicit val summaryExchangeRateGainsStoreFactory = wire[SummaryExchangeRateGainsStoreFactory]
   implicit val globalMessagesStore = wire[GlobalMessagesStore]
   implicit val pageLoadingStateStore = wire[PageLoadingStateStore]
+  implicit val pendingModificationsStore = wire[PendingModificationsStore]
 }

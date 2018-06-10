@@ -49,6 +49,7 @@ final class FactoAppModule(implicit getInitialDataResponse: GetInitialDataRespon
     fluxStoresModule.summaryExchangeRateGainsStoreFactory
   implicit private val globalMessagesStore = fluxStoresModule.globalMessagesStore
   implicit private val pageLoadingStateStore = fluxStoresModule.pageLoadingStateStore
+  implicit private val pendingModificationsStore = fluxStoresModule.pendingModificationsStore
 
   // Create other Flux modules
   implicit private val reactAppModule = new flux.react.app.Module

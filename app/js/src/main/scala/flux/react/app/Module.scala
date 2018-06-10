@@ -6,9 +6,8 @@ import common.time.Clock
 import flux.action.Dispatcher
 import flux.react.app.balancecheckform.BalanceCheckForm
 import flux.react.app.transactiongroupform.TransactionGroupForm
-import flux.stores.entries._
 import flux.stores.entries.factories._
-import flux.stores.{GlobalMessagesStore, PageLoadingStateStore}
+import flux.stores.{GlobalMessagesStore, PageLoadingStateStore, PendingModificationsStore}
 import models.access.JsEntityAccess
 import models.accounting.config.Config
 import models.user.User
@@ -29,6 +28,7 @@ final class Module(implicit i18n: I18n,
                    summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
                    globalMessagesStore: GlobalMessagesStore,
                    pageLoadingStateStore: PageLoadingStateStore,
+                   pendingModificationsStore: PendingModificationsStore,
                    dispatcher: Dispatcher,
                    clock: Clock) {
 
@@ -42,6 +42,8 @@ final class Module(implicit i18n: I18n,
   implicit private lazy val menu: Menu = wire[Menu]
   implicit private lazy val globalMessages: GlobalMessages = wire[GlobalMessages]
   implicit private lazy val pageLoadingSpinner: PageLoadingSpinner = wire[PageLoadingSpinner]
+  implicit private lazy val pendingModificationsCounter: PendingModificationsCounter =
+    wire[PendingModificationsCounter]
   implicit lazy val layout: Layout = wire[Layout]
   implicit lazy val templateList = wire[TemplateList]
 
