@@ -63,7 +63,9 @@ private[api] final class SerialWebsocketClient(websocketPath: String) {
     }
 
     websocket.onerror = (e: ErrorEvent) => {
-      val errorMessage = s"Error has occured: ${e.message}"
+      // Note: the given event turns out to be of type "error", but has an undefined message. This causes
+      // ClassCastException when accessing it as a String
+      val errorMessage = s"Error when connecting to WebSocket"
       websocketPromise.tryFailure(new RuntimeException(errorMessage))
       responseMessagePromises.headOption.map(_.tryFailure(new RuntimeException(errorMessage)))
       logLine(errorMessage)
