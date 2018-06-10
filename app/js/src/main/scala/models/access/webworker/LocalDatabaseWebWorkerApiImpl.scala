@@ -17,12 +17,10 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
   override def create(dbName: String, inMemory: Boolean): Future[Unit] = {
     if (inMemory) {
       lokiDb = LokiJs.Database.inMemoryForTests(
-        dbName,
-        persistedStringCodex = LokiJs.PersistedStringCodex.NullCodex)
+        dbName)
     } else {
       lokiDb = LokiJs.Database.persistent(
-        dbName,
-        persistedStringCodex = LokiJs.PersistedStringCodex.NullCodex)
+        dbName)
     }
 
     lokiDb.loadDatabase()
@@ -129,45 +127,5 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
     lokiDb
       .getCollection(collectionName)
       .getOrElse(throw new IllegalArgumentException(s"Could not get collection $collectionName"))
-  }
-}
-object LocalDatabaseWebWorkerApiImpl {
-
-  private final class EncryptingCodex(secret: String) extends LokiJs.PersistedStringCodex {
-    private val decodedPrefix = "DECODED"
-
-    override def encodeBeforeSave(dbString: String) = {
-      val millis1 = System.currentTimeMillis()
-      console.log(s"  Encrypting ${dbString.length / 1e6}Mb String...")
-      val result =
-        CryptoJs.RC4Drop.encrypt(stringToEncrypt = decodedPrefix + dbString, password = secret).toString()
-      val millis2 = System.currentTimeMillis()
-      console.log(s"  Encrypting ${dbString.length / 1e6}Mb String: Done after ${(millis2 - millis1) / 1e3}s")
-      result
-    }
-
-    override def decodeAfterLoad(encodedString: String) = {
-      val millis1 = System.currentTimeMillis()
-      console.log(s"  Decrypting ${encodedString.length / 1e6}Mb String...")
-      val decoded =
-        try {
-          CryptoJs.RC4Drop
-            .decrypt(stringToDecrypt = encodedString, password = secret)
-            .toString(CryptoJs.Encoding.Utf8)
-        } catch {
-          case t: Throwable =>
-            console.log(s"  Caught exception while decoding database string: $t")
-            ""
-        }
-      val millis2 = System.currentTimeMillis()
-      console.log(
-        s"  Decrypting ${encodedString.length / 1e6}Mb String: Done after ${(millis2 - millis1) / 1e3}s")
-      if (decoded.startsWith(decodedPrefix)) {
-        Some(decoded.substring(decodedPrefix.length))
-      } else {
-        console.log(s"  Failed to decode database string: ${encodedString.substring(0, 10)}")
-        None
-      }
-    }
   }
 }

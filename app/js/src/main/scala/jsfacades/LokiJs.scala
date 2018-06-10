@@ -51,35 +51,15 @@ object LokiJs {
   }
 
   object Database {
-    def persistent(dbName: String,
-                   persistedStringCodex: PersistedStringCodex = PersistedStringCodex.NullCodex): Database = {
+    def persistent(dbName: String): Database = {
+      new Database(new DatabaseFacade(dbName, js.Dictionary("adapter" -> new Adapter.IndexedAdapter(dbName))))
+    }
+
+    def inMemoryForTests(dbName: String): Database = {
       new Database(
         new DatabaseFacade(
           dbName,
-          js.Dictionary("adapter" -> Adapter
-            .toAdapterDecorator(persistedStringCodex, new Adapter.IndexedAdapter(dbName)))))
-    }
-
-    def inMemoryForTests(
-        dbName: String,
-        persistedStringCodex: PersistedStringCodex = PersistedStringCodex.NullCodex): Database = {
-      new Database(
-        new DatabaseFacade(
-          dbName,
-          js.Dictionary(
-            "adapter" -> Adapter.toAdapterDecorator(persistedStringCodex, new Adapter.MemoryAdapter()),
-            "env" -> "BROWSER")))
-    }
-  }
-
-  trait PersistedStringCodex {
-    def encodeBeforeSave(dbString: String): String
-    def decodeAfterLoad(encodedString: String): Option[String]
-  }
-  object PersistedStringCodex {
-    object NullCodex extends PersistedStringCodex {
-      override def encodeBeforeSave(dbString: String) = dbString
-      override def decodeAfterLoad(encodedString: String) = Some(encodedString)
+          js.Dictionary("adapter" -> new Adapter.MemoryAdapter(), "env" -> "BROWSER")))
     }
   }
 
@@ -96,35 +76,6 @@ object LokiJs {
     @JSGlobal("loki.LokiMemoryAdapter")
     @js.native
     final class MemoryAdapter() extends Adapter
-
-    def toAdapterDecorator(codex: PersistedStringCodex, delegate: Adapter): Adapter =
-      js.Dynamic
-        .literal(
-          saveDatabase = (dbName: String, dbString: String, callback: js.Function0[Unit]) =>
-            logExceptions {
-              delegate.saveDatabase(dbName, codex.encodeBeforeSave(dbString), callback)
-          },
-          loadDatabase = (dbName: String, callback: js.Function1[js.Any, Unit]) =>
-            logExceptions {
-              delegate.loadDatabase(
-                dbName,
-                callback = {
-                  case result @ null =>
-                    callback(result)
-                  case result: AnyRef if result.getClass == classOf[String] =>
-                    val encodedDbString = result.asInstanceOf[String]
-
-                    codex.decodeAfterLoad(encodedDbString) match {
-                      case Some(dbString) => callback(dbString)
-                      case None           => callback(null)
-                    }
-                  case result =>
-                    callback(result)
-                }
-              )
-          }
-        )
-        .asInstanceOf[Adapter]
   }
 
   @js.native
