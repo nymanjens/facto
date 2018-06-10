@@ -21,6 +21,8 @@ case class PendingModifications(private val modifications: Set[EntityModificatio
     addModificationIds.get(implicitly[EntityType[E]]) contains entity.id
   }
 
+  def size: Int = modifications.size
+
   def ++(otherModifications: Iterable[EntityModification]): PendingModifications =
     copy(modifications = modifications ++ otherModifications)
 
