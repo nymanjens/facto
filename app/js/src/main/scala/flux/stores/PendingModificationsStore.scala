@@ -2,9 +2,11 @@ package flux.stores
 
 import flux.stores.PendingModificationsStore.State
 import models.access.JsEntityAccess
-import models.modification.EntityModification
+import models.accounting.Transaction
+import models.modification.{EntityModification, EntityType}
 
 import scala.collection.immutable.Seq
+import scala.collection.mutable
 
 final class PendingModificationsStore(implicit jsEntityAccess: JsEntityAccess) extends StateStore[State] {
   jsEntityAccess.registerListener(JsEntityAccessListener)
@@ -32,10 +34,32 @@ final class PendingModificationsStore(implicit jsEntityAccess: JsEntityAccess) e
 
     private def onAnyChange(): Unit = {
       if (jsEntityAccess.pendingModifications.persistedLocally) {
-        setState(State(numberOfModifications = jsEntityAccess.pendingModifications.size))
+        setState(
+          State(
+            numberOfModifications = getModificationsSize(jsEntityAccess.pendingModifications.modifications)))
       } else {
         setState(State(numberOfModifications = 0))
       }
+    }
+
+    private def getModificationsSize(modifications: Set[EntityModification]): Int = {
+      val affectedTransactionGroupIds = mutable.Set[Long]()
+      var nonTransactionEditCount = 0
+
+      for (modification <- modifications) modification.entityType match {
+        case EntityType.TransactionType =>
+          modification match {
+            case EntityModification.Add(entity) =>
+              affectedTransactionGroupIds += entity.asInstanceOf[Transaction].transactionGroupId
+            case _ =>
+          }
+        case EntityType.TransactionGroupType        => affectedTransactionGroupIds += modification.entityId
+        case EntityType.UserType                    => nonTransactionEditCount += 1
+        case EntityType.BalanceCheckType            => nonTransactionEditCount += 1
+        case EntityType.ExchangeRateMeasurementType => nonTransactionEditCount += 1
+      }
+
+      affectedTransactionGroupIds.size + nonTransactionEditCount
     }
   }
 }

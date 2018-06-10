@@ -6,8 +6,7 @@ import models.modification.{EntityModification, EntityType}
 
 import scala2js.Converters._
 
-case class PendingModifications(private val modifications: Set[EntityModification],
-                                persistedLocally: Boolean) {
+case class PendingModifications(modifications: Set[EntityModification], persistedLocally: Boolean) {
   private val addModificationIds: ImmutableSetMultimap[EntityType.any, Long] = {
     val builder = ImmutableSetMultimap.builder[EntityType.any, Long]()
     modifications collect {
@@ -20,8 +19,6 @@ case class PendingModifications(private val modifications: Set[EntityModificatio
   def additionIsPending[E <: Entity: EntityType](entity: E): Boolean = {
     addModificationIds.get(implicitly[EntityType[E]]) contains entity.id
   }
-
-  def size: Int = modifications.size
 
   def ++(otherModifications: Iterable[EntityModification]): PendingModifications =
     copy(modifications = modifications ++ otherModifications)
