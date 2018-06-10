@@ -21,7 +21,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 /** RemoteDatabaseProxy implementation that queries the remote back-end directly until LocalDatabase
   */
-private[access] final class HybridRemoteDatabaseProxy(localDatabaseFuture: Future[LocalDatabase])(
+private[access] final class HybridRemoteDatabaseProxy(unsafeLocalDatabaseFuture: Future[LocalDatabase])(
     implicit apiClient: ScalaJsApiClient,
     getInitialDataResponse: GetInitialDataResponse)
     extends RemoteDatabaseProxy {
@@ -119,14 +119,30 @@ private[access] final class HybridRemoteDatabaseProxy(localDatabaseFuture: Futur
       nextUpdateToken = response.nextUpdateToken)
   }
 
-  override def clearLocalDatabase(): Future[Unit] = async {
-    val localDatabase = await(localDatabaseFuture)
-    await(localDatabase.resetAndInitialize())
-    await(localDatabase.save())
+  override def clearLocalDatabase(): Future[Unit] = {
+    val clearFuture = async {
+      val localDatabase = await(unsafeLocalDatabaseFuture)
+      await(localDatabase.resetAndInitialize())
+      await(localDatabase.save())
+    }
+    clearFuture.recover {
+      case t: Throwable =>
+        console.log(s"  Could not clear local database: $t")
+        t.printStackTrace()
+        // Fall back to successful future
+        (): Unit
+    }
   }
 
   override def localDatabaseReadyFuture: Future[Unit] = localDatabaseFuture.map(_ => (): Unit)
 
+  private val localDatabaseFuture: Future[LocalDatabase] = unsafeLocalDatabaseFuture.recoverWith {
+    case t: Throwable =>
+      console.log(s"  Could not create local database: $t")
+      t.printStackTrace()
+      // Fallback to infinitely running future so that API based lookup is always used as fallback
+      Promise[LocalDatabase]().future
+  }
   private def localDatabaseOption: Option[LocalDatabase] = localDatabaseFuture.value.map(_.get)
 }
 
@@ -136,64 +152,53 @@ private[access] object HybridRemoteDatabaseProxy {
   private[access] def create(localDatabase: Future[LocalDatabase])(
       implicit apiClient: ScalaJsApiClient,
       getInitialDataResponse: GetInitialDataResponse): HybridRemoteDatabaseProxy = {
-    val dbFuture =
-      async {
-        val db = await(localDatabase)
-        val populateIsNecessary = {
-          if (await(db.isEmpty)) {
-            console.log(s"  Database is empty")
+    new HybridRemoteDatabaseProxy(async {
+      val db = await(localDatabase)
+      val populateIsNecessary = {
+        if (await(db.isEmpty)) {
+          console.log(s"  Database is empty")
+          true
+        } else {
+          val dbVersionOption = await(db.getSingletonValue(VersionKey))
+          if (!dbVersionOption.contains(localDatabaseAndEntityVersion)) {
+            console.log(
+              s"  The database version ${dbVersionOption getOrElse "<empty>"} no longer matches " +
+                s"the newest version $localDatabaseAndEntityVersion")
             true
           } else {
-            val dbVersionOption = await(db.getSingletonValue(VersionKey))
-            if (!dbVersionOption.contains(localDatabaseAndEntityVersion)) {
-              console.log(
-                s"  The database version ${dbVersionOption getOrElse "<empty>"} no longer matches " +
-                  s"the newest version $localDatabaseAndEntityVersion")
-              true
-            } else {
-              console.log(s"  Database was loaded successfully. No need for a full repopulation.")
-              false
-            }
+            console.log(s"  Database was loaded successfully. No need for a full repopulation.")
+            false
           }
         }
-        if (populateIsNecessary) {
-          console.log(s"  Populating database...")
-
-          // Reset database
-          await(db.resetAndInitialize())
-
-          // Set version
-          await(db.setSingletonValue(VersionKey, localDatabaseAndEntityVersion))
-
-          // Add all entities
-          val allEntitiesResponse = await(apiClient.getAllEntities(EntityType.values))
-          val _ = await(Future.sequence {
-            for (entityType <- allEntitiesResponse.entityTypes) yield {
-              def addAllToDb[E <: Entity](implicit entityType: EntityType[E]) =
-                db.addAll(allEntitiesResponse.entities(entityType))
-              addAllToDb(entityType)
-            }
-          })
-
-          await(db.setSingletonValue(NextUpdateTokenKey, allEntitiesResponse.nextUpdateToken))
-
-          // Await because we don't want to save unpersisted modifications that can be made as soon as
-          // the database becomes valid.
-          await(db.save())
-          console.log(s"  Population done!")
-          db
-        } else {
-          db
-        }
       }
-    val safeDbFuture = dbFuture.recoverWith {
-      case t: Throwable =>
-        console.log(s"  Could not create local database: $t")
-        t.printStackTrace()
-        // Fallback to infinitely running future so that API based lookup is always used as fallback
-        Promise[LocalDatabase]().future
-    }
-    new HybridRemoteDatabaseProxy(safeDbFuture)
+      if (populateIsNecessary) {
+        console.log(s"  Populating database...")
+
+        // Reset database
+        await(db.resetAndInitialize())
+
+        // Set version
+        await(db.setSingletonValue(VersionKey, localDatabaseAndEntityVersion))
+
+        // Add all entities
+        val allEntitiesResponse = await(apiClient.getAllEntities(EntityType.values))
+        val _ = await(Future.sequence {
+          for (entityType <- allEntitiesResponse.entityTypes) yield {
+            def addAllToDb[E <: Entity](implicit entityType: EntityType[E]) =
+              db.addAll(allEntitiesResponse.entities(entityType))
+            addAllToDb(entityType)
+          }
+        })
+
+        await(db.setSingletonValue(NextUpdateTokenKey, allEntitiesResponse.nextUpdateToken))
+
+        // Await because we don't want to save unpersisted modifications that can be made as soon as
+        // the database becomes valid.
+        await(db.save())
+        console.log(s"  Population done!")
+      }
+      db
+    })
   }
 
 }
