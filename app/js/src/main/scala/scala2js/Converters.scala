@@ -220,7 +220,6 @@ object Converters {
         ModelField.User.loginName,
         ModelField.User.passwordHash,
         ModelField.User.name,
-        ModelField.User.databaseEncryptionKey,
         ModelField.User.expandCashFlowTablesByDefault
       )
 
@@ -232,7 +231,6 @@ object Converters {
         loginName = getRequired(ModelField.User.loginName),
         passwordHash = getRequired(ModelField.User.passwordHash),
         name = getRequired(ModelField.User.name),
-        databaseEncryptionKey = getRequired(ModelField.User.databaseEncryptionKey),
         expandCashFlowTablesByDefault = getRequired(ModelField.User.expandCashFlowTablesByDefault)
       )
     }

@@ -52,11 +52,10 @@ object LocalDatabaseWebWorkerScript {
 
   private def executeMethod(methodNum: Int, args: js.Array[js.Any]): Future[js.Any] = {
     (methodNum, args.toVector) match {
-      case (MethodNumbers.create, Seq(dbName, encryptionSecret, inMemory)) =>
+      case (MethodNumbers.create, Seq(dbName, inMemory)) =>
         apiImpl
           .create(
             dbName.asInstanceOf[String],
-            encryptionSecret.asInstanceOf[String],
             inMemory.asInstanceOf[Boolean])
           .map(_ => js.undefined)
       case (MethodNumbers.executeDataQuery, Seq(lokiQuery)) =>

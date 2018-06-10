@@ -238,21 +238,21 @@ private final class LocalDatabaseImpl(implicit webWorker: LocalDatabaseWebWorker
 @visibleForTesting
 object LocalDatabaseImpl {
 
-  def create(encryptionSecret: String = "")(
+  def create()(
       implicit webWorker: LocalDatabaseWebWorkerApi): Future[LocalDatabase] = async {
-    await(webWorker.create(dbName = "facto-db", encryptionSecret = encryptionSecret, inMemory = false))
+    await(webWorker.create(dbName = "facto-db", inMemory = false))
     new LocalDatabaseImpl()
   }
 
-  def createStoredForTests(encryptionSecret: String = "")(
+  def createStoredForTests()(
       implicit webWorker: LocalDatabaseWebWorkerApi): Future[LocalDatabase] = async {
-    await(webWorker.create(dbName = "test-db", encryptionSecret = encryptionSecret, inMemory = false))
+    await(webWorker.create(dbName = "test-db", inMemory = false))
     new LocalDatabaseImpl()
   }
 
-  def createInMemoryForTests(encryptionSecret: String = "")(
+  def createInMemoryForTests()(
       implicit webWorker: LocalDatabaseWebWorkerApi): Future[LocalDatabase] = async {
-    await(webWorker.create(dbName = "facto-db", encryptionSecret = encryptionSecret, inMemory = true))
+    await(webWorker.create(dbName = "facto-db", inMemory = true))
     new LocalDatabaseImpl()
   }
 

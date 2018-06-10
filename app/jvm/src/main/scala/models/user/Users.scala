@@ -15,7 +15,6 @@ object Users {
       loginName = loginName,
       passwordHash = hash(password),
       name = name,
-      databaseEncryptionKey = Random.alphanumeric.take(100).mkString(""),
       expandCashFlowTablesByDefault = true
     )
 

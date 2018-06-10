@@ -58,13 +58,10 @@ object SlickEntityTableDef {
 
       def name = column[String]("name")
 
-      def databaseEncryptionKey = column[String]("databaseEncryptionKey")
-
       def expandCashFlowTablesByDefault = column[Boolean]("expandCashFlowTablesByDefault")
 
       override def * =
-        (loginName, passwordHash, name, databaseEncryptionKey, expandCashFlowTablesByDefault, id.?) <>
-          (User.tupled, User.unapply)
+        (loginName, passwordHash, name, expandCashFlowTablesByDefault, id.?) <>          (User.tupled, User.unapply)
     }
   }
 

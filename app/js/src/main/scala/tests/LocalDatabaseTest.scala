@@ -23,7 +23,6 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
 
   implicit private val webWorker: LocalDatabaseWebWorkerApi =
     new models.access.webworker.Module().localDatabaseWebWorkerApiStub
-  private val encryptionSecret = "gA5t6NkQaFpOZsBEU45bZgwlwi7Zeb"
 
   override def tests = Seq(
     ManualTest("isEmpty") {
@@ -54,7 +53,7 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
     },
     ManualTest("save") {
       async {
-        val db = await(LocalDatabaseImpl.createStoredForTests(encryptionSecret))
+        val db = await(LocalDatabaseImpl.createStoredForTests())
         await(db.resetAndInitialize())
         await(db.addAll(Seq(testTransactionWithId)))
         await(db.setSingletonValue(VersionKey, "testVersion"))
@@ -62,7 +61,7 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
         await(db.save())
         await(db.setSingletonValue(VersionKey, "otherTestVersion"))
 
-        val otherDb = await(LocalDatabaseImpl.createStoredForTests(encryptionSecret))
+        val otherDb = await(LocalDatabaseImpl.createStoredForTests())
         await(DbResultSet.fromExecutor(otherDb.queryExecutor[Transaction]()).data()) ==>
           Seq(testTransactionWithId)
         await(otherDb.getSingletonValue(VersionKey)).get ==> "testVersion"
@@ -235,7 +234,7 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
   )
 
   def createAndInitializeDb(): Future[LocalDatabase] = async {
-    val db = await(LocalDatabaseImpl.createInMemoryForTests(encryptionSecret))
+    val db = await(LocalDatabaseImpl.createInMemoryForTests())
     await(db.resetAndInitialize())
     db
   }

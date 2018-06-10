@@ -23,8 +23,8 @@ private[webworker] final class LocalDatabaseWebWorkerApiStub extends LocalDataba
   private val responseMessagePromises: mutable.Buffer[Promise[js.Any]] = mutable.Buffer()
   private val worker: Worker = initializeWebWorker()
 
-  override def create(dbName: String, encryptionSecret: String, inMemory: Boolean) = {
-    sendAndReceive(MethodNumbers.create, dbName, encryptionSecret, inMemory).map(_ => (): Unit)
+  override def create(dbName: String, inMemory: Boolean) = {
+    sendAndReceive(MethodNumbers.create, dbName, inMemory).map(_ => (): Unit)
   }
 
   override def executeDataQuery(lokiQuery: LocalDatabaseWebWorkerApi.LokiQuery) =

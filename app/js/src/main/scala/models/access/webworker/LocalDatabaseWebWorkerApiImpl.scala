@@ -14,21 +14,15 @@ import scala.scalajs.js
 private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDatabaseWebWorkerApi {
   private var lokiDb: LokiJs.Database = _
 
-  override def create(dbName: String, encryptionSecret: String, inMemory: Boolean): Future[Unit] = {
+  override def create(dbName: String, inMemory: Boolean): Future[Unit] = {
     if (inMemory) {
       lokiDb = LokiJs.Database.inMemoryForTests(
         dbName,
-        persistedStringCodex =
-          if (encryptionSecret.isEmpty) LokiJs.PersistedStringCodex.NullCodex
-          else new LocalDatabaseWebWorkerApiImpl.EncryptingCodex(encryptionSecret)
-      )
+        persistedStringCodex = LokiJs.PersistedStringCodex.NullCodex)
     } else {
       lokiDb = LokiJs.Database.persistent(
         dbName,
-        persistedStringCodex =
-          if (encryptionSecret.isEmpty) LokiJs.PersistedStringCodex.NullCodex
-          else new LocalDatabaseWebWorkerApiImpl.EncryptingCodex(encryptionSecret)
-      )
+        persistedStringCodex = LokiJs.PersistedStringCodex.NullCodex)
     }
 
     lokiDb.loadDatabase()

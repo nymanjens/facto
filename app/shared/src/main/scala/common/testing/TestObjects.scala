@@ -177,7 +177,6 @@ object TestObjects {
       "be196838736ddfd0007dd8b2e8f46f22d440d4c5959925cb49135abc9cdb01e84961aa43dd0ddb6ee59975eb649280d9f44088840af37451828a6412b9b574fc",
     // = sha512("pw")
     name = "Test User A",
-    databaseEncryptionKey = "QLvqUFDMmHek6o7yQhl79OA5Havq6u",
     expandCashFlowTablesByDefault = true,
     idOption = Option(918273)
   )
@@ -187,7 +186,6 @@ object TestObjects {
       "be196838736ddfd0007dd8b2e8f46f22d440d4c5959925cb49135abc9cdb01e84961aa43dd0ddb6ee59975eb649280d9f44088840af37451828a6412b9b574fc",
     // = sha512("pw")
     name = "Test User B",
-    databaseEncryptionKey = "DhzRU47mYWqf0PeXtZxEhPpyTVk8Gh",
     expandCashFlowTablesByDefault = true,
     idOption = Option(918274)
   )

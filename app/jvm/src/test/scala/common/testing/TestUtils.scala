@@ -70,7 +70,6 @@ object TestUtils {
       loginName = "robot",
       passwordHash = "Some hash",
       name = "Robot",
-      databaseEncryptionKey = "",
       expandCashFlowTablesByDefault = true)
     val addition =
       if (entity.idOption.isDefined) EntityModification.Add(entity)

@@ -9,7 +9,7 @@ import scala.scalajs.js
 import scala.collection.immutable.Seq
 
 trait LocalDatabaseWebWorkerApi {
-  def create(dbName: String, encryptionSecret: String = "", inMemory: Boolean): Future[Unit]
+  def create(dbName: String, inMemory: Boolean): Future[Unit]
 
   def executeDataQuery(lokiQuery: LokiQuery): Future[Seq[js.Dictionary[js.Any]]]
 
