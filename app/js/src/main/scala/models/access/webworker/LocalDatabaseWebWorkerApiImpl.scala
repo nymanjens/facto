@@ -1,7 +1,7 @@
 package models.access.webworker
 
 import jsfacades.LokiJs.FilterFactory.Operation
-import jsfacades.{CryptoJs, LokiJs}
+import jsfacades.LokiJs
 import models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
 import models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation._
 import org.scalajs.dom.console
@@ -16,11 +16,9 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
 
   override def create(dbName: String, inMemory: Boolean): Future[Unit] = {
     if (inMemory) {
-      lokiDb = LokiJs.Database.inMemoryForTests(
-        dbName)
+      lokiDb = LokiJs.Database.inMemoryForTests(dbName)
     } else {
-      lokiDb = LokiJs.Database.persistent(
-        dbName)
+      lokiDb = LokiJs.Database.persistent(dbName)
     }
 
     lokiDb.loadDatabase()

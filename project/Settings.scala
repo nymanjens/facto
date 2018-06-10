@@ -51,7 +51,6 @@ object Settings {
     val reactTagInput = "org.webjars.npm" % "react-tag-input" % "4.7.2"
     val fontAwesome = "org.webjars" % "font-awesome" % "4.6.2"
     val lokiJs = "org.webjars.bower" % "lokijs" % "1.4.2"
-    val cryptoJs = "org.webjars" % "cryptojs" % "3.1.2"
     val metisMenu = "org.webjars" % "metisMenu" % "1.1.3" // Used by Start Bootstrap
     val mousetrap = "org.webjars.npm" % "mousetrap" % "1.6.1"
     val reactAutosuggest = "org.webjars.npm" % "react-autosuggest" % "9.3.2"
@@ -132,14 +131,12 @@ object Settings {
       webjarDeps.reactTagInput / "ReactTags.min.js" dependsOn files.reactDnd,
       webjarDeps.reactAutosuggest / "dist/standalone/autosuggest.min.js" dependsOn files.reactDom,
       webjarDeps.lokiJs / "lokijs.min.js",
-      webjarDeps.lokiJs / "loki-indexed-adapter.min.js",
-      webjarDeps.cryptoJs / "rollups/rc4.js"
+      webjarDeps.lokiJs / "loki-indexed-adapter.min.js"
     ))
 
   val webworkerJsDependencies = Def.setting(
     Seq(
       webjarDeps.lokiJs / "lokijs.min.js",
-      webjarDeps.lokiJs / "loki-indexed-adapter.min.js",
-      webjarDeps.cryptoJs / "rollups/rc4.js"
+      webjarDeps.lokiJs / "loki-indexed-adapter.min.js"
     ))
 }

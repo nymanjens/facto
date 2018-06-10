@@ -54,9 +54,7 @@ object LocalDatabaseWebWorkerScript {
     (methodNum, args.toVector) match {
       case (MethodNumbers.create, Seq(dbName, inMemory)) =>
         apiImpl
-          .create(
-            dbName.asInstanceOf[String],
-            inMemory.asInstanceOf[Boolean])
+          .create(dbName.asInstanceOf[String], inMemory.asInstanceOf[Boolean])
           .map(_ => js.undefined)
       case (MethodNumbers.executeDataQuery, Seq(lokiQuery)) =>
         apiImpl

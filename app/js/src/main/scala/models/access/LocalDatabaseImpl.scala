@@ -3,7 +3,7 @@ package models.access
 import common.ScalaUtils.visibleForTesting
 import common.testing.TestObjects
 import jsfacades.LokiJs.FilterFactory.Operation
-import jsfacades.{CryptoJs, LokiJs}
+import jsfacades.LokiJs
 import models.Entity
 import models.access.webworker.LocalDatabaseWebWorkerApi
 import models.access.webworker.LocalDatabaseWebWorkerApi.{LokiQuery, WriteOperation}
@@ -238,20 +238,17 @@ private final class LocalDatabaseImpl(implicit webWorker: LocalDatabaseWebWorker
 @visibleForTesting
 object LocalDatabaseImpl {
 
-  def create()(
-      implicit webWorker: LocalDatabaseWebWorkerApi): Future[LocalDatabase] = async {
+  def create()(implicit webWorker: LocalDatabaseWebWorkerApi): Future[LocalDatabase] = async {
     await(webWorker.create(dbName = "facto-db", inMemory = false))
     new LocalDatabaseImpl()
   }
 
-  def createStoredForTests()(
-      implicit webWorker: LocalDatabaseWebWorkerApi): Future[LocalDatabase] = async {
+  def createStoredForTests()(implicit webWorker: LocalDatabaseWebWorkerApi): Future[LocalDatabase] = async {
     await(webWorker.create(dbName = "test-db", inMemory = false))
     new LocalDatabaseImpl()
   }
 
-  def createInMemoryForTests()(
-      implicit webWorker: LocalDatabaseWebWorkerApi): Future[LocalDatabase] = async {
+  def createInMemoryForTests()(implicit webWorker: LocalDatabaseWebWorkerApi): Future[LocalDatabase] = async {
     await(webWorker.create(dbName = "facto-db", inMemory = true))
     new LocalDatabaseImpl()
   }
