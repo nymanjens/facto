@@ -1,15 +1,19 @@
 package flux.react.app
 
 import common.I18n
+import common.LoggingUtils.LogExceptionsCallback
+import flux.action.{Action, Dispatcher}
 import flux.react.ReactVdomUtils.^^
 import flux.react.router.{Page, RouterContext}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.PackageBase.VdomAttr
 import japgolly.scalajs.react.vdom.html_<^._
+import models.access.JsEntityAccess
 import models.user.User
 import org.scalajs.dom
 
 import scala.collection.immutable.Seq
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 
 final class Layout(implicit globalMessages: GlobalMessages,
@@ -17,7 +21,9 @@ final class Layout(implicit globalMessages: GlobalMessages,
                    pendingModificationsCounter: PendingModificationsCounter,
                    menu: Menu,
                    user: User,
-                   i18n: I18n) {
+                   i18n: I18n,
+                   jsEntityAccess: JsEntityAccess,
+                   dispatcher: Dispatcher) {
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
@@ -79,6 +85,7 @@ final class Layout(implicit globalMessages: GlobalMessages,
                 <.li(
                   <.a(
                     ^.href := "/logout/",
+                    ^.onClick ==> doLogout,
                     <.i(^.className := "fa fa-sign-out fa-fw"),
                     " ",
                     i18n("facto.logout")))
@@ -120,17 +127,25 @@ final class Layout(implicit globalMessages: GlobalMessages,
   }
 
   // **************** Private helper methods ****************//
-  def navbarCollapsed: Boolean = {
+  private def navbarCollapsed: Boolean = {
     // Based on Start Bootstrap code in bower_components/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js
     val width = if (dom.window.innerWidth > 0) dom.window.innerWidth else dom.window.screen.width
     width < 768
   }
-  def pageWrapperHeight: Int = {
+  private def pageWrapperHeight: Int = {
     // Based on Start Bootstrap code in bower_components/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js
     val topOffset = if (navbarCollapsed) 100 else 50
 
     val windowHeight = if (dom.window.innerHeight > 0) dom.window.innerHeight else dom.window.screen.height
     windowHeight.toInt - 1 - topOffset
+  }
+
+  private def doLogout(e: ReactMouseEvent): Callback = LogExceptionsCallback {
+    e.preventDefault()
+    dispatcher.dispatch(Action.SetPageLoadingState(isLoading = true))
+    jsEntityAccess.clearLocalDatabase() map { _ =>
+      dom.window.location.href = "/logout/"
+    }
   }
 
   private def ifThenSeq[V](condition: Boolean, value: V): Seq[V] = if (condition) Seq(value) else Seq()
