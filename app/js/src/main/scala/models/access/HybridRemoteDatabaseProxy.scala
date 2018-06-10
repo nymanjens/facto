@@ -119,6 +119,12 @@ private[access] final class HybridRemoteDatabaseProxy(localDatabaseFuture: Futur
       nextUpdateToken = response.nextUpdateToken)
   }
 
+  override def clearLocalDatabase(): Future[Unit] = async {
+    val localDatabase = await(localDatabaseFuture)
+    await(localDatabase.resetAndInitialize())
+    await(localDatabase.save())
+  }
+
   override def localDatabaseReadyFuture: Future[Unit] = localDatabaseFuture.map(_ => (): Unit)
 
   private def localDatabaseOption: Option[LocalDatabase] = localDatabaseFuture.value.map(_.get)

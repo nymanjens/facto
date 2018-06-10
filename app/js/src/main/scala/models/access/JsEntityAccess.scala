@@ -30,6 +30,8 @@ trait JsEntityAccess extends EntityAccess {
   final def persistModifications(modifications: EntityModification*): Future[Unit] =
     persistModifications(modifications.toVector)
 
+  def clearLocalDatabase(): Future[Unit]
+
   // **************** Other ****************//
   def registerListener(listener: JsEntityAccess.Listener): Unit
   private[access] def startSchedulingModifiedEntityUpdates(): Unit

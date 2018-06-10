@@ -19,6 +19,8 @@ trait RemoteDatabaseProxy {
   def getAndApplyRemotelyModifiedEntities(
       updateToken: Option[UpdateToken]): Future[GetRemotelyModifiedEntitiesResponse]
 
+  def clearLocalDatabase(): Future[Unit]
+
   /**
     * If there is a local database, this future completes when it's finished loading. Otherwise, this future never
     * completes.

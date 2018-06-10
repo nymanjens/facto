@@ -88,6 +88,10 @@ private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
     }
   }
 
+  override def clearLocalDatabase(): Future[Unit] = {
+    remoteDatabaseProxy.clearLocalDatabase()
+  }
+
   // **************** Other ****************//
   override def registerListener(listener: Listener): Unit = {
     require(!isCallingListeners)
