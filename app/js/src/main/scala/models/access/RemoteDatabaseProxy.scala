@@ -9,7 +9,7 @@ import scala.concurrent.Future
 import scala2js.Converters._
 
 /** Proxy for the server-side database. */
-trait RemoteDatabaseProxy {
+private[access] trait RemoteDatabaseProxy {
   def queryExecutor[E <: Entity: EntityType](): DbQueryExecutor.Async[E]
 
   def pendingModifications(): Future[Seq[EntityModification]]
