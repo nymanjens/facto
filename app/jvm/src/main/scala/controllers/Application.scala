@@ -1,7 +1,9 @@
 package controllers
 
+import scala.collection.JavaConverters._
 import java.net.URL
 import java.nio.ByteBuffer
+import java.util
 
 import akka.stream.scaladsl._
 import api.Picklers._
@@ -14,6 +16,7 @@ import com.google.common.io.Resources
 import com.google.inject.Inject
 import common.GuavaReplacement.Splitter
 import common.ResourceFiles
+import common.publisher.MappingPublisher
 import controllers.Application.Forms
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 import controllers.helpers.AuthenticatedAction
@@ -21,6 +24,7 @@ import models.Entity
 import models.access.JvmEntityAccess
 import models.modification.{EntityModification, EntityType}
 import models.user.{User, Users}
+import org.reactivestreams.{Publisher, Subscriber, Subscription}
 import play.api.Mode
 import play.api.data.Form
 import play.api.data.Forms._
@@ -146,6 +150,20 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
 
       doScalaJsApiCall(request.path, request.args)
     }
+  }
+
+  def entityModificationPushWebSocket = WebSocket.accept[Array[Byte], Array[Byte]] { request =>
+    def modificationsToBytes(modifications: Seq[EntityModification]): Array[Byte] = {
+      val responseBuffer = Pickle.intoBytes(modifications)
+      val data: Array[Byte] = Array.ofDim[Byte](responseBuffer.remaining())
+      responseBuffer.get(data)
+      data
+    }
+
+    val in = Sink.ignore
+    val out = Source.fromPublisher(
+      new MappingPublisher(entityAccess.entityModificationPublisher, modificationsToBytes))
+    Flow.fromSinkAndSource(in, out)
   }
 
   // Note: This action manually implements what autowire normally does automatically. Unfortunately, autowire

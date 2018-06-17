@@ -1,6 +1,7 @@
 package models.access
 
 import com.google.inject._
+import common.publisher.TriggerablePublisher
 import common.time.Clock
 import models.Entity
 import models.accounting._
@@ -13,10 +14,11 @@ import models.modification.EntityType.{
 }
 import models.modification.{EntityModification, EntityModificationEntity, EntityType}
 import models.money.ExchangeRateMeasurement
-import models.slick.{SlickEntityTableDef, SlickEntityManager}
+import models.slick.{SlickEntityManager, SlickEntityTableDef}
 import models.slick.SlickUtils.dbApi._
 import models.slick.SlickUtils.dbRun
 import models.user.User
+import org.reactivestreams.Publisher
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
@@ -30,6 +32,9 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends EntityAccess {
         getManager(entityType).fetchAll().asInstanceOf[Seq[E]]
     })
 
+  private val entityModificationPublisher_ : TriggerablePublisher[Seq[EntityModification]] =
+    new TriggerablePublisher()
+
   // **************** Getters ****************//
   override def newQuery[E <: Entity: EntityType]() = DbResultSet.fromExecutor(queryExecutor[E].asAsync)
   override def newQuerySyncForUser() = newQuerySync[User]()
@@ -41,6 +46,8 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends EntityAccess {
   def newSlickQuery[E <: Entity]()(
       implicit entityTableDef: SlickEntityTableDef[E]): TableQuery[entityTableDef.Table] =
     SlickEntityManager.forType.newQuery.asInstanceOf[TableQuery[entityTableDef.Table]]
+
+  def entityModificationPublisher: Publisher[Seq[EntityModification]] = entityModificationPublisher_
 
   // **************** Setters ****************//
   def persistEntityModifications(modifications: EntityModification*)(implicit user: User): Unit = {
@@ -73,6 +80,8 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends EntityAccess {
 
       inMemoryEntityDatabase.update(modification)
     }
+
+    entityModificationPublisher_.trigger(modifications)
   }
 
   // ********** Management methods ********** //
