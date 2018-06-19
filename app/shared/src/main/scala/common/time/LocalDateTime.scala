@@ -19,8 +19,8 @@ trait LocalDateTime extends Comparable[LocalDateTime] {
 
 object LocalDateTime {
 
-  val MIN: LocalDateTime = LocalDateTime.of(LocalDate.MIN, LocalTime.MIN);
-  val MAX: LocalDateTime = LocalDateTime.of(LocalDate.MAX, LocalTime.MAX);
+  val MIN: LocalDateTime = LocalDateTime.of(LocalDate.MIN, LocalTime.MIN)
+  val MAX: LocalDateTime = LocalDateTime.of(LocalDate.MAX, LocalTime.MAX)
 
   def of(localDate: LocalDate, localTime: LocalTime): LocalDateTime = {
     if (localTime.getNano != 0) {

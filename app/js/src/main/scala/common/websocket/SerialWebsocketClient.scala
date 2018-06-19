@@ -50,7 +50,7 @@ private[websocket] final class SerialWebsocketClient(websocketPath: String) {
     val websocket = new dom.WebSocket(s"${protocol}//${dom.window.location.host}/$websocketPath")
     val websocketPromise: Promise[WebSocket] = Promise()
 
-    websocket.binaryType = "arraybuffer";
+    websocket.binaryType = "arraybuffer"
     websocket.onmessage = (e: MessageEvent) => {
       val bytes = TypedArrayBuffer.wrap(e.data.asInstanceOf[ArrayBuffer])
       onMessageReceived(bytes)

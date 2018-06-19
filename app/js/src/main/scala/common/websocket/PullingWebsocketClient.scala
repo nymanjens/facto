@@ -18,7 +18,7 @@ final class PullingWebsocketClient(websocketPath: String,
     val protocol = if (dom.window.location.protocol == "https:") "wss:" else "ws:"
     val websocket = new dom.WebSocket(s"${protocol}//${dom.window.location.host}/$websocketPath")
 
-    websocket.binaryType = "arraybuffer";
+    websocket.binaryType = "arraybuffer"
     websocket.onmessage = (e: MessageEvent) => {
       val bytes = TypedArrayBuffer.wrap(e.data.asInstanceOf[ArrayBuffer])
       onMessageReceived(bytes)
