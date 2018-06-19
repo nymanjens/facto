@@ -16,6 +16,7 @@ import models.modification.{EntityModification, EntityType}
 import org.scalajs.dom
 import api.Picklers._
 import common.LoggingUtils.logExceptions
+import common.websocket.SerialWebsocketClientParallelizer
 
 import scala.collection.immutable.Seq
 import scala.concurrent.Future

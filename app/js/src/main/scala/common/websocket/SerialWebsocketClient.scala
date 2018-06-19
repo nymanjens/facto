@@ -1,8 +1,7 @@
-package api
+package common.websocket
 
 import java.nio.ByteBuffer
 
-import api.Picklers._
 import common.LoggingUtils.logExceptions
 import org.scalajs.dom
 import org.scalajs.dom.{CloseEvent, ErrorEvent, Event, MessageEvent, _}
@@ -12,9 +11,8 @@ import scala.collection.mutable
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js.typedarray.{ArrayBuffer, _}
-import scala.util.Random
 
-private[api] final class SerialWebsocketClient(websocketPath: String) {
+private[websocket] final class SerialWebsocketClient(websocketPath: String) {
   require(!websocketPath.startsWith("/"))
 
   var openWebsocketPromise: Option[Promise[WebSocket]] = None

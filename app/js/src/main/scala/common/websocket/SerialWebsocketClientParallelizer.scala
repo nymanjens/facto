@@ -1,14 +1,11 @@
-package api
+package common.websocket
 
 import java.nio.ByteBuffer
 
-import api.Picklers._
-
-import scala.async.Async.async
-import scala.concurrent.Future
 import scala.collection.immutable.Seq
+import scala.concurrent.Future
 
-private[api] final class SerialWebsocketClientParallelizer(websocketPath: String, numWebsockets: Int) {
+final class SerialWebsocketClientParallelizer(websocketPath: String, numWebsockets: Int) {
 
   private val websocketClients: Seq[SerialWebsocketClient] =
     (0 until numWebsockets).map(_ => new SerialWebsocketClient(websocketPath = websocketPath))
