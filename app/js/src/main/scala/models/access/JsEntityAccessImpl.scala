@@ -100,14 +100,10 @@ private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
   }
 
   override private[access] def startSchedulingModifiedEntityUpdates(): Unit = {
-    var timeout = 5.seconds
-    def cyclicLogic(updateToken: Option[UpdateToken]): Unit = async {
-      val nextUpdateToken = await(updateModifiedEntities(updateToken))
-      js.timers.setTimeout(timeout)(cyclicLogic(Some(nextUpdateToken)))
-      timeout * 1.02
-    }
-
-    js.timers.setTimeout(0)(cyclicLogic(updateToken = None))
+    remoteDatabaseProxy.startCheckingForModifiedEntityUpdates(modifications => {
+      _pendingModifications --= modifications
+      invokeListenersAsync(_.modificationsAddedOrPendingStateChanged(modifications))
+    })
   }
 
   // **************** Private helper methods ****************//
@@ -120,16 +116,5 @@ private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
         isCallingListeners = false
       }
     }
-  }
-
-  @visibleForTesting private[access] def updateModifiedEntities(
-      updateToken: Option[UpdateToken]): Future[UpdateToken] = async {
-    val response = await(remoteDatabaseProxy.getAndApplyRemotelyModifiedEntities(updateToken))
-    if (response.changes.nonEmpty) {
-      console.log(s"  ${response.changes.size} remote modifications received")
-      _pendingModifications --= response.changes
-      await(invokeListenersAsync(_.modificationsAddedOrPendingStateChanged(response.changes)))
-    }
-    response.nextUpdateToken
   }
 }

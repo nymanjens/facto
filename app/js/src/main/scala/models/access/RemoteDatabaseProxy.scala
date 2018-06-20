@@ -16,8 +16,9 @@ private[access] trait RemoteDatabaseProxy {
 
   def persistEntityModifications(modifications: Seq[EntityModification]): PersistEntityModificationsResponse
 
-  def getAndApplyRemotelyModifiedEntities(
-      updateToken: Option[UpdateToken]): Future[GetRemotelyModifiedEntitiesResponse]
+  /** TODO */
+  def startCheckingForModifiedEntityUpdates(
+      maybeNewEntityModificationsListener: Seq[EntityModification] => Future[Unit]): Unit
 
   def clearLocalDatabase(): Future[Unit]
 
@@ -29,6 +30,4 @@ private[access] trait RemoteDatabaseProxy {
 
   case class PersistEntityModificationsResponse(queryReflectsModifications: Future[Unit],
                                                 completelyDone: Future[Unit])
-  case class GetRemotelyModifiedEntitiesResponse(changes: Seq[EntityModification],
-                                                 nextUpdateToken: UpdateToken)
 }
