@@ -5,11 +5,10 @@ import java.nio.ByteBuffer
 import org.scalajs.dom
 import org.scalajs.dom.{CloseEvent, ErrorEvent, Event, MessageEvent, _}
 
+import scala.scalajs.js
 import scala.scalajs.js.typedarray.{ArrayBuffer, _}
 
-final class PullingWebsocketClient(websocketPath: String,
-                                   onMessageReceived: ByteBuffer => Unit,
-                                   onSuccessfulOpen: () => Unit) {
+final class PullingWebsocketClient(websocketPath: String, onMessageReceived: ByteBuffer => Unit) {
   require(!websocketPath.startsWith("/"))
 
   openWebsocket()
@@ -25,7 +24,6 @@ final class PullingWebsocketClient(websocketPath: String,
     }
     websocket.onopen = (e: Event) => {
       logLine("Opened")
-      onSuccessfulOpen()
     }
     websocket.onerror = (e: ErrorEvent) => {
       // Note: the given event turns out to be of type "error", but has an undefined message. This causes
@@ -37,6 +35,7 @@ final class PullingWebsocketClient(websocketPath: String,
       val errorMessage = s"WebSocket was closed: ${e.reason}"
       logLine(errorMessage)
       // TODO: Retry
+      //      js.timers.setTimeout(timeout)(logic))
     }
   }
 
