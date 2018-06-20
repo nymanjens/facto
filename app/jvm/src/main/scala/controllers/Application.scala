@@ -15,12 +15,16 @@ import com.google.inject.Inject
 import common.GuavaReplacement.Splitter
 import common.ResourceFiles
 import common.publisher.Publishers
+import common.time.Clock
 import controllers.Application.Forms
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 import controllers.helpers.AuthenticatedAction
 import models.Entity
 import models.access.JvmEntityAccess
-import models.modification.{EntityModification, EntityType}
+import models.modification.{EntityModification, EntityModificationEntity, EntityType}
+import models.slick.SlickUtils.dbRun
+import models.slick.SlickUtils.dbApi._
+import models.slick.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}
 import models.user.{User, Users}
 import play.api.Mode
 import play.api.data.Form
@@ -32,6 +36,7 @@ import scala.collection.immutable.Seq
 
 final class Application @Inject()(implicit override val messagesApi: MessagesApi,
                                   components: ControllerComponents,
+                                  clock: Clock,
                                   entityAccess: JvmEntityAccess,
                                   scalaJsApiServerFactory: ScalaJsApiServerFactory,
                                   playConfiguration: play.api.Configuration,
@@ -149,21 +154,41 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
     }
   }
 
-  def entityModificationPushWebSocket = WebSocket.accept[Array[Byte], Array[Byte]] { request =>
-    def modificationsToBytes(modificationsWithToken: ModificationsWithToken): Array[Byte] = {
-      val responseBuffer = Pickle.intoBytes(modificationsWithToken)
-      val data: Array[Byte] = Array.ofDim[Byte](responseBuffer.remaining())
-      responseBuffer.get(data)
-      data
-    }
+  def entityModificationPushWebSocket(updateToken: UpdateToken) = WebSocket.accept[Array[Byte], Array[Byte]] {
+    request =>
+      def modificationsToBytes(modificationsWithToken: ModificationsWithToken): Array[Byte] = {
+        val responseBuffer = Pickle.intoBytes(modificationsWithToken)
+        val data: Array[Byte] = Array.ofDim[Byte](responseBuffer.remaining())
+        responseBuffer.get(data)
+        data
+      }
 
-    val in = Sink.ignore
-    val out =
-      Source.fromPublisher(
-        Publishers.prependWithoutMissingNotifications(
-          firstValueFunction = () => null,
-          Publishers.map(entityAccess.entityModificationPublisher, modificationsToBytes)))
-    Flow.fromSinkAndSource(in, out)
+      def firstValueFunction(): ModificationsWithToken = {
+        // All modifications are idempotent so we can use the time when we started getting the entities as next
+        // update token.
+        val nextUpdateToken: UpdateToken = clock.now
+
+        val modifications = {
+          val modificationEntities = dbRun(
+            entityAccess
+              .newSlickQuery[EntityModificationEntity]()
+              .filter(_.date >= updateToken)
+              .sortBy(_.date))
+          modificationEntities.toStream.map(_.modification).toVector
+        }
+
+        ModificationsWithToken(modifications, nextUpdateToken)
+      }
+
+      val in = Sink.ignore
+      val out =
+        Source.fromPublisher(
+          Publishers.map(
+            Publishers.prependWithoutMissingNotifications(
+              firstValueFunction _,
+              entityAccess.entityModificationPublisher),
+            modificationsToBytes))
+      Flow.fromSinkAndSource(in, out)
   }
 
   // Note: This action manually implements what autowire normally does automatically. Unfortunately, autowire
