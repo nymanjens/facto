@@ -20,10 +20,16 @@ final class FutureLocalDatabase(unsafeLocalDatabaseFuture: Future[LocalDatabase]
   def option(includesLatestUpdates: Boolean = true): Option[LocalDatabase] = ???
 
   /** TODO */
-  def addUpdateAtStart(func: LocalDatabase => Future[Unit]): Unit = ???
+  // warning if already finished finished - if so, execute func immediately
+  def addUpdateAtStart(func: LocalDatabase => Future[Unit]): Unit = {
+    ???
+  }
 
   /** TODO */
-  def addUpdateAtEnd(func: LocalDatabase => Future[Unit]): Unit = ???
+  // warning if already finished finished - if so, execute func immetiately
+  def addUpdateAtEnd(func: LocalDatabase => Future[Unit]): Unit = {
+    ???
+  }
 
   //  private def safeLocalDatabaseFuture: Future[LocalDatabase] =
 //    unsafeLocalDatabaseFuture.recoverWith {
