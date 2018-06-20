@@ -1,12 +1,7 @@
 package api
 
 import api.Picklers._
-import api.ScalaJsApi.{
-  GetAllEntitiesResponse,
-  ModificationsWithToken,
-  GetInitialDataResponse,
-  UpdateToken
-}
+import api.ScalaJsApi.{GetAllEntitiesResponse, ModificationsWithToken, GetInitialDataResponse, UpdateToken}
 import common.money.Currency
 import common.time.LocalDateTime
 import models.Entity
@@ -39,7 +34,7 @@ trait ScalaJsApi {
 }
 
 object ScalaJsApi {
-  type UpdateToken = LocalDateTime
+  type UpdateToken = String
 
   /**
     * @param i18nMessages Maps key to the message with placeholders.
@@ -60,6 +55,5 @@ object ScalaJsApi {
       entitiesMap(entityType).asInstanceOf[Seq[E]]
     }
   }
-  case class ModificationsWithToken(modifications: Seq[EntityModification],
-                                            nextUpdateToken: UpdateToken)
+  case class ModificationsWithToken(modifications: Seq[EntityModification], nextUpdateToken: UpdateToken)
 }

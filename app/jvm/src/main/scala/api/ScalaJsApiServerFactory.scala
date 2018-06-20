@@ -1,12 +1,8 @@
 package api
 
 import api.Picklers._
-import api.ScalaJsApi.{
-  GetAllEntitiesResponse,
-  ModificationsWithToken,
-  GetInitialDataResponse,
-  UpdateToken
-}
+import api.ScalaJsApi.{GetAllEntitiesResponse, GetInitialDataResponse, ModificationsWithToken, UpdateToken}
+import api.UpdateTokens.{toLocalDateTime, toUpdateToken}
 import com.google.inject._
 import common.PlayI18n
 import common.money.Currency
@@ -48,12 +44,12 @@ final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
           }
           mapBuilder.toStream.map { case (k, v) => k -> v.result() }.toMap
         },
-        nextUpdateToken = clock.now
+        nextUpdateToken = toUpdateToken(clock.now)
       )
 
     override def getAllEntities(types: Seq[EntityType.any]) = {
       // All modifications are idempotent so we can use the time when we started getting the entities as next update token.
-      val nextUpdateToken: UpdateToken = clock.now
+      val nextUpdateToken: UpdateToken = toUpdateToken(clock.now)
       val entitiesMap: Map[EntityType.any, Seq[Entity]] = {
         types
           .map(entityType => {
@@ -67,13 +63,13 @@ final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
 
     override def getEntityModifications(updateToken: UpdateToken): ModificationsWithToken = {
       // All modifications are idempotent so we can use the time when we started getting the entities as next update token.
-      val nextUpdateToken: UpdateToken = clock.now
+      val nextUpdateToken: UpdateToken = toUpdateToken(clock.now)
 
       val modifications = {
         val modificationEntities = dbRun(
           entityAccess
             .newSlickQuery[EntityModificationEntity]()
-            .filter(_.date >= updateToken)
+            .filter(_.date >= toLocalDateTime(updateToken))
             .sortBy(_.date))
         modificationEntities.toStream.map(_.modification).toVector
       }

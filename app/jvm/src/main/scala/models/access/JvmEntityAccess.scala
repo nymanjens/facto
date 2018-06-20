@@ -3,6 +3,7 @@ package models.access
 import java.time.Duration
 
 import api.ScalaJsApi.ModificationsWithToken
+import api.UpdateTokens.toUpdateToken
 import com.google.inject._
 import common.publisher.TriggerablePublisher
 import common.time.Clock
@@ -62,7 +63,7 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends EntityAccess {
     // could start earlier but end later than invocation A. If the WebSocket closes before the modifications B
     // get published, the `nextUpdateToken` value returned by A must be old enough so that modifications from
     // B all happened after it.
-    val nextUpdateToken = clock.now minus Duration.ofSeconds(20)
+    val nextUpdateToken = toUpdateToken(clock.now minus Duration.ofSeconds(20))
 
     for (modification <- modifications) {
       // Apply modification

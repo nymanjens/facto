@@ -6,6 +6,7 @@ import java.nio.ByteBuffer
 import akka.stream.scaladsl._
 import api.Picklers._
 import api.ScalaJsApi.{ModificationsWithToken, UpdateToken}
+import api.UpdateTokens.{toLocalDateTime, toUpdateToken}
 import api.{PicklableDbQuery, ScalaJsApiRequest, ScalaJsApiServerFactory}
 import boopickle.Default._
 import com.google.common.base.Charsets
@@ -166,13 +167,13 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
       def firstValueFunction(): ModificationsWithToken = {
         // All modifications are idempotent so we can use the time when we started getting the entities as next
         // update token.
-        val nextUpdateToken: UpdateToken = clock.now
+        val nextUpdateToken: UpdateToken = toUpdateToken(clock.now)
 
         val modifications = {
           val modificationEntities = dbRun(
             entityAccess
               .newSlickQuery[EntityModificationEntity]()
-              .filter(_.date >= updateToken)
+              .filter(_.date >= toLocalDateTime(updateToken))
               .sortBy(_.date))
           modificationEntities.toStream.map(_.modification).toVector
         }

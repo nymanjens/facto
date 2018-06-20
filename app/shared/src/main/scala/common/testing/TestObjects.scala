@@ -3,7 +3,7 @@ package common.testing
 import java.time.Month
 import java.time.Month._
 
-import api.ScalaJsApi.GetInitialDataResponse
+import api.ScalaJsApi.{GetInitialDataResponse, UpdateToken}
 import common.time.LocalDateTimes.createDateTime
 import common.time.{LocalDateTime, LocalDateTimes}
 import models.accounting.config.Account.SummaryTotalRowDef
@@ -193,6 +193,8 @@ object TestObjects {
   def testUserRedacted: User = testUser.copy(passwordHash = "<redacted>")
 
   val testDate: LocalDateTime = LocalDateTimes.createDateTime(2008, MARCH, 13)
+  val testUpdateToken: UpdateToken = s"123782:12378"
+
   val testTransactionGroupWithId: TransactionGroup =
     TransactionGroup(createdDate = testDate, idOption = Some(129874444))
   val testTransactionWithIdA: Transaction = Transaction(
@@ -245,7 +247,7 @@ object TestObjects {
     allUsers = Seq(testUserA, testUserB),
     i18nMessages = Map(),
     ratioReferenceToForeignCurrency = Map(),
-    nextUpdateToken = testDate
+    nextUpdateToken = "1234:5678"
   )
 
   private val unsetDouble: Double = -387461.19

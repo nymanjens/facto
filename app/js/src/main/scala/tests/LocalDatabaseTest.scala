@@ -35,7 +35,7 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
         await(db.resetAndInitialize())
 
         await(db.isEmpty) ==> true
-        await(db.setSingletonValue(NextUpdateTokenKey, testDate))
+        await(db.setSingletonValue(NextUpdateTokenKey, testUpdateToken))
         await(db.isEmpty) ==> false
       }
     },
@@ -47,8 +47,8 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
         await(db.setSingletonValue(VersionKey, "abc"))
         await(db.getSingletonValue(VersionKey)).get ==> "abc"
 
-        await(db.setSingletonValue(NextUpdateTokenKey, testDate))
-        await(db.getSingletonValue(NextUpdateTokenKey)).get ==> testDate
+        await(db.setSingletonValue(NextUpdateTokenKey, testUpdateToken))
+        await(db.getSingletonValue(NextUpdateTokenKey)).get ==> testUpdateToken
       }
     },
     ManualTest("save") {
