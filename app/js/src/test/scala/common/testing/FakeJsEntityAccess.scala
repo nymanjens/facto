@@ -35,7 +35,7 @@ final class FakeJsEntityAccess extends JsEntityAccess {
   override def registerListener(listener: Listener): Unit = {
     listeners += listener
   }
-  override def startSchedulingModifiedEntityUpdates(): Unit = ???
+  override def startCheckingForModifiedEntityUpdates(): Unit = ???
 
   // **************** Additional methods for tests ****************//
   def newQuerySync[E <: Entity: EntityType](): DbResultSet.Sync[E] = DbResultSet.fromExecutor(queryExecutor)

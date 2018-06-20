@@ -99,7 +99,7 @@ private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
     listeners = listeners :+ listener
   }
 
-  override private[access] def startSchedulingModifiedEntityUpdates(): Unit = {
+  override private[access] def startCheckingForModifiedEntityUpdates(): Unit = {
     remoteDatabaseProxy.startCheckingForModifiedEntityUpdates(modifications => {
       _pendingModifications --= modifications
       invokeListenersAsync(_.modificationsAddedOrPendingStateChanged(modifications))
