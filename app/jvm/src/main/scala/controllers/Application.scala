@@ -16,7 +16,7 @@ import com.google.common.io.Resources
 import com.google.inject.Inject
 import common.GuavaReplacement.Splitter
 import common.ResourceFiles
-import common.publisher.MappingPublisher
+import common.publisher.{MappingPublisher, Publishers}
 import controllers.Application.Forms
 import controllers.Application.Forms.{AddUserData, ChangePasswordData}
 import controllers.helpers.AuthenticatedAction
@@ -161,8 +161,11 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
     }
 
     val in = Sink.ignore
-    val out = Source.fromPublisher(
-      new MappingPublisher(entityAccess.entityModificationPublisher, modificationsToBytes))
+    val out =
+      Source.fromPublisher(
+        Publishers.prependWithoutMissingNotifications(
+          firstValueFunction = () => null,
+          Publishers.map(entityAccess.entityModificationPublisher, modificationsToBytes)))
     Flow.fromSinkAndSource(in, out)
   }
 
