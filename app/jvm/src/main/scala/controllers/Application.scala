@@ -1,5 +1,6 @@
 package controllers
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import java.net.URL
 import java.nio.ByteBuffer
 
@@ -34,6 +35,7 @@ import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc._
 
 import scala.collection.immutable.Seq
+import scala.concurrent.Future
 
 final class Application @Inject()(implicit override val messagesApi: MessagesApi,
                                   components: ControllerComponents,
@@ -164,7 +166,12 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
         data
       }
 
-      def firstValueFunction(): ModificationsWithToken = {
+      // Start recording all updates
+      val entityModificationPublisher =
+        Publishers.delayMessagesUntilFirstSubscriber(entityAccess.entityModificationPublisher)
+
+      // Calculate updates from the update token onwards
+      val firstMessage = {
         // All modifications are idempotent so we can use the time when we started getting the entities as next
         // update token.
         val nextUpdateToken: UpdateToken = toUpdateToken(clock.now)
@@ -182,13 +189,10 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
       }
 
       val in = Sink.ignore
-      val out =
-        Source.fromPublisher(
-          Publishers.map(
-            Publishers.prependWithoutMissingNotifications(
-              firstValueFunction _,
-              entityAccess.entityModificationPublisher),
-            modificationsToBytes))
+      val out = Source
+        .single(modificationsToBytes(firstMessage))
+        .concat(Source.fromPublisher(
+          Publishers.map(entityAccess.entityModificationPublisher, modificationsToBytes)))
       Flow.fromSinkAndSource(in, out)
   }
 
