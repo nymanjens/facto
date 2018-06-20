@@ -2,12 +2,7 @@ package api
 
 import java.nio.ByteBuffer
 
-import api.ScalaJsApi.{
-  GetAllEntitiesResponse,
-  ModificationsWithToken,
-  GetInitialDataResponse,
-  UpdateToken
-}
+import api.ScalaJsApi.{GetAllEntitiesResponse, ModificationsWithToken, GetInitialDataResponse, UpdateToken}
 import autowire._
 import boopickle.Default._
 import models.Entity
