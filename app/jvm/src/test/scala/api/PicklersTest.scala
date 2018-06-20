@@ -64,9 +64,9 @@ class PicklersTest extends HookedSpecification {
         nextUpdateToken = testDate))
   }
 
-  "GetEntityModificationsResponse" in {
-    testPickleAndUnpickle[GetEntityModificationsResponse](
-      GetEntityModificationsResponse(modifications = Seq(testModification), nextUpdateToken = testDate))
+  "ModificationsWithToken" in {
+    testPickleAndUnpickle[ModificationsWithToken](
+      ModificationsWithToken(modifications = Seq(testModification), nextUpdateToken = testDate))
   }
 
   private def testPickleAndUnpickle[T: Pickler](value: T) = {

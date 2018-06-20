@@ -3,7 +3,7 @@ package api
 import api.Picklers._
 import api.ScalaJsApi.{
   GetAllEntitiesResponse,
-  GetEntityModificationsResponse,
+  ModificationsWithToken,
   GetInitialDataResponse,
   UpdateToken
 }
@@ -28,7 +28,7 @@ trait ScalaJsApi {
   def getAllEntities(types: Seq[EntityType.any]): GetAllEntitiesResponse
 
   /** Returns all modifications that happened after the given update token was returned, ordered from old to new. */
-  def getEntityModifications(updateToken: UpdateToken): GetEntityModificationsResponse
+  def getEntityModifications(updateToken: UpdateToken): ModificationsWithToken
 
   /** Stores the given entity modifications. */
   def persistEntityModifications(modifications: Seq[EntityModification]): Unit
@@ -60,6 +60,6 @@ object ScalaJsApi {
       entitiesMap(entityType).asInstanceOf[Seq[E]]
     }
   }
-  case class GetEntityModificationsResponse(modifications: Seq[EntityModification],
+  case class ModificationsWithToken(modifications: Seq[EntityModification],
                                             nextUpdateToken: UpdateToken)
 }

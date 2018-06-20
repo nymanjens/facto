@@ -4,7 +4,7 @@ import java.nio.ByteBuffer
 
 import api.ScalaJsApi.{
   GetAllEntitiesResponse,
-  GetEntityModificationsResponse,
+  ModificationsWithToken,
   GetInitialDataResponse,
   UpdateToken
 }
@@ -27,7 +27,7 @@ trait ScalaJsApiClient {
 
   def getInitialData(): Future[GetInitialDataResponse]
   def getAllEntities(types: Seq[EntityType.any]): Future[GetAllEntitiesResponse]
-  def getEntityModifications(updateToken: UpdateToken): Future[GetEntityModificationsResponse]
+  def getEntityModifications(updateToken: UpdateToken): Future[ModificationsWithToken]
   def persistEntityModifications(modifications: Seq[EntityModification]): Future[Unit]
   def executeDataQuery[E <: Entity](dbQuery: DbQuery[E]): Future[Seq[E]]
   def executeCountQuery(dbQuery: DbQuery[_ <: Entity]): Future[Int]

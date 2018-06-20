@@ -1,6 +1,6 @@
 package models.access
 
-import api.ScalaJsApi.{GetEntityModificationsResponse, GetInitialDataResponse, UpdateToken}
+import api.ScalaJsApi.{ModificationsWithToken, GetInitialDataResponse, UpdateToken}
 import api.ScalaJsApiClient
 import common.LoggingUtils.logFailure
 import common.ScalaUtils.visibleForTesting
@@ -16,7 +16,7 @@ import scala.concurrent.{Future, Promise}
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 final class EntityModificationPushClient(updateToken: UpdateToken,
-                                         onMessageReceived: GetEntityModificationsResponse => Unit) {
+                                         onMessageReceived: ModificationsWithToken => Unit) {
 
   private val websocketClient = new PushingWebsocketClient(
     websocketPath = s"websocket/entitymodificationpush/$updateToken/",

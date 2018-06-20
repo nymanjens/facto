@@ -3,7 +3,7 @@ package api
 import api.Picklers._
 import api.ScalaJsApi.{
   GetAllEntitiesResponse,
-  GetEntityModificationsResponse,
+  ModificationsWithToken,
   GetInitialDataResponse,
   UpdateToken
 }
@@ -65,7 +65,7 @@ final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
       GetAllEntitiesResponse(entitiesMap, nextUpdateToken)
     }
 
-    override def getEntityModifications(updateToken: UpdateToken): GetEntityModificationsResponse = {
+    override def getEntityModifications(updateToken: UpdateToken): ModificationsWithToken = {
       // All modifications are idempotent so we can use the time when we started getting the entities as next update token.
       val nextUpdateToken: UpdateToken = clock.now
 
@@ -78,7 +78,7 @@ final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
         modificationEntities.toStream.map(_.modification).toVector
       }
 
-      GetEntityModificationsResponse(modifications, nextUpdateToken)
+      ModificationsWithToken(modifications, nextUpdateToken)
     }
 
     override def persistEntityModifications(modifications: Seq[EntityModification]): Unit = {
