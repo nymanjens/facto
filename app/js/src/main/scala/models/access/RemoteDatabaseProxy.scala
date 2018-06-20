@@ -28,6 +28,6 @@ private[access] trait RemoteDatabaseProxy {
     */
   def localDatabaseReadyFuture: Future[Unit]
 
-  case class PersistEntityModificationsResponse(queryReflectsModifications: Future[Unit],
-                                                completelyDone: Future[Unit])
+  case class PersistEntityModificationsResponse(queryReflectsModificationsFuture: Future[Unit],
+                                                completelyDoneFuture: Future[Unit])
 }

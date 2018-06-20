@@ -71,8 +71,8 @@ private[access] final class HybridRemoteDatabaseProxy(futureLocalDatabase: Futur
             await(localDatabase.addPendingModifications(modifications))
         })
         PersistEntityModificationsResponse(
-          queryReflectsModifications = serverUpdated,
-          completelyDone = serverUpdated)
+          queryReflectsModificationsFuture = serverUpdated,
+          completelyDoneFuture = serverUpdated)
 
       case Some(localDatabase) =>
         val queryReflectsModifications = async {
@@ -85,8 +85,8 @@ private[access] final class HybridRemoteDatabaseProxy(futureLocalDatabase: Futur
           await(serverUpdated)
         }
         PersistEntityModificationsResponse(
-          queryReflectsModifications = queryReflectsModifications,
-          completelyDone = completelyDone)
+          queryReflectsModificationsFuture = queryReflectsModifications,
+          completelyDoneFuture = completelyDone)
     }
   }
 

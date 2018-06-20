@@ -76,14 +76,14 @@ private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
 
     val persistResponse = remoteDatabaseProxy.persistEntityModifications(modifications)
 
-    val queryBlockingFuture = persistResponse.queryReflectsModifications
+    val queryBlockingFuture = persistResponse.queryReflectsModificationsFuture
     queryBlockingFutures += queryBlockingFuture
     queryBlockingFuture map { _ =>
       queryBlockingFutures -= queryBlockingFuture
     }
 
     async {
-      await(persistResponse.completelyDone)
+      await(persistResponse.completelyDoneFuture)
       await(listenersInvoked)
     }
   }
