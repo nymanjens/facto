@@ -15,6 +15,7 @@ trait LocalDateTime extends Comparable[LocalDateTime] {
   def getMonth: Month
 
   def plus(duration: Duration): LocalDateTime
+  def minus(duration: Duration): LocalDateTime
 }
 
 object LocalDateTime {
@@ -55,6 +56,7 @@ object LocalDateTime {
       val newdateMillis = dateMillis + timeMillis + durationMillis
       of(LocalDate.ofEpochDay(newdateMillis / millisInDay), time plus duration)
     }
+    override def minus(duration: Duration) = plus(duration.negated())
 
     override def toString = s"$date $time"
 
