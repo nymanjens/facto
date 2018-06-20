@@ -8,7 +8,7 @@ import org.scalajs.dom.{CloseEvent, ErrorEvent, Event, MessageEvent, _}
 import scala.scalajs.js
 import scala.scalajs.js.typedarray.{ArrayBuffer, _}
 
-final class PullingWebsocketClient(websocketPath: String, onMessageReceived: ByteBuffer => Unit) {
+final class PushingWebsocketClient(websocketPath: String, onMessageReceived: ByteBuffer => Unit) {
   require(!websocketPath.startsWith("/"))
 
   openWebsocket()
@@ -39,5 +39,5 @@ final class PullingWebsocketClient(websocketPath: String, onMessageReceived: Byt
     }
   }
 
-  private def logLine(line: String): Unit = console.log(s"  [PullingWebsocketClient] $line")
+  private def logLine(line: String): Unit = console.log(s"  [PushingWebsocketClient] $line")
 }

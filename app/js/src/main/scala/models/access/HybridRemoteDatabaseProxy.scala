@@ -92,12 +92,12 @@ private[access] final class HybridRemoteDatabaseProxy(futureLocalDatabase: Futur
 
   override def startCheckingForModifiedEntityUpdates(
       maybeNewEntityModificationsListener: Seq[EntityModification] => Future[Unit]): Unit = {
-    val temporaryPuller = new EntityModificationPuller(
+    val temporaryPushClient = new EntityModificationPushClient(
       updateToken = getInitialDataResponse.nextUpdateToken,
       onMessageReceived = modificationsWithToken =>
         async {
           val modifications = modificationsWithToken.modifications
-          console.log(s"  [temporary puller] ${modifications.size} remote modifications pulled")
+          console.log(s"  [temporary push client] ${modifications.size} remote modifications received")
           await(maybeNewEntityModificationsListener(modifications))
       }
     )
@@ -106,14 +106,14 @@ private[access] final class HybridRemoteDatabaseProxy(futureLocalDatabase: Futur
     futureLocalDatabase.addUpdateAtStart(localDatabase =>
       async {
         val storedUpdateToken = await(localDatabase.getSingletonValue(NextUpdateTokenKey).map(_.get))
-        temporaryPuller.close()
+        temporaryPushClient.close()
 
-        val permanentPuller = new EntityModificationPuller(
+        val permanentPushClient = new EntityModificationPushClient(
           updateToken = storedUpdateToken,
           onMessageReceived = modificationsWithToken =>
             async {
               val modifications = modificationsWithToken.modifications
-              console.log(s"  [permanent puller] ${modifications.size} remote modifications pulled")
+              console.log(s"  [permanent push client] ${modifications.size} remote modifications received")
               await(localDatabase.applyModifications(modifications))
               await(localDatabase.removePendingModifications(modifications))
               await(
@@ -122,7 +122,7 @@ private[access] final class HybridRemoteDatabaseProxy(futureLocalDatabase: Futur
               await(maybeNewEntityModificationsListener(modifications))
           }
         )
-        await(permanentPuller.firstMessageWasProcessedFuture)
+        await(permanentPushClient.firstMessageWasProcessedFuture)
     })
   }
 
