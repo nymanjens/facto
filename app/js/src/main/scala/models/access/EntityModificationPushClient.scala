@@ -1,7 +1,10 @@
 package models.access
 
-import api.ScalaJsApi.{ModificationsWithToken, GetInitialDataResponse, UpdateToken}
+import boopickle.Default._
+import api.Picklers._
+import api.ScalaJsApi.{GetInitialDataResponse, ModificationsWithToken, UpdateToken}
 import api.ScalaJsApiClient
+import boopickle.Default.Unpickle
 import common.LoggingUtils.logFailure
 import common.ScalaUtils.visibleForTesting
 import common.websocket.PushingWebsocketClient
@@ -16,16 +19,23 @@ import scala.concurrent.{Future, Promise}
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 final class EntityModificationPushClient(updateToken: UpdateToken,
-                                         onMessageReceived: ModificationsWithToken => Unit) {
+                                         onMessageReceived: ModificationsWithToken => Future[Unit]) {
+
+  private val firstMessageWasProcessedPromise: Promise[Unit] = Promise()
 
   private val websocketClient = new PushingWebsocketClient(
     websocketPath = s"websocket/entitymodificationpush/$updateToken/",
-    onMessageReceived = bytes => ???
+    onMessageReceived = bytes =>
+      async {
+        val modificationsWithToken = Unpickle[ModificationsWithToken].fromBytes(bytes)
+        await(onMessageReceived(modificationsWithToken))
+        firstMessageWasProcessedPromise.trySuccess((): Unit)
+    }
   )
 
   // TODO: Keep track of latest updateToken and use that to re-open PushingWebsocketClient if it fails
 
-  def firstMessageWasProcessedFuture: Future[Unit] = ???
+  def firstMessageWasProcessedFuture: Future[Unit] = firstMessageWasProcessedPromise.future
 
-  def close(): Future[Unit] = ???
+  def close(): Unit = websocketClient.close()
 }
