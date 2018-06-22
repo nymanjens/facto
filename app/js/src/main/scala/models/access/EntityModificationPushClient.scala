@@ -1,20 +1,11 @@
 package models.access
 
-import boopickle.Default._
 import api.Picklers._
-import api.ScalaJsApi.{GetInitialDataResponse, ModificationsWithToken, UpdateToken}
-import api.ScalaJsApiClient
-import boopickle.Default.Unpickle
-import common.LoggingUtils.logFailure
-import common.ScalaUtils.visibleForTesting
-import common.websocket.PushingWebsocketClient
-import models.Entity
-import models.access.SingletonKey.NextUpdateTokenKey
-import models.modification.{EntityModification, EntityType}
-import org.scalajs.dom.console
+import api.ScalaJsApi.{ModificationsWithToken, UpdateToken}
+import boopickle.Default.{Unpickle, _}
+import common.websocket.BinaryWebsocketClient
 
 import scala.async.Async.{async, await}
-import scala.collection.immutable.Seq
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
@@ -23,7 +14,8 @@ final class EntityModificationPushClient(updateToken: UpdateToken,
 
   private val firstMessageWasProcessedPromise: Promise[Unit] = Promise()
 
-  private val websocketClient = new PushingWebsocketClient(
+  private val websocketClient = BinaryWebsocketClient.open(
+    name = "EntityModificationPushClient",
     websocketPath = s"websocket/entitymodificationpush/$updateToken/",
     onMessageReceived = bytes =>
       async {
@@ -37,5 +29,5 @@ final class EntityModificationPushClient(updateToken: UpdateToken,
 
   def firstMessageWasProcessedFuture: Future[Unit] = firstMessageWasProcessedPromise.future
 
-  def close(): Unit = websocketClient.close()
+  def close(): Unit = websocketClient.map(_.close())
 }

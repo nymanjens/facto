@@ -6,9 +6,7 @@ import common.LoggingUtils.logExceptions
 import org.scalajs.dom
 import org.scalajs.dom.{CloseEvent, ErrorEvent, Event, MessageEvent, _}
 
-import scala.async.Async.{async, await}
 import scala.concurrent.{Future, Promise}
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js.typedarray.{ArrayBuffer, _}
 
 final class BinaryWebsocketClient(name: String, jsWebsocket: WebSocket) {
@@ -17,7 +15,7 @@ final class BinaryWebsocketClient(name: String, jsWebsocket: WebSocket) {
     jsWebsocket.send(toArrayBuffer(message))
   }
 
-  def close(): Unit = async {
+  def close(): Unit = {
     BinaryWebsocketClient.logLine(name, "Closing WebSocket...")
     jsWebsocket.onclose = (e: CloseEvent) => {}
     jsWebsocket.close()
@@ -42,7 +40,7 @@ object BinaryWebsocketClient {
 
     val protocol = if (dom.window.location.protocol == "https:") "wss:" else "ws:"
     val jsWebsocket = new dom.WebSocket(s"${protocol}//${dom.window.location.host}/$websocketPath")
-    val jsWebsocketPromise: Promise[WebSocket] = Promise()
+    val resultPromise: Promise[BinaryWebsocketClient] = Promise()
 
     jsWebsocket.binaryType = "arraybuffer"
     jsWebsocket.onmessage = (e: MessageEvent) =>
@@ -52,7 +50,7 @@ object BinaryWebsocketClient {
     }
     jsWebsocket.onopen = (e: Event) =>
       logExceptions {
-        jsWebsocketPromise.success(jsWebsocket)
+        resultPromise.success(new BinaryWebsocketClient(name, jsWebsocket))
         logLine(name, "Opened")
     }
     jsWebsocket.onerror = (e: ErrorEvent) =>
@@ -60,18 +58,18 @@ object BinaryWebsocketClient {
         // Note: the given event turns out to be of type "error", but has an undefined message. This causes
         // ClassCastException when accessing it as a String
         val errorMessage = s"Error when connecting to WebSocket"
-        jsWebsocketPromise.tryFailure(new RuntimeException(errorMessage))
+        resultPromise.tryFailure(new RuntimeException(errorMessage))
         logLine(name, errorMessage)
     }
     jsWebsocket.onclose = (e: CloseEvent) =>
       logExceptions {
         val errorMessage = s"WebSocket was closed: ${e.reason}"
-        jsWebsocketPromise.tryFailure(new RuntimeException(errorMessage))
+        resultPromise.tryFailure(new RuntimeException(errorMessage))
         logLine(name, errorMessage)
         onClose()
     }
 
-    jsWebsocketPromise.future
+    resultPromise.future
   }
 
   private def logLine(name: String, line: String): Unit = console.log(s"  [$name] $line")
