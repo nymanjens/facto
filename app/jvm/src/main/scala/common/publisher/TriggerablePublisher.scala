@@ -9,18 +9,17 @@ final class TriggerablePublisher[T] extends Publisher[T] {
 
   override def subscribe(subscriber: Subscriber[_ >: T]): Unit = {
     subscribers.add(subscriber)
-    println(s"!!!!!!!!!!! subscribe(): subscribers = ${subscribers.size()}")
+    println(s"  TriggerablePublisher.subscribe(): ${subscribers.size()} subscribers")
     subscriber.onSubscribe(new Subscription {
       override def request(n: Long): Unit = {}
       override def cancel(): Unit = {
         subscribers.remove(subscriber)
-        println(s"!!!!!!!!!!! cancel(): subscribers = ${subscribers.size()}")
+        println(s"  TriggerablePublisher.cancel(): ${subscribers.size()} subscribers")
       }
     })
   }
 
   def trigger(value: T): Unit = {
-    println(s"!!!!!!!!! run(): subscribers = ${subscribers.size()}")
     for (s <- subscribers.asScala) {
       s.onNext(value)
     }
