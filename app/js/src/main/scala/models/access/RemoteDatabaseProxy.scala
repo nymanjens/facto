@@ -16,7 +16,11 @@ private[access] trait RemoteDatabaseProxy {
 
   def persistEntityModifications(modifications: Seq[EntityModification]): PersistEntityModificationsResponse
 
-  /** TODO */
+  /**
+    * Start listening for entity modifications.
+    *
+    * Upon receiving any modifications, the given listener should be invoked.
+    */
   def startCheckingForModifiedEntityUpdates(
       maybeNewEntityModificationsListener: Seq[EntityModification] => Future[Unit]): Unit
 

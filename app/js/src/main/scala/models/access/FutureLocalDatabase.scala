@@ -12,7 +12,7 @@ import scala.collection.mutable
 import scala.concurrent.{Future, Promise}
 import scala2js.Converters._
 
-/** TODO */
+/** Wrapper around a LocalDatabase future that allows to attach updates to it. */
 private[access] final class FutureLocalDatabase(unsafeLocalDatabaseFuture: Future[LocalDatabase]) {
 
   private val pendingUpdates: mutable.Buffer[LocalDatabase => Future[Unit]] = mutable.Buffer()
@@ -21,7 +21,13 @@ private[access] final class FutureLocalDatabase(unsafeLocalDatabaseFuture: Futur
 
   unsafeLocalDatabaseFuture.map(performPendingUpdates)
 
-  /** TODO */
+  /**
+    * Returns future for the LocalDatabase.
+    *
+    * @param safe If true, errors thrown by the database future are caught and translated into a never-ending
+    *     future
+    * @param includesLatestUpdates If true, the future completes when there are no more scheduled updates
+    */
   def future(safe: Boolean = true, includesLatestUpdates: Boolean = true): Future[LocalDatabase] = async {
     val db = await {
       if (safe) safeLocalDatabaseFuture else unsafeLocalDatabaseFuture
@@ -34,21 +40,33 @@ private[access] final class FutureLocalDatabase(unsafeLocalDatabaseFuture: Futur
     db
   }
 
-  /** TODO */
+  /**
+    * Returns the LocalDatabase if it is ready.
+    *
+    * @param includesLatestUpdates If true, the LocalDatabase is only ready when there are no more scheduled
+    *     updates
+    */
   def option(includesLatestUpdates: Boolean = true): Option[LocalDatabase] = {
     future(includesLatestUpdates = includesLatestUpdates).value.map(_.get)
   }
 
-  /** TODO */
-  // warning if already finished finished - if so, execute func immediately
+  /**
+    * Schedule an operation to be executed immediately after the LocalDatabase has loaded.
+    *
+    * Note: If the LocalDatabase has already loaded, the given function is executed ASAP.
+    */
   def addUpdateAtStart(func: LocalDatabase => Future[Unit]): Unit = {
     pendingUpdates.prepend(func)
     lastUpdateDonePromise = Promise()
     unsafeLocalDatabaseFuture.map(performPendingUpdates)
   }
 
-  /** TODO */
-  // warning if already finished finished - if so, execute func immediately
+  /**
+    * Schedule an operation to be executed when the LocalDatabase has loaded and all other updates are done.
+    *
+    * Note: If the LocalDatabase has already loaded and all other updates are done, the given function is
+    * executed ASAP.
+    */
   def addUpdateAtEnd(func: LocalDatabase => Future[Unit]): Unit = {
     pendingUpdates += func
     lastUpdateDonePromise = Promise()

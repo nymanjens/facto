@@ -5,11 +5,20 @@ import org.reactivestreams.{Publisher, Subscriber, Subscription}
 
 import scala.collection.immutable.Seq
 
+/** Utility methods for working woth reactivestreams Publishers. */
 object Publishers {
 
+  /**
+    * Returns the same publisher as the givne one, except that the given `mappingFunction` is applied to all
+    * messages.
+    */
   def map[From, To](delegate: Publisher[From], mappingFunction: From => To): Publisher[To] =
     new MappingPublisher(delegate, mappingFunction)
 
+  /**
+    * Returns a new publisher that is the same as the given publisher, except that the messages posted by the
+    * given publisher are stored and replayed when the first subscriber is added to the returned subscriber.
+    */
   def delayMessagesUntilFirstSubscriber[T](delegate: Publisher[T]): Publisher[T] =
     new ReplayingPublisher(delegate)
 
@@ -25,7 +34,6 @@ object Publishers {
     }
   }
 
-  /** TODO */
   private final class ReplayingPublisher[T](delegate: Publisher[T]) extends Publisher[T] {
     private val accumulatingSubscriber = new AccumulatingSubscriber()
     delegate.subscribe(accumulatingSubscriber)
