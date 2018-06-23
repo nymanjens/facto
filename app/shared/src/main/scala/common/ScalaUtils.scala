@@ -16,6 +16,8 @@ object ScalaUtils {
     (callback, promise.future)
   }
 
+  def toPromise[T](future: Future[T]): Promise[T] = Promise[T]().completeWith(future)
+
   /** Scala version of com.google.common.annotations.VisibleForTesting. */
   class visibleForTesting extends StaticAnnotation
 
