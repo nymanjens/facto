@@ -191,8 +191,7 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
       val in = Sink.ignore
       val out = Source
         .single(modificationsToBytes(firstMessage))
-        .concat(Source.fromPublisher(
-          Publishers.map(entityAccess.entityModificationPublisher, modificationsToBytes)))
+        .concat(Source.fromPublisher(Publishers.map(entityModificationPublisher, modificationsToBytes)))
       Flow.fromSinkAndSource(in, out)
   }
 
