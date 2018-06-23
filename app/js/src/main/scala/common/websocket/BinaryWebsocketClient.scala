@@ -35,6 +35,7 @@ object BinaryWebsocketClient {
   def open(name: String,
            websocketPath: String,
            onMessageReceived: ByteBuffer => Unit,
+           onError: () => Unit = () => {},
            onClose: () => Unit = () => {}): Future[BinaryWebsocketClient] = {
     require(!websocketPath.startsWith("/"))
 
@@ -58,13 +59,14 @@ object BinaryWebsocketClient {
       logExceptions {
         // Note: the given event turns out to be of type "error", but has an undefined message. This causes
         // ClassCastException when accessing it as a String
-        val errorMessage = s"Error when connecting to WebSocket"
+        val errorMessage = s"Error from WebSocket"
         resultPromise.tryFailure(new RuntimeException(errorMessage))
         logLine(name, errorMessage)
+        onError()
     }
     jsWebsocket.onclose = (e: CloseEvent) =>
       logExceptions {
-        val errorMessage = s"WebSocket was closed: ${e.reason}"
+        val errorMessage = s"WebSocket was closed"
         resultPromise.tryFailure(new RuntimeException(errorMessage))
         logLine(name, errorMessage)
         onClose()

@@ -45,7 +45,19 @@ private[websocket] final class SerialWebsocketClient(websocketPath: String) {
       openWebsocketPromise = Some(
         toPromise(
           BinaryWebsocketClient
-            .open(name = name, websocketPath = websocketPath, onMessageReceived = onMessageReceived)))
+            .open(
+              name = name,
+              websocketPath = websocketPath,
+              onMessageReceived = onMessageReceived,
+              onError = () =>
+                responseMessagePromises.headOption.map(
+                  _.tryFailure(new RuntimeException("Error from WebSocket"))),
+              onClose = () => {
+                responseMessagePromises.headOption.map(
+                  _.tryFailure(new RuntimeException("WebSocket was closed")))
+                openWebsocketPromise = None
+              }
+            )))
     }
     openWebsocketPromise.get
   }
