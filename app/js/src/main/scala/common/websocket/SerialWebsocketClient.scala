@@ -53,9 +53,9 @@ private[websocket] final class SerialWebsocketClient(websocketPath: String) {
                 responseMessagePromises.headOption.map(
                   _.tryFailure(new RuntimeException("Error from WebSocket"))),
               onClose = () => {
+                openWebsocketPromise = None
                 responseMessagePromises.headOption.map(
                   _.tryFailure(new RuntimeException("WebSocket was closed")))
-                openWebsocketPromise = None
               }
             )))
     }
