@@ -116,11 +116,13 @@ private[access] final class HybridRemoteDatabaseProxy(futureLocalDatabase: Futur
             async {
               val modifications = modificationsWithToken.modifications
               console.log(s"  [permanent push client] ${modifications.size} remote modifications received")
-              await(localDatabase.applyModifications(modifications))
-              await(localDatabase.removePendingModifications(modifications))
-              await(
-                localDatabase.setSingletonValue(NextUpdateTokenKey, modificationsWithToken.nextUpdateToken))
-              await(localDatabase.save())
+              if (modifications.nonEmpty) {
+                await(localDatabase.applyModifications(modifications))
+                await(localDatabase.removePendingModifications(modifications))
+                await(
+                  localDatabase.setSingletonValue(NextUpdateTokenKey, modificationsWithToken.nextUpdateToken))
+                await(localDatabase.save())
+              }
               await(maybeNewEntityModificationsListener(modifications))
           }
         )
