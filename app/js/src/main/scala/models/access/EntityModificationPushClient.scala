@@ -31,6 +31,7 @@ final class EntityModificationPushClient(name: String,
   }
 
   dom.window.addEventListener("online", onlineListener)
+  dom.window.addEventListener("focus", onlineListener)
 
   def firstMessageWasProcessedFuture: Future[Unit] = firstMessageWasProcessedPromise.future
 
@@ -40,6 +41,7 @@ final class EntityModificationPushClient(name: String,
     }
     websocketClient = Some(Future.failed(new IllegalStateException("WebSocket is closed")))
     dom.window.removeEventListener("online", onlineListener)
+    dom.window.removeEventListener("focus", onlineListener)
   }
 
   private def openWebsocketClient(updateToken: UpdateToken): Future[BinaryWebsocketClient] = {
