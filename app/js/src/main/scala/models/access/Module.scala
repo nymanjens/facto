@@ -15,7 +15,7 @@ final class Module(implicit user: User,
     implicit val remoteDatabaseProxy = HybridRemoteDatabaseProxy.create(localDatabaseFuture)
     val entityAccess = new JsEntityAccessImpl(getInitialDataResponse.allUsers)
 
-    entityAccess.startSchedulingModifiedEntityUpdates()
+    entityAccess.startCheckingForModifiedEntityUpdates()
 
     entityAccess
   }

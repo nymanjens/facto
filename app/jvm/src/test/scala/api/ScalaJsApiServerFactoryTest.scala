@@ -1,5 +1,6 @@
 package api
 
+import api.UpdateTokens.toUpdateToken
 import models.access.DbQueryImplicits._
 import com.google.inject._
 import common.GuavaReplacement.Iterables.getOnlyElement
@@ -63,20 +64,7 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
     val response = serverFactory.create().getAllEntities(Seq(EntityType.TransactionType))
 
     response.entities(EntityType.TransactionType) mustEqual Seq(testTransactionWithId)
-    response.nextUpdateToken mustEqual testDate
-  }
-
-  "getEntityModifications()" in new WithApplication {
-    fakeClock.setTime(date1)
-    entityAccess.persistEntityModifications(testModificationA)
-    fakeClock.setTime(date3)
-    entityAccess.persistEntityModifications(testModificationB)
-    fakeClock.setTime(date4)
-
-    val response = serverFactory.create().getEntityModifications(updateToken = date2)
-
-    response.modifications mustEqual Seq(testModificationB)
-    response.nextUpdateToken mustEqual date4
+    response.nextUpdateToken mustEqual toUpdateToken(testDate)
   }
 
   "persistEntityModifications()" in new WithApplication {

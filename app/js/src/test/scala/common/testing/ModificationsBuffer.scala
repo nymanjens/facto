@@ -19,7 +19,7 @@ final class ModificationsBuffer {
   // **************** Getters ****************//
   def getModifications(updateToken: UpdateToken = ModificationsBuffer.startToken): Seq[EntityModification] =
     Seq({
-      for (m <- buffer if m.updateToken >= updateToken) yield m.modification
+      for (m <- buffer if m.updateToken.toLong >= updateToken.toLong) yield m.modification
     }: _*)
 
   def getAllEntitiesOfType[E <: Entity](implicit entityType: EntityType[E]): Seq[E] = {
@@ -39,7 +39,7 @@ final class ModificationsBuffer {
     if (buffer.isEmpty) {
       ModificationsBuffer.startToken
     } else {
-      buffer.map(_.updateToken).max plus Duration.ofDays(1)
+      (buffer.map(_.updateToken.toLong).max + 1).toString
     }
   }
 
@@ -65,5 +65,5 @@ final class ModificationsBuffer {
 }
 
 object ModificationsBuffer {
-  private val startToken: UpdateToken = LocalDateTime.of(1990, JANUARY, 1, 0, 0)
+  private val startToken: UpdateToken = "0"
 }

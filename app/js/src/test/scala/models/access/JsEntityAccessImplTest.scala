@@ -51,17 +51,6 @@ object JsEntityAccessImplTest extends TestSuite {
 
         listener.modifications ==> Seq(Seq(testModification))
       }
-
-      "updateModifiedEntities(): calls listeners" - async {
-        val nextUpdateToken = await(fakeApiClient.getAllEntities(Seq(TransactionType))).nextUpdateToken
-        val listener = new FakeProxyListener()
-        entityAccess.registerListener(listener)
-        fakeApiClient.persistEntityModifications(Seq(testModification))
-
-        await(entityAccess.updateModifiedEntities(Some(nextUpdateToken)))
-
-        listener.modifications ==> Seq(Seq(testModification))
-      }
     }
 
     "Fake local database loaded" - {
@@ -100,60 +89,6 @@ object JsEntityAccessImplTest extends TestSuite {
         }
 
         fakeLocalDatabase.allModifications ==> Seq(testModificationA)
-      }
-
-      "newQuery()" - async {
-        localDatabasePromise.success(fakeLocalDatabase)
-        await(remoteDatabaseProxy.localDatabaseReadyFuture)
-        fakeLocalDatabase.addAll(Seq(testTransactionWithId))
-
-        await(entityAccess.newQuery[Transaction]().data()) ==> Seq(testTransactionWithId)
-      }
-
-      "persistModifications()" - async {
-        localDatabasePromise.success(fakeLocalDatabase)
-        await(remoteDatabaseProxy.localDatabaseReadyFuture)
-
-        await(entityAccess.persistModifications(Seq(testModification)))
-
-        fakeApiClient.allModifications ==> Seq(testModification)
-        fakeLocalDatabase.allModifications ==> Seq(testModification)
-      }
-
-      "persistModifications(): calls listeners" - async {
-        localDatabasePromise.success(fakeLocalDatabase)
-        await(remoteDatabaseProxy.localDatabaseReadyFuture)
-        val listener = new FakeProxyListener()
-        entityAccess.registerListener(listener)
-
-        await(entityAccess.persistModifications(Seq(testModification)))
-
-        listener.modifications ==> Seq(Seq(testModification))
-      }
-
-      "updateModifiedEntities()" - async {
-        localDatabasePromise.success(fakeLocalDatabase)
-        await(remoteDatabaseProxy.localDatabaseReadyFuture)
-        val nextUpdateToken = await(fakeApiClient.getAllEntities(Seq(TransactionType))).nextUpdateToken
-        fakeApiClient.persistEntityModifications(Seq(testModification))
-        fakeLocalDatabase.allModifications ==> Seq() // sanity check
-
-        await(entityAccess.updateModifiedEntities(Some(nextUpdateToken)))
-
-        fakeLocalDatabase.allModifications ==> Seq(testModification)
-      }
-
-      "updateModifiedEntities(): calls listeners" - async {
-        localDatabasePromise.success(fakeLocalDatabase)
-        await(remoteDatabaseProxy.localDatabaseReadyFuture)
-        val nextUpdateToken = await(fakeApiClient.getAllEntities(Seq(TransactionType))).nextUpdateToken
-        val listener = new FakeProxyListener()
-        entityAccess.registerListener(listener)
-        fakeApiClient.persistEntityModifications(Seq(testModification))
-
-        await(entityAccess.updateModifiedEntities(Some(nextUpdateToken)))
-
-        listener.modifications ==> Seq(Seq(testModification))
       }
     }
   }

@@ -1,6 +1,6 @@
 package common.testing
 
-import api.ScalaJsApi.{GetAllEntitiesResponse, GetEntityModificationsResponse, UpdateToken}
+import api.ScalaJsApi.{GetAllEntitiesResponse, ModificationsWithToken, UpdateToken}
 import api.ScalaJsApiClient
 import models.Entity
 import models.access.{DbQuery, DbQueryExecutor}
@@ -27,12 +27,6 @@ final class FakeScalaJsApiClient extends ScalaJsApiClient {
       }.toMap,
       nextUpdateToken = modificationsBuffer.nextUpdateToken
     )
-  }
-
-  override def getEntityModifications(updateToken: UpdateToken) = Future.successful {
-    GetEntityModificationsResponse(
-      modifications = modificationsBuffer.getModifications(updateToken),
-      nextUpdateToken = modificationsBuffer.nextUpdateToken)
   }
 
   override def persistEntityModifications(modifications: Seq[EntityModification]) = {

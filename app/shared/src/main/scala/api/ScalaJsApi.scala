@@ -1,12 +1,7 @@
 package api
 
 import api.Picklers._
-import api.ScalaJsApi.{
-  GetAllEntitiesResponse,
-  GetEntityModificationsResponse,
-  GetInitialDataResponse,
-  UpdateToken
-}
+import api.ScalaJsApi.{GetAllEntitiesResponse, ModificationsWithToken, GetInitialDataResponse, UpdateToken}
 import common.money.Currency
 import common.time.LocalDateTime
 import models.Entity
@@ -27,9 +22,6 @@ trait ScalaJsApi {
   /** Returns a map, mapping the entity type to a sequence of all entities of that type. */
   def getAllEntities(types: Seq[EntityType.any]): GetAllEntitiesResponse
 
-  /** Returns all modifications that happened after the given update token was returned, ordered from old to new. */
-  def getEntityModifications(updateToken: UpdateToken): GetEntityModificationsResponse
-
   /** Stores the given entity modifications. */
   def persistEntityModifications(modifications: Seq[EntityModification]): Unit
 
@@ -39,7 +31,7 @@ trait ScalaJsApi {
 }
 
 object ScalaJsApi {
-  type UpdateToken = LocalDateTime
+  type UpdateToken = String
 
   /**
     * @param i18nMessages Maps key to the message with placeholders.
@@ -60,6 +52,5 @@ object ScalaJsApi {
       entitiesMap(entityType).asInstanceOf[Seq[E]]
     }
   }
-  case class GetEntityModificationsResponse(modifications: Seq[EntityModification],
-                                            nextUpdateToken: UpdateToken)
+  case class ModificationsWithToken(modifications: Seq[EntityModification], nextUpdateToken: UpdateToken)
 }

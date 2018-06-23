@@ -9,15 +9,20 @@ import scala.concurrent.Future
 import scala2js.Converters._
 
 /** Proxy for the server-side database. */
-trait RemoteDatabaseProxy {
+private[access] trait RemoteDatabaseProxy {
   def queryExecutor[E <: Entity: EntityType](): DbQueryExecutor.Async[E]
 
   def pendingModifications(): Future[Seq[EntityModification]]
 
   def persistEntityModifications(modifications: Seq[EntityModification]): PersistEntityModificationsResponse
 
-  def getAndApplyRemotelyModifiedEntities(
-      updateToken: Option[UpdateToken]): Future[GetRemotelyModifiedEntitiesResponse]
+  /**
+    * Start listening for entity modifications.
+    *
+    * Upon receiving any modifications, the given listener should be invoked.
+    */
+  def startCheckingForModifiedEntityUpdates(
+      maybeNewEntityModificationsListener: Seq[EntityModification] => Future[Unit]): Unit
 
   def clearLocalDatabase(): Future[Unit]
 
@@ -27,8 +32,6 @@ trait RemoteDatabaseProxy {
     */
   def localDatabaseReadyFuture: Future[Unit]
 
-  case class PersistEntityModificationsResponse(queryReflectsModifications: Future[Unit],
-                                                completelyDone: Future[Unit])
-  case class GetRemotelyModifiedEntitiesResponse(changes: Seq[EntityModification],
-                                                 nextUpdateToken: UpdateToken)
+  case class PersistEntityModificationsResponse(queryReflectsModificationsFuture: Future[Unit],
+                                                completelyDoneFuture: Future[Unit])
 }

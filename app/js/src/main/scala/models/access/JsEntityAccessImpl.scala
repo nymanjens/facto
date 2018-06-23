@@ -76,14 +76,14 @@ private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
 
     val persistResponse = remoteDatabaseProxy.persistEntityModifications(modifications)
 
-    val queryBlockingFuture = persistResponse.queryReflectsModifications
+    val queryBlockingFuture = persistResponse.queryReflectsModificationsFuture
     queryBlockingFutures += queryBlockingFuture
     queryBlockingFuture map { _ =>
       queryBlockingFutures -= queryBlockingFuture
     }
 
     async {
-      await(persistResponse.completelyDone)
+      await(persistResponse.completelyDoneFuture)
       await(listenersInvoked)
     }
   }
@@ -99,15 +99,11 @@ private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
     listeners = listeners :+ listener
   }
 
-  override private[access] def startSchedulingModifiedEntityUpdates(): Unit = {
-    var timeout = 5.seconds
-    def cyclicLogic(updateToken: Option[UpdateToken]): Unit = async {
-      val nextUpdateToken = await(updateModifiedEntities(updateToken))
-      js.timers.setTimeout(timeout)(cyclicLogic(Some(nextUpdateToken)))
-      timeout * 1.02
-    }
-
-    js.timers.setTimeout(0)(cyclicLogic(updateToken = None))
+  override private[access] def startCheckingForModifiedEntityUpdates(): Unit = {
+    remoteDatabaseProxy.startCheckingForModifiedEntityUpdates(modifications => {
+      _pendingModifications --= modifications
+      invokeListenersAsync(_.modificationsAddedOrPendingStateChanged(modifications))
+    })
   }
 
   // **************** Private helper methods ****************//
@@ -120,16 +116,5 @@ private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
         isCallingListeners = false
       }
     }
-  }
-
-  @visibleForTesting private[access] def updateModifiedEntities(
-      updateToken: Option[UpdateToken]): Future[UpdateToken] = async {
-    val response = await(remoteDatabaseProxy.getAndApplyRemotelyModifiedEntities(updateToken))
-    if (response.changes.nonEmpty) {
-      console.log(s"  ${response.changes.size} remote modifications received")
-      _pendingModifications --= response.changes
-      await(invokeListenersAsync(_.modificationsAddedOrPendingStateChanged(response.changes)))
-    }
-    response.nextUpdateToken
   }
 }

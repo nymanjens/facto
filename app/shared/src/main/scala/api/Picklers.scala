@@ -4,7 +4,7 @@ import java.time.{LocalDate, LocalTime}
 
 import api.PicklableDbQuery.FieldWithValue
 import api.PicklableDbQuery.Sorting.FieldWithDirection
-import api.ScalaJsApi.{GetAllEntitiesResponse, GetEntityModificationsResponse, GetInitialDataResponse}
+import api.ScalaJsApi.{GetAllEntitiesResponse, ModificationsWithToken, GetInitialDataResponse}
 import boopickle.CompositePickler
 import boopickle.Default._
 import common.money.Currency

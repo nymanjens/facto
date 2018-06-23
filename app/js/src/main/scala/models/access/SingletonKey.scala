@@ -20,10 +20,7 @@ object SingletonKey {
   abstract class StringSingletonKey extends SingletonKey[String] {
     override val valueConverter = implicitly[Scala2Js.Converter[String]]
   }
-  abstract class DateTimeSingletonKey extends SingletonKey[LocalDateTime] {
-    override val valueConverter = implicitly[Scala2Js.Converter[LocalDateTime]]
-  }
 
-  object NextUpdateTokenKey extends DateTimeSingletonKey
+  object NextUpdateTokenKey extends StringSingletonKey
   object VersionKey extends StringSingletonKey
 }

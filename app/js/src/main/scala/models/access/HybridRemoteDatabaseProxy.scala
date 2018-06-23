@@ -1,33 +1,27 @@
 package models.access
 
-import java.time.Duration
-
-import api.ScalaJsApi.{GetInitialDataResponse, UpdateToken}
+import api.ScalaJsApi.GetInitialDataResponse
 import api.ScalaJsApiClient
 import common.LoggingUtils.logFailure
-import common.ScalaUtils.visibleForTesting
 import models.Entity
+import models.access.SingletonKey.{NextUpdateTokenKey, VersionKey}
 import models.modification.{EntityModification, EntityType}
+import org.scalajs.dom.console
 
 import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
-import models.access.SingletonKey.{NextUpdateTokenKey, VersionKey}
-import models.access.webworker.LocalDatabaseWebWorkerApi
-import models.user.User
-import org.scalajs.dom.console
-
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 /** RemoteDatabaseProxy implementation that queries the remote back-end directly until LocalDatabase
   */
-private[access] final class HybridRemoteDatabaseProxy(unsafeLocalDatabaseFuture: Future[LocalDatabase])(
+private[access] final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
     implicit apiClient: ScalaJsApiClient,
     getInitialDataResponse: GetInitialDataResponse)
     extends RemoteDatabaseProxy {
 
   override def queryExecutor[E <: Entity: EntityType]() = {
-    localDatabaseOption match {
+    futureLocalDatabase.option() match {
       case None =>
         new DbQueryExecutor.Async[E] {
           override def data(dbQuery: DbQuery[E]) =
@@ -48,7 +42,7 @@ private[access] final class HybridRemoteDatabaseProxy(unsafeLocalDatabaseFuture:
             }
 
             for {
-              localDatabase <- localDatabaseFuture
+              localDatabase <- futureLocalDatabase.future()
               if !resultPromise.isCompleted
               seq <- logFailure(localDatabaseCall(localDatabase))
             } resultPromise.trySuccess(seq)
@@ -61,24 +55,24 @@ private[access] final class HybridRemoteDatabaseProxy(unsafeLocalDatabaseFuture:
   }
 
   override def pendingModifications(): Future[Seq[EntityModification]] = async {
-    val localDatabase = await(localDatabaseFuture) // "Pending modifications" make no sense without a local database
+    val localDatabase = await(futureLocalDatabase.future()) // "Pending modifications" make no sense without a local database
     await(localDatabase.pendingModifications())
   }
 
   override def persistEntityModifications(modifications: Seq[EntityModification]) = {
     val serverUpdated = apiClient.persistEntityModifications(modifications)
 
-    localDatabaseOption match {
+    futureLocalDatabase.option() match {
       case None =>
         // Apply changes to local database, but don't wait for it
-        async {
-          val localDatabase = await(localDatabaseFuture)
-          await(localDatabase.applyModifications(modifications))
-          await(localDatabase.addPendingModifications(modifications))
-        }
+        futureLocalDatabase.scheduleUpdateAtEnd(localDatabase =>
+          async {
+            await(localDatabase.applyModifications(modifications))
+            await(localDatabase.addPendingModifications(modifications))
+        })
         PersistEntityModificationsResponse(
-          queryReflectsModifications = serverUpdated,
-          completelyDone = serverUpdated)
+          queryReflectsModificationsFuture = serverUpdated,
+          completelyDoneFuture = serverUpdated)
 
       case Some(localDatabase) =>
         val queryReflectsModifications = async {
@@ -87,41 +81,58 @@ private[access] final class HybridRemoteDatabaseProxy(unsafeLocalDatabaseFuture:
         }
         val completelyDone = async {
           await(queryReflectsModifications)
-          await(localDatabaseOption.get.save())
+          await(localDatabase.save())
           await(serverUpdated)
         }
         PersistEntityModificationsResponse(
-          queryReflectsModifications = queryReflectsModifications,
-          completelyDone = completelyDone)
+          queryReflectsModificationsFuture = queryReflectsModifications,
+          completelyDoneFuture = completelyDone)
     }
   }
 
-  override def getAndApplyRemotelyModifiedEntities(maybeUpdateToken: Option[UpdateToken]) = async {
-    val updateToken: UpdateToken = localDatabaseOption match {
-      case None => maybeUpdateToken getOrElse getInitialDataResponse.nextUpdateToken
-      // Don't use given token because after the database is ready, we want to make sure to update
-      // since the last local DB update
-      case Some(localDatabase) => await(localDatabase.getSingletonValue(NextUpdateTokenKey).map(_.get))
-    }
+  override def startCheckingForModifiedEntityUpdates(
+      maybeNewEntityModificationsListener: Seq[EntityModification] => Future[Unit]): Unit = {
+    val temporaryPushClient = new EntityModificationPushClient(
+      name = "EntityModificationPush[temporary]",
+      updateToken = getInitialDataResponse.nextUpdateToken,
+      onMessageReceived = modificationsWithToken =>
+        async {
+          val modifications = modificationsWithToken.modifications
+          console.log(s"  [temporary push client] ${modifications.size} remote modifications received")
+          await(maybeNewEntityModificationsListener(modifications))
+      }
+    )
 
-    val response = await(apiClient.getEntityModifications(updateToken))
+    // Adding at start here because old modifications were already reflected in API lookups
+    futureLocalDatabase.scheduleUpdateAtStart(localDatabase =>
+      async {
+        val storedUpdateToken = await(localDatabase.getSingletonValue(NextUpdateTokenKey).map(_.get))
+        temporaryPushClient.close()
 
-    if (localDatabaseOption.isDefined && response.modifications.nonEmpty) {
-      val localDatabase = localDatabaseOption.get
-      await(localDatabase.applyModifications(response.modifications))
-      await(localDatabase.removePendingModifications(response.modifications))
-      await(localDatabase.setSingletonValue(NextUpdateTokenKey, response.nextUpdateToken))
-      await(localDatabase.save())
-    }
-
-    GetRemotelyModifiedEntitiesResponse(
-      changes = response.modifications,
-      nextUpdateToken = response.nextUpdateToken)
+        val permanentPushClient = new EntityModificationPushClient(
+          name = "EntityModificationPush[permanent]",
+          updateToken = storedUpdateToken,
+          onMessageReceived = modificationsWithToken =>
+            async {
+              val modifications = modificationsWithToken.modifications
+              console.log(s"  [permanent push client] ${modifications.size} remote modifications received")
+              if (modifications.nonEmpty) {
+                await(localDatabase.applyModifications(modifications))
+                await(localDatabase.removePendingModifications(modifications))
+                await(
+                  localDatabase.setSingletonValue(NextUpdateTokenKey, modificationsWithToken.nextUpdateToken))
+                await(localDatabase.save())
+              }
+              await(maybeNewEntityModificationsListener(modifications))
+          }
+        )
+        await(permanentPushClient.firstMessageWasProcessedFuture)
+    })
   }
 
   override def clearLocalDatabase(): Future[Unit] = {
     val clearFuture = async {
-      val localDatabase = await(unsafeLocalDatabaseFuture)
+      val localDatabase = await(futureLocalDatabase.future(safe = false, includesLatestUpdates = false))
       await(localDatabase.resetAndInitialize())
       await(localDatabase.save())
     }
@@ -134,25 +145,16 @@ private[access] final class HybridRemoteDatabaseProxy(unsafeLocalDatabaseFuture:
     }
   }
 
-  override def localDatabaseReadyFuture: Future[Unit] = localDatabaseFuture.map(_ => (): Unit)
-
-  private val localDatabaseFuture: Future[LocalDatabase] = unsafeLocalDatabaseFuture.recoverWith {
-    case t: Throwable =>
-      console.log(s"  Could not create local database: $t")
-      t.printStackTrace()
-      // Fallback to infinitely running future so that API based lookup is always used as fallback
-      Promise[LocalDatabase]().future
-  }
-  private def localDatabaseOption: Option[LocalDatabase] = localDatabaseFuture.value.map(_.get)
+  override def localDatabaseReadyFuture: Future[Unit] = futureLocalDatabase.future().map(_ => (): Unit)
 }
 
 private[access] object HybridRemoteDatabaseProxy {
-  private val localDatabaseAndEntityVersion = "2.0"
+  private val localDatabaseAndEntityVersion = "3.0"
 
   private[access] def create(localDatabase: Future[LocalDatabase])(
       implicit apiClient: ScalaJsApiClient,
       getInitialDataResponse: GetInitialDataResponse): HybridRemoteDatabaseProxy = {
-    new HybridRemoteDatabaseProxy(async {
+    new HybridRemoteDatabaseProxy(new FutureLocalDatabase(async {
       val db = await(localDatabase)
       val populateIsNecessary = {
         if (await(db.isEmpty)) {
@@ -198,7 +200,7 @@ private[access] object HybridRemoteDatabaseProxy {
         console.log(s"  Population done!")
       }
       db
-    })
+    }))
   }
 
 }

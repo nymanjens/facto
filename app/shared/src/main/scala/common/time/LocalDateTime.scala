@@ -15,12 +15,13 @@ trait LocalDateTime extends Comparable[LocalDateTime] {
   def getMonth: Month
 
   def plus(duration: Duration): LocalDateTime
+  def minus(duration: Duration): LocalDateTime
 }
 
 object LocalDateTime {
 
-  val MIN: LocalDateTime = LocalDateTime.of(LocalDate.MIN, LocalTime.MIN);
-  val MAX: LocalDateTime = LocalDateTime.of(LocalDate.MAX, LocalTime.MAX);
+  val MIN: LocalDateTime = LocalDateTime.of(LocalDate.MIN, LocalTime.MIN)
+  val MAX: LocalDateTime = LocalDateTime.of(LocalDate.MAX, LocalTime.MAX)
 
   def of(localDate: LocalDate, localTime: LocalTime): LocalDateTime = {
     if (localTime.getNano != 0) {
@@ -55,6 +56,7 @@ object LocalDateTime {
       val newdateMillis = dateMillis + timeMillis + durationMillis
       of(LocalDate.ofEpochDay(newdateMillis / millisInDay), time plus duration)
     }
+    override def minus(duration: Duration) = plus(duration.negated())
 
     override def toString = s"$date $time"
 

@@ -1,6 +1,11 @@
 package models.access
 
+import java.time.Duration
+
+import api.ScalaJsApi.ModificationsWithToken
+import api.UpdateTokens.toUpdateToken
 import com.google.inject._
+import common.publisher.TriggerablePublisher
 import common.time.Clock
 import models.Entity
 import models.accounting._
@@ -13,10 +18,11 @@ import models.modification.EntityType.{
 }
 import models.modification.{EntityModification, EntityModificationEntity, EntityType}
 import models.money.ExchangeRateMeasurement
-import models.slick.{SlickEntityTableDef, SlickEntityManager}
+import models.slick.{SlickEntityManager, SlickEntityTableDef}
 import models.slick.SlickUtils.dbApi._
 import models.slick.SlickUtils.dbRun
 import models.user.User
+import org.reactivestreams.Publisher
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
@@ -30,6 +36,9 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends EntityAccess {
         getManager(entityType).fetchAll().asInstanceOf[Seq[E]]
     })
 
+  private val entityModificationPublisher_ : TriggerablePublisher[ModificationsWithToken] =
+    new TriggerablePublisher()
+
   // **************** Getters ****************//
   override def newQuery[E <: Entity: EntityType]() = DbResultSet.fromExecutor(queryExecutor[E].asAsync)
   override def newQuerySyncForUser() = newQuerySync[User]()
@@ -42,12 +51,20 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends EntityAccess {
       implicit entityTableDef: SlickEntityTableDef[E]): TableQuery[entityTableDef.Table] =
     SlickEntityManager.forType.newQuery.asInstanceOf[TableQuery[entityTableDef.Table]]
 
+  def entityModificationPublisher: Publisher[ModificationsWithToken] = entityModificationPublisher_
+
   // **************** Setters ****************//
   def persistEntityModifications(modifications: EntityModification*)(implicit user: User): Unit = {
     persistEntityModifications(modifications.toVector)
   }
 
   def persistEntityModifications(modifications: Seq[EntityModification])(implicit user: User): Unit = {
+    // Remove some time from the next update token because a slower persistEntityModifications() invocation B
+    // could start earlier but end later than invocation A. If the WebSocket closes before the modifications B
+    // get published, the `nextUpdateToken` value returned by A must be old enough so that modifications from
+    // B all happened after it.
+    val nextUpdateToken = toUpdateToken(clock.now minus Duration.ofSeconds(20))
+
     for (modification <- modifications) {
       // Apply modification
       val entityType = modification.entityType
@@ -73,6 +90,8 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends EntityAccess {
 
       inMemoryEntityDatabase.update(modification)
     }
+
+    entityModificationPublisher_.trigger(ModificationsWithToken(modifications, nextUpdateToken))
   }
 
   // ********** Management methods ********** //

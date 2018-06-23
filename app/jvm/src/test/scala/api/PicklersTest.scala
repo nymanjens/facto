@@ -53,7 +53,7 @@ class PicklersTest extends HookedSpecification {
         i18nMessages = Map("abc" -> "def"),
         ratioReferenceToForeignCurrency =
           Map(Currency.Gbp -> SortedMap(LocalDateTimes.createDateTime(2012, MAY, 2) -> 1.2349291837)),
-        nextUpdateToken = testDate
+        nextUpdateToken = testUpdateToken
       ))
   }
 
@@ -61,12 +61,12 @@ class PicklersTest extends HookedSpecification {
     testPickleAndUnpickle[GetAllEntitiesResponse](
       GetAllEntitiesResponse(
         entitiesMap = Map(EntityType.TransactionType -> Seq(testTransactionWithId)),
-        nextUpdateToken = testDate))
+        nextUpdateToken = testUpdateToken))
   }
 
-  "GetEntityModificationsResponse" in {
-    testPickleAndUnpickle[GetEntityModificationsResponse](
-      GetEntityModificationsResponse(modifications = Seq(testModification), nextUpdateToken = testDate))
+  "ModificationsWithToken" in {
+    testPickleAndUnpickle[ModificationsWithToken](
+      ModificationsWithToken(modifications = Seq(testModification), nextUpdateToken = testUpdateToken))
   }
 
   private def testPickleAndUnpickle[T: Pickler](value: T) = {

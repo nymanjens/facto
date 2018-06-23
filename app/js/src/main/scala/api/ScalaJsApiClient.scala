@@ -2,12 +2,7 @@ package api
 
 import java.nio.ByteBuffer
 
-import api.ScalaJsApi.{
-  GetAllEntitiesResponse,
-  GetEntityModificationsResponse,
-  GetInitialDataResponse,
-  UpdateToken
-}
+import api.ScalaJsApi.{GetAllEntitiesResponse, ModificationsWithToken, GetInitialDataResponse, UpdateToken}
 import autowire._
 import boopickle.Default._
 import models.Entity
@@ -16,6 +11,7 @@ import models.modification.{EntityModification, EntityType}
 import org.scalajs.dom
 import api.Picklers._
 import common.LoggingUtils.logExceptions
+import common.websocket.SerialWebsocketClientParallelizer
 
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
@@ -26,7 +22,6 @@ trait ScalaJsApiClient {
 
   def getInitialData(): Future[GetInitialDataResponse]
   def getAllEntities(types: Seq[EntityType.any]): Future[GetAllEntitiesResponse]
-  def getEntityModifications(updateToken: UpdateToken): Future[GetEntityModificationsResponse]
   def persistEntityModifications(modifications: Seq[EntityModification]): Future[Unit]
   def executeDataQuery[E <: Entity](dbQuery: DbQuery[E]): Future[Seq[E]]
   def executeCountQuery(dbQuery: DbQuery[_ <: Entity]): Future[Int]
@@ -42,10 +37,6 @@ object ScalaJsApiClient {
 
     override def getAllEntities(types: Seq[EntityType.any]) = {
       WebsocketAutowireClient[ScalaJsApi].getAllEntities(types).call()
-    }
-
-    override def getEntityModifications(updateToken: UpdateToken) = {
-      WebsocketAutowireClient[ScalaJsApi].getEntityModifications(updateToken).call()
     }
 
     override def persistEntityModifications(modifications: Seq[EntityModification]) = {
