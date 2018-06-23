@@ -13,7 +13,7 @@ import scala.concurrent.{Future, Promise}
 import scala2js.Converters._
 
 /** TODO */
-final class FutureLocalDatabase(unsafeLocalDatabaseFuture: Future[LocalDatabase]) {
+private[access] final class FutureLocalDatabase(unsafeLocalDatabaseFuture: Future[LocalDatabase]) {
 
   private val pendingUpdates: mutable.Buffer[LocalDatabase => Future[Unit]] = mutable.Buffer()
   private var updateInProgress: Boolean = false
