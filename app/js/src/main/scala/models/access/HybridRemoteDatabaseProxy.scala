@@ -93,6 +93,7 @@ private[access] final class HybridRemoteDatabaseProxy(futureLocalDatabase: Futur
   override def startCheckingForModifiedEntityUpdates(
       maybeNewEntityModificationsListener: Seq[EntityModification] => Future[Unit]): Unit = {
     val temporaryPushClient = new EntityModificationPushClient(
+      name="EntityModificationPush[temporary]",
       updateToken = getInitialDataResponse.nextUpdateToken,
       onMessageReceived = modificationsWithToken =>
         async {
@@ -109,6 +110,7 @@ private[access] final class HybridRemoteDatabaseProxy(futureLocalDatabase: Futur
         temporaryPushClient.close()
 
         val permanentPushClient = new EntityModificationPushClient(
+          name="EntityModificationPush[permanent]",
           updateToken = storedUpdateToken,
           onMessageReceived = modificationsWithToken =>
             async {

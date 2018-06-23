@@ -14,7 +14,8 @@ import scala.concurrent.{Future, Promise}
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 
-final class EntityModificationPushClient(updateToken: UpdateToken,
+final class EntityModificationPushClient(name: String,
+                                         updateToken: UpdateToken,
                                          onMessageReceived: ModificationsWithToken => Future[Unit]) {
 
   private val firstMessageWasProcessedPromise: Promise[Unit] = Promise()
@@ -43,7 +44,7 @@ final class EntityModificationPushClient(updateToken: UpdateToken,
 
   private def openWebsocketClient(updateToken: UpdateToken): Future[BinaryWebsocketClient] = {
     BinaryWebsocketClient.open(
-      name = "EntityModificationPushClient",
+      name = name,
       websocketPath = s"websocket/entitymodificationpush/$updateToken/",
       onMessageReceived = bytes =>
         async {
@@ -52,6 +53,7 @@ final class EntityModificationPushClient(updateToken: UpdateToken,
           firstMessageWasProcessedPromise.trySuccess((): Unit)
       },
       onClose = () => {
+        websocketClient = None
         js.timers.setTimeout(10.seconds) {
           if (websocketClient.isEmpty) {
             websocketClient = Some(openWebsocketClient(lastUpdateToken))

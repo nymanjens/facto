@@ -16,9 +16,9 @@ final class BinaryWebsocketClient(name: String, jsWebsocket: WebSocket) {
   }
 
   def close(): Unit = {
-    BinaryWebsocketClient.logLine(name, "Closing WebSocket...")
     jsWebsocket.onclose = (e: CloseEvent) => {}
     jsWebsocket.close()
+    BinaryWebsocketClient.logLine(name, "Closed WebSocket")
   }
 
   private def toArrayBuffer(byteBuffer: ByteBuffer): ArrayBuffer = {
@@ -38,6 +38,7 @@ object BinaryWebsocketClient {
            onClose: () => Unit = () => {}): Future[BinaryWebsocketClient] = {
     require(!websocketPath.startsWith("/"))
 
+    logLine(name, "Opening...")
     val protocol = if (dom.window.location.protocol == "https:") "wss:" else "ws:"
     val jsWebsocket = new dom.WebSocket(s"${protocol}//${dom.window.location.host}/$websocketPath")
     val resultPromise: Promise[BinaryWebsocketClient] = Promise()
