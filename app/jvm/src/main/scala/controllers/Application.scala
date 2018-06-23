@@ -207,9 +207,6 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
       case "getAllEntities" =>
         val types = Unpickle[Seq[EntityType.any]].fromBytes(argsMap("types"))
         Pickle.intoBytes(scalaJsApiServer.getAllEntities(types))
-      case "getEntityModifications" =>
-        val updateToken = Unpickle[UpdateToken].fromBytes(argsMap("updateToken"))
-        Pickle.intoBytes(scalaJsApiServer.getEntityModifications(updateToken))
       case "persistEntityModifications" =>
         val modifications = Unpickle[Seq[EntityModification]].fromBytes(argsMap("modifications"))
         Pickle.intoBytes(scalaJsApiServer.persistEntityModifications(modifications))

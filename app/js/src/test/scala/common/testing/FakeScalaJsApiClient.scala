@@ -29,12 +29,6 @@ final class FakeScalaJsApiClient extends ScalaJsApiClient {
     )
   }
 
-  override def getEntityModifications(updateToken: UpdateToken) = Future.successful {
-    ModificationsWithToken(
-      modifications = modificationsBuffer.getModifications(updateToken),
-      nextUpdateToken = modificationsBuffer.nextUpdateToken)
-  }
-
   override def persistEntityModifications(modifications: Seq[EntityModification]) = {
     modificationsBuffer.addModifications(modifications)
     Future.successful((): Unit)

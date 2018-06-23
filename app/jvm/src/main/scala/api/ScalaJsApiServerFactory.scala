@@ -61,22 +61,6 @@ final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
       GetAllEntitiesResponse(entitiesMap, nextUpdateToken)
     }
 
-    override def getEntityModifications(updateToken: UpdateToken): ModificationsWithToken = {
-      // All modifications are idempotent so we can use the time when we started getting the entities as next update token.
-      val nextUpdateToken: UpdateToken = toUpdateToken(clock.now)
-
-      val modifications = {
-        val modificationEntities = dbRun(
-          entityAccess
-            .newSlickQuery[EntityModificationEntity]()
-            .filter(_.date >= toLocalDateTime(updateToken))
-            .sortBy(_.date))
-        modificationEntities.toStream.map(_.modification).toVector
-      }
-
-      ModificationsWithToken(modifications, nextUpdateToken)
-    }
-
     override def persistEntityModifications(modifications: Seq[EntityModification]): Unit = {
       entityAccess.persistEntityModifications(modifications)
     }

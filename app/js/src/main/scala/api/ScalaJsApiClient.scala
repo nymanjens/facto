@@ -22,7 +22,6 @@ trait ScalaJsApiClient {
 
   def getInitialData(): Future[GetInitialDataResponse]
   def getAllEntities(types: Seq[EntityType.any]): Future[GetAllEntitiesResponse]
-  def getEntityModifications(updateToken: UpdateToken): Future[ModificationsWithToken]
   def persistEntityModifications(modifications: Seq[EntityModification]): Future[Unit]
   def executeDataQuery[E <: Entity](dbQuery: DbQuery[E]): Future[Seq[E]]
   def executeCountQuery(dbQuery: DbQuery[_ <: Entity]): Future[Int]
@@ -38,10 +37,6 @@ object ScalaJsApiClient {
 
     override def getAllEntities(types: Seq[EntityType.any]) = {
       WebsocketAutowireClient[ScalaJsApi].getAllEntities(types).call()
-    }
-
-    override def getEntityModifications(updateToken: UpdateToken) = {
-      WebsocketAutowireClient[ScalaJsApi].getEntityModifications(updateToken).call()
     }
 
     override def persistEntityModifications(modifications: Seq[EntityModification]) = {
