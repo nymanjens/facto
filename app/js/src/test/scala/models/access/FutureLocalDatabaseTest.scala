@@ -35,7 +35,7 @@ object FutureLocalDatabaseTest extends TestSuite {
       }))
     }
     "future(includesLatestUpdates = false)" - async {
-      futureLocalDatabase.addUpdateAtStart(_ => Promise().future)
+      futureLocalDatabase.scheduleUpdateAtStart(_ => Promise().future)
       val future = futureLocalDatabase.future(safe = false, includesLatestUpdates = false)
 
       await(expectNeverComplete(future))
@@ -44,10 +44,10 @@ object FutureLocalDatabaseTest extends TestSuite {
       await(expectComplete(future, expected = localDatabase))
     }
 
-    "addUpdateAt{Start,End}()" - async {
-      val updateAtEnd = FakeUpdateFunction.createAndAdd(futureLocalDatabase.addUpdateAtEnd)
-      val updateAtEnd2 = FakeUpdateFunction.createAndAdd(futureLocalDatabase.addUpdateAtEnd)
-      val updateAtStart = FakeUpdateFunction.createAndAdd(futureLocalDatabase.addUpdateAtStart)
+    "scheduleUpdateAt{Start,End}()" - async {
+      val updateAtEnd = FakeUpdateFunction.createAndAdd(futureLocalDatabase.scheduleUpdateAtEnd)
+      val updateAtEnd2 = FakeUpdateFunction.createAndAdd(futureLocalDatabase.scheduleUpdateAtEnd)
+      val updateAtStart = FakeUpdateFunction.createAndAdd(futureLocalDatabase.scheduleUpdateAtStart)
       unsafeLocalDatabasePromise.success(localDatabase)
 
       await(expectComplete(updateAtStart.wasCalledFuture))
@@ -65,14 +65,14 @@ object FutureLocalDatabaseTest extends TestSuite {
       await(expectComplete(updateAtEnd2.wasCalledFuture))
 
       updateAtEnd2.set()
-      val updateAtEnd3 = FakeUpdateFunction.createAndAdd(futureLocalDatabase.addUpdateAtEnd)
+      val updateAtEnd3 = FakeUpdateFunction.createAndAdd(futureLocalDatabase.scheduleUpdateAtEnd)
 
       await(expectComplete(updateAtEnd3.wasCalledFuture))
     }
 
     "future(includesLatestUpdates = true)" - async {
-      val updateAtEnd = FakeUpdateFunction.createAndAdd(futureLocalDatabase.addUpdateAtEnd)
-      val updateAtStart = FakeUpdateFunction.createAndAdd(futureLocalDatabase.addUpdateAtStart)
+      val updateAtEnd = FakeUpdateFunction.createAndAdd(futureLocalDatabase.scheduleUpdateAtEnd)
+      val updateAtStart = FakeUpdateFunction.createAndAdd(futureLocalDatabase.scheduleUpdateAtStart)
       var future = futureLocalDatabase.future(safe = false, includesLatestUpdates = true)
 
       await(expectNeverComplete(future))
@@ -89,7 +89,7 @@ object FutureLocalDatabaseTest extends TestSuite {
 
       await(expectComplete(future, localDatabase))
 
-      val updateAtEnd2 = FakeUpdateFunction.createAndAdd(futureLocalDatabase.addUpdateAtEnd)
+      val updateAtEnd2 = FakeUpdateFunction.createAndAdd(futureLocalDatabase.scheduleUpdateAtEnd)
       future = futureLocalDatabase.future(safe = false, includesLatestUpdates = true)
 
       await(expectNeverComplete(future))

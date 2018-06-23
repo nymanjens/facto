@@ -65,7 +65,7 @@ private[access] final class HybridRemoteDatabaseProxy(futureLocalDatabase: Futur
     futureLocalDatabase.option() match {
       case None =>
         // Apply changes to local database, but don't wait for it
-        futureLocalDatabase.addUpdateAtEnd(localDatabase =>
+        futureLocalDatabase.scheduleUpdateAtEnd(localDatabase =>
           async {
             await(localDatabase.applyModifications(modifications))
             await(localDatabase.addPendingModifications(modifications))
@@ -104,7 +104,7 @@ private[access] final class HybridRemoteDatabaseProxy(futureLocalDatabase: Futur
     )
 
     // Adding at start here because old modifications were already reflected in API lookups
-    futureLocalDatabase.addUpdateAtStart(localDatabase =>
+    futureLocalDatabase.scheduleUpdateAtStart(localDatabase =>
       async {
         val storedUpdateToken = await(localDatabase.getSingletonValue(NextUpdateTokenKey).map(_.get))
         temporaryPushClient.close()

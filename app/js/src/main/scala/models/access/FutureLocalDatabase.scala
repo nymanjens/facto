@@ -55,7 +55,7 @@ private[access] final class FutureLocalDatabase(unsafeLocalDatabaseFuture: Futur
     *
     * Note: If the LocalDatabase has already loaded, the given function is executed ASAP.
     */
-  def addUpdateAtStart(func: LocalDatabase => Future[Unit]): Unit = {
+  def scheduleUpdateAtStart(func: LocalDatabase => Future[Unit]): Unit = {
     pendingUpdates.prepend(func)
     lastUpdateDonePromise = Promise()
     unsafeLocalDatabaseFuture.map(performPendingUpdates)
@@ -67,7 +67,7 @@ private[access] final class FutureLocalDatabase(unsafeLocalDatabaseFuture: Futur
     * Note: If the LocalDatabase has already loaded and all other updates are done, the given function is
     * executed ASAP.
     */
-  def addUpdateAtEnd(func: LocalDatabase => Future[Unit]): Unit = {
+  def scheduleUpdateAtEnd(func: LocalDatabase => Future[Unit]): Unit = {
     pendingUpdates += func
     lastUpdateDonePromise = Promise()
     unsafeLocalDatabaseFuture.map(performPendingUpdates)
