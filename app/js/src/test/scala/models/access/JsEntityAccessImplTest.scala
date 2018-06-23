@@ -90,35 +90,6 @@ object JsEntityAccessImplTest extends TestSuite {
 
         fakeLocalDatabase.allModifications ==> Seq(testModificationA)
       }
-
-      "newQuery()" - async {
-        localDatabasePromise.success(fakeLocalDatabase)
-        await(remoteDatabaseProxy.localDatabaseReadyFuture)
-        fakeLocalDatabase.addAll(Seq(testTransactionWithId))
-
-        await(entityAccess.newQuery[Transaction]().data()) ==> Seq(testTransactionWithId)
-      }
-
-      "persistModifications()" - async {
-        localDatabasePromise.success(fakeLocalDatabase)
-        await(remoteDatabaseProxy.localDatabaseReadyFuture)
-
-        await(entityAccess.persistModifications(Seq(testModification)))
-
-        fakeApiClient.allModifications ==> Seq(testModification)
-        fakeLocalDatabase.allModifications ==> Seq(testModification)
-      }
-
-      "persistModifications(): calls listeners" - async {
-        localDatabasePromise.success(fakeLocalDatabase)
-        await(remoteDatabaseProxy.localDatabaseReadyFuture)
-        val listener = new FakeProxyListener()
-        entityAccess.registerListener(listener)
-
-        await(entityAccess.persistModifications(Seq(testModification)))
-
-        listener.modifications ==> Seq(Seq(testModification))
-      }
     }
   }
 
