@@ -4,16 +4,17 @@ import api.Picklers._
 import common.LoggingUtils.logExceptions
 import models.access.webworker.LocalDatabaseWebWorkerApi.MethodNumbers
 import models.access.webworker.LocalDatabaseWebWorkerApiConverters._
+import org.scalajs
 import org.scalajs.dom
 import org.scalajs.dom.raw.Worker
 
 import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
 import scala.collection.mutable
+import scala.concurrent.duration._
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
-import scala.scalajs.js.Dictionary
 import scala.scalajs.js.JSConverters._
 import scala2js.Converters._
 import scala2js.Scala2Js
@@ -24,20 +25,26 @@ private[webworker] final class LocalDatabaseWebWorkerApiStub extends LocalDataba
   private val worker: Worker = initializeWebWorker()
 
   override def create(dbName: String, inMemory: Boolean) = {
-    sendAndReceive(MethodNumbers.create, dbName, inMemory).map(_ => (): Unit)
+    sendAndReceive(MethodNumbers.create, Seq(dbName, inMemory)).map(_ => (): Unit)
   }
 
   override def executeDataQuery(lokiQuery: LocalDatabaseWebWorkerApi.LokiQuery) =
-    sendAndReceive(MethodNumbers.executeDataQuery, Scala2Js.toJs(lokiQuery))
+    sendAndReceive(MethodNumbers.executeDataQuery, Seq(Scala2Js.toJs(lokiQuery)))
       .map(_.asInstanceOf[js.Array[js.Dictionary[js.Any]]].toVector)
 
   override def executeCountQuery(lokiQuery: LocalDatabaseWebWorkerApi.LokiQuery) =
-    sendAndReceive(MethodNumbers.executeCountQuery, Scala2Js.toJs(lokiQuery)).map(_.asInstanceOf[Int])
+    sendAndReceive(MethodNumbers.executeCountQuery, Seq(Scala2Js.toJs(lokiQuery))).map(_.asInstanceOf[Int])
 
   override def applyWriteOperations(operations: Seq[LocalDatabaseWebWorkerApi.WriteOperation]) =
-    sendAndReceive(MethodNumbers.applyWriteOperations, Scala2Js.toJs(operations.toList)).map(_ => (): Unit)
+    sendAndReceive(
+      MethodNumbers.applyWriteOperations,
+      Seq(Scala2Js.toJs(operations.toList)),
+      timeout = 1.minute)
+      .map(_ => (): Unit)
 
-  private def sendAndReceive(methodNum: Int, args: js.Any*): Future[js.Any] = async {
+  private def sendAndReceive(methodNum: Int,
+                             args: Seq[js.Any],
+                             timeout: FiniteDuration = 5.seconds): Future[js.Any] = async {
     val lastMessagePromise: Option[Promise[_]] = responseMessagePromises.lastOption
     val thisMessagePromise: Promise[js.Any] = Promise()
     responseMessagePromises += thisMessagePromise
@@ -48,6 +55,17 @@ private[webworker] final class LocalDatabaseWebWorkerApiStub extends LocalDataba
 
     logExceptions {
       worker.postMessage(js.Array(methodNum, args.toJSArray))
+    }
+
+    js.timers.setTimeout(timeout) {
+      if (!thisMessagePromise.isCompleted) {
+        scalajs.dom.console
+          .log(
+            "  [LocalDatabaseWebWorker] Operation timed out " +
+              s"(methodNum = $methodNum, args = $args, timeout = $timeout)")
+      }
+      thisMessagePromise.tryFailure(
+        new Exception(s"Operation timed out (methodNum = $methodNum, args = $args, timeout = $timeout)"))
     }
 
     await(thisMessagePromise.future)
