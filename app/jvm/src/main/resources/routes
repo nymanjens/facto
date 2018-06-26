@@ -8,8 +8,16 @@ GET  /manualtests/                     controllers.Application.manualTests
 GET  /app/                             controllers.Application.reactAppRoot
 GET  /app/*anyString                   controllers.Application.reactApp(anyString)
 GET  /appwithoutcreds/                 controllers.Application.reactAppWithoutCredentials
-GET  /localDatabaseWebWorker.js        controllers.Application.localDatabaseWebWorker
-GET  /serviceWorker.js                 controllers.Application.serviceWorker
+
+# Javscript files
+GET  /localDatabaseWebWorker.js        controllers.JavascriptFiles.localDatabaseWebWorker
+GET  /serviceWorker.js                 controllers.JavascriptFiles.serviceWorker
+
+# Internal API
+POST /scalajsapi/*path                 controllers.Application.scalaJsApiPost(path: String)
+GET  /scalajsapi/*path                 controllers.Application.scalaJsApiGet(path: String)
+GET  /websocket/scalajsapi/            controllers.Application.scalaJsApiWebsocket
+GET  /websocket/entitymodificationpush/:updateToken/  controllers.Application.entityModificationPushWebsocket(updateToken)
 
 # External API
 GET  /externalapi/healthcheck/         controllers.ExternalApi.healthCheck
@@ -26,12 +34,6 @@ GET   /profile/                        controllers.Application.profile
 POST  /profile/changepassword/         controllers.Application.changePassword
 GET   /administration/                 controllers.Application.administration
 POST  /profile/adduser/                controllers.Application.addUser
-
-# Autowire calls
-POST /scalajsapi/*path                 controllers.Application.scalaJsApiPost(path: String)
-GET  /scalajsapi/*path                 controllers.Application.scalaJsApiGet(path: String)
-GET  /websocket/scalajsapi/            controllers.Application.scalaJsApiWebsocket
-GET  /websocket/entitymodificationpush/:updateToken/  controllers.Application.entityModificationPushWebsocket(updateToken)
 
 # Map static resources from the /public folder to the /assets URL path
 GET  /assets/*file                     controllers.Assets.versioned(path="/public", file: Asset)
