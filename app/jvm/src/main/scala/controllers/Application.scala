@@ -147,7 +147,7 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
     Ok(bytes)
   }
 
-  def scalaJsApiWebSocket = WebSocket.accept[Array[Byte], Array[Byte]] { request =>
+  def scalaJsApiWebsocket = WebSocket.accept[Array[Byte], Array[Byte]] { request =>
     implicit val user = AuthenticatedAction.requireAuthenticatedUser(request)
 
     Flow[Array[Byte]].map { requestBytes =>
@@ -157,7 +157,7 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
     }
   }
 
-  def entityModificationPushWebSocket(updateToken: UpdateToken) = WebSocket.accept[Array[Byte], Array[Byte]] {
+  def entityModificationPushWebsocket(updateToken: UpdateToken) = WebSocket.accept[Array[Byte], Array[Byte]] {
     request =>
       def modificationsToBytes(modificationsWithToken: ModificationsWithToken): Array[Byte] = {
         val responseBuffer = Pickle.intoBytes(modificationsWithToken)

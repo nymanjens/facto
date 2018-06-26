@@ -79,7 +79,7 @@ private[websocket] final class SerialWebsocketClient(websocketPath: String) {
     SerialWebsocketClient.nextWebsocketNumber += 1
     result
   }
-  private def name: String = s"WebSocketClient-$websocketNumber"
+  private def name: String = s"SerialWebSocket-$websocketNumber"
 }
 object SerialWebsocketClient {
   private var nextWebsocketNumber: Int = 1
