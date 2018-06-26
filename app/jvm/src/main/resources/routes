@@ -14,10 +14,10 @@ GET  /localDatabaseWebWorker.js        controllers.JavascriptFiles.localDatabase
 GET  /serviceWorker.js                 controllers.JavascriptFiles.serviceWorker
 
 # Internal API
-POST /scalajsapi/*path                 controllers.Application.scalaJsApiPost(path: String)
-GET  /scalajsapi/*path                 controllers.Application.scalaJsApiGet(path: String)
-GET  /websocket/scalajsapi/            controllers.Application.scalaJsApiWebsocket
-GET  /websocket/entitymodificationpush/:updateToken/  controllers.Application.entityModificationPushWebsocket(updateToken)
+POST /scalajsapi/*path                 controllers.InternalApi.scalaJsApiPost(path: String)
+GET  /scalajsapi/*path                 controllers.InternalApi.scalaJsApiGet(path: String)
+GET  /websocket/scalajsapi/            controllers.InternalApi.scalaJsApiWebsocket
+GET  /websocket/entitymodificationpush/:updateToken/  controllers.InternalApi.entityModificationPushWebsocket(updateToken)
 
 # External API
 GET  /externalapi/healthcheck/         controllers.ExternalApi.healthCheck
