@@ -149,7 +149,7 @@ private[access] final class HybridRemoteDatabaseProxy(futureLocalDatabase: Futur
 }
 
 private[access] object HybridRemoteDatabaseProxy {
-  private val localDatabaseAndEntityVersion = "3.0"
+  private val localDatabaseAndEntityVersion = "3.1"
 
   private[access] def create(localDatabase: Future[LocalDatabase])(
       implicit apiClient: ScalaJsApiClient,

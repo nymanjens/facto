@@ -15,7 +15,8 @@ object Users {
       loginName = loginName,
       passwordHash = hash(password),
       name = name,
-      expandCashFlowTablesByDefault = true
+      expandCashFlowTablesByDefault = true,
+      expandLiquidationTablesByDefault = true
     )
 
   def copyUserWithPassword(user: User, password: String): User = {

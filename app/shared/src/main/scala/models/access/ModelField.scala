@@ -60,6 +60,8 @@ object ModelField {
     case object name extends ModelField[String, E]("name", _.name)
     case object expandCashFlowTablesByDefault
         extends ModelField[Boolean, E]("expandCashFlowTablesByDefault", _.expandCashFlowTablesByDefault)
+    case object expandLiquidationTablesByDefault
+        extends ModelField[Boolean, E]("expandLiquidationTablesByDefault", _.expandLiquidationTablesByDefault)
   }
 
   object Transaction {
@@ -119,6 +121,7 @@ object ModelField {
       .put(User.passwordHash, 4)
       .put(User.name, 5)
       .put(User.expandCashFlowTablesByDefault, 7)
+      .put(User.expandLiquidationTablesByDefault, 33)
       .put(Transaction.id, 8)
       .put(Transaction.transactionGroupId, 9)
       .put(Transaction.issuerId, 10)

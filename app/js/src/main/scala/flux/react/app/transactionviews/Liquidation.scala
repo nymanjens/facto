@@ -29,7 +29,7 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
-    .initialState(State(setExpanded = Unique(true)))
+    .initialState(State(setExpanded = Unique(user.expandLiquidationTablesByDefault)))
     .renderPS(
       ($, props, state) => {
         implicit val router = props.router

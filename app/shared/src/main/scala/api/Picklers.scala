@@ -30,6 +30,7 @@ object Picklers {
       // Password redacted
       state.pickle(user.name)
       state.pickle(user.expandCashFlowTablesByDefault)
+      state.pickle(user.expandLiquidationTablesByDefault)
       state.pickle(user.idOption)
     }
     override def unpickle(implicit state: UnpickleState): User = logExceptions {
@@ -38,6 +39,7 @@ object Picklers {
         passwordHash = "<redacted>",
         name = state.unpickle[String],
         expandCashFlowTablesByDefault = state.unpickle[Boolean],
+        expandLiquidationTablesByDefault = state.unpickle[Boolean],
         idOption = state.unpickle[Option[Long]]
       )
     }

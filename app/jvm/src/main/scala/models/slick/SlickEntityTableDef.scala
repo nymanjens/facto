@@ -53,15 +53,13 @@ object SlickEntityTableDef {
     /* override */
     final class Table(tag: SlickTag) extends EntityTable[User](tag, tableName) {
       def loginName = column[String]("loginName")
-
       def passwordHash = column[String]("passwordHash")
-
       def name = column[String]("name")
-
       def expandCashFlowTablesByDefault = column[Boolean]("expandCashFlowTablesByDefault")
+      def expandLiquidationTablesByDefault = column[Boolean]("expandLiquidationTablesByDefault")
 
       override def * =
-        (loginName, passwordHash, name, expandCashFlowTablesByDefault, id.?) <> (User.tupled, User.unapply)
+        (loginName, passwordHash, name, expandCashFlowTablesByDefault,expandLiquidationTablesByDefault, id.?) <> (User.tupled, User.unapply)
     }
   }
 
