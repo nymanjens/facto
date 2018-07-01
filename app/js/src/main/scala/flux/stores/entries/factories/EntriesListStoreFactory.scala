@@ -33,7 +33,9 @@ object EntriesListStoreFactory {
                           hasMore: Boolean,
                           override val impactingTransactionIds: Set[Long],
                           override val impactingBalanceCheckIds: Set[Long])
-      extends EntriesStore.StateTrait
+      extends EntriesStore.StateTrait {
+    def isEmpty: Boolean = entries.isEmpty
+  }
   object State {
     def empty[Entry]: State[Entry] =
       State(Seq(), hasMore = false, impactingTransactionIds = Set(), impactingBalanceCheckIds = Set())

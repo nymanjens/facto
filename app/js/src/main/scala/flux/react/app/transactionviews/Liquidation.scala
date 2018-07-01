@@ -56,6 +56,7 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
                   setExpanded = state.setExpanded,
                   additionalInput = accountPair,
                   latestEntryToTableTitleExtra = latestEntry => latestEntry.debt.toString,
+                  hideEmptyTable = true,
                   tableHeaders = Seq(
                     <.th(i18n("facto.payed")),
                     <.th(i18n("facto.beneficiary")),

@@ -9,6 +9,7 @@ import flux.react.uielements.Table.TableRowData
 import flux.stores.StateStore
 import flux.stores.entries.factories.EntriesListStoreFactory
 import flux.stores.entries.{EntriesStore, WithIsPending}
+import japgolly.scalajs.react.vdom.VdomArray
 import japgolly.scalajs.react.vdom.html_<^.{VdomElement, _}
 import japgolly.scalajs.react.{Callback, _}
 import org.scalajs.dom.console
@@ -36,6 +37,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
             setExpanded: Unique[Boolean] = null,
             additionalInput: AdditionalInput,
             latestEntryToTableTitleExtra: Entry => String = null,
+            hideEmptyTable: Boolean = false,
             tableHeaders: Seq[VdomElement],
             calculateTableData: Entry => Seq[VdomElement]): VdomElement = {
     withRowNumber(
@@ -46,6 +48,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
       setExpanded = setExpanded,
       additionalInput = additionalInput,
       latestEntryToTableTitleExtra = latestEntryToTableTitleExtra,
+      hideEmptyTable = hideEmptyTable,
       tableHeaders = tableHeaders,
       calculateTableDataFromEntryAndRowNum = (entry, rowNum) => calculateTableData(entry)
     )
@@ -62,6 +65,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
                     setExpanded: Unique[Boolean] = null,
                     additionalInput: AdditionalInput,
                     latestEntryToTableTitleExtra: Entry => String = null,
+                    hideEmptyTable: Boolean = false,
                     tableHeaders: Seq[VdomElement],
                     calculateTableDataFromEntryAndRowNum: (Entry, Int) => Seq[VdomElement]): VdomElement = {
     component
@@ -73,6 +77,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
           numEntriesStrategy,
           setExpanded = Option(setExpanded),
           latestEntryToTableTitleExtra = Option(latestEntryToTableTitleExtra),
+          hideEmptyTable,
           tableHeaders,
           calculateTableDataFromEntryAndRowNum,
           additionalInput
@@ -86,6 +91,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
                            numEntriesStrategy: NumEntriesStrategy,
                            setExpanded: Option[Unique[Boolean]],
                            latestEntryToTableTitleExtra: Option[Entry => String],
+                           hideEmptyTable: Boolean,
                            tableHeaders: Seq[VdomElement],
                            calculateTableDataFromEntryAndRowNum: (Entry, Int) => Seq[VdomElement],
                            additionalInput: AdditionalInput)
@@ -114,38 +120,42 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
       $.modState(state => logExceptions(state.withEntriesFrom(entriesStore))).runNow()
     }
 
-    def render(props: Props, state: State) = logExceptions {
-      uielements.Table(
-        title = props.tableTitle,
-        tableClasses = props.tableClasses,
-        setExpanded = props.setExpanded,
-        expandNumEntriesCallback = {
-          if (state.storeState.isDefined && state.storeState.get.hasMore) {
-            Some(expandMaxNumEntries(props, state))
-          } else { None }
-        },
-        tableTitleExtra = tableTitleExtra(props, state),
-        tableHeaders = props.tableHeaders,
-        tableRowDatas = state.storeState match {
-          case Some(storeState) =>
-            storeState.entries.reverse.zipWithIndex.map {
-              case (WithIsPending(entry, isPending), index) =>
+    def render(props: Props, state: State): VdomElement = logExceptions {
+      if (props.hideEmptyTable && state.storeState.isDefined && state.storeState.get.isEmpty) {
+        <.span()
+      } else {
+        uielements.Table(
+          title = props.tableTitle,
+          tableClasses = props.tableClasses,
+          setExpanded = props.setExpanded,
+          expandNumEntriesCallback = {
+            if (state.storeState.isDefined && state.storeState.get.hasMore) {
+              Some(expandMaxNumEntries(props, state))
+            } else { None }
+          },
+          tableTitleExtra = tableTitleExtra(props, state),
+          tableHeaders = props.tableHeaders,
+          tableRowDatas = state.storeState match {
+            case Some(storeState) =>
+              storeState.entries.reverse.zipWithIndex.map {
+                case (WithIsPending(entry, isPending), index) =>
+                  TableRowData(
+                    props.calculateTableDataFromEntryAndRowNum(entry, index),
+                    deemphasize = isPending)
+              }
+            case None =>
+              for (i <- 0 until state.maxNumEntries + 1) yield {
                 TableRowData(
-                  props.calculateTableDataFromEntryAndRowNum(entry, index),
-                  deemphasize = isPending)
-            }
-          case None =>
-            for (i <- 0 until state.maxNumEntries + 1) yield {
-              TableRowData(
-                Seq[VdomElement](
-                  <.td(
-                    ^.colSpan := props.tableHeaders.size,
-                    ^.style := js.Dictionary("color" -> "white"),
-                    "loading...")),
-                deemphasize = false)
-            }
-        }
-      )
+                  Seq[VdomElement](
+                    <.td(
+                      ^.colSpan := props.tableHeaders.size,
+                      ^.style := js.Dictionary("color" -> "white"),
+                      "loading...")),
+                  deemphasize = false)
+              }
+          }
+        )
+      }
     }
 
     def tableTitleExtra(props: Props, state: State): VdomElement = {

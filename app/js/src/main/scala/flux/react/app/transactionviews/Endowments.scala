@@ -48,6 +48,7 @@ final class Endowments(implicit entriesStoreFactory: EndowmentEntriesStoreFactor
                   numEntriesStrategy = NumEntriesStrategy(start = 30, intermediateBeforeInf = Seq(100)),
                   setExpanded = state.setExpanded,
                   additionalInput = account,
+                  hideEmptyTable = true,
                   tableHeaders = Seq(
                     <.th(i18n("facto.payed")),
                     <.th(i18n("facto.consumed")),
