@@ -21,6 +21,7 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit entityAcc
   entityAccess.registerListener(JsEntityAccessListener)
 
   private var _state: Option[State] = None
+  private var stateIsStale: Boolean = true
   private var stateUpdateInFlight: Boolean = false
 
   /** Buffer of modifications that were added during the last update. */
@@ -52,14 +53,14 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit entityAcc
 
   // **************** StateStore hooks ****************//
   override protected final def onStateUpdateListenersChange(): Unit = {
-    if (stateUpdateListeners.nonEmpty && _state.isEmpty && !stateUpdateInFlight) {
+    if (stateUpdateListeners.nonEmpty && stateIsStale && !stateUpdateInFlight) {
       startStateUpdate()
     }
   }
 
   // **************** Private helper methods ****************//
   private def startStateUpdate(): Unit = {
-    require(_state.isEmpty, "State is not empty while starting state update")
+    require(stateIsStale, "State is not stale while starting state update")
     require(stateUpdateListeners.nonEmpty, "Nobody is listening to the state, so why update it?")
     require(!stateUpdateInFlight, "A state update is already in flight. This is not supported.")
 
@@ -74,9 +75,13 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit entityAcc
           if (stateUpdateListeners.nonEmpty) {
             startStateUpdate()
           }
-        } else if (_state != Some(calculatedState)) {
-          _state = Some(calculatedState)
-          invokeStateUpdateListeners()
+        } else {
+          pendingModifications = Seq()
+          stateIsStale = false
+          if (_state != Some(calculatedState)) {
+            _state = Some(calculatedState)
+            invokeStateUpdateListeners()
+          }
         }
       }
     }
@@ -120,20 +125,18 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit entityAcc
     override def modificationsAddedOrPendingStateChanged(modifications: Seq[EntityModification]): Unit = {
       checkNotCallingListeners()
 
-      _state match {
-        case Some(s) if impactsState(modifications, s) =>
-          require(!stateUpdateInFlight, "stateUpdateInFlight is true but _state is non empty")
-          _state = None
-
-          if (stateUpdateListeners.nonEmpty) {
-            startStateUpdate()
-          }
-
-        case None if stateUpdateListeners.nonEmpty =>
+      if (stateIsStale) {
+        if (stateUpdateListeners.nonEmpty) {
           require(stateUpdateInFlight, s"Expected stateUpdateInFlight = true")
           pendingModifications = pendingModifications ++ modifications
+        }
+      } else {
+        require(!stateUpdateInFlight, "stateUpdateInFlight is true but stateIsStale is false")
+        stateIsStale = true
 
-        case _ =>
+        if (stateUpdateListeners.nonEmpty) {
+          startStateUpdate()
+        }
       }
     }
   }
