@@ -25,7 +25,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiStub extends LocalDataba
   private val worker: Worker = initializeWebWorker()
 
   override def create(dbName: String, inMemory: Boolean) = {
-    sendAndReceive(MethodNumbers.create, Seq(dbName, inMemory)).map(_ => (): Unit)
+    sendAndReceive(MethodNumbers.create, Seq(dbName, inMemory), timeout = 10.seconds).map(_ => (): Unit)
   }
 
   override def executeDataQuery(lokiQuery: LocalDatabaseWebWorkerApi.LokiQuery) =
