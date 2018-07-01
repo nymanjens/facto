@@ -71,7 +71,8 @@ object TestUtils {
       passwordHash = "Some hash",
       name = "Robot",
       expandCashFlowTablesByDefault = true,
-      expandLiquidationTablesByDefault=true)
+      expandLiquidationTablesByDefault = true
+    )
     val addition =
       if (entity.idOption.isDefined) EntityModification.Add(entity)
       else EntityModification.createAddWithRandomId(entity)

@@ -59,7 +59,7 @@ object SlickEntityTableDef {
       def expandLiquidationTablesByDefault = column[Boolean]("expandLiquidationTablesByDefault")
 
       override def * =
-        (loginName, passwordHash, name, expandCashFlowTablesByDefault,expandLiquidationTablesByDefault, id.?) <> (User.tupled, User.unapply)
+        (loginName, passwordHash, name, expandCashFlowTablesByDefault, expandLiquidationTablesByDefault, id.?) <> (User.tupled, User.unapply)
     }
   }
 
