@@ -42,7 +42,7 @@ final class PendingModificationsStore(implicit jsEntityAccess: JsEntityAccess) e
       }
     }
 
-    private def getModificationsSize(modifications: Set[EntityModification]): Int = {
+    private def getModificationsSize(modifications: Seq[EntityModification]): Int = {
       val affectedTransactionGroupIds = mutable.Set[Long]()
       var nonTransactionEditCount = 0
 

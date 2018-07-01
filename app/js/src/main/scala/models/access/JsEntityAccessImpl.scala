@@ -23,7 +23,7 @@ private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
 
   private var listeners: Seq[Listener] = Seq()
   private var _pendingModifications: PendingModifications =
-    PendingModifications(Set(), persistedLocally = false)
+    PendingModifications(Seq(), persistedLocally = false)
   private var isCallingListeners: Boolean = false
   private val queryBlockingFutures: mutable.Buffer[Future[Unit]] = mutable.Buffer()
 
