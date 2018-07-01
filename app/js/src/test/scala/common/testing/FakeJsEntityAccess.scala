@@ -15,7 +15,7 @@ final class FakeJsEntityAccess extends JsEntityAccess {
 
   private val modificationsBuffer: ModificationsBuffer = new ModificationsBuffer()
   private var _pendingModifications: PendingModifications =
-    PendingModifications(Set(), persistedLocally = false)
+    PendingModifications(Seq(), persistedLocally = false)
   private val listeners: mutable.Buffer[Listener] = mutable.Buffer()
 
   // **************** Implementation of ScalaJsApiClient trait ****************//
