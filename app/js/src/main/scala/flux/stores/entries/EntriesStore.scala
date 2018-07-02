@@ -1,6 +1,6 @@
 package flux.stores.entries
 
-import common.LoggingUtils.logFailure
+import common.LoggingUtils.{logFailure, logExceptions}
 import flux.stores.StateStore
 import models.access.JsEntityAccess
 import models.accounting.{BalanceCheck, Transaction}
@@ -59,7 +59,7 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit entityAcc
   }
 
   // **************** Private helper methods ****************//
-  private def startStateUpdate(): Unit = {
+  private def startStateUpdate(): Unit = logExceptions {
     require(stateIsStale, "State is not stale while starting state update")
     require(stateUpdateListeners.nonEmpty, "Nobody is listening to the state, so why update it?")
     require(!stateUpdateInFlight, "A state update is already in flight. This is not supported.")

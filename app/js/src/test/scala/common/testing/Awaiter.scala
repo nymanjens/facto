@@ -12,6 +12,12 @@ object Awaiter {
     expectEventually(a == b, throw new AssertionError(s"Expected $a == $b to be eventually true"))
   }
 
+  def expectEventuallyNonEmpty[T](iterable: => Iterable[T]): Future[Unit] = {
+    expectEventually(
+      iterable.nonEmpty,
+      throw new AssertionError(s"Expected given iterable to be eventually non-empty"))
+  }
+
   def expectEventually(condition: => Boolean, onTimeout: => Unit): Future[Unit] = {
     val resultPromise = Promise[Unit]()
 

@@ -34,8 +34,9 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       entityAccess.addRemotelyAddedEntities(testTransactionWithId)
 
-      await(store.stateFuture).hasMore ==> false
-      await(store.stateFuture).entries.map(_.entry) ==> toGeneralEntrySeq(Seq(testTransactionWithId))
+      await(Awaiter.expectEventuallyNonEmpty(store.state.get.entries))
+      store.state.get.hasMore ==> false
+      store.state.get.entries.map(_.entry) ==> toGeneralEntrySeq(Seq(testTransactionWithId))
       store.state.get.entries.map(_.entry) ==> toGeneralEntrySeq(Seq(testTransactionWithId))
     }
 
@@ -44,8 +45,9 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       entityAccess.persistModifications(Seq(EntityModification.Add(testTransactionWithId)))
 
-      await(store.stateFuture).hasMore ==> false
-      await(store.stateFuture).entries.map(_.entry) ==> toGeneralEntrySeq(Seq(testTransactionWithId))
+      await(Awaiter.expectEventuallyNonEmpty(store.state.get.entries))
+      store.state.get.hasMore ==> false
+      store.state.get.entries.map(_.entry) ==> toGeneralEntrySeq(Seq(testTransactionWithId))
     }
 
     "store state is updated upon local removal" - async {
@@ -55,7 +57,7 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       entityAccess.persistModifications(Seq(EntityModification.Remove[Transaction](testTransactionWithId.id)))
 
-      await(store.stateFuture) ==> EntriesListStoreFactory.State.empty
+      await(Awaiter.expectEventuallyEqual(store.state.get, EntriesListStoreFactory.State.empty))
     }
 
     "store calls listeners" - async {
@@ -64,15 +66,12 @@ object AllEntriesStoreFactoryTest extends TestSuite {
         onStateUpdateCount += 1
       })
 
-      await(store.stateFuture)
       await(Awaiter.expectEventuallyEqual(onStateUpdateCount, 1))
 
       entityAccess.persistModifications(Seq(EntityModification.Add(testTransactionWithIdB)))
-      await(store.stateFuture)
       await(Awaiter.expectEventuallyEqual(onStateUpdateCount, 2))
 
       entityAccess.addRemotelyAddedEntities(testTransactionWithIdA)
-      await(store.stateFuture)
 
       await(Awaiter.expectEventuallyEqual(onStateUpdateCount, 3))
     }
