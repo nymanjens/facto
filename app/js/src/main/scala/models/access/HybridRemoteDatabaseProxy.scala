@@ -17,7 +17,8 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
   */
 private[access] final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
     implicit apiClient: ScalaJsApiClient,
-    getInitialDataResponse: GetInitialDataResponse)
+    getInitialDataResponse: GetInitialDataResponse,
+    entityModificationPushClientFactory: EntityModificationPushClientFactory)
     extends RemoteDatabaseProxy {
 
   override def queryExecutor[E <: Entity: EntityType]() = {
@@ -92,7 +93,7 @@ private[access] final class HybridRemoteDatabaseProxy(futureLocalDatabase: Futur
 
   override def startCheckingForModifiedEntityUpdates(
       maybeNewEntityModificationsListener: Seq[EntityModification] => Future[Unit]): Unit = {
-    val temporaryPushClient = new EntityModificationPushClient(
+    val temporaryPushClient = entityModificationPushClientFactory.createClient(
       name = "EntityModificationPush[temporary]",
       updateToken = getInitialDataResponse.nextUpdateToken,
       onMessageReceived = modificationsWithToken =>
@@ -109,7 +110,7 @@ private[access] final class HybridRemoteDatabaseProxy(futureLocalDatabase: Futur
         val storedUpdateToken = await(localDatabase.getSingletonValue(NextUpdateTokenKey).map(_.get))
         temporaryPushClient.close()
 
-        val permanentPushClient = new EntityModificationPushClient(
+        val permanentPushClient = entityModificationPushClientFactory.createClient(
           name = "EntityModificationPush[permanent]",
           updateToken = storedUpdateToken,
           onMessageReceived = modificationsWithToken =>
@@ -153,7 +154,8 @@ private[access] object HybridRemoteDatabaseProxy {
 
   private[access] def create(localDatabase: Future[LocalDatabase])(
       implicit apiClient: ScalaJsApiClient,
-      getInitialDataResponse: GetInitialDataResponse): HybridRemoteDatabaseProxy = {
+      getInitialDataResponse: GetInitialDataResponse,
+      entityModificationPushClientFactory: EntityModificationPushClientFactory): HybridRemoteDatabaseProxy = {
     new HybridRemoteDatabaseProxy(new FutureLocalDatabase(async {
       val db = await(localDatabase)
       val populateIsNecessary = {

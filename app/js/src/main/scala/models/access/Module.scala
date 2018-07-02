@@ -8,6 +8,9 @@ final class Module(implicit user: User,
                    scalaJsApiClient: ScalaJsApiClient,
                    getInitialDataResponse: GetInitialDataResponse) {
 
+  implicit private val entityModificationPushClientFactory: EntityModificationPushClientFactory =
+    new EntityModificationPushClientFactory()
+
   implicit val entityAccess: JsEntityAccess = {
     val webWorkerModule = new models.access.webworker.Module()
     implicit val localDatabaseWebWorkerApiStub = webWorkerModule.localDatabaseWebWorkerApiStub
