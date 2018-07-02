@@ -34,6 +34,7 @@ final class BinaryWebsocketClient(name: String, jsWebsocket: WebSocket) {
 object BinaryWebsocketClient {
   def open(name: String,
            websocketPath: String,
+           onOpen: () => Unit = () => {},
            onMessageReceived: ByteBuffer => Unit,
            onError: () => Unit = () => {},
            onClose: () => Unit = () => {}): Future[BinaryWebsocketClient] = {
@@ -54,6 +55,7 @@ object BinaryWebsocketClient {
       logExceptions {
         resultPromise.success(new BinaryWebsocketClient(name, jsWebsocket))
         logLine(name, "Opened")
+        onOpen()
     }
     jsWebsocket.onerror = (e: ErrorEvent) =>
       logExceptions {

@@ -3,9 +3,10 @@ package models.access
 import api.Picklers._
 import api.ScalaJsApi.{ModificationsWithToken, UpdateToken}
 import boopickle.Default.{Unpickle, _}
+import common.Listenable
+import common.Listenable.WritableListenable
 import common.websocket.BinaryWebsocketClient
 import org.scalajs.dom
-import org.scalajs.dom.console
 import org.scalajs.dom.raw.Event
 
 import scala.async.Async.{async, await}
@@ -16,10 +17,15 @@ import scala.scalajs.js
 
 private[access] final class EntityModificationPushClientFactory {
 
+  private val _pushClientsAreOnline: WritableListenable[Boolean] = WritableListenable(true)
+
   def createClient(name: String,
                    updateToken: UpdateToken,
                    onMessageReceived: ModificationsWithToken => Future[Unit]): EntityModificationPushClient =
     new EntityModificationPushClient(name, updateToken, onMessageReceived)
+
+  /** Returns true if a push client socket is open or if there is no reason to believe it wouldn't be able to open. */
+  def pushClientsAreOnline: Listenable[Boolean] = _pushClientsAreOnline
 
   private[access] final class EntityModificationPushClient private[EntityModificationPushClientFactory] (
       name: String,
@@ -57,11 +63,13 @@ private[access] final class EntityModificationPushClientFactory {
       BinaryWebsocketClient.open(
         name = name,
         websocketPath = s"websocket/entitymodificationpush/$updateToken/",
+        onOpen = () => _pushClientsAreOnline.set(true),
         onMessageReceived = bytes =>
           async {
             val modificationsWithToken = Unpickle[ModificationsWithToken].fromBytes(bytes)
             await(onMessageReceived(modificationsWithToken))
             firstMessageWasProcessedPromise.trySuccess((): Unit)
+            _pushClientsAreOnline.set(true)
         },
         onClose = () => {
           websocketClient = None
@@ -70,6 +78,7 @@ private[access] final class EntityModificationPushClientFactory {
               websocketClient = Some(openWebsocketClient(lastUpdateToken))
             }
           }
+          _pushClientsAreOnline.set(false)
         }
       )
     }
