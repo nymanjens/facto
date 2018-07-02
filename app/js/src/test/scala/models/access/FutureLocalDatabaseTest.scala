@@ -1,13 +1,12 @@
 package models.access
 
+import common.testing.Awaiter
 import utest._
 
 import scala.async.Async.{async, await}
-import scala.concurrent.duration._
 import scala.concurrent.{Future, Promise}
 import scala.language.reflectiveCalls
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala.scalajs.js
 import scala.util.{Failure, Success}
 
 object FutureLocalDatabaseTest extends TestSuite {
@@ -22,7 +21,7 @@ object FutureLocalDatabaseTest extends TestSuite {
       unsafeLocalDatabasePromise.failure(new IllegalArgumentException("Test error"))
       val future = futureLocalDatabase.future(safe = true)
 
-      await(expectNeverComplete(future))
+      await(Awaiter.expectNeverComplete(future))
     }
     "future(safe = false)" - async {
       val exception = new IllegalArgumentException("Test error")
@@ -38,10 +37,10 @@ object FutureLocalDatabaseTest extends TestSuite {
       futureLocalDatabase.scheduleUpdateAtStart(_ => Promise().future)
       val future = futureLocalDatabase.future(safe = false, includesLatestUpdates = false)
 
-      await(expectNeverComplete(future))
+      await(Awaiter.expectNeverComplete(future))
 
       unsafeLocalDatabasePromise.success(localDatabase)
-      await(expectComplete(future, expected = localDatabase))
+      await(Awaiter.expectComplete(future, expected = localDatabase))
     }
 
     "scheduleUpdateAt{Start,End}()" - async {
@@ -50,24 +49,24 @@ object FutureLocalDatabaseTest extends TestSuite {
       val updateAtStart = FakeUpdateFunction.createAndAdd(futureLocalDatabase.scheduleUpdateAtStart)
       unsafeLocalDatabasePromise.success(localDatabase)
 
-      await(expectComplete(updateAtStart.wasCalledFuture))
+      await(Awaiter.expectComplete(updateAtStart.wasCalledFuture))
       updateAtEnd.wasCalled ==> false
       updateAtEnd2.wasCalled ==> false
 
       updateAtStart.set()
 
       updateAtStart.wasCalled ==> true
-      await(expectComplete(updateAtEnd.wasCalledFuture))
+      await(Awaiter.expectComplete(updateAtEnd.wasCalledFuture))
       updateAtEnd2.wasCalled ==> false
 
       updateAtEnd.set()
 
-      await(expectComplete(updateAtEnd2.wasCalledFuture))
+      await(Awaiter.expectComplete(updateAtEnd2.wasCalledFuture))
 
       updateAtEnd2.set()
       val updateAtEnd3 = FakeUpdateFunction.createAndAdd(futureLocalDatabase.scheduleUpdateAtEnd)
 
-      await(expectComplete(updateAtEnd3.wasCalledFuture))
+      await(Awaiter.expectComplete(updateAtEnd3.wasCalledFuture))
     }
 
     "future(includesLatestUpdates = true)" - async {
@@ -75,56 +74,28 @@ object FutureLocalDatabaseTest extends TestSuite {
       val updateAtStart = FakeUpdateFunction.createAndAdd(futureLocalDatabase.scheduleUpdateAtStart)
       var future = futureLocalDatabase.future(safe = false, includesLatestUpdates = true)
 
-      await(expectNeverComplete(future))
+      await(Awaiter.expectNeverComplete(future))
 
       unsafeLocalDatabasePromise.success(localDatabase)
 
-      await(expectNeverComplete(future))
+      await(Awaiter.expectNeverComplete(future))
 
       updateAtStart.set()
 
-      await(expectNeverComplete(future))
+      await(Awaiter.expectNeverComplete(future))
 
       updateAtEnd.set()
 
-      await(expectComplete(future, localDatabase))
+      await(Awaiter.expectComplete(future, localDatabase))
 
       val updateAtEnd2 = FakeUpdateFunction.createAndAdd(futureLocalDatabase.scheduleUpdateAtEnd)
       future = futureLocalDatabase.future(safe = false, includesLatestUpdates = true)
 
-      await(expectNeverComplete(future))
+      await(Awaiter.expectNeverComplete(future))
 
       updateAtEnd2.set()
-      await(expectComplete(future, localDatabase))
+      await(Awaiter.expectComplete(future, localDatabase))
     }
-  }
-
-  private def expectNeverComplete(future: Future[_]): Future[Unit] = {
-    val resultPromise = Promise[Unit]()
-    future.map(
-      value =>
-        resultPromise.tryFailure(new java.lang.AssertionError(
-          s"Expected future that never completes, but completed with value $value")))
-    js.timers.setTimeout(500.milliseconds) {
-      resultPromise.trySuccess((): Unit)
-    }
-    resultPromise.future
-  }
-  private def expectComplete[T](future: Future[T], expected: T = null): Future[Unit] = {
-    val resultPromise = Promise[Unit]()
-    future.map(value =>
-      if (value == ((): Unit) || value == expected) {
-        resultPromise.trySuccess((): Unit)
-      } else {
-        resultPromise.tryFailure(
-          new java.lang.AssertionError(
-            s"Expected future to be completed with value $expected, but got $value"))
-    })
-    js.timers.setTimeout(500.milliseconds) {
-      resultPromise.tryFailure(
-        new java.lang.AssertionError(s"future completion timed out (expected $expected)"))
-    }
-    resultPromise.future
   }
 
   class FakeUpdateFunction {

@@ -2,7 +2,7 @@ package flux.stores.entries.factories
 
 import java.time.Month.JANUARY
 
-import common.testing.FakeJsEntityAccess
+import common.testing.{Awaiter, FakeJsEntityAccess}
 import common.testing.TestObjects._
 import common.time.LocalDateTime
 import common.time.LocalDateTimes.createDateTime
@@ -68,18 +68,16 @@ object AllEntriesStoreFactoryTest extends TestSuite {
       })
 
       await(store.stateFuture)
-
-      onStateUpdateCount ==> 1
+      await(Awaiter.expectEventuallyEqual(onStateUpdateCount, 1))
 
       entityAccess.persistModifications(Seq(EntityModification.Add(testTransactionWithIdB)))
       await(store.stateFuture)
-
-      onStateUpdateCount ==> 2
+      await(Awaiter.expectEventuallyEqual(onStateUpdateCount, 2))
 
       entityAccess.addRemotelyAddedEntities(testTransactionWithIdA)
       await(store.stateFuture)
 
-      onStateUpdateCount ==> 3
+      await(Awaiter.expectEventuallyEqual(onStateUpdateCount, 3))
     }
 
     "combines consecutive transactions" - async {
