@@ -26,6 +26,7 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
 
   // ********** actions ********** //
   def healthCheck = Action { implicit request =>
+    entityAccess.checkConsistentCaches()
     Ok("OK")
   }
 

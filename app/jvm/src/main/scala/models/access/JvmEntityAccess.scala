@@ -106,6 +106,28 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends EntityAccess {
     }
   }
 
+  def checkConsistentCaches(): Unit = {
+    for (entityType <- EntityType.values) {
+      def run[E <: Entity](entityType: EntityType[E]): Unit = {
+        val allEntitiesInDb: Seq[E] = getManager(entityType).fetchAll().sortBy(_.id)
+        val allEntitiesInMemory: Seq[E] =
+          DbResultSet
+            .fromExecutor(inMemoryEntityDatabase.queryExecutor(entityType))(entityType)
+            .sort(DbQuery.Sorting.ascBy(ModelField.id(entityType)))
+            .data()
+        require(
+          allEntitiesInMemory.size == allEntitiesInDb.size,
+          s"Mismatch between db and cache for entityType $entityType: Size mismatch: " +
+            s"${allEntitiesInMemory.size} != ${allEntitiesInDb.size}"
+        )
+        require(
+          allEntitiesInMemory == allEntitiesInDb,
+          s"Mismatch between db and cache for entityType $entityType")
+      }
+      run(entityType)
+    }
+  }
+
   // ********** Private helper methods ********** //
   private def getManager(entityType: EntityType.any): SlickEntityManager[entityType.get] =
     SlickEntityManager.forType(getEntityTableDef(entityType))
