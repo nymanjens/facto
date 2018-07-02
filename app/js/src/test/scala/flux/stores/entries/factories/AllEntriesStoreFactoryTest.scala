@@ -2,11 +2,11 @@ package flux.stores.entries.factories
 
 import java.time.Month.JANUARY
 
-import common.testing.{Awaiter, FakeJsEntityAccess}
 import common.testing.TestObjects._
+import common.testing.{Awaiter, FakeJsEntityAccess}
 import common.time.LocalDateTime
 import common.time.LocalDateTimes.createDateTime
-import flux.stores.entries.GeneralEntry
+import flux.stores.entries.GeneralEntry.toGeneralEntrySeq
 import models.accounting._
 import models.modification.EntityModification
 import utest._
@@ -35,9 +35,8 @@ object AllEntriesStoreFactoryTest extends TestSuite {
       entityAccess.addRemotelyAddedEntities(testTransactionWithId)
 
       await(store.stateFuture).hasMore ==> false
-      await(store.stateFuture).entries.map(_.entry) ==>
-        GeneralEntry.toGeneralEntrySeq(Seq(testTransactionWithId))
-      store.state.get.entries.map(_.entry) ==> GeneralEntry.toGeneralEntrySeq(Seq(testTransactionWithId))
+      await(store.stateFuture).entries.map(_.entry) ==> toGeneralEntrySeq(Seq(testTransactionWithId))
+      store.state.get.entries.map(_.entry) ==> toGeneralEntrySeq(Seq(testTransactionWithId))
     }
 
     "store state is updated upon local update" - async {
@@ -46,15 +45,13 @@ object AllEntriesStoreFactoryTest extends TestSuite {
       entityAccess.persistModifications(Seq(EntityModification.Add(testTransactionWithId)))
 
       await(store.stateFuture).hasMore ==> false
-      await(store.stateFuture).entries.map(_.entry) ==>
-        GeneralEntry.toGeneralEntrySeq(Seq(testTransactionWithId))
+      await(store.stateFuture).entries.map(_.entry) ==> toGeneralEntrySeq(Seq(testTransactionWithId))
     }
 
     "store state is updated upon local removal" - async {
       entityAccess.persistModifications(Seq(EntityModification.Add(testTransactionWithId)))
       await(store.stateFuture).hasMore ==> false
-      await(store.stateFuture).entries.map(_.entry) ==>
-        GeneralEntry.toGeneralEntrySeq(Seq(testTransactionWithId))
+      await(store.stateFuture).entries.map(_.entry) ==> toGeneralEntrySeq(Seq(testTransactionWithId))
 
       entityAccess.persistModifications(Seq(EntityModification.Remove[Transaction](testTransactionWithId.id)))
 
@@ -88,8 +85,7 @@ object AllEntriesStoreFactoryTest extends TestSuite {
       entityAccess.addRemotelyAddedEntities(trans1, trans2, trans3)
 
       await(store.stateFuture).hasMore ==> false
-      await(store.stateFuture).entries.map(_.entry) ==>
-        GeneralEntry.toGeneralEntrySeq(Seq(trans1, trans2), Seq(trans3))
+      await(store.stateFuture).entries.map(_.entry) ==> toGeneralEntrySeq(Seq(trans1, trans2), Seq(trans3))
     }
 
     "sorts entries on transaction date first and then created date" - async {
@@ -117,7 +113,7 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       await(store.stateFuture).hasMore ==> false
       await(store.stateFuture).entries.map(_.entry) ==>
-        GeneralEntry.toGeneralEntrySeq(Seq(trans1), Seq(trans2), Seq(trans3))
+        toGeneralEntrySeq(Seq(trans1), Seq(trans2), Seq(trans3))
     }
 
     "respects maxNumEntries" - async {
@@ -133,7 +129,7 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       await(store.stateFuture).hasMore ==> true
       await(store.stateFuture).entries.map(_.entry) ==>
-        GeneralEntry.toGeneralEntrySeq(Seq(trans2), Seq(trans3), Seq(trans4))
+        toGeneralEntrySeq(Seq(trans2), Seq(trans3), Seq(trans4))
     }
   }
 }

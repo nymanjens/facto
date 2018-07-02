@@ -1,7 +1,8 @@
 package flux.stores.entries.factories
 
 import common.testing.TestObjects._
-import flux.stores.entries.{ComplexQueryFilter, GeneralEntry}
+import flux.stores.entries.ComplexQueryFilter
+import flux.stores.entries.GeneralEntry.toGeneralEntrySeq
 import utest._
 
 import scala.async.Async.{async, await}
@@ -32,7 +33,7 @@ object ComplexQueryStoreFactoryTest extends TestSuite {
       val state = await(store.stateFuture)
 
       state.hasMore ==> false
-      state.entries.map(_.entry) ==> GeneralEntry.toGeneralEntrySeq(Seq(trans1, trans3), Seq(trans4, trans5))
+      state.entries.map(_.entry) ==> toGeneralEntrySeq(Seq(trans1, trans3), Seq(trans4, trans5))
     }
 
     "respects maxNumEntries" - async {
@@ -40,7 +41,7 @@ object ComplexQueryStoreFactoryTest extends TestSuite {
       val state = await(store.stateFuture)
 
       state.hasMore ==> true
-      state.entries.map(_.entry) ==> GeneralEntry.toGeneralEntrySeq(Seq(trans4, trans5))
+      state.entries.map(_.entry) ==> toGeneralEntrySeq(Seq(trans4, trans5))
     }
   }
 }

@@ -5,7 +5,7 @@ import java.time.Month.JANUARY
 import common.testing.FakeJsEntityAccess
 import common.testing.TestObjects._
 import common.time.LocalDateTimes.createDateTime
-import flux.stores.entries.GeneralEntry
+import flux.stores.entries.GeneralEntry.toGeneralEntrySeq
 import models.accounting._
 import models.accounting.config.{Account, Category}
 import utest._
@@ -34,8 +34,7 @@ object EndowmentEntriesStoreFactoryTest extends TestSuite {
       val state = await(store.stateFuture)
 
       state.hasMore ==> false
-      state.entries.map(_.entry) ==>
-        GeneralEntry.toGeneralEntrySeq(Seq(trans1), Seq(trans2), Seq(trans3), Seq(trans4))
+      state.entries.map(_.entry) ==> toGeneralEntrySeq(Seq(trans1), Seq(trans2), Seq(trans3), Seq(trans4))
     }
 
     "respects maxNumEntries" - async {
@@ -43,7 +42,7 @@ object EndowmentEntriesStoreFactoryTest extends TestSuite {
       val state = await(store.stateFuture)
 
       state.hasMore ==> true
-      state.entries.map(_.entry) ==> GeneralEntry.toGeneralEntrySeq(Seq(trans2), Seq(trans3), Seq(trans4))
+      state.entries.map(_.entry) ==> toGeneralEntrySeq(Seq(trans2), Seq(trans3), Seq(trans4))
     }
   }
 
