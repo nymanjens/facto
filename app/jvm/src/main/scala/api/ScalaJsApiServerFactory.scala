@@ -1,7 +1,7 @@
 package api
 
 import api.Picklers._
-import api.ScalaJsApi.{GetAllEntitiesResponse, GetInitialDataResponse, ModificationsWithToken, UpdateToken}
+import api.ScalaJsApi._
 import api.UpdateTokens.{toLocalDateTime, toUpdateToken}
 import com.google.inject._
 import common.PlayI18n
@@ -14,7 +14,7 @@ import models.modification.{EntityModification, EntityModificationEntity, Entity
 import models.money.ExchangeRateMeasurement
 import models.slick.SlickUtils.dbApi._
 import models.slick.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}
-import models.user.User
+import models.user.{User, Users}
 
 import scala.collection.immutable.{Seq, TreeMap}
 import scala.collection.mutable
@@ -83,8 +83,58 @@ final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
       internal
     }
 
-    override def upsertUser(userPrototype: ScalaJsApi.UserPrototype): Unit = {
-      ???
+    override def upsertUser(userProto: UserPrototype): Unit = {
+      def requireNonEmpty(s: Option[String]): Unit = {
+        require(s.isDefined, "field is missing")
+        require(s.get.nonEmpty, "field contains an empty string")
+      }
+      def requireNonEmptyIfSet(s: Option[String]): Unit = {
+        if (s.isDefined) {
+          require(s.get.nonEmpty, "field contains an empty string")
+        }
+      }
+
+      userProto.id match {
+        case None => // Add user
+          requireNonEmpty(userProto.loginName)
+          requireNonEmpty(userProto.plainTextPassword)
+          requireNonEmpty(userProto.name)
+
+          entityAccess.persistEntityModifications(
+            EntityModification.createAddWithRandomId(Users.createUser(
+              loginName = userProto.loginName.get,
+              password = userProto.plainTextPassword.get,
+              name = userProto.name.get,
+              isAdmin = userProto.isAdmin getOrElse false,
+              expandCashFlowTablesByDefault = userProto.expandCashFlowTablesByDefault getOrElse true,
+              expandLiquidationTablesByDefault = userProto.expandLiquidationTablesByDefault getOrElse true
+            )))
+
+        case Some(id) => // Update user
+          requireNonEmptyIfSet(userProto.loginName)
+          requireNonEmptyIfSet(userProto.plainTextPassword)
+          requireNonEmptyIfSet(userProto.name)
+
+          val existingUser = entityAccess.newQuerySync[User]().findById(id)
+          val updatedUser = {
+            var result = existingUser.copy(
+              loginName = userProto.loginName getOrElse existingUser.loginName,
+              name = userProto.name getOrElse existingUser.name,
+              isAdmin = userProto.isAdmin getOrElse existingUser.isAdmin,
+              expandCashFlowTablesByDefault =
+                userProto.expandCashFlowTablesByDefault getOrElse existingUser.expandCashFlowTablesByDefault,
+              expandLiquidationTablesByDefault =
+                userProto.expandLiquidationTablesByDefault getOrElse
+                  existingUser.expandLiquidationTablesByDefault
+            )
+            if (userProto.plainTextPassword.isDefined) {
+              result = Users.copyUserWithPassword(result, userProto.plainTextPassword.get)
+            }
+            result
+          }
+
+          entityAccess.persistEntityModifications(EntityModification.createUpdate(updatedUser))
+      }
     }
   }
 }

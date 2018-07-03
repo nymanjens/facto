@@ -1,6 +1,6 @@
 package common.testing
 
-import api.ScalaJsApi.{GetAllEntitiesResponse, ModificationsWithToken, UpdateToken}
+import api.ScalaJsApi.{GetAllEntitiesResponse, ModificationsWithToken, UpdateToken, UserPrototype}
 import api.{ScalaJsApi, ScalaJsApiClient}
 import models.Entity
 import models.access.{DbQuery, DbQueryExecutor}
@@ -47,7 +47,7 @@ final class FakeScalaJsApiClient extends ScalaJsApiClient {
     DbQueryExecutor.fromEntities(entities)
   }
 
-  override def upsertUser(userPrototype: ScalaJsApi.UserPrototype): Future[Unit] = ???
+  override def upsertUser(userPrototype: UserPrototype): Future[Unit] = ???
 
   // **************** Additional methods for tests ****************//
   def addEntities[E <: Entity: EntityType](entities: E*): Unit = {

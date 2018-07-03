@@ -10,14 +10,19 @@ import scala.util.Random
 
 object Users {
 
-  def createUser(loginName: String, password: String, name: String, isAdmin: Boolean = false): User =
+  def createUser(loginName: String,
+                 password: String,
+                 name: String,
+                 isAdmin: Boolean = false,
+                 expandCashFlowTablesByDefault: Boolean = true,
+                 expandLiquidationTablesByDefault: Boolean = true): User =
     User(
       loginName = loginName,
       passwordHash = hash(password),
       name = name,
       isAdmin = isAdmin,
-      expandCashFlowTablesByDefault = true,
-      expandLiquidationTablesByDefault = true
+      expandCashFlowTablesByDefault = expandCashFlowTablesByDefault,
+      expandLiquidationTablesByDefault = expandLiquidationTablesByDefault
     )
 
   def copyUserWithPassword(user: User, password: String): User = {
