@@ -26,6 +26,7 @@ final class FactoAppModule(implicit getInitialDataResponse: GetInitialDataRespon
   // Create and unpack Models Access module
   val modelsAccessModule = new models.access.Module
   implicit val entityAccess = modelsAccessModule.entityAccess
+  implicit val entityModificationPushClientFactory = modelsAccessModule.entityModificationPushClientFactory
 
   // Create and unpack Models module
   private val modelsModule = new models.Module

@@ -15,13 +15,14 @@ import scala.concurrent.{Future, Promise}
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 
-private[access] final class EntityModificationPushClientFactory {
+final class EntityModificationPushClientFactory {
 
   private val _pushClientsAreOnline: WritableListenable[Boolean] = WritableListenable(true)
 
-  def createClient(name: String,
-                   updateToken: UpdateToken,
-                   onMessageReceived: ModificationsWithToken => Future[Unit]): EntityModificationPushClient =
+  private[access] def createClient(
+      name: String,
+      updateToken: UpdateToken,
+      onMessageReceived: ModificationsWithToken => Future[Unit]): EntityModificationPushClient =
     new EntityModificationPushClient(name, updateToken, onMessageReceived)
 
   /** Returns true if a push client socket is open or if there is no reason to believe it wouldn't be able to open. */

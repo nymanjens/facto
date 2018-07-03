@@ -6,7 +6,7 @@ import common.time.Clock
 import flux.action.Dispatcher
 import flux.stores.entries._
 import flux.stores.entries.factories._
-import models.access.JsEntityAccess
+import models.access.{EntityModificationPushClientFactory, JsEntityAccess}
 import models.accounting.config.Config
 import models.user.User
 
@@ -16,7 +16,8 @@ final class Module(implicit i18n: I18n,
                    entityAccess: JsEntityAccess,
                    exchangeRateManager: ExchangeRateManager,
                    dispatcher: Dispatcher,
-                   clock: Clock) {
+                   clock: Clock,
+                   entityModificationPushClientFactory: EntityModificationPushClientFactory) {
 
   import com.softwaremill.macwire._
 

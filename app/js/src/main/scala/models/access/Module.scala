@@ -8,7 +8,7 @@ final class Module(implicit user: User,
                    scalaJsApiClient: ScalaJsApiClient,
                    getInitialDataResponse: GetInitialDataResponse) {
 
-  implicit private val entityModificationPushClientFactory: EntityModificationPushClientFactory =
+  implicit val entityModificationPushClientFactory: EntityModificationPushClientFactory =
     new EntityModificationPushClientFactory()
 
   implicit val entityAccess: JsEntityAccess = {

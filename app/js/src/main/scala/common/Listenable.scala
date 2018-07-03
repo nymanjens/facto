@@ -4,6 +4,7 @@ import scala.collection.immutable.Seq
 import common.Listenable.Listener
 
 trait Listenable[T] {
+  def get: T
   def registerListener(listener: Listener[T]): Unit
   def deregisterListener(listener: Listener[T]): Unit
 }
@@ -13,6 +14,7 @@ object Listenable {
     private var value: T = initialValue
     private var listeners: Seq[Listener[T]] = Seq()
 
+    override def get: T = value
     override def registerListener(listener: Listener[T]): Unit = {
       listeners = listeners :+ listener
     }
