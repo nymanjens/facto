@@ -24,7 +24,8 @@ object JsEntityAccessImplTest extends TestSuite {
     implicit val fakeApiClient: FakeScalaJsApiClient = new FakeScalaJsApiClient()
     implicit val fakeClock: Clock = new TestModule().fakeClock
     implicit val getInitialDataResponse = testGetInitialDataResponse
-    implicit val entityModificationPushClientFactory: EntityModificationPushClientFactory = null
+    implicit val entityModificationPushClientFactory: EntityModificationPushClientFactory =
+      new EntityModificationPushClientFactory
     val fakeLocalDatabase: FakeLocalDatabase = new FakeLocalDatabase()
     val localDatabasePromise: Promise[LocalDatabase] = Promise()
     implicit val remoteDatabaseProxy: HybridRemoteDatabaseProxy =
