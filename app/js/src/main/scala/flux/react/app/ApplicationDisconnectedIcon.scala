@@ -1,12 +1,14 @@
 package flux.react.app
 
+import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import flux.stores.{ApplicationIsOnlineStore, PageLoadingStateStore, StateStore}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
 private[app] final class ApplicationDisconnectedIcon(
-    implicit applicationIsOnlineStore: ApplicationIsOnlineStore) {
+    implicit applicationIsOnlineStore: ApplicationIsOnlineStore,
+    i18n: I18n) {
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
@@ -43,7 +45,9 @@ private[app] final class ApplicationDisconnectedIcon(
     def render(props: Props, state: State): VdomElement = logExceptions {
       state.isDisconnected match {
         case true =>
-          <.span(^.className := "navbar-brand", <.i(^.className := "fa fa-chain-broken"))
+          <.span(
+            ^.className := "navbar-brand",
+            <.i(^.className := "fa fa-chain-broken", ^.title := i18n("facto.offline")))
         case false =>
           <.span()
       }

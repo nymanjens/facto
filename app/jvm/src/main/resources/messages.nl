@@ -144,3 +144,4 @@ facto.expand-all=Allen uitklappen
 facto.net-worth=Netto vermogen
 facto.add-new=toevoegen
 facto.loading=Laden
+facto.offline=Offline
