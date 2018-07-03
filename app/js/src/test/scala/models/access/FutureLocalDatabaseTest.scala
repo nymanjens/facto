@@ -40,7 +40,7 @@ object FutureLocalDatabaseTest extends TestSuite {
       await(Awaiter.expectNeverComplete(future))
 
       unsafeLocalDatabasePromise.success(localDatabase)
-      await(Awaiter.expectComplete(future, expected = localDatabase))
+      await(Awaiter.expectEventuallyComplete(future, expected = localDatabase))
     }
 
     "scheduleUpdateAt{Start,End}()" - async {
@@ -49,24 +49,24 @@ object FutureLocalDatabaseTest extends TestSuite {
       val updateAtStart = FakeUpdateFunction.createAndAdd(futureLocalDatabase.scheduleUpdateAtStart)
       unsafeLocalDatabasePromise.success(localDatabase)
 
-      await(Awaiter.expectComplete(updateAtStart.wasCalledFuture))
+      await(Awaiter.expectEventuallyComplete(updateAtStart.wasCalledFuture))
       updateAtEnd.wasCalled ==> false
       updateAtEnd2.wasCalled ==> false
 
       updateAtStart.set()
 
       updateAtStart.wasCalled ==> true
-      await(Awaiter.expectComplete(updateAtEnd.wasCalledFuture))
+      await(Awaiter.expectEventuallyComplete(updateAtEnd.wasCalledFuture))
       updateAtEnd2.wasCalled ==> false
 
       updateAtEnd.set()
 
-      await(Awaiter.expectComplete(updateAtEnd2.wasCalledFuture))
+      await(Awaiter.expectEventuallyComplete(updateAtEnd2.wasCalledFuture))
 
       updateAtEnd2.set()
       val updateAtEnd3 = FakeUpdateFunction.createAndAdd(futureLocalDatabase.scheduleUpdateAtEnd)
 
-      await(Awaiter.expectComplete(updateAtEnd3.wasCalledFuture))
+      await(Awaiter.expectEventuallyComplete(updateAtEnd3.wasCalledFuture))
     }
 
     "future(includesLatestUpdates = true)" - async {
@@ -86,7 +86,7 @@ object FutureLocalDatabaseTest extends TestSuite {
 
       updateAtEnd.set()
 
-      await(Awaiter.expectComplete(future, localDatabase))
+      await(Awaiter.expectEventuallyComplete(future, localDatabase))
 
       val updateAtEnd2 = FakeUpdateFunction.createAndAdd(futureLocalDatabase.scheduleUpdateAtEnd)
       future = futureLocalDatabase.future(safe = false, includesLatestUpdates = true)
@@ -94,7 +94,7 @@ object FutureLocalDatabaseTest extends TestSuite {
       await(Awaiter.expectNeverComplete(future))
 
       updateAtEnd2.set()
-      await(Awaiter.expectComplete(future, localDatabase))
+      await(Awaiter.expectEventuallyComplete(future, localDatabase))
     }
   }
 

@@ -29,7 +29,7 @@ object ListenableTest extends TestSuite {
 
         listenable.set(456)
 
-        await(Awaiter.expectComplete(promise.future, 456))
+        await(Awaiter.expectEventuallyComplete(promise.future, 456))
       }
       "doesn't call listener when value stays the same" - async {
         val promise = Promise[Int]()

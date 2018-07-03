@@ -37,7 +37,7 @@ object Awaiter {
     resultPromise.future
   }
 
-  def expectComplete[T](future: Future[T], expected: T = null): Future[Unit] = {
+  def expectEventuallyComplete[T](future: Future[T], expected: T = null): Future[Unit] = {
     val resultPromise = Promise[Unit]()
     future.map(value =>
       if (value == ((): Unit) || value == expected) {
