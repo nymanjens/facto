@@ -116,7 +116,7 @@ final class Layout(implicit globalMessages: GlobalMessages,
                 children,
                 <.hr(),
                 <.span(^.dangerouslySetInnerHtml := "&copy;"),
-                " 2016 Jens Nyman"))
+                " 2018 Jens Nyman"))
           )
         )
       )
