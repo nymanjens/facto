@@ -1,7 +1,7 @@
 package common.testing
 
 import api.ScalaJsApi.{GetAllEntitiesResponse, ModificationsWithToken, UpdateToken}
-import api.ScalaJsApiClient
+import api.{ScalaJsApi, ScalaJsApiClient}
 import models.Entity
 import models.access.{DbQuery, DbQueryExecutor}
 import models.modification.{EntityModification, EntityType}
@@ -46,6 +46,8 @@ final class FakeScalaJsApiClient extends ScalaJsApiClient {
     val entities = await(getAllEntities(Seq(entityType))).entities(entityType)
     DbQueryExecutor.fromEntities(entities)
   }
+
+  override def upsertUser(userPrototype: ScalaJsApi.UserPrototype): Future[Unit] = ???
 
   // **************** Additional methods for tests ****************//
   def addEntities[E <: Entity: EntityType](entities: E*): Unit = {

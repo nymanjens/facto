@@ -82,5 +82,9 @@ final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
       }
       internal
     }
+
+    override def upsertUser(userPrototype: ScalaJsApi.UserPrototype): Unit = {
+      ???
+    }
   }
 }

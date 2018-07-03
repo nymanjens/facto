@@ -2,7 +2,7 @@ package api
 
 import java.nio.ByteBuffer
 
-import api.ScalaJsApi.{GetAllEntitiesResponse, ModificationsWithToken, GetInitialDataResponse, UpdateToken}
+import api.ScalaJsApi._
 import autowire._
 import boopickle.Default._
 import models.Entity
@@ -25,6 +25,7 @@ trait ScalaJsApiClient {
   def persistEntityModifications(modifications: Seq[EntityModification]): Future[Unit]
   def executeDataQuery[E <: Entity](dbQuery: DbQuery[E]): Future[Seq[E]]
   def executeCountQuery(dbQuery: DbQuery[_ <: Entity]): Future[Int]
+  def upsertUser(userPrototype: UserPrototype): Future[Unit]
 }
 
 object ScalaJsApiClient {
@@ -54,6 +55,10 @@ object ScalaJsApiClient {
     override def executeCountQuery(dbQuery: DbQuery[_ <: Entity]) = {
       val picklableDbQuery = PicklableDbQuery.fromRegular(dbQuery)
       WebsocketAutowireClient[ScalaJsApi].executeCountQuery(picklableDbQuery).call()
+    }
+
+    override def upsertUser(userPrototype: UserPrototype) = {
+      WebsocketAutowireClient[ScalaJsApi].upsertUser(userPrototype).call()
     }
 
     private object HttpPostAutowireClient extends autowire.Client[ByteBuffer, Pickler, Pickler] {
