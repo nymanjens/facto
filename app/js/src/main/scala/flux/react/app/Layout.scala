@@ -18,6 +18,7 @@ import scala.scalajs.js
 
 final class Layout(implicit globalMessages: GlobalMessages,
                    pageLoadingSpinner: PageLoadingSpinner,
+                   applicationDisconnectedIcon: ApplicationDisconnectedIcon,
                    pendingModificationsCounter: PendingModificationsCounter,
                    menu: Menu,
                    user: User,
@@ -54,6 +55,7 @@ final class Layout(implicit globalMessages: GlobalMessages,
           ),
           <.ul(
             ^.className := "nav navbar-top-links navbar-right",
+            applicationDisconnectedIcon(),
             pendingModificationsCounter(),
             <.li(
               ^.className := "dropdown",

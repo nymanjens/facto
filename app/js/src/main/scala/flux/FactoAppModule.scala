@@ -51,6 +51,7 @@ final class FactoAppModule(implicit getInitialDataResponse: GetInitialDataRespon
   implicit private val globalMessagesStore = fluxStoresModule.globalMessagesStore
   implicit private val pageLoadingStateStore = fluxStoresModule.pageLoadingStateStore
   implicit private val pendingModificationsStore = fluxStoresModule.pendingModificationsStore
+  implicit private val applicationIsOnlineStore = fluxStoresModule.applicationIsOnlineStore
 
   // Create other Flux modules
   implicit private val reactAppModule = new flux.react.app.Module
