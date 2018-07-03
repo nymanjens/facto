@@ -11,8 +11,9 @@ private[models] final class SlickEntityManager[E <: Entity] private (
 
   // ********** Management methods ********** //
   def createTable(): Unit = {
-    Logger.info(
-      s"Creating table `${tableDef.tableName}`:\n        " + newQuery.schema.createStatements.mkString("\n"))
+    //Logger.info(
+    //  s"Creating table `${tableDef.tableName}`:\n        " +
+    //    newQuery.schema.createStatements.mkString("\n"))
     dbRun(newQuery.schema.create)
   }
 
