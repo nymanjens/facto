@@ -60,11 +60,12 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
       val password = AppConfigHelper.defaultPassword getOrElse "changeme"
 
       println("")
-      println("  Createing admin user...")
-      println(s"    loginName: $loginName")
-      println(s"    password: $password")
+      println(s"  Creating admin user...")
+      println(s"      loginName: $loginName")
+      println(s"      password: $password")
       entityAccess.persistEntityModifications(
-        EntityModification.createAddWithRandomId(Users.createUser(loginName, password, name = "Admin")))
+        EntityModification.createAddWithRandomId(
+          Users.createUser(loginName, password, name = "Admin", isAdmin = true)))
       println("  Done. Exiting.")
 
       System.exit(0)

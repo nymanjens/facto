@@ -36,7 +36,7 @@
           </a>
           <ul class="dropdown-menu dropdown-user">
             <li><a href="@routes.Application.profile"><i class="fa fa-user fa-fw"></i> @Messages("facto.user-profile")</a></li>
-            @if(user.loginName == "admin") {
+            @if(user.isAdmin) {
               <li><a href="@routes.Application.administration"><i class="fa fa-cogs fa-fw"></i> @Messages("facto.user-administration")</a></li>
             }
             <li class="divider"></li>

@@ -10,12 +10,12 @@ import scala.util.Random
 
 object Users {
 
-  def createUser(loginName: String, password: String, name: String): User =
+  def createUser(loginName: String, password: String, name: String, isAdmin: Boolean = false): User =
     User(
       loginName = loginName,
       passwordHash = hash(password),
       name = name,
-      isAdmin = false,
+      isAdmin = isAdmin,
       expandCashFlowTablesByDefault = true,
       expandLiquidationTablesByDefault = true
     )

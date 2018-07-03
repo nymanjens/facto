@@ -53,7 +53,7 @@ object AuthenticatedAction {
       controllerComponents: ControllerComponents,
       playConfiguration: play.api.Configuration): AuthenticatedAction[AnyContent] =
     AuthenticatedAction { user => request =>
-      require(user.loginName == "admin")
+      require(user.isAdmin)
       userAndRequestToResult(user)(request)
     }
 
