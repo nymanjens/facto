@@ -15,6 +15,7 @@ object Users {
       loginName = loginName,
       passwordHash = hash(password),
       name = name,
+      isAdmin = false,
       expandCashFlowTablesByDefault = true,
       expandLiquidationTablesByDefault = true
     )

@@ -29,6 +29,7 @@ object Picklers {
       state.pickle(user.loginName)
       // Password redacted
       state.pickle(user.name)
+      state.pickle(user.isAdmin)
       state.pickle(user.expandCashFlowTablesByDefault)
       state.pickle(user.expandLiquidationTablesByDefault)
       state.pickle(user.idOption)
@@ -38,6 +39,7 @@ object Picklers {
         loginName = state.unpickle[String],
         passwordHash = "<redacted>",
         name = state.unpickle[String],
+        isAdmin = state.unpickle[Boolean],
         expandCashFlowTablesByDefault = state.unpickle[Boolean],
         expandLiquidationTablesByDefault = state.unpickle[Boolean],
         idOption = state.unpickle[Option[Long]]

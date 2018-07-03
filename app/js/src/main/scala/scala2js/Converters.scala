@@ -220,6 +220,7 @@ object Converters {
         ModelField.User.loginName,
         ModelField.User.passwordHash,
         ModelField.User.name,
+        ModelField.User.isAdmin,
         ModelField.User.expandCashFlowTablesByDefault,
         ModelField.User.expandLiquidationTablesByDefault
       )
@@ -232,6 +233,7 @@ object Converters {
         loginName = getRequired(ModelField.User.loginName),
         passwordHash = getRequired(ModelField.User.passwordHash),
         name = getRequired(ModelField.User.name),
+        isAdmin = getRequired(ModelField.User.isAdmin),
         expandCashFlowTablesByDefault = getRequired(ModelField.User.expandCashFlowTablesByDefault),
         expandLiquidationTablesByDefault = getRequired(ModelField.User.expandLiquidationTablesByDefault)
       )

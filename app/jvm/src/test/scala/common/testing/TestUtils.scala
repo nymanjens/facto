@@ -70,6 +70,7 @@ object TestUtils {
       loginName = "robot",
       passwordHash = "Some hash",
       name = "Robot",
+      isAdmin = false,
       expandCashFlowTablesByDefault = true,
       expandLiquidationTablesByDefault = true
     )

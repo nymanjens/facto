@@ -75,7 +75,7 @@ final class Layout(implicit globalMessages: GlobalMessages,
                     <.i(^.className := "fa fa-user fa-fw"),
                     " ",
                     i18n("facto.user-profile"))),
-                ^^.ifThen(user.loginName == "admin") {
+                ^^.ifThen(user.isAdmin) {
                   <.li(
                     <.a(
                       ^.href := "/administration/",

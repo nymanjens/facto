@@ -58,6 +58,7 @@ object ModelField {
     case object loginName extends ModelField[String, E]("loginName", _.loginName)
     case object passwordHash extends ModelField[String, E]("passwordHash", _.passwordHash)
     case object name extends ModelField[String, E]("name", _.name)
+    case object isAdmin extends ModelField[Boolean, E]("isAdmin", _.isAdmin)
     case object expandCashFlowTablesByDefault
         extends ModelField[Boolean, E]("expandCashFlowTablesByDefault", _.expandCashFlowTablesByDefault)
     case object expandLiquidationTablesByDefault
@@ -120,6 +121,7 @@ object ModelField {
       .put(User.loginName, 3)
       .put(User.passwordHash, 4)
       .put(User.name, 5)
+      .put(User.isAdmin, 34)
       .put(User.expandCashFlowTablesByDefault, 7)
       .put(User.expandLiquidationTablesByDefault, 33)
       .put(Transaction.id, 8)
