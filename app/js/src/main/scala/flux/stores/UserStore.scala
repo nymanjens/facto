@@ -1,5 +1,8 @@
 package flux.stores
 
+import api.ScalaJsApiClient
+import flux.action.Action.{RemoveBalanceCheck, UpdateBalanceCheck, UpsertUser}
+
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.async.Async.{async, await}
 import flux.action.Dispatcher
@@ -11,8 +14,15 @@ import models.user.User
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 
-final class UserStore(implicit dispatcher: Dispatcher, entityAccess: JsEntityAccess)
+final class UserStore(implicit dispatcher: Dispatcher,
+                      scalaJsApiClient: ScalaJsApiClient,
+                      entityAccess: JsEntityAccess)
     extends AsyncEntityDerivedStateStore[State] {
+
+  dispatcher.registerPartialAsync {
+    case UpsertUser(userPrototype) =>
+      scalaJsApiClient.upsertUser(userPrototype)
+  }
 
   override protected def calculateState(): Future[State] = async {
     val allUsers = await(entityAccess.newQuery[User]().data())

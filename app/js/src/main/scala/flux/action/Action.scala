@@ -1,5 +1,6 @@
 package flux.action
 
+import api.ScalaJsApi.UserPrototype
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 
 import scala.collection.immutable.Seq
@@ -7,6 +8,9 @@ import scala.collection.immutable.Seq
 sealed trait Action
 
 object Action {
+
+  // **************** User-related actions **************** //
+  case class UpsertUser(userPrototype: UserPrototype) extends Action
 
   // **************** Transaction[Group]-related actions **************** //
   case class AddTransactionGroup(transactionsWithoutIdProvider: TransactionGroup => Seq[Transaction])
