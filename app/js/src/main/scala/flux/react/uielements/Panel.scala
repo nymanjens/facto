@@ -7,14 +7,14 @@ import japgolly.scalajs.react.vdom.html_<^._
 import scala.collection.immutable.Seq
 
 object Panel {
-  private case class Props(title: String, panelClasses: Seq[String], widthInColumns: Int)
+  private case class Props(title: String, panelClasses: Seq[String])
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
     .renderPC((_, props, children) =>
       <.div(
         ^^.classes("row" +: props.panelClasses),
         <.div(
-          ^^.classes(s"col-lg-${props.widthInColumns}"),
+          ^^.classes("col-lg-12"),
           <.div(
             ^^.classes("panel panel-default"),
             <.div(^^.classes("panel-heading"), props.title),
@@ -23,13 +23,12 @@ object Panel {
     ))
     .build
 
-  def apply(title: String, panelClasses: Seq[String] = Seq(), key: String = null, widthInColumns: Int = 12)(
+  def apply(title: String, panelClasses: Seq[String] = Seq(), key: String = null)(
       children: VdomNode*): VdomElement = {
-    val props = Props(title, panelClasses, widthInColumns)
     if (key == null) {
-      component(props)(children: _*)
+      component(Props(title, panelClasses))(children: _*)
     } else {
-      component.withKey(key).apply(props)(children: _*)
+      component.withKey(key).apply(Props(title, panelClasses))(children: _*)
     }
   }
 }
