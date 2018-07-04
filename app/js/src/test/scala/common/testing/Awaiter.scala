@@ -37,8 +37,9 @@ object Awaiter {
           if (cycleCount > 100) {
             resultPromise.completeWith(
               Future(onFail).flatMap(_ => Future.failed(new AssertionError(s"expect $verb timed out"))))
+          } else {
+            js.timers.setTimeout(5.milliseconds)(cyclicLogic(cycleCount = cycleCount + 1))
           }
-          js.timers.setTimeout(5.milliseconds)(cyclicLogic(cycleCount = cycleCount + 1))
         }
       }
       cyclicLogic()
@@ -75,8 +76,9 @@ object Awaiter {
         } else {
           if (cycleCount > 20) {
             resultPromise.success((): Unit)
+          } else {
+            js.timers.setTimeout(5.milliseconds)(cyclicLogic(cycleCount = cycleCount + 1))
           }
-          js.timers.setTimeout(5.milliseconds)(cyclicLogic(cycleCount = cycleCount + 1))
         }
       }
       cyclicLogic()
