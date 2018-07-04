@@ -34,7 +34,7 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       entityAccess.addRemotelyAddedEntities(testTransactionWithId)
 
-      await(Awaiter.expectEventuallyNonEmpty(store.state.get.entries))
+      await(Awaiter.expectEventually.nonEmpty(store.state.get.entries))
       store.state.get.hasMore ==> false
       store.state.get.entries.map(_.entry) ==> toGeneralEntrySeq(Seq(testTransactionWithId))
       store.state.get.entries.map(_.entry) ==> toGeneralEntrySeq(Seq(testTransactionWithId))
@@ -45,7 +45,7 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       entityAccess.persistModifications(Seq(EntityModification.Add(testTransactionWithId)))
 
-      await(Awaiter.expectEventuallyNonEmpty(store.state.get.entries))
+      await(Awaiter.expectEventually.nonEmpty(store.state.get.entries))
       store.state.get.hasMore ==> false
       store.state.get.entries.map(_.entry) ==> toGeneralEntrySeq(Seq(testTransactionWithId))
     }
@@ -57,7 +57,7 @@ object AllEntriesStoreFactoryTest extends TestSuite {
 
       entityAccess.persistModifications(Seq(EntityModification.Remove[Transaction](testTransactionWithId.id)))
 
-      await(Awaiter.expectEventuallyEqual(store.state.get, EntriesListStoreFactory.State.empty))
+      await(Awaiter.expectEventually.equal(store.state.get, EntriesListStoreFactory.State.empty))
     }
 
     "store calls listeners" - async {
@@ -66,14 +66,14 @@ object AllEntriesStoreFactoryTest extends TestSuite {
         onStateUpdateCount += 1
       })
 
-      await(Awaiter.expectEventuallyEqual(onStateUpdateCount, 1))
+      await(Awaiter.expectEventually.equal(onStateUpdateCount, 1))
 
       entityAccess.persistModifications(Seq(EntityModification.Add(testTransactionWithIdB)))
-      await(Awaiter.expectEventuallyEqual(onStateUpdateCount, 2))
+      await(Awaiter.expectEventually.equal(onStateUpdateCount, 2))
 
       entityAccess.addRemotelyAddedEntities(testTransactionWithIdA)
 
-      await(Awaiter.expectEventuallyEqual(onStateUpdateCount, 3))
+      await(Awaiter.expectEventually.equal(onStateUpdateCount, 3))
     }
 
     "combines consecutive transactions" - async {

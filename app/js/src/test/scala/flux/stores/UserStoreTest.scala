@@ -1,17 +1,9 @@
 package flux.stores
 
-import java.time.Month.JANUARY
-
 import api.ScalaJsApi.UserPrototype
+import common.testing.Awaiter
 import common.testing.TestObjects._
-import common.testing.{Awaiter, FakeJsEntityAccess}
-import common.time.LocalDateTime
-import common.time.LocalDateTimes.createDateTime
 import flux.action.Action
-import flux.stores.BalanceCheckStoreTest.{assertAddBalanceCheck, testBalanceCheckWithoutId}
-import flux.stores.entries.GeneralEntry.toGeneralEntrySeq
-import models.accounting._
-import models.modification.EntityModification
 import utest._
 
 import scala.async.Async.{async, await}
@@ -47,7 +39,7 @@ object UserStoreTest extends TestSuite {
 
       entityAccess.addRemotelyAddedEntities(testUserA)
 
-      await(Awaiter.expectEventuallyNonEmpty(store.state.get.allUsers))
+      await(Awaiter.expectEventually.nonEmpty(store.state.get.allUsers))
       store.state.get.allUsers ==> Seq(testUserA)
     }
 
@@ -57,16 +49,16 @@ object UserStoreTest extends TestSuite {
         onStateUpdateCount += 1
       })
 
-      await(Awaiter.expectEventuallyEqual(onStateUpdateCount, 1))
+      await(Awaiter.expectEventually.equal(onStateUpdateCount, 1))
 
       entityAccess.addRemotelyAddedEntities(testUserA)
 
-      await(Awaiter.expectEventuallyEqual(onStateUpdateCount, 2))
+      await(Awaiter.expectEventually.equal(onStateUpdateCount, 2))
 
       entityAccess.addRemotelyAddedEntities(testUserA) // Duplicate
       entityAccess.addRemotelyAddedEntities(testTransactionWithIdB) // Irrelevant
 
-      await(Awaiter.expectConsistentlyEqual(onStateUpdateCount, 2))
+      await(Awaiter.expectConsistently.equal(onStateUpdateCount, 2))
     }
   }
 }
