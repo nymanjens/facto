@@ -6,10 +6,9 @@ import models.accounting.{BalanceCheck, Transaction}
 import models.modification.{EntityModification, EntityType}
 
 /**
-  * General purpose flux store that maintains a state derived from data in the database
-  * and doesn't support mutation operations.
+  * Abstract base class for a store with transaction-derived entries.
   *
-  * @tparam State Any immutable type that contains all state maintained by this store
+  * @tparam State An immutable type that contains all state maintained by this store
   */
 abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit entityAccess: JsEntityAccess)
     extends AsyncEntityDerivedStateStore[State] {
