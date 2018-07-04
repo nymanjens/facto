@@ -1,9 +1,11 @@
 package flux.stores
 
+import scala.concurrent.duration._
 import api.ScalaJsApi.UserPrototype
 import common.testing.Awaiter
 import common.testing.TestObjects._
 import flux.action.Action
+import models.modification.EntityModification
 import utest._
 
 import scala.async.Async.{async, await}
@@ -59,6 +61,18 @@ object UserStoreTest extends TestSuite {
       entityAccess.addRemotelyAddedEntities(testTransactionWithIdB) // Irrelevant
 
       await(Awaiter.expectConsistently.equal(onStateUpdateCount, 2))
+    }
+
+    "store copes with update during recalculation" - async {
+      val testUserBUpdate = testUserB.copy(name = "other name")
+      entityAccess.slowDownQueries(50.milliseconds)
+
+      entityAccess.addRemotelyAddedEntities(testUserA)
+      entityAccess.addRemotelyAddedEntities(testUserB)
+      val newStateFuture = store.stateFuture
+      entityAccess.persistModifications(EntityModification.createUpdate(testUserBUpdate))
+
+      await(newStateFuture).allUsers ==> Seq(testUserA, testUserBUpdate)
     }
   }
 }
