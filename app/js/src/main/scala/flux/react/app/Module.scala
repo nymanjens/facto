@@ -41,6 +41,7 @@ final class Module(implicit i18n: I18n,
   import com.softwaremill.macwire._
 
   // Configuration of submodules
+  private val userManagementModule = new flux.react.app.usermanagement.Module
   private val transactionGroupFormModule = new flux.react.app.transactiongroupform.Module
   private val balanceCheckFormModule = new flux.react.app.balancecheckform.Module
   private val transactionViewsModule = new flux.react.app.transactionviews.Module
@@ -52,7 +53,12 @@ final class Module(implicit i18n: I18n,
     wire[ApplicationDisconnectedIcon]
   implicit private lazy val pendingModificationsCounter: PendingModificationsCounter =
     wire[PendingModificationsCounter]
+
   implicit lazy val layout: Layout = wire[Layout]
+
+  implicit lazy val userProfile = userManagementModule.userProfile
+  implicit lazy val userAdministration = userManagementModule.userAdministration
+
   implicit lazy val templateList = wire[TemplateList]
 
   implicit lazy val transactionGroupForm: TransactionGroupForm =
