@@ -37,6 +37,10 @@ object Awaiter {
     resultPromise.future
   }
 
+  def expectConsistentlyEqual[T](a: => T, b: => T): Future[Unit] = {
+    ???
+  }
+
   def expectEventuallyComplete[T](future: Future[T], expected: T = null): Future[Unit] = {
     val resultPromise = Promise[Unit]()
     future.map(value =>

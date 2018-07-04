@@ -16,7 +16,7 @@ import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 
-/** Test test also tests `EntriesStoreFactory` and `EntriesStore`. */
+// Also tests `AsyncEntityDerivedStateStore`, `EntriesStoreFactory` and `EntriesStore`.
 object AllEntriesStoreFactoryTest extends TestSuite {
 
   override def tests = TestSuite {
