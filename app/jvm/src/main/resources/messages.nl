@@ -145,3 +145,6 @@ facto.net-worth=Netto vermogen
 facto.add-new=toevoegen
 facto.loading=Laden
 facto.offline=Offline
+facto.is-admin=Admin?
+facto.expand-cash-flow=Cash flow uitklappen?
+facto.expand-liquidation=Vereffening uitklappen?

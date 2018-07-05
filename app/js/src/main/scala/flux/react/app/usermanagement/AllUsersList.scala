@@ -3,6 +3,7 @@ package flux.react.app.usermanagement
 import scala.collection.immutable.Seq
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
+import flux.react.ReactVdomUtils.<<
 import flux.react.uielements
 import flux.react.uielements.Table.TableRowData
 import flux.stores.{StateStore, UserStore}
@@ -48,11 +49,16 @@ private[app] final class AllUsersList(implicit i18n: I18n, userStore: UserStore)
 
     def render(props: Props, state: State): VdomElement = logExceptions {
       uielements.HalfPanel(title = <.span(i18n("facto.all-users"))) {
-        uielements
-          .Table(
-            tableHeaders = Seq(<.th(i18n("facto.login-name")), <.th(i18n("facto.full-name"))),
-            tableRowDatas = tableRowDatas(state))
-
+        uielements.Table(
+          tableHeaders = Seq(
+            <.th(i18n("facto.login-name")),
+            <.th(i18n("facto.full-name")),
+            <.th(i18n("facto.is-admin")),
+            <.th(i18n("facto.expand-cash-flow")),
+            <.th(i18n("facto.expand-liquidation"))
+          ),
+          tableRowDatas = tableRowDatas(state)
+        )
       }
     }
 
@@ -62,11 +68,18 @@ private[app] final class AllUsersList(implicit i18n: I18n, userStore: UserStore)
           for (i <- 0 until 3) yield {
             uielements.Table.TableRowData(
               Seq[VdomElement](
-                <.td(^.colSpan := 2, ^.style := js.Dictionary("color" -> "white"), "loading...")))
+                <.td(^.colSpan := 5, ^.style := js.Dictionary("color" -> "white"), "loading...")))
           }
         case Some(allUsers) =>
           for (user <- allUsers) yield {
-            uielements.Table.TableRowData(Seq[VdomElement](<.td(user.loginName), <.td(user.name)))
+            uielements.Table.TableRowData(
+              Seq[VdomElement](
+                <.td(user.loginName),
+                <.td(user.name),
+                <.td(<<.ifThen(user.isAdmin)(<.i(^.className := "fa fa-check"))),
+                <.td(<<.ifThen(user.expandCashFlowTablesByDefault)(<.i(^.className := "fa fa-check"))),
+                <.td(<<.ifThen(user.expandLiquidationTablesByDefault)(<.i(^.className := "fa fa-check")))
+              ))
           }
       }
     }
