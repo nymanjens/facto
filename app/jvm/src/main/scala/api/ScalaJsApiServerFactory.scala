@@ -100,6 +100,9 @@ final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
           requireNonEmpty(userProto.plainTextPassword)
           requireNonEmpty(userProto.name)
 
+          // Check permissions
+          require(user.isAdmin, "Only an admin can add users")
+
           entityAccess.persistEntityModifications(
             EntityModification.createAddWithRandomId(Users.createUser(
               loginName = userProto.loginName.get,
@@ -114,6 +117,9 @@ final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
           requireNonEmptyIfSet(userProto.loginName)
           requireNonEmptyIfSet(userProto.plainTextPassword)
           requireNonEmptyIfSet(userProto.name)
+
+          // Check permissions
+          require(user.isAdmin || id == user.id, "Changing an other user's password")
 
           val existingUser = entityAccess.newQuerySync[User]().findById(id)
           val updatedUser = {
