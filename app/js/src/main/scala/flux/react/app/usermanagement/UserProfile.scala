@@ -1,21 +1,19 @@
 package flux.react.app.usermanagement
 
+import api.ScalaJsApi.UserPrototype
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
-import flux.react.ReactVdomUtils.<<
-import flux.react.router.{Page, RouterContext}
+import flux.action.{Action, Dispatcher}
+import flux.react.router.RouterContext
 import flux.react.uielements
-import flux.react.uielements.Panel
 import flux.react.uielements.input.bootstrap
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
-import models.access.EntityAccess
-import models.accounting.config.{Config, Template}
 import models.user.User
 
 import scala.collection.immutable.Seq
 
-private[app] final class UserProfile(implicit user: User, i18n: I18n) {
+private[app] final class UserProfile(implicit user: User, i18n: I18n, dispatcher: Dispatcher) {
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
@@ -34,7 +32,6 @@ private[app] final class UserProfile(implicit user: User, i18n: I18n) {
 
   private final class Backend(val $ : BackendScope[Props, State]) {
 
-    private val oldPasswordRef = bootstrap.TextInput.ref()
     private val passwordRef = bootstrap.TextInput.ref()
     private val passwordVerificationRef = bootstrap.TextInput.ref()
 
@@ -58,15 +55,6 @@ private[app] final class UserProfile(implicit user: User, i18n: I18n) {
                 label = i18n("facto.login-name"),
                 defaultValue = user.loginName,
                 disabled = true
-              ),
-              bootstrap.TextInput(
-                ref = oldPasswordRef,
-                name = "oldPassword",
-                label = i18n("facto.old-password"),
-                inputType = "password",
-                required = true,
-                showErrorMessage = state.showErrorMessages,
-                focusOnMount = true,
               ),
               bootstrap.TextInput(
                 ref = passwordRef,
@@ -104,21 +92,24 @@ private[app] final class UserProfile(implicit user: User, i18n: I18n) {
           var newState = State(showErrorMessages = true)
 
           val maybeNewPassword = for {
-            oldPassword <- oldPasswordRef().value
             password <- passwordRef().value
             passwordVerification <- passwordVerificationRef().value
             validPassword <- {
-              // TODO: Do verification
-              Some(password)
+              if (password != passwordVerification) {
+                newState = newState.copy(globalErrors = Seq(i18n("facto.error.passwords-should-match")))
+                None
+              } else {
+                Some(password)
+              }
             }
           } yield validPassword
 
           maybeNewPassword match {
             case Some(newPassword) =>
-              // TODO: Submit
+              dispatcher.dispatch(
+                Action.UpsertUser(UserPrototype.create(id = user.id, plainTextPassword = newPassword)))
 
               // Clear form
-              oldPasswordRef().setValue("")
               passwordRef().setValue("")
               passwordVerificationRef().setValue("")
               newState = State()
