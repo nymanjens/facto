@@ -103,7 +103,7 @@ object Table {
   }
 
   // **************** Public inner types ****************//
-  case class TableRowData(cells: Seq[VdomElement], deemphasize: Boolean)
+  case class TableRowData(cells: Seq[VdomElement], deemphasize: Boolean = false)
 
   // **************** Private inner methods ****************//
   private def ifThenSeq[V](condition: Boolean, value: V): Seq[V] = if (condition) Seq(value) else Seq()

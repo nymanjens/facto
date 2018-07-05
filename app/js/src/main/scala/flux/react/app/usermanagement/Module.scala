@@ -16,6 +16,7 @@ final class Module(implicit i18n: I18n,
 
   private implicit lazy val updatePasswordForm = wire[UpdatePasswordForm]
   private implicit lazy val addUserForm = wire[AddUserForm]
+  private implicit lazy val allUsersList = wire[AllUsersList]
 
   implicit lazy val userProfile: UserProfile = wire[UserProfile]
   implicit lazy val userAdministration: UserAdministration = wire[UserAdministration]

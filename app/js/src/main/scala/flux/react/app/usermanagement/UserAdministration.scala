@@ -6,7 +6,9 @@ import flux.react.uielements
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
-private[app] final class UserAdministration(implicit i18n: I18n, addUserForm: AddUserForm) {
+private[app] final class UserAdministration(implicit i18n: I18n,
+                                            allUsersList: AllUsersList,
+                                            addUserForm: AddUserForm) {
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
@@ -14,10 +16,8 @@ private[app] final class UserAdministration(implicit i18n: I18n, addUserForm: Ad
       implicit val router = props.router
       <.span(
         uielements.PageHeader(router.currentPage),
-        <.div(
-          ^.className := "row",
-          addUserForm()
-        )
+        <.div(^.className := "row", allUsersList()),
+        <.div(^.className := "row", addUserForm())
       )
     })
     .build
