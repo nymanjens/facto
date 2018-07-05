@@ -49,7 +49,6 @@ private[app] final class AllUsersList(implicit i18n: I18n, userStore: UserStore)
       uielements.HalfPanel(title = <.span(i18n("facto.all-users"))) {
         uielements
           .Table(
-            title = i18n("facto.all-users"),
             tableHeaders = Seq(<.th(i18n("facto.login-name")), <.th(i18n("facto.full-name"))),
             tableRowDatas = tableRowDatas(state))
 
