@@ -64,7 +64,7 @@ final class GlobalMessagesStore(implicit i18n: I18n,
         if userPrototype.id.isDefined && userPrototype.plainTextPassword.isDefined =>
       i18n("facto.successfully-updated-password")
     case UpsertUser(userPrototype) if userPrototype.id.isEmpty =>
-      i18n("facto.successfully-added-user")
+      i18n("facto.successfully-added-user", userPrototype.loginName getOrElse "<Unknown name>")
 
     // **************** Transaction[Group]-related actions **************** //
     case AddTransactionGroup(transactionsProvider) if numTransactions(transactionsProvider) == 1 =>
