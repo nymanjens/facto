@@ -79,7 +79,7 @@ private[usermanagement] final class AddUserForm(implicit user: User, i18n: I18n,
             ^.tpe := "submit",
             ^.className := "btn btn-default",
             ^.onClick ==> onSubmit,
-            i18n("facto.ok"))
+            i18n("facto.add"))
         )
       )
     }
