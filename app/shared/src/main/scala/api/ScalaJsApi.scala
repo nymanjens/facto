@@ -1,7 +1,7 @@
 package api
 
 import api.Picklers._
-import api.ScalaJsApi.{GetAllEntitiesResponse, ModificationsWithToken, GetInitialDataResponse, UpdateToken}
+import api.ScalaJsApi._
 import common.money.Currency
 import common.time.LocalDateTime
 import models.Entity
@@ -28,6 +28,9 @@ trait ScalaJsApi {
   def executeDataQuery(dbQuery: PicklableDbQuery): Seq[Entity]
 
   def executeCountQuery(dbQuery: PicklableDbQuery): Int
+
+  /** Adds or updates a user according to the present fields in the given prototype. */
+  def upsertUser(userPrototype: UserPrototype): Unit
 }
 
 object ScalaJsApi {
@@ -53,4 +56,40 @@ object ScalaJsApi {
     }
   }
   case class ModificationsWithToken(modifications: Seq[EntityModification], nextUpdateToken: UpdateToken)
+
+  /**
+    * Copy of the User model with all fields optional.
+    *
+    * @param id Required for update. Unset for add.
+    * @param loginName Required for add.
+    * @param plainTextPassword Required for add.
+    * @param name Required for add.
+    */
+  case class UserPrototype(id: Option[Long] = None,
+                           loginName: Option[String] = None,
+                           plainTextPassword: Option[String] = None,
+                           name: Option[String] = None,
+                           isAdmin: Option[Boolean] = None,
+                           expandCashFlowTablesByDefault: Option[Boolean] = None,
+                           expandLiquidationTablesByDefault: Option[Boolean] = None)
+  object UserPrototype {
+    def create(id: java.lang.Long = null,
+               loginName: String = null,
+               plainTextPassword: String = null,
+               name: String = null,
+               isAdmin: java.lang.Boolean = null,
+               expandCashFlowTablesByDefault: java.lang.Boolean = null,
+               expandLiquidationTablesByDefault: java.lang.Boolean = null): UserPrototype =
+      UserPrototype(
+        id = if (id == null) None else Some(id),
+        loginName = Option(loginName),
+        plainTextPassword = Option(plainTextPassword),
+        name = Option(name),
+        isAdmin = if (isAdmin == null) None else Some(isAdmin),
+        expandCashFlowTablesByDefault =
+          if (expandCashFlowTablesByDefault == null) None else Some(expandCashFlowTablesByDefault),
+        expandLiquidationTablesByDefault =
+          if (expandLiquidationTablesByDefault == null) None else Some(expandLiquidationTablesByDefault)
+      )
+  }
 }

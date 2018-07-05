@@ -4,7 +4,7 @@ import java.nio.ByteBuffer
 
 import akka.stream.scaladsl._
 import api.Picklers._
-import api.ScalaJsApi.{ModificationsWithToken, UpdateToken}
+import api.ScalaJsApi.{ModificationsWithToken, UpdateToken, UserPrototype}
 import api.UpdateTokens.{toLocalDateTime, toUpdateToken}
 import api.{PicklableDbQuery, ScalaJsApiRequest, ScalaJsApiServerFactory}
 import boopickle.Default._
@@ -116,6 +116,9 @@ final class InternalApi @Inject()(implicit override val messagesApi: MessagesApi
       case "executeCountQuery" =>
         val dbQuery = Unpickle[PicklableDbQuery].fromBytes(argsMap("dbQuery"))
         Pickle.intoBytes(scalaJsApiServer.executeCountQuery(dbQuery))
+      case "upsertUser" =>
+        val userPrototype = Unpickle[UserPrototype].fromBytes(argsMap("userPrototype"))
+        Pickle.intoBytes(scalaJsApiServer.upsertUser(userPrototype))
     }
 
     val data: Array[Byte] = Array.ofDim[Byte](responseBuffer.remaining())

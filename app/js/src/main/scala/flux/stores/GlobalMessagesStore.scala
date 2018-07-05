@@ -59,6 +59,13 @@ final class GlobalMessagesStore(implicit i18n: I18n,
   }
 
   private def getCompletionMessage: PartialFunction[Action, String] = {
+    // **************** User-related actions **************** //
+    case UpsertUser(userPrototype)
+        if userPrototype.id.isDefined && userPrototype.plainTextPassword.isDefined =>
+      i18n("facto.successfully-updated-password")
+    case UpsertUser(userPrototype) if userPrototype.id.isEmpty =>
+      i18n("facto.successfully-added-user", userPrototype.loginName getOrElse "<Unknown name>")
+
     // **************** Transaction[Group]-related actions **************** //
     case AddTransactionGroup(transactionsProvider) if numTransactions(transactionsProvider) == 1 =>
       i18n("facto.successfully-created-1-transaction")

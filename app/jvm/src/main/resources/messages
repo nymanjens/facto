@@ -72,7 +72,6 @@ facto.date.dayofweek.fri.abbrev=Fri
 facto.date.dayofweek.sat.abbrev=Sat
 facto.date.dayofweek.sun.abbrev=Sun
 
-facto.error.old-password-is-incorrect=Old password is incorrect
 facto.error.passwords-should-match=Passwords should match
 facto.error.invalid-username-or-password=Invalid username or password
 facto.error.noReservoir.atLeast2=To be able to use the N/A money reservoir, there must be at least two transactions
@@ -191,3 +190,6 @@ facto.net-worth=Net worth
 facto.add-new=add new
 facto.loading=Loading
 facto.offline=Offline
+facto.is-admin=Is admin?
+facto.expand-cash-flow=Expand cash flow?
+facto.expand-liquidation=Expand liquidation?

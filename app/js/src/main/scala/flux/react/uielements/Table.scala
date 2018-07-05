@@ -19,25 +19,27 @@ object Table {
         ^^.classes(
           Seq("table", "table-bordered", "table-hover", "table-condensed", "table-overflow-elipsis") ++ props.tableClasses),
         <.thead(
-          <.tr(
-            ^^.classes("info", "expand-on-click"),
-            <.th(
-              ^.colSpan := props.colSpan,
-              <.span(
-                ^.className := "primary-title",
-                <.i(
-                  ^.className := s"fa fa-angle-${if (state.expanded) "down" else "right"}",
-                  ^.style := js.Dictionary("width" -> "12px")),
-                " ",
-                props.title
+          <<.ifThen(props.title) { title =>
+            <.tr(
+              ^^.classes("info", "expand-on-click"),
+              <.th(
+                ^.colSpan := props.colSpan,
+                <.span(
+                  ^.className := "primary-title",
+                  <.i(
+                    ^.className := s"fa fa-angle-${if (state.expanded) "down" else "right"}",
+                    ^.style := js.Dictionary("width" -> "12px")),
+                  " ",
+                  title
+                ),
+                <<.ifThen(props.tableTitleExtra) { extra =>
+                  <.span(^.className := "secondary-title", extra)
+                }
               ),
-              <<.ifThen(props.tableTitleExtra) { extra =>
-                <.span(^.className := "secondary-title", extra)
-              }
-            ),
-            ^.onClick -->
-              $.modState(_.copy(expanded = !state.expanded))
-          ),
+              ^.onClick -->
+                $.modState(_.copy(expanded = !state.expanded))
+            )
+          },
           <<.ifThen(state.expanded) {
             <.tr(props.tableHeaders.toTagMod)
           }
@@ -83,7 +85,7 @@ object Table {
     .build
 
   // **************** API ****************//
-  def apply(title: String,
+  def apply(title: String = null,
             tableClasses: Seq[String] = Seq(),
             setExpanded: Option[Unique[Boolean]] = None,
             expandNumEntriesCallback: Option[Callback] = None,
@@ -92,7 +94,7 @@ object Table {
             tableRowDatas: Seq[TableRowData])(implicit i18n: I18n): VdomElement = {
     component(
       Props(
-        title = title,
+        title = Option(title),
         tableClasses = tableClasses,
         setExpanded = setExpanded,
         expandNumEntriesCallback = expandNumEntriesCallback,
@@ -103,13 +105,13 @@ object Table {
   }
 
   // **************** Public inner types ****************//
-  case class TableRowData(cells: Seq[VdomElement], deemphasize: Boolean)
+  case class TableRowData(cells: Seq[VdomElement], deemphasize: Boolean = false)
 
   // **************** Private inner methods ****************//
   private def ifThenSeq[V](condition: Boolean, value: V): Seq[V] = if (condition) Seq(value) else Seq()
 
   // **************** Private inner types ****************//
-  private case class Props(title: String,
+  private case class Props(title: Option[String],
                            tableClasses: Seq[String],
                            setExpanded: Option[Unique[Boolean]],
                            expandNumEntriesCallback: Option[Callback],

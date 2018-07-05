@@ -70,18 +70,20 @@ final class Layout(implicit globalMessages: GlobalMessages,
               <.ul(
                 ^.className := "dropdown-menu dropdown-user",
                 <.li(
-                  <.a(
-                    ^.href := "/profile/",
-                    <.i(^.className := "fa fa-user fa-fw"),
-                    " ",
-                    i18n("facto.user-profile"))),
+                  router
+                    .anchorWithHrefTo(Page.UserProfile)(
+                      <.i(^.className := Page.UserProfile.iconClass),
+                      " ",
+                      Page.UserProfile.title
+                    )),
                 ^^.ifThen(user.isAdmin) {
                   <.li(
-                    <.a(
-                      ^.href := "/administration/",
-                      <.i(^.className := "fa fa-cogs fa-fw"),
-                      " ",
-                      i18n("facto.user-administration")))
+                    router
+                      .anchorWithHrefTo(Page.UserAdministration)(
+                        <.i(^.className := Page.UserAdministration.iconClass),
+                        " ",
+                        Page.UserAdministration.title
+                      ))
                 },
                 <.li(^.className := "divider"),
                 <.li(

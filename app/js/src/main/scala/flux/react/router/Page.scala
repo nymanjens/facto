@@ -41,6 +41,10 @@ object Page {
     override def iconClass = ""
   }
 
+  // **************** User management views **************** //
+  case object UserProfile extends PageBase("facto.user-profile", iconClass = "fa fa-user fa-fw")
+  case object UserAdministration extends PageBase("facto.user-administration", iconClass = "fa fa-cogs fa-fw")
+
   // **************** Accounting data views **************** //
   case object Everything extends PageBase("facto.everything", iconClass = "icon-list")
   case object CashFlow extends PageBase("facto.cash-flow", iconClass = "icon-money")

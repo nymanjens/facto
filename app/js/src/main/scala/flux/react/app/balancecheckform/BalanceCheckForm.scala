@@ -87,8 +87,8 @@ final class BalanceCheckForm(implicit i18n: I18n,
   private case class Props(operationMeta: OperationMeta, returnToPath: Path, router: RouterContext)
 
   private final class Backend(val $ : BackendScope[Props, State]) {
-    val checkDateRef = dateMappedInput.ref()
-    val balanceRef = MoneyInput.ref()
+    private val checkDateRef = dateMappedInput.ref()
+    private val balanceRef = MoneyInput.ref()
 
     def render(props: Props, state: State) = logExceptions {
       implicit val router = props.router
@@ -194,7 +194,7 @@ final class BalanceCheckForm(implicit i18n: I18n,
 
       $.modState(state =>
         logExceptions {
-          var newState = state.copy(showErrorMessages = true)
+          val newState = state.copy(showErrorMessages = true)
 
           val maybeBalanceCheck = for {
             checkDate <- checkDateRef().value

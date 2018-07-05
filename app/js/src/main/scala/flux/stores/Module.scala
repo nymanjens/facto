@@ -1,5 +1,6 @@
 package flux.stores
 
+import api.ScalaJsApiClient
 import common.I18n
 import common.money.ExchangeRateManager
 import common.time.Clock
@@ -17,6 +18,7 @@ final class Module(implicit i18n: I18n,
                    exchangeRateManager: ExchangeRateManager,
                    dispatcher: Dispatcher,
                    clock: Clock,
+                   scalaJsApiClient: ScalaJsApiClient,
                    entityModificationPushClientFactory: EntityModificationPushClientFactory) {
 
   import com.softwaremill.macwire._
@@ -39,4 +41,5 @@ final class Module(implicit i18n: I18n,
   implicit val pageLoadingStateStore = wire[PageLoadingStateStore]
   implicit val pendingModificationsStore = wire[PendingModificationsStore]
   implicit val applicationIsOnlineStore = wire[ApplicationIsOnlineStore]
+  implicit val userStore = wire[UserStore]
 }

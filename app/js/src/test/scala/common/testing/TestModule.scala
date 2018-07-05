@@ -15,6 +15,7 @@ class TestModule {
   implicit lazy val fakeI18n = wire[FakeI18n]
   implicit lazy val testAccountingConfig = TestObjects.testAccountingConfig
   implicit lazy val testUser = TestObjects.testUser
+  implicit lazy val fakeScalaJsApiClient = wire[FakeScalaJsApiClient]
 
   // ******************* Non-fake implementations ******************* //
   implicit lazy val exchangeRateManager = new JsExchangeRateManager(ratioReferenceToForeignCurrency = Map())

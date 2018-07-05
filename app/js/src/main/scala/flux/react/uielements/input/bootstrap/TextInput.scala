@@ -19,7 +19,7 @@ object TextInput {
                      onChange: String => Callback,
                      extraProps: ExtraProps) => {
       <.input(
-        ^.tpe := "text",
+        ^.tpe := extraProps.inputType,
         ^^.classes(classes),
         ^.name := name,
         ^.value := valueString,
@@ -34,6 +34,7 @@ object TextInput {
   def apply(ref: Reference,
             name: String,
             label: String,
+            inputType: String = "text",
             defaultValue: String = "",
             required: Boolean = false,
             showErrorMessage: Boolean = false,
@@ -53,7 +54,7 @@ object TextInput {
       inputClasses = inputClasses,
       listener = listener,
       valueTransformer = ValueTransformer.nullInstance,
-      extra = ExtraProps(focusOnMount = focusOnMount, disabled = disabled)
+      extra = ExtraProps(inputType = inputType, focusOnMount = focusOnMount, disabled = disabled)
     )
     ref.mutableRef.component(props)
   }
@@ -65,7 +66,7 @@ object TextInput {
       private[TextInput] val mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps])
       extends InputComponent.Reference(mutableRef)
 
-  case class ExtraProps private[TextInput] (focusOnMount: Boolean, disabled: Boolean)
+  case class ExtraProps private[TextInput] (inputType: String, focusOnMount: Boolean, disabled: Boolean)
 
   // **************** Private inner types ****************//
   private type Value = String

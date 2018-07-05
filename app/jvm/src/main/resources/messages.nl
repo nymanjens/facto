@@ -27,7 +27,6 @@ facto.date.dayofweek.fri.abbrev=vr
 facto.date.dayofweek.sat.abbrev=za
 facto.date.dayofweek.sun.abbrev=zo
 
-facto.error.old-password-is-incorrect=Oud wachtwoord is fout
 facto.error.passwords-should-match=Wachtwoorden komen niet overeen
 facto.error.invalid-username-or-password=Ongeldige gebruikersnaam of wachtwoord
 facto.error.noReservoir.atLeast2=Minstens twee inboekingen vereist bij fictieve overschrijving
@@ -145,3 +144,6 @@ facto.net-worth=Netto vermogen
 facto.add-new=toevoegen
 facto.loading=Laden
 facto.offline=Offline
+facto.is-admin=Admin?
+facto.expand-cash-flow=Cash flow uitklappen?
+facto.expand-liquidation=Vereffening uitklappen?

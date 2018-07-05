@@ -1,14 +1,16 @@
 package common.testing
 
+import scala.concurrent.duration._
+import scala.scalajs.js
 import models.Entity
-import models.access.{DbQueryExecutor, DbResultSet, JsEntityAccess, PendingModifications}
+import models.access._
 import models.access.JsEntityAccess.Listener
 import models.modification.{EntityModification, EntityType}
 import models.user.User
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
-import scala.concurrent.Future
+import scala.concurrent.{Future, Promise}
 import scala2js.Converters._
 
 final class FakeJsEntityAccess extends JsEntityAccess {
@@ -17,10 +19,23 @@ final class FakeJsEntityAccess extends JsEntityAccess {
   private var _pendingModifications: PendingModifications =
     PendingModifications(Seq(), persistedLocally = false)
   private val listeners: mutable.Buffer[Listener] = mutable.Buffer()
+  private var queryDelay: FiniteDuration = 0.seconds
 
   // **************** Implementation of ScalaJsApiClient trait ****************//
   override def newQuery[E <: Entity: EntityType]() = {
-    DbResultSet.fromExecutor(queryExecutor[E].asAsync)
+    def addDelay[T](future: Future[T]): Future[T] = {
+      val resultPromise = Promise[T]()
+      js.timers.setTimeout(queryDelay) {
+        resultPromise.completeWith(future)
+      }
+      resultPromise.future
+    }
+
+    val delegate = queryExecutor[E].asAsync
+    DbResultSet.fromExecutor(new DbQueryExecutor.Async[E] {
+      override def data(dbQuery: DbQuery[E]): Future[Seq[E]] = addDelay(delegate.data(dbQuery))
+      override def count(dbQuery: DbQuery[E]): Future[Int] = addDelay(delegate.count(dbQuery))
+    })
   }
   override def newQuerySyncForUser() = {
     DbResultSet.fromExecutor(queryExecutor[User])
@@ -64,4 +79,6 @@ final class FakeJsEntityAccess extends JsEntityAccess {
 
   def queryExecutor[E <: Entity: EntityType]: DbQueryExecutor.Sync[E] =
     DbQueryExecutor.fromEntities(modificationsBuffer.getAllEntitiesOfType[E])
+
+  def slowDownQueries(duration: FiniteDuration): Unit = { queryDelay = duration }
 }

@@ -44,6 +44,10 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
           | staticRoute(RouterFactory.pathPrefix, Page.Root)
             ~> redirectToPage(Page.CashFlow)(Redirect.Replace)
 
+          | staticRuleFromPage(Page.UserProfile, reactAppModule.userProfile.apply)
+
+          | staticRuleFromPage(Page.UserAdministration, reactAppModule.userAdministration.apply)
+
           | staticRuleFromPage(Page.Everything, reactAppModule.everything.apply)
 
           | staticRuleFromPage(Page.CashFlow, reactAppModule.cashFlow.apply)

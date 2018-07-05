@@ -150,7 +150,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
                     <.td(
                       ^.colSpan := props.tableHeaders.size,
                       ^.style := js.Dictionary("color" -> "white"),
-                      "loading...")),
+                      "...")),
                   deemphasize = false)
               }
           }

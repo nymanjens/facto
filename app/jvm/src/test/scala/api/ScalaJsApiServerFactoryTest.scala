@@ -1,5 +1,6 @@
 package api
 
+import api.ScalaJsApi.UserPrototype
 import api.UpdateTokens.toUpdateToken
 import models.access.DbQueryImplicits._
 import com.google.inject._
@@ -14,6 +15,7 @@ import models.accounting.config._
 import models.modification.{EntityModification, EntityModificationEntity, EntityType}
 import models.money.ExchangeRateMeasurement
 import models.slick.SlickUtils.dbRun
+import models.user.User
 import org.junit.runner._
 import org.specs2.runner._
 import play.api.test._
@@ -93,5 +95,50 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
             limit = None)))
 
     entities.toSet mustEqual Set(transaction1, transaction2)
+  }
+
+  "upsertUser()" should {
+    "add" in new WithApplication {
+      serverFactory
+        .create()(testUser.copy(isAdmin = true))
+        .upsertUser(UserPrototype.create(loginName = "tester", plainTextPassword = "abc", name = "Tester"))
+
+      val storedUser = getOnlyElement(entityAccess.newQuerySync[User]().data())
+
+      storedUser.loginName mustEqual "tester"
+      storedUser.name mustEqual "Tester"
+      storedUser.isAdmin mustEqual false
+      storedUser.expandCashFlowTablesByDefault mustEqual true
+      storedUser.expandLiquidationTablesByDefault mustEqual true
+    }
+
+    "update" should {
+      "password" in new WithApplication {
+        serverFactory
+          .create()(testUser.copy(isAdmin = true))
+          .upsertUser(UserPrototype.create(loginName = "tester", plainTextPassword = "abc", name = "Tester"))
+        val createdUser = getOnlyElement(entityAccess.newQuerySync[User]().data())
+        serverFactory
+          .create()(testUser.copy(idOption = Some(createdUser.id)))
+          .upsertUser(UserPrototype.create(id = createdUser.id, plainTextPassword = "def"))
+        val updatedUser = getOnlyElement(entityAccess.newQuerySync[User]().data())
+
+        updatedUser.passwordHash mustNotEqual createdUser.passwordHash
+      }
+      "isAdmin" in new WithApplication {
+        serverFactory
+          .create()(testUser.copy(isAdmin = true))
+          .upsertUser(UserPrototype
+            .create(loginName = "tester", plainTextPassword = "abc", name = "Tester", isAdmin = false))
+        val createdUser = getOnlyElement(entityAccess.newQuerySync[User]().data())
+        serverFactory
+          .create()(testUser.copy(idOption = Some(createdUser.id)))
+          .upsertUser(UserPrototype.create(id = createdUser.id, isAdmin = true))
+        val updatedUser = getOnlyElement(entityAccess.newQuerySync[User]().data())
+
+        createdUser.isAdmin mustEqual false
+        updatedUser.isAdmin mustEqual true
+      }
+    }
   }
 }

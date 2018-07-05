@@ -2,6 +2,11 @@ package flux.stores
 
 import scala.collection.immutable.Seq
 
+/**
+  * Abstract base class for any store that exposes a single listenable state.
+  *
+  * @tparam State An immutable type that contains all state maintained by this store
+  */
 abstract class StateStore[State] {
 
   private var _stateUpdateListeners: Seq[StateStore.Listener] = Seq()

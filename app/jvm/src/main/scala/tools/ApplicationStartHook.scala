@@ -73,11 +73,7 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
   }
 
   private def dropAndCreateNewDb(): Unit = {
-    println("  Creating tables...")
-
     entityAccess.dropAndCreateTables()
-
-    println("   done")
   }
 
   private def loadDummyUsers(): Unit = {

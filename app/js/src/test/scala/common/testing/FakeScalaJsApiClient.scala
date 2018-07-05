@@ -1,19 +1,21 @@
 package common.testing
 
-import api.ScalaJsApi.{GetAllEntitiesResponse, ModificationsWithToken, UpdateToken}
-import api.ScalaJsApiClient
+import api.ScalaJsApi.{GetAllEntitiesResponse, ModificationsWithToken, UpdateToken, UserPrototype}
+import api.{ScalaJsApi, ScalaJsApiClient}
 import models.Entity
 import models.access.{DbQuery, DbQueryExecutor}
 import models.modification.{EntityModification, EntityType}
 
 import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
+import scala.collection.mutable
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 final class FakeScalaJsApiClient extends ScalaJsApiClient {
 
   private val modificationsBuffer: ModificationsBuffer = new ModificationsBuffer()
+  private val upsertedUserPrototypes: mutable.Buffer[UserPrototype] = mutable.Buffer()
 
   // **************** Implementation of ScalaJsApiClient trait ****************//
   override def getInitialData() = ???
@@ -47,10 +49,16 @@ final class FakeScalaJsApiClient extends ScalaJsApiClient {
     DbQueryExecutor.fromEntities(entities)
   }
 
+  override def upsertUser(userPrototype: UserPrototype): Future[Unit] = async {
+    upsertedUserPrototypes += userPrototype
+  }
+
   // **************** Additional methods for tests ****************//
   def addEntities[E <: Entity: EntityType](entities: E*): Unit = {
     modificationsBuffer.addEntities(entities.toVector)
   }
 
   def allModifications: Seq[EntityModification] = modificationsBuffer.getModifications()
+
+  def allUpsertedUserPrototypes: Seq[UserPrototype] = upsertedUserPrototypes.toVector
 }
