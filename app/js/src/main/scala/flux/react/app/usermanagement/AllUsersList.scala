@@ -35,6 +35,7 @@ private[app] final class AllUsersList(implicit i18n: I18n, userStore: UserStore)
 
     def willMount(state: State): Callback = LogExceptionsCallback {
       userStore.register(this)
+      $.modState(state => logExceptions(state.copy(maybeAllUsers = userStore.state.map(_.allUsers)))).runNow()
     }
 
     def willUnmount(): Callback = LogExceptionsCallback {
