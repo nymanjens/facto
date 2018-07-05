@@ -100,7 +100,7 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
   "upsertUser()" should {
     "add" in new WithApplication {
       serverFactory
-        .create()
+        .create()(testUser.copy(isAdmin = true))
         .upsertUser(UserPrototype.create(loginName = "tester", plainTextPassword = "abc", name = "Tester"))
 
       val storedUser = getOnlyElement(entityAccess.newQuerySync[User]().data())
@@ -115,11 +115,11 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
     "update" should {
       "password" in new WithApplication {
         serverFactory
-          .create()
+          .create()(testUser.copy(isAdmin = true))
           .upsertUser(UserPrototype.create(loginName = "tester", plainTextPassword = "abc", name = "Tester"))
         val createdUser = getOnlyElement(entityAccess.newQuerySync[User]().data())
         serverFactory
-          .create()
+          .create()(testUser.copy(idOption = Some(createdUser.id)))
           .upsertUser(UserPrototype.create(id = createdUser.id, plainTextPassword = "def"))
         val updatedUser = getOnlyElement(entityAccess.newQuerySync[User]().data())
 
@@ -127,12 +127,12 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
       }
       "isAdmin" in new WithApplication {
         serverFactory
-          .create()
+          .create()(testUser.copy(isAdmin = true))
           .upsertUser(UserPrototype
             .create(loginName = "tester", plainTextPassword = "abc", name = "Tester", isAdmin = false))
         val createdUser = getOnlyElement(entityAccess.newQuerySync[User]().data())
         serverFactory
-          .create()
+          .create()(testUser.copy(idOption = Some(createdUser.id)))
           .upsertUser(UserPrototype.create(id = createdUser.id, isAdmin = true))
         val updatedUser = getOnlyElement(entityAccess.newQuerySync[User]().data())
 
