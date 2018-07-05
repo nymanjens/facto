@@ -62,6 +62,21 @@ final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
     }
 
     override def persistEntityModifications(modifications: Seq[EntityModification]): Unit = {
+      // check permissions
+      for (modification <- modifications) {
+        require(
+          !modification.isInstanceOf[EntityModification.Update],
+          "Update modifications are not allowed to be created by clients " +
+            "(see EntityModification.Update documentation)"
+        )
+        require(
+          modification.entityType != EntityType.UserType,
+          "Please modify users by calling upsertUser() instead")
+        require(
+          modification.entityType != EntityType.ExchangeRateMeasurementType,
+          "Client initiated exchange rate measurement changes are not allowed")
+      }
+
       entityAccess.persistEntityModifications(modifications)
     }
 
