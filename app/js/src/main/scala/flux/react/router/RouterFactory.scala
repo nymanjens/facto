@@ -46,7 +46,7 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
 
           | staticRuleFromPage(Page.UserProfile, reactAppModule.userProfile.apply)
 
-          | staticRuleFromPage(Page.UserAdministration, reactAppModule.userProfile.apply)
+          | staticRuleFromPage(Page.UserAdministration, reactAppModule.userAdministration.apply)
 
           | staticRuleFromPage(Page.Everything, reactAppModule.everything.apply)
 

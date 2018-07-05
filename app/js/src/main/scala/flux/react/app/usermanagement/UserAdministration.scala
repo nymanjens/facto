@@ -1,20 +1,24 @@
 package flux.react.app.usermanagement
 
 import common.I18n
-import common.LoggingUtils.logExceptions
 import flux.react.router.RouterContext
+import flux.react.uielements
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
-import models.user.User
 
-private[app] final class UserAdministration(implicit user: User, i18n: I18n) {
+private[app] final class UserAdministration(implicit i18n: I18n, addUserForm: AddUserForm) {
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
-    .renderP(($, props) =>
-      logExceptions {
-        implicit val router = props.router
-        <.span("Hello world")
+    .renderP(($, props) => {
+      implicit val router = props.router
+      <.span(
+        uielements.PageHeader(router.currentPage),
+        <.div(
+          ^.className := "row",
+          addUserForm()
+        )
+      )
     })
     .build
 

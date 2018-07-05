@@ -15,6 +15,7 @@ final class Module(implicit i18n: I18n,
   import com.softwaremill.macwire._
 
   private implicit lazy val updatePasswordForm = wire[UpdatePasswordForm]
+  private implicit lazy val addUserForm = wire[AddUserForm]
 
   implicit lazy val userProfile: UserProfile = wire[UserProfile]
   implicit lazy val userAdministration: UserAdministration = wire[UserAdministration]
