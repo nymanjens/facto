@@ -1,7 +1,7 @@
 package flux.react
 
 import common.LoggingUtils.logExceptions
-import flux.FactoAppModule
+import flux.ClientAppModule
 import org.scalajs.dom
 import org.scalajs.dom.console
 import org.scalajs.dom.raw.Event
@@ -34,7 +34,7 @@ object FactoApp extends js.JSApp {
     implicit val scalaJsApiClient = apiModule.scalaJsApiClient
     implicit val initialDataResponse = await(scalaJsApiClient.getInitialData())
 
-    implicit val globalModule = new FactoAppModule()
+    implicit val globalModule = new ClientAppModule()
 
     // tell React to render the router in the document body
     logExceptions {

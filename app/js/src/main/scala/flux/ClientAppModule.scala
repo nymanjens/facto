@@ -7,8 +7,8 @@ import japgolly.scalajs.react.extra.router.Router
 import models.accounting.config.Config
 import models.user.User
 
-final class FactoAppModule(implicit getInitialDataResponse: GetInitialDataResponse,
-                           scalaJsApiClient: ScalaJsApiClient) {
+final class ClientAppModule(implicit getInitialDataResponse: GetInitialDataResponse,
+                            scalaJsApiClient: ScalaJsApiClient) {
 
   // Unpack arguments
   implicit private val accountingConfig: Config = getInitialDataResponse.accountingConfig
