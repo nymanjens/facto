@@ -4,8 +4,8 @@ import sbt.Project.projectToRef
 // a special crossProject for configuring a JS/JVM/shared structure
 lazy val shared = (crossProject.crossType(CrossType.Pure) in file("app/shared"))
   .settings(
-    scalaVersion := Settings.versions.scala,
-    libraryDependencies ++= Settings.sharedDependencies.value
+    scalaVersion := BuildSettings.versions.scala,
+    libraryDependencies ++= BuildSettings.sharedDependencies.value
   )
   // set up settings specific to the JS project
   .jsConfigure(_ enablePlugins ScalaJSPlay)
@@ -21,14 +21,14 @@ lazy val elideOptions = settingKey[Seq[String]]("Set limit for elidable function
 lazy val client: Project = (project in file("app/js"))
   .settings(
     name := "client",
-    version := Settings.version,
-    scalaVersion := Settings.versions.scala,
-    scalacOptions ++= Settings.scalacOptions,
-    libraryDependencies ++= Settings.scalajsDependencies.value,
+    version := BuildSettings.version,
+    scalaVersion := BuildSettings.versions.scala,
+    scalacOptions ++= BuildSettings.scalacOptions,
+    libraryDependencies ++= BuildSettings.scalajsDependencies.value,
     // by default we do development build, no eliding
     elideOptions := Seq(),
     scalacOptions ++= elideOptions.value,
-    jsDependencies ++= Settings.jsDependencies.value,
+    jsDependencies ++= BuildSettings.jsDependencies.value,
     // RuntimeDOM is needed for tests
     jsDependencies += RuntimeDOM % "test",
     // yes, we want to package JS dependencies
@@ -45,13 +45,13 @@ lazy val client: Project = (project in file("app/js"))
 lazy val webworkerClientDeps: Project = (project in file("app/empty"))
   .settings(
     name := "webworker-client-deps",
-    version := Settings.version,
-    scalaVersion := Settings.versions.scala,
-    scalacOptions ++= Settings.scalacOptions,
+    version := BuildSettings.version,
+    scalaVersion := BuildSettings.versions.scala,
+    scalacOptions ++= BuildSettings.scalacOptions,
     // by default we do development build, no eliding
     elideOptions := Seq(),
     scalacOptions ++= elideOptions.value,
-    jsDependencies ++= Settings.webworkerJsDependencies.value,
+    jsDependencies ++= BuildSettings.webworkerJsDependencies.value,
     // yes, we want to package JS dependencies
     skip in packageJSDependencies := false,
     // use Scala.js provided launcher code to start the client app
@@ -67,10 +67,10 @@ lazy val clients = Seq(client, webworkerClientDeps)
 lazy val server = (project in file("app/jvm"))
   .settings(
     name := "server",
-    version := Settings.version,
-    scalaVersion := Settings.versions.scala,
-    scalacOptions ++= Settings.scalacOptions,
-    libraryDependencies ++= Settings.jvmDependencies.value,
+    version := BuildSettings.version,
+    scalaVersion := BuildSettings.versions.scala,
+    scalacOptions ++= BuildSettings.scalacOptions,
+    libraryDependencies ++= BuildSettings.jvmDependencies.value,
     libraryDependencies += guice,
     commands += ReleaseCmd,
     javaOptions := Seq("-Dconfig.file=conf/application.conf"),

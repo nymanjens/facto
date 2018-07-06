@@ -2,7 +2,7 @@
 resolvers += "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/"
 
 // The Play plugin
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.6.15") // Must be the same as Settings.versions.play
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.6.15") // Must be the same as BuildSettings.versions.play
 addSbtPlugin("com.vmunier" % "sbt-play-scalajs" % "0.3.1")
 
 // scala.js plugins
