@@ -38,11 +38,11 @@ final class Endowments(implicit entriesStoreFactory: EndowmentEntriesStoreFactor
             uielements.CollapseAllExpandAllButtons(setExpanded =>
               $.modState(_.copy(setExpanded = setExpanded)))
           },
-          uielements.Panel(i18n("facto.all-accounts")) {
+          uielements.Panel(i18n("app.all-accounts")) {
             {
               for (account <- accountingConfig.personallySortedAccounts) yield {
                 entriesListTable(
-                  tableTitle = i18n("facto.endowments-of", account.longName),
+                  tableTitle = i18n("app.endowments-of", account.longName),
                   tableClasses = Seq("table-endowments"),
                   key = account.code,
                   numEntriesStrategy = NumEntriesStrategy(start = 30, intermediateBeforeInf = Seq(100)),
@@ -50,13 +50,13 @@ final class Endowments(implicit entriesStoreFactory: EndowmentEntriesStoreFactor
                   additionalInput = account,
                   hideEmptyTable = true,
                   tableHeaders = Seq(
-                    <.th(i18n("facto.payed")),
-                    <.th(i18n("facto.consumed")),
-                    <.th(i18n("facto.beneficiary")),
-                    <.th(i18n("facto.payed-with-to")),
-                    <.th(i18n("facto.category")),
-                    <.th(i18n("facto.description")),
-                    <.th(i18n("facto.flow")),
+                    <.th(i18n("app.payed")),
+                    <.th(i18n("app.consumed")),
+                    <.th(i18n("app.beneficiary")),
+                    <.th(i18n("app.payed-with-to")),
+                    <.th(i18n("app.category")),
+                    <.th(i18n("app.description")),
+                    <.th(i18n("app.flow")),
                     <.th("")
                   ),
                   calculateTableData = entry =>

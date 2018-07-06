@@ -19,7 +19,7 @@ final class WaitForFuture[V] {
         case None =>
           <.div(
             ^.style := js.Dictionary("padding" -> "200px 0  500px 60px"),
-            s"${props.i18n("facto.loading")}...")
+            s"${props.i18n("app.loading")}...")
     })
     .componentWillMount($ =>
       LogExceptionsCallback {

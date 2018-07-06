@@ -60,7 +60,7 @@ final class Summary(implicit summaryTable: SummaryTable,
                 .TextInput(
                   ref = queryInputRef,
                   name = "query",
-                  placeholder = i18n("facto.example-query"),
+                  placeholder = i18n("app.example-query"),
                   classes = Seq("form-control")),
               <.span(
                 ^.className := "input-group-btn",
@@ -97,8 +97,8 @@ final class Summary(implicit summaryTable: SummaryTable,
         <.a(
           ^.className := "btn btn-info btn-lg btn-block",
           ^.onClick --> $.modState(s => s.copy(includeUnrelatedAccounts = !s.includeUnrelatedAccounts)),
-          if (state.includeUnrelatedAccounts) i18n("facto.hide-other-accounts")
-          else i18n("facto.show-other-accounts")
+          if (state.includeUnrelatedAccounts) i18n("app.hide-other-accounts")
+          else i18n("app.show-other-accounts")
         )
       )
     }

@@ -33,7 +33,7 @@ final class GlobalMessagesStore(implicit i18n: I18n,
   // **************** Private dispatcher methods ****************//
   private def dispatcherListener: PartialFunction[Action, Unit] = {
     case action if getCompletionMessage.isDefinedAt(action) =>
-      setState(Message(string = i18n("facto.sending-data-to-server"), messageType = Message.Type.Working))
+      setState(Message(string = i18n("app.sending-data-to-server"), messageType = Message.Type.Working))
 
     case Action.Done(action) =>
       getCompletionMessage.lift.apply(action) match {
@@ -47,7 +47,7 @@ final class GlobalMessagesStore(implicit i18n: I18n,
       getCompletionMessage.lift.apply(action) match {
         case Some(message) =>
           setState(
-            Message(string = i18n("facto.sending-data-to-server-failed"), messageType = Message.Type.Failure))
+            Message(string = i18n("app.sending-data-to-server-failed"), messageType = Message.Type.Failure))
           clearMessageAfterDelay()
         case None =>
       }
@@ -62,31 +62,31 @@ final class GlobalMessagesStore(implicit i18n: I18n,
     // **************** User-related actions **************** //
     case UpsertUser(userPrototype)
         if userPrototype.id.isDefined && userPrototype.plainTextPassword.isDefined =>
-      i18n("facto.successfully-updated-password")
+      i18n("app.successfully-updated-password")
     case UpsertUser(userPrototype) if userPrototype.id.isEmpty =>
-      i18n("facto.successfully-added-user", userPrototype.loginName getOrElse "<Unknown name>")
+      i18n("app.successfully-added-user", userPrototype.loginName getOrElse "<Unknown name>")
 
     // **************** Transaction[Group]-related actions **************** //
     case AddTransactionGroup(transactionsProvider) if numTransactions(transactionsProvider) == 1 =>
-      i18n("facto.successfully-created-1-transaction")
+      i18n("app.successfully-created-1-transaction")
     case AddTransactionGroup(transactionsProvider) =>
-      i18n("facto.successfully-created-transactions", numTransactions(transactionsProvider))
+      i18n("app.successfully-created-transactions", numTransactions(transactionsProvider))
 
     case UpdateTransactionGroup(group, transactions) if transactions.size == 1 =>
-      i18n("facto.successfully-edited-1-transaction")
+      i18n("app.successfully-edited-1-transaction")
     case UpdateTransactionGroup(group, transactions) =>
-      i18n("facto.successfully-edited-transactions", transactions.size)
+      i18n("app.successfully-edited-transactions", transactions.size)
 
     case RemoveTransactionGroup(group) =>
-      i18n("facto.successfully-deleted-transactions")
+      i18n("app.successfully-deleted-transactions")
 
     // **************** BalanceCheck-related actions **************** //
     case AddBalanceCheck(balanceCheck) =>
-      i18n("facto.successfully-created-a-balance-check-for", balanceCheck.moneyReservoir.name)
+      i18n("app.successfully-created-a-balance-check-for", balanceCheck.moneyReservoir.name)
     case UpdateBalanceCheck(existingBalanceCheck, newBalanceCheck) =>
-      i18n("facto.successfully-edited-a-balance-check-for", newBalanceCheck.moneyReservoir.name)
+      i18n("app.successfully-edited-a-balance-check-for", newBalanceCheck.moneyReservoir.name)
     case RemoveBalanceCheck(existingBalanceCheck) =>
-      i18n("facto.successfully-deleted-balance-check-for", existingBalanceCheck.moneyReservoir.name)
+      i18n("app.successfully-deleted-balance-check-for", existingBalanceCheck.moneyReservoir.name)
   }
 
   /** Clear this message after some delay */

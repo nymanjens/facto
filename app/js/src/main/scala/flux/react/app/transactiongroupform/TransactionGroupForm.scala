@@ -200,7 +200,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
                   ^.className := "btn btn-default delete-button",
                   <.i(^.className := "fa fa-times"),
                   " ",
-                  i18n("facto.delete"),
+                  i18n("app.delete"),
                   ^.onClick --> onDelete
                 )
               },
@@ -245,7 +245,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
                 transactionPanel(
                   key = panelIndex,
                   ref = panelRef(panelIndex),
-                  title = i18n("facto.transaction") + " " + (i + 1),
+                  title = i18n("app.transaction") + " " + (i + 1),
                   defaultValues = transactionPartial,
                   forceFlowValue = if (lastPanel && state.totalFlowRestriction.userSetsTotal) {
                     Some(state.totalFlow - state.totalFlowExceptLast)
@@ -270,7 +270,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
                   ^.tpe := "submit",
                   ^.className := "btn btn-default",
                   ^.onClick ==> onSubmit,
-                  i18n("facto.ok")
+                  i18n("app.ok")
                 )
               )
             )
@@ -341,17 +341,17 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
           datas.size match {
             case 0                                => throw new AssertionError("Should not be possible")
-            case 1 if containsEmptyReservoirCodes => Some(i18n("facto.error.noReservoir.atLeast2"))
+            case 1 if containsEmptyReservoirCodes => Some(i18n("app.error.noReservoir.atLeast2"))
             case _ =>
               if (containsEmptyReservoirCodes) {
                 if (allReservoirCodesAreEmpty) {
                   if (state.totalFlow.isZero) {
                     None
                   } else {
-                    Some(i18n("facto.error.noReservoir.zeroSum"))
+                    Some(i18n("app.error.noReservoir.zeroSum"))
                   }
                 } else {
-                  Some(i18n("facto.error.noReservoir.notAllTheSame"))
+                  Some(i18n("app.error.noReservoir.notAllTheSame"))
                 }
               } else {
                 None
@@ -368,7 +368,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
             foreignCurrency && dateInFuture
           }
           if (futureForeignTransactionsExist) {
-            Some(i18n("facto.error.foreignReservoirInFuture"))
+            Some(i18n("app.error.foreignReservoirInFuture"))
           } else {
             None
           }

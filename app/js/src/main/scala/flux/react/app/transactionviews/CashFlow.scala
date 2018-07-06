@@ -53,7 +53,7 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
               account <- accountingConfig.personallySortedAccounts
               if state.includeUnrelatedReservoirs || account.isMineOrCommon
             } yield {
-              uielements.Panel(i18n("facto.account-of", account.longName), key = account.code) {
+              uielements.Panel(i18n("app.account-of", account.longName), key = account.code) {
                 {
                   for {
                     reservoir <- accountingConfig
@@ -72,15 +72,15 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
                       setExpanded = state.setExpanded,
                       additionalInput = reservoir,
                       latestEntryToTableTitleExtra =
-                        latestEntry => s"${i18n("facto.balance")}: ${latestEntry.balance}",
+                        latestEntry => s"${i18n("app.balance")}: ${latestEntry.balance}",
                       tableHeaders = Seq(
-                        <.th(i18n("facto.payed")),
-                        <.th(i18n("facto.consumed")),
-                        <.th(i18n("facto.beneficiary")),
-                        <.th(i18n("facto.category")),
-                        <.th(i18n("facto.description")),
-                        <.th(i18n("facto.flow")),
-                        <.th(i18n("facto.balance"), " ", balanceCheckAddNewButton(reservoir)),
+                        <.th(i18n("app.payed")),
+                        <.th(i18n("app.consumed")),
+                        <.th(i18n("app.beneficiary")),
+                        <.th(i18n("app.category")),
+                        <.th(i18n("app.description")),
+                        <.th(i18n("app.flow")),
+                        <.th(i18n("app.balance"), " ", balanceCheckAddNewButton(reservoir)),
                         <.th(transactionGroupAddButton(reservoir))
                       ),
                       calculateTableDataFromEntryAndRowNum = (cashFlowEntry, rowNumber) =>
@@ -110,7 +110,7 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
                               <.td(
                                 ^.colSpan := 4,
                                 ^.style := js.Dictionary("fontWeight" -> "bold"),
-                                i18n("facto.balance-correction") + ":"),
+                                i18n("app.balance-correction") + ":"),
                               <.td(
                                 ^.style := js.Dictionary("fontWeight" -> "bold"),
                                 if (entry.balanceIncrease.cents > 0) "+" else "-",
@@ -136,8 +136,8 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
             ^.className := "btn btn-info btn-lg btn-block",
             ^.onClick --> LogExceptionsCallback(
               $.modState(s => s.copy(includeUnrelatedReservoirs = !s.includeUnrelatedReservoirs)).runNow()),
-            if (state.includeUnrelatedReservoirs) i18n("facto.hide-other-accounts")
-            else i18n("facto.show-other-accounts")
+            if (state.includeUnrelatedReservoirs) i18n("app.hide-other-accounts")
+            else i18n("app.show-other-accounts")
           ),
           // includeHiddenReservoirs toggle button
           <<.ifThen(state.includeHiddenReservoirs || state.includeUnrelatedReservoirs) {
@@ -145,8 +145,8 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
               ^.className := "btn btn-info btn-lg btn-block",
               ^.onClick --> LogExceptionsCallback(
                 $.modState(s => s.copy(includeHiddenReservoirs = !s.includeHiddenReservoirs)).runNow()),
-              if (state.includeHiddenReservoirs) i18n("facto.hide-hidden-reservoirs")
-              else i18n("facto.show-hidden-reservoirs")
+              if (state.includeHiddenReservoirs) i18n("app.hide-hidden-reservoirs")
+              else i18n("app.show-hidden-reservoirs")
             )
           }
         )
@@ -175,7 +175,7 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
       ^.role := "button",
       <.i(^.className := "icon-new-empty"),
       " ",
-      i18n("facto.add-new")
+      i18n("app.add-new")
     )
   }
 
@@ -204,7 +204,7 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
       ^.role := "button",
       <.i(^.className := "fa fa-pencil fa-fw"),
       " ",
-      i18n("facto.edit")
+      i18n("app.edit")
     )
   }
 

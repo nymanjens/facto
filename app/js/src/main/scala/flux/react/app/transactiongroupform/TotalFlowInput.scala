@@ -44,7 +44,7 @@ private[transactiongroupform] final class TotalFlowInput(implicit i18n: I18n,
             ^.className := "input-group",
             <.span(
               ^.className := "input-group-addon",
-              i18n("facto.total") + ":"
+              i18n("app.total") + ":"
             ),
             <.span(
               ^.className := "input-group-addon",

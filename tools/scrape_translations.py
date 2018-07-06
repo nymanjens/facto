@@ -10,9 +10,9 @@ def generate_code(words_html):
   assert re.match(r'^[a-z0-9-]+$', code), "Illegal code: {}".format(code)
   assert "--" not in code, "Illegal code: {}".format(code)
   if words_html != words:
-    return "facto.{}.html".format(code)
+    return "app.{}.html".format(code)
   else:
-    return "facto.{}".format(code)
+    return "app.{}".format(code)
 
 def add_to_messages(fpath, code, words):
   line_to_add = "{}={}\n".format(code, words)

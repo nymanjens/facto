@@ -27,7 +27,7 @@ private[app] final class TemplateList(implicit user: User,
         <.span(
           uielements.PageHeader(router.currentPage),
           Panel(
-            title = i18n("facto.templates"),
+            title = i18n("app.templates"),
             panelClasses = Seq("templates-panel")
           ) {
             val templates = accountingConfig.templatesToShowFor(Template.Placement.TemplateList, user)

@@ -119,11 +119,11 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
   }
 
   private object AppConfigHelper {
-    def dropAndCreateNewDb: Boolean = getBoolean("facto.development.dropAndCreateNewDb")
-    def loadDummyUsers: Boolean = getBoolean("facto.development.loadDummyUsers")
-    def loadCsvDummyData: Boolean = getBoolean("facto.development.loadCsvDummyData")
-    def csvDummyDataFolder: Path = getExistingPath("facto.development.csvDummyDataFolder")
-    def defaultPassword: Option[String] = getString("facto.setup.defaultPassword")
+    def dropAndCreateNewDb: Boolean = getBoolean("app.development.dropAndCreateNewDb")
+    def loadDummyUsers: Boolean = getBoolean("app.development.loadDummyUsers")
+    def loadCsvDummyData: Boolean = getBoolean("app.development.loadCsvDummyData")
+    def csvDummyDataFolder: Path = getExistingPath("app.development.csvDummyDataFolder")
+    def defaultPassword: Option[String] = getString("app.setup.defaultPassword")
 
     private def getBoolean(cfgPath: String): Boolean =
       app.configuration.getOptional[Boolean](cfgPath) getOrElse false

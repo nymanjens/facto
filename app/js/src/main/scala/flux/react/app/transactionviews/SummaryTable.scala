@@ -225,7 +225,7 @@ private[transactionviews] final class SummaryTable(
             <.th(
               ^.colSpan := columns.size,
               <.span(^.className := "primary-title", account.longName),
-              <.span(^.className := "secondary-title", i18n("facto.net-worth"), " ", data.netWorth.toString)
+              <.span(^.className := "secondary-title", i18n("app.net-worth"), " ", data.netWorth.toString)
             )
           ),
           // **************** Year header **************** //
@@ -257,7 +257,7 @@ private[transactionviews] final class SummaryTable(
           <.tr(
             columns.map {
               case TitleColumn =>
-                <.th(^.key := "title", i18n("facto.category"))
+                <.th(^.key := "title", i18n("app.category"))
               case OmittedYearsColumn(yearRange) =>
                 <.th(
                   ^.key := "omitted-years",
@@ -268,7 +268,7 @@ private[transactionviews] final class SummaryTable(
               case MonthColumn(month) =>
                 <.th(^.key := s"${month.year}-${month.month}", month.abbreviation)
               case AverageColumn(year) =>
-                <.th(^.key := s"avg-$year", i18n("facto.avg"))
+                <.th(^.key := s"avg-$year", i18n("app.avg"))
             }.toVdomArray
           )
         ),
@@ -354,7 +354,7 @@ private[transactionviews] final class SummaryTable(
                 ^.key := s"exchange-rate-gains-${currency.code}",
                 columns.map {
                   case TitleColumn =>
-                    <.td(^.key := "title", i18n("facto.exchange-rate-gains"), " ", currency.code)
+                    <.td(^.key := "title", i18n("app.exchange-rate-gains"), " ", currency.code)
                   case OmittedYearsColumn(_) =>
                     <.td(^.key := "omitted-years", "...")
                   case MonthColumn(month) =>
@@ -380,7 +380,7 @@ private[transactionviews] final class SummaryTable(
                 case _ if data.categories.nonEmpty =>
                   Seq(
                     SummaryTotalRowDef(
-                      rowTitleHtml = s"<b>${i18n("facto.total")}</b>",
+                      rowTitleHtml = s"<b>${i18n("app.total")}</b>",
                       categoriesToIgnore = Set()))
                 case _ => Seq()
               }

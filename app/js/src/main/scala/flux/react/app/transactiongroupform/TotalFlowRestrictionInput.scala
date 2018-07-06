@@ -30,9 +30,9 @@ private[transactiongroupform] final class TotalFlowRestrictionInput(implicit i18
         <.div(
           ^.className := "btn-group",
           VdomAttr("data-toggle") := "buttons",
-          button(TotalFlowRestriction.AnyTotal, i18n("facto.any-total")),
-          button(TotalFlowRestriction.ChooseTotal, i18n("facto.choose-total")),
-          button(TotalFlowRestriction.ZeroSum, i18n("facto.zero-sum"))
+          button(TotalFlowRestriction.AnyTotal, i18n("app.any-total")),
+          button(TotalFlowRestriction.ChooseTotal, i18n("app.choose-total")),
+          button(TotalFlowRestriction.ZeroSum, i18n("app.zero-sum"))
         )
     })
     .build

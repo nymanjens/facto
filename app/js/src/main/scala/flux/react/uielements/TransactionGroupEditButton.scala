@@ -17,7 +17,7 @@ object TransactionGroupEditButton {
         ^.role := "button",
         <.i(^^.classes("fa", "fa-pencil", "fa-fw")),
         " ",
-        props.i18n("facto.edit")
+        props.i18n("app.edit")
       )
     })
     .build

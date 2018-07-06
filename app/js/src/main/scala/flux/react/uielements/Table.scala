@@ -55,7 +55,7 @@ object Table {
             }.toVdomArray,
             if (props.tableRowDatas.isEmpty) {
               <.tr(
-                <.td(^.colSpan := props.colSpan, ^^.classes("no-entries"), props.i18n("facto.no-entries"))
+                <.td(^.colSpan := props.colSpan, ^^.classes("no-entries"), props.i18n("app.no-entries"))
               )
             } else if (props.expandNumEntriesCallback.isDefined) {
               <.tr(

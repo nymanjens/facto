@@ -39,7 +39,7 @@ private[usermanagement] final class AddUserForm(implicit user: User, i18n: I18n,
     def render(props: Props, state: State) = logExceptions {
       <.form(
         ^.className := "form-horizontal",
-        uielements.HalfPanel(title = <.span(i18n("facto.add-user")))(
+        uielements.HalfPanel(title = <.span(i18n("app.add-user")))(
           {
             for (error <- state.globalErrors) yield {
               <.div(^.className := "alert alert-danger", ^.key := error, error)
@@ -48,21 +48,21 @@ private[usermanagement] final class AddUserForm(implicit user: User, i18n: I18n,
           bootstrap.TextInput(
             ref = loginNameRef,
             name = "loginName",
-            label = i18n("facto.login-name"),
+            label = i18n("app.login-name"),
             required = true,
             showErrorMessage = state.showErrorMessages
           ),
           bootstrap.TextInput(
             ref = nameRef,
             name = "name",
-            label = i18n("facto.full-name"),
+            label = i18n("app.full-name"),
             required = true,
             showErrorMessage = state.showErrorMessages
           ),
           bootstrap.TextInput(
             ref = passwordRef,
             name = "password",
-            label = i18n("facto.password"),
+            label = i18n("app.password"),
             inputType = "password",
             required = true,
             showErrorMessage = state.showErrorMessages
@@ -70,7 +70,7 @@ private[usermanagement] final class AddUserForm(implicit user: User, i18n: I18n,
           bootstrap.TextInput(
             ref = passwordVerificationRef,
             name = "passwordVerification",
-            label = i18n("facto.retype-password"),
+            label = i18n("app.retype-password"),
             inputType = "password",
             required = true,
             showErrorMessage = state.showErrorMessages
@@ -79,7 +79,7 @@ private[usermanagement] final class AddUserForm(implicit user: User, i18n: I18n,
             ^.tpe := "submit",
             ^.className := "btn btn-default",
             ^.onClick ==> onSubmit,
-            i18n("facto.add"))
+            i18n("app.add"))
         )
       )
     }
@@ -99,7 +99,7 @@ private[usermanagement] final class AddUserForm(implicit user: User, i18n: I18n,
             passwordVerification <- passwordVerificationRef().value
             validPassword <- {
               if (password != passwordVerification) {
-                newState = newState.copy(globalErrors = Seq(i18n("facto.error.passwords-should-match")))
+                newState = newState.copy(globalErrors = Seq(i18n("app.error.passwords-should-match")))
                 None
               } else {
                 Some(password)

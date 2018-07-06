@@ -41,31 +41,31 @@ object Page {
   }
 
   // **************** User management views **************** //
-  case object UserProfile extends PageBase("facto.user-profile", iconClass = "fa fa-user fa-fw")
-  case object UserAdministration extends PageBase("facto.user-administration", iconClass = "fa fa-cogs fa-fw")
+  case object UserProfile extends PageBase("app.user-profile", iconClass = "fa fa-user fa-fw")
+  case object UserAdministration extends PageBase("app.user-administration", iconClass = "fa fa-cogs fa-fw")
 
   // **************** Accounting data views **************** //
-  case object Everything extends PageBase("facto.everything", iconClass = "icon-list")
-  case object CashFlow extends PageBase("facto.cash-flow", iconClass = "icon-money")
-  case object Liquidation extends PageBase("facto.liquidation", iconClass = "icon-balance-scale")
-  case object Endowments extends PageBase("facto.endowments", iconClass = "icon-crown")
-  case object Summary extends PageBase("facto.summary", iconClass = "icon-table")
+  case object Everything extends PageBase("app.everything", iconClass = "icon-list")
+  case object CashFlow extends PageBase("app.cash-flow", iconClass = "icon-money")
+  case object Liquidation extends PageBase("app.liquidation", iconClass = "icon-balance-scale")
+  case object Endowments extends PageBase("app.endowments", iconClass = "icon-crown")
+  case object Summary extends PageBase("app.summary", iconClass = "icon-table")
   case class Search private[router] (private[router] val encodedQuery: String) extends Page {
     def query: String = js.URIUtils.decodeURIComponent(js.URIUtils.decodeURI(encodedQuery))
 
-    override def title(implicit i18n: I18n) = i18n("facto.search-results-for", query)
+    override def title(implicit i18n: I18n) = i18n("app.search-results-for", query)
     override def iconClass = "icon-list"
   }
   object Search {
     def apply(query: String): Search = new Search(js.URIUtils.encodeURIComponent(query))
   }
-  case object TemplateList extends PageBase("facto.templates", iconClass = "icon-template")
+  case object TemplateList extends PageBase("app.templates", iconClass = "icon-template")
 
   // **************** Accounting forms - transactions **************** //
   case class NewTransactionGroup private (encodedReturnTo: Option[String])
       extends HasReturnTo(encodedReturnTo)
       with Page {
-    override def title(implicit i18n: I18n) = i18n("facto.new-transaction")
+    override def title(implicit i18n: I18n) = i18n("app.new-transaction")
     override def iconClass = "icon-new-empty"
   }
   object NewTransactionGroup {
@@ -76,7 +76,7 @@ object Page {
   case class EditTransactionGroup private (transactionGroupId: Long, encodedReturnTo: Option[String])
       extends HasReturnTo(encodedReturnTo)
       with Page {
-    override def title(implicit i18n: I18n) = i18n("facto.edit-transaction")
+    override def title(implicit i18n: I18n) = i18n("app.edit-transaction")
     override def iconClass = "icon-new-empty"
   }
   object EditTransactionGroup {
@@ -88,7 +88,7 @@ object Page {
   case class NewTransactionGroupFromReservoir private (reservoirCode: String, encodedReturnTo: Option[String])
       extends HasReturnTo(encodedReturnTo)
       with Page {
-    override def title(implicit i18n: I18n) = i18n("facto.new-transaction")
+    override def title(implicit i18n: I18n) = i18n("app.new-transaction")
     override def iconClass = "icon-new-empty"
   }
   object NewTransactionGroupFromReservoir {
@@ -100,7 +100,7 @@ object Page {
   case class NewFromTemplate private (templateCode: String, encodedReturnTo: Option[String])
       extends HasReturnTo(encodedReturnTo)
       with Page {
-    override def title(implicit i18n: I18n) = i18n("facto.new-transaction")
+    override def title(implicit i18n: I18n) = i18n("app.new-transaction")
     override def iconClass = "icon-new-empty"
   }
   object NewFromTemplate {
@@ -113,7 +113,7 @@ object Page {
                                       encodedReturnTo: Option[String])
       extends HasReturnTo(encodedReturnTo)
       with Page {
-    override def title(implicit i18n: I18n) = i18n("facto.new-transaction")
+    override def title(implicit i18n: I18n) = i18n("app.new-transaction")
     override def iconClass = "icon-new-empty"
   }
   object NewForRepayment {
@@ -125,7 +125,7 @@ object Page {
   case class NewBalanceCheck private (reservoirCode: String, encodedReturnTo: Option[String])
       extends HasReturnTo(encodedReturnTo)
       with Page {
-    override def title(implicit i18n: I18n) = i18n("facto.new-balance-check")
+    override def title(implicit i18n: I18n) = i18n("app.new-balance-check")
     override def iconClass = "icon-new-empty"
   }
   object NewBalanceCheck {
@@ -136,7 +136,7 @@ object Page {
   case class EditBalanceCheck private (balanceCheckId: Long, encodedReturnTo: Option[String])
       extends HasReturnTo(encodedReturnTo)
       with Page {
-    override def title(implicit i18n: I18n) = i18n("facto.edit-balance-check")
+    override def title(implicit i18n: I18n) = i18n("app.edit-balance-check")
     override def iconClass = "icon-new-empty"
   }
   object EditBalanceCheck {

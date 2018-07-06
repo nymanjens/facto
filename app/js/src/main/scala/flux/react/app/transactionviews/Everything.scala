@@ -32,21 +32,21 @@ final class Everything(implicit entriesStoreFactory: AllEntriesStoreFactory,
         implicit val router = props.router
         <.span(
           uielements.PageHeader(router.currentPage),
-          uielements.Panel(i18n("facto.genral-information-about-all-entries"))(
+          uielements.Panel(i18n("app.genral-information-about-all-entries"))(
             entriesListTable(
-              tableTitle = i18n("facto.all"),
+              tableTitle = i18n("app.all"),
               tableClasses = Seq("table-everything"),
               numEntriesStrategy = NumEntriesStrategy(start = 400),
               additionalInput = (): Unit,
               tableHeaders = Seq(
-                <.th(i18n("facto.issuer")),
-                <.th(i18n("facto.payed")),
-                <.th(i18n("facto.consumed")),
-                <.th(i18n("facto.beneficiary")),
-                <.th(i18n("facto.payed-with-to")),
-                <.th(i18n("facto.category")),
-                <.th(i18n("facto.description")),
-                <.th(i18n("facto.flow")),
+                <.th(i18n("app.issuer")),
+                <.th(i18n("app.payed")),
+                <.th(i18n("app.consumed")),
+                <.th(i18n("app.beneficiary")),
+                <.th(i18n("app.payed-with-to")),
+                <.th(i18n("app.category")),
+                <.th(i18n("app.description")),
+                <.th(i18n("app.flow")),
                 <.th("")
               ),
               calculateTableData = entry =>

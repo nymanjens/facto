@@ -38,7 +38,7 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
             uielements.CollapseAllExpandAllButtons(setExpanded =>
               $.modState(_.copy(setExpanded = setExpanded)))
           },
-          uielements.Panel(i18n("facto.all-combinations")) {
+          uielements.Panel(i18n("app.all-combinations")) {
             {
               for {
                 (account1, i1) <- accountingConfig.personallySortedAccounts.zipWithIndex
@@ -48,7 +48,7 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
                 val accountPair = AccountPair(account1, account2)
                 val startNumEntries = 10
                 entriesListTable(
-                  tableTitle = i18n("facto.debt-of", account1.longName, account2.longName),
+                  tableTitle = i18n("app.debt-of", account1.longName, account2.longName),
                   tableClasses = Seq("table-liquidation"),
                   key = s"${account1.code}_${account2.code}",
                   numEntriesStrategy =
@@ -58,12 +58,12 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
                   latestEntryToTableTitleExtra = latestEntry => latestEntry.debt.toString,
                   hideEmptyTable = true,
                   tableHeaders = Seq(
-                    <.th(i18n("facto.payed")),
-                    <.th(i18n("facto.beneficiary")),
-                    <.th(i18n("facto.payed-with-to")),
-                    <.th(i18n("facto.category")),
-                    <.th(i18n("facto.description")),
-                    <.th(i18n("facto.flow")),
+                    <.th(i18n("app.payed")),
+                    <.th(i18n("app.beneficiary")),
+                    <.th(i18n("app.payed-with-to")),
+                    <.th(i18n("app.category")),
+                    <.th(i18n("app.description")),
+                    <.th(i18n("app.flow")),
                     <.th(s"${account1.veryShortName} -> ${account2.veryShortName}"),
                     <.th(repayButton(account1 = account1, account2 = account2))
                   ),
@@ -100,7 +100,7 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
       ^.role := "button",
       <.i(^.className := "fa fa-check-square-o fa-fw"),
       " ",
-      i18n("facto.repay")
+      i18n("app.repay")
     )
 
   }

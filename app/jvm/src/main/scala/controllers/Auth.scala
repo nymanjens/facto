@@ -32,7 +32,7 @@ final class Auth @Inject()(implicit override val messagesApi: MessagesApi,
 
   def logout = Action { implicit request =>
     Redirect(routes.Auth.login("/")).withNewSession.flashing(
-      "message" -> Messages("facto.you-are-now-logged-out")
+      "message" -> Messages("app.you-are-now-logged-out")
     )
   }
 }
@@ -45,7 +45,7 @@ object Auth {
       tuple(
         "loginName" -> nonEmptyText,
         "password" -> text
-      ) verifying ("facto.error.invalid-username-or-password", result =>
+      ) verifying ("app.error.invalid-username-or-password", result =>
         result match {
           case (loginName, password) => Users.authenticate(loginName, password)
       })

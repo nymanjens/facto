@@ -47,14 +47,14 @@ private[app] final class AllUsersList(implicit i18n: I18n, userStore: UserStore)
     }
 
     def render(props: Props, state: State): VdomElement = logExceptions {
-      uielements.HalfPanel(title = <.span(i18n("facto.all-users"))) {
+      uielements.HalfPanel(title = <.span(i18n("app.all-users"))) {
         uielements.Table(
           tableHeaders = Seq(
-            <.th(i18n("facto.login-name")),
-            <.th(i18n("facto.full-name")),
-            <.th(i18n("facto.is-admin")),
-            <.th(i18n("facto.expand-cash-flow")),
-            <.th(i18n("facto.expand-liquidation"))
+            <.th(i18n("app.login-name")),
+            <.th(i18n("app.full-name")),
+            <.th(i18n("app.is-admin")),
+            <.th(i18n("app.expand-cash-flow")),
+            <.th(i18n("app.expand-liquidation"))
           ),
           tableRowDatas = tableRowDatas(state)
         )

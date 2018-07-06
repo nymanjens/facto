@@ -105,7 +105,7 @@ final class BalanceCheckForm(implicit i18n: I18n,
                     ^.className := "btn btn-default delete-button",
                     <.i(^.className := "fa fa-times"),
                     " ",
-                    i18n("facto.delete"),
+                    i18n("app.delete"),
                     ^.onClick --> onDelete
                   ))
               }
@@ -116,18 +116,18 @@ final class BalanceCheckForm(implicit i18n: I18n,
           ^.className := "row",
           <.form(
             ^.className := "form-horizontal",
-            HalfPanel(title = <.span(i18n("facto.balance-check")))(
+            HalfPanel(title = <.span(i18n("app.balance-check")))(
               bootstrap.TextInput(
                 ref = bootstrap.TextInput.ref(),
                 name = "issuer",
-                label = i18n("facto.issuer"),
+                label = i18n("app.issuer"),
                 defaultValue = props.operationMeta.issuer.name,
                 disabled = true
               ),
               bootstrap.TextInput(
                 ref = bootstrap.TextInput.ref(),
                 name = "money-reservoir",
-                label = i18n("facto.reservoir"),
+                label = i18n("app.reservoir"),
                 defaultValue = props.operationMeta.reservoir.name,
                 disabled = true
               ),
@@ -140,7 +140,7 @@ final class BalanceCheckForm(implicit i18n: I18n,
                 bootstrap.TextInput(
                   ref = mappedExtraProps.ref,
                   name = "check-date",
-                  label = i18n("facto.check-date"),
+                  label = i18n("app.check-date"),
                   defaultValue = mappedExtraProps.defaultValue,
                   required = true,
                   showErrorMessage = state.showErrorMessages,
@@ -150,7 +150,7 @@ final class BalanceCheckForm(implicit i18n: I18n,
               bootstrap.MoneyInput(
                 ref = balanceRef,
                 name = "balance",
-                label = i18n("facto.balance"),
+                label = i18n("app.balance"),
                 defaultValue = props.operationMeta.balanceInCents,
                 required = false, // not required to be different from 0.0
                 showErrorMessage = state.showErrorMessages,
@@ -165,7 +165,7 @@ final class BalanceCheckForm(implicit i18n: I18n,
                   ^.tpe := "submit",
                   ^.className := "btn btn-default",
                   ^.onClick ==> onSubmit,
-                  i18n("facto.ok")
+                  i18n("app.ok")
                 )
               )
             )

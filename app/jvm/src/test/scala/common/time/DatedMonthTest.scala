@@ -17,7 +17,7 @@ class DatedMonthTest extends HookedSpecification {
 
   "abbreviation" in {
     val month = DatedMonth(LocalDate.of(1990, JUNE, 1))
-    month.abbreviation mustEqual "facto.date.month.jun.abbrev"
+    month.abbreviation mustEqual "app.date.month.jun.abbrev"
   }
 
   "contains" in {

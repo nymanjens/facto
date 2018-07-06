@@ -11,28 +11,28 @@ object Formatting {
   // Note: Cannot use DateTimeFormatter as it isn't supported by scala.js
 
   private val monthToMessageKey: Map[Month, String] = Map(
-    JANUARY -> "facto.date.month.jan.abbrev",
-    FEBRUARY -> "facto.date.month.feb.abbrev",
-    MARCH -> "facto.date.month.mar.abbrev",
-    APRIL -> "facto.date.month.apr.abbrev",
-    MAY -> "facto.date.month.may.abbrev",
-    JUNE -> "facto.date.month.jun.abbrev",
-    JULY -> "facto.date.month.jul.abbrev",
-    AUGUST -> "facto.date.month.aug.abbrev",
-    SEPTEMBER -> "facto.date.month.sep.abbrev",
-    OCTOBER -> "facto.date.month.oct.abbrev",
-    NOVEMBER -> "facto.date.month.nov.abbrev",
-    DECEMBER -> "facto.date.month.dec.abbrev"
+    JANUARY -> "app.date.month.jan.abbrev",
+    FEBRUARY -> "app.date.month.feb.abbrev",
+    MARCH -> "app.date.month.mar.abbrev",
+    APRIL -> "app.date.month.apr.abbrev",
+    MAY -> "app.date.month.may.abbrev",
+    JUNE -> "app.date.month.jun.abbrev",
+    JULY -> "app.date.month.jul.abbrev",
+    AUGUST -> "app.date.month.aug.abbrev",
+    SEPTEMBER -> "app.date.month.sep.abbrev",
+    OCTOBER -> "app.date.month.oct.abbrev",
+    NOVEMBER -> "app.date.month.nov.abbrev",
+    DECEMBER -> "app.date.month.dec.abbrev"
   )
 
   private val dayOfWeekToMessageKey: Map[DayOfWeek, String] = Map(
-    MONDAY -> "facto.date.dayofweek.mon.abbrev",
-    TUESDAY -> "facto.date.dayofweek.tue.abbrev",
-    WEDNESDAY -> "facto.date.dayofweek.wed.abbrev",
-    THURSDAY -> "facto.date.dayofweek.thu.abbrev",
-    FRIDAY -> "facto.date.dayofweek.fri.abbrev",
-    SATURDAY -> "facto.date.dayofweek.sat.abbrev",
-    SUNDAY -> "facto.date.dayofweek.sun.abbrev"
+    MONDAY -> "app.date.dayofweek.mon.abbrev",
+    TUESDAY -> "app.date.dayofweek.tue.abbrev",
+    WEDNESDAY -> "app.date.dayofweek.wed.abbrev",
+    THURSDAY -> "app.date.dayofweek.thu.abbrev",
+    FRIDAY -> "app.date.dayofweek.fri.abbrev",
+    SATURDAY -> "app.date.dayofweek.sat.abbrev",
+    SUNDAY -> "app.date.dayofweek.sun.abbrev"
   )
 
   def formatDate(dateTime: LocalDateTime)(implicit i18n: I18n, clock: Clock): String = {
@@ -50,11 +50,11 @@ object Formatting {
       val dayDifference = abs(now.getDayOfYear - date.getDayOfYear)
 
       if (date.getDayOfYear == now.getDayOfYear) {
-        i18n("facto.today")
+        i18n("app.today")
       } else if (date.getDayOfYear == now.getDayOfYear - 1) {
-        i18n("facto.yesterday")
+        i18n("app.yesterday")
       } else if (date.getDayOfYear == now.getDayOfYear + 1) {
-        i18n("facto.tomorrow")
+        i18n("app.tomorrow")
       } else if (dayDifference < 7) {
         s"$dayOfWeek, $dayMonthString"
       } else {

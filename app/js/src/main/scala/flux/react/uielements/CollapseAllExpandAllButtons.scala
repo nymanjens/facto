@@ -17,7 +17,7 @@ object CollapseAllExpandAllButtons {
           ^.onClick --> Callback(props.setExpandedCallback(Unique(false)).runNow()),
           <.i(^^.classes("fa", "fa-angle-double-right")),
           " ",
-          props.i18n("facto.collapse-all")
+          props.i18n("app.collapse-all")
         ),
         " ",
         <.div(
@@ -26,7 +26,7 @@ object CollapseAllExpandAllButtons {
           ^.onClick --> Callback(props.setExpandedCallback(Unique(true)).runNow()),
           <.i(^^.classes("fa", "fa-angle-double-down")),
           " ",
-          props.i18n("facto.expand-all")
+          props.i18n("app.expand-all")
         )
       )
     })

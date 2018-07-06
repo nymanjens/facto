@@ -39,7 +39,7 @@ private[usermanagement] final class UpdatePasswordForm(implicit user: User,
     def render(props: Props, state: State) = logExceptions {
       <.form(
         ^.className := "form-horizontal",
-        uielements.HalfPanel(title = <.span(i18n("facto.change-password")))(
+        uielements.HalfPanel(title = <.span(i18n("app.change-password")))(
           {
             for (error <- state.globalErrors) yield {
               <.div(^.className := "alert alert-danger", ^.key := error, error)
@@ -48,14 +48,14 @@ private[usermanagement] final class UpdatePasswordForm(implicit user: User,
           bootstrap.TextInput(
             ref = bootstrap.TextInput.ref(),
             name = "loginName",
-            label = i18n("facto.login-name"),
+            label = i18n("app.login-name"),
             defaultValue = user.loginName,
             disabled = true
           ),
           bootstrap.TextInput(
             ref = passwordRef,
             name = "password",
-            label = i18n("facto.password"),
+            label = i18n("app.password"),
             inputType = "password",
             required = true,
             showErrorMessage = state.showErrorMessages
@@ -63,7 +63,7 @@ private[usermanagement] final class UpdatePasswordForm(implicit user: User,
           bootstrap.TextInput(
             ref = passwordVerificationRef,
             name = "passwordVerification",
-            label = i18n("facto.retype-password"),
+            label = i18n("app.retype-password"),
             inputType = "password",
             required = true,
             showErrorMessage = state.showErrorMessages
@@ -72,7 +72,7 @@ private[usermanagement] final class UpdatePasswordForm(implicit user: User,
             ^.tpe := "submit",
             ^.className := "btn btn-default",
             ^.onClick ==> onSubmit,
-            i18n("facto.ok"))
+            i18n("app.ok"))
         )
       )
     }
@@ -90,7 +90,7 @@ private[usermanagement] final class UpdatePasswordForm(implicit user: User,
             passwordVerification <- passwordVerificationRef().value
             validPassword <- {
               if (password != passwordVerification) {
-                newState = newState.copy(globalErrors = Seq(i18n("facto.error.passwords-should-match")))
+                newState = newState.copy(globalErrors = Seq(i18n("app.error.passwords-should-match")))
                 None
               } else {
                 Some(password)

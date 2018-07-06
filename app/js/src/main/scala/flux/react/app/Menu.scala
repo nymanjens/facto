@@ -75,7 +75,7 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
                 .TextInput(
                   ref = queryInputRef,
                   name = "query",
-                  placeholder = i18n("facto.search"),
+                  placeholder = i18n("app.search"),
                   classes = Seq("form-control")),
               <.span(
                 ^.className := "input-group-btn",
@@ -98,15 +98,15 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
             ))
         ),
         <.li(
-          menuItem(i18n("facto.everything.html"), Page.Everything),
-          menuItem(i18n("facto.cash-flow.html"), Page.CashFlow),
-          menuItem(i18n("facto.liquidation.html"), Page.Liquidation),
-          menuItem(i18n("facto.endowments.html"), Page.Endowments),
-          menuItem(i18n("facto.summary.html"), Page.Summary)
+          menuItem(i18n("app.everything.html"), Page.Everything),
+          menuItem(i18n("app.cash-flow.html"), Page.CashFlow),
+          menuItem(i18n("app.liquidation.html"), Page.Liquidation),
+          menuItem(i18n("app.endowments.html"), Page.Endowments),
+          menuItem(i18n("app.summary.html"), Page.Summary)
         ),
         <.li(
-          menuItem(i18n("facto.templates.html"), Page.TemplateList),
-          menuItem(i18n("facto.new-entry.html"), Page.NewTransactionGroup())
+          menuItem(i18n("app.templates.html"), Page.TemplateList),
+          menuItem(i18n("app.new-entry.html"), Page.NewTransactionGroup())
         ),
         <<.ifThen(newEntryTemplates.nonEmpty) {
           <.li({

@@ -15,7 +15,7 @@ private[transactiongroupform] final class AddTransactionPanel(implicit i18n: I18
     .renderP((_, props) =>
       logExceptions {
         HalfPanel(
-          title = <.span(i18n("facto.new-transaction")),
+          title = <.span(i18n("app.new-transaction")),
           panelClasses = Seq("add-transaction-button-holder"))(
           <.table(
             <.tbody(

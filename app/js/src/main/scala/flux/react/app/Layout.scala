@@ -92,7 +92,7 @@ final class Layout(implicit globalMessages: GlobalMessages,
                     ^.onClick ==> doLogout,
                     <.i(^.className := "fa fa-sign-out fa-fw"),
                     " ",
-                    i18n("facto.logout")))
+                    i18n("app.logout")))
               )
             )
           ),

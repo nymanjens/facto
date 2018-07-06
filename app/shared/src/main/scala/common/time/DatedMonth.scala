@@ -38,18 +38,18 @@ case class DatedMonth(startDate: LocalDate) extends Ordered[DatedMonth] {
 object DatedMonth {
 
   private val abbreviationCodes: Map[Month, String] = Map(
-    Month.JANUARY -> "facto.date.month.jan.abbrev",
-    Month.FEBRUARY -> "facto.date.month.feb.abbrev",
-    Month.MARCH -> "facto.date.month.mar.abbrev",
-    Month.APRIL -> "facto.date.month.apr.abbrev",
-    Month.MAY -> "facto.date.month.may.abbrev",
-    Month.JUNE -> "facto.date.month.jun.abbrev",
-    Month.JULY -> "facto.date.month.jul.abbrev",
-    Month.AUGUST -> "facto.date.month.aug.abbrev",
-    Month.SEPTEMBER -> "facto.date.month.sep.abbrev",
-    Month.OCTOBER -> "facto.date.month.oct.abbrev",
-    Month.NOVEMBER -> "facto.date.month.nov.abbrev",
-    Month.DECEMBER -> "facto.date.month.dec.abbrev"
+    Month.JANUARY -> "app.date.month.jan.abbrev",
+    Month.FEBRUARY -> "app.date.month.feb.abbrev",
+    Month.MARCH -> "app.date.month.mar.abbrev",
+    Month.APRIL -> "app.date.month.apr.abbrev",
+    Month.MAY -> "app.date.month.may.abbrev",
+    Month.JUNE -> "app.date.month.jun.abbrev",
+    Month.JULY -> "app.date.month.jul.abbrev",
+    Month.AUGUST -> "app.date.month.aug.abbrev",
+    Month.SEPTEMBER -> "app.date.month.sep.abbrev",
+    Month.OCTOBER -> "app.date.month.oct.abbrev",
+    Month.NOVEMBER -> "app.date.month.nov.abbrev",
+    Month.DECEMBER -> "app.date.month.dec.abbrev"
   )
 
   def of(year: Int, month: Month): DatedMonth = DatedMonth(LocalDate.of(year, month, 1))

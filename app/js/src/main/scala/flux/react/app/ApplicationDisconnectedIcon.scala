@@ -47,7 +47,7 @@ private[app] final class ApplicationDisconnectedIcon(
         case true =>
           <.span(
             ^.className := "navbar-brand",
-            <.i(^.className := "fa fa-chain-broken", ^.title := i18n("facto.offline")))
+            <.i(^.className := "fa fa-chain-broken", ^.title := i18n("app.offline")))
         case false =>
           <.span()
       }

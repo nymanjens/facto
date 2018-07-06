@@ -167,7 +167,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
                 <.span(latestEntryToTableTitleExtra(latestEntry.entry), " ")
               }
             },
-            <.span(^.style := js.Dictionary("color" -> "#999"), s"(${i18n("facto.n-entries", numEntries)})")
+            <.span(^.style := js.Dictionary("color" -> "#999"), s"(${i18n("app.n-entries", numEntries)})")
           )
         case None =>
           <.i(^.className := "fa fa-circle-o-notch fa-spin")

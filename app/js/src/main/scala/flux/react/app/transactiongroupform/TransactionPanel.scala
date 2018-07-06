@@ -228,19 +228,18 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawTransactionDate),
             startWithDefault = props.defaultValues.isEmpty,
             delegateRefFactory = TextInput.ref _
-          ) {
-            extraProps =>
-              bootstrap.TextInput(
-                ref = extraProps.ref,
-                name = "transaction-date",
-                label = i18n("facto.date-payed"),
-                defaultValue = mappedExtraProps.defaultValue,
-                required = true,
-                showErrorMessage = props.showErrorMessages,
-                additionalValidator = mappedExtraProps.additionalValidator,
-                inputClasses = extraProps.inputClasses,
-                focusOnMount = props.focusOnMount
-              )
+          ) { extraProps =>
+            bootstrap.TextInput(
+              ref = extraProps.ref,
+              name = "transaction-date",
+              label = i18n("app.date-payed"),
+              defaultValue = mappedExtraProps.defaultValue,
+              required = true,
+              showErrorMessage = props.showErrorMessages,
+              additionalValidator = mappedExtraProps.additionalValidator,
+              inputClasses = extraProps.inputClasses,
+              focusOnMount = props.focusOnMount
+            )
           }
         },
         dateMappedInput(
@@ -264,7 +263,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                 bootstrap.TextInput(
                   ref = extraProps2.ref,
                   name = "date-consumed",
-                  label = i18n("facto.date-consumed"),
+                  label = i18n("app.date-consumed"),
                   defaultValue = mappedExtraProps.defaultValue,
                   required = true,
                   showErrorMessage = props.showErrorMessages,
@@ -278,7 +277,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           bootstrap.TextInput(
             ref = issuerRef,
             name = "issuer",
-            label = i18n("facto.issuer"),
+            label = i18n("app.issuer"),
             defaultValue = props.defaultValues.issuer.get.name,
             disabled = true
           )
@@ -292,7 +291,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           reservoirSelectInput(
             ref = extraProps.ref,
             name = "payed-with-to",
-            label = i18n("facto.payed-with-to"),
+            label = i18n("app.payed-with-to"),
             defaultValue = state.moneyReservoir,
             inputClasses = extraProps.inputClasses,
             options = selectableReservoirs(state.moneyReservoir),
@@ -311,7 +310,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           accountSelectInput(
             ref = extraProps.ref,
             name = "beneficiary",
-            label = i18n("facto.beneficiary"),
+            label = i18n("app.beneficiary"),
             defaultValue = state.beneficiaryAccount,
             inputClasses = extraProps.inputClasses,
             options = accountingConfig.personallySortedAccounts,
@@ -330,7 +329,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           categorySelectInput(
             ref = extraProps.ref,
             name = "category",
-            label = i18n("facto.category"),
+            label = i18n("app.category"),
             defaultValue = props.defaultValues.category getOrElse state.beneficiaryAccount.categories.head,
             inputClasses = extraProps.inputClasses,
             options = state.beneficiaryAccount.categories,
@@ -349,7 +348,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           bootstrap.AutosuggestTextInput(
             ref = extraProps.ref,
             name = "description",
-            label = i18n("facto.description"),
+            label = i18n("app.description"),
             defaultValue = props.defaultValues.description,
             required = true,
             showErrorMessage = props.showErrorMessages,
@@ -365,7 +364,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
         bootstrap.MoneyInput.withCurrencyConversion(
           ref = flowRef,
           name = "flow",
-          label = i18n("facto.flow"),
+          label = i18n("app.flow"),
           defaultValue = props.defaultValues.flowInCents,
           required = true,
           showErrorMessage = props.showErrorMessages,
@@ -386,7 +385,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           bootstrap.TextAreaInput(
             ref = extraProps.ref,
             name = "more-info",
-            label = i18n("facto.more-info"),
+            label = i18n("app.more-info"),
             defaultValue = props.defaultValues.detailDescription,
             showErrorMessage = props.showErrorMessages,
             inputClasses = extraProps.inputClasses,
@@ -402,7 +401,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           bootstrap.TagInput(
             ref = extraProps.ref,
             name = "tags",
-            label = i18n("facto.tags"),
+            label = i18n("app.tags"),
             suggestions = state.allTags,
             showErrorMessage = props.showErrorMessages,
             additionalValidator = _.forall(Tags.isValidTag),
