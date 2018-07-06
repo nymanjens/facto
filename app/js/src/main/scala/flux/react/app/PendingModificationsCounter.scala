@@ -1,7 +1,7 @@
 package flux.react.app
 
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
-import flux.stores.{PageLoadingStateStore, PendingModificationsStore, StateStore}
+import flux.stores.{PendingModificationsStore, StateStore}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 

@@ -1,9 +1,9 @@
 package models.modification
 
 import common.time.LocalDateTime
-import models.user.User
 import models.Entity
 import models.access.EntityAccess
+import models.user.User
 
 /**
   * Symbolises a modification to an entity.

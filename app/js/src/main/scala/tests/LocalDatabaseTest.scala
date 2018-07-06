@@ -1,10 +1,9 @@
 package tests
 
-import models.access.{DbQuery, DbResultSet, LocalDatabase, LocalDatabaseImpl, ModelField}
 import common.testing.TestObjects._
-import models.access.LocalDatabase
 import models.access.SingletonKey.{NextUpdateTokenKey, VersionKey}
 import models.access.webworker.LocalDatabaseWebWorkerApi
+import models.access.{DbResultSet, LocalDatabase, LocalDatabaseImpl}
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 import models.modification.EntityModification
 import models.money.ExchangeRateMeasurement

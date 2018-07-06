@@ -1,6 +1,6 @@
 package api
 
-import api.UpdateTokens.{toUpdateToken, toLocalDateTime}
+import api.UpdateTokens.{toLocalDateTime, toUpdateToken}
 import common.testing.TestUtils._
 import common.testing._
 import org.junit.runner._

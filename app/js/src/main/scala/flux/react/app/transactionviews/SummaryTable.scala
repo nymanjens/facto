@@ -10,9 +10,9 @@ import flux.react.ReactVdomUtils._
 import flux.react.router.{Page, RouterContext}
 import flux.react.uielements
 import flux.stores.StateStore
+import flux.stores.entries._
 import flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForYear
 import flux.stores.entries.factories.SummaryForYearStoreFactory.{SummaryCell, SummaryForYear}
-import flux.stores.entries._
 import flux.stores.entries.factories.{
   CashFlowEntriesStoreFactory,
   SummaryExchangeRateGainsStoreFactory,

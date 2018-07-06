@@ -307,8 +307,6 @@ object StoreFactoryStateUpdateTest extends TestSuite {
 
   private final class ThisTestModule extends TestModule {
 
-    import com.softwaremill.macwire._
-
     implicit private val complexQueryFilter = new ComplexQueryFilter
 
     val allEntriesStoreFactory = new AllEntriesStoreFactory

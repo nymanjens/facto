@@ -5,7 +5,6 @@ import api.ScalaJsApi._
 import common.money.Currency
 import common.time.LocalDateTime
 import models.Entity
-import models.access.DbQuery
 import models.accounting.config.Config
 import models.modification.{EntityModification, EntityType}
 import models.user.User

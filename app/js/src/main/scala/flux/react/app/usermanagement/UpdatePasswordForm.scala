@@ -4,7 +4,6 @@ import api.ScalaJsApi.UserPrototype
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import flux.action.{Action, Dispatcher}
-import flux.react.router.RouterContext
 import flux.react.uielements
 import flux.react.uielements.input.bootstrap
 import japgolly.scalajs.react._

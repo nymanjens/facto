@@ -1,7 +1,8 @@
 package common
 
-import scala.collection.immutable.Seq
 import common.Listenable.Listener
+
+import scala.collection.immutable.Seq
 
 trait Listenable[T] {
   def get: T

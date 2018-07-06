@@ -1,7 +1,7 @@
 package flux.react.app.transactionviews
 
 import common.Formatting._
-import common.money.{ExchangeRateManager, ReferenceMoney}
+import common.money.ExchangeRateManager
 import common.time.Clock
 import common.{I18n, Unique}
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy

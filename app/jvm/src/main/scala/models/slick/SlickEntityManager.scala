@@ -1,10 +1,10 @@
 package models.slick
 
-import scala.collection.immutable.Seq
 import models.Entity
 import models.slick.SlickUtils.dbApi.{Table => SlickTable, Tag => SlickTag, _}
 import models.slick.SlickUtils.dbRun
-import play.api.Logger
+
+import scala.collection.immutable.Seq
 
 private[models] final class SlickEntityManager[E <: Entity] private (
     implicit val tableDef: SlickEntityTableDef[E]) {

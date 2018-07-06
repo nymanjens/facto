@@ -5,9 +5,8 @@ import common.time.LocalDateTime
 import models.access.JsEntityAccess
 import models.modification.{EntityModification, EntityType}
 
-import scala.collection.SortedMap
 import scala.collection.immutable.Seq
-import scala.collection.mutable
+import scala.collection.{SortedMap, mutable}
 import scala2js.Converters._
 
 final class JsExchangeRateManager(

@@ -3,19 +3,15 @@ package api
 import java.time.{LocalDate, LocalTime}
 
 import api.PicklableDbQuery.FieldWithValue
-import api.PicklableDbQuery.Sorting.FieldWithDirection
-import api.ScalaJsApi.{GetAllEntitiesResponse, ModificationsWithToken, GetInitialDataResponse}
-import boopickle.CompositePickler
 import boopickle.Default._
 import common.money.Currency
 import common.time.LocalDateTime
 import models.Entity
-import models.access.DbQuery.PicklableOrdering
-import models.access.{DbQuery, ModelField}
+import models.access.ModelField
 import models.accounting.config._
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
-import models.modification.{EntityModification, EntityType}
 import models.modification.EntityType._
+import models.modification.{EntityModification, EntityType}
 import models.money.ExchangeRateMeasurement
 import models.user.User
 

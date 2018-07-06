@@ -2,7 +2,6 @@ package models.access
 
 import common.ScalaUtils
 import common.ScalaUtils.visibleForTesting
-import common.time.LocalDateTime
 
 import scala2js.Converters._
 import scala2js.Scala2Js

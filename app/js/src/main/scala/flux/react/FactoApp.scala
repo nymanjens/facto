@@ -4,7 +4,7 @@ import common.LoggingUtils.logExceptions
 import flux.FactoAppModule
 import org.scalajs.dom
 import org.scalajs.dom.console
-import org.scalajs.dom.raw.{ErrorEvent, Event}
+import org.scalajs.dom.raw.Event
 
 import scala.async.Async.{async, await}
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue

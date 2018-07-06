@@ -2,7 +2,7 @@ package api
 
 import api.Picklers._
 import api.ScalaJsApi._
-import api.UpdateTokens.{toLocalDateTime, toUpdateToken}
+import api.UpdateTokens.toUpdateToken
 import com.google.inject._
 import common.PlayI18n
 import common.money.Currency
@@ -10,10 +10,8 @@ import common.time.{Clock, LocalDateTime}
 import models.Entity
 import models.access.{DbQuery, JvmEntityAccess}
 import models.accounting.config.Config
-import models.modification.{EntityModification, EntityModificationEntity, EntityType}
+import models.modification.{EntityModification, EntityType}
 import models.money.ExchangeRateMeasurement
-import models.slick.SlickUtils.dbApi._
-import models.slick.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}
 import models.user.{User, Users}
 
 import scala.collection.immutable.{Seq, TreeMap}

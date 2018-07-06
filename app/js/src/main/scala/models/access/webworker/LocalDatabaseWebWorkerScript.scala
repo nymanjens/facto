@@ -1,6 +1,5 @@
 package models.access.webworker
 
-import common.LoggingUtils.logExceptions
 import api.Picklers._
 import jsfacades.WebWorker
 import models.access.webworker.LocalDatabaseWebWorkerApi.{LokiQuery, MethodNumbers, WriteOperation}
@@ -8,17 +7,15 @@ import models.access.webworker.LocalDatabaseWebWorkerApiConverters._
 import org.scalajs.dom
 import org.scalajs.dom.console
 
-import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
+import scala.scalajs.js.JSConverters._
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
-import scala.util.Success
+import scala.util.{Failure, Success}
 import scala2js.Converters._
-import js.JSConverters._
 import scala2js.Scala2Js
-import scala.util.{Failure, Success, Try}
 
 @JSExportTopLevel("LocalDatabaseWebWorkerScript")
 object LocalDatabaseWebWorkerScript {

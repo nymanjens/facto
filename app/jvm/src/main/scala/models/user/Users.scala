@@ -6,8 +6,6 @@ import common.time.Clock
 import models.access.{EntityAccess, JvmEntityAccess, ModelField}
 import models.modification.EntityModification
 
-import scala.util.Random
-
 object Users {
 
   def createUser(loginName: String,

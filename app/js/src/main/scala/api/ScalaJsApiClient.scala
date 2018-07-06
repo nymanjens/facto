@@ -2,16 +2,16 @@ package api
 
 import java.nio.ByteBuffer
 
+import api.Picklers._
 import api.ScalaJsApi._
 import autowire._
 import boopickle.Default._
+import common.LoggingUtils.logExceptions
+import common.websocket.SerialWebsocketClientParallelizer
 import models.Entity
 import models.access.DbQuery
 import models.modification.{EntityModification, EntityType}
 import org.scalajs.dom
-import api.Picklers._
-import common.LoggingUtils.logExceptions
-import common.websocket.SerialWebsocketClientParallelizer
 
 import scala.collection.immutable.Seq
 import scala.concurrent.Future

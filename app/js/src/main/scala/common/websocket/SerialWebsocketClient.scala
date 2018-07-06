@@ -3,16 +3,13 @@ package common.websocket
 import java.nio.ByteBuffer
 
 import common.LoggingUtils.logExceptions
-import common.ScalaUtils
 import common.ScalaUtils.toPromise
-import org.scalajs.dom
-import org.scalajs.dom.{CloseEvent, ErrorEvent, Event, MessageEvent, _}
+import org.scalajs.dom._
 
 import scala.async.Async.{async, await}
 import scala.collection.mutable
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala.scalajs.js.typedarray.{ArrayBuffer, _}
 
 private[websocket] final class SerialWebsocketClient(websocketPath: String) {
   require(!websocketPath.startsWith("/"))

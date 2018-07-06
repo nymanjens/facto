@@ -1,9 +1,5 @@
 package flux.react.app.transactionviews
 
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala.async.Async.{async, await}
-import scala.concurrent.duration._
-import api.ScalaJsApi.UpdateToken
 import common.testing.TestObjects._
 import common.testing.{FakeRouterContext, ReactTestWrapper, TestModule}
 import flux.stores.entries.factories.AllEntriesStoreFactory
@@ -11,8 +7,11 @@ import japgolly.scalajs.react.vdom._
 import models.accounting._
 import utest._
 
+import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
+import scala.concurrent.duration._
 import scala.concurrent.{Future, Promise}
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala2js.Converters._
 
@@ -117,8 +116,6 @@ object EverythingTest extends TestSuite {
   }
 
   private final class ThisTestModule extends TestModule {
-
-    import com.softwaremill.macwire._
 
     implicit val factory: AllEntriesStoreFactory = new AllEntriesStoreFactory
     val everything: Everything = new Everything

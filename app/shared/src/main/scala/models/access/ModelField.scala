@@ -1,13 +1,11 @@
 package models.access
 
-import models.modification.EntityType._
-import java.util.Objects
-
 import common.GuavaReplacement.ImmutableBiMap
 import common.time.LocalDateTime
 import models.Entity
 import models.access.ModelField.FieldType
 import models.modification.EntityType
+import models.modification.EntityType._
 import models.money.ExchangeRateMeasurement
 import models.user.User
 

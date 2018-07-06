@@ -1,8 +1,8 @@
 package flux.stores
 
+import common.Listenable
 import flux.stores.ApplicationIsOnlineStore.State
 import models.access.EntityModificationPushClientFactory
-import common.Listenable
 
 final class ApplicationIsOnlineStore(
     implicit entityModificationPushClientFactory: EntityModificationPushClientFactory)

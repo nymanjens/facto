@@ -3,7 +3,7 @@ package flux.stores
 import common.time.Clock
 import flux.action.Action.{AddTransactionGroup, RemoveTransactionGroup, UpdateTransactionGroup}
 import flux.action.Dispatcher
-import models.access.{EntityAccess, JsEntityAccess}
+import models.access.JsEntityAccess
 import models.accounting._
 import models.modification.EntityModification
 

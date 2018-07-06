@@ -1,16 +1,16 @@
 package common.testing
 
-import scala.concurrent.duration._
-import scala.scalajs.js
 import models.Entity
-import models.access._
 import models.access.JsEntityAccess.Listener
+import models.access._
 import models.modification.{EntityModification, EntityType}
 import models.user.User
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
+import scala.concurrent.duration._
 import scala.concurrent.{Future, Promise}
+import scala.scalajs.js
 import scala2js.Converters._
 
 final class FakeJsEntityAccess extends JsEntityAccess {

@@ -1,6 +1,5 @@
 package models.access
 
-import common.time.LocalDateTime
 import models.access.DbQuery.{Filter, PicklableOrdering}
 
 import scala.collection.immutable.Seq

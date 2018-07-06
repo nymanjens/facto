@@ -3,8 +3,7 @@ package models.accounting.config
 import com.google.inject._
 import common.testing.TestObjects._
 import common.testing._
-import models._
-import models.access.{EntityAccess, JvmEntityAccess}
+import models.access.JvmEntityAccess
 import models.user.Users
 import org.junit.runner._
 import org.specs2.runner._

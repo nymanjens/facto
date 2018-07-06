@@ -12,8 +12,6 @@ final class Module(implicit i18n: I18n,
                    clock: Clock,
                    userStore: UserStore) {
 
-  import com.softwaremill.macwire._
-
   private implicit lazy val updatePasswordForm = new UpdatePasswordForm
   private implicit lazy val addUserForm = new AddUserForm
   private implicit lazy val allUsersList = new AllUsersList

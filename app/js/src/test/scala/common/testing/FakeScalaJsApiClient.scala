@@ -1,7 +1,7 @@
 package common.testing
 
-import api.ScalaJsApi.{GetAllEntitiesResponse, ModificationsWithToken, UpdateToken, UserPrototype}
-import api.{ScalaJsApi, ScalaJsApiClient}
+import api.ScalaJsApi.{GetAllEntitiesResponse, UserPrototype}
+import api.ScalaJsApiClient
 import models.Entity
 import models.access.{DbQuery, DbQueryExecutor}
 import models.modification.{EntityModification, EntityType}

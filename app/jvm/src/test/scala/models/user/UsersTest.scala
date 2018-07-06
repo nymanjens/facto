@@ -3,7 +3,6 @@ package models.user
 import com.google.inject._
 import common.testing._
 import models.access.JvmEntityAccess
-import models.modification.EntityModification
 import org.junit.runner._
 import org.specs2.runner._
 import play.api.test._

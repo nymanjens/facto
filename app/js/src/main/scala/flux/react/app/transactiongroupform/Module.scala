@@ -20,8 +20,6 @@ final class Module(implicit i18n: I18n,
                    dispatcher: Dispatcher,
                    clock: Clock) {
 
-  import com.softwaremill.macwire._
-
   implicit private lazy val transactionPanel: TransactionPanel = new TransactionPanel
   implicit private lazy val addTransactionPanel: AddTransactionPanel = new AddTransactionPanel
   implicit private lazy val totalFlowRestrictionInput: TotalFlowRestrictionInput =

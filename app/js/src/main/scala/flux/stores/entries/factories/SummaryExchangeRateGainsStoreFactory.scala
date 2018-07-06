@@ -4,9 +4,9 @@ import common.money.{Currency, ExchangeRateManager, MoneyWithGeneralCurrency, Re
 import common.time.JavaTimeImplicits._
 import common.time.{DatedMonth, LocalDateTime}
 import flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.{
+  DateToBalanceFunction,
   GainsForMonth,
-  GainsForYear,
-  DateToBalanceFunction
+  GainsForYear
 }
 import flux.stores.entries.{ComplexQueryFilter, EntriesStore}
 import models.access.DbQueryImplicits._

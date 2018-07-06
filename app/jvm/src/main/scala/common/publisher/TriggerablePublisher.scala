@@ -1,7 +1,8 @@
 package common.publisher
 
-import scala.collection.JavaConverters._
 import org.reactivestreams.{Publisher, Subscriber, Subscription}
+
+import scala.collection.JavaConverters._
 
 final class TriggerablePublisher[T] extends Publisher[T] {
   private val subscribers: java.util.List[Subscriber[_ >: T]] =

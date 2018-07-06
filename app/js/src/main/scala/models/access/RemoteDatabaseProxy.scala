@@ -1,6 +1,5 @@
 package models.access
 
-import api.ScalaJsApi.UpdateToken
 import models.Entity
 import models.modification.{EntityModification, EntityType}
 

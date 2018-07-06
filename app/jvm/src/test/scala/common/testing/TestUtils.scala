@@ -4,12 +4,12 @@ import java.time.{Instant, ZoneId}
 
 import common.testing.TestObjects._
 import common.time.LocalDateTime
+import models.Entity
+import models.access.JvmEntityAccess
 import models.accounting.config.{Account, Category, MoneyReservoir}
 import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 import models.modification.{EntityModification, EntityType}
 import models.user.User
-import models.Entity
-import models.access.JvmEntityAccess
 
 import scala.collection.immutable.Seq
 

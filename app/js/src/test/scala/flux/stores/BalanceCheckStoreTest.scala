@@ -1,14 +1,14 @@
 package flux.stores
 
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala.async.Async.{async, await}
 import common.testing.TestObjects._
 import flux.action.Action
 import models.accounting._
 import models.modification.EntityModification
 import utest._
 
+import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 
 object BalanceCheckStoreTest extends TestSuite {

@@ -1,6 +1,5 @@
 package models.access
 
-import api.ScalaJsApi.GetInitialDataResponse
 import common.testing.TestObjects._
 import common.testing.{FakeScalaJsApiClient, ModificationsBuffer, TestModule}
 import common.time.Clock

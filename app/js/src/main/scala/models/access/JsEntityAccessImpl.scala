@@ -1,21 +1,16 @@
 package models.access
 
-import api.ScalaJsApi.UpdateToken
 import common.LoggingUtils.logExceptions
-import common.ScalaUtils.visibleForTesting
 import models.Entity
 import models.access.JsEntityAccess.Listener
 import models.modification.{EntityModification, EntityType}
 import models.user.User
-import org.scalajs.dom.console
 
 import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.concurrent.Future
-import scala.concurrent.duration._
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala.scalajs.js
 
 private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
     implicit remoteDatabaseProxy: RemoteDatabaseProxy)

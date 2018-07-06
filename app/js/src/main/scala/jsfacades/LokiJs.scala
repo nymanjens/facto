@@ -1,9 +1,7 @@
 package jsfacades
 
-import common.LoggingUtils.logExceptions
 import common.ScalaUtils
 
-import org.scalajs.dom.console
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.js

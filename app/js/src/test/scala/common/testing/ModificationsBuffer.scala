@@ -1,11 +1,6 @@
 package common.testing
 
-import java.time.Duration
-import java.time.Month.JANUARY
-
 import api.ScalaJsApi.UpdateToken
-import common.time.JavaTimeImplicits._
-import common.time.LocalDateTime
 import models.Entity
 import models.modification.{EntityModification, EntityType}
 

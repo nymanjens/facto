@@ -1,15 +1,11 @@
 package models.access
 
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import common.ScalaUtils.visibleForTesting
-import models.Entity
-import models.modification.{EntityModification, EntityType}
 import org.scalajs.dom.console
 
 import scala.async.Async.{async, await}
-import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.concurrent.{Future, Promise}
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 
 /** Wrapper around a LocalDatabase future that allows to attach updates to it. */

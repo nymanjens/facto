@@ -177,8 +177,6 @@ object SummaryTableTest extends TestSuite {
 
   private final class ThisTestModule extends TestModule {
 
-    import com.softwaremill.macwire._
-
     private val storesModule = new flux.stores.Module
 
     implicit val summaryYearsStoreFactory = storesModule.summaryYearsStoreFactory

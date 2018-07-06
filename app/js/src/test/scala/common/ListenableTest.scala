@@ -1,12 +1,12 @@
 package common
 
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala.async.Async.{async, await}
 import common.Listenable.WritableListenable
 import common.testing.Awaiter
 import utest.{TestSuite, _}
 
-import scala.concurrent.{Await, Promise}
+import scala.async.Async.{async, await}
+import scala.concurrent.Promise
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 
 object ListenableTest extends TestSuite {

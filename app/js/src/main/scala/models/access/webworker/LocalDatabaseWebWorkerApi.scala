@@ -1,12 +1,10 @@
 package models.access.webworker
 
-import api.PicklableDbQuery
-import models.Entity
 import models.access.webworker.LocalDatabaseWebWorkerApi.{LokiQuery, WriteOperation}
 
+import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.js
-import scala.collection.immutable.Seq
 
 trait LocalDatabaseWebWorkerApi {
   def create(dbName: String, inMemory: Boolean): Future[Unit]

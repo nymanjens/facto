@@ -7,9 +7,8 @@ import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import flux.react.uielements
 import flux.react.uielements.Table.TableRowData
 import flux.stores.StateStore
+import flux.stores.entries.WithIsPending
 import flux.stores.entries.factories.EntriesListStoreFactory
-import flux.stores.entries.{EntriesStore, WithIsPending}
-import japgolly.scalajs.react.vdom.VdomArray
 import japgolly.scalajs.react.vdom.html_<^.{VdomElement, _}
 import japgolly.scalajs.react.{Callback, _}
 import org.scalajs.dom.console

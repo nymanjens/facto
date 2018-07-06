@@ -7,8 +7,6 @@ import models.money.JsExchangeRateManager
 
 final class Module(implicit entityAccess: JsEntityAccess, getInitialDataResponse: GetInitialDataResponse) {
 
-  import com.softwaremill.macwire._
-
   implicit lazy val exchangeRateManager: ExchangeRateManager =
     new JsExchangeRateManager(getInitialDataResponse.ratioReferenceToForeignCurrency)
 }

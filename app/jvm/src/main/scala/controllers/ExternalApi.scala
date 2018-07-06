@@ -3,7 +3,6 @@ package controllers
 import com.google.inject.Inject
 import common.money.Currency
 import common.time.{Clock, TimeUtils}
-import models._
 import models.access.JvmEntityAccess
 import models.accounting._
 import models.accounting.config.{Account, Config, Template}

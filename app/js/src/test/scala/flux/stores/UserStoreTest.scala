@@ -1,6 +1,5 @@
 package flux.stores
 
-import scala.concurrent.duration._
 import api.ScalaJsApi.UserPrototype
 import common.testing.Awaiter
 import common.testing.TestObjects._
@@ -10,6 +9,7 @@ import utest._
 
 import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
+import scala.concurrent.duration._
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 

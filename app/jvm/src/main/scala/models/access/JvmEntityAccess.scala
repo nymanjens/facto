@@ -18,14 +18,13 @@ import models.modification.EntityType.{
 }
 import models.modification.{EntityModification, EntityModificationEntity, EntityType}
 import models.money.ExchangeRateMeasurement
-import models.slick.{SlickEntityManager, SlickEntityTableDef}
 import models.slick.SlickUtils.dbApi._
 import models.slick.SlickUtils.dbRun
+import models.slick.{SlickEntityManager, SlickEntityTableDef}
 import models.user.User
 import org.reactivestreams.Publisher
 
 import scala.collection.immutable.Seq
-import scala.collection.mutable
 
 final class JvmEntityAccess @Inject()(clock: Clock) extends EntityAccess {
 

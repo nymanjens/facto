@@ -5,7 +5,6 @@ import common.money.ExchangeRateManager
 import common.time.Clock
 import flux.action.Dispatcher
 import flux.stores.GlobalMessagesStore
-import flux.stores.entries._
 import flux.stores.entries.factories._
 import models.access.JsEntityAccess
 import models.accounting.config.Config
@@ -27,8 +26,6 @@ final class Module(implicit i18n: I18n,
                    summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
                    globalMessagesStore: GlobalMessagesStore,
                    clock: Clock) {
-
-  import com.softwaremill.macwire._
 
   implicit lazy val everything = new Everything
   implicit lazy val cashFlow = new CashFlow

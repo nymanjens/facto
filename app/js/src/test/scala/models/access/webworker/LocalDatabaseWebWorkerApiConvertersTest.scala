@@ -4,9 +4,9 @@ import models.access.webworker.LocalDatabaseWebWorkerApi.{LokiQuery, WriteOperat
 import models.access.webworker.LocalDatabaseWebWorkerApiConverters._
 import utest._
 
+import scala.collection.immutable.Seq
 import scala.language.reflectiveCalls
 import scala.scalajs.js
-import scala.collection.immutable.Seq
 import scala2js.Scala2Js
 
 object LocalDatabaseWebWorkerApiConvertersTest extends TestSuite {

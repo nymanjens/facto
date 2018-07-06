@@ -3,8 +3,8 @@ package tests
 import common.testing.TestObjects._
 import models.access.DbQuery.Filter
 import models.access.DbQueryImplicits._
-import models.access.webworker.LocalDatabaseWebWorkerApi
 import models.access._
+import models.access.webworker.LocalDatabaseWebWorkerApi
 import models.accounting.Transaction
 import tests.ManualTests.{ManualTest, ManualTestSuite}
 

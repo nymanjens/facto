@@ -1,9 +1,6 @@
 package flux.action
 
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala.async.Async.{async, await}
 import common.LoggingUtils.logExceptions
-import org.scalajs.dom.console
 
 import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq

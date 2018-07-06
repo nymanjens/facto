@@ -21,8 +21,6 @@ final class Module(implicit i18n: I18n,
                    scalaJsApiClient: ScalaJsApiClient,
                    entityModificationPushClientFactory: EntityModificationPushClientFactory) {
 
-  import com.softwaremill.macwire._
-
   new TransactionAndGroupStore
   new BalanceCheckStore
 

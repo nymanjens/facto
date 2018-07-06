@@ -2,7 +2,7 @@ package flux.react.app.transactiongroupform
 
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, LogExceptionsFuture, logExceptions}
-import common.money.{Currency, DatedMoney, ExchangeRateManager, ReferenceMoney}
+import common.money.{Currency, ExchangeRateManager, ReferenceMoney}
 import common.time.Clock
 import common.time.JavaTimeImplicits._
 import flux.action.{Action, Dispatcher}
@@ -14,7 +14,7 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.Path
 import japgolly.scalajs.react.vdom.html_<^._
 import models.access.EntityAccess
-import models.accounting.config.{Account, Config}
+import models.accounting.config.Config
 import models.accounting.{Transaction, TransactionGroup}
 import models.user.User
 

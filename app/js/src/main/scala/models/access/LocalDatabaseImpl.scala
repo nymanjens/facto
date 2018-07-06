@@ -1,32 +1,6 @@
 package models.access
 
 import common.ScalaUtils.visibleForTesting
-import common.testing.TestObjects
-import jsfacades.LokiJs.FilterFactory.Operation
-import jsfacades.LokiJs
-import models.Entity
-import models.access.webworker.LocalDatabaseWebWorkerApi
-import models.access.webworker.LocalDatabaseWebWorkerApi.{LokiQuery, WriteOperation}
-import models.modification.EntityType.{
-  BalanceCheckType,
-  ExchangeRateMeasurementType,
-  TransactionGroupType,
-  TransactionType,
-  UserType
-}
-import models.modification.{EntityModification, EntityType}
-import org.scalajs.dom.console
-
-import scala.async.Async.{async, await}
-import scala.collection.immutable.Seq
-import scala.concurrent.Future
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala.scalajs.js
-import scala.scalajs.js.JSConverters._
-import scala.util.matching.Regex
-import scala2js.Converters._
-import scala2js.Scala2Js
-import common.ScalaUtils.visibleForTesting
 import jsfacades.LokiJs
 import jsfacades.LokiJs.FilterFactory.Operation
 import models.Entity
@@ -46,7 +20,9 @@ import org.scalajs.dom.console
 import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
+import scala.scalajs.js.JSConverters._
 import scala.util.matching.Regex
 import scala2js.Converters._
 import scala2js.Scala2Js

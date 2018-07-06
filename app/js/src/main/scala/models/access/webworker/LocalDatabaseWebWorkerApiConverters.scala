@@ -1,13 +1,13 @@
 package models.access.webworker
 
-import models.access.webworker.LocalDatabaseWebWorkerApi.{LokiQuery, WriteOperation}
 import models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation._
+import models.access.webworker.LocalDatabaseWebWorkerApi.{LokiQuery, WriteOperation}
 
 import scala.collection.immutable.Seq
 import scala.scalajs.js
-import scala2js.Scala2Js
 import scala.scalajs.js.JSConverters._
 import scala2js.Converters._
+import scala2js.Scala2Js
 
 private[webworker] object LocalDatabaseWebWorkerApiConverters {
 

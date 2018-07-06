@@ -1,16 +1,15 @@
 package flux.react.app.usermanagement
 
-import scala.collection.immutable.Seq
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import flux.react.ReactVdomUtils.<<
 import flux.react.uielements
-import flux.react.uielements.Table.TableRowData
 import flux.stores.{StateStore, UserStore}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import models.user.User
 
+import scala.collection.immutable.Seq
 import scala.scalajs.js
 
 private[app] final class AllUsersList(implicit i18n: I18n, userStore: UserStore) {
