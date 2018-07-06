@@ -11,8 +11,8 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
-@JSExportTopLevel("FactoApp")
-object FactoApp extends js.JSApp {
+@JSExportTopLevel("ClientApp")
+object ClientApp extends js.JSApp {
 
   @JSExport
   override def main(): Unit = async {

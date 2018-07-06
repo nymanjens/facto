@@ -3,7 +3,6 @@ package controllers
 import java.net.URL
 
 import api.Picklers._
-import api.ScalaJsApiServerFactory
 import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
 import com.google.common.io.Resources
@@ -22,7 +21,6 @@ final class JavascriptFiles @Inject()(implicit override val messagesApi: Message
                                       components: ControllerComponents,
                                       clock: Clock,
                                       entityAccess: JvmEntityAccess,
-                                      scalaJsApiServerFactory: ScalaJsApiServerFactory,
                                       playConfiguration: play.api.Configuration,
                                       env: play.api.Environment,
                                       webJarAssets: controllers.WebJarAssets)
@@ -32,7 +30,7 @@ final class JavascriptFiles @Inject()(implicit override val messagesApi: Message
   private lazy val localDatabaseWebWorkerResultCache: Result =
     Ok(s"""
           |importScripts("${JavascriptFiles.Assets.webworkerDeps.urlPath}");
-          |importScripts("${JavascriptFiles.Assets.factoAppClient.urlPath}");
+          |importScripts("${JavascriptFiles.Assets.clientApp.urlPath}");
           |LocalDatabaseWebWorkerScript.run();
       """.stripMargin).as("application/javascript")
   def localDatabaseWebWorker = Action(_ => localDatabaseWebWorkerResultCache)
@@ -62,21 +60,21 @@ final class JavascriptFiles @Inject()(implicit override val messagesApi: Message
 
 object JavascriptFiles {
   private object Assets {
-    private val factoAppProjectName: String = "client"
+    private val clientAppProjectName: String = "client"
     private val webworkerDepsProjectName: String = "webworker-client-deps"
 
-    val factoAppClient: Asset =
-      firstExistingVersionedAsset(s"$factoAppProjectName-opt.js", s"$factoAppProjectName-fastopt.js")
-    val factoAppDeps: Asset =
-      firstExistingVersionedAsset(s"$factoAppProjectName-jsdeps.min.js", s"$factoAppProjectName-jsdeps.js")
+    val clientApp: Asset =
+      firstExistingVersionedAsset(s"$clientAppProjectName-opt.js", s"$clientAppProjectName-fastopt.js")
+    val clientAppDeps: Asset =
+      firstExistingVersionedAsset(s"$clientAppProjectName-jsdeps.min.js", s"$clientAppProjectName-jsdeps.js")
     val webworkerDeps: Asset =
       firstExistingVersionedAsset(
         s"$webworkerDepsProjectName-jsdeps.min.js",
         s"$webworkerDepsProjectName-jsdeps.js")
 
     val all: Seq[Asset] = Seq(
-      factoAppClient,
-      factoAppDeps,
+      clientApp,
+      clientAppDeps,
       webworkerDeps,
       WebJarAsset("metisMenu/1.1.3/metisMenu.min.css"),
       WebJarAsset("font-awesome/4.6.2/css/font-awesome.min.css"),
