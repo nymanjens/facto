@@ -16,7 +16,7 @@ class ConfigTest extends HookedSpecification {
   @Inject implicit private val entityAccess: JvmEntityAccess = null
 
   override def before() = {
-    Guice.createInjector(new FactoTestModule).injectMembers(this)
+    Guice.createInjector(new TestModule).injectMembers(this)
   }
 
   "configuration parsing" in new WithApplication {

@@ -15,7 +15,7 @@ class FormattingTest extends HookedSpecification {
   @Inject implicit private val fakeI18n: FakeI18n = null
 
   override def before() = {
-    Guice.createInjector(new FactoTestModule).injectMembers(this)
+    Guice.createInjector(new TestModule).injectMembers(this)
     setFakeI18nMappings()
     fakeClock.setTime(createDateTime(2010, APRIL, 4))
   }

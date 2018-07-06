@@ -7,7 +7,7 @@ import common.time._
 import models.ModelsModule
 import models.accounting.config.ConfigModule
 
-final class FactoTestModule extends AbstractModule {
+final class TestModule extends AbstractModule {
 
   override def configure() = {
     install(new ConfigModule)

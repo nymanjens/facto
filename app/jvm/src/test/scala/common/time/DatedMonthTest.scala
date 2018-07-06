@@ -4,7 +4,7 @@ import java.time.LocalDate
 import java.time.Month._
 
 import com.google.inject.{Guice, Inject}
-import common.testing.{FactoTestModule, FakeI18n, HookedSpecification}
+import common.testing.{TestModule, FakeI18n, HookedSpecification}
 import common.time.LocalDateTimes.createDateTime
 
 class DatedMonthTest extends HookedSpecification {
@@ -12,7 +12,7 @@ class DatedMonthTest extends HookedSpecification {
   @Inject implicit private val fakeI18n: FakeI18n = null
 
   override def before() = {
-    Guice.createInjector(new FactoTestModule).injectMembers(this)
+    Guice.createInjector(new TestModule).injectMembers(this)
   }
 
   "abbreviation" in {

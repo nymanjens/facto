@@ -14,7 +14,7 @@ class UsersTest extends HookedSpecification {
   @Inject implicit private val clock: FakeClock = null
 
   override def before() = {
-    Guice.createInjector(new FactoTestModule).injectMembers(this)
+    Guice.createInjector(new TestModule).injectMembers(this)
   }
 
   "createUser()" in new WithApplication {

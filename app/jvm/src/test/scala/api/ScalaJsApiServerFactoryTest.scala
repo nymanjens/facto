@@ -40,7 +40,7 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
   @Inject private val serverFactory: ScalaJsApiServerFactory = null
 
   override def before() = {
-    Guice.createInjector(new FactoTestModule).injectMembers(this)
+    Guice.createInjector(new TestModule).injectMembers(this)
   }
 
   "getInitialData()" in new WithApplication {
