@@ -2,7 +2,5 @@ package api
 
 final class Module {
 
-  import com.softwaremill.macwire._
-
-  implicit lazy val scalaJsApiClient: ScalaJsApiClient = wire[ScalaJsApiClient.Impl]
+  implicit lazy val scalaJsApiClient: ScalaJsApiClient = new ScalaJsApiClient.Impl
 }
