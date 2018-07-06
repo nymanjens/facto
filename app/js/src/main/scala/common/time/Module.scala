@@ -4,5 +4,5 @@ final class Module {
 
   import com.softwaremill.macwire._
 
-  implicit lazy val clock: Clock = wire[JsClock]
+  implicit lazy val clock: Clock = new JsClock
 }

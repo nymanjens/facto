@@ -186,6 +186,6 @@ object SummaryTableTest extends TestSuite {
     implicit val summaryExchangeRateGainsStoreFactory = storesModule.summaryExchangeRateGainsStoreFactory
     implicit val cashFlowEntriesStoreFactory = storesModule.cashFlowEntriesStoreFactory
 
-    val summaryTable: SummaryTable = wire[SummaryTable]
+    val summaryTable: SummaryTable = new SummaryTable
   }
 }

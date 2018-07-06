@@ -23,23 +23,23 @@ final class Module(implicit i18n: I18n,
 
   import com.softwaremill.macwire._
 
-  wire[TransactionAndGroupStore]
-  wire[BalanceCheckStore]
+  new TransactionAndGroupStore
+  new BalanceCheckStore
 
-  implicit private val complexQueryFilter = wire[ComplexQueryFilter]
+  implicit private val complexQueryFilter = new ComplexQueryFilter
 
-  implicit val allEntriesStoreFactory = wire[AllEntriesStoreFactory]
-  implicit val cashFlowEntriesStoreFactory = wire[CashFlowEntriesStoreFactory]
-  implicit val liquidationEntriesStoreFactory = wire[LiquidationEntriesStoreFactory]
-  implicit val endowmentEntriesStoreFactory = wire[EndowmentEntriesStoreFactory]
-  implicit val tagsStoreFactory = wire[TagsStoreFactory]
-  implicit val complexQueryStoreFactory = wire[ComplexQueryStoreFactory]
-  implicit val summaryForYearStoreFactory = wire[SummaryForYearStoreFactory]
-  implicit val summaryYearsStoreFactory = wire[SummaryYearsStoreFactory]
-  implicit val summaryExchangeRateGainsStoreFactory = wire[SummaryExchangeRateGainsStoreFactory]
-  implicit val globalMessagesStore = wire[GlobalMessagesStore]
-  implicit val pageLoadingStateStore = wire[PageLoadingStateStore]
-  implicit val pendingModificationsStore = wire[PendingModificationsStore]
-  implicit val applicationIsOnlineStore = wire[ApplicationIsOnlineStore]
-  implicit val userStore = wire[UserStore]
+  implicit val allEntriesStoreFactory = new AllEntriesStoreFactory
+  implicit val cashFlowEntriesStoreFactory = new CashFlowEntriesStoreFactory
+  implicit val liquidationEntriesStoreFactory = new LiquidationEntriesStoreFactory
+  implicit val endowmentEntriesStoreFactory = new EndowmentEntriesStoreFactory
+  implicit val tagsStoreFactory = new TagsStoreFactory
+  implicit val complexQueryStoreFactory = new ComplexQueryStoreFactory
+  implicit val summaryForYearStoreFactory = new SummaryForYearStoreFactory
+  implicit val summaryYearsStoreFactory = new SummaryYearsStoreFactory
+  implicit val summaryExchangeRateGainsStoreFactory = new SummaryExchangeRateGainsStoreFactory
+  implicit val globalMessagesStore = new GlobalMessagesStore
+  implicit val pageLoadingStateStore = new PageLoadingStateStore
+  implicit val pendingModificationsStore = new PendingModificationsStore
+  implicit val applicationIsOnlineStore = new ApplicationIsOnlineStore
+  implicit val userStore = new UserStore
 }

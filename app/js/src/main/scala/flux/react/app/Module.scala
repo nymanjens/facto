@@ -42,20 +42,20 @@ final class Module(implicit i18n: I18n,
   private val balanceCheckFormModule = new flux.react.app.balancecheckform.Module
   private val transactionViewsModule = new flux.react.app.transactionviews.Module
 
-  implicit private lazy val menu: Menu = wire[Menu]
-  implicit private lazy val globalMessages: GlobalMessages = wire[GlobalMessages]
-  implicit private lazy val pageLoadingSpinner: PageLoadingSpinner = wire[PageLoadingSpinner]
+  implicit private lazy val menu: Menu = new Menu
+  implicit private lazy val globalMessages: GlobalMessages = new GlobalMessages
+  implicit private lazy val pageLoadingSpinner: PageLoadingSpinner = new PageLoadingSpinner
   implicit private lazy val applicationDisconnectedIcon: ApplicationDisconnectedIcon =
-    wire[ApplicationDisconnectedIcon]
+    new ApplicationDisconnectedIcon
   implicit private lazy val pendingModificationsCounter: PendingModificationsCounter =
-    wire[PendingModificationsCounter]
+    new PendingModificationsCounter
 
-  implicit lazy val layout: Layout = wire[Layout]
+  implicit lazy val layout: Layout = new Layout
 
   implicit lazy val userProfile = userManagementModule.userProfile
   implicit lazy val userAdministration = userManagementModule.userAdministration
 
-  implicit lazy val templateList = wire[TemplateList]
+  implicit lazy val templateList = new TemplateList
 
   implicit lazy val transactionGroupForm: TransactionGroupForm =
     transactionGroupFormModule.transactionGroupForm

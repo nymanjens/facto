@@ -120,7 +120,7 @@ object EverythingTest extends TestSuite {
 
     import com.softwaremill.macwire._
 
-    implicit val factory: AllEntriesStoreFactory = wire[AllEntriesStoreFactory]
-    val everything: Everything = wire[Everything]
+    implicit val factory: AllEntriesStoreFactory = new AllEntriesStoreFactory
+    val everything: Everything = new Everything
   }
 }

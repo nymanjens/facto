@@ -30,11 +30,11 @@ final class Module(implicit i18n: I18n,
 
   import com.softwaremill.macwire._
 
-  implicit lazy val everything = wire[Everything]
-  implicit lazy val cashFlow = wire[CashFlow]
-  implicit lazy val liquidation = wire[Liquidation]
-  implicit lazy val endowments = wire[Endowments]
-  implicit lazy val searchResults = wire[SearchResults]
-  implicit private lazy val summaryTable = wire[SummaryTable]
-  implicit lazy val summary = wire[Summary]
+  implicit lazy val everything = new Everything
+  implicit lazy val cashFlow = new CashFlow
+  implicit lazy val liquidation = new Liquidation
+  implicit lazy val endowments = new Endowments
+  implicit lazy val searchResults = new SearchResults
+  implicit private lazy val summaryTable = new SummaryTable
+  implicit lazy val summary = new Summary
 }
