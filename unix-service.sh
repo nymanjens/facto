@@ -1,7 +1,7 @@
 #!/bin/sh
 # To install facto as a service:
 # - move this file to /etc/init.d/facto
-# - update FACTO_ROOT
+# - update SERVICE_ROOT
 # - run:
 #     sudo chmod +x /etc/init.d/facto
 #     sudo update-rc.d facto defaults # start at startup
@@ -21,8 +21,8 @@ HOME=/root
 export USER HOME
 
 ### settings ##
-FACTO_ROOT=/path/to/facto
-RUNNING_PID=$FACTO_ROOT/RUNNING_PID
+SERVICE_ROOT=/path/to/facto
+RUNNING_PID=$SERVICE_ROOT/RUNNING_PID
 
 ### helper functions ###
 kill_running() {
@@ -62,7 +62,7 @@ case "$1" in
 
     echo "Starting facto..." && echo
 
-    su pi -c "cd $FACTO_ROOT && bin/server" > /tmp/facto-logs 2>&1 &
+    su pi -c "cd $SERVICE_ROOT && bin/server" > /tmp/facto-logs 2>&1 &
 
     echo "Waiting for $RUNNING_PID to appear"
     for i in `seq 1 20`; do
