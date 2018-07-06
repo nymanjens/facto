@@ -1,7 +1,6 @@
-package flux.react
+package flux
 
 import common.LoggingUtils.logExceptions
-import flux.ClientAppModule
 import org.scalajs.dom
 import org.scalajs.dom.console
 import org.scalajs.dom.raw.Event
