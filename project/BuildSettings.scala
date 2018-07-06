@@ -128,9 +128,7 @@ object BuildSettings {
       webjarDeps.mousetrap / "plugins/global-bind/mousetrap-global-bind.min.js",
       webjarDeps.reactTagInput / files.reactDnd dependsOn files.reactDom,
       webjarDeps.reactTagInput / "ReactTags.min.js" dependsOn files.reactDnd,
-      webjarDeps.reactAutosuggest / "dist/standalone/autosuggest.min.js" dependsOn files.reactDom,
-      webjarDeps.lokiJs / "lokijs.min.js",
-      webjarDeps.lokiJs / "loki-indexed-adapter.min.js"
+      webjarDeps.reactAutosuggest / "dist/standalone/autosuggest.min.js" dependsOn files.reactDom
     ))
 
   val webworkerJsDependencies = Def.setting(
