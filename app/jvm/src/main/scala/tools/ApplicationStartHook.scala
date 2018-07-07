@@ -53,7 +53,7 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
     }
 
     if (CommandLineFlags.createAdminUser) {
-      implicit val user = Users.getOrCreateRobotUser()
+      implicit val robotUser = Users.getOrCreateRobotUser()
 
       val loginName = "admin"
       val password = AppConfigHelper.defaultPassword getOrElse "changeme"
