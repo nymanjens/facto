@@ -92,7 +92,11 @@ object JavascriptFiles {
     )
 
     private def firstExistingVersionedAsset(filenames: String*): Asset =
-      VersionedAsset(filenames.find(name => ResourceFiles.exists(s"/public/$name")).get)
+      VersionedAsset(
+        filenames
+          .find(name => ResourceFiles.exists(s"/public/$name"))
+          .getOrElse(
+            throw new IllegalArgumentException(s"Could not find any of these files: ${filenames.toVector}")))
 
     sealed trait Asset {
       def maybeLocalResource: Option[URL]
