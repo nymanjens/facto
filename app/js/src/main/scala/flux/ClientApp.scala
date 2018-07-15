@@ -8,12 +8,11 @@ import org.scalajs.dom.raw.Event
 import scala.async.Async.{async, await}
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import common.LoggingUtils.{logExceptions, logFailure}
+import org.scalajs.dom.{Event, console}
 
-@JSExportTopLevel("ClientApp")
 object ClientApp extends js.JSApp {
 
-  @JSExport
   override def main(): Unit = async {
     console.log("  Application starting")
     // send log messages also to the server
