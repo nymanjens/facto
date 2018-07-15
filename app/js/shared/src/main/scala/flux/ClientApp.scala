@@ -1,6 +1,5 @@
 package flux
 
-import common.LoggingUtils.logExceptions
 import org.scalajs.dom
 import org.scalajs.dom.console
 import org.scalajs.dom.raw.Event
@@ -11,9 +10,9 @@ import scala.scalajs.js
 import common.LoggingUtils.{logExceptions, logFailure}
 import org.scalajs.dom.{Event, console}
 
-object ClientApp extends js.JSApp {
+object ClientApp {
 
-  override def main(): Unit = async {
+  def main(): Unit = async {
     console.log("  Application starting")
     // send log messages also to the server
     //log.enableServerLogging("/logging")
