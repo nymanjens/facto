@@ -287,12 +287,12 @@ final class TransactionGroupForm(implicit i18n: I18n,
     }
 
     private val addTransactionPanelCallback: Callback = LogExceptionsCallback {
-      $.modState(logExceptions(_.plusPanel())).runNow()
+      $.modState(state => logExceptions(state.plusPanel())).runNow()
       LogExceptionsFuture(onFormChange()) // Make sure the state is updated after this
     }
 
     private def removeTransactionPanel(index: Int): Callback = LogExceptionsCallback {
-      $.modState(logExceptions(_.minusPanelIndex(index))).runNow()
+      $.modState(state => logExceptions(state.minusPanelIndex(index))).runNow()
       LogExceptionsFuture(onFormChange()) // Make sure the state is updated after this
     }
 
@@ -301,12 +301,13 @@ final class TransactionGroupForm(implicit i18n: I18n,
     }
 
     private def updateTotalFlowRestriction(totalFlowRestriction: TotalFlowRestriction): Unit = {
-      $.modState(logExceptions { state =>
-        var newState = state.copy(totalFlowRestriction = totalFlowRestriction)
-        if (totalFlowRestriction == TotalFlowRestriction.ZeroSum) {
-          newState = newState.copy(totalFlow = ReferenceMoney(0))
-        }
-        newState
+      $.modState(state =>
+        logExceptions {
+          var newState = state.copy(totalFlowRestriction = totalFlowRestriction)
+          if (totalFlowRestriction == TotalFlowRestriction.ZeroSum) {
+            newState = newState.copy(totalFlow = ReferenceMoney(0))
+          }
+          newState
       }).runNow()
     }
 
