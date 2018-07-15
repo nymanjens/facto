@@ -4,7 +4,8 @@ import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.time.{LocalDateTime, TimeUtils}
 import flux.react.uielements.input.MappedInput.ValueTransformer
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
+import japgolly.scalajs.react.component.Scala.{MountedImpure}
+import japgolly.scalajs.react.Ref.ToScalaComponent
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom._
 
@@ -41,7 +42,7 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
       .vdomElement
   }
 
-  def ref(): Reference = new Reference(ScalaComponent.mutableRefTo(component))
+  def ref(): Reference = new Reference(Ref.toScalaComponent(component))
   def delegateRef(ref: Reference): DelegateReference = new DelegateReference(ref.mutableRef)
 
   // **************** Public inner types ****************//
@@ -53,21 +54,21 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
   final class Reference private[MappedInput] (private[MappedInput] val mutableRef: ThisMutableRef)
       extends InputBase.Reference[Value] {
     override def apply(): InputBase.Proxy[Value] = {
-      Option(mutableRef.value) map (new Proxy(_)) getOrElse InputBase.Proxy.nullObject()
+      Option(mutableRef.unsafeGet()) map (new Proxy(_)) getOrElse InputBase.Proxy.nullObject()
     }
   }
 
   final class DelegateReference private[MappedInput] (mutableRef: ThisMutableRef)
       extends InputBase.Reference[DelegateValue] {
     override def apply(): InputBase.Proxy[DelegateValue] = {
-      Option(mutableRef.value) map (_.backend.delegateRef()) getOrElse InputBase.Proxy.nullObject()
+      Option(mutableRef.unsafeGet()) map (_.backend.delegateRef()) getOrElse InputBase.Proxy.nullObject()
     }
   }
 
   // **************** Private inner types ****************//
   private type State = Unit
   private type ThisCtorSummoner = CtorType.Summoner.Aux[Box[Props.any], Children.None, CtorType.Props]
-  private type ThisMutableRef = MutableRef[Props.any, State, Backend, ThisCtorSummoner#CT]
+  private type ThisMutableRef = ToScalaComponent[Props.any, State, Backend, ThisCtorSummoner#CT]
   private type ThisComponentU = MountedImpure[Props.any, State, Backend]
 
   private final class Proxy(private val component: ThisComponentU) extends InputBase.Proxy[Value] {

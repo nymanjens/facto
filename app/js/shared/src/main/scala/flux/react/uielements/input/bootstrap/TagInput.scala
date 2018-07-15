@@ -5,7 +5,8 @@ import common.LoggingUtils.logExceptions
 import flux.react.ReactVdomUtils.{<<, ^^}
 import flux.react.uielements.input.{InputBase, InputValidator}
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
+import japgolly.scalajs.react.component.Scala.{MountedImpure}
+import japgolly.scalajs.react.Ref.ToScalaComponent
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom.html_<^._
 import jsfacades.ReactTagInput
@@ -46,18 +47,18 @@ object TagInput {
     ref.mutableRef.component(props)
   }
 
-  def ref(): Reference = new Reference(ScalaComponent.mutableRefTo(component))
+  def ref(): Reference = new Reference(Ref.toScalaComponent(component))
 
   // **************** Public inner types ****************//
   final class Reference private[TagInput] (private[TagInput] val mutableRef: ThisMutableRef)
       extends InputBase.Reference[Seq[String]] {
     override def apply(): InputBase.Proxy[Seq[String]] = {
-      Option(mutableRef.value) map (new Proxy(_)) getOrElse InputBase.Proxy.nullObject()
+      Option(mutableRef.unsafeGet()) map (new Proxy(_)) getOrElse InputBase.Proxy.nullObject()
     }
   }
   // **************** Private inner types ****************//
   private type ThisCtorSummoner = CtorType.Summoner.Aux[Box[Props], Children.None, CtorType.Props]
-  private type ThisMutableRef = MutableRef[Props, State, Backend, ThisCtorSummoner#CT]
+  private type ThisMutableRef = ToScalaComponent[Props, State, Backend, ThisCtorSummoner#CT]
   private type ThisComponentU = MountedImpure[Props, State, Backend]
 
   case class Props(label: String,

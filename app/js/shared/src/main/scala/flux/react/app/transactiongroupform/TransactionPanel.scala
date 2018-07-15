@@ -12,7 +12,8 @@ import flux.react.uielements.input.bootstrap.{MoneyInput, SelectInput, TextAreaI
 import flux.react.uielements.input.{InputBase, InputWithDefaultFromReference, MappedInput, bootstrap}
 import flux.stores.entries.factories.TagsStoreFactory
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
+import japgolly.scalajs.react.component.Scala.{MountedImpure}
+import japgolly.scalajs.react.Ref.ToScalaComponent
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom.html_<^._
 import models.access.DbQueryImplicits._
@@ -25,6 +26,7 @@ import scala.async.Async.{async, await}
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
+import japgolly.scalajs.react.Ref.ToScalaComponent
 
 private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                                                            accountingConfig: Config,
@@ -101,7 +103,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
     ref.mutableRef.component.withKey(key.toString).apply(props)
   }
 
-  def ref(): Reference = new Reference(ScalaComponent.mutableRefTo(component))
+  def ref(): Reference = new Reference(Ref.toScalaComponent(component))
 
   // **************** Private methods ****************//
   private def selectableReservoirs(currentReservoir: MoneyReservoir = null): Seq[MoneyReservoir] = {
@@ -113,8 +115,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
 
   // **************** Public inner types ****************//
   final class Reference private[TransactionPanel] (
-      private[TransactionPanel] val mutableRef: MutableRef[Props, State, Backend, ThisCtorSummoner#CT]) {
-    def apply(): Proxy = new Proxy(() => Option(mutableRef.value))
+      private[TransactionPanel] val mutableRef: ToScalaComponent[Props, State, Backend, ThisCtorSummoner#CT]) {
+    def apply(): Proxy = new Proxy(() => Option(mutableRef.unsafeGet()))
   }
 
   final class Proxy private[TransactionPanel] (
