@@ -4,6 +4,7 @@ import common.I18n
 import flux.react.uielements.input.bootstrap.InputComponent.{Props, ValueTransformer}
 import flux.react.uielements.input.{InputBase, InputValidator}
 import japgolly.scalajs.react._
+import japgolly.scalajs.react.raw.React
 import japgolly.scalajs.react.vdom.VdomElement
 import japgolly.scalajs.react.vdom.html_<^._
 import jsfacades.ReactAutosuggest
@@ -24,7 +25,7 @@ object AutosuggestTextInput {
         suggestions = extraProps.suggestions,
         onSuggestionsFetchRequested = extraProps.onSuggestionsFetchRequested,
         onSuggestionsClearRequested = extraProps.onSuggestionsClearRequested,
-        renderSuggestion = suggestion => js.Dynamic.global.React.createElement("a", null, suggestion),
+        renderSuggestion = suggestion => React.createElement("a", null, suggestion),
         inputProps = ReactAutosuggest.InputProps(
           value = valueString,
           onChange = newString => onChange(newString).runNow(),

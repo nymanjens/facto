@@ -7,6 +7,8 @@ import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala2js.Converters._
 
+import scala.scalajs.js.annotation.JSImport
+
 object ReactAutosuggest {
 
   // **************** API ****************//
@@ -16,7 +18,7 @@ object ReactAutosuggest {
             renderSuggestion: String => js.Any,
             inputProps: InputProps,
             theme: Theme) = {
-    val component = JsComponent[js.Object, Children.None, Null](js.Dynamic.global.Autosuggest)
+    val component = JsComponent[js.Object, Children.None, Null](RawComponent)
     component(
       Props(
         suggestions = suggestions.toJSArray,
@@ -53,6 +55,10 @@ object ReactAutosuggest {
                    suggestionHighlighted: String)
 
   // **************** Private inner types ****************//
+  @JSImport("react-autosuggest", JSImport.Namespace)
+  @js.native
+  private object RawComponent extends js.Object
+
   private case class Props(suggestions: js.Array[String],
                            onSuggestionsFetchRequested: js.Function1[js.Dynamic, Unit],
                            onSuggestionsClearRequested: js.Function0[Unit],

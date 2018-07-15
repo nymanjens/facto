@@ -8,6 +8,8 @@ import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala2js.Converters._
 
+import scala.scalajs.js.annotation.JSImport
+
 object ReactTagInput {
 
   // **************** API ****************//
@@ -20,7 +22,7 @@ object ReactTagInput {
             minQueryLength: Int = 2,
             classNames: Map[String, String] = Map(),
             autoFocus: Boolean = false) = {
-    val component = JsComponent[js.Object, Children.None, Null](js.Dynamic.global.ReactTags.WithContext)
+    val component = JsComponent[js.Object, Children.None, Null](RawComponent)
     component(
       Props(
         tags = tags.zipWithIndex.map { case (tag, i) => TagObject(i, tag) }.toJSArray,
@@ -45,6 +47,10 @@ object ReactTagInput {
   }
 
   // **************** Private inner types ****************//
+  @JSImport("react-tag-input", "WithContext")
+  @js.native
+  private object RawComponent extends js.Object
+
   @js.native
   private trait TagObject extends js.Object {
     def id: Int = js.native
