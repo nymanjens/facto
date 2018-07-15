@@ -17,12 +17,13 @@ object LoggingUtils {
         throw t
     }
   }
-  def logFailure[T](future: Future[T])(implicit executor: ExecutionContext): Future[T] = {
-    future.failed.foreach { t =>
+  def logFailure[T](future: => Future[T])(implicit executor: ExecutionContext): Future[T] = {
+    val theFuture = logExceptions(future)
+    theFuture.failed.foreach { t =>
       console.log(s"  Caught exception: $t")
       t.printStackTrace()
     }
-    future
+    theFuture
   }
 
   def LogExceptionsCallback[T](codeBlock: => T): CallbackTo[T] = {

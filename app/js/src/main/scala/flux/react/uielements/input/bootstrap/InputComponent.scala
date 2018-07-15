@@ -5,7 +5,8 @@ import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import flux.react.ReactVdomUtils.{<<, ^^}
 import flux.react.uielements.input.{InputBase, InputValidator}
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.component.Scala.{MountedImpure, MutableRef}
+import japgolly.scalajs.react.component.Scala.{MountedImpure}
+import japgolly.scalajs.react.Ref.ToScalaComponent
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom.html_<^._
 import org.scalajs.dom.console
@@ -108,7 +109,7 @@ private[bootstrap] object InputComponent {
   private type ThisCtorSummoner[Value, ExtraProps] =
     CtorType.Summoner.Aux[Box[Props[Value, ExtraProps]], Children.None, CtorType.Props]
   type ThisMutableRef[Value, ExtraProps] =
-    MutableRef[Props[Value, ExtraProps], State[Value], Backend, ThisCtorSummoner[Value, ExtraProps]#CT]
+    ToScalaComponent[Props[Value, ExtraProps], State[Value], Backend, ThisCtorSummoner[Value, ExtraProps]#CT]
 
   trait InputRenderer[ExtraProps] {
     def renderInput(classes: Seq[String],
@@ -183,7 +184,7 @@ private[bootstrap] object InputComponent {
   abstract class Reference[Value, ExtraProps](mutableRef: ThisMutableRef[Value, ExtraProps])
       extends InputBase.Reference[Value] {
     override final def apply(): InputBase.Proxy[Value] = {
-      Option(mutableRef.value) map (new Proxy(_)) getOrElse InputBase.Proxy.nullObject()
+      Option(mutableRef.unsafeGet()) map (new Proxy(_)) getOrElse InputBase.Proxy.nullObject()
     }
   }
 

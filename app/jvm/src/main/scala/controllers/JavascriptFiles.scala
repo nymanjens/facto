@@ -22,16 +22,17 @@ final class JavascriptFiles @Inject()(implicit override val messagesApi: Message
                                       clock: Clock,
                                       entityAccess: JvmEntityAccess,
                                       playConfiguration: play.api.Configuration,
-                                      env: play.api.Environment,
-                                      webJarAssets: controllers.WebJarAssets)
+                                      env: play.api.Environment)
     extends AbstractController(components)
     with I18nSupport {
 
   private lazy val localDatabaseWebWorkerResultCache: Result =
     Ok(s"""
           |importScripts("${JavascriptFiles.Assets.webworkerDeps.urlPath}");
-          |importScripts("${JavascriptFiles.Assets.clientApp.urlPath}");
-          |LocalDatabaseWebWorkerScript.run();
+          |var require = ScalaJSBundlerLibrary.require;
+          |var exports = {};
+          |var window = self;
+          |importScripts("${JavascriptFiles.Assets.webworker.urlPath}");
       """.stripMargin).as("application/javascript")
   def localDatabaseWebWorker = Action(_ => localDatabaseWebWorkerResultCache)
 
@@ -61,34 +62,43 @@ final class JavascriptFiles @Inject()(implicit override val messagesApi: Message
 object JavascriptFiles {
   private object Assets {
     private val clientAppProjectName: String = "client"
-    private val webworkerDepsProjectName: String = "webworker-client-deps"
+    private val webworkerProjectName: String = "webworker-client"
 
     val clientApp: Asset =
       firstExistingVersionedAsset(s"$clientAppProjectName-opt.js", s"$clientAppProjectName-fastopt.js")
     val clientAppDeps: Asset =
-      firstExistingVersionedAsset(s"$clientAppProjectName-jsdeps.min.js", s"$clientAppProjectName-jsdeps.js")
+      firstExistingVersionedAsset(
+        s"$clientAppProjectName-opt-library.js",
+        s"$clientAppProjectName-fastopt-library.js")
+    val webworker: Asset =
+      firstExistingVersionedAsset(s"$webworkerProjectName-opt.js", s"$webworkerProjectName-fastopt.js")
     val webworkerDeps: Asset =
       firstExistingVersionedAsset(
-        s"$webworkerDepsProjectName-jsdeps.min.js",
-        s"$webworkerDepsProjectName-jsdeps.js")
+        s"$webworkerProjectName-opt-library.js",
+        s"$webworkerProjectName-fastopt-library.js")
 
     val all: Seq[Asset] = Seq(
       clientApp,
       clientAppDeps,
+      webworker,
       webworkerDeps,
-      WebJarAsset("metisMenu/1.1.3/metisMenu.min.css"),
-      WebJarAsset("font-awesome/4.6.2/css/font-awesome.min.css"),
-      WebJarAsset("font-awesome/4.6.2/fonts/fontawesome-webfont.woff2?v=4.6.2"),
-      WebJarAsset("font-awesome/4.6.2/fonts/fontawesome-webfont.woff?v=4.6.2 0"),
-      WebJarAsset("font-awesome/4.6.2/fonts/fontawesome-webfont.ttf?v=4.6.2"),
       VersionedAsset("images/favicon192x192.png"),
-      VersionedAsset("lib/bootstrap/css/bootstrap.min.css"),
+      VersionedAsset("bootstrap/dist/css/bootstrap.min.css"),
+      VersionedAsset("metismenu/dist/metisMenu.min.css"),
+      VersionedAsset("font-awesome/css/font-awesome.min.css"),
+      UnversionedAsset("font-awesome/fonts/fontawesome-webfont.woff2?v=4.6.3"),
+      UnversionedAsset("font-awesome/fonts/fontawesome-webfont.woff?v=4.6.3 0"),
+      UnversionedAsset("font-awesome/fonts/fontawesome-webfont.ttf?v=4.6.3"),
       VersionedAsset("lib/fontello/css/fontello.css"),
       UnversionedAsset("lib/fontello/font/fontello.woff2?49985636"),
-      VersionedAsset("bower_components/startbootstrap-sb-admin-2/dist/css/sb-admin-2.css"),
+      VersionedAsset("startbootstrap-sb-admin-2/dist/css/sb-admin-2.css"),
       VersionedAsset("stylesheets/main.min.css"),
-      VersionedAsset("bower_components/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js"),
+      VersionedAsset("jquery/dist/jquery.min.js"),
+      VersionedAsset("bootstrap/dist/js/bootstrap.min.js"),
+      VersionedAsset("metismenu/dist/metisMenu.min.js"),
+      VersionedAsset("startbootstrap-sb-admin-2/dist/js/sb-admin-2.js"),
       DynamicAsset(routes.JavascriptFiles.localDatabaseWebWorker)
+      // TODO: Revisit this list
     )
 
     private def firstExistingVersionedAsset(filenames: String*): Asset =
@@ -114,10 +124,6 @@ object JavascriptFiles {
     }
     case class UnversionedAsset(relativePath: String) extends ResourceAsset(relativePath) {
       override def urlPath = s"/assets/$relativePath"
-    }
-    case class WebJarAsset(relativePath: String) extends Asset {
-      override def maybeLocalResource = None
-      override def urlPath = routes.WebJarAssets.at(relativePath).path()
     }
     case class DynamicAsset(call: Call) extends Asset {
       override def maybeLocalResource = None

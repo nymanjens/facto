@@ -6,10 +6,10 @@ import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
-import scala.scalajs.js.annotation.JSGlobal
+import scala.scalajs.js.annotation.{JSGlobal, JSImport}
 
 object LokiJs {
-  @JSGlobal("loki")
+  @JSImport("lokijs", JSImport.Namespace)
   @js.native
   private final class DatabaseFacade(dbName: String, args: js.Dictionary[js.Any] = null) extends js.Object {
 
@@ -67,11 +67,11 @@ object LokiJs {
     def loadDatabase(dbName: String, callback: js.Function1[js.Any, Unit]): Unit = js.native
   }
   private object Adapter {
-    @JSGlobal("LokiIndexedAdapter")
+    @JSImport("lokijs/src/loki-indexed-adapter", JSImport.Namespace)
     @js.native
     final class IndexedAdapter(name: String) extends Adapter
 
-    @JSGlobal("loki.LokiMemoryAdapter")
+    @JSImport("lokijs", "LokiMemoryAdapter")
     @js.native
     final class MemoryAdapter() extends Adapter
   }

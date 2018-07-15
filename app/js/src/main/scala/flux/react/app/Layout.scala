@@ -132,12 +132,12 @@ final class Layout(implicit globalMessages: GlobalMessages,
 
   // **************** Private helper methods ****************//
   private def navbarCollapsed: Boolean = {
-    // Based on Start Bootstrap code in bower_components/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js
+    // Based on Start Bootstrap code in assets/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js
     val width = if (dom.window.innerWidth > 0) dom.window.innerWidth else dom.window.screen.width
     width < 768
   }
   private def pageWrapperHeight: Int = {
-    // Based on Start Bootstrap code in bower_components/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js
+    // Based on Start Bootstrap code in assets/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js
     val topOffset = if (navbarCollapsed) 100 else 50
 
     val windowHeight = if (dom.window.innerHeight > 0) dom.window.innerHeight else dom.window.screen.height

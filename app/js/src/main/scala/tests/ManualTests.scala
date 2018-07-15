@@ -3,13 +3,10 @@ package tests
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 /** Test framework for unit tests that have to be manually run in a browser. */
-@JSExportTopLevel("ManualTests")
 object ManualTests {
 
-  @JSExport
   def run(): Unit = {
     var nextFuture = Future.successful((): Unit)
     var successCount = 0

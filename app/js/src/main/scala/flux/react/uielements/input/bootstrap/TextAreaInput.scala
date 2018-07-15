@@ -51,7 +51,7 @@ object TextAreaInput {
     ref.mutableRef.component(props)
   }
 
-  def ref(): Reference = new Reference(ScalaComponent.mutableRefTo(component))
+  def ref(): Reference = new Reference(Ref.toScalaComponent(component))
 
   // **************** Public inner types ****************//
   final class Reference private[TextAreaInput] (

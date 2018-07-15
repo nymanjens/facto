@@ -12,17 +12,14 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scala.util.{Failure, Success}
 import scala2js.Converters._
 import scala2js.Scala2Js
 
-@JSExportTopLevel("LocalDatabaseWebWorkerScript")
 object LocalDatabaseWebWorkerScript {
 
   private val apiImpl = new LocalDatabaseWebWorkerApiImpl()
 
-  @JSExport
   def run(): Unit = {
     WebWorker.addEventListener("message", onMessage _)
   }

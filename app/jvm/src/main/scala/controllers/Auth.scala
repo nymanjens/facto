@@ -13,8 +13,7 @@ final class Auth @Inject()(implicit override val messagesApi: MessagesApi,
                            components: ControllerComponents,
                            entityAccess: JvmEntityAccess,
                            playConfiguration: play.api.Configuration,
-                           env: play.api.Environment,
-                           webJarAssets: controllers.WebJarAssets)
+                           env: play.api.Environment)
     extends AbstractController(components)
     with I18nSupport {
 

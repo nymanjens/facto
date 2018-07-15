@@ -1,12 +1,12 @@
 package jsfacades
 
 import org.scalajs.dom.raw.KeyboardEvent
-
-import scala.scalajs.js
-import scala.scalajs.js.annotation.JSGlobal
 import scala2js.Converters._
 
-@JSGlobal("Mousetrap")
+import scala.scalajs.js
+import scala.scalajs.js.annotation.JSImport
+
+@JSImport("global-mousetrap", JSImport.Namespace)
 @js.native
 object Mousetrap extends js.Object {
 

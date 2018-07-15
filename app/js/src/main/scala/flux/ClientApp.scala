@@ -30,18 +30,18 @@ object ClientApp extends js.JSApp {
 
     val apiModule = new api.Module
     implicit val scalaJsApiClient = apiModule.scalaJsApiClient
-    implicit val initialDataResponse = await(scalaJsApiClient.getInitialData())
+    implicit val initialDataResponse = await(logFailure(scalaJsApiClient.getInitialData()))
 
-    implicit val globalModule = new ClientAppModule()
-
-    // tell React to render the router in the document body
     logExceptions {
+      implicit val globalModule = new ClientAppModule()
+
+      // tell React to render the router in the document body
       globalModule.router().renderIntoDOM(dom.document.getElementById("root"))
     }
   }
 
   private def logUncaughtErrors(): Unit = {
-    dom.window.onerror = (event, url, lineNumber, _) => console.log("  Uncaught error:", event)
+    dom.window.onerror = (event, url, lineNumber, _1, _2) => console.log("  Uncaught error:", event)
     dom.window.addEventListener("error", (event: Event) => {
       console.log("  Uncaught error:", event)
       false

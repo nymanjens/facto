@@ -1,6 +1,7 @@
 package flux.react.uielements.input
 
 import japgolly.scalajs.react._
+import org.scalajs.dom.console
 
 /**
   * Contains base traits to be used by input components that describe a single value.
@@ -34,7 +35,10 @@ object InputBase {
     final def valueIsValid: Boolean = value.isDefined
 
     /** Focuses the input field. */
-    def focus(): Unit = ???
+    def focus(): Unit = {
+      console.log("focus() not implemented")
+      throw new UnsupportedOperationException()
+    }
 
     def registerListener(listener: Listener[Value]): Unit
     def deregisterListener(listener: Listener[Value]): Unit

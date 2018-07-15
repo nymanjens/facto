@@ -57,7 +57,7 @@ object BinaryWebsocketClient {
         logLine(name, "Opened")
         onOpen()
     }
-    jsWebsocket.onerror = (e: ErrorEvent) =>
+    jsWebsocket.onerror = (e: Event) =>
       logExceptions {
         // Note: the given event turns out to be of type "error", but has an undefined message. This causes
         // ClassCastException when accessing it as a String
