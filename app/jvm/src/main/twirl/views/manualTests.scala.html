@@ -7,14 +7,10 @@
 
 @extrascript = {
   @* The compiled scala.js code *@
-  @scalajs.html.selectScript(
-      projectName = "client",
+  @utils.ImportScalaJsProject(
+      projectName = "manual-tests",
       assets = path => routes.Assets.versioned(path).toString,
       resourceExists = name => getClass.getResource(s"/public/$name") != null)
-
-  <script>
-    ManualTests.run()
-  </script>
 }
 
 @Base("Manual Tests", extrascript = extrascript) {

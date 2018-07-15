@@ -79,8 +79,33 @@ lazy val webworkerClient: Project = (project in file("app/js/webworker"))
   .enablePlugins(ScalaJSBundlerPlugin, ScalaJSWeb)
   .dependsOn(sharedJsCopy, jsShared)
 
+lazy val manualTests: Project = (project in file("app/js/manualtests"))
+  .settings(
+    name := "manual-tests",
+    version := BuildSettings.version,
+    scalaVersion := BuildSettings.versions.scala,
+    scalacOptions ++= BuildSettings.scalacOptions,
+    libraryDependencies ++= BuildSettings.scalajsDependencies.value,
+    // by default we do development build, no eliding
+    elideOptions := Seq(),
+    scalacOptions ++= elideOptions.value,
+    // use Scala.js provided launcher code to start the client app
+    scalaJSUseMainModuleInitializer := true,
+    // Fix for bug that produces a huge amount of warnings (https://github.com/webpack/webpack/issues/4518).
+    // Unfortunately, this means no source maps :-/
+    emitSourceMaps in fastOptJS := false,
+    // scalajs-bundler NPM packages
+    npmDependencies in Compile ++= BuildSettings.npmDependencies(baseDirectory.value / "../../.."),
+    // Custom webpack config
+    webpackConfigFile := Some(baseDirectory.value / "webpack.config.js"),
+    // Enable faster builds when developing
+    webpackBundlingMode := BundlingMode.LibraryOnly()
+  )
+  .enablePlugins(ScalaJSBundlerPlugin, ScalaJSWeb)
+  .dependsOn(sharedJsCopy, jsShared)
+
 // Client projects
-lazy val clientProjects = Seq(client, webworkerClient)
+lazy val clientProjects = Seq(client, webworkerClient, manualTests)
 
 lazy val server = (project in file("app/jvm"))
   .settings(
@@ -118,6 +143,7 @@ lazy val ReleaseCmd = Command.command("release") { state =>
     "client/clean" ::
     "client/test" ::
     "webworkerClient/clean" ::
+    "manualTests/clean" ::
     "server/clean" ::
     "server/test" ::
     "server/dist" ::
