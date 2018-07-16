@@ -53,7 +53,7 @@ object TagInput {
   final class Reference private[TagInput] (private[TagInput] val mutableRef: ThisMutableRef)
       extends InputBase.Reference[Seq[String]] {
     override def apply(): InputBase.Proxy[Seq[String]] = {
-      Option(mutableRef.unsafeGet()) map (new Proxy(_)) getOrElse InputBase.Proxy.nullObject()
+      mutableRef.get.asCallback.runNow() map (new Proxy(_)) getOrElse InputBase.Proxy.nullObject()
     }
   }
   // **************** Private inner types ****************//

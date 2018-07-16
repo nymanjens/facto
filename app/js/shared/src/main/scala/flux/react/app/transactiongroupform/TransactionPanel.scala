@@ -114,9 +114,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   }
 
   // **************** Public inner types ****************//
-  final class Reference private[TransactionPanel] (
-      private[TransactionPanel] val mutableRef: ToScalaComponent[Props, State, Backend, ThisCtorSummoner#CT]) {
-    def apply(): Proxy = new Proxy(() => Option(mutableRef.unsafeGet()))
+  final class Reference private[TransactionPanel] (private[TransactionPanel] val mutableRef: ThisMutableRef) {
+    def apply(): Proxy = new Proxy(() => mutableRef.get.asCallback.runNow())
   }
 
   final class Proxy private[TransactionPanel] (
@@ -182,6 +181,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   // **************** Private inner types ****************//
   private type ThisCtorSummoner = CtorType.Summoner.Aux[Box[Props], Children.None, CtorType.Props]
   private type ThisComponentU = MountedImpure[Props, State, Backend]
+  private type ThisMutableRef = ToScalaComponent[Props, State, Backend, ThisCtorSummoner#CT]
   private case class State(transactionDate: LocalDateTime,
                            beneficiaryAccount: Account,
                            moneyReservoir: MoneyReservoir,

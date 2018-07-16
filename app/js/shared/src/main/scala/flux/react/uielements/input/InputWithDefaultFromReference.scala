@@ -68,11 +68,11 @@ class InputWithDefaultFromReference[Value] private () {
       private[InputWithDefaultFromReference] val mutableRef: ThisMutableRef)
       extends InputBase.Reference[Value] {
     override def apply() = {
-      Option(mutableRef.unsafeGet()) flatMap { proxy =>
+      mutableRef.get.asCallback.runNow() flatMap { proxy =>
         val backend = proxy.backend
         proxy.props.defaultValueProxy match {
-          case Some(_) => Option(backend.implRef.unsafeGet()) map (_.backend.delegateRef())
-          case None    => Option(backend.dummyRef.unsafeGet()) map (_.backend.delegateRef())
+          case Some(_) => backend.implRef.get.asCallback.runNow() map (_.backend.delegateRef())
+          case None    => backend.dummyRef.get.asCallback.runNow() map (_.backend.delegateRef())
         }
       } getOrElse InputBase.Proxy.nullObject()
     }

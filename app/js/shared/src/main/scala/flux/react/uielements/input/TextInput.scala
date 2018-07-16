@@ -7,7 +7,8 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.component.Scala.MountedImpure
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom.html_<^._
-import org.scalajs.dom.html
+import org.scalajs.dom
+import org.scalajs.dom.{console, html}
 
 import scala.collection.immutable.Seq
 
@@ -34,7 +35,7 @@ object TextInput {
   final class Reference private[TextInput] (private[TextInput] val mutableRef: ThisMutableRef)
       extends InputBase.Reference[String] {
     override def apply(): InputBase.Proxy[String] = {
-      Option(mutableRef.unsafeGet()) map (new Proxy(_)) getOrElse InputBase.Proxy.nullObject()
+      mutableRef.get.asCallback.runNow() map (new Proxy(_)) getOrElse InputBase.Proxy.nullObject()
     }
   }
 
@@ -63,7 +64,10 @@ object TextInput {
     override def deregisterListener(listener: InputBase.Listener[String]) = ???
 
     override def focus(): Unit = {
-      component.backend.theInput.unsafeGet().focus()
+      component.backend.theInput.get.asCallback.runNow() match {
+        case Some(input) => input.focus()
+        case None        => console.log("Warning: Could not focus because input not found")
+      }
     }
   }
 
