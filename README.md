@@ -24,10 +24,10 @@ Familiy Accounting Tool keeps track of every transaction your family makes. Its 
 
     ```
     # refresh application secret
-    ./activator playUpdateSecret
+    sbt playUpdateSecret
 
     # Build application
-    ./activator dist
+    sbt dist
 
     # Deploy files
     cd /somewhere/you/want/the/files
