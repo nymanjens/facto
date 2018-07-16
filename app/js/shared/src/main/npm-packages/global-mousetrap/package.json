@@ -1,0 +1,8 @@
+{
+  "name": "global-mousetrap",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "mousetrap": "^1.6.2"
+  }
+}
