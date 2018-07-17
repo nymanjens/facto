@@ -48,7 +48,7 @@ lazy val client: Project = (project in file("app/js/client"))
     npmDependencies in Compile ++= BuildSettings.npmDependencies(baseDirectory.value / "../../.."),
     // Custom webpack config
     webpackConfigFile := Some(
-      baseDirectory.value / (if (optimizeForRelease.value) "webpack.prod.js" else "webpack.base.js")),
+      baseDirectory.value / (if (optimizeForRelease.value) "../webpack.prod.js" else "../webpack.base.js")),
     // Enable faster builds when developing
     webpackBundlingMode := BundlingMode.LibraryOnly()
   )
@@ -57,10 +57,14 @@ lazy val client: Project = (project in file("app/js/client"))
 
 lazy val webworkerClient: Project = (project in file("app/js/webworker"))
   .settings(
+    // Add custom setting
+    optimizeForRelease := false,
+    // Basic settings
     name := "webworker-client",
     version := BuildSettings.version,
     scalaVersion := BuildSettings.versions.scala,
     scalacOptions ++= BuildSettings.scalacOptions,
+    scalacOptions ++= (if (optimizeForRelease.value) Seq("-Xelide-below", "WARNING") else Seq()),
     libraryDependencies ++= BuildSettings.scalajsDependencies.value,
     // use Scala.js provided launcher code to start the client app
     scalaJSUseMainModuleInitializer := true,
@@ -70,7 +74,8 @@ lazy val webworkerClient: Project = (project in file("app/js/webworker"))
     // scalajs-bundler NPM packages
     npmDependencies in Compile ++= BuildSettings.npmDependencies(baseDirectory.value / "../../.."),
     // Custom webpack config
-    webpackConfigFile := Some(baseDirectory.value / "webpack.config.js"),
+    webpackConfigFile := Some(
+      baseDirectory.value / (if (optimizeForRelease.value) "../webpack.prod.js" else "../webpack.base.js")),
     // Enable faster builds when developing
     webpackBundlingMode := BundlingMode.LibraryOnly()
   )
@@ -79,10 +84,14 @@ lazy val webworkerClient: Project = (project in file("app/js/webworker"))
 
 lazy val manualTests: Project = (project in file("app/js/manualtests"))
   .settings(
+    // Add custom setting
+    optimizeForRelease := false,
+    // Basic settings
     name := "manual-tests",
     version := BuildSettings.version,
     scalaVersion := BuildSettings.versions.scala,
     scalacOptions ++= BuildSettings.scalacOptions,
+    scalacOptions ++= (if (optimizeForRelease.value) Seq("-Xelide-below", "WARNING") else Seq()),
     libraryDependencies ++= BuildSettings.scalajsDependencies.value,
     // use Scala.js provided launcher code to start the client app
     scalaJSUseMainModuleInitializer := true,
@@ -92,7 +101,8 @@ lazy val manualTests: Project = (project in file("app/js/manualtests"))
     // scalajs-bundler NPM packages
     npmDependencies in Compile ++= BuildSettings.npmDependencies(baseDirectory.value / "../../.."),
     // Custom webpack config
-    webpackConfigFile := Some(baseDirectory.value / "webpack.config.js"),
+    webpackConfigFile := Some(
+      baseDirectory.value / (if (optimizeForRelease.value) "../webpack.prod.js" else "../webpack.base.js")),
     // Enable faster builds when developing
     webpackBundlingMode := BundlingMode.LibraryOnly()
   )
