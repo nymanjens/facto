@@ -136,9 +136,9 @@ lazy val server = (project in file("app/jvm"))
 
 // Command for building a release
 lazy val ReleaseCmd = Command.command("releaseOptimized") { state =>
-  "set optimizeForRelease in client := true" ::
+  "set optimizeForRelease := true" ::
     "server/dist" ::
-    "set optimizeForRelease in client := false" ::
+    "set optimizeForRelease := false" ::
     state
 }
 
