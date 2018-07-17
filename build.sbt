@@ -12,8 +12,7 @@ lazy val sharedJvmCopy = shared.jvm.settings(name := "sharedJVM")
 
 lazy val sharedJsCopy = shared.js.settings(name := "sharedJS")
 
-// use eliding to drop some debug code in the production build
-lazy val elideOptions = settingKey[Seq[String]]("Set limit for elidable functions")
+lazy val optimizeForRelease = settingKey[Boolean]("If true, this is a release build")
 
 lazy val jsShared: Project = (project in file("app/js/shared"))
   .settings(
@@ -29,14 +28,15 @@ lazy val jsShared: Project = (project in file("app/js/shared"))
 
 lazy val client: Project = (project in file("app/js/client"))
   .settings(
+    // Add custom setting
+    optimizeForRelease := false,
+    // Basic settings
     name := "client",
     version := BuildSettings.version,
     scalaVersion := BuildSettings.versions.scala,
     scalacOptions ++= BuildSettings.scalacOptions,
+    scalacOptions ++= (if (optimizeForRelease.value) Seq("-Xelide-below", "WARNING") else Seq()),
     libraryDependencies ++= BuildSettings.scalajsDependencies.value,
-    // by default we do development build, no eliding
-    elideOptions := Seq(),
-    scalacOptions ++= elideOptions.value,
     // use Scala.js provided launcher code to start the client app
     scalaJSUseMainModuleInitializer := true,
     // use uTest framework for tests
@@ -47,7 +47,8 @@ lazy val client: Project = (project in file("app/js/client"))
     // scalajs-bundler NPM packages
     npmDependencies in Compile ++= BuildSettings.npmDependencies(baseDirectory.value / "../../.."),
     // Custom webpack config
-    webpackConfigFile := Some(baseDirectory.value / "webpack.config.js"),
+    webpackConfigFile := Some(
+      baseDirectory.value / (if (optimizeForRelease.value) "../webpack.prod.js" else "../webpack.base.js")),
     // Enable faster builds when developing
     webpackBundlingMode := BundlingMode.LibraryOnly()
   )
@@ -56,14 +57,15 @@ lazy val client: Project = (project in file("app/js/client"))
 
 lazy val webworkerClient: Project = (project in file("app/js/webworker"))
   .settings(
+    // Add custom setting
+    optimizeForRelease := false,
+    // Basic settings
     name := "webworker-client",
     version := BuildSettings.version,
     scalaVersion := BuildSettings.versions.scala,
     scalacOptions ++= BuildSettings.scalacOptions,
+    scalacOptions ++= (if (optimizeForRelease.value) Seq("-Xelide-below", "WARNING") else Seq()),
     libraryDependencies ++= BuildSettings.scalajsDependencies.value,
-    // by default we do development build, no eliding
-    elideOptions := Seq(),
-    scalacOptions ++= elideOptions.value,
     // use Scala.js provided launcher code to start the client app
     scalaJSUseMainModuleInitializer := true,
     // Fix for bug that produces a huge amount of warnings (https://github.com/webpack/webpack/issues/4518).
@@ -72,7 +74,8 @@ lazy val webworkerClient: Project = (project in file("app/js/webworker"))
     // scalajs-bundler NPM packages
     npmDependencies in Compile ++= BuildSettings.npmDependencies(baseDirectory.value / "../../.."),
     // Custom webpack config
-    webpackConfigFile := Some(baseDirectory.value / "webpack.config.js"),
+    webpackConfigFile := Some(
+      baseDirectory.value / (if (optimizeForRelease.value) "../webpack.prod.js" else "../webpack.base.js")),
     // Enable faster builds when developing
     webpackBundlingMode := BundlingMode.LibraryOnly()
   )
@@ -81,14 +84,15 @@ lazy val webworkerClient: Project = (project in file("app/js/webworker"))
 
 lazy val manualTests: Project = (project in file("app/js/manualtests"))
   .settings(
+    // Add custom setting
+    optimizeForRelease := false,
+    // Basic settings
     name := "manual-tests",
     version := BuildSettings.version,
     scalaVersion := BuildSettings.versions.scala,
     scalacOptions ++= BuildSettings.scalacOptions,
+    scalacOptions ++= (if (optimizeForRelease.value) Seq("-Xelide-below", "WARNING") else Seq()),
     libraryDependencies ++= BuildSettings.scalajsDependencies.value,
-    // by default we do development build, no eliding
-    elideOptions := Seq(),
-    scalacOptions ++= elideOptions.value,
     // use Scala.js provided launcher code to start the client app
     scalaJSUseMainModuleInitializer := true,
     // Fix for bug that produces a huge amount of warnings (https://github.com/webpack/webpack/issues/4518).
@@ -97,7 +101,8 @@ lazy val manualTests: Project = (project in file("app/js/manualtests"))
     // scalajs-bundler NPM packages
     npmDependencies in Compile ++= BuildSettings.npmDependencies(baseDirectory.value / "../../.."),
     // Custom webpack config
-    webpackConfigFile := Some(baseDirectory.value / "webpack.config.js"),
+    webpackConfigFile := Some(
+      baseDirectory.value / (if (optimizeForRelease.value) "../webpack.prod.js" else "../webpack.base.js")),
     // Enable faster builds when developing
     webpackBundlingMode := BundlingMode.LibraryOnly()
   )
@@ -123,11 +128,13 @@ lazy val server = (project in file("app/jvm"))
     pipelineStages in Assets := Seq(scalaJSPipeline),
     pipelineStages := Seq(scalaJSProd, digest, gzip),
     // Expose as sbt-web assets some files retrieved from the NPM packages of the `client` project
+    // @formatter:off
     npmAssets ++= NpmAssets.ofProject(client) { modules => (modules / "jquery").*** }.value,
     npmAssets ++= NpmAssets.ofProject(client) { modules => (modules / "bootstrap").*** }.value,
     npmAssets ++= NpmAssets.ofProject(client) { modules => (modules / "metismenu").*** }.value,
     npmAssets ++= NpmAssets.ofProject(client) { modules => (modules / "font-awesome").*** }.value,
     npmAssets ++= NpmAssets.ofProject(client) { modules => (modules / "startbootstrap-sb-admin-2").*** }.value,
+    // @formatter:on
     // compress CSS
     LessKeys.compress in Assets := true
   )
@@ -138,16 +145,14 @@ lazy val server = (project in file("app/jvm"))
   .dependsOn(sharedJvmCopy)
 
 // Command for building a release
-lazy val ReleaseCmd = Command.command("release") { state =>
-  "set elideOptions in client := Seq(\"-Xelide-below\", \"WARNING\")" ::
-    "client/clean" ::
-    "client/test" ::
-    "webworkerClient/clean" ::
-    "manualTests/clean" ::
-    "server/clean" ::
-    "server/test" ::
+lazy val ReleaseCmd = Command.command("releaseOptimized") { state =>
+  "set optimizeForRelease in client := true" ::
+    "set optimizeForRelease in webworkerClient := true" ::
+    "set optimizeForRelease in manualTests := true" ::
     "server/dist" ::
-    "set elideOptions in client := Seq()" ::
+    "set optimizeForRelease in client := false" ::
+    "set optimizeForRelease in webworkerClient := false" ::
+    "set optimizeForRelease in manualTests := false" ::
     state
 }
 
