@@ -47,10 +47,10 @@ lazy val client: Project = (project in file("app/js/client"))
     // scalajs-bundler NPM packages
     npmDependencies in Compile ++= BuildSettings.npmDependencies(baseDirectory.value / "../../.."),
     // Custom webpack config
-    webpackConfigFile := Some(baseDirectory.value / "webpack.config.js"),
+    webpackConfigFile := Some(
+      baseDirectory.value / (if (optimizeForRelease.value) "webpack.prod.js" else "webpack.base.js")),
     // Enable faster builds when developing
-    webpackBundlingMode := (if (optimizeForRelease.value) BundlingMode.Application
-                            else BundlingMode.LibraryOnly())
+    webpackBundlingMode := BundlingMode.LibraryOnly()
   )
   .enablePlugins(ScalaJSBundlerPlugin, ScalaJSWeb)
   .dependsOn(sharedJsCopy, jsShared)
