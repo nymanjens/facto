@@ -105,7 +105,8 @@ self.addEventListener('install', (event) => {
 
 
 self.addEventListener('fetch', (event) => {
-  if(event.request.url.startsWith(ROOT_URL + '/app/')) {
+  if(event.request.url == ROOT_URL + '/' ||
+      event.request.url.startsWith(ROOT_URL + '/app/')) {
     // Check whether we are still logged in. If we are offline, return the
     // cached app page.
     console.log('  [SW] Fetch or cache:', event.request.url);
