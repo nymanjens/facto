@@ -80,6 +80,8 @@ final class EntityModificationPushClientFactory {
             }
           }
           _pushClientsAreOnline.set(false)
+          firstMessageWasProcessedPromise.tryFailure(
+            new RuntimeException(s"[$name] WebSocket was closed before first message was processed"))
         }
       )
     }

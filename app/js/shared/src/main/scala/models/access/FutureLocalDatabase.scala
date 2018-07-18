@@ -77,7 +77,12 @@ private[access] final class FutureLocalDatabase(unsafeLocalDatabaseFuture: Futur
         val update = pendingUpdates.remove(0)
         updateInProgress = true
         async {
-          await(update(db))
+          await(update(db).recover {
+            case t: Throwable =>
+              console.log(s"  Failed to perform database update: $t")
+              t.printStackTrace()
+              (): Unit
+          })
           updateInProgress = false
           performPendingUpdates(db)
         }
