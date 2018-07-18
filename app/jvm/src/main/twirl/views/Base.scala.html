@@ -27,11 +27,11 @@
     <link href="@routes.Assets.versioned("bootstrap/dist/css/bootstrap.min.css")" rel="stylesheet">
 
     @* Metis menu (used by Start Bootstrap) *@
-    @utils.ImportStylesheetAsync(routes.Assets.versioned("metismenu/dist/metisMenu.min.css").toString)
+    <link href="@routes.Assets.versioned("metismenu/dist/metisMenu.min.css")" rel="stylesheet">
 
     @* Custom Fonts *@
-    @utils.ImportStylesheetAsync(routes.Assets.versioned("font-awesome/css/font-awesome.min.css").toString)
-    @utils.ImportStylesheetAsync(routes.Assets.versioned("lib/fontello/css/fontello.css").toString)
+    <link href="@routes.Assets.versioned("font-awesome/css/font-awesome.min.css")" rel="stylesheet">
+    <link href="@routes.Assets.versioned("lib/fontello/css/fontello.css")" rel="stylesheet">
 
     @* HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries *@
     @* WARNING: Respond.js doesn't work if you view the page via file:// *@
@@ -41,7 +41,7 @@
     <![endif]-->
 
     @* startbootstrap-sb-admin-2 CSS *@
-    @utils.ImportStylesheetAsync(routes.Assets.versioned("startbootstrap-sb-admin-2/dist/css/sb-admin-2.css").toString)
+    <link href="@routes.Assets.versioned("startbootstrap-sb-admin-2/dist/css/sb-admin-2.css")" rel="stylesheet">
 
     @* Custom CSS *@
     <link href="@routes.Assets.versioned("stylesheets/main.min.css")" rel="stylesheet">
