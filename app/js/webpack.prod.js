@@ -1,11 +1,14 @@
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const webpack = require("webpack");
-const baseConfig = require('./webpack.base.js');
+const scalajsConfig = require('./scalajs.webpack.config');
 
 module.exports = Object.assign(
   {},
-  baseConfig,
+  scalajsConfig,
   {
+    node: {
+      fs: "empty",
+    },
     plugins: [
       new UglifyJsPlugin(),
       new webpack.DefinePlugin({

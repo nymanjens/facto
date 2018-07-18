@@ -48,7 +48,7 @@ lazy val client: Project = (project in file("app/js/client"))
     npmDependencies in Compile ++= BuildSettings.npmDependencies(baseDirectory.value / "../../.."),
     // Custom webpack config
     webpackConfigFile := Some(
-      baseDirectory.value / (if (optimizeForRelease.value) "../webpack.prod.js" else "../webpack.base.js")),
+      baseDirectory.value / (if (optimizeForRelease.value) "../webpack.prod.js" else "../webpack.dev.js")),
     // Enable faster builds when developing
     webpackBundlingMode := BundlingMode.LibraryOnly()
   )
@@ -75,7 +75,7 @@ lazy val webworkerClient: Project = (project in file("app/js/webworker"))
     npmDependencies in Compile ++= BuildSettings.npmDependencies(baseDirectory.value / "../../.."),
     // Custom webpack config
     webpackConfigFile := Some(
-      baseDirectory.value / (if (optimizeForRelease.value) "../webpack.prod.js" else "../webpack.base.js")),
+      baseDirectory.value / (if (optimizeForRelease.value) "../webpack.prod.js" else "../webpack.dev.js")),
     // Enable faster builds when developing
     webpackBundlingMode := BundlingMode.LibraryOnly()
   )
@@ -102,7 +102,7 @@ lazy val manualTests: Project = (project in file("app/js/manualtests"))
     npmDependencies in Compile ++= BuildSettings.npmDependencies(baseDirectory.value / "../../.."),
     // Custom webpack config
     webpackConfigFile := Some(
-      baseDirectory.value / (if (optimizeForRelease.value) "../webpack.prod.js" else "../webpack.base.js")),
+      baseDirectory.value / (if (optimizeForRelease.value) "../webpack.prod.js" else "../webpack.dev.js")),
     // Enable faster builds when developing
     webpackBundlingMode := BundlingMode.LibraryOnly()
   )
