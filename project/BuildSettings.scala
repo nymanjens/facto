@@ -39,7 +39,6 @@ object BuildSettings {
 
     val uTest = "0.4.7"
     val scalajsReact = "1.2.1"
-    val diode = "1.1.0"
   }
 
   /**
@@ -79,9 +78,6 @@ object BuildSettings {
       "com.github.japgolly.scalajs-react" %%% "core" % versions.scalajsReact,
       "com.github.japgolly.scalajs-react" %%% "extra" % versions.scalajsReact,
       "com.github.japgolly.scalajs-react" %%% "test" % versions.scalajsReact % Test,
-      "com.github.japgolly.scalacss" %%% "ext-react" % "0.5.3",
-      "me.chrons" %%% "diode" % versions.diode,
-      "me.chrons" %%% "diode-react" % versions.diode,
       "org.scala-js" %%% "scalajs-dom" % "0.9.1",
       "org.scala-js" %%% "scalajs-java-time" % "0.2.0",
       "com.lihaoyi" %%% "utest" % versions.uTest % Test
