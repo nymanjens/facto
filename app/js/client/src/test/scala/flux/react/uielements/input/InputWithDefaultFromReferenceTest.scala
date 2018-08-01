@@ -8,7 +8,6 @@ import scala2js.Converters._
 import utest._
 
 import scala.collection.mutable
-import scala.language.existentials
 
 object InputWithDefaultFromReferenceTest extends TestSuite {
   implicit private val fake18n = new TestModule().fakeI18n
@@ -119,8 +118,7 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
   }
 
   private final class ComponentTester(unrenderedComponent: VdomElement) {
-    private val renderedComponent = ReactTestUtils.renderIntoDocument(unrenderedComponent)
-    private val wrappedComponent = new ReactTestWrapper(renderedComponent)
+    private val wrappedComponent = ReactTestWrapper.renderComponent(unrenderedComponent)
 
     def showsBoundUntilChange: Boolean = {
       wrappedComponent.child(tagName = "input").classes contains "bound-until-change"

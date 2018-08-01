@@ -2,12 +2,9 @@ package flux.react.uielements.input.bootstrap
 
 import common.testing.{ReactTestWrapper, TestModule}
 import flux.react.uielements.input.{InputBase, bootstrap}
-import japgolly.scalajs.react.test.ReactTestUtils
 import japgolly.scalajs.react.vdom._
 import scala2js.Converters._
 import utest._
-
-import scala.language.existentials
 
 object TextInputTest extends TestSuite {
   implicit private val fake18n = new TestModule().fakeI18n
@@ -76,8 +73,7 @@ object TextInputTest extends TestSuite {
   }
 
   private final class ComponentTester(unrenderedComponent: VdomElement) {
-    private val renderedComponent = ReactTestUtils.renderIntoDocument(unrenderedComponent)
-    private val wrappedComponent = new ReactTestWrapper(renderedComponent)
+    private val wrappedComponent = ReactTestWrapper.renderComponent(unrenderedComponent)
 
     def valueProxy: InputBase.Proxy[String] = {
       testRef()

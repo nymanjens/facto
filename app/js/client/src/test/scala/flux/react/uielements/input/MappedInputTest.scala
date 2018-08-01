@@ -10,8 +10,6 @@ import japgolly.scalajs.react.vdom.VdomElement
 import scala2js.Converters._
 import utest._
 
-import scala.language.existentials
-
 object MappedInputTest extends TestSuite {
   implicit private val fake18n = new TestModule().fakeI18n
   private val dateMappedInput = MappedInput.forTypes[String, LocalDateTime]
@@ -76,8 +74,7 @@ object MappedInputTest extends TestSuite {
   }
 
   private final class ComponentTester(unrenderedComponent: VdomElement) {
-    private val renderedComponent = ReactTestUtils.renderIntoDocument(unrenderedComponent)
-    private val wrappedComponent = new ReactTestWrapper(renderedComponent)
+    private val wrappedComponent = ReactTestWrapper.renderComponent(unrenderedComponent)
 
     def inputValue(): String = {
       wrappedComponent.child(tagName = "input").attribute("value")
