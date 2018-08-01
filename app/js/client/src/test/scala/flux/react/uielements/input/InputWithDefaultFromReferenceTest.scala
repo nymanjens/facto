@@ -4,10 +4,11 @@ import common.testing.{ReactTestWrapper, TestModule}
 import flux.react.uielements.input.InputBase.Listener
 import japgolly.scalajs.react.test.ReactTestUtils
 import japgolly.scalajs.react.vdom.VdomElement
+import scala2js.Converters._
 import utest._
 
 import scala.collection.mutable
-import scala2js.Converters._
+import scala.language.existentials
 
 object InputWithDefaultFromReferenceTest extends TestSuite {
   implicit private val fake18n = new TestModule().fakeI18n
