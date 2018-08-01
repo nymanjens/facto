@@ -99,7 +99,7 @@ private[access] final class HybridRemoteDatabaseProxy(futureLocalDatabase: Futur
       onMessageReceived = modificationsWithToken =>
         async {
           val modifications = modificationsWithToken.modifications
-          console.log(s"  [temporary push client] ${modifications.size} remote modifications received")
+          println(s"  [temporary push client] ${modifications.size} remote modifications received")
           await(maybeNewEntityModificationsListener(modifications))
       }
     )
@@ -116,7 +116,7 @@ private[access] final class HybridRemoteDatabaseProxy(futureLocalDatabase: Futur
           onMessageReceived = modificationsWithToken =>
             async {
               val modifications = modificationsWithToken.modifications
-              console.log(s"  [permanent push client] ${modifications.size} remote modifications received")
+              println(s"  [permanent push client] ${modifications.size} remote modifications received")
               if (modifications.nonEmpty) {
                 await(localDatabase.applyModifications(modifications))
                 await(localDatabase.removePendingModifications(modifications))
@@ -139,7 +139,7 @@ private[access] final class HybridRemoteDatabaseProxy(futureLocalDatabase: Futur
     }
     clearFuture.recover {
       case t: Throwable =>
-        console.log(s"  Could not clear local database: $t")
+        println(s"  Could not clear local database: $t")
         t.printStackTrace()
         // Fall back to successful future
         (): Unit
@@ -160,23 +160,23 @@ private[access] object HybridRemoteDatabaseProxy {
       val db = await(localDatabase)
       val populateIsNecessary = {
         if (await(db.isEmpty)) {
-          console.log(s"  Database is empty")
+          println(s"  Database is empty")
           true
         } else {
           val dbVersionOption = await(db.getSingletonValue(VersionKey))
           if (!dbVersionOption.contains(localDatabaseAndEntityVersion)) {
-            console.log(
+            println(
               s"  The database version ${dbVersionOption getOrElse "<empty>"} no longer matches " +
                 s"the newest version $localDatabaseAndEntityVersion")
             true
           } else {
-            console.log(s"  Database was loaded successfully. No need for a full repopulation.")
+            println(s"  Database was loaded successfully. No need for a full repopulation.")
             false
           }
         }
       }
       if (populateIsNecessary) {
-        console.log(s"  Populating database...")
+        println(s"  Populating database...")
 
         // Reset database
         await(db.resetAndInitialize())
@@ -199,7 +199,7 @@ private[access] object HybridRemoteDatabaseProxy {
         // Await because we don't want to save unpersisted modifications that can be made as soon as
         // the database becomes valid.
         await(db.save())
-        console.log(s"  Population done!")
+        println(s"  Population done!")
       }
       db
     }))

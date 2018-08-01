@@ -38,7 +38,7 @@ object LocalDatabaseWebWorkerScript {
       case Success(result) =>
         WebWorker.postMessage(result)
       case Failure(e) =>
-        console.log(s"  LocalDatabaseWebWorkerScript: Caught exception: $e")
+        println(s"  LocalDatabaseWebWorkerScript: Caught exception: $e")
         e.printStackTrace()
         WebWorker.postMessage("FAILED") // signal to caller that call failed
     }
