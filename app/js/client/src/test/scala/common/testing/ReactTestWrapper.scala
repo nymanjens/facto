@@ -1,8 +1,8 @@
 package common.testing
 
-import japgolly.scalajs.react.test.ReactTestUtils
+import japgolly.scalajs.react._
 import japgolly.scalajs.react.test.ReactTestUtils.MountedOutput
-import japgolly.scalajs.react.test.raw.ReactAddonsTestUtils
+import japgolly.scalajs.react.test.{ReactTestUtils, Simulate}
 import japgolly.scalajs.react.vdom.VdomElement
 
 import scala.collection.immutable.Seq
@@ -37,24 +37,24 @@ final class ReactTestWrapper(private val componentM: MountedOutput) {
   }
 
   def attribute(name: String): String = {
-    Option(componentM.getDOMNode.asElement.map(.asElement).getAttribute(name)) getOrElse ""
+    Option(componentM.getDOMNode.asElement.getAttribute(name)) getOrElse ""
   }
 
   def click(): Unit = {
-    ReactAddonsTestUtils.Simulate.click(componentM.getDOMNode.asElement.map(.asElement))
+    Simulate.click(componentM.getDOMNode.asElement)
   }
 
   def classes: Seq[String] = {
-    val classString = Option(componentM.getDOMNode.asElement.map(.asElement).getAttribute("class")) getOrElse ""
+    val classString = Option(componentM.getDOMNode.asElement.getAttribute("class")) getOrElse ""
     classString.toLowerCase.split(' ').toVector
   }
 
   def tagName: String = {
-    componentM.getDOMNode.asElement.map(.asElement).tagName.toLowerCase
+    componentM.getDOMNode.asElement.tagName.toLowerCase
   }
 
   def typeAttribute: String = {
-    val attrib = Option(componentM.getDOMNode.asElement.map(.asElement).getAttribute("type")) getOrElse ""
+    val attrib = Option(componentM.getDOMNode.asElement.getAttribute("type")) getOrElse ""
     attrib.toLowerCase
   }
 }
