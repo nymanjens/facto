@@ -12,7 +12,7 @@ object LoggingUtils {
       codeBlock
     } catch {
       case t: Throwable =>
-        console.log(s"  Caught exception: $t")
+        println(s"  Caught exception: $t")
         t.printStackTrace()
         throw t
     }
@@ -20,7 +20,7 @@ object LoggingUtils {
   def logFailure[T](future: => Future[T])(implicit executor: ExecutionContext): Future[T] = {
     val theFuture = logExceptions(future)
     theFuture.failed.foreach { t =>
-      console.log(s"  Caught exception: $t")
+      println(s"  Caught exception: $t")
       t.printStackTrace()
     }
     theFuture

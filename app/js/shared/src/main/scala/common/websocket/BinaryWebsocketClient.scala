@@ -77,5 +77,5 @@ object BinaryWebsocketClient {
     resultPromise.future
   }
 
-  private def logLine(name: String, line: String): Unit = console.log(s"  [$name] $line")
+  private def logLine(name: String, line: String): Unit = println(s"  [$name] $line")
 }
