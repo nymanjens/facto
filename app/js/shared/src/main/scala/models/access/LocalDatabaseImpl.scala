@@ -166,13 +166,13 @@ private final class LocalDatabaseImpl(implicit webWorker: LocalDatabaseWebWorker
   }
 
   override def save(): Future[Unit] = async {
-    println("  Saving database...")
+    console.log("  Saving database...")
     await(webWorker.applyWriteOperations(Seq(WriteOperation.SaveDatabase)))
-    println("  Saving database done.")
+    console.log("  Saving database done.")
   }
 
   override def resetAndInitialize(): Future[Unit] = async {
-    println("  Resetting database...")
+    console.log("  Resetting database...")
     await(
       webWorker.applyWriteOperations(
         Seq() ++
@@ -188,7 +188,7 @@ private final class LocalDatabaseImpl(implicit webWorker: LocalDatabaseWebWorker
             .AddCollection(singletonsCollectionName, uniqueIndices = Seq("id"), indices = Seq()) :+
           WriteOperation
             .AddCollection(pendingModificationsCollectionName, uniqueIndices = Seq("id"), indices = Seq())))
-    println("  Resetting database done.")
+    console.log("  Resetting database done.")
   }
 
   // **************** Private helper methods ****************//
