@@ -79,7 +79,7 @@ private[access] final class FutureLocalDatabase(unsafeLocalDatabaseFuture: Futur
         async {
           await(update(db).recover {
             case t: Throwable =>
-              println(s"  Failed to perform database update: $t")
+              console.log(s"  Failed to perform database update: $t")
               t.printStackTrace()
               (): Unit
           })
@@ -93,7 +93,7 @@ private[access] final class FutureLocalDatabase(unsafeLocalDatabaseFuture: Futur
   private val safeLocalDatabaseFuture: Future[LocalDatabase] =
     unsafeLocalDatabaseFuture.recoverWith {
       case t: Throwable =>
-        println(s"  Could not create local database: $t")
+        console.log(s"  Could not create local database: $t")
         t.printStackTrace()
         // Fallback to infinitely running future so that API based lookup is always used as fallback
         Promise[LocalDatabase]().future

@@ -67,7 +67,7 @@ private[websocket] final class SerialWebsocketClient(websocketPath: String) {
         responseMessagePromises.remove(0)
         promise.success(bytes)
       case None =>
-        println(s"  [$name] Warning: Received message without request")
+        console.log(s"  [$name] Warning: Received message without request")
     }
   }
 
