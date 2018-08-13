@@ -12,8 +12,6 @@ lazy val sharedJvmCopy = shared.jvm.settings(name := "sharedJVM")
 
 lazy val sharedJsCopy = shared.js.settings(name := "sharedJS")
 
-lazy val optimizeForRelease = settingKey[Boolean]("If true, this is a release build")
-
 lazy val jsShared: Project = (project in file("app/js/shared"))
   .settings(
     name := "jsShared",
@@ -28,14 +26,12 @@ lazy val jsShared: Project = (project in file("app/js/shared"))
 
 lazy val client: Project = (project in file("app/js/client"))
   .settings(
-    // Add custom setting
-    optimizeForRelease := false,
     // Basic settings
     name := "client",
     version := BuildSettings.version,
     scalaVersion := BuildSettings.versions.scala,
     scalacOptions ++= BuildSettings.scalacOptions,
-    scalacOptions ++= (if (optimizeForRelease.value) Seq("-Xelide-below", "WARNING") else Seq()),
+    scalacOptions in fullOptJS ++= Seq("-Xelide-below", "WARNING"),
     libraryDependencies ++= BuildSettings.scalajsDependencies.value,
     // use Scala.js provided launcher code to start the client app
     scalaJSUseMainModuleInitializer := true,
@@ -49,9 +45,9 @@ lazy val client: Project = (project in file("app/js/client"))
     // scalajs-bundler NPM packages
     npmDependencies in Compile ++= BuildSettings.npmDependencies(baseDirectory.value / "../../.."),
     // Custom webpack config
-    webpackConfigFile := Some(
-      baseDirectory.value / (if (optimizeForRelease.value) "../webpack.prod.js" else "../webpack.dev.js")),
     webpackConfigFile in Test := None,
+    webpackConfigFile in fastOptJS := Some(baseDirectory.value / "../webpack.dev.js"),
+    webpackConfigFile in fullOptJS := Some(baseDirectory.value / "../webpack.prod.js"),
     // Enable faster builds when developing
     webpackBundlingMode := BundlingMode.LibraryOnly(),
     webpackBundlingMode in Test := BundlingMode.LibraryAndApplication()
@@ -61,14 +57,12 @@ lazy val client: Project = (project in file("app/js/client"))
 
 lazy val webworkerClient: Project = (project in file("app/js/webworker"))
   .settings(
-    // Add custom setting
-    optimizeForRelease := false,
     // Basic settings
     name := "webworker-client",
     version := BuildSettings.version,
     scalaVersion := BuildSettings.versions.scala,
     scalacOptions ++= BuildSettings.scalacOptions,
-    scalacOptions ++= (if (optimizeForRelease.value) Seq("-Xelide-below", "WARNING") else Seq()),
+    scalacOptions in fullOptJS ++= Seq("-Xelide-below", "WARNING"),
     libraryDependencies ++= BuildSettings.scalajsDependencies.value,
     // use Scala.js provided launcher code to start the client app
     scalaJSUseMainModuleInitializer := true,
@@ -78,8 +72,9 @@ lazy val webworkerClient: Project = (project in file("app/js/webworker"))
     // scalajs-bundler NPM packages
     npmDependencies in Compile ++= BuildSettings.npmDependencies(baseDirectory.value / "../../.."),
     // Custom webpack config
-    webpackConfigFile := Some(
-      baseDirectory.value / (if (optimizeForRelease.value) "../webpack.prod.js" else "../webpack.dev.js")),
+    webpackConfigFile in Test := None,
+    webpackConfigFile in fastOptJS := Some(baseDirectory.value / "../webpack.dev.js"),
+    webpackConfigFile in fullOptJS := Some(baseDirectory.value / "../webpack.prod.js"),
     // Enable faster builds when developing
     webpackBundlingMode := BundlingMode.LibraryOnly()
   )
@@ -88,14 +83,12 @@ lazy val webworkerClient: Project = (project in file("app/js/webworker"))
 
 lazy val manualTests: Project = (project in file("app/js/manualtests"))
   .settings(
-    // Add custom setting
-    optimizeForRelease := false,
     // Basic settings
     name := "manual-tests",
     version := BuildSettings.version,
     scalaVersion := BuildSettings.versions.scala,
     scalacOptions ++= BuildSettings.scalacOptions,
-    scalacOptions ++= (if (optimizeForRelease.value) Seq("-Xelide-below", "WARNING") else Seq()),
+    scalacOptions in fullOptJS ++= Seq("-Xelide-below", "WARNING"),
     libraryDependencies ++= BuildSettings.scalajsDependencies.value,
     // use Scala.js provided launcher code to start the client app
     scalaJSUseMainModuleInitializer := true,
@@ -105,8 +98,9 @@ lazy val manualTests: Project = (project in file("app/js/manualtests"))
     // scalajs-bundler NPM packages
     npmDependencies in Compile ++= BuildSettings.npmDependencies(baseDirectory.value / "../../.."),
     // Custom webpack config
-    webpackConfigFile := Some(
-      baseDirectory.value / (if (optimizeForRelease.value) "../webpack.prod.js" else "../webpack.dev.js")),
+    webpackConfigFile in Test := None,
+    webpackConfigFile in fastOptJS := Some(baseDirectory.value / "../webpack.dev.js"),
+    webpackConfigFile in fullOptJS := Some(baseDirectory.value / "../webpack.prod.js"),
     // Enable faster builds when developing
     webpackBundlingMode := BundlingMode.LibraryOnly()
   )
@@ -124,7 +118,6 @@ lazy val server = (project in file("app/jvm"))
     scalacOptions ++= BuildSettings.scalacOptions,
     libraryDependencies ++= BuildSettings.jvmDependencies.value,
     libraryDependencies += guice,
-    commands += ReleaseCmd,
     javaOptions := Seq("-Dconfig.file=conf/application.conf"),
     javaOptions in Test := Seq("-Dconfig.resource=test-application.conf"),
     // connect to the client project
@@ -147,18 +140,6 @@ lazy val server = (project in file("app/jvm"))
   .disablePlugins(PlayLayoutPlugin) // use the standard directory layout instead of Play's custom
   .aggregate(clientProjects.map(projectToRef): _*)
   .dependsOn(sharedJvmCopy)
-
-// Command for building a release
-lazy val ReleaseCmd = Command.command("releaseOptimized") { state =>
-  "set optimizeForRelease in client := true" ::
-    "set optimizeForRelease in webworkerClient := true" ::
-    "set optimizeForRelease in manualTests := true" ::
-    "server/dist" ::
-    "set optimizeForRelease in client := false" ::
-    "set optimizeForRelease in webworkerClient := false" ::
-    "set optimizeForRelease in manualTests := false" ::
-    state
-}
 
 // loads the Play server project at sbt startup
 onLoad in Global := (Command.process("project server", _: State)) compose (onLoad in Global).value
