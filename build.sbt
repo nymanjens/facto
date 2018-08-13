@@ -41,6 +41,8 @@ lazy val client: Project = (project in file("app/js/client"))
     scalaJSUseMainModuleInitializer := true,
     // use uTest framework for tests
     testFrameworks += new TestFramework("utest.runner.Framework"),
+    // Execute the tests in browser-like environment
+    requiresDOM in Test := true,
     // Fix for bug that produces a huge amount of warnings (https://github.com/webpack/webpack/issues/4518).
     // Unfortunately, this means no source maps :-/
     emitSourceMaps in fastOptJS := false,
@@ -49,8 +51,10 @@ lazy val client: Project = (project in file("app/js/client"))
     // Custom webpack config
     webpackConfigFile := Some(
       baseDirectory.value / (if (optimizeForRelease.value) "../webpack.prod.js" else "../webpack.dev.js")),
+    webpackConfigFile in Test := None,
     // Enable faster builds when developing
-    webpackBundlingMode := BundlingMode.LibraryOnly()
+    webpackBundlingMode := BundlingMode.LibraryOnly(),
+    webpackBundlingMode in Test := BundlingMode.LibraryAndApplication()
   )
   .enablePlugins(ScalaJSBundlerPlugin, ScalaJSWeb)
   .dependsOn(sharedJsCopy, jsShared)
