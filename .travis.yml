@@ -14,9 +14,8 @@ install:
   - npm install -g jshint
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION test:fastOptJS test:fullOptJS
-  - sbt ++$TRAVIS_SCALA_VERSION 'set parallelExecution in ThisBuild := false' test
-  - sbt ++$TRAVIS_SCALA_VERSION 'set parallelExecution in ThisBuild := false' 'set scalaJSStage in ThisBuild := FullOptStage' test
+  - sbt ++$TRAVIS_SCALA_VERSION test:fastOptJS
+  - sbt ++$TRAVIS_SCALA_VERSION test:fullOptJS
   - sbt scalastyle
   - sbt test:scalastyle # run scalastyle in test code
   - jshint app/jvm/src/main/resources/
