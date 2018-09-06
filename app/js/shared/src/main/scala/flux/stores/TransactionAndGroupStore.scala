@@ -23,7 +23,7 @@ private[stores] final class TransactionAndGroupStore(implicit entityAccess: JsEn
         val transactionsWithoutId = transactionsWithoutIdProvider(group)
         val transactionAdditions =
           for ((transactionWithoutId, id) <- zipWithIncrementingId(transactionsWithoutId)) yield {
-            EntityModification.createAddWithId(transactionWithoutId, id)
+            EntityModification.createAddWithId(id, transactionWithoutId)
           }
         await(entityAccess.persistModifications(groupAddition +: transactionAdditions))
       }
@@ -33,7 +33,7 @@ private[stores] final class TransactionAndGroupStore(implicit entityAccess: JsEn
         val transactionDeletions = await(group.transactions) map (EntityModification.createDelete(_))
         val transactionAdditions =
           for ((transactionWithoutId, id) <- zipWithIncrementingId(transactionsWithoutId)) yield {
-            EntityModification.createAddWithId(transactionWithoutId, id)
+            EntityModification.createAddWithId(id, transactionWithoutId)
           }
         await(entityAccess.persistModifications(transactionDeletions ++ transactionAdditions))
       }

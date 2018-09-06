@@ -27,7 +27,7 @@ object EntityModification {
     Add(entityWithId)
   }
 
-  def createAddWithId[E <: Entity: EntityType](entityWithoutId: E, id: Long): Add[E] = {
+  def createAddWithId[E <: Entity: EntityType](id: Long, entityWithoutId: E): Add[E] = {
     require(entityWithoutId.idOption.isEmpty, entityWithoutId)
 
     val entityWithId = Entity.withId(id, entityWithoutId)
