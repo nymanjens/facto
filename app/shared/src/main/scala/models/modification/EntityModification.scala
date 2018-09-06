@@ -23,14 +23,14 @@ object EntityModification {
   def createAddWithRandomId[E <: Entity: EntityType](entityWithoutId: E): Add[E] = {
     require(entityWithoutId.idOption.isEmpty, entityWithoutId)
 
-    val entityWithId = entityWithoutId.withId(generateRandomId()).asInstanceOf[E]
+    val entityWithId = Entity.withId(generateRandomId(), entityWithoutId)
     Add(entityWithId)
   }
 
   def createAddWithId[E <: Entity: EntityType](entityWithoutId: E, id: Long): Add[E] = {
     require(entityWithoutId.idOption.isEmpty, entityWithoutId)
 
-    val entityWithId = entityWithoutId.withId(id).asInstanceOf[E]
+    val entityWithId = Entity.withId(id, entityWithoutId)
     Add(entityWithId)
   }
 

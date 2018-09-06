@@ -204,7 +204,7 @@ object Converters {
       val entityWithoutId = toScalaWithoutId(dict)
       val idOption = dict.get(ModelField.id[E].name).map(Scala2Js.toScala[Long])
       if (idOption.isDefined) {
-        entityWithoutId.withId(idOption.get).asInstanceOf[E]
+        Entity.withId(idOption.get, entityWithoutId)
       } else {
         entityWithoutId
       }

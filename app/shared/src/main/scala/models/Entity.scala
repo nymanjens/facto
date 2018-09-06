@@ -20,4 +20,6 @@ trait Entity {
 
 object Entity {
   def asEntity(entity: Entity): Entity = entity
+
+  def withId[E <: Entity](id: Long, entity: E): E = entity.withId(id).asInstanceOf[E]
 }

@@ -66,7 +66,7 @@ final class FakeJsEntityAccess extends JsEntityAccess {
   }
 
   def addWithRandomId[E <: Entity: EntityType](entityWithoutId: E): E = {
-    val entity = entityWithoutId.withId(EntityModification.generateRandomId()).asInstanceOf[E]
+    val entity = Entity.withId(EntityModification.generateRandomId(), entityWithoutId)
     addRemotelyAddedEntities(entity)
     entity
   }
