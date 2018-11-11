@@ -77,7 +77,8 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
     for (moneyReservoir <- accountingConfig.moneyReservoirs(includeHidden = true)) {
       val balanceCorrections = findBalanceCorrections(moneyReservoir)
       if (balanceCorrections.nonEmpty) {
-        resultBuilder.append(s"${moneyReservoir.name} (${moneyReservoir.code}):\n")
+        val extraIfHidden = if (moneyReservoir.hidden) " [HIDDEN]" else ""
+        resultBuilder.append(s"${moneyReservoir.name} (${moneyReservoir.code})${extraIfHidden}:\n")
         for (correction <- balanceCorrections) {
           resultBuilder.append(
             s"  ${correction.balanceCheck.checkDate.toLocalDate}: " +
