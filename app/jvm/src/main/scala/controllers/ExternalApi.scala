@@ -1,11 +1,13 @@
 package controllers
 
 import com.google.inject.Inject
-import common.money.Currency
+import common.money.{Currency, MoneyWithGeneralCurrency}
 import common.time.{Clock, TimeUtils}
-import models.access.JvmEntityAccess
+import models.Entity
+import models.access.DbQueryImplicits._
+import models.access.{JvmEntityAccess, ModelField}
 import models.accounting._
-import models.accounting.config.{Account, Config, Template}
+import models.accounting.config.{Account, Config, MoneyReservoir, Template}
 import models.modification.EntityModification
 import models.money.ExchangeRateMeasurement
 import models.user.{User, Users}
@@ -66,6 +68,29 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
     Ok("OK")
   }
 
+  def listBalanceCorrections(applicationSecret: String) = Action { implicit request =>
+    validateApplicationSecret(applicationSecret)
+
+    val resultBuilder = StringBuilder.newBuilder
+    resultBuilder.append("OK\n\n")
+
+    for (moneyReservoir <- accountingConfig.moneyReservoirs(includeHidden = true)) {
+      val balanceCorrections = findBalanceCorrections(moneyReservoir)
+      if (balanceCorrections.nonEmpty) {
+        resultBuilder.append(s"${moneyReservoir.name} (${moneyReservoir.code}):\n")
+        for (correction <- balanceCorrections) {
+          resultBuilder.append(
+            s"  ${correction.balanceCheck.checkDate.toLocalDate}: " +
+              s"${correction.expectedAmount} -> ${correction.balanceCheck.balance} " +
+              s"(${forceSign(correction.balanceCheck.balance - correction.expectedAmount)})\n")
+        }
+        resultBuilder.append("\n")
+      }
+    }
+
+    Ok(resultBuilder.toString().trim())
+  }
+
   // ********** private helper methods ********** //
   private def validateApplicationSecret(applicationSecret: String): Unit = {
     val realApplicationSecret: String = playConfiguration.get[String]("play.http.secret.key")
@@ -98,5 +123,47 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
           transactionDate = clock.now,
           consumedDate = clock.now
         )
+  }
+
+  private case class BalanceCorrection(balanceCheck: BalanceCheck, expectedAmount: MoneyWithGeneralCurrency)
+  private def findBalanceCorrections(moneyReservoir: MoneyReservoir): List[BalanceCorrection] = {
+    val balanceChecks =
+      entityAccess
+        .newQuerySync[BalanceCheck]()
+        .filter(ModelField.BalanceCheck.moneyReservoirCode === moneyReservoir.code)
+        .data()
+    val transactions =
+      entityAccess
+        .newQuerySync[Transaction]()
+        .filter(ModelField.Transaction.moneyReservoirCode === moneyReservoir.code)
+        .data()
+
+    // merge the two
+    val mergedRows = (transactions ++ balanceChecks).sortBy {
+      case trans: Transaction => (trans.transactionDate, trans.createdDate)
+      case bc: BalanceCheck   => (bc.checkDate, bc.createdDate)
+    }
+
+    def findMismatches(nextRows: List[Entity],
+                       currentBalance: MoneyWithGeneralCurrency): List[BalanceCorrection] =
+      (nextRows: @unchecked) match {
+        case (trans: Transaction) :: rest =>
+          findMismatches(rest, currentBalance = currentBalance + trans.flow)
+        case (bc: BalanceCheck) :: rest =>
+          if (bc.balance == currentBalance) {
+            findMismatches(rest, bc.balance)
+          } else {
+            BalanceCorrection(bc, expectedAmount = currentBalance) :: findMismatches(rest, bc.balance)
+          }
+        case Nil =>
+          Nil
+      }
+    findMismatches(mergedRows.toList, currentBalance = MoneyWithGeneralCurrency(0, moneyReservoir.currency))
+  }
+
+  private def forceSign(money: MoneyWithGeneralCurrency): String = {
+    val sign = if (money.cents > 0) "+" else "-"
+    val positiveAmount = if (money.cents > 0) money else money.negated
+    s"$sign $positiveAmount"
   }
 }

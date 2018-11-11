@@ -23,6 +23,7 @@ GET  /websocket/entitymodificationpush/:updateToken/  controllers.InternalApi.en
 GET  /externalapi/healthcheck/         controllers.ExternalApi.healthCheck
 GET  /externalapi/acc/trans/addfromtpl/:tplCode/:appSecret/  controllers.ExternalApi.addTransactionFromTemplate(tplCode, appSecret)
 GET  /externalapi/acc/money/xchgmeasurement/:date/:currency/:ratio/:appSecret/  controllers.ExternalApi.addExchangeRateMeasurement(date, currency, ratio: Double, appSecret)
+GET  /externalapi/acc/bc/list/:appSecret/  controllers.ExternalApi.listBalanceCorrections(appSecret)
 
 # Auth
 GET  /login/                           controllers.Auth.login(returnTo ?= "/")
