@@ -68,7 +68,7 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
                       key = reservoir.code,
                       numEntriesStrategy = NumEntriesStrategy(
                         start = CashFlow.minNumEntriesPerReservoir,
-                        intermediateBeforeInf = Seq(30)),
+                        intermediateBeforeInf = Seq(150)),
                       setExpanded = state.setExpanded,
                       additionalInput = reservoir,
                       latestEntryToTableTitleExtra =
