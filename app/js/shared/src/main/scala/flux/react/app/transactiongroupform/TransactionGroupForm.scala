@@ -273,11 +273,13 @@ final class TransactionGroupForm(implicit i18n: I18n,
                   i18n("app.submit")
                 ),
                 " ",
-                <.button(
-                  ^.className := "btn btn-default",
-                  ^.onClick ==> onSubmit(redirectOnSuccess = false),
-                  i18n("app.submit-and-create")
-                )
+                <<.ifThen(props.operationMeta == OperationMeta.AddNew) {
+                  <.button(
+                    ^.className := "btn btn-default",
+                    ^.onClick ==> onSubmit(redirectOnSuccess = false),
+                    i18n("app.submit-and-create")
+                  )
+                }
               )
             )
           )
