@@ -269,8 +269,14 @@ final class TransactionGroupForm(implicit i18n: I18n,
                 <.button(
                   ^.tpe := "submit",
                   ^.className := "btn btn-default",
-                  ^.onClick ==> onSubmit,
-                  i18n("app.ok")
+                  ^.onClick ==> onSubmit(redirectOnSuccess = true),
+                  i18n("app.submit")
+                ),
+                " ",
+                <.button(
+                  ^.className := "btn btn-default",
+                  ^.onClick ==> onSubmit(redirectOnSuccess = false),
+                  i18n("app.submit-and-create")
                 )
               )
             )
@@ -332,107 +338,110 @@ final class TransactionGroupForm(implicit i18n: I18n,
       }).runNow()
     }
 
-    private def onSubmit(e: ReactEventFromInput): Callback = LogExceptionsCallback {
-      val props = $.props.runNow()
+    private def onSubmit(redirectOnSuccess: Boolean)(e: ReactEventFromInput): Callback =
+      LogExceptionsCallback {
+        val props = $.props.runNow()
 
-      def getErrorMessage(datas: Seq[transactionPanel.Data], state: State): Option[String] = {
-        def invalidMoneyReservoirsError: Option[String] = {
-          val containsEmptyReservoirCodes = datas.exists(_.moneyReservoir.isNullReservoir)
-          val allReservoirCodesAreEmpty = datas.forall(_.moneyReservoir.isNullReservoir)
+        def getErrorMessage(datas: Seq[transactionPanel.Data], state: State): Option[String] = {
+          def invalidMoneyReservoirsError: Option[String] = {
+            val containsEmptyReservoirCodes = datas.exists(_.moneyReservoir.isNullReservoir)
+            val allReservoirCodesAreEmpty = datas.forall(_.moneyReservoir.isNullReservoir)
 
-          datas.size match {
-            case 0                                => throw new AssertionError("Should not be possible")
-            case 1 if containsEmptyReservoirCodes => Some(i18n("app.error.noReservoir.atLeast2"))
-            case _ =>
-              if (containsEmptyReservoirCodes) {
-                if (allReservoirCodesAreEmpty) {
-                  if (state.totalFlow.isZero) {
-                    None
+            datas.size match {
+              case 0                                => throw new AssertionError("Should not be possible")
+              case 1 if containsEmptyReservoirCodes => Some(i18n("app.error.noReservoir.atLeast2"))
+              case _ =>
+                if (containsEmptyReservoirCodes) {
+                  if (allReservoirCodesAreEmpty) {
+                    if (state.totalFlow.isZero) {
+                      None
+                    } else {
+                      Some(i18n("app.error.noReservoir.zeroSum"))
+                    }
                   } else {
-                    Some(i18n("app.error.noReservoir.zeroSum"))
+                    Some(i18n("app.error.noReservoir.notAllTheSame"))
                   }
                 } else {
-                  Some(i18n("app.error.noReservoir.notAllTheSame"))
+                  None
                 }
-              } else {
-                None
-              }
-          }
-        }
-
-        // Don't allow future transactions in a foreign currency because we don't know what the exchange rate
-        // to the default currency will be. Future fluctuations might break the immutability of the conversion.
-        def noFutureForeignTransactionsError: Option[String] = {
-          val futureForeignTransactionsExist = datas.exists { data =>
-            val foreignCurrency = data.moneyReservoir.currency.isForeign
-            val dateInFuture = data.transactionDate > clock.now
-            foreignCurrency && dateInFuture
-          }
-          if (futureForeignTransactionsExist) {
-            Some(i18n("app.error.foreignReservoirInFuture"))
-          } else {
-            None
-          }
-        }
-        invalidMoneyReservoirsError orElse noFutureForeignTransactionsError
-      }
-
-      def submitValid(datas: Seq[transactionPanel.Data], state: State) = {
-        def transactionsWithoutIdProvider(group: TransactionGroup, issuerId: Option[Long] = None) = {
-          for (data <- datas)
-            yield
-              Transaction(
-                transactionGroupId = group.id,
-                issuerId = issuerId getOrElse user.id,
-                beneficiaryAccountCode = data.beneficiaryAccount.code,
-                moneyReservoirCode = data.moneyReservoir.code,
-                categoryCode = data.category.code,
-                description = data.description,
-                flowInCents = data.flow.cents,
-                detailDescription = data.detailDescription,
-                tags = data.tags,
-                createdDate = group.createdDate,
-                transactionDate = data.transactionDate,
-                consumedDate = data.consumedDate
-              )
-        }
-
-        val action = props.operationMeta match {
-          case OperationMeta.AddNew =>
-            Action.AddTransactionGroup(transactionsWithoutIdProvider = transactionsWithoutIdProvider(_))
-          case OperationMeta.Edit(group, transactions) =>
-            Action.UpdateTransactionGroup(
-              transactionGroupWithId = group,
-              transactionsWithoutId = transactionsWithoutIdProvider(group, Some(transactions.head.issuerId))
-            )
-        }
-
-        dispatcher.dispatch(action)
-      }
-
-      e.preventDefault()
-
-      $.modState(state =>
-        logExceptions {
-          var newState = state.copy(showErrorMessages = true)
-
-          val maybeDatas = for (panelIndex <- state.panelIndices) yield panelRef(panelIndex).apply().data
-          if (maybeDatas forall (_.isDefined)) {
-            val datas = maybeDatas map (_.get)
-
-            getErrorMessage(datas, state) match {
-              case Some(errorMessage) =>
-                newState = newState.copy(globalErrorMessage = Some(errorMessage))
-
-              case None =>
-                submitValid(datas, state)
-                props.router.setPath(props.returnToPath)
             }
           }
 
-          newState
-      }).runNow()
-    }
+          // Don't allow future transactions in a foreign currency because we don't know what the exchange rate
+          // to the default currency will be. Future fluctuations might break the immutability of the conversion.
+          def noFutureForeignTransactionsError: Option[String] = {
+            val futureForeignTransactionsExist = datas.exists { data =>
+              val foreignCurrency = data.moneyReservoir.currency.isForeign
+              val dateInFuture = data.transactionDate > clock.now
+              foreignCurrency && dateInFuture
+            }
+            if (futureForeignTransactionsExist) {
+              Some(i18n("app.error.foreignReservoirInFuture"))
+            } else {
+              None
+            }
+          }
+          invalidMoneyReservoirsError orElse noFutureForeignTransactionsError
+        }
+
+        def submitValid(datas: Seq[transactionPanel.Data], state: State) = {
+          def transactionsWithoutIdProvider(group: TransactionGroup, issuerId: Option[Long] = None) = {
+            for (data <- datas)
+              yield
+                Transaction(
+                  transactionGroupId = group.id,
+                  issuerId = issuerId getOrElse user.id,
+                  beneficiaryAccountCode = data.beneficiaryAccount.code,
+                  moneyReservoirCode = data.moneyReservoir.code,
+                  categoryCode = data.category.code,
+                  description = data.description,
+                  flowInCents = data.flow.cents,
+                  detailDescription = data.detailDescription,
+                  tags = data.tags,
+                  createdDate = group.createdDate,
+                  transactionDate = data.transactionDate,
+                  consumedDate = data.consumedDate
+                )
+          }
+
+          val action = props.operationMeta match {
+            case OperationMeta.AddNew =>
+              Action.AddTransactionGroup(transactionsWithoutIdProvider = transactionsWithoutIdProvider(_))
+            case OperationMeta.Edit(group, transactions) =>
+              Action.UpdateTransactionGroup(
+                transactionGroupWithId = group,
+                transactionsWithoutId = transactionsWithoutIdProvider(group, Some(transactions.head.issuerId))
+              )
+          }
+
+          dispatcher.dispatch(action)
+        }
+
+        e.preventDefault()
+
+        $.modState(state =>
+          logExceptions {
+            var newState = state.copy(showErrorMessages = true)
+
+            val maybeDatas = for (panelIndex <- state.panelIndices) yield panelRef(panelIndex).apply().data
+            if (maybeDatas forall (_.isDefined)) {
+              val datas = maybeDatas map (_.get)
+
+              getErrorMessage(datas, state) match {
+                case Some(errorMessage) =>
+                  newState = newState.copy(globalErrorMessage = Some(errorMessage))
+
+                case None =>
+                  submitValid(datas, state)
+                  if (redirectOnSuccess) {
+                    props.router.setPath(props.returnToPath)
+                  }
+              }
+            }
+
+            newState
+        }).runNow()
+      }
 
     private def onDelete: Callback = LogExceptionsCallback {
       val props = $.props.runNow()

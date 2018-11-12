@@ -147,3 +147,5 @@ app.offline=Offline
 app.is-admin=Admin?
 app.expand-cash-flow=Cash flow uitklappen?
 app.expand-liquidation=Vereffening uitklappen?
+app.submit=Verzenden
+app.submit-and-create=Verzenden en nieuwe maken
