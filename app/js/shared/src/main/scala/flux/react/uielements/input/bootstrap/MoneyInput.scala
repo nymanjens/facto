@@ -1,6 +1,9 @@
 package flux.react.uielements.input.bootstrap
 
-import common.I18n
+import common.GuavaReplacement.Splitter
+import common.LoggingUtils.LogExceptionsCallback
+import common.{I18n, LoggingUtils}
+import common.ScalaUtils.visibleForTesting
 import common.money.{Currency, DatedMoney, ExchangeRateManager, Money}
 import common.time.LocalDateTime
 import flux.react.ReactVdomUtils.^^
@@ -33,6 +36,12 @@ object MoneyInput {
         }
         datedMoney.exchangedForReferenceCurrency(extraProps.exchangeRateManager)
       }
+      def materializeInputIfValid(): Callback = {
+        ValueTransformer.stringToValue(valueString, extraProps) match {
+          case Some(cents) => onChange(ValueTransformer.valueToString(cents, extraProps))
+          case None        => Callback.empty
+        }
+      }
 
       <.div(
         ^.className := "input-group",
@@ -47,7 +56,8 @@ object MoneyInput {
           ^.name := name,
           ^.value := valueString,
           ^.disabled := extraProps.forceValue.isDefined,
-          ^.onChange ==> ((event: ReactEventFromInput) => onChange(event.target.value))
+          ^.onChange ==> ((event: ReactEventFromInput) => onChange(event.target.value)),
+          ^.onBlur ==> ((event: ReactEventFromInput) => materializeInputIfValid())
         ),
         ^^.ifThen(extraProps.currency.isForeign && extraProps.dateForCurrencyConversion.isDefined) {
           <.span(
@@ -162,7 +172,7 @@ object MoneyInput {
 
   private object ValueTransformer extends InputComponent.ValueTransformer[Value, ExtraProps] {
     override def stringToValue(string: String, extraProps: ExtraProps) = {
-      Money.floatStringToCents(string)
+      StringArithmetic.floatStringToCents(string)
     }
 
     override def valueToString(cents: Long, extraProps: ExtraProps) = {
@@ -170,5 +180,36 @@ object MoneyInput {
     }
 
     override def isEmptyValue(value: Long) = value == 0
+  }
+
+  @visibleForTesting private[bootstrap] object StringArithmetic {
+    private sealed abstract class Operation(val apply: (Long, Long) => Long, val toChar: Char)
+    private case object Plus extends Operation(_ + _, '+')
+    private case object Minus extends Operation(_ - _, '-')
+    private case object Times extends Operation(_ * _ / 100, '*')
+    private case object DividedBy extends Operation((lhs, rhs) => if (rhs == 0) 0 else lhs * 100 / rhs, '/')
+
+    def floatStringToCents(string: String): Option[Long] = {
+      def inner(string: String, operations: List[Operation]): Option[Long] = operations match {
+        case Nil => Money.floatStringToCents(string)
+        case operation :: otherOperations if string contains operation.toChar =>
+          val parts = {
+            val rawParts = Splitter.on(operation.toChar).split(string)
+            if (rawParts.head.trim.isEmpty && (operation == Plus || operation == Minus)) {
+              "0" +: rawParts.tail
+            } else {
+              rawParts
+            }
+          }
+          val results = parts.map(part => inner(part, otherOperations))
+          if (results.forall(_.isDefined)) {
+            Some(results.map(_.get).reduceLeft(operation.apply))
+          } else {
+            None
+          }
+        case _ :: otherOperations => inner(string, otherOperations)
+      }
+      inner(string, operations = List(Plus, Minus, Times, DividedBy))
+    }
   }
 }
