@@ -8,6 +8,7 @@ import japgolly.scalajs.react.vdom.html_<^._
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
+import scala.util.{Failure, Success}
 
 final class WaitForFuture[V] {
   private val component = ScalaComponent
@@ -16,10 +17,7 @@ final class WaitForFuture[V] {
     .renderPS((_, props, state) =>
       state.input match {
         case Some(input) => props.inputToElement(input)
-        case None =>
-          <.div(
-            ^.style := js.Dictionary("padding" -> "200px 0  500px 60px"),
-            s"${props.i18n("app.loading")}...")
+        case None        => props.waitingElement
     })
     .componentWillMount($ =>
       LogExceptionsCallback {
@@ -28,11 +26,26 @@ final class WaitForFuture[V] {
     .build
 
   // **************** API ****************//
-  def apply(futureInput: Future[V])(inputToElement: V => VdomElement)(implicit i18n: I18n): VdomElement = {
-    component.apply(Props(futureInput = futureInput, inputToElement = inputToElement))
+  def apply(futureInput: Future[V], waitingElement: VdomElement = null)(inputToElement: V => VdomElement)(
+      implicit i18n: I18n): VdomElement = {
+    futureInput.value match {
+      case Some(Success(value)) => inputToElement(value)
+      case Some(Failure(_))     => waitingElement
+      case None =>
+        component.apply(
+          Props(
+            futureInput = futureInput,
+            inputToElement = inputToElement,
+            waitingElement = Option(waitingElement) getOrElse defaultWaitingElement))
+    }
   }
 
+  private def defaultWaitingElement(implicit i18n: I18n): VdomElement =
+    <.div(^.style := js.Dictionary("padding" -> "200px 0  500px 60px"), s"${i18n("app.loading")}...")
+
   // **************** Private inner types ****************//
-  private case class Props(futureInput: Future[V], inputToElement: V => VdomElement)(implicit val i18n: I18n)
+  private case class Props(futureInput: Future[V],
+                           inputToElement: V => VdomElement,
+                           waitingElement: VdomElement)
   private case class State(input: Option[V])
 }
