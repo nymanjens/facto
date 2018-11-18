@@ -5,7 +5,7 @@ import common.money.ExchangeRateManager
 import common.time.Clock
 import flux.action.Dispatcher
 import flux.stores.GlobalMessagesStore
-import flux.stores.entries.factories.TagsStoreFactory
+import flux.stores.entries.factories.{LiquidationEntriesStoreFactory, TagsStoreFactory}
 import models.access.JsEntityAccess
 import models.accounting.config.Config
 import models.user.User
@@ -18,7 +18,8 @@ final class Module(implicit i18n: I18n,
                    globalMessagesStore: GlobalMessagesStore,
                    tagsStoreFactory: TagsStoreFactory,
                    dispatcher: Dispatcher,
-                   clock: Clock) {
+                   clock: Clock,
+                   liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory) {
 
   implicit private lazy val transactionPanel: TransactionPanel = new TransactionPanel
   implicit private lazy val addTransactionPanel: AddTransactionPanel = new AddTransactionPanel

@@ -120,6 +120,16 @@ object Page {
     def apply(account1: Account, account2: Account)(implicit routerContext: RouterContext): NewForRepayment =
       NewForRepayment(account1.code, account2.code, HasReturnTo.getCurrentEncodedPath)
   }
+  case class NewForLiquidationSimplification private (encodedReturnTo: Option[String])
+      extends HasReturnTo(encodedReturnTo)
+      with Page {
+    override def title(implicit i18n: I18n) = i18n("app.simplify-liquidation")
+    override def iconClass = "icon-new-empty"
+  }
+  object NewForLiquidationSimplification {
+    def apply()(implicit routerContext: RouterContext): NewForLiquidationSimplification =
+      NewForLiquidationSimplification(HasReturnTo.getCurrentEncodedPath)
+  }
 
   // **************** Accounting forms - balance checks **************** //
   case class NewBalanceCheck private (reservoirCode: String, encodedReturnTo: Option[String])

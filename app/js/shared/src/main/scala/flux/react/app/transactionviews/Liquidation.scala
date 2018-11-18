@@ -4,7 +4,9 @@ import common.Formatting._
 import common.money.ExchangeRateManager
 import common.time.Clock
 import common.{I18n, Unique}
+import flux.react.ReactVdomUtils.^^
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
+import flux.react.router.Page.NewForLiquidationSimplification
 import flux.react.router.{Page, RouterContext}
 import flux.react.uielements
 import flux.stores.entries.factories.LiquidationEntriesStoreFactory
@@ -34,10 +36,12 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
       ($, props, state) => {
         implicit val router = props.router
         <.span(
-          uielements.PageHeader.withExtension(router.currentPage) {
+          uielements.PageHeader.withExtension(router.currentPage)(
             uielements.CollapseAllExpandAllButtons(setExpanded =>
-              $.modState(_.copy(setExpanded = setExpanded)))
-          },
+              $.modState(_.copy(setExpanded = setExpanded))),
+            " ",
+            simplifyLiquidationButton()
+          ),
           uielements.Panel(i18n("app.all-combinations")) {
             {
               for {
@@ -46,13 +50,13 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
                 if i1 < i2
               } yield {
                 val accountPair = AccountPair(account1, account2)
-                val startNumEntries = 10
                 entriesListTable(
                   tableTitle = i18n("app.debt-of", account1.longName, account2.longName),
                   tableClasses = Seq("table-liquidation"),
                   key = s"${account1.code}_${account2.code}",
-                  numEntriesStrategy =
-                    NumEntriesStrategy(start = startNumEntries, intermediateBeforeInf = Seq(30)),
+                  numEntriesStrategy = NumEntriesStrategy(
+                    start = Liquidation.minNumEntriesPerPair,
+                    intermediateBeforeInf = Seq(30)),
                   setExpanded = state.setExpanded,
                   additionalInput = accountPair,
                   latestEntryToTableTitleExtra = latestEntry => latestEntry.debt.toString,
@@ -93,6 +97,16 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
   }
 
   // **************** Private helper methods ****************//
+  private def simplifyLiquidationButton()(implicit router: RouterContext): VdomElement = {
+    router.anchorWithHrefTo(Page.NewForLiquidationSimplification())(
+      ^^.classes("btn", "btn-default"),
+      ^.role := "button",
+      <.i(^.className := "fa fa-scissors fa-fw"),
+      " ",
+      i18n("app.simplify-liquidation")
+    )
+  }
+
   private def repayButton(account1: Account, account2: Account)(
       implicit router: RouterContext): VdomElement = {
     router.anchorWithHrefTo(Page.NewForRepayment(account1 = account1, account2 = account2))(
@@ -102,10 +116,13 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
       " ",
       i18n("app.repay")
     )
-
   }
 
   // **************** Private inner types ****************//
   private case class Props(router: RouterContext)
   private case class State(setExpanded: Unique[Boolean])
+}
+
+object Liquidation {
+  val minNumEntriesPerPair: Int = 10
 }

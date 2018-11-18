@@ -195,3 +195,5 @@ app.is-admin=Is admin?
 app.expand-cash-flow=Expand cash flow?
 app.expand-liquidation=Expand liquidation?
 app.submit-and-create=Submit and create another one
+app.simplify-liquidation=Simplify Liquidation
+app.liquidation-simplification=Simplification of liquidation: Eliminating {0} <-> {1}

@@ -91,6 +91,11 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
               ctl)
           }
 
+          | dynamicRuleFromPage(_ ~ returnToPath.caseClass[Page.NewForLiquidationSimplification]) {
+            (page, ctl) =>
+              reactAppModule.transactionGroupForm.forLiquidationSimplification(page.returnToPath, ctl)
+          }
+
           | dynamicRuleFromPage(_ / (codeString ~ returnToPath).caseClass[Page.NewBalanceCheck]) {
             (page, ctl) =>
               reactAppModule.balanceCheckForm.forCreate(page.reservoirCode, page.returnToPath, ctl)

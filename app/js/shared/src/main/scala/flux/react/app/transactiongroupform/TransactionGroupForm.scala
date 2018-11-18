@@ -8,13 +8,17 @@ import common.time.JavaTimeImplicits._
 import flux.action.{Action, Dispatcher}
 import flux.react.ReactVdomUtils.{<<, ^^}
 import flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
+import flux.react.app.transactionviews
+import flux.react.app.transactionviews.Liquidation
 import flux.react.router.RouterContext
 import flux.react.uielements
+import flux.stores.entries.{AccountPair, LiquidationEntry}
+import flux.stores.entries.factories.{EntriesListStoreFactory, LiquidationEntriesStoreFactory}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.Path
 import japgolly.scalajs.react.vdom.html_<^._
 import models.access.EntityAccess
-import models.accounting.config.Config
+import models.accounting.config.{Account, Config}
 import models.accounting.{Transaction, TransactionGroup}
 import models.user.User
 
@@ -34,7 +38,8 @@ final class TransactionGroupForm(implicit i18n: I18n,
                                  transactionPanel: TransactionPanel,
                                  addTransactionPanel: AddTransactionPanel,
                                  totalFlowInput: TotalFlowInput,
-                                 totalFlowRestrictionInput: TotalFlowRestrictionInput) {
+                                 totalFlowRestrictionInput: TotalFlowRestrictionInput,
+                                 liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory) {
 
   private val waitForFuture = new uielements.WaitForFuture[Props]
   private val component = {
@@ -132,6 +137,68 @@ final class TransactionGroupForm(implicit i18n: I18n,
       router
     )
   }
+
+  def forLiquidationSimplification(returnToPath: Path, router: RouterContext): VdomElement =
+    create(async {
+      def props(groupPartial: TransactionGroup.Partial): Props =
+        Props(
+          operationMeta = OperationMeta.AddNew,
+          groupPartial = groupPartial,
+          returnToPath = returnToPath,
+          router = router)
+      val commonAccount = accountingConfig.constants.commonAccount
+
+      val pairToDebt: Map[AccountPair, Option[ReferenceMoney]] =
+        await(Future.sequence(for {
+          (account1, i1) <- accountingConfig.personallySortedAccounts.zipWithIndex
+          (account2, i2) <- accountingConfig.personallySortedAccounts.zipWithIndex
+          accountPair <- Some(AccountPair(account1, account2))
+          if i1 < i2 && !accountPair.toSet.contains(commonAccount)
+        } yield {
+          val stateFuture =
+            liquidationEntriesStoreFactory.get(accountPair, Liquidation.minNumEntriesPerPair).stateFuture
+          stateFuture.map { state =>
+            accountPair -> state.entries.lastOption.map(_.entry.debt)
+          }
+        })).toMap
+
+      val filteredPairToDebt = (for {
+        (accountPair, maybeDebt) <- pairToDebt
+        debt <- maybeDebt
+        if debt.nonZero
+      } yield accountPair -> debt).toMap
+
+      if (filteredPairToDebt.nonEmpty) {
+        def partial(title: String,
+                    beneficiary: Account,
+                    reservoirAccount: Account,
+                    flow: ReferenceMoney): Transaction.Partial =
+          Transaction.Partial(
+            beneficiary = Some(beneficiary),
+            moneyReservoir = Some(reservoirAccount.defaultElectronicReservoir),
+            category = Some(accountingConfig.constants.accountingCategory),
+            description = title,
+            flowInCents = flow.cents
+          )
+
+        val partialTransactions = for {
+          (AccountPair(account1, account2), debt) <- filteredPairToDebt.toVector
+          transaction <- {
+            val title = i18n("app.liquidation-simplification", account1.veryShortName, account2.veryShortName)
+            Seq(
+              partial(title, beneficiary = commonAccount, reservoirAccount = account1, flow = debt),
+              partial(title, beneficiary = account1, reservoirAccount = account1, flow = debt.negated),
+              partial(title, beneficiary = commonAccount, reservoirAccount = account2, flow = debt.negated),
+              partial(title, beneficiary = account1, reservoirAccount = account2, flow = debt)
+            )
+          }
+        } yield transaction
+
+        props(TransactionGroup.Partial(transactions = partialTransactions, zeroSum = true))
+      } else {
+        props(TransactionGroup.Partial.withSingleEmptyTransaction)
+      }
+    })
 
   // **************** Private helper methods ****************//
   private def forCreate(transactionGroupPartial: TransactionGroup.Partial,

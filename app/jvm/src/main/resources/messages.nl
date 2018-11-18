@@ -149,3 +149,5 @@ app.expand-cash-flow=Cash flow uitklappen?
 app.expand-liquidation=Vereffening uitklappen?
 app.submit=Verzenden
 app.submit-and-create=Verzenden en nieuwe maken
+app.simplify-liquidation=Vereffening vereenvoudigen
+app.liquidation-simplification=Vereenvoudiging van vereffening: {0} <-> {1} weggewerkt
