@@ -20,6 +20,10 @@ class MoneyTest extends TestSuite {
     implicit val exchangeRateManager: JsExchangeRateManager = testModule.exchangeRateManager
 
     "Money" - {
+      "unary -" - {
+        (-ReferenceMoney(8701)).cents ==> -8701
+        (-ReferenceMoney(-8701)).cents ==> 8701
+      }
       "centsToFloatString" - {
         Money.centsToFloatString(-8701) ==> "-87.01"
       }

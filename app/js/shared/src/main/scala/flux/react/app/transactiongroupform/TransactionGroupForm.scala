@@ -187,8 +187,8 @@ final class TransactionGroupForm(implicit i18n: I18n,
             val title = i18n("app.liquidation-simplification", account1.veryShortName, account2.veryShortName)
             Seq(
               partial(title, beneficiary = commonAccount, reservoirAccount = account1, flow = debt),
-              partial(title, beneficiary = account1, reservoirAccount = account1, flow = debt.negated),
-              partial(title, beneficiary = commonAccount, reservoirAccount = account2, flow = debt.negated),
+              partial(title, beneficiary = account1, reservoirAccount = account1, flow = -debt),
+              partial(title, beneficiary = commonAccount, reservoirAccount = account2, flow = -debt),
               partial(title, beneficiary = account1, reservoirAccount = account2, flow = debt)
             )
           }

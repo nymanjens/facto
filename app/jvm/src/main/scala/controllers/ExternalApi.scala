@@ -164,7 +164,7 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
 
   private def forceSign(money: MoneyWithGeneralCurrency): String = {
     val sign = if (money.cents > 0) "+" else "-"
-    val positiveAmount = if (money.cents > 0) money else money.negated
+    val positiveAmount = if (money.cents > 0) money else -money
     s"$sign $positiveAmount"
   }
 }

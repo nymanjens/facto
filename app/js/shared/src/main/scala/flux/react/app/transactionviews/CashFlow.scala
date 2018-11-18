@@ -117,7 +117,7 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
                                 " ",
                                 uielements.MoneyWithCurrency(
                                   if (entry.balanceIncrease.cents > 0) entry.balanceIncrease
-                                  else entry.balanceIncrease.negated)
+                                  else -entry.balanceIncrease)
                               ),
                               <.td(
                                 ^.style := js.Dictionary("fontWeight" -> "bold"),

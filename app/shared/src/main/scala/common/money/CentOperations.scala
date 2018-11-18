@@ -17,8 +17,7 @@ trait CentOperations[M <: CentOperations[M]] {
   protected def validateCentOperation(that: M): Unit
 
   // **************** Arithmetic operations **************** //
-  final def negated: M = withCents(-cents)
-
+  final def unary_- : M = withCents(-cents)
   final def +(that: M): M = doCentOperationToSelfType(_ + _)(that)
   final def -(that: M): M = doCentOperationToSelfType(_ - _)(that)
   final def *(number: Long): M = withCents(cents * number)
@@ -47,7 +46,7 @@ object CentOperations {
     * @tparam M The concrete type implementing this trait.
     */
   trait CentOperationsNumeric[M <: CentOperations[M]] extends Numeric[M] {
-    override def negate(x: M): M = x.negated
+    override def negate(x: M): M = -x
     override def plus(x: M, y: M): M = x + y
     override def minus(x: M, y: M): M = x - y
     override def times(x: M, y: M): M =
