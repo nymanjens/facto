@@ -15,32 +15,105 @@ object FutureLocalDatabaseTest extends TestSuite {
     val unsafeLocalDatabasePromise = Promise[LocalDatabase]()
     val futureLocalDatabase =
       new FutureLocalDatabase(unsafeLocalDatabaseFuture = unsafeLocalDatabasePromise.future)
-    val localDatabase: LocalDatabase = null // Too cumbersome to depend on the chaning interface
+    val localDatabase: LocalDatabase = null // Too cumbersome to depend on the changing interface
 
-    "future(safe = true)" - async {
-      unsafeLocalDatabasePromise.failure(new IllegalArgumentException("Test error"))
-      val future = futureLocalDatabase.future(safe = true)
-
-      await(Awaiter.expectConsistently.neverComplete(future))
-    }
-    "future(safe = false)" - async {
+    "databasePromise throws exception" - {
       val exception = new IllegalArgumentException("Test error")
       unsafeLocalDatabasePromise.failure(exception)
-      val future = futureLocalDatabase.future(safe = false)
 
-      await(future.transform(value => {
-        value ==> Failure(exception)
-        Success(localDatabase)
-      }))
+      "future(safe = true)" - async {
+        val future = futureLocalDatabase.future(safe = true)
+
+        await(Awaiter.expectConsistently.neverComplete(future))
+      }
+      "future(safe = false)" - async {
+        val future = futureLocalDatabase.future(safe = false)
+
+        await(future.transform {
+          case Success(_) => throw new java.lang.AssertionError("Expected failure")
+          case Failure(thisException) =>
+            thisException ==> exception
+            Success(null)
+        })
+      }
+      "option()" - async {
+        def option = futureLocalDatabase.option()
+
+        await(Awaiter.expectConsistently.equal(option, None))
+      }
     }
-    "future(includesLatestUpdates = false)" - async {
+    "includesLatestUpdates = false" - {
       futureLocalDatabase.scheduleUpdateAtStart(_ => Promise().future)
       val future = futureLocalDatabase.future(safe = false, includesLatestUpdates = false)
+      def option = futureLocalDatabase.option(includesLatestUpdates = false)
 
-      await(Awaiter.expectConsistently.neverComplete(future))
+      "database not yet resolved" - {
+        "future" - Awaiter.expectConsistently.neverComplete(future)
+        "option" - Awaiter.expectConsistently.equal(option, None)
+      }
+      "database resolved" - {
+        unsafeLocalDatabasePromise.success(localDatabase)
 
-      unsafeLocalDatabasePromise.success(localDatabase)
-      await(Awaiter.expectEventually.complete(future, expected = localDatabase))
+        "future" - Awaiter.expectEventually.complete(future, expected = localDatabase)
+        "option" - Awaiter.expectEventually.equal(option, Some(localDatabase))
+      }
+    }
+
+    "includesLatestUpdates = true" - {
+      val future = futureLocalDatabase.future(safe = false, includesLatestUpdates = true)
+      def option = futureLocalDatabase.option(includesLatestUpdates = true)
+
+      "without updates" - {
+        "database not yet resolved" - {
+          "future" - Awaiter.expectConsistently.neverComplete(future)
+          "option" - Awaiter.expectConsistently.equal(option, None)
+        }
+        "database resolved" - {
+          unsafeLocalDatabasePromise.success(localDatabase)
+
+          "future" - Awaiter.expectEventually.complete(future, expected = localDatabase)
+          "option" - Awaiter.expectEventually.equal(option, Some(localDatabase))
+        }
+      }
+      "with updates" - {
+        val updateAtEnd = FakeUpdateFunction.createAndAdd(futureLocalDatabase.scheduleUpdateAtEnd)
+        val updateAtStart = FakeUpdateFunction.createAndAdd(futureLocalDatabase.scheduleUpdateAtStart)
+
+        "database not yet resolved" - {
+          "future" - Awaiter.expectConsistently.neverComplete(future)
+          "option" - Awaiter.expectConsistently.equal(option, None)
+        }
+        "database resolved" - {
+          unsafeLocalDatabasePromise.success(localDatabase)
+
+          "updateAtStart resolved" - {
+            updateAtStart.set()
+            "future" - Awaiter.expectConsistently.neverComplete(future)
+            "option" - Awaiter.expectConsistently.equal(option, None)
+
+            "updateAtEnd resolved" - {
+              updateAtEnd.set()
+              "future" - Awaiter.expectEventually.complete(future, localDatabase)
+              "option" - Awaiter.expectEventually.equal(option, Some(localDatabase))
+
+              "with added updateAtEnd2" - async {
+                await(Awaiter.expectEventually.complete(future, localDatabase)) // Wait for future to complete
+
+                val updateAtEnd2 = FakeUpdateFunction.createAndAdd(futureLocalDatabase.scheduleUpdateAtEnd)
+                val future2 = futureLocalDatabase.future(safe = false, includesLatestUpdates = true)
+
+                await(Awaiter.expectConsistently.neverComplete(future2))
+                await(Awaiter.expectConsistently.equal(option, None))
+
+                updateAtEnd2.set()
+
+                await(Awaiter.expectEventually.complete(future2, localDatabase))
+                await(Awaiter.expectEventually.equal(option, Some(localDatabase)))
+              }
+            }
+          }
+        }
+      }
     }
 
     "scheduleUpdateAt{Start,End}()" - async {
@@ -67,34 +140,6 @@ object FutureLocalDatabaseTest extends TestSuite {
       val updateAtEnd3 = FakeUpdateFunction.createAndAdd(futureLocalDatabase.scheduleUpdateAtEnd)
 
       await(Awaiter.expectEventually.complete(updateAtEnd3.wasCalledFuture))
-    }
-
-    "future(includesLatestUpdates = true)" - async {
-      val updateAtEnd = FakeUpdateFunction.createAndAdd(futureLocalDatabase.scheduleUpdateAtEnd)
-      val updateAtStart = FakeUpdateFunction.createAndAdd(futureLocalDatabase.scheduleUpdateAtStart)
-      var future = futureLocalDatabase.future(safe = false, includesLatestUpdates = true)
-
-      await(Awaiter.expectConsistently.neverComplete(future))
-
-      unsafeLocalDatabasePromise.success(localDatabase)
-
-      await(Awaiter.expectConsistently.neverComplete(future))
-
-      updateAtStart.set()
-
-      await(Awaiter.expectConsistently.neverComplete(future))
-
-      updateAtEnd.set()
-
-      await(Awaiter.expectEventually.complete(future, localDatabase))
-
-      val updateAtEnd2 = FakeUpdateFunction.createAndAdd(futureLocalDatabase.scheduleUpdateAtEnd)
-      future = futureLocalDatabase.future(safe = false, includesLatestUpdates = true)
-
-      await(Awaiter.expectConsistently.neverComplete(future))
-
-      updateAtEnd2.set()
-      await(Awaiter.expectEventually.complete(future, localDatabase))
     }
   }
 

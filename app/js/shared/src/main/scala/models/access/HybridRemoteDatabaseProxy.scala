@@ -70,6 +70,7 @@ private[access] final class HybridRemoteDatabaseProxy(futureLocalDatabase: Futur
           async {
             await(localDatabase.applyModifications(modifications))
             await(localDatabase.addPendingModifications(modifications))
+            await(localDatabase.save())
         })
         PersistEntityModificationsResponse(
           queryReflectsModificationsFuture = serverUpdated,

@@ -8,6 +8,8 @@ import scala.concurrent.{Future, Promise}
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 
+import scala.util.Success
+
 /** Wrapper around a LocalDatabase future that allows to attach updates to it. */
 private[access] final class FutureLocalDatabase(unsafeLocalDatabaseFuture: Future[LocalDatabase]) {
 
@@ -43,7 +45,18 @@ private[access] final class FutureLocalDatabase(unsafeLocalDatabaseFuture: Futur
     *     updates
     */
   def option(includesLatestUpdates: Boolean = true): Option[LocalDatabase] = {
-    future(includesLatestUpdates = includesLatestUpdates).value.map(_.get)
+    safeLocalDatabaseFuture.value match {
+      case Some(Success(localDatabase)) =>
+        if (includesLatestUpdates) {
+          lastUpdateDonePromise.future.value match {
+            case Some(Success(_)) => Some(localDatabase)
+            case _                => None
+          }
+        } else {
+          Some(localDatabase)
+        }
+      case _ => None
+    }
   }
 
   /**
