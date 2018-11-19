@@ -36,15 +36,15 @@ Familiy Accounting Tool keeps track of every transaction your family makes. Its 
     rm -d facto-1.0-SNAPSHOT/
 
     # Create database tables
-    bin/facto -DdropAndCreateNewDb
+    bin/server -DdropAndCreateNewDb
     rm RUNNING_PID
 
     # Create admin user
-    bin/facto -DcreateAdminUser
+    bin/server -DcreateAdminUser
     rm RUNNING_PID
 
     # Run application
-    bin/facto
+    bin/server
     ```
 
 ## Configuration
