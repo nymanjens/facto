@@ -98,7 +98,6 @@ object JavascriptFiles {
       VersionedAsset("metismenu/dist/metisMenu.min.js"),
       VersionedAsset("startbootstrap-sb-admin-2/dist/js/sb-admin-2.js"),
       DynamicAsset(routes.JavascriptFiles.localDatabaseWebWorker)
-      // TODO: Revisit this list
     )
 
     private def firstExistingVersionedAsset(filenames: String*): Asset =
