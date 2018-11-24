@@ -5,7 +5,7 @@ import java.nio.ByteBuffer
 import akka.stream.scaladsl._
 import api.Picklers._
 import api.ScalaJsApi.{ModificationsWithToken, UpdateToken, UserPrototype}
-import api.UpdateTokens.{toLocalDateTime, toUpdateToken}
+import api.UpdateTokens.{toInstant, toUpdateToken}
 import api.{PicklableDbQuery, ScalaJsApiRequest, ScalaJsApiServerFactory}
 import boopickle.Default._
 import com.google.inject.Inject
@@ -16,7 +16,7 @@ import models.Entity
 import models.access.JvmEntityAccess
 import models.modification.{EntityModification, EntityModificationEntity, EntityType}
 import models.slick.SlickUtils.dbApi._
-import models.slick.SlickUtils.{dbRun, localDateTimeToSqlDateMapper}
+import models.slick.SlickUtils.{dbRun, instantToSqlTimestampMapper}
 import models.user.User
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
@@ -73,14 +73,14 @@ final class InternalApi @Inject()(implicit override val messagesApi: MessagesApi
       val firstMessage = {
         // All modifications are idempotent so we can use the time when we started getting the entities as next
         // update token.
-        val nextUpdateToken: UpdateToken = toUpdateToken(clock.now)
+        val nextUpdateToken: UpdateToken = toUpdateToken(clock.nowInstant)
 
         val modifications = {
           val modificationEntities = dbRun(
             entityAccess
               .newSlickQuery[EntityModificationEntity]()
-              .filter(_.date >= toLocalDateTime(updateToken))
-              .sortBy(_.date))
+              .filter(_.instant >= toInstant(updateToken))
+              .sortBy(m => (m.instant, m.instantNanos)))
           modificationEntities.toStream.map(_.modification).toVector
         }
 

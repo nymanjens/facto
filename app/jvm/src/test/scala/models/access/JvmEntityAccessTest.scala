@@ -29,14 +29,14 @@ class JvmEntityAccessTest extends HookedSpecification {
 
   "persistEntityModifications()" in {
     "Persists EntityModification" in new WithApplication {
-      fakeClock.setTime(testDate)
+      fakeClock.setNowInstant(testInstant)
 
       entityAccess.persistEntityModifications(testModification)
 
       val modificationEntity = getOnlyElement(dbRun(entityAccess.newSlickQuery[EntityModificationEntity]()))
       modificationEntity.userId mustEqual user.id
       modificationEntity.modification mustEqual testModification
-      modificationEntity.date mustEqual testDate
+      modificationEntity.instant mustEqual testInstant
     }
 
     "EntityModification.Add" in new WithApplication {

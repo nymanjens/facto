@@ -1,5 +1,7 @@
 package models.modification
 
+import java.time.Instant
+
 import common.time.LocalDateTime
 import models.Entity
 import models.access.EntityAccess
@@ -13,7 +15,7 @@ import models.user.User
   */
 case class EntityModificationEntity(userId: Long,
                                     modification: EntityModification,
-                                    date: LocalDateTime,
+                                    instant: Instant,
                                     idOption: Option[Long] = None)
     extends Entity {
   require(userId > 0)

@@ -1,6 +1,6 @@
 package api
 
-import java.time.{LocalDate, LocalTime}
+import java.time.{Instant, LocalDate, LocalTime}
 
 import api.Picklers._
 import api.ScalaJsApi.UpdateToken
@@ -11,14 +11,12 @@ import scala.collection.immutable.Seq
 
 object UpdateTokens {
 
-  def toUpdateToken(dateTime: LocalDateTime): UpdateToken = {
-    val epochDay = dateTime.toLocalDate.toEpochDay
-    val secondOfDay = dateTime.toLocalTime.toSecondOfDay
-    s"$epochDay:$secondOfDay"
+  def toUpdateToken(instant: Instant): UpdateToken = {
+    s"${instant.getEpochSecond}:${instant.getNano}"
   }
 
-  def toLocalDateTime(updateToken: UpdateToken): LocalDateTime = {
-    val Seq(epochDay, secondOfDay) = Splitter.on(':').split(updateToken)
-    LocalDateTime.of(LocalDate.ofEpochDay(epochDay.toLong), LocalTime.ofSecondOfDay(secondOfDay.toLong))
+  def toInstant(updateToken: UpdateToken): Instant = {
+    val Seq(epochSecond, nano) = Splitter.on(':').split(updateToken)
+    Instant.ofEpochSecond(epochSecond.toLong).plusNanos(nano.toLong)
   }
 }

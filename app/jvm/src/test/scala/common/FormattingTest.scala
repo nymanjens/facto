@@ -17,7 +17,7 @@ class FormattingTest extends HookedSpecification {
   override def before() = {
     Guice.createInjector(new TestModule).injectMembers(this)
     setFakeI18nMappings()
-    fakeClock.setTime(createDateTime(2010, APRIL, 4))
+    fakeClock.setNow(createDateTime(2010, APRIL, 4))
   }
 
   "formatDate()" in {

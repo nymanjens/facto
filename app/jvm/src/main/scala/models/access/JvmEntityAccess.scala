@@ -62,7 +62,7 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends EntityAccess {
     // could start earlier but end later than invocation A. If the WebSocket closes before the modifications B
     // get published, the `nextUpdateToken` value returned by A must be old enough so that modifications from
     // B all happened after it.
-    val nextUpdateToken = toUpdateToken(clock.now minus Duration.ofSeconds(20))
+    val nextUpdateToken = toUpdateToken(clock.nowInstant minus Duration.ofSeconds(20))
 
     for (modification <- modifications) {
       // Apply modification
@@ -84,7 +84,7 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends EntityAccess {
             idOption = Some(EntityModification.generateRandomId()),
             userId = user.id,
             modification = modification,
-            date = clock.now
+            instant = clock.nowInstant
           ))
 
       inMemoryEntityDatabase.update(modification)
