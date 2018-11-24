@@ -170,6 +170,7 @@ object SlickEntityTableDef {
     /* override */
     final class Table(tag: SlickTag) extends EntityTable[EntityModificationEntity](tag, tableName) {
       def userId = column[Long]("userId")
+      def entityId = column[Long]("entityId")
       def change = column[EntityModification]("modification")
       def instant = column[Instant]("date")
       // The instant field can't hold the nano precision of the `instant` field above. It thus
@@ -177,9 +178,10 @@ object SlickEntityTableDef {
       def instantNanos = column[Long]("instantNanos")
 
       override def * = {
-        def tupled(tuple: (Long, EntityModification, Instant, Long, Option[Long])): EntityModificationEntity =
+        def tupled(
+            tuple: (Long, Long, EntityModification, Instant, Long, Option[Long])): EntityModificationEntity =
           tuple match {
-            case (userId, modification, instant, instantNanos, idOption) =>
+            case (userId, entityId, modification, instant, instantNanos, idOption) =>
               EntityModificationEntity(
                 userId = userId,
                 modification = modification,
@@ -188,10 +190,10 @@ object SlickEntityTableDef {
               )
           }
         def unapply(
-            e: EntityModificationEntity): Option[(Long, EntityModification, Instant, Long, Option[Long])] =
-          Some((e.userId, e.modification, e.instant, e.instant.getNano, e.idOption))
+            e: EntityModificationEntity): Option[(Long, Long, EntityModification, Instant, Long, Option[Long])] =
+          Some((e.userId, e.modification.entityId, e.modification, e.instant, e.instant.getNano, e.idOption))
 
-        (userId, change, instant, instantNanos, id.?) <> (tupled _, unapply _)
+        (userId, entityId, change, instant, instantNanos, id.?) <> (tupled _, unapply _)
       }
     }
 
