@@ -19,6 +19,8 @@ import models.modification.EntityType.{
 import models.modification.{EntityModification, EntityModificationEntity, EntityType}
 import models.money.ExchangeRateMeasurement
 import models.slick.SlickUtils.dbApi._
+import models.slick.SlickUtils.{dbRun, instantToSqlTimestampMapper}
+import models.slick.SlickUtils.dbApi._
 import models.slick.SlickUtils.dbRun
 import models.slick.{SlickEntityManager, SlickEntityTableDef}
 import models.user.User
@@ -58,13 +60,31 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends EntityAccess {
   }
 
   def persistEntityModifications(modifications: Seq[EntityModification])(implicit user: User): Unit = {
+    def isDuplicate(modification: EntityModification) = {
+      val existingEntities = dbRun(
+        newSlickQuery[EntityModificationEntity]()
+          .filter(_.entityId === modification.entityId)
+          .result)
+        .filter(_.modification.entityType == modification.entityType)
+      val entityAlreadyRemoved =
+        existingEntities.exists(_.modification.isInstanceOf[EntityModification.Remove[_]])
+      modification match {
+        case _: EntityModification.Add[_]    => existingEntities.nonEmpty
+        case _: EntityModification.Update[_] => entityAlreadyRemoved
+        case _: EntityModification.Remove[_] => entityAlreadyRemoved
+      }
+    }
+
     // Remove some time from the next update token because a slower persistEntityModifications() invocation B
     // could start earlier but end later than invocation A. If the WebSocket closes before the modifications B
     // get published, the `nextUpdateToken` value returned by A must be old enough so that modifications from
     // B all happened after it.
     val nextUpdateToken = toUpdateToken(clock.nowInstant minus Duration.ofSeconds(20))
 
-    for (modification <- modifications) {
+    for {
+      modification <- modifications
+      if !isDuplicate(modification)
+    } {
       // Apply modification
       val entityType = modification.entityType
       modification match {

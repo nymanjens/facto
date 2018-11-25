@@ -33,7 +33,7 @@ class JvmEntityAccessTest extends HookedSpecification {
 
       entityAccess.persistEntityModifications(testModification)
 
-      val modificationEntity = getOnlyElement(dbRun(entityAccess.newSlickQuery[EntityModificationEntity]()))
+      val modificationEntity = getOnlyElement(allEntityModifications())
       modificationEntity.userId mustEqual user.id
       modificationEntity.modification mustEqual testModification
       modificationEntity.instant mustEqual testInstant
@@ -111,7 +111,48 @@ class JvmEntityAccessTest extends HookedSpecification {
 
       entityAccess.newQuerySync[Transaction]().data() mustEqual Seq(transaction1)
     }
+
+    "Filters duplicates: EntityModification.Add" in new WithApplication {
+      val user1 = createUser()
+      val updatedUser1 = user1.copy(name = "other name")
+      entityAccess.persistEntityModifications(EntityModification.Add(user1))
+      entityAccess.persistEntityModifications(EntityModification.Update(updatedUser1))
+      val initialModifications = allEntityModifications()
+
+      entityAccess.persistEntityModifications(EntityModification.Add(user1), EntityModification.Add(user1))
+
+      entityAccess.newQuerySync[User]().data() mustEqual Seq(updatedUser1)
+      allEntityModifications() mustEqual initialModifications
+    }
+    "Filters duplicates: EntityModification.Update" in new WithApplication {
+      val user1 = createUser()
+      val updatedUser1 = user1.copy(name = "other name")
+
+      entityAccess.persistEntityModifications(EntityModification.Add(user1))
+      entityAccess.persistEntityModifications(EntityModification.createDelete(user1))
+      val initialModifications = allEntityModifications()
+
+      entityAccess.persistEntityModifications(EntityModification.Update(updatedUser1))
+
+      entityAccess.newQuerySync[User]().data() must beEmpty
+      allEntityModifications() mustEqual initialModifications
+    }
+    "Filters duplicates: EntityModification.Update" in new WithApplication {
+      val user1 = createUser()
+
+      entityAccess.persistEntityModifications(EntityModification.Add(user1))
+      entityAccess.persistEntityModifications(EntityModification.createDelete(user1))
+      val initialModifications = allEntityModifications()
+
+      entityAccess.persistEntityModifications(EntityModification.createDelete(user1))
+
+      entityAccess.newQuerySync[User]().data() must beEmpty
+      allEntityModifications() mustEqual initialModifications
+    }
   }
+
+  private def allEntityModifications(): Seq[EntityModificationEntity] =
+    dbRun(entityAccess.newSlickQuery[EntityModificationEntity]()).toVector
 
   private def createUser(): User = testUser.copy(idOption = Some(EntityModification.generateRandomId()))
 }
