@@ -13,7 +13,8 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
-    implicit remoteDatabaseProxy: RemoteDatabaseProxy)
+    implicit remoteDatabaseProxy: RemoteDatabaseProxy,
+    entityModificationPushClientFactory: EntityModificationPushClientFactory)
     extends JsEntityAccess {
 
   private var listeners: Seq[Listener] = Seq()
@@ -35,6 +36,15 @@ private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
 
     if (existingPendingModifications.nonEmpty) {
       await(persistModifications(existingPendingModifications))
+    }
+
+    // Send pending modifications whenever connection with the server is restored
+    entityModificationPushClientFactory.pushClientsAreOnline.deregisterListener { isOnline =>
+      if (isOnline) {
+        if (_pendingModifications.modifications.nonEmpty) {
+          persistModifications(_pendingModifications.modifications)
+        }
+      }
     }
   }
 
