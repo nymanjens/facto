@@ -64,7 +64,7 @@ final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
       for (modification <- modifications) {
         require(
           !modification.isInstanceOf[EntityModification.Update[_]],
-          "Update modifications are not allowed to be created by clients " +
+          "Update modifications are not allowed by remote clients " +
             "(see EntityModification.Update documentation)"
         )
         require(
