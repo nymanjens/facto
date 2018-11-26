@@ -21,7 +21,7 @@ object SummaryTableTest extends TestSuite {
     val testModule = new ThisTestModule()
     implicit val summaryTable = testModule.summaryTable
     implicit val fakeClock = testModule.fakeClock
-    fakeClock.setTime(createDateTime(2013, JANUARY, 2))
+    fakeClock.setNow(createDateTime(2013, JANUARY, 2))
 
     val allYearsData = summaryTable.AllYearsData(
       allTransactionsYearRange = YearRange.closed(2010, 2013),
@@ -82,7 +82,7 @@ object SummaryTableTest extends TestSuite {
             ReferenceMoney(roundToLong((2200.0 + 120 + 123) / 12))
         }
         "only before June" - {
-          fakeClock.setTime(createDateTime(2012, JUNE, 2))
+          fakeClock.setNow(createDateTime(2012, JUNE, 2))
 
           allYearsData
             .averageWithoutCategories(categoriesToIgnore = Set(), year = 2012) ==>
@@ -111,7 +111,7 @@ object SummaryTableTest extends TestSuite {
             ReferenceMoney(roundToLong((2200.0 + 120) / 12))
         }
         "only before June" - {
-          fakeClock.setTime(createDateTime(2012, JUNE, 2))
+          fakeClock.setNow(createDateTime(2012, JUNE, 2))
           allYearsData.yearlyAverage(2012, testCategoryA) ==> ReferenceMoney(roundToLong(2200.0 / 5))
         }
         "only after first transaction of year (April)" - {
@@ -125,7 +125,7 @@ object SummaryTableTest extends TestSuite {
           allYearsData.monthsForAverage(2012) ==> DatedMonth.allMonthsIn(2012)
         }
         "only before June" - {
-          fakeClock.setTime(createDateTime(2012, JUNE, 2))
+          fakeClock.setNow(createDateTime(2012, JUNE, 2))
           allYearsData.monthsForAverage(2012) ==>
             Seq(
               DatedMonth.of(2012, JANUARY),
@@ -163,7 +163,7 @@ object SummaryTableTest extends TestSuite {
           allYearsData.averageExchangeRateGains(Currency.Gbp, 2012) ==> ReferenceMoney(roundToLong(123 / 12))
         }
         "only before June" - {
-          fakeClock.setTime(createDateTime(2012, JUNE, 2))
+          fakeClock.setNow(createDateTime(2012, JUNE, 2))
           allYearsData.averageExchangeRateGains(Currency.Gbp, 2012) ==> ReferenceMoney(0)
         }
         "only after first transaction of year (April)" - {

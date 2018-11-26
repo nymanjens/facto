@@ -60,24 +60,24 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
   }
 
   "getAllEntities()" in new WithApplication {
-    fakeClock.setTime(testDate)
+    fakeClock.setNowInstant(testInstant)
     TestUtils.persist(testTransactionWithId)
 
     val response = serverFactory.create().getAllEntities(Seq(EntityType.TransactionType))
 
     response.entities(EntityType.TransactionType) mustEqual Seq(testTransactionWithId)
-    response.nextUpdateToken mustEqual toUpdateToken(testDate)
+    response.nextUpdateToken mustEqual toUpdateToken(testInstant)
   }
 
   "persistEntityModifications()" in new WithApplication {
-    fakeClock.setTime(testDate)
+    fakeClock.setNowInstant(testInstant)
 
     serverFactory.create().persistEntityModifications(Seq(testModification))
 
     val modificationEntity = getOnlyElement(dbRun(entityAccess.newSlickQuery[EntityModificationEntity]()))
     modificationEntity.userId mustEqual user.id
     modificationEntity.modification mustEqual testModification
-    modificationEntity.date mustEqual testDate
+    modificationEntity.instant mustEqual testInstant
   }
 
   "executeDataQuery()" in new WithApplication {

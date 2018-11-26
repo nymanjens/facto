@@ -45,30 +45,4 @@ object SlickUtils {
 
   implicit val instantToSqlTimestampMapper: ColumnType[Instant] =
     MappedColumnType.base[Instant, java.sql.Timestamp](java.sql.Timestamp.from, _.toInstant)
-
-  implicit val orderTokenToBytesMapper: ColumnType[OrderToken] = {
-    val zone = ZoneId.of("Europe/Paris") // This is arbitrary. It just has to be the same in both directions
-    def toSql(orderToken: OrderToken) = {
-      val bytes = new Array[Byte](orderToken.parts.size * 4)
-      val buffer = ByteBuffer.wrap(bytes)
-      for (part <- orderToken.parts) {
-        buffer.putInt(part)
-      }
-      bytes
-    }
-    def toOrderToken(bytes: Array[Byte]) = {
-      val byteBuffer = ByteBuffer.wrap(bytes)
-
-      def toOrderTokenParts(): List[Int] = {
-        if (byteBuffer.hasRemaining()) {
-          byteBuffer.getInt() :: toOrderTokenParts()
-        } else {
-          Nil
-        }
-      }
-
-      OrderToken(toOrderTokenParts())
-    }
-    MappedColumnType.base[OrderToken, Array[Byte]](toSql, toOrderToken)
-  }
 }
