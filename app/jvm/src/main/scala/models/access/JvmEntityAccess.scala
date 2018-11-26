@@ -81,7 +81,14 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends EntityAccess {
     // B all happened after it.
     val nextUpdateToken = toUpdateToken(clock.nowInstant minus Duration.ofSeconds(20))
 
-    val uniqueModifications = modifications.filter(m => !isDuplicate(m))
+    val uniqueModifications = modifications.filter { m =>
+      if (isDuplicate(m)) {
+        println(s"  Note: Modification marked as duplicate: modification = $m")
+        false
+      } else {
+        true
+      }
+    }
 
     for (modification <- uniqueModifications) {
       // Apply modification
