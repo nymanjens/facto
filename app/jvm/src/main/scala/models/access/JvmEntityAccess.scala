@@ -71,7 +71,7 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends EntityAccess {
       modification match {
         case _: EntityModification.Add[_]    => existingEntities.nonEmpty
         case _: EntityModification.Update[_] => entityAlreadyRemoved
-        case _: EntityModification.Remove[_] => entityAlreadyRemoved
+        case _: EntityModification.Remove[_] => false // Always allow removes to fix inconsistencies
       }
     }
 

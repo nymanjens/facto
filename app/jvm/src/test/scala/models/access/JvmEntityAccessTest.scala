@@ -137,18 +137,6 @@ class JvmEntityAccessTest extends HookedSpecification {
       entityAccess.newQuerySync[User]().data() must beEmpty
       allEntityModifications() mustEqual initialModifications
     }
-    "Filters duplicates: EntityModification.Update" in new WithApplication {
-      val user1 = createUser()
-
-      entityAccess.persistEntityModifications(EntityModification.Add(user1))
-      entityAccess.persistEntityModifications(EntityModification.createDelete(user1))
-      val initialModifications = allEntityModifications()
-
-      entityAccess.persistEntityModifications(EntityModification.createDelete(user1))
-
-      entityAccess.newQuerySync[User]().data() must beEmpty
-      allEntityModifications() mustEqual initialModifications
-    }
   }
 
   private def allEntityModifications(): Seq[EntityModificationEntity] =
