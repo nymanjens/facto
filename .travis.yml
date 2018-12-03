@@ -14,7 +14,7 @@ install:
   - npm install -g jshint
 
 script:
-  - travis_wait 40 sbt ++$TRAVIS_SCALA_VERSION 'set parallelExecution in Test := false' test
+  - sbt ++$TRAVIS_SCALA_VERSION test
   - sbt scalastyle
   - sbt test:scalastyle # run scalastyle in test code
   - jshint app/jvm/src/main/resources/
