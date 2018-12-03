@@ -1,6 +1,7 @@
 package common.testing
 
 import java.time.Month
+import java.time.Instant
 import java.time.Month._
 
 import api.ScalaJsApi.{GetInitialDataResponse, UpdateToken}
@@ -197,6 +198,7 @@ object TestObjects {
   def testUserRedacted: User = testUser.copy(passwordHash = "<redacted>")
 
   val testDate: LocalDateTime = LocalDateTimes.createDateTime(2008, MARCH, 13)
+  val testInstant = Instant.ofEpochMilli(999000111)
   val testUpdateToken: UpdateToken = s"123782:12378"
 
   val testTransactionGroupWithId: TransactionGroup =

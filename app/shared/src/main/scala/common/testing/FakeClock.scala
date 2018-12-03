@@ -1,21 +1,28 @@
 package common.testing
 
+import java.time.Instant
 import java.time.Month.JANUARY
 
 import common.time.{Clock, LocalDateTime}
 
 final class FakeClock extends Clock {
 
-  @volatile private var currentTime: LocalDateTime = FakeClock.defaultTime
+  @volatile private var currentLocalDateTime: LocalDateTime = FakeClock.defaultLocalDateTime
+  @volatile private var currentInstant: Instant = FakeClock.defaultInstant
 
-  override def now = currentTime
-  override def nowInstant = ???
+  override def now = currentLocalDateTime
+  override def nowInstant = currentInstant
 
-  def setTime(time: LocalDateTime) = {
-    currentTime = time
+  def setNow(localDateTime: LocalDateTime): Unit = {
+    currentLocalDateTime = localDateTime
+  }
+
+  def setNowInstant(instant: Instant): Unit = {
+    currentInstant = instant
   }
 }
 
 object FakeClock {
-  val defaultTime: LocalDateTime = LocalDateTime.of(2000, JANUARY, 1, 0, 0)
+  val defaultLocalDateTime: LocalDateTime = LocalDateTime.of(2000, JANUARY, 1, 0, 0)
+  val defaultInstant: Instant = Instant.ofEpochMilli(9812093809912L)
 }

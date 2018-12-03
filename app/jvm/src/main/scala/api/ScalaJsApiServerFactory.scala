@@ -42,12 +42,12 @@ final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
           }
           mapBuilder.toStream.map { case (k, v) => k -> v.result() }.toMap
         },
-        nextUpdateToken = toUpdateToken(clock.now)
+        nextUpdateToken = toUpdateToken(clock.nowInstant)
       )
 
     override def getAllEntities(types: Seq[EntityType.any]) = {
       // All modifications are idempotent so we can use the time when we started getting the entities as next update token.
-      val nextUpdateToken: UpdateToken = toUpdateToken(clock.now)
+      val nextUpdateToken: UpdateToken = toUpdateToken(clock.nowInstant)
       val entitiesMap: Map[EntityType.any, Seq[Entity]] = {
         types
           .map(entityType => {
@@ -64,7 +64,7 @@ final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
       for (modification <- modifications) {
         require(
           !modification.isInstanceOf[EntityModification.Update[_]],
-          "Update modifications are not allowed to be created by clients " +
+          "Update modifications are not allowed by remote clients " +
             "(see EntityModification.Update documentation)"
         )
         require(

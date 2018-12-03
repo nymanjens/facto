@@ -1,6 +1,6 @@
 package common.time
 
-import java.time.{Duration, LocalDate}
+import java.time.{Duration, Instant, LocalDate}
 
 object JavaTimeImplicits {
 
@@ -9,6 +9,14 @@ object JavaTimeImplicits {
     def <(other: T): Boolean = ordering.compare(thisComparable, other) < 0
     def >=(other: T): Boolean = ordering.compare(thisComparable, other) >= 0
     def >(other: T): Boolean = ordering.compare(thisComparable, other) > 0
+  }
+
+  implicit object InstantOrdering extends Ordering[Instant] {
+    override def compare(x: Instant, y: Instant): Int = x compareTo y
+  }
+  implicit class InstantWrapper(thisInstant: Instant) extends BaseWrapper[Instant](thisInstant) {
+    def -(duration: Duration): Instant = thisInstant minus duration
+    def +(duration: Duration): Instant = thisInstant plus duration
   }
 
   implicit object LocalDateTimeOrdering extends Ordering[LocalDateTime] {

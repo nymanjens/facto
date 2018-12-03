@@ -1,6 +1,8 @@
 package models.slick
 
 import java.time.{ZoneId, LocalDateTime => JavaLocalDateTime}
+import java.nio.ByteBuffer
+import java.time.{Instant, ZoneId, LocalDateTime => JavaLocalDateTime}
 
 import common.time.{LocalDateTime, LocalDateTimes}
 import slick.basic.DatabaseConfig
@@ -40,4 +42,7 @@ object SlickUtils {
     }
     MappedColumnType.base[LocalDateTime, java.sql.Timestamp](toSql, toLocalDateTime)
   }
+
+  implicit val instantToSqlTimestampMapper: ColumnType[Instant] =
+    MappedColumnType.base[Instant, java.sql.Timestamp](java.sql.Timestamp.from, _.toInstant)
 }

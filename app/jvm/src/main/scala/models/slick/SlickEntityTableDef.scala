@@ -1,6 +1,7 @@
 package models.slick
 
 import java.nio.ByteBuffer
+import java.time.Instant
 
 import api.Picklers._
 import boopickle.Default.{Pickle, Unpickle}
@@ -12,6 +13,7 @@ import models.modification.{EntityModification, EntityModificationEntity}
 import models.money.ExchangeRateMeasurement
 import models.slick.SlickUtils.dbApi.{Table => SlickTable, Tag => SlickTag, _}
 import models.slick.SlickUtils.localDateTimeToSqlDateMapper
+import models.slick.SlickUtils.instantToSqlTimestampMapper
 import models.user.User
 
 import scala.collection.immutable.Seq
@@ -168,11 +170,31 @@ object SlickEntityTableDef {
     /* override */
     final class Table(tag: SlickTag) extends EntityTable[EntityModificationEntity](tag, tableName) {
       def userId = column[Long]("userId")
+      def entityId = column[Long]("entityId")
       def change = column[EntityModification]("modification")
-      def date = column[LocalDateTime]("date")
+      def instant = column[Instant]("date")
+      // The instant field can't hold the nano precision of the `instant` field above. It thus
+      // has to be persisted separately.
+      def instantNanos = column[Long]("instantNanos")
 
-      override def * =
-        (userId, change, date, id.?) <> (EntityModificationEntity.tupled, EntityModificationEntity.unapply)
+      override def * = {
+        def tupled(
+            tuple: (Long, Long, EntityModification, Instant, Long, Option[Long])): EntityModificationEntity =
+          tuple match {
+            case (userId, entityId, modification, instant, instantNanos, idOption) =>
+              EntityModificationEntity(
+                userId = userId,
+                modification = modification,
+                instant = Instant.ofEpochSecond(instant.getEpochSecond, instantNanos),
+                idOption = idOption
+              )
+          }
+        def unapply(
+            e: EntityModificationEntity): Option[(Long, Long, EntityModification, Instant, Long, Option[Long])] =
+          Some((e.userId, e.modification.entityId, e.modification, e.instant, e.instant.getNano, e.idOption))
+
+        (userId, entityId, change, instant, instantNanos, id.?) <> (tupled _, unapply _)
+      }
     }
 
     implicit val entityModificationToBytesMapper: ColumnType[EntityModification] = {

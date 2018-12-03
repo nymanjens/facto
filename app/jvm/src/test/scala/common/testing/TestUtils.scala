@@ -17,7 +17,7 @@ object TestUtils {
 
   def persistTransaction(groupId: Long = -1,
                          flowInCents: Long = 0,
-                         date: LocalDateTime = FakeClock.defaultTime,
+                         date: LocalDateTime = FakeClock.defaultLocalDateTime,
                          timestamp: Long = -1,
                          account: Account = testAccount,
                          category: Category = testCategory,
@@ -26,7 +26,7 @@ object TestUtils {
                          detailDescription: String = "detailDescription",
                          tags: Seq[String] = Seq())(implicit entityAccess: JvmEntityAccess): Transaction = {
     val actualGroupId = if (groupId == -1) {
-      persist(TransactionGroup(createdDate = FakeClock.defaultTime)).id
+      persist(TransactionGroup(createdDate = FakeClock.defaultLocalDateTime)).id
     } else {
       groupId
     }
@@ -50,7 +50,7 @@ object TestUtils {
 
   def persistBalanceCheck(
       balanceInCents: Long = 0,
-      date: LocalDateTime = FakeClock.defaultTime,
+      date: LocalDateTime = FakeClock.defaultLocalDateTime,
       timestamp: Long = -1,
       reservoir: MoneyReservoir = testReservoir)(implicit entityAccess: JvmEntityAccess): BalanceCheck = {
     val actualDate = if (timestamp == -1) date else localDateTimeOfEpochSecond(timestamp)

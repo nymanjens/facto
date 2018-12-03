@@ -61,10 +61,11 @@ private[access] final class HybridRemoteDatabaseProxy(futureLocalDatabase: Futur
   }
 
   override def persistEntityModifications(modifications: Seq[EntityModification]) = {
-    val serverUpdated = apiClient.persistEntityModifications(modifications)
 
     futureLocalDatabase.option() match {
       case None =>
+        val serverUpdated = apiClient.persistEntityModifications(modifications)
+
         // Apply changes to local database, but don't wait for it
         futureLocalDatabase.scheduleUpdateAtEnd(localDatabase =>
           async {
@@ -77,6 +78,13 @@ private[access] final class HybridRemoteDatabaseProxy(futureLocalDatabase: Futur
           completelyDoneFuture = serverUpdated)
 
       case Some(localDatabase) =>
+        val serverUpdated = async {
+          // Also send all pending modifications. If we don't do this, an unsuccessful call for modification A
+          // followed by a successful call for modification B will result in B being applied to the server before A.
+          val pendingModifications = await(localDatabase.pendingModifications())
+          await(apiClient.persistEntityModifications(pendingModifications ++ modifications))
+        }
+
         val queryReflectsModifications = async {
           await(localDatabase.applyModifications(modifications))
           await(localDatabase.addPendingModifications(modifications))
