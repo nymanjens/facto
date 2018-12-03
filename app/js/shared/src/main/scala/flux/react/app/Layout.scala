@@ -107,7 +107,7 @@ final class Layout(implicit globalMessages: GlobalMessages,
         // Page Content
         <.div(
           ^.id := "page-wrapper",
-          ^.style := js.Dictionary("minHeight" -> s"${pageWrapperHeight}px"),
+          ^.style := js.Dictionary("minHeight" -> s"${pageWrapperHeightPx}px"),
           <.div(
             ^.className := "container-fluid",
             <.div(
@@ -136,7 +136,7 @@ final class Layout(implicit globalMessages: GlobalMessages,
     val width = if (dom.window.innerWidth > 0) dom.window.innerWidth else dom.window.screen.width
     width < 768
   }
-  private def pageWrapperHeight: Int = {
+  private def pageWrapperHeightPx: Int = {
     // Based on Start Bootstrap code in assets/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js
     val topOffset = if (navbarCollapsed) 100 else 50
 
