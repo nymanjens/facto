@@ -113,41 +113,49 @@ object ModelField {
 
   // **************** Field numbers **************** //
   private val fieldToNumberMap: ImmutableBiMap[ModelField[_, _], Int] =
-    ImmutableBiMap
-      .builder[ModelField[_, _], Int]()
-      .put(User.id, 2)
-      .put(User.loginName, 3)
-      .put(User.passwordHash, 4)
-      .put(User.name, 5)
-      .put(User.isAdmin, 34)
-      .put(User.expandCashFlowTablesByDefault, 7)
-      .put(User.expandLiquidationTablesByDefault, 33)
-      .put(Transaction.id, 8)
-      .put(Transaction.transactionGroupId, 9)
-      .put(Transaction.issuerId, 10)
-      .put(Transaction.beneficiaryAccountCode, 11)
-      .put(Transaction.moneyReservoirCode, 12)
-      .put(Transaction.categoryCode, 13)
-      .put(Transaction.description, 14)
-      .put(Transaction.flowInCents, 15)
-      .put(Transaction.detailDescription, 16)
-      .put(Transaction.tags, 17)
-      .put(Transaction.createdDate, 18)
-      .put(Transaction.transactionDate, 19)
-      .put(Transaction.consumedDate, 20)
-      .put(TransactionGroup.id, 21)
-      .put(TransactionGroup.createdDate, 22)
-      .put(BalanceCheck.id, 23)
-      .put(BalanceCheck.issuerId, 24)
-      .put(BalanceCheck.moneyReservoirCode, 25)
-      .put(BalanceCheck.balanceInCents, 26)
-      .put(BalanceCheck.createdDate, 27)
-      .put(BalanceCheck.checkDate, 28)
-      .put(ExchangeRateMeasurement.id, 29)
-      .put(ExchangeRateMeasurement.date, 30)
-      .put(ExchangeRateMeasurement.foreignCurrencyCode, 31)
-      .put(ExchangeRateMeasurement.ratioReferenceToForeignCurrency, 32)
-      .build()
+    toBiMapWithUniqueValues(
+      User.id,
+      User.loginName,
+      User.passwordHash,
+      User.name,
+      User.isAdmin,
+      User.expandCashFlowTablesByDefault,
+      User.expandLiquidationTablesByDefault,
+      Transaction.id,
+      Transaction.transactionGroupId,
+      Transaction.issuerId,
+      Transaction.beneficiaryAccountCode,
+      Transaction.moneyReservoirCode,
+      Transaction.categoryCode,
+      Transaction.description,
+      Transaction.flowInCents,
+      Transaction.detailDescription,
+      Transaction.tags,
+      Transaction.createdDate,
+      Transaction.transactionDate,
+      Transaction.consumedDate,
+      TransactionGroup.id,
+      TransactionGroup.createdDate,
+      BalanceCheck.id,
+      BalanceCheck.issuerId,
+      BalanceCheck.moneyReservoirCode,
+      BalanceCheck.balanceInCents,
+      BalanceCheck.createdDate,
+      BalanceCheck.checkDate,
+      ExchangeRateMeasurement.id,
+      ExchangeRateMeasurement.date,
+      ExchangeRateMeasurement.foreignCurrencyCode,
+      ExchangeRateMeasurement.ratioReferenceToForeignCurrency
+    )
+
   def toNumber(field: ModelField[_, _]): Int = fieldToNumberMap.get(field)
   def fromNumber(number: Int): ModelField[_, _] = fieldToNumberMap.inverse().get(number)
+
+  private def toBiMapWithUniqueValues(fields: ModelField[_, _]*): ImmutableBiMap[ModelField[_, _], Int] = {
+    val resultBuilder = ImmutableBiMap.builder[ModelField[_, _], Int]()
+    for ((field, index) <- fields.zipWithIndex) {
+      resultBuilder.put(field, index + 1)
+    }
+    resultBuilder.build()
+  }
 }
