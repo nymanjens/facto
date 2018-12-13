@@ -126,15 +126,16 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends EntityAccess {
   // ********** Private inner types ********** //
   private object EntityModificationAsyncProcessor {
     @GuardedBy("this")
-    private val alreadySeenModifications: mutable.Set[EntityModification] = mutable.Set()
+    private val alreadySeenAddsAndRemoves: mutable.Set[EntityModification] = mutable.Set()
 
     private val singleThreadedExecutor =
       ExecutionContext.fromExecutorService(Executors.newSingleThreadExecutor())
 
     def processAsync(modifications: Seq[EntityModification])(implicit user: User): Future[Unit] =
       this.synchronized {
-        val uniqueModifications = modifications.filterNot(alreadySeenModifications)
-        alreadySeenModifications ++= uniqueModifications
+        val uniqueModifications = modifications.filterNot(alreadySeenAddsAndRemoves)
+        alreadySeenAddsAndRemoves ++= uniqueModifications.filter(m =>
+          m.isInstanceOf[EntityModification.Add] || m.isInstanceOf[EntityModification.Remove])
         Future(processSync(uniqueModifications))(singleThreadedExecutor)
       }
 
