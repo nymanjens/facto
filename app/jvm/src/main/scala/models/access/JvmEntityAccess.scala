@@ -1,12 +1,10 @@
 package models.access
 
 import java.time.Duration
-import java.util.concurrent.{ExecutorService, Executors}
+import java.util.concurrent.Executors
 
 import api.ScalaJsApi.ModificationsWithToken
 import api.UpdateTokens.toUpdateToken
-import com.google.common.collect.Multimaps
-import com.google.common.util.concurrent.MoreExecutors
 import com.google.inject._
 import common.publisher.TriggerablePublisher
 import common.time.Clock
@@ -21,8 +19,6 @@ import models.modification.EntityType.{
 }
 import models.modification.{EntityModification, EntityModificationEntity, EntityType}
 import models.money.ExchangeRateMeasurement
-import models.slick.SlickUtils.dbApi._
-import models.slick.SlickUtils.{dbRun, instantToSqlTimestampMapper}
 import models.slick.SlickUtils.dbApi._
 import models.slick.SlickUtils.dbRun
 import models.slick.{SlickEntityManager, SlickEntityTableDef}
@@ -135,22 +131,17 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends EntityAccess {
       this.synchronized {
         val uniqueModifications = modifications.filterNot(alreadySeenAddsAndRemoves)
         alreadySeenAddsAndRemoves ++= uniqueModifications.filter(m =>
-          m.isInstanceOf[EntityModification.Add] || m.isInstanceOf[EntityModification.Remove])
+          m.isInstanceOf[EntityModification.Add[_]] || m.isInstanceOf[EntityModification.Remove[_]])
         Future(processSync(uniqueModifications))(singleThreadedExecutor)
       }
 
     private def processSync(modifications: Seq[EntityModification])(implicit user: User): Unit = {
-      val existingModifications: Set[EntityModification] =
-        dbRun(
-          newSlickQuery[EntityModificationEntity]()
-            .filter(_.entityId inSet modifications.map(_.entityId).toSet)
-            .result)
-          .map(_.modification)
-          .toSet
-      def isDuplicate(modification: EntityModification) = {
-        val existingEntities = existingModifications
+      def isDuplicate(modification: EntityModification,
+                      existingModifications: Iterable[EntityModification]): Boolean = {
+        val existingEntities = existingModifications.toStream
           .filter(_.entityId == modification.entityId)
           .filter(_.entityType == modification.entityType)
+          .toSet
         val entityAlreadyRemoved =
           existingEntities.exists(_.isInstanceOf[EntityModification.Remove[_]])
         modification match {
@@ -160,46 +151,59 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends EntityAccess {
         }
       }
 
+      val existingModifications: mutable.Set[EntityModification] =
+        mutable.Set() ++
+          dbRun(
+            newSlickQuery[EntityModificationEntity]()
+              .filter(_.entityId inSet modifications.map(_.entityId).toSet)
+              .result)
+            .map(_.modification)
+
       // Remove some time from the next update token because a slower persistEntityModifications() invocation B
       // could start earlier but end later than invocation A. If the WebSocket closes before the modifications B
       // get published, the `nextUpdateToken` value returned by A must be old enough so that modifications from
       // B all happened after it.
       val nextUpdateToken = toUpdateToken(clock.nowInstant minus Duration.ofSeconds(20))
 
-      val uniqueModifications = modifications.filter { m =>
-        if (isDuplicate(m)) {
-          println(s"  Note: Modification marked as duplicate: modification = $m")
-          false
-        } else {
-          true
+      val uniqueModifications =
+        for {
+          modification <- modifications
+          if {
+            if (isDuplicate(modification, existingModifications)) {
+              println(s"  Note: Modification marked as duplicate: modification = $modification")
+              false
+            } else {
+              true
+            }
+          }
+        } yield {
+          existingModifications += modification
+
+          // Apply modification
+          val entityType = modification.entityType
+          modification match {
+            case EntityModification.Add(entity) =>
+              getManager(entityType).addNew(entity.asInstanceOf[entityType.get])
+            case EntityModification.Update(entity) =>
+              getManager(entityType).updateIfExists(entity.asInstanceOf[entityType.get])
+            case EntityModification.Remove(entityId) =>
+              getManager(entityType).deleteIfExists(entityId)
+          }
+
+          // Add modification
+          SlickEntityManager
+            .forType[EntityModificationEntity]
+            .addNew(
+              EntityModificationEntity(
+                idOption = Some(EntityModification.generateRandomId()),
+                userId = user.id,
+                modification = modification,
+                instant = clock.nowInstant
+              ))
+
+          inMemoryEntityDatabase.update(modification)
+          modification
         }
-      }
-
-      for (modification <- uniqueModifications) {
-        // Apply modification
-        val entityType = modification.entityType
-        modification match {
-          case EntityModification.Add(entity) =>
-            getManager(entityType).addNew(entity.asInstanceOf[entityType.get])
-          case EntityModification.Update(entity) =>
-            getManager(entityType).updateIfExists(entity.asInstanceOf[entityType.get])
-          case EntityModification.Remove(entityId) =>
-            getManager(entityType).deleteIfExists(entityId)
-        }
-
-        // Add modification
-        SlickEntityManager
-          .forType[EntityModificationEntity]
-          .addNew(
-            EntityModificationEntity(
-              idOption = Some(EntityModification.generateRandomId()),
-              userId = user.id,
-              modification = modification,
-              instant = clock.nowInstant
-            ))
-
-        inMemoryEntityDatabase.update(modification)
-      }
 
       entityModificationPublisher_.trigger(ModificationsWithToken(uniqueModifications, nextUpdateToken))
     }
