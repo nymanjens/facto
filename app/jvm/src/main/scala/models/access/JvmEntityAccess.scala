@@ -5,6 +5,7 @@ import java.util.concurrent.{ExecutorService, Executors}
 
 import api.ScalaJsApi.ModificationsWithToken
 import api.UpdateTokens.toUpdateToken
+import com.google.common.collect.Multimaps
 import com.google.common.util.concurrent.MoreExecutors
 import com.google.inject._
 import common.publisher.TriggerablePublisher
@@ -138,14 +139,19 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends EntityAccess {
       }
 
     private def processSync(modifications: Seq[EntityModification])(implicit user: User): Unit = {
-      def isDuplicate(modification: EntityModification) = {
-        val existingEntities = dbRun(
+      val existingModifications: Set[EntityModification] =
+        dbRun(
           newSlickQuery[EntityModificationEntity]()
-            .filter(_.entityId === modification.entityId)
+            .filter(_.entityId inSet modifications.map(_.entityId).toSet)
             .result)
-          .filter(_.modification.entityType == modification.entityType)
+          .map(_.modification)
+          .toSet
+      def isDuplicate(modification: EntityModification) = {
+        val existingEntities = existingModifications
+          .filter(_.entityId == modification.entityId)
+          .filter(_.entityType == modification.entityType)
         val entityAlreadyRemoved =
-          existingEntities.exists(_.modification.isInstanceOf[EntityModification.Remove[_]])
+          existingEntities.exists(_.isInstanceOf[EntityModification.Remove[_]])
         modification match {
           case _: EntityModification.Add[_]    => existingEntities.nonEmpty
           case _: EntityModification.Update[_] => entityAlreadyRemoved
@@ -173,7 +179,7 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends EntityAccess {
         val entityType = modification.entityType
         modification match {
           case EntityModification.Add(entity) =>
-            getManager(entityType).addIfNew(entity.asInstanceOf[entityType.get])
+            getManager(entityType).addNew(entity.asInstanceOf[entityType.get])
           case EntityModification.Update(entity) =>
             getManager(entityType).updateIfExists(entity.asInstanceOf[entityType.get])
           case EntityModification.Remove(entityId) =>
@@ -183,7 +189,7 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends EntityAccess {
         // Add modification
         SlickEntityManager
           .forType[EntityModificationEntity]
-          .addIfNew(
+          .addNew(
             EntityModificationEntity(
               idOption = Some(EntityModification.generateRandomId()),
               userId = user.id,

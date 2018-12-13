@@ -18,18 +18,15 @@ private[models] final class SlickEntityManager[E <: Entity] private (
   }
 
   // ********** Mutators ********** //
-  private[models] def addIfNew(entityWithId: E): Unit = {
+  private[models] def addNew(entityWithId: E): Unit = {
     require(entityWithId.idOption.isDefined, s"This entity has no id ($entityWithId)")
-    val existingEntities = dbRun(newQuery.filter(_.id === entityWithId.id).result)
-
-    if (existingEntities.isEmpty) {
-      mustAffectOneSingleRow {
-        dbRun(newQuery.forceInsert(entityWithId))
-      }
+    mustAffectOneSingleRow {
+      dbRun(newQuery.forceInsert(entityWithId))
     }
   }
 
   private[models] def updateIfExists(entityWithId: E): Unit = {
+    require(entityWithId.idOption.isDefined, s"This entity has no id ($entityWithId)")
     dbRun(newQuery.filter(_.id === entityWithId.id).update(entityWithId))
   }
 
