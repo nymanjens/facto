@@ -75,7 +75,7 @@ final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
           "Client initiated exchange rate measurement changes are not allowed")
       }
 
-      entityAccess.persistEntityModifications(modifications)
+      entityAccess.persistEntityModificationsAsync(modifications) // Don't wait for it to finish
     }
 
     override def executeDataQuery(dbQuery: PicklableDbQuery) = {
