@@ -39,13 +39,13 @@ object DbResultSet {
     }
 
     // **************** Terminal operations **************** //
-    def findOne[V](field: ModelField[V, E], value: V): Option[E] = {
-      filter(field === value).limit(1).data() match {
+    def findOne[V](filter: Filter[E]): Option[E] = {
+      this.filter(filter).limit(1).data() match {
         case Seq(e) => Some(e)
         case Seq()  => None
       }
     }
-    def findById(id: Long): E = findOne(ModelField.id[E], id) match {
+    def findById(id: Long): E = findOne(ModelField.id[E] === id) match {
       case Some(x) => x
       case None    => throw new IllegalArgumentException(s"Could not find entry with id=$id")
     }
@@ -74,14 +74,14 @@ object DbResultSet {
     }
 
     // **************** Terminal operations **************** //
-    def findOne[V](field: ModelField[V, E], value: V): Future[Option[E]] = async {
-      await(filter(field === value).limit(1).data()) match {
+    def findOne[V](filter: Filter[E]): Future[Option[E]] = async {
+      await(this.filter(filter).limit(1).data()) match {
         case Seq(e) => Some(e)
         case Seq()  => None
       }
     }
     def findById(id: Long): Future[E] = async {
-      await(findOne(ModelField.id[E], id)) match {
+      await(findOne(ModelField.id[E] === id)) match {
         case Some(x) => x
         case None    => throw new IllegalArgumentException(s"Could not find entry with id=$id")
       }

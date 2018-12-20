@@ -224,7 +224,7 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction()
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertThat(_.findOne(ModelField.id, transaction2.id))
+        .assertThat(_.findOne(ModelField.id[Transaction] === transaction2.id))
         .isEqualTo(Some(transaction2))
     },
     ManualTest("queryExecutor().count()") {

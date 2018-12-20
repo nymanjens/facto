@@ -1,5 +1,6 @@
 package flux.stores.entries.factories
 
+import models.access.DbQueryImplicits._
 import java.time.Month._
 
 import common.testing.TestObjects._
@@ -234,7 +235,7 @@ object StoreFactoryStateUpdateTest extends TestSuite {
     def checkRemovingExistingEntity(update: EntityModification): Unit = {
 
       def checkIfIdExists[E <: Entity: EntityType](id: Long): Unit = {
-        val existing = entityAccess.newQuerySync[E]().findOne(ModelField.id[E], id)
+        val existing = entityAccess.newQuerySync[E]().findOne(ModelField.id[E] === id)
         require(existing.isDefined, s"Could not find entity of ${update.entityType} with id $id")
       }
 

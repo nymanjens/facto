@@ -1,5 +1,6 @@
 package models.accounting.config
 
+import models.access.DbQueryImplicits._
 import common.Require.requireNonNull
 import models.access.{EntityAccess, ModelField}
 import models.accounting.{
@@ -41,7 +42,7 @@ case class Template(code: String,
                                entityAccess: EntityAccess): Option[Set[User]] = {
     onlyShowForUserLoginNames.map { loginNameOption =>
       loginNameOption.map { loginName =>
-        val user = entityAccess.newQuerySyncForUser().findOne(ModelField.User.loginName, loginName)
+        val user = entityAccess.newQuerySyncForUser().findOne(ModelField.User.loginName === loginName)
         require(user.isDefined, s"No user exists with loginName '$loginName'")
         require(
           accountingConfig.accountOf(user.get).isDefined,
