@@ -166,9 +166,7 @@ private final class LocalDatabaseImpl(implicit webWorker: LocalDatabaseWebWorker
   }
 
   override def save(): Future[Unit] = async {
-    console.log("  Saving database...")
     await(webWorker.applyWriteOperations(Seq(WriteOperation.SaveDatabase)))
-    console.log("  Saving database done.")
   }
 
   override def resetAndInitialize(): Future[Unit] = async {
