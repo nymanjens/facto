@@ -1,48 +1,33 @@
 package flux.react.app
 
-import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
-import flux.stores.{PendingModificationsStore, StateStore}
+import common.LoggingUtils.logExceptions
+import flux.react.common.HydroReactComponent
+import flux.stores.PendingModificationsStore
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
 private[app] final class PendingModificationsCounter(
-    implicit pendingModificationsStore: PendingModificationsStore) {
-
-  private val component = ScalaComponent
-    .builder[Props](getClass.getSimpleName)
-    .initialState[State](State(numberOfModifications = 0))
-    .renderBackend[Backend]
-    .componentWillMount(scope => scope.backend.willMount(scope.state))
-    .componentWillUnmount(scope => scope.backend.willUnmount())
-    .build
+    implicit pendingModificationsStore: PendingModificationsStore)
+    extends HydroReactComponent {
 
   // **************** API ****************//
   def apply(): VdomElement = {
-    component()
+    component((): Unit)
   }
 
-  // **************** Private inner types ****************//
-  private type Props = Unit
-  private case class State(numberOfModifications: Int)
+  // **************** Implementation of HydroReactComponent methods ****************//
+  override protected val config = ComponentConfig(backendConstructor = new Backend(_), initialState = State())
+    .withStateStoresDependency(
+      pendingModificationsStore,
+      _.copy(numberOfModifications = pendingModificationsStore.state.numberOfModifications))
 
-  private class Backend($ : BackendScope[Props, State]) extends StateStore.Listener {
+  // **************** Implementation of HydroReactComponent types ****************//
+  protected type Props = Unit
+  protected case class State(numberOfModifications: Int = 0)
 
-    def willMount(state: State): Callback = LogExceptionsCallback {
-      pendingModificationsStore.register(this)
-      $.modState(state =>
-        State(numberOfModifications = pendingModificationsStore.state.numberOfModifications)).runNow()
-    }
+  protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
 
-    def willUnmount(): Callback = LogExceptionsCallback {
-      pendingModificationsStore.deregister(this)
-    }
-
-    override def onStateUpdate() = {
-      $.modState(state =>
-        State(numberOfModifications = pendingModificationsStore.state.numberOfModifications)).runNow()
-    }
-
-    def render(props: Props, state: State): VdomElement = logExceptions {
+    override def render(props: Props, state: State): VdomElement = logExceptions {
       state.numberOfModifications match {
         case 0 =>
           <.span()

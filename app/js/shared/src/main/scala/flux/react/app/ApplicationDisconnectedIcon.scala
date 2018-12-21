@@ -1,48 +1,35 @@
 package flux.react.app
 
 import common.I18n
-import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
-import flux.stores.{ApplicationIsOnlineStore, StateStore}
+import common.LoggingUtils.logExceptions
+import flux.react.common.HydroReactComponent
+import flux.stores.ApplicationIsOnlineStore
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
 private[app] final class ApplicationDisconnectedIcon(
     implicit applicationIsOnlineStore: ApplicationIsOnlineStore,
-    i18n: I18n) {
-
-  private val component = ScalaComponent
-    .builder[Props](getClass.getSimpleName)
-    .initialState[State](State(isDisconnected = false))
-    .renderBackend[Backend]
-    .componentWillMount(scope => scope.backend.willMount(scope.state))
-    .componentWillUnmount(scope => scope.backend.willUnmount())
-    .build
+    i18n: I18n)
+    extends HydroReactComponent {
 
   // **************** API ****************//
   def apply(): VdomElement = {
-    component()
+    component((): Unit)
   }
 
-  // **************** Private inner types ****************//
-  private type Props = Unit
-  private case class State(isDisconnected: Boolean)
+  // **************** Implementation of HydroReactComponent methods ****************//
+  override protected val config = ComponentConfig(backendConstructor = new Backend(_), initialState = State())
+    .withStateStoresDependency(
+      applicationIsOnlineStore,
+      _.copy(isDisconnected = !applicationIsOnlineStore.state.isOnline))
 
-  private class Backend($ : BackendScope[Props, State]) extends StateStore.Listener {
+  // **************** Implementation of HydroReactComponent types ****************//
+  protected type Props = Unit
+  protected case class State(isDisconnected: Boolean = false)
 
-    def willMount(state: State): Callback = LogExceptionsCallback {
-      applicationIsOnlineStore.register(this)
-      $.modState(state => State(isDisconnected = !applicationIsOnlineStore.state.isOnline)).runNow()
-    }
+  protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
 
-    def willUnmount(): Callback = LogExceptionsCallback {
-      applicationIsOnlineStore.deregister(this)
-    }
-
-    override def onStateUpdate() = {
-      $.modState(state => State(isDisconnected = !applicationIsOnlineStore.state.isOnline)).runNow()
-    }
-
-    def render(props: Props, state: State): VdomElement = logExceptions {
+    override def render(props: Props, state: State): VdomElement = logExceptions {
       state.isDisconnected match {
         case true =>
           <.span(

@@ -4,6 +4,7 @@ import api.ScalaJsApi.UserPrototype
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import flux.action.{Action, Dispatcher}
+import flux.react.common.HydroReactComponent
 import flux.react.uielements
 import flux.react.uielements.input.bootstrap
 import japgolly.scalajs.react._
@@ -14,29 +15,27 @@ import scala.collection.immutable.Seq
 
 private[usermanagement] final class UpdatePasswordForm(implicit user: User,
                                                        i18n: I18n,
-                                                       dispatcher: Dispatcher) {
-
-  private val component = ScalaComponent
-    .builder[Props](getClass.getSimpleName)
-    .initialState(State())
-    .renderBackend[Backend]
-    .build
+                                                       dispatcher: Dispatcher)
+    extends HydroReactComponent {
 
   // **************** API ****************//
   def apply(): VdomElement = {
     component(Props())
   }
 
-  // **************** Private inner types ****************//
-  private case class Props()
-  private case class State(showErrorMessages: Boolean = false, globalErrors: Seq[String] = Seq())
+  // **************** Implementation of HydroReactComponent methods ****************//
+  override protected val config = ComponentConfig(backendConstructor = new Backend(_), initialState = State())
 
-  private final class Backend(val $ : BackendScope[Props, State]) {
+  // **************** Implementation of HydroReactComponent types ****************//
+  protected case class Props()
+  protected case class State(showErrorMessages: Boolean = false, globalErrors: Seq[String] = Seq())
+
+  protected final class Backend(val $ : BackendScope[Props, State]) extends BackendBase($) {
 
     private val passwordRef = bootstrap.TextInput.ref()
     private val passwordVerificationRef = bootstrap.TextInput.ref()
 
-    def render(props: Props, state: State) = logExceptions {
+    override def render(props: Props, state: State) = logExceptions {
       <.form(
         ^.className := "form-horizontal",
         uielements.HalfPanel(title = <.span(i18n("app.change-password")))(
