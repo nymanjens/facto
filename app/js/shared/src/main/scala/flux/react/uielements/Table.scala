@@ -1,5 +1,6 @@
 package flux.react.uielements
 
+import common.CollectionUtils.ifThenSeq
 import common.LoggingUtils.LogExceptionsCallback
 import common.{I18n, Unique}
 import flux.react.ReactVdomUtils.{<<, ^^}
@@ -106,9 +107,6 @@ object Table {
 
   // **************** Public inner types ****************//
   case class TableRowData(cells: Seq[VdomElement], deemphasize: Boolean = false)
-
-  // **************** Private inner methods ****************//
-  private def ifThenSeq[V](condition: Boolean, value: V): Seq[V] = if (condition) Seq(value) else Seq()
 
   // **************** Private inner types ****************//
   private case class Props(title: Option[String],

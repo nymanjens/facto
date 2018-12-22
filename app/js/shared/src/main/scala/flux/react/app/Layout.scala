@@ -1,5 +1,6 @@
 package flux.react.app
 
+import common.CollectionUtils.ifThenSeq
 import common.I18n
 import common.LoggingUtils.LogExceptionsCallback
 import flux.action.{Action, Dispatcher}
@@ -151,8 +152,6 @@ final class Layout(implicit globalMessages: GlobalMessages,
       dom.window.location.href = "/logout/"
     }
   }
-
-  private def ifThenSeq[V](condition: Boolean, value: V): Seq[V] = if (condition) Seq(value) else Seq()
 
   // **************** Private inner types ****************//
   private case class Props(router: RouterContext)

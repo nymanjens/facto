@@ -1,5 +1,6 @@
 package flux.react.app.transactionviews
 
+import common.CollectionUtils.ifThenSeq
 import common.I18n
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.ScalaUtils.visibleForTesting
@@ -470,8 +471,6 @@ private[transactionviews] final class SummaryTable(
       allRegisteredStores.filterNot(usedStores).foreach(_.deregister(this))
       allRegisteredStores = usedStores
     }
-
-    private def ifThenSeq[V](condition: Boolean, value: V): Seq[V] = if (condition) Seq(value) else Seq()
 
     private def cellClasses(month: DatedMonth)(implicit data: AllYearsData): Seq[String] =
       Seq("cell") ++
