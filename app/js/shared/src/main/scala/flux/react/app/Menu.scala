@@ -5,6 +5,8 @@ import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import common.money.ExchangeRateManager
 import common.time.Clock
 import flux.react.ReactVdomUtils.{<<, ^^}
+import flux.react.ReactVdomUtils.^^
+import flux.react.common.HydroReactComponent
 import flux.react.router.{Page, RouterContext}
 import flux.react.uielements
 import flux.stores.entries.factories.AllEntriesStoreFactory
@@ -23,35 +25,42 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
                               clock: Clock,
                               accountingConfig: Config,
                               exchangeRateManager: ExchangeRateManager,
-                              i18n: I18n) {
-
-  private val component = ScalaComponent
-    .builder[Props](getClass.getSimpleName)
-    .renderBackend[Backend]
-    .componentWillMount(scope => scope.backend.configureKeyboardShortcuts(scope.props.router))
-    .componentDidMount(scope =>
-      LogExceptionsCallback {
-        scope.props.router.currentPage match {
-          case page: Page.Search => {
-            scope.backend.queryInputRef().setValue(page.query)
-          }
-          case _ =>
-        }
-    })
-    .componentWillReceiveProps(scope => scope.backend.configureKeyboardShortcuts(scope.nextProps.router))
-    .build
+                              i18n: I18n)
+    extends HydroReactComponent.Stateless {
 
   // **************** API ****************//
   def apply(router: RouterContext): VdomElement = {
     component(Props(router))
   }
 
-  // **************** Private inner types ****************//
-  private type State = Unit
-  private class Backend(val $ : BackendScope[Props, State]) {
+  // **************** Implementation of HydroReactComponent methods ****************//
+  override protected val statelessConfig = StatelessComponentConfig(backendConstructor = new Backend(_))
+
+  // **************** Implementation of HydroReactComponent types ****************//
+  protected case class Props(router: RouterContext)
+
+  protected class Backend($ : BackendScope[Props, State])
+      extends BackendBase($)
+      with WillMount
+      with DidMount
+      with WillReceiveProps {
     val queryInputRef = uielements.input.TextInput.ref()
 
-    def render(props: Props, state: State) = logExceptions {
+    override def willMount(props: Props, state: State): Callback = configureKeyboardShortcuts(props.router)
+
+    override def didMount(props: Props, state: State): Callback = LogExceptionsCallback {
+      props.router.currentPage match {
+        case page: Page.Search => {
+          queryInputRef().setValue(page.query)
+        }
+        case _ =>
+      }
+    }
+
+    override def willReceiveProps(currentProps: Props, nextProps: Props, state: State): Callback =
+      configureKeyboardShortcuts(nextProps.router)
+
+    override def render(props: Props, state: State) = logExceptions {
       implicit val router = props.router
       def menuItem(label: String, page: Page, iconClass: String = null): VdomElement =
         router
@@ -159,6 +168,4 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
       }
     }
   }
-
-  private case class Props(router: RouterContext)
 }

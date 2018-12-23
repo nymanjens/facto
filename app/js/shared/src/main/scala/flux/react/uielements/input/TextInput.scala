@@ -2,6 +2,7 @@ package flux.react.uielements.input
 
 import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
 import flux.react.ReactVdomUtils.^^
+import flux.react.common.HydroReactComponent
 import japgolly.scalajs.react.Ref.ToScalaComponent
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.component.Scala.MountedImpure
@@ -12,13 +13,7 @@ import org.scalajs.dom.{console, html}
 
 import scala.collection.immutable.Seq
 
-object TextInput {
-
-  private val component = ScalaComponent
-    .builder[Props](getClass.getSimpleName)
-    .initialState(State(value = ""))
-    .renderBackend[Backend]
-    .build
+object TextInput extends HydroReactComponent {
 
   // **************** API ****************//
   def apply(ref: Reference,
@@ -39,9 +34,12 @@ object TextInput {
     }
   }
 
-  // **************** Private inner types ****************//
-  private case class Props private[TextInput] (name: String, placeholder: String, classes: Seq[String])
-  private case class State(value: String) {
+  // **************** Implementation of HydroReactComponent methods ****************//
+  override protected val config = ComponentConfig(backendConstructor = new Backend(_), initialState = State())
+
+  // **************** Implementation of HydroReactComponent types ****************//
+  protected case class Props private[TextInput] (name: String, placeholder: String, classes: Seq[String])
+  protected case class State(value: String = "") {
     def withValue(newValue: String): State = copy(value = newValue)
   }
 
@@ -71,10 +69,10 @@ object TextInput {
     }
   }
 
-  private class Backend($ : BackendScope[Props, State]) {
+  protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
     val theInput = Ref[html.Input]
 
-    def render(props: Props, state: State) = logExceptions {
+    override def render(props: Props, state: State) = logExceptions {
       <.input(
         ^.tpe := "text",
         ^.name := props.name,

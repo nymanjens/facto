@@ -1,45 +1,32 @@
 package flux.react.app
 
-import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
-import flux.stores.{PageLoadingStateStore, StateStore}
+import common.LoggingUtils.logExceptions
+import flux.react.common.HydroReactComponent
+import flux.stores.PageLoadingStateStore
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
-private[app] final class PageLoadingSpinner(implicit pageLoadingStateStore: PageLoadingStateStore) {
-
-  private val component = ScalaComponent
-    .builder[Props](getClass.getSimpleName)
-    .initialState[State](State(isLoading = false))
-    .renderBackend[Backend]
-    .componentWillMount(scope => scope.backend.willMount(scope.state))
-    .componentWillUnmount(scope => scope.backend.willUnmount())
-    .build
+private[app] final class PageLoadingSpinner(implicit pageLoadingStateStore: PageLoadingStateStore)
+    extends HydroReactComponent {
 
   // **************** API ****************//
   def apply(): VdomElement = {
-    component()
+    component((): Unit)
   }
 
-  // **************** Private inner types ****************//
-  private type Props = Unit
-  private case class State(isLoading: Boolean)
+  // **************** Implementation of HydroReactComponent methods ****************//
+  override protected val config = ComponentConfig(backendConstructor = new Backend(_), initialState = State())
+    .withStateStoresDependency(
+      pageLoadingStateStore,
+      _.copy(isLoading = pageLoadingStateStore.state.isLoading))
 
-  private class Backend($ : BackendScope[Props, State]) extends StateStore.Listener {
+  // **************** Implementation of HydroReactComponent types ****************//
+  protected type Props = Unit
+  protected case class State(isLoading: Boolean = false)
 
-    def willMount(state: State): Callback = LogExceptionsCallback {
-      pageLoadingStateStore.register(this)
-      $.modState(state => State(isLoading = pageLoadingStateStore.state.isLoading)).runNow()
-    }
+  protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
 
-    def willUnmount(): Callback = LogExceptionsCallback {
-      pageLoadingStateStore.deregister(this)
-    }
-
-    override def onStateUpdate() = {
-      $.modState(state => State(isLoading = pageLoadingStateStore.state.isLoading)).runNow()
-    }
-
-    def render(props: Props, state: State): VdomElement = logExceptions {
+    override def render(props: Props, state: State): VdomElement = logExceptions {
       state.isLoading match {
         case true =>
           <.span(^.className := "navbar-brand", <.i(^.className := "fa fa-circle-o-notch fa-spin"))

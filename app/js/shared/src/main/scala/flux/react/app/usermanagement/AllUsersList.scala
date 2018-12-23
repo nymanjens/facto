@@ -1,10 +1,11 @@
 package flux.react.app.usermanagement
 
 import common.I18n
-import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
+import common.LoggingUtils.logExceptions
 import flux.react.ReactVdomUtils.<<
+import flux.react.common.HydroReactComponent
 import flux.react.uielements
-import flux.stores.{StateStore, UserStore}
+import flux.stores.UserStore
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import models.user.User
@@ -12,41 +13,24 @@ import models.user.User
 import scala.collection.immutable.Seq
 import scala.scalajs.js
 
-private[app] final class AllUsersList(implicit i18n: I18n, userStore: UserStore) {
-
-  private val component = ScalaComponent
-    .builder[Props](getClass.getSimpleName)
-    .initialState[State](State(maybeAllUsers = None))
-    .renderBackend[Backend]
-    .componentWillMount(scope => scope.backend.willMount(scope.state))
-    .componentWillUnmount(scope => scope.backend.willUnmount())
-    .build
+private[app] final class AllUsersList(implicit i18n: I18n, userStore: UserStore) extends HydroReactComponent {
 
   // **************** API ****************//
   def apply(): VdomElement = {
-    component()
+    component((): Unit)
   }
 
-  // **************** Private inner types ****************//
-  private type Props = Unit
-  private case class State(maybeAllUsers: Option[Seq[User]])
+  // **************** Implementation of HydroReactComponent methods ****************//
+  override protected val config = ComponentConfig(backendConstructor = new Backend(_), initialState = State())
+    .withStateStoresDependency(userStore, _.copy(maybeAllUsers = userStore.state.map(_.allUsers)))
 
-  private class Backend($ : BackendScope[Props, State]) extends StateStore.Listener {
+  // **************** Implementation of HydroReactComponent types ****************//
+  protected type Props = Unit
+  protected case class State(maybeAllUsers: Option[Seq[User]] = None)
 
-    def willMount(state: State): Callback = LogExceptionsCallback {
-      userStore.register(this)
-      $.modState(state => logExceptions(state.copy(maybeAllUsers = userStore.state.map(_.allUsers)))).runNow()
-    }
+  protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
 
-    def willUnmount(): Callback = LogExceptionsCallback {
-      userStore.deregister(this)
-    }
-
-    override def onStateUpdate() = {
-      $.modState(state => logExceptions(state.copy(maybeAllUsers = userStore.state.map(_.allUsers)))).runNow()
-    }
-
-    def render(props: Props, state: State): VdomElement = logExceptions {
+    override def render(props: Props, state: State): VdomElement = logExceptions {
       uielements.HalfPanel(title = <.span(i18n("app.all-users"))) {
         uielements.Table(
           tableHeaders = Seq(
