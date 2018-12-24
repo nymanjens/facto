@@ -4,12 +4,8 @@ import api.ScalaJsApi.UserPrototype
 import common.I18n
 import common.LoggingUtils.LogExceptionsCallback
 import common.LoggingUtils.logExceptions
-import flux.action.Actions
-import hydro.flux.action.StandardActions
-import hydro.flux.action.StandardActions
-import flux.react.uielements
-import flux.react.uielements.input.bootstrap
 import hydro.flux.action.Dispatcher
+import hydro.flux.action.StandardActions
 import hydro.flux.react.HydroReactComponent
 import hydro.flux.react.uielements.HalfPanel
 import hydro.flux.react.uielements.input.bootstrap.TextInput
