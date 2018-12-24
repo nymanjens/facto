@@ -7,9 +7,9 @@ import common.I18n
 import common.Unique
 import flux.react.ReactVdomUtils.^^
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
-import flux.react.router.Page.NewForLiquidationSimplification
-import flux.react.router.Page
-import flux.react.router.RouterContext
+import flux.router.Page.NewForLiquidationSimplification
+import flux.router.Page
+import flux.router.RouterContext
 import flux.react.uielements
 import flux.stores.entries.factories.LiquidationEntriesStoreFactory
 import flux.stores.entries.AccountPair

@@ -9,8 +9,8 @@ import flux.react.ReactVdomUtils.<<
 import flux.react.ReactVdomUtils.^^
 import flux.react.ReactVdomUtils.^^
 import flux.react.common.HydroReactComponent
-import flux.react.router.Page
-import flux.react.router.RouterContext
+import flux.router.Page
+import flux.router.RouterContext
 import flux.react.uielements
 import flux.stores.entries.factories.AllEntriesStoreFactory
 import japgolly.scalajs.react._

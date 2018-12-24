@@ -4,8 +4,8 @@ import common.CollectionUtils.ifThenSeq
 import common.I18n
 import common.LoggingUtils.LogExceptionsCallback
 import flux.react.ReactVdomUtils.^^
-import flux.react.router.Page
-import flux.react.router.RouterContext
+import flux.router.Page
+import flux.router.RouterContext
 import hydro.flux.action.Dispatcher
 import hydro.flux.action.StandardActions
 import hydro.flux.react.uielements.sbadmin.ApplicationDisconnectedIcon

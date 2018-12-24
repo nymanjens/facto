@@ -3,8 +3,8 @@ package flux.react.app
 import common.I18n
 import common.LoggingUtils.logExceptions
 import flux.react.ReactVdomUtils.<<
-import flux.react.router.Page
-import flux.react.router.RouterContext
+import flux.router.Page
+import flux.router.RouterContext
 import flux.react.uielements
 import flux.react.uielements.Panel
 import japgolly.scalajs.react._

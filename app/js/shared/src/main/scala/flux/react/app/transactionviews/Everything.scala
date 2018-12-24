@@ -5,7 +5,7 @@ import common.I18n
 import common.money.ExchangeRateManager
 import common.time.Clock
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
-import flux.react.router.RouterContext
+import flux.router.RouterContext
 import flux.react.uielements
 import flux.stores.entries.GeneralEntry
 import flux.stores.entries.factories.AllEntriesStoreFactory

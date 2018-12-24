@@ -4,6 +4,7 @@ import api.ScalaJsApi.UserPrototype
 import common.testing.Awaiter
 import common.testing.TestObjects._
 import flux.action.Actions
+import hydro.flux.action.StandardActions
 import hydro.flux.stores.UserStore
 import models.modification.EntityModification
 import utest._

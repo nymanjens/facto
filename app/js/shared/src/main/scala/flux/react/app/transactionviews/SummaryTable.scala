@@ -13,10 +13,10 @@ import common.time.Clock
 import common.time.DatedMonth
 import common.time.YearRange
 import flux.react.ReactVdomUtils._
-import flux.react.router.Page
-import flux.react.router.RouterContext
+import flux.router.Page
+import flux.router.RouterContext
 import flux.react.uielements
-import flux.stores.StateStore
+import hydro.flux.stores.StateStore
 import flux.stores.entries._
 import flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForYear
 import flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryCell

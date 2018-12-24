@@ -1,8 +1,9 @@
 package flux
 
 import common.testing.TestObjects._
-import flux.action.Action
-import flux.action.Dispatcher
+import flux.action.Actions
+import hydro.flux.action.StandardActions
+import hydro.flux.action.Dispatcher
 import hydro.flux.action.Action
 import hydro.flux.action.StandardActions
 import scala2js.Converters._

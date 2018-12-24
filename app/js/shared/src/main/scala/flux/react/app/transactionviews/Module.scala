@@ -3,7 +3,7 @@ package flux.react.app.transactionviews
 import common.I18n
 import common.money.ExchangeRateManager
 import common.time.Clock
-import flux.action.Dispatcher
+import hydro.flux.action.Dispatcher
 import flux.stores.GlobalMessagesStore
 import flux.stores.entries.factories._
 import models.access.JsEntityAccess

@@ -1,6 +1,6 @@
 package flux.stores.entries
 
-import flux.stores.AsyncEntityDerivedStateStore
+import hydro.flux.stores.AsyncEntityDerivedStateStore
 import models.access.JsEntityAccess
 import models.accounting.BalanceCheck
 import models.accounting.Transaction

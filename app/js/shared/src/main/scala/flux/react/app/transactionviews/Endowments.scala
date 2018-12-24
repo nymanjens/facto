@@ -6,7 +6,7 @@ import common.time.Clock
 import common.I18n
 import common.Unique
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
-import flux.react.router.RouterContext
+import flux.router.RouterContext
 import flux.react.uielements
 import flux.stores.entries.GeneralEntry
 import flux.stores.entries.factories.EndowmentEntriesStoreFactory

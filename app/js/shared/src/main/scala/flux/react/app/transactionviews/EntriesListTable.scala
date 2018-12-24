@@ -8,7 +8,7 @@ import flux.react.ReactVdomUtils.<<
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import flux.react.uielements
 import flux.react.uielements.Table.TableRowData
-import flux.stores.StateStore
+import hydro.flux.stores.StateStore
 import flux.stores.entries.WithIsPending
 import flux.stores.entries.factories.EntriesListStoreFactory
 import japgolly.scalajs.react.vdom.html_<^.VdomElement
