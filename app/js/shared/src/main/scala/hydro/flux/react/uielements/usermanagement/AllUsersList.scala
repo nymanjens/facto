@@ -1,10 +1,12 @@
-package hydro.flux.react.uielements.sbadmin.usermanagement
+package hydro.flux.react.uielements.usermanagement
 
 import common.I18n
 import common.LoggingUtils.logExceptions
 import flux.react.ReactVdomUtils.<<
 import flux.react.uielements
 import hydro.flux.react.HydroReactComponent
+import hydro.flux.react.uielements.HalfPanel
+import hydro.flux.react.uielements.Table
 import hydro.flux.stores.UserStore
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
@@ -31,8 +33,8 @@ final class AllUsersList(implicit i18n: I18n, userStore: UserStore) extends Hydr
   protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
 
     override def render(props: Props, state: State): VdomElement = logExceptions {
-      uielements.HalfPanel(title = <.span(i18n("app.all-users"))) {
-        uielements.Table(
+      HalfPanel(title = <.span(i18n("app.all-users"))) {
+        Table(
           tableHeaders = Seq(
             <.th(i18n("app.login-name")),
             <.th(i18n("app.full-name")),
@@ -45,17 +47,17 @@ final class AllUsersList(implicit i18n: I18n, userStore: UserStore) extends Hydr
       }
     }
 
-    private def tableRowDatas(state: State): Seq[uielements.Table.TableRowData] = {
+    private def tableRowDatas(state: State): Seq[Table.TableRowData] = {
       state.maybeAllUsers match {
         case None =>
           for (i <- 0 until 3) yield {
-            uielements.Table.TableRowData(
+            Table.TableRowData(
               Seq[VdomElement](
                 <.td(^.colSpan := 5, ^.style := js.Dictionary("color" -> "white"), "loading...")))
           }
         case Some(allUsers) =>
           for (user <- allUsers) yield {
-            uielements.Table.TableRowData(
+            Table.TableRowData(
               Seq[VdomElement](
                 <.td(user.loginName),
                 <.td(user.name),

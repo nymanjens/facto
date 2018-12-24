@@ -1,4 +1,4 @@
-package hydro.flux.react.uielements.sbadmin
+package hydro.flux.react.uielements
 
 import common.LoggingUtils.logExceptions
 import flux.react.app.Menu

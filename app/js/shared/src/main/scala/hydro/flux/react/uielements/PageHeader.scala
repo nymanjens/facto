@@ -1,4 +1,4 @@
-package flux.react.uielements
+package hydro.flux.react.uielements
 
 import common.I18n
 import flux.router.Page

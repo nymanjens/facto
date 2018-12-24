@@ -1,4 +1,4 @@
-package flux.react.uielements.input
+package hydro.flux.react.uielements.input
 
 trait InputValidator[Value] {
   def isValid(value: Value): Boolean

@@ -15,6 +15,8 @@ import models.access.EntityAccess
 import models.accounting.config.Config
 
 import scala.collection.immutable.Seq
+import hydro.flux.react.uielements.PageHeader
+import hydro.flux.react.uielements.Panel
 
 final class Everything(implicit entriesStoreFactory: AllEntriesStoreFactory,
                        entityAccess: EntityAccess,
@@ -31,8 +33,8 @@ final class Everything(implicit entriesStoreFactory: AllEntriesStoreFactory,
       (_, props) => {
         implicit val router = props.router
         <.span(
-          uielements.PageHeader(router.currentPage),
-          uielements.Panel(i18n("app.genral-information-about-all-entries"))(
+          PageHeader(router.currentPage),
+          Panel(i18n("app.genral-information-about-all-entries"))(
             entriesListTable(
               tableTitle = i18n("app.all"),
               tableClasses = Seq("table-everything"),

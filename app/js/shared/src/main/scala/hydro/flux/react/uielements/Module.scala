@@ -1,4 +1,4 @@
-package hydro.flux.react.uielements.sbadmin
+package hydro.flux.react.uielements
 
 import common.I18n
 import common.time.Clock

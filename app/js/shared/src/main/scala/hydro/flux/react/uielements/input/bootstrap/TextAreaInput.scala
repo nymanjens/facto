@@ -1,10 +1,10 @@
-package flux.react.uielements.input.bootstrap
+package hydro.flux.react.uielements.input.bootstrap
 
 import common.I18n
 import flux.react.ReactVdomUtils.^^
-import flux.react.uielements.input.InputBase
-import flux.react.uielements.input.bootstrap.InputComponent.Props
-import flux.react.uielements.input.bootstrap.InputComponent.ValueTransformer
+import hydro.flux.react.uielements.input.InputBase
+import hydro.flux.react.uielements.input.bootstrap.InputComponent.Props
+import hydro.flux.react.uielements.input.bootstrap.InputComponent.ValueTransformer
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 

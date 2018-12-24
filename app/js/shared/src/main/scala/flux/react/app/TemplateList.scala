@@ -6,7 +6,8 @@ import flux.react.ReactVdomUtils.<<
 import flux.router.Page
 import flux.router.RouterContext
 import flux.react.uielements
-import flux.react.uielements.Panel
+import hydro.flux.react.uielements.PageHeader
+import hydro.flux.react.uielements.Panel
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import models.access.EntityAccess
@@ -27,7 +28,7 @@ private[app] final class TemplateList(implicit user: User,
       logExceptions {
         implicit val router = props.router
         <.span(
-          uielements.PageHeader(router.currentPage),
+          PageHeader(router.currentPage),
           Panel(
             title = i18n("app.templates"),
             panelClasses = Seq("templates-panel")

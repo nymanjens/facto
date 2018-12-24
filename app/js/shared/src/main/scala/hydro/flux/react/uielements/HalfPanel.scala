@@ -1,4 +1,4 @@
-package flux.react.uielements
+package hydro.flux.react.uielements
 
 import flux.react.ReactVdomUtils.<<
 import flux.react.ReactVdomUtils.^^

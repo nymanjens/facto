@@ -10,6 +10,8 @@ import japgolly.scalajs.react.component.Scala.MountedImpure
 import japgolly.scalajs.react.Ref.ToScalaComponent
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom._
+import hydro.flux.react.uielements.input.InputBase
+import hydro.flux.react.uielements.input.InputValidator
 
 import scala.collection.mutable
 import scala.reflect.ClassTag

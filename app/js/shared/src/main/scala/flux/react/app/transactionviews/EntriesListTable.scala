@@ -7,7 +7,8 @@ import common.Unique
 import flux.react.ReactVdomUtils.<<
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import flux.react.uielements
-import flux.react.uielements.Table.TableRowData
+import hydro.flux.react.uielements.Table
+import hydro.flux.react.uielements.Table.TableRowData
 import hydro.flux.stores.StateStore
 import flux.stores.entries.WithIsPending
 import flux.stores.entries.factories.EntriesListStoreFactory
@@ -127,7 +128,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
       if (props.hideEmptyTable && state.storeState.isDefined && state.storeState.get.isEmpty) {
         <.span()
       } else {
-        uielements.Table(
+        Table(
           title = props.tableTitle,
           tableClasses = props.tableClasses,
           setExpanded = props.setExpanded,

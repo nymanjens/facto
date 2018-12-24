@@ -1,4 +1,4 @@
-package flux.react.uielements.input
+package hydro.flux.react.uielements.input
 
 import japgolly.scalajs.react._
 import org.scalajs.dom.console

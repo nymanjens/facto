@@ -23,6 +23,8 @@ import flux.stores.entries.AccountPair
 import flux.stores.entries.LiquidationEntry
 import flux.stores.entries.factories.EntriesListStoreFactory
 import flux.stores.entries.factories.LiquidationEntriesStoreFactory
+import hydro.flux.react.uielements.PageHeader
+import hydro.flux.react.uielements.WaitForFuture
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.Path
 import japgolly.scalajs.react.vdom.html_<^._
@@ -53,7 +55,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
                                  totalFlowRestrictionInput: TotalFlowRestrictionInput,
                                  liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory) {
 
-  private val waitForFuture = new uielements.WaitForFuture[Props]
+  private val waitForFuture = new WaitForFuture[Props]
   private val component = {
     ScalaComponent
       .builder[Props](getClass.getSimpleName)
@@ -273,7 +275,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
           ^.className := "row",
           <.div(
             ^.className := "col-lg-12",
-            uielements.PageHeader.withExtension(router.currentPage)(
+            PageHeader.withExtension(router.currentPage)(
               <<.ifThen(props.operationMeta.isInstanceOf[OperationMeta.Edit]) {
                 <.a(
                   ^.className := "btn btn-default delete-button",

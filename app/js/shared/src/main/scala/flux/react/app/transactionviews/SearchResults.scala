@@ -1,5 +1,7 @@
 package flux.react.app.transactionviews
 
+import hydro.flux.react.uielements.PageHeader
+import hydro.flux.react.uielements.Panel
 import common.Formatting._
 import common.I18n
 import common.money.ExchangeRateManager
@@ -32,8 +34,8 @@ final class SearchResults(implicit complexQueryStoreFactory: ComplexQueryStoreFa
       (_, props) => {
         implicit val router = props.router
         <.span(
-          uielements.PageHeader(router.currentPage),
-          uielements.Panel(i18n("app.search-results"))(
+          PageHeader(router.currentPage),
+          Panel(i18n("app.search-results"))(
             entriesListTable(
               tableTitle = i18n("app.all"),
               tableClasses = Seq("table-search"),

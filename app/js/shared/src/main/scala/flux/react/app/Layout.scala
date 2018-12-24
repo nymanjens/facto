@@ -8,10 +8,10 @@ import flux.router.Page
 import flux.router.RouterContext
 import hydro.flux.action.Dispatcher
 import hydro.flux.action.StandardActions
-import hydro.flux.react.uielements.sbadmin.ApplicationDisconnectedIcon
-import hydro.flux.react.uielements.sbadmin.GlobalMessages
-import hydro.flux.react.uielements.sbadmin.PageLoadingSpinner
-import hydro.flux.react.uielements.sbadmin.PendingModificationsCounter
+import hydro.flux.react.uielements.ApplicationDisconnectedIcon
+import hydro.flux.react.uielements.GlobalMessages
+import hydro.flux.react.uielements.PageLoadingSpinner
+import hydro.flux.react.uielements.PendingModificationsCounter
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.PackageBase.VdomAttr
 import japgolly.scalajs.react.vdom.html_<^._

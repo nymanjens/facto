@@ -14,6 +14,9 @@ import flux.react.uielements
 import flux.stores.entries.factories.LiquidationEntriesStoreFactory
 import flux.stores.entries.AccountPair
 import flux.stores.entries.LiquidationEntry
+import hydro.flux.react.uielements.CollapseAllExpandAllButtons
+import hydro.flux.react.uielements.PageHeader
+import hydro.flux.react.uielements.Panel
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import models.access.EntityAccess
@@ -40,13 +43,12 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
       ($, props, state) => {
         implicit val router = props.router
         <.span(
-          uielements.PageHeader.withExtension(router.currentPage)(
-            uielements.CollapseAllExpandAllButtons(setExpanded =>
-              $.modState(_.copy(setExpanded = setExpanded))),
+          PageHeader.withExtension(router.currentPage)(
+            CollapseAllExpandAllButtons(setExpanded => $.modState(_.copy(setExpanded = setExpanded))),
             " ",
             simplifyLiquidationButton()
           ),
-          uielements.Panel(i18n("app.all-combinations")) {
+          Panel(i18n("app.all-combinations")) {
             {
               for {
                 (account1, i1) <- accountingConfig.personallySortedAccounts.zipWithIndex

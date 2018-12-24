@@ -14,12 +14,14 @@ import common.time.LocalDateTimes
 import common.I18n
 import common.SinglePendingTaskQueue
 import flux.react.ReactVdomUtils.<<
-import flux.react.uielements.HalfPanel
+import hydro.flux.react.uielements.HalfPanel
+import flux.react.uielements.input.bootstrap.AutosuggestTextInput
 import flux.react.uielements.input.bootstrap.MoneyInput
-import flux.react.uielements.input.bootstrap.SelectInput
-import flux.react.uielements.input.bootstrap.TextAreaInput
-import flux.react.uielements.input.bootstrap.TextInput
-import flux.react.uielements.input.InputBase
+import flux.react.uielements.input.bootstrap.TagInput
+import hydro.flux.react.uielements.input.bootstrap.SelectInput
+import hydro.flux.react.uielements.input.bootstrap.TextAreaInput
+import hydro.flux.react.uielements.input.bootstrap.TextInput
+import hydro.flux.react.uielements.input.InputBase
 import flux.react.uielements.input.InputWithDefaultFromReference
 import flux.react.uielements.input.MappedInput
 import flux.react.uielements.input.bootstrap
@@ -66,8 +68,8 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   private val dateMappedInput = MappedInput.forTypes[String, LocalDateTime]
 
   private val reservoirSelectInput = SelectInput.forType[MoneyReservoir]
-  private val accountSelectInput = bootstrap.SelectInput.forType[Account]
-  private val categorySelectInput = bootstrap.SelectInput.forType[Category]
+  private val accountSelectInput = SelectInput.forType[Account]
+  private val categorySelectInput = SelectInput.forType[Category]
 
   private val component = {
     ScalaComponent
@@ -226,7 +228,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
     val consumedDateRef = dateMappedInput.ref()
     val rawTransactionDateRef = dateMappedInput.delegateRef(transactionDateRef)
     val rawConsumedDateRef = dateMappedInput.delegateRef(consumedDateRef)
-    val issuerRef = bootstrap.TextInput.ref()
+    val issuerRef = TextInput.ref()
     val moneyReservoirRef = reservoirInputWithDefault.ref()
     val beneficiaryAccountRef = accountInputWithDefault.ref()
     val categoryRef = categoryInputWithDefault.ref()
@@ -250,7 +252,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             startWithDefault = props.defaultValues.isEmpty,
             delegateRefFactory = TextInput.ref _
           ) { extraProps =>
-            bootstrap.TextInput(
+            TextInput(
               ref = extraProps.ref,
               name = "transaction-date",
               label = i18n("app.date-payed"),
@@ -279,9 +281,9 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                 ref = extraProps1.ref,
                 defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawConsumedDate),
                 startWithDefault = props.defaultValues.isEmpty,
-                delegateRefFactory = bootstrap.TextInput.ref _
+                delegateRefFactory = TextInput.ref _
               ) { extraProps2 =>
-                bootstrap.TextInput(
+                TextInput(
                   ref = extraProps2.ref,
                   name = "date-consumed",
                   label = i18n("app.date-consumed"),
@@ -295,7 +297,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           }
         },
         <<.ifThen(props.defaultValues.issuer.isDefined && props.defaultValues.issuer.get != user) {
-          bootstrap.TextInput(
+          TextInput(
             ref = issuerRef,
             name = "issuer",
             label = i18n("app.issuer"),
@@ -364,9 +366,9 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ref = descriptionRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.description),
           startWithDefault = props.defaultValues.isEmpty,
-          delegateRefFactory = bootstrap.AutosuggestTextInput.ref _
+          delegateRefFactory = AutosuggestTextInput.ref _
         ) { extraProps =>
-          bootstrap.AutosuggestTextInput(
+          AutosuggestTextInput(
             ref = extraProps.ref,
             name = "description",
             label = i18n("app.description"),
@@ -382,7 +384,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
             listener = AnythingChangedListener
           )
         },
-        bootstrap.MoneyInput.withCurrencyConversion(
+        MoneyInput.withCurrencyConversion(
           ref = flowRef,
           name = "flow",
           label = i18n("app.flow"),
@@ -403,7 +405,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           startWithDefault = props.defaultValues.isEmpty,
           delegateRefFactory = TextAreaInput.ref _
         ) { extraProps =>
-          bootstrap.TextAreaInput(
+          TextAreaInput(
             ref = extraProps.ref,
             name = "more-info",
             label = i18n("app.more-info"),
@@ -417,9 +419,9 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           ref = tagsRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.tags),
           startWithDefault = props.defaultValues.isEmpty,
-          delegateRefFactory = bootstrap.TagInput.ref _
+          delegateRefFactory = TagInput.ref _
         ) { extraProps =>
-          bootstrap.TagInput(
+          TagInput(
             ref = extraProps.ref,
             name = "tags",
             label = i18n("app.tags"),

@@ -1,4 +1,4 @@
-package hydro.flux.react.uielements.sbadmin.usermanagement
+package hydro.flux.react.uielements.usermanagement
 
 import api.ScalaJsApi.UserPrototype
 import common.I18n
@@ -11,13 +11,17 @@ import flux.react.uielements
 import flux.react.uielements.input.bootstrap
 import hydro.flux.action.Dispatcher
 import hydro.flux.react.HydroReactComponent
+import hydro.flux.react.uielements.HalfPanel
+import hydro.flux.react.uielements.input.bootstrap.TextInput
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import models.user.User
 
 import scala.collection.immutable.Seq
 
-private[usermanagement] final class AddUserForm(implicit user: User, i18n: I18n, dispatcher: Dispatcher)
+private[usermanagement] final class UpdatePasswordForm(implicit user: User,
+                                                       i18n: I18n,
+                                                       dispatcher: Dispatcher)
     extends HydroReactComponent {
 
   // **************** API ****************//
@@ -34,35 +38,26 @@ private[usermanagement] final class AddUserForm(implicit user: User, i18n: I18n,
 
   protected final class Backend(val $ : BackendScope[Props, State]) extends BackendBase($) {
 
-    private val loginNameRef = bootstrap.TextInput.ref()
-    private val nameRef = bootstrap.TextInput.ref()
-    private val passwordRef = bootstrap.TextInput.ref()
-    private val passwordVerificationRef = bootstrap.TextInput.ref()
+    private val passwordRef = TextInput.ref()
+    private val passwordVerificationRef = TextInput.ref()
 
     override def render(props: Props, state: State) = logExceptions {
       <.form(
         ^.className := "form-horizontal",
-        uielements.HalfPanel(title = <.span(i18n("app.add-user")))(
+        HalfPanel(title = <.span(i18n("app.change-password")))(
           {
             for (error <- state.globalErrors) yield {
               <.div(^.className := "alert alert-danger", ^.key := error, error)
             }
           }.toVdomArray,
-          bootstrap.TextInput(
-            ref = loginNameRef,
+          TextInput(
+            ref = TextInput.ref(),
             name = "loginName",
             label = i18n("app.login-name"),
-            required = true,
-            showErrorMessage = state.showErrorMessages
+            defaultValue = user.loginName,
+            disabled = true
           ),
-          bootstrap.TextInput(
-            ref = nameRef,
-            name = "name",
-            label = i18n("app.full-name"),
-            required = true,
-            showErrorMessage = state.showErrorMessages
-          ),
-          bootstrap.TextInput(
+          TextInput(
             ref = passwordRef,
             name = "password",
             label = i18n("app.password"),
@@ -70,7 +65,7 @@ private[usermanagement] final class AddUserForm(implicit user: User, i18n: I18n,
             required = true,
             showErrorMessage = state.showErrorMessages
           ),
-          bootstrap.TextInput(
+          TextInput(
             ref = passwordVerificationRef,
             name = "passwordVerification",
             label = i18n("app.retype-password"),
@@ -82,7 +77,7 @@ private[usermanagement] final class AddUserForm(implicit user: User, i18n: I18n,
             ^.tpe := "submit",
             ^.className := "btn btn-default",
             ^.onClick ==> onSubmit,
-            i18n("app.add"))
+            i18n("app.ok"))
         )
       )
     }
@@ -95,9 +90,7 @@ private[usermanagement] final class AddUserForm(implicit user: User, i18n: I18n,
         logExceptions {
           var newState = State(showErrorMessages = true)
 
-          val maybeUserPrototype = for {
-            loginName <- loginNameRef().value
-            name <- nameRef().value
+          val maybeNewPassword = for {
             password <- passwordRef().value
             passwordVerification <- passwordVerificationRef().value
             validPassword <- {
@@ -108,15 +101,15 @@ private[usermanagement] final class AddUserForm(implicit user: User, i18n: I18n,
                 Some(password)
               }
             }
-          } yield UserPrototype.create(loginName = loginName, name = name, plainTextPassword = validPassword)
+          } yield validPassword
 
-          maybeUserPrototype match {
-            case Some(userPrototype) =>
-              dispatcher.dispatch(StandardActions.UpsertUser(userPrototype))
+          maybeNewPassword match {
+            case Some(newPassword) =>
+              dispatcher.dispatch(
+                StandardActions.UpsertUser(
+                  UserPrototype.create(id = user.id, plainTextPassword = newPassword)))
 
               // Clear form
-              loginNameRef().setValue("")
-              nameRef().setValue("")
               passwordRef().setValue("")
               passwordVerificationRef().setValue("")
               newState = State()

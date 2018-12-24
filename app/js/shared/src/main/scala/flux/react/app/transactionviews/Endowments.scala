@@ -15,6 +15,9 @@ import japgolly.scalajs.react.vdom.html_<^._
 import models.access.EntityAccess
 import models.accounting.config.Account
 import models.accounting.config.Config
+import hydro.flux.react.uielements.CollapseAllExpandAllButtons
+import hydro.flux.react.uielements.PageHeader
+import hydro.flux.react.uielements.Panel
 import models.user.User
 
 import scala.collection.immutable.Seq
@@ -36,11 +39,10 @@ final class Endowments(implicit entriesStoreFactory: EndowmentEntriesStoreFactor
       ($, props, state) => {
         implicit val router = props.router
         <.span(
-          uielements.PageHeader.withExtension(router.currentPage) {
-            uielements.CollapseAllExpandAllButtons(setExpanded =>
-              $.modState(_.copy(setExpanded = setExpanded)))
+          PageHeader.withExtension(router.currentPage) {
+            CollapseAllExpandAllButtons(setExpanded => $.modState(_.copy(setExpanded = setExpanded)))
           },
-          uielements.Panel(i18n("app.all-accounts")) {
+          Panel(i18n("app.all-accounts")) {
             {
               for (account <- accountingConfig.personallySortedAccounts) yield {
                 entriesListTable(

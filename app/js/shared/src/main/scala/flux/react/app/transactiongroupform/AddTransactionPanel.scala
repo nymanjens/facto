@@ -2,7 +2,7 @@ package flux.react.app.transactiongroupform
 
 import common.I18n
 import common.LoggingUtils.logExceptions
-import flux.react.uielements.HalfPanel
+import hydro.flux.react.uielements.HalfPanel
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 

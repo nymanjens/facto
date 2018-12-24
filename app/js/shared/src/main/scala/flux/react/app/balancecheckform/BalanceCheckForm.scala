@@ -12,10 +12,12 @@ import hydro.flux.action.Dispatcher
 import flux.react.ReactVdomUtils.<<
 import flux.router.RouterContext
 import flux.react.uielements
-import flux.react.uielements.HalfPanel
+import hydro.flux.react.uielements.HalfPanel
+import hydro.flux.react.uielements.PageHeader
+import hydro.flux.react.uielements.WaitForFuture
 import flux.react.uielements.input.bootstrap.MoneyInput
 import flux.react.uielements.input.MappedInput
-import flux.react.uielements.input.bootstrap
+import hydro.flux.react.uielements.input.bootstrap.TextInput
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.Path
 import japgolly.scalajs.react.vdom.html_<^._
@@ -38,7 +40,7 @@ final class BalanceCheckForm(implicit i18n: I18n,
                              exchangeRateManager: ExchangeRateManager,
                              dispatcher: Dispatcher) {
 
-  private val waitForFuture = new uielements.WaitForFuture[Props]
+  private val waitForFuture = new WaitForFuture[Props]
   private val dateMappedInput = MappedInput.forTypes[String, LocalDateTime]
 
   private val component = {
@@ -104,7 +106,7 @@ final class BalanceCheckForm(implicit i18n: I18n,
           ^.className := "row",
           <.div(
             ^.className := "col-lg-12",
-            uielements.PageHeader.withExtension(router.currentPage)(
+            PageHeader.withExtension(router.currentPage)(
               <<.ifThen(props.operationMeta.isInstanceOf[OperationMeta.Edit]) {
                 <.span(
                   " ",
@@ -124,15 +126,15 @@ final class BalanceCheckForm(implicit i18n: I18n,
           <.form(
             ^.className := "form-horizontal",
             HalfPanel(title = <.span(i18n("app.balance-check")))(
-              bootstrap.TextInput(
-                ref = bootstrap.TextInput.ref(),
+              TextInput(
+                ref = TextInput.ref(),
                 name = "issuer",
                 label = i18n("app.issuer"),
                 defaultValue = props.operationMeta.issuer.name,
                 disabled = true
               ),
-              bootstrap.TextInput(
-                ref = bootstrap.TextInput.ref(),
+              TextInput(
+                ref = TextInput.ref(),
                 name = "money-reservoir",
                 label = i18n("app.reservoir"),
                 defaultValue = props.operationMeta.reservoir.name,
@@ -142,9 +144,9 @@ final class BalanceCheckForm(implicit i18n: I18n,
                 ref = checkDateRef,
                 defaultValue = props.operationMeta.checkDate,
                 valueTransformer = MappedInput.ValueTransformer.StringToLocalDateTime,
-                delegateRefFactory = bootstrap.TextInput.ref _
+                delegateRefFactory = TextInput.ref _
               ) { mappedExtraProps =>
-                bootstrap.TextInput(
+                TextInput(
                   ref = mappedExtraProps.ref,
                   name = "check-date",
                   label = i18n("app.check-date"),
@@ -154,7 +156,7 @@ final class BalanceCheckForm(implicit i18n: I18n,
                   additionalValidator = mappedExtraProps.additionalValidator
                 )
               },
-              bootstrap.MoneyInput(
+              MoneyInput(
                 ref = balanceRef,
                 name = "balance",
                 label = i18n("app.balance"),

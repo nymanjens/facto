@@ -15,6 +15,9 @@ import flux.router.Page
 import flux.router.RouterContext
 import flux.react.uielements
 import flux.stores.entries.CashFlowEntry
+import hydro.flux.react.uielements.CollapseAllExpandAllButtons
+import hydro.flux.react.uielements.PageHeader
+import hydro.flux.react.uielements.Panel
 import flux.stores.entries.factories.CashFlowEntriesStoreFactory
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.VdomArray
@@ -50,15 +53,14 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
       ($, props, state) => {
         implicit val router = props.router
         <.span(
-          uielements.PageHeader.withExtension(router.currentPage) {
-            uielements.CollapseAllExpandAllButtons(setExpanded =>
-              $.modState(_.copy(setExpanded = setExpanded)))
+          PageHeader.withExtension(router.currentPage) {
+            CollapseAllExpandAllButtons(setExpanded => $.modState(_.copy(setExpanded = setExpanded)))
           }, {
             for {
               account <- accountingConfig.personallySortedAccounts
               if state.includeUnrelatedReservoirs || account.isMineOrCommon
             } yield {
-              uielements.Panel(i18n("app.account-of", account.longName), key = account.code) {
+              Panel(i18n("app.account-of", account.longName), key = account.code) {
                 {
                   for {
                     reservoir <- accountingConfig

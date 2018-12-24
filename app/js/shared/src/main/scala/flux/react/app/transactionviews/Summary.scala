@@ -7,6 +7,8 @@ import common.money.ExchangeRateManager
 import common.time.Clock
 import flux.router.RouterContext
 import flux.react.uielements
+import hydro.flux.react.uielements.PageHeader
+import hydro.flux.react.uielements.input.TextInput
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import models.access.EntityAccess
@@ -47,22 +49,21 @@ final class Summary(implicit summaryTable: SummaryTable,
                            expandedYear: Int)
 
   private class Backend(val $ : BackendScope[Props, State]) {
-    val queryInputRef = uielements.input.TextInput.ref()
+    val queryInputRef = TextInput.ref()
 
     def render(props: Props, state: State) = logExceptions {
       implicit val router = props.router
       <.span(
-        uielements.PageHeader.withExtension(router.currentPage)(
+        PageHeader.withExtension(router.currentPage)(
           <.form(
             ^.className := "form-inline summary-query-filter",
             <.div(
               ^.className := "input-group",
-              uielements.input
-                .TextInput(
-                  ref = queryInputRef,
-                  name = "query",
-                  placeholder = i18n("app.example-query"),
-                  classes = Seq("form-control")),
+              TextInput(
+                ref = queryInputRef,
+                name = "query",
+                placeholder = i18n("app.example-query"),
+                classes = Seq("form-control")),
               <.span(
                 ^.className := "input-group-btn",
                 <.button(

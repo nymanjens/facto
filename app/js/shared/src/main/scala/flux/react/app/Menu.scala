@@ -7,11 +7,11 @@ import common.money.ExchangeRateManager
 import common.time.Clock
 import flux.react.ReactVdomUtils.<<
 import flux.react.ReactVdomUtils.^^
-import flux.react.uielements
 import flux.router.Page
 import flux.router.RouterContext
 import flux.stores.entries.factories.AllEntriesStoreFactory
 import hydro.flux.react.HydroReactComponent
+import hydro.flux.react.uielements.input.TextInput
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import jsfacades.Mousetrap
@@ -47,7 +47,7 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
       with WillMount
       with DidMount
       with WillReceiveProps {
-    val queryInputRef = uielements.input.TextInput.ref()
+    val queryInputRef = TextInput.ref()
 
     override def willMount(props: Props, state: State): Callback = configureKeyboardShortcuts(props.router)
 
@@ -83,12 +83,11 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
           <.form(
             <.div(
               ^.className := "input-group custom-search-form",
-              uielements.input
-                .TextInput(
-                  ref = queryInputRef,
-                  name = "query",
-                  placeholder = i18n("app.search"),
-                  classes = Seq("form-control")),
+              TextInput(
+                ref = queryInputRef,
+                name = "query",
+                placeholder = i18n("app.search"),
+                classes = Seq("form-control")),
               <.span(
                 ^.className := "input-group-btn",
                 <.button(

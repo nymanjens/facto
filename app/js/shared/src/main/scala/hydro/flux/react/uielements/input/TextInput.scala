@@ -1,4 +1,4 @@
-package flux.react.uielements.input
+package hydro.flux.react.uielements.input
 
 import common.LoggingUtils.LogExceptionsCallback
 import common.LoggingUtils.logExceptions

@@ -1,5 +1,6 @@
 package flux.react.uielements.input
 
+import hydro.flux.react.uielements.input.InputBase
 import common.LoggingUtils.LogExceptionsCallback
 import common.LoggingUtils.logExceptions
 import japgolly.scalajs.react._
