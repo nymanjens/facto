@@ -2,9 +2,11 @@ package models.access
 
 import org.scalajs.dom.console
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.mutable
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.Future
+import scala.concurrent.Promise
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._
 

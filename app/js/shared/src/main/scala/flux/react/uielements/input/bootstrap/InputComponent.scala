@@ -1,18 +1,23 @@
 package flux.react.uielements.input.bootstrap
 
 import common.I18n
-import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
-import flux.react.ReactVdomUtils.{<<, ^^}
-import flux.react.uielements.input.{InputBase, InputValidator}
+import common.LoggingUtils.LogExceptionsCallback
+import common.LoggingUtils.logExceptions
+import flux.react.ReactVdomUtils.<<
+import flux.react.ReactVdomUtils.^^
+import flux.react.uielements.input.InputBase
+import flux.react.uielements.input.InputValidator
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.component.Scala.{MountedImpure}
+import japgolly.scalajs.react.component.Scala.MountedImpure
 import japgolly.scalajs.react.Ref.ToScalaComponent
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom.html_<^._
 import org.scalajs.dom.console
 
 import scala.collection.immutable.Seq
-import scala.util.{Failure, Success, Try}
+import scala.util.Failure
+import scala.util.Success
+import scala.util.Try
 
 /**
   * ReactScala component that can be used as building block for input components that fit

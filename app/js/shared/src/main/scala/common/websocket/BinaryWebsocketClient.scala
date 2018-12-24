@@ -4,10 +4,16 @@ import java.nio.ByteBuffer
 
 import common.LoggingUtils.logExceptions
 import org.scalajs.dom
-import org.scalajs.dom.{CloseEvent, ErrorEvent, Event, MessageEvent, _}
+import org.scalajs.dom.CloseEvent
+import org.scalajs.dom.ErrorEvent
+import org.scalajs.dom.Event
+import org.scalajs.dom.MessageEvent
+import org.scalajs.dom._
 
-import scala.concurrent.{Future, Promise}
-import scala.scalajs.js.typedarray.{ArrayBuffer, _}
+import scala.concurrent.Future
+import scala.concurrent.Promise
+import scala.scalajs.js.typedarray.ArrayBuffer
+import scala.scalajs.js.typedarray._
 
 final class BinaryWebsocketClient(name: String, jsWebsocket: WebSocket) {
 

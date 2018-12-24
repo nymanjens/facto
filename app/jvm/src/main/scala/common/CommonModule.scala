@@ -1,7 +1,8 @@
 package common
 
 import com.google.inject._
-import common.time.{Clock, JvmClock}
+import common.time.Clock
+import common.time.JvmClock
 
 final class CommonModule extends AbstractModule {
 

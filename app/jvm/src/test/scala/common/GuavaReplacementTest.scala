@@ -1,6 +1,7 @@
 package common
 
-import common.GuavaReplacement.{ImmutableSetMultimap, Splitter}
+import common.GuavaReplacement.ImmutableSetMultimap
+import common.GuavaReplacement.Splitter
 import common.testing._
 import org.junit.runner._
 import org.specs2.runner._

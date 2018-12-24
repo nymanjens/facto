@@ -3,10 +3,12 @@ package models.access
 import common.LoggingUtils.logExceptions
 import models.Entity
 import models.access.JsEntityAccess.Listener
-import models.modification.{EntityModification, EntityType}
+import models.modification.EntityModification
+import models.modification.EntityType
 import models.user.User
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.concurrent.Future

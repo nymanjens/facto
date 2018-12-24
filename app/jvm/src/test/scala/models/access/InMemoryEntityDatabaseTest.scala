@@ -7,9 +7,10 @@ import models.access.DbQuery.Sorting
 import models.access.DbQueryImplicits._
 import models.access.InMemoryEntityDatabase.EntitiesFetcher
 import models.accounting.Transaction
-import models.modification.{EntityModification, EntityType}
-import org.junit.runner._
-import org.specs2.runner._
+import models.modification.EntityModification
+import models.modification.EntityType
+import org.junit.runner.RunWith
+import org.specs2.runner.JUnitRunner
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable

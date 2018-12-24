@@ -3,11 +3,14 @@ package models.access
 import common.testing.Awaiter
 import utest._
 
-import scala.async.Async.{async, await}
-import scala.concurrent.{Future, Promise}
+import scala.async.Async.async
+import scala.async.Async.await
+import scala.concurrent.Future
+import scala.concurrent.Promise
 import scala.language.reflectiveCalls
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala.util.{Failure, Success}
+import scala.util.Failure
+import scala.util.Success
 
 object FutureLocalDatabaseTest extends TestSuite {
 

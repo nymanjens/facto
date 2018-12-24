@@ -1,14 +1,18 @@
 package flux
 
 import common.testing.TestObjects._
-import flux.action.{Action, Dispatcher}
+import flux.action.Action
+import flux.action.Dispatcher
+import hydro.flux.action.Action
+import hydro.flux.action.StandardActions
+import scala2js.Converters._
 import utest._
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.mutable
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala2js.Converters._
 
 object DispatcherTest extends TestSuite {
 
@@ -25,7 +29,7 @@ object DispatcherTest extends TestSuite {
 
       await(dispatcher.dispatch(testAction))
 
-      dispatchedActions ==> mutable.Buffer(testAction, Action.Done(testAction))
+      dispatchedActions ==> mutable.Buffer(testAction, StandardActions.Done(testAction))
     }
 
     "does not allow dispatching during the sync part of a callback" - async {

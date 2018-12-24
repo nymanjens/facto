@@ -1,8 +1,14 @@
-package flux.react.router
+package flux.router
 
 import common.I18n
-import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
-import flux.action.{Action, Dispatcher}
+import common.LoggingUtils.LogExceptionsCallback
+import common.LoggingUtils.logExceptions
+import flux.action.Action
+import flux.action.Dispatcher
+import flux.action.Action
+import flux.stores.document.AllDocumentsStore
+import hydro.flux.action.Dispatcher
+import hydro.flux.action.StandardActions
 import japgolly.scalajs.react.extra.router.StaticDsl.RouteB
 import japgolly.scalajs.react.extra.router._
 import japgolly.scalajs.react.vdom.html_<^._

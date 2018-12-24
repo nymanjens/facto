@@ -2,8 +2,10 @@ package flux.react.uielements
 
 import common.CollectionUtils.ifThenSeq
 import common.LoggingUtils.LogExceptionsCallback
-import common.{I18n, Unique}
-import flux.react.ReactVdomUtils.{<<, ^^}
+import common.I18n
+import common.Unique
+import flux.react.ReactVdomUtils.<<
+import flux.react.ReactVdomUtils.^^
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 

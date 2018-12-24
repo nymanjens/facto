@@ -1,7 +1,7 @@
 package flux.react.uielements
 
 import common.I18n
-import flux.react.router.Page
+import flux.router.Page
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 

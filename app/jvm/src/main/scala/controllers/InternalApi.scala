@@ -5,8 +5,8 @@ import java.nio.ByteBuffer
 import akka.stream.scaladsl._
 import api.Picklers._
 import api.ScalaJsApi.{ModificationsWithToken, UpdateToken, UserPrototype}
-import api.UpdateTokens.{toInstant, toUpdateToken}
 import api.{PicklableDbQuery, ScalaJsApiRequest, ScalaJsApiServerFactory}
+import api.UpdateTokens.{toInstant, toUpdateToken}
 import boopickle.Default._
 import com.google.inject.Inject
 import common.publisher.Publishers

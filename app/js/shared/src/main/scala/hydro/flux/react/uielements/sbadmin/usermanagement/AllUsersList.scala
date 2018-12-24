@@ -1,11 +1,11 @@
-package flux.react.app.usermanagement
+package hydro.flux.react.uielements.sbadmin.usermanagement
 
 import common.I18n
 import common.LoggingUtils.logExceptions
 import flux.react.ReactVdomUtils.<<
-import flux.react.common.HydroReactComponent
 import flux.react.uielements
-import flux.stores.UserStore
+import hydro.flux.react.HydroReactComponent
+import hydro.flux.stores.UserStore
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import models.user.User
@@ -13,7 +13,7 @@ import models.user.User
 import scala.collection.immutable.Seq
 import scala.scalajs.js
 
-private[app] final class AllUsersList(implicit i18n: I18n, userStore: UserStore) extends HydroReactComponent {
+final class AllUsersList(implicit i18n: I18n, userStore: UserStore) extends HydroReactComponent {
 
   // **************** API ****************//
   def apply(): VdomElement = {

@@ -8,11 +8,13 @@ import org.scalajs
 import org.scalajs.dom
 import org.scalajs.dom.raw.Worker
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.concurrent.duration._
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.Future
+import scala.concurrent.Promise
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._

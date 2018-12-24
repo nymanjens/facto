@@ -2,7 +2,9 @@ package models.access.webworker
 
 import api.Picklers._
 import jsfacades.WebWorker
-import models.access.webworker.LocalDatabaseWebWorkerApi.{LokiQuery, MethodNumbers, WriteOperation}
+import models.access.webworker.LocalDatabaseWebWorkerApi.LokiQuery
+import models.access.webworker.LocalDatabaseWebWorkerApi.MethodNumbers
+import models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
 import models.access.webworker.LocalDatabaseWebWorkerApiConverters._
 import org.scalajs.dom
 import org.scalajs.dom.console
@@ -12,7 +14,8 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
-import scala.util.{Failure, Success}
+import scala.util.Failure
+import scala.util.Success
 import scala2js.Converters._
 import scala2js.Scala2Js
 

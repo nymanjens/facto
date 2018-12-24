@@ -6,7 +6,9 @@ import models.access.JvmEntityAccess
 import models.user.Users
 import play.api.data.Forms._
 import play.api.data._
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.i18n.I18nSupport
+import play.api.i18n.Messages
+import play.api.i18n.MessagesApi
 import play.api.mvc._
 
 final class Auth @Inject()(implicit override val messagesApi: MessagesApi,

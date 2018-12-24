@@ -1,7 +1,8 @@
 package controllers.helpers
 
 import models.access.DbQueryImplicits._
-import models.access.{JvmEntityAccess, ModelField}
+import models.access.JvmEntityAccess
+import models.access.ModelField
 import models.user.User
 import play.api.mvc._
 

@@ -2,9 +2,11 @@ package models.access
 
 import common.time.LocalDateTime
 import models.Entity
+import models.access.DbQuery.Filter
+import models.access.DbQuery.Sorting
 import models.access.DbQuery.Sorting.FieldWithDirection
-import models.access.DbQuery.{Filter, Sorting}
-import models.accounting.{BalanceCheck, Transaction}
+import models.accounting.BalanceCheck
+import models.accounting.Transaction
 import models.modification.EntityType
 
 import scala.collection.immutable.Seq

@@ -1,11 +1,13 @@
 package models.access
 
 import models.Entity
-import models.access.DbQuery.{Filter, Sorting}
+import models.access.DbQuery.Filter
+import models.access.DbQuery.Sorting
 import models.access.DbQueryImplicits._
 import models.modification.EntityType
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global

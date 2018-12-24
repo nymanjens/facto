@@ -1,9 +1,11 @@
 package common.time
 
-import java.time.{Duration, Instant}
+import java.time.Duration
+import java.time.Instant
 
 import com.google.inject._
-import common.testing.{HookedSpecification, TestModule}
+import common.testing.HookedSpecification
+import common.testing.TestModule
 import common.time.JavaTimeImplicits._
 import org.specs2.matcher.MatchResult
 

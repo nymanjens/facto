@@ -1,4 +1,4 @@
-package flux.react.router
+package flux.router
 
 import common.I18n
 import japgolly.scalajs.react.extra.router.Path

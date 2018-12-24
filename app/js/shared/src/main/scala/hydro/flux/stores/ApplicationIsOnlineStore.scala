@@ -1,7 +1,7 @@
-package flux.stores
+package hydro.flux.stores
 
 import common.Listenable
-import flux.stores.ApplicationIsOnlineStore.State
+import hydro.flux.stores.ApplicationIsOnlineStore.State
 import models.access.EntityModificationPushClientFactory
 
 final class ApplicationIsOnlineStore(

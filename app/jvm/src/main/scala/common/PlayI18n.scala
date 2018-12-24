@@ -2,7 +2,9 @@ package common
 
 import com.google.inject.Inject
 import common.GuavaReplacement.Iterables.getOnlyElement
-import play.api.i18n.{Lang, Langs, MessagesApi}
+import play.api.i18n.Lang
+import play.api.i18n.Langs
+import play.api.i18n.MessagesApi
 
 trait PlayI18n extends I18n {
 

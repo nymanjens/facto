@@ -3,9 +3,10 @@ package flux.react.app
 import common.CollectionUtils.ifThenSeq
 import common.I18n
 import common.LoggingUtils.LogExceptionsCallback
-import flux.action.{Action, Dispatcher}
 import flux.react.ReactVdomUtils.^^
 import flux.react.router.{Page, RouterContext}
+import hydro.flux.action.{Dispatcher, StandardActions}
+import hydro.flux.react.uielements.sbadmin.{ApplicationDisconnectedIcon, GlobalMessages, PageLoadingSpinner, PendingModificationsCounter}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.PackageBase.VdomAttr
 import japgolly.scalajs.react.vdom.html_<^._
@@ -147,7 +148,7 @@ final class Layout(implicit globalMessages: GlobalMessages,
 
   private def doLogout(e: ReactMouseEvent): Callback = LogExceptionsCallback {
     e.preventDefault()
-    dispatcher.dispatch(Action.SetPageLoadingState(isLoading = true))
+    dispatcher.dispatch(StandardActions.SetPageLoadingState(isLoading = true))
     jsEntityAccess.clearLocalDatabase() map { _ =>
       dom.window.location.href = "/logout/"
     }

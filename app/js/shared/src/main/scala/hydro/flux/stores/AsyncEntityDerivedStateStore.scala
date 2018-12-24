@@ -1,11 +1,13 @@
-package flux.stores
+package hydro.flux.stores
 
-import common.LoggingUtils.{logExceptions, logFailure}
+import common.LoggingUtils.logExceptions
+import common.LoggingUtils.logFailure
 import models.access.JsEntityAccess
 import models.modification.EntityModification
 
 import scala.collection.immutable.Seq
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.Future
+import scala.concurrent.Promise
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 /**

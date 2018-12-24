@@ -4,7 +4,8 @@ import api.Picklers._
 import common.testing._
 import common.time.LocalDateTime
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, ModelField}
+import models.access.DbQuery
+import models.access.ModelField
 import models.accounting.Transaction
 import org.junit.runner._
 import org.specs2.runner._

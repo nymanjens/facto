@@ -4,13 +4,17 @@ import api.ScalaJsApi.GetInitialDataResponse
 import api.ScalaJsApiClient
 import common.LoggingUtils.logFailure
 import models.Entity
-import models.access.SingletonKey.{NextUpdateTokenKey, VersionKey}
-import models.modification.{EntityModification, EntityType}
+import models.access.SingletonKey.NextUpdateTokenKey
+import models.access.SingletonKey.VersionKey
+import models.modification.EntityModification
+import models.modification.EntityType
 import org.scalajs.dom.console
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.immutable.Seq
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.Future
+import scala.concurrent.Promise
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 /** RemoteDatabaseProxy implementation that queries the remote back-end directly until LocalDatabase

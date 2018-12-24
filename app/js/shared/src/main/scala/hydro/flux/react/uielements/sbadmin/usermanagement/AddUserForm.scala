@@ -1,21 +1,22 @@
-package flux.react.app.usermanagement
+package hydro.flux.react.uielements.sbadmin.usermanagement
 
 import api.ScalaJsApi.UserPrototype
 import common.I18n
-import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
-import flux.action.{Action, Dispatcher}
-import flux.react.common.HydroReactComponent
+import common.LoggingUtils.LogExceptionsCallback
+import common.LoggingUtils.logExceptions
+import flux.action.Actions
+import hydro.flux.action.StandardActions
 import flux.react.uielements
 import flux.react.uielements.input.bootstrap
+import hydro.flux.action.Dispatcher
+import hydro.flux.react.HydroReactComponent
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import models.user.User
 
 import scala.collection.immutable.Seq
 
-private[usermanagement] final class UpdatePasswordForm(implicit user: User,
-                                                       i18n: I18n,
-                                                       dispatcher: Dispatcher)
+private[usermanagement] final class AddUserForm(implicit user: User, i18n: I18n, dispatcher: Dispatcher)
     extends HydroReactComponent {
 
   // **************** API ****************//
@@ -32,24 +33,33 @@ private[usermanagement] final class UpdatePasswordForm(implicit user: User,
 
   protected final class Backend(val $ : BackendScope[Props, State]) extends BackendBase($) {
 
+    private val loginNameRef = bootstrap.TextInput.ref()
+    private val nameRef = bootstrap.TextInput.ref()
     private val passwordRef = bootstrap.TextInput.ref()
     private val passwordVerificationRef = bootstrap.TextInput.ref()
 
     override def render(props: Props, state: State) = logExceptions {
       <.form(
         ^.className := "form-horizontal",
-        uielements.HalfPanel(title = <.span(i18n("app.change-password")))(
+        uielements.HalfPanel(title = <.span(i18n("app.add-user")))(
           {
             for (error <- state.globalErrors) yield {
               <.div(^.className := "alert alert-danger", ^.key := error, error)
             }
           }.toVdomArray,
           bootstrap.TextInput(
-            ref = bootstrap.TextInput.ref(),
+            ref = loginNameRef,
             name = "loginName",
             label = i18n("app.login-name"),
-            defaultValue = user.loginName,
-            disabled = true
+            required = true,
+            showErrorMessage = state.showErrorMessages
+          ),
+          bootstrap.TextInput(
+            ref = nameRef,
+            name = "name",
+            label = i18n("app.full-name"),
+            required = true,
+            showErrorMessage = state.showErrorMessages
           ),
           bootstrap.TextInput(
             ref = passwordRef,
@@ -71,7 +81,7 @@ private[usermanagement] final class UpdatePasswordForm(implicit user: User,
             ^.tpe := "submit",
             ^.className := "btn btn-default",
             ^.onClick ==> onSubmit,
-            i18n("app.ok"))
+            i18n("app.add"))
         )
       )
     }
@@ -84,7 +94,9 @@ private[usermanagement] final class UpdatePasswordForm(implicit user: User,
         logExceptions {
           var newState = State(showErrorMessages = true)
 
-          val maybeNewPassword = for {
+          val maybeUserPrototype = for {
+            loginName <- loginNameRef().value
+            name <- nameRef().value
             password <- passwordRef().value
             passwordVerification <- passwordVerificationRef().value
             validPassword <- {
@@ -95,14 +107,15 @@ private[usermanagement] final class UpdatePasswordForm(implicit user: User,
                 Some(password)
               }
             }
-          } yield validPassword
+          } yield UserPrototype.create(loginName = loginName, name = name, plainTextPassword = validPassword)
 
-          maybeNewPassword match {
-            case Some(newPassword) =>
-              dispatcher.dispatch(
-                Action.UpsertUser(UserPrototype.create(id = user.id, plainTextPassword = newPassword)))
+          maybeUserPrototype match {
+            case Some(userPrototype) =>
+              dispatcher.dispatch(StandardActions.UpsertUser(userPrototype))
 
               // Clear form
+              loginNameRef().setValue("")
+              nameRef().setValue("")
               passwordRef().setValue("")
               passwordVerificationRef().setValue("")
               newState = State()

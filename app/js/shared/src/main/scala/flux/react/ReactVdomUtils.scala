@@ -1,7 +1,9 @@
 package flux.react
 
 import japgolly.scalajs.react.vdom.html_<^._
-import japgolly.scalajs.react.vdom.{TagMod, VdomArray, VdomNode}
+import japgolly.scalajs.react.vdom.TagMod
+import japgolly.scalajs.react.vdom.VdomArray
+import japgolly.scalajs.react.vdom.VdomNode
 
 import scala.collection.immutable.Seq
 

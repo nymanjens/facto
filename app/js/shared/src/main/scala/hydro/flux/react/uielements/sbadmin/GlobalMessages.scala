@@ -1,16 +1,16 @@
-package flux.react.app
+package hydro.flux.react.uielements.sbadmin
 
 import common.LoggingUtils.logExceptions
-import flux.react.common.HydroReactComponent
+import flux.react.app.Menu
 import flux.stores.GlobalMessagesStore
 import flux.stores.GlobalMessagesStore.Message
+import hydro.flux.react.HydroReactComponent
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.scalajs.js
 
-private[app] final class GlobalMessages(implicit globalMessagesStore: GlobalMessagesStore, menu: Menu)
-    extends HydroReactComponent {
+final class GlobalMessages(implicit globalMessagesStore: GlobalMessagesStore) extends HydroReactComponent {
 
   // **************** API ****************//
   def apply(): VdomElement = {

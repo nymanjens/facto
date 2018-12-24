@@ -1,6 +1,8 @@
 package api
 
-import java.time.{Instant, LocalDate, LocalTime}
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalTime
 
 import api.Picklers._
 import api.ScalaJsApi.UpdateToken

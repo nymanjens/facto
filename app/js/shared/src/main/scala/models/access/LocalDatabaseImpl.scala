@@ -4,28 +4,30 @@ import common.ScalaUtils.visibleForTesting
 import jsfacades.LokiJs
 import jsfacades.LokiJs.FilterFactory.Operation
 import models.Entity
-import models.access.LocalDatabaseImpl.{ModificationWithId, Singleton}
+import models.access.LocalDatabaseImpl.ModificationWithId
+import models.access.LocalDatabaseImpl.Singleton
 import models.access.webworker.LocalDatabaseWebWorkerApi
-import models.access.webworker.LocalDatabaseWebWorkerApi.{LokiQuery, WriteOperation}
-import models.modification.EntityType.{
-  BalanceCheckType,
-  ExchangeRateMeasurementType,
-  TransactionGroupType,
-  TransactionType,
-  UserType
-}
-import models.modification.{EntityModification, EntityType}
+import models.access.webworker.LocalDatabaseWebWorkerApi.LokiQuery
+import models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
+import models.modification.EntityType.BalanceCheckType
+import models.modification.EntityType.ExchangeRateMeasurementType
+import models.modification.EntityType.TransactionGroupType
+import models.modification.EntityType.TransactionType
+import models.modification.EntityType.UserType
+import models.modification.EntityModification
+import models.modification.EntityType
 import org.scalajs.dom.console
+import scala2js.Converters._
+import scala2js.Scala2Js
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.util.matching.Regex
-import scala2js.Converters._
-import scala2js.Scala2Js
 
 private final class LocalDatabaseImpl(implicit webWorker: LocalDatabaseWebWorkerApi) extends LocalDatabase {
 

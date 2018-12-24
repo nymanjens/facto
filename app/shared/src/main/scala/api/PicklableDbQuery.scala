@@ -1,9 +1,11 @@
 package api
 
 import api.PicklableDbQuery.Sorting.FieldWithDirection
-import api.PicklableDbQuery.{Filter, Sorting}
+import api.PicklableDbQuery.Filter
+import api.PicklableDbQuery.Sorting
 import models.Entity
-import models.access.{DbQuery, ModelField}
+import models.access.DbQuery
+import models.access.ModelField
 import models.modification.EntityType
 
 import scala.collection.immutable.Seq

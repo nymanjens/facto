@@ -1,4 +1,4 @@
-package flux.action
+package hydro.flux.action
 
 final class Module {
 

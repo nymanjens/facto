@@ -12,7 +12,8 @@ import common.ResourceFiles
 import common.time.Clock
 import models.access.JvmEntityAccess
 import play.api.Mode
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
+import play.api.i18n.MessagesApi
 import play.api.mvc._
 
 import scala.collection.immutable.Seq

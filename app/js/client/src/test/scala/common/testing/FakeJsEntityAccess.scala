@@ -3,13 +3,15 @@ package common.testing
 import models.Entity
 import models.access.JsEntityAccess.Listener
 import models.access._
-import models.modification.{EntityModification, EntityType}
+import models.modification.EntityModification
+import models.modification.EntityType
 import models.user.User
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.concurrent.duration._
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.Future
+import scala.concurrent.Promise
 import scala.scalajs.js
 import scala2js.Converters._
 

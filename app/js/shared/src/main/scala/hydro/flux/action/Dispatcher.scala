@@ -1,13 +1,15 @@
-package flux.action
+package hydro.flux.action
 
 import common.LoggingUtils.logExceptions
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala.util.{Failure, Success}
+import scala.util.Failure
+import scala.util.Success
 
 /**
   * Dispatcher is used to broadcast payloads to registered callbacks.
@@ -46,8 +48,8 @@ object Dispatcher {
 
       invokeCallbacks(action)
         .transformWith {
-          case Success(_) => invokeCallbacks(Action.Done(action))
-          case Failure(e) => invokeCallbacks(Action.Failed(action)).map(_ => throw e)
+          case Success(_) => invokeCallbacks(StandardActions.Done(action))
+          case Failure(e) => invokeCallbacks(StandardActions.Failed(action)).map(_ => throw e)
         }
     }
 

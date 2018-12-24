@@ -1,7 +1,9 @@
 package common.publisher
 
 import net.jcip.annotations.GuardedBy
-import org.reactivestreams.{Publisher, Subscriber, Subscription}
+import org.reactivestreams.Publisher
+import org.reactivestreams.Subscriber
+import org.reactivestreams.Subscription
 
 import scala.collection.immutable.Seq
 

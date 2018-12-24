@@ -1,6 +1,7 @@
 package common
 
-import utest.{TestSuite, _}
+import utest.TestSuite
+import utest._
 
 import scala2js.Converters._
 

@@ -1,6 +1,7 @@
 package common.time
 
-import java.time.{LocalTime, Month}
+import java.time.LocalTime
+import java.time.Month
 
 /**
   * Extension of `LocalDateTime`, which should keep the same API as `java.time.LocalDateTime`.

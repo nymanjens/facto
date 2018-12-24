@@ -3,9 +3,12 @@ package common
 import java.lang.Math.abs
 import java.time.DayOfWeek._
 import java.time.Month._
-import java.time.{DayOfWeek, LocalDate, Month}
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.Month
 
-import common.time.{Clock, LocalDateTime}
+import common.time.Clock
+import common.time.LocalDateTime
 
 object Formatting {
   // Note: Cannot use DateTimeFormatter as it isn't supported by scala.js

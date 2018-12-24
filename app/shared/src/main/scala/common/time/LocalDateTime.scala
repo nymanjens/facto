@@ -1,6 +1,9 @@
 package common.time
 
-import java.time.{Duration, LocalDate, LocalTime, Month}
+import java.time.Duration
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.Month
 
 import common.Require.requireNonNull
 

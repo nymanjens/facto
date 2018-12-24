@@ -10,18 +10,19 @@ import common.publisher.TriggerablePublisher
 import common.time.Clock
 import models.Entity
 import models.accounting._
-import models.modification.EntityType.{
-  BalanceCheckType,
-  ExchangeRateMeasurementType,
-  TransactionGroupType,
-  TransactionType,
-  UserType
-}
-import models.modification.{EntityModification, EntityModificationEntity, EntityType}
+import models.modification.EntityType.BalanceCheckType
+import models.modification.EntityType.ExchangeRateMeasurementType
+import models.modification.EntityType.TransactionGroupType
+import models.modification.EntityType.TransactionType
+import models.modification.EntityType.UserType
+import models.modification.EntityModification
+import models.modification.EntityModificationEntity
+import models.modification.EntityType
 import models.money.ExchangeRateMeasurement
 import models.slick.SlickUtils.dbApi._
 import models.slick.SlickUtils.dbRun
-import models.slick.{SlickEntityManager, SlickEntityTableDef}
+import models.slick.SlickEntityManager
+import models.slick.SlickEntityTableDef
 import models.user.User
 import net.jcip.annotations.GuardedBy
 import org.reactivestreams.Publisher

@@ -1,9 +1,11 @@
 package flux.stores
 
 import flux.stores.PendingModificationsStore.State
+import hydro.flux.stores.StateStore
 import models.access.JsEntityAccess
 import models.accounting.Transaction
-import models.modification.{EntityModification, EntityType}
+import models.modification.EntityModification
+import models.modification.EntityType
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable

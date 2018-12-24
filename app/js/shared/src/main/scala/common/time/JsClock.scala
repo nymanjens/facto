@@ -1,6 +1,8 @@
 package common.time
 
-import java.time.{Instant, LocalDate, LocalTime}
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalTime
 
 final class JsClock extends Clock {
 

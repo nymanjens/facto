@@ -10,11 +10,11 @@ import models.accounting._
 import models.modification._
 import models.money.ExchangeRateMeasurement
 import models.user.User
+import scala2js.Scala2Js.{Converter, MapConverter}
 
 import scala.collection.immutable.Seq
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
-import scala2js.Scala2Js.{Converter, MapConverter}
 
 object Converters {
 

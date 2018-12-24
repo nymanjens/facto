@@ -1,6 +1,7 @@
 package models.access.webworker
 
-import models.access.webworker.LocalDatabaseWebWorkerApi.{LokiQuery, WriteOperation}
+import models.access.webworker.LocalDatabaseWebWorkerApi.LokiQuery
+import models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
 import models.access.webworker.LocalDatabaseWebWorkerApiConverters._
 import utest._
 

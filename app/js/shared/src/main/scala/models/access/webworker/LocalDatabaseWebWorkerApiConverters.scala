@@ -1,7 +1,8 @@
 package models.access.webworker
 
 import models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation._
-import models.access.webworker.LocalDatabaseWebWorkerApi.{LokiQuery, WriteOperation}
+import models.access.webworker.LocalDatabaseWebWorkerApi.LokiQuery
+import models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
 
 import scala.collection.immutable.Seq
 import scala.scalajs.js

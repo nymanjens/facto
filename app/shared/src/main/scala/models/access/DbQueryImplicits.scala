@@ -1,6 +1,7 @@
 package models.access
 
-import models.access.DbQuery.{Filter, PicklableOrdering}
+import models.access.DbQuery.Filter
+import models.access.DbQuery.PicklableOrdering
 
 import scala.collection.immutable.Seq
 

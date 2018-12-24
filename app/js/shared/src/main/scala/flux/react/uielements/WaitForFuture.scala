@@ -8,7 +8,8 @@ import japgolly.scalajs.react.vdom.html_<^._
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
-import scala.util.{Failure, Success}
+import scala.util.Failure
+import scala.util.Success
 
 final class WaitForFuture[V] {
   private val component = ScalaComponent

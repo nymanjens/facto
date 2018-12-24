@@ -3,11 +3,13 @@ package flux.stores
 import api.ScalaJsApi.UserPrototype
 import common.testing.Awaiter
 import common.testing.TestObjects._
-import flux.action.Action
+import flux.action.Actions
+import hydro.flux.stores.UserStore
 import models.modification.EntityModification
 import utest._
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.concurrent.duration._
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
@@ -24,10 +26,10 @@ object UserStoreTest extends TestSuite {
 
     val store: UserStore = new UserStore()
 
-    "Listens to Action.UpsertUser" - async {
+    "Listens to Actions.UpsertUser" - async {
       val userPrototype = UserPrototype.create(id = 19283L)
 
-      await(fakeDispatcher.dispatch(Action.UpsertUser(userPrototype)))
+      await(fakeDispatcher.dispatch(Actions.UpsertUser(userPrototype)))
 
       fakeScalaJsApiClient.allUpsertedUserPrototypes ==> Seq(userPrototype)
     }

@@ -1,6 +1,8 @@
 package common.time
 
-import java.time.{Duration, Instant, LocalDate}
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalDate
 
 object JavaTimeImplicits {
 

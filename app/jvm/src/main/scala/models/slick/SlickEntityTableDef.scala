@@ -4,16 +4,20 @@ import java.nio.ByteBuffer
 import java.time.Instant
 
 import api.Picklers._
-import boopickle.Default.{Pickle, Unpickle}
+import boopickle.Default.Pickle
+import boopickle.Default.Unpickle
 import common.accounting.Tags
 import common.time.LocalDateTime
 import models.Entity
-import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
-import models.modification.{EntityModification, EntityModificationEntity}
+import models.accounting.BalanceCheck
+import models.accounting.Transaction
+import models.accounting.TransactionGroup
+import models.modification.EntityModification
+import models.modification.EntityModificationEntity
 import models.money.ExchangeRateMeasurement
 import models.slick.SlickUtils.dbApi.{Table => SlickTable, Tag => SlickTag, _}
-import models.slick.SlickUtils.localDateTimeToSqlDateMapper
 import models.slick.SlickUtils.instantToSqlTimestampMapper
+import models.slick.SlickUtils.localDateTimeToSqlDateMapper
 import models.user.User
 
 import scala.collection.immutable.Seq
@@ -189,8 +193,8 @@ object SlickEntityTableDef {
                 idOption = idOption
               )
           }
-        def unapply(
-            e: EntityModificationEntity): Option[(Long, Long, EntityModification, Instant, Long, Option[Long])] =
+        def unapply(e: EntityModificationEntity)
+          : Option[(Long, Long, EntityModification, Instant, Long, Option[Long])] =
           Some((e.userId, e.modification.entityId, e.modification, e.instant, e.instant.getNano, e.idOption))
 
         (userId, entityId, change, instant, instantNanos, id.?) <> (tupled _, unapply _)

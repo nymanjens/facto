@@ -1,10 +1,11 @@
 package models.slick
 
-import java.time.{ZoneId, LocalDateTime => JavaLocalDateTime}
-import java.nio.ByteBuffer
-import java.time.{Instant, ZoneId, LocalDateTime => JavaLocalDateTime}
+import java.time.Instant
+import java.time.ZoneId
+import java.time.{LocalDateTime => JavaLocalDateTime}
 
-import common.time.{LocalDateTime, LocalDateTimes}
+import common.time.LocalDateTime
+import common.time.LocalDateTimes
 import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
 

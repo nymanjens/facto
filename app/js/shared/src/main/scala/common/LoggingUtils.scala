@@ -3,7 +3,8 @@ package common
 import japgolly.scalajs.react.CallbackTo
 import org.scalajs.dom.console
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 object LoggingUtils {
 

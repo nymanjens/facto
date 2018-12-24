@@ -1,14 +1,20 @@
 package common.testing
 
-import java.time.{Instant, ZoneId}
+import java.time.Instant
+import java.time.ZoneId
 
 import common.testing.TestObjects._
 import common.time.LocalDateTime
 import models.Entity
 import models.access.JvmEntityAccess
-import models.accounting.config.{Account, Category, MoneyReservoir}
-import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
-import models.modification.{EntityModification, EntityType}
+import models.accounting.config.Account
+import models.accounting.config.Category
+import models.accounting.config.MoneyReservoir
+import models.accounting.BalanceCheck
+import models.accounting.Transaction
+import models.accounting.TransactionGroup
+import models.modification.EntityModification
+import models.modification.EntityType
 import models.user.User
 
 import scala.collection.immutable.Seq

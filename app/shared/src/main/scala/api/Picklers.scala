@@ -1,6 +1,7 @@
 package api
 
-import java.time.{LocalDate, LocalTime}
+import java.time.LocalDate
+import java.time.LocalTime
 
 import api.PicklableDbQuery.FieldWithValue
 import boopickle.Default._
@@ -9,13 +10,17 @@ import common.time.LocalDateTime
 import models.Entity
 import models.access.ModelField
 import models.accounting.config._
-import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
+import models.accounting.BalanceCheck
+import models.accounting.Transaction
+import models.accounting.TransactionGroup
 import models.modification.EntityType._
-import models.modification.{EntityModification, EntityType}
+import models.modification.EntityModification
+import models.modification.EntityType
 import models.money.ExchangeRateMeasurement
 import models.user.User
 
-import scala.collection.immutable.{Seq, Set}
+import scala.collection.immutable.Seq
+import scala.collection.immutable.Set
 
 object Picklers {
 

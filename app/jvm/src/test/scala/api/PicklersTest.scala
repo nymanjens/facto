@@ -12,7 +12,8 @@ import common.testing._
 import common.time.LocalDateTimes
 import models.accounting.Transaction
 import models.accounting.config.Config
-import models.modification.{EntityModification, EntityType}
+import models.modification.EntityModification
+import models.modification.EntityType
 import org.junit.runner._
 import org.specs2.runner._
 

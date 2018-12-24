@@ -5,7 +5,8 @@ import common.GuavaReplacement.Iterables.getOnlyElement
 import common.testing.TestObjects._
 import common.testing._
 import models.accounting.Transaction
-import models.modification.{EntityModification, EntityModificationEntity}
+import models.modification.EntityModification
+import models.modification.EntityModificationEntity
 import models.slick.SlickUtils.dbRun
 import models.user.User
 import org.junit.runner._

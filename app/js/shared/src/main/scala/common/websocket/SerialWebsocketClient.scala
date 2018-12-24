@@ -6,9 +6,11 @@ import common.LoggingUtils.logExceptions
 import common.ScalaUtils.toPromise
 import org.scalajs.dom._
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.mutable
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.Future
+import scala.concurrent.Promise
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 private[websocket] final class SerialWebsocketClient(websocketPath: String) {

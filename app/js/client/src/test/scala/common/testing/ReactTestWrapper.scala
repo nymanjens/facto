@@ -2,7 +2,8 @@ package common.testing
 
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.test.ReactTestUtils.MountedOutput
-import japgolly.scalajs.react.test.{ReactTestUtils, Simulate}
+import japgolly.scalajs.react.test.ReactTestUtils
+import japgolly.scalajs.react.test.Simulate
 import japgolly.scalajs.react.vdom.VdomElement
 
 import scala.collection.immutable.Seq

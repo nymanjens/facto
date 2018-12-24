@@ -1,7 +1,9 @@
-package flux.react.router
+package flux.router
 
 import common.I18n
-import flux.action.Dispatcher
+import flux.router.Page
+import flux.router.RouterFactory
+import hydro.flux.action.Dispatcher
 import japgolly.scalajs.react.extra.router._
 
 final class Module(implicit reactAppModule: flux.react.app.Module, dispatcher: Dispatcher, i18n: I18n) {

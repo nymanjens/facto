@@ -2,7 +2,8 @@ package api
 
 import java.time.Instant
 
-import api.UpdateTokens.{toInstant, toUpdateToken}
+import api.UpdateTokens.toInstant
+import api.UpdateTokens.toUpdateToken
 import common.testing.TestUtils._
 import common.testing._
 import org.junit.runner._

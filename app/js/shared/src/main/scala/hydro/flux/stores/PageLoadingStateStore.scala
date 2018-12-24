@@ -1,7 +1,11 @@
-package flux.stores
+package hydro.flux.stores
 
-import flux.action.{Action, Dispatcher}
-import flux.stores.PageLoadingStateStore.State
+import flux.action.Actions
+import hydro.flux.action.StandardActions
+import hydro.flux.stores.PageLoadingStateStore.State
+import hydro.flux.action.Action
+import hydro.flux.action.Dispatcher
+import hydro.flux.stores.PageLoadingStateStore.State
 
 final class PageLoadingStateStore(implicit dispatcher: Dispatcher) extends StateStore[State] {
   dispatcher.registerPartialSync(dispatcherListener)
@@ -13,7 +17,7 @@ final class PageLoadingStateStore(implicit dispatcher: Dispatcher) extends State
 
   // **************** Private dispatcher methods ****************//
   private def dispatcherListener: PartialFunction[Action, Unit] = {
-    case Action.SetPageLoadingState(isLoading) =>
+    case StandardActions.SetPageLoadingState(isLoading) =>
       setState(State(isLoading = isLoading))
   }
 

@@ -8,6 +8,10 @@ import flux.react.app.balancecheckform.BalanceCheckForm
 import flux.react.app.transactiongroupform.TransactionGroupForm
 import flux.stores._
 import flux.stores.entries.factories._
+import hydro.flux.action.Dispatcher
+import hydro.flux.stores.ApplicationIsOnlineStore
+import hydro.flux.stores.PageLoadingStateStore
+import hydro.flux.stores.UserStore
 import models.access.JsEntityAccess
 import models.accounting.config.Config
 import models.user.User
@@ -35,18 +39,22 @@ final class Module(implicit i18n: I18n,
                    clock: Clock) {
 
   // Configuration of submodules
+  private val hydroSbadminUielementsModule = new hydro.flux.react.uielements.sbadmin.Module
+  private val userManagementModule = new hydro.flux.react.uielements.sbadmin.usermanagement.Module
   private val userManagementModule = new flux.react.app.usermanagement.Module
   private val transactionGroupFormModule = new flux.react.app.transactiongroupform.Module
   private val balanceCheckFormModule = new flux.react.app.balancecheckform.Module
   private val transactionViewsModule = new flux.react.app.transactionviews.Module
+  private val desktopModule = new flux.react.app.document.Module
+
+  implicit private lazy val globalMessages = hydroSbadminUielementsModule.globalMessages
+  implicit private lazy val pageLoadingSpinner = hydroSbadminUielementsModule.pageLoadingSpinner
+  implicit private lazy val applicationDisconnectedIcon =
+    hydroSbadminUielementsModule.applicationDisconnectedIcon
+  implicit private lazy val pendingModificationsCounter =
+    hydroSbadminUielementsModule.pendingModificationsCounter
 
   implicit private lazy val menu: Menu = new Menu
-  implicit private lazy val globalMessages: GlobalMessages = new GlobalMessages
-  implicit private lazy val pageLoadingSpinner: PageLoadingSpinner = new PageLoadingSpinner
-  implicit private lazy val applicationDisconnectedIcon: ApplicationDisconnectedIcon =
-    new ApplicationDisconnectedIcon
-  implicit private lazy val pendingModificationsCounter: PendingModificationsCounter =
-    new PendingModificationsCounter
 
   implicit lazy val layout: Layout = new Layout
 

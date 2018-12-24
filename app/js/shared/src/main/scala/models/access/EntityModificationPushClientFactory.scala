@@ -1,17 +1,21 @@
 package models.access
 
 import api.Picklers._
-import api.ScalaJsApi.{ModificationsWithToken, UpdateToken}
-import boopickle.Default.{Unpickle, _}
+import api.ScalaJsApi.ModificationsWithToken
+import api.ScalaJsApi.UpdateToken
+import boopickle.Default.Unpickle
+import boopickle.Default._
 import common.Listenable
 import common.Listenable.WritableListenable
 import common.websocket.BinaryWebsocketClient
 import org.scalajs.dom
 import org.scalajs.dom.raw.Event
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.concurrent.duration._
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.Future
+import scala.concurrent.Promise
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 

@@ -2,7 +2,8 @@ package flux
 
 import api.ScalaJsApi.GetInitialDataResponse
 import api.ScalaJsApiClient
-import flux.react.router.Page
+import flux.router.Page
+import hydro.flux.action.Module
 import japgolly.scalajs.react.extra.router.Router
 import models.accounting.config.Config
 import models.user.User
@@ -30,7 +31,7 @@ final class ClientAppModule(implicit getInitialDataResponse: GetInitialDataRespo
   implicit private val exchangeRateManager = modelsModule.exchangeRateManager
 
   // Create and unpack Flux action module
-  private val fluxActionModule = new flux.action.Module
+  private val fluxActionModule = new Module
   implicit private val dispatcher = fluxActionModule.dispatcher
 
   // Create and unpack Flux store module
@@ -53,7 +54,7 @@ final class ClientAppModule(implicit getInitialDataResponse: GetInitialDataRespo
 
   // Create other Flux modules
   implicit private val reactAppModule = new flux.react.app.Module
-  implicit private val routerModule = new flux.react.router.Module
+  implicit private val routerModule = new flux.router.Module
 
   val router: Router[Page] = routerModule.router
 }

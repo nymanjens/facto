@@ -1,10 +1,13 @@
 package models.access
 
-import java.util.concurrent.{ConcurrentHashMap, ConcurrentMap, ConcurrentSkipListSet}
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
+import java.util.concurrent.ConcurrentSkipListSet
 
 import models.Entity
 import models.access.InMemoryEntityDatabase.EntitiesFetcher
-import models.modification.{EntityModification, EntityType}
+import models.modification.EntityModification
+import models.modification.EntityType
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq

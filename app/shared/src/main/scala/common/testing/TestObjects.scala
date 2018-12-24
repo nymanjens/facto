@@ -1,20 +1,25 @@
 package common.testing
 
-import java.time.Month
 import java.time.Instant
+import java.time.Month
 import java.time.Month._
 
-import api.ScalaJsApi.{GetInitialDataResponse, UpdateToken}
+import api.ScalaJsApi.GetInitialDataResponse
+import api.ScalaJsApi.UpdateToken
+import common.time.LocalDateTime
+import common.time.LocalDateTimes
 import common.time.LocalDateTimes.createDateTime
-import common.time.{LocalDateTime, LocalDateTimes}
+import models.accounting.BalanceCheck
+import models.accounting.Transaction
+import models.accounting.TransactionGroup
 import models.accounting.config.Account.SummaryTotalRowDef
 import models.accounting.config._
-import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
 import models.modification.EntityModification
 import models.money.ExchangeRateMeasurement
 import models.user.User
 
-import scala.collection.immutable.{ListMap, Seq}
+import scala.collection.immutable.ListMap
+import scala.collection.immutable.Seq
 import scala.util.Random
 
 object TestObjects {
