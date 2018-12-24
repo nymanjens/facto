@@ -5,6 +5,7 @@ import common.LoggingUtils.LogExceptionsCallback
 import common.LoggingUtils.logExceptions
 import flux.action.Actions
 import hydro.flux.action.Dispatcher
+import hydro.flux.action.StandardActions
 import japgolly.scalajs.react.extra.router.StaticDsl.RouteB
 import japgolly.scalajs.react.extra.router._
 import japgolly.scalajs.react.vdom.html_<^._
@@ -110,7 +111,8 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
         // Fallback
         ).notFound(redirectToPage(Page.CashFlow)(Redirect.Replace))
           .onPostRender((prev, cur) =>
-            LogExceptionsCallback(dispatcher.dispatch(Actions.SetPageLoadingState(isLoading = false))))
+            LogExceptionsCallback(
+              dispatcher.dispatch(StandardActions.SetPageLoadingState(isLoading = false))))
           .setTitle(page => s"${page.title} | Facto")
       }
       .renderWith(layout)
