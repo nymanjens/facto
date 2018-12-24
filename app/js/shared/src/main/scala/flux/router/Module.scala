@@ -1,8 +1,6 @@
 package flux.router
 
 import common.I18n
-import flux.router.Page
-import flux.router.RouterFactory
 import hydro.flux.action.Dispatcher
 import japgolly.scalajs.react.extra.router._
 
