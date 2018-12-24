@@ -41,11 +41,9 @@ final class Module(implicit i18n: I18n,
   // Configuration of submodules
   private val hydroSbadminUielementsModule = new hydro.flux.react.uielements.sbadmin.Module
   private val userManagementModule = new hydro.flux.react.uielements.sbadmin.usermanagement.Module
-  private val userManagementModule = new flux.react.app.usermanagement.Module
   private val transactionGroupFormModule = new flux.react.app.transactiongroupform.Module
   private val balanceCheckFormModule = new flux.react.app.balancecheckform.Module
   private val transactionViewsModule = new flux.react.app.transactionviews.Module
-  private val desktopModule = new flux.react.app.document.Module
 
   implicit private lazy val globalMessages = hydroSbadminUielementsModule.globalMessages
   implicit private lazy val pageLoadingSpinner = hydroSbadminUielementsModule.pageLoadingSpinner

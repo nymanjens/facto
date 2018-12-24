@@ -191,7 +191,7 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
       ^.role := "button",
       ^.onClick --> LogExceptionsCallback {
         dispatcher.dispatch(
-          Action.AddBalanceCheck(BalanceCheck(
+          Actions.AddBalanceCheck(BalanceCheck(
             issuerId = user.id,
             moneyReservoirCode = reservoir.code,
             balanceInCents = entry.balance.cents,

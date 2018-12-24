@@ -487,9 +487,9 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
           val action = props.operationMeta match {
             case OperationMeta.AddNew =>
-              Action.AddTransactionGroup(transactionsWithoutIdProvider = transactionsWithoutIdProvider(_))
+              Actions.AddTransactionGroup(transactionsWithoutIdProvider = transactionsWithoutIdProvider(_))
             case OperationMeta.Edit(group, transactions) =>
-              Action.UpdateTransactionGroup(
+              Actions.UpdateTransactionGroup(
                 transactionGroupWithId = group,
                 transactionsWithoutId = transactionsWithoutIdProvider(group, Some(transactions.head.issuerId))
               )
@@ -530,7 +530,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
       props.operationMeta match {
         case OperationMeta.AddNew => throw new AssertionError("Should never happen")
         case OperationMeta.Edit(group, transactions) =>
-          dispatcher.dispatch(Action.RemoveTransactionGroup(transactionGroupWithId = group))
+          dispatcher.dispatch(Actions.RemoveTransactionGroup(transactionGroupWithId = group))
           props.router.setPath(props.returnToPath)
       }
     }

@@ -19,7 +19,7 @@ object DispatcherTest extends TestSuite {
 
   override def tests = TestSuite {
     val dispatcher: Dispatcher.Impl = new Dispatcher.Impl()
-    val testAction = Action.RemoveTransactionGroup(testTransactionGroupWithId)
+    val testAction = Actions.RemoveTransactionGroup(testTransactionGroupWithId)
 
     "dispatches actions to listeners, including Done action" - async {
       val dispatchedActions: mutable.Buffer[Action] = mutable.Buffer()

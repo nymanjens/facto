@@ -24,19 +24,19 @@ object BalanceCheckStoreTest extends TestSuite {
 
     val balanceCheckStore = new BalanceCheckStore()
 
-    "Listens to Action.AddBalanceCheck" - async {
-      await(fakeDispatcher.dispatch(Action.AddBalanceCheck(testBalanceCheckWithoutId)))
+    "Listens to Actions.AddBalanceCheck" - async {
+      await(fakeDispatcher.dispatch(Actions.AddBalanceCheck(testBalanceCheckWithoutId)))
 
       val Seq(addBc) = fakeDatabase.allModifications
       assertAddBalanceCheck(addBc, testBalanceCheckWithoutId)
     }
 
-    "Listens to Action.UpdateBalanceCheck" - async {
+    "Listens to Actions.UpdateBalanceCheck" - async {
       fakeDatabase.addRemotelyAddedEntities(testBalanceCheckWithId)
       val initialModifications = fakeDatabase.allModifications
       val newBalanceCheck = testBalanceCheckWithId.copy(balanceInCents = 39877, idOption = None)
 
-      await(fakeDispatcher.dispatch(Action.UpdateBalanceCheck(testBalanceCheckWithId, newBalanceCheck)))
+      await(fakeDispatcher.dispatch(Actions.UpdateBalanceCheck(testBalanceCheckWithId, newBalanceCheck)))
 
       fakeDatabase.allModifications.size - initialModifications.size ==> 2
       val Seq(removeBc, addBc) = fakeDatabase.allModifications takeRight 2
@@ -44,11 +44,11 @@ object BalanceCheckStoreTest extends TestSuite {
       assertAddBalanceCheck(addBc, newBalanceCheck)
     }
 
-    "Listens to Action.RemoveBalanceCheck" - async {
+    "Listens to Actions.RemoveBalanceCheck" - async {
       fakeDatabase.addRemotelyAddedEntities(testBalanceCheckWithId)
       val initialModifications = fakeDatabase.allModifications
 
-      await(fakeDispatcher.dispatch(Action.RemoveBalanceCheck(testBalanceCheckWithId)))
+      await(fakeDispatcher.dispatch(Actions.RemoveBalanceCheck(testBalanceCheckWithId)))
 
       fakeDatabase.allModifications.size - initialModifications.size ==> 1
       (fakeDatabase.allModifications takeRight 1) ==> Seq(

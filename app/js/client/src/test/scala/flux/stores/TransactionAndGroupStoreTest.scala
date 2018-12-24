@@ -25,9 +25,9 @@ object TransactionAndGroupStoreTest extends TestSuite {
 
     val transactionAndGroupStore = new TransactionAndGroupStore()
 
-    "Listens to Action.AddTransactionGroup" - async {
+    "Listens to Actions.AddTransactionGroup" - async {
       var groupId: Long = -1
-      await(fakeDispatcher.dispatch(Action.AddTransactionGroup(transactionsWithoutIdProvider = group => {
+      await(fakeDispatcher.dispatch(Actions.AddTransactionGroup(transactionsWithoutIdProvider = group => {
         groupId = group.id
         Seq(testTransactionWithId.copy(idOption = None, transactionGroupId = group.id))
       })))
@@ -48,13 +48,13 @@ object TransactionAndGroupStoreTest extends TestSuite {
       }
     }
 
-    "Listens to Action.UpdateTransactionGroup" - async {
+    "Listens to Actions.UpdateTransactionGroup" - async {
       fakeDatabase.addRemotelyAddedEntities(testTransactionGroupWithId)
       fakeDatabase.addRemotelyAddedEntities(testTransactionWithId)
       val initialModifications = fakeDatabase.allModifications
       await(
         fakeDispatcher.dispatch(
-          Action.UpdateTransactionGroup(
+          Actions.UpdateTransactionGroup(
             transactionGroupWithId = testTransactionGroupWithId,
             transactionsWithoutId = Seq(
               testTransactionWithIdB.copy(idOption = None)
@@ -73,11 +73,11 @@ object TransactionAndGroupStoreTest extends TestSuite {
       }
     }
 
-    "Listens to Action.RemoveTransactionGroup" - async {
+    "Listens to Actions.RemoveTransactionGroup" - async {
       fakeDatabase.addRemotelyAddedEntities(testTransactionGroupWithId)
       fakeDatabase.addRemotelyAddedEntities(testTransactionWithId)
       val initialModifications = fakeDatabase.allModifications
-      await(fakeDispatcher.dispatch(Action.RemoveTransactionGroup(testTransactionGroupWithId)))
+      await(fakeDispatcher.dispatch(Actions.RemoveTransactionGroup(testTransactionGroupWithId)))
 
       fakeDatabase.allModifications.size - initialModifications.size ==> 2
       val Seq(removeTransaction, removeGroup) = fakeDatabase.allModifications takeRight 2
