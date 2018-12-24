@@ -2,7 +2,8 @@ package models.accounting.config
 
 import models.access.DbQueryImplicits._
 import common.Require.requireNonNull
-import models.access.{EntityAccess, ModelField}
+import models.access.EntityAccess
+import models.access.ModelField
 import models.accounting.config.Account.SummaryTotalRowDef
 import models.user.User
 

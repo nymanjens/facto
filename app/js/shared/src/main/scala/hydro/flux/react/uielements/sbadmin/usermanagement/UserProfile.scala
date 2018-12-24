@@ -6,8 +6,7 @@ import flux.router.RouterContext
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
-final class UserProfile(implicit i18n: I18n,
-                        updatePasswordForm: UpdatePasswordForm) {
+final class UserProfile(implicit i18n: I18n, updatePasswordForm: UpdatePasswordForm) {
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)

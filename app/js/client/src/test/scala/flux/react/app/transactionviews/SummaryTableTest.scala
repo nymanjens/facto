@@ -3,16 +3,20 @@ package flux.react.app.transactionviews
 import java.time.Month._
 
 import common.GuavaReplacement.DoubleMath.roundToLong
-import common.money.{Currency, ReferenceMoney}
+import common.money.Currency
+import common.money.ReferenceMoney
 import common.testing.TestModule
 import common.testing.TestObjects._
 import common.time.LocalDateTimes.createDateTime
-import common.time.{DatedMonth, YearRange}
-import flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.{GainsForMonth, GainsForYear}
+import common.time.DatedMonth
+import common.time.YearRange
+import flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForMonth
+import flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForYear
 import flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
 import utest._
 
-import scala.collection.immutable.{ListMap, Seq}
+import scala.collection.immutable.ListMap
+import scala.collection.immutable.Seq
 import scala2js.Converters._
 
 object SummaryTableTest extends TestSuite {

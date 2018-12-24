@@ -1,12 +1,15 @@
 package models.money
 
-import common.money.{Currency, ExchangeRateManager}
+import common.money.Currency
+import common.money.ExchangeRateManager
 import common.time.LocalDateTime
 import models.access.JsEntityAccess
-import models.modification.{EntityModification, EntityType}
+import models.modification.EntityModification
+import models.modification.EntityType
 
 import scala.collection.immutable.Seq
-import scala.collection.{SortedMap, mutable}
+import scala.collection.SortedMap
+import scala.collection.mutable
 import scala2js.Converters._
 
 final class JsExchangeRateManager(

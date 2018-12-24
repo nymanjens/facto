@@ -2,10 +2,15 @@ package models.money
 
 import java.time.Duration
 
-import common.money.Currency.{Eur, Gbp, Usd}
-import common.testing.{FakeJsEntityAccess, TestModule}
-import common.time.{Clock, LocalDateTime}
-import utest.{TestSuite, _}
+import common.money.Currency.Eur
+import common.money.Currency.Gbp
+import common.money.Currency.Usd
+import common.testing.FakeJsEntityAccess
+import common.testing.TestModule
+import common.time.Clock
+import common.time.LocalDateTime
+import utest.TestSuite
+import utest._
 
 import scala.collection.SortedMap
 import scala2js.Converters._

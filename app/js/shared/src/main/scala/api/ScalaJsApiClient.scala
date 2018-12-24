@@ -10,7 +10,8 @@ import common.LoggingUtils.logExceptions
 import common.websocket.SerialWebsocketClientParallelizer
 import models.Entity
 import models.access.DbQuery
-import models.modification.{EntityModification, EntityType}
+import models.modification.EntityModification
+import models.modification.EntityType
 import models.modification.EntityModification
 import models.modification.EntityType
 import org.scalajs.dom

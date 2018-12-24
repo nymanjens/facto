@@ -1,6 +1,8 @@
 package flux.stores
 
-import flux.action.Action.{AddBalanceCheck, RemoveBalanceCheck, UpdateBalanceCheck}
+import flux.action.Action.AddBalanceCheck
+import flux.action.Action.RemoveBalanceCheck
+import flux.action.Action.UpdateBalanceCheck
 import flux.action.Dispatcher
 import models.access.JsEntityAccess
 import models.modification.EntityModification

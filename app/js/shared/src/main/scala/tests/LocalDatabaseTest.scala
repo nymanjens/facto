@@ -1,16 +1,23 @@
 package tests
 
 import common.testing.TestObjects._
-import models.access.SingletonKey.{NextUpdateTokenKey, VersionKey}
+import models.access.SingletonKey.NextUpdateTokenKey
+import models.access.SingletonKey.VersionKey
 import models.access.webworker.LocalDatabaseWebWorkerApi
-import models.access.{DbResultSet, LocalDatabase, LocalDatabaseImpl}
-import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
+import models.access.DbResultSet
+import models.access.LocalDatabase
+import models.access.LocalDatabaseImpl
+import models.accounting.BalanceCheck
+import models.accounting.Transaction
+import models.accounting.TransactionGroup
 import models.modification.EntityModification
 import models.money.ExchangeRateMeasurement
 import models.user.User
-import tests.ManualTests.{ManualTest, ManualTestSuite}
+import tests.ManualTests.ManualTest
+import tests.ManualTests.ManualTestSuite
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue

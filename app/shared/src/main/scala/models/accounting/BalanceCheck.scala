@@ -4,7 +4,8 @@ import common.money.DatedMoney
 import common.time.LocalDateTime
 import models.Entity
 import models.access.EntityAccess
-import models.accounting.config.{Config, MoneyReservoir}
+import models.accounting.config.Config
+import models.accounting.config.MoneyReservoir
 import models.user.User
 
 /** BalanceCheck entities are immutable. Just delete and create a new one when updating. */

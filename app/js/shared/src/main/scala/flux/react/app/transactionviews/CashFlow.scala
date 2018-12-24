@@ -4,11 +4,14 @@ import common.Formatting._
 import common.LoggingUtils.LogExceptionsCallback
 import common.money.ExchangeRateManager
 import common.time.Clock
-import common.{I18n, Unique}
-import flux.action.{Action, Dispatcher}
+import common.I18n
+import common.Unique
+import flux.action.Action
+import flux.action.Dispatcher
 import flux.react.ReactVdomUtils.<<
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
-import flux.react.router.{Page, RouterContext}
+import flux.react.router.Page
+import flux.react.router.RouterContext
 import flux.react.uielements
 import flux.stores.entries.CashFlowEntry
 import flux.stores.entries.factories.CashFlowEntriesStoreFactory
@@ -17,7 +20,8 @@ import japgolly.scalajs.react.vdom.VdomArray
 import japgolly.scalajs.react.vdom.html_<^._
 import models.access.EntityAccess
 import models.accounting.BalanceCheck
-import models.accounting.config.{Config, MoneyReservoir}
+import models.accounting.config.Config
+import models.accounting.config.MoneyReservoir
 import models.user.User
 
 import scala.collection.immutable.Seq

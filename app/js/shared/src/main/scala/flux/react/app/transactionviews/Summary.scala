@@ -1,7 +1,8 @@
 package flux.react.app.transactionviews
 
 import common.I18n
-import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
+import common.LoggingUtils.LogExceptionsCallback
+import common.LoggingUtils.logExceptions
 import common.money.ExchangeRateManager
 import common.time.Clock
 import flux.react.router.RouterContext

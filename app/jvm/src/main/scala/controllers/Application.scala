@@ -6,7 +6,8 @@ import com.google.inject.Inject
 import common.time.Clock
 import controllers.helpers.AuthenticatedAction
 import models.access.JvmEntityAccess
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
+import play.api.i18n.MessagesApi
 import play.api.mvc._
 
 final class Application @Inject()(implicit override val messagesApi: MessagesApi,

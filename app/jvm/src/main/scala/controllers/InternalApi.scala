@@ -4,9 +4,14 @@ import java.nio.ByteBuffer
 
 import akka.stream.scaladsl._
 import api.Picklers._
-import api.ScalaJsApi.{ModificationsWithToken, UpdateToken, UserPrototype}
-import api.{PicklableDbQuery, ScalaJsApiRequest, ScalaJsApiServerFactory}
-import api.UpdateTokens.{toInstant, toUpdateToken}
+import api.ScalaJsApi.ModificationsWithToken
+import api.ScalaJsApi.UpdateToken
+import api.ScalaJsApi.UserPrototype
+import api.PicklableDbQuery
+import api.ScalaJsApiRequest
+import api.ScalaJsApiServerFactory
+import api.UpdateTokens.toInstant
+import api.UpdateTokens.toUpdateToken
 import boopickle.Default._
 import com.google.inject.Inject
 import common.publisher.Publishers
@@ -14,11 +19,15 @@ import common.time.Clock
 import controllers.helpers.AuthenticatedAction
 import models.Entity
 import models.access.JvmEntityAccess
-import models.modification.{EntityModification, EntityModificationEntity, EntityType}
+import models.modification.EntityModification
+import models.modification.EntityModificationEntity
+import models.modification.EntityType
 import models.slick.SlickUtils.dbApi._
-import models.slick.SlickUtils.{dbRun, instantToSqlTimestampMapper}
+import models.slick.SlickUtils.dbRun
+import models.slick.SlickUtils.instantToSqlTimestampMapper
 import models.user.User
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
+import play.api.i18n.MessagesApi
 import play.api.mvc._
 
 import scala.collection.immutable.Seq

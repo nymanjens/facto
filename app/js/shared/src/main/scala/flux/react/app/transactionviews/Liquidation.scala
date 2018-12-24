@@ -3,18 +3,22 @@ package flux.react.app.transactionviews
 import common.Formatting._
 import common.money.ExchangeRateManager
 import common.time.Clock
-import common.{I18n, Unique}
+import common.I18n
+import common.Unique
 import flux.react.ReactVdomUtils.^^
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import flux.react.router.Page.NewForLiquidationSimplification
-import flux.react.router.{Page, RouterContext}
+import flux.react.router.Page
+import flux.react.router.RouterContext
 import flux.react.uielements
 import flux.stores.entries.factories.LiquidationEntriesStoreFactory
-import flux.stores.entries.{AccountPair, LiquidationEntry}
+import flux.stores.entries.AccountPair
+import flux.stores.entries.LiquidationEntry
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import models.access.EntityAccess
-import models.accounting.config.{Account, Config}
+import models.accounting.config.Account
+import models.accounting.config.Config
 import models.user.User
 
 import scala.collection.immutable.Seq

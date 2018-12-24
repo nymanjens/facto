@@ -2,32 +2,40 @@ package flux.react.app.transactionviews
 
 import common.CollectionUtils.ifThenSeq
 import common.I18n
-import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
+import common.LoggingUtils.LogExceptionsCallback
+import common.LoggingUtils.logExceptions
 import common.ScalaUtils.visibleForTesting
 import common.accounting.Tags
-import common.money.{Currency, ExchangeRateManager, ReferenceMoney}
-import common.time.{Clock, DatedMonth, YearRange}
+import common.money.Currency
+import common.money.ExchangeRateManager
+import common.money.ReferenceMoney
+import common.time.Clock
+import common.time.DatedMonth
+import common.time.YearRange
 import flux.react.ReactVdomUtils._
-import flux.react.router.{Page, RouterContext}
+import flux.react.router.Page
+import flux.react.router.RouterContext
 import flux.react.uielements
 import flux.stores.StateStore
 import flux.stores.entries._
 import flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForYear
-import flux.stores.entries.factories.SummaryForYearStoreFactory.{SummaryCell, SummaryForYear}
-import flux.stores.entries.factories.{
-  CashFlowEntriesStoreFactory,
-  SummaryExchangeRateGainsStoreFactory,
-  SummaryForYearStoreFactory,
-  SummaryYearsStoreFactory
-}
+import flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryCell
+import flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
+import flux.stores.entries.factories.CashFlowEntriesStoreFactory
+import flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory
+import flux.stores.entries.factories.SummaryForYearStoreFactory
+import flux.stores.entries.factories.SummaryYearsStoreFactory
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import models.access.EntityAccess
 import models.accounting.config.Account.SummaryTotalRowDef
-import models.accounting.config.{Account, Category, Config}
+import models.accounting.config.Account
+import models.accounting.config.Category
+import models.accounting.config.Config
 import models.user.User
 
-import scala.collection.immutable.{ListMap, Seq}
+import scala.collection.immutable.ListMap
+import scala.collection.immutable.Seq
 import scala.collection.mutable
 
 private[transactionviews] final class SummaryTable(

@@ -1,15 +1,22 @@
 package flux.stores.entries.factories
 
 import common.GuavaReplacement.Iterables.getOnlyElement
-import common.money.{ExchangeRateManager, ReferenceMoney}
+import common.money.ExchangeRateManager
+import common.money.ReferenceMoney
 import flux.stores.entries.WithIsPending.isAnyPending
 import flux.stores.entries._
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, JsEntityAccess, ModelField}
-import models.accounting.config.{Account, Config, MoneyReservoir}
-import models.accounting.{BalanceCheck, Transaction}
+import models.access.DbQuery
+import models.access.JsEntityAccess
+import models.access.ModelField
+import models.accounting.config.Account
+import models.accounting.config.Config
+import models.accounting.config.MoneyReservoir
+import models.accounting.BalanceCheck
+import models.accounting.Transaction
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue

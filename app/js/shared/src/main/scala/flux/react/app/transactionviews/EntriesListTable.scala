@@ -1,7 +1,9 @@
 package flux.react.app.transactionviews
 
-import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
-import common.{I18n, Unique}
+import common.LoggingUtils.LogExceptionsCallback
+import common.LoggingUtils.logExceptions
+import common.I18n
+import common.Unique
 import flux.react.ReactVdomUtils.<<
 import flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import flux.react.uielements
@@ -9,8 +11,10 @@ import flux.react.uielements.Table.TableRowData
 import flux.stores.StateStore
 import flux.stores.entries.WithIsPending
 import flux.stores.entries.factories.EntriesListStoreFactory
-import japgolly.scalajs.react.vdom.html_<^.{VdomElement, _}
-import japgolly.scalajs.react.{Callback, _}
+import japgolly.scalajs.react.vdom.html_<^.VdomElement
+import japgolly.scalajs.react.vdom.html_<^._
+import japgolly.scalajs.react.Callback
+import japgolly.scalajs.react._
 import org.scalajs.dom.console
 
 import scala.collection.immutable.Seq

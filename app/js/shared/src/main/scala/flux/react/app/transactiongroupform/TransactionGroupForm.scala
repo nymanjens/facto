@@ -1,28 +1,39 @@
 package flux.react.app.transactiongroupform
 
 import common.I18n
-import common.LoggingUtils.{LogExceptionsCallback, LogExceptionsFuture, logExceptions}
-import common.money.{Currency, ExchangeRateManager, ReferenceMoney}
+import common.LoggingUtils.LogExceptionsCallback
+import common.LoggingUtils.LogExceptionsFuture
+import common.LoggingUtils.logExceptions
+import common.money.Currency
+import common.money.ExchangeRateManager
+import common.money.ReferenceMoney
 import common.time.Clock
 import common.time.JavaTimeImplicits._
-import flux.action.{Action, Dispatcher}
-import flux.react.ReactVdomUtils.{<<, ^^}
+import flux.action.Action
+import flux.action.Dispatcher
+import flux.react.ReactVdomUtils.<<
+import flux.react.ReactVdomUtils.^^
 import flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
 import flux.react.app.transactionviews
 import flux.react.app.transactionviews.Liquidation
 import flux.react.router.RouterContext
 import flux.react.uielements
-import flux.stores.entries.{AccountPair, LiquidationEntry}
-import flux.stores.entries.factories.{EntriesListStoreFactory, LiquidationEntriesStoreFactory}
+import flux.stores.entries.AccountPair
+import flux.stores.entries.LiquidationEntry
+import flux.stores.entries.factories.EntriesListStoreFactory
+import flux.stores.entries.factories.LiquidationEntriesStoreFactory
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.Path
 import japgolly.scalajs.react.vdom.html_<^._
 import models.access.EntityAccess
-import models.accounting.config.{Account, Config}
-import models.accounting.{Transaction, TransactionGroup}
+import models.accounting.config.Account
+import models.accounting.config.Config
+import models.accounting.Transaction
+import models.accounting.TransactionGroup
 import models.user.User
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.concurrent.Future

@@ -1,20 +1,24 @@
 package flux.react.app
 
 import common.I18n
-import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
+import common.LoggingUtils.LogExceptionsCallback
+import common.LoggingUtils.logExceptions
 import common.money.ExchangeRateManager
 import common.time.Clock
-import flux.react.ReactVdomUtils.{<<, ^^}
+import flux.react.ReactVdomUtils.<<
+import flux.react.ReactVdomUtils.^^
 import flux.react.ReactVdomUtils.^^
 import flux.react.common.HydroReactComponent
-import flux.react.router.{Page, RouterContext}
+import flux.react.router.Page
+import flux.react.router.RouterContext
 import flux.react.uielements
 import flux.stores.entries.factories.AllEntriesStoreFactory
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import jsfacades.Mousetrap
 import models.access.EntityAccess
-import models.accounting.config.{Config, Template}
+import models.accounting.config.Config
+import models.accounting.config.Template
 import models.user.User
 
 import scala.collection.immutable.Seq

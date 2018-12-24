@@ -6,9 +6,11 @@ import models.access.DbQueryImplicits._
 import models.access._
 import models.access.webworker.LocalDatabaseWebWorkerApi
 import models.accounting.Transaction
-import tests.ManualTests.{ManualTest, ManualTestSuite}
+import tests.ManualTests.ManualTest
+import tests.ManualTests.ManualTestSuite
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.language.reflectiveCalls

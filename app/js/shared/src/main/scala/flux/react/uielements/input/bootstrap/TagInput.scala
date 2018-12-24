@@ -2,10 +2,12 @@ package flux.react.uielements.input.bootstrap
 
 import common.I18n
 import common.LoggingUtils.logExceptions
-import flux.react.ReactVdomUtils.{<<, ^^}
-import flux.react.uielements.input.{InputBase, InputValidator}
+import flux.react.ReactVdomUtils.<<
+import flux.react.ReactVdomUtils.^^
+import flux.react.uielements.input.InputBase
+import flux.react.uielements.input.InputValidator
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.component.Scala.{MountedImpure}
+import japgolly.scalajs.react.component.Scala.MountedImpure
 import japgolly.scalajs.react.Ref.ToScalaComponent
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom.html_<^._

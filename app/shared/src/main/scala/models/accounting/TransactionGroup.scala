@@ -1,10 +1,13 @@
 package models.accounting
 
-import common.money.{ExchangeRateManager, ReferenceMoney}
+import common.money.ExchangeRateManager
+import common.money.ReferenceMoney
 import common.time.LocalDateTime
 import models.Entity
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, EntityAccess, ModelField}
+import models.access.DbQuery
+import models.access.EntityAccess
+import models.access.ModelField
 import models.accounting.config.Config
 
 import scala.collection.immutable.Seq

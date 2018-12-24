@@ -6,7 +6,8 @@ import common.money.Currency
 import common.time.LocalDateTime
 import models.Entity
 import models.accounting.config.Config
-import models.modification.{EntityModification, EntityType}
+import models.modification.EntityModification
+import models.modification.EntityType
 import models.user.User
 
 import scala.collection.SortedMap

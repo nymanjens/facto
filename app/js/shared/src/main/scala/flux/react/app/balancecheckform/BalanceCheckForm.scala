@@ -1,25 +1,31 @@
 package flux.react.app.balancecheckform
 
 import common.I18n
-import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
+import common.LoggingUtils.LogExceptionsCallback
+import common.LoggingUtils.logExceptions
 import common.money.ExchangeRateManager
-import common.time.{Clock, LocalDateTime}
-import flux.action.{Action, Dispatcher}
+import common.time.Clock
+import common.time.LocalDateTime
+import flux.action.Action
+import flux.action.Dispatcher
 import flux.react.ReactVdomUtils.<<
 import flux.react.router.RouterContext
 import flux.react.uielements
 import flux.react.uielements.HalfPanel
 import flux.react.uielements.input.bootstrap.MoneyInput
-import flux.react.uielements.input.{MappedInput, bootstrap}
+import flux.react.uielements.input.MappedInput
+import flux.react.uielements.input.bootstrap
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.Path
 import japgolly.scalajs.react.vdom.html_<^._
 import models.access.EntityAccess
 import models.accounting.BalanceCheck
-import models.accounting.config.{Config, MoneyReservoir}
+import models.accounting.config.Config
+import models.accounting.config.MoneyReservoir
 import models.user.User
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 

@@ -3,7 +3,9 @@ package flux.router
 import common.I18n
 import japgolly.scalajs.react.extra.router.Path
 import models.accounting.BalanceCheck
-import models.accounting.config.{Account, MoneyReservoir, Template}
+import models.accounting.config.Account
+import models.accounting.config.MoneyReservoir
+import models.accounting.config.Template
 
 import scala.scalajs.js
 

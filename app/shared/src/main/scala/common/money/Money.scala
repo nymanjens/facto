@@ -5,7 +5,8 @@ import java.lang.Math.abs
 import common.GuavaReplacement.DoubleMath.roundToLong
 import common.time.LocalDateTime
 
-import scala.util.{Failure, Try}
+import scala.util.Failure
+import scala.util.Try
 
 /**
   * Base class for any type that represents an amount of money.

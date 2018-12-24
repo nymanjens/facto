@@ -3,8 +3,11 @@ package common.time
 import java.time.LocalDate
 import java.time.Month._
 
-import com.google.inject.{Guice, Inject}
-import common.testing.{TestModule, FakeI18n, HookedSpecification}
+import com.google.inject.Guice
+import com.google.inject.Inject
+import common.testing.TestModule
+import common.testing.FakeI18n
+import common.testing.HookedSpecification
 import common.time.LocalDateTimes.createDateTime
 
 class DatedMonthTest extends HookedSpecification {

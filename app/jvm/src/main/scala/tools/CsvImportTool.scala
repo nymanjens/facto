@@ -7,9 +7,13 @@ import com.google.common.base.Splitter
 import com.google.inject.Inject
 import common.ResourceFiles
 import common.money.Money
-import common.time.{Clock, LocalDateTime, LocalDateTimes}
+import common.time.Clock
+import common.time.LocalDateTime
+import common.time.LocalDateTimes
 import models.access.JvmEntityAccess
-import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
+import models.accounting.BalanceCheck
+import models.accounting.Transaction
+import models.accounting.TransactionGroup
 import models.modification.EntityModification
 import models.user.User
 

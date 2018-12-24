@@ -1,8 +1,10 @@
 package flux.react.uielements.input
 
-import java.time.Month.{APRIL, MAY}
+import java.time.Month.APRIL
+import java.time.Month.MAY
 
-import common.testing.{ReactTestWrapper, TestModule}
+import common.testing.ReactTestWrapper
+import common.testing.TestModule
 import common.time.LocalDateTime
 import common.time.LocalDateTimes.createDateTime
 import japgolly.scalajs.react.test.ReactTestUtils

@@ -4,10 +4,13 @@ import models.access.DbQueryImplicits._
 import java.time.Month._
 
 import common.testing.TestObjects._
-import common.testing.{FakeJsEntityAccess, TestModule}
+import common.testing.FakeJsEntityAccess
+import common.testing.TestModule
 import flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForYear
 import flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
-import flux.stores.entries.{AccountPair, ComplexQueryFilter, EntriesStore}
+import flux.stores.entries.AccountPair
+import flux.stores.entries.ComplexQueryFilter
+import flux.stores.entries.EntriesStore
 import models.Entity
 import models.access.ModelField
 import models.accounting._
@@ -15,8 +18,10 @@ import models.modification.EntityModification._
 import models.modification._
 import utest._
 
-import scala.async.Async.{async, await}
-import scala.collection.immutable.{ListMap, Seq}
+import scala.async.Async.async
+import scala.async.Async.await
+import scala.collection.immutable.ListMap
+import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._

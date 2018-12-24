@@ -5,7 +5,8 @@ import common.money.ExchangeRateManager
 import common.time.Clock
 import flux.action.Dispatcher
 import flux.stores.GlobalMessagesStore
-import flux.stores.entries.factories.{LiquidationEntriesStoreFactory, TagsStoreFactory}
+import flux.stores.entries.factories.LiquidationEntriesStoreFactory
+import flux.stores.entries.factories.TagsStoreFactory
 import models.access.JsEntityAccess
 import models.accounting.config.Config
 import models.user.User

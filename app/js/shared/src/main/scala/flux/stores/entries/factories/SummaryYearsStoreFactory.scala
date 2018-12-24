@@ -4,11 +4,15 @@ import common.time.YearRange
 import flux.stores.entries.EntriesStore
 import flux.stores.entries.factories.SummaryYearsStoreFactory.State
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, JsEntityAccess, ModelField}
+import models.access.DbQuery
+import models.access.JsEntityAccess
+import models.access.ModelField
 import models.accounting.config.Account
-import models.accounting.{BalanceCheck, Transaction}
+import models.accounting.BalanceCheck
+import models.accounting.Transaction
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue

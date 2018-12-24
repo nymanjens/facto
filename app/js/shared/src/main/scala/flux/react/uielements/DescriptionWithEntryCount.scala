@@ -1,7 +1,8 @@
 package flux.react.uielements
 
 import common.accounting.Tags
-import flux.react.ReactVdomUtils.{<<, ^^}
+import flux.react.ReactVdomUtils.<<
+import flux.react.ReactVdomUtils.^^
 import flux.stores.entries.GroupedTransactions
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._

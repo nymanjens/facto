@@ -3,17 +3,21 @@ package flux.stores.entries.factories
 import java.time.Duration
 import java.time.Month.JANUARY
 
-import common.money.{Currency, MoneyWithGeneralCurrency}
+import common.money.Currency
+import common.money.MoneyWithGeneralCurrency
 import common.testing.TestObjects._
-import common.testing.{FakeJsEntityAccess, TestModule}
+import common.testing.FakeJsEntityAccess
+import common.testing.TestModule
 import common.time.LocalDateTimes.createDateTime
-import flux.stores.entries.CashFlowEntry.{BalanceCorrection, RegularEntry}
+import flux.stores.entries.CashFlowEntry.BalanceCorrection
+import flux.stores.entries.CashFlowEntry.RegularEntry
 import models.accounting._
 import models.accounting.config.MoneyReservoir
 import models.modification.EntityModification
 import utest._
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue

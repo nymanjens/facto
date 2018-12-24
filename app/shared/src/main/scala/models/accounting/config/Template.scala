@@ -2,14 +2,14 @@ package models.accounting.config
 
 import models.access.DbQueryImplicits._
 import common.Require.requireNonNull
-import models.access.{EntityAccess, ModelField}
-import models.accounting.{
-  Transaction => AccountingTransaction,
-  TransactionGroup => AccountingTransactionGroup
-}
+import models.access.EntityAccess
+import models.access.ModelField
+import models.accounting.{Transaction => AccountingTransaction}
+import models.accounting.{TransactionGroup => AccountingTransactionGroup}
 import models.user.User
 
-import scala.collection.immutable.{Seq, Set}
+import scala.collection.immutable.Seq
+import scala.collection.immutable.Set
 
 // Every field ending with "Tpl" may contain $-prefixed placeholders.
 // Example: descriptionTpl = "Endowment for ${account.longName}"

@@ -1,17 +1,26 @@
 package flux.stores.entries.factories
 
-import common.money.{ExchangeRateManager, MoneyWithGeneralCurrency}
+import common.money.ExchangeRateManager
+import common.money.MoneyWithGeneralCurrency
 import common.time.JavaTimeImplicits._
 import common.time.LocalDateTime
-import flux.stores.entries.CashFlowEntry.{BalanceCorrection, RegularEntry}
-import flux.stores.entries.WithIsPending.{isAnyPending, isPending}
-import flux.stores.entries.{CashFlowEntry, WithIsPending}
+import flux.stores.entries.CashFlowEntry.BalanceCorrection
+import flux.stores.entries.CashFlowEntry.RegularEntry
+import flux.stores.entries.WithIsPending.isAnyPending
+import flux.stores.entries.WithIsPending.isPending
+import flux.stores.entries.CashFlowEntry
+import flux.stores.entries.WithIsPending
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, JsEntityAccess, ModelField}
-import models.accounting.config.{Config, MoneyReservoir}
-import models.accounting.{Transaction, _}
+import models.access.DbQuery
+import models.access.JsEntityAccess
+import models.access.ModelField
+import models.accounting.config.Config
+import models.accounting.config.MoneyReservoir
+import models.accounting.Transaction
+import models.accounting._
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._

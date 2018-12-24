@@ -1,6 +1,7 @@
 package scala2js
 
-import java.time.{LocalDate, LocalTime}
+import java.time.LocalDate
+import java.time.LocalTime
 
 import common.GuavaReplacement.ImmutableBiMap
 import common.time.LocalDateTime
@@ -10,7 +11,8 @@ import models.accounting._
 import models.modification._
 import models.money.ExchangeRateMeasurement
 import models.user.User
-import scala2js.Scala2Js.{Converter, MapConverter}
+import scala2js.Scala2Js.Converter
+import scala2js.Scala2Js.MapConverter
 
 import scala.collection.immutable.Seq
 import scala.scalajs.js

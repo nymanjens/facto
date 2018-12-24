@@ -4,10 +4,13 @@ import common.GuavaReplacement.ImmutableSetMultimap
 import flux.stores.entries.EntriesStore
 import flux.stores.entries.factories.TagsStoreFactory.State
 import models.access.DbQueryImplicits._
-import models.access.{JsEntityAccess, ModelField}
-import models.accounting.{BalanceCheck, Transaction}
+import models.access.JsEntityAccess
+import models.access.ModelField
+import models.accounting.BalanceCheck
+import models.accounting.Transaction
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._

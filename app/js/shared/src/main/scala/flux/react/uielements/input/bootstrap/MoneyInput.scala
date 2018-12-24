@@ -2,9 +2,13 @@ package flux.react.uielements.input.bootstrap
 
 import common.GuavaReplacement.Splitter
 import common.LoggingUtils.LogExceptionsCallback
-import common.{I18n, LoggingUtils}
+import common.I18n
+import common.LoggingUtils
 import common.ScalaUtils.visibleForTesting
-import common.money.{Currency, DatedMoney, ExchangeRateManager, Money}
+import common.money.Currency
+import common.money.DatedMoney
+import common.money.ExchangeRateManager
+import common.money.Money
 import common.time.LocalDateTime
 import flux.react.ReactVdomUtils.^^
 import flux.react.uielements.input.InputBase

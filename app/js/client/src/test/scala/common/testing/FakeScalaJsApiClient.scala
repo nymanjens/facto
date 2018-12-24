@@ -1,12 +1,16 @@
 package common.testing
 
-import api.ScalaJsApi.{GetAllEntitiesResponse, UserPrototype}
+import api.ScalaJsApi.GetAllEntitiesResponse
+import api.ScalaJsApi.UserPrototype
 import api.ScalaJsApiClient
 import models.Entity
-import models.access.{DbQuery, DbQueryExecutor}
-import models.modification.{EntityModification, EntityType}
+import models.access.DbQuery
+import models.access.DbQueryExecutor
+import models.modification.EntityModification
+import models.modification.EntityType
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.concurrent.Future

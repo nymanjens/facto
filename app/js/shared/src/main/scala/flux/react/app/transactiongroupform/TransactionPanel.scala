@@ -1,28 +1,47 @@
 package flux.react.app.transactiongroupform
 import java.util.NoSuchElementException
 
-import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
+import common.LoggingUtils.LogExceptionsCallback
+import common.LoggingUtils.logExceptions
 import common.accounting.Tags
-import common.money.{Currency, DatedMoney, ExchangeRateManager, ReferenceMoney}
-import common.time.{Clock, LocalDateTime, LocalDateTimes}
-import common.{I18n, SinglePendingTaskQueue}
+import common.money.Currency
+import common.money.DatedMoney
+import common.money.ExchangeRateManager
+import common.money.ReferenceMoney
+import common.time.Clock
+import common.time.LocalDateTime
+import common.time.LocalDateTimes
+import common.I18n
+import common.SinglePendingTaskQueue
 import flux.react.ReactVdomUtils.<<
 import flux.react.uielements.HalfPanel
-import flux.react.uielements.input.bootstrap.{MoneyInput, SelectInput, TextAreaInput, TextInput}
-import flux.react.uielements.input.{InputBase, InputWithDefaultFromReference, MappedInput, bootstrap}
+import flux.react.uielements.input.bootstrap.MoneyInput
+import flux.react.uielements.input.bootstrap.SelectInput
+import flux.react.uielements.input.bootstrap.TextAreaInput
+import flux.react.uielements.input.bootstrap.TextInput
+import flux.react.uielements.input.InputBase
+import flux.react.uielements.input.InputWithDefaultFromReference
+import flux.react.uielements.input.MappedInput
+import flux.react.uielements.input.bootstrap
 import flux.stores.entries.factories.TagsStoreFactory
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.component.Scala.{MountedImpure}
+import japgolly.scalajs.react.component.Scala.MountedImpure
 import japgolly.scalajs.react.Ref.ToScalaComponent
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom.html_<^._
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, JsEntityAccess, ModelField}
+import models.access.DbQuery
+import models.access.JsEntityAccess
+import models.access.ModelField
 import models.accounting.Transaction
-import models.accounting.config.{Account, Category, Config, MoneyReservoir}
+import models.accounting.config.Account
+import models.accounting.config.Category
+import models.accounting.config.Config
+import models.accounting.config.MoneyReservoir
 import models.user.User
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._

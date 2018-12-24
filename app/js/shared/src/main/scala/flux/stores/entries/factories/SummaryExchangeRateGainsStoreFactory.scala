@@ -1,21 +1,31 @@
 package flux.stores.entries.factories
 
-import common.money.{Currency, ExchangeRateManager, MoneyWithGeneralCurrency, ReferenceMoney}
+import common.money.Currency
+import common.money.ExchangeRateManager
+import common.money.MoneyWithGeneralCurrency
+import common.money.ReferenceMoney
 import common.time.JavaTimeImplicits._
-import common.time.{DatedMonth, LocalDateTime}
-import flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.{
-  DateToBalanceFunction,
-  GainsForMonth,
-  GainsForYear
-}
-import flux.stores.entries.{ComplexQueryFilter, EntriesStore}
+import common.time.DatedMonth
+import common.time.LocalDateTime
+import flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.DateToBalanceFunction
+import flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForMonth
+import flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForYear
+import flux.stores.entries.ComplexQueryFilter
+import flux.stores.entries.EntriesStore
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, JsEntityAccess, ModelField}
-import models.accounting.config.{Account, Config, MoneyReservoir}
-import models.accounting.{BalanceCheck, Transaction}
+import models.access.DbQuery
+import models.access.JsEntityAccess
+import models.access.ModelField
+import models.accounting.config.Account
+import models.accounting.config.Config
+import models.accounting.config.MoneyReservoir
+import models.accounting.BalanceCheck
+import models.accounting.Transaction
 
-import scala.async.Async.{async, await}
-import scala.collection.immutable.{Seq, SortedMap}
+import scala.async.Async.async
+import scala.async.Async.await
+import scala.collection.immutable.Seq
+import scala.collection.immutable.SortedMap
 import scala.collection.mutable
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue

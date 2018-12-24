@@ -1,7 +1,9 @@
 package flux.stores.entries
 
-import common.testing.TestObjects.{testCategory, _}
-import flux.stores.entries.ComplexQueryFilter.{Prefix, QueryPart}
+import common.testing.TestObjects.testCategory
+import common.testing.TestObjects._
+import flux.stores.entries.ComplexQueryFilter.Prefix
+import flux.stores.entries.ComplexQueryFilter.QueryPart
 import models.access.EntityAccess
 import models.accounting.Transaction
 import utest._

@@ -5,7 +5,8 @@ import models.access.EntityAccess
 import models.accounting.config.MoneyReservoir.NullMoneyReservoir
 import models.user.User
 
-import scala.collection.immutable.{ListMap, Seq}
+import scala.collection.immutable.ListMap
+import scala.collection.immutable.Seq
 
 /**
   * Contains the accountin configuration of this application. This is assumed to remain constant.

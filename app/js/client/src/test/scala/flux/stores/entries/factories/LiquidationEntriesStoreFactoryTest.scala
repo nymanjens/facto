@@ -4,15 +4,19 @@ import java.time.Month.JANUARY
 
 import common.money.ReferenceMoney
 import common.testing.TestObjects._
-import common.testing.{FakeJsEntityAccess, TestModule}
+import common.testing.FakeJsEntityAccess
+import common.testing.TestModule
 import common.time.LocalDateTimes.createDateTime
-import flux.stores.entries.{AccountPair, LiquidationEntry}
+import flux.stores.entries.AccountPair
+import flux.stores.entries.LiquidationEntry
 import models.accounting._
-import models.accounting.config.{Account, MoneyReservoir}
+import models.accounting.config.Account
+import models.accounting.config.MoneyReservoir
 import models.modification.EntityModification
 import utest._
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue

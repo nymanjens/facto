@@ -8,17 +8,16 @@ import common.Require.requireNonNull
 import common.ScalaUtils.nullable
 import models.accounting.config.Account.{SummaryTotalRowDef => ParsedSummaryTotalRowDef}
 import models.accounting.config.MoneyReservoir.NullMoneyReservoir
-import models.accounting.config.{
-  Account => ParsedAccount,
-  Category => ParsedCategory,
-  Config => ParsedConfig,
-  Constants => ParsedConstants,
-  MoneyReservoir => ParsedMoneyReservoir,
-  Template => ParsedTemplate
-}
+import models.accounting.config.{Account => ParsedAccount}
+import models.accounting.config.{Category => ParsedCategory}
+import models.accounting.config.{Config => ParsedConfig}
+import models.accounting.config.{Constants => ParsedConstants}
+import models.accounting.config.{MoneyReservoir => ParsedMoneyReservoir}
+import models.accounting.config.{Template => ParsedTemplate}
 
 import scala.collection.JavaConverters._
-import scala.collection.immutable.{ListMap, Seq}
+import scala.collection.immutable.ListMap
+import scala.collection.immutable.Seq
 
 object Parsable {
 

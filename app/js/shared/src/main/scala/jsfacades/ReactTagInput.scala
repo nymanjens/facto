@@ -1,6 +1,7 @@
 package jsfacades
 
-import japgolly.scalajs.react.{Children, JsComponent}
+import japgolly.scalajs.react.Children
+import japgolly.scalajs.react.JsComponent
 import org.scalajs.dom.ext.KeyCode
 
 import scala.collection.immutable.Seq

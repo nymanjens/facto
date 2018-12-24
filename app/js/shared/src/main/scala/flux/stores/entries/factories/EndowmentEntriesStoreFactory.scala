@@ -2,11 +2,16 @@ package flux.stores.entries.factories
 
 import flux.stores.entries.GeneralEntry
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, JsEntityAccess, ModelField}
-import models.accounting.config.{Account, Config}
-import models.accounting.{BalanceCheck, Transaction}
+import models.access.DbQuery
+import models.access.JsEntityAccess
+import models.access.ModelField
+import models.accounting.config.Account
+import models.accounting.config.Config
+import models.accounting.BalanceCheck
+import models.accounting.Transaction
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._

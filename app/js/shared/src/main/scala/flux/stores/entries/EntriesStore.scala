@@ -2,8 +2,10 @@ package flux.stores.entries
 
 import flux.stores.AsyncEntityDerivedStateStore
 import models.access.JsEntityAccess
-import models.accounting.{BalanceCheck, Transaction}
-import models.modification.{EntityModification, EntityType}
+import models.accounting.BalanceCheck
+import models.accounting.Transaction
+import models.modification.EntityModification
+import models.modification.EntityType
 
 /**
   * Abstract base class for a store with transaction-derived entries.

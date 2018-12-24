@@ -1,7 +1,9 @@
 package flux.action
 
 import api.ScalaJsApi.UserPrototype
-import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
+import models.accounting.BalanceCheck
+import models.accounting.Transaction
+import models.accounting.TransactionGroup
 
 import scala.collection.immutable.Seq
 

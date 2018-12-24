@@ -1,15 +1,24 @@
 package flux.stores.entries.factories
 
-import common.money.{ExchangeRateManager, ReferenceMoney}
-import common.time.{DatedMonth, LocalDateTime}
+import common.money.ExchangeRateManager
+import common.money.ReferenceMoney
+import common.time.DatedMonth
+import common.time.LocalDateTime
 import flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
-import flux.stores.entries.{ComplexQueryFilter, EntriesStore}
+import flux.stores.entries.ComplexQueryFilter
+import flux.stores.entries.EntriesStore
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, JsEntityAccess, ModelField}
-import models.accounting.config.{Account, Category, Config}
-import models.accounting.{BalanceCheck, Transaction}
+import models.access.DbQuery
+import models.access.JsEntityAccess
+import models.access.ModelField
+import models.accounting.config.Account
+import models.accounting.config.Category
+import models.accounting.config.Config
+import models.accounting.BalanceCheck
+import models.accounting.Transaction
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._

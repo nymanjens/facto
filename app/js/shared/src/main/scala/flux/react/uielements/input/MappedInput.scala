@@ -1,10 +1,12 @@
 package flux.react.uielements.input
 
-import common.LoggingUtils.{LogExceptionsCallback, logExceptions}
-import common.time.{LocalDateTime, TimeUtils}
+import common.LoggingUtils.LogExceptionsCallback
+import common.LoggingUtils.logExceptions
+import common.time.LocalDateTime
+import common.time.TimeUtils
 import flux.react.uielements.input.MappedInput.ValueTransformer
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.component.Scala.{MountedImpure}
+import japgolly.scalajs.react.component.Scala.MountedImpure
 import japgolly.scalajs.react.Ref.ToScalaComponent
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom._

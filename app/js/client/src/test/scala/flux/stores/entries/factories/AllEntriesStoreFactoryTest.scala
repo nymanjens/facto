@@ -3,7 +3,8 @@ package flux.stores.entries.factories
 import java.time.Month.JANUARY
 
 import common.testing.TestObjects._
-import common.testing.{Awaiter, FakeJsEntityAccess}
+import common.testing.Awaiter
+import common.testing.FakeJsEntityAccess
 import common.time.LocalDateTime
 import common.time.LocalDateTimes.createDateTime
 import flux.stores.entries.GeneralEntry.toGeneralEntrySeq
@@ -11,7 +12,8 @@ import models.accounting._
 import models.modification.EntityModification
 import utest._
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala2js.Converters._

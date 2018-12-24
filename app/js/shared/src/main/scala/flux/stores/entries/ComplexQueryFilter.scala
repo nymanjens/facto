@@ -3,9 +3,13 @@ package flux.stores.entries
 import common.GuavaReplacement.Splitter
 import common.ScalaUtils.visibleForTesting
 import common.money.Money
-import flux.stores.entries.ComplexQueryFilter.{Prefix, QueryFilterPair, QueryPart}
+import flux.stores.entries.ComplexQueryFilter.Prefix
+import flux.stores.entries.ComplexQueryFilter.QueryFilterPair
+import flux.stores.entries.ComplexQueryFilter.QueryPart
 import models.access.DbQueryImplicits._
-import models.access.{DbQuery, JsEntityAccess, ModelField}
+import models.access.DbQuery
+import models.access.JsEntityAccess
+import models.access.ModelField
 import models.accounting._
 import models.accounting.config.Config
 

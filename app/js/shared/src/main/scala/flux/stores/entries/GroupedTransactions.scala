@@ -1,11 +1,16 @@
 package flux.stores.entries
 
-import common.money.{ExchangeRateManager, Money, MoneyWithGeneralCurrency}
+import common.money.ExchangeRateManager
+import common.money.Money
+import common.money.MoneyWithGeneralCurrency
 import common.time.JavaTimeImplicits._
 import common.time.LocalDateTime
 import models.access.EntityAccess
 import models.accounting.Transaction
-import models.accounting.config.{Account, Category, Config, MoneyReservoir}
+import models.accounting.config.Account
+import models.accounting.config.Category
+import models.accounting.config.Config
+import models.accounting.config.MoneyReservoir
 import models.user.User
 
 import scala.annotation.tailrec

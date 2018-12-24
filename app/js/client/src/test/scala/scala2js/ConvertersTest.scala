@@ -6,7 +6,8 @@ import common.testing.TestObjects._
 import common.time.LocalDateTime
 import models.access.ModelField
 import models.accounting._
-import models.modification.{EntityModification, EntityType}
+import models.modification.EntityModification
+import models.modification.EntityType
 import models.money.ExchangeRateMeasurement
 import models.user.User
 import scala2js.Converters._

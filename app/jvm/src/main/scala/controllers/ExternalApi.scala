@@ -1,17 +1,25 @@
 package controllers
 
 import com.google.inject.Inject
-import common.money.{Currency, MoneyWithGeneralCurrency}
-import common.time.{Clock, TimeUtils}
+import common.money.Currency
+import common.money.MoneyWithGeneralCurrency
+import common.time.Clock
+import common.time.TimeUtils
 import models.Entity
 import models.access.DbQueryImplicits._
-import models.access.{JvmEntityAccess, ModelField}
+import models.access.JvmEntityAccess
+import models.access.ModelField
 import models.accounting._
-import models.accounting.config.{Account, Config, MoneyReservoir, Template}
+import models.accounting.config.Account
+import models.accounting.config.Config
+import models.accounting.config.MoneyReservoir
+import models.accounting.config.Template
 import models.modification.EntityModification
 import models.money.ExchangeRateMeasurement
-import models.user.{User, Users}
-import play.api.i18n.{I18nSupport, MessagesApi}
+import models.user.User
+import models.user.Users
+import play.api.i18n.I18nSupport
+import play.api.i18n.MessagesApi
 import play.api.mvc._
 
 import scala.collection.immutable.Seq

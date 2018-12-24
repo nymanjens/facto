@@ -7,10 +7,12 @@ import common.testing.TestObjects._
 import common.time.LocalDateTimes.createDateTime
 import flux.stores.entries.GeneralEntry.toGeneralEntrySeq
 import models.accounting._
-import models.accounting.config.{Account, Category}
+import models.accounting.config.Account
+import models.accounting.config.Category
 import utest._
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.util.Random

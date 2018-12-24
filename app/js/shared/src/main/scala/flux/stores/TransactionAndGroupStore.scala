@@ -1,13 +1,16 @@
 package flux.stores
 
 import common.time.Clock
-import flux.action.Action.{AddTransactionGroup, RemoveTransactionGroup, UpdateTransactionGroup}
+import flux.action.Action.AddTransactionGroup
+import flux.action.Action.RemoveTransactionGroup
+import flux.action.Action.UpdateTransactionGroup
 import flux.action.Dispatcher
 import models.access.JsEntityAccess
 import models.accounting._
 import models.modification.EntityModification
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
