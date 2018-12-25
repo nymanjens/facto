@@ -38,7 +38,9 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
                      accountingConfig: Config,
                      user: User,
                      exchangeRateManager: ExchangeRateManager,
-                     i18n: I18n) {
+                     i18n: I18n,
+                     pageHeader: PageHeader,
+) {
 
   private val entriesListTable: EntriesListTable[CashFlowEntry, MoneyReservoir] = new EntriesListTable
 
@@ -53,7 +55,7 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
       ($, props, state) => {
         implicit val router = props.router
         <.span(
-          PageHeader.withExtension(router.currentPage) {
+          pageHeader.withExtension(router.currentPage) {
             CollapseAllExpandAllButtons(setExpanded => $.modState(_.copy(setExpanded = setExpanded)))
           }, {
             for {

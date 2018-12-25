@@ -81,7 +81,7 @@ final class Layout(implicit globalMessages: GlobalMessages,
                     .anchorWithHrefTo(Page.UserProfile)(
                       <.i(^.className := Page.UserProfile.iconClass),
                       " ",
-                      Page.UserProfile.title
+                      Page.UserProfile.titleSync
                     )),
                 ^^.ifThen(user.isAdmin) {
                   <.li(
@@ -89,7 +89,7 @@ final class Layout(implicit globalMessages: GlobalMessages,
                       .anchorWithHrefTo(Page.UserAdministration)(
                         <.i(^.className := Page.UserAdministration.iconClass),
                         " ",
-                        Page.UserAdministration.title
+                        Page.UserAdministration.titleSync
                       ))
                 },
                 <.li(^.className := "divider"),

@@ -38,7 +38,9 @@ final class BalanceCheckForm(implicit i18n: I18n,
                              user: User,
                              entityAccess: EntityAccess,
                              exchangeRateManager: ExchangeRateManager,
-                             dispatcher: Dispatcher) {
+                             dispatcher: Dispatcher,
+                             pageHeader: PageHeader,
+) {
 
   private val waitForFuture = new WaitForFuture[Props]
   private val dateMappedInput = MappedInput.forTypes[String, LocalDateTime]
@@ -106,7 +108,7 @@ final class BalanceCheckForm(implicit i18n: I18n,
           ^.className := "row",
           <.div(
             ^.className := "col-lg-12",
-            PageHeader.withExtension(router.currentPage)(
+            pageHeader.withExtension(router.currentPage)(
               <<.ifThen(props.operationMeta.isInstanceOf[OperationMeta.Edit]) {
                 <.span(
                   " ",

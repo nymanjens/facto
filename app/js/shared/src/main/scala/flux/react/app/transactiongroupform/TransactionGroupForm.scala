@@ -53,7 +53,9 @@ final class TransactionGroupForm(implicit i18n: I18n,
                                  addTransactionPanel: AddTransactionPanel,
                                  totalFlowInput: TotalFlowInput,
                                  totalFlowRestrictionInput: TotalFlowRestrictionInput,
-                                 liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory) {
+                                 liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory,
+                                 pageHeader: PageHeader,
+) {
 
   private val waitForFuture = new WaitForFuture[Props]
   private val component = {
@@ -275,7 +277,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
           ^.className := "row",
           <.div(
             ^.className := "col-lg-12",
-            PageHeader.withExtension(router.currentPage)(
+            pageHeader.withExtension(router.currentPage)(
               <<.ifThen(props.operationMeta.isInstanceOf[OperationMeta.Edit]) {
                 <.a(
                   ^.className := "btn btn-default delete-button",

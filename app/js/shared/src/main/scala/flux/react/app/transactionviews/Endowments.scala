@@ -28,7 +28,9 @@ final class Endowments(implicit entriesStoreFactory: EndowmentEntriesStoreFactor
                        accountingConfig: Config,
                        user: User,
                        exchangeRateManager: ExchangeRateManager,
-                       i18n: I18n) {
+                       i18n: I18n,
+                       pageHeader: PageHeader,
+) {
 
   private val entriesListTable: EntriesListTable[GeneralEntry, Account] = new EntriesListTable
 
@@ -39,7 +41,7 @@ final class Endowments(implicit entriesStoreFactory: EndowmentEntriesStoreFactor
       ($, props, state) => {
         implicit val router = props.router
         <.span(
-          PageHeader.withExtension(router.currentPage) {
+          pageHeader.withExtension(router.currentPage) {
             CollapseAllExpandAllButtons(setExpanded => $.modState(_.copy(setExpanded = setExpanded)))
           },
           Panel(i18n("app.all-accounts")) {

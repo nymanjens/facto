@@ -6,6 +6,7 @@ import common.time.Clock
 import hydro.flux.action.Dispatcher
 import flux.stores.GlobalMessagesStore
 import flux.stores.entries.factories._
+import hydro.flux.react.uielements.PageHeader
 import models.access.JsEntityAccess
 import models.accounting.config.Config
 import models.user.User
@@ -25,7 +26,9 @@ final class Module(implicit i18n: I18n,
                    summaryYearsStoreFactory: SummaryYearsStoreFactory,
                    summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
                    globalMessagesStore: GlobalMessagesStore,
-                   clock: Clock) {
+                   clock: Clock,
+                   pageHeader: PageHeader,
+) {
 
   implicit lazy val everything = new Everything
   implicit lazy val cashFlow = new CashFlow

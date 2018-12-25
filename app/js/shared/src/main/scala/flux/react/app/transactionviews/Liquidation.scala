@@ -32,7 +32,9 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
                         accountingConfig: Config,
                         user: User,
                         exchangeRateManager: ExchangeRateManager,
-                        i18n: I18n) {
+                        i18n: I18n,
+                        pageHeader: PageHeader,
+) {
 
   private val entriesListTable: EntriesListTable[LiquidationEntry, AccountPair] = new EntriesListTable
 
@@ -43,7 +45,7 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
       ($, props, state) => {
         implicit val router = props.router
         <.span(
-          PageHeader.withExtension(router.currentPage)(
+          pageHeader.withExtension(router.currentPage)(
             CollapseAllExpandAllButtons(setExpanded => $.modState(_.copy(setExpanded = setExpanded))),
             " ",
             simplifyLiquidationButton()

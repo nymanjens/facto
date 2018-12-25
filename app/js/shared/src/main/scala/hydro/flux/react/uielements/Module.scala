@@ -22,6 +22,7 @@ final class Module(implicit i18n: I18n,
                    dispatcher: Dispatcher,
                    clock: Clock) {
 
+  lazy val pageHeader = new PageHeader
   lazy val globalMessages: GlobalMessages = new GlobalMessages
   lazy val pageLoadingSpinner: PageLoadingSpinner = new PageLoadingSpinner
   lazy val applicationDisconnectedIcon: ApplicationDisconnectedIcon = new ApplicationDisconnectedIcon

@@ -3,18 +3,23 @@ package flux.router
 import common.I18n
 import common.LoggingUtils.LogExceptionsCallback
 import common.LoggingUtils.logExceptions
-import flux.action.Actions
 import hydro.flux.action.Dispatcher
 import hydro.flux.action.StandardActions
 import japgolly.scalajs.react.extra.router.StaticDsl.RouteB
 import japgolly.scalajs.react.extra.router._
 import japgolly.scalajs.react.vdom.html_<^._
+import models.access.EntityAccess
+import org.scalajs.dom
 
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.reflect.ClassTag
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 private[router] final class RouterFactory(implicit reactAppModule: flux.react.app.Module,
                                           dispatcher: Dispatcher,
-                                          i18n: I18n) {
+                                          i18n: I18n,
+                                          entityAccess: EntityAccess) {
 
   def createRouter(): Router[Page] = {
     Router(BaseUrl.until(RouterFactory.pathPrefix), routerConfig)
@@ -113,7 +118,11 @@ private[router] final class RouterFactory(implicit reactAppModule: flux.react.ap
           .onPostRender((prev, cur) =>
             LogExceptionsCallback(
               dispatcher.dispatch(StandardActions.SetPageLoadingState(isLoading = false))))
-          .setTitle(page => s"${page.title} | Facto")
+          .onPostRender((_, page) =>
+            LogExceptionsCallback(async {
+              val title = await(page.title)
+              dom.document.title = s"$title | Facto"
+            }))
       }
       .renderWith(layout)
   }

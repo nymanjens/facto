@@ -23,7 +23,9 @@ final class Everything(implicit entriesStoreFactory: AllEntriesStoreFactory,
                        clock: Clock,
                        accountingConfig: Config,
                        exchangeRateManager: ExchangeRateManager,
-                       i18n: I18n) {
+                       i18n: I18n,
+                       pageHeader: PageHeader,
+) {
 
   private val entriesListTable: EntriesListTable[GeneralEntry, Unit] = new EntriesListTable
 
@@ -33,7 +35,7 @@ final class Everything(implicit entriesStoreFactory: AllEntriesStoreFactory,
       (_, props) => {
         implicit val router = props.router
         <.span(
-          PageHeader(router.currentPage),
+          pageHeader(router.currentPage),
           Panel(i18n("app.genral-information-about-all-entries"))(
             entriesListTable(
               tableTitle = i18n("app.all"),

@@ -7,6 +7,7 @@ import hydro.flux.action.Dispatcher
 import flux.stores.GlobalMessagesStore
 import flux.stores.entries.factories.LiquidationEntriesStoreFactory
 import flux.stores.entries.factories.TagsStoreFactory
+import hydro.flux.react.uielements.PageHeader
 import models.access.JsEntityAccess
 import models.accounting.config.Config
 import models.user.User
@@ -20,7 +21,9 @@ final class Module(implicit i18n: I18n,
                    tagsStoreFactory: TagsStoreFactory,
                    dispatcher: Dispatcher,
                    clock: Clock,
-                   liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory) {
+                   liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory,
+                   pageHeader: PageHeader,
+) {
 
   implicit private lazy val transactionPanel: TransactionPanel = new TransactionPanel
   implicit private lazy val addTransactionPanel: AddTransactionPanel = new AddTransactionPanel

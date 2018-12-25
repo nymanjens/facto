@@ -23,7 +23,9 @@ final class SearchResults(implicit complexQueryStoreFactory: ComplexQueryStoreFa
                           clock: Clock,
                           accountingConfig: Config,
                           exchangeRateManager: ExchangeRateManager,
-                          i18n: I18n) {
+                          i18n: I18n,
+                          pageHeader: PageHeader,
+) {
 
   private val entriesListTable: EntriesListTable[GeneralEntry, ComplexQueryStoreFactory.Query] =
     new EntriesListTable
@@ -34,7 +36,7 @@ final class SearchResults(implicit complexQueryStoreFactory: ComplexQueryStoreFa
       (_, props) => {
         implicit val router = props.router
         <.span(
-          PageHeader(router.currentPage),
+          pageHeader(router.currentPage),
           Panel(i18n("app.search-results"))(
             entriesListTable(
               tableTitle = i18n("app.all"),

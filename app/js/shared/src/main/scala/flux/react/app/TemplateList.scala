@@ -20,7 +20,9 @@ import scala.collection.immutable.Seq
 private[app] final class TemplateList(implicit user: User,
                                       accountingConfig: Config,
                                       entityAccess: EntityAccess,
-                                      i18n: I18n) {
+                                      i18n: I18n,
+                                      pageHeader: PageHeader,
+) {
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
@@ -28,7 +30,7 @@ private[app] final class TemplateList(implicit user: User,
       logExceptions {
         implicit val router = props.router
         <.span(
-          PageHeader(router.currentPage),
+          pageHeader(router.currentPage),
           Panel(
             title = i18n("app.templates"),
             panelClasses = Seq("templates-panel")

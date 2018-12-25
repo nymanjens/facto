@@ -23,7 +23,9 @@ final class Summary(implicit summaryTable: SummaryTable,
                     clock: Clock,
                     accountingConfig: Config,
                     exchangeRateManager: ExchangeRateManager,
-                    i18n: I18n) {
+                    i18n: I18n,
+                    pageHeader: PageHeader,
+) {
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
@@ -54,7 +56,7 @@ final class Summary(implicit summaryTable: SummaryTable,
     def render(props: Props, state: State) = logExceptions {
       implicit val router = props.router
       <.span(
-        PageHeader.withExtension(router.currentPage)(
+        pageHeader.withExtension(router.currentPage)(
           <.form(
             ^.className := "form-inline summary-query-filter",
             <.div(

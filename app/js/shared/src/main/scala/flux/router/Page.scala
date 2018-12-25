@@ -2,21 +2,24 @@ package flux.router
 
 import common.I18n
 import japgolly.scalajs.react.extra.router.Path
+import models.access.EntityAccess
 import models.accounting.BalanceCheck
 import models.accounting.config.Account
 import models.accounting.config.MoneyReservoir
 import models.accounting.config.Template
 
+import scala.concurrent.Future
 import scala.scalajs.js
 
 sealed trait Page {
-  def title(implicit i18n: I18n): String
+  def title(implicit i18n: I18n, entityAccess: EntityAccess): Future[String]
   def iconClass: String
 }
 object Page {
 
   sealed abstract class PageBase(titleKey: String, override val iconClass: String) extends Page {
-    override def title(implicit i18n: I18n) = i18n(titleKey)
+    override def title(implicit i18n: I18n, entityAccess: EntityAccess) = Future.successful(titleSync)
+    def titleSync(implicit i18n: I18n) = i18n(titleKey)
   }
 
   sealed abstract class HasReturnTo(private val encodedReturnTo: Option[String]) {
@@ -38,7 +41,7 @@ object Page {
   }
 
   case object Root extends Page {
-    override def title(implicit i18n: I18n) = "Root"
+    override def title(implicit i18n: I18n, entityAccess: EntityAccess) = Future.successful("Root")
     override def iconClass = ""
   }
 
@@ -55,7 +58,8 @@ object Page {
   case class Search private[router] (private[router] val encodedQuery: String) extends Page {
     def query: String = js.URIUtils.decodeURIComponent(js.URIUtils.decodeURI(encodedQuery))
 
-    override def title(implicit i18n: I18n) = i18n("app.search-results-for", query)
+    override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
+      Future.successful(i18n("app.search-results-for", query))
     override def iconClass = "icon-list"
   }
   object Search {
@@ -67,7 +71,8 @@ object Page {
   case class NewTransactionGroup private (encodedReturnTo: Option[String])
       extends HasReturnTo(encodedReturnTo)
       with Page {
-    override def title(implicit i18n: I18n) = i18n("app.new-transaction")
+    override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
+      Future.successful(i18n("app.new-transaction"))
     override def iconClass = "icon-new-empty"
   }
   object NewTransactionGroup {
@@ -78,7 +83,8 @@ object Page {
   case class EditTransactionGroup private (transactionGroupId: Long, encodedReturnTo: Option[String])
       extends HasReturnTo(encodedReturnTo)
       with Page {
-    override def title(implicit i18n: I18n) = i18n("app.edit-transaction")
+    override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
+      Future.successful(i18n("app.edit-transaction"))
     override def iconClass = "icon-new-empty"
   }
   object EditTransactionGroup {
@@ -90,7 +96,8 @@ object Page {
   case class NewTransactionGroupFromReservoir private (reservoirCode: String, encodedReturnTo: Option[String])
       extends HasReturnTo(encodedReturnTo)
       with Page {
-    override def title(implicit i18n: I18n) = i18n("app.new-transaction")
+    override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
+      Future.successful(i18n("app.new-transaction"))
     override def iconClass = "icon-new-empty"
   }
   object NewTransactionGroupFromReservoir {
@@ -102,7 +109,8 @@ object Page {
   case class NewFromTemplate private (templateCode: String, encodedReturnTo: Option[String])
       extends HasReturnTo(encodedReturnTo)
       with Page {
-    override def title(implicit i18n: I18n) = i18n("app.new-transaction")
+    override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
+      Future.successful(i18n("app.new-transaction"))
     override def iconClass = "icon-new-empty"
   }
   object NewFromTemplate {
@@ -115,7 +123,8 @@ object Page {
                                       encodedReturnTo: Option[String])
       extends HasReturnTo(encodedReturnTo)
       with Page {
-    override def title(implicit i18n: I18n) = i18n("app.new-transaction")
+    override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
+      Future.successful(i18n("app.new-transaction"))
     override def iconClass = "icon-new-empty"
   }
   object NewForRepayment {
@@ -125,7 +134,8 @@ object Page {
   case class NewForLiquidationSimplification private (encodedReturnTo: Option[String])
       extends HasReturnTo(encodedReturnTo)
       with Page {
-    override def title(implicit i18n: I18n) = i18n("app.simplify-liquidation")
+    override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
+      Future.successful(i18n("app.simplify-liquidation"))
     override def iconClass = "icon-new-empty"
   }
   object NewForLiquidationSimplification {
@@ -137,7 +147,8 @@ object Page {
   case class NewBalanceCheck private (reservoirCode: String, encodedReturnTo: Option[String])
       extends HasReturnTo(encodedReturnTo)
       with Page {
-    override def title(implicit i18n: I18n) = i18n("app.new-balance-check")
+    override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
+      Future.successful(i18n("app.new-balance-check"))
     override def iconClass = "icon-new-empty"
   }
   object NewBalanceCheck {
@@ -148,7 +159,8 @@ object Page {
   case class EditBalanceCheck private (balanceCheckId: Long, encodedReturnTo: Option[String])
       extends HasReturnTo(encodedReturnTo)
       with Page {
-    override def title(implicit i18n: I18n) = i18n("app.edit-balance-check")
+    override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
+      Future.successful(i18n("app.edit-balance-check"))
     override def iconClass = "icon-new-empty"
   }
   object EditBalanceCheck {
