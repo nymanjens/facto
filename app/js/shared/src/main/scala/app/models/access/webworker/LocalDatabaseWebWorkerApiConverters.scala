@@ -8,7 +8,7 @@ import scala.collection.immutable.Seq
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import app.scala2js.Converters._
-import app.scala2js.Scala2Js
+import hydro.scala2js.Scala2Js
 
 private[webworker] object LocalDatabaseWebWorkerApiConverters {
 

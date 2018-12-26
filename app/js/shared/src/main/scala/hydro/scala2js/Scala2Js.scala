@@ -1,6 +1,7 @@
-package app.scala2js
+package hydro.scala2js
 
 import app.models.access.ModelField
+import app.scala2js.Converters
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
