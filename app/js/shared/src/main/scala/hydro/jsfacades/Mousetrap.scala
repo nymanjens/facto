@@ -1,4 +1,4 @@
-package jsfacades
+package hydro.jsfacades
 
 import org.scalajs.dom.raw.KeyboardEvent
 import app.scala2js.Converters._

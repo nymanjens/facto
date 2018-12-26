@@ -11,7 +11,7 @@ import japgolly.scalajs.react.component.Scala.MountedImpure
 import japgolly.scalajs.react.Ref.ToScalaComponent
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom.html_<^._
-import jsfacades.ReactTagInput
+import hydro.jsfacades.ReactTagInput
 import org.scalajs.dom.ext.KeyCode
 
 import scala.collection.immutable.Seq

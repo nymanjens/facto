@@ -1,4 +1,4 @@
-package jsfacades
+package hydro.jsfacades
 
 import hydro.common.LoggingUtils
 import hydro.common.LoggingUtils.logExceptions

@@ -1,7 +1,7 @@
 package app.models.access.webworker
 
-import jsfacades.LokiJs
-import jsfacades.LokiJs.FilterFactory.Operation
+import hydro.jsfacades.LokiJs
+import hydro.jsfacades.LokiJs.FilterFactory.Operation
 import app.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
 import app.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation._
 import org.scalajs.dom.console

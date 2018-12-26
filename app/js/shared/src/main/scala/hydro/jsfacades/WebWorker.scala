@@ -1,4 +1,4 @@
-package jsfacades
+package hydro.jsfacades
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSGlobalScope

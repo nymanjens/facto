@@ -1,4 +1,4 @@
-package jsfacades
+package hydro.jsfacades
 
 import common.ScalaUtils
 

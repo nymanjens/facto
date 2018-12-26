@@ -1,7 +1,7 @@
 package app.models.access.webworker
 
 import app.api.Picklers._
-import jsfacades.WebWorker
+import hydro.jsfacades.WebWorker
 import app.models.access.webworker.LocalDatabaseWebWorkerApi.LokiQuery
 import app.models.access.webworker.LocalDatabaseWebWorkerApi.MethodNumbers
 import app.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation

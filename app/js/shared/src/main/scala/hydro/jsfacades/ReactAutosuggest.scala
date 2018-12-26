@@ -1,4 +1,4 @@
-package jsfacades
+package hydro.jsfacades
 
 import japgolly.scalajs.react.Children
 import japgolly.scalajs.react.JsComponent

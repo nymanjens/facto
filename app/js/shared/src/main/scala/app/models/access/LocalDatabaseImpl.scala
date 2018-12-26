@@ -1,8 +1,8 @@
 package app.models.access
 
 import common.ScalaUtils.visibleForTesting
-import jsfacades.LokiJs
-import jsfacades.LokiJs.FilterFactory.Operation
+import hydro.jsfacades.LokiJs
+import hydro.jsfacades.LokiJs.FilterFactory.Operation
 import app.models.Entity
 import app.models.access.LocalDatabaseImpl.ModificationWithId
 import app.models.access.LocalDatabaseImpl.Singleton
