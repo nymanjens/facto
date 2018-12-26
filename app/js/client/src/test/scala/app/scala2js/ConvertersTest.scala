@@ -1,4 +1,4 @@
-package scala2js
+package app.scala2js
 
 import java.time.Month.MARCH
 
@@ -10,7 +10,7 @@ import app.models.modification.EntityModification
 import app.models.modification.EntityType
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
-import scala2js.Converters._
+import app.scala2js.Converters._
 import utest._
 
 import scala.collection.immutable.Seq

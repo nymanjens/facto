@@ -5,7 +5,7 @@ import common.testing.TestModule
 import hydro.flux.react.uielements.input.InputBase
 import app.flux.react.uielements.input.bootstrap
 import japgolly.scalajs.react.vdom._
-import scala2js.Converters._
+import app.scala2js.Converters._
 import utest._
 
 object TextInputTest extends TestSuite {

@@ -8,7 +8,7 @@ import utest._
 import scala.collection.immutable.Seq
 import scala.language.reflectiveCalls
 import scala.scalajs.js
-import scala2js.Scala2Js
+import app.scala2js.Scala2Js
 
 object LocalDatabaseWebWorkerApiConvertersTest extends TestSuite {
 

@@ -3,8 +3,8 @@ package app.models.access
 import common.ScalaUtils
 import common.ScalaUtils.visibleForTesting
 
-import scala2js.Converters._
-import scala2js.Scala2Js
+import app.scala2js.Converters._
+import app.scala2js.Scala2Js
 
 @visibleForTesting
 sealed trait SingletonKey[V] {

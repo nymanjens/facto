@@ -13,7 +13,7 @@ import scala.concurrent.duration._
 import scala.concurrent.Future
 import scala.concurrent.Promise
 import scala.scalajs.js
-import scala2js.Converters._
+import app.scala2js.Converters._
 
 final class FakeJsEntityAccess extends JsEntityAccess {
 

@@ -16,7 +16,7 @@ import scala.async.Async.async
 import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala2js.Converters._
+import app.scala2js.Converters._
 
 // Also tests `AsyncEntityDerivedStateStore`, `EntriesStoreFactory` and `EntriesStore`.
 object AllEntriesStoreFactoryTest extends TestSuite {

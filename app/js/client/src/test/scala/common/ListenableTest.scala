@@ -2,7 +2,7 @@ package common
 
 import common.Listenable.WritableListenable
 import common.testing.Awaiter
-import scala2js.Converters._
+import app.scala2js.Converters._
 import utest.TestSuite
 import utest._
 

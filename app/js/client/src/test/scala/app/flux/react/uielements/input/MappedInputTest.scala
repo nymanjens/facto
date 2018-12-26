@@ -9,7 +9,7 @@ import common.time.LocalDateTime
 import common.time.LocalDateTimes.createDateTime
 import japgolly.scalajs.react.test.ReactTestUtils
 import japgolly.scalajs.react.vdom.VdomElement
-import scala2js.Converters._
+import app.scala2js.Converters._
 import utest._
 
 object MappedInputTest extends TestSuite {

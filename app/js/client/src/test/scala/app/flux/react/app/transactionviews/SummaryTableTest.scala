@@ -17,7 +17,7 @@ import utest._
 
 import scala.collection.immutable.ListMap
 import scala.collection.immutable.Seq
-import scala2js.Converters._
+import app.scala2js.Converters._
 
 object SummaryTableTest extends TestSuite {
 

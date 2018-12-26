@@ -3,7 +3,7 @@ package common
 import utest.TestSuite
 import utest._
 
-import scala2js.Converters._
+import app.scala2js.Converters._
 
 object JsI18nTest extends TestSuite {
 

@@ -10,7 +10,7 @@ import app.models.modification.EntityType
 import scala.collection.immutable.Seq
 import scala.collection.SortedMap
 import scala.collection.mutable
-import scala2js.Converters._
+import app.scala2js.Converters._
 
 final class JsExchangeRateManager(
     ratioReferenceToForeignCurrency: Map[Currency, SortedMap[LocalDateTime, Double]])(

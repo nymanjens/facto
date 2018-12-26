@@ -16,8 +16,8 @@ import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.util.Failure
 import scala.util.Success
-import scala2js.Converters._
-import scala2js.Scala2Js
+import app.scala2js.Converters._
+import app.scala2js.Scala2Js
 
 object LocalDatabaseWebWorkerScript {
 

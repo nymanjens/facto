@@ -1,4 +1,4 @@
-package scala2js
+package app.scala2js
 
 import app.models.access.ModelField
 

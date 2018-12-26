@@ -23,7 +23,7 @@ import scala.async.Async.async
 import scala.async.Async.await
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala2js.Converters._
+import app.scala2js.Converters._
 
 final class CashFlowEntriesStoreFactory(implicit entityAccess: JsEntityAccess,
                                         accountingConfig: Config,

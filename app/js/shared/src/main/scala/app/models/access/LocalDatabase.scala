@@ -7,7 +7,7 @@ import app.models.modification.EntityType
 
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
-import scala2js.Converters._
+import app.scala2js.Converters._
 
 /** Client-side persistence layer. */
 @visibleForTesting

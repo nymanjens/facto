@@ -6,7 +6,7 @@ import app.models.modification.EntityType
 
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
-import scala2js.Converters._
+import app.scala2js.Converters._
 
 /** Proxy for the server-side database. */
 private[access] trait RemoteDatabaseProxy {
