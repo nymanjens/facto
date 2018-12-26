@@ -2,8 +2,8 @@ package hydro.flux.react.uielements
 
 import common.I18n
 import common.time.Clock
-import flux.react.uielements
-import flux.stores._
+import app.flux.react.uielements
+import app.flux.stores._
 import hydro.flux.action.Dispatcher
 import hydro.flux.stores.ApplicationIsOnlineStore
 import hydro.flux.stores.PageLoadingStateStore

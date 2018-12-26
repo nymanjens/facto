@@ -3,8 +3,8 @@ package hydro.flux.react.uielements.input.bootstrap
 import common.I18n
 import common.LoggingUtils.LogExceptionsCallback
 import common.LoggingUtils.logExceptions
-import flux.react.ReactVdomUtils.<<
-import flux.react.ReactVdomUtils.^^
+import app.flux.react.ReactVdomUtils.<<
+import app.flux.react.ReactVdomUtils.^^
 import hydro.flux.react.uielements.input.InputBase
 import hydro.flux.react.uielements.input.InputValidator
 import japgolly.scalajs.react._

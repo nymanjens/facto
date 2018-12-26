@@ -2,8 +2,8 @@ package hydro.flux.react.uielements.usermanagement
 
 import common.I18n
 import common.LoggingUtils.logExceptions
-import flux.react.ReactVdomUtils.<<
-import flux.react.uielements
+import app.flux.react.ReactVdomUtils.<<
+import app.flux.react.uielements
 import hydro.flux.react.HydroReactComponent
 import hydro.flux.react.uielements.HalfPanel
 import hydro.flux.react.uielements.Table
