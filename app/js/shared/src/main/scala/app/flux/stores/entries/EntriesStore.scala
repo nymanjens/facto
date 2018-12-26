@@ -1,11 +1,11 @@
 package app.flux.stores.entries
 
 import hydro.flux.stores.AsyncEntityDerivedStateStore
-import models.access.JsEntityAccess
-import models.accounting.BalanceCheck
-import models.accounting.Transaction
-import models.modification.EntityModification
-import models.modification.EntityType
+import app.models.access.JsEntityAccess
+import app.models.accounting.BalanceCheck
+import app.models.accounting.Transaction
+import app.models.modification.EntityModification
+import app.models.modification.EntityType
 
 /**
   * Abstract base class for a store with transaction-derived entries.

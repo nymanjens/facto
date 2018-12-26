@@ -5,9 +5,9 @@ import app.flux.action.Actions.AddTransactionGroup
 import app.flux.action.Actions.RemoveTransactionGroup
 import app.flux.action.Actions.UpdateTransactionGroup
 import hydro.flux.action.Dispatcher
-import models.access.JsEntityAccess
-import models.accounting._
-import models.modification.EntityModification
+import app.models.access.JsEntityAccess
+import app.models.accounting._
+import app.models.modification.EntityModification
 
 import scala.async.Async.async
 import scala.async.Async.await

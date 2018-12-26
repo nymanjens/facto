@@ -3,8 +3,8 @@ package app.flux.stores
 import common.testing.TestObjects._
 import app.flux.action.Actions
 import hydro.flux.action.StandardActions
-import models.accounting._
-import models.modification.EntityModification
+import app.models.accounting._
+import app.models.modification.EntityModification
 import utest._
 
 import scala.async.Async.async

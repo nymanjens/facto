@@ -2,10 +2,10 @@ package app.flux.stores.entries.factories
 
 import app.flux.stores.entries.ComplexQueryFilter
 import app.flux.stores.entries.GeneralEntry
-import models.access.DbQuery
-import models.access.JsEntityAccess
-import models.accounting.BalanceCheck
-import models.accounting.Transaction
+import app.models.access.DbQuery
+import app.models.access.JsEntityAccess
+import app.models.accounting.BalanceCheck
+import app.models.accounting.Transaction
 
 import scala.async.Async.async
 import scala.async.Async.await

@@ -11,7 +11,7 @@ import hydro.flux.react.uielements.HalfPanel
 import hydro.flux.react.uielements.input.bootstrap.TextInput
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
-import models.user.User
+import app.models.user.User
 
 import scala.collection.immutable.Seq
 

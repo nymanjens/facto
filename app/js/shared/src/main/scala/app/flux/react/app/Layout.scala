@@ -15,8 +15,8 @@ import hydro.flux.react.uielements.PendingModificationsCounter
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.PackageBase.VdomAttr
 import japgolly.scalajs.react.vdom.html_<^._
-import models.access.JsEntityAccess
-import models.user.User
+import app.models.access.JsEntityAccess
+import app.models.user.User
 import org.scalajs.dom
 
 import scala.collection.immutable.Seq

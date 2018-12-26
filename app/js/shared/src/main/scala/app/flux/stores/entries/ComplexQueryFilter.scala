@@ -6,12 +6,12 @@ import common.money.Money
 import app.flux.stores.entries.ComplexQueryFilter.Prefix
 import app.flux.stores.entries.ComplexQueryFilter.QueryFilterPair
 import app.flux.stores.entries.ComplexQueryFilter.QueryPart
-import models.access.DbQueryImplicits._
-import models.access.DbQuery
-import models.access.JsEntityAccess
-import models.access.ModelField
-import models.accounting._
-import models.accounting.config.Config
+import app.models.access.DbQueryImplicits._
+import app.models.access.DbQuery
+import app.models.access.JsEntityAccess
+import app.models.access.ModelField
+import app.models.accounting._
+import app.models.accounting.config.Config
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable

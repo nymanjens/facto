@@ -1,18 +1,18 @@
 package tests
 
 import common.testing.TestObjects._
-import models.access.SingletonKey.NextUpdateTokenKey
-import models.access.SingletonKey.VersionKey
-import models.access.webworker.LocalDatabaseWebWorkerApi
-import models.access.DbResultSet
-import models.access.LocalDatabase
-import models.access.LocalDatabaseImpl
-import models.accounting.BalanceCheck
-import models.accounting.Transaction
-import models.accounting.TransactionGroup
-import models.modification.EntityModification
-import models.money.ExchangeRateMeasurement
-import models.user.User
+import app.models.access.SingletonKey.NextUpdateTokenKey
+import app.models.access.SingletonKey.VersionKey
+import app.models.access.webworker.LocalDatabaseWebWorkerApi
+import app.models.access.DbResultSet
+import app.models.access.LocalDatabase
+import app.models.access.LocalDatabaseImpl
+import app.models.accounting.BalanceCheck
+import app.models.accounting.Transaction
+import app.models.accounting.TransactionGroup
+import app.models.modification.EntityModification
+import app.models.money.ExchangeRateMeasurement
+import app.models.user.User
 import tests.ManualTests.ManualTest
 import tests.ManualTests.ManualTestSuite
 
@@ -28,7 +28,7 @@ import scala2js.Converters._
 private[tests] class LocalDatabaseTest extends ManualTestSuite {
 
   implicit private val webWorker: LocalDatabaseWebWorkerApi =
-    new models.access.webworker.Module().localDatabaseWebWorkerApiStub
+    new app.models.access.webworker.Module().localDatabaseWebWorkerApiStub
 
   override def tests = Seq(
     ManualTest("isEmpty") {

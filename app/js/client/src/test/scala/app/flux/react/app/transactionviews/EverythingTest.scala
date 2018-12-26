@@ -6,7 +6,7 @@
 //import common.testing.{Awaiter, FakeRouterContext, ReactTestWrapper, TestModule}
 //import app.flux.stores.entries.factories.AllEntriesStoreFactory
 //import japgolly.scalajs.react.vdom._
-//import models.accounting._
+//import app.models.accounting._
 //import utest._
 //
 //import scala.async.Async.{async, await}

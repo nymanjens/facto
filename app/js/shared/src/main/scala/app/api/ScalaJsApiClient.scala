@@ -8,12 +8,12 @@ import autowire._
 import boopickle.Default._
 import common.LoggingUtils.logExceptions
 import common.websocket.SerialWebsocketClientParallelizer
-import models.Entity
-import models.access.DbQuery
-import models.modification.EntityModification
-import models.modification.EntityType
-import models.modification.EntityModification
-import models.modification.EntityType
+import app.models.Entity
+import app.models.access.DbQuery
+import app.models.modification.EntityModification
+import app.models.modification.EntityType
+import app.models.modification.EntityModification
+import app.models.modification.EntityType
 import org.scalajs.dom
 
 import scala.collection.immutable.Seq

@@ -10,12 +10,12 @@ import common.money.Money
 import common.time.Clock
 import common.time.LocalDateTime
 import common.time.LocalDateTimes
-import models.access.JvmEntityAccess
-import models.accounting.BalanceCheck
-import models.accounting.Transaction
-import models.accounting.TransactionGroup
-import models.modification.EntityModification
-import models.user.User
+import app.models.access.JvmEntityAccess
+import app.models.accounting.BalanceCheck
+import app.models.accounting.Transaction
+import app.models.accounting.TransactionGroup
+import app.models.modification.EntityModification
+import app.models.user.User
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq

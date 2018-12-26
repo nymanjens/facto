@@ -8,7 +8,7 @@ import hydro.flux.action.StandardActions
 import japgolly.scalajs.react.extra.router.StaticDsl.RouteB
 import japgolly.scalajs.react.extra.router._
 import japgolly.scalajs.react.vdom.html_<^._
-import models.access.EntityAccess
+import app.models.access.EntityAccess
 import org.scalajs.dom
 
 import scala.async.Async.async

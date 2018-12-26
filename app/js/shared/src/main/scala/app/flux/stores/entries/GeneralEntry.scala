@@ -1,6 +1,6 @@
 package app.flux.stores.entries
 
-import models.accounting.Transaction
+import app.models.accounting.Transaction
 
 import scala.collection.immutable.Seq
 

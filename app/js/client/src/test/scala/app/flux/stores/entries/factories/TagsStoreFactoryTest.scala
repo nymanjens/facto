@@ -4,7 +4,7 @@ import common.GuavaReplacement.ImmutableSetMultimap
 import common.testing.TestObjects._
 import common.testing.FakeJsEntityAccess
 import common.testing.TestModule
-import models.accounting._
+import app.models.accounting._
 import utest._
 
 import scala.async.Async.async

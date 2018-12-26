@@ -28,12 +28,12 @@ import hydro.flux.react.uielements.WaitForFuture
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.Path
 import japgolly.scalajs.react.vdom.html_<^._
-import models.access.EntityAccess
-import models.accounting.config.Account
-import models.accounting.config.Config
-import models.accounting.Transaction
-import models.accounting.TransactionGroup
-import models.user.User
+import app.models.access.EntityAccess
+import app.models.accounting.config.Account
+import app.models.accounting.config.Config
+import app.models.accounting.Transaction
+import app.models.accounting.TransactionGroup
+import app.models.user.User
 
 import scala.async.Async.async
 import scala.async.Async.await

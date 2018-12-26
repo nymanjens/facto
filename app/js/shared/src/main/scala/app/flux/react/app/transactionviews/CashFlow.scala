@@ -22,11 +22,11 @@ import app.flux.stores.entries.factories.CashFlowEntriesStoreFactory
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.VdomArray
 import japgolly.scalajs.react.vdom.html_<^._
-import models.access.EntityAccess
-import models.accounting.BalanceCheck
-import models.accounting.config.Config
-import models.accounting.config.MoneyReservoir
-import models.user.User
+import app.models.access.EntityAccess
+import app.models.accounting.BalanceCheck
+import app.models.accounting.config.Config
+import app.models.accounting.config.MoneyReservoir
+import app.models.user.User
 
 import scala.collection.immutable.Seq
 import scala.scalajs.js

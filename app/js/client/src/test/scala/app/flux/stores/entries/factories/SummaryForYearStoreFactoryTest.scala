@@ -9,8 +9,8 @@ import common.testing.TestObjects._
 import common.time.DatedMonth
 import app.flux.stores.entries.ComplexQueryFilter
 import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
-import models.accounting.Transaction
-import models.accounting.config.Account
+import app.models.accounting.Transaction
+import app.models.accounting.config.Account
 import utest._
 
 import scala.async.Async.async

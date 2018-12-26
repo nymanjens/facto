@@ -4,8 +4,8 @@ import common.testing.TestObjects.testCategory
 import common.testing.TestObjects._
 import app.flux.stores.entries.ComplexQueryFilter.Prefix
 import app.flux.stores.entries.ComplexQueryFilter.QueryPart
-import models.access.EntityAccess
-import models.accounting.Transaction
+import app.models.access.EntityAccess
+import app.models.accounting.Transaction
 import utest._
 
 import scala.collection.immutable.Seq

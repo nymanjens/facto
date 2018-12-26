@@ -5,17 +5,17 @@ import java.time.ZoneId
 
 import common.testing.TestObjects._
 import common.time.LocalDateTime
-import models.Entity
-import models.access.JvmEntityAccess
-import models.accounting.config.Account
-import models.accounting.config.Category
-import models.accounting.config.MoneyReservoir
-import models.accounting.BalanceCheck
-import models.accounting.Transaction
-import models.accounting.TransactionGroup
-import models.modification.EntityModification
-import models.modification.EntityType
-import models.user.User
+import app.models.Entity
+import app.models.access.JvmEntityAccess
+import app.models.accounting.config.Account
+import app.models.accounting.config.Category
+import app.models.accounting.config.MoneyReservoir
+import app.models.accounting.BalanceCheck
+import app.models.accounting.Transaction
+import app.models.accounting.TransactionGroup
+import app.models.modification.EntityModification
+import app.models.modification.EntityType
+import app.models.user.User
 
 import scala.collection.immutable.Seq
 

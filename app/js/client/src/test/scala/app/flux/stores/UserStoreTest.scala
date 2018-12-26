@@ -6,7 +6,7 @@ import common.testing.TestObjects._
 import app.flux.action.Actions
 import hydro.flux.action.StandardActions
 import hydro.flux.stores.UserStore
-import models.modification.EntityModification
+import app.models.modification.EntityModification
 import utest._
 
 import scala.async.Async.async

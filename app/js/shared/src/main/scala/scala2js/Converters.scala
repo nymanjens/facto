@@ -5,12 +5,12 @@ import java.time.LocalTime
 
 import common.GuavaReplacement.ImmutableBiMap
 import common.time.LocalDateTime
-import models._
-import models.access.ModelField
-import models.accounting._
-import models.modification._
-import models.money.ExchangeRateMeasurement
-import models.user.User
+import app.models._
+import app.models.access.ModelField
+import app.models.accounting._
+import app.models.modification._
+import app.models.money.ExchangeRateMeasurement
+import app.models.user.User
 import scala2js.Scala2Js.Converter
 import scala2js.Scala2Js.MapConverter
 

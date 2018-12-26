@@ -7,15 +7,15 @@ import common.time.LocalDateTime
 import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
 import app.flux.stores.entries.ComplexQueryFilter
 import app.flux.stores.entries.EntriesStore
-import models.access.DbQueryImplicits._
-import models.access.DbQuery
-import models.access.JsEntityAccess
-import models.access.ModelField
-import models.accounting.config.Account
-import models.accounting.config.Category
-import models.accounting.config.Config
-import models.accounting.BalanceCheck
-import models.accounting.Transaction
+import app.models.access.DbQueryImplicits._
+import app.models.access.DbQuery
+import app.models.access.JsEntityAccess
+import app.models.access.ModelField
+import app.models.accounting.config.Account
+import app.models.accounting.config.Category
+import app.models.accounting.config.Config
+import app.models.accounting.BalanceCheck
+import app.models.accounting.Transaction
 
 import scala.async.Async.async
 import scala.async.Async.await

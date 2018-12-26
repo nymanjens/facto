@@ -1,6 +1,6 @@
 package app.flux.stores.entries.factories
 
-import models.access.DbQueryImplicits._
+import app.models.access.DbQueryImplicits._
 import java.time.Month._
 
 import common.testing.TestObjects._
@@ -11,11 +11,11 @@ import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYe
 import app.flux.stores.entries.AccountPair
 import app.flux.stores.entries.ComplexQueryFilter
 import app.flux.stores.entries.EntriesStore
-import models.Entity
-import models.access.ModelField
-import models.accounting._
-import models.modification.EntityModification._
-import models.modification._
+import app.models.Entity
+import app.models.access.ModelField
+import app.models.accounting._
+import app.models.modification.EntityModification._
+import app.models.modification._
 import utest._
 
 import scala.async.Async.async

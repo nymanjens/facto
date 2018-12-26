@@ -9,14 +9,14 @@ import app.api.ScalaJsApi.UpdateToken
 import common.time.LocalDateTime
 import common.time.LocalDateTimes
 import common.time.LocalDateTimes.createDateTime
-import models.accounting.BalanceCheck
-import models.accounting.Transaction
-import models.accounting.TransactionGroup
-import models.accounting.config.Account.SummaryTotalRowDef
-import models.accounting.config._
-import models.modification.EntityModification
-import models.money.ExchangeRateMeasurement
-import models.user.User
+import app.models.accounting.BalanceCheck
+import app.models.accounting.Transaction
+import app.models.accounting.TransactionGroup
+import app.models.accounting.config.Account.SummaryTotalRowDef
+import app.models.accounting.config._
+import app.models.modification.EntityModification
+import app.models.money.ExchangeRateMeasurement
+import app.models.user.User
 
 import scala.collection.immutable.ListMap
 import scala.collection.immutable.Seq

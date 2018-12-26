@@ -4,7 +4,7 @@ import common.I18n
 import app.flux.router.Page
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
-import models.access.EntityAccess
+import app.models.access.EntityAccess
 
 final class PageHeader(implicit i18n: I18n, entityAccess: EntityAccess) {
 

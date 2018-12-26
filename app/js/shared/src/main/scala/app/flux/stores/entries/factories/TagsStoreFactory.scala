@@ -3,11 +3,11 @@ package app.flux.stores.entries.factories
 import common.GuavaReplacement.ImmutableSetMultimap
 import app.flux.stores.entries.EntriesStore
 import app.flux.stores.entries.factories.TagsStoreFactory.State
-import models.access.DbQueryImplicits._
-import models.access.JsEntityAccess
-import models.access.ModelField
-import models.accounting.BalanceCheck
-import models.accounting.Transaction
+import app.models.access.DbQueryImplicits._
+import app.models.access.JsEntityAccess
+import app.models.access.ModelField
+import app.models.accounting.BalanceCheck
+import app.models.accounting.Transaction
 
 import scala.async.Async.async
 import scala.async.Async.await

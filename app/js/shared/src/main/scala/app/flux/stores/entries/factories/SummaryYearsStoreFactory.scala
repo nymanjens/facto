@@ -3,13 +3,13 @@ package app.flux.stores.entries.factories
 import common.time.YearRange
 import app.flux.stores.entries.EntriesStore
 import app.flux.stores.entries.factories.SummaryYearsStoreFactory.State
-import models.access.DbQueryImplicits._
-import models.access.DbQuery
-import models.access.JsEntityAccess
-import models.access.ModelField
-import models.accounting.config.Account
-import models.accounting.BalanceCheck
-import models.accounting.Transaction
+import app.models.access.DbQueryImplicits._
+import app.models.access.DbQuery
+import app.models.access.JsEntityAccess
+import app.models.access.ModelField
+import app.models.accounting.config.Account
+import app.models.accounting.BalanceCheck
+import app.models.accounting.Transaction
 
 import scala.async.Async.async
 import scala.async.Async.await

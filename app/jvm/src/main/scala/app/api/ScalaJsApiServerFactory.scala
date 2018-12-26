@@ -8,15 +8,15 @@ import common.PlayI18n
 import common.money.Currency
 import common.time.Clock
 import common.time.LocalDateTime
-import models.Entity
-import models.access.DbQuery
-import models.access.JvmEntityAccess
-import models.accounting.config.Config
-import models.modification.EntityModification
-import models.modification.EntityType
-import models.money.ExchangeRateMeasurement
-import models.user.User
-import models.user.Users
+import app.models.Entity
+import app.models.access.DbQuery
+import app.models.access.JvmEntityAccess
+import app.models.accounting.config.Config
+import app.models.modification.EntityModification
+import app.models.modification.EntityType
+import app.models.money.ExchangeRateMeasurement
+import app.models.user.User
+import app.models.user.Users
 
 import scala.collection.immutable.Seq
 import scala.collection.immutable.TreeMap

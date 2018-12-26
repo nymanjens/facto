@@ -5,13 +5,13 @@ import common.money.Money
 import common.money.MoneyWithGeneralCurrency
 import common.time.JavaTimeImplicits._
 import common.time.LocalDateTime
-import models.access.EntityAccess
-import models.accounting.Transaction
-import models.accounting.config.Account
-import models.accounting.config.Category
-import models.accounting.config.Config
-import models.accounting.config.MoneyReservoir
-import models.user.User
+import app.models.access.EntityAccess
+import app.models.accounting.Transaction
+import app.models.accounting.config.Account
+import app.models.accounting.config.Category
+import app.models.accounting.config.Config
+import app.models.accounting.config.MoneyReservoir
+import app.models.user.User
 
 import scala.annotation.tailrec
 import scala.collection.immutable.Seq

@@ -6,7 +6,7 @@ import java.time.LocalTime
 import java.time.ZoneId
 
 import com.google.inject._
-import models.accounting.config.Config
+import app.models.accounting.config.Config
 
 final class JvmClock @Inject()(accountingConfig: Config) extends Clock {
   val zone = ZoneId.of(accountingConfig.constants.zoneId)

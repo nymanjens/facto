@@ -2,11 +2,11 @@ package app.flux.router
 
 import common.I18n
 import japgolly.scalajs.react.extra.router.Path
-import models.access.EntityAccess
-import models.accounting.BalanceCheck
-import models.accounting.config.Account
-import models.accounting.config.MoneyReservoir
-import models.accounting.config.Template
+import app.models.access.EntityAccess
+import app.models.accounting.BalanceCheck
+import app.models.accounting.config.Account
+import app.models.accounting.config.MoneyReservoir
+import app.models.accounting.config.Template
 
 import scala.concurrent.Future
 import scala.scalajs.js

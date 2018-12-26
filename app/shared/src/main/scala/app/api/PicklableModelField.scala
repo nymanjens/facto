@@ -1,6 +1,6 @@
 package app.api
 
-import models.access.ModelField
+import app.models.access.ModelField
 
 /** Fork of ModelField that is picklable. */
 case class PicklableModelField(fieldNumber: Int) {

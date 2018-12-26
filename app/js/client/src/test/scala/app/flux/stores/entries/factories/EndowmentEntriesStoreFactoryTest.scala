@@ -6,9 +6,9 @@ import common.testing.FakeJsEntityAccess
 import common.testing.TestObjects._
 import common.time.LocalDateTimes.createDateTime
 import app.flux.stores.entries.GeneralEntry.toGeneralEntrySeq
-import models.accounting._
-import models.accounting.config.Account
-import models.accounting.config.Category
+import app.models.accounting._
+import app.models.accounting.config.Account
+import app.models.accounting.config.Category
 import utest._
 
 import scala.async.Async.async

@@ -1,11 +1,11 @@
 package common.testing
 
-import models.Entity
-import models.access.JsEntityAccess.Listener
-import models.access._
-import models.modification.EntityModification
-import models.modification.EntityType
-import models.user.User
+import app.models.Entity
+import app.models.access.JsEntityAccess.Listener
+import app.models.access._
+import app.models.modification.EntityModification
+import app.models.modification.EntityType
+import app.models.user.User
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable

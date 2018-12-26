@@ -31,16 +31,16 @@ import japgolly.scalajs.react.component.Scala.MountedImpure
 import japgolly.scalajs.react.Ref.ToScalaComponent
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom.html_<^._
-import models.access.DbQueryImplicits._
-import models.access.DbQuery
-import models.access.JsEntityAccess
-import models.access.ModelField
-import models.accounting.Transaction
-import models.accounting.config.Account
-import models.accounting.config.Category
-import models.accounting.config.Config
-import models.accounting.config.MoneyReservoir
-import models.user.User
+import app.models.access.DbQueryImplicits._
+import app.models.access.DbQuery
+import app.models.access.JsEntityAccess
+import app.models.access.ModelField
+import app.models.accounting.Transaction
+import app.models.accounting.config.Account
+import app.models.accounting.config.Category
+import app.models.accounting.config.Config
+import app.models.accounting.config.MoneyReservoir
+import app.models.user.User
 
 import scala.async.Async.async
 import scala.async.Async.await

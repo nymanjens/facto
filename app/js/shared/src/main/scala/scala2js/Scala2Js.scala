@@ -1,6 +1,6 @@
 package scala2js
 
-import models.access.ModelField
+import app.models.access.ModelField
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._

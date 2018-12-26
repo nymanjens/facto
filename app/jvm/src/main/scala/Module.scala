@@ -1,8 +1,8 @@
 import app.api.ScalaJsApiModule
 import com.google.inject.AbstractModule
 import common.CommonModule
-import models.ModelsModule
-import models.accounting.config.ConfigModule
+import app.models.ModelsModule
+import app.models.accounting.config.ConfigModule
 import tools.ApplicationStartHook
 
 final class Module extends AbstractModule {

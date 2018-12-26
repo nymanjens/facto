@@ -1,4 +1,4 @@
-import models.access.webworker.LocalDatabaseWebWorkerScript
+import app.models.access.webworker.LocalDatabaseWebWorkerScript
 
 object Main {
   def main(args: Array[String]): Unit = {

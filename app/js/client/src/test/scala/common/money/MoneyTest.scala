@@ -6,8 +6,8 @@ import common.money.Currency.Gbp
 import common.testing.FakeJsEntityAccess
 import common.testing.TestModule
 import common.time.Clock
-import models.money.ExchangeRateMeasurement
-import models.money.JsExchangeRateManager
+import app.models.money.ExchangeRateMeasurement
+import app.models.money.JsExchangeRateManager
 import utest.TestSuite
 import utest._
 

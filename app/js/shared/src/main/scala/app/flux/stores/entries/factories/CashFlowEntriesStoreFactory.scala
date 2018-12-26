@@ -10,14 +10,14 @@ import app.flux.stores.entries.WithIsPending.isAnyPending
 import app.flux.stores.entries.WithIsPending.isPending
 import app.flux.stores.entries.CashFlowEntry
 import app.flux.stores.entries.WithIsPending
-import models.access.DbQueryImplicits._
-import models.access.DbQuery
-import models.access.JsEntityAccess
-import models.access.ModelField
-import models.accounting.config.Config
-import models.accounting.config.MoneyReservoir
-import models.accounting.Transaction
-import models.accounting._
+import app.models.access.DbQueryImplicits._
+import app.models.access.DbQuery
+import app.models.access.JsEntityAccess
+import app.models.access.ModelField
+import app.models.accounting.config.Config
+import app.models.accounting.config.MoneyReservoir
+import app.models.accounting.Transaction
+import app.models.accounting._
 
 import scala.async.Async.async
 import scala.async.Async.await

@@ -4,12 +4,12 @@ import java.time.Month.MARCH
 
 import common.testing.TestObjects._
 import common.time.LocalDateTime
-import models.access.ModelField
-import models.accounting._
-import models.modification.EntityModification
-import models.modification.EntityType
-import models.money.ExchangeRateMeasurement
-import models.user.User
+import app.models.access.ModelField
+import app.models.accounting._
+import app.models.modification.EntityModification
+import app.models.modification.EntityType
+import app.models.money.ExchangeRateMeasurement
+import app.models.user.User
 import scala2js.Converters._
 import utest._
 

@@ -15,10 +15,10 @@ import hydro.flux.react.uielements.input.TextInput
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import jsfacades.Mousetrap
-import models.access.EntityAccess
-import models.accounting.config.Config
-import models.accounting.config.Template
-import models.user.User
+import app.models.access.EntityAccess
+import app.models.accounting.config.Config
+import app.models.accounting.config.Template
+import app.models.user.User
 
 import scala.collection.immutable.Seq
 

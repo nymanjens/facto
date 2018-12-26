@@ -5,7 +5,7 @@ import common.time.Clock
 import hydro.flux.action.Dispatcher
 import hydro.flux.react.uielements.PageHeader
 import hydro.flux.stores.UserStore
-import models.user.User
+import app.models.user.User
 
 final class Module(implicit i18n: I18n,
                    user: User,

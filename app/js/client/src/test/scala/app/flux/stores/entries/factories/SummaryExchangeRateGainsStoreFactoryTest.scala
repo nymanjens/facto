@@ -12,8 +12,8 @@ import common.time.DatedMonth
 import common.time.LocalDateTime
 import app.flux.stores.entries.ComplexQueryFilter
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForMonth
-import models.accounting.config.MoneyReservoir
-import models.modification.EntityModification
+import app.models.accounting.config.MoneyReservoir
+import app.models.modification.EntityModification
 import utest._
 
 import scala.async.Async.async

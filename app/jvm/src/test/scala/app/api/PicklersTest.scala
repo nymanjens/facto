@@ -10,10 +10,10 @@ import common.money.Currency
 import common.testing.TestObjects._
 import common.testing._
 import common.time.LocalDateTimes
-import models.accounting.Transaction
-import models.accounting.config.Config
-import models.modification.EntityModification
-import models.modification.EntityType
+import app.models.accounting.Transaction
+import app.models.accounting.config.Config
+import app.models.modification.EntityModification
+import app.models.modification.EntityType
 import org.junit.runner._
 import org.specs2.runner._
 

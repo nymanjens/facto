@@ -4,7 +4,7 @@ import common.testing.TestObjects._
 import common.testing.FakeJsEntityAccess
 import common.testing.TestModule
 import common.time.YearRange
-import models.accounting.config.Account
+import app.models.accounting.config.Account
 import utest._
 
 import scala.async.Async.async

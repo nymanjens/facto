@@ -15,9 +15,9 @@ import hydro.flux.action.Action
 import hydro.flux.action.Dispatcher
 import hydro.flux.action.StandardActions
 import hydro.flux.stores.StateStore
-import models.access.EntityAccess
-import models.accounting._
-import models.accounting.config.Config
+import app.models.access.EntityAccess
+import app.models.accounting._
+import app.models.accounting.config.Config
 
 import scala.collection.immutable.Seq
 import scala.concurrent.duration._

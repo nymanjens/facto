@@ -4,8 +4,8 @@ import app.api.ScalaJsApiModule
 import com.google.inject._
 import common._
 import common.time._
-import models.ModelsModule
-import models.accounting.config.ConfigModule
+import app.models.ModelsModule
+import app.models.accounting.config.ConfigModule
 
 final class TestModule extends AbstractModule {
 

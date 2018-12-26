@@ -3,11 +3,11 @@ package common.testing
 import app.api.ScalaJsApi.GetAllEntitiesResponse
 import app.api.ScalaJsApi.UserPrototype
 import app.api.ScalaJsApiClient
-import models.Entity
-import models.access.DbQuery
-import models.access.DbQueryExecutor
-import models.modification.EntityModification
-import models.modification.EntityType
+import app.models.Entity
+import app.models.access.DbQuery
+import app.models.access.DbQueryExecutor
+import app.models.modification.EntityModification
+import app.models.modification.EntityType
 
 import scala.async.Async.async
 import scala.async.Async.await

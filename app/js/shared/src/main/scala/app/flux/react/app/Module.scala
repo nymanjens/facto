@@ -12,9 +12,9 @@ import hydro.flux.action.Dispatcher
 import hydro.flux.stores.ApplicationIsOnlineStore
 import hydro.flux.stores.PageLoadingStateStore
 import hydro.flux.stores.UserStore
-import models.access.JsEntityAccess
-import models.accounting.config.Config
-import models.user.User
+import app.models.access.JsEntityAccess
+import app.models.accounting.config.Config
+import app.models.user.User
 
 final class Module(implicit i18n: I18n,
                    accountingConfig: Config,

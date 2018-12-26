@@ -7,9 +7,9 @@ import hydro.flux.action.Dispatcher
 import app.flux.stores.GlobalMessagesStore
 import app.flux.stores.entries.factories._
 import hydro.flux.react.uielements.PageHeader
-import models.access.JsEntityAccess
-import models.accounting.config.Config
-import models.user.User
+import app.models.access.JsEntityAccess
+import app.models.accounting.config.Config
+import app.models.user.User
 
 final class Module(implicit i18n: I18n,
                    accountingConfig: Config,

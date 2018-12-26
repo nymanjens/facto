@@ -21,11 +21,11 @@ import hydro.flux.react.uielements.input.bootstrap.TextInput
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.Path
 import japgolly.scalajs.react.vdom.html_<^._
-import models.access.EntityAccess
-import models.accounting.BalanceCheck
-import models.accounting.config.Config
-import models.accounting.config.MoneyReservoir
-import models.user.User
+import app.models.access.EntityAccess
+import app.models.accounting.BalanceCheck
+import app.models.accounting.config.Config
+import app.models.accounting.config.MoneyReservoir
+import app.models.user.User
 
 import scala.async.Async.async
 import scala.async.Async.await

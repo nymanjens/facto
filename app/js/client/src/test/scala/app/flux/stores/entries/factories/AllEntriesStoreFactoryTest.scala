@@ -8,8 +8,8 @@ import common.testing.FakeJsEntityAccess
 import common.time.LocalDateTime
 import common.time.LocalDateTimes.createDateTime
 import app.flux.stores.entries.GeneralEntry.toGeneralEntrySeq
-import models.accounting._
-import models.modification.EntityModification
+import app.models.accounting._
+import app.models.modification.EntityModification
 import utest._
 
 import scala.async.Async.async

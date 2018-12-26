@@ -10,7 +10,7 @@ import hydro.flux.react.uielements.Table
 import hydro.flux.stores.UserStore
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
-import models.user.User
+import app.models.user.User
 
 import scala.collection.immutable.Seq
 import scala.scalajs.js

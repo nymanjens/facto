@@ -1,8 +1,8 @@
 package app.flux.stores.entries
 
-import models.Entity
-import models.access.JsEntityAccess
-import models.modification.EntityType
+import app.models.Entity
+import app.models.access.JsEntityAccess
+import app.models.modification.EntityType
 
 case class WithIsPending[Entry](entry: Entry, isPending: Boolean)
 
