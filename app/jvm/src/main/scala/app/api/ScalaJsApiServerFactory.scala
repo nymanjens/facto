@@ -1,8 +1,8 @@
-package api
+package app.api
 
-import api.Picklers._
-import api.ScalaJsApi._
-import api.UpdateTokens.toUpdateToken
+import app.api.Picklers._
+import app.api.ScalaJsApi._
+import app.api.UpdateTokens.toUpdateToken
 import com.google.inject._
 import common.PlayI18n
 import common.money.Currency

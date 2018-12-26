@@ -1,6 +1,6 @@
 package common.testing
 
-import api.ScalaJsApiModule
+import app.api.ScalaJsApiModule
 import com.google.inject._
 import common._
 import common.time._

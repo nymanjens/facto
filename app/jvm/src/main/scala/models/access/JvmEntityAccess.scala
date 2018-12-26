@@ -3,8 +3,8 @@ package models.access
 import java.time.Duration
 import java.util.concurrent.Executors
 
-import api.ScalaJsApi.ModificationsWithToken
-import api.UpdateTokens.toUpdateToken
+import app.api.ScalaJsApi.ModificationsWithToken
+import app.api.UpdateTokens.toUpdateToken
 import com.google.inject._
 import common.publisher.TriggerablePublisher
 import common.time.Clock

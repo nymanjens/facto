@@ -1,6 +1,6 @@
 package app.flux.stores
 
-import api.ScalaJsApi.UserPrototype
+import app.api.ScalaJsApi.UserPrototype
 import common.testing.Awaiter
 import common.testing.TestObjects._
 import app.flux.action.Actions

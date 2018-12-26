@@ -1,9 +1,9 @@
-package api
+package app.api
 
 import java.time.LocalDate
 import java.time.LocalTime
 
-import api.PicklableDbQuery.FieldWithValue
+import app.api.PicklableDbQuery.FieldWithValue
 import boopickle.Default._
 import common.money.Currency
 import common.time.LocalDateTime

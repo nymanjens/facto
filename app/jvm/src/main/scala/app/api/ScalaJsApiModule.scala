@@ -1,4 +1,4 @@
-package api
+package app.api
 
 import com.google.inject.AbstractModule
 

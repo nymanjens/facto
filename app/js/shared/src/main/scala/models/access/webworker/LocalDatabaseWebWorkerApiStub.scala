@@ -1,6 +1,6 @@
 package models.access.webworker
 
-import api.Picklers._
+import app.api.Picklers._
 import common.LoggingUtils.logExceptions
 import models.access.webworker.LocalDatabaseWebWorkerApi.MethodNumbers
 import models.access.webworker.LocalDatabaseWebWorkerApiConverters._

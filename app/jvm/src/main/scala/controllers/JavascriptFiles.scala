@@ -2,7 +2,7 @@ package controllers
 
 import java.net.URL
 
-import api.Picklers._
+import app.api.Picklers._
 import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
 import com.google.common.io.Resources

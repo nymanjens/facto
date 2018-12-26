@@ -1,4 +1,4 @@
-package api
+package app.api
 
 final class Module {
 

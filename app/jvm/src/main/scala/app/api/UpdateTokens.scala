@@ -1,11 +1,11 @@
-package api
+package app.api
 
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 
-import api.Picklers._
-import api.ScalaJsApi.UpdateToken
+import app.api.Picklers._
+import app.api.ScalaJsApi.UpdateToken
 import common.GuavaReplacement.Splitter
 import common.time.LocalDateTime
 

@@ -1,6 +1,6 @@
 package models.access.webworker
 
-import api.Picklers._
+import app.api.Picklers._
 import jsfacades.WebWorker
 import models.access.webworker.LocalDatabaseWebWorkerApi.LokiQuery
 import models.access.webworker.LocalDatabaseWebWorkerApi.MethodNumbers

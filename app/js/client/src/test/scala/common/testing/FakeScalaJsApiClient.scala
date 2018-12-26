@@ -1,8 +1,8 @@
 package common.testing
 
-import api.ScalaJsApi.GetAllEntitiesResponse
-import api.ScalaJsApi.UserPrototype
-import api.ScalaJsApiClient
+import app.api.ScalaJsApi.GetAllEntitiesResponse
+import app.api.ScalaJsApi.UserPrototype
+import app.api.ScalaJsApiClient
 import models.Entity
 import models.access.DbQuery
 import models.access.DbQueryExecutor

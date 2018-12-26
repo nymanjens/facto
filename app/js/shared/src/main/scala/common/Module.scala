@@ -1,6 +1,6 @@
 package common
 
-import api.ScalaJsApi.GetInitialDataResponse
+import app.api.ScalaJsApi.GetInitialDataResponse
 
 final class Module(implicit getInitialDataResponse: GetInitialDataResponse) {
 

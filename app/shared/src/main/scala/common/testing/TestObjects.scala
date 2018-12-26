@@ -4,8 +4,8 @@ import java.time.Instant
 import java.time.Month
 import java.time.Month._
 
-import api.ScalaJsApi.GetInitialDataResponse
-import api.ScalaJsApi.UpdateToken
+import app.api.ScalaJsApi.GetInitialDataResponse
+import app.api.ScalaJsApi.UpdateToken
 import common.time.LocalDateTime
 import common.time.LocalDateTimes
 import common.time.LocalDateTimes.createDateTime

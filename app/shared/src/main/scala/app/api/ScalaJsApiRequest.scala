@@ -1,8 +1,8 @@
-package api
+package app.api
 
 import java.nio.ByteBuffer
 
-import api.Picklers._
+import app.api.Picklers._
 
 /**
   * Picklable combination of method name (= path) and method arguments, representing a single call

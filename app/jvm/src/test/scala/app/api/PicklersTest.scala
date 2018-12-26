@@ -1,9 +1,9 @@
-package api
+package app.api
 
 import java.time.Month._
 
-import api.Picklers._
-import api.ScalaJsApi._
+import app.api.Picklers._
+import app.api.ScalaJsApi._
 import boopickle.Default._
 import boopickle.Pickler
 import common.money.Currency

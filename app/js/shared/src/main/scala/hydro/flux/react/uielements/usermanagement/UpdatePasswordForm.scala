@@ -1,6 +1,6 @@
 package hydro.flux.react.uielements.usermanagement
 
-import api.ScalaJsApi.UserPrototype
+import app.api.ScalaJsApi.UserPrototype
 import common.I18n
 import common.LoggingUtils.LogExceptionsCallback
 import common.LoggingUtils.logExceptions

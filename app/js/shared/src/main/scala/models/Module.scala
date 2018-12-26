@@ -1,6 +1,6 @@
 package models
 
-import api.ScalaJsApi.GetInitialDataResponse
+import app.api.ScalaJsApi.GetInitialDataResponse
 import common.money.ExchangeRateManager
 import models.access.JsEntityAccess
 import models.money.JsExchangeRateManager

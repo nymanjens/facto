@@ -1,7 +1,7 @@
 package models.access
 
-import api.ScalaJsApi.GetInitialDataResponse
-import api.ScalaJsApiClient
+import app.api.ScalaJsApi.GetInitialDataResponse
+import app.api.ScalaJsApiClient
 import models.user.User
 
 final class Module(implicit user: User,

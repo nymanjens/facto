@@ -1,6 +1,6 @@
 package hydro.flux.action
 
-import api.ScalaJsApi.UserPrototype
+import app.api.ScalaJsApi.UserPrototype
 
 object StandardActions {
 

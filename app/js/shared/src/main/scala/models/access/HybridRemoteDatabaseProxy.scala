@@ -1,7 +1,7 @@
 package models.access
 
-import api.ScalaJsApi.GetInitialDataResponse
-import api.ScalaJsApiClient
+import app.api.ScalaJsApi.GetInitialDataResponse
+import app.api.ScalaJsApiClient
 import common.LoggingUtils.logFailure
 import models.Entity
 import models.access.SingletonKey.NextUpdateTokenKey

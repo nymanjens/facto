@@ -3,15 +3,15 @@ package controllers
 import java.nio.ByteBuffer
 
 import akka.stream.scaladsl._
-import api.Picklers._
-import api.ScalaJsApi.ModificationsWithToken
-import api.ScalaJsApi.UpdateToken
-import api.ScalaJsApi.UserPrototype
-import api.PicklableDbQuery
-import api.ScalaJsApiRequest
-import api.ScalaJsApiServerFactory
-import api.UpdateTokens.toInstant
-import api.UpdateTokens.toUpdateToken
+import app.api.Picklers._
+import app.api.ScalaJsApi.ModificationsWithToken
+import app.api.ScalaJsApi.UpdateToken
+import app.api.ScalaJsApi.UserPrototype
+import app.api.PicklableDbQuery
+import app.api.ScalaJsApiRequest
+import app.api.ScalaJsApiServerFactory
+import app.api.UpdateTokens.toInstant
+import app.api.UpdateTokens.toUpdateToken
 import boopickle.Default._
 import com.google.inject.Inject
 import common.publisher.Publishers

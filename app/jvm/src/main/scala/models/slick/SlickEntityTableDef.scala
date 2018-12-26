@@ -3,7 +3,7 @@ package models.slick
 import java.nio.ByteBuffer
 import java.time.Instant
 
-import api.Picklers._
+import app.api.Picklers._
 import boopickle.Default.Pickle
 import boopickle.Default.Unpickle
 import common.accounting.Tags

@@ -1,8 +1,8 @@
 package models.access
 
-import api.Picklers._
-import api.ScalaJsApi.ModificationsWithToken
-import api.ScalaJsApi.UpdateToken
+import app.api.Picklers._
+import app.api.ScalaJsApi.ModificationsWithToken
+import app.api.ScalaJsApi.UpdateToken
 import boopickle.Default.Unpickle
 import boopickle.Default._
 import common.Listenable

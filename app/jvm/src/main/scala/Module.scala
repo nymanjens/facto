@@ -1,4 +1,4 @@
-import api.ScalaJsApiModule
+import app.api.ScalaJsApiModule
 import com.google.inject.AbstractModule
 import common.CommonModule
 import models.ModelsModule

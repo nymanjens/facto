@@ -28,7 +28,7 @@ object ClientApp {
     val commonTimeModule = new common.time.Module
     implicit val clock = commonTimeModule.clock
 
-    val apiModule = new api.Module
+    val apiModule = new app.api.Module
     implicit val scalaJsApiClient = apiModule.scalaJsApiClient
     implicit val initialDataResponse = await(logFailure(scalaJsApiClient.getInitialData()))
 

@@ -1,9 +1,9 @@
-package api
+package app.api
 
 import java.nio.ByteBuffer
 
-import api.Picklers._
-import api.ScalaJsApi._
+import app.api.Picklers._
+import app.api.ScalaJsApi._
 import autowire._
 import boopickle.Default._
 import common.LoggingUtils.logExceptions

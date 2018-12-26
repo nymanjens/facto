@@ -1,7 +1,7 @@
-package api
+package app.api
 
-import api.ScalaJsApi.UserPrototype
-import api.UpdateTokens.toUpdateToken
+import app.api.ScalaJsApi.UserPrototype
+import app.api.UpdateTokens.toUpdateToken
 import com.google.inject._
 import common.GuavaReplacement.Iterables.getOnlyElement
 import common.money.Currency

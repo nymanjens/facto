@@ -1,8 +1,8 @@
-package api
+package app.api
 
-import api.PicklableDbQuery.Sorting.FieldWithDirection
-import api.PicklableDbQuery.Filter
-import api.PicklableDbQuery.Sorting
+import app.api.PicklableDbQuery.Sorting.FieldWithDirection
+import app.api.PicklableDbQuery.Filter
+import app.api.PicklableDbQuery.Sorting
 import models.Entity
 import models.access.DbQuery
 import models.access.ModelField

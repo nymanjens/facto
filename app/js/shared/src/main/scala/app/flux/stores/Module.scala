@@ -1,6 +1,6 @@
 package app.flux.stores
 
-import api.ScalaJsApiClient
+import app.api.ScalaJsApiClient
 import common.I18n
 import common.money.ExchangeRateManager
 import common.time.Clock
