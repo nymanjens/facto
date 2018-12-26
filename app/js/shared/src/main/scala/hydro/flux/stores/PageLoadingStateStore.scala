@@ -2,7 +2,6 @@ package hydro.flux.stores
 
 import app.flux.action.Actions
 import hydro.flux.action.StandardActions
-import hydro.flux.action.StandardActions
 import hydro.flux.stores.PageLoadingStateStore.State
 import hydro.flux.action.Action
 import hydro.flux.action.Dispatcher

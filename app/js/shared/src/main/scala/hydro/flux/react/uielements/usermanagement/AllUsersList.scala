@@ -3,7 +3,6 @@ package hydro.flux.react.uielements.usermanagement
 import common.I18n
 import hydro.common.LoggingUtils.logExceptions
 import app.flux.react.ReactVdomUtils.<<
-import app.flux.react.uielements
 import hydro.flux.react.HydroReactComponent
 import hydro.flux.react.uielements.HalfPanel
 import hydro.flux.react.uielements.Table
