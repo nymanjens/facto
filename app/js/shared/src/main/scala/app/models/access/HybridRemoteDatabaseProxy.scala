@@ -2,7 +2,7 @@ package app.models.access
 
 import app.api.ScalaJsApi.GetInitialDataResponse
 import app.api.ScalaJsApiClient
-import common.LoggingUtils.logFailure
+import hydro.common.LoggingUtils.logFailure
 import app.models.Entity
 import app.models.access.SingletonKey.NextUpdateTokenKey
 import app.models.access.SingletonKey.VersionKey

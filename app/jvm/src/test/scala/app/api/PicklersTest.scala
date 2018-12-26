@@ -9,7 +9,7 @@ import boopickle.Pickler
 import common.money.Currency
 import common.testing.TestObjects._
 import common.testing._
-import common.time.LocalDateTimes
+import hydro.common.time.LocalDateTimes
 import app.models.accounting.Transaction
 import app.models.accounting.config.Config
 import app.models.modification.EntityModification

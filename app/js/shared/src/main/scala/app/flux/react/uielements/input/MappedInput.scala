@@ -1,9 +1,9 @@
 package app.flux.react.uielements.input
 
-import common.LoggingUtils.LogExceptionsCallback
-import common.LoggingUtils.logExceptions
-import common.time.LocalDateTime
-import common.time.TimeUtils
+import hydro.common.LoggingUtils.LogExceptionsCallback
+import hydro.common.LoggingUtils.logExceptions
+import hydro.common.time.LocalDateTime
+import hydro.common.time.TimeUtils
 import app.flux.react.uielements.input.MappedInput.ValueTransformer
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.component.Scala.MountedImpure

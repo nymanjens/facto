@@ -3,7 +3,7 @@ package app.flux.react.app.transactionviews
 import common.Formatting._
 import common.I18n
 import common.money.ExchangeRateManager
-import common.time.Clock
+import hydro.common.time.Clock
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.router.RouterContext
 import app.flux.react.uielements

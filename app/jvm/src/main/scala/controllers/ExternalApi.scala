@@ -3,8 +3,8 @@ package controllers
 import com.google.inject.Inject
 import common.money.Currency
 import common.money.MoneyWithGeneralCurrency
-import common.time.Clock
-import common.time.TimeUtils
+import hydro.common.time.Clock
+import hydro.common.time.TimeUtils
 import app.models.Entity
 import app.models.access.DbQueryImplicits._
 import app.models.access.JvmEntityAccess

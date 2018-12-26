@@ -7,8 +7,8 @@ import common.money.Currency.Gbp
 import common.money.Currency.Usd
 import common.testing.FakeJsEntityAccess
 import common.testing.TestModule
-import common.time.Clock
-import common.time.LocalDateTime
+import hydro.common.time.Clock
+import hydro.common.time.LocalDateTime
 import utest.TestSuite
 import utest._
 

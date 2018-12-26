@@ -6,7 +6,7 @@ import java.time.LocalTime
 import app.api.PicklableDbQuery.FieldWithValue
 import boopickle.Default._
 import common.money.Currency
-import common.time.LocalDateTime
+import hydro.common.time.LocalDateTime
 import app.models.Entity
 import app.models.access.ModelField
 import app.models.accounting.config._

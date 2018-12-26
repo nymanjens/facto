@@ -5,7 +5,7 @@ import java.time.Duration
 import common.money.Currency.Gbp
 import common.testing.FakeJsEntityAccess
 import common.testing.TestModule
-import common.time.Clock
+import hydro.common.time.Clock
 import app.models.money.ExchangeRateMeasurement
 import app.models.money.JsExchangeRateManager
 import utest.TestSuite

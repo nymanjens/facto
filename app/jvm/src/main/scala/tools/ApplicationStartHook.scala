@@ -8,8 +8,8 @@ import java.time.Month.JANUARY
 
 import com.google.inject.Inject
 import common.ResourceFiles
-import common.time.Clock
-import common.time.LocalDateTime
+import hydro.common.time.Clock
+import hydro.common.time.LocalDateTime
 import app.models.access.JvmEntityAccess
 import app.models.modification.EntityModification
 import app.models.money.ExchangeRateMeasurement

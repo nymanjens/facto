@@ -7,7 +7,7 @@ import app.api.ScalaJsApi.ModificationsWithToken
 import app.api.UpdateTokens.toUpdateToken
 import com.google.inject._
 import common.publisher.TriggerablePublisher
-import common.time.Clock
+import hydro.common.time.Clock
 import app.models.Entity
 import app.models.accounting._
 import app.models.modification.EntityType.BalanceCheckType

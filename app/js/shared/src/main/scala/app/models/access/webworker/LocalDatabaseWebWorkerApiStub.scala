@@ -1,7 +1,7 @@
 package app.models.access.webworker
 
 import app.api.Picklers._
-import common.LoggingUtils.logExceptions
+import hydro.common.LoggingUtils.logExceptions
 import app.models.access.webworker.LocalDatabaseWebWorkerApi.MethodNumbers
 import app.models.access.webworker.LocalDatabaseWebWorkerApiConverters._
 import org.scalajs

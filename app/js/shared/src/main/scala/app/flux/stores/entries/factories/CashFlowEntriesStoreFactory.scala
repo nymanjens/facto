@@ -2,8 +2,8 @@ package app.flux.stores.entries.factories
 
 import common.money.ExchangeRateManager
 import common.money.MoneyWithGeneralCurrency
-import common.time.JavaTimeImplicits._
-import common.time.LocalDateTime
+import hydro.common.time.JavaTimeImplicits._
+import hydro.common.time.LocalDateTime
 import app.flux.stores.entries.CashFlowEntry.BalanceCorrection
 import app.flux.stores.entries.CashFlowEntry.RegularEntry
 import app.flux.stores.entries.WithIsPending.isAnyPending

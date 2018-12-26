@@ -1,7 +1,7 @@
 package app.flux.stores
 
 import app.api.ScalaJsApi.UserPrototype
-import common.testing.Awaiter
+import hydro.common.testing.Awaiter
 import common.testing.TestObjects._
 import app.flux.action.Actions
 import hydro.flux.action.StandardActions

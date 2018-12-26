@@ -1,6 +1,6 @@
 package app.models.access
 
-import common.time.LocalDateTime
+import hydro.common.time.LocalDateTime
 import app.models.Entity
 import app.models.access.DbQuery.Filter
 import app.models.access.DbQuery.Sorting

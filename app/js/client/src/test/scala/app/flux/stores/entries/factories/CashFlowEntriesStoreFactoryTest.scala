@@ -8,7 +8,7 @@ import common.money.MoneyWithGeneralCurrency
 import common.testing.TestObjects._
 import common.testing.FakeJsEntityAccess
 import common.testing.TestModule
-import common.time.LocalDateTimes.createDateTime
+import hydro.common.time.LocalDateTimes.createDateTime
 import app.flux.stores.entries.CashFlowEntry.BalanceCorrection
 import app.flux.stores.entries.CashFlowEntry.RegularEntry
 import app.models.accounting._

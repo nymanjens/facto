@@ -2,7 +2,7 @@ package app.flux.react.app.balancecheckform
 
 import common.I18n
 import common.money.ExchangeRateManager
-import common.time.Clock
+import hydro.common.time.Clock
 import hydro.flux.action.Dispatcher
 import app.flux.stores.GlobalMessagesStore
 import hydro.flux.react.uielements.PageHeader

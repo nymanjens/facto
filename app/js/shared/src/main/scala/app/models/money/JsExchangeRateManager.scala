@@ -2,7 +2,7 @@ package app.models.money
 
 import common.money.Currency
 import common.money.ExchangeRateManager
-import common.time.LocalDateTime
+import hydro.common.time.LocalDateTime
 import app.models.access.JsEntityAccess
 import app.models.modification.EntityModification
 import app.models.modification.EntityType

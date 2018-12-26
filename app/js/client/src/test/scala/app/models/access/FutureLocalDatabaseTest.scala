@@ -1,6 +1,6 @@
 package app.models.access
 
-import common.testing.Awaiter
+import hydro.common.testing.Awaiter
 import utest._
 
 import scala.async.Async.async

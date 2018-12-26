@@ -1,9 +1,9 @@
 package hydro.flux.react.uielements
 
 import common.CollectionUtils.ifThenSeq
-import common.LoggingUtils.LogExceptionsCallback
+import hydro.common.LoggingUtils.LogExceptionsCallback
 import common.I18n
-import common.Unique
+import hydro.common.Unique
 import app.flux.react.ReactVdomUtils.<<
 import app.flux.react.ReactVdomUtils.^^
 import japgolly.scalajs.react._

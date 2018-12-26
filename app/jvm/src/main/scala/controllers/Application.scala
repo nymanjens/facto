@@ -3,7 +3,7 @@ package controllers
 import app.api.Picklers._
 import app.api.ScalaJsApiServerFactory
 import com.google.inject.Inject
-import common.time.Clock
+import hydro.common.time.Clock
 import controllers.helpers.AuthenticatedAction
 import app.models.access.JvmEntityAccess
 import play.api.i18n.I18nSupport

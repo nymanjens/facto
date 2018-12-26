@@ -3,7 +3,7 @@ package common.testing
 import app.api.ScalaJsApiModule
 import com.google.inject._
 import common._
-import common.time._
+import hydro.common.time._
 import app.models.ModelsModule
 import app.models.accounting.config.ConfigModule
 

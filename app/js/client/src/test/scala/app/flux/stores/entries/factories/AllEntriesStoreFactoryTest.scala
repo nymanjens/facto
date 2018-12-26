@@ -3,10 +3,10 @@ package app.flux.stores.entries.factories
 import java.time.Month.JANUARY
 
 import common.testing.TestObjects._
-import common.testing.Awaiter
+import hydro.common.testing.Awaiter
 import common.testing.FakeJsEntityAccess
-import common.time.LocalDateTime
-import common.time.LocalDateTimes.createDateTime
+import hydro.common.time.LocalDateTime
+import hydro.common.time.LocalDateTimes.createDateTime
 import app.flux.stores.entries.GeneralEntry.toGeneralEntrySeq
 import app.models.accounting._
 import app.models.modification.EntityModification

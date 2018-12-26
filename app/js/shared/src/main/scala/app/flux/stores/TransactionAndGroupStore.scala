@@ -1,6 +1,6 @@
 package app.flux.stores
 
-import common.time.Clock
+import hydro.common.time.Clock
 import app.flux.action.Actions.AddTransactionGroup
 import app.flux.action.Actions.RemoveTransactionGroup
 import app.flux.action.Actions.UpdateTransactionGroup

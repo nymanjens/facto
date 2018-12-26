@@ -6,9 +6,9 @@ import java.time.Month._
 
 import app.api.ScalaJsApi.GetInitialDataResponse
 import app.api.ScalaJsApi.UpdateToken
-import common.time.LocalDateTime
-import common.time.LocalDateTimes
-import common.time.LocalDateTimes.createDateTime
+import hydro.common.time.LocalDateTime
+import hydro.common.time.LocalDateTimes
+import hydro.common.time.LocalDateTimes.createDateTime
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup

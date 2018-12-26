@@ -3,7 +3,7 @@ package app.scala2js
 import java.time.Month.MARCH
 
 import common.testing.TestObjects._
-import common.time.LocalDateTime
+import hydro.common.time.LocalDateTime
 import app.models.access.ModelField
 import app.models.accounting._
 import app.models.modification.EntityModification

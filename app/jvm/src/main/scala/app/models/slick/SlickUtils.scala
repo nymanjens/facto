@@ -4,8 +4,8 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.{LocalDateTime => JavaLocalDateTime}
 
-import common.time.LocalDateTime
-import common.time.LocalDateTimes
+import hydro.common.time.LocalDateTime
+import hydro.common.time.LocalDateTimes
 import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
 

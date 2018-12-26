@@ -1,7 +1,7 @@
 package hydro.flux.react.uielements
 
 import common.I18n
-import common.LoggingUtils.logExceptions
+import hydro.common.LoggingUtils.logExceptions
 import hydro.flux.react.HydroReactComponent
 import hydro.flux.stores.ApplicationIsOnlineStore
 import japgolly.scalajs.react._

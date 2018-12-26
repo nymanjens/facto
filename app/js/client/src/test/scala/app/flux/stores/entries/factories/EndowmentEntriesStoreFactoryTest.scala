@@ -4,7 +4,7 @@ import java.time.Month.JANUARY
 
 import common.testing.FakeJsEntityAccess
 import common.testing.TestObjects._
-import common.time.LocalDateTimes.createDateTime
+import hydro.common.time.LocalDateTimes.createDateTime
 import app.flux.stores.entries.GeneralEntry.toGeneralEntrySeq
 import app.models.accounting._
 import app.models.accounting.config.Account

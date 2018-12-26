@@ -1,7 +1,7 @@
 package app.flux.react.uielements.input.bootstrap
 
 import common.I18n
-import common.LoggingUtils.logExceptions
+import hydro.common.LoggingUtils.logExceptions
 import app.flux.react.ReactVdomUtils.<<
 import app.flux.react.ReactVdomUtils.^^
 import hydro.flux.react.uielements.input.InputBase

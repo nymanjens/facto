@@ -7,7 +7,7 @@ import app.api.Picklers._
 import boopickle.Default.Pickle
 import boopickle.Default.Unpickle
 import common.accounting.Tags
-import common.time.LocalDateTime
+import hydro.common.time.LocalDateTime
 import app.models.Entity
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction

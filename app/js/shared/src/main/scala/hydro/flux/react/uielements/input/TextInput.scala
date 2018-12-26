@@ -1,7 +1,7 @@
 package hydro.flux.react.uielements.input
 
-import common.LoggingUtils.LogExceptionsCallback
-import common.LoggingUtils.logExceptions
+import hydro.common.LoggingUtils.LogExceptionsCallback
+import hydro.common.LoggingUtils.logExceptions
 import app.flux.react.ReactVdomUtils.^^
 import hydro.flux.react.HydroReactComponent
 import japgolly.scalajs.react.Ref.ToScalaComponent

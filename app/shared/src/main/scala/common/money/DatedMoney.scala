@@ -1,7 +1,7 @@
 package common.money
 
 import common.GuavaReplacement.DoubleMath.roundToLong
-import common.time.LocalDateTime
+import hydro.common.time.LocalDateTime
 
 /**
   * Represents an amount of money that was spent or gained at a given date.

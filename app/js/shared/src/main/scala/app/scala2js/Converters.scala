@@ -4,7 +4,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 import common.GuavaReplacement.ImmutableBiMap
-import common.time.LocalDateTime
+import hydro.common.time.LocalDateTime
 import app.models._
 import app.models.access.ModelField
 import app.models.accounting._

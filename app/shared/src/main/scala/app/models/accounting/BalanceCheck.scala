@@ -1,7 +1,7 @@
 package app.models.accounting
 
 import common.money.DatedMoney
-import common.time.LocalDateTime
+import hydro.common.time.LocalDateTime
 import app.models.Entity
 import app.models.access.EntityAccess
 import app.models.accounting.config.Config

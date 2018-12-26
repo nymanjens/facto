@@ -2,7 +2,7 @@ package app.flux.react.app
 
 import common.CollectionUtils.ifThenSeq
 import common.I18n
-import common.LoggingUtils.LogExceptionsCallback
+import hydro.common.LoggingUtils.LogExceptionsCallback
 import app.flux.react.ReactVdomUtils.^^
 import app.flux.router.Page
 import app.flux.router.RouterContext

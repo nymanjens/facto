@@ -1,7 +1,7 @@
 package app.flux.react.app
 
 import common.I18n
-import common.LoggingUtils.logExceptions
+import hydro.common.LoggingUtils.logExceptions
 import app.flux.react.ReactVdomUtils.<<
 import app.flux.router.Page
 import app.flux.router.RouterContext

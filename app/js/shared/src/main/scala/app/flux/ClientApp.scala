@@ -1,7 +1,7 @@
 package app.flux
 
-import common.LoggingUtils.logExceptions
-import common.LoggingUtils.logFailure
+import hydro.common.LoggingUtils.logExceptions
+import hydro.common.LoggingUtils.logFailure
 import org.scalajs.dom
 import org.scalajs.dom.Event
 import org.scalajs.dom.console
@@ -25,7 +25,7 @@ object ClientApp {
     logUncaughtErrors()
     setUpServiceWorker()
 
-    val commonTimeModule = new common.time.Module
+    val commonTimeModule = new hydro.common.time.Module
     implicit val clock = commonTimeModule.clock
 
     val apiModule = new app.api.Module

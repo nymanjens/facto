@@ -6,7 +6,7 @@ import java.time.Month._
 import common.money.ReferenceMoney
 import common.testing.FakeJsEntityAccess
 import common.testing.TestObjects._
-import common.time.DatedMonth
+import hydro.common.time.DatedMonth
 import app.flux.stores.entries.ComplexQueryFilter
 import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
 import app.models.accounting.Transaction

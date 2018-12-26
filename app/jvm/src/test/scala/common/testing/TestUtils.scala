@@ -4,7 +4,7 @@ import java.time.Instant
 import java.time.ZoneId
 
 import common.testing.TestObjects._
-import common.time.LocalDateTime
+import hydro.common.time.LocalDateTime
 import app.models.Entity
 import app.models.access.JvmEntityAccess
 import app.models.accounting.config.Account

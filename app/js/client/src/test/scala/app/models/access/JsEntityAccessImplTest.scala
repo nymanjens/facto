@@ -1,10 +1,10 @@
 package app.models.access
 
 import common.testing.FakeScalaJsApiClient
-import common.testing.ModificationsBuffer
+import hydro.common.testing.ModificationsBuffer
 import common.testing.TestModule
 import common.testing.TestObjects._
-import common.time.Clock
+import hydro.common.time.Clock
 import app.models.Entity
 import app.models.accounting.Transaction
 import app.models.modification.EntityModification

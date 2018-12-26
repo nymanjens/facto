@@ -6,8 +6,8 @@ import app.api.Picklers._
 import app.api.ScalaJsApi._
 import autowire._
 import boopickle.Default._
-import common.LoggingUtils.logExceptions
-import common.websocket.SerialWebsocketClientParallelizer
+import hydro.common.LoggingUtils.logExceptions
+import hydro.common.websocket.SerialWebsocketClientParallelizer
 import app.models.Entity
 import app.models.access.DbQuery
 import app.models.modification.EntityModification

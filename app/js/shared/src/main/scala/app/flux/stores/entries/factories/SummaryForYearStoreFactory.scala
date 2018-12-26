@@ -2,8 +2,8 @@ package app.flux.stores.entries.factories
 
 import common.money.ExchangeRateManager
 import common.money.ReferenceMoney
-import common.time.DatedMonth
-import common.time.LocalDateTime
+import hydro.common.time.DatedMonth
+import hydro.common.time.LocalDateTime
 import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
 import app.flux.stores.entries.ComplexQueryFilter
 import app.flux.stores.entries.EntriesStore

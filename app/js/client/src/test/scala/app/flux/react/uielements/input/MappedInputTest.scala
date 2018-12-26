@@ -5,8 +5,8 @@ import java.time.Month.MAY
 
 import common.testing.ReactTestWrapper
 import common.testing.TestModule
-import common.time.LocalDateTime
-import common.time.LocalDateTimes.createDateTime
+import hydro.common.time.LocalDateTime
+import hydro.common.time.LocalDateTimes.createDateTime
 import japgolly.scalajs.react.test.ReactTestUtils
 import japgolly.scalajs.react.vdom.VdomElement
 import app.scala2js.Converters._

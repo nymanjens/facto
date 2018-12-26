@@ -5,9 +5,9 @@ import app.api.ScalaJsApi.ModificationsWithToken
 import app.api.ScalaJsApi.UpdateToken
 import boopickle.Default.Unpickle
 import boopickle.Default._
-import common.Listenable
-import common.Listenable.WritableListenable
-import common.websocket.BinaryWebsocketClient
+import hydro.common.Listenable
+import hydro.common.Listenable.WritableListenable
+import hydro.common.websocket.BinaryWebsocketClient
 import org.scalajs.dom
 import org.scalajs.dom.raw.Event
 

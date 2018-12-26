@@ -7,8 +7,8 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.Month
 
-import common.time.Clock
-import common.time.LocalDateTime
+import hydro.common.time.Clock
+import hydro.common.time.LocalDateTime
 
 object Formatting {
   // Note: Cannot use DateTimeFormatter as it isn't supported by scala.js

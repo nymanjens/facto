@@ -16,9 +16,9 @@ final class ClientAppModule(implicit getInitialDataResponse: GetInitialDataRespo
   implicit private val user: User = getInitialDataResponse.user
 
   // Create and unpack common modules
-  private val commonTimeModule = new common.time.Module
+  private val commonTimeModule = new hydro.common.time.Module
   implicit private val clock = commonTimeModule.clock
-  private val commonModule = new common.Module
+  private val commonModule = new hydro.common.Module
   implicit private val i18n = commonModule.i18n
 
   // Create and unpack Models Access module

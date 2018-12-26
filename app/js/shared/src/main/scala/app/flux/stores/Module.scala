@@ -3,7 +3,7 @@ package app.flux.stores
 import app.api.ScalaJsApiClient
 import common.I18n
 import common.money.ExchangeRateManager
-import common.time.Clock
+import hydro.common.time.Clock
 import app.flux.stores.entries._
 import app.flux.stores.entries.factories._
 import hydro.flux.action.Dispatcher

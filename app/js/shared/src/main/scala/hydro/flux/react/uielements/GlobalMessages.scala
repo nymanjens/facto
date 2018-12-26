@@ -1,6 +1,6 @@
 package hydro.flux.react.uielements
 
-import common.LoggingUtils.logExceptions
+import hydro.common.LoggingUtils.logExceptions
 import app.flux.react.app.Menu
 import app.flux.stores.GlobalMessagesStore
 import app.flux.stores.GlobalMessagesStore.Message

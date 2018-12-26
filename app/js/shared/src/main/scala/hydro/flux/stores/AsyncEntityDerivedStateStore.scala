@@ -1,7 +1,7 @@
 package hydro.flux.stores
 
-import common.LoggingUtils.logExceptions
-import common.LoggingUtils.logFailure
+import hydro.common.LoggingUtils.logExceptions
+import hydro.common.LoggingUtils.logFailure
 import app.models.access.JsEntityAccess
 import app.models.modification.EntityModification
 

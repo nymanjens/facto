@@ -1,7 +1,7 @@
 package hydro.flux.react.uielements
 
 import common.I18n
-import common.LoggingUtils.LogExceptionsCallback
+import hydro.common.LoggingUtils.LogExceptionsCallback
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
