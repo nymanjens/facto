@@ -5,11 +5,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 
-import com.google.inject._
-import app.models.accounting.config.Config
-
-final class JvmClock @Inject()(accountingConfig: Config) extends Clock {
-  val zone = ZoneId.of(accountingConfig.constants.zoneId)
+final class JvmClock(zone: ZoneId) extends Clock {
 
   private val initialInstant: Instant = Instant.now
   private val initialNanos: Long = System.nanoTime
