@@ -12,7 +12,7 @@ import scala.collection.mutable
 
 class FakeRouterContext extends RouterContext {
   private val allowedPagesToNavigateTo: mutable.Set[Page] = mutable.Set()
-  private var _currentPage: Page = Page.Everything
+  private var _currentPage: Page = Page.UserProfile
 
   // **************** API implementation: Getters **************** //
   override def currentPage = _currentPage
