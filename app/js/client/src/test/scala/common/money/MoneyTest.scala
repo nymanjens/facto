@@ -12,7 +12,7 @@ import utest.TestSuite
 import utest._
 
 import scala.collection.immutable.Seq
-import app.scala2js.Converters._
+import hydro.scala2js.StandardConverters._
 
 class MoneyTest extends TestSuite {
 

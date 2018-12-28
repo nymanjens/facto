@@ -1,7 +1,6 @@
 package hydro.scala2js
 
 import app.models.access.ModelField
-import app.scala2js.Converters
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
@@ -35,5 +34,6 @@ object Scala2Js {
     implicitly[Converter[T]].toScala(value)
   }
 
-  def toJs[V, E](value: V, field: ModelField[V, E]): js.Any = toJs(value)(Converters.fromModelField(field))
+  def toJs[V, E](value: V, field: ModelField[V, E]): js.Any =
+    toJs(value)(StandardConverters.fromModelField(field))
 }

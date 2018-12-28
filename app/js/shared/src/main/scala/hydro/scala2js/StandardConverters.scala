@@ -1,30 +1,24 @@
-package app.scala2js
+package hydro.scala2js
 
 import java.time.LocalDate
 import java.time.LocalTime
 
-import common.GuavaReplacement.ImmutableBiMap
-import hydro.common.time.LocalDateTime
 import app.models._
 import app.models.access.ModelField
 import app.models.accounting._
 import app.models.modification._
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
-import hydro.scala2js.Scala2Js
+import common.GuavaReplacement.ImmutableBiMap
+import hydro.common.time.LocalDateTime
 import hydro.scala2js.Scala2Js.Converter
 import hydro.scala2js.Scala2Js.MapConverter
 
 import scala.collection.immutable.Seq
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
-import hydro.scala2js.Scala2Js.Converter
-import hydro.scala2js.Scala2Js.MapConverter
 
-import scala.collection.mutable
-import scala.concurrent.duration.FiniteDuration
-
-object Converters {
+object StandardConverters {
 
   // **************** Convertor generators **************** //
   implicit def fromEntityType[E <: Entity: EntityType]: MapConverter[E] = {

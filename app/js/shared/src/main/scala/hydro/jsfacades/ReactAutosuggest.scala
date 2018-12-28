@@ -6,7 +6,7 @@ import japgolly.scalajs.react.JsComponent
 import scala.collection.immutable.Seq
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
-import app.scala2js.Converters._
+import hydro.scala2js.StandardConverters._
 
 import scala.scalajs.js.annotation.JSImport
 

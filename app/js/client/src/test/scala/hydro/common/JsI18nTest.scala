@@ -3,7 +3,7 @@ package hydro.common
 import utest.TestSuite
 import utest._
 
-import app.scala2js.Converters._
+import hydro.scala2js.StandardConverters._
 
 object JsI18nTest extends TestSuite {
 

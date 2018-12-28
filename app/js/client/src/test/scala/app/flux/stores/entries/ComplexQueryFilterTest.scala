@@ -10,7 +10,7 @@ import utest._
 
 import scala.collection.immutable.Seq
 import scala.language.reflectiveCalls
-import app.scala2js.Converters._
+import hydro.scala2js.StandardConverters._
 
 object ComplexQueryFilterTest extends TestSuite {
 

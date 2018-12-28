@@ -6,7 +6,7 @@ import hydro.flux.action.StandardActions
 import hydro.flux.action.Dispatcher
 import hydro.flux.action.Action
 import hydro.flux.action.StandardActions
-import app.scala2js.Converters._
+import hydro.scala2js.StandardConverters._
 import utest._
 
 import scala.async.Async.async

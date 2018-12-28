@@ -15,7 +15,7 @@ import app.models.accounting.config.Config
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
-import app.scala2js.Converters._
+import hydro.scala2js.StandardConverters._
 
 private[stores] final class ComplexQueryFilter(implicit entityAccess: JsEntityAccess,
                                                accountingConfig: Config) {

@@ -10,7 +10,7 @@ import utest._
 import scala.async.Async.async
 import scala.async.Async.await
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import app.scala2js.Converters._
+import hydro.scala2js.StandardConverters._
 
 object SummaryYearsStoreFactoryTest extends TestSuite {
 

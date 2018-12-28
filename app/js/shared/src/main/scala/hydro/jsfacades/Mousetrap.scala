@@ -1,7 +1,7 @@
 package hydro.jsfacades
 
 import org.scalajs.dom.raw.KeyboardEvent
-import app.scala2js.Converters._
+import hydro.scala2js.StandardConverters._
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSImport

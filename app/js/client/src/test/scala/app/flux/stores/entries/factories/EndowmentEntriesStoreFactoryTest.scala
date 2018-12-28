@@ -16,7 +16,7 @@ import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.util.Random
-import app.scala2js.Converters._
+import hydro.scala2js.StandardConverters._
 
 object EndowmentEntriesStoreFactoryTest extends TestSuite {
 

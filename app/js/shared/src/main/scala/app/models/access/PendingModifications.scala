@@ -6,7 +6,7 @@ import app.models.modification.EntityModification
 import app.models.modification.EntityType
 
 import scala.collection.immutable.Seq
-import app.scala2js.Converters._
+import hydro.scala2js.StandardConverters._
 
 case class PendingModifications(modifications: Seq[EntityModification], persistedLocally: Boolean) {
   private val addModificationIds: ImmutableSetMultimap[EntityType.any, Long] = {

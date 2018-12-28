@@ -18,7 +18,7 @@ import scala.concurrent.Promise
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
-import app.scala2js.Converters._
+import hydro.scala2js.StandardConverters._
 import hydro.scala2js.Scala2Js
 
 private[webworker] final class LocalDatabaseWebWorkerApiStub extends LocalDatabaseWebWorkerApi {

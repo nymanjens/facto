@@ -3,7 +3,7 @@ package app.flux.stores.entries
 import common.testing.TestObjects._
 import utest._
 
-import app.scala2js.Converters._
+import hydro.scala2js.StandardConverters._
 
 // Note: Testing with GeneralEntry because GroupedTransactions is abstract
 object GroupedTransactionsTest extends TestSuite {

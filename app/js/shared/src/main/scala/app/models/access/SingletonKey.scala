@@ -3,7 +3,7 @@ package app.models.access
 import common.ScalaUtils
 import common.ScalaUtils.visibleForTesting
 
-import app.scala2js.Converters._
+import hydro.scala2js.StandardConverters._
 import hydro.scala2js.Scala2Js
 
 @visibleForTesting

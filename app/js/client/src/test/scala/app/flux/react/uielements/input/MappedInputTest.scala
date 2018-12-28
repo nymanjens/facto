@@ -9,7 +9,7 @@ import hydro.common.time.LocalDateTime
 import hydro.common.time.LocalDateTimes.createDateTime
 import japgolly.scalajs.react.test.ReactTestUtils
 import japgolly.scalajs.react.vdom.VdomElement
-import app.scala2js.Converters._
+import hydro.scala2js.StandardConverters._
 import utest._
 
 object MappedInputTest extends TestSuite {

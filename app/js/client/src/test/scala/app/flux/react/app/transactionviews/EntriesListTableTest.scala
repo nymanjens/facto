@@ -4,7 +4,7 @@ import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import utest._
 
 import scala.collection.immutable.Seq
-import app.scala2js.Converters._
+import hydro.scala2js.StandardConverters._
 
 object EntriesListTableTest extends TestSuite {
 
