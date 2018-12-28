@@ -202,15 +202,23 @@ object Picklers {
       }
 
       private def picklerForField(field: ModelField[_, _]): Pickler[_] = {
-        def fromType[V: Pickler](fieldType: ModelField.FieldType[V]): Pickler[V] = implicitly
-        field.fieldType match {
-          case ModelField.FieldType.BooleanType       => fromType(ModelField.FieldType.BooleanType)
-          case ModelField.FieldType.LongType          => fromType(ModelField.FieldType.LongType)
-          case ModelField.FieldType.DoubleType        => fromType(ModelField.FieldType.DoubleType)
-          case ModelField.FieldType.StringType        => fromType(ModelField.FieldType.StringType)
-          case ModelField.FieldType.LocalDateTimeType => fromType(ModelField.FieldType.LocalDateTimeType)
-          case ModelField.FieldType.StringSeqType     => fromType(ModelField.FieldType.StringSeqType)
+        def fromFieldType(fieldType: ModelField.FieldType[_]): Pickler[_] = {
+          def fromType[V: Pickler](fieldType: ModelField.FieldType[V]): Pickler[V] = implicitly
+          fieldType match {
+            case ModelField.FieldType.OptionType(valueFieldType) =>
+              optionPickler(fromFieldType(valueFieldType))
+            case ModelField.FieldType.BooleanType        => fromType(ModelField.FieldType.BooleanType)
+            case ModelField.FieldType.IntType            => fromType(ModelField.FieldType.IntType)
+            case ModelField.FieldType.LongType           => fromType(ModelField.FieldType.LongType)
+            case ModelField.FieldType.DoubleType         => fromType(ModelField.FieldType.DoubleType)
+            case ModelField.FieldType.StringType         => fromType(ModelField.FieldType.StringType)
+            case ModelField.FieldType.LocalDateTimeType  => fromType(ModelField.FieldType.LocalDateTimeType)
+            case ModelField.FieldType.FiniteDurationType => fromType(ModelField.FieldType.FiniteDurationType)
+            case ModelField.FieldType.StringSeqType      => fromType(ModelField.FieldType.StringSeqType)
+            case ModelField.FieldType.OrderTokenType     => fromType(ModelField.FieldType.OrderTokenType)
+          }
         }
+        fromFieldType(field.fieldType)
       }
     }
 
