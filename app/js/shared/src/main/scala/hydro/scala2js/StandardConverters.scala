@@ -150,6 +150,27 @@ object StandardConverters {
     }
   }
 
+  implicit object FiniteDurationConverter extends Converter[FiniteDuration] {
+
+    private val secondsInDay = 60 * 60 * 24
+
+    override def toJs(duration: FiniteDuration) = {
+      Scala2Js.toJs(duration.toMillis)
+    }
+    override def toScala(value: js.Any) = {
+      Scala2Js.toScala[Long](value).millis
+    }
+  }
+
+  implicit object OrderTokenConverter extends Converter[OrderToken] {
+    override def toJs(token: OrderToken) = {
+      token.parts.toJSArray
+    }
+    override def toScala(value: js.Any) = {
+      OrderToken(value.asInstanceOf[js.Array[Int]].toList)
+    }
+  }
+
   implicit val EntityTypeConverter: Converter[EntityType.any] = enumConverter(
     EntityType.UserType,
     EntityType.TransactionType,
