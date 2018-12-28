@@ -18,6 +18,11 @@ import hydro.scala2js.Scala2Js.MapConverter
 import scala.collection.immutable.Seq
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
+import hydro.scala2js.Scala2Js.Converter
+import hydro.scala2js.Scala2Js.MapConverter
+
+import scala.collection.mutable
+import scala.concurrent.duration.FiniteDuration
 
 object Converters {
 
@@ -187,8 +192,10 @@ object Converters {
   }
 
   // **************** Entity converters **************** //
-  private[scala2js] abstract class EntityConverter[E <: Entity: EntityType] extends MapConverter[E] {
-    override final def toJs(entity: E) = {
+  final class EntityConverter[E <: Entity: EntityType](allFieldsWithoutId: Seq[ModelField[_, E]] = Seq(),
+                                                       toScalaWithoutId: EntityConverter.DictWrapper[E] => E)
+      extends MapConverter[E] {
+    override def toJs(entity: E) = {
       val result = js.Dictionary[js.Any]()
 
       def addField[V](field: ModelField[V, E]): Unit = {
@@ -203,8 +210,8 @@ object Converters {
       result
     }
 
-    override final def toScala(dict: js.Dictionary[js.Any]) = {
-      val entityWithoutId = toScalaWithoutId(dict)
+    override def toScala(dict: js.Dictionary[js.Any]) = {
+      val entityWithoutId = toScalaWithoutId(new EntityConverter.DictWrapper(dict))
       val idOption = dict.get(ModelField.id[E].name).map(Scala2Js.toScala[Long])
       if (idOption.isDefined) {
         Entity.withId(idOption.get, entityWithoutId)
@@ -212,125 +219,107 @@ object Converters {
         entityWithoutId
       }
     }
-
-    protected def allFieldsWithoutId: Seq[ModelField[_, E]]
-    protected def toScalaWithoutId(dict: js.Dictionary[js.Any]): E
+  }
+  object EntityConverter {
+    final class DictWrapper[E <: Entity: EntityType](val dict: js.Dictionary[js.Any]) {
+      def getRequired[V](field: ModelField[V, E]): V = {
+        require(dict.contains(field.name), s"Key ${field.name} is missing from ${js.JSON.stringify(dict)}")
+        Scala2Js.toScala[V](dict(field.name))(fromModelField(field))
+      }
+    }
   }
 
-  implicit object UserConverter extends EntityConverter[User] {
-    override def allFieldsWithoutId =
-      Seq(
-        ModelField.User.loginName,
-        ModelField.User.passwordHash,
-        ModelField.User.name,
-        ModelField.User.isAdmin,
-        ModelField.User.expandCashFlowTablesByDefault,
-        ModelField.User.expandLiquidationTablesByDefault
-      )
-
-    override def toScalaWithoutId(dict: js.Dictionary[js.Any]) = {
-      def getRequired[T](field: ModelField[T, User]) =
-        getRequiredValueFromDict(dict)(field)
-
+  implicit val UserConverter: EntityConverter[User] = new EntityConverter(
+    allFieldsWithoutId = Seq(
+      ModelField.User.loginName,
+      ModelField.User.passwordHash,
+      ModelField.User.name,
+      ModelField.User.isAdmin,
+      ModelField.User.expandCashFlowTablesByDefault,
+      ModelField.User.expandLiquidationTablesByDefault,
+    ),
+    toScalaWithoutId = dict =>
       User(
-        loginName = getRequired(ModelField.User.loginName),
-        passwordHash = getRequired(ModelField.User.passwordHash),
-        name = getRequired(ModelField.User.name),
-        isAdmin = getRequired(ModelField.User.isAdmin),
-        expandCashFlowTablesByDefault = getRequired(ModelField.User.expandCashFlowTablesByDefault),
-        expandLiquidationTablesByDefault = getRequired(ModelField.User.expandLiquidationTablesByDefault)
-      )
-    }
-  }
+        loginName = dict.getRequired(ModelField.User.loginName),
+        passwordHash = dict.getRequired(ModelField.User.passwordHash),
+        name = dict.getRequired(ModelField.User.name),
+        isAdmin = dict.getRequired(ModelField.User.isAdmin),
+        expandCashFlowTablesByDefault = dict.getRequired(ModelField.User.expandCashFlowTablesByDefault),
+        expandLiquidationTablesByDefault = dict.getRequired(ModelField.User.expandLiquidationTablesByDefault)
+    )
+  )
 
-  implicit object TransactionConverter extends EntityConverter[Transaction] {
-    override def allFieldsWithoutId =
-      Seq(
-        ModelField.Transaction.transactionGroupId,
-        ModelField.Transaction.issuerId,
-        ModelField.Transaction.beneficiaryAccountCode,
-        ModelField.Transaction.moneyReservoirCode,
-        ModelField.Transaction.categoryCode,
-        ModelField.Transaction.description,
-        ModelField.Transaction.flowInCents,
-        ModelField.Transaction.detailDescription,
-        ModelField.Transaction.tags,
-        ModelField.Transaction.createdDate,
-        ModelField.Transaction.transactionDate,
-        ModelField.Transaction.consumedDate
-      )
-
-    override def toScalaWithoutId(dict: js.Dictionary[js.Any]) = {
-      def getRequired[T](field: ModelField[T, Transaction]) =
-        getRequiredValueFromDict(dict)(field)
-
+  implicit val TransactionConverter: EntityConverter[Transaction] = new EntityConverter(
+    allFieldsWithoutId = Seq(
+      ModelField.Transaction.transactionGroupId,
+      ModelField.Transaction.issuerId,
+      ModelField.Transaction.beneficiaryAccountCode,
+      ModelField.Transaction.moneyReservoirCode,
+      ModelField.Transaction.categoryCode,
+      ModelField.Transaction.description,
+      ModelField.Transaction.flowInCents,
+      ModelField.Transaction.detailDescription,
+      ModelField.Transaction.tags,
+      ModelField.Transaction.createdDate,
+      ModelField.Transaction.transactionDate,
+      ModelField.Transaction.consumedDate,
+    ),
+    toScalaWithoutId = dict =>
       Transaction(
-        transactionGroupId = getRequired(ModelField.Transaction.transactionGroupId),
-        issuerId = getRequired(ModelField.Transaction.issuerId),
-        beneficiaryAccountCode = getRequired(ModelField.Transaction.beneficiaryAccountCode),
-        moneyReservoirCode = getRequired(ModelField.Transaction.moneyReservoirCode),
-        categoryCode = getRequired(ModelField.Transaction.categoryCode),
-        description = getRequired(ModelField.Transaction.description),
-        flowInCents = getRequired(ModelField.Transaction.flowInCents),
-        detailDescription = getRequired(ModelField.Transaction.detailDescription),
-        tags = getRequired(ModelField.Transaction.tags),
-        createdDate = getRequired(ModelField.Transaction.createdDate),
-        transactionDate = getRequired(ModelField.Transaction.transactionDate),
-        consumedDate = getRequired(ModelField.Transaction.consumedDate)
-      )
-    }
-  }
+        transactionGroupId = dict.getRequired(ModelField.Transaction.transactionGroupId),
+        issuerId = dict.getRequired(ModelField.Transaction.issuerId),
+        beneficiaryAccountCode = dict.getRequired(ModelField.Transaction.beneficiaryAccountCode),
+        moneyReservoirCode = dict.getRequired(ModelField.Transaction.moneyReservoirCode),
+        categoryCode = dict.getRequired(ModelField.Transaction.categoryCode),
+        description = dict.getRequired(ModelField.Transaction.description),
+        flowInCents = dict.getRequired(ModelField.Transaction.flowInCents),
+        detailDescription = dict.getRequired(ModelField.Transaction.detailDescription),
+        tags = dict.getRequired(ModelField.Transaction.tags),
+        createdDate = dict.getRequired(ModelField.Transaction.createdDate),
+        transactionDate = dict.getRequired(ModelField.Transaction.transactionDate),
+        consumedDate = dict.getRequired(ModelField.Transaction.consumedDate)
+    )
+  )
 
-  implicit object TransactionGroupConverter extends EntityConverter[TransactionGroup] {
-    override def allFieldsWithoutId = Seq(ModelField.TransactionGroup.createdDate)
-    override def toScalaWithoutId(dict: js.Dictionary[js.Any]) = {
-      def getRequired[T](field: ModelField[T, TransactionGroup]) =
-        getRequiredValueFromDict(dict)(field)
+  implicit val TransactionGroupConverter: EntityConverter[TransactionGroup] = new EntityConverter(
+    allFieldsWithoutId = Seq(
+      ModelField.TransactionGroup.createdDate,
+    ),
+    toScalaWithoutId =
+      dict => TransactionGroup(createdDate = dict.getRequired(ModelField.TransactionGroup.createdDate))
+  )
 
-      TransactionGroup(createdDate = getRequired(ModelField.TransactionGroup.createdDate))
-    }
-  }
-
-  implicit object BalanceCheckConverter extends EntityConverter[BalanceCheck] {
-    override def allFieldsWithoutId =
-      Seq(
-        ModelField.BalanceCheck.issuerId,
-        ModelField.BalanceCheck.moneyReservoirCode,
-        ModelField.BalanceCheck.balanceInCents,
-        ModelField.BalanceCheck.createdDate,
-        ModelField.BalanceCheck.checkDate
-      )
-    override def toScalaWithoutId(dict: js.Dictionary[js.Any]) = {
-      def getRequired[T](field: ModelField[T, BalanceCheck]) =
-        getRequiredValueFromDict(dict)(field)
-
+  implicit val BalanceCheckConverter: EntityConverter[BalanceCheck] = new EntityConverter(
+    allFieldsWithoutId = Seq(
+      ModelField.BalanceCheck.issuerId,
+      ModelField.BalanceCheck.moneyReservoirCode,
+      ModelField.BalanceCheck.balanceInCents,
+      ModelField.BalanceCheck.createdDate,
+      ModelField.BalanceCheck.checkDate,
+    ),
+    toScalaWithoutId = dict =>
       BalanceCheck(
-        issuerId = getRequired(ModelField.BalanceCheck.issuerId),
-        moneyReservoirCode = getRequired(ModelField.BalanceCheck.moneyReservoirCode),
-        balanceInCents = getRequired(ModelField.BalanceCheck.balanceInCents),
-        createdDate = getRequired(ModelField.BalanceCheck.createdDate),
-        checkDate = getRequired(ModelField.BalanceCheck.checkDate)
-      )
-    }
-  }
+        issuerId = dict.getRequired(ModelField.BalanceCheck.issuerId),
+        moneyReservoirCode = dict.getRequired(ModelField.BalanceCheck.moneyReservoirCode),
+        balanceInCents = dict.getRequired(ModelField.BalanceCheck.balanceInCents),
+        createdDate = dict.getRequired(ModelField.BalanceCheck.createdDate),
+        checkDate = dict.getRequired(ModelField.BalanceCheck.checkDate)
+    )
+  )
 
-  implicit object ExchangeRateMeasurementConverter extends EntityConverter[ExchangeRateMeasurement] {
-    override def allFieldsWithoutId =
-      Seq(
+  implicit val ExchangeRateMeasurementConverter: EntityConverter[ExchangeRateMeasurement] =
+    new EntityConverter(
+      allFieldsWithoutId = Seq(
         ModelField.ExchangeRateMeasurement.date,
         ModelField.ExchangeRateMeasurement.foreignCurrencyCode,
-        ModelField.ExchangeRateMeasurement.ratioReferenceToForeignCurrency
+        ModelField.ExchangeRateMeasurement.ratioReferenceToForeignCurrency,
+      ),
+      toScalaWithoutId = dict =>
+        ExchangeRateMeasurement(
+          date = dict.getRequired(ModelField.ExchangeRateMeasurement.date),
+          foreignCurrencyCode = dict.getRequired(ModelField.ExchangeRateMeasurement.foreignCurrencyCode),
+          ratioReferenceToForeignCurrency =
+            dict.getRequired(ModelField.ExchangeRateMeasurement.ratioReferenceToForeignCurrency)
       )
-    override def toScalaWithoutId(dict: js.Dictionary[js.Any]) = {
-      def getRequired[T](field: ModelField[T, ExchangeRateMeasurement]) =
-        getRequiredValueFromDict(dict)(field)
-
-      ExchangeRateMeasurement(
-        date = getRequired(ModelField.ExchangeRateMeasurement.date),
-        foreignCurrencyCode = getRequired(ModelField.ExchangeRateMeasurement.foreignCurrencyCode),
-        ratioReferenceToForeignCurrency =
-          getRequired(ModelField.ExchangeRateMeasurement.ratioReferenceToForeignCurrency)
-      )
-    }
-  }
+    )
 }
