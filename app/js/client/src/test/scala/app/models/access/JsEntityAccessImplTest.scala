@@ -11,6 +11,7 @@ import app.models.modification.EntityModification
 import app.models.modification.EntityType
 import app.models.modification.EntityType.TransactionType
 import hydro.scala2js.StandardConverters._
+import app.scala2js.AppConverters._
 import utest._
 
 import scala.async.Async.async

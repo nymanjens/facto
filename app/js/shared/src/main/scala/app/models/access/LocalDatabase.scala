@@ -8,6 +8,7 @@ import app.models.modification.EntityType
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import hydro.scala2js.StandardConverters._
+import app.scala2js.AppConverters._
 
 /** Client-side persistence layer. */
 @visibleForTesting

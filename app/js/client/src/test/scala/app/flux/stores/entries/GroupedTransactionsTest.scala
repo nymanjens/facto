@@ -4,6 +4,7 @@ import common.testing.TestObjects._
 import utest._
 
 import hydro.scala2js.StandardConverters._
+import app.scala2js.AppConverters._
 
 // Note: Testing with GeneralEntry because GroupedTransactions is abstract
 object GroupedTransactionsTest extends TestSuite {

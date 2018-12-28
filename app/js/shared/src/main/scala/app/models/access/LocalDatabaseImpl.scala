@@ -18,6 +18,7 @@ import app.models.modification.EntityModification
 import app.models.modification.EntityType
 import org.scalajs.dom.console
 import hydro.scala2js.StandardConverters._
+import app.scala2js.AppConverters._
 import hydro.scala2js.Scala2Js
 
 import scala.async.Async.async

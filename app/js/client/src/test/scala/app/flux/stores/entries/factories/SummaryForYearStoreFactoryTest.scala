@@ -18,6 +18,7 @@ import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import hydro.scala2js.StandardConverters._
+import app.scala2js.AppConverters._
 
 object SummaryForYearStoreFactoryTest extends TestSuite {
 

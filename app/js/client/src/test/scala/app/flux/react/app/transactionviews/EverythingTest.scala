@@ -16,6 +16,7 @@
 //import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 //import scala.scalajs.js
 //import hydro.scala2js.StandardConverters._
+//import app.scala2js.AppConverters._
 //
 //object EverythingTest extends TestSuite {
 //

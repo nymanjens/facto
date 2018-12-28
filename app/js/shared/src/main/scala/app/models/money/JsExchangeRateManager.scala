@@ -11,6 +11,7 @@ import scala.collection.immutable.Seq
 import scala.collection.SortedMap
 import scala.collection.mutable
 import hydro.scala2js.StandardConverters._
+import app.scala2js.AppConverters._
 
 final class JsExchangeRateManager(
     ratioReferenceToForeignCurrency: Map[Currency, SortedMap[LocalDateTime, Double]])(

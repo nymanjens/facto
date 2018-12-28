@@ -9,6 +9,7 @@ import org.scalajs.dom.raw.KeyboardEvent
 
 import scala.scalajs.js
 import hydro.scala2js.StandardConverters._
+import app.scala2js.AppConverters._
 
 import scala.scalajs.js.annotation.JSImport
 

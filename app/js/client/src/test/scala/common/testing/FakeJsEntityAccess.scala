@@ -14,6 +14,7 @@ import scala.concurrent.Future
 import scala.concurrent.Promise
 import scala.scalajs.js
 import hydro.scala2js.StandardConverters._
+import app.scala2js.AppConverters._
 
 final class FakeJsEntityAccess extends JsEntityAccess {
 

@@ -9,6 +9,7 @@ import scala.concurrent.Future
 import scala.concurrent.Promise
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import hydro.scala2js.StandardConverters._
+import app.scala2js.AppConverters._
 
 import scala.util.Success
 

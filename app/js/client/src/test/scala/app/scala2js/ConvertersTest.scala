@@ -11,6 +11,7 @@ import app.models.modification.EntityType
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
 import hydro.scala2js.StandardConverters._
+import app.scala2js.AppConverters._
 import utest._
 
 import scala.collection.immutable.Seq

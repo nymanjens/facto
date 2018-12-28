@@ -15,6 +15,7 @@ import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import hydro.scala2js.StandardConverters._
+import app.scala2js.AppConverters._
 
 final class EndowmentEntriesStoreFactory(implicit entityAccess: JsEntityAccess, accountingConfig: Config)
     extends EntriesListStoreFactory[GeneralEntry, Account] {

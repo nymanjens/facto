@@ -5,26 +5,10 @@ import java.time.LocalTime
 
 import app.models._
 import app.models.access.ModelField
-import app.models.accounting._
 import app.models.modification._
-import app.models.money.ExchangeRateMeasurement
-import app.models.user.User
-import common.GuavaReplacement.ImmutableBiMap
-import hydro.common.time.LocalDateTime
-import hydro.scala2js.Scala2Js.Converter
-import hydro.scala2js.Scala2Js.MapConverter
-
-import scala.collection.immutable.Seq
-import scala.scalajs.js
-import scala.scalajs.js.JSConverters._
-import java.time.LocalDate
-import java.time.LocalTime
-
-import app.models._
-import app.models.access.ModelField
-import app.models.modification._
-import app.models.user.User
 import app.scala2js.AppConverters
+import app.scala2js.AppConverters.EntityTypeConverter
+import app.scala2js.AppConverters.fromEntityType
 import common.GuavaReplacement.ImmutableBiMap
 import common.OrderToken
 import hydro.common.time.LocalDateTime

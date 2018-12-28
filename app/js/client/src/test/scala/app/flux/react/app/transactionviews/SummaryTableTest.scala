@@ -18,6 +18,7 @@ import utest._
 import scala.collection.immutable.ListMap
 import scala.collection.immutable.Seq
 import hydro.scala2js.StandardConverters._
+import app.scala2js.AppConverters._
 
 object SummaryTableTest extends TestSuite {
 

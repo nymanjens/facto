@@ -25,6 +25,7 @@ import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import hydro.scala2js.StandardConverters._
+import app.scala2js.AppConverters._
 
 object StoreFactoryStateUpdateTest extends TestSuite {
 

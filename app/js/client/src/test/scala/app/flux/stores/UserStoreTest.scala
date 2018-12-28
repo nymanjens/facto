@@ -15,6 +15,7 @@ import scala.collection.immutable.Seq
 import scala.concurrent.duration._
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import hydro.scala2js.StandardConverters._
+import app.scala2js.AppConverters._
 
 // Also tests `AsyncEntityDerivedStateStore`
 object UserStoreTest extends TestSuite {

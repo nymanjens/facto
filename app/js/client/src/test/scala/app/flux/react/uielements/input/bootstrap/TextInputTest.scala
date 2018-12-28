@@ -6,6 +6,7 @@ import hydro.flux.react.uielements.input.InputBase
 import app.flux.react.uielements.input.bootstrap
 import japgolly.scalajs.react.vdom._
 import hydro.scala2js.StandardConverters._
+import app.scala2js.AppConverters._
 import utest._
 
 object TextInputTest extends TestSuite {

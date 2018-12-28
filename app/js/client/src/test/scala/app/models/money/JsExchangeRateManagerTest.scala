@@ -14,6 +14,7 @@ import utest._
 
 import scala.collection.SortedMap
 import hydro.scala2js.StandardConverters._
+import app.scala2js.AppConverters._
 
 object JsExchangeRateManagerTest extends TestSuite {
 

@@ -17,6 +17,7 @@ import scala.scalajs.js.JSConverters._
 import scala.util.Failure
 import scala.util.Success
 import hydro.scala2js.StandardConverters._
+import app.scala2js.AppConverters._
 import hydro.scala2js.Scala2Js
 
 object LocalDatabaseWebWorkerScript {
