@@ -8,8 +8,10 @@ import app.models.modification.EntityType
 import app.models.modification.EntityType._
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
+import common.OrderToken
 
 import scala.collection.immutable.Seq
+import scala.concurrent.duration.FiniteDuration
 
 /**
   * Represents a field in an model entity.
@@ -39,11 +41,17 @@ object ModelField {
   sealed trait FieldType[T]
   object FieldType {
     implicit case object BooleanType extends FieldType[Boolean]
+    implicit case object IntType extends FieldType[Int]
+    implicit case object MaybeIntType extends FieldType[Option[Int]]
     implicit case object LongType extends FieldType[Long]
+    implicit case object MaybeLongType extends FieldType[Option[Long]]
     implicit case object DoubleType extends FieldType[Double]
     implicit case object StringType extends FieldType[String]
     implicit case object LocalDateTimeType extends FieldType[LocalDateTime]
+    implicit case object MaybeLocalDateTimeType extends FieldType[Option[LocalDateTime]]
+    implicit case object FiniteDurationType extends FieldType[FiniteDuration]
     implicit case object StringSeqType extends FieldType[Seq[String]]
+    implicit case object OrderTokenType extends FieldType[OrderToken]
   }
 
   abstract sealed class IdModelField[E <: Entity] extends ModelField[Long, E]("id", _.idOption getOrElse -1)
