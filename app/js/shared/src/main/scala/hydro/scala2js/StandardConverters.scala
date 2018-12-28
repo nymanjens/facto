@@ -37,11 +37,18 @@ object StandardConverters {
     def fromType[V2: Converter](fieldType: ModelField.FieldType[V2]): Converter[V2] = implicitly
     val result = modelField.fieldType match {
       case ModelField.FieldType.BooleanType       => fromType(ModelField.FieldType.BooleanType)
+      case ModelField.FieldType.IntType           => fromType(ModelField.FieldType.IntType)
+      case ModelField.FieldType.MaybeIntType      => fromType(ModelField.FieldType.MaybeIntType)
       case ModelField.FieldType.LongType          => fromType(ModelField.FieldType.LongType)
+      case ModelField.FieldType.MaybeLongType     => fromType(ModelField.FieldType.MaybeLongType)
       case ModelField.FieldType.DoubleType        => fromType(ModelField.FieldType.DoubleType)
       case ModelField.FieldType.StringType        => fromType(ModelField.FieldType.StringType)
       case ModelField.FieldType.LocalDateTimeType => fromType(ModelField.FieldType.LocalDateTimeType)
+      case ModelField.FieldType.MaybeLocalDateTimeType =>
+        fromType(ModelField.FieldType.MaybeLocalDateTimeType)
+      case ModelField.FieldType.FiniteDurationType => fromType(ModelField.FieldType.FiniteDurationType)
       case ModelField.FieldType.StringSeqType     => fromType(ModelField.FieldType.StringSeqType)
+      case ModelField.FieldType.OrderTokenType    => fromType(ModelField.FieldType.OrderTokenType)
     }
     result.asInstanceOf[Converter[V]]
   }
