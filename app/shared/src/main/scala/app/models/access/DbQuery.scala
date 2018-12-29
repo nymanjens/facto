@@ -25,6 +25,9 @@ object DbQuery {
     implicit case object LongOrdering extends PicklableOrdering[Long] {
       override def toOrdering: Ordering[Long] = implicitly[Ordering[Long]]
     }
+    implicit case object StringOrdering extends PicklableOrdering[String] {
+      override def toOrdering: Ordering[String] = implicitly[Ordering[String]]
+    }
     implicit case object LocalDateTimeOrdering extends PicklableOrdering[LocalDateTime] {
       override def toOrdering: Ordering[LocalDateTime] = implicitly[Ordering[LocalDateTime]]
     }

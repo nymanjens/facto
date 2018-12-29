@@ -18,6 +18,14 @@ object ScalaUtils {
 
   def toPromise[T](future: Future[T]): Promise[T] = Promise[T]().completeWith(future)
 
+  def ifThenOption[T](condition: Boolean)(value: => T): Option[T] = {
+    if (condition) {
+      Some(value)
+    } else {
+      None
+    }
+  }
+
   /** Scala version of com.google.common.annotations.VisibleForTesting. */
   class visibleForTesting extends StaticAnnotation
 
