@@ -50,72 +50,75 @@ private[router] final class RouterFactory(implicit reactAppModule: app.flux.reac
         // wrap/connect components to the circuit
         (emptyRule
 
-          | staticRoute(RouterFactory.pathPrefix, Page.Root)
-            ~> redirectToPage(Page.CashFlow)(Redirect.Replace)
+          | staticRoute(RouterFactory.pathPrefix, AppPages.Root)
+            ~> redirectToPage(AppPages.CashFlow)(Redirect.Replace)
 
-          | staticRuleFromPage(Page.UserProfile, reactAppModule.userProfile.apply)
+          | staticRuleFromPage(AppPages.UserProfile, reactAppModule.userProfile.apply)
 
-          | staticRuleFromPage(Page.UserAdministration, reactAppModule.userAdministration.apply)
+          | staticRuleFromPage(AppPages.UserAdministration, reactAppModule.userAdministration.apply)
 
-          | staticRuleFromPage(Page.Everything, reactAppModule.everything.apply)
+          | staticRuleFromPage(AppPages.Everything, reactAppModule.everything.apply)
 
-          | staticRuleFromPage(Page.CashFlow, reactAppModule.cashFlow.apply)
+          | staticRuleFromPage(AppPages.CashFlow, reactAppModule.cashFlow.apply)
 
-          | staticRuleFromPage(Page.Liquidation, reactAppModule.liquidation.apply)
+          | staticRuleFromPage(AppPages.Liquidation, reactAppModule.liquidation.apply)
 
-          | staticRuleFromPage(Page.Endowments, reactAppModule.endowments.apply)
+          | staticRuleFromPage(AppPages.Endowments, reactAppModule.endowments.apply)
 
-          | staticRuleFromPage(Page.Summary, reactAppModule.summary.apply)
+          | staticRuleFromPage(AppPages.Summary, reactAppModule.summary.apply)
 
-          | dynamicRuleFromPage(_ ~ query.caseClass[Page.Search]) { (page, ctl) =>
+          | dynamicRuleFromPage(_ ~ query.caseClass[AppPages.Search]) { (page, ctl) =>
             reactAppModule.searchResults(page.query, ctl)
           }
-          | staticRuleFromPage(Page.TemplateList, reactAppModule.templateList.apply)
+          | staticRuleFromPage(AppPages.TemplateList, reactAppModule.templateList.apply)
 
-          | dynamicRuleFromPage(_ ~ returnToPath.caseClass[Page.NewTransactionGroup]) { (page, ctl) =>
+          | dynamicRuleFromPage(_ ~ returnToPath.caseClass[AppPages.NewTransactionGroup]) { (page, ctl) =>
             reactAppModule.transactionGroupForm.forCreate(page.returnToPath, ctl)
           }
 
-          | dynamicRuleFromPage(_ / (long ~ returnToPath).caseClass[Page.EditTransactionGroup]) {
+          | dynamicRuleFromPage(_ / (long ~ returnToPath).caseClass[AppPages.EditTransactionGroup]) {
             (page, ctl) =>
               reactAppModule.transactionGroupForm.forEdit(page.transactionGroupId, page.returnToPath, ctl)
           }
 
           | dynamicRuleFromPage(
-            _ / (codeString ~ returnToPath).caseClass[Page.NewTransactionGroupFromReservoir]) { (page, ctl) =>
-            reactAppModule.transactionGroupForm.forReservoir(page.reservoirCode, page.returnToPath, ctl)
+            _ / (codeString ~ returnToPath).caseClass[AppPages.NewTransactionGroupFromReservoir]) {
+            (page, ctl) =>
+              reactAppModule.transactionGroupForm.forReservoir(page.reservoirCode, page.returnToPath, ctl)
           }
 
-          | dynamicRuleFromPage(_ / (codeString ~ returnToPath).caseClass[Page.NewFromTemplate]) {
+          | dynamicRuleFromPage(_ / (codeString ~ returnToPath).caseClass[AppPages.NewFromTemplate]) {
             (page, ctl) =>
               reactAppModule.transactionGroupForm.forTemplate(page.templateCode, page.returnToPath, ctl)
           }
 
           | dynamicRuleFromPage(
-            _ / ((codeString / codeString) ~ returnToPath).caseClass[Page.NewForRepayment]) { (page, ctl) =>
-            reactAppModule.transactionGroupForm.forRepayment(
-              page.accountCode1,
-              page.accountCode2,
-              page.returnToPath,
-              ctl)
+            _ / ((codeString / codeString) ~ returnToPath).caseClass[AppPages.NewForRepayment]) {
+            (page, ctl) =>
+              reactAppModule.transactionGroupForm.forRepayment(
+                page.accountCode1,
+                page.accountCode2,
+                page.returnToPath,
+                ctl)
           }
 
-          | dynamicRuleFromPage(_ ~ returnToPath.caseClass[Page.NewForLiquidationSimplification]) {
+          | dynamicRuleFromPage(_ ~ returnToPath.caseClass[AppPages.NewForLiquidationSimplification]) {
             (page, ctl) =>
               reactAppModule.transactionGroupForm.forLiquidationSimplification(page.returnToPath, ctl)
           }
 
-          | dynamicRuleFromPage(_ / (codeString ~ returnToPath).caseClass[Page.NewBalanceCheck]) {
+          | dynamicRuleFromPage(_ / (codeString ~ returnToPath).caseClass[AppPages.NewBalanceCheck]) {
             (page, ctl) =>
               reactAppModule.balanceCheckForm.forCreate(page.reservoirCode, page.returnToPath, ctl)
           }
 
-          | dynamicRuleFromPage(_ / (long ~ returnToPath).caseClass[Page.EditBalanceCheck]) { (page, ctl) =>
-            reactAppModule.balanceCheckForm.forEdit(page.balanceCheckId, page.returnToPath, ctl)
+          | dynamicRuleFromPage(_ / (long ~ returnToPath).caseClass[AppPages.EditBalanceCheck]) {
+            (page, ctl) =>
+              reactAppModule.balanceCheckForm.forEdit(page.balanceCheckId, page.returnToPath, ctl)
           }
 
         // Fallback
-        ).notFound(redirectToPage(Page.CashFlow)(Redirect.Replace))
+        ).notFound(redirectToPage(AppPages.CashFlow)(Redirect.Replace))
           .onPostRender((prev, cur) =>
             LogExceptionsCallback(
               dispatcher.dispatch(StandardActions.SetPageLoadingState(isLoading = false))))

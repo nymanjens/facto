@@ -2,6 +2,7 @@ package app.flux.react.uielements
 
 import common.I18n
 import hydro.flux.react.ReactVdomUtils.^^
+import app.flux.router.AppPages
 import app.flux.router.Page
 import hydro.flux.router.RouterContext
 import japgolly.scalajs.react._
@@ -13,7 +14,7 @@ object TransactionGroupEditButton {
     .builder[Props](getClass.getSimpleName)
     .renderP((_, props) => {
       implicit val router = props.router
-      router.anchorWithHrefTo(Page.EditTransactionGroup(props.groupId))(
+      router.anchorWithHrefTo(AppPages.EditTransactionGroup(props.groupId))(
         ^^.classes("btn", "btn-default", "btn-xs"),
         ^.role := "button",
         <.i(^^.classes("fa", "fa-pencil", "fa-fw")),

@@ -1,28 +1,27 @@
 package app.flux.react.app.transactionviews
 
-import common.Formatting._
-import common.money.ExchangeRateManager
-import hydro.common.time.Clock
-import common.I18n
-import hydro.common.Unique
-import hydro.flux.react.ReactVdomUtils.^^
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
-import app.flux.router.Page.NewForLiquidationSimplification
-import app.flux.router.Page
-import hydro.flux.router.RouterContext
 import app.flux.react.uielements
-import app.flux.stores.entries.factories.LiquidationEntriesStoreFactory
+import app.flux.router.AppPages
 import app.flux.stores.entries.AccountPair
 import app.flux.stores.entries.LiquidationEntry
-import hydro.flux.react.uielements.CollapseAllExpandAllButtons
-import hydro.flux.react.uielements.PageHeader
-import hydro.flux.react.uielements.Panel
-import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.html_<^._
+import app.flux.stores.entries.factories.LiquidationEntriesStoreFactory
 import app.models.access.EntityAccess
 import app.models.accounting.config.Account
 import app.models.accounting.config.Config
 import app.models.user.User
+import common.Formatting._
+import common.I18n
+import common.money.ExchangeRateManager
+import hydro.common.Unique
+import hydro.common.time.Clock
+import hydro.flux.react.ReactVdomUtils.^^
+import hydro.flux.react.uielements.CollapseAllExpandAllButtons
+import hydro.flux.react.uielements.PageHeader
+import hydro.flux.react.uielements.Panel
+import hydro.flux.router.RouterContext
+import japgolly.scalajs.react._
+import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
 
@@ -106,7 +105,7 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
 
   // **************** Private helper methods ****************//
   private def simplifyLiquidationButton()(implicit router: RouterContext): VdomElement = {
-    router.anchorWithHrefTo(Page.NewForLiquidationSimplification())(
+    router.anchorWithHrefTo(AppPages.NewForLiquidationSimplification())(
       ^^.classes("btn", "btn-default"),
       ^.role := "button",
       <.i(^.className := "fa fa-scissors fa-fw"),
@@ -117,7 +116,7 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
 
   private def repayButton(account1: Account, account2: Account)(
       implicit router: RouterContext): VdomElement = {
-    router.anchorWithHrefTo(Page.NewForRepayment(account1 = account1, account2 = account2))(
+    router.anchorWithHrefTo(AppPages.NewForRepayment(account1 = account1, account2 = account2))(
       ^.className := "btn btn-info btn-xs",
       ^.role := "button",
       <.i(^.className := "fa fa-check-square-o fa-fw"),

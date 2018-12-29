@@ -16,7 +16,7 @@ sealed trait Page {
   def title(implicit i18n: I18n, entityAccess: EntityAccess): Future[String]
   def iconClass: String
 }
-object Page {
+object AppPages {
 
   sealed abstract class PageBase(titleKey: String, override val iconClass: String) extends Page {
     override def title(implicit i18n: I18n, entityAccess: EntityAccess) = Future.successful(titleSync)

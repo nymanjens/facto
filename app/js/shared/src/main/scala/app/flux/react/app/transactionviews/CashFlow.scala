@@ -11,6 +11,7 @@ import hydro.flux.action.StandardActions
 import hydro.flux.action.Dispatcher
 import hydro.flux.react.ReactVdomUtils.<<
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
+import app.flux.router.AppPages
 import app.flux.router.Page
 import hydro.flux.router.RouterContext
 import app.flux.react.uielements
@@ -171,7 +172,7 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
   // **************** Private helper methods ****************//
   private def balanceCheckAddNewButton(reservoir: MoneyReservoir)(
       implicit router: RouterContext): VdomElement = {
-    router.anchorWithHrefTo(Page.NewBalanceCheck(reservoir))(
+    router.anchorWithHrefTo(AppPages.NewBalanceCheck(reservoir))(
       ^.className := "btn btn-info btn-xs",
       ^.role := "button",
       <.i(^.className := "fa fa-check-square-o fa-fw")
@@ -179,7 +180,7 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
   }
   private def transactionGroupAddButton(reservoir: MoneyReservoir)(
       implicit router: RouterContext): VdomElement = {
-    router.anchorWithHrefTo(Page.NewTransactionGroupFromReservoir(reservoir))(
+    router.anchorWithHrefTo(AppPages.NewTransactionGroupFromReservoir(reservoir))(
       ^.className := "btn btn-info btn-xs",
       ^.role := "button",
       <.i(^.className := "icon-new-empty"),
@@ -208,7 +209,7 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
   }
 
   def balanceCheckEditButton(balanceCorrection: BalanceCheck)(implicit router: RouterContext): VdomElement = {
-    router.anchorWithHrefTo(Page.EditBalanceCheck(balanceCorrection))(
+    router.anchorWithHrefTo(AppPages.EditBalanceCheck(balanceCorrection))(
       ^.className := "btn btn-default btn-xs",
       ^.role := "button",
       <.i(^.className := "fa fa-pencil fa-fw"),

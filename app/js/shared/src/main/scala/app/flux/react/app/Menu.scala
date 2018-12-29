@@ -7,6 +7,7 @@ import common.money.ExchangeRateManager
 import hydro.common.time.Clock
 import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.ReactVdomUtils.^^
+import app.flux.router.AppPages
 import app.flux.router.Page
 import hydro.flux.router.RouterContext
 import app.flux.stores.entries.factories.AllEntriesStoreFactory
@@ -53,7 +54,7 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
 
     override def didMount(props: Props, state: State): Callback = LogExceptionsCallback {
       props.router.currentPage match {
-        case page: Page.Search => {
+        case page: AppPages.Search => {
           queryInputRef().setValue(page.query)
         }
         case _ =>
@@ -98,7 +99,7 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
                       e.preventDefault()
 
                       queryInputRef().value match {
-                        case Some(query) => props.router.setPage(Page.Search(query))
+                        case Some(query) => props.router.setPage(AppPages.Search(query))
                         case None        =>
                       }
                     }
@@ -109,20 +110,21 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
             ))
         ),
         <.li(
-          menuItem(i18n("app.everything.html"), Page.Everything),
-          menuItem(i18n("app.cash-flow.html"), Page.CashFlow),
-          menuItem(i18n("app.liquidation.html"), Page.Liquidation),
-          menuItem(i18n("app.endowments.html"), Page.Endowments),
-          menuItem(i18n("app.summary.html"), Page.Summary)
+          menuItem(i18n("app.everything.html"), AppPages.Everything),
+          menuItem(i18n("app.cash-flow.html"), AppPages.CashFlow),
+          menuItem(i18n("app.liquidation.html"), AppPages.Liquidation),
+          menuItem(i18n("app.endowments.html"), AppPages.Endowments),
+          menuItem(i18n("app.summary.html"), AppPages.Summary)
         ),
         <.li(
-          menuItem(i18n("app.templates.html"), Page.TemplateList),
-          menuItem(i18n("app.new-entry.html"), Page.NewTransactionGroup())
+          menuItem(i18n("app.templates.html"), AppPages.TemplateList),
+          menuItem(i18n("app.new-entry.html"), AppPages.NewTransactionGroup())
         ),
         <<.ifThen(newEntryTemplates.nonEmpty) {
           <.li({
             for (template <- newEntryTemplates)
-              yield menuItem(template.name, Page.NewFromTemplate(template), iconClass = template.iconClass)
+              yield
+                menuItem(template.name, AppPages.NewFromTemplate(template), iconClass = template.iconClass)
           }.toVdomArray)
         }
       )
@@ -140,16 +142,16 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
           router.setPage(page)
         })
 
-      bindToPage("shift+alt+e", Page.Everything)
-      bindToPage("shift+alt+a", Page.Everything)
-      bindToPage("shift+alt+c", Page.CashFlow)
-      bindToPage("shift+alt+l", Page.Liquidation)
-      bindToPage("shift+alt+v", Page.Liquidation)
-      bindToPage("shift+alt+d", Page.Endowments)
-      bindToPage("shift+alt+s", Page.Summary)
-      bindToPage("shift+alt+t", Page.TemplateList)
-      bindToPage("shift+alt+j", Page.TemplateList)
-      bindToPage("shift+alt+n", Page.NewTransactionGroup())
+      bindToPage("shift+alt+e", AppPages.Everything)
+      bindToPage("shift+alt+a", AppPages.Everything)
+      bindToPage("shift+alt+c", AppPages.CashFlow)
+      bindToPage("shift+alt+l", AppPages.Liquidation)
+      bindToPage("shift+alt+v", AppPages.Liquidation)
+      bindToPage("shift+alt+d", AppPages.Endowments)
+      bindToPage("shift+alt+s", AppPages.Summary)
+      bindToPage("shift+alt+t", AppPages.TemplateList)
+      bindToPage("shift+alt+j", AppPages.TemplateList)
+      bindToPage("shift+alt+n", AppPages.NewTransactionGroup())
 
       bind("shift+alt+f", () => queryInputRef().focus())
     }
@@ -159,14 +161,14 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
         accountingConfig.templatesToShowFor(placement, user)
 
       router.currentPage match {
-        case Page.Everything            => templatesForPlacement(Template.Placement.EverythingView)
-        case Page.CashFlow              => templatesForPlacement(Template.Placement.CashFlowView)
-        case Page.Liquidation           => templatesForPlacement(Template.Placement.LiquidationView)
-        case Page.Endowments            => templatesForPlacement(Template.Placement.EndowmentsView)
-        case Page.Summary               => templatesForPlacement(Template.Placement.SummaryView)
-        case _: Page.Search             => templatesForPlacement(Template.Placement.SearchView)
-        case page: Page.NewFromTemplate => Seq(accountingConfig.templateWithCode(page.templateCode))
-        case _                          => Seq()
+        case AppPages.Everything            => templatesForPlacement(Template.Placement.EverythingView)
+        case AppPages.CashFlow              => templatesForPlacement(Template.Placement.CashFlowView)
+        case AppPages.Liquidation           => templatesForPlacement(Template.Placement.LiquidationView)
+        case AppPages.Endowments            => templatesForPlacement(Template.Placement.EndowmentsView)
+        case AppPages.Summary               => templatesForPlacement(Template.Placement.SummaryView)
+        case _: AppPages.Search             => templatesForPlacement(Template.Placement.SearchView)
+        case page: AppPages.NewFromTemplate => Seq(accountingConfig.templateWithCode(page.templateCode))
+        case _                              => Seq()
       }
     }
   }

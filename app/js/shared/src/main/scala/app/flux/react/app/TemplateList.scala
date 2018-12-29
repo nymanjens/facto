@@ -3,6 +3,7 @@ package app.flux.react.app
 import common.I18n
 import hydro.common.LoggingUtils.logExceptions
 import hydro.flux.react.ReactVdomUtils.<<
+import app.flux.router.AppPages
 import app.flux.router.Page
 import hydro.flux.router.RouterContext
 import app.flux.react.uielements
@@ -39,7 +40,7 @@ private[app] final class TemplateList(implicit user: User,
             <<.joinWithSpaces(
               for (template <- templates)
                 yield
-                  router.anchorWithHrefTo(Page.NewFromTemplate(template))(
+                  router.anchorWithHrefTo(AppPages.NewFromTemplate(template))(
                     ^.key := template.code,
                     ^.className := "btn btn-info btn-lg",
                     <.i(^.className := template.iconClass),

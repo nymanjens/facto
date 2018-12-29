@@ -13,6 +13,7 @@ import hydro.common.time.Clock
 import hydro.common.time.DatedMonth
 import hydro.common.time.YearRange
 import hydro.flux.react.ReactVdomUtils._
+import app.flux.router.AppPages
 import app.flux.router.Page
 import hydro.flux.router.RouterContext
 import app.flux.react.uielements
@@ -328,7 +329,7 @@ private[transactionviews] final class SummaryTable(
                                 <.div(
                                   ^.key := transaction.id,
                                   router.anchorWithHrefTo(
-                                    Page.EditTransactionGroup(transaction.transactionGroupId))(
+                                    AppPages.EditTransactionGroup(transaction.transactionGroupId))(
                                     uielements.MoneyWithCurrency(transaction.flow),
                                     " - ",
                                     <<.joinWithSpaces(transaction.tags

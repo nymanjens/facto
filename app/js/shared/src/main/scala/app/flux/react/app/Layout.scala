@@ -4,6 +4,7 @@ import common.CollectionUtils.ifThenSeq
 import common.I18n
 import hydro.common.LoggingUtils.LogExceptionsCallback
 import hydro.flux.react.ReactVdomUtils.^^
+import app.flux.router.AppPages
 import app.flux.router.Page
 import hydro.flux.router.RouterContext
 import hydro.flux.action.Dispatcher
@@ -56,7 +57,7 @@ final class Layout(implicit globalMessages: GlobalMessages,
               <.span(^.className := "icon-bar"),
               <.span(^.className := "icon-bar")
             ),
-            router.anchorWithHrefTo(Page.Root)(^.className := "navbar-brand", "Family Accounting Tool"),
+            router.anchorWithHrefTo(AppPages.Root)(^.className := "navbar-brand", "Family Accounting Tool"),
             " ",
             pageLoadingSpinner()
           ),
@@ -78,18 +79,18 @@ final class Layout(implicit globalMessages: GlobalMessages,
                 ^.className := "dropdown-menu dropdown-user",
                 <.li(
                   router
-                    .anchorWithHrefTo(Page.UserProfile)(
-                      <.i(^.className := Page.UserProfile.iconClass),
+                    .anchorWithHrefTo(AppPages.UserProfile)(
+                      <.i(^.className := AppPages.UserProfile.iconClass),
                       " ",
-                      Page.UserProfile.titleSync
+                      AppPages.UserProfile.titleSync
                     )),
                 ^^.ifThen(user.isAdmin) {
                   <.li(
                     router
-                      .anchorWithHrefTo(Page.UserAdministration)(
-                        <.i(^.className := Page.UserAdministration.iconClass),
+                      .anchorWithHrefTo(AppPages.UserAdministration)(
+                        <.i(^.className := AppPages.UserAdministration.iconClass),
                         " ",
-                        Page.UserAdministration.titleSync
+                        AppPages.UserAdministration.titleSync
                       ))
                 },
                 <.li(^.className := "divider"),
