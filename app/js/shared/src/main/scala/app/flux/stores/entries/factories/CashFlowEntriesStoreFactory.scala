@@ -11,7 +11,11 @@ import app.flux.stores.entries.WithIsPending.isPending
 import app.flux.stores.entries.CashFlowEntry
 import app.flux.stores.entries.WithIsPending
 import app.models.access.DbQueryImplicits._
+
+
 import app.models.access.DbQuery
+import app.models.access.AppDbQuerySorting
+import app.models.access.AppDbQuerySorting
 import app.models.access.AppJsEntityAccess
 import hydro.models.access.JsEntityAccess
 import app.models.access.ModelFields
@@ -54,7 +58,7 @@ final class CashFlowEntriesStoreFactory(implicit entityAccess: AppJsEntityAccess
               entityAccess
                 .newQuery[Transaction]()
                 .filter(ModelFields.Transaction.moneyReservoirCode === moneyReservoir.code)
-                .sort(DbQuery.Sorting.Transaction.deterministicallyByTransactionDate.reversed)
+                .sort(AppDbQuerySorting.Transaction.deterministicallyByTransactionDate.reversed)
                 .limit(numTransactionsToFetch)
                 .data()).last.transactionDate
 
@@ -64,7 +68,7 @@ final class CashFlowEntriesStoreFactory(implicit entityAccess: AppJsEntityAccess
               .newQuery[BalanceCheck]()
               .filter(ModelFields.BalanceCheck.moneyReservoirCode === moneyReservoir.code)
               .filter(ModelFields.BalanceCheck.checkDate < oldestTransDate)
-              .sort(DbQuery.Sorting.BalanceCheck.deterministicallyByCheckDate.reversed)
+              .sort(AppDbQuerySorting.BalanceCheck.deterministicallyByCheckDate.reversed)
               .limit(1)
               .data()).headOption
         }

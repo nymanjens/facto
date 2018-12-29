@@ -6,7 +6,11 @@ import app.common.money.ReferenceMoney
 import app.flux.stores.entries.WithIsPending.isAnyPending
 import app.flux.stores.entries._
 import app.models.access.DbQueryImplicits._
+
+
 import app.models.access.DbQuery
+import app.models.access.AppDbQuerySorting
+import app.models.access.AppDbQuerySorting
 import app.models.access.AppJsEntityAccess
 import hydro.models.access.JsEntityAccess
 import app.models.access.ModelFields
@@ -93,7 +97,7 @@ final class LiquidationEntriesStoreFactory(implicit entityAccess: AppJsEntityAcc
                     .map(_.code)
                     .toVector))
           )
-          .sort(DbQuery.Sorting.Transaction.deterministicallyByTransactionDate)
+          .sort(AppDbQuerySorting.Transaction.deterministicallyByTransactionDate)
           .data())
 
       val isRelevantSeq = await(Future.sequence(transactions.map(isRelevantForAccounts(_, accountPair))))
@@ -111,7 +115,7 @@ final class LiquidationEntriesStoreFactory(implicit entityAccess: AppJsEntityAcc
                 entityAccess
                   .newQuery[Transaction]()
                   .filter(ModelFields.Transaction.transactionGroupId === transaction.transactionGroupId)
-                  .sort(DbQuery.Sorting.Transaction.deterministicallyByCreateDate)
+                  .sort(AppDbQuerySorting.Transaction.deterministicallyByCreateDate)
                   .limit(1)
                   .data())).beneficiary
           case _ => transaction.moneyReservoir.owner

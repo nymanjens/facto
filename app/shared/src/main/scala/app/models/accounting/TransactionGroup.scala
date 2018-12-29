@@ -5,7 +5,11 @@ import app.common.money.ReferenceMoney
 import hydro.common.time.LocalDateTime
 import app.models.Entity
 import app.models.access.DbQueryImplicits._
+
+
 import app.models.access.DbQuery
+import app.models.access.AppDbQuerySorting
+import app.models.access.AppDbQuerySorting
 import app.models.access.EntityAccess
 import app.models.access.ModelFields
 import app.models.access.ModelField
@@ -23,7 +27,7 @@ case class TransactionGroup(createdDate: LocalDateTime, idOption: Option[Long] =
     entityAccess
       .newQuery[Transaction]()
       .filter(ModelFields.Transaction.transactionGroupId === id)
-      .sort(DbQuery.Sorting.Transaction.deterministicallyByCreateDate)
+      .sort(AppDbQuerySorting.Transaction.deterministicallyByCreateDate)
       .data()
   }
 }

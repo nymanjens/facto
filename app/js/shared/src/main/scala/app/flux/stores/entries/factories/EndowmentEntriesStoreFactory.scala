@@ -2,7 +2,11 @@ package app.flux.stores.entries.factories
 
 import app.flux.stores.entries.GeneralEntry
 import app.models.access.DbQueryImplicits._
+
+
 import app.models.access.DbQuery
+import app.models.access.AppDbQuerySorting
+import app.models.access.AppDbQuerySorting
 import app.models.access.AppJsEntityAccess
 import hydro.models.access.JsEntityAccess
 import app.models.access.ModelFields
@@ -31,7 +35,7 @@ final class EndowmentEntriesStoreFactory(implicit entityAccess: AppJsEntityAcces
             .filter(
               ModelFields.Transaction.categoryCode === accountingConfig.constants.endowmentCategory.code)
             .filter(ModelFields.Transaction.beneficiaryAccountCode === account.code)
-            .sort(DbQuery.Sorting.Transaction.deterministicallyByConsumedDate.reversed)
+            .sort(AppDbQuerySorting.Transaction.deterministicallyByConsumedDate.reversed)
             .limit(3 * maxNumEntries)
             .data()).reverse
 

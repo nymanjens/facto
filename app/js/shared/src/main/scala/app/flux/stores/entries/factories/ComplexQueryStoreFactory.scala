@@ -3,6 +3,8 @@ package app.flux.stores.entries.factories
 import app.flux.stores.entries.ComplexQueryFilter
 import app.flux.stores.entries.GeneralEntry
 import app.models.access.DbQuery
+import app.models.access.AppDbQuerySorting
+import app.models.access.AppDbQuerySorting
 import app.models.access.AppJsEntityAccess
 import hydro.models.access.JsEntityAccess
 import app.models.accounting.BalanceCheck
@@ -28,7 +30,7 @@ final class ComplexQueryStoreFactory(implicit entityAccess: AppJsEntityAccess,
           entityAccess
             .newQuery[Transaction]()
             .filter(filterFromQuery)
-            .sort(DbQuery.Sorting.Transaction.deterministicallyByCreateDate.reversed)
+            .sort(AppDbQuerySorting.Transaction.deterministicallyByCreateDate.reversed)
             .limit(3 * maxNumEntries)
             .data()).reverse
 

@@ -2,6 +2,8 @@ package app.flux.stores.entries.factories
 
 import app.flux.stores.entries.GeneralEntry
 import app.models.access.DbQuery
+import app.models.access.AppDbQuerySorting
+import app.models.access.AppDbQuerySorting
 import app.models.access.AppJsEntityAccess
 import hydro.models.access.JsEntityAccess
 import app.models.accounting.BalanceCheck
@@ -21,7 +23,7 @@ final class AllEntriesStoreFactory(implicit entityAccess: AppJsEntityAccess)
         await(
           entityAccess
             .newQuery[Transaction]()
-            .sort(DbQuery.Sorting.Transaction.deterministicallyByTransactionDate.reversed)
+            .sort(AppDbQuerySorting.Transaction.deterministicallyByTransactionDate.reversed)
             .limit(3 * maxNumEntries)
             .data()).reverse
 

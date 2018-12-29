@@ -1,6 +1,8 @@
 package app.models.accounting.config
 
 import app.models.access.DbQueryImplicits._
+
+
 import app.common.Require.requireNonNull
 import app.models.access.AppEntityAccess
 import app.models.access.ModelFields

@@ -13,7 +13,11 @@ import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.Ga
 import app.flux.stores.entries.ComplexQueryFilter
 import app.flux.stores.entries.EntriesStore
 import app.models.access.DbQueryImplicits._
+
+
 import app.models.access.DbQuery
+import app.models.access.AppDbQuerySorting
+import app.models.access.AppDbQuerySorting
 import app.models.access.AppJsEntityAccess
 import hydro.models.access.JsEntityAccess
 import app.models.access.ModelFields
@@ -75,7 +79,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit entityAccess: AppJsEnt
             .newQuery[BalanceCheck]()
             .filter(ModelFields.BalanceCheck.moneyReservoirCode === reservoir.code)
             .filter(ModelFields.BalanceCheck.checkDate < monthsInYear.head.startTime)
-            .sort(DbQuery.Sorting.BalanceCheck.deterministicallyByCheckDate.reversed)
+            .sort(AppDbQuerySorting.BalanceCheck.deterministicallyByCheckDate.reversed)
             .limit(1)
             .data()).headOption
       val oldestBalanceDate = oldestRelevantBalanceCheck.map(_.checkDate).getOrElse(LocalDateTime.MIN)

@@ -8,7 +8,11 @@ import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYe
 import app.flux.stores.entries.ComplexQueryFilter
 import app.flux.stores.entries.EntriesStore
 import app.models.access.DbQueryImplicits._
+
+
 import app.models.access.DbQuery
+import app.models.access.AppDbQuerySorting
+import app.models.access.AppDbQuerySorting
 import app.models.access.AppJsEntityAccess
 import hydro.models.access.JsEntityAccess
 import app.models.access.ModelFields
@@ -48,7 +52,7 @@ final class SummaryForYearStoreFactory(implicit entityAccess: AppJsEntityAccess,
           entityAccess
             .newQuery[Transaction]()
             .filter(combinedFilter)
-            .sort(DbQuery.Sorting.Transaction.deterministicallyByConsumedDate)
+            .sort(AppDbQuerySorting.Transaction.deterministicallyByConsumedDate)
             .data())
 
       SummaryForYear(transactions)

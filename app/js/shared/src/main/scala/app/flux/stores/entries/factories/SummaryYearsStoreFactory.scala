@@ -4,7 +4,11 @@ import app.common.time.YearRange
 import app.flux.stores.entries.EntriesStore
 import app.flux.stores.entries.factories.SummaryYearsStoreFactory.State
 import app.models.access.DbQueryImplicits._
+
+
 import app.models.access.DbQuery
+import app.models.access.AppDbQuerySorting
+import app.models.access.AppDbQuerySorting
 import app.models.access.AppJsEntityAccess
 import hydro.models.access.JsEntityAccess
 import app.models.access.ModelFields
@@ -33,9 +37,9 @@ final class SummaryYearsStoreFactory(implicit entityAccess: AppJsEntityAccess)
   // **************** Implementation of EntriesStoreFactory methods/types ****************//
   override protected def createNew(account: Account) = new Store {
     override protected def calculateState() = async {
-      val earliestFuture = getFirstAfterSorting(DbQuery.Sorting.Transaction.deterministicallyByConsumedDate)
+      val earliestFuture = getFirstAfterSorting(AppDbQuerySorting.Transaction.deterministicallyByConsumedDate)
       val latestFuture =
-        getFirstAfterSorting(DbQuery.Sorting.Transaction.deterministicallyByConsumedDate.reversed)
+        getFirstAfterSorting(AppDbQuerySorting.Transaction.deterministicallyByConsumedDate.reversed)
       val (maybeEarliest, maybeLatest) = (await(earliestFuture), await(latestFuture))
 
       val rangeOption = for {

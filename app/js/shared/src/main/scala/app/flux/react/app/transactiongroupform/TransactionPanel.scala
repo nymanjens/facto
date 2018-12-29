@@ -32,7 +32,11 @@ import japgolly.scalajs.react.Ref.ToScalaComponent
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom.html_<^._
 import app.models.access.DbQueryImplicits._
+
+
 import app.models.access.DbQuery
+import app.models.access.AppDbQuerySorting
+import app.models.access.AppDbQuerySorting
 import app.models.access.AppJsEntityAccess
 import hydro.models.access.JsEntityAccess
 import app.models.access.ModelFields
@@ -447,7 +451,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           entityAccess
             .newQuery[Transaction]()
             .filter(ModelFields.Transaction.categoryCode === category.code)
-            .sort(DbQuery.Sorting.Transaction.deterministicallyByCreateDate.reversed)
+            .sort(AppDbQuerySorting.Transaction.deterministicallyByCreateDate.reversed)
             .limit(300)
             .data())
         // Only update if category is still the same
