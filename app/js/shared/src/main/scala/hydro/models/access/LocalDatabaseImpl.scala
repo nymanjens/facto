@@ -1,16 +1,18 @@
-package app.models.access
+package hydro.models.access
 
 import common.ScalaUtils.visibleForTesting
 import hydro.jsfacades.LokiJs
 import hydro.jsfacades.LokiJs.FilterFactory.Operation
 import app.models.Entity
-import app.models.access.LocalDatabaseImpl.ModificationWithId
-import app.models.access.LocalDatabaseImpl.SecondaryIndexFunction
-import app.models.access.LocalDatabaseImpl.Singleton
+import app.models.access._
+import hydro.models.access.LocalDatabaseImpl.ModificationWithId
+import hydro.models.access.LocalDatabaseImpl.SecondaryIndexFunction
+import hydro.models.access.LocalDatabaseImpl.Singleton
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.LokiQuery
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
 import app.models.modification.EntityModification
+import app.models.access._
 import app.models.modification.EntityType
 import org.scalajs.dom.console
 import hydro.scala2js.StandardConverters._
@@ -198,7 +200,6 @@ private final class LocalDatabaseImpl(implicit webWorker: LocalDatabaseWebWorker
     EntityType.values.map(collectionNameOf) :+ singletonsCollectionName :+ pendingModificationsCollectionName
 }
 
-@visibleForTesting
 object LocalDatabaseImpl {
 
   def create()(implicit webWorker: LocalDatabaseWebWorkerApi,

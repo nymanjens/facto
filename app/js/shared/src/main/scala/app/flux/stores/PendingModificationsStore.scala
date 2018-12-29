@@ -3,7 +3,7 @@ package app.flux.stores
 import app.flux.stores.PendingModificationsStore.State
 import hydro.flux.stores.StateStore
 import app.models.access.AppJsEntityAccess
-import app.models.access.JsEntityAccess
+import hydro.models.access.JsEntityAccess
 import app.models.accounting.Transaction
 import app.models.modification.EntityModification
 import app.models.modification.EntityType

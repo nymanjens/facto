@@ -1,4 +1,4 @@
-package app.models.access
+package hydro.models.access
 
 import common.ScalaUtils
 import common.ScalaUtils.visibleForTesting
@@ -6,6 +6,7 @@ import common.ScalaUtils.visibleForTesting
 import hydro.scala2js.StandardConverters._
 import app.scala2js.AppConverters._
 import hydro.scala2js.Scala2Js
+import app.models.access._
 
 @visibleForTesting
 sealed trait SingletonKey[V] {

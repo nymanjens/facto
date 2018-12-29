@@ -2,7 +2,7 @@ package hydro.flux.stores
 
 import hydro.common.LoggingUtils.logExceptions
 import hydro.common.LoggingUtils.logFailure
-import app.models.access.JsEntityAccess
+import hydro.models.access.JsEntityAccess
 import app.models.modification.EntityModification
 
 import scala.collection.immutable.Seq

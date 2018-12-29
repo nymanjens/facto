@@ -2,7 +2,7 @@ package app.flux.stores.entries
 
 import app.models.Entity
 import app.models.access.AppJsEntityAccess
-import app.models.access.JsEntityAccess
+import hydro.models.access.JsEntityAccess
 import app.models.modification.EntityType
 
 case class WithIsPending[Entry](entry: Entry, isPending: Boolean)

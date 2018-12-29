@@ -1,8 +1,9 @@
-package app.models.access
+package hydro.models.access
 
 import hydro.common.LoggingUtils.logExceptions
 import app.models.Entity
-import app.models.access.JsEntityAccess.Listener
+import app.models.access._
+import hydro.models.access.JsEntityAccess.Listener
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
 import app.models.user.User
@@ -14,7 +15,7 @@ import scala.collection.mutable
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-private[access] class JsEntityAccessImpl()(
+class JsEntityAccessImpl()(
     implicit remoteDatabaseProxy: RemoteDatabaseProxy,
     entityModificationPushClientFactory: EntityModificationPushClientFactory)
     extends JsEntityAccess {
@@ -109,7 +110,7 @@ private[access] class JsEntityAccessImpl()(
     listeners = listeners.filter(_ != listener)
   }
 
-  override private[access] def startCheckingForModifiedEntityUpdates(): Unit = {
+  override def startCheckingForModifiedEntityUpdates(): Unit = {
     remoteDatabaseProxy.startCheckingForModifiedEntityUpdates(modifications => {
       _pendingModifications --= modifications
       invokeListenersAsync(_.modificationsAddedOrPendingStateChanged(modifications))

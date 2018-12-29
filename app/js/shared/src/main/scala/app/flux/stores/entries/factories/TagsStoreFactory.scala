@@ -5,7 +5,7 @@ import app.flux.stores.entries.EntriesStore
 import app.flux.stores.entries.factories.TagsStoreFactory.State
 import app.models.access.DbQueryImplicits._
 import app.models.access.AppJsEntityAccess
-import app.models.access.JsEntityAccess
+import hydro.models.access.JsEntityAccess
 import app.models.access.ModelField
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction

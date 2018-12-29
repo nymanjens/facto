@@ -1,4 +1,4 @@
-package app.models.access
+package hydro.models.access
 
 import org.scalajs.dom.console
 

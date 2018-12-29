@@ -1,10 +1,11 @@
-package app.models.access
+package hydro.models.access
 
 import app.models.Entity
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
 
 import scala.collection.immutable.Seq
+import app.models.access._
 import scala.concurrent.Future
 
 trait JsEntityAccess extends EntityAccess {

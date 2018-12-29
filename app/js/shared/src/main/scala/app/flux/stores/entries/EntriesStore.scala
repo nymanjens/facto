@@ -2,7 +2,7 @@ package app.flux.stores.entries
 
 import hydro.flux.stores.AsyncEntityDerivedStateStore
 import app.models.access.AppJsEntityAccess
-import app.models.access.JsEntityAccess
+import hydro.models.access.JsEntityAccess
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.modification.EntityModification

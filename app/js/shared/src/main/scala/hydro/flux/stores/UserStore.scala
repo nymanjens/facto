@@ -5,7 +5,7 @@ import hydro.flux.action.StandardActions.UpsertUser
 import hydro.flux.stores.UserStore.State
 import hydro.flux.action.Dispatcher
 import hydro.flux.action.StandardActions.UpsertUser
-import app.models.access.JsEntityAccess
+import hydro.models.access.JsEntityAccess
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
 import app.models.user.User

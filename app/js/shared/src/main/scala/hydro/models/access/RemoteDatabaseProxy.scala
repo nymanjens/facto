@@ -1,4 +1,4 @@
-package app.models.access
+package hydro.models.access
 
 import app.models.Entity
 import app.models.modification.EntityModification
@@ -8,9 +8,10 @@ import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import hydro.scala2js.StandardConverters._
 import app.scala2js.AppConverters._
+import app.models.access._
 
 /** Proxy for the server-side database. */
-private[access] trait RemoteDatabaseProxy {
+trait RemoteDatabaseProxy {
   def queryExecutor[E <: Entity: EntityType](): DbQueryExecutor.Async[E]
 
   def pendingModifications(): Future[Seq[EntityModification]]

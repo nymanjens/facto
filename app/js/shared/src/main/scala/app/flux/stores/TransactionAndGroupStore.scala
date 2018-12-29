@@ -6,7 +6,7 @@ import app.flux.action.Actions.RemoveTransactionGroup
 import app.flux.action.Actions.UpdateTransactionGroup
 import hydro.flux.action.Dispatcher
 import app.models.access.AppJsEntityAccess
-import app.models.access.JsEntityAccess
+import hydro.models.access.JsEntityAccess
 import app.models.accounting._
 import app.models.modification.EntityModification
 

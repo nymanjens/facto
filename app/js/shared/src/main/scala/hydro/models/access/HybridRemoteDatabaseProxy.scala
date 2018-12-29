@@ -1,11 +1,12 @@
-package app.models.access
+package hydro.models.access
 
 import app.api.ScalaJsApi.GetInitialDataResponse
 import app.api.ScalaJsApiClient
 import hydro.common.LoggingUtils.logFailure
 import app.models.Entity
-import app.models.access.SingletonKey.NextUpdateTokenKey
-import app.models.access.SingletonKey.VersionKey
+import app.models.access._
+import hydro.models.access.SingletonKey.NextUpdateTokenKey
+import hydro.models.access.SingletonKey.VersionKey
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
 import org.scalajs.dom.console
@@ -17,9 +18,8 @@ import scala.concurrent.Future
 import scala.concurrent.Promise
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-/** RemoteDatabaseProxy implementation that queries the remote back-end directly until LocalDatabase
-  */
-private[access] final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
+/** RemoteDatabaseProxy implementation that queries the remote back-end directly until LocalDatabase */
+final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
     implicit apiClient: ScalaJsApiClient,
     getInitialDataResponse: GetInitialDataResponse,
     entityModificationPushClientFactory: EntityModificationPushClientFactory)
@@ -162,10 +162,10 @@ private[access] final class HybridRemoteDatabaseProxy(futureLocalDatabase: Futur
   override def localDatabaseReadyFuture: Future[Unit] = futureLocalDatabase.future().map(_ => (): Unit)
 }
 
-private[access] object HybridRemoteDatabaseProxy {
+object HybridRemoteDatabaseProxy {
   private val localDatabaseAndEntityVersion = "hydro-1.0"
 
-  private[access] def create(localDatabase: Future[LocalDatabase])(
+  def create(localDatabase: Future[LocalDatabase])(
       implicit apiClient: ScalaJsApiClient,
       getInitialDataResponse: GetInitialDataResponse,
       entityModificationPushClientFactory: EntityModificationPushClientFactory): HybridRemoteDatabaseProxy = {

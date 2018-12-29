@@ -1,4 +1,4 @@
-package app.models.access
+package hydro.models.access
 
 import common.ScalaUtils.visibleForTesting
 import app.models.Entity
@@ -9,6 +9,7 @@ import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import hydro.scala2js.StandardConverters._
 import app.scala2js.AppConverters._
+import app.models.access._
 
 /** Client-side persistence layer. */
 @visibleForTesting

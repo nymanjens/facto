@@ -10,9 +10,9 @@ import hydro.flux.action.Dispatcher
 import hydro.flux.stores.ApplicationIsOnlineStore
 import hydro.flux.stores.PageLoadingStateStore
 import hydro.flux.stores.UserStore
-import app.models.access.EntityModificationPushClientFactory
+import hydro.models.access.EntityModificationPushClientFactory
 import app.models.access.AppJsEntityAccess
-import app.models.access.JsEntityAccess
+import hydro.models.access.JsEntityAccess
 import app.models.accounting.config.Config
 import app.models.user.User
 

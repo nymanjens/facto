@@ -1,12 +1,12 @@
 package tests
 
 import common.testing.TestObjects._
-import app.models.access.SingletonKey.NextUpdateTokenKey
-import app.models.access.SingletonKey.VersionKey
+import hydro.models.access.SingletonKey.NextUpdateTokenKey
+import hydro.models.access.SingletonKey.VersionKey
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi
 import app.models.access.DbResultSet
-import app.models.access.LocalDatabase
-import app.models.access.LocalDatabaseImpl
+import hydro.models.access.LocalDatabase
+import hydro.models.access.LocalDatabaseImpl
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup

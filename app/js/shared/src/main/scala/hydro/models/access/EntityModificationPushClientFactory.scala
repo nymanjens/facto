@@ -1,5 +1,6 @@
-package app.models.access
+package hydro.models.access
 
+import app.models.access._
 import app.api.Picklers._
 import app.api.ScalaJsApi.ModificationsWithToken
 import app.api.ScalaJsApi.UpdateToken
