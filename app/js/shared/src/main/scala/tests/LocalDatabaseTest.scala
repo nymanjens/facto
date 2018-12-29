@@ -3,7 +3,7 @@ package tests
 import common.testing.TestObjects._
 import app.models.access.SingletonKey.NextUpdateTokenKey
 import app.models.access.SingletonKey.VersionKey
-import app.models.access.webworker.LocalDatabaseWebWorkerApi
+import hydro.models.access.webworker.LocalDatabaseWebWorkerApi
 import app.models.access.DbResultSet
 import app.models.access.LocalDatabase
 import app.models.access.LocalDatabaseImpl
@@ -29,7 +29,7 @@ import app.scala2js.AppConverters._
 private[tests] class LocalDatabaseTest extends ManualTestSuite {
 
   implicit private val webWorker: LocalDatabaseWebWorkerApi =
-    new app.models.access.webworker.Module().localDatabaseWebWorkerApiStub
+    new hydro.models.access.webworker.Module().localDatabaseWebWorkerApiStub
 
   override def tests = Seq(
     ManualTest("isEmpty") {

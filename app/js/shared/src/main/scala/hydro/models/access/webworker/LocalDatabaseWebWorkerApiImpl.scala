@@ -1,9 +1,9 @@
-package app.models.access.webworker
+package hydro.models.access.webworker
 
 import hydro.jsfacades.LokiJs
 import hydro.jsfacades.LokiJs.FilterFactory.Operation
-import app.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
-import app.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation._
+import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
+import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation._
 import org.scalajs.dom.console
 
 import scala.collection.immutable.Seq

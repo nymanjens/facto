@@ -1,7 +1,7 @@
-package app.models.access.webworker
+package hydro.models.access.webworker
 
-import app.models.access.webworker.LocalDatabaseWebWorkerApi.LokiQuery
-import app.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
+import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.LokiQuery
+import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
 
 import scala.collection.immutable.Seq
 import scala.concurrent.Future

@@ -12,7 +12,7 @@ final class Module(implicit user: User,
     new EntityModificationPushClientFactory()
 
   implicit val entityAccess: JsEntityAccess = {
-    val webWorkerModule = new app.models.access.webworker.Module()
+    val webWorkerModule = new hydro.models.access.webworker.Module()
     implicit val localDatabaseWebWorkerApiStub = webWorkerModule.localDatabaseWebWorkerApiStub
     val localDatabaseFuture = LocalDatabaseImpl.create()
     implicit val remoteDatabaseProxy = HybridRemoteDatabaseProxy.create(localDatabaseFuture)

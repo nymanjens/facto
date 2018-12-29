@@ -4,7 +4,7 @@ import common.testing.TestObjects._
 import app.models.access.DbQuery.Filter
 import app.models.access.DbQueryImplicits._
 import app.models.access._
-import app.models.access.webworker.LocalDatabaseWebWorkerApi
+import hydro.models.access.webworker.LocalDatabaseWebWorkerApi
 import app.models.accounting.Transaction
 import tests.ManualTests.ManualTest
 import tests.ManualTests.ManualTestSuite
@@ -23,7 +23,7 @@ import app.scala2js.AppConverters._
 private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
 
   implicit private val webWorker: LocalDatabaseWebWorkerApi =
-    new app.models.access.webworker.Module().localDatabaseWebWorkerApiStub
+    new hydro.models.access.webworker.Module().localDatabaseWebWorkerApiStub
 
   override def tests = Seq(
     // **************** Regular filter tests **************** //
