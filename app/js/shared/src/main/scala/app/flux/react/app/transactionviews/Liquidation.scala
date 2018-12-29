@@ -9,7 +9,7 @@ import hydro.flux.react.ReactVdomUtils.^^
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.router.Page.NewForLiquidationSimplification
 import app.flux.router.Page
-import app.flux.router.RouterContext
+import hydro.flux.router.RouterContext
 import app.flux.react.uielements
 import app.flux.stores.entries.factories.LiquidationEntriesStoreFactory
 import app.flux.stores.entries.AccountPair

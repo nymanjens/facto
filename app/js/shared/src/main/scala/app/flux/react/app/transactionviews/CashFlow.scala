@@ -12,7 +12,7 @@ import hydro.flux.action.Dispatcher
 import hydro.flux.react.ReactVdomUtils.<<
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.router.Page
-import app.flux.router.RouterContext
+import hydro.flux.router.RouterContext
 import app.flux.react.uielements
 import app.flux.stores.entries.CashFlowEntry
 import hydro.flux.react.uielements.CollapseAllExpandAllButtons

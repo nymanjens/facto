@@ -8,7 +8,7 @@ import hydro.common.time.Clock
 import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.ReactVdomUtils.^^
 import app.flux.router.Page
-import app.flux.router.RouterContext
+import hydro.flux.router.RouterContext
 import app.flux.stores.entries.factories.AllEntriesStoreFactory
 import hydro.flux.react.HydroReactComponent
 import hydro.flux.react.uielements.input.TextInput

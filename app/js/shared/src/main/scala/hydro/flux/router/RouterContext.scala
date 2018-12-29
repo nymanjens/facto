@@ -1,6 +1,7 @@
-package app.flux.router
+package hydro.flux.router
 
 import app.flux.action.Actions
+import app.flux.router.Page
 import hydro.flux.action.StandardActions
 import hydro.flux.action.Dispatcher
 import japgolly.scalajs.react.extra.router.Path

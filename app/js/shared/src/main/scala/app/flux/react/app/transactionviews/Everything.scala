@@ -5,7 +5,7 @@ import common.I18n
 import common.money.ExchangeRateManager
 import hydro.common.time.Clock
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
-import app.flux.router.RouterContext
+import hydro.flux.router.RouterContext
 import app.flux.react.uielements
 import app.flux.stores.entries.GeneralEntry
 import app.flux.stores.entries.factories.AllEntriesStoreFactory
