@@ -28,8 +28,8 @@ import app.scala2js.AppConverters._
 // is incompatible with Loki.
 private[tests] class LocalDatabaseTest extends ManualTestSuite {
 
-  implicit private val webWorker: LocalDatabaseWebWorkerApi =
-    new hydro.models.access.webworker.Module().localDatabaseWebWorkerApiStub
+  implicit private val webWorker = new hydro.models.access.webworker.Module().localDatabaseWebWorkerApiStub
+  implicit private val secondaryIndexFunction = app.models.access.Module.secondaryIndexFunction
 
   override def tests = Seq(
     ManualTest("isEmpty") {
