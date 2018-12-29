@@ -2,7 +2,7 @@ package app.flux.stores
 
 import app.api.ScalaJsApi.UserPrototype
 import hydro.common.testing.Awaiter
-import common.testing.TestObjects._
+import app.common.testing.TestObjects._
 import app.flux.action.AppActions
 import hydro.flux.action.StandardActions
 import hydro.flux.stores.UserStore

@@ -4,8 +4,8 @@ import java.time.Duration
 import java.time.Instant
 
 import com.google.inject._
-import common.testing.HookedSpecification
-import common.testing.TestModule
+import app.common.testing.HookedSpecification
+import app.common.testing.TestModule
 import hydro.common.time.JavaTimeImplicits._
 import org.specs2.matcher.MatchResult
 

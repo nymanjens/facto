@@ -1,6 +1,6 @@
 package app.models.money
 
-import common.money.Currency
+import app.common.money.Currency
 import hydro.common.time.LocalDateTime
 import app.models.Entity
 

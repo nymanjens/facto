@@ -6,7 +6,7 @@ import java.util.concurrent.Executors
 import app.api.ScalaJsApi.ModificationsWithToken
 import app.api.UpdateTokens.toUpdateToken
 import com.google.inject._
-import common.publisher.TriggerablePublisher
+import app.common.publisher.TriggerablePublisher
 import hydro.common.time.Clock
 import app.models.Entity
 import app.models.accounting._

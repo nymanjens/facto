@@ -1,9 +1,9 @@
 package app.flux.stores.entries.factories
 
-import common.money.Currency
-import common.money.ExchangeRateManager
-import common.money.MoneyWithGeneralCurrency
-import common.money.ReferenceMoney
+import app.common.money.Currency
+import app.common.money.ExchangeRateManager
+import app.common.money.MoneyWithGeneralCurrency
+import app.common.money.ReferenceMoney
 import hydro.common.time.JavaTimeImplicits._
 import app.common.time.DatedMonth
 import hydro.common.time.LocalDateTime

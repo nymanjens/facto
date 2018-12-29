@@ -3,11 +3,11 @@ package app.flux.stores.entries.factories
 import java.time.Duration
 import java.time.Month.JANUARY
 
-import common.money.Currency
-import common.money.MoneyWithGeneralCurrency
-import common.testing.TestObjects._
-import common.testing.FakeJsEntityAccess
-import common.testing.TestModule
+import app.common.money.Currency
+import app.common.money.MoneyWithGeneralCurrency
+import app.common.testing.TestObjects._
+import app.common.testing.FakeJsEntityAccess
+import app.common.testing.TestModule
 import hydro.common.time.LocalDateTimes.createDateTime
 import app.flux.stores.entries.CashFlowEntry.BalanceCorrection
 import app.flux.stores.entries.CashFlowEntry.RegularEntry

@@ -1,6 +1,6 @@
 package hydro.models.access
 
-import common.GuavaReplacement.ImmutableSetMultimap
+import app.common.GuavaReplacement.ImmutableSetMultimap
 import app.models.Entity
 import app.models.modification.EntityModification
 import app.models.modification.EntityType

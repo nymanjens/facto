@@ -7,7 +7,7 @@ import java.time.LocalTime
 import java.time.Month.JANUARY
 
 import com.google.inject.Inject
-import common.ResourceFiles
+import app.common.ResourceFiles
 import hydro.common.time.Clock
 import hydro.common.time.LocalDateTime
 import app.models.access.JvmEntityAccess

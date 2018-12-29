@@ -1,6 +1,6 @@
 package app.models.access
 
-import common.GuavaReplacement.ImmutableBiMap
+import app.common.GuavaReplacement.ImmutableBiMap
 import hydro.common.time.LocalDateTime
 import app.models.Entity
 import app.models.access.ModelField.FieldType
@@ -8,7 +8,7 @@ import app.models.modification.EntityType
 import app.models.modification.EntityType._
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
-import common.OrderToken
+import app.common.OrderToken
 
 import scala.collection.immutable.Seq
 import scala.concurrent.duration.FiniteDuration

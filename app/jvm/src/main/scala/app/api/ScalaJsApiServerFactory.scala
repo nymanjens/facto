@@ -4,8 +4,8 @@ import app.api.Picklers._
 import app.api.ScalaJsApi._
 import app.api.UpdateTokens.toUpdateToken
 import com.google.inject._
-import common.PlayI18n
-import common.money.Currency
+import app.common.PlayI18n
+import app.common.money.Currency
 import hydro.common.time.Clock
 import hydro.common.time.LocalDateTime
 import app.models.Entity

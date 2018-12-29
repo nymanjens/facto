@@ -4,8 +4,8 @@ import java.time.Instant
 
 import app.api.UpdateTokens.toInstant
 import app.api.UpdateTokens.toUpdateToken
-import common.testing.TestUtils._
-import common.testing._
+import app.common.testing.TestUtils._
+import app.common.testing._
 import org.junit.runner._
 import org.specs2.runner._
 

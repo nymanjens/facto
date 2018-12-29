@@ -1,6 +1,6 @@
 package hydro.flux.react.uielements
 
-import common.I18n
+import app.common.I18n
 import hydro.common.Unique
 import hydro.flux.react.ReactVdomUtils.^^
 import japgolly.scalajs.react._

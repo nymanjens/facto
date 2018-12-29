@@ -1,6 +1,6 @@
 package app.flux.react.uielements
 
-import common.accounting.Tags
+import app.common.accounting.Tags
 import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.ReactVdomUtils.^^
 import app.flux.stores.entries.GroupedTransactions

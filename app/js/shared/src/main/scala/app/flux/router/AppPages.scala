@@ -1,6 +1,6 @@
 package app.flux.router
 
-import common.I18n
+import app.common.I18n
 import japgolly.scalajs.react.extra.router.Path
 import app.models.access.EntityAccess
 import app.models.accounting.BalanceCheck

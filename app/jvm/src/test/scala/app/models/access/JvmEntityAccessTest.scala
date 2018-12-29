@@ -1,9 +1,9 @@
 package app.models.access
 
 import com.google.inject._
-import common.GuavaReplacement.Iterables.getOnlyElement
-import common.testing.TestObjects._
-import common.testing._
+import app.common.GuavaReplacement.Iterables.getOnlyElement
+import app.common.testing.TestObjects._
+import app.common.testing._
 import app.models.accounting.Transaction
 import app.models.modification.EntityModification
 import app.models.modification.EntityModificationEntity

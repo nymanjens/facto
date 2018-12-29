@@ -1,6 +1,6 @@
 package app.flux.stores
 
-import common.testing.TestObjects._
+import app.common.testing.TestObjects._
 import app.flux.action.AppActions
 import hydro.flux.action.StandardActions
 import app.models.accounting._

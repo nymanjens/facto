@@ -1,7 +1,7 @@
 package app.api
 
 import app.api.Picklers._
-import common.testing._
+import app.common.testing._
 import hydro.common.time.LocalDateTime
 import app.models.access.DbQueryImplicits._
 import app.models.access.DbQuery

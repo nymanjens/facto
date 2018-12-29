@@ -6,7 +6,7 @@ import java.time.LocalTime
 
 import app.api.Picklers._
 import app.api.ScalaJsApi.UpdateToken
-import common.GuavaReplacement.Splitter
+import app.common.GuavaReplacement.Splitter
 import hydro.common.time.LocalDateTime
 
 import scala.collection.immutable.Seq

@@ -1,7 +1,7 @@
 package app.flux.stores.entries.factories
 
-import common.money.ExchangeRateManager
-import common.money.MoneyWithGeneralCurrency
+import app.common.money.ExchangeRateManager
+import app.common.money.MoneyWithGeneralCurrency
 import hydro.common.time.JavaTimeImplicits._
 import hydro.common.time.LocalDateTime
 import app.flux.stores.entries.CashFlowEntry.BalanceCorrection

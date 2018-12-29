@@ -1,6 +1,6 @@
 package tests
 
-import common.testing.TestObjects._
+import app.common.testing.TestObjects._
 import app.models.access.DbQuery.Filter
 import app.models.access.DbQueryImplicits._
 import app.models.access._

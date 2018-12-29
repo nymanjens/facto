@@ -3,9 +3,9 @@ package app.flux.stores.entries.factories
 import java.time.Month
 import java.time.Month._
 
-import common.money.ReferenceMoney
-import common.testing.FakeJsEntityAccess
-import common.testing.TestObjects._
+import app.common.money.ReferenceMoney
+import app.common.testing.FakeJsEntityAccess
+import app.common.testing.TestObjects._
 import app.common.time.DatedMonth
 import app.flux.stores.entries.ComplexQueryFilter
 import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear

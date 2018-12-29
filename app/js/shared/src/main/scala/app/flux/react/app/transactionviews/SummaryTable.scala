@@ -1,14 +1,14 @@
 package app.flux.react.app.transactionviews
 
-import common.CollectionUtils.ifThenSeq
-import common.I18n
+import app.common.CollectionUtils.ifThenSeq
+import app.common.I18n
 import hydro.common.LoggingUtils.LogExceptionsCallback
 import hydro.common.LoggingUtils.logExceptions
-import common.ScalaUtils.visibleForTesting
-import common.accounting.Tags
-import common.money.Currency
-import common.money.ExchangeRateManager
-import common.money.ReferenceMoney
+import app.common.ScalaUtils.visibleForTesting
+import app.common.accounting.Tags
+import app.common.money.Currency
+import app.common.money.ExchangeRateManager
+import app.common.money.ReferenceMoney
 import hydro.common.time.Clock
 import app.common.time.DatedMonth
 import app.common.time.YearRange

@@ -3,8 +3,8 @@ package app.flux.react.uielements.input
 import java.time.Month.APRIL
 import java.time.Month.MAY
 
-import common.testing.ReactTestWrapper
-import common.testing.TestModule
+import app.common.testing.ReactTestWrapper
+import app.common.testing.TestModule
 import hydro.common.time.LocalDateTime
 import hydro.common.time.LocalDateTimes.createDateTime
 import japgolly.scalajs.react.test.ReactTestUtils

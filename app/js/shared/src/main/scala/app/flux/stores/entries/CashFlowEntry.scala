@@ -1,7 +1,7 @@
 package app.flux.stores.entries
 
-import common.money.DatedMoney
-import common.money.MoneyWithGeneralCurrency
+import app.common.money.DatedMoney
+import app.common.money.MoneyWithGeneralCurrency
 import app.models.accounting.config.Config
 import app.models.accounting.Transaction
 import app.models.accounting._

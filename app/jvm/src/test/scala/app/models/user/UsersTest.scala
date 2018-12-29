@@ -1,7 +1,7 @@
 package app.models.user
 
 import com.google.inject._
-import common.testing._
+import app.common.testing._
 import app.models.access.JvmEntityAccess
 import org.junit.runner._
 import org.specs2.runner._

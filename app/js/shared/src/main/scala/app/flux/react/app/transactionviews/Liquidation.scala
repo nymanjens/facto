@@ -11,9 +11,9 @@ import app.models.access.EntityAccess
 import app.models.accounting.config.Account
 import app.models.accounting.config.Config
 import app.models.user.User
-import common.Formatting._
-import common.I18n
-import common.money.ExchangeRateManager
+import app.common.Formatting._
+import app.common.I18n
+import app.common.money.ExchangeRateManager
 import hydro.common.Unique
 import hydro.common.time.Clock
 import hydro.flux.react.ReactVdomUtils.^^

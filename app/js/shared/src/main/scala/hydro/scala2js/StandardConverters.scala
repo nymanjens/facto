@@ -9,8 +9,8 @@ import app.models.modification._
 import app.scala2js.AppConverters
 import app.scala2js.AppConverters.EntityTypeConverter
 import app.scala2js.AppConverters.fromEntityType
-import common.GuavaReplacement.ImmutableBiMap
-import common.OrderToken
+import app.common.GuavaReplacement.ImmutableBiMap
+import app.common.OrderToken
 import hydro.common.time.LocalDateTime
 import hydro.scala2js.Scala2Js.Converter
 import hydro.scala2js.Scala2Js.MapConverter

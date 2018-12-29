@@ -1,8 +1,8 @@
 package hydro.flux.react.uielements.input.bootstrap
 
-import common.CollectionUtils.toListMap
-import common.GuavaReplacement.Iterables.getOnlyElement
-import common.I18n
+import app.common.CollectionUtils.toListMap
+import app.common.GuavaReplacement.Iterables.getOnlyElement
+import app.common.I18n
 import hydro.flux.react.ReactVdomUtils.^^
 import hydro.flux.react.uielements.input.InputBase
 import hydro.flux.react.uielements.input.bootstrap.InputComponent.Props

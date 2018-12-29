@@ -1,6 +1,6 @@
 package app.flux.react.uielements
 
-import common.I18n
+import app.common.I18n
 import hydro.flux.react.ReactVdomUtils.^^
 import app.flux.router.AppPages
 import hydro.flux.router.Page

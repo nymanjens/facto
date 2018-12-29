@@ -1,7 +1,7 @@
 package app.models.accounting
 
-import common.money.ExchangeRateManager
-import common.money.ReferenceMoney
+import app.common.money.ExchangeRateManager
+import app.common.money.ReferenceMoney
 import hydro.common.time.LocalDateTime
 import app.models.Entity
 import app.models.access.DbQueryImplicits._

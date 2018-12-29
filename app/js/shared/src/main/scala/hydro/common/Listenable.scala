@@ -3,7 +3,7 @@ package hydro.common
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import hydro.common.Listenable.FlatMappedListenable
 import hydro.common.Listenable.Listener
-import common.ScalaUtils.visibleForTesting
+import app.common.ScalaUtils.visibleForTesting
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable

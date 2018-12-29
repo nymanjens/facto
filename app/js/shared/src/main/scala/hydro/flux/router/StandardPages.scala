@@ -1,7 +1,7 @@
 package hydro.flux.router
 
 import app.models.access.EntityAccess
-import common.I18n
+import app.common.I18n
 import hydro.flux.router.Page.PageBase
 
 import scala.concurrent.Future

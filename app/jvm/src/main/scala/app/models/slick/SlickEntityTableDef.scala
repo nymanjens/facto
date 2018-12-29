@@ -6,7 +6,7 @@ import java.time.Instant
 import app.api.Picklers._
 import boopickle.Default.Pickle
 import boopickle.Default.Unpickle
-import common.accounting.Tags
+import app.common.accounting.Tags
 import hydro.common.time.LocalDateTime
 import app.models.Entity
 import app.models.accounting.BalanceCheck

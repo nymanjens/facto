@@ -1,7 +1,7 @@
 package app.models.money
 
-import common.money.Currency
-import common.money.ExchangeRateManager
+import app.common.money.Currency
+import app.common.money.ExchangeRateManager
 import hydro.common.time.LocalDateTime
 import app.models.access.AppJsEntityAccess
 import hydro.models.access.JsEntityAccess

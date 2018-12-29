@@ -1,6 +1,6 @@
 package hydro.models.access
 
-import common.ScalaUtils.visibleForTesting
+import app.common.ScalaUtils.visibleForTesting
 import hydro.jsfacades.LokiJs
 import hydro.jsfacades.LokiJs.FilterFactory.Operation
 import app.models.Entity

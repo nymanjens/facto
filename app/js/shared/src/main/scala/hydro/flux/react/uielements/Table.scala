@@ -1,8 +1,8 @@
 package hydro.flux.react.uielements
 
-import common.CollectionUtils.ifThenSeq
+import app.common.CollectionUtils.ifThenSeq
 import hydro.common.LoggingUtils.LogExceptionsCallback
-import common.I18n
+import app.common.I18n
 import hydro.common.Unique
 import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.ReactVdomUtils.^^

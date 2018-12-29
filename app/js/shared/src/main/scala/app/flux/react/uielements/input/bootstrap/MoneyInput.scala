@@ -1,14 +1,14 @@
 package app.flux.react.uielements.input.bootstrap
 
-import common.GuavaReplacement.Splitter
+import app.common.GuavaReplacement.Splitter
 import hydro.common.LoggingUtils.LogExceptionsCallback
-import common.I18n
+import app.common.I18n
 import hydro.common.LoggingUtils
-import common.ScalaUtils.visibleForTesting
-import common.money.Currency
-import common.money.DatedMoney
-import common.money.ExchangeRateManager
-import common.money.Money
+import app.common.ScalaUtils.visibleForTesting
+import app.common.money.Currency
+import app.common.money.DatedMoney
+import app.common.money.ExchangeRateManager
+import app.common.money.Money
 import hydro.common.time.LocalDateTime
 import hydro.flux.react.ReactVdomUtils.^^
 import hydro.flux.react.uielements.input.InputBase

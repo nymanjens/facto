@@ -2,9 +2,9 @@ package app.flux.react.app.transactionviews
 
 import hydro.flux.react.uielements.PageHeader
 import hydro.flux.react.uielements.Panel
-import common.Formatting._
-import common.I18n
-import common.money.ExchangeRateManager
+import app.common.Formatting._
+import app.common.I18n
+import app.common.money.ExchangeRateManager
 import hydro.common.time.Clock
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import hydro.flux.router.RouterContext

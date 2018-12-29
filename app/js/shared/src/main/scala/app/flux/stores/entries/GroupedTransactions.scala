@@ -1,8 +1,8 @@
 package app.flux.stores.entries
 
-import common.money.ExchangeRateManager
-import common.money.Money
-import common.money.MoneyWithGeneralCurrency
+import app.common.money.ExchangeRateManager
+import app.common.money.Money
+import app.common.money.MoneyWithGeneralCurrency
 import hydro.common.time.JavaTimeImplicits._
 import hydro.common.time.LocalDateTime
 import app.models.access.AppJsEntityAccess

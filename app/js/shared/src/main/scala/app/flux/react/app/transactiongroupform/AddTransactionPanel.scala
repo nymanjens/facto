@@ -1,6 +1,6 @@
 package app.flux.react.app.transactiongroupform
 
-import common.I18n
+import app.common.I18n
 import hydro.common.LoggingUtils.logExceptions
 import hydro.flux.react.uielements.HalfPanel
 import japgolly.scalajs.react._

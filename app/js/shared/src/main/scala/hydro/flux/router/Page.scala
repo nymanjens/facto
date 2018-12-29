@@ -2,7 +2,7 @@ package hydro.flux.router
 
 import app.flux.router.RouterFactory
 import app.models.access.EntityAccess
-import common.I18n
+import app.common.I18n
 import japgolly.scalajs.react.extra.router.Path
 
 import scala.concurrent.Future

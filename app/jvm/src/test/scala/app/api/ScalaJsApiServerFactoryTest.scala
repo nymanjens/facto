@@ -3,11 +3,11 @@ package app.api
 import app.api.ScalaJsApi.UserPrototype
 import app.api.UpdateTokens.toUpdateToken
 import com.google.inject._
-import common.GuavaReplacement.Iterables.getOnlyElement
-import common.money.Currency
-import common.testing.TestObjects._
-import common.testing.TestUtils._
-import common.testing._
+import app.common.GuavaReplacement.Iterables.getOnlyElement
+import app.common.money.Currency
+import app.common.testing.TestObjects._
+import app.common.testing.TestUtils._
+import app.common.testing._
 import app.models.access.DbQueryImplicits._
 import app.models.access.DbQuery
 import app.models.access.JvmEntityAccess

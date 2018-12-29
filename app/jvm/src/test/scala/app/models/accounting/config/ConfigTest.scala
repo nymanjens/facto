@@ -1,8 +1,8 @@
 package app.models.accounting.config
 
 import com.google.inject._
-import common.testing.TestObjects._
-import common.testing._
+import app.common.testing.TestObjects._
+import app.common.testing._
 import app.models.access.JvmEntityAccess
 import app.models.user.Users
 import org.junit.runner._

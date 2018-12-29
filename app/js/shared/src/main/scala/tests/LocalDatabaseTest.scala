@@ -1,6 +1,6 @@
 package tests
 
-import common.testing.TestObjects._
+import app.common.testing.TestObjects._
 import hydro.models.access.SingletonKey.NextUpdateTokenKey
 import hydro.models.access.SingletonKey.VersionKey
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi

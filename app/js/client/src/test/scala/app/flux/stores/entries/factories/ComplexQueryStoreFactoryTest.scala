@@ -1,6 +1,6 @@
 package app.flux.stores.entries.factories
 
-import common.testing.TestObjects._
+import app.common.testing.TestObjects._
 import app.flux.stores.entries.ComplexQueryFilter
 import app.flux.stores.entries.GeneralEntry.toGeneralEntrySeq
 import utest._

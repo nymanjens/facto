@@ -5,7 +5,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.Month
 
-import common.Require.requireNonNull
+import app.common.Require.requireNonNull
 
 /**
   * Drop-in replacement for java.time.LocalDateTime, which isn't supported by scala.js yet.

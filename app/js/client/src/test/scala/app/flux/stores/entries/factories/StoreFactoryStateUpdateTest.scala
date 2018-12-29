@@ -3,9 +3,9 @@ package app.flux.stores.entries.factories
 import app.models.access.DbQueryImplicits._
 import java.time.Month._
 
-import common.testing.TestObjects._
-import common.testing.FakeJsEntityAccess
-import common.testing.TestModule
+import app.common.testing.TestObjects._
+import app.common.testing.FakeJsEntityAccess
+import app.common.testing.TestModule
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForYear
 import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
 import app.flux.stores.entries.AccountPair

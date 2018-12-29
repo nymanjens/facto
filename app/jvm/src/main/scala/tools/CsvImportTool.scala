@@ -5,8 +5,8 @@ import java.time.Instant
 
 import com.google.common.base.Splitter
 import com.google.inject.Inject
-import common.ResourceFiles
-import common.money.Money
+import app.common.ResourceFiles
+import app.common.money.Money
 import hydro.common.time.Clock
 import hydro.common.time.LocalDateTime
 import hydro.common.time.LocalDateTimes

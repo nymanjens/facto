@@ -1,6 +1,6 @@
 package app.flux
 
-import common.testing.TestObjects._
+import app.common.testing.TestObjects._
 import app.flux.action.AppActions
 import hydro.flux.action.StandardActions
 import hydro.flux.action.Dispatcher

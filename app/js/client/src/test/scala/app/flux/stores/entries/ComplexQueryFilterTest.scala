@@ -1,7 +1,7 @@
 package app.flux.stores.entries
 
-import common.testing.TestObjects.testCategory
-import common.testing.TestObjects._
+import app.common.testing.TestObjects.testCategory
+import app.common.testing.TestObjects._
 import app.flux.stores.entries.ComplexQueryFilter.Prefix
 import app.flux.stores.entries.ComplexQueryFilter.QueryPart
 import app.models.access.EntityAccess

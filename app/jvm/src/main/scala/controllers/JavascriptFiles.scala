@@ -7,8 +7,8 @@ import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
 import com.google.common.io.Resources
 import com.google.inject.Inject
-import common.GuavaReplacement.Splitter
-import common.ResourceFiles
+import app.common.GuavaReplacement.Splitter
+import app.common.ResourceFiles
 import hydro.common.time.Clock
 import app.models.access.JvmEntityAccess
 import play.api.Mode

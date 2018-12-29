@@ -1,8 +1,8 @@
 package controllers
 
 import com.google.inject.Inject
-import common.money.Currency
-import common.money.MoneyWithGeneralCurrency
+import app.common.money.Currency
+import app.common.money.MoneyWithGeneralCurrency
 import hydro.common.time.Clock
 import hydro.common.time.TimeUtils
 import app.models.Entity

@@ -1,6 +1,6 @@
 package app.flux.stores.entries
 
-import common.testing.TestObjects._
+import app.common.testing.TestObjects._
 import utest._
 
 import hydro.scala2js.StandardConverters._

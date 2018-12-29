@@ -1,9 +1,9 @@
 package app.flux.stores.entries.factories
 
-import common.GuavaReplacement.ImmutableSetMultimap
-import common.testing.TestObjects._
-import common.testing.FakeJsEntityAccess
-import common.testing.TestModule
+import app.common.GuavaReplacement.ImmutableSetMultimap
+import app.common.testing.TestObjects._
+import app.common.testing.FakeJsEntityAccess
+import app.common.testing.TestModule
 import app.models.accounting._
 import utest._
 

@@ -1,8 +1,8 @@
 package app.flux.stores.entries.factories
 
-import common.testing.TestObjects._
-import common.testing.FakeJsEntityAccess
-import common.testing.TestModule
+import app.common.testing.TestObjects._
+import app.common.testing.FakeJsEntityAccess
+import app.common.testing.TestModule
 import app.common.time.YearRange
 import app.models.accounting.config.Account
 import utest._

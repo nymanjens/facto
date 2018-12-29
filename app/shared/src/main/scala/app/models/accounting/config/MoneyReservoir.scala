@@ -1,7 +1,7 @@
 package app.models.accounting.config
 
-import common.Require.requireNonNull
-import common.money.Currency
+import app.common.Require.requireNonNull
+import app.common.money.Currency
 
 case class MoneyReservoir(code: String,
                           name: String,

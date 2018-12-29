@@ -2,8 +2,8 @@
 
 //package app.flux.react.app.transactionviews
 //
-//import common.testing.TestObjects._
-//import common.testing.{Awaiter, FakeRouterContext, ReactTestWrapper, TestModule}
+//import app.common.testing.TestObjects._
+//import app.common.testing.{Awaiter, FakeRouterContext, ReactTestWrapper, TestModule}
 //import app.flux.stores.entries.factories.AllEntriesStoreFactory
 //import japgolly.scalajs.react.vdom._
 //import app.models.accounting._

@@ -1,6 +1,6 @@
 package hydro.common
 
-import common.I18n
+import app.common.I18n
 
 /**
   * @param i18nMessages Maps key to the message with placeholders.

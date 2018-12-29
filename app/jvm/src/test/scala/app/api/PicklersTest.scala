@@ -6,9 +6,9 @@ import app.api.Picklers._
 import app.api.ScalaJsApi._
 import boopickle.Default._
 import boopickle.Pickler
-import common.money.Currency
-import common.testing.TestObjects._
-import common.testing._
+import app.common.money.Currency
+import app.common.testing.TestObjects._
+import app.common.testing._
 import hydro.common.time.LocalDateTimes
 import app.models.accounting.Transaction
 import app.models.accounting.config.Config

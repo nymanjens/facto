@@ -5,9 +5,9 @@ import java.time.Month._
 
 import com.google.inject.Guice
 import com.google.inject.Inject
-import common.testing.TestModule
-import common.testing.FakeI18n
-import common.testing.HookedSpecification
+import app.common.testing.TestModule
+import app.common.testing.FakeI18n
+import app.common.testing.HookedSpecification
 import hydro.common.time.LocalDateTimes.createDateTime
 
 class DatedMonthTest extends HookedSpecification {

@@ -1,6 +1,6 @@
 package hydro.flux.react.uielements
 
-import common.I18n
+import app.common.I18n
 import hydro.common.LoggingUtils.logExceptions
 import hydro.flux.react.HydroReactComponent
 import hydro.flux.stores.ApplicationIsOnlineStore

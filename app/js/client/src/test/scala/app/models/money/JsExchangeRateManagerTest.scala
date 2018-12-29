@@ -2,11 +2,11 @@ package app.models.money
 
 import java.time.Duration
 
-import common.money.Currency.Eur
-import common.money.Currency.Gbp
-import common.money.Currency.Usd
-import common.testing.FakeJsEntityAccess
-import common.testing.TestModule
+import app.common.money.Currency.Eur
+import app.common.money.Currency.Gbp
+import app.common.money.Currency.Usd
+import app.common.testing.FakeJsEntityAccess
+import app.common.testing.TestModule
 import hydro.common.time.Clock
 import hydro.common.time.LocalDateTime
 import utest.TestSuite

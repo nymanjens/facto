@@ -1,6 +1,6 @@
 package hydro.models.access
 
-import common.ScalaUtils.visibleForTesting
+import app.common.ScalaUtils.visibleForTesting
 import app.models.Entity
 import app.models.modification.EntityModification
 import app.models.modification.EntityType

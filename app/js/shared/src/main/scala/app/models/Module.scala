@@ -1,7 +1,7 @@
 package app.models
 
 import app.api.ScalaJsApi.GetInitialDataResponse
-import common.money.ExchangeRateManager
+import app.common.money.ExchangeRateManager
 import app.models.access.AppJsEntityAccess
 import hydro.models.access.JsEntityAccess
 import app.models.money.JsExchangeRateManager

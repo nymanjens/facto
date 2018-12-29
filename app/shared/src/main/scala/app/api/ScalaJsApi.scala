@@ -2,7 +2,7 @@ package app.api
 
 import app.api.Picklers._
 import app.api.ScalaJsApi._
-import common.money.Currency
+import app.common.money.Currency
 import hydro.common.time.LocalDateTime
 import app.models.Entity
 import app.models.accounting.config.Config

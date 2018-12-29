@@ -1,9 +1,9 @@
 package app.models.access
 
-import common.testing.FakeScalaJsApiClient
+import app.common.testing.FakeScalaJsApiClient
 import hydro.common.testing.ModificationsBuffer
-import common.testing.TestModule
-import common.testing.TestObjects._
+import app.common.testing.TestModule
+import app.common.testing.TestObjects._
 import hydro.common.time.Clock
 import app.models.Entity
 import app.models.accounting.Transaction

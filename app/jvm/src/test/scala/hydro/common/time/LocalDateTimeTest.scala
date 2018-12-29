@@ -3,7 +3,7 @@ package hydro.common.time
 import java.time.Duration
 import java.time.Month._
 
-import common.testing.TestUtils._
+import app.common.testing.TestUtils._
 import org.specs2.mutable._
 
 class LocalDateTimeTest extends Specification {

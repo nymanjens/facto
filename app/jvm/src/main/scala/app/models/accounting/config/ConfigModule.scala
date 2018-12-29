@@ -6,7 +6,7 @@ import java.nio.file.Paths
 import com.google.common.base.Throwables
 import com.google.inject.AbstractModule
 import com.google.inject.Provides
-import common.ResourceFiles
+import app.common.ResourceFiles
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor
 import org.yaml.snakeyaml.introspector.BeanAccess

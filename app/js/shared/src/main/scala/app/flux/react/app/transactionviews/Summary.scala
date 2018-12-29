@@ -1,9 +1,9 @@
 package app.flux.react.app.transactionviews
 
-import common.I18n
+import app.common.I18n
 import hydro.common.LoggingUtils.LogExceptionsCallback
 import hydro.common.LoggingUtils.logExceptions
-import common.money.ExchangeRateManager
+import app.common.money.ExchangeRateManager
 import hydro.common.time.Clock
 import hydro.flux.router.RouterContext
 import app.flux.react.uielements

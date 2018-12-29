@@ -1,9 +1,9 @@
 package app.flux.react.uielements
 
-import common.money.Currency
-import common.money.DatedMoney
-import common.money.ExchangeRateManager
-import common.money.Money
+import app.common.money.Currency
+import app.common.money.DatedMoney
+import app.common.money.ExchangeRateManager
+import app.common.money.Money
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 

@@ -4,8 +4,8 @@ import java.util.Collections
 
 import com.google.common.base.Preconditions.checkNotNull
 import com.google.common.collect.ImmutableList
-import common.Require.requireNonNull
-import common.ScalaUtils.nullable
+import app.common.Require.requireNonNull
+import app.common.ScalaUtils.nullable
 import app.models.accounting.config.Account.{SummaryTotalRowDef => ParsedSummaryTotalRowDef}
 import app.models.accounting.config.MoneyReservoir.NullMoneyReservoir
 import app.models.accounting.config.{Account => ParsedAccount}

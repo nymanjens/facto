@@ -1,10 +1,10 @@
 package app.flux.react.app.transactionviews
 
-import common.Formatting._
+import app.common.Formatting._
 import hydro.common.LoggingUtils.LogExceptionsCallback
-import common.money.ExchangeRateManager
+import app.common.money.ExchangeRateManager
 import hydro.common.time.Clock
-import common.I18n
+import app.common.I18n
 import hydro.common.Unique
 import app.flux.action.AppActions
 import hydro.flux.action.StandardActions
