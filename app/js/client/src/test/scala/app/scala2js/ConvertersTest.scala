@@ -22,7 +22,8 @@ object ConvertersTest extends TestSuite {
 
   override def tests = TestSuite {
     "fromModelField" - {
-      StandardConverters.fromModelField(ModelField.Transaction.categoryCode) ==> StandardConverters.StringConverter
+      StandardConverters
+        .fromModelField(ModelField.Transaction.categoryCode) ==> StandardConverters.StringConverter
       StandardConverters.fromModelField(ModelField.id[User]) ==> StandardConverters.LongConverter
     }
     "LongConverter" - {
