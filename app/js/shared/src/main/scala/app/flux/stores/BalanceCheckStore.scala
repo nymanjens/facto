@@ -1,8 +1,8 @@
 package app.flux.stores
 
-import app.flux.action.Actions.AddBalanceCheck
-import app.flux.action.Actions.RemoveBalanceCheck
-import app.flux.action.Actions.UpdateBalanceCheck
+import app.flux.action.AppActions.AddBalanceCheck
+import app.flux.action.AppActions.RemoveBalanceCheck
+import app.flux.action.AppActions.UpdateBalanceCheck
 import hydro.flux.action.Dispatcher
 import app.models.access.AppJsEntityAccess
 import hydro.models.access.JsEntityAccess

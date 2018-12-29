@@ -7,7 +7,7 @@ import app.models.accounting.TransactionGroup
 
 import scala.collection.immutable.Seq
 
-object Actions {
+object AppActions {
 
   // **************** Transaction[Group]-related actions **************** //
   case class AddTransactionGroup(transactionsWithoutIdProvider: TransactionGroup => Seq[Transaction])

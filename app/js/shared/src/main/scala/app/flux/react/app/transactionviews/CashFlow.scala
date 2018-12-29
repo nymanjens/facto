@@ -6,7 +6,7 @@ import common.money.ExchangeRateManager
 import hydro.common.time.Clock
 import common.I18n
 import hydro.common.Unique
-import app.flux.action.Actions
+import app.flux.action.AppActions
 import hydro.flux.action.StandardActions
 import hydro.flux.action.Dispatcher
 import hydro.flux.react.ReactVdomUtils.<<
@@ -197,7 +197,7 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
       ^.role := "button",
       ^.onClick --> LogExceptionsCallback {
         dispatcher.dispatch(
-          Actions.AddBalanceCheck(BalanceCheck(
+          AppActions.AddBalanceCheck(BalanceCheck(
             issuerId = user.id,
             moneyReservoirCode = reservoir.code,
             balanceInCents = entry.balance.cents,

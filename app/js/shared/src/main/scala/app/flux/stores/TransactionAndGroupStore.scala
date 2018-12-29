@@ -1,9 +1,9 @@
 package app.flux.stores
 
 import hydro.common.time.Clock
-import app.flux.action.Actions.AddTransactionGroup
-import app.flux.action.Actions.RemoveTransactionGroup
-import app.flux.action.Actions.UpdateTransactionGroup
+import app.flux.action.AppActions.AddTransactionGroup
+import app.flux.action.AppActions.RemoveTransactionGroup
+import app.flux.action.AppActions.UpdateTransactionGroup
 import hydro.flux.action.Dispatcher
 import app.models.access.AppJsEntityAccess
 import hydro.models.access.JsEntityAccess

@@ -6,7 +6,7 @@ import hydro.common.LoggingUtils.logExceptions
 import common.money.ExchangeRateManager
 import hydro.common.time.Clock
 import hydro.common.time.LocalDateTime
-import app.flux.action.Actions
+import app.flux.action.AppActions
 import hydro.flux.action.StandardActions
 import hydro.flux.action.Dispatcher
 import hydro.flux.react.ReactVdomUtils.<<
@@ -192,9 +192,9 @@ final class BalanceCheckForm(implicit i18n: I18n,
       def submitValid(balanceCheckWithoutId: BalanceCheck) = {
         val action = props.operationMeta match {
           case OperationMeta.AddNew(_) =>
-            Actions.AddBalanceCheck(balanceCheckWithoutId)
+            AppActions.AddBalanceCheck(balanceCheckWithoutId)
           case OperationMeta.Edit(existingBalanceCheck) =>
-            Actions.UpdateBalanceCheck(
+            AppActions.UpdateBalanceCheck(
               existingBalanceCheck = existingBalanceCheck,
               newBalanceCheckWithoutId = balanceCheckWithoutId)
         }
@@ -234,7 +234,7 @@ final class BalanceCheckForm(implicit i18n: I18n,
       props.operationMeta match {
         case OperationMeta.AddNew(_) => throw new AssertionError("Should never happen")
         case OperationMeta.Edit(balanceCheck) =>
-          dispatcher.dispatch(Actions.RemoveBalanceCheck(existingBalanceCheck = balanceCheck))
+          dispatcher.dispatch(AppActions.RemoveBalanceCheck(existingBalanceCheck = balanceCheck))
           props.router.setPath(props.returnToPath)
       }
     }

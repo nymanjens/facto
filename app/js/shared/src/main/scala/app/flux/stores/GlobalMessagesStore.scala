@@ -7,7 +7,7 @@ import hydro.common.time.Clock
 import hydro.common.time.JavaTimeImplicits._
 import common.I18n
 import hydro.common.Unique
-import app.flux.action.Actions._
+import app.flux.action.AppActions._
 import hydro.flux.action.StandardActions._
 import app.flux.stores.GlobalMessagesStore.Message
 import hydro.flux.action.StandardActions._

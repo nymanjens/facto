@@ -1,7 +1,7 @@
 package app.flux.stores
 
 import common.testing.TestObjects._
-import app.flux.action.Actions
+import app.flux.action.AppActions
 import hydro.flux.action.StandardActions
 import app.models.accounting._
 import app.models.modification.EntityModification
@@ -26,7 +26,7 @@ object BalanceCheckStoreTest extends TestSuite {
     val balanceCheckStore = new BalanceCheckStore()
 
     "Listens to Actions.AddBalanceCheck" - async {
-      await(fakeDispatcher.dispatch(Actions.AddBalanceCheck(testBalanceCheckWithoutId)))
+      await(fakeDispatcher.dispatch(AppActions.AddBalanceCheck(testBalanceCheckWithoutId)))
 
       val Seq(addBc) = fakeDatabase.allModifications
       assertAddBalanceCheck(addBc, testBalanceCheckWithoutId)
@@ -37,7 +37,7 @@ object BalanceCheckStoreTest extends TestSuite {
       val initialModifications = fakeDatabase.allModifications
       val newBalanceCheck = testBalanceCheckWithId.copy(balanceInCents = 39877, idOption = None)
 
-      await(fakeDispatcher.dispatch(Actions.UpdateBalanceCheck(testBalanceCheckWithId, newBalanceCheck)))
+      await(fakeDispatcher.dispatch(AppActions.UpdateBalanceCheck(testBalanceCheckWithId, newBalanceCheck)))
 
       fakeDatabase.allModifications.size - initialModifications.size ==> 2
       val Seq(removeBc, addBc) = fakeDatabase.allModifications takeRight 2
@@ -49,7 +49,7 @@ object BalanceCheckStoreTest extends TestSuite {
       fakeDatabase.addRemotelyAddedEntities(testBalanceCheckWithId)
       val initialModifications = fakeDatabase.allModifications
 
-      await(fakeDispatcher.dispatch(Actions.RemoveBalanceCheck(testBalanceCheckWithId)))
+      await(fakeDispatcher.dispatch(AppActions.RemoveBalanceCheck(testBalanceCheckWithId)))
 
       fakeDatabase.allModifications.size - initialModifications.size ==> 1
       (fakeDatabase.allModifications takeRight 1) ==> Seq(

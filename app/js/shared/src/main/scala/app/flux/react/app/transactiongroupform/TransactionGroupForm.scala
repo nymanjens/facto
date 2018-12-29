@@ -9,7 +9,7 @@ import common.money.ExchangeRateManager
 import common.money.ReferenceMoney
 import hydro.common.time.Clock
 import hydro.common.time.JavaTimeImplicits._
-import app.flux.action.Actions
+import app.flux.action.AppActions
 import hydro.flux.action.StandardActions
 import hydro.flux.action.Dispatcher
 import hydro.flux.react.ReactVdomUtils.<<
@@ -492,9 +492,9 @@ final class TransactionGroupForm(implicit i18n: I18n,
 
           val action = props.operationMeta match {
             case OperationMeta.AddNew =>
-              Actions.AddTransactionGroup(transactionsWithoutIdProvider = transactionsWithoutIdProvider(_))
+              AppActions.AddTransactionGroup(transactionsWithoutIdProvider = transactionsWithoutIdProvider(_))
             case OperationMeta.Edit(group, transactions) =>
-              Actions.UpdateTransactionGroup(
+              AppActions.UpdateTransactionGroup(
                 transactionGroupWithId = group,
                 transactionsWithoutId = transactionsWithoutIdProvider(group, Some(transactions.head.issuerId))
               )
@@ -535,7 +535,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
       props.operationMeta match {
         case OperationMeta.AddNew => throw new AssertionError("Should never happen")
         case OperationMeta.Edit(group, transactions) =>
-          dispatcher.dispatch(Actions.RemoveTransactionGroup(transactionGroupWithId = group))
+          dispatcher.dispatch(AppActions.RemoveTransactionGroup(transactionGroupWithId = group))
           props.router.setPath(props.returnToPath)
       }
     }

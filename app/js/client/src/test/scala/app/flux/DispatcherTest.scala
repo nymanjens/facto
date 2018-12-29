@@ -1,7 +1,7 @@
 package app.flux
 
 import common.testing.TestObjects._
-import app.flux.action.Actions
+import app.flux.action.AppActions
 import hydro.flux.action.StandardActions
 import hydro.flux.action.Dispatcher
 import hydro.flux.action.Action
@@ -20,7 +20,7 @@ object DispatcherTest extends TestSuite {
 
   override def tests = TestSuite {
     val dispatcher: Dispatcher.Impl = new Dispatcher.Impl()
-    val testAction = Actions.RemoveTransactionGroup(testTransactionGroupWithId)
+    val testAction = AppActions.RemoveTransactionGroup(testTransactionGroupWithId)
 
     "dispatches actions to listeners, including Done action" - async {
       val dispatchedActions: mutable.Buffer[Action] = mutable.Buffer()

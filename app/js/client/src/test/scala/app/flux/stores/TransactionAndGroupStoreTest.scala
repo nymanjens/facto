@@ -1,7 +1,7 @@
 package app.flux.stores
 
 import common.testing.TestObjects._
-import app.flux.action.Actions
+import app.flux.action.AppActions
 import hydro.flux.action.StandardActions
 import app.models.accounting._
 import app.models.modification.EntityModification
@@ -28,7 +28,7 @@ object TransactionAndGroupStoreTest extends TestSuite {
 
     "Listens to Actions.AddTransactionGroup" - async {
       var groupId: Long = -1
-      await(fakeDispatcher.dispatch(Actions.AddTransactionGroup(transactionsWithoutIdProvider = group => {
+      await(fakeDispatcher.dispatch(AppActions.AddTransactionGroup(transactionsWithoutIdProvider = group => {
         groupId = group.id
         Seq(testTransactionWithId.copy(idOption = None, transactionGroupId = group.id))
       })))
@@ -55,7 +55,7 @@ object TransactionAndGroupStoreTest extends TestSuite {
       val initialModifications = fakeDatabase.allModifications
       await(
         fakeDispatcher.dispatch(
-          Actions.UpdateTransactionGroup(
+          AppActions.UpdateTransactionGroup(
             transactionGroupWithId = testTransactionGroupWithId,
             transactionsWithoutId = Seq(
               testTransactionWithIdB.copy(idOption = None)
@@ -78,7 +78,7 @@ object TransactionAndGroupStoreTest extends TestSuite {
       fakeDatabase.addRemotelyAddedEntities(testTransactionGroupWithId)
       fakeDatabase.addRemotelyAddedEntities(testTransactionWithId)
       val initialModifications = fakeDatabase.allModifications
-      await(fakeDispatcher.dispatch(Actions.RemoveTransactionGroup(testTransactionGroupWithId)))
+      await(fakeDispatcher.dispatch(AppActions.RemoveTransactionGroup(testTransactionGroupWithId)))
 
       fakeDatabase.allModifications.size - initialModifications.size ==> 2
       val Seq(removeTransaction, removeGroup) = fakeDatabase.allModifications takeRight 2
