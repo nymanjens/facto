@@ -1,11 +1,10 @@
 package hydro.flux.react.uielements
 
+import app.models.access.EntityAccess
 import common.I18n
-import app.flux.router.AppPages
+import hydro.flux.router.Page
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
-import app.models.access.EntityAccess
-import hydro.flux.router.Page
 
 final class PageHeader(implicit i18n: I18n, entityAccess: EntityAccess) {
 
