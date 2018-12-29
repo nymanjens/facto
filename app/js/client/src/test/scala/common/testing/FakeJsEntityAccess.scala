@@ -1,7 +1,7 @@
 package common.testing
 
 import app.models.Entity
-import app.models.access.JsEntityAccess.Listener
+import app.models.access.AppJsEntityAccess.Listener
 import app.models.access._
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
@@ -16,7 +16,7 @@ import scala.scalajs.js
 import hydro.scala2js.StandardConverters._
 import app.scala2js.AppConverters._
 
-final class FakeJsEntityAccess extends JsEntityAccess {
+final class FakeJsEntityAccess extends AppJsEntityAccess {
 
   private val modificationsBuffer: ModificationsBuffer = new ModificationsBuffer()
   private var _pendingModifications: PendingModifications =

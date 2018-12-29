@@ -5,7 +5,7 @@ import app.flux.action.Actions.AddTransactionGroup
 import app.flux.action.Actions.RemoveTransactionGroup
 import app.flux.action.Actions.UpdateTransactionGroup
 import hydro.flux.action.Dispatcher
-import app.models.access.JsEntityAccess
+import app.models.access.AppJsEntityAccess
 import app.models.accounting._
 import app.models.modification.EntityModification
 
@@ -14,7 +14,7 @@ import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-private[stores] final class TransactionAndGroupStore(implicit entityAccess: JsEntityAccess,
+private[stores] final class TransactionAndGroupStore(implicit entityAccess: AppJsEntityAccess,
                                                      clock: Clock,
                                                      dispatcher: Dispatcher) {
   dispatcher.registerPartialAsync {

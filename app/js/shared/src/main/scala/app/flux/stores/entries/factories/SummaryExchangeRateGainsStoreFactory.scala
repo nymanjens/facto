@@ -14,7 +14,7 @@ import app.flux.stores.entries.ComplexQueryFilter
 import app.flux.stores.entries.EntriesStore
 import app.models.access.DbQueryImplicits._
 import app.models.access.DbQuery
-import app.models.access.JsEntityAccess
+import app.models.access.AppJsEntityAccess
 import app.models.access.ModelField
 import app.models.accounting.config.Account
 import app.models.accounting.config.Config
@@ -35,7 +35,7 @@ import app.scala2js.AppConverters._
 /**
   * Store factory that calculates the monthly gains and losses made by exchange rate fluctuations in a given year.
   */
-final class SummaryExchangeRateGainsStoreFactory(implicit entityAccess: JsEntityAccess,
+final class SummaryExchangeRateGainsStoreFactory(implicit entityAccess: AppJsEntityAccess,
                                                  exchangeRateManager: ExchangeRateManager,
                                                  accountingConfig: Config,
                                                  complexQueryFilter: ComplexQueryFilter)

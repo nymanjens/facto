@@ -33,7 +33,7 @@ import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom.html_<^._
 import app.models.access.DbQueryImplicits._
 import app.models.access.DbQuery
-import app.models.access.JsEntityAccess
+import app.models.access.AppJsEntityAccess
 import app.models.access.ModelField
 import app.models.accounting.Transaction
 import app.models.accounting.config.Account
@@ -55,7 +55,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
                                                            user: User,
                                                            exchangeRateManager: ExchangeRateManager,
                                                            clock: Clock,
-                                                           entityAccess: JsEntityAccess,
+                                                           entityAccess: AppJsEntityAccess,
                                                            tagsStoreFactory: TagsStoreFactory) {
 
   private val anythingChangedQueue = SinglePendingTaskQueue.create()

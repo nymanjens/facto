@@ -2,7 +2,7 @@ package app.models.access
 
 import hydro.common.LoggingUtils.logExceptions
 import app.models.Entity
-import app.models.access.JsEntityAccess.Listener
+import app.models.access.AppJsEntityAccess.Listener
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
 import app.models.user.User
@@ -17,7 +17,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 private[access] final class JsEntityAccessImpl(allUsers: Seq[User])(
     implicit remoteDatabaseProxy: RemoteDatabaseProxy,
     entityModificationPushClientFactory: EntityModificationPushClientFactory)
-    extends JsEntityAccess {
+    extends AppJsEntityAccess {
 
   private var listeners: Seq[Listener] = Seq()
   private var _pendingModifications: PendingModifications =

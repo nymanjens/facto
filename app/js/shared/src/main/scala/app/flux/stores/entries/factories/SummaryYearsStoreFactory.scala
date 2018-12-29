@@ -5,7 +5,7 @@ import app.flux.stores.entries.EntriesStore
 import app.flux.stores.entries.factories.SummaryYearsStoreFactory.State
 import app.models.access.DbQueryImplicits._
 import app.models.access.DbQuery
-import app.models.access.JsEntityAccess
+import app.models.access.AppJsEntityAccess
 import app.models.access.ModelField
 import app.models.accounting.config.Account
 import app.models.accounting.BalanceCheck
@@ -25,7 +25,7 @@ import app.scala2js.AppConverters._
   * The calculated range is guaranteed to contain at least all years there are transactions for but may also contain
   * more (although unlikely).
   */
-final class SummaryYearsStoreFactory(implicit entityAccess: JsEntityAccess)
+final class SummaryYearsStoreFactory(implicit entityAccess: AppJsEntityAccess)
     extends EntriesStoreFactory[State] {
 
   // **************** Implementation of EntriesStoreFactory methods/types ****************//

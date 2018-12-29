@@ -3,7 +3,7 @@ package app.flux.stores.entries.factories
 import app.flux.stores.entries.ComplexQueryFilter
 import app.flux.stores.entries.GeneralEntry
 import app.models.access.DbQuery
-import app.models.access.JsEntityAccess
+import app.models.access.AppJsEntityAccess
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 
@@ -14,7 +14,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import hydro.scala2js.StandardConverters._
 import app.scala2js.AppConverters._
 
-final class ComplexQueryStoreFactory(implicit entityAccess: JsEntityAccess,
+final class ComplexQueryStoreFactory(implicit entityAccess: AppJsEntityAccess,
                                      complexQueryFilter: ComplexQueryFilter)
     extends EntriesListStoreFactory[GeneralEntry, ComplexQueryStoreFactory.Query] {
 

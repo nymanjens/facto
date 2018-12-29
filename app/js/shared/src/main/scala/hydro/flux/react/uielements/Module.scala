@@ -7,12 +7,12 @@ import hydro.flux.action.Dispatcher
 import hydro.flux.stores.ApplicationIsOnlineStore
 import hydro.flux.stores.PageLoadingStateStore
 import hydro.flux.stores.UserStore
-import app.models.access.JsEntityAccess
+import app.models.access.AppJsEntityAccess
 import app.models.user.User
 
 final class Module(implicit i18n: I18n,
                    user: User,
-                   entityAccess: JsEntityAccess,
+                   entityAccess: AppJsEntityAccess,
                    globalMessagesStore: GlobalMessagesStore,
                    pageLoadingStateStore: PageLoadingStateStore,
                    pendingModificationsStore: PendingModificationsStore,

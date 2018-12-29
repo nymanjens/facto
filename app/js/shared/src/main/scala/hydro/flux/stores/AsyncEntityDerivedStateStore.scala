@@ -2,7 +2,7 @@ package hydro.flux.stores
 
 import hydro.common.LoggingUtils.logExceptions
 import hydro.common.LoggingUtils.logFailure
-import app.models.access.JsEntityAccess
+import app.models.access.AppJsEntityAccess
 import app.models.modification.EntityModification
 
 import scala.collection.immutable.Seq
@@ -16,7 +16,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
   *
   * @tparam State An immutable type that contains all state maintained by this store
   */
-abstract class AsyncEntityDerivedStateStore[State](implicit entityAccess: JsEntityAccess)
+abstract class AsyncEntityDerivedStateStore[State](implicit entityAccess: AppJsEntityAccess)
     extends StateStore[Option[State]] {
   entityAccess.registerListener(JsEntityAccessListener)
 
@@ -90,7 +90,7 @@ abstract class AsyncEntityDerivedStateStore[State](implicit entityAccess: JsEnti
     modifications.toStream.filter(m => modificationImpactsState(m, state)).take(1).nonEmpty
 
   // **************** Inner type definitions ****************//
-  private object JsEntityAccessListener extends JsEntityAccess.Listener {
+  private object JsEntityAccessListener extends AppJsEntityAccess.Listener {
     override def modificationsAddedOrPendingStateChanged(modifications: Seq[EntityModification]): Unit = {
       checkNotCallingListeners()
 

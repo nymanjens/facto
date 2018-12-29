@@ -2,7 +2,7 @@ package app.flux.stores
 
 import app.flux.stores.PendingModificationsStore.State
 import hydro.flux.stores.StateStore
-import app.models.access.JsEntityAccess
+import app.models.access.AppJsEntityAccess
 import app.models.accounting.Transaction
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
@@ -10,7 +10,7 @@ import app.models.modification.EntityType
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 
-final class PendingModificationsStore(implicit jsEntityAccess: JsEntityAccess) extends StateStore[State] {
+final class PendingModificationsStore(implicit jsEntityAccess: AppJsEntityAccess) extends StateStore[State] {
   jsEntityAccess.registerListener(JsEntityAccessListener)
 
   private var _state: State = State(numberOfModifications = 0)
@@ -28,7 +28,7 @@ final class PendingModificationsStore(implicit jsEntityAccess: JsEntityAccess) e
   }
 
   // **************** Private inner types ****************//
-  object JsEntityAccessListener extends JsEntityAccess.Listener {
+  object JsEntityAccessListener extends AppJsEntityAccess.Listener {
     override def modificationsAddedOrPendingStateChanged(modifications: Seq[EntityModification]): Unit =
       onAnyChange()
 

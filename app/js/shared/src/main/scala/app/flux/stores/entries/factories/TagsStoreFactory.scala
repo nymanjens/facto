@@ -4,7 +4,7 @@ import common.GuavaReplacement.ImmutableSetMultimap
 import app.flux.stores.entries.EntriesStore
 import app.flux.stores.entries.factories.TagsStoreFactory.State
 import app.models.access.DbQueryImplicits._
-import app.models.access.JsEntityAccess
+import app.models.access.AppJsEntityAccess
 import app.models.access.ModelField
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
@@ -16,7 +16,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import hydro.scala2js.StandardConverters._
 import app.scala2js.AppConverters._
 
-final class TagsStoreFactory(implicit entityAccess: JsEntityAccess) extends EntriesStoreFactory[State] {
+final class TagsStoreFactory(implicit entityAccess: AppJsEntityAccess) extends EntriesStoreFactory[State] {
 
   // **************** Public API ****************//
   def get(): Store = get((): Unit)

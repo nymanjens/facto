@@ -2,7 +2,7 @@ package app.flux.stores.entries.factories
 
 import app.flux.stores.entries.WithIsPending.isAnyPending
 import app.flux.stores.entries._
-import app.models.access.JsEntityAccess
+import app.models.access.AppJsEntityAccess
 
 import scala.collection.immutable.Seq
 
@@ -10,7 +10,7 @@ import scala.collection.immutable.Seq
   * @tparam AdditionalInput The (immutable) input type that together with injected dependencies and the max number of
   *                         entries is enough to calculate the latest value of `State`. Example: Int.
   */
-abstract class EntriesListStoreFactory[Entry, AdditionalInput](implicit entityAccess: JsEntityAccess)
+abstract class EntriesListStoreFactory[Entry, AdditionalInput](implicit entityAccess: AppJsEntityAccess)
     extends EntriesStoreFactory[EntriesListStoreFactory.State[Entry]] {
 
   // **************** Abstract methods/types ****************//
@@ -41,7 +41,7 @@ object EntriesListStoreFactory {
       State(Seq(), hasMore = false, impactingTransactionIds = Set(), impactingBalanceCheckIds = Set())
 
     def withImpactingIdsInEntries[Entry <: GroupedTransactions](entries: Seq[Entry], hasMore: Boolean)(
-        implicit entityAccess: JsEntityAccess): State[Entry] =
+        implicit entityAccess: AppJsEntityAccess): State[Entry] =
       State(
         entries.map(entry => WithIsPending(entry, isPending = isAnyPending(entry.transactions))),
         hasMore = hasMore,

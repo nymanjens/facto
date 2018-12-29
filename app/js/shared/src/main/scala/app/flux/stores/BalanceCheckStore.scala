@@ -4,10 +4,11 @@ import app.flux.action.Actions.AddBalanceCheck
 import app.flux.action.Actions.RemoveBalanceCheck
 import app.flux.action.Actions.UpdateBalanceCheck
 import hydro.flux.action.Dispatcher
-import app.models.access.JsEntityAccess
+import app.models.access.AppJsEntityAccess
 import app.models.modification.EntityModification
 
-private[stores] final class BalanceCheckStore(implicit entityAccess: JsEntityAccess, dispatcher: Dispatcher) {
+private[stores] final class BalanceCheckStore(implicit entityAccess: AppJsEntityAccess,
+                                              dispatcher: Dispatcher) {
   dispatcher.registerPartialAsync {
     case AddBalanceCheck(balanceCheckWithoutId) =>
       entityAccess.persistModifications(EntityModification.createAddWithRandomId(balanceCheckWithoutId))

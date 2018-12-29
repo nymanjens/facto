@@ -7,7 +7,7 @@ import app.flux.stores.entries.WithIsPending.isAnyPending
 import app.flux.stores.entries._
 import app.models.access.DbQueryImplicits._
 import app.models.access.DbQuery
-import app.models.access.JsEntityAccess
+import app.models.access.AppJsEntityAccess
 import app.models.access.ModelField
 import app.models.accounting.config.Account
 import app.models.accounting.config.Config
@@ -23,7 +23,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import hydro.scala2js.StandardConverters._
 import app.scala2js.AppConverters._
 
-final class LiquidationEntriesStoreFactory(implicit entityAccess: JsEntityAccess,
+final class LiquidationEntriesStoreFactory(implicit entityAccess: AppJsEntityAccess,
                                            accountingConfig: Config,
                                            exchangeRateManager: ExchangeRateManager)
     extends EntriesListStoreFactory[LiquidationEntry, AccountPair] {

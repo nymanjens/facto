@@ -6,14 +6,14 @@ import hydro.common.time.Clock
 import hydro.flux.action.Dispatcher
 import app.flux.stores.GlobalMessagesStore
 import hydro.flux.react.uielements.PageHeader
-import app.models.access.JsEntityAccess
+import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Config
 import app.models.user.User
 
 final class Module(implicit i18n: I18n,
                    accountingConfig: Config,
                    user: User,
-                   entityAccess: JsEntityAccess,
+                   entityAccess: AppJsEntityAccess,
                    exchangeRateManager: ExchangeRateManager,
                    globalMessagesStore: GlobalMessagesStore,
                    dispatcher: Dispatcher,

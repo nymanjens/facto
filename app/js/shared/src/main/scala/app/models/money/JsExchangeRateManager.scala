@@ -3,7 +3,7 @@ package app.models.money
 import common.money.Currency
 import common.money.ExchangeRateManager
 import hydro.common.time.LocalDateTime
-import app.models.access.JsEntityAccess
+import app.models.access.AppJsEntityAccess
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
 
@@ -15,7 +15,7 @@ import app.scala2js.AppConverters._
 
 final class JsExchangeRateManager(
     ratioReferenceToForeignCurrency: Map[Currency, SortedMap[LocalDateTime, Double]])(
-    implicit entityAccess: JsEntityAccess)
+    implicit entityAccess: AppJsEntityAccess)
     extends ExchangeRateManager {
   entityAccess.registerListener(JsEntityAccessListener)
 
@@ -52,7 +52,7 @@ final class JsExchangeRateManager(
   }
 
   // **************** Inner type definitions ****************//
-  private object JsEntityAccessListener extends JsEntityAccess.Listener {
+  private object JsEntityAccessListener extends AppJsEntityAccess.Listener {
     override def modificationsAddedOrPendingStateChanged(modifications: Seq[EntityModification]): Unit = {
       for (modification <- modifications) {
         modification.entityType match {

@@ -1,7 +1,7 @@
 package app.flux.stores.entries
 
 import hydro.flux.stores.AsyncEntityDerivedStateStore
-import app.models.access.JsEntityAccess
+import app.models.access.AppJsEntityAccess
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.modification.EntityModification
@@ -12,7 +12,7 @@ import app.models.modification.EntityType
   *
   * @tparam State An immutable type that contains all state maintained by this store
   */
-abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit entityAccess: JsEntityAccess)
+abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit entityAccess: AppJsEntityAccess)
     extends AsyncEntityDerivedStateStore[State] {
 
   // **************** Abstract methods ****************//

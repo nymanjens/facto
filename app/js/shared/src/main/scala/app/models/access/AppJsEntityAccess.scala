@@ -10,7 +10,7 @@ import scala.concurrent.Future
 import hydro.scala2js.StandardConverters._
 import app.scala2js.AppConverters._
 
-trait JsEntityAccess extends EntityAccess {
+trait AppJsEntityAccess extends EntityAccess {
 
   // **************** Getters ****************//
   override def newQuery[E <: Entity: EntityType](): DbResultSet.Async[E]
@@ -35,12 +35,12 @@ trait JsEntityAccess extends EntityAccess {
   def clearLocalDatabase(): Future[Unit]
 
   // **************** Other ****************//
-  def registerListener(listener: JsEntityAccess.Listener): Unit
-  def deregisterListener(listener: JsEntityAccess.Listener): Unit
+  def registerListener(listener: AppJsEntityAccess.Listener): Unit
+  def deregisterListener(listener: AppJsEntityAccess.Listener): Unit
   private[access] def startCheckingForModifiedEntityUpdates(): Unit
 }
 
-object JsEntityAccess {
+object AppJsEntityAccess {
 
   trait Listener {
 

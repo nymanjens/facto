@@ -12,7 +12,7 @@ import app.flux.stores.entries.CashFlowEntry
 import app.flux.stores.entries.WithIsPending
 import app.models.access.DbQueryImplicits._
 import app.models.access.DbQuery
-import app.models.access.JsEntityAccess
+import app.models.access.AppJsEntityAccess
 import app.models.access.ModelField
 import app.models.accounting.config.Config
 import app.models.accounting.config.MoneyReservoir
@@ -26,7 +26,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import hydro.scala2js.StandardConverters._
 import app.scala2js.AppConverters._
 
-final class CashFlowEntriesStoreFactory(implicit entityAccess: JsEntityAccess,
+final class CashFlowEntriesStoreFactory(implicit entityAccess: AppJsEntityAccess,
                                         accountingConfig: Config,
                                         exchangeRateManager: ExchangeRateManager)
     extends EntriesListStoreFactory[CashFlowEntry, MoneyReservoir] {

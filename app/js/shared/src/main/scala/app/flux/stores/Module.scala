@@ -11,14 +11,14 @@ import hydro.flux.stores.ApplicationIsOnlineStore
 import hydro.flux.stores.PageLoadingStateStore
 import hydro.flux.stores.UserStore
 import app.models.access.EntityModificationPushClientFactory
-import app.models.access.JsEntityAccess
+import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Config
 import app.models.user.User
 
 final class Module(implicit i18n: I18n,
                    accountingConfig: Config,
                    user: User,
-                   entityAccess: JsEntityAccess,
+                   entityAccess: AppJsEntityAccess,
                    exchangeRateManager: ExchangeRateManager,
                    dispatcher: Dispatcher,
                    clock: Clock,

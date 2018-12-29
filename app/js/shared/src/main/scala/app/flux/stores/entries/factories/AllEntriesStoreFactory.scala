@@ -2,7 +2,7 @@ package app.flux.stores.entries.factories
 
 import app.flux.stores.entries.GeneralEntry
 import app.models.access.DbQuery
-import app.models.access.JsEntityAccess
+import app.models.access.AppJsEntityAccess
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 
@@ -11,7 +11,7 @@ import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-final class AllEntriesStoreFactory(implicit entityAccess: JsEntityAccess)
+final class AllEntriesStoreFactory(implicit entityAccess: AppJsEntityAccess)
     extends EntriesListStoreFactory[GeneralEntry, Unit] {
 
   override protected def createNew(maxNumEntries: Int, input: Unit) = new Store {

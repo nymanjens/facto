@@ -3,7 +3,7 @@ package app.flux.stores.entries.factories
 import app.flux.stores.entries.GeneralEntry
 import app.models.access.DbQueryImplicits._
 import app.models.access.DbQuery
-import app.models.access.JsEntityAccess
+import app.models.access.AppJsEntityAccess
 import app.models.access.ModelField
 import app.models.accounting.config.Account
 import app.models.accounting.config.Config
@@ -17,7 +17,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import hydro.scala2js.StandardConverters._
 import app.scala2js.AppConverters._
 
-final class EndowmentEntriesStoreFactory(implicit entityAccess: JsEntityAccess, accountingConfig: Config)
+final class EndowmentEntriesStoreFactory(implicit entityAccess: AppJsEntityAccess, accountingConfig: Config)
     extends EntriesListStoreFactory[GeneralEntry, Account] {
 
   override protected def createNew(maxNumEntries: Int, account: Account) = new Store {

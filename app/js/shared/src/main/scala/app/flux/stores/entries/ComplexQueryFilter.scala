@@ -8,7 +8,7 @@ import app.flux.stores.entries.ComplexQueryFilter.QueryFilterPair
 import app.flux.stores.entries.ComplexQueryFilter.QueryPart
 import app.models.access.DbQueryImplicits._
 import app.models.access.DbQuery
-import app.models.access.JsEntityAccess
+import app.models.access.AppJsEntityAccess
 import app.models.access.ModelField
 import app.models.accounting._
 import app.models.accounting.config.Config
@@ -18,7 +18,7 @@ import scala.collection.mutable
 import hydro.scala2js.StandardConverters._
 import app.scala2js.AppConverters._
 
-private[stores] final class ComplexQueryFilter(implicit entityAccess: JsEntityAccess,
+private[stores] final class ComplexQueryFilter(implicit entityAccess: AppJsEntityAccess,
                                                accountingConfig: Config) {
 
   // **************** Public API **************** //

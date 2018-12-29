@@ -11,7 +11,7 @@ final class Module(implicit user: User,
   implicit val entityModificationPushClientFactory: EntityModificationPushClientFactory =
     new EntityModificationPushClientFactory()
 
-  implicit val entityAccess: JsEntityAccess = {
+  implicit val entityAccess: AppJsEntityAccess = {
     val webWorkerModule = new hydro.models.access.webworker.Module()
     implicit val localDatabaseWebWorkerApiStub = webWorkerModule.localDatabaseWebWorkerApiStub
     val localDatabaseFuture = LocalDatabaseImpl.create()
