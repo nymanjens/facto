@@ -23,6 +23,7 @@ import app.flux.stores.entries.factories.CashFlowEntriesStoreFactory
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.VdomArray
 import japgolly.scalajs.react.vdom.html_<^._
+import app.models.access.AppJsEntityAccess
 import app.models.access.EntityAccess
 import app.models.accounting.BalanceCheck
 import app.models.accounting.config.Config
@@ -34,7 +35,7 @@ import scala.scalajs.js
 
 final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
                      dispatcher: Dispatcher,
-                     entityAccess: EntityAccess,
+                     entityAccess: AppJsEntityAccess,
                      clock: Clock,
                      accountingConfig: Config,
                      user: User,

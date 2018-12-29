@@ -1,7 +1,7 @@
 package app.models.accounting.config
 
 import common.Require.requireNonNull
-import app.models.access.EntityAccess
+import app.models.access.AppEntityAccess
 import app.models.accounting.config.MoneyReservoir.NullMoneyReservoir
 import app.models.user.User
 
@@ -50,7 +50,7 @@ case class Config(accounts: ListMap[String, Account],
     moneyReservoirs(includeNullReservoir = includeNullReservoir)
 
   def templatesToShowFor(location: Template.Placement, user: User)(
-      implicit entityAccess: EntityAccess): Seq[Template] = {
+      implicit entityAccess: AppEntityAccess): Seq[Template] = {
     implicit val accountingConfig = this
     templates filter (_.showFor(location, user))
   }
@@ -62,10 +62,10 @@ case class Config(accounts: ListMap[String, Account],
     codeToTemplate(code)
   }
 
-  def accountOf(user: User)(implicit entityAccess: EntityAccess): Option[Account] =
+  def accountOf(user: User)(implicit entityAccess: AppEntityAccess): Option[Account] =
     accounts.values.filter(_.userLoginName == Some(user.loginName)).headOption
 
-  def personallySortedAccounts(implicit user: User, entityAccess: EntityAccess): Seq[Account] = {
+  def personallySortedAccounts(implicit user: User, entityAccess: AppEntityAccess): Seq[Account] = {
     val myAccount = accountOf(user)
     val otherAccounts = for {
       acc <- accounts.values

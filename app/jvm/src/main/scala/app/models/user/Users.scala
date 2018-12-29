@@ -4,7 +4,7 @@ import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
 import hydro.common.time.Clock
 import app.models.access.DbQueryImplicits._
-import app.models.access.EntityAccess
+import app.models.access.AppEntityAccess
 import app.models.access.JvmEntityAccess
 import app.models.access.ModelField
 import app.models.modification.EntityModification
@@ -49,7 +49,7 @@ object Users {
     }
   }
 
-  def authenticate(loginName: String, password: String)(implicit entityAccess: EntityAccess): Boolean = {
+  def authenticate(loginName: String, password: String)(implicit entityAccess: AppEntityAccess): Boolean = {
     entityAccess.newQuerySyncForUser().findOne(ModelField.User.loginName === loginName) match {
       case Some(user) if user.passwordHash == hash(password) => true
       case _                                                 => false

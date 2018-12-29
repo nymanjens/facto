@@ -2,7 +2,7 @@ package app.models.accounting.config
 
 import app.models.access.DbQueryImplicits._
 import common.Require.requireNonNull
-import app.models.access.EntityAccess
+import app.models.access.AppEntityAccess
 import app.models.access.ModelField
 import app.models.accounting.config.Account.SummaryTotalRowDef
 import app.models.user.User
@@ -40,7 +40,7 @@ case class Account(code: String,
 
   override def toString = s"Account($code)"
 
-  def user(implicit entityAccess: EntityAccess): Option[User] = {
+  def user(implicit entityAccess: AppEntityAccess): Option[User] = {
     userLoginName.map { loginName =>
       val user = entityAccess.newQuerySyncForUser().findOne(ModelField.User.loginName === loginName)
       require(user.isDefined, s"No user exists with loginName '$loginName'")
@@ -57,7 +57,7 @@ case class Account(code: String,
   def visibleReservoirs(implicit accountingConfig: Config): Seq[MoneyReservoir] =
     accountingConfig.visibleReservoirs.filter(_.owner == this).toList
 
-  def isMineOrCommon(implicit user: User, accountingConfig: Config, entityAccess: EntityAccess): Boolean =
+  def isMineOrCommon(implicit user: User, accountingConfig: Config, entityAccess: AppEntityAccess): Boolean =
     Set(accountingConfig.accountOf(user), Some(accountingConfig.constants.commonAccount)).flatten
       .contains(this)
 }

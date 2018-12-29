@@ -11,6 +11,7 @@ import hydro.flux.react.uielements.PageHeader
 import hydro.flux.react.uielements.Panel
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
+import app.models.access.AppJsEntityAccess
 import app.models.access.EntityAccess
 import app.models.accounting.config.Config
 import app.models.accounting.config.Template
@@ -20,7 +21,7 @@ import scala.collection.immutable.Seq
 
 private[app] final class TemplateList(implicit user: User,
                                       accountingConfig: Config,
-                                      entityAccess: EntityAccess,
+                                      entityAccess: AppJsEntityAccess,
                                       i18n: I18n,
                                       pageHeader: PageHeader,
 ) {

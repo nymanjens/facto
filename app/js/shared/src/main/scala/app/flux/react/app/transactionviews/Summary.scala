@@ -11,6 +11,7 @@ import hydro.flux.react.uielements.PageHeader
 import hydro.flux.react.uielements.input.TextInput
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
+import app.models.access.AppJsEntityAccess
 import app.models.access.EntityAccess
 import app.models.accounting.config.Config
 import app.models.user.User
@@ -18,7 +19,7 @@ import app.models.user.User
 import scala.collection.immutable.Seq
 
 final class Summary(implicit summaryTable: SummaryTable,
-                    entityAccess: EntityAccess,
+                    entityAccess: AppJsEntityAccess,
                     user: User,
                     clock: Clock,
                     accountingConfig: Config,

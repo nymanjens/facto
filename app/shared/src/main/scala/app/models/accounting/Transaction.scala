@@ -3,7 +3,7 @@ package app.models.accounting
 import common.money.DatedMoney
 import hydro.common.time.LocalDateTime
 import app.models._
-import app.models.access.EntityAccess
+import app.models.access.AppEntityAccess
 import app.models.accounting.config.Account
 import app.models.accounting.config.Category
 import app.models.accounting.config.Config
@@ -36,7 +36,7 @@ case class Transaction(transactionGroupId: Long,
 
   override def withId(id: Long) = copy(idOption = Some(id))
 
-  def issuer(implicit entityAccess: EntityAccess): User =
+  def issuer(implicit entityAccess: AppEntityAccess): User =
     entityAccess.newQuerySyncForUser().findById(issuerId)
   def beneficiary(implicit accountingConfig: Config): Account =
     accountingConfig.accounts(beneficiaryAccountCode)
@@ -72,7 +72,7 @@ object Transaction {
                      transactionDate: Option[LocalDateTime] = None,
                      consumedDate: Option[LocalDateTime] = None,
                      idOption: Option[Long] = None) {
-    def issuer(implicit entityAccess: EntityAccess): Option[User] =
+    def issuer(implicit entityAccess: AppEntityAccess): Option[User] =
       issuerId.map(entityAccess.newQuerySyncForUser().findById)
     def isEmpty: Boolean = this == Partial.empty
   }

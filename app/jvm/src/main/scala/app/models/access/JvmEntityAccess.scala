@@ -31,7 +31,7 @@ import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.concurrent._
 
-final class JvmEntityAccess @Inject()(clock: Clock) extends EntityAccess {
+final class JvmEntityAccess @Inject()(clock: Clock) extends AppEntityAccess {
 
   // lazy val because dropAndCreateTables() can be called before first fetch
   private lazy val inMemoryEntityDatabase: InMemoryEntityDatabase = new InMemoryEntityDatabase(

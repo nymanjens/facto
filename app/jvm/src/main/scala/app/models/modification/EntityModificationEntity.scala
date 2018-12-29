@@ -2,9 +2,8 @@ package app.models.modification
 
 import java.time.Instant
 
-import hydro.common.time.LocalDateTime
 import app.models.Entity
-import app.models.access.EntityAccess
+import app.models.access.AppEntityAccess
 import app.models.user.User
 
 /**
@@ -23,7 +22,7 @@ case class EntityModificationEntity(userId: Long,
 
   override def withId(id: Long) = copy(idOption = Some(id))
 
-  def user(implicit entityAccess: EntityAccess): User = entityAccess.newQuerySyncForUser().findById(userId)
+  def user(implicit entityAccess: AppEntityAccess): User = entityAccess.newQuerySyncForUser().findById(userId)
 }
 
 object EntityModificationEntity {

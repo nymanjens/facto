@@ -28,6 +28,7 @@ import app.flux.stores.entries.factories.SummaryForYearStoreFactory
 import app.flux.stores.entries.factories.SummaryYearsStoreFactory
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
+import app.models.access.AppJsEntityAccess
 import app.models.access.EntityAccess
 import app.models.accounting.config.Account.SummaryTotalRowDef
 import app.models.accounting.config.Account
@@ -44,7 +45,7 @@ private[transactionviews] final class SummaryTable(
     summaryForYearStoreFactory: SummaryForYearStoreFactory,
     summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
     cashFlowEntriesStoreFactory: CashFlowEntriesStoreFactory,
-    entityAccess: EntityAccess,
+    entityAccess: AppJsEntityAccess,
     user: User,
     clock: Clock,
     accountingConfig: Config,

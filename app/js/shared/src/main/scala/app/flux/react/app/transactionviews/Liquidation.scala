@@ -6,6 +6,7 @@ import app.flux.router.AppPages
 import app.flux.stores.entries.AccountPair
 import app.flux.stores.entries.LiquidationEntry
 import app.flux.stores.entries.factories.LiquidationEntriesStoreFactory
+import app.models.access.AppJsEntityAccess
 import app.models.access.EntityAccess
 import app.models.accounting.config.Account
 import app.models.accounting.config.Config
@@ -26,7 +27,7 @@ import japgolly.scalajs.react.vdom.html_<^._
 import scala.collection.immutable.Seq
 
 final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFactory,
-                        entityAccess: EntityAccess,
+                        entityAccess: AppJsEntityAccess,
                         clock: Clock,
                         accountingConfig: Config,
                         user: User,

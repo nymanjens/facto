@@ -13,13 +13,14 @@ import app.flux.stores.entries.GeneralEntry
 import app.flux.stores.entries.factories.ComplexQueryStoreFactory
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
+import app.models.access.AppJsEntityAccess
 import app.models.access.EntityAccess
 import app.models.accounting.config.Config
 
 import scala.collection.immutable.Seq
 
 final class SearchResults(implicit complexQueryStoreFactory: ComplexQueryStoreFactory,
-                          entityAccess: EntityAccess,
+                          entityAccess: AppJsEntityAccess,
                           clock: Clock,
                           accountingConfig: Config,
                           exchangeRateManager: ExchangeRateManager,

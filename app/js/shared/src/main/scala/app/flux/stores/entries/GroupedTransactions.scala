@@ -5,6 +5,7 @@ import common.money.Money
 import common.money.MoneyWithGeneralCurrency
 import hydro.common.time.JavaTimeImplicits._
 import hydro.common.time.LocalDateTime
+import app.models.access.AppJsEntityAccess
 import app.models.access.EntityAccess
 import app.models.accounting.Transaction
 import app.models.accounting.config.Account
@@ -22,7 +23,7 @@ abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
     s"More than one transaction group: ${transactions.map(_.transactionGroupId).distinct}")
 
   def groupId: Long = transactions.head.transactionGroupId
-  def issuer(implicit entityAccess: EntityAccess): User = transactions.head.issuer
+  def issuer(implicit entityAccess: AppJsEntityAccess): User = transactions.head.issuer
   def transactionDates: Seq[LocalDateTime] = transactions.map(_.transactionDate).distinct
   def consumedDates: Seq[LocalDateTime] = transactions.flatMap(_.consumedDateOption).distinct
   def beneficiaries(implicit accountingConfig: Config): Seq[Account] =

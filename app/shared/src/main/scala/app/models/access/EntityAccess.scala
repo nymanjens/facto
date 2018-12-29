@@ -9,6 +9,4 @@ trait EntityAccess {
 
   // **************** Getters ****************//
   def newQuery[E <: Entity: EntityType](): DbResultSet.Async[E]
-
-  def newQuerySyncForUser(): DbResultSet.Sync[User]
 }

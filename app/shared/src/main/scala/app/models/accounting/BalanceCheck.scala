@@ -3,7 +3,7 @@ package app.models.accounting
 import common.money.DatedMoney
 import hydro.common.time.LocalDateTime
 import app.models.Entity
-import app.models.access.EntityAccess
+import app.models.access.AppEntityAccess
 import app.models.accounting.config.Config
 import app.models.accounting.config.MoneyReservoir
 import app.models.user.User
@@ -23,7 +23,7 @@ case class BalanceCheck(issuerId: Long,
     s"BalanceCheck(id=$idOption, issuer=$issuerId, $moneyReservoirCode, $balanceInCents, " +
       s"created=$createdDate, checked=$checkDate)"
 
-  def issuer(implicit entityAccess: EntityAccess): User =
+  def issuer(implicit entityAccess: AppEntityAccess): User =
     entityAccess.newQuerySyncForUser().findById(issuerId)
   def moneyReservoir(implicit accountingConfig: Config): MoneyReservoir =
     accountingConfig.moneyReservoir(moneyReservoirCode)

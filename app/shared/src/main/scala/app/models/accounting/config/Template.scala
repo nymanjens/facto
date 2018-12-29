@@ -2,7 +2,7 @@ package app.models.accounting.config
 
 import app.models.access.DbQueryImplicits._
 import common.Require.requireNonNull
-import app.models.access.EntityAccess
+import app.models.access.AppEntityAccess
 import app.models.access.ModelField
 import app.models.accounting.{Transaction => AccountingTransaction}
 import app.models.accounting.{TransactionGroup => AccountingTransactionGroup}
@@ -23,7 +23,7 @@ case class Template(code: String,
   requireNonNull(code, name, placement, onlyShowForUserLoginNames, zeroSum, iconClass, transactions)
 
   def showFor(location: Template.Placement, user: User)(implicit accountingConfig: Config,
-                                                        entityAccess: EntityAccess): Boolean = {
+                                                        entityAccess: AppEntityAccess): Boolean = {
     val showAtLocation = placement contains location
     val showToUser = onlyShowForUsers match {
       case Some(users) => users contains user
@@ -39,7 +39,7 @@ case class Template(code: String,
   }
 
   private def onlyShowForUsers(implicit accountingConfig: Config,
-                               entityAccess: EntityAccess): Option[Set[User]] = {
+                               entityAccess: AppEntityAccess): Option[Set[User]] = {
     onlyShowForUserLoginNames.map { loginNameOption =>
       loginNameOption.map { loginName =>
         val user = entityAccess.newQuerySyncForUser().findOne(ModelField.User.loginName === loginName)

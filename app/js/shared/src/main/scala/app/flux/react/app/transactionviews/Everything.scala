@@ -11,6 +11,7 @@ import app.flux.stores.entries.GeneralEntry
 import app.flux.stores.entries.factories.AllEntriesStoreFactory
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
+import app.models.access.AppJsEntityAccess
 import app.models.access.EntityAccess
 import app.models.accounting.config.Config
 
@@ -19,7 +20,7 @@ import hydro.flux.react.uielements.PageHeader
 import hydro.flux.react.uielements.Panel
 
 final class Everything(implicit entriesStoreFactory: AllEntriesStoreFactory,
-                       entityAccess: EntityAccess,
+                       entityAccess: AppJsEntityAccess,
                        clock: Clock,
                        accountingConfig: Config,
                        exchangeRateManager: ExchangeRateManager,
