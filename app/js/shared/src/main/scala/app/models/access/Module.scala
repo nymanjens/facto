@@ -16,7 +16,7 @@ final class Module(implicit user: User,
     implicit val localDatabaseWebWorkerApiStub = webWorkerModule.localDatabaseWebWorkerApiStub
     val localDatabaseFuture = LocalDatabaseImpl.create()
     implicit val remoteDatabaseProxy = HybridRemoteDatabaseProxy.create(localDatabaseFuture)
-    val entityAccess = new AppJsEntityAccessImpl(getInitialDataResponse.allUsers)
+    val entityAccess = new AppJsEntityAccess(getInitialDataResponse.allUsers)
 
     entityAccess.startCheckingForModifiedEntityUpdates()
 
