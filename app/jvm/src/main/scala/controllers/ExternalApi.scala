@@ -8,6 +8,7 @@ import hydro.common.time.TimeUtils
 import app.models.Entity
 import app.models.access.DbQueryImplicits._
 import app.models.access.JvmEntityAccess
+import app.models.access.ModelFields
 import app.models.access.ModelField
 import app.models.accounting._
 import app.models.accounting.config.Account
@@ -139,12 +140,12 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
     val balanceChecks =
       entityAccess
         .newQuerySync[BalanceCheck]()
-        .filter(ModelField.BalanceCheck.moneyReservoirCode === moneyReservoir.code)
+        .filter(ModelFields.BalanceCheck.moneyReservoirCode === moneyReservoir.code)
         .data()
     val transactions =
       entityAccess
         .newQuerySync[Transaction]()
-        .filter(ModelField.Transaction.moneyReservoirCode === moneyReservoir.code)
+        .filter(ModelFields.Transaction.moneyReservoirCode === moneyReservoir.code)
         .data()
 
     // merge the two

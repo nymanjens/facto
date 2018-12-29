@@ -11,6 +11,7 @@ import app.common.testing._
 import app.models.access.DbQueryImplicits._
 import app.models.access.DbQuery
 import app.models.access.JvmEntityAccess
+import app.models.access.ModelFields
 import app.models.access.ModelField
 import app.models.accounting.Transaction
 import app.models.accounting.config._
@@ -20,6 +21,7 @@ import app.models.modification.EntityType
 import app.models.money.ExchangeRateMeasurement
 import app.models.access.DbQuery
 import app.models.access.JvmEntityAccess
+import app.models.access.ModelFields
 import app.models.access.ModelField
 import app.models.modification.EntityModification
 import app.models.modification.EntityModificationEntity
@@ -102,7 +104,7 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
       .executeDataQuery(
         PicklableDbQuery.fromRegular(
           DbQuery[Transaction](
-            filter = ModelField.Transaction.categoryCode === testCategoryA.code,
+            filter = ModelFields.Transaction.categoryCode === testCategoryA.code,
             sorting = None,
             limit = None)))
 

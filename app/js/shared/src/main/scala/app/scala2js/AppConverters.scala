@@ -1,6 +1,7 @@
 package app.scala2js
 
 import app.models._
+import app.models.access.ModelFields
 import app.models.access.ModelField
 import app.models.accounting._
 import app.models.modification._
@@ -39,95 +40,95 @@ object AppConverters {
   // **************** Entity converters **************** //
   implicit val UserConverter: EntityConverter[User] = new EntityConverter(
     allFieldsWithoutId = Seq(
-      ModelField.User.loginName,
-      ModelField.User.passwordHash,
-      ModelField.User.name,
-      ModelField.User.isAdmin,
-      ModelField.User.expandCashFlowTablesByDefault,
-      ModelField.User.expandLiquidationTablesByDefault,
+      ModelFields.User.loginName,
+      ModelFields.User.passwordHash,
+      ModelFields.User.name,
+      ModelFields.User.isAdmin,
+      ModelFields.User.expandCashFlowTablesByDefault,
+      ModelFields.User.expandLiquidationTablesByDefault,
     ),
     toScalaWithoutId = dict =>
       User(
-        loginName = dict.getRequired(ModelField.User.loginName),
-        passwordHash = dict.getRequired(ModelField.User.passwordHash),
-        name = dict.getRequired(ModelField.User.name),
-        isAdmin = dict.getRequired(ModelField.User.isAdmin),
-        expandCashFlowTablesByDefault = dict.getRequired(ModelField.User.expandCashFlowTablesByDefault),
-        expandLiquidationTablesByDefault = dict.getRequired(ModelField.User.expandLiquidationTablesByDefault)
+        loginName = dict.getRequired(ModelFields.User.loginName),
+        passwordHash = dict.getRequired(ModelFields.User.passwordHash),
+        name = dict.getRequired(ModelFields.User.name),
+        isAdmin = dict.getRequired(ModelFields.User.isAdmin),
+        expandCashFlowTablesByDefault = dict.getRequired(ModelFields.User.expandCashFlowTablesByDefault),
+        expandLiquidationTablesByDefault = dict.getRequired(ModelFields.User.expandLiquidationTablesByDefault)
     )
   )
 
   implicit val TransactionConverter: EntityConverter[Transaction] = new EntityConverter(
     allFieldsWithoutId = Seq(
-      ModelField.Transaction.transactionGroupId,
-      ModelField.Transaction.issuerId,
-      ModelField.Transaction.beneficiaryAccountCode,
-      ModelField.Transaction.moneyReservoirCode,
-      ModelField.Transaction.categoryCode,
-      ModelField.Transaction.description,
-      ModelField.Transaction.flowInCents,
-      ModelField.Transaction.detailDescription,
-      ModelField.Transaction.tags,
-      ModelField.Transaction.createdDate,
-      ModelField.Transaction.transactionDate,
-      ModelField.Transaction.consumedDate,
+      ModelFields.Transaction.transactionGroupId,
+      ModelFields.Transaction.issuerId,
+      ModelFields.Transaction.beneficiaryAccountCode,
+      ModelFields.Transaction.moneyReservoirCode,
+      ModelFields.Transaction.categoryCode,
+      ModelFields.Transaction.description,
+      ModelFields.Transaction.flowInCents,
+      ModelFields.Transaction.detailDescription,
+      ModelFields.Transaction.tags,
+      ModelFields.Transaction.createdDate,
+      ModelFields.Transaction.transactionDate,
+      ModelFields.Transaction.consumedDate,
     ),
     toScalaWithoutId = dict =>
       Transaction(
-        transactionGroupId = dict.getRequired(ModelField.Transaction.transactionGroupId),
-        issuerId = dict.getRequired(ModelField.Transaction.issuerId),
-        beneficiaryAccountCode = dict.getRequired(ModelField.Transaction.beneficiaryAccountCode),
-        moneyReservoirCode = dict.getRequired(ModelField.Transaction.moneyReservoirCode),
-        categoryCode = dict.getRequired(ModelField.Transaction.categoryCode),
-        description = dict.getRequired(ModelField.Transaction.description),
-        flowInCents = dict.getRequired(ModelField.Transaction.flowInCents),
-        detailDescription = dict.getRequired(ModelField.Transaction.detailDescription),
-        tags = dict.getRequired(ModelField.Transaction.tags),
-        createdDate = dict.getRequired(ModelField.Transaction.createdDate),
-        transactionDate = dict.getRequired(ModelField.Transaction.transactionDate),
-        consumedDate = dict.getRequired(ModelField.Transaction.consumedDate)
+        transactionGroupId = dict.getRequired(ModelFields.Transaction.transactionGroupId),
+        issuerId = dict.getRequired(ModelFields.Transaction.issuerId),
+        beneficiaryAccountCode = dict.getRequired(ModelFields.Transaction.beneficiaryAccountCode),
+        moneyReservoirCode = dict.getRequired(ModelFields.Transaction.moneyReservoirCode),
+        categoryCode = dict.getRequired(ModelFields.Transaction.categoryCode),
+        description = dict.getRequired(ModelFields.Transaction.description),
+        flowInCents = dict.getRequired(ModelFields.Transaction.flowInCents),
+        detailDescription = dict.getRequired(ModelFields.Transaction.detailDescription),
+        tags = dict.getRequired(ModelFields.Transaction.tags),
+        createdDate = dict.getRequired(ModelFields.Transaction.createdDate),
+        transactionDate = dict.getRequired(ModelFields.Transaction.transactionDate),
+        consumedDate = dict.getRequired(ModelFields.Transaction.consumedDate)
     )
   )
 
   implicit val TransactionGroupConverter: EntityConverter[TransactionGroup] = new EntityConverter(
     allFieldsWithoutId = Seq(
-      ModelField.TransactionGroup.createdDate,
+      ModelFields.TransactionGroup.createdDate,
     ),
     toScalaWithoutId =
-      dict => TransactionGroup(createdDate = dict.getRequired(ModelField.TransactionGroup.createdDate))
+      dict => TransactionGroup(createdDate = dict.getRequired(ModelFields.TransactionGroup.createdDate))
   )
 
   implicit val BalanceCheckConverter: EntityConverter[BalanceCheck] = new EntityConverter(
     allFieldsWithoutId = Seq(
-      ModelField.BalanceCheck.issuerId,
-      ModelField.BalanceCheck.moneyReservoirCode,
-      ModelField.BalanceCheck.balanceInCents,
-      ModelField.BalanceCheck.createdDate,
-      ModelField.BalanceCheck.checkDate,
+      ModelFields.BalanceCheck.issuerId,
+      ModelFields.BalanceCheck.moneyReservoirCode,
+      ModelFields.BalanceCheck.balanceInCents,
+      ModelFields.BalanceCheck.createdDate,
+      ModelFields.BalanceCheck.checkDate,
     ),
     toScalaWithoutId = dict =>
       BalanceCheck(
-        issuerId = dict.getRequired(ModelField.BalanceCheck.issuerId),
-        moneyReservoirCode = dict.getRequired(ModelField.BalanceCheck.moneyReservoirCode),
-        balanceInCents = dict.getRequired(ModelField.BalanceCheck.balanceInCents),
-        createdDate = dict.getRequired(ModelField.BalanceCheck.createdDate),
-        checkDate = dict.getRequired(ModelField.BalanceCheck.checkDate)
+        issuerId = dict.getRequired(ModelFields.BalanceCheck.issuerId),
+        moneyReservoirCode = dict.getRequired(ModelFields.BalanceCheck.moneyReservoirCode),
+        balanceInCents = dict.getRequired(ModelFields.BalanceCheck.balanceInCents),
+        createdDate = dict.getRequired(ModelFields.BalanceCheck.createdDate),
+        checkDate = dict.getRequired(ModelFields.BalanceCheck.checkDate)
     )
   )
 
   implicit val ExchangeRateMeasurementConverter: EntityConverter[ExchangeRateMeasurement] =
     new EntityConverter(
       allFieldsWithoutId = Seq(
-        ModelField.ExchangeRateMeasurement.date,
-        ModelField.ExchangeRateMeasurement.foreignCurrencyCode,
-        ModelField.ExchangeRateMeasurement.ratioReferenceToForeignCurrency,
+        ModelFields.ExchangeRateMeasurement.date,
+        ModelFields.ExchangeRateMeasurement.foreignCurrencyCode,
+        ModelFields.ExchangeRateMeasurement.ratioReferenceToForeignCurrency,
       ),
       toScalaWithoutId = dict =>
         ExchangeRateMeasurement(
-          date = dict.getRequired(ModelField.ExchangeRateMeasurement.date),
-          foreignCurrencyCode = dict.getRequired(ModelField.ExchangeRateMeasurement.foreignCurrencyCode),
+          date = dict.getRequired(ModelFields.ExchangeRateMeasurement.date),
+          foreignCurrencyCode = dict.getRequired(ModelFields.ExchangeRateMeasurement.foreignCurrencyCode),
           ratioReferenceToForeignCurrency =
-            dict.getRequired(ModelField.ExchangeRateMeasurement.ratioReferenceToForeignCurrency)
+            dict.getRequired(ModelFields.ExchangeRateMeasurement.ratioReferenceToForeignCurrency)
       )
     )
 }

@@ -43,9 +43,9 @@ object Module {
   val secondaryIndexFunction: SecondaryIndexFunction = SecondaryIndexFunction({
     case TransactionType =>
       Seq(
-        ModelField.Transaction.transactionGroupId,
-        ModelField.Transaction.moneyReservoirCode,
-        ModelField.Transaction.beneficiaryAccountCode)
+        ModelFields.Transaction.transactionGroupId,
+        ModelFields.Transaction.moneyReservoirCode,
+        ModelFields.Transaction.beneficiaryAccountCode)
     case TransactionGroupType        => Seq()
     case BalanceCheckType            => Seq()
     case ExchangeRateMeasurementType => Seq()

@@ -7,6 +7,7 @@ import app.models.Entity
 import app.models.access.DbQueryImplicits._
 import app.models.access.DbQuery
 import app.models.access.EntityAccess
+import app.models.access.ModelFields
 import app.models.access.ModelField
 import app.models.accounting.config.Config
 
@@ -21,7 +22,7 @@ case class TransactionGroup(createdDate: LocalDateTime, idOption: Option[Long] =
   def transactions(implicit entityAccess: EntityAccess): Future[Seq[Transaction]] = {
     entityAccess
       .newQuery[Transaction]()
-      .filter(ModelField.Transaction.transactionGroupId === id)
+      .filter(ModelFields.Transaction.transactionGroupId === id)
       .sort(DbQuery.Sorting.Transaction.deterministicallyByCreateDate)
       .data()
   }

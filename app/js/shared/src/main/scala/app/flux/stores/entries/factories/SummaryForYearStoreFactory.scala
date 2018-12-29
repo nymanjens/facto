@@ -11,6 +11,7 @@ import app.models.access.DbQueryImplicits._
 import app.models.access.DbQuery
 import app.models.access.AppJsEntityAccess
 import hydro.models.access.JsEntityAccess
+import app.models.access.ModelFields
 import app.models.access.ModelField
 import app.models.accounting.config.Account
 import app.models.accounting.config.Category
@@ -37,8 +38,8 @@ final class SummaryForYearStoreFactory(implicit entityAccess: AppJsEntityAccess,
   // **************** Implementation of EntriesStoreFactory methods/types ****************//
   override protected def createNew(input: Input) = new Store {
     private val combinedFilter: DbQuery.Filter[Transaction] =
-      (ModelField.Transaction.beneficiaryAccountCode === input.account.code) &&
-        filterInYear(ModelField.Transaction.consumedDate, input.year) &&
+      (ModelFields.Transaction.beneficiaryAccountCode === input.account.code) &&
+        filterInYear(ModelFields.Transaction.consumedDate, input.year) &&
         complexQueryFilter.fromQuery(input.query)
 
     override protected def calculateState() = async {

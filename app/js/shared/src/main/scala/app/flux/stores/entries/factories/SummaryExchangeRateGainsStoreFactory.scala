@@ -16,6 +16,7 @@ import app.models.access.DbQueryImplicits._
 import app.models.access.DbQuery
 import app.models.access.AppJsEntityAccess
 import hydro.models.access.JsEntityAccess
+import app.models.access.ModelFields
 import app.models.access.ModelField
 import app.models.accounting.config.Account
 import app.models.accounting.config.Config
@@ -72,8 +73,8 @@ final class SummaryExchangeRateGainsStoreFactory(implicit entityAccess: AppJsEnt
         await(
           entityAccess
             .newQuery[BalanceCheck]()
-            .filter(ModelField.BalanceCheck.moneyReservoirCode === reservoir.code)
-            .filter(ModelField.BalanceCheck.checkDate < monthsInYear.head.startTime)
+            .filter(ModelFields.BalanceCheck.moneyReservoirCode === reservoir.code)
+            .filter(ModelFields.BalanceCheck.checkDate < monthsInYear.head.startTime)
             .sort(DbQuery.Sorting.BalanceCheck.deterministicallyByCheckDate.reversed)
             .limit(1)
             .data()).headOption
@@ -84,10 +85,10 @@ final class SummaryExchangeRateGainsStoreFactory(implicit entityAccess: AppJsEnt
       val balanceChecksFuture: Future[Seq[BalanceCheck]] =
         entityAccess
           .newQuery[BalanceCheck]()
-          .filter(ModelField.BalanceCheck.moneyReservoirCode === reservoir.code)
+          .filter(ModelFields.BalanceCheck.moneyReservoirCode === reservoir.code)
           .filter(
             filterInRange(
-              ModelField.BalanceCheck.checkDate,
+              ModelFields.BalanceCheck.checkDate,
               oldestBalanceDate,
               monthsInYear.last.startTimeOfNextMonth))
           .data()
@@ -95,10 +96,10 @@ final class SummaryExchangeRateGainsStoreFactory(implicit entityAccess: AppJsEnt
       val transactionsFuture: Future[Seq[Transaction]] =
         entityAccess
           .newQuery[Transaction]()
-          .filter(ModelField.Transaction.moneyReservoirCode === reservoir.code)
+          .filter(ModelFields.Transaction.moneyReservoirCode === reservoir.code)
           .filter(
             filterInRange(
-              ModelField.Transaction.transactionDate,
+              ModelFields.Transaction.transactionDate,
               oldestBalanceDate,
               monthsInYear.last.startTimeOfNextMonth))
           .data()

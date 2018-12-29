@@ -2,6 +2,7 @@ package controllers.helpers
 
 import app.models.access.DbQueryImplicits._
 import app.models.access.JvmEntityAccess
+import app.models.access.ModelFields
 import app.models.access.ModelField
 import app.models.user.User
 import play.api.mvc._
@@ -14,7 +15,7 @@ abstract class AuthenticatedAction[A](bodyParser: BodyParser[A])(implicit entity
   private val delegate: EssentialAction = {
     Security.Authenticated(AuthenticatedAction.username, AuthenticatedAction.onUnauthorized) { username =>
       controllerComponents.actionBuilder(bodyParser) { request =>
-        entityAccess.newQuerySync[User]().findOne(ModelField.User.loginName === username) match {
+        entityAccess.newQuerySync[User]().findOne(ModelFields.User.loginName === username) match {
           case Some(user) => calculateResult(user, request)
           case None       => AuthenticatedAction.onUnauthorized(request)
         }
@@ -61,7 +62,7 @@ object AuthenticatedAction {
   def requireAuthenticatedUser(request: RequestHeader)(implicit entityAccess: JvmEntityAccess): User = {
     val username = AuthenticatedAction.username(request)
     require(username.isDefined, "Username not set")
-    val user = entityAccess.newQuerySync[User]().findOne(ModelField.User.loginName === username.get)
+    val user = entityAccess.newQuerySync[User]().findOne(ModelFields.User.loginName === username.get)
     require(user.isDefined, s"Could not find username $username")
     user.get
   }

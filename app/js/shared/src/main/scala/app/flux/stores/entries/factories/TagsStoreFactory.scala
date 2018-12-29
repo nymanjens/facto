@@ -6,6 +6,7 @@ import app.flux.stores.entries.factories.TagsStoreFactory.State
 import app.models.access.DbQueryImplicits._
 import app.models.access.AppJsEntityAccess
 import hydro.models.access.JsEntityAccess
+import app.models.access.ModelFields
 import app.models.access.ModelField
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
@@ -29,7 +30,7 @@ final class TagsStoreFactory(implicit entityAccess: AppJsEntityAccess) extends E
         await(
           entityAccess
             .newQuery[Transaction]()
-            .filter(ModelField.Transaction.tags !== Seq())
+            .filter(ModelFields.Transaction.tags !== Seq())
             .data())
 
       val tagToTransactionIdsBuilder =

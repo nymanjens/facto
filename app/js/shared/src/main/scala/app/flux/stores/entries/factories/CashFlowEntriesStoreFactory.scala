@@ -14,6 +14,7 @@ import app.models.access.DbQueryImplicits._
 import app.models.access.DbQuery
 import app.models.access.AppJsEntityAccess
 import hydro.models.access.JsEntityAccess
+import app.models.access.ModelFields
 import app.models.access.ModelField
 import app.models.accounting.config.Config
 import app.models.accounting.config.MoneyReservoir
@@ -40,7 +41,7 @@ final class CashFlowEntriesStoreFactory(implicit entityAccess: AppJsEntityAccess
           await(
             entityAccess
               .newQuery[Transaction]()
-              .filter(ModelField.Transaction.moneyReservoirCode === moneyReservoir.code)
+              .filter(ModelFields.Transaction.moneyReservoirCode === moneyReservoir.code)
               .count())
 
         if (totalNumTransactions < numTransactionsToFetch) {
@@ -52,7 +53,7 @@ final class CashFlowEntriesStoreFactory(implicit entityAccess: AppJsEntityAccess
             await(
               entityAccess
                 .newQuery[Transaction]()
-                .filter(ModelField.Transaction.moneyReservoirCode === moneyReservoir.code)
+                .filter(ModelFields.Transaction.moneyReservoirCode === moneyReservoir.code)
                 .sort(DbQuery.Sorting.Transaction.deterministicallyByTransactionDate.reversed)
                 .limit(numTransactionsToFetch)
                 .data()).last.transactionDate
@@ -61,8 +62,8 @@ final class CashFlowEntriesStoreFactory(implicit entityAccess: AppJsEntityAccess
           await(
             entityAccess
               .newQuery[BalanceCheck]()
-              .filter(ModelField.BalanceCheck.moneyReservoirCode === moneyReservoir.code)
-              .filter(ModelField.BalanceCheck.checkDate < oldestTransDate)
+              .filter(ModelFields.BalanceCheck.moneyReservoirCode === moneyReservoir.code)
+              .filter(ModelFields.BalanceCheck.checkDate < oldestTransDate)
               .sort(DbQuery.Sorting.BalanceCheck.deterministicallyByCheckDate.reversed)
               .limit(1)
               .data()).headOption
@@ -78,16 +79,16 @@ final class CashFlowEntriesStoreFactory(implicit entityAccess: AppJsEntityAccess
       val balanceChecksFuture: Future[Seq[BalanceCheck]] =
         entityAccess
           .newQuery[BalanceCheck]()
-          .filter(ModelField.BalanceCheck.moneyReservoirCode === moneyReservoir.code)
-          .filter(ModelField.BalanceCheck.checkDate >= oldestBalanceDate)
+          .filter(ModelFields.BalanceCheck.moneyReservoirCode === moneyReservoir.code)
+          .filter(ModelFields.BalanceCheck.checkDate >= oldestBalanceDate)
           .data()
 
       // get relevant transactions
       val transactionsFuture: Future[Seq[Transaction]] =
         entityAccess
           .newQuery[Transaction]()
-          .filter(ModelField.Transaction.moneyReservoirCode === moneyReservoir.code)
-          .filter(ModelField.Transaction.transactionDate >= oldestBalanceDate)
+          .filter(ModelFields.Transaction.moneyReservoirCode === moneyReservoir.code)
+          .filter(ModelFields.Transaction.transactionDate >= oldestBalanceDate)
           .data()
       val balanceChecks: Seq[BalanceCheck] = await(balanceChecksFuture)
       val transactions: Seq[Transaction] = await(transactionsFuture)

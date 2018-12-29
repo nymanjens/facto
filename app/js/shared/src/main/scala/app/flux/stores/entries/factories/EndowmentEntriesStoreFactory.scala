@@ -5,6 +5,7 @@ import app.models.access.DbQueryImplicits._
 import app.models.access.DbQuery
 import app.models.access.AppJsEntityAccess
 import hydro.models.access.JsEntityAccess
+import app.models.access.ModelFields
 import app.models.access.ModelField
 import app.models.accounting.config.Account
 import app.models.accounting.config.Config
@@ -27,8 +28,9 @@ final class EndowmentEntriesStoreFactory(implicit entityAccess: AppJsEntityAcces
         await(
           entityAccess
             .newQuery[Transaction]()
-            .filter(ModelField.Transaction.categoryCode === accountingConfig.constants.endowmentCategory.code)
-            .filter(ModelField.Transaction.beneficiaryAccountCode === account.code)
+            .filter(
+              ModelFields.Transaction.categoryCode === accountingConfig.constants.endowmentCategory.code)
+            .filter(ModelFields.Transaction.beneficiaryAccountCode === account.code)
             .sort(DbQuery.Sorting.Transaction.deterministicallyByConsumedDate.reversed)
             .limit(3 * maxNumEntries)
             .data()).reverse

@@ -3,6 +3,7 @@ package hydro.api
 import java.time.LocalDate
 import java.time.LocalTime
 
+import app.models.access.ModelFields
 import app.models.access.ModelField
 import boopickle.Default._
 import hydro.api.PicklableDbQuery.FieldWithValue
@@ -63,15 +64,16 @@ abstract class StandardPicklers {
           fieldType match {
             case ModelField.FieldType.OptionType(valueFieldType) =>
               optionPickler(fromFieldType(valueFieldType))
-            case ModelField.FieldType.BooleanType        => fromType(ModelField.FieldType.BooleanType)
-            case ModelField.FieldType.IntType            => fromType(ModelField.FieldType.IntType)
-            case ModelField.FieldType.LongType           => fromType(ModelField.FieldType.LongType)
-            case ModelField.FieldType.DoubleType         => fromType(ModelField.FieldType.DoubleType)
-            case ModelField.FieldType.StringType         => fromType(ModelField.FieldType.StringType)
-            case ModelField.FieldType.LocalDateTimeType  => fromType(ModelField.FieldType.LocalDateTimeType)
-            case ModelField.FieldType.FiniteDurationType => fromType(ModelField.FieldType.FiniteDurationType)
-            case ModelField.FieldType.StringSeqType      => fromType(ModelField.FieldType.StringSeqType)
-            case ModelField.FieldType.OrderTokenType     => fromType(ModelField.FieldType.OrderTokenType)
+            case ModelField.FieldType.BooleanType       => fromType(ModelField.FieldType.BooleanType)
+            case ModelField.FieldType.IntType           => fromType(ModelField.FieldType.IntType)
+            case ModelField.FieldType.LongType          => fromType(ModelField.FieldType.LongType)
+            case ModelField.FieldType.DoubleType        => fromType(ModelField.FieldType.DoubleType)
+            case ModelField.FieldType.StringType        => fromType(ModelField.FieldType.StringType)
+            case ModelField.FieldType.LocalDateTimeType => fromType(ModelField.FieldType.LocalDateTimeType)
+            case ModelField.FieldType.FiniteDurationType =>
+              fromType(ModelField.FieldType.FiniteDurationType)
+            case ModelField.FieldType.StringSeqType  => fromType(ModelField.FieldType.StringSeqType)
+            case ModelField.FieldType.OrderTokenType => fromType(ModelField.FieldType.OrderTokenType)
           }
         }
         fromFieldType(field.fieldType)

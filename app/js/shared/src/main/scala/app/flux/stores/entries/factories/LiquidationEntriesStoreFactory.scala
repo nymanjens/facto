@@ -9,6 +9,7 @@ import app.models.access.DbQueryImplicits._
 import app.models.access.DbQuery
 import app.models.access.AppJsEntityAccess
 import hydro.models.access.JsEntityAccess
+import app.models.access.ModelFields
 import app.models.access.ModelField
 import app.models.accounting.config.Account
 import app.models.accounting.config.Config
@@ -81,14 +82,14 @@ final class LiquidationEntriesStoreFactory(implicit entityAccess: AppJsEntityAcc
           .filter(
             DbQuery.Filter.NullFilter[Transaction]()
               ||
-                ((ModelField.Transaction.moneyReservoirCode isAnyOf account1ReservoirCodes) &&
-                  (ModelField.Transaction.beneficiaryAccountCode === accountPair.account2.code))
+                ((ModelFields.Transaction.moneyReservoirCode isAnyOf account1ReservoirCodes) &&
+                  (ModelFields.Transaction.beneficiaryAccountCode === accountPair.account2.code))
               ||
-                ((ModelField.Transaction.moneyReservoirCode isAnyOf account2ReservoirCodes) &&
-                  (ModelField.Transaction.beneficiaryAccountCode === accountPair.account1.code))
+                ((ModelFields.Transaction.moneyReservoirCode isAnyOf account2ReservoirCodes) &&
+                  (ModelFields.Transaction.beneficiaryAccountCode === accountPair.account1.code))
               ||
-                ((ModelField.Transaction.moneyReservoirCode === "") &&
-                  (ModelField.Transaction.beneficiaryAccountCode isAnyOf accountPair.toSet
+                ((ModelFields.Transaction.moneyReservoirCode === "") &&
+                  (ModelFields.Transaction.beneficiaryAccountCode isAnyOf accountPair.toSet
                     .map(_.code)
                     .toVector))
           )
@@ -109,7 +110,7 @@ final class LiquidationEntriesStoreFactory(implicit entityAccess: AppJsEntityAcc
               await(
                 entityAccess
                   .newQuery[Transaction]()
-                  .filter(ModelField.Transaction.transactionGroupId === transaction.transactionGroupId)
+                  .filter(ModelFields.Transaction.transactionGroupId === transaction.transactionGroupId)
                   .sort(DbQuery.Sorting.Transaction.deterministicallyByCreateDate)
                   .limit(1)
                   .data())).beneficiary

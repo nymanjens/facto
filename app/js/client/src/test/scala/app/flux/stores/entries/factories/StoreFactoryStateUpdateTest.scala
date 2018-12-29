@@ -12,6 +12,7 @@ import app.flux.stores.entries.AccountPair
 import app.flux.stores.entries.ComplexQueryFilter
 import app.flux.stores.entries.EntriesStore
 import app.models.Entity
+import app.models.access.ModelFields
 import app.models.access.ModelField
 import app.models.accounting._
 import app.models.modification.EntityModification._
@@ -241,7 +242,7 @@ object StoreFactoryStateUpdateTest extends TestSuite {
     def checkRemovingExistingEntity(update: EntityModification): Unit = {
 
       def checkIfIdExists[E <: Entity: EntityType](id: Long): Unit = {
-        val existing = entityAccess.newQuerySync[E]().findOne(ModelField.id[E] === id)
+        val existing = entityAccess.newQuerySync[E]().findOne(ModelFields.id[E] === id)
         require(existing.isDefined, s"Could not find entity of ${update.entityType} with id $id")
       }
 

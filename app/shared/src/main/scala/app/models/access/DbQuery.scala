@@ -138,22 +138,22 @@ object DbQuery {
 
     object Transaction {
       val deterministicallyByTransactionDate: Sorting[Transaction] = DbQuery.Sorting
-        .ascBy(ModelField.Transaction.transactionDate)
-        .thenAscBy(ModelField.Transaction.createdDate)
-        .thenAscBy(ModelField.id)
+        .ascBy(ModelFields.Transaction.transactionDate)
+        .thenAscBy(ModelFields.Transaction.createdDate)
+        .thenAscBy(ModelFields.id)
       val deterministicallyByConsumedDate: Sorting[Transaction] = DbQuery.Sorting
-        .ascBy(ModelField.Transaction.consumedDate)
-        .thenAscBy(ModelField.Transaction.createdDate)
-        .thenAscBy(ModelField.id)
+        .ascBy(ModelFields.Transaction.consumedDate)
+        .thenAscBy(ModelFields.Transaction.createdDate)
+        .thenAscBy(ModelFields.id)
       val deterministicallyByCreateDate: Sorting[Transaction] = DbQuery.Sorting
-        .ascBy(ModelField.Transaction.createdDate)
-        .thenAscBy(ModelField.id)
+        .ascBy(ModelFields.Transaction.createdDate)
+        .thenAscBy(ModelFields.id)
     }
     object BalanceCheck {
       val deterministicallyByCheckDate: Sorting[BalanceCheck] = DbQuery.Sorting
-        .ascBy(ModelField.BalanceCheck.checkDate)
-        .thenAscBy(ModelField.BalanceCheck.createdDate)
-        .thenAscBy(ModelField.id)
+        .ascBy(ModelFields.BalanceCheck.checkDate)
+        .thenAscBy(ModelFields.BalanceCheck.createdDate)
+        .thenAscBy(ModelFields.id)
     }
   }
 }

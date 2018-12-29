@@ -99,13 +99,13 @@ class InMemoryEntityDatabaseTest extends HookedSpecification {
       DbResultSet
         .fromExecutor(executor)
         .limit(2)
-        .sort(Sorting.ascBy(ModelField.Transaction.flowInCents))
+        .sort(Sorting.ascBy(ModelFields.Transaction.flowInCents))
         .data() mustEqual Seq(trans3, trans2)
     }
     "filtered" in {
       DbResultSet
         .fromExecutor(executor)
-        .filter(ModelField.Transaction.flowInCents === 200)
+        .filter(ModelFields.Transaction.flowInCents === 200)
         .data() mustEqual Seq(trans2)
     }
   }

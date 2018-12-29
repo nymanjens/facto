@@ -4,6 +4,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 import app.models._
+import app.models.access.ModelFields
 import app.models.access.ModelField
 import app.models.modification._
 import app.scala2js.AppConverters
@@ -28,16 +29,17 @@ object StandardConverters {
     def fromFieldType[V1](fieldType: ModelField.FieldType[V1]): Converter[V1] = {
       def fromType[V2: Converter](fieldType: ModelField.FieldType[V2]): Converter[V2] = implicitly
       val result = fieldType match {
-        case ModelField.FieldType.OptionType(valueFieldType) => optionConverter(fromFieldType(valueFieldType))
-        case ModelField.FieldType.BooleanType                => fromType(ModelField.FieldType.BooleanType)
-        case ModelField.FieldType.IntType                    => fromType(ModelField.FieldType.IntType)
-        case ModelField.FieldType.LongType                   => fromType(ModelField.FieldType.LongType)
-        case ModelField.FieldType.DoubleType                 => fromType(ModelField.FieldType.DoubleType)
-        case ModelField.FieldType.StringType                 => fromType(ModelField.FieldType.StringType)
-        case ModelField.FieldType.LocalDateTimeType          => fromType(ModelField.FieldType.LocalDateTimeType)
-        case ModelField.FieldType.FiniteDurationType         => fromType(ModelField.FieldType.FiniteDurationType)
-        case ModelField.FieldType.StringSeqType              => fromType(ModelField.FieldType.StringSeqType)
-        case ModelField.FieldType.OrderTokenType             => fromType(ModelField.FieldType.OrderTokenType)
+        case ModelField.FieldType.OptionType(valueFieldType) =>
+          optionConverter(fromFieldType(valueFieldType))
+        case ModelField.FieldType.BooleanType        => fromType(ModelField.FieldType.BooleanType)
+        case ModelField.FieldType.IntType            => fromType(ModelField.FieldType.IntType)
+        case ModelField.FieldType.LongType           => fromType(ModelField.FieldType.LongType)
+        case ModelField.FieldType.DoubleType         => fromType(ModelField.FieldType.DoubleType)
+        case ModelField.FieldType.StringType         => fromType(ModelField.FieldType.StringType)
+        case ModelField.FieldType.LocalDateTimeType  => fromType(ModelField.FieldType.LocalDateTimeType)
+        case ModelField.FieldType.FiniteDurationType => fromType(ModelField.FieldType.FiniteDurationType)
+        case ModelField.FieldType.StringSeqType      => fromType(ModelField.FieldType.StringSeqType)
+        case ModelField.FieldType.OrderTokenType     => fromType(ModelField.FieldType.OrderTokenType)
       }
       result.asInstanceOf[Converter[V1]]
     }
@@ -226,14 +228,14 @@ object StandardConverters {
         addField(field)
       }
       for (id <- entity.idOption) {
-        result.update(ModelField.id[E].name, Scala2Js.toJs(id, ModelField.id[E]))
+        result.update(ModelFields.id[E].name, Scala2Js.toJs(id, ModelFields.id[E]))
       }
       result
     }
 
     override def toScala(dict: js.Dictionary[js.Any]) = {
       val entityWithoutId = toScalaWithoutId(new EntityConverter.DictWrapper(dict))
-      val idOption = dict.get(ModelField.id[E].name).map(Scala2Js.toScala[Long])
+      val idOption = dict.get(ModelFields.id[E].name).map(Scala2Js.toScala[Long])
       if (idOption.isDefined) {
         Entity.withId(idOption.get, entityWithoutId)
       } else {

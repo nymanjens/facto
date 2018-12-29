@@ -5,6 +5,7 @@ import app.common.testing._
 import hydro.common.time.LocalDateTime
 import app.models.access.DbQueryImplicits._
 import app.models.access.DbQuery
+import app.models.access.ModelFields
 import app.models.access.ModelField
 import app.models.accounting.Transaction
 import org.junit.runner._
@@ -29,16 +30,18 @@ class PicklableDbQueryTest extends HookedSpecification {
         DbQuery[Transaction](
           filter = DbQuery.Filter.NullFilter(),
           sorting = Some(
-            DbQuery.Sorting.ascBy(ModelField.Transaction.createdDate).thenDescBy(ModelField.Transaction.id)),
+            DbQuery.Sorting
+              .ascBy(ModelFields.Transaction.createdDate)
+              .thenDescBy(ModelFields.Transaction.id)),
           limit = Some(192)
         ))
     }
     "filters" in {
       val filters: Seq[DbQuery.Filter[Transaction]] = Seq(
-        ModelField.Transaction.issuerId === 5,
-        ModelField.Transaction.issuerId !== 5,
-        (ModelField.Transaction.issuerId < 5) || (ModelField.Transaction.createdDate > LocalDateTime.MIN),
-        (ModelField.Transaction.description containsIgnoreCase "abc") && (ModelField.Transaction.tags contains "abc")
+        ModelFields.Transaction.issuerId === 5,
+        ModelFields.Transaction.issuerId !== 5,
+        (ModelFields.Transaction.issuerId < 5) || (ModelFields.Transaction.createdDate > LocalDateTime.MIN),
+        (ModelFields.Transaction.description containsIgnoreCase "abc") && (ModelFields.Transaction.tags contains "abc")
       )
       for (filter <- filters) yield {
         testFromRegularToRegular(DbQuery[Transaction](filter = filter, sorting = None, limit = Some(192)))

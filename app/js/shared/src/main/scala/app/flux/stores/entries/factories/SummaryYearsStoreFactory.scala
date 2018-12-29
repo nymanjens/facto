@@ -7,6 +7,7 @@ import app.models.access.DbQueryImplicits._
 import app.models.access.DbQuery
 import app.models.access.AppJsEntityAccess
 import hydro.models.access.JsEntityAccess
+import app.models.access.ModelFields
 import app.models.access.ModelField
 import app.models.accounting.config.Account
 import app.models.accounting.BalanceCheck
@@ -58,7 +59,7 @@ final class SummaryYearsStoreFactory(implicit entityAccess: AppJsEntityAccess)
         val data = await(
           entityAccess
             .newQuery[Transaction]()
-            .filter(ModelField.Transaction.beneficiaryAccountCode === account.code)
+            .filter(ModelFields.Transaction.beneficiaryAccountCode === account.code)
             .sort(sorting)
             .limit(1)
             .data())
