@@ -2,7 +2,6 @@ package app.flux.router
 
 import app.flux.action.Actions
 import hydro.flux.action.StandardActions
-import hydro.flux.action.StandardActions
 import hydro.flux.action.Dispatcher
 import japgolly.scalajs.react.extra.router.Path
 import japgolly.scalajs.react.extra.router.RouterCtl
