@@ -2,18 +2,18 @@ package app.api
 
 import java.nio.ByteBuffer
 
-import app.api.Picklers._
 import app.api.ScalaJsApi._
-import autowire._
-import boopickle.Default._
-import hydro.common.LoggingUtils.logExceptions
-import hydro.common.websocket.SerialWebsocketClientParallelizer
 import app.models.Entity
 import app.models.access.DbQuery
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
-import app.models.modification.EntityModification
-import app.models.modification.EntityType
+import autowire._
+import boopickle.Default._
+import hydro.api.PicklableDbQuery
+import app.api.Picklers._
+import hydro.api.ScalaJsApiRequest
+import hydro.common.LoggingUtils.logExceptions
+import hydro.common.websocket.SerialWebsocketClientParallelizer
 import org.scalajs.dom
 
 import scala.collection.immutable.Seq

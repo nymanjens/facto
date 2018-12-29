@@ -1,8 +1,8 @@
-package app.api
+package hydro.api
 
-import app.api.PicklableDbQuery.Sorting.FieldWithDirection
-import app.api.PicklableDbQuery.Filter
-import app.api.PicklableDbQuery.Sorting
+import hydro.api.PicklableDbQuery.Sorting.FieldWithDirection
+import hydro.api.PicklableDbQuery.Filter
+import hydro.api.PicklableDbQuery.Sorting
 import app.models.Entity
 import app.models.access.DbQuery
 import app.models.access.ModelField

@@ -9,6 +9,7 @@ import app.models.accounting.config.Config
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
 import app.models.user.User
+import hydro.api.PicklableDbQuery
 
 import scala.collection.SortedMap
 import scala.collection.immutable.Seq

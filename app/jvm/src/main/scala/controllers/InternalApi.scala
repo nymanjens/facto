@@ -7,8 +7,8 @@ import app.api.Picklers._
 import app.api.ScalaJsApi.ModificationsWithToken
 import app.api.ScalaJsApi.UpdateToken
 import app.api.ScalaJsApi.UserPrototype
-import app.api.PicklableDbQuery
-import app.api.ScalaJsApiRequest
+import hydro.api.PicklableDbQuery
+import hydro.api.ScalaJsApiRequest
 import app.api.ScalaJsApiServerFactory
 import app.api.UpdateTokens.toInstant
 import app.api.UpdateTokens.toUpdateToken

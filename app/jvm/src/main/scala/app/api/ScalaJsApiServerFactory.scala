@@ -17,6 +17,7 @@ import app.models.modification.EntityType
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
 import app.models.user.Users
+import hydro.api.PicklableDbQuery
 
 import scala.collection.immutable.Seq
 import scala.collection.immutable.TreeMap
