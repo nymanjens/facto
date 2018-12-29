@@ -3,7 +3,7 @@ package hydro.models.access
 import app.api.ScalaJsApi.GetInitialDataResponse
 import app.api.ScalaJsApiClient
 import hydro.common.LoggingUtils.logFailure
-import app.models.Entity
+import hydro.models.Entity
 import app.models.access._
 import hydro.models.access.SingletonKey.NextUpdateTokenKey
 import hydro.models.access.SingletonKey.VersionKey

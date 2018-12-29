@@ -1,7 +1,7 @@
 package app.models.modification
 
 import app.common.ScalaUtils
-import app.models.Entity
+import hydro.models.Entity
 import app.models.accounting._
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User

@@ -1,7 +1,7 @@
 package hydro.common.testing
 
 import app.api.ScalaJsApi.UpdateToken
-import app.models.Entity
+import hydro.models.Entity
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
 

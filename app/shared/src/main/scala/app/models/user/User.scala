@@ -1,6 +1,6 @@
 package app.models.user
 
-import app.models.Entity
+import hydro.models.Entity
 
 case class User(loginName: String,
                 passwordHash: String,

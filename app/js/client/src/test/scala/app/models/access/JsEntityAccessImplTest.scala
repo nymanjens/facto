@@ -5,7 +5,7 @@ import hydro.common.testing.ModificationsBuffer
 import app.common.testing.TestModule
 import app.common.testing.TestObjects._
 import hydro.common.time.Clock
-import app.models.Entity
+import hydro.models.Entity
 import app.models.accounting.Transaction
 import app.models.modification.EntityModification
 import app.models.modification.EntityType

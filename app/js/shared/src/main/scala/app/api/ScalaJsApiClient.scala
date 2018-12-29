@@ -3,7 +3,7 @@ package app.api
 import java.nio.ByteBuffer
 
 import app.api.ScalaJsApi._
-import app.models.Entity
+import hydro.models.Entity
 import hydro.models.access.DbQuery
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppDbQuerySorting

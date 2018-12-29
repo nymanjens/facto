@@ -13,7 +13,7 @@ import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYe
 import app.flux.stores.entries.AccountPair
 import app.flux.stores.entries.ComplexQueryFilter
 import app.flux.stores.entries.EntriesStore
-import app.models.Entity
+import hydro.models.Entity
 import app.models.access.ModelFields
 import hydro.models.access.ModelField
 import app.models.accounting._

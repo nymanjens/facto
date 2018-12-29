@@ -1,7 +1,7 @@
 package app.models.access
 
 import app.common.GuavaReplacement.ImmutableBiMap
-import app.models.Entity
+import hydro.models.Entity
 import hydro.models.access.ModelField.IdModelField
 import hydro.models.access.ModelField.toBiMapWithUniqueValues
 import app.models.modification.EntityType

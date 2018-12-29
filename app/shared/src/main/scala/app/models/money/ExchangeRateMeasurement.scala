@@ -2,7 +2,7 @@ package app.models.money
 
 import app.common.money.Currency
 import hydro.common.time.LocalDateTime
-import app.models.Entity
+import hydro.models.Entity
 
 /**
   * Measurements of the exchange rate of the reference currency to another (foreign) currency at a certain point in

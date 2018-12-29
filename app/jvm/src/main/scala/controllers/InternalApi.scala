@@ -17,7 +17,7 @@ import com.google.inject.Inject
 import app.common.publisher.Publishers
 import hydro.common.time.Clock
 import controllers.helpers.AuthenticatedAction
-import app.models.Entity
+import hydro.models.Entity
 import app.models.access.JvmEntityAccess
 import app.models.modification.EntityModification
 import app.models.modification.EntityModificationEntity

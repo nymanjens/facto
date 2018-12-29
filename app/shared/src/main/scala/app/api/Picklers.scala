@@ -1,7 +1,7 @@
 package app.api
 
 import app.common.money.Currency
-import app.models.Entity
+import hydro.models.Entity
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup

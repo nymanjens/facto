@@ -4,6 +4,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 import app.models._
+import hydro.models.Entity
 import app.models.access.ModelFields
 import hydro.models.access.ModelField
 import app.models.modification._

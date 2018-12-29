@@ -2,7 +2,7 @@ package app.models.modification
 
 import java.time.Instant
 
-import app.models.Entity
+import hydro.models.Entity
 import app.models.access.AppEntityAccess
 import app.models.user.User
 

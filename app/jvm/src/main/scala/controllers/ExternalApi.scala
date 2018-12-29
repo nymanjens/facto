@@ -5,7 +5,7 @@ import app.common.money.Currency
 import app.common.money.MoneyWithGeneralCurrency
 import hydro.common.time.Clock
 import hydro.common.time.TimeUtils
-import app.models.Entity
+import hydro.models.Entity
 import hydro.models.access.DbQueryImplicits._
 
 

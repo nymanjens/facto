@@ -8,7 +8,7 @@ import app.api.UpdateTokens.toUpdateToken
 import com.google.inject._
 import app.common.publisher.TriggerablePublisher
 import hydro.common.time.Clock
-import app.models.Entity
+import hydro.models.Entity
 import app.models.accounting._
 import app.models.modification.EntityType.BalanceCheckType
 import app.models.modification.EntityType.ExchangeRateMeasurementType

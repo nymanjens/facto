@@ -3,7 +3,7 @@ package hydro.api
 import hydro.api.PicklableDbQuery.Sorting.FieldWithDirection
 import hydro.api.PicklableDbQuery.Filter
 import hydro.api.PicklableDbQuery.Sorting
-import app.models.Entity
+import hydro.models.Entity
 import hydro.models.access.DbQuery
 import app.models.access.ModelFields
 import hydro.models.access.ModelField

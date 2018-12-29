@@ -3,6 +3,7 @@ package app.models.accounting
 import app.common.money.DatedMoney
 import hydro.common.time.LocalDateTime
 import app.models._
+import hydro.models.Entity
 import app.models.access.AppEntityAccess
 import app.models.accounting.config.Account
 import app.models.accounting.config.Category

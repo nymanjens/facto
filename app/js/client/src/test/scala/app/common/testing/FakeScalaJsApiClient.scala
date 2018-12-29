@@ -3,7 +3,7 @@ package app.common.testing
 import app.api.ScalaJsApi.GetAllEntitiesResponse
 import app.api.ScalaJsApi.UserPrototype
 import app.api.ScalaJsApiClient
-import app.models.Entity
+import hydro.models.Entity
 import hydro.models.access.DbQuery
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppDbQuerySorting

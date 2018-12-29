@@ -4,7 +4,7 @@ import app.api.Picklers._
 import app.api.ScalaJsApi._
 import app.common.money.Currency
 import hydro.common.time.LocalDateTime
-import app.models.Entity
+import hydro.models.Entity
 import app.models.accounting.config.Config
 import app.models.modification.EntityModification
 import app.models.modification.EntityType

@@ -1,6 +1,6 @@
 package hydro.models.access
 
-import app.models.Entity
+import hydro.models.Entity
 import app.models.access.ModelFields
 import hydro.models.access.DbQuery.Filter
 import hydro.models.access.DbQuery.Sorting

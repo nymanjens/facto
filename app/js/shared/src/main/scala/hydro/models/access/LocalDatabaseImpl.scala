@@ -3,7 +3,7 @@ package hydro.models.access
 import app.common.ScalaUtils.visibleForTesting
 import hydro.jsfacades.LokiJs
 import hydro.jsfacades.LokiJs.FilterFactory.Operation
-import app.models.Entity
+import hydro.models.Entity
 import app.models.access._
 import hydro.models.access.LocalDatabaseImpl.ModificationWithId
 import hydro.models.access.LocalDatabaseImpl.SecondaryIndexFunction

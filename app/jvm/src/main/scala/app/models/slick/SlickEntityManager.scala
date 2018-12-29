@@ -1,6 +1,6 @@
 package app.models.slick
 
-import app.models.Entity
+import hydro.models.Entity
 import app.models.slick.SlickUtils.dbApi.{Table => SlickTable, Tag => SlickTag, _}
 import app.models.slick.SlickUtils.dbRun
 

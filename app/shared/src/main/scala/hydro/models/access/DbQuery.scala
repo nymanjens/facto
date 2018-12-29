@@ -1,7 +1,7 @@
 package hydro.models.access
 
 import hydro.common.time.LocalDateTime
-import app.models.Entity
+import hydro.models.Entity
 import hydro.models.access.DbQuery.Sorting.FieldWithDirection
 import hydro.models.access.DbQuery.Filter
 import hydro.models.access.DbQuery.Sorting

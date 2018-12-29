@@ -1,4 +1,4 @@
-package app.models
+package hydro.models
 
 // Based on active-slick (https://github.com/strongtyped/active-slick)
 

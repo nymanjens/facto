@@ -2,7 +2,7 @@ package app.models.access
 
 import app.common.testing.TestObjects._
 import app.common.testing._
-import app.models.Entity
+import hydro.models.Entity
 import hydro.models.access.DbQuery.Sorting
 
 

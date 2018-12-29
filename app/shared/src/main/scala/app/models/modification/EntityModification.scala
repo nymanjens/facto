@@ -2,7 +2,7 @@ package app.models.modification
 
 import java.lang.Math.abs
 
-import app.models.Entity
+import hydro.models.Entity
 
 import scala.util.Random
 

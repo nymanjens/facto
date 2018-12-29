@@ -1,7 +1,7 @@
 package hydro.models.access
 
 import hydro.common.LoggingUtils.logExceptions
-import app.models.Entity
+import hydro.models.Entity
 import app.models.access._
 import hydro.models.access.JsEntityAccess.Listener
 import app.models.modification.EntityModification

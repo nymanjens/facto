@@ -4,7 +4,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.ConcurrentSkipListSet
 
-import app.models.Entity
+import hydro.models.Entity
 import app.models.access.InMemoryEntityDatabase.EntitiesFetcher
 import app.models.modification.EntityModification
 import app.models.modification.EntityType

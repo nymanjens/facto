@@ -1,6 +1,6 @@
 package app.flux.stores.entries
 
-import app.models.Entity
+import hydro.models.Entity
 import app.models.access.AppJsEntityAccess
 import hydro.models.access.JsEntityAccess
 import app.models.modification.EntityType

@@ -8,7 +8,7 @@ import app.common.PlayI18n
 import app.common.money.Currency
 import hydro.common.time.Clock
 import hydro.common.time.LocalDateTime
-import app.models.Entity
+import hydro.models.Entity
 import hydro.models.access.DbQuery
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppDbQuerySorting
