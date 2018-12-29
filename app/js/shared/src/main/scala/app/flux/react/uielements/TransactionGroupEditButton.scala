@@ -3,7 +3,7 @@ package app.flux.react.uielements
 import common.I18n
 import hydro.flux.react.ReactVdomUtils.^^
 import app.flux.router.AppPages
-import app.flux.router.Page
+import hydro.flux.router.Page
 import hydro.flux.router.RouterContext
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._

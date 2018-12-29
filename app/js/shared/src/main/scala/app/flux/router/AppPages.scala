@@ -7,15 +7,12 @@ import app.models.accounting.BalanceCheck
 import app.models.accounting.config.Account
 import app.models.accounting.config.MoneyReservoir
 import app.models.accounting.config.Template
+import hydro.flux.router.Page
 import hydro.flux.router.RouterContext
 
 import scala.concurrent.Future
 import scala.scalajs.js
 
-sealed trait Page {
-  def title(implicit i18n: I18n, entityAccess: EntityAccess): Future[String]
-  def iconClass: String
-}
 object AppPages {
 
   sealed abstract class PageBase(titleKey: String, override val iconClass: String) extends Page {

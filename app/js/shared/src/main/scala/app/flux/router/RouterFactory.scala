@@ -9,6 +9,7 @@ import japgolly.scalajs.react.extra.router.StaticDsl.RouteB
 import japgolly.scalajs.react.extra.router._
 import japgolly.scalajs.react.vdom.html_<^._
 import app.models.access.EntityAccess
+import hydro.flux.router.Page
 import hydro.flux.router.RouterContext
 import org.scalajs.dom
 

@@ -1,17 +1,13 @@
 package hydro.flux.router
 
-import app.flux.action.Actions
-import app.flux.router.AppPages
-import app.flux.router.Page
-import app.flux.router.Page
-import hydro.flux.action.StandardActions
 import hydro.flux.action.Dispatcher
-import japgolly.scalajs.react.extra.router.Path
-import japgolly.scalajs.react.extra.router.RouterCtl
-import japgolly.scalajs.react.vdom.html_<^._
+import hydro.flux.action.StandardActions
 import japgolly.scalajs.react.Callback
 import japgolly.scalajs.react.CallbackOption
 import japgolly.scalajs.react.ReactMouseEvent
+import japgolly.scalajs.react.extra.router.Path
+import japgolly.scalajs.react.extra.router.RouterCtl
+import japgolly.scalajs.react.vdom.html_<^._
 import org.scalajs.dom.html
 
 import scala.scalajs.js

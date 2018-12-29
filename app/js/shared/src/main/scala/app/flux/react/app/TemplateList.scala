@@ -4,7 +4,7 @@ import common.I18n
 import hydro.common.LoggingUtils.logExceptions
 import hydro.flux.react.ReactVdomUtils.<<
 import app.flux.router.AppPages
-import app.flux.router.Page
+import hydro.flux.router.Page
 import hydro.flux.router.RouterContext
 import app.flux.react.uielements
 import hydro.flux.react.uielements.PageHeader
