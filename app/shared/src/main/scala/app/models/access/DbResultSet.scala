@@ -2,14 +2,8 @@ package app.models.access
 
 import app.models.Entity
 import app.models.access.DbQuery.Filter
-
-
 import app.models.access.DbQuery.Sorting
-
-
 import app.models.access.DbQueryImplicits._
-
-
 import app.models.modification.EntityType
 
 import scala.async.Async.async
