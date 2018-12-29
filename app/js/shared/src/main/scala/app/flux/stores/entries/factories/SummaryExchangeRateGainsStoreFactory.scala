@@ -5,7 +5,7 @@ import common.money.ExchangeRateManager
 import common.money.MoneyWithGeneralCurrency
 import common.money.ReferenceMoney
 import hydro.common.time.JavaTimeImplicits._
-import hydro.common.time.DatedMonth
+import app.common.time.DatedMonth
 import hydro.common.time.LocalDateTime
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.DateToBalanceFunction
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForMonth

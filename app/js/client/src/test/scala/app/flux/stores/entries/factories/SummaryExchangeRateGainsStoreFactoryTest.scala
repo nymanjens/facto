@@ -8,7 +8,7 @@ import common.testing.TestObjects._
 import common.testing.FakeJsEntityAccess
 import common.testing.TestModule
 import hydro.common.time.LocalDateTimes.createDateTime
-import hydro.common.time.DatedMonth
+import app.common.time.DatedMonth
 import hydro.common.time.LocalDateTime
 import app.flux.stores.entries.ComplexQueryFilter
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForMonth
