@@ -3,7 +3,7 @@ package app.flux.stores.entries.factories
 import common.testing.TestObjects._
 import common.testing.FakeJsEntityAccess
 import common.testing.TestModule
-import hydro.common.time.YearRange
+import app.common.time.YearRange
 import app.models.accounting.config.Account
 import utest._
 

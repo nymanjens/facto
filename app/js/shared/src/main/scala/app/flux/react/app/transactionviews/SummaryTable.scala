@@ -11,7 +11,7 @@ import common.money.ExchangeRateManager
 import common.money.ReferenceMoney
 import hydro.common.time.Clock
 import app.common.time.DatedMonth
-import hydro.common.time.YearRange
+import app.common.time.YearRange
 import hydro.flux.react.ReactVdomUtils._
 import app.flux.router.AppPages
 import hydro.flux.router.Page

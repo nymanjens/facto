@@ -1,6 +1,6 @@
 package app.flux.stores.entries.factories
 
-import hydro.common.time.YearRange
+import app.common.time.YearRange
 import app.flux.stores.entries.EntriesStore
 import app.flux.stores.entries.factories.SummaryYearsStoreFactory.State
 import app.models.access.DbQueryImplicits._

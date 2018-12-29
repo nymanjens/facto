@@ -9,7 +9,7 @@ import common.testing.TestModule
 import common.testing.TestObjects._
 import hydro.common.time.LocalDateTimes.createDateTime
 import app.common.time.DatedMonth
-import hydro.common.time.YearRange
+import app.common.time.YearRange
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForMonth
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForYear
 import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
