@@ -8,6 +8,7 @@ import app.flux.stores.GlobalMessagesStore
 import app.flux.stores.entries.factories._
 import hydro.flux.react.uielements.PageHeader
 import app.models.access.AppJsEntityAccess
+import app.models.access.JsEntityAccess
 import app.models.accounting.config.Config
 import app.models.user.User
 

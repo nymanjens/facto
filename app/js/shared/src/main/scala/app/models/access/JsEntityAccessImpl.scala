@@ -2,7 +2,7 @@ package app.models.access
 
 import hydro.common.LoggingUtils.logExceptions
 import app.models.Entity
-import app.models.access.AppJsEntityAccess.Listener
+import app.models.access.JsEntityAccess.Listener
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
 import app.models.user.User

@@ -1,7 +1,7 @@
 package common.testing
 
 import app.models.Entity
-import app.models.access.AppJsEntityAccess.Listener
+import app.models.access.JsEntityAccess.Listener
 import app.models.access._
 import app.models.modification.EntityModification
 import app.models.modification.EntityType

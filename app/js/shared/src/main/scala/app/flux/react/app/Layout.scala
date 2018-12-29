@@ -18,6 +18,7 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.PackageBase.VdomAttr
 import japgolly.scalajs.react.vdom.html_<^._
 import app.models.access.AppJsEntityAccess
+import app.models.access.JsEntityAccess
 import app.models.user.User
 import org.scalajs.dom
 

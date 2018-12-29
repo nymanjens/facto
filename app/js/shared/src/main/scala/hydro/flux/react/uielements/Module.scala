@@ -8,6 +8,7 @@ import hydro.flux.stores.ApplicationIsOnlineStore
 import hydro.flux.stores.PageLoadingStateStore
 import hydro.flux.stores.UserStore
 import app.models.access.AppJsEntityAccess
+import app.models.access.JsEntityAccess
 import app.models.user.User
 
 final class Module(implicit i18n: I18n,

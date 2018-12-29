@@ -12,6 +12,7 @@ import hydro.flux.stores.PageLoadingStateStore
 import hydro.flux.stores.UserStore
 import app.models.access.EntityModificationPushClientFactory
 import app.models.access.AppJsEntityAccess
+import app.models.access.JsEntityAccess
 import app.models.accounting.config.Config
 import app.models.user.User
 

@@ -4,6 +4,7 @@ import common.money.Currency
 import common.money.ExchangeRateManager
 import hydro.common.time.LocalDateTime
 import app.models.access.AppJsEntityAccess
+import app.models.access.JsEntityAccess
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
 
@@ -52,7 +53,7 @@ final class JsExchangeRateManager(
   }
 
   // **************** Inner type definitions ****************//
-  private object JsEntityAccessListener extends AppJsEntityAccess.Listener {
+  private object JsEntityAccessListener extends JsEntityAccess.Listener {
     override def modificationsAddedOrPendingStateChanged(modifications: Seq[EntityModification]): Unit = {
       for (modification <- modifications) {
         modification.entityType match {

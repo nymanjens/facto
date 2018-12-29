@@ -3,6 +3,7 @@ package app.flux.stores
 import app.flux.stores.PendingModificationsStore.State
 import hydro.flux.stores.StateStore
 import app.models.access.AppJsEntityAccess
+import app.models.access.JsEntityAccess
 import app.models.accounting.Transaction
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
@@ -28,7 +29,7 @@ final class PendingModificationsStore(implicit jsEntityAccess: AppJsEntityAccess
   }
 
   // **************** Private inner types ****************//
-  object JsEntityAccessListener extends AppJsEntityAccess.Listener {
+  object JsEntityAccessListener extends JsEntityAccess.Listener {
     override def modificationsAddedOrPendingStateChanged(modifications: Seq[EntityModification]): Unit =
       onAnyChange()
 

@@ -3,6 +3,7 @@ package app.flux.stores.entries.factories
 import app.flux.stores.entries.WithIsPending.isAnyPending
 import app.flux.stores.entries._
 import app.models.access.AppJsEntityAccess
+import app.models.access.JsEntityAccess
 
 import scala.collection.immutable.Seq
 

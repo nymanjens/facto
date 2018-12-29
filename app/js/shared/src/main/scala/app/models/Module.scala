@@ -3,6 +3,7 @@ package app.models
 import app.api.ScalaJsApi.GetInitialDataResponse
 import common.money.ExchangeRateManager
 import app.models.access.AppJsEntityAccess
+import app.models.access.JsEntityAccess
 import app.models.money.JsExchangeRateManager
 
 final class Module(implicit entityAccess: AppJsEntityAccess, getInitialDataResponse: GetInitialDataResponse) {
