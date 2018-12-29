@@ -13,7 +13,7 @@ import app.flux.stores.entries.factories.EndowmentEntriesStoreFactory
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import app.models.access.AppJsEntityAccess
-import app.models.access.EntityAccess
+import hydro.models.access.EntityAccess
 import app.models.accounting.config.Account
 import app.models.accounting.config.Config
 import hydro.flux.react.uielements.CollapseAllExpandAllButtons

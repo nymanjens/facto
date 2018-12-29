@@ -9,6 +9,8 @@ import app.models.access.InMemoryEntityDatabase.EntitiesFetcher
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
 
+import hydro.models.access.DbQueryExecutor
+import hydro.models.access.DbQuery
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
 

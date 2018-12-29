@@ -9,7 +9,7 @@ import app.common.money.Currency
 import hydro.common.time.Clock
 import hydro.common.time.LocalDateTime
 import app.models.Entity
-import app.models.access.DbQuery
+import hydro.models.access.DbQuery
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppDbQuerySorting
 import app.models.access.JvmEntityAccess

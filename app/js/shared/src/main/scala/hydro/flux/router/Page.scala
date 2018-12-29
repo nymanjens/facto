@@ -1,7 +1,7 @@
 package hydro.flux.router
 
 import app.flux.router.RouterFactory
-import app.models.access.EntityAccess
+import hydro.models.access.EntityAccess
 import app.common.I18n
 import japgolly.scalajs.react.extra.router.Path
 

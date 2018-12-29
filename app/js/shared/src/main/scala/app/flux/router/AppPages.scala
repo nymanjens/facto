@@ -2,7 +2,7 @@ package app.flux.router
 
 import app.common.I18n
 import japgolly.scalajs.react.extra.router.Path
-import app.models.access.EntityAccess
+import hydro.models.access.EntityAccess
 import app.models.accounting.BalanceCheck
 import app.models.accounting.config.Account
 import app.models.accounting.config.MoneyReservoir

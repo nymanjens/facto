@@ -1,7 +1,7 @@
-package app.models.access
+package hydro.models.access
 
-import app.models.access.DbQuery.Filter
-import app.models.access.DbQuery.PicklableOrdering
+import hydro.models.access.DbQuery.Filter
+import hydro.models.access.DbQuery.PicklableOrdering
 
 import scala.collection.immutable.Seq
 

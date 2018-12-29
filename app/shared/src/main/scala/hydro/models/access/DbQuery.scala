@@ -1,10 +1,10 @@
-package app.models.access
+package hydro.models.access
 
 import hydro.common.time.LocalDateTime
 import app.models.Entity
-import app.models.access.DbQuery.Sorting.FieldWithDirection
-import app.models.access.DbQuery.Filter
-import app.models.access.DbQuery.Sorting
+import hydro.models.access.DbQuery.Sorting.FieldWithDirection
+import hydro.models.access.DbQuery.Filter
+import hydro.models.access.DbQuery.Sorting
 import app.models.modification.EntityType
 
 import scala.collection.immutable.Seq

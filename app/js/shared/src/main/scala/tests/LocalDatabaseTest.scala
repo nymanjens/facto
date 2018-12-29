@@ -4,7 +4,7 @@ import app.common.testing.TestObjects._
 import hydro.models.access.SingletonKey.NextUpdateTokenKey
 import hydro.models.access.SingletonKey.VersionKey
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi
-import app.models.access.DbResultSet
+import hydro.models.access.DbResultSet
 import hydro.models.access.LocalDatabase
 import hydro.models.access.LocalDatabaseImpl
 import app.models.accounting.BalanceCheck
@@ -23,6 +23,9 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import hydro.scala2js.StandardConverters._
 import app.scala2js.AppConverters._
+import hydro.models.access.DbResultSet
+import hydro.models.access.DbQueryExecutor
+import hydro.models.access.DbQuery
 
 // Note that this is a manual test because the Rhino javascript engine used for tests
 // is incompatible with Loki.

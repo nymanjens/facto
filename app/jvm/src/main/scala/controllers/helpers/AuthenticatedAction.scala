@@ -1,11 +1,11 @@
 package controllers.helpers
 
-import app.models.access.DbQueryImplicits._
+import hydro.models.access.DbQueryImplicits._
 
 
 import app.models.access.JvmEntityAccess
 import app.models.access.ModelFields
-import app.models.access.ModelField
+import hydro.models.access.ModelField
 import app.models.user.User
 import play.api.mvc._
 

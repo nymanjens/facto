@@ -3,14 +3,14 @@ package app.api
 import app.api.Picklers._
 import app.common.testing._
 import hydro.common.time.LocalDateTime
-import app.models.access.DbQueryImplicits._
+import hydro.models.access.DbQueryImplicits._
 
 
-import app.models.access.DbQuery
+import hydro.models.access.DbQuery
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppDbQuerySorting
 import app.models.access.ModelFields
-import app.models.access.ModelField
+import hydro.models.access.ModelField
 import app.models.accounting.Transaction
 import org.junit.runner._
 import org.specs2.runner._

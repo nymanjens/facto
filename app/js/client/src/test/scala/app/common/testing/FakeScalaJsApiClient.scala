@@ -4,10 +4,10 @@ import app.api.ScalaJsApi.GetAllEntitiesResponse
 import app.api.ScalaJsApi.UserPrototype
 import app.api.ScalaJsApiClient
 import app.models.Entity
-import app.models.access.DbQuery
+import hydro.models.access.DbQuery
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppDbQuerySorting
-import app.models.access.DbQueryExecutor
+import hydro.models.access.DbQueryExecutor
 import app.models.access.AppDbQuerySortingExecutor
 
 import app.models.modification.EntityModification

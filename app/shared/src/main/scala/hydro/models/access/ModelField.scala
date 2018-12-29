@@ -1,9 +1,9 @@
-package app.models.access
+package hydro.models.access
 
 import app.common.GuavaReplacement.ImmutableBiMap
 import app.common.OrderToken
 import app.models.Entity
-import app.models.access.ModelField.FieldType
+import hydro.models.access.ModelField.FieldType
 import hydro.common.time.LocalDateTime
 
 import scala.collection.immutable.Seq
@@ -16,8 +16,7 @@ import scala.concurrent.duration.FiniteDuration
   * @tparam V The type of the values
   * @tparam E The type corresponding to the entity that contains this field
   */
-abstract class ModelField[V, E] private[access] (val name: String, accessor: E => V)(
-    implicit val fieldType: FieldType[V]) {
+abstract class ModelField[V, E](val name: String, accessor: E => V)(implicit val fieldType: FieldType[V]) {
 
   def get(entity: E): V = accessor(entity)
 }

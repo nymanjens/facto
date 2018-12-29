@@ -1,9 +1,10 @@
-package app.models.access
+package hydro.models.access
 
 import app.models.Entity
-import app.models.access.DbQuery.Filter
-import app.models.access.DbQuery.Sorting
-import app.models.access.DbQueryImplicits._
+import app.models.access.ModelFields
+import hydro.models.access.DbQuery.Filter
+import hydro.models.access.DbQuery.Sorting
+import hydro.models.access.DbQueryImplicits._
 import app.models.modification.EntityType
 
 import scala.async.Async.async

@@ -12,7 +12,7 @@ import hydro.flux.react.uielements.input.TextInput
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import app.models.access.AppJsEntityAccess
-import app.models.access.EntityAccess
+import hydro.models.access.EntityAccess
 import app.models.accounting.config.Config
 import app.models.user.User
 

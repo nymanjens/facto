@@ -6,12 +6,12 @@ import app.common.money.MoneyWithGeneralCurrency
 import hydro.common.time.Clock
 import hydro.common.time.TimeUtils
 import app.models.Entity
-import app.models.access.DbQueryImplicits._
+import hydro.models.access.DbQueryImplicits._
 
 
 import app.models.access.JvmEntityAccess
 import app.models.access.ModelFields
-import app.models.access.ModelField
+import hydro.models.access.ModelField
 import app.models.accounting._
 import app.models.accounting.config.Account
 import app.models.accounting.config.Config

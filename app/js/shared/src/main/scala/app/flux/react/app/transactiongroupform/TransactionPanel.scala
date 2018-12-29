@@ -31,16 +31,16 @@ import japgolly.scalajs.react.component.Scala.MountedImpure
 import japgolly.scalajs.react.Ref.ToScalaComponent
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom.html_<^._
-import app.models.access.DbQueryImplicits._
+import hydro.models.access.DbQueryImplicits._
 
 
-import app.models.access.DbQuery
+import hydro.models.access.DbQuery
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppJsEntityAccess
 import hydro.models.access.JsEntityAccess
 import app.models.access.ModelFields
-import app.models.access.ModelField
+import hydro.models.access.ModelField
 import app.models.accounting.Transaction
 import app.models.accounting.config.Account
 import app.models.accounting.config.Category

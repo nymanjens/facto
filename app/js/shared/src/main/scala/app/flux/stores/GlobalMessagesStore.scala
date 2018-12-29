@@ -15,7 +15,7 @@ import hydro.flux.action.Action
 import hydro.flux.action.Dispatcher
 import hydro.flux.action.StandardActions
 import hydro.flux.stores.StateStore
-import app.models.access.EntityAccess
+import hydro.models.access.EntityAccess
 import app.models.accounting._
 import app.models.accounting.config.Config
 

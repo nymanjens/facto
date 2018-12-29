@@ -3,13 +3,13 @@ package app.flux.stores.entries.factories
 import app.common.GuavaReplacement.ImmutableSetMultimap
 import app.flux.stores.entries.EntriesStore
 import app.flux.stores.entries.factories.TagsStoreFactory.State
-import app.models.access.DbQueryImplicits._
+import hydro.models.access.DbQueryImplicits._
 
 
 import app.models.access.AppJsEntityAccess
 import hydro.models.access.JsEntityAccess
 import app.models.access.ModelFields
-import app.models.access.ModelField
+import hydro.models.access.ModelField
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 

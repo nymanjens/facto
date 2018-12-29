@@ -1,12 +1,12 @@
 package app.models.accounting.config
 
-import app.models.access.DbQueryImplicits._
+import hydro.models.access.DbQueryImplicits._
 
 
 import app.common.Require.requireNonNull
 import app.models.access.AppEntityAccess
 import app.models.access.ModelFields
-import app.models.access.ModelField
+import hydro.models.access.ModelField
 import app.models.accounting.{Transaction => AccountingTransaction}
 import app.models.accounting.{TransactionGroup => AccountingTransactionGroup}
 import app.models.user.User

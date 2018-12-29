@@ -7,7 +7,7 @@ import app.flux.stores.entries.AccountPair
 import app.flux.stores.entries.LiquidationEntry
 import app.flux.stores.entries.factories.LiquidationEntriesStoreFactory
 import app.models.access.AppJsEntityAccess
-import app.models.access.EntityAccess
+import hydro.models.access.EntityAccess
 import app.models.accounting.config.Account
 import app.models.accounting.config.Config
 import app.models.user.User

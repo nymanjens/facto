@@ -18,6 +18,8 @@ import hydro.models.access.JsEntityAccess
 import hydro.models.access.JsEntityAccessImpl
 import hydro.models.access.LocalDatabaseImpl
 import hydro.models.access.LocalDatabaseImpl.SecondaryIndexFunction
+import hydro.models.access.DbResultSet
+import hydro.models.access.DbQueryExecutor
 
 import scala.collection.immutable.Seq
 

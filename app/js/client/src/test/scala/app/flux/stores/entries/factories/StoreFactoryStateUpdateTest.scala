@@ -1,6 +1,6 @@
 package app.flux.stores.entries.factories
 
-import app.models.access.DbQueryImplicits._
+import hydro.models.access.DbQueryImplicits._
 
 
 import java.time.Month._
@@ -15,7 +15,7 @@ import app.flux.stores.entries.ComplexQueryFilter
 import app.flux.stores.entries.EntriesStore
 import app.models.Entity
 import app.models.access.ModelFields
-import app.models.access.ModelField
+import hydro.models.access.ModelField
 import app.models.accounting._
 import app.models.modification.EntityModification._
 import app.models.modification._

@@ -3,10 +3,10 @@ package app.models.access
 import app.common.testing.TestObjects._
 import app.common.testing._
 import app.models.Entity
-import app.models.access.DbQuery.Sorting
+import hydro.models.access.DbQuery.Sorting
 
 
-import app.models.access.DbQueryImplicits._
+import hydro.models.access.DbQueryImplicits._
 
 
 import app.models.access.InMemoryEntityDatabase.EntitiesFetcher

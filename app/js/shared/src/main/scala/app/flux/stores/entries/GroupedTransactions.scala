@@ -6,7 +6,7 @@ import app.common.money.MoneyWithGeneralCurrency
 import hydro.common.time.JavaTimeImplicits._
 import hydro.common.time.LocalDateTime
 import app.models.access.AppJsEntityAccess
-import app.models.access.EntityAccess
+import hydro.models.access.EntityAccess
 import app.models.accounting.Transaction
 import app.models.accounting.config.Account
 import app.models.accounting.config.Category

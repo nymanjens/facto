@@ -5,7 +5,7 @@ import java.time.LocalTime
 
 import app.models._
 import app.models.access.ModelFields
-import app.models.access.ModelField
+import hydro.models.access.ModelField
 import app.models.modification._
 import app.scala2js.AppConverters
 import app.scala2js.AppConverters.EntityTypeConverter

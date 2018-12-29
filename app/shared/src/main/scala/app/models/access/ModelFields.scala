@@ -2,13 +2,14 @@ package app.models.access
 
 import app.common.GuavaReplacement.ImmutableBiMap
 import app.models.Entity
-import app.models.access.ModelField.IdModelField
-import app.models.access.ModelField.toBiMapWithUniqueValues
+import hydro.models.access.ModelField.IdModelField
+import hydro.models.access.ModelField.toBiMapWithUniqueValues
 import app.models.modification.EntityType
 import app.models.modification.EntityType._
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
 import hydro.common.time.LocalDateTime
+import hydro.models.access.ModelField
 
 import scala.collection.immutable.Seq
 

@@ -4,7 +4,7 @@ import app.common.testing.TestObjects.testCategory
 import app.common.testing.TestObjects._
 import app.flux.stores.entries.ComplexQueryFilter.Prefix
 import app.flux.stores.entries.ComplexQueryFilter.QueryPart
-import app.models.access.EntityAccess
+import hydro.models.access.EntityAccess
 import app.models.accounting.Transaction
 import utest._
 

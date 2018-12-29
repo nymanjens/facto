@@ -4,11 +4,9 @@ import hydro.api.PicklableDbQuery.Sorting.FieldWithDirection
 import hydro.api.PicklableDbQuery.Filter
 import hydro.api.PicklableDbQuery.Sorting
 import app.models.Entity
-import app.models.access.DbQuery
-import app.models.access.AppDbQuerySorting
-import app.models.access.AppDbQuerySorting
+import hydro.models.access.DbQuery
 import app.models.access.ModelFields
-import app.models.access.ModelField
+import hydro.models.access.ModelField
 import app.models.modification.EntityType
 
 import scala.collection.immutable.Seq

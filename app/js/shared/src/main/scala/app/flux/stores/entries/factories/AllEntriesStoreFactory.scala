@@ -1,7 +1,7 @@
 package app.flux.stores.entries.factories
 
 import app.flux.stores.entries.GeneralEntry
-import app.models.access.DbQuery
+import hydro.models.access.DbQuery
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppJsEntityAccess

@@ -3,7 +3,7 @@ package app.flux.router
 import app.common.I18n
 import hydro.flux.action.Dispatcher
 import japgolly.scalajs.react.extra.router._
-import app.models.access.EntityAccess
+import hydro.models.access.EntityAccess
 import hydro.flux.router.Page
 
 final class Module(implicit

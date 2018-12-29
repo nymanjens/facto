@@ -4,15 +4,15 @@ import app.common.money.ExchangeRateManager
 import app.common.money.ReferenceMoney
 import hydro.common.time.LocalDateTime
 import app.models.Entity
-import app.models.access.DbQueryImplicits._
+import hydro.models.access.DbQueryImplicits._
 
 
-import app.models.access.DbQuery
+import hydro.models.access.DbQuery
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppDbQuerySorting
-import app.models.access.EntityAccess
+import hydro.models.access.EntityAccess
 import app.models.access.ModelFields
-import app.models.access.ModelField
+import hydro.models.access.ModelField
 import app.models.accounting.config.Config
 
 import scala.collection.immutable.Seq

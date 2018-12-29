@@ -8,27 +8,27 @@ import app.common.money.Currency
 import app.common.testing.TestObjects._
 import app.common.testing.TestUtils._
 import app.common.testing._
-import app.models.access.DbQueryImplicits._
+import hydro.models.access.DbQueryImplicits._
 
 
-import app.models.access.DbQuery
+import hydro.models.access.DbQuery
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppDbQuerySorting
 import app.models.access.JvmEntityAccess
 import app.models.access.ModelFields
-import app.models.access.ModelField
+import hydro.models.access.ModelField
 import app.models.accounting.Transaction
 import app.models.accounting.config._
 import app.models.modification.EntityModification
 import app.models.modification.EntityModificationEntity
 import app.models.modification.EntityType
 import app.models.money.ExchangeRateMeasurement
-import app.models.access.DbQuery
+import hydro.models.access.DbQuery
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppDbQuerySorting
 import app.models.access.JvmEntityAccess
 import app.models.access.ModelFields
-import app.models.access.ModelField
+import hydro.models.access.ModelField
 import app.models.modification.EntityModification
 import app.models.modification.EntityModificationEntity
 import app.models.modification.EntityType

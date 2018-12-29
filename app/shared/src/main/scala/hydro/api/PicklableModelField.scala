@@ -1,7 +1,7 @@
 package hydro.api
 
 import app.models.access.ModelFields
-import app.models.access.ModelField
+import hydro.models.access.ModelField
 
 /** Fork of ModelField that is picklable. */
 case class PicklableModelField(fieldNumber: Int) {
