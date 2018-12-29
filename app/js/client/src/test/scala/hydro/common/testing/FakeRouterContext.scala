@@ -4,6 +4,7 @@ import hydro.common.LoggingUtils.LogExceptionsCallback
 import app.flux.router.AppPages
 import hydro.flux.router.Page
 import hydro.flux.router.RouterContext
+import hydro.flux.router.StandardPages
 import japgolly.scalajs.react.extra.router.Path
 import japgolly.scalajs.react.vdom.html_<^.VdomTagOf
 import japgolly.scalajs.react.vdom.html_<^._
@@ -13,7 +14,7 @@ import scala.collection.mutable
 
 class FakeRouterContext extends RouterContext {
   private val allowedPagesToNavigateTo: mutable.Set[Page] = mutable.Set()
-  private var _currentPage: Page = AppPages.UserProfile
+  private var _currentPage: Page = StandardPages.UserProfile
 
   // **************** API implementation: Getters **************** //
   override def currentPage = _currentPage

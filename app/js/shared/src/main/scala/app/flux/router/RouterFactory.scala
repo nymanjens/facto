@@ -11,6 +11,7 @@ import japgolly.scalajs.react.vdom.html_<^._
 import app.models.access.EntityAccess
 import hydro.flux.router.Page
 import hydro.flux.router.RouterContext
+import hydro.flux.router.StandardPages
 import org.scalajs.dom
 
 import scala.async.Async.async
@@ -51,12 +52,12 @@ private[router] final class RouterFactory(implicit reactAppModule: app.flux.reac
         // wrap/connect components to the circuit
         (emptyRule
 
-          | staticRoute(RouterFactory.pathPrefix, AppPages.Root)
+          | staticRoute(RouterFactory.pathPrefix, StandardPages.Root)
             ~> redirectToPage(AppPages.CashFlow)(Redirect.Replace)
 
-          | staticRuleFromPage(AppPages.UserProfile, reactAppModule.userProfile.apply)
+          | staticRuleFromPage(StandardPages.UserProfile, reactAppModule.userProfile.apply)
 
-          | staticRuleFromPage(AppPages.UserAdministration, reactAppModule.userAdministration.apply)
+          | staticRuleFromPage(StandardPages.UserAdministration, reactAppModule.userAdministration.apply)
 
           | staticRuleFromPage(AppPages.Everything, reactAppModule.everything.apply)
 

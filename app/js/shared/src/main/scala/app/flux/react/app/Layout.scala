@@ -7,6 +7,7 @@ import hydro.flux.react.ReactVdomUtils.^^
 import app.flux.router.AppPages
 import hydro.flux.router.Page
 import hydro.flux.router.RouterContext
+import hydro.flux.router.StandardPages
 import hydro.flux.action.Dispatcher
 import hydro.flux.action.StandardActions
 import hydro.flux.react.uielements.ApplicationDisconnectedIcon
@@ -57,7 +58,8 @@ final class Layout(implicit globalMessages: GlobalMessages,
               <.span(^.className := "icon-bar"),
               <.span(^.className := "icon-bar")
             ),
-            router.anchorWithHrefTo(AppPages.Root)(^.className := "navbar-brand", "Family Accounting Tool"),
+            router
+              .anchorWithHrefTo(StandardPages.Root)(^.className := "navbar-brand", "Family Accounting Tool"),
             " ",
             pageLoadingSpinner()
           ),
@@ -79,18 +81,18 @@ final class Layout(implicit globalMessages: GlobalMessages,
                 ^.className := "dropdown-menu dropdown-user",
                 <.li(
                   router
-                    .anchorWithHrefTo(AppPages.UserProfile)(
-                      <.i(^.className := AppPages.UserProfile.iconClass),
+                    .anchorWithHrefTo(StandardPages.UserProfile)(
+                      <.i(^.className := StandardPages.UserProfile.iconClass),
                       " ",
-                      AppPages.UserProfile.titleSync
+                      StandardPages.UserProfile.titleSync
                     )),
                 ^^.ifThen(user.isAdmin) {
                   <.li(
                     router
-                      .anchorWithHrefTo(AppPages.UserAdministration)(
-                        <.i(^.className := AppPages.UserAdministration.iconClass),
+                      .anchorWithHrefTo(StandardPages.UserAdministration)(
+                        <.i(^.className := StandardPages.UserAdministration.iconClass),
                         " ",
-                        AppPages.UserAdministration.titleSync
+                        StandardPages.UserAdministration.titleSync
                       ))
                 },
                 <.li(^.className := "divider"),

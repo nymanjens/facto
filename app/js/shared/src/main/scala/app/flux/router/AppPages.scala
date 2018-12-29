@@ -8,17 +8,13 @@ import app.models.accounting.config.Account
 import app.models.accounting.config.MoneyReservoir
 import app.models.accounting.config.Template
 import hydro.flux.router.Page
+import hydro.flux.router.Page.PageBase
 import hydro.flux.router.RouterContext
 
 import scala.concurrent.Future
 import scala.scalajs.js
 
 object AppPages {
-
-  sealed abstract class PageBase(titleKey: String, override val iconClass: String) extends Page {
-    override def title(implicit i18n: I18n, entityAccess: EntityAccess) = Future.successful(titleSync)
-    def titleSync(implicit i18n: I18n) = i18n(titleKey)
-  }
 
   sealed abstract class HasReturnTo(private val encodedReturnTo: Option[String]) {
     def returnToPath: Path =
@@ -37,15 +33,6 @@ object AppPages {
         js.URIUtils.decodeURIComponent(path))
     }
   }
-
-  case object Root extends Page {
-    override def title(implicit i18n: I18n, entityAccess: EntityAccess) = Future.successful("Root")
-    override def iconClass = ""
-  }
-
-  // **************** User management views **************** //
-  case object UserProfile extends PageBase("app.user-profile", iconClass = "fa fa-user fa-fw")
-  case object UserAdministration extends PageBase("app.user-administration", iconClass = "fa fa-cogs fa-fw")
 
   // **************** Accounting data views **************** //
   case object Everything extends PageBase("app.everything", iconClass = "icon-list")
