@@ -2,7 +2,6 @@ package hydro.flux.stores
 
 import hydro.common.LoggingUtils.logExceptions
 import hydro.common.LoggingUtils.logFailure
-import app.models.access.AppJsEntityAccess
 import app.models.access.JsEntityAccess
 import app.models.modification.EntityModification
 
@@ -17,7 +16,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
   *
   * @tparam State An immutable type that contains all state maintained by this store
   */
-abstract class AsyncEntityDerivedStateStore[State](implicit entityAccess: AppJsEntityAccess)
+abstract class AsyncEntityDerivedStateStore[State](implicit entityAccess: JsEntityAccess)
     extends StateStore[Option[State]] {
   entityAccess.registerListener(JsEntityAccessListener)
 
