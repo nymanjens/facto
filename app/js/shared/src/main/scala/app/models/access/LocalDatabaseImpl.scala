@@ -10,11 +10,6 @@ import app.models.access.LocalDatabaseImpl.Singleton
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.LokiQuery
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
-import app.models.modification.EntityType.BalanceCheckType
-import app.models.modification.EntityType.ExchangeRateMeasurementType
-import app.models.modification.EntityType.TransactionGroupType
-import app.models.modification.EntityType.TransactionType
-import app.models.modification.EntityType.UserType
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
 import org.scalajs.dom.console
@@ -201,7 +196,6 @@ private final class LocalDatabaseImpl(implicit webWorker: LocalDatabaseWebWorker
   private val pendingModificationsCollectionName = "pendingModifications"
   private def allCollectionNames: Seq[String] =
     EntityType.values.map(collectionNameOf) :+ singletonsCollectionName :+ pendingModificationsCollectionName
-
 }
 
 @visibleForTesting
