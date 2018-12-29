@@ -9,7 +9,7 @@ import hydro.common.Unique
 import app.flux.action.Actions
 import hydro.flux.action.StandardActions
 import hydro.flux.action.Dispatcher
-import app.flux.react.ReactVdomUtils.<<
+import hydro.flux.react.ReactVdomUtils.<<
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.router.Page
 import app.flux.router.RouterContext

@@ -5,7 +5,7 @@ import common.money.ExchangeRateManager
 import hydro.common.time.Clock
 import common.I18n
 import hydro.common.Unique
-import app.flux.react.ReactVdomUtils.^^
+import hydro.flux.react.ReactVdomUtils.^^
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.router.Page.NewForLiquidationSimplification
 import app.flux.router.Page

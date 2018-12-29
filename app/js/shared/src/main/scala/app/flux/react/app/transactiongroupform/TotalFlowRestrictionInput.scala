@@ -3,7 +3,7 @@ package app.flux.react.app.transactiongroupform
 import common.I18n
 import hydro.common.LoggingUtils.LogExceptionsCallback
 import hydro.common.LoggingUtils.logExceptions
-import app.flux.react.ReactVdomUtils.^^
+import hydro.flux.react.ReactVdomUtils.^^
 import app.flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._

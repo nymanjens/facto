@@ -5,8 +5,8 @@ import hydro.common.LoggingUtils.LogExceptionsCallback
 import hydro.common.LoggingUtils.logExceptions
 import common.money.ExchangeRateManager
 import hydro.common.time.Clock
-import app.flux.react.ReactVdomUtils.<<
-import app.flux.react.ReactVdomUtils.^^
+import hydro.flux.react.ReactVdomUtils.<<
+import hydro.flux.react.ReactVdomUtils.^^
 import app.flux.router.Page
 import app.flux.router.RouterContext
 import app.flux.stores.entries.factories.AllEntriesStoreFactory

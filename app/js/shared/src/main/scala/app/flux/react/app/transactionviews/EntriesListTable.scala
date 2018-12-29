@@ -4,7 +4,7 @@ import hydro.common.LoggingUtils.LogExceptionsCallback
 import hydro.common.LoggingUtils.logExceptions
 import common.I18n
 import hydro.common.Unique
-import app.flux.react.ReactVdomUtils.<<
+import hydro.flux.react.ReactVdomUtils.<<
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.react.uielements
 import hydro.flux.react.uielements.Table

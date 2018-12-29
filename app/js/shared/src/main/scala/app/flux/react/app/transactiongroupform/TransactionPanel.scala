@@ -13,7 +13,7 @@ import hydro.common.time.LocalDateTime
 import hydro.common.time.LocalDateTimes
 import common.I18n
 import hydro.common.SinglePendingTaskQueue
-import app.flux.react.ReactVdomUtils.<<
+import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.uielements.HalfPanel
 import app.flux.react.uielements.input.bootstrap.AutosuggestTextInput
 import app.flux.react.uielements.input.bootstrap.MoneyInput

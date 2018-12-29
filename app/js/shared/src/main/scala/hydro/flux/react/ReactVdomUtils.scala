@@ -1,4 +1,4 @@
-package app.flux.react
+package hydro.flux.react
 
 import japgolly.scalajs.react.vdom.html_<^._
 import japgolly.scalajs.react.vdom.TagMod

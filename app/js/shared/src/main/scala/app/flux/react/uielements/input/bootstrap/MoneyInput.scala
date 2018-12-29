@@ -10,7 +10,7 @@ import common.money.DatedMoney
 import common.money.ExchangeRateManager
 import common.money.Money
 import hydro.common.time.LocalDateTime
-import app.flux.react.ReactVdomUtils.^^
+import hydro.flux.react.ReactVdomUtils.^^
 import hydro.flux.react.uielements.input.InputBase
 import hydro.flux.react.uielements.input.bootstrap.InputComponent
 import hydro.flux.react.uielements.input.bootstrap.InputComponent.Props

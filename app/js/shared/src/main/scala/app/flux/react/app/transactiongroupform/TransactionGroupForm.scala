@@ -12,8 +12,8 @@ import hydro.common.time.JavaTimeImplicits._
 import app.flux.action.Actions
 import hydro.flux.action.StandardActions
 import hydro.flux.action.Dispatcher
-import app.flux.react.ReactVdomUtils.<<
-import app.flux.react.ReactVdomUtils.^^
+import hydro.flux.react.ReactVdomUtils.<<
+import hydro.flux.react.ReactVdomUtils.^^
 import app.flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
 import app.flux.react.app.transactionviews
 import app.flux.react.app.transactionviews.Liquidation

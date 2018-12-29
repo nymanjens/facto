@@ -12,7 +12,7 @@ import common.money.ReferenceMoney
 import hydro.common.time.Clock
 import hydro.common.time.DatedMonth
 import hydro.common.time.YearRange
-import app.flux.react.ReactVdomUtils._
+import hydro.flux.react.ReactVdomUtils._
 import app.flux.router.Page
 import app.flux.router.RouterContext
 import app.flux.react.uielements

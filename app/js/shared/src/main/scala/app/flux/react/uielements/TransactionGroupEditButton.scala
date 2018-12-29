@@ -1,7 +1,7 @@
 package app.flux.react.uielements
 
 import common.I18n
-import app.flux.react.ReactVdomUtils.^^
+import hydro.flux.react.ReactVdomUtils.^^
 import app.flux.router.Page
 import app.flux.router.RouterContext
 import japgolly.scalajs.react._
