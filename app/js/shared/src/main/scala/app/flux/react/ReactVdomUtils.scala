@@ -10,7 +10,8 @@ import scala.collection.immutable.Seq
 object ReactVdomUtils {
   object ^^ {
     def classes(cls: String*): TagMod = classes(cls.toVector)
-    def classes(cls: Seq[String]): TagMod = ^.classSetM(cls.filter(_.nonEmpty).map(c => (c, true)).toMap)
+    def classes(cls: Iterable[String]): TagMod =
+      ^.classSetM(cls.toVector.filter(_.nonEmpty).map(c => (c, true)).toMap)
 
     def ifThen(cond: Boolean)(thenElement: => TagMod): TagMod = {
       if (cond) {
