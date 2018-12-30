@@ -3,13 +3,37 @@ package hydro.api
 import java.time.LocalDate
 import java.time.LocalTime
 
+import app.common.GuavaReplacement
+import app.common.GuavaReplacement.ImmutableBiMap
 import app.models.access.ModelFields
+import app.models.modification.EntityType
 import hydro.models.access.ModelField
 import boopickle.Default._
 import hydro.api.PicklableDbQuery.FieldWithValue
 import hydro.common.time.LocalDateTime
 
 abstract class StandardPicklers {
+
+  def enumPickler[T](values: Seq[T]): Pickler[T] = {
+    val valueToNumber: ImmutableBiMap[T, Int] = {
+      val builder = ImmutableBiMap.builder[T, Int]()
+      for ((value, number) <- values.zipWithIndex) {
+        builder.put(value, number)
+      }
+      builder.build()
+    }
+
+    new Pickler[T] {
+      override def pickle(value: T)(implicit state: PickleState): Unit = {
+        state.pickle(valueToNumber.get(value))
+      }
+      override def unpickle(implicit state: UnpickleState): T = {
+        valueToNumber.inverse().get(state.unpickle[Int])
+      }
+    }
+  }
+
+  implicit val EntityTypePickler: Pickler[EntityType.any] = enumPickler(EntityType.values)
 
   implicit object LocalDateTimePickler extends Pickler[LocalDateTime] {
     override def pickle(dateTime: LocalDateTime)(implicit state: PickleState): Unit = logExceptions {

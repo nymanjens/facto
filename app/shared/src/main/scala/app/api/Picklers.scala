@@ -11,6 +11,7 @@ import app.models.modification.EntityType
 import app.models.modification.EntityType._
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
+import boopickle.Default
 import boopickle.Default._
 import hydro.api.StandardPicklers
 
@@ -74,28 +75,6 @@ object Picklers extends StandardPicklers {
     }
     override def unpickle(implicit state: UnpickleState): Currency = logExceptions {
       Currency.of(state.unpickle[String])
-    }
-  }
-
-  implicit object EntityTypePickler extends Pickler[EntityType.any] {
-    override def pickle(entityType: EntityType.any)(implicit state: PickleState): Unit = logExceptions {
-      val intValue: Int = entityType match {
-        case UserType                    => 1
-        case TransactionType             => 2
-        case TransactionGroupType        => 3
-        case BalanceCheckType            => 4
-        case ExchangeRateMeasurementType => 5
-      }
-      state.pickle(intValue)
-    }
-    override def unpickle(implicit state: UnpickleState): EntityType.any = logExceptions {
-      state.unpickle[Int] match {
-        case 1 => UserType
-        case 2 => TransactionType
-        case 3 => TransactionGroupType
-        case 4 => BalanceCheckType
-        case 5 => ExchangeRateMeasurementType
-      }
     }
   }
 
