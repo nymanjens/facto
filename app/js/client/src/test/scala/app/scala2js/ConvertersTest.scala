@@ -10,11 +10,6 @@ import app.models.accounting._
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
 import app.models.money.ExchangeRateMeasurement
-import app.models.accounting.TransactionGroup
-import app.models.accounting.Transaction
-import app.models.accounting.BalanceCheck
-import app.models.user.User
-import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
 import hydro.scala2js.StandardConverters._
 import app.scala2js.AppConverters._
@@ -50,11 +45,11 @@ object ConvertersTest extends TestSuite {
     }
 
     "fromEntityType" - {
-      fromUser.Type) ==> UserConverter
-      fromEntit.Type.Transaction.Type) ==> TransactionConverter
-      fromEntit.Type.TransactionGroup.Type) ==> TransactionGroupConverter
-      fromEntit.Type.BalanceCheck.Type) ==> BalanceCheckConverter
-      fromEntit.Type.ExchangeRateMeasurement.Type) ==> ExchangeRateMeasurementConverter
+      fromEntityType(User.Type) ==> UserConverter
+      fromEntityType(EntityType.TransactionType) ==> TransactionConverter
+      fromEntityType(EntityType.TransactionGroupType) ==> TransactionGroupConverter
+      fromEntityType(EntityType.BalanceCheckType) ==> BalanceCheckConverter
+      fromEntityType(EntityType.ExchangeRateMeasurementType) ==> ExchangeRateMeasurementConverter
     }
 
     "seqConverter" - {
@@ -74,8 +69,8 @@ object ConvertersTest extends TestSuite {
     }
 
     "EntityTypeConverter" - {
-      testToJsAndBack[EntityType.any](BalanceCheck.Type)
-      testToJsAndBack[EntityType.any](Transaction.Type)
+      testToJsAndBack[EntityType.any](EntityType.BalanceCheckType)
+      testToJsAndBack[EntityType.any](EntityType.TransactionType)
     }
 
     "EntityModificationConverter" - {
