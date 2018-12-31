@@ -21,7 +21,7 @@ object AppConverters {
   implicit def fromEntityType[E <: Entity: EntityType]: MapConverter[E] = {
     val entityType: EntityType[E] = implicitly[EntityType[E]]
     val converter: MapConverter[_ <: Entity] = entityType match {
-      case EntityType.UserType                    => UserConverter
+      case User.Type                    => UserConverter
       case EntityType.TransactionType             => TransactionConverter
       case EntityType.TransactionGroupType        => TransactionGroupConverter
       case EntityType.BalanceCheckType            => BalanceCheckConverter
@@ -32,7 +32,7 @@ object AppConverters {
 
   // **************** General converters **************** //
   implicit val EntityTypeConverter: Converter[EntityType.any] = StandardConverters.enumConverter(
-    EntityType.UserType,
+    User.Type,
     EntityType.TransactionType,
     EntityType.TransactionGroupType,
     EntityType.BalanceCheckType,

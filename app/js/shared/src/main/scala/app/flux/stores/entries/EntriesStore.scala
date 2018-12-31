@@ -7,6 +7,7 @@ import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
+import app.models.user.User
 
 /**
   * Abstract base class for a store with transaction-derived entries.
@@ -24,7 +25,7 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit entityAcc
   protected override def modificationImpactsState(entityModification: EntityModification,
                                                   state: State): Boolean = {
     entityModification.entityType match {
-      case EntityType.UserType => true // Almost never happens and likely to change entries
+      case User.Type => true // Almost never happens and likely to change entries
       case EntityType.ExchangeRateMeasurementType =>
         false // In normal circumstances, no entries should be changed retroactively
       case EntityType.TransactionGroupType =>

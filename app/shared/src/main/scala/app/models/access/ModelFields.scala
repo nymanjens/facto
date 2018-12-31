@@ -17,7 +17,7 @@ object ModelFields {
 
   // **************** Methods **************** //
   def id[E <: Entity](implicit entityType: EntityType[E]): ModelField[Long, E] = entityType match {
-    case UserType                    => User.id.asInstanceOf[ModelField[Long, E]]
+    case app.models.user.User.Type   => User.id.asInstanceOf[ModelField[Long, E]]
     case TransactionType             => Transaction.id.asInstanceOf[ModelField[Long, E]]
     case TransactionGroupType        => TransactionGroup.id.asInstanceOf[ModelField[Long, E]]
     case BalanceCheckType            => BalanceCheck.id.asInstanceOf[ModelField[Long, E]]

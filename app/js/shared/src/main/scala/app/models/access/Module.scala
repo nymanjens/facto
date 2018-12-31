@@ -8,7 +8,7 @@ import app.models.modification.EntityType.BalanceCheckType
 import app.models.modification.EntityType.ExchangeRateMeasurementType
 import app.models.modification.EntityType.TransactionGroupType
 import app.models.modification.EntityType.TransactionType
-import app.models.modification.EntityType.UserType
+
 import app.models.user.User
 import hydro.models.access.EntityModificationPushClientFactory
 import hydro.models.access.HybridRemoteDatabaseProxy
@@ -49,6 +49,6 @@ object Module {
     case TransactionGroupType        => Seq()
     case BalanceCheckType            => Seq()
     case ExchangeRateMeasurementType => Seq()
-    case UserType                    => Seq()
+    case User.Type                    => Seq()
   })
 }

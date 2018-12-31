@@ -10,7 +10,7 @@ import app.models.modification.EntityType.BalanceCheckType
 import app.models.modification.EntityType.ExchangeRateMeasurementType
 import app.models.modification.EntityType.TransactionGroupType
 import app.models.modification.EntityType.TransactionType
-import app.models.modification.EntityType.UserType
+
 import app.models.user.User
 import hydro.models.access.EntityModificationPushClientFactory
 import hydro.models.access.HybridRemoteDatabaseProxy

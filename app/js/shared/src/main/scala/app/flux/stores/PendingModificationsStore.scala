@@ -7,6 +7,7 @@ import hydro.models.access.JsEntityAccess
 import app.models.accounting.Transaction
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
+import app.models.user.User
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
@@ -57,7 +58,7 @@ final class PendingModificationsStore(implicit jsEntityAccess: AppJsEntityAccess
             case _ =>
           }
         case EntityType.TransactionGroupType        => affectedTransactionGroupIds += modification.entityId
-        case EntityType.UserType                    => nonTransactionEditCount += 1
+        case User.Type                              => nonTransactionEditCount += 1
         case EntityType.BalanceCheckType            => nonTransactionEditCount += 1
         case EntityType.ExchangeRateMeasurementType => nonTransactionEditCount += 1
       }

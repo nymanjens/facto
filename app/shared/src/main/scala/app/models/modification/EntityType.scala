@@ -7,12 +7,11 @@ import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
 
 import scala.collection.immutable.Seq
+import scala.reflect.ClassTag
 
 /** Enumeration of all entity types that are transfered between server and client. */
-sealed trait EntityType[E <: Entity] {
+final class EntityType[E <: Entity](val entityClass: Class[E]) {
   type get = E
-
-  def entityClass: Class[E]
 
   def checkRightType(entity: Entity): get = {
     require(
@@ -21,20 +20,22 @@ sealed trait EntityType[E <: Entity] {
     entity.asInstanceOf[E]
   }
 
-  def name: String = ScalaUtils.objectName(this)
+  lazy val name: String = entityClass.getSimpleName + "Type"
   override def toString = name
 }
 object EntityType {
   type any = EntityType[_ <: Entity]
 
+  def apply[E <: Entity]()(implicit classTag: ClassTag[E]): EntityType[E] =
+    new EntityType[E](classTag.runtimeClass.asInstanceOf[Class[E]])
+
   // @formatter:off
-  implicit case object UserType extends EntityType[User] { override def entityClass = classOf[User]}
-  implicit case object TransactionType extends EntityType[Transaction] { override def entityClass = classOf[Transaction] }
-  implicit case object TransactionGroupType extends EntityType[TransactionGroup] { override def entityClass = classOf[TransactionGroup] }
-  implicit case object BalanceCheckType extends EntityType[BalanceCheck] { override def entityClass = classOf[BalanceCheck] }
-  implicit case object ExchangeRateMeasurementType extends EntityType[ExchangeRateMeasurement] { override def entityClass = classOf[ExchangeRateMeasurement] }
+  implicit val TransactionType: EntityType[Transaction] = EntityType()
+  implicit val TransactionGroupType: EntityType[TransactionGroup] = EntityType()
+  implicit val BalanceCheckType: EntityType[BalanceCheck] = EntityType()
+  implicit val ExchangeRateMeasurementType: EntityType[ExchangeRateMeasurement] = EntityType()
   // @formatter:on
 
-  val values: Seq[EntityType.any] =
-    Seq(UserType, TransactionType, TransactionGroupType, BalanceCheckType, ExchangeRateMeasurementType)
+  lazy val values: Seq[EntityType.any] =
+    Seq(User.Type, TransactionType, TransactionGroupType, BalanceCheckType, ExchangeRateMeasurementType)
 }

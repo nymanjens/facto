@@ -45,7 +45,7 @@ object ConvertersTest extends TestSuite {
     }
 
     "fromEntityType" - {
-      fromEntityType(EntityType.UserType) ==> UserConverter
+      fromEntityType(User.Type) ==> UserConverter
       fromEntityType(EntityType.TransactionType) ==> TransactionConverter
       fromEntityType(EntityType.TransactionGroupType) ==> TransactionGroupConverter
       fromEntityType(EntityType.BalanceCheckType) ==> BalanceCheckConverter

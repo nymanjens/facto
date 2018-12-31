@@ -14,7 +14,7 @@ import app.models.modification.EntityType.BalanceCheckType
 import app.models.modification.EntityType.ExchangeRateMeasurementType
 import app.models.modification.EntityType.TransactionGroupType
 import app.models.modification.EntityType.TransactionType
-import app.models.modification.EntityType.UserType
+
 import app.models.modification.EntityModification
 import app.models.modification.EntityModificationEntity
 import app.models.modification.EntityType
@@ -114,7 +114,7 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends AppEntityAccess {
 
   private def getEntityTableDef(entityType: EntityType.any): SlickEntityTableDef[entityType.get] = {
     val tableDef = entityType match {
-      case UserType                    => implicitly[SlickEntityTableDef[User]]
+      case User.Type                    => implicitly[SlickEntityTableDef[User]]
       case TransactionType             => implicitly[SlickEntityTableDef[Transaction]]
       case TransactionGroupType        => implicitly[SlickEntityTableDef[TransactionGroup]]
       case BalanceCheckType            => implicitly[SlickEntityTableDef[BalanceCheck]]

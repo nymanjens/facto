@@ -1,5 +1,6 @@
 package app.models.user
 
+import app.models.modification.EntityType
 import hydro.models.Entity
 
 case class User(loginName: String,
@@ -15,5 +16,7 @@ case class User(loginName: String,
 }
 
 object User {
+  implicit val Type: EntityType[User] = EntityType()
+
   def tupled = (this.apply _).tupled
 }

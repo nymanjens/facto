@@ -33,7 +33,7 @@ final class UserStore(implicit dispatcher: Dispatcher,
 
   override protected def modificationImpactsState(entityModification: EntityModification,
                                                   state: State): Boolean =
-    entityModification.entityType == EntityType.UserType
+    entityModification.entityType == User.Type
 }
 
 object UserStore {

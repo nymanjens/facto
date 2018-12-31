@@ -76,7 +76,7 @@ final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
             "(see EntityModification.Update documentation)"
         )
         require(
-          modification.entityType != EntityType.UserType,
+          modification.entityType != User.Type,
           "Please modify users by calling upsertUser() instead")
         require(
           modification.entityType != EntityType.ExchangeRateMeasurementType,
