@@ -10,7 +10,6 @@ import app.common.testing.TestUtils._
 import app.common.testing._
 import hydro.models.access.DbQueryImplicits._
 
-
 import hydro.models.access.DbQuery
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppDbQuerySorting

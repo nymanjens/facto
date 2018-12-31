@@ -2,7 +2,6 @@ package app.flux.stores.entries.factories
 
 import hydro.models.access.DbQueryImplicits._
 
-
 import java.time.Month._
 
 import app.common.testing.TestObjects._

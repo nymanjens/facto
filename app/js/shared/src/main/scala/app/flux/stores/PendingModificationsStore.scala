@@ -63,7 +63,7 @@ final class PendingModificationsStore(implicit jsEntityAccess: AppJsEntityAccess
             case _ =>
           }
         case TransactionGroup.Type        => affectedTransactionGroupIds += modification.entityId
-        case User.Type                              => nonTransactionEditCount += 1
+        case User.Type                    => nonTransactionEditCount += 1
         case BalanceCheck.Type            => nonTransactionEditCount += 1
         case ExchangeRateMeasurement.Type => nonTransactionEditCount += 1
       }

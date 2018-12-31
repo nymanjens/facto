@@ -27,11 +27,12 @@ object ModelFields {
 
   // **************** Methods **************** //
   def id[E <: Entity](implicit entityType: EntityType[E]): ModelField[Long, E] = entityType match {
-    case app.models.user.User.Type   => User.id.asInstanceOf[ModelField[Long, E]]
-    case app.models.accounting.Transaction.Type             => Transaction.id.asInstanceOf[ModelField[Long, E]]
-    case app.models.accounting.TransactionGroup.Type        => TransactionGroup.id.asInstanceOf[ModelField[Long, E]]
-    case app.models.accounting.BalanceCheck.Type            => BalanceCheck.id.asInstanceOf[ModelField[Long, E]]
-    case app.models.money.ExchangeRateMeasurement.Type => ExchangeRateMeasurement.id.asInstanceOf[ModelField[Long, E]]
+    case app.models.user.User.Type                   => User.id.asInstanceOf[ModelField[Long, E]]
+    case app.models.accounting.Transaction.Type      => Transaction.id.asInstanceOf[ModelField[Long, E]]
+    case app.models.accounting.TransactionGroup.Type => TransactionGroup.id.asInstanceOf[ModelField[Long, E]]
+    case app.models.accounting.BalanceCheck.Type     => BalanceCheck.id.asInstanceOf[ModelField[Long, E]]
+    case app.models.money.ExchangeRateMeasurement.Type =>
+      ExchangeRateMeasurement.id.asInstanceOf[ModelField[Long, E]]
   }
 
   // **************** Enumeration of all fields **************** //

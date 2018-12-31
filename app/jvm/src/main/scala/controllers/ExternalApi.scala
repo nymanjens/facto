@@ -8,7 +8,6 @@ import hydro.common.time.TimeUtils
 import hydro.models.Entity
 import hydro.models.access.DbQueryImplicits._
 
-
 import app.models.access.JvmEntityAccess
 import app.models.access.ModelFields
 import hydro.models.access.ModelField

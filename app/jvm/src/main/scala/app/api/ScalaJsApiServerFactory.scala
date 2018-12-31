@@ -80,9 +80,7 @@ final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
           "Update modifications are not allowed by remote clients " +
             "(see EntityModification.Update documentation)"
         )
-        require(
-          modification.entityType != User.Type,
-          "Please modify users by calling upsertUser() instead")
+        require(modification.entityType != User.Type, "Please modify users by calling upsertUser() instead")
         require(
           modification.entityType != ExchangeRateMeasurement.Type,
           "Client initiated exchange rate measurement changes are not allowed")

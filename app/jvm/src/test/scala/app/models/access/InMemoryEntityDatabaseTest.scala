@@ -5,9 +5,7 @@ import app.common.testing._
 import hydro.models.Entity
 import hydro.models.access.DbQuery.Sorting
 
-
 import hydro.models.access.DbQueryImplicits._
-
 
 import app.models.access.InMemoryEntityDatabase.EntitiesFetcher
 import app.models.accounting.Transaction
@@ -124,7 +122,7 @@ class InMemoryEntityDatabaseTest extends HookedSpecification {
 
     override def fetch[E <: Entity](entityType: EntityType[E]) = entityType match {
       case Transaction.Type => transactions.toVector.asInstanceOf[Seq[E]]
-      case _                          => Seq()
+      case _                => Seq()
     }
   }
 }

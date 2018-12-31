@@ -8,7 +8,6 @@ import app.flux.stores.entries.ComplexQueryFilter.QueryFilterPair
 import app.flux.stores.entries.ComplexQueryFilter.QueryPart
 import hydro.models.access.DbQueryImplicits._
 
-
 import hydro.models.access.DbQuery
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppDbQuerySorting

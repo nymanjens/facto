@@ -6,9 +6,7 @@ import app.common.testing.TestObjects._
 import hydro.common.time.LocalDateTimes.createDateTime
 import hydro.models.access.DbQuery.Filter
 
-
 import hydro.models.access.DbQueryImplicits._
-
 
 import app.models.accounting.Transaction
 import app.models.accounting.config.Category

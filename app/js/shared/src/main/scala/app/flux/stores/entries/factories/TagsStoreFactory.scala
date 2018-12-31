@@ -5,7 +5,6 @@ import app.flux.stores.entries.EntriesStore
 import app.flux.stores.entries.factories.TagsStoreFactory.State
 import hydro.models.access.DbQueryImplicits._
 
-
 import app.models.access.AppJsEntityAccess
 import hydro.models.access.JsEntityAccess
 import app.models.access.ModelFields

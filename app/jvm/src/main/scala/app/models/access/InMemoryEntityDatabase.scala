@@ -149,7 +149,7 @@ private[access] object InMemoryEntityDatabase {
           AppDbQuerySorting.Transaction.deterministicallyByCreateDate
         )
       case BalanceCheck.Type => Set(AppDbQuerySorting.BalanceCheck.deterministicallyByCheckDate)
-      case _                           => Set()
+      case _                 => Set()
     }
   }
 }
