@@ -1,15 +1,15 @@
 package app.models.accounting
 
 import app.common.money.DatedMoney
-import hydro.common.time.LocalDateTime
-import app.models._
-import hydro.models.Entity
 import app.models.access.AppEntityAccess
 import app.models.accounting.config.Account
 import app.models.accounting.config.Category
 import app.models.accounting.config.Config
 import app.models.accounting.config.MoneyReservoir
+import app.models.modification.EntityType
 import app.models.user.User
+import hydro.common.time.LocalDateTime
+import hydro.models.Entity
 
 import scala.collection.immutable.Seq
 
@@ -57,6 +57,8 @@ case class Transaction(transactionGroupId: Long,
   }
 }
 object Transaction {
+  implicit val Type: EntityType[Transaction] = EntityType()
+
   def tupled = (this.apply _).tupled
 
   /** Same as Transaction, except all fields are optional. */

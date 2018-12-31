@@ -7,6 +7,11 @@ import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
+import app.models.money.ExchangeRateMeasurement
+import app.models.accounting.TransactionGroup
+import app.models.accounting.Transaction
+import app.models.accounting.BalanceCheck
+import app.models.user.User
 import app.models.user.User
 
 /**
@@ -26,15 +31,15 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit entityAcc
                                                   state: State): Boolean = {
     entityModification.entityType match {
       case User.Type => true // Almost never happens and likely to change entries
-      case EntityType.ExchangeRateMeasurementType =>
+      case ExchangeRateMeasurement.Type =>
         false // In normal circumstances, no entries should be changed retroactively
-      case EntityType.TransactionGroupType =>
+      case TransactionGroup.Type =>
         entityModification match {
           case EntityModification.Add(_)    => false // Always gets added alongside Transaction additions
           case EntityModification.Update(_) => throw new UnsupportedOperationException("Immutable entity")
           case EntityModification.Remove(_) => false // Always gets removed alongside Transaction removals
         }
-      case EntityType.TransactionType =>
+      case Transaction.Type =>
         entityModification match {
           case EntityModification.Add(transaction) =>
             transactionUpsertImpactsState(transaction.asInstanceOf[Transaction], state)
@@ -42,7 +47,7 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit entityAcc
           case EntityModification.Remove(transactionId) =>
             state.impactedByTransactionId(transactionId)
         }
-      case EntityType.BalanceCheckType =>
+      case BalanceCheck.Type =>
         entityModification match {
           case EntityModification.Add(bc) =>
             balanceCheckUpsertImpactsState(bc.asInstanceOf[BalanceCheck], state)

@@ -7,6 +7,11 @@ import hydro.models.access.JsEntityAccess
 import app.models.accounting.Transaction
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
+import app.models.money.ExchangeRateMeasurement
+import app.models.accounting.TransactionGroup
+import app.models.accounting.Transaction
+import app.models.accounting.BalanceCheck
+import app.models.user.User
 import app.models.user.User
 
 import scala.collection.immutable.Seq
@@ -51,16 +56,16 @@ final class PendingModificationsStore(implicit jsEntityAccess: AppJsEntityAccess
       var nonTransactionEditCount = 0
 
       for (modification <- modifications) modification.entityType match {
-        case EntityType.TransactionType =>
+        case Transaction.Type =>
           modification match {
             case EntityModification.Add(entity) =>
               affectedTransactionGroupIds += entity.asInstanceOf[Transaction].transactionGroupId
             case _ =>
           }
-        case EntityType.TransactionGroupType        => affectedTransactionGroupIds += modification.entityId
+        case TransactionGroup.Type        => affectedTransactionGroupIds += modification.entityId
         case User.Type                              => nonTransactionEditCount += 1
-        case EntityType.BalanceCheckType            => nonTransactionEditCount += 1
-        case EntityType.ExchangeRateMeasurementType => nonTransactionEditCount += 1
+        case BalanceCheck.Type            => nonTransactionEditCount += 1
+        case ExchangeRateMeasurement.Type => nonTransactionEditCount += 1
       }
 
       affectedTransactionGroupIds.size + nonTransactionEditCount

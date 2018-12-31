@@ -5,8 +5,6 @@ import app.common.money.ReferenceMoney
 import hydro.common.time.LocalDateTime
 import hydro.models.Entity
 import hydro.models.access.DbQueryImplicits._
-
-
 import hydro.models.access.DbQuery
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppDbQuerySorting
@@ -14,6 +12,9 @@ import hydro.models.access.EntityAccess
 import app.models.access.ModelFields
 import hydro.models.access.ModelField
 import app.models.accounting.config.Config
+import app.models.modification.EntityType
+import app.models.money.ExchangeRateMeasurement
+import app.models.user.User
 
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
@@ -33,6 +34,8 @@ case class TransactionGroup(createdDate: LocalDateTime, idOption: Option[Long] =
 }
 
 object TransactionGroup {
+  implicit val Type: EntityType[TransactionGroup] = EntityType()
+
   def tupled = (this.apply _).tupled
 
   /**

@@ -14,6 +14,11 @@ import app.models.accounting.Transaction
 import app.models.accounting.config.Config
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
+import app.models.money.ExchangeRateMeasurement
+import app.models.accounting.TransactionGroup
+import app.models.accounting.Transaction
+import app.models.accounting.BalanceCheck
+import app.models.user.User
 import org.junit.runner._
 import org.specs2.runner._
 
@@ -28,7 +33,7 @@ class PicklersTest extends HookedSpecification {
   }
 
   "EntityType" in {
-    testPickleAndUnpickle[EntityType.any](EntityType.ExchangeRateMeasurementType)
+    testPickleAndUnpickle[EntityType.any](ExchangeRateMeasurement.Type)
   }
 
   "EntityModification" in {
@@ -61,7 +66,7 @@ class PicklersTest extends HookedSpecification {
   "GetAllEntitiesResponse" in {
     testPickleAndUnpickle[GetAllEntitiesResponse](
       GetAllEntitiesResponse(
-        entitiesMap = Map(EntityType.TransactionType -> Seq(testTransactionWithId)),
+        entitiesMap = Map(Transaction.Type -> Seq(testTransactionWithId)),
         nextUpdateToken = testUpdateToken))
   }
 

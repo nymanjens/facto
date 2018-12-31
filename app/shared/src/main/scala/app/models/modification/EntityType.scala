@@ -1,9 +1,11 @@
 package app.models.modification
 
 import app.common.ScalaUtils
-import hydro.models.Entity
-import app.models.accounting._
+import app.models.accounting.BalanceCheck
+import app.models.accounting.Transaction
+import app.models.accounting.TransactionGroup
 import app.models.money.ExchangeRateMeasurement
+import hydro.models.Entity
 import app.models.user.User
 
 import scala.collection.immutable.Seq
@@ -29,13 +31,6 @@ object EntityType {
   def apply[E <: Entity]()(implicit classTag: ClassTag[E]): EntityType[E] =
     new EntityType[E](classTag.runtimeClass.asInstanceOf[Class[E]])
 
-  // @formatter:off
-  implicit val TransactionType: EntityType[Transaction] = EntityType()
-  implicit val TransactionGroupType: EntityType[TransactionGroup] = EntityType()
-  implicit val BalanceCheckType: EntityType[BalanceCheck] = EntityType()
-  implicit val ExchangeRateMeasurementType: EntityType[ExchangeRateMeasurement] = EntityType()
-  // @formatter:on
-
   lazy val values: Seq[EntityType.any] =
-    Seq(User.Type, TransactionType, TransactionGroupType, BalanceCheckType, ExchangeRateMeasurementType)
+    Seq(User.Type, Transaction.Type, TransactionGroup.Type, BalanceCheck.Type, ExchangeRateMeasurement.Type)
 }

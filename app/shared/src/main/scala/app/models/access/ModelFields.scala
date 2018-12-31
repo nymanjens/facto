@@ -5,7 +5,17 @@ import hydro.models.Entity
 import hydro.models.access.ModelField.IdModelField
 import hydro.models.access.ModelField.toBiMapWithUniqueValues
 import app.models.modification.EntityType
-import app.models.modification.EntityType._
+import app.models.money.ExchangeRateMeasurement
+import app.models.accounting.TransactionGroup
+import app.models.accounting.Transaction
+import app.models.accounting.BalanceCheck
+import app.models.user.User
+import app.models.modification.EntityType
+import app.models.money.ExchangeRateMeasurement
+import app.models.accounting.TransactionGroup
+import app.models.accounting.Transaction
+import app.models.accounting.BalanceCheck
+import app.models.user.User
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
 import hydro.common.time.LocalDateTime
@@ -18,10 +28,10 @@ object ModelFields {
   // **************** Methods **************** //
   def id[E <: Entity](implicit entityType: EntityType[E]): ModelField[Long, E] = entityType match {
     case app.models.user.User.Type   => User.id.asInstanceOf[ModelField[Long, E]]
-    case TransactionType             => Transaction.id.asInstanceOf[ModelField[Long, E]]
-    case TransactionGroupType        => TransactionGroup.id.asInstanceOf[ModelField[Long, E]]
-    case BalanceCheckType            => BalanceCheck.id.asInstanceOf[ModelField[Long, E]]
-    case ExchangeRateMeasurementType => ExchangeRateMeasurement.id.asInstanceOf[ModelField[Long, E]]
+    case app.models.accounting.Transaction.Type             => Transaction.id.asInstanceOf[ModelField[Long, E]]
+    case app.models.accounting.TransactionGroup.Type        => TransactionGroup.id.asInstanceOf[ModelField[Long, E]]
+    case app.models.accounting.BalanceCheck.Type            => BalanceCheck.id.asInstanceOf[ModelField[Long, E]]
+    case app.models.money.ExchangeRateMeasurement.Type => ExchangeRateMeasurement.id.asInstanceOf[ModelField[Long, E]]
   }
 
   // **************** Enumeration of all fields **************** //

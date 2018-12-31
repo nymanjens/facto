@@ -14,6 +14,11 @@ import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
 import app.models.modification.EntityModification
 import app.models.access._
 import app.models.modification.EntityType
+import app.models.money.ExchangeRateMeasurement
+import app.models.accounting.TransactionGroup
+import app.models.accounting.Transaction
+import app.models.accounting.BalanceCheck
+import app.models.user.User
 import org.scalajs.dom.console
 import hydro.scala2js.StandardConverters._
 import app.scala2js.AppConverters._

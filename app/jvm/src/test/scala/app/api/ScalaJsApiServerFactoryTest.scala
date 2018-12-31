@@ -23,6 +23,11 @@ import app.models.modification.EntityModification
 import app.models.modification.EntityModificationEntity
 import app.models.modification.EntityType
 import app.models.money.ExchangeRateMeasurement
+import app.models.accounting.TransactionGroup
+import app.models.accounting.Transaction
+import app.models.accounting.BalanceCheck
+import app.models.user.User
+import app.models.money.ExchangeRateMeasurement
 import hydro.models.access.DbQuery
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppDbQuerySorting
@@ -32,6 +37,11 @@ import hydro.models.access.ModelField
 import app.models.modification.EntityModification
 import app.models.modification.EntityModificationEntity
 import app.models.modification.EntityType
+import app.models.money.ExchangeRateMeasurement
+import app.models.accounting.TransactionGroup
+import app.models.accounting.Transaction
+import app.models.accounting.BalanceCheck
+import app.models.user.User
 import app.models.slick.SlickUtils.dbRun
 import app.models.user.User
 import org.junit.runner._
@@ -81,9 +91,9 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
     fakeClock.setNowInstant(testInstant)
     TestUtils.persist(testTransactionWithId)
 
-    val response = serverFactory.create().getAllEntities(Seq(EntityType.TransactionType))
+    val response = serverFactory.create().getAllEntities(Seq(Transaction.Type))
 
-    response.entities(EntityType.TransactionType) mustEqual Seq(testTransactionWithId)
+    response.entities(Transaction.Type) mustEqual Seq(testTransactionWithId)
     response.nextUpdateToken mustEqual toUpdateToken(testInstant)
   }
 

@@ -10,14 +10,19 @@ import app.common.publisher.TriggerablePublisher
 import hydro.common.time.Clock
 import hydro.models.Entity
 import app.models.accounting._
-import app.models.modification.EntityType.BalanceCheckType
-import app.models.modification.EntityType.ExchangeRateMeasurementType
-import app.models.modification.EntityType.TransactionGroupType
-import app.models.modification.EntityType.TransactionType
+import app.models.accounting.BalanceCheck
+import app.models.money.ExchangeRateMeasurement
+import app.models.accounting.TransactionGroup
+import app.models.accounting.Transaction
 
 import app.models.modification.EntityModification
 import app.models.modification.EntityModificationEntity
 import app.models.modification.EntityType
+import app.models.money.ExchangeRateMeasurement
+import app.models.accounting.TransactionGroup
+import app.models.accounting.Transaction
+import app.models.accounting.BalanceCheck
+import app.models.user.User
 import app.models.money.ExchangeRateMeasurement
 import app.models.slick.SlickUtils.dbApi._
 import app.models.slick.SlickUtils.dbRun
@@ -115,10 +120,10 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends AppEntityAccess {
   private def getEntityTableDef(entityType: EntityType.any): SlickEntityTableDef[entityType.get] = {
     val tableDef = entityType match {
       case User.Type                    => implicitly[SlickEntityTableDef[User]]
-      case TransactionType             => implicitly[SlickEntityTableDef[Transaction]]
-      case TransactionGroupType        => implicitly[SlickEntityTableDef[TransactionGroup]]
-      case BalanceCheckType            => implicitly[SlickEntityTableDef[BalanceCheck]]
-      case ExchangeRateMeasurementType => implicitly[SlickEntityTableDef[ExchangeRateMeasurement]]
+      case Transaction.Type             => implicitly[SlickEntityTableDef[Transaction]]
+      case TransactionGroup.Type        => implicitly[SlickEntityTableDef[TransactionGroup]]
+      case BalanceCheck.Type            => implicitly[SlickEntityTableDef[BalanceCheck]]
+      case ExchangeRateMeasurement.Type => implicitly[SlickEntityTableDef[ExchangeRateMeasurement]]
     }
     tableDef.asInstanceOf[SlickEntityTableDef[entityType.get]]
   }

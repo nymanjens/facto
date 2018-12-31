@@ -13,6 +13,11 @@ import app.models.access.InMemoryEntityDatabase.EntitiesFetcher
 import app.models.accounting.Transaction
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
+import app.models.money.ExchangeRateMeasurement
+import app.models.accounting.TransactionGroup
+import app.models.accounting.Transaction
+import app.models.accounting.BalanceCheck
+import app.models.user.User
 import org.junit.runner.RunWith
 import org.specs2.runner.JUnitRunner
 
@@ -118,7 +123,7 @@ class InMemoryEntityDatabaseTest extends HookedSpecification {
     val transactions: mutable.Set[Transaction] = mutable.Set()
 
     override def fetch[E <: Entity](entityType: EntityType[E]) = entityType match {
-      case EntityType.TransactionType => transactions.toVector.asInstanceOf[Seq[E]]
+      case Transaction.Type => transactions.toVector.asInstanceOf[Seq[E]]
       case _                          => Seq()
     }
   }

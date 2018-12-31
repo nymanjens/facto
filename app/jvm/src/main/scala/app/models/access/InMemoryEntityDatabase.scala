@@ -8,6 +8,11 @@ import hydro.models.Entity
 import app.models.access.InMemoryEntityDatabase.EntitiesFetcher
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
+import app.models.money.ExchangeRateMeasurement
+import app.models.accounting.TransactionGroup
+import app.models.accounting.Transaction
+import app.models.accounting.BalanceCheck
+import app.models.user.User
 
 import hydro.models.access.DbQueryExecutor
 import hydro.models.access.DbQuery
@@ -137,13 +142,13 @@ private[access] object InMemoryEntityDatabase {
       typeToCollection(entityType).asInstanceOf[EntityCollection[E]]
 
     private def sortings(entityType: EntityType.any): Set[DbQuery.Sorting[_]] = entityType match {
-      case EntityType.TransactionType =>
+      case Transaction.Type =>
         Set(
           AppDbQuerySorting.Transaction.deterministicallyByTransactionDate,
           AppDbQuerySorting.Transaction.deterministicallyByConsumedDate,
           AppDbQuerySorting.Transaction.deterministicallyByCreateDate
         )
-      case EntityType.BalanceCheckType => Set(AppDbQuerySorting.BalanceCheck.deterministicallyByCheckDate)
+      case BalanceCheck.Type => Set(AppDbQuerySorting.BalanceCheck.deterministicallyByCheckDate)
       case _                           => Set()
     }
   }

@@ -249,9 +249,9 @@ object StoreFactoryStateUpdateTest extends TestSuite {
       }
 
       update match {
-        case Remove(id) if update.entityType == EntityType.TransactionType =>
+        case Remove(id) if update.entityType == Transaction.Type =>
           checkIfIdExists[Transaction](id)
-        case Remove(id) if update.entityType == EntityType.BalanceCheckType =>
+        case Remove(id) if update.entityType == BalanceCheck.Type =>
           checkIfIdExists[BalanceCheck](id)
         case _ => // Do nothing
       }

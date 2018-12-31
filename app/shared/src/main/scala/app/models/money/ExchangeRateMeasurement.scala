@@ -1,6 +1,7 @@
 package app.models.money
 
 import app.common.money.Currency
+import app.models.modification.EntityType
 import hydro.common.time.LocalDateTime
 import hydro.models.Entity
 
@@ -27,5 +28,7 @@ case class ExchangeRateMeasurement(date: LocalDateTime,
 }
 
 object ExchangeRateMeasurement {
+  implicit val Type: EntityType[ExchangeRateMeasurement] = EntityType()
+
   def tupled = (this.apply _).tupled
 }

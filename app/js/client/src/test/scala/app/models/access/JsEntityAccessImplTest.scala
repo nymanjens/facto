@@ -9,7 +9,12 @@ import hydro.models.Entity
 import app.models.accounting.Transaction
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
-import app.models.modification.EntityType.TransactionType
+import app.models.money.ExchangeRateMeasurement
+import app.models.accounting.TransactionGroup
+import app.models.accounting.Transaction
+import app.models.accounting.BalanceCheck
+import app.models.user.User
+import app.models.accounting.Transaction
 import hydro.scala2js.StandardConverters._
 import app.scala2js.AppConverters._
 import utest._

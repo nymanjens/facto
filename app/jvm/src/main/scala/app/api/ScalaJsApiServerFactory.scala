@@ -17,6 +17,11 @@ import app.models.accounting.config.Config
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
 import app.models.money.ExchangeRateMeasurement
+import app.models.accounting.TransactionGroup
+import app.models.accounting.Transaction
+import app.models.accounting.BalanceCheck
+import app.models.user.User
+import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
 import app.models.user.Users
 import hydro.api.PicklableDbQuery
@@ -79,7 +84,7 @@ final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
           modification.entityType != User.Type,
           "Please modify users by calling upsertUser() instead")
         require(
-          modification.entityType != EntityType.ExchangeRateMeasurementType,
+          modification.entityType != ExchangeRateMeasurement.Type,
           "Client initiated exchange rate measurement changes are not allowed")
       }
 
