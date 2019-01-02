@@ -18,6 +18,7 @@ import app.models.accounting.Transaction
 import app.models.modification.EntityModification
 import app.models.modification.EntityModificationEntity
 import app.models.modification.EntityType
+import app.models.modification.EntityTypes
 import app.models.money.ExchangeRateMeasurement
 import app.models.accounting.TransactionGroup
 import app.models.accounting.Transaction
@@ -92,7 +93,7 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends AppEntityAccess {
   }
 
   def checkConsistentCaches(): Unit = {
-    for (entityType <- EntityType.values) {
+    for (entityType <- EntityTypes.all) {
       def run[E <: Entity](entityType: EntityType[E]): Unit = {
         val allEntitiesInDb: Seq[E] = getManager(entityType).fetchAll().sortBy(_.id)
         val allEntitiesInMemory: Seq[E] =

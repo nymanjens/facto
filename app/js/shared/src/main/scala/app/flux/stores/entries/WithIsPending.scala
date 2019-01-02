@@ -4,6 +4,7 @@ import hydro.models.Entity
 import app.models.access.AppJsEntityAccess
 import hydro.models.access.JsEntityAccess
 import app.models.modification.EntityType
+import app.models.modification.EntityTypes
 import app.models.money.ExchangeRateMeasurement
 import app.models.accounting.TransactionGroup
 import app.models.accounting.Transaction

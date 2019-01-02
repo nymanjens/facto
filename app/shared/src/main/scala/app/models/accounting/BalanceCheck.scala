@@ -7,6 +7,7 @@ import app.models.access.AppEntityAccess
 import app.models.accounting.config.Config
 import app.models.accounting.config.MoneyReservoir
 import app.models.modification.EntityType
+import app.models.modification.EntityTypes
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
 

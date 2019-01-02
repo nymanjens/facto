@@ -14,6 +14,7 @@ import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
 import app.models.modification.EntityModification
 import app.models.access._
 import app.models.modification.EntityType
+import app.models.modification.EntityTypes
 import app.models.money.ExchangeRateMeasurement
 import app.models.accounting.TransactionGroup
 import app.models.accounting.Transaction
@@ -184,7 +185,7 @@ private final class LocalDatabaseImpl(implicit webWorker: LocalDatabaseWebWorker
         Seq() ++
           (for (collectionName <- allCollectionNames)
             yield WriteOperation.RemoveCollection(collectionName)) ++
-          (for (entityType <- EntityType.values)
+          (for (entityType <- EntityTypes.all)
             yield
               WriteOperation.AddCollection(
                 collectionNameOf(entityType),
@@ -202,7 +203,7 @@ private final class LocalDatabaseImpl(implicit webWorker: LocalDatabaseWebWorker
   private val singletonsCollectionName = "singletons"
   private val pendingModificationsCollectionName = "pendingModifications"
   private def allCollectionNames: Seq[String] =
-    EntityType.values.map(collectionNameOf) :+ singletonsCollectionName :+ pendingModificationsCollectionName
+    EntityTypes.all.map(collectionNameOf) :+ singletonsCollectionName :+ pendingModificationsCollectionName
 }
 
 object LocalDatabaseImpl {

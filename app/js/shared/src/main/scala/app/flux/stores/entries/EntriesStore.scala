@@ -7,6 +7,7 @@ import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
+import app.models.modification.EntityTypes
 import app.models.money.ExchangeRateMeasurement
 import app.models.accounting.TransactionGroup
 import app.models.accounting.Transaction

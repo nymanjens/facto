@@ -8,6 +8,7 @@ import hydro.models.Entity
 import app.models.access.InMemoryEntityDatabase.EntitiesFetcher
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
+import app.models.modification.EntityTypes
 import app.models.money.ExchangeRateMeasurement
 import app.models.accounting.TransactionGroup
 import app.models.accounting.Transaction
@@ -127,7 +128,7 @@ private[access] object InMemoryEntityDatabase {
 
   private final class TypeToCollectionMap(entitiesFetcher: EntitiesFetcher) {
     private val typeToCollection: Map[EntityType.any, EntityCollection.any] = {
-      for (entityType <- EntityType.values) yield {
+      for (entityType <- EntityTypes.all) yield {
         def internal[E <: Entity](
             implicit entityType: EntityType[E]): (EntityType.any, EntityCollection.any) = {
           entityType -> new EntityCollection[E](

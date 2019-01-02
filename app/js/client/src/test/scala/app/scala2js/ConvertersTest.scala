@@ -9,6 +9,7 @@ import hydro.models.access.ModelField
 import app.models.accounting._
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
+import app.models.modification.EntityTypes
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
 import hydro.scala2js.StandardConverters._

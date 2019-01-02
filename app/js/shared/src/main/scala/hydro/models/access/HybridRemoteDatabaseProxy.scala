@@ -9,6 +9,7 @@ import hydro.models.access.SingletonKey.NextUpdateTokenKey
 import hydro.models.access.SingletonKey.VersionKey
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
+import app.models.modification.EntityTypes
 import app.models.money.ExchangeRateMeasurement
 import app.models.accounting.TransactionGroup
 import app.models.accounting.Transaction
@@ -203,7 +204,7 @@ object HybridRemoteDatabaseProxy {
         await(db.setSingletonValue(VersionKey, localDatabaseAndEntityVersion))
 
         // Add all entities
-        val allEntitiesResponse = await(apiClient.getAllEntities(EntityType.values))
+        val allEntitiesResponse = await(apiClient.getAllEntities(EntityTypes.all))
         val _ = await(Future.sequence {
           for (entityType <- allEntitiesResponse.entityTypes) yield {
             def addAllToDb[E <: Entity](implicit entityType: EntityType[E]) =
