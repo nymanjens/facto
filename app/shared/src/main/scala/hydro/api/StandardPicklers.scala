@@ -23,7 +23,7 @@ abstract class StandardPicklers {
     val valueToNumber: ImmutableBiMap[T, Int] = {
       val builder = ImmutableBiMap.builder[T, Int]()
       for ((value, number) <- values.zipWithIndex) {
-        builder.put(value, number)
+        builder.put(value, number + 1)
       }
       builder.build()
     }
