@@ -134,6 +134,7 @@ object GuavaReplacement {
     def get(key: K): V = forwardMap(key)
     def inverse(): ImmutableBiMap[V, K] = new ImmutableBiMap(backwardMap, forwardMap)
     def keySet: Set[K] = forwardMap.keySet
+    override def toString: String = forwardMap.toString
   }
   object ImmutableBiMap {
     def builder[K, V](): Builder[K, V] = new Builder[K, V]()
