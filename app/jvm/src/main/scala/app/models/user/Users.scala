@@ -34,7 +34,7 @@ object Users {
     val loginName = "robot"
     def hash(s: String) = Hashing.sha512().hashString(s, Charsets.UTF_8).toString
 
-    entityAccess.newQuerySyncForUser().findOne(ModelFields.User.loginName === loginName) match {
+    entityAccess.newQuerySync[User]().findOne(ModelFields.User.loginName === loginName) match {
       case Some(user) => user
       case None =>
         val userAddition = EntityModification.createAddWithRandomId(
@@ -49,8 +49,8 @@ object Users {
     }
   }
 
-  def authenticate(loginName: String, password: String)(implicit entityAccess: AppEntityAccess): Boolean = {
-    entityAccess.newQuerySyncForUser().findOne(ModelFields.User.loginName === loginName) match {
+  def authenticate(loginName: String, password: String)(implicit entityAccess: JvmEntityAccess): Boolean = {
+    entityAccess.newQuerySync[User]().findOne(ModelFields.User.loginName === loginName) match {
       case Some(user) if user.passwordHash == hash(password) => true
       case _                                                 => false
     }
