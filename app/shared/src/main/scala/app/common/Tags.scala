@@ -7,7 +7,7 @@ import scala.math.abs
 import scala.util.matching.Regex
 
 object Tags {
-  private val validTagRegex: Regex = """[a-zA-Z0-9-_@$&()+=!.<>;:]+""".r
+  private val validTagRegex: Regex = """[a-zA-Z0-9-_@$&()+=!.<>;: ]+""".r
   private val bootstrapClassSuffixOptions: Seq[String] =
     Seq("primary", "success", "info", "warning", "danger")
 
