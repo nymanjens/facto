@@ -1,13 +1,11 @@
 package app.scala2js
 
-import app.models._
-import hydro.models.Entity
 import app.models.access.ModelFields
-import hydro.models.access.ModelField
 import app.models.accounting._
 import app.models.modification._
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
+import hydro.models.Entity
 import hydro.scala2js.Scala2Js.Converter
 import hydro.scala2js.Scala2Js.MapConverter
 import hydro.scala2js.StandardConverters

@@ -1,7 +1,7 @@
 package app.common
 
-import com.google.inject.Inject
 import app.common.GuavaReplacement.Iterables.getOnlyElement
+import com.google.inject.Inject
 import play.api.i18n.Lang
 import play.api.i18n.Langs
 import play.api.i18n.MessagesApi

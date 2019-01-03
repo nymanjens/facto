@@ -1,10 +1,10 @@
 package app.models.accounting.config
 
-import com.google.inject._
 import app.common.testing.TestObjects._
 import app.common.testing._
 import app.models.access.JvmEntityAccess
 import app.models.user.Users
+import com.google.inject._
 import org.junit.runner._
 import org.specs2.runner._
 import play.api.test._

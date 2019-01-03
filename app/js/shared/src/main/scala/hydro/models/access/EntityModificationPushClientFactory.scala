@@ -1,7 +1,5 @@
 package hydro.models.access
 
-import app.models.access._
-import app.api.Picklers._
 import app.api.ScalaJsApi.ModificationsWithToken
 import app.api.ScalaJsApi.UpdateToken
 import boopickle.Default.Unpickle
@@ -14,9 +12,9 @@ import org.scalajs.dom.raw.Event
 
 import scala.async.Async.async
 import scala.async.Async.await
-import scala.concurrent.duration._
 import scala.concurrent.Future
 import scala.concurrent.Promise
+import scala.concurrent.duration._
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 

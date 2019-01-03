@@ -1,11 +1,12 @@
 package hydro.models.access.webworker
 
-import app.api.Picklers._
 import hydro.jsfacades.WebWorker
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.LokiQuery
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.MethodNumbers
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApiConverters._
+import hydro.scala2js.Scala2Js
+import hydro.scala2js.StandardConverters._
 import org.scalajs.dom
 import org.scalajs.dom.console
 
@@ -16,9 +17,6 @@ import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.util.Failure
 import scala.util.Success
-import hydro.scala2js.StandardConverters._
-import app.scala2js.AppConverters._
-import hydro.scala2js.Scala2Js
 
 object LocalDatabaseWebWorkerScript {
 

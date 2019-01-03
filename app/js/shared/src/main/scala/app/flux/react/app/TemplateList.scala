@@ -1,21 +1,18 @@
 package app.flux.react.app
 
 import app.common.I18n
-import hydro.common.LoggingUtils.logExceptions
-import hydro.flux.react.ReactVdomUtils.<<
 import app.flux.router.AppPages
-import hydro.flux.router.Page
-import hydro.flux.router.RouterContext
-import app.flux.react.uielements
-import hydro.flux.react.uielements.PageHeader
-import hydro.flux.react.uielements.Panel
-import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.html_<^._
 import app.models.access.AppJsEntityAccess
-import hydro.models.access.EntityAccess
 import app.models.accounting.config.Config
 import app.models.accounting.config.Template
 import app.models.user.User
+import hydro.common.LoggingUtils.logExceptions
+import hydro.flux.react.ReactVdomUtils.<<
+import hydro.flux.react.uielements.PageHeader
+import hydro.flux.react.uielements.Panel
+import hydro.flux.router.RouterContext
+import japgolly.scalajs.react._
+import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
 

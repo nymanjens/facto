@@ -1,14 +1,12 @@
 package app.models.accounting.config
 
-import hydro.models.access.DbQueryImplicits._
-
 import app.common.Require.requireNonNull
 import app.models.access.AppEntityAccess
 import app.models.access.ModelFields
-import hydro.models.access.ModelField
 import app.models.accounting.{Transaction => AccountingTransaction}
 import app.models.accounting.{TransactionGroup => AccountingTransactionGroup}
 import app.models.user.User
+import hydro.models.access.DbQueryImplicits._
 
 import scala.collection.immutable.Seq
 import scala.collection.immutable.Set

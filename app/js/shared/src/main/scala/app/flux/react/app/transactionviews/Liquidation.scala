@@ -1,5 +1,8 @@
 package app.flux.react.app.transactionviews
 
+import app.common.Formatting._
+import app.common.I18n
+import app.common.money.ExchangeRateManager
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.react.uielements
 import app.flux.router.AppPages
@@ -7,13 +10,9 @@ import app.flux.stores.entries.AccountPair
 import app.flux.stores.entries.LiquidationEntry
 import app.flux.stores.entries.factories.LiquidationEntriesStoreFactory
 import app.models.access.AppJsEntityAccess
-import hydro.models.access.EntityAccess
 import app.models.accounting.config.Account
 import app.models.accounting.config.Config
 import app.models.user.User
-import app.common.Formatting._
-import app.common.I18n
-import app.common.money.ExchangeRateManager
 import hydro.common.Unique
 import hydro.common.time.Clock
 import hydro.flux.react.ReactVdomUtils.^^

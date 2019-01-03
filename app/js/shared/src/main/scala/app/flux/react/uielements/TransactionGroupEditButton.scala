@@ -1,9 +1,8 @@
 package app.flux.react.uielements
 
 import app.common.I18n
-import hydro.flux.react.ReactVdomUtils.^^
 import app.flux.router.AppPages
-import hydro.flux.router.Page
+import hydro.flux.react.ReactVdomUtils.^^
 import hydro.flux.router.RouterContext
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._

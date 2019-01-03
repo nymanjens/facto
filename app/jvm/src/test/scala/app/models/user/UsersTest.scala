@@ -1,8 +1,8 @@
 package app.models.user
 
-import com.google.inject._
 import app.common.testing._
 import app.models.access.JvmEntityAccess
+import com.google.inject._
 import org.junit.runner._
 import org.specs2.runner._
 import play.api.test._

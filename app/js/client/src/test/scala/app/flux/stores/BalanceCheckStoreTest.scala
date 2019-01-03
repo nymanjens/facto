@@ -2,7 +2,6 @@ package app.flux.stores
 
 import app.common.testing.TestObjects._
 import app.flux.action.AppActions
-import hydro.flux.action.StandardActions
 import app.models.accounting._
 import app.models.modification.EntityModification
 import utest._
@@ -11,8 +10,6 @@ import scala.async.Async.async
 import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import hydro.scala2js.StandardConverters._
-import app.scala2js.AppConverters._
 
 object BalanceCheckStoreTest extends TestSuite {
 

@@ -1,12 +1,12 @@
 package app.flux.react.app.transactiongroupform
 
 import app.common.I18n
-import hydro.common.LoggingUtils.LogExceptionsCallback
-import hydro.common.LoggingUtils.logExceptions
 import app.common.money.Currency
 import app.common.money.ExchangeRateManager
 import app.common.money.Money
 import app.common.money.ReferenceMoney
+import hydro.common.LoggingUtils.LogExceptionsCallback
+import hydro.common.LoggingUtils.logExceptions
 import hydro.common.time.Clock
 import hydro.flux.react.ReactVdomUtils.^^
 import japgolly.scalajs.react._

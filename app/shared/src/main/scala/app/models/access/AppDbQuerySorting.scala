@@ -1,9 +1,9 @@
 package app.models.access
 
-import hydro.models.access.DbQuery.Sorting
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import hydro.models.access.DbQuery
+import hydro.models.access.DbQuery.Sorting
 
 object AppDbQuerySorting {
 

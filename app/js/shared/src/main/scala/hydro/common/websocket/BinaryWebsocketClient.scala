@@ -5,7 +5,6 @@ import java.nio.ByteBuffer
 import hydro.common.LoggingUtils.logExceptions
 import org.scalajs.dom
 import org.scalajs.dom.CloseEvent
-import org.scalajs.dom.ErrorEvent
 import org.scalajs.dom.Event
 import org.scalajs.dom.MessageEvent
 import org.scalajs.dom._

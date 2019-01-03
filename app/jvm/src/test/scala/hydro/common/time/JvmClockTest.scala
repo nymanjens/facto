@@ -3,9 +3,9 @@ package hydro.common.time
 import java.time.Duration
 import java.time.Instant
 
-import com.google.inject._
 import app.common.testing.HookedSpecification
 import app.common.testing.TestModule
+import com.google.inject._
 import hydro.common.time.JavaTimeImplicits._
 import org.specs2.matcher.MatchResult
 

@@ -6,7 +6,6 @@ import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
-import scala.scalajs.js.annotation.JSGlobal
 import scala.scalajs.js.annotation.JSImport
 
 object LokiJs {

@@ -3,26 +3,20 @@ package app.flux.stores.entries.factories
 import app.common.time.YearRange
 import app.flux.stores.entries.EntriesStore
 import app.flux.stores.entries.factories.SummaryYearsStoreFactory.State
-import hydro.models.access.DbQueryImplicits._
-
-import hydro.models.access.DbQuery
-import app.models.access.AppDbQuerySorting
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppJsEntityAccess
-import hydro.models.access.JsEntityAccess
 import app.models.access.ModelFields
-import hydro.models.access.ModelField
-import app.models.accounting.config.Account
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
+import app.models.accounting.config.Account
+import hydro.models.access.DbQuery
+import hydro.models.access.DbQueryImplicits._
 
 import scala.async.Async.async
 import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import hydro.scala2js.StandardConverters._
-import app.scala2js.AppConverters._
 
 /**
   * Store factory that calculates the year span of all transactions of an account.

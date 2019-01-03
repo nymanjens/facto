@@ -1,12 +1,11 @@
 package app.flux.stores
 
 import app.api.ScalaJsApi.UserPrototype
-import hydro.common.testing.Awaiter
 import app.common.testing.TestObjects._
 import app.flux.action.AppActions
-import hydro.flux.action.StandardActions
-import hydro.flux.stores.UserStore
 import app.models.modification.EntityModification
+import hydro.common.testing.Awaiter
+import hydro.flux.stores.UserStore
 import utest._
 
 import scala.async.Async.async
@@ -14,8 +13,6 @@ import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.concurrent.duration._
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import hydro.scala2js.StandardConverters._
-import app.scala2js.AppConverters._
 
 // Also tests `AsyncEntityDerivedStateStore`
 object UserStoreTest extends TestSuite {

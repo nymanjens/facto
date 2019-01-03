@@ -2,8 +2,6 @@ package app.models.accounting.config
 
 import java.util.Collections
 
-import com.google.common.base.Preconditions.checkNotNull
-import com.google.common.collect.ImmutableList
 import app.common.Require.requireNonNull
 import app.common.ScalaUtils.nullable
 import app.models.accounting.config.Account.{SummaryTotalRowDef => ParsedSummaryTotalRowDef}
@@ -14,6 +12,8 @@ import app.models.accounting.config.{Config => ParsedConfig}
 import app.models.accounting.config.{Constants => ParsedConstants}
 import app.models.accounting.config.{MoneyReservoir => ParsedMoneyReservoir}
 import app.models.accounting.config.{Template => ParsedTemplate}
+import com.google.common.base.Preconditions.checkNotNull
+import com.google.common.collect.ImmutableList
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.ListMap

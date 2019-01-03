@@ -5,15 +5,13 @@ import java.time.Duration
 import app.common.money.Currency.Gbp
 import app.common.testing.FakeJsEntityAccess
 import app.common.testing.TestModule
-import hydro.common.time.Clock
 import app.models.money.ExchangeRateMeasurement
 import app.models.money.JsExchangeRateManager
+import hydro.common.time.Clock
 import utest.TestSuite
 import utest._
 
 import scala.collection.immutable.Seq
-import hydro.scala2js.StandardConverters._
-import app.scala2js.AppConverters._
 
 class MoneyTest extends TestSuite {
 

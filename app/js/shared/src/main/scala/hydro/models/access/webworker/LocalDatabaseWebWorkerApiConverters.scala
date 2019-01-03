@@ -1,15 +1,14 @@
 package hydro.models.access.webworker
 
-import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation._
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.LokiQuery
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
+import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation._
+import hydro.scala2js.Scala2Js
+import hydro.scala2js.StandardConverters._
 
 import scala.collection.immutable.Seq
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
-import hydro.scala2js.StandardConverters._
-import app.scala2js.AppConverters._
-import hydro.scala2js.Scala2Js
 
 private[webworker] object LocalDatabaseWebWorkerApiConverters {
 

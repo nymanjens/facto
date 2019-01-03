@@ -1,16 +1,11 @@
 package hydro.jsfacades
 
-import hydro.common.LoggingUtils
 import hydro.common.LoggingUtils.logExceptions
 import japgolly.scalajs.react.Children
 import japgolly.scalajs.react.JsComponent
-import org.scalajs.dom
 import org.scalajs.dom.raw.KeyboardEvent
 
 import scala.scalajs.js
-import hydro.scala2js.StandardConverters._
-import app.scala2js.AppConverters._
-
 import scala.scalajs.js.annotation.JSImport
 
 object ReactContentEditable {

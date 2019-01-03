@@ -1,9 +1,9 @@
 package hydro.flux.react
 
-import japgolly.scalajs.react.vdom.html_<^._
 import japgolly.scalajs.react.vdom.TagMod
 import japgolly.scalajs.react.vdom.VdomArray
 import japgolly.scalajs.react.vdom.VdomNode
+import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
 

@@ -1,10 +1,10 @@
 package app.flux.react.uielements.input
 
-import hydro.flux.react.uielements.input.InputBase
 import hydro.common.LoggingUtils.LogExceptionsCallback
 import hydro.common.LoggingUtils.logExceptions
-import japgolly.scalajs.react._
+import hydro.flux.react.uielements.input.InputBase
 import japgolly.scalajs.react.Ref.ToScalaComponent
+import japgolly.scalajs.react._
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom._
 

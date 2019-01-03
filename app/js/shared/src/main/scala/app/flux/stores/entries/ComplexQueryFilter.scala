@@ -6,22 +6,16 @@ import app.common.money.Money
 import app.flux.stores.entries.ComplexQueryFilter.Prefix
 import app.flux.stores.entries.ComplexQueryFilter.QueryFilterPair
 import app.flux.stores.entries.ComplexQueryFilter.QueryPart
-import hydro.models.access.DbQueryImplicits._
-
-import hydro.models.access.DbQuery
-import app.models.access.AppDbQuerySorting
-import app.models.access.AppDbQuerySorting
 import app.models.access.AppJsEntityAccess
-import hydro.models.access.JsEntityAccess
 import app.models.access.ModelFields
-import hydro.models.access.ModelField
 import app.models.accounting._
 import app.models.accounting.config.Config
+import hydro.models.access.DbQueryImplicits._
+import hydro.models.access.DbQuery
+import hydro.models.access.ModelField
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
-import hydro.scala2js.StandardConverters._
-import app.scala2js.AppConverters._
 
 private[stores] final class ComplexQueryFilter(implicit entityAccess: AppJsEntityAccess,
                                                accountingConfig: Config) {

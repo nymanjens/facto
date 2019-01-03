@@ -4,14 +4,12 @@ import app.common.testing.TestObjects.testCategory
 import app.common.testing.TestObjects._
 import app.flux.stores.entries.ComplexQueryFilter.Prefix
 import app.flux.stores.entries.ComplexQueryFilter.QueryPart
-import hydro.models.access.EntityAccess
 import app.models.accounting.Transaction
+import hydro.models.access.EntityAccess
 import utest._
 
 import scala.collection.immutable.Seq
 import scala.language.reflectiveCalls
-import hydro.scala2js.StandardConverters._
-import app.scala2js.AppConverters._
 
 object ComplexQueryFilterTest extends TestSuite {
 

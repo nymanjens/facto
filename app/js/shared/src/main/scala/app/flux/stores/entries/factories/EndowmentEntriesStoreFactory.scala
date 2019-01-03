@@ -1,26 +1,19 @@
 package app.flux.stores.entries.factories
 
 import app.flux.stores.entries.GeneralEntry
-import hydro.models.access.DbQueryImplicits._
-
-import hydro.models.access.DbQuery
-import app.models.access.AppDbQuerySorting
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppJsEntityAccess
-import hydro.models.access.JsEntityAccess
 import app.models.access.ModelFields
-import hydro.models.access.ModelField
-import app.models.accounting.config.Account
-import app.models.accounting.config.Config
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
+import app.models.accounting.config.Account
+import app.models.accounting.config.Config
+import hydro.models.access.DbQueryImplicits._
 
 import scala.async.Async.async
 import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import hydro.scala2js.StandardConverters._
-import app.scala2js.AppConverters._
 
 final class EndowmentEntriesStoreFactory(implicit entityAccess: AppJsEntityAccess, accountingConfig: Config)
     extends EntriesListStoreFactory[GeneralEntry, Account] {

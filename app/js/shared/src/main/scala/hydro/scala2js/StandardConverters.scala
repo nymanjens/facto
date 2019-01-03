@@ -3,17 +3,16 @@ package hydro.scala2js
 import java.time.LocalDate
 import java.time.LocalTime
 
-import app.models._
-import hydro.models.Entity
+import app.common.GuavaReplacement.ImmutableBiMap
+import app.common.OrderToken
 import app.models.access.ModelFields
-import hydro.models.access.ModelField
 import app.models.modification._
 import app.scala2js.AppConverters
 import app.scala2js.AppConverters.EntityTypeConverter
 import app.scala2js.AppConverters.fromEntityType
-import app.common.GuavaReplacement.ImmutableBiMap
-import app.common.OrderToken
 import hydro.common.time.LocalDateTime
+import hydro.models.Entity
+import hydro.models.access.ModelField
 import hydro.scala2js.Scala2Js.Converter
 import hydro.scala2js.Scala2Js.MapConverter
 

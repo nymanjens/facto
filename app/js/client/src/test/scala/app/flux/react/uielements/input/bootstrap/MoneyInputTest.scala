@@ -1,8 +1,6 @@
 package app.flux.react.uielements.input.bootstrap
 
 import app.flux.react.uielements.input.bootstrap.MoneyInput.StringArithmetic
-import hydro.scala2js.StandardConverters._
-import app.scala2js.AppConverters._
 import utest._
 
 object MoneyInputTest extends TestSuite {

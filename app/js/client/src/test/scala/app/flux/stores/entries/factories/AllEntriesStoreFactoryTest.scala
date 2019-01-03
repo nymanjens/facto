@@ -2,22 +2,20 @@ package app.flux.stores.entries.factories
 
 import java.time.Month.JANUARY
 
-import app.common.testing.TestObjects._
-import hydro.common.testing.Awaiter
 import app.common.testing.FakeJsEntityAccess
-import hydro.common.time.LocalDateTime
-import hydro.common.time.LocalDateTimes.createDateTime
+import app.common.testing.TestObjects._
 import app.flux.stores.entries.GeneralEntry.toGeneralEntrySeq
 import app.models.accounting._
 import app.models.modification.EntityModification
+import hydro.common.testing.Awaiter
+import hydro.common.time.LocalDateTime
+import hydro.common.time.LocalDateTimes.createDateTime
 import utest._
 
 import scala.async.Async.async
 import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import hydro.scala2js.StandardConverters._
-import app.scala2js.AppConverters._
 
 // Also tests `AsyncEntityDerivedStateStore`, `EntriesStoreFactory` and `EntriesStore`.
 object AllEntriesStoreFactoryTest extends TestSuite {

@@ -3,21 +3,11 @@ package app.common.testing
 import app.api.ScalaJsApi.GetAllEntitiesResponse
 import app.api.ScalaJsApi.UserPrototype
 import app.api.ScalaJsApiClient
-import hydro.models.Entity
-import hydro.models.access.DbQuery
-import app.models.access.AppDbQuerySorting
-import app.models.access.AppDbQuerySorting
-import hydro.models.access.DbQueryExecutor
-import app.models.access.AppDbQuerySortingExecutor
-
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
-import app.models.modification.EntityTypes
-import app.models.money.ExchangeRateMeasurement
-import app.models.accounting.TransactionGroup
-import app.models.accounting.Transaction
-import app.models.accounting.BalanceCheck
-import app.models.user.User
+import hydro.models.Entity
+import hydro.models.access.DbQuery
+import hydro.models.access.DbQueryExecutor
 
 import scala.async.Async.async
 import scala.async.Async.await

@@ -4,11 +4,7 @@ import java.nio.ByteBuffer
 import java.time.Instant
 
 import app.api.Picklers._
-import boopickle.Default.Pickle
-import boopickle.Default.Unpickle
 import app.common.accounting.Tags
-import hydro.common.time.LocalDateTime
-import hydro.models.Entity
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup
@@ -19,6 +15,10 @@ import app.models.slick.SlickUtils.dbApi.{Table => SlickTable, Tag => SlickTag, 
 import app.models.slick.SlickUtils.instantToSqlTimestampMapper
 import app.models.slick.SlickUtils.localDateTimeToSqlDateMapper
 import app.models.user.User
+import boopickle.Default.Pickle
+import boopickle.Default.Unpickle
+import hydro.common.time.LocalDateTime
+import hydro.models.Entity
 
 import scala.collection.immutable.Seq
 

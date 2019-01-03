@@ -3,8 +3,6 @@ package hydro.common
 import hydro.common.Listenable.ListenableMap
 import hydro.common.Listenable.WritableListenable
 import hydro.common.testing.Awaiter
-import hydro.scala2js.StandardConverters._
-import app.scala2js.AppConverters._
 import utest.TestSuite
 import utest._
 

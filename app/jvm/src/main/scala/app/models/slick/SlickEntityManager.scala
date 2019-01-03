@@ -1,8 +1,8 @@
 package app.models.slick
 
-import hydro.models.Entity
-import app.models.slick.SlickUtils.dbApi.{Table => SlickTable, Tag => SlickTag, _}
+import app.models.slick.SlickUtils.dbApi._
 import app.models.slick.SlickUtils.dbRun
+import hydro.models.Entity
 
 import scala.collection.immutable.Seq
 

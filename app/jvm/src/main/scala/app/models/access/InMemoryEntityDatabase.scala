@@ -4,19 +4,16 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.ConcurrentSkipListSet
 
-import hydro.models.Entity
 import app.models.access.InMemoryEntityDatabase.EntitiesFetcher
+import app.models.accounting.BalanceCheck
+import app.models.accounting.Transaction
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
 import app.models.modification.EntityTypes
-import app.models.money.ExchangeRateMeasurement
-import app.models.accounting.TransactionGroup
-import app.models.accounting.Transaction
-import app.models.accounting.BalanceCheck
-import app.models.user.User
-
-import hydro.models.access.DbQueryExecutor
+import hydro.models.Entity
 import hydro.models.access.DbQuery
+import hydro.models.access.DbQueryExecutor
+
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
 

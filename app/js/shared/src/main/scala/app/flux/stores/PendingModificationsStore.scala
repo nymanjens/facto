@@ -1,19 +1,15 @@
 package app.flux.stores
 
 import app.flux.stores.PendingModificationsStore.State
-import hydro.flux.stores.StateStore
 import app.models.access.AppJsEntityAccess
-import hydro.models.access.JsEntityAccess
-import app.models.accounting.Transaction
-import app.models.modification.EntityModification
-import app.models.modification.EntityType
-import app.models.modification.EntityTypes
-import app.models.money.ExchangeRateMeasurement
-import app.models.accounting.TransactionGroup
-import app.models.accounting.Transaction
 import app.models.accounting.BalanceCheck
+import app.models.accounting.Transaction
+import app.models.accounting.TransactionGroup
+import app.models.modification.EntityModification
+import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
-import app.models.user.User
+import hydro.flux.stores.StateStore
+import hydro.models.access.JsEntityAccess
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable

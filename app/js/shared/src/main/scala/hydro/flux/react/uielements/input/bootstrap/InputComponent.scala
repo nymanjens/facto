@@ -7,9 +7,9 @@ import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.ReactVdomUtils.^^
 import hydro.flux.react.uielements.input.InputBase
 import hydro.flux.react.uielements.input.InputValidator
+import japgolly.scalajs.react.Ref.ToScalaComponent
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.component.Scala.MountedImpure
-import japgolly.scalajs.react.Ref.ToScalaComponent
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom.html_<^._
 import org.scalajs.dom.console

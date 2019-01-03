@@ -2,8 +2,8 @@ package hydro.common.websocket
 
 import java.nio.ByteBuffer
 
-import hydro.common.LoggingUtils.logExceptions
 import app.common.ScalaUtils.toPromise
+import hydro.common.LoggingUtils.logExceptions
 import org.scalajs.dom._
 
 import scala.async.Async.async

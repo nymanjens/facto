@@ -1,13 +1,13 @@
 package hydro.common
 
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import app.common.ScalaUtils.visibleForTesting
 import hydro.common.Listenable.FlatMappedListenable
 import hydro.common.Listenable.Listener
-import app.common.ScalaUtils.visibleForTesting
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.util.Success
 
 sealed trait Listenable[T] {

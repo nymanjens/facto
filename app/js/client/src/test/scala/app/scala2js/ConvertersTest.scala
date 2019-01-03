@@ -3,17 +3,14 @@ package app.scala2js
 import java.time.Month.MARCH
 
 import app.common.testing.TestObjects._
-import hydro.common.time.LocalDateTime
 import app.models.access.ModelFields
-import hydro.models.access.ModelField
 import app.models.accounting._
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
-import app.models.modification.EntityTypes
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
-import hydro.scala2js.StandardConverters._
 import app.scala2js.AppConverters._
+import hydro.common.time.LocalDateTime
 import utest._
 
 import scala.collection.immutable.Seq

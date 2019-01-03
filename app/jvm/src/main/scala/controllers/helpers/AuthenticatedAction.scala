@@ -1,11 +1,9 @@
 package controllers.helpers
 
-import hydro.models.access.DbQueryImplicits._
-
 import app.models.access.JvmEntityAccess
 import app.models.access.ModelFields
-import hydro.models.access.ModelField
 import app.models.user.User
+import hydro.models.access.DbQueryImplicits._
 import play.api.mvc._
 
 abstract class AuthenticatedAction[A](bodyParser: BodyParser[A])(implicit entityAccess: JvmEntityAccess,

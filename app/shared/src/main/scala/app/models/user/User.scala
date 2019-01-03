@@ -1,7 +1,6 @@
 package app.models.user
 
 import app.models.modification.EntityType
-import app.models.modification.EntityTypes
 import hydro.models.Entity
 
 case class User(loginName: String,

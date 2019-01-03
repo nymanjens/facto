@@ -4,28 +4,25 @@ import app.common.money.Currency
 import app.common.money.ExchangeRateManager
 import app.common.money.MoneyWithGeneralCurrency
 import app.common.money.ReferenceMoney
-import hydro.common.time.JavaTimeImplicits._
 import app.common.time.DatedMonth
-import hydro.common.time.LocalDateTime
+import app.flux.stores.entries.ComplexQueryFilter
+import app.flux.stores.entries.EntriesStore
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.DateToBalanceFunction
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForMonth
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForYear
-import app.flux.stores.entries.ComplexQueryFilter
-import app.flux.stores.entries.EntriesStore
-import hydro.models.access.DbQueryImplicits._
-
-import hydro.models.access.DbQuery
-import app.models.access.AppDbQuerySorting
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppJsEntityAccess
-import hydro.models.access.JsEntityAccess
 import app.models.access.ModelFields
-import hydro.models.access.ModelField
+import app.models.accounting.BalanceCheck
+import app.models.accounting.Transaction
 import app.models.accounting.config.Account
 import app.models.accounting.config.Config
 import app.models.accounting.config.MoneyReservoir
-import app.models.accounting.BalanceCheck
-import app.models.accounting.Transaction
+import hydro.common.time.JavaTimeImplicits._
+import hydro.common.time.LocalDateTime
+import hydro.models.access.DbQueryImplicits._
+import hydro.models.access.DbQuery
+import hydro.models.access.ModelField
 
 import scala.async.Async.async
 import scala.async.Async.await
@@ -34,8 +31,6 @@ import scala.collection.immutable.SortedMap
 import scala.collection.mutable
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import hydro.scala2js.StandardConverters._
-import app.scala2js.AppConverters._
 
 /**
   * Store factory that calculates the monthly gains and losses made by exchange rate fluctuations in a given year.

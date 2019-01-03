@@ -1,15 +1,13 @@
 package app.models.accounting
 
 import app.common.money.DatedMoney
-import hydro.common.time.LocalDateTime
-import hydro.models.Entity
 import app.models.access.AppEntityAccess
 import app.models.accounting.config.Config
 import app.models.accounting.config.MoneyReservoir
 import app.models.modification.EntityType
-import app.models.modification.EntityTypes
-import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
+import hydro.common.time.LocalDateTime
+import hydro.models.Entity
 
 /** BalanceCheck entities are immutable. Just delete and create a new one when updating. */
 case class BalanceCheck(issuerId: Long,

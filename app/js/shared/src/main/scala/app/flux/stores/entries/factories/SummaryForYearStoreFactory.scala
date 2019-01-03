@@ -3,31 +3,26 @@ package app.flux.stores.entries.factories
 import app.common.money.ExchangeRateManager
 import app.common.money.ReferenceMoney
 import app.common.time.DatedMonth
-import hydro.common.time.LocalDateTime
-import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
 import app.flux.stores.entries.ComplexQueryFilter
 import app.flux.stores.entries.EntriesStore
-import hydro.models.access.DbQueryImplicits._
-
-import hydro.models.access.DbQuery
-import app.models.access.AppDbQuerySorting
+import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppJsEntityAccess
-import hydro.models.access.JsEntityAccess
 import app.models.access.ModelFields
-import hydro.models.access.ModelField
+import app.models.accounting.BalanceCheck
+import app.models.accounting.Transaction
 import app.models.accounting.config.Account
 import app.models.accounting.config.Category
 import app.models.accounting.config.Config
-import app.models.accounting.BalanceCheck
-import app.models.accounting.Transaction
+import hydro.common.time.LocalDateTime
+import hydro.models.access.DbQueryImplicits._
+import hydro.models.access.DbQuery
+import hydro.models.access.ModelField
 
 import scala.async.Async.async
 import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import hydro.scala2js.StandardConverters._
-import app.scala2js.AppConverters._
 
 final class SummaryForYearStoreFactory(implicit entityAccess: AppJsEntityAccess,
                                        accountingConfig: Config,

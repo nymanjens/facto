@@ -1,26 +1,25 @@
 package app.flux.react.app
 
 import app.common.I18n
-import hydro.common.LoggingUtils.LogExceptionsCallback
-import hydro.common.LoggingUtils.logExceptions
 import app.common.money.ExchangeRateManager
-import hydro.common.time.Clock
-import hydro.flux.react.ReactVdomUtils.<<
-import hydro.flux.react.ReactVdomUtils.^^
 import app.flux.router.AppPages
-import hydro.flux.router.Page
-import hydro.flux.router.RouterContext
 import app.flux.stores.entries.factories.AllEntriesStoreFactory
-import hydro.flux.react.HydroReactComponent
-import hydro.flux.react.uielements.input.TextInput
-import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.html_<^._
-import hydro.jsfacades.Mousetrap
 import app.models.access.AppJsEntityAccess
-import hydro.models.access.EntityAccess
 import app.models.accounting.config.Config
 import app.models.accounting.config.Template
 import app.models.user.User
+import hydro.common.LoggingUtils.LogExceptionsCallback
+import hydro.common.LoggingUtils.logExceptions
+import hydro.common.time.Clock
+import hydro.flux.react.HydroReactComponent
+import hydro.flux.react.ReactVdomUtils.<<
+import hydro.flux.react.ReactVdomUtils.^^
+import hydro.flux.react.uielements.input.TextInput
+import hydro.flux.router.Page
+import hydro.flux.router.RouterContext
+import hydro.jsfacades.Mousetrap
+import japgolly.scalajs.react._
+import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
 

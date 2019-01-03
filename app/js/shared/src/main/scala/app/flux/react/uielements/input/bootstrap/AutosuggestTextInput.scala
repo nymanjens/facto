@@ -1,19 +1,18 @@
 package app.flux.react.uielements.input.bootstrap
 
 import app.common.I18n
-import hydro.flux.react.uielements.input.bootstrap.InputComponent.Props
-import hydro.flux.react.uielements.input.bootstrap.InputComponent.ValueTransformer
 import hydro.flux.react.uielements.input.InputBase
 import hydro.flux.react.uielements.input.InputValidator
 import hydro.flux.react.uielements.input.bootstrap.InputComponent
+import hydro.flux.react.uielements.input.bootstrap.InputComponent.Props
+import hydro.flux.react.uielements.input.bootstrap.InputComponent.ValueTransformer
+import hydro.jsfacades.ReactAutosuggest
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.raw.React
 import japgolly.scalajs.react.vdom.VdomElement
 import japgolly.scalajs.react.vdom.html_<^._
-import hydro.jsfacades.ReactAutosuggest
 
 import scala.collection.immutable.Seq
-import scala.scalajs.js
 
 object AutosuggestTextInput {
 

@@ -1,21 +1,20 @@
 package app.flux.react.app.transactionviews
 
+import app.common.I18n
+import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
+import app.flux.stores.entries.WithIsPending
+import app.flux.stores.entries.factories.EntriesListStoreFactory
 import hydro.common.LoggingUtils.LogExceptionsCallback
 import hydro.common.LoggingUtils.logExceptions
-import app.common.I18n
 import hydro.common.Unique
 import hydro.flux.react.ReactVdomUtils.<<
-import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
-import app.flux.react.uielements
 import hydro.flux.react.uielements.Table
 import hydro.flux.react.uielements.Table.TableRowData
 import hydro.flux.stores.StateStore
-import app.flux.stores.entries.WithIsPending
-import app.flux.stores.entries.factories.EntriesListStoreFactory
-import japgolly.scalajs.react.vdom.html_<^.VdomElement
-import japgolly.scalajs.react.vdom.html_<^._
 import japgolly.scalajs.react.Callback
 import japgolly.scalajs.react._
+import japgolly.scalajs.react.vdom.html_<^.VdomElement
+import japgolly.scalajs.react.vdom.html_<^._
 import org.scalajs.dom.console
 
 import scala.collection.immutable.Seq

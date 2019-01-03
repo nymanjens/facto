@@ -2,15 +2,14 @@ package controllers
 
 import java.net.URL
 
-import app.api.Picklers._
+import app.common.GuavaReplacement.Splitter
+import app.common.ResourceFiles
+import app.models.access.JvmEntityAccess
 import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
 import com.google.common.io.Resources
 import com.google.inject.Inject
-import app.common.GuavaReplacement.Splitter
-import app.common.ResourceFiles
 import hydro.common.time.Clock
-import app.models.access.JvmEntityAccess
 import play.api.Mode
 import play.api.i18n.I18nSupport
 import play.api.i18n.MessagesApi

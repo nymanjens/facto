@@ -2,16 +2,15 @@ package app.flux.react.app.transactiongroupform
 
 import app.common.I18n
 import app.common.money.ExchangeRateManager
-import hydro.common.time.Clock
-import hydro.flux.action.Dispatcher
 import app.flux.stores.GlobalMessagesStore
 import app.flux.stores.entries.factories.LiquidationEntriesStoreFactory
 import app.flux.stores.entries.factories.TagsStoreFactory
-import hydro.flux.react.uielements.PageHeader
 import app.models.access.AppJsEntityAccess
-import hydro.models.access.JsEntityAccess
 import app.models.accounting.config.Config
 import app.models.user.User
+import hydro.common.time.Clock
+import hydro.flux.action.Dispatcher
+import hydro.flux.react.uielements.PageHeader
 
 final class Module(implicit i18n: I18n,
                    accountingConfig: Config,

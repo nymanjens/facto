@@ -2,9 +2,9 @@ package app.models.modification
 
 import java.time.Instant
 
-import hydro.models.Entity
 import app.models.access.AppEntityAccess
 import app.models.user.User
+import hydro.models.Entity
 
 /**
   * Symbolises a modification to an entity.

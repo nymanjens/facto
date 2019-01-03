@@ -3,9 +3,6 @@ package hydro.common
 import utest.TestSuite
 import utest._
 
-import hydro.scala2js.StandardConverters._
-import app.scala2js.AppConverters._
-
 object JsI18nTest extends TestSuite {
 
   override def tests = TestSuite {

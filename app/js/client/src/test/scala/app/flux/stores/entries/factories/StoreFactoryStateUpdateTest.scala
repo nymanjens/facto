@@ -1,23 +1,21 @@
 package app.flux.stores.entries.factories
 
-import hydro.models.access.DbQueryImplicits._
-
 import java.time.Month._
 
-import app.common.testing.TestObjects._
 import app.common.testing.FakeJsEntityAccess
 import app.common.testing.TestModule
-import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForYear
-import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
+import app.common.testing.TestObjects._
 import app.flux.stores.entries.AccountPair
 import app.flux.stores.entries.ComplexQueryFilter
 import app.flux.stores.entries.EntriesStore
-import hydro.models.Entity
+import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForYear
+import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
 import app.models.access.ModelFields
-import hydro.models.access.ModelField
 import app.models.accounting._
 import app.models.modification.EntityModification._
 import app.models.modification._
+import hydro.models.Entity
+import hydro.models.access.DbQueryImplicits._
 import utest._
 
 import scala.async.Async.async
@@ -26,8 +24,6 @@ import scala.collection.immutable.ListMap
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import hydro.scala2js.StandardConverters._
-import app.scala2js.AppConverters._
 
 object StoreFactoryStateUpdateTest extends TestSuite {
 

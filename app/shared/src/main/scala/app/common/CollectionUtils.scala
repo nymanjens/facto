@@ -1,7 +1,7 @@
 package app.common
 
-import scala.collection.immutable.Seq
 import scala.collection.immutable.ListMap
+import scala.collection.immutable.Seq
 
 object CollectionUtils {
 

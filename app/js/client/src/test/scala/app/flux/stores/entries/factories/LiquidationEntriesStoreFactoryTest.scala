@@ -3,16 +3,16 @@ package app.flux.stores.entries.factories
 import java.time.Month.JANUARY
 
 import app.common.money.ReferenceMoney
-import app.common.testing.TestObjects._
 import app.common.testing.FakeJsEntityAccess
 import app.common.testing.TestModule
-import hydro.common.time.LocalDateTimes.createDateTime
+import app.common.testing.TestObjects._
 import app.flux.stores.entries.AccountPair
 import app.flux.stores.entries.LiquidationEntry
 import app.models.accounting._
 import app.models.accounting.config.Account
 import app.models.accounting.config.MoneyReservoir
 import app.models.modification.EntityModification
+import hydro.common.time.LocalDateTimes.createDateTime
 import utest._
 
 import scala.async.Async.async
@@ -20,8 +20,6 @@ import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import hydro.scala2js.StandardConverters._
-import app.scala2js.AppConverters._
 
 object LiquidationEntriesStoreFactoryTest extends TestSuite {
 

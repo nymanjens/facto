@@ -1,15 +1,15 @@
 package app.flux.router
 
 import app.common.I18n
-import japgolly.scalajs.react.extra.router.Path
-import hydro.models.access.EntityAccess
 import app.models.accounting.BalanceCheck
 import app.models.accounting.config.Account
 import app.models.accounting.config.MoneyReservoir
 import app.models.accounting.config.Template
-import hydro.flux.router.Page
 import hydro.flux.router.Page.PageBase
+import hydro.flux.router.Page
 import hydro.flux.router.RouterContext
+import hydro.models.access.EntityAccess
+import japgolly.scalajs.react.extra.router.Path
 
 import scala.concurrent.Future
 import scala.scalajs.js

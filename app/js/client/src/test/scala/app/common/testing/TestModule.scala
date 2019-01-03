@@ -1,9 +1,8 @@
 package app.common.testing
 
-import hydro.flux.action.Dispatcher
+import app.models.money.JsExchangeRateManager
 import hydro.flux.action.Dispatcher
 import hydro.models.access.EntityModificationPushClientFactory
-import app.models.money.JsExchangeRateManager
 
 class TestModule {
 

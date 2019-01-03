@@ -2,9 +2,9 @@ package app.flux.stores.entries
 
 import app.common.money.DatedMoney
 import app.common.money.MoneyWithGeneralCurrency
-import app.models.accounting.config.Config
 import app.models.accounting.Transaction
 import app.models.accounting._
+import app.models.accounting.config.Config
 
 import scala.collection.immutable.Seq
 

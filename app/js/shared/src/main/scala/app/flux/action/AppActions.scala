@@ -1,9 +1,9 @@
 package app.flux.action
 
-import hydro.flux.action.Action
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup
+import hydro.flux.action.Action
 
 import scala.collection.immutable.Seq
 

@@ -6,14 +6,14 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.Month.JANUARY
 
-import com.google.inject.Inject
 import app.common.ResourceFiles
-import hydro.common.time.Clock
-import hydro.common.time.LocalDateTime
 import app.models.access.JvmEntityAccess
 import app.models.modification.EntityModification
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.Users
+import com.google.inject.Inject
+import hydro.common.time.Clock
+import hydro.common.time.LocalDateTime
 import play.api.Application
 import play.api.Mode
 

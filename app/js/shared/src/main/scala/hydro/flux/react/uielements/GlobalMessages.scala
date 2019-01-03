@@ -1,9 +1,8 @@
 package hydro.flux.react.uielements
 
-import hydro.common.LoggingUtils.logExceptions
-import app.flux.react.app.Menu
 import app.flux.stores.GlobalMessagesStore
 import app.flux.stores.GlobalMessagesStore.Message
+import hydro.common.LoggingUtils.logExceptions
 import hydro.flux.react.HydroReactComponent
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._

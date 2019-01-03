@@ -1,29 +1,21 @@
 package hydro.models.access
 
-import app.common.ScalaUtils.visibleForTesting
+import app.models.modification.EntityModification
+import app.models.modification.EntityType
+import app.models.modification.EntityTypes
+import app.scala2js.AppConverters._
 import hydro.jsfacades.LokiJs
 import hydro.jsfacades.LokiJs.FilterFactory.Operation
 import hydro.models.Entity
-import app.models.access._
 import hydro.models.access.LocalDatabaseImpl.ModificationWithId
 import hydro.models.access.LocalDatabaseImpl.SecondaryIndexFunction
 import hydro.models.access.LocalDatabaseImpl.Singleton
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.LokiQuery
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
-import app.models.modification.EntityModification
-import app.models.access._
-import app.models.modification.EntityType
-import app.models.modification.EntityTypes
-import app.models.money.ExchangeRateMeasurement
-import app.models.accounting.TransactionGroup
-import app.models.accounting.Transaction
-import app.models.accounting.BalanceCheck
-import app.models.user.User
-import org.scalajs.dom.console
-import hydro.scala2js.StandardConverters._
-import app.scala2js.AppConverters._
 import hydro.scala2js.Scala2Js
+import hydro.scala2js.StandardConverters._
+import org.scalajs.dom.console
 
 import scala.async.Async.async
 import scala.async.Async.await

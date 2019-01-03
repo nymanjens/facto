@@ -1,20 +1,11 @@
 package hydro.models.access
 
 import app.common.GuavaReplacement.ImmutableSetMultimap
-import hydro.models.Entity
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
-import app.models.modification.EntityTypes
-import app.models.money.ExchangeRateMeasurement
-import app.models.accounting.TransactionGroup
-import app.models.accounting.Transaction
-import app.models.accounting.BalanceCheck
-import app.models.user.User
+import hydro.models.Entity
 
 import scala.collection.immutable.Seq
-import hydro.scala2js.StandardConverters._
-import app.scala2js.AppConverters._
-import app.models.access._
 
 case class PendingModifications(modifications: Seq[EntityModification], persistedLocally: Boolean) {
   private val addModificationIds: ImmutableSetMultimap[EntityType.any, Long] = {

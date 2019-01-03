@@ -1,6 +1,5 @@
 package hydro.scala2js
 
-import app.models.access.ModelFields
 import hydro.models.access.ModelField
 
 import scala.scalajs.js

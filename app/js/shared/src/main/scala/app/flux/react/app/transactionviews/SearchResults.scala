@@ -1,21 +1,20 @@
 package app.flux.react.app.transactionviews
 
-import hydro.flux.react.uielements.PageHeader
-import hydro.flux.react.uielements.Panel
 import app.common.Formatting._
 import app.common.I18n
 import app.common.money.ExchangeRateManager
-import hydro.common.time.Clock
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
-import hydro.flux.router.RouterContext
 import app.flux.react.uielements
 import app.flux.stores.entries.GeneralEntry
 import app.flux.stores.entries.factories.ComplexQueryStoreFactory
+import app.models.access.AppJsEntityAccess
+import app.models.accounting.config.Config
+import hydro.common.time.Clock
+import hydro.flux.react.uielements.PageHeader
+import hydro.flux.react.uielements.Panel
+import hydro.flux.router.RouterContext
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
-import app.models.access.AppJsEntityAccess
-import hydro.models.access.EntityAccess
-import app.models.accounting.config.Config
 
 import scala.collection.immutable.Seq
 

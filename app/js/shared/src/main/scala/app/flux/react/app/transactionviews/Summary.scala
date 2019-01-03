@@ -1,20 +1,18 @@
 package app.flux.react.app.transactionviews
 
 import app.common.I18n
-import hydro.common.LoggingUtils.LogExceptionsCallback
-import hydro.common.LoggingUtils.logExceptions
 import app.common.money.ExchangeRateManager
-import hydro.common.time.Clock
-import hydro.flux.router.RouterContext
-import app.flux.react.uielements
-import hydro.flux.react.uielements.PageHeader
-import hydro.flux.react.uielements.input.TextInput
-import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.html_<^._
 import app.models.access.AppJsEntityAccess
-import hydro.models.access.EntityAccess
 import app.models.accounting.config.Config
 import app.models.user.User
+import hydro.common.LoggingUtils.LogExceptionsCallback
+import hydro.common.LoggingUtils.logExceptions
+import hydro.common.time.Clock
+import hydro.flux.react.uielements.PageHeader
+import hydro.flux.react.uielements.input.TextInput
+import hydro.flux.router.RouterContext
+import japgolly.scalajs.react._
+import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
 

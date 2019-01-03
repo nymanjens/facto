@@ -3,12 +3,12 @@ package hydro.models.access.webworker
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.LokiQuery
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApiConverters._
+import hydro.scala2js.Scala2Js
 import utest._
 
 import scala.collection.immutable.Seq
 import scala.language.reflectiveCalls
 import scala.scalajs.js
-import hydro.scala2js.Scala2Js
 
 object LocalDatabaseWebWorkerApiConvertersTest extends TestSuite {
 

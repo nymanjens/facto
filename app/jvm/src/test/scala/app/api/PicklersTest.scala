@@ -4,22 +4,17 @@ import java.time.Month._
 
 import app.api.Picklers._
 import app.api.ScalaJsApi._
-import boopickle.Default._
-import boopickle.Pickler
 import app.common.money.Currency
 import app.common.testing.TestObjects._
 import app.common.testing._
-import hydro.common.time.LocalDateTimes
 import app.models.accounting.Transaction
 import app.models.accounting.config.Config
 import app.models.modification.EntityModification
 import app.models.modification.EntityType
-import app.models.modification.EntityTypes
 import app.models.money.ExchangeRateMeasurement
-import app.models.accounting.TransactionGroup
-import app.models.accounting.Transaction
-import app.models.accounting.BalanceCheck
-import app.models.user.User
+import boopickle.Default._
+import boopickle.Pickler
+import hydro.common.time.LocalDateTimes
 import org.junit.runner._
 import org.specs2.runner._
 

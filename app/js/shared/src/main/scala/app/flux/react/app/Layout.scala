@@ -2,24 +2,21 @@ package app.flux.react.app
 
 import app.common.CollectionUtils.ifThenSeq
 import app.common.I18n
+import app.models.access.AppJsEntityAccess
+import app.models.user.User
 import hydro.common.LoggingUtils.LogExceptionsCallback
-import hydro.flux.react.ReactVdomUtils.^^
-import app.flux.router.AppPages
-import hydro.flux.router.Page
-import hydro.flux.router.RouterContext
-import hydro.flux.router.StandardPages
 import hydro.flux.action.Dispatcher
 import hydro.flux.action.StandardActions
+import hydro.flux.react.ReactVdomUtils.^^
 import hydro.flux.react.uielements.ApplicationDisconnectedIcon
 import hydro.flux.react.uielements.GlobalMessages
 import hydro.flux.react.uielements.PageLoadingSpinner
 import hydro.flux.react.uielements.PendingModificationsCounter
+import hydro.flux.router.RouterContext
+import hydro.flux.router.StandardPages
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.PackageBase.VdomAttr
 import japgolly.scalajs.react.vdom.html_<^._
-import app.models.access.AppJsEntityAccess
-import hydro.models.access.JsEntityAccess
-import app.models.user.User
 import org.scalajs.dom
 
 import scala.collection.immutable.Seq

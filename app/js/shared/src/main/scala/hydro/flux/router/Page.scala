@@ -1,12 +1,9 @@
 package hydro.flux.router
 
-import app.flux.router.RouterFactory
-import hydro.models.access.EntityAccess
 import app.common.I18n
-import japgolly.scalajs.react.extra.router.Path
+import hydro.models.access.EntityAccess
 
 import scala.concurrent.Future
-import scala.scalajs.js
 
 trait Page {
   def title(implicit i18n: I18n, entityAccess: EntityAccess): Future[String]

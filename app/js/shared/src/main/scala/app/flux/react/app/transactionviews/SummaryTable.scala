@@ -2,22 +2,15 @@ package app.flux.react.app.transactionviews
 
 import app.common.CollectionUtils.ifThenSeq
 import app.common.I18n
-import hydro.common.LoggingUtils.LogExceptionsCallback
-import hydro.common.LoggingUtils.logExceptions
 import app.common.ScalaUtils.visibleForTesting
 import app.common.accounting.Tags
 import app.common.money.Currency
 import app.common.money.ExchangeRateManager
 import app.common.money.ReferenceMoney
-import hydro.common.time.Clock
 import app.common.time.DatedMonth
 import app.common.time.YearRange
-import hydro.flux.react.ReactVdomUtils._
-import app.flux.router.AppPages
-import hydro.flux.router.Page
-import hydro.flux.router.RouterContext
 import app.flux.react.uielements
-import hydro.flux.stores.StateStore
+import app.flux.router.AppPages
 import app.flux.stores.entries._
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForYear
 import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryCell
@@ -26,15 +19,20 @@ import app.flux.stores.entries.factories.CashFlowEntriesStoreFactory
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory
 import app.flux.stores.entries.factories.SummaryForYearStoreFactory
 import app.flux.stores.entries.factories.SummaryYearsStoreFactory
-import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.html_<^._
 import app.models.access.AppJsEntityAccess
-import hydro.models.access.EntityAccess
 import app.models.accounting.config.Account.SummaryTotalRowDef
 import app.models.accounting.config.Account
 import app.models.accounting.config.Category
 import app.models.accounting.config.Config
 import app.models.user.User
+import hydro.common.LoggingUtils.LogExceptionsCallback
+import hydro.common.LoggingUtils.logExceptions
+import hydro.common.time.Clock
+import hydro.flux.react.ReactVdomUtils._
+import hydro.flux.router.RouterContext
+import hydro.flux.stores.StateStore
+import japgolly.scalajs.react._
+import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.ListMap
 import scala.collection.immutable.Seq

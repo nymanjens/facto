@@ -3,10 +3,7 @@ package app.flux.react.uielements.input
 import app.common.testing.ReactTestWrapper
 import app.common.testing.TestModule
 import hydro.flux.react.uielements.input.InputBase.Listener
-import japgolly.scalajs.react.test.ReactTestUtils
 import japgolly.scalajs.react.vdom.VdomElement
-import hydro.scala2js.StandardConverters._
-import app.scala2js.AppConverters._
 import utest._
 
 import scala.collection.mutable

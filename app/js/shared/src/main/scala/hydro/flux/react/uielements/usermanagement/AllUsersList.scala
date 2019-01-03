@@ -1,15 +1,15 @@
 package hydro.flux.react.uielements.usermanagement
 
 import app.common.I18n
+import app.models.user.User
 import hydro.common.LoggingUtils.logExceptions
-import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.HydroReactComponent
+import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.uielements.HalfPanel
 import hydro.flux.react.uielements.Table
 import hydro.flux.stores.UserStore
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
-import app.models.user.User
 
 import scala.collection.immutable.Seq
 import scala.scalajs.js

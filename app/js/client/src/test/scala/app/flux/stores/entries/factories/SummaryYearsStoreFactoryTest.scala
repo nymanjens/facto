@@ -1,8 +1,8 @@
 package app.flux.stores.entries.factories
 
-import app.common.testing.TestObjects._
 import app.common.testing.FakeJsEntityAccess
 import app.common.testing.TestModule
+import app.common.testing.TestObjects._
 import app.common.time.YearRange
 import app.models.accounting.config.Account
 import utest._
@@ -10,8 +10,6 @@ import utest._
 import scala.async.Async.async
 import scala.async.Async.await
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import hydro.scala2js.StandardConverters._
-import app.scala2js.AppConverters._
 
 object SummaryYearsStoreFactoryTest extends TestSuite {
 

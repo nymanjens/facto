@@ -1,9 +1,9 @@
 package app.flux.react.uielements
 
 import app.common.accounting.Tags
+import app.flux.stores.entries.GroupedTransactions
 import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.ReactVdomUtils.^^
-import app.flux.stores.entries.GroupedTransactions
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 

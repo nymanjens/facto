@@ -2,9 +2,9 @@ package app.flux.router
 
 import app.common.I18n
 import hydro.flux.action.Dispatcher
-import japgolly.scalajs.react.extra.router._
-import hydro.models.access.EntityAccess
 import hydro.flux.router.Page
+import hydro.models.access.EntityAccess
+import japgolly.scalajs.react.extra.router._
 
 final class Module(implicit
                    reactAppModule: app.flux.react.app.Module,

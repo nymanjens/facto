@@ -3,21 +3,16 @@ package app.flux.stores.entries.factories
 import app.common.GuavaReplacement.ImmutableSetMultimap
 import app.flux.stores.entries.EntriesStore
 import app.flux.stores.entries.factories.TagsStoreFactory.State
-import hydro.models.access.DbQueryImplicits._
-
 import app.models.access.AppJsEntityAccess
-import hydro.models.access.JsEntityAccess
 import app.models.access.ModelFields
-import hydro.models.access.ModelField
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
+import hydro.models.access.DbQueryImplicits._
 
 import scala.async.Async.async
 import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import hydro.scala2js.StandardConverters._
-import app.scala2js.AppConverters._
 
 final class TagsStoreFactory(implicit entityAccess: AppJsEntityAccess) extends EntriesStoreFactory[State] {
 

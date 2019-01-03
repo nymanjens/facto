@@ -1,9 +1,7 @@
 package app.flux.react.uielements.input.bootstrap
 
 import app.common.GuavaReplacement.Splitter
-import hydro.common.LoggingUtils.LogExceptionsCallback
 import app.common.I18n
-import hydro.common.LoggingUtils
 import app.common.ScalaUtils.visibleForTesting
 import app.common.money.Currency
 import app.common.money.DatedMoney

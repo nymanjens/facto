@@ -2,34 +2,27 @@ package app.flux.stores.entries.factories
 
 import app.common.money.ExchangeRateManager
 import app.common.money.MoneyWithGeneralCurrency
-import hydro.common.time.JavaTimeImplicits._
-import hydro.common.time.LocalDateTime
 import app.flux.stores.entries.CashFlowEntry.BalanceCorrection
 import app.flux.stores.entries.CashFlowEntry.RegularEntry
-import app.flux.stores.entries.WithIsPending.isAnyPending
-import app.flux.stores.entries.WithIsPending.isPending
 import app.flux.stores.entries.CashFlowEntry
 import app.flux.stores.entries.WithIsPending
-import hydro.models.access.DbQueryImplicits._
-
-import hydro.models.access.DbQuery
-import app.models.access.AppDbQuerySorting
+import app.flux.stores.entries.WithIsPending.isAnyPending
+import app.flux.stores.entries.WithIsPending.isPending
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppJsEntityAccess
-import hydro.models.access.JsEntityAccess
 import app.models.access.ModelFields
-import hydro.models.access.ModelField
-import app.models.accounting.config.Config
-import app.models.accounting.config.MoneyReservoir
 import app.models.accounting.Transaction
 import app.models.accounting._
+import app.models.accounting.config.Config
+import app.models.accounting.config.MoneyReservoir
+import hydro.common.time.JavaTimeImplicits._
+import hydro.common.time.LocalDateTime
+import hydro.models.access.DbQueryImplicits._
 
 import scala.async.Async.async
 import scala.async.Async.await
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import hydro.scala2js.StandardConverters._
-import app.scala2js.AppConverters._
 
 final class CashFlowEntriesStoreFactory(implicit entityAccess: AppJsEntityAccess,
                                         accountingConfig: Config,

@@ -1,13 +1,13 @@
 package tests
 
 import app.common.testing.TestObjects._
-import hydro.models.access.DbQuery.Filter
-
-import hydro.models.access.DbQueryImplicits._
-
 import app.models.access._
-import hydro.models.access.webworker.LocalDatabaseWebWorkerApi
 import app.models.accounting.Transaction
+import hydro.models.access.DbQuery.Filter
+import hydro.models.access.DbQueryImplicits._
+import hydro.models.access.DbQuery
+import hydro.models.access.DbResultSet
+import hydro.models.access.LocalDatabaseImpl
 import tests.ManualTests.ManualTest
 import tests.ManualTests.ManualTestSuite
 
@@ -17,12 +17,6 @@ import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.language.reflectiveCalls
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import hydro.scala2js.StandardConverters._
-import app.scala2js.AppConverters._
-import hydro.models.access.LocalDatabaseImpl
-import hydro.models.access.DbResultSet
-import hydro.models.access.DbQueryExecutor
-import hydro.models.access.DbQuery
 
 // Note that this is a manual test because the Rhino javascript engine used for tests
 // is incompatible with Loki.

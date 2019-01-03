@@ -7,9 +7,6 @@ import org.scalajs.dom.ext.KeyCode
 import scala.collection.immutable.Seq
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
-import hydro.scala2js.StandardConverters._
-import app.scala2js.AppConverters._
-
 import scala.scalajs.js.annotation.JSImport
 
 object ReactTagInput {

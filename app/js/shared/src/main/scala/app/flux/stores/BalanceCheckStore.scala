@@ -3,10 +3,9 @@ package app.flux.stores
 import app.flux.action.AppActions.AddBalanceCheck
 import app.flux.action.AppActions.RemoveBalanceCheck
 import app.flux.action.AppActions.UpdateBalanceCheck
-import hydro.flux.action.Dispatcher
 import app.models.access.AppJsEntityAccess
-import hydro.models.access.JsEntityAccess
 import app.models.modification.EntityModification
+import hydro.flux.action.Dispatcher
 
 private[stores] final class BalanceCheckStore(implicit entityAccess: AppJsEntityAccess,
                                               dispatcher: Dispatcher) {
