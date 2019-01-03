@@ -4,27 +4,27 @@ import java.time.Duration
 import java.util.concurrent.Executors
 
 import app.api.ScalaJsApi.ModificationsWithToken
-import hydro.common.UpdateTokens.toUpdateToken
-import hydro.common.publisher.TriggerablePublisher
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup
+import app.models.modification.EntityTypes
+import app.models.money.ExchangeRateMeasurement
+import app.models.slick.SlickEntityTableDef
+import app.models.user.User
+import com.google.inject._
+import hydro.common.UpdateTokens.toUpdateToken
+import hydro.common.publisher.TriggerablePublisher
+import hydro.common.time.Clock
 import hydro.models.modification.EntityModification
 import hydro.models.modification.EntityModificationEntity
 import hydro.models.modification.EntityType
-import app.models.modification.EntityTypes
-import app.models.money.ExchangeRateMeasurement
-import hydro.models.slick.SlickEntityManager
-import app.models.slick.SlickEntityTableDef
 import hydro.models.slick.SlickUtils.dbApi._
 import hydro.models.slick.SlickUtils.dbRun
-import app.models.user.User
-import com.google.inject._
-import hydro.common.time.Clock
 import hydro.models.Entity
 import hydro.models.access.DbQuery
 import hydro.models.access.DbQueryExecutor
 import hydro.models.access.DbResultSet
+import hydro.models.slick.SlickEntityManager
 import net.jcip.annotations.GuardedBy
 import org.reactivestreams.Publisher
 
@@ -74,7 +74,7 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends AppEntityAccess {
 
   // ********** Management methods ********** //
   def dropAndCreateTables(): Unit = {
-    for (tableDef <- SlickEntityTableDef.all) {
+    for (tableDef <- SlickEntityTableDefs.all) {
       def internal[E <: Entity](tableDef: SlickEntityTableDef[E]) = {
         val entityManager = SlickEntityManager.forType[E](tableDef)
         dbRun(sqlu"""DROP TABLE IF EXISTS #${tableDef.tableName}""")

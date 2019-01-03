@@ -1,13 +1,13 @@
 package hydro.models.slick
 
+import app.models.slick.SlickEntityTableDef
 import hydro.models.slick.SlickUtils.dbApi._
 import hydro.models.slick.SlickUtils.dbRun
 import hydro.models.Entity
 
 import scala.collection.immutable.Seq
 
-private[models] final class SlickEntityManager[E <: Entity] private (
-    implicit val tableDef: SlickEntityTableDef[E]) {
+final class SlickEntityManager[E <: Entity] private (implicit val tableDef: SlickEntityTableDef[E]) {
 
   // ********** Management methods ********** //
   def createTable(): Unit = {
@@ -18,19 +18,19 @@ private[models] final class SlickEntityManager[E <: Entity] private (
   }
 
   // ********** Mutators ********** //
-  private[models] def addNew(entityWithId: E): Unit = {
+  def addNew(entityWithId: E): Unit = {
     require(entityWithId.idOption.isDefined, s"This entity has no id ($entityWithId)")
     mustAffectOneSingleRow {
       dbRun(newQuery.forceInsert(entityWithId))
     }
   }
 
-  private[models] def updateIfExists(entityWithId: E): Unit = {
+  def updateIfExists(entityWithId: E): Unit = {
     require(entityWithId.idOption.isDefined, s"This entity has no id ($entityWithId)")
     dbRun(newQuery.filter(_.id === entityWithId.id).update(entityWithId))
   }
 
-  private[models] def deleteIfExists(entityId: Long): Unit = {
+  def deleteIfExists(entityId: Long): Unit = {
     dbRun(newQuery.filter(_.id === entityId).delete)
   }
 
@@ -44,6 +44,6 @@ private[models] final class SlickEntityManager[E <: Entity] private (
     require(affectedRows == 1, s"Query affected $affectedRows rows")
   }
 }
-private[models] object SlickEntityManager {
+object SlickEntityManager {
   def forType[E <: Entity: SlickEntityTableDef]: SlickEntityManager[E] = new SlickEntityManager[E]
 }

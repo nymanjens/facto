@@ -70,5 +70,5 @@ object AuthenticatedAction {
   private def username(request: RequestHeader): Option[String] = request.session.get("username")
 
   private def onUnauthorized(request: RequestHeader): Result =
-    Results.Redirect(app.controllers.routes.Auth.login(request.uri))
+    Results.Redirect(hydro.controllers.routes.Auth.login(request.uri))
 }

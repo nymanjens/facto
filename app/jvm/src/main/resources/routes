@@ -26,9 +26,9 @@ GET  /externalapi/acc/money/xchgmeasurement/:date/:currency/:ratio/:appSecret/  
 GET  /externalapi/acc/bc/list/:appSecret/  app.controllers.ExternalApi.listBalanceCorrections(appSecret)
 
 # Auth
-GET  /login/                           app.controllers.Auth.login(returnTo ?= "/")
-POST /login/                           app.controllers.Auth.authenticate(returnTo ?= "/")
-GET  /logout/                          app.controllers.Auth.logout
+GET  /login/                           hydro.controllers.Auth.login(returnTo ?= "/")
+POST /login/                           hydro.controllers.Auth.authenticate(returnTo ?= "/")
+GET  /logout/                          hydro.controllers.Auth.logout
 
 # Map static resources from the /public folder to the /assets URL path
 GET  /assets/*file                     controllers.Assets.versioned(path="/public", file: Asset)
