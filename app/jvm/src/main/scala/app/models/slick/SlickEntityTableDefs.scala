@@ -4,14 +4,15 @@ import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup
 import app.models.money.ExchangeRateMeasurement
-import hydro.models.slick.SlickEntityTableDef.EntityTable
-import hydro.models.slick.StandardSlickEntityTableDefs.EntityModificationEntityDef
 import app.models.user.User
 import hydro.common.time.LocalDateTime
 import hydro.common.Tags
+import hydro.models.slick.SlickEntityTableDef
+import hydro.models.slick.SlickEntityTableDef.EntityTable
 import hydro.models.slick.SlickUtils._
 import hydro.models.slick.SlickUtils.dbApi._
 import hydro.models.slick.SlickUtils.dbApi.{Tag => SlickTag}
+import hydro.models.slick.StandardSlickEntityTableDefs.EntityModificationEntityDef
 
 import scala.collection.immutable.Seq
 
