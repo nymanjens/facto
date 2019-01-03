@@ -1,9 +1,9 @@
-package controllers
+package app.controllers
 
 import app.models.access.JvmEntityAccess
 import app.models.user.Users
 import com.google.inject.Inject
-import controllers.Auth.Forms
+import app.controllers.Auth.Forms
 import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n.I18nSupport

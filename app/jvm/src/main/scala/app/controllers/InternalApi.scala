@@ -1,4 +1,4 @@
-package controllers
+package app.controllers
 
 import java.nio.ByteBuffer
 
@@ -21,7 +21,7 @@ import app.models.slick.SlickUtils.instantToSqlTimestampMapper
 import app.models.user.User
 import boopickle.Default._
 import com.google.inject.Inject
-import controllers.helpers.AuthenticatedAction
+import app.controllers.helpers.AuthenticatedAction
 import hydro.api.PicklableDbQuery
 import hydro.api.ScalaJsApiRequest
 import hydro.common.time.Clock

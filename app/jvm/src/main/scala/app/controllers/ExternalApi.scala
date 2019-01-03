@@ -1,4 +1,4 @@
-package controllers
+package app.controllers
 
 import app.common.money.Currency
 import app.common.money.MoneyWithGeneralCurrency

@@ -1,4 +1,4 @@
-package controllers.helpers
+package app.controllers.helpers
 
 import app.models.access.JvmEntityAccess
 import app.models.access.ModelFields
