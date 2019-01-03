@@ -2,7 +2,7 @@ package app.flux.react.app.transactiongroupform
 import java.util.NoSuchElementException
 
 import app.common.I18n
-import app.common.accounting.Tags
+import app.common.Tags
 import app.common.money.Currency
 import app.common.money.DatedMoney
 import app.common.money.ExchangeRateManager

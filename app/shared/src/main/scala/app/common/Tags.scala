@@ -1,4 +1,4 @@
-package app.common.accounting
+package app.common
 
 import app.common.GuavaReplacement.Splitter
 

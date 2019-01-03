@@ -3,7 +3,7 @@ package app.flux.react.app.transactionviews
 import app.common.CollectionUtils.ifThenSeq
 import app.common.I18n
 import app.common.ScalaUtils.visibleForTesting
-import app.common.accounting.Tags
+import app.common.Tags
 import app.common.money.Currency
 import app.common.money.ExchangeRateManager
 import app.common.money.ReferenceMoney
