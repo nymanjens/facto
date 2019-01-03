@@ -7,6 +7,7 @@ import app.models.modification.EntityModification
 import app.models.modification.EntityType
 import autowire._
 import boopickle.Default._
+import app.api.Picklers._
 import hydro.api.PicklableDbQuery
 import hydro.api.ScalaJsApiRequest
 import hydro.common.LoggingUtils.logExceptions

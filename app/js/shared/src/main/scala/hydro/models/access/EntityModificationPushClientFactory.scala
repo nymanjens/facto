@@ -4,6 +4,7 @@ import app.api.ScalaJsApi.ModificationsWithToken
 import app.api.ScalaJsApi.UpdateToken
 import boopickle.Default.Unpickle
 import boopickle.Default._
+import app.api.Picklers._
 import hydro.common.Listenable
 import hydro.common.Listenable.WritableListenable
 import hydro.common.websocket.BinaryWebsocketClient
