@@ -10,6 +10,8 @@ import app.models.accounting.TransactionGroup
 import app.models.modification.EntityTypes
 import app.models.money.ExchangeRateMeasurement
 import app.models.slick.SlickEntityTableDef
+import app.models.slick.SlickEntityTableDefs
+import app.models.slick.StandardSlickEntityTableDefs.EntityModificationEntityDef
 import app.models.user.User
 import com.google.inject._
 import hydro.common.UpdateTokens.toUpdateToken
@@ -54,7 +56,7 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends AppEntityAccess {
 
   def newSlickQuery[E <: Entity]()(
       implicit entityTableDef: SlickEntityTableDef[E]): TableQuery[entityTableDef.Table] =
-    SlickEntityManager.forType.newQuery.asInstanceOf[TableQuery[entityTableDef.Table]]
+    SlickEntityManager.forType[E].newQuery.asInstanceOf[TableQuery[entityTableDef.Table]]
 
   def entityModificationPublisher: Publisher[ModificationsWithToken] = entityModificationPublisher_
 
@@ -112,11 +114,11 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends AppEntityAccess {
 
   private def getEntityTableDef(entityType: EntityType.any): SlickEntityTableDef[entityType.get] = {
     val tableDef = entityType match {
-      case User.Type                    => implicitly[SlickEntityTableDef[User]]
-      case Transaction.Type             => implicitly[SlickEntityTableDef[Transaction]]
-      case TransactionGroup.Type        => implicitly[SlickEntityTableDef[TransactionGroup]]
-      case BalanceCheck.Type            => implicitly[SlickEntityTableDef[BalanceCheck]]
-      case ExchangeRateMeasurement.Type => implicitly[SlickEntityTableDef[ExchangeRateMeasurement]]
+      case User.Type                    => SlickEntityTableDefs.UserDef
+      case Transaction.Type             => SlickEntityTableDefs.TransactionDef
+      case TransactionGroup.Type        => SlickEntityTableDefs.TransactionGroupDef
+      case BalanceCheck.Type            => SlickEntityTableDefs.BalanceCheckDef
+      case ExchangeRateMeasurement.Type => SlickEntityTableDefs.ExchangeRateMeasurementDef
     }
     tableDef.asInstanceOf[SlickEntityTableDef[entityType.get]]
   }
