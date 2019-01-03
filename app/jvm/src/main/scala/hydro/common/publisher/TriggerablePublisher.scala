@@ -1,4 +1,4 @@
-package app.common.publisher
+package hydro.common.publisher
 
 import org.reactivestreams.Publisher
 import org.reactivestreams.Subscriber

@@ -6,7 +6,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.Month.JANUARY
 
-import app.common.ResourceFiles
+import hydro.common.ResourceFiles
 import app.models.access.JvmEntityAccess
 import hydro.models.modification.EntityModification
 import app.models.money.ExchangeRateMeasurement

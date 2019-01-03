@@ -3,7 +3,7 @@ package app.controllers
 import java.net.URL
 
 import hydro.common.GuavaReplacement.Splitter
-import app.common.ResourceFiles
+import hydro.common.ResourceFiles
 import app.models.access.JvmEntityAccess
 import com.google.common.base.Charsets
 import com.google.common.hash.Hashing

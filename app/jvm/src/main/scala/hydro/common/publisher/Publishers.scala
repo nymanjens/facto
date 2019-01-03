@@ -1,4 +1,4 @@
-package app.common.publisher
+package hydro.common.publisher
 
 import net.jcip.annotations.GuardedBy
 import org.reactivestreams.Publisher

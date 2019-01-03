@@ -1,4 +1,4 @@
-package app.common
+package hydro.common
 
 import hydro.common.GuavaReplacement.Iterables.getOnlyElement
 import hydro.common.I18n

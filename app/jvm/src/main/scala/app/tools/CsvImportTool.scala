@@ -3,7 +3,7 @@ package app.tools
 import java.nio.file.Path
 import java.time.Instant
 
-import app.common.ResourceFiles
+import hydro.common.ResourceFiles
 import app.common.money.Money
 import app.models.access.JvmEntityAccess
 import app.models.accounting.BalanceCheck
