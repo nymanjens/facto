@@ -2,7 +2,7 @@ package app.flux.react.app.transactionviews
 
 import java.time.Month._
 
-import app.common.GuavaReplacement.DoubleMath.roundToLong
+import hydro.common.GuavaReplacement.DoubleMath.roundToLong
 import app.common.money.Currency
 import app.common.money.ReferenceMoney
 import app.common.testing.TestModule

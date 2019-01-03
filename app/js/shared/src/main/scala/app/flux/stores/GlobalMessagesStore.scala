@@ -2,7 +2,7 @@ package app.flux.stores
 
 import java.time.Instant
 
-import app.common.I18n
+import hydro.common.I18n
 import app.flux.action.AppActions._
 import app.flux.stores.GlobalMessagesStore.Message
 import app.models.accounting._

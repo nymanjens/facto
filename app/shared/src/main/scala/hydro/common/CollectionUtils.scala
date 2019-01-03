@@ -1,4 +1,4 @@
-package app.common
+package hydro.common
 
 import scala.collection.immutable.ListMap
 import scala.collection.immutable.Seq

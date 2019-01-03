@@ -1,6 +1,6 @@
 package app.models.accounting.config
 
-import app.common.Require.requireNonNull
+import hydro.common.Require.requireNonNull
 import app.models.access.AppEntityAccess
 import app.models.access.ModelFields
 import app.models.accounting.config.Account.SummaryTotalRowDef

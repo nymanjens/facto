@@ -1,6 +1,6 @@
 package hydro.flux.react.uielements
 
-import app.common.I18n
+import hydro.common.I18n
 import app.flux.stores._
 import app.models.user.User
 import hydro.common.time.Clock

@@ -1,6 +1,6 @@
 package app.models.access
 
-import app.common.GuavaReplacement.ImmutableBiMap
+import hydro.common.GuavaReplacement.ImmutableBiMap
 import hydro.models.modification.EntityType
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User

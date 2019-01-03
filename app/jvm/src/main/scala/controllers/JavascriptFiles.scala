@@ -2,7 +2,7 @@ package controllers
 
 import java.net.URL
 
-import app.common.GuavaReplacement.Splitter
+import hydro.common.GuavaReplacement.Splitter
 import app.common.ResourceFiles
 import app.models.access.JvmEntityAccess
 import com.google.common.base.Charsets

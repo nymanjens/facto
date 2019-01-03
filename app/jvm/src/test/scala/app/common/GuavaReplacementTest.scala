@@ -1,7 +1,7 @@
 package app.common
 
-import app.common.GuavaReplacement.ImmutableSetMultimap
-import app.common.GuavaReplacement.Splitter
+import hydro.common.GuavaReplacement.ImmutableSetMultimap
+import hydro.common.GuavaReplacement.Splitter
 import app.common.testing._
 import org.junit.runner._
 import org.specs2.runner._

@@ -1,7 +1,7 @@
 package app.flux.react.app.transactionviews
 
-import app.common.Formatting._
-import app.common.I18n
+import hydro.common.Formatting._
+import hydro.common.I18n
 import app.common.money.ExchangeRateManager
 import app.flux.action.AppActions
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy

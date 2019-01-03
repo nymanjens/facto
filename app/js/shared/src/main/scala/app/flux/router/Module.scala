@@ -1,6 +1,6 @@
 package app.flux.router
 
-import app.common.I18n
+import hydro.common.I18n
 import hydro.flux.action.Dispatcher
 import hydro.flux.router.Page
 import hydro.models.access.EntityAccess

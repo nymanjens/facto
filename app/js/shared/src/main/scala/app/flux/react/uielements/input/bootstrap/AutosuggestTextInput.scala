@@ -1,6 +1,6 @@
 package app.flux.react.uielements.input.bootstrap
 
-import app.common.I18n
+import hydro.common.I18n
 import hydro.flux.react.uielements.input.InputBase
 import hydro.flux.react.uielements.input.InputValidator
 import hydro.flux.react.uielements.input.bootstrap.InputComponent

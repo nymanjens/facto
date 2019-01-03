@@ -1,4 +1,4 @@
-package app.common.testing
+package hydro.common.testing
 
 import java.time.Instant
 import java.time.Month.JANUARY

@@ -1,6 +1,6 @@
 package hydro.flux.react.uielements.usermanagement
 
-import app.common.I18n
+import hydro.common.I18n
 import app.models.user.User
 import hydro.common.LoggingUtils.logExceptions
 import hydro.flux.react.HydroReactComponent

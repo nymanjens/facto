@@ -1,7 +1,7 @@
 package hydro.common
 
 import app.api.ScalaJsApi.GetInitialDataResponse
-import app.common.I18n
+import hydro.common.I18n
 
 final class Module(implicit getInitialDataResponse: GetInitialDataResponse) {
 

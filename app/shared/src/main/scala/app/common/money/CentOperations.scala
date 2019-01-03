@@ -1,6 +1,6 @@
 package app.common.money
 
-import app.common.GuavaReplacement.DoubleMath.roundToLong
+import hydro.common.GuavaReplacement.DoubleMath.roundToLong
 
 /**
   * Can be mixed in a type that has cents to add some arithmetic operations.

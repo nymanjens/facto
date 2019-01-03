@@ -3,8 +3,8 @@ package hydro.scala2js
 import java.time.LocalDate
 import java.time.LocalTime
 
-import app.common.GuavaReplacement.ImmutableBiMap
-import app.common.OrderToken
+import hydro.common.GuavaReplacement.ImmutableBiMap
+import hydro.common.OrderToken
 import app.models.access.ModelFields
 import app.scala2js.AppConverters
 import app.scala2js.AppConverters.EntityTypeConverter

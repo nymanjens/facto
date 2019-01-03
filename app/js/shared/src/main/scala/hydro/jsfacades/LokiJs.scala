@@ -1,6 +1,6 @@
 package hydro.jsfacades
 
-import app.common.ScalaUtils
+import hydro.common.ScalaUtils
 
 import scala.collection.immutable.Seq
 import scala.concurrent.Future

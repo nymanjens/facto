@@ -1,6 +1,6 @@
 package app.flux.react.app.transactionviews
 
-import app.common.I18n
+import hydro.common.I18n
 import app.common.money.ExchangeRateManager
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Config

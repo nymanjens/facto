@@ -1,7 +1,7 @@
 package app.flux.stores
 
 import app.api.ScalaJsApiClient
-import app.common.I18n
+import hydro.common.I18n
 import app.common.money.ExchangeRateManager
 import app.flux.stores.entries._
 import app.flux.stores.entries.factories._

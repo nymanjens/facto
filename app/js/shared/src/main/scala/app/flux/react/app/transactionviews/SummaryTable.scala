@@ -1,9 +1,9 @@
 package app.flux.react.app.transactionviews
 
-import app.common.CollectionUtils.ifThenSeq
-import app.common.I18n
-import app.common.ScalaUtils.visibleForTesting
-import app.common.Tags
+import hydro.common.CollectionUtils.ifThenSeq
+import hydro.common.I18n
+import hydro.common.ScalaUtils.visibleForTesting
+import hydro.common.Tags
 import app.common.money.Currency
 import app.common.money.ExchangeRateManager
 import app.common.money.ReferenceMoney

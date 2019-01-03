@@ -4,7 +4,7 @@ import java.nio.ByteBuffer
 import java.time.Instant
 
 import app.api.Picklers._
-import app.common.Tags
+import hydro.common.Tags
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup

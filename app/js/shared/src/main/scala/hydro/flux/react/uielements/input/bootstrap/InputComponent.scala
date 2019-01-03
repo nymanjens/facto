@@ -1,6 +1,6 @@
 package hydro.flux.react.uielements.input.bootstrap
 
-import app.common.I18n
+import hydro.common.I18n
 import hydro.common.LoggingUtils.LogExceptionsCallback
 import hydro.common.LoggingUtils.logExceptions
 import hydro.flux.react.ReactVdomUtils.<<

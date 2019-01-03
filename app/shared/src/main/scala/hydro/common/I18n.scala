@@ -1,4 +1,4 @@
-package app.common
+package hydro.common
 
 trait I18n {
 

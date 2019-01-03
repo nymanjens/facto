@@ -1,6 +1,6 @@
 package app.flux.react.app.transactiongroupform
 
-import app.common.I18n
+import hydro.common.I18n
 import app.common.money.Currency
 import app.common.money.ExchangeRateManager
 import app.common.money.ReferenceMoney

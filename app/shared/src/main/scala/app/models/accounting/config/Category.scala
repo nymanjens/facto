@@ -1,6 +1,6 @@
 package app.models.accounting.config
 
-import app.common.Require.requireNonNull
+import hydro.common.Require.requireNonNull
 
 import scala.collection.immutable.Seq
 

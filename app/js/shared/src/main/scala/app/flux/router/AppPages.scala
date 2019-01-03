@@ -1,6 +1,6 @@
 package app.flux.router
 
-import app.common.I18n
+import hydro.common.I18n
 import app.models.accounting.BalanceCheck
 import app.models.accounting.config.Account
 import app.models.accounting.config.MoneyReservoir

@@ -1,4 +1,4 @@
-package app.common
+package hydro.common
 
 import java.lang.Math.abs
 import java.time.DayOfWeek._

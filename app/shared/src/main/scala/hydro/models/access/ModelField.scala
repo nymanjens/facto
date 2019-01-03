@@ -1,7 +1,7 @@
 package hydro.models.access
 
-import app.common.GuavaReplacement.ImmutableBiMap
-import app.common.OrderToken
+import hydro.common.GuavaReplacement.ImmutableBiMap
+import hydro.common.OrderToken
 import hydro.common.time.LocalDateTime
 import hydro.models.Entity
 import hydro.models.access.ModelField.FieldType

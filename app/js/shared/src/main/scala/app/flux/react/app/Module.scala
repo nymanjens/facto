@@ -1,6 +1,6 @@
 package app.flux.react.app
 
-import app.common.I18n
+import hydro.common.I18n
 import app.common.money.ExchangeRateManager
 import app.flux.react.app.balancecheckform.BalanceCheckForm
 import app.flux.react.app.transactiongroupform.TransactionGroupForm

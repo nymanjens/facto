@@ -1,8 +1,8 @@
 package app.flux.react.uielements.input.bootstrap
 
-import app.common.GuavaReplacement.Splitter
-import app.common.I18n
-import app.common.ScalaUtils.visibleForTesting
+import hydro.common.GuavaReplacement.Splitter
+import hydro.common.I18n
+import hydro.common.ScalaUtils.visibleForTesting
 import app.common.money.Currency
 import app.common.money.DatedMoney
 import app.common.money.ExchangeRateManager

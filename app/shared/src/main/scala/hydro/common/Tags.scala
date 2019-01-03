@@ -1,6 +1,6 @@
-package app.common
+package hydro.common
 
-import app.common.GuavaReplacement.Splitter
+import hydro.common.GuavaReplacement.Splitter
 
 import scala.collection.immutable.Seq
 import scala.math.abs

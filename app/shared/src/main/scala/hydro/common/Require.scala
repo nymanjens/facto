@@ -1,4 +1,4 @@
-package app.common
+package hydro.common
 
 object Require {
 

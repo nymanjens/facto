@@ -1,4 +1,4 @@
-package app.common
+package hydro.common
 
 import scala.annotation.tailrec
 import scala.collection.immutable.Seq

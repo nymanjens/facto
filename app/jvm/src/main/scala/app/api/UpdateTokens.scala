@@ -3,7 +3,7 @@ package app.api
 import java.time.Instant
 
 import app.api.ScalaJsApi.UpdateToken
-import app.common.GuavaReplacement.Splitter
+import hydro.common.GuavaReplacement.Splitter
 
 import scala.collection.immutable.Seq
 

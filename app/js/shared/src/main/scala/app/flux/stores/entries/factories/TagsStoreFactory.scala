@@ -1,6 +1,6 @@
 package app.flux.stores.entries.factories
 
-import app.common.GuavaReplacement.ImmutableSetMultimap
+import hydro.common.GuavaReplacement.ImmutableSetMultimap
 import app.flux.stores.entries.EntriesStore
 import app.flux.stores.entries.factories.TagsStoreFactory.State
 import app.models.access.AppJsEntityAccess

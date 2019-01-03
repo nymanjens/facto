@@ -2,7 +2,7 @@ package app.api
 
 import app.api.ScalaJsApi.UserPrototype
 import app.api.UpdateTokens.toUpdateToken
-import app.common.GuavaReplacement.Iterables.getOnlyElement
+import hydro.common.GuavaReplacement.Iterables.getOnlyElement
 import app.common.money.Currency
 import app.common.testing.TestObjects._
 import app.common.testing.TestUtils._

@@ -1,6 +1,6 @@
 package app.flux.stores.entries.factories
 
-import app.common.GuavaReplacement.ImmutableSetMultimap
+import hydro.common.GuavaReplacement.ImmutableSetMultimap
 import app.common.testing.FakeJsEntityAccess
 import app.common.testing.TestModule
 import app.common.testing.TestObjects._

@@ -1,4 +1,4 @@
-package app.common
+package hydro.common
 
 import scala.annotation.StaticAnnotation
 import scala.concurrent._

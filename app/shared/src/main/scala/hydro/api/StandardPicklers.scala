@@ -3,7 +3,7 @@ package hydro.api
 import java.time.LocalDate
 import java.time.LocalTime
 
-import app.common.GuavaReplacement.ImmutableBiMap
+import hydro.common.GuavaReplacement.ImmutableBiMap
 import app.models.modification.EntityTypes
 import boopickle.Default._
 import hydro.api.PicklableDbQuery.FieldWithValue

@@ -1,6 +1,6 @@
 package app.flux.react.app.transactiongroupform
 
-import app.common.I18n
+import hydro.common.I18n
 import app.flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
 import hydro.common.LoggingUtils.LogExceptionsCallback
 import hydro.common.LoggingUtils.logExceptions

@@ -1,6 +1,6 @@
 package hydro.flux.react.uielements.usermanagement
 
-import app.common.I18n
+import hydro.common.I18n
 import hydro.flux.react.uielements.PageHeader
 import hydro.flux.router.RouterContext
 import japgolly.scalajs.react._

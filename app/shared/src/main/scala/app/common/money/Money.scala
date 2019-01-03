@@ -2,7 +2,7 @@ package app.common.money
 
 import java.lang.Math.abs
 
-import app.common.GuavaReplacement.DoubleMath.roundToLong
+import hydro.common.GuavaReplacement.DoubleMath.roundToLong
 import hydro.common.time.LocalDateTime
 
 import scala.util.Failure

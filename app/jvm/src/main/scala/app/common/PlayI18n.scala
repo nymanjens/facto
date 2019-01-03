@@ -1,6 +1,6 @@
 package app.common
 
-import app.common.GuavaReplacement.Iterables.getOnlyElement
+import hydro.common.GuavaReplacement.Iterables.getOnlyElement
 import com.google.inject.Inject
 import play.api.i18n.Lang
 import play.api.i18n.Langs

@@ -1,6 +1,6 @@
 package app.flux.react.app.transactionviews
 
-import app.common.I18n
+import hydro.common.I18n
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.stores.entries.WithIsPending
 import app.flux.stores.entries.factories.EntriesListStoreFactory
