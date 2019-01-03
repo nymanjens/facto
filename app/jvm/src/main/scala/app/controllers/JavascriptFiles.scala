@@ -119,7 +119,7 @@ object JavascriptFiles {
       override final def maybeLocalResource = Some(getClass.getResource(resourcePath))
     }
     case class VersionedAsset(relativePath: String) extends ResourceAsset(relativePath) {
-      override def urlPath = routes.Assets.versioned(relativePath).path()
+      override def urlPath = controllers.routes.Assets.versioned(relativePath).path()
     }
     case class UnversionedAsset(relativePath: String) extends ResourceAsset(relativePath) {
       override def urlPath = s"/assets/$relativePath"

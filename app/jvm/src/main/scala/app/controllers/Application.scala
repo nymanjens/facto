@@ -20,7 +20,7 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
     with I18nSupport {
 
   def index() = AuthenticatedAction { implicit user => implicit request =>
-    Redirect(controllers.routes.Application.reactAppRoot())
+    Redirect(app.controllers.routes.Application.reactAppRoot())
   }
 
   def reactAppRoot = AuthenticatedAction { implicit user => implicit request =>

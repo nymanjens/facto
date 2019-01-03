@@ -32,7 +32,7 @@ final class Auth @Inject()(implicit override val messagesApi: MessagesApi,
   }
 
   def logout = Action { implicit request =>
-    Redirect(routes.Auth.login("/")).withNewSession.flashing(
+    Redirect(app.controllers.routes.Auth.login("/")).withNewSession.flashing(
       "message" -> Messages("app.you-are-now-logged-out")
     )
   }
