@@ -1,9 +1,9 @@
-package app.controllers
+package hydro.controllers
 
 import app.models.access.JvmEntityAccess
 import app.models.user.Users
 import com.google.inject.Inject
-import app.controllers.Auth.Forms
+import hydro.controllers.Auth.Forms
 import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n.I18nSupport
