@@ -1,9 +1,11 @@
 package app.models.slick
 
+import java.nio.ByteBuffer
 import java.time.Instant
 import java.time.ZoneId
 import java.time.{LocalDateTime => JavaLocalDateTime}
 
+import hydro.common.OrderToken
 import hydro.common.time.LocalDateTime
 import hydro.common.time.LocalDateTimes
 import slick.basic.DatabaseConfig
@@ -29,7 +31,7 @@ object SlickUtils {
 
   def dbRun[T, C[T]](query: Query[_, T, C]): C[T] = dbRun(query.result)
 
-  // ********** datetime helpers ********** //
+  // ********** column mappers ********** //
   implicit val localDateTimeToSqlDateMapper: ColumnType[LocalDateTime] = {
     val zone = ZoneId.of("Europe/Paris") // This is arbitrary. It just has to be the same in both directions
     def toSql(localDateTime: LocalDateTime) = {
@@ -46,4 +48,33 @@ object SlickUtils {
 
   implicit val instantToSqlTimestampMapper: ColumnType[Instant] =
     MappedColumnType.base[Instant, java.sql.Timestamp](java.sql.Timestamp.from, _.toInstant)
+
+  implicit val finiteDurationToMillisMapper: ColumnType[FiniteDuration] =
+    MappedColumnType.base[FiniteDuration, Long](_.toMillis, _.millis)
+
+  implicit val orderTokenToBytesMapper: ColumnType[OrderToken] = {
+    val zone = ZoneId.of("Europe/Paris") // This is arbitrary. It just has to be the same in both directions
+    def toSql(orderToken: OrderToken) = {
+      val bytes = new Array[Byte](orderToken.parts.size * 4)
+      val buffer = ByteBuffer.wrap(bytes)
+      for (part <- orderToken.parts) {
+        buffer.putInt(part)
+      }
+      bytes
+    }
+    def toOrderToken(bytes: Array[Byte]) = {
+      val byteBuffer = ByteBuffer.wrap(bytes)
+
+      def toOrderTokenParts(): List[Int] = {
+        if (byteBuffer.hasRemaining()) {
+          byteBuffer.getInt() :: toOrderTokenParts()
+        } else {
+          Nil
+        }
+      }
+
+      OrderToken(toOrderTokenParts())
+    }
+    MappedColumnType.base[OrderToken, Array[Byte]](toSql, toOrderToken)
+  }
 }
