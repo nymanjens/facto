@@ -3,7 +3,7 @@ import app.common.CommonModule
 import app.models.ModelsModule
 import app.models.accounting.config.ConfigModule
 import com.google.inject.AbstractModule
-import tools.ApplicationStartHook
+import app.tools.ApplicationStartHook
 
 final class Module extends AbstractModule {
   override def configure() = {
