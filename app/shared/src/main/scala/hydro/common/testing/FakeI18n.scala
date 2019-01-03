@@ -1,6 +1,6 @@
 package hydro.common.testing
 
-import app.common._
+import hydro.common.I18n
 
 import scala.collection.mutable
 

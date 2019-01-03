@@ -1,6 +1,6 @@
 package app.common.testing
 
-import app.common._
+import app.common.PlayI18n
 
 import scala.collection.mutable
 
