@@ -1,10 +1,10 @@
-package app.models.slick
+package hydro.models.slick
 
 import java.nio.ByteBuffer
 import java.time.Instant
 
 import app.api.Picklers._
-import app.models.slick.SlickEntityTableDef.EntityTable
+import hydro.models.slick.SlickEntityTableDef.EntityTable
 import boopickle.Default.Pickle
 import boopickle.Default.Unpickle
 import hydro.models.modification.EntityModification

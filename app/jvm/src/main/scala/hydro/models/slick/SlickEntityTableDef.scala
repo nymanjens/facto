@@ -1,4 +1,4 @@
-package app.models.slick
+package hydro.models.slick
 
 import hydro.models.slick.SlickUtils.dbApi.{Table => SlickTable}
 import hydro.models.slick.SlickUtils.dbApi.{Tag => SlickTag}

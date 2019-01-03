@@ -1,9 +1,9 @@
 package hydro.models.slick
 
-import app.models.slick.SlickEntityTableDef
-import app.models.slick.StandardSlickEntityTableDefs
+import hydro.models.slick.SlickEntityTableDef
+import hydro.models.slick.StandardSlickEntityTableDefs
 import app.models.slick.SlickEntityTableDefs
-import app.models.slick.StandardSlickEntityTableDefs
+import hydro.models.slick.StandardSlickEntityTableDefs
 import hydro.models.slick.SlickUtils.dbApi._
 import hydro.models.slick.SlickUtils.dbRun
 import hydro.models.Entity

@@ -4,8 +4,8 @@ import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup
 import app.models.money.ExchangeRateMeasurement
-import app.models.slick.SlickEntityTableDef.EntityTable
-import app.models.slick.StandardSlickEntityTableDefs.EntityModificationEntityDef
+import hydro.models.slick.SlickEntityTableDef.EntityTable
+import hydro.models.slick.StandardSlickEntityTableDefs.EntityModificationEntityDef
 import app.models.user.User
 import hydro.common.time.LocalDateTime
 import hydro.common.Tags

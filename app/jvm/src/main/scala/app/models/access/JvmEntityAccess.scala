@@ -9,9 +9,9 @@ import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup
 import app.models.modification.EntityTypes
 import app.models.money.ExchangeRateMeasurement
-import app.models.slick.SlickEntityTableDef
+import hydro.models.slick.SlickEntityTableDef
 import app.models.slick.SlickEntityTableDefs
-import app.models.slick.StandardSlickEntityTableDefs.EntityModificationEntityDef
+import hydro.models.slick.StandardSlickEntityTableDefs.EntityModificationEntityDef
 import app.models.user.User
 import com.google.inject._
 import hydro.common.UpdateTokens.toUpdateToken
