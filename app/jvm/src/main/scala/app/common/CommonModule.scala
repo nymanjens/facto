@@ -7,6 +7,7 @@ import com.google.inject._
 import hydro.common.time.Clock
 import hydro.common.time.JvmClock
 import hydro.common.I18n
+import hydro.common.PlayI18n
 
 final class CommonModule extends AbstractModule {
 
