@@ -6,13 +6,14 @@ import java.time.LocalTime
 import app.common.GuavaReplacement.ImmutableBiMap
 import app.common.OrderToken
 import app.models.access.ModelFields
-import app.models.modification._
 import app.scala2js.AppConverters
 import app.scala2js.AppConverters.EntityTypeConverter
 import app.scala2js.AppConverters.fromEntityType
 import hydro.common.time.LocalDateTime
 import hydro.models.Entity
 import hydro.models.access.ModelField
+import hydro.models.modification.EntityModification
+import hydro.models.modification.EntityType
 import hydro.scala2js.Scala2Js.Converter
 import hydro.scala2js.Scala2Js.MapConverter
 
