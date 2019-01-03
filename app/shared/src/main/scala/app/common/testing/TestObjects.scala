@@ -11,7 +11,7 @@ import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup
 import app.models.accounting.config.Account.SummaryTotalRowDef
 import app.models.accounting.config._
-import app.models.modification.EntityModification
+import hydro.models.modification.EntityModification
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
 import hydro.common.time.LocalDateTime

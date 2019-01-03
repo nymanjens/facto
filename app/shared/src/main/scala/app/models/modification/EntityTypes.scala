@@ -5,6 +5,7 @@ import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
+import hydro.models.modification.EntityType
 
 import scala.collection.immutable.Seq
 

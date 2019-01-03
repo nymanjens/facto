@@ -9,8 +9,8 @@ import app.common.testing.TestObjects._
 import app.common.testing._
 import app.models.accounting.Transaction
 import app.models.accounting.config.Config
-import app.models.modification.EntityModification
-import app.models.modification.EntityType
+import hydro.models.modification.EntityModification
+import hydro.models.modification.EntityType
 import app.models.money.ExchangeRateMeasurement
 import boopickle.Default._
 import boopickle.Pickler

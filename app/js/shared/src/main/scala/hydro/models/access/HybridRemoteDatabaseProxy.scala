@@ -2,8 +2,8 @@ package hydro.models.access
 
 import app.api.ScalaJsApi.GetInitialDataResponse
 import app.api.ScalaJsApiClient
-import app.models.modification.EntityModification
-import app.models.modification.EntityType
+import hydro.models.modification.EntityModification
+import hydro.models.modification.EntityType
 import app.models.modification.EntityTypes
 import hydro.common.LoggingUtils.logFailure
 import hydro.models.Entity

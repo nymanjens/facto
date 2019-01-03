@@ -9,7 +9,7 @@ import app.models.access.JvmEntityAccess
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup
-import app.models.modification.EntityModification
+import hydro.models.modification.EntityModification
 import app.models.user.User
 import com.google.common.base.Splitter
 import com.google.inject.Inject

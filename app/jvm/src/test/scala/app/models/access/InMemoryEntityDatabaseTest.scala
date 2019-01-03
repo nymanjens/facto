@@ -4,8 +4,8 @@ import app.common.testing.TestObjects._
 import app.common.testing._
 import app.models.access.InMemoryEntityDatabase.EntitiesFetcher
 import app.models.accounting.Transaction
-import app.models.modification.EntityModification
-import app.models.modification.EntityType
+import hydro.models.modification.EntityModification
+import hydro.models.modification.EntityType
 import hydro.models.Entity
 import hydro.models.access.DbQuery.Sorting
 import hydro.models.access.DbQueryImplicits._

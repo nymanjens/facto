@@ -3,8 +3,8 @@ package app.common.testing
 import app.api.ScalaJsApi.GetAllEntitiesResponse
 import app.api.ScalaJsApi.UserPrototype
 import app.api.ScalaJsApiClient
-import app.models.modification.EntityModification
-import app.models.modification.EntityType
+import hydro.models.modification.EntityModification
+import hydro.models.modification.EntityType
 import hydro.models.Entity
 import hydro.models.access.DbQuery
 import hydro.models.access.DbQueryExecutor

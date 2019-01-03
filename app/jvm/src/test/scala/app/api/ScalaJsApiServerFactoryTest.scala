@@ -11,7 +11,7 @@ import app.models.access.JvmEntityAccess
 import app.models.access.ModelFields
 import app.models.accounting.Transaction
 import app.models.accounting.config._
-import app.models.modification.EntityModification
+import hydro.models.modification.EntityModification
 import app.models.modification.EntityModificationEntity
 import app.models.money.ExchangeRateMeasurement
 import app.models.slick.SlickUtils.dbRun

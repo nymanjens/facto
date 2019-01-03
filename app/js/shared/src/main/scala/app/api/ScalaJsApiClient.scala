@@ -3,8 +3,8 @@ package app.api
 import java.nio.ByteBuffer
 
 import app.api.ScalaJsApi._
-import app.models.modification.EntityModification
-import app.models.modification.EntityType
+import hydro.models.modification.EntityModification
+import hydro.models.modification.EntityType
 import autowire._
 import boopickle.Default._
 import app.api.Picklers._

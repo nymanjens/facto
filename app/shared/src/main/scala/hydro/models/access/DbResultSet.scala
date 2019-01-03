@@ -1,7 +1,7 @@
 package hydro.models.access
 
 import app.models.access.ModelFields
-import app.models.modification.EntityType
+import hydro.models.modification.EntityType
 import hydro.models.Entity
 import hydro.models.access.DbQuery.Filter
 import hydro.models.access.DbQuery.Sorting

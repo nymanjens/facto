@@ -8,7 +8,7 @@ import java.time.Month.JANUARY
 
 import app.common.ResourceFiles
 import app.models.access.JvmEntityAccess
-import app.models.modification.EntityModification
+import hydro.models.modification.EntityModification
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.Users
 import com.google.inject.Inject

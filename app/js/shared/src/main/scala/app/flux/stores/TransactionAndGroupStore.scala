@@ -5,7 +5,7 @@ import app.flux.action.AppActions.RemoveTransactionGroup
 import app.flux.action.AppActions.UpdateTransactionGroup
 import app.models.access.AppJsEntityAccess
 import app.models.accounting._
-import app.models.modification.EntityModification
+import hydro.models.modification.EntityModification
 import hydro.common.time.Clock
 import hydro.flux.action.Dispatcher
 

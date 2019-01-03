@@ -2,7 +2,7 @@ package app.scala2js
 
 import app.models.access.ModelFields
 import app.models.accounting._
-import app.models.modification._
+import hydro.models.modification.EntityType
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
 import hydro.models.Entity

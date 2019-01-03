@@ -7,8 +7,8 @@ import java.util.concurrent.ConcurrentSkipListSet
 import app.models.access.InMemoryEntityDatabase.EntitiesFetcher
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
-import app.models.modification.EntityModification
-import app.models.modification.EntityType
+import hydro.models.modification.EntityModification
+import hydro.models.modification.EntityType
 import app.models.modification.EntityTypes
 import hydro.models.Entity
 import hydro.models.access.DbQuery

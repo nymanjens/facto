@@ -1,8 +1,8 @@
 package hydro.models.access
 
 import app.common.GuavaReplacement.ImmutableSetMultimap
-import app.models.modification.EntityModification
-import app.models.modification.EntityType
+import hydro.models.modification.EntityModification
+import hydro.models.modification.EntityType
 import hydro.models.Entity
 
 import scala.collection.immutable.Seq

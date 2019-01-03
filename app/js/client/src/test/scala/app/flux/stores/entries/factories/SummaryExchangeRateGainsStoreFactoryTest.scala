@@ -11,7 +11,7 @@ import app.common.time.DatedMonth
 import app.flux.stores.entries.ComplexQueryFilter
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForMonth
 import app.models.accounting.config.MoneyReservoir
-import app.models.modification.EntityModification
+import hydro.models.modification.EntityModification
 import hydro.common.time.LocalDateTime
 import hydro.common.time.LocalDateTimes.createDateTime
 import utest._

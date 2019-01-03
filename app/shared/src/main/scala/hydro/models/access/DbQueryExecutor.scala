@@ -1,6 +1,6 @@
 package hydro.models.access
 
-import app.models.modification.EntityType
+import hydro.models.modification.EntityType
 import hydro.models.Entity
 
 import scala.collection.immutable.Seq

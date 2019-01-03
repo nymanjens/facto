@@ -5,7 +5,7 @@ import java.time.Month.JANUARY
 import app.common.testing.TestObjects._
 import app.models.accounting.Transaction
 import app.models.accounting.config.Category
-import app.models.modification.EntityModification
+import hydro.models.modification.EntityModification
 import hydro.common.time.LocalDateTimes.createDateTime
 import hydro.models.access.DbQuery.Filter
 import hydro.models.access.DbQueryImplicits._

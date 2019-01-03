@@ -1,4 +1,4 @@
-package app.models.modification
+package hydro.models.modification
 
 import hydro.models.Entity
 

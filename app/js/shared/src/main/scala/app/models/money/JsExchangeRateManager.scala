@@ -3,7 +3,7 @@ package app.models.money
 import app.common.money.Currency
 import app.common.money.ExchangeRateManager
 import app.models.access.AppJsEntityAccess
-import app.models.modification.EntityModification
+import hydro.models.modification.EntityModification
 import hydro.common.time.LocalDateTime
 import hydro.models.access.JsEntityAccess
 

@@ -12,9 +12,9 @@ import app.api.UpdateTokens.toInstant
 import app.api.UpdateTokens.toUpdateToken
 import app.common.publisher.Publishers
 import app.models.access.JvmEntityAccess
-import app.models.modification.EntityModification
+import hydro.models.modification.EntityModification
 import app.models.modification.EntityModificationEntity
-import app.models.modification.EntityType
+import hydro.models.modification.EntityType
 import app.models.slick.SlickUtils.dbApi._
 import app.models.slick.SlickUtils.dbRun
 import app.models.slick.SlickUtils.instantToSqlTimestampMapper

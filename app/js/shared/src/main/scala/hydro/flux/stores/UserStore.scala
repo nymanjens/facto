@@ -1,7 +1,7 @@
 package hydro.flux.stores
 
 import app.api.ScalaJsApiClient
-import app.models.modification.EntityModification
+import hydro.models.modification.EntityModification
 import app.models.user.User
 import hydro.flux.action.Dispatcher
 import hydro.flux.action.StandardActions.UpsertUser

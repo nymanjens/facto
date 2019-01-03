@@ -1,7 +1,7 @@
 package hydro.models.access
 
-import app.models.modification.EntityModification
-import app.models.modification.EntityType
+import hydro.models.modification.EntityModification
+import hydro.models.modification.EntityType
 import app.models.modification.EntityTypes
 import app.scala2js.AppConverters._
 import hydro.jsfacades.LokiJs

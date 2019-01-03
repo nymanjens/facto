@@ -5,8 +5,8 @@ import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup
 import app.models.accounting.config._
-import app.models.modification.EntityModification
-import app.models.modification.EntityType
+import hydro.models.modification.EntityModification
+import hydro.models.modification.EntityType
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
 import boopickle.Default._

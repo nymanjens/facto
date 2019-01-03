@@ -12,7 +12,7 @@ import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.Ga
 import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
 import app.models.access.ModelFields
 import app.models.accounting._
-import app.models.modification.EntityModification._
+import hydro.models.modification.EntityModification._
 import app.models.modification._
 import hydro.models.Entity
 import hydro.models.access.DbQueryImplicits._

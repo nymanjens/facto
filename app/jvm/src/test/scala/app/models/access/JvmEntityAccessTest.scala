@@ -4,7 +4,7 @@ import app.common.GuavaReplacement.Iterables.getOnlyElement
 import app.common.testing.TestObjects._
 import app.common.testing._
 import app.models.accounting.Transaction
-import app.models.modification.EntityModification
+import hydro.models.modification.EntityModification
 import app.models.modification.EntityModificationEntity
 import app.models.slick.SlickUtils.dbRun
 import app.models.user.User

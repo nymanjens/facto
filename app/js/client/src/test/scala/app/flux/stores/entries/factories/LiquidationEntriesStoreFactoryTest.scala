@@ -11,7 +11,7 @@ import app.flux.stores.entries.LiquidationEntry
 import app.models.accounting._
 import app.models.accounting.config.Account
 import app.models.accounting.config.MoneyReservoir
-import app.models.modification.EntityModification
+import hydro.models.modification.EntityModification
 import hydro.common.time.LocalDateTimes.createDateTime
 import utest._
 

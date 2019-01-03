@@ -8,7 +8,7 @@ import app.common.accounting.Tags
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup
-import app.models.modification.EntityModification
+import hydro.models.modification.EntityModification
 import app.models.modification.EntityModificationEntity
 import app.models.money.ExchangeRateMeasurement
 import app.models.slick.SlickUtils.dbApi.{Table => SlickTable, Tag => SlickTag, _}

@@ -6,8 +6,8 @@ import app.common.PlayI18n
 import app.common.money.Currency
 import app.models.access.JvmEntityAccess
 import app.models.accounting.config.Config
-import app.models.modification.EntityModification
-import app.models.modification.EntityType
+import hydro.models.modification.EntityModification
+import hydro.models.modification.EntityType
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
 import app.models.user.Users

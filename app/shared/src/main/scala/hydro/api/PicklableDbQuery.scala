@@ -1,6 +1,6 @@
 package hydro.api
 
-import app.models.modification.EntityType
+import hydro.models.modification.EntityType
 import hydro.api.PicklableDbQuery.Filter
 import hydro.api.PicklableDbQuery.Sorting
 import hydro.api.PicklableDbQuery.Sorting.FieldWithDirection

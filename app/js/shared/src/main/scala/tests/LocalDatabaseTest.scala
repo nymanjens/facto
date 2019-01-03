@@ -4,7 +4,7 @@ import app.common.testing.TestObjects._
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup
-import app.models.modification.EntityModification
+import hydro.models.modification.EntityModification
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
 import hydro.models.access.DbResultSet

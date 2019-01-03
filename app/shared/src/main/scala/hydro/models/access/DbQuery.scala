@@ -1,6 +1,6 @@
 package hydro.models.access
 
-import app.models.modification.EntityType
+import hydro.models.modification.EntityType
 import hydro.common.time.LocalDateTime
 import hydro.models.Entity
 import hydro.models.access.DbQuery.Filter

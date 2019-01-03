@@ -5,7 +5,7 @@ import app.common.money.ReferenceMoney
 import app.models.access.AppDbQuerySorting
 import app.models.access.ModelFields
 import app.models.accounting.config.Config
-import app.models.modification.EntityType
+import hydro.models.modification.EntityType
 import hydro.common.time.LocalDateTime
 import hydro.models.Entity
 import hydro.models.access.DbQueryImplicits._

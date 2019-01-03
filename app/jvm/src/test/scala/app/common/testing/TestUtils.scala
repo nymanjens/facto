@@ -11,8 +11,8 @@ import app.models.accounting.TransactionGroup
 import app.models.accounting.config.Account
 import app.models.accounting.config.Category
 import app.models.accounting.config.MoneyReservoir
-import app.models.modification.EntityModification
-import app.models.modification.EntityType
+import hydro.models.modification.EntityModification
+import hydro.models.modification.EntityType
 import app.models.user.User
 import hydro.common.time.LocalDateTime
 import hydro.models.Entity

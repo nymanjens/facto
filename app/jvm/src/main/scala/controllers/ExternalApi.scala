@@ -9,7 +9,7 @@ import app.models.accounting.config.Account
 import app.models.accounting.config.Config
 import app.models.accounting.config.MoneyReservoir
 import app.models.accounting.config.Template
-import app.models.modification.EntityModification
+import hydro.models.modification.EntityModification
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
 import app.models.user.Users

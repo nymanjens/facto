@@ -3,8 +3,8 @@ package app.api
 import app.api.ScalaJsApi._
 import app.common.money.Currency
 import app.models.accounting.config.Config
-import app.models.modification.EntityModification
-import app.models.modification.EntityType
+import hydro.models.modification.EntityModification
+import hydro.models.modification.EntityType
 import app.models.user.User
 import hydro.api.PicklableDbQuery
 import hydro.common.time.LocalDateTime

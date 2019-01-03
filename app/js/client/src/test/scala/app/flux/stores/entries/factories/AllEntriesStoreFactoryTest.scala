@@ -6,7 +6,7 @@ import app.common.testing.FakeJsEntityAccess
 import app.common.testing.TestObjects._
 import app.flux.stores.entries.GeneralEntry.toGeneralEntrySeq
 import app.models.accounting._
-import app.models.modification.EntityModification
+import hydro.models.modification.EntityModification
 import hydro.common.testing.Awaiter
 import hydro.common.time.LocalDateTime
 import hydro.common.time.LocalDateTimes.createDateTime

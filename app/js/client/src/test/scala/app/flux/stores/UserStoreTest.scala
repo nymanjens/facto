@@ -3,7 +3,7 @@ package app.flux.stores
 import app.api.ScalaJsApi.UserPrototype
 import app.common.testing.TestObjects._
 import app.flux.action.AppActions
-import app.models.modification.EntityModification
+import hydro.models.modification.EntityModification
 import hydro.common.testing.Awaiter
 import hydro.flux.stores.UserStore
 import utest._
