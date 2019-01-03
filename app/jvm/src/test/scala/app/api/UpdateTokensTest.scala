@@ -2,8 +2,8 @@ package app.api
 
 import java.time.Instant
 
-import app.api.UpdateTokens.toInstant
-import app.api.UpdateTokens.toUpdateToken
+import hydro.common.UpdateTokens.toInstant
+import hydro.common.UpdateTokens.toUpdateToken
 import app.common.testing._
 import org.junit.runner._
 import org.specs2.runner._

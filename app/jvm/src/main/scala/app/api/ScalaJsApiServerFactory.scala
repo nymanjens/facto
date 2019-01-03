@@ -1,7 +1,7 @@
 package app.api
 
 import app.api.ScalaJsApi._
-import app.api.UpdateTokens.toUpdateToken
+import hydro.common.UpdateTokens.toUpdateToken
 import app.common.PlayI18n
 import app.common.money.Currency
 import app.models.access.JvmEntityAccess

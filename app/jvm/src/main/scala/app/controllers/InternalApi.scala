@@ -8,8 +8,8 @@ import app.api.ScalaJsApi.ModificationsWithToken
 import app.api.ScalaJsApi.UpdateToken
 import app.api.ScalaJsApi.UserPrototype
 import app.api.ScalaJsApiServerFactory
-import app.api.UpdateTokens.toInstant
-import app.api.UpdateTokens.toUpdateToken
+import hydro.common.UpdateTokens.toInstant
+import hydro.common.UpdateTokens.toUpdateToken
 import app.common.publisher.Publishers
 import app.models.access.JvmEntityAccess
 import hydro.models.modification.EntityModification
