@@ -21,7 +21,7 @@ import app.models.slick.SlickUtils.instantToSqlTimestampMapper
 import app.models.user.User
 import boopickle.Default._
 import com.google.inject.Inject
-import app.controllers.helpers.AuthenticatedAction
+import hydro.controllers.helpers.AuthenticatedAction
 import hydro.api.PicklableDbQuery
 import hydro.api.ScalaJsApiRequest
 import hydro.common.time.Clock
