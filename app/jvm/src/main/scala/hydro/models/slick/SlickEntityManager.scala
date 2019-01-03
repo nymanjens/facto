@@ -1,4 +1,4 @@
-package app.models.slick
+package hydro.models.slick
 
 import app.models.slick.SlickUtils.dbApi._
 import app.models.slick.SlickUtils.dbRun
