@@ -12,7 +12,7 @@ import app.models.access.ModelFields
 import app.models.accounting.Transaction
 import app.models.accounting.config._
 import hydro.models.modification.EntityModification
-import app.models.modification.EntityModificationEntity
+import hydro.models.modification.EntityModificationEntity
 import app.models.money.ExchangeRateMeasurement
 import hydro.models.slick.SlickUtils.dbRun
 import app.models.user.User

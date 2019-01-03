@@ -13,7 +13,7 @@ import hydro.common.UpdateTokens.toUpdateToken
 import hydro.common.publisher.Publishers
 import app.models.access.JvmEntityAccess
 import hydro.models.modification.EntityModification
-import app.models.modification.EntityModificationEntity
+import hydro.models.modification.EntityModificationEntity
 import hydro.models.modification.EntityType
 import hydro.models.slick.SlickUtils.dbApi._
 import hydro.models.slick.SlickUtils.dbRun

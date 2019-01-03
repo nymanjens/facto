@@ -9,7 +9,7 @@ import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup
 import hydro.models.modification.EntityModification
-import app.models.modification.EntityModificationEntity
+import hydro.models.modification.EntityModificationEntity
 import app.models.money.ExchangeRateMeasurement
 import hydro.models.slick.SlickUtils.dbApi.{Table => SlickTable, Tag => SlickTag, _}
 import hydro.models.slick.SlickUtils.instantToSqlTimestampMapper
