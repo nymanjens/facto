@@ -28,18 +28,17 @@ object StandardConverters {
   // **************** Convertor generators **************** //
   def fromModelField[V](modelField: ModelField[V, _]): Converter[V] = {
     def fromFieldType[V1](fieldType: ModelField.FieldType[V1]): Converter[V1] = {
-      def fromType[V2: Converter](fieldType: ModelField.FieldType[V2]): Converter[V2] = implicitly
       val result = fieldType match {
         case ModelField.FieldType.OptionType(valueFieldType) => optionConverter(fromFieldType(valueFieldType))
-        case ModelField.FieldType.BooleanType                => fromType(ModelField.FieldType.BooleanType)
-        case ModelField.FieldType.IntType                    => fromType(ModelField.FieldType.IntType)
-        case ModelField.FieldType.LongType                   => fromType(ModelField.FieldType.LongType)
-        case ModelField.FieldType.DoubleType                 => fromType(ModelField.FieldType.DoubleType)
-        case ModelField.FieldType.StringType                 => fromType(ModelField.FieldType.StringType)
-        case ModelField.FieldType.LocalDateTimeType          => fromType(ModelField.FieldType.LocalDateTimeType)
-        case ModelField.FieldType.FiniteDurationType         => fromType(ModelField.FieldType.FiniteDurationType)
-        case ModelField.FieldType.StringSeqType              => fromType(ModelField.FieldType.StringSeqType)
-        case ModelField.FieldType.OrderTokenType             => fromType(ModelField.FieldType.OrderTokenType)
+        case ModelField.FieldType.BooleanType                => BooleanConverter
+        case ModelField.FieldType.IntType                    => IntConverter
+        case ModelField.FieldType.LongType                   => LongConverter
+        case ModelField.FieldType.DoubleType                 => DoubleConverter
+        case ModelField.FieldType.StringType                 => StringConverter
+        case ModelField.FieldType.LocalDateTimeType          => LocalDateTimeConverter
+        case ModelField.FieldType.FiniteDurationType         => FiniteDurationConverter
+        case ModelField.FieldType.StringSeqType              => seqConverter(StringConverter)
+        case ModelField.FieldType.OrderTokenType             => OrderTokenConverter
       }
       result.asInstanceOf[Converter[V1]]
     }
