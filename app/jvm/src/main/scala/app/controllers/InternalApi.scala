@@ -15,9 +15,9 @@ import app.models.access.JvmEntityAccess
 import hydro.models.modification.EntityModification
 import app.models.modification.EntityModificationEntity
 import hydro.models.modification.EntityType
-import app.models.slick.SlickUtils.dbApi._
-import app.models.slick.SlickUtils.dbRun
-import app.models.slick.SlickUtils.instantToSqlTimestampMapper
+import hydro.models.slick.SlickUtils.dbApi._
+import hydro.models.slick.SlickUtils.dbRun
+import hydro.models.slick.SlickUtils.instantToSqlTimestampMapper
 import app.models.user.User
 import boopickle.Default._
 import com.google.inject.Inject

@@ -1,4 +1,4 @@
-package app.models.slick
+package hydro.models.slick
 
 import java.nio.ByteBuffer
 import java.time.Instant

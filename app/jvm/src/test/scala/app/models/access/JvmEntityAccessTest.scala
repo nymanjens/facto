@@ -6,7 +6,7 @@ import app.common.testing._
 import app.models.accounting.Transaction
 import hydro.models.modification.EntityModification
 import app.models.modification.EntityModificationEntity
-import app.models.slick.SlickUtils.dbRun
+import hydro.models.slick.SlickUtils.dbRun
 import app.models.user.User
 import com.google.inject._
 import org.junit.runner._

@@ -14,7 +14,7 @@ import app.models.accounting.config._
 import hydro.models.modification.EntityModification
 import app.models.modification.EntityModificationEntity
 import app.models.money.ExchangeRateMeasurement
-import app.models.slick.SlickUtils.dbRun
+import hydro.models.slick.SlickUtils.dbRun
 import app.models.user.User
 import com.google.inject._
 import hydro.models.access.DbQuery
