@@ -6,14 +6,14 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.Month.JANUARY
 
-import hydro.common.ResourceFiles
 import app.models.access.JvmEntityAccess
-import hydro.models.modification.EntityModification
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.Users
 import com.google.inject.Inject
+import hydro.common.ResourceFiles
 import hydro.common.time.Clock
 import hydro.common.time.LocalDateTime
+import hydro.models.modification.EntityModification
 import play.api.Application
 import play.api.Mode
 
@@ -57,7 +57,7 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
     }
 
     if (CommandLineFlags.createAdminUser) {
-      implicit val robotUser = Users.getOrCreateRobotUser()
+      implicit val user = Users.getOrCreateRobotUser()
 
       val loginName = "admin"
       val password = AppConfigHelper.defaultPassword getOrElse "changeme"
@@ -83,12 +83,14 @@ final class ApplicationStartHook @Inject()(implicit app: Application,
     implicit val user = Users.getOrCreateRobotUser()
 
     entityAccess.persistEntityModifications(
-      EntityModification.createAddWithRandomId(
-        Users.createUser(loginName = "admin", password = "a", name = "Admin")),
-      EntityModification.createAddWithRandomId(
-        Users.createUser(loginName = "alice", password = "a", name = "Alice")),
-      EntityModification.createAddWithRandomId(
-        Users.createUser(loginName = "bob", password = "b", name = "Bob"))
+      EntityModification
+        .createAddWithId(
+          1111,
+          Users.createUser(loginName = "admin", password = "a", name = "Admin", isAdmin = true)),
+      EntityModification
+        .createAddWithId(2222, Users.createUser(loginName = "alice", password = "a", name = "Alice")),
+      EntityModification
+        .createAddWithId(3333, Users.createUser(loginName = "bob", password = "b", name = "Bob"))
     )
   }
 
