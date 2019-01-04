@@ -10,14 +10,14 @@ GET  /app/*anyString                   hydro.controllers.StandardActions.reactAp
 GET  /appwithoutcreds/                 hydro.controllers.StandardActions.reactAppWithoutCredentials
 
 # Javscript files
-GET  /localDatabaseWebWorker.js        app.controllers.JavascriptFiles.localDatabaseWebWorker
-GET  /serviceWorker.js                 app.controllers.JavascriptFiles.serviceWorker
+GET  /localDatabaseWebWorker.js        hydro.controllers.JavascriptFiles.localDatabaseWebWorker
+GET  /serviceWorker.js                 hydro.controllers.JavascriptFiles.serviceWorker
 
 # Internal API
-POST /scalajsapi/*path                 app.controllers.InternalApi.scalaJsApiPost(path: String)
-GET  /scalajsapi/*path                 app.controllers.InternalApi.scalaJsApiGet(path: String)
-GET  /websocket/scalajsapi/            app.controllers.InternalApi.scalaJsApiWebsocket
-GET  /websocket/entitymodificationpush/:updateToken/  app.controllers.InternalApi.entityModificationPushWebsocket(updateToken)
+POST /scalajsapi/*path                 hydro.controllers.InternalApi.scalaJsApiPost(path: String)
+GET  /scalajsapi/*path                 hydro.controllers.InternalApi.scalaJsApiGet(path: String)
+GET  /websocket/scalajsapi/            hydro.controllers.InternalApi.scalaJsApiWebsocket
+GET  /websocket/entitymodificationpush/:updateToken/  hydro.controllers.InternalApi.entityModificationPushWebsocket(updateToken)
 
 # External API
 GET  /externalapi/healthcheck/         hydro.controllers.StandardActions.healthCheck
