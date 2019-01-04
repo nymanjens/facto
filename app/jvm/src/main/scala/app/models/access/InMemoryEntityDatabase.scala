@@ -5,11 +5,11 @@ import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.ConcurrentSkipListSet
 
 import app.models.access.InMemoryEntityDatabase.EntitiesFetcher
-import app.models.accounting.BalanceCheck
-import app.models.accounting.Transaction
+import app.models.access.InMemoryEntityDatabase.Sortings
+import app.models.modification.EntityTypes
+import hydro.common.GuavaReplacement.ImmutableSetMultimap
 import hydro.models.modification.EntityModification
 import hydro.models.modification.EntityType
-import app.models.modification.EntityTypes
 import hydro.models.Entity
 import hydro.models.access.DbQuery
 import hydro.models.access.DbQueryExecutor
@@ -18,10 +18,10 @@ import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
 
 /** In memory storage class that supports DbQuery operations and EntityModifications. */
-private[access] final class InMemoryEntityDatabase(entitiesFetcher: EntitiesFetcher) {
+final class InMemoryEntityDatabase(entitiesFetcher: EntitiesFetcher, sortings: Sortings = Sortings.create) {
 
   private val typeToCollection: InMemoryEntityDatabase.TypeToCollectionMap =
-    new InMemoryEntityDatabase.TypeToCollectionMap(entitiesFetcher)
+    new InMemoryEntityDatabase.TypeToCollectionMap(entitiesFetcher, sortings)
 
   def queryExecutor[E <: Entity: EntityType]: DbQueryExecutor.Sync[E] = {
     val entityType = implicitly[EntityType[E]]
@@ -33,10 +33,21 @@ private[access] final class InMemoryEntityDatabase(entitiesFetcher: EntitiesFetc
     typeToCollection(entityType).update(modification)
   }
 }
-private[access] object InMemoryEntityDatabase {
+object InMemoryEntityDatabase {
 
   trait EntitiesFetcher {
     def fetch[E <: Entity](entityType: EntityType[E]): Seq[E]
+  }
+
+  class Sortings private (typeToSorting: ImmutableSetMultimap[EntityType.any, DbQuery.Sorting[_]]) {
+    def apply(entityType: EntityType.any): Set[DbQuery.Sorting[_]] = typeToSorting.get(entityType)
+
+    def withSorting[E <: Entity: EntityType](sorting: DbQuery.Sorting[E]): Sortings = {
+      new Sortings(typeToSorting.toBuilder.put(implicitly[EntityType[E]], sorting).build())
+    }
+  }
+  object Sortings {
+    def create: Sortings = new Sortings(ImmutableSetMultimap.of())
   }
 
   private final class EntityCollection[E <: Entity: EntityType](fetchEntities: () => Seq[E],
@@ -123,7 +134,7 @@ private[access] object InMemoryEntityDatabase {
     type any = EntityCollection[_ <: Entity]
   }
 
-  private final class TypeToCollectionMap(entitiesFetcher: EntitiesFetcher) {
+  private final class TypeToCollectionMap(entitiesFetcher: EntitiesFetcher, sortings: Sortings) {
     private val typeToCollection: Map[EntityType.any, EntityCollection.any] = {
       for (entityType <- EntityTypes.all) yield {
         def internal[E <: Entity](
@@ -138,16 +149,5 @@ private[access] object InMemoryEntityDatabase {
 
     def apply[E <: Entity](entityType: EntityType[E]): EntityCollection[E] =
       typeToCollection(entityType).asInstanceOf[EntityCollection[E]]
-
-    private def sortings(entityType: EntityType.any): Set[DbQuery.Sorting[_]] = entityType match {
-      case Transaction.Type =>
-        Set(
-          AppDbQuerySorting.Transaction.deterministicallyByTransactionDate,
-          AppDbQuerySorting.Transaction.deterministicallyByConsumedDate,
-          AppDbQuerySorting.Transaction.deterministicallyByCreateDate
-        )
-      case BalanceCheck.Type => Set(AppDbQuerySorting.BalanceCheck.deterministicallyByCheckDate)
-      case _                 => Set()
-    }
   }
 }

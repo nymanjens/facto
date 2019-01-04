@@ -41,7 +41,13 @@ final class JvmEntityAccess @Inject()(clock: Clock) extends AppEntityAccess {
     entitiesFetcher = new InMemoryEntityDatabase.EntitiesFetcher {
       override def fetch[E <: Entity](entityType: EntityType[E]): Seq[E] =
         getManager(entityType).fetchAll().asInstanceOf[Seq[E]]
-    })
+    },
+    sortings = InMemoryEntityDatabase.Sortings.create
+      .withSorting(AppDbQuerySorting.Transaction.deterministicallyByTransactionDate)
+      .withSorting(AppDbQuerySorting.Transaction.deterministicallyByConsumedDate)
+      .withSorting(AppDbQuerySorting.Transaction.deterministicallyByCreateDate)
+      .withSorting(AppDbQuerySorting.BalanceCheck.deterministicallyByCheckDate)
+  )
 
   private val entityModificationPublisher_ : TriggerablePublisher[ModificationsWithToken] =
     new TriggerablePublisher()

@@ -100,6 +100,14 @@ object GuavaReplacement {
     def containsValue(value: B): Boolean = backingMap.values.toStream.flatten.contains(value)
     def values: Iterable[B] = backingMap.values.toStream.flatMap(set => set)
 
+    def toBuilder: ImmutableSetMultimap.Builder[A, B] = {
+      val builder = ImmutableSetMultimap.builder[A, B]()
+      for ((k, v) <- backingMap) {
+        builder.putAll(k, v.toSeq: _*)
+      }
+      builder
+    }
+
     override def toString = backingMap.toString
 
     override def equals(that: scala.Any) = that match {
