@@ -3,35 +3,29 @@ package app.controllers
 import java.nio.ByteBuffer
 
 import akka.stream.scaladsl._
-import app.api.Picklers._
 import app.api.ScalaJsApi.ModificationsWithToken
 import app.api.ScalaJsApi.UpdateToken
-import app.api.ScalaJsApi.UserPrototype
 import app.api.ScalaJsApiServerFactory
+import app.controllers.InternalApi.ScalaJsApiCaller
 import app.models.access.JvmEntityAccess
-import hydro.models.slick.StandardSlickEntityTableDefs.EntityModificationEntityDef
 import app.models.user.User
 import boopickle.Default._
+import app.api.Picklers._
 import com.google.inject.Inject
-import hydro.api.PicklableDbQuery
 import hydro.api.ScalaJsApiRequest
 import hydro.common.UpdateTokens.toInstant
 import hydro.common.UpdateTokens.toUpdateToken
 import hydro.common.publisher.Publishers
 import hydro.common.time.Clock
 import hydro.controllers.helpers.AuthenticatedAction
-import hydro.models.modification.EntityModification
 import hydro.models.modification.EntityModificationEntity
-import hydro.models.modification.EntityType
 import hydro.models.slick.SlickUtils.dbApi._
 import hydro.models.slick.SlickUtils.dbRun
 import hydro.models.slick.SlickUtils.instantToSqlTimestampMapper
-import hydro.models.Entity
+import hydro.models.slick.StandardSlickEntityTableDefs.EntityModificationEntityDef
 import play.api.i18n.I18nSupport
 import play.api.i18n.MessagesApi
 import play.api.mvc._
-
-import scala.collection.immutable.Seq
 
 final class InternalApi @Inject()(implicit override val messagesApi: MessagesApi,
                                   components: ControllerComponents,
@@ -39,8 +33,9 @@ final class InternalApi @Inject()(implicit override val messagesApi: MessagesApi
                                   entityAccess: JvmEntityAccess,
                                   scalaJsApiServerFactory: ScalaJsApiServerFactory,
                                   playConfiguration: play.api.Configuration,
-                                  env: play.api.Environment)
-    extends AbstractController(components)
+                                  env: play.api.Environment,
+                                  scalaJsApiCaller: ScalaJsApiCaller,
+) extends AbstractController(components)
     with I18nSupport {
 
   def scalaJsApiPost(path: String) = AuthenticatedAction(parse.raw) { implicit user => implicit request =>
@@ -108,30 +103,15 @@ final class InternalApi @Inject()(implicit override val messagesApi: MessagesApi
   // doesn't seem to work for some reason.
   private def doScalaJsApiCall(path: String, argsMap: Map[String, ByteBuffer])(
       implicit user: User): Array[Byte] = {
-    val scalaJsApiServer = scalaJsApiServerFactory.create()
-
-    val responseBuffer = path match {
-      case "getInitialData" =>
-        Pickle.intoBytes(scalaJsApiServer.getInitialData())
-      case "getAllEntities" =>
-        val types = Unpickle[Seq[EntityType.any]].fromBytes(argsMap("types"))
-        Pickle.intoBytes(scalaJsApiServer.getAllEntities(types))
-      case "persistEntityModifications" =>
-        val modifications = Unpickle[Seq[EntityModification]].fromBytes(argsMap("modifications"))
-        Pickle.intoBytes(scalaJsApiServer.persistEntityModifications(modifications))
-      case "executeDataQuery" =>
-        val dbQuery = Unpickle[PicklableDbQuery].fromBytes(argsMap("dbQuery"))
-        Pickle.intoBytes[Seq[Entity]](scalaJsApiServer.executeDataQuery(dbQuery))
-      case "executeCountQuery" =>
-        val dbQuery = Unpickle[PicklableDbQuery].fromBytes(argsMap("dbQuery"))
-        Pickle.intoBytes(scalaJsApiServer.executeCountQuery(dbQuery))
-      case "upsertUser" =>
-        val userPrototype = Unpickle[UserPrototype].fromBytes(argsMap("userPrototype"))
-        Pickle.intoBytes(scalaJsApiServer.upsertUser(userPrototype))
-    }
+    val responseBuffer = scalaJsApiCaller(path, argsMap)
 
     val data: Array[Byte] = Array.ofDim[Byte](responseBuffer.remaining())
     responseBuffer.get(data)
     data
+  }
+}
+object InternalApi {
+  trait ScalaJsApiCaller {
+    def apply(path: String, argsMap: Map[String, ByteBuffer])(implicit user: User): ByteBuffer
   }
 }

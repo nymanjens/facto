@@ -1,21 +1,21 @@
 package app.controllers
 
-import app.api.ScalaJsApiModule
-import app.common.CommonModule
+import app.controllers.InternalApi.ScalaJsApiCaller
 import app.controllers.JavascriptFiles.appAssets
 import app.controllers.JavascriptFiles.Asset
 import app.controllers.JavascriptFiles.UnversionedAsset
 import app.controllers.JavascriptFiles.VersionedAsset
-import app.models.ModelsModule
-import app.models.accounting.config.ConfigModule
-import app.tools.ApplicationStartHook
+import app.controllers.helpers.ScalaJsApiCallerImpl
 import com.google.inject.AbstractModule
 import com.google.inject.Provides
 
 import scala.collection.immutable.Seq
 
 final class ControllersModule extends AbstractModule {
-  override def configure() = {}
+
+  override def configure() = {
+    bind(classOf[ScalaJsApiCaller]).to(classOf[ScalaJsApiCallerImpl])
+  }
 
   @Provides @appAssets def provideAppAssets: Seq[Asset] = Seq(
     VersionedAsset("bootstrap/dist/css/bootstrap.min.css"),
