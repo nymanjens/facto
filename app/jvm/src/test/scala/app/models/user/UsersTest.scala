@@ -1,6 +1,7 @@
 package app.models.user
 
 import app.common.testing._
+import hydro.common.testing._
 import app.models.access.JvmEntityAccess
 import com.google.inject._
 import org.junit.runner._

@@ -1,6 +1,7 @@
 package hydro.api
 
 import app.common.testing._
+import hydro.common.testing._
 import app.models.access.ModelFields
 import app.models.user.User
 import hydro.models.access.DbQuery

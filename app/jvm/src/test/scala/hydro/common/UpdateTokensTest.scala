@@ -5,6 +5,7 @@ import java.time.Instant
 import hydro.common.UpdateTokens.toInstant
 import hydro.common.UpdateTokens.toUpdateToken
 import app.common.testing._
+import hydro.common.testing._
 import org.junit.runner._
 import org.specs2.runner._
 

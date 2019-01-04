@@ -2,6 +2,7 @@ package app.models.accounting.config
 
 import app.common.testing.TestObjects._
 import app.common.testing._
+import hydro.common.testing._
 import app.models.access.JvmEntityAccess
 import app.models.user.Users
 import com.google.inject._

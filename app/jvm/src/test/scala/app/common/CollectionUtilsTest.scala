@@ -1,6 +1,7 @@
 package app.common
 
 import app.common.testing._
+import hydro.common.testing._
 import org.junit.runner._
 import org.specs2.runner._
 

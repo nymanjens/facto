@@ -3,6 +3,7 @@ package app.common
 import java.time.Month._
 
 import app.common.testing._
+import hydro.common.testing._
 import com.google.inject._
 import hydro.common.time.LocalDateTimes.createDateTime
 import org.junit.runner._

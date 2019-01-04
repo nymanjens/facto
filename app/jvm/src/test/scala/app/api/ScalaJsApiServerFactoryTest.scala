@@ -7,6 +7,7 @@ import app.common.money.Currency
 import app.common.testing.TestObjects._
 import app.common.testing.TestUtils._
 import app.common.testing._
+import hydro.common.testing._
 import app.models.access.JvmEntityAccess
 import app.models.access.ModelFields
 import app.models.accounting.Transaction

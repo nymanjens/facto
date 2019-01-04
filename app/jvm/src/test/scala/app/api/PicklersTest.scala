@@ -7,6 +7,7 @@ import app.api.ScalaJsApi._
 import app.common.money.Currency
 import app.common.testing.TestObjects._
 import app.common.testing._
+import hydro.common.testing._
 import app.models.accounting.Transaction
 import app.models.accounting.config.Config
 import hydro.models.modification.EntityModification
