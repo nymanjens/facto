@@ -18,11 +18,6 @@ import hydro.models.slick.SlickUtils.dbApi._
 import hydro.models.slick.SlickUtils.dbRun
 import hydro.models.slick.StandardSlickEntityTableDefs.EntityModificationEntityDef
 import hydro.models.Entity
-import hydro.models.access.DbQuery
-import hydro.models.access.DbQueryExecutor
-import hydro.models.access.DbResultSet
-import hydro.models.access.EntityAccess
-import hydro.models.access.InMemoryEntityDatabase
 import hydro.models.slick.SlickEntityManager
 import net.jcip.annotations.GuardedBy
 import org.reactivestreams.Publisher

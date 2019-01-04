@@ -9,6 +9,7 @@ import app.models.user.User
 import com.google.inject._
 import hydro.common.time.Clock
 import hydro.models.access.InMemoryEntityDatabase
+import hydro.models.access.JvmEntityAccessBase
 import hydro.models.modification.EntityType
 import hydro.models.slick.SlickEntityTableDef
 
