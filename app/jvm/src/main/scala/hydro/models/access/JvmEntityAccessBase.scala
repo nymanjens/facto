@@ -4,6 +4,7 @@ import java.time.Duration
 import java.util.concurrent.Executors
 
 import app.api.ScalaJsApi.ModificationsWithToken
+import app.models.access.ModelFields
 import app.models.modification.EntityTypes
 import app.models.slick.SlickEntityTableDefs
 import app.models.user.User
