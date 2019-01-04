@@ -1,4 +1,4 @@
-package app.api
+package hydro.common
 
 import java.time.Instant
 
