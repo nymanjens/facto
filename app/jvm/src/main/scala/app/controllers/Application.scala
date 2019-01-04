@@ -19,19 +19,6 @@ final class Application @Inject()(implicit override val messagesApi: MessagesApi
     extends AbstractController(components)
     with I18nSupport {
 
-  def index() = AuthenticatedAction { implicit user => implicit request =>
-    Redirect(app.controllers.routes.Application.reactAppRoot())
-  }
-
-  def reactAppRoot = AuthenticatedAction { implicit user => implicit request =>
-    Ok(views.html.reactApp())
-  }
-  def reactApp(anyString: String) = reactAppRoot
-
-  def reactAppWithoutCredentials = Action { implicit request =>
-    Ok(views.html.reactApp())
-  }
-
   def manualTests() = AuthenticatedAction { implicit user => implicit request =>
     Ok(views.html.manualTests())
   }

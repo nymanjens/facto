@@ -3,11 +3,11 @@
 # ~~~~
 
 # General
-GET  /                                 app.controllers.Application.index
+GET  /                                 hydro.controllers.StandardActions.index
 GET  /manualtests/                     app.controllers.Application.manualTests
-GET  /app/                             app.controllers.Application.reactAppRoot
-GET  /app/*anyString                   app.controllers.Application.reactApp(anyString)
-GET  /appwithoutcreds/                 app.controllers.Application.reactAppWithoutCredentials
+GET  /app/                             hydro.controllers.StandardActions.reactAppRoot
+GET  /app/*anyString                   hydro.controllers.StandardActions.reactApp(anyString)
+GET  /appwithoutcreds/                 hydro.controllers.StandardActions.reactAppWithoutCredentials
 
 # Javscript files
 GET  /localDatabaseWebWorker.js        app.controllers.JavascriptFiles.localDatabaseWebWorker
@@ -20,7 +20,7 @@ GET  /websocket/scalajsapi/            app.controllers.InternalApi.scalaJsApiWeb
 GET  /websocket/entitymodificationpush/:updateToken/  app.controllers.InternalApi.entityModificationPushWebsocket(updateToken)
 
 # External API
-GET  /externalapi/healthcheck/         app.controllers.ExternalApi.healthCheck
+GET  /externalapi/healthcheck/         hydro.controllers.StandardActions.healthCheck
 GET  /externalapi/acc/trans/addfromtpl/:tplCode/:appSecret/  app.controllers.ExternalApi.addTransactionFromTemplate(tplCode, appSecret)
 GET  /externalapi/acc/money/xchgmeasurement/:date/:currency/:ratio/:appSecret/  app.controllers.ExternalApi.addExchangeRateMeasurement(date, currency, ratio: Double, appSecret)
 GET  /externalapi/acc/bc/list/:appSecret/  app.controllers.ExternalApi.listBalanceCorrections(appSecret)
