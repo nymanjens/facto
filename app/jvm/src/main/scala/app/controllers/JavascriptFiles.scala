@@ -2,28 +2,33 @@ package app.controllers
 
 import java.net.URL
 
-import hydro.common.GuavaReplacement.Splitter
-import hydro.common.ResourceFiles
-import app.models.access.JvmEntityAccess
+import app.controllers.JavascriptFiles.Asset
+import app.controllers.JavascriptFiles.appAssets
 import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
 import com.google.common.io.Resources
 import com.google.inject.Inject
+import hydro.common.GuavaReplacement.Splitter
+import hydro.common.ResourceFiles
 import hydro.common.time.Clock
+import hydro.common.ScalaUtils.visibleForTesting
+import hydro.models.access.EntityAccess
 import play.api.Mode
 import play.api.i18n.I18nSupport
 import play.api.i18n.MessagesApi
 import play.api.mvc._
 
+import scala.annotation.StaticAnnotation
 import scala.collection.immutable.Seq
 
 final class JavascriptFiles @Inject()(implicit override val messagesApi: MessagesApi,
                                       components: ControllerComponents,
                                       clock: Clock,
-                                      entityAccess: JvmEntityAccess,
+                                      entityAccess: EntityAccess,
                                       playConfiguration: play.api.Configuration,
-                                      env: play.api.Environment)
-    extends AbstractController(components)
+                                      env: play.api.Environment,
+                                      @appAssets appAssets: Seq[Asset],
+) extends AbstractController(components)
     with I18nSupport {
 
   private lazy val localDatabaseWebWorkerResultCache: Result =
@@ -38,10 +43,10 @@ final class JavascriptFiles @Inject()(implicit override val messagesApi: Message
 
   private def serviceWorkerResultFunc(): Result = {
     val jsFileTemplate = ResourceFiles.read("/serviceWorker.template.js")
-    val scriptPathsJs = JavascriptFiles.Assets.all.map(asset => s"'${asset.urlPath}'").mkString(", ")
+    val scriptPathsJs = allAssets.map(asset => s"'${asset.urlPath}'").mkString(", ")
     val cacheNameSuffix = {
       val hasher = Hashing.murmur3_128().newHasher()
-      for (asset <- JavascriptFiles.Assets.all) {
+      for (asset <- allAssets) {
         hasher.putString(asset.urlPath, Charsets.UTF_8)
         for (resource <- asset.maybeLocalResource) {
           hasher.putBytes(Resources.toByteArray(resource))
@@ -57,9 +62,36 @@ final class JavascriptFiles @Inject()(implicit override val messagesApi: Message
   private lazy val serviceWorkerResultCache: Result = serviceWorkerResultFunc()
   def serviceWorker =
     Action(_ => if (env.mode == Mode.Dev) serviceWorkerResultFunc() else serviceWorkerResultCache)
+
+  private def allAssets: Seq[Asset] = JavascriptFiles.Assets.standardAssets ++ appAssets
 }
 
 object JavascriptFiles {
+
+  class appAssets extends StaticAnnotation
+
+  sealed trait Asset {
+    def maybeLocalResource: Option[URL]
+    def urlPath: String
+  }
+  abstract class ResourceAsset(relativePath: String) extends Asset {
+    // Remove the query parameters to find the local resource path
+    private val resourcePath: String = Splitter.on('?').split(s"/public/$relativePath").head
+    require(ResourceFiles.exists(resourcePath), s"Could not find asset at $resourcePath")
+
+    override final def maybeLocalResource = Some(getClass.getResource(resourcePath))
+  }
+  case class VersionedAsset(relativePath: String) extends ResourceAsset(relativePath) {
+    override def urlPath = controllers.routes.Assets.versioned(relativePath).path()
+  }
+  case class UnversionedAsset(relativePath: String) extends ResourceAsset(relativePath) {
+    override def urlPath = s"/assets/$relativePath"
+  }
+  case class DynamicAsset(call: Call) extends Asset {
+    override def maybeLocalResource = None
+    override def urlPath = call.path()
+  }
+
   private object Assets {
     private val clientAppProjectName: String = "client"
     private val webworkerProjectName: String = "webworker-client"
@@ -77,26 +109,12 @@ object JavascriptFiles {
         s"$webworkerProjectName-opt-library.js",
         s"$webworkerProjectName-fastopt-library.js")
 
-    val all: Seq[Asset] = Seq(
+    val standardAssets: Seq[Asset] = Seq(
       clientApp,
       clientAppDeps,
       webworker,
       webworkerDeps,
       VersionedAsset("images/favicon192x192.png"),
-      VersionedAsset("bootstrap/dist/css/bootstrap.min.css"),
-      VersionedAsset("metismenu/dist/metisMenu.min.css"),
-      VersionedAsset("font-awesome/css/font-awesome.min.css"),
-      UnversionedAsset("font-awesome/fonts/fontawesome-webfont.woff2?v=4.6.3"),
-      UnversionedAsset("font-awesome/fonts/fontawesome-webfont.woff?v=4.6.3 0"),
-      UnversionedAsset("font-awesome/fonts/fontawesome-webfont.ttf?v=4.6.3"),
-      VersionedAsset("lib/fontello/css/fontello.css"),
-      UnversionedAsset("lib/fontello/font/fontello.woff2?49985636"),
-      VersionedAsset("startbootstrap-sb-admin-2/dist/css/sb-admin-2.css"),
-      VersionedAsset("stylesheets/main.min.css"),
-      VersionedAsset("jquery/dist/jquery.min.js"),
-      VersionedAsset("bootstrap/dist/js/bootstrap.min.js"),
-      VersionedAsset("metismenu/dist/metisMenu.min.js"),
-      VersionedAsset("startbootstrap-sb-admin-2/dist/js/sb-admin-2.js"),
       DynamicAsset(routes.JavascriptFiles.localDatabaseWebWorker)
     )
 
@@ -106,27 +124,5 @@ object JavascriptFiles {
           .find(name => ResourceFiles.exists(s"/public/$name"))
           .getOrElse(
             throw new IllegalArgumentException(s"Could not find any of these files: ${filenames.toVector}")))
-
-    sealed trait Asset {
-      def maybeLocalResource: Option[URL]
-      def urlPath: String
-    }
-    abstract class ResourceAsset(relativePath: String) extends Asset {
-      // Remove the query parameters to find the local resource path
-      private val resourcePath: String = Splitter.on('?').split(s"/public/$relativePath").head
-      require(ResourceFiles.exists(resourcePath), s"Could not find asset at $resourcePath")
-
-      override final def maybeLocalResource = Some(getClass.getResource(resourcePath))
-    }
-    case class VersionedAsset(relativePath: String) extends ResourceAsset(relativePath) {
-      override def urlPath = controllers.routes.Assets.versioned(relativePath).path()
-    }
-    case class UnversionedAsset(relativePath: String) extends ResourceAsset(relativePath) {
-      override def urlPath = s"/assets/$relativePath"
-    }
-    case class DynamicAsset(call: Call) extends Asset {
-      override def maybeLocalResource = None
-      override def urlPath = call.path()
-    }
   }
 }
