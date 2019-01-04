@@ -1,4 +1,4 @@
-package app.common
+package hydro.common
 
 import hydro.common.GuavaReplacement.ImmutableSetMultimap
 import hydro.common.GuavaReplacement.Splitter

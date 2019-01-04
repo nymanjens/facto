@@ -1,4 +1,4 @@
-package app.common
+package hydro.common
 
 import app.common.testing._
 import hydro.common.testing._

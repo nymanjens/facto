@@ -1,4 +1,4 @@
-package app.common
+package hydro.common
 
 import org.specs2.mutable._
 
