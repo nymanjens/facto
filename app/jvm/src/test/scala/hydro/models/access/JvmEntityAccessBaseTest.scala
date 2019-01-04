@@ -1,4 +1,4 @@
-package app.models.access
+package hydro.models.access
 
 import hydro.common.GuavaReplacement.Iterables.getOnlyElement
 import app.common.testing.TestObjects._
@@ -16,7 +16,7 @@ import play.api.test._
 import scala.collection.immutable.Seq
 
 @RunWith(classOf[JUnitRunner])
-class JvmEntityAccessTest extends HookedSpecification {
+class JvmEntityAccessBaseTest extends HookedSpecification {
 
   implicit private val adminUser = createUser().copy(loginName = "admin")
 
