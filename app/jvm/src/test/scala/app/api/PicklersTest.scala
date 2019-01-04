@@ -15,6 +15,7 @@ import app.models.money.ExchangeRateMeasurement
 import boopickle.Default._
 import boopickle.Pickler
 import hydro.common.time.LocalDateTimes
+import app.api.Picklers._
 import org.junit.runner._
 import org.specs2.runner._
 
