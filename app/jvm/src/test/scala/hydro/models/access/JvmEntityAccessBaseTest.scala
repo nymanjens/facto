@@ -6,6 +6,7 @@ import app.common.testing._
 import hydro.common.testing._
 import hydro.models.modification.EntityModification
 import hydro.models.modification.EntityModificationEntity
+import hydro.models.slick.StandardSlickEntityTableDefs.EntityModificationEntityDef
 import hydro.models.slick.SlickUtils.dbRun
 import app.models.user.User
 import com.google.inject._
@@ -22,7 +23,7 @@ class JvmEntityAccessBaseTest extends HookedSpecification {
 
   @Inject implicit private val fakeClock: FakeClock = null
 
-  @Inject private val entityAccess: JvmEntityAccess = null
+  @Inject private val entityAccess: JvmEntityAccessBase = null
 
   override def before() = {
     Guice.createInjector(new TestModule).injectMembers(this)

@@ -2,6 +2,7 @@ package hydro.models.access
 
 import app.common.testing.TestObjects.testUser
 import app.common.testing._
+import app.models.access.ModelFields
 import hydro.common.testing._
 import hydro.models.access.InMemoryEntityDatabase.EntitiesFetcher
 import hydro.models.modification.EntityModification
