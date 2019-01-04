@@ -4,15 +4,13 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.ConcurrentSkipListSet
 
-import hydro.models.access.InMemoryEntityDatabase.EntitiesFetcher
-import hydro.models.access.InMemoryEntityDatabase.Sortings
 import app.models.modification.EntityTypes
 import hydro.common.GuavaReplacement.ImmutableSetMultimap
+import hydro.models.access.InMemoryEntityDatabase.EntitiesFetcher
+import hydro.models.access.InMemoryEntityDatabase.Sortings
 import hydro.models.modification.EntityModification
 import hydro.models.modification.EntityType
 import hydro.models.Entity
-import hydro.models.access.DbQuery
-import hydro.models.access.DbQueryExecutor
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
