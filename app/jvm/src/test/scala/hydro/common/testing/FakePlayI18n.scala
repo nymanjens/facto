@@ -1,4 +1,4 @@
-package app.common.testing
+package hydro.common.testing
 
 import hydro.common.PlayI18n
 
