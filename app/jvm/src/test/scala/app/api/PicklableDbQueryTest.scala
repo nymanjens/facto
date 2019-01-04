@@ -2,8 +2,7 @@ package app.api
 
 import app.common.testing._
 import app.models.access.ModelFields
-import app.models.accounting.Transaction
-import hydro.common.time.LocalDateTime
+import app.models.user.User
 import hydro.models.access.DbQuery
 import hydro.models.access.DbQueryImplicits._
 import org.junit.runner._
@@ -21,28 +20,23 @@ class PicklableDbQueryTest extends HookedSpecification {
 
     "null object" in {
       testFromRegularToRegular(
-        DbQuery[Transaction](filter = DbQuery.Filter.NullFilter(), sorting = None, limit = None))
+        DbQuery[User](filter = DbQuery.Filter.NullFilter(), sorting = None, limit = None))
     }
-    "sorting and limit" in {
+    "limit" in {
       testFromRegularToRegular(
-        DbQuery[Transaction](
+        DbQuery[User](
           filter = DbQuery.Filter.NullFilter(),
-          sorting = Some(
-            DbQuery.Sorting
-              .ascBy(ModelFields.Transaction.createdDate)
-              .thenDescBy(ModelFields.Transaction.id)),
+          sorting = None,
           limit = Some(192)
         ))
     }
     "filters" in {
-      val filters: Seq[DbQuery.Filter[Transaction]] = Seq(
-        ModelFields.Transaction.issuerId === 5,
-        ModelFields.Transaction.issuerId !== 5,
-        (ModelFields.Transaction.issuerId < 5) || (ModelFields.Transaction.createdDate > LocalDateTime.MIN),
-        (ModelFields.Transaction.description containsIgnoreCase "abc") && (ModelFields.Transaction.tags contains "abc")
+      val filters: Seq[DbQuery.Filter[User]] = Seq(
+        (ModelFields.User.loginName === "a") && (ModelFields.User.loginName !== "b"),
+        ModelFields.User.name containsIgnoreCase "abc"
       )
       for (filter <- filters) yield {
-        testFromRegularToRegular(DbQuery[Transaction](filter = filter, sorting = None, limit = Some(192)))
+        testFromRegularToRegular(DbQuery[User](filter = filter, sorting = None, limit = Some(192)))
       }
     }
   }

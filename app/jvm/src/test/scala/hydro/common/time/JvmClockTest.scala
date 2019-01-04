@@ -3,19 +3,13 @@ package hydro.common.time
 import java.time.Duration
 import java.time.Instant
 
-import app.common.testing.HookedSpecification
-import app.common.testing.TestModule
-import com.google.inject._
 import hydro.common.time.JavaTimeImplicits._
 import org.specs2.matcher.MatchResult
+import org.specs2.mutable._
 
-class JvmClockTest extends HookedSpecification {
+class JvmClockTest extends Specification {
 
-  @Inject private val jvmClock: JvmClock = null
-
-  override def before() = {
-    Guice.createInjector(new TestModule).injectMembers(this)
-  }
+  val jvmClock = new JvmClock
 
   "nowInstant" in {
     assertEqualWithDelta(jvmClock.nowInstant, Instant.now, Duration.ofMillis(10))
