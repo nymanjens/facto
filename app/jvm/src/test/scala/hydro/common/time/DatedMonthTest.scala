@@ -4,7 +4,7 @@ import java.time.LocalDate
 import java.time.Month._
 
 import hydro.common.testing.FakeI18n
-import app.common.testing.HookedSpecification
+import hydro.common.testing.HookedSpecification
 import app.common.testing.TestModule
 import com.google.inject.Guice
 import com.google.inject.Inject

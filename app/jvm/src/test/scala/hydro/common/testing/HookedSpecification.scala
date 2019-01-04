@@ -1,4 +1,4 @@
-package app.common.testing
+package hydro.common.testing
 
 import org.specs2.mutable.Specification
 import org.specs2.specification.core.Fragments
