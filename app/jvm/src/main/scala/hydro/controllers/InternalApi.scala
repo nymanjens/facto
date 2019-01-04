@@ -1,4 +1,4 @@
-package app.controllers
+package hydro.controllers
 
 import java.nio.ByteBuffer
 
@@ -6,7 +6,7 @@ import akka.stream.scaladsl._
 import app.api.ScalaJsApi.ModificationsWithToken
 import app.api.ScalaJsApi.UpdateToken
 import app.api.ScalaJsApiServerFactory
-import app.controllers.InternalApi.ScalaJsApiCaller
+import hydro.controllers.InternalApi.ScalaJsApiCaller
 import app.models.access.JvmEntityAccess
 import app.models.user.User
 import boopickle.Default._

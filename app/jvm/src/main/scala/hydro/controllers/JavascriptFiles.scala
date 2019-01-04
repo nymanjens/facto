@@ -1,9 +1,9 @@
-package app.controllers
+package hydro.controllers
 
 import java.net.URL
 
-import app.controllers.JavascriptFiles.Asset
-import app.controllers.JavascriptFiles.appAssets
+import hydro.controllers.JavascriptFiles.Asset
+import hydro.controllers.JavascriptFiles.appAssets
 import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
 import com.google.common.io.Resources

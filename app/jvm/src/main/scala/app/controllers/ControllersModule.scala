@@ -1,10 +1,10 @@
 package app.controllers
 
-import app.controllers.InternalApi.ScalaJsApiCaller
-import app.controllers.JavascriptFiles.appAssets
-import app.controllers.JavascriptFiles.Asset
-import app.controllers.JavascriptFiles.UnversionedAsset
-import app.controllers.JavascriptFiles.VersionedAsset
+import hydro.controllers.InternalApi.ScalaJsApiCaller
+import hydro.controllers.JavascriptFiles.appAssets
+import hydro.controllers.JavascriptFiles.Asset
+import hydro.controllers.JavascriptFiles.UnversionedAsset
+import hydro.controllers.JavascriptFiles.VersionedAsset
 import app.controllers.helpers.ScalaJsApiCallerImpl
 import com.google.inject.AbstractModule
 import com.google.inject.Provides

@@ -4,7 +4,7 @@ import java.nio.ByteBuffer
 
 import app.api.ScalaJsApi.UserPrototype
 import app.api.ScalaJsApiServerFactory
-import app.controllers.InternalApi.ScalaJsApiCaller
+import hydro.controllers.InternalApi.ScalaJsApiCaller
 import app.models.user.User
 import boopickle.Default._
 import app.api.Picklers._
