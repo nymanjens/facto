@@ -1,4 +1,4 @@
-package app.common.testing
+package hydro.common.testing
 
 import hydro.common.DomNodeUtils
 import japgolly.scalajs.react._

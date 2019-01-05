@@ -1,6 +1,6 @@
 package hydro.flux.react.uielements.input.bootstrap
 
-import app.common.testing.ReactTestWrapper
+import hydro.common.testing.ReactTestWrapper
 import app.common.testing.TestModule
 import hydro.flux.react.uielements.input.InputBase
 import hydro.flux.react.uielements.input.bootstrap
