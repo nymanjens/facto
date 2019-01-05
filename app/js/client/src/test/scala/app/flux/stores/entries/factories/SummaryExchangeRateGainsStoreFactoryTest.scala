@@ -4,7 +4,7 @@ import java.time.LocalDate
 import java.time.Month._
 
 import app.common.money.ReferenceMoney
-import app.common.testing.FakeJsEntityAccess
+import hydro.common.testing.FakeJsEntityAccess
 import app.common.testing.TestModule
 import app.common.testing.TestObjects._
 import app.common.time.DatedMonth

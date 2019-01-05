@@ -5,7 +5,7 @@ import java.time.Duration
 import app.common.money.Currency.Eur
 import app.common.money.Currency.Gbp
 import app.common.money.Currency.Usd
-import app.common.testing.FakeJsEntityAccess
+import hydro.common.testing.FakeJsEntityAccess
 import app.common.testing.TestModule
 import hydro.common.time.Clock
 import hydro.common.time.LocalDateTime

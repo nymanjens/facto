@@ -2,7 +2,7 @@ package app.flux.stores.entries.factories
 
 import java.time.Month._
 
-import app.common.testing.FakeJsEntityAccess
+import hydro.common.testing.FakeJsEntityAccess
 import app.common.testing.TestModule
 import app.common.testing.TestObjects._
 import app.flux.stores.entries.AccountPair

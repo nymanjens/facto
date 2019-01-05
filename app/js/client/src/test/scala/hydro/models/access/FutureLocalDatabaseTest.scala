@@ -1,4 +1,4 @@
-package app.models.access
+package hydro.models.access
 
 import hydro.common.testing.Awaiter
 import utest._

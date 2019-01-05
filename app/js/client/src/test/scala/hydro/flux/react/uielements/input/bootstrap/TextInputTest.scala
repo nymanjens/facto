@@ -1,4 +1,4 @@
-package app.flux.react.uielements.input.bootstrap
+package hydro.flux.react.uielements.input.bootstrap
 
 import app.common.testing.ReactTestWrapper
 import app.common.testing.TestModule

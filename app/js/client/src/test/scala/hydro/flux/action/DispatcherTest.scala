@@ -1,4 +1,4 @@
-package app.flux
+package hydro.flux.action
 
 import app.common.testing.TestObjects.testUserPrototype
 import hydro.flux.action.Action

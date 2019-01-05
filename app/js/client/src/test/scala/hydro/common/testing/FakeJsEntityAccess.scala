@@ -1,4 +1,4 @@
-package app.common.testing
+package hydro.common.testing
 
 import hydro.models.modification.EntityModification
 import hydro.models.modification.EntityType

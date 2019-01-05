@@ -1,4 +1,4 @@
-package app.models.access
+package hydro.models.access
 
 import app.common.testing.FakeScalaJsApiClient
 import app.common.testing.TestModule

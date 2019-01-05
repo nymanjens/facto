@@ -1,4 +1,4 @@
-package app.flux.stores
+package hydro.flux.stores
 
 import app.api.ScalaJsApi.UserPrototype
 import app.common.testing.TestObjects._

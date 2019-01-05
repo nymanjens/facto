@@ -5,7 +5,7 @@ import java.time.Month.JANUARY
 
 import app.common.money.Currency
 import app.common.money.MoneyWithGeneralCurrency
-import app.common.testing.FakeJsEntityAccess
+import hydro.common.testing.FakeJsEntityAccess
 import app.common.testing.TestModule
 import app.common.testing.TestObjects._
 import app.flux.stores.entries.CashFlowEntry.BalanceCorrection

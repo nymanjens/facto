@@ -3,7 +3,7 @@ package app.common.money
 import java.time.Duration
 
 import app.common.money.Currency.Gbp
-import app.common.testing.FakeJsEntityAccess
+import hydro.common.testing.FakeJsEntityAccess
 import app.common.testing.TestModule
 import app.models.money.ExchangeRateMeasurement
 import app.models.money.JsExchangeRateManager
