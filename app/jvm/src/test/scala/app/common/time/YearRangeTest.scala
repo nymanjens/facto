@@ -1,4 +1,4 @@
-package hydro.common.time
+package app.common.time
 
 import org.specs2.mutable._
 
