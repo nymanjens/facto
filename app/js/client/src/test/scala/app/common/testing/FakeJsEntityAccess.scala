@@ -1,9 +1,7 @@
 package app.common.testing
 
-import app.models.access._
 import hydro.models.modification.EntityModification
 import hydro.models.modification.EntityType
-import app.models.user.User
 import hydro.models.Entity
 import hydro.models.access.JsEntityAccess.Listener
 
@@ -14,7 +12,7 @@ import scala.concurrent.Promise
 import scala.concurrent.duration._
 import scala.scalajs.js
 
-final class FakeJsEntityAccess extends AppJsEntityAccess {
+class FakeJsEntityAccess extends JsEntityAccess {
 
   private val modificationsBuffer: ModificationsBuffer = new ModificationsBuffer()
   private var _pendingModifications: PendingModifications =
@@ -38,9 +36,6 @@ final class FakeJsEntityAccess extends AppJsEntityAccess {
       override def count(dbQuery: DbQuery[E]): Future[Int] = addDelay(delegate.count(dbQuery))
     })
   }
-  override def newQuerySyncForUser() = {
-    DbResultSet.fromExecutor(queryExecutor[User])
-  }
   override def pendingModifications: PendingModifications = _pendingModifications
   override def persistModifications(modifications: Seq[EntityModification]): Future[Unit] = {
     modificationsBuffer.addModifications(modifications)
@@ -50,6 +45,9 @@ final class FakeJsEntityAccess extends AppJsEntityAccess {
   override def clearLocalDatabase(): Future[Unit] = ???
   override def registerListener(listener: Listener): Unit = {
     listeners += listener
+  }
+  override def deregisterListener(listener: Listener): Unit = {
+    listeners -= listener
   }
   override def startCheckingForModifiedEntityUpdates(): Unit = ???
 
