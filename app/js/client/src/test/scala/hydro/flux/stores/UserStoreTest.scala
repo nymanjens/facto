@@ -2,10 +2,9 @@ package hydro.flux.stores
 
 import app.api.ScalaJsApi.UserPrototype
 import app.common.testing.TestObjects._
-import app.flux.action.AppActions
-import hydro.models.modification.EntityModification
 import hydro.common.testing.Awaiter
-import hydro.flux.stores.UserStore
+import hydro.flux.action.StandardActions
+import hydro.models.modification.EntityModification
 import utest._
 
 import scala.async.Async.async
@@ -18,17 +17,17 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 object UserStoreTest extends TestSuite {
 
   override def tests = TestSuite {
-    val testModule = new common.testing.TestModule
+    val testModule = new app.common.testing.TestModule
     implicit val entityAccess = testModule.fakeEntityAccess
     implicit val fakeDispatcher = testModule.fakeDispatcher
     implicit val fakeScalaJsApiClient = testModule.fakeScalaJsApiClient
 
     val store: UserStore = new UserStore()
 
-    "Listens to Actions.UpsertUser" - async {
+    "Listens to UpsertUser" - async {
       val userPrototype = UserPrototype.create(id = 19283L)
 
-      await(fakeDispatcher.dispatch(AppActions.UpsertUser(userPrototype)))
+      await(fakeDispatcher.dispatch(StandardActions.UpsertUser(userPrototype)))
 
       fakeScalaJsApiClient.allUpsertedUserPrototypes ==> Seq(userPrototype)
     }

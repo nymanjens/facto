@@ -1,6 +1,9 @@
 package app.common.testing
 
 import app.models.money.JsExchangeRateManager
+import hydro.common.testing.FakeClock
+import hydro.common.testing.FakeI18n
+import hydro.common.testing.FakeJsEntityAccess
 import hydro.flux.action.Dispatcher
 import hydro.models.access.EntityModificationPushClientFactory
 

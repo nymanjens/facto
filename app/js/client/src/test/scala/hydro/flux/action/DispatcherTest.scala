@@ -1,8 +1,6 @@
 package hydro.flux.action
 
 import app.common.testing.TestObjects.testUserPrototype
-import hydro.flux.action.Action
-import hydro.flux.action.StandardActions
 import utest._
 
 import scala.async.Async.async
