@@ -2,21 +2,21 @@
 
 //package app.flux.react.app.transactionviews
 //
+//import app.common.testing.ReactTestWrapper
+//import app.common.testing.TestModule
 //import app.common.testing.TestObjects._
-//import app.common.testing.{Awaiter, FakeRouterContext, ReactTestWrapper, TestModule}
 //import app.flux.stores.entries.factories.AllEntriesStoreFactory
-//import japgolly.scalajs.react.vdom._
 //import app.models.accounting._
+//import hydro.common.testing.Awaiter
+//import hydro.common.testing.FakeRouterContext
+//import japgolly.scalajs.react.vdom._
 //import utest._
 //
-//import scala.async.Async.{async, await}
+//import scala.async.Async.async
+//import scala.async.Async.await
 //import scala.collection.immutable.Seq
-//import scala.concurrent.duration._
-//import scala.concurrent.{Future, Promise}
+//import scala.concurrent.Future
 //import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-//import scala.scalajs.js
-//import hydro.scala2js.StandardConverters._
-//import app.scala2js.AppConverters._
 //
 //object EverythingTest extends TestSuite {
 //

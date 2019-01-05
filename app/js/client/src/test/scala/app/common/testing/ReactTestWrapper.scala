@@ -1,27 +1,28 @@
 package app.common.testing
 
+import hydro.common.DomNodeUtils
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.test.ReactTestUtils.MountedOutput
 import japgolly.scalajs.react.test.ReactTestUtils
 import japgolly.scalajs.react.test.Simulate
 import japgolly.scalajs.react.vdom.VdomElement
+import org.scalajs.dom.raw
 
 import scala.collection.immutable.Seq
+import scala.scalajs.js
 
-final class ReactTestWrapper(private val componentM: MountedOutput) {
+final class ReactTestWrapper(private val element: raw.Element) {
 
   /** Will return all children that comply to both the tagName, class and type filter (active if non-empty). */
   def children(tagName: String = "", clazz: String = "", tpe: String = ""): Seq[ReactTestWrapper] = {
-    val childComponentMs = ReactTestUtils.findAllInRenderedTree(
-      componentM,
-      childComponent => {
-        val child = new ReactTestWrapper(childComponent)
-        (clazz.isEmpty || child.classes.contains(clazz.toLowerCase)) &&
-        (tagName.isEmpty || child.tagName == tagName.toLowerCase) &&
-        (tpe.isEmpty || child.typeAttribute == tpe.toLowerCase)
-      }
-    )
-    childComponentMs.map(new ReactTestWrapper(_))
+    for {
+      nodeWithOffset <- DomNodeUtils.walkDepthFirstPreOrder(element).toVector
+      element <- DomNodeUtils.asElement(nodeWithOffset.node)
+      child <- Some(new ReactTestWrapper(element))
+      if tagName.isEmpty || child.tagName == tagName.toLowerCase
+      if clazz.isEmpty || child.classes.contains(clazz.toLowerCase)
+      if tpe.isEmpty || child.typeAttribute == tpe.toLowerCase
+    } yield child
   }
 
   def child(tagName: String = "", clazz: String = "", tpe: String = ""): ReactTestWrapper = {
@@ -38,30 +39,41 @@ final class ReactTestWrapper(private val componentM: MountedOutput) {
   }
 
   def attribute(name: String): String = {
-    Option(componentM.getDOMNode.asElement.getAttribute(name)) getOrElse ""
+    Option(element.getAttribute(name)) getOrElse ""
   }
 
   def click(): Unit = {
-    Simulate.click(componentM.getDOMNode.asElement)
+    Simulate.click(element)
+  }
+
+  def typeKeyboardCharacter(key: String,
+                            shiftKey: Boolean = false,
+                            altKey: Boolean = false,
+                            ctrlKey: Boolean = false): Unit = {
+    val eventData = js.Dynamic.literal(key = key, shiftKey = shiftKey, altKey = altKey, ctrlKey = ctrlKey)
+    Simulate.keyDown(element, eventData = eventData)
+    Simulate.keyPress(element, eventData = eventData)
+    Simulate.keyUp(element, eventData = eventData)
   }
 
   def classes: Seq[String] = {
-    val classString = Option(componentM.getDOMNode.asElement.getAttribute("class")) getOrElse ""
+    val classString = Option(element.getAttribute("class")) getOrElse ""
     classString.toLowerCase.split(' ').toVector
   }
 
   def tagName: String = {
-    componentM.getDOMNode.asElement.tagName.toLowerCase
+    element.tagName.toLowerCase
   }
 
   def typeAttribute: String = {
-    val attrib = Option(componentM.getDOMNode.asElement.getAttribute("type")) getOrElse ""
+    val attrib = Option(element.getAttribute("type")) getOrElse ""
     attrib.toLowerCase
   }
 }
 
 object ReactTestWrapper {
   def renderComponent(component: VdomElement): ReactTestWrapper = {
-    new ReactTestWrapper(ReactTestUtils renderIntoDocument component)
+    val componentM: MountedOutput = ReactTestUtils renderIntoDocument component
+    new ReactTestWrapper(componentM.getDOMNode.asElement)
   }
 }

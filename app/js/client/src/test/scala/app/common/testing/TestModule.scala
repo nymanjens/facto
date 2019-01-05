@@ -4,6 +4,7 @@ import app.models.money.JsExchangeRateManager
 import hydro.common.testing.FakeClock
 import hydro.common.testing.FakeI18n
 import hydro.flux.action.Dispatcher
+import hydro.flux.react.uielements.PageHeader
 import hydro.models.access.EntityModificationPushClientFactory
 
 class TestModule {
@@ -21,4 +22,5 @@ class TestModule {
   implicit lazy val exchangeRateManager = new JsExchangeRateManager(ratioReferenceToForeignCurrency = Map())
   implicit lazy val entityModificationPushClientFactory: EntityModificationPushClientFactory =
     new EntityModificationPushClientFactory
+  implicit val pageHeader = new PageHeader
 }
