@@ -27,8 +27,8 @@ final class JavascriptFiles @Inject()(implicit override val messagesApi: Message
                                       entityAccess: EntityAccess,
                                       playConfiguration: play.api.Configuration,
                                       env: play.api.Environment,
-                                      @appAssets appAssets: Seq[Asset],
-) extends AbstractController(components)
+                                      @appAssets appAssets: Seq[Asset])
+    extends AbstractController(components)
     with I18nSupport {
 
   private lazy val localDatabaseWebWorkerResultCache: Result =

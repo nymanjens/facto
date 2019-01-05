@@ -34,8 +34,8 @@ final class InternalApi @Inject()(implicit override val messagesApi: MessagesApi
                                   scalaJsApiServerFactory: ScalaJsApiServerFactory,
                                   playConfiguration: play.api.Configuration,
                                   env: play.api.Environment,
-                                  scalaJsApiCaller: ScalaJsApiCaller,
-) extends AbstractController(components)
+                                  scalaJsApiCaller: ScalaJsApiCaller)
+    extends AbstractController(components)
     with I18nSupport {
 
   def scalaJsApiPost(path: String) = AuthenticatedAction(parse.raw) { implicit user => implicit request =>
