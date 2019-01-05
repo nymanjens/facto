@@ -9,7 +9,6 @@ class TagsTest extends Specification {
     Tags.isValidTag("'") mustEqual false
     Tags.isValidTag("single-illegal-char-at-end?") mustEqual false
     Tags.isValidTag("]single-illegal-char-at-start") mustEqual false
-    Tags.isValidTag("space in middle") mustEqual false
 
     Tags.isValidTag("a") mustEqual true
     Tags.isValidTag("normal-string") mustEqual true
