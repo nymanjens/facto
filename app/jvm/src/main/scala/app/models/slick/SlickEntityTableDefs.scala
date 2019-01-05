@@ -25,8 +25,7 @@ object SlickEntityTableDefs {
       TransactionGroupDef,
       BalanceCheckDef,
       ExchangeRateMeasurementDef,
-      EntityModificationEntityDef,
-    )
+      EntityModificationEntityDef)
 
   implicit object UserDef extends SlickEntityTableDef[User] {
 
