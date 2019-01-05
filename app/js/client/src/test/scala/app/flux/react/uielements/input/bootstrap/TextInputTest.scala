@@ -2,8 +2,8 @@ package app.flux.react.uielements.input.bootstrap
 
 import app.common.testing.ReactTestWrapper
 import app.common.testing.TestModule
-import app.flux.react.uielements.input.bootstrap
 import hydro.flux.react.uielements.input.InputBase
+import hydro.flux.react.uielements.input.bootstrap
 import japgolly.scalajs.react.vdom._
 import utest._
 

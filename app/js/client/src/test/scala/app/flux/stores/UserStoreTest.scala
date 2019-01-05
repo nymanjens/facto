@@ -59,7 +59,6 @@ object UserStoreTest extends TestSuite {
       await(Awaiter.expectEventually.equal(onStateUpdateCount, 2))
 
       entityAccess.addRemotelyAddedEntities(testUserA) // Duplicate
-      entityAccess.addRemotelyAddedEntities(testTransactionWithIdB) // Irrelevant
 
       await(Awaiter.expectConsistently.equal(onStateUpdateCount, 2))
     }
