@@ -15,7 +15,7 @@ object ComplexQueryFilterTest extends TestSuite {
 
   override def tests = TestSuite {
 
-    val testModule = new common.testing.TestModule
+    val testModule = new app.common.testing.TestModule
 
     implicit val fakeDatabase = testModule.fakeEntityAccess
     implicit val testAccountingConfig = testModule.testAccountingConfig

@@ -3,14 +3,13 @@ package app.common.testing
 import app.models.money.JsExchangeRateManager
 import hydro.common.testing.FakeClock
 import hydro.common.testing.FakeI18n
-import hydro.common.testing.FakeJsEntityAccess
 import hydro.flux.action.Dispatcher
 import hydro.models.access.EntityModificationPushClientFactory
 
 class TestModule {
 
   // ******************* Fake implementations ******************* //
-  implicit lazy val fakeEntityAccess = new FakeJsEntityAccess
+  implicit lazy val fakeEntityAccess = new FakeAppJsEntityAccess
   implicit lazy val fakeClock = new FakeClock
   implicit lazy val fakeDispatcher = new Dispatcher.Fake
   implicit lazy val fakeI18n = new FakeI18n

@@ -8,6 +8,7 @@ import hydro.common.testing.HookedSpecification
 import app.common.testing.TestModule
 import com.google.inject.Guice
 import com.google.inject.Inject
+import hydro.common.time.LocalDateTime
 import hydro.common.time.LocalDateTimes.createDateTime
 
 class DatedMonthTest extends HookedSpecification {

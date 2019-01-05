@@ -21,7 +21,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 object SummaryForYearStoreFactoryTest extends TestSuite {
 
   override def tests = TestSuite {
-    val testModule = new common.testing.TestModule
+    val testModule = new app.common.testing.TestModule
 
     implicit val entityAccess = testModule.fakeEntityAccess
     implicit val testAccountingConfig = testModule.testAccountingConfig

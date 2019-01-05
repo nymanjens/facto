@@ -6,6 +6,7 @@ import java.time.Month._
 
 import app.api.ScalaJsApi.GetInitialDataResponse
 import app.api.ScalaJsApi.UpdateToken
+import app.api.ScalaJsApi.UserPrototype
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup
@@ -201,6 +202,13 @@ object TestObjects {
   )
   def testUser: User = testUserA
   def testUserRedacted: User = testUser.copy(passwordHash = "<redacted>")
+
+  val testUserPrototype = UserPrototype.create(
+    id = testUser.id,
+    loginName = testUser.loginName,
+    plainTextPassword = "dlkfjasfd",
+    name = testUser.name,
+    isAdmin = testUser.isAdmin)
 
   val testDate: LocalDateTime = LocalDateTimes.createDateTime(2008, MARCH, 13)
   val testInstant = Instant.ofEpochMilli(999000111)

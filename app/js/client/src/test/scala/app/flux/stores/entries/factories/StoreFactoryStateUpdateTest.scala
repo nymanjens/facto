@@ -16,6 +16,8 @@ import hydro.models.modification.EntityModification._
 import app.models.modification._
 import hydro.models.Entity
 import hydro.models.access.DbQueryImplicits._
+import hydro.models.modification.EntityModification
+import hydro.models.modification.EntityType
 import utest._
 
 import scala.async.Async.async
