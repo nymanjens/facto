@@ -7,6 +7,7 @@ import app.common.testing.ReactTestWrapper
 import app.common.testing.TestModule
 import hydro.common.time.LocalDateTime
 import hydro.common.time.LocalDateTimes.createDateTime
+import hydro.flux.react.uielements.input.bootstrap.TextInput
 import japgolly.scalajs.react.vdom.VdomElement
 import utest._
 
@@ -59,9 +60,9 @@ object MappedInputTest extends TestSuite {
         ref = ref,
         defaultValue = defaultDate,
         valueTransformer = MappedInput.ValueTransformer.StringToLocalDateTime,
-        delegateRefFactory = bootstrap.TextInput.ref _
+        delegateRefFactory = TextInput.ref _
       ) { extraProps =>
-        bootstrap.TextInput(
+        TextInput(
           ref = extraProps.ref,
           name = "dummy-name",
           label = "label",

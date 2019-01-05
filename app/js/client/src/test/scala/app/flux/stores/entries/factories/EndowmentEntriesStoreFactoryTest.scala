@@ -2,6 +2,7 @@ package app.flux.stores.entries.factories
 
 import java.time.Month.JANUARY
 
+import app.common.testing.FakeAppJsEntityAccess
 import hydro.common.testing.FakeJsEntityAccess
 import app.common.testing.TestObjects._
 import app.flux.stores.entries.GeneralEntry.toGeneralEntrySeq
@@ -20,7 +21,7 @@ import scala.util.Random
 object EndowmentEntriesStoreFactoryTest extends TestSuite {
 
   override def tests = TestSuite {
-    implicit val entityAccess = new FakeJsEntityAccess()
+    implicit val entityAccess: FakeAppJsEntityAccess = new FakeAppJsEntityAccess()
     val factory: EndowmentEntriesStoreFactory = new EndowmentEntriesStoreFactory()
 
     val trans1 = persistTransaction(id = 1, consumedDay = 1, account = testAccountA)

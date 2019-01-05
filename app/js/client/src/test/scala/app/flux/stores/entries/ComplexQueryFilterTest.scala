@@ -4,6 +4,7 @@ import app.common.testing.TestObjects.testCategory
 import app.common.testing.TestObjects._
 import app.flux.stores.entries.ComplexQueryFilter.Prefix
 import app.flux.stores.entries.ComplexQueryFilter.QueryPart
+import app.models.access.AppEntityAccess
 import app.models.accounting.Transaction
 import hydro.models.access.EntityAccess
 import utest._
@@ -207,7 +208,7 @@ object ComplexQueryFilterTest extends TestSuite {
   }
 
   private def withTransactions(transactions: Transaction*)(implicit complexQueryFilter: ComplexQueryFilter,
-                                                           entityAccess: EntityAccess) =
+                                                           entityAccess: AppEntityAccess) =
     new Object {
       def assertThatQuery(query: String) = new Object {
         def containsExactly(expected: Transaction*): Unit = {

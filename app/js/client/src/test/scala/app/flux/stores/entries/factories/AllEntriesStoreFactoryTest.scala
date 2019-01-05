@@ -2,14 +2,14 @@ package app.flux.stores.entries.factories
 
 import java.time.Month.JANUARY
 
-import hydro.common.testing.FakeJsEntityAccess
+import app.common.testing.FakeAppJsEntityAccess
 import app.common.testing.TestObjects._
 import app.flux.stores.entries.GeneralEntry.toGeneralEntrySeq
 import app.models.accounting._
-import hydro.models.modification.EntityModification
 import hydro.common.testing.Awaiter
 import hydro.common.time.LocalDateTime
 import hydro.common.time.LocalDateTimes.createDateTime
+import hydro.models.modification.EntityModification
 import utest._
 
 import scala.async.Async.async
@@ -21,7 +21,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 object AllEntriesStoreFactoryTest extends TestSuite {
 
   override def tests = TestSuite {
-    implicit val entityAccess: FakeJsEntityAccess = new FakeJsEntityAccess()
+    implicit val entityAccess: FakeAppJsEntityAccess = new FakeAppJsEntityAccess()
     val factory: AllEntriesStoreFactory = new AllEntriesStoreFactory()
     val store: factory.Store = factory.get(maxNumEntries = 3)
 
