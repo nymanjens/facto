@@ -3,7 +3,12 @@ package hydro.common.testing
 import hydro.models.modification.EntityModification
 import hydro.models.modification.EntityType
 import hydro.models.Entity
+import hydro.models.access.DbResultSet
+import hydro.models.access.DbQueryExecutor
+import hydro.models.access.DbQuery
+import hydro.models.access.JsEntityAccess
 import hydro.models.access.JsEntityAccess.Listener
+import hydro.models.access.PendingModifications
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
