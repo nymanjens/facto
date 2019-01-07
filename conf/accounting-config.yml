@@ -1,4 +1,4 @@
-!!models.accounting.config.Parsable$Config
+!!app.models.accounting.config.Parsable$Config
 categories:
   - &catLife
       code: LIFE

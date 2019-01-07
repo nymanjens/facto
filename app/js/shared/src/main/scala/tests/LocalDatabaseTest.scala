@@ -1,27 +1,32 @@
 package tests
 
-import common.testing.TestObjects._
-import models.access.SingletonKey.{NextUpdateTokenKey, VersionKey}
-import models.access.webworker.LocalDatabaseWebWorkerApi
-import models.access.{DbResultSet, LocalDatabase, LocalDatabaseImpl}
-import models.accounting.{BalanceCheck, Transaction, TransactionGroup}
-import models.modification.EntityModification
-import models.money.ExchangeRateMeasurement
-import models.user.User
-import tests.ManualTests.{ManualTest, ManualTestSuite}
+import app.common.testing.TestObjects._
+import app.models.accounting.BalanceCheck
+import app.models.accounting.Transaction
+import app.models.accounting.TransactionGroup
+import hydro.models.modification.EntityModification
+import app.models.money.ExchangeRateMeasurement
+import app.models.user.User
+import hydro.models.access.DbResultSet
+import hydro.models.access.LocalDatabase
+import hydro.models.access.LocalDatabaseImpl
+import hydro.models.access.SingletonKey.NextUpdateTokenKey
+import hydro.models.access.SingletonKey.VersionKey
+import tests.ManualTests.ManualTest
+import tests.ManualTests.ManualTestSuite
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala2js.Converters._
 
 // Note that this is a manual test because the Rhino javascript engine used for tests
 // is incompatible with Loki.
 private[tests] class LocalDatabaseTest extends ManualTestSuite {
 
-  implicit private val webWorker: LocalDatabaseWebWorkerApi =
-    new models.access.webworker.Module().localDatabaseWebWorkerApiStub
+  implicit private val webWorker = new hydro.models.access.webworker.Module().localDatabaseWebWorkerApiStub
+  implicit private val secondaryIndexFunction = app.models.access.Module.secondaryIndexFunction
 
   override def tests = Seq(
     ManualTest("isEmpty") {

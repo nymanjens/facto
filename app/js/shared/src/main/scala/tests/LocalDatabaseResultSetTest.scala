@@ -1,26 +1,29 @@
 package tests
 
-import common.testing.TestObjects._
-import models.access.DbQuery.Filter
-import models.access.DbQueryImplicits._
-import models.access._
-import models.access.webworker.LocalDatabaseWebWorkerApi
-import models.accounting.Transaction
-import tests.ManualTests.{ManualTest, ManualTestSuite}
+import app.common.testing.TestObjects._
+import app.models.access._
+import app.models.accounting.Transaction
+import hydro.models.access.DbQuery.Filter
+import hydro.models.access.DbQueryImplicits._
+import hydro.models.access.DbQuery
+import hydro.models.access.DbResultSet
+import hydro.models.access.LocalDatabaseImpl
+import tests.ManualTests.ManualTest
+import tests.ManualTests.ManualTestSuite
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.language.reflectiveCalls
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala2js.Converters._
 
 // Note that this is a manual test because the Rhino javascript engine used for tests
 // is incompatible with Loki.
 private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
 
-  implicit private val webWorker: LocalDatabaseWebWorkerApi =
-    new models.access.webworker.Module().localDatabaseWebWorkerApiStub
+  implicit private val webWorker = new hydro.models.access.webworker.Module().localDatabaseWebWorkerApiStub
+  implicit private val secondaryIndexFunction = app.models.access.Module.secondaryIndexFunction
 
   override def tests = Seq(
     // **************** Regular filter tests **************** //
@@ -39,7 +42,7 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction()
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(ModelField.id[Transaction] === transaction2.id)
+        .assertFilteredWith(ModelFields.id[Transaction] === transaction2.id)
         .containsExactly(transaction2)
     },
     ManualTest("queryExecutor().filter(notEqual)") {
@@ -48,7 +51,7 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction()
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(ModelField.id[Transaction] !== transaction2.id)
+        .assertFilteredWith(ModelFields.id[Transaction] !== transaction2.id)
         .containsExactly(transaction1, transaction3)
     },
     ManualTest("queryExecutor().filter(lessThan)") {
@@ -57,7 +60,7 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction(day = 3)
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(ModelField.Transaction.createdDate < transaction3.createdDate)
+        .assertFilteredWith(ModelFields.Transaction.createdDate < transaction3.createdDate)
         .containsExactly(transaction1, transaction2)
     },
     ManualTest("queryExecutor().filter(greaterThan)") {
@@ -66,7 +69,7 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction(day = 3)
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(ModelField.Transaction.createdDate > transaction1.createdDate)
+        .assertFilteredWith(ModelFields.Transaction.createdDate > transaction1.createdDate)
         .containsExactly(transaction2, transaction3)
     },
     ManualTest("queryExecutor().filter(greaterOrEqualThan)") {
@@ -75,7 +78,7 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction(day = 3)
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(ModelField.Transaction.createdDate >= transaction2.createdDate)
+        .assertFilteredWith(ModelFields.Transaction.createdDate >= transaction2.createdDate)
         .containsExactly(transaction2, transaction3)
     },
     ManualTest("queryExecutor().filter(anyOf)") {
@@ -85,7 +88,7 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
 
       withTransactions(transaction1, transaction2, transaction3)
         .assertFilteredWith(
-          ModelField.Transaction.categoryCode isAnyOf Seq(testCategoryA.code, testCategoryB.code))
+          ModelFields.Transaction.categoryCode isAnyOf Seq(testCategoryA.code, testCategoryB.code))
         .containsExactly(transaction1, transaction2)
     },
     ManualTest("queryExecutor().filter(noneOf)") {
@@ -95,7 +98,7 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
 
       withTransactions(transaction1, transaction2, transaction3)
         .assertFilteredWith(
-          ModelField.Transaction.categoryCode isNoneOf Seq(testCategoryA.code, testCategoryB.code))
+          ModelFields.Transaction.categoryCode isNoneOf Seq(testCategoryA.code, testCategoryB.code))
         .containsExactly(transaction3)
     },
     ManualTest("queryExecutor().filter(containsIgnoreCase)") {
@@ -104,7 +107,7 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction(description = "prefix\nBBBBcccc\nsuffix")
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(ModelField.Transaction.description containsIgnoreCase "BBBB.*cccc")
+        .assertFilteredWith(ModelFields.Transaction.description containsIgnoreCase "BBBB.*cccc")
         .containsExactly(transaction1, transaction2)
     },
     ManualTest("queryExecutor().filter(doesntContainIgnoreCase)") {
@@ -113,7 +116,7 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction(description = "prefix\nBBBBcccc\nsuffix")
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(ModelField.Transaction.description doesntContainIgnoreCase "BBBB.*cccc")
+        .assertFilteredWith(ModelFields.Transaction.description doesntContainIgnoreCase "BBBB.*cccc")
         .containsExactly(transaction3)
     },
     ManualTest("queryExecutor().filter(seqContains)") {
@@ -122,7 +125,7 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction(tags = Seq("tag"))
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(ModelField.Transaction.tags contains "tag")
+        .assertFilteredWith(ModelFields.Transaction.tags contains "tag")
         .containsExactly(transaction1, transaction3)
     },
     ManualTest("queryExecutor().filter(seqDoesntContain)") {
@@ -131,7 +134,7 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction(tags = Seq("tag"))
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertFilteredWith(ModelField.Transaction.tags doesntContain "tag")
+        .assertFilteredWith(ModelFields.Transaction.tags doesntContain "tag")
         .containsExactly(transaction2)
     },
     // **************** OR / AND filter tests **************** //
@@ -143,9 +146,9 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
 
       withTransactions(transaction1, transaction2, transaction3, transaction4)
         .assertFilteredWith({
-          ModelField.id[Transaction] === transaction1.id
+          ModelFields.id[Transaction] === transaction1.id
         } || {
-          ModelField.id[Transaction] isAnyOf Seq(transaction2.id, transaction3.id)
+          ModelFields.id[Transaction] isAnyOf Seq(transaction2.id, transaction3.id)
         })
         .containsExactly(transaction1, transaction2, transaction3)
     },
@@ -156,9 +159,9 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
 
       withTransactions(transaction1, transaction2, transaction3)
         .assertFilteredWith({
-          ModelField.Transaction.description === "abc"
+          ModelFields.Transaction.description === "abc"
         } && {
-          ModelField.Transaction.categoryCode === testCategoryB.code
+          ModelFields.Transaction.categoryCode === testCategoryB.code
         })
         .containsExactly(transaction2)
     },
@@ -169,9 +172,9 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
 
       withTransactions(transaction1, transaction2, transaction3)
         .assertFilteredWith({
-          ModelField.id[Transaction] isAnyOf Seq(transaction2.id, transaction3.id)
+          ModelFields.id[Transaction] isAnyOf Seq(transaction2.id, transaction3.id)
         } && {
-          ModelField.id[Transaction] isAnyOf Seq(transaction1.id, transaction2.id)
+          ModelFields.id[Transaction] isAnyOf Seq(transaction1.id, transaction2.id)
         })
         .containsExactly(transaction2)
     },
@@ -183,11 +186,11 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
       withTransactions(transaction1, transaction2, transaction3)
         .assertFilteredWith(
           {
-            (ModelField.id[Transaction] isAnyOf Seq(transaction2.id, transaction3.id)) &&
-            (ModelField.id[Transaction] isAnyOf Seq(transaction1.id, transaction2.id))
+            (ModelFields.id[Transaction] isAnyOf Seq(transaction2.id, transaction3.id)) &&
+            (ModelFields.id[Transaction] isAnyOf Seq(transaction1.id, transaction2.id))
           } || {
-            (ModelField.id[Transaction] isAnyOf Seq(transaction1.id, transaction3.id)) &&
-            (ModelField.id[Transaction] isAnyOf Seq(transaction2.id, transaction3.id))
+            (ModelFields.id[Transaction] isAnyOf Seq(transaction1.id, transaction3.id)) &&
+            (ModelFields.id[Transaction] isAnyOf Seq(transaction2.id, transaction3.id))
           }
         )
         .containsExactly(transaction2, transaction3)
@@ -201,8 +204,8 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
       withTransactions(transaction1, transaction2, transaction3)
         .assertThat(
           _.sort(DbQuery.Sorting
-            .descBy(ModelField.Transaction.transactionGroupId)
-            .thenAscBy(ModelField.Transaction.createdDate))
+            .descBy(ModelFields.Transaction.transactionGroupId)
+            .thenAscBy(ModelFields.Transaction.createdDate))
             .data())
         .containsExactlyInOrder(transaction3, transaction1, transaction2)
     },
@@ -213,7 +216,7 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
 
       withTransactions(transaction1, transaction2, transaction3)
         .assertThat(
-          _.sort(DbQuery.Sorting.ascBy(ModelField.Transaction.createdDate))
+          _.sort(DbQuery.Sorting.ascBy(ModelFields.Transaction.createdDate))
             .limit(2)
             .data())
         .containsExactlyInOrder(transaction1, transaction2)
@@ -224,7 +227,7 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction()
 
       withTransactions(transaction1, transaction2, transaction3)
-        .assertThat(_.findOne(ModelField.id[Transaction] === transaction2.id))
+        .assertThat(_.findOne(ModelFields.id[Transaction] === transaction2.id))
         .isEqualTo(Some(transaction2))
     },
     ManualTest("queryExecutor().count()") {
