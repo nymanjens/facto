@@ -103,7 +103,8 @@ final class SbadminMenu(implicit i18n: I18n) extends HydroReactComponent.Statele
                       ^^.ifThen(page.getClass == props.router.currentPage.getClass) {
                         ^.className := "active"
                       },
-                      ^.key := label,
+                      // Add underscore to force rerender to fix bug when mouse is on current menu item
+                      ^.key := (page.toString + (if (page == props.router.currentPage) "_" else "")),
                       <.i(^.className := iconClass getOrElse page.iconClass),
                       " ",
                       <.span(^.dangerouslySetInnerHtml := label)
