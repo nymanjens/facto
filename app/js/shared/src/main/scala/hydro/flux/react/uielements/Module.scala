@@ -26,4 +26,5 @@ final class Module(implicit i18n: I18n,
   lazy val pageLoadingSpinner: PageLoadingSpinner = new PageLoadingSpinner
   lazy val applicationDisconnectedIcon: ApplicationDisconnectedIcon = new ApplicationDisconnectedIcon
   lazy val pendingModificationsCounter: PendingModificationsCounter = new PendingModificationsCounter
+  lazy val sbadminMenu: SbadminMenu = new SbadminMenu()
 }
