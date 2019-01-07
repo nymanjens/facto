@@ -129,6 +129,18 @@ final class SbadminMenu(implicit i18n: I18n) extends HydroReactComponent.Statele
         bind(shortcut, () => {
           router.setPage(page)
         })
+      def goToAdjacentMenuItem(step: Int): Unit = {
+        val allLeftMenuPages = props.menuItems.flatten.map(_.page)
+        allLeftMenuPages.indexOf(router.currentPage) match {
+          case -1 =>
+          case i if 0 <= i + step && i + step < allLeftMenuPages.size =>
+            router.setPage(allLeftMenuPages(i + step))
+          case _ =>
+        }
+      }
+
+      bind("shift+alt+up", () => goToAdjacentMenuItem(step = -1))
+      bind("shift+alt+down", () => goToAdjacentMenuItem(step = +1))
 
       for {
         menuItem <- props.menuItems.flatten

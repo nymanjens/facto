@@ -16,21 +16,28 @@ import scala.scalajs.js
 
 object AppPages {
 
-  sealed abstract class HasReturnTo(private val encodedReturnTo: Option[String]) {
+  sealed trait HasReturnTo {
+    private[AppPages] def encodedReturnTo: Option[String]
     def returnToPath: Path =
       Path(RouterFactory.pathPrefix + js.URIUtils.decodeURIComponent(encodedReturnTo getOrElse ""))
   }
   private object HasReturnTo {
-    def getCurrentEncodedPath(implicit routerContext: RouterContext): Option[String] = Some {
-      val path = routerContext
-        .toPath(routerContext.currentPage)
-        .removePrefix(RouterFactory.pathPrefix)
-        .get
-        .value
-      js.URIUtils.encodeURIComponent(
-        // Decode path first because routerContext.toPath() seems to produce unnecessarily and
-        // inconsistently escaped strings
-        js.URIUtils.decodeURIComponent(path))
+    def getCurrentEncodedPath(implicit routerContext: RouterContext): Option[String] = {
+      routerContext.currentPage match {
+        case currentPage: HasReturnTo => currentPage.encodedReturnTo
+        case currentPage =>
+          Some {
+            val path = routerContext
+              .toPath(currentPage)
+              .removePrefix(RouterFactory.pathPrefix)
+              .get
+              .value
+            js.URIUtils.encodeURIComponent(
+              // Decode path first because routerContext.toPath() seems to produce unnecessarily and
+              // inconsistently escaped strings
+              js.URIUtils.decodeURIComponent(path))
+          }
+      }
     }
   }
 
@@ -53,8 +60,8 @@ object AppPages {
   case object TemplateList extends PageBase("app.templates", iconClass = "icon-template")
 
   // **************** Accounting forms - transactions **************** //
-  case class NewTransactionGroup private (encodedReturnTo: Option[String])
-      extends HasReturnTo(encodedReturnTo)
+  case class NewTransactionGroup private (override val encodedReturnTo: Option[String])
+      extends HasReturnTo
       with Page {
     override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
       Future.successful(i18n("app.new-transaction"))
@@ -65,8 +72,9 @@ object AppPages {
       NewTransactionGroup(HasReturnTo.getCurrentEncodedPath)
   }
 
-  case class EditTransactionGroup private (transactionGroupId: Long, encodedReturnTo: Option[String])
-      extends HasReturnTo(encodedReturnTo)
+  case class EditTransactionGroup private (transactionGroupId: Long,
+                                           override val encodedReturnTo: Option[String])
+      extends HasReturnTo
       with Page {
     override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
       Future.successful(i18n("app.edit-transaction"))
@@ -78,8 +86,9 @@ object AppPages {
       EditTransactionGroup(transactionGroupId, HasReturnTo.getCurrentEncodedPath)
   }
 
-  case class NewTransactionGroupFromReservoir private (reservoirCode: String, encodedReturnTo: Option[String])
-      extends HasReturnTo(encodedReturnTo)
+  case class NewTransactionGroupFromReservoir private (reservoirCode: String,
+                                                       override val encodedReturnTo: Option[String])
+      extends HasReturnTo
       with Page {
     override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
       Future.successful(i18n("app.new-transaction"))
@@ -91,8 +100,8 @@ object AppPages {
       NewTransactionGroupFromReservoir(reservoir.code, HasReturnTo.getCurrentEncodedPath)
   }
 
-  case class NewFromTemplate private (templateCode: String, encodedReturnTo: Option[String])
-      extends HasReturnTo(encodedReturnTo)
+  case class NewFromTemplate private (templateCode: String, override val encodedReturnTo: Option[String])
+      extends HasReturnTo
       with Page {
     override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
       Future.successful(i18n("app.new-transaction"))
@@ -105,8 +114,8 @@ object AppPages {
 
   case class NewForRepayment private (accountCode1: String,
                                       accountCode2: String,
-                                      encodedReturnTo: Option[String])
-      extends HasReturnTo(encodedReturnTo)
+                                      override val encodedReturnTo: Option[String])
+      extends HasReturnTo
       with Page {
     override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
       Future.successful(i18n("app.new-transaction"))
@@ -116,8 +125,8 @@ object AppPages {
     def apply(account1: Account, account2: Account)(implicit routerContext: RouterContext): NewForRepayment =
       NewForRepayment(account1.code, account2.code, HasReturnTo.getCurrentEncodedPath)
   }
-  case class NewForLiquidationSimplification private (encodedReturnTo: Option[String])
-      extends HasReturnTo(encodedReturnTo)
+  case class NewForLiquidationSimplification private (override val encodedReturnTo: Option[String])
+      extends HasReturnTo
       with Page {
     override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
       Future.successful(i18n("app.simplify-liquidation"))
@@ -129,8 +138,8 @@ object AppPages {
   }
 
   // **************** Accounting forms - balance checks **************** //
-  case class NewBalanceCheck private (reservoirCode: String, encodedReturnTo: Option[String])
-      extends HasReturnTo(encodedReturnTo)
+  case class NewBalanceCheck private (reservoirCode: String, override val encodedReturnTo: Option[String])
+      extends HasReturnTo
       with Page {
     override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
       Future.successful(i18n("app.new-balance-check"))
@@ -141,8 +150,8 @@ object AppPages {
       NewBalanceCheck(reservoir.code, HasReturnTo.getCurrentEncodedPath)
   }
 
-  case class EditBalanceCheck private (balanceCheckId: Long, encodedReturnTo: Option[String])
-      extends HasReturnTo(encodedReturnTo)
+  case class EditBalanceCheck private (balanceCheckId: Long, override val encodedReturnTo: Option[String])
+      extends HasReturnTo
       with Page {
     override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
       Future.successful(i18n("app.edit-balance-check"))
