@@ -20,15 +20,26 @@ import scala.collection.immutable.Seq
 final class SbadminMenu(implicit i18n: I18n) extends HydroReactComponent.Stateless {
 
   // **************** API ****************//
-  def apply(menuItems: Seq[Seq[MenuItem]], enableSearch: Boolean, router: RouterContext): VdomElement = {
-    component(Props(menuItems = menuItems, enableSearch = enableSearch, router = router))
+  def apply(menuItems: Seq[Seq[MenuItem]],
+            enableSearch: Boolean,
+            router: RouterContext,
+            configureAdditionalKeyboardShortcuts: () => Unit = () => {}): VdomElement = {
+    component(
+      Props(
+        menuItems = menuItems,
+        enableSearch = enableSearch,
+        router = router,
+        configureAdditionalKeyboardShortcuts = configureAdditionalKeyboardShortcuts))
   }
 
   // **************** Implementation of HydroReactComponent methods ****************//
   override protected val statelessConfig = StatelessComponentConfig(backendConstructor = new Backend(_))
 
   // **************** Implementation of HydroReactComponent types ****************//
-  protected case class Props(menuItems: Seq[Seq[MenuItem]], enableSearch: Boolean, router: RouterContext)
+  protected case class Props(menuItems: Seq[Seq[MenuItem]],
+                             enableSearch: Boolean,
+                             router: RouterContext,
+                             configureAdditionalKeyboardShortcuts: () => Unit)
 
   protected class Backend($ : BackendScope[Props, State])
       extends BackendBase($)
@@ -100,9 +111,7 @@ final class SbadminMenu(implicit i18n: I18n) extends HydroReactComponent.Statele
                 for (MenuItem(label, page, iconClass, shortcuts) <- menuItemLi) yield {
                   router
                     .anchorWithHrefTo(page)(
-                      ^^.ifThen(page.getClass == props.router.currentPage.getClass) {
-                        ^.className := "active"
-                      },
+                      ^^.ifThen(page == props.router.currentPage) { ^.className := "active" },
                       // Add underscore to force rerender to fix bug when mouse is on current menu item
                       ^.key := (page.toString + (if (page == props.router.currentPage) "_" else "")),
                       <.i(^.className := iconClass getOrElse page.iconClass),
@@ -153,6 +162,8 @@ final class SbadminMenu(implicit i18n: I18n) extends HydroReactComponent.Statele
       if (props.enableSearch) {
         bind("shift+alt+f", () => queryInputRef().focus())
       }
+
+      props.configureAdditionalKeyboardShortcuts()
     }
   }
 }
