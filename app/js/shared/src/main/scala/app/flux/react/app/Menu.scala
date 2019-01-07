@@ -1,39 +1,25 @@
 package app.flux.react.app
 
-import hydro.common.I18n
 import app.common.money.ExchangeRateManager
 import app.flux.router.AppPages
-import hydro.flux.router.StandardPages
 import app.flux.stores.entries.factories.AllEntriesStoreFactory
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Config
 import app.models.accounting.config.Template
 import app.models.user.User
-import hydro.common.LoggingUtils.LogExceptionsCallback
-import hydro.common.LoggingUtils.logExceptions
+import hydro.common.I18n
 import hydro.common.time.Clock
-import hydro.common.CollectionUtils
-import hydro.flux.react.HydroReactComponent
-import hydro.flux.react.ReactVdomUtils.<<
-import hydro.flux.react.ReactVdomUtils.^^
-import hydro.flux.react.uielements.input.TextInput
-import hydro.flux.react.uielements.HalfPanel.getClass
 import hydro.flux.react.uielements.SbadminMenu
 import hydro.flux.react.uielements.SbadminMenu.MenuItem
-import hydro.flux.router.Page
 import hydro.flux.router.RouterContext
-import hydro.jsfacades.Mousetrap
-import japgolly.scalajs.react._
+import hydro.flux.router.StandardPages
 import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
 
-private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFactory,
-                              entityAccess: AppJsEntityAccess,
+private[app] final class Menu(implicit accountingConfig: Config,
                               user: User,
-                              clock: Clock,
-                              accountingConfig: Config,
-                              exchangeRateManager: ExchangeRateManager,
+                              entityAccess: AppJsEntityAccess,
                               i18n: I18n,
                               sbadminMenu: SbadminMenu) {
 
