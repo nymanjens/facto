@@ -47,16 +47,6 @@ object AppPages {
   case object Liquidation extends PageBase("app.liquidation", iconClass = "icon-balance-scale")
   case object Endowments extends PageBase("app.endowments", iconClass = "icon-crown")
   case object Summary extends PageBase("app.summary", iconClass = "icon-table")
-  case class Search private[router] (private[router] val encodedQuery: String) extends Page {
-    def query: String = js.URIUtils.decodeURIComponent(js.URIUtils.decodeURI(encodedQuery))
-
-    override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
-      Future.successful(i18n("app.search-results-for", query))
-    override def iconClass = "icon-list"
-  }
-  object Search {
-    def apply(query: String): Search = new Search(js.URIUtils.encodeURIComponent(query))
-  }
   case object TemplateList extends PageBase("app.templates", iconClass = "icon-template")
 
   // **************** Accounting forms - transactions **************** //

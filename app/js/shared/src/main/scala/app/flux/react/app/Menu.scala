@@ -3,6 +3,7 @@ package app.flux.react.app
 import hydro.common.I18n
 import app.common.money.ExchangeRateManager
 import app.flux.router.AppPages
+import hydro.flux.router.StandardPages
 import app.flux.stores.entries.factories.AllEntriesStoreFactory
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Config
@@ -79,7 +80,7 @@ private[app] final class Menu(implicit entriesStoreFactory: AllEntriesStoreFacto
       case AppPages.Liquidation           => templatesForPlacement(Template.Placement.LiquidationView)
       case AppPages.Endowments            => templatesForPlacement(Template.Placement.EndowmentsView)
       case AppPages.Summary               => templatesForPlacement(Template.Placement.SummaryView)
-      case _: AppPages.Search             => templatesForPlacement(Template.Placement.SearchView)
+      case _: StandardPages.Search        => templatesForPlacement(Template.Placement.SearchView)
       case page: AppPages.NewFromTemplate => Seq(accountingConfig.templateWithCode(page.templateCode))
       case _                              => Seq()
     }

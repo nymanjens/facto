@@ -1,6 +1,6 @@
 package hydro.flux.react.uielements
 
-import app.flux.router.AppPages
+import hydro.flux.router.StandardPages
 import hydro.common.I18n
 import hydro.common.LoggingUtils.LogExceptionsCallback
 import hydro.common.LoggingUtils.logExceptions
@@ -41,7 +41,7 @@ final class SbadminMenu(implicit i18n: I18n) extends HydroReactComponent.Statele
 
     override def didMount(props: Props, state: State): Callback = LogExceptionsCallback {
       props.router.currentPage match {
-        case page: AppPages.Search => {
+        case page: StandardPages.Search => {
           queryInputRef().setValue(page.query)
         }
         case _ =>
@@ -78,7 +78,7 @@ final class SbadminMenu(implicit i18n: I18n) extends HydroReactComponent.Statele
                         e.preventDefault()
 
                         queryInputRef().value match {
-                          case Some(query) => props.router.setPage(AppPages.Search(query))
+                          case Some(query) => props.router.setPage(StandardPages.Search(query))
                           case None        =>
                         }
                       }

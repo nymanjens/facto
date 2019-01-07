@@ -8,6 +8,7 @@ import hydro.flux.action.StandardActions
 import hydro.flux.router.Page
 import hydro.flux.router.RouterContext
 import hydro.flux.router.StandardPages
+import hydro.flux.router.StandardPages
 import hydro.models.access.EntityAccess
 import japgolly.scalajs.react.extra.router.StaticDsl.RouteB
 import japgolly.scalajs.react.extra.router._
@@ -69,7 +70,7 @@ private[router] final class RouterFactory(implicit reactAppModule: app.flux.reac
 
           | staticRuleFromPage(AppPages.Summary, reactAppModule.summary.apply)
 
-          | dynamicRuleFromPage(_ ~ query.caseClass[AppPages.Search]) { (page, ctl) =>
+          | dynamicRuleFromPage(_ ~ query.caseClass[StandardPages.Search]) { (page, ctl) =>
             reactAppModule.searchResults(page.query, ctl)
           }
           | staticRuleFromPage(AppPages.TemplateList, reactAppModule.templateList.apply)
