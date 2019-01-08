@@ -40,11 +40,8 @@ final class Module(implicit i18n: I18n,
   // Configuration of submodules
   private val hydroUielementsModule = new hydro.flux.react.uielements.Module
   implicit private lazy val pageHeader = hydroUielementsModule.pageHeader
-  implicit private lazy val globalMessages = hydroUielementsModule.globalMessages
-  implicit private lazy val pageLoadingSpinner = hydroUielementsModule.pageLoadingSpinner
-  implicit private lazy val applicationDisconnectedIcon = hydroUielementsModule.applicationDisconnectedIcon
-  implicit private lazy val pendingModificationsCounter = hydroUielementsModule.pendingModificationsCounter
   implicit private lazy val sbadminMenu = hydroUielementsModule.sbadminMenu
+  implicit private lazy val sbadminLayout = hydroUielementsModule.sbadminLayout
 
   private val userManagementModule = new hydro.flux.react.uielements.usermanagement.Module
   private val transactionGroupFormModule = new app.flux.react.app.transactiongroupform.Module

@@ -24,7 +24,7 @@ private[app] final class Menu(implicit accountingConfig: Config,
                               sbadminMenu: SbadminMenu) {
 
   // **************** API ****************//
-  def apply(implicit router: RouterContext): VdomElement = {
+  def apply()(implicit router: RouterContext): VdomElement = {
     sbadminMenu(
       menuItems = Seq(
         Seq(

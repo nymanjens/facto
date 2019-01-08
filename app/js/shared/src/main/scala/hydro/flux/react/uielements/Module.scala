@@ -21,10 +21,11 @@ final class Module(implicit i18n: I18n,
                    dispatcher: Dispatcher,
                    clock: Clock) {
 
-  lazy val pageHeader = new PageHeader
-  lazy val globalMessages: GlobalMessages = new GlobalMessages
-  lazy val pageLoadingSpinner: PageLoadingSpinner = new PageLoadingSpinner
-  lazy val applicationDisconnectedIcon: ApplicationDisconnectedIcon = new ApplicationDisconnectedIcon
-  lazy val pendingModificationsCounter: PendingModificationsCounter = new PendingModificationsCounter
-  lazy val sbadminMenu: SbadminMenu = new SbadminMenu()
+  implicit lazy val pageHeader = new PageHeader
+  implicit lazy val globalMessages: GlobalMessages = new GlobalMessages
+  implicit lazy val pageLoadingSpinner: PageLoadingSpinner = new PageLoadingSpinner
+  implicit lazy val applicationDisconnectedIcon: ApplicationDisconnectedIcon = new ApplicationDisconnectedIcon
+  implicit lazy val pendingModificationsCounter: PendingModificationsCounter = new PendingModificationsCounter
+  implicit lazy val sbadminMenu: SbadminMenu = new SbadminMenu()
+  implicit lazy val sbadminLayout: SbadminLayout = new SbadminLayout()
 }
