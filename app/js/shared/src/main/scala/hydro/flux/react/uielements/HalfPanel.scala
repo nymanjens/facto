@@ -23,7 +23,7 @@ object HalfPanel {
                 ^.className := "pull-right",
                 Bootstrap.Button(variant = Variant.default, size = Size.xs)(
                   ^.onClick --> props.closeButtonCallback.get,
-                  Bootstrap.FontAwesomeIcon("times"),
+                  Bootstrap.FontAwesomeIcon("times", fixedWidth = true),
                 )
               )
             }

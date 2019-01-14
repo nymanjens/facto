@@ -45,8 +45,17 @@ object Bootstrap {
   }
 
   def Icon(className: String): VdomTag = <.i(^.className := className)
-  def FontAwesomeIcon(name: String, otherNames: String*): VdomTag = {
-    <.i(^^.classes(s"fa fa-$name fa-fw" +: otherNames.map(n => s"fa-$n")))
+  def FontAwesomeIcon(name: String, otherName: String = null, fixedWidth: Boolean = false): VdomTag = {
+    val classes = mutable.Buffer[String]()
+    classes += "fa"
+    classes += s"fa-$name"
+    if (otherName != null) {
+      classes += s"fa-$otherName"
+    }
+    if (fixedWidth) {
+      classes += s"fa-fw"
+    }
+    <.i(^^.classes(classes))
   }
 
   def Panel(variant: Variant = Variant.default): VdomTag =
