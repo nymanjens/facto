@@ -5,6 +5,9 @@ import hydro.common.LoggingUtils.LogExceptionsCallback
 import hydro.common.LoggingUtils.logExceptions
 import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.ReactVdomUtils.^^
+import hydro.flux.react.uielements.Bootstrap.Variant
+import hydro.flux.react.uielements.Bootstrap.Size
+import hydro.flux.react.uielements.Bootstrap
 import hydro.flux.react.uielements.input.InputBase
 import hydro.flux.react.uielements.input.InputValidator
 import japgolly.scalajs.react.Ref.ToScalaComponent
@@ -12,6 +15,9 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.component.Scala.MountedImpure
 import japgolly.scalajs.react.internal.Box
 import japgolly.scalajs.react.vdom.html_<^._
+import hydro.flux.react.uielements.Bootstrap.Variant
+import hydro.flux.react.uielements.Bootstrap.Size
+import hydro.flux.react.uielements.Bootstrap
 import org.scalajs.dom.console
 
 import scala.collection.immutable.Seq
@@ -54,9 +60,8 @@ object InputComponent {
 
           <.div(
             ^^.classes(Seq("form-group") ++ errorMessage.map(_ => "has-error")),
-            <.label(^.className := "col-sm-4 control-label", props.label),
-            <.div(
-              ^.className := "col-sm-8",
+            Bootstrap.Col(sm = 4, tag = <.label)(^.className := "control-label", props.label),
+            Bootstrap.Col(sm = 8)(
               inputRenderer.renderInput(
                 classes = "form-control" +: props.inputClasses,
                 name = props.name,

@@ -31,9 +31,9 @@ final class ApplicationDisconnectedIcon(implicit applicationIsOnlineStore: Appli
     override def render(props: Props, state: State): VdomElement = logExceptions {
       state.isDisconnected match {
         case true =>
-          <.span(
-            ^.className := "navbar-brand",
-            <.i(^.className := "fa fa-chain-broken", ^.title := i18n("app.offline")))
+          Bootstrap.NavbarBrand()(
+            Bootstrap.FontAwesomeIcon("chain-broken")(^.title := i18n("app.offline"))
+          )
         case false =>
           <.span()
       }

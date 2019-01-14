@@ -1,8 +1,8 @@
 package hydro.flux.react.uielements
 
-import hydro.common.I18n
 import app.flux.stores._
 import app.models.user.User
+import hydro.common.I18n
 import hydro.common.time.Clock
 import hydro.flux.action.Dispatcher
 import hydro.flux.stores.ApplicationIsOnlineStore
