@@ -2,6 +2,8 @@ package hydro.flux.react.uielements
 
 import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.ReactVdomUtils.^^
+import hydro.flux.react.uielements.Bootstrap.Size
+import hydro.flux.react.uielements.Bootstrap.Variant
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
@@ -11,26 +13,22 @@ object HalfPanel {
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
     .renderPC((_, props, children) =>
-      <.div(
-        ^^.classes("col-lg-6" +: props.panelClasses),
-        <.div(
-          ^^.classes("panel panel-default"),
-          <.div(
-            ^^.classes("panel-heading"),
+      Bootstrap.Col(lg = 6)(
+        ^^.classes(props.panelClasses),
+        Bootstrap.Panel()(
+          Bootstrap.PanelHeading(
             props.title,
             <<.ifThen(props.closeButtonCallback.isDefined) {
               <.div(
                 ^.className := "pull-right",
-                <.button(
-                  ^.tpe := "button",
-                  ^.className := "btn btn-default btn-xs",
+                Bootstrap.Button(variant = Variant.default, size = Size.xs)(
                   ^.onClick --> props.closeButtonCallback.get,
-                  <.i(^.className := "fa  fa-times fa-fw")
+                  Bootstrap.FontAwesomeIcon("times", fixedWidth = true),
                 )
               )
             }
           ),
-          <.div(^^.classes("panel-body"), children)
+          Bootstrap.PanelBody(children)
         )
     ))
     .build

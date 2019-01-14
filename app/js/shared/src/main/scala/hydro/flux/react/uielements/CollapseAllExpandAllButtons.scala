@@ -2,7 +2,7 @@ package hydro.flux.react.uielements
 
 import hydro.common.I18n
 import hydro.common.Unique
-import hydro.flux.react.ReactVdomUtils.^^
+import hydro.flux.react.uielements.Bootstrap.Variant
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
@@ -12,20 +12,16 @@ object CollapseAllExpandAllButtons {
     .builder[Props](getClass.getSimpleName)
     .renderP((_, props) => {
       <.span(
-        <.div(
-          ^^.classes("btn", "btn-default"),
-          ^.role := "button",
+        Bootstrap.Button(variant = Variant.default)(
           ^.onClick --> Callback(props.setExpandedCallback(Unique(false)).runNow()),
-          <.i(^^.classes("fa", "fa-angle-double-right")),
+          Bootstrap.FontAwesomeIcon("angle-double-right"),
           " ",
           props.i18n("app.collapse-all")
         ),
         " ",
-        <.div(
-          ^^.classes("btn", "btn-default"),
-          ^.role := "button",
+        Bootstrap.Button(variant = Variant.default)(
           ^.onClick --> Callback(props.setExpandedCallback(Unique(true)).runNow()),
-          <.i(^^.classes("fa", "fa-angle-double-down")),
+          Bootstrap.FontAwesomeIcon("angle-double-down"),
           " ",
           props.i18n("app.expand-all")
         )

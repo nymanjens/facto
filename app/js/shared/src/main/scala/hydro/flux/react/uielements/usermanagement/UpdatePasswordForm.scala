@@ -12,6 +12,9 @@ import hydro.flux.react.uielements.HalfPanel
 import hydro.flux.react.uielements.input.bootstrap.TextInput
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
+import hydro.flux.react.uielements.Bootstrap.Variant
+import hydro.flux.react.uielements.Bootstrap.Size
+import hydro.flux.react.uielements.Bootstrap
 
 import scala.collection.immutable.Seq
 
@@ -38,12 +41,11 @@ private[usermanagement] final class UpdatePasswordForm(implicit user: User,
     private val passwordVerificationRef = TextInput.ref()
 
     override def render(props: Props, state: State) = logExceptions {
-      <.form(
-        ^.className := "form-horizontal",
+      Bootstrap.FormHorizontal(
         HalfPanel(title = <.span(i18n("app.change-password")))(
           {
             for (error <- state.globalErrors) yield {
-              <.div(^.className := "alert alert-danger", ^.key := error, error)
+              Bootstrap.Alert(Variant.danger)(^.key := error, error)
             }
           }.toVdomArray,
           TextInput(
@@ -69,11 +71,7 @@ private[usermanagement] final class UpdatePasswordForm(implicit user: User,
             required = true,
             showErrorMessage = state.showErrorMessages
           ),
-          <.button(
-            ^.tpe := "submit",
-            ^.className := "btn btn-default",
-            ^.onClick ==> onSubmit,
-            i18n("app.ok"))
+          Bootstrap.Button()(^.tpe := "submit", ^.onClick ==> onSubmit, i18n("app.ok"))
         )
       )
     }

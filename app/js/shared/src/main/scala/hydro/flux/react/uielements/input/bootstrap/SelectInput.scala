@@ -4,10 +4,16 @@ import hydro.common.CollectionUtils.toListMap
 import hydro.common.GuavaReplacement.Iterables.getOnlyElement
 import hydro.common.I18n
 import hydro.flux.react.ReactVdomUtils.^^
+import hydro.flux.react.uielements.Bootstrap.Variant
+import hydro.flux.react.uielements.Bootstrap.Size
+import hydro.flux.react.uielements.Bootstrap
 import hydro.flux.react.uielements.input.InputBase
 import hydro.flux.react.uielements.input.bootstrap.InputComponent.Props
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
+import hydro.flux.react.uielements.Bootstrap.Variant
+import hydro.flux.react.uielements.Bootstrap.Size
+import hydro.flux.react.uielements.Bootstrap
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable

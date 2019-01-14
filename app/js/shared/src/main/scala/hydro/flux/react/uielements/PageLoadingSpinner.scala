@@ -29,7 +29,9 @@ final class PageLoadingSpinner(implicit pageLoadingStateStore: PageLoadingStateS
     override def render(props: Props, state: State): VdomElement = logExceptions {
       state.isLoading match {
         case true =>
-          <.span(^.className := "navbar-brand", <.i(^.className := "fa fa-circle-o-notch fa-spin"))
+          Bootstrap.NavbarBrand()(
+            Bootstrap.FontAwesomeIcon("circle-o-notch", "spin"),
+          )
         case false =>
           <.span()
       }

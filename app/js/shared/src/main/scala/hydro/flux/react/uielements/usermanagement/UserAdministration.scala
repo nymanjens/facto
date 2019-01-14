@@ -5,6 +5,9 @@ import hydro.flux.react.uielements.PageHeader
 import hydro.flux.router.RouterContext
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
+import hydro.flux.react.uielements.Bootstrap.Variant
+import hydro.flux.react.uielements.Bootstrap.Size
+import hydro.flux.react.uielements.Bootstrap
 
 final class UserAdministration(implicit i18n: I18n,
                                pageHeader: PageHeader,
@@ -17,8 +20,8 @@ final class UserAdministration(implicit i18n: I18n,
       implicit val router = props.router
       <.span(
         pageHeader(router.currentPage),
-        <.div(^.className := "row", allUsersList()),
-        <.div(^.className := "row", addUserForm())
+        Bootstrap.Row(allUsersList()),
+        Bootstrap.Row(addUserForm()),
       )
     })
     .build

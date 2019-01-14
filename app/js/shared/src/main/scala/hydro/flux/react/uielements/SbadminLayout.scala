@@ -36,7 +36,6 @@ final class SbadminLayout(implicit globalMessages: GlobalMessages,
       // Navigation
       <.nav(
         ^.className := "navbar navbar-default navbar-static-top",
-        ^.role := "navigation",
         ^.style := js.Dictionary("marginBottom" -> 0),
         <.div(
           ^.className := "navbar-header",
@@ -50,7 +49,7 @@ final class SbadminLayout(implicit globalMessages: GlobalMessages,
             <.span(^.className := "icon-bar"),
             <.span(^.className := "icon-bar")
           ),
-          router.anchorWithHrefTo(StandardPages.Root)(^.className := "navbar-brand", title),
+          Bootstrap.NavbarBrand(tag = router.anchorWithHrefTo(StandardPages.Root))(title),
           " ",
           pageLoadingSpinner()
         ),
@@ -64,9 +63,9 @@ final class SbadminLayout(implicit globalMessages: GlobalMessages,
               ^.className := "dropdown-toggle",
               VdomAttr("data-toggle") := "dropdown",
               ^.href := "#",
-              <.i(^.className := "fa fa-user fa-fw"),
+              Bootstrap.FontAwesomeIcon("user", fixedWidth = true),
               " ",
-              <.i(^.className := "fa fa-caret-down")
+              Bootstrap.FontAwesomeIcon("caret-down"),
             ),
             <.ul(
               ^.className := "dropdown-menu dropdown-user",
@@ -111,9 +110,8 @@ final class SbadminLayout(implicit globalMessages: GlobalMessages,
         ^.style := js.Dictionary("minHeight" -> s"${pageWrapperHeightPx}px"),
         <.div(
           ^.className := "container-fluid",
-          <.div(
-            ^.className := "row",
-            <.div(^.className := "col-lg-12", globalMessages(), pageContent)
+          Bootstrap.Row(
+            Bootstrap.Col(lg = 12)(globalMessages(), pageContent)
           )
         )
       )

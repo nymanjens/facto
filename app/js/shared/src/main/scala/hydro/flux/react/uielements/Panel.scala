@@ -10,17 +10,16 @@ object Panel {
   private case class Props(title: String, panelClasses: Seq[String])
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
-    .renderPC((_, props, children) =>
-      <.div(
-        ^^.classes("row" +: props.panelClasses),
-        <.div(
-          ^^.classes("col-lg-12"),
-          <.div(
-            ^^.classes("panel panel-default"),
-            <.div(^^.classes("panel-heading"), props.title),
-            <.div(^^.classes("panel-body"), children))
-        )
-    ))
+    .renderPC(
+      (_, props, children) =>
+        Bootstrap.Row(
+          ^^.classes(props.panelClasses),
+          Bootstrap.Col(lg = 12)(
+            Bootstrap.Panel()(
+              Bootstrap.PanelHeading(props.title),
+              Bootstrap.PanelBody(children),
+            ))
+      ))
     .build
 
   def apply(title: String, panelClasses: Seq[String] = Seq(), key: String = null)(

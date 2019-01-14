@@ -31,9 +31,9 @@ final class PendingModificationsCounter(implicit pendingModificationsStore: Pend
         case 0 =>
           <.span()
         case numberOfModifications =>
-          <.span(
-            ^.className := "navbar-brand pending-modifications",
-            <.i(^.className := "glyphicon-hourglass"),
+          Bootstrap.NavbarBrand()(
+            ^.className := "pending-modifications",
+            Bootstrap.Icon("glyphicon-hourglass"),
             " ",
             numberOfModifications)
       }

@@ -4,6 +4,7 @@ import app.flux.stores.GlobalMessagesStore
 import app.flux.stores.GlobalMessagesStore.Message
 import hydro.common.LoggingUtils.logExceptions
 import hydro.flux.react.HydroReactComponent
+import hydro.flux.react.uielements.Bootstrap.Variant
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
@@ -30,20 +31,19 @@ final class GlobalMessages(implicit globalMessagesStore: GlobalMessagesStore) ex
       state.maybeMessage match {
         case None => <.span()
         case Some(message) =>
-          <.div(
-            ^.className := "alert alert-info",
+          Bootstrap.Alert(variant = Variant.info)(
             ^.style := js.Dictionary("marginTop" -> "20px"),
             <.span(
-              <.i(
-                ^.className := iconClassNames(message.messageType),
-                ^.style := js.Dictionary("marginRight" -> "11px")),
+              Bootstrap.Icon(iconClassName(message.messageType))(
+                ^.style := js.Dictionary("marginRight" -> "11px"),
+              ),
               " "),
             message.string
           )
       }
     }
 
-    private def iconClassNames(messageType: Message.Type): String = messageType match {
+    private def iconClassName(messageType: Message.Type): String = messageType match {
       case Message.Type.Working => "fa fa-circle-o-notch fa-spin"
       case Message.Type.Success => "fa fa-check"
       case Message.Type.Failure => "fa fa-warning"
