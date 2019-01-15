@@ -82,8 +82,7 @@ final class SbadminMenu(implicit i18n: I18n) extends HydroReactComponent.Statele
                   classes = Seq("form-control")),
                 <.span(
                   ^.className := "input-group-btn",
-                  Bootstrap.Button(variant = Variant.default)(
-                    ^.tpe := "submit",
+                  Bootstrap.Button(variant = Variant.default, tpe="submit")(
                     ^.onClick ==> { (e: ReactEventFromInput) =>
                       LogExceptionsCallback {
                         e.preventDefault()

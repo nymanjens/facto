@@ -80,7 +80,7 @@ private[usermanagement] final class AddUserForm(implicit user: User, i18n: I18n,
             required = true,
             showErrorMessage = state.showErrorMessages
           ),
-          Bootstrap.Button()(^.tpe := "submit", ^.onClick ==> onSubmit, i18n("app.add"))
+          Bootstrap.Button(tpe = "submit")(^.onClick ==> onSubmit, i18n("app.add"))
         )
       )
     }

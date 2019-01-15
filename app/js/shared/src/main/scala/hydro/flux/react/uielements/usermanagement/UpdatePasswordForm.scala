@@ -71,7 +71,7 @@ private[usermanagement] final class UpdatePasswordForm(implicit user: User,
             required = true,
             showErrorMessage = state.showErrorMessages
           ),
-          Bootstrap.Button()(^.tpe := "submit", ^.onClick ==> onSubmit, i18n("app.ok"))
+          Bootstrap.Button(tpe = "submit")(^.onClick ==> onSubmit, i18n("app.ok"))
         )
       )
     }

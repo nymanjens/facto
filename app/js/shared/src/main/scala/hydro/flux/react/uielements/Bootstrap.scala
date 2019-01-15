@@ -28,7 +28,8 @@ object Bootstrap {
              size: Size = null,
              block: Boolean = false,
              circle: Boolean = false,
-             tag: VdomTag = <.button): VdomTag = {
+             tag: VdomTag = <.button,
+             tpe: String = "button"): VdomTag = {
     val classes = mutable.Buffer[String]()
     classes += "btn"
     classes += s"btn-${variant.name}"
@@ -41,7 +42,7 @@ object Bootstrap {
     if (circle) {
       classes += s"btn-circle"
     }
-    tag(^^.classes(classes))
+    tag(^^.classes(classes), ^.tpe := tpe)
   }
 
   def Icon(className: String): VdomTag = <.i(^.className := className)

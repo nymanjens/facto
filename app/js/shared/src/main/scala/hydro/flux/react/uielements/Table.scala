@@ -69,7 +69,6 @@ object Table {
                   Bootstrap.Button(size = Size.sm, circle = true, tag = <.a)(
                     ^.onClick --> props.expandNumEntriesCallback.get,
                     ^.className := "expand-num-entries",
-                    ^.tpe := "button",
                     Bootstrap.FontAwesomeIcon("ellipsis-h"),
                   )
                 )

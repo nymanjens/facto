@@ -40,7 +40,6 @@ final class SbadminLayout(implicit globalMessages: GlobalMessages,
         <.div(
           ^.className := "navbar-header",
           <.button(
-            ^.tpe := "button",
             ^.className := "navbar-toggle",
             VdomAttr("data-toggle") := "collapse",
             VdomAttr("data-target") := ".navbar-collapse",
