@@ -59,11 +59,11 @@ class JvmEntityAccessBaseTest extends HookedSpecification {
       entityAccess.newQuerySync[User]().data() mustEqual Seq(updatedUser1)
     }
 
-    "EntityModification.Delete" in new WithApplication {
+    "EntityModification.Remove" in new WithApplication {
       val user1 = createUser()
       entityAccess.persistEntityModifications(EntityModification.Add(user1))
 
-      entityAccess.persistEntityModifications(EntityModification.createDelete(user1))
+      entityAccess.persistEntityModifications(EntityModification.createRemove(user1))
 
       entityAccess.newQuerySync[User]().data() mustEqual Seq()
     }
@@ -98,7 +98,7 @@ class JvmEntityAccessBaseTest extends HookedSpecification {
       entityAccess.newQuerySync[User]().data() mustEqual Seq(updatedUser1)
     }
 
-    "EntityModification.Delete is idempotent" in new WithApplication {
+    "EntityModification.Remove is idempotent" in new WithApplication {
       val user1 = createUser()
       val user2 = createUser()
       val user3 = createUser()
@@ -106,9 +106,9 @@ class JvmEntityAccessBaseTest extends HookedSpecification {
       entityAccess.persistEntityModifications(EntityModification.Add(user2))
 
       entityAccess.persistEntityModifications(
-        EntityModification.createDelete(user2),
-        EntityModification.createDelete(user2),
-        EntityModification.createDelete(user3)
+        EntityModification.createRemove(user2),
+        EntityModification.createRemove(user2),
+        EntityModification.createRemove(user3)
       )
 
       entityAccess.newQuerySync[User]().data() mustEqual Seq(user1)
@@ -131,7 +131,7 @@ class JvmEntityAccessBaseTest extends HookedSpecification {
       val updatedUser1 = user1.copy(name = "other name")
 
       entityAccess.persistEntityModifications(EntityModification.Add(user1))
-      entityAccess.persistEntityModifications(EntityModification.createDelete(user1))
+      entityAccess.persistEntityModifications(EntityModification.createRemove(user1))
       val initialModifications = allEntityModifications()
 
       entityAccess.persistEntityModifications(EntityModification.Update(updatedUser1))

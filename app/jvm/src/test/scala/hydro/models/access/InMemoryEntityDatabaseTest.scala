@@ -57,7 +57,7 @@ class InMemoryEntityDatabaseTest extends HookedSpecification {
         .data() // ensure lazy fetching gets triggered (if any)
 
       entitiesFetcher.users -= user4
-      database.update(EntityModification.createDelete(user4))
+      database.update(EntityModification.createRemove(user4))
 
       runTestsAssumingUser123(database)
     }

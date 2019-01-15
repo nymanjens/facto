@@ -29,7 +29,7 @@ final class SlickEntityManager[E <: Entity] private (implicit val tableDef: Slic
     dbRun(newQuery.filter(_.id === entityWithId.id).update(entityWithId))
   }
 
-  def deleteIfExists(entityId: Long): Unit = {
+  def removeIfExists(entityId: Long): Unit = {
     dbRun(newQuery.filter(_.id === entityId).delete)
   }
 

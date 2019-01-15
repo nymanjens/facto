@@ -178,7 +178,7 @@ abstract class JvmEntityAccessBase(implicit clock: Clock) extends EntityAccess {
             case EntityModification.Update(entity) =>
               getManager(entityType).updateIfExists(entity.asInstanceOf[entityType.get])
             case EntityModification.Remove(entityId) =>
-              getManager(entityType).deleteIfExists(entityId)
+              getManager(entityType).removeIfExists(entityId)
           }
 
           // Add modification
