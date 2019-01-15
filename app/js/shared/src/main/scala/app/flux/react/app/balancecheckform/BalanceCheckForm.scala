@@ -153,7 +153,8 @@ final class BalanceCheckForm(implicit i18n: I18n,
                   defaultValue = mappedExtraProps.defaultValue,
                   required = true,
                   showErrorMessage = state.showErrorMessages,
-                  additionalValidator = mappedExtraProps.additionalValidator
+                  additionalValidator = mappedExtraProps.additionalValidator,
+                  focusOnMount = true
                 )
               },
               MoneyInput(
