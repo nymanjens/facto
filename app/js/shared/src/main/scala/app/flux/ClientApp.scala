@@ -3,7 +3,6 @@ package app.flux
 import hydro.common.LoggingUtils.logExceptions
 import hydro.common.LoggingUtils.logFailure
 import org.scalajs.dom
-import org.scalajs.dom.Event
 import org.scalajs.dom.console
 
 import scala.async.Async.async
@@ -19,7 +18,6 @@ object ClientApp {
     // create stylesheet
     //GlobalStyles.addToDocument()
 
-    logUncaughtErrors()
     setUpServiceWorker()
 
     val commonTimeModule = new hydro.common.time.Module
@@ -35,14 +33,6 @@ object ClientApp {
       // tell React to render the router in the document body
       globalModule.router().renderIntoDOM(dom.document.getElementById("root"))
     }
-  }
-
-  private def logUncaughtErrors(): Unit = {
-    dom.window.onerror = (event, url, lineNumber, _1, _2) => console.log("  Uncaught error:", event)
-    dom.window.addEventListener("error", (event: Event) => {
-      console.log("  Uncaught error:", event)
-      false
-    })
   }
 
   private def setUpServiceWorker(): Unit = logExceptions {
