@@ -33,7 +33,7 @@ private[stores] final class TransactionAndGroupStore(implicit entityAccess: AppJ
 
     case UpdateTransactionGroup(group, transactionsWithoutId) =>
       async {
-        val transactionDeletions = await(group.transactions) map (EntityModification.createDelete(_))
+        val transactionDeletions = await(group.transactions) map (EntityModification.createRemove(_))
         val transactionAdditions =
           for ((transactionWithoutId, id) <- zipWithIncrementingId(transactionsWithoutId)) yield {
             EntityModification.createAddWithId(id, transactionWithoutId)
@@ -43,8 +43,8 @@ private[stores] final class TransactionAndGroupStore(implicit entityAccess: AppJ
 
     case RemoveTransactionGroup(group) =>
       async {
-        val transactionDeletions = await(group.transactions) map (EntityModification.createDelete(_))
-        val groupDeletion = EntityModification.createDelete(group)
+        val transactionDeletions = await(group.transactions) map (EntityModification.createRemove(_))
+        val groupDeletion = EntityModification.createRemove(group)
         await(entityAccess.persistModifications(transactionDeletions :+ groupDeletion))
       }
   }

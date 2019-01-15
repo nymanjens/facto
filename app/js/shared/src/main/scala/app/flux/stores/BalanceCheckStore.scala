@@ -14,11 +14,11 @@ private[stores] final class BalanceCheckStore(implicit entityAccess: AppJsEntity
       entityAccess.persistModifications(EntityModification.createAddWithRandomId(balanceCheckWithoutId))
 
     case UpdateBalanceCheck(existingBalanceCheck, newBalanceCheckWithoutId) =>
-      val bcDeletion = EntityModification.createDelete(existingBalanceCheck)
+      val bcDeletion = EntityModification.createRemove(existingBalanceCheck)
       val bcAddition = EntityModification.createAddWithRandomId(newBalanceCheckWithoutId)
       entityAccess.persistModifications(bcDeletion, bcAddition)
 
     case RemoveBalanceCheck(balanceCheckWithId) =>
-      entityAccess.persistModifications(EntityModification.createDelete(balanceCheckWithId))
+      entityAccess.persistModifications(EntityModification.createRemove(balanceCheckWithId))
   }
 }

@@ -171,7 +171,7 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
         val transaction1 = createTransaction()
         await(db.addAll(Seq(transaction1)))
 
-        await(db.applyModifications(Seq(EntityModification.createDelete(transaction1))))
+        await(db.applyModifications(Seq(EntityModification.createRemove(transaction1))))
 
         await(DbResultSet.fromExecutor(db.queryExecutor[Transaction]()).data()) ==> Seq()
       }
@@ -227,9 +227,9 @@ private[tests] class LocalDatabaseTest extends ManualTestSuite {
         await(
           db.applyModifications(
             Seq(
-              EntityModification.createDelete(transaction2),
-              EntityModification.createDelete(transaction2),
-              EntityModification.createDelete(transaction3)
+              EntityModification.createRemove(transaction2),
+              EntityModification.createRemove(transaction2),
+              EntityModification.createRemove(transaction3)
             )))
 
         await(DbResultSet.fromExecutor(db.queryExecutor[Transaction]()).data()) ==> Seq(transaction1)
