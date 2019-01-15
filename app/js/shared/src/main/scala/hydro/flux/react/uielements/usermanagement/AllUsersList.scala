@@ -42,8 +42,6 @@ final class AllUsersList(implicit i18n: I18n, userStore: UserStore) extends Hydr
             <.th(i18n("app.login-name")),
             <.th(i18n("app.full-name")),
             <.th(i18n("app.is-admin")),
-            <.th(i18n("app.expand-cash-flow")),
-            <.th(i18n("app.expand-liquidation"))
           ),
           tableRowDatas = tableRowDatas(state)
         )
