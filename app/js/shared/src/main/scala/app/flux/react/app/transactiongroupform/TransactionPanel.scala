@@ -231,7 +231,7 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
     val categoryRef = categoryInputWithDefault.ref()
     val descriptionRef = stringInputWithDefault.ref()
     val flowRef = MoneyInput.ref()
-    val detailDescriptionRef = stringInputWithDefault.ref()
+    val detailDescriptionRef = TextAreaInput.ref()
     val tagsRef = tagsInputWithDefault.ref()
 
     def render(props: Props, state: State) = logExceptions {
@@ -396,22 +396,14 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
           date = state.transactionDate,
           listener = AnythingChangedListener
         ),
-        stringInputWithDefault.forOption(
+        TextAreaInput(
           ref = detailDescriptionRef,
-          defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.detailDescription),
-          startWithDefault = props.defaultValues.isEmpty,
-          delegateRefFactory = TextAreaInput.ref _
-        ) { extraProps =>
-          TextAreaInput(
-            ref = extraProps.ref,
-            name = "more-info",
-            label = i18n("app.more-info"),
-            defaultValue = props.defaultValues.detailDescription,
-            showErrorMessage = props.showErrorMessages,
-            inputClasses = extraProps.inputClasses,
-            listener = AnythingChangedListener
-          )
-        },
+          name = "more-info",
+          label = i18n("app.more-info"),
+          defaultValue = props.defaultValues.detailDescription,
+          showErrorMessage = props.showErrorMessages,
+          listener = AnythingChangedListener
+        ),
         tagsInputWithDefault.forOption(
           ref = tagsRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.tags),
