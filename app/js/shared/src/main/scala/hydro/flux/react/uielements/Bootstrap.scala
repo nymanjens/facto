@@ -88,6 +88,5 @@ object Bootstrap {
     val sm = Size("sm")
     val lg = Size("lg")
     val xl = Size("xl")
-    val huge = Size("huge")
   }
 }
