@@ -33,7 +33,7 @@ final class PendingModificationsCounter(implicit pendingModificationsStore: Pend
         case numberOfModifications =>
           Bootstrap.NavbarBrand()(
             ^.className := "pending-modifications",
-            Bootstrap.Icon("glyphicon-hourglass"),
+            Bootstrap.Glyphicon("hourglass"),
             " ",
             numberOfModifications)
       }

@@ -58,6 +58,7 @@ object Bootstrap {
     }
     <.i(^^.classes(classes))
   }
+  def Glyphicon(name: String): VdomTag = Icon(s"glyphicon glyphicon-$name")
 
   def Panel(variant: Variant = Variant.default): VdomTag =
     <.div(^.className := s"panel panel-${variant.name}")
