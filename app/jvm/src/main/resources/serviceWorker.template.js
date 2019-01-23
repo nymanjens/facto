@@ -138,28 +138,37 @@ self.addEventListener('fetch', (event) => {
     );
   } else if(event.request.url == ROOT_URL + PERSIST_ENTITY_MODIFICATIONS_PATH) {
     if('sync' in self.registration) {
-      event.respondWith(new Promise((promiseResolve, promiseReject) => {
-        const key = generateRandomString();
-        console.log(`  [SW] Sending sync(${key})`);
-        event.request.clone().arrayBuffer()
-            .then((arrayBuffer)  => persistedMap.put(key, arrayBuffer))
-            .then(() => self.registration.sync.register(key))
-            .then(() => {
-              // Wait for persisted Map entry to become empty, indicating
-              // completion
-              let timeout = 2;
-              const tryAgain = () => {
-                persistedMap.get(key).then(result => {
-                  if(result) {
-                    setTimeout(tryAgain, ++timeout);
-                  } else {
-                    promiseResolve(new Response());
-                  }
-                });
-              };
-              tryAgain();
+      const requestClone = event.request.clone()
+      event.respondWith(
+        fetch(event.request)
+          .catch(e => {
+            console.log(
+                `[SW] Caught exception while persisting entity modification`,
+                e);
+            return new Promise((promiseResolve, promiseReject) => {
+              const key = generateRandomString();
+              console.log(`  [SW] Sending sync(${key})`);
+              requestClone.arrayBuffer()
+                  .then((arrayBuffer)  => persistedMap.put(key, arrayBuffer))
+                  .then(() => self.registration.sync.register(key))
+                  .then(() => {
+                    // Wait for persisted Map entry to become empty, indicating
+                    // completion
+                    let timeout = 2;
+                    const tryAgain = () => {
+                      persistedMap.get(key).then(result => {
+                        if(result) {
+                          setTimeout(tryAgain, ++timeout);
+                        } else {
+                          promiseResolve(new Response());
+                        }
+                      });
+                    };
+                    tryAgain();
+                  });
             });
-      }));
+          })
+      );
     } else {
       event.respondWith(fetch(event.request));
     }
