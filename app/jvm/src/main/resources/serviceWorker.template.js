@@ -1,4 +1,4 @@
-const CACHE_NAME = 'facto-v3-$CACHE_NAME_SUFFIX$';
+const CACHE_NAME = 'app-$CACHE_NAME_SUFFIX$';
 const ROOT_URL = new Request('/').url.slice(0, -1);
 const APP_PAGE_PATH = '/appwithoutcreds/';
 const GET_INITIAL_DATA_PATH = '/scalajsapi/getInitialData';
