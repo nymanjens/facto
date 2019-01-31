@@ -15,8 +15,11 @@ install:
 
 script:
   - sbt ++$TRAVIS_SCALA_VERSION test
-  - sbt scalastyle
-  - sbt test:scalastyle # run scalastyle in test code
+  - sbt "project sharedJVM"        scalastyle test:scalastyle
+  - sbt "project sharedJS"         scalastyle test:scalastyle
+  - sbt "project jsShared"         scalastyle test:scalastyle
+  - sbt "project client"           scalastyle test:scalastyle
+  - sbt "project server"           scalastyle test:scalastyle
   - jshint app/jvm/src/main/resources/
   - jshint app/jvm/src/main/assets/
 
