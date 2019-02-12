@@ -23,7 +23,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 // Note that this is a manual test because the Rhino javascript engine used for tests
 // is incompatible with Loki.
-private[tests] class LocalDatabaseTest extends ManualTestSuite {
+private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
 
   implicit private val webWorker = new hydro.models.access.webworker.Module().localDatabaseWebWorkerApiStub
   implicit private val secondaryIndexFunction = app.models.access.Module.secondaryIndexFunction
