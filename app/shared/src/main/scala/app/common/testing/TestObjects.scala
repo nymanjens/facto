@@ -10,14 +10,16 @@ import app.api.ScalaJsApi.UserPrototype
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup
-import app.models.accounting.config.Account.SummaryTotalRowDef
 import app.models.accounting.config._
-import hydro.models.modification.EntityModification
+import app.models.accounting.config.Account.SummaryTotalRowDef
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
 import hydro.common.time.LocalDateTime
+import hydro.common.OrderToken
 import hydro.common.time.LocalDateTimes
 import hydro.common.time.LocalDateTimes.createDateTime
+import hydro.models.modification.EntityModification
+import hydro.models.UpdatableEntity.LastUpdateTime
 
 import scala.collection.immutable.ListMap
 import scala.collection.immutable.Seq
@@ -25,12 +27,12 @@ import scala.util.Random
 
 object TestObjects {
 
-  val testCategoryA: Category = Category(code = "CAT_A", name = "Category A")
-  val testCategoryB: Category = Category(code = "CAT_B", name = "Category B", helpText = "b-help")
-  val testCategoryC: Category = Category(code = "CAT_C", name = "Category C")
+  def testCategoryA: Category = Category(code = "CAT_A", name = "Category A")
+  def testCategoryB: Category = Category(code = "CAT_B", name = "Category B", helpText = "b-help")
+  def testCategoryC: Category = Category(code = "CAT_C", name = "Category C")
   def testCategory: Category = testCategoryA
 
-  val testAccountCommon: Account = Account(
+  def testAccountCommon: Account = Account(
     code = "ACC_COMMON",
     longName = "Account Common",
     shorterName = "Acc.Common",
@@ -39,7 +41,7 @@ object TestObjects {
     categories = Seq(testCategoryA, testCategoryB),
     summaryTotalRows = Seq(SummaryTotalRowDef(rowTitleHtml = "<b>Total</b>", categoriesToIgnore = Set()))
   )
-  val testAccountA: Account = Account(
+  def testAccountA: Account = Account(
     code = "ACC_A",
     longName = "Account A",
     shorterName = "Acc.A",
@@ -55,7 +57,7 @@ object TestObjects {
         categoriesToIgnore = Set(testCategoryA))
     )
   )
-  val testAccountB: Account = Account(
+  def testAccountB: Account = Account(
     code = "ACC_B",
     longName = "Account B",
     shorterName = "Acc.B",
@@ -68,49 +70,49 @@ object TestObjects {
   )
   def testAccount: Account = testAccountA
 
-  val testReservoirCashCommon = MoneyReservoir(
+  def testReservoirCashCommon = MoneyReservoir(
     code = "CASH_COMMON",
     name = "Cash Common",
     shorterName = "Cash Common",
     owner = testAccountCommon,
     hidden = false)
-  val testReservoirCardCommon = MoneyReservoir(
+  def testReservoirCardCommon = MoneyReservoir(
     code = "CARD_COMMON",
     name = "Card Common",
     shorterName = "Card Common",
     owner = testAccountCommon,
     hidden = false)
-  val testReservoirCashA = MoneyReservoir(
+  def testReservoirCashA = MoneyReservoir(
     code = "CASH_A",
     name = "Cash A",
     shorterName = "Cash A",
     owner = testAccountA,
     hidden = false)
-  val testReservoirCardA = MoneyReservoir(
+  def testReservoirCardA = MoneyReservoir(
     code = "CARD_A",
     name = "Card A",
     shorterName = "Card A",
     owner = testAccountA,
     hidden = false)
-  val testReservoirCashB = MoneyReservoir(
+  def testReservoirCashB = MoneyReservoir(
     code = "CASH_B",
     name = "Cash B",
     shorterName = "Cash B",
     owner = testAccountB,
     hidden = false)
-  val testReservoirCardB = MoneyReservoir(
+  def testReservoirCardB = MoneyReservoir(
     code = "CARD_B",
     name = "Card B",
     shorterName = "Card B",
     owner = testAccountB,
     hidden = false)
-  val testReservoirHidden = MoneyReservoir(
+  def testReservoirHidden = MoneyReservoir(
     code = "HIDDEN",
     name = "Card Hidden",
     shorterName = "Card Hidden",
     owner = testAccountB,
     hidden = true)
-  val testReservoirCashGbp = MoneyReservoir(
+  def testReservoirCashGbp = MoneyReservoir(
     code = "CASH_GBP",
     name = "Cash GBP",
     shorterName = "Cash GBP",
@@ -122,7 +124,7 @@ object TestObjects {
   def testReservoir: MoneyReservoir = testReservoirCashCommon
   def otherTestReservoir: MoneyReservoir = testReservoirCardCommon
 
-  val testTemplate: Template = Template(
+  def testTemplate: Template = Template(
     code = "new-endowment",
     name = "New Endowment",
     placement = Set(Template.Placement.EndowmentsView),
@@ -146,7 +148,7 @@ object TestObjects {
     )
   )
 
-  val testConstants = Constants(
+  def testConstants = Constants(
     commonAccount = testAccountCommon,
     accountingCategory = testCategoryA,
     endowmentCategory = testCategoryB,
@@ -178,6 +180,8 @@ object TestObjects {
     resultBuilder.result
   }
 
+  def testLastUpdateTime = LastUpdateTime.allFieldsUpdated(testInstant)
+
   def testUserA: User = User(
     loginName = "testUserA",
     passwordHash =
@@ -187,9 +191,10 @@ object TestObjects {
     isAdmin = false,
     expandCashFlowTablesByDefault = true,
     expandLiquidationTablesByDefault = true,
-    idOption = Option(918273)
+    idOption = Option(918273),
+    lastUpdateTime = testLastUpdateTime,
   )
-  val testUserB: User = User(
+  def testUserB: User = User(
     loginName = "testUserB",
     passwordHash =
       "be196838736ddfd0007dd8b2e8f46f22d440d4c5959925cb49135abc9cdb01e84961aa43dd0ddb6ee59975eb649280d9f44088840af37451828a6412b9b574fc",
@@ -198,25 +203,37 @@ object TestObjects {
     isAdmin = false,
     expandCashFlowTablesByDefault = true,
     expandLiquidationTablesByDefault = true,
-    idOption = Option(918274)
+    idOption = Option(918274),
+    lastUpdateTime = testLastUpdateTime,
   )
   def testUser: User = testUserA
   def testUserRedacted: User = testUser.copy(passwordHash = "<redacted>")
 
-  val testUserPrototype = UserPrototype.create(
+  def testUserPrototype = UserPrototype.create(
     id = testUser.id,
     loginName = testUser.loginName,
     plainTextPassword = "dlkfjasfd",
     name = testUser.name,
     isAdmin = testUser.isAdmin)
 
-  val testDate: LocalDateTime = LocalDateTimes.createDateTime(2008, MARCH, 13)
-  val testInstant = Instant.ofEpochMilli(999000111)
-  val testUpdateToken: UpdateToken = s"123782:12378"
+  def orderTokenA: OrderToken = OrderToken.middleBetween(None, Some(OrderToken.middle))
+  def orderTokenB: OrderToken = OrderToken.middleBetween(Some(OrderToken.middle), None)
+  def orderTokenC: OrderToken = OrderToken.middleBetween(Some(orderTokenB), None)
+  def orderTokenD: OrderToken = OrderToken.middleBetween(Some(orderTokenC), None)
+  def orderTokenE: OrderToken = OrderToken.middleBetween(Some(orderTokenD), None)
+  def testOrderToken: OrderToken = orderTokenC
 
-  val testTransactionGroupWithId: TransactionGroup =
+  def testDate: LocalDateTime = LocalDateTimes.createDateTime(2008, MARCH, 13)
+  def testInstantA: Instant = Instant.ofEpochMilli(999000001)
+  def testInstantB: Instant = Instant.ofEpochMilli(999000002)
+  def testInstantC: Instant = Instant.ofEpochMilli(999000003)
+  def testInstantD: Instant = Instant.ofEpochMilli(999000004)
+  def testInstant: Instant = testInstantA
+  def testUpdateToken: UpdateToken = s"123782:12378"
+
+  def testTransactionGroupWithId: TransactionGroup =
     TransactionGroup(createdDate = testDate, idOption = Some(129874444))
-  val testTransactionWithIdA: Transaction = Transaction(
+  def testTransactionWithIdA: Transaction = Transaction(
     transactionGroupId = testTransactionGroupWithId.id,
     issuerId = testUserA.id,
     beneficiaryAccountCode = testAccountA.code,
@@ -229,7 +246,7 @@ object TestObjects {
     consumedDate = testDate,
     idOption = Some(721309875)
   )
-  val testTransactionWithIdB: Transaction = Transaction(
+  def testTransactionWithIdB: Transaction = Transaction(
     transactionGroupId = testTransactionGroupWithId.id,
     issuerId = testUserB.id,
     beneficiaryAccountCode = testAccountB.code,
@@ -243,24 +260,24 @@ object TestObjects {
     idOption = Some(4371098)
   )
   def testTransactionWithId: Transaction = testTransactionWithIdA
-  val testBalanceCheckWithId: BalanceCheck = BalanceCheck(
+  def testBalanceCheckWithId: BalanceCheck = BalanceCheck(
     issuerId = testUser.id,
     moneyReservoirCode = testReservoir.code,
     balanceInCents = 38746,
     createdDate = testDate,
     checkDate = testDate,
     idOption = Some(873865333))
-  val testExchangeRateMeasurementWithId: ExchangeRateMeasurement = ExchangeRateMeasurement(
+  def testExchangeRateMeasurementWithId: ExchangeRateMeasurement = ExchangeRateMeasurement(
     date = testDate,
     foreignCurrencyCode = "GBP",
     ratioReferenceToForeignCurrency = 1.234,
     idOption = Some(764785511))
 
-  val testModificationA: EntityModification = EntityModification.Add(testTransactionWithIdA)
-  val testModificationB: EntityModification = EntityModification.Add(testTransactionWithIdB)
+  def testModificationA: EntityModification = EntityModification.Add(testTransactionWithIdA)
+  def testModificationB: EntityModification = EntityModification.Add(testTransactionWithIdB)
   def testModification: EntityModification = testModificationA
 
-  val testGetInitialDataResponse: GetInitialDataResponse = GetInitialDataResponse(
+  def testGetInitialDataResponse: GetInitialDataResponse = GetInitialDataResponse(
     accountingConfig = testAccountingConfig,
     user = testUserA,
     allUsers = Seq(testUserA, testUserB),

@@ -21,6 +21,7 @@ object UserStoreTest extends TestSuite {
     implicit val entityAccess = testModule.fakeEntityAccess
     implicit val fakeDispatcher = testModule.fakeDispatcher
     implicit val fakeScalaJsApiClient = testModule.fakeScalaJsApiClient
+    implicit val fakeClock = testModule.fakeClock
 
     val store: UserStore = new UserStore()
 
@@ -63,15 +64,15 @@ object UserStoreTest extends TestSuite {
     }
 
     "store copes with update during recalculation" - async {
-      val testUserBUpdate = testUserB.copy(name = "other name")
+      val testUserBUpdate = EntityModification.createUpdateAllFields(testUserB.copy(name = "other name"))
       entityAccess.slowDownQueries(50.milliseconds)
 
       entityAccess.addRemotelyAddedEntities(testUserA)
       entityAccess.addRemotelyAddedEntities(testUserB)
       val newStateFuture = store.stateFuture
-      entityAccess.persistModifications(EntityModification.createUpdate(testUserBUpdate))
+      entityAccess.persistModifications(testUserBUpdate)
 
-      await(newStateFuture).allUsers ==> Seq(testUserA, testUserBUpdate)
+      await(newStateFuture).allUsers ==> Seq(testUserA, testUserBUpdate.updatedEntity)
     }
   }
 }

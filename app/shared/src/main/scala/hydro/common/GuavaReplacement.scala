@@ -143,6 +143,11 @@ object GuavaReplacement {
     def inverse(): ImmutableBiMap[V, K] = new ImmutableBiMap(backwardMap, forwardMap)
     def keySet: Set[K] = forwardMap.keySet
     override def toString: String = forwardMap.toString
+    override def equals(o: Any): Boolean = o match {
+      case that: ImmutableBiMap[_, _] => this.forwardMap == that.forwardMap
+      case _                          => false
+    }
+    override def hashCode(): Int = forwardMap.hashCode()
   }
   object ImmutableBiMap {
     def builder[K, V](): Builder[K, V] = new Builder[K, V]()

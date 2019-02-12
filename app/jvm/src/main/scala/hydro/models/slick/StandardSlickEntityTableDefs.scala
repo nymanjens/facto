@@ -1,16 +1,13 @@
 package hydro.models.slick
 
-import java.nio.ByteBuffer
 import java.time.Instant
 
 import app.api.Picklers._
-import hydro.models.slick.SlickEntityTableDef.EntityTable
-import boopickle.Default.Pickle
-import boopickle.Default.Unpickle
 import hydro.models.modification.EntityModification
 import hydro.models.modification.EntityModificationEntity
-import hydro.models.slick.SlickUtils.dbApi.{Tag => SlickTag}
+import hydro.models.slick.SlickEntityTableDef.EntityTable
 import hydro.models.slick.SlickUtils.dbApi._
+import hydro.models.slick.SlickUtils.dbApi.{Tag => SlickTag}
 import hydro.models.slick.SlickUtils.instantToSqlTimestampMapper
 
 object StandardSlickEntityTableDefs {
@@ -50,19 +47,7 @@ object StandardSlickEntityTableDefs {
       }
     }
 
-    implicit val entityModificationToBytesMapper: ColumnType[EntityModification] = {
-      def toBytes(modification: EntityModification) = {
-        val byteBuffer = Pickle.intoBytes(modification)
-
-        val byteArray = new Array[Byte](byteBuffer.remaining)
-        byteBuffer.get(byteArray)
-        byteArray
-      }
-      def toEntityModification(bytes: Array[Byte]) = {
-        val byteBuffer = ByteBuffer.wrap(bytes)
-        Unpickle[EntityModification].fromBytes(byteBuffer)
-      }
-      MappedColumnType.base[EntityModification, Array[Byte]](toBytes, toEntityModification)
-    }
+    implicit val entityModificationToBytesMapper: ColumnType[EntityModification] =
+      SlickUtils.bytesMapperFromPickler
   }
 }

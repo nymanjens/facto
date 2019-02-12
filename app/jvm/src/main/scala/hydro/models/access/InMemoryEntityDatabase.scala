@@ -11,6 +11,7 @@ import hydro.models.access.InMemoryEntityDatabase.Sortings
 import hydro.models.modification.EntityModification
 import hydro.models.modification.EntityType
 import hydro.models.Entity
+import hydro.models.UpdatableEntity
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
@@ -77,13 +78,27 @@ object InMemoryEntityDatabase {
             }
           }
         case EntityModification.Update(entity) =>
-          val previousValue = idToEntityMap.replace(entity.id, entity.asInstanceOf[E])
-          if (previousValue != null) {
-            for (set <- sortingToEntities.values) {
-              set.remove(previousValue)
-              set.add(entity.asInstanceOf[E])
+          def updateInner[E2 <: E with UpdatableEntity] = {
+            var previousValue: E2 = null.asInstanceOf[E2]
+            val castEntity = entity.asInstanceOf[E2]
+            idToEntityMap.compute(
+              entity.id,
+              (id, existingEntity) =>
+                existingEntity match {
+                  case null => castEntity
+                  case _ =>
+                    previousValue = existingEntity.asInstanceOf[E2]
+                    UpdatableEntity.merge(previousValue, castEntity)
+              }
+            )
+            if (previousValue != null) {
+              for (set <- sortingToEntities.values) {
+                set.remove(previousValue)
+                set.add(castEntity)
+              }
             }
           }
+          updateInner
         case EntityModification.Remove(entityId) =>
           val previousValue = idToEntityMap.remove(entityId)
           if (previousValue != null) {

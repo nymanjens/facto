@@ -13,6 +13,10 @@ import hydro.models.slick.SlickUtils._
 import hydro.models.slick.SlickUtils.dbApi._
 import hydro.models.slick.SlickUtils.dbApi.{Tag => SlickTag}
 import hydro.models.slick.StandardSlickEntityTableDefs.EntityModificationEntityDef
+import hydro.models.slick.SlickUtils.finiteDurationToMillisMapper
+import hydro.models.slick.SlickUtils.orderTokenToBytesMapper
+import hydro.models.slick.SlickUtils.lastUpdateTimeToBytesMapper
+import hydro.models.UpdatableEntity.LastUpdateTime
 
 import scala.collection.immutable.Seq
 
@@ -40,6 +44,7 @@ object SlickEntityTableDefs {
       def isAdmin = column[Boolean]("isAdmin")
       def expandCashFlowTablesByDefault = column[Boolean]("expandCashFlowTablesByDefault")
       def expandLiquidationTablesByDefault = column[Boolean]("expandLiquidationTablesByDefault")
+      def lastUpdateTime = column[LastUpdateTime]("lastUpdateTime")
 
       override def * =
         (
@@ -49,7 +54,9 @@ object SlickEntityTableDefs {
           isAdmin,
           expandCashFlowTablesByDefault,
           expandLiquidationTablesByDefault,
-          id.?) <> (User.tupled, User.unapply)
+          id.?,
+          lastUpdateTime,
+        ) <> (User.tupled, User.unapply)
     }
   }
 
