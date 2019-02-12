@@ -232,7 +232,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
 
         await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()) ==> Seq(user1)
       }
-    }
+    },
   )
 
   def createAndInitializeDb(): Future[LocalDatabase] = async {

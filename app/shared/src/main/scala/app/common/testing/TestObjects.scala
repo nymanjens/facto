@@ -180,7 +180,7 @@ object TestObjects {
     resultBuilder.result
   }
 
-  val testLastUpdateTime = LastUpdateTime.allFieldsUpdated(testInstant)
+  def testLastUpdateTime = LastUpdateTime.allFieldsUpdated(testInstant)
 
   def testUserA: User = User(
     loginName = "testUserA",
