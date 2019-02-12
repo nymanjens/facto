@@ -1,19 +1,25 @@
 package hydro.models.slick
 
 import java.nio.ByteBuffer
+import java.time.{LocalDateTime => JavaLocalDateTime}
 import java.time.Instant
 import java.time.ZoneId
-import java.time.{LocalDateTime => JavaLocalDateTime}
 
+import app.api.Picklers._
+import boopickle.Default.Pickle
+import boopickle.Default.Pickler
+import boopickle.Default.Unpickle
 import hydro.common.OrderToken
 import hydro.common.time.LocalDateTime
 import hydro.common.time.LocalDateTimes
+import hydro.models.UpdatableEntity.LastUpdateTime
 import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.language.higherKinds
+import scala.reflect.ClassTag
 
 object SlickUtils {
 
@@ -32,6 +38,21 @@ object SlickUtils {
   def dbRun[T, C[T]](query: Query[_, T, C]): C[T] = dbRun(query.result)
 
   // ********** column mappers ********** //
+  def bytesMapperFromPickler[T: Pickler: ClassTag]: ColumnType[T] = {
+    def toBytes(value: T) = {
+      val byteBuffer = Pickle.intoBytes(value)
+
+      val byteArray = new Array[Byte](byteBuffer.remaining)
+      byteBuffer.get(byteArray)
+      byteArray
+    }
+    def toValue(bytes: Array[Byte]) = {
+      val byteBuffer = ByteBuffer.wrap(bytes)
+      Unpickle[T].fromBytes(byteBuffer)
+    }
+    MappedColumnType.base[T, Array[Byte]](toBytes, toValue)
+  }
+
   implicit val localDateTimeToSqlDateMapper: ColumnType[LocalDateTime] = {
     val zone = ZoneId.of("Europe/Paris") // This is arbitrary. It just has to be the same in both directions
     def toSql(localDateTime: LocalDateTime) = {
@@ -77,4 +98,6 @@ object SlickUtils {
     }
     MappedColumnType.base[OrderToken, Array[Byte]](toSql, toOrderToken)
   }
+
+  implicit val lastUpdateTimeToBytesMapper: ColumnType[LastUpdateTime] = bytesMapperFromPickler
 }

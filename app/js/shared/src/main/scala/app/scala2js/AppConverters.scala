@@ -2,13 +2,11 @@ package app.scala2js
 
 import app.models.access.ModelFields
 import app.models.accounting._
-import hydro.models.modification.EntityType
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
+import hydro.models.modification.EntityType
 import hydro.models.Entity
-import hydro.scala2js.Scala2Js.Converter
 import hydro.scala2js.Scala2Js.MapConverter
-import hydro.scala2js.StandardConverters
 import hydro.scala2js.StandardConverters.EntityConverter
 
 import scala.collection.immutable.Seq
@@ -27,14 +25,6 @@ object AppConverters {
     }
     converter.asInstanceOf[MapConverter[E]]
   }
-
-  // **************** General converters **************** //
-  implicit val EntityTypeConverter: Converter[EntityType.any] = StandardConverters.enumConverter(
-    User.Type,
-    Transaction.Type,
-    TransactionGroup.Type,
-    BalanceCheck.Type,
-    ExchangeRateMeasurement.Type)
 
   // **************** Entity converters **************** //
   implicit val UserConverter: EntityConverter[User] = new EntityConverter(

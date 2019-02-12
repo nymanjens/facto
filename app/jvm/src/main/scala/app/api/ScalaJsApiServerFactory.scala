@@ -155,7 +155,7 @@ final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
             result
           }
 
-          entityAccess.persistEntityModifications(EntityModification.createUpdate(updatedUser))
+          entityAccess.persistEntityModifications(EntityModification.createUpdateAllFields(updatedUser))
       }
     }
   }

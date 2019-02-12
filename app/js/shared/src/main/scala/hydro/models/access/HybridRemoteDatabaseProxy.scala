@@ -163,7 +163,7 @@ final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
 }
 
 object HybridRemoteDatabaseProxy {
-  private val localDatabaseAndEntityVersion = "hydro-1.0"
+  private val localDatabaseAndEntityVersion = "hydro-2.0"
 
   def create(localDatabase: Future[LocalDatabase])(
       implicit apiClient: ScalaJsApiClient,

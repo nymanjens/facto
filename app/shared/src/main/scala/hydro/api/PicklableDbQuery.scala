@@ -229,7 +229,7 @@ object PicklableDbQuery {
 
   case class FieldWithValue(field: PicklableModelField, value: Any)
   object FieldWithValue {
-    def fromRegular(field: ModelField[_, _], value: Any): FieldWithValue =
+    def fromRegular(field: ModelField.any, value: Any): FieldWithValue =
       FieldWithValue(PicklableModelField.fromRegular(field), value)
   }
 }

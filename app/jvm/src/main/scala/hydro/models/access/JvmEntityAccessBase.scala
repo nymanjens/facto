@@ -1,5 +1,18 @@
 package hydro.models.access
 
+import app.models.access.ModelFields
+import hydro.models.modification.EntityType
+import hydro.models.Entity
+import hydro.models.access.DbQuery.Filter
+import hydro.models.access.DbQuery.Sorting
+import hydro.models.access.DbQueryImplicits._
+
+import scala.async.Async.async
+import scala.async.Async.await
+import scala.collection.immutable.Seq
+import scala.collection.mutable
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import java.time.Duration
 import java.util.concurrent.Executors
 
@@ -20,6 +33,7 @@ import hydro.models.slick.SlickUtils.dbRun
 import hydro.models.slick.StandardSlickEntityTableDefs.EntityModificationEntityDef
 import hydro.models.Entity
 import hydro.models.slick.SlickEntityManager
+import hydro.models.UpdatableEntity
 import net.jcip.annotations.GuardedBy
 import org.reactivestreams.Publisher
 
@@ -127,8 +141,10 @@ abstract class JvmEntityAccessBase(implicit clock: Clock) extends EntityAccess {
       }
 
     private def processSync(modifications: Seq[EntityModification])(implicit user: User): Unit = {
-      def isDuplicate(modification: EntityModification,
-                      existingModifications: Iterable[EntityModification]): Boolean = {
+
+      /** Returns true if an existing modification makes the given one irrelevant. */
+      def eclipsedByExistingModification(modification: EntityModification,
+                                         existingModifications: Iterable[EntityModification]): Boolean = {
         val existingEntities = existingModifications.toStream
           .filter(_.entityId == modification.entityId)
           .filter(_.entityType == modification.entityType)
@@ -160,7 +176,7 @@ abstract class JvmEntityAccessBase(implicit clock: Clock) extends EntityAccess {
         for {
           modification <- modifications
           if {
-            if (isDuplicate(modification, existingModifications)) {
+            if (eclipsedByExistingModification(modification, existingModifications)) {
               println(s"  Note: Modification marked as duplicate: modification = $modification")
               false
             } else {
@@ -174,9 +190,23 @@ abstract class JvmEntityAccessBase(implicit clock: Clock) extends EntityAccess {
           val entityType = modification.entityType
           modification match {
             case EntityModification.Add(entity) =>
-              getManager(entityType).addNew(entity.asInstanceOf[entityType.get])
+              getManager(entityType).addNew(entityType.checkRightType(entity))
             case EntityModification.Update(entity) =>
-              getManager(entityType).updateIfExists(entity.asInstanceOf[entityType.get])
+              def updateInner[E <: entityType.get with UpdatableEntity] = {
+                implicit val castEntityType = entityType.asInstanceOf[EntityType[E]]
+                val maybeExistingEntity = DbResultSet
+                  .fromExecutor(inMemoryEntityDatabase.queryExecutor[E])
+                  .findOne(ModelFields.id[E] === entity.id)
+
+                maybeExistingEntity match {
+                  case Some(existingEntity) =>
+                    val mergedEntity = UpdatableEntity.merge(existingEntity, entity.asInstanceOf[E])
+                    getManager(castEntityType).updateIfExists(mergedEntity)
+                  case None =>
+                    getManager(castEntityType).addNew(castEntityType.checkRightType(entity))
+                }
+              }
+              updateInner
             case EntityModification.Remove(entityId) =>
               getManager(entityType).removeIfExists(entityId)
           }

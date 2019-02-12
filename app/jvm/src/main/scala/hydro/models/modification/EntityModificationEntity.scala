@@ -15,7 +15,7 @@ import hydro.models.Entity
 case class EntityModificationEntity(userId: Long,
                                     modification: EntityModification,
                                     instant: Instant,
-                                    idOption: Option[Long] = None)
+                                    override val idOption: Option[Long] = None)
     extends Entity {
   require(userId > 0)
   for (idVal <- idOption) require(idVal > 0)

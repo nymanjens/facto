@@ -6,17 +6,13 @@ import app.api.Picklers._
 import app.api.ScalaJsApi._
 import app.common.money.Currency
 import app.common.testing.TestObjects._
-import app.common.testing._
-import hydro.common.testing._
 import app.models.accounting.Transaction
 import app.models.accounting.config.Config
-import hydro.models.modification.EntityModification
-import hydro.models.modification.EntityType
-import app.models.money.ExchangeRateMeasurement
 import boopickle.Default._
 import boopickle.Pickler
+import hydro.common.testing._
 import hydro.common.time.LocalDateTimes
-import app.api.Picklers._
+import hydro.models.modification.EntityModification
 import org.junit.runner._
 import org.specs2.runner._
 
@@ -28,10 +24,6 @@ class PicklersTest extends HookedSpecification {
 
   "accounting config" in {
     testPickleAndUnpickle[Config](testAccountingConfig)
-  }
-
-  "EntityType" in {
-    testPickleAndUnpickle[EntityType.any](ExchangeRateMeasurement.Type)
   }
 
   "EntityModification" in {
@@ -59,18 +51,6 @@ class PicklersTest extends HookedSpecification {
           Map(Currency.Gbp -> SortedMap(LocalDateTimes.createDateTime(2012, MAY, 2) -> 1.2349291837)),
         nextUpdateToken = testUpdateToken
       ))
-  }
-
-  "GetAllEntitiesResponse" in {
-    testPickleAndUnpickle[GetAllEntitiesResponse](
-      GetAllEntitiesResponse(
-        entitiesMap = Map(Transaction.Type -> Seq(testTransactionWithId)),
-        nextUpdateToken = testUpdateToken))
-  }
-
-  "ModificationsWithToken" in {
-    testPickleAndUnpickle[ModificationsWithToken](
-      ModificationsWithToken(modifications = Seq(testModification), nextUpdateToken = testUpdateToken))
   }
 
   private def testPickleAndUnpickle[T: Pickler](value: T) = {

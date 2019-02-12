@@ -5,10 +5,10 @@ import hydro.models.access.ModelField
 
 /** Fork of ModelField that is picklable. */
 case class PicklableModelField(fieldNumber: Int) {
-  def toRegular: ModelField[_, _] = ModelFields.fromNumber(fieldNumber)
+  def toRegular: ModelField.any = ModelFields.fromNumber(fieldNumber)
 }
 
 object PicklableModelField {
-  def fromRegular(regular: ModelField[_, _]): PicklableModelField =
+  def fromRegular(regular: ModelField.any): PicklableModelField =
     PicklableModelField(ModelFields.toNumber(regular))
 }

@@ -10,14 +10,16 @@ import app.api.ScalaJsApi.UserPrototype
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup
-import app.models.accounting.config.Account.SummaryTotalRowDef
 import app.models.accounting.config._
-import hydro.models.modification.EntityModification
+import app.models.accounting.config.Account.SummaryTotalRowDef
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
 import hydro.common.time.LocalDateTime
+import hydro.common.OrderToken
 import hydro.common.time.LocalDateTimes
 import hydro.common.time.LocalDateTimes.createDateTime
+import hydro.models.modification.EntityModification
+import hydro.models.UpdatableEntity.LastUpdateTime
 
 import scala.collection.immutable.ListMap
 import scala.collection.immutable.Seq
@@ -178,6 +180,8 @@ object TestObjects {
     resultBuilder.result
   }
 
+  val testLastUpdateTime = LastUpdateTime.allFieldsUpdated(testInstant)
+
   def testUserA: User = User(
     loginName = "testUserA",
     passwordHash =
@@ -187,7 +191,8 @@ object TestObjects {
     isAdmin = false,
     expandCashFlowTablesByDefault = true,
     expandLiquidationTablesByDefault = true,
-    idOption = Option(918273)
+    idOption = Option(918273),
+    lastUpdateTime = testLastUpdateTime,
   )
   val testUserB: User = User(
     loginName = "testUserB",
@@ -198,7 +203,8 @@ object TestObjects {
     isAdmin = false,
     expandCashFlowTablesByDefault = true,
     expandLiquidationTablesByDefault = true,
-    idOption = Option(918274)
+    idOption = Option(918274),
+    lastUpdateTime = testLastUpdateTime,
   )
   def testUser: User = testUserA
   def testUserRedacted: User = testUser.copy(passwordHash = "<redacted>")
@@ -210,8 +216,19 @@ object TestObjects {
     name = testUser.name,
     isAdmin = testUser.isAdmin)
 
+  val orderTokenA: OrderToken = OrderToken.middleBetween(None, Some(OrderToken.middle))
+  val orderTokenB: OrderToken = OrderToken.middleBetween(Some(OrderToken.middle), None)
+  val orderTokenC: OrderToken = OrderToken.middleBetween(Some(orderTokenB), None)
+  val orderTokenD: OrderToken = OrderToken.middleBetween(Some(orderTokenC), None)
+  val orderTokenE: OrderToken = OrderToken.middleBetween(Some(orderTokenD), None)
+  def testOrderToken: OrderToken = orderTokenC
+
   val testDate: LocalDateTime = LocalDateTimes.createDateTime(2008, MARCH, 13)
-  val testInstant = Instant.ofEpochMilli(999000111)
+  val testInstantA: Instant = Instant.ofEpochMilli(999000001)
+  val testInstantB: Instant = Instant.ofEpochMilli(999000002)
+  val testInstantC: Instant = Instant.ofEpochMilli(999000003)
+  val testInstantD: Instant = Instant.ofEpochMilli(999000004)
+  def testInstant: Instant = testInstantA
   val testUpdateToken: UpdateToken = s"123782:12378"
 
   val testTransactionGroupWithId: TransactionGroup =

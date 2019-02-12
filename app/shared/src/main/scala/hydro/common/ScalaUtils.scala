@@ -26,6 +26,11 @@ object ScalaUtils {
     }
   }
 
+  def stripRequiredPrefix(s: String, prefix: String): String = {
+    require(s.startsWith(prefix), s"string doesn't start with prefix: prefix = $prefix, string = $s")
+    s.stripPrefix(prefix)
+  }
+
   /** Scala version of com.google.common.annotations.VisibleForTesting. */
   class visibleForTesting extends StaticAnnotation
 
