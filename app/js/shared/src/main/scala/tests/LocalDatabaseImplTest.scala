@@ -1,6 +1,7 @@
 package tests
 
 import app.common.testing.TestObjects._
+import app.models.access.ModelFields
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import hydro.models.modification.EntityModification
@@ -155,16 +156,65 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
         await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()) ==> Seq(user1)
       }
     },
-    ManualTest("applyModifications: Update") {
+    ManualTest("applyModifications: Update: Full update") {
       async {
         val db = await(createAndInitializeDb())
         val user1 = createUser()
-        val userUpdate = EntityModification.createUpdateAllFields(user1.copy(name = "updated name"))
-        await(db.addAll(Seq(user1)))
+        val user2 = createUser()
+        val user3 = createUser()
 
-        await(db.applyModifications(Seq(userUpdate)))
+        await(db.addAll(Seq(user1, user2, user3)))
 
-        await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()) ==> Seq(userUpdate.updatedEntity)
+        val user2Update = EntityModification.createUpdateAllFields(user2.copy(name = "other name"))
+        await(db.applyModifications(Seq(user2Update)))
+
+        await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()).toSet ==>
+          Set(user1, user2Update.updatedEntity, user3)
+      }
+    },
+    ManualTest("applyModifications: Update: Partial update") {
+      async {
+        val db = await(createAndInitializeDb())
+        val user1 = createUser()
+        val user2 = createUser()
+        val user3 = createUser()
+
+        await(db.addAll(Seq(user1, user2, user3)))
+
+        val user2UpdateA = EntityModification
+          .createUpdate(user2.copy(loginName = "login2_update"), fieldMask = Seq(ModelFields.User.loginName))
+        val user2UpdateB = EntityModification
+          .createUpdate(user2.copy(name = "name2_update"), fieldMask = Seq(ModelFields.User.name))
+        await(db.applyModifications(Seq(user2UpdateA)))
+        await(db.applyModifications(Seq(user2UpdateB)))
+
+        await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()).toSet ==>
+          Set(
+            user1,
+            user2.copy(
+              loginName = "login2_update",
+              name = "name2_update",
+              lastUpdateTime = user2UpdateA.updatedEntity.lastUpdateTime
+                .merge(user2UpdateB.updatedEntity.lastUpdateTime, forceIncrement = false)
+            ),
+            user3
+          )
+      }
+    },
+    ManualTest("applyModifications: Update: Upsert") {
+      async {
+        val db = await(createAndInitializeDb())
+        val user1 = createUser()
+        val user2 = createUser()
+        val user3 = createUser()
+
+        await(db.addAll(Seq(user1, user3)))
+
+        val user2Update = EntityModification.createUpdateAllFields(user2)
+        await(db.applyModifications(Seq(user2Update)))
+
+        await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()).toSet ==>
+          Set(user1, user2Update.updatedEntity, user3)
       }
     },
     ManualTest("applyModifications: Delete") {
