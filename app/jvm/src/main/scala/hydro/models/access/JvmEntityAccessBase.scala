@@ -142,7 +142,7 @@ abstract class JvmEntityAccessBase(implicit clock: Clock) extends EntityAccess {
 
     private def processSync(modifications: Seq[EntityModification])(implicit user: User): Unit = {
 
-      /** Returns true if an existing modification makes the given one irrelevant. */
+      // Returns true if an existing modification makes the given one irrelevant.
       def eclipsedByExistingModification(modification: EntityModification,
                                          existingModifications: Iterable[EntityModification]): Boolean = {
         val existingEntities = existingModifications.toStream
