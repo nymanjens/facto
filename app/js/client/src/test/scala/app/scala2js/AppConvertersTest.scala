@@ -11,7 +11,7 @@ import hydro.common.time.LocalDateTime
 import hydro.scala2js.Scala2Js
 import utest._
 
-object ConvertersTest extends TestSuite {
+object AppConvertersTest extends TestSuite {
   val dateTime = LocalDateTime.of(2022, MARCH, 13, 12, 13)
 
   override def tests = TestSuite {

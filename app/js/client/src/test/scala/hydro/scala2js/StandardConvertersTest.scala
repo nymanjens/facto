@@ -6,7 +6,6 @@ import java.time.Month.MARCH
 import app.common.testing.TestObjects._
 import app.models.access.ModelFields
 import app.models.user.User
-import app.scala2js.ConvertersTest.testToJsAndBack
 import hydro.common.time.LocalDateTime
 import hydro.models.modification.EntityModification
 import hydro.models.modification.EntityType
