@@ -138,7 +138,7 @@ self.addEventListener('fetch', (event) => {
     );
   } else if(event.request.url == ROOT_URL + PERSIST_ENTITY_MODIFICATIONS_PATH) {
     if('sync' in self.registration) {
-      const requestClone = event.request.clone()
+      const requestClone = event.request.clone();
       event.respondWith(
         fetch(event.request)
           .catch(e => {
