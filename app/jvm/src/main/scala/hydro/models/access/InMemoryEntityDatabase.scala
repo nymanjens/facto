@@ -81,14 +81,10 @@ object InMemoryEntityDatabase {
           def updateInner[E2 <: E with UpdatableEntity] = {
             var previousValue: E2 = null.asInstanceOf[E2]
             val castEntity = entity.asInstanceOf[E2]
-            idToEntityMap.compute(
-              entity.id,
-              (id, existingEntity) =>
-                existingEntity match {
-                  case null => castEntity
-                  case _ =>
-                    previousValue = existingEntity.asInstanceOf[E2]
-                    UpdatableEntity.merge(previousValue, castEntity)
+            idToEntityMap.computeIfPresent(
+              entity.id, { (id, existingEntity) =>
+                previousValue = existingEntity.asInstanceOf[E2]
+                UpdatableEntity.merge(previousValue, castEntity)
               }
             )
             if (previousValue != null) {

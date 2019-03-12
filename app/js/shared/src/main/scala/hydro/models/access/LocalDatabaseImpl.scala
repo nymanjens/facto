@@ -144,10 +144,10 @@ private final class LocalDatabaseImpl(implicit webWorker: LocalDatabaseWebWorker
                 inner(m.entityType)
               })).toMap
 
-      webWorker.applyWriteOperations(modifications map {
+      webWorker.applyWriteOperations(modifications flatMap {
         case modification @ EntityModification.Add(entity) =>
           implicit val entityType = modification.entityType
-          WriteOperation.Insert(collectionNameOf(entityType), Scala2Js.toJsMap(entity))
+          Some(WriteOperation.Insert(collectionNameOf(entityType), Scala2Js.toJsMap(entity)))
         case modification @ EntityModification.Update(updatedEntity) =>
           def updateInner[E <: UpdatableEntity] = {
             implicit val entityType = modification.entityType.asInstanceOf[EntityType[E]]
@@ -156,16 +156,15 @@ private final class LocalDatabaseImpl(implicit webWorker: LocalDatabaseWebWorker
             maybeExistingEntity match {
               case Some(existingEntity) =>
                 val mergedEntity = UpdatableEntity.merge(existingEntity, updatedEntity.asInstanceOf[E])
-                WriteOperation.Update(collectionNameOf(entityType), Scala2Js.toJsMap(mergedEntity))
-              case None =>
-                WriteOperation
-                  .Insert(collectionNameOf(entityType), Scala2Js.toJsMap(updatedEntity.asInstanceOf[E]))
+                Some(WriteOperation.Update(collectionNameOf(entityType), Scala2Js.toJsMap(mergedEntity)))
+              case None => // Do nothing (no upsert)
+                None
             }
           }
           updateInner
         case modification @ EntityModification.Remove(id) =>
           val entityType = modification.entityType
-          WriteOperation.Remove(collectionNameOf(entityType), Scala2Js.toJs(id))
+          Some(WriteOperation.Remove(collectionNameOf(entityType), Scala2Js.toJs(id)))
       })
     }
   }

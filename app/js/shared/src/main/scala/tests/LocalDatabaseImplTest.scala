@@ -201,7 +201,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
           )
       }
     },
-    ManualTest("applyModifications: Update: Upsert") {
+    ManualTest("applyModifications: Update: Ignored when already deleted") {
       async {
         val db = await(createAndInitializeDb())
         val user1 = createUser()
@@ -213,8 +213,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
         val user2Update = EntityModification.createUpdateAllFields(user2)
         await(db.applyModifications(Seq(user2Update)))
 
-        await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()).toSet ==>
-          Set(user1, user2Update.updatedEntity, user3)
+        await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()).toSet ==> Set(user1, user3)
       }
     },
     ManualTest("applyModifications: Delete") {

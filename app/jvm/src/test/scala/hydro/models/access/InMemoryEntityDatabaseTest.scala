@@ -111,7 +111,7 @@ class InMemoryEntityDatabaseTest extends HookedSpecification {
           user3
         )
       }
-      "Upsert" in {
+      "Ignored when already deleted" in {
         entitiesFetcher.setUsers(user1, user3)
         implicit val database = new InMemoryEntityDatabase(entitiesFetcher)
         triggerLazyFetching(database)
@@ -119,7 +119,7 @@ class InMemoryEntityDatabaseTest extends HookedSpecification {
         val user2Update = EntityModification.createUpdateAllFields(user2)
         database.update(user2Update)
 
-        assertDatabaseContainsExactlySorted(user1, user2Update.updatedEntity, user3)
+        assertDatabaseContainsExactlySorted(user1, user3)
       }
     }
   }
