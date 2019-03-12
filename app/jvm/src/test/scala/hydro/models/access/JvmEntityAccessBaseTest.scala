@@ -95,13 +95,13 @@ class JvmEntityAccessBaseTest extends HookedSpecification {
           user3
         )
       }
-      "Upsert" in new WithApplication {
+      "Ignored when already deleted" in new WithApplication {
         entityAccess.persistEntityModifications(EntityModification.Add(user1), EntityModification.Add(user3))
 
         val user2Update = EntityModification.createUpdateAllFields(user2)
         entityAccess.persistEntityModifications(user2Update)
 
-        assertPersistedUsersEqual(user1, user2Update.updatedEntity, user3)
+        assertPersistedUsersEqual(user1, user3)
       }
     }
 

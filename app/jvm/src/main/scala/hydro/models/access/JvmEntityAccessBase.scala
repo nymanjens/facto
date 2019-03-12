@@ -202,8 +202,7 @@ abstract class JvmEntityAccessBase(implicit clock: Clock) extends EntityAccess {
                   case Some(existingEntity) =>
                     val mergedEntity = UpdatableEntity.merge(existingEntity, entity.asInstanceOf[E])
                     getManager(castEntityType).updateIfExists(mergedEntity)
-                  case None =>
-                    getManager(castEntityType).addNew(castEntityType.checkRightType(entity))
+                  case None => // Do nothing (don't upsert)
                 }
               }
               updateInner
