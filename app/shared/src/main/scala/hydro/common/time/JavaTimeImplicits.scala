@@ -19,6 +19,7 @@ object JavaTimeImplicits {
   implicit class InstantWrapper(thisInstant: Instant) extends BaseWrapper[Instant](thisInstant) {
     def -(duration: Duration): Instant = thisInstant minus duration
     def +(duration: Duration): Instant = thisInstant plus duration
+    def -(instant: Instant): Duration = Duration.between(thisInstant, instant)
   }
 
   implicit object LocalDateTimeOrdering extends Ordering[LocalDateTime] {

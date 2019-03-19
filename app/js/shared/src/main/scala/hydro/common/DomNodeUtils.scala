@@ -51,18 +51,19 @@ object DomNodeUtils {
     } else if (node.nodeType == dom.raw.Node.ELEMENT_NODE) {
       val element = node.asInstanceOf[dom.raw.Element]
       element.tagName match {
-        case "LI"   => ParsedNode.Li(element)
-        case "UL"   => ParsedNode.Ul(element)
-        case "OL"   => ParsedNode.Ol(element)
-        case "BR"   => ParsedNode.Br(element)
-        case "DIV"  => ParsedNode.Div(element)
-        case "P"    => ParsedNode.P(element)
-        case "B"    => ParsedNode.B(element)
-        case "I"    => ParsedNode.I(element)
-        case "S"    => ParsedNode.S(element)
-        case "CODE" => ParsedNode.Code(element)
-        case "A"    => ParsedNode.A(element)
-        case _      => ParsedNode.Other(node)
+        case "LI"    => ParsedNode.Li(element)
+        case "UL"    => ParsedNode.Ul(element)
+        case "OL"    => ParsedNode.Ol(element)
+        case "BR"    => ParsedNode.Br(element)
+        case "DIV"   => ParsedNode.Div(element)
+        case "P"     => ParsedNode.P(element)
+        case "B"     => ParsedNode.B(element)
+        case "I"     => ParsedNode.I(element)
+        case "S"     => ParsedNode.S(element)
+        case "CODE"  => ParsedNode.Code(element)
+        case "A"     => ParsedNode.A(element)
+        case "STYLE" => ParsedNode.Style(element)
+        case _       => ParsedNode.Other(node)
       }
     } else {
       ParsedNode.Other(node)
@@ -83,6 +84,7 @@ object DomNodeUtils {
     case class S(element: dom.raw.Element) extends ParsedNode
     case class Code(element: dom.raw.Element) extends ParsedNode
     case class A(element: dom.raw.Element) extends ParsedNode
+    case class Style(element: dom.raw.Element) extends ParsedNode
     case class Other(node: dom.raw.Node) extends ParsedNode
   }
 }
