@@ -8,7 +8,7 @@ import hydro.models.Entity
 import scala.collection.immutable.Seq
 
 case class PendingModifications(modifications: Seq[EntityModification], persistedLocally: Boolean) {
-  private val addModificationIds: ImmutableSetMultimap[EntityType.any, Long] = {
+  private lazy val addModificationIds: ImmutableSetMultimap[EntityType.any, Long] = {
     val builder = ImmutableSetMultimap.builder[EntityType.any, Long]()
     modifications collect {
       case modification: EntityModification.Add[_] =>
