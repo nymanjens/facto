@@ -20,6 +20,11 @@ case class OrderToken(parts: List[Int]) extends Ordered[OrderToken] {
     }
     innerCompare(this.parts, that.parts)
   }
+
+  override def toString = {
+    val partsString = parts.map(p => "0x%x".format(p)).mkString(", ")
+    s"OrderToken[$partsString]"
+  }
 }
 
 object OrderToken {
