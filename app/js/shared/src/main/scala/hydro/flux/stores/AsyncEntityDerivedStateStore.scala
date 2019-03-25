@@ -110,17 +110,23 @@ abstract class AsyncEntityDerivedStateStore[State](implicit entityAccess: JsEnti
     override def modificationsAddedOrPendingStateChanged(modifications: Seq[EntityModification]): Unit = {
       checkNotCallingListeners()
 
-      if (stateIsStale) {
-        if (stateUpdateListeners.nonEmpty) {
-          require(stateUpdateInFlight, s"Expected stateUpdateInFlight = true")
-          pendingModifications = pendingModifications ++ modifications
-        }
-      } else {
-        require(!stateUpdateInFlight, "stateUpdateInFlight is true but stateIsStale is false")
-        stateIsStale = true
+      val modificationsCouldBeRelevant = _state match {
+        case None    => true
+        case Some(s) => impactsState(modifications, s)
+      }
+      if (modificationsCouldBeRelevant) {
+        if (stateIsStale) {
+          if (stateUpdateListeners.nonEmpty) {
+            require(stateUpdateInFlight, s"Expected stateUpdateInFlight = true")
+            pendingModifications = pendingModifications ++ modifications
+          }
+        } else {
+          require(!stateUpdateInFlight, "stateUpdateInFlight is true but stateIsStale is false")
+          stateIsStale = true
 
-        if (stateUpdateListeners.nonEmpty) {
-          startStateUpdate()
+          if (stateUpdateListeners.nonEmpty) {
+            startStateUpdate()
+          }
         }
       }
     }
