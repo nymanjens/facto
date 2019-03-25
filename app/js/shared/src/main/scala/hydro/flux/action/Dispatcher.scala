@@ -1,5 +1,6 @@
 package hydro.flux.action
 
+import hydro.common.LoggingUtils
 import hydro.common.LoggingUtils.logExceptions
 
 import scala.async.Async.async
@@ -49,7 +50,7 @@ object Dispatcher {
       invokeCallbacks(action)
         .transformWith {
           case Success(_) => invokeCallbacks(StandardActions.Done(action))
-          case Failure(e) => invokeCallbacks(StandardActions.Failed(action)).map(_ => throw e)
+          case Failure(e) => invokeCallbacks(StandardActions.Failed(action)).map(_ => logExceptions(throw e))
         }
     }
 
