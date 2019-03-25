@@ -23,6 +23,7 @@ abstract class AsyncEntityDerivedStateStore[State](implicit entityAccess: JsEnti
   private var _state: Option[State] = None
   private var stateIsStale: Boolean = true
   private var stateUpdateInFlight: Boolean = false
+  private var staleBecomesFalseListeners: Seq[StateStore.Listener] = Seq()
 
   /** Buffer of modifications that were added during the last update. */
   private var pendingModifications: Seq[EntityModification] = Seq()
@@ -32,16 +33,22 @@ abstract class AsyncEntityDerivedStateStore[State](implicit entityAccess: JsEnti
 
   /** Returns a future that is resolved as soon as `this.state` has a non-stale value. */
   final def stateFuture: Future[State] = state match {
-    case Some(s) => Future.successful(s)
-    case None =>
+    case Some(s) if !stateIsStale => Future.successful(s)
+    case _ =>
       val promise = Promise[State]()
       val listener: StateStore.Listener = () => {
-        if (state.isDefined && !promise.isCompleted) {
+        if (state.isDefined && !promise.isCompleted && !stateIsStale) {
           promise.success(state.get)
         }
       }
+      // Note: Regular State change listener is required because registration triggers recalculation if there are
+      // no other listeners.
+      // The StaleBecomesFalseListener is required because the regular listener doesn't get triggered if there is
+      // no state change (even if it went from stale to non-stale).
       register(listener)
+      registerStaleBecomesFalseListener(listener)
       promise.future.map(_ => deregister(listener))
+      promise.future.map(_ => deregisterStaleBecomesFalseListener(listener))
       promise.future
   }
 
@@ -58,6 +65,14 @@ abstract class AsyncEntityDerivedStateStore[State](implicit entityAccess: JsEnti
   }
 
   // **************** Private helper methods ****************//
+  private def registerStaleBecomesFalseListener(listener: StateStore.Listener): Unit = {
+    staleBecomesFalseListeners = staleBecomesFalseListeners :+ listener
+  }
+
+  private def deregisterStaleBecomesFalseListener(listener: StateStore.Listener): Unit = {
+    staleBecomesFalseListeners = staleBecomesFalseListeners.filter(_ != listener)
+  }
+
   private def startStateUpdate(): Unit = logExceptions {
     require(stateIsStale, "State is not stale while starting state update")
     require(stateUpdateListeners.nonEmpty, "Nobody is listening to the state, so why update it?")
@@ -81,6 +96,7 @@ abstract class AsyncEntityDerivedStateStore[State](implicit entityAccess: JsEnti
             _state = Some(calculatedState)
             invokeStateUpdateListeners()
           }
+          staleBecomesFalseListeners.foreach(_.onStateUpdate())
         }
       }
     }
