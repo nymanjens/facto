@@ -32,7 +32,7 @@ final class GlobalMessages(implicit globalMessagesStore: GlobalMessagesStore) ex
         case None => <.span()
         case Some(message) =>
           Bootstrap.Alert(variant = Variant.info)(
-            ^.style := js.Dictionary("marginTop" -> "20px"),
+            ^.className := "global-messages",
             <.span(
               Bootstrap.Icon(iconClassName(message.messageType))(
                 ^.style := js.Dictionary("marginRight" -> "11px"),
