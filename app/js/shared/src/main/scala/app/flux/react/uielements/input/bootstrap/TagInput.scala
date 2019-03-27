@@ -119,7 +119,7 @@ object TagInput {
             minQueryLength = 1,
             classNames = Map("tagInputField" -> "form-control")
           ),
-          <<.ifThen(errorMessage) { msg =>
+          <<.ifDefined(errorMessage) { msg =>
             <.span(^.className := "help-block", msg)
           }
         )

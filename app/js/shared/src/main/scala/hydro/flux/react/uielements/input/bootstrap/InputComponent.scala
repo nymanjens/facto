@@ -68,7 +68,7 @@ object InputComponent {
                 valueString = state.valueString,
                 onChange = onChange,
                 extraProps = props.extra),
-              <<.ifThen(errorMessage) { msg =>
+              <<.ifDefined(errorMessage) { msg =>
                 <.span(^.className := "help-block", msg)
               }
             )

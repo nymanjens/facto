@@ -23,7 +23,7 @@ object Table {
         ^^.classes(
           Seq("table", "table-bordered", "table-hover", "table-condensed", "table-overflow-elipsis") ++ props.tableClasses),
         <.thead(
-          <<.ifThen(props.title) { title =>
+          <<.ifDefined(props.title) { title =>
             <.tr(
               ^^.classes("info", "expand-on-click"),
               <.th(
@@ -36,7 +36,7 @@ object Table {
                   " ",
                   title
                 ),
-                <<.ifThen(props.tableTitleExtra) { extra =>
+                <<.ifDefined(props.tableTitleExtra) { extra =>
                   <.span(^.className := "secondary-title", extra)
                 }
               ),

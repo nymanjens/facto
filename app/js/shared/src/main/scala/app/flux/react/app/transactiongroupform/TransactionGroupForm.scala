@@ -299,7 +299,7 @@ final class TransactionGroupForm(implicit i18n: I18n,
             )
           )
         ),
-        ^^.ifThen(state.globalErrorMessage) { errorMessage =>
+        ^^.ifDefined(state.globalErrorMessage) { errorMessage =>
           <.div(
             ^.className := "alert alert-danger",
             errorMessage

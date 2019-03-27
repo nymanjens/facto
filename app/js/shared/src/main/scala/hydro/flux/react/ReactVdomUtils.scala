@@ -20,7 +20,7 @@ object ReactVdomUtils {
         TagMod.empty
       }
     }
-    def ifThen[T](option: Option[T])(thenElement: T => TagMod): TagMod = {
+    def ifDefined[T](option: Option[T])(thenElement: T => TagMod): TagMod = {
       ifThen(option.isDefined)(thenElement(option.get))
     }
   }
@@ -34,7 +34,7 @@ object ReactVdomUtils {
       }
     }
 
-    def ifThen[T](option: Option[T])(thenElement: T => VdomNode): VdomNode = {
+    def ifDefined[T](option: Option[T])(thenElement: T => VdomNode): VdomNode = {
       ifThen(option.isDefined)(thenElement(option.get))
     }
 

@@ -166,8 +166,8 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
         case Some(storeState) =>
           val numEntries = storeState.entries.size + (if (storeState.hasMore) "+" else "")
           <.span(
-            <<.ifThen(props.latestEntryToTableTitleExtra) { latestEntryToTableTitleExtra =>
-              <<.ifThen(storeState.entries.lastOption) { latestEntry =>
+            <<.ifDefined(props.latestEntryToTableTitleExtra) { latestEntryToTableTitleExtra =>
+              <<.ifDefined(storeState.entries.lastOption) { latestEntry =>
                 <.span(latestEntryToTableTitleExtra(latestEntry.entry), " ")
               }
             },

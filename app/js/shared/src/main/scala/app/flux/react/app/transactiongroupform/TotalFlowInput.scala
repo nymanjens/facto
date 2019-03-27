@@ -63,7 +63,7 @@ private[transactiongroupform] final class TotalFlowInput(implicit i18n: I18n,
               ^.disabled := props.forceValue.isDefined,
               ^.onChange ==> onChange
             ),
-            ^^.ifThen(foreignMoney) { money =>
+            ^^.ifDefined(foreignMoney) { money =>
               <.span(
                 ^.className := "input-group-addon",
                 <.i(^.className := money.currency.iconClass),
