@@ -71,6 +71,12 @@
       "css": "saving",
       "code": 59398,
       "src": "modernpics"
+    },
+    {
+      "uid": "891d861cffd152a6474f01e77716d44e",
+      "css": "bicycle",
+      "code": 61958,
+      "src": "fontawesome"
     }
   ]
 }
