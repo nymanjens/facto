@@ -58,7 +58,7 @@ final class GlobalMessagesStore(implicit i18n: I18n,
       }
 
     case StandardActions.SetPageLoadingState( /* isLoading = */ false) =>
-      if (state.isDefined && state.get.age > java.time.Duration.ofSeconds(3)) {
+      if (state.isDefined && state.get.age > java.time.Duration.ofSeconds(1)) {
         setState(None)
       }
   }
@@ -96,11 +96,8 @@ final class GlobalMessagesStore(implicit i18n: I18n,
 
   /** Clear this message after some delay */
   private def clearMessageAfterDelay(): Unit = {
-    // Note: The delay is large because we don't want everything on the page to suddenly move up one row
-    // while it is being used. This is expected to trigger when a user has left the page open while doing
-    // something else.
     val uniqueStateWhenCreatedMessage = _state
-    js.timers.setTimeout(2.minutes)(logExceptions {
+    js.timers.setTimeout(2.seconds)(logExceptions {
       if (_state == uniqueStateWhenCreatedMessage) {
         // state has remained unchanged since start of timer
         setState(None)
