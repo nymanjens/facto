@@ -23,6 +23,15 @@ object DbQuery {
     implicit case object LongOrdering extends PicklableOrdering[Long] {
       override def toOrdering: Ordering[Long] = implicitly[Ordering[Long]]
     }
+    implicit case object MaybeLongOrdering extends PicklableOrdering[Option[Long]] {
+      override def toOrdering: Ordering[Option[Long]] = implicitly[Ordering[Option[Long]]]
+    }
+    implicit case object IntOrdering extends PicklableOrdering[Int] {
+      override def toOrdering: Ordering[Int] = implicitly[Ordering[Int]]
+    }
+    implicit case object MaybeIntOrdering extends PicklableOrdering[Option[Int]] {
+      override def toOrdering: Ordering[Option[Int]] = implicitly[Ordering[Option[Int]]]
+    }
     implicit case object StringOrdering extends PicklableOrdering[String] {
       override def toOrdering: Ordering[String] = implicitly[Ordering[String]]
     }

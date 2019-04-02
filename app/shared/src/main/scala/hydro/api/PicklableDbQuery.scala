@@ -217,11 +217,18 @@ object PicklableDbQuery {
   object PicklableOrdering {
     def fromRegular(regular: DbQuery.PicklableOrdering[_]): PicklableOrdering = regular match {
       case DbQuery.PicklableOrdering.LongOrdering          => LongOrdering
+      case DbQuery.PicklableOrdering.MaybeLongOrdering     => MaybeLongOrdering
+      case DbQuery.PicklableOrdering.IntOrdering           => IntOrdering
+      case DbQuery.PicklableOrdering.MaybeIntOrdering      => MaybeIntOrdering
+      case DbQuery.PicklableOrdering.LongOrdering          => LongOrdering
       case DbQuery.PicklableOrdering.StringOrdering        => StringOrdering
       case DbQuery.PicklableOrdering.LocalDateTimeOrdering => LocalDateTimeOrdering
     }
 
     case object LongOrdering extends PicklableOrdering(DbQuery.PicklableOrdering.LongOrdering)
+    case object MaybeLongOrdering extends PicklableOrdering(DbQuery.PicklableOrdering.MaybeLongOrdering)
+    case object IntOrdering extends PicklableOrdering(DbQuery.PicklableOrdering.IntOrdering)
+    case object MaybeIntOrdering extends PicklableOrdering(DbQuery.PicklableOrdering.MaybeIntOrdering)
     case object StringOrdering extends PicklableOrdering(DbQuery.PicklableOrdering.StringOrdering)
     case object LocalDateTimeOrdering
         extends PicklableOrdering(DbQuery.PicklableOrdering.LocalDateTimeOrdering)
