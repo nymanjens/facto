@@ -74,9 +74,10 @@ class JsEntityAccessImpl()(implicit remoteDatabaseProxy: RemoteDatabaseProxy,
 
     _pendingModifications ++= modifications
 
-    val listenersInvoked = invokeListenersAsync(_.modificationsAddedOrPendingStateChanged(modifications))
-
     val persistResponse = remoteDatabaseProxy.persistEntityModifications(modifications)
+    val listenersInvoked = persistResponse.queryReflectsModificationsFuture flatMap { _ =>
+      invokeListenersAsync(_.modificationsAddedOrPendingStateChanged(modifications))
+    }
 
     val queryBlockingFuture = persistResponse.queryReflectsModificationsFuture
     queryBlockingFutures += queryBlockingFuture
