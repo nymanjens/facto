@@ -86,10 +86,11 @@ private[webworker] final class LocalDatabaseWebWorkerApiMultiDbImpl extends Loca
       case Some(db) => db
       case None =>
         val db = new LocalDatabaseWebWorkerApiImpl()
-        db.create(
-          dbName = s"${dbNamePrefix}_$collectionName",
-          inMemory = inMemory,
-          separateDbPerCollection = false)
+        await(
+          db.create(
+            dbName = s"${dbNamePrefix}_$collectionName",
+            inMemory = inMemory,
+            separateDbPerCollection = false))
         collectionNameToDbMap.put(collectionName, db)
         db
     }
