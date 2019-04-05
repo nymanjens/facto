@@ -240,22 +240,31 @@ private final class LocalDatabaseImpl(implicit webWorker: LocalDatabaseWebWorker
 
 object LocalDatabaseImpl {
 
-  def create()(implicit webWorker: LocalDatabaseWebWorkerApi,
-               secondaryIndexFunction: SecondaryIndexFunction): Future[LocalDatabase] = async {
-    await(webWorker.create(dbName = "hydro-db", inMemory = false))
+  def create(separateDbPerCollection: Boolean = false)(
+      implicit webWorker: LocalDatabaseWebWorkerApi,
+      secondaryIndexFunction: SecondaryIndexFunction): Future[LocalDatabase] = async {
+    await(
+      webWorker
+        .create(dbName = "hydro-db", inMemory = false, separateDbPerCollection = separateDbPerCollection))
     new LocalDatabaseImpl()
   }
 
-  def createStoredForTests()(implicit webWorker: LocalDatabaseWebWorkerApi,
-                             secondaryIndexFunction: SecondaryIndexFunction): Future[LocalDatabase] = async {
-    await(webWorker.create(dbName = "test-db", inMemory = false))
+  def createStoredForTests(separateDbPerCollection: Boolean = false)(
+      implicit webWorker: LocalDatabaseWebWorkerApi,
+      secondaryIndexFunction: SecondaryIndexFunction): Future[LocalDatabase] = async {
+    await(
+      webWorker
+        .create(dbName = "test-db", inMemory = false, separateDbPerCollection = separateDbPerCollection))
     new LocalDatabaseImpl()
   }
 
-  def createInMemoryForTests()(implicit webWorker: LocalDatabaseWebWorkerApi,
-                               secondaryIndexFunction: SecondaryIndexFunction): Future[LocalDatabase] =
+  def createInMemoryForTests(separateDbPerCollection: Boolean = false)(
+      implicit webWorker: LocalDatabaseWebWorkerApi,
+      secondaryIndexFunction: SecondaryIndexFunction): Future[LocalDatabase] =
     async {
-      await(webWorker.create(dbName = "hydro-db", inMemory = true))
+      await(
+        webWorker
+          .create(dbName = "hydro-db", inMemory = true, separateDbPerCollection = separateDbPerCollection))
       new LocalDatabaseImpl()
     }
 

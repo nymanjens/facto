@@ -14,7 +14,8 @@ import scala.scalajs.js
 private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDatabaseWebWorkerApi {
   private var lokiDb: LokiJs.Database = _
 
-  override def create(dbName: String, inMemory: Boolean): Future[Unit] = {
+  override def create(dbName: String, inMemory: Boolean, separateDbPerCollection: Boolean): Future[Unit] = {
+    require(!separateDbPerCollection)
     if (inMemory) {
       lokiDb = LokiJs.Database.inMemoryForTests(dbName)
     } else {

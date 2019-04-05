@@ -20,7 +20,7 @@ import scala.util.Success
 
 object LocalDatabaseWebWorkerScript {
 
-  private val apiImpl = new LocalDatabaseWebWorkerApiImpl()
+  private var apiImpl: LocalDatabaseWebWorkerApi = _
 
   def run(): Unit = {
     WebWorker.addEventListener("message", onMessage _)
@@ -48,9 +48,13 @@ object LocalDatabaseWebWorkerScript {
 
   private def executeMethod(methodNum: Int, args: js.Array[js.Any]): Future[js.Any] = {
     (methodNum, args.toVector) match {
-      case (MethodNumbers.create, Seq(dbName, inMemory)) =>
+      case (MethodNumbers.create, Seq(dbName, inMemory, separateDbPerCollectionObj)) =>
+        val separateDbPerCollection = separateDbPerCollectionObj.asInstanceOf[Boolean]
+        apiImpl =
+          if (separateDbPerCollection) new LocalDatabaseWebWorkerApiMultiDbImpl()
+          else new LocalDatabaseWebWorkerApiImpl()
         apiImpl
-          .create(dbName.asInstanceOf[String], inMemory.asInstanceOf[Boolean])
+          .create(dbName.asInstanceOf[String], inMemory.asInstanceOf[Boolean], separateDbPerCollection)
           .map(_ => js.undefined)
       case (MethodNumbers.executeDataQuery, Seq(lokiQuery)) =>
         apiImpl
