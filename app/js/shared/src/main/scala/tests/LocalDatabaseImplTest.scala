@@ -31,267 +31,282 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
   implicit private val secondaryIndexFunction = app.models.access.Module.secondaryIndexFunction
   implicit private val fakeClock = new FakeClock
 
-  override def tests = Seq(
-    ManualTest("isEmpty") {
-      async {
-        val db = await(createAndInitializeDb())
-        await(db.isEmpty) ==> true
-        await(db.addAll(Seq(createUser())))
-        await(db.isEmpty) ==> false
+  override def tests =
+    testsWithParameters(separateDbPerCollection = false) ++
+      testsWithParameters(separateDbPerCollection = true)
 
-        await(db.resetAndInitialize())
+  private def testsWithParameters(separateDbPerCollection: Boolean) = {
+    def manualTest(name: String)(testCode: => Future[Unit]): ManualTest =
+      ManualTest(s"$name [separateDbPerCollection = $separateDbPerCollection]")(testCode)
 
-        await(db.isEmpty) ==> true
-        await(db.setSingletonValue(NextUpdateTokenKey, testUpdateToken))
-        await(db.isEmpty) ==> false
-      }
-    },
-    ManualTest("setSingletonValue") {
-      async {
-        val db = await(createAndInitializeDb())
-        await(db.getSingletonValue(VersionKey)).isDefined ==> false
+    Seq(
+      manualTest("isEmpty") {
+        async {
+          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          await(db.isEmpty) ==> true
+          await(db.addAll(Seq(createUser())))
+          await(db.isEmpty) ==> false
 
-        await(db.setSingletonValue(VersionKey, "abc"))
-        await(db.getSingletonValue(VersionKey)).get ==> "abc"
+          await(db.resetAndInitialize())
 
-        await(db.setSingletonValue(NextUpdateTokenKey, testUpdateToken))
-        await(db.getSingletonValue(NextUpdateTokenKey)).get ==> testUpdateToken
-      }
-    },
-    ManualTest("save") {
-      async {
-        val user1 = createUser()
+          await(db.isEmpty) ==> true
+          await(db.setSingletonValue(NextUpdateTokenKey, testUpdateToken))
+          await(db.isEmpty) ==> false
+        }
+      },
+      manualTest("setSingletonValue") {
+        async {
+          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          await(db.getSingletonValue(VersionKey)).isDefined ==> false
 
-        val db = await(LocalDatabaseImpl.createStoredForTests())
-        await(db.resetAndInitialize())
-        await(db.addAll(Seq(user1)))
-        await(db.setSingletonValue(VersionKey, "testVersion"))
+          await(db.setSingletonValue(VersionKey, "abc"))
+          await(db.getSingletonValue(VersionKey)).get ==> "abc"
 
-        await(db.save())
-        await(db.setSingletonValue(VersionKey, "otherTestVersion"))
+          await(db.setSingletonValue(NextUpdateTokenKey, testUpdateToken))
+          await(db.getSingletonValue(NextUpdateTokenKey)).get ==> testUpdateToken
+        }
+      },
+      manualTest("save") {
+        async {
+          val user1 = createUser()
 
-        val otherDb = await(LocalDatabaseImpl.createStoredForTests())
-        await(DbResultSet.fromExecutor(otherDb.queryExecutor[User]()).data()) ==> Seq(user1)
-        await(otherDb.getSingletonValue(VersionKey)).get ==> "testVersion"
-      }
-    },
-    ManualTest("resetAndInitialize") {
-      async {
-        val db = await(createAndInitializeDb())
-        await(db.addAll(Seq(createUser())))
-        db.setSingletonValue(VersionKey, "testVersion")
+          val db =
+            await(LocalDatabaseImpl.createStoredForTests(separateDbPerCollection = separateDbPerCollection))
+          await(db.resetAndInitialize())
+          await(db.addAll(Seq(user1)))
+          await(db.setSingletonValue(VersionKey, "testVersion"))
 
-        await(db.resetAndInitialize())
+          await(db.save())
+          await(db.setSingletonValue(VersionKey, "otherTestVersion"))
 
-        await(db.isEmpty) ==> true
-      }
-    },
-    ManualTest("addAll") {
-      async {
-        val db = await(createAndInitializeDb())
-        await(db.addAll(Seq(testUserRedacted)))
-        await(db.addAll(Seq(testTransactionWithId)))
-        await(db.addAll(Seq(testBalanceCheckWithId)))
-        await(db.addAll(Seq(testExchangeRateMeasurementWithId)))
+          val otherDb =
+            await(LocalDatabaseImpl.createStoredForTests(separateDbPerCollection = separateDbPerCollection))
+          await(DbResultSet.fromExecutor(otherDb.queryExecutor[User]()).data()) ==> Seq(user1)
+          await(otherDb.getSingletonValue(VersionKey)).get ==> "testVersion"
+        }
+      },
+      manualTest("resetAndInitialize") {
+        async {
+          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          await(db.addAll(Seq(createUser())))
+          db.setSingletonValue(VersionKey, "testVersion")
 
-        await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()) ==> Seq(testUserRedacted)
-        await(DbResultSet.fromExecutor(db.queryExecutor[Transaction]()).data()) ==> Seq(testTransactionWithId)
-        await(DbResultSet.fromExecutor(db.queryExecutor[BalanceCheck]()).data()) ==>
-          Seq(testBalanceCheckWithId)
-        await(DbResultSet.fromExecutor(db.queryExecutor[ExchangeRateMeasurement]()).data()) ==>
-          Seq(testExchangeRateMeasurementWithId)
-      }
-    },
-    ManualTest("addAll: Inserts no duplicates IDs") {
-      async {
-        val user1 = createUser()
+          await(db.resetAndInitialize())
 
-        val db = await(createAndInitializeDb())
-        val userWithSameIdA = user1.copy(name = "name A")
-        val userWithSameIdB = user1.copy(name = "name B")
-        await(db.addAll(Seq(user1, userWithSameIdA)))
-        await(db.addAll(Seq(user1, userWithSameIdB)))
+          await(db.isEmpty) ==> true
+        }
+      },
+      manualTest("addAll") {
+        async {
+          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          await(db.addAll(Seq(testUserRedacted)))
+          await(db.addAll(Seq(testTransactionWithId)))
+          await(db.addAll(Seq(testBalanceCheckWithId)))
+          await(db.addAll(Seq(testExchangeRateMeasurementWithId)))
 
-        await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()) ==> Seq(user1)
-      }
-    },
-    ManualTest("addPendingModifications") {
-      async {
-        val db = await(createAndInitializeDb())
+          await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()) ==> Seq(testUserRedacted)
+          await(DbResultSet.fromExecutor(db.queryExecutor[Transaction]()).data()) ==> Seq(
+            testTransactionWithId)
+          await(DbResultSet.fromExecutor(db.queryExecutor[BalanceCheck]()).data()) ==>
+            Seq(testBalanceCheckWithId)
+          await(DbResultSet.fromExecutor(db.queryExecutor[ExchangeRateMeasurement]()).data()) ==>
+            Seq(testExchangeRateMeasurementWithId)
+        }
+      },
+      manualTest("addAll: Inserts no duplicates IDs") {
+        async {
+          val user1 = createUser()
 
-        await(db.addPendingModifications(Seq(testModificationA, testModificationB)))
-        await(db.addPendingModifications(Seq(testModificationB)))
+          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          val userWithSameIdA = user1.copy(name = "name A")
+          val userWithSameIdB = user1.copy(name = "name B")
+          await(db.addAll(Seq(user1, userWithSameIdA)))
+          await(db.addAll(Seq(user1, userWithSameIdB)))
 
-        await(db.pendingModifications()) ==> Seq(testModificationA, testModificationB)
-      }
-    },
-    ManualTest("removePendingModifications: Modification in db") {
-      async {
-        val db = await(createAndInitializeDb())
-        await(db.addPendingModifications(Seq(testModificationA)))
-        await(db.addPendingModifications(Seq(testModificationB)))
+          await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()) ==> Seq(user1)
+        }
+      },
+      manualTest("addPendingModifications") {
+        async {
+          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
 
-        await(db.removePendingModifications(Seq(testModificationA)))
+          await(db.addPendingModifications(Seq(testModificationA, testModificationB)))
+          await(db.addPendingModifications(Seq(testModificationB)))
 
-        await(db.pendingModifications()) ==> Seq(testModificationB)
-      }
-    },
-    ManualTest("removePendingModifications: Modification not in db") {
-      async {
-        val db = await(createAndInitializeDb())
-        await(db.addPendingModifications(Seq(testModificationA)))
+          await(db.pendingModifications()) ==> Seq(testModificationA, testModificationB)
+        }
+      },
+      manualTest("removePendingModifications: Modification in db") {
+        async {
+          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          await(db.addPendingModifications(Seq(testModificationA)))
+          await(db.addPendingModifications(Seq(testModificationB)))
 
-        await(db.removePendingModifications(Seq(testModificationB)))
+          await(db.removePendingModifications(Seq(testModificationA)))
 
-        await(db.pendingModifications()) ==> Seq(testModificationA)
-      }
-    },
-    ManualTest("applyModifications: Add") {
-      async {
-        val db = await(createAndInitializeDb())
-        val user1 = createUser()
+          await(db.pendingModifications()) ==> Seq(testModificationB)
+        }
+      },
+      manualTest("removePendingModifications: Modification not in db") {
+        async {
+          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          await(db.addPendingModifications(Seq(testModificationA)))
 
-        await(db.applyModifications(Seq(EntityModification.Add(user1))))
+          await(db.removePendingModifications(Seq(testModificationB)))
 
-        await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()) ==> Seq(user1)
-      }
-    },
-    ManualTest("applyModifications: Update: Full update") {
-      async {
-        val db = await(createAndInitializeDb())
-        val user1 = createUser()
-        val user2 = createUser()
-        val user3 = createUser()
+          await(db.pendingModifications()) ==> Seq(testModificationA)
+        }
+      },
+      manualTest("applyModifications: Add") {
+        async {
+          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          val user1 = createUser()
 
-        await(db.addAll(Seq(user1, user2, user3)))
+          await(db.applyModifications(Seq(EntityModification.Add(user1))))
 
-        val user2Update = EntityModification.createUpdateAllFields(user2.copy(name = "other name"))
-        await(db.applyModifications(Seq(user2Update)))
+          await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()) ==> Seq(user1)
+        }
+      },
+      manualTest("applyModifications: Update: Full update") {
+        async {
+          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          val user1 = createUser()
+          val user2 = createUser()
+          val user3 = createUser()
 
-        await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()).toSet ==>
-          Set(user1, user2Update.updatedEntity, user3)
-      }
-    },
-    ManualTest("applyModifications: Update: Partial update") {
-      async {
-        val db = await(createAndInitializeDb())
-        val user1 = createUser()
-        val user2 = createUser()
-        val user3 = createUser()
+          await(db.addAll(Seq(user1, user2, user3)))
 
-        await(db.addAll(Seq(user1, user2, user3)))
+          val user2Update = EntityModification.createUpdateAllFields(user2.copy(name = "other name"))
+          await(db.applyModifications(Seq(user2Update)))
 
-        val user2UpdateA = EntityModification
-          .createUpdate(user2.copy(loginName = "login2_update"), fieldMask = Seq(ModelFields.User.loginName))
-        val user2UpdateB = EntityModification
-          .createUpdate(user2.copy(name = "name2_update"), fieldMask = Seq(ModelFields.User.name))
-        await(db.applyModifications(Seq(user2UpdateA)))
-        await(db.applyModifications(Seq(user2UpdateB)))
+          await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()).toSet ==>
+            Set(user1, user2Update.updatedEntity, user3)
+        }
+      },
+      manualTest("applyModifications: Update: Partial update") {
+        async {
+          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          val user1 = createUser()
+          val user2 = createUser()
+          val user3 = createUser()
 
-        await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()).toSet ==>
-          Set(
-            user1,
-            user2.copy(
-              loginName = "login2_update",
-              name = "name2_update",
-              lastUpdateTime = user2UpdateA.updatedEntity.lastUpdateTime
-                .merge(user2UpdateB.updatedEntity.lastUpdateTime, forceIncrement = false)
-            ),
-            user3
-          )
-      }
-    },
-    ManualTest("applyModifications: Update: Ignored when already deleted") {
-      async {
-        val db = await(createAndInitializeDb())
-        val user1 = createUser()
-        val user2 = createUser()
-        val user3 = createUser()
+          await(db.addAll(Seq(user1, user2, user3)))
 
-        await(db.addAll(Seq(user1, user3)))
+          val user2UpdateA = EntityModification
+            .createUpdate(
+              user2.copy(loginName = "login2_update"),
+              fieldMask = Seq(ModelFields.User.loginName))
+          val user2UpdateB = EntityModification
+            .createUpdate(user2.copy(name = "name2_update"), fieldMask = Seq(ModelFields.User.name))
+          await(db.applyModifications(Seq(user2UpdateA)))
+          await(db.applyModifications(Seq(user2UpdateB)))
 
-        val user2Update = EntityModification.createUpdateAllFields(user2)
-        await(db.applyModifications(Seq(user2Update)))
+          await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()).toSet ==>
+            Set(
+              user1,
+              user2.copy(
+                loginName = "login2_update",
+                name = "name2_update",
+                lastUpdateTime = user2UpdateA.updatedEntity.lastUpdateTime
+                  .merge(user2UpdateB.updatedEntity.lastUpdateTime, forceIncrement = false)
+              ),
+              user3
+            )
+        }
+      },
+      manualTest("applyModifications: Update: Ignored when already deleted") {
+        async {
+          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          val user1 = createUser()
+          val user2 = createUser()
+          val user3 = createUser()
 
-        await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()).toSet ==> Set(user1, user3)
-      }
-    },
-    ManualTest("applyModifications: Delete") {
-      async {
-        val db = await(createAndInitializeDb())
-        val user1 = createUser()
-        await(db.addAll(Seq(user1)))
+          await(db.addAll(Seq(user1, user3)))
 
-        await(db.applyModifications(Seq(EntityModification.createRemove(user1))))
+          val user2Update = EntityModification.createUpdateAllFields(user2)
+          await(db.applyModifications(Seq(user2Update)))
 
-        await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()) ==> Seq()
-      }
-    },
-    ManualTest("applyModifications: Add is idempotent") {
-      async {
-        val db = await(createAndInitializeDb())
-        val user1 = createUser()
-        val updatedUser1 = user1.copy(name = "updated name")
-        val user2 = createUser()
-        val user3 = createUser()
+          await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()).toSet ==> Set(user1, user3)
+        }
+      },
+      manualTest("applyModifications: Delete") {
+        async {
+          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          val user1 = createUser()
+          await(db.addAll(Seq(user1)))
 
-        await(
-          db.applyModifications(
-            Seq(
-              EntityModification.Add(user1),
-              EntityModification.Add(user1),
-              EntityModification.Add(updatedUser1),
-              EntityModification.Add(user2)
-            )))
+          await(db.applyModifications(Seq(EntityModification.createRemove(user1))))
 
-        await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()).toSet ==> Set(user1, user2)
-      }
-    },
-    ManualTest("applyModifications: Update is idempotent") {
-      async {
-        val db = await(createAndInitializeDb())
+          await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()) ==> Seq()
+        }
+      },
+      manualTest("applyModifications: Add is idempotent") {
+        async {
+          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          val user1 = createUser()
+          val updatedUser1 = user1.copy(name = "updated name")
+          val user2 = createUser()
+          val user3 = createUser()
 
-        val user1 = createUser()
-        val updatedUserA =
-          user1.copy(name = "A", lastUpdateTime = LastUpdateTime.allFieldsUpdated(testInstantA))
-        val updatedUserB =
-          user1.copy(name = "B", lastUpdateTime = LastUpdateTime.allFieldsUpdated(testInstantB))
-        await(db.applyModifications(Seq(EntityModification.Add(user1))))
+          await(
+            db.applyModifications(
+              Seq(
+                EntityModification.Add(user1),
+                EntityModification.Add(user1),
+                EntityModification.Add(updatedUser1),
+                EntityModification.Add(user2)
+              )))
 
-        await(
-          db.applyModifications(
-            Seq(
-              EntityModification.Update(updatedUserB),
-              EntityModification.Update(updatedUserA),
-              EntityModification.Update(updatedUserB),
-            )))
+          await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()).toSet ==> Set(user1, user2)
+        }
+      },
+      manualTest("applyModifications: Update is idempotent") {
+        async {
+          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
 
-        await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()) ==> Seq(updatedUserB)
-      }
-    },
-    ManualTest("applyModifications: Delete is idempotent") {
-      async {
-        val db = await(createAndInitializeDb())
-        val user1 = createUser()
-        val user2 = createUser()
-        val user3 = createUser()
-        await(db.addAll(Seq(user1, user2)))
+          val user1 = createUser()
+          val updatedUserA =
+            user1.copy(name = "A", lastUpdateTime = LastUpdateTime.allFieldsUpdated(testInstantA))
+          val updatedUserB =
+            user1.copy(name = "B", lastUpdateTime = LastUpdateTime.allFieldsUpdated(testInstantB))
+          await(db.applyModifications(Seq(EntityModification.Add(user1))))
 
-        await(
-          db.applyModifications(
-            Seq(
-              EntityModification.createRemove(user2),
-              EntityModification.createRemove(user2),
-              EntityModification.createRemove(user3)
-            )))
+          await(
+            db.applyModifications(
+              Seq(
+                EntityModification.Update(updatedUserB),
+                EntityModification.Update(updatedUserA),
+                EntityModification.Update(updatedUserB),
+              )))
 
-        await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()) ==> Seq(user1)
-      }
-    },
-  )
+          await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()) ==> Seq(updatedUserB)
+        }
+      },
+      manualTest("applyModifications: Delete is idempotent") {
+        async {
+          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          val user1 = createUser()
+          val user2 = createUser()
+          val user3 = createUser()
+          await(db.addAll(Seq(user1, user2)))
 
-  def createAndInitializeDb(): Future[LocalDatabase] = async {
-    val db = await(LocalDatabaseImpl.createInMemoryForTests())
+          await(
+            db.applyModifications(
+              Seq(
+                EntityModification.createRemove(user2),
+                EntityModification.createRemove(user2),
+                EntityModification.createRemove(user3)
+              )))
+
+          await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()) ==> Seq(user1)
+        }
+      },
+    )
+  }
+
+  def createAndInitializeDb(separateDbPerCollection: Boolean): Future[LocalDatabase] = async {
+    val db =
+      await(LocalDatabaseImpl.createInMemoryForTests(separateDbPerCollection = separateDbPerCollection))
     await(db.resetAndInitialize())
     db
   }
