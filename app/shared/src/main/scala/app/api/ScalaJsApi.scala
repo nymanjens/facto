@@ -55,7 +55,11 @@ object ScalaJsApi {
       entitiesMap(entityType).asInstanceOf[Seq[E]]
     }
   }
+
+  sealed trait EntityModificationPushPacket
   case class ModificationsWithToken(modifications: Seq[EntityModification], nextUpdateToken: UpdateToken)
+      extends EntityModificationPushPacket
+  object EntityModificationPushHeartbeat extends EntityModificationPushPacket
 
   /**
     * Copy of the User model with all fields optional.

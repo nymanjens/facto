@@ -7,6 +7,7 @@ import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
+import hydro.common.time.Clock
 import hydro.models.access.EntityModificationPushClientFactory
 import hydro.models.access.HybridRemoteDatabaseProxy
 import hydro.models.access.LocalDatabaseImpl
@@ -15,6 +16,7 @@ import hydro.models.access.LocalDatabaseImpl.SecondaryIndexFunction
 import scala.collection.immutable.Seq
 
 final class Module(implicit user: User,
+                   clock: Clock,
                    scalaJsApiClient: ScalaJsApiClient,
                    getInitialDataResponse: GetInitialDataResponse) {
 

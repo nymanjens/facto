@@ -5,6 +5,9 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 
+import app.api.ScalaJsApi.EntityModificationPushPacket
+import app.api.ScalaJsApi.EntityModificationPushHeartbeat
+import app.api.ScalaJsApi.ModificationsWithToken
 import hydro.common.GuavaReplacement.ImmutableBiMap
 import app.models.modification.EntityTypes
 import boopickle.Default._
@@ -181,6 +184,17 @@ abstract class StandardPicklers {
       }
     }
   }
+
+  implicit object EntityModificationPushHeartbeatPickler
+      extends Pickler[EntityModificationPushHeartbeat.type] {
+    override def pickle(data: EntityModificationPushHeartbeat.type)(implicit state: PickleState): Unit = {}
+    override def unpickle(implicit state: UnpickleState): EntityModificationPushHeartbeat.type =
+      EntityModificationPushHeartbeat
+  }
+
+  implicit val entityModificationPushPacketPickler = compositePickler[EntityModificationPushPacket]
+    .addConcreteType[ModificationsWithToken]
+    .addConcreteType[EntityModificationPushHeartbeat.type]
 
   protected def logExceptions[T](codeBlock: => T): T = {
     try {

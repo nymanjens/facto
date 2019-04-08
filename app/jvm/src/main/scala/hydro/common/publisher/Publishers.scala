@@ -7,15 +7,18 @@ import org.reactivestreams.Subscription
 
 import scala.collection.immutable.Seq
 
-/** Utility methods for working woth reactivestreams Publishers. */
+/** Utility methods for working with reactivestreams Publishers. */
 object Publishers {
 
   /**
-    * Returns the same publisher as the givne one, except that the given `mappingFunction` is applied to all
+    * Returns the same publisher as the given one, except that the given `mappingFunction` is applied to all
     * messages.
     */
   def map[From, To](delegate: Publisher[From], mappingFunction: From => To): Publisher[To] =
     new MappingPublisher(delegate, mappingFunction)
+
+  def combine[T](publishers: Publisher[_ <: T]*): Publisher[T] =
+    new CombiningPublisher[T](publishers.toVector)
 
   /**
     * Returns a new publisher that is the same as the given publisher, except that the messages posted by the
@@ -33,6 +36,19 @@ object Publishers {
         override def onError(t: Throwable): Unit = outerSubscriber.onError(t)
         override def onComplete(): Unit = outerSubscriber.onComplete()
       })
+    }
+  }
+
+  private final class CombiningPublisher[T](delegatePublishers: Seq[Publisher[_ <: T]]) extends Publisher[T] {
+    override def subscribe(outerSubscriber: Subscriber[_ >: T]): Unit = {
+      for (delegate <- delegatePublishers)
+        delegate.subscribe(new Subscriber[T] {
+          override def onSubscribe(subscription: Subscription): Unit =
+            outerSubscriber.onSubscribe(subscription)
+          override def onNext(t: T): Unit = outerSubscriber.onNext(t)
+          override def onError(t: Throwable): Unit = outerSubscriber.onError(t)
+          override def onComplete(): Unit = outerSubscriber.onComplete()
+        })
     }
   }
 

@@ -2,39 +2,51 @@ package hydro.controllers
 
 import java.nio.ByteBuffer
 
+import akka.actor.ActorSystem
 import akka.stream.scaladsl._
 import app.api.ScalaJsApi.ModificationsWithToken
 import app.api.ScalaJsApi.UpdateToken
+import app.api.ScalaJsApi.EntityModificationPushPacket
+import app.api.ScalaJsApi.EntityModificationPushHeartbeat
 import app.api.ScalaJsApiServerFactory
-import hydro.controllers.InternalApi.ScalaJsApiCaller
 import app.models.access.JvmEntityAccess
 import app.models.user.User
 import boopickle.Default._
 import app.api.Picklers._
 import com.google.inject.Inject
+import com.google.inject.Singleton
 import hydro.api.ScalaJsApiRequest
 import hydro.common.UpdateTokens.toInstant
 import hydro.common.UpdateTokens.toUpdateToken
 import hydro.common.publisher.Publishers
+import hydro.common.publisher.TriggerablePublisher
 import hydro.common.time.Clock
+import hydro.controllers.InternalApi.ScalaJsApiCaller
 import hydro.controllers.helpers.AuthenticatedAction
+import hydro.controllers.InternalApi.EntityModificationPushHeartbeatScheduler
 import hydro.models.modification.EntityModificationEntity
 import hydro.models.slick.SlickUtils.dbApi._
 import hydro.models.slick.SlickUtils.dbRun
 import hydro.models.slick.SlickUtils.instantToSqlTimestampMapper
 import hydro.models.slick.StandardSlickEntityTableDefs.EntityModificationEntityDef
+import org.reactivestreams.Publisher
 import play.api.i18n.I18nSupport
 import play.api.i18n.MessagesApi
 import play.api.mvc._
 
-final class InternalApi @Inject()(implicit override val messagesApi: MessagesApi,
-                                  components: ControllerComponents,
-                                  clock: Clock,
-                                  entityAccess: JvmEntityAccess,
-                                  scalaJsApiServerFactory: ScalaJsApiServerFactory,
-                                  playConfiguration: play.api.Configuration,
-                                  env: play.api.Environment,
-                                  scalaJsApiCaller: ScalaJsApiCaller)
+import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext
+
+final class InternalApi @Inject()(
+    implicit override val messagesApi: MessagesApi,
+    components: ControllerComponents,
+    clock: Clock,
+    entityAccess: JvmEntityAccess,
+    scalaJsApiServerFactory: ScalaJsApiServerFactory,
+    playConfiguration: play.api.Configuration,
+    env: play.api.Environment,
+    scalaJsApiCaller: ScalaJsApiCaller,
+    entityModificationPushHeartbeatScheduler: EntityModificationPushHeartbeatScheduler)
     extends AbstractController(components)
     with I18nSupport {
 
@@ -63,8 +75,8 @@ final class InternalApi @Inject()(implicit override val messagesApi: MessagesApi
 
   def entityModificationPushWebsocket(updateToken: UpdateToken) = WebSocket.accept[Array[Byte], Array[Byte]] {
     request =>
-      def modificationsToBytes(modificationsWithToken: ModificationsWithToken): Array[Byte] = {
-        val responseBuffer = Pickle.intoBytes(modificationsWithToken)
+      def packetToBytes(packet: EntityModificationPushPacket): Array[Byte] = {
+        val responseBuffer = Pickle.intoBytes(packet)
         val data: Array[Byte] = Array.ofDim[Byte](responseBuffer.remaining())
         responseBuffer.get(data)
         data
@@ -94,8 +106,15 @@ final class InternalApi @Inject()(implicit override val messagesApi: MessagesApi
 
       val in = Sink.ignore
       val out = Source
-        .single(modificationsToBytes(firstMessage))
-        .concat(Source.fromPublisher(Publishers.map(entityModificationPublisher, modificationsToBytes)))
+        .single(packetToBytes(firstMessage))
+        .concat(
+          Source.fromPublisher(
+            Publishers
+              .map(
+                Publishers.combine[EntityModificationPushPacket](
+                  entityModificationPublisher,
+                  entityModificationPushHeartbeatScheduler.publisher),
+                packetToBytes)))
       Flow.fromSinkAndSource(in, out)
   }
 
@@ -113,5 +132,20 @@ final class InternalApi @Inject()(implicit override val messagesApi: MessagesApi
 object InternalApi {
   trait ScalaJsApiCaller {
     def apply(path: String, argsMap: Map[String, ByteBuffer])(implicit user: User): ByteBuffer
+  }
+
+  @Singleton
+  private[controllers] class EntityModificationPushHeartbeatScheduler @Inject()(
+      implicit actorSystem: ActorSystem,
+      executionContext: ExecutionContext) {
+
+    private val publisher_ : TriggerablePublisher[EntityModificationPushHeartbeat.type] =
+      new TriggerablePublisher()
+
+    actorSystem.scheduler.schedule(initialDelay = 0.seconds, interval = 5.seconds) {
+      publisher_.trigger(EntityModificationPushHeartbeat)
+    }
+
+    def publisher: Publisher[EntityModificationPushHeartbeat.type] = publisher_
   }
 }
