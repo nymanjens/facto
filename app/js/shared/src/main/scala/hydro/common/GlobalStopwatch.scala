@@ -18,8 +18,8 @@ object GlobalStopwatch {
 
   def logTimeSinceStart(stepName: => String): Unit = {
     val now = Instant.now()
-    val lastDiff = lastLogTime - now
-    val startDiff = startTime - now
+    val lastDiff = now - lastLogTime
+    val startDiff = now - startTime
     console.log(
       s"  {GlobalStopwatch} Elapsed: Since last time: ${lastDiff.toMillis}ms, Since start: ${startDiff.toMillis}ms ($stepName) ")
 
