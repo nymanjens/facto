@@ -8,6 +8,9 @@ import app.models.accounting.config.Template
 import app.models.user.User
 import hydro.common.LoggingUtils.logExceptions
 import hydro.flux.react.ReactVdomUtils.<<
+import hydro.flux.react.uielements.Bootstrap
+import hydro.flux.react.uielements.Bootstrap.Size
+import hydro.flux.react.uielements.Bootstrap.Variant
 import hydro.flux.react.uielements.PageHeader
 import hydro.flux.react.uielements.Panel
 import hydro.flux.router.RouterContext
@@ -38,13 +41,14 @@ private[app] final class TemplateList(implicit user: User,
             <<.joinWithSpaces(
               for (template <- templates)
                 yield
-                  router.anchorWithHrefTo(AppPages.NewFromTemplate(template))(
+                  Bootstrap.Button(
+                    Variant.info,
+                    Size.lg,
+                    tag = router.anchorWithHrefTo(AppPages.NewFromTemplate(template)))(
                     ^.key := template.code,
-                    ^.className := "btn btn-info btn-lg",
                     <.i(^.className := template.iconClass),
                     " ",
-                    template.name
-                  )
+                    template.name)
             )
           }
         )
