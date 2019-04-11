@@ -1,5 +1,8 @@
 package app.flux.react.app.transactionviews
 
+import hydro.flux.react.uielements.Bootstrap
+import hydro.flux.react.uielements.Bootstrap.Size
+import hydro.flux.react.uielements.Bootstrap.Variant
 import hydro.common.I18n
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.stores.entries.WithIsPending
@@ -174,7 +177,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
             <.span(^.style := js.Dictionary("color" -> "#999"), s"(${i18n("app.n-entries", numEntries)})")
           )
         case None =>
-          <.i(^.className := "fa fa-circle-o-notch fa-spin")
+          Bootstrap.FontAwesomeIcon("circle-o-notch", spin = true)
       }
     }
 

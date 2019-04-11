@@ -46,7 +46,10 @@ object Bootstrap {
   }
 
   def Icon(className: String): VdomTag = <.i(^.className := className)
-  def FontAwesomeIcon(name: String, otherName: String = null, fixedWidth: Boolean = false): VdomTag = {
+  def FontAwesomeIcon(name: String,
+                      otherName: String = null,
+                      fixedWidth: Boolean = false,
+                      spin: Boolean = false): VdomTag = {
     val classes = mutable.Buffer[String]()
     classes += "fa"
     classes += s"fa-$name"
@@ -55,6 +58,9 @@ object Bootstrap {
     }
     if (fixedWidth) {
       classes += s"fa-fw"
+    }
+    if (spin) {
+      classes += s"fa-spin"
     }
     <.i(^^.classes(classes))
   }
@@ -69,6 +75,7 @@ object Bootstrap {
 
   def InputGroup: VdomTag = <.div(^.className := "input-group")
   def InputGroupAddon: VdomTag = <.span(^.className := "input-group-addon")
+  def InputGroupButton: VdomTag = <.span(^.className := "input-group-btn")
 
   def NavbarBrand(tag: VdomTag = <.span): VdomTag = tag(^.className := "navbar-brand")
 

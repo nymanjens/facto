@@ -1,5 +1,8 @@
 package app.flux.react.app.transactionviews
 
+import hydro.flux.react.uielements.Bootstrap
+import hydro.flux.react.uielements.Bootstrap.Size
+import hydro.flux.react.uielements.Bootstrap.Variant
 import hydro.common.I18n
 import app.common.money.ExchangeRateManager
 import app.models.access.AppJsEntityAccess
@@ -56,27 +59,23 @@ final class Summary(implicit summaryTable: SummaryTable,
       implicit val router = props.router
       <.span(
         pageHeader.withExtension(router.currentPage)(
-          <.form(
-            ^.className := "form-inline summary-query-filter",
-            <.div(
-              ^.className := "input-group",
+          Bootstrap.FormInline()(
+            ^.className := "summary-query-filter",
+            Bootstrap.InputGroup(
               TextInput(
                 ref = queryInputRef,
                 name = "query",
                 placeholder = i18n("app.example-query"),
                 classes = Seq("form-control")),
-              <.span(
-                ^.className := "input-group-btn",
-                <.button(
-                  ^.className := "btn btn-default",
-                  ^.tpe := "submit",
+              Bootstrap.InputGroupButton(
+                Bootstrap.Button(tpe = "submit")(
                   ^.onClick ==> { (e: ReactEventFromInput) =>
                     LogExceptionsCallback {
                       e.preventDefault()
                       $.modState(_.copy(query = queryInputRef().value getOrElse "")).runNow()
                     }
                   },
-                  <.i(^.className := "fa fa-search")
+                  Bootstrap.FontAwesomeIcon("search"),
                 )
               )
             )
@@ -97,8 +96,7 @@ final class Summary(implicit summaryTable: SummaryTable,
           }
         }.toVdomArray,
         // includeUnrelatedAccounts toggle button
-        <.a(
-          ^.className := "btn btn-info btn-lg btn-block",
+        Bootstrap.Button(Variant.info, Size.lg, block = true, tag = <.a)(
           ^.onClick --> $.modState(s => s.copy(includeUnrelatedAccounts = !s.includeUnrelatedAccounts)),
           if (state.includeUnrelatedAccounts) i18n("app.hide-other-accounts")
           else i18n("app.show-other-accounts")
