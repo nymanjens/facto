@@ -1,5 +1,8 @@
 package app.flux.react.app.transactiongroupform
 
+import hydro.flux.react.uielements.Bootstrap
+import hydro.flux.react.uielements.Bootstrap.Size
+import hydro.flux.react.uielements.Bootstrap.Variant
 import hydro.common.I18n
 import app.flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
 import hydro.common.LoggingUtils.LogExceptionsCallback
@@ -18,9 +21,10 @@ private[transactiongroupform] final class TotalFlowRestrictionInput(implicit i18
     .renderPS(($, props, state) =>
       logExceptions {
         def button(totalFlowRestriction: TotalFlowRestriction, label: String) = {
-          <.label(
-            ^^.classes(Seq("btn", "btn-default", "btn-sm")
-              ++ (if (state == totalFlowRestriction) Seq("active") else Seq())),
+          Bootstrap.Button(size = Size.sm, tag = <.label)(
+            ^^.ifThen(state == totalFlowRestriction) {
+              ^.className := "active"
+            },
             ^.onClick --> LogExceptionsCallback {
               $.setState(totalFlowRestriction).runNow()
               props.onChangeListener(totalFlowRestriction)
@@ -28,6 +32,7 @@ private[transactiongroupform] final class TotalFlowRestrictionInput(implicit i18
             label
           )
         }
+
         <.div(
           ^.className := "btn-group",
           VdomAttr("data-toggle") := "buttons",
