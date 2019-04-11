@@ -6,6 +6,7 @@ import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.ReactVdomUtils.^^
 import hydro.flux.react.uielements.input.InputBase
 import hydro.flux.react.uielements.input.InputValidator
+import hydro.flux.react.uielements.Bootstrap
 import hydro.jsfacades.ReactTagInput
 import japgolly.scalajs.react.Ref.ToScalaComponent
 import japgolly.scalajs.react._
@@ -104,11 +105,12 @@ object TagInput {
     def render(props: Props, state: State) = logExceptions {
       val errorMessage = generateErrorMessage(state, props)
 
-      <.div(
-        ^^.classes(Seq("form-group") ++ errorMessage.map(_ => "has-error")),
-        <.label(^.className := "col-sm-4 control-label", props.label),
-        <.div(
-          ^.className := "col-sm-8",
+      Bootstrap.FormGroup(
+        ^^.ifThen(errorMessage.isDefined) {
+          ^.className := "has-error"
+        },
+        Bootstrap.Col(sm = 4, tag = Bootstrap.ControlLabel(props.label)),
+        Bootstrap.Col(sm = 8)(
           ReactTagInput(
             tags = state.tags,
             suggestions = props.suggestions,

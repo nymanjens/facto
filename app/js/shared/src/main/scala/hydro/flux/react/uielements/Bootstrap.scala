@@ -60,16 +60,22 @@ object Bootstrap {
   }
   def Glyphicon(name: String): VdomTag = Icon(s"glyphicon glyphicon-$name")
 
+  def ControlLabel: VdomTag = <.label(^.className := "control-label")
+
   def Panel(variant: Variant = Variant.default): VdomTag =
     <.div(^.className := s"panel panel-${variant.name}")
   def PanelHeading: VdomTag = <.div(^.className := "panel-heading")
   def PanelBody: VdomTag = <.div(^.className := "panel-body")
+
+  def InputGroup: VdomTag = <.div(^.className := "input-group")
+  def InputGroupAddon: VdomTag = <.span(^.className := "input-group-addon")
 
   def NavbarBrand(tag: VdomTag = <.span): VdomTag = tag(^.className := "navbar-brand")
 
   def Alert(variant: Variant): VdomTag = <.div(^.className := s"alert alert-${variant.name}")
 
   def FormHorizontal: VdomTag = <.form(^.className := "form-horizontal")
+  def FormGroup: VdomTag = <.div(^.className := "form-group")
 
   case class Variant private (name: String)
   object Variant {

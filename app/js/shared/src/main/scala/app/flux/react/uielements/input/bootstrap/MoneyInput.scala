@@ -12,6 +12,7 @@ import hydro.flux.react.ReactVdomUtils.^^
 import hydro.flux.react.uielements.input.InputBase
 import hydro.flux.react.uielements.input.bootstrap.InputComponent
 import hydro.flux.react.uielements.input.bootstrap.InputComponent.Props
+import hydro.flux.react.uielements.Bootstrap
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
@@ -46,10 +47,8 @@ object MoneyInput {
         }
       }
 
-      <.div(
-        ^.className := "input-group",
-        <.span(
-          ^.className := "input-group-addon",
+      Bootstrap.InputGroup(
+        Bootstrap.InputGroupAddon(
           <.i(^.className := extraProps.currency.iconClass)
         ),
         <.input(
@@ -63,8 +62,7 @@ object MoneyInput {
           ^.onBlur ==> ((event: ReactEventFromInput) => materializeInputIfValid())
         ),
         ^^.ifThen(extraProps.currency.isForeign && extraProps.dateForCurrencyConversion.isDefined) {
-          <.span(
-            ^.className := "input-group-addon",
+          Bootstrap.InputGroupAddon(
             <.i(^.className := Currency.default.iconClass),
             " ",
             referenceMoney(extraProps.currency, extraProps.dateForCurrencyConversion.get).formatFloat
