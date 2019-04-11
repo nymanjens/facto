@@ -9,6 +9,7 @@ import hydro.common.LoggingUtils.LogExceptionsCallback
 import hydro.common.LoggingUtils.logExceptions
 import hydro.common.time.Clock
 import hydro.flux.react.ReactVdomUtils.^^
+import hydro.flux.react.uielements.Bootstrap
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
@@ -42,16 +43,13 @@ private[transactiongroupform] final class TotalFlowInput(implicit i18n: I18n,
           datedMoney.exchangedForCurrency(foreignCurrency)
         }
 
-        <.span(
-          ^.className := "total-flow-form form-inline",
-          <.div(
-            ^.className := "input-group",
-            <.span(
-              ^.className := "input-group-addon",
+        Bootstrap.FormInline(tag = <.span)(
+          ^.className := "total-flow-form",
+          Bootstrap.InputGroup(
+            Bootstrap.InputGroupAddon(
               i18n("app.total") + ":"
             ),
-            <.span(
-              ^.className := "input-group-addon",
+            Bootstrap.InputGroupAddon(
               <.i(^.className := Currency.default.iconClass)
             ),
             <.input(
@@ -64,8 +62,7 @@ private[transactiongroupform] final class TotalFlowInput(implicit i18n: I18n,
               ^.onChange ==> onChange
             ),
             ^^.ifDefined(foreignMoney) { money =>
-              <.span(
-                ^.className := "input-group-addon",
+              Bootstrap.InputGroupAddon(
                 <.i(^.className := money.currency.iconClass),
                 " ",
                 money.formatFloat

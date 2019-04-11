@@ -2,6 +2,9 @@ package app.flux.react.app.transactiongroupform
 
 import hydro.common.I18n
 import hydro.common.LoggingUtils.logExceptions
+import hydro.flux.react.uielements.Bootstrap
+import hydro.flux.react.uielements.Bootstrap.Size
+import hydro.flux.react.uielements.Bootstrap.Variant
 import hydro.flux.react.uielements.HalfPanel
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
@@ -21,14 +24,12 @@ private[transactiongroupform] final class AddTransactionPanel(implicit i18n: I18
             <.tbody(
               <.tr(
                 <.td(
-                  <.button(
-                    ^.tpe := "button",
-                    ^.className := "btn btn-primary btn-huge add-transaction-button",
+                  Bootstrap.Button(Variant.primary)(
+                    ^.className := "btn-huge add-transaction-button",
                     ^.onClick --> props.onClick,
-                    <.span(
-                      ^.className := "glyphicon glyphicon-plus",
+                    Bootstrap.Glyphicon("plus")(
                       ^.aria.hidden := true
-                    )
+                    ),
                   )
                 )
               )

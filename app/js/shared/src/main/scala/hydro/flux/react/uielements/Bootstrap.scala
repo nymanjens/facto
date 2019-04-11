@@ -76,6 +76,7 @@ object Bootstrap {
 
   def FormHorizontal: VdomTag = <.form(^.className := "form-horizontal")
   def FormGroup: VdomTag = <.div(^.className := "form-group")
+  def FormInline(tag: VdomTag = <.form): VdomTag = tag(^.className := "form-inline")
 
   case class Variant private (name: String)
   object Variant {
