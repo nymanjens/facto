@@ -1,5 +1,8 @@
 package app.flux.react.app.transactiongroupform
 
+import hydro.flux.react.uielements.Bootstrap
+import hydro.flux.react.uielements.Bootstrap.Size
+import hydro.flux.react.uielements.Bootstrap.Variant
 import hydro.common.I18n
 import app.common.money.Currency
 import app.common.money.ExchangeRateManager
@@ -268,15 +271,13 @@ final class TransactionGroupForm(implicit i18n: I18n,
       implicit val router = props.router
       <.div(
         ^.className := "transaction-group-form",
-        <.div(
-          ^.className := "row",
-          <.div(
-            ^.className := "col-lg-12",
+        Bootstrap.Row(
+          Bootstrap.Col(lg = 12)(
             pageHeader.withExtension(router.currentPage)(
               <<.ifThen(props.operationMeta.isInstanceOf[OperationMeta.Edit]) {
-                <.a(
-                  ^.className := "btn btn-default delete-button",
-                  <.i(^.className := "fa fa-times"),
+                Bootstrap.Button(tag = <.a)(
+                  ^.className := "delete-button",
+                  Bootstrap.FontAwesomeIcon("times"),
                   " ",
                   i18n("app.delete"),
                   ^.onClick --> onDelete
@@ -300,16 +301,13 @@ final class TransactionGroupForm(implicit i18n: I18n,
           )
         ),
         ^^.ifDefined(state.globalErrorMessage) { errorMessage =>
-          <.div(
-            ^.className := "alert alert-danger",
+          Bootstrap.Alert(Variant.danger)(
             errorMessage
           )
         },
-        <.form(
-          ^.className := "form-horizontal",
+        Bootstrap.FormHorizontal(
           ^.key := "main-form",
-          <.div(
-            ^.className := "row",
+          Bootstrap.Row(
             <.div(
               ^.className := "transaction-group-form",
               (for ((panelIndex, i) <- state.panelIndices.zipWithIndex) yield {
@@ -340,20 +338,15 @@ final class TransactionGroupForm(implicit i18n: I18n,
               }).toVdomArray,
               addTransactionPanel(onClick = addTransactionPanelCallback)
             ),
-            <.div(
-              ^.className := "form-group",
-              <.div(
-                ^.className := "col-sm-offset-2 col-sm-10",
-                <.button(
-                  ^.tpe := "submit",
-                  ^.className := "btn btn-default",
+            Bootstrap.FormGroup(
+              Bootstrap.Col(sm = 10, smOffset = 2)(
+                Bootstrap.Button(tpe = "submit")(
                   ^.onClick ==> onSubmit(redirectOnSuccess = true),
                   i18n("app.submit")
                 ),
                 " ",
                 <<.ifThen(props.operationMeta == OperationMeta.AddNew) {
-                  <.button(
-                    ^.className := "btn btn-default",
+                  Bootstrap.Button()(
                     ^.onClick ==> onSubmit(redirectOnSuccess = false),
                     i18n("app.submit-and-create")
                   )
