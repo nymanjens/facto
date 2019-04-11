@@ -58,9 +58,11 @@ object InputComponent {
           }
           val errorMessage = generateErrorMessage(state, props)
 
-          <.div(
-            ^^.classes(Seq("form-group") ++ errorMessage.map(_ => "has-error")),
-            Bootstrap.Col(sm = 4, tag = <.label)(^.className := "control-label", props.label),
+          Bootstrap.FormGroup(
+            ^^.ifThen(errorMessage.isDefined) {
+              ^.className := "has-error"
+            },
+            Bootstrap.Col(sm = 4, tag = Bootstrap.ControlLabel(props.label)),
             Bootstrap.Col(sm = 8)(
               inputRenderer.renderInput(
                 classes = "form-control" +: props.inputClasses,
