@@ -1,5 +1,8 @@
 package app.flux.react.app.transactionviews
 
+import hydro.flux.react.uielements.Bootstrap
+import hydro.flux.react.uielements.Bootstrap.Size
+import hydro.flux.react.uielements.Bootstrap.Variant
 import hydro.common.Formatting._
 import hydro.common.I18n
 import app.common.money.ExchangeRateManager
@@ -104,7 +107,8 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
                               <.td(
                                 uielements.MoneyWithCurrency(entry.balance),
                                 entry.balanceVerified match {
-                                  case true => <.span(" ", <.i(^.className := "fa fa-check fa-fw"))
+                                  case true =>
+                                    <.span(" ", Bootstrap.FontAwesomeIcon("check", fixedWidth = true))
                                   case false if rowNumber == 0 =>
                                     <.span(" ", balanceCheckConfirmButton(reservoir, entry))
                                   case _ => VdomArray.empty()
@@ -140,8 +144,7 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
             }
           }.toVdomArray,
           // includeUnrelatedReservoirs toggle button
-          <.a(
-            ^.className := "btn btn-info btn-lg btn-block",
+          Bootstrap.Button(Variant.info, Size.lg, block = true, tag = <.a)(
             ^.onClick --> LogExceptionsCallback(
               $.modState(s => s.copy(includeUnrelatedReservoirs = !s.includeUnrelatedReservoirs)).runNow()),
             if (state.includeUnrelatedReservoirs) i18n("app.hide-other-accounts")
@@ -149,8 +152,7 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
           ),
           // includeHiddenReservoirs toggle button
           <<.ifThen(state.includeHiddenReservoirs || state.includeUnrelatedReservoirs) {
-            <.a(
-              ^.className := "btn btn-info btn-lg btn-block",
+            Bootstrap.Button(Variant.info, Size.lg, block = true, tag = <.a)(
               ^.onClick --> LogExceptionsCallback(
                 $.modState(s => s.copy(includeHiddenReservoirs = !s.includeHiddenReservoirs)).runNow()),
               if (state.includeHiddenReservoirs) i18n("app.hide-hidden-reservoirs")
@@ -170,28 +172,24 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
   // **************** Private helper methods ****************//
   private def balanceCheckAddNewButton(reservoir: MoneyReservoir)(
       implicit router: RouterContext): VdomElement = {
-    router.anchorWithHrefTo(AppPages.NewBalanceCheck(reservoir))(
-      ^.className := "btn btn-info btn-xs",
-      ^.role := "button",
-      <.i(^.className := "fa fa-check-square-o fa-fw")
+    val link = router.anchorWithHrefTo(AppPages.NewBalanceCheck(reservoir))
+    Bootstrap.Button(Variant.info, Size.xs, tag = link)(
+      Bootstrap.FontAwesomeIcon("check-square-o", fixedWidth = true)
     )
   }
   private def transactionGroupAddButton(reservoir: MoneyReservoir)(
       implicit router: RouterContext): VdomElement = {
-    router.anchorWithHrefTo(AppPages.NewTransactionGroupFromReservoir(reservoir))(
-      ^.className := "btn btn-info btn-xs",
-      ^.role := "button",
+    val link = router.anchorWithHrefTo(AppPages.NewTransactionGroupFromReservoir(reservoir))
+    Bootstrap.Button(Variant.info, Size.xs, tag = link)(
       <.i(^.className := "icon-new-empty"),
       " ",
-      i18n("app.add-new")
+      i18n("app.add-new"),
     )
   }
 
   private def balanceCheckConfirmButton(reservoir: MoneyReservoir, entry: CashFlowEntry.RegularEntry)(
       implicit router: RouterContext): VdomElement = {
-    <.button(
-      ^.className := "btn btn-info btn-xs",
-      ^.role := "button",
+    Bootstrap.Button(Variant.info, Size.xs)(
       ^.onClick --> LogExceptionsCallback {
         dispatcher.dispatch(
           AppActions.AddBalanceCheck(BalanceCheck(
@@ -202,15 +200,14 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
             checkDate = entry.mostRecentTransaction.transactionDate
           )))
       }.void,
-      <.i(^.className := "fa fa-check-square-o fa-fw")
+      Bootstrap.FontAwesomeIcon("check-square-o", fixedWidth = true),
     )
   }
 
   def balanceCheckEditButton(balanceCorrection: BalanceCheck)(implicit router: RouterContext): VdomElement = {
-    router.anchorWithHrefTo(AppPages.EditBalanceCheck(balanceCorrection))(
-      ^.className := "btn btn-default btn-xs",
-      ^.role := "button",
-      <.i(^.className := "fa fa-pencil fa-fw"),
+    val link = router.anchorWithHrefTo(AppPages.EditBalanceCheck(balanceCorrection))
+    Bootstrap.Button(size = Size.xs, tag = link)(
+      Bootstrap.FontAwesomeIcon("pencil", fixedWidth = true),
       " ",
       i18n("app.edit")
     )
