@@ -17,10 +17,10 @@ object Bootstrap {
           tag: VdomTag = <.div): VdomTag = {
     val classes = mutable.Buffer[String]()
     if (sm != -1) classes += s"col-sm-$sm"
-    else if (md != -1) classes += s"col-md-$md"
-    else if (lg != -1) classes += s"col-lg-$lg"
-    else if (smOffset != -1) classes += s"col-sm-offset-$smOffset"
-    else if (mdOffset != -1) classes += s"col-md-offset-$mdOffset"
+    if (md != -1) classes += s"col-md-$md"
+    if (lg != -1) classes += s"col-lg-$lg"
+    if (smOffset != -1) classes += s"col-sm-offset-$smOffset"
+    if (mdOffset != -1) classes += s"col-md-offset-$mdOffset"
     tag(^^.classes(classes))
   }
 

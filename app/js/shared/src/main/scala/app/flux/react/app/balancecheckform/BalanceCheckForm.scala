@@ -20,6 +20,7 @@ import hydro.flux.react.uielements.HalfPanel
 import hydro.flux.react.uielements.PageHeader
 import hydro.flux.react.uielements.WaitForFuture
 import hydro.flux.react.uielements.input.bootstrap.TextInput
+import hydro.flux.react.uielements.Bootstrap
 import hydro.flux.router.RouterContext
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.Path
@@ -102,17 +103,15 @@ final class BalanceCheckForm(implicit i18n: I18n,
     def render(props: Props, state: State) = logExceptions {
       implicit val router = props.router
       <.div(
-        <.div(
-          ^.className := "row",
-          <.div(
-            ^.className := "col-lg-12",
+        Bootstrap.Row(
+          Bootstrap.Col(lg = 12)(
             pageHeader.withExtension(router.currentPage)(
               <<.ifThen(props.operationMeta.isInstanceOf[OperationMeta.Edit]) {
                 <.span(
                   " ",
-                  <.a(
-                    ^.className := "btn btn-default delete-button",
-                    <.i(^.className := "fa fa-times"),
+                  Bootstrap.Button(tag = <.a)(
+                    ^.className := "delete-button",
+                    Bootstrap.FontAwesomeIcon("times"),
                     " ",
                     i18n("app.delete"),
                     ^.onClick --> onDelete
@@ -121,10 +120,8 @@ final class BalanceCheckForm(implicit i18n: I18n,
             )
           )
         ),
-        <.div(
-          ^.className := "row",
-          <.form(
-            ^.className := "form-horizontal",
+        Bootstrap.Row(
+          Bootstrap.FormHorizontal(
             HalfPanel(title = <.span(i18n("app.balance-check")))(
               TextInput(
                 ref = TextInput.ref(),
@@ -167,13 +164,9 @@ final class BalanceCheckForm(implicit i18n: I18n,
                 currency = props.operationMeta.reservoir.currency
               )
             ),
-            <.div(
-              ^.className := "form-group",
-              <.div(
-                ^.className := "col-sm-offset-2 col-sm-10",
-                <.button(
-                  ^.tpe := "submit",
-                  ^.className := "btn btn-default",
+            Bootstrap.FormGroup(
+              Bootstrap.Col(sm = 10, smOffset = 2)(
+                Bootstrap.Button(tpe = "submit")(
                   ^.onClick ==> onSubmit,
                   i18n("app.ok")
                 )
