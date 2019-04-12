@@ -73,15 +73,14 @@ final class SbadminMenu(implicit i18n: I18n) extends HydroReactComponent.Statele
           <.li(
             ^.className := "sidebar-search",
             <.form(
-              <.div(
-                ^.className := "input-group custom-search-form",
+              Bootstrap.InputGroup(
+                ^.className := "custom-search-form",
                 TextInput(
                   ref = queryInputRef,
                   name = "query",
                   placeholder = i18n("app.search"),
                   classes = Seq("form-control")),
-                <.span(
-                  ^.className := "input-group-btn",
+                Bootstrap.InputGroupButton(
                   Bootstrap.Button(variant = Variant.default, tpe = "submit")(
                     ^.onClick ==> { (e: ReactEventFromInput) =>
                       LogExceptionsCallback {
