@@ -333,7 +333,7 @@ private[transactionviews] final class SummaryTable(
                                     " - ",
                                     <<.joinWithSpaces(transaction.tags
                                       .map(tag =>
-                                        <.span
+                                        <.span(
                                           ^^.classes("label", s"label-${Tags.getBootstrapClassSuffix(tag)}"),
                                           ^.key := tag,
                                           tag))),
