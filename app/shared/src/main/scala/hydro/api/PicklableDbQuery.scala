@@ -220,7 +220,6 @@ object PicklableDbQuery {
       case DbQuery.PicklableOrdering.MaybeLongOrdering     => MaybeLongOrdering
       case DbQuery.PicklableOrdering.IntOrdering           => IntOrdering
       case DbQuery.PicklableOrdering.MaybeIntOrdering      => MaybeIntOrdering
-      case DbQuery.PicklableOrdering.LongOrdering          => LongOrdering
       case DbQuery.PicklableOrdering.StringOrdering        => StringOrdering
       case DbQuery.PicklableOrdering.LocalDateTimeOrdering => LocalDateTimeOrdering
     }
