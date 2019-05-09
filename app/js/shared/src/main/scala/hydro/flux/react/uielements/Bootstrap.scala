@@ -45,6 +45,8 @@ object Bootstrap {
     tag(^^.classes(classes), ^.tpe := tpe)
   }
 
+  def ButtonGroup: VdomTag = <.span(^.className := "btn-group")
+
   def Icon(className: String): VdomTag = <.i(^.className := className)
   def FontAwesomeIcon(name: String,
                       otherName: String = null,
