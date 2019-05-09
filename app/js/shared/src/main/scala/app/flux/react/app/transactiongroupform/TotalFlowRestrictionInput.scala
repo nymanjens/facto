@@ -33,8 +33,7 @@ private[transactiongroupform] final class TotalFlowRestrictionInput(implicit i18
           )
         }
 
-        <.div(
-          ^.className := "btn-group",
+        Bootstrap.ButtonGroup(
           VdomAttr("data-toggle") := "buttons",
           button(TotalFlowRestriction.AnyTotal, i18n("app.any-total")),
           button(TotalFlowRestriction.ChooseTotal, i18n("app.choose-total")),
