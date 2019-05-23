@@ -163,18 +163,11 @@ abstract class JvmEntityAccessBase(implicit clock: Clock) extends EntityAccess {
         // B all happened after it.
         val nextUpdateToken = toUpdateToken(clock.nowInstant minus Duration.ofSeconds(20))
 
-        val uniqueModifications =
-          for {
-            modification <- modifications
-            if {
-              if (eclipsedByExistingModification(modification, existingModifications)) {
-                println(s"  Note: Modification marked as duplicate: modification = $modification")
-                false
-              } else {
-                true
-              }
-            }
-          } yield {
+        val uniqueModifications = modifications flatMap { modification =>
+          if (eclipsedByExistingModification(modification, existingModifications)) {
+            println(s"  Note: Modification marked as duplicate: modification = $modification")
+            Seq()
+          } else {
             existingModifications += modification
 
             // Apply modification
@@ -213,8 +206,9 @@ abstract class JvmEntityAccessBase(implicit clock: Clock) extends EntityAccess {
                 ))
 
             inMemoryEntityDatabase.update(modification)
-            modification
+            Seq(modification)
           }
+        }
 
         entityModificationPublisher_.trigger(ModificationsWithToken(uniqueModifications, nextUpdateToken))
       }
