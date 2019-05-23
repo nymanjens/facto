@@ -1,18 +1,5 @@
 package hydro.models.access
 
-import app.models.access.ModelFields
-import hydro.models.modification.EntityType
-import hydro.models.Entity
-import hydro.models.access.DbQuery.Filter
-import hydro.models.access.DbQuery.Sorting
-import hydro.models.access.DbQueryImplicits._
-
-import scala.async.Async.async
-import scala.async.Async.await
-import scala.collection.immutable.Seq
-import scala.collection.mutable
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import java.time.Duration
 import java.util.concurrent.Executors
 
@@ -21,9 +8,11 @@ import app.models.access.ModelFields
 import app.models.modification.EntityTypes
 import app.models.slick.SlickEntityTableDefs
 import app.models.user.User
+import hydro.common.LoggingUtils.logExceptions
 import hydro.common.UpdateTokens.toUpdateToken
 import hydro.common.publisher.TriggerablePublisher
 import hydro.common.time.Clock
+import hydro.models.access.DbQueryImplicits._
 import hydro.models.modification.EntityModification
 import hydro.models.modification.EntityModificationEntity
 import hydro.models.modification.EntityType
@@ -40,6 +29,7 @@ import org.reactivestreams.Publisher
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.concurrent._
+import scala.concurrent.Future
 
 abstract class JvmEntityAccessBase(implicit clock: Clock) extends EntityAccess {
 
@@ -140,92 +130,93 @@ abstract class JvmEntityAccessBase(implicit clock: Clock) extends EntityAccess {
         Future(processSync(uniqueModifications))(singleThreadedExecutor)
       }
 
-    private def processSync(modifications: Seq[EntityModification])(implicit user: User): Unit = {
+    private def processSync(modifications: Seq[EntityModification])(implicit user: User): Unit =
+      logExceptions {
 
-      // Returns true if an existing modification makes the given one irrelevant.
-      def eclipsedByExistingModification(modification: EntityModification,
-                                         existingModifications: Iterable[EntityModification]): Boolean = {
-        val existingEntities = existingModifications.toStream
-          .filter(_.entityId == modification.entityId)
-          .filter(_.entityType == modification.entityType)
-          .toSet
-        val entityAlreadyRemoved =
-          existingEntities.exists(_.isInstanceOf[EntityModification.Remove[_]])
-        modification match {
-          case _: EntityModification.Add[_]    => existingEntities.nonEmpty
-          case _: EntityModification.Update[_] => entityAlreadyRemoved
-          case _: EntityModification.Remove[_] => false // Always allow removes to fix inconsistencies
-        }
-      }
-
-      val existingModifications: mutable.Set[EntityModification] =
-        mutable.Set() ++
-          dbRun(
-            newSlickQuery[EntityModificationEntity]()
-              .filter(_.entityId inSet modifications.map(_.entityId).toSet)
-              .result)
-            .map(_.modification)
-
-      // Remove some time from the next update token because a slower persistEntityModifications() invocation B
-      // could start earlier but end later than invocation A. If the WebSocket closes before the modifications B
-      // get published, the `nextUpdateToken` value returned by A must be old enough so that modifications from
-      // B all happened after it.
-      val nextUpdateToken = toUpdateToken(clock.nowInstant minus Duration.ofSeconds(20))
-
-      val uniqueModifications =
-        for {
-          modification <- modifications
-          if {
-            if (eclipsedByExistingModification(modification, existingModifications)) {
-              println(s"  Note: Modification marked as duplicate: modification = $modification")
-              false
-            } else {
-              true
-            }
-          }
-        } yield {
-          existingModifications += modification
-
-          // Apply modification
-          val entityType = modification.entityType
+        // Returns true if an existing modification makes the given one irrelevant.
+        def eclipsedByExistingModification(modification: EntityModification,
+                                           existingModifications: Iterable[EntityModification]): Boolean = {
+          val existingEntities = existingModifications.toStream
+            .filter(_.entityId == modification.entityId)
+            .filter(_.entityType == modification.entityType)
+            .toSet
+          val entityAlreadyRemoved =
+            existingEntities.exists(_.isInstanceOf[EntityModification.Remove[_]])
           modification match {
-            case EntityModification.Add(entity) =>
-              getManager(entityType).addNew(entityType.checkRightType(entity))
-            case EntityModification.Update(entity) =>
-              def updateInner[E <: entityType.get with UpdatableEntity] = {
-                implicit val castEntityType = entityType.asInstanceOf[EntityType[E]]
-                val maybeExistingEntity = DbResultSet
-                  .fromExecutor(inMemoryEntityDatabase.queryExecutor[E])
-                  .findOne(ModelFields.id[E] === entity.id)
-
-                maybeExistingEntity match {
-                  case Some(existingEntity) =>
-                    val mergedEntity = UpdatableEntity.merge(existingEntity, entity.asInstanceOf[E])
-                    getManager(castEntityType).updateIfExists(mergedEntity)
-                  case None => // Do nothing (don't upsert)
-                }
-              }
-              updateInner
-            case EntityModification.Remove(entityId) =>
-              getManager(entityType).removeIfExists(entityId)
+            case _: EntityModification.Add[_]    => existingEntities.nonEmpty
+            case _: EntityModification.Update[_] => entityAlreadyRemoved
+            case _: EntityModification.Remove[_] => false // Always allow removes to fix inconsistencies
           }
-
-          // Add modification
-          SlickEntityManager
-            .forType[EntityModificationEntity]
-            .addNew(
-              EntityModificationEntity(
-                idOption = Some(EntityModification.generateRandomId()),
-                userId = user.id,
-                modification = modification,
-                instant = clock.nowInstant
-              ))
-
-          inMemoryEntityDatabase.update(modification)
-          modification
         }
 
-      entityModificationPublisher_.trigger(ModificationsWithToken(uniqueModifications, nextUpdateToken))
-    }
+        val existingModifications: mutable.Set[EntityModification] =
+          mutable.Set() ++
+            dbRun(
+              newSlickQuery[EntityModificationEntity]()
+                .filter(_.entityId inSet modifications.map(_.entityId).toSet)
+                .result)
+              .map(_.modification)
+
+        // Remove some time from the next update token because a slower persistEntityModifications() invocation B
+        // could start earlier but end later than invocation A. If the WebSocket closes before the modifications B
+        // get published, the `nextUpdateToken` value returned by A must be old enough so that modifications from
+        // B all happened after it.
+        val nextUpdateToken = toUpdateToken(clock.nowInstant minus Duration.ofSeconds(20))
+
+        val uniqueModifications =
+          for {
+            modification <- modifications
+            if {
+              if (eclipsedByExistingModification(modification, existingModifications)) {
+                println(s"  Note: Modification marked as duplicate: modification = $modification")
+                false
+              } else {
+                true
+              }
+            }
+          } yield {
+            existingModifications += modification
+
+            // Apply modification
+            val entityType = modification.entityType
+            modification match {
+              case EntityModification.Add(entity) =>
+                getManager(entityType).addNew(entityType.checkRightType(entity))
+              case EntityModification.Update(entity) =>
+                def updateInner[E <: entityType.get with UpdatableEntity] = {
+                  implicit val castEntityType = entityType.asInstanceOf[EntityType[E]]
+                  val maybeExistingEntity = DbResultSet
+                    .fromExecutor(inMemoryEntityDatabase.queryExecutor[E])
+                    .findOne(ModelFields.id[E] === entity.id)
+
+                  maybeExistingEntity match {
+                    case Some(existingEntity) =>
+                      val mergedEntity = UpdatableEntity.merge(existingEntity, entity.asInstanceOf[E])
+                      getManager(castEntityType).updateIfExists(mergedEntity)
+                    case None => // Do nothing (don't upsert)
+                  }
+                }
+                updateInner
+              case EntityModification.Remove(entityId) =>
+                getManager(entityType).removeIfExists(entityId)
+            }
+
+            // Add modification
+            SlickEntityManager
+              .forType[EntityModificationEntity]
+              .addNew(
+                EntityModificationEntity(
+                  idOption = Some(EntityModification.generateRandomId()),
+                  userId = user.id,
+                  modification = modification,
+                  instant = clock.nowInstant
+                ))
+
+            inMemoryEntityDatabase.update(modification)
+            modification
+          }
+
+        entityModificationPublisher_.trigger(ModificationsWithToken(uniqueModifications, nextUpdateToken))
+      }
   }
 }
