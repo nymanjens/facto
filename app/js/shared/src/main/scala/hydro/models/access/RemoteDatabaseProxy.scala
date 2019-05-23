@@ -8,7 +8,7 @@ import scala.collection.immutable.Seq
 import scala.concurrent.Future
 
 /** Proxy for the server-side database. */
-trait RemoteDatabaseProxy {
+private[access] trait RemoteDatabaseProxy {
   def queryExecutor[E <: Entity: EntityType](): DbQueryExecutor.Async[E]
 
   def pendingModifications(): Future[Seq[EntityModification]]
