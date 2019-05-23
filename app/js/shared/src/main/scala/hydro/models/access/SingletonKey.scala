@@ -6,7 +6,7 @@ import hydro.scala2js.Scala2Js
 import hydro.scala2js.StandardConverters._
 
 @visibleForTesting
-private[access] sealed trait SingletonKey[V] {
+sealed trait SingletonKey[V] {
   implicit def valueConverter: Scala2Js.Converter[V]
 
   def name: String = ScalaUtils.objectName(this)
@@ -14,7 +14,7 @@ private[access] sealed trait SingletonKey[V] {
 }
 
 @visibleForTesting
-private[access] object SingletonKey {
+object SingletonKey {
   abstract class StringSingletonKey extends SingletonKey[String] {
     override val valueConverter = implicitly[Scala2Js.Converter[String]]
   }

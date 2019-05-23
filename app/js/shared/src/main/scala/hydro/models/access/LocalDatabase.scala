@@ -10,7 +10,7 @@ import scala.concurrent.Future
 
 /** Client-side persistence layer. */
 @visibleForTesting
-private[access] trait LocalDatabase {
+trait LocalDatabase {
   // **************** Getters ****************//
   def queryExecutor[E <: Entity: EntityType](): DbQueryExecutor.Async[E]
   def pendingModifications(): Future[Seq[EntityModification]]
