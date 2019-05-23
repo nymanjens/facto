@@ -16,8 +16,8 @@ final class LocalDatabaseHasBeenLoadedStore(implicit jsEntityAccess: JsEntityAcc
 
   // **************** Private inner types ****************//
   object HasBeenLoadedListener extends Listenable.Listener[Boolean] {
-    override def onChange(isOnline: Boolean): Unit = {
-      _state = State(isOnline)
+    override def onChange(hasBeenLoaded: Boolean): Unit = {
+      _state = State(hasBeenLoaded = hasBeenLoaded)
       invokeStateUpdateListeners()
     }
   }
