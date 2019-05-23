@@ -1,6 +1,6 @@
 package hydro.models.access.webworker
 
-import hydro.common.LoggingUtils.logExceptions
+import hydro.common.JsLoggingUtils.logExceptions
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.MethodNumbers
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApiConverters._
 import hydro.scala2js.Scala2Js

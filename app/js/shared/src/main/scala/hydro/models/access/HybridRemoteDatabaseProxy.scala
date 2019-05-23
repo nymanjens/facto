@@ -5,7 +5,7 @@ import app.api.ScalaJsApiClient
 import hydro.models.modification.EntityModification
 import hydro.models.modification.EntityType
 import app.models.modification.EntityTypes
-import hydro.common.LoggingUtils.logFailure
+import hydro.common.JsLoggingUtils.logFailure
 import hydro.models.Entity
 import hydro.models.access.SingletonKey.NextUpdateTokenKey
 import hydro.models.access.SingletonKey.VersionKey

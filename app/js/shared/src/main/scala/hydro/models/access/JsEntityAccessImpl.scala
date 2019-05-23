@@ -2,7 +2,7 @@ package hydro.models.access
 
 import hydro.models.modification.EntityModification
 import hydro.models.modification.EntityType
-import hydro.common.LoggingUtils.logExceptions
+import hydro.common.JsLoggingUtils.logExceptions
 import hydro.models.Entity
 import hydro.models.access.JsEntityAccess.Listener
 

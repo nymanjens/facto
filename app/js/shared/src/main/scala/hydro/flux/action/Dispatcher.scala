@@ -1,7 +1,7 @@
 package hydro.flux.action
 
-import hydro.common.LoggingUtils
-import hydro.common.LoggingUtils.logExceptions
+import hydro.common.JsLoggingUtils
+import hydro.common.JsLoggingUtils.logExceptions
 
 import scala.async.Async.async
 import scala.async.Async.await

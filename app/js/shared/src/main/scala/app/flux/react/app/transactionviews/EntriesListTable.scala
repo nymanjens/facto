@@ -7,8 +7,8 @@ import hydro.common.I18n
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.stores.entries.WithIsPending
 import app.flux.stores.entries.factories.EntriesListStoreFactory
-import hydro.common.LoggingUtils.LogExceptionsCallback
-import hydro.common.LoggingUtils.logExceptions
+import hydro.common.JsLoggingUtils.LogExceptionsCallback
+import hydro.common.JsLoggingUtils.logExceptions
 import hydro.common.Unique
 import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.uielements.Table

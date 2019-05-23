@@ -2,7 +2,7 @@ package hydro.flux.react.uielements.usermanagement
 
 import hydro.common.I18n
 import app.models.user.User
-import hydro.common.LoggingUtils.logExceptions
+import hydro.common.JsLoggingUtils.logExceptions
 import hydro.flux.react.HydroReactComponent
 import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.uielements.Bootstrap

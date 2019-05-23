@@ -6,7 +6,7 @@ import org.scalajs.dom.console
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-object LoggingUtils {
+object JsLoggingUtils {
 
   def logExceptions[T](codeBlock: => T): T = {
     try {

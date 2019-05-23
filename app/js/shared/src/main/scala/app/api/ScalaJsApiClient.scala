@@ -10,7 +10,7 @@ import boopickle.Default._
 import app.api.Picklers._
 import hydro.api.PicklableDbQuery
 import hydro.api.ScalaJsApiRequest
-import hydro.common.LoggingUtils.logExceptions
+import hydro.common.JsLoggingUtils.logExceptions
 import hydro.common.websocket.SerialWebsocketClientParallelizer
 import hydro.models.Entity
 import hydro.models.access.DbQuery

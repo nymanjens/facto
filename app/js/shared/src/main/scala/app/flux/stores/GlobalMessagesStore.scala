@@ -7,7 +7,7 @@ import app.flux.action.AppActions._
 import app.flux.stores.GlobalMessagesStore.Message
 import app.models.accounting._
 import app.models.accounting.config.Config
-import hydro.common.LoggingUtils.logExceptions
+import hydro.common.JsLoggingUtils.logExceptions
 import hydro.common.Unique
 import hydro.common.time.Clock
 import hydro.common.time.JavaTimeImplicits._

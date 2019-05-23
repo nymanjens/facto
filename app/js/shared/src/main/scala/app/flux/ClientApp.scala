@@ -1,7 +1,7 @@
 package app.flux
 
-import hydro.common.LoggingUtils.logExceptions
-import hydro.common.LoggingUtils.logFailure
+import hydro.common.JsLoggingUtils.logExceptions
+import hydro.common.JsLoggingUtils.logFailure
 import org.scalajs.dom
 import org.scalajs.dom.console
 

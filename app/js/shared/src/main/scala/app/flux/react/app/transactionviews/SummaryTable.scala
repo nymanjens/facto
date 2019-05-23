@@ -25,8 +25,8 @@ import app.models.accounting.config.Account
 import app.models.accounting.config.Category
 import app.models.accounting.config.Config
 import app.models.user.User
-import hydro.common.LoggingUtils.LogExceptionsCallback
-import hydro.common.LoggingUtils.logExceptions
+import hydro.common.JsLoggingUtils.LogExceptionsCallback
+import hydro.common.JsLoggingUtils.logExceptions
 import hydro.common.time.Clock
 import hydro.flux.react.ReactVdomUtils._
 import hydro.flux.react.uielements.Bootstrap

@@ -5,8 +5,8 @@ import hydro.flux.react.uielements.Bootstrap.Size
 import hydro.flux.react.uielements.Bootstrap.Variant
 import hydro.common.I18n
 import app.flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
-import hydro.common.LoggingUtils.LogExceptionsCallback
-import hydro.common.LoggingUtils.logExceptions
+import hydro.common.JsLoggingUtils.LogExceptionsCallback
+import hydro.common.JsLoggingUtils.logExceptions
 import hydro.flux.react.ReactVdomUtils.^^
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._

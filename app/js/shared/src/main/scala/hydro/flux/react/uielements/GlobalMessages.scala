@@ -2,7 +2,7 @@ package hydro.flux.react.uielements
 
 import app.flux.stores.GlobalMessagesStore
 import app.flux.stores.GlobalMessagesStore.Message
-import hydro.common.LoggingUtils.logExceptions
+import hydro.common.JsLoggingUtils.logExceptions
 import hydro.flux.react.HydroReactComponent
 import hydro.flux.react.uielements.Bootstrap.Variant
 import japgolly.scalajs.react._

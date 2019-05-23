@@ -17,7 +17,7 @@ import app.models.accounting.BalanceCheck
 import app.models.accounting.config.Config
 import app.models.accounting.config.MoneyReservoir
 import app.models.user.User
-import hydro.common.LoggingUtils.LogExceptionsCallback
+import hydro.common.JsLoggingUtils.LogExceptionsCallback
 import hydro.common.Unique
 import hydro.common.time.Clock
 import hydro.flux.action.Dispatcher

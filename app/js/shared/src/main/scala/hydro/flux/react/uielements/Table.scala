@@ -2,7 +2,7 @@ package hydro.flux.react.uielements
 
 import hydro.common.CollectionUtils.ifThenSeq
 import hydro.common.I18n
-import hydro.common.LoggingUtils.LogExceptionsCallback
+import hydro.common.JsLoggingUtils.LogExceptionsCallback
 import hydro.common.Unique
 import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.ReactVdomUtils.^^

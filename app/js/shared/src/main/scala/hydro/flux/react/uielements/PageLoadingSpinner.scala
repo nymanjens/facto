@@ -1,6 +1,6 @@
 package hydro.flux.react.uielements
 
-import hydro.common.LoggingUtils.logExceptions
+import hydro.common.JsLoggingUtils.logExceptions
 import hydro.flux.react.HydroReactComponent
 import hydro.flux.stores.PageLoadingStateStore
 import japgolly.scalajs.react._

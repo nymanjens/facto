@@ -1,6 +1,6 @@
 package hydro.common.testing
 
-import hydro.common.LoggingUtils.LogExceptionsCallback
+import hydro.common.JsLoggingUtils.LogExceptionsCallback
 import hydro.flux.router.Page
 import hydro.flux.router.RouterContext
 import hydro.flux.router.StandardPages

@@ -3,7 +3,7 @@ package hydro.flux.react.uielements
 import app.models.user.User
 import hydro.common.CollectionUtils.ifThenSeq
 import hydro.common.I18n
-import hydro.common.LoggingUtils.LogExceptionsCallback
+import hydro.common.JsLoggingUtils.LogExceptionsCallback
 import hydro.flux.action.Dispatcher
 import hydro.flux.action.StandardActions
 import hydro.flux.react.ReactVdomUtils.^^

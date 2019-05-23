@@ -1,8 +1,8 @@
 package app.flux.react.uielements.input
 
 import app.flux.react.uielements.input.MappedInput.ValueTransformer
-import hydro.common.LoggingUtils.LogExceptionsCallback
-import hydro.common.LoggingUtils.logExceptions
+import hydro.common.JsLoggingUtils.LogExceptionsCallback
+import hydro.common.JsLoggingUtils.logExceptions
 import hydro.common.time.LocalDateTime
 import hydro.common.time.TimeUtils
 import hydro.flux.react.uielements.input.InputBase

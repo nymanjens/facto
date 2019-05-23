@@ -1,6 +1,6 @@
 package hydro.common
 
-import hydro.common.LoggingUtils.logExceptions
+import hydro.common.JsLoggingUtils.logExceptions
 
 import scala.concurrent.ExecutionContext
 import scala.scalajs.concurrent.JSExecutionContext

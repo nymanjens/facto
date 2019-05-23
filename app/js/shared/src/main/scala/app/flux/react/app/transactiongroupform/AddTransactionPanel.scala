@@ -1,7 +1,7 @@
 package app.flux.react.app.transactiongroupform
 
 import hydro.common.I18n
-import hydro.common.LoggingUtils.logExceptions
+import hydro.common.JsLoggingUtils.logExceptions
 import hydro.flux.react.uielements.Bootstrap
 import hydro.flux.react.uielements.Bootstrap.Size
 import hydro.flux.react.uielements.Bootstrap.Variant

@@ -6,7 +6,7 @@ import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Config
 import app.models.accounting.config.Template
 import app.models.user.User
-import hydro.common.LoggingUtils.logExceptions
+import hydro.common.JsLoggingUtils.logExceptions
 import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.uielements.Bootstrap
 import hydro.flux.react.uielements.Bootstrap.Size

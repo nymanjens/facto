@@ -5,8 +5,8 @@ import app.common.money.Currency
 import app.common.money.ExchangeRateManager
 import app.common.money.Money
 import app.common.money.ReferenceMoney
-import hydro.common.LoggingUtils.LogExceptionsCallback
-import hydro.common.LoggingUtils.logExceptions
+import hydro.common.JsLoggingUtils.LogExceptionsCallback
+import hydro.common.JsLoggingUtils.logExceptions
 import hydro.common.time.Clock
 import hydro.flux.react.ReactVdomUtils.^^
 import hydro.flux.react.uielements.Bootstrap
