@@ -2,6 +2,8 @@ package hydro.common
 
 import java.time.Instant
 
+import hydro.common.time.JavaTimeImplicits._
+
 object GlobalStopwatch {
 
   private var startTime: Instant = Instant.now()
