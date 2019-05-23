@@ -1,5 +1,6 @@
 package hydro.models.access
 
+import hydro.common.Listenable
 import hydro.models.modification.EntityModification
 import hydro.models.modification.EntityType
 import hydro.models.Entity
@@ -17,6 +18,8 @@ trait JsEntityAccess extends EntityAccess {
     * remotely.
     */
   def pendingModifications: PendingModifications
+
+  def localDatabaseHasBeenLoaded: Listenable[Boolean]
 
   // **************** Setters ****************//
   /**

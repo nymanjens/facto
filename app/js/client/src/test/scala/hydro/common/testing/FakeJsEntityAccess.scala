@@ -1,5 +1,6 @@
 package hydro.common.testing
 
+import hydro.common.Listenable
 import hydro.models.modification.EntityModification
 import hydro.models.modification.EntityType
 import hydro.models.Entity
@@ -55,6 +56,7 @@ class FakeJsEntityAccess extends JsEntityAccess {
     listeners -= listener
   }
   override def startCheckingForModifiedEntityUpdates(): Unit = ???
+  override def localDatabaseHasBeenLoaded: Listenable[Boolean] = ???
 
   // **************** Additional methods for tests ****************//
   def newQuerySync[E <: Entity: EntityType](): DbResultSet.Sync[E] = DbResultSet.fromExecutor(queryExecutor)

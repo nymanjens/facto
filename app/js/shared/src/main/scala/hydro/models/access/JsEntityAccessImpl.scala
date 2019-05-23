@@ -3,6 +3,8 @@ package hydro.models.access
 import hydro.models.modification.EntityModification
 import hydro.models.modification.EntityType
 import hydro.common.JsLoggingUtils.logExceptions
+import hydro.common.Listenable
+import hydro.common.Listenable.WritableListenable
 import hydro.models.Entity
 import hydro.models.access.JsEntityAccess.Listener
 
@@ -22,6 +24,7 @@ class JsEntityAccessImpl()(implicit remoteDatabaseProxy: RemoteDatabaseProxy,
     PendingModifications(Seq(), persistedLocally = false)
   private var isCallingListeners: Boolean = false
   private val queryBlockingFutures: mutable.Buffer[Future[Unit]] = mutable.Buffer()
+  private val _localDatabaseHasBeenLoaded: WritableListenable[Boolean] = WritableListenable(false)
 
   // Attach events to local database loading
   async {
@@ -46,6 +49,8 @@ class JsEntityAccessImpl()(implicit remoteDatabaseProxy: RemoteDatabaseProxy,
         }
       }
     }
+
+    _localDatabaseHasBeenLoaded.set(true)
   }
 
   // **************** Getters ****************//
@@ -67,6 +72,8 @@ class JsEntityAccessImpl()(implicit remoteDatabaseProxy: RemoteDatabaseProxy,
   }
 
   override def pendingModifications = _pendingModifications
+
+  override def localDatabaseHasBeenLoaded: Listenable[Boolean] = _localDatabaseHasBeenLoaded
 
   // **************** Setters ****************//
   override def persistModifications(modifications: Seq[EntityModification]): Future[Unit] = logExceptions {
