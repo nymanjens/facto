@@ -42,7 +42,7 @@ class JsEntityAccessImpl()(implicit remoteDatabaseProxy: RemoteDatabaseProxy,
     }
 
     // Send pending modifications whenever connection with the server is restored
-    entityModificationPushClientFactory.pushClientsAreOnline.deregisterListener { isOnline =>
+    entityModificationPushClientFactory.pushClientsAreOnline.registerListener { isOnline =>
       if (isOnline) {
         if (_pendingModifications.modifications.nonEmpty) {
           persistModifications(_pendingModifications.modifications)
