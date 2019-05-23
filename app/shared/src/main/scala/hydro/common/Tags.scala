@@ -8,8 +8,6 @@ import scala.util.matching.Regex
 
 object Tags {
   private val validTagRegex: Regex = """[a-zA-Z0-9-_@$&()+=!.<>;: ]+""".r
-  private val bootstrapClassSuffixOptions: Seq[String] =
-    Seq("primary", "success", "info", "warning", "danger")
 
   def isValidTag(tag: String): Boolean = tag match {
     case validTagRegex() => true
@@ -22,9 +20,4 @@ object Tags {
   }
 
   def serializeToString(tags: Iterable[String]): String = tags.mkString(",")
-
-  def getBootstrapClassSuffix(tag: String): String = {
-    val index = abs(tag.hashCode) % bootstrapClassSuffixOptions.size
-    bootstrapClassSuffixOptions(index)
-  }
 }

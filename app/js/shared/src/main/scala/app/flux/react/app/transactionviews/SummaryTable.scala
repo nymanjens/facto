@@ -29,6 +29,8 @@ import hydro.common.LoggingUtils.LogExceptionsCallback
 import hydro.common.LoggingUtils.logExceptions
 import hydro.common.time.Clock
 import hydro.flux.react.ReactVdomUtils._
+import hydro.flux.react.uielements.Bootstrap
+import hydro.flux.react.uielements.BootstrapTags
 import hydro.flux.router.RouterContext
 import hydro.flux.stores.StateStore
 import japgolly.scalajs.react._
@@ -331,12 +333,13 @@ private[transactionviews] final class SummaryTable(
                                     AppPages.EditTransactionGroup(transaction.transactionGroupId))(
                                     uielements.MoneyWithCurrency(transaction.flow),
                                     " - ",
-                                    <<.joinWithSpaces(transaction.tags
-                                      .map(tag =>
-                                        <.span(
-                                          ^^.classes("label", s"label-${Tags.getBootstrapClassSuffix(tag)}"),
-                                          ^.key := tag,
-                                          tag))),
+                                    <<.joinWithSpaces(
+                                      transaction.tags
+                                        .map(tag =>
+                                          Bootstrap.Label(BootstrapTags.toStableVariant(tag))(
+                                            ^.key := tag,
+                                            tag,
+                                        ))),
                                     " ",
                                     transaction.description
                                   )
