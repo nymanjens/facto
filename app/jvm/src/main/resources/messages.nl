@@ -144,6 +144,7 @@ app.net-worth=Netto vermogen
 app.add-new=toevoegen
 app.loading=Laden
 app.offline=Offline
+app.local-database-has-been-loaded=De lokale database is geladen
 app.is-admin=Admin?
 app.expand-cash-flow=Cash flow uitklappen?
 app.expand-liquidation=Vereffening uitklappen?

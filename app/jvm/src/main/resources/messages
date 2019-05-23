@@ -191,6 +191,7 @@ app.net-worth=Net worth
 app.add-new=add new
 app.loading=Loading
 app.offline=Offline
+app.local-database-has-been-loaded=Local database has been loaded
 app.is-admin=Is admin?
 app.expand-cash-flow=Expand cash flow?
 app.expand-liquidation=Expand liquidation?
