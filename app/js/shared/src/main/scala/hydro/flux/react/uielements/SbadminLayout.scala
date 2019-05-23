@@ -22,6 +22,7 @@ import scala.scalajs.js
 final class SbadminLayout(implicit globalMessages: GlobalMessages,
                           pageLoadingSpinner: PageLoadingSpinner,
                           applicationDisconnectedIcon: ApplicationDisconnectedIcon,
+                          localDatabaseHasBeenLoadedIcon: LocalDatabaseHasBeenLoadedIcon,
                           pendingModificationsCounter: PendingModificationsCounter,
                           user: User,
                           i18n: I18n,
@@ -56,6 +57,7 @@ final class SbadminLayout(implicit globalMessages: GlobalMessages,
           ^.className := "nav navbar-top-links navbar-right",
           applicationDisconnectedIcon(),
           pendingModificationsCounter(),
+          localDatabaseHasBeenLoadedIcon(),
           <.li(
             ^.className := "dropdown",
             <.a(

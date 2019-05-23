@@ -27,6 +27,7 @@ final class Module(implicit i18n: I18n,
   implicit lazy val globalMessages: GlobalMessages = new GlobalMessages
   implicit lazy val pageLoadingSpinner: PageLoadingSpinner = new PageLoadingSpinner
   implicit lazy val applicationDisconnectedIcon: ApplicationDisconnectedIcon = new ApplicationDisconnectedIcon
+  implicit lazy val localDatabaseHasBeenLoadedIcon: LocalDatabaseHasBeenLoadedIcon = new LocalDatabaseHasBeenLoadedIcon
   implicit lazy val pendingModificationsCounter: PendingModificationsCounter = new PendingModificationsCounter
   implicit lazy val sbadminMenu: SbadminMenu = new SbadminMenu()
   implicit lazy val sbadminLayout: SbadminLayout = new SbadminLayout()
