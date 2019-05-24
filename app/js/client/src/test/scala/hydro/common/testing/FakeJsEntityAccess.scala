@@ -56,7 +56,8 @@ class FakeJsEntityAccess extends JsEntityAccess {
     listeners -= listener
   }
   override def startCheckingForModifiedEntityUpdates(): Unit = ???
-  override def localDatabaseHasBeenLoaded: Listenable[Boolean] = ???
+
+  override def localDatabaseHasBeenLoaded: Listenable[Boolean] = Listenable.fixed(false)
 
   // **************** Additional methods for tests ****************//
   def newQuerySync[E <: Entity: EntityType](): DbResultSet.Sync[E] = DbResultSet.fromExecutor(queryExecutor)
