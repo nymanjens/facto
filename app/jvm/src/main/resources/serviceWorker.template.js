@@ -89,6 +89,23 @@ const persistedMap = new PersistedMap();
 
 const generateRandomString = () => Math.random().toString(36).substring(2);
 
+const waitingPromise = (ms) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(resolve, ms);
+  });
+};
+const firstSuccessfulPromise = (promise1, promise2) => {
+  return Promise.race([promise1, promise2])
+      .catch(e => promise1)
+      .catch(e => promise2);
+};
+const undefinedToError = (value) => {
+  if(value === undefined) {
+    throw new Error("No cached value");
+  }
+  return value;
+};
+
 
 self.addEventListener('install', (event) => {
   console.log('  [SW] Installing service worker for cache', CACHE_NAME);
@@ -109,32 +126,32 @@ self.addEventListener('fetch', (event) => {
       event.request.url.startsWith(ROOT_URL + '/app/')) {
     // Check whether we are still logged in. If we are offline, return the
     // cached app page.
-    console.log('  [SW] Fetch or cache:', event.request.url);
+    console.log('  [SW] Fetch or delayed cache:', event.request.url);
     event.respondWith(
-      fetch(event.request)
-          .catch(e => {
-            console.log(
-                `[SW] Caught exception while fetching ${event.request.url}`, e);
-            return caches.match(APP_PAGE_PATH);
-          })
+      firstSuccessfulPromise(
+        fetch(event.request),
+        waitingPromise(/* ms */ 800)
+            .then(() => caches.match(APP_PAGE_PATH))
+            .then(undefinedToError)
+      )
     );
   } else if(event.request.url == ROOT_URL + GET_INITIAL_DATA_PATH) {
     // Initial data may change, e.g. when logging in. If we are oflfine, return
     // the cached values.
     console.log('  [SW] (Fetch and cache) or cache:', event.request.url);
     event.respondWith(
-      fetch(event.request)
-          .then(response =>
-              caches.open(CACHE_NAME)
-                .then((cache) =>
-                    cache
-                        .put(event.request, response.clone())
-                        .then(() => response)))
-          .catch(e => {
-            console.log(
-                `[SW] Caught exception while fetching ${event.request.url}`, e);
-            return caches.match(event.request);
-          })
+      firstSuccessfulPromise(
+        fetch(event.request)
+            .then(response =>
+                caches.open(CACHE_NAME)
+                  .then((cache) =>
+                      cache
+                          .put(event.request, response.clone())
+                          .then(() => response))),
+        waitingPromise(/* ms */ 1500)
+            .then(() => caches.match(event.request))
+            .then(undefinedToError)
+      )
     );
   } else if(event.request.url == ROOT_URL + PERSIST_ENTITY_MODIFICATIONS_PATH) {
     if('sync' in self.registration) {
