@@ -163,10 +163,14 @@ abstract class JvmEntityAccessBase(implicit clock: Clock) extends EntityAccess {
         // B all happened after it.
         val nextUpdateToken = toUpdateToken(clock.nowInstant minus Duration.ofSeconds(20))
 
-        val uniqueModifications = modifications flatMap { modification =>
+        val modificationBundler = new ModificationBundler(
+          triggerEveryNAdditions = 20,
+          triggerFunction = modifications =>
+            entityModificationPublisher_.trigger(ModificationsWithToken(modifications, nextUpdateToken)))
+
+        for (modification <- modifications) {
           if (eclipsedByExistingModification(modification, existingModifications)) {
             println(s"  Note: Modification marked as duplicate: modification = $modification")
-            Seq()
           } else {
             existingModifications += modification
 
@@ -206,11 +210,31 @@ abstract class JvmEntityAccessBase(implicit clock: Clock) extends EntityAccess {
                 ))
 
             inMemoryEntityDatabase.update(modification)
-            Seq(modification)
+
+            modificationBundler.addModificationAndMaybeTrigger(modification)
           }
         }
 
-        entityModificationPublisher_.trigger(ModificationsWithToken(uniqueModifications, nextUpdateToken))
+        modificationBundler.forceTrigger()
       }
+
+    private class ModificationBundler(triggerEveryNAdditions: Int,
+                                      triggerFunction: Seq[EntityModification] => Unit) {
+      private val untriggeredModifications: mutable.Buffer[EntityModification] = mutable.Buffer()
+
+      def addModificationAndMaybeTrigger(entityModification: EntityModification): Unit = {
+        untriggeredModifications += entityModification
+        if (untriggeredModifications.size >= triggerEveryNAdditions) {
+          forceTrigger()
+        }
+      }
+
+      def forceTrigger(): Unit = {
+        if (untriggeredModifications.nonEmpty) {
+          triggerFunction(untriggeredModifications.toVector)
+          untriggeredModifications.clear()
+        }
+      }
+    }
   }
 }
