@@ -1,6 +1,7 @@
 package hydro.flux.react.uielements
 
 import app.models.user.User
+import app.AppVersion
 import hydro.common.CollectionUtils.ifThenSeq
 import hydro.common.I18n
 import hydro.common.JsLoggingUtils.LogExceptionsCallback
@@ -30,7 +31,7 @@ final class SbadminLayout(implicit globalMessages: GlobalMessages,
                           dispatcher: Dispatcher) {
 
   // **************** API ****************//
-  def apply(title: TagMod, leftMenu: VdomElement, pageContent: VdomElement)(
+  def apply(title: TagMod, leftMenu: VdomElement, pageContent: VdomElement, extraFooter: Seq[TagMod] = Seq())(
       implicit router: RouterContext): VdomElement = {
     <.div(
       ^.id := "wrapper",
@@ -112,7 +113,15 @@ final class SbadminLayout(implicit globalMessages: GlobalMessages,
         <.div(
           ^.className := "container-fluid",
           Bootstrap.Row(
-            Bootstrap.Col(lg = 12)(globalMessages(), pageContent)
+            Bootstrap.Col(lg = 12)(
+              globalMessages(),
+              pageContent,
+              <.hr(),
+              s"v${AppVersion.versionString}",
+              <.span(^.style := js.Dictionary("marginLeft" -> "45px")),
+              <.span(^.dangerouslySetInnerHtml := "&copy;"),
+              " 2019 Jens Nyman"
+            )(extraFooter: _*)
           )
         )
       )

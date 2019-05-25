@@ -11,16 +11,7 @@ final class Layout(implicit menu: Menu, sbadminLayout: SbadminLayout) {
     .builder[Props](getClass.getSimpleName)
     .renderPC { (_, props, children) =>
       implicit val router = props.router
-      sbadminLayout(
-        title = "Family Accounting Tool",
-        leftMenu = menu(),
-        pageContent = <.span(
-          children,
-          <.hr(),
-          <.span(^.dangerouslySetInnerHtml := "&copy;"),
-          " 2018 Jens Nyman",
-        )
-      )
+      sbadminLayout(title = "Family Accounting Tool", leftMenu = menu(), pageContent = <.span(children))
     }
     .build
 
