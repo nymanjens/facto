@@ -11,6 +11,7 @@ import app.api.ScalaJsApi.UpdateToken
 import boopickle.Default.Unpickle
 import boopickle.Default._
 import app.api.Picklers._
+import app.AppVersion
 import hydro.common.Listenable
 import hydro.common.Listenable.WritableListenable
 import hydro.common.time.Clock
@@ -91,7 +92,11 @@ final class EntityModificationPushClientFactory(implicit clock: Clock) {
                 await(onMessageReceived(modificationsWithToken))
                 firstMessageWasProcessedPromise.trySuccess((): Unit)
               case EntityModificationPushHeartbeat => // Do nothing
-              case VersionCheck => // TODO
+              case VersionCheck(versionString) =>
+                if (versionString != AppVersion.versionString) {
+                  println("  Detected that client version is outdated. Will reload page.")
+                  // TODO: Reload page
+                }
             }
             _pushClientsAreOnline.set(true)
             lastPacketTime = clock.nowInstant
