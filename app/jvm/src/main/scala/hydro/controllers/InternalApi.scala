@@ -4,6 +4,7 @@ import java.nio.ByteBuffer
 
 import akka.actor.ActorSystem
 import akka.stream.scaladsl._
+import app.api.ScalaJsApi.VersionCheck
 import app.api.ScalaJsApi.ModificationsWithToken
 import app.api.ScalaJsApi.UpdateToken
 import app.api.ScalaJsApi.EntityModificationPushPacket

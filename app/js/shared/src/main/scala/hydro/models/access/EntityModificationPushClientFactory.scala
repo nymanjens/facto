@@ -6,6 +6,7 @@ import java.time.Instant
 import app.api.ScalaJsApi.EntityModificationPushPacket
 import app.api.ScalaJsApi.EntityModificationPushHeartbeat
 import app.api.ScalaJsApi.ModificationsWithToken
+import app.api.ScalaJsApi.VersionCheck
 import app.api.ScalaJsApi.UpdateToken
 import boopickle.Default.Unpickle
 import boopickle.Default._
@@ -90,6 +91,7 @@ final class EntityModificationPushClientFactory(implicit clock: Clock) {
                 await(onMessageReceived(modificationsWithToken))
                 firstMessageWasProcessedPromise.trySuccess((): Unit)
               case EntityModificationPushHeartbeat => // Do nothing
+              case VersionCheck => // TODO
             }
             _pushClientsAreOnline.set(true)
             lastPacketTime = clock.nowInstant

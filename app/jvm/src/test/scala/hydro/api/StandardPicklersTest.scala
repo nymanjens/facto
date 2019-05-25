@@ -63,6 +63,9 @@ class StandardPicklersTest extends HookedSpecification {
     testPickleAndUnpickle[ModificationsWithToken](
       ModificationsWithToken(modifications = Seq(testModification), nextUpdateToken = testUpdateToken))
   }
+  "VersionCheck" in {
+    testPickleAndUnpickle[VersionCheck](VersionCheck(versionString = "1.2.3"))
+  }
 
   private def testPickleAndUnpickle[T: Pickler](value: T) = {
     val bytes = Pickle.intoBytes[T](value)

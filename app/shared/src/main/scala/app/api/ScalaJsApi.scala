@@ -60,6 +60,7 @@ object ScalaJsApi {
   case class ModificationsWithToken(modifications: Seq[EntityModification], nextUpdateToken: UpdateToken)
       extends EntityModificationPushPacket
   object EntityModificationPushHeartbeat extends EntityModificationPushPacket
+  case class VersionCheck(versionString: String) extends EntityModificationPushPacket
 
   /**
     * Copy of the User model with all fields optional.

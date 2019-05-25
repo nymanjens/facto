@@ -8,6 +8,7 @@ import java.time.LocalTime
 import app.api.ScalaJsApi.EntityModificationPushPacket
 import app.api.ScalaJsApi.EntityModificationPushHeartbeat
 import app.api.ScalaJsApi.ModificationsWithToken
+import app.api.ScalaJsApi.VersionCheck
 import hydro.common.GuavaReplacement.ImmutableBiMap
 import app.models.modification.EntityTypes
 import boopickle.Default._
@@ -195,6 +196,7 @@ abstract class StandardPicklers {
   implicit val entityModificationPushPacketPickler = compositePickler[EntityModificationPushPacket]
     .addConcreteType[ModificationsWithToken]
     .addConcreteType[EntityModificationPushHeartbeat.type]
+    .addConcreteType[VersionCheck]
 
   protected def logExceptions[T](codeBlock: => T): T = {
     try {
