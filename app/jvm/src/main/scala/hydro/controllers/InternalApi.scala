@@ -14,6 +14,7 @@ import app.models.access.JvmEntityAccess
 import app.models.user.User
 import boopickle.Default._
 import app.api.Picklers._
+import app.AppVersion
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import hydro.api.ScalaJsApiRequest
@@ -88,7 +89,7 @@ final class InternalApi @Inject()(
         Publishers.delayMessagesUntilFirstSubscriber(entityAccess.entityModificationPublisher)
 
       // Calculate updates from the update token onwards
-      val firstMessage = {
+      val firstModificationsWithToken = {
         // All modifications are idempotent so we can use the time when we started getting the entities as next
         // update token.
         val nextUpdateToken: UpdateToken = toUpdateToken(clock.nowInstant)
@@ -104,18 +105,19 @@ final class InternalApi @Inject()(
 
         ModificationsWithToken(modifications, nextUpdateToken)
       }
+      val versionCheck = VersionCheck(versionString = AppVersion.versionString)
 
       val in = Sink.ignore
-      val out = Source
-        .single(packetToBytes(firstMessage))
-        .concat(
+      val out =
+        Source.single(packetToBytes(firstModificationsWithToken)) concat
+          Source.single(packetToBytes(versionCheck)) concat
           Source.fromPublisher(
             Publishers
               .map(
                 Publishers.combine[EntityModificationPushPacket](
                   entityModificationPublisher,
                   entityModificationPushHeartbeatScheduler.publisher),
-                packetToBytes)))
+                packetToBytes))
       Flow.fromSinkAndSource(in, out)
   }
 
