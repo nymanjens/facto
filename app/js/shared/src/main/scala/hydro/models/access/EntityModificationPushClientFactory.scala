@@ -19,6 +19,7 @@ import hydro.common.websocket.BinaryWebsocketClient
 import org.scalajs.dom
 import org.scalajs.dom.raw.Event
 import hydro.common.time.JavaTimeImplicits._
+import org.scalajs
 
 import scala.async.Async.async
 import scala.async.Async.await
@@ -94,8 +95,8 @@ final class EntityModificationPushClientFactory(implicit clock: Clock) {
               case EntityModificationPushHeartbeat => // Do nothing
               case VersionCheck(versionString) =>
                 if (versionString != AppVersion.versionString) {
-                  println("  Detected that client version is outdated. Will reload page.")
-                  // TODO: Reload page
+                  println("  Detected that client version is outdated. Will reload page...")
+                  dom.window.location.reload(/* forcedReload = */ true)
                 }
             }
             _pushClientsAreOnline.set(true)
