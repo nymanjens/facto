@@ -120,7 +120,8 @@ final class SbadminLayout(implicit globalMessages: GlobalMessages,
               s"v${AppVersion.versionString}",
               <.span(^.style := js.Dictionary("marginLeft" -> "45px")),
               <.span(^.dangerouslySetInnerHtml := "&copy;"),
-              " 2019 Jens Nyman")
+              " 2019 Jens Nyman"
+            )
           )
         )
       )
