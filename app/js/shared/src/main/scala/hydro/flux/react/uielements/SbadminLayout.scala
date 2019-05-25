@@ -31,7 +31,7 @@ final class SbadminLayout(implicit globalMessages: GlobalMessages,
                           dispatcher: Dispatcher) {
 
   // **************** API ****************//
-  def apply(title: TagMod, leftMenu: VdomElement, pageContent: VdomElement)(
+  def apply(title: TagMod, leftMenu: VdomElement, pageContent: VdomElement, extraFooter: Seq[TagMod] = Seq())(
       implicit router: RouterContext): VdomElement = {
     <.div(
       ^.id := "wrapper",
@@ -121,7 +121,7 @@ final class SbadminLayout(implicit globalMessages: GlobalMessages,
               <.span(^.style := js.Dictionary("marginLeft" -> "45px")),
               <.span(^.dangerouslySetInnerHtml := "&copy;"),
               " 2019 Jens Nyman"
-            )
+            )(extraFooter: _*)
           )
         )
       )
