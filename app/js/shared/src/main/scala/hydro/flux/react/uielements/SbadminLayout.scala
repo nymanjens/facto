@@ -112,7 +112,12 @@ final class SbadminLayout(implicit globalMessages: GlobalMessages,
         <.div(
           ^.className := "container-fluid",
           Bootstrap.Row(
-            Bootstrap.Col(lg = 12)(globalMessages(), pageContent)
+            Bootstrap.Col(lg = 12)(
+              globalMessages(),
+              pageContent,
+              <.hr(),
+              <.span(^.dangerouslySetInnerHtml := "&copy;"),
+              " 2019 Jens Nyman")
           )
         )
       )
