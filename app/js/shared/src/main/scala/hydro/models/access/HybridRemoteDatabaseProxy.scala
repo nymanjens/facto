@@ -22,7 +22,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
     implicit apiClient: ScalaJsApiClient,
     getInitialDataResponse: GetInitialDataResponse,
-    entityModificationPushClientFactory: EntityModificationPushClientFactory)
+    hydroPushSocketClientFactory: HydroPushSocketClientFactory)
     extends RemoteDatabaseProxy {
 
   override def queryExecutor[E <: Entity: EntityType]() = {
@@ -106,8 +106,8 @@ final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
 
   override def startCheckingForModifiedEntityUpdates(
       maybeNewEntityModificationsListener: Seq[EntityModification] => Future[Unit]): Unit = {
-    val temporaryPushClient = entityModificationPushClientFactory.createClient(
-      name = "EntityModificationPush[temporary]",
+    val temporaryPushClient = hydroPushSocketClientFactory.createClient(
+      name = "HydroPushSocket[temporary]",
       updateToken = getInitialDataResponse.nextUpdateToken,
       onMessageReceived = modificationsWithToken =>
         async {
@@ -123,8 +123,8 @@ final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
         val storedUpdateToken = await(localDatabase.getSingletonValue(NextUpdateTokenKey).map(_.get))
         temporaryPushClient.close()
 
-        val permanentPushClient = entityModificationPushClientFactory.createClient(
-          name = "EntityModificationPush[permanent]",
+        val permanentPushClient = hydroPushSocketClientFactory.createClient(
+          name = "HydroPushSocket[permanent]",
           updateToken = storedUpdateToken,
           onMessageReceived = modificationsWithToken =>
             async {
@@ -168,7 +168,7 @@ object HybridRemoteDatabaseProxy {
   def create(localDatabase: Future[LocalDatabase])(
       implicit apiClient: ScalaJsApiClient,
       getInitialDataResponse: GetInitialDataResponse,
-      entityModificationPushClientFactory: EntityModificationPushClientFactory): HybridRemoteDatabaseProxy = {
+      hydroPushSocketClientFactory: HydroPushSocketClientFactory): HybridRemoteDatabaseProxy = {
     new HybridRemoteDatabaseProxy(new FutureLocalDatabase(async {
       val db = await(localDatabase)
       val populateIsNecessary = {

@@ -8,7 +8,7 @@ import app.models.accounting.TransactionGroup
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
 import hydro.common.time.Clock
-import hydro.models.access.EntityModificationPushClientFactory
+import hydro.models.access.HydroPushSocketClientFactory
 import hydro.models.access.HybridRemoteDatabaseProxy
 import hydro.models.access.LocalDatabaseImpl
 import hydro.models.access.LocalDatabaseImpl.SecondaryIndexFunction
@@ -22,8 +22,8 @@ final class Module(implicit user: User,
 
   implicit private val secondaryIndexFunction = Module.secondaryIndexFunction
 
-  implicit val entityModificationPushClientFactory: EntityModificationPushClientFactory =
-    new EntityModificationPushClientFactory()
+  implicit val hydroPushSocketClientFactory: HydroPushSocketClientFactory =
+    new HydroPushSocketClientFactory()
 
   implicit val entityAccess: AppJsEntityAccess = {
     val webWorkerModule = new hydro.models.access.webworker.Module()

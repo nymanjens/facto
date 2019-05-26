@@ -7,8 +7,8 @@ import akka.stream.scaladsl._
 import app.api.ScalaJsApi.VersionCheck
 import app.api.ScalaJsApi.ModificationsWithToken
 import app.api.ScalaJsApi.UpdateToken
-import app.api.ScalaJsApi.EntityModificationPushPacket
-import app.api.ScalaJsApi.EntityModificationPushHeartbeat
+import app.api.ScalaJsApi.HydroPushSocketPacket
+import app.api.ScalaJsApi.HydroPushSocketHeartbeat
 import app.api.ScalaJsApiServerFactory
 import app.models.access.JvmEntityAccess
 import app.models.user.User
@@ -25,7 +25,7 @@ import hydro.common.publisher.TriggerablePublisher
 import hydro.common.time.Clock
 import hydro.controllers.InternalApi.ScalaJsApiCaller
 import hydro.controllers.helpers.AuthenticatedAction
-import hydro.controllers.InternalApi.EntityModificationPushHeartbeatScheduler
+import hydro.controllers.InternalApi.HydroPushSocketHeartbeatScheduler
 import hydro.models.modification.EntityModificationEntity
 import hydro.models.slick.SlickUtils.dbApi._
 import hydro.models.slick.SlickUtils.dbRun
@@ -48,7 +48,7 @@ final class InternalApi @Inject()(
     playConfiguration: play.api.Configuration,
     env: play.api.Environment,
     scalaJsApiCaller: ScalaJsApiCaller,
-    entityModificationPushHeartbeatScheduler: EntityModificationPushHeartbeatScheduler)
+    hydroPushSocketHeartbeatScheduler: HydroPushSocketHeartbeatScheduler)
     extends AbstractController(components)
     with I18nSupport {
 
@@ -75,9 +75,9 @@ final class InternalApi @Inject()(
     }
   }
 
-  def entityModificationPushWebsocket(updateToken: UpdateToken) = WebSocket.accept[Array[Byte], Array[Byte]] {
+  def hydroPushSocketWebsocket(updateToken: UpdateToken) = WebSocket.accept[Array[Byte], Array[Byte]] {
     request =>
-      def packetToBytes(packet: EntityModificationPushPacket): Array[Byte] = {
+      def packetToBytes(packet: HydroPushSocketPacket): Array[Byte] = {
         val responseBuffer = Pickle.intoBytes(packet)
         val data: Array[Byte] = Array.ofDim[Byte](responseBuffer.remaining())
         responseBuffer.get(data)
@@ -114,9 +114,9 @@ final class InternalApi @Inject()(
           Source.fromPublisher(
             Publishers
               .map(
-                Publishers.combine[EntityModificationPushPacket](
+                Publishers.combine[HydroPushSocketPacket](
                   entityModificationPublisher,
-                  entityModificationPushHeartbeatScheduler.publisher),
+                  hydroPushSocketHeartbeatScheduler.publisher),
                 packetToBytes))
       Flow.fromSinkAndSource(in, out)
   }
@@ -138,17 +138,17 @@ object InternalApi {
   }
 
   @Singleton
-  private[controllers] class EntityModificationPushHeartbeatScheduler @Inject()(
+  private[controllers] class HydroPushSocketHeartbeatScheduler @Inject()(
       implicit actorSystem: ActorSystem,
       executionContext: ExecutionContext) {
 
-    private val publisher_ : TriggerablePublisher[EntityModificationPushHeartbeat.type] =
+    private val publisher_ : TriggerablePublisher[HydroPushSocketHeartbeat.type] =
       new TriggerablePublisher()
 
     actorSystem.scheduler.schedule(initialDelay = 0.seconds, interval = 5.seconds) {
-      publisher_.trigger(EntityModificationPushHeartbeat)
+      publisher_.trigger(HydroPushSocketHeartbeat)
     }
 
-    def publisher: Publisher[EntityModificationPushHeartbeat.type] = publisher_
+    def publisher: Publisher[HydroPushSocketHeartbeat.type] = publisher_
   }
 }

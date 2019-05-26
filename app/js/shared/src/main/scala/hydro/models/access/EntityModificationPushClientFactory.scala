@@ -3,8 +3,8 @@ package hydro.models.access
 import java.time
 import java.time.Instant
 
-import app.api.ScalaJsApi.EntityModificationPushPacket
-import app.api.ScalaJsApi.EntityModificationPushHeartbeat
+import app.api.ScalaJsApi.HydroPushSocketPacket
+import app.api.ScalaJsApi.HydroPushSocketHeartbeat
 import app.api.ScalaJsApi.ModificationsWithToken
 import app.api.ScalaJsApi.VersionCheck
 import app.api.ScalaJsApi.UpdateToken
@@ -29,20 +29,20 @@ import scala.concurrent.duration._
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 
-final class EntityModificationPushClientFactory(implicit clock: Clock) {
+final class HydroPushSocketClientFactory(implicit clock: Clock) {
 
   private val _pushClientsAreOnline: WritableListenable[Boolean] = WritableListenable(true)
 
   private[access] def createClient(
       name: String,
       updateToken: UpdateToken,
-      onMessageReceived: ModificationsWithToken => Future[Unit]): EntityModificationPushClient =
-    new EntityModificationPushClient(name, updateToken, onMessageReceived)
+      onMessageReceived: ModificationsWithToken => Future[Unit]): HydroPushSocketClient =
+    new HydroPushSocketClient(name, updateToken, onMessageReceived)
 
   /** Returns true if a push client socket is open or if there is no reason to believe it wouldn't be able to open. */
   def pushClientsAreOnline: Listenable[Boolean] = _pushClientsAreOnline
 
-  private[access] final class EntityModificationPushClient private[EntityModificationPushClientFactory] (
+  private[access] final class HydroPushSocketClient private[HydroPushSocketClientFactory] (
       name: String,
       updateToken: UpdateToken,
       onMessageReceived: ModificationsWithToken => Future[Unit]) {
@@ -84,15 +84,15 @@ final class EntityModificationPushClientFactory(implicit clock: Clock) {
       lastStartToOpenTime = clock.nowInstant
       BinaryWebsocketClient.open(
         name = name,
-        websocketPath = s"websocket/entitymodificationpush/$updateToken/",
+        websocketPath = s"websocket/hydropush/$updateToken/",
         onMessageReceived = bytes =>
           async {
-            val packet = Unpickle[EntityModificationPushPacket].fromBytes(bytes)
+            val packet = Unpickle[HydroPushSocketPacket].fromBytes(bytes)
             packet match {
               case modificationsWithToken: ModificationsWithToken =>
                 await(onMessageReceived(modificationsWithToken))
                 firstMessageWasProcessedPromise.trySuccess((): Unit)
-              case EntityModificationPushHeartbeat => // Do nothing
+              case HydroPushSocketHeartbeat => // Do nothing
               case VersionCheck(versionString) =>
                 if (versionString != AppVersion.versionString) {
                   println("  Detected that client version is outdated. Will reload page...")

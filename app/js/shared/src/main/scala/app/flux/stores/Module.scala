@@ -14,7 +14,7 @@ import hydro.flux.stores.ApplicationIsOnlineStore
 import hydro.flux.stores.LocalDatabaseHasBeenLoadedStore
 import hydro.flux.stores.PageLoadingStateStore
 import hydro.flux.stores.UserStore
-import hydro.models.access.EntityModificationPushClientFactory
+import hydro.models.access.HydroPushSocketClientFactory
 
 final class Module(implicit i18n: I18n,
                    accountingConfig: Config,
@@ -24,7 +24,7 @@ final class Module(implicit i18n: I18n,
                    dispatcher: Dispatcher,
                    clock: Clock,
                    scalaJsApiClient: ScalaJsApiClient,
-                   entityModificationPushClientFactory: EntityModificationPushClientFactory) {
+                   hydroPushSocketClientFactory: HydroPushSocketClientFactory) {
 
   new TransactionAndGroupStore
   new BalanceCheckStore

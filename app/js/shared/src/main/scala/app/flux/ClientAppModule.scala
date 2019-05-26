@@ -24,7 +24,7 @@ final class ClientAppModule(implicit getInitialDataResponse: GetInitialDataRespo
   // Create and unpack Models Access module
   val modelsAccessModule = new app.models.access.Module
   implicit val entityAccess = modelsAccessModule.entityAccess
-  implicit val entityModificationPushClientFactory = modelsAccessModule.entityModificationPushClientFactory
+  implicit val hydroPushSocketClientFactory = modelsAccessModule.hydroPushSocketClientFactory
 
   // Create and unpack Models module
   private val modelsModule = new app.models.Module

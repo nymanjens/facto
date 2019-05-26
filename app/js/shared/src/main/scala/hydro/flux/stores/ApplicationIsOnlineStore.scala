@@ -2,15 +2,15 @@ package hydro.flux.stores
 
 import hydro.common.Listenable
 import hydro.flux.stores.ApplicationIsOnlineStore.State
-import hydro.models.access.EntityModificationPushClientFactory
+import hydro.models.access.HydroPushSocketClientFactory
 
 final class ApplicationIsOnlineStore(
-    implicit entityModificationPushClientFactory: EntityModificationPushClientFactory)
+    implicit hydroPushSocketClientFactory: HydroPushSocketClientFactory)
     extends StateStore[State] {
 
-  entityModificationPushClientFactory.pushClientsAreOnline.registerListener(PushClientsAreOnlineListener)
+  hydroPushSocketClientFactory.pushClientsAreOnline.registerListener(PushClientsAreOnlineListener)
 
-  private var _state: State = State(isOnline = entityModificationPushClientFactory.pushClientsAreOnline.get)
+  private var _state: State = State(isOnline = hydroPushSocketClientFactory.pushClientsAreOnline.get)
 
   // **************** Public API ****************//
   override def state: State = _state

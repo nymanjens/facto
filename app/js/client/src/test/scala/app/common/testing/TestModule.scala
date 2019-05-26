@@ -5,7 +5,7 @@ import hydro.common.testing.FakeClock
 import hydro.common.testing.FakeI18n
 import hydro.flux.action.Dispatcher
 import hydro.flux.react.uielements.PageHeader
-import hydro.models.access.EntityModificationPushClientFactory
+import hydro.models.access.HydroPushSocketClientFactory
 
 class TestModule {
 
@@ -20,7 +20,7 @@ class TestModule {
 
   // ******************* Non-fake implementations ******************* //
   implicit lazy val exchangeRateManager = new JsExchangeRateManager(ratioReferenceToForeignCurrency = Map())
-  implicit lazy val entityModificationPushClientFactory: EntityModificationPushClientFactory =
-    new EntityModificationPushClientFactory
+  implicit lazy val hydroPushSocketClientFactory: HydroPushSocketClientFactory =
+    new HydroPushSocketClientFactory
   implicit val pageHeader = new PageHeader
 }

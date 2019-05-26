@@ -5,8 +5,8 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 
-import app.api.ScalaJsApi.EntityModificationPushPacket
-import app.api.ScalaJsApi.EntityModificationPushHeartbeat
+import app.api.ScalaJsApi.HydroPushSocketPacket
+import app.api.ScalaJsApi.HydroPushSocketHeartbeat
 import app.api.ScalaJsApi.ModificationsWithToken
 import app.api.ScalaJsApi.VersionCheck
 import hydro.common.GuavaReplacement.ImmutableBiMap
@@ -186,16 +186,16 @@ abstract class StandardPicklers {
     }
   }
 
-  implicit object EntityModificationPushHeartbeatPickler
-      extends Pickler[EntityModificationPushHeartbeat.type] {
-    override def pickle(data: EntityModificationPushHeartbeat.type)(implicit state: PickleState): Unit = {}
-    override def unpickle(implicit state: UnpickleState): EntityModificationPushHeartbeat.type =
-      EntityModificationPushHeartbeat
+  implicit object HydroPushSocketHeartbeatPickler
+      extends Pickler[HydroPushSocketHeartbeat.type] {
+    override def pickle(data: HydroPushSocketHeartbeat.type)(implicit state: PickleState): Unit = {}
+    override def unpickle(implicit state: UnpickleState): HydroPushSocketHeartbeat.type =
+      HydroPushSocketHeartbeat
   }
 
-  implicit val entityModificationPushPacketPickler = compositePickler[EntityModificationPushPacket]
+  implicit val hydroPushSocketPacketPickler = compositePickler[HydroPushSocketPacket]
     .addConcreteType[ModificationsWithToken]
-    .addConcreteType[EntityModificationPushHeartbeat.type]
+    .addConcreteType[HydroPushSocketHeartbeat.type]
     .addConcreteType[VersionCheck]
 
   protected def logExceptions[T](codeBlock: => T): T = {

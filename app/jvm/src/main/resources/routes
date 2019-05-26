@@ -17,7 +17,7 @@ GET  /serviceWorker.js                 hydro.controllers.JavascriptFiles.service
 POST /scalajsapi/*path                 hydro.controllers.InternalApi.scalaJsApiPost(path: String)
 GET  /scalajsapi/*path                 hydro.controllers.InternalApi.scalaJsApiGet(path: String)
 GET  /websocket/scalajsapi/            hydro.controllers.InternalApi.scalaJsApiWebsocket
-GET  /websocket/entitymodificationpush/:updateToken/  hydro.controllers.InternalApi.entityModificationPushWebsocket(updateToken)
+GET  /websocket/hydropush/:updateToken/  hydro.controllers.InternalApi.hydroPushSocketWebsocket(updateToken)
 
 # External API
 GET  /externalapi/healthcheck/         hydro.controllers.StandardActions.healthCheck
