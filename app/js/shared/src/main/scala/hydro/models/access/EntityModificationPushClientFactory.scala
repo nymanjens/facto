@@ -4,9 +4,7 @@ import java.time
 import java.time.Instant
 
 import app.api.ScalaJsApi.HydroPushSocketPacket
-import app.api.ScalaJsApi.HydroPushSocketHeartbeat
-import app.api.ScalaJsApi.ModificationsWithToken
-import app.api.ScalaJsApi.VersionCheck
+import app.api.ScalaJsApi.HydroPushSocketPacket.EntityModificationsWithToken
 import app.api.ScalaJsApi.UpdateToken
 import boopickle.Default.Unpickle
 import boopickle.Default._
@@ -36,7 +34,7 @@ final class HydroPushSocketClientFactory(implicit clock: Clock) {
   private[access] def createClient(
       name: String,
       updateToken: UpdateToken,
-      onMessageReceived: ModificationsWithToken => Future[Unit]): HydroPushSocketClient =
+      onMessageReceived: EntityModificationsWithToken => Future[Unit]): HydroPushSocketClient =
     new HydroPushSocketClient(name, updateToken, onMessageReceived)
 
   /** Returns true if a push client socket is open or if there is no reason to believe it wouldn't be able to open. */
@@ -45,7 +43,7 @@ final class HydroPushSocketClientFactory(implicit clock: Clock) {
   private[access] final class HydroPushSocketClient private[HydroPushSocketClientFactory] (
       name: String,
       updateToken: UpdateToken,
-      onMessageReceived: ModificationsWithToken => Future[Unit]) {
+      onMessageReceived: EntityModificationsWithToken => Future[Unit]) {
 
     private val firstMessageWasProcessedPromise: Promise[Unit] = Promise()
     private var lastUpdateToken: UpdateToken = updateToken
@@ -89,11 +87,11 @@ final class HydroPushSocketClientFactory(implicit clock: Clock) {
           async {
             val packet = Unpickle[HydroPushSocketPacket].fromBytes(bytes)
             packet match {
-              case modificationsWithToken: ModificationsWithToken =>
+              case modificationsWithToken: EntityModificationsWithToken =>
                 await(onMessageReceived(modificationsWithToken))
                 firstMessageWasProcessedPromise.trySuccess((): Unit)
-              case HydroPushSocketHeartbeat => // Do nothing
-              case VersionCheck(versionString) =>
+              case HydroPushSocketPacket.Heartbeat => // Do nothing
+              case HydroPushSocketPacket.VersionCheck(versionString) =>
                 if (versionString != AppVersion.versionString) {
                   println("  Detected that client version is outdated. Will reload page...")
                   dom.window.location.reload(/* forcedReload = */ true)

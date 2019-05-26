@@ -4,11 +4,9 @@ import java.nio.ByteBuffer
 
 import akka.actor.ActorSystem
 import akka.stream.scaladsl._
-import app.api.ScalaJsApi.VersionCheck
-import app.api.ScalaJsApi.ModificationsWithToken
-import app.api.ScalaJsApi.UpdateToken
 import app.api.ScalaJsApi.HydroPushSocketPacket
-import app.api.ScalaJsApi.HydroPushSocketHeartbeat
+import app.api.ScalaJsApi.HydroPushSocketPacket.EntityModificationsWithToken
+import app.api.ScalaJsApi.UpdateToken
 import app.api.ScalaJsApiServerFactory
 import app.models.access.JvmEntityAccess
 import app.models.user.User
@@ -103,9 +101,9 @@ final class InternalApi @Inject()(
           modificationEntities.toStream.map(_.modification).toVector
         }
 
-        ModificationsWithToken(modifications, nextUpdateToken)
+        EntityModificationsWithToken(modifications, nextUpdateToken)
       }
-      val versionCheck = VersionCheck(versionString = AppVersion.versionString)
+      val versionCheck = HydroPushSocketPacket.VersionCheck(versionString = AppVersion.versionString)
 
       val in = Sink.ignore
       val out =
@@ -142,13 +140,13 @@ object InternalApi {
       implicit actorSystem: ActorSystem,
       executionContext: ExecutionContext) {
 
-    private val publisher_ : TriggerablePublisher[HydroPushSocketHeartbeat.type] =
+    private val publisher_ : TriggerablePublisher[HydroPushSocketPacket.Heartbeat.type] =
       new TriggerablePublisher()
 
     actorSystem.scheduler.schedule(initialDelay = 0.seconds, interval = 5.seconds) {
-      publisher_.trigger(HydroPushSocketHeartbeat)
+      publisher_.trigger(HydroPushSocketPacket.Heartbeat)
     }
 
-    def publisher: Publisher[HydroPushSocketHeartbeat.type] = publisher_
+    def publisher: Publisher[HydroPushSocketPacket.Heartbeat.type] = publisher_
   }
 }

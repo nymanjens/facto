@@ -57,10 +57,13 @@ object ScalaJsApi {
   }
 
   sealed trait HydroPushSocketPacket
-  case class ModificationsWithToken(modifications: Seq[EntityModification], nextUpdateToken: UpdateToken)
-      extends HydroPushSocketPacket
-  object HydroPushSocketHeartbeat extends HydroPushSocketPacket
-  case class VersionCheck(versionString: String) extends HydroPushSocketPacket
+  object HydroPushSocketPacket {
+    case class EntityModificationsWithToken(modifications: Seq[EntityModification],
+                                            nextUpdateToken: UpdateToken)
+        extends HydroPushSocketPacket
+    object Heartbeat extends HydroPushSocketPacket
+    case class VersionCheck(versionString: String) extends HydroPushSocketPacket
+  }
 
   /**
     * Copy of the User model with all fields optional.

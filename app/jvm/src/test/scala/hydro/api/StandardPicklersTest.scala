@@ -8,6 +8,9 @@ import app.models.access.ModelFields
 import app.models.user.User
 import boopickle.Default._
 import boopickle.Pickler
+import app.api.ScalaJsApi.HydroPushSocketPacket
+import app.api.ScalaJsApi.HydroPushSocketPacket.EntityModificationsWithToken
+
 import hydro.common.testing._
 import hydro.models.access.DbQuery
 import hydro.models.access.DbQuery.Sorting
@@ -60,11 +63,12 @@ class StandardPicklersTest extends HookedSpecification {
   }
 
   "ModificationsWithToken" in {
-    testPickleAndUnpickle[ModificationsWithToken](
-      ModificationsWithToken(modifications = Seq(testModification), nextUpdateToken = testUpdateToken))
+    testPickleAndUnpickle[EntityModificationsWithToken](
+      EntityModificationsWithToken(modifications = Seq(testModification), nextUpdateToken = testUpdateToken))
   }
   "VersionCheck" in {
-    testPickleAndUnpickle[VersionCheck](VersionCheck(versionString = "1.2.3"))
+    testPickleAndUnpickle[HydroPushSocketPacket.VersionCheck](
+      HydroPushSocketPacket.VersionCheck(versionString = "1.2.3"))
   }
 
   private def testPickleAndUnpickle[T: Pickler](value: T) = {

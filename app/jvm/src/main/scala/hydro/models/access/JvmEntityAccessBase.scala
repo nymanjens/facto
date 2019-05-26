@@ -3,7 +3,7 @@ package hydro.models.access
 import java.time.Duration
 import java.util.concurrent.Executors
 
-import app.api.ScalaJsApi.ModificationsWithToken
+import app.api.ScalaJsApi.HydroPushSocketPacket.EntityModificationsWithToken
 import app.models.access.ModelFields
 import app.models.modification.EntityTypes
 import app.models.slick.SlickEntityTableDefs
@@ -42,7 +42,7 @@ abstract class JvmEntityAccessBase(implicit clock: Clock) extends EntityAccess {
     sortings = sortings
   )
 
-  private val entityModificationPublisher_ : TriggerablePublisher[ModificationsWithToken] =
+  private val entityModificationPublisher_ : TriggerablePublisher[EntityModificationsWithToken] =
     new TriggerablePublisher()
 
   // **************** Methods to be overridden ****************//
@@ -60,7 +60,7 @@ abstract class JvmEntityAccessBase(implicit clock: Clock) extends EntityAccess {
       implicit entityTableDef: SlickEntityTableDef[E]): TableQuery[entityTableDef.Table] =
     SlickEntityManager.forType[E].newQuery.asInstanceOf[TableQuery[entityTableDef.Table]]
 
-  def entityModificationPublisher: Publisher[ModificationsWithToken] = entityModificationPublisher_
+  def entityModificationPublisher: Publisher[EntityModificationsWithToken] = entityModificationPublisher_
 
   // **************** Setters ****************//
   def persistEntityModifications(modifications: EntityModification*)(implicit user: User): Unit = {
@@ -166,7 +166,7 @@ abstract class JvmEntityAccessBase(implicit clock: Clock) extends EntityAccess {
         val modificationBundler = new ModificationBundler(
           triggerEveryNAdditions = 20,
           triggerFunction = modifications =>
-            entityModificationPublisher_.trigger(ModificationsWithToken(modifications, nextUpdateToken)))
+            entityModificationPublisher_.trigger(EntityModificationsWithToken(modifications, nextUpdateToken)))
 
         for (modification <- modifications) {
           if (eclipsedByExistingModification(modification, existingModifications)) {
