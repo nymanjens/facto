@@ -70,55 +70,63 @@ object TestObjects {
   )
   def testAccount: Account = testAccountA
 
-  def testReservoirCashCommon = MoneyReservoir(
-    code = "CASH_COMMON",
-    name = "Cash Common",
-    shorterName = "Cash Common",
-    owner = testAccountCommon,
-    hidden = false)
-  def testReservoirCardCommon = MoneyReservoir(
-    code = "CARD_COMMON",
-    name = "Card Common",
-    shorterName = "Card Common",
-    owner = testAccountCommon,
-    hidden = false)
-  def testReservoirCashA = MoneyReservoir(
-    code = "CASH_A",
-    name = "Cash A",
-    shorterName = "Cash A",
-    owner = testAccountA,
-    hidden = false)
-  def testReservoirCardA = MoneyReservoir(
-    code = "CARD_A",
-    name = "Card A",
-    shorterName = "Card A",
-    owner = testAccountA,
-    hidden = false)
-  def testReservoirCashB = MoneyReservoir(
-    code = "CASH_B",
-    name = "Cash B",
-    shorterName = "Cash B",
-    owner = testAccountB,
-    hidden = false)
-  def testReservoirCardB = MoneyReservoir(
-    code = "CARD_B",
-    name = "Card B",
-    shorterName = "Card B",
-    owner = testAccountB,
-    hidden = false)
-  def testReservoirHidden = MoneyReservoir(
-    code = "HIDDEN",
-    name = "Card Hidden",
-    shorterName = "Card Hidden",
-    owner = testAccountB,
-    hidden = true)
-  def testReservoirCashGbp = MoneyReservoir(
-    code = "CASH_GBP",
-    name = "Cash GBP",
-    shorterName = "Cash GBP",
-    owner = testAccountA,
-    hidden = true,
-    currencyCode = Some("GBP"))
+  def testReservoirCashCommon =
+    MoneyReservoir(
+      code = "CASH_COMMON",
+      name = "Cash Common",
+      shorterName = "Cash Common",
+      owner = testAccountCommon,
+      hidden = false)
+  def testReservoirCardCommon =
+    MoneyReservoir(
+      code = "CARD_COMMON",
+      name = "Card Common",
+      shorterName = "Card Common",
+      owner = testAccountCommon,
+      hidden = false)
+  def testReservoirCashA =
+    MoneyReservoir(
+      code = "CASH_A",
+      name = "Cash A",
+      shorterName = "Cash A",
+      owner = testAccountA,
+      hidden = false)
+  def testReservoirCardA =
+    MoneyReservoir(
+      code = "CARD_A",
+      name = "Card A",
+      shorterName = "Card A",
+      owner = testAccountA,
+      hidden = false)
+  def testReservoirCashB =
+    MoneyReservoir(
+      code = "CASH_B",
+      name = "Cash B",
+      shorterName = "Cash B",
+      owner = testAccountB,
+      hidden = false)
+  def testReservoirCardB =
+    MoneyReservoir(
+      code = "CARD_B",
+      name = "Card B",
+      shorterName = "Card B",
+      owner = testAccountB,
+      hidden = false)
+  def testReservoirHidden =
+    MoneyReservoir(
+      code = "HIDDEN",
+      name = "Card Hidden",
+      shorterName = "Card Hidden",
+      owner = testAccountB,
+      hidden = true)
+  def testReservoirCashGbp =
+    MoneyReservoir(
+      code = "CASH_GBP",
+      name = "Cash GBP",
+      shorterName = "Cash GBP",
+      owner = testAccountA,
+      hidden = true,
+      currencyCode = Some("GBP"))
   def testReservoirOfAccountA: MoneyReservoir = testReservoirCashA
   def testReservoirOfAccountB: MoneyReservoir = testReservoirCashB
   def testReservoir: MoneyReservoir = testReservoirCashCommon
@@ -209,12 +217,13 @@ object TestObjects {
   def testUser: User = testUserA
   def testUserRedacted: User = testUser.copy(passwordHash = "<redacted>")
 
-  def testUserPrototype = UserPrototype.create(
-    id = testUser.id,
-    loginName = testUser.loginName,
-    plainTextPassword = "dlkfjasfd",
-    name = testUser.name,
-    isAdmin = testUser.isAdmin)
+  def testUserPrototype =
+    UserPrototype.create(
+      id = testUser.id,
+      loginName = testUser.loginName,
+      plainTextPassword = "dlkfjasfd",
+      name = testUser.name,
+      isAdmin = testUser.isAdmin)
 
   def orderTokenA: OrderToken = OrderToken.middleBetween(None, Some(OrderToken.middle))
   def orderTokenB: OrderToken = OrderToken.middleBetween(Some(OrderToken.middle), None)
@@ -260,18 +269,20 @@ object TestObjects {
     idOption = Some(4371098)
   )
   def testTransactionWithId: Transaction = testTransactionWithIdA
-  def testBalanceCheckWithId: BalanceCheck = BalanceCheck(
-    issuerId = testUser.id,
-    moneyReservoirCode = testReservoir.code,
-    balanceInCents = 38746,
-    createdDate = testDate,
-    checkDate = testDate,
-    idOption = Some(873865333))
-  def testExchangeRateMeasurementWithId: ExchangeRateMeasurement = ExchangeRateMeasurement(
-    date = testDate,
-    foreignCurrencyCode = "GBP",
-    ratioReferenceToForeignCurrency = 1.234,
-    idOption = Some(764785511))
+  def testBalanceCheckWithId: BalanceCheck =
+    BalanceCheck(
+      issuerId = testUser.id,
+      moneyReservoirCode = testReservoir.code,
+      balanceInCents = 38746,
+      createdDate = testDate,
+      checkDate = testDate,
+      idOption = Some(873865333))
+  def testExchangeRateMeasurementWithId: ExchangeRateMeasurement =
+    ExchangeRateMeasurement(
+      date = testDate,
+      foreignCurrencyCode = "GBP",
+      ratioReferenceToForeignCurrency = 1.234,
+      idOption = Some(764785511))
 
   def testModificationA: EntityModification = EntityModification.Add(testTransactionWithIdA)
   def testModificationB: EntityModification = EntityModification.Add(testTransactionWithIdB)

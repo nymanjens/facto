@@ -4,8 +4,7 @@ import hydro.common.Listenable
 import hydro.flux.stores.ApplicationIsOnlineStore.State
 import hydro.models.access.HydroPushSocketClientFactory
 
-final class ApplicationIsOnlineStore(
-    implicit hydroPushSocketClientFactory: HydroPushSocketClientFactory)
+final class ApplicationIsOnlineStore(implicit hydroPushSocketClientFactory: HydroPushSocketClientFactory)
     extends StateStore[State] {
 
   hydroPushSocketClientFactory.pushClientsAreOnline.registerListener(PushClientsAreOnlineListener)

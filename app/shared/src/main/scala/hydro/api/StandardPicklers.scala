@@ -184,8 +184,7 @@ abstract class StandardPicklers {
     }
   }
 
-  implicit object HydroPushSocketHeartbeatPickler
-      extends Pickler[HydroPushSocketPacket.Heartbeat.type] {
+  implicit object HydroPushSocketHeartbeatPickler extends Pickler[HydroPushSocketPacket.Heartbeat.type] {
     override def pickle(data: HydroPushSocketPacket.Heartbeat.type)(implicit state: PickleState): Unit = {}
     override def unpickle(implicit state: UnpickleState): HydroPushSocketPacket.Heartbeat.type =
       HydroPushSocketPacket.Heartbeat

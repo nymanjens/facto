@@ -94,7 +94,7 @@ final class HydroPushSocketClientFactory(implicit clock: Clock) {
               case HydroPushSocketPacket.VersionCheck(versionString) =>
                 if (versionString != AppVersion.versionString) {
                   println("  Detected that client version is outdated. Will reload page...")
-                  dom.window.location.reload(/* forcedReload = */ true)
+                  dom.window.location.reload( /* forcedReload = */ true)
                 }
             }
             _pushClientsAreOnline.set(true)

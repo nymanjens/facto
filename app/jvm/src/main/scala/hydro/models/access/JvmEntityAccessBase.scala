@@ -166,7 +166,8 @@ abstract class JvmEntityAccessBase(implicit clock: Clock) extends EntityAccess {
         val modificationBundler = new ModificationBundler(
           triggerEveryNAdditions = 20,
           triggerFunction = modifications =>
-            entityModificationPublisher_.trigger(EntityModificationsWithToken(modifications, nextUpdateToken)))
+            entityModificationPublisher_.trigger(EntityModificationsWithToken(modifications, nextUpdateToken))
+        )
 
         for (modification <- modifications) {
           if (eclipsedByExistingModification(modification, existingModifications)) {
