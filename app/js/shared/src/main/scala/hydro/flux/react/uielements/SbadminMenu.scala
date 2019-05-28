@@ -87,7 +87,7 @@ final class SbadminMenu(implicit i18n: I18n) extends HydroReactComponent.Statele
                         e.preventDefault()
 
                         queryInputRef().value match {
-                          case Some(query) => props.router.setPage(StandardPages.Search(query))
+                          case Some(query) => props.router.setPage(StandardPages.Search.fromInput(query))
                           case None        =>
                         }
                       }
