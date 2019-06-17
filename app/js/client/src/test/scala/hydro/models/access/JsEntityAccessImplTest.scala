@@ -3,6 +3,7 @@ package hydro.models.access
 import app.common.testing.FakeScalaJsApiClient
 import app.common.testing.TestModule
 import app.common.testing.TestObjects._
+import app.models.modification.EntityTypes
 import hydro.models.modification.EntityModification
 import hydro.models.modification.EntityType
 import app.models.user.User
@@ -25,6 +26,7 @@ object JsEntityAccessImplTest extends TestSuite {
   override def tests = TestSuite {
     implicit val fakeApiClient: FakeScalaJsApiClient = new FakeScalaJsApiClient()
     implicit val fakeClock: Clock = new TestModule().fakeClock
+    implicit val entitySyncLogic: EntitySyncLogic = new EntitySyncLogic.FullySynced(EntityTypes.all)
     implicit val getInitialDataResponse = testGetInitialDataResponse
     implicit val hydroPushSocketClientFactory: HydroPushSocketClientFactory =
       new HydroPushSocketClientFactory

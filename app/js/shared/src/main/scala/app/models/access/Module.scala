@@ -5,9 +5,11 @@ import app.api.ScalaJsApiClient
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup
+import app.models.modification.EntityTypes
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
 import hydro.common.time.Clock
+import hydro.models.access.EntitySyncLogic
 import hydro.models.access.HydroPushSocketClientFactory
 import hydro.models.access.HybridRemoteDatabaseProxy
 import hydro.models.access.LocalDatabaseImpl
@@ -21,6 +23,7 @@ final class Module(implicit user: User,
                    getInitialDataResponse: GetInitialDataResponse) {
 
   implicit private val secondaryIndexFunction = Module.secondaryIndexFunction
+  implicit private val entitySyncLogic = new EntitySyncLogic.FullySynced(EntityTypes.all)
 
   implicit val hydroPushSocketClientFactory: HydroPushSocketClientFactory =
     new HydroPushSocketClientFactory()
