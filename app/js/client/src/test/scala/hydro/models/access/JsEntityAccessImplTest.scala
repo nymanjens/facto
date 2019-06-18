@@ -8,6 +8,7 @@ import hydro.models.modification.EntityModification
 import hydro.models.modification.EntityType
 import app.models.user.User
 import hydro.common.testing.ModificationsBuffer
+import hydro.common.testing.FakeLocalDatabase
 import hydro.common.time.Clock
 import hydro.models.Entity
 import utest._
@@ -99,52 +100,6 @@ object JsEntityAccessImplTest extends TestSuite {
     }
   }
 
-  private final class FakeLocalDatabase extends LocalDatabase {
-    val modificationsBuffer: ModificationsBuffer = new ModificationsBuffer()
-    val _pendingModifications: mutable.Buffer[EntityModification] = mutable.Buffer()
-    private val singletonMap: mutable.Map[SingletonKey[_], js.Any] = mutable.Map()
-
-    // **************** Getters ****************//
-    override def queryExecutor[E <: Entity: EntityType]() = {
-      DbQueryExecutor.fromEntities(modificationsBuffer.getAllEntitiesOfType[E]).asAsync
-    }
-    override def pendingModifications() = Future.successful(_pendingModifications.toVector)
-    override def getSingletonValue[V](key: SingletonKey[V]) = {
-      Future.successful(singletonMap.get(key) map key.valueConverter.toScala)
-    }
-    override def isEmpty = {
-      Future.successful(modificationsBuffer.isEmpty && singletonMap.isEmpty)
-    }
-
-    // **************** Setters ****************//
-    override def applyModifications(modifications: Seq[EntityModification]) = {
-      modificationsBuffer.addModifications(modifications)
-      Future.successful((): Unit)
-    }
-    override def addAll[E <: Entity: EntityType](entities: Seq[E]) = {
-      modificationsBuffer.addEntities(entities)
-      Future.successful((): Unit)
-    }
-    override def addPendingModifications(modifications: Seq[EntityModification]) = Future.successful {
-      _pendingModifications ++= modifications
-    }
-    override def removePendingModifications(modifications: Seq[EntityModification]) = Future.successful {
-      _pendingModifications --= modifications
-    }
-    override def setSingletonValue[V](key: SingletonKey[V], value: V) = {
-      singletonMap.put(key, key.valueConverter.toJs(value))
-      Future.successful((): Unit)
-    }
-    override def save() = Future.successful((): Unit)
-    override def resetAndInitialize() = {
-      modificationsBuffer.clear()
-      singletonMap.clear()
-      Future.successful((): Unit)
-    }
-
-    // **************** Additional methods for tests ****************//
-    def allModifications: Seq[EntityModification] = modificationsBuffer.getModifications()
-  }
 
   private final class FakeProxyListener extends JsEntityAccess.Listener {
     private val _modifications: mutable.Buffer[Seq[EntityModification]] = mutable.Buffer()
