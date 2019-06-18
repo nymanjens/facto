@@ -41,7 +41,7 @@ abstract class StateStore[State] {
     isCallingListeners = false
   }
 
-  protected final def stateUpdateListeners: Seq[StateStore.Listener] = _stateUpdateListeners
+  final def stateUpdateListeners: Seq[StateStore.Listener] = _stateUpdateListeners
 
   protected final def checkNotCallingListeners(): Unit = {
     require(!isCallingListeners, "checkNotCallingListeners(): But isCallingListeners is true")
