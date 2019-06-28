@@ -143,7 +143,7 @@ abstract class HydroReactComponent {
   case class ComponentConfig(
       backendConstructor: BackendScope[Props, State] => Backend,
       initialState: State,
-      componentName: String = getClass.getSimpleName,
+      componentName: String = HydroReactComponent.this.getClass.getSimpleName,
       stateStoresDependencies: Seq[Props => StateStoresDependency] = Seq(),
   ) {
     def withStateStoresDependency(store: StateStore[_], stateUpdate: State => State): ComponentConfig =
@@ -169,7 +169,7 @@ object HydroReactComponent {
 
     case class StatelessComponentConfig(
         backendConstructor: BackendScope[Props, State] => Backend,
-        componentName: String = getClass.getSimpleName,
+        componentName: String = Stateless.this.getClass.getSimpleName,
     )
   }
 }
