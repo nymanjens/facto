@@ -53,7 +53,7 @@ final class Summary(implicit summaryTable: SummaryTable,
                            expandedYear: Int)
 
   private class Backend(val $ : BackendScope[Props, State]) {
-    val queryInputRef = TextInput.ref()
+    private val queryInputRef = TextInput.ref()
 
     def render(props: Props, state: State) = logExceptions {
       implicit val router = props.router
