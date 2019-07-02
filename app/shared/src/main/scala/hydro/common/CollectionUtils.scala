@@ -24,6 +24,14 @@ object CollectionUtils {
 
   def ifThenSeq[V](condition: Boolean, value: V): Seq[V] = if (condition) Seq(value) else Seq()
 
+  def maybeGet[E](seq: Seq[E], index: Int): Option[E] = {
+    if (seq.indices contains index) {
+      Some(seq(index))
+    } else {
+      None
+    }
+  }
+
   /**
     * Converts the given values to a bimap that associates an integer with each value.
     *
