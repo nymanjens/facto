@@ -28,8 +28,7 @@ final class PageHeader(implicit i18n: I18n, entityAccess: EntityAccess) {
     withExtension(page, title)()
   }
 
-  def withExtension(page: Page, title: String = null)(children: VdomNode*)(
-      implicit i18n: I18n): VdomElement = {
+  def withExtension(page: Page, title: String = null)(children: VdomNode*): VdomElement = {
     def newComponent(title: String): VdomElement =
       component(Props(title = title, iconClass = page.iconClass))(children: _*)
     if (title != null) {
@@ -42,5 +41,5 @@ final class PageHeader(implicit i18n: I18n, entityAccess: EntityAccess) {
   }
 
   // **************** Private inner types ****************//
-  private case class Props(title: String, iconClass: String)(implicit val i18n: I18n)
+  private case class Props(title: String, iconClass: String)
 }
