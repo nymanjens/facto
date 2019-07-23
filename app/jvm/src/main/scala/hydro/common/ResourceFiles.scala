@@ -2,6 +2,7 @@ package hydro.common
 
 import java.io.FileNotFoundException
 import java.nio.file.Path
+import java.nio.file.Paths
 
 object ResourceFiles {
 
@@ -28,4 +29,9 @@ object ResourceFiles {
   }
 
   def exists(path: Path): Boolean = exists(path.toString)
+
+  def canonicalizePath(pathString: String): String = {
+    val pathStringWithHomeResolved = pathString.replaceFirst("^~", System.getProperty("user.home"))
+    Paths.get(pathStringWithHomeResolved).toAbsolutePath.normalize.toString
+  }
 }

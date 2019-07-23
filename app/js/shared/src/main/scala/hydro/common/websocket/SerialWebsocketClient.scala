@@ -16,7 +16,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 private[websocket] final class SerialWebsocketClient(websocketPath: String) {
   require(!websocketPath.startsWith("/"))
 
-  var openWebsocketPromise: Option[Promise[BinaryWebsocketClient]] = None
+  var openWebsocketPromise: Option[Promise[WebsocketClient[ByteBuffer]]] = None
   val responseMessagePromises: mutable.Buffer[Promise[ByteBuffer]] = mutable.Buffer()
 
   def sendAndReceive(request: ByteBuffer): Future[ByteBuffer] = async {
@@ -39,24 +39,23 @@ private[websocket] final class SerialWebsocketClient(websocketPath: String) {
 
   def backlogSize: Int = responseMessagePromises.size
 
-  private def getOrOpenWebsocket(): Promise[BinaryWebsocketClient] = {
+  private def getOrOpenWebsocket(): Promise[WebsocketClient[ByteBuffer]] = {
     if (openWebsocketPromise.isEmpty) {
       openWebsocketPromise = Some(
         toPromise(
-          BinaryWebsocketClient
-            .open(
-              name = name,
-              websocketPath = websocketPath,
-              onMessageReceived = onMessageReceived,
-              onError = () =>
-                responseMessagePromises.headOption.map(
-                  _.tryFailure(new RuntimeException("Error from WebSocket"))),
-              onClose = () => {
-                openWebsocketPromise = None
-                responseMessagePromises.headOption.map(
-                  _.tryFailure(new RuntimeException("WebSocket was closed")))
-              }
-            )))
+          WebsocketClient.open[ByteBuffer](
+            name = name,
+            websocketPath = websocketPath,
+            onMessageReceived = onMessageReceived,
+            onError = () =>
+              responseMessagePromises.headOption.map(
+                _.tryFailure(new RuntimeException("Error from WebSocket"))),
+            onClose = () => {
+              openWebsocketPromise = None
+              responseMessagePromises.headOption.map(
+                _.tryFailure(new RuntimeException("WebSocket was closed")))
+            }
+          )))
     }
     openWebsocketPromise.get
   }

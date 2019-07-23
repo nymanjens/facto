@@ -1,5 +1,6 @@
 package hydro.models.access
 
+import java.nio.ByteBuffer
 import java.time
 import java.time.Instant
 
@@ -13,7 +14,7 @@ import app.AppVersion
 import hydro.common.Listenable
 import hydro.common.Listenable.WritableListenable
 import hydro.common.time.Clock
-import hydro.common.websocket.BinaryWebsocketClient
+import hydro.common.websocket.WebsocketClient
 import org.scalajs.dom
 import org.scalajs.dom.raw.Event
 import hydro.common.time.JavaTimeImplicits._
@@ -51,7 +52,7 @@ final class HydroPushSocketClientFactory(implicit clock: Clock) {
     private var lastPacketTime: Instant = clock.nowInstant
 
     private var isClosed = false
-    private var websocketClient: Option[Future[BinaryWebsocketClient]] = Some(
+    private var websocketClient: Option[Future[WebsocketClient[ByteBuffer]]] = Some(
       openWebsocketClient(updateToken))
 
     private val onlineListener: js.Function1[Event, Unit] = _ => openWebsocketIfEmpty()
@@ -78,9 +79,9 @@ final class HydroPushSocketClientFactory(implicit clock: Clock) {
       }
     }
 
-    private def openWebsocketClient(updateToken: UpdateToken): Future[BinaryWebsocketClient] = {
+    private def openWebsocketClient(updateToken: UpdateToken): Future[WebsocketClient[ByteBuffer]] = {
       lastStartToOpenTime = clock.nowInstant
-      BinaryWebsocketClient.open(
+      WebsocketClient.open[ByteBuffer](
         name = name,
         websocketPath = s"websocket/hydropush/$updateToken/",
         onMessageReceived = bytes =>

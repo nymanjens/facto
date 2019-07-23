@@ -25,4 +25,10 @@ final class TriggerablePublisher[T] extends Publisher[T] {
       s.onNext(value)
     }
   }
+
+  def complete(): Unit = {
+    for (s <- subscribers.asScala) {
+      s.onComplete()
+    }
+  }
 }
