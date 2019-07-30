@@ -1,6 +1,7 @@
 package hydro.flux.stores
 
 import scala.collection.immutable.Seq
+import scala.collection.mutable
 
 /**
   * Abstract base class for any store that exposes a single listenable state.
@@ -9,7 +10,7 @@ import scala.collection.immutable.Seq
   */
 abstract class StateStore[State] {
 
-  private var _stateUpdateListeners: Seq[StateStore.Listener] = Seq()
+  private val _stateUpdateListeners: mutable.Set[StateStore.Listener] = mutable.Set()
   private var isCallingListeners: Boolean = false
 
   // **************** Public API: To override ****************//
@@ -19,14 +20,14 @@ abstract class StateStore[State] {
   final def register(listener: StateStore.Listener): Unit = {
     checkNotCallingListeners()
 
-    _stateUpdateListeners = _stateUpdateListeners :+ listener
+    _stateUpdateListeners.add(listener)
     onStateUpdateListenersChange()
   }
 
   final def deregister(listener: StateStore.Listener): Unit = {
     checkNotCallingListeners()
 
-    _stateUpdateListeners = _stateUpdateListeners.filter(_ != listener)
+    _stateUpdateListeners.remove(listener)
     onStateUpdateListenersChange()
   }
 
@@ -41,7 +42,7 @@ abstract class StateStore[State] {
     isCallingListeners = false
   }
 
-  final def stateUpdateListeners: Seq[StateStore.Listener] = _stateUpdateListeners
+  final def stateUpdateListeners: scala.collection.Set[StateStore.Listener] = _stateUpdateListeners
 
   protected final def checkNotCallingListeners(): Unit = {
     require(!isCallingListeners, "checkNotCallingListeners(): But isCallingListeners is true")
