@@ -72,7 +72,7 @@ object EntityModification {
   /**
     * Update to an existing entity.
     *
-    * If no entity exists yet, it is added.
+    * If no entity exists yet, it is not added (i.e. this is not an upsert).
     */
   case class Update[E <: UpdatableEntity: EntityType](updatedEntity: E) extends EntityModification {
     require(updatedEntity.idOption.isDefined, s"Entity ID must be defined (for entity $updatedEntity)")
