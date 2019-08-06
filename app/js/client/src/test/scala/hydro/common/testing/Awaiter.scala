@@ -27,7 +27,9 @@ object Awaiter {
     }
 
     def isEmpty[T](iterable: => Iterable[T]): Future[Unit] = {
-      expectCondition(iterable.isEmpty, throw new AssertionError(s"Expected given iterable to be $verb empty"))
+      expectCondition(
+        iterable.isEmpty,
+        throw new AssertionError(s"Expected given iterable to be $verb empty"))
     }
   }
   final class EventuallyAwaiter extends AwaiterWithType {

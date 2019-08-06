@@ -100,7 +100,6 @@ object JsEntityAccessImplTest extends TestSuite {
     }
   }
 
-
   private final class FakeProxyListener extends JsEntityAccess.Listener {
     private val _modifications: mutable.Buffer[Seq[EntityModification]] = mutable.Buffer()
 
