@@ -1,6 +1,5 @@
 package hydro.flux.stores
 
-import scala.collection.immutable.Seq
 import scala.collection.mutable
 
 /**
@@ -10,7 +9,7 @@ import scala.collection.mutable
   */
 abstract class StateStore[State] {
 
-  private val _stateUpdateListeners: mutable.Set[StateStore.Listener] = mutable.Set()
+  private val _stateUpdateListeners: mutable.Set[StateStore.Listener] = mutable.LinkedHashSet()
   private var isCallingListeners: Boolean = false
 
   // **************** Public API: To override ****************//
