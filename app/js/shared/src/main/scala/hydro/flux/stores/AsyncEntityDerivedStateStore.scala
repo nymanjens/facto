@@ -6,6 +6,7 @@ import hydro.common.JsLoggingUtils.logFailure
 import hydro.models.access.JsEntityAccess
 
 import scala.collection.immutable.Seq
+import scala.collection.mutable
 import scala.concurrent.Future
 import scala.concurrent.Promise
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
@@ -23,7 +24,7 @@ abstract class AsyncEntityDerivedStateStore[State](implicit entityAccess: JsEnti
   private var _state: Option[State] = None
   private var stateIsStale: Boolean = true
   private var stateUpdateInFlight: Boolean = false
-  private var staleBecomesFalseListeners: Seq[StateStore.Listener] = Seq()
+  private val staleBecomesFalseListeners: mutable.Set[StateStore.Listener] = mutable.LinkedHashSet()
 
   /** Buffer of modifications that were added during the last update. */
   private var pendingModifications: Seq[EntityModification] = Seq()
@@ -66,11 +67,11 @@ abstract class AsyncEntityDerivedStateStore[State](implicit entityAccess: JsEnti
 
   // **************** Private helper methods ****************//
   private def registerStaleBecomesFalseListener(listener: StateStore.Listener): Unit = {
-    staleBecomesFalseListeners = staleBecomesFalseListeners :+ listener
+    staleBecomesFalseListeners.add(listener)
   }
 
   private def deregisterStaleBecomesFalseListener(listener: StateStore.Listener): Unit = {
-    staleBecomesFalseListeners = staleBecomesFalseListeners.filter(_ != listener)
+    staleBecomesFalseListeners.remove(listener)
   }
 
   private def startStateUpdate(): Unit = logExceptions {
