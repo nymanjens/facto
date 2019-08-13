@@ -12,7 +12,7 @@ import utest.TestSuite
 import scala.concurrent.Future
 import scala.concurrent.Promise
 
-object SerializingTaskQueueTest extends TestSuite {
+object SerializingTaskQueueJsTest extends TestSuite {
 
   override def tests = TestSuite {
 
