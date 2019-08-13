@@ -24,7 +24,7 @@ import app.models.accounting.config.MoneyReservoir
 import app.models.user.User
 import hydro.common.JsLoggingUtils.LogExceptionsCallback
 import hydro.common.JsLoggingUtils.logExceptions
-import hydro.common.SinglePendingTaskQueue
+import app.common.SinglePendingTaskQueue
 import hydro.common.time.Clock
 import hydro.common.time.LocalDateTime
 import hydro.common.time.LocalDateTimes

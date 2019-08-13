@@ -1,4 +1,4 @@
-package hydro.common
+package app.common
 
 import hydro.common.JsLoggingUtils.logExceptions
 
