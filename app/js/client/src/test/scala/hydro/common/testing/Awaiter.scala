@@ -95,10 +95,10 @@ object Awaiter {
 
     def neverComplete(future: Future[_]): Future[Unit] = {
       val resultPromise = Promise[Unit]()
-      future.map(
-        value =>
+      future.onComplete(
+        tryValue =>
           resultPromise.tryFailure(new java.lang.AssertionError(
-            s"Expected future that never completes, but completed with value $value")))
+            s"Expected future that never completes, but completed with tryValue $tryValue")))
       js.timers.setTimeout(100.milliseconds) {
         resultPromise.trySuccess((): Unit)
       }

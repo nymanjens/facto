@@ -13,9 +13,8 @@ trait SerializingTaskQueue {
   def schedule[T](task: => Future[T]): Future[T]
 }
 object SerializingTaskQueue {
-  def create(): SerializingTaskQueue = new SerializingTaskQueue.WithInfiniteQueue()
-  def withAtMostSingleQueuedTask(): SerializingTaskQueue =
-    new common.SerializingTaskQueue.WithAtMostSingleQueuedTask()
+  def create(): SerializingTaskQueue = new WithInfiniteQueue()
+  def withAtMostSingleQueuedTask(): SerializingTaskQueue = new WithAtMostSingleQueuedTask()
 
   private class WithInfiniteQueue extends SerializingTaskQueue {
     @guardedBy("this")
