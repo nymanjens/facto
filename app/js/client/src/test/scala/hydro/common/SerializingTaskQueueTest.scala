@@ -17,7 +17,7 @@ object SerializingTaskQueueTest extends TestSuite {
   override def tests = TestSuite {
 
     "schedule()" - {
-      val queue = new SerializingTaskQueue
+      val queue = SerializingTaskQueue.create()
       val task1 = Promise[String]()
       val task2 = Promise[String]()
       val task1Counter = new AtomicLong

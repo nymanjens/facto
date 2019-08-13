@@ -36,4 +36,7 @@ object ScalaUtils {
 
   /** Scala version of javax.annotations.Nullable. */
   class nullable extends StaticAnnotation
+
+  /** Scala version of GuardedBy. */
+  class guardedBy(objectName: String) extends StaticAnnotation
 }

@@ -1,14 +1,54 @@
 package hydro.common
 
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicLong
+
+import hydro.common
+import hydro.common.ScalaUtils.guardedBy
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class SerializingTaskQueue {
-  private var mostRecentlyAddedTaskFuture: Future[_] = Future.successful(null)
+trait SerializingTaskQueue {
+  def schedule[T](task: => Future[T]): Future[T]
+}
+object SerializingTaskQueue {
+  def create(): SerializingTaskQueue = new SerializingTaskQueue.WithInfiniteQueue()
+  def withAtMostSingleQueuedTask(): SerializingTaskQueue =
+    new common.SerializingTaskQueue.WithAtMostSingleQueuedTask()
 
-  def schedule[T](task: => Future[T]): Future[T] = {
-    val result: Future[T] = mostRecentlyAddedTaskFuture.flatMap(_ => task)
-    mostRecentlyAddedTaskFuture = result
-    result
+  private class WithInfiniteQueue extends SerializingTaskQueue {
+    @guardedBy("this")
+    private var mostRecentlyAddedTaskFuture: Future[_] = Future.successful(null)
+
+    override def schedule[T](task: => Future[T]): Future[T] = {
+      this.synchronized {
+        val result: Future[T] = mostRecentlyAddedTaskFuture.flatMap(_ => task)
+        mostRecentlyAddedTaskFuture = result
+        result
+      }
+    }
+  }
+
+  private class WithAtMostSingleQueuedTask extends SerializingTaskQueue {
+    private val delegate: SerializingTaskQueue = new WithInfiniteQueue()
+    @guardedBy("this")
+    private var queueContainsTask: Boolean = false
+
+    override def schedule[T](task: => Future[T]): Future[T] = {
+      this.synchronized {
+        if (queueContainsTask) {
+          Future.failed(new RuntimeException("Task was not scheduled"))
+        } else {
+          queueContainsTask = true
+          delegate.schedule {
+            this.synchronized {
+              queueContainsTask = false
+            }
+            task
+          }
+        }
+      }
+    }
   }
 }

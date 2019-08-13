@@ -34,7 +34,7 @@ private final class LocalDatabaseImpl(implicit webWorker: LocalDatabaseWebWorker
                                       secondaryIndexFunction: SecondaryIndexFunction)
     extends LocalDatabase {
 
-  private val serializingWriteQueue = new SerializingTaskQueue()
+  private val serializingWriteQueue = SerializingTaskQueue.create()
 
   // Scala compiler bug workaround: Declare implicit converters
   implicit private val modificationWithIdConverter = ModificationWithId.Converter
