@@ -1,7 +1,7 @@
 package hydro.common
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 class SerializingTaskQueue {
   private var mostRecentlyAddedTaskFuture: Future[_] = Future.successful(null)
