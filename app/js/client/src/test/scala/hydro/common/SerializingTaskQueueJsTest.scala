@@ -60,10 +60,10 @@ object SerializingTaskQueueJsTest extends TestSuite {
 
         await(
           combined(
-            Awaiter.expectEventually.equal(task1Counter.get(), 1L),
-            Awaiter.expectEventually.equal(task2Counter.get(), 1L),
             Awaiter.expectEventually.complete(task1Result, expected = "a"),
             Awaiter.expectEventually.complete(task2Result, expected = "b"),
+            Awaiter.expectEventually.equal(task1Counter.get(), 1L),
+            Awaiter.expectEventually.equal(task2Counter.get(), 1L),
           )
         )
       }
