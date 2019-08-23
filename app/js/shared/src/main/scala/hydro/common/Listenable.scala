@@ -1,6 +1,6 @@
 package hydro.common
 
-import hydro.common.ScalaUtils.visibleForTesting
+import hydro.common.Annotations.visibleForTesting
 import hydro.common.Listenable.FlatMappedListenable
 import hydro.common.Listenable.Listener
 

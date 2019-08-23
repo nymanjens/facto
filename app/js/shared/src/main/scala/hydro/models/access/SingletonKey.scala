@@ -1,7 +1,7 @@
 package hydro.models.access
 
 import hydro.common.ScalaUtils
-import hydro.common.ScalaUtils.visibleForTesting
+import hydro.common.Annotations.visibleForTesting
 import hydro.scala2js.Scala2Js
 import hydro.scala2js.StandardConverters._
 

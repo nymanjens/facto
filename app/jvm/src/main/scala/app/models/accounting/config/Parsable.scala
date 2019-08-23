@@ -3,7 +3,7 @@ package app.models.accounting.config
 import java.util.Collections
 
 import hydro.common.Require.requireNonNull
-import hydro.common.ScalaUtils.nullable
+import hydro.common.Annotations.nullable
 import app.models.accounting.config.Account.{SummaryTotalRowDef => ParsedSummaryTotalRowDef}
 import app.models.accounting.config.MoneyReservoir.NullMoneyReservoir
 import app.models.accounting.config.{Account => ParsedAccount}

@@ -11,7 +11,7 @@ import com.google.inject.Inject
 import hydro.common.GuavaReplacement.Splitter
 import hydro.common.ResourceFiles
 import hydro.common.time.Clock
-import hydro.common.ScalaUtils.visibleForTesting
+import hydro.common.Annotations.visibleForTesting
 import hydro.models.access.EntityAccess
 import play.api.Mode
 import play.api.i18n.I18nSupport

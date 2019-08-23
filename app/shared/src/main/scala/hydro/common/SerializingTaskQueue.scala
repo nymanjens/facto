@@ -4,7 +4,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
 
 import hydro.common
-import hydro.common.ScalaUtils.guardedBy
+import hydro.common.Annotations.guardedBy
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

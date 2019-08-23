@@ -1,6 +1,5 @@
 package hydro.common
 
-import scala.annotation.StaticAnnotation
 import scala.concurrent._
 
 object ScalaUtils {
@@ -30,13 +29,4 @@ object ScalaUtils {
     require(s.startsWith(prefix), s"string doesn't start with prefix: prefix = $prefix, string = $s")
     s.stripPrefix(prefix)
   }
-
-  /** Scala version of com.google.common.annotations.VisibleForTesting. */
-  class visibleForTesting extends StaticAnnotation
-
-  /** Scala version of javax.annotations.Nullable. */
-  class nullable extends StaticAnnotation
-
-  /** Scala version of GuardedBy. */
-  class guardedBy(objectName: String) extends StaticAnnotation
 }

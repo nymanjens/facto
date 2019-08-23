@@ -2,7 +2,7 @@ package app.flux.react.uielements.input.bootstrap
 
 import hydro.common.GuavaReplacement.Splitter
 import hydro.common.I18n
-import hydro.common.ScalaUtils.visibleForTesting
+import hydro.common.Annotations.visibleForTesting
 import app.common.money.Currency
 import app.common.money.DatedMoney
 import app.common.money.ExchangeRateManager

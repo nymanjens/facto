@@ -2,7 +2,7 @@ package app.flux.react.app.transactionviews
 
 import hydro.common.CollectionUtils.ifThenSeq
 import hydro.common.I18n
-import hydro.common.ScalaUtils.visibleForTesting
+import hydro.common.Annotations.visibleForTesting
 import hydro.common.Tags
 import app.common.money.Currency
 import app.common.money.ExchangeRateManager
