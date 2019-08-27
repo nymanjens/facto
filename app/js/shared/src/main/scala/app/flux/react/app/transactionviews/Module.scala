@@ -3,6 +3,7 @@ package app.flux.react.app.transactionviews
 import hydro.common.I18n
 import app.common.money.ExchangeRateManager
 import app.flux.stores.GlobalMessagesStore
+import app.flux.stores.CollapsedExpandedStateStoreFactory
 import app.flux.stores.entries.factories._
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Config
@@ -25,6 +26,7 @@ final class Module(implicit i18n: I18n,
                    summaryForYearStoreFactory: SummaryForYearStoreFactory,
                    summaryYearsStoreFactory: SummaryYearsStoreFactory,
                    summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
+                   collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
                    globalMessagesStore: GlobalMessagesStore,
                    clock: Clock,
                    pageHeader: PageHeader,

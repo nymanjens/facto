@@ -46,6 +46,7 @@ final class ClientAppModule(implicit getInitialDataResponse: GetInitialDataRespo
   implicit private val summaryYearsStoreFactory = fluxStoresModule.summaryYearsStoreFactory
   implicit private val summaryExchangeRateGainsStoreFactory =
     fluxStoresModule.summaryExchangeRateGainsStoreFactory
+  implicit private val collapsedExpandedStateStoreFactory = fluxStoresModule.collapsedExpandedStateStoreFactory
   implicit private val globalMessagesStore = fluxStoresModule.globalMessagesStore
   implicit private val pageLoadingStateStore = fluxStoresModule.pageLoadingStateStore
   implicit private val pendingModificationsStore = fluxStoresModule.pendingModificationsStore
