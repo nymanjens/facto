@@ -35,7 +35,7 @@ import scala.collection.immutable.Seq
 import scala.scalajs.js
 
 final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
-//                     collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
+                     collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
                      dispatcher: Dispatcher,
                      entityAccess: AppJsEntityAccess,
                      clock: Clock,
@@ -48,23 +48,20 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
 
   private val entriesListTable: EntriesListTable[CashFlowEntry, MoneyReservoir] = new EntriesListTable
 
-//  private val collapsedExpandedStateStore = collapsedExpandedStateStoreFactory
-//    .get(getClass.getSimpleName)
-//    .initializedWithDefaultExpanded(user.expandCashFlowTablesByDefault)
+  private val collapsedExpandedStateStore = collapsedExpandedStateStoreFactory
+    .get(getClass.getSimpleName)
+    .initializedWithDefaultExpanded(user.expandCashFlowTablesByDefault)
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
-    .initialState(
-      State(
-        includeUnrelatedReservoirs = false,
-        includeHiddenReservoirs = false,
-        setExpanded = Unique(user.expandCashFlowTablesByDefault)))
+    .initialState(State(includeUnrelatedReservoirs = false, includeHiddenReservoirs = false))
     .renderPS(
       ($, props, state) => {
         implicit val router = props.router
         <.span(
           pageHeader.withExtension(router.currentPage) {
-            CollapseAllExpandAllButtons(setExpanded => $.modState(_.copy(setExpanded = setExpanded)))
+            CollapseAllExpandAllButtons(
+              onExpandedUpdate = collapsedExpandedStateStore.setExpandedForAllTables)
           }, {
             for {
               account <- accountingConfig.personallySortedAccounts
@@ -86,7 +83,7 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
                       numEntriesStrategy = NumEntriesStrategy(
                         start = CashFlow.minNumEntriesPerReservoir,
                         intermediateBeforeInf = Seq(150)),
-                      setExpanded = state.setExpanded,
+//                      setExpanded = state.setExpanded,
                       additionalInput = reservoir,
                       latestEntryToTableTitleExtra =
                         latestEntry => s"${i18n("app.balance")}: ${latestEntry.balance}",
@@ -221,9 +218,10 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
 
   // **************** Private inner types ****************//
   private case class Props(router: RouterContext)
-  private case class State(includeUnrelatedReservoirs: Boolean,
-                           includeHiddenReservoirs: Boolean,
-                           setExpanded: Unique[Boolean])
+  private case class State(
+      includeUnrelatedReservoirs: Boolean,
+      includeHiddenReservoirs: Boolean,
+  )
 }
 
 object CashFlow {

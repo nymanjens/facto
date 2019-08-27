@@ -48,7 +48,7 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
         implicit val router = props.router
         <.span(
           pageHeader.withExtension(router.currentPage)(
-            CollapseAllExpandAllButtons(setExpanded => $.modState(_.copy(setExpanded = setExpanded))),
+//            CollapseAllExpandAllButtons(setExpanded => $.modState(_.copy(setExpanded = setExpanded))),
             " ",
             simplifyLiquidationButton()
           ),

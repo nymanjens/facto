@@ -41,9 +41,9 @@ final class Endowments(implicit entriesStoreFactory: EndowmentEntriesStoreFactor
       ($, props, state) => {
         implicit val router = props.router
         <.span(
-          pageHeader.withExtension(router.currentPage) {
-            CollapseAllExpandAllButtons(setExpanded => $.modState(_.copy(setExpanded = setExpanded)))
-          },
+//          pageHeader.withExtension(router.currentPage) {
+//            CollapseAllExpandAllButtons(setExpanded => $.modState(_.copy(setExpanded = setExpanded)))
+//          },
           Panel(i18n("app.all-accounts")) {
             {
               for (account <- accountingConfig.personallySortedAccounts) yield {
