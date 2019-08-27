@@ -12,6 +12,7 @@ import app.flux.react.uielements
 import app.flux.router.AppPages
 import app.flux.stores.entries.CashFlowEntry
 import app.flux.stores.entries.factories.CashFlowEntriesStoreFactory
+import app.flux.stores.CollapsedExpandedStateStoreFactory
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.BalanceCheck
 import app.models.accounting.config.Config
@@ -34,6 +35,7 @@ import scala.collection.immutable.Seq
 import scala.scalajs.js
 
 final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
+//                     collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
                      dispatcher: Dispatcher,
                      entityAccess: AppJsEntityAccess,
                      clock: Clock,
@@ -45,6 +47,10 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
 ) {
 
   private val entriesListTable: EntriesListTable[CashFlowEntry, MoneyReservoir] = new EntriesListTable
+
+//  private val collapsedExpandedStateStore = collapsedExpandedStateStoreFactory
+//    .get(getClass.getSimpleName)
+//    .initializedWithDefaultExpanded(user.expandCashFlowTablesByDefault)
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
