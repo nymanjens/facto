@@ -17,8 +17,10 @@ abstract class EntriesListStoreFactory[Entry, AdditionalInput](implicit entityAc
   protected def createNew(maxNumEntries: Int, input: AdditionalInput): Store
 
   // **************** Implementation of EntriesStoreFactory methods/types ****************//
-  override protected final def createNew(input: Input) =
+  override protected final def createNew(input: Input) = {
+    require(input.maxNumEntries > 0, s"maxNumEntries must be positive but was ${input.maxNumEntries}")
     createNew(input.maxNumEntries, input.additionalInput)
+  }
 
   /* override */
   case class Input(maxNumEntries: Int, additionalInput: AdditionalInput)
