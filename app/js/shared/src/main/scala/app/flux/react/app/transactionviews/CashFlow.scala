@@ -48,9 +48,8 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
 
   private val entriesListTable: EntriesListTable[CashFlowEntry, MoneyReservoir] = new EntriesListTable
 
-  private val collapsedExpandedStateStore = collapsedExpandedStateStoreFactory
-    .get(getClass.getSimpleName)
-    .initializedWithDefaultExpanded(user.expandCashFlowTablesByDefault)
+  private val collapsedExpandedStateStoreHandle = collapsedExpandedStateStoreFactory
+    .initializeView(getClass.getSimpleName, defaultExpanded = user.expandCashFlowTablesByDefault)
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
@@ -61,7 +60,7 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
         <.span(
           pageHeader.withExtension(router.currentPage) {
             CollapseAllExpandAllButtons(
-              onExpandedUpdate = collapsedExpandedStateStore.setExpandedForAllTables)
+              onExpandedUpdate = collapsedExpandedStateStoreHandle.setExpandedForAllTables)
           }, {
             for {
               account <- accountingConfig.personallySortedAccounts

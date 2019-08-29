@@ -1,61 +1,63 @@
 package app.flux.stores
 
 import app.flux.stores.CollapsedExpandedStateStoreFactory.State
+import hydro.common.Listenable
+import hydro.common.Listenable.WritableListenable
 import hydro.flux.stores.StateStore
 import hydro.flux.stores.StoreFactory
 
-final class CollapsedExpandedStateStoreFactory() extends StoreFactory {
+import scala.collection.mutable
+
+final class CollapsedExpandedStateStoreFactory() {
 
   // **************** Public API **************** //
-  def get(viewName: String): Store = getCachedOrCreate(viewName)
+  def initializeView(viewName: String, defaultExpanded: Boolean = true): ViewHandle =
+    new ViewHandle(viewName, defaultExpanded: Boolean)
 
-  // **************** Implementation of base class methods and types **************** //
-  /* override */
-  protected type Input = String
+  final class ViewHandle(viewName: String, private var defaultExpanded: Boolean) extends StoreFactory {
 
-  protected override def createNew(input: Input): Store = new Store(input)
+    private val allStores: mutable.Set[Store] = mutable.Set()
 
-  /* override */
-  final class Store(viewName: String) extends StateStore[State] {
-
-    // **************** Private fields **************** //
-    private var inMemoryState: State = State(tableNameToExpandedMap = Map(), defaultExpanded = true)
-
-    // **************** Public API **************** //
-    def initializedWithDefaultExpanded(expanded: Boolean): Store = {
-      updateState(_ => State(tableNameToExpandedMap = Map(), defaultExpanded = expanded))
-      this
-    }
-
-    def setExpanded(tableName: String, expanded: Boolean): Unit = {
-      updateState(s => s.copy(tableNameToExpandedMap = s.tableNameToExpandedMap.updated(tableName, expanded)))
-    }
+    def getStore(tableName: String): Store = getCachedOrCreate(tableName)
 
     def setExpandedForAllTables(expanded: Boolean): Unit = {
-      updateState(_ => State(tableNameToExpandedMap = Map(), defaultExpanded = expanded))
+      for (store <- allStores) {
+        store.inMemoryState.set(State(expanded = expanded))
+      }
+      defaultExpanded = expanded
     }
 
-    // **************** Implementation of base class methods **************** //
-    override def state: State = inMemoryState
+    // **************** Implementation of base class methods and types **************** //
+    /* override */
+    protected type Input = String
 
-    // **************** Private helper methods **************** //
-    private def updateState(updateFunc: State => State): Unit = {
-      val oldState = inMemoryState
-      inMemoryState = updateFunc(inMemoryState)
+    protected override def createNew(input: Input): Store = {
+      val store = new Store(input)
+      allStores.add(store)
+      store
+    }
 
-      if (inMemoryState != oldState) {
-        invokeStateUpdateListeners()
+    /* override */
+    final class Store(viewName: String) extends CollapsedExpandedStateStoreFactory.Store {
+
+      // **************** Private fields **************** //
+      private[CollapsedExpandedStateStoreFactory] var inMemoryState: WritableListenable[State] =
+        WritableListenable[State](State(expanded = true))
+      inMemoryState.registerListener(newValue => invokeStateUpdateListeners())
+
+      // **************** Implementation of base class methods **************** //
+      override def state: State = inMemoryState.get
+      override def setExpandedForSingleTable(expanded: Boolean): Unit = {
+        inMemoryState.set(State(expanded = expanded))
       }
     }
   }
-
 }
 
 object CollapsedExpandedStateStoreFactory {
-  case class State(
-      private[CollapsedExpandedStateStoreFactory] val tableNameToExpandedMap: Map[String, Boolean],
-      private[CollapsedExpandedStateStoreFactory] val defaultExpanded: Boolean,
-  ) {
-    def expanded(tableName: String): Boolean = tableNameToExpandedMap.getOrElse(tableName, defaultExpanded)
+  case class State(expanded: Boolean)
+
+  abstract class Store extends StateStore[State] {
+    def setExpandedForSingleTable(expanded: Boolean): Unit
   }
 }
