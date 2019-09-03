@@ -5,17 +5,55 @@ import hydro.common.I18n
 import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.ReactVdomUtils.^^
 import hydro.flux.react.uielements.Bootstrap.Size
+import hydro.flux.react.HydroReactComponent
 import japgolly.scalajs.react._
+import japgolly.scalajs.react.vdom.html_<^
 import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
 import scala.scalajs.js
 
-object Table {
+object Table extends HydroReactComponent.Stateless {
 
-  private val component = ScalaComponent
-    .builder[Props](getClass.getSimpleName)
-    .renderP(($, props) =>
+  // **************** API ****************//
+  def apply(title: String = null,
+            tableClasses: Seq[String] = Seq(),
+            expanded: Boolean = true,
+            onToggleCollapsedExpanded: Option[() => Unit] = None,
+            expandNumEntriesCallback: Option[Callback] = None,
+            tableTitleExtra: VdomElement = null,
+            tableHeaders: Seq[VdomElement],
+            tableRowDatas: Seq[TableRowData])(implicit i18n: I18n): VdomElement = {
+    component(
+      Props(
+        title = Option(title),
+        tableClasses = tableClasses,
+        expanded = expanded,
+        onToggleCollapsedExpanded = onToggleCollapsedExpanded,
+        expandNumEntriesCallback = expandNumEntriesCallback,
+        tableTitleExtra = Option(tableTitleExtra),
+        tableHeaders = tableHeaders,
+        tableRowDatas = tableRowDatas
+      ))
+  }
+
+  // **************** Implementation of HydroReactComponent methods ****************//
+  override protected val statelessConfig = StatelessComponentConfig(backendConstructor = new Backend(_))
+
+  // **************** Implementation of HydroReactComponent types ****************//
+  protected case class Props(title: Option[String],
+                             tableClasses: Seq[String],
+                             expanded: Boolean,
+                             onToggleCollapsedExpanded: Option[() => Unit],
+                             expandNumEntriesCallback: Option[Callback],
+                             tableTitleExtra: Option[VdomElement],
+                             tableHeaders: Seq[VdomElement],
+                             tableRowDatas: Seq[TableRowData])(implicit val i18n: I18n) {
+    def colSpan: Int = tableHeaders.size
+  }
+
+  protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
+    override def render(props: Props, state: Unit) = {
       <.table(
         ^^.classes(
           Seq("table", "table-bordered", "table-hover", "table-condensed", "table-overflow-elipsis") ++ props.tableClasses),
@@ -79,43 +117,10 @@ object Table {
             }
           )
         }
-    ))
-    .build
-
-  // **************** API ****************//
-  def apply(title: String = null,
-            tableClasses: Seq[String] = Seq(),
-            expanded: Boolean = true,
-            onToggleCollapsedExpanded: Option[() => Unit] = None,
-            expandNumEntriesCallback: Option[Callback] = None,
-            tableTitleExtra: VdomElement = null,
-            tableHeaders: Seq[VdomElement],
-            tableRowDatas: Seq[TableRowData])(implicit i18n: I18n): VdomElement = {
-    component(
-      Props(
-        title = Option(title),
-        tableClasses = tableClasses,
-        expanded = expanded,
-        onToggleCollapsedExpanded = onToggleCollapsedExpanded,
-        expandNumEntriesCallback = expandNumEntriesCallback,
-        tableTitleExtra = Option(tableTitleExtra),
-        tableHeaders = tableHeaders,
-        tableRowDatas = tableRowDatas
-      ))
+      )
+    }
   }
 
   // **************** Public inner types ****************//
   case class TableRowData(cells: Seq[VdomElement], deemphasize: Boolean = false)
-
-  // **************** Private inner types ****************//
-  private case class Props(title: Option[String],
-                           tableClasses: Seq[String],
-                           expanded: Boolean,
-                           onToggleCollapsedExpanded: Option[() => Unit],
-                           expandNumEntriesCallback: Option[Callback],
-                           tableTitleExtra: Option[VdomElement],
-                           tableHeaders: Seq[VdomElement],
-                           tableRowDatas: Seq[TableRowData])(implicit val i18n: I18n) {
-    def colSpan: Int = tableHeaders.size
-  }
 }
