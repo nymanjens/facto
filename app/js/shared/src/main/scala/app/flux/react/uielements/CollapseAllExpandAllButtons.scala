@@ -1,6 +1,7 @@
-package hydro.flux.react.uielements
+package app.flux.react.uielements
 
 import hydro.common.I18n
+import hydro.flux.react.uielements.Bootstrap
 import hydro.flux.react.uielements.Bootstrap.Variant
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._

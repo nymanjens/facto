@@ -9,6 +9,7 @@ import app.common.money.ExchangeRateManager
 import app.flux.action.AppActions
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.react.uielements
+import app.flux.react.uielements.CollapseAllExpandAllButtons
 import app.flux.router.AppPages
 import app.flux.stores.entries.CashFlowEntry
 import app.flux.stores.entries.factories.CashFlowEntriesStoreFactory
@@ -22,7 +23,6 @@ import hydro.common.JsLoggingUtils.LogExceptionsCallback
 import hydro.common.time.Clock
 import hydro.flux.action.Dispatcher
 import hydro.flux.react.ReactVdomUtils.<<
-import hydro.flux.react.uielements.CollapseAllExpandAllButtons
 import hydro.flux.react.uielements.PageHeader
 import hydro.flux.react.uielements.Panel
 import hydro.flux.router.RouterContext

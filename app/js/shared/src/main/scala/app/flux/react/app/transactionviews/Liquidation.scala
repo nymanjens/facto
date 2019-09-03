@@ -3,6 +3,7 @@ package app.flux.react.app.transactionviews
 import app.common.money.ExchangeRateManager
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.react.uielements
+import app.flux.react.uielements.CollapseAllExpandAllButtons
 import app.flux.router.AppPages
 import app.flux.stores.entries.AccountPair
 import app.flux.stores.entries.LiquidationEntry
@@ -18,7 +19,6 @@ import hydro.common.time.Clock
 import hydro.flux.react.uielements.Bootstrap
 import hydro.flux.react.uielements.Bootstrap.Size
 import hydro.flux.react.uielements.Bootstrap.Variant
-import hydro.flux.react.uielements.CollapseAllExpandAllButtons
 import hydro.flux.react.uielements.PageHeader
 import hydro.flux.react.uielements.Panel
 import hydro.flux.router.RouterContext

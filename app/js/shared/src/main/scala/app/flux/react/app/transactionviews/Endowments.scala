@@ -5,6 +5,7 @@ import hydro.common.I18n
 import app.common.money.ExchangeRateManager
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.react.uielements
+import app.flux.react.uielements.CollapseAllExpandAllButtons
 import app.flux.stores.entries.GeneralEntry
 import app.flux.stores.entries.factories.EndowmentEntriesStoreFactory
 import app.flux.stores.CollapsedExpandedStateStoreFactory
@@ -14,7 +15,6 @@ import app.models.accounting.config.Config
 import app.models.user.User
 import hydro.common.Unique
 import hydro.common.time.Clock
-import hydro.flux.react.uielements.CollapseAllExpandAllButtons
 import hydro.flux.react.uielements.PageHeader
 import hydro.flux.react.uielements.Panel
 import hydro.flux.router.RouterContext
