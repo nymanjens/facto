@@ -49,6 +49,11 @@ abstract class StateStore[State] {
 }
 
 object StateStore {
+
+  def alwaysReturning[State](fixedState: State): StateStore[State] = new StateStore[State] {
+    override def state: State = fixedState
+  }
+
   trait Listener {
     def onStateUpdate(): Unit
   }

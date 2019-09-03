@@ -40,6 +40,7 @@ final class Module(implicit i18n: I18n,
   implicit val summaryForYearStoreFactory = new SummaryForYearStoreFactory
   implicit val summaryYearsStoreFactory = new SummaryYearsStoreFactory
   implicit val summaryExchangeRateGainsStoreFactory = new SummaryExchangeRateGainsStoreFactory
+  implicit val collapsedExpandedStateStoreFactory = new CollapsedExpandedStateStoreFactory
   implicit val globalMessagesStore = new GlobalMessagesStore
   implicit val pageLoadingStateStore = new PageLoadingStateStore
   implicit val pendingModificationsStore = new PendingModificationsStore

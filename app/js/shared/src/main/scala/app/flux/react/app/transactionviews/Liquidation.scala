@@ -1,25 +1,24 @@
 package app.flux.react.app.transactionviews
 
-import hydro.flux.react.uielements.Bootstrap
-import hydro.flux.react.uielements.Bootstrap.Size
-import hydro.flux.react.uielements.Bootstrap.Variant
-import hydro.common.Formatting._
-import hydro.common.I18n
 import app.common.money.ExchangeRateManager
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.react.uielements
+import app.flux.react.uielements.CollapseAllExpandAllButtons
 import app.flux.router.AppPages
 import app.flux.stores.entries.AccountPair
 import app.flux.stores.entries.LiquidationEntry
 import app.flux.stores.entries.factories.LiquidationEntriesStoreFactory
+import app.flux.stores.CollapsedExpandedStateStoreFactory
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Account
 import app.models.accounting.config.Config
 import app.models.user.User
-import hydro.common.Unique
+import hydro.common.Formatting._
+import hydro.common.I18n
 import hydro.common.time.Clock
-import hydro.flux.react.ReactVdomUtils.^^
-import hydro.flux.react.uielements.CollapseAllExpandAllButtons
+import hydro.flux.react.uielements.Bootstrap
+import hydro.flux.react.uielements.Bootstrap.Size
+import hydro.flux.react.uielements.Bootstrap.Variant
 import hydro.flux.react.uielements.PageHeader
 import hydro.flux.react.uielements.Panel
 import hydro.flux.router.RouterContext
@@ -28,27 +27,32 @@ import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
 
-final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFactory,
-                        entityAccess: AppJsEntityAccess,
-                        clock: Clock,
-                        accountingConfig: Config,
-                        user: User,
-                        exchangeRateManager: ExchangeRateManager,
-                        i18n: I18n,
-                        pageHeader: PageHeader,
+final class Liquidation(
+    implicit entriesStoreFactory: LiquidationEntriesStoreFactory,
+    collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
+    entityAccess: AppJsEntityAccess,
+    clock: Clock,
+    accountingConfig: Config,
+    user: User,
+    exchangeRateManager: ExchangeRateManager,
+    i18n: I18n,
+    pageHeader: PageHeader,
 ) {
 
   private val entriesListTable: EntriesListTable[LiquidationEntry, AccountPair] = new EntriesListTable
+  private val collapsedExpandedStateStoreHandle = collapsedExpandedStateStoreFactory
+    .initializeView(getClass.getSimpleName, defaultExpanded = user.expandLiquidationTablesByDefault)
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
-    .initialState(State(setExpanded = Unique(user.expandLiquidationTablesByDefault)))
+    .initialState(State())
     .renderPS(
       ($, props, state) => {
         implicit val router = props.router
         <.span(
           pageHeader.withExtension(router.currentPage)(
-            CollapseAllExpandAllButtons(setExpanded => $.modState(_.copy(setExpanded = setExpanded))),
+            CollapseAllExpandAllButtons(
+              onExpandedUpdate = collapsedExpandedStateStoreHandle.setExpandedForAllTables),
             " ",
             simplifyLiquidationButton()
           ),
@@ -60,14 +64,15 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
                 if i1 < i2
               } yield {
                 val accountPair = AccountPair(account1, account2)
+                val tableName = s"${account1.code}_${account2.code}"
                 entriesListTable(
                   tableTitle = i18n("app.debt-of", account1.longName, account2.longName),
                   tableClasses = Seq("table-liquidation"),
-                  key = s"${account1.code}_${account2.code}",
+                  key = tableName,
                   numEntriesStrategy = NumEntriesStrategy(
                     start = Liquidation.minNumEntriesPerPair,
                     intermediateBeforeInf = Seq(30)),
-                  setExpanded = state.setExpanded,
+                  collapsedExpandedStateStore = Some(collapsedExpandedStateStoreHandle.getStore(tableName)),
                   additionalInput = accountPair,
                   latestEntryToTableTitleExtra = latestEntry => latestEntry.debt.toString,
                   hideEmptyTable = true,
@@ -128,7 +133,7 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
 
   // **************** Private inner types ****************//
   private case class Props(router: RouterContext)
-  private case class State(setExpanded: Unique[Boolean])
+  private case class State()
 }
 
 object Liquidation {
