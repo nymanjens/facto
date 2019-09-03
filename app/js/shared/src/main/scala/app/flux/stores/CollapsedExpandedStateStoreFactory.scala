@@ -42,7 +42,7 @@ final class CollapsedExpandedStateStoreFactory() {
 
       // **************** Private fields **************** //
       private[CollapsedExpandedStateStoreFactory] var inMemoryState: WritableListenable[State] =
-        WritableListenable[State](State(expanded = true))
+        WritableListenable[State](State(expanded = defaultExpanded))
       inMemoryState.registerListener(newValue => invokeStateUpdateListeners())
 
       // **************** Implementation of base class methods **************** //
