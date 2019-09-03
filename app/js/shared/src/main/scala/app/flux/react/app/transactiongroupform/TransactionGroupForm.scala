@@ -10,6 +10,7 @@ import app.common.money.ReferenceMoney
 import app.flux.action.AppActions
 import app.flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
 import app.flux.react.app.transactionviews.Liquidation
+import app.flux.router.AppPages
 import app.flux.stores.entries.AccountPair
 import app.flux.stores.entries.factories.LiquidationEntriesStoreFactory
 import app.models.access.AppJsEntityAccess
@@ -23,6 +24,7 @@ import hydro.common.JsLoggingUtils.LogExceptionsFuture
 import hydro.common.JsLoggingUtils.logExceptions
 import hydro.common.time.Clock
 import hydro.common.time.JavaTimeImplicits._
+import hydro.common.time.LocalDateTime
 import hydro.flux.action.Dispatcher
 import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.ReactVdomUtils.^^
@@ -98,6 +100,39 @@ final class TransactionGroupForm(implicit i18n: I18n,
         router = router
       )
     })
+
+  def forCreateFromCopy(transactionGroupId: Long, returnToPath: Path, router: RouterContext): VdomElement = {
+    def clearedUncopyableFields(groupPartial: TransactionGroup.Partial): TransactionGroup.Partial = {
+      val clearedTransactions = for (transaction <- groupPartial.transactions) yield {
+        Transaction.Partial(
+          beneficiary = transaction.beneficiary,
+          moneyReservoir = transaction.moneyReservoir,
+          category = transaction.category,
+          description = transaction.description,
+          flowInCents = transaction.flowInCents,
+          detailDescription = transaction.detailDescription,
+          tags = transaction.tags,
+        )
+      }
+
+      TransactionGroup.Partial(
+        transactions = clearedTransactions,
+        zeroSum = groupPartial.zeroSum,
+      )
+    }
+
+    create(async {
+      val group = await(entityAccess.newQuery[TransactionGroup]().findById(transactionGroupId))
+      val transactions = await(group.transactions)
+
+      Props(
+        operationMeta = OperationMeta.AddNew,
+        groupPartial = clearedUncopyableFields(TransactionGroup.Partial.from(group, transactions)),
+        returnToPath = returnToPath,
+        router = router
+      )
+    })
+  }
 
   def forReservoir(reservoirCode: String, returnToPath: Path, router: RouterContext): VdomElement = {
     val reservoir = accountingConfig.moneyReservoir(reservoirCode)
@@ -275,12 +310,19 @@ final class TransactionGroupForm(implicit i18n: I18n,
           Bootstrap.Col(lg = 12)(
             pageHeader.withExtension(router.currentPage)(
               <<.ifThen(props.operationMeta.isInstanceOf[OperationMeta.Edit]) {
-                Bootstrap.Button(tag = <.a)(
-                  ^.className := "delete-button",
-                  Bootstrap.FontAwesomeIcon("times"),
+                <.span(
+                  Bootstrap.Button(tag = <.a)(
+                    ^.className := "delete-button",
+                    Bootstrap.FontAwesomeIcon("times"),
+                    " ",
+                    i18n("app.delete"),
+                    ^.onClick --> onDelete
+                  ),
                   " ",
-                  i18n("app.delete"),
-                  ^.onClick --> onDelete
+                  Bootstrap.Button(tag = <.a)(
+                    Bootstrap.FontAwesomeIcon("copy"),
+                    ^.onClick --> onCopy
+                  ),
                 )
               },
               <.span(
@@ -524,6 +566,15 @@ final class TransactionGroupForm(implicit i18n: I18n,
         case OperationMeta.Edit(group, transactions) =>
           dispatcher.dispatch(AppActions.RemoveTransactionGroup(transactionGroupWithId = group))
           props.router.setPath(props.returnToPath)
+      }
+    }
+    private def onCopy(implicit router: RouterContext): Callback = LogExceptionsCallback {
+      val props = $.props.runNow()
+
+      props.operationMeta match {
+        case OperationMeta.AddNew => throw new AssertionError("Should never happen")
+        case OperationMeta.Edit(group, transactions) =>
+          props.router.setPage(AppPages.NewTransactionGroupFromCopy(transactionGroupId = group.id))
       }
     }
   }

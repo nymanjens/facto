@@ -76,6 +76,19 @@ object AppPages {
       EditTransactionGroup(transactionGroupId, HasReturnTo.getCurrentEncodedPath)
   }
 
+  case class NewTransactionGroupFromCopy private (transactionGroupId: Long,
+                                                  override val encodedReturnTo: Option[String])
+      extends HasReturnTo
+      with Page {
+    override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
+      Future.successful(i18n("app.new-transaction"))
+    override def iconClass = "icon-new-empty"
+  }
+  object NewTransactionGroupFromCopy {
+    def apply(transactionGroupId: Long)(implicit routerContext: RouterContext): NewTransactionGroupFromCopy =
+      NewTransactionGroupFromCopy(transactionGroupId, HasReturnTo.getCurrentEncodedPath)
+  }
+
   case class NewTransactionGroupFromReservoir private (reservoirCode: String,
                                                        override val encodedReturnTo: Option[String])
       extends HasReturnTo

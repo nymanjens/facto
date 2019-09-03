@@ -84,6 +84,14 @@ private[router] final class RouterFactory(implicit reactAppModule: app.flux.reac
               reactAppModule.transactionGroupForm.forEdit(page.transactionGroupId, page.returnToPath, ctl)
           }
 
+          | dynamicRuleFromPage(_ / (long ~ returnToPath).caseClass[AppPages.NewTransactionGroupFromCopy]) {
+            (page, ctl) =>
+              reactAppModule.transactionGroupForm.forCreateFromCopy(
+                page.transactionGroupId,
+                page.returnToPath,
+                ctl)
+          }
+
           | dynamicRuleFromPage(
             _ / (codeString ~ returnToPath).caseClass[AppPages.NewTransactionGroupFromReservoir]) {
             (page, ctl) =>
