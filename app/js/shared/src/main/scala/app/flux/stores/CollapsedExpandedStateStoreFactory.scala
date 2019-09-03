@@ -11,7 +11,7 @@ import scala.collection.mutable
 final class CollapsedExpandedStateStoreFactory() {
 
   // **************** Public API **************** //
-  def initializeView(viewName: String, defaultExpanded: Boolean = true): ViewHandle =
+  def initializeView(viewName: String, defaultExpanded: Boolean): ViewHandle =
     new ViewHandle(viewName, defaultExpanded = defaultExpanded)
 
   final class ViewHandle(viewName: String, private var defaultExpanded: Boolean) extends StoreFactory {
