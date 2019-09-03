@@ -12,6 +12,7 @@ import app.flux.router.AppPages
 import app.flux.stores.entries.AccountPair
 import app.flux.stores.entries.LiquidationEntry
 import app.flux.stores.entries.factories.LiquidationEntriesStoreFactory
+import app.flux.stores.CollapsedExpandedStateStoreFactory
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Account
 import app.models.accounting.config.Config
@@ -28,7 +29,7 @@ import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
 
-final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFactory,
+final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFactory,collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
                         entityAccess: AppJsEntityAccess,
                         clock: Clock,
                         accountingConfig: Config,
@@ -67,7 +68,6 @@ final class Liquidation(implicit entriesStoreFactory: LiquidationEntriesStoreFac
                   numEntriesStrategy = NumEntriesStrategy(
                     start = Liquidation.minNumEntriesPerPair,
                     intermediateBeforeInf = Seq(30)),
-                  setExpanded = state.setExpanded,
                   additionalInput = accountPair,
                   latestEntryToTableTitleExtra = latestEntry => latestEntry.debt.toString,
                   hideEmptyTable = true,

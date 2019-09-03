@@ -19,7 +19,6 @@ import app.models.accounting.config.Config
 import app.models.accounting.config.MoneyReservoir
 import app.models.user.User
 import hydro.common.JsLoggingUtils.LogExceptionsCallback
-import hydro.common.Unique
 import hydro.common.time.Clock
 import hydro.flux.action.Dispatcher
 import hydro.flux.react.ReactVdomUtils.<<
@@ -34,20 +33,20 @@ import japgolly.scalajs.react.vdom.html_<^._
 import scala.collection.immutable.Seq
 import scala.scalajs.js
 
-final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
-                     collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
-                     dispatcher: Dispatcher,
-                     entityAccess: AppJsEntityAccess,
-                     clock: Clock,
-                     accountingConfig: Config,
-                     user: User,
-                     exchangeRateManager: ExchangeRateManager,
-                     i18n: I18n,
-                     pageHeader: PageHeader,
+final class CashFlow(
+    implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
+    collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
+    dispatcher: Dispatcher,
+    entityAccess: AppJsEntityAccess,
+    clock: Clock,
+    accountingConfig: Config,
+    user: User,
+    exchangeRateManager: ExchangeRateManager,
+    i18n: I18n,
+    pageHeader: PageHeader,
 ) {
 
   private val entriesListTable: EntriesListTable[CashFlowEntry, MoneyReservoir] = new EntriesListTable
-
   private val collapsedExpandedStateStoreHandle = collapsedExpandedStateStoreFactory
     .initializeView(getClass.getSimpleName, defaultExpanded = user.expandCashFlowTablesByDefault)
 
@@ -75,14 +74,15 @@ final class CashFlow(implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
                         includeHidden = state.includeHiddenReservoirs)
                     if reservoir.owner == account
                   } yield {
+                    val tableName = reservoir.code
                     entriesListTable.withRowNumber(
                       tableTitle = reservoir.name,
                       tableClasses = Seq("table-cashflow"),
-                      key = reservoir.code,
+                      key = tableName,
                       numEntriesStrategy = NumEntriesStrategy(
                         start = CashFlow.minNumEntriesPerReservoir,
                         intermediateBeforeInf = Seq(150)),
-//                      setExpanded = state.setExpanded,
+                      collapsedExpandedStateStore = Some(collapsedExpandedStateStoreHandle.getStore(tableName)),
                       additionalInput = reservoir,
                       latestEntryToTableTitleExtra =
                         latestEntry => s"${i18n("app.balance")}: ${latestEntry.balance}",

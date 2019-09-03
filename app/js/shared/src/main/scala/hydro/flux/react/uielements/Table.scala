@@ -2,8 +2,6 @@ package hydro.flux.react.uielements
 
 import hydro.common.CollectionUtils.ifThenSeq
 import hydro.common.I18n
-import hydro.common.JsLoggingUtils.LogExceptionsCallback
-import hydro.common.Unique
 import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.ReactVdomUtils.^^
 import hydro.flux.react.uielements.Bootstrap.Size
@@ -25,7 +23,7 @@ object Table {
           <<.ifDefined(props.title) { title =>
             <.tr(
               ^^.classes("info"),
-              ^^.ifDefined(props.toggleCollapsedExpandedCallback) { callback =>
+              ^^.ifDefined(props.onToggleCollapsedExpanded) { _ =>
                 ^^.classes("expand-on-click")
               },
               <.th(
@@ -42,8 +40,8 @@ object Table {
                   <.span(^.className := "secondary-title", extra)
                 }
               ),
-              ^^.ifDefined(props.toggleCollapsedExpandedCallback) { callback =>
-                ^.onClick --> callback
+              ^^.ifDefined(props.onToggleCollapsedExpanded) { onToggle =>
+                ^.onClick --> Callback(onToggle())
               },
             )
           },
@@ -88,7 +86,7 @@ object Table {
   def apply(title: String = null,
             tableClasses: Seq[String] = Seq(),
             expanded: Boolean = true,
-            toggleCollapsedExpandedCallback: Option[Callback] = None,
+            onToggleCollapsedExpanded: Option[() => Unit] = None,
             expandNumEntriesCallback: Option[Callback] = None,
             tableTitleExtra: VdomElement = null,
             tableHeaders: Seq[VdomElement],
@@ -98,7 +96,7 @@ object Table {
         title = Option(title),
         tableClasses = tableClasses,
         expanded = expanded,
-        toggleCollapsedExpandedCallback = toggleCollapsedExpandedCallback,
+        onToggleCollapsedExpanded = onToggleCollapsedExpanded,
         expandNumEntriesCallback = expandNumEntriesCallback,
         tableTitleExtra = Option(tableTitleExtra),
         tableHeaders = tableHeaders,
@@ -113,7 +111,7 @@ object Table {
   private case class Props(title: Option[String],
                            tableClasses: Seq[String],
                            expanded: Boolean,
-                           toggleCollapsedExpandedCallback: Option[Callback],
+                           onToggleCollapsedExpanded: Option[() => Unit],
                            expandNumEntriesCallback: Option[Callback],
                            tableTitleExtra: Option[VdomElement],
                            tableHeaders: Seq[VdomElement],
