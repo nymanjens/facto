@@ -46,8 +46,10 @@ final class Endowments(
       ($, props, state) => {
         implicit val router = props.router
         <.span(
-          CollapseAllExpandAllButtons(
-            onExpandedUpdate = collapsedExpandedStateStoreHandle.setExpandedForAllTables),
+          pageHeader.withExtension(router.currentPage) {
+            CollapseAllExpandAllButtons(
+              onExpandedUpdate = collapsedExpandedStateStoreHandle.setExpandedForAllTables)
+          },
           Panel(i18n("app.all-accounts")) {
             {
               for (account <- accountingConfig.personallySortedAccounts) yield {
