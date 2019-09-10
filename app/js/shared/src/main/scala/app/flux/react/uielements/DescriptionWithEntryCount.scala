@@ -1,10 +1,8 @@
 package app.flux.react.uielements
 
 import app.common.accounting.TemplateMatcher
-import hydro.common.Tags
 import app.flux.stores.entries.GroupedTransactions
 import hydro.flux.react.ReactVdomUtils.<<
-import hydro.flux.react.ReactVdomUtils.^^
 import hydro.flux.react.uielements.Bootstrap
 import hydro.flux.react.uielements.BootstrapTags
 import japgolly.scalajs.react._
