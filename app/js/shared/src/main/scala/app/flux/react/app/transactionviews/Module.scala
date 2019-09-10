@@ -2,6 +2,7 @@ package app.flux.react.app.transactionviews
 
 import hydro.common.I18n
 import app.common.money.ExchangeRateManager
+import app.flux.react.uielements.DescriptionWithEntryCount
 import app.flux.stores.GlobalMessagesStore
 import app.flux.stores.CollapsedExpandedStateStoreFactory
 import app.flux.stores.entries.factories._
@@ -30,6 +31,7 @@ final class Module(implicit i18n: I18n,
                    globalMessagesStore: GlobalMessagesStore,
                    clock: Clock,
                    pageHeader: PageHeader,
+                   descriptionWithEntryCount: DescriptionWithEntryCount,
 ) {
 
   implicit lazy val everything = new Everything

@@ -16,7 +16,7 @@ class TemplateMatcher(
 ) {
 
   // **************** Private fields **************** //
-  type InvolvedCategories = Seq[String]
+  private type InvolvedCategories = Seq[String]
 
   private val templatesIndex: Map[InvolvedCategories, Seq[Template]] =
     accountingConfig.templates.groupBy(_.transactions.map(_.categoryCode)).withDefaultValue(Seq())

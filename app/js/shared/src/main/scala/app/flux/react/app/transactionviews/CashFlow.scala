@@ -10,6 +10,7 @@ import app.flux.action.AppActions
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.react.uielements
 import app.flux.react.uielements.CollapseAllExpandAllButtons
+import app.flux.react.uielements.DescriptionWithEntryCount
 import app.flux.router.AppPages
 import app.flux.stores.entries.CashFlowEntry
 import app.flux.stores.entries.factories.CashFlowEntriesStoreFactory
@@ -44,6 +45,7 @@ final class CashFlow(
     exchangeRateManager: ExchangeRateManager,
     i18n: I18n,
     pageHeader: PageHeader,
+    descriptionWithEntryCount: DescriptionWithEntryCount,
 ) {
 
   private val entriesListTable: EntriesListTable[CashFlowEntry, MoneyReservoir] = new EntriesListTable
@@ -82,7 +84,8 @@ final class CashFlow(
                       numEntriesStrategy = NumEntriesStrategy(
                         start = CashFlow.minNumEntriesPerReservoir,
                         intermediateBeforeInf = Seq(150)),
-                      collapsedExpandedStateStore = Some(collapsedExpandedStateStoreHandle.getStore(tableName)),
+                      collapsedExpandedStateStore =
+                        Some(collapsedExpandedStateStoreHandle.getStore(tableName)),
                       additionalInput = reservoir,
                       latestEntryToTableTitleExtra =
                         latestEntry => s"${i18n("app.balance")}: ${latestEntry.balance}",
@@ -104,7 +107,7 @@ final class CashFlow(
                               <.td(entry.consumedDates.map(formatDate).mkString(", ")),
                               <.td(entry.beneficiaries.map(_.shorterName).mkString(", ")),
                               <.td(entry.categories.map(_.name).mkString(", ")),
-                              <.td(uielements.DescriptionWithEntryCount(entry)),
+                              <.td(descriptionWithEntryCount(entry)),
                               <.td(uielements.MoneyWithCurrency(entry.flow)),
                               <.td(
                                 uielements.MoneyWithCurrency(entry.balance),
