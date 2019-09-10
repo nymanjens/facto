@@ -143,9 +143,9 @@ object Parsable {
   }
 
   object Template {
-    case class Transaction(beneficiaryCode: String @nullable,
-                           moneyReservoirCode: String @nullable,
-                           categoryCode: String @nullable,
+    case class Transaction(beneficiaryCode: String,
+                           moneyReservoirCode: String,
+                           categoryCode: String,
                            description: String,
                            flowAsFloat: Double,
                            detailDescription: String,
@@ -156,17 +156,27 @@ object Parsable {
       def parse(accounts: Map[String, ParsedAccount],
                 reservoirs: Map[String, ParsedMoneyReservoir],
                 categories: Map[String, ParsedCategory]): ParsedTemplate.Transaction = {
-        def validateCode(values: Set[String])(code: String): String = {
-          if (!(code contains "$")) {
+        require(beneficiaryCode != null, s"beneficiaryCode is a mandatory parameter (Transaction = $this)")
+        require(
+          moneyReservoirCode != null,
+          s"moneyReservoirCode is a mandatory parameter (Transaction = $this)")
+        require(categoryCode != null, s"categoryCode is a mandatory parameter (Transaction = $this)")
+        require(description.nonEmpty, s"description is a mandatory parameter (Transaction = $this)")
+
+        def validateCode(code: String, values: Set[String], allowPlaceholders: Boolean = false): String = {
+          if (allowPlaceholders && (code contains "$")) {
+            // Don't validate strings with placeholders
+          } else {
             require(values contains code, s"Illegal code '$code' (possibilities = $values)")
           }
           code
         }
         val reservoirsIncludingNull = reservoirs ++ Map(NullMoneyReservoir.code -> NullMoneyReservoir)
         ParsedTemplate.Transaction(
-          beneficiaryCodeTpl = Option(beneficiaryCode) map validateCode(accounts.keySet),
-          moneyReservoirCodeTpl = Option(moneyReservoirCode) map validateCode(reservoirsIncludingNull.keySet),
-          categoryCodeTpl = Option(categoryCode) map validateCode(categories.keySet),
+          beneficiaryCodeTpl = validateCode(beneficiaryCode, accounts.keySet, allowPlaceholders = true),
+          moneyReservoirCodeTpl =
+            validateCode(moneyReservoirCode, reservoirsIncludingNull.keySet, allowPlaceholders = true),
+          categoryCode = validateCode(categoryCode, categories.keySet),
           descriptionTpl = description,
           flowInCents = (flowAsFloat.toDouble * 100).round,
           detailDescription = detailDescription,

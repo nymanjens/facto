@@ -140,16 +140,16 @@ object TestObjects {
     iconClass = "fa-plus-square",
     transactions = Seq(
       Template.Transaction(
-        beneficiaryCodeTpl = Some("ACC_COMMON"),
-        moneyReservoirCodeTpl = Some(""),
-        categoryCodeTpl = Some("CAT_A"),
+        beneficiaryCodeTpl = "ACC_COMMON",
+        moneyReservoirCodeTpl = "CASH_GBP",
+        categoryCode = "CAT_A",
         descriptionTpl = "Endowment for ${account.longName}",
         detailDescription = "These are the details."
       ),
       Template.Transaction(
-        beneficiaryCodeTpl = Some("${account.code}"),
-        moneyReservoirCodeTpl = Some(""),
-        categoryCodeTpl = Some("CAT_A"),
+        beneficiaryCodeTpl = "${account.code}",
+        moneyReservoirCodeTpl = "CASH_GBP",
+        categoryCode = "CAT_A",
         descriptionTpl = "Endowment for ${account.longName}",
         detailDescription = "These are the details."
       )

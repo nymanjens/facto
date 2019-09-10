@@ -79,20 +79,14 @@ object Template {
     }
   }
 
-  case class Transaction(beneficiaryCodeTpl: Option[String] = None,
-                         moneyReservoirCodeTpl: Option[String] = None,
-                         categoryCodeTpl: Option[String] = None,
-                         descriptionTpl: String = "",
+  case class Transaction(beneficiaryCodeTpl: String,
+                         moneyReservoirCodeTpl: String,
+                         categoryCode: String,
+                         descriptionTpl: String,
                          flowInCents: Long = 0,
                          detailDescription: String = "",
                          tags: Seq[String] = Seq()) {
-    requireNonNull(
-      beneficiaryCodeTpl,
-      moneyReservoirCodeTpl,
-      categoryCodeTpl,
-      descriptionTpl,
-      flowInCents,
-      tags)
+    requireNonNull(beneficiaryCodeTpl, moneyReservoirCodeTpl, categoryCode, descriptionTpl, flowInCents, tags)
 
     def toPartial(account: Account)(implicit accountingConfig: Config): AccountingTransaction.Partial = {
       def fillInPlaceholders(string: String): String = {
@@ -113,9 +107,9 @@ object Template {
           yield reservoir.code -> reservoir
       }.toMap
       AccountingTransaction.Partial(
-        beneficiary = beneficiaryCodeTpl map fillInPlaceholders map accountingConfig.accounts,
-        moneyReservoir = moneyReservoirCodeTpl map fillInPlaceholders map reservoirsIncludingNullMap,
-        category = categoryCodeTpl map fillInPlaceholders map accountingConfig.categories,
+        beneficiary = Some(accountingConfig.accounts(fillInPlaceholders(beneficiaryCodeTpl))),
+        moneyReservoir = Some(reservoirsIncludingNullMap(fillInPlaceholders(moneyReservoirCodeTpl))),
+        category = Some(accountingConfig.categories(categoryCode)),
         description = fillInPlaceholders(descriptionTpl),
         flowInCents = flowInCents,
         detailDescription = detailDescription,

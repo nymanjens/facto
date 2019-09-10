@@ -36,9 +36,8 @@ class TemplateMatcher(
         var addedToAnyCategory = false
         for {
           transactionTemplate <- template.transactions
-          categoryCode <- transactionTemplate.categoryCodeTpl
         } {
-          resultBuilder.put(Some(categoryCode), template)
+          resultBuilder.put(Some(transactionTemplate.categoryCode), template)
           addedToAnyCategory = true
         }
 
@@ -88,8 +87,8 @@ class TemplateMatcher(
     // Notable absent fields: money reservoir and flow, because they tend to change more often
 
     val beneficiaryMatches =
-      matchOrTrue(templateTransaction.beneficiaryCodeTpl, transaction.beneficiaryAccountCode)
-    val categoryMatches = matchOrTrue(templateTransaction.categoryCodeTpl, transaction.category.code)
+      matchOrTrueIfPlaceholders(templateTransaction.beneficiaryCodeTpl, transaction.beneficiaryAccountCode)
+    val categoryMatches = templateTransaction.categoryCode == transaction.category.code
     val descriptionMatches = transaction.description startsWith templateTransaction.descriptionTpl
     val detailDescriptionMatches = transaction.detailDescription startsWith templateTransaction.detailDescription
     val tagsMatch = templateTransaction.tags.forall(transaction.tags.contains)
@@ -101,11 +100,11 @@ class TemplateMatcher(
     transactions.map(_.flow.exchangedForReferenceCurrency).sum == ReferenceMoney(0)
   }
 
-  private def matchOrTrue[V](templateValue: Option[V], transactionValue: V): Boolean = {
-    if (templateValue.isDefined) {
-      templateValue.get == transactionValue
-    } else {
+  private def matchOrTrueIfPlaceholders(templateValue: String, transactionValue: String): Boolean = {
+    if (templateValue contains "$") {
       true
+    } else {
+      templateValue == transactionValue
     }
   }
 }
