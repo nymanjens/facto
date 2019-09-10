@@ -6,10 +6,8 @@ import app.models.access.AppEntityAccess
 import app.models.accounting.config.Config
 import app.models.accounting.config.Template
 import app.models.accounting.Transaction
-import hydro.common.GuavaReplacement.ImmutableSetMultimap
 
 import scala.collection.immutable.Seq
-import scala.collection.mutable
 
 class TemplateMatcher(
     implicit accountingConfig: Config,
@@ -18,39 +16,10 @@ class TemplateMatcher(
 ) {
 
   // **************** Private fields **************** //
-  type InvolvedCategory = Option[String]
-  type NumberOfTransactions = Int
+  type InvolvedCategories = Seq[String]
 
-  /**
-    * Usage instructions:
-    * - The number of transactions has to be exactly equal so use the right number there.
-    * - The template categories are optional (per transaction). Try all categories in the transaction group to find all
-    *   relevant templates and also try the 'None' value.
-    **/
-  private val templatesIndex: Map[NumberOfTransactions, ImmutableSetMultimap[InvolvedCategory, Template]] = {
-    def toInvolvedCategoryMultimap(
-        templates: Seq[Template]): ImmutableSetMultimap[InvolvedCategory, Template] = {
-      val resultBuilder = ImmutableSetMultimap.builder[InvolvedCategory, Template]()
-
-      for (template <- templates) {
-        var addedToAnyCategory = false
-        for {
-          transactionTemplate <- template.transactions
-        } {
-          resultBuilder.put(Some(transactionTemplate.categoryCode), template)
-          addedToAnyCategory = true
-        }
-
-        if (!addedToAnyCategory) {
-          resultBuilder.put(None, template)
-        }
-      }
-
-      resultBuilder.build()
-    }
-
-    accountingConfig.templates.groupBy(_.transactions.size).mapValues(toInvolvedCategoryMultimap)
-  }
+  private val templatesIndex: Map[InvolvedCategories, Seq[Template]] =
+    accountingConfig.templates.groupBy(_.transactions.map(_.categoryCode)).withDefaultValue(Seq())
 
   // **************** Public API **************** //
   /**
@@ -58,7 +27,8 @@ class TemplateMatcher(
     * template exists.
     */
   def getMatchingTemplate(transactions: Seq[Transaction]): Option[Template] = {
-    ???
+    val involvedCategories = transactions.map(_.categoryCode)
+    templatesIndex(involvedCategories).find(template => matches(template, transactions))
   }
 
   // **************** Private helper methods **************** //
