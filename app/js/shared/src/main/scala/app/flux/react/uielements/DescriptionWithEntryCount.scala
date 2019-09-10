@@ -10,8 +10,6 @@ import hydro.flux.react.uielements.BootstrapTags
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
-import scala.collection.immutable.Seq
-
 final class DescriptionWithEntryCount(
     implicit templateMatcher: TemplateMatcher,
 ) {
@@ -20,27 +18,29 @@ final class DescriptionWithEntryCount(
     .builder[Props](getClass.getSimpleName)
     .renderP((_, props) => {
       val entry = props.entry
-      val tagIndications =
-        <<.joinWithSpaces(
-          entry.tags
-            .map(tag => Bootstrap.Label(BootstrapTags.toStableVariant(tag))(^.key := tag, tag)) ++
-            // Add empty span to force space after non-empty label list
-            Seq(<.span(^.key := "empty-span-for-space")))
-//      val maybeTemplateIcon = <<.ifDefined() {
-//
-//      }
+
+      val maybeTemplateIcon: Option[VdomNode] = templateMatcher.getMatchingTemplate(entry.transactions) map {
+        template =>
+          <.i(^.key := "template-icon", ^.className := template.iconClass)
+      }
+      val tagIndications: Seq[VdomNode] =
+        entry.tags
+          .map(tag => Bootstrap.Label(BootstrapTags.toStableVariant(tag))(^.key := tag, tag): VdomNode)
+      val centralContent = joinWithSpaces(maybeTemplateIcon, tagIndications, entry.description)
 
       if (entry.transactions.size == 1) {
-        <.span(tagIndications, entry.description)
+        centralContent
       } else {
-        UpperRightCorner(cornerContent = s"(${entry.transactions.size})")(
-          centralContent = tagIndications,
-          entry.description)
+        UpperRightCorner(cornerContent = s"(${entry.transactions.size})")(centralContent)
       }
     })
     .build
 
   def apply(entry: GroupedTransactions): VdomElement = {
     component(Props(entry))
+  }
+
+  private def joinWithSpaces(option: Option[VdomNode], seq: Seq[VdomNode], node: VdomNode): VdomArray = {
+    <<.joinWithSpaces(option.toSeq ++ seq :+ node)
   }
 }
