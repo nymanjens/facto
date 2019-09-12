@@ -6,8 +6,12 @@ import app.models.access.AppEntityAccess
 import app.models.accounting.config.Config
 import app.models.accounting.config.Template
 import app.models.accounting.Transaction
+import app.models.accounting.config.Category
+import hydro.common.GuavaReplacement
+import hydro.common.GuavaReplacement.ImmutableSetMultimap
 
 import scala.collection.immutable.Seq
+import scala.collection.mutable
 
 class TemplateMatcher(
     implicit accountingConfig: Config,
@@ -16,58 +20,67 @@ class TemplateMatcher(
 ) {
 
   // **************** Private fields **************** //
-  private type InvolvedCategories = Seq[String]
+  private type Description = String
 
-  private val templatesIndex: Map[InvolvedCategories, Seq[Template]] =
-    accountingConfig.templates.groupBy(_.transactions.map(_.categoryCode)).withDefaultValue(Seq())
+  /** Map from description to every template that involves that description. */
+  private val templatesIndex: ImmutableSetMultimap[Description, Template] = {
+    val mapBuilder = ImmutableSetMultimap.builder[Description, Template]()
+    for {
+      template <- accountingConfig.templates
+      transaction <- template.transactions
+    } {
+      mapBuilder.put(transaction.descriptionTpl, template)
+    }
+    mapBuilder.build()
+  }
 
   // **************** Public API **************** //
   /**
-    * Returns a template that a group with the given transactions is probably an instance of or None if no such
-    * template exists.
+    * Returns a template that a group with the given subset of transactions is probably an instance of or None if no
+    * such template exists.
     */
-  def getMatchingTemplate(transactions: Seq[Transaction]): Option[Template] = {
-    val involvedCategories = transactions.map(_.categoryCode)
-    templatesIndex(involvedCategories).find(template => matches(template, transactions))
+  def getMatchingTemplate(transactionsSubset: Seq[Transaction]): Option[Template] = {
+    // Only try first description, since the template we are looking for *has* to be at least in that entry
+    templatesIndex
+      .get(transactionsSubset.head.description)
+      .find(template => matches(template, transactionsSubset))
   }
 
   // **************** Private helper methods **************** //
-  private def matches(template: Template, transactions: Seq[Transaction]): Boolean = {
+  private def matches(template: Template, transactionsSubset: Seq[Transaction]): Boolean = {
+    // Note: Because of an earlier bug where transaction order was not preserved when added via the external API
+    // (by template), we ignore the transaction order.
+
     def loginNameMatches =
       template.onlyShowForUserLoginNames.map { onlyShowForUserLoginNames =>
         if (onlyShowForUserLoginNames.nonEmpty) {
-          onlyShowForUserLoginNames contains transactions.head.issuer.loginName
+          onlyShowForUserLoginNames contains transactionsSubset.head.issuer.loginName
         } else {
           true
         }
       } getOrElse true
 
-    def numberOfTransactionsMatch = template.transactions.size == transactions.size
-
-    def transactionsMatch = (template.transactions zip transactions).forall {
-      case (te, tr) => matches(te, tr)
+    def transactionsMatch = template.transactions.permutations.exists { permutation =>
+      (permutation zip transactionsSubset).forall {
+        case (te, tr) => matches(te, tr)
+      }
     }
 
-    def zeroSumMatches = if (template.zeroSum) isZeroSum(transactions) else true
-
-    loginNameMatches && numberOfTransactionsMatch && transactionsMatch && zeroSumMatches
+    loginNameMatches && transactionsMatch
   }
 
   private def matches(templateTransaction: Template.Transaction, transaction: Transaction): Boolean = {
     // Notable absent fields: money reservoir and flow, because they tend to change more often
 
-    val beneficiaryMatches =
+    def descriptionMatches = transaction.description == templateTransaction.descriptionTpl
+    def beneficiaryMatches =
       matchOrTrueIfPlaceholders(templateTransaction.beneficiaryCodeTpl, transaction.beneficiaryAccountCode)
-    val categoryMatches = templateTransaction.categoryCode == transaction.category.code
-    val descriptionMatches = transaction.description startsWith templateTransaction.descriptionTpl
-    val detailDescriptionMatches = transaction.detailDescription startsWith templateTransaction.detailDescription
-    val tagsMatch = templateTransaction.tags.forall(transaction.tags.contains)
+    def categoryMatches = templateTransaction.categoryCode == transaction.category.code
+    def detailDescriptionMatches =
+      transaction.detailDescription startsWith templateTransaction.detailDescription
+    def tagsMatch = templateTransaction.tags.forall(transaction.tags.contains)
 
-    beneficiaryMatches && categoryMatches && descriptionMatches && detailDescriptionMatches && tagsMatch
-  }
-
-  private def isZeroSum(transactions: Seq[Transaction]): Boolean = {
-    transactions.map(_.flow.exchangedForReferenceCurrency).sum == ReferenceMoney(0)
+    descriptionMatches && beneficiaryMatches && categoryMatches && detailDescriptionMatches && tagsMatch
   }
 
   private def matchOrTrueIfPlaceholders(templateValue: String, transactionValue: String): Boolean = {
