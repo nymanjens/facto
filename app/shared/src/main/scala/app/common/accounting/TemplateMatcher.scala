@@ -78,11 +78,9 @@ class TemplateMatcher(
     def beneficiaryMatches =
       matchOrTrueIfPlaceholders(templateTransaction.beneficiaryCodeTpl, transaction.beneficiaryAccountCode)
     def categoryMatches = templateTransaction.categoryCode == transaction.category.code
-    def detailDescriptionMatches =
-      transaction.detailDescription startsWith templateTransaction.detailDescription
     def tagsMatch = templateTransaction.tags.forall(transaction.tags.contains)
 
-    descriptionMatches && beneficiaryMatches && categoryMatches && detailDescriptionMatches && tagsMatch
+    descriptionMatches && beneficiaryMatches && categoryMatches && tagsMatch
   }
 
   private def matchOrTrueIfPlaceholders(templateValue: String, transactionValue: String): Boolean = {
