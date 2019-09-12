@@ -51,6 +51,8 @@ class TemplateMatcher(
     // Note: Because of an earlier bug where transaction order was not preserved when added via the external API
     // (by template), we ignore the transaction order.
 
+    def tooManyTransactions = transactionsSubset.size > template.transactions.size
+
     def loginNameMatches =
       template.onlyShowForUserLoginNames.map { onlyShowForUserLoginNames =>
         if (onlyShowForUserLoginNames.nonEmpty) {
@@ -66,7 +68,7 @@ class TemplateMatcher(
       }
     }
 
-    loginNameMatches && transactionsMatch
+    !tooManyTransactions && loginNameMatches && transactionsMatch
   }
 
   private def matches(templateTransaction: Template.Transaction, transaction: Transaction): Boolean = {
