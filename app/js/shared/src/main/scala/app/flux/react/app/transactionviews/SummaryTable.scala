@@ -1,5 +1,6 @@
 package app.flux.react.app.transactionviews
 
+import app.common.accounting.TemplateMatcher
 import hydro.common.CollectionUtils.ifThenSeq
 import hydro.common.I18n
 import hydro.common.Annotations.visibleForTesting
@@ -50,7 +51,9 @@ private[transactionviews] final class SummaryTable(
     clock: Clock,
     accountingConfig: Config,
     exchangeRateManager: ExchangeRateManager,
-    i18n: I18n) {
+    i18n: I18n,
+    templateMatcher: TemplateMatcher,
+) {
 
   private val component = {
     ScalaComponent
@@ -327,21 +330,26 @@ private[transactionviews] final class SummaryTable(
                             <.div(
                               ^.className := "entries",
                               (for (transaction <- cellData.transactions) yield {
+                                val maybeTemplateIcon: Option[VdomNode] =
+                                  templateMatcher.getMatchingTemplate(Seq(transaction)) map { template =>
+                                    <.i(^.key := "template-icon", ^.className := template.iconClass)
+                                  }
+                                val tagIndications = transaction.tags
+                                  .map(
+                                    tag =>
+                                      Bootstrap.Label(BootstrapTags.toStableVariant(tag))(
+                                        ^.key := tag,
+                                        tag,
+                                      ): VdomNode)
                                 <.div(
                                   ^.key := transaction.id,
                                   router.anchorWithHrefTo(
                                     AppPages.EditTransactionGroup(transaction.transactionGroupId))(
                                     uielements.MoneyWithCurrency(transaction.flow),
                                     " - ",
-                                    <<.joinWithSpaces(
-                                      transaction.tags
-                                        .map(tag =>
-                                          Bootstrap.Label(BootstrapTags.toStableVariant(tag))(
-                                            ^.key := tag,
-                                            tag,
-                                        ))),
-                                    " ",
-                                    transaction.description
+                                    <<.joinWithSpaces(maybeTemplateIcon.toVector ++
+                                      tagIndications :+
+                                      (transaction.description: VdomNode))
                                   )
                                 )
                               }).toVdomArray

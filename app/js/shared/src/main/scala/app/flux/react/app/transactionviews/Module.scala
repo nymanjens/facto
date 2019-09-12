@@ -1,5 +1,6 @@
 package app.flux.react.app.transactionviews
 
+import app.common.accounting.TemplateMatcher
 import hydro.common.I18n
 import app.common.money.ExchangeRateManager
 import app.flux.react.uielements.DescriptionWithEntryCount
@@ -13,25 +14,27 @@ import hydro.common.time.Clock
 import hydro.flux.action.Dispatcher
 import hydro.flux.react.uielements.PageHeader
 
-final class Module(implicit i18n: I18n,
-                   accountingConfig: Config,
-                   user: User,
-                   entityAccess: AppJsEntityAccess,
-                   dispatcher: Dispatcher,
-                   exchangeRateManager: ExchangeRateManager,
-                   allEntriesStoreFactory: AllEntriesStoreFactory,
-                   cashFlowEntriesStoreFactory: CashFlowEntriesStoreFactory,
-                   liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory,
-                   endowmentEntriesStoreFactory: EndowmentEntriesStoreFactory,
-                   complexQueryStoreFactory: ComplexQueryStoreFactory,
-                   summaryForYearStoreFactory: SummaryForYearStoreFactory,
-                   summaryYearsStoreFactory: SummaryYearsStoreFactory,
-                   summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
-                   collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
-                   globalMessagesStore: GlobalMessagesStore,
-                   clock: Clock,
-                   pageHeader: PageHeader,
-                   descriptionWithEntryCount: DescriptionWithEntryCount,
+final class Module(
+    implicit i18n: I18n,
+    accountingConfig: Config,
+    user: User,
+    entityAccess: AppJsEntityAccess,
+    dispatcher: Dispatcher,
+    exchangeRateManager: ExchangeRateManager,
+    allEntriesStoreFactory: AllEntriesStoreFactory,
+    cashFlowEntriesStoreFactory: CashFlowEntriesStoreFactory,
+    liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory,
+    endowmentEntriesStoreFactory: EndowmentEntriesStoreFactory,
+    complexQueryStoreFactory: ComplexQueryStoreFactory,
+    summaryForYearStoreFactory: SummaryForYearStoreFactory,
+    summaryYearsStoreFactory: SummaryYearsStoreFactory,
+    summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
+    collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
+    globalMessagesStore: GlobalMessagesStore,
+    clock: Clock,
+    pageHeader: PageHeader,
+    descriptionWithEntryCount: DescriptionWithEntryCount,
+    templateMatcher: TemplateMatcher,
 ) {
 
   implicit lazy val everything = new Everything
