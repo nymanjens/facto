@@ -24,7 +24,8 @@ final class DescriptionWithEntryCount(
       val tagIndications: Seq[VdomNode] =
         entry.tags
           .map(tag => Bootstrap.Label(BootstrapTags.toStableVariant(tag))(^.key := tag, tag): VdomNode)
-      val centralContent = joinWithSpaces(maybeTemplateIcon, tagIndications, entry.description)
+      val centralContent =
+        <<.joinWithSpaces(maybeTemplateIcon.toVector ++ tagIndications :+ (entry.description: VdomNode))
 
       if (entry.transactions.size == 1) {
         centralContent
@@ -36,9 +37,5 @@ final class DescriptionWithEntryCount(
 
   def apply(entry: GroupedTransactions): VdomElement = {
     component(Props(entry))
-  }
-
-  private def joinWithSpaces(option: Option[VdomNode], seq: Seq[VdomNode], node: VdomNode): VdomArray = {
-    <<.joinWithSpaces(option.toSeq ++ seq :+ node)
   }
 }
