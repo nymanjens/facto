@@ -29,7 +29,7 @@ class TemplateMatcher(
       template <- accountingConfig.templates
       transaction <- template.transactions
     } {
-      mapBuilder.put(transaction.descriptionTpl, template)
+      mapBuilder.put(transaction.description, template)
     }
     mapBuilder.build()
   }
@@ -74,7 +74,7 @@ class TemplateMatcher(
   private def matches(templateTransaction: Template.Transaction, transaction: Transaction): Boolean = {
     // Notable absent fields: money reservoir and flow, because they tend to change more often
 
-    def descriptionMatches = transaction.description == templateTransaction.descriptionTpl
+    def descriptionMatches = transaction.description == templateTransaction.description
     def beneficiaryMatches =
       matchOrTrueIfPlaceholders(templateTransaction.beneficiaryCodeTpl, transaction.beneficiaryAccountCode)
     def categoryMatches = templateTransaction.categoryCode == transaction.category.code

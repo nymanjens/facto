@@ -162,6 +162,7 @@ object Parsable {
           s"moneyReservoirCode is a mandatory parameter (Transaction = $this)")
         require(categoryCode != null, s"categoryCode is a mandatory parameter (Transaction = $this)")
         require(description.nonEmpty, s"description is a mandatory parameter (Transaction = $this)")
+        require(!description.contains("$"), s"description cannot contain placeholders (Transaction = $this)")
 
         def validateCode(code: String, values: Set[String], allowPlaceholders: Boolean = false): String = {
           if (allowPlaceholders && (code contains "$")) {
@@ -177,7 +178,7 @@ object Parsable {
           moneyReservoirCodeTpl =
             validateCode(moneyReservoirCode, reservoirsIncludingNull.keySet, allowPlaceholders = true),
           categoryCode = validateCode(categoryCode, categories.keySet),
-          descriptionTpl = description,
+          description = description,
           flowInCents = (flowAsFloat.toDouble * 100).round,
           detailDescription = detailDescription,
           tags = Option(tags).map(_.asScala.toList).getOrElse(Seq())

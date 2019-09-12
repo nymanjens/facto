@@ -12,7 +12,7 @@ import scala.collection.immutable.Seq
 import scala.collection.immutable.Set
 
 // Every field ending with "Tpl" may contain $-prefixed placeholders.
-// Example: descriptionTpl = "Endowment for ${account.longName}"
+// Example: beneficiaryCodeTpl = "${account.code}"
 case class Template(code: String,
                     name: String,
                     placement: Set[Template.Placement],
@@ -82,11 +82,11 @@ object Template {
   case class Transaction(beneficiaryCodeTpl: String,
                          moneyReservoirCodeTpl: String,
                          categoryCode: String,
-                         descriptionTpl: String,
+                         description: String,
                          flowInCents: Long = 0,
                          detailDescription: String = "",
                          tags: Seq[String] = Seq()) {
-    requireNonNull(beneficiaryCodeTpl, moneyReservoirCodeTpl, categoryCode, descriptionTpl, flowInCents, tags)
+    requireNonNull(beneficiaryCodeTpl, moneyReservoirCodeTpl, categoryCode, description, flowInCents, tags)
 
     def toPartial(account: Account)(implicit accountingConfig: Config): AccountingTransaction.Partial = {
       def fillInPlaceholders(string: String): String = {
@@ -110,7 +110,7 @@ object Template {
         beneficiary = Some(accountingConfig.accounts(fillInPlaceholders(beneficiaryCodeTpl))),
         moneyReservoir = Some(reservoirsIncludingNullMap(fillInPlaceholders(moneyReservoirCodeTpl))),
         category = Some(accountingConfig.categories(categoryCode)),
-        description = fillInPlaceholders(descriptionTpl),
+        description = description,
         flowInCents = flowInCents,
         detailDescription = detailDescription,
         tags = tags
