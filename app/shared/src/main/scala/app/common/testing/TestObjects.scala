@@ -143,14 +143,14 @@ object TestObjects {
         beneficiaryCodeTpl = "ACC_COMMON",
         moneyReservoirCodeTpl = "CASH_GBP",
         categoryCode = "CAT_A",
-        description = "Endowment for ${account.longName}",
+        description = "Bakery",
         detailDescription = "These are the details."
       ),
       Template.Transaction(
         beneficiaryCodeTpl = "${account.code}",
         moneyReservoirCodeTpl = "CASH_GBP",
         categoryCode = "CAT_A",
-        description = "Endowment for ${account.longName}",
+        description = "Bakery",
         detailDescription = "These are the details."
       )
     )
