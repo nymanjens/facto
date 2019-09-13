@@ -141,14 +141,14 @@ object TestObjects {
     transactions = Seq(
       Template.Transaction(
         beneficiaryCodeTpl = "ACC_COMMON",
-        moneyReservoirCodeTpl = "CASH_GBP",
+        moneyReservoirCodeTpl = "",
         categoryCode = "CAT_A",
         description = "Bakery",
         detailDescription = "These are the details."
       ),
       Template.Transaction(
         beneficiaryCodeTpl = "${account.code}",
-        moneyReservoirCodeTpl = "CASH_GBP",
+        moneyReservoirCodeTpl = "",
         categoryCode = "CAT_A",
         description = "Bakery",
         detailDescription = "These are the details."
