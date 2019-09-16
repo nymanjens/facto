@@ -15,7 +15,6 @@ import scala.collection.mutable
 
 class TemplateMatcher(
     implicit accountingConfig: Config,
-    exchangeRateManager: ExchangeRateManager,
     entityAccess: AppEntityAccess,
 ) {
 

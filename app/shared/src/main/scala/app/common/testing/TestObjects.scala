@@ -23,6 +23,7 @@ import hydro.models.UpdatableEntity.LastUpdateTime
 
 import scala.collection.immutable.ListMap
 import scala.collection.immutable.Seq
+import scala.collection.immutable.Set
 import scala.util.Random
 
 object TestObjects {
@@ -356,6 +357,45 @@ object TestObjects {
       date = createDateTime(year, month, day),
       foreignCurrencyCode = foreignCurrencyCode,
       ratioReferenceToForeignCurrency = if (ratio == unsetDouble) Random.nextDouble() else ratio
+    )
+  }
+  def createTemplate(
+      code: String = null,
+      name: String = null,
+      placement: Set[Template.Placement] = Set(),
+      onlyShowForUserLoginNames: Option[Set[String]] = None,
+      zeroSum: Boolean = false,
+      iconClass: String = "",
+      transactions: Seq[Template.Transaction],
+  ): Template = {
+    val randomString = EntityModification.generateRandomId().toString
+    Template(
+      code = Option(code) getOrElse randomString,
+      name = Option(name) getOrElse randomString,
+      placement = placement,
+      onlyShowForUserLoginNames = onlyShowForUserLoginNames,
+      zeroSum = zeroSum,
+      iconClass = iconClass,
+      transactions = transactions,
+    )
+  }
+  def createTemplateTransaction(
+      beneficiaryCodeTpl: String = "ACC_A",
+      moneyReservoirCodeTpl: String = "CASH_A",
+      categoryCode: String = "CAT_A",
+      description: String = "Some description",
+      flowInCents: Long = 129837,
+      detailDescription: String = "",
+      tags: Seq[String] = Seq(),
+  ): Template.Transaction = {
+    Template.Transaction(
+      beneficiaryCodeTpl = beneficiaryCodeTpl,
+      moneyReservoirCodeTpl = moneyReservoirCodeTpl,
+      categoryCode = categoryCode,
+      description = description,
+      flowInCents = flowInCents,
+      detailDescription = detailDescription,
+      tags = tags,
     )
   }
 }
