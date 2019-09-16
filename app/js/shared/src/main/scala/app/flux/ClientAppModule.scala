@@ -30,6 +30,10 @@ final class ClientAppModule(implicit getInitialDataResponse: GetInitialDataRespo
   private val modelsModule = new app.models.Module
   implicit private val exchangeRateManager = modelsModule.exchangeRateManager
 
+  // Create and unpack app.common modules
+  private val appCommonAccountingModule = new app.common.accounting.Module()
+  implicit private val templateMatcher = appCommonAccountingModule.templateMatcher
+
   // Create and unpack Flux action module
   private val fluxActionModule = new Module
   implicit private val dispatcher = fluxActionModule.dispatcher
@@ -46,7 +50,8 @@ final class ClientAppModule(implicit getInitialDataResponse: GetInitialDataRespo
   implicit private val summaryYearsStoreFactory = fluxStoresModule.summaryYearsStoreFactory
   implicit private val summaryExchangeRateGainsStoreFactory =
     fluxStoresModule.summaryExchangeRateGainsStoreFactory
-  implicit private val collapsedExpandedStateStoreFactory = fluxStoresModule.collapsedExpandedStateStoreFactory
+  implicit private val collapsedExpandedStateStoreFactory =
+    fluxStoresModule.collapsedExpandedStateStoreFactory
   implicit private val globalMessagesStore = fluxStoresModule.globalMessagesStore
   implicit private val pageLoadingStateStore = fluxStoresModule.pageLoadingStateStore
   implicit private val pendingModificationsStore = fluxStoresModule.pendingModificationsStore

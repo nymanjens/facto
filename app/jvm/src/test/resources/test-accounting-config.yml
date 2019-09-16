@@ -94,12 +94,12 @@ templates:
       - beneficiaryCode: ACC_COMMON
         moneyReservoirCode: "" # N/A
         categoryCode: CAT_A
-        description: Endowment for ${account.longName}
+        description: Bakery
         detailDescription: "These are the details."
       - beneficiaryCode: ${account.code}
         moneyReservoirCode: "" # N/A
         categoryCode: CAT_A
-        description: Endowment for ${account.longName}
+        description: Bakery
         detailDescription: "These are the details."
 
 constants:

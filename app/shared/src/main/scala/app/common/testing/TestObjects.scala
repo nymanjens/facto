@@ -23,6 +23,7 @@ import hydro.models.UpdatableEntity.LastUpdateTime
 
 import scala.collection.immutable.ListMap
 import scala.collection.immutable.Seq
+import scala.collection.immutable.Set
 import scala.util.Random
 
 object TestObjects {
@@ -66,6 +67,17 @@ object TestObjects {
     defaultCashReservoirCode = Some("CASH_B"),
     defaultElectronicReservoirCode = "CARD_B",
     categories = Seq(testCategoryB),
+    summaryTotalRows = Seq(SummaryTotalRowDef(rowTitleHtml = "<b>Total</b>", categoriesToIgnore = Set()))
+  )
+  def testAccountC: Account = Account(
+    code = "ACC_C",
+    longName = "Account C",
+    shorterName = "Acc.C",
+    veryShortName = "C",
+    userLoginName = Some("testUserC"),
+    defaultCashReservoirCode = Some("CASH_C"),
+    defaultElectronicReservoirCode = "CARD_C",
+    categories = Seq(testCategoryC),
     summaryTotalRows = Seq(SummaryTotalRowDef(rowTitleHtml = "<b>Total</b>", categoriesToIgnore = Set()))
   )
   def testAccount: Account = testAccountA
@@ -140,17 +152,17 @@ object TestObjects {
     iconClass = "fa-plus-square",
     transactions = Seq(
       Template.Transaction(
-        beneficiaryCodeTpl = Some("ACC_COMMON"),
-        moneyReservoirCodeTpl = Some(""),
-        categoryCodeTpl = Some("CAT_A"),
-        descriptionTpl = "Endowment for ${account.longName}",
+        beneficiaryCodeTpl = "ACC_COMMON",
+        moneyReservoirCodeTpl = "",
+        categoryCode = "CAT_A",
+        description = "Bakery",
         detailDescription = "These are the details."
       ),
       Template.Transaction(
-        beneficiaryCodeTpl = Some("${account.code}"),
-        moneyReservoirCodeTpl = Some(""),
-        categoryCodeTpl = Some("CAT_A"),
-        descriptionTpl = "Endowment for ${account.longName}",
+        beneficiaryCodeTpl = "${account.code}",
+        moneyReservoirCodeTpl = "",
+        categoryCode = "CAT_A",
+        description = "Bakery",
         detailDescription = "These are the details."
       )
     )
@@ -356,6 +368,45 @@ object TestObjects {
       date = createDateTime(year, month, day),
       foreignCurrencyCode = foreignCurrencyCode,
       ratioReferenceToForeignCurrency = if (ratio == unsetDouble) Random.nextDouble() else ratio
+    )
+  }
+  def createTemplate(
+      code: String = null,
+      name: String = null,
+      placement: Set[Template.Placement] = Set(),
+      onlyShowForUserLoginNames: Option[Set[String]] = None,
+      zeroSum: Boolean = false,
+      iconClass: String = "",
+      transactions: Seq[Template.Transaction],
+  ): Template = {
+    val randomString = EntityModification.generateRandomId().toString
+    Template(
+      code = Option(code) getOrElse randomString,
+      name = Option(name) getOrElse randomString,
+      placement = placement,
+      onlyShowForUserLoginNames = onlyShowForUserLoginNames,
+      zeroSum = zeroSum,
+      iconClass = iconClass,
+      transactions = transactions,
+    )
+  }
+  def createTemplateTransaction(
+      beneficiaryCodeTpl: String = "ACC_A",
+      moneyReservoirCodeTpl: String = "CASH_A",
+      categoryCode: String = "CAT_A",
+      description: String = "Some description",
+      flowInCents: Long = 129837,
+      detailDescription: String = "",
+      tags: Seq[String] = Seq(),
+  ): Template.Transaction = {
+    Template.Transaction(
+      beneficiaryCodeTpl = beneficiaryCodeTpl,
+      moneyReservoirCodeTpl = moneyReservoirCodeTpl,
+      categoryCode = categoryCode,
+      description = description,
+      flowInCents = flowInCents,
+      detailDescription = detailDescription,
+      tags = tags,
     )
   }
 }
