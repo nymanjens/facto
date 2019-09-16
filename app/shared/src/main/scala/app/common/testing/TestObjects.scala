@@ -69,6 +69,17 @@ object TestObjects {
     categories = Seq(testCategoryB),
     summaryTotalRows = Seq(SummaryTotalRowDef(rowTitleHtml = "<b>Total</b>", categoriesToIgnore = Set()))
   )
+  def testAccountC: Account = Account(
+    code = "ACC_C",
+    longName = "Account C",
+    shorterName = "Acc.C",
+    veryShortName = "C",
+    userLoginName = Some("testUserC"),
+    defaultCashReservoirCode = Some("CASH_C"),
+    defaultElectronicReservoirCode = "CARD_C",
+    categories = Seq(testCategoryC),
+    summaryTotalRows = Seq(SummaryTotalRowDef(rowTitleHtml = "<b>Total</b>", categoriesToIgnore = Set()))
+  )
   def testAccount: Account = testAccountA
 
   def testReservoirCashCommon =

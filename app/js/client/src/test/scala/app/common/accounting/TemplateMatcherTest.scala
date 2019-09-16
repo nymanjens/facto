@@ -1,16 +1,8 @@
 package app.common.accounting
 
-import java.time.Duration
-
-import app.common.money.Currency.Gbp
 import app.common.testing.TestModule
-import app.common.testing.TestObjects
 import app.common.testing.TestObjects._
 import app.models.accounting.config.Template
-import app.models.money.ExchangeRateMeasurement
-import app.models.money.JsExchangeRateManager
-import hydro.common.testing.FakeJsEntityAccess
-import hydro.common.time.Clock
 import utest._
 import utest.TestSuite
 
@@ -26,18 +18,18 @@ class TemplateMatcherTest extends TestSuite {
         templateMatcher.getMatchingTemplate(Seq(testTransactionWithId)) ==> None
       }
       "With single transaction in template" - {
-        val templateAbcd =
-          createTemplate(transactions = Seq(createTemplateTransaction(description = "ABCD")))
-        val templateEfgh =
-          createTemplate(transactions = Seq(createTemplateTransaction(description = "EFGH")))
-        val templateMatcher = newTemplateMatcher(templateAbcd, templateEfgh)
+        val templateA =
+          createTemplate(transactions = Seq(createTemplateTransaction(description = "AAA")))
+        val templateB =
+          createTemplate(transactions = Seq(createTemplateTransaction(description = "BBB")))
+        val templateMatcher = newTemplateMatcher(templateA, templateB)
 
         "Matching template" - {
-          templateMatcher.getMatchingTemplate(Seq(createTransaction(description = "ABCD"))) ==>
-            Some(templateAbcd)
+          templateMatcher.getMatchingTemplate(Seq(createTransaction(description = "AAA"))) ==>
+            Some(templateA)
         }
         "No matching template" - {
-          templateMatcher.getMatchingTemplate(Seq(createTransaction(description = "XYZ"))) ==> None
+          templateMatcher.getMatchingTemplate(Seq(createTransaction(description = "BBB"))) ==> None
         }
       }
       "With multiple transactions in template" - {
@@ -81,6 +73,64 @@ class TemplateMatcherTest extends TestSuite {
                 createTransaction(description = "BBB"),
                 createTransaction(description = "CCC"))) ==>
               Some(templateAb)
+          }
+        }
+      }
+      "Other properties" - {
+        "category" - {
+          val templateA =
+            createTemplate(
+              transactions =
+                Seq(createTemplateTransaction(description = "XYZ", categoryCode = testCategoryA.code)))
+          val templateB =
+            createTemplate(
+              transactions =
+                Seq(createTemplateTransaction(description = "XYZ", categoryCode = testCategoryB.code)))
+          val templateMatcher = newTemplateMatcher(templateA, templateB)
+
+          "Matching template" - {
+            templateMatcher.getMatchingTemplate(
+              Seq(createTransaction(description = "XYZ", category = testCategoryB))) ==>
+              Some(templateB)
+          }
+          "No matching template" - {
+            templateMatcher.getMatchingTemplate(
+              Seq(createTransaction(description = "XYZ", category = testCategoryC))) ==> None
+          }
+        }
+        "beneficiary" - {
+          "Without placeholder" - {
+            val templateA =
+              createTemplate(
+                transactions =
+                  Seq(createTemplateTransaction(description = "XYZ", beneficiaryCodeTpl = testAccountA.code)))
+            val templateB =
+              createTemplate(
+                transactions =
+                  Seq(createTemplateTransaction(description = "XYZ", beneficiaryCodeTpl = testAccountB.code)))
+            val templateMatcher = newTemplateMatcher(templateA, templateB)
+
+            "Matching template" - {
+              templateMatcher.getMatchingTemplate(
+                Seq(createTransaction(description = "XYZ", beneficiary = testAccountA))) ==>
+                Some(templateB)
+            }
+            "No matching template" - {
+              templateMatcher.getMatchingTemplate(
+                Seq(createTransaction(description = "XYZ", beneficiary = testAccountC))) ==> None
+            }
+          }
+          "With placeholder" - {
+            val templateA =
+              createTemplate(transactions = Seq(
+                createTemplateTransaction(description = "XYZ", beneficiaryCodeTpl = "$" + "{account.code}")))
+            val templateMatcher = newTemplateMatcher(templateA)
+
+            "Matching template" - {
+              templateMatcher.getMatchingTemplate(
+                Seq(createTransaction(description = "XYZ", beneficiary = testAccountA))) ==>
+                Some(templateA)
+            }
           }
         }
       }
