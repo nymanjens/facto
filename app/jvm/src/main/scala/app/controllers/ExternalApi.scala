@@ -42,9 +42,12 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
       val template = accountingConfig.templateWithCode(templateCode)
 
       val groupAddition = EntityModification.createAddWithRandomId(TransactionGroup(createdDate = clock.now))
+      val transactionsWithoutId = toTransactions(template, transactionGroup = groupAddition.entity, issuer)
       val transactionAdditions =
-        toTransactions(template, transactionGroup = groupAddition.entity, issuer)
-          .map(EntityModification.createAddWithRandomId(_))
+        for ((transactionWithoutId, id) <- zipWithIncrementingId(transactionsWithoutId)) yield {
+          EntityModification.createAddWithId(id, transactionWithoutId)
+        }
+
       entityAccess.persistEntityModifications(
         groupAddition +: transactionAdditions
       )
@@ -169,5 +172,14 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
     val sign = if (money.cents > 0) "+" else "-"
     val positiveAmount = if (money.cents > 0) money else -money
     s"$sign $positiveAmount"
+  }
+
+  private def zipWithIncrementingId[E](entities: Seq[E]): Seq[(E, Long)] = {
+    val ids = {
+      val start = EntityModification.generateRandomId()
+      val end = start + entities.size
+      start until end
+    }
+    entities zip ids
   }
 }
