@@ -47,10 +47,12 @@ final class Summary(implicit summaryTable: SummaryTable,
 
   // **************** Private inner types ****************//
   private case class Props(router: RouterContext)
-  private case class State(includeUnrelatedAccounts: Boolean,
-                           query: String,
-                           yearLowerBound: Int,
-                           expandedYear: Int)
+  private case class State(
+      includeUnrelatedAccounts: Boolean,
+      query: String,
+      yearLowerBound: Int,
+      expandedYear: Int,
+  )
 
   private class Backend(val $ : BackendScope[Props, State]) {
     private val queryInputRef = TextInput.ref()

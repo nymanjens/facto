@@ -13,9 +13,11 @@ import hydro.flux.react.uielements.Bootstrap
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
-private[transactiongroupform] final class TotalFlowInput(implicit i18n: I18n,
-                                                         clock: Clock,
-                                                         exchangeRateManager: ExchangeRateManager) {
+private[transactiongroupform] final class TotalFlowInput(
+    implicit i18n: I18n,
+    clock: Clock,
+    exchangeRateManager: ExchangeRateManager,
+) {
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
@@ -84,18 +86,22 @@ private[transactiongroupform] final class TotalFlowInput(implicit i18n: I18n,
     .build
 
   // **************** API ****************//
-  def apply(defaultValue: ReferenceMoney = ReferenceMoney(0),
-            forceValue: Option[ReferenceMoney],
-            foreignCurrency: Option[Currency],
-            onChange: ReferenceMoney => Unit): VdomElement = {
+  def apply(
+      defaultValue: ReferenceMoney = ReferenceMoney(0),
+      forceValue: Option[ReferenceMoney],
+      foreignCurrency: Option[Currency],
+      onChange: ReferenceMoney => Unit,
+  ): VdomElement = {
     component(Props(defaultValue, forceValue, foreignCurrency, onChange))
   }
 
   // **************** Private inner types ****************//
-  case class Props(defaultValue: ReferenceMoney,
-                   forceValue: Option[ReferenceMoney],
-                   foreignCurrency: Option[Currency],
-                   onChangeListener: ReferenceMoney => Unit)
+  case class Props(
+      defaultValue: ReferenceMoney,
+      forceValue: Option[ReferenceMoney],
+      foreignCurrency: Option[Currency],
+      onChangeListener: ReferenceMoney => Unit,
+  )
 
   case class State(valueString: String) {
     def parsedValueOrDefault: ReferenceMoney =

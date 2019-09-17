@@ -28,16 +28,18 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
 ) extends HydroReactComponent {
 
   // **************** API ****************//
-  def apply(tableTitle: String,
-            tableClasses: Seq[String] = Seq(),
-            key: String = "",
-            numEntriesStrategy: NumEntriesStrategy,
-            collapsedExpandedStateStore: Option[CollapsedExpandedStateStoreFactory.Store] = None,
-            additionalInput: AdditionalInput,
-            latestEntryToTableTitleExtra: Entry => String = null,
-            hideEmptyTable: Boolean = false,
-            tableHeaders: Seq[VdomElement],
-            calculateTableData: Entry => Seq[VdomElement]): VdomElement = {
+  def apply(
+      tableTitle: String,
+      tableClasses: Seq[String] = Seq(),
+      key: String = "",
+      numEntriesStrategy: NumEntriesStrategy,
+      collapsedExpandedStateStore: Option[CollapsedExpandedStateStoreFactory.Store] = None,
+      additionalInput: AdditionalInput,
+      latestEntryToTableTitleExtra: Entry => String = null,
+      hideEmptyTable: Boolean = false,
+      tableHeaders: Seq[VdomElement],
+      calculateTableData: Entry => Seq[VdomElement],
+  ): VdomElement = {
     withRowNumber(
       tableTitle = tableTitle,
       tableClasses = tableClasses,
@@ -56,16 +58,18 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
     * @param calculateTableDataFromEntryAndRowNum Returns an a seq of table datas from an entry and the number of the
     *                                             row. The first row is zero.
     */
-  def withRowNumber(tableTitle: String,
-                    tableClasses: Seq[String] = Seq(),
-                    key: String = "",
-                    numEntriesStrategy: NumEntriesStrategy,
-                    collapsedExpandedStateStore: Option[CollapsedExpandedStateStoreFactory.Store],
-                    additionalInput: AdditionalInput,
-                    latestEntryToTableTitleExtra: Entry => String = null,
-                    hideEmptyTable: Boolean = false,
-                    tableHeaders: Seq[VdomElement],
-                    calculateTableDataFromEntryAndRowNum: (Entry, Int) => Seq[VdomElement]): VdomElement = {
+  def withRowNumber(
+      tableTitle: String,
+      tableClasses: Seq[String] = Seq(),
+      key: String = "",
+      numEntriesStrategy: NumEntriesStrategy,
+      collapsedExpandedStateStore: Option[CollapsedExpandedStateStoreFactory.Store],
+      additionalInput: AdditionalInput,
+      latestEntryToTableTitleExtra: Entry => String = null,
+      hideEmptyTable: Boolean = false,
+      tableHeaders: Seq[VdomElement],
+      calculateTableDataFromEntryAndRowNum: (Entry, Int) => Seq[VdomElement],
+  ): VdomElement = {
     component
       .withKey(key)
       .apply(

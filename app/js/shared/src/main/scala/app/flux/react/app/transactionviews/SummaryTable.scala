@@ -67,13 +67,15 @@ private[transactionviews] final class SummaryTable(
   }
 
   // **************** API ****************//
-  def apply(key: String,
-            account: Account,
-            query: String,
-            yearLowerBound: Int,
-            expandedYear: Int,
-            onShowHiddenYears: Callback,
-            onSetExpandedYear: Int => Callback)(implicit router: RouterContext): VdomElement = {
+  def apply(
+      key: String,
+      account: Account,
+      query: String,
+      yearLowerBound: Int,
+      expandedYear: Int,
+      onShowHiddenYears: Callback,
+      onSetExpandedYear: Int => Callback,
+  )(implicit router: RouterContext): VdomElement = {
     component
       .withKey(key)
       .apply(
@@ -91,20 +93,23 @@ private[transactionviews] final class SummaryTable(
 
   // **************** Private types ****************//
 
-  private case class Props(account: Account,
-                           query: String,
-                           yearLowerBound: Int,
-                           expandedYear: Int,
-                           onShowHiddenYears: Callback,
-                           onSetExpandedYear: Int => Callback,
-                           router: RouterContext)
+  private case class Props(
+      account: Account,
+      query: String,
+      yearLowerBound: Int,
+      expandedYear: Int,
+      onShowHiddenYears: Callback,
+      onSetExpandedYear: Int => Callback,
+      router: RouterContext,
+  )
 
   private case class State(allYearsData: AllYearsData, dataIsLoading: Boolean)
 
   @visibleForTesting private[transactionviews] case class AllYearsData(
       allTransactionsYearRange: YearRange,
       private val yearsToData: ListMap[Int, AllYearsData.YearData],
-      netWorth: ReferenceMoney) {
+      netWorth: ReferenceMoney,
+  ) {
 
     /**
       * Returns the categories of the transactions in the order configured for this account.

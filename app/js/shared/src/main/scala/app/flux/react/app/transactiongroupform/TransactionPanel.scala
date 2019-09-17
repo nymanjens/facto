@@ -46,13 +46,15 @@ import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
-                                                           accountingConfig: Config,
-                                                           user: User,
-                                                           exchangeRateManager: ExchangeRateManager,
-                                                           clock: Clock,
-                                                           entityAccess: AppJsEntityAccess,
-                                                           tagsStoreFactory: TagsStoreFactory) {
+private[transactiongroupform] final class TransactionPanel(
+    implicit i18n: I18n,
+    accountingConfig: Config,
+    user: User,
+    exchangeRateManager: ExchangeRateManager,
+    clock: Clock,
+    entityAccess: AppJsEntityAccess,
+    tagsStoreFactory: TagsStoreFactory,
+) {
 
   private val anythingChangedQueue = SinglePendingTaskQueue.create()
 
@@ -97,16 +99,18 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
   }
 
   // **************** API ****************//
-  def apply(key: Int,
-            ref: Reference,
-            title: String,
-            defaultValues: Transaction.Partial,
-            forceFlowValue: Option[ReferenceMoney] = None,
-            showErrorMessages: Boolean,
-            defaultPanel: Option[Proxy],
-            focusOnMount: Boolean,
-            closeButtonCallback: Option[Callback] = None,
-            onFormChange: () => Unit): VdomElement = {
+  def apply(
+      key: Int,
+      ref: Reference,
+      title: String,
+      defaultValues: Transaction.Partial,
+      forceFlowValue: Option[ReferenceMoney] = None,
+      showErrorMessages: Boolean,
+      defaultPanel: Option[Proxy],
+      focusOnMount: Boolean,
+      closeButtonCallback: Option[Callback] = None,
+      onFormChange: () => Unit,
+  ): VdomElement = {
 
     val props = Props(
       title = title,
@@ -186,38 +190,44 @@ private[transactiongroupform] final class TransactionPanel(implicit i18n: I18n,
     private def maybeBackend: Option[Backend] = maybeComponentFactory() map (_.backend)
   }
 
-  case class Data(transactionDate: LocalDateTime,
-                  consumedDate: LocalDateTime,
-                  moneyReservoir: MoneyReservoir,
-                  beneficiaryAccount: Account,
-                  category: Category,
-                  description: String,
-                  flow: DatedMoney,
-                  detailDescription: String,
-                  tags: Seq[String])
+  case class Data(
+      transactionDate: LocalDateTime,
+      consumedDate: LocalDateTime,
+      moneyReservoir: MoneyReservoir,
+      beneficiaryAccount: Account,
+      category: Category,
+      description: String,
+      flow: DatedMoney,
+      detailDescription: String,
+      tags: Seq[String],
+  )
 
   // **************** Private inner types ****************//
   private type ThisCtorSummoner = CtorType.Summoner.Aux[Box[Props], Children.None, CtorType.Props]
   private type ThisComponentU = MountedImpure[Props, State, Backend]
   private type ThisMutableRef = ToScalaComponent[Props, State, Backend, ThisCtorSummoner#CT]
-  private case class State(transactionDate: LocalDateTime,
-                           beneficiaryAccount: Account,
-                           moneyReservoir: MoneyReservoir,
-                           descriptionSuggestions: Seq[String] = Seq(),
-                           allDescriptionSuggestionsForCategory: Option[State.CategoryAndSuggestions] = None,
-                           allTags: Seq[String] = Seq())
+  private case class State(
+      transactionDate: LocalDateTime,
+      beneficiaryAccount: Account,
+      moneyReservoir: MoneyReservoir,
+      descriptionSuggestions: Seq[String] = Seq(),
+      allDescriptionSuggestionsForCategory: Option[State.CategoryAndSuggestions] = None,
+      allTags: Seq[String] = Seq(),
+  )
   private object State {
     case class CategoryAndSuggestions(category: Category, suggestions: Seq[String])
   }
 
-  private case class Props(title: String,
-                           defaultValues: Transaction.Partial,
-                           forceFlowValue: Option[ReferenceMoney],
-                           showErrorMessages: Boolean,
-                           defaultPanel: Option[Proxy],
-                           focusOnMount: Boolean,
-                           deleteButtonCallback: Option[Callback],
-                           onFormChange: () => Unit)
+  private case class Props(
+      title: String,
+      defaultValues: Transaction.Partial,
+      forceFlowValue: Option[ReferenceMoney],
+      showErrorMessages: Boolean,
+      defaultPanel: Option[Proxy],
+      focusOnMount: Boolean,
+      deleteButtonCallback: Option[Callback],
+      onFormChange: () => Unit,
+  )
 
   private class Backend(val $ : BackendScope[Props, State]) {
 

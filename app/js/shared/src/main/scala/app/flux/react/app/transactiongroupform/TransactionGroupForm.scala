@@ -157,10 +157,12 @@ final class TransactionGroupForm(implicit i18n: I18n,
     forCreate(template.toPartial(userAccount), returnToPath, router)
   }
 
-  def forRepayment(accountCode1: String,
-                   accountCode2: String,
-                   returnToPath: Path,
-                   router: RouterContext): VdomElement = {
+  def forRepayment(
+      accountCode1: String,
+      accountCode2: String,
+      returnToPath: Path,
+      router: RouterContext,
+  ): VdomElement = {
     val account1 = accountingConfig.accounts(accountCode1)
     val account2 = accountingConfig.accounts(accountCode2)
 
@@ -218,10 +220,12 @@ final class TransactionGroupForm(implicit i18n: I18n,
       } yield accountPair -> debt).toMap
 
       if (filteredPairToDebt.nonEmpty) {
-        def partial(title: String,
-                    beneficiary: Account,
-                    reservoirAccount: Account,
-                    flow: ReferenceMoney): Transaction.Partial =
+        def partial(
+            title: String,
+            beneficiary: Account,
+            reservoirAccount: Account,
+            flow: ReferenceMoney,
+        ): Transaction.Partial =
           Transaction.Partial(
             beneficiary = Some(beneficiary),
             moneyReservoir = Some(reservoirAccount.defaultElectronicReservoir),
@@ -250,9 +254,11 @@ final class TransactionGroupForm(implicit i18n: I18n,
     })
 
   // **************** Private helper methods ****************//
-  private def forCreate(transactionGroupPartial: TransactionGroup.Partial,
-                        returnToPath: Path,
-                        router: RouterContext): VdomElement = {
+  private def forCreate(
+      transactionGroupPartial: TransactionGroup.Partial,
+      returnToPath: Path,
+      router: RouterContext,
+  ): VdomElement = {
     create(
       Props(
         operationMeta = OperationMeta.AddNew,
@@ -279,23 +285,27 @@ final class TransactionGroupForm(implicit i18n: I18n,
     * @param foreignCurrency Any foreign currency of any of the selected money reservoirs. If there are multiple,
     *                        this can by any of these.
     */
-  private case class State(panelIndices: Seq[Int],
-                           nextPanelIndex: Int,
-                           showErrorMessages: Boolean = false,
-                           globalErrorMessage: Option[String] = None,
-                           foreignCurrency: Option[Currency],
-                           totalFlowRestriction: TotalFlowRestriction,
-                           totalFlow: ReferenceMoney,
-                           totalFlowExceptLast: ReferenceMoney) {
+  private case class State(
+      panelIndices: Seq[Int],
+      nextPanelIndex: Int,
+      showErrorMessages: Boolean = false,
+      globalErrorMessage: Option[String] = None,
+      foreignCurrency: Option[Currency],
+      totalFlowRestriction: TotalFlowRestriction,
+      totalFlow: ReferenceMoney,
+      totalFlowExceptLast: ReferenceMoney,
+  ) {
     def plusPanel(): State =
       copy(panelIndices = panelIndices :+ nextPanelIndex, nextPanelIndex = nextPanelIndex + 1)
     def minusPanelIndex(index: Int): State = copy(panelIndices = panelIndices.filter(_ != index))
   }
 
-  private case class Props(operationMeta: OperationMeta,
-                           groupPartial: TransactionGroup.Partial,
-                           returnToPath: Path,
-                           router: RouterContext)
+  private case class Props(
+      operationMeta: OperationMeta,
+      groupPartial: TransactionGroup.Partial,
+      returnToPath: Path,
+      router: RouterContext,
+  )
 
   private final class Backend(val $ : BackendScope[Props, State]) {
 
