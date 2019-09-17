@@ -147,7 +147,8 @@ class MoneyTest extends TestSuite {
 
   private def persistGbpMeasurement(daysBeforeNow: Int, ratio: Double)(
       implicit entityAccess: FakeJsEntityAccess,
-      clock: Clock): Unit = {
+      clock: Clock,
+  ): Unit = {
     entityAccess.addWithRandomId(
       ExchangeRateMeasurement(
         date = clock.now.plus(Duration.ofDays(-daysBeforeNow)),

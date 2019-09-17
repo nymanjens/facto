@@ -78,8 +78,10 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
     }
   }
 
-  private def createTestComponent(ref: stringInputWithDefault.Reference,
-                                  proxy: InputBase.Proxy[String]): ComponentTester = {
+  private def createTestComponent(
+      ref: stringInputWithDefault.Reference,
+      proxy: InputBase.Proxy[String],
+  ): ComponentTester = {
     new ComponentTester(
       stringInputWithDefault(ref = ref, defaultValueProxy = proxy, delegateRefFactory = TextInput.ref _) {
         extraProps =>
