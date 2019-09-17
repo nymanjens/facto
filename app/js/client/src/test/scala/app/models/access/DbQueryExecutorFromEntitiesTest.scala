@@ -233,12 +233,14 @@ object DbQueryExecutorFromEntitiesTest extends TestSuite {
     }
   }
 
-  private def createTransaction(groupId: Long = 1273984,
-                                day: Int = 25,
-                                category: Category = testCategory,
-                                description: String = "some description",
-                                detailDescription: String = "some detail description",
-                                tags: Seq[String] = Seq("some-tag")): Transaction = {
+  private def createTransaction(
+      groupId: Long = 1273984,
+      day: Int = 25,
+      category: Category = testCategory,
+      description: String = "some description",
+      detailDescription: String = "some detail description",
+      tags: Seq[String] = Seq("some-tag"),
+  ): Transaction = {
     testTransactionWithId.copy(
       idOption = Some(EntityModification.generateRandomId()),
       transactionGroupId = groupId,

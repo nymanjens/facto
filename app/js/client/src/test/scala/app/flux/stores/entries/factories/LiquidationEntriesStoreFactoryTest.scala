@@ -112,7 +112,8 @@ object LiquidationEntriesStoreFactoryTest extends TestSuite {
       flowInCents: Long,
       day: Int,
       account: Account = testAccountA,
-      reservoir: MoneyReservoir)(implicit entityAccess: FakeJsEntityAccess): Transaction = {
+      reservoir: MoneyReservoir,
+  )(implicit entityAccess: FakeJsEntityAccess): Transaction = {
     val transaction = testTransactionWithIdA.copy(
       idOption = Some(EntityModification.generateRandomId()),
       transactionGroupId = groupId,

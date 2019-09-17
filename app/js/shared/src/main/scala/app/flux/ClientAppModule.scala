@@ -8,8 +8,10 @@ import hydro.flux.action.Module
 import hydro.flux.router.Page
 import japgolly.scalajs.react.extra.router.Router
 
-final class ClientAppModule(implicit getInitialDataResponse: GetInitialDataResponse,
-                            scalaJsApiClient: ScalaJsApiClient) {
+final class ClientAppModule(
+    implicit getInitialDataResponse: GetInitialDataResponse,
+    scalaJsApiClient: ScalaJsApiClient,
+) {
 
   // Unpack arguments
   implicit private val accountingConfig: Config = getInitialDataResponse.accountingConfig

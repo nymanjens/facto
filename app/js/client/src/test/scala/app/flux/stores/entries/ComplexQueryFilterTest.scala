@@ -207,8 +207,10 @@ object ComplexQueryFilterTest extends TestSuite {
     }
   }
 
-  private def withTransactions(transactions: Transaction*)(implicit complexQueryFilter: ComplexQueryFilter,
-                                                           entityAccess: AppEntityAccess) =
+  private def withTransactions(transactions: Transaction*)(
+      implicit complexQueryFilter: ComplexQueryFilter,
+      entityAccess: AppEntityAccess,
+  ) =
     new Object {
       def assertThatQuery(query: String) = new Object {
         def containsExactly(expected: Transaction*): Unit = {

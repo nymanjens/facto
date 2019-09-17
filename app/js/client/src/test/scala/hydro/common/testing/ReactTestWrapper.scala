@@ -46,10 +46,12 @@ final class ReactTestWrapper(private val element: raw.Element) {
     Simulate.click(element)
   }
 
-  def typeKeyboardCharacter(key: String,
-                            shiftKey: Boolean = false,
-                            altKey: Boolean = false,
-                            ctrlKey: Boolean = false): Unit = {
+  def typeKeyboardCharacter(
+      key: String,
+      shiftKey: Boolean = false,
+      altKey: Boolean = false,
+      ctrlKey: Boolean = false,
+  ): Unit = {
     val eventData = js.Dynamic.literal(key = key, shiftKey = shiftKey, altKey = altKey, ctrlKey = ctrlKey)
     Simulate.keyDown(element, eventData = eventData)
     Simulate.keyPress(element, eventData = eventData)

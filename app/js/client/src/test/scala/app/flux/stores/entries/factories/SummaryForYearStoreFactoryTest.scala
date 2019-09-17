@@ -130,7 +130,8 @@ object SummaryForYearStoreFactoryTest extends TestSuite {
       month: Month = MARCH,
       day: Int = 20,
       beneficiary: Account = testAccountA,
-      description: String = "abcdefg")(implicit entityAccess: FakeJsEntityAccess): Transaction = {
+      description: String = "abcdefg",
+  )(implicit entityAccess: FakeJsEntityAccess): Transaction = {
     val transaction =
       createTransaction(
         beneficiary = beneficiary,

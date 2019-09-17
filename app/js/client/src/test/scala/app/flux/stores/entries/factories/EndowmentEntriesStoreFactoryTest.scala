@@ -48,12 +48,13 @@ object EndowmentEntriesStoreFactoryTest extends TestSuite {
     }
   }
 
-  private def persistTransaction(id: Long,
-                                 consumedDay: Int,
-                                 createdDay: Int = 1,
-                                 account: Account = testAccountA,
-                                 category: Category = testAccountingConfig.constants.endowmentCategory)(
-      implicit entityAccess: FakeJsEntityAccess): Transaction = {
+  private def persistTransaction(
+      id: Long,
+      consumedDay: Int,
+      createdDay: Int = 1,
+      account: Account = testAccountA,
+      category: Category = testAccountingConfig.constants.endowmentCategory,
+  )(implicit entityAccess: FakeJsEntityAccess): Transaction = {
     val transaction = testTransactionWithIdA.copy(
       idOption = Some(id),
       transactionGroupId = id,

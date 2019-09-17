@@ -12,9 +12,10 @@ object AppActions {
   // **************** Transaction[Group]-related actions **************** //
   case class AddTransactionGroup(transactionsWithoutIdProvider: TransactionGroup => Seq[Transaction])
       extends Action
-  case class UpdateTransactionGroup(transactionGroupWithId: TransactionGroup,
-                                    transactionsWithoutId: Seq[Transaction])
-      extends Action
+  case class UpdateTransactionGroup(
+      transactionGroupWithId: TransactionGroup,
+      transactionsWithoutId: Seq[Transaction],
+  ) extends Action
   case class RemoveTransactionGroup(transactionGroupWithId: TransactionGroup) extends Action
 
   // **************** BalanceCheck-related actions **************** //

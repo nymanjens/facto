@@ -109,7 +109,8 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
   private def persistTransaction(
       flow: Double,
       date: LocalDateTime,
-      reservoir: MoneyReservoir = testReservoirCashGbp)(implicit entityAccess: FakeJsEntityAccess): Unit = {
+      reservoir: MoneyReservoir = testReservoirCashGbp,
+  )(implicit entityAccess: FakeJsEntityAccess): Unit = {
     entityAccess.addRemotelyAddedEntities(
       createTransaction(flow = flow, reservoir = reservoir).copy(transactionDate = date))
   }

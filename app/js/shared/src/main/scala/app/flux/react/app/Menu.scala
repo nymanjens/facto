@@ -17,11 +17,13 @@ import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
 
-private[app] final class Menu(implicit accountingConfig: Config,
-                              user: User,
-                              entityAccess: AppJsEntityAccess,
-                              i18n: I18n,
-                              sbadminMenu: SbadminMenu) {
+private[app] final class Menu(
+    implicit accountingConfig: Config,
+    user: User,
+    entityAccess: AppJsEntityAccess,
+    i18n: I18n,
+    sbadminMenu: SbadminMenu,
+) {
 
   // **************** API ****************//
   def apply()(implicit router: RouterContext): VdomElement = {

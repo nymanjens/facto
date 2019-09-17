@@ -56,9 +56,11 @@ object TextInputTest extends TestSuite {
     }
   }
 
-  private def createTestComponent(defaultValue: String = "",
-                                  required: Boolean = false,
-                                  showErrorMessage: Boolean = false): ComponentTester = {
+  private def createTestComponent(
+      defaultValue: String = "",
+      required: Boolean = false,
+      showErrorMessage: Boolean = false,
+  ): ComponentTester = {
     new ComponentTester(
       bootstrap.TextInput(
         ref = testRef,

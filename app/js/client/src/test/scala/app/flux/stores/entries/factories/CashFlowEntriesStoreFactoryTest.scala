@@ -130,7 +130,8 @@ object CashFlowEntriesStoreFactoryTest extends TestSuite {
       flowInCents: Long,
       day: Int,
       reservoir: MoneyReservoir = testReservoir,
-      createIncrement: Int = 0)(implicit entityAccess: FakeJsEntityAccess): Transaction = {
+      createIncrement: Int = 0,
+  )(implicit entityAccess: FakeJsEntityAccess): Transaction = {
     val transaction = testTransactionWithIdA.copy(
       idOption = Some(EntityModification.generateRandomId()),
       transactionGroupId = groupId,
@@ -147,7 +148,8 @@ object CashFlowEntriesStoreFactoryTest extends TestSuite {
       balanceInCents: Long,
       day: Int,
       reservoir: MoneyReservoir = testReservoir,
-      createIncrement: Int = 0)(implicit entityAccess: FakeJsEntityAccess): BalanceCheck = {
+      createIncrement: Int = 0,
+  )(implicit entityAccess: FakeJsEntityAccess): BalanceCheck = {
     val balanceCheck = testBalanceCheckWithId.copy(
       idOption = Some(EntityModification.generateRandomId()),
       balanceInCents = balanceInCents,

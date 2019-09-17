@@ -52,9 +52,11 @@ object MappedInputTest extends TestSuite {
     }
   }
 
-  private def createTestComponent(ref: dateMappedInput.Reference,
-                                  showErrorMessage: Boolean = false,
-                                  initialValue: String = null): ComponentTester = {
+  private def createTestComponent(
+      ref: dateMappedInput.Reference,
+      showErrorMessage: Boolean = false,
+      initialValue: String = null,
+  ): ComponentTester = {
     new ComponentTester(
       dateMappedInput(
         ref = ref,
