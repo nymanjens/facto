@@ -18,11 +18,13 @@ object AutosuggestTextInput {
 
   private val component = InputComponent.create[Value, ExtraProps](
     name = getClass.getSimpleName,
-    inputRenderer = (classes: Seq[String],
-                     name: String,
-                     valueString: String,
-                     onChange: String => Callback,
-                     extraProps: ExtraProps) => {
+    inputRenderer = (
+        classes: Seq[String],
+        name: String,
+        valueString: String,
+        onChange: String => Callback,
+        extraProps: ExtraProps,
+    ) => {
       ReactAutosuggest(
         suggestions = extraProps.suggestions,
         onSuggestionsFetchRequested = extraProps.onSuggestionsFetchRequested,
@@ -47,19 +49,20 @@ object AutosuggestTextInput {
   )
 
   // **************** API ****************//
-  def apply(ref: Reference,
-            name: String,
-            label: String,
-            defaultValue: String = "",
-            required: Boolean = false,
-            showErrorMessage: Boolean = false,
-            additionalValidator: InputValidator[String] = InputValidator.alwaysValid,
-            inputClasses: Seq[String] = Seq(),
-            suggestions: Seq[String],
-            onSuggestionsFetchRequested: String => Unit,
-            onSuggestionsClearRequested: () => Unit,
-            listener: InputBase.Listener[String] = InputBase.Listener.nullInstance)(
-      implicit i18n: I18n): VdomElement = {
+  def apply(
+      ref: Reference,
+      name: String,
+      label: String,
+      defaultValue: String = "",
+      required: Boolean = false,
+      showErrorMessage: Boolean = false,
+      additionalValidator: InputValidator[String] = InputValidator.alwaysValid,
+      inputClasses: Seq[String] = Seq(),
+      suggestions: Seq[String],
+      onSuggestionsFetchRequested: String => Unit,
+      onSuggestionsClearRequested: () => Unit,
+      listener: InputBase.Listener[String] = InputBase.Listener.nullInstance,
+  )(implicit i18n: I18n): VdomElement = {
     val props = Props(
       label = label,
       name = name,
@@ -85,9 +88,11 @@ object AutosuggestTextInput {
       private[AutosuggestTextInput] val mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps])
       extends InputComponent.Reference(mutableRef)
 
-  case class ExtraProps private[AutosuggestTextInput] (suggestions: Seq[String],
-                                                       onSuggestionsFetchRequested: String => Unit,
-                                                       onSuggestionsClearRequested: () => Unit)
+  case class ExtraProps private[AutosuggestTextInput] (
+      suggestions: Seq[String],
+      onSuggestionsFetchRequested: String => Unit,
+      onSuggestionsClearRequested: () => Unit,
+  )
 
   // **************** Private inner types ****************//
   private type Value = String

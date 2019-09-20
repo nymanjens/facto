@@ -20,10 +20,12 @@ import scala.async.Async.await
 import scala.reflect.ClassTag
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-private[router] final class RouterFactory(implicit reactAppModule: app.flux.react.app.Module,
-                                          dispatcher: Dispatcher,
-                                          i18n: I18n,
-                                          entityAccess: EntityAccess) {
+private[router] final class RouterFactory(
+    implicit reactAppModule: app.flux.react.app.Module,
+    dispatcher: Dispatcher,
+    i18n: I18n,
+    entityAccess: EntityAccess,
+) {
 
   def createRouter(): Router[Page] = {
     Router(BaseUrl.until(RouterFactory.pathPrefix), routerConfig)

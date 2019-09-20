@@ -28,11 +28,13 @@ object MoneyInput {
         case None             => oldValue
       }
     },
-    inputRenderer = (classes: Seq[String],
-                     name: String,
-                     valueString: String,
-                     onChange: String => Callback,
-                     extraProps: ExtraProps) => {
+    inputRenderer = (
+        classes: Seq[String],
+        name: String,
+        valueString: String,
+        onChange: String => Callback,
+        extraProps: ExtraProps,
+    ) => {
       def referenceMoney(currency: Currency, date: LocalDateTime) = {
         val datedMoney = {
           val cents = ValueTransformer.stringToValue(valueString, extraProps) getOrElse 0L
@@ -73,19 +75,22 @@ object MoneyInput {
   )
 
   // **************** API ****************//
-  def withCurrencyConversion(ref: Reference,
-                             name: String,
-                             label: String,
-                             defaultValue: Long,
-                             required: Boolean = false,
-                             showErrorMessage: Boolean,
-                             inputClasses: Seq[String] = Seq(),
-                             forceValue: Option[Long] = None,
-                             currency: Currency,
-                             date: LocalDateTime,
-                             listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance)(
+  def withCurrencyConversion(
+      ref: Reference,
+      name: String,
+      label: String,
+      defaultValue: Long,
+      required: Boolean = false,
+      showErrorMessage: Boolean,
+      inputClasses: Seq[String] = Seq(),
+      forceValue: Option[Long] = None,
+      currency: Currency,
+      date: LocalDateTime,
+      listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance,
+  )(
       implicit exchangeRateManager: ExchangeRateManager,
-      i18n: I18n): VdomElement = applyInternal(
+      i18n: I18n,
+  ): VdomElement = applyInternal(
     ref = ref,
     name = name,
     label = label,
@@ -99,18 +104,21 @@ object MoneyInput {
     listener = listener
   )
 
-  def apply(ref: Reference,
-            name: String,
-            label: String,
-            defaultValue: Long,
-            required: Boolean = false,
-            showErrorMessage: Boolean,
-            inputClasses: Seq[String] = Seq(),
-            forceValue: Option[Long] = None,
-            currency: Currency,
-            listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance)(
+  def apply(
+      ref: Reference,
+      name: String,
+      label: String,
+      defaultValue: Long,
+      required: Boolean = false,
+      showErrorMessage: Boolean,
+      inputClasses: Seq[String] = Seq(),
+      forceValue: Option[Long] = None,
+      currency: Currency,
+      listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance,
+  )(
       implicit exchangeRateManager: ExchangeRateManager,
-      i18n: I18n): VdomElement = applyInternal(
+      i18n: I18n,
+  ): VdomElement = applyInternal(
     ref = ref,
     name = name,
     label = label,
@@ -125,19 +133,22 @@ object MoneyInput {
   )
 
   // **************** Private helper methods ****************//
-  private def applyInternal(ref: Reference,
-                            name: String,
-                            label: String,
-                            defaultValue: Long,
-                            required: Boolean,
-                            showErrorMessage: Boolean,
-                            inputClasses: Seq[String],
-                            forceValue: Option[Long],
-                            currency: Currency,
-                            dateForCurrencyConversion: Option[LocalDateTime],
-                            listener: InputBase.Listener[Value])(
+  private def applyInternal(
+      ref: Reference,
+      name: String,
+      label: String,
+      defaultValue: Long,
+      required: Boolean,
+      showErrorMessage: Boolean,
+      inputClasses: Seq[String],
+      forceValue: Option[Long],
+      currency: Currency,
+      dateForCurrencyConversion: Option[LocalDateTime],
+      listener: InputBase.Listener[Value],
+  )(
       implicit exchangeRateManager: ExchangeRateManager,
-      i18n: I18n): VdomElement = {
+      i18n: I18n,
+  ): VdomElement = {
     val props = Props[Value, ExtraProps](
       label = label,
       name = name,
@@ -165,7 +176,8 @@ object MoneyInput {
   case class ExtraProps(
       forceValue: Option[Long],
       currency: Currency,
-      dateForCurrencyConversion: Option[LocalDateTime])(implicit val exchangeRateManager: ExchangeRateManager)
+      dateForCurrencyConversion: Option[LocalDateTime],
+  )(implicit val exchangeRateManager: ExchangeRateManager)
 
   // **************** Private inner types ****************//
   /** Number of cents. */

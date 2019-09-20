@@ -16,8 +16,10 @@ import japgolly.scalajs.react.vdom._
 import scala.collection.mutable
 import scala.reflect.ClassTag
 
-class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: ClassTag[DelegateValue],
-                                                 valueTag: ClassTag[Value]) {
+class MappedInput[DelegateValue, Value] private (
+    implicit delegateValueTag: ClassTag[DelegateValue],
+    valueTag: ClassTag[Value],
+) {
 
   private val component = ScalaComponent
     .builder[Props.any](
@@ -33,8 +35,8 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
       defaultValue: Value,
       valueTransformer: ValueTransformer[DelegateValue, Value],
       listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance,
-      delegateRefFactory: () => DelegateRef)(
-      delegateInputElementFactory: InputElementExtraProps[DelegateRef] => VdomElement): VdomElement = {
+      delegateRefFactory: () => DelegateRef,
+  )(delegateInputElementFactory: InputElementExtraProps[DelegateRef] => VdomElement): VdomElement = {
     ref.mutableRef
       .component(
         Props(
@@ -53,7 +55,8 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
   case class InputElementExtraProps[DelegateRef <: InputBase.Reference[DelegateValue]](
       ref: DelegateRef,
       defaultValue: DelegateValue,
-      additionalValidator: InputValidator[DelegateValue])
+      additionalValidator: InputValidator[DelegateValue],
+  )
 
   final class Reference private[MappedInput] (private[MappedInput] val mutableRef: ThisMutableRef)
       extends InputBase.Reference[Value] {
@@ -100,8 +103,10 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
     private val mappedToDelegateListener
       : mutable.Map[InputBase.Listener[Value], InputBase.Listener[DelegateValue]] = mutable.Map()
 
-    def toDelegateListener(mappedListener: InputBase.Listener[Value],
-                           props: Props.any): InputBase.Listener[DelegateValue] = {
+    def toDelegateListener(
+        mappedListener: InputBase.Listener[Value],
+        props: Props.any,
+    ): InputBase.Listener[DelegateValue] = {
       if (!(mappedToDelegateListener contains mappedListener)) {
         mappedToDelegateListener.put(
           mappedListener,
@@ -126,7 +131,8 @@ class MappedInput[DelegateValue, Value] private (implicit delegateValueTag: Clas
       valueTransformer: ValueTransformer[DelegateValue, Value],
       defaultValue: Value,
       listener: InputBase.Listener[Value],
-      delegateElementFactory: InputElementExtraProps[DelegateRef] => VdomElement)
+      delegateElementFactory: InputElementExtraProps[DelegateRef] => VdomElement,
+  )
   private object Props {
     type any = Props[_ <: InputBase.Reference[DelegateValue]]
   }

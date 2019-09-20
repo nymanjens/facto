@@ -27,16 +27,17 @@ object TagInput {
     .build
 
   // **************** API ****************//
-  def apply(ref: Reference,
-            label: String,
-            name: String,
-            suggestions: Seq[String],
-            defaultValue: Seq[String],
-            showErrorMessage: Boolean,
-            additionalValidator: InputValidator[Seq[String]],
-            inputClasses: Seq[String],
-            listener: InputBase.Listener[Seq[String]] = InputBase.Listener.nullInstance)(
-      implicit i18n: I18n): VdomElement = {
+  def apply(
+      ref: Reference,
+      label: String,
+      name: String,
+      suggestions: Seq[String],
+      defaultValue: Seq[String],
+      showErrorMessage: Boolean,
+      additionalValidator: InputValidator[Seq[String]],
+      inputClasses: Seq[String],
+      listener: InputBase.Listener[Seq[String]] = InputBase.Listener.nullInstance,
+  )(implicit i18n: I18n): VdomElement = {
     val props = Props(
       label = label,
       name = name,
@@ -64,14 +65,16 @@ object TagInput {
   private type ThisMutableRef = ToScalaComponent[Props, State, Backend, ThisCtorSummoner#CT]
   private type ThisComponentU = MountedImpure[Props, State, Backend]
 
-  case class Props(label: String,
-                   name: String,
-                   defaultValue: Seq[String],
-                   suggestions: Seq[String],
-                   showErrorMessage: Boolean,
-                   additionalValidator: InputValidator[Seq[String]],
-                   inputClasses: Seq[String],
-                   listener: InputBase.Listener[Seq[String]])(implicit val i18n: I18n)
+  case class Props(
+      label: String,
+      name: String,
+      defaultValue: Seq[String],
+      suggestions: Seq[String],
+      showErrorMessage: Boolean,
+      additionalValidator: InputValidator[Seq[String]],
+      inputClasses: Seq[String],
+      listener: InputBase.Listener[Seq[String]],
+  )(implicit val i18n: I18n)
 
   case class State(tags: Seq[String], listeners: Seq[InputBase.Listener[Seq[String]]] = Seq()) {
     def withTags(newTags: Seq[String]): State = copy(tags = newTags)

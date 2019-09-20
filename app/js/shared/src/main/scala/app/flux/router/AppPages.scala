@@ -62,9 +62,10 @@ object AppPages {
       NewTransactionGroup(HasReturnTo.getCurrentEncodedPath)
   }
 
-  case class EditTransactionGroup private (transactionGroupId: Long,
-                                           override val encodedReturnTo: Option[String])
-      extends HasReturnTo
+  case class EditTransactionGroup private (
+      transactionGroupId: Long,
+      override val encodedReturnTo: Option[String],
+  ) extends HasReturnTo
       with Page {
     override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
       Future.successful(i18n("app.edit-transaction"))
@@ -76,9 +77,10 @@ object AppPages {
       EditTransactionGroup(transactionGroupId, HasReturnTo.getCurrentEncodedPath)
   }
 
-  case class NewTransactionGroupFromCopy private (transactionGroupId: Long,
-                                                  override val encodedReturnTo: Option[String])
-      extends HasReturnTo
+  case class NewTransactionGroupFromCopy private (
+      transactionGroupId: Long,
+      override val encodedReturnTo: Option[String],
+  ) extends HasReturnTo
       with Page {
     override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
       Future.successful(i18n("app.new-transaction"))
@@ -89,9 +91,10 @@ object AppPages {
       NewTransactionGroupFromCopy(transactionGroupId, HasReturnTo.getCurrentEncodedPath)
   }
 
-  case class NewTransactionGroupFromReservoir private (reservoirCode: String,
-                                                       override val encodedReturnTo: Option[String])
-      extends HasReturnTo
+  case class NewTransactionGroupFromReservoir private (
+      reservoirCode: String,
+      override val encodedReturnTo: Option[String],
+  ) extends HasReturnTo
       with Page {
     override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
       Future.successful(i18n("app.new-transaction"))
@@ -115,10 +118,11 @@ object AppPages {
       NewFromTemplate(template.code, HasReturnTo.getCurrentEncodedPath)
   }
 
-  case class NewForRepayment private (accountCode1: String,
-                                      accountCode2: String,
-                                      override val encodedReturnTo: Option[String])
-      extends HasReturnTo
+  case class NewForRepayment private (
+      accountCode1: String,
+      accountCode2: String,
+      override val encodedReturnTo: Option[String],
+  ) extends HasReturnTo
       with Page {
     override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
       Future.successful(i18n("app.new-transaction"))
