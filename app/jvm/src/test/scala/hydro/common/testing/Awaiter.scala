@@ -28,8 +28,10 @@ object Awaiter {
   }
   final class EventuallyAwaiter extends AwaiterWithType {
     override protected def verb = "eventually"
-    override protected def expectCondition(condition: => Boolean,
-                                           failureMessage: => String): MatchResult[Any] = {
+    override protected def expectCondition(
+        condition: => Boolean,
+        failureMessage: => String,
+    ): MatchResult[Any] = {
       var cycleCount = 0
       while (cycleCount < 100 && !condition) {
         Thread.sleep(5)
@@ -49,8 +51,10 @@ object Awaiter {
   }
   final class ConsistentlyAwaiter extends AwaiterWithType {
     override protected def verb = "consistently"
-    override protected def expectCondition(condition: => Boolean,
-                                           failureMessage: => String): MatchResult[Any] = {
+    override protected def expectCondition(
+        condition: => Boolean,
+        failureMessage: => String,
+    ): MatchResult[Any] = {
       for (i <- 1 to 50) {
         if (!condition) {
           throw new AssertionError(failureMessage)

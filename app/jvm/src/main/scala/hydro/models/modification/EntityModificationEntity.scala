@@ -12,11 +12,12 @@ import hydro.models.Entity
   * EntityModificationEntity entities are immutable and are assumed to be relatively short-lived, especially after
   * code updates to related models.
   */
-case class EntityModificationEntity(userId: Long,
-                                    modification: EntityModification,
-                                    instant: Instant,
-                                    override val idOption: Option[Long] = None)
-    extends Entity {
+case class EntityModificationEntity(
+    userId: Long,
+    modification: EntityModification,
+    instant: Instant,
+    override val idOption: Option[Long] = None,
+) extends Entity {
   require(userId > 0)
   for (idVal <- idOption) require(idVal > 0)
 

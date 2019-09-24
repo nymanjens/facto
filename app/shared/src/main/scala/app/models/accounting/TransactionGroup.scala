@@ -37,16 +37,19 @@ object TransactionGroup {
     * Same as TransactionGroup, except all fields are optional, plus an additional `transactions` and `zeroSum` which
     * a `TransactionGroup` stores implicitly.
     */
-  case class Partial(transactions: Seq[Transaction.Partial],
-                     zeroSum: Boolean = false,
-                     createdDate: Option[LocalDateTime] = None,
-                     idOption: Option[Long] = None)
+  case class Partial(
+      transactions: Seq[Transaction.Partial],
+      zeroSum: Boolean = false,
+      createdDate: Option[LocalDateTime] = None,
+      idOption: Option[Long] = None,
+  )
   object Partial {
     val withSingleEmptyTransaction: Partial = Partial(transactions = Seq(Transaction.Partial.empty))
 
     def from(group: TransactionGroup, transactions: Seq[Transaction])(
         implicit accountingConfig: Config,
-        exchangeRateManager: ExchangeRateManager): Partial = {
+        exchangeRateManager: ExchangeRateManager,
+    ): Partial = {
       val isZeroSum = transactions.map(_.flow.exchangedForReferenceCurrency).sum == ReferenceMoney(0)
       Partial(
         transactions = transactions.map(Transaction.Partial.from),

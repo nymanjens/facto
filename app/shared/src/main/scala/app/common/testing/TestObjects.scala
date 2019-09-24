@@ -310,19 +310,21 @@ object TestObjects {
   )
 
   private val unsetDouble: Double = -387461.19
-  def createTransaction(id: Long = -1,
-                        groupId: Long = -1,
-                        issuer: User = testUserA,
-                        beneficiary: Account = testAccountA,
-                        reservoir: MoneyReservoir = null,
-                        year: Int = 2012,
-                        month: Month = MARCH,
-                        day: Int = 25,
-                        category: Category = testCategory,
-                        description: String = "some description",
-                        flow: Double = unsetDouble,
-                        detailDescription: String = "some detail description",
-                        tags: Seq[String] = Seq("some-tag")): Transaction = {
+  def createTransaction(
+      id: Long = -1,
+      groupId: Long = -1,
+      issuer: User = testUserA,
+      beneficiary: Account = testAccountA,
+      reservoir: MoneyReservoir = null,
+      year: Int = 2012,
+      month: Month = MARCH,
+      day: Int = 25,
+      category: Category = testCategory,
+      description: String = "some description",
+      flow: Double = unsetDouble,
+      detailDescription: String = "some detail description",
+      tags: Seq[String] = Seq("some-tag"),
+  ): Transaction = {
     testTransactionWithId.copy(
       idOption = Some(if (id == -1) EntityModification.generateRandomId() else id),
       transactionGroupId = if (groupId == -1) EntityModification.generateRandomId() else groupId,
@@ -340,13 +342,15 @@ object TestObjects {
     )
   }
 
-  def createBalanceCheck(id: Long = -1,
-                         issuer: User = testUserA,
-                         reservoir: MoneyReservoir = testReservoir,
-                         year: Int = 2012,
-                         month: Month = MARCH,
-                         day: Int = 25,
-                         balance: Double = unsetDouble): BalanceCheck = {
+  def createBalanceCheck(
+      id: Long = -1,
+      issuer: User = testUserA,
+      reservoir: MoneyReservoir = testReservoir,
+      year: Int = 2012,
+      month: Month = MARCH,
+      day: Int = 25,
+      balance: Double = unsetDouble,
+  ): BalanceCheck = {
     BalanceCheck(
       idOption = Some(if (id == -1) EntityModification.generateRandomId() else id),
       moneyReservoirCode = reservoir.code,
@@ -357,12 +361,14 @@ object TestObjects {
     )
   }
 
-  def createExchangeRateMeasurement(id: Long = -1,
-                                    year: Int = 2012,
-                                    month: Month = MARCH,
-                                    day: Int = 25,
-                                    foreignCurrencyCode: String = "GBP",
-                                    ratio: Double = unsetDouble): ExchangeRateMeasurement = {
+  def createExchangeRateMeasurement(
+      id: Long = -1,
+      year: Int = 2012,
+      month: Month = MARCH,
+      day: Int = 25,
+      foreignCurrencyCode: String = "GBP",
+      ratio: Double = unsetDouble,
+  ): ExchangeRateMeasurement = {
     ExchangeRateMeasurement(
       idOption = Some(if (id == -1) EntityModification.generateRandomId() else id),
       date = createDateTime(year, month, day),

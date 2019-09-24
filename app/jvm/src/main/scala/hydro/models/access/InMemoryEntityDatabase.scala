@@ -49,9 +49,10 @@ object InMemoryEntityDatabase {
     def create: Sortings = new Sortings(ImmutableSetMultimap.of())
   }
 
-  private final class EntityCollection[E <: Entity: EntityType](fetchEntities: () => Seq[E],
-                                                                sortings: Set[DbQuery.Sorting[E]])
-      extends DbQueryExecutor.Sync[E] {
+  private final class EntityCollection[E <: Entity: EntityType](
+      fetchEntities: () => Seq[E],
+      sortings: Set[DbQuery.Sorting[E]],
+  ) extends DbQueryExecutor.Sync[E] {
 
     private val idToEntityMap: ConcurrentMap[Long, E] = {
       val map = new ConcurrentHashMap[Long, E]

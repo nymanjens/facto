@@ -3,12 +3,14 @@ package app.models.accounting.config
 import hydro.common.Require.requireNonNull
 import app.common.money.Currency
 
-case class MoneyReservoir(code: String,
-                          name: String,
-                          shorterName: String,
-                          owner: Account,
-                          hidden: Boolean,
-                          currencyCode: Option[String] = None) {
+case class MoneyReservoir(
+    code: String,
+    name: String,
+    shorterName: String,
+    owner: Account,
+    hidden: Boolean,
+    currencyCode: Option[String] = None,
+) {
   requireNonNull(code, name, shorterName, owner, hidden, currencyCode)
 
   override def toString = s"MoneyReservoir($code)"

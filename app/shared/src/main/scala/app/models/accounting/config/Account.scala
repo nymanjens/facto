@@ -9,15 +9,17 @@ import hydro.models.access.DbQueryImplicits._
 
 import scala.collection.immutable.Seq
 
-case class Account(code: String,
-                   longName: String,
-                   shorterName: String,
-                   veryShortName: String,
-                   userLoginName: Option[String] = None,
-                   defaultCashReservoirCode: Option[String] = None,
-                   defaultElectronicReservoirCode: String,
-                   categories: Seq[Category] = Nil,
-                   summaryTotalRows: Seq[SummaryTotalRowDef] = Nil) {
+case class Account(
+    code: String,
+    longName: String,
+    shorterName: String,
+    veryShortName: String,
+    userLoginName: Option[String] = None,
+    defaultCashReservoirCode: Option[String] = None,
+    defaultElectronicReservoirCode: String,
+    categories: Seq[Category] = Nil,
+    summaryTotalRows: Seq[SummaryTotalRowDef] = Nil,
+) {
   requireNonNull(
     code,
     longName,

@@ -13,17 +13,21 @@ import scala.collection.immutable.Set
 
 // Every field ending with "Tpl" may contain $-prefixed placeholders.
 // Example: beneficiaryCodeTpl = "${account.code}"
-case class Template(code: String,
-                    name: String,
-                    placement: Set[Template.Placement],
-                    onlyShowForUserLoginNames: Option[Set[String]] = None,
-                    zeroSum: Boolean,
-                    iconClass: String,
-                    transactions: Seq[Template.Transaction]) {
+case class Template(
+    code: String,
+    name: String,
+    placement: Set[Template.Placement],
+    onlyShowForUserLoginNames: Option[Set[String]] = None,
+    zeroSum: Boolean,
+    iconClass: String,
+    transactions: Seq[Template.Transaction],
+) {
   requireNonNull(code, name, placement, onlyShowForUserLoginNames, zeroSum, iconClass, transactions)
 
-  def showFor(location: Template.Placement, user: User)(implicit accountingConfig: Config,
-                                                        entityAccess: AppEntityAccess): Boolean = {
+  def showFor(location: Template.Placement, user: User)(
+      implicit accountingConfig: Config,
+      entityAccess: AppEntityAccess,
+  ): Boolean = {
     val showAtLocation = placement contains location
     val showToUser = onlyShowForUsers match {
       case Some(users) => users contains user
@@ -38,8 +42,10 @@ case class Template(code: String,
       zeroSum = zeroSum)
   }
 
-  private def onlyShowForUsers(implicit accountingConfig: Config,
-                               entityAccess: AppEntityAccess): Option[Set[User]] = {
+  private def onlyShowForUsers(
+      implicit accountingConfig: Config,
+      entityAccess: AppEntityAccess,
+  ): Option[Set[User]] = {
     onlyShowForUserLoginNames.map { loginNameOption =>
       loginNameOption.map { loginName =>
         val user = entityAccess.newQuerySyncForUser().findOne(ModelFields.User.loginName === loginName)
@@ -79,13 +85,15 @@ object Template {
     }
   }
 
-  case class Transaction(beneficiaryCodeTpl: String,
-                         moneyReservoirCodeTpl: String,
-                         categoryCode: String,
-                         description: String,
-                         flowInCents: Long = 0,
-                         detailDescription: String = "",
-                         tags: Seq[String] = Seq()) {
+  case class Transaction(
+      beneficiaryCodeTpl: String,
+      moneyReservoirCodeTpl: String,
+      categoryCode: String,
+      description: String,
+      flowInCents: Long = 0,
+      detailDescription: String = "",
+      tags: Seq[String] = Seq(),
+  ) {
     requireNonNull(beneficiaryCodeTpl, moneyReservoirCodeTpl, categoryCode, description, flowInCents, tags)
 
     def toPartial(account: Account)(implicit accountingConfig: Config): AccountingTransaction.Partial = {

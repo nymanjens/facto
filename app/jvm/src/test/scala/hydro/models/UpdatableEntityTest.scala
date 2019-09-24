@@ -242,10 +242,12 @@ class UpdatableEntityTest extends HookedSpecification {
     }
   }
 
-  private def randomUser(lastUpdateTime: LastUpdateTime,
-                         fieldA: String = null,
-                         fieldB: String = null,
-                         fieldC: String = null): User = {
+  private def randomUser(
+      lastUpdateTime: LastUpdateTime,
+      fieldA: String = null,
+      fieldB: String = null,
+      fieldC: String = null,
+  ): User = {
 
     def randomString(prefix: String): String = s"${prefix}_${abs(Random.nextInt()).toString.substring(0, 4)}"
     testUser.copy(
@@ -256,11 +258,13 @@ class UpdatableEntityTest extends HookedSpecification {
       passwordHash = Option(fieldC) getOrElse randomString("fieldC"),
     )
   }
-  private def copy(user: User,
-                   lastUpdateTime: LastUpdateTime = null,
-                   fieldA: String = null,
-                   fieldB: String = null,
-                   fieldC: String = null): User = {
+  private def copy(
+      user: User,
+      lastUpdateTime: LastUpdateTime = null,
+      fieldA: String = null,
+      fieldB: String = null,
+      fieldC: String = null,
+  ): User = {
     user.copy(
       loginName = Option(fieldA) getOrElse user.loginName,
       name = Option(fieldB) getOrElse user.name,

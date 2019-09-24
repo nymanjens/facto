@@ -38,8 +38,10 @@ object CollectionUtils {
     * These associated integers remain stable as long as the `stableNameMapper` returns the same value,
     * even if the order of values is changed, or values are added/removed.
     */
-  def toBiMapWithStableIntKeys[V](stableNameMapper: V => String,
-                                  values: Iterable[V]): ImmutableBiMap[V, Int] = {
+  def toBiMapWithStableIntKeys[V](
+      stableNameMapper: V => String,
+      values: Iterable[V],
+  ): ImmutableBiMap[V, Int] = {
     val valuesSeq = values.toVector
     val names = valuesSeq.map(stableNameMapper)
     val hashCodes = names.map(_.hashCode)

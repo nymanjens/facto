@@ -38,8 +38,10 @@ object OrderToken {
       s"Not true that lower=$lower <= higher=$higher")
 
     type HasCarryOver = Boolean
-    def middleBetweenWithCarryOver(lower: Option[List[Int]],
-                                   higher: Option[List[Int]]): (List[Int], HasCarryOver) = {
+    def middleBetweenWithCarryOver(
+        lower: Option[List[Int]],
+        higher: Option[List[Int]],
+    ): (List[Int], HasCarryOver) = {
       val (lowerHead, lowerNext) = splitHeadAndNext(lower, Int.MinValue)
       val (higherHead, higherNext) = splitHeadAndNext(higher, Int.MaxValue)
 
@@ -100,15 +102,19 @@ object OrderToken {
     }
   }
 
-  def evenlyDistributedValuesBetween(numValues: Int,
-                                     lowerExclusive: Option[OrderToken],
-                                     higherExclusive: Option[OrderToken]): Seq[OrderToken] = {
+  def evenlyDistributedValuesBetween(
+      numValues: Int,
+      lowerExclusive: Option[OrderToken],
+      higherExclusive: Option[OrderToken],
+  ): Seq[OrderToken] = {
     val resultBuffer = (for (i <- 0 until numValues) yield null.asInstanceOf[OrderToken]).toBuffer
 
-    def resultFiller(resultIndexBaseline: Int = 0,
-                     numValues: Int,
-                     lower: Option[OrderToken],
-                     higher: Option[OrderToken]): Unit = {
+    def resultFiller(
+        resultIndexBaseline: Int = 0,
+        numValues: Int,
+        lower: Option[OrderToken],
+        higher: Option[OrderToken],
+    ): Unit = {
       val middle = middleBetween(lower, higher)
       val middleIndexOffset = numValues / 2
       resultBuffer.update(resultIndexBaseline + middleIndexOffset, middle)
@@ -131,8 +137,10 @@ object OrderToken {
     resultBuffer.toVector
   }
 
-  private def splitHeadAndNext(listOption: Option[List[Int]],
-                               noneOptionValue: Int): (Long, Option[List[Int]]) =
+  private def splitHeadAndNext(
+      listOption: Option[List[Int]],
+      noneOptionValue: Int,
+  ): (Long, Option[List[Int]]) =
     listOption match {
       case None               => (noneOptionValue.toLong, None)
       case Some(Nil)          => (middleValue.toLong, Some(Nil))

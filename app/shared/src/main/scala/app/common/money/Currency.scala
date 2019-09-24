@@ -3,9 +3,11 @@ package app.common.money
 /**
   * @param code The three letter symbol.
   */
-sealed abstract class Currency(val code: String,
-                               val symbol: String,
-                               val iconClassOption: Option[String] = None) {
+sealed abstract class Currency(
+    val code: String,
+    val symbol: String,
+    val iconClassOption: Option[String] = None,
+) {
   def iconClass: String = iconClassOption.getOrElse("fa fa-money")
   def isForeign: Boolean = this != Currency.default
   override def toString = code

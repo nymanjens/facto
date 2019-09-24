@@ -14,20 +14,21 @@ import hydro.models.Entity
 import scala.collection.immutable.Seq
 
 /** Transaction entities are immutable. Just delete and create a new one when updating. */
-case class Transaction(transactionGroupId: Long,
-                       issuerId: Long,
-                       beneficiaryAccountCode: String,
-                       moneyReservoirCode: String,
-                       categoryCode: String,
-                       description: String,
-                       flowInCents: Long,
-                       detailDescription: String = "",
-                       tags: Seq[String] = Seq(),
-                       createdDate: LocalDateTime,
-                       transactionDate: LocalDateTime,
-                       consumedDate: LocalDateTime,
-                       idOption: Option[Long] = None)
-    extends Entity {
+case class Transaction(
+    transactionGroupId: Long,
+    issuerId: Long,
+    beneficiaryAccountCode: String,
+    moneyReservoirCode: String,
+    categoryCode: String,
+    description: String,
+    flowInCents: Long,
+    detailDescription: String = "",
+    tags: Seq[String] = Seq(),
+    createdDate: LocalDateTime,
+    transactionDate: LocalDateTime,
+    consumedDate: LocalDateTime,
+    idOption: Option[Long] = None,
+) extends Entity {
   require(transactionGroupId > 0)
   require(issuerId > 0)
   require(!beneficiaryAccountCode.isEmpty)
@@ -62,19 +63,21 @@ object Transaction {
   def tupled = (this.apply _).tupled
 
   /** Same as Transaction, except all fields are optional. */
-  case class Partial(transactionGroupId: Option[Long] = None,
-                     issuerId: Option[Long] = None,
-                     beneficiary: Option[Account] = None,
-                     moneyReservoir: Option[MoneyReservoir] = None,
-                     category: Option[Category] = None,
-                     description: String = "",
-                     flowInCents: Long = 0,
-                     detailDescription: String = "",
-                     tags: Seq[String] = Seq(),
-                     createdDate: Option[LocalDateTime] = None,
-                     transactionDate: Option[LocalDateTime] = None,
-                     consumedDate: Option[LocalDateTime] = None,
-                     idOption: Option[Long] = None) {
+  case class Partial(
+      transactionGroupId: Option[Long] = None,
+      issuerId: Option[Long] = None,
+      beneficiary: Option[Account] = None,
+      moneyReservoir: Option[MoneyReservoir] = None,
+      category: Option[Category] = None,
+      description: String = "",
+      flowInCents: Long = 0,
+      detailDescription: String = "",
+      tags: Seq[String] = Seq(),
+      createdDate: Option[LocalDateTime] = None,
+      transactionDate: Option[LocalDateTime] = None,
+      consumedDate: Option[LocalDateTime] = None,
+      idOption: Option[Long] = None,
+  ) {
     def issuer(implicit entityAccess: AppEntityAccess): Option[User] =
       issuerId.map(entityAccess.newQuerySyncForUser().findById)
     def isEmpty: Boolean = this == Partial.empty
@@ -83,19 +86,21 @@ object Transaction {
   object Partial {
     val empty: Partial = Partial()
 
-    def from(transactionGroupId: Long = 0,
-             issuerId: Long = 0,
-             beneficiary: Account = null,
-             moneyReservoir: MoneyReservoir = null,
-             category: Category = null,
-             description: String = "",
-             flowInCents: Long = 0,
-             detailDescription: String = "",
-             tags: Seq[String] = Seq(),
-             createdDate: LocalDateTime = null,
-             transactionDate: LocalDateTime = null,
-             consumedDate: LocalDateTime = null,
-             idOption: Option[Long] = None): Partial =
+    def from(
+        transactionGroupId: Long = 0,
+        issuerId: Long = 0,
+        beneficiary: Account = null,
+        moneyReservoir: MoneyReservoir = null,
+        category: Category = null,
+        description: String = "",
+        flowInCents: Long = 0,
+        detailDescription: String = "",
+        tags: Seq[String] = Seq(),
+        createdDate: LocalDateTime = null,
+        transactionDate: LocalDateTime = null,
+        consumedDate: LocalDateTime = null,
+        idOption: Option[Long] = None,
+    ): Partial =
       Partial(
         transactionGroupId = if (transactionGroupId == 0) None else Some(transactionGroupId),
         issuerId = if (issuerId == 0) None else Some(issuerId),

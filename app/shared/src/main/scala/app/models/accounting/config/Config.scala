@@ -14,11 +14,13 @@ import scala.collection.immutable.Seq
   * @param accounts   Maps code to account
   * @param categories Maps code to category
   */
-case class Config(accounts: ListMap[String, Account],
-                  categories: ListMap[String, Category],
-                  moneyReservoirsMap: ListMap[String, MoneyReservoir],
-                  templates: Seq[Template],
-                  constants: Constants) {
+case class Config(
+    accounts: ListMap[String, Account],
+    categories: ListMap[String, Category],
+    moneyReservoirsMap: ListMap[String, MoneyReservoir],
+    templates: Seq[Template],
+    constants: Constants,
+) {
   requireNonNull(accounts, categories, moneyReservoirsMap, templates, constants)
 
   // Not exposing moneyReservoirs because it's too easy to accidentally show hidden reservoirs
@@ -31,8 +33,10 @@ case class Config(accounts: ListMap[String, Account],
     case _  => moneyReservoirsMap.get(code)
   }
 
-  def moneyReservoirs(includeNullReservoir: Boolean = false,
-                      includeHidden: Boolean = false): Seq[MoneyReservoir] = {
+  def moneyReservoirs(
+      includeNullReservoir: Boolean = false,
+      includeHidden: Boolean = false,
+  ): Seq[MoneyReservoir] = {
     var result = moneyReservoirsMap.values.toVector
     if (!includeHidden) {
       result = result.filter(!_.hidden)

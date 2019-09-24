@@ -46,10 +46,13 @@ object ScalaJsApi {
       allUsers: Seq[User],
       i18nMessages: Map[String, String],
       ratioReferenceToForeignCurrency: Map[Currency, SortedMap[LocalDateTime, Double]],
-      nextUpdateToken: UpdateToken)
+      nextUpdateToken: UpdateToken,
+  )
 
-  case class GetAllEntitiesResponse(entitiesMap: Map[EntityType.any, Seq[Entity]],
-                                    nextUpdateToken: UpdateToken) {
+  case class GetAllEntitiesResponse(
+      entitiesMap: Map[EntityType.any, Seq[Entity]],
+      nextUpdateToken: UpdateToken,
+  ) {
     def entityTypes: Iterable[EntityType.any] = entitiesMap.keys
     def entities[E <: Entity](entityType: EntityType[E]): Seq[E] = {
       entitiesMap(entityType).asInstanceOf[Seq[E]]
@@ -58,9 +61,10 @@ object ScalaJsApi {
 
   sealed trait HydroPushSocketPacket
   object HydroPushSocketPacket {
-    case class EntityModificationsWithToken(modifications: Seq[EntityModification],
-                                            nextUpdateToken: UpdateToken)
-        extends HydroPushSocketPacket
+    case class EntityModificationsWithToken(
+        modifications: Seq[EntityModification],
+        nextUpdateToken: UpdateToken,
+    ) extends HydroPushSocketPacket
     object Heartbeat extends HydroPushSocketPacket
     case class VersionCheck(versionString: String) extends HydroPushSocketPacket
   }
@@ -73,21 +77,25 @@ object ScalaJsApi {
     * @param plainTextPassword Required for add.
     * @param name Required for add.
     */
-  case class UserPrototype(id: Option[Long] = None,
-                           loginName: Option[String] = None,
-                           plainTextPassword: Option[String] = None,
-                           name: Option[String] = None,
-                           isAdmin: Option[Boolean] = None,
-                           expandCashFlowTablesByDefault: Option[Boolean] = None,
-                           expandLiquidationTablesByDefault: Option[Boolean] = None)
+  case class UserPrototype(
+      id: Option[Long] = None,
+      loginName: Option[String] = None,
+      plainTextPassword: Option[String] = None,
+      name: Option[String] = None,
+      isAdmin: Option[Boolean] = None,
+      expandCashFlowTablesByDefault: Option[Boolean] = None,
+      expandLiquidationTablesByDefault: Option[Boolean] = None,
+  )
   object UserPrototype {
-    def create(id: java.lang.Long = null,
-               loginName: String = null,
-               plainTextPassword: String = null,
-               name: String = null,
-               isAdmin: java.lang.Boolean = null,
-               expandCashFlowTablesByDefault: java.lang.Boolean = null,
-               expandLiquidationTablesByDefault: java.lang.Boolean = null): UserPrototype =
+    def create(
+        id: java.lang.Long = null,
+        loginName: String = null,
+        plainTextPassword: String = null,
+        name: String = null,
+        isAdmin: java.lang.Boolean = null,
+        expandCashFlowTablesByDefault: java.lang.Boolean = null,
+        expandLiquidationTablesByDefault: java.lang.Boolean = null,
+    ): UserPrototype =
       UserPrototype(
         id = if (id == null) None else Some(id),
         loginName = Option(loginName),

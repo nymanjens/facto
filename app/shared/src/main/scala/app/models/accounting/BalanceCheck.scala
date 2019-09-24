@@ -10,13 +10,14 @@ import hydro.common.time.LocalDateTime
 import hydro.models.Entity
 
 /** BalanceCheck entities are immutable. Just delete and create a new one when updating. */
-case class BalanceCheck(issuerId: Long,
-                        moneyReservoirCode: String,
-                        balanceInCents: Long,
-                        createdDate: LocalDateTime,
-                        checkDate: LocalDateTime,
-                        idOption: Option[Long] = None)
-    extends Entity {
+case class BalanceCheck(
+    issuerId: Long,
+    moneyReservoirCode: String,
+    balanceInCents: Long,
+    createdDate: LocalDateTime,
+    checkDate: LocalDateTime,
+    idOption: Option[Long] = None,
+) extends Entity {
 
   override def withId(id: Long) = copy(idOption = Some(id))
 

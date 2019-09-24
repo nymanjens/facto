@@ -171,8 +171,10 @@ abstract class StandardPicklers {
           addModification(entity, entityType)
         case `updateNumber` =>
           val entity = state.unpickle[Entity]
-          def updateModification[E <: UpdatableEntity](entity: Entity,
-                                                       entityType: EntityType.any): EntityModification = {
+          def updateModification[E <: UpdatableEntity](
+              entity: Entity,
+              entityType: EntityType.any,
+          ): EntityModification = {
             val castEntityType = entityType.asInstanceOf[EntityType[E]]
             EntityModification.Update(castEntityType.checkRightType(entity))(castEntityType)
           }

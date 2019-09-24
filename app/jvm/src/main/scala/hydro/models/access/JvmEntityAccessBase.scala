@@ -134,8 +134,10 @@ abstract class JvmEntityAccessBase(implicit clock: Clock) extends EntityAccess {
       logExceptions {
 
         // Returns true if an existing modification makes the given one irrelevant.
-        def eclipsedByExistingModification(modification: EntityModification,
-                                           existingModifications: Iterable[EntityModification]): Boolean = {
+        def eclipsedByExistingModification(
+            modification: EntityModification,
+            existingModifications: Iterable[EntityModification],
+        ): Boolean = {
           val existingEntities = existingModifications.toStream
             .filter(_.entityId == modification.entityId)
             .filter(_.entityType == modification.entityType)
@@ -219,8 +221,10 @@ abstract class JvmEntityAccessBase(implicit clock: Clock) extends EntityAccess {
         modificationBundler.forceTrigger()
       }
 
-    private class ModificationBundler(triggerEveryNAdditions: Int,
-                                      triggerFunction: Seq[EntityModification] => Unit) {
+    private class ModificationBundler(
+        triggerEveryNAdditions: Int,
+        triggerFunction: Seq[EntityModification] => Unit,
+    ) {
       private val untriggeredModifications: mutable.Buffer[EntityModification] = mutable.Buffer()
 
       def addModificationAndMaybeTrigger(entityModification: EntityModification): Unit = {

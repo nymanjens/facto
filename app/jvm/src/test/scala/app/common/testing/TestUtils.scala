@@ -22,16 +22,18 @@ import scala.collection.immutable.Seq
 
 object TestUtils {
 
-  def persistTransaction(groupId: Long = -1,
-                         flowInCents: Long = 0,
-                         date: LocalDateTime = FakeClock.defaultLocalDateTime,
-                         timestamp: Long = -1,
-                         account: Account = testAccount,
-                         category: Category = testCategory,
-                         reservoir: MoneyReservoir = testReservoir,
-                         description: String = "description",
-                         detailDescription: String = "detailDescription",
-                         tags: Seq[String] = Seq())(implicit entityAccess: JvmEntityAccess): Transaction = {
+  def persistTransaction(
+      groupId: Long = -1,
+      flowInCents: Long = 0,
+      date: LocalDateTime = FakeClock.defaultLocalDateTime,
+      timestamp: Long = -1,
+      account: Account = testAccount,
+      category: Category = testCategory,
+      reservoir: MoneyReservoir = testReservoir,
+      description: String = "description",
+      detailDescription: String = "detailDescription",
+      tags: Seq[String] = Seq(),
+  )(implicit entityAccess: JvmEntityAccess): Transaction = {
     val actualGroupId = if (groupId == -1) {
       persist(TransactionGroup(createdDate = FakeClock.defaultLocalDateTime)).id
     } else {
@@ -59,7 +61,8 @@ object TestUtils {
       balanceInCents: Long = 0,
       date: LocalDateTime = FakeClock.defaultLocalDateTime,
       timestamp: Long = -1,
-      reservoir: MoneyReservoir = testReservoir)(implicit entityAccess: JvmEntityAccess): BalanceCheck = {
+      reservoir: MoneyReservoir = testReservoir,
+  )(implicit entityAccess: JvmEntityAccess): BalanceCheck = {
     val actualDate = if (timestamp == -1) date else localDateTimeOfEpochSecond(timestamp)
     persist(
       BalanceCheck(

@@ -13,11 +13,12 @@ import hydro.models.Entity
   *
   * ExchangeRateMeasurement entities are immutable.
   */
-case class ExchangeRateMeasurement(date: LocalDateTime,
-                                   foreignCurrencyCode: String,
-                                   ratioReferenceToForeignCurrency: Double,
-                                   idOption: Option[Long] = None)
-    extends Entity {
+case class ExchangeRateMeasurement(
+    date: LocalDateTime,
+    foreignCurrencyCode: String,
+    ratioReferenceToForeignCurrency: Double,
+    idOption: Option[Long] = None,
+) extends Entity {
   require(!foreignCurrencyCode.isEmpty)
   require(ratioReferenceToForeignCurrency > 0)
   for (idVal <- idOption) require(idVal > 0)

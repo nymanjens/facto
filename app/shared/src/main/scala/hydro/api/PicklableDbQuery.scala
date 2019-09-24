@@ -11,10 +11,12 @@ import hydro.models.access.ModelField
 import scala.collection.immutable.Seq
 
 /** Fork of DbQuery that is picklable. */
-case class PicklableDbQuery(filter: Filter,
-                            sorting: Option[Sorting],
-                            limit: Option[Int],
-                            entityType: EntityType.any) {
+case class PicklableDbQuery(
+    filter: Filter,
+    sorting: Option[Sorting],
+    limit: Option[Int],
+    entityType: EntityType.any,
+) {
   def toRegular: DbQuery[_ <: Entity] = {
     def internal[E <: Entity] =
       DbQuery[E](
@@ -193,9 +195,11 @@ object PicklableDbQuery {
     def fromRegular(regular: DbQuery.Sorting[_]): Sorting =
       Sorting(regular.fieldsWithDirection.map(FieldWithDirection.fromRegular))
 
-    case class FieldWithDirection(field: PicklableModelField,
-                                  isDesc: Boolean,
-                                  picklableValueOrdering: PicklableOrdering) {
+    case class FieldWithDirection(
+        field: PicklableModelField,
+        isDesc: Boolean,
+        picklableValueOrdering: PicklableOrdering,
+    ) {
       def toRegular: DbQuery.Sorting.FieldWithDirection[_, _] = {
         def internal[V] = {
           DbQuery.Sorting.FieldWithDirection(field.toRegular.asInstanceOf[ModelField[V, _]], isDesc)(
