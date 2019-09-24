@@ -44,9 +44,11 @@ private[webworker] final class LocalDatabaseWebWorkerApiStub extends LocalDataba
       timeout = 1.minute)
       .map(_ => (): Unit)
 
-  private def sendAndReceive(methodNum: Int,
-                             args: Seq[js.Any],
-                             timeout: FiniteDuration = 5.seconds): Future[js.Any] = async {
+  private def sendAndReceive(
+      methodNum: Int,
+      args: Seq[js.Any],
+      timeout: FiniteDuration = 5.seconds,
+  ): Future[js.Any] = async {
     val lastMessagePromise: Option[Promise[_]] = responseMessagePromises.lastOption
     val thisMessagePromise: Promise[js.Any] = Promise()
     responseMessagePromises += thisMessagePromise

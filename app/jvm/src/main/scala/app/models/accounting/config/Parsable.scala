@@ -21,11 +21,13 @@ import scala.collection.immutable.Seq
 
 object Parsable {
 
-  case class Config(accounts: java.util.List[Account],
-                    categories: java.util.List[Category],
-                    moneyReservoirs: java.util.List[MoneyReservoir],
-                    templates: java.util.List[Template],
-                    constants: Constants) {
+  case class Config(
+      accounts: java.util.List[Account],
+      categories: java.util.List[Category],
+      moneyReservoirs: java.util.List[MoneyReservoir],
+      templates: java.util.List[Template],
+      constants: Constants,
+  ) {
     def this() = this(null, null, null, null, null)
 
     def parse: ParsedConfig = {
@@ -44,15 +46,17 @@ object Parsable {
     }
   }
 
-  case class Account(code: String,
-                     longName: String,
-                     shorterName: String,
-                     veryShortName: String,
-                     userLoginName: String @nullable,
-                     defaultCashReservoirCode: String @nullable,
-                     defaultElectronicReservoirCode: String,
-                     categories: java.util.List[Category],
-                     summaryTotalRows: java.util.List[Account.SummaryTotalRowDef] @nullable) {
+  case class Account(
+      code: String,
+      longName: String,
+      shorterName: String,
+      veryShortName: String,
+      userLoginName: String @nullable,
+      defaultCashReservoirCode: String @nullable,
+      defaultElectronicReservoirCode: String,
+      categories: java.util.List[Category],
+      summaryTotalRows: java.util.List[Account.SummaryTotalRowDef] @nullable,
+  ) {
     def this() = this(null, null, null, null, null, null, null, null, null)
 
     def parse: ParsedAccount = {
@@ -94,12 +98,14 @@ object Parsable {
     }
   }
 
-  case class MoneyReservoir(code: String,
-                            name: String,
-                            shorterName: String @nullable,
-                            owner: Account,
-                            hidden: Boolean,
-                            currency: String @nullable) {
+  case class MoneyReservoir(
+      code: String,
+      name: String,
+      shorterName: String @nullable,
+      owner: Account,
+      hidden: Boolean,
+      currency: String @nullable,
+  ) {
     def this() = this(null, null, null, null, hidden = false, null)
 
     def parse: ParsedMoneyReservoir = {
@@ -114,19 +120,23 @@ object Parsable {
     }
   }
 
-  case class Template(code: String,
-                      name: String,
-                      placement: java.util.List[String],
-                      onlyShowForUserLoginNames: java.util.List[String] @nullable,
-                      zeroSum: Boolean,
-                      icon: String,
-                      transactions: java.util.List[Template.Transaction]) {
+  case class Template(
+      code: String,
+      name: String,
+      placement: java.util.List[String],
+      onlyShowForUserLoginNames: java.util.List[String] @nullable,
+      zeroSum: Boolean,
+      icon: String,
+      transactions: java.util.List[Template.Transaction],
+  ) {
 
     def this() = this(null, null, null, null, zeroSum = false, icon = "fa-plus-square", null)
 
-    def parse(accounts: Map[String, ParsedAccount],
-              reservoirs: Map[String, ParsedMoneyReservoir],
-              categories: Map[String, ParsedCategory]): ParsedTemplate = {
+    def parse(
+        accounts: Map[String, ParsedAccount],
+        reservoirs: Map[String, ParsedMoneyReservoir],
+        categories: Map[String, ParsedCategory],
+    ): ParsedTemplate = {
       ParsedTemplate(
         code = code,
         name = name,
@@ -143,19 +153,23 @@ object Parsable {
   }
 
   object Template {
-    case class Transaction(beneficiaryCode: String,
-                           moneyReservoirCode: String,
-                           categoryCode: String,
-                           description: String,
-                           flowAsFloat: Double,
-                           detailDescription: String,
-                           tags: java.util.List[String] @nullable) {
+    case class Transaction(
+        beneficiaryCode: String,
+        moneyReservoirCode: String,
+        categoryCode: String,
+        description: String,
+        flowAsFloat: Double,
+        detailDescription: String,
+        tags: java.util.List[String] @nullable,
+    ) {
       def this() =
         this(null, null, null, description = "", flowAsFloat = 0, detailDescription = "", tags = null)
 
-      def parse(accounts: Map[String, ParsedAccount],
-                reservoirs: Map[String, ParsedMoneyReservoir],
-                categories: Map[String, ParsedCategory]): ParsedTemplate.Transaction = {
+      def parse(
+          accounts: Map[String, ParsedAccount],
+          reservoirs: Map[String, ParsedMoneyReservoir],
+          categories: Map[String, ParsedCategory],
+      ): ParsedTemplate.Transaction = {
         require(beneficiaryCode != null, s"beneficiaryCode is a mandatory parameter (Transaction = $this)")
         require(
           moneyReservoirCode != null,
@@ -187,11 +201,13 @@ object Parsable {
     }
   }
 
-  case class Constants(commonAccount: Account,
-                       accountingCategory: Category,
-                       endowmentCategory: Category,
-                       liquidationDescription: String,
-                       zoneId: String) {
+  case class Constants(
+      commonAccount: Account,
+      accountingCategory: Category,
+      endowmentCategory: Category,
+      liquidationDescription: String,
+      zoneId: String,
+  ) {
     def this() = this(null, null, null, liquidationDescription = "Liquidation", zoneId = "Europe/Brussels")
 
     def parse: ParsedConstants = {
@@ -205,8 +221,10 @@ object Parsable {
     }
   }
 
-  private def toListMap[T, K, V](list: java.util.List[T])(keyGetter: T => K,
-                                                          valueGetter: T => V): ListMap[K, V] = {
+  private def toListMap[T, K, V](list: java.util.List[T])(
+      keyGetter: T => K,
+      valueGetter: T => V,
+  ): ListMap[K, V] = {
     checkNotNull(list)
     val tuples = list.asScala.map(t => (keyGetter(t), valueGetter(t)))
     val resultBuilder = ListMap.newBuilder[K, V]

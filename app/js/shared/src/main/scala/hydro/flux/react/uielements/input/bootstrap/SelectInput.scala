@@ -23,11 +23,13 @@ class SelectInput[Value] private (implicit valueTag: ClassTag[Value]) {
 
   private val component = InputComponent.create[Value, ExtraProps](
     name = s"${getClass.getSimpleName}_${valueTag.runtimeClass.getSimpleName}",
-    inputRenderer = (classes: Seq[String],
-                     name: String,
-                     valueString: String,
-                     onChange: String => Callback,
-                     extraProps: ExtraProps) => {
+    inputRenderer = (
+        classes: Seq[String],
+        name: String,
+        valueString: String,
+        onChange: String => Callback,
+        extraProps: ExtraProps,
+    ) => {
       <.select(
         ^^.classes(classes),
         ^.name := name,
@@ -46,16 +48,17 @@ class SelectInput[Value] private (implicit valueTag: ClassTag[Value]) {
   )
 
   // **************** API ****************//
-  def apply(ref: Reference,
-            name: String,
-            label: String,
-            defaultValue: Value = null.asInstanceOf[Value],
-            inputClasses: Seq[String] = Seq(),
-            options: Seq[Value],
-            valueToId: Value => String,
-            valueToName: Value => String,
-            listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance)(
-      implicit i18n: I18n): VdomElement = {
+  def apply(
+      ref: Reference,
+      name: String,
+      label: String,
+      defaultValue: Value = null.asInstanceOf[Value],
+      inputClasses: Seq[String] = Seq(),
+      options: Seq[Value],
+      valueToId: Value => String,
+      valueToName: Value => String,
+      listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance,
+  )(implicit i18n: I18n): VdomElement = {
     val props = Props(
       label = label,
       name = name,
@@ -79,9 +82,11 @@ class SelectInput[Value] private (implicit valueTag: ClassTag[Value]) {
 
   case class ExtraProps private (idToOptionMap: Map[String, ExtraProps.ValueAndName])
   object ExtraProps {
-    private[SelectInput] def create(options: Seq[Value],
-                                    valueToId: Value => String,
-                                    valueToName: Value => String): ExtraProps = {
+    private[SelectInput] def create(
+        options: Seq[Value],
+        valueToId: Value => String,
+        valueToName: Value => String,
+    ): ExtraProps = {
       ExtraProps(
         idToOptionMap = toListMap {
           for (option <- options) yield {

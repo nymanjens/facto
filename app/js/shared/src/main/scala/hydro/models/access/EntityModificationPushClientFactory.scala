@@ -35,7 +35,8 @@ final class HydroPushSocketClientFactory(implicit clock: Clock) {
   private[access] def createClient(
       name: String,
       updateToken: UpdateToken,
-      onMessageReceived: EntityModificationsWithToken => Future[Unit]): HydroPushSocketClient =
+      onMessageReceived: EntityModificationsWithToken => Future[Unit],
+  ): HydroPushSocketClient =
     new HydroPushSocketClient(name, updateToken, onMessageReceived)
 
   /** Returns true if a push client socket is open or if there is no reason to believe it wouldn't be able to open. */
@@ -44,7 +45,8 @@ final class HydroPushSocketClientFactory(implicit clock: Clock) {
   private[access] final class HydroPushSocketClient private[HydroPushSocketClientFactory] (
       name: String,
       updateToken: UpdateToken,
-      onMessageReceived: EntityModificationsWithToken => Future[Unit]) {
+      onMessageReceived: EntityModificationsWithToken => Future[Unit],
+  ) {
 
     private val firstMessageWasProcessedPromise: Promise[Unit] = Promise()
     private var lastUpdateToken: UpdateToken = updateToken

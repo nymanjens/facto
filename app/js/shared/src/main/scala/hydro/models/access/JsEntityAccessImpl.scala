@@ -15,9 +15,10 @@ import scala.collection.mutable
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-class JsEntityAccessImpl()(implicit remoteDatabaseProxy: RemoteDatabaseProxy,
-                           hydroPushSocketClientFactory: HydroPushSocketClientFactory)
-    extends JsEntityAccess {
+class JsEntityAccessImpl()(
+    implicit remoteDatabaseProxy: RemoteDatabaseProxy,
+    hydroPushSocketClientFactory: HydroPushSocketClientFactory,
+) extends JsEntityAccess {
 
   private var listeners: Seq[Listener] = Seq()
   private var _pendingModifications: PendingModifications =

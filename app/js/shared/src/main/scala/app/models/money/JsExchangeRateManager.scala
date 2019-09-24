@@ -21,9 +21,11 @@ final class JsExchangeRateManager(
     mutable.Map(ratioReferenceToForeignCurrency.toVector: _*)
 
   // **************** Implementation of ExchangeRateManager trait ****************//
-  override def getRatioSecondToFirstCurrency(firstCurrency: Currency,
-                                             secondCurrency: Currency,
-                                             date: LocalDateTime): Double = {
+  override def getRatioSecondToFirstCurrency(
+      firstCurrency: Currency,
+      secondCurrency: Currency,
+      date: LocalDateTime,
+  ): Double = {
     (firstCurrency, secondCurrency) match {
       case (Currency.default, Currency.default) => 1.0
       case (foreignCurrency, Currency.default) =>

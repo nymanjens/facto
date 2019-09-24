@@ -24,10 +24,11 @@ import scala.async.Async.await
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-final class CashFlowEntriesStoreFactory(implicit entityAccess: AppJsEntityAccess,
-                                        accountingConfig: Config,
-                                        exchangeRateManager: ExchangeRateManager)
-    extends EntriesListStoreFactory[CashFlowEntry, MoneyReservoir] {
+final class CashFlowEntriesStoreFactory(
+    implicit entityAccess: AppJsEntityAccess,
+    accountingConfig: Config,
+    exchangeRateManager: ExchangeRateManager,
+) extends EntriesListStoreFactory[CashFlowEntry, MoneyReservoir] {
 
   override protected def createNew(maxNumEntries: Int, moneyReservoir: MoneyReservoir) = new Store {
     override protected def calculateState() = async {
@@ -96,8 +97,10 @@ final class CashFlowEntriesStoreFactory(implicit entityAccess: AppJsEntityAccess
       }
 
       // convert to entries (recursion does not lead to growing stack because of Stream)
-      def convertToEntries(nextRows: List[AnyRef],
-                           currentBalance: MoneyWithGeneralCurrency): Stream[CashFlowEntry] =
+      def convertToEntries(
+          nextRows: List[AnyRef],
+          currentBalance: MoneyWithGeneralCurrency,
+      ): Stream[CashFlowEntry] =
         (nextRows: @unchecked) match {
           case (trans: Transaction) :: rest =>
             val newBalance = currentBalance + trans.flow

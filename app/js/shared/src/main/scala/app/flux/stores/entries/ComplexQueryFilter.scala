@@ -17,8 +17,10 @@ import hydro.models.access.ModelField
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 
-private[stores] final class ComplexQueryFilter(implicit entityAccess: AppJsEntityAccess,
-                                               accountingConfig: Config) {
+private[stores] final class ComplexQueryFilter(
+    implicit entityAccess: AppJsEntityAccess,
+    accountingConfig: Config,
+) {
 
   // **************** Public API **************** //
   def fromQuery(query: String): DbQuery.Filter[Transaction] = {
@@ -134,9 +136,11 @@ private[stores] final class ComplexQueryFilter(implicit entityAccess: AppJsEntit
 }
 
 object ComplexQueryFilter {
-  private case class QueryFilterPair(positiveFilter: DbQuery.Filter[Transaction],
-                                     negativeFilter: DbQuery.Filter[Transaction],
-                                     estimatedExecutionCost: Int) {
+  private case class QueryFilterPair(
+      positiveFilter: DbQuery.Filter[Transaction],
+      negativeFilter: DbQuery.Filter[Transaction],
+      estimatedExecutionCost: Int,
+  ) {
     def negated: QueryFilterPair =
       QueryFilterPair(
         positiveFilter = negativeFilter,

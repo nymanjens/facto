@@ -23,8 +23,8 @@ final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
     implicit apiClient: ScalaJsApiClient,
     getInitialDataResponse: GetInitialDataResponse,
     hydroPushSocketClientFactory: HydroPushSocketClientFactory,
-    entitySyncLogic: EntitySyncLogic)
-    extends RemoteDatabaseProxy {
+    entitySyncLogic: EntitySyncLogic,
+) extends RemoteDatabaseProxy {
 
   override def queryExecutor[E <: Entity: EntityType]() = {
     new DbQueryExecutor.Async[E] {
@@ -37,7 +37,8 @@ final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
       private def execute[R](
           dbQuery: DbQuery[E],
           apiClientCall: DbQuery[E] => Future[R],
-          localDatabaseCall: (DbQueryExecutor.Async[E], DbQuery[E]) => Future[R]): Future[R] = {
+          localDatabaseCall: (DbQueryExecutor.Async[E], DbQuery[E]) => Future[R],
+      ): Future[R] = {
         futureLocalDatabase.option() match {
           case None =>
             hybridCall(dbQuery, apiClientCall, localDatabaseCall)
@@ -56,7 +57,8 @@ final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
       private def hybridCall[R](
           dbQuery: DbQuery[E],
           apiClientCall: DbQuery[E] => Future[R],
-          localDatabaseCall: (DbQueryExecutor.Async[E], DbQuery[E]) => Future[R]): Future[R] = {
+          localDatabaseCall: (DbQueryExecutor.Async[E], DbQuery[E]) => Future[R],
+      ): Future[R] = {
         val resultPromise = Promise[R]()
 
         for (seq <- logFailure(apiClientCall(dbQuery))) {
@@ -185,7 +187,8 @@ object HybridRemoteDatabaseProxy {
       implicit apiClient: ScalaJsApiClient,
       getInitialDataResponse: GetInitialDataResponse,
       hydroPushSocketClientFactory: HydroPushSocketClientFactory,
-      entitySyncLogic: EntitySyncLogic): HybridRemoteDatabaseProxy = {
+      entitySyncLogic: EntitySyncLogic,
+  ): HybridRemoteDatabaseProxy = {
     new HybridRemoteDatabaseProxy(new FutureLocalDatabase(async {
       val db = await(localDatabase)
       val populateIsNecessary = {

@@ -11,17 +11,19 @@ import hydro.flux.stores.PageLoadingStateStore
 import hydro.flux.stores.UserStore
 import hydro.models.access.JsEntityAccess
 
-final class Module(implicit i18n: I18n,
-                   user: User,
-                   entityAccess: JsEntityAccess,
-                   globalMessagesStore: GlobalMessagesStore,
-                   pageLoadingStateStore: PageLoadingStateStore,
-                   pendingModificationsStore: PendingModificationsStore,
-                   applicationIsOnlineStore: ApplicationIsOnlineStore,
-                   localDatabaseHasBeenLoadedStore: LocalDatabaseHasBeenLoadedStore,
-                   userStore: UserStore,
-                   dispatcher: Dispatcher,
-                   clock: Clock) {
+final class Module(
+    implicit i18n: I18n,
+    user: User,
+    entityAccess: JsEntityAccess,
+    globalMessagesStore: GlobalMessagesStore,
+    pageLoadingStateStore: PageLoadingStateStore,
+    pendingModificationsStore: PendingModificationsStore,
+    applicationIsOnlineStore: ApplicationIsOnlineStore,
+    localDatabaseHasBeenLoadedStore: LocalDatabaseHasBeenLoadedStore,
+    userStore: UserStore,
+    dispatcher: Dispatcher,
+    clock: Clock,
+) {
 
   implicit lazy val pageHeader = new PageHeader
   implicit lazy val globalMessages: GlobalMessages = new GlobalMessages

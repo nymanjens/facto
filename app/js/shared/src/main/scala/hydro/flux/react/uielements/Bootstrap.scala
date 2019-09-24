@@ -9,12 +9,14 @@ object Bootstrap {
 
   def Row: VdomTag = <.div(^.className := "row")
 
-  def Col(sm: Int = -1,
-          md: Int = -1,
-          lg: Int = -1,
-          smOffset: Int = -1,
-          mdOffset: Int = -1,
-          tag: VdomTag = <.div): VdomTag = {
+  def Col(
+      sm: Int = -1,
+      md: Int = -1,
+      lg: Int = -1,
+      smOffset: Int = -1,
+      mdOffset: Int = -1,
+      tag: VdomTag = <.div,
+  ): VdomTag = {
     val classes = mutable.Buffer[String]()
     if (sm != -1) classes += s"col-sm-$sm"
     if (md != -1) classes += s"col-md-$md"
@@ -24,12 +26,14 @@ object Bootstrap {
     tag(^^.classes(classes))
   }
 
-  def Button(variant: Variant = Variant.default,
-             size: Size = null,
-             block: Boolean = false,
-             circle: Boolean = false,
-             tag: VdomTag = <.button,
-             tpe: String = "button"): VdomTag = {
+  def Button(
+      variant: Variant = Variant.default,
+      size: Size = null,
+      block: Boolean = false,
+      circle: Boolean = false,
+      tag: VdomTag = <.button,
+      tpe: String = "button",
+  ): VdomTag = {
     val classes = mutable.Buffer[String]()
     classes += "btn"
     classes += s"btn-${variant.name}"
@@ -48,10 +52,12 @@ object Bootstrap {
   def ButtonGroup: VdomTag = <.span(^.className := "btn-group")
 
   def Icon(className: String): VdomTag = <.i(^.className := className)
-  def FontAwesomeIcon(name: String,
-                      otherName: String = null,
-                      fixedWidth: Boolean = false,
-                      spin: Boolean = false): VdomTag = {
+  def FontAwesomeIcon(
+      name: String,
+      otherName: String = null,
+      fixedWidth: Boolean = false,
+      spin: Boolean = false,
+  ): VdomTag = {
     val classes = mutable.Buffer[String]()
     classes += "fa"
     classes += s"fa-$name"

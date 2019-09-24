@@ -35,11 +35,12 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 /**
   * Store factory that calculates the monthly gains and losses made by exchange rate fluctuations in a given year.
   */
-final class SummaryExchangeRateGainsStoreFactory(implicit entityAccess: AppJsEntityAccess,
-                                                 exchangeRateManager: ExchangeRateManager,
-                                                 accountingConfig: Config,
-                                                 complexQueryFilter: ComplexQueryFilter)
-    extends EntriesStoreFactory[GainsForYear] {
+final class SummaryExchangeRateGainsStoreFactory(
+    implicit entityAccess: AppJsEntityAccess,
+    exchangeRateManager: ExchangeRateManager,
+    accountingConfig: Config,
+    complexQueryFilter: ComplexQueryFilter,
+) extends EntriesStoreFactory[GainsForYear] {
 
   // **************** Public API ****************//
   def get(account: Account, year: Int): Store =
@@ -149,9 +150,11 @@ final class SummaryExchangeRateGainsStoreFactory(implicit entityAccess: AppJsEnt
     private def isRelevantReservoir(reservoir: MoneyReservoir): Boolean =
       reservoir.owner == input.account && reservoir.currency.isForeign
 
-    private def filterInRange[E](field: ModelField[LocalDateTime, E],
-                                 start: LocalDateTime,
-                                 end: LocalDateTime): DbQuery.Filter[E] = {
+    private def filterInRange[E](
+        field: ModelField[LocalDateTime, E],
+        start: LocalDateTime,
+        end: LocalDateTime,
+    ): DbQuery.Filter[E] = {
       (field >= start) && (field < end)
     }
   }
@@ -167,10 +170,11 @@ object SummaryExchangeRateGainsStoreFactory {
     keys.map(key => key -> valueCombiner(maps.filter(_ contains key).map(_.apply(key)))).toMap
   }
 
-  case class GainsForYear(private val monthToGains: Map[DatedMonth, GainsForMonth],
-                          protected override val impactingTransactionIds: Set[Long],
-                          protected override val impactingBalanceCheckIds: Set[Long])
-      extends EntriesStore.StateTrait {
+  case class GainsForYear(
+      private val monthToGains: Map[DatedMonth, GainsForMonth],
+      protected override val impactingTransactionIds: Set[Long],
+      protected override val impactingBalanceCheckIds: Set[Long],
+  ) extends EntriesStore.StateTrait {
     def gainsForMonth(month: DatedMonth): GainsForMonth = monthToGains.getOrElse(month, GainsForMonth.empty)
     def currencies: Seq[Currency] = monthToGains.values.toStream.flatMap(_.currencies).distinct.toVector
     def nonEmpty: Boolean = this != GainsForYear.empty

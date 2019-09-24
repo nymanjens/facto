@@ -22,10 +22,12 @@ import scala.collection.immutable.Seq
 import scala.collection.immutable.TreeMap
 import scala.collection.mutable
 
-final class ScalaJsApiServerFactory @Inject()(implicit accountingConfig: Config,
-                                              clock: Clock,
-                                              entityAccess: JvmEntityAccess,
-                                              i18n: PlayI18n) {
+final class ScalaJsApiServerFactory @Inject()(
+    implicit accountingConfig: Config,
+    clock: Clock,
+    entityAccess: JvmEntityAccess,
+    i18n: PlayI18n,
+) {
 
   def create()(implicit user: User): ScalaJsApi = new ScalaJsApi() {
 

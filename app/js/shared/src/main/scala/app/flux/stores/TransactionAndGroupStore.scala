@@ -14,9 +14,11 @@ import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-private[stores] final class TransactionAndGroupStore(implicit entityAccess: AppJsEntityAccess,
-                                                     clock: Clock,
-                                                     dispatcher: Dispatcher) {
+private[stores] final class TransactionAndGroupStore(
+    implicit entityAccess: AppJsEntityAccess,
+    clock: Clock,
+    dispatcher: Dispatcher,
+) {
   dispatcher.registerPartialAsync {
     case AddTransactionGroup(transactionsWithoutIdProvider) =>
       async {

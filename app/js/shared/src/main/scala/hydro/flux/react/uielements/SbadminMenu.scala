@@ -21,10 +21,12 @@ import scala.collection.immutable.Seq
 final class SbadminMenu(implicit i18n: I18n) extends HydroReactComponent.Stateless {
 
   // **************** API ****************//
-  def apply(menuItems: Seq[Seq[MenuItem]],
-            enableSearch: Boolean,
-            router: RouterContext,
-            configureAdditionalKeyboardShortcuts: () => Unit = () => {}): VdomElement = {
+  def apply(
+      menuItems: Seq[Seq[MenuItem]],
+      enableSearch: Boolean,
+      router: RouterContext,
+      configureAdditionalKeyboardShortcuts: () => Unit = () => {},
+  ): VdomElement = {
     component(
       Props(
         menuItems = menuItems,
@@ -37,10 +39,12 @@ final class SbadminMenu(implicit i18n: I18n) extends HydroReactComponent.Statele
   override protected val statelessConfig = StatelessComponentConfig(backendConstructor = new Backend(_))
 
   // **************** Implementation of HydroReactComponent types ****************//
-  protected case class Props(menuItems: Seq[Seq[MenuItem]],
-                             enableSearch: Boolean,
-                             router: RouterContext,
-                             configureAdditionalKeyboardShortcuts: () => Unit)
+  protected case class Props(
+      menuItems: Seq[Seq[MenuItem]],
+      enableSearch: Boolean,
+      router: RouterContext,
+      configureAdditionalKeyboardShortcuts: () => Unit,
+  )
 
   protected class Backend($ : BackendScope[Props, State])
       extends BackendBase($)
@@ -167,8 +171,10 @@ final class SbadminMenu(implicit i18n: I18n) extends HydroReactComponent.Statele
 }
 object SbadminMenu {
   // **************** Public types **************** //
-  case class MenuItem(label: String,
-                      page: Page,
-                      iconClass: Option[String] = None,
-                      shortcuts: Seq[String] = Seq())
+  case class MenuItem(
+      label: String,
+      page: Page,
+      iconClass: Option[String] = None,
+      shortcuts: Seq[String] = Seq(),
+  )
 }

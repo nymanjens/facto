@@ -24,13 +24,14 @@ import play.api.mvc._
 
 import scala.collection.immutable.Seq
 
-final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi,
-                                  components: ControllerComponents,
-                                  clock: Clock,
-                                  playConfiguration: play.api.Configuration,
-                                  accountingConfig: Config,
-                                  entityAccess: JvmEntityAccess)
-    extends AbstractController(components)
+final class ExternalApi @Inject()(
+    implicit override val messagesApi: MessagesApi,
+    components: ControllerComponents,
+    clock: Clock,
+    playConfiguration: play.api.Configuration,
+    accountingConfig: Config,
+    entityAccess: JvmEntityAccess,
+) extends AbstractController(components)
     with I18nSupport {
 
   // ********** actions ********** //
@@ -55,10 +56,12 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
       Ok("OK")
   }
 
-  def addExchangeRateMeasurement(dateString: String,
-                                 foreignCurrencyCode: String,
-                                 ratioReferenceToForeignCurrency: Double,
-                                 applicationSecret: String) = Action { implicit request =>
+  def addExchangeRateMeasurement(
+      dateString: String,
+      foreignCurrencyCode: String,
+      ratioReferenceToForeignCurrency: Double,
+      applicationSecret: String,
+  ) = Action { implicit request =>
     validateApplicationSecret(applicationSecret)
 
     implicit val user = Users.getOrCreateRobotUser()
@@ -106,9 +109,11 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
       s"Invalid application secret. Found '$applicationSecret' but should be '$realApplicationSecret'")
   }
 
-  private def toTransactions(template: Template,
-                             transactionGroup: TransactionGroup,
-                             issuer: User): Seq[Transaction] = {
+  private def toTransactions(
+      template: Template,
+      transactionGroup: TransactionGroup,
+      issuer: User,
+  ): Seq[Transaction] = {
     def checkNotEmpty(s: String): String = {
       require(!s.isEmpty)
       s
@@ -151,8 +156,10 @@ final class ExternalApi @Inject()(implicit override val messagesApi: MessagesApi
       case bc: BalanceCheck   => (bc.checkDate, bc.createdDate)
     }
 
-    def findMismatches(nextRows: List[Entity],
-                       currentBalance: MoneyWithGeneralCurrency): List[BalanceCorrection] =
+    def findMismatches(
+        nextRows: List[Entity],
+        currentBalance: MoneyWithGeneralCurrency,
+    ): List[BalanceCorrection] =
       (nextRows: @unchecked) match {
         case (trans: Transaction) :: rest =>
           findMismatches(rest, currentBalance = currentBalance + trans.flow)

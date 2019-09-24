@@ -16,15 +16,17 @@ import hydro.flux.stores.PageLoadingStateStore
 import hydro.flux.stores.UserStore
 import hydro.models.access.HydroPushSocketClientFactory
 
-final class Module(implicit i18n: I18n,
-                   accountingConfig: Config,
-                   user: User,
-                   entityAccess: AppJsEntityAccess,
-                   exchangeRateManager: ExchangeRateManager,
-                   dispatcher: Dispatcher,
-                   clock: Clock,
-                   scalaJsApiClient: ScalaJsApiClient,
-                   hydroPushSocketClientFactory: HydroPushSocketClientFactory) {
+final class Module(
+    implicit i18n: I18n,
+    accountingConfig: Config,
+    user: User,
+    entityAccess: AppJsEntityAccess,
+    exchangeRateManager: ExchangeRateManager,
+    dispatcher: Dispatcher,
+    clock: Clock,
+    scalaJsApiClient: ScalaJsApiClient,
+    hydroPushSocketClientFactory: HydroPushSocketClientFactory,
+) {
 
   new TransactionAndGroupStore
   new BalanceCheckStore

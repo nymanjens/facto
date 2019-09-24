@@ -21,14 +21,15 @@ import play.api.mvc._
 import scala.annotation.StaticAnnotation
 import scala.collection.immutable.Seq
 
-final class JavascriptFiles @Inject()(implicit override val messagesApi: MessagesApi,
-                                      components: ControllerComponents,
-                                      clock: Clock,
-                                      entityAccess: EntityAccess,
-                                      playConfiguration: play.api.Configuration,
-                                      env: play.api.Environment,
-                                      @appAssets appAssets: Seq[Asset])
-    extends AbstractController(components)
+final class JavascriptFiles @Inject()(
+    implicit override val messagesApi: MessagesApi,
+    components: ControllerComponents,
+    clock: Clock,
+    entityAccess: EntityAccess,
+    playConfiguration: play.api.Configuration,
+    env: play.api.Environment,
+    @appAssets appAssets: Seq[Asset],
+) extends AbstractController(components)
     with I18nSupport {
 
   private lazy val localDatabaseWebWorkerResultCache: Result =

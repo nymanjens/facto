@@ -31,11 +31,12 @@ object EntriesListStoreFactory {
   /**
     * @param entries the latest `maxNumEntries` entries sorted from old to new.
     */
-  case class State[Entry](entries: Seq[WithIsPending[Entry]],
-                          hasMore: Boolean,
-                          override val impactingTransactionIds: Set[Long],
-                          override val impactingBalanceCheckIds: Set[Long])
-      extends EntriesStore.StateTrait {
+  case class State[Entry](
+      entries: Seq[WithIsPending[Entry]],
+      hasMore: Boolean,
+      override val impactingTransactionIds: Set[Long],
+      override val impactingBalanceCheckIds: Set[Long],
+  ) extends EntriesStore.StateTrait {
     def isEmpty: Boolean = entries.isEmpty
   }
   object State {

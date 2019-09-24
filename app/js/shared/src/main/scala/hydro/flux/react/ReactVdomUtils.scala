@@ -38,8 +38,10 @@ object ReactVdomUtils {
       ifThen(option.isDefined)(thenElement(option.get))
     }
 
-    def joinWithSpaces[A](elems: TraversableOnce[A])(implicit f: A => VdomNode,
-                                                     stringF: String => VdomNode): VdomArray = {
+    def joinWithSpaces[A](elems: TraversableOnce[A])(
+        implicit f: A => VdomNode,
+        stringF: String => VdomNode,
+    ): VdomArray = {
       VdomArray.empty() ++= elems.flatMap(a => Seq(f(a), stringF(" ")))
     }
   }

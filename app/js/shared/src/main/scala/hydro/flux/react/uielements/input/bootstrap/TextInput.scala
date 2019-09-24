@@ -15,11 +15,13 @@ object TextInput {
 
   private val component = InputComponent.create[Value, ExtraProps](
     name = getClass.getSimpleName,
-    inputRenderer = (classes: Seq[String],
-                     name: String,
-                     valueString: String,
-                     onChange: String => Callback,
-                     extraProps: ExtraProps) => {
+    inputRenderer = (
+        classes: Seq[String],
+        name: String,
+        valueString: String,
+        onChange: String => Callback,
+        extraProps: ExtraProps,
+    ) => {
       <.input(
         ^.tpe := extraProps.inputType,
         ^^.classes(classes),
@@ -33,19 +35,20 @@ object TextInput {
   )
 
   // **************** API ****************//
-  def apply(ref: Reference,
-            name: String,
-            label: String,
-            inputType: String = "text",
-            defaultValue: String = "",
-            required: Boolean = false,
-            showErrorMessage: Boolean = false,
-            additionalValidator: InputValidator[String] = InputValidator.alwaysValid,
-            inputClasses: Seq[String] = Seq(),
-            focusOnMount: Boolean = false,
-            disabled: Boolean = false,
-            listener: InputBase.Listener[String] = InputBase.Listener.nullInstance)(
-      implicit i18n: I18n): VdomElement = {
+  def apply(
+      ref: Reference,
+      name: String,
+      label: String,
+      inputType: String = "text",
+      defaultValue: String = "",
+      required: Boolean = false,
+      showErrorMessage: Boolean = false,
+      additionalValidator: InputValidator[String] = InputValidator.alwaysValid,
+      inputClasses: Seq[String] = Seq(),
+      focusOnMount: Boolean = false,
+      disabled: Boolean = false,
+      listener: InputBase.Listener[String] = InputBase.Listener.nullInstance,
+  )(implicit i18n: I18n): VdomElement = {
     val props = Props(
       label = label,
       name = name,

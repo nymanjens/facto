@@ -14,10 +14,11 @@ sealed trait CashFlowEntry {
 
 object CashFlowEntry {
 
-  case class RegularEntry(override val transactions: Seq[Transaction],
-                          private val nonDatedBalance: MoneyWithGeneralCurrency,
-                          balanceVerified: Boolean)
-      extends GroupedTransactions(transactions)
+  case class RegularEntry(
+      override val transactions: Seq[Transaction],
+      private val nonDatedBalance: MoneyWithGeneralCurrency,
+      balanceVerified: Boolean,
+  ) extends GroupedTransactions(transactions)
       with CashFlowEntry {
 
     override def balance(implicit accountingConfig: Config) = {

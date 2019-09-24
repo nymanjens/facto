@@ -7,9 +7,10 @@ import hydro.flux.stores.ApplicationIsOnlineStore
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
-final class ApplicationDisconnectedIcon(implicit applicationIsOnlineStore: ApplicationIsOnlineStore,
-                                        i18n: I18n)
-    extends HydroReactComponent {
+final class ApplicationDisconnectedIcon(
+    implicit applicationIsOnlineStore: ApplicationIsOnlineStore,
+    i18n: I18n,
+) extends HydroReactComponent {
 
   // **************** API ****************//
   def apply(): VdomElement = {

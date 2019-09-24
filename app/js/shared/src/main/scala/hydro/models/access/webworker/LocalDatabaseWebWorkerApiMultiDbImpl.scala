@@ -72,8 +72,10 @@ private[webworker] final class LocalDatabaseWebWorkerApiMultiDbImpl extends Loca
     ).map(_ => (): Unit)
   }
 
-  private def combineFuturesInOrder[T](iterable: Iterable[T],
-                                       futureFunction: T => Future[Unit]): Future[Unit] = {
+  private def combineFuturesInOrder[T](
+      iterable: Iterable[T],
+      futureFunction: T => Future[Unit],
+  ): Future[Unit] = {
     var result = Future.successful((): Unit)
     for (elem <- iterable) {
       result = result.flatMap(_ => futureFunction(elem))

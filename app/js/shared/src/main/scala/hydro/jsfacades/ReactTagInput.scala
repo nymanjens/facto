@@ -12,15 +12,17 @@ import scala.scalajs.js.annotation.JSImport
 object ReactTagInput {
 
   // **************** API ****************//
-  def apply(tags: Seq[String] = Seq(),
-            suggestions: Seq[String],
-            handleAddition: String => Unit,
-            handleDelete: DeleteHandler,
-            handleDrag: DragHandler,
-            delimiters: Seq[Int] = Seq(KeyCode.Enter, KeyCode.Tab),
-            minQueryLength: Int = 2,
-            classNames: Map[String, String] = Map(),
-            autoFocus: Boolean = false) = {
+  def apply(
+      tags: Seq[String] = Seq(),
+      suggestions: Seq[String],
+      handleAddition: String => Unit,
+      handleDelete: DeleteHandler,
+      handleDrag: DragHandler,
+      delimiters: Seq[Int] = Seq(KeyCode.Enter, KeyCode.Tab),
+      minQueryLength: Int = 2,
+      classNames: Map[String, String] = Map(),
+      autoFocus: Boolean = false,
+  ) = {
     val component = JsComponent[js.Object, Children.None, Null](RawComponent)
     component(
       Props(
@@ -59,15 +61,17 @@ object ReactTagInput {
     def apply(id: Int, tag: String): js.Object = js.Dynamic.literal(id = id, text = tag)
   }
 
-  private case class Props(tags: js.Array[js.Object],
-                           suggestions: js.Array[String],
-                           handleAddition: js.Function1[String, Unit],
-                           handleDelete: js.Function1[Int, Unit],
-                           handleDrag: js.Function3[TagObject, Int, Int, Unit],
-                           delimiters: js.Array[Int],
-                           minQueryLength: Int,
-                           classNames: js.Dictionary[String],
-                           autoFocus: Boolean) {
+  private case class Props(
+      tags: js.Array[js.Object],
+      suggestions: js.Array[String],
+      handleAddition: js.Function1[String, Unit],
+      handleDelete: js.Function1[Int, Unit],
+      handleDrag: js.Function3[TagObject, Int, Int, Unit],
+      delimiters: js.Array[Int],
+      minQueryLength: Int,
+      classNames: js.Dictionary[String],
+      autoFocus: Boolean,
+  ) {
     def toJsObject: js.Object =
       js.Dynamic.literal(
         tags = tags,

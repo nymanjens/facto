@@ -19,10 +19,12 @@ import play.api.Mode
 
 import scala.collection.JavaConverters._
 
-final class ApplicationStartHook @Inject()(implicit app: Application,
-                                           entityAccess: JvmEntityAccess,
-                                           csvImportTool: CsvImportTool,
-                                           clock: Clock) {
+final class ApplicationStartHook @Inject()(
+    implicit app: Application,
+    entityAccess: JvmEntityAccess,
+    csvImportTool: CsvImportTool,
+    clock: Clock,
+) {
   onStart()
 
   private def onStart(): Unit = {

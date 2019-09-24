@@ -7,12 +7,13 @@ import play.api.i18n.I18nSupport
 import play.api.i18n.MessagesApi
 import play.api.mvc._
 
-final class StandardActions @Inject()(implicit override val messagesApi: MessagesApi,
-                                      components: ControllerComponents,
-                                      entityAccess: JvmEntityAccess,
-                                      playConfiguration: play.api.Configuration,
-                                      env: play.api.Environment)
-    extends AbstractController(components)
+final class StandardActions @Inject()(
+    implicit override val messagesApi: MessagesApi,
+    components: ControllerComponents,
+    entityAccess: JvmEntityAccess,
+    playConfiguration: play.api.Configuration,
+    env: play.api.Environment,
+) extends AbstractController(components)
     with I18nSupport {
 
   def index() = AuthenticatedAction { implicit user => implicit request =>

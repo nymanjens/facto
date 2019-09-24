@@ -251,9 +251,10 @@ object StandardConverters {
   }
 
   // **************** Entity converters **************** //
-  final class EntityConverter[E <: Entity: EntityType](allFieldsWithoutId: Seq[ModelField[_, E]] = Seq(),
-                                                       toScalaWithoutId: EntityConverter.DictWrapper[E] => E)
-      extends MapConverter[E] {
+  final class EntityConverter[E <: Entity: EntityType](
+      allFieldsWithoutId: Seq[ModelField[_, E]] = Seq(),
+      toScalaWithoutId: EntityConverter.DictWrapper[E] => E,
+  ) extends MapConverter[E] {
     override def toJs(entity: E) = {
       val result = js.Dictionary[js.Any]()
 

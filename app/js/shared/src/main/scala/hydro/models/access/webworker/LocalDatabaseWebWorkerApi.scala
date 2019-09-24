@@ -22,10 +22,12 @@ trait LocalDatabaseWebWorkerApi {
   def applyWriteOperations(operations: Seq[WriteOperation]): Future[Unit]
 }
 object LocalDatabaseWebWorkerApi {
-  case class LokiQuery(collectionName: String,
-                       filter: Option[js.Dictionary[js.Any]] = None,
-                       sorting: Option[js.Array[js.Array[js.Any]]] = None,
-                       limit: Option[Int] = None)
+  case class LokiQuery(
+      collectionName: String,
+      filter: Option[js.Dictionary[js.Any]] = None,
+      sorting: Option[js.Array[js.Array[js.Any]]] = None,
+      limit: Option[Int] = None,
+  )
 
   sealed trait WriteOperation
   object WriteOperation {

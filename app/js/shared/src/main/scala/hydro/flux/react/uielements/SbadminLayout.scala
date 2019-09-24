@@ -20,15 +20,17 @@ import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 
-final class SbadminLayout(implicit globalMessages: GlobalMessages,
-                          pageLoadingSpinner: PageLoadingSpinner,
-                          applicationDisconnectedIcon: ApplicationDisconnectedIcon,
-                          localDatabaseHasBeenLoadedIcon: LocalDatabaseHasBeenLoadedIcon,
-                          pendingModificationsCounter: PendingModificationsCounter,
-                          user: User,
-                          i18n: I18n,
-                          jsEntityAccess: JsEntityAccess,
-                          dispatcher: Dispatcher) {
+final class SbadminLayout(
+    implicit globalMessages: GlobalMessages,
+    pageLoadingSpinner: PageLoadingSpinner,
+    applicationDisconnectedIcon: ApplicationDisconnectedIcon,
+    localDatabaseHasBeenLoadedIcon: LocalDatabaseHasBeenLoadedIcon,
+    pendingModificationsCounter: PendingModificationsCounter,
+    user: User,
+    i18n: I18n,
+    jsEntityAccess: JsEntityAccess,
+    dispatcher: Dispatcher,
+) {
 
   // **************** API ****************//
   def apply(title: TagMod, leftMenu: VdomElement, pageContent: VdomElement, extraFooter: Seq[TagMod] = Seq())(

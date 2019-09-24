@@ -11,8 +11,8 @@ import scala.collection.immutable.Seq
 
 private[access] final class AppJsEntityAccessImpl(allUsers: Seq[User])(
     implicit remoteDatabaseProxy: RemoteDatabaseProxy,
-    hydroPushSocketClientFactory: HydroPushSocketClientFactory)
-    extends JsEntityAccessImpl
+    hydroPushSocketClientFactory: HydroPushSocketClientFactory,
+) extends JsEntityAccessImpl
     with AppJsEntityAccess {
 
   override def newQuerySyncForUser() =

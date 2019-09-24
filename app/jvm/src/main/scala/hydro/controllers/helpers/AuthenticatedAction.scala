@@ -6,10 +6,11 @@ import app.models.user.User
 import hydro.models.access.DbQueryImplicits._
 import play.api.mvc._
 
-abstract class AuthenticatedAction[A](bodyParser: BodyParser[A])(implicit entityAccess: JvmEntityAccess,
-                                                                 controllerComponents: ControllerComponents,
-                                                                 playConfiguration: play.api.Configuration)
-    extends EssentialAction {
+abstract class AuthenticatedAction[A](bodyParser: BodyParser[A])(
+    implicit entityAccess: JvmEntityAccess,
+    controllerComponents: ControllerComponents,
+    playConfiguration: play.api.Configuration,
+) extends EssentialAction {
 
   private val delegate: EssentialAction = {
     Security.Authenticated(AuthenticatedAction.username, AuthenticatedAction.onUnauthorized) { username =>
@@ -34,7 +35,8 @@ object AuthenticatedAction {
   def apply[A](bodyParser: BodyParser[A])(userAndRequestToResult: UserAndRequestToResult[A])(
       implicit entityAccess: JvmEntityAccess,
       controllerComponents: ControllerComponents,
-      playConfiguration: play.api.Configuration): AuthenticatedAction[A] = {
+      playConfiguration: play.api.Configuration,
+  ): AuthenticatedAction[A] = {
     new AuthenticatedAction[A](bodyParser) {
       override def calculateResult(implicit user: User, request: Request[A]): Result = {
         userAndRequestToResult(user)(request)
@@ -45,14 +47,16 @@ object AuthenticatedAction {
   def apply(userAndRequestToResult: UserAndRequestToResult[AnyContent])(
       implicit entityAccess: JvmEntityAccess,
       controllerComponents: ControllerComponents,
-      playConfiguration: play.api.Configuration): AuthenticatedAction[AnyContent] = {
+      playConfiguration: play.api.Configuration,
+  ): AuthenticatedAction[AnyContent] = {
     apply(controllerComponents.parsers.defaultBodyParser)(userAndRequestToResult)
   }
 
   def requireAdminUser(userAndRequestToResult: UserAndRequestToResult[AnyContent])(
       implicit entityAccess: JvmEntityAccess,
       controllerComponents: ControllerComponents,
-      playConfiguration: play.api.Configuration): AuthenticatedAction[AnyContent] =
+      playConfiguration: play.api.Configuration,
+  ): AuthenticatedAction[AnyContent] =
     AuthenticatedAction { user => request =>
       require(user.isAdmin)
       userAndRequestToResult(user)(request)

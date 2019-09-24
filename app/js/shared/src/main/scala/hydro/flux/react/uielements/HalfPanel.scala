@@ -34,14 +34,18 @@ object HalfPanel {
     .build
 
   // **************** API ****************//
-  def apply(title: VdomElement,
-            panelClasses: Seq[String] = Seq(),
-            closeButtonCallback: Option[Callback] = None)(children: VdomNode*): VdomElement = {
+  def apply(
+      title: VdomElement,
+      panelClasses: Seq[String] = Seq(),
+      closeButtonCallback: Option[Callback] = None,
+  )(children: VdomNode*): VdomElement = {
     component(Props(title, panelClasses, closeButtonCallback))(children: _*)
   }
 
   // **************** Private inner types ****************//
-  private case class Props(title: VdomElement,
-                           panelClasses: Seq[String],
-                           closeButtonCallback: Option[Callback])
+  private case class Props(
+      title: VdomElement,
+      panelClasses: Seq[String],
+      closeButtonCallback: Option[Callback],
+  )
 }

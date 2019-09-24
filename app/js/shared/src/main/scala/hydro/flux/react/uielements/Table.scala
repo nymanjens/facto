@@ -16,14 +16,16 @@ import scala.scalajs.js
 object Table extends HydroReactComponent.Stateless {
 
   // **************** API ****************//
-  def apply(title: String = null,
-            tableClasses: Seq[String] = Seq(),
-            expanded: Boolean = true,
-            onToggleCollapsedExpanded: Option[() => Unit] = None,
-            expandNumEntriesCallback: Option[Callback] = None,
-            tableTitleExtra: VdomElement = null,
-            tableHeaders: Seq[VdomElement],
-            tableRowDatas: Seq[TableRowData])(implicit i18n: I18n): VdomElement = {
+  def apply(
+      title: String = null,
+      tableClasses: Seq[String] = Seq(),
+      expanded: Boolean = true,
+      onToggleCollapsedExpanded: Option[() => Unit] = None,
+      expandNumEntriesCallback: Option[Callback] = None,
+      tableTitleExtra: VdomElement = null,
+      tableHeaders: Seq[VdomElement],
+      tableRowDatas: Seq[TableRowData],
+  )(implicit i18n: I18n): VdomElement = {
     component(
       Props(
         title = Option(title),
@@ -41,14 +43,16 @@ object Table extends HydroReactComponent.Stateless {
   override protected val statelessConfig = StatelessComponentConfig(backendConstructor = new Backend(_))
 
   // **************** Implementation of HydroReactComponent types ****************//
-  protected case class Props(title: Option[String],
-                             tableClasses: Seq[String],
-                             expanded: Boolean,
-                             onToggleCollapsedExpanded: Option[() => Unit],
-                             expandNumEntriesCallback: Option[Callback],
-                             tableTitleExtra: Option[VdomElement],
-                             tableHeaders: Seq[VdomElement],
-                             tableRowDatas: Seq[TableRowData])(implicit val i18n: I18n) {
+  protected case class Props(
+      title: Option[String],
+      tableClasses: Seq[String],
+      expanded: Boolean,
+      onToggleCollapsedExpanded: Option[() => Unit],
+      expandNumEntriesCallback: Option[Callback],
+      tableTitleExtra: Option[VdomElement],
+      tableHeaders: Seq[VdomElement],
+      tableRowDatas: Seq[TableRowData],
+  )(implicit val i18n: I18n) {
     def colSpan: Int = tableHeaders.size
   }
 

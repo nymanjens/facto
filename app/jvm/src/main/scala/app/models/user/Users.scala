@@ -11,12 +11,14 @@ import hydro.models.access.DbQueryImplicits._
 
 object Users {
 
-  def createUser(loginName: String,
-                 password: String,
-                 name: String,
-                 isAdmin: Boolean = false,
-                 expandCashFlowTablesByDefault: Boolean = true,
-                 expandLiquidationTablesByDefault: Boolean = true): User =
+  def createUser(
+      loginName: String,
+      password: String,
+      name: String,
+      isAdmin: Boolean = false,
+      expandCashFlowTablesByDefault: Boolean = true,
+      expandLiquidationTablesByDefault: Boolean = true,
+  ): User =
     User(
       loginName = loginName,
       passwordHash = hash(password),

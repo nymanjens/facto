@@ -9,10 +9,12 @@ import hydro.flux.react.uielements.Bootstrap.Variant
 import hydro.flux.react.uielements.Bootstrap.Size
 import hydro.flux.react.uielements.Bootstrap
 
-final class UserAdministration(implicit i18n: I18n,
-                               pageHeader: PageHeader,
-                               allUsersList: AllUsersList,
-                               addUserForm: AddUserForm) {
+final class UserAdministration(
+    implicit i18n: I18n,
+    pageHeader: PageHeader,
+    allUsersList: AllUsersList,
+    addUserForm: AddUserForm,
+) {
 
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)

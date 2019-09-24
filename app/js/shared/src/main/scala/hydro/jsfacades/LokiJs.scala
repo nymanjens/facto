@@ -22,9 +22,11 @@ object LokiJs {
   }
 
   final class Database(facade: DatabaseFacade) {
-    def addCollection(name: String,
-                      uniqueIndices: Seq[String] = Seq(),
-                      indices: Seq[String] = Seq()): Collection = {
+    def addCollection(
+        name: String,
+        uniqueIndices: Seq[String] = Seq(),
+        indices: Seq[String] = Seq(),
+    ): Collection = {
       facade.addCollection(
         name,
         args = js.Dictionary("unique" -> uniqueIndices.toJSArray, "indices" -> indices.toJSArray))

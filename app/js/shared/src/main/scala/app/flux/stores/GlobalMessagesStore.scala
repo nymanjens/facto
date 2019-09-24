@@ -22,12 +22,13 @@ import scala.collection.immutable.Seq
 import scala.concurrent.duration._
 import scala.scalajs.js
 
-final class GlobalMessagesStore(implicit i18n: I18n,
-                                clock: Clock,
-                                entityAccess: EntityAccess,
-                                accountingConfig: Config,
-                                dispatcher: Dispatcher)
-    extends StateStore[Option[Message]] {
+final class GlobalMessagesStore(
+    implicit i18n: I18n,
+    clock: Clock,
+    entityAccess: EntityAccess,
+    accountingConfig: Config,
+    dispatcher: Dispatcher,
+) extends StateStore[Option[Message]] {
   dispatcher.registerPartialSync(dispatcherListener)
 
   private var _state: Option[Unique[Message]] = None

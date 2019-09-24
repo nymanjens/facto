@@ -30,9 +30,10 @@ import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 import scala.util.matching.Regex
 
-private final class LocalDatabaseImpl(implicit webWorker: LocalDatabaseWebWorkerApi,
-                                      secondaryIndexFunction: SecondaryIndexFunction)
-    extends LocalDatabase {
+private final class LocalDatabaseImpl(
+    implicit webWorker: LocalDatabaseWebWorkerApi,
+    secondaryIndexFunction: SecondaryIndexFunction,
+) extends LocalDatabase {
 
   private val serializingWriteQueue = SerializingTaskQueue.create()
 
@@ -59,13 +60,17 @@ private final class LocalDatabaseImpl(implicit webWorker: LocalDatabaseWebWorker
       )
 
       private def toLokiJsFilter(filter: DbQuery.Filter[E]): Option[js.Dictionary[js.Any]] = {
-        def rawKeyValueFilter(operation: Operation,
-                              field: ModelField[_, E],
-                              jsValue: js.Any): Option[js.Dictionary[js.Any]] =
+        def rawKeyValueFilter(
+            operation: Operation,
+            field: ModelField[_, E],
+            jsValue: js.Any,
+        ): Option[js.Dictionary[js.Any]] =
           Some(LokiJs.FilterFactory.keyValueFilter(operation, field.name, jsValue))
-        def keyValueFilter[V](operation: Operation,
-                              field: ModelField[V, E],
-                              value: V): Option[js.Dictionary[js.Any]] =
+        def keyValueFilter[V](
+            operation: Operation,
+            field: ModelField[V, E],
+            value: V,
+        ): Option[js.Dictionary[js.Any]] =
           rawKeyValueFilter(operation, field, Scala2Js.toJs(value, field))
 
         filter match {
@@ -242,7 +247,8 @@ object LocalDatabaseImpl {
 
   def create(separateDbPerCollection: Boolean = false)(
       implicit webWorker: LocalDatabaseWebWorkerApi,
-      secondaryIndexFunction: SecondaryIndexFunction): Future[LocalDatabase] = async {
+      secondaryIndexFunction: SecondaryIndexFunction,
+  ): Future[LocalDatabase] = async {
     await(
       webWorker
         .create(dbName = "hydro-db", inMemory = false, separateDbPerCollection = separateDbPerCollection))
@@ -251,7 +257,8 @@ object LocalDatabaseImpl {
 
   def createStoredForTests(separateDbPerCollection: Boolean = false)(
       implicit webWorker: LocalDatabaseWebWorkerApi,
-      secondaryIndexFunction: SecondaryIndexFunction): Future[LocalDatabase] = async {
+      secondaryIndexFunction: SecondaryIndexFunction,
+  ): Future[LocalDatabase] = async {
     await(
       webWorker
         .create(dbName = "test-db", inMemory = false, separateDbPerCollection = separateDbPerCollection))
@@ -260,7 +267,8 @@ object LocalDatabaseImpl {
 
   def createInMemoryForTests(separateDbPerCollection: Boolean = false)(
       implicit webWorker: LocalDatabaseWebWorkerApi,
-      secondaryIndexFunction: SecondaryIndexFunction): Future[LocalDatabase] =
+      secondaryIndexFunction: SecondaryIndexFunction,
+  ): Future[LocalDatabase] =
     async {
       await(
         webWorker

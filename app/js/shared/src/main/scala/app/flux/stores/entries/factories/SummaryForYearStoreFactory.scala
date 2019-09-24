@@ -24,10 +24,11 @@ import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-final class SummaryForYearStoreFactory(implicit entityAccess: AppJsEntityAccess,
-                                       accountingConfig: Config,
-                                       complexQueryFilter: ComplexQueryFilter)
-    extends EntriesStoreFactory[SummaryForYear] {
+final class SummaryForYearStoreFactory(
+    implicit entityAccess: AppJsEntityAccess,
+    accountingConfig: Config,
+    complexQueryFilter: ComplexQueryFilter,
+) extends EntriesStoreFactory[SummaryForYear] {
 
   // **************** Public API ****************//
   def get(account: Account, year: Int, query: String = ""): Store =
@@ -99,8 +100,10 @@ object SummaryForYearStoreFactory {
 
     def nonEmpty: Boolean = transactions.nonEmpty
 
-    def totalFlow(implicit exchangeRateManager: ExchangeRateManager,
-                  accountingConfig: Config): ReferenceMoney = {
+    def totalFlow(
+        implicit exchangeRateManager: ExchangeRateManager,
+        accountingConfig: Config,
+    ): ReferenceMoney = {
       if (_totalFlow eq null) {
         _totalFlow = transactions.map(_.flow.exchangedForReferenceCurrency).sum
       }

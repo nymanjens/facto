@@ -20,11 +20,13 @@ object TextAreaInput {
 
   private val component = InputComponent.create[Value, ExtraProps](
     name = getClass.getSimpleName,
-    inputRenderer = (classes: Seq[String],
-                     name: String,
-                     valueString: String,
-                     onChange: String => Callback,
-                     extraProps: ExtraProps) => {
+    inputRenderer = (
+        classes: Seq[String],
+        name: String,
+        valueString: String,
+        onChange: String => Callback,
+        extraProps: ExtraProps,
+    ) => {
       <.textarea(
         ^^.classes(classes),
         ^.name := name,
@@ -36,15 +38,16 @@ object TextAreaInput {
   )
 
   // **************** API ****************//
-  def apply(ref: Reference,
-            name: String,
-            label: String,
-            defaultValue: String = "",
-            required: Boolean = false,
-            showErrorMessage: Boolean,
-            inputClasses: Seq[String] = Seq(),
-            listener: InputBase.Listener[String] = InputBase.Listener.nullInstance)(
-      implicit i18n: I18n): VdomElement = {
+  def apply(
+      ref: Reference,
+      name: String,
+      label: String,
+      defaultValue: String = "",
+      required: Boolean = false,
+      showErrorMessage: Boolean,
+      inputClasses: Seq[String] = Seq(),
+      listener: InputBase.Listener[String] = InputBase.Listener.nullInstance,
+  )(implicit i18n: I18n): VdomElement = {
     val props = Props(
       label = label,
       name = name,

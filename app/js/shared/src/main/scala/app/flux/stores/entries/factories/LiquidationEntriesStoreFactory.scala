@@ -22,18 +22,21 @@ import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-final class LiquidationEntriesStoreFactory(implicit entityAccess: AppJsEntityAccess,
-                                           accountingConfig: Config,
-                                           exchangeRateManager: ExchangeRateManager)
-    extends EntriesListStoreFactory[LiquidationEntry, AccountPair] {
+final class LiquidationEntriesStoreFactory(
+    implicit entityAccess: AppJsEntityAccess,
+    accountingConfig: Config,
+    exchangeRateManager: ExchangeRateManager,
+) extends EntriesListStoreFactory[LiquidationEntry, AccountPair] {
 
   override protected def createNew(maxNumEntries: Int, accountPair: AccountPair) = new Store {
     override protected def calculateState() = async {
       val relevantTransactions = await(getRelevantTransactions())
 
       // convert to entries (recursion does not lead to growing stack because of Stream)
-      def convertToEntries(nextTransactions: List[Transaction],
-                           currentDebt: ReferenceMoney): Stream[LiquidationEntry] =
+      def convertToEntries(
+          nextTransactions: List[Transaction],
+          currentDebt: ReferenceMoney,
+      ): Stream[LiquidationEntry] =
         nextTransactions match {
           case trans :: rest =>
             val addsTo1To2Debt = trans.beneficiary == accountPair.account2

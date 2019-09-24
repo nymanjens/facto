@@ -13,9 +13,10 @@ import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-final class ComplexQueryStoreFactory(implicit entityAccess: AppJsEntityAccess,
-                                     complexQueryFilter: ComplexQueryFilter)
-    extends EntriesListStoreFactory[GeneralEntry, ComplexQueryStoreFactory.Query] {
+final class ComplexQueryStoreFactory(
+    implicit entityAccess: AppJsEntityAccess,
+    complexQueryFilter: ComplexQueryFilter,
+) extends EntriesListStoreFactory[GeneralEntry, ComplexQueryStoreFactory.Query] {
 
   override protected def createNew(maxNumEntries: Int, query: String) = new Store {
     private val filterFromQuery: DbQuery.Filter[Transaction] = complexQueryFilter.fromQuery(query)

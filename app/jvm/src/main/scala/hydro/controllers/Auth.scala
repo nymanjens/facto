@@ -11,12 +11,13 @@ import play.api.i18n.Messages
 import play.api.i18n.MessagesApi
 import play.api.mvc._
 
-final class Auth @Inject()(implicit override val messagesApi: MessagesApi,
-                           components: ControllerComponents,
-                           entityAccess: JvmEntityAccess,
-                           playConfiguration: play.api.Configuration,
-                           env: play.api.Environment)
-    extends AbstractController(components)
+final class Auth @Inject()(
+    implicit override val messagesApi: MessagesApi,
+    components: ControllerComponents,
+    entityAccess: JvmEntityAccess,
+    playConfiguration: play.api.Configuration,
+    env: play.api.Environment,
+) extends AbstractController(components)
     with I18nSupport {
 
   // ********** actions ********** //

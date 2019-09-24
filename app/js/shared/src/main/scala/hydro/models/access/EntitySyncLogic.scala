@@ -29,8 +29,10 @@ trait EntitySyncLogic {
     *
     * Note that this method may be called multiple times with the same modification.
     */
-  def handleEntityModificationUpdate(entityModifications: Seq[EntityModification],
-                                     db: LocalDatabase): Future[Unit]
+  def handleEntityModificationUpdate(
+      entityModifications: Seq[EntityModification],
+      db: LocalDatabase,
+  ): Future[Unit]
 
 }
 object EntitySyncLogic {
@@ -51,12 +53,16 @@ object EntitySyncLogic {
       allEntitiesResponse.nextUpdateToken
     }
 
-    override def canBeExecutedLocally[E <: Entity: EntityType](dbQuery: DbQuery[E],
-                                                               db: LocalDatabase): Future[Boolean] =
+    override def canBeExecutedLocally[E <: Entity: EntityType](
+        dbQuery: DbQuery[E],
+        db: LocalDatabase,
+    ): Future[Boolean] =
       Future.successful(entityTypes contains implicitly[EntityType[E]])
 
-    override def handleEntityModificationUpdate(entityModifications: Seq[EntityModification],
-                                                db: LocalDatabase): Future[Unit] = {
+    override def handleEntityModificationUpdate(
+        entityModifications: Seq[EntityModification],
+        db: LocalDatabase,
+    ): Future[Unit] = {
       db.applyModifications(entityModifications.filter(entityTypes contains _.entityType))
     }
   }

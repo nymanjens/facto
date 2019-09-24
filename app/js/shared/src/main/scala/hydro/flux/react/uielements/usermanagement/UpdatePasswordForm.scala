@@ -18,10 +18,11 @@ import hydro.flux.react.uielements.Bootstrap
 
 import scala.collection.immutable.Seq
 
-private[usermanagement] final class UpdatePasswordForm(implicit user: User,
-                                                       i18n: I18n,
-                                                       dispatcher: Dispatcher)
-    extends HydroReactComponent {
+private[usermanagement] final class UpdatePasswordForm(
+    implicit user: User,
+    i18n: I18n,
+    dispatcher: Dispatcher,
+) extends HydroReactComponent {
 
   // **************** API ****************//
   def apply(): VdomElement = {

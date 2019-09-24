@@ -45,8 +45,10 @@ final class WaitForFuture[V] {
     <.div(^.style := js.Dictionary("padding" -> "200px 0  500px 60px"), s"${i18n("app.loading")}...")
 
   // **************** Private inner types ****************//
-  private case class Props(futureInput: Future[V],
-                           inputToElement: V => VdomElement,
-                           waitingElement: VdomElement)
+  private case class Props(
+      futureInput: Future[V],
+      inputToElement: V => VdomElement,
+      waitingElement: VdomElement,
+  )
   private case class State(input: Option[V])
 }

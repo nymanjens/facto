@@ -32,10 +32,12 @@ import scala.util.Try
 object InputComponent {
 
   // **************** API ****************//
-  def create[Value, ExtraProps](name: String,
-                                valueChangeForPropsChange: (Props[Value, ExtraProps], Value) => Value =
-                                  (_: Props[Value, ExtraProps], oldValue: Value) => oldValue,
-                                inputRenderer: InputRenderer[ExtraProps]) = {
+  def create[Value, ExtraProps](
+      name: String,
+      valueChangeForPropsChange: (Props[Value, ExtraProps], Value) => Value =
+        (_: Props[Value, ExtraProps], oldValue: Value) => oldValue,
+      inputRenderer: InputRenderer[ExtraProps],
+  ) = {
     ScalaComponent
       .builder[Props[Value, ExtraProps]](name)
       .initialStateFromProps[State[Value]](props =>
@@ -99,8 +101,10 @@ object InputComponent {
   }
 
   // **************** Private methods ****************//
-  private def generateErrorMessage[Value, ExtraProps](state: State[Value],
-                                                      props: Props[Value, ExtraProps]): Option[String] = {
+  private def generateErrorMessage[Value, ExtraProps](
+      state: State[Value],
+      props: Props[Value, ExtraProps],
+  ): Option[String] = {
     if (props.showErrorMessage) {
       def isEmpty(value: Value): Boolean = props.valueTransformer.isEmptyValue(value)
 
@@ -124,11 +128,13 @@ object InputComponent {
     ToScalaComponent[Props[Value, ExtraProps], State[Value], Backend, ThisCtorSummoner[Value, ExtraProps]#CT]
 
   trait InputRenderer[ExtraProps] {
-    def renderInput(classes: Seq[String],
-                    name: String,
-                    valueString: String,
-                    onChange: String => Callback,
-                    extraProps: ExtraProps): VdomNode
+    def renderInput(
+        classes: Seq[String],
+        name: String,
+        valueString: String,
+        onChange: String => Callback,
+        extraProps: ExtraProps,
+    ): VdomNode
   }
 
   /** Converter between String and Value. */
@@ -183,7 +189,8 @@ object InputComponent {
       inputClasses: Seq[String],
       listener: InputBase.Listener[Value],
       extra: ExtraProps = (): Unit,
-      valueTransformer: ValueTransformer[Value, ExtraProps])(implicit val i18n: I18n)
+      valueTransformer: ValueTransformer[Value, ExtraProps],
+  )(implicit val i18n: I18n)
 
   case class State[Value](valueString: String, listeners: Seq[InputBase.Listener[Value]] = Seq()) {
     def withValueString(newString: String): State[Value] = copy(valueString = newString)

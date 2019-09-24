@@ -11,12 +11,14 @@ import scala.scalajs.js.annotation.JSImport
 object ReactAutosuggest {
 
   // **************** API ****************//
-  def apply(suggestions: Seq[String],
-            onSuggestionsFetchRequested: String => Unit,
-            onSuggestionsClearRequested: () => Unit,
-            renderSuggestion: String => js.Any,
-            inputProps: InputProps,
-            theme: Theme) = {
+  def apply(
+      suggestions: Seq[String],
+      onSuggestionsFetchRequested: String => Unit,
+      onSuggestionsClearRequested: () => Unit,
+      renderSuggestion: String => js.Any,
+      inputProps: InputProps,
+      theme: Theme,
+  ) = {
     val component = JsComponent[js.Object, Children.None, Null](RawComponent)
     component(
       Props(
@@ -46,25 +48,29 @@ object ReactAutosuggest {
   // **************** Public inner types ****************//
   case class InputProps(value: String, onChange: String => Unit, name: String, classes: Seq[String])
 
-  case class Theme(container: String,
-                   input: String,
-                   suggestionsContainer: String,
-                   suggestionsList: String,
-                   suggestion: String,
-                   suggestionHighlighted: String)
+  case class Theme(
+      container: String,
+      input: String,
+      suggestionsContainer: String,
+      suggestionsList: String,
+      suggestion: String,
+      suggestionHighlighted: String,
+  )
 
   // **************** Private inner types ****************//
   @JSImport("react-autosuggest", JSImport.Namespace)
   @js.native
   private object RawComponent extends js.Object
 
-  private case class Props(suggestions: js.Array[String],
-                           onSuggestionsFetchRequested: js.Function1[js.Dynamic, Unit],
-                           onSuggestionsClearRequested: js.Function0[Unit],
-                           getSuggestionValue: js.Function1[String, String],
-                           renderSuggestion: js.Function1[String, js.Any],
-                           inputProps: js.Object,
-                           theme: js.Object) {
+  private case class Props(
+      suggestions: js.Array[String],
+      onSuggestionsFetchRequested: js.Function1[js.Dynamic, Unit],
+      onSuggestionsClearRequested: js.Function0[Unit],
+      getSuggestionValue: js.Function1[String, String],
+      renderSuggestion: js.Function1[String, js.Any],
+      inputProps: js.Object,
+      theme: js.Object,
+  ) {
     def toJsObject: js.Object =
       js.Dynamic.literal(
         suggestions = suggestions,

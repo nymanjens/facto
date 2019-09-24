@@ -37,16 +37,17 @@ import play.api.mvc._
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
-final class InternalApi @Inject()(implicit override val messagesApi: MessagesApi,
-                                  components: ControllerComponents,
-                                  clock: Clock,
-                                  entityAccess: JvmEntityAccess,
-                                  scalaJsApiServerFactory: ScalaJsApiServerFactory,
-                                  playConfiguration: play.api.Configuration,
-                                  env: play.api.Environment,
-                                  scalaJsApiCaller: ScalaJsApiCaller,
-                                  hydroPushSocketHeartbeatScheduler: HydroPushSocketHeartbeatScheduler)
-    extends AbstractController(components)
+final class InternalApi @Inject()(
+    implicit override val messagesApi: MessagesApi,
+    components: ControllerComponents,
+    clock: Clock,
+    entityAccess: JvmEntityAccess,
+    scalaJsApiServerFactory: ScalaJsApiServerFactory,
+    playConfiguration: play.api.Configuration,
+    env: play.api.Environment,
+    scalaJsApiCaller: ScalaJsApiCaller,
+    hydroPushSocketHeartbeatScheduler: HydroPushSocketHeartbeatScheduler,
+) extends AbstractController(components)
     with I18nSupport {
 
   def scalaJsApiPost(path: String) = AuthenticatedAction(parse.raw) { implicit user => implicit request =>
@@ -135,8 +136,10 @@ object InternalApi {
   }
 
   @Singleton
-  private[controllers] class HydroPushSocketHeartbeatScheduler @Inject()(implicit actorSystem: ActorSystem,
-                                                                         executionContext: ExecutionContext) {
+  private[controllers] class HydroPushSocketHeartbeatScheduler @Inject()(
+      implicit actorSystem: ActorSystem,
+      executionContext: ExecutionContext,
+  ) {
 
     private val publisher_ : TriggerablePublisher[HydroPushSocketPacket.Heartbeat.type] =
       new TriggerablePublisher()

@@ -14,10 +14,11 @@ import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-final class UserStore(implicit dispatcher: Dispatcher,
-                      scalaJsApiClient: ScalaJsApiClient,
-                      entityAccess: JsEntityAccess)
-    extends AsyncEntityDerivedStateStore[State] {
+final class UserStore(
+    implicit dispatcher: Dispatcher,
+    scalaJsApiClient: ScalaJsApiClient,
+    entityAccess: JsEntityAccess,
+) extends AsyncEntityDerivedStateStore[State] {
 
   dispatcher.registerPartialAsync {
     case UpsertUser(userPrototype) =>
@@ -29,8 +30,10 @@ final class UserStore(implicit dispatcher: Dispatcher,
     State(allUsers = allUsers)
   }
 
-  override protected def modificationImpactsState(entityModification: EntityModification,
-                                                  state: State): Boolean =
+  override protected def modificationImpactsState(
+      entityModification: EntityModification,
+      state: State,
+  ): Boolean =
     entityModification.entityType == User.Type
 }
 

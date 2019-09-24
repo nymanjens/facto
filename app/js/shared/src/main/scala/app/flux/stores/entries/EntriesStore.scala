@@ -22,8 +22,10 @@ abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit entityAcc
   protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State): Boolean
 
   // **************** Implementation of abstract methods ****************//
-  protected override def modificationImpactsState(entityModification: EntityModification,
-                                                  state: State): Boolean = {
+  protected override def modificationImpactsState(
+      entityModification: EntityModification,
+      state: State,
+  ): Boolean = {
     entityModification.entityType match {
       case User.Type => true // Almost never happens and likely to change entries
       case ExchangeRateMeasurement.Type =>
