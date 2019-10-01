@@ -84,6 +84,7 @@ app.user-profile=User Profile
 app.user-administration=User Administration
 app.update-logs=Update Logs
 app.logout=Logout
+app.no-longer-logged-in=You are no longer logged in. Please refresh this page.
 app.everything.html=<u>E</u>verything
 app.cash-flow.html=<u>C</u>ash Flow
 app.liquidation.html=<u>L</u>iquidation

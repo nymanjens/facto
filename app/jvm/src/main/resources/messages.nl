@@ -39,6 +39,7 @@ app.user-profile=Profiel
 app.user-administration=Administratie
 app.update-logs=Update Logs
 app.logout=Afmelden
+app.no-longer-logged-in=U bent niet meer ingelogd. Gelieve de pagina te herladen.
 app.everything.html=<u>A</u>lles
 app.cash-flow.html=<u>C</u>ash Flow
 app.liquidation.html=<u>V</u>ereffening

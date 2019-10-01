@@ -4,6 +4,7 @@ import app.models.access.JvmEntityAccess
 import app.models.user.Users
 import com.google.inject.Inject
 import hydro.controllers.Auth.Forms
+import hydro.controllers.helpers.AuthenticatedAction
 import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n.I18nSupport
@@ -36,6 +37,10 @@ final class Auth @Inject()(
     Redirect(hydro.controllers.routes.Auth.login("/")).withNewSession.flashing(
       "message" -> Messages("app.you-are-now-logged-out")
     )
+  }
+
+  def amILoggedIn = Action { implicit request =>
+    Ok(AuthenticatedAction.getAuthenticatedUser(request).isDefined.toString)
   }
 }
 

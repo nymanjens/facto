@@ -63,11 +63,16 @@ object AuthenticatedAction {
     }
 
   def requireAuthenticatedUser(request: RequestHeader)(implicit entityAccess: JvmEntityAccess): User = {
-    val username = AuthenticatedAction.username(request)
-    require(username.isDefined, "Username not set")
-    val user = entityAccess.newQuerySync[User]().findOne(ModelFields.User.loginName === username.get)
-    require(user.isDefined, s"Could not find username $username")
+    val user = getAuthenticatedUser(request)
+    require(user.isDefined, s"Request is not authenticated: $request")
     user.get
+  }
+
+  def getAuthenticatedUser(request: RequestHeader)(implicit entityAccess: JvmEntityAccess): Option[User] = {
+    for {
+      username <- AuthenticatedAction.username(request)
+      user <- entityAccess.newQuerySync[User]().findOne(ModelFields.User.loginName === username)
+    } yield user
   }
 
   // **************** private helper methods **************** //

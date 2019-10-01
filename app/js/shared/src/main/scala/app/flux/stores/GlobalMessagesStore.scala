@@ -2,11 +2,11 @@ package app.flux.stores
 
 import java.time.Instant
 
-import hydro.common.I18n
 import app.flux.action.AppActions._
 import app.flux.stores.GlobalMessagesStore.Message
 import app.models.accounting._
 import app.models.accounting.config.Config
+import hydro.common.I18n
 import hydro.common.JsLoggingUtils.logExceptions
 import hydro.common.Unique
 import hydro.common.time.Clock
@@ -17,9 +17,13 @@ import hydro.flux.action.StandardActions
 import hydro.flux.action.StandardActions._
 import hydro.flux.stores.StateStore
 import hydro.models.access.EntityAccess
+import org.scalajs.dom
 
 import scala.collection.immutable.Seq
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.concurrent.duration._
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 
 final class GlobalMessagesStore(
@@ -30,6 +34,7 @@ final class GlobalMessagesStore(
     dispatcher: Dispatcher,
 ) extends StateStore[Option[Message]] {
   dispatcher.registerPartialSync(dispatcherListener)
+  startCheckingLoggedInState()
 
   private var _state: Option[Unique[Message]] = None
 
@@ -117,6 +122,17 @@ final class GlobalMessagesStore(
   private def setState(state: Option[Message]): Unit = {
     _state = state.map(Unique.apply)
     invokeStateUpdateListeners()
+  }
+
+  private def startCheckingLoggedInState(): Unit = {
+    dom.window.setInterval(() => checkLoggedInState(), timeout = 60 * 1000.0)
+  }
+
+  private def checkLoggedInState(): Unit = async {
+    val response = await(dom.ext.Ajax.get(url = "/loggedin/")).responseText
+    if (response != "true") {
+      setState(Message(string = i18n("app.no-longer-logged-in"), messageType = Message.Type.Failure))
+    }
   }
 }
 

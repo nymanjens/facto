@@ -75,6 +75,8 @@ final class InternalApi @Inject()(
 
   def hydroPushSocketWebsocket(updateToken: UpdateToken) = WebSocket.accept[Array[Byte], Array[Byte]] {
     request =>
+      AuthenticatedAction.requireAuthenticatedUser(request)
+
       def packetToBytes(packet: HydroPushSocketPacket): Array[Byte] = {
         val responseBuffer = Pickle.intoBytes(packet)
         val data: Array[Byte] = Array.ofDim[Byte](responseBuffer.remaining())
