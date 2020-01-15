@@ -125,7 +125,7 @@ final class ExternalApi @Inject()(
           transactionGroupId = transactionGroup.id,
           issuerId = issuer.id,
           beneficiaryAccountCode = checkNotEmpty(partial.beneficiary.get.code),
-          moneyReservoirCode = checkNotEmpty(partial.moneyReservoir.get.code),
+          moneyReservoirCode = partial.moneyReservoir.get.code,
           categoryCode = checkNotEmpty(partial.category.get.code),
           description = checkNotEmpty(partial.description),
           flowInCents = partial.flowInCents,
