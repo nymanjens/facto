@@ -181,7 +181,7 @@ final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
 }
 
 object HybridRemoteDatabaseProxy {
-  private val localDatabaseAndEntityVersion = "hydro-2.3"
+  private val localDatabaseAndEntityVersion = "hydro-2.4"
 
   def create(localDatabase: Future[LocalDatabase])(
       implicit apiClient: ScalaJsApiClient,
@@ -197,7 +197,7 @@ object HybridRemoteDatabaseProxy {
           true
         } else {
           val dbVersionOption = await(db.getSingletonValue(VersionKey))
-          if (!dbVersionOption.contains(localDatabaseAndEntityVersion)) {
+          if (dbVersionOption != Some(localDatabaseAndEntityVersion)) {
             console.log(
               s"  The database version ${dbVersionOption getOrElse "<empty>"} no longer matches " +
                 s"the newest version $localDatabaseAndEntityVersion")
