@@ -200,7 +200,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
                 <.span(latestEntryToTableTitleExtra(latestEntry.entry), " ")
               }
             },
-            <.span(^.style := js.Dictionary("color" -> "#999"), s"(${i18n("app.n-entries", numEntries)})")
+            <.span(s"(${i18n("app.n-entries", numEntries)})")
           )
         case None =>
           Bootstrap.FontAwesomeIcon("circle-o-notch", spin = true)
