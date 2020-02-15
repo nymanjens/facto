@@ -89,6 +89,15 @@ final class SbadminLayout(
                       StandardPages.UserAdministration.titleSync
                     ))
               },
+              ^^.ifThen(user.isAdmin) {
+                <.li(
+                  router
+                    .anchorWithHrefTo(StandardPages.DatabaseExplorer)(
+                      <.i(^.className := StandardPages.DatabaseExplorer.iconClass),
+                      " ",
+                      StandardPages.DatabaseExplorer.titleSync
+                    ))
+              },
               <.li(^.className := "divider"),
               <.li(
                 <.a(

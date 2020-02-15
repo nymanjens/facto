@@ -14,6 +14,7 @@ import hydro.flux.stores.ApplicationIsOnlineStore
 import hydro.flux.stores.LocalDatabaseHasBeenLoadedStore
 import hydro.flux.stores.PageLoadingStateStore
 import hydro.flux.stores.UserStore
+import hydro.flux.stores.DatabaseExplorerStoreFactory
 import hydro.models.access.HydroPushSocketClientFactory
 
 final class Module(
@@ -49,4 +50,5 @@ final class Module(
   implicit val applicationIsOnlineStore = new ApplicationIsOnlineStore
   implicit val localDatabaseHasBeenLoadedStore = new LocalDatabaseHasBeenLoadedStore
   implicit val userStore = new UserStore
+  implicit val databaseExplorerStoreFactory = new DatabaseExplorerStoreFactory
 }

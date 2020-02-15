@@ -22,7 +22,7 @@ object Table extends HydroReactComponent.Stateless {
       expanded: Boolean = true,
       onToggleCollapsedExpanded: Option[() => Unit] = None,
       expandNumEntriesCallback: Option[Callback] = None,
-      tableTitleExtra: VdomElement = null,
+      tableTitleExtra: VdomNode = null,
       tableHeaders: Seq[VdomElement],
       tableRowDatas: Seq[TableRowData],
   )(implicit i18n: I18n): VdomElement = {
@@ -49,7 +49,7 @@ object Table extends HydroReactComponent.Stateless {
       expanded: Boolean,
       onToggleCollapsedExpanded: Option[() => Unit],
       expandNumEntriesCallback: Option[Callback],
-      tableTitleExtra: Option[VdomElement],
+      tableTitleExtra: Option[VdomNode],
       tableHeaders: Seq[VdomElement],
       tableRowDatas: Seq[TableRowData],
   )(implicit val i18n: I18n) {

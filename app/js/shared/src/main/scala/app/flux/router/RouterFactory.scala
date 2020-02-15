@@ -62,6 +62,8 @@ private[router] final class RouterFactory(
 
           | staticRuleFromPage(StandardPages.UserAdministration, reactAppModule.userAdministration.apply)
 
+          | staticRuleFromPage(StandardPages.DatabaseExplorer, reactAppModule.databaseExplorer.apply)
+
           | staticRuleFromPage(AppPages.Everything, reactAppModule.everything.apply)
 
           | staticRuleFromPage(AppPages.CashFlow, reactAppModule.cashFlow.apply)

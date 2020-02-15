@@ -17,6 +17,9 @@ object StandardPages {
   case object UserProfile extends PageBase("app.user-profile", iconClass = "fa fa-user fa-fw")
   case object UserAdministration extends PageBase("app.user-administration", iconClass = "fa fa-cogs fa-fw")
 
+  // **************** Database explorer views **************** //
+  case object DatabaseExplorer extends PageBase("app.database-explorer", iconClass = "fa fa-database")
+
   // **************** Menu bar search **************** //
   case class Search private (encodedQuery: String) extends Page {
     def query: String = {

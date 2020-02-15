@@ -9,7 +9,6 @@ import hydro.common.CollectionUtils
 import hydro.common.ScalaUtils
 import hydro.models.Entity
 import hydro.models.access.ModelField
-import hydro.models.access.ModelField.IdModelField
 
 import scala.collection.immutable.Seq
 
@@ -133,47 +132,50 @@ object ModelFields {
           v => _.copy(ratioReferenceToForeignCurrency = v))
   }
 
-  // **************** Field numbers **************** //
+  // **************** Field-related methods **************** //
+  private val allFields: Seq[ModelField.any] = Seq(
+    User.id,
+    User.loginName,
+    User.passwordHash,
+    User.name,
+    User.isAdmin,
+    User.expandCashFlowTablesByDefault,
+    User.expandLiquidationTablesByDefault,
+    Transaction.id,
+    Transaction.transactionGroupId,
+    Transaction.issuerId,
+    Transaction.beneficiaryAccountCode,
+    Transaction.moneyReservoirCode,
+    Transaction.categoryCode,
+    Transaction.description,
+    Transaction.flowInCents,
+    Transaction.detailDescription,
+    Transaction.tags,
+    Transaction.createdDate,
+    Transaction.transactionDate,
+    Transaction.consumedDate,
+    TransactionGroup.id,
+    TransactionGroup.createdDate,
+    BalanceCheck.id,
+    BalanceCheck.issuerId,
+    BalanceCheck.moneyReservoirCode,
+    BalanceCheck.balanceInCents,
+    BalanceCheck.createdDate,
+    BalanceCheck.checkDate,
+    ExchangeRateMeasurement.id,
+    ExchangeRateMeasurement.date,
+    ExchangeRateMeasurement.foreignCurrencyCode,
+    ExchangeRateMeasurement.ratioReferenceToForeignCurrency,
+  )
   private val fieldToNumberMap: ImmutableBiMap[ModelField.any, Int] =
     CollectionUtils.toBiMapWithStableIntKeys(
-      stableNameMapper = field =>
-        ScalaUtils.stripRequiredPrefix(field.getClass.getName, prefix = ModelFields.getClass.getName),
-      values = Seq(
-        User.id,
-        User.loginName,
-        User.passwordHash,
-        User.name,
-        User.isAdmin,
-        User.expandCashFlowTablesByDefault,
-        User.expandLiquidationTablesByDefault,
-        Transaction.id,
-        Transaction.transactionGroupId,
-        Transaction.issuerId,
-        Transaction.beneficiaryAccountCode,
-        Transaction.moneyReservoirCode,
-        Transaction.categoryCode,
-        Transaction.description,
-        Transaction.flowInCents,
-        Transaction.detailDescription,
-        Transaction.tags,
-        Transaction.createdDate,
-        Transaction.transactionDate,
-        Transaction.consumedDate,
-        TransactionGroup.id,
-        TransactionGroup.createdDate,
-        BalanceCheck.id,
-        BalanceCheck.issuerId,
-        BalanceCheck.moneyReservoirCode,
-        BalanceCheck.balanceInCents,
-        BalanceCheck.createdDate,
-        BalanceCheck.checkDate,
-        ExchangeRateMeasurement.id,
-        ExchangeRateMeasurement.date,
-        ExchangeRateMeasurement.foreignCurrencyCode,
-        ExchangeRateMeasurement.ratioReferenceToForeignCurrency
-      )
+      stableNameMapper = field => s"${field.entityType.entityClass.getSimpleName}$$${field.name}$$",
+      values = allFields,
     )
 
+  def allFieldsOfEntity(entityType: EntityType.any): Seq[ModelField.any] = {
+    allFields.filter(_.entityType == entityType).toVector
+  }
   def toNumber(field: ModelField.any): Int = fieldToNumberMap.get(field)
   def fromNumber(number: Int): ModelField.any = fieldToNumberMap.inverse().get(number)
 }

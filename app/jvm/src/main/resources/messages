@@ -82,6 +82,7 @@ app.error.duplicateTransactionGroup=There already exists a transaction that is e
 
 app.user-profile=User Profile
 app.user-administration=User Administration
+app.database-explorer=Database Explorer
 app.update-logs=Update Logs
 app.logout=Logout
 app.no-longer-logged-in=You are no longer logged in. Please refresh this page.

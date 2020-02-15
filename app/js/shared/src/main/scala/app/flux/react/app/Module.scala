@@ -17,6 +17,7 @@ import hydro.flux.stores.ApplicationIsOnlineStore
 import hydro.flux.stores.LocalDatabaseHasBeenLoadedStore
 import hydro.flux.stores.PageLoadingStateStore
 import hydro.flux.stores.UserStore
+import hydro.flux.stores.DatabaseExplorerStoreFactory
 
 final class Module(
     implicit i18n: I18n,
@@ -40,6 +41,7 @@ final class Module(
     applicationIsOnlineStore: ApplicationIsOnlineStore,
     localDatabaseHasBeenLoadedStore: LocalDatabaseHasBeenLoadedStore,
     userStore: UserStore,
+    databaseExplorerStoreFactory: DatabaseExplorerStoreFactory,
     dispatcher: Dispatcher,
     clock: Clock,
     templateMatcher: TemplateMatcher,
@@ -54,6 +56,7 @@ final class Module(
   implicit private lazy val descriptionWithEntryCount = appUielementsModule.descriptionWithEntryCount
 
   private val userManagementModule = new hydro.flux.react.uielements.usermanagement.Module
+  private val databaseExplorerModule = new hydro.flux.react.uielements.dbexplorer.Module
   private val transactionGroupFormModule = new app.flux.react.app.transactiongroupform.Module
   private val balanceCheckFormModule = new app.flux.react.app.balancecheckform.Module
   private val transactionViewsModule = new app.flux.react.app.transactionviews.Module
@@ -64,6 +67,7 @@ final class Module(
 
   implicit lazy val userProfile = userManagementModule.userProfile
   implicit lazy val userAdministration = userManagementModule.userAdministration
+  implicit lazy val databaseExplorer = databaseExplorerModule.databaseExplorer
 
   implicit lazy val templateList = new TemplateList
 
