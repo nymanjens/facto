@@ -6,6 +6,6 @@ import hydro.api.EntityPermissions
 final class ApiModule extends AbstractModule {
   override def configure() = {
     bind(classOf[ScalaJsApiServerFactory])
-    bind(classOf[EntityPermissions]).toInstance(EntityPermissions.DefaultImpl)
+    bind(classOf[EntityPermissions]).to(classOf[AppEntityPermissions])
   }
 }

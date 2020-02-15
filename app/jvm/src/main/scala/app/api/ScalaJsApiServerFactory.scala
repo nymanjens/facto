@@ -76,9 +76,6 @@ final class ScalaJsApiServerFactory @Inject()(
       // check permissions
       for (modification <- modifications) {
         entityPermissions.checkAllowedForWrite(modification)
-        require(
-          modification.entityType != ExchangeRateMeasurement.Type,
-          "Client initiated exchange rate measurement changes are not allowed")
       }
 
       entityAccess.persistEntityModificationsAsync(modifications) // Don't wait for it to finish
