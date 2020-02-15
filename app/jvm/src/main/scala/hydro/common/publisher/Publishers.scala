@@ -11,6 +11,14 @@ import scala.collection.immutable.Seq
 object Publishers {
 
   /**
+    * Returns the same publisher as the given one, except that the given `filterFunction` is applied to all
+    * messages: Only when `filterFunction` returns true, will a message be published.
+    */
+  // Warning: This is unused & untested!
+  def filter[T](delegate: Publisher[T], filterFunction: T => Boolean): Publisher[T] =
+    new FilterPublisher(delegate, filterFunction)
+
+  /**
     * Returns the same publisher as the given one, except that the given `mappingFunction` is applied to all
     * messages.
     */
@@ -26,6 +34,22 @@ object Publishers {
     */
   def delayMessagesUntilFirstSubscriber[T](delegate: Publisher[T]): Publisher[T] =
     new ReplayingPublisher(delegate)
+
+  private final class FilterPublisher[T](delegate: Publisher[T], filterFunction: T => Boolean)
+      extends Publisher[T] {
+    override def subscribe(outerSubscriber: Subscriber[_ >: T]): Unit = {
+      delegate.subscribe(new Subscriber[T] {
+        override def onSubscribe(subscription: Subscription): Unit = outerSubscriber.onSubscribe(subscription)
+        override def onNext(t: T): Unit = {
+          if (filterFunction(t)) {
+            outerSubscriber.onNext(t)
+          }
+        }
+        override def onError(t: Throwable): Unit = outerSubscriber.onError(t)
+        override def onComplete(): Unit = outerSubscriber.onComplete()
+      })
+    }
+  }
 
   private final class MappingPublisher[From, To](delegate: Publisher[From], mappingFunction: From => To)
       extends Publisher[To] {

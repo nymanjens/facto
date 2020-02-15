@@ -15,6 +15,7 @@ import app.api.Picklers._
 import app.AppVersion
 import com.google.inject.Inject
 import com.google.inject.Singleton
+import hydro.api.EntityPermissions
 import hydro.api.ScalaJsApiRequest
 import hydro.common.UpdateTokens.toInstant
 import hydro.common.UpdateTokens.toUpdateToken
@@ -42,6 +43,7 @@ final class InternalApi @Inject()(
     components: ControllerComponents,
     clock: Clock,
     entityAccess: JvmEntityAccess,
+    entityPermissions: EntityPermissions,
     scalaJsApiServerFactory: ScalaJsApiServerFactory,
     playConfiguration: play.api.Configuration,
     env: play.api.Environment,
@@ -75,7 +77,7 @@ final class InternalApi @Inject()(
 
   def hydroPushSocketWebsocket(updateToken: UpdateToken) = WebSocket.accept[Array[Byte], Array[Byte]] {
     request =>
-      AuthenticatedAction.requireAuthenticatedUser(request)
+      implicit val user = AuthenticatedAction.requireAuthenticatedUser(request)
 
       def packetToBytes(packet: HydroPushSocketPacket): Array[Byte] = {
         val responseBuffer = Pickle.intoBytes(packet)
@@ -85,11 +87,24 @@ final class InternalApi @Inject()(
       }
 
       // Start recording all updates
-      val entityModificationPublisher =
-        Publishers.delayMessagesUntilFirstSubscriber(entityAccess.entityModificationPublisher)
+      val entityModificationPublisher: Publisher[EntityModificationsWithToken] =
+        Publishers.delayMessagesUntilFirstSubscriber(
+          Publishers.map[EntityModificationsWithToken, EntityModificationsWithToken](
+            entityAccess.entityModificationPublisher,
+            modificationsWithToken => {
+              if (modificationsWithToken.modifications.forall(entityPermissions.isAllowedToStream)) {
+                // Optimization in case nothing needs to be filtered
+                modificationsWithToken
+              } else {
+                modificationsWithToken.copy(
+                  modifications =
+                    modificationsWithToken.modifications.filter(entityPermissions.isAllowedToStream))
+              }
+            }
+          ))
 
       // Calculate updates from the update token onwards
-      val firstModificationsWithToken = {
+      val firstModificationsWithToken: HydroPushSocketPacket = {
         // All modifications are idempotent so we can use the time when we started getting the entities as next
         // update token.
         val nextUpdateToken: UpdateToken = toUpdateToken(clock.nowInstant)
@@ -100,7 +115,10 @@ final class InternalApi @Inject()(
               .newSlickQuery[EntityModificationEntity]()
               .filter(_.instant >= toInstant(updateToken))
               .sortBy(m => (m.instant, m.instantNanos)))
-          modificationEntities.toStream.map(_.modification).toVector
+          val allModifications = modificationEntities.toStream.map(_.modification).toVector
+
+          // apply permissions filter
+          allModifications.filter(entityPermissions.isAllowedToStream)
         }
 
         EntityModificationsWithToken(modifications, nextUpdateToken)
@@ -112,12 +130,11 @@ final class InternalApi @Inject()(
         Source.single(packetToBytes(firstModificationsWithToken)) concat
           Source.single(packetToBytes(versionCheck)) concat
           Source.fromPublisher(
-            Publishers
-              .map(
-                Publishers.combine[HydroPushSocketPacket](
-                  entityModificationPublisher,
-                  hydroPushSocketHeartbeatScheduler.publisher),
-                packetToBytes))
+            Publishers.map(
+              Publishers.combine[HydroPushSocketPacket](
+                entityModificationPublisher,
+                hydroPushSocketHeartbeatScheduler.publisher),
+              packetToBytes))
       Flow.fromSinkAndSource(in, out)
   }
 

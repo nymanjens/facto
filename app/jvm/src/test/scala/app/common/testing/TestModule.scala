@@ -1,6 +1,6 @@
 package app.common.testing
 
-import app.api.ScalaJsApiModule
+import app.api.ApiModule
 import app.models.ModelsModule
 import app.models.access.JvmEntityAccess
 import app.models.accounting.config.ConfigModule
@@ -18,7 +18,7 @@ final class TestModule extends AbstractModule {
   override def configure() = {
     install(new ConfigModule)
     install(new ModelsModule)
-    install(new ScalaJsApiModule)
+    install(new ApiModule)
     bindSingleton(classOf[Clock], classOf[FakeClock])
     bindSingleton(classOf[PlayI18n], classOf[FakePlayI18n])
     bind(classOf[I18n]).to(classOf[PlayI18n])
