@@ -89,19 +89,23 @@ final class InternalApi @Inject()(
       // Start recording all updates
       val entityModificationPublisher: Publisher[EntityModificationsWithToken] =
         Publishers.delayMessagesUntilFirstSubscriber(
-          Publishers.map[EntityModificationsWithToken, EntityModificationsWithToken](
-            entityAccess.entityModificationPublisher,
-            modificationsWithToken => {
-              if (modificationsWithToken.modifications.forall(entityPermissions.isAllowedToStream)) {
-                // Optimization in case nothing needs to be filtered
-                modificationsWithToken
-              } else {
-                modificationsWithToken.copy(
-                  modifications =
-                    modificationsWithToken.modifications.filter(entityPermissions.isAllowedToStream))
+          Publishers.filter(
+            Publishers.map[EntityModificationsWithToken, EntityModificationsWithToken](
+              entityAccess.entityModificationPublisher,
+              mappingFunction = modificationsWithToken => {
+                if (modificationsWithToken.modifications.forall(entityPermissions.isAllowedToStream)) {
+                  // Optimization in case nothing needs to be filtered
+                  modificationsWithToken
+                } else {
+                  modificationsWithToken.copy(
+                    modifications =
+                      modificationsWithToken.modifications.filter(entityPermissions.isAllowedToStream))
+                }
               }
-            }
-          ))
+            ),
+            filterFunction = _.modifications.nonEmpty
+          )
+        )
 
       // Calculate updates from the update token onwards
       val firstModificationsWithToken: HydroPushSocketPacket = {

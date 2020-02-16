@@ -14,7 +14,6 @@ object Publishers {
     * Returns the same publisher as the given one, except that the given `filterFunction` is applied to all
     * messages: Only when `filterFunction` returns true, will a message be published.
     */
-  // Warning: This is unused & untested!
   def filter[T](delegate: Publisher[T], filterFunction: T => Boolean): Publisher[T] =
     new FilterPublisher(delegate, filterFunction)
 
