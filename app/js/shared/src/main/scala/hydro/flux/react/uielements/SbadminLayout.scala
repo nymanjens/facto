@@ -58,6 +58,10 @@ final class SbadminLayout(
         ),
         <.ul(
           ^.className := "nav navbar-top-links navbar-right",
+          Bootstrap.NavbarBrand()(
+            ^.style := js.Dictionary("fontSize" -> "14px"),
+            user.name,
+          ),
           applicationDisconnectedIcon(),
           pendingModificationsCounter(),
           localDatabaseHasBeenLoadedIcon(),
