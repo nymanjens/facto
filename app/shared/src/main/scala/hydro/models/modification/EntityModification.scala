@@ -22,6 +22,15 @@ import scala.util.Random
 sealed trait EntityModification {
   def entityType: EntityType.any
   def entityId: Long
+
+  final def maybeEntity[E <: Entity: EntityType]: Option[E] = {
+    require(this.entityType == implicitly[EntityType[E]])
+    this match {
+      case EntityModification.Add(e)    => Some(e.asInstanceOf[E])
+      case EntityModification.Update(e) => Some(e.asInstanceOf[E])
+      case EntityModification.Remove(_) => None
+    }
+  }
 }
 
 object EntityModification {
