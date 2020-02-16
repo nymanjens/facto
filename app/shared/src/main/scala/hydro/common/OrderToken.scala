@@ -107,6 +107,8 @@ object OrderToken {
       lowerExclusive: Option[OrderToken],
       higherExclusive: Option[OrderToken],
   ): Seq[OrderToken] = {
+    require(numValues > 0, "Must request more than 0 values")
+
     val resultBuffer = (for (i <- 0 until numValues) yield null.asInstanceOf[OrderToken]).toBuffer
 
     def resultFiller(
