@@ -34,4 +34,20 @@ final class StandardActions @Inject()(
     entityAccess.checkConsistentCaches()
     Ok("OK")
   }
+
+  def databaseSchema(applicationSecret: String) = Action { implicit request =>
+    validateApplicationSecret(applicationSecret)
+
+    val schema = entityAccess.getDatabaseSchemaAsStrings().mkString("\n\n")
+
+    Ok(s"OK\n\n$schema")
+  }
+
+  // ********** private helper methods ********** //
+  private def validateApplicationSecret(applicationSecret: String): Unit = {
+    val realApplicationSecret: String = playConfiguration.get[String]("play.http.secret.key")
+    require(
+      applicationSecret == realApplicationSecret,
+      s"Invalid application secret. Found '$applicationSecret' but should be '$realApplicationSecret'")
+  }
 }

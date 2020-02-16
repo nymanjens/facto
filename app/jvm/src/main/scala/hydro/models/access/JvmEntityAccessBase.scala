@@ -88,6 +88,18 @@ abstract class JvmEntityAccessBase(implicit clock: Clock) extends EntityAccess {
     }
   }
 
+  def getDatabaseSchemaAsStrings(): Seq[String] = {
+    for (tableDef <- SlickEntityTableDefs.all) yield {
+      def internal[E <: Entity](tableDef: SlickEntityTableDef[E]) = {
+        val entityManager = SlickEntityManager.forType[E](tableDef)
+
+        s"## ${tableDef.tableName} ##\n" +
+          entityManager.newQuery.schema.createStatements.mkString("\n")
+      }
+      internal(tableDef.asInstanceOf[SlickEntityTableDef[Entity]])
+    }
+  }
+
   def checkConsistentCaches(): Unit = {
     for (entityType <- EntityTypes.all) {
       def run[E <: Entity](entityType: EntityType[E]): Unit = {
