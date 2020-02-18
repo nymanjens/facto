@@ -151,7 +151,8 @@ final class BalanceCheckForm(implicit i18n: I18n,
                   required = true,
                   showErrorMessage = state.showErrorMessages,
                   additionalValidator = mappedExtraProps.additionalValidator,
-                  focusOnMount = true
+                  focusOnMount = true,
+                  arrowHandler = TextInput.ArrowHandler.DateHandler,
                 )
               },
               MoneyInput(

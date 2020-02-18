@@ -268,7 +268,8 @@ private[transactiongroupform] final class TransactionPanel(
               showErrorMessage = props.showErrorMessages,
               additionalValidator = mappedExtraProps.additionalValidator,
               inputClasses = extraProps.inputClasses,
-              focusOnMount = props.focusOnMount
+              focusOnMount = props.focusOnMount,
+              arrowHandler = TextInput.ArrowHandler.DateHandler,
             )
           }
         },
@@ -298,7 +299,8 @@ private[transactiongroupform] final class TransactionPanel(
                   required = true,
                   showErrorMessage = props.showErrorMessages,
                   additionalValidator = mappedExtraProps.additionalValidator,
-                  inputClasses = extraProps1.inputClasses ++ extraProps2.inputClasses
+                  inputClasses = extraProps1.inputClasses ++ extraProps2.inputClasses,
+                  arrowHandler = TextInput.ArrowHandler.DateHandler,
                 )
               }
           }
