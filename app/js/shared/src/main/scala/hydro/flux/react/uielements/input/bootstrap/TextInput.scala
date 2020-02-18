@@ -47,6 +47,7 @@ object TextInput {
       inputClasses: Seq[String] = Seq(),
       focusOnMount: Boolean = false,
       disabled: Boolean = false,
+      arrowHandler: ArrowHandler = null,
       listener: InputBase.Listener[String] = InputBase.Listener.nullInstance,
   )(implicit i18n: I18n): VdomElement = {
     val props = Props(
@@ -59,7 +60,12 @@ object TextInput {
       inputClasses = inputClasses,
       listener = listener,
       valueTransformer = ValueTransformer.nullInstance,
-      extra = ExtraProps(inputType = inputType, focusOnMount = focusOnMount, disabled = disabled)
+      extra = ExtraProps(
+        inputType = inputType,
+        focusOnMount = focusOnMount,
+        disabled = disabled,
+        arrowHandler = Option(arrowHandler),
+      )
     )
     ref.mutableRef.component(props)
   }
@@ -67,11 +73,21 @@ object TextInput {
   def ref(): Reference = new Reference(Ref.toScalaComponent(component))
 
   // **************** Public inner types ****************//
+  trait ArrowHandler {
+    def newValueOnArrowUp(currentValue: String): String
+    def newValueOnArrowDown(currentValue: String): String
+  }
+
   final class Reference private[TextInput] (
       private[TextInput] val mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps])
       extends InputComponent.Reference(mutableRef)
 
-  case class ExtraProps private[TextInput] (inputType: String, focusOnMount: Boolean, disabled: Boolean)
+  case class ExtraProps private[TextInput] (
+      inputType: String,
+      focusOnMount: Boolean,
+      disabled: Boolean,
+      arrowHandler: Option[ArrowHandler],
+  )
 
   // **************** Private inner types ****************//
   private type Value = String
