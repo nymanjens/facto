@@ -42,19 +42,20 @@ import scala.collection.mutable
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-final class TransactionGroupForm(implicit i18n: I18n,
-                                 clock: Clock,
-                                 accountingConfig: Config,
-                                 user: User,
-                                 entityAccess: AppJsEntityAccess,
-                                 exchangeRateManager: ExchangeRateManager,
-                                 dispatcher: Dispatcher,
-                                 transactionPanel: TransactionPanel,
-                                 addTransactionPanel: AddTransactionPanel,
-                                 totalFlowInput: TotalFlowInput,
-                                 totalFlowRestrictionInput: TotalFlowRestrictionInput,
-                                 liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory,
-                                 pageHeader: PageHeader,
+final class TransactionGroupForm(
+    implicit i18n: I18n,
+    clock: Clock,
+    accountingConfig: Config,
+    user: User,
+    entityAccess: AppJsEntityAccess,
+    exchangeRateManager: ExchangeRateManager,
+    dispatcher: Dispatcher,
+    transactionPanel: TransactionPanel,
+    addTransactionPanel: AddTransactionPanel,
+    totalFlowInput: TotalFlowInput,
+    totalFlowRestrictionInput: TotalFlowRestrictionInput,
+    liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory,
+    pageHeader: PageHeader,
 ) {
 
   private val waitForFuture = new WaitForFuture[Props]

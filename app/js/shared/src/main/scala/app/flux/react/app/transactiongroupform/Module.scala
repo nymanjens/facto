@@ -12,17 +12,18 @@ import hydro.common.time.Clock
 import hydro.flux.action.Dispatcher
 import hydro.flux.react.uielements.PageHeader
 
-final class Module(implicit i18n: I18n,
-                   accountingConfig: Config,
-                   user: User,
-                   entityAccess: AppJsEntityAccess,
-                   exchangeRateManager: ExchangeRateManager,
-                   globalMessagesStore: GlobalMessagesStore,
-                   tagsStoreFactory: TagsStoreFactory,
-                   dispatcher: Dispatcher,
-                   clock: Clock,
-                   liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory,
-                   pageHeader: PageHeader,
+final class Module(
+    implicit i18n: I18n,
+    accountingConfig: Config,
+    user: User,
+    entityAccess: AppJsEntityAccess,
+    exchangeRateManager: ExchangeRateManager,
+    globalMessagesStore: GlobalMessagesStore,
+    tagsStoreFactory: TagsStoreFactory,
+    dispatcher: Dispatcher,
+    clock: Clock,
+    liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory,
+    pageHeader: PageHeader,
 ) {
 
   implicit private lazy val transactionPanel: TransactionPanel = new TransactionPanel
