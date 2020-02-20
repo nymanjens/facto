@@ -129,8 +129,8 @@ final class GlobalMessagesStore(
   }
 
   private def checkLoggedInState(): Unit = async {
-    val response = await(dom.ext.Ajax.get(url = "/loggedin/")).responseText
-    if (response != "true") {
+    val ajaxResponse = await(dom.ext.Ajax.get(url = "/loggedin/"))
+    if (ajaxResponse.responseText == "false") {
       setState(Message(string = i18n("app.no-longer-logged-in"), messageType = Message.Type.Failure))
     }
   }
