@@ -72,13 +72,19 @@ final class ScalaJsApiServerFactory @Inject()(
       GetAllEntitiesResponse(entitiesMap, nextUpdateToken)
     }
 
-    override def persistEntityModifications(modifications: Seq[EntityModification]): Unit = {
+    override def persistEntityModifications(
+        modifications: Seq[EntityModification],
+        waitUntilQueryReflectsModifications: Boolean,
+    ): Unit = {
       // check permissions
       for (modification <- modifications) {
         entityPermissions.checkAllowedForWrite(modification)
       }
 
-      entityAccess.persistEntityModificationsAsync(modifications) // Don't wait for it to finish
+      val future = entityAccess.persistEntityModificationsAsync(modifications)
+      if (waitUntilQueryReflectsModifications) {
+        Await.ready(future, atMost = Duration.Inf)
+      }
     }
 
     override def executeDataQuery(dbQuery: PicklableDbQuery) = {

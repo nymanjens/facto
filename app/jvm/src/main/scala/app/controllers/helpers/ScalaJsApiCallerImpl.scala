@@ -30,7 +30,10 @@ final class ScalaJsApiCallerImpl @Inject()(implicit scalaJsApiServerFactory: Sca
         Pickle.intoBytes(scalaJsApiServer.getAllEntities(types))
       case "persistEntityModifications" =>
         val modifications = Unpickle[Seq[EntityModification]].fromBytes(argsMap("modifications"))
-        Pickle.intoBytes(scalaJsApiServer.persistEntityModifications(modifications))
+        val waitUntilQueryReflectsModifications =
+          Unpickle[Boolean].fromBytes(argsMap("waitUntilQueryReflectsModifications"))
+        Pickle.intoBytes(
+          scalaJsApiServer.persistEntityModifications(modifications, waitUntilQueryReflectsModifications))
       case "executeDataQuery" =>
         val dbQuery = Unpickle[PicklableDbQuery].fromBytes(argsMap("dbQuery"))
         Pickle.intoBytes[Seq[Entity]](scalaJsApiServer.executeDataQuery(dbQuery))

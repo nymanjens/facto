@@ -23,7 +23,10 @@ trait ScalaJsApi {
   def getAllEntities(types: Seq[EntityType.any]): GetAllEntitiesResponse
 
   /** Stores the given entity modifications. */
-  def persistEntityModifications(modifications: Seq[EntityModification]): Unit
+  def persistEntityModifications(
+      modifications: Seq[EntityModification],
+      waitUntilQueryReflectsModifications: Boolean,
+  ): Unit
 
   def executeDataQuery(dbQuery: PicklableDbQuery): Seq[Entity]
 

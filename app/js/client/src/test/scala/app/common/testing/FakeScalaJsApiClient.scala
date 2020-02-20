@@ -36,7 +36,10 @@ final class FakeScalaJsApiClient extends ScalaJsApiClient {
     )
   }
 
-  override def persistEntityModifications(modifications: Seq[EntityModification]) = {
+  override def persistEntityModifications(
+      modifications: Seq[EntityModification],
+      waitUntilQueryReflectsModifications: Boolean,
+  ) = {
     modificationsBuffer.addModifications(modifications)
     Future.successful((): Unit)
   }

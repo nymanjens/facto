@@ -62,7 +62,12 @@ object JsEntityAccessImplTest extends TestSuite {
 
     "Fake local database loaded" - {
       "loads initial data if db is empty" - async {
-        await(fakeApiClient.persistEntityModifications(Seq(testModification)))
+        await(
+          fakeApiClient.persistEntityModifications(
+            Seq(testModification),
+            waitUntilQueryReflectsModifications = true,
+          )
+        )
         localDatabasePromise.success(fakeLocalDatabase)
         await(remoteDatabaseProxy.localDatabaseReadyFuture)
 
@@ -71,7 +76,10 @@ object JsEntityAccessImplTest extends TestSuite {
 
       "loads initial data if db is non-empty but has wrong version" - async {
         fakeLocalDatabase.applyModifications(Seq(testModificationA))
-        fakeApiClient.persistEntityModifications(Seq(testModificationB))
+        fakeApiClient.persistEntityModifications(
+          Seq(testModificationB),
+          waitUntilQueryReflectsModifications = true,
+        )
         localDatabasePromise.success(fakeLocalDatabase)
         await(remoteDatabaseProxy.localDatabaseReadyFuture)
 
@@ -79,7 +87,10 @@ object JsEntityAccessImplTest extends TestSuite {
       }
 
       "does not load initial data if db is non-empty with right version" - async {
-        fakeApiClient.persistEntityModifications(Seq(testModificationA))
+        fakeApiClient.persistEntityModifications(
+          Seq(testModificationA),
+          waitUntilQueryReflectsModifications = true,
+        )
         localDatabasePromise.success(fakeLocalDatabase)
 
         val entityAccess1 = {
@@ -87,7 +98,10 @@ object JsEntityAccessImplTest extends TestSuite {
           await(remoteDatabaseProxy.localDatabaseReadyFuture)
           new JsEntityAccessImpl()
         }
-        fakeApiClient.persistEntityModifications(Seq(testModificationB))
+        fakeApiClient.persistEntityModifications(
+          Seq(testModificationB),
+          waitUntilQueryReflectsModifications = true,
+        )
 
         val entityAccess2 = {
           implicit val remoteDatabaseProxy = HybridRemoteDatabaseProxy.create(localDatabasePromise.future)

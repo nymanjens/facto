@@ -80,7 +80,12 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
   "persistEntityModifications()" in new WithApplication {
     fakeClock.setNowInstant(testInstant)
 
-    serverFactory.create().persistEntityModifications(Seq(testModification))
+    serverFactory
+      .create()
+      .persistEntityModifications(
+        Seq(testModification),
+        waitUntilQueryReflectsModifications = true,
+      )
 
     Awaiter.expectEventually.nonEmpty(dbRun(entityAccess.newSlickQuery[EntityModificationEntity]()))
 
