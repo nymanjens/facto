@@ -29,7 +29,7 @@ object TemplateMatcherTest extends TestSuite {
             Some(templateA)
         }
         "No matching template" - {
-          templateMatcher.getMatchingTemplate(Seq(createTransaction(description = "BBB"))) ==> None
+          templateMatcher.getMatchingTemplate(Seq(createTransaction(description = "CCC"))) ==> None
         }
       }
       "With multiple transactions in template" - {
@@ -71,8 +71,7 @@ object TemplateMatcherTest extends TestSuite {
               Seq(
                 createTransaction(description = "AAA"),
                 createTransaction(description = "BBB"),
-                createTransaction(description = "CCC"))) ==>
-              Some(templateAb)
+                createTransaction(description = "CCC"))) ==> None
           }
         }
       }
@@ -113,7 +112,7 @@ object TemplateMatcherTest extends TestSuite {
             "Matching template" - {
               templateMatcher.getMatchingTemplate(
                 Seq(createTransaction(description = "XYZ", beneficiary = testAccountA))) ==>
-                Some(templateB)
+                Some(templateA)
             }
             "No matching template" - {
               templateMatcher.getMatchingTemplate(
