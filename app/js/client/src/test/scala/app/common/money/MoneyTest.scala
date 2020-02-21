@@ -77,7 +77,7 @@ object MoneyTest extends TestSuite {
           Case(",123", None)
         )
 
-        for (testCase <- testCases) yield {
+        for (testCase <- testCases) {
           testCase.test()
           testCase.negated.test()
           testCase.withPlusSignPrefix.test()
