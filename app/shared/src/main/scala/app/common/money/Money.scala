@@ -55,18 +55,20 @@ object Money {
     * to its number of cents.
     *
     * This method is lenient in its input. It allows both the point or the comma as decimal delimiter. It
-    * also detects the comma as separator of thousands.
+    * detects the comma as separator of thousands. It also allows the 'k' suffix which represents x1000.
     *
     * Examples:
     *   - floatStringToCents("1,234") = Some(123400)
     *   - floatStringToCents("1 234") = Some(123400)
     *   - floatStringToCents("1,23") = Some(123)
     *   - floatStringToCents("1.23") = Some(123)
+    *   - floatStringToCents("1.23k") = Some(123000)
+    *   - floatStringToCents("1.23M") = Some(123000000)
     */
   def floatStringToCents(string: String): Option[Long] = tryFloatStringToCents(string).toOption
 
   def tryFloatStringToCents(string: String): Try[Long] = {
-    def parseWithoutSign(string: String): Try[Long] = {
+    def parseWithoutSignOrMetricPrefix(string: String): Try[Long] = {
       def parseCents(string: String): Try[Long] = {
         string match {
           case _ if string.length == 1 => Try(string.toLong * 10)
@@ -131,12 +133,22 @@ object Money {
       (isNegative, if (isNegative) string.substring(1) else removePlusSignPrefix(string))
     }
 
+    def detectAndRemoveMetricPrefix(string: String): (Int, String) = {
+      val metricPrefixToDecimal = Map('k' -> 1000, 'M' -> 1000000)
+      val metricPrefix =
+        metricPrefixToDecimal.keys.find(metricPrefix => string endsWith metricPrefix.toString)
+
+      if (metricPrefix.isDefined) {
+        (metricPrefixToDecimal(metricPrefix.get), string.substring(0, string.length - 1))
+      } else {
+        (1, string)
+      }
+    }
+
     val stringWithoutSpaces = string.replace(" ", "")
     val (isNegative, stringWithoutSign) = detectAndRemoveSign(stringWithoutSpaces)
-    if (isNegative) {
-      parseWithoutSign(stringWithoutSign) map (cents => -cents)
-    } else {
-      parseWithoutSign(stringWithoutSign)
-    }
+    val (decimal, stringWithoutSignOrMetricPrefix) = detectAndRemoveMetricPrefix(stringWithoutSign)
+    val factor = (if (isNegative) -1 else 1) * decimal
+    parseWithoutSignOrMetricPrefix(stringWithoutSignOrMetricPrefix) map (cents => factor * cents)
   }
 }

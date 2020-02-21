@@ -29,6 +29,11 @@ object MoneyInputTest extends TestSuite {
 
         "empty string" - { StringArithmetic.floatStringToCents("") ==> None }
 
+        "with metric prefix" - {
+          "1k" - { testNameToCents() ==> Some(1000 * 100) }
+          "-23.2k" - { testNameToCents() ==> Some(-23.2 * 1000 * 100) }
+        }
+
         "sign prefix" - {
           "+1" - { testNameToCents() ==> Some(100) }
           "-1" - { testNameToCents() ==> Some(-100) }
