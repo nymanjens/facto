@@ -13,7 +13,7 @@ import utest._
 
 import scala.collection.immutable.Seq
 
-class MoneyTest extends TestSuite {
+object MoneyTest extends TestSuite {
 
   override def tests = TestSuite {
     val testModule = new TestModule()
@@ -67,7 +67,7 @@ class MoneyTest extends TestSuite {
           Case(" 1 , 234 . 56 ", Option(123456)),
           Case("1.23k", Option(123000)),
           Case("1.23M", Option(123000000)),
-          Case("-20k", Option(-2000000)),
+          Case("20k", Option(-2000000)),
           Case("1.2.3", None),
           Case("", None),
           Case("--1", None),
