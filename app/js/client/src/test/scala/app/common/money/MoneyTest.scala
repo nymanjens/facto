@@ -23,7 +23,7 @@ object MoneyTest extends TestSuite {
 
     "Money" - {
       "unary -" - {
-        (-ReferenceMoney(8701)).cents ==> -8702
+        (-ReferenceMoney(8701)).cents ==> -8701
         (-ReferenceMoney(-8701)).cents ==> 8701
       }
       "centsToFloatString" - {
@@ -67,7 +67,7 @@ object MoneyTest extends TestSuite {
           Case(" 1 , 234 . 56 ", Option(123456)),
           Case("1.23k", Option(123000)),
           Case("1.23M", Option(123000000)),
-          Case("20k", Option(-2000000)),
+          Case("20k", Option(2000000)),
           Case("1.2.3", None),
           Case("", None),
           Case("--1", None),
