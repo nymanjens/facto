@@ -8,7 +8,7 @@ import utest.TestSuite
 
 import scala.collection.immutable.Seq
 
-class TemplateMatcherTest extends TestSuite {
+object TemplateMatcherTest extends TestSuite {
 
   override def tests = TestSuite {
     "getMatchingTemplate" - {
