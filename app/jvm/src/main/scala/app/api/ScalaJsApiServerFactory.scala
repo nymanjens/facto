@@ -22,6 +22,8 @@ import hydro.models.access.DbQuery
 import scala.collection.immutable.Seq
 import scala.collection.immutable.TreeMap
 import scala.collection.mutable
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 
 final class ScalaJsApiServerFactory @Inject()(
     implicit accountingConfig: Config,
