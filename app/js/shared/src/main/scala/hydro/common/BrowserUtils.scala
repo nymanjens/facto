@@ -20,6 +20,16 @@ object BrowserUtils {
       needles = Seq("android", "blackberry", "iphone", "ipad", "ipod", "opera mini", "iemobile", "wpdesktop"))
   }
 
+  lazy val isFirefox: Boolean = logExceptions {
+    val navigator = dom.window.navigator
+    val userAgent = maybeAsString(navigator.userAgent)
+    val vendor = maybeAsString(navigator.asInstanceOf[js.Dynamic].vendor)
+
+    val stringToTest = userAgent orElse vendor getOrElse ""
+
+    stringToTest contains "Firefox"
+  }
+
   private def stringContainsAnyOf(haystack: String, needles: Seq[String]): Boolean = {
     needles.map(_.toLowerCase).exists(haystack.toLowerCase.contains)
   }
