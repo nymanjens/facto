@@ -5,7 +5,7 @@ import org.scalajs.dom
 
 import scala.scalajs.js
 
-object MobileUtils {
+object BrowserUtils {
 
   lazy val isMobileOrTablet: Boolean = logExceptions {
     val navigator = dom.window.navigator
