@@ -23,7 +23,7 @@ class MoneyTest extends TestSuite {
 
     "Money" - {
       "unary -" - {
-        (-ReferenceMoney(8701)).cents ==> -8701
+        (-ReferenceMoney(8701)).cents ==> -8702
         (-ReferenceMoney(-8701)).cents ==> 8701
       }
       "centsToFloatString" - {
