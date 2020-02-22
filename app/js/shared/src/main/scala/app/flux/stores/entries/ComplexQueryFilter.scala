@@ -50,8 +50,13 @@ private[stores] final class ComplexQueryFilter(
   private def createFilterPair(singlePartWithoutNegation: String): QueryFilterPair = {
     def filterOptions[T](inputString: String, options: Seq[T])(nameFunc: T => String): Seq[T] =
       options.filter(option => nameFunc(option).toLowerCase contains inputString.toLowerCase)
-    def fallback =
-      QueryFilterPair.containsIgnoreCase(ModelFields.Transaction.description, singlePartWithoutNegation)
+    def fallback = {
+      QueryFilterPair.or(
+        QueryFilterPair.containsIgnoreCase(ModelFields.Transaction.description, singlePartWithoutNegation),
+        QueryFilterPair.seqContains(ModelFields.Transaction.tags, singlePartWithoutNegation),
+        QueryFilterPair.containsIgnoreCase(ModelFields.Transaction.detailDescription, singlePartWithoutNegation),
+      )
+    }
 
     parsePrefixAndSuffix(singlePartWithoutNegation) match {
       case Some((prefix, suffix)) =>
@@ -141,14 +146,25 @@ object ComplexQueryFilter {
       negativeFilter: DbQuery.Filter[Transaction],
       estimatedExecutionCost: Int,
   ) {
-    def negated: QueryFilterPair =
+    def negated: QueryFilterPair = {
       QueryFilterPair(
         positiveFilter = negativeFilter,
         negativeFilter = positiveFilter,
-        estimatedExecutionCost = estimatedExecutionCost)
+        estimatedExecutionCost = estimatedExecutionCost,
+      )
+    }
   }
 
   private object QueryFilterPair {
+
+    def or(queryFilterPairs: QueryFilterPair*): QueryFilterPair = {
+      QueryFilterPair(
+        positiveFilter = DbQuery.Filter.Or(queryFilterPairs.toVector.map(_.positiveFilter)),
+        negativeFilter = DbQuery.Filter.And(queryFilterPairs.toVector.map(_.negativeFilter)),
+        estimatedExecutionCost = queryFilterPairs.map(_.estimatedExecutionCost).sum,
+      )
+    }
+
     def isEqualTo[V](field: ModelField[V, Transaction], value: V): QueryFilterPair =
       anyOf(field, Seq(value))
 
