@@ -35,7 +35,6 @@ trait JsEntityAccess extends EntityAccess {
   // **************** Other ****************//
   def registerListener(listener: JsEntityAccess.Listener): Unit
   def deregisterListener(listener: JsEntityAccess.Listener): Unit
-  private[access] def startCheckingForModifiedEntityUpdates(): Unit
 }
 
 object JsEntityAccess {

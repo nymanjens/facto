@@ -116,7 +116,8 @@ class JsEntityAccessImpl()(
     listeners = listeners.filter(_ != listener)
   }
 
-  override def startCheckingForModifiedEntityUpdates(): Unit = {
+  // **************** Additional API ****************//
+  def startCheckingForModifiedEntityUpdates(): Unit = {
     remoteDatabaseProxy.startCheckingForModifiedEntityUpdates(modifications => {
       _pendingModifications --= modifications
       invokeListenersAsync(_.modificationsAddedOrPendingStateChanged(modifications))

@@ -55,7 +55,6 @@ class FakeJsEntityAccess extends JsEntityAccess {
   override def deregisterListener(listener: Listener): Unit = {
     listeners -= listener
   }
-  override def startCheckingForModifiedEntityUpdates(): Unit = ???
 
   override def localDatabaseHasBeenLoaded: Listenable[Boolean] = Listenable.fixed(false)
 
