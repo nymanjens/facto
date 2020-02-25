@@ -18,7 +18,7 @@ import scala.concurrent.Future
 import scala.concurrent.Promise
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-/** RemoteDatabaseProxy implementation that queries the remote back-end directly until LocalDatabase */
+/** RemoteDatabaseProxy implementation that queries the remote back-end directly until LocalDatabase is ready */
 final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
     implicit apiClient: ScalaJsApiClient,
     getInitialDataResponse: GetInitialDataResponse,
