@@ -1,5 +1,6 @@
 package hydro.models.access
 
+import app.api.ScalaJsApiClient
 import hydro.models.modification.EntityModification
 import hydro.models.modification.EntityType
 import hydro.common.JsLoggingUtils.logExceptions
@@ -16,7 +17,9 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 class JsEntityAccessImpl()(
-    implicit remoteDatabaseProxy: RemoteDatabaseProxy,
+    implicit
+    apiClient: ScalaJsApiClient,
+    remoteDatabaseProxy: RemoteDatabaseProxy,
     hydroPushSocketClientFactory: HydroPushSocketClientFactory,
 ) extends JsEntityAccess {
 
@@ -44,14 +47,18 @@ class JsEntityAccessImpl()(
     // Optional: Try sending the existing pending modifications at application start, in the hope that the browser
     // is now online.
     if (existingPendingModifications.nonEmpty) {
-      remoteDatabaseProxy.persistEntityModifications(existingPendingModifications)
+      apiClient.persistEntityModifications(
+        existingPendingModifications,
+        waitUntilQueryReflectsModifications = false)
     }
 
     // Send pending modifications whenever connection with the server is restored
     hydroPushSocketClientFactory.pushClientsAreOnline.registerListener { isOnline =>
       if (isOnline) {
         if (_pendingModifications.modifications.nonEmpty) {
-          remoteDatabaseProxy.persistEntityModifications(_pendingModifications.modifications)
+          apiClient.persistEntityModifications(
+            _pendingModifications.modifications,
+            waitUntilQueryReflectsModifications = false)
         }
       }
     }
