@@ -24,12 +24,14 @@ object BuildSettings {
     "-Xfuture", // Warn of changes to future major Scala version
     "-Xlint:-unused,_",
     "-Yno-adapted-args", // Do not adapt an argument list (either by inserting () or creating a tuple) to match the receiver.
-    "-Ywarn-dead-code",
     "-Ywarn-unused:-imports"
-    // "-Ywarn-value-discard" // Warning for value discard bugs (see
-    // http://underscore.io/blog/posts/2016/11/24/value-discard.html)
-    // Disabled because some cases (e.g. Guice modules) actually
-    // benefit from this feature.
+
+    // Disabled because it causes issues with scala.js facade types, particularly `var x = js.native`
+    // "-Ywarn-dead-code",
+
+    // Warning for value discard bugs (see http://underscore.io/blog/posts/2016/11/24/value-discard.html).
+    // Disabled because some cases (e.g. Guice modules) actually benefit from this feature.
+    // "-Ywarn-value-discard"
   )
 
   /** Declare global dependency versions here to avoid mismatches in multi part dependencies */
