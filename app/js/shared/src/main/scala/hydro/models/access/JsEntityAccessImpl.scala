@@ -33,25 +33,29 @@ class JsEntityAccessImpl()(
     val existingPendingModifications = await(remoteDatabaseProxy.pendingModifications())
 
     _pendingModifications = _pendingModifications.copy(persistedLocally = true)
+    _pendingModifications ++= existingPendingModifications
+
+    _localDatabaseHasBeenLoaded.set(true)
 
     // Heuristic: When the local database is also loaded and the pending modifications are loaded, pending
     // modifications will be stored or at least start being stored
     invokeListenersAsync(_.pendingModificationsPersistedLocally())
 
+    // Optional: Try sending the existing pending modifications at application start, in the hope that the browser
+    // is now online.
     if (existingPendingModifications.nonEmpty) {
-      await(persistModifications(existingPendingModifications))
+      remoteDatabaseProxy.persistEntityModifications(existingPendingModifications)
     }
 
     // Send pending modifications whenever connection with the server is restored
     hydroPushSocketClientFactory.pushClientsAreOnline.registerListener { isOnline =>
       if (isOnline) {
         if (_pendingModifications.modifications.nonEmpty) {
-          persistModifications(_pendingModifications.modifications)
+          remoteDatabaseProxy.persistEntityModifications(_pendingModifications.modifications)
         }
       }
     }
 
-    _localDatabaseHasBeenLoaded.set(true)
   }
 
   // **************** Getters ****************//
