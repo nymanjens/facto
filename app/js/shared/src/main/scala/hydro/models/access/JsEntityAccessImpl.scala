@@ -17,7 +17,6 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 class JsEntityAccessImpl()(
     implicit remoteDatabaseProxy: RemoteDatabaseProxy,
-    hydroPushSocketClientFactory: HydroPushSocketClientFactory,
 ) extends JsEntityAccess {
 
   private var listeners: Seq[Listener] = Seq()
@@ -47,14 +46,15 @@ class JsEntityAccessImpl()(
       remoteDatabaseProxy.persistEntityModifications(existingPendingModifications)
     }
 
-    // Send pending modifications whenever connection with the server is restored
-    hydroPushSocketClientFactory.pushClientsAreOnline.registerListener { isOnline =>
-      if (isOnline) {
-        if (_pendingModifications.modifications.nonEmpty) {
-          remoteDatabaseProxy.persistEntityModifications(_pendingModifications.modifications)
-        }
-      }
-    }
+    // TODO(feat-SharedWorker): Move to SharedWorker
+    // // Send pending modifications whenever connection with the server is restored
+    // hydroPushSocketClientFactory.pushClientsAreOnline.registerListener { isOnline =>
+    //   if (isOnline) {
+    //     if (_pendingModifications.modifications.nonEmpty) {
+    //       remoteDatabaseProxy.persistEntityModifications(_pendingModifications.modifications)
+    //     }
+    //   }
+    // }
 
   }
 
