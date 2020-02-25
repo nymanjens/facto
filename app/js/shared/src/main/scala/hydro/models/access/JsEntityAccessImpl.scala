@@ -20,6 +20,7 @@ class JsEntityAccessImpl()(
     implicit
     apiClient: ScalaJsApiClient,
     remoteDatabaseProxy: RemoteDatabaseProxy,
+    hydroPushSocketClientFactory: HydroPushSocketClientFactory,
 ) extends JsEntityAccess {
 
   private var listeners: Seq[Listener] = Seq()
@@ -52,16 +53,17 @@ class JsEntityAccessImpl()(
     }
 
     // TODO(feat-SharedWorker): Move to SharedWorker
-    // // Send pending modifications whenever connection with the server is restored
-    // hydroPushSocketClientFactory.pushClientsAreOnline.registerListener { isOnline =>
-    //   if (isOnline) {
-    //     if (_pendingModifications.modifications.nonEmpty) {
-    //       apiClient.persistEntityModifications(
-    //         _pendingModifications.modifications,
-    //         waitUntilQueryReflectsModifications = false)
-    //     }
-    //   }
-    // }
+    // Send pending modifications whenever connection with the server is restored
+    hydroPushSocketClientFactory.pushClientsAreOnline.registerListener { isOnline =>
+      if (isOnline) {
+        if (_pendingModifications.modifications.nonEmpty) {
+          apiClient.persistEntityModifications(
+            _pendingModifications.modifications,
+            waitUntilQueryReflectsModifications = false)
+        }
+      }
+    }
+
   }
 
   // **************** Getters ****************//
