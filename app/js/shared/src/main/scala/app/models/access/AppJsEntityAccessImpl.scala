@@ -1,5 +1,6 @@
 package app.models.access
 
+import app.api.ScalaJsApiClient
 import app.models.user.User
 import hydro.models.access.DbQueryExecutor
 import hydro.models.access.DbResultSet
@@ -10,7 +11,9 @@ import hydro.models.access.RemoteDatabaseProxy
 import scala.collection.immutable.Seq
 
 private[access] final class AppJsEntityAccessImpl(allUsers: Seq[User])(
-    implicit remoteDatabaseProxy: RemoteDatabaseProxy,
+    implicit
+    apiClient: ScalaJsApiClient,
+    remoteDatabaseProxy: RemoteDatabaseProxy,
     hydroPushSocketClientFactory: HydroPushSocketClientFactory,
 ) extends JsEntityAccessImpl
     with AppJsEntityAccess {
