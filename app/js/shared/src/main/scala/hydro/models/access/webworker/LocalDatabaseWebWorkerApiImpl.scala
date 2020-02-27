@@ -1,5 +1,8 @@
 package hydro.models.access.webworker
 
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.async.Async.async
+import scala.async.Async.await
 import hydro.jsfacades.LokiJs
 import hydro.jsfacades.LokiJs.FilterFactory.Operation
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
@@ -7,22 +10,34 @@ import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation._
 import org.scalajs.dom.console
 
 import scala.collection.immutable.Seq
+import scala.collection.mutable
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 
 private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDatabaseWebWorkerApi {
-  private var lokiDb: LokiJs.Database = _
+  private val nameToLokiDbs: mutable.Map[String, LokiJs.Database] = mutable.Map()
+  private var currentLokiDb: LokiJs.Database = _
 
-  override def createIfNecessary(dbName: String, inMemory: Boolean, separateDbPerCollection: Boolean): Future[Unit] = {
+  override def createIfNecessary(dbName: String,
+                                 inMemory: Boolean,
+                                 separateDbPerCollection: Boolean): Future[Unit] = async {
     require(!separateDbPerCollection)
-    if (inMemory) {
-      lokiDb = LokiJs.Database.inMemoryForTests(dbName)
-    } else {
-      lokiDb = LokiJs.Database.persistent(dbName)
+
+    if (!nameToLokiDbs.contains(dbName)) {
+      val newLokiDb =
+        if (inMemory) {
+          LokiJs.Database.inMemoryForTests(dbName)
+        } else {
+          LokiJs.Database.persistent(dbName)
+        }
+
+      nameToLokiDbs.put(dbName, newLokiDb)
+
+      await(newLokiDb.loadDatabase())
     }
 
-    lokiDb.loadDatabase()
+    currentLokiDb = nameToLokiDbs(dbName)
   }
 
   override def executeDataQuery(
@@ -39,7 +54,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
     })
 
   private def toResultSet(lokiQuery: LocalDatabaseWebWorkerApi.LokiQuery): Option[LokiJs.ResultSet] = {
-    lokiDb.getCollection(lokiQuery.collectionName) match {
+    currentLokiDb.getCollection(lokiQuery.collectionName) match {
       case None =>
         console.log(
           s"  Warning: Tried to query ${lokiQuery.collectionName}, but that collection doesn't exist")
@@ -93,7 +108,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
           Future.successful((): Unit)
 
         case AddCollection(collectionName, uniqueIndices, indices) =>
-          lokiDb.addCollection(
+          currentLokiDb.addCollection(
             collectionName,
             uniqueIndices = uniqueIndices,
             indices = indices
@@ -101,11 +116,11 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
           Future.successful((): Unit)
 
         case RemoveCollection(collectionName) =>
-          lokiDb.removeCollection(collectionName)
+          currentLokiDb.removeCollection(collectionName)
           Future.successful((): Unit)
 
         case SaveDatabase =>
-          lokiDb.saveDatabase()
+          currentLokiDb.saveDatabase()
       })
       .map(_ => (): Unit)
   }
@@ -123,7 +138,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
   }
 
   private def getCollection(collectionName: String): LokiJs.Collection = {
-    lokiDb
+    currentLokiDb
       .getCollection(collectionName)
       .getOrElse(throw new IllegalArgumentException(s"Could not get collection $collectionName"))
   }
