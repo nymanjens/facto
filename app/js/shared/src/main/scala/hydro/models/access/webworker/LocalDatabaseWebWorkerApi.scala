@@ -11,7 +11,7 @@ trait LocalDatabaseWebWorkerApi {
 
   /**
     * Creates a database with the given name and properties. If a database with that name already exists, this
-    * method returns when that database is ready.
+    * method does nothing.
     */
   def createIfNecessary(dbName: String, inMemory: Boolean, separateDbPerCollection: Boolean): Future[Unit]
 
