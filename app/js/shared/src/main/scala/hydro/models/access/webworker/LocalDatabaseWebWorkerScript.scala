@@ -48,13 +48,16 @@ object LocalDatabaseWebWorkerScript {
 
   private def executeMethod(methodNum: Int, args: js.Array[js.Any]): Future[js.Any] = {
     (methodNum, args.toVector) match {
-      case (MethodNumbers.create, Seq(dbName, inMemory, separateDbPerCollectionObj)) =>
+      case (MethodNumbers.createIfNecessary, Seq(dbName, inMemory, separateDbPerCollectionObj)) =>
         val separateDbPerCollection = separateDbPerCollectionObj.asInstanceOf[Boolean]
         apiImpl =
           if (separateDbPerCollection) new LocalDatabaseWebWorkerApiMultiDbImpl()
           else new LocalDatabaseWebWorkerApiImpl()
         apiImpl
-          .create(dbName.asInstanceOf[String], inMemory.asInstanceOf[Boolean], separateDbPerCollection)
+          .createIfNecessary(
+            dbName.asInstanceOf[String],
+            inMemory.asInstanceOf[Boolean],
+            separateDbPerCollection)
           .map(_ => js.undefined)
       case (MethodNumbers.executeDataQuery, Seq(lokiQuery)) =>
         apiImpl

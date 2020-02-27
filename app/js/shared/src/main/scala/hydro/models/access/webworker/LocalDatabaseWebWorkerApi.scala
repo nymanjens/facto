@@ -8,7 +8,12 @@ import scala.concurrent.Future
 import scala.scalajs.js
 
 trait LocalDatabaseWebWorkerApi {
-  def create(dbName: String, inMemory: Boolean, separateDbPerCollection: Boolean): Future[Unit]
+
+  /**
+    * Creates a database with the given name and properties. If a database with that name already exists, this
+    * method returns when that database is ready.
+    */
+  def createIfNecessary(dbName: String, inMemory: Boolean, separateDbPerCollection: Boolean): Future[Unit]
 
   def executeDataQuery(lokiQuery: LokiQuery): Future[Seq[js.Dictionary[js.Any]]]
 
@@ -41,7 +46,7 @@ object LocalDatabaseWebWorkerApi {
   }
 
   object MethodNumbers {
-    val create: Int = 1
+    val createIfNecessary: Int = 1
     val executeDataQuery: Int = 2
     val executeCountQuery: Int = 3
     val applyWriteOperations: Int = 4

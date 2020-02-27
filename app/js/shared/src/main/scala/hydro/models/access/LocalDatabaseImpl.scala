@@ -251,7 +251,7 @@ object LocalDatabaseImpl {
   ): Future[LocalDatabase] = async {
     await(
       webWorker
-        .create(dbName = "hydro-db", inMemory = false, separateDbPerCollection = separateDbPerCollection))
+        .createIfNecessary(dbName = "hydro-db", inMemory = false, separateDbPerCollection = separateDbPerCollection))
     new LocalDatabaseImpl()
   }
 
@@ -261,7 +261,7 @@ object LocalDatabaseImpl {
   ): Future[LocalDatabase] = async {
     await(
       webWorker
-        .create(dbName = "test-db", inMemory = false, separateDbPerCollection = separateDbPerCollection))
+        .createIfNecessary(dbName = "test-db", inMemory = false, separateDbPerCollection = separateDbPerCollection))
     new LocalDatabaseImpl()
   }
 
@@ -272,7 +272,7 @@ object LocalDatabaseImpl {
     async {
       await(
         webWorker
-          .create(dbName = "hydro-db", inMemory = true, separateDbPerCollection = separateDbPerCollection))
+          .createIfNecessary(dbName = "test-in-memory-db", inMemory = true, separateDbPerCollection = separateDbPerCollection))
       new LocalDatabaseImpl()
     }
 

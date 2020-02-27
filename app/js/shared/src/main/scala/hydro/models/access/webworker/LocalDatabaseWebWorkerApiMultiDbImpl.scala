@@ -20,7 +20,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiMultiDbImpl extends Loca
   private var inMemory: Boolean = _
   private var changedCollectionsSinceLastSave: mutable.Set[String] = mutable.Set[String]()
 
-  override def create(dbName: String, inMemory: Boolean, separateDbPerCollection: Boolean): Future[Unit] = {
+  override def createIfNecessary(dbName: String, inMemory: Boolean, separateDbPerCollection: Boolean): Future[Unit] = {
     require(separateDbPerCollection)
 
     this.dbNamePrefix = dbName
@@ -89,7 +89,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiMultiDbImpl extends Loca
       case None =>
         val db = new LocalDatabaseWebWorkerApiImpl()
         await(
-          db.create(
+          db.createIfNecessary(
             dbName = s"${dbNamePrefix}_$collectionName",
             inMemory = inMemory,
             separateDbPerCollection = false))

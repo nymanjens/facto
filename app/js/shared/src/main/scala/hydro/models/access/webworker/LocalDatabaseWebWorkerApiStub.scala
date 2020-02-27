@@ -25,8 +25,8 @@ private[webworker] final class LocalDatabaseWebWorkerApiStub extends LocalDataba
   private val responseMessagePromises: mutable.Buffer[Promise[js.Any]] = mutable.Buffer()
   private val worker: Worker = initializeWebWorker()
 
-  override def create(dbName: String, inMemory: Boolean, separateDbPerCollection: Boolean) = {
-    sendAndReceive(MethodNumbers.create, Seq(dbName, inMemory, separateDbPerCollection), timeout = 10.seconds)
+  override def createIfNecessary(dbName: String, inMemory: Boolean, separateDbPerCollection: Boolean) = {
+    sendAndReceive(MethodNumbers.createIfNecessary, Seq(dbName, inMemory, separateDbPerCollection), timeout = 10.seconds)
       .map(_ => (): Unit)
   }
 
