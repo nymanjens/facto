@@ -224,27 +224,40 @@ private final class LocalDatabaseImpl(
       .map(_ => (): Unit)
   }
 
-  override def resetAndInitialize(): Future[Unit] = serializingWriteQueue.schedule {
-    async {
-      console.log("  Resetting database...")
-      await(
-        webWorker.applyWriteOperations(
-          Seq() ++
-            (for (collectionName <- allCollectionNames)
-              yield WriteOperation.RemoveCollection(collectionName)) ++
-            (for (entityType <- EntityTypes.all)
-              yield
-                WriteOperation.AddCollection(
-                  collectionNameOf(entityType),
-                  uniqueIndices = Seq("id"),
-                  indices = secondaryIndexFunction(entityType).map(_.name))) :+
-            WriteOperation
-              .AddCollection(singletonsCollectionName, uniqueIndices = Seq("id"), indices = Seq()) :+
-            WriteOperation
-              .AddCollection(pendingModificationsCollectionName, uniqueIndices = Seq("id"), indices = Seq())))
-      console.log("  Resetting database done.")
+  override def resetAndInitialize[V](alsoSetSingleton: (SingletonKey[V], V) = null): Future[Unit] =
+    serializingWriteQueue.schedule {
+      async {
+        console.log("  Resetting database...")
+        await(
+          webWorker
+            .applyWriteOperations(
+              Seq() ++
+                (for (collectionName <- allCollectionNames)
+                  yield WriteOperation.RemoveCollection(collectionName)) ++
+                (for (entityType <- EntityTypes.all)
+                  yield
+                    WriteOperation.AddCollection(
+                      collectionNameOf(entityType),
+                      uniqueIndices = Seq("id"),
+                      indices = secondaryIndexFunction(entityType).map(_.name))) ++
+                Seq(
+                  WriteOperation
+                    .AddCollection(singletonsCollectionName, uniqueIndices = Seq("id"), indices = Seq()),
+                  WriteOperation.AddCollection(
+                    pendingModificationsCollectionName,
+                    uniqueIndices = Seq("id"),
+                    indices = Seq())
+                ) ++
+                Option(alsoSetSingleton).map {
+                  case (key, value) =>
+                    implicit val converter = key.valueConverter
+                    val singletonObj =
+                      Scala2Js.toJsMap(Singleton(key = key.name, value = Scala2Js.toJs(value)))
+                    WriteOperation.Insert(singletonsCollectionName, singletonObj)
+                }))
+        console.log("  Resetting database done.")
+      }
     }
-  }
 
   // **************** Private helper methods ****************//
   private def collectionNameOf(entityType: EntityType.any): String = s"entities_${entityType.name}"

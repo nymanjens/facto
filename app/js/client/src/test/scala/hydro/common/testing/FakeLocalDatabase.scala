@@ -59,7 +59,7 @@ final class FakeLocalDatabase extends LocalDatabase {
     }
   }
   override def save() = Future.successful((): Unit)
-  override def resetAndInitialize() = {
+  override def resetAndInitialize[V](alsoSetSingleton: (SingletonKey[V], V) = null) = {
     modificationsBuffer.clear()
     singletonMap.clear()
     Future.successful((): Unit)

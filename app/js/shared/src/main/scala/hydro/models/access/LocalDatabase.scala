@@ -57,5 +57,5 @@ trait LocalDatabase {
   def save(): Future[Unit]
 
   /** Removes all data and resets its configuration. */
-  def resetAndInitialize(): Future[Unit]
+  def resetAndInitialize[V](alsoSetSingleton: (SingletonKey[V], V) = null): Future[Unit]
 }
