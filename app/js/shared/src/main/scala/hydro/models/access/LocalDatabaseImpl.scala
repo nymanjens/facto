@@ -200,12 +200,12 @@ private final class LocalDatabaseImpl(
 
   override def setSingletonValue[V](key: SingletonKey[V], value: V) = serializingWriteQueue.schedule {
     implicit val converter = key.valueConverter
+    val singletonObj = Scala2Js.toJsMap(Singleton(key = key.name, value = Scala2Js.toJs(value)))
     webWorker.applyWriteOperations(
       Seq(
-        WriteOperation.Remove(singletonsCollectionName, id = key.name),
-        WriteOperation.Insert(
-          singletonsCollectionName,
-          Scala2Js.toJsMap(Singleton(key = key.name, value = Scala2Js.toJs(value))))
+        // Either the Update or Insert will be a no-op, depending on whether this value already exists
+        WriteOperation.Update(singletonsCollectionName, singletonObj),
+        WriteOperation.Insert(singletonsCollectionName, singletonObj)
       ))
   }
 

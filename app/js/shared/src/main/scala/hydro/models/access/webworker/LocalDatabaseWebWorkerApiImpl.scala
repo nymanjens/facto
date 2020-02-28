@@ -97,9 +97,10 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
           Future.successful {
             val lokiCollection = getCollection(collectionName)
             findById(lokiCollection, updatedObj("id")) match {
-              case None               => false
-              case Some(`updatedObj`) => false
-              case Some(_) =>
+              case None => false
+              case Some(e) if e.filterKeys(k => k != "meta" && k != "$loki").toMap == updatedObj.toMap =>
+                false
+              case Some(e) =>
                 lokiCollection.findAndRemove(
                   LokiJs.FilterFactory.keyValueFilter(Operation.Equal, "id", updatedObj("id")))
                 lokiCollection.insert(updatedObj)
