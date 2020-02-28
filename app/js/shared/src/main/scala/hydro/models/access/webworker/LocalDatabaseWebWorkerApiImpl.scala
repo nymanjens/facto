@@ -16,12 +16,12 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 
 private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDatabaseWebWorkerApi {
-  private val nameToLokiDbs: mutable.Map[String, LokiJs.Database] = mutable.Map()
+  private val nameToLokiDbs: mutable.Map[String, Future[LokiJs.Database]] = mutable.Map()
   private var currentLokiDb: LokiJs.Database = _
 
   override def createIfNecessary(dbName: String,
                                  inMemory: Boolean,
-                                 separateDbPerCollection: Boolean): Future[Unit] = async {
+                                 separateDbPerCollection: Boolean): Future[Unit] = {
     require(!separateDbPerCollection)
 
     if (!nameToLokiDbs.contains(dbName)) {
@@ -32,12 +32,16 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
           LokiJs.Database.persistent(dbName)
         }
 
-      nameToLokiDbs.put(dbName, newLokiDb)
-
-      await(newLokiDb.loadDatabase())
+      nameToLokiDbs.put(dbName, async {
+        await(newLokiDb.loadDatabase())
+        newLokiDb
+      })
     }
 
-    currentLokiDb = nameToLokiDbs(dbName)
+    nameToLokiDbs(dbName).map { db =>
+      currentLokiDb = db
+      (): Unit
+    }
   }
 
   override def executeDataQuery(
