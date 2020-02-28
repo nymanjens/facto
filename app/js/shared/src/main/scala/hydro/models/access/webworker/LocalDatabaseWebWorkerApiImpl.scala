@@ -79,54 +79,68 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
     }
   }
 
-  override def applyWriteOperations(operations: Seq[WriteOperation]): Future[Unit] = {
+  override def applyWriteOperations(operations: Seq[WriteOperation]): Future[Boolean] = {
     Future
       .sequence(operations map {
         case Insert(collectionName, obj) =>
-          val lokiCollection = getCollection(collectionName)
-          findById(lokiCollection, obj("id")) match {
-            case Some(entity) =>
-            case None =>
-              lokiCollection.insert(obj)
+          Future.successful {
+            val lokiCollection = getCollection(collectionName)
+            findById(lokiCollection, obj("id")) match {
+              case Some(entity) => false
+              case None =>
+                lokiCollection.insert(obj)
+                true
+            }
           }
-          Future.successful((): Unit)
 
         case Update(collectionName, updatedObj) =>
-          val lokiCollection = getCollection(collectionName)
-          findById(lokiCollection, updatedObj("id")) match {
-            case None =>
-            case Some(entity) =>
-              lokiCollection.findAndRemove(
-                LokiJs.FilterFactory.keyValueFilter(Operation.Equal, "id", updatedObj("id")))
-              lokiCollection.insert(updatedObj)
+          Future.successful {
+            val lokiCollection = getCollection(collectionName)
+            findById(lokiCollection, updatedObj("id")) match {
+              case None               => false
+              case Some(`updatedObj`) => false
+              case Some(_) =>
+                lokiCollection.findAndRemove(
+                  LokiJs.FilterFactory.keyValueFilter(Operation.Equal, "id", updatedObj("id")))
+                lokiCollection.insert(updatedObj)
+                true
+            }
           }
-          Future.successful((): Unit)
 
         case Remove(collectionName, id) =>
-          val lokiCollection = getCollection(collectionName)
-          findById(lokiCollection, id) match {
-            case None =>
-            case Some(entity) =>
-              lokiCollection.findAndRemove(LokiJs.FilterFactory.keyValueFilter(Operation.Equal, "id", id))
+          Future.successful {
+            val lokiCollection = getCollection(collectionName)
+            findById(lokiCollection, id) match {
+              case None => false
+              case Some(entity) =>
+                lokiCollection.findAndRemove(LokiJs.FilterFactory.keyValueFilter(Operation.Equal, "id", id))
+                true
+            }
           }
-          Future.successful((): Unit)
 
         case AddCollection(collectionName, uniqueIndices, indices) =>
-          currentLokiDb.addCollection(
-            collectionName,
-            uniqueIndices = uniqueIndices,
-            indices = indices
-          )
-          Future.successful((): Unit)
+          Future.successful {
+            currentLokiDb.addCollection(
+              collectionName,
+              uniqueIndices = uniqueIndices,
+              indices = indices
+            )
+            true
+          }
 
         case RemoveCollection(collectionName) =>
-          currentLokiDb.removeCollection(collectionName)
-          Future.successful((): Unit)
+          Future.successful {
+            currentLokiDb.removeCollection(collectionName)
+            true
+          }
 
         case SaveDatabase =>
-          currentLokiDb.saveDatabase()
+          async {
+            await(currentLokiDb.saveDatabase())
+            false
+          }
       })
-      .map(_ => (): Unit)
+      .map(changedSeq => changedSeq contains true)
   }
 
   private def findById(lokiCollection: LokiJs.Collection, id: js.Any): Option[js.Dictionary[js.Any]] = {

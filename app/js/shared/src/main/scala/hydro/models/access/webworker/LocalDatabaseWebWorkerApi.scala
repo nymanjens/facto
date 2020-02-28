@@ -24,7 +24,7 @@ trait LocalDatabaseWebWorkerApi {
     *
     * Returns true if database was modified (SaveDatabase doesn't count as modification).
     */
-  def applyWriteOperations(operations: Seq[WriteOperation]): Future[Unit]
+  def applyWriteOperations(operations: Seq[WriteOperation]): Future[Boolean]
 }
 object LocalDatabaseWebWorkerApi {
   case class LokiQuery(

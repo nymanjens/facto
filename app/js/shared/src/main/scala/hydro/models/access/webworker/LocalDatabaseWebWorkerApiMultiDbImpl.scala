@@ -20,7 +20,9 @@ private[webworker] final class LocalDatabaseWebWorkerApiMultiDbImpl extends Loca
   private var inMemory: Boolean = _
   private var changedCollectionsSinceLastSave: mutable.Set[String] = mutable.Set[String]()
 
-  override def createIfNecessary(dbName: String, inMemory: Boolean, separateDbPerCollection: Boolean): Future[Unit] = {
+  override def createIfNecessary(dbName: String,
+                                 inMemory: Boolean,
+                                 separateDbPerCollection: Boolean): Future[Unit] = {
     require(separateDbPerCollection)
 
     this.dbNamePrefix = dbName
@@ -39,8 +41,8 @@ private[webworker] final class LocalDatabaseWebWorkerApiMultiDbImpl extends Loca
     await(db.executeCountQuery(lokiQuery))
   }
 
-  override def applyWriteOperations(operations: Seq[WriteOperation]): Future[Unit] = {
-    def performOperationOnCollection(operation: WriteOperation, collectionName: String): Future[Unit] =
+  override def applyWriteOperations(operations: Seq[WriteOperation]): Future[Boolean] = {
+    def performOperationOnCollection(operation: WriteOperation, collectionName: String): Future[Boolean] =
       async {
         changedCollectionsSinceLastSave.add(collectionName)
         val db = await(getDbForCollection(collectionName))
@@ -67,18 +69,22 @@ private[webworker] final class LocalDatabaseWebWorkerApiMultiDbImpl extends Loca
               }
             })
             changedCollectionsSinceLastSave.clear()
+            false
           }
       }
-    ).map(_ => (): Unit)
+    )
   }
 
   private def combineFuturesInOrder[T](
       iterable: Iterable[T],
-      futureFunction: T => Future[Unit],
-  ): Future[Unit] = {
-    var result = Future.successful((): Unit)
+      futureFunction: T => Future[Boolean],
+  ): Future[Boolean] = {
+    var result = Future.successful(false)
     for (elem <- iterable) {
-      result = result.flatMap(_ => futureFunction(elem))
+      result = for {
+        anythingChangedSoFar <- result
+        changed <- futureFunction(elem)
+      } yield anythingChangedSoFar || changed
     }
     result
   }

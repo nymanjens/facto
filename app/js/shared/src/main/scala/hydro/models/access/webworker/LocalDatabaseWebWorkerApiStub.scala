@@ -42,7 +42,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiStub extends LocalDataba
       MethodNumbers.applyWriteOperations,
       Seq(Scala2Js.toJs(operations.toList)),
       timeout = 1.minute)
-      .map(_ => (): Unit)
+      .map(_.asInstanceOf[Boolean])
 
   private def sendAndReceive(
       methodNum: Int,

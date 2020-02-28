@@ -32,21 +32,23 @@ final class FakeLocalDatabase extends LocalDatabase {
   // **************** Setters ****************//
   override def applyModifications(modifications: Seq[EntityModification]) = {
     modificationsBuffer.addModifications(modifications)
-    Future.successful((): Unit)
+    Future.successful(true)
   }
   override def addAll[E <: Entity: EntityType](entities: Seq[E]) = {
     modificationsBuffer.addEntities(entities)
-    Future.successful((): Unit)
+    Future.successful(true)
   }
   override def addPendingModifications(modifications: Seq[EntityModification]) = Future.successful {
     _pendingModifications ++= modifications
+    true
   }
   override def removePendingModifications(modifications: Seq[EntityModification]) = Future.successful {
     _pendingModifications --= modifications
+    true
   }
   override def setSingletonValue[V](key: SingletonKey[V], value: V) = {
     singletonMap.put(key, key.valueConverter.toJs(value))
-    Future.successful((): Unit)
+    Future.successful(true)
   }
   override def save() = Future.successful((): Unit)
   override def resetAndInitialize() = {

@@ -114,6 +114,7 @@ final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
         val queryReflectsModifications = async {
           await(entitySyncLogic.handleEntityModificationUpdate(modifications, localDatabase))
           await(localDatabase.addPendingModifications(modifications))
+          (): Unit
         }
         val completelyDone = async {
           await(queryReflectsModifications)

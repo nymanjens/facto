@@ -135,9 +135,9 @@ private final class LocalDatabaseImpl(
   // **************** Setters ****************//
   override def applyModifications(modifications: Seq[EntityModification]) = serializingWriteQueue.schedule {
     async {
-      val updatesToExistingEntityMap: Map[EntityModification, Option[Entity]] = await(
-        Future
-          .sequence(
+      val updatesToExistingEntityMap: Map[EntityModification, Option[Entity]] =
+        await(
+          Future.sequence(
             modifications
               .filter(m => m.isInstanceOf[EntityModification.Update[_]])
               .map { m =>
@@ -149,7 +149,7 @@ private final class LocalDatabaseImpl(
                 inner(m.entityType)
               })).toMap
 
-      webWorker.applyWriteOperations(modifications flatMap {
+      await(webWorker.applyWriteOperations(modifications flatMap {
         case modification @ EntityModification.Add(entity) =>
           implicit val entityType = modification.entityType
           Some(WriteOperation.Insert(collectionNameOf(entityType), Scala2Js.toJsMap(entity)))
@@ -170,7 +170,7 @@ private final class LocalDatabaseImpl(
         case modification @ EntityModification.Remove(id) =>
           val entityType = modification.entityType
           Some(WriteOperation.Remove(collectionNameOf(entityType), Scala2Js.toJs(id)))
-      })
+      }))
     }
   }
 
@@ -180,7 +180,7 @@ private final class LocalDatabaseImpl(
       for (entity <- entities) yield WriteOperation.Insert(collectionName, Scala2Js.toJsMap(entity)))
   }
 
-  override def addPendingModifications(modifications: Seq[EntityModification]): Future[Unit] =
+  override def addPendingModifications(modifications: Seq[EntityModification]) =
     serializingWriteQueue.schedule {
       webWorker.applyWriteOperations(
         for (modification <- modifications)
@@ -189,7 +189,7 @@ private final class LocalDatabaseImpl(
               .Insert(pendingModificationsCollectionName, Scala2Js.toJsMap(ModificationWithId(modification))))
     }
 
-  override def removePendingModifications(modifications: Seq[EntityModification]): Future[Unit] =
+  override def removePendingModifications(modifications: Seq[EntityModification]) =
     serializingWriteQueue.schedule {
       webWorker.applyWriteOperations(
         for (modification <- modifications)
@@ -209,8 +209,10 @@ private final class LocalDatabaseImpl(
       ))
   }
 
-  override def save(): Future[Unit] = serializingWriteQueue.schedule {
-    webWorker.applyWriteOperations(Seq(WriteOperation.SaveDatabase))
+  override def save() = serializingWriteQueue.schedule {
+    webWorker
+      .applyWriteOperations(Seq(WriteOperation.SaveDatabase))
+      .map(_ => (): Unit)
   }
 
   override def resetAndInitialize(): Future[Unit] = serializingWriteQueue.schedule {
@@ -251,7 +253,10 @@ object LocalDatabaseImpl {
   ): Future[LocalDatabase] = async {
     await(
       webWorker
-        .createIfNecessary(dbName = "hydro-db", inMemory = false, separateDbPerCollection = separateDbPerCollection))
+        .createIfNecessary(
+          dbName = "hydro-db",
+          inMemory = false,
+          separateDbPerCollection = separateDbPerCollection))
     new LocalDatabaseImpl()
   }
 
@@ -261,7 +266,10 @@ object LocalDatabaseImpl {
   ): Future[LocalDatabase] = async {
     await(
       webWorker
-        .createIfNecessary(dbName = "test-db", inMemory = false, separateDbPerCollection = separateDbPerCollection))
+        .createIfNecessary(
+          dbName = "test-db",
+          inMemory = false,
+          separateDbPerCollection = separateDbPerCollection))
     new LocalDatabaseImpl()
   }
 
@@ -272,7 +280,10 @@ object LocalDatabaseImpl {
     async {
       await(
         webWorker
-          .createIfNecessary(dbName = "test-in-memory-db", inMemory = true, separateDbPerCollection = separateDbPerCollection))
+          .createIfNecessary(
+            dbName = "test-in-memory-db",
+            inMemory = true,
+            separateDbPerCollection = separateDbPerCollection))
       new LocalDatabaseImpl()
     }
 
