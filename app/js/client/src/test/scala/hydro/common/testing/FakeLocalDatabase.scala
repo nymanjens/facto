@@ -50,6 +50,14 @@ final class FakeLocalDatabase extends LocalDatabase {
     singletonMap.put(key, key.valueConverter.toJs(value))
     Future.successful(true)
   }
+  override def addSingletonValueIfNew[V](key: SingletonKey[V], value: V) = {
+    if (singletonMap contains key) {
+      Future.successful(false)
+    } else {
+      singletonMap.put(key, key.valueConverter.toJs(value))
+      Future.successful(true)
+    }
+  }
   override def save() = Future.successful((): Unit)
   override def resetAndInitialize() = {
     modificationsBuffer.clear()

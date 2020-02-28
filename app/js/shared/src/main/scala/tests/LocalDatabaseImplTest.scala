@@ -63,9 +63,28 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
           await(db.getSingletonValue(VersionKey)).get ==> "abc"
 
           await(db.setSingletonValue(VersionKey, "abc")) ==> false
+          await(db.getSingletonValue(VersionKey)).get ==> "abc"
+
+          await(db.setSingletonValue(VersionKey, "def")) ==> true
+          await(db.getSingletonValue(VersionKey)).get ==> "def"
 
           await(db.setSingletonValue(NextUpdateTokenKey, testUpdateToken)) ==> true
           await(db.getSingletonValue(NextUpdateTokenKey)).get ==> testUpdateToken
+        }
+      },
+      manualTest("addSingletonValueIfNew") {
+        async {
+          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          await(db.getSingletonValue(VersionKey)).isDefined ==> false
+
+          await(db.addSingletonValueIfNew(VersionKey, "abc")) ==> true
+          await(db.getSingletonValue(VersionKey)).get ==> "abc"
+
+          await(db.addSingletonValueIfNew(VersionKey, "abc")) ==> false
+          await(db.getSingletonValue(VersionKey)).get ==> "abc"
+
+          await(db.addSingletonValueIfNew(VersionKey, "def")) ==> false
+          await(db.getSingletonValue(VersionKey)).get ==> "abc"
         }
       },
       manualTest("save") {
@@ -155,7 +174,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
           val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
           await(db.addPendingModifications(Seq(testModificationA)))
 
-          await(db.removePendingModifications(Seq(testModificationB)))  ==> false
+          await(db.removePendingModifications(Seq(testModificationB))) ==> false
 
           await(db.pendingModifications()) ==> Seq(testModificationA)
         }

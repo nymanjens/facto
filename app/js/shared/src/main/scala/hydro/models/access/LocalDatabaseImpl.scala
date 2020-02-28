@@ -209,6 +209,15 @@ private final class LocalDatabaseImpl(
       ))
   }
 
+  override def addSingletonValueIfNew[V](key: SingletonKey[V], value: V) = {
+    implicit val converter = key.valueConverter
+    val singletonObj = Scala2Js.toJsMap(Singleton(key = key.name, value = Scala2Js.toJs(value)))
+    webWorker.applyWriteOperations(
+      Seq(
+        WriteOperation.Insert(singletonsCollectionName, singletonObj)
+      ))
+  }
+
   override def save() = serializingWriteQueue.schedule {
     webWorker
       .applyWriteOperations(Seq(WriteOperation.SaveDatabase))
