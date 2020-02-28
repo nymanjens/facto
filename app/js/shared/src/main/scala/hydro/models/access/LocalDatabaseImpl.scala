@@ -203,6 +203,7 @@ private final class LocalDatabaseImpl(
     val singletonObj = Scala2Js.toJsMap(Singleton(key = key.name, value = Scala2Js.toJs(value)))
     webWorker.applyWriteOperations(
       Seq(
+        addSingletonCollectionOperation,
         // Either the Update or Insert will be a no-op, depending on whether this value already exists
         WriteOperation.Update(singletonsCollectionName, singletonObj),
         WriteOperation.Insert(singletonsCollectionName, singletonObj)
@@ -214,6 +215,7 @@ private final class LocalDatabaseImpl(
     val singletonObj = Scala2Js.toJsMap(Singleton(key = key.name, value = Scala2Js.toJs(value)))
     webWorker.applyWriteOperations(
       Seq(
+        addSingletonCollectionOperation,
         WriteOperation.Insert(singletonsCollectionName, singletonObj)
       ))
   }
@@ -241,8 +243,7 @@ private final class LocalDatabaseImpl(
                       uniqueIndices = Seq("id"),
                       indices = secondaryIndexFunction(entityType).map(_.name))) ++
                 Seq(
-                  WriteOperation
-                    .AddCollection(singletonsCollectionName, uniqueIndices = Seq("id"), indices = Seq()),
+                  addSingletonCollectionOperation,
                   WriteOperation.AddCollection(
                     pendingModificationsCollectionName,
                     uniqueIndices = Seq("id"),
@@ -265,6 +266,10 @@ private final class LocalDatabaseImpl(
   private val pendingModificationsCollectionName = "pendingModifications"
   private def allCollectionNames: Seq[String] =
     EntityTypes.all.map(collectionNameOf) :+ singletonsCollectionName :+ pendingModificationsCollectionName
+
+  private def addSingletonCollectionOperation: WriteOperation = {
+    WriteOperation.AddCollection(singletonsCollectionName, uniqueIndices = Seq("id"), indices = Seq())
+  }
 }
 
 object LocalDatabaseImpl {
