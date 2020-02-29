@@ -229,7 +229,7 @@ private final class LocalDatabaseImpl(
   override def resetAndInitialize[V](alsoSetSingleton: (SingletonKey[V], V) = null): Future[Unit] =
     serializingWriteQueue.schedule {
       async {
-        console.log("  Resetting database...")
+        //console.log("  Resetting database...")
         await(
           webWorker
             .applyWriteOperations(
@@ -256,7 +256,7 @@ private final class LocalDatabaseImpl(
                       Scala2Js.toJsMap(Singleton(key = key.name, value = Scala2Js.toJs(value)))
                     WriteOperation.Insert(singletonsCollectionName, singletonObj)
                 }))
-        console.log("  Resetting database done.")
+        //console.log("  Resetting database done.")
       }
     }
 
