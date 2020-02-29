@@ -1,14 +1,20 @@
 package hydro.models.access
 
+import hydro.common.time.JavaTimeImplicits._
+import java.time.Duration
+
 import app.api.ScalaJsApi.GetInitialDataResponse
 import app.api.ScalaJsApiClient
 import hydro.models.modification.EntityModification
 import hydro.models.modification.EntityType
 import app.models.modification.EntityTypes
 import hydro.common.JsLoggingUtils.logFailure
+import hydro.common.time.Clock
 import hydro.models.Entity
 import hydro.models.access.SingletonKey.NextUpdateTokenKey
 import hydro.models.access.SingletonKey.VersionKey
+import hydro.models.access.SingletonKey.DbStatusKey
+import hydro.models.access.SingletonKey.DbStatus
 import org.scalajs.dom.console
 
 import scala.async.Async.async
@@ -186,53 +192,105 @@ final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
 }
 
 object HybridRemoteDatabaseProxy {
-  private val localDatabaseAndEntityVersion = "hydro-2.4"
+  private val localDatabaseAndEntityVersion = "hydro-2.5"
 
   def create(localDatabase: Future[LocalDatabase])(
       implicit apiClient: ScalaJsApiClient,
+      clock: Clock,
       getInitialDataResponse: GetInitialDataResponse,
       hydroPushSocketClientFactory: HydroPushSocketClientFactory,
       entitySyncLogic: EntitySyncLogic,
   ): HybridRemoteDatabaseProxy = {
     new HybridRemoteDatabaseProxy(new FutureLocalDatabase(async {
       val db = await(localDatabase)
-      val populateIsNecessary = {
-        if (await(db.isEmpty)) {
-          console.log(s"  Database is empty")
-          true
-        } else {
-          val dbVersionOption = await(db.getSingletonValue(VersionKey))
-          if (dbVersionOption != Some(localDatabaseAndEntityVersion)) {
-            console.log(
-              s"  The database version ${dbVersionOption getOrElse "<empty>"} no longer matches " +
-                s"the newest version $localDatabaseAndEntityVersion")
-            true
-          } else {
-            console.log(s"  Database was loaded successfully. No need for a full repopulation.")
-            false
-          }
-        }
+
+      val hasMandateToResetAndPopulate = await(maybeGetMandateToResetAndPopulate(db))
+      if (hasMandateToResetAndPopulate) {
+        resetAndPopulateDb(db)
       }
-      if (populateIsNecessary) {
-        console.log(s"  Populating database...")
 
-        // Reset database
-        await(db.resetAndInitialize())
+      await(dbStatusBecomesReadyFuture())
 
-        // Set version
-        await(db.setSingletonValue(VersionKey, localDatabaseAndEntityVersion))
-
-        // Populate with entities
-        val nextUpdateToken = await(entitySyncLogic.populateLocalDatabaseAndGetUpdateToken(db))
-        await(db.setSingletonValue(NextUpdateTokenKey, nextUpdateToken))
-
-        // Await because we don't want to save unpersisted modifications that can be made as soon as
-        // the database becomes valid.
-        await(db.save())
-        console.log(s"  Population done!")
-      }
       db
     }))
   }
 
+  private def maybeGetMandateToResetAndPopulate(db: LocalDatabase)(implicit clock: Clock): Future[Boolean] =
+    async {
+      val emptyAndMandateToPopulate =
+        await(db.addSingletonValueIfNew(DbStatusKey, DbStatus.Populating(startTime = clock.nowInstant)))
+
+      if (emptyAndMandateToPopulate) {
+        console.log(s"  Database is empty and this instance will populate it")
+        true
+      } else {
+        await(db.getSingletonValue(DbStatusKey)) match {
+          case None =>
+            throw new AssertionError(
+              "This should be impossible because a mandate should result in an" +
+                "atomic reset and re-addition of the DbStatusKey")
+
+          case Some(DbStatus.Populating(startTime))
+              if startTime < (clock.nowInstant - Duration.ofMinutes(5)) =>
+            console.log(
+              s"  Database was being reset and populated by another instance, but that instance started " +
+                s"more than 30 minutes ago, which probably means it stopped prematurely")
+            // Heuristic: This is unsafe because another instance may be refilling the database at this point.
+            // However, it is deemed unlikely enough to fix.
+            await(db.resetAndInitialize())
+            await(maybeGetMandateToResetAndPopulate(db))
+
+          case Some(DbStatus.Populating(_)) =>
+            console.log(
+              s"  Database is being reset and populated by another instance, will wait for that one to finish")
+            false
+
+          case Some(DbStatus.Ready) =>
+            val dbVersionOption = await(db.getSingletonValue(VersionKey))
+            if (dbVersionOption != Some(localDatabaseAndEntityVersion)) {
+              console.log(
+                s"  The database version ${dbVersionOption getOrElse "<empty>"} no longer matches " +
+                  s"the newest version $localDatabaseAndEntityVersion")
+              true
+            } else {
+              console.log(s"  Database was loaded successfully. No need for a full repopulation.")
+              false
+            }
+        }
+      }
+    }
+
+  private def resetAndPopulateDb(db: LocalDatabase)(
+      implicit apiClient: ScalaJsApiClient,
+      clock: Clock,
+      entitySyncLogic: EntitySyncLogic,
+  ): Future[Unit] = async {
+    console.log(s"  Populating database...")
+
+    // Reset database
+    await(
+      db.resetAndInitialize(
+        alsoSetSingleton = (DbStatusKey, DbStatus.Populating(startTime = clock.nowInstant))))
+
+    // Set version
+    await(db.setSingletonValue(VersionKey, localDatabaseAndEntityVersion))
+
+    // Populate with entities
+    val nextUpdateToken = await(entitySyncLogic.populateLocalDatabaseAndGetUpdateToken(db))
+    await(db.setSingletonValue(NextUpdateTokenKey, nextUpdateToken))
+
+    // Mark as ready, this has to be done before the save because otherwise it's not stored if the
+    // worker is killed.
+    await(db.setSingletonValue(DbStatusKey, DbStatus.Ready))
+
+    // Await because we don't want to save unpersisted modifications that can be made as soon as
+    // the database becomes valid.
+    await(db.save())
+
+    console.log(s"  Population done!")
+  }
+
+  private def dbStatusBecomesReadyFuture(): Future[Unit] = async {
+    // TODO
+  }
 }
