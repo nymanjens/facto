@@ -46,7 +46,11 @@ final class FakeLocalDatabase extends LocalDatabase {
     _pendingModifications --= modifications
     true
   }
-  override def setSingletonValue[V](key: SingletonKey[V], value: V) = {
+  override def setSingletonValue[V](
+      key: SingletonKey[V],
+      value: V,
+      abortUnlessExistingValueEquals: V = null,
+  ) = {
     singletonMap.put(key, key.valueConverter.toJs(value))
     Future.successful(true)
   }

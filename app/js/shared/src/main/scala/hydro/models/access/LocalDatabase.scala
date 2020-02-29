@@ -39,9 +39,15 @@ trait LocalDatabase {
     *
     * Note that this change is not automatically persisted in the browser's storage (call `save()` to do this).
     *
+    * @param abortUnlessExistingValueEquals If set, the given value must be the existing value, otherwise
+    *                                       the operation is aborted.
     * @return true if the in memory database changed as a result of this method
     */
-  def setSingletonValue[V](key: SingletonKey[V], value: V): Future[Boolean]
+  def setSingletonValue[V](
+      key: SingletonKey[V],
+      value: V,
+      abortUnlessExistingValueEquals: V = null,
+  ): Future[Boolean]
 
   /**
     * Sets the given singleton value in memory if the key was not already associated with a value. If the

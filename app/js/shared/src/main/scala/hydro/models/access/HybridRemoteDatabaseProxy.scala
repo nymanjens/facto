@@ -204,12 +204,20 @@ object HybridRemoteDatabaseProxy {
     new HybridRemoteDatabaseProxy(new FutureLocalDatabase(async {
       val db = await(localDatabase)
 
-      val hasMandateToResetAndPopulate = await(maybeGetMandateToResetAndPopulate(db))
-      if (hasMandateToResetAndPopulate) {
-        resetAndPopulateDb(db)
-      }
+      // Start with attempt to get mandate, because this could be the only instance and thus responsible for
+      // checking the database existence and version
+      var dbStatusReadyResult: DbStatusBecomesReadyResult =
+        DbStatusBecomesReadyResult.ThisInstanceIsResponsibleForDbReset
 
-      await(dbStatusBecomesReadyFuture())
+      while (dbStatusReadyResult == DbStatusBecomesReadyResult.ThisInstanceIsResponsibleForDbReset) {
+        val hasMandateToResetAndPopulate = await(maybeGetMandateToResetAndPopulate(db))
+        if (hasMandateToResetAndPopulate) {
+          await(resetAndPopulateDb(db))
+          dbStatusReadyResult = DbStatusBecomesReadyResult.DbReady
+        } else {
+          dbStatusReadyResult = await(dbStatusBecomesReadyFuture())
+        }
+      }
 
       db
     }))
@@ -230,28 +238,47 @@ object HybridRemoteDatabaseProxy {
               "This should be impossible because a mandate should result in an" +
                 "atomic reset and re-addition of the DbStatusKey")
 
-          case Some(DbStatus.Populating(startTime))
-              if startTime < (clock.nowInstant - Duration.ofMinutes(5)) =>
+          case existingValue @ Some(DbStatus.Populating(startTime))
+              if startTime < (clock.nowInstant - Duration.ofMinutes(8)) =>
             console.log(
               s"  Database was being reset and populated by another instance, but that instance started " +
                 s"more than 30 minutes ago, which probably means it stopped prematurely")
-            // Heuristic: This is unsafe because another instance may be refilling the database at this point.
-            // However, it is deemed unlikely enough to fix.
-            await(db.resetAndInitialize())
-            await(maybeGetMandateToResetAndPopulate(db))
+            val mandateToFix = await(
+              db.setSingletonValue(
+                DbStatusKey,
+                DbStatus.Populating(startTime = clock.nowInstant),
+                abortUnlessExistingValueEquals = existingValue.get))
+            if (mandateToFix) {
+              console.log("  Got mandate to fix this")
+              true
+            } else {
+              console.log("  Other instance got mandate to fix this")
+              false
+            }
 
           case Some(DbStatus.Populating(_)) =>
             console.log(
               s"  Database is being reset and populated by another instance, will wait for that one to finish")
             false
 
-          case Some(DbStatus.Ready) =>
+          case existingValue @ Some(DbStatus.Ready) =>
             val dbVersionOption = await(db.getSingletonValue(VersionKey))
             if (dbVersionOption != Some(localDatabaseAndEntityVersion)) {
               console.log(
                 s"  The database version ${dbVersionOption getOrElse "<empty>"} no longer matches " +
                   s"the newest version $localDatabaseAndEntityVersion")
-              true
+              val mandateToFix = await(
+                db.setSingletonValue(
+                  DbStatusKey,
+                  DbStatus.Populating(startTime = clock.nowInstant),
+                  abortUnlessExistingValueEquals = existingValue.get))
+              if (mandateToFix) {
+                console.log("  Got mandate to fix this")
+                true
+              } else {
+                console.log("  Other instance got mandate to fix this")
+                false
+              }
             } else {
               console.log(s"  Database was loaded successfully. No need for a full repopulation.")
               false
@@ -290,7 +317,14 @@ object HybridRemoteDatabaseProxy {
     console.log(s"  Population done!")
   }
 
-  private def dbStatusBecomesReadyFuture(): Future[Unit] = async {
+  private def dbStatusBecomesReadyFuture(): Future[DbStatusBecomesReadyResult] = async {
     // TODO
+    DbStatusBecomesReadyResult.DbReady
+  }
+
+  sealed trait DbStatusBecomesReadyResult
+  object DbStatusBecomesReadyResult {
+    object DbReady extends DbStatusBecomesReadyResult
+    object ThisInstanceIsResponsibleForDbReset extends DbStatusBecomesReadyResult
   }
 }

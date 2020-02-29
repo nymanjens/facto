@@ -198,7 +198,11 @@ private final class LocalDatabaseImpl(
               .Remove(pendingModificationsCollectionName, Scala2Js.toJs(ModificationWithId(modification).id)))
     }
 
-  override def setSingletonValue[V](key: SingletonKey[V], value: V) = serializingWriteQueue.schedule {
+  override def setSingletonValue[V](
+      key: SingletonKey[V],
+      value: V,
+      abortUnlessExistingValueEquals: V = null,
+  ) = serializingWriteQueue.schedule {
     implicit val converter = key.valueConverter
     val singletonObj = Scala2Js.toJsMap(Singleton(key = key.name, value = Scala2Js.toJs(value)))
     webWorker.applyWriteOperations(
