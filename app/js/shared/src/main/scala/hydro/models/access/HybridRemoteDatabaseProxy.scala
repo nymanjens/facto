@@ -1,5 +1,6 @@
 package hydro.models.access
 
+import scala.concurrent.duration._
 import hydro.common.time.JavaTimeImplicits._
 import java.time.Duration
 
@@ -23,6 +24,7 @@ import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.concurrent.Promise
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.scalajs.js
 
 /** RemoteDatabaseProxy implementation that queries the remote back-end directly until LocalDatabase is ready */
 final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
@@ -193,6 +195,7 @@ final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
 
 object HybridRemoteDatabaseProxy {
   private val localDatabaseAndEntityVersion = "hydro-2.5"
+  private val maxTimeToPopulate: Duration = Duration.ofMinutes(8)
 
   def create(localDatabase: Future[LocalDatabase])(
       implicit apiClient: ScalaJsApiClient,
@@ -215,7 +218,7 @@ object HybridRemoteDatabaseProxy {
           await(resetAndPopulateDb(db))
           dbStatusReadyResult = DbStatusBecomesReadyResult.DbReady
         } else {
-          dbStatusReadyResult = await(dbStatusBecomesReadyFuture())
+          dbStatusReadyResult = await(dbStatusBecomesReadyFuture(db))
         }
       }
 
@@ -238,8 +241,8 @@ object HybridRemoteDatabaseProxy {
               "This should be impossible because a mandate should result in an" +
                 "atomic reset and re-addition of the DbStatusKey")
 
-          case existingValue @ Some(DbStatus.Populating(startTime))
-              if startTime < (clock.nowInstant - Duration.ofMinutes(8)) =>
+          case Some(existingValue @ DbStatus.Populating(startTime))
+              if startTime < (clock.nowInstant - maxTimeToPopulate) =>
             console.log(
               s"  Database was being reset and populated by another instance, but that instance started " +
                 s"more than 30 minutes ago, which probably means it stopped prematurely")
@@ -247,7 +250,7 @@ object HybridRemoteDatabaseProxy {
               db.setSingletonValue(
                 DbStatusKey,
                 DbStatus.Populating(startTime = clock.nowInstant),
-                abortUnlessExistingValueEquals = existingValue.get))
+                abortUnlessExistingValueEquals = existingValue))
             if (mandateToFix) {
               console.log("  Got mandate to fix this")
               true
@@ -261,7 +264,7 @@ object HybridRemoteDatabaseProxy {
               s"  Database is being reset and populated by another instance, will wait for that one to finish")
             false
 
-          case existingValue @ Some(DbStatus.Ready) =>
+          case Some(existingValue @ DbStatus.Ready) =>
             val dbVersionOption = await(db.getSingletonValue(VersionKey))
             if (dbVersionOption != Some(localDatabaseAndEntityVersion)) {
               console.log(
@@ -271,7 +274,7 @@ object HybridRemoteDatabaseProxy {
                 db.setSingletonValue(
                   DbStatusKey,
                   DbStatus.Populating(startTime = clock.nowInstant),
-                  abortUnlessExistingValueEquals = existingValue.get))
+                  abortUnlessExistingValueEquals = existingValue))
               if (mandateToFix) {
                 console.log("  Got mandate to fix this")
                 true
@@ -317,9 +320,28 @@ object HybridRemoteDatabaseProxy {
     console.log(s"  Population done!")
   }
 
-  private def dbStatusBecomesReadyFuture(): Future[DbStatusBecomesReadyResult] = async {
-    // TODO
-    DbStatusBecomesReadyResult.DbReady
+  private def dbStatusBecomesReadyFuture(db: LocalDatabase)(
+      implicit clock: Clock,
+  ): Future[DbStatusBecomesReadyResult] = {
+    val promise: Promise[DbStatusBecomesReadyResult] = Promise()
+
+    def singleIteration(): Unit = {
+      db.getSingletonValue(DbStatusKey).foreach {
+        case None =>
+          throw new AssertionError(
+            "This should be impossible because a mandate should result in an" +
+              "atomic reset and re-addition of the DbStatusKey")
+        case Some(DbStatus.Populating(startTime)) if startTime < (clock.nowInstant - maxTimeToPopulate) =>
+          promise.success(DbStatusBecomesReadyResult.ThisInstanceIsResponsibleForDbReset)
+        case Some(DbStatus.Populating(_)) =>
+          js.timers.setTimeout(1.milliseconds)(singleIteration())
+        case Some(DbStatus.Ready) =>
+          promise.success(DbStatusBecomesReadyResult.DbReady)
+      }
+    }
+    singleIteration()
+
+    promise.future
   }
 
   sealed trait DbStatusBecomesReadyResult
