@@ -72,6 +72,25 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
           await(db.getSingletonValue(NextUpdateTokenKey)).get ==> testUpdateToken
         }
       },
+      manualTest("setSingletonValue(abortUnlessExistingValueEquals)") {
+        async {
+          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          await(db.getSingletonValue(VersionKey)).isDefined ==> false
+
+          await(db.setSingletonValue(VersionKey, "abc", abortUnlessExistingValueEquals = "")) ==> false
+          await(db.getSingletonValue(VersionKey)).isDefined ==> false
+
+          await(db.setSingletonValue(VersionKey, "abc")) ==> true
+          await(db.setSingletonValue(VersionKey, "abc", abortUnlessExistingValueEquals = "abc")) ==> false
+          await(db.getSingletonValue(VersionKey)).get ==> "abc"
+
+          await(db.setSingletonValue(VersionKey, "def", abortUnlessExistingValueEquals = "ghi")) ==> false
+          await(db.getSingletonValue(VersionKey)).get ==> "abc"
+
+          await(db.setSingletonValue(VersionKey, "def", abortUnlessExistingValueEquals = "abc")) ==> true
+          await(db.getSingletonValue(VersionKey)).get ==> "def"
+        }
+      },
       manualTest("addSingletonValueIfNew") {
         async {
           val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))

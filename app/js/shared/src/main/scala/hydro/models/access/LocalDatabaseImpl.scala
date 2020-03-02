@@ -211,14 +211,25 @@ private final class LocalDatabaseImpl(
       abortUnlessExistingValueEquals: V = null,
   ) = serializingWriteQueue.schedule {
     implicit val converter = key.valueConverter
-    val singletonObj = Scala2Js.toJsMap(Singleton(key = key.name, value = Scala2Js.toJs(value)))
+    def singletonObj(v: V): js.Dictionary[js.Any] = {
+      Scala2Js.toJsMap(Singleton(key = key.name, value = Scala2Js.toJs(v)))
+    }
+
     webWorker.applyWriteOperations(
-      Seq(
-        addSingletonCollectionOperation,
-        // Either the Update or Insert will be a no-op, depending on whether this value already exists
-        WriteOperation.Update(singletonsCollectionName, singletonObj),
-        WriteOperation.Insert(singletonsCollectionName, singletonObj)
-      ))
+      if (abortUnlessExistingValueEquals != null)
+        Seq(
+          WriteOperation.Update(
+            singletonsCollectionName,
+            singletonObj(value),
+            abortUnlessExistingValueEquals = singletonObj(abortUnlessExistingValueEquals),
+          ))
+      else
+        Seq(
+          addSingletonCollectionOperation,
+          // Either the Update or Insert will be a no-op, depending on whether this value already exists
+          WriteOperation.Update(singletonsCollectionName, singletonObj(value)),
+          WriteOperation.Insert(singletonsCollectionName, singletonObj(value))
+        ))
   }
 
   override def addSingletonValueIfNew[V](key: SingletonKey[V], value: V) = {

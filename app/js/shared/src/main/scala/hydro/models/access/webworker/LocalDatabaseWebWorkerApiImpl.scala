@@ -19,9 +19,11 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
   private val nameToLokiDbs: mutable.Map[String, Future[LokiJs.Database]] = mutable.Map()
   private var currentLokiDb: LokiJs.Database = _
 
-  override def createIfNecessary(dbName: String,
-                                 inMemory: Boolean,
-                                 separateDbPerCollection: Boolean): Future[Unit] = {
+  override def createIfNecessary(
+      dbName: String,
+      inMemory: Boolean,
+      separateDbPerCollection: Boolean,
+  ): Future[Unit] = {
     require(!separateDbPerCollection)
 
     if (!nameToLokiDbs.contains(dbName)) {
@@ -93,12 +95,17 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
             }
           }
 
-        case Update(collectionName, updatedObj) =>
+        case Update(collectionName, updatedObj, abortUnlessExistingValueEquals) =>
           Future.successful {
             val lokiCollection = getCollection(collectionName)
             findById(lokiCollection, updatedObj("id")) match {
               case None => false
-              case Some(e) if e.filterKeys(k => k != "meta" && k != "$loki").toMap == updatedObj.toMap =>
+              case Some(e) if areEqualEntities(fromLoki = e, fromClient = updatedObj) =>
+                false
+              case Some(e)
+                  if abortUnlessExistingValueEquals.isDefined &&
+                    !areEqualEntities(fromLoki = e, fromClient = abortUnlessExistingValueEquals.get) =>
+                // Abort
                 false
               case Some(e) =>
                 lokiCollection.findAndRemove(
@@ -164,5 +171,12 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
     currentLokiDb
       .getCollection(collectionName)
       .getOrElse(throw new IllegalArgumentException(s"Could not get collection $collectionName"))
+  }
+
+  private def areEqualEntities(
+      fromLoki: js.Dictionary[js.Any],
+      fromClient: js.Dictionary[js.Any],
+  ): Boolean = {
+    fromLoki.filterKeys(k => k != "meta" && k != "$loki").toMap == fromClient.toMap
   }
 }

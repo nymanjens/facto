@@ -20,9 +20,11 @@ private[webworker] final class LocalDatabaseWebWorkerApiMultiDbImpl extends Loca
   private var inMemory: Boolean = _
   private var changedCollectionsSinceLastSave: mutable.Set[String] = mutable.Set[String]()
 
-  override def createIfNecessary(dbName: String,
-                                 inMemory: Boolean,
-                                 separateDbPerCollection: Boolean): Future[Unit] = {
+  override def createIfNecessary(
+      dbName: String,
+      inMemory: Boolean,
+      separateDbPerCollection: Boolean,
+  ): Future[Unit] = {
     require(separateDbPerCollection)
 
     this.dbNamePrefix = dbName
@@ -52,7 +54,8 @@ private[webworker] final class LocalDatabaseWebWorkerApiMultiDbImpl extends Loca
     combineFuturesInOrder[WriteOperation](
       operations, {
         case operation @ Insert(collectionName, _) => performOperationOnCollection(operation, collectionName)
-        case operation @ Update(collectionName, _) => performOperationOnCollection(operation, collectionName)
+        case operation @ Update(collectionName, _, _) =>
+          performOperationOnCollection(operation, collectionName)
         case operation @ Remove(collectionName, _) => performOperationOnCollection(operation, collectionName)
         case operation @ AddCollection(collectionName, _, _) =>
           performOperationOnCollection(operation, collectionName)

@@ -23,8 +23,9 @@ private[webworker] object LocalDatabaseWebWorkerApiConverters {
     override def toJs(operation: WriteOperation) = {
       operation match {
         case Insert(collectionName, obj) => js.Array[js.Any](insertNumber, collectionName, obj)
-        case Update(collectionName, obj) => js.Array[js.Any](updateNumber, collectionName, obj)
-        case Remove(collectionName, id)  => js.Array[js.Any](removeNumber, collectionName, id)
+        case Update(collectionName, obj, abortUnlessExistingValueEquals) =>
+          js.Array[js.Any](updateNumber, collectionName, obj, abortUnlessExistingValueEquals)
+        case Remove(collectionName, id) => js.Array[js.Any](removeNumber, collectionName, id)
         case AddCollection(collectionName, uniqueIndices, indices) =>
           js.Array[js.Any](addCollectionNumber, collectionName, uniqueIndices.toJSArray, indices.toJSArray)
         case RemoveCollection(collectionName) => js.Array[js.Any](removeCollectionNumber, collectionName)
@@ -39,8 +40,12 @@ private[webworker] object LocalDatabaseWebWorkerApiConverters {
       (firstElement, seq) match {
         case (`insertNumber`, Seq(_, collectionName, obj)) =>
           Insert(collectionName.asInstanceOf[String], obj.asInstanceOf[js.Dictionary[js.Any]])
-        case (`updateNumber`, Seq(_, collectionName, obj)) =>
-          Update(collectionName.asInstanceOf[String], obj.asInstanceOf[js.Dictionary[js.Any]])
+        case (`updateNumber`, Seq(_, collectionName, obj, abortUnlessExistingValueEquals)) =>
+          Update(
+            collectionName.asInstanceOf[String],
+            obj.asInstanceOf[js.Dictionary[js.Any]],
+            abortUnlessExistingValueEquals.asInstanceOf[js.UndefOr[js.Dictionary[js.Any]]],
+          )
         case (`removeNumber`, Seq(_, collectionName, id)) =>
           Remove(collectionName.asInstanceOf[String], id)
         case (`addCollectionNumber`, Seq(_, collectionName, uniqueIndices, indices)) =>
