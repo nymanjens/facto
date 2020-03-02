@@ -135,6 +135,13 @@ private final class LocalDatabaseImpl(
   // **************** Setters ****************//
   override def applyModifications(modifications: Seq[EntityModification]) = serializingWriteQueue.schedule {
     async {
+      // Note: This implementation is not atomic (unlike all the other methods in this class, thanks to
+      // LokiJS being sync and the shared worker only having one thread). This may lead to broken assumptions
+      // in clients. However, it was kept here because:
+      // - Fixing it is quite complicated
+      // - It is assumed to be very unlikely that the same entity is simultaneously modified in
+      //   two different instances
+
       val updatesToExistingEntityMap: Map[EntityModification, Option[Entity]] =
         await(
           Future.sequence(
