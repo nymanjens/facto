@@ -87,25 +87,6 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
           await(db.getSingletonValue(VersionKey)).get ==> "abc"
         }
       },
-      manualTest("save") {
-        async {
-          val user1 = createUser()
-
-          val db =
-            await(LocalDatabaseImpl.createStoredForTests(separateDbPerCollection = separateDbPerCollection))
-          await(db.resetAndInitialize())
-          await(db.addAll(Seq(user1)))
-          await(db.setSingletonValue(VersionKey, "testVersion"))
-
-          await(db.save())
-          await(db.setSingletonValue(VersionKey, "otherTestVersion"))
-
-          val otherDb =
-            await(LocalDatabaseImpl.createStoredForTests(separateDbPerCollection = separateDbPerCollection))
-          await(DbResultSet.fromExecutor(otherDb.queryExecutor[User]()).data()) ==> Seq(user1)
-          await(otherDb.getSingletonValue(VersionKey)).get ==> "testVersion"
-        }
-      },
       manualTest("resetAndInitialize") {
         async {
           val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
