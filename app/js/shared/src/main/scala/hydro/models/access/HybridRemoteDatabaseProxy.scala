@@ -334,7 +334,7 @@ object HybridRemoteDatabaseProxy {
         case Some(DbStatus.Populating(startTime)) if startTime < (clock.nowInstant - maxTimeToPopulate) =>
           promise.success(DbStatusBecomesReadyResult.ThisInstanceIsResponsibleForDbReset)
         case Some(DbStatus.Populating(_)) =>
-          js.timers.setTimeout(1.milliseconds)(singleIteration())
+          js.timers.setTimeout(500.milliseconds)(singleIteration())
         case Some(DbStatus.Ready) =>
           promise.success(DbStatusBecomesReadyResult.DbReady)
       }
