@@ -258,19 +258,20 @@ private[transactiongroupform] final class TransactionPanel(
             defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawTransactionDate),
             startWithDefault = props.defaultValues.isEmpty,
             delegateRefFactory = TextInput.ref _
-          ) { extraProps =>
-            TextInput(
-              ref = extraProps.ref,
-              name = "transaction-date",
-              label = i18n("app.date-payed"),
-              defaultValue = mappedExtraProps.defaultValue,
-              required = true,
-              showErrorMessage = props.showErrorMessages,
-              additionalValidator = mappedExtraProps.additionalValidator,
-              inputClasses = extraProps.inputClasses,
-              focusOnMount = props.focusOnMount,
-              arrowHandler = TextInput.ArrowHandler.DateHandler,
-            )
+          ) {
+            extraProps =>
+              TextInput(
+                ref = extraProps.ref,
+                name = "transaction-date",
+                label = i18n("app.date-payed"),
+                defaultValue = mappedExtraProps.defaultValue,
+                required = true,
+                showErrorMessage = props.showErrorMessages,
+                additionalValidator = mappedExtraProps.additionalValidator,
+                inputClasses = extraProps.inputClasses,
+                focusOnMount = props.focusOnMount,
+                arrowHandler = TextInput.ArrowHandler.DateHandler,
+              )
           }
         },
         dateMappedInput(
@@ -290,18 +291,19 @@ private[transactiongroupform] final class TransactionPanel(
                 defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawConsumedDate),
                 startWithDefault = props.defaultValues.isEmpty,
                 delegateRefFactory = TextInput.ref _
-              ) { extraProps2 =>
-                TextInput(
-                  ref = extraProps2.ref,
-                  name = "date-consumed",
-                  label = i18n("app.date-consumed"),
-                  defaultValue = mappedExtraProps.defaultValue,
-                  required = true,
-                  showErrorMessage = props.showErrorMessages,
-                  additionalValidator = mappedExtraProps.additionalValidator,
-                  inputClasses = extraProps1.inputClasses ++ extraProps2.inputClasses,
-                  arrowHandler = TextInput.ArrowHandler.DateHandler,
-                )
+              ) {
+                extraProps2 =>
+                  TextInput(
+                    ref = extraProps2.ref,
+                    name = "date-consumed",
+                    label = i18n("app.date-consumed"),
+                    defaultValue = mappedExtraProps.defaultValue,
+                    required = true,
+                    showErrorMessage = props.showErrorMessages,
+                    additionalValidator = mappedExtraProps.additionalValidator,
+                    inputClasses = extraProps1.inputClasses ++ extraProps2.inputClasses,
+                    arrowHandler = TextInput.ArrowHandler.DateHandler,
+                  )
               }
           }
         },

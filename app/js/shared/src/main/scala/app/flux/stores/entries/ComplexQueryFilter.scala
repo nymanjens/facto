@@ -54,7 +54,8 @@ private[stores] final class ComplexQueryFilter(
       QueryFilterPair.or(
         QueryFilterPair.containsIgnoreCase(ModelFields.Transaction.description, singlePartWithoutNegation),
         QueryFilterPair.seqContains(ModelFields.Transaction.tags, singlePartWithoutNegation),
-        QueryFilterPair.containsIgnoreCase(ModelFields.Transaction.detailDescription, singlePartWithoutNegation),
+        QueryFilterPair
+          .containsIgnoreCase(ModelFields.Transaction.detailDescription, singlePartWithoutNegation),
       )
     }
 
