@@ -24,7 +24,9 @@ import scala.util.Success
 
 object LocalDatabaseWebWorkerScript {
 
-  private var apiImpl: LocalDatabaseWebWorkerApi = _
+  private val separateDbPerCollectionToApiImplMap: mutable.Map[Boolean, LocalDatabaseWebWorkerApi] =
+    mutable.Map()
+  private var currentApiImpl: LocalDatabaseWebWorkerApi = _
   private val connectedPorts: mutable.Buffer[MessagePort] = mutable.Buffer()
 
   def run(): Unit = {
@@ -63,25 +65,29 @@ object LocalDatabaseWebWorkerScript {
     (methodNum, args.toVector) match {
       case (MethodNumbers.createIfNecessary, Seq(dbName, inMemory, separateDbPerCollectionObj)) =>
         val separateDbPerCollection = separateDbPerCollectionObj.asInstanceOf[Boolean]
-        apiImpl =
-          if (separateDbPerCollection) new LocalDatabaseWebWorkerApiMultiDbImpl()
-          else new LocalDatabaseWebWorkerApiImpl()
-        apiImpl
+        if (!separateDbPerCollectionToApiImplMap.contains(separateDbPerCollection)) {
+          separateDbPerCollectionToApiImplMap.update(
+            separateDbPerCollection,
+            if (separateDbPerCollection) new LocalDatabaseWebWorkerApiMultiDbImpl()
+            else new LocalDatabaseWebWorkerApiImpl())
+        }
+        currentApiImpl = separateDbPerCollectionToApiImplMap(separateDbPerCollection)
+        currentApiImpl
           .createIfNecessary(
             dbName.asInstanceOf[String],
             inMemory.asInstanceOf[Boolean],
             separateDbPerCollection)
           .map(_ => js.undefined)
       case (MethodNumbers.executeDataQuery, Seq(lokiQuery)) =>
-        apiImpl
+        currentApiImpl
           .executeDataQuery(Scala2Js.toScala[LokiQuery](lokiQuery))
           .map(r => r.toJSArray)
       case (MethodNumbers.executeCountQuery, Seq(lokiQuery)) =>
-        apiImpl
+        currentApiImpl
           .executeCountQuery(Scala2Js.toScala[LokiQuery](lokiQuery))
           .map(r => r)
       case (MethodNumbers.applyWriteOperations, Seq(operations)) =>
-        apiImpl
+        currentApiImpl
           .applyWriteOperations(Scala2Js.toScala[Seq[WriteOperation]](operations))
           .map(r => r)
     }
