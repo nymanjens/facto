@@ -7,7 +7,7 @@ import hydro.scala2js.Scala2Js
 import hydro.scala2js.StandardConverters._
 import org.scalajs
 import org.scalajs.dom
-import org.scalajs.dom.raw.Worker
+import org.scalajs.dom.experimental.sharedworkers.SharedWorker
 
 import scala.async.Async.async
 import scala.async.Async.await
@@ -23,10 +23,13 @@ import scala.scalajs.js.JSConverters._
 private[webworker] final class LocalDatabaseWebWorkerApiStub extends LocalDatabaseWebWorkerApi {
 
   private val responseMessagePromises: mutable.Buffer[Promise[js.Any]] = mutable.Buffer()
-  private val worker: Worker = initializeWebWorker()
+  private val worker: SharedWorker = initializeWebWorker()
 
   override def createIfNecessary(dbName: String, inMemory: Boolean, separateDbPerCollection: Boolean) = {
-    sendAndReceive(MethodNumbers.createIfNecessary, Seq(dbName, inMemory, separateDbPerCollection), timeout = 10.seconds)
+    sendAndReceive(
+      MethodNumbers.createIfNecessary,
+      Seq(dbName, inMemory, separateDbPerCollection),
+      timeout = 10.seconds)
       .map(_ => (): Unit)
   }
 
@@ -58,7 +61,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiStub extends LocalDataba
     }
 
     logExceptions {
-      worker.postMessage(js.Array(methodNum, args.toJSArray))
+      worker.port.postMessage(js.Array(methodNum, args.toJSArray))
     }
 
     js.timers.setTimeout(timeout) {
@@ -75,10 +78,10 @@ private[webworker] final class LocalDatabaseWebWorkerApiStub extends LocalDataba
     await(thisMessagePromise.future)
   }
 
-  private def initializeWebWorker(): Worker = {
-    val worker = new Worker("/localDatabaseWebWorker.js")
-    worker.onmessage = (e: js.Any) => {
-      val data = e.asInstanceOf[dom.MessageEvent].data.asInstanceOf[js.Any]
+  private def initializeWebWorker(): SharedWorker = {
+    val worker = new SharedWorker("/localDatabaseWebWorker.js")
+    worker.port.onmessage = (event: dom.MessageEvent) => {
+      val data = event.data.asInstanceOf[js.Any]
 
       responseMessagePromises.headOption match {
         case Some(promise) if promise.isCompleted =>
@@ -94,6 +97,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiStub extends LocalDataba
           throw new AssertionError(s"Received unexpected message: $data")
       }
     }
+    worker.port.start()
     worker
   }
 }

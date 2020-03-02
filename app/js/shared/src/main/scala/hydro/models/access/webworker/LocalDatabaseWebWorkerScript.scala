@@ -1,6 +1,5 @@
 package hydro.models.access.webworker
 
-import hydro.jsfacades.WebWorker
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.LokiQuery
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.MethodNumbers
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
@@ -9,8 +8,13 @@ import hydro.scala2js.Scala2Js
 import hydro.scala2js.StandardConverters._
 import org.scalajs.dom
 import org.scalajs.dom.console
+import org.scalajs.dom.MessagePort
+import org.scalajs.dom.experimental.serviceworkers.ExtendableMessageEvent
+import org.scalajs.dom.experimental.sharedworkers.SharedWorkerGlobalScope
+import org.scalajs.dom.raw.MessageEvent
 
 import scala.collection.immutable.Seq
+import scala.collection.mutable
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
@@ -21,12 +25,21 @@ import scala.util.Success
 object LocalDatabaseWebWorkerScript {
 
   private var apiImpl: LocalDatabaseWebWorkerApi = _
+  private val connectedPorts: mutable.Buffer[MessagePort] = mutable.Buffer()
 
   def run(): Unit = {
-    WebWorker.addEventListener("message", onMessage _)
+    SharedWorkerGlobalScope.self.addEventListener(
+      "connect",
+      (connectEvent: ExtendableMessageEvent) => {
+        val port: MessagePort = connectEvent.ports(0)
+        connectedPorts.append(port)
+        port.addEventListener("message", onMessage(senderPort = port))
+        port.start()
+      }
+    )
   }
 
-  private def onMessage(msg: dom.MessageEvent) = {
+  private def onMessage(senderPort: MessagePort)(msg: dom.MessageEvent) = {
     val data = msg.data.asInstanceOf[js.Array[js.Any]].toVector
 
     // Flatmap dummy future so that exceptions being thrown my method invocation and in returned future
@@ -38,11 +51,11 @@ object LocalDatabaseWebWorkerScript {
       }
     } onComplete {
       case Success(result) =>
-        WebWorker.postMessage(result)
+        senderPort.postMessage(result)
       case Failure(e) =>
         console.log(s"  LocalDatabaseWebWorkerScript: Caught exception: $e")
         e.printStackTrace()
-        WebWorker.postMessage("FAILED") // signal to caller that call failed
+        senderPort.postMessage("FAILED") // signal to caller that call failed
     }
   }
 
