@@ -245,7 +245,7 @@ object HybridRemoteDatabaseProxy {
               if startTime < (clock.nowInstant - maxTimeToPopulate) =>
             console.log(
               s"  Database was being reset and populated by another instance, but that instance started " +
-                s"more than 30 minutes ago, which probably means it stopped prematurely")
+                s"more than $maxTimeToPopulate ago, which probably means it stopped prematurely")
             val mandateToFix = await(
               db.setSingletonValue(
                 DbStatusKey,
