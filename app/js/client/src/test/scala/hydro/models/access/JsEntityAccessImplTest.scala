@@ -91,20 +91,22 @@ object JsEntityAccessImplTest extends TestSuite {
           Seq(testModificationA),
           waitUntilQueryReflectsModifications = true,
         )
-        localDatabasePromise.success(fakeLocalDatabase)
 
         val entityAccess1 = {
-          implicit val remoteDatabaseProxy = HybridRemoteDatabaseProxy.create(localDatabasePromise.future)
+          implicit val remoteDatabaseProxy =
+            HybridRemoteDatabaseProxy.create(Future.successful(fakeLocalDatabase))
           await(remoteDatabaseProxy.localDatabaseReadyFuture)
           new JsEntityAccessImpl()
         }
+
         fakeApiClient.persistEntityModifications(
           Seq(testModificationB),
           waitUntilQueryReflectsModifications = true,
         )
 
         val entityAccess2 = {
-          implicit val remoteDatabaseProxy = HybridRemoteDatabaseProxy.create(localDatabasePromise.future)
+          implicit val remoteDatabaseProxy =
+            HybridRemoteDatabaseProxy.create(Future.successful(fakeLocalDatabase))
           await(remoteDatabaseProxy.localDatabaseReadyFuture)
           new JsEntityAccessImpl()
         }

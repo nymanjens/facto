@@ -54,12 +54,12 @@ object SingletonKey {
 
       override def toScala(value: js.Any) = {
         val array = value.asInstanceOf[js.Array[js.Any]]
-        val typeNumber = Scala2Js.toScala[Int](array.shift())
+        val typeNumber = Scala2Js.toScala[Int](array(0))
 
         array.toVector match {
-          case Vector(startTime) if typeNumber == populatingNumber =>
+          case Vector(_, startTime) if typeNumber == populatingNumber =>
             DbStatus.Populating(Scala2Js.toScala[Instant](startTime))
-          case Vector() if typeNumber == readyNumber =>
+          case Vector(_) if typeNumber == readyNumber =>
             DbStatus.Ready
         }
       }

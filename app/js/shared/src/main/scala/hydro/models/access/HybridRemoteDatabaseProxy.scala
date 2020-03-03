@@ -328,9 +328,9 @@ object HybridRemoteDatabaseProxy {
     def singleIteration(): Unit = {
       db.getSingletonValue(DbStatusKey).foreach {
         case None =>
-          throw new AssertionError(
-            "This should be impossible because a mandate should result in an" +
-              "atomic reset and re-addition of the DbStatusKey")
+          promise.failure(
+            new AssertionError("This should be impossible because a mandate should result in an" +
+              "atomic reset and re-addition of the DbStatusKey"))
         case Some(DbStatus.Populating(startTime)) if startTime < (clock.nowInstant - maxTimeToPopulate) =>
           promise.success(DbStatusBecomesReadyResult.ThisInstanceIsResponsibleForDbReset)
         case Some(DbStatus.Populating(_)) =>
