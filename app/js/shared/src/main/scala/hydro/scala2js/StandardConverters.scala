@@ -230,19 +230,19 @@ object StandardConverters {
     override def toScala(value: js.Any) = {
       def internal[E <: Entity] = {
         val array = value.asInstanceOf[js.Array[js.Any]]
-        implicit val entityType = Scala2Js.toScala[EntityType.any](array.shift()).asInstanceOf[EntityType[E]]
-        val modificationTypeNumber = Scala2Js.toScala[Int](array.shift())
+        implicit val entityType = Scala2Js.toScala[EntityType.any](array(0)).asInstanceOf[EntityType[E]]
+        val modificationTypeNumber = Scala2Js.toScala[Int](array(1))
 
         array.toVector match {
-          case Vector(entity) if modificationTypeNumber == addNumber =>
+          case Vector(_, _, entity) if modificationTypeNumber == addNumber =>
             EntityModification.Add(Scala2Js.toScala[E](entity))
-          case Vector(entity) if modificationTypeNumber == updateNumber =>
+          case Vector(_, _, entity) if modificationTypeNumber == updateNumber =>
             def updateInternal[E2 <: UpdatableEntity] = {
               implicit val castEntityType = entityType.asInstanceOf[EntityType[E2]]
               EntityModification.Update(Scala2Js.toScala[E2](entity))
             }
             updateInternal
-          case Vector(entityId) if modificationTypeNumber == removeNumber =>
+          case Vector(_, _, entityId) if modificationTypeNumber == removeNumber =>
             EntityModification.Remove(Scala2Js.toScala[Long](entityId))(entityType)
         }
       }
