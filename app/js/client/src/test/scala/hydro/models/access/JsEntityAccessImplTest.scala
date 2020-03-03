@@ -7,6 +7,7 @@ import app.models.modification.EntityTypes
 import hydro.models.modification.EntityModification
 import hydro.models.modification.EntityType
 import app.models.user.User
+import hydro.common.testing.Awaiter
 import hydro.common.testing.ModificationsBuffer
 import hydro.common.testing.FakeLocalDatabase
 import hydro.common.time.Clock
@@ -81,7 +82,7 @@ object JsEntityAccessImplTest extends TestSuite {
           waitUntilQueryReflectsModifications = true,
         )
         localDatabasePromise.success(fakeLocalDatabase)
-        await(remoteDatabaseProxy.localDatabaseReadyFuture)
+        await(Awaiter.expectEventually.complete(remoteDatabaseProxy.localDatabaseReadyFuture))
 
         fakeLocalDatabase.allModifications ==> Seq(testModificationB)
       }
@@ -95,7 +96,7 @@ object JsEntityAccessImplTest extends TestSuite {
         val entityAccess1 = {
           implicit val remoteDatabaseProxy =
             HybridRemoteDatabaseProxy.create(Future.successful(fakeLocalDatabase))
-          await(remoteDatabaseProxy.localDatabaseReadyFuture)
+          await(Awaiter.expectEventually.complete(remoteDatabaseProxy.localDatabaseReadyFuture))
           new JsEntityAccessImpl()
         }
 
@@ -107,7 +108,7 @@ object JsEntityAccessImplTest extends TestSuite {
         val entityAccess2 = {
           implicit val remoteDatabaseProxy =
             HybridRemoteDatabaseProxy.create(Future.successful(fakeLocalDatabase))
-          await(remoteDatabaseProxy.localDatabaseReadyFuture)
+          await(Awaiter.expectEventually.complete(remoteDatabaseProxy.localDatabaseReadyFuture))
           new JsEntityAccessImpl()
         }
 
