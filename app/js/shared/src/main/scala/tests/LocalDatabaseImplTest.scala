@@ -131,6 +131,17 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
           await(db.isEmpty) ==> true
         }
       },
+      manualTest("resetAndInitialize(alsoSetSingleton)") {
+        async {
+          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          await(db.addAll(Seq(createUser())))
+          db.setSingletonValue(VersionKey, "testVersion")
+
+          await(db.resetAndInitialize(alsoSetSingleton = (VersionKey, "abc")))
+
+          await(db.getSingletonValue(VersionKey)) ==> Some("abc")
+        }
+      },
       manualTest("addAll") {
         async {
           val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
