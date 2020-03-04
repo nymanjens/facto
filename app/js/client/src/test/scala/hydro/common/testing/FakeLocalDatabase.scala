@@ -32,24 +32,38 @@ final class FakeLocalDatabase extends LocalDatabase {
   // **************** Setters ****************//
   override def applyModifications(modifications: Seq[EntityModification]) = {
     modificationsBuffer.addModifications(modifications)
-    Future.successful((): Unit)
+    Future.successful(true)
   }
   override def addAll[E <: Entity: EntityType](entities: Seq[E]) = {
     modificationsBuffer.addEntities(entities)
-    Future.successful((): Unit)
+    Future.successful(true)
   }
   override def addPendingModifications(modifications: Seq[EntityModification]) = Future.successful {
     _pendingModifications ++= modifications
+    true
   }
   override def removePendingModifications(modifications: Seq[EntityModification]) = Future.successful {
     _pendingModifications --= modifications
+    true
   }
-  override def setSingletonValue[V](key: SingletonKey[V], value: V) = {
+  override def setSingletonValue[V](
+      key: SingletonKey[V],
+      value: V,
+      abortUnlessExistingValueEquals: V = null,
+  ) = {
     singletonMap.put(key, key.valueConverter.toJs(value))
-    Future.successful((): Unit)
+    Future.successful(true)
+  }
+  override def addSingletonValueIfNew[V](key: SingletonKey[V], value: V) = {
+    if (singletonMap contains key) {
+      Future.successful(false)
+    } else {
+      singletonMap.put(key, key.valueConverter.toJs(value))
+      Future.successful(true)
+    }
   }
   override def save() = Future.successful((): Unit)
-  override def resetAndInitialize() = {
+  override def resetAndInitialize[V](alsoSetSingleton: (SingletonKey[V], V) = null) = {
     modificationsBuffer.clear()
     singletonMap.clear()
     Future.successful((): Unit)

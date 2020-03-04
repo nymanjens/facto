@@ -13,11 +13,19 @@ import scala.scalajs.js
 object LocalDatabaseWebWorkerApiConvertersTest extends TestSuite {
 
   private val testObj: js.Dictionary[js.Any] = js.Dictionary("a" -> 1, "b" -> "2")
+  private val testObj2: js.Dictionary[js.Any] = js.Dictionary("a" -> 3, "b" -> "4")
 
   override def tests = TestSuite {
     "WriteOperationConverter" - {
       "Insert" - { testForwardAndBackward[WriteOperation](WriteOperation.Insert("test", testObj)) }
-      "Update" - { testForwardAndBackward[WriteOperation](WriteOperation.Update("test", testObj)) }
+      "Update" - {
+        testForwardAndBackward[WriteOperation](
+          WriteOperation.Update("test", testObj, abortUnlessExistingValueEquals = js.undefined))
+      }
+      "Update with abortUnlessExistingValueEquals" - {
+        testForwardAndBackward[WriteOperation](
+          WriteOperation.Update("test", testObj, abortUnlessExistingValueEquals = testObj2))
+      }
       "Remove" - { testForwardAndBackward[WriteOperation](WriteOperation.Remove("test", "192837")) }
       "Clear" - { testForwardAndBackward[WriteOperation](WriteOperation.RemoveCollection("test")) }
       "AddCollection" - {

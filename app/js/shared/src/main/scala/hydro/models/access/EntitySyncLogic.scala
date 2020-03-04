@@ -64,6 +64,7 @@ object EntitySyncLogic {
         db: LocalDatabase,
     ): Future[Unit] = {
       db.applyModifications(entityModifications.filter(entityTypes contains _.entityType))
+        .map(_ => (): Unit)
     }
   }
 }

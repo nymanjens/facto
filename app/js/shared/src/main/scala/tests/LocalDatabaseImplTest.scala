@@ -14,6 +14,8 @@ import hydro.models.access.LocalDatabaseImpl
 import hydro.models.access.SingletonKey.NextUpdateTokenKey
 import hydro.models.access.SingletonKey.VersionKey
 import hydro.models.UpdatableEntity.LastUpdateTime
+import hydro.models.access.SingletonKey.DbStatus
+import hydro.models.access.SingletonKey.DbStatusKey
 import tests.ManualTests.ManualTest
 import tests.ManualTests.ManualTestSuite
 
@@ -26,6 +28,10 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 // Note that this is a manual test because the Rhino javascript engine used for tests
 // is incompatible with Loki.
 private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
+
+  private val testDbStatusA = DbStatus.Populating(testInstantA)
+  private val testDbStatusB = DbStatus.Populating(testInstantB)
+  private val testDbStatusC = DbStatus.Populating(testInstantC)
 
   implicit private val webWorker = new hydro.models.access.webworker.Module().localDatabaseWebWorkerApiStub
   implicit private val secondaryIndexFunction = app.models.access.Module.secondaryIndexFunction
@@ -57,32 +63,61 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
       manualTest("setSingletonValue") {
         async {
           val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
-          await(db.getSingletonValue(VersionKey)).isDefined ==> false
+          await(db.getSingletonValue(DbStatusKey)).isDefined ==> false
 
-          await(db.setSingletonValue(VersionKey, "abc"))
-          await(db.getSingletonValue(VersionKey)).get ==> "abc"
+          await(db.setSingletonValue(DbStatusKey, testDbStatusA)) ==> true
+          await(db.getSingletonValue(DbStatusKey)).get ==> testDbStatusA
 
-          await(db.setSingletonValue(NextUpdateTokenKey, testUpdateToken))
+          await(db.setSingletonValue(DbStatusKey, testDbStatusA)) ==> false
+          await(db.getSingletonValue(DbStatusKey)).get ==> testDbStatusA
+
+          await(db.setSingletonValue(DbStatusKey, testDbStatusB)) ==> true
+          await(db.getSingletonValue(DbStatusKey)).get ==> testDbStatusB
+
+          await(db.setSingletonValue(NextUpdateTokenKey, testUpdateToken)) ==> true
           await(db.getSingletonValue(NextUpdateTokenKey)).get ==> testUpdateToken
         }
       },
-      manualTest("save") {
+      manualTest("setSingletonValue(abortUnlessExistingValueEquals)") {
         async {
-          val user1 = createUser()
+          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          await(db.getSingletonValue(DbStatusKey)).isDefined ==> false
 
-          val db =
-            await(LocalDatabaseImpl.createStoredForTests(separateDbPerCollection = separateDbPerCollection))
-          await(db.resetAndInitialize())
-          await(db.addAll(Seq(user1)))
-          await(db.setSingletonValue(VersionKey, "testVersion"))
+          await(
+            db.setSingletonValue(DbStatusKey, testDbStatusA, abortUnlessExistingValueEquals = testDbStatusC)
+          ) ==> false
+          await(db.getSingletonValue(DbStatusKey)).isDefined ==> false
 
-          await(db.save())
-          await(db.setSingletonValue(VersionKey, "otherTestVersion"))
+          await(db.setSingletonValue(DbStatusKey, testDbStatusA)) ==> true
+          await(
+            db.setSingletonValue(DbStatusKey, testDbStatusA, abortUnlessExistingValueEquals = testDbStatusA),
+          ) ==> false
+          await(db.getSingletonValue(DbStatusKey)).get ==> testDbStatusA
 
-          val otherDb =
-            await(LocalDatabaseImpl.createStoredForTests(separateDbPerCollection = separateDbPerCollection))
-          await(DbResultSet.fromExecutor(otherDb.queryExecutor[User]()).data()) ==> Seq(user1)
-          await(otherDb.getSingletonValue(VersionKey)).get ==> "testVersion"
+          await(
+            db.setSingletonValue(DbStatusKey, testDbStatusB, abortUnlessExistingValueEquals = testDbStatusC)
+          ) ==> false
+          await(db.getSingletonValue(DbStatusKey)).get ==> testDbStatusA
+
+          await(
+            db.setSingletonValue(DbStatusKey, testDbStatusB, abortUnlessExistingValueEquals = testDbStatusA)
+          ) ==> true
+          await(db.getSingletonValue(DbStatusKey)).get ==> testDbStatusB
+        }
+      },
+      manualTest("addSingletonValueIfNew") {
+        async {
+          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          await(db.getSingletonValue(VersionKey)).isDefined ==> false
+
+          await(db.addSingletonValueIfNew(VersionKey, "abc")) ==> true
+          await(db.getSingletonValue(VersionKey)).get ==> "abc"
+
+          await(db.addSingletonValueIfNew(VersionKey, "abc")) ==> false
+          await(db.getSingletonValue(VersionKey)).get ==> "abc"
+
+          await(db.addSingletonValueIfNew(VersionKey, "def")) ==> false
+          await(db.getSingletonValue(VersionKey)).get ==> "abc"
         }
       },
       manualTest("resetAndInitialize") {
@@ -96,13 +131,25 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
           await(db.isEmpty) ==> true
         }
       },
+      manualTest("resetAndInitialize(alsoSetSingleton)") {
+        async {
+          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          await(db.addAll(Seq(createUser())))
+          db.setSingletonValue(VersionKey, "testVersion")
+
+          await(db.resetAndInitialize(alsoSetSingleton = (VersionKey, "abc")))
+
+          await(db.getSingletonValue(VersionKey)) ==> Some("abc")
+        }
+      },
       manualTest("addAll") {
         async {
           val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
-          await(db.addAll(Seq(testUserRedacted)))
-          await(db.addAll(Seq(testTransactionWithId)))
-          await(db.addAll(Seq(testBalanceCheckWithId)))
-          await(db.addAll(Seq(testExchangeRateMeasurementWithId)))
+          await(db.addAll(Seq(testUserRedacted))) ==> true
+          await(db.addAll(Seq(testUserRedacted))) ==> false
+          await(db.addAll(Seq(testTransactionWithId))) ==> true
+          await(db.addAll(Seq(testBalanceCheckWithId))) ==> true
+          await(db.addAll(Seq(testExchangeRateMeasurementWithId))) ==> true
 
           await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()) ==> Seq(testUserRedacted)
           await(DbResultSet.fromExecutor(db.queryExecutor[Transaction]()).data()) ==> Seq(
@@ -120,8 +167,8 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
           val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
           val userWithSameIdA = user1.copy(name = "name A")
           val userWithSameIdB = user1.copy(name = "name B")
-          await(db.addAll(Seq(user1, userWithSameIdA)))
-          await(db.addAll(Seq(user1, userWithSameIdB)))
+          await(db.addAll(Seq(user1, userWithSameIdA))) ==> true
+          await(db.addAll(Seq(user1, userWithSameIdB))) ==> false
 
           await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()) ==> Seq(user1)
         }
@@ -130,8 +177,8 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
         async {
           val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
 
-          await(db.addPendingModifications(Seq(testModificationA, testModificationB)))
-          await(db.addPendingModifications(Seq(testModificationB)))
+          await(db.addPendingModifications(Seq(testModificationA, testModificationB))) ==> true
+          await(db.addPendingModifications(Seq(testModificationB))) ==> false
 
           await(db.pendingModifications()) ==> Seq(testModificationA, testModificationB)
         }
@@ -142,7 +189,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
           await(db.addPendingModifications(Seq(testModificationA)))
           await(db.addPendingModifications(Seq(testModificationB)))
 
-          await(db.removePendingModifications(Seq(testModificationA)))
+          await(db.removePendingModifications(Seq(testModificationA))) ==> true
 
           await(db.pendingModifications()) ==> Seq(testModificationB)
         }
@@ -152,7 +199,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
           val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
           await(db.addPendingModifications(Seq(testModificationA)))
 
-          await(db.removePendingModifications(Seq(testModificationB)))
+          await(db.removePendingModifications(Seq(testModificationB))) ==> false
 
           await(db.pendingModifications()) ==> Seq(testModificationA)
         }
@@ -162,9 +209,11 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
           val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
           val user1 = createUser()
 
-          await(db.applyModifications(Seq(EntityModification.Add(user1))))
+          await(db.applyModifications(Seq(EntityModification.Add(user1)))) ==> true
 
           await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()) ==> Seq(user1)
+
+          await(db.applyModifications(Seq(EntityModification.Add(user1)))) ==> false
         }
       },
       manualTest("applyModifications: Update: Full update") {
@@ -177,7 +226,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
           await(db.addAll(Seq(user1, user2, user3)))
 
           val user2Update = EntityModification.createUpdateAllFields(user2.copy(name = "other name"))
-          await(db.applyModifications(Seq(user2Update)))
+          await(db.applyModifications(Seq(user2Update))) ==> true
 
           await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()).toSet ==>
             Set(user1, user2Update.updatedEntity, user3)
@@ -198,8 +247,8 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
               fieldMask = Seq(ModelFields.User.loginName))
           val user2UpdateB = EntityModification
             .createUpdate(user2.copy(name = "name2_update"), fieldMask = Seq(ModelFields.User.name))
-          await(db.applyModifications(Seq(user2UpdateA)))
-          await(db.applyModifications(Seq(user2UpdateB)))
+          await(db.applyModifications(Seq(user2UpdateA))) ==> true
+          await(db.applyModifications(Seq(user2UpdateB))) ==> true
 
           await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()).toSet ==>
             Set(
@@ -224,7 +273,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
           await(db.addAll(Seq(user1, user3)))
 
           val user2Update = EntityModification.createUpdateAllFields(user2)
-          await(db.applyModifications(Seq(user2Update)))
+          await(db.applyModifications(Seq(user2Update))) ==> false
 
           await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()).toSet ==> Set(user1, user3)
         }
@@ -235,7 +284,8 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
           val user1 = createUser()
           await(db.addAll(Seq(user1)))
 
-          await(db.applyModifications(Seq(EntityModification.createRemove(user1))))
+          await(db.applyModifications(Seq(EntityModification.createRemove(user1)))) ==> true
+          await(db.applyModifications(Seq(EntityModification.createRemove(user1)))) ==> false
 
           await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()) ==> Seq()
         }
@@ -255,7 +305,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
                 EntityModification.Add(user1),
                 EntityModification.Add(updatedUser1),
                 EntityModification.Add(user2)
-              )))
+              ))) ==> true
 
           await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()).toSet ==> Set(user1, user2)
         }
@@ -277,7 +327,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
                 EntityModification.Update(updatedUserB),
                 EntityModification.Update(updatedUserA),
                 EntityModification.Update(updatedUserB),
-              )))
+              ))) ==> true
 
           await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()) ==> Seq(updatedUserB)
         }
@@ -296,7 +346,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
                 EntityModification.createRemove(user2),
                 EntityModification.createRemove(user2),
                 EntityModification.createRemove(user3)
-              )))
+              ))) ==> true
 
           await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()) ==> Seq(user1)
         }

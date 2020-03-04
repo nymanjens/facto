@@ -135,9 +135,16 @@ private final class LocalDatabaseImpl(
   // **************** Setters ****************//
   override def applyModifications(modifications: Seq[EntityModification]) = serializingWriteQueue.schedule {
     async {
-      val updatesToExistingEntityMap: Map[EntityModification, Option[Entity]] = await(
-        Future
-          .sequence(
+      // Note: This implementation is not atomic (unlike all the other methods in this class, thanks to
+      // LokiJS being sync and the shared worker only having one thread). This may lead to broken assumptions
+      // in clients. However, it was kept here because:
+      // - Fixing it is quite complicated
+      // - It is assumed to be very unlikely that the same entity is simultaneously modified in
+      //   two different instances
+
+      val updatesToExistingEntityMap: Map[EntityModification, Option[Entity]] =
+        await(
+          Future.sequence(
             modifications
               .filter(m => m.isInstanceOf[EntityModification.Update[_]])
               .map { m =>
@@ -149,7 +156,7 @@ private final class LocalDatabaseImpl(
                 inner(m.entityType)
               })).toMap
 
-      webWorker.applyWriteOperations(modifications flatMap {
+      await(webWorker.applyWriteOperations(modifications flatMap {
         case modification @ EntityModification.Add(entity) =>
           implicit val entityType = modification.entityType
           Some(WriteOperation.Insert(collectionNameOf(entityType), Scala2Js.toJsMap(entity)))
@@ -170,7 +177,7 @@ private final class LocalDatabaseImpl(
         case modification @ EntityModification.Remove(id) =>
           val entityType = modification.entityType
           Some(WriteOperation.Remove(collectionNameOf(entityType), Scala2Js.toJs(id)))
-      })
+      }))
     }
   }
 
@@ -180,7 +187,7 @@ private final class LocalDatabaseImpl(
       for (entity <- entities) yield WriteOperation.Insert(collectionName, Scala2Js.toJsMap(entity)))
   }
 
-  override def addPendingModifications(modifications: Seq[EntityModification]): Future[Unit] =
+  override def addPendingModifications(modifications: Seq[EntityModification]) =
     serializingWriteQueue.schedule {
       webWorker.applyWriteOperations(
         for (modification <- modifications)
@@ -189,7 +196,7 @@ private final class LocalDatabaseImpl(
               .Insert(pendingModificationsCollectionName, Scala2Js.toJsMap(ModificationWithId(modification))))
     }
 
-  override def removePendingModifications(modifications: Seq[EntityModification]): Future[Unit] =
+  override def removePendingModifications(modifications: Seq[EntityModification]) =
     serializingWriteQueue.schedule {
       webWorker.applyWriteOperations(
         for (modification <- modifications)
@@ -198,42 +205,82 @@ private final class LocalDatabaseImpl(
               .Remove(pendingModificationsCollectionName, Scala2Js.toJs(ModificationWithId(modification).id)))
     }
 
-  override def setSingletonValue[V](key: SingletonKey[V], value: V) = serializingWriteQueue.schedule {
+  override def setSingletonValue[V](
+      key: SingletonKey[V],
+      value: V,
+      abortUnlessExistingValueEquals: V = null,
+  ) = serializingWriteQueue.schedule {
     implicit val converter = key.valueConverter
+    def singletonObj(v: V): js.Dictionary[js.Any] = {
+      Scala2Js.toJsMap(Singleton(key = key.name, value = Scala2Js.toJs(v)))
+    }
+
+    webWorker.applyWriteOperations(
+      if (abortUnlessExistingValueEquals != null)
+        Seq(
+          WriteOperation.Update(
+            singletonsCollectionName,
+            singletonObj(value),
+            abortUnlessExistingValueEquals = singletonObj(abortUnlessExistingValueEquals),
+          ))
+      else
+        Seq(
+          addSingletonCollectionOperation,
+          // Either the Update or Insert will be a no-op, depending on whether this value already exists
+          WriteOperation.Update(singletonsCollectionName, singletonObj(value)),
+          WriteOperation.Insert(singletonsCollectionName, singletonObj(value))
+        ))
+  }
+
+  override def addSingletonValueIfNew[V](key: SingletonKey[V], value: V) = {
+    implicit val converter = key.valueConverter
+    val singletonObj = Scala2Js.toJsMap(Singleton(key = key.name, value = Scala2Js.toJs(value)))
     webWorker.applyWriteOperations(
       Seq(
-        WriteOperation.Remove(singletonsCollectionName, id = key.name),
-        WriteOperation.Insert(
-          singletonsCollectionName,
-          Scala2Js.toJsMap(Singleton(key = key.name, value = Scala2Js.toJs(value))))
+        addSingletonCollectionOperation,
+        WriteOperation.Insert(singletonsCollectionName, singletonObj)
       ))
   }
 
-  override def save(): Future[Unit] = serializingWriteQueue.schedule {
-    webWorker.applyWriteOperations(Seq(WriteOperation.SaveDatabase))
+  override def save() = serializingWriteQueue.schedule {
+    webWorker
+      .applyWriteOperations(Seq(WriteOperation.SaveDatabase))
+      .map(_ => (): Unit)
   }
 
-  override def resetAndInitialize(): Future[Unit] = serializingWriteQueue.schedule {
-    async {
-      console.log("  Resetting database...")
-      await(
-        webWorker.applyWriteOperations(
-          Seq() ++
-            (for (collectionName <- allCollectionNames)
-              yield WriteOperation.RemoveCollection(collectionName)) ++
-            (for (entityType <- EntityTypes.all)
-              yield
-                WriteOperation.AddCollection(
-                  collectionNameOf(entityType),
-                  uniqueIndices = Seq("id"),
-                  indices = secondaryIndexFunction(entityType).map(_.name))) :+
-            WriteOperation
-              .AddCollection(singletonsCollectionName, uniqueIndices = Seq("id"), indices = Seq()) :+
-            WriteOperation
-              .AddCollection(pendingModificationsCollectionName, uniqueIndices = Seq("id"), indices = Seq())))
-      console.log("  Resetting database done.")
+  override def resetAndInitialize[V](alsoSetSingleton: (SingletonKey[V], V) = null): Future[Unit] =
+    serializingWriteQueue.schedule {
+      async {
+        //console.log("  Resetting database...")
+        await(
+          webWorker
+            .applyWriteOperations(
+              Seq() ++
+                (for (collectionName <- allCollectionNames)
+                  yield WriteOperation.RemoveCollection(collectionName)) ++
+                (for (entityType <- EntityTypes.all)
+                  yield
+                    WriteOperation.AddCollection(
+                      collectionNameOf(entityType),
+                      uniqueIndices = Seq("id"),
+                      indices = secondaryIndexFunction(entityType).map(_.name))) ++
+                Seq(
+                  addSingletonCollectionOperation,
+                  WriteOperation.AddCollection(
+                    pendingModificationsCollectionName,
+                    uniqueIndices = Seq("id"),
+                    indices = Seq())
+                ) ++
+                Option(alsoSetSingleton).map {
+                  case (key, value) =>
+                    implicit val converter = key.valueConverter
+                    val singletonObj =
+                      Scala2Js.toJsMap(Singleton(key = key.name, value = Scala2Js.toJs(value)))
+                    WriteOperation.Insert(singletonsCollectionName, singletonObj)
+                }))
+        //console.log("  Resetting database done.")
+      }
     }
-  }
 
   // **************** Private helper methods ****************//
   private def collectionNameOf(entityType: EntityType.any): String = s"entities_${entityType.name}"
@@ -241,6 +288,10 @@ private final class LocalDatabaseImpl(
   private val pendingModificationsCollectionName = "pendingModifications"
   private def allCollectionNames: Seq[String] =
     EntityTypes.all.map(collectionNameOf) :+ singletonsCollectionName :+ pendingModificationsCollectionName
+
+  private def addSingletonCollectionOperation: WriteOperation = {
+    WriteOperation.AddCollection(singletonsCollectionName, uniqueIndices = Seq("id"), indices = Seq())
+  }
 }
 
 object LocalDatabaseImpl {
@@ -251,7 +302,10 @@ object LocalDatabaseImpl {
   ): Future[LocalDatabase] = async {
     await(
       webWorker
-        .create(dbName = "hydro-db", inMemory = false, separateDbPerCollection = separateDbPerCollection))
+        .createIfNecessary(
+          dbName = "hydro-db",
+          inMemory = false,
+          separateDbPerCollection = separateDbPerCollection))
     new LocalDatabaseImpl()
   }
 
@@ -261,7 +315,10 @@ object LocalDatabaseImpl {
   ): Future[LocalDatabase] = async {
     await(
       webWorker
-        .create(dbName = "test-db", inMemory = false, separateDbPerCollection = separateDbPerCollection))
+        .createIfNecessary(
+          dbName = "test-db",
+          inMemory = false,
+          separateDbPerCollection = separateDbPerCollection))
     new LocalDatabaseImpl()
   }
 
@@ -272,7 +329,10 @@ object LocalDatabaseImpl {
     async {
       await(
         webWorker
-          .create(dbName = "hydro-db", inMemory = true, separateDbPerCollection = separateDbPerCollection))
+          .createIfNecessary(
+            dbName = "test-in-memory-db",
+            inMemory = true,
+            separateDbPerCollection = separateDbPerCollection))
       new LocalDatabaseImpl()
     }
 

@@ -102,5 +102,9 @@ object StandardConvertersTest extends TestSuite {
     val jsValue = Scala2Js.toJs[T](value)
     val generated = Scala2Js.toScala[T](jsValue)
     generated ==> value
+
+    // Test a second time, to check that `jsValue` is not mutated
+    val generated2 = Scala2Js.toScala[T](jsValue)
+    generated2 ==> value
   }
 }

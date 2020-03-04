@@ -52,6 +52,7 @@ class JsEntityAccessImpl()(
         waitUntilQueryReflectsModifications = false)
     }
 
+    // TODO(feat-SharedWorker): Move to SharedWorker
     // Send pending modifications whenever connection with the server is restored
     hydroPushSocketClientFactory.pushClientsAreOnline.registerListener { isOnline =>
       if (isOnline) {
