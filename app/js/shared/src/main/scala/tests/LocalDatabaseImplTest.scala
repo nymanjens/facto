@@ -14,6 +14,8 @@ import hydro.models.access.LocalDatabaseImpl
 import hydro.models.access.SingletonKey.NextUpdateTokenKey
 import hydro.models.access.SingletonKey.VersionKey
 import hydro.models.UpdatableEntity.LastUpdateTime
+import hydro.models.access.SingletonKey.DbStatus
+import hydro.models.access.SingletonKey.DbStatusKey
 import tests.ManualTests.ManualTest
 import tests.ManualTests.ManualTestSuite
 
@@ -26,6 +28,10 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 // Note that this is a manual test because the Rhino javascript engine used for tests
 // is incompatible with Loki.
 private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
+
+  private val testDbStatusA = DbStatus.Populating(testInstantA)
+  private val testDbStatusB = DbStatus.Populating(testInstantB)
+  private val testDbStatusC = DbStatus.Populating(testInstantC)
 
   implicit private val webWorker = new hydro.models.access.webworker.Module().localDatabaseWebWorkerApiStub
   implicit private val secondaryIndexFunction = app.models.access.Module.secondaryIndexFunction
@@ -57,16 +63,16 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
       manualTest("setSingletonValue") {
         async {
           val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
-          await(db.getSingletonValue(VersionKey)).isDefined ==> false
+          await(db.getSingletonValue(DbStatusKey)).isDefined ==> false
 
-          await(db.setSingletonValue(VersionKey, "abc")) ==> true
-          await(db.getSingletonValue(VersionKey)).get ==> "abc"
+          await(db.setSingletonValue(DbStatusKey, testDbStatusA)) ==> true
+          await(db.getSingletonValue(DbStatusKey)).get ==> testDbStatusA
 
-          await(db.setSingletonValue(VersionKey, "abc")) ==> false
-          await(db.getSingletonValue(VersionKey)).get ==> "abc"
+          await(db.setSingletonValue(DbStatusKey, testDbStatusA)) ==> false
+          await(db.getSingletonValue(DbStatusKey)).get ==> testDbStatusA
 
-          await(db.setSingletonValue(VersionKey, "def")) ==> true
-          await(db.getSingletonValue(VersionKey)).get ==> "def"
+          await(db.setSingletonValue(DbStatusKey, testDbStatusB)) ==> true
+          await(db.getSingletonValue(DbStatusKey)).get ==> testDbStatusB
 
           await(db.setSingletonValue(NextUpdateTokenKey, testUpdateToken)) ==> true
           await(db.getSingletonValue(NextUpdateTokenKey)).get ==> testUpdateToken
@@ -75,20 +81,28 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
       manualTest("setSingletonValue(abortUnlessExistingValueEquals)") {
         async {
           val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
-          await(db.getSingletonValue(VersionKey)).isDefined ==> false
+          await(db.getSingletonValue(DbStatusKey)).isDefined ==> false
 
-          await(db.setSingletonValue(VersionKey, "abc", abortUnlessExistingValueEquals = "")) ==> false
-          await(db.getSingletonValue(VersionKey)).isDefined ==> false
+          await(
+            db.setSingletonValue(DbStatusKey, testDbStatusA, abortUnlessExistingValueEquals = testDbStatusC)
+          ) ==> false
+          await(db.getSingletonValue(DbStatusKey)).isDefined ==> false
 
-          await(db.setSingletonValue(VersionKey, "abc")) ==> true
-          await(db.setSingletonValue(VersionKey, "abc", abortUnlessExistingValueEquals = "abc")) ==> false
-          await(db.getSingletonValue(VersionKey)).get ==> "abc"
+          await(db.setSingletonValue(DbStatusKey, testDbStatusA)) ==> true
+          await(
+            db.setSingletonValue(DbStatusKey, testDbStatusA, abortUnlessExistingValueEquals = testDbStatusA),
+          ) ==> false
+          await(db.getSingletonValue(DbStatusKey)).get ==> testDbStatusA
 
-          await(db.setSingletonValue(VersionKey, "def", abortUnlessExistingValueEquals = "ghi")) ==> false
-          await(db.getSingletonValue(VersionKey)).get ==> "abc"
+          await(
+            db.setSingletonValue(DbStatusKey, testDbStatusB, abortUnlessExistingValueEquals = testDbStatusC)
+          ) ==> false
+          await(db.getSingletonValue(DbStatusKey)).get ==> testDbStatusA
 
-          await(db.setSingletonValue(VersionKey, "def", abortUnlessExistingValueEquals = "abc")) ==> true
-          await(db.getSingletonValue(VersionKey)).get ==> "def"
+          await(
+            db.setSingletonValue(DbStatusKey, testDbStatusB, abortUnlessExistingValueEquals = testDbStatusA)
+          ) ==> true
+          await(db.getSingletonValue(DbStatusKey)).get ==> testDbStatusB
         }
       },
       manualTest("addSingletonValueIfNew") {
