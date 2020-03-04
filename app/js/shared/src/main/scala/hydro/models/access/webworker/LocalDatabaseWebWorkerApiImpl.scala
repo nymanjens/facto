@@ -1,5 +1,8 @@
 package hydro.models.access.webworker
 
+import hydro.common.Annotations.visibleForTesting
+
+import scala.scalajs.js.JSConverters._
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.async.Async.async
 import scala.async.Async.await
@@ -7,6 +10,7 @@ import hydro.jsfacades.LokiJs
 import hydro.jsfacades.LokiJs.FilterFactory.Operation
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation._
+import hydro.models.access.webworker.LocalDatabaseWebWorkerApiImpl.areEquivalentEntities
 import org.scalajs.dom.console
 
 import scala.collection.immutable.Seq
@@ -100,11 +104,11 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
             val lokiCollection = getCollection(collectionName)
             findById(lokiCollection, updatedObj("id")) match {
               case None => false
-              case Some(e) if areEqualEntities(fromLoki = e, fromClient = updatedObj) =>
+              case Some(e) if areEquivalentEntities(fromLoki = e, fromClient = updatedObj) =>
                 false
               case Some(e)
                   if abortUnlessExistingValueEquals.isDefined &&
-                    !areEqualEntities(fromLoki = e, fromClient = abortUnlessExistingValueEquals.get) =>
+                    !areEquivalentEntities(fromLoki = e, fromClient = abortUnlessExistingValueEquals.get) =>
                 // Abort
                 false
               case Some(e) =>
@@ -172,11 +176,36 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
       .getCollection(collectionName)
       .getOrElse(throw new IllegalArgumentException(s"Could not get collection $collectionName"))
   }
+}
+object LocalDatabaseWebWorkerApiImpl {
 
-  private def areEqualEntities(
+  @visibleForTesting
+  private[webworker] def areEquivalentEntities(
       fromLoki: js.Dictionary[js.Any],
       fromClient: js.Dictionary[js.Any],
   ): Boolean = {
-    fromLoki.filterKeys(k => k != "meta" && k != "$loki").toMap == fromClient.toMap
+    areEquivalent(fromLoki.filterKeys(k => k != "meta" && k != "$loki").toJSDictionary, fromClient)
+  }
+
+  private def areEquivalent(a: Any, b: Any): Boolean = {
+    def areEquivalentDictionaries(a: js.Dictionary[_], b: js.Dictionary[_]): Boolean = {
+      (a.keys == b.keys) && a.keys.forall { key =>
+        areEquivalent(a(key), b(key))
+      }
+    }
+    def areEquivalentArrays(a: js.Array[_], b: js.Array[_]): Boolean = {
+      (a.length == b.length) && (a zip b).forall {
+        case (elemA, elemB) => areEquivalent(elemA, elemB)
+      }
+    }
+
+    (a, b) match {
+      case (valueA: js.Array[_], valueB: js.Array[_]) => areEquivalentArrays(valueA, valueB)
+      case (valueA: js.Object, valueB: js.Object) =>
+        areEquivalentDictionaries(
+          valueA.asInstanceOf[js.Dictionary[_]],
+          valueB.asInstanceOf[js.Dictionary[_]])
+      case (valueA, valueB) => valueA == valueB
+    }
   }
 }
