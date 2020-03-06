@@ -1,5 +1,6 @@
 package hydro.models.access.webworker
 
+import hydro.common.JsLoggingUtils.logExceptions
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.LokiQuery
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.MethodNumbers
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
@@ -36,12 +37,14 @@ object LocalDatabaseWebWorkerScript {
       .getAllSupported()
       .setUpFromWorkerScript(new WorkerScriptLogic {
         override def onMessage(data: js.Any): Future[OnMessageResponse] = {
-          // Flatmap dummy future so that exceptions being thrown my method invocation and in returned future
+          // Flatmap dummy future so that exceptions being thrown by method invocation and in returned future
           // get treated the same
           Future.successful((): Unit).flatMap { _ =>
-            data match {
-              case Seq(methodNum, args) =>
-                executeMethod(methodNum.asInstanceOf[Int], args.asInstanceOf[js.Array[js.Any]])
+            logExceptions {
+              data.asInstanceOf[js.Array[_]].toVector match {
+                case Seq(methodNum, args) =>
+                  executeMethod(methodNum.asInstanceOf[Int], args.asInstanceOf[js.Array[js.Any]])
+              }
             }
           } map { result =>
             OnMessageResponse(response = result)
