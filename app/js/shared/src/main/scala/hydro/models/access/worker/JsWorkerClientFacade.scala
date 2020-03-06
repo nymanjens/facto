@@ -7,9 +7,7 @@ import hydro.models.access.worker.impl.SharedWorkerFacadeImpl
 import scala.scalajs.js
 
 trait JsWorkerClientFacade {
-
   def setUpClient(onMessage: js.Any => Unit): JsWorkerClient
-
 }
 object JsWorkerClientFacade {
 
