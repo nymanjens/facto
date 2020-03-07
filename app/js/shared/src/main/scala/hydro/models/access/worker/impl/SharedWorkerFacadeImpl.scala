@@ -14,7 +14,7 @@ import scala.collection.mutable
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 
-object SharedWorkerFacadeImpl extends JsWorkerClientFacade with JsWorkerServerFacade {
+private[worker] object SharedWorkerFacadeImpl extends JsWorkerClientFacade with JsWorkerServerFacade {
 
   override def setUpClient(scriptUrl: String, onMessage: js.Any => Unit): JsWorkerClient = {
     println("  Setting up SharedWorker client...")

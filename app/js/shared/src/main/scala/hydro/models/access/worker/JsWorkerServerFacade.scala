@@ -1,8 +1,10 @@
 package hydro.models.access.worker
 
 import hydro.models.access.worker.JsWorkerServerFacade.WorkerScriptLogic
+import hydro.models.access.worker.impl.DedicatedWorkerFacadeImpl
 import hydro.models.access.worker.impl.SharedWorkerFacadeImpl
 import org.scalajs.dom.experimental.sharedworkers.SharedWorkerGlobalScope
+import org.scalajs.dom.webworkers.DedicatedWorkerGlobalScope
 
 import scala.concurrent.Future
 import scala.scalajs.js
@@ -12,11 +14,13 @@ trait JsWorkerServerFacade {
 }
 object JsWorkerServerFacade {
 
-  def getAllSupported(): JsWorkerServerFacade = new JsWorkerServerFacade {
-    override def setUpFromWorkerScript(workerScriptLogic: WorkerScriptLogic): Unit = {
-      if (!js.isUndefined(SharedWorkerGlobalScope.self.onconnect)) {
-        SharedWorkerFacadeImpl.setUpFromWorkerScript(workerScriptLogic)
-      }
+  def getFromGlobalScope(): JsWorkerServerFacade = {
+    if (!js.isUndefined(SharedWorkerGlobalScope.self.onconnect)) {
+      SharedWorkerFacadeImpl
+    } else if (!js.isUndefined(DedicatedWorkerGlobalScope.self.onmessage)) {
+      DedicatedWorkerFacadeImpl
+    } else {
+      throw new AssertionError("This global scope supports none of the implemented workers")
     }
   }
 

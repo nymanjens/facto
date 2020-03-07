@@ -2,6 +2,7 @@ package hydro.models.access.worker
 
 import hydro.common.ScalaUtils.ifThenOption
 import hydro.models.access.worker.JsWorkerClientFacade.JsWorkerClient
+import hydro.models.access.worker.impl.DedicatedWorkerFacadeImpl
 import hydro.models.access.worker.impl.SharedWorkerFacadeImpl
 
 import scala.scalajs.js
@@ -16,7 +17,7 @@ object JsWorkerClientFacade {
       SharedWorkerFacadeImpl
     }
   }
-  def getWebWorker(): JsWorkerClientFacade = ???
+  def getDedicated(): JsWorkerClientFacade = DedicatedWorkerFacadeImpl
 
   trait JsWorkerClient {
     def postMessage(message: js.Any): Unit

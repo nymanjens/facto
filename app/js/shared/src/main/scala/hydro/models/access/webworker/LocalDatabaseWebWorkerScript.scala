@@ -34,7 +34,7 @@ object LocalDatabaseWebWorkerScript {
 
   def run(): Unit = {
     JsWorkerServerFacade
-      .getAllSupported()
+      .getFromGlobalScope()
       .setUpFromWorkerScript(new WorkerScriptLogic {
         override def onMessage(data: js.Any): Future[OnMessageResponse] = {
           // Flatmap dummy future so that exceptions being thrown by method invocation and in returned future

@@ -84,7 +84,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiStub extends LocalDataba
 
   private def initializeJsWorker(): JsWorkerClient = {
     val workerClientFacade =
-      JsWorkerClientFacade.getSharedIfSupported() getOrElse JsWorkerClientFacade.getWebWorker()
+      JsWorkerClientFacade.getSharedIfSupported() getOrElse JsWorkerClientFacade.getDedicated()
 
     workerClientFacade.setUpClient(
       scriptUrl = "/localDatabaseWebWorker.js",
