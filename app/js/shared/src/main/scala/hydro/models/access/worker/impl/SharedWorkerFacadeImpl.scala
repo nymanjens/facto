@@ -16,10 +16,10 @@ import scala.scalajs.js
 
 object SharedWorkerFacadeImpl extends JsWorkerClientFacade with JsWorkerServerFacade {
 
-  override def setUpClient(onMessage: js.Any => Unit): JsWorkerClient = {
+  override def setUpClient(scriptUrl: String, onMessage: js.Any => Unit): JsWorkerClient = {
     println("  Setting up SharedWorker client...")
 
-    val worker = new SharedWorker("/localDatabaseWebWorker.js")
+    val worker = new SharedWorker(scriptUrl)
     worker.port.onmessage = (event: dom.MessageEvent) => {
       onMessage(event.data.asInstanceOf[js.Any])
     }
