@@ -15,9 +15,9 @@ trait JsWorkerServerFacade {
 object JsWorkerServerFacade {
 
   def getFromGlobalScope(): JsWorkerServerFacade = {
-    if (!js.isUndefined(SharedWorkerGlobalScope.self.onconnect)) {
+    if (!js.isUndefined(js.Dynamic.global.onconnect)) {
       SharedWorkerFacadeImpl
-    } else if (!js.isUndefined(DedicatedWorkerGlobalScope.self.onmessage)) {
+    } else if (!js.isUndefined(js.Dynamic.global.onmessage)) {
       DedicatedWorkerFacadeImpl
     } else {
       throw new AssertionError("This global scope supports none of the implemented workers")
