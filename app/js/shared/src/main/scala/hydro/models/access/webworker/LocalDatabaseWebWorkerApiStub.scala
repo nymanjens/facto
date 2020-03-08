@@ -3,11 +3,11 @@ package hydro.models.access.webworker
 import hydro.common.JsLoggingUtils.logExceptions
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.MethodNumbers
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApiConverters._
+import hydro.models.access.worker.JsWorkerClientFacade
+import hydro.models.access.worker.JsWorkerClientFacade.JsWorkerClient
 import hydro.scala2js.Scala2Js
 import hydro.scala2js.StandardConverters._
 import org.scalajs
-import org.scalajs.dom
-import org.scalajs.dom.experimental.sharedworkers.SharedWorker
 
 import scala.async.Async.async
 import scala.async.Async.await
@@ -20,10 +20,12 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 
-private[webworker] final class LocalDatabaseWebWorkerApiStub extends LocalDatabaseWebWorkerApi {
+final class LocalDatabaseWebWorkerApiStub(
+    forceJsWorker: Option[JsWorkerClientFacade] = None,
+) extends LocalDatabaseWebWorkerApi {
 
   private val responseMessagePromises: mutable.Buffer[Promise[js.Any]] = mutable.Buffer()
-  private val worker: SharedWorker = initializeWebWorker()
+  private val worker: JsWorkerClient = initializeJsWorker()
 
   override def createIfNecessary(dbName: String, inMemory: Boolean, separateDbPerCollection: Boolean) = {
     sendAndReceive(
@@ -65,7 +67,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiStub extends LocalDataba
       }
 
       logExceptions {
-        worker.port.postMessage(js.Array(methodNum, args.toJSArray))
+        worker.postMessage(js.Array(methodNum, args.toJSArray))
       }
 
       js.timers.setTimeout(timeout) {
@@ -82,27 +84,31 @@ private[webworker] final class LocalDatabaseWebWorkerApiStub extends LocalDataba
       await(thisMessagePromise.future)
     }
 
-  private def initializeWebWorker(): SharedWorker = {
-    val worker = new SharedWorker("/localDatabaseWebWorker.js")
-    worker.port.onmessage = (event: dom.MessageEvent) => {
-      val data = event.data.asInstanceOf[js.Any]
+  private def initializeJsWorker(): JsWorkerClient = {
+    val workerClientFacade = (
+      forceJsWorker orElse
+        JsWorkerClientFacade.getSharedIfSupported() getOrElse
+        JsWorkerClientFacade.getDedicated()
+    )
 
-      responseMessagePromises.headOption match {
-        case Some(promise) if promise.isCompleted =>
-          throw new AssertionError(
-            "First promise in responseMessagePromises is completed. This is a bug unless this operation timed out.")
-        case Some(promise) =>
-          responseMessagePromises.remove(0)
-          if (data == Scala2Js.toJs("FAILED")) {
-            promise.failure(new IllegalStateException("WebWorker invocation failed"))
-          } else {
-            promise.success(data)
-          }
-        case None =>
-          throw new AssertionError(s"Received unexpected message: $data")
-      }
-    }
-    worker.port.start()
-    worker
+    workerClientFacade.setUpClient(
+      scriptUrl = "/localDatabaseWebWorker.js",
+      onMessage = data => {
+        responseMessagePromises.headOption match {
+          case Some(promise) if promise.isCompleted =>
+            throw new AssertionError(
+              "First promise in responseMessagePromises is completed. This is a bug unless this operation timed out.")
+          case Some(promise) =>
+            responseMessagePromises.remove(0)
+            if (data == Scala2Js.toJs("FAILED")) {
+              promise.failure(new IllegalStateException("WebWorker invocation failed"))
+            } else {
+              promise.success(data)
+            }
+          case None =>
+            throw new AssertionError(s"Received unexpected message: $data")
+        }
+      },
+    )
   }
 }

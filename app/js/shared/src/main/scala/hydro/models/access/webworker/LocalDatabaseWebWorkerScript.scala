@@ -1,9 +1,13 @@
 package hydro.models.access.webworker
 
+import hydro.common.JsLoggingUtils.logExceptions
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.LokiQuery
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.MethodNumbers
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApiConverters._
+import hydro.models.access.worker.JsWorkerServerFacade
+import hydro.models.access.worker.JsWorkerServerFacade.OnMessageResponse
+import hydro.models.access.worker.JsWorkerServerFacade.WorkerScriptLogic
 import hydro.scala2js.Scala2Js
 import hydro.scala2js.StandardConverters._
 import org.scalajs.dom
@@ -27,38 +31,31 @@ object LocalDatabaseWebWorkerScript {
   private val separateDbPerCollectionToApiImplMap: mutable.Map[Boolean, LocalDatabaseWebWorkerApi] =
     mutable.Map()
   private var currentApiImpl: LocalDatabaseWebWorkerApi = _
-  private val connectedPorts: mutable.Buffer[MessagePort] = mutable.Buffer()
 
   def run(): Unit = {
-    SharedWorkerGlobalScope.self.addEventListener(
-      "connect",
-      (connectEvent: ExtendableMessageEvent) => {
-        val port: MessagePort = connectEvent.ports(0)
-        connectedPorts.append(port)
-        port.addEventListener("message", onMessage(senderPort = port))
-        port.start()
-      }
-    )
-  }
-
-  private def onMessage(senderPort: MessagePort)(msg: dom.MessageEvent) = {
-    val data = msg.data.asInstanceOf[js.Array[js.Any]].toVector
-
-    // Flatmap dummy future so that exceptions being thrown my method invocation and in returned future
-    // get treated the same
-    Future.successful((): Unit).flatMap { _ =>
-      data match {
-        case Seq(methodNum, args) =>
-          executeMethod(methodNum.asInstanceOf[Int], args.asInstanceOf[js.Array[js.Any]])
-      }
-    } onComplete {
-      case Success(result) =>
-        senderPort.postMessage(result)
-      case Failure(e) =>
-        console.log(s"  LocalDatabaseWebWorkerScript: Caught exception: $e")
-        e.printStackTrace()
-        senderPort.postMessage("FAILED") // signal to caller that call failed
-    }
+    JsWorkerServerFacade
+      .getFromGlobalScope()
+      .setUpFromWorkerScript(new WorkerScriptLogic {
+        override def onMessage(data: js.Any): Future[OnMessageResponse] = {
+          // Flatmap dummy future so that exceptions being thrown by method invocation and in returned future
+          // get treated the same
+          Future.successful((): Unit).flatMap { _ =>
+            logExceptions {
+              data.asInstanceOf[js.Array[_]].toVector match {
+                case Seq(methodNum, args) =>
+                  executeMethod(methodNum.asInstanceOf[Int], args.asInstanceOf[js.Array[js.Any]])
+              }
+            }
+          } map { result =>
+            OnMessageResponse(response = result)
+          } recover {
+            case e: Throwable =>
+              console.log(s"  LocalDatabaseWebWorkerScript: Caught exception: $e")
+              e.printStackTrace()
+              OnMessageResponse(response = "FAILED") // signal to caller that call failed
+          }
+        }
+      })
   }
 
   private def executeMethod(methodNum: Int, args: js.Array[js.Any]): Future[js.Any] = {

@@ -16,6 +16,9 @@ import hydro.models.access.SingletonKey.VersionKey
 import hydro.models.UpdatableEntity.LastUpdateTime
 import hydro.models.access.SingletonKey.DbStatus
 import hydro.models.access.SingletonKey.DbStatusKey
+import hydro.models.access.webworker.LocalDatabaseWebWorkerApiStub
+import hydro.models.access.worker.JsWorkerClientFacade
+import hydro.models.access.worker.impl.SharedWorkerFacadeImpl
 import tests.ManualTests.ManualTest
 import tests.ManualTests.ManualTestSuite
 
@@ -33,22 +36,39 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
   private val testDbStatusB = DbStatus.Populating(testInstantB)
   private val testDbStatusC = DbStatus.Populating(testInstantC)
 
-  implicit private val webWorker = new hydro.models.access.webworker.Module().localDatabaseWebWorkerApiStub
   implicit private val secondaryIndexFunction = app.models.access.Module.secondaryIndexFunction
   implicit private val fakeClock = new FakeClock
 
   override def tests =
-    testsWithParameters(separateDbPerCollection = false) ++
-      testsWithParameters(separateDbPerCollection = true)
+    Seq(
+      testsWithParameters(
+        TestParameters(
+          separateDbPerCollection = false,
+          jsWorker = JsWorkerClientFacade.getSharedIfSupported().get,
+        )),
+      testsWithParameters(
+        TestParameters(
+          separateDbPerCollection = true,
+          jsWorker = JsWorkerClientFacade.getSharedIfSupported().get,
+        )),
+      testsWithParameters(
+        TestParameters(
+          separateDbPerCollection = false,
+          jsWorker = JsWorkerClientFacade.getDedicated(),
+        )),
+    ).flatten
 
-  private def testsWithParameters(separateDbPerCollection: Boolean) = {
+  private def testsWithParameters(testParameters: TestParameters) = {
     def manualTest(name: String)(testCode: => Future[Unit]): ManualTest =
-      ManualTest(s"$name [separateDbPerCollection = $separateDbPerCollection]")(testCode)
+      ManualTest(
+        s"$name " +
+          s"[separateDbPerCollection=${testParameters.separateDbPerCollection}, " +
+          s"${testParameters.jsWorker.getClass.getSimpleName}]")(testCode)
 
     Seq(
       manualTest("isEmpty") {
         async {
-          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          val db = await(createAndInitializeDb(testParameters))
           await(db.isEmpty) ==> true
           await(db.addAll(Seq(createUser())))
           await(db.isEmpty) ==> false
@@ -62,7 +82,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
       },
       manualTest("setSingletonValue") {
         async {
-          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          val db = await(createAndInitializeDb(testParameters))
           await(db.getSingletonValue(DbStatusKey)).isDefined ==> false
 
           await(db.setSingletonValue(DbStatusKey, testDbStatusA)) ==> true
@@ -80,7 +100,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
       },
       manualTest("setSingletonValue(abortUnlessExistingValueEquals)") {
         async {
-          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          val db = await(createAndInitializeDb(testParameters))
           await(db.getSingletonValue(DbStatusKey)).isDefined ==> false
 
           await(
@@ -107,7 +127,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
       },
       manualTest("addSingletonValueIfNew") {
         async {
-          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          val db = await(createAndInitializeDb(testParameters))
           await(db.getSingletonValue(VersionKey)).isDefined ==> false
 
           await(db.addSingletonValueIfNew(VersionKey, "abc")) ==> true
@@ -122,7 +142,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
       },
       manualTest("resetAndInitialize") {
         async {
-          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          val db = await(createAndInitializeDb(testParameters))
           await(db.addAll(Seq(createUser())))
           db.setSingletonValue(VersionKey, "testVersion")
 
@@ -133,7 +153,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
       },
       manualTest("resetAndInitialize(alsoSetSingleton)") {
         async {
-          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          val db = await(createAndInitializeDb(testParameters))
           await(db.addAll(Seq(createUser())))
           db.setSingletonValue(VersionKey, "testVersion")
 
@@ -144,7 +164,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
       },
       manualTest("addAll") {
         async {
-          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          val db = await(createAndInitializeDb(testParameters))
           await(db.addAll(Seq(testUserRedacted))) ==> true
           await(db.addAll(Seq(testUserRedacted))) ==> false
           await(db.addAll(Seq(testTransactionWithId))) ==> true
@@ -164,7 +184,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
         async {
           val user1 = createUser()
 
-          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          val db = await(createAndInitializeDb(testParameters))
           val userWithSameIdA = user1.copy(name = "name A")
           val userWithSameIdB = user1.copy(name = "name B")
           await(db.addAll(Seq(user1, userWithSameIdA))) ==> true
@@ -175,7 +195,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
       },
       manualTest("addPendingModifications") {
         async {
-          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          val db = await(createAndInitializeDb(testParameters))
 
           await(db.addPendingModifications(Seq(testModificationA, testModificationB))) ==> true
           await(db.addPendingModifications(Seq(testModificationB))) ==> false
@@ -185,7 +205,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
       },
       manualTest("removePendingModifications: Modification in db") {
         async {
-          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          val db = await(createAndInitializeDb(testParameters))
           await(db.addPendingModifications(Seq(testModificationA)))
           await(db.addPendingModifications(Seq(testModificationB)))
 
@@ -196,7 +216,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
       },
       manualTest("removePendingModifications: Modification not in db") {
         async {
-          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          val db = await(createAndInitializeDb(testParameters))
           await(db.addPendingModifications(Seq(testModificationA)))
 
           await(db.removePendingModifications(Seq(testModificationB))) ==> false
@@ -206,7 +226,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
       },
       manualTest("applyModifications: Add") {
         async {
-          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          val db = await(createAndInitializeDb(testParameters))
           val user1 = createUser()
 
           await(db.applyModifications(Seq(EntityModification.Add(user1)))) ==> true
@@ -218,7 +238,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
       },
       manualTest("applyModifications: Update: Full update") {
         async {
-          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          val db = await(createAndInitializeDb(testParameters))
           val user1 = createUser()
           val user2 = createUser()
           val user3 = createUser()
@@ -234,7 +254,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
       },
       manualTest("applyModifications: Update: Partial update") {
         async {
-          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          val db = await(createAndInitializeDb(testParameters))
           val user1 = createUser()
           val user2 = createUser()
           val user3 = createUser()
@@ -265,7 +285,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
       },
       manualTest("applyModifications: Update: Ignored when already deleted") {
         async {
-          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          val db = await(createAndInitializeDb(testParameters))
           val user1 = createUser()
           val user2 = createUser()
           val user3 = createUser()
@@ -280,7 +300,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
       },
       manualTest("applyModifications: Delete") {
         async {
-          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          val db = await(createAndInitializeDb(testParameters))
           val user1 = createUser()
           await(db.addAll(Seq(user1)))
 
@@ -292,7 +312,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
       },
       manualTest("applyModifications: Add is idempotent") {
         async {
-          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          val db = await(createAndInitializeDb(testParameters))
           val user1 = createUser()
           val updatedUser1 = user1.copy(name = "updated name")
           val user2 = createUser()
@@ -312,7 +332,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
       },
       manualTest("applyModifications: Update is idempotent") {
         async {
-          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          val db = await(createAndInitializeDb(testParameters))
 
           val user1 = createUser()
           val updatedUserA =
@@ -334,7 +354,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
       },
       manualTest("applyModifications: Delete is idempotent") {
         async {
-          val db = await(createAndInitializeDb(separateDbPerCollection = separateDbPerCollection))
+          val db = await(createAndInitializeDb(testParameters))
           val user1 = createUser()
           val user2 = createUser()
           val user3 = createUser()
@@ -354,13 +374,25 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
     )
   }
 
-  def createAndInitializeDb(separateDbPerCollection: Boolean): Future[LocalDatabase] = async {
+  private def createAndInitializeDb(
+      testParameters: TestParameters,
+  ): Future[LocalDatabase] = async {
+    implicit val webWorker = new LocalDatabaseWebWorkerApiStub(forceJsWorker = Some(testParameters.jsWorker))
+
     val db =
-      await(LocalDatabaseImpl.createInMemoryForTests(separateDbPerCollection = separateDbPerCollection))
+      await(
+        LocalDatabaseImpl.createInMemoryForTests(
+          separateDbPerCollection = testParameters.separateDbPerCollection))
     await(db.resetAndInitialize())
     db
   }
 
-  private def createUser(): User =
+  private def createUser(): User = {
     testUserRedacted.copy(idOption = Some(EntityModification.generateRandomId()))
+  }
+
+  case class TestParameters(
+      separateDbPerCollection: Boolean,
+      jsWorker: JsWorkerClientFacade,
+  )
 }
