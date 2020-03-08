@@ -130,9 +130,10 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
             }
           }
 
-        case AddCollection(collectionName, uniqueIndices, indices) =>
+        case AddCollection(collectionName, uniqueIndices, indices, broadcastUpdates) =>
           Future.successful {
             if (currentLokiDb.getCollection(collectionName).isEmpty) {
+              // TODO: Apply `broadcastUpdates`
               currentLokiDb.addCollection(
                 collectionName,
                 uniqueIndices = uniqueIndices,

@@ -26,8 +26,14 @@ private[webworker] object LocalDatabaseWebWorkerApiConverters {
         case Update(collectionName, obj, abortUnlessExistingValueEquals) =>
           js.Array[js.Any](updateNumber, collectionName, obj, abortUnlessExistingValueEquals)
         case Remove(collectionName, id) => js.Array[js.Any](removeNumber, collectionName, id)
-        case AddCollection(collectionName, uniqueIndices, indices) =>
-          js.Array[js.Any](addCollectionNumber, collectionName, uniqueIndices.toJSArray, indices.toJSArray)
+        case AddCollection(collectionName, uniqueIndices, indices, broadcastUpdates) =>
+          js.Array[js.Any](
+            addCollectionNumber,
+            collectionName,
+            uniqueIndices.toJSArray,
+            indices.toJSArray,
+            broadcastUpdates,
+          )
         case RemoveCollection(collectionName) => js.Array[js.Any](removeCollectionNumber, collectionName)
         case SaveDatabase                     => js.Array[js.Any](saveDatabaseNumber)
       }
@@ -48,11 +54,12 @@ private[webworker] object LocalDatabaseWebWorkerApiConverters {
           )
         case (`removeNumber`, Seq(_, collectionName, id)) =>
           Remove(collectionName.asInstanceOf[String], id)
-        case (`addCollectionNumber`, Seq(_, collectionName, uniqueIndices, indices)) =>
+        case (`addCollectionNumber`, Seq(_, collectionName, uniqueIndices, indices, broadcastUpdates)) =>
           AddCollection(
             collectionName = collectionName.asInstanceOf[String],
             uniqueIndices = uniqueIndices.asInstanceOf[js.Array[String]].toVector,
-            indices = indices.asInstanceOf[js.Array[String]].toVector
+            indices = indices.asInstanceOf[js.Array[String]].toVector,
+            broadcastUpdates = broadcastUpdates.asInstanceOf[Boolean],
           )
         case (`removeCollectionNumber`, Seq(_, collectionName)) =>
           RemoveCollection(collectionName.asInstanceOf[String])

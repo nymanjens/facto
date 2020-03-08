@@ -50,6 +50,7 @@ object LocalDatabaseWebWorkerApi {
         collectionName: String,
         uniqueIndices: Seq[String],
         indices: Seq[String],
+        broadcastUpdates: Boolean,
     ) extends WriteOperation
 
     case class RemoveCollection(collectionName: String) extends WriteOperation

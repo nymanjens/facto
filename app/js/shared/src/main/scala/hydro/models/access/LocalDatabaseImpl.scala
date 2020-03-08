@@ -225,7 +225,7 @@ private final class LocalDatabaseImpl(
           ))
       else
         Seq(
-          addSingletonCollectionOperation,
+          addSingletonCollectionOperation(),
           // Either the Update or Insert will be a no-op, depending on whether this value already exists
           WriteOperation.Update(singletonsCollectionName, singletonObj(value)),
           WriteOperation.Insert(singletonsCollectionName, singletonObj(value))
@@ -237,7 +237,7 @@ private final class LocalDatabaseImpl(
     val singletonObj = Scala2Js.toJsMap(Singleton(key = key.name, value = Scala2Js.toJs(value)))
     webWorker.applyWriteOperations(
       Seq(
-        addSingletonCollectionOperation,
+        addSingletonCollectionOperation(),
         WriteOperation.Insert(singletonsCollectionName, singletonObj)
       ))
   }
@@ -263,13 +263,17 @@ private final class LocalDatabaseImpl(
                     WriteOperation.AddCollection(
                       collectionNameOf(entityType),
                       uniqueIndices = Seq("id"),
-                      indices = secondaryIndexFunction(entityType).map(_.name))) ++
+                      indices = secondaryIndexFunction(entityType).map(_.name),
+                      broadcastUpdates = false,
+                    )) ++
                 Seq(
-                  addSingletonCollectionOperation,
+                  addSingletonCollectionOperation(),
                   WriteOperation.AddCollection(
                     pendingModificationsCollectionName,
                     uniqueIndices = Seq("id"),
-                    indices = Seq())
+                    indices = Seq(),
+                    broadcastUpdates = true,
+                  )
                 ) ++
                 Option(alsoSetSingleton).map {
                   case (key, value) =>
@@ -289,8 +293,13 @@ private final class LocalDatabaseImpl(
   private def allCollectionNames: Seq[String] =
     EntityTypes.all.map(collectionNameOf) :+ singletonsCollectionName :+ pendingModificationsCollectionName
 
-  private def addSingletonCollectionOperation: WriteOperation = {
-    WriteOperation.AddCollection(singletonsCollectionName, uniqueIndices = Seq("id"), indices = Seq())
+  private def addSingletonCollectionOperation(): WriteOperation = {
+    WriteOperation.AddCollection(
+      singletonsCollectionName,
+      uniqueIndices = Seq("id"),
+      indices = Seq(),
+      broadcastUpdates = false,
+    )
   }
 }
 

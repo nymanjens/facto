@@ -57,7 +57,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiMultiDbImpl extends Loca
         case operation @ Update(collectionName, _, _) =>
           performOperationOnCollection(operation, collectionName)
         case operation @ Remove(collectionName, _) => performOperationOnCollection(operation, collectionName)
-        case operation @ AddCollection(collectionName, _, _) =>
+        case operation @ AddCollection(collectionName, _, _, _) =>
           performOperationOnCollection(operation, collectionName)
         case operation @ RemoveCollection(collectionName) =>
           performOperationOnCollection(operation, collectionName)

@@ -29,7 +29,13 @@ object LocalDatabaseWebWorkerApiConvertersTest extends TestSuite {
       "Remove" - { testForwardAndBackward[WriteOperation](WriteOperation.Remove("test", "192837")) }
       "Clear" - { testForwardAndBackward[WriteOperation](WriteOperation.RemoveCollection("test")) }
       "AddCollection" - {
-        testForwardAndBackward[WriteOperation](WriteOperation.AddCollection("test", Seq("id"), Seq("code")))
+        testForwardAndBackward[WriteOperation](
+          WriteOperation.AddCollection(
+            collectionName = "test",
+            uniqueIndices = Seq("id"),
+            indices = Seq("code"),
+            broadcastUpdates = true,
+          ))
       }
       "SaveDatabase" - { testForwardAndBackward[WriteOperation](WriteOperation.SaveDatabase) }
     }
