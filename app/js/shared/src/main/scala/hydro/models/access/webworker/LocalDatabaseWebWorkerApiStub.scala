@@ -20,7 +20,9 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 
-private[webworker] final class LocalDatabaseWebWorkerApiStub extends LocalDatabaseWebWorkerApi {
+final class LocalDatabaseWebWorkerApiStub(
+    forceJsWorker: Option[JsWorkerClientFacade] = None,
+) extends LocalDatabaseWebWorkerApi {
 
   private val responseMessagePromises: mutable.Buffer[Promise[js.Any]] = mutable.Buffer()
   private val worker: JsWorkerClient = initializeJsWorker()
@@ -83,8 +85,11 @@ private[webworker] final class LocalDatabaseWebWorkerApiStub extends LocalDataba
     }
 
   private def initializeJsWorker(): JsWorkerClient = {
-    val workerClientFacade =
-      JsWorkerClientFacade.getSharedIfSupported() getOrElse JsWorkerClientFacade.getDedicated()
+    val workerClientFacade = (
+      forceJsWorker orElse
+        JsWorkerClientFacade.getSharedIfSupported() getOrElse
+        JsWorkerClientFacade.getDedicated()
+    )
 
     workerClientFacade.setUpClient(
       scriptUrl = "/localDatabaseWebWorker.js",
