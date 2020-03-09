@@ -44,24 +44,14 @@ private[webworker] final class LocalDatabaseWebWorkerApiMultiDbImpl extends Loca
   }
 
   override def applyWriteOperations(operations: Seq[WriteOperation]): Future[Boolean] = {
-    def performOperationOnCollection(operation: WriteOperation, collectionName: String): Future[Boolean] =
-      async {
-        changedCollectionsSinceLastSave.add(collectionName)
-        val db = await(getDbForCollection(collectionName))
-        await(db.applyWriteOperations(Seq(operation)))
-      }
-
     combineFuturesInOrder[WriteOperation](
-      operations, {
-        case operation @ Insert(collectionName, _) => performOperationOnCollection(operation, collectionName)
-        case operation @ Update(collectionName, _, _) =>
-          performOperationOnCollection(operation, collectionName)
-        case operation @ Remove(collectionName, _) => performOperationOnCollection(operation, collectionName)
-        case operation @ AddCollection(collectionName, _, _, _) =>
-          performOperationOnCollection(operation, collectionName)
-        case operation @ RemoveCollection(collectionName) =>
-          performOperationOnCollection(operation, collectionName)
-      }
+      operations,
+      operation =>
+        async {
+          changedCollectionsSinceLastSave.add(operation.collectionName)
+          val db = await(getDbForCollection(operation.collectionName))
+          await(db.applyWriteOperations(Seq(operation)))
+      },
     )
   }
 

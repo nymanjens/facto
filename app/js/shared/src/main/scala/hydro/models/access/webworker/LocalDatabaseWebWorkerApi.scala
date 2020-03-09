@@ -43,27 +43,29 @@ object LocalDatabaseWebWorkerApi {
       limit: Option[Int] = None,
   )
 
-  sealed trait WriteOperation
+  sealed trait WriteOperation {
+    def collectionName: String
+  }
   object WriteOperation {
-    case class Insert(collectionName: String, obj: js.Dictionary[js.Any]) extends WriteOperation
+    case class Insert(override val collectionName: String, obj: js.Dictionary[js.Any]) extends WriteOperation
 
     case class Update(
-        collectionName: String,
+        override val collectionName: String,
         updatedObj: js.Dictionary[js.Any],
         abortUnlessExistingValueEquals: js.UndefOr[js.Dictionary[js.Any]] = js.undefined,
     ) extends WriteOperation
 
-    case class Remove(collectionName: String, id: js.Any) extends WriteOperation
+    case class Remove(override val collectionName: String, id: js.Any) extends WriteOperation
 
     case class AddCollection(
-        collectionName: String,
+        override val collectionName: String,
         uniqueIndices: Seq[String],
         indices: Seq[String],
         // If true, BroadcastedWriteOperations will be sent for this collection
         broadcastWriteOperations: Boolean,
     ) extends WriteOperation
 
-    case class RemoveCollection(collectionName: String) extends WriteOperation
+    case class RemoveCollection(override val collectionName: String) extends WriteOperation
   }
 
   object MethodNumbers {
