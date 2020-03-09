@@ -61,21 +61,20 @@ private[webworker] final class LocalDatabaseWebWorkerApiMultiDbImpl extends Loca
           performOperationOnCollection(operation, collectionName)
         case operation @ RemoveCollection(collectionName) =>
           performOperationOnCollection(operation, collectionName)
-        case operation @ SaveDatabase =>
-          async {
-            await(Future.sequence {
-              changedCollectionsSinceLastSave.map { collectionName =>
-                async {
-                  val db = await(getDbForCollection(collectionName))
-                  await(db.applyWriteOperations(Seq(operation)))
-                }
-              }
-            })
-            changedCollectionsSinceLastSave.clear()
-            false
-          }
       }
     )
+  }
+
+  override def saveDatabase(): Future[Unit] = async {
+    await(Future.sequence {
+      changedCollectionsSinceLastSave.map { collectionName =>
+        async {
+          val db = await(getDbForCollection(collectionName))
+          await(db.saveDatabase())
+        }
+      }
+    })
+    changedCollectionsSinceLastSave.clear()
   }
 
   override private[webworker] def getWriteOperationsToBroadcast(operations: Seq[WriteOperation]) = {

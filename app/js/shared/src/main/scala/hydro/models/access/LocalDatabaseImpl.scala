@@ -243,9 +243,7 @@ private final class LocalDatabaseImpl(
   }
 
   override def save() = serializingWriteQueue.schedule {
-    webWorker
-      .applyWriteOperations(Seq(WriteOperation.SaveDatabase))
-      .map(_ => (): Unit)
+    webWorker.saveDatabase()
   }
 
   override def resetAndInitialize[V](alsoSetSingleton: (SingletonKey[V], V) = null): Future[Unit] =

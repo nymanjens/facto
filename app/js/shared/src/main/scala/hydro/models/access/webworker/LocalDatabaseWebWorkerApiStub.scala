@@ -58,6 +58,13 @@ final class LocalDatabaseWebWorkerApiStub(
       timeout = 2.minutes,
     ).map(_.asInstanceOf[Boolean])
 
+  override def saveDatabase() =
+    sendAndReceive(
+      MethodNumbers.saveDatabase,
+      Seq(),
+      timeout = 2.minutes,
+    ).map(_ => (): Unit)
+
   override private[webworker] def getWriteOperationsToBroadcast(operations: Seq[WriteOperation]) = {
     throw new AssertionError(
       "This method should never be called because it only makes sense on the worker script")

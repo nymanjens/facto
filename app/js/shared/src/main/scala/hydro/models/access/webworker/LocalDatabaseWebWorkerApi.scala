@@ -22,9 +22,11 @@ trait LocalDatabaseWebWorkerApi {
   /**
     * Executes the given operations in sequence.
     *
-    * Returns true if database was modified (SaveDatabase doesn't count as modification).
+    * Returns true if database was modified.
     */
   def applyWriteOperations(operations: Seq[WriteOperation]): Future[Boolean]
+
+  def saveDatabase(): Future[Unit]
 
   /**
     * Pure function (no side effects) that returns the operations that should be broadcasted.
@@ -62,8 +64,6 @@ object LocalDatabaseWebWorkerApi {
     ) extends WriteOperation
 
     case class RemoveCollection(collectionName: String) extends WriteOperation
-
-    case object SaveDatabase extends WriteOperation
   }
 
   object MethodNumbers {
@@ -71,6 +71,7 @@ object LocalDatabaseWebWorkerApi {
     val executeDataQuery: Int = 2
     val executeCountQuery: Int = 3
     val applyWriteOperations: Int = 4
+    val saveDatabase: Int = 5
   }
 
   sealed trait WorkerResponse

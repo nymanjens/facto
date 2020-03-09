@@ -18,7 +18,6 @@ private[webworker] object LocalDatabaseWebWorkerApiConverters {
     private val removeNumber: Int = 3
     private val addCollectionNumber: Int = 4
     private val removeCollectionNumber: Int = 5
-    private val saveDatabaseNumber: Int = 6
 
     override def toJs(operation: WriteOperation) = {
       operation match {
@@ -35,7 +34,6 @@ private[webworker] object LocalDatabaseWebWorkerApiConverters {
             broadcastWriteOperations,
           )
         case RemoveCollection(collectionName) => js.Array[js.Any](removeCollectionNumber, collectionName)
-        case SaveDatabase                     => js.Array[js.Any](saveDatabaseNumber)
       }
     }
 
@@ -63,7 +61,6 @@ private[webworker] object LocalDatabaseWebWorkerApiConverters {
           )
         case (`removeCollectionNumber`, Seq(_, collectionName)) =>
           RemoveCollection(collectionName.asInstanceOf[String])
-        case (`saveDatabaseNumber`, Seq(_)) => SaveDatabase
       }
     }
   }

@@ -155,14 +155,12 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
             collectionsToBroadcast.remove(collectionName)
             true
           }
-
-        case SaveDatabase =>
-          async {
-            await(currentLokiDb.saveDatabase())
-            false
-          }
       })
       .map(changedSeq => changedSeq contains true)
+  }
+
+  override def saveDatabase(): Future[Unit] = {
+    currentLokiDb.saveDatabase()
   }
 
   override private[webworker] def getWriteOperationsToBroadcast(operations: Seq[WriteOperation]) = {

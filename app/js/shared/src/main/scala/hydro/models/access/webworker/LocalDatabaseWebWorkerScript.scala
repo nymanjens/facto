@@ -10,12 +10,7 @@ import hydro.models.access.worker.JsWorkerServerFacade.OnMessageResponse
 import hydro.models.access.worker.JsWorkerServerFacade.WorkerScriptLogic
 import hydro.scala2js.Scala2Js
 import hydro.scala2js.StandardConverters._
-import org.scalajs.dom
 import org.scalajs.dom.console
-import org.scalajs.dom.MessagePort
-import org.scalajs.dom.experimental.serviceworkers.ExtendableMessageEvent
-import org.scalajs.dom.experimental.sharedworkers.SharedWorkerGlobalScope
-import org.scalajs.dom.raw.MessageEvent
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
@@ -23,8 +18,6 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
-import scala.util.Failure
-import scala.util.Success
 
 object LocalDatabaseWebWorkerScript {
 
@@ -87,6 +80,8 @@ object LocalDatabaseWebWorkerScript {
         currentApiImpl
           .applyWriteOperations(Scala2Js.toScala[Seq[WriteOperation]](operations))
           .map(r => r)
+      case (MethodNumbers.saveDatabase, Seq()) =>
+        currentApiImpl.saveDatabase().map(_ => js.undefined)
     }
   }
 }

@@ -37,7 +37,6 @@ object LocalDatabaseWebWorkerApiConvertersTest extends TestSuite {
             broadcastWriteOperations = true,
           ))
       }
-      "SaveDatabase" - { testForwardAndBackward[WriteOperation](WriteOperation.SaveDatabase) }
     }
 
     "LokiQueryConverter" - {
