@@ -66,8 +66,11 @@ private[webworker] final class LocalDatabaseWebWorkerApiMultiDbImpl
   }
 
   override private[webworker] def getWriteOperationsToBroadcast(operations: Seq[WriteOperation]) = {
-    // TODO(feat-broadcast): Implement
-    ???
+    for {
+      operation <- operations
+      db <- collectionNameToDbMap.get(operation.collectionName).toVector
+      operationToBroadcast <- db.getWriteOperationsToBroadcast(Seq(operation))
+    } yield operationToBroadcast
   }
 
   private def combineFuturesInOrder[T](
