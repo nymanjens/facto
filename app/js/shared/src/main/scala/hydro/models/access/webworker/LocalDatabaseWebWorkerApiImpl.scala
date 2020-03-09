@@ -22,6 +22,7 @@ import scala.scalajs.js
 private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDatabaseWebWorkerApi {
   private val nameToLokiDbs: mutable.Map[String, Future[LokiJs.Database]] = mutable.Map()
   private var currentLokiDb: LokiJs.Database = _
+  private val collectionsToBroadcast: mutable.Set[String] = mutable.Set()
 
   override def createIfNecessary(
       dbName: String,
@@ -46,6 +47,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
 
     nameToLokiDbs(dbName).map { db =>
       currentLokiDb = db
+      collectionsToBroadcast.clear()
       (): Unit
     }
   }
@@ -133,12 +135,14 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
         case AddCollection(collectionName, uniqueIndices, indices, broadcastUpdates) =>
           Future.successful {
             if (currentLokiDb.getCollection(collectionName).isEmpty) {
-              // TODO: Apply `broadcastUpdates`
               currentLokiDb.addCollection(
                 collectionName,
                 uniqueIndices = uniqueIndices,
                 indices = indices
               )
+              if (broadcastUpdates) {
+                collectionsToBroadcast.add(collectionName)
+              }
               true
             } else {
               false
@@ -148,6 +152,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
         case RemoveCollection(collectionName) =>
           Future.successful {
             currentLokiDb.removeCollection(collectionName)
+            collectionsToBroadcast.remove(collectionName)
             true
           }
 
