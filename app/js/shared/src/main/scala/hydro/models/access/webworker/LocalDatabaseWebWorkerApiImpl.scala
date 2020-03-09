@@ -165,6 +165,11 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
       .map(changedSeq => changedSeq contains true)
   }
 
+  override private[webworker] def getWriteOperationsToBroadcast(operations: Seq[WriteOperation]) = {
+    // TODO(feat-broadcast): Implement
+    ???
+  }
+
   private def findById(lokiCollection: LokiJs.Collection, id: js.Any): Option[js.Dictionary[js.Any]] = {
     lokiCollection
       .chain()

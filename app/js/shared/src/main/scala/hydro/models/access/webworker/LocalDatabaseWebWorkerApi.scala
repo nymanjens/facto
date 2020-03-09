@@ -25,6 +25,13 @@ trait LocalDatabaseWebWorkerApi {
     * Returns true if database was modified (SaveDatabase doesn't count as modification).
     */
   def applyWriteOperations(operations: Seq[WriteOperation]): Future[Boolean]
+
+  /**
+    * Pure function (no side effects) that returns the operations that should be broadcasted.
+    *
+    * This should only be implemented by the worker server.
+    */
+  private[webworker] def getWriteOperationsToBroadcast(operations: Seq[WriteOperation]): Seq[WriteOperation]
 }
 object LocalDatabaseWebWorkerApi {
   case class LokiQuery(
@@ -50,6 +57,7 @@ object LocalDatabaseWebWorkerApi {
         collectionName: String,
         uniqueIndices: Seq[String],
         indices: Seq[String],
+        // If true, BroadcastedWriteOperations will be sent for this collection
         broadcastUpdates: Boolean,
     ) extends WriteOperation
 
@@ -63,5 +71,12 @@ object LocalDatabaseWebWorkerApi {
     val executeDataQuery: Int = 2
     val executeCountQuery: Int = 3
     val applyWriteOperations: Int = 4
+  }
+
+  sealed trait WorkerResponse
+  object WorkerResponse {
+    case class Failed(stackTrace: String) extends WorkerResponse
+    case class MethodReturnValue(value: js.Any) extends WorkerResponse
+    case class BroadcastedWriteOperations(operations: Seq[WriteOperation]) extends WorkerResponse
   }
 }

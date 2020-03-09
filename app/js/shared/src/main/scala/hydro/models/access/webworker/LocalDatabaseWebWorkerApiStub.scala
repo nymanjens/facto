@@ -1,7 +1,9 @@
 package hydro.models.access.webworker
 
 import hydro.common.JsLoggingUtils.logExceptions
+import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.LokiQuery
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.MethodNumbers
+import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApiConverters._
 import hydro.models.access.worker.JsWorkerClientFacade
 import hydro.models.access.worker.JsWorkerClientFacade.JsWorkerClient
@@ -35,26 +37,31 @@ final class LocalDatabaseWebWorkerApiStub(
     ).map(_ => (): Unit)
   }
 
-  override def executeDataQuery(lokiQuery: LocalDatabaseWebWorkerApi.LokiQuery) =
+  override def executeDataQuery(lokiQuery: LokiQuery) =
     sendAndReceive(
       MethodNumbers.executeDataQuery,
       Seq(Scala2Js.toJs(lokiQuery)),
       timeout = 40.seconds,
     ).map(_.asInstanceOf[js.Array[js.Dictionary[js.Any]]].toVector)
 
-  override def executeCountQuery(lokiQuery: LocalDatabaseWebWorkerApi.LokiQuery) =
+  override def executeCountQuery(lokiQuery: LokiQuery) =
     sendAndReceive(
       MethodNumbers.executeCountQuery,
       Seq(Scala2Js.toJs(lokiQuery)),
       timeout = 40.seconds,
     ).map(_.asInstanceOf[Int])
 
-  override def applyWriteOperations(operations: Seq[LocalDatabaseWebWorkerApi.WriteOperation]) =
+  override def applyWriteOperations(operations: Seq[WriteOperation]) =
     sendAndReceive(
       MethodNumbers.applyWriteOperations,
       Seq(Scala2Js.toJs(operations.toList)),
       timeout = 2.minutes,
     ).map(_.asInstanceOf[Boolean])
+
+  override private[webworker] def getWriteOperationsToBroadcast(operations: Seq[WriteOperation]) = {
+    throw new AssertionError(
+      "This method should never be called because it only makes sense on the worker script")
+  }
 
   private def sendAndReceive(methodNum: Int, args: Seq[js.Any], timeout: FiniteDuration): Future[js.Any] =
     async {

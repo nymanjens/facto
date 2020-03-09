@@ -78,6 +78,11 @@ private[webworker] final class LocalDatabaseWebWorkerApiMultiDbImpl extends Loca
     )
   }
 
+  override private[webworker] def getWriteOperationsToBroadcast(operations: Seq[WriteOperation]) = {
+    // TODO(feat-broadcast): Implement
+    ???
+  }
+
   private def combineFuturesInOrder[T](
       iterable: Iterable[T],
       futureFunction: T => Future[Boolean],
