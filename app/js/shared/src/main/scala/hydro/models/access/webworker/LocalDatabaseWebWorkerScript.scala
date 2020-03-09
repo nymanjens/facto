@@ -21,9 +21,9 @@ import scala.scalajs.js.JSConverters._
 
 object LocalDatabaseWebWorkerScript {
 
-  private val separateDbPerCollectionToApiImplMap: mutable.Map[Boolean, LocalDatabaseWebWorkerApi] =
+  private val separateDbPerCollectionToApiImplMap: mutable.Map[Boolean, LocalDatabaseWebWorkerApi.ForServer] =
     mutable.Map()
-  private var currentApiImpl: LocalDatabaseWebWorkerApi = _
+  private var currentApiImpl: LocalDatabaseWebWorkerApi.ForServer = _
 
   def run(): Unit = {
     JsWorkerServerFacade

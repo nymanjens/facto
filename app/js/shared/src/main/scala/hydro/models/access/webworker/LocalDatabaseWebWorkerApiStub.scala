@@ -24,7 +24,7 @@ import scala.scalajs.js.JSConverters._
 
 final class LocalDatabaseWebWorkerApiStub(
     forceJsWorker: Option[JsWorkerClientFacade] = None,
-) extends LocalDatabaseWebWorkerApi {
+) extends LocalDatabaseWebWorkerApi.ForClient {
 
   private val responseMessagePromises: mutable.Buffer[Promise[js.Any]] = mutable.Buffer()
   private val worker: JsWorkerClient = initializeJsWorker()
@@ -64,11 +64,6 @@ final class LocalDatabaseWebWorkerApiStub(
       Seq(),
       timeout = 2.minutes,
     ).map(_ => (): Unit)
-
-  override private[webworker] def getWriteOperationsToBroadcast(operations: Seq[WriteOperation]) = {
-    throw new AssertionError(
-      "This method should never be called because it only makes sense on the worker script")
-  }
 
   private def sendAndReceive(methodNum: Int, args: Seq[js.Any], timeout: FiniteDuration): Future[js.Any] =
     async {

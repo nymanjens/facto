@@ -8,6 +8,7 @@ import scala.async.Async.async
 import scala.async.Async.await
 import hydro.jsfacades.LokiJs
 import hydro.jsfacades.LokiJs.FilterFactory.Operation
+import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.LokiQuery
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation._
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApiImpl.areEquivalentEntities
@@ -19,7 +20,7 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 
-private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDatabaseWebWorkerApi {
+private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDatabaseWebWorkerApi.ForServer {
   private val nameToLokiDbs: mutable.Map[String, Future[LokiJs.Database]] = mutable.Map()
   private var currentLokiDb: LokiJs.Database = _
   private val collectionsToBroadcast: mutable.Set[String] = mutable.Set()
@@ -52,20 +53,19 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
     }
   }
 
-  override def executeDataQuery(
-      lokiQuery: LocalDatabaseWebWorkerApi.LokiQuery): Future[Seq[js.Dictionary[js.Any]]] =
+  override def executeDataQuery(lokiQuery: LokiQuery): Future[Seq[js.Dictionary[js.Any]]] =
     Future.successful(toResultSet(lokiQuery) match {
       case Some(r) => r.data().toVector
       case None    => Seq()
     })
 
-  override def executeCountQuery(lokiQuery: LocalDatabaseWebWorkerApi.LokiQuery): Future[Int] =
+  override def executeCountQuery(lokiQuery: LokiQuery): Future[Int] =
     Future.successful(toResultSet(lokiQuery) match {
       case Some(r) => r.count()
       case None    => 0
     })
 
-  private def toResultSet(lokiQuery: LocalDatabaseWebWorkerApi.LokiQuery): Option[LokiJs.ResultSet] = {
+  private def toResultSet(lokiQuery: LokiQuery): Option[LokiJs.ResultSet] = {
     currentLokiDb.getCollection(lokiQuery.collectionName) match {
       case None =>
         console.log(

@@ -31,7 +31,7 @@ import scala.scalajs.js.JSConverters._
 import scala.util.matching.Regex
 
 private final class LocalDatabaseImpl(
-    implicit webWorker: LocalDatabaseWebWorkerApi,
+    implicit webWorker: LocalDatabaseWebWorkerApi.ForClient,
     secondaryIndexFunction: SecondaryIndexFunction,
 ) extends LocalDatabase {
 
@@ -304,7 +304,7 @@ private final class LocalDatabaseImpl(
 object LocalDatabaseImpl {
 
   def create(separateDbPerCollection: Boolean = false)(
-      implicit webWorker: LocalDatabaseWebWorkerApi,
+      implicit webWorker: LocalDatabaseWebWorkerApi.ForClient,
       secondaryIndexFunction: SecondaryIndexFunction,
   ): Future[LocalDatabase] = async {
     await(
@@ -317,7 +317,7 @@ object LocalDatabaseImpl {
   }
 
   def createStoredForTests(separateDbPerCollection: Boolean = false)(
-      implicit webWorker: LocalDatabaseWebWorkerApi,
+      implicit webWorker: LocalDatabaseWebWorkerApi.ForClient,
       secondaryIndexFunction: SecondaryIndexFunction,
   ): Future[LocalDatabase] = async {
     await(
@@ -330,7 +330,7 @@ object LocalDatabaseImpl {
   }
 
   def createInMemoryForTests(separateDbPerCollection: Boolean = false)(
-      implicit webWorker: LocalDatabaseWebWorkerApi,
+      implicit webWorker: LocalDatabaseWebWorkerApi.ForClient,
       secondaryIndexFunction: SecondaryIndexFunction,
   ): Future[LocalDatabase] =
     async {

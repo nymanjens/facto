@@ -27,15 +27,17 @@ trait LocalDatabaseWebWorkerApi {
   def applyWriteOperations(operations: Seq[WriteOperation]): Future[Boolean]
 
   def saveDatabase(): Future[Unit]
-
-  /**
-    * Pure function (no side effects) that returns the operations that should be broadcasted.
-    *
-    * This should only be implemented by the worker server.
-    */
-  private[webworker] def getWriteOperationsToBroadcast(operations: Seq[WriteOperation]): Seq[WriteOperation]
 }
 object LocalDatabaseWebWorkerApi {
+
+  private[webworker] trait ForServer extends LocalDatabaseWebWorkerApi {
+
+    /** Pure function (no side effects) that returns the operations that should be broadcasted. */
+    private[webworker] def getWriteOperationsToBroadcast(operations: Seq[WriteOperation]): Seq[WriteOperation]
+  }
+
+  trait ForClient extends LocalDatabaseWebWorkerApi {}
+
   case class LokiQuery(
       collectionName: String,
       filter: Option[js.Dictionary[js.Any]] = None,
