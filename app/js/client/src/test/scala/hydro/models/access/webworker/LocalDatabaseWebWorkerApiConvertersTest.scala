@@ -34,7 +34,7 @@ object LocalDatabaseWebWorkerApiConvertersTest extends TestSuite {
             collectionName = "test",
             uniqueIndices = Seq("id"),
             indices = Seq("code"),
-            broadcastUpdates = true,
+            broadcastWriteOperations = true,
           ))
       }
       "SaveDatabase" - { testForwardAndBackward[WriteOperation](WriteOperation.SaveDatabase) }

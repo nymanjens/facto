@@ -58,7 +58,7 @@ object LocalDatabaseWebWorkerApi {
         uniqueIndices: Seq[String],
         indices: Seq[String],
         // If true, BroadcastedWriteOperations will be sent for this collection
-        broadcastUpdates: Boolean,
+        broadcastWriteOperations: Boolean,
     ) extends WriteOperation
 
     case class RemoveCollection(collectionName: String) extends WriteOperation

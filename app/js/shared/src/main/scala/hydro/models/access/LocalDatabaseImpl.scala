@@ -264,7 +264,7 @@ private final class LocalDatabaseImpl(
                       collectionNameOf(entityType),
                       uniqueIndices = Seq("id"),
                       indices = secondaryIndexFunction(entityType).map(_.name),
-                      broadcastUpdates = false,
+                      broadcastWriteOperations = false,
                     )) ++
                 Seq(
                   addSingletonCollectionOperation(),
@@ -272,7 +272,7 @@ private final class LocalDatabaseImpl(
                     pendingModificationsCollectionName,
                     uniqueIndices = Seq("id"),
                     indices = Seq(),
-                    broadcastUpdates = true,
+                    broadcastWriteOperations = true,
                   )
                 ) ++
                 Option(alsoSetSingleton).map {
@@ -298,7 +298,7 @@ private final class LocalDatabaseImpl(
       singletonsCollectionName,
       uniqueIndices = Seq("id"),
       indices = Seq(),
-      broadcastUpdates = false,
+      broadcastWriteOperations = false,
     )
   }
 }
