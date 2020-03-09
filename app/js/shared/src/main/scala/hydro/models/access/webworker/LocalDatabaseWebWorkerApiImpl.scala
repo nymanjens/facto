@@ -157,8 +157,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
   }
 
   override private[webworker] def getWriteOperationsToBroadcast(operations: Seq[WriteOperation]) = {
-    // TODO(feat-broadcast): Implement
-    ???
+    operations.filter(operation => collectionsToBroadcast contains operation.collectionName)
   }
 
   private def findById(lokiCollection: LokiJs.Collection, id: js.Any): Option[js.Dictionary[js.Any]] = {
