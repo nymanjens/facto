@@ -36,7 +36,14 @@ object LocalDatabaseWebWorkerApi {
     private[webworker] def getWriteOperationsToBroadcast(operations: Seq[WriteOperation]): Seq[WriteOperation]
   }
 
-  trait ForClient extends LocalDatabaseWebWorkerApi {}
+  trait ForClient extends LocalDatabaseWebWorkerApi {
+    def registerListener(listener: ForClient.Listener): Unit
+  }
+  object ForClient {
+    trait Listener {
+      def onWriteOperationsDone(writeOperations: Seq[WriteOperation]): Unit
+    }
+  }
 
   case class LokiQuery(
       collectionName: String,

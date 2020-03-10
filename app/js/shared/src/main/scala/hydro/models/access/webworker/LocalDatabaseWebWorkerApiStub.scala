@@ -1,6 +1,8 @@
 package hydro.models.access.webworker
 
 import hydro.common.JsLoggingUtils.logExceptions
+import hydro.common.Listenable.Listener
+import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.ForClient
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.LokiQuery
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.MethodNumbers
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
@@ -28,6 +30,7 @@ final class LocalDatabaseWebWorkerApiStub(
 
   private val responseMessagePromises: mutable.Buffer[Promise[js.Any]] = mutable.Buffer()
   private val worker: JsWorkerClient = initializeJsWorker()
+  private var listeners: Seq[LocalDatabaseWebWorkerApi.ForClient.Listener] = Seq()
 
   override def createIfNecessary(dbName: String, inMemory: Boolean, separateDbPerCollection: Boolean) = {
     sendAndReceive(
@@ -64,6 +67,10 @@ final class LocalDatabaseWebWorkerApiStub(
       Seq(),
       timeout = 2.minutes,
     ).map(_ => (): Unit)
+
+  override def registerListener(listener: LocalDatabaseWebWorkerApi.ForClient.Listener): Unit = {
+    listeners = listeners :+ listener
+  }
 
   private def sendAndReceive(methodNum: Int, args: Seq[js.Any], timeout: FiniteDuration): Future[js.Any] =
     async {
