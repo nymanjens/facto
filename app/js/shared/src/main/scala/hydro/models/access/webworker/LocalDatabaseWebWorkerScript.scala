@@ -97,7 +97,10 @@ object LocalDatabaseWebWorkerScript {
           OnMessageResponse(
             response = Scala2Js.toJs[WorkerResponse](WorkerResponse.MethodReturnValue(returnValue)),
             responseToBroadcastToOtherPorts =
-              Scala2Js.toJs[WorkerResponse](WorkerResponse.BroadcastedWriteOperations(operationsToBroadcast)),
+              if (operationsToBroadcast.nonEmpty)
+                Scala2Js.toJs[WorkerResponse](
+                  WorkerResponse.BroadcastedWriteOperations(operationsToBroadcast))
+              else js.undefined,
           )
         }
       case (MethodNumbers.saveDatabase, Seq()) =>
