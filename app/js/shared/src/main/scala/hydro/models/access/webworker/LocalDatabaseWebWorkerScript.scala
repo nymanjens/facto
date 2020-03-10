@@ -1,8 +1,15 @@
 package hydro.models.access.webworker
 
+import java.io.PrintWriter
+import java.io.StringWriter
+
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.async.Async.async
+import scala.async.Async.await
 import hydro.common.JsLoggingUtils.logExceptions
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.LokiQuery
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.MethodNumbers
+import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WorkerResponse
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApiConverters._
 import hydro.models.access.worker.JsWorkerServerFacade
@@ -39,19 +46,24 @@ object LocalDatabaseWebWorkerScript {
                   executeMethod(methodNum.asInstanceOf[Int], args.asInstanceOf[js.Array[js.Any]])
               }
             }
-          } map { result =>
-            OnMessageResponse(response = result)
           } recover {
             case e: Throwable =>
               console.log(s"  LocalDatabaseWebWorkerScript: Caught exception: $e")
               e.printStackTrace()
-              OnMessageResponse(response = "FAILED") // signal to caller that call failed
+              OnMessageResponse(
+                response = Scala2Js.toJs[WorkerResponse](WorkerResponse.Failed(getStackTraceString(e))))
           }
         }
       })
   }
 
-  private def executeMethod(methodNum: Int, args: js.Array[js.Any]): Future[js.Any] = {
+  private def executeMethod(methodNum: Int, args: js.Array[js.Any]): Future[OnMessageResponse] = {
+    def toResponse(returnValue: js.Any): OnMessageResponse = {
+      OnMessageResponse(
+        response = Scala2Js.toJs[WorkerResponse](WorkerResponse.MethodReturnValue(returnValue)),
+      )
+    }
+
     (methodNum, args.toVector) match {
       case (MethodNumbers.createIfNecessary, Seq(dbName, inMemory, separateDbPerCollectionObj)) =>
         val separateDbPerCollection = separateDbPerCollectionObj.asInstanceOf[Boolean]
@@ -67,21 +79,35 @@ object LocalDatabaseWebWorkerScript {
             dbName.asInstanceOf[String],
             inMemory.asInstanceOf[Boolean],
             separateDbPerCollection)
-          .map(_ => js.undefined)
+          .map(_ => toResponse(js.undefined))
       case (MethodNumbers.executeDataQuery, Seq(lokiQuery)) =>
         currentApiImpl
           .executeDataQuery(Scala2Js.toScala[LokiQuery](lokiQuery))
-          .map(r => r.toJSArray)
+          .map(r => toResponse(r.toJSArray))
       case (MethodNumbers.executeCountQuery, Seq(lokiQuery)) =>
         currentApiImpl
           .executeCountQuery(Scala2Js.toScala[LokiQuery](lokiQuery))
-          .map(r => r)
-      case (MethodNumbers.applyWriteOperations, Seq(operations)) =>
-        currentApiImpl
-          .applyWriteOperations(Scala2Js.toScala[Seq[WriteOperation]](operations))
-          .map(r => r)
+          .map(r => toResponse(r))
+      case (MethodNumbers.applyWriteOperations, Seq(operationsJsValue)) =>
+        async {
+          val operations = Scala2Js.toScala[Seq[WriteOperation]](operationsJsValue)
+          val returnValue = await(currentApiImpl.applyWriteOperations(operations))
+          val operationsToBroadcast = currentApiImpl.getWriteOperationsToBroadcast(operations)
+
+          OnMessageResponse(
+            response = Scala2Js.toJs[WorkerResponse](WorkerResponse.MethodReturnValue(returnValue)),
+            responseToBroadcastToOtherPorts =
+              Scala2Js.toJs[WorkerResponse](WorkerResponse.BroadcastedWriteOperations(operationsToBroadcast)),
+          )
+        }
       case (MethodNumbers.saveDatabase, Seq()) =>
-        currentApiImpl.saveDatabase().map(_ => js.undefined)
+        currentApiImpl.saveDatabase().map(_ => toResponse(js.undefined))
     }
+  }
+
+  private def getStackTraceString(throwable: Throwable): String = {
+    val sw = new StringWriter
+    throwable.printStackTrace(new PrintWriter(sw))
+    sw.toString
   }
 }
