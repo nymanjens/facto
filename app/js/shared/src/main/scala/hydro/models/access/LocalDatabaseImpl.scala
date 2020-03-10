@@ -17,6 +17,7 @@ import hydro.models.access.webworker.LocalDatabaseWebWorkerApi
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.LokiQuery
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
 import hydro.models.UpdatableEntity
+import hydro.models.access.LocalDatabase.PendingModificationsListener
 import hydro.scala2js.Scala2Js
 import hydro.scala2js.StandardConverters._
 import org.scalajs.dom.console
@@ -283,6 +284,23 @@ private final class LocalDatabaseImpl(
         //console.log("  Resetting database done.")
       }
     }
+
+  override def registerPendingModificationsListener(listener: PendingModificationsListener): Unit = {
+    webWorker.registerListener(new LocalDatabaseWebWorkerApi.ForClient.Listener {
+      override def onWriteOperationsDone(writeOperations: Seq[WriteOperation]): Unit = {
+        writeOperations.collect {
+          case WriteOperation.Insert(`pendingModificationsCollectionName`, jsObj) =>
+            listener.onPendingModificationAddedByOtherInstance(
+              Scala2Js.toScala[ModificationWithId](jsObj).modification)
+          case WriteOperation.Remove(`pendingModificationsCollectionName`, id) =>
+            listener.onPendingModificationRemovedByOtherInstance(Scala2Js.toScala[Long](id))
+          case operation @ WriteOperation.Update(`pendingModificationsCollectionName`, _, _) =>
+            throw new AssertionError(
+              s"Got Update operation ($operation) for pending modifications, which should never happen")
+        }
+      }
+    })
+  }
 
   // **************** Private helper methods ****************//
   private def collectionNameOf(entityType: EntityType.any): String = s"entities_${entityType.name}"
