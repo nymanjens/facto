@@ -4,21 +4,22 @@ import app.common.testing.TestObjects._
 import app.models.access.ModelFields
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
-import hydro.models.modification.EntityModification
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
+import hydro.common.testing.Awaiter
 import hydro.common.testing.FakeClock
 import hydro.models.access.DbResultSet
 import hydro.models.access.LocalDatabase
 import hydro.models.access.LocalDatabaseImpl
 import hydro.models.access.SingletonKey.NextUpdateTokenKey
 import hydro.models.access.SingletonKey.VersionKey
+import hydro.models.modification.EntityModification
 import hydro.models.UpdatableEntity.LastUpdateTime
 import hydro.models.access.SingletonKey.DbStatus
 import hydro.models.access.SingletonKey.DbStatusKey
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApiStub
 import hydro.models.access.worker.JsWorkerClientFacade
-import hydro.models.access.worker.impl.SharedWorkerFacadeImpl
+import hydro.models.access.LocalDatabase.PendingModificationsListener
 import tests.ManualTests.ManualTest
 import tests.ManualTests.ManualTestSuite
 
@@ -26,6 +27,7 @@ import scala.async.Async.async
 import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
+import scala.concurrent.Promise
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 // Note that this is a manual test because the Rhino javascript engine used for tests
@@ -369,6 +371,53 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
               ))) ==> true
 
           await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()) ==> Seq(user1)
+        }
+      },
+      manualTest("registerPendingModificationsListener: Listener is not called for same instance") {
+        async {
+          val db = await(createAndInitializeDb(testParameters))
+
+          val nextEventPromise: Promise[EntityModification] = Promise()
+          db.registerPendingModificationsListener(new PendingModificationsListener {
+            override def onPendingModificationAddedByOtherInstance(modification: EntityModification): Unit =
+              nextEventPromise.failure(new AssertionError(s"Got Add($modification)"))
+            override def onPendingModificationRemovedByOtherInstance(modificationId: Long): Unit =
+              nextEventPromise.failure(new AssertionError(s"Got Remove($modificationId)"))
+          })
+
+          await(db.addPendingModifications(Seq(testModificationA, testModificationB))) ==> true
+          await(db.removePendingModifications(Seq(testModificationB))) ==> true
+
+          await(db.pendingModifications()) ==> Seq(testModificationA)
+          await(Awaiter.expectConsistently.neverComplete(nextEventPromise.future))
+        }
+      },
+      manualTest("registerPendingModificationsListener: Listener is called for different instance") {
+        async {
+          if (testParameters.jsWorker == JsWorkerClientFacade.getSharedIfSupported().get) {
+            val db = await(createAndInitializeDb(testParameters))
+
+            val nextEventPromise: Promise[EntityModification] = Promise()
+            db.registerPendingModificationsListener(new PendingModificationsListener {
+              override def onPendingModificationAddedByOtherInstance(modification: EntityModification): Unit =
+                nextEventPromise.success(modification)
+              override def onPendingModificationRemovedByOtherInstance(modificationId: Long): Unit =
+                nextEventPromise.failure(new AssertionError(s"Got Remove($modificationId)"))
+            })
+
+            val otherDb = {
+              implicit val webWorker =
+                new LocalDatabaseWebWorkerApiStub(forceJsWorker = Some(testParameters.jsWorker))
+              await(
+                LocalDatabaseImpl.createInMemoryForTests(
+                  separateDbPerCollection = testParameters.separateDbPerCollection))
+            }
+
+            await(otherDb.addPendingModifications(Seq(testModificationA))) ==> true
+
+            await(db.pendingModifications()) ==> Seq(testModificationA)
+            await(Awaiter.expectEventually.complete(nextEventPromise.future, expected = testModificationA))
+          }
         }
       },
     )
