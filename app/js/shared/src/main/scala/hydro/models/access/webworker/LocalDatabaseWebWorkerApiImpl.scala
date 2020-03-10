@@ -47,8 +47,10 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
     }
 
     nameToLokiDbs(dbName).map { db =>
+      if (currentLokiDb != db) {
+        collectionsToBroadcast.clear()
+      }
       currentLokiDb = db
-      collectionsToBroadcast.clear()
       (): Unit
     }
   }
