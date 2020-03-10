@@ -380,9 +380,9 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
           val nextEventPromise: Promise[EntityModification] = Promise()
           db.registerPendingModificationsListener(new PendingModificationsListener {
             override def onPendingModificationAddedByOtherInstance(modification: EntityModification): Unit =
-              nextEventPromise.failure(new AssertionError(s"Got Add($modification)"))
+              nextEventPromise.tryFailure(new AssertionError(s"Got Add($modification)"))
             override def onPendingModificationRemovedByOtherInstance(modificationId: Long): Unit =
-              nextEventPromise.failure(new AssertionError(s"Got Remove($modificationId)"))
+              nextEventPromise.tryFailure(new AssertionError(s"Got Remove($modificationId)"))
           })
 
           await(db.addPendingModifications(Seq(testModificationA, testModificationB))) ==> true
@@ -400,9 +400,9 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
             val nextEventPromise: Promise[EntityModification] = Promise()
             db.registerPendingModificationsListener(new PendingModificationsListener {
               override def onPendingModificationAddedByOtherInstance(modification: EntityModification): Unit =
-                nextEventPromise.success(modification)
+                nextEventPromise.trySuccess(modification)
               override def onPendingModificationRemovedByOtherInstance(modificationId: Long): Unit =
-                nextEventPromise.failure(new AssertionError(s"Got Remove($modificationId)"))
+                nextEventPromise.tryFailure(new AssertionError(s"Got Remove($modificationId)"))
             })
 
             val otherDb = {
