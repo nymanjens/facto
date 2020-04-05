@@ -17,7 +17,6 @@ import hydro.models.access.webworker.LocalDatabaseWebWorkerApi
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.LokiQuery
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
 import hydro.models.UpdatableEntity
-import hydro.models.access.LocalDatabase.PendingModificationsListener
 import hydro.scala2js.Scala2Js
 import hydro.scala2js.StandardConverters._
 import org.scalajs.dom.console

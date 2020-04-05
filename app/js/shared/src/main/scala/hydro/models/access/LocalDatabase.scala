@@ -5,7 +5,6 @@ import hydro.models.modification.EntityModification
 import hydro.models.modification.EntityType
 import hydro.models.Entity
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.ForClient
-import hydro.models.access.LocalDatabase.PendingModificationsListener
 
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
@@ -68,10 +67,4 @@ trait LocalDatabase {
   def resetAndInitialize[V](alsoSetSingleton: (SingletonKey[V], V) = null): Future[Unit]
 
   def registerPendingModificationsListener(listener: PendingModificationsListener): Unit
-}
-object LocalDatabase {
-  trait PendingModificationsListener {
-    def onPendingModificationAddedByOtherInstance(modification: EntityModification): Unit
-    def onPendingModificationRemovedByOtherInstance(modificationId: Long): Unit
-  }
 }

@@ -5,7 +5,7 @@ import hydro.models.modification.EntityType
 import hydro.models.Entity
 import hydro.models.access.DbQueryExecutor
 import hydro.models.access.LocalDatabase
-import hydro.models.access.LocalDatabase.PendingModificationsListener
+import hydro.models.access.PendingModificationsListener
 import hydro.models.access.SingletonKey
 
 import scala.collection.immutable.Seq

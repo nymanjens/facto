@@ -19,7 +19,7 @@ import hydro.models.access.SingletonKey.DbStatus
 import hydro.models.access.SingletonKey.DbStatusKey
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApiStub
 import hydro.models.access.worker.JsWorkerClientFacade
-import hydro.models.access.LocalDatabase.PendingModificationsListener
+import hydro.models.access.PendingModificationsListener
 import tests.ManualTests.ManualTest
 import tests.ManualTests.ManualTestSuite
 
