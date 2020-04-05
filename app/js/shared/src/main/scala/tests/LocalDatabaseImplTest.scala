@@ -26,6 +26,7 @@ import tests.ManualTests.ManualTestSuite
 import scala.async.Async.async
 import scala.async.Async.await
 import scala.collection.immutable.Seq
+import scala.collection.mutable
 import scala.concurrent.Future
 import scala.concurrent.Promise
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
@@ -397,12 +398,13 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
           if (testParameters.jsWorker == JsWorkerClientFacade.getSharedIfSupported().get) {
             val db = await(createAndInitializeDb(testParameters))
 
-            val nextEventPromise: Promise[EntityModification] = Promise()
+            val receivedAdditions: mutable.Buffer[EntityModification] = mutable.Buffer()
+            val errors: mutable.Buffer[Throwable] = mutable.Buffer()
             db.registerPendingModificationsListener(new PendingModificationsListener {
               override def onPendingModificationAddedByOtherInstance(modification: EntityModification): Unit =
-                nextEventPromise.trySuccess(modification)
+                receivedAdditions += modification
               override def onPendingModificationRemovedByOtherInstance(modificationId: Long): Unit =
-                nextEventPromise.tryFailure(new AssertionError(s"Got Remove($modificationId)"))
+                errors += new AssertionError(s"Got Remove($modificationId)")
             })
 
             val otherDb = {
@@ -414,9 +416,12 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
             }
 
             await(otherDb.addPendingModifications(Seq(testModificationA))) ==> true
+            await(otherDb.addPendingModifications(Seq(testModificationA))) ==> false
 
             await(db.pendingModifications()) ==> Seq(testModificationA)
-            await(Awaiter.expectEventually.complete(nextEventPromise.future, expected = testModificationA))
+            await(Awaiter.expectConsistently.isEmpty(errors))
+            await(Awaiter.expectEventually.nonEmpty(receivedAdditions))
+            await(Awaiter.expectConsistently.equal(receivedAdditions.toVector, Seq(testModificationA)))
           }
         }
       },
