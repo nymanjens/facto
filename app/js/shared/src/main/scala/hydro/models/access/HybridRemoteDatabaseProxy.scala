@@ -199,7 +199,7 @@ final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
 }
 
 object HybridRemoteDatabaseProxy {
-  private val localDatabaseAndEntityVersion = "hydro-2.5"
+  private val localDatabaseAndEntityVersion = "hydro-2.6"
   private val maxTimeToPopulate: Duration = Duration.ofMinutes(8)
 
   def create(localDatabase: Future[LocalDatabase])(
