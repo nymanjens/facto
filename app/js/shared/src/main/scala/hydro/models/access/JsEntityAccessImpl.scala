@@ -156,10 +156,20 @@ class JsEntityAccessImpl()(
   // **************** Private inner types ****************//
   private object UpdatingPendingModificationsListener extends PendingModificationsListener {
     override def onPendingModificationAddedByOtherInstance(modification: EntityModification): Unit = {
-      _pendingModifications ++= Seq(modification)
+      if (!(_pendingModifications.modifications contains modification)) {
+        _pendingModifications ++= Seq(modification)
+        invokeListenersAsync(_.modificationsAddedOrPendingStateChanged(Seq(modification)))
+      }
     }
-    override def onPendingModificationRemovedByOtherInstance(modificationPseudoUniqueIdentifier: Long): Unit = {
-      _pendingModifications = _pendingModifications.copyWithoutPseudoUniqueIdentifier(modificationPseudoUniqueIdentifier)
+    override def onPendingModificationRemovedByOtherInstance(
+        modificationPseudoUniqueIdentifier: Long): Unit = {
+      val modificationsToRemove =
+        _pendingModifications.modifications.filter(
+          _.pseudoUniqueIdentifier == modificationPseudoUniqueIdentifier)
+      if (modificationsToRemove.nonEmpty) {
+        _pendingModifications --= modificationsToRemove
+        invokeListenersAsync(_.modificationsAddedOrPendingStateChanged(modificationsToRemove))
+      }
     }
   }
 }
