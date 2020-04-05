@@ -191,6 +191,11 @@ final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
   }
 
   override def localDatabaseReadyFuture: Future[Unit] = futureLocalDatabase.future().map(_ => (): Unit)
+
+  override def registerPendingModificationsListener(listener: PendingModificationsListener): Unit = {
+    futureLocalDatabase.scheduleUpdateAtStart(db =>
+      Future.successful(db.registerPendingModificationsListener(listener)))
+  }
 }
 
 object HybridRemoteDatabaseProxy {
