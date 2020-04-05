@@ -36,11 +36,11 @@ object ManualTests {
     }
     nextFuture map { _ =>
       println(s"  All tests finished. $successCount succeeded, ${failingTestNames.size} failed")
-      if(failingTestNames.nonEmpty) {
+      if (failingTestNames.nonEmpty) {
         println("")
         println("  Failing tests:")
-        for(testName <- failingTestNames) {
-        println(s"    - $testName")
+        for (testName <- failingTestNames) {
+          println(s"    - $testName")
         }
       }
     }

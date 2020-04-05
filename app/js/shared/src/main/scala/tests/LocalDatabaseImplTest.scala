@@ -382,8 +382,10 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
           db.registerPendingModificationsListener(new PendingModificationsListener {
             override def onPendingModificationAddedByOtherInstance(modification: EntityModification): Unit =
               nextEventPromise.tryFailure(new AssertionError(s"Got Add($modification)"))
-            override def onPendingModificationRemovedByOtherInstance(modificationPseudoUniqueIdentifier: Long): Unit =
-              nextEventPromise.tryFailure(new AssertionError(s"Got Remove($modificationPseudoUniqueIdentifier)"))
+            override def onPendingModificationRemovedByOtherInstance(
+                modificationPseudoUniqueIdentifier: Long): Unit =
+              nextEventPromise.tryFailure(
+                new AssertionError(s"Got Remove($modificationPseudoUniqueIdentifier)"))
           })
 
           await(db.addPendingModifications(Seq(testModificationA, testModificationB))) ==> true
@@ -403,7 +405,8 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
             db.registerPendingModificationsListener(new PendingModificationsListener {
               override def onPendingModificationAddedByOtherInstance(modification: EntityModification): Unit =
                 receivedAdditions += modification
-              override def onPendingModificationRemovedByOtherInstance(modificationPseudoUniqueIdentifier: Long): Unit =
+              override def onPendingModificationRemovedByOtherInstance(
+                  modificationPseudoUniqueIdentifier: Long): Unit =
                 errors += new AssertionError(s"Got Remove($modificationPseudoUniqueIdentifier)")
             })
 
