@@ -38,6 +38,11 @@ class JsEntityAccessImpl()(
     _pendingModifications = _pendingModifications.copy(persistedLocally = true)
     _pendingModifications ++= existingPendingModifications
 
+    // Start listening to changes right after the existing list was loaded.
+    // Note: There is a race condition here if updates happened between the fetching and the listening. Listening
+    // too early has the risk of applying updates that are then overwritten (unless we hold on to them).
+    remoteDatabaseProxy.registerPendingModificationsListener(UpdatingPendingModificationsListener)
+
     _localDatabaseHasBeenLoaded.set(true)
 
     // Heuristic: When the local database is also loaded and the pending modifications are loaded, pending
@@ -52,7 +57,7 @@ class JsEntityAccessImpl()(
         waitUntilQueryReflectsModifications = false)
     }
 
-    // TODO(feat-SharedWorker): Move to SharedWorker
+    // TODO: Move to SharedWorker
     // Send pending modifications whenever connection with the server is restored
     hydroPushSocketClientFactory.pushClientsAreOnline.registerListener { isOnline =>
       if (isOnline) {
@@ -144,6 +149,26 @@ class JsEntityAccessImpl()(
         isCallingListeners = true
         listeners.foreach(func)
         isCallingListeners = false
+      }
+    }
+  }
+
+  // **************** Private inner types ****************//
+  private object UpdatingPendingModificationsListener extends PendingModificationsListener {
+    override def onPendingModificationAddedByOtherInstance(modification: EntityModification): Unit = {
+      if (!(_pendingModifications.modifications contains modification)) {
+        _pendingModifications ++= Seq(modification)
+        invokeListenersAsync(_.modificationsAddedOrPendingStateChanged(Seq(modification)))
+      }
+    }
+    override def onPendingModificationRemovedByOtherInstance(
+        modificationPseudoUniqueIdentifier: Long): Unit = {
+      val modificationsToRemove =
+        _pendingModifications.modifications.filter(
+          _.pseudoUniqueIdentifier == modificationPseudoUniqueIdentifier)
+      if (modificationsToRemove.nonEmpty) {
+        _pendingModifications --= modificationsToRemove
+        invokeListenersAsync(_.modificationsAddedOrPendingStateChanged(modificationsToRemove))
       }
     }
   }

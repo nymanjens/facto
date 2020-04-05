@@ -1,6 +1,7 @@
 package hydro.models.access.webworker
 
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.LokiQuery
+import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WorkerResponse
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApiConverters._
 import hydro.scala2js.Scala2Js
@@ -9,6 +10,8 @@ import utest._
 import scala.collection.immutable.Seq
 import scala.language.reflectiveCalls
 import scala.scalajs.js
+
+import app.common.testing.TestObjects._
 
 object LocalDatabaseWebWorkerApiConvertersTest extends TestSuite {
 
@@ -29,9 +32,14 @@ object LocalDatabaseWebWorkerApiConvertersTest extends TestSuite {
       "Remove" - { testForwardAndBackward[WriteOperation](WriteOperation.Remove("test", "192837")) }
       "Clear" - { testForwardAndBackward[WriteOperation](WriteOperation.RemoveCollection("test")) }
       "AddCollection" - {
-        testForwardAndBackward[WriteOperation](WriteOperation.AddCollection("test", Seq("id"), Seq("code")))
+        testForwardAndBackward[WriteOperation](
+          WriteOperation.AddCollection(
+            collectionName = "test",
+            uniqueIndices = Seq("id"),
+            indices = Seq("code"),
+            broadcastWriteOperations = true,
+          ))
       }
-      "SaveDatabase" - { testForwardAndBackward[WriteOperation](WriteOperation.SaveDatabase) }
     }
 
     "LokiQueryConverter" - {
@@ -42,6 +50,18 @@ object LocalDatabaseWebWorkerApiConvertersTest extends TestSuite {
           filter = Some(testObj),
           sorting = Some(js.Array(js.Array[js.Any]("xx", 12))),
           limit = Some(1238)))
+    }
+
+    "WorkerResponseConverter" - {
+      "Failed" - { testForwardAndBackward[WorkerResponse](WorkerResponse.Failed("test")) }
+      "MethodReturnValue" - {
+        testForwardAndBackward[WorkerResponse](WorkerResponse.MethodReturnValue(testObj))
+      }
+      "BroadcastedWriteOperations" - {
+        testForwardAndBackward[WorkerResponse](
+          WorkerResponse.BroadcastedWriteOperations(
+            Seq(WriteOperation.Update("test", testObj, abortUnlessExistingValueEquals = js.undefined))))
+      }
     }
   }
 

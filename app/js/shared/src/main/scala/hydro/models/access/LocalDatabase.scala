@@ -4,6 +4,7 @@ import hydro.common.Annotations.visibleForTesting
 import hydro.models.modification.EntityModification
 import hydro.models.modification.EntityType
 import hydro.models.Entity
+import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.ForClient
 
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
@@ -64,4 +65,6 @@ trait LocalDatabase {
 
   /** Removes all data and resets its configuration. */
   def resetAndInitialize[V](alsoSetSingleton: (SingletonKey[V], V) = null): Future[Unit]
+
+  def registerPendingModificationsListener(listener: PendingModificationsListener): Unit
 }

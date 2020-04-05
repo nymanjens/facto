@@ -31,6 +31,8 @@ trait RemoteDatabaseProxy {
     */
   def localDatabaseReadyFuture: Future[Unit]
 
+  def registerPendingModificationsListener(listener: PendingModificationsListener): Unit
+
   case class PersistEntityModificationsResponse(
       queryReflectsModificationsFuture: Future[Unit],
       completelyDoneFuture: Future[Unit],

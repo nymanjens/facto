@@ -5,6 +5,7 @@ import hydro.models.modification.EntityType
 import hydro.models.Entity
 import hydro.models.access.DbQueryExecutor
 import hydro.models.access.LocalDatabase
+import hydro.models.access.PendingModificationsListener
 import hydro.models.access.SingletonKey
 
 import scala.collection.immutable.Seq
@@ -68,6 +69,8 @@ final class FakeLocalDatabase extends LocalDatabase {
     singletonMap.clear()
     Future.successful((): Unit)
   }
+
+  override def registerPendingModificationsListener(listener: PendingModificationsListener): Unit = {}
 
   // **************** Additional methods for tests ****************//
   def allModifications: Seq[EntityModification] = modificationsBuffer.getModifications()

@@ -1,10 +1,11 @@
 package hydro.common.testing
 
-import scala.concurrent.Future
-import scala.concurrent.Promise
 import scala.concurrent.duration._
 import scala.language.reflectiveCalls
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+
+import scala.concurrent.Future
+import scala.concurrent.Promise
 import scala.scalajs.js
 
 object Awaiter {

@@ -1,12 +1,14 @@
 package hydro.models.access.webworker
 
 import hydro.common.JsLoggingUtils.logExceptions
+import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.LokiQuery
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.MethodNumbers
+import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WorkerResponse
+import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApiConverters._
 import hydro.models.access.worker.JsWorkerClientFacade
 import hydro.models.access.worker.JsWorkerClientFacade.JsWorkerClient
 import hydro.scala2js.Scala2Js
-import hydro.scala2js.StandardConverters._
 import org.scalajs
 
 import scala.async.Async.async
@@ -22,10 +24,11 @@ import scala.scalajs.js.JSConverters._
 
 final class LocalDatabaseWebWorkerApiStub(
     forceJsWorker: Option[JsWorkerClientFacade] = None,
-) extends LocalDatabaseWebWorkerApi {
+) extends LocalDatabaseWebWorkerApi.ForClient {
 
   private val responseMessagePromises: mutable.Buffer[Promise[js.Any]] = mutable.Buffer()
   private val worker: JsWorkerClient = initializeJsWorker()
+  private var listeners: Seq[LocalDatabaseWebWorkerApi.ForClient.Listener] = Seq()
 
   override def createIfNecessary(dbName: String, inMemory: Boolean, separateDbPerCollection: Boolean) = {
     sendAndReceive(
@@ -35,26 +38,37 @@ final class LocalDatabaseWebWorkerApiStub(
     ).map(_ => (): Unit)
   }
 
-  override def executeDataQuery(lokiQuery: LocalDatabaseWebWorkerApi.LokiQuery) =
+  override def executeDataQuery(lokiQuery: LokiQuery) =
     sendAndReceive(
       MethodNumbers.executeDataQuery,
       Seq(Scala2Js.toJs(lokiQuery)),
       timeout = 40.seconds,
     ).map(_.asInstanceOf[js.Array[js.Dictionary[js.Any]]].toVector)
 
-  override def executeCountQuery(lokiQuery: LocalDatabaseWebWorkerApi.LokiQuery) =
+  override def executeCountQuery(lokiQuery: LokiQuery) =
     sendAndReceive(
       MethodNumbers.executeCountQuery,
       Seq(Scala2Js.toJs(lokiQuery)),
       timeout = 40.seconds,
     ).map(_.asInstanceOf[Int])
 
-  override def applyWriteOperations(operations: Seq[LocalDatabaseWebWorkerApi.WriteOperation]) =
+  override def applyWriteOperations(operations: Seq[WriteOperation]) =
     sendAndReceive(
       MethodNumbers.applyWriteOperations,
       Seq(Scala2Js.toJs(operations.toList)),
       timeout = 2.minutes,
     ).map(_.asInstanceOf[Boolean])
+
+  override def saveDatabase() =
+    sendAndReceive(
+      MethodNumbers.saveDatabase,
+      Seq(),
+      timeout = 2.minutes,
+    ).map(_ => (): Unit)
+
+  override def registerListener(listener: LocalDatabaseWebWorkerApi.ForClient.Listener): Unit = {
+    listeners = listeners :+ listener
+  }
 
   private def sendAndReceive(methodNum: Int, args: Seq[js.Any], timeout: FiniteDuration): Future[js.Any] =
     async {
@@ -76,9 +90,10 @@ final class LocalDatabaseWebWorkerApiStub(
             .log(
               "  [LocalDatabaseWebWorker] Operation timed out " +
                 s"(methodNum = $methodNum, args = $args, timeout = $timeout)")
+          responseMessagePromises -= thisMessagePromise
+          thisMessagePromise.failure(
+            new Exception(s"Operation timed out (methodNum = $methodNum, args = $args, timeout = $timeout)"))
         }
-        thisMessagePromise.tryFailure(
-          new Exception(s"Operation timed out (methodNum = $methodNum, args = $args, timeout = $timeout)"))
       }
 
       await(thisMessagePromise.future)
@@ -93,21 +108,34 @@ final class LocalDatabaseWebWorkerApiStub(
 
     workerClientFacade.setUpClient(
       scriptUrl = "/localDatabaseWebWorker.js",
-      onMessage = data => {
-        responseMessagePromises.headOption match {
-          case Some(promise) if promise.isCompleted =>
-            throw new AssertionError(
-              "First promise in responseMessagePromises is completed. This is a bug unless this operation timed out.")
-          case Some(promise) =>
-            responseMessagePromises.remove(0)
-            if (data == Scala2Js.toJs("FAILED")) {
-              promise.failure(new IllegalStateException("WebWorker invocation failed"))
-            } else {
-              promise.success(data)
-            }
-          case None =>
-            throw new AssertionError(s"Received unexpected message: $data")
-        }
+      onMessage = data =>
+        logExceptions {
+          Scala2Js.toScala[WorkerResponse](data) match {
+            case response @ WorkerResponse.Failed(stackTrace) =>
+              responseMessagePromises.headOption match {
+                case Some(promise) =>
+                  responseMessagePromises.remove(0)
+                  promise.failure(new IllegalStateException(s"WebWorker invocation failed:\n$stackTrace"))
+                case None =>
+                  throw new AssertionError(
+                    s"Received unexpected message (this is a bug unless this operation timed out): $response")
+              }
+
+            case response @ WorkerResponse.MethodReturnValue(returnValue) =>
+              responseMessagePromises.headOption match {
+                case Some(promise) =>
+                  responseMessagePromises.remove(0)
+                  promise.success(returnValue)
+                case None =>
+                  throw new AssertionError(
+                    s"Received unexpected message (this is a bug unless this operation timed out): $response")
+              }
+
+            case WorkerResponse.BroadcastedWriteOperations(writeOperations) =>
+              for (listener <- listeners) {
+                listener.onWriteOperationsDone(writeOperations)
+              }
+          }
       },
     )
   }

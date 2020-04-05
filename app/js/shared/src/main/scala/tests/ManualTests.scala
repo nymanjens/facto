@@ -1,6 +1,7 @@
 package tests
 
 import scala.collection.immutable.Seq
+import scala.collection.mutable
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
@@ -10,22 +11,23 @@ object ManualTests {
   def run(): Unit = {
     var nextFuture = Future.successful((): Unit)
     var successCount = 0
-    var failureCount = 0
+    val failingTestNames: mutable.Buffer[String] = mutable.Buffer()
+
     for (testSuite <- allTestSuites) {
       for (test <- testSuite.tests) {
         nextFuture = nextFuture flatMap { _ =>
-          val prefix = s"[${testSuite.getClass.getSimpleName}: ${test.name}]"
-          println(s"  $prefix  Starting test")
+          val testName = s"${testSuite.getClass.getSimpleName}: ${test.name}"
+          println(s"  [$testName]  Starting test")
           Future.successful((): Unit) flatMap { _ =>
             test.testCode()
           } map { _ =>
-            println(s"  $prefix  Finished test")
+            println(s"  [$testName]  Finished test")
             successCount += 1
           } recoverWith {
             case throwable => {
-              println(s"  $prefix  Test failed: $throwable")
+              println(s"  [$testName]  Test failed: $throwable")
               throwable.printStackTrace()
-              failureCount += 1
+              failingTestNames += testName
               Future.successful((): Unit)
             }
           }
@@ -33,7 +35,14 @@ object ManualTests {
       }
     }
     nextFuture map { _ =>
-      println(s"  All tests finished. $successCount succeeded, $failureCount failed")
+      println(s"  All tests finished. $successCount succeeded, ${failingTestNames.size} failed")
+      if (failingTestNames.nonEmpty) {
+        println("")
+        println("  Failing tests:")
+        for (testName <- failingTestNames) {
+          println(s"    - $testName")
+        }
+      }
     }
   }
 

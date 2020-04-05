@@ -8,6 +8,7 @@ import scala.async.Async.async
 import scala.async.Async.await
 import hydro.jsfacades.LokiJs
 import hydro.jsfacades.LokiJs.FilterFactory.Operation
+import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.LokiQuery
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApi.WriteOperation._
 import hydro.models.access.webworker.LocalDatabaseWebWorkerApiImpl.areEquivalentEntities
@@ -19,9 +20,10 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 
-private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDatabaseWebWorkerApi {
+private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDatabaseWebWorkerApi.ForServer {
   private val nameToLokiDbs: mutable.Map[String, Future[LokiJs.Database]] = mutable.Map()
   private var currentLokiDb: LokiJs.Database = _
+  private val collectionsToBroadcast: mutable.Set[String] = mutable.Set()
 
   override def createIfNecessary(
       dbName: String,
@@ -45,25 +47,27 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
     }
 
     nameToLokiDbs(dbName).map { db =>
+      if (currentLokiDb != db) {
+        collectionsToBroadcast.clear()
+      }
       currentLokiDb = db
       (): Unit
     }
   }
 
-  override def executeDataQuery(
-      lokiQuery: LocalDatabaseWebWorkerApi.LokiQuery): Future[Seq[js.Dictionary[js.Any]]] =
+  override def executeDataQuery(lokiQuery: LokiQuery): Future[Seq[js.Dictionary[js.Any]]] =
     Future.successful(toResultSet(lokiQuery) match {
       case Some(r) => r.data().toVector
       case None    => Seq()
     })
 
-  override def executeCountQuery(lokiQuery: LocalDatabaseWebWorkerApi.LokiQuery): Future[Int] =
+  override def executeCountQuery(lokiQuery: LokiQuery): Future[Int] =
     Future.successful(toResultSet(lokiQuery) match {
       case Some(r) => r.count()
       case None    => 0
     })
 
-  private def toResultSet(lokiQuery: LocalDatabaseWebWorkerApi.LokiQuery): Option[LokiJs.ResultSet] = {
+  private def toResultSet(lokiQuery: LokiQuery): Option[LokiJs.ResultSet] = {
     currentLokiDb.getCollection(lokiQuery.collectionName) match {
       case None =>
         console.log(
@@ -86,77 +90,76 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
   }
 
   override def applyWriteOperations(operations: Seq[WriteOperation]): Future[Boolean] = {
-    Future
-      .sequence(operations map {
-        case Insert(collectionName, obj) =>
-          Future.successful {
-            val lokiCollection = getCollection(collectionName)
-            findById(lokiCollection, obj("id")) match {
-              case Some(entity) => false
-              case None =>
-                lokiCollection.insert(obj)
-                true
-            }
-          }
+    val changedSeq: Seq[Boolean] =
+      for (operation <- operations)
+        yield
+          operation match {
+            case Insert(collectionName, obj) =>
+              val lokiCollection = getCollection(collectionName)
+              findById(lokiCollection, obj("id")) match {
+                case Some(entity) => false
+                case None =>
+                  lokiCollection.insert(obj)
+                  true
+              }
 
-        case Update(collectionName, updatedObj, abortUnlessExistingValueEquals) =>
-          Future.successful {
-            val lokiCollection = getCollection(collectionName)
-            findById(lokiCollection, updatedObj("id")) match {
-              case None => false
-              case Some(e) if areEquivalentEntities(fromLoki = e, fromClient = updatedObj) =>
+            case Update(collectionName, updatedObj, abortUnlessExistingValueEquals) =>
+              val lokiCollection = getCollection(collectionName)
+              findById(lokiCollection, updatedObj("id")) match {
+                case None => false
+                case Some(e) if areEquivalentEntities(fromLoki = e, fromClient = updatedObj) =>
+                  false
+                case Some(e)
+                    if abortUnlessExistingValueEquals.isDefined &&
+                      !areEquivalentEntities(fromLoki = e, fromClient = abortUnlessExistingValueEquals.get) =>
+                  // Abort
+                  false
+                case Some(e) =>
+                  lokiCollection.findAndRemove(
+                    LokiJs.FilterFactory.keyValueFilter(Operation.Equal, "id", updatedObj("id")))
+                  lokiCollection.insert(updatedObj)
+                  true
+              }
+
+            case Remove(collectionName, id) =>
+              val lokiCollection = getCollection(collectionName)
+              findById(lokiCollection, id) match {
+                case None => false
+                case Some(entity) =>
+                  lokiCollection.findAndRemove(LokiJs.FilterFactory.keyValueFilter(Operation.Equal, "id", id))
+                  true
+              }
+
+            case AddCollection(collectionName, uniqueIndices, indices, broadcastWriteOperations) =>
+              if (currentLokiDb.getCollection(collectionName).isEmpty) {
+                currentLokiDb.addCollection(
+                  collectionName,
+                  uniqueIndices = uniqueIndices,
+                  indices = indices
+                )
+                if (broadcastWriteOperations) {
+                  collectionsToBroadcast.add(collectionName)
+                }
+                true
+              } else {
                 false
-              case Some(e)
-                  if abortUnlessExistingValueEquals.isDefined &&
-                    !areEquivalentEntities(fromLoki = e, fromClient = abortUnlessExistingValueEquals.get) =>
-                // Abort
-                false
-              case Some(e) =>
-                lokiCollection.findAndRemove(
-                  LokiJs.FilterFactory.keyValueFilter(Operation.Equal, "id", updatedObj("id")))
-                lokiCollection.insert(updatedObj)
-                true
-            }
-          }
+              }
 
-        case Remove(collectionName, id) =>
-          Future.successful {
-            val lokiCollection = getCollection(collectionName)
-            findById(lokiCollection, id) match {
-              case None => false
-              case Some(entity) =>
-                lokiCollection.findAndRemove(LokiJs.FilterFactory.keyValueFilter(Operation.Equal, "id", id))
-                true
-            }
-          }
-
-        case AddCollection(collectionName, uniqueIndices, indices) =>
-          Future.successful {
-            if (currentLokiDb.getCollection(collectionName).isEmpty) {
-              currentLokiDb.addCollection(
-                collectionName,
-                uniqueIndices = uniqueIndices,
-                indices = indices
-              )
+            case RemoveCollection(collectionName) =>
+              currentLokiDb.removeCollection(collectionName)
+              collectionsToBroadcast.remove(collectionName)
               true
-            } else {
-              false
-            }
           }
 
-        case RemoveCollection(collectionName) =>
-          Future.successful {
-            currentLokiDb.removeCollection(collectionName)
-            true
-          }
+    Future.successful(changedSeq contains true)
+  }
 
-        case SaveDatabase =>
-          async {
-            await(currentLokiDb.saveDatabase())
-            false
-          }
-      })
-      .map(changedSeq => changedSeq contains true)
+  override def saveDatabase(): Future[Unit] = {
+    currentLokiDb.saveDatabase()
+  }
+
+  override private[webworker] def getWriteOperationsToBroadcast(operations: Seq[WriteOperation]) = {
+    operations.filter(operation => collectionsToBroadcast contains operation.collectionName)
   }
 
   private def findById(lokiCollection: LokiJs.Collection, id: js.Any): Option[js.Dictionary[js.Any]] = {

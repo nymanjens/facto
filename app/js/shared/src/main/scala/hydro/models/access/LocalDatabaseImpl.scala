@@ -31,7 +31,7 @@ import scala.scalajs.js.JSConverters._
 import scala.util.matching.Regex
 
 private final class LocalDatabaseImpl(
-    implicit webWorker: LocalDatabaseWebWorkerApi,
+    implicit webWorker: LocalDatabaseWebWorkerApi.ForClient,
     secondaryIndexFunction: SecondaryIndexFunction,
 ) extends LocalDatabase {
 
@@ -225,7 +225,7 @@ private final class LocalDatabaseImpl(
           ))
       else
         Seq(
-          addSingletonCollectionOperation,
+          addSingletonCollectionOperation(),
           // Either the Update or Insert will be a no-op, depending on whether this value already exists
           WriteOperation.Update(singletonsCollectionName, singletonObj(value)),
           WriteOperation.Insert(singletonsCollectionName, singletonObj(value))
@@ -237,15 +237,13 @@ private final class LocalDatabaseImpl(
     val singletonObj = Scala2Js.toJsMap(Singleton(key = key.name, value = Scala2Js.toJs(value)))
     webWorker.applyWriteOperations(
       Seq(
-        addSingletonCollectionOperation,
+        addSingletonCollectionOperation(),
         WriteOperation.Insert(singletonsCollectionName, singletonObj)
       ))
   }
 
   override def save() = serializingWriteQueue.schedule {
-    webWorker
-      .applyWriteOperations(Seq(WriteOperation.SaveDatabase))
-      .map(_ => (): Unit)
+    webWorker.saveDatabase()
   }
 
   override def resetAndInitialize[V](alsoSetSingleton: (SingletonKey[V], V) = null): Future[Unit] =
@@ -263,13 +261,17 @@ private final class LocalDatabaseImpl(
                     WriteOperation.AddCollection(
                       collectionNameOf(entityType),
                       uniqueIndices = Seq("id"),
-                      indices = secondaryIndexFunction(entityType).map(_.name))) ++
+                      indices = secondaryIndexFunction(entityType).map(_.name),
+                      broadcastWriteOperations = false,
+                    )) ++
                 Seq(
-                  addSingletonCollectionOperation,
+                  addSingletonCollectionOperation(),
                   WriteOperation.AddCollection(
                     pendingModificationsCollectionName,
                     uniqueIndices = Seq("id"),
-                    indices = Seq())
+                    indices = Seq(),
+                    broadcastWriteOperations = true,
+                  )
                 ) ++
                 Option(alsoSetSingleton).map {
                   case (key, value) =>
@@ -282,6 +284,23 @@ private final class LocalDatabaseImpl(
       }
     }
 
+  override def registerPendingModificationsListener(listener: PendingModificationsListener): Unit = {
+    webWorker.registerListener(new LocalDatabaseWebWorkerApi.ForClient.Listener {
+      override def onWriteOperationsDone(writeOperations: Seq[WriteOperation]): Unit = {
+        writeOperations.collect {
+          case WriteOperation.Insert(`pendingModificationsCollectionName`, jsObj) =>
+            listener.onPendingModificationAddedByOtherInstance(
+              Scala2Js.toScala[ModificationWithId](jsObj).modification)
+          case WriteOperation.Remove(`pendingModificationsCollectionName`, id) =>
+            listener.onPendingModificationRemovedByOtherInstance(Scala2Js.toScala[Long](id))
+          case operation @ WriteOperation.Update(`pendingModificationsCollectionName`, _, _) =>
+            throw new AssertionError(
+              s"Got Update operation ($operation) for pending modifications, which should never happen")
+        }
+      }
+    })
+  }
+
   // **************** Private helper methods ****************//
   private def collectionNameOf(entityType: EntityType.any): String = s"entities_${entityType.name}"
   private val singletonsCollectionName = "singletons"
@@ -289,15 +308,20 @@ private final class LocalDatabaseImpl(
   private def allCollectionNames: Seq[String] =
     EntityTypes.all.map(collectionNameOf) :+ singletonsCollectionName :+ pendingModificationsCollectionName
 
-  private def addSingletonCollectionOperation: WriteOperation = {
-    WriteOperation.AddCollection(singletonsCollectionName, uniqueIndices = Seq("id"), indices = Seq())
+  private def addSingletonCollectionOperation(): WriteOperation = {
+    WriteOperation.AddCollection(
+      singletonsCollectionName,
+      uniqueIndices = Seq("id"),
+      indices = Seq(),
+      broadcastWriteOperations = false,
+    )
   }
 }
 
 object LocalDatabaseImpl {
 
   def create(separateDbPerCollection: Boolean = false)(
-      implicit webWorker: LocalDatabaseWebWorkerApi,
+      implicit webWorker: LocalDatabaseWebWorkerApi.ForClient,
       secondaryIndexFunction: SecondaryIndexFunction,
   ): Future[LocalDatabase] = async {
     await(
@@ -310,7 +334,7 @@ object LocalDatabaseImpl {
   }
 
   def createStoredForTests(separateDbPerCollection: Boolean = false)(
-      implicit webWorker: LocalDatabaseWebWorkerApi,
+      implicit webWorker: LocalDatabaseWebWorkerApi.ForClient,
       secondaryIndexFunction: SecondaryIndexFunction,
   ): Future[LocalDatabase] = async {
     await(
@@ -323,7 +347,7 @@ object LocalDatabaseImpl {
   }
 
   def createInMemoryForTests(separateDbPerCollection: Boolean = false)(
-      implicit webWorker: LocalDatabaseWebWorkerApi,
+      implicit webWorker: LocalDatabaseWebWorkerApi.ForClient,
       secondaryIndexFunction: SecondaryIndexFunction,
   ): Future[LocalDatabase] =
     async {
@@ -358,7 +382,7 @@ object LocalDatabaseImpl {
   }
 
   private case class ModificationWithId(modification: EntityModification) {
-    def id: Long = modification.hashCode()
+    def id: Long = modification.pseudoUniqueIdentifier
   }
 
   private object ModificationWithId {

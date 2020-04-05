@@ -191,10 +191,15 @@ final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
   }
 
   override def localDatabaseReadyFuture: Future[Unit] = futureLocalDatabase.future().map(_ => (): Unit)
+
+  override def registerPendingModificationsListener(listener: PendingModificationsListener): Unit = {
+    futureLocalDatabase.scheduleUpdateAtStart(db =>
+      Future.successful(db.registerPendingModificationsListener(listener)))
+  }
 }
 
 object HybridRemoteDatabaseProxy {
-  private val localDatabaseAndEntityVersion = "hydro-2.5"
+  private val localDatabaseAndEntityVersion = "hydro-2.6"
   private val maxTimeToPopulate: Duration = Duration.ofMinutes(8)
 
   def create(localDatabase: Future[LocalDatabase])(

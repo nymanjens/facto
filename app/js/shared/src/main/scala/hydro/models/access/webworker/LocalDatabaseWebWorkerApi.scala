@@ -22,11 +22,29 @@ trait LocalDatabaseWebWorkerApi {
   /**
     * Executes the given operations in sequence.
     *
-    * Returns true if database was modified (SaveDatabase doesn't count as modification).
+    * Returns true if database was modified.
     */
   def applyWriteOperations(operations: Seq[WriteOperation]): Future[Boolean]
+
+  def saveDatabase(): Future[Unit]
 }
 object LocalDatabaseWebWorkerApi {
+
+  private[webworker] trait ForServer extends LocalDatabaseWebWorkerApi {
+
+    /** Pure function (no side effects) that returns the operations that should be broadcasted. */
+    private[webworker] def getWriteOperationsToBroadcast(operations: Seq[WriteOperation]): Seq[WriteOperation]
+  }
+
+  trait ForClient extends LocalDatabaseWebWorkerApi {
+    def registerListener(listener: ForClient.Listener): Unit
+  }
+  object ForClient {
+    trait Listener {
+      def onWriteOperationsDone(writeOperations: Seq[WriteOperation]): Unit
+    }
+  }
+
   case class LokiQuery(
       collectionName: String,
       filter: Option[js.Dictionary[js.Any]] = None,
@@ -34,27 +52,30 @@ object LocalDatabaseWebWorkerApi {
       limit: Option[Int] = None,
   )
 
-  sealed trait WriteOperation
+  sealed trait WriteOperation {
+    def collectionName: String
+  }
   object WriteOperation {
-    case class Insert(collectionName: String, obj: js.Dictionary[js.Any]) extends WriteOperation
+    case class Insert(override val collectionName: String, obj: js.Dictionary[js.Any]) extends WriteOperation
 
     case class Update(
-        collectionName: String,
+        override val collectionName: String,
         updatedObj: js.Dictionary[js.Any],
         abortUnlessExistingValueEquals: js.UndefOr[js.Dictionary[js.Any]] = js.undefined,
     ) extends WriteOperation
 
-    case class Remove(collectionName: String, id: js.Any) extends WriteOperation
+    // Note: `id` is js.Any because it should already be converted via Scala2Js before it is sent to the worker
+    case class Remove(override val collectionName: String, id: js.Any) extends WriteOperation
 
     case class AddCollection(
-        collectionName: String,
+        override val collectionName: String,
         uniqueIndices: Seq[String],
         indices: Seq[String],
+        // If true, BroadcastedWriteOperations will be sent for this collection
+        broadcastWriteOperations: Boolean,
     ) extends WriteOperation
 
-    case class RemoveCollection(collectionName: String) extends WriteOperation
-
-    case object SaveDatabase extends WriteOperation
+    case class RemoveCollection(override val collectionName: String) extends WriteOperation
   }
 
   object MethodNumbers {
@@ -62,5 +83,13 @@ object LocalDatabaseWebWorkerApi {
     val executeDataQuery: Int = 2
     val executeCountQuery: Int = 3
     val applyWriteOperations: Int = 4
+    val saveDatabase: Int = 5
+  }
+
+  sealed trait WorkerResponse
+  object WorkerResponse {
+    case class Failed(stackTrace: String) extends WorkerResponse
+    case class MethodReturnValue(value: js.Any) extends WorkerResponse
+    case class BroadcastedWriteOperations(operations: Seq[WriteOperation]) extends WorkerResponse
   }
 }
