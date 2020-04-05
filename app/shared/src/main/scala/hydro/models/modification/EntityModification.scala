@@ -23,6 +23,11 @@ sealed trait EntityModification {
   def entityType: EntityType.any
   def entityId: Long
 
+  /** Heuristic for a stable unique identifier for this modification */
+  def pseudoUniqueIdentifier: Long = {
+    (entityId.hashCode().toLong << 32) + this.hashCode()
+  }
+
   final def maybeEntity[E <: Entity: EntityType]: Option[E] = {
     require(this.entityType == implicitly[EntityType[E]])
     this match {

@@ -382,7 +382,7 @@ object LocalDatabaseImpl {
   }
 
   private case class ModificationWithId(modification: EntityModification) {
-    def id: Long = modification.hashCode()
+    def id: Long = modification.pseudoUniqueIdentifier
   }
 
   private object ModificationWithId {
