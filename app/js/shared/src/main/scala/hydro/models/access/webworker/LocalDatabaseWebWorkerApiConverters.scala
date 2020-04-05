@@ -25,7 +25,7 @@ private[webworker] object LocalDatabaseWebWorkerApiConverters {
         case Insert(collectionName, obj) => js.Array[js.Any](insertNumber, collectionName, obj)
         case Update(collectionName, obj, abortUnlessExistingValueEquals) =>
           js.Array[js.Any](updateNumber, collectionName, obj, abortUnlessExistingValueEquals)
-        case Remove(collectionName, id) => js.Array[js.Any](removeNumber, collectionName, Scala2Js.toJs(id))
+        case Remove(collectionName, id) => js.Array[js.Any](removeNumber, collectionName, id)
         case AddCollection(collectionName, uniqueIndices, indices, broadcastWriteOperations) =>
           js.Array[js.Any](
             addCollectionNumber,
@@ -53,7 +53,7 @@ private[webworker] object LocalDatabaseWebWorkerApiConverters {
             abortUnlessExistingValueEquals.asInstanceOf[js.UndefOr[js.Dictionary[js.Any]]],
           )
         case (`removeNumber`, Seq(collectionName, id)) =>
-          Remove(collectionName.asInstanceOf[String], Scala2Js.toScala[Long](id))
+          Remove(collectionName.asInstanceOf[String], id)
         case (`addCollectionNumber`, Seq(collectionName, uniqueIndices, indices, broadcastWriteOperations)) =>
           AddCollection(
             collectionName = collectionName.asInstanceOf[String],

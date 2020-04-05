@@ -64,7 +64,7 @@ object LocalDatabaseWebWorkerApi {
         abortUnlessExistingValueEquals: js.UndefOr[js.Dictionary[js.Any]] = js.undefined,
     ) extends WriteOperation
 
-    case class Remove(override val collectionName: String, id: Long) extends WriteOperation
+    case class Remove(override val collectionName: String, id: js.Any) extends WriteOperation
 
     case class AddCollection(
         override val collectionName: String,

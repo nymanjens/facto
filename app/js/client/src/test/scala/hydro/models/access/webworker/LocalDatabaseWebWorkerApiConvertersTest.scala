@@ -29,7 +29,7 @@ object LocalDatabaseWebWorkerApiConvertersTest extends TestSuite {
         testForwardAndBackward[WriteOperation](
           WriteOperation.Update("test", testObj, abortUnlessExistingValueEquals = testObj2))
       }
-      "Remove" - { testForwardAndBackward[WriteOperation](WriteOperation.Remove("test", 1928371023123987L)) }
+      "Remove" - { testForwardAndBackward[WriteOperation](WriteOperation.Remove("test", "192837")) }
       "Clear" - { testForwardAndBackward[WriteOperation](WriteOperation.RemoveCollection("test")) }
       "AddCollection" - {
         testForwardAndBackward[WriteOperation](

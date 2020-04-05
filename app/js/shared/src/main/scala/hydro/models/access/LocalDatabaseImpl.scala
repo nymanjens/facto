@@ -177,7 +177,7 @@ private final class LocalDatabaseImpl(
           updateInner
         case modification @ EntityModification.Remove(id) =>
           val entityType = modification.entityType
-          Some(WriteOperation.Remove(collectionNameOf(entityType), id))
+          Some(WriteOperation.Remove(collectionNameOf(entityType), Scala2Js.toJs(id)))
       }))
     }
   }
@@ -203,7 +203,7 @@ private final class LocalDatabaseImpl(
         for (modification <- modifications)
           yield
             WriteOperation
-              .Remove(pendingModificationsCollectionName, ModificationWithId(modification).id))
+              .Remove(pendingModificationsCollectionName, Scala2Js.toJs(ModificationWithId(modification).id)))
     }
 
   override def setSingletonValue[V](
@@ -293,7 +293,7 @@ private final class LocalDatabaseImpl(
             listener.onPendingModificationAddedByOtherInstance(
               Scala2Js.toScala[ModificationWithId](jsObj).modification)
           case WriteOperation.Remove(`pendingModificationsCollectionName`, id) =>
-            listener.onPendingModificationRemovedByOtherInstance(id)
+            listener.onPendingModificationRemovedByOtherInstance(Scala2Js.toScala[Long](id))
           case operation @ WriteOperation.Update(`pendingModificationsCollectionName`, _, _) =>
             throw new AssertionError(
               s"Got Update operation ($operation) for pending modifications, which should never happen")
