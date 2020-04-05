@@ -64,6 +64,7 @@ object LocalDatabaseWebWorkerApi {
         abortUnlessExistingValueEquals: js.UndefOr[js.Dictionary[js.Any]] = js.undefined,
     ) extends WriteOperation
 
+    // Note: `id` is js.Any because it should already be converted via Scala2Js before it is sent to the worker
     case class Remove(override val collectionName: String, id: js.Any) extends WriteOperation
 
     case class AddCollection(
