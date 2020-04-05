@@ -27,6 +27,10 @@ case class PendingModifications(modifications: Seq[EntityModification], persiste
   def --(otherModifications: Iterable[EntityModification]): PendingModifications =
     copy(modifications = minus(modifications, otherModifications))
 
+  def copyWithoutPseudoUniqueIdentifier(pseudoUniqueIdentifier: Long): PendingModifications = {
+    copy(modifications = modifications.filter(_.pseudoUniqueIdentifier != pseudoUniqueIdentifier))
+  }
+
   private def minus[E](a: Iterable[E], b: Iterable[E]): Seq[E] = {
     val bSet = b.toSet
     a.filter(!bSet.contains(_)).toVector

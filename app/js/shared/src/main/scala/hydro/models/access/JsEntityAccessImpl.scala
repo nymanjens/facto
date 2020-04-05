@@ -38,6 +38,11 @@ class JsEntityAccessImpl()(
     _pendingModifications = _pendingModifications.copy(persistedLocally = true)
     _pendingModifications ++= existingPendingModifications
 
+    // Start listening to changes right after the existing list was loaded.
+    // Note: There is a race condition here if updates happened between the fetching and the listening. Listening
+    // too early has the risk of applying updates that are then overwritten (unless we hold on to them).
+    remoteDatabaseProxy.registerPendingModificationsListener(UpdatingPendingModificationsListener)
+
     _localDatabaseHasBeenLoaded.set(true)
 
     // Heuristic: When the local database is also loaded and the pending modifications are loaded, pending
@@ -145,6 +150,16 @@ class JsEntityAccessImpl()(
         listeners.foreach(func)
         isCallingListeners = false
       }
+    }
+  }
+
+  // **************** Private inner types ****************//
+  private object UpdatingPendingModificationsListener extends PendingModificationsListener {
+    override def onPendingModificationAddedByOtherInstance(modification: EntityModification): Unit = {
+      _pendingModifications ++= Seq(modification)
+    }
+    override def onPendingModificationRemovedByOtherInstance(modificationPseudoUniqueIdentifier: Long): Unit = {
+      _pendingModifications = _pendingModifications.copyWithoutPseudoUniqueIdentifier(modificationPseudoUniqueIdentifier)
     }
   }
 }
