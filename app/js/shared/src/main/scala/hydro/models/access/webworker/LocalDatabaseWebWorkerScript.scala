@@ -91,13 +91,13 @@ object LocalDatabaseWebWorkerScript {
       case (MethodNumbers.applyWriteOperations, Seq(operationsJsValue)) =>
         async {
           val operations = Scala2Js.toScala[Seq[WriteOperation]](operationsJsValue)
-          val returnValue = await(currentApiImpl.applyWriteOperations(operations))
+          val somethingChanged = await(currentApiImpl.applyWriteOperations(operations))
           val operationsToBroadcast = currentApiImpl.getWriteOperationsToBroadcast(operations)
 
           OnMessageResponse(
-            response = Scala2Js.toJs[WorkerResponse](WorkerResponse.MethodReturnValue(returnValue)),
+            response = Scala2Js.toJs[WorkerResponse](WorkerResponse.MethodReturnValue(somethingChanged)),
             responseToBroadcastToOtherPorts =
-              if (operationsToBroadcast.nonEmpty)
+              if (operationsToBroadcast.nonEmpty && somethingChanged)
                 Scala2Js.toJs[WorkerResponse](
                   WorkerResponse.BroadcastedWriteOperations(operationsToBroadcast))
               else js.undefined,
