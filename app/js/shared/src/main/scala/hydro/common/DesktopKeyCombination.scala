@@ -11,7 +11,7 @@ sealed trait DesktopKeyCombination {
 object DesktopKeyCombination {
 
   def fromEvent(event: SyntheticKeyboardEvent[_]): DesktopKeyCombination = {
-    val ctrlOrMeta = event.ctrlKey || event.metaKey // TODO: Use the one or the other based on OS X / not OS X
+    val ctrlOrMeta = if (BrowserUtils.isMacOsX) event.metaKey else event.ctrlKey
     val key = event.key
 
     if (key.length == 1) {

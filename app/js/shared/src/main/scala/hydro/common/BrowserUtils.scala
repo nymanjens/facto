@@ -30,6 +30,11 @@ object BrowserUtils {
     stringToTest contains "Firefox"
   }
 
+  lazy val isMacOsX: Boolean = logExceptions {
+    val navigator = dom.window.navigator
+    navigator.platform.toLowerCase.startsWith("mac")
+  }
+
   private def stringContainsAnyOf(haystack: String, needles: Seq[String]): Boolean = {
     needles.map(_.toLowerCase).exists(haystack.toLowerCase.contains)
   }
