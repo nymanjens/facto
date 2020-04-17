@@ -112,7 +112,7 @@ abstract class HydroReactComponent {
 
   // **************** Protected types ****************//
   abstract class BackendBase($ : BackendScope[Props, State]) extends StateStore.Listener {
-    def render(props: Props, state: State): VdomElement
+    def render(props: Props, state: State): VdomNode
 
     override final def onStateUpdate() = {
       $.props.flatMap(updateStateFromStoresCallback).runNow()
