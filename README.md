@@ -19,22 +19,11 @@ Familiy Accounting Tool keeps track of every transaction your family makes. Its 
 
 ## Installation
 
-- Clone this repository or download the files
+- Download the [latest release](https://github.com/nymanjens/facto/releases)
+- Unpack the archive and open a terminal in the unpacked folder
 - Run following commands to get the app running:
 
     ```
-    # refresh application secret
-    sbt playUpdateSecret
-
-    # Build application
-    sbt dist
-
-    # Deploy files
-    cd /somewhere/you/want/the/files
-    unzip .../target/universal/facto-1.0-SNAPSHOT.zip
-    mv facto-1.0-SNAPSHOT/* .
-    rm -d facto-1.0-SNAPSHOT/
-
     # Create database tables
     bin/server -DdropAndCreateNewDb
     rm RUNNING_PID
@@ -46,6 +35,8 @@ Familiy Accounting Tool keeps track of every transaction your family makes. Its 
     # Run application
     bin/server
     ```
+
+- Browse to http://localhost:9000
 
 ## Configuration
 - `conf/application.conf`:<br>
