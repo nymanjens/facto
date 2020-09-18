@@ -56,6 +56,7 @@ final class ChartSpecInput(implicit
       HalfPanel(title = <.span(i18n("app.graph-lines"))) {
         <.span(
           Table(
+            tableClasses = Seq("table-chart-spec"),
             tableHeaders = Seq(
               <.th(i18n("app.query")),
               <.th(i18n("app.inverted")),
@@ -74,7 +75,11 @@ final class ChartSpecInput(implicit
         Table.TableRowData(
           Seq[VdomElement](
             <.td(
-              SingleTextInputForm()
+              SingleTextInputForm(
+                defaultValue = line.query,
+                onChange =
+                  newQuery => props.notifyUpdatedChartSpec(_.modified(lineIndex, _.copy(query = newQuery))),
+              )
             ),
             <.td(
               <.input(
@@ -111,8 +116,56 @@ final class ChartSpecInput(implicit
     }
   }
 
-  private object SingleTextInputForm {
-    def apply(): VdomElement = ???
+  private object SingleTextInputForm extends HydroReactComponent {
+    // **************** API ****************//
+    def apply(
+        defaultValue: String,
+        onChange: String => Callback,
+    ): VdomElement = {
+      component(Props(defaultValue, onChange))
+    }
+
+    // **************** Implementation of HydroReactComponent methods ****************//
+    override protected val config =
+      ComponentConfig(
+        backendConstructor = new Backend(_),
+        initialStateFromProps = props => State(value = props.defaultValue),
+      )
+
+    // **************** Implementation of HydroReactComponent types ****************//
+    protected case class Props(
+        defaultValue: String,
+        onChange: String => Callback,
+    )
+    protected case class State(value: String)
+
+    protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
+      override def render(props: Props, state: State): VdomElement = logExceptions {
+        <.form(
+          <.input(
+            ^.tpe := "text",
+            ^.value := state.value,
+            ^^.ifThen(state.value != props.defaultValue) {
+              ^.className := "value-has-changed"
+            },
+            ^.autoComplete := "off",
+            ^.onChange ==> { (e: ReactEventFromInput) =>
+              val newString = e.target.value
+              $.modState(_.copy(value = newString))
+            },
+          ),
+          " ",
+          Bootstrap.Button(Variant.info, Size.xs, tpe = "submit")(
+            ^.disabled := state.value == props.defaultValue,
+            Bootstrap.FontAwesomeIcon("pencil"),
+            ^.onClick ==> { (e: ReactEventFromInput) =>
+              e.preventDefault()
+              props.onChange(state.value)
+            },
+          ),
+        )
+      }
+    }
   }
 }
 object ChartSpecInput {

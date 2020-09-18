@@ -52,6 +52,7 @@ final class Chart(implicit
     override def render(props: Props, state: State) = logExceptions {
       implicit val router = props.router
       <.span(
+        ^.className := "charts-page",
         pageHeader(router.currentPage),
         Bootstrap.Row(
           chartSpecInput(
