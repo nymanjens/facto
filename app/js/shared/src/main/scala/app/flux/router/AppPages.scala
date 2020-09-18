@@ -172,7 +172,8 @@ object AppPages {
   }
 
   // **************** Chart **************** //
-  case class Chart private(encodedChartSpecs: String) extends PageBase("app.chart", iconClass = "fa fa-bar-chart-o") {
+  case class Chart private (encodedChartSpecs: String)
+      extends PageBase("app.chart", iconClass = "fa fa-bar-chart-o") {
     def stringifiedChartSpecs: String = {
       js.URIUtils.decodeURIComponent(js.URIUtils.decodeURI(encodedChartSpecs))
     }
