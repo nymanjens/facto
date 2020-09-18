@@ -30,7 +30,7 @@ final class Chart(implicit
 ) extends HydroReactComponent {
 
   // **************** API ****************//
-  def apply(router: RouterContext): VdomElement = {
+  def apply(stringifiedChartSpecs: String, router: RouterContext): VdomElement = {
     component(Props(router))
   }
 

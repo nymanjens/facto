@@ -44,4 +44,5 @@ final class Module(implicit
   implicit lazy val searchResults = new SearchResults
   implicit private lazy val summaryTable = new SummaryTable
   implicit lazy val summary = new Summary
+  implicit lazy val chart = new Chart
 }

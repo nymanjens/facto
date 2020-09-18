@@ -82,4 +82,5 @@ final class Module(implicit
   implicit lazy val searchResults = transactionViewsModule.searchResults
   implicit lazy val summary = transactionViewsModule.summary
 
+  implicit lazy val chart = transactionViewsModule.chart
 }

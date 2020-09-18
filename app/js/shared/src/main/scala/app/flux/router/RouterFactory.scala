@@ -135,6 +135,10 @@ private[router] final class RouterFactory(implicit
               reactAppModule.balanceCheckForm.forEdit(page.balanceCheckId, page.returnToPath, ctl)
           }
 
+          | dynamicRuleFromPage(_ ~ query.caseClass[AppPages.Chart]) { (page, ctl) =>
+            reactAppModule.chart(page.stringifiedChartSpecs, ctl)
+          }
+
         // Fallback
         ).notFound(redirectToPage(AppPages.CashFlow)(Redirect.Replace))
           .onPostRender((prev, cur) =>
