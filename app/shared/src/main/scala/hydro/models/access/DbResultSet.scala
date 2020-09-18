@@ -120,7 +120,7 @@ object DbResultSet {
           case multipleFilters => Filter.And(multipleFilters)
         },
         sorting = sorting,
-        limit = limit
+        limit = limit,
       )
   }
 }

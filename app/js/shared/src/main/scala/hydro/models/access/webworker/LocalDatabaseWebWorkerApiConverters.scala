@@ -75,7 +75,8 @@ private[webworker] object LocalDatabaseWebWorkerApiConverters {
             collectionName,
             filter getOrElse js.undefined,
             sorting getOrElse js.undefined,
-            limit map Scala2Js.toJs[Int] getOrElse js.undefined)
+            limit map Scala2Js.toJs[Int] getOrElse js.undefined,
+          )
       }
     }
 
@@ -86,7 +87,7 @@ private[webworker] object LocalDatabaseWebWorkerApiConverters {
             collectionName = collectionName.asInstanceOf[String],
             filter = filter.toOption.map(_.asInstanceOf[js.Dictionary[js.Any]]),
             sorting = sorting.toOption.map(_.asInstanceOf[js.Array[js.Array[js.Any]]]),
-            limit = limit.toOption.map(_.asInstanceOf[Int])
+            limit = limit.toOption.map(_.asInstanceOf[Int]),
           )
       }
     }

@@ -45,7 +45,8 @@ object InputComponent {
           // Calling valueChangeForPropsChange() to make sure there is no discrepancy between init and update.
           val value = valueChangeForPropsChange(props, props.defaultValue)
           State(valueString = ValueTransformer.valueToString(value, props), listeners = Seq(props.listener))
-      })
+        }
+      )
       .renderPS((context, props, state) =>
         logExceptions {
           def onChange(newString: String): Callback = LogExceptionsCallback {
@@ -71,13 +72,15 @@ object InputComponent {
                 name = props.name,
                 valueString = state.valueString,
                 onChange = onChange,
-                extraProps = props.extra),
+                extraProps = props.extra,
+              ),
               <<.ifDefined(errorMessage) { msg =>
                 <.span(^.className := "help-block", msg)
-              }
-            )
+              },
+            ),
           )
-      })
+        }
+      )
       .componentWillReceiveProps(scope =>
         LogExceptionsCallback {
           // If the props have changed, the transformed value may have changed. If this happens, the listeners should
@@ -96,7 +99,8 @@ object InputComponent {
               listener.onChange(newValue, directUserChange = false).runNow()
             }
           }
-      })
+        }
+      )
       .build
   }
 
@@ -240,13 +244,15 @@ object InputComponent {
           } else {
             console.log(
               s"  Setting a value ('$newValue') that is different when transformed to string and back to value " +
-                s"(valueThroughTransformer = '$valueThroughTransformer'). Will ignore this setter.")
+                s"(valueThroughTransformer = '$valueThroughTransformer'). Will ignore this setter."
+            )
             this.valueOrDefault
           }
         case Failure(e) =>
           console.log(
             s"  Failed to get the String value for $newValue. This may be intended if the valid options for " +
-              s"this input change. Will ignore this setter.\n$e")
+              s"this input change. Will ignore this setter.\n$e"
+          )
           this.valueOrDefault
       }
     }

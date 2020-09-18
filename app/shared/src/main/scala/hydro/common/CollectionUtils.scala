@@ -7,7 +7,7 @@ import scala.collection.immutable.Seq
 
 object CollectionUtils {
 
-  /** Converts list of pairs to ListMap. **/
+  /** Converts list of pairs to ListMap. * */
   def toListMap[A, B](entries: Iterable[(A, B)]): ListMap[A, B] = ListMap(entries.toSeq: _*)
 
   def asMap[K, V](keys: Iterable[K], valueFunc: K => V): Map[K, V] = keys.map(k => k -> valueFunc(k)).toMap
@@ -50,7 +50,7 @@ object CollectionUtils {
     require(
       hashCodes.distinct.size == hashCodes.size,
       s"There are hash codes that are not unique: $hashCodes. " +
-        "This is bad luck and can be solved by adding a salt (missing feature at the moment)."
+        "This is bad luck and can be solved by adding a salt (missing feature at the moment).",
     )
 
     val resultBuilder = ImmutableBiMap.builder[V, Int]()

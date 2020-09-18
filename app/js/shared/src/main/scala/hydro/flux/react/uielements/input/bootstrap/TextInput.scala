@@ -41,9 +41,9 @@ object TextInput {
         ^.disabled := extraProps.disabled,
         ^^.ifDefined(extraProps.arrowHandler) { arrowHandler =>
           ^.onKeyDown ==> handleKeyDown(arrowHandler, currentValue = valueString, onChange = onChange),
-        }
+        },
       )
-    }
+    },
   )
 
   // **************** API ****************//
@@ -77,7 +77,7 @@ object TextInput {
         focusOnMount = focusOnMount,
         disabled = disabled,
         arrowHandler = Option(arrowHandler),
-      )
+      ),
     )
     ref.mutableRef.component(props)
   }
@@ -111,8 +111,8 @@ object TextInput {
   }
 
   final class Reference private[TextInput] (
-      private[TextInput] val mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps])
-      extends InputComponent.Reference(mutableRef)
+      private[TextInput] val mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps]
+  ) extends InputComponent.Reference(mutableRef)
 
   case class ExtraProps private[TextInput] (
       inputType: String,
@@ -131,7 +131,8 @@ object TextInput {
 
     keyCombination match {
       case special @ SpecialKey(
-            ArrowUp | ArrowDown, /* ctrlOrMeta */ false, /* shift */ false, /* alt */ false) =>
+            ArrowUp | ArrowDown, /* ctrlOrMeta */ false, /* shift */ false, /* alt */ false,
+          ) =>
         val newValue =
           special.specialKeyType match {
             case ArrowUp   => arrowHandler.newValueOnArrowUp(currentValue)

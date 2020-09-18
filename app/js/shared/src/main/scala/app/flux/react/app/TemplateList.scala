@@ -19,11 +19,12 @@ import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
 
-private[app] final class TemplateList(implicit user: User,
-                                      accountingConfig: Config,
-                                      entityAccess: AppJsEntityAccess,
-                                      i18n: I18n,
-                                      pageHeader: PageHeader,
+private[app] final class TemplateList(implicit
+    user: User,
+    accountingConfig: Config,
+    entityAccess: AppJsEntityAccess,
+    i18n: I18n,
+    pageHeader: PageHeader,
 ) {
 
   private val component = ScalaComponent
@@ -35,24 +36,21 @@ private[app] final class TemplateList(implicit user: User,
           pageHeader(router.currentPage),
           Panel(
             title = i18n("app.templates"),
-            panelClasses = Seq("templates-panel")
+            panelClasses = Seq("templates-panel"),
           ) {
             val templates = accountingConfig.templatesToShowFor(Template.Placement.TemplateList, user)
             <<.joinWithSpaces(
               for (template <- templates)
-                yield
-                  Bootstrap.Button(
-                    Variant.info,
-                    Size.lg,
-                    tag = router.anchorWithHrefTo(AppPages.NewFromTemplate(template)))(
-                    ^.key := template.code,
-                    <.i(^.className := template.iconClass),
-                    " ",
-                    template.name)
+                yield Bootstrap.Button(
+                  Variant.info,
+                  Size.lg,
+                  tag = router.anchorWithHrefTo(AppPages.NewFromTemplate(template)),
+                )(^.key := template.code, <.i(^.className := template.iconClass), " ", template.name)
             )
-          }
+          },
         )
-    })
+      }
+    )
     .build
 
   // **************** API ****************//

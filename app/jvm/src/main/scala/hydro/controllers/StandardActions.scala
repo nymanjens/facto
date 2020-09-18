@@ -7,8 +7,8 @@ import play.api.i18n.I18nSupport
 import play.api.i18n.MessagesApi
 import play.api.mvc._
 
-final class StandardActions @Inject()(
-    implicit override val messagesApi: MessagesApi,
+final class StandardActions @Inject() (implicit
+    override val messagesApi: MessagesApi,
     components: ControllerComponents,
     entityAccess: JvmEntityAccess,
     playConfiguration: play.api.Configuration,
@@ -48,6 +48,7 @@ final class StandardActions @Inject()(
     val realApplicationSecret: String = playConfiguration.get[String]("play.http.secret.key")
     require(
       applicationSecret == realApplicationSecret,
-      s"Invalid application secret. Found '$applicationSecret' but should be '$realApplicationSecret'")
+      s"Invalid application secret. Found '$applicationSecret' but should be '$realApplicationSecret'",
+    )
   }
 }

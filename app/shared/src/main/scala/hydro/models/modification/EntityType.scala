@@ -11,7 +11,8 @@ final class EntityType[E <: Entity](val entityClass: Class[E]) {
   def checkRightType(entity: Entity): get = {
     require(
       entity.getClass == entityClass,
-      s"Got entity of type ${entity.getClass}, but this entityType requires $entityClass")
+      s"Got entity of type ${entity.getClass}, but this entityType requires $entityClass",
+    )
     entity.asInstanceOf[E]
   }
 

@@ -39,7 +39,8 @@ object SerializingTaskQueueJsTest extends TestSuite {
             Awaiter.expectConsistently.neverComplete(task2Result),
             Awaiter.expectEventually.equal(task1Counter.get(), 1L),
             Awaiter.expectConsistently.equal(task2Counter.get(), 0L),
-          ))
+          )
+        )
       }
 
       "1 task complete" - async {
@@ -51,7 +52,8 @@ object SerializingTaskQueueJsTest extends TestSuite {
             Awaiter.expectConsistently.neverComplete(task2Result),
             Awaiter.expectEventually.equal(task1Counter.get(), 1L),
             Awaiter.expectEventually.equal(task2Counter.get(), 1L),
-          ))
+          )
+        )
       }
 
       "2 tasks complete" - async {
@@ -95,7 +97,8 @@ object SerializingTaskQueueJsTest extends TestSuite {
             Awaiter.expectConsistently.neverComplete(task2Result),
             Awaiter.expectEventually.equal(task1Counter.get(), 1L),
             Awaiter.expectConsistently.equal(task2Counter.get(), 0L),
-          ))
+          )
+        )
 
         expectIsFailure(queue.schedule(Future.successful((): Unit)))
       }
@@ -116,7 +119,8 @@ object SerializingTaskQueueJsTest extends TestSuite {
             Awaiter.expectConsistently.neverComplete(task2Result),
             Awaiter.expectEventually.equal(task1Counter.get(), 1L),
             Awaiter.expectEventually.equal(task2Counter.get(), 1L),
-          ))
+          )
+        )
 
         val task3Result = queue.schedule(Future.successful((): Unit))
         await(Awaiter.expectConsistently.neverComplete(task3Result))

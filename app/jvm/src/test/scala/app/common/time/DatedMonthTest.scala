@@ -50,7 +50,7 @@ class DatedMonthTest extends HookedSpecification {
       DatedMonth(LocalDate.of(1990, SEPTEMBER, 1)),
       DatedMonth(LocalDate.of(1990, OCTOBER, 1)),
       DatedMonth(LocalDate.of(1990, NOVEMBER, 1)),
-      DatedMonth(LocalDate.of(1990, DECEMBER, 1))
+      DatedMonth(LocalDate.of(1990, DECEMBER, 1)),
     )
   }
 

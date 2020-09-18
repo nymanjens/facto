@@ -71,7 +71,7 @@ class FormattingTest extends HookedSpecification {
       "app.date.dayofweek.thu.abbrev" -> "Thu",
       "app.date.dayofweek.fri.abbrev" -> "Fri",
       "app.date.dayofweek.sat.abbrev" -> "Sat",
-      "app.date.dayofweek.sun.abbrev" -> "Sun"
+      "app.date.dayofweek.sun.abbrev" -> "Sun",
     )
   }
 }

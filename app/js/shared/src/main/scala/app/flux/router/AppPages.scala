@@ -35,7 +35,8 @@ object AppPages {
             js.URIUtils.encodeURIComponent(
               // Decode path first because routerContext.toPath() seems to produce unnecessarily and
               // inconsistently escaped strings
-              js.URIUtils.decodeURIComponent(path))
+              js.URIUtils.decodeURIComponent(path)
+            )
           }
       }
     }
@@ -102,8 +103,9 @@ object AppPages {
     override def iconClass = "icon-new-empty"
   }
   object NewTransactionGroupFromReservoir {
-    def apply(reservoir: MoneyReservoir)(
-        implicit routerContext: RouterContext): NewTransactionGroupFromReservoir =
+    def apply(reservoir: MoneyReservoir)(implicit
+        routerContext: RouterContext
+    ): NewTransactionGroupFromReservoir =
       NewTransactionGroupFromReservoir(reservoir.code, HasReturnTo.getCurrentEncodedPath)
   }
 

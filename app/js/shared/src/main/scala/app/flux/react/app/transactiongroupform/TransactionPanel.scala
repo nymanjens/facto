@@ -46,8 +46,8 @@ import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-private[transactiongroupform] final class TransactionPanel(
-    implicit i18n: I18n,
+private[transactiongroupform] final class TransactionPanel(implicit
+    i18n: I18n,
     accountingConfig: Config,
     user: User,
     exchangeRateManager: ExchangeRateManager,
@@ -78,10 +78,12 @@ private[transactiongroupform] final class TransactionPanel(
           State(
             transactionDate = props.defaultValues.transactionDate getOrElse LocalDateTimes
               .toStartOfDay(clock.now),
-            beneficiaryAccount = props.defaultValues.beneficiary getOrElse accountingConfig.personallySortedAccounts.head,
-            moneyReservoir = props.defaultValues.moneyReservoir getOrElse selectableReservoirs().head
+            beneficiaryAccount =
+              props.defaultValues.beneficiary getOrElse accountingConfig.personallySortedAccounts.head,
+            moneyReservoir = props.defaultValues.moneyReservoir getOrElse selectableReservoirs().head,
           )
-      })
+        }
+      )
       .renderBackend[Backend]
       .componentWillMount($ =>
         LogExceptionsCallback {
@@ -94,7 +96,8 @@ private[transactiongroupform] final class TransactionPanel(
             .get()
             .stateFuture
             .map(state => $.modState(_.copy(allTags = state.tagToTransactionIds.keySet.toVector)).runNow())
-      })
+        }
+      )
       .build
   }
 
@@ -120,7 +123,7 @@ private[transactiongroupform] final class TransactionPanel(
       defaultPanel = defaultPanel,
       focusOnMount = focusOnMount,
       deleteButtonCallback = closeButtonCallback,
-      onFormChange = onFormChange
+      onFormChange = onFormChange,
     )
     ref.mutableRef.component.withKey(key.toString).apply(props)
   }
@@ -141,7 +144,8 @@ private[transactiongroupform] final class TransactionPanel(
   }
 
   final class Proxy private[TransactionPanel] (
-      private val maybeComponentFactory: () => Option[ThisComponentU]) {
+      private val maybeComponentFactory: () => Option[ThisComponentU]
+  ) {
     def rawTransactionDate: InputBase.Proxy[String] = fromBackendOrNull(_.rawTransactionDateRef())
     def rawConsumedDate: InputBase.Proxy[String] = fromBackendOrNull(_.rawConsumedDateRef())
     def beneficiaryAccount: InputBase.Proxy[Account] = fromBackendOrNull(_.beneficiaryAccountRef())
@@ -156,7 +160,8 @@ private[transactiongroupform] final class TransactionPanel(
         DatedMoney(
           cents = backend.flowRef().valueOrDefault,
           currency = backend.moneyReservoirRef().valueOrDefault.currency,
-          date = backend.transactionDateRef().valueOrDefault)
+          date = backend.transactionDateRef().valueOrDefault,
+        )
       case None => DatedMoney(0, Currency.default, clock.now)
 
     }
@@ -174,17 +179,20 @@ private[transactiongroupform] final class TransactionPanel(
             flow = DatedMoney(
               cents = backend.flowRef().value.get,
               currency = backend.moneyReservoirRef().value.get.currency,
-              date = backend.transactionDateRef().value.get),
+              date = backend.transactionDateRef().value.get,
+            ),
             detailDescription = backend.detailDescriptionRef().value.get,
-            tags = backend.tagsRef().value.get
-          ))
+            tags = backend.tagsRef().value.get,
+          )
+        )
       } catch {
         case e: NoSuchElementException => None
       }
     }
 
     private def fromBackendOrNull[Value](
-        backendToProxy: Backend => InputBase.Proxy[Value]): InputBase.Proxy[Value] = {
+        backendToProxy: Backend => InputBase.Proxy[Value]
+    ): InputBase.Proxy[Value] = {
       maybeBackend map (backendToProxy(_)) getOrElse InputBase.Proxy.nullObject()
     }
     private def maybeBackend: Option[Backend] = maybeComponentFactory() map (_.backend)
@@ -251,27 +259,26 @@ private[transactiongroupform] final class TransactionPanel(
           defaultValue = state.transactionDate,
           valueTransformer = MappedInput.ValueTransformer.StringToLocalDateTime,
           listener = TransactionDateListener,
-          delegateRefFactory = stringInputWithDefault.ref _
+          delegateRefFactory = stringInputWithDefault.ref _,
         ) { mappedExtraProps =>
           stringInputWithDefault.forOption(
             ref = mappedExtraProps.ref,
             defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawTransactionDate),
             startWithDefault = props.defaultValues.isEmpty,
-            delegateRefFactory = TextInput.ref _
-          ) {
-            extraProps =>
-              TextInput(
-                ref = extraProps.ref,
-                name = "transaction-date",
-                label = i18n("app.date-payed"),
-                defaultValue = mappedExtraProps.defaultValue,
-                required = true,
-                showErrorMessage = props.showErrorMessages,
-                additionalValidator = mappedExtraProps.additionalValidator,
-                inputClasses = extraProps.inputClasses,
-                focusOnMount = props.focusOnMount,
-                arrowHandler = TextInput.ArrowHandler.DateHandler,
-              )
+            delegateRefFactory = TextInput.ref _,
+          ) { extraProps =>
+            TextInput(
+              ref = extraProps.ref,
+              name = "transaction-date",
+              label = i18n("app.date-payed"),
+              defaultValue = mappedExtraProps.defaultValue,
+              required = true,
+              showErrorMessage = props.showErrorMessages,
+              additionalValidator = mappedExtraProps.additionalValidator,
+              inputClasses = extraProps.inputClasses,
+              focusOnMount = props.focusOnMount,
+              arrowHandler = TextInput.ArrowHandler.DateHandler,
+            )
           }
         },
         dateMappedInput(
@@ -279,32 +286,31 @@ private[transactiongroupform] final class TransactionPanel(
           defaultValue = props.defaultValues.consumedDate getOrElse LocalDateTimes.toStartOfDay(clock.now),
           valueTransformer = MappedInput.ValueTransformer.StringToLocalDateTime,
           delegateRefFactory = stringInputWithDefault.ref _,
-          listener = AnythingChangedListener
+          listener = AnythingChangedListener,
         ) { mappedExtraProps =>
           stringInputWithDefault(
             ref = mappedExtraProps.ref,
             defaultValueProxy = rawTransactionDateRef(),
-            delegateRefFactory = stringInputWithDefault.ref _) {
-            extraProps1 =>
-              stringInputWithDefault.forOption(
-                ref = extraProps1.ref,
-                defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawConsumedDate),
-                startWithDefault = props.defaultValues.isEmpty,
-                delegateRefFactory = TextInput.ref _
-              ) {
-                extraProps2 =>
-                  TextInput(
-                    ref = extraProps2.ref,
-                    name = "date-consumed",
-                    label = i18n("app.date-consumed"),
-                    defaultValue = mappedExtraProps.defaultValue,
-                    required = true,
-                    showErrorMessage = props.showErrorMessages,
-                    additionalValidator = mappedExtraProps.additionalValidator,
-                    inputClasses = extraProps1.inputClasses ++ extraProps2.inputClasses,
-                    arrowHandler = TextInput.ArrowHandler.DateHandler,
-                  )
-              }
+            delegateRefFactory = stringInputWithDefault.ref _,
+          ) { extraProps1 =>
+            stringInputWithDefault.forOption(
+              ref = extraProps1.ref,
+              defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.rawConsumedDate),
+              startWithDefault = props.defaultValues.isEmpty,
+              delegateRefFactory = TextInput.ref _,
+            ) { extraProps2 =>
+              TextInput(
+                ref = extraProps2.ref,
+                name = "date-consumed",
+                label = i18n("app.date-consumed"),
+                defaultValue = mappedExtraProps.defaultValue,
+                required = true,
+                showErrorMessage = props.showErrorMessages,
+                additionalValidator = mappedExtraProps.additionalValidator,
+                inputClasses = extraProps1.inputClasses ++ extraProps2.inputClasses,
+                arrowHandler = TextInput.ArrowHandler.DateHandler,
+              )
+            }
           }
         },
         <<.ifThen(props.defaultValues.issuer.isDefined && props.defaultValues.issuer.get != user) {
@@ -313,14 +319,14 @@ private[transactiongroupform] final class TransactionPanel(
             name = "issuer",
             label = i18n("app.issuer"),
             defaultValue = props.defaultValues.issuer.get.name,
-            disabled = true
+            disabled = true,
           )
         },
         reservoirInputWithDefault.forOption(
           ref = moneyReservoirRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.moneyReservoir),
           startWithDefault = props.defaultValues.isEmpty,
-          delegateRefFactory = reservoirSelectInput.ref _
+          delegateRefFactory = reservoirSelectInput.ref _,
         ) { extraProps =>
           reservoirSelectInput(
             ref = extraProps.ref,
@@ -331,7 +337,7 @@ private[transactiongroupform] final class TransactionPanel(
             options = selectableReservoirs(state.moneyReservoir),
             valueToId = _.code,
             valueToName = _.name,
-            listener = MoneyReservoirListener
+            listener = MoneyReservoirListener,
           )
         },
         accountInputWithDefault.forOption(
@@ -339,7 +345,7 @@ private[transactiongroupform] final class TransactionPanel(
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.beneficiaryAccount),
           startWithDefault = props.defaultValues.isEmpty,
           directUserChangeOnly = true,
-          delegateRefFactory = accountSelectInput.ref _
+          delegateRefFactory = accountSelectInput.ref _,
         ) { extraProps =>
           accountSelectInput(
             ref = extraProps.ref,
@@ -350,7 +356,7 @@ private[transactiongroupform] final class TransactionPanel(
             options = accountingConfig.personallySortedAccounts,
             valueToId = _.code,
             valueToName = _.longName,
-            listener = BeneficiaryAccountListener
+            listener = BeneficiaryAccountListener,
           )
         },
         categoryInputWithDefault.forOption(
@@ -358,7 +364,7 @@ private[transactiongroupform] final class TransactionPanel(
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.category),
           startWithDefault = props.defaultValues.isEmpty,
           directUserChangeOnly = true,
-          delegateRefFactory = categorySelectInput.ref _
+          delegateRefFactory = categorySelectInput.ref _,
         ) { extraProps =>
           categorySelectInput(
             ref = extraProps.ref,
@@ -370,14 +376,14 @@ private[transactiongroupform] final class TransactionPanel(
             valueToId = _.code,
             valueToName = category =>
               if (category.helpText.isEmpty) category.name else s"${category.name} (${category.helpText})",
-            listener = AnythingChangedListener
+            listener = AnythingChangedListener,
           )
         },
         stringInputWithDefault.forOption(
           ref = descriptionRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.description),
           startWithDefault = props.defaultValues.isEmpty,
-          delegateRefFactory = AutosuggestTextInput.ref _
+          delegateRefFactory = AutosuggestTextInput.ref _,
         ) { extraProps =>
           AutosuggestTextInput(
             ref = extraProps.ref,
@@ -392,7 +398,7 @@ private[transactiongroupform] final class TransactionPanel(
               $.modState(_.copy(descriptionSuggestions = getDescriptionSuggestions(value)))
                 .runNow(),
             onSuggestionsClearRequested = () => $.modState(_.copy(descriptionSuggestions = Seq())).runNow(),
-            listener = AnythingChangedListener
+            listener = AnythingChangedListener,
           )
         },
         MoneyInput.withCurrencyConversion(
@@ -405,10 +411,11 @@ private[transactiongroupform] final class TransactionPanel(
           forceValue = props.forceFlowValue.map(
             _.withDate(state.transactionDate)
               .exchangedForCurrency(state.moneyReservoir.currency)
-              .cents),
+              .cents
+          ),
           currency = state.moneyReservoir.currency,
           date = state.transactionDate,
-          listener = AnythingChangedListener
+          listener = AnythingChangedListener,
         ),
         TextAreaInput(
           ref = detailDescriptionRef,
@@ -416,13 +423,13 @@ private[transactiongroupform] final class TransactionPanel(
           label = i18n("app.more-info"),
           defaultValue = props.defaultValues.detailDescription,
           showErrorMessage = props.showErrorMessages,
-          listener = AnythingChangedListener
+          listener = AnythingChangedListener,
         ),
         tagsInputWithDefault.forOption(
           ref = tagsRef,
           defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.tags),
           startWithDefault = props.defaultValues.isEmpty,
-          delegateRefFactory = TagInput.ref _
+          delegateRefFactory = TagInput.ref _,
         ) { extraProps =>
           TagInput(
             ref = extraProps.ref,
@@ -433,9 +440,9 @@ private[transactiongroupform] final class TransactionPanel(
             additionalValidator = _.forall(Tags.isValidTag),
             defaultValue = props.defaultValues.tags,
             inputClasses = extraProps.inputClasses,
-            listener = AnythingChangedListener
+            listener = AnythingChangedListener,
           )
-        }
+        },
       )
     }
 
@@ -449,12 +456,16 @@ private[transactiongroupform] final class TransactionPanel(
             .filter(ModelFields.Transaction.categoryCode === category.code)
             .sort(AppDbQuerySorting.Transaction.deterministicallyByCreateDate.reversed)
             .limit(300)
-            .data())
+            .data()
+        )
         // Only update if category is still the same
         if (categoryRef().value.get == category) {
           val suggestions = transactions.toStream.map(_.description).distinct.toVector
-          $.modState(_.copy(
-            allDescriptionSuggestionsForCategory = Some(State.CategoryAndSuggestions(category, suggestions))))
+          $.modState(
+            _.copy(
+              allDescriptionSuggestionsForCategory = Some(State.CategoryAndSuggestions(category, suggestions))
+            )
+          )
             .runNow()
         }
       }

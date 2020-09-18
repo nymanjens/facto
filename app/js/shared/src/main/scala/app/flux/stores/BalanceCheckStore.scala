@@ -7,8 +7,8 @@ import app.models.access.AppJsEntityAccess
 import hydro.models.modification.EntityModification
 import hydro.flux.action.Dispatcher
 
-private[stores] final class BalanceCheckStore(
-    implicit entityAccess: AppJsEntityAccess,
+private[stores] final class BalanceCheckStore(implicit
+    entityAccess: AppJsEntityAccess,
     dispatcher: Dispatcher,
 ) {
   dispatcher.registerPartialAsync {

@@ -18,8 +18,9 @@ object UpperRightCorner {
         // a div is added that has position:relative (a relative
         // reference is needed for the upper-right-corner to work).
         props.centralContent.toTagMod,
-        <.div(^^.classes("upper-right-corner"), props.cornerContent.toTagMod)
-    ))
+        <.div(^^.classes("upper-right-corner"), props.cornerContent.toTagMod),
+      )
+    )
     .build
 
   def apply(cornerContent: TagMod*)(centralContent: TagMod*): VdomElement = {

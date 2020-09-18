@@ -10,9 +10,8 @@ import scala.collection.immutable.Seq
 case class PendingModifications(modifications: Seq[EntityModification], persistedLocally: Boolean) {
   private lazy val addModificationIds: ImmutableSetMultimap[EntityType.any, Long] = {
     val builder = ImmutableSetMultimap.builder[EntityType.any, Long]()
-    modifications collect {
-      case modification: EntityModification.Add[_] =>
-        builder.put(modification.entityType, modification.entityId)
+    modifications collect { case modification: EntityModification.Add[_] =>
+      builder.put(modification.entityType, modification.entityId)
     }
     builder.build()
   }

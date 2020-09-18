@@ -35,8 +35,9 @@ object Table extends HydroReactComponent.Stateless {
         expandNumEntriesCallback = expandNumEntriesCallback,
         tableTitleExtra = Option(tableTitleExtra),
         tableHeaders = tableHeaders,
-        tableRowDatas = tableRowDatas
-      ))
+        tableRowDatas = tableRowDatas,
+      )
+    )
   }
 
   // **************** Implementation of HydroReactComponent methods ****************//
@@ -60,7 +61,14 @@ object Table extends HydroReactComponent.Stateless {
     override def render(props: Props, state: Unit) = {
       <.table(
         ^^.classes(
-          Seq("table", "table-bordered", "table-hover", "table-condensed", "table-overflow-elipsis") ++ props.tableClasses),
+          Seq(
+            "table",
+            "table-bordered",
+            "table-hover",
+            "table-condensed",
+            "table-overflow-elipsis",
+          ) ++ props.tableClasses
+        ),
         <.thead(
           <<.ifDefined(props.title) { title =>
             <.tr(
@@ -76,11 +84,11 @@ object Table extends HydroReactComponent.Stateless {
                     ^.style := js.Dictionary("width" -> "12px")
                   ),
                   " ",
-                  title
+                  title,
                 ),
                 <<.ifDefined(props.tableTitleExtra) { extra =>
                   <.span(^.className := "secondary-title", extra)
-                }
+                },
               ),
               ^^.ifDefined(props.onToggleCollapsedExpanded) { onToggle =>
                 ^.onClick --> Callback(onToggle())
@@ -89,16 +97,16 @@ object Table extends HydroReactComponent.Stateless {
           },
           <<.ifThen(props.expanded) {
             <.tr(props.tableHeaders.toTagMod)
-          }
+          },
         ),
         <<.ifThen(props.expanded) {
           <.tbody(
-            props.tableRowDatas.zipWithIndex.map {
-              case (TableRowData(tableData, deemphasize), index) =>
-                <.tr(
-                  ^.key := s"row-$index",
-                  ^^.classes("data-row" +: ifThenSeq(deemphasize, "deemphasized")),
-                  tableData.toTagMod)
+            props.tableRowDatas.zipWithIndex.map { case (TableRowData(tableData, deemphasize), index) =>
+              <.tr(
+                ^.key := s"row-$index",
+                ^^.classes("data-row" +: ifThenSeq(deemphasize, "deemphasized")),
+                tableData.toTagMod,
+              )
             }.toVdomArray,
             if (props.tableRowDatas.isEmpty) {
               <.tr(
@@ -113,14 +121,14 @@ object Table extends HydroReactComponent.Stateless {
                     ^.onClick --> props.expandNumEntriesCallback.get,
                     ^.className := "expand-num-entries",
                     Bootstrap.FontAwesomeIcon("ellipsis-h"),
-                  )
+                  ),
                 )
               )
             } else {
               EmptyVdom
-            }
+            },
           )
-        }
+        },
       )
     }
   }

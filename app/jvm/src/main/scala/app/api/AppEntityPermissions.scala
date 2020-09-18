@@ -13,7 +13,8 @@ final class AppEntityPermissions extends EntityPermissions {
 
     require(
       modification.entityType != ExchangeRateMeasurement.Type,
-      "Client initiated exchange rate measurement changes are not allowed")
+      "Client initiated exchange rate measurement changes are not allowed",
+    )
   }
 
   override def isAllowedToRead(entity: Entity)(implicit user: User): Boolean = {

@@ -25,8 +25,8 @@ import scala.collection.mutable
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-final class ScalaJsApiServerFactory @Inject()(
-    implicit accountingConfig: Config,
+final class ScalaJsApiServerFactory @Inject() (implicit
+    accountingConfig: Config,
     clock: Clock,
     entityAccess: JvmEntityAccess,
     i18n: PlayI18n,
@@ -53,7 +53,7 @@ final class ScalaJsApiServerFactory @Inject()(
           }
           mapBuilder.toStream.map { case (k, v) => k -> v.result() }.toMap
         },
-        nextUpdateToken = toUpdateToken(clock.nowInstant)
+        nextUpdateToken = toUpdateToken(clock.nowInstant),
       )
 
     override def getAllEntities(types: Seq[EntityType.any]) = {
@@ -67,7 +67,8 @@ final class ScalaJsApiServerFactory @Inject()(
 
               // apply permissions filter
               allEntities.filter(entityPermissions.isAllowedToRead)
-          })
+            }
+          )
           .toMap
       }
 
@@ -133,14 +134,17 @@ final class ScalaJsApiServerFactory @Inject()(
           require(user.isAdmin, "Only an admin can add users")
 
           entityAccess.persistEntityModifications(
-            EntityModification.createAddWithRandomId(Users.createUser(
-              loginName = userProto.loginName.get,
-              password = userProto.plainTextPassword.get,
-              name = userProto.name.get,
-              isAdmin = userProto.isAdmin getOrElse false,
-              expandCashFlowTablesByDefault = userProto.expandCashFlowTablesByDefault getOrElse true,
-              expandLiquidationTablesByDefault = userProto.expandLiquidationTablesByDefault getOrElse true
-            )))
+            EntityModification.createAddWithRandomId(
+              Users.createUser(
+                loginName = userProto.loginName.get,
+                password = userProto.plainTextPassword.get,
+                name = userProto.name.get,
+                isAdmin = userProto.isAdmin getOrElse false,
+                expandCashFlowTablesByDefault = userProto.expandCashFlowTablesByDefault getOrElse true,
+                expandLiquidationTablesByDefault = userProto.expandLiquidationTablesByDefault getOrElse true,
+              )
+            )
+          )
 
         case Some(id) => // Update user
           requireNonEmptyIfSet(userProto.loginName)
@@ -158,9 +162,8 @@ final class ScalaJsApiServerFactory @Inject()(
               isAdmin = userProto.isAdmin getOrElse existingUser.isAdmin,
               expandCashFlowTablesByDefault =
                 userProto.expandCashFlowTablesByDefault getOrElse existingUser.expandCashFlowTablesByDefault,
-              expandLiquidationTablesByDefault =
-                userProto.expandLiquidationTablesByDefault getOrElse
-                  existingUser.expandLiquidationTablesByDefault
+              expandLiquidationTablesByDefault = userProto.expandLiquidationTablesByDefault getOrElse
+                existingUser.expandLiquidationTablesByDefault,
             )
             if (userProto.plainTextPassword.isDefined) {
               result = Users.copyUserWithPassword(result, userProto.plainTextPassword.get)

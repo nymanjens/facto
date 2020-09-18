@@ -24,8 +24,8 @@ import play.api.mvc._
 
 import scala.collection.immutable.Seq
 
-final class ExternalApi @Inject()(
-    implicit override val messagesApi: MessagesApi,
+final class ExternalApi @Inject() (implicit
+    override val messagesApi: MessagesApi,
     components: ControllerComponents,
     clock: Clock,
     playConfiguration: play.api.Configuration,
@@ -73,7 +73,10 @@ final class ExternalApi @Inject()(
         ExchangeRateMeasurement(
           date = date,
           foreignCurrencyCode = foreignCurrencyCode,
-          ratioReferenceToForeignCurrency = ratioReferenceToForeignCurrency)))
+          ratioReferenceToForeignCurrency = ratioReferenceToForeignCurrency,
+        )
+      )
+    )
     Ok("OK")
   }
 
@@ -92,7 +95,8 @@ final class ExternalApi @Inject()(
           resultBuilder.append(
             s"  ${correction.balanceCheck.checkDate.toLocalDate}: " +
               s"${correction.expectedAmount} -> ${correction.balanceCheck.balance} " +
-              s"(${forceSign(correction.balanceCheck.balance - correction.expectedAmount)})\n")
+              s"(${forceSign(correction.balanceCheck.balance - correction.expectedAmount)})\n"
+          )
         }
         resultBuilder.append("\n")
       }
@@ -106,7 +110,8 @@ final class ExternalApi @Inject()(
     val realApplicationSecret: String = playConfiguration.get[String]("play.http.secret.key")
     require(
       applicationSecret == realApplicationSecret,
-      s"Invalid application secret. Found '$applicationSecret' but should be '$realApplicationSecret'")
+      s"Invalid application secret. Found '$applicationSecret' but should be '$realApplicationSecret'",
+    )
   }
 
   private def toTransactions(
@@ -120,21 +125,20 @@ final class ExternalApi @Inject()(
     }
     val groupPartial = template.toPartial(Account.nullInstance)
     for (partial <- groupPartial.transactions)
-      yield
-        Transaction(
-          transactionGroupId = transactionGroup.id,
-          issuerId = issuer.id,
-          beneficiaryAccountCode = checkNotEmpty(partial.beneficiary.get.code),
-          moneyReservoirCode = partial.moneyReservoir.get.code,
-          categoryCode = checkNotEmpty(partial.category.get.code),
-          description = checkNotEmpty(partial.description),
-          flowInCents = partial.flowInCents,
-          detailDescription = partial.detailDescription,
-          tags = partial.tags,
-          createdDate = clock.now,
-          transactionDate = clock.now,
-          consumedDate = clock.now
-        )
+      yield Transaction(
+        transactionGroupId = transactionGroup.id,
+        issuerId = issuer.id,
+        beneficiaryAccountCode = checkNotEmpty(partial.beneficiary.get.code),
+        moneyReservoirCode = partial.moneyReservoir.get.code,
+        categoryCode = checkNotEmpty(partial.category.get.code),
+        description = checkNotEmpty(partial.description),
+        flowInCents = partial.flowInCents,
+        detailDescription = partial.detailDescription,
+        tags = partial.tags,
+        createdDate = clock.now,
+        transactionDate = clock.now,
+        consumedDate = clock.now,
+      )
   }
 
   private case class BalanceCorrection(balanceCheck: BalanceCheck, expectedAmount: MoneyWithGeneralCurrency)

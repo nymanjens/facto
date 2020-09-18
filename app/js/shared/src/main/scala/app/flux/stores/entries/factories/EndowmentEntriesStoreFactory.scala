@@ -25,11 +25,13 @@ final class EndowmentEntriesStoreFactory(implicit entityAccess: AppJsEntityAcces
           entityAccess
             .newQuery[Transaction]()
             .filter(
-              ModelFields.Transaction.categoryCode === accountingConfig.constants.endowmentCategory.code)
+              ModelFields.Transaction.categoryCode === accountingConfig.constants.endowmentCategory.code
+            )
             .filter(ModelFields.Transaction.beneficiaryAccountCode === account.code)
             .sort(AppDbQuerySorting.Transaction.deterministicallyByConsumedDate.reversed)
             .limit(3 * maxNumEntries)
-            .data()).reverse
+            .data()
+        ).reverse
 
       var entries = transactions.map(t => GeneralEntry(Seq(t)))
 

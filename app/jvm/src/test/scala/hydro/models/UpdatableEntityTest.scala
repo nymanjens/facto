@@ -56,12 +56,14 @@ class UpdatableEntityTest extends HookedSpecification {
       val user2 = randomUser(
         LastUpdateTime.someFieldsUpdated(Seq(fieldB, fieldC), testInstantB),
         fieldB = "bbb",
-        fieldC = "ccc")
+        fieldC = "ccc",
+      )
 
       val expectedTime =
         LastUpdateTime(
           timePerField = Map(fieldA -> testInstantA, fieldB -> testInstantB, fieldC -> testInstantB),
-          otherFieldsTime = None)
+          otherFieldsTime = None,
+        )
       UpdatableEntity.merge(user1, user2) mustEqual copy(user2, fieldA = "aaa", lastUpdateTime = expectedTime)
       UpdatableEntity.merge(user2, user1) mustEqual
         copy(user1, fieldB = "bbb", fieldC = "ccc", lastUpdateTime = expectedTime)
@@ -69,16 +71,20 @@ class UpdatableEntityTest extends HookedSpecification {
     "general + general" in {
       val user1 = randomUser(
         LastUpdateTime(timePerField = Map(fieldA -> testInstantD), otherFieldsTime = Some(testInstantB)),
-        fieldA = "aaa")
+        fieldA = "aaa",
+      )
       val user2 = randomUser(
         LastUpdateTime(
           timePerField = Map(fieldA -> testInstantA, fieldB -> testInstantC),
-          otherFieldsTime = Some(testInstantA)),
-        fieldB = "bbb")
+          otherFieldsTime = Some(testInstantA),
+        ),
+        fieldB = "bbb",
+      )
 
       val expectedTime = LastUpdateTime(
         timePerField = Map(fieldA -> testInstantD, fieldB -> testInstantC),
-        otherFieldsTime = Some(testInstantB))
+        otherFieldsTime = Some(testInstantB),
+      )
       val expected = copy(user1, fieldB = "bbb", lastUpdateTime = expectedTime)
       UpdatableEntity.merge(user1, user2) mustEqual expected
       UpdatableEntity.merge(user2, user1) mustEqual expected
@@ -106,13 +112,17 @@ class UpdatableEntityTest extends HookedSpecification {
           time.canonicalized mustEqual time
         }
         "otherFieldsTime is newest" in {
-          LastUpdateTime(timePerField = Map(fieldA -> testInstantA), otherFieldsTime = Some(testInstantB)).canonicalized mustEqual
+          LastUpdateTime(
+            timePerField = Map(fieldA -> testInstantA),
+            otherFieldsTime = Some(testInstantB),
+          ).canonicalized mustEqual
             LastUpdateTime.allFieldsUpdated(testInstantB)
         }
         "otherFieldsTime is in the middle" in {
           LastUpdateTime(
             timePerField = Map(fieldA -> testInstantA, fieldB -> testInstantC),
-            otherFieldsTime = Some(testInstantB)).canonicalized mustEqual
+            otherFieldsTime = Some(testInstantB),
+          ).canonicalized mustEqual
             LastUpdateTime(timePerField = Map(fieldB -> testInstantC), otherFieldsTime = Some(testInstantB))
         }
       }
@@ -152,7 +162,8 @@ class UpdatableEntityTest extends HookedSpecification {
           val expected =
             LastUpdateTime(
               timePerField = Map(fieldA -> testInstantA, fieldB -> testInstantB, fieldC -> testInstantB),
-              otherFieldsTime = None)
+              otherFieldsTime = None,
+            )
           time1.merge(time2, forceIncrement = false) mustEqual expected
           time2.merge(time1, forceIncrement = false) mustEqual expected
         }
@@ -161,11 +172,13 @@ class UpdatableEntityTest extends HookedSpecification {
             LastUpdateTime(timePerField = Map(fieldA -> testInstantD), otherFieldsTime = Some(testInstantB))
           val time2 = LastUpdateTime(
             timePerField = Map(fieldA -> testInstantA, fieldB -> testInstantC),
-            otherFieldsTime = Some(testInstantA))
+            otherFieldsTime = Some(testInstantA),
+          )
 
           val expected = LastUpdateTime(
             timePerField = Map(fieldA -> testInstantD, fieldB -> testInstantC),
-            otherFieldsTime = Some(testInstantB))
+            otherFieldsTime = Some(testInstantB),
+          )
           time1.merge(time2, forceIncrement = false) mustEqual expected
           time2.merge(time1, forceIncrement = false) mustEqual expected
         }
@@ -201,12 +214,14 @@ class UpdatableEntityTest extends HookedSpecification {
           time1.merge(time2, forceIncrement = true) mustEqual
             LastUpdateTime(
               timePerField = Map(fieldA -> testInstantA, fieldB -> testInstantB, fieldC -> testInstantB),
-              otherFieldsTime = None)
+              otherFieldsTime = None,
+            )
           time2.merge(time1, forceIncrement = true) mustEqual
             LastUpdateTime(
               timePerField =
                 Map(fieldA -> testInstantA, fieldB -> testInstantBIncrement, fieldC -> testInstantB),
-              otherFieldsTime = None)
+              otherFieldsTime = None,
+            )
         }
         "general + someFieldsUpdated (no overlap)" in {
           val time1 =
@@ -216,27 +231,32 @@ class UpdatableEntityTest extends HookedSpecification {
           time1.merge(time2, forceIncrement = true) mustEqual
             LastUpdateTime(
               timePerField = Map(fieldA -> testInstantC, fieldB -> testInstantB),
-              otherFieldsTime = Some(testInstantA))
+              otherFieldsTime = Some(testInstantA),
+            )
           time2.merge(time1, forceIncrement = true) mustEqual
             LastUpdateTime(
               timePerField = Map(fieldA -> testInstantC),
-              otherFieldsTime = Some(testInstantBIncrement))
+              otherFieldsTime = Some(testInstantBIncrement),
+            )
         }
         "general + general" in {
           val time1 =
             LastUpdateTime(timePerField = Map(fieldA -> testInstantD), otherFieldsTime = Some(testInstantB))
           val time2 = LastUpdateTime(
             timePerField = Map(fieldA -> testInstantA, fieldB -> testInstantC),
-            otherFieldsTime = Some(testInstantA))
+            otherFieldsTime = Some(testInstantA),
+          )
 
           time1.merge(time2, forceIncrement = true) mustEqual
             LastUpdateTime(
               timePerField = Map(fieldA -> testInstantDIncrement, fieldB -> testInstantC),
-              otherFieldsTime = Some(testInstantBIncrement))
+              otherFieldsTime = Some(testInstantBIncrement),
+            )
           time2.merge(time1, forceIncrement = true) mustEqual
             LastUpdateTime(
               timePerField = Map(fieldA -> testInstantD),
-              otherFieldsTime = Some(testInstantCIncrement))
+              otherFieldsTime = Some(testInstantCIncrement),
+            )
         }
       }
     }

@@ -20,7 +20,7 @@ object LocalDatabaseWebWorkerApiImplTest extends TestSuite {
             "x" -> 7,
           ),
           fromClient = js.Dictionary(
-            "x" -> 7,
+            "x" -> 7
           ),
         ) ==> true
       }
@@ -56,25 +56,25 @@ object LocalDatabaseWebWorkerApiImplTest extends TestSuite {
         LocalDatabaseWebWorkerApiImpl.areEquivalentEntities(
           fromLoki = js.Dictionary(
             "nested" -> js.Dictionary(
-              "x" -> 7,
-            ),
+              "x" -> 7
+            )
           ),
           fromClient = js.Dictionary(
             "nested" -> js.Dictionary(
-              "x" -> 7,
-            ),
+              "x" -> 7
+            )
           ),
         ) ==> true
         LocalDatabaseWebWorkerApiImpl.areEquivalentEntities(
           fromLoki = js.Dictionary(
             "nested" -> js.Dictionary(
-              "x" -> 7,
-            ),
+              "x" -> 7
+            )
           ),
           fromClient = js.Dictionary(
             "nested" -> js.Dictionary(
-              "x" -> 8,
-            ),
+              "x" -> 8
+            )
           ),
         ) ==> false
       }
@@ -82,18 +82,18 @@ object LocalDatabaseWebWorkerApiImplTest extends TestSuite {
       "with arrays" - {
         LocalDatabaseWebWorkerApiImpl.areEquivalentEntities(
           fromLoki = js.Dictionary(
-            "array" -> js.Array(1, 2, "3"),
+            "array" -> js.Array(1, 2, "3")
           ),
           fromClient = js.Dictionary(
-            "array" -> js.Array(1, 2, "3"),
+            "array" -> js.Array(1, 2, "3")
           ),
         ) ==> true
         LocalDatabaseWebWorkerApiImpl.areEquivalentEntities(
           fromLoki = js.Dictionary(
-            "array" -> js.Array(1, 2, "3"),
+            "array" -> js.Array(1, 2, "3")
           ),
           fromClient = js.Dictionary(
-            "array" -> js.Array(1, 2, 3),
+            "array" -> js.Array(1, 2, 3)
           ),
         ) ==> false
       }

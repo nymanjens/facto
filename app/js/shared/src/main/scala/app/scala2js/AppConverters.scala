@@ -43,8 +43,8 @@ object AppConverters {
         name = dict.getRequired(ModelFields.User.name),
         isAdmin = dict.getRequired(ModelFields.User.isAdmin),
         expandCashFlowTablesByDefault = dict.getRequired(ModelFields.User.expandCashFlowTablesByDefault),
-        expandLiquidationTablesByDefault = dict.getRequired(ModelFields.User.expandLiquidationTablesByDefault)
-    )
+        expandLiquidationTablesByDefault = dict.getRequired(ModelFields.User.expandLiquidationTablesByDefault),
+      ),
   )
 
   implicit val TransactionConverter: EntityConverter[Transaction] = new EntityConverter(
@@ -75,16 +75,16 @@ object AppConverters {
         tags = dict.getRequired(ModelFields.Transaction.tags),
         createdDate = dict.getRequired(ModelFields.Transaction.createdDate),
         transactionDate = dict.getRequired(ModelFields.Transaction.transactionDate),
-        consumedDate = dict.getRequired(ModelFields.Transaction.consumedDate)
-    )
+        consumedDate = dict.getRequired(ModelFields.Transaction.consumedDate),
+      ),
   )
 
   implicit val TransactionGroupConverter: EntityConverter[TransactionGroup] = new EntityConverter(
     allFieldsWithoutId = Seq(
-      ModelFields.TransactionGroup.createdDate,
+      ModelFields.TransactionGroup.createdDate
     ),
-    toScalaWithoutId =
-      dict => TransactionGroup(createdDate = dict.getRequired(ModelFields.TransactionGroup.createdDate))
+    toScalaWithoutId = dict =>
+      TransactionGroup(createdDate = dict.getRequired(ModelFields.TransactionGroup.createdDate)),
   )
 
   implicit val BalanceCheckConverter: EntityConverter[BalanceCheck] = new EntityConverter(
@@ -101,8 +101,8 @@ object AppConverters {
         moneyReservoirCode = dict.getRequired(ModelFields.BalanceCheck.moneyReservoirCode),
         balanceInCents = dict.getRequired(ModelFields.BalanceCheck.balanceInCents),
         createdDate = dict.getRequired(ModelFields.BalanceCheck.createdDate),
-        checkDate = dict.getRequired(ModelFields.BalanceCheck.checkDate)
-    )
+        checkDate = dict.getRequired(ModelFields.BalanceCheck.checkDate),
+      ),
   )
 
   implicit val ExchangeRateMeasurementConverter: EntityConverter[ExchangeRateMeasurement] =
@@ -117,7 +117,7 @@ object AppConverters {
           date = dict.getRequired(ModelFields.ExchangeRateMeasurement.date),
           foreignCurrencyCode = dict.getRequired(ModelFields.ExchangeRateMeasurement.foreignCurrencyCode),
           ratioReferenceToForeignCurrency =
-            dict.getRequired(ModelFields.ExchangeRateMeasurement.ratioReferenceToForeignCurrency)
-      )
+            dict.getRequired(ModelFields.ExchangeRateMeasurement.ratioReferenceToForeignCurrency),
+        ),
     )
 }

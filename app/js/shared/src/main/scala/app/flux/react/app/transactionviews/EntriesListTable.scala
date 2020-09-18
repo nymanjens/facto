@@ -22,8 +22,8 @@ import org.scalajs.dom.console
 import scala.collection.immutable.Seq
 import scala.scalajs.js
 
-private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
-    implicit protected val entriesStoreFactory: EntriesListStoreFactory[Entry, AdditionalInput],
+private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](implicit
+    protected val entriesStoreFactory: EntriesListStoreFactory[Entry, AdditionalInput],
     i18n: I18n,
 ) extends HydroReactComponent {
 
@@ -50,7 +50,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
       latestEntryToTableTitleExtra = latestEntryToTableTitleExtra,
       hideEmptyTable = hideEmptyTable,
       tableHeaders = tableHeaders,
-      calculateTableDataFromEntryAndRowNum = (entry, rowNum) => calculateTableData(entry)
+      calculateTableDataFromEntryAndRowNum = (entry, rowNum) => calculateTableData(entry),
     )
   }
 
@@ -82,19 +82,20 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
           hideEmptyTable,
           tableHeaders,
           calculateTableDataFromEntryAndRowNum,
-          additionalInput
-        ))
+          additionalInput,
+        )
+      )
       .vdomElement
   }
 
   // **************** Implementation of HydroReactComponent methods ****************//
   override protected val config = ComponentConfig(backendConstructor = new Backend(_), initialState = State())
-    .withStateStoresDependencyFromProps(
-      props =>
-        StateStoresDependency(
-          props.collapsedExpandedStateStoreOrDummy,
-          _.copy(expanded = props.collapsedExpandedStateStoreOrDummy.state.expanded)
-      ))
+    .withStateStoresDependencyFromProps(props =>
+      StateStoresDependency(
+        props.collapsedExpandedStateStoreOrDummy,
+        _.copy(expanded = props.collapsedExpandedStateStoreOrDummy.state.expanded),
+      )
+    )
 
   // **************** Implementation of HydroReactComponent types ****************//
   protected case class Props(
@@ -132,7 +133,8 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
       val maxNumEntries = props.numEntriesStrategy.start
 
       entriesStore = entriesStoreFactory.get(
-        entriesStoreFactory.Input(maxNumEntries = maxNumEntries, props.additionalInput))
+        entriesStoreFactory.Input(maxNumEntries = maxNumEntries, props.additionalInput)
+      )
       entriesStore.register(EntriesStoreListener)
 
       $.modState(state =>
@@ -140,7 +142,8 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
           state
             .withEntriesFrom(entriesStore)
             .copy(maxNumEntries = maxNumEntries)
-      }).runNow()
+        }
+      ).runNow()
     }
 
     override def willUnmount(props: Props, state: State): Callback = LogExceptionsCallback {
@@ -156,10 +159,9 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
           title = props.tableTitle,
           tableClasses = props.tableClasses,
           expanded = state.expanded,
-          onToggleCollapsedExpanded =
-            props.collapsedExpandedStateStore map { store => () =>
-              store.setExpandedForSingleTable(!state.expanded)
-            },
+          onToggleCollapsedExpanded = props.collapsedExpandedStateStore map { store => () =>
+            store.setExpandedForSingleTable(!state.expanded)
+          },
           expandNumEntriesCallback = {
             if (state.storeState.isDefined && state.storeState.get.hasMore) {
               Some(expandMaxNumEntries(props, state))
@@ -169,11 +171,11 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
           tableHeaders = props.tableHeaders,
           tableRowDatas = state.storeState match {
             case Some(storeState) =>
-              storeState.entries.reverse.zipWithIndex.map {
-                case (WithIsPending(entry, isPending), index) =>
-                  TableRowData(
-                    props.calculateTableDataFromEntryAndRowNum(entry, index),
-                    deemphasize = isPending)
+              storeState.entries.reverse.zipWithIndex.map { case (WithIsPending(entry, isPending), index) =>
+                TableRowData(
+                  props.calculateTableDataFromEntryAndRowNum(entry, index),
+                  deemphasize = isPending,
+                )
               }
             case None =>
               for (i <- 0 until state.maxNumEntries + 1) yield {
@@ -182,10 +184,13 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
                     <.td(
                       ^.colSpan := props.tableHeaders.size,
                       ^.style := js.Dictionary("color" -> "white"),
-                      "...")),
-                  deemphasize = false)
+                      "...",
+                    )
+                  ),
+                  deemphasize = false,
+                )
               }
-          }
+          },
         )
       }
     }
@@ -200,7 +205,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
                 <.span(latestEntryToTableTitleExtra(latestEntry.entry), " ")
               }
             },
-            <.span(s"(${i18n("app.n-entries", numEntries)})")
+            <.span(s"(${i18n("app.n-entries", numEntries)})"),
           )
         case None =>
           Bootstrap.FontAwesomeIcon("circle-o-notch", spin = true)
@@ -211,10 +216,12 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](
       def updateMaxNumEntries(maxNumEntries: Int): Unit = {
         entriesStore.deregister(EntriesStoreListener)
         entriesStore = entriesStoreFactory.get(
-          entriesStoreFactory.Input(maxNumEntries = maxNumEntries, props.additionalInput))
+          entriesStoreFactory.Input(maxNumEntries = maxNumEntries, props.additionalInput)
+        )
         entriesStore.register(EntriesStoreListener)
         $.modState(state =>
-          logExceptions(state.withEntriesFrom(entriesStore).copy(maxNumEntries = maxNumEntries))).runNow()
+          logExceptions(state.withEntriesFrom(entriesStore).copy(maxNumEntries = maxNumEntries))
+        ).runNow()
       }
 
       val nextMaxNumEntries = {

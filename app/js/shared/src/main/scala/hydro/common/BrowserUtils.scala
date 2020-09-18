@@ -17,7 +17,8 @@ object BrowserUtils {
 
     stringContainsAnyOf(
       haystack = stringToTest,
-      needles = Seq("android", "blackberry", "iphone", "ipad", "ipod", "opera mini", "iemobile", "wpdesktop"))
+      needles = Seq("android", "blackberry", "iphone", "ipad", "ipod", "opera mini", "iemobile", "wpdesktop"),
+    )
   }
 
   lazy val isFirefox: Boolean = logExceptions {

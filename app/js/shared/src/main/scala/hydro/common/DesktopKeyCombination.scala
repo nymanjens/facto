@@ -19,7 +19,8 @@ object DesktopKeyCombination {
         character = getOnlyElement(key),
         ctrlOrMeta = ctrlOrMeta,
         shift = event.shiftKey,
-        alt = event.altKey)
+        alt = event.altKey,
+      )
     } else {
       SpecialKey(
         specialKeyType = key match {
@@ -33,7 +34,7 @@ object DesktopKeyCombination {
         },
         ctrlOrMeta = ctrlOrMeta,
         shift = event.shiftKey,
-        alt = event.altKey
+        alt = event.altKey,
       )
     }
   }

@@ -114,7 +114,7 @@ object Transaction {
         createdDate = Option(createdDate),
         transactionDate = Option(transactionDate),
         consumedDate = Option(consumedDate),
-        idOption = idOption
+        idOption = idOption,
       )
 
     def from(transaction: Transaction)(implicit accountingConfig: Config): Partial =
@@ -131,7 +131,7 @@ object Transaction {
         createdDate = transaction.createdDate,
         transactionDate = transaction.transactionDate,
         consumedDate = transaction.consumedDate,
-        idOption = transaction.idOption
+        idOption = transaction.idOption,
       )
   }
 }

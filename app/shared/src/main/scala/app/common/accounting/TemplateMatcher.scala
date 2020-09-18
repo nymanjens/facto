@@ -13,8 +13,8 @@ import hydro.common.GuavaReplacement.ImmutableSetMultimap
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 
-class TemplateMatcher(
-    implicit accountingConfig: Config,
+class TemplateMatcher(implicit
+    accountingConfig: Config,
     entityAccess: AppEntityAccess,
 ) {
 
@@ -62,8 +62,8 @@ class TemplateMatcher(
       } getOrElse true
 
     def transactionsMatch = template.transactions.permutations.exists { permutation =>
-      (permutation zip transactionsSubset).forall {
-        case (te, tr) => matches(te, tr)
+      (permutation zip transactionsSubset).forall { case (te, tr) =>
+        matches(te, tr)
       }
     }
 

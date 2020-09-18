@@ -8,8 +8,8 @@ import hydro.flux.react.uielements.BootstrapTags
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
-final class DescriptionWithEntryCount(
-    implicit templateMatcher: TemplateMatcher,
+final class DescriptionWithEntryCount(implicit
+    templateMatcher: TemplateMatcher
 ) {
   private case class Props(entry: GroupedTransactions)
   private val component = ScalaComponent
@@ -17,10 +17,10 @@ final class DescriptionWithEntryCount(
     .renderP((_, props) => {
       val entry = props.entry
 
-      val maybeTemplateIcon: Option[VdomNode] = templateMatcher.getMatchingTemplate(entry.transactions) map {
-        template =>
+      val maybeTemplateIcon: Option[VdomNode] =
+        templateMatcher.getMatchingTemplate(entry.transactions) map { template =>
           <.i(^.key := "template-icon", ^.className := template.iconClass)
-      }
+        }
       val tagIndications: Seq[VdomNode] =
         entry.tags
           .map(tag => Bootstrap.Label(BootstrapTags.toStableVariant(tag))(^.key := tag, tag): VdomNode)

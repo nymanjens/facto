@@ -50,7 +50,8 @@ object BalanceCheckStoreTest extends TestSuite {
 
       fakeDatabase.allModifications.size - initialModifications.size ==> 1
       (fakeDatabase.allModifications takeRight 1) ==> Seq(
-        EntityModification.Remove[BalanceCheck](testBalanceCheckWithId.id))
+        EntityModification.Remove[BalanceCheck](testBalanceCheckWithId.id)
+      )
     }
 
     "Registers callback" - {

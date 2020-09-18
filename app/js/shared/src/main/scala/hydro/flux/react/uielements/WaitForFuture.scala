@@ -19,16 +19,19 @@ final class WaitForFuture[V] {
       state.input match {
         case Some(input) => props.inputToElement(input)
         case None        => props.waitingElement
-    })
+      }
+    )
     .componentWillMount($ =>
       LogExceptionsCallback {
         $.props.futureInput.map(input => $.modState(_.copy(input = Some(input))).runNow())
-    })
+      }
+    )
     .build
 
   // **************** API ****************//
-  def apply(futureInput: Future[V], waitingElement: VdomElement = null)(inputToElement: V => VdomElement)(
-      implicit i18n: I18n): VdomElement = {
+  def apply(futureInput: Future[V], waitingElement: VdomElement = null)(
+      inputToElement: V => VdomElement
+  )(implicit i18n: I18n): VdomElement = {
     futureInput.value match {
       case Some(Success(value)) => inputToElement(value)
       case Some(Failure(_))     => waitingElement
@@ -37,7 +40,9 @@ final class WaitForFuture[V] {
           Props(
             futureInput = futureInput,
             inputToElement = inputToElement,
-            waitingElement = Option(waitingElement) getOrElse defaultWaitingElement))
+            waitingElement = Option(waitingElement) getOrElse defaultWaitingElement,
+          )
+        )
     }
   }
 

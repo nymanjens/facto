@@ -17,8 +17,8 @@ import hydro.models.access.LocalDatabaseImpl.SecondaryIndexFunction
 
 import scala.collection.immutable.Seq
 
-final class Module(
-    implicit user: User,
+final class Module(implicit
+    user: User,
     clock: Clock,
     scalaJsApiClient: ScalaJsApiClient,
     getInitialDataResponse: GetInitialDataResponse,
@@ -48,7 +48,8 @@ object Module {
       Seq(
         ModelFields.Transaction.transactionGroupId,
         ModelFields.Transaction.moneyReservoirCode,
-        ModelFields.Transaction.beneficiaryAccountCode)
+        ModelFields.Transaction.beneficiaryAccountCode,
+      )
     case TransactionGroup.Type        => Seq()
     case BalanceCheck.Type            => Seq()
     case ExchangeRateMeasurement.Type => Seq()

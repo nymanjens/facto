@@ -14,15 +14,14 @@ import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-final class UserStore(
-    implicit dispatcher: Dispatcher,
+final class UserStore(implicit
+    dispatcher: Dispatcher,
     scalaJsApiClient: ScalaJsApiClient,
     entityAccess: JsEntityAccess,
 ) extends AsyncEntityDerivedStateStore[State] {
 
-  dispatcher.registerPartialAsync {
-    case UpsertUser(userPrototype) =>
-      scalaJsApiClient.upsertUser(userPrototype)
+  dispatcher.registerPartialAsync { case UpsertUser(userPrototype) =>
+    scalaJsApiClient.upsertUser(userPrototype)
   }
 
   override protected def calculateState(): Future[State] = async {

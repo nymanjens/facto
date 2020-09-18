@@ -72,7 +72,7 @@ object Parsable {
         defaultCashReservoirCode = Option(defaultCashReservoirCode),
         defaultElectronicReservoirCode = defaultElectronicReservoirCode,
         categories = checkNotNull(categories).asScala.toList.map(_.parse),
-        summaryTotalRows = nonNullSummaryTotalRows.asScala.toList.map(_.parse)
+        summaryTotalRows = nonNullSummaryTotalRows.asScala.toList.map(_.parse),
       )
     }
   }
@@ -83,7 +83,8 @@ object Parsable {
       def parse: ParsedSummaryTotalRowDef =
         ParsedSummaryTotalRowDef(
           rowTitleHtml = checkNotNull(rowTitleHtml),
-          categoriesToIgnore = checkNotNull(categoriesToIgnore).asScala.map(_.parse).toSet)
+          categoriesToIgnore = checkNotNull(categoriesToIgnore).asScala.map(_.parse).toSet,
+        )
     }
     object SummaryTotalRowDef {
       val default: SummaryTotalRowDef = SummaryTotalRowDef("<b>Total</b>", Collections.emptyList[Category])
@@ -116,7 +117,8 @@ object Parsable {
         parsedShorterName,
         owner.parse,
         hidden,
-        currencyCode = Option(currency))
+        currencyCode = Option(currency),
+      )
     }
   }
 
@@ -144,10 +146,8 @@ object Parsable {
         onlyShowForUserLoginNames = Option(onlyShowForUserLoginNames) map (_.asScala.toSet),
         zeroSum = zeroSum,
         iconClass = icon,
-        transactions = checkNotNull(transactions).asScala.toList map (_.parse(
-          accounts,
-          reservoirs,
-          categories))
+        transactions =
+          checkNotNull(transactions).asScala.toList map (_.parse(accounts, reservoirs, categories)),
       )
     }
   }
@@ -173,7 +173,8 @@ object Parsable {
         require(beneficiaryCode != null, s"beneficiaryCode is a mandatory parameter (Transaction = $this)")
         require(
           moneyReservoirCode != null,
-          s"moneyReservoirCode is a mandatory parameter (Transaction = $this)")
+          s"moneyReservoirCode is a mandatory parameter (Transaction = $this)",
+        )
         require(categoryCode != null, s"categoryCode is a mandatory parameter (Transaction = $this)")
         require(description.nonEmpty, s"description is a mandatory parameter (Transaction = $this)")
         require(!description.contains("$"), s"description cannot contain placeholders (Transaction = $this)")
@@ -195,7 +196,7 @@ object Parsable {
           description = description,
           flowInCents = (flowAsFloat.toDouble * 100).round,
           detailDescription = detailDescription,
-          tags = Option(tags).map(_.asScala.toList).getOrElse(Seq())
+          tags = Option(tags).map(_.asScala.toList).getOrElse(Seq()),
         )
       }
     }
@@ -216,7 +217,7 @@ object Parsable {
         accountingCategory = accountingCategory.parse,
         endowmentCategory = endowmentCategory.parse,
         liquidationDescription = liquidationDescription,
-        zoneId = zoneId
+        zoneId = zoneId,
       )
     }
   }

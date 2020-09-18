@@ -58,11 +58,15 @@ object Awaiter {
         } else {
           resultPromise.tryFailure(
             new java.lang.AssertionError(
-              s"Expected future to be completed with value $expected, but got $value"))
-      })
+              s"Expected future to be completed with value $expected, but got $value"
+            )
+          )
+        }
+      )
       js.timers.setTimeout(500.milliseconds) {
         resultPromise.tryFailure(
-          new java.lang.AssertionError(s"future completion timed out (expected $expected)"))
+          new java.lang.AssertionError(s"future completion timed out (expected $expected)")
+        )
       }
       resultPromise.future
     }
@@ -90,10 +94,13 @@ object Awaiter {
 
     def neverComplete(future: Future[_]): Future[Unit] = {
       val resultPromise = Promise[Unit]()
-      future.onComplete(
-        tryValue =>
-          resultPromise.tryFailure(new java.lang.AssertionError(
-            s"Expected future that never completes, but completed with tryValue $tryValue")))
+      future.onComplete(tryValue =>
+        resultPromise.tryFailure(
+          new java.lang.AssertionError(
+            s"Expected future that never completes, but completed with tryValue $tryValue"
+          )
+        )
+      )
       js.timers.setTimeout(100.milliseconds) {
         resultPromise.trySuccess((): Unit)
       }

@@ -25,7 +25,8 @@ class TimeUtilsTest extends Specification {
       SEPTEMBER,
       OCTOBER,
       NOVEMBER,
-      DECEMBER)
+      DECEMBER,
+    )
   }
 
   "parseDateString" in {

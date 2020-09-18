@@ -28,8 +28,8 @@ import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
 
-final class Liquidation(
-    implicit entriesStoreFactory: LiquidationEntriesStoreFactory,
+final class Liquidation(implicit
+    entriesStoreFactory: LiquidationEntriesStoreFactory,
     collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
     entityAccess: AppJsEntityAccess,
     clock: Clock,
@@ -48,64 +48,64 @@ final class Liquidation(
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
     .initialState(State())
-    .renderPS(
-      ($, props, state) => {
-        implicit val router = props.router
-        <.span(
-          pageHeader.withExtension(router.currentPage)(
-            CollapseAllExpandAllButtons(
-              onExpandedUpdate = collapsedExpandedStateStoreHandle.setExpandedForAllTables),
-            " ",
-            simplifyLiquidationButton()
+    .renderPS(($, props, state) => {
+      implicit val router = props.router
+      <.span(
+        pageHeader.withExtension(router.currentPage)(
+          CollapseAllExpandAllButtons(
+            onExpandedUpdate = collapsedExpandedStateStoreHandle.setExpandedForAllTables
           ),
-          Panel(i18n("app.all-combinations")) {
-            {
-              for {
-                (account1, i1) <- accountingConfig.personallySortedAccounts.zipWithIndex
-                (account2, i2) <- accountingConfig.personallySortedAccounts.zipWithIndex
-                if i1 < i2
-              } yield {
-                val accountPair = AccountPair(account1, account2)
-                val tableName = s"${account1.code}_${account2.code}"
-                entriesListTable(
-                  tableTitle = i18n("app.debt-of", account1.longName, account2.longName),
-                  tableClasses = Seq("table-liquidation"),
-                  key = tableName,
-                  numEntriesStrategy = NumEntriesStrategy(
-                    start = Liquidation.minNumEntriesPerPair,
-                    intermediateBeforeInf = Seq(30)),
-                  collapsedExpandedStateStore = Some(collapsedExpandedStateStoreHandle.getStore(tableName)),
-                  additionalInput = accountPair,
-                  latestEntryToTableTitleExtra = latestEntry => latestEntry.debt.toString,
-                  hideEmptyTable = true,
-                  tableHeaders = Seq(
-                    <.th(i18n("app.payed")),
-                    <.th(i18n("app.beneficiary")),
-                    <.th(i18n("app.payed-with-to")),
-                    <.th(i18n("app.category")),
-                    <.th(i18n("app.description")),
-                    <.th(i18n("app.flow")),
-                    <.th(s"${account1.veryShortName} -> ${account2.veryShortName}"),
-                    <.th(repayButton(account1 = account1, account2 = account2))
+          " ",
+          simplifyLiquidationButton(),
+        ),
+        Panel(i18n("app.all-combinations")) {
+          {
+            for {
+              (account1, i1) <- accountingConfig.personallySortedAccounts.zipWithIndex
+              (account2, i2) <- accountingConfig.personallySortedAccounts.zipWithIndex
+              if i1 < i2
+            } yield {
+              val accountPair = AccountPair(account1, account2)
+              val tableName = s"${account1.code}_${account2.code}"
+              entriesListTable(
+                tableTitle = i18n("app.debt-of", account1.longName, account2.longName),
+                tableClasses = Seq("table-liquidation"),
+                key = tableName,
+                numEntriesStrategy = NumEntriesStrategy(
+                  start = Liquidation.minNumEntriesPerPair,
+                  intermediateBeforeInf = Seq(30),
+                ),
+                collapsedExpandedStateStore = Some(collapsedExpandedStateStoreHandle.getStore(tableName)),
+                additionalInput = accountPair,
+                latestEntryToTableTitleExtra = latestEntry => latestEntry.debt.toString,
+                hideEmptyTable = true,
+                tableHeaders = Seq(
+                  <.th(i18n("app.payed")),
+                  <.th(i18n("app.beneficiary")),
+                  <.th(i18n("app.payed-with-to")),
+                  <.th(i18n("app.category")),
+                  <.th(i18n("app.description")),
+                  <.th(i18n("app.flow")),
+                  <.th(s"${account1.veryShortName} -> ${account2.veryShortName}"),
+                  <.th(repayButton(account1 = account1, account2 = account2)),
+                ),
+                calculateTableData = entry =>
+                  Seq[VdomElement](
+                    <.td(entry.transactionDates.map(formatDate).mkString(", ")),
+                    <.td(entry.beneficiaries.map(_.shorterName).mkString(", ")),
+                    <.td(entry.moneyReservoirs.map(_.shorterName).mkString(", ")),
+                    <.td(entry.categories.map(_.name).mkString(", ")),
+                    <.td(descriptionWithEntryCount(entry)),
+                    <.td(uielements.MoneyWithCurrency(entry.flow)),
+                    <.td(uielements.MoneyWithCurrency(entry.debt)),
+                    <.td(uielements.TransactionGroupEditButton(entry.groupId)),
                   ),
-                  calculateTableData = entry =>
-                    Seq[VdomElement](
-                      <.td(entry.transactionDates.map(formatDate).mkString(", ")),
-                      <.td(entry.beneficiaries.map(_.shorterName).mkString(", ")),
-                      <.td(entry.moneyReservoirs.map(_.shorterName).mkString(", ")),
-                      <.td(entry.categories.map(_.name).mkString(", ")),
-                      <.td(descriptionWithEntryCount(entry)),
-                      <.td(uielements.MoneyWithCurrency(entry.flow)),
-                      <.td(uielements.MoneyWithCurrency(entry.debt)),
-                      <.td(uielements.TransactionGroupEditButton(entry.groupId))
-                  )
-                )
-              }
-            }.toVdomArray
-          }
-        )
-      }
-    )
+              )
+            }
+          }.toVdomArray
+        },
+      )
+    })
     .build
 
   // **************** API ****************//
@@ -119,17 +119,18 @@ final class Liquidation(
     Bootstrap.Button(tag = link)(
       Bootstrap.FontAwesomeIcon("scissors", fixedWidth = true),
       " ",
-      i18n("app.simplify-liquidation")
+      i18n("app.simplify-liquidation"),
     )
   }
 
-  private def repayButton(account1: Account, account2: Account)(
-      implicit router: RouterContext): VdomElement = {
+  private def repayButton(account1: Account, account2: Account)(implicit
+      router: RouterContext
+  ): VdomElement = {
     val link = router.anchorWithHrefTo(AppPages.NewForRepayment(account1 = account1, account2 = account2))
     Bootstrap.Button(Variant.info, Size.xs, tag = link)(
       Bootstrap.FontAwesomeIcon("check-square-o", fixedWidth = true),
       " ",
-      i18n("app.repay")
+      i18n("app.repay"),
     )
   }
 

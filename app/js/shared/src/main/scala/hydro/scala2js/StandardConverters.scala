@@ -174,8 +174,8 @@ object StandardConverters {
 
   implicit object LastUpdateTimeConverter extends Converter[LastUpdateTime] {
     override def toJs(value: LastUpdateTime) = {
-      val timePerFieldJs = value.timePerField.map {
-        case (field, time) => js.Array[js.Any](ModelFields.toNumber(field), Scala2Js.toJs(time))
+      val timePerFieldJs = value.timePerField.map { case (field, time) =>
+        js.Array[js.Any](ModelFields.toNumber(field), Scala2Js.toJs(time))
       }.toJSArray
       js.Array[js.Any](timePerFieldJs, Scala2Js.toJs(value.otherFieldsTime))
     }
@@ -211,12 +211,16 @@ object StandardConverters {
             result.push(addNumber)
             result.push(
               Scala2Js.toJs(entity.asInstanceOf[E])(
-                AppConverters.fromEntityType(modification.entityType.asInstanceOf[EntityType[E]])))
+                AppConverters.fromEntityType(modification.entityType.asInstanceOf[EntityType[E]])
+              )
+            )
           case EntityModification.Update(entity) =>
             result.push(updateNumber)
             result.push(
               Scala2Js.toJs(entity.asInstanceOf[E])(
-                AppConverters.fromEntityType(modification.entityType.asInstanceOf[EntityType[E]])))
+                AppConverters.fromEntityType(modification.entityType.asInstanceOf[EntityType[E]])
+              )
+            )
           case EntityModification.Remove(entityId) =>
             result.push(removeNumber)
             result.push(Scala2Js.toJs(entityId))

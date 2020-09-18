@@ -17,7 +17,7 @@ final class PageHeader(implicit i18n: I18n, entityAccess: EntityAccess) {
         " ",
         props.title,
         " ",
-        children
+        children,
       )
     }
     .build

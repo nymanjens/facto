@@ -112,25 +112,31 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
       reservoir: MoneyReservoir = testReservoirCashGbp,
   )(implicit entityAccess: FakeJsEntityAccess): Unit = {
     entityAccess.addRemotelyAddedEntities(
-      createTransaction(flow = flow, reservoir = reservoir).copy(transactionDate = date))
+      createTransaction(flow = flow, reservoir = reservoir).copy(transactionDate = date)
+    )
   }
-  private def persistBalanceCheck(balance: Double, date: LocalDateTime)(
-      implicit entityAccess: FakeJsEntityAccess): Unit = {
+  private def persistBalanceCheck(balance: Double, date: LocalDateTime)(implicit
+      entityAccess: FakeJsEntityAccess
+  ): Unit = {
     entityAccess.addRemotelyAddedEntities(
       testBalanceCheckWithId.copy(
         idOption = Some(EntityModification.generateRandomId()),
         moneyReservoirCode = testReservoirCashGbp.code,
         checkDate = date,
-        balanceInCents = (balance * 100).toLong))
+        balanceInCents = (balance * 100).toLong,
+      )
+    )
   }
-  private def persistGbpRate(date: LocalDateTime, ratio: Double)(
-      implicit entityAccess: FakeJsEntityAccess): Unit = {
+  private def persistGbpRate(date: LocalDateTime, ratio: Double)(implicit
+      entityAccess: FakeJsEntityAccess
+  ): Unit = {
     entityAccess.addRemotelyAddedEntities(
       testExchangeRateMeasurementWithId.copy(
         idOption = Some(EntityModification.generateRandomId()),
         date = date,
         foreignCurrencyCode = testReservoirCashGbp.currency.code,
-        ratioReferenceToForeignCurrency = ratio
-      ))
+        ratioReferenceToForeignCurrency = ratio,
+      )
+    )
   }
 }

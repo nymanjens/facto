@@ -29,7 +29,8 @@ final class ConfigModule extends AbstractModule {
         } else {
           require(
             ResourceFiles.exists(configLocation),
-            s"Could not find $configLocation as file or as resource")
+            s"Could not find $configLocation as file or as resource",
+          )
           ResourceFiles.read(configLocation)
         }
       }

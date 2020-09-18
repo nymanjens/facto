@@ -17,8 +17,8 @@ import japgolly.scalajs.react.vdom.html_<^._
 import scala.collection.immutable.Seq
 import scala.scalajs.js
 
-private[dbexplorer] final class DatabaseTableView(
-    implicit jsEntityAccess: JsEntityAccess,
+private[dbexplorer] final class DatabaseTableView(implicit
+    jsEntityAccess: JsEntityAccess,
     i18n: I18n,
     databaseExplorerStoreFactory: DatabaseExplorerStoreFactory,
 ) extends HydroReactComponent {
@@ -79,8 +79,10 @@ private[dbexplorer] final class DatabaseTableView(
           for (_ <- 0 until 10) yield {
             TableRowData(
               cells = Seq[VdomElement](
-                <.td(^.colSpan := tableHeaders().size, ^.style := js.Dictionary("color" -> "white"), "...")),
-              deemphasize = false)
+                <.td(^.colSpan := tableHeaders().size, ^.style := js.Dictionary("color" -> "white"), "...")
+              ),
+              deemphasize = false,
+            )
           }
       }
     }

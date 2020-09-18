@@ -61,17 +61,17 @@ object MoneyInput {
           ^.value := valueString,
           ^.disabled := extraProps.forceValue.isDefined,
           ^.onChange ==> ((event: ReactEventFromInput) => onChange(event.target.value)),
-          ^.onBlur ==> ((event: ReactEventFromInput) => materializeInputIfValid())
+          ^.onBlur ==> ((event: ReactEventFromInput) => materializeInputIfValid()),
         ),
         ^^.ifThen(extraProps.currency.isForeign && extraProps.dateForCurrencyConversion.isDefined) {
           Bootstrap.InputGroupAddon(
             <.i(^.className := Currency.default.iconClass),
             " ",
-            referenceMoney(extraProps.currency, extraProps.dateForCurrencyConversion.get).formatFloat
+            referenceMoney(extraProps.currency, extraProps.dateForCurrencyConversion.get).formatFloat,
           )
-        }
+        },
       )
-    }
+    },
   )
 
   // **************** API ****************//
@@ -87,8 +87,8 @@ object MoneyInput {
       currency: Currency,
       date: LocalDateTime,
       listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance,
-  )(
-      implicit exchangeRateManager: ExchangeRateManager,
+  )(implicit
+      exchangeRateManager: ExchangeRateManager,
       i18n: I18n,
   ): VdomElement = applyInternal(
     ref = ref,
@@ -101,7 +101,7 @@ object MoneyInput {
     forceValue = forceValue,
     currency = currency,
     dateForCurrencyConversion = Some(date),
-    listener = listener
+    listener = listener,
   )
 
   def apply(
@@ -115,8 +115,8 @@ object MoneyInput {
       forceValue: Option[Long] = None,
       currency: Currency,
       listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance,
-  )(
-      implicit exchangeRateManager: ExchangeRateManager,
+  )(implicit
+      exchangeRateManager: ExchangeRateManager,
       i18n: I18n,
   ): VdomElement = applyInternal(
     ref = ref,
@@ -129,7 +129,7 @@ object MoneyInput {
     forceValue = forceValue,
     currency = currency,
     dateForCurrencyConversion = None,
-    listener = listener
+    listener = listener,
   )
 
   // **************** Private helper methods ****************//
@@ -145,8 +145,8 @@ object MoneyInput {
       currency: Currency,
       dateForCurrencyConversion: Option[LocalDateTime],
       listener: InputBase.Listener[Value],
-  )(
-      implicit exchangeRateManager: ExchangeRateManager,
+  )(implicit
+      exchangeRateManager: ExchangeRateManager,
       i18n: I18n,
   ): VdomElement = {
     val props = Props[Value, ExtraProps](
@@ -160,8 +160,9 @@ object MoneyInput {
       extra = ExtraProps(
         forceValue = forceValue,
         currency = currency,
-        dateForCurrencyConversion = dateForCurrencyConversion),
-      valueTransformer = ValueTransformer
+        dateForCurrencyConversion = dateForCurrencyConversion,
+      ),
+      valueTransformer = ValueTransformer,
     )
     ref.mutableRef.component(props)
   }
@@ -170,8 +171,8 @@ object MoneyInput {
 
   // **************** Public inner types ****************//
   final class Reference private[MoneyInput] (
-      private[MoneyInput] val mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps])
-      extends InputComponent.Reference(mutableRef)
+      private[MoneyInput] val mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps]
+  ) extends InputComponent.Reference(mutableRef)
 
   case class ExtraProps(
       forceValue: Option[Long],

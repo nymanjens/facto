@@ -13,7 +13,8 @@ object WithIsPending {
     entityAccess.pendingModifications.additionIsPending(entity)
 
   /** Shortcut to cut down on boiler plate. */
-  def isAnyPending[E <: Entity: EntityType](entities: Iterable[E])(
-      implicit entityAccess: AppJsEntityAccess): Boolean =
+  def isAnyPending[E <: Entity: EntityType](entities: Iterable[E])(implicit
+      entityAccess: AppJsEntityAccess
+  ): Boolean =
     entities.exists(isPending)
 }

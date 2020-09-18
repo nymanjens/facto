@@ -22,7 +22,8 @@ case class PicklableDbQuery(
       DbQuery[E](
         filter = filter.toRegular.asInstanceOf[DbQuery.Filter[E]],
         sorting = sorting.map(_.toRegular.asInstanceOf[DbQuery.Sorting[E]]),
-        limit = limit)(entityType.asInstanceOf[EntityType[E]])
+        limit = limit,
+      )(entityType.asInstanceOf[EntityType[E]])
     internal
   }
 }
@@ -32,7 +33,7 @@ object PicklableDbQuery {
       filter = Filter.fromRegular(regular.filter),
       sorting = regular.sorting.map(Sorting.fromRegular),
       limit = regular.limit,
-      entityType = regular.entityType.asInstanceOf[EntityType.any]
+      entityType = regular.entityType.asInstanceOf[EntityType.any],
     )
 
   sealed trait Filter {
@@ -46,11 +47,13 @@ object PicklableDbQuery {
       case f @ DbQuery.Filter.GreaterThan(field, value) =>
         GreaterThan(
           FieldWithValue.fromRegular(field, value),
-          PicklableOrdering.fromRegular(f.picklableOrdering))
+          PicklableOrdering.fromRegular(f.picklableOrdering),
+        )
       case f @ DbQuery.Filter.GreaterOrEqualThan(field, value) =>
         GreaterOrEqualThan(
           FieldWithValue.fromRegular(field, value),
-          PicklableOrdering.fromRegular(f.picklableOrdering))
+          PicklableOrdering.fromRegular(f.picklableOrdering),
+        )
       case f @ DbQuery.Filter.LessThan(field, value) =>
         LessThan(FieldWithValue.fromRegular(field, value), PicklableOrdering.fromRegular(f.picklableOrdering))
       case DbQuery.Filter.AnyOf(field, values) =>
@@ -77,7 +80,8 @@ object PicklableDbQuery {
         def internal[V, E]: DbQuery.Filter[_] =
           DbQuery.Filter.Equal[V, E](
             fieldWithValue.field.toRegular.asInstanceOf[ModelField[V, E]],
-            fieldWithValue.value.asInstanceOf[V])
+            fieldWithValue.value.asInstanceOf[V],
+          )
         internal
       }
     }
@@ -86,7 +90,8 @@ object PicklableDbQuery {
         def internal[V, E]: DbQuery.Filter[_] =
           DbQuery.Filter.NotEqual[V, E](
             fieldWithValue.field.toRegular.asInstanceOf[ModelField[V, E]],
-            fieldWithValue.value.asInstanceOf[V])
+            fieldWithValue.value.asInstanceOf[V],
+          )
         internal
       }
     }
@@ -96,7 +101,8 @@ object PicklableDbQuery {
           DbQuery.Filter.GreaterThan[V, E](
             fieldWithValue.field.toRegular.asInstanceOf[ModelField[V, E]],
             fieldWithValue.value
-              .asInstanceOf[V])(ordering.toRegular.asInstanceOf[DbQuery.PicklableOrdering[V]])
+              .asInstanceOf[V],
+          )(ordering.toRegular.asInstanceOf[DbQuery.PicklableOrdering[V]])
         internal
       }
     }
@@ -107,7 +113,8 @@ object PicklableDbQuery {
           DbQuery.Filter.GreaterOrEqualThan[V, E](
             fieldWithValue.field.toRegular.asInstanceOf[ModelField[V, E]],
             fieldWithValue.value
-              .asInstanceOf[V])(ordering.toRegular.asInstanceOf[DbQuery.PicklableOrdering[V]])
+              .asInstanceOf[V],
+          )(ordering.toRegular.asInstanceOf[DbQuery.PicklableOrdering[V]])
         internal
       }
     }
@@ -117,7 +124,8 @@ object PicklableDbQuery {
           DbQuery.Filter.LessThan[V, E](
             fieldWithValue.field.toRegular.asInstanceOf[ModelField[V, E]],
             fieldWithValue.value
-              .asInstanceOf[V])(ordering.toRegular.asInstanceOf[DbQuery.PicklableOrdering[V]])
+              .asInstanceOf[V],
+          )(ordering.toRegular.asInstanceOf[DbQuery.PicklableOrdering[V]])
         internal
       }
     }
@@ -187,7 +195,8 @@ object PicklableDbQuery {
     def toRegular: DbQuery.Sorting[_] = {
       def internal[E] =
         DbQuery.Sorting[E](
-          fieldsWithDirection.map(_.toRegular.asInstanceOf[DbQuery.Sorting.FieldWithDirection[_, E]]))
+          fieldsWithDirection.map(_.toRegular.asInstanceOf[DbQuery.Sorting.FieldWithDirection[_, E]])
+        )
       internal
     }
   }
@@ -203,7 +212,8 @@ object PicklableDbQuery {
       def toRegular: DbQuery.Sorting.FieldWithDirection[_, _] = {
         def internal[V] = {
           DbQuery.Sorting.FieldWithDirection(field.toRegular.asInstanceOf[ModelField[V, _]], isDesc)(
-            picklableValueOrdering.toRegular.asInstanceOf[DbQuery.PicklableOrdering[V]])
+            picklableValueOrdering.toRegular.asInstanceOf[DbQuery.PicklableOrdering[V]]
+          )
         }
         internal
       }
@@ -213,7 +223,8 @@ object PicklableDbQuery {
         FieldWithDirection(
           PicklableModelField.fromRegular(regular.field),
           regular.isDesc,
-          PicklableOrdering.fromRegular(regular.picklableValueOrdering))
+          PicklableOrdering.fromRegular(regular.picklableValueOrdering),
+        )
     }
   }
 

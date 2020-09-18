@@ -9,8 +9,8 @@ import hydro.flux.react.uielements.Bootstrap.Variant
 import hydro.flux.react.uielements.Bootstrap.Size
 import hydro.flux.react.uielements.Bootstrap
 
-final class UserAdministration(
-    implicit i18n: I18n,
+final class UserAdministration(implicit
+    i18n: I18n,
     pageHeader: PageHeader,
     allUsersList: AllUsersList,
     addUserForm: AddUserForm,

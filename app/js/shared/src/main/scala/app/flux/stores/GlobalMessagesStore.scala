@@ -26,8 +26,8 @@ import scala.concurrent.duration._
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 
-final class GlobalMessagesStore(
-    implicit i18n: I18n,
+final class GlobalMessagesStore(implicit
+    i18n: I18n,
     clock: Clock,
     entityAccess: EntityAccess,
     accountingConfig: Config,
@@ -58,7 +58,8 @@ final class GlobalMessagesStore(
       getCompletionMessage.lift.apply(action) match {
         case Some(message) =>
           setState(
-            Message(string = i18n("app.sending-data-to-server-failed"), messageType = Message.Type.Failure))
+            Message(string = i18n("app.sending-data-to-server-failed"), messageType = Message.Type.Failure)
+          )
           clearMessageAfterDelay()
         case None =>
       }

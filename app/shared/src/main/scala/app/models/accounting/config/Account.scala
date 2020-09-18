@@ -29,7 +29,8 @@ case class Account(
     defaultCashReservoirCode,
     defaultCashReservoirCode,
     categories,
-    summaryTotalRows)
+    summaryTotalRows,
+  )
 
   private[config] def validateCodes(moneyReservoirs: Iterable[MoneyReservoir]): Unit = {
     def requireValidCode(code: String): Unit = {
@@ -70,7 +71,8 @@ object Account {
     longName = "NULL_INSTANCE",
     shorterName = "NULL_INSTANCE",
     veryShortName = "NULL_INSTANCE",
-    defaultElectronicReservoirCode = "")
+    defaultElectronicReservoirCode = "",
+  )
 
   case class SummaryTotalRowDef(rowTitleHtml: String, categoriesToIgnore: Set[Category]) {
     requireNonNull(rowTitleHtml, categoriesToIgnore)

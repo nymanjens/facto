@@ -27,8 +27,8 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 
 /** RemoteDatabaseProxy implementation that queries the remote back-end directly until LocalDatabase is ready */
-final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
-    implicit apiClient: ScalaJsApiClient,
+final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(implicit
+    apiClient: ScalaJsApiClient,
     getInitialDataResponse: GetInitialDataResponse,
     hydroPushSocketClientFactory: HydroPushSocketClientFactory,
     entitySyncLogic: EntitySyncLogic,
@@ -86,7 +86,8 @@ final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
   }
 
   override def pendingModifications(): Future[Seq[EntityModification]] = async {
-    val localDatabase = await(futureLocalDatabase.future()) // "Pending modifications" make no sense without a local database
+    val localDatabase =
+      await(futureLocalDatabase.future()) // "Pending modifications" make no sense without a local database
     await(localDatabase.pendingModifications())
   }
 
@@ -103,10 +104,12 @@ final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
             await(entitySyncLogic.handleEntityModificationUpdate(modifications, localDatabase))
             await(localDatabase.addPendingModifications(modifications))
             await(localDatabase.save())
-        })
+          }
+        )
         PersistEntityModificationsResponse(
           queryReflectsModificationsFuture = serverUpdated,
-          completelyDoneFuture = serverUpdated)
+          completelyDoneFuture = serverUpdated,
+        )
 
       case Some(localDatabase) =>
         val serverResponded = async {
@@ -116,7 +119,9 @@ final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
           await(
             apiClient.persistEntityModifications(
               pendingModifications ++ modifications,
-              waitUntilQueryReflectsModifications = false))
+              waitUntilQueryReflectsModifications = false,
+            )
+          )
         }
 
         val queryReflectsModifications = async {
@@ -131,12 +136,14 @@ final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
         }
         PersistEntityModificationsResponse(
           queryReflectsModificationsFuture = queryReflectsModifications,
-          completelyDoneFuture = completelyDone)
+          completelyDoneFuture = completelyDone,
+        )
     }
   }
 
   override def startCheckingForModifiedEntityUpdates(
-      maybeNewEntityModificationsListener: Seq[EntityModification] => Future[Unit]): Unit = {
+      maybeNewEntityModificationsListener: Seq[EntityModification] => Future[Unit]
+  ): Unit = {
     val temporaryPushClient = hydroPushSocketClientFactory.createClient(
       name = "HydroPushSocket[temporary]",
       updateToken = getInitialDataResponse.nextUpdateToken,
@@ -145,7 +152,7 @@ final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
           val modifications = modificationsWithToken.modifications
           console.log(s"  [temporary push client] ${modifications.size} remote modifications received")
           await(maybeNewEntityModificationsListener(modifications))
-      }
+        },
     )
 
     // Adding at start here because old modifications were already reflected in API lookups
@@ -165,14 +172,16 @@ final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
                 await(entitySyncLogic.handleEntityModificationUpdate(modifications, localDatabase))
                 await(localDatabase.removePendingModifications(modifications))
                 await(
-                  localDatabase.setSingletonValue(NextUpdateTokenKey, modificationsWithToken.nextUpdateToken))
+                  localDatabase.setSingletonValue(NextUpdateTokenKey, modificationsWithToken.nextUpdateToken)
+                )
                 await(localDatabase.save())
               }
               await(maybeNewEntityModificationsListener(modifications))
-          }
+            },
         )
         await(permanentPushClient.firstMessageWasProcessedFuture)
-    })
+      }
+    )
   }
 
   override def clearLocalDatabase(): Future[Unit] = {
@@ -181,12 +190,11 @@ final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
       await(localDatabase.resetAndInitialize())
       await(localDatabase.save())
     }
-    clearFuture.recover {
-      case t: Throwable =>
-        console.log(s"  Could not clear local database: $t")
-        t.printStackTrace()
-        // Fall back to successful future
-        (): Unit
+    clearFuture.recover { case t: Throwable =>
+      console.log(s"  Could not clear local database: $t")
+      t.printStackTrace()
+      // Fall back to successful future
+      (): Unit
     }
   }
 
@@ -194,7 +202,8 @@ final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
 
   override def registerPendingModificationsListener(listener: PendingModificationsListener): Unit = {
     futureLocalDatabase.scheduleUpdateAtStart(db =>
-      Future.successful(db.registerPendingModificationsListener(listener)))
+      Future.successful(db.registerPendingModificationsListener(listener))
+    )
   }
 }
 
@@ -202,8 +211,8 @@ object HybridRemoteDatabaseProxy {
   private val localDatabaseAndEntityVersion = "hydro-2.6"
   private val maxTimeToPopulate: Duration = Duration.ofMinutes(8)
 
-  def create(localDatabase: Future[LocalDatabase])(
-      implicit apiClient: ScalaJsApiClient,
+  def create(localDatabase: Future[LocalDatabase])(implicit
+      apiClient: ScalaJsApiClient,
       clock: Clock,
       getInitialDataResponse: GetInitialDataResponse,
       hydroPushSocketClientFactory: HydroPushSocketClientFactory,
@@ -244,18 +253,22 @@ object HybridRemoteDatabaseProxy {
           case None =>
             throw new AssertionError(
               "This should be impossible because a mandate should result in an" +
-                "atomic reset and re-addition of the DbStatusKey")
+                "atomic reset and re-addition of the DbStatusKey"
+            )
 
           case Some(existingValue @ DbStatus.Populating(startTime))
               if startTime < (clock.nowInstant - maxTimeToPopulate) =>
             console.log(
               s"  Database was being reset and populated by another instance, but that instance started " +
-                s"more than $maxTimeToPopulate ago, which probably means it stopped prematurely")
+                s"more than $maxTimeToPopulate ago, which probably means it stopped prematurely"
+            )
             val mandateToFix = await(
               db.setSingletonValue(
                 DbStatusKey,
                 DbStatus.Populating(startTime = clock.nowInstant),
-                abortUnlessExistingValueEquals = existingValue))
+                abortUnlessExistingValueEquals = existingValue,
+              )
+            )
             if (mandateToFix) {
               console.log("  Got mandate to fix this")
               true
@@ -266,7 +279,8 @@ object HybridRemoteDatabaseProxy {
 
           case Some(DbStatus.Populating(_)) =>
             console.log(
-              s"  Database is being reset and populated by another instance, will wait for that one to finish")
+              s"  Database is being reset and populated by another instance, will wait for that one to finish"
+            )
             false
 
           case Some(existingValue @ DbStatus.Ready) =>
@@ -274,12 +288,15 @@ object HybridRemoteDatabaseProxy {
             if (dbVersionOption != Some(localDatabaseAndEntityVersion)) {
               console.log(
                 s"  The database version ${dbVersionOption getOrElse "<empty>"} no longer matches " +
-                  s"the newest version $localDatabaseAndEntityVersion")
+                  s"the newest version $localDatabaseAndEntityVersion"
+              )
               val mandateToFix = await(
                 db.setSingletonValue(
                   DbStatusKey,
                   DbStatus.Populating(startTime = clock.nowInstant),
-                  abortUnlessExistingValueEquals = existingValue))
+                  abortUnlessExistingValueEquals = existingValue,
+                )
+              )
               if (mandateToFix) {
                 console.log("  Got mandate to fix this")
                 true
@@ -295,8 +312,8 @@ object HybridRemoteDatabaseProxy {
       }
     }
 
-  private def resetAndPopulateDb(db: LocalDatabase)(
-      implicit apiClient: ScalaJsApiClient,
+  private def resetAndPopulateDb(db: LocalDatabase)(implicit
+      apiClient: ScalaJsApiClient,
       clock: Clock,
       entitySyncLogic: EntitySyncLogic,
   ): Future[Unit] = async {
@@ -305,7 +322,9 @@ object HybridRemoteDatabaseProxy {
     // Reset database
     await(
       db.resetAndInitialize(
-        alsoSetSingleton = (DbStatusKey, DbStatus.Populating(startTime = clock.nowInstant))))
+        alsoSetSingleton = (DbStatusKey, DbStatus.Populating(startTime = clock.nowInstant))
+      )
+    )
 
     // Set version
     await(db.setSingletonValue(VersionKey, localDatabaseAndEntityVersion))
@@ -325,8 +344,8 @@ object HybridRemoteDatabaseProxy {
     console.log(s"  Population done!")
   }
 
-  private def dbStatusBecomesReadyFuture(db: LocalDatabase)(
-      implicit clock: Clock,
+  private def dbStatusBecomesReadyFuture(db: LocalDatabase)(implicit
+      clock: Clock
   ): Future[DbStatusBecomesReadyResult] = {
     val promise: Promise[DbStatusBecomesReadyResult] = Promise()
 
@@ -334,8 +353,11 @@ object HybridRemoteDatabaseProxy {
       db.getSingletonValue(DbStatusKey).foreach {
         case None =>
           promise.failure(
-            new AssertionError("This should be impossible because a mandate should result in an" +
-              "atomic reset and re-addition of the DbStatusKey"))
+            new AssertionError(
+              "This should be impossible because a mandate should result in an" +
+                "atomic reset and re-addition of the DbStatusKey"
+            )
+          )
         case Some(DbStatus.Populating(startTime)) if startTime < (clock.nowInstant - maxTimeToPopulate) =>
           promise.success(DbStatusBecomesReadyResult.ThisInstanceIsResponsibleForDbReset)
         case Some(DbStatus.Populating(_)) =>

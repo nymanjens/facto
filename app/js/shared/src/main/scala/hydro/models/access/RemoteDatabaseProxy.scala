@@ -21,7 +21,8 @@ trait RemoteDatabaseProxy {
     * Upon receiving any modifications, the given listener should be invoked.
     */
   def startCheckingForModifiedEntityUpdates(
-      maybeNewEntityModificationsListener: Seq[EntityModification] => Future[Unit]): Unit
+      maybeNewEntityModificationsListener: Seq[EntityModification] => Future[Unit]
+  ): Unit
 
   def clearLocalDatabase(): Future[Unit]
 

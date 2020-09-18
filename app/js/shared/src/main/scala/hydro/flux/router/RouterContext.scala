@@ -37,9 +37,9 @@ object RouterContext {
   def apply(currentPage: Page, routerCtl: RouterCtl[Page])(implicit dispatcher: Dispatcher): RouterContext =
     new RouterContext.Impl(currentPage, routerCtl)
 
-  private final class Impl(override val currentPage: Page, routerCtl: RouterCtl[Page])(
-      implicit dispatcher: Dispatcher)
-      extends RouterContext {
+  private final class Impl(override val currentPage: Page, routerCtl: RouterCtl[Page])(implicit
+      dispatcher: Dispatcher
+  ) extends RouterContext {
 
     // **************** Getters **************** //
     override def toPath(page: Page): Path = routerCtl.pathFor(page)

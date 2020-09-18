@@ -7,8 +7,8 @@ import hydro.flux.stores.LocalDatabaseHasBeenLoadedStore
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
-final class LocalDatabaseHasBeenLoadedIcon(
-    implicit localDatabaseHasBeenLoadedStore: LocalDatabaseHasBeenLoadedStore,
+final class LocalDatabaseHasBeenLoadedIcon(implicit
+    localDatabaseHasBeenLoadedStore: LocalDatabaseHasBeenLoadedStore,
     i18n: I18n,
 ) extends HydroReactComponent {
 
@@ -21,7 +21,8 @@ final class LocalDatabaseHasBeenLoadedIcon(
   override protected val config = ComponentConfig(backendConstructor = new Backend(_), initialState = State())
     .withStateStoresDependency(
       localDatabaseHasBeenLoadedStore,
-      _.copy(hasBeenLoaded = localDatabaseHasBeenLoadedStore.state.hasBeenLoaded))
+      _.copy(hasBeenLoaded = localDatabaseHasBeenLoadedStore.state.hasBeenLoaded),
+    )
 
   // **************** Implementation of HydroReactComponent types ****************//
   protected type Props = Unit

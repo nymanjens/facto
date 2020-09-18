@@ -24,8 +24,8 @@ import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-final class SummaryForYearStoreFactory(
-    implicit entityAccess: AppJsEntityAccess,
+final class SummaryForYearStoreFactory(implicit
+    entityAccess: AppJsEntityAccess,
     accountingConfig: Config,
     complexQueryFilter: ComplexQueryFilter,
 ) extends EntriesStoreFactory[SummaryForYear] {
@@ -48,7 +48,8 @@ final class SummaryForYearStoreFactory(
             .newQuery[Transaction]()
             .filter(combinedFilter)
             .sort(AppDbQuerySorting.Transaction.deterministicallyByConsumedDate)
-            .data())
+            .data()
+        )
 
       SummaryForYear(transactions)
     }
@@ -100,8 +101,8 @@ object SummaryForYearStoreFactory {
 
     def nonEmpty: Boolean = transactions.nonEmpty
 
-    def totalFlow(
-        implicit exchangeRateManager: ExchangeRateManager,
+    def totalFlow(implicit
+        exchangeRateManager: ExchangeRateManager,
         accountingConfig: Config,
     ): ReferenceMoney = {
       if (_totalFlow eq null) {

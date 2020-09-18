@@ -63,7 +63,7 @@ object Picklers extends StandardPicklers {
         onlyShowForUserLoginNames = state.unpickle[Option[Set[String]]],
         zeroSum = state.unpickle[Boolean],
         iconClass = state.unpickle[String],
-        transactions = state.unpickle[Seq[Template.Transaction]]
+        transactions = state.unpickle[Seq[Template.Transaction]],
       )
     }
   }

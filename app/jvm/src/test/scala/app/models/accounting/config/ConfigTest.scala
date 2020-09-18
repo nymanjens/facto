@@ -28,13 +28,15 @@ class ConfigTest extends HookedSpecification {
     config.accounts.keys.toList must beEqualTo(List("ACC_COMMON", "ACC_A", "ACC_B"))
     config.categories.keys.toList must beEqualTo(List("CAT_B", "CAT_A", "CAT_C"))
     config.visibleReservoirs.map(_.code) must beEqualTo(
-      List("CASH_COMMON", "CARD_COMMON", "CASH_A", "CARD_A", "CASH_B", "CARD_B"))
+      List("CASH_COMMON", "CARD_COMMON", "CASH_A", "CARD_A", "CASH_B", "CARD_B")
+    )
 
     // check content by samples
     config.accounts("ACC_A").code must beEqualTo("ACC_A")
     config.accounts("ACC_A").longName must beEqualTo("Account A")
     config.accounts("ACC_A").categories must beEqualTo(
-      List(config.categories("CAT_A"), config.categories("CAT_B")))
+      List(config.categories("CAT_A"), config.categories("CAT_B"))
+    )
     config.accounts("ACC_A").user mustEqual Some(testUserA)
     config.accounts("ACC_COMMON").user mustEqual None
 

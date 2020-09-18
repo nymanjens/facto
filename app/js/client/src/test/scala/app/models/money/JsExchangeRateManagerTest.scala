@@ -26,7 +26,7 @@ object JsExchangeRateManagerTest extends TestSuite {
           Gbp -> SortedMap(
             yesterdayPlusMillis(1000) -> 2.0,
             yesterdayPlusMillis(2000) -> 3.0,
-            yesterdayPlusMillis(3000) -> 0.5
+            yesterdayPlusMillis(3000) -> 0.5,
           )
         )
       )
@@ -67,13 +67,16 @@ object JsExchangeRateManagerTest extends TestSuite {
     }
   }
 
-  def persistGbpMeasurement(date: LocalDateTime, ratio: Double)(
-      implicit entityAccess: FakeJsEntityAccess): Unit = {
+  def persistGbpMeasurement(date: LocalDateTime, ratio: Double)(implicit
+      entityAccess: FakeJsEntityAccess
+  ): Unit = {
     entityAccess.addWithRandomId(
       ExchangeRateMeasurement(
         date = date,
         foreignCurrencyCode = Gbp.code,
-        ratioReferenceToForeignCurrency = ratio))
+        ratioReferenceToForeignCurrency = ratio,
+      )
+    )
   }
 
   def yesterdayPlusMillis(millis: Long)(implicit clock: Clock): LocalDateTime = {

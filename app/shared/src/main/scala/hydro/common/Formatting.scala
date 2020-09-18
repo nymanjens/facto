@@ -25,7 +25,7 @@ object Formatting {
     SEPTEMBER -> "app.date.month.sep.abbrev",
     OCTOBER -> "app.date.month.oct.abbrev",
     NOVEMBER -> "app.date.month.nov.abbrev",
-    DECEMBER -> "app.date.month.dec.abbrev"
+    DECEMBER -> "app.date.month.dec.abbrev",
   )
 
   private val dayOfWeekToMessageKey: Map[DayOfWeek, String] = Map(
@@ -35,7 +35,7 @@ object Formatting {
     THURSDAY -> "app.date.dayofweek.thu.abbrev",
     FRIDAY -> "app.date.dayofweek.fri.abbrev",
     SATURDAY -> "app.date.dayofweek.sat.abbrev",
-    SUNDAY -> "app.date.dayofweek.sun.abbrev"
+    SUNDAY -> "app.date.dayofweek.sun.abbrev",
   )
 
   def formatDate(dateTime: LocalDateTime)(implicit i18n: I18n, clock: Clock): String = {

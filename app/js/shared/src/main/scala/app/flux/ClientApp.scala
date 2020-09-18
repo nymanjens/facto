@@ -42,7 +42,7 @@ object ClientApp {
         .register("/serviceWorker.js")
         .`then`(
           (registration: Any) => {},
-          (err: Any) => println(s"  Installation of service worker failed: ${err}")
+          (err: Any) => println(s"  Installation of service worker failed: ${err}"),
         )
     }
   }

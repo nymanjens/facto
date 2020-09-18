@@ -45,7 +45,8 @@ object MoneyTest extends TestSuite {
             val resultTry = Money.tryFloatStringToCents(input)
             if (resultTry.toOption != output) {
               throw new java.lang.AssertionError(
-                s"Money.tryFloatStringToCents('$input') = $resultTry, but expected $output")
+                s"Money.tryFloatStringToCents('$input') = $resultTry, but expected $output"
+              )
             }
             resultTry.toOption ==> output
           }
@@ -74,7 +75,7 @@ object MoneyTest extends TestSuite {
           Case(".", None),
           Case(",", None),
           Case(".123", None),
-          Case(",123", None)
+          Case(",123", None),
         )
 
         for (testCase <- testCases) {
@@ -115,13 +116,13 @@ object MoneyTest extends TestSuite {
 
         Seq(
           MoneyWithGeneralCurrency(-111, Currency.Gbp),
-          MoneyWithGeneralCurrency(-222, Currency.Gbp)
+          MoneyWithGeneralCurrency(-222, Currency.Gbp),
         ).sum(numeric) ==> MoneyWithGeneralCurrency(-333, Currency.Gbp)
 
         try {
           Seq(
             MoneyWithGeneralCurrency(-111, Currency.Eur),
-            MoneyWithGeneralCurrency(-222, Currency.Gbp)
+            MoneyWithGeneralCurrency(-222, Currency.Gbp),
           ).sum(numeric)
           throw new java.lang.AssertionError()
         } catch {
@@ -148,14 +149,16 @@ object MoneyTest extends TestSuite {
     }
   }
 
-  private def persistGbpMeasurement(daysBeforeNow: Int, ratio: Double)(
-      implicit entityAccess: FakeJsEntityAccess,
+  private def persistGbpMeasurement(daysBeforeNow: Int, ratio: Double)(implicit
+      entityAccess: FakeJsEntityAccess,
       clock: Clock,
   ): Unit = {
     entityAccess.addWithRandomId(
       ExchangeRateMeasurement(
         date = clock.now.plus(Duration.ofDays(-daysBeforeNow)),
         foreignCurrencyCode = Gbp.code,
-        ratioReferenceToForeignCurrency = ratio))
+        ratioReferenceToForeignCurrency = ratio,
+      )
+    )
   }
 }

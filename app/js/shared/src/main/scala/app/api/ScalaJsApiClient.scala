@@ -82,7 +82,7 @@ object ScalaJsApiClient {
             url = "/scalajsapi/" + req.path.last,
             data = Pickle.intoBytes(req.args),
             responseType = "arraybuffer",
-            headers = Map("Content-Type" -> "application/octet-stream")
+            headers = Map("Content-Type" -> "application/octet-stream"),
           )
           .map(r => TypedArrayBuffer.wrap(r.response.asInstanceOf[ArrayBuffer]))
       }
@@ -98,7 +98,7 @@ object ScalaJsApiClient {
           .get(
             url = "/scalajsapi/" + req.path.last,
             responseType = "arraybuffer",
-            headers = Map("Content-Type" -> "application/octet-stream")
+            headers = Map("Content-Type" -> "application/octet-stream"),
           )
           .map(r => TypedArrayBuffer.wrap(r.response.asInstanceOf[ArrayBuffer]))
       }

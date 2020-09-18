@@ -57,7 +57,7 @@ private[worker] object SharedWorkerFacadeImpl extends JsWorkerClientFacade with 
         connectedPorts.append(port)
         port.addEventListener("message", onMessage(senderPort = port))
         port.start()
-      }
+      },
     )
 
     println("  Setting up SharedWorker server: Done")

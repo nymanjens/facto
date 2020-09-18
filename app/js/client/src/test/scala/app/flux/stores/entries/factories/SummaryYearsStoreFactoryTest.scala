@@ -51,8 +51,9 @@ object SummaryYearsStoreFactoryTest extends TestSuite {
     }
   }
 
-  private def persistTransaction(year: Int, beneficiary: Account = testAccountA)(
-      implicit entityAccess: FakeJsEntityAccess): Unit = {
+  private def persistTransaction(year: Int, beneficiary: Account = testAccountA)(implicit
+      entityAccess: FakeJsEntityAccess
+  ): Unit = {
     entityAccess.addRemotelyAddedEntities(createTransaction(beneficiary = beneficiary, year = year))
   }
 }

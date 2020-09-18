@@ -35,8 +35,8 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 /**
   * Store factory that calculates the monthly gains and losses made by exchange rate fluctuations in a given year.
   */
-final class SummaryExchangeRateGainsStoreFactory(
-    implicit entityAccess: AppJsEntityAccess,
+final class SummaryExchangeRateGainsStoreFactory(implicit
+    entityAccess: AppJsEntityAccess,
     exchangeRateManager: ExchangeRateManager,
     accountingConfig: Config,
     complexQueryFilter: ComplexQueryFilter,
@@ -76,7 +76,8 @@ final class SummaryExchangeRateGainsStoreFactory(
             .filter(ModelFields.BalanceCheck.checkDate < monthsInYear.head.startTime)
             .sort(AppDbQuerySorting.BalanceCheck.deterministicallyByCheckDate.reversed)
             .limit(1)
-            .data()).headOption
+            .data()
+        ).headOption
       val oldestBalanceDate = oldestRelevantBalanceCheck.map(_.checkDate).getOrElse(LocalDateTime.MIN)
       val initialBalance =
         oldestRelevantBalanceCheck.map(_.balance).getOrElse(MoneyWithGeneralCurrency(0, reservoir.currency))
@@ -89,7 +90,9 @@ final class SummaryExchangeRateGainsStoreFactory(
             filterInRange(
               ModelFields.BalanceCheck.checkDate,
               oldestBalanceDate,
-              monthsInYear.last.startTimeOfNextMonth))
+              monthsInYear.last.startTimeOfNextMonth,
+            )
+          )
           .data()
 
       val transactionsFuture: Future[Seq[Transaction]] =
@@ -100,7 +103,9 @@ final class SummaryExchangeRateGainsStoreFactory(
             filterInRange(
               ModelFields.Transaction.transactionDate,
               oldestBalanceDate,
-              monthsInYear.last.startTimeOfNextMonth))
+              monthsInYear.last.startTimeOfNextMonth,
+            )
+          )
           .data()
       val balanceChecks: Seq[BalanceCheck] = await(balanceChecksFuture)
       val transactions: Seq[Transaction] = await(transactionsFuture)
@@ -133,9 +138,8 @@ final class SummaryExchangeRateGainsStoreFactory(
             val gainFromUpdates =
               dateToBalanceFunction
                 .updatesInRange(month)
-                .map {
-                  case (date, DateToBalanceFunction.Update(balance, changeComparedToLast)) =>
-                    gainFromMoney(date, changeComparedToLast)
+                .map { case (date, DateToBalanceFunction.Update(balance, changeComparedToLast)) =>
+                  gainFromMoney(date, changeComparedToLast)
                 }
                 .sum
             gainFromIntialMoney + gainFromUpdates
@@ -143,7 +147,7 @@ final class SummaryExchangeRateGainsStoreFactory(
           month -> GainsForMonth.forSingle(reservoir, gain)
         }.toMap,
         impactingTransactionIds = transactions.toStream.map(_.id).toSet,
-        impactingBalanceCheckIds = (balanceChecks.toStream ++ oldestRelevantBalanceCheck).map(_.id).toSet
+        impactingBalanceCheckIds = (balanceChecks.toStream ++ oldestRelevantBalanceCheck).map(_.id).toSet,
       )
     }
 
@@ -186,8 +190,7 @@ object SummaryExchangeRateGainsStoreFactory {
     def sum(gains: Seq[GainsForYear]): GainsForYear = GainsForYear(
       monthToGains = combineMapValues(gains.map(_.monthToGains))(GainsForMonth.sum),
       impactingTransactionIds = gains.map(_.impactingTransactionIds).reduceOption(_ union _) getOrElse Set(),
-      impactingBalanceCheckIds =
-        gains.map(_.impactingBalanceCheckIds).reduceOption(_ union _) getOrElse Set()
+      impactingBalanceCheckIds = gains.map(_.impactingBalanceCheckIds).reduceOption(_ union _) getOrElse Set(),
     )
   }
 
@@ -213,11 +216,13 @@ object SummaryExchangeRateGainsStoreFactory {
 
     def sum(gains: Seq[GainsForMonth]): GainsForMonth =
       GainsForMonth(
-        reservoirToGains = combineMapValues(gains.map(_.reservoirToGains))(_.sum).filterNot(_._2.isZero))
+        reservoirToGains = combineMapValues(gains.map(_.reservoirToGains))(_.sum).filterNot(_._2.isZero)
+      )
   }
 
   private[SummaryExchangeRateGainsStoreFactory] final class DateToBalanceFunction(
-      dateToBalanceUpdates: SortedMap[LocalDateTime, DateToBalanceFunction.Update]) {
+      dateToBalanceUpdates: SortedMap[LocalDateTime, DateToBalanceFunction.Update]
+  ) {
     def apply(date: LocalDateTime): MoneyWithGeneralCurrency = {
       dateToBalanceUpdates.to(date).values.last.balance
     }
@@ -232,14 +237,16 @@ object SummaryExchangeRateGainsStoreFactory {
     final class Builder(initialDate: LocalDateTime, initialBalance: MoneyWithGeneralCurrency) {
       private val dateToBalanceUpdates: mutable.SortedMap[LocalDateTime, Update] =
         mutable.SortedMap(
-          initialDate -> Update(balance = initialBalance, changeComparedToLast = initialBalance))
+          initialDate -> Update(balance = initialBalance, changeComparedToLast = initialBalance)
+        )
 
       def incrementLatestBalance(date: LocalDateTime, addition: MoneyWithGeneralCurrency): Unit = {
         val (lastDate, lastBalance) = dateToBalanceUpdates.last
         require(lastDate <= date)
         dateToBalanceUpdates.put(
           date,
-          Update(balance = lastBalance.balance + addition, changeComparedToLast = addition))
+          Update(balance = lastBalance.balance + addition, changeComparedToLast = addition),
+        )
       }
 
       def addBalanceUpdate(date: LocalDateTime, balance: MoneyWithGeneralCurrency): Unit = {
@@ -247,7 +254,8 @@ object SummaryExchangeRateGainsStoreFactory {
         require(lastDate <= date)
         dateToBalanceUpdates.put(
           date,
-          Update(balance = balance, changeComparedToLast = balance - lastBalance.balance))
+          Update(balance = balance, changeComparedToLast = balance - lastBalance.balance),
+        )
       }
 
       def result: DateToBalanceFunction =

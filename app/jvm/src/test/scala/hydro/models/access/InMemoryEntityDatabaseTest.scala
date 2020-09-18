@@ -37,7 +37,8 @@ class InMemoryEntityDatabaseTest extends HookedSpecification {
 
     implicit val database = new InMemoryEntityDatabase(
       entitiesFetcher,
-      sortings = Sortings.create.withSorting(Sorting.ascBy(ModelFields.User.loginName)))
+      sortings = Sortings.create.withSorting(Sorting.ascBy(ModelFields.User.loginName)),
+    )
 
     "all data" in {
       newUserQuery().data() must containTheSameElementsAs(Seq(user1, user2, user3))
@@ -93,10 +94,12 @@ class InMemoryEntityDatabaseTest extends HookedSpecification {
 
         val user2UpdateA = EntityModification.createUpdate(
           user2.copy(loginName = "login2_update"),
-          fieldMask = Seq(ModelFields.User.loginName))
+          fieldMask = Seq(ModelFields.User.loginName),
+        )
         val user2UpdateB = EntityModification.createUpdate(
           user2.copy(name = "name2_update"),
-          fieldMask = Seq(ModelFields.User.name))
+          fieldMask = Seq(ModelFields.User.name),
+        )
         database.update(user2UpdateA)
         database.update(user2UpdateB)
 
@@ -106,9 +109,9 @@ class InMemoryEntityDatabaseTest extends HookedSpecification {
             loginName = "login2_update",
             name = "name2_update",
             lastUpdateTime = user2UpdateA.updatedEntity.lastUpdateTime
-              .merge(user2UpdateB.updatedEntity.lastUpdateTime, forceIncrement = false)
+              .merge(user2UpdateB.updatedEntity.lastUpdateTime, forceIncrement = false),
           ),
-          user3
+          user3,
         )
       }
       "Ignored when already deleted" in {
@@ -151,7 +154,7 @@ class InMemoryEntityDatabaseTest extends HookedSpecification {
     testUser.copy(
       idOption = Some(if (id == -1) EntityModification.generateRandomId() else id),
       loginName = loginName,
-      name = name
+      name = name,
     )
   }
 

@@ -55,14 +55,14 @@ private[usermanagement] final class AddUserForm(implicit user: User, i18n: I18n,
             name = "loginName",
             label = i18n("app.login-name"),
             required = true,
-            showErrorMessage = state.showErrorMessages
+            showErrorMessage = state.showErrorMessages,
           ),
           TextInput(
             ref = nameRef,
             name = "name",
             label = i18n("app.full-name"),
             required = true,
-            showErrorMessage = state.showErrorMessages
+            showErrorMessage = state.showErrorMessages,
           ),
           TextInput(
             ref = passwordRef,
@@ -70,7 +70,7 @@ private[usermanagement] final class AddUserForm(implicit user: User, i18n: I18n,
             label = i18n("app.password"),
             inputType = "password",
             required = true,
-            showErrorMessage = state.showErrorMessages
+            showErrorMessage = state.showErrorMessages,
           ),
           TextInput(
             ref = passwordVerificationRef,
@@ -78,9 +78,9 @@ private[usermanagement] final class AddUserForm(implicit user: User, i18n: I18n,
             label = i18n("app.retype-password"),
             inputType = "password",
             required = true,
-            showErrorMessage = state.showErrorMessages
+            showErrorMessage = state.showErrorMessages,
           ),
-          Bootstrap.Button(tpe = "submit")(^.onClick ==> onSubmit, i18n("app.add"))
+          Bootstrap.Button(tpe = "submit")(^.onClick ==> onSubmit, i18n("app.add")),
         )
       )
     }
@@ -122,7 +122,8 @@ private[usermanagement] final class AddUserForm(implicit user: User, i18n: I18n,
             case None =>
           }
           newState
-      }).runNow()
+        }
+      ).runNow()
     }
   }
 }

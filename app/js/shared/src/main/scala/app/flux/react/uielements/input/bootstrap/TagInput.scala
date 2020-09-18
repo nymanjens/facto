@@ -22,7 +22,8 @@ object TagInput {
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
     .initialStateFromProps[State](props =>
-      logExceptions { State(tags = props.defaultValue, listeners = Seq(props.listener)) })
+      logExceptions { State(tags = props.defaultValue, listeners = Seq(props.listener)) }
+    )
     .renderBackend[Backend]
     .build
 
@@ -46,7 +47,7 @@ object TagInput {
       showErrorMessage = showErrorMessage,
       additionalValidator = additionalValidator,
       inputClasses = inputClasses,
-      listener = listener
+      listener = listener,
     )
     ref.mutableRef.component(props)
   }
@@ -122,12 +123,12 @@ object TagInput {
             handleDrag = handleDrag(_, _, _),
             delimiters = Seq(KeyCode.Enter, KeyCode.Tab, KeyCode.Space, /* comma */ 188, /* dot */ 190),
             minQueryLength = 1,
-            classNames = Map("tagInputField" -> "form-control")
+            classNames = Map("tagInputField" -> "form-control"),
           ),
           <<.ifDefined(errorMessage) { msg =>
             <.span(^.className := "help-block", msg)
-          }
-        )
+          },
+        ),
       )
     }
 

@@ -85,7 +85,9 @@ object SummaryForYearStoreFactoryTest extends TestSuite {
           Seq(
             createTransaction(year = 2012, month = FEBRUARY),
             createTransaction(year = 2012, month = FEBRUARY),
-            createTransaction(year = 2012, month = MARCH)))
+            createTransaction(year = 2012, month = MARCH),
+          )
+        )
 
         summaryForYear.months ==> Set(DatedMonth.of(2012, FEBRUARY), DatedMonth.of(2012, MARCH))
       }
@@ -94,7 +96,9 @@ object SummaryForYearStoreFactoryTest extends TestSuite {
           Seq(
             createTransaction(category = testCategoryA),
             createTransaction(category = testCategoryA),
-            createTransaction(category = testCategoryB)))
+            createTransaction(category = testCategoryB),
+          )
+        )
 
         summaryForYear.categories ==> Set(testCategoryA, testCategoryB)
       }
@@ -138,7 +142,8 @@ object SummaryForYearStoreFactoryTest extends TestSuite {
         description = description,
         year = year,
         month = month,
-        day = day)
+        day = day,
+      )
     entityAccess.addRemotelyAddedEntities(transaction)
     transaction
   }

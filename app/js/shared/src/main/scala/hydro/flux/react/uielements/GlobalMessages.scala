@@ -35,10 +35,11 @@ final class GlobalMessages(implicit globalMessagesStore: GlobalMessagesStore) ex
             ^.className := "global-messages",
             <.span(
               Bootstrap.Icon(iconClassName(message.messageType))(
-                ^.style := js.Dictionary("marginRight" -> "11px"),
+                ^.style := js.Dictionary("marginRight" -> "11px")
               ),
-              " "),
-            message.string
+              " ",
+            ),
+            message.string,
           )
       }
     }

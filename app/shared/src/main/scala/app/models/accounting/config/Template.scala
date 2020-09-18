@@ -24,8 +24,8 @@ case class Template(
 ) {
   requireNonNull(code, name, placement, onlyShowForUserLoginNames, zeroSum, iconClass, transactions)
 
-  def showFor(location: Template.Placement, user: User)(
-      implicit accountingConfig: Config,
+  def showFor(location: Template.Placement, user: User)(implicit
+      accountingConfig: Config,
       entityAccess: AppEntityAccess,
   ): Boolean = {
     val showAtLocation = placement contains location
@@ -39,11 +39,12 @@ case class Template(
   def toPartial(account: Account)(implicit accountingConfig: Config): AccountingTransactionGroup.Partial = {
     AccountingTransactionGroup.Partial(
       transactions = transactions map (_.toPartial(account)),
-      zeroSum = zeroSum)
+      zeroSum = zeroSum,
+    )
   }
 
-  private def onlyShowForUsers(
-      implicit accountingConfig: Config,
+  private def onlyShowForUsers(implicit
+      accountingConfig: Config,
       entityAccess: AppEntityAccess,
   ): Option[Set[User]] = {
     onlyShowForUserLoginNames.map { loginNameOption =>
@@ -53,7 +54,7 @@ case class Template(
         require(
           accountingConfig.accountOf(user.get).isDefined,
           s"Only user names that have an associated account can be used in templates " +
-            s"(user = '$loginName', template = '$name')"
+            s"(user = '$loginName', template = '$name')",
         )
         user.get
       }
@@ -102,7 +103,7 @@ object Template {
           "${account.code}" -> account.code,
           "${account.longName}" -> account.longName,
           "${account.defaultCashReservoir.code}" -> account.defaultCashReservoir.map(_.code).getOrElse(""),
-          "${account.defaultElectronicReservoir.code}" -> account.defaultElectronicReservoir.code
+          "${account.defaultElectronicReservoir.code}" -> account.defaultElectronicReservoir.code,
         )
         var result = string
         for ((placeholder, replacement) <- placeholderToReplacement) {
@@ -121,7 +122,7 @@ object Template {
         description = description,
         flowInCents = flowInCents,
         detailDescription = detailDescription,
-        tags = tags
+        tags = tags,
       )
     }
   }

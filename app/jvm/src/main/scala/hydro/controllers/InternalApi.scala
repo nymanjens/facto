@@ -38,8 +38,8 @@ import play.api.mvc._
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
-final class InternalApi @Inject()(
-    implicit override val messagesApi: MessagesApi,
+final class InternalApi @Inject() (implicit
+    override val messagesApi: MessagesApi,
     components: ControllerComponents,
     clock: Clock,
     entityAccess: JvmEntityAccess,
@@ -99,11 +99,12 @@ final class InternalApi @Inject()(
                 } else {
                   modificationsWithToken.copy(
                     modifications =
-                      modificationsWithToken.modifications.filter(entityPermissions.isAllowedToStream))
+                      modificationsWithToken.modifications.filter(entityPermissions.isAllowedToStream)
+                  )
                 }
-              }
+              },
             ),
-            filterFunction = _.modifications.nonEmpty
+            filterFunction = _.modifications.nonEmpty,
           )
         )
 
@@ -118,7 +119,8 @@ final class InternalApi @Inject()(
             entityAccess
               .newSlickQuery[EntityModificationEntity]()
               .filter(_.instant >= toInstant(updateToken))
-              .sortBy(m => (m.instant, m.instantNanos)))
+              .sortBy(m => (m.instant, m.instantNanos))
+          )
           val allModifications = modificationEntities.toStream.map(_.modification).toVector
 
           // apply permissions filter
@@ -137,15 +139,19 @@ final class InternalApi @Inject()(
             Publishers.map(
               Publishers.combine[HydroPushSocketPacket](
                 entityModificationPublisher,
-                hydroPushSocketHeartbeatScheduler.publisher),
-              packetToBytes))
+                hydroPushSocketHeartbeatScheduler.publisher,
+              ),
+              packetToBytes,
+            )
+          )
       Flow.fromSinkAndSource(in, out)
   }
 
   // Note: This action manually implements what autowire normally does automatically. Unfortunately, autowire
   // doesn't seem to work for some reason.
-  private def doScalaJsApiCall(path: String, argsMap: Map[String, ByteBuffer])(
-      implicit user: User): Array[Byte] = {
+  private def doScalaJsApiCall(path: String, argsMap: Map[String, ByteBuffer])(implicit
+      user: User
+  ): Array[Byte] = {
     val responseBuffer = scalaJsApiCaller(path, argsMap)
 
     val data: Array[Byte] = Array.ofDim[Byte](responseBuffer.remaining())
@@ -159,8 +165,8 @@ object InternalApi {
   }
 
   @Singleton
-  private[controllers] class HydroPushSocketHeartbeatScheduler @Inject()(
-      implicit actorSystem: ActorSystem,
+  private[controllers] class HydroPushSocketHeartbeatScheduler @Inject() (implicit
+      actorSystem: ActorSystem,
       executionContext: ExecutionContext,
   ) {
 

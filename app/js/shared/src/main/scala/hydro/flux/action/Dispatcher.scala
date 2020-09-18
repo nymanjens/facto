@@ -31,8 +31,8 @@ trait Dispatcher {
 }
 
 object Dispatcher {
-  private def nullCallback: PartialFunction[Action, Future[Unit]] = {
-    case _ => Future.successful((): Unit)
+  private def nullCallback: PartialFunction[Action, Future[Unit]] = { case _ =>
+    Future.successful((): Unit)
   }
 
   private[flux] final class Impl extends Dispatcher {

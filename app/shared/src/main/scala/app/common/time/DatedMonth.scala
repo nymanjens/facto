@@ -53,7 +53,7 @@ object DatedMonth {
     Month.SEPTEMBER -> "app.date.month.sep.abbrev",
     Month.OCTOBER -> "app.date.month.oct.abbrev",
     Month.NOVEMBER -> "app.date.month.nov.abbrev",
-    Month.DECEMBER -> "app.date.month.dec.abbrev"
+    Month.DECEMBER -> "app.date.month.dec.abbrev",
   )
 
   def of(year: Int, month: Month): DatedMonth = DatedMonth(LocalDate.of(year, month, 1))

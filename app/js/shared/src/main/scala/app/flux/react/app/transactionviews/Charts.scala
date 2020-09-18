@@ -18,8 +18,8 @@ import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
 
-final class Charts(
-    implicit summaryTable: SummaryTable,
+final class Charts(implicit
+    summaryTable: SummaryTable,
     entityAccess: AppJsEntityAccess,
     user: User,
     clock: Clock,
@@ -42,9 +42,9 @@ final class Charts(
   protected case class State(
       query: String = accountingConfig.accountOf(user) match {
         case Some(account) if account.longName.contains(" ") => s"beneficiary:'${account.longName}'"
-        case Some(account)                                     => s"beneficiary:${account.longName}"
-        case None                                              => ""
-      },
+        case Some(account)                                   => s"beneficiary:${account.longName}"
+        case None                                            => ""
+      }
   )
 
   protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
@@ -61,7 +61,8 @@ final class Charts(
                 ref = queryInputRef,
                 name = "query",
                 placeholder = i18n("app.example-query"),
-                classes = Seq("form-control")),
+                classes = Seq("form-control"),
+              ),
               Bootstrap.InputGroupButton(
                 Bootstrap.Button(tpe = "submit")(
                   ^.onClick ==> { (e: ReactEventFromInput) =>
@@ -72,9 +73,10 @@ final class Charts(
                   },
                   Bootstrap.FontAwesomeIcon("search"),
                 )
-              )
-            )
-          )),
+              ),
+            ),
+          )
+        ),
         <.div(
           "Hello world!"
         ),

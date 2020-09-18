@@ -16,8 +16,9 @@ import scala.concurrent.Promise
 import scala.scalajs.js.typedarray._
 import scala.scalajs.js.typedarray.ArrayBuffer
 
-final class WebsocketClient[T](name: String, jsWebsocket: WebSocket)(
-    implicit typeSpecificConversion: TypeSpecificConversion[T]) {
+final class WebsocketClient[T](name: String, jsWebsocket: WebSocket)(implicit
+    typeSpecificConversion: TypeSpecificConversion[T]
+) {
 
   def send(message: T): Unit = logExceptions {
     typeSpecificConversion.send(jsWebsocket, message)
@@ -49,13 +50,13 @@ object WebsocketClient {
     jsWebsocket.onmessage = (e: MessageEvent) =>
       logExceptions {
         onMessageReceived(typeSpecificConversion.extractMessage(e))
-    }
+      }
     jsWebsocket.onopen = (e: Event) =>
       logExceptions {
         resultPromise.success(new WebsocketClient(name, jsWebsocket))
         logLine(name, "Opened")
         onOpen()
-    }
+      }
     jsWebsocket.onerror = (e: Event) =>
       logExceptions {
         // Note: the given event turns out to be of type "error", but has an undefined message. This causes
@@ -64,14 +65,14 @@ object WebsocketClient {
         resultPromise.tryFailure(new RuntimeException(errorMessage))
         logLine(name, errorMessage)
         onError()
-    }
+      }
     jsWebsocket.onclose = (e: CloseEvent) =>
       logExceptions {
         val errorMessage = s"WebSocket was closed"
         resultPromise.tryFailure(new RuntimeException(errorMessage))
         logLine(name, errorMessage)
         onClose()
-    }
+      }
 
     resultPromise.future
   }

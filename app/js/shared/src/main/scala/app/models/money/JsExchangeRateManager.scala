@@ -12,8 +12,8 @@ import scala.collection.SortedMap
 import scala.collection.mutable
 
 final class JsExchangeRateManager(
-    ratioReferenceToForeignCurrency: Map[Currency, SortedMap[LocalDateTime, Double]])(
-    implicit entityAccess: AppJsEntityAccess)
+    ratioReferenceToForeignCurrency: Map[Currency, SortedMap[LocalDateTime, Double]]
+)(implicit entityAccess: AppJsEntityAccess)
     extends ExchangeRateManager {
   entityAccess.registerListener(JsEntityAccessListener)
 
@@ -35,7 +35,8 @@ final class JsExchangeRateManager(
       case _ =>
         throw new UnsupportedOperationException(
           s"Exchanging from non-reference to non-reference currency is not " +
-            s"supported ($firstCurrency -> $secondCurrency)")
+            s"supported ($firstCurrency -> $secondCurrency)"
+        )
     }
   }
 
@@ -66,7 +67,8 @@ final class JsExchangeRateManager(
                   currency,
                   measurementsCache
                     .getOrElse(currency, SortedMap[LocalDateTime, Double]()) +
-                    (entity.date -> entity.ratioReferenceToForeignCurrency))
+                    (entity.date -> entity.ratioReferenceToForeignCurrency),
+                )
               case EntityModification.Update(_) =>
                 throw new UnsupportedOperationException("Immutable entity")
               case EntityModification.Remove(id) =>

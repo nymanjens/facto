@@ -19,7 +19,8 @@ private[transactiongroupform] final class AddTransactionPanel(implicit i18n: I18
       logExceptions {
         HalfPanel(
           title = <.span(i18n("app.new-transaction")),
-          panelClasses = Seq("add-transaction-button-holder"))(
+          panelClasses = Seq("add-transaction-button-holder"),
+        )(
           <.table(
             <.tbody(
               <.tr(
@@ -36,7 +37,8 @@ private[transactiongroupform] final class AddTransactionPanel(implicit i18n: I18
             )
           )
         )
-    })
+      }
+    )
     .build
 
   // **************** API ****************//

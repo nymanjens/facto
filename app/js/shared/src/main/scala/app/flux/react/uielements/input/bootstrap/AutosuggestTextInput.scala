@@ -34,7 +34,7 @@ object AutosuggestTextInput {
           value = valueString,
           onChange = newString => onChange(newString).runNow(),
           name = name,
-          classes = classes
+          classes = classes,
         ),
         theme = ReactAutosuggest.Theme(
           container = "autosuggest",
@@ -42,10 +42,10 @@ object AutosuggestTextInput {
           suggestionsContainer = "dropdown open",
           suggestionsList = "dropdown-menu",
           suggestion = "",
-          suggestionHighlighted = "active"
-        )
+          suggestionHighlighted = "active",
+        ),
       )
-    }
+    },
   )
 
   // **************** API ****************//
@@ -76,7 +76,8 @@ object AutosuggestTextInput {
       extra = ExtraProps(
         suggestions = suggestions,
         onSuggestionsFetchRequested = onSuggestionsFetchRequested,
-        onSuggestionsClearRequested = onSuggestionsClearRequested)
+        onSuggestionsClearRequested = onSuggestionsClearRequested,
+      ),
     )
     ref.mutableRef.component(props)
   }
@@ -85,8 +86,8 @@ object AutosuggestTextInput {
 
   // **************** Public inner types ****************//
   final class Reference private[AutosuggestTextInput] (
-      private[AutosuggestTextInput] val mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps])
-      extends InputComponent.Reference(mutableRef)
+      private[AutosuggestTextInput] val mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps]
+  ) extends InputComponent.Reference(mutableRef)
 
   case class ExtraProps private[AutosuggestTextInput] (
       suggestions: Seq[String],

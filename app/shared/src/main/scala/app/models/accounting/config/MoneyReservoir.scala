@@ -33,7 +33,8 @@ object MoneyReservoir {
       longName = "UNKNOWN",
       shorterName = "UNKNOWN",
       veryShortName = "UNKNOWN",
-      defaultElectronicReservoirCode = ""),
-    hidden = true
+      defaultElectronicReservoirCode = "",
+    ),
+    hidden = true,
   )
 }

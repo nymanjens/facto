@@ -23,11 +23,10 @@ object SerializingTaskQueue {
     override def schedule[T](task: => Future[T]): Future[T] = {
       this.synchronized {
         val result: Future[T] = mostRecentlyAddedTaskFuture.flatMap(_ => task)
-        mostRecentlyAddedTaskFuture = result.recover {
-          case throwable: Throwable =>
-            println(s"  Caught exception in SerializingTaskQueue: $throwable")
-            throwable.printStackTrace()
-            null
+        mostRecentlyAddedTaskFuture = result.recover { case throwable: Throwable =>
+          println(s"  Caught exception in SerializingTaskQueue: $throwable")
+          throwable.printStackTrace()
+          null
         }
         result
       }

@@ -42,8 +42,8 @@ import scala.collection.mutable
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-final class TransactionGroupForm(
-    implicit i18n: I18n,
+final class TransactionGroupForm(implicit
+    i18n: I18n,
     clock: Clock,
     accountingConfig: Config,
     user: User,
@@ -76,9 +76,10 @@ final class TransactionGroupForm(
             foreignCurrency = None,
             totalFlowRestriction = totalFlowRestriction,
             totalFlow = ReferenceMoney(0),
-            totalFlowExceptLast = ReferenceMoney(0)
+            totalFlowExceptLast = ReferenceMoney(0),
           )
-      })
+        }
+      )
       .renderBackend[Backend]
       .componentDidMount(scope => LogExceptionsCallback(scope.backend.onFormChange()))
       .build
@@ -98,7 +99,7 @@ final class TransactionGroupForm(
         operationMeta = OperationMeta.Edit(group, transactions),
         groupPartial = TransactionGroup.Partial.from(group, transactions),
         returnToPath = returnToPath,
-        router = router
+        router = router,
       )
     })
 
@@ -130,7 +131,7 @@ final class TransactionGroupForm(
         operationMeta = OperationMeta.AddNew,
         groupPartial = clearedUncopyableFields(TransactionGroup.Partial.from(group, transactions)),
         returnToPath = returnToPath,
-        router = router
+        router = router,
       )
     })
   }
@@ -142,12 +143,12 @@ final class TransactionGroupForm(
         Seq(
           Transaction.Partial.from(
             beneficiary = reservoir.owner,
-            moneyReservoir = reservoir
+            moneyReservoir = reservoir,
           )
         )
       ),
       returnToPath,
-      router
+      router,
     )
   }
 
@@ -174,19 +175,19 @@ final class TransactionGroupForm(
             beneficiary = account1,
             moneyReservoir = account1.defaultElectronicReservoir,
             category = accountingConfig.constants.accountingCategory,
-            description = accountingConfig.constants.liquidationDescription
+            description = accountingConfig.constants.liquidationDescription,
           ),
           Transaction.Partial.from(
             beneficiary = account1,
             moneyReservoir = account2.defaultElectronicReservoir,
             category = accountingConfig.constants.accountingCategory,
-            description = accountingConfig.constants.liquidationDescription
-          )
+            description = accountingConfig.constants.liquidationDescription,
+          ),
         ),
-        zeroSum = true
+        zeroSum = true,
       ),
       returnToPath,
-      router
+      router,
     )
   }
 
@@ -197,7 +198,8 @@ final class TransactionGroupForm(
           operationMeta = OperationMeta.AddNew,
           groupPartial = groupPartial,
           returnToPath = returnToPath,
-          router = router)
+          router = router,
+        )
       val commonAccount = accountingConfig.constants.commonAccount
 
       val pairToDebt: Map[AccountPair, Option[ReferenceMoney]] =
@@ -232,7 +234,7 @@ final class TransactionGroupForm(
             moneyReservoir = Some(reservoirAccount.defaultElectronicReservoir),
             category = Some(accountingConfig.constants.accountingCategory),
             description = title,
-            flowInCents = flow.cents
+            flowInCents = flow.cents,
           )
 
         val partialTransactions = for {
@@ -243,7 +245,7 @@ final class TransactionGroupForm(
               partial(title, beneficiary = commonAccount, reservoirAccount = account1, flow = debt),
               partial(title, beneficiary = account1, reservoirAccount = account1, flow = -debt),
               partial(title, beneficiary = commonAccount, reservoirAccount = account2, flow = -debt),
-              partial(title, beneficiary = account1, reservoirAccount = account2, flow = debt)
+              partial(title, beneficiary = account1, reservoirAccount = account2, flow = debt),
             )
           }
         } yield transaction
@@ -265,7 +267,9 @@ final class TransactionGroupForm(
         operationMeta = OperationMeta.AddNew,
         groupPartial = transactionGroupPartial,
         returnToPath = returnToPath,
-        router = router))
+        router = router,
+      )
+    )
   }
 
   private def create(props: Props): VdomElement = create(Future.successful(props))
@@ -327,12 +331,12 @@ final class TransactionGroupForm(
                     Bootstrap.FontAwesomeIcon("times"),
                     " ",
                     i18n("app.delete"),
-                    ^.onClick --> onDelete
+                    ^.onClick --> onDelete,
                   ),
                   " ",
                   Bootstrap.Button(tag = <.a)(
                     Bootstrap.FontAwesomeIcon("copy"),
-                    ^.onClick --> onCopy
+                    ^.onClick --> onCopy,
                   ),
                 )
               },
@@ -343,13 +347,13 @@ final class TransactionGroupForm(
                     if (state.totalFlowRestriction == TotalFlowRestriction.ChooseTotal) None
                     else Some(state.totalFlow),
                   foreignCurrency = state.foreignCurrency,
-                  onChange = updateTotalFlow
+                  onChange = updateTotalFlow,
                 ),
                 totalFlowRestrictionInput(
                   defaultValue = state.totalFlowRestriction,
-                  onChange = updateTotalFlowRestriction
-                )
-              )
+                  onChange = updateTotalFlowRestriction,
+                ),
+              ),
             )
           )
         ),
@@ -386,28 +390,28 @@ final class TransactionGroupForm(
                     if (firstPanel) None else Some(panelRef(panelIndex = state.panelIndices.head)()),
                   focusOnMount = firstPanel,
                   closeButtonCallback = if (firstPanel) None else Some(removeTransactionPanel(panelIndex)),
-                  onFormChange = this.onFormChange _
+                  onFormChange = this.onFormChange _,
                 )
               }).toVdomArray,
-              addTransactionPanel(onClick = addTransactionPanelCallback)
+              addTransactionPanel(onClick = addTransactionPanelCallback),
             ),
             Bootstrap.FormGroup(
               Bootstrap.Col(sm = 10, smOffset = 2)(
                 Bootstrap.Button(tpe = "submit")(
                   ^.onClick ==> onSubmit(redirectOnSuccess = true),
-                  i18n("app.submit")
+                  i18n("app.submit"),
                 ),
                 " ",
                 <<.ifThen(props.operationMeta == OperationMeta.AddNew) {
                   Bootstrap.Button()(
                     ^.onClick ==> onSubmit(redirectOnSuccess = false),
-                    i18n("app.submit-and-create")
+                    i18n("app.submit-and-create"),
                   )
-                }
+                },
               )
-            )
-          )
-        )
+            ),
+          ),
+        ),
       )
     }
 
@@ -440,7 +444,8 @@ final class TransactionGroupForm(
             newState = newState.copy(totalFlow = ReferenceMoney(0))
           }
           newState
-      }).runNow()
+        }
+      ).runNow()
     }
 
     def onFormChange(): Unit = {
@@ -456,12 +461,14 @@ final class TransactionGroupForm(
 
           var newState = state.copy(
             foreignCurrency = currencies.find(_.isForeign),
-            totalFlowExceptLast = flows.dropRight(1).sum)
+            totalFlowExceptLast = flows.dropRight(1).sum,
+          )
           if (state.totalFlowRestriction == TotalFlowRestriction.AnyTotal) {
             newState = newState.copy(totalFlow = flows.sum)
           }
           newState
-      }).runNow()
+        }
+      ).runNow()
     }
 
     private def onSubmit(redirectOnSuccess: Boolean)(e: ReactEventFromInput): Callback =
@@ -513,21 +520,20 @@ final class TransactionGroupForm(
         def submitValid(datas: Seq[transactionPanel.Data], state: State) = {
           def transactionsWithoutIdProvider(group: TransactionGroup, issuerId: Option[Long] = None) = {
             for (data <- datas)
-              yield
-                Transaction(
-                  transactionGroupId = group.id,
-                  issuerId = issuerId getOrElse user.id,
-                  beneficiaryAccountCode = data.beneficiaryAccount.code,
-                  moneyReservoirCode = data.moneyReservoir.code,
-                  categoryCode = data.category.code,
-                  description = data.description,
-                  flowInCents = data.flow.cents,
-                  detailDescription = data.detailDescription,
-                  tags = data.tags,
-                  createdDate = group.createdDate,
-                  transactionDate = data.transactionDate,
-                  consumedDate = data.consumedDate
-                )
+              yield Transaction(
+                transactionGroupId = group.id,
+                issuerId = issuerId getOrElse user.id,
+                beneficiaryAccountCode = data.beneficiaryAccount.code,
+                moneyReservoirCode = data.moneyReservoir.code,
+                categoryCode = data.category.code,
+                description = data.description,
+                flowInCents = data.flow.cents,
+                detailDescription = data.detailDescription,
+                tags = data.tags,
+                createdDate = group.createdDate,
+                transactionDate = data.transactionDate,
+                consumedDate = data.consumedDate,
+              )
           }
 
           val action = props.operationMeta match {
@@ -536,7 +542,7 @@ final class TransactionGroupForm(
             case OperationMeta.Edit(group, transactions) =>
               AppActions.UpdateTransactionGroup(
                 transactionGroupWithId = group,
-                transactionsWithoutId = transactionsWithoutIdProvider(group, Some(transactions.head.issuerId))
+                transactionsWithoutId = transactionsWithoutIdProvider(group, Some(transactions.head.issuerId)),
               )
           }
 
@@ -566,7 +572,8 @@ final class TransactionGroupForm(
             }
 
             newState
-        }).runNow()
+          }
+        ).runNow()
       }
 
     private def onDelete: Callback = LogExceptionsCallback {

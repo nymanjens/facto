@@ -42,8 +42,9 @@ object TagsStoreFactoryTest extends TestSuite {
     }
   }
 
-  private def persistTransaction(id: Long, tags: Seq[String])(
-      implicit entityAccess: FakeJsEntityAccess): Transaction = {
+  private def persistTransaction(id: Long, tags: Seq[String])(implicit
+      entityAccess: FakeJsEntityAccess
+  ): Transaction = {
     val transaction = testTransactionWithIdA.copy(idOption = Some(id), tags = tags)
     entityAccess.addRemotelyAddedEntities(transaction)
     transaction

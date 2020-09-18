@@ -5,7 +5,7 @@ import sbt.Project.projectToRef
 lazy val shared = (crossProject.crossType(CrossType.Pure) in file("app/shared"))
   .settings(
     scalaVersion := BuildSettings.versions.scala,
-    libraryDependencies ++= BuildSettings.sharedDependencies.value
+    libraryDependencies ++= BuildSettings.sharedDependencies.value,
   )
 
 lazy val sharedJvmCopy = shared.jvm.settings(name := "sharedJVM")
@@ -19,7 +19,7 @@ lazy val jsShared: Project = (project in file("app/js/shared"))
     scalacOptions ++= BuildSettings.scalacOptions,
     libraryDependencies ++= BuildSettings.scalajsDependencies.value,
     // use uTest framework for tests
-    testFrameworks += new TestFramework("utest.runner.Framework")
+    testFrameworks += new TestFramework("utest.runner.Framework"),
   )
   .enablePlugins(ScalaJSWeb)
   .dependsOn(sharedJsCopy)
@@ -50,7 +50,7 @@ lazy val client: Project = (project in file("app/js/client"))
     webpackConfigFile in fullOptJS := Some(baseDirectory.value / "../webpack.prod.js"),
     // Enable faster builds when developing
     webpackBundlingMode := BundlingMode.LibraryOnly(),
-    webpackBundlingMode in Test := BundlingMode.LibraryAndApplication()
+    webpackBundlingMode in Test := BundlingMode.LibraryAndApplication(),
   )
   .enablePlugins(ScalaJSBundlerPlugin, ScalaJSWeb)
   .dependsOn(sharedJsCopy, jsShared)
@@ -76,7 +76,7 @@ lazy val webworkerClient: Project = (project in file("app/js/webworker"))
     webpackConfigFile in fastOptJS := Some(baseDirectory.value / "../webpack.dev.js"),
     webpackConfigFile in fullOptJS := Some(baseDirectory.value / "../webpack.prod.js"),
     // Enable faster builds when developing
-    webpackBundlingMode := BundlingMode.LibraryOnly()
+    webpackBundlingMode := BundlingMode.LibraryOnly(),
   )
   .enablePlugins(ScalaJSBundlerPlugin, ScalaJSWeb)
   .dependsOn(sharedJsCopy, jsShared)
@@ -102,7 +102,7 @@ lazy val manualTests: Project = (project in file("app/js/manualtests"))
     webpackConfigFile in fastOptJS := Some(baseDirectory.value / "../webpack.dev.js"),
     webpackConfigFile in fullOptJS := Some(baseDirectory.value / "../webpack.prod.js"),
     // Enable faster builds when developing
-    webpackBundlingMode := BundlingMode.LibraryOnly()
+    webpackBundlingMode := BundlingMode.LibraryOnly(),
   )
   .enablePlugins(ScalaJSBundlerPlugin, ScalaJSWeb)
   .dependsOn(sharedJsCopy, jsShared)
@@ -133,7 +133,7 @@ lazy val server = (project in file("app/jvm"))
     npmAssets ++= NpmAssets.ofProject(client) { modules => (modules / "startbootstrap-sb-admin-2").*** }.value,
     // @formatter:on
     // compress CSS
-    LessKeys.compress in Assets := true
+    LessKeys.compress in Assets := true,
   )
   .enablePlugins(PlayScala, WebScalaJSBundlerPlugin)
   .disablePlugins(PlayFilters) // Don't use the default filters

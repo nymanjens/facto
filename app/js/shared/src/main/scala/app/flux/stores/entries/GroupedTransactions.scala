@@ -19,7 +19,8 @@ import scala.collection.immutable.Seq
 abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
   require(
     transactions.map(_.transactionGroupId).distinct.size == 1,
-    s"More than one transaction group: ${transactions.map(_.transactionGroupId).distinct}")
+    s"More than one transaction group: ${transactions.map(_.transactionGroupId).distinct}",
+  )
 
   def groupId: Long = transactions.head.transactionGroupId
   def issuer(implicit entityAccess: AppJsEntityAccess): User = transactions.head.issuer
@@ -95,8 +96,9 @@ abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
 }
 
 object GroupedTransactions {
-  def combineConsecutiveOfSameGroup[T <: GroupedTransactions](entries: Seq[T])(
-      combine: (T, T) => T): List[T] = {
+  def combineConsecutiveOfSameGroup[T <: GroupedTransactions](
+      entries: Seq[T]
+  )(combine: (T, T) => T): List[T] = {
     // recursion does not lead to growing stack because of Stream
     def combineToStream(nextEntries: List[T]): Stream[T] = nextEntries match {
       case x :: y :: rest if x.groupId == y.groupId =>

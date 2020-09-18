@@ -7,8 +7,8 @@ import hydro.flux.stores.ApplicationIsOnlineStore
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
-final class ApplicationDisconnectedIcon(
-    implicit applicationIsOnlineStore: ApplicationIsOnlineStore,
+final class ApplicationDisconnectedIcon(implicit
+    applicationIsOnlineStore: ApplicationIsOnlineStore,
     i18n: I18n,
 ) extends HydroReactComponent {
 
@@ -21,7 +21,8 @@ final class ApplicationDisconnectedIcon(
   override protected val config = ComponentConfig(backendConstructor = new Backend(_), initialState = State())
     .withStateStoresDependency(
       applicationIsOnlineStore,
-      _.copy(isDisconnected = !applicationIsOnlineStore.state.isOnline))
+      _.copy(isDisconnected = !applicationIsOnlineStore.state.isOnline),
+    )
 
   // **************** Implementation of HydroReactComponent types ****************//
   protected type Props = Unit

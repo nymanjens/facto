@@ -91,7 +91,7 @@ object InputWithDefaultFromReferenceTest extends TestSuite {
             label = "label",
             defaultValue = "startvalue",
             showErrorMessage = false,
-            inputClasses = extraProps.inputClasses
+            inputClasses = extraProps.inputClasses,
           )
       }
     )

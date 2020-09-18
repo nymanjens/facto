@@ -63,12 +63,13 @@ object CashFlowEntriesStoreFactoryTest extends TestSuite {
         RegularEntry(
           Seq(trans2, trans3),
           MoneyWithGeneralCurrency(420, Currency.default),
-          balanceVerified = false),
+          balanceVerified = false,
+        ),
         BalanceCorrection(bc2, MoneyWithGeneralCurrency(420, Currency.default)),
         BalanceCorrection(bc3, MoneyWithGeneralCurrency(20, Currency.default)),
         RegularEntry(Seq(trans4), MoneyWithGeneralCurrency(-170, Currency.default), balanceVerified = true),
         RegularEntry(Seq(trans5), MoneyWithGeneralCurrency(-220, Currency.default), balanceVerified = false),
-        RegularEntry(Seq(trans6), MoneyWithGeneralCurrency(-250, Currency.default), balanceVerified = true)
+        RegularEntry(Seq(trans6), MoneyWithGeneralCurrency(-250, Currency.default), balanceVerified = true),
       )
 
       // Run tests
@@ -76,14 +77,15 @@ object CashFlowEntriesStoreFactoryTest extends TestSuite {
       await(
         Future.sequence(
           for (i <- 1 to expectedEntries.size)
-            yield
-              async {
-                val subList = expectedEntries.takeRight(i)
+            yield async {
+              val subList = expectedEntries.takeRight(i)
 
-                val state = await(factory.get(testReservoir, maxNumEntries = subList.size).stateFuture)
-                state.entries.map(_.entry) ==> subList
-                state.hasMore ==> (i < expectedEntries.size)
-              }))
+              val state = await(factory.get(testReservoir, maxNumEntries = subList.size).stateFuture)
+              state.entries.map(_.entry) ==> subList
+              state.hasMore ==> (i < expectedEntries.size)
+            }
+        )
+      )
 
       // All entries
       val allEntriesState = await(factory.get(testReservoir, maxNumEntries = 10000).stateFuture)
@@ -112,12 +114,13 @@ object CashFlowEntriesStoreFactoryTest extends TestSuite {
         RegularEntry(
           Seq(trans2, trans3),
           MoneyWithGeneralCurrency(420, Currency.default),
-          balanceVerified = false),
+          balanceVerified = false,
+        ),
         BalanceCorrection(bc2, MoneyWithGeneralCurrency(420, Currency.default)),
         BalanceCorrection(bc3, MoneyWithGeneralCurrency(20, Currency.default)),
         RegularEntry(Seq(trans4), MoneyWithGeneralCurrency(-170, Currency.default), balanceVerified = true),
         RegularEntry(Seq(trans5), MoneyWithGeneralCurrency(-220, Currency.default), balanceVerified = false),
-        RegularEntry(Seq(trans6), MoneyWithGeneralCurrency(-250, Currency.default), balanceVerified = true)
+        RegularEntry(Seq(trans6), MoneyWithGeneralCurrency(-250, Currency.default), balanceVerified = true),
       )
 
       val state = await(factory.get(testReservoir, maxNumEntries = 10000).stateFuture)
@@ -139,7 +142,7 @@ object CashFlowEntriesStoreFactoryTest extends TestSuite {
       createdDate = createDateTime(2012, JANUARY, day).plus(Duration.ofSeconds(createIncrement)),
       transactionDate = createDateTime(2012, JANUARY, day),
       consumedDate = createDateTime(2012, JANUARY, day),
-      moneyReservoirCode = reservoir.code
+      moneyReservoirCode = reservoir.code,
     )
     entityAccess.addRemotelyAddedEntities(transaction)
     transaction
@@ -155,7 +158,7 @@ object CashFlowEntriesStoreFactoryTest extends TestSuite {
       balanceInCents = balanceInCents,
       createdDate = createDateTime(2012, JANUARY, day).plus(Duration.ofSeconds(createIncrement)),
       checkDate = createDateTime(2012, JANUARY, day),
-      moneyReservoirCode = reservoir.code
+      moneyReservoirCode = reservoir.code,
     )
     entityAccess.addRemotelyAddedEntities(balanceCheck)
     balanceCheck

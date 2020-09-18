@@ -18,7 +18,8 @@ final class PendingModificationsCounter(implicit pendingModificationsStore: Pend
   override protected val config = ComponentConfig(backendConstructor = new Backend(_), initialState = State())
     .withStateStoresDependency(
       pendingModificationsStore,
-      _.copy(numberOfModifications = pendingModificationsStore.state.numberOfModifications))
+      _.copy(numberOfModifications = pendingModificationsStore.state.numberOfModifications),
+    )
 
   // **************** Implementation of HydroReactComponent types ****************//
   protected type Props = Unit
@@ -35,7 +36,8 @@ final class PendingModificationsCounter(implicit pendingModificationsStore: Pend
             ^.className := "pending-modifications",
             Bootstrap.Glyphicon("hourglass"),
             " ",
-            numberOfModifications)
+            numberOfModifications,
+          )
       }
     }
   }

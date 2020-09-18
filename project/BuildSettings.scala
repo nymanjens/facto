@@ -24,7 +24,7 @@ object BuildSettings {
     "-Xfuture", // Warn of changes to future major Scala version
     "-Xlint:-unused,_",
     "-Yno-adapted-args", // Do not adapt an argument list (either by inserting () or creating a tuple) to match the receiver.
-    "-Ywarn-unused:-imports"
+    "-Ywarn-unused:-imports",
 
     // Disabled because it causes issues with scala.js facade types, particularly `var x = js.native`
     // "-Ywarn-dead-code",
@@ -51,8 +51,9 @@ object BuildSettings {
     Seq(
       "org.scala-lang.modules" %% "scala-async" % "0.9.6",
       "com.lihaoyi" %%% "autowire" % "0.2.6",
-      "me.chrons" %%% "boopickle" % "1.2.5"
-    ))
+      "me.chrons" %%% "boopickle" % "1.2.5",
+    )
+  )
 
   /** Dependencies only used by the JVM project */
   val jvmDependencies = Def.setting(
@@ -71,8 +72,9 @@ object BuildSettings {
       "com.h2database" % "h2" % "1.4.195" % Test,
       "org.xerial" % "sqlite-jdbc" % "3.8.11.2",
       "com.google.code.findbugs" % "jsr305" % "1.3.9",
-      "net.jcip" % "jcip-annotations" % "1.0"
-    ))
+      "net.jcip" % "jcip-annotations" % "1.0",
+    )
+  )
 
   /** Dependencies only used by the JS project (note the use of %%% instead of %%) */
   val scalajsDependencies = Def.setting(
@@ -82,8 +84,9 @@ object BuildSettings {
       "com.github.japgolly.scalajs-react" %%% "test" % versions.scalajsReact % Test,
       "org.scala-js" %%% "scalajs-dom" % "0.9.1",
       "org.scala-js" %%% "scalajs-java-time" % "0.2.0",
-      "com.lihaoyi" %%% "utest" % versions.uTest % Test
-    ))
+      "com.lihaoyi" %%% "utest" % versions.uTest % Test,
+    )
+  )
 
   def npmDependencies(projectRootDirectory: File): Seq[(String, String)] = Seq(
     // For assets only
@@ -98,6 +101,6 @@ object BuildSettings {
     "react-dom" -> "16.2.0",
     "react-tag-input" -> "4.7.2",
     "react-autosuggest" -> "9.3.2",
-    "global-mousetrap" -> s"file:${projectRootDirectory / "app/js/shared/src/main/npm-packages/global-mousetrap"}"
+    "global-mousetrap" -> s"file:${projectRootDirectory / "app/js/shared/src/main/npm-packages/global-mousetrap"}",
   )
 }

@@ -37,12 +37,16 @@ object TemplateMatcherTest extends TestSuite {
           createTemplate(
             transactions = Seq(
               createTemplateTransaction(description = "AAA"),
-              createTemplateTransaction(description = "BBB")))
+              createTemplateTransaction(description = "BBB"),
+            )
+          )
         val templateCd =
           createTemplate(
             transactions = Seq(
               createTemplateTransaction(description = "CCC"),
-              createTemplateTransaction(description = "DDD")))
+              createTemplateTransaction(description = "DDD"),
+            )
+          )
         val templateMatcher = newTemplateMatcher(templateAb, templateCd)
 
         "Matching template" - {
@@ -52,12 +56,14 @@ object TemplateMatcherTest extends TestSuite {
           }
           "Full set" - {
             templateMatcher.getMatchingTemplate(
-              Seq(createTransaction(description = "AAA"), createTransaction(description = "BBB"))) ==>
+              Seq(createTransaction(description = "AAA"), createTransaction(description = "BBB"))
+            ) ==>
               Some(templateAb)
           }
           "Full set out of order" - {
             templateMatcher.getMatchingTemplate(
-              Seq(createTransaction(description = "BBB"), createTransaction(description = "AAA"))) ==>
+              Seq(createTransaction(description = "BBB"), createTransaction(description = "AAA"))
+            ) ==>
               Some(templateAb)
           }
         }
@@ -71,7 +77,9 @@ object TemplateMatcherTest extends TestSuite {
               Seq(
                 createTransaction(description = "AAA"),
                 createTransaction(description = "BBB"),
-                createTransaction(description = "CCC"))) ==> None
+                createTransaction(description = "CCC"),
+              )
+            ) ==> None
           }
         }
       }
@@ -80,21 +88,25 @@ object TemplateMatcherTest extends TestSuite {
           val templateA =
             createTemplate(
               transactions =
-                Seq(createTemplateTransaction(description = "XYZ", categoryCode = testCategoryA.code)))
+                Seq(createTemplateTransaction(description = "XYZ", categoryCode = testCategoryA.code))
+            )
           val templateB =
             createTemplate(
               transactions =
-                Seq(createTemplateTransaction(description = "XYZ", categoryCode = testCategoryB.code)))
+                Seq(createTemplateTransaction(description = "XYZ", categoryCode = testCategoryB.code))
+            )
           val templateMatcher = newTemplateMatcher(templateA, templateB)
 
           "Matching template" - {
             templateMatcher.getMatchingTemplate(
-              Seq(createTransaction(description = "XYZ", category = testCategoryB))) ==>
+              Seq(createTransaction(description = "XYZ", category = testCategoryB))
+            ) ==>
               Some(templateB)
           }
           "No matching template" - {
             templateMatcher.getMatchingTemplate(
-              Seq(createTransaction(description = "XYZ", category = testCategoryC))) ==> None
+              Seq(createTransaction(description = "XYZ", category = testCategoryC))
+            ) ==> None
           }
         }
         "beneficiary" - {
@@ -102,32 +114,40 @@ object TemplateMatcherTest extends TestSuite {
             val templateA =
               createTemplate(
                 transactions =
-                  Seq(createTemplateTransaction(description = "XYZ", beneficiaryCodeTpl = testAccountA.code)))
+                  Seq(createTemplateTransaction(description = "XYZ", beneficiaryCodeTpl = testAccountA.code))
+              )
             val templateB =
               createTemplate(
                 transactions =
-                  Seq(createTemplateTransaction(description = "XYZ", beneficiaryCodeTpl = testAccountB.code)))
+                  Seq(createTemplateTransaction(description = "XYZ", beneficiaryCodeTpl = testAccountB.code))
+              )
             val templateMatcher = newTemplateMatcher(templateA, templateB)
 
             "Matching template" - {
               templateMatcher.getMatchingTemplate(
-                Seq(createTransaction(description = "XYZ", beneficiary = testAccountA))) ==>
+                Seq(createTransaction(description = "XYZ", beneficiary = testAccountA))
+              ) ==>
                 Some(templateA)
             }
             "No matching template" - {
               templateMatcher.getMatchingTemplate(
-                Seq(createTransaction(description = "XYZ", beneficiary = testAccountC))) ==> None
+                Seq(createTransaction(description = "XYZ", beneficiary = testAccountC))
+              ) ==> None
             }
           }
           "With placeholder" - {
             val templateA =
-              createTemplate(transactions = Seq(
-                createTemplateTransaction(description = "XYZ", beneficiaryCodeTpl = "$" + "{account.code}")))
+              createTemplate(transactions =
+                Seq(
+                  createTemplateTransaction(description = "XYZ", beneficiaryCodeTpl = "$" + "{account.code}")
+                )
+              )
             val templateMatcher = newTemplateMatcher(templateA)
 
             "Matching template" - {
               templateMatcher.getMatchingTemplate(
-                Seq(createTransaction(description = "XYZ", beneficiary = testAccountA))) ==>
+                Seq(createTransaction(description = "XYZ", beneficiary = testAccountA))
+              ) ==>
                 Some(templateA)
             }
           }

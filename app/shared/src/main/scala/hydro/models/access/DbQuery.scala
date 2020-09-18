@@ -11,8 +11,9 @@ import scala.collection.immutable.Seq
 import scala.math.Ordering.Implicits._
 
 /** Represents a simple database query in a portable way. */
-case class DbQuery[E <: Entity](filter: Filter[E], sorting: Option[Sorting[E]], limit: Option[Int])(
-    implicit val entityType: EntityType[E])
+case class DbQuery[E <: Entity](filter: Filter[E], sorting: Option[Sorting[E]], limit: Option[Int])(implicit
+    val entityType: EntityType[E]
+)
 
 object DbQuery {
 
@@ -53,25 +54,25 @@ object DbQuery {
     case class NotEqual[V, E](field: ModelField[V, E], value: V) extends Filter[E] {
       override def apply(entity: E) = field.get(entity) != value
     }
-    case class GreaterThan[V, E](field: ModelField[V, E], value: V)(
-        implicit val picklableOrdering: PicklableOrdering[V])
-        extends Filter[E] {
+    case class GreaterThan[V, E](field: ModelField[V, E], value: V)(implicit
+        val picklableOrdering: PicklableOrdering[V]
+    ) extends Filter[E] {
       override def apply(entity: E) = {
         implicit val ordering = implicitly[PicklableOrdering[V]].toOrdering
         field.get(entity) > value
       }
     }
-    case class GreaterOrEqualThan[V, E](field: ModelField[V, E], value: V)(
-        implicit val picklableOrdering: PicklableOrdering[V])
-        extends Filter[E] {
+    case class GreaterOrEqualThan[V, E](field: ModelField[V, E], value: V)(implicit
+        val picklableOrdering: PicklableOrdering[V]
+    ) extends Filter[E] {
       override def apply(entity: E) = {
         implicit val ordering = implicitly[PicklableOrdering[V]].toOrdering
         field.get(entity) >= value
       }
     }
-    case class LessThan[V, E](field: ModelField[V, E], value: V)(
-        implicit val picklableOrdering: PicklableOrdering[V])
-        extends Filter[E] {
+    case class LessThan[V, E](field: ModelField[V, E], value: V)(implicit
+        val picklableOrdering: PicklableOrdering[V]
+    ) extends Filter[E] {
       override def apply(entity: E) = {
         implicit val ordering = implicitly[PicklableOrdering[V]].toOrdering
         field.get(entity) < value
@@ -112,12 +113,11 @@ object DbQuery {
       Sorting(fieldsWithDirection :+ FieldWithDirection[V, E](field, isDesc = isDesc))
 
     def toOrdering: Ordering[E] = (x: E, y: E) => {
-      fieldsWithDirection.toStream.flatMap {
-        case f @ DbQuery.Sorting.FieldWithDirection(field, _) =>
-          f.ordering.compare(field.get(x), field.get(y)) match {
-            case 0      => None
-            case result => Some(result)
-          }
+      fieldsWithDirection.toStream.flatMap { case f @ DbQuery.Sorting.FieldWithDirection(field, _) =>
+        f.ordering.compare(field.get(x), field.get(y)) match {
+          case 0      => None
+          case result => Some(result)
+        }
       }.headOption getOrElse 0
     }
 
@@ -135,8 +135,9 @@ object DbQuery {
     def by[V: PicklableOrdering, E](field: ModelField[V, E], isDesc: Boolean): Sorting[E] =
       Sorting(Seq(FieldWithDirection(field, isDesc = isDesc)))
 
-    case class FieldWithDirection[V, E](field: ModelField[V, E], isDesc: Boolean)(
-        implicit val picklableValueOrdering: PicklableOrdering[V]) {
+    case class FieldWithDirection[V, E](field: ModelField[V, E], isDesc: Boolean)(implicit
+        val picklableValueOrdering: PicklableOrdering[V]
+    ) {
       def ordering: Ordering[V] = {
         val ascendingOrdering = picklableValueOrdering.toOrdering
         if (isDesc) ascendingOrdering.reverse else ascendingOrdering

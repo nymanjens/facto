@@ -62,7 +62,7 @@ object MappedInputTest extends TestSuite {
         ref = ref,
         defaultValue = defaultDate,
         valueTransformer = MappedInput.ValueTransformer.StringToLocalDateTime,
-        delegateRefFactory = TextInput.ref _
+        delegateRefFactory = TextInput.ref _,
       ) { extraProps =>
         TextInput(
           ref = extraProps.ref,
@@ -70,7 +70,7 @@ object MappedInputTest extends TestSuite {
           label = "label",
           defaultValue = Option(initialValue) getOrElse extraProps.defaultValue,
           showErrorMessage = showErrorMessage,
-          additionalValidator = extraProps.additionalValidator
+          additionalValidator = extraProps.additionalValidator,
         )
       }
     )
