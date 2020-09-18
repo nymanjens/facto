@@ -29,7 +29,12 @@ final class Chart(implicit
 
   // **************** API ****************//
   def apply(stringifiedChartSpecs: String, router: RouterContext): VdomElement = {
-    component(Props(router))
+    component(
+      Props(
+        chartSpec = ChartSpec.parseStringified(stringifiedChartSpecs),
+        router = router,
+      )
+    )
   }
 
   // **************** Implementation of HydroReactComponent methods ****************//
@@ -37,8 +42,8 @@ final class Chart(implicit
 
   // **************** Private inner types ****************//
   protected case class Props(
+      chartSpec: ChartSpec,
       router: RouterContext,
-      chartSpec: ChartSpec = ChartSpec.empty,
   )
 
   protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
