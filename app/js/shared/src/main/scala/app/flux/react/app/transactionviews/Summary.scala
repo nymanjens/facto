@@ -36,7 +36,9 @@ final class Summary(implicit summaryTable: SummaryTable,
         includeUnrelatedAccounts = false,
         query = "",
         yearLowerBound = clock.now.getYear - 1,
-        expandedYear = clock.now.getYear))
+        expandedYear = clock.now.getYear,
+        showYearlyTotal = false,
+      ))
     .renderBackend[Backend]
     .build
 
@@ -52,6 +54,7 @@ final class Summary(implicit summaryTable: SummaryTable,
       query: String,
       yearLowerBound: Int,
       expandedYear: Int,
+      showYearlyTotal: Boolean, // instead of average
   )
 
   private class Backend(val $ : BackendScope[Props, State]) {
@@ -92,8 +95,10 @@ final class Summary(implicit summaryTable: SummaryTable,
               query = state.query,
               yearLowerBound = state.yearLowerBound,
               expandedYear = state.expandedYear,
+              showYearlyTotal = state.showYearlyTotal,
               onShowHiddenYears = $.modState(_.copy(yearLowerBound = Int.MinValue)),
-              onSetExpandedYear = year => $.modState(_.copy(expandedYear = year))
+              onSetExpandedYear = year => $.modState(_.copy(expandedYear = year)),
+              onShowYearlyTotalToggle = $.modState(s => s.copy(showYearlyTotal = !s.showYearlyTotal)),
             )
           }
         }.toVdomArray,

@@ -69,6 +69,7 @@ app.templates=Sjablonen
 app.delete=Verwijderen
 app.balance-check=Balans instellen
 app.total=Totaal
+app.total_column=totaal
 app.any-total=Restrictieloos totaal
 app.choose-total=Kies totaal
 app.zero-sum=Zero sum

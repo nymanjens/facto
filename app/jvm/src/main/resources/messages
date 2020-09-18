@@ -117,6 +117,7 @@ app.templates=Templates
 app.delete=Delete
 app.balance-check=Balance Check
 app.total=Total
+app.total_column=Total
 app.any-total=Any Total
 app.choose-total=Choose Total
 app.zero-sum=Zero Sum

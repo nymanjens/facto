@@ -73,8 +73,10 @@ private[transactionviews] final class SummaryTable(
       query: String,
       yearLowerBound: Int,
       expandedYear: Int,
+      showYearlyTotal: Boolean,
       onShowHiddenYears: Callback,
       onSetExpandedYear: Int => Callback,
+      onShowYearlyTotalToggle: Callback,
   )(implicit router: RouterContext): VdomElement = {
     component
       .withKey(key)
@@ -84,9 +86,11 @@ private[transactionviews] final class SummaryTable(
           query = query,
           yearLowerBound = yearLowerBound,
           expandedYear = expandedYear,
+          showYearlyTotal = showYearlyTotal,
           onShowHiddenYears = onShowHiddenYears,
           onSetExpandedYear = onSetExpandedYear,
-          router = router
+          onShowYearlyTotalToggle = onShowYearlyTotalToggle,
+          router = router,
         ))
       .vdomElement
   }
@@ -98,8 +102,10 @@ private[transactionviews] final class SummaryTable(
       query: String,
       yearLowerBound: Int,
       expandedYear: Int,
+      showYearlyTotal: Boolean, // instead of average
       onShowHiddenYears: Callback,
       onSetExpandedYear: Int => Callback,
+      onShowYearlyTotalToggle: Callback,
       router: RouterContext,
   )
 
@@ -139,6 +145,9 @@ private[transactionviews] final class SummaryTable(
           total / months.size
       }
     }
+    def totalWithoutCategories(categoriesToIgnore: Set[Category], year: Int): ReferenceMoney = {
+      DatedMonth.allMonthsIn(year).map(totalWithoutCategories(categoriesToIgnore, _)).sum
+    }
 
     def years: Seq[Int] = yearsToData.toVector.map(_._1)
     def yearlyAverage(year: Int, category: Category): ReferenceMoney = {
@@ -148,6 +157,9 @@ private[transactionviews] final class SummaryTable(
           val totalFlow = months.map(yearsToData(year).summary.cell(category, _).totalFlow).sum
           totalFlow / months.size
       }
+    }
+    def yearlyTotal(year: Int, category: Category): ReferenceMoney = {
+      DatedMonth.allMonthsIn(year).map(month => yearsToData(year).summary.cell(category, month).totalFlow).sum
     }
 
     def monthsForAverage(year: Int): Seq[DatedMonth] = {
@@ -170,6 +182,9 @@ private[transactionviews] final class SummaryTable(
         case Seq()  => ReferenceMoney(0)
         case months => months.map(exchangeRateGains(currency, _)).sum / months.size
       }
+    }
+    def totalExchangeRateGains(currency: Currency, year: Int): ReferenceMoney = {
+      DatedMonth.allMonthsIn(year).map(exchangeRateGains(currency, _)).sum
     }
 
     private lazy val categoriesSet: Set[Category] = {
@@ -270,6 +285,13 @@ private[transactionviews] final class SummaryTable(
                     ^.colSpan := columnsForYear(year, expandedYear = props.expandedYear).size,
                     <.a(^.href := "javascript:void(0)", ^.onClick --> props.onSetExpandedYear(year), year)
                   ))
+              case TotalColumn(year) =>
+                Some(
+                  <.th(
+                    ^.key := year,
+                    ^.colSpan := columnsForYear(year, expandedYear = props.expandedYear).size,
+                    <.a(^.href := "javascript:void(0)", ^.onClick --> props.onSetExpandedYear(year), year)
+                  ))
             }.toVdomArray
           ),
           // **************** Month header **************** //
@@ -287,7 +309,23 @@ private[transactionviews] final class SummaryTable(
               case MonthColumn(month) =>
                 <.th(^.key := s"${month.year}-${month.month}", month.abbreviation)
               case AverageColumn(year) =>
-                <.th(^.key := s"avg-$year", i18n("app.avg"))
+                <.th(
+                  ^.key := s"avg-$year",
+                  <.a(
+                    ^.href := "javascript:void(0)",
+                    ^.onClick --> props.onShowYearlyTotalToggle,
+                    i18n("app.avg"),
+                  ),
+                )
+              case TotalColumn(year) =>
+                <.th(
+                  ^.key := s"total-$year",
+                  <.a(
+                    ^.href := "javascript:void(0)",
+                    ^.onClick --> props.onShowYearlyTotalToggle,
+                    i18n("app.total_column"),
+                  ),
+                )
             }.toVdomArray
           )
         ),
@@ -308,6 +346,8 @@ private[transactionviews] final class SummaryTable(
                       <.td(^.key := s"empty-avg-${month.year}-${month.month}", ^.className := "cell")
                     case AverageColumn(year) =>
                       <.td(^.key := s"empty-avg-$year", ^.className := "average")
+                    case TotalColumn(year) =>
+                      <.td(^.key := s"empty-total-$year", ^.className := "average")
                   }.toVdomArray
                 )
               }
@@ -367,6 +407,11 @@ private[transactionviews] final class SummaryTable(
                         ^.key := s"avg-${category.code}-$year",
                         ^.className := "average",
                         data.yearlyAverage(year, category).formatFloat)
+                    case TotalColumn(year) =>
+                      <.td(
+                        ^.key := s"total-${category.code}-$year",
+                        ^.className := "average",
+                        data.yearlyTotal(year, category).formatFloat)
                   }.toVdomArray
                 )
               }
@@ -393,6 +438,11 @@ private[transactionviews] final class SummaryTable(
                       ^.key := s"avg-$year",
                       ^.className := "average",
                       data.averageExchangeRateGains(currency, year).formatFloat)
+                  case TotalColumn(year) =>
+                    <.td(
+                      ^.key := s"total-$year",
+                      ^.className := "average",
+                      data.totalExchangeRateGains(currency, year).formatFloat)
                 }.toVdomArray
               )
             }).toVdomArray
@@ -436,6 +486,11 @@ private[transactionviews] final class SummaryTable(
                         ^.key := s"average-$rowIndex-$year",
                         ^.className := "average",
                         data.averageWithoutCategories(categoriesToIgnore, year).formatFloat)
+                    case TotalColumn(year) =>
+                      <.td(
+                        ^.key := s"total-$rowIndex-$year",
+                        ^.className := "average",
+                        data.totalWithoutCategories(categoriesToIgnore, year).formatFloat)
                   }.toVdomArray
                 )
             }.toVdomArray
@@ -506,11 +561,13 @@ private[transactionviews] final class SummaryTable(
     private case class OmittedYearsColumn(yearRange: YearRange) extends Column
     private case class MonthColumn(month: DatedMonth) extends Column
     private case class AverageColumn(year: Int) extends Column
-    private def columnsForYear(year: Int, expandedYear: Int): Seq[Column] = {
+    private case class TotalColumn(year: Int) extends Column
+    private def columnsForYear(year: Int, expandedYear: Int)(implicit props: Props): Seq[Column] = {
+      val avgOrTotal = if (props.showYearlyTotal) TotalColumn(year) else AverageColumn(year)
       if (year == expandedYear) {
-        DatedMonth.allMonthsIn(year).map(MonthColumn) :+ AverageColumn(year)
+        DatedMonth.allMonthsIn(year).map(MonthColumn) :+ avgOrTotal
       } else {
-        Seq(AverageColumn(year))
+        Seq(avgOrTotal)
       }
     }
     private def columns(implicit props: Props, data: AllYearsData): Seq[Column] = {
