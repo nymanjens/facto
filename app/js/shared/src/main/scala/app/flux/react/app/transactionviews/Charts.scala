@@ -41,8 +41,9 @@ final class Charts(
   protected case class Props(router: RouterContext)
   protected case class State(
       query: String = accountingConfig.accountOf(user) match {
-        case Some(account) => s"beneficiary:${account.shorterName}"
-        case None          => ""
+        case Some(account) if account.longName.contains(" ") => s"beneficiary:'${account.longName}'"
+        case Some(account)                                     => s"beneficiary:${account.longName}"
+        case None                                              => ""
       },
   )
 
