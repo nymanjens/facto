@@ -18,15 +18,15 @@ import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
 
-final class Charts(implicit
-    summaryTable: SummaryTable,
-    entityAccess: AppJsEntityAccess,
-    user: User,
-    clock: Clock,
-    accountingConfig: Config,
-    exchangeRateManager: ExchangeRateManager,
-    i18n: I18n,
-    pageHeader: PageHeader,
+final class Chart(implicit
+                  summaryTable: SummaryTable,
+                  entityAccess: AppJsEntityAccess,
+                  user: User,
+                  clock: Clock,
+                  accountingConfig: Config,
+                  exchangeRateManager: ExchangeRateManager,
+                  i18n: I18n,
+                  pageHeader: PageHeader,
 ) extends HydroReactComponent {
 
   // **************** API ****************//
