@@ -2,6 +2,7 @@ package app.flux.react.app.transactionviews
 
 import app.common.money.ExchangeRateManager
 import app.flux.react.app.transactionviews.ChartSpecInput.ChartSpec
+import app.flux.router.AppPages
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Config
 import app.models.user.User
@@ -55,7 +56,10 @@ final class Chart(implicit
         Bootstrap.Row(
           chartSpecInput(
             chartSpec = props.chartSpec,
-            onChartSpecUpdate = newChartSpec => Callback.empty,
+            onChartSpecUpdate = newChartSpec => {
+              router.setPage(AppPages.Chart.fromInput(newChartSpec.stringify))
+              Callback.empty
+            },
           )
         ),
       )
