@@ -66,7 +66,7 @@ case class Config(
     codeToTemplate(code)
   }
 
-  def accountOf(user: User)(implicit entityAccess: AppEntityAccess): Option[Account] =
+  def accountOf(user: User): Option[Account] =
     accounts.values.filter(_.userLoginName == Some(user.loginName)).headOption
 
   def personallySortedAccounts(implicit user: User, entityAccess: AppEntityAccess): Seq[Account] = {
