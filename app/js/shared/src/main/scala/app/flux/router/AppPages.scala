@@ -171,16 +171,16 @@ object AppPages {
       EditBalanceCheck(balanceCheck.id, HasReturnTo.getCurrentEncodedPath)
   }
 
-  // **************** Charts **************** //
-  case class Charts private (encodedChartSpecs: String) extends PageBase("app.charts", iconClass = "fa fa-bar-chart-o") {
+  // **************** Chart **************** //
+  case class Chart private(encodedChartSpecs: String) extends PageBase("app.chart", iconClass = "fa fa-bar-chart-o") {
     def stringifiedChartSpecs: String = {
       js.URIUtils.decodeURIComponent(js.URIUtils.decodeURI(encodedChartSpecs))
     }
   }
-  object Charts {
+  object Chart {
 
-    def fromInput(stringifiedChartSpecs: String): Charts = {
-      new Charts(js.URIUtils.encodeURIComponent(stringifiedChartSpecs))
+    def fromInput(stringifiedChartSpecs: String): Chart = {
+      new Chart(js.URIUtils.encodeURIComponent(stringifiedChartSpecs))
     }
   }
 }
