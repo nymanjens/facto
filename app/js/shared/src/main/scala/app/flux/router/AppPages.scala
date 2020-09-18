@@ -47,6 +47,7 @@ object AppPages {
   case object Liquidation extends PageBase("app.liquidation", iconClass = "icon-balance-scale")
   case object Endowments extends PageBase("app.endowments", iconClass = "icon-crown")
   case object Summary extends PageBase("app.summary", iconClass = "icon-table")
+  case object Charts extends PageBase("app.charts", iconClass = "fa fa-bar-chart-o")
   case object TemplateList extends PageBase("app.templates", iconClass = "icon-template")
 
   // **************** Accounting forms - transactions **************** //
