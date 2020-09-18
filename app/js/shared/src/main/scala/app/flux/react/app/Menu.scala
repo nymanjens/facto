@@ -43,6 +43,7 @@ private[app] final class Menu(implicit
           ),
           MenuItem(i18n("app.endowments.html"), AppPages.Endowments, shortcuts = Seq("shift+alt+d")),
           MenuItem(i18n("app.summary.html"), AppPages.Summary, shortcuts = Seq("shift+alt+s")),
+          MenuItem(i18n("app.chart.html"), AppPages.Chart.empty, shortcuts = Seq("shift+alt+r")),
         ),
         Seq(
           MenuItem(

@@ -179,6 +179,8 @@ object AppPages {
   }
   object Chart {
 
+    val empty: Chart = Chart.fromInput("")
+
     def fromInput(stringifiedChartSpecs: String): Chart = {
       new Chart(js.URIUtils.encodeURIComponent(stringifiedChartSpecs))
     }
