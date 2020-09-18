@@ -1,5 +1,7 @@
 package hydro.flux.react
 
+import hydro.common.GuavaReplacement.Preconditions
+import hydro.common.GuavaReplacement.Preconditions.checkNotNull
 import hydro.common.JsLoggingUtils.LogExceptionsCallback
 import hydro.common.JsLoggingUtils.logExceptions
 import hydro.flux.stores.StateStore
@@ -25,7 +27,7 @@ abstract class HydroReactComponent {
     val step2: Builder.Step2[Props, State] =
       if (this.isInstanceOf[HydroReactComponent.Stateless])
         step1.stateless.asInstanceOf[Builder.Step2[Props, State]]
-      else step1.initialState[State](config.initialState)
+      else step1.initialStateFromProps[State](config.initialStateFromProps)
     val step3: Builder.Step3[Props, State, Backend] = step2.backend(config.backendConstructor)
     var step4: Builder.Step4[Props, Children.None, State, Backend] =
       step3.renderPS((scope, props, state) => scope.backend.render(props, state))
@@ -144,19 +146,42 @@ abstract class HydroReactComponent {
   }
 
   case class StateStoresDependency(store: StateStore[_], stateUpdate: State => State)
-  case class ComponentConfig(
-      backendConstructor: BackendScope[Props, State] => Backend,
-      initialState: State,
-      componentName: String = HydroReactComponent.this.getClass.getSimpleName,
-      stateStoresDependencies: Seq[Props => StateStoresDependency] = Seq(),
+  class ComponentConfig(
+      val backendConstructor: BackendScope[Props, State] => Backend,
+      val initialStateFromProps: Props => State,
+      val componentName: String,
+      val stateStoresDependencies: Seq[Props => StateStoresDependency],
   ) {
     def withStateStoresDependency(store: StateStore[_], stateUpdate: State => State): ComponentConfig =
       withStateStoresDependencyFromProps(_ => StateStoresDependency(store, stateUpdate))
 
     def withStateStoresDependencyFromProps(
         dependencyFromProps: Props => StateStoresDependency
-    ): ComponentConfig =
-      copy(stateStoresDependencies = stateStoresDependencies :+ dependencyFromProps)
+    ): ComponentConfig = {
+      new ComponentConfig(
+        backendConstructor = backendConstructor,
+        initialStateFromProps = initialStateFromProps,
+        componentName = componentName,
+        stateStoresDependencies = stateStoresDependencies :+ dependencyFromProps,
+      )
+    }
+  }
+  object ComponentConfig {
+    def apply(
+        backendConstructor: BackendScope[Props, State] => Backend,
+        initialState: State = null.asInstanceOf[State],
+        initialStateFromProps: Props => State = null,
+        componentName: String = HydroReactComponent.this.getClass.getSimpleName,
+        stateStoresDependencies: Seq[Props => StateStoresDependency] = Seq(),
+    ): ComponentConfig = {
+      new ComponentConfig(
+        backendConstructor = backendConstructor,
+        initialStateFromProps =
+          Option(initialState).map(s => (_: Props) => s) getOrElse checkNotNull(initialStateFromProps),
+        componentName = componentName,
+        stateStoresDependencies = stateStoresDependencies,
+      )
+    }
   }
 }
 object HydroReactComponent {
