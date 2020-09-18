@@ -1,12 +1,12 @@
 package app.flux.router
 
-import hydro.common.I18n
 import app.models.accounting.BalanceCheck
 import app.models.accounting.config.Account
 import app.models.accounting.config.MoneyReservoir
 import app.models.accounting.config.Template
-import hydro.flux.router.Page.PageBase
+import hydro.common.I18n
 import hydro.flux.router.Page
+import hydro.flux.router.Page.PageBase
 import hydro.flux.router.RouterContext
 import hydro.models.access.EntityAccess
 import japgolly.scalajs.react.extra.router.Path
@@ -48,7 +48,6 @@ object AppPages {
   case object Liquidation extends PageBase("app.liquidation", iconClass = "icon-balance-scale")
   case object Endowments extends PageBase("app.endowments", iconClass = "icon-crown")
   case object Summary extends PageBase("app.summary", iconClass = "icon-table")
-  case object Charts extends PageBase("app.charts", iconClass = "fa fa-bar-chart-o")
   case object TemplateList extends PageBase("app.templates", iconClass = "icon-template")
 
   // **************** Accounting forms - transactions **************** //
@@ -170,5 +169,18 @@ object AppPages {
   object EditBalanceCheck {
     def apply(balanceCheck: BalanceCheck)(implicit routerContext: RouterContext): EditBalanceCheck =
       EditBalanceCheck(balanceCheck.id, HasReturnTo.getCurrentEncodedPath)
+  }
+
+  // **************** Charts **************** //
+  case class Charts private (encodedChartSpecs: String) extends PageBase("app.charts", iconClass = "fa fa-bar-chart-o") {
+    def stringifiedChartSpecs: String = {
+      js.URIUtils.decodeURIComponent(js.URIUtils.decodeURI(encodedChartSpecs))
+    }
+  }
+  object Charts {
+
+    def fromInput(stringifiedChartSpecs: String): Charts = {
+      new Charts(js.URIUtils.encodeURIComponent(stringifiedChartSpecs))
+    }
   }
 }
