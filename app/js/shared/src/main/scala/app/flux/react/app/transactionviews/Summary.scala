@@ -13,54 +13,50 @@ import hydro.common.JsLoggingUtils.logExceptions
 import hydro.common.time.Clock
 import hydro.flux.react.uielements.PageHeader
 import hydro.flux.react.uielements.input.TextInput
+import hydro.flux.react.HydroReactComponent
 import hydro.flux.router.RouterContext
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
 
-final class Summary(implicit summaryTable: SummaryTable,
-                    entityAccess: AppJsEntityAccess,
-                    user: User,
-                    clock: Clock,
-                    accountingConfig: Config,
-                    exchangeRateManager: ExchangeRateManager,
-                    i18n: I18n,
-                    pageHeader: PageHeader,
-) {
+final class Summary(
+  implicit summaryTable: SummaryTable,
+  entityAccess: AppJsEntityAccess,
+  user: User,
+  clock: Clock,
+  accountingConfig: Config,
+  exchangeRateManager: ExchangeRateManager,
+  i18n: I18n,
+  pageHeader: PageHeader,
+) extends HydroReactComponent {
 
-  private val component = ScalaComponent
-    .builder[Props](getClass.getSimpleName)
-    .initialState(
-      State(
-        includeUnrelatedAccounts = false,
-        query = "",
-        yearLowerBound = clock.now.getYear - 1,
-        expandedYear = clock.now.getYear,
-        showYearlyTotal = false,
-      ))
-    .renderBackend[Backend]
-    .build
 
   // **************** API ****************//
   def apply(router: RouterContext): VdomElement = {
     component(Props(router))
   }
 
+  // **************** Implementation of HydroReactComponent methods ****************//
+  override protected val config = ComponentConfig(backendConstructor = new Backend(_), initialState = State(
+    yearLowerBound = clock.now.getYear - 1,
+    expandedYear = clock.now.getYear,
+  ))
+
   // **************** Private inner types ****************//
-  private case class Props(router: RouterContext)
-  private case class State(
-      includeUnrelatedAccounts: Boolean,
-      query: String,
+  protected case class Props(router: RouterContext)
+  protected case class State(
+      includeUnrelatedAccounts: Boolean = false,
+      query: String = "",
       yearLowerBound: Int,
       expandedYear: Int,
-      showYearlyTotal: Boolean, // instead of average
+      showYearlyTotal: Boolean = false, // instead of average
   )
 
-  private class Backend(val $ : BackendScope[Props, State]) {
+  protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
     private val queryInputRef = TextInput.ref()
 
-    def render(props: Props, state: State) = logExceptions {
+    override def render(props: Props, state: State) = logExceptions {
       implicit val router = props.router
       <.span(
         pageHeader.withExtension(router.currentPage)(
