@@ -68,7 +68,7 @@ final class ChartStoreFactory(implicit
                 beneficiaryAccountCode = reservoir.owner.code,
                 moneyReservoirCode = reservoir.code,
                 categoryCode = "Exchange",
-                description = "",
+                description = "Exchange rate gains",
                 flowInCents = 0,
                 createdDate = LocalDateTime.MIN,
                 transactionDate = LocalDateTime.MIN,
