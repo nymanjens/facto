@@ -1,7 +1,10 @@
 package app.flux.react.app.transactionviews
 
+import app.common.money.Currency
+
 import scala.collection.immutable.Seq
 import app.common.money.ExchangeRateManager
+import app.common.money.Money
 import app.common.money.ReferenceMoney
 import app.common.time.DatedMonth
 import app.flux.react.app.transactionviews.ChartSpecInput.ChartSpec
@@ -93,26 +96,25 @@ final class Chart(implicit
         ),
         // **************** Chart **************** //
         <.div(
-          ^.style := js.Dictionary("maxWidth" -> "1300px"),
-          Recharts.ResponsiveContainer(width = "100%", height = 350)(
+          Recharts.ResponsiveContainer(width = "100%", height = 450)(
             Recharts.LineChart(
               data = assembleData(),
-              margin = Recharts.Margin(top = 5, right = 20, left = 0, bottom = 35),
+              margin = Recharts.Margin(top = 5, right = 20, left = 50, bottom = 35),
             )(
               Recharts.CartesianGrid(strokeDasharray = "3 3", vertical = false),
               Recharts.XAxis(dataKey = "month"),
-              Recharts.YAxis(),
-              Recharts.Tooltip(),
+              Recharts.YAxis(tickFormatter = formatDoubleMoney(roundToInteger = true)),
+              Recharts.Tooltip(formatter = formatDoubleMoney()),
               Recharts.Legend(),
               (for ((line, lineIndex) <- props.chartSpec.lines.zipWithIndex)
                 yield Recharts.Line(
-                  key = s"line_$lineIndex",
+                  key = lineName(line, lineIndex),
                   tpe = "linear",
-                  dataKey = s"line_$lineIndex",
+                  dataKey = lineName(line, lineIndex),
                   stroke = "blue",
                 )).toVdomArray,
             )
-          ),
+          )
         ),
       )
     }
@@ -127,7 +129,7 @@ final class Chart(implicit
           Map[String, js.Any](
             "month" -> s"${month.abbreviation} ${month.year}"
           ) ++ props.chartSpec.lines.zipWithIndex.map { case (line, lineIndex) =>
-            s"line_$lineIndex" -> (state
+            lineName(line, lineIndex) -> (state
               .lineToPoints(line)
               .points
               .getOrElse(month, ReferenceMoney(0))
@@ -135,6 +137,17 @@ final class Chart(implicit
           }
         }
       }
+    }
+
+    private def lineName(line: Line, lineIndex: Int): String = {
+      s"Graph ${lineIndex + 1}: '${line.query}'"
+    }
+
+    private def formatDoubleMoney(roundToInteger: Boolean = false)(amount: Any): String = {
+      val money = ReferenceMoney(Money.floatToCents(amount.asInstanceOf[Double]))
+      val moneyString = if (roundToInteger) money.formatFloat.dropRight(3) else money.formatFloat
+      val nonBreakingSpace = "\u00A0"
+      s"${money.currency.symbol}${nonBreakingSpace}$moneyString"
     }
   }
 }

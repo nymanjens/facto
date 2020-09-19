@@ -76,14 +76,14 @@ object Recharts {
     )
   }
 
-  def YAxis() = {
+  def YAxis(tickFormatter: Function1[Any, String]) = {
     val component = JsComponent[js.Object, Children.None, Null](YAxisComponent)
-    component(js.Dynamic.literal())
+    component(js.Dynamic.literal(tickFormatter = tickFormatter))
   }
 
-  def Tooltip() = {
+  def Tooltip(formatter: Function1[Any, String]) = {
     val component = JsComponent[js.Object, Children.None, Null](TooltipComponent)
-    component(js.Dynamic.literal())
+    component(js.Dynamic.literal(formatter = formatter))
   }
 
   def Legend() = {
