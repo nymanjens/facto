@@ -13,8 +13,8 @@ object ChartSpecInputTest extends TestSuite {
         def testRoundTrip(chartSpec: ChartSpec) = {
           ChartSpec.parseStringified(chartSpec.stringify) ==> chartSpec
         }
-        "empty" - {
-          testRoundTrip(ChartSpec.empty)
+        "singleEmptyLine" - {
+          testRoundTrip(ChartSpec.singleEmptyLine)
         }
         "single empty line" - {
           testRoundTrip(ChartSpec(Seq(Line())))

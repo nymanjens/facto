@@ -19,6 +19,7 @@ import hydro.flux.react.ReactVdomUtils.^^
 import hydro.flux.react.uielements.Bootstrap.Size
 import hydro.flux.react.uielements.Bootstrap.Variant
 import hydro.flux.react.uielements.Panel
+import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.router.RouterContext
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
@@ -97,10 +98,12 @@ final class ChartSpecInput(implicit
               )
             ),
             <.td(
-              Bootstrap.Button(Variant.info, Size.xs, tag = <.a)(
-                Bootstrap.FontAwesomeIcon("times"),
-                ^.onClick --> props.notifyUpdatedChartSpec(_.withRemovedLine(lineIndex)),
-              )
+              <<.ifThen(lineIndex > 0) {
+                Bootstrap.Button(Variant.info, Size.xs, tag = <.a)(
+                  Bootstrap.FontAwesomeIcon("times"),
+                  ^.onClick --> props.notifyUpdatedChartSpec(_.withRemovedLine(lineIndex)),
+                )
+              }
             ),
           )
         )
@@ -192,12 +195,13 @@ object ChartSpecInput {
     }
   }
   object ChartSpec {
-    val empty = ChartSpec(lines = Seq())
+    val singleEmptyLine = ChartSpec(lines = Seq(Line()))
 
     private val lineDelimiter = "~~"
 
     def parseStringified(string: String): ChartSpec = {
-      ChartSpec(string.split(lineDelimiter).filter(_.nonEmpty).map(Line.parseStringified).toVector)
+      val lines = string.split(lineDelimiter).filter(_.nonEmpty).map(Line.parseStringified).toVector
+      if (lines.nonEmpty) ChartSpec(lines) else ChartSpec.singleEmptyLine
     }
   }
 
