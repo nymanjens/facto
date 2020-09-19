@@ -181,9 +181,9 @@ object AppPages {
   }
   object Chart {
 
-    val empty: Chart = Chart.fromInput("")
+    val empty: Chart = Chart.fromStringifiedChartSpec("")
 
-    def fromInput(stringifiedChartSpecs: String): Chart = {
+    def fromStringifiedChartSpec(stringifiedChartSpecs: String): Chart = {
       new Chart(
         // Translate empty string to something else so that the URL is always parsable
         if (stringifiedChartSpecs.isEmpty) "-"

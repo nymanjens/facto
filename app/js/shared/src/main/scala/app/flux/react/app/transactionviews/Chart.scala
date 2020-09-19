@@ -58,7 +58,7 @@ final class Chart(implicit
           chartSpecInput(
             chartSpec = props.chartSpec,
             onChartSpecUpdate = newChartSpec => {
-              router.setPage(AppPages.Chart.fromInput(newChartSpec.stringify))
+              router.setPage(AppPages.Chart.fromStringifiedChartSpec(newChartSpec.stringify))
               Callback.empty
             },
           )
