@@ -82,7 +82,7 @@ final class ChartStoreFactory(implicit
     }
   }
 
-  override def createNew(queryString: Input): Store = {
+  override protected def createNew(queryString: Input): Store = {
     val filterFromQuery = complexQueryFilter.fromQuery(queryString)
     new Store(
       filterFromQuery,
