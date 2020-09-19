@@ -1,17 +1,11 @@
 package app.flux.stores.entries.factories
 
 import app.common.money.ExchangeRateManager
-
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala.async.Async.async
-import scala.async.Async.await
 import app.common.money.ReferenceMoney
 import app.common.time.DatedMonth
 import app.flux.stores.entries.ComplexQueryFilter
 import app.flux.stores.entries.factories.ChartStoreFactory.LinePoints
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForYear
-import app.flux.stores.entries.GeneralEntry
-import app.models.access.AppDbQuerySorting
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Config
 import app.models.accounting.Transaction
@@ -23,9 +17,11 @@ import hydro.flux.stores.StoreFactory
 import hydro.models.access.DbQuery
 import hydro.models.modification.EntityModification
 
+import scala.async.Async.async
+import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
-import scala.util.Random
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 /**
   * Store factory that calculates the points on a graph based on a search query. This includes exchange rate gains.
