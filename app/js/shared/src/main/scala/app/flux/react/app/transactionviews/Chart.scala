@@ -45,6 +45,9 @@ final class Chart(implicit
     chartStoreFactory: ChartStoreFactory,
 ) extends HydroReactComponent {
 
+  private val lineColors: Seq[String] =
+    Seq("purple","orange", "green", "deeppink", "#DD0", "fuchsia", "red", "blue")
+
   // **************** API ****************//
   def apply(stringifiedChartSpecs: String, router: RouterContext): VdomElement = {
     component(
@@ -119,7 +122,7 @@ final class Chart(implicit
                   key = lineName(line, lineIndex),
                   tpe = "linear",
                   dataKey = lineName(line, lineIndex),
-                  stroke = "blue",
+                  stroke = lineColors(lineIndex % lineColors.size),
                 )).toVdomArray,
             )
           )
