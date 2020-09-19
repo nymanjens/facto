@@ -46,7 +46,7 @@ final class Chart(implicit
 ) extends HydroReactComponent {
 
   private val lineColors: Seq[String] =
-    Seq("purple","orange", "green", "deeppink", "#DD0", "fuchsia", "red", "blue")
+    Seq("purple", "orange", "green", "deeppink", "#DD0", "fuchsia", "red", "blue")
 
   // **************** API ****************//
   def apply(stringifiedChartSpecs: String, router: RouterContext): VdomElement = {
@@ -135,11 +135,15 @@ final class Chart(implicit
         Map[String, js.Any](
           "month" -> formatMonth(month)
         ) ++ props.chartSpec.lines.zipWithIndex.map { case (line, lineIndex) =>
-          lineName(line, lineIndex) -> (state
-            .lineToPoints(line)
-            .points
-            .getOrElse(month, ReferenceMoney(0))
-            .toDouble: js.Any)
+          lineName(line, lineIndex) -> {
+            val amount =
+              state
+                .lineToPoints(line)
+                .points
+                .getOrElse(month, ReferenceMoney(0))
+                .toDouble
+            (if (line.inverted) -amount else amount): js.Any
+          }
         }
       }
     }
