@@ -59,7 +59,7 @@ final class ChartSpecInput(implicit
           Table(
             tableClasses = Seq("table-chart-spec"),
             tableHeaders = Seq(
-              <.th(i18n("app.query")),
+              <.th(i18n("app.query"), ^.width := "100%"),
               <.th(i18n("app.inverted")),
               <.th(i18n("app.cumulative")),
               <.th(),
