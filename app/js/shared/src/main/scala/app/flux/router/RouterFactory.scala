@@ -136,7 +136,7 @@ private[router] final class RouterFactory(implicit
           }
 
           | dynamicRuleFromPage(_ ~ query.caseClass[AppPages.Chart]) { (page, ctl) =>
-            reactAppModule.chart(page.stringifiedChartSpecs, ctl)
+            reactAppModule.chart(page.stringifiedChartSpec, ctl)
           }
 
         // Fallback

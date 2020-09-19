@@ -174,7 +174,7 @@ object AppPages {
   // **************** Chart **************** //
   case class Chart private (encodedChartSpecs: String)
       extends PageBase("app.chart", iconClass = "fa fa-bar-chart-o") {
-    def stringifiedChartSpecs: String = {
+    def stringifiedChartSpec: String = {
       if (encodedChartSpecs == "-") ""
       else js.URIUtils.decodeURIComponent(js.URIUtils.decodeURI(encodedChartSpecs))
     }
@@ -183,11 +183,11 @@ object AppPages {
 
     val empty: Chart = Chart.fromStringifiedChartSpec("")
 
-    def fromStringifiedChartSpec(stringifiedChartSpecs: String): Chart = {
+    def fromStringifiedChartSpec(stringifiedChartSpec: String): Chart = {
       new Chart(
         // Translate empty string to something else so that the URL is always parsable
-        if (stringifiedChartSpecs.isEmpty) "-"
-        else js.URIUtils.encodeURIComponent(stringifiedChartSpecs)
+        if (stringifiedChartSpec.isEmpty) "-"
+        else js.URIUtils.encodeURIComponent(stringifiedChartSpec)
       )
     }
   }
