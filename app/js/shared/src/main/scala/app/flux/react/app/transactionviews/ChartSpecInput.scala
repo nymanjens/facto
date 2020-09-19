@@ -46,7 +46,7 @@ final class ChartSpecInput(implicit
       onChartSpecUpdate: ChartSpec => Callback,
   ) {
     def notifyUpdatedChartSpec(modification: ChartSpec => ChartSpec): Callback = {
-      onChartSpecUpdate(modification(modification(chartSpec)))
+      onChartSpecUpdate(modification(chartSpec))
     }
   }
 
