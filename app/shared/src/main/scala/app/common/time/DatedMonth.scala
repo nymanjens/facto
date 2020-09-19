@@ -9,6 +9,7 @@ import hydro.common.time.LocalDateTime
 import hydro.common.time.TimeUtils
 
 import scala.collection.immutable.Seq
+import scala.collection.mutable
 
 case class DatedMonth(startDate: LocalDate) extends Ordered[DatedMonth] {
   TimeUtils.requireStartOfMonth(startDate)
@@ -65,9 +66,18 @@ object DatedMonth {
   def containing(dateTime: LocalDateTime): DatedMonth = containing(dateTime.toLocalDate)
 
   def allMonthsIn(year: Int): Seq[DatedMonth] = {
-    Month.values()
     for (month <- TimeUtils.allMonths)
       yield DatedMonth(LocalDate.of(year, month, 1))
+  }
+
+  def monthsInClosedRange(start: DatedMonth, endInclusive: DatedMonth): Seq[DatedMonth] = {
+    val resultBuilder = mutable.Buffer[DatedMonth]()
+    var cursor = start
+    while (cursor <= endInclusive) {
+      resultBuilder.append(cursor)
+      cursor = DatedMonth(cursor.startDateOfNextMonth)
+    }
+    resultBuilder.toVector
   }
 
   private def startOfMonthContaining(date: LocalDate): LocalDate = {

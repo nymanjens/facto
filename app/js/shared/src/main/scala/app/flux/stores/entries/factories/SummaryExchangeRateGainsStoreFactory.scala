@@ -23,6 +23,7 @@ import hydro.common.time.LocalDateTime
 import hydro.models.access.DbQueryImplicits._
 import hydro.models.access.DbQuery
 import hydro.models.access.ModelField
+import hydro.models.Entity
 
 import scala.async.Async.async
 import scala.async.Async.await
@@ -33,7 +34,7 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 /**
-  * Store factory that calculates the monthly gains and losses made by exchange rate fluctuations in a given year.
+  * Store factory that calculates the monthly gains and losses made by exchange rate fluctuations.
   */
 final class SummaryExchangeRateGainsStoreFactory(implicit
     entityAccess: AppJsEntityAccess,
@@ -43,8 +44,8 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
 ) extends EntriesStoreFactory[GainsForYear] {
 
   // **************** Public API ****************//
-  def get(account: Account, year: Int): Store =
-    get(Input(account = account, year = year))
+  def get(account: Account = null, year: Int = -1): Store =
+    get(Input(account = Option(account), year = if (year == -1) None else Some(year)))
 
   // **************** Implementation of EntriesStoreFactory methods/types ****************//
   override protected def createNew(input: Input) = new Store {
@@ -59,25 +60,30 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
       }
     }
 
-    override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) =
-      isRelevantReservoir(transaction.moneyReservoir) && transaction.transactionDate.getYear <= input.year
-    override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) =
-      isRelevantReservoir(balanceCheck.moneyReservoir) && balanceCheck.checkDate.getYear <= input.year
+    override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) = {
+      isRelevantReservoir(transaction.moneyReservoir) &&
+      (input.year.isEmpty || transaction.transactionDate.getYear <= input.year.get)
+    }
+    override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) = {
+      isRelevantReservoir(balanceCheck.moneyReservoir) &&
+      (input.year.isEmpty || balanceCheck.checkDate.getYear <= input.year.get)
+    }
 
     // **************** Private helper methods ****************//
     private def calculateGainsForYear(reservoir: MoneyReservoir): Future[GainsForYear] = async {
-      val monthsInYear = DatedMonth.allMonthsIn(input.year)
-
-      val oldestRelevantBalanceCheck: Option[BalanceCheck] =
-        await(
-          entityAccess
-            .newQuery[BalanceCheck]()
-            .filter(ModelFields.BalanceCheck.moneyReservoirCode === reservoir.code)
-            .filter(ModelFields.BalanceCheck.checkDate < monthsInYear.head.startTime)
-            .sort(AppDbQuerySorting.BalanceCheck.deterministicallyByCheckDate.reversed)
-            .limit(1)
-            .data()
-        ).headOption
+      val oldestRelevantBalanceCheck: Option[BalanceCheck] = input.year match {
+        case None => None
+        case Some(year) =>
+          await(
+            entityAccess
+              .newQuery[BalanceCheck]()
+              .filter(ModelFields.BalanceCheck.moneyReservoirCode === reservoir.code)
+              .filter(ModelFields.BalanceCheck.checkDate < DatedMonth.allMonthsIn(year).head.startTime)
+              .sort(AppDbQuerySorting.BalanceCheck.deterministicallyByCheckDate.reversed)
+              .limit(1)
+              .data()
+          ).headOption
+      }
       val oldestBalanceDate = oldestRelevantBalanceCheck.map(_.checkDate).getOrElse(LocalDateTime.MIN)
       val initialBalance =
         oldestRelevantBalanceCheck.map(_.balance).getOrElse(MoneyWithGeneralCurrency(0, reservoir.currency))
@@ -87,11 +93,15 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
           .newQuery[BalanceCheck]()
           .filter(ModelFields.BalanceCheck.moneyReservoirCode === reservoir.code)
           .filter(
-            filterInRange(
-              ModelFields.BalanceCheck.checkDate,
-              oldestBalanceDate,
-              monthsInYear.last.startTimeOfNextMonth,
-            )
+            input.year match {
+              case None => DbQuery.Filter.NullFilter()
+              case Some(year) =>
+                filterInRange(
+                  ModelFields.BalanceCheck.checkDate,
+                  oldestBalanceDate,
+                  DatedMonth.allMonthsIn(year).last.startTimeOfNextMonth,
+                )
+            }
           )
           .data()
 
@@ -100,22 +110,26 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
           .newQuery[Transaction]()
           .filter(ModelFields.Transaction.moneyReservoirCode === reservoir.code)
           .filter(
-            filterInRange(
-              ModelFields.Transaction.transactionDate,
-              oldestBalanceDate,
-              monthsInYear.last.startTimeOfNextMonth,
-            )
+            input.year match {
+              case None => DbQuery.Filter.NullFilter()
+              case Some(year) =>
+                filterInRange(
+                  ModelFields.Transaction.transactionDate,
+                  oldestBalanceDate,
+                  DatedMonth.allMonthsIn(year).last.startTimeOfNextMonth,
+                )
+            }
           )
           .data()
       val balanceChecks: Seq[BalanceCheck] = await(balanceChecksFuture)
       val transactions: Seq[Transaction] = await(transactionsFuture)
 
+      val mergedRows: Seq[Entity] = (transactions ++ balanceChecks).sortBy {
+        case trans: Transaction => (trans.transactionDate, trans.createdDate)
+        case bc: BalanceCheck   => (bc.checkDate, bc.createdDate)
+      }
       val dateToBalanceFunction: DateToBalanceFunction = {
         val builder = new DateToBalanceFunction.Builder(oldestBalanceDate, initialBalance)
-        val mergedRows = (transactions ++ balanceChecks).sortBy {
-          case trans: Transaction => (trans.transactionDate, trans.createdDate)
-          case bc: BalanceCheck   => (bc.checkDate, bc.createdDate)
-        }
         mergedRows.foreach {
           case transaction: Transaction =>
             builder.incrementLatestBalance(transaction.transactionDate, transaction.flow)
@@ -125,8 +139,27 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
         builder.result
       }
 
+      val monthsInPeriod: Seq[DatedMonth] = input.year match {
+        case Some(year) => DatedMonth.allMonthsIn(year)
+        case None =>
+          mergedRows match {
+            case Seq() => Seq()
+            case _ =>
+              def entityToDate(entity: Entity): LocalDateTime = {
+                entity match {
+                  case trans: Transaction => trans.transactionDate
+                  case bc: BalanceCheck   => bc.checkDate
+                }
+              }
+              DatedMonth.monthsInClosedRange(
+                DatedMonth.containing(entityToDate(mergedRows.head)),
+                DatedMonth.containing(entityToDate(mergedRows.last)),
+              )
+          }
+      }
+
       GainsForYear(
-        monthToGains = monthsInYear.map { month =>
+        monthToGains = monthsInPeriod.map { month =>
           val gain: ReferenceMoney = {
             def gainFromMoney(date: LocalDateTime, amount: MoneyWithGeneralCurrency): ReferenceMoney = {
               val valueAtDate = amount.withDate(date).exchangedForReferenceCurrency
@@ -151,9 +184,16 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
       )
     }
 
-    private def isRelevantReservoir(reservoir: MoneyReservoir): Boolean =
-      reservoir.owner == input.account && reservoir.currency.isForeign
+    private def isRelevantReservoir(reservoir: MoneyReservoir): Boolean = {
+      isRelevantAccount(reservoir.owner) && reservoir.currency.isForeign
+    }
 
+    private def isRelevantAccount(account: Account): Boolean = {
+      input.account match {
+        case None    => true
+        case Some(a) => account == a
+      }
+    }
     private def filterInRange[E](
         field: ModelField[LocalDateTime, E],
         start: LocalDateTime,
@@ -164,7 +204,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
   }
 
   /* override */
-  protected case class Input(account: Account, year: Int)
+  protected case class Input(account: Option[Account], year: Option[Int])
 }
 
 object SummaryExchangeRateGainsStoreFactory {
