@@ -18,6 +18,7 @@ import hydro.flux.react.uielements.Table
 import hydro.flux.react.ReactVdomUtils.^^
 import hydro.flux.react.uielements.Bootstrap.Size
 import hydro.flux.react.uielements.Bootstrap.Variant
+import hydro.flux.react.uielements.Panel
 import hydro.flux.router.RouterContext
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
@@ -53,7 +54,7 @@ final class ChartSpecInput(implicit
 
     override def render(props: Props, state: State) = logExceptions {
       implicit val _: Props = props
-      HalfPanel(title = <.span(i18n("app.graph-lines"))) {
+      Panel(title = i18n("app.graph-lines"), lg = 9) {
         <.span(
           Table(
             tableClasses = Seq("table-chart-spec"),
