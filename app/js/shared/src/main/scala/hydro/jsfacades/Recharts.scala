@@ -85,7 +85,7 @@ object Recharts {
 
   def Tooltip(formatter: Function1[Any, String]) = {
     val component = JsComponent[js.Object, Children.None, Null](TooltipComponent)
-    component(js.Dynamic.literal(formatter = formatter))
+    component(js.Dynamic.literal(formatter = formatter, isAnimationActive = false))
   }
 
   def Legend() = {

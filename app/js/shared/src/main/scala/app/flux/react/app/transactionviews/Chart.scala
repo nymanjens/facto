@@ -106,7 +106,7 @@ final class Chart(implicit
           Recharts.ResponsiveContainer(width = "100%", height = 450)(
             Recharts.LineChart(
               data = assembleData(),
-              margin = Recharts.Margin(top = 5, right = 100, left = 50, bottom = 35),
+              margin = Recharts.Margin(top = 5, right = 50, left = 50, bottom = 35),
             )(
               Recharts.CartesianGrid(strokeDasharray = "3 3", vertical = false),
               Recharts.XAxis(
@@ -143,7 +143,7 @@ final class Chart(implicit
                 .points
                 .getOrElse(month, ReferenceMoney(0))
             val result = {
-              if(line.cumulative) {
+              if (line.cumulative) {
                 val newCumulativeAmount = cumulativeMap(line) + amount
                 cumulativeMap.put(line, newCumulativeAmount)
                 newCumulativeAmount
