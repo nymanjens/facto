@@ -2,6 +2,8 @@ package app.flux.react.app.transactionviews
 
 import scala.collection.immutable.Seq
 import app.common.money.ExchangeRateManager
+import app.common.money.ReferenceMoney
+import app.common.time.DatedMonth
 import app.flux.react.app.transactionviews.ChartSpecInput.ChartSpec
 import app.flux.react.app.transactionviews.ChartSpecInput.Line
 import app.flux.router.AppPages
@@ -17,8 +19,11 @@ import hydro.flux.react.uielements.PageHeader
 import hydro.flux.react.HydroReactComponent
 import hydro.flux.react.uielements.Bootstrap
 import hydro.flux.router.RouterContext
+import hydro.jsfacades.Recharts
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
+
+import scala.scalajs.js
 
 final class Chart(implicit
     summaryTable: SummaryTable,
@@ -71,9 +76,12 @@ final class Chart(implicit
 
     override def render(props: Props, state: State) = logExceptions {
       implicit val router = props.router
+      implicit val _ = props
+      implicit val __ = state
       <.span(
         ^.className := "charts-page",
         pageHeader(router.currentPage),
+        // **************** Chartspec **************** //
         Bootstrap.Row(
           chartSpecInput(
             chartSpec = props.chartSpec,
@@ -83,7 +91,50 @@ final class Chart(implicit
             },
           )
         ),
+        // **************** Chart **************** //
+        <.div(
+          ^.style := js.Dictionary("maxWidth" -> "1300px"),
+          Recharts.ResponsiveContainer(width = "100%", height = 350)(
+            Recharts.LineChart(
+              data = assembleData(),
+              margin = Recharts.Margin(top = 5, right = 20, left = 0, bottom = 35),
+            )(
+              Recharts.CartesianGrid(strokeDasharray = "3 3", vertical = false),
+              Recharts.XAxis(dataKey = "month"),
+              Recharts.YAxis(),
+              Recharts.Tooltip(),
+              Recharts.Legend(),
+              (for ((line, lineIndex) <- props.chartSpec.lines.zipWithIndex)
+                yield Recharts.Line(
+                  key = s"line_$lineIndex",
+                  tpe = "linear",
+                  dataKey = s"line_$lineIndex",
+                  stroke = "blue",
+                )).toVdomArray,
+            )
+          ),
+        ),
       )
+    }
+
+    private def assembleData()(implicit props: Props, state: State): Seq[Map[String, js.Any]] = {
+      val allDatesWithData = state.lineToPoints.flatMap(_._2.points.keySet)
+      if (allDatesWithData.isEmpty) {
+        Seq()
+      } else {
+        val dates = DatedMonth.monthsInClosedRange(allDatesWithData.min, allDatesWithData.max)
+        for (month <- dates) yield {
+          Map[String, js.Any](
+            "month" -> s"${month.abbreviation} ${month.year}"
+          ) ++ props.chartSpec.lines.zipWithIndex.map { case (line, lineIndex) =>
+            s"line_$lineIndex" -> (state
+              .lineToPoints(line)
+              .points
+              .getOrElse(month, ReferenceMoney(0))
+              .toDouble: js.Any)
+          }
+        }
+      }
     }
   }
 }
