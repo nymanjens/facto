@@ -70,11 +70,11 @@ abstract class HydroReactComponent {
             )
         )
     }
-    if (config.stateStoresDependencies.nonEmpty) {
+    if (config.maybeStateStoresDependencies.nonEmpty) {
       step4 = step4
         .componentWillMount { scope =>
           logExceptions {
-            for (StateStoresDependency(store, _) <- getStateStoresDependencies(scope.props)) {
+            for (StateStoresDependency(store, _) <- config.stateStoresDependencies(scope.props)) {
               store.register(scope.backend)
             }
             scope.backend.updateStateFromStoresCallback(scope.props)
@@ -85,7 +85,9 @@ abstract class HydroReactComponent {
             var anythingChanged = false
             for {
               (StateStoresDependency(oldStore, _), StateStoresDependency(newStore, _)) <-
-                getStateStoresDependencies(scope.currentProps) zip getStateStoresDependencies(scope.nextProps)
+                config.stateStoresDependencies(scope.currentProps) zip config.stateStoresDependencies(
+                  scope.nextProps
+                )
               if oldStore != newStore
             } {
               oldStore.deregister(scope.backend)
@@ -101,18 +103,13 @@ abstract class HydroReactComponent {
         }
         .componentWillUnmount { scope =>
           LogExceptionsCallback {
-            for (StateStoresDependency(store, _) <- getStateStoresDependencies(scope.props)) {
+            for (StateStoresDependency(store, _) <- config.stateStoresDependencies(scope.props)) {
               store.deregister(scope.backend)
             }
           }
         }
     }
     step4.build
-  }
-
-  // **************** Private helper methods ****************//
-  private def getStateStoresDependencies(props: Props): Seq[StateStoresDependency] = {
-    config.stateStoresDependencies.map(_.apply(props))
   }
 
   // **************** Protected types ****************//
@@ -127,7 +124,7 @@ abstract class HydroReactComponent {
       $.modState(oldState =>
         logExceptions {
           var state = oldState
-          for (StateStoresDependency(_, stateUpdate) <- getStateStoresDependencies(props)) {
+          for (StateStoresDependency(_, stateUpdate) <- config.stateStoresDependencies(props)) {
             state = stateUpdate(state)
           }
           state
@@ -150,7 +147,7 @@ abstract class HydroReactComponent {
       val backendConstructor: BackendScope[Props, State] => Backend,
       val initialStateFromProps: Props => State,
       val componentName: String,
-      val stateStoresDependencies: Seq[Props => StateStoresDependency],
+      val maybeStateStoresDependencies: Option[Props => Seq[StateStoresDependency]],
   ) {
     def withStateStoresDependency(store: StateStore[_], stateUpdate: State => State): ComponentConfig =
       withStateStoresDependencyFromProps(_ => StateStoresDependency(store, stateUpdate))
@@ -162,8 +159,17 @@ abstract class HydroReactComponent {
         backendConstructor = backendConstructor,
         initialStateFromProps = initialStateFromProps,
         componentName = componentName,
-        stateStoresDependencies = stateStoresDependencies :+ dependencyFromProps,
+        maybeStateStoresDependencies = Some(props => {
+          stateStoresDependencies(props) :+ dependencyFromProps(props)
+        }),
       )
+    }
+
+    private[HydroReactComponent] def stateStoresDependencies(props: Props): Seq[StateStoresDependency] = {
+      maybeStateStoresDependencies match {
+        case None                      => Seq()
+        case Some(propsToDependencies) => propsToDependencies(props)
+      }
     }
   }
   object ComponentConfig {
@@ -172,14 +178,14 @@ abstract class HydroReactComponent {
         initialState: State = null.asInstanceOf[State],
         initialStateFromProps: Props => State = null,
         componentName: String = HydroReactComponent.this.getClass.getSimpleName,
-        stateStoresDependencies: Seq[Props => StateStoresDependency] = Seq(),
+        stateStoresDependencies: Option[Props => Seq[StateStoresDependency]] = None,
     ): ComponentConfig = {
       new ComponentConfig(
         backendConstructor = backendConstructor,
         initialStateFromProps =
           Option(initialState).map(s => (_: Props) => s) getOrElse checkNotNull(initialStateFromProps),
         componentName = componentName,
-        stateStoresDependencies = stateStoresDependencies,
+        maybeStateStoresDependencies = stateStoresDependencies,
       )
     }
   }
@@ -194,7 +200,7 @@ object HydroReactComponent {
       backendConstructor = statelessConfig.backendConstructor,
       initialState = (): Unit,
       componentName = statelessConfig.componentName,
-      stateStoresDependencies = Seq(),
+      stateStoresDependencies = None,
     )
 
     case class StatelessComponentConfig(
