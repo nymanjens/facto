@@ -19,6 +19,7 @@ trait Money {
   def currency: Currency
 
   final def formatFloat: String = Money.centsToFloatString(cents)
+  final def toDouble: Double = cents / 100.0
 
   final def withDate(date: LocalDateTime): DatedMoney = {
     DatedMoney(cents, currency, date)
