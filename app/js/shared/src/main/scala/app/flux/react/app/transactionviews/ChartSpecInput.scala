@@ -54,7 +54,7 @@ final class ChartSpecInput(implicit
 
     override def render(props: Props, state: State) = logExceptions {
       implicit val _: Props = props
-      Panel(title = i18n("app.graph-lines"), lg = 9) {
+      Panel(title = i18n("app.graph-lines"), lg = 8) {
         <.span(
           Table(
             tableClasses = Seq("table-chart-spec"),
