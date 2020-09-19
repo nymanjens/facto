@@ -67,11 +67,13 @@ object Recharts {
     )
   }
 
-  def XAxis(dataKey: String) = {
+  def XAxis(dataKey: String, tickFormatter: Function1[Any, String], ticks: js.Array[String]) = {
     val component = JsComponent[js.Object, Children.None, Null](XAxisComponent)
     component(
       js.Dynamic.literal(
-        dataKey = dataKey
+        dataKey = dataKey,
+        tickFormatter = tickFormatter,
+        ticks = ticks,
       )
     )
   }

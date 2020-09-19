@@ -1,5 +1,9 @@
 package app.flux.react.app.transactionviews
 
+import scala.scalajs.js.JSConverters._
+
+import java.time.Month
+
 import app.common.money.Currency
 
 import scala.collection.immutable.Seq
@@ -102,7 +106,11 @@ final class Chart(implicit
               margin = Recharts.Margin(top = 5, right = 20, left = 50, bottom = 35),
             )(
               Recharts.CartesianGrid(strokeDasharray = "3 3", vertical = false),
-              Recharts.XAxis(dataKey = "month"),
+              Recharts.XAxis(
+                dataKey = "month",
+                tickFormatter = s => s.toString.takeRight(4),
+                ticks = assembleAllJanuaries().toJSArray,
+              ),
               Recharts.YAxis(tickFormatter = formatDoubleMoney(roundToInteger = true)),
               Recharts.Tooltip(formatter = formatDoubleMoney()),
               Recharts.Legend(),
@@ -120,27 +128,38 @@ final class Chart(implicit
     }
 
     private def assembleData()(implicit props: Props, state: State): Seq[Map[String, js.Any]] = {
+      for (month <- getAllMonths()) yield {
+        Map[String, js.Any](
+          "month" -> formatMonth(month)
+        ) ++ props.chartSpec.lines.zipWithIndex.map { case (line, lineIndex) =>
+          lineName(line, lineIndex) -> (state
+            .lineToPoints(line)
+            .points
+            .getOrElse(month, ReferenceMoney(0))
+            .toDouble: js.Any)
+        }
+      }
+    }
+
+    private def assembleAllJanuaries()(implicit props: Props, state: State): Seq[String] = {
+      getAllMonths().filter(_.month == Month.JANUARY).map(formatMonth)
+    }
+
+    private def getAllMonths()(implicit props: Props, state: State): Seq[DatedMonth] = {
       val allDatesWithData = state.lineToPoints.flatMap(_._2.points.keySet)
       if (allDatesWithData.isEmpty) {
         Seq()
       } else {
-        val dates = DatedMonth.monthsInClosedRange(allDatesWithData.min, allDatesWithData.max)
-        for (month <- dates) yield {
-          Map[String, js.Any](
-            "month" -> s"${month.abbreviation} ${month.year}"
-          ) ++ props.chartSpec.lines.zipWithIndex.map { case (line, lineIndex) =>
-            lineName(line, lineIndex) -> (state
-              .lineToPoints(line)
-              .points
-              .getOrElse(month, ReferenceMoney(0))
-              .toDouble: js.Any)
-          }
-        }
+        DatedMonth.monthsInClosedRange(allDatesWithData.min, allDatesWithData.max)
       }
     }
 
     private def lineName(line: Line, lineIndex: Int): String = {
       s"Graph ${lineIndex + 1}: '${line.query}'"
+    }
+
+    private def formatMonth(month: DatedMonth): String = {
+      s"${month.abbreviation} ${month.year}"
     }
 
     private def formatDoubleMoney(roundToInteger: Boolean = false)(amount: Any): String = {
