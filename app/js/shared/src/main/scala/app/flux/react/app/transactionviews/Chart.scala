@@ -106,7 +106,7 @@ final class Chart(implicit
           Recharts.ResponsiveContainer(width = "100%", height = 450)(
             Recharts.LineChart(
               data = assembleData(),
-              margin = Recharts.Margin(top = 5, right = 50, left = 50, bottom = 35),
+              margin = Recharts.Margin(top = 5, right = 100, left = 50, bottom = 35),
             )(
               Recharts.CartesianGrid(strokeDasharray = "3 3", vertical = false),
               Recharts.XAxis(
