@@ -29,6 +29,7 @@ final class Module(implicit
     summaryForYearStoreFactory: SummaryForYearStoreFactory,
     summaryYearsStoreFactory: SummaryYearsStoreFactory,
     summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
+    chartStoreFactory: ChartStoreFactory,
     collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
     globalMessagesStore: GlobalMessagesStore,
     clock: Clock,

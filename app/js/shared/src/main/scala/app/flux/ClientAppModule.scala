@@ -52,6 +52,8 @@ final class ClientAppModule(implicit
   implicit private val summaryYearsStoreFactory = fluxStoresModule.summaryYearsStoreFactory
   implicit private val summaryExchangeRateGainsStoreFactory =
     fluxStoresModule.summaryExchangeRateGainsStoreFactory
+  implicit private val chartStoreFactory =
+    fluxStoresModule.chartStoreFactory
   implicit private val collapsedExpandedStateStoreFactory =
     fluxStoresModule.collapsedExpandedStateStoreFactory
   implicit private val globalMessagesStore = fluxStoresModule.globalMessagesStore

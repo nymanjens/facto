@@ -43,6 +43,7 @@ final class Module(implicit
   implicit val summaryForYearStoreFactory = new SummaryForYearStoreFactory
   implicit val summaryYearsStoreFactory = new SummaryYearsStoreFactory
   implicit val summaryExchangeRateGainsStoreFactory = new SummaryExchangeRateGainsStoreFactory
+  implicit val chartStoreFactory = new ChartStoreFactory
   implicit val collapsedExpandedStateStoreFactory = new CollapsedExpandedStateStoreFactory
   implicit val globalMessagesStore = new GlobalMessagesStore
   implicit val pageLoadingStateStore = new PageLoadingStateStore
