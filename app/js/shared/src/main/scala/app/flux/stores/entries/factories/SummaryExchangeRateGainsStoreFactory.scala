@@ -215,7 +215,7 @@ object SummaryExchangeRateGainsStoreFactory {
   }
 
   case class GainsForYear(
-      private val monthToGains: Map[DatedMonth, GainsForMonth],
+      monthToGains: Map[DatedMonth, GainsForMonth],
       protected override val impactingTransactionIds: Set[Long],
       protected override val impactingBalanceCheckIds: Set[Long],
   ) extends EntriesStore.StateTrait {
@@ -234,7 +234,7 @@ object SummaryExchangeRateGainsStoreFactory {
     )
   }
 
-  case class GainsForMonth private (private val reservoirToGains: Map[MoneyReservoir, ReferenceMoney]) {
+  case class GainsForMonth private (reservoirToGains: Map[MoneyReservoir, ReferenceMoney]) {
     reservoirToGains.values.foreach(gain => require(!gain.isZero))
 
     lazy val total: ReferenceMoney = reservoirToGains.values.sum
