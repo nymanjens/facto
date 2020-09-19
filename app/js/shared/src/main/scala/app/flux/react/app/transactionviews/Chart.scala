@@ -1,7 +1,6 @@
 package app.flux.react.app.transactionviews
 
 import scala.scalajs.js.JSConverters._
-
 import java.time.Month
 
 import app.common.money.Currency
@@ -30,6 +29,7 @@ import hydro.jsfacades.Recharts
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
+import scala.collection.mutable
 import scala.scalajs.js
 
 final class Chart(implicit
@@ -106,7 +106,7 @@ final class Chart(implicit
           Recharts.ResponsiveContainer(width = "100%", height = 450)(
             Recharts.LineChart(
               data = assembleData(),
-              margin = Recharts.Margin(top = 5, right = 20, left = 50, bottom = 35),
+              margin = Recharts.Margin(top = 5, right = 50, left = 50, bottom = 35),
             )(
               Recharts.CartesianGrid(strokeDasharray = "3 3", vertical = false),
               Recharts.XAxis(
@@ -131,6 +131,7 @@ final class Chart(implicit
     }
 
     private def assembleData()(implicit props: Props, state: State): Seq[Map[String, js.Any]] = {
+      val cumulativeMap = mutable.Map[Line, ReferenceMoney]().withDefaultValue(ReferenceMoney(0))
       for (month <- getAllMonths()) yield {
         Map[String, js.Any](
           "month" -> formatMonth(month)
@@ -141,8 +142,16 @@ final class Chart(implicit
                 .lineToPoints(line)
                 .points
                 .getOrElse(month, ReferenceMoney(0))
-                .toDouble
-            (if (line.inverted) -amount else amount): js.Any
+            val result = {
+              if(line.cumulative) {
+                val newCumulativeAmount = cumulativeMap(line) + amount
+                cumulativeMap.put(line, newCumulativeAmount)
+                newCumulativeAmount
+              } else {
+                amount
+              }
+            }
+            (if (line.inverted) -result.toDouble else result.toDouble): js.Any
           }
         }
       }
