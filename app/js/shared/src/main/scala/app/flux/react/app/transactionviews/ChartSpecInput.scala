@@ -222,7 +222,7 @@ object ChartSpecInput {
           case '_' => false
         },
         cumulative = string.charAt(1) match {
-          case 'I' => true
+          case 'C' => true
           case '_' => false
         },
       )
