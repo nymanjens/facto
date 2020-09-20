@@ -29,18 +29,20 @@ object StandardSlickEntityTableDefs {
 
       override def * = {
         def tupled(
-            tuple: (Long, Long, EntityModification, Instant, Long, Option[Long])): EntityModificationEntity =
+            tuple: (Long, Long, EntityModification, Instant, Long, Option[Long])
+        ): EntityModificationEntity =
           tuple match {
             case (userId, entityId, modification, instant, instantNanos, idOption) =>
               EntityModificationEntity(
                 userId = userId,
                 modification = modification,
                 instant = Instant.ofEpochSecond(instant.getEpochSecond, instantNanos),
-                idOption = idOption
+                idOption = idOption,
               )
           }
-        def unapply(e: EntityModificationEntity)
-          : Option[(Long, Long, EntityModification, Instant, Long, Option[Long])] =
+        def unapply(
+            e: EntityModificationEntity
+        ): Option[(Long, Long, EntityModification, Instant, Long, Option[Long])] =
           Some((e.userId, e.modification.entityId, e.modification, e.instant, e.instant.getNano, e.idOption))
 
         (userId, entityId, change, instant, instantNanos, id.?) <> (tupled _, unapply _)

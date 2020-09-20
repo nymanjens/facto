@@ -8,8 +8,8 @@ import hydro.flux.action.Module
 import hydro.flux.router.Page
 import japgolly.scalajs.react.extra.router.Router
 
-final class ClientAppModule(
-    implicit getInitialDataResponse: GetInitialDataResponse,
+final class ClientAppModule(implicit
+    getInitialDataResponse: GetInitialDataResponse,
     scalaJsApiClient: ScalaJsApiClient,
 ) {
 
@@ -52,6 +52,8 @@ final class ClientAppModule(
   implicit private val summaryYearsStoreFactory = fluxStoresModule.summaryYearsStoreFactory
   implicit private val summaryExchangeRateGainsStoreFactory =
     fluxStoresModule.summaryExchangeRateGainsStoreFactory
+  implicit private val chartStoreFactory =
+    fluxStoresModule.chartStoreFactory
   implicit private val collapsedExpandedStateStoreFactory =
     fluxStoresModule.collapsedExpandedStateStoreFactory
   implicit private val globalMessagesStore = fluxStoresModule.globalMessagesStore

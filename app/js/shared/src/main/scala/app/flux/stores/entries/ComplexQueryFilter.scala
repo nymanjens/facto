@@ -17,8 +17,8 @@ import hydro.models.access.ModelField
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 
-private[stores] final class ComplexQueryFilter(
-    implicit entityAccess: AppJsEntityAccess,
+private[stores] final class ComplexQueryFilter(implicit
+    entityAccess: AppJsEntityAccess,
     accountingConfig: Config,
 ) {
 
@@ -30,19 +30,19 @@ private[stores] final class ComplexQueryFilter(
       DbQuery.Filter.And(
         Seq(
           splitInParts(query)
-            .map {
-              case QueryPart(string, negated) =>
-                val filterPair = createFilterPair(singlePartWithoutNegation = string)
+            .map { case QueryPart(string, negated) =>
+              val filterPair = createFilterPair(singlePartWithoutNegation = string)
 
-                if (negated) {
-                  filterPair.negated
-                } else {
-                  filterPair
-                }
+              if (negated) {
+                filterPair.negated
+              } else {
+                filterPair
+              }
             }
             .sortBy(_.estimatedExecutionCost)
             .map(_.positiveFilter): _*
-        ))
+        )
+      )
     }
   }
 
@@ -65,20 +65,25 @@ private[stores] final class ComplexQueryFilter(
           case Prefix.Issuer =>
             QueryFilterPair.anyOf(
               ModelFields.Transaction.issuerId,
-              filterOptions(suffix, entityAccess.newQuerySyncForUser().data())(_.name).map(_.id))
+              filterOptions(suffix, entityAccess.newQuerySyncForUser().data())(_.name).map(_.id),
+            )
           case Prefix.Beneficiary =>
             QueryFilterPair.anyOf(
               ModelFields.Transaction.beneficiaryAccountCode,
-              filterOptions(suffix, accountingConfig.accountsSeq)(_.longName).map(_.code))
+              filterOptions(suffix, accountingConfig.accountsSeq)(_.longName).map(_.code),
+            )
           case Prefix.Reservoir =>
             QueryFilterPair.anyOf(
               ModelFields.Transaction.moneyReservoirCode,
               filterOptions(suffix, accountingConfig.moneyReservoirs(includeHidden = true))(_.name)
-                .map(_.code))
+                .map(_.code),
+            )
           case Prefix.Category =>
             QueryFilterPair.anyOf(
               ModelFields.Transaction.categoryCode,
-              filterOptions(suffix, accountingConfig.categoriesSeq)(_.name).map(_.code))
+              // Adding suffix as categoryCode to allow filtering on dummy categories such as "Exchange"
+              filterOptions(suffix, accountingConfig.categoriesSeq)(_.name).map(_.code) :+ suffix,
+            )
           case Prefix.Description =>
             QueryFilterPair.containsIgnoreCase(ModelFields.Transaction.description, suffix)
           case Prefix.Flow =>
@@ -175,25 +180,28 @@ object ComplexQueryFilter {
           QueryFilterPair(
             estimatedExecutionCost = 1,
             positiveFilter = field === value,
-            negativeFilter = field !== value)
+            negativeFilter = field !== value,
+          )
         case _ =>
           QueryFilterPair(
             estimatedExecutionCost = 2,
             positiveFilter = field isAnyOf values,
-            negativeFilter = field isNoneOf values)
+            negativeFilter = field isNoneOf values,
+          )
       }
 
     def containsIgnoreCase(field: ModelField[String, Transaction], substring: String): QueryFilterPair =
       QueryFilterPair(
         estimatedExecutionCost = 3,
         positiveFilter = field containsIgnoreCase substring,
-        negativeFilter = field doesntContainIgnoreCase substring)
+        negativeFilter = field doesntContainIgnoreCase substring,
+      )
 
     def seqContains(field: ModelField[Seq[String], Transaction], value: String): QueryFilterPair =
       QueryFilterPair(
         estimatedExecutionCost = 3,
         positiveFilter = field contains value,
-        negativeFilter = field doesntContain value
+        negativeFilter = field doesntContain value,
       )
   }
 

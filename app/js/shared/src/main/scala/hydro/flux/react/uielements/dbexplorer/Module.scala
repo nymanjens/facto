@@ -5,8 +5,8 @@ import hydro.flux.react.uielements.PageHeader
 import hydro.flux.stores.DatabaseExplorerStoreFactory
 import hydro.models.access.JsEntityAccess
 
-final class Module(
-    implicit i18n: I18n,
+final class Module(implicit
+    i18n: I18n,
     pageHeader: PageHeader,
     jsEntityAccess: JsEntityAccess,
     databaseExplorerStoreFactory: DatabaseExplorerStoreFactory,

@@ -19,8 +19,8 @@ import hydro.flux.stores.PageLoadingStateStore
 import hydro.flux.stores.UserStore
 import hydro.flux.stores.DatabaseExplorerStoreFactory
 
-final class Module(
-    implicit i18n: I18n,
+final class Module(implicit
+    i18n: I18n,
     accountingConfig: Config,
     user: User,
     entityAccess: AppJsEntityAccess,
@@ -34,6 +34,7 @@ final class Module(
     summaryForYearStoreFactory: SummaryForYearStoreFactory,
     summaryYearsStoreFactory: SummaryYearsStoreFactory,
     summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
+    chartStoreFactory: ChartStoreFactory,
     collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
     globalMessagesStore: GlobalMessagesStore,
     pageLoadingStateStore: PageLoadingStateStore,
@@ -82,4 +83,5 @@ final class Module(
   implicit lazy val searchResults = transactionViewsModule.searchResults
   implicit lazy val summary = transactionViewsModule.summary
 
+  implicit lazy val chart = transactionViewsModule.chart
 }

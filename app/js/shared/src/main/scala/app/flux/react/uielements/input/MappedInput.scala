@@ -16,14 +16,15 @@ import japgolly.scalajs.react.vdom._
 import scala.collection.mutable
 import scala.reflect.ClassTag
 
-class MappedInput[DelegateValue, Value] private (
-    implicit delegateValueTag: ClassTag[DelegateValue],
+class MappedInput[DelegateValue, Value] private (implicit
+    delegateValueTag: ClassTag[DelegateValue],
     valueTag: ClassTag[Value],
 ) {
 
   private val component = ScalaComponent
     .builder[Props.any](
-      s"${getClass.getSimpleName}_${delegateValueTag.runtimeClass.getSimpleName}_${valueTag.runtimeClass.getSimpleName}")
+      s"${getClass.getSimpleName}_${delegateValueTag.runtimeClass.getSimpleName}_${valueTag.runtimeClass.getSimpleName}"
+    )
     .renderBackend[Backend]
     .componentDidMount(scope => scope.backend.didMount(scope.props))
     .componentWillUnmount(scope => scope.backend.willUnmount(scope.props))
@@ -44,7 +45,9 @@ class MappedInput[DelegateValue, Value] private (
           valueTransformer,
           defaultValue,
           listener,
-          delegateElementFactory = delegateInputElementFactory))
+          delegateElementFactory = delegateInputElementFactory,
+        )
+      )
       .vdomElement
   }
 
@@ -101,7 +104,7 @@ class MappedInput[DelegateValue, Value] private (
 
   private object Proxy {
     private val mappedToDelegateListener
-      : mutable.Map[InputBase.Listener[Value], InputBase.Listener[DelegateValue]] = mutable.Map()
+        : mutable.Map[InputBase.Listener[Value], InputBase.Listener[DelegateValue]] = mutable.Map()
 
     def toDelegateListener(
         mappedListener: InputBase.Listener[Value],
@@ -116,10 +119,11 @@ class MappedInput[DelegateValue, Value] private (
                 mappedListener
                   .onChange(
                     newValue = props.valueTransformer.forward(newDelegateValue) getOrElse props.defaultValue,
-                    directUserChange = directUserChange)
+                    directUserChange = directUserChange,
+                  )
                   .runNow()
               }
-          }
+          },
         )
       }
       mappedToDelegateListener(mappedListener)
@@ -156,8 +160,9 @@ class MappedInput[DelegateValue, Value] private (
           InputElementExtraProps(
             ref = delegateRef.asInstanceOf[DelegateRef],
             defaultValue = defaultDelegateValue,
-            additionalValidator = value => props.valueTransformer.forward(value).isDefined
-          ))
+            additionalValidator = value => props.valueTransformer.forward(value).isDefined,
+          )
+        )
       }
       renderInternal(props)
     }

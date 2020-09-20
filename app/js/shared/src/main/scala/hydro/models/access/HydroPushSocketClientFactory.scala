@@ -55,7 +55,8 @@ final class HydroPushSocketClientFactory(implicit clock: Clock) {
 
     private var isClosed = false
     private var websocketClient: Option[Future[WebsocketClient[ByteBuffer]]] = Some(
-      openWebsocketClient(updateToken))
+      openWebsocketClient(updateToken)
+    )
 
     private val onlineListener: js.Function1[Event, Unit] = _ => openWebsocketIfEmpty()
 
@@ -102,14 +103,15 @@ final class HydroPushSocketClientFactory(implicit clock: Clock) {
             }
             _pushClientsAreOnline.set(true)
             lastPacketTime = clock.nowInstant
-        },
+          },
         onClose = () => {
           websocketClient = None
           js.timers.setTimeout(10.seconds)(openWebsocketIfEmpty())
           _pushClientsAreOnline.set(false)
           firstMessageWasProcessedPromise.tryFailure(
-            new RuntimeException(s"[$name] WebSocket was closed before first message was processed"))
-        }
+            new RuntimeException(s"[$name] WebSocket was closed before first message was processed")
+          )
+        },
       )
     }
 
@@ -128,7 +130,8 @@ final class HydroPushSocketClientFactory(implicit clock: Clock) {
                 (clock.nowInstant - lastPacketTime) > java.time.Duration.ofSeconds(10) &&
                 (clock.nowInstant - lastStartToOpenTime) > java.time.Duration.ofSeconds(10) =>
             println(
-              s"  [$name] WebSocket didn't receive heartbeat for $timeoutDuration. Closing and restarting connection")
+              s"  [$name] WebSocket didn't receive heartbeat for $timeoutDuration. Closing and restarting connection"
+            )
             websocketClient = None
             clientFuture.value.get.get.close()
 

@@ -50,7 +50,7 @@ class DatedMonthTest extends HookedSpecification {
       DatedMonth(LocalDate.of(1990, SEPTEMBER, 1)),
       DatedMonth(LocalDate.of(1990, OCTOBER, 1)),
       DatedMonth(LocalDate.of(1990, NOVEMBER, 1)),
-      DatedMonth(LocalDate.of(1990, DECEMBER, 1))
+      DatedMonth(LocalDate.of(1990, DECEMBER, 1)),
     )
   }
 
@@ -61,5 +61,20 @@ class DatedMonthTest extends HookedSpecification {
   "startTimeOfNextMonth" in {
     val month = DatedMonth(LocalDate.of(1990, JUNE, 1))
     month.startTimeOfNextMonth mustEqual LocalDateTime.of(1990, JULY, 1, hour = 0, minute = 0)
+  }
+
+  "monthsInClosedRange" in {
+    val months = DatedMonth.monthsInClosedRange(
+      start = DatedMonth(LocalDate.of(1990, OCTOBER, 1)),
+      endInclusive = DatedMonth(LocalDate.of(1991, MARCH, 1)),
+    )
+    months mustEqual Seq(
+      DatedMonth(LocalDate.of(1990, OCTOBER, 1)),
+      DatedMonth(LocalDate.of(1990, NOVEMBER, 1)),
+      DatedMonth(LocalDate.of(1990, DECEMBER, 1)),
+      DatedMonth(LocalDate.of(1991, JANUARY, 1)),
+      DatedMonth(LocalDate.of(1991, FEBRUARY, 1)),
+      DatedMonth(LocalDate.of(1991, MARCH, 1)),
+    )
   }
 }

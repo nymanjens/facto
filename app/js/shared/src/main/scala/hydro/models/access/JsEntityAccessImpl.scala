@@ -16,8 +16,7 @@ import scala.collection.mutable
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-class JsEntityAccessImpl()(
-    implicit
+class JsEntityAccessImpl()(implicit
     apiClient: ScalaJsApiClient,
     remoteDatabaseProxy: RemoteDatabaseProxy,
     hydroPushSocketClientFactory: HydroPushSocketClientFactory,
@@ -54,7 +53,8 @@ class JsEntityAccessImpl()(
     if (existingPendingModifications.nonEmpty) {
       apiClient.persistEntityModifications(
         existingPendingModifications,
-        waitUntilQueryReflectsModifications = false)
+        waitUntilQueryReflectsModifications = false,
+      )
     }
 
     // TODO: Move to SharedWorker
@@ -64,7 +64,8 @@ class JsEntityAccessImpl()(
         if (_pendingModifications.modifications.nonEmpty) {
           apiClient.persistEntityModifications(
             _pendingModifications.modifications,
-            waitUntilQueryReflectsModifications = false)
+            waitUntilQueryReflectsModifications = false,
+          )
         }
       }
     }
@@ -162,10 +163,12 @@ class JsEntityAccessImpl()(
       }
     }
     override def onPendingModificationRemovedByOtherInstance(
-        modificationPseudoUniqueIdentifier: Long): Unit = {
+        modificationPseudoUniqueIdentifier: Long
+    ): Unit = {
       val modificationsToRemove =
         _pendingModifications.modifications.filter(
-          _.pseudoUniqueIdentifier == modificationPseudoUniqueIdentifier)
+          _.pseudoUniqueIdentifier == modificationPseudoUniqueIdentifier
+        )
       if (modificationsToRemove.nonEmpty) {
         _pendingModifications --= modificationsToRemove
         invokeListenersAsync(_.modificationsAddedOrPendingStateChanged(modificationsToRemove))

@@ -32,7 +32,9 @@ final class SbadminMenu(implicit i18n: I18n) extends HydroReactComponent.Statele
         menuItems = menuItems,
         enableSearch = enableSearch,
         router = router,
-        configureAdditionalKeyboardShortcuts = configureAdditionalKeyboardShortcuts))
+        configureAdditionalKeyboardShortcuts = configureAdditionalKeyboardShortcuts,
+      )
+    )
   }
 
   // **************** Implementation of HydroReactComponent methods ****************//
@@ -83,7 +85,8 @@ final class SbadminMenu(implicit i18n: I18n) extends HydroReactComponent.Statele
                   ref = queryInputRef,
                   name = "query",
                   placeholder = i18n("app.search"),
-                  classes = Seq("form-control")),
+                  classes = Seq("form-control"),
+                ),
                 Bootstrap.InputGroupButton(
                   Bootstrap.Button(variant = Variant.default, tpe = "submit")(
                     ^.onClick ==> { (e: ReactEventFromInput) =>
@@ -98,8 +101,9 @@ final class SbadminMenu(implicit i18n: I18n) extends HydroReactComponent.Statele
                     },
                     Bootstrap.FontAwesomeIcon("search"),
                   )
-                )
-              ))
+                ),
+              )
+            ),
           )
         },
         (
@@ -118,10 +122,10 @@ final class SbadminMenu(implicit i18n: I18n) extends HydroReactComponent.Statele
                       ^.key := (page.toString + (if (page == props.router.currentPage) "_" else "")),
                       <.i(^.className := iconClass getOrElse page.iconClass),
                       " ",
-                      <.span(^.dangerouslySetInnerHtml := label)
+                      <.span(^.dangerouslySetInnerHtml := label),
                     )
                 }
-              ).toVdomArray
+              ).toVdomArray,
             )
           }
         ).toVdomArray,
@@ -132,15 +136,21 @@ final class SbadminMenu(implicit i18n: I18n) extends HydroReactComponent.Statele
       implicit val router = props.router
 
       def bind(shortcut: String, runnable: () => Unit): Unit = {
-        Mousetrap.bindGlobal(shortcut, e => {
-          e.preventDefault()
-          runnable()
-        })
+        Mousetrap.bindGlobal(
+          shortcut,
+          e => {
+            e.preventDefault()
+            runnable()
+          },
+        )
       }
       def bindToPage(shortcut: String, page: Page): Unit =
-        bind(shortcut, () => {
-          router.setPage(page)
-        })
+        bind(
+          shortcut,
+          () => {
+            router.setPage(page)
+          },
+        )
       def goToAdjacentMenuItem(step: Int): Unit = {
         val allLeftMenuPages = props.menuItems.flatten.map(_.page)
         allLeftMenuPages.indexOf(router.currentPage) match {

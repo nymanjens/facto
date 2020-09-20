@@ -29,7 +29,8 @@ object SlickEntityTableDefs {
       TransactionGroupDef,
       BalanceCheckDef,
       ExchangeRateMeasurementDef,
-      EntityModificationEntityDef)
+      EntityModificationEntityDef,
+    )
 
   implicit object UserDef extends SlickEntityTableDef[User] {
 
@@ -98,7 +99,8 @@ object SlickEntityTableDefs {
           createdDate,
           transactionDate,
           consumedDate,
-          id.?) <> (Transaction.tupled, Transaction.unapply)
+          id.?,
+        ) <> (Transaction.tupled, Transaction.unapply)
     }
   }
 
@@ -129,7 +131,14 @@ object SlickEntityTableDefs {
       def checkDate = column[LocalDateTime]("checkDate")
 
       override def * =
-        (issuerId, moneyReservoirCode, balance, createdDate, checkDate, id.?) <> (BalanceCheck.tupled, BalanceCheck.unapply)
+        (
+          issuerId,
+          moneyReservoirCode,
+          balance,
+          createdDate,
+          checkDate,
+          id.?,
+        ) <> (BalanceCheck.tupled, BalanceCheck.unapply)
     }
   }
 
@@ -145,7 +154,12 @@ object SlickEntityTableDefs {
       def ratioReferenceToForeignCurrency = column[Double]("ratioReferenceToForeignCurrency")
 
       override def * =
-        (date, foreignCurrencyCode, ratioReferenceToForeignCurrency, id.?) <> (ExchangeRateMeasurement.tupled, ExchangeRateMeasurement.unapply)
+        (
+          date,
+          foreignCurrencyCode,
+          ratioReferenceToForeignCurrency,
+          id.?,
+        ) <> (ExchangeRateMeasurement.tupled, ExchangeRateMeasurement.unapply)
     }
   }
 }

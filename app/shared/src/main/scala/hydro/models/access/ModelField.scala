@@ -35,8 +35,8 @@ object ModelField {
       name: String,
       accessor: E => V,
       setter: V => E => E,
-  )(
-      implicit fieldType: FieldType[V],
+  )(implicit
+      fieldType: FieldType[V],
       entityType: EntityType[E],
   ): ModelField[V, E] = {
     new ModelField(

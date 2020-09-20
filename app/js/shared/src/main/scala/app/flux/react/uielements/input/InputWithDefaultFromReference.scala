@@ -40,8 +40,9 @@ class InputWithDefaultFromReference[Value] private () {
           defaultValueProxy = defaultValueProxy,
           startWithDefault = startWithDefault,
           inputElementFactory = inputElementFactory,
-          directUserChangeOnly = directUserChangeOnly
-        ))
+          directUserChangeOnly = directUserChangeOnly,
+        )
+      )
       .vdomElement
   }
 
@@ -57,7 +58,7 @@ class InputWithDefaultFromReference[Value] private () {
       defaultValueProxy = Some(() => defaultValueProxy),
       startWithDefault = startWithDefault,
       delegateRefFactory = delegateRefFactory,
-      directUserChangeOnly = directUserChangeOnly
+      directUserChangeOnly = directUserChangeOnly,
     )(inputElementFactory)
   }
 
@@ -70,8 +71,8 @@ class InputWithDefaultFromReference[Value] private () {
   )
 
   final class Reference private[InputWithDefaultFromReference] (
-      private[InputWithDefaultFromReference] val mutableRef: ThisMutableRef)
-      extends InputBase.Reference[Value] {
+      private[InputWithDefaultFromReference] val mutableRef: ThisMutableRef
+  ) extends InputBase.Reference[Value] {
     override def apply() = {
       mutableRef.get.asCallback.runNow() flatMap { proxy =>
         val backend = proxy.backend
@@ -159,7 +160,8 @@ class InputWithDefaultFromReference[Value] private () {
         def renderInternal[DelegateRef <: InputBase.Reference[Value]](props: Props[DelegateRef]) = {
           val inputClasses = if (state.isConnected) Seq("bound-until-change") else Seq()
           props.inputElementFactory(
-            InputElementExtraProps(delegateRef.asInstanceOf[DelegateRef], inputClasses))
+            InputElementExtraProps(delegateRef.asInstanceOf[DelegateRef], inputClasses)
+          )
         }
         renderInternal(props)
       }
@@ -177,9 +179,11 @@ class InputWithDefaultFromReference[Value] private () {
           currentDefaultValue = newDefaultValue
 
           val inputProxy = delegateRef()
-          if ($.state
-                .runNow()
-                .isConnected && (directUserChange || ! $.props.runNow().directUserChangeOnly)) {
+          if (
+            $.state
+              .runNow()
+              .isConnected && (directUserChange || ! $.props.runNow().directUserChangeOnly)
+          ) {
             currentInputValue = inputProxy.setValue(newDefaultValue)
           }
           $.setState(ConnectionState(isConnected = newDefaultValue == currentInputValue)).runNow()
@@ -209,7 +213,8 @@ class InputWithDefaultFromReference[Value] private () {
       def render(props: Props.any, state: State) = logExceptions {
         def renderInternal[DelegateRef <: InputBase.Reference[Value]](props: Props[DelegateRef]) = {
           props.inputElementFactory(
-            InputElementExtraProps(delegateRef.asInstanceOf[DelegateRef], inputClasses = Seq()))
+            InputElementExtraProps(delegateRef.asInstanceOf[DelegateRef], inputClasses = Seq())
+          )
         }
         renderInternal(props)
       }

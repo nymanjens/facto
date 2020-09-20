@@ -62,7 +62,8 @@ class JvmEntityAccessBaseTest extends HookedSpecification {
         entityAccess.persistEntityModifications(
           EntityModification.Add(user1),
           EntityModification.Add(user2),
-          EntityModification.Add(user3))
+          EntityModification.Add(user3),
+        )
 
         val user2Update = EntityModification.createUpdateAllFields(user2.copy(name = "other name"))
         entityAccess.persistEntityModifications(user2Update)
@@ -73,14 +74,17 @@ class JvmEntityAccessBaseTest extends HookedSpecification {
         entityAccess.persistEntityModifications(
           EntityModification.Add(user1),
           EntityModification.Add(user2),
-          EntityModification.Add(user3))
+          EntityModification.Add(user3),
+        )
 
         val user2UpdateA = EntityModification.createUpdate(
           user2.copy(loginName = "login2_update"),
-          fieldMask = Seq(ModelFields.User.loginName))
+          fieldMask = Seq(ModelFields.User.loginName),
+        )
         val user2UpdateB = EntityModification.createUpdate(
           user2.copy(name = "name2_update"),
-          fieldMask = Seq(ModelFields.User.name))
+          fieldMask = Seq(ModelFields.User.name),
+        )
         entityAccess.persistEntityModifications(user2UpdateA)
         entityAccess.persistEntityModifications(user2UpdateB)
 
@@ -90,9 +94,9 @@ class JvmEntityAccessBaseTest extends HookedSpecification {
             loginName = "login2_update",
             name = "name2_update",
             lastUpdateTime = user2UpdateA.updatedEntity.lastUpdateTime
-              .merge(user2UpdateB.updatedEntity.lastUpdateTime, forceIncrement = false)
+              .merge(user2UpdateB.updatedEntity.lastUpdateTime, forceIncrement = false),
           ),
-          user3
+          user3,
         )
       }
       "Ignored when already deleted" in new WithApplication {
@@ -124,7 +128,7 @@ class JvmEntityAccessBaseTest extends HookedSpecification {
           EntityModification.Add(user1),
           EntityModification.Add(user1),
           EntityModification.Add(updatedUser1),
-          EntityModification.Add(user2)
+          EntityModification.Add(user2),
         )
 
         assertPersistedUsersEqual(user1, user2)
@@ -157,7 +161,7 @@ class JvmEntityAccessBaseTest extends HookedSpecification {
         entityAccess.persistEntityModifications(
           EntityModification.createRemove(user2),
           EntityModification.createRemove(user2),
-          EntityModification.createRemove(user3)
+          EntityModification.createRemove(user3),
         )
 
         assertPersistedUsersEqual(user1)

@@ -17,8 +17,8 @@ import hydro.flux.stores.UserStore
 import hydro.flux.stores.DatabaseExplorerStoreFactory
 import hydro.models.access.HydroPushSocketClientFactory
 
-final class Module(
-    implicit i18n: I18n,
+final class Module(implicit
+    i18n: I18n,
     accountingConfig: Config,
     user: User,
     entityAccess: AppJsEntityAccess,
@@ -43,6 +43,7 @@ final class Module(
   implicit val summaryForYearStoreFactory = new SummaryForYearStoreFactory
   implicit val summaryYearsStoreFactory = new SummaryYearsStoreFactory
   implicit val summaryExchangeRateGainsStoreFactory = new SummaryExchangeRateGainsStoreFactory
+  implicit val chartStoreFactory = new ChartStoreFactory
   implicit val collapsedExpandedStateStoreFactory = new CollapsedExpandedStateStoreFactory
   implicit val globalMessagesStore = new GlobalMessagesStore
   implicit val pageLoadingStateStore = new PageLoadingStateStore

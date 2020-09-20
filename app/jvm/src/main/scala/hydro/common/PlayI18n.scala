@@ -13,7 +13,7 @@ trait PlayI18n extends I18n {
 }
 
 object PlayI18n {
-  final class Impl @Inject()(implicit val messagesApi: MessagesApi, langs: Langs) extends PlayI18n {
+  final class Impl @Inject() (implicit val messagesApi: MessagesApi, langs: Langs) extends PlayI18n {
 
     private val defaultLang: Lang = {
       require(langs.availables.size == 1, "Only a single language is supported at a time.")

@@ -1,12 +1,12 @@
 package app.flux.router
 
-import hydro.common.I18n
 import app.models.accounting.BalanceCheck
 import app.models.accounting.config.Account
 import app.models.accounting.config.MoneyReservoir
 import app.models.accounting.config.Template
-import hydro.flux.router.Page.PageBase
+import hydro.common.I18n
 import hydro.flux.router.Page
+import hydro.flux.router.Page.PageBase
 import hydro.flux.router.RouterContext
 import hydro.models.access.EntityAccess
 import japgolly.scalajs.react.extra.router.Path
@@ -35,7 +35,8 @@ object AppPages {
             js.URIUtils.encodeURIComponent(
               // Decode path first because routerContext.toPath() seems to produce unnecessarily and
               // inconsistently escaped strings
-              js.URIUtils.decodeURIComponent(path))
+              js.URIUtils.decodeURIComponent(path)
+            )
           }
       }
     }
@@ -101,8 +102,9 @@ object AppPages {
     override def iconClass = "icon-new-empty"
   }
   object NewTransactionGroupFromReservoir {
-    def apply(reservoir: MoneyReservoir)(
-        implicit routerContext: RouterContext): NewTransactionGroupFromReservoir =
+    def apply(reservoir: MoneyReservoir)(implicit
+        routerContext: RouterContext
+    ): NewTransactionGroupFromReservoir =
       NewTransactionGroupFromReservoir(reservoir.code, HasReturnTo.getCurrentEncodedPath)
   }
 
@@ -167,5 +169,26 @@ object AppPages {
   object EditBalanceCheck {
     def apply(balanceCheck: BalanceCheck)(implicit routerContext: RouterContext): EditBalanceCheck =
       EditBalanceCheck(balanceCheck.id, HasReturnTo.getCurrentEncodedPath)
+  }
+
+  // **************** Chart **************** //
+  case class Chart private (encodedChartSpecs: String)
+      extends PageBase("app.chart", iconClass = "fa fa-bar-chart-o") {
+    def stringifiedChartSpec: String = {
+      if (encodedChartSpecs == "-") ""
+      else js.URIUtils.decodeURIComponent(js.URIUtils.decodeURI(encodedChartSpecs))
+    }
+  }
+  object Chart {
+
+    val empty: Chart = Chart.fromStringifiedChartSpec("")
+
+    def fromStringifiedChartSpec(stringifiedChartSpec: String): Chart = {
+      new Chart(
+        // Translate empty string to something else so that the URL is always parsable
+        if (stringifiedChartSpec.isEmpty) "-"
+        else js.URIUtils.encodeURIComponent(stringifiedChartSpec)
+      )
+    }
   }
 }

@@ -40,10 +40,13 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
           LokiJs.Database.persistent(dbName)
         }
 
-      nameToLokiDbs.put(dbName, async {
-        await(newLokiDb.loadDatabase())
-        newLokiDb
-      })
+      nameToLokiDbs.put(
+        dbName,
+        async {
+          await(newLokiDb.loadDatabase())
+          newLokiDb
+        },
+      )
     }
 
     nameToLokiDbs(dbName).map { db =>
@@ -71,7 +74,8 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
     currentLokiDb.getCollection(lokiQuery.collectionName) match {
       case None =>
         console.log(
-          s"  Warning: Tried to query ${lokiQuery.collectionName}, but that collection doesn't exist")
+          s"  Warning: Tried to query ${lokiQuery.collectionName}, but that collection doesn't exist"
+        )
         None
 
       case Some(lokiCollection) =>
@@ -92,64 +96,64 @@ private[webworker] final class LocalDatabaseWebWorkerApiImpl extends LocalDataba
   override def applyWriteOperations(operations: Seq[WriteOperation]): Future[Boolean] = {
     val changedSeq: Seq[Boolean] =
       for (operation <- operations)
-        yield
-          operation match {
-            case Insert(collectionName, obj) =>
-              val lokiCollection = getCollection(collectionName)
-              findById(lokiCollection, obj("id")) match {
-                case Some(entity) => false
-                case None =>
-                  lokiCollection.insert(obj)
-                  true
-              }
-
-            case Update(collectionName, updatedObj, abortUnlessExistingValueEquals) =>
-              val lokiCollection = getCollection(collectionName)
-              findById(lokiCollection, updatedObj("id")) match {
-                case None => false
-                case Some(e) if areEquivalentEntities(fromLoki = e, fromClient = updatedObj) =>
-                  false
-                case Some(e)
-                    if abortUnlessExistingValueEquals.isDefined &&
-                      !areEquivalentEntities(fromLoki = e, fromClient = abortUnlessExistingValueEquals.get) =>
-                  // Abort
-                  false
-                case Some(e) =>
-                  lokiCollection.findAndRemove(
-                    LokiJs.FilterFactory.keyValueFilter(Operation.Equal, "id", updatedObj("id")))
-                  lokiCollection.insert(updatedObj)
-                  true
-              }
-
-            case Remove(collectionName, id) =>
-              val lokiCollection = getCollection(collectionName)
-              findById(lokiCollection, id) match {
-                case None => false
-                case Some(entity) =>
-                  lokiCollection.findAndRemove(LokiJs.FilterFactory.keyValueFilter(Operation.Equal, "id", id))
-                  true
-              }
-
-            case AddCollection(collectionName, uniqueIndices, indices, broadcastWriteOperations) =>
-              if (currentLokiDb.getCollection(collectionName).isEmpty) {
-                currentLokiDb.addCollection(
-                  collectionName,
-                  uniqueIndices = uniqueIndices,
-                  indices = indices
-                )
-                if (broadcastWriteOperations) {
-                  collectionsToBroadcast.add(collectionName)
-                }
+        yield operation match {
+          case Insert(collectionName, obj) =>
+            val lokiCollection = getCollection(collectionName)
+            findById(lokiCollection, obj("id")) match {
+              case Some(entity) => false
+              case None =>
+                lokiCollection.insert(obj)
                 true
-              } else {
-                false
-              }
+            }
 
-            case RemoveCollection(collectionName) =>
-              currentLokiDb.removeCollection(collectionName)
-              collectionsToBroadcast.remove(collectionName)
+          case Update(collectionName, updatedObj, abortUnlessExistingValueEquals) =>
+            val lokiCollection = getCollection(collectionName)
+            findById(lokiCollection, updatedObj("id")) match {
+              case None => false
+              case Some(e) if areEquivalentEntities(fromLoki = e, fromClient = updatedObj) =>
+                false
+              case Some(e)
+                  if abortUnlessExistingValueEquals.isDefined &&
+                    !areEquivalentEntities(fromLoki = e, fromClient = abortUnlessExistingValueEquals.get) =>
+                // Abort
+                false
+              case Some(e) =>
+                lokiCollection.findAndRemove(
+                  LokiJs.FilterFactory.keyValueFilter(Operation.Equal, "id", updatedObj("id"))
+                )
+                lokiCollection.insert(updatedObj)
+                true
+            }
+
+          case Remove(collectionName, id) =>
+            val lokiCollection = getCollection(collectionName)
+            findById(lokiCollection, id) match {
+              case None => false
+              case Some(entity) =>
+                lokiCollection.findAndRemove(LokiJs.FilterFactory.keyValueFilter(Operation.Equal, "id", id))
+                true
+            }
+
+          case AddCollection(collectionName, uniqueIndices, indices, broadcastWriteOperations) =>
+            if (currentLokiDb.getCollection(collectionName).isEmpty) {
+              currentLokiDb.addCollection(
+                collectionName,
+                uniqueIndices = uniqueIndices,
+                indices = indices,
+              )
+              if (broadcastWriteOperations) {
+                collectionsToBroadcast.add(collectionName)
+              }
               true
-          }
+            } else {
+              false
+            }
+
+          case RemoveCollection(collectionName) =>
+            currentLokiDb.removeCollection(collectionName)
+            collectionsToBroadcast.remove(collectionName)
+            true
+        }
 
     Future.successful(changedSeq contains true)
   }
@@ -197,8 +201,8 @@ object LocalDatabaseWebWorkerApiImpl {
       }
     }
     def areEquivalentArrays(a: js.Array[_], b: js.Array[_]): Boolean = {
-      (a.length == b.length) && (a zip b).forall {
-        case (elemA, elemB) => areEquivalent(elemA, elemB)
+      (a.length == b.length) && (a zip b).forall { case (elemA, elemB) =>
+        areEquivalent(elemA, elemB)
       }
     }
 
@@ -207,7 +211,8 @@ object LocalDatabaseWebWorkerApiImpl {
       case (valueA: js.Object, valueB: js.Object) =>
         areEquivalentDictionaries(
           valueA.asInstanceOf[js.Dictionary[_]],
-          valueB.asInstanceOf[js.Dictionary[_]])
+          valueB.asInstanceOf[js.Dictionary[_]],
+        )
       case (valueA, valueB) => valueA == valueB
     }
   }

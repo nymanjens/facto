@@ -43,7 +43,7 @@ final class AllUsersList(implicit i18n: I18n, userStore: UserStore) extends Hydr
             <.th(i18n("app.full-name")),
             <.th(i18n("app.is-admin")),
           ),
-          tableRowDatas = tableRowDatas(state)
+          tableRowDatas = tableRowDatas(state),
         )
       }
     }
@@ -54,7 +54,9 @@ final class AllUsersList(implicit i18n: I18n, userStore: UserStore) extends Hydr
           for (i <- 0 until 3) yield {
             Table.TableRowData(
               Seq[VdomElement](
-                <.td(^.colSpan := 5, ^.style := js.Dictionary("color" -> "white"), "loading...")))
+                <.td(^.colSpan := 5, ^.style := js.Dictionary("color" -> "white"), "loading...")
+              )
+            )
           }
         case Some(allUsers) =>
           for (user <- allUsers) yield {
@@ -63,7 +65,8 @@ final class AllUsersList(implicit i18n: I18n, userStore: UserStore) extends Hydr
                 <.td(user.loginName),
                 <.td(user.name),
                 <.td(<<.ifThen(user.isAdmin)(Bootstrap.FontAwesomeIcon("check"))),
-              ))
+              )
+            )
           }
       }
     }

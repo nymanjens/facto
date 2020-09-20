@@ -30,13 +30,14 @@ object ReactTagInput {
         suggestions = suggestions.toJSArray,
         handleAddition = handleAddition,
         handleDelete = pos => handleDelete.onDeleted(pos, tags(pos)),
-        handleDrag = (tagObject, currentPos, newPos) =>
-          handleDrag.onDragged(tagObject.text, currentPos, newPos),
+        handleDrag =
+          (tagObject, currentPos, newPos) => handleDrag.onDragged(tagObject.text, currentPos, newPos),
         delimiters = delimiters.toJSArray,
         minQueryLength = minQueryLength,
         classNames = classNames.toJSDictionary,
-        autoFocus
-      ).toJsObject)
+        autoFocus,
+      ).toJsObject
+    )
   }
 
   // **************** Public inner types ****************//
@@ -82,7 +83,7 @@ object ReactTagInput {
         delimiters = delimiters,
         minQueryLength = minQueryLength,
         classNames = classNames,
-        autofocus = autoFocus
+        autofocus = autoFocus,
       )
   }
 }

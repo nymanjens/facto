@@ -38,20 +38,24 @@ class OrderTokenTest extends Specification {
       "one difference without carry-over" in {
         OrderToken.middleBetween(
           someToken(10, 20, Int.MaxValue, Int.MaxValue, Int.MaxValue - 4),
-          someToken(10, 21, Int.MinValue, Int.MinValue, Int.MinValue + 3)) mustEqual
+          someToken(10, 21, Int.MinValue, Int.MinValue, Int.MinValue + 3),
+        ) mustEqual
           OrderToken(List(10, 20, Int.MaxValue, Int.MaxValue, Int.MaxValue))
         OrderToken.middleBetween(
           someToken(10, 20, Int.MaxValue, Int.MaxValue, Int.MaxValue - 2),
-          someToken(10, 21, 0, 0, 4)) mustEqual OrderToken(List(10, 21, Int.MinValue / 2 - 1))
+          someToken(10, 21, 0, 0, 4),
+        ) mustEqual OrderToken(List(10, 21, Int.MinValue / 2 - 1))
       }
       "one difference with carry-over" in {
         OrderToken.middleBetween(
           someToken(10, 20, Int.MaxValue, Int.MaxValue, Int.MaxValue - 3, 123),
-          someToken(10, 21, Int.MinValue, Int.MinValue, Int.MinValue + 4)) mustEqual
+          someToken(10, 21, Int.MinValue, Int.MinValue, Int.MinValue + 4),
+        ) mustEqual
           OrderToken(List(10, 21, Int.MinValue, Int.MinValue, Int.MinValue))
         OrderToken.middleBetween(
           someToken(10, 20, Int.MaxValue, Int.MaxValue, Int.MaxValue - 2, 123),
-          someToken(10, 21, Int.MinValue, Int.MinValue, Int.MinValue + 5, 456)) mustEqual
+          someToken(10, 21, Int.MinValue, Int.MinValue, Int.MinValue + 5, 456),
+        ) mustEqual
           OrderToken(List(10, 21, Int.MinValue, Int.MinValue, Int.MinValue + 1))
       }
     }
@@ -105,7 +109,7 @@ class OrderTokenTest extends Specification {
           OrderToken(List(Int.MinValue - Int.MinValue / 8)),
           OrderToken(List(Int.MinValue - Int.MinValue / 4)),
           OrderToken(List(Int.MinValue / 2)),
-          OrderToken(List(Int.MinValue / 4))
+          OrderToken(List(Int.MinValue / 4)),
         )
     }
     "With all bounds defined" in {
@@ -116,7 +120,7 @@ class OrderTokenTest extends Specification {
           OrderToken(List(3)),
           OrderToken(List(5)),
           OrderToken(List(6)),
-          OrderToken(List(7))
+          OrderToken(List(7)),
         )
     }
   }

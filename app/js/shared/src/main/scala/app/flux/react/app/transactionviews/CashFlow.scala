@@ -34,8 +34,8 @@ import japgolly.scalajs.react.vdom.html_<^._
 import scala.collection.immutable.Seq
 import scala.scalajs.js
 
-final class CashFlow(
-    implicit entriesStoreFactory: CashFlowEntriesStoreFactory,
+final class CashFlow(implicit
+    entriesStoreFactory: CashFlowEntriesStoreFactory,
     collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
     dispatcher: Dispatcher,
     entityAccess: AppJsEntityAccess,
@@ -55,118 +55,124 @@ final class CashFlow(
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
     .initialState(State(includeUnrelatedReservoirs = false, includeHiddenReservoirs = false))
-    .renderPS(
-      ($, props, state) => {
-        implicit val router = props.router
-        <.span(
-          pageHeader.withExtension(router.currentPage) {
-            CollapseAllExpandAllButtons(
-              onExpandedUpdate = collapsedExpandedStateStoreHandle.setExpandedForAllTables)
-          }, {
-            for {
-              account <- accountingConfig.personallySortedAccounts
-              if state.includeUnrelatedReservoirs || account.isMineOrCommon
-            } yield {
-              Panel(i18n("app.account-of", account.longName), key = account.code) {
-                {
-                  for {
-                    reservoir <- accountingConfig
-                      .moneyReservoirs(
-                        includeNullReservoir = false,
-                        includeHidden = state.includeHiddenReservoirs)
-                    if reservoir.owner == account
-                  } yield {
-                    val tableName = reservoir.code
-                    entriesListTable.withRowNumber(
-                      tableTitle = reservoir.name,
-                      tableClasses = Seq("table-cashflow"),
-                      key = tableName,
-                      numEntriesStrategy = NumEntriesStrategy(
-                        start = CashFlow.minNumEntriesPerReservoir,
-                        intermediateBeforeInf = Seq(150)),
-                      collapsedExpandedStateStore =
-                        Some(collapsedExpandedStateStoreHandle.getStore(tableName)),
-                      additionalInput = reservoir,
-                      latestEntryToTableTitleExtra =
-                        latestEntry => s"${i18n("app.balance")}: ${latestEntry.balance}",
-                      tableHeaders = Seq(
-                        <.th(i18n("app.payed")),
-                        <.th(i18n("app.consumed")),
-                        <.th(i18n("app.beneficiary")),
-                        <.th(i18n("app.category")),
-                        <.th(i18n("app.description")),
-                        <.th(i18n("app.flow")),
-                        <.th(i18n("app.balance"), " ", balanceCheckAddNewButton(reservoir)),
-                        <.th(transactionGroupAddButton(reservoir))
-                      ),
-                      calculateTableDataFromEntryAndRowNum = (cashFlowEntry, rowNumber) =>
-                        cashFlowEntry match {
-                          case entry: CashFlowEntry.RegularEntry =>
-                            Seq[VdomElement](
-                              <.td(entry.transactionDates.map(formatDate).mkString(", ")),
-                              <.td(entry.consumedDates.map(formatDate).mkString(", ")),
-                              <.td(entry.beneficiaries.map(_.shorterName).mkString(", ")),
-                              <.td(entry.categories.map(_.name).mkString(", ")),
-                              <.td(descriptionWithEntryCount(entry)),
-                              <.td(uielements.MoneyWithCurrency(entry.flow)),
-                              <.td(
-                                uielements.MoneyWithCurrency(entry.balance),
-                                entry.balanceVerified match {
-                                  case true =>
-                                    <.span(" ", Bootstrap.FontAwesomeIcon("check", fixedWidth = true))
-                                  case false if rowNumber == 0 =>
-                                    <.span(" ", balanceCheckConfirmButton(reservoir, entry))
-                                  case _ => VdomArray.empty()
-                                }
-                              ),
-                              <.td(uielements.TransactionGroupEditButton(entry.groupId))
-                            )
-                          case entry @ CashFlowEntry.BalanceCorrection(balanceCorrection, expectedAmount) =>
-                            Seq[VdomElement](
-                              <.td(formatDate(balanceCorrection.checkDate)),
-                              <.td(
-                                ^.colSpan := 4,
-                                ^.style := js.Dictionary("fontWeight" -> "bold"),
-                                i18n("app.balance-correction") + ":"),
-                              <.td(
-                                ^.style := js.Dictionary("fontWeight" -> "bold"),
-                                if (entry.balanceIncrease.cents > 0) "+" else "-",
-                                " ",
-                                uielements.MoneyWithCurrency(
-                                  if (entry.balanceIncrease.cents > 0) entry.balanceIncrease
-                                  else -entry.balanceIncrease)
-                              ),
-                              <.td(
-                                ^.style := js.Dictionary("fontWeight" -> "bold"),
-                                uielements.MoneyWithCurrency(balanceCorrection.balance)),
-                              <.td(balanceCheckEditButton(balanceCorrection))
-                            )
-                      }
+    .renderPS(($, props, state) => {
+      implicit val router = props.router
+      <.span(
+        pageHeader.withExtension(router.currentPage) {
+          CollapseAllExpandAllButtons(
+            onExpandedUpdate = collapsedExpandedStateStoreHandle.setExpandedForAllTables
+          )
+        },
+        (
+          for {
+            account <- accountingConfig.personallySortedAccounts
+            if state.includeUnrelatedReservoirs || account.isMineOrCommon
+          } yield {
+            Panel(i18n("app.account-of", account.longName), key = account.code) {
+              {
+                for {
+                  reservoir <- accountingConfig
+                    .moneyReservoirs(
+                      includeNullReservoir = false,
+                      includeHidden = state.includeHiddenReservoirs,
                     )
-                  }
-                }.toVdomArray
-              }
+                  if reservoir.owner == account
+                } yield {
+                  val tableName = reservoir.code
+                  entriesListTable.withRowNumber(
+                    tableTitle = reservoir.name,
+                    tableClasses = Seq("table-cashflow"),
+                    key = tableName,
+                    numEntriesStrategy = NumEntriesStrategy(
+                      start = CashFlow.minNumEntriesPerReservoir,
+                      intermediateBeforeInf = Seq(150),
+                    ),
+                    collapsedExpandedStateStore = Some(collapsedExpandedStateStoreHandle.getStore(tableName)),
+                    additionalInput = reservoir,
+                    latestEntryToTableTitleExtra =
+                      latestEntry => s"${i18n("app.balance")}: ${latestEntry.balance}",
+                    tableHeaders = Seq(
+                      <.th(i18n("app.payed")),
+                      <.th(i18n("app.consumed")),
+                      <.th(i18n("app.beneficiary")),
+                      <.th(i18n("app.category")),
+                      <.th(i18n("app.description")),
+                      <.th(i18n("app.flow")),
+                      <.th(i18n("app.balance"), " ", balanceCheckAddNewButton(reservoir)),
+                      <.th(transactionGroupAddButton(reservoir)),
+                    ),
+                    calculateTableDataFromEntryAndRowNum = (cashFlowEntry, rowNumber) =>
+                      cashFlowEntry match {
+                        case entry: CashFlowEntry.RegularEntry =>
+                          Seq[VdomElement](
+                            <.td(entry.transactionDates.map(formatDate).mkString(", ")),
+                            <.td(entry.consumedDates.map(formatDate).mkString(", ")),
+                            <.td(entry.beneficiaries.map(_.shorterName).mkString(", ")),
+                            <.td(entry.categories.map(_.name).mkString(", ")),
+                            <.td(descriptionWithEntryCount(entry)),
+                            <.td(uielements.MoneyWithCurrency(entry.flow)),
+                            <.td(
+                              uielements.MoneyWithCurrency(entry.balance),
+                              entry.balanceVerified match {
+                                case true =>
+                                  <.span(" ", Bootstrap.FontAwesomeIcon("check", fixedWidth = true))
+                                case false if rowNumber == 0 =>
+                                  <.span(" ", balanceCheckConfirmButton(reservoir, entry))
+                                case _ => VdomArray.empty()
+                              },
+                            ),
+                            <.td(uielements.TransactionGroupEditButton(entry.groupId)),
+                          )
+                        case entry @ CashFlowEntry.BalanceCorrection(balanceCorrection, expectedAmount) =>
+                          Seq[VdomElement](
+                            <.td(formatDate(balanceCorrection.checkDate)),
+                            <.td(
+                              ^.colSpan := 4,
+                              ^.style := js.Dictionary("fontWeight" -> "bold"),
+                              i18n("app.balance-correction") + ":",
+                            ),
+                            <.td(
+                              ^.style := js.Dictionary("fontWeight" -> "bold"),
+                              if (entry.balanceIncrease.cents > 0) "+" else "-",
+                              " ",
+                              uielements.MoneyWithCurrency(
+                                if (entry.balanceIncrease.cents > 0) entry.balanceIncrease
+                                else -entry.balanceIncrease
+                              ),
+                            ),
+                            <.td(
+                              ^.style := js.Dictionary("fontWeight" -> "bold"),
+                              uielements.MoneyWithCurrency(balanceCorrection.balance),
+                            ),
+                            <.td(balanceCheckEditButton(balanceCorrection)),
+                          )
+                      },
+                  )
+                }
+              }.toVdomArray
             }
-          }.toVdomArray,
-          // includeUnrelatedReservoirs toggle button
+          }
+        ).toVdomArray,
+        // includeUnrelatedReservoirs toggle button
+        Bootstrap.Button(Variant.info, Size.lg, block = true, tag = <.a)(
+          ^.onClick --> LogExceptionsCallback(
+            $.modState(s => s.copy(includeUnrelatedReservoirs = !s.includeUnrelatedReservoirs)).runNow()
+          ),
+          if (state.includeUnrelatedReservoirs) i18n("app.hide-other-accounts")
+          else i18n("app.show-other-accounts"),
+        ),
+        // includeHiddenReservoirs toggle button
+        <<.ifThen(state.includeHiddenReservoirs || state.includeUnrelatedReservoirs) {
           Bootstrap.Button(Variant.info, Size.lg, block = true, tag = <.a)(
             ^.onClick --> LogExceptionsCallback(
-              $.modState(s => s.copy(includeUnrelatedReservoirs = !s.includeUnrelatedReservoirs)).runNow()),
-            if (state.includeUnrelatedReservoirs) i18n("app.hide-other-accounts")
-            else i18n("app.show-other-accounts")
-          ),
-          // includeHiddenReservoirs toggle button
-          <<.ifThen(state.includeHiddenReservoirs || state.includeUnrelatedReservoirs) {
-            Bootstrap.Button(Variant.info, Size.lg, block = true, tag = <.a)(
-              ^.onClick --> LogExceptionsCallback(
-                $.modState(s => s.copy(includeHiddenReservoirs = !s.includeHiddenReservoirs)).runNow()),
-              if (state.includeHiddenReservoirs) i18n("app.hide-hidden-reservoirs")
-              else i18n("app.show-hidden-reservoirs")
-            )
-          }
-        )
-      }
-    )
+              $.modState(s => s.copy(includeHiddenReservoirs = !s.includeHiddenReservoirs)).runNow()
+            ),
+            if (state.includeHiddenReservoirs) i18n("app.hide-hidden-reservoirs")
+            else i18n("app.show-hidden-reservoirs"),
+          )
+        },
+      )
+    })
     .build
 
   // **************** API ****************//
@@ -175,15 +181,17 @@ final class CashFlow(
   }
 
   // **************** Private helper methods ****************//
-  private def balanceCheckAddNewButton(reservoir: MoneyReservoir)(
-      implicit router: RouterContext): VdomElement = {
+  private def balanceCheckAddNewButton(
+      reservoir: MoneyReservoir
+  )(implicit router: RouterContext): VdomElement = {
     val link = router.anchorWithHrefTo(AppPages.NewBalanceCheck(reservoir))
     Bootstrap.Button(Variant.info, Size.xs, tag = link)(
       Bootstrap.FontAwesomeIcon("check-square-o", fixedWidth = true)
     )
   }
-  private def transactionGroupAddButton(reservoir: MoneyReservoir)(
-      implicit router: RouterContext): VdomElement = {
+  private def transactionGroupAddButton(
+      reservoir: MoneyReservoir
+  )(implicit router: RouterContext): VdomElement = {
     val link = router.anchorWithHrefTo(AppPages.NewTransactionGroupFromReservoir(reservoir))
     Bootstrap.Button(Variant.info, Size.xs, tag = link)(
       <.i(^.className := "icon-new-empty"),
@@ -192,18 +200,22 @@ final class CashFlow(
     )
   }
 
-  private def balanceCheckConfirmButton(reservoir: MoneyReservoir, entry: CashFlowEntry.RegularEntry)(
-      implicit router: RouterContext): VdomElement = {
+  private def balanceCheckConfirmButton(reservoir: MoneyReservoir, entry: CashFlowEntry.RegularEntry)(implicit
+      router: RouterContext
+  ): VdomElement = {
     Bootstrap.Button(Variant.info, Size.xs)(
       ^.onClick --> LogExceptionsCallback {
         dispatcher.dispatch(
-          AppActions.AddBalanceCheck(BalanceCheck(
-            issuerId = user.id,
-            moneyReservoirCode = reservoir.code,
-            balanceInCents = entry.balance.cents,
-            createdDate = clock.now,
-            checkDate = entry.mostRecentTransaction.transactionDate
-          )))
+          AppActions.AddBalanceCheck(
+            BalanceCheck(
+              issuerId = user.id,
+              moneyReservoirCode = reservoir.code,
+              balanceInCents = entry.balance.cents,
+              createdDate = clock.now,
+              checkDate = entry.mostRecentTransaction.transactionDate,
+            )
+          )
+        )
       }.void,
       Bootstrap.FontAwesomeIcon("check-square-o", fixedWidth = true),
     )
@@ -214,7 +226,7 @@ final class CashFlow(
     Bootstrap.Button(size = Size.xs, tag = link)(
       Bootstrap.FontAwesomeIcon("pencil", fixedWidth = true),
       " ",
-      i18n("app.edit")
+      i18n("app.edit"),
     )
   }
 

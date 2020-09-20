@@ -20,7 +20,7 @@ import hydro.common.time.LocalDateTimes
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
 
-final class CsvImportTool @Inject()(implicit clock: Clock, entityAccess: JvmEntityAccess) {
+final class CsvImportTool @Inject() (implicit clock: Clock, entityAccess: JvmEntityAccess) {
 
   def importTransactions(csvFilePath: Path)(implicit user: User): Unit = {
     // example of line: "2 :: Common :: LIFE :: CARD_COMMON :: imperdiet Duis  :: -25.04 :: 1425855600 :: 0 :: 1425934823"
@@ -29,15 +29,16 @@ final class CsvImportTool @Inject()(implicit clock: Clock, entityAccess: JvmEnti
       val parts = Splitter.on(" :: ").trimResults().split(line).asScala.toList
       parts match {
         case List(
-            issuerId,
-            beneficiaryAccountCode,
-            categoryCode,
-            moneyReservoirCode,
-            description,
-            flowAsFloat,
-            transactionDateStamp,
-            consumedDateStamp,
-            createdDateStamp) =>
+              issuerId,
+              beneficiaryAccountCode,
+              categoryCode,
+              moneyReservoirCode,
+              description,
+              flowAsFloat,
+              transactionDateStamp,
+              consumedDateStamp,
+              createdDateStamp,
+            ) =>
           val groupAddition =
             EntityModification.createAddWithRandomId(TransactionGroup(createdDate = clock.now))
           val group = groupAddition.entity
@@ -56,8 +57,10 @@ final class CsvImportTool @Inject()(implicit clock: Clock, entityAccess: JvmEnti
                 transactionDate = epochSecondsToDateTime(transactionDateStamp.toLong),
                 consumedDate = epochSecondsToDateTime(
                   if (consumedDateStamp.toLong == 0) transactionDateStamp.toLong
-                  else consumedDateStamp.toLong)
-              ))
+                  else consumedDateStamp.toLong
+                ),
+              )
+            )
           entityAccess.persistEntityModifications(groupAddition, transactionAddition)
       }
     }
@@ -71,13 +74,16 @@ final class CsvImportTool @Inject()(implicit clock: Clock, entityAccess: JvmEnti
       parts match {
         case List(issuerId, moneyReservoirCode, balanceAsFloat, checkDateStamp, createdDateStamp) =>
           entityAccess.persistEntityModifications(
-            EntityModification.createAddWithRandomId(BalanceCheck(
-              issuerId = issuerId.toInt,
-              moneyReservoirCode = moneyReservoirCode,
-              balanceInCents = Money.floatToCents(balanceAsFloat.toDouble),
-              createdDate = epochSecondsToDateTime(createdDateStamp.toLong),
-              checkDate = epochSecondsToDateTime(checkDateStamp.toLong)
-            )))
+            EntityModification.createAddWithRandomId(
+              BalanceCheck(
+                issuerId = issuerId.toInt,
+                moneyReservoirCode = moneyReservoirCode,
+                balanceInCents = Money.floatToCents(balanceAsFloat.toDouble),
+                createdDate = epochSecondsToDateTime(createdDateStamp.toLong),
+                checkDate = epochSecondsToDateTime(checkDateStamp.toLong),
+              )
+            )
+          )
       }
     }
   }

@@ -46,12 +46,12 @@ object LocalDatabaseWebWorkerScript {
                   executeMethod(methodNum.asInstanceOf[Int], args.asInstanceOf[js.Array[js.Any]])
               }
             }
-          } recover {
-            case e: Throwable =>
-              console.log(s"  LocalDatabaseWebWorkerScript: Caught exception: $e")
-              e.printStackTrace()
-              OnMessageResponse(
-                response = Scala2Js.toJs[WorkerResponse](WorkerResponse.Failed(getStackTraceString(e))))
+          } recover { case e: Throwable =>
+            console.log(s"  LocalDatabaseWebWorkerScript: Caught exception: $e")
+            e.printStackTrace()
+            OnMessageResponse(
+              response = Scala2Js.toJs[WorkerResponse](WorkerResponse.Failed(getStackTraceString(e)))
+            )
           }
         }
       })
@@ -60,7 +60,7 @@ object LocalDatabaseWebWorkerScript {
   private def executeMethod(methodNum: Int, args: js.Array[js.Any]): Future[OnMessageResponse] = {
     def toResponse(returnValue: js.Any): OnMessageResponse = {
       OnMessageResponse(
-        response = Scala2Js.toJs[WorkerResponse](WorkerResponse.MethodReturnValue(returnValue)),
+        response = Scala2Js.toJs[WorkerResponse](WorkerResponse.MethodReturnValue(returnValue))
       )
     }
 
@@ -71,14 +71,16 @@ object LocalDatabaseWebWorkerScript {
           separateDbPerCollectionToApiImplMap.update(
             separateDbPerCollection,
             if (separateDbPerCollection) new LocalDatabaseWebWorkerApiMultiDbImpl()
-            else new LocalDatabaseWebWorkerApiImpl())
+            else new LocalDatabaseWebWorkerApiImpl(),
+          )
         }
         currentApiImpl = separateDbPerCollectionToApiImplMap(separateDbPerCollection)
         currentApiImpl
           .createIfNecessary(
             dbName.asInstanceOf[String],
             inMemory.asInstanceOf[Boolean],
-            separateDbPerCollection)
+            separateDbPerCollection,
+          )
           .map(_ => toResponse(js.undefined))
       case (MethodNumbers.executeDataQuery, Seq(lokiQuery)) =>
         currentApiImpl
@@ -99,7 +101,8 @@ object LocalDatabaseWebWorkerScript {
             responseToBroadcastToOtherPorts =
               if (operationsToBroadcast.nonEmpty && somethingChanged)
                 Scala2Js.toJs[WorkerResponse](
-                  WorkerResponse.BroadcastedWriteOperations(operationsToBroadcast))
+                  WorkerResponse.BroadcastedWriteOperations(operationsToBroadcast)
+                )
               else js.undefined,
           )
         }

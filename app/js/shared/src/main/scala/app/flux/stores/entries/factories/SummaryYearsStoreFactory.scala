@@ -38,17 +38,18 @@ final class SummaryYearsStoreFactory(implicit entityAccess: AppJsEntityAccess)
       val rangeOption = for {
         earliest <- maybeEarliest
         latest <- maybeLatest
-      } yield
-        State(
-          YearRange.closed(earliest.consumedDate.getYear, latest.consumedDate.getYear),
-          impactingTransactionIds = Set(earliest.id, latest.id))
+      } yield State(
+        YearRange.closed(earliest.consumedDate.getYear, latest.consumedDate.getYear),
+        impactingTransactionIds = Set(earliest.id, latest.id),
+      )
 
       rangeOption getOrElse State.empty
     }
 
     override protected def transactionUpsertImpactsState(transaction: Transaction, oldState: State) =
       transaction.beneficiaryAccountCode == account.code && !oldState.yearRange.contains(
-        transaction.consumedDate.getYear)
+        transaction.consumedDate.getYear
+      )
     override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) = false
 
     private def getFirstAfterSorting(sorting: DbQuery.Sorting[Transaction]): Future[Option[Transaction]] =
@@ -59,7 +60,8 @@ final class SummaryYearsStoreFactory(implicit entityAccess: AppJsEntityAccess)
             .filter(ModelFields.Transaction.beneficiaryAccountCode === account.code)
             .sort(sorting)
             .limit(1)
-            .data())
+            .data()
+        )
         data match {
           case Seq()  => None
           case Seq(t) => Some(t)

@@ -15,7 +15,7 @@ final class UserProfile(implicit i18n: I18n, updatePasswordForm: UpdatePasswordF
       implicit val router = props.router
       <.span(
         pageHeader(router.currentPage),
-        Bootstrap.Row(updatePasswordForm())
+        Bootstrap.Row(updatePasswordForm()),
       )
     })
     .build

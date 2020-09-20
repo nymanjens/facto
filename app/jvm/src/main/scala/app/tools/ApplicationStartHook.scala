@@ -19,8 +19,8 @@ import play.api.Mode
 
 import scala.collection.JavaConverters._
 
-final class ApplicationStartHook @Inject()(
-    implicit app: Application,
+final class ApplicationStartHook @Inject() (implicit
+    app: Application,
     entityAccess: JvmEntityAccess,
     csvImportTool: CsvImportTool,
     clock: Clock,
@@ -70,7 +70,9 @@ final class ApplicationStartHook @Inject()(
       println(s"      password: $password")
       entityAccess.persistEntityModifications(
         EntityModification.createAddWithRandomId(
-          Users.createUser(loginName, password, name = "Admin", isAdmin = true)))
+          Users.createUser(loginName, password, name = "Admin", isAdmin = true)
+        )
+      )
       println("  Done. Exiting.")
 
       System.exit(0)
@@ -110,7 +112,10 @@ final class ApplicationStartHook @Inject()(
         ExchangeRateMeasurement(
           date = LocalDateTime.of(LocalDate.of(1990, JANUARY, 1), LocalTime.MIN),
           foreignCurrencyCode = "GBP",
-          ratioReferenceToForeignCurrency = 1.2)))
+          ratioReferenceToForeignCurrency = 1.2,
+        )
+      )
+    )
   }
 
   private def assertExists(path: Path): Path = {

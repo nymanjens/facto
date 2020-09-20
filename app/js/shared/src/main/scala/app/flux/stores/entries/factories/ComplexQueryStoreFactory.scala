@@ -13,8 +13,8 @@ import scala.async.Async.await
 import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-final class ComplexQueryStoreFactory(
-    implicit entityAccess: AppJsEntityAccess,
+final class ComplexQueryStoreFactory(implicit
+    entityAccess: AppJsEntityAccess,
     complexQueryFilter: ComplexQueryFilter,
 ) extends EntriesListStoreFactory[GeneralEntry, ComplexQueryStoreFactory.Query] {
 
@@ -29,7 +29,8 @@ final class ComplexQueryStoreFactory(
             .filter(filterFromQuery)
             .sort(AppDbQuerySorting.Transaction.deterministicallyByCreateDate.reversed)
             .limit(3 * maxNumEntries)
-            .data()).reverse
+            .data()
+        ).reverse
 
       var entries = transactions.map(t => GeneralEntry(Seq(t)))
 

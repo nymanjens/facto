@@ -207,8 +207,8 @@ object ComplexQueryFilterTest extends TestSuite {
     }
   }
 
-  private def withTransactions(transactions: Transaction*)(
-      implicit complexQueryFilter: ComplexQueryFilter,
+  private def withTransactions(transactions: Transaction*)(implicit
+      complexQueryFilter: ComplexQueryFilter,
       entityAccess: AppEntityAccess,
   ) =
     new Object {

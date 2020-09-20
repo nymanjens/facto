@@ -40,7 +40,7 @@ object TestObjects {
     veryShortName = "Common",
     defaultElectronicReservoirCode = "CARD_COMMON",
     categories = Seq(testCategoryA, testCategoryB),
-    summaryTotalRows = Seq(SummaryTotalRowDef(rowTitleHtml = "<b>Total</b>", categoriesToIgnore = Set()))
+    summaryTotalRows = Seq(SummaryTotalRowDef(rowTitleHtml = "<b>Total</b>", categoriesToIgnore = Set())),
   )
   def testAccountA: Account = Account(
     code = "ACC_A",
@@ -55,8 +55,9 @@ object TestObjects {
       SummaryTotalRowDef(rowTitleHtml = "<b>Total</b>", categoriesToIgnore = Set()),
       SummaryTotalRowDef(
         rowTitleHtml = "<b>Total</b> (without catA)",
-        categoriesToIgnore = Set(testCategoryA))
-    )
+        categoriesToIgnore = Set(testCategoryA),
+      ),
+    ),
   )
   def testAccountB: Account = Account(
     code = "ACC_B",
@@ -67,7 +68,7 @@ object TestObjects {
     defaultCashReservoirCode = Some("CASH_B"),
     defaultElectronicReservoirCode = "CARD_B",
     categories = Seq(testCategoryB),
-    summaryTotalRows = Seq(SummaryTotalRowDef(rowTitleHtml = "<b>Total</b>", categoriesToIgnore = Set()))
+    summaryTotalRows = Seq(SummaryTotalRowDef(rowTitleHtml = "<b>Total</b>", categoriesToIgnore = Set())),
   )
   def testAccountC: Account = Account(
     code = "ACC_C",
@@ -78,7 +79,7 @@ object TestObjects {
     defaultCashReservoirCode = Some("CASH_C"),
     defaultElectronicReservoirCode = "CARD_C",
     categories = Seq(testCategoryC),
-    summaryTotalRows = Seq(SummaryTotalRowDef(rowTitleHtml = "<b>Total</b>", categoriesToIgnore = Set()))
+    summaryTotalRows = Seq(SummaryTotalRowDef(rowTitleHtml = "<b>Total</b>", categoriesToIgnore = Set())),
   )
   def testAccount: Account = testAccountA
 
@@ -88,49 +89,56 @@ object TestObjects {
       name = "Cash Common",
       shorterName = "Cash Common",
       owner = testAccountCommon,
-      hidden = false)
+      hidden = false,
+    )
   def testReservoirCardCommon =
     MoneyReservoir(
       code = "CARD_COMMON",
       name = "Card Common",
       shorterName = "Card Common",
       owner = testAccountCommon,
-      hidden = false)
+      hidden = false,
+    )
   def testReservoirCashA =
     MoneyReservoir(
       code = "CASH_A",
       name = "Cash A",
       shorterName = "Cash A",
       owner = testAccountA,
-      hidden = false)
+      hidden = false,
+    )
   def testReservoirCardA =
     MoneyReservoir(
       code = "CARD_A",
       name = "Card A",
       shorterName = "Card A",
       owner = testAccountA,
-      hidden = false)
+      hidden = false,
+    )
   def testReservoirCashB =
     MoneyReservoir(
       code = "CASH_B",
       name = "Cash B",
       shorterName = "Cash B",
       owner = testAccountB,
-      hidden = false)
+      hidden = false,
+    )
   def testReservoirCardB =
     MoneyReservoir(
       code = "CARD_B",
       name = "Card B",
       shorterName = "Card B",
       owner = testAccountB,
-      hidden = false)
+      hidden = false,
+    )
   def testReservoirHidden =
     MoneyReservoir(
       code = "HIDDEN",
       name = "Card Hidden",
       shorterName = "Card Hidden",
       owner = testAccountB,
-      hidden = true)
+      hidden = true,
+    )
   def testReservoirCashGbp =
     MoneyReservoir(
       code = "CASH_GBP",
@@ -138,7 +146,8 @@ object TestObjects {
       shorterName = "Cash GBP",
       owner = testAccountA,
       hidden = true,
-      currencyCode = Some("GBP"))
+      currencyCode = Some("GBP"),
+    )
   def testReservoirOfAccountA: MoneyReservoir = testReservoirCashA
   def testReservoirOfAccountB: MoneyReservoir = testReservoirCashB
   def testReservoir: MoneyReservoir = testReservoirCashCommon
@@ -156,16 +165,16 @@ object TestObjects {
         moneyReservoirCodeTpl = "",
         categoryCode = "CAT_A",
         description = "Bakery",
-        detailDescription = "These are the details."
+        detailDescription = "These are the details.",
       ),
       Template.Transaction(
         beneficiaryCodeTpl = "${account.code}",
         moneyReservoirCodeTpl = "",
         categoryCode = "CAT_A",
         description = "Bakery",
-        detailDescription = "These are the details."
-      )
-    )
+        detailDescription = "These are the details.",
+      ),
+    ),
   )
 
   def testConstants = Constants(
@@ -173,7 +182,7 @@ object TestObjects {
     accountingCategory = testCategoryA,
     endowmentCategory = testCategoryB,
     liquidationDescription = "Liquidation",
-    zoneId = "Europe/Brussels"
+    zoneId = "Europe/Brussels",
   )
 
   implicit val testAccountingConfig: Config = Config(
@@ -188,10 +197,10 @@ object TestObjects {
       "CASH_B" -> testReservoirCashB,
       "CARD_B" -> testReservoirCardB,
       "HIDDEN" -> testReservoirHidden,
-      "CASH_GBP" -> testReservoirCashGbp
+      "CASH_GBP" -> testReservoirCashGbp,
     ),
     templates = Seq(testTemplate),
-    constants = testConstants
+    constants = testConstants,
   )
 
   private def createListMap[K, V](elems: (K, V)*): ListMap[K, V] = {
@@ -235,7 +244,8 @@ object TestObjects {
       loginName = testUser.loginName,
       plainTextPassword = "dlkfjasfd",
       name = testUser.name,
-      isAdmin = testUser.isAdmin)
+      isAdmin = testUser.isAdmin,
+    )
 
   def orderTokenA: OrderToken = OrderToken.middleBetween(None, Some(OrderToken.middle))
   def orderTokenB: OrderToken = OrderToken.middleBetween(Some(OrderToken.middle), None)
@@ -265,7 +275,7 @@ object TestObjects {
     createdDate = testDate,
     transactionDate = testDate,
     consumedDate = testDate,
-    idOption = Some(721309875)
+    idOption = Some(721309875),
   )
   def testTransactionWithIdB: Transaction = Transaction(
     transactionGroupId = testTransactionGroupWithId.id,
@@ -278,7 +288,7 @@ object TestObjects {
     createdDate = testDate,
     transactionDate = testDate,
     consumedDate = testDate,
-    idOption = Some(4371098)
+    idOption = Some(4371098),
   )
   def testTransactionWithId: Transaction = testTransactionWithIdA
   def testBalanceCheckWithId: BalanceCheck =
@@ -288,13 +298,15 @@ object TestObjects {
       balanceInCents = 38746,
       createdDate = testDate,
       checkDate = testDate,
-      idOption = Some(873865333))
+      idOption = Some(873865333),
+    )
   def testExchangeRateMeasurementWithId: ExchangeRateMeasurement =
     ExchangeRateMeasurement(
       date = testDate,
       foreignCurrencyCode = "GBP",
       ratioReferenceToForeignCurrency = 1.234,
-      idOption = Some(764785511))
+      idOption = Some(764785511),
+    )
 
   def testModificationA: EntityModification = EntityModification.Add(testTransactionWithIdA)
   def testModificationB: EntityModification = EntityModification.Add(testTransactionWithIdB)
@@ -306,7 +318,7 @@ object TestObjects {
     allUsers = Seq(testUserA, testUserB),
     i18nMessages = Map(),
     ratioReferenceToForeignCurrency = Map(),
-    nextUpdateToken = "1234:5678"
+    nextUpdateToken = "1234:5678",
   )
 
   private val unsetDouble: Double = -387461.19
@@ -338,7 +350,7 @@ object TestObjects {
       tags = tags,
       createdDate = createDateTime(year, month, day),
       transactionDate = createDateTime(year, month, day),
-      consumedDate = createDateTime(year, month, day)
+      consumedDate = createDateTime(year, month, day),
     )
   }
 
@@ -357,7 +369,7 @@ object TestObjects {
       balanceInCents = if (balance == unsetDouble) Random.nextLong() % 10000 else (balance * 100).toLong,
       issuerId = issuer.id,
       createdDate = createDateTime(year, month, day),
-      checkDate = createDateTime(year, month, day)
+      checkDate = createDateTime(year, month, day),
     )
   }
 
@@ -373,7 +385,7 @@ object TestObjects {
       idOption = Some(if (id == -1) EntityModification.generateRandomId() else id),
       date = createDateTime(year, month, day),
       foreignCurrencyCode = foreignCurrencyCode,
-      ratioReferenceToForeignCurrency = if (ratio == unsetDouble) Random.nextDouble() else ratio
+      ratioReferenceToForeignCurrency = if (ratio == unsetDouble) Random.nextDouble() else ratio,
     )
   }
   def createTemplate(

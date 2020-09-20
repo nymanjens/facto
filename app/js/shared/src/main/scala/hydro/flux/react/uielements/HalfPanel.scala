@@ -24,13 +24,14 @@ object HalfPanel {
                 Bootstrap.Button(variant = Variant.default, size = Size.xs)(
                   ^.onClick --> props.closeButtonCallback.get,
                   Bootstrap.FontAwesomeIcon("times", fixedWidth = true),
-                )
+                ),
               )
-            }
+            },
           ),
-          Bootstrap.PanelBody(children)
-        )
-    ))
+          Bootstrap.PanelBody(children),
+        ),
+      )
+    )
     .build
 
   // **************** API ****************//

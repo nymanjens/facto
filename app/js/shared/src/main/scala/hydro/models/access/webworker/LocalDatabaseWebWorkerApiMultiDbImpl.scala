@@ -49,7 +49,7 @@ private[webworker] final class LocalDatabaseWebWorkerApiMultiDbImpl
           changedCollectionsSinceLastSave.add(operation.collectionName)
           val db = await(getDbForCollection(operation.collectionName))
           await(db.applyWriteOperations(Seq(operation)))
-      },
+        },
     )
   }
 
@@ -97,7 +97,9 @@ private[webworker] final class LocalDatabaseWebWorkerApiMultiDbImpl
             db.createIfNecessary(
               dbName = s"${dbNamePrefix}_$collectionName",
               inMemory = inMemory,
-              separateDbPerCollection = false))
+              separateDbPerCollection = false,
+            )
+          )
           collectionNameToDbMap.put(collectionName, db)
           db
       }

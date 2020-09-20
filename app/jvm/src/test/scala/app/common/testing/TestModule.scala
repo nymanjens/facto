@@ -32,7 +32,8 @@ final class TestModule extends AbstractModule {
     play.api.Configuration.from(
       Map(
         "app.accounting.configYamlFilePath" -> "/test-accounting-config.yml"
-      ))
+      )
+    )
   }
 
   private def bindSingleton[T](interface: Class[T], implementation: Class[_ <: T]): Unit = {

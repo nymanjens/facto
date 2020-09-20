@@ -108,7 +108,7 @@ object ScalaJsApi {
         expandCashFlowTablesByDefault =
           if (expandCashFlowTablesByDefault == null) None else Some(expandCashFlowTablesByDefault),
         expandLiquidationTablesByDefault =
-          if (expandLiquidationTablesByDefault == null) None else Some(expandLiquidationTablesByDefault)
+          if (expandLiquidationTablesByDefault == null) None else Some(expandLiquidationTablesByDefault),
       )
   }
 }

@@ -40,6 +40,7 @@ object GroupedTransactionsTest extends TestSuite {
     GeneralEntry(
       descriptions
         .map(description => createTransaction(groupId = 18282, description = description))
-        .toVector)
+        .toVector
+    )
   }
 }

@@ -21,8 +21,8 @@ import play.api.mvc._
 import scala.annotation.StaticAnnotation
 import scala.collection.immutable.Seq
 
-final class JavascriptFiles @Inject()(
-    implicit override val messagesApi: MessagesApi,
+final class JavascriptFiles @Inject() (implicit
+    override val messagesApi: MessagesApi,
     components: ControllerComponents,
     clock: Clock,
     entityAccess: EntityAccess,
@@ -102,13 +102,15 @@ object JavascriptFiles {
     val clientAppDeps: Asset =
       firstExistingVersionedAsset(
         s"$clientAppProjectName-opt-library.js",
-        s"$clientAppProjectName-fastopt-library.js")
+        s"$clientAppProjectName-fastopt-library.js",
+      )
     val webworker: Asset =
       firstExistingVersionedAsset(s"$webworkerProjectName-opt.js", s"$webworkerProjectName-fastopt.js")
     val webworkerDeps: Asset =
       firstExistingVersionedAsset(
         s"$webworkerProjectName-opt-library.js",
-        s"$webworkerProjectName-fastopt-library.js")
+        s"$webworkerProjectName-fastopt-library.js",
+      )
 
     val standardAssets: Seq[Asset] = Seq(
       clientApp,
@@ -116,7 +118,7 @@ object JavascriptFiles {
       webworker,
       webworkerDeps,
       VersionedAsset("images/favicon192x192.png"),
-      DynamicAsset(routes.JavascriptFiles.localDatabaseWebWorker)
+      DynamicAsset(routes.JavascriptFiles.localDatabaseWebWorker),
     )
 
     private def firstExistingVersionedAsset(filenames: String*): Asset =
@@ -124,6 +126,8 @@ object JavascriptFiles {
         filenames
           .find(name => ResourceFiles.exists(s"/public/$name"))
           .getOrElse(
-            throw new IllegalArgumentException(s"Could not find any of these files: ${filenames.toVector}")))
+            throw new IllegalArgumentException(s"Could not find any of these files: ${filenames.toVector}")
+          )
+      )
   }
 }

@@ -44,12 +44,13 @@ object EntriesListStoreFactory {
       State(Seq(), hasMore = false, impactingTransactionIds = Set(), impactingBalanceCheckIds = Set())
 
     def withImpactingIdsInEntries[Entry <: GroupedTransactions](entries: Seq[Entry], hasMore: Boolean)(
-        implicit entityAccess: AppJsEntityAccess): State[Entry] =
+        implicit entityAccess: AppJsEntityAccess
+    ): State[Entry] =
       State(
         entries.map(entry => WithIsPending(entry, isPending = isAnyPending(entry.transactions))),
         hasMore = hasMore,
         impactingTransactionIds = entries.toStream.flatMap(_.transactions).map(_.id).toSet,
-        impactingBalanceCheckIds = Set()
+        impactingBalanceCheckIds = Set(),
       )
   }
 }

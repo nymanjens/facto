@@ -14,8 +14,8 @@ import hydro.common.time.Clock
 import hydro.flux.action.Dispatcher
 import hydro.flux.react.uielements.PageHeader
 
-final class Module(
-    implicit i18n: I18n,
+final class Module(implicit
+    i18n: I18n,
     accountingConfig: Config,
     user: User,
     entityAccess: AppJsEntityAccess,
@@ -29,6 +29,7 @@ final class Module(
     summaryForYearStoreFactory: SummaryForYearStoreFactory,
     summaryYearsStoreFactory: SummaryYearsStoreFactory,
     summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
+    chartStoreFactory: ChartStoreFactory,
     collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
     globalMessagesStore: GlobalMessagesStore,
     clock: Clock,
@@ -44,4 +45,6 @@ final class Module(
   implicit lazy val searchResults = new SearchResults
   implicit private lazy val summaryTable = new SummaryTable
   implicit lazy val summary = new Summary
+  implicit private lazy val chartSpecInput = new ChartSpecInput()
+  implicit lazy val chart = new Chart
 }

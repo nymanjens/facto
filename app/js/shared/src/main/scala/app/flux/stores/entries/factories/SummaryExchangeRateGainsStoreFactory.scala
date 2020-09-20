@@ -1,5 +1,8 @@
 package app.flux.stores.entries.factories
 
+import java.time.Duration
+import java.time.LocalTime
+
 import app.common.money.Currency
 import app.common.money.ExchangeRateManager
 import app.common.money.MoneyWithGeneralCurrency
@@ -18,11 +21,13 @@ import app.models.accounting.Transaction
 import app.models.accounting.config.Account
 import app.models.accounting.config.Config
 import app.models.accounting.config.MoneyReservoir
+import hydro.common.time.Clock
 import hydro.common.time.JavaTimeImplicits._
 import hydro.common.time.LocalDateTime
 import hydro.models.access.DbQueryImplicits._
 import hydro.models.access.DbQuery
 import hydro.models.access.ModelField
+import hydro.models.Entity
 
 import scala.async.Async.async
 import scala.async.Async.await
@@ -33,18 +38,19 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 /**
-  * Store factory that calculates the monthly gains and losses made by exchange rate fluctuations in a given year.
+  * Store factory that calculates the monthly gains and losses made by exchange rate fluctuations.
   */
-final class SummaryExchangeRateGainsStoreFactory(
-    implicit entityAccess: AppJsEntityAccess,
+final class SummaryExchangeRateGainsStoreFactory(implicit
+    entityAccess: AppJsEntityAccess,
     exchangeRateManager: ExchangeRateManager,
     accountingConfig: Config,
     complexQueryFilter: ComplexQueryFilter,
+    clock: Clock,
 ) extends EntriesStoreFactory[GainsForYear] {
 
   // **************** Public API ****************//
-  def get(account: Account, year: Int): Store =
-    get(Input(account = account, year = year))
+  def get(account: Account = null, year: Int = -1): Store =
+    get(Input(account = Option(account), year = if (year == -1) None else Some(year)))
 
   // **************** Implementation of EntriesStoreFactory methods/types ****************//
   override protected def createNew(input: Input) = new Store {
@@ -59,24 +65,30 @@ final class SummaryExchangeRateGainsStoreFactory(
       }
     }
 
-    override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) =
-      isRelevantReservoir(transaction.moneyReservoir) && transaction.transactionDate.getYear <= input.year
-    override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) =
-      isRelevantReservoir(balanceCheck.moneyReservoir) && balanceCheck.checkDate.getYear <= input.year
+    override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) = {
+      isRelevantReservoir(transaction.moneyReservoir) &&
+      (input.year.isEmpty || transaction.transactionDate.getYear <= input.year.get)
+    }
+    override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) = {
+      isRelevantReservoir(balanceCheck.moneyReservoir) &&
+      (input.year.isEmpty || balanceCheck.checkDate.getYear <= input.year.get)
+    }
 
     // **************** Private helper methods ****************//
     private def calculateGainsForYear(reservoir: MoneyReservoir): Future[GainsForYear] = async {
-      val monthsInYear = DatedMonth.allMonthsIn(input.year)
-
-      val oldestRelevantBalanceCheck: Option[BalanceCheck] =
-        await(
-          entityAccess
-            .newQuery[BalanceCheck]()
-            .filter(ModelFields.BalanceCheck.moneyReservoirCode === reservoir.code)
-            .filter(ModelFields.BalanceCheck.checkDate < monthsInYear.head.startTime)
-            .sort(AppDbQuerySorting.BalanceCheck.deterministicallyByCheckDate.reversed)
-            .limit(1)
-            .data()).headOption
+      val oldestRelevantBalanceCheck: Option[BalanceCheck] = input.year match {
+        case None => None
+        case Some(year) =>
+          await(
+            entityAccess
+              .newQuery[BalanceCheck]()
+              .filter(ModelFields.BalanceCheck.moneyReservoirCode === reservoir.code)
+              .filter(ModelFields.BalanceCheck.checkDate < DatedMonth.allMonthsIn(year).head.startTime)
+              .sort(AppDbQuerySorting.BalanceCheck.deterministicallyByCheckDate.reversed)
+              .limit(1)
+              .data()
+          ).headOption
+      }
       val oldestBalanceDate = oldestRelevantBalanceCheck.map(_.checkDate).getOrElse(LocalDateTime.MIN)
       val initialBalance =
         oldestRelevantBalanceCheck.map(_.balance).getOrElse(MoneyWithGeneralCurrency(0, reservoir.currency))
@@ -86,10 +98,16 @@ final class SummaryExchangeRateGainsStoreFactory(
           .newQuery[BalanceCheck]()
           .filter(ModelFields.BalanceCheck.moneyReservoirCode === reservoir.code)
           .filter(
-            filterInRange(
-              ModelFields.BalanceCheck.checkDate,
-              oldestBalanceDate,
-              monthsInYear.last.startTimeOfNextMonth))
+            input.year match {
+              case None => DbQuery.Filter.NullFilter()
+              case Some(year) =>
+                filterInRange(
+                  ModelFields.BalanceCheck.checkDate,
+                  oldestBalanceDate,
+                  DatedMonth.allMonthsIn(year).last.startTimeOfNextMonth,
+                )
+            }
+          )
           .data()
 
       val transactionsFuture: Future[Seq[Transaction]] =
@@ -97,20 +115,26 @@ final class SummaryExchangeRateGainsStoreFactory(
           .newQuery[Transaction]()
           .filter(ModelFields.Transaction.moneyReservoirCode === reservoir.code)
           .filter(
-            filterInRange(
-              ModelFields.Transaction.transactionDate,
-              oldestBalanceDate,
-              monthsInYear.last.startTimeOfNextMonth))
+            input.year match {
+              case None => DbQuery.Filter.NullFilter()
+              case Some(year) =>
+                filterInRange(
+                  ModelFields.Transaction.transactionDate,
+                  oldestBalanceDate,
+                  DatedMonth.allMonthsIn(year).last.startTimeOfNextMonth,
+                )
+            }
+          )
           .data()
       val balanceChecks: Seq[BalanceCheck] = await(balanceChecksFuture)
       val transactions: Seq[Transaction] = await(transactionsFuture)
 
+      val mergedRows: Seq[Entity] = (transactions ++ balanceChecks).sortBy {
+        case trans: Transaction => (trans.transactionDate, trans.createdDate)
+        case bc: BalanceCheck   => (bc.checkDate, bc.createdDate)
+      }
       val dateToBalanceFunction: DateToBalanceFunction = {
         val builder = new DateToBalanceFunction.Builder(oldestBalanceDate, initialBalance)
-        val mergedRows = (transactions ++ balanceChecks).sortBy {
-          case trans: Transaction => (trans.transactionDate, trans.createdDate)
-          case bc: BalanceCheck   => (bc.checkDate, bc.createdDate)
-        }
         mergedRows.foreach {
           case transaction: Transaction =>
             builder.incrementLatestBalance(transaction.transactionDate, transaction.flow)
@@ -120,8 +144,27 @@ final class SummaryExchangeRateGainsStoreFactory(
         builder.result
       }
 
+      val monthsInPeriod: Seq[DatedMonth] = input.year match {
+        case Some(year) => DatedMonth.allMonthsIn(year)
+        case None =>
+          mergedRows match {
+            case Seq() => Seq()
+            case _ =>
+              def entityToDate(entity: Entity): LocalDateTime = {
+                entity match {
+                  case trans: Transaction => trans.transactionDate
+                  case bc: BalanceCheck   => bc.checkDate
+                }
+              }
+              DatedMonth.monthsInClosedRange(
+                DatedMonth.containing(entityToDate(mergedRows.head)),
+                Seq(DatedMonth.current, DatedMonth.containing(entityToDate(mergedRows.last))).max,
+              )
+          }
+      }
+
       GainsForYear(
-        monthToGains = monthsInYear.map { month =>
+        monthToGains = monthsInPeriod.map { month =>
           val gain: ReferenceMoney = {
             def gainFromMoney(date: LocalDateTime, amount: MoneyWithGeneralCurrency): ReferenceMoney = {
               val valueAtDate = amount.withDate(date).exchangedForReferenceCurrency
@@ -133,9 +176,8 @@ final class SummaryExchangeRateGainsStoreFactory(
             val gainFromUpdates =
               dateToBalanceFunction
                 .updatesInRange(month)
-                .map {
-                  case (date, DateToBalanceFunction.Update(balance, changeComparedToLast)) =>
-                    gainFromMoney(date, changeComparedToLast)
+                .map { case (date, DateToBalanceFunction.Update(balance, changeComparedToLast)) =>
+                  gainFromMoney(date, changeComparedToLast)
                 }
                 .sum
             gainFromIntialMoney + gainFromUpdates
@@ -143,13 +185,20 @@ final class SummaryExchangeRateGainsStoreFactory(
           month -> GainsForMonth.forSingle(reservoir, gain)
         }.toMap,
         impactingTransactionIds = transactions.toStream.map(_.id).toSet,
-        impactingBalanceCheckIds = (balanceChecks.toStream ++ oldestRelevantBalanceCheck).map(_.id).toSet
+        impactingBalanceCheckIds = (balanceChecks.toStream ++ oldestRelevantBalanceCheck).map(_.id).toSet,
       )
     }
 
-    private def isRelevantReservoir(reservoir: MoneyReservoir): Boolean =
-      reservoir.owner == input.account && reservoir.currency.isForeign
+    private def isRelevantReservoir(reservoir: MoneyReservoir): Boolean = {
+      isRelevantAccount(reservoir.owner) && reservoir.currency.isForeign
+    }
 
+    private def isRelevantAccount(account: Account): Boolean = {
+      input.account match {
+        case None    => true
+        case Some(a) => account == a
+      }
+    }
     private def filterInRange[E](
         field: ModelField[LocalDateTime, E],
         start: LocalDateTime,
@@ -160,7 +209,7 @@ final class SummaryExchangeRateGainsStoreFactory(
   }
 
   /* override */
-  protected case class Input(account: Account, year: Int)
+  protected case class Input(account: Option[Account], year: Option[Int])
 }
 
 object SummaryExchangeRateGainsStoreFactory {
@@ -171,7 +220,7 @@ object SummaryExchangeRateGainsStoreFactory {
   }
 
   case class GainsForYear(
-      private val monthToGains: Map[DatedMonth, GainsForMonth],
+      monthToGains: Map[DatedMonth, GainsForMonth],
       protected override val impactingTransactionIds: Set[Long],
       protected override val impactingBalanceCheckIds: Set[Long],
   ) extends EntriesStore.StateTrait {
@@ -186,12 +235,11 @@ object SummaryExchangeRateGainsStoreFactory {
     def sum(gains: Seq[GainsForYear]): GainsForYear = GainsForYear(
       monthToGains = combineMapValues(gains.map(_.monthToGains))(GainsForMonth.sum),
       impactingTransactionIds = gains.map(_.impactingTransactionIds).reduceOption(_ union _) getOrElse Set(),
-      impactingBalanceCheckIds =
-        gains.map(_.impactingBalanceCheckIds).reduceOption(_ union _) getOrElse Set()
+      impactingBalanceCheckIds = gains.map(_.impactingBalanceCheckIds).reduceOption(_ union _) getOrElse Set(),
     )
   }
 
-  case class GainsForMonth private (private val reservoirToGains: Map[MoneyReservoir, ReferenceMoney]) {
+  case class GainsForMonth private (reservoirToGains: Map[MoneyReservoir, ReferenceMoney]) {
     reservoirToGains.values.foreach(gain => require(!gain.isZero))
 
     lazy val total: ReferenceMoney = reservoirToGains.values.sum
@@ -213,11 +261,13 @@ object SummaryExchangeRateGainsStoreFactory {
 
     def sum(gains: Seq[GainsForMonth]): GainsForMonth =
       GainsForMonth(
-        reservoirToGains = combineMapValues(gains.map(_.reservoirToGains))(_.sum).filterNot(_._2.isZero))
+        reservoirToGains = combineMapValues(gains.map(_.reservoirToGains))(_.sum).filterNot(_._2.isZero)
+      )
   }
 
   private[SummaryExchangeRateGainsStoreFactory] final class DateToBalanceFunction(
-      dateToBalanceUpdates: SortedMap[LocalDateTime, DateToBalanceFunction.Update]) {
+      dateToBalanceUpdates: SortedMap[LocalDateTime, DateToBalanceFunction.Update]
+  ) {
     def apply(date: LocalDateTime): MoneyWithGeneralCurrency = {
       dateToBalanceUpdates.to(date).values.last.balance
     }
@@ -232,26 +282,50 @@ object SummaryExchangeRateGainsStoreFactory {
     final class Builder(initialDate: LocalDateTime, initialBalance: MoneyWithGeneralCurrency) {
       private val dateToBalanceUpdates: mutable.SortedMap[LocalDateTime, Update] =
         mutable.SortedMap(
-          initialDate -> Update(balance = initialBalance, changeComparedToLast = initialBalance))
+          initialDate -> Update(balance = initialBalance, changeComparedToLast = initialBalance)
+        )
 
       def incrementLatestBalance(date: LocalDateTime, addition: MoneyWithGeneralCurrency): Unit = {
         val (lastDate, lastBalance) = dateToBalanceUpdates.last
-        require(lastDate <= date)
         dateToBalanceUpdates.put(
-          date,
-          Update(balance = lastBalance.balance + addition, changeComparedToLast = addition))
+          maybeAddSomeSecondsToAvoidEdgeCases(date),
+          Update(balance = lastBalance.balance + addition, changeComparedToLast = addition),
+        )
       }
 
       def addBalanceUpdate(date: LocalDateTime, balance: MoneyWithGeneralCurrency): Unit = {
         val (lastDate, lastBalance) = dateToBalanceUpdates.last
-        require(lastDate <= date)
         dateToBalanceUpdates.put(
-          date,
-          Update(balance = balance, changeComparedToLast = balance - lastBalance.balance))
+          maybeAddSomeSecondsToAvoidEdgeCases(date),
+          Update(balance = balance, changeComparedToLast = balance - lastBalance.balance),
+        )
       }
 
-      def result: DateToBalanceFunction =
+      def result: DateToBalanceFunction = {
         new DateToBalanceFunction(SortedMap.apply(dateToBalanceUpdates.toSeq: _*))
+      }
+
+      /** Avoids duplicates dates and 00:00. Assumes that dates are provided to this builder in chronological order. */
+      private def maybeAddSomeSecondsToAvoidEdgeCases(date: LocalDateTime): LocalDateTime = {
+        var candidate = date
+
+        // Avoid LocalDateTimes that start at '00:00', which on the first day of the month interferes
+        // with DatedMonth.startOfNextMonth.
+        candidate = if (candidate.toLocalTime == LocalTime.MIN) {
+          candidate.plus(Duration.ofSeconds(1))
+        } else {
+          candidate
+        }
+
+        // Avoid dates that are already in the dateToBalanceUpdates map (assuming dates were presented in
+        // chronological order)
+        val (lastDate, lastBalance) = dateToBalanceUpdates.last
+        candidate =
+          if (lastDate < candidate) candidate
+          else lastDate.plus(Duration.ofSeconds(1))
+
+        candidate
+      }
     }
   }
 }

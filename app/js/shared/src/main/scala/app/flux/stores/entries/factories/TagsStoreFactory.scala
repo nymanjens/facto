@@ -27,7 +27,8 @@ final class TagsStoreFactory(implicit entityAccess: AppJsEntityAccess) extends E
           entityAccess
             .newQuery[Transaction]()
             .filter(ModelFields.Transaction.tags !== Seq())
-            .data())
+            .data()
+        )
 
       val tagToTransactionIdsBuilder =
         ImmutableSetMultimap.builder[TagsStoreFactory.Tag, TagsStoreFactory.TransactionId]()

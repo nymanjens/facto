@@ -70,7 +70,7 @@ object TextInputTest extends TestSuite {
         defaultValue = defaultValue,
         showErrorMessage = showErrorMessage,
         additionalValidator = _ != "INVALID_VALUE",
-        focusOnMount = true
+        focusOnMount = true,
       )
     )
   }

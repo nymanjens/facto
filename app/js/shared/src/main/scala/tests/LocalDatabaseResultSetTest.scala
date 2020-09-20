@@ -88,7 +88,8 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
 
       withTransactions(transaction1, transaction2, transaction3)
         .assertFilteredWith(
-          ModelFields.Transaction.categoryCode isAnyOf Seq(testCategoryA.code, testCategoryB.code))
+          ModelFields.Transaction.categoryCode isAnyOf Seq(testCategoryA.code, testCategoryB.code)
+        )
         .containsExactly(transaction1, transaction2)
     },
     ManualTest("queryExecutor().filter(noneOf)") {
@@ -98,7 +99,8 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
 
       withTransactions(transaction1, transaction2, transaction3)
         .assertFilteredWith(
-          ModelFields.Transaction.categoryCode isNoneOf Seq(testCategoryA.code, testCategoryB.code))
+          ModelFields.Transaction.categoryCode isNoneOf Seq(testCategoryA.code, testCategoryB.code)
+        )
         .containsExactly(transaction3)
     },
     ManualTest("queryExecutor().filter(containsIgnoreCase)") {
@@ -203,10 +205,13 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
 
       withTransactions(transaction1, transaction2, transaction3)
         .assertThat(
-          _.sort(DbQuery.Sorting
-            .descBy(ModelFields.Transaction.transactionGroupId)
-            .thenAscBy(ModelFields.Transaction.createdDate))
-            .data())
+          _.sort(
+            DbQuery.Sorting
+              .descBy(ModelFields.Transaction.transactionGroupId)
+              .thenAscBy(ModelFields.Transaction.createdDate)
+          )
+            .data()
+        )
         .containsExactlyInOrder(transaction3, transaction1, transaction2)
     },
     ManualTest("queryExecutor().limit()") {
@@ -218,7 +223,8 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
         .assertThat(
           _.sort(DbQuery.Sorting.ascBy(ModelFields.Transaction.createdDate))
             .limit(2)
-            .data())
+            .data()
+        )
         .containsExactlyInOrder(transaction1, transaction2)
     },
     ManualTest("queryExecutor().findOne()") {
@@ -236,7 +242,7 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
       val transaction3 = createTransaction()
 
       withTransactions(transaction1, transaction2, transaction3).assertThat(_.count()).isEqualTo(3)
-    }
+    },
   )
 
   private def withTransactions(transactions: Transaction*) = new Object {

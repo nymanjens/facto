@@ -23,11 +23,13 @@ object LocalDatabaseWebWorkerApiConvertersTest extends TestSuite {
       "Insert" - { testForwardAndBackward[WriteOperation](WriteOperation.Insert("test", testObj)) }
       "Update" - {
         testForwardAndBackward[WriteOperation](
-          WriteOperation.Update("test", testObj, abortUnlessExistingValueEquals = js.undefined))
+          WriteOperation.Update("test", testObj, abortUnlessExistingValueEquals = js.undefined)
+        )
       }
       "Update with abortUnlessExistingValueEquals" - {
         testForwardAndBackward[WriteOperation](
-          WriteOperation.Update("test", testObj, abortUnlessExistingValueEquals = testObj2))
+          WriteOperation.Update("test", testObj, abortUnlessExistingValueEquals = testObj2)
+        )
       }
       "Remove" - { testForwardAndBackward[WriteOperation](WriteOperation.Remove("test", "192837")) }
       "Clear" - { testForwardAndBackward[WriteOperation](WriteOperation.RemoveCollection("test")) }
@@ -38,7 +40,8 @@ object LocalDatabaseWebWorkerApiConvertersTest extends TestSuite {
             uniqueIndices = Seq("id"),
             indices = Seq("code"),
             broadcastWriteOperations = true,
-          ))
+          )
+        )
       }
     }
 
@@ -49,7 +52,9 @@ object LocalDatabaseWebWorkerApiConvertersTest extends TestSuite {
           collectionName = "test",
           filter = Some(testObj),
           sorting = Some(js.Array(js.Array[js.Any]("xx", 12))),
-          limit = Some(1238)))
+          limit = Some(1238),
+        )
+      )
     }
 
     "WorkerResponseConverter" - {
@@ -60,7 +65,9 @@ object LocalDatabaseWebWorkerApiConvertersTest extends TestSuite {
       "BroadcastedWriteOperations" - {
         testForwardAndBackward[WorkerResponse](
           WorkerResponse.BroadcastedWriteOperations(
-            Seq(WriteOperation.Update("test", testObj, abortUnlessExistingValueEquals = js.undefined))))
+            Seq(WriteOperation.Update("test", testObj, abortUnlessExistingValueEquals = js.undefined))
+          )
+        )
       }
     }
   }

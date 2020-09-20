@@ -53,8 +53,9 @@ case class Config(
   def visibleReservoirs(includeNullReservoir: Boolean = false): Seq[MoneyReservoir] =
     moneyReservoirs(includeNullReservoir = includeNullReservoir)
 
-  def templatesToShowFor(location: Template.Placement, user: User)(
-      implicit entityAccess: AppEntityAccess): Seq[Template] = {
+  def templatesToShowFor(location: Template.Placement, user: User)(implicit
+      entityAccess: AppEntityAccess
+  ): Seq[Template] = {
     implicit val accountingConfig = this
     templates filter (_.showFor(location, user))
   }
@@ -66,7 +67,7 @@ case class Config(
     codeToTemplate(code)
   }
 
-  def accountOf(user: User)(implicit entityAccess: AppEntityAccess): Option[Account] =
+  def accountOf(user: User): Option[Account] =
     accounts.values.filter(_.userLoginName == Some(user.loginName)).headOption
 
   def personallySortedAccounts(implicit user: User, entityAccess: AppEntityAccess): Seq[Account] = {

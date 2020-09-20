@@ -90,11 +90,10 @@ private[access] final class FutureLocalDatabase(unsafeLocalDatabaseFuture: Futur
         val update = pendingUpdates.remove(0)
         updateInProgress = true
         async {
-          await(update(db).recover {
-            case t: Throwable =>
-              console.log(s"  Failed to perform database update: $t")
-              t.printStackTrace()
-              (): Unit
+          await(update(db).recover { case t: Throwable =>
+            console.log(s"  Failed to perform database update: $t")
+            t.printStackTrace()
+            (): Unit
           })
           updateInProgress = false
           performPendingUpdates(db)
@@ -104,11 +103,10 @@ private[access] final class FutureLocalDatabase(unsafeLocalDatabaseFuture: Futur
   }
 
   private val safeLocalDatabaseFuture: Future[LocalDatabase] =
-    unsafeLocalDatabaseFuture.recoverWith {
-      case t: Throwable =>
-        console.log(s"  Could not create local database: $t")
-        t.printStackTrace()
-        // Fallback to infinitely running future so that API based lookup is always used as fallback
-        Promise[LocalDatabase]().future
+    unsafeLocalDatabaseFuture.recoverWith { case t: Throwable =>
+      console.log(s"  Could not create local database: $t")
+      t.printStackTrace()
+      // Fallback to infinitely running future so that API based lookup is always used as fallback
+      Promise[LocalDatabase]().future
     }
 }

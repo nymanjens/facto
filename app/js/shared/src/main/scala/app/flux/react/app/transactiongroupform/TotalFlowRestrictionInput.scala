@@ -29,7 +29,7 @@ private[transactiongroupform] final class TotalFlowRestrictionInput(implicit i18
               $.setState(totalFlowRestriction).runNow()
               props.onChangeListener(totalFlowRestriction)
             },
-            label
+            label,
           )
         }
 
@@ -37,9 +37,10 @@ private[transactiongroupform] final class TotalFlowRestrictionInput(implicit i18
           VdomAttr("data-toggle") := "buttons",
           button(TotalFlowRestriction.AnyTotal, i18n("app.any-total")),
           button(TotalFlowRestriction.ChooseTotal, i18n("app.choose-total")),
-          button(TotalFlowRestriction.ZeroSum, i18n("app.zero-sum"))
+          button(TotalFlowRestriction.ZeroSum, i18n("app.zero-sum")),
         )
-    })
+      }
+    )
     .build
 
   // **************** API ****************//

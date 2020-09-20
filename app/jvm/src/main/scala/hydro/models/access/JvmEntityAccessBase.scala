@@ -39,7 +39,7 @@ abstract class JvmEntityAccessBase(implicit clock: Clock) extends EntityAccess {
       override def fetch[E <: Entity](entityType: EntityType[E]): Seq[E] =
         getManager(entityType).fetchAll().asInstanceOf[Seq[E]]
     },
-    sortings = sortings
+    sortings = sortings,
   )
 
   private val entityModificationPublisher_ : TriggerablePublisher[EntityModificationsWithToken] =
@@ -56,8 +56,9 @@ abstract class JvmEntityAccessBase(implicit clock: Clock) extends EntityAccess {
 
   def queryExecutor[E <: Entity: EntityType]: DbQueryExecutor.Sync[E] = inMemoryEntityDatabase.queryExecutor
 
-  def newSlickQuery[E <: Entity]()(
-      implicit entityTableDef: SlickEntityTableDef[E]): TableQuery[entityTableDef.Table] =
+  def newSlickQuery[E <: Entity]()(implicit
+      entityTableDef: SlickEntityTableDef[E]
+  ): TableQuery[entityTableDef.Table] =
     SlickEntityManager.forType[E].newQuery.asInstanceOf[TableQuery[entityTableDef.Table]]
 
   def entityModificationPublisher: Publisher[EntityModificationsWithToken] = entityModificationPublisher_
@@ -71,8 +72,9 @@ abstract class JvmEntityAccessBase(implicit clock: Clock) extends EntityAccess {
     Await.ready(persistEntityModificationsAsync(modifications), scala.concurrent.duration.Duration.Inf)
   }
 
-  def persistEntityModificationsAsync(modifications: Seq[EntityModification])(
-      implicit user: User): Future[Unit] = {
+  def persistEntityModificationsAsync(
+      modifications: Seq[EntityModification]
+  )(implicit user: User): Future[Unit] = {
     EntityModificationAsyncProcessor.processAsync(modifications)
   }
 
@@ -112,11 +114,12 @@ abstract class JvmEntityAccessBase(implicit clock: Clock) extends EntityAccess {
         require(
           allEntitiesInMemory.size == allEntitiesInDb.size,
           s"Mismatch between db and cache for entityType $entityType: Size mismatch: " +
-            s"${allEntitiesInMemory.size} != ${allEntitiesInDb.size}"
+            s"${allEntitiesInMemory.size} != ${allEntitiesInDb.size}",
         )
         require(
           allEntitiesInMemory == allEntitiesInDb,
-          s"Mismatch between db and cache for entityType $entityType")
+          s"Mismatch between db and cache for entityType $entityType",
+        )
       }
       run(entityType)
     }
@@ -138,7 +141,8 @@ abstract class JvmEntityAccessBase(implicit clock: Clock) extends EntityAccess {
       this.synchronized {
         val uniqueModifications = modifications.filterNot(alreadySeenAddsAndRemoves)
         alreadySeenAddsAndRemoves ++= uniqueModifications.filter(m =>
-          m.isInstanceOf[EntityModification.Add[_]] || m.isInstanceOf[EntityModification.Remove[_]])
+          m.isInstanceOf[EntityModification.Add[_]] || m.isInstanceOf[EntityModification.Remove[_]]
+        )
         Future(processSync(uniqueModifications))(singleThreadedExecutor)
       }
 
@@ -168,7 +172,8 @@ abstract class JvmEntityAccessBase(implicit clock: Clock) extends EntityAccess {
             dbRun(
               newSlickQuery[EntityModificationEntity]()
                 .filter(_.entityId inSet modifications.map(_.entityId).toSet)
-                .result)
+                .result
+            )
               .map(_.modification)
 
         // Remove some time from the next update token because a slower persistEntityModifications() invocation B
@@ -180,7 +185,7 @@ abstract class JvmEntityAccessBase(implicit clock: Clock) extends EntityAccess {
         val modificationBundler = new ModificationBundler(
           triggerEveryNAdditions = 20,
           triggerFunction = modifications =>
-            entityModificationPublisher_.trigger(EntityModificationsWithToken(modifications, nextUpdateToken))
+            entityModificationPublisher_.trigger(EntityModificationsWithToken(modifications, nextUpdateToken)),
         )
 
         for (modification <- modifications) {
@@ -221,8 +226,9 @@ abstract class JvmEntityAccessBase(implicit clock: Clock) extends EntityAccess {
                   idOption = Some(EntityModification.generateRandomId()),
                   userId = user.id,
                   modification = modification,
-                  instant = clock.nowInstant
-                ))
+                  instant = clock.nowInstant,
+                )
+              )
 
             inMemoryEntityDatabase.update(modification)
 

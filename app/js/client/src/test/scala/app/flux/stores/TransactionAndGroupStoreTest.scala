@@ -36,7 +36,8 @@ object TransactionAndGroupStoreTest extends TestSuite {
       val Seq(addGroup, addTransaction) = fakeDatabase.allModifications
 
       addGroup ==> EntityModification.Add(
-        TransactionGroup(idOption = Some(groupId), createdDate = fakeClock.now))
+        TransactionGroup(idOption = Some(groupId), createdDate = fakeClock.now)
+      )
 
       addTransaction match {
         case EntityModification.Add(transaction: Transaction) =>
@@ -56,7 +57,10 @@ object TransactionAndGroupStoreTest extends TestSuite {
             transactionGroupWithId = testTransactionGroupWithId,
             transactionsWithoutId = Seq(
               testTransactionWithIdB.copy(idOption = None)
-            ))))
+            ),
+          )
+        )
+      )
 
       fakeDatabase.allModifications.size - initialModifications.size ==> 2
       val Seq(removeTransaction, addTransaction) = fakeDatabase.allModifications takeRight 2

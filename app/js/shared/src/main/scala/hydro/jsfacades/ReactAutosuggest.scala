@@ -23,16 +23,17 @@ object ReactAutosuggest {
     component(
       Props(
         suggestions = suggestions.toJSArray,
-        onSuggestionsFetchRequested = params => onSuggestionsFetchRequested(params.value.asInstanceOf[String]),
+        onSuggestionsFetchRequested =
+          params => onSuggestionsFetchRequested(params.value.asInstanceOf[String]),
         onSuggestionsClearRequested = onSuggestionsClearRequested,
         getSuggestionValue = s => s,
         renderSuggestion = renderSuggestion,
         inputProps = js.Dynamic.literal(
           value = inputProps.value,
-          onChange = (event: js.Any, params: js.Dynamic) =>
-            inputProps.onChange(params.newValue.asInstanceOf[String]),
+          onChange =
+            (event: js.Any, params: js.Dynamic) => inputProps.onChange(params.newValue.asInstanceOf[String]),
           name = inputProps.name,
-          className = inputProps.classes.mkString(" ")
+          className = inputProps.classes.mkString(" "),
         ),
         theme = js.Dynamic.literal(
           container = theme.container,
@@ -40,9 +41,10 @@ object ReactAutosuggest {
           suggestionsContainer = theme.suggestionsContainer,
           suggestionsList = theme.suggestionsList,
           suggestion = theme.suggestion,
-          suggestionHighlighted = theme.suggestionHighlighted
-        )
-      ).toJsObject)
+          suggestionHighlighted = theme.suggestionHighlighted,
+        ),
+      ).toJsObject
+    )
   }
 
   // **************** Public inner types ****************//
@@ -79,7 +81,7 @@ object ReactAutosuggest {
         getSuggestionValue = getSuggestionValue,
         renderSuggestion = renderSuggestion,
         inputProps = inputProps,
-        theme = theme
+        theme = theme,
       )
   }
 }

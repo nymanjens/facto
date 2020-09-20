@@ -20,8 +20,8 @@ import scala.async.Async.await
 import scala.reflect.ClassTag
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-private[router] final class RouterFactory(
-    implicit reactAppModule: app.flux.react.app.Module,
+private[router] final class RouterFactory(implicit
+    reactAppModule: app.flux.react.app.Module,
     dispatcher: Dispatcher,
     i18n: I18n,
     entityAccess: EntityAccess,
@@ -43,12 +43,13 @@ private[router] final class RouterFactory(
           val path = RouterFactory.pathPrefix + page.getClass.getSimpleName.toLowerCase
           staticRoute(path, page) ~> renderR(ctl => logExceptions(renderer(RouterContext(page, ctl))))
         }
-        def dynamicRuleFromPage[P <: Page](dynamicPart: String => RouteB[P])(
-            renderer: (P, RouterContext) => VdomElement)(implicit pageClass: ClassTag[P]): dsl.Rule = {
+        def dynamicRuleFromPage[P <: Page](
+            dynamicPart: String => RouteB[P]
+        )(renderer: (P, RouterContext) => VdomElement)(implicit pageClass: ClassTag[P]): dsl.Rule = {
           val staticPathPart = RouterFactory.pathPrefix + pageClass.runtimeClass.getSimpleName.toLowerCase
           val path = dynamicPart(staticPathPart)
-          dynamicRouteCT(path) ~> dynRenderR {
-            case (page, ctl) => logExceptions(renderer(page, RouterContext(page, ctl)))
+          dynamicRouteCT(path) ~> dynRenderR { case (page, ctl) =>
+            logExceptions(renderer(page, RouterContext(page, ctl)))
           }
         }
 
@@ -56,7 +57,7 @@ private[router] final class RouterFactory(
         (emptyRule
 
           | staticRoute(RouterFactory.pathPrefix, StandardPages.Root)
-            ~> redirectToPage(AppPages.CashFlow)(Redirect.Replace)
+          ~> redirectToPage(AppPages.CashFlow)(Redirect.Replace)
 
           | staticRuleFromPage(StandardPages.UserProfile, reactAppModule.userProfile.apply)
 
@@ -93,13 +94,14 @@ private[router] final class RouterFactory(
               reactAppModule.transactionGroupForm.forCreateFromCopy(
                 page.transactionGroupId,
                 page.returnToPath,
-                ctl)
+                ctl,
+              )
           }
 
           | dynamicRuleFromPage(
-            _ / (codeString ~ returnToPath).caseClass[AppPages.NewTransactionGroupFromReservoir]) {
-            (page, ctl) =>
-              reactAppModule.transactionGroupForm.forReservoir(page.reservoirCode, page.returnToPath, ctl)
+            _ / (codeString ~ returnToPath).caseClass[AppPages.NewTransactionGroupFromReservoir]
+          ) { (page, ctl) =>
+            reactAppModule.transactionGroupForm.forReservoir(page.reservoirCode, page.returnToPath, ctl)
           }
 
           | dynamicRuleFromPage(_ / (codeString ~ returnToPath).caseClass[AppPages.NewFromTemplate]) {
@@ -108,13 +110,14 @@ private[router] final class RouterFactory(
           }
 
           | dynamicRuleFromPage(
-            _ / ((codeString / codeString) ~ returnToPath).caseClass[AppPages.NewForRepayment]) {
-            (page, ctl) =>
-              reactAppModule.transactionGroupForm.forRepayment(
-                page.accountCode1,
-                page.accountCode2,
-                page.returnToPath,
-                ctl)
+            _ / ((codeString / codeString) ~ returnToPath).caseClass[AppPages.NewForRepayment]
+          ) { (page, ctl) =>
+            reactAppModule.transactionGroupForm.forRepayment(
+              page.accountCode1,
+              page.accountCode2,
+              page.returnToPath,
+              ctl,
+            )
           }
 
           | dynamicRuleFromPage(_ ~ returnToPath.caseClass[AppPages.NewForLiquidationSimplification]) {
@@ -132,24 +135,31 @@ private[router] final class RouterFactory(
               reactAppModule.balanceCheckForm.forEdit(page.balanceCheckId, page.returnToPath, ctl)
           }
 
+          | dynamicRuleFromPage(_ ~ query.caseClass[AppPages.Chart]) { (page, ctl) =>
+            reactAppModule.chart(page.stringifiedChartSpec, ctl)
+          }
+
         // Fallback
         ).notFound(redirectToPage(AppPages.CashFlow)(Redirect.Replace))
           .onPostRender((prev, cur) =>
-            LogExceptionsCallback(
-              dispatcher.dispatch(StandardActions.SetPageLoadingState(isLoading = false))))
+            LogExceptionsCallback(dispatcher.dispatch(StandardActions.SetPageLoadingState(isLoading = false)))
+          )
           .onPostRender((_, page) =>
             LogExceptionsCallback(async {
               val title = await(page.title)
               dom.document.title = s"$title | Facto"
-            }))
+            })
+          )
       }
       .renderWith(layout)
   }
 
-  private def layout(routerCtl: RouterCtl[Page], resolution: Resolution[Page])(
-      implicit reactAppModule: app.flux.react.app.Module) = {
+  private def layout(routerCtl: RouterCtl[Page], resolution: Resolution[Page])(implicit
+      reactAppModule: app.flux.react.app.Module
+  ) = {
     reactAppModule.layout(RouterContext(resolution.page, routerCtl))(
-      <.div(^.key := resolution.page.toString, resolution.render()))
+      <.div(^.key := resolution.page.toString, resolution.render())
+    )
   }
 }
 private[router] object RouterFactory {

@@ -34,24 +34,29 @@ object SummaryTableTest extends TestSuite {
             Seq(
               createTransaction(year = 2012, month = APRIL, flow = 22, category = testCategoryA),
               createTransaction(year = 2012, month = JUNE, flow = 1.2, category = testCategoryA),
-              createTransaction(year = 2012, month = JUNE, flow = -2, category = testCategoryC)
-            )),
+              createTransaction(year = 2012, month = JUNE, flow = -2, category = testCategoryC),
+            )
+          ),
           GainsForYear(
-            monthToGains = Map(DatedMonth.of(2012, JUNE) ->
-              GainsForMonth.forSingle(testReservoirCashGbp, ReferenceMoney(123))),
+            monthToGains = Map(
+              DatedMonth.of(2012, JUNE) ->
+                GainsForMonth.forSingle(testReservoirCashGbp, ReferenceMoney(123))
+            ),
             impactingTransactionIds = Set(),
-            impactingBalanceCheckIds = Set()
-          )
+            impactingBalanceCheckIds = Set(),
+          ),
         ),
         2013 -> summaryTable.AllYearsData.YearData(
           SummaryForYear(
             Seq(
               createTransaction(year = 2013, category = testCategoryA),
-              createTransaction(year = 2013, category = testCategoryB))),
-          GainsForYear.empty
-        )
+              createTransaction(year = 2013, category = testCategoryB),
+            )
+          ),
+          GainsForYear.empty,
+        ),
       ),
-      netWorth = ReferenceMoney(23737373)
+      netWorth = ReferenceMoney(23737373),
     )
 
     "AllYearsData" - {
@@ -72,7 +77,10 @@ object SummaryTableTest extends TestSuite {
           .totalWithoutCategories(categoriesToIgnore = Set(), month = DatedMonth.of(2012, JUNE)) ==>
           ReferenceMoney(120 - 200 + 123)
         allYearsData
-          .totalWithoutCategories(categoriesToIgnore = Set(testCategoryC), month = DatedMonth.of(2012, JUNE)) ==>
+          .totalWithoutCategories(
+            categoriesToIgnore = Set(testCategoryC),
+            month = DatedMonth.of(2012, JUNE),
+          ) ==>
           ReferenceMoney(120 + 123)
       }
       "averageWithoutCategories" - {
@@ -135,7 +143,8 @@ object SummaryTableTest extends TestSuite {
               DatedMonth.of(2012, FEBRUARY),
               DatedMonth.of(2012, MARCH),
               DatedMonth.of(2012, APRIL),
-              DatedMonth.of(2012, MAY))
+              DatedMonth.of(2012, MAY),
+            )
         }
         "only after first transaction of year (April)" - {
           val newAllYearsData = allYearsData.copy(allTransactionsYearRange = YearRange.closed(2012, 2013))
@@ -150,7 +159,7 @@ object SummaryTableTest extends TestSuite {
               DatedMonth.of(2012, SEPTEMBER),
               DatedMonth.of(2012, OCTOBER),
               DatedMonth.of(2012, NOVEMBER),
-              DatedMonth.of(2012, DECEMBER)
+              DatedMonth.of(2012, DECEMBER),
             )
         }
       }

@@ -12,8 +12,8 @@ import play.api.i18n.Messages
 import play.api.i18n.MessagesApi
 import play.api.mvc._
 
-final class Auth @Inject()(
-    implicit override val messagesApi: MessagesApi,
+final class Auth @Inject() (implicit
+    override val messagesApi: MessagesApi,
     components: ControllerComponents,
     entityAccess: JvmEntityAccess,
     playConfiguration: play.api.Configuration,
@@ -29,7 +29,7 @@ final class Auth @Inject()(
   def authenticate(returnTo: String) = Action { implicit request =>
     Forms.loginForm.bindFromRequest.fold(
       formWithErrors => BadRequest(views.html.login(formWithErrors, returnTo)),
-      user => Redirect(returnTo).withSession("username" -> user._1)
+      user => Redirect(returnTo).withSession("username" -> user._1),
     )
   }
 
@@ -51,11 +51,11 @@ object Auth {
     def loginForm(implicit entityAccess: JvmEntityAccess) = Form(
       tuple(
         "loginName" -> nonEmptyText,
-        "password" -> text
+        "password" -> text,
       ) verifying ("app.error.invalid-username-or-password", result =>
         result match {
           case (loginName, password) => Users.authenticate(loginName, password)
-      })
+        })
     )
   }
 

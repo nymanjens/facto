@@ -6,8 +6,8 @@ import app.models.user.User
 import hydro.models.access.DbQueryImplicits._
 import play.api.mvc._
 
-abstract class AuthenticatedAction[A](bodyParser: BodyParser[A])(
-    implicit entityAccess: JvmEntityAccess,
+abstract class AuthenticatedAction[A](bodyParser: BodyParser[A])(implicit
+    entityAccess: JvmEntityAccess,
     controllerComponents: ControllerComponents,
     playConfiguration: play.api.Configuration,
 ) extends EssentialAction {
@@ -32,8 +32,8 @@ object AuthenticatedAction {
 
   type UserAndRequestToResult[A] = User => Request[A] => Result
 
-  def apply[A](bodyParser: BodyParser[A])(userAndRequestToResult: UserAndRequestToResult[A])(
-      implicit entityAccess: JvmEntityAccess,
+  def apply[A](bodyParser: BodyParser[A])(userAndRequestToResult: UserAndRequestToResult[A])(implicit
+      entityAccess: JvmEntityAccess,
       controllerComponents: ControllerComponents,
       playConfiguration: play.api.Configuration,
   ): AuthenticatedAction[A] = {
@@ -44,16 +44,16 @@ object AuthenticatedAction {
     }
   }
 
-  def apply(userAndRequestToResult: UserAndRequestToResult[AnyContent])(
-      implicit entityAccess: JvmEntityAccess,
+  def apply(userAndRequestToResult: UserAndRequestToResult[AnyContent])(implicit
+      entityAccess: JvmEntityAccess,
       controllerComponents: ControllerComponents,
       playConfiguration: play.api.Configuration,
   ): AuthenticatedAction[AnyContent] = {
     apply(controllerComponents.parsers.defaultBodyParser)(userAndRequestToResult)
   }
 
-  def requireAdminUser(userAndRequestToResult: UserAndRequestToResult[AnyContent])(
-      implicit entityAccess: JvmEntityAccess,
+  def requireAdminUser(userAndRequestToResult: UserAndRequestToResult[AnyContent])(implicit
+      entityAccess: JvmEntityAccess,
       controllerComponents: ControllerComponents,
       playConfiguration: play.api.Configuration,
   ): AuthenticatedAction[AnyContent] =

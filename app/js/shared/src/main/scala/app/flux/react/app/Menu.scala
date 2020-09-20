@@ -17,8 +17,8 @@ import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
 
-private[app] final class Menu(
-    implicit accountingConfig: Config,
+private[app] final class Menu(implicit
+    accountingConfig: Config,
     user: User,
     entityAccess: AppJsEntityAccess,
     i18n: I18n,
@@ -33,28 +33,35 @@ private[app] final class Menu(
           MenuItem(
             i18n("app.everything.html"),
             AppPages.Everything,
-            shortcuts = Seq("shift+alt+e", "shift+alt+a")),
+            shortcuts = Seq("shift+alt+e", "shift+alt+a"),
+          ),
           MenuItem(i18n("app.cash-flow.html"), AppPages.CashFlow, shortcuts = Seq("shift+alt+c")),
           MenuItem(
             i18n("app.liquidation.html"),
             AppPages.Liquidation,
-            shortcuts = Seq("shift+alt+l", "shift+alt+v")),
+            shortcuts = Seq("shift+alt+l", "shift+alt+v"),
+          ),
           MenuItem(i18n("app.endowments.html"), AppPages.Endowments, shortcuts = Seq("shift+alt+d")),
-          MenuItem(i18n("app.summary.html"), AppPages.Summary, shortcuts = Seq("shift+alt+s"))
+          MenuItem(i18n("app.summary.html"), AppPages.Summary, shortcuts = Seq("shift+alt+s")),
+          MenuItem(i18n("app.chart.html"), AppPages.Chart.empty, shortcuts = Seq("shift+alt+r")),
         ),
         Seq(
           MenuItem(
             i18n("app.templates.html"),
             AppPages.TemplateList,
-            shortcuts = Seq("shift+alt+t", "shift+alt+j")),
-          MenuItem(i18n("app.new-entry.html"), AppPages.NewTransactionGroup(), shortcuts = Seq("shift+alt+n"))
+            shortcuts = Seq("shift+alt+t", "shift+alt+j"),
+          ),
+          MenuItem(i18n("app.new-entry.html"), AppPages.NewTransactionGroup(), shortcuts = Seq("shift+alt+n")),
         ),
         for (template <- newEntryTemplates)
-          yield
-            MenuItem(template.name, AppPages.NewFromTemplate(template), iconClass = Some(template.iconClass))
+          yield MenuItem(
+            template.name,
+            AppPages.NewFromTemplate(template),
+            iconClass = Some(template.iconClass),
+          ),
       ),
       enableSearch = true,
-      router = router
+      router = router,
     )
   }
 

@@ -46,8 +46,8 @@ object TransactionGroup {
   object Partial {
     val withSingleEmptyTransaction: Partial = Partial(transactions = Seq(Transaction.Partial.empty))
 
-    def from(group: TransactionGroup, transactions: Seq[Transaction])(
-        implicit accountingConfig: Config,
+    def from(group: TransactionGroup, transactions: Seq[Transaction])(implicit
+        accountingConfig: Config,
         exchangeRateManager: ExchangeRateManager,
     ): Partial = {
       val isZeroSum = transactions.map(_.flow.exchangedForReferenceCurrency).sum == ReferenceMoney(0)
@@ -55,7 +55,7 @@ object TransactionGroup {
         transactions = transactions.map(Transaction.Partial.from),
         zeroSum = isZeroSum,
         createdDate = Some(group.createdDate),
-        idOption = group.idOption
+        idOption = group.idOption,
       )
     }
   }

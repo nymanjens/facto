@@ -16,15 +16,15 @@ object CollapseAllExpandAllButtons {
           ^.onClick --> Callback(props.onExpandedUpdate(false)),
           Bootstrap.FontAwesomeIcon("angle-double-right"),
           " ",
-          props.i18n("app.collapse-all")
+          props.i18n("app.collapse-all"),
         ),
         " ",
         Bootstrap.Button(variant = Variant.default)(
           ^.onClick --> Callback(props.onExpandedUpdate(true)),
           Bootstrap.FontAwesomeIcon("angle-double-down"),
           " ",
-          props.i18n("app.expand-all")
-        )
+          props.i18n("app.expand-all"),
+        ),
       )
     })
     .build

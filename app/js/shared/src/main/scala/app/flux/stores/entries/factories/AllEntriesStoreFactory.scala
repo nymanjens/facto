@@ -22,7 +22,8 @@ final class AllEntriesStoreFactory(implicit entityAccess: AppJsEntityAccess)
             .newQuery[Transaction]()
             .sort(AppDbQuerySorting.Transaction.deterministicallyByTransactionDate.reversed)
             .limit(3 * maxNumEntries)
-            .data()).reverse
+            .data()
+        ).reverse
 
       var entries = transactions.map(t => GeneralEntry(Seq(t)))
 

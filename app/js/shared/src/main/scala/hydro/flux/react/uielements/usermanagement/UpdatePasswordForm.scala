@@ -18,8 +18,8 @@ import hydro.flux.react.uielements.Bootstrap
 
 import scala.collection.immutable.Seq
 
-private[usermanagement] final class UpdatePasswordForm(
-    implicit user: User,
+private[usermanagement] final class UpdatePasswordForm(implicit
+    user: User,
     i18n: I18n,
     dispatcher: Dispatcher,
 ) extends HydroReactComponent {
@@ -54,7 +54,7 @@ private[usermanagement] final class UpdatePasswordForm(
             name = "loginName",
             label = i18n("app.login-name"),
             defaultValue = user.loginName,
-            disabled = true
+            disabled = true,
           ),
           TextInput(
             ref = passwordRef,
@@ -62,7 +62,7 @@ private[usermanagement] final class UpdatePasswordForm(
             label = i18n("app.password"),
             inputType = "password",
             required = true,
-            showErrorMessage = state.showErrorMessages
+            showErrorMessage = state.showErrorMessages,
           ),
           TextInput(
             ref = passwordVerificationRef,
@@ -70,9 +70,9 @@ private[usermanagement] final class UpdatePasswordForm(
             label = i18n("app.retype-password"),
             inputType = "password",
             required = true,
-            showErrorMessage = state.showErrorMessages
+            showErrorMessage = state.showErrorMessages,
           ),
-          Bootstrap.Button(tpe = "submit")(^.onClick ==> onSubmit, i18n("app.ok"))
+          Bootstrap.Button(tpe = "submit")(^.onClick ==> onSubmit, i18n("app.ok")),
         )
       )
     }
@@ -102,7 +102,9 @@ private[usermanagement] final class UpdatePasswordForm(
             case Some(newPassword) =>
               dispatcher.dispatch(
                 StandardActions.UpsertUser(
-                  UserPrototype.create(id = user.id, plainTextPassword = newPassword)))
+                  UserPrototype.create(id = user.id, plainTextPassword = newPassword)
+                )
+              )
 
               // Clear form
               passwordRef().setValue("")
@@ -112,7 +114,8 @@ private[usermanagement] final class UpdatePasswordForm(
             case None =>
           }
           newState
-      }).runNow()
+        }
+      ).runNow()
     }
   }
 }

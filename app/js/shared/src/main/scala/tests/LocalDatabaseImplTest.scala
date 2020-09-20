@@ -48,17 +48,20 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
         TestParameters(
           separateDbPerCollection = false,
           jsWorker = JsWorkerClientFacade.getSharedIfSupported().get,
-        )),
+        )
+      ),
       testsWithParameters(
         TestParameters(
           separateDbPerCollection = true,
           jsWorker = JsWorkerClientFacade.getSharedIfSupported().get,
-        )),
+        )
+      ),
       testsWithParameters(
         TestParameters(
           separateDbPerCollection = false,
           jsWorker = JsWorkerClientFacade.getDedicated(),
-        )),
+        )
+      ),
     ).flatten
 
   private def testsWithParameters(testParameters: TestParameters) = {
@@ -66,7 +69,8 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
       ManualTest(
         s"$name " +
           s"[separateDbPerCollection=${testParameters.separateDbPerCollection}, " +
-          s"${testParameters.jsWorker.getClass.getSimpleName}]")(testCode)
+          s"${testParameters.jsWorker.getClass.getSimpleName}]"
+      )(testCode)
 
     Seq(
       manualTest("isEmpty") {
@@ -113,7 +117,7 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
 
           await(db.setSingletonValue(DbStatusKey, testDbStatusA)) ==> true
           await(
-            db.setSingletonValue(DbStatusKey, testDbStatusA, abortUnlessExistingValueEquals = testDbStatusA),
+            db.setSingletonValue(DbStatusKey, testDbStatusA, abortUnlessExistingValueEquals = testDbStatusA)
           ) ==> false
           await(db.getSingletonValue(DbStatusKey)).get ==> testDbStatusA
 
@@ -176,7 +180,8 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
 
           await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()) ==> Seq(testUserRedacted)
           await(DbResultSet.fromExecutor(db.queryExecutor[Transaction]()).data()) ==> Seq(
-            testTransactionWithId)
+            testTransactionWithId
+          )
           await(DbResultSet.fromExecutor(db.queryExecutor[BalanceCheck]()).data()) ==>
             Seq(testBalanceCheckWithId)
           await(DbResultSet.fromExecutor(db.queryExecutor[ExchangeRateMeasurement]()).data()) ==>
@@ -267,7 +272,8 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
           val user2UpdateA = EntityModification
             .createUpdate(
               user2.copy(loginName = "login2_update"),
-              fieldMask = Seq(ModelFields.User.loginName))
+              fieldMask = Seq(ModelFields.User.loginName),
+            )
           val user2UpdateB = EntityModification
             .createUpdate(user2.copy(name = "name2_update"), fieldMask = Seq(ModelFields.User.name))
           await(db.applyModifications(Seq(user2UpdateA))) ==> true
@@ -280,9 +286,9 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
                 loginName = "login2_update",
                 name = "name2_update",
                 lastUpdateTime = user2UpdateA.updatedEntity.lastUpdateTime
-                  .merge(user2UpdateB.updatedEntity.lastUpdateTime, forceIncrement = false)
+                  .merge(user2UpdateB.updatedEntity.lastUpdateTime, forceIncrement = false),
               ),
-              user3
+              user3,
             )
         }
       },
@@ -327,8 +333,10 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
                 EntityModification.Add(user1),
                 EntityModification.Add(user1),
                 EntityModification.Add(updatedUser1),
-                EntityModification.Add(user2)
-              ))) ==> true
+                EntityModification.Add(user2),
+              )
+            )
+          ) ==> true
 
           await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()).toSet ==> Set(user1, user2)
         }
@@ -350,7 +358,9 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
                 EntityModification.Update(updatedUserB),
                 EntityModification.Update(updatedUserA),
                 EntityModification.Update(updatedUserB),
-              ))) ==> true
+              )
+            )
+          ) ==> true
 
           await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()) ==> Seq(updatedUserB)
         }
@@ -368,8 +378,10 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
               Seq(
                 EntityModification.createRemove(user2),
                 EntityModification.createRemove(user2),
-                EntityModification.createRemove(user3)
-              ))) ==> true
+                EntityModification.createRemove(user3),
+              )
+            )
+          ) ==> true
 
           await(DbResultSet.fromExecutor(db.queryExecutor[User]()).data()) ==> Seq(user1)
         }
@@ -383,9 +395,11 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
             override def onPendingModificationAddedByOtherInstance(modification: EntityModification): Unit =
               nextEventPromise.tryFailure(new AssertionError(s"Got Add($modification)"))
             override def onPendingModificationRemovedByOtherInstance(
-                modificationPseudoUniqueIdentifier: Long): Unit =
+                modificationPseudoUniqueIdentifier: Long
+            ): Unit =
               nextEventPromise.tryFailure(
-                new AssertionError(s"Got Remove($modificationPseudoUniqueIdentifier)"))
+                new AssertionError(s"Got Remove($modificationPseudoUniqueIdentifier)")
+              )
           })
 
           await(db.addPendingModifications(Seq(testModificationA, testModificationB))) ==> true
@@ -406,7 +420,8 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
               override def onPendingModificationAddedByOtherInstance(modification: EntityModification): Unit =
                 receivedAdditions += modification
               override def onPendingModificationRemovedByOtherInstance(
-                  modificationPseudoUniqueIdentifier: Long): Unit =
+                  modificationPseudoUniqueIdentifier: Long
+              ): Unit =
                 errors += new AssertionError(s"Got Remove($modificationPseudoUniqueIdentifier)")
             })
 
@@ -415,7 +430,9 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
                 new LocalDatabaseWebWorkerApiStub(forceJsWorker = Some(testParameters.jsWorker))
               await(
                 LocalDatabaseImpl.createInMemoryForTests(
-                  separateDbPerCollection = testParameters.separateDbPerCollection))
+                  separateDbPerCollection = testParameters.separateDbPerCollection
+                )
+              )
             }
 
             await(otherDb.addPendingModifications(Seq(testModificationA))) ==> true
@@ -432,14 +449,16 @@ private[tests] class LocalDatabaseImplTest extends ManualTestSuite {
   }
 
   private def createAndInitializeDb(
-      testParameters: TestParameters,
+      testParameters: TestParameters
   ): Future[LocalDatabase] = async {
     implicit val webWorker = new LocalDatabaseWebWorkerApiStub(forceJsWorker = Some(testParameters.jsWorker))
 
     val db =
       await(
         LocalDatabaseImpl.createInMemoryForTests(
-          separateDbPerCollection = testParameters.separateDbPerCollection))
+          separateDbPerCollection = testParameters.separateDbPerCollection
+        )
+      )
     await(db.resetAndInitialize())
     db
   }

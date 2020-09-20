@@ -56,7 +56,8 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
       EntityModification.Add(testUserA),
       EntityModification.Add(testUserB),
       EntityModification.createAddWithRandomId(
-        ExchangeRateMeasurement(date1, "GBP", ratioReferenceToForeignCurrency = 1.3))
+        ExchangeRateMeasurement(date1, "GBP", ratioReferenceToForeignCurrency = 1.3)
+      ),
     )
 
     val response = serverFactory.create().getInitialData()
@@ -107,7 +108,10 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
           DbQuery[Transaction](
             filter = ModelFields.Transaction.categoryCode === testCategoryA.code,
             sorting = None,
-            limit = None)))
+            limit = None,
+          )
+        )
+      )
 
     entities.toSet mustEqual Set(transaction1, transaction2)
   }
@@ -143,8 +147,10 @@ class ScalaJsApiServerFactoryTest extends HookedSpecification {
       "isAdmin" in new WithApplication {
         serverFactory
           .create()(testUser.copy(isAdmin = true))
-          .upsertUser(UserPrototype
-            .create(loginName = "tester", plainTextPassword = "abc", name = "Tester", isAdmin = false))
+          .upsertUser(
+            UserPrototype
+              .create(loginName = "tester", plainTextPassword = "abc", name = "Tester", isAdmin = false)
+          )
         val createdUser = getOnlyElement(entityAccess.newQuerySync[User]().data())
         serverFactory
           .create()(testUser.copy(idOption = Some(createdUser.id)))

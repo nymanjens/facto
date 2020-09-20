@@ -20,8 +20,8 @@ import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 
-final class SbadminLayout(
-    implicit globalMessages: GlobalMessages,
+final class SbadminLayout(implicit
+    globalMessages: GlobalMessages,
     pageLoadingSpinner: PageLoadingSpinner,
     applicationDisconnectedIcon: ApplicationDisconnectedIcon,
     localDatabaseHasBeenLoadedIcon: LocalDatabaseHasBeenLoadedIcon,
@@ -34,7 +34,8 @@ final class SbadminLayout(
 
   // **************** API ****************//
   def apply(title: TagMod, leftMenu: VdomElement, pageContent: VdomElement, extraFooter: Seq[TagMod] = Seq())(
-      implicit router: RouterContext): VdomElement = {
+      implicit router: RouterContext
+  ): VdomElement = {
     <.div(
       ^.id := "wrapper",
       // Navigation
@@ -50,11 +51,11 @@ final class SbadminLayout(
             <.span(^.className := "sr-only", "Toggle navigation"),
             <.span(^.className := "icon-bar"),
             <.span(^.className := "icon-bar"),
-            <.span(^.className := "icon-bar")
+            <.span(^.className := "icon-bar"),
           ),
           Bootstrap.NavbarBrand(tag = router.anchorWithHrefTo(StandardPages.Root))(title),
           " ",
-          pageLoadingSpinner()
+          pageLoadingSpinner(),
         ),
         <.ul(
           ^.className := "nav navbar-top-links navbar-right",
@@ -82,16 +83,18 @@ final class SbadminLayout(
                   .anchorWithHrefTo(StandardPages.UserProfile)(
                     <.i(^.className := StandardPages.UserProfile.iconClass),
                     " ",
-                    StandardPages.UserProfile.titleSync
-                  )),
+                    StandardPages.UserProfile.titleSync,
+                  )
+              ),
               ^^.ifThen(user.isAdmin) {
                 <.li(
                   router
                     .anchorWithHrefTo(StandardPages.UserAdministration)(
                       <.i(^.className := StandardPages.UserAdministration.iconClass),
                       " ",
-                      StandardPages.UserAdministration.titleSync
-                    ))
+                      StandardPages.UserAdministration.titleSync,
+                    )
+                )
               },
               ^^.ifThen(user.isAdmin) {
                 <.li(
@@ -99,8 +102,9 @@ final class SbadminLayout(
                     .anchorWithHrefTo(StandardPages.DatabaseExplorer)(
                       <.i(^.className := StandardPages.DatabaseExplorer.iconClass),
                       " ",
-                      StandardPages.DatabaseExplorer.titleSync
-                    ))
+                      StandardPages.DatabaseExplorer.titleSync,
+                    )
+                )
               },
               <.li(^.className := "divider"),
               <.li(
@@ -109,17 +113,20 @@ final class SbadminLayout(
                   ^.onClick ==> doLogout,
                   <.i(^.className := "fa fa-sign-out fa-fw"),
                   " ",
-                  i18n("app.logout")))
-            )
-          )
+                  i18n("app.logout"),
+                )
+              ),
+            ),
+          ),
         ),
         <.div(
           ^.className := "navbar-default sidebar",
           ^.role := "navigation",
           <.div(
             ^^.classes(Seq("sidebar-nav", "navbar-collapse") ++ ifThenSeq(navbarCollapsed, "collapse")),
-            leftMenu)
-        )
+            leftMenu,
+          ),
+        ),
       ),
       // Page Content
       <.div(
@@ -135,11 +142,11 @@ final class SbadminLayout(
               s"v${AppVersion.versionString}",
               <.span(^.style := js.Dictionary("marginLeft" -> "45px")),
               <.span(^.dangerouslySetInnerHtml := "&copy;"),
-              " 2019 Jens Nyman"
+              " 2019 Jens Nyman",
             )(extraFooter: _*)
-          )
-        )
-      )
+          ),
+        ),
+      ),
     )
   }
 

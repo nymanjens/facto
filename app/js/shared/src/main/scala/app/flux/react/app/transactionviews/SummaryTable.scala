@@ -41,8 +41,8 @@ import scala.collection.immutable.ListMap
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 
-private[transactionviews] final class SummaryTable(
-    implicit summaryYearsStoreFactory: SummaryYearsStoreFactory,
+private[transactionviews] final class SummaryTable(implicit
+    summaryYearsStoreFactory: SummaryYearsStoreFactory,
     summaryForYearStoreFactory: SummaryForYearStoreFactory,
     summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
     cashFlowEntriesStoreFactory: CashFlowEntriesStoreFactory,
@@ -91,7 +91,8 @@ private[transactionviews] final class SummaryTable(
           onSetExpandedYear = onSetExpandedYear,
           onShowYearlyTotalToggle = onShowYearlyTotalToggle,
           router = router,
-        ))
+        )
+      )
       .vdomElement
   }
 
@@ -199,7 +200,8 @@ private[transactionviews] final class SummaryTable(
       AllYearsData(
         allTransactionsYearRange = YearRange.empty,
         yearsToData = ListMap(),
-        netWorth = ReferenceMoney(0))
+        netWorth = ReferenceMoney(0),
+      )
 
     def builder(allTransactionsYearRange: YearRange): Builder = new Builder(allTransactionsYearRange)
 
@@ -259,8 +261,8 @@ private[transactionviews] final class SummaryTable(
             <.th(
               ^.colSpan := columns.size,
               <.span(^.className := "primary-title", account.longName),
-              <.span(^.className := "secondary-title", i18n("app.net-worth"), " ", data.netWorth.toString)
-            )
+              <.span(^.className := "secondary-title", i18n("app.net-worth"), " ", data.netWorth.toString),
+            ),
           ),
           // **************** Year header **************** //
           <.tr(
@@ -275,7 +277,10 @@ private[transactionviews] final class SummaryTable(
                       ^.href := "javascript:void(0)",
                       ^.onClick --> props.onShowHiddenYears,
                       yearRange.firstYear,
-                      <<.ifThen(yearRange.size > 1)("-"))))
+                      <<.ifThen(yearRange.size > 1)("-"),
+                    ),
+                  )
+                )
               case MonthColumn(month) =>
                 None
               case AverageColumn(year) =>
@@ -283,15 +288,17 @@ private[transactionviews] final class SummaryTable(
                   <.th(
                     ^.key := year,
                     ^.colSpan := columnsForYear(year, expandedYear = props.expandedYear).size,
-                    <.a(^.href := "javascript:void(0)", ^.onClick --> props.onSetExpandedYear(year), year)
-                  ))
+                    <.a(^.href := "javascript:void(0)", ^.onClick --> props.onSetExpandedYear(year), year),
+                  )
+                )
               case TotalColumn(year) =>
                 Some(
                   <.th(
                     ^.key := year,
                     ^.colSpan := columnsForYear(year, expandedYear = props.expandedYear).size,
-                    <.a(^.href := "javascript:void(0)", ^.onClick --> props.onSetExpandedYear(year), year)
-                  ))
+                    <.a(^.href := "javascript:void(0)", ^.onClick --> props.onSetExpandedYear(year), year),
+                  )
+                )
             }.toVdomArray
           ),
           // **************** Month header **************** //
@@ -305,7 +312,9 @@ private[transactionviews] final class SummaryTable(
                   <.a(
                     ^.href := "javascript:void(0)",
                     ^.onClick --> props.onShowHiddenYears,
-                    <<.ifThen(yearRange.size > 1)(yearRange.lastYear)))
+                    <<.ifThen(yearRange.size > 1)(yearRange.lastYear),
+                  ),
+                )
               case MonthColumn(month) =>
                 <.th(^.key := s"${month.year}-${month.month}", month.abbreviation)
               case AverageColumn(year) =>
@@ -327,7 +336,7 @@ private[transactionviews] final class SummaryTable(
                   ),
                 )
             }.toVdomArray
-          )
+          ),
         ),
         <.tbody(
           // **************** Categories data **************** //
@@ -348,7 +357,7 @@ private[transactionviews] final class SummaryTable(
                       <.td(^.key := s"empty-avg-$year", ^.className := "average")
                     case TotalColumn(year) =>
                       <.td(^.key := s"empty-total-$year", ^.className := "average")
-                  }.toVdomArray
+                  }.toVdomArray,
                 )
               }
             }.toVdomArray
@@ -368,7 +377,8 @@ private[transactionviews] final class SummaryTable(
                         ^.key := s"avg-${category.code}-${month.year}-${month.month}",
                         ^^.classes(cellClasses(month)),
                         uielements.UpperRightCorner(
-                          cornerContent = <<.ifThen(cellData.nonEmpty)(s"(${cellData.transactions.size})"))(
+                          cornerContent = <<.ifThen(cellData.nonEmpty)(s"(${cellData.transactions.size})")
+                        )(
                           /* centralContent = */
                           if (cellData.nonEmpty) cellData.totalFlow.formatFloat else "",
                           ^^.ifThen(cellData.nonEmpty) {
@@ -380,39 +390,44 @@ private[transactionviews] final class SummaryTable(
                                     <.i(^.key := "template-icon", ^.className := template.iconClass)
                                   }
                                 val tagIndications = transaction.tags
-                                  .map(
-                                    tag =>
-                                      Bootstrap.Label(BootstrapTags.toStableVariant(tag))(
-                                        ^.key := tag,
-                                        tag,
-                                      ): VdomNode)
+                                  .map(tag =>
+                                    Bootstrap.Label(BootstrapTags.toStableVariant(tag))(
+                                      ^.key := tag,
+                                      tag,
+                                    ): VdomNode
+                                  )
                                 <.div(
                                   ^.key := transaction.id,
                                   router.anchorWithHrefTo(
-                                    AppPages.EditTransactionGroup(transaction.transactionGroupId))(
+                                    AppPages.EditTransactionGroup(transaction.transactionGroupId)
+                                  )(
                                     uielements.MoneyWithCurrency(transaction.flow),
                                     " - ",
-                                    <<.joinWithSpaces(maybeTemplateIcon.toVector ++
-                                      tagIndications :+
-                                      (transaction.description: VdomNode))
-                                  )
+                                    <<.joinWithSpaces(
+                                      maybeTemplateIcon.toVector ++
+                                        tagIndications :+
+                                        (transaction.description: VdomNode)
+                                    ),
+                                  ),
                                 )
-                              }).toVdomArray
+                              }).toVdomArray,
                             )
-                          }
-                        )
+                          },
+                        ),
                       )
                     case AverageColumn(year) =>
                       <.td(
                         ^.key := s"avg-${category.code}-$year",
                         ^.className := "average",
-                        data.yearlyAverage(year, category).formatFloat)
+                        data.yearlyAverage(year, category).formatFloat,
+                      )
                     case TotalColumn(year) =>
                       <.td(
                         ^.key := s"total-${category.code}-$year",
                         ^.className := "average",
-                        data.yearlyTotal(year, category).formatFloat)
-                  }.toVdomArray
+                        data.yearlyTotal(year, category).formatFloat,
+                      )
+                  }.toVdomArray,
                 )
               }
             }.toVdomArray
@@ -431,19 +446,21 @@ private[transactionviews] final class SummaryTable(
                     <.td(
                       ^.key := s"gain-${currency.code}-${month.year}-${month.month}",
                       ^^.classes(cellClasses(month)),
-                      data.exchangeRateGains(currency, month).formatFloat
+                      data.exchangeRateGains(currency, month).formatFloat,
                     )
                   case AverageColumn(year) =>
                     <.td(
                       ^.key := s"avg-$year",
                       ^.className := "average",
-                      data.averageExchangeRateGains(currency, year).formatFloat)
+                      data.averageExchangeRateGains(currency, year).formatFloat,
+                    )
                   case TotalColumn(year) =>
                     <.td(
                       ^.key := s"total-$year",
                       ^.className := "average",
-                      data.totalExchangeRateGains(currency, year).formatFloat)
-                }.toVdomArray
+                      data.totalExchangeRateGains(currency, year).formatFloat,
+                    )
+                }.toVdomArray,
               )
             }).toVdomArray
           },
@@ -456,46 +473,46 @@ private[transactionviews] final class SummaryTable(
                   Seq(
                     SummaryTotalRowDef(
                       rowTitleHtml = s"<b>${i18n("app.total")}</b>",
-                      categoriesToIgnore = Set()))
+                      categoriesToIgnore = Set(),
+                    )
+                  )
                 case _ => Seq()
               }
-            }.zipWithIndex.map {
-              case (SummaryTotalRowDef(rowTitleHtml, categoriesToIgnore), rowIndex) =>
-                <.tr(
-                  ^.key := s"total-$rowIndex",
-                  ^.className := s"total total-$rowIndex",
-                  columns.map {
-                    case TitleColumn =>
-                      <.td(
-                        ^.key := "title",
-                        ^.className := "title",
-                        ^.dangerouslySetInnerHtml := rowTitleHtml)
-                    case OmittedYearsColumn(_) =>
-                      <.td(^.key := "omitted-years", "...")
-                    case MonthColumn(month) =>
-                      val total = data.totalWithoutCategories(categoriesToIgnore, month)
-                      <.td(
-                        ^.key := s"total-$rowIndex-${month.year}-${month.month}",
-                        ^^.classes(cellClasses(month)),
-                        <<.ifThen(total.nonZero) {
-                          total.formatFloat
-                        }
-                      )
-                    case AverageColumn(year) =>
-                      <.td(
-                        ^.key := s"average-$rowIndex-$year",
-                        ^.className := "average",
-                        data.averageWithoutCategories(categoriesToIgnore, year).formatFloat)
-                    case TotalColumn(year) =>
-                      <.td(
-                        ^.key := s"total-$rowIndex-$year",
-                        ^.className := "average",
-                        data.totalWithoutCategories(categoriesToIgnore, year).formatFloat)
-                  }.toVdomArray
-                )
+            }.zipWithIndex.map { case (SummaryTotalRowDef(rowTitleHtml, categoriesToIgnore), rowIndex) =>
+              <.tr(
+                ^.key := s"total-$rowIndex",
+                ^.className := s"total total-$rowIndex",
+                columns.map {
+                  case TitleColumn =>
+                    <.td(^.key := "title", ^.className := "title", ^.dangerouslySetInnerHtml := rowTitleHtml)
+                  case OmittedYearsColumn(_) =>
+                    <.td(^.key := "omitted-years", "...")
+                  case MonthColumn(month) =>
+                    val total = data.totalWithoutCategories(categoriesToIgnore, month)
+                    <.td(
+                      ^.key := s"total-$rowIndex-${month.year}-${month.month}",
+                      ^^.classes(cellClasses(month)),
+                      <<.ifThen(total.nonZero) {
+                        total.formatFloat
+                      },
+                    )
+                  case AverageColumn(year) =>
+                    <.td(
+                      ^.key := s"average-$rowIndex-$year",
+                      ^.className := "average",
+                      data.averageWithoutCategories(categoriesToIgnore, year).formatFloat,
+                    )
+                  case TotalColumn(year) =>
+                    <.td(
+                      ^.key := s"total-$rowIndex-$year",
+                      ^.className := "average",
+                      data.totalWithoutCategories(categoriesToIgnore, year).formatFloat,
+                    )
+                }.toVdomArray,
+              )
             }.toVdomArray
-          }
-        )
+          },
+        ),
       )
     }
 
@@ -522,7 +539,8 @@ private[transactionviews] final class SummaryTable(
           dataBuilder.addYear(
             year,
             summaryForYearStore.state getOrElse SummaryForYear.empty,
-            exchangeRateGainsStore.flatMap(_.state) getOrElse GainsForYear.empty)
+            exchangeRateGainsStore.flatMap(_.state) getOrElse GainsForYear.empty,
+          )
           usedStores += summaryForYearStore
           usedStores ++= exchangeRateGainsStore.toSeq
         }
@@ -530,13 +548,15 @@ private[transactionviews] final class SummaryTable(
           if (reservoir.owner == props.account) {
             val store = cashFlowEntriesStoreFactory.get(
               moneyReservoir = reservoir,
-              maxNumEntries = CashFlow.minNumEntriesPerReservoir)
+              maxNumEntries = CashFlow.minNumEntriesPerReservoir,
+            )
 
             if (store.state.isDefined) {
               dataBuilder.addToNetWorth(
                 store.state.get.entries.lastOption
                   .map(_.entry.balance.withDate(clock.now).exchangedForReferenceCurrency) getOrElse
-                  ReferenceMoney(0))
+                  ReferenceMoney(0)
+              )
             }
 
             usedStores += store

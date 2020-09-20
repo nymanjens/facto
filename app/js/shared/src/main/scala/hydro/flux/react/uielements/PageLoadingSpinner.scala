@@ -18,7 +18,8 @@ final class PageLoadingSpinner(implicit pageLoadingStateStore: PageLoadingStateS
   override protected val config = ComponentConfig(backendConstructor = new Backend(_), initialState = State())
     .withStateStoresDependency(
       pageLoadingStateStore,
-      _.copy(isLoading = pageLoadingStateStore.state.isLoading))
+      _.copy(isLoading = pageLoadingStateStore.state.isLoading),
+    )
 
   // **************** Implementation of HydroReactComponent types ****************//
   protected type Props = Unit
@@ -30,7 +31,7 @@ final class PageLoadingSpinner(implicit pageLoadingStateStore: PageLoadingStateS
       state.isLoading match {
         case true =>
           Bootstrap.NavbarBrand()(
-            Bootstrap.FontAwesomeIcon("circle-o-notch", "spin"),
+            Bootstrap.FontAwesomeIcon("circle-o-notch", "spin")
           )
         case false =>
           <.span()

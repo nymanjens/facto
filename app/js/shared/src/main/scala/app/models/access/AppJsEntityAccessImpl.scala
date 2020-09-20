@@ -10,8 +10,7 @@ import hydro.models.access.RemoteDatabaseProxy
 
 import scala.collection.immutable.Seq
 
-private[access] final class AppJsEntityAccessImpl(allUsers: Seq[User])(
-    implicit
+private[access] final class AppJsEntityAccessImpl(allUsers: Seq[User])(implicit
     apiClient: ScalaJsApiClient,
     remoteDatabaseProxy: RemoteDatabaseProxy,
     hydroPushSocketClientFactory: HydroPushSocketClientFactory,

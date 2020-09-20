@@ -14,8 +14,9 @@ case class DatedMoney(override val cents: Long, override val currency: Currency,
   def exchangedForReferenceCurrency(implicit exchangeRateManager: ExchangeRateManager): ReferenceMoney =
     ReferenceMoney(exchangedForCurrency(Currency.default).cents)
 
-  def exchangedForCurrency(otherCurrency: Currency)(
-      implicit exchangeRateManager: ExchangeRateManager): DatedMoney = {
+  def exchangedForCurrency(
+      otherCurrency: Currency
+  )(implicit exchangeRateManager: ExchangeRateManager): DatedMoney = {
     val ratio = exchangeRateManager.getRatioSecondToFirstCurrency(currency, otherCurrency, date)
     val centsInOtherCurrency = roundToLong(ratio * cents)
     DatedMoney(centsInOtherCurrency, otherCurrency, date)

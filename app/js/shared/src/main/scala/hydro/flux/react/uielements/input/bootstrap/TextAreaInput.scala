@@ -32,9 +32,9 @@ object TextAreaInput {
         ^.name := name,
         ^.value := valueString,
         ^.rows := 2,
-        ^.onChange ==> ((event: ReactEventFromInput) => onChange(event.target.value))
+        ^.onChange ==> ((event: ReactEventFromInput) => onChange(event.target.value)),
       )
-    }
+    },
   )
 
   // **************** API ****************//
@@ -56,7 +56,7 @@ object TextAreaInput {
       showErrorMessage = showErrorMessage,
       inputClasses = inputClasses,
       listener = listener,
-      valueTransformer = ValueTransformer.nullInstance
+      valueTransformer = ValueTransformer.nullInstance,
     )
     ref.mutableRef.component(props)
   }
@@ -65,8 +65,8 @@ object TextAreaInput {
 
   // **************** Public inner types ****************//
   final class Reference private[TextAreaInput] (
-      private[TextAreaInput] val mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps])
-      extends InputComponent.Reference(mutableRef)
+      private[TextAreaInput] val mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps]
+  ) extends InputComponent.Reference(mutableRef)
 
   // **************** Private inner types ****************//
   private type ExtraProps = Unit

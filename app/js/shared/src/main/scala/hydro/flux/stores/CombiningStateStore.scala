@@ -4,10 +4,9 @@ import scala.collection.immutable.Seq
 
 abstract class CombiningStateStore[InputStateA, InputStateB, OutputState](
     storeA: StateStore[InputStateA],
-    storeB: StateStore[InputStateB]
+    storeB: StateStore[InputStateB],
 ) extends StateStore[OutputState] {
-  require(storeA.stateUpdateListeners.isEmpty, "Combining should happen on a newly created store")
-  require(storeB.stateUpdateListeners.isEmpty, "Combining should happen on a newly created store")
+  onStateUpdateListenersChange()
 
   protected def combineStoreStates(storeAState: InputStateA, storeBState: InputStateB): OutputState
 

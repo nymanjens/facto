@@ -12,8 +12,8 @@ import hydro.flux.stores.UserStore
 import hydro.flux.stores.DatabaseExplorerStoreFactory
 import hydro.models.access.JsEntityAccess
 
-final class Module(
-    implicit i18n: I18n,
+final class Module(implicit
+    i18n: I18n,
     user: User,
     entityAccess: JsEntityAccess,
     globalMessagesStore: GlobalMessagesStore,

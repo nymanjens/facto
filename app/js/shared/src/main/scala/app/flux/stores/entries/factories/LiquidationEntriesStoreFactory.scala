@@ -22,8 +22,8 @@ import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-final class LiquidationEntriesStoreFactory(
-    implicit entityAccess: AppJsEntityAccess,
+final class LiquidationEntriesStoreFactory(implicit
+    entityAccess: AppJsEntityAccess,
     accountingConfig: Config,
     exchangeRateManager: ExchangeRateManager,
 ) extends EntriesListStoreFactory[LiquidationEntry, AccountPair] {
@@ -61,7 +61,7 @@ final class LiquidationEntriesStoreFactory(
           .map(entry => WithIsPending(entry, isPending = isAnyPending(entry.transactions))),
         hasMore = entries.size > maxNumEntries,
         impactingTransactionIds = relevantTransactions.toStream.map(_.id).toSet,
-        impactingBalanceCheckIds = Set()
+        impactingBalanceCheckIds = Set(),
       )
     }
 
@@ -84,17 +84,18 @@ final class LiquidationEntriesStoreFactory(
               ||
                 ((ModelFields.Transaction.moneyReservoirCode isAnyOf account1ReservoirCodes) &&
                   (ModelFields.Transaction.beneficiaryAccountCode === accountPair.account2.code))
-              ||
+                ||
                 ((ModelFields.Transaction.moneyReservoirCode isAnyOf account2ReservoirCodes) &&
                   (ModelFields.Transaction.beneficiaryAccountCode === accountPair.account1.code))
-              ||
+                ||
                 ((ModelFields.Transaction.moneyReservoirCode === "") &&
                   (ModelFields.Transaction.beneficiaryAccountCode isAnyOf accountPair.toSet
                     .map(_.code)
                     .toVector))
           )
           .sort(AppDbQuerySorting.Transaction.deterministicallyByTransactionDate)
-          .data())
+          .data()
+      )
 
       val isRelevantSeq = await(Future.sequence(transactions.map(isRelevantForAccounts(_, accountPair))))
       (isRelevantSeq zip transactions).filter(_._1).map(_._2)
@@ -113,7 +114,9 @@ final class LiquidationEntriesStoreFactory(
                   .filter(ModelFields.Transaction.transactionGroupId === transaction.transactionGroupId)
                   .sort(AppDbQuerySorting.Transaction.deterministicallyByCreateDate)
                   .limit(1)
-                  .data())).beneficiary
+                  .data()
+              )
+            ).beneficiary
           case _ => transaction.moneyReservoir.owner
         }
         val involvedAccounts: Set[Account] = Set(transaction.beneficiary, moneyReservoirOwner)

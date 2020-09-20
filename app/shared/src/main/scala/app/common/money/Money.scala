@@ -19,6 +19,7 @@ trait Money {
   def currency: Currency
 
   final def formatFloat: String = Money.centsToFloatString(cents)
+  final def toDouble: Double = cents / 100.0
 
   final def withDate(date: LocalDateTime): DatedMoney = {
     DatedMoney(cents, currency, date)
@@ -113,9 +114,11 @@ object Money {
         parseDelimitedBy(".", string.replace(",", ""))
       } else if (string contains ",") {
         val commaParts = string.split(",")
-        if (!string.startsWith(",")
-            && commaParts.nonEmpty
-            && commaParts.tail.map(_.length).toSet == Set(3)) {
+        if (
+          !string.startsWith(",")
+          && commaParts.nonEmpty
+          && commaParts.tail.map(_.length).toSet == Set(3)
+        ) {
           parseNonCents(string.replace(",", ""))
         } else {
           parseDelimitedBy(",", string)

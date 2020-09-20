@@ -68,7 +68,8 @@ object Awaiter {
     def neverComplete(future: Future[_]): MatchResult[Any] = {
       expectCondition(
         !future.isCompleted,
-        s"Expected future that never completes, but completed with tryValue ${future.value.get}")
+        s"Expected future that never completes, but completed with tryValue ${future.value.get}",
+      )
     }
   }
 }

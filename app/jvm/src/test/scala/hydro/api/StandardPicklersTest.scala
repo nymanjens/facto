@@ -46,7 +46,10 @@ class StandardPicklersTest extends HookedSpecification {
         DbQuery[User](
           filter = ModelFields.User.loginName === "xxx",
           sorting = Some(Sorting.ascBy(ModelFields.User.loginName)),
-          limit = Some(10))))
+          limit = Some(10),
+        )
+      )
+    )
   }
 
   "EntityModification" in {
@@ -59,16 +62,20 @@ class StandardPicklersTest extends HookedSpecification {
     testPickleAndUnpickle[GetAllEntitiesResponse](
       GetAllEntitiesResponse(
         entitiesMap = Map(User.Type -> Seq(testUserRedacted)),
-        nextUpdateToken = testUpdateToken))
+        nextUpdateToken = testUpdateToken,
+      )
+    )
   }
 
   "ModificationsWithToken" in {
     testPickleAndUnpickle[EntityModificationsWithToken](
-      EntityModificationsWithToken(modifications = Seq(testModification), nextUpdateToken = testUpdateToken))
+      EntityModificationsWithToken(modifications = Seq(testModification), nextUpdateToken = testUpdateToken)
+    )
   }
   "VersionCheck" in {
     testPickleAndUnpickle[HydroPushSocketPacket.VersionCheck](
-      HydroPushSocketPacket.VersionCheck(versionString = "1.2.3"))
+      HydroPushSocketPacket.VersionCheck(versionString = "1.2.3")
+    )
   }
 
   private def testPickleAndUnpickle[T: Pickler](value: T) = {

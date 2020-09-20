@@ -23,7 +23,7 @@ import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 
 final class LocalDatabaseWebWorkerApiStub(
-    forceJsWorker: Option[JsWorkerClientFacade] = None,
+    forceJsWorker: Option[JsWorkerClientFacade] = None
 ) extends LocalDatabaseWebWorkerApi.ForClient {
 
   private val responseMessagePromises: mutable.Buffer[Promise[js.Any]] = mutable.Buffer()
@@ -89,10 +89,12 @@ final class LocalDatabaseWebWorkerApiStub(
           scalajs.dom.console
             .log(
               "  [LocalDatabaseWebWorker] Operation timed out " +
-                s"(methodNum = $methodNum, args = $args, timeout = $timeout)")
+                s"(methodNum = $methodNum, args = $args, timeout = $timeout)"
+            )
           responseMessagePromises -= thisMessagePromise
           thisMessagePromise.failure(
-            new Exception(s"Operation timed out (methodNum = $methodNum, args = $args, timeout = $timeout)"))
+            new Exception(s"Operation timed out (methodNum = $methodNum, args = $args, timeout = $timeout)")
+          )
         }
       }
 
@@ -100,11 +102,10 @@ final class LocalDatabaseWebWorkerApiStub(
     }
 
   private def initializeJsWorker(): JsWorkerClient = {
-    val workerClientFacade = (
+    val workerClientFacade =
       forceJsWorker orElse
         JsWorkerClientFacade.getSharedIfSupported() getOrElse
         JsWorkerClientFacade.getDedicated()
-    )
 
     workerClientFacade.setUpClient(
       scriptUrl = "/localDatabaseWebWorker.js",
@@ -118,7 +119,8 @@ final class LocalDatabaseWebWorkerApiStub(
                   promise.failure(new IllegalStateException(s"WebWorker invocation failed:\n$stackTrace"))
                 case None =>
                   throw new AssertionError(
-                    s"Received unexpected message (this is a bug unless this operation timed out): $response")
+                    s"Received unexpected message (this is a bug unless this operation timed out): $response"
+                  )
               }
 
             case response @ WorkerResponse.MethodReturnValue(returnValue) =>
@@ -128,7 +130,8 @@ final class LocalDatabaseWebWorkerApiStub(
                   promise.success(returnValue)
                 case None =>
                   throw new AssertionError(
-                    s"Received unexpected message (this is a bug unless this operation timed out): $response")
+                    s"Received unexpected message (this is a bug unless this operation timed out): $response"
+                  )
               }
 
             case WorkerResponse.BroadcastedWriteOperations(writeOperations) =>
@@ -136,7 +139,7 @@ final class LocalDatabaseWebWorkerApiStub(
                 listener.onWriteOperationsDone(writeOperations)
               }
           }
-      },
+        },
     )
   }
 }

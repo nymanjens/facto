@@ -13,14 +13,15 @@ import hydro.models.access.JvmEntityAccessBase
 import hydro.models.modification.EntityType
 import hydro.models.slick.SlickEntityTableDef
 
-final class JvmEntityAccess @Inject()(implicit clock: Clock)
+final class JvmEntityAccess @Inject() (implicit clock: Clock)
     extends JvmEntityAccessBase
     with AppEntityAccess {
 
   override def newQuerySyncForUser() = newQuerySync[User]()
 
   override protected def getEntityTableDef(
-      entityType: EntityType.any): SlickEntityTableDef[entityType.get] = {
+      entityType: EntityType.any
+  ): SlickEntityTableDef[entityType.get] = {
     val tableDef = entityType match {
       case User.Type                    => SlickEntityTableDefs.UserDef
       case Transaction.Type             => SlickEntityTableDefs.TransactionDef

@@ -94,20 +94,24 @@ object AllEntriesStoreFactoryTest extends TestSuite {
           idOption = Some(id),
           transactionGroupId = id,
           createdDate = createdDate,
-          transactionDate = transactionDate)
+          transactionDate = transactionDate,
+        )
       }
       val trans1 = transaction(
         111,
         transactionDate = createDateTime(2012, JANUARY, 2),
-        createdDate = createDateTime(2012, JANUARY, 3))
+        createdDate = createDateTime(2012, JANUARY, 3),
+      )
       val trans2 = transaction(
         222,
         transactionDate = createDateTime(2012, JANUARY, 3),
-        createdDate = createDateTime(2012, JANUARY, 1))
+        createdDate = createDateTime(2012, JANUARY, 1),
+      )
       val trans3 = transaction(
         333,
         transactionDate = createDateTime(2012, JANUARY, 3),
-        createdDate = createDateTime(2012, JANUARY, 2))
+        createdDate = createDateTime(2012, JANUARY, 2),
+      )
 
       entityAccess.addRemotelyAddedEntities(trans3, trans2, trans1)
 

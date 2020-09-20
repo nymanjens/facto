@@ -10,8 +10,8 @@ import hydro.flux.router.RouterContext
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
-final class DatabaseExplorer(
-    implicit i18n: I18n,
+final class DatabaseExplorer(implicit
+    i18n: I18n,
     pageHeader: PageHeader,
     databaseTableView: DatabaseTableView,
 ) extends HydroReactComponent.Stateless {
@@ -40,7 +40,7 @@ final class DatabaseExplorer(
               databaseTableView(entityType),
             )
           }
-        ).toVdomArray
+        ).toVdomArray,
       )
     }
   }

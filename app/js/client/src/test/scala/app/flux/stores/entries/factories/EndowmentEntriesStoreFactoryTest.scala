@@ -63,7 +63,7 @@ object EndowmentEntriesStoreFactoryTest extends TestSuite {
       transactionDate = createDateTime(2012, JANUARY, createdDay),
       consumedDate = createDateTime(2012, JANUARY, consumedDay),
       beneficiaryAccountCode = account.code,
-      categoryCode = category.code
+      categoryCode = category.code,
     )
     entityAccess.addRemotelyAddedEntities(transaction)
     transaction

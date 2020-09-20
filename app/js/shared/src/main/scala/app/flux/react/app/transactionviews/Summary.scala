@@ -20,17 +20,16 @@ import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
 
-final class Summary(
-  implicit summaryTable: SummaryTable,
-  entityAccess: AppJsEntityAccess,
-  user: User,
-  clock: Clock,
-  accountingConfig: Config,
-  exchangeRateManager: ExchangeRateManager,
-  i18n: I18n,
-  pageHeader: PageHeader,
+final class Summary(implicit
+    summaryTable: SummaryTable,
+    entityAccess: AppJsEntityAccess,
+    user: User,
+    clock: Clock,
+    accountingConfig: Config,
+    exchangeRateManager: ExchangeRateManager,
+    i18n: I18n,
+    pageHeader: PageHeader,
 ) extends HydroReactComponent {
-
 
   // **************** API ****************//
   def apply(router: RouterContext): VdomElement = {
@@ -38,10 +37,13 @@ final class Summary(
   }
 
   // **************** Implementation of HydroReactComponent methods ****************//
-  override protected val config = ComponentConfig(backendConstructor = new Backend(_), initialState = State(
-    yearLowerBound = clock.now.getYear - 1,
-    expandedYear = clock.now.getYear,
-  ))
+  override protected val config = ComponentConfig(
+    backendConstructor = new Backend(_),
+    initialState = State(
+      yearLowerBound = clock.now.getYear - 1,
+      expandedYear = clock.now.getYear,
+    ),
+  )
 
   // **************** Private inner types ****************//
   protected case class Props(router: RouterContext)
@@ -67,7 +69,8 @@ final class Summary(
                 ref = queryInputRef,
                 name = "query",
                 placeholder = i18n("app.example-query"),
-                classes = Seq("form-control")),
+                classes = Seq("form-control"),
+              ),
               Bootstrap.InputGroupButton(
                 Bootstrap.Button(tpe = "submit")(
                   ^.onClick ==> { (e: ReactEventFromInput) =>
@@ -78,9 +81,10 @@ final class Summary(
                   },
                   Bootstrap.FontAwesomeIcon("search"),
                 )
-              )
-            )
-          )), {
+              ),
+            ),
+          )
+        ), {
           for {
             account <- accountingConfig.personallySortedAccounts
             if state.includeUnrelatedAccounts || account.isMineOrCommon
@@ -102,8 +106,8 @@ final class Summary(
         Bootstrap.Button(Variant.info, Size.lg, block = true, tag = <.a)(
           ^.onClick --> $.modState(s => s.copy(includeUnrelatedAccounts = !s.includeUnrelatedAccounts)),
           if (state.includeUnrelatedAccounts) i18n("app.hide-other-accounts")
-          else i18n("app.show-other-accounts")
-        )
+          else i18n("app.show-other-accounts"),
+        ),
       )
     }
   }

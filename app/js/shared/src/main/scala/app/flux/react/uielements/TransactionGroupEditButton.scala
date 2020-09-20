@@ -20,7 +20,7 @@ object TransactionGroupEditButton {
         .Button(size = Size.xs, tag = router.anchorWithHrefTo(AppPages.EditTransactionGroup(props.groupId)))(
           Bootstrap.FontAwesomeIcon("pencil", fixedWidth = true),
           " ",
-          props.i18n("app.edit")
+          props.i18n("app.edit"),
         )
     })
     .build

@@ -20,7 +20,8 @@ object GlobalStopwatch {
     val lastDiff = now - lastLogTime
     val startDiff = now - startTime
     println(
-      s"  {GlobalStopwatch} Elapsed: Since last time: ${lastDiff.toMillis}ms, Since start: ${startDiff.toMillis}ms ($stepName) ")
+      s"  {GlobalStopwatch} Elapsed: Since last time: ${lastDiff.toMillis}ms, Since start: ${startDiff.toMillis}ms ($stepName) "
+    )
 
     lastLogTime = Instant.now()
   }

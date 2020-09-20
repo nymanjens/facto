@@ -41,13 +41,13 @@ abstract class StandardPicklers {
         LocalDate.of(
           state.unpickle[Int] /* year */,
           state.unpickle[Int] /* month */,
-          state.unpickle[Int] /* dayOfMonth */
+          state.unpickle[Int], /* dayOfMonth */
         ),
         LocalTime.of(
           state.unpickle[Int] /* hour */,
           state.unpickle[Int] /* minute */,
-          state.unpickle[Int] /* second */
-        )
+          state.unpickle[Int], /* second */
+        ),
       )
     }
   }
@@ -88,7 +88,7 @@ abstract class StandardPicklers {
       LastUpdateTime(
         timePerField =
           state.unpickle[Map[PicklableModelField, Instant]].map { case (k, v) => k.toRegular -> v }.toMap,
-        otherFieldsTime = state.unpickle[Option[Instant]]
+        otherFieldsTime = state.unpickle[Option[Instant]],
       )
     }
   }
@@ -99,7 +99,8 @@ abstract class StandardPicklers {
         def internal[E]: Unit = {
           state.pickle(obj.field)
           state.pickle(obj.value.asInstanceOf[E])(
-            picklerForField(obj.field.toRegular).asInstanceOf[Pickler[E]])
+            picklerForField(obj.field.toRegular).asInstanceOf[Pickler[E]]
+          )
         }
         internal
       }

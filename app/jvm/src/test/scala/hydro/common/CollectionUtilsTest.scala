@@ -22,7 +22,8 @@ class CollectionUtilsTest extends HookedSpecification {
     CollectionUtils.getMostCommonStringIgnoringCase(Seq("abc", "ABC", "abc", "def")) mustEqual "abc"
     CollectionUtils.getMostCommonStringIgnoringCase(Seq("abc", "ABC", "ABC", "def")) mustEqual "ABC"
     CollectionUtils.getMostCommonStringIgnoringCase(
-      Seq("abc", "abc", "ABC", "ABC", "ABC", "def", "def", "def", "def")) mustEqual "ABC"
+      Seq("abc", "abc", "ABC", "ABC", "ABC", "def", "def", "def", "def")
+    ) mustEqual "ABC"
   }
 
   "toBiMapWithStableIntKeys" in {

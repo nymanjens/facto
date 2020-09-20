@@ -29,7 +29,8 @@ object LokiJs {
     ): Collection = {
       facade.addCollection(
         name,
-        args = js.Dictionary("unique" -> uniqueIndices.toJSArray, "indices" -> indices.toJSArray))
+        args = js.Dictionary("unique" -> uniqueIndices.toJSArray, "indices" -> indices.toJSArray),
+      )
     }
     def getCollection(name: String): Option[Collection] = facade.getCollection(name) match {
       case null  => None
@@ -59,7 +60,9 @@ object LokiJs {
       new Database(
         new DatabaseFacade(
           dbName,
-          js.Dictionary("adapter" -> new Adapter.MemoryAdapter(), "env" -> "BROWSER")))
+          js.Dictionary("adapter" -> new Adapter.MemoryAdapter(), "env" -> "BROWSER"),
+        )
+      )
     }
   }
 
@@ -130,8 +133,8 @@ object LokiJs {
 
   object SortingFactory {
     def keysWithDirection(keyWithDirection: Seq[KeyWithDirection]): js.Array[js.Array[js.Any]] = {
-      val result: Seq[js.Array[js.Any]] = keyWithDirection map {
-        case KeyWithDirection(key, isDesc) => js.Array[js.Any](key, isDesc)
+      val result: Seq[js.Array[js.Any]] = keyWithDirection map { case KeyWithDirection(key, isDesc) =>
+        js.Array[js.Any](key, isDesc)
       }
       result.toJSArray
     }

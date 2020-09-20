@@ -1,5 +1,7 @@
 package hydro.flux.react
 
+import hydro.common.GuavaReplacement.Preconditions
+import hydro.common.GuavaReplacement.Preconditions.checkNotNull
 import hydro.common.JsLoggingUtils.LogExceptionsCallback
 import hydro.common.JsLoggingUtils.logExceptions
 import hydro.flux.stores.StateStore
@@ -25,7 +27,7 @@ abstract class HydroReactComponent {
     val step2: Builder.Step2[Props, State] =
       if (this.isInstanceOf[HydroReactComponent.Stateless])
         step1.stateless.asInstanceOf[Builder.Step2[Props, State]]
-      else step1.initialState[State](config.initialState)
+      else step1.initialStateFromProps[State](config.initialStateFromProps)
     val step3: Builder.Step3[Props, State, Backend] = step2.backend(config.backendConstructor)
     var step4: Builder.Step4[Props, Children.None, State, Backend] =
       step3.renderPS((scope, props, state) => scope.backend.render(props, state))
@@ -34,12 +36,14 @@ abstract class HydroReactComponent {
     if (dummyBackend.isInstanceOf[WillMount]) {
       step4 = step4
         .componentWillMount(scope =>
-          scope.backend.asInstanceOf[WillMount].willMount(scope.props, scope.state))
+          scope.backend.asInstanceOf[WillMount].willMount(scope.props, scope.state)
+        )
     }
     if (dummyBackend.isInstanceOf[WillUnmount]) {
       step4 = step4
         .componentWillUnmount(scope =>
-          scope.backend.asInstanceOf[WillUnmount].willUnmount(scope.props, scope.state))
+          scope.backend.asInstanceOf[WillUnmount].willUnmount(scope.props, scope.state)
+        )
     }
     if (dummyBackend.isInstanceOf[DidMount]) {
       step4 = step4
@@ -47,29 +51,30 @@ abstract class HydroReactComponent {
     }
     if (dummyBackend.isInstanceOf[WillReceiveProps]) {
       step4 = step4
-        .componentWillReceiveProps(
-          scope =>
-            scope.backend
-              .asInstanceOf[WillReceiveProps]
-              .willReceiveProps(currentProps = scope.currentProps, nextProps = scope.nextProps, scope.state))
+        .componentWillReceiveProps(scope =>
+          scope.backend
+            .asInstanceOf[WillReceiveProps]
+            .willReceiveProps(currentProps = scope.currentProps, nextProps = scope.nextProps, scope.state)
+        )
     }
     if (dummyBackend.isInstanceOf[DidUpdate]) {
       step4 = step4
-        .componentDidUpdate(
-          scope =>
-            scope.backend
-              .asInstanceOf[DidUpdate]
-              .didUpdate(
-                prevProps = scope.prevProps,
-                currentProps = scope.currentProps,
-                prevState = scope.prevState,
-                currentState = scope.currentState))
+        .componentDidUpdate(scope =>
+          scope.backend
+            .asInstanceOf[DidUpdate]
+            .didUpdate(
+              prevProps = scope.prevProps,
+              currentProps = scope.currentProps,
+              prevState = scope.prevState,
+              currentState = scope.currentState,
+            )
+        )
     }
-    if (config.stateStoresDependencies.nonEmpty) {
+    if (config.maybeStateStoresDependencies.nonEmpty) {
       step4 = step4
         .componentWillMount { scope =>
           logExceptions {
-            for (StateStoresDependency(store, _) <- getStateStoresDependencies(scope.props)) {
+            for (StateStoresDependency(store, _) <- config.stateStoresDependencies(scope.props)) {
               store.register(scope.backend)
             }
             scope.backend.updateStateFromStoresCallback(scope.props)
@@ -79,8 +84,10 @@ abstract class HydroReactComponent {
           logExceptions {
             var anythingChanged = false
             for {
-              (StateStoresDependency(oldStore, _), StateStoresDependency(newStore, _)) <- getStateStoresDependencies(
-                scope.currentProps) zip getStateStoresDependencies(scope.nextProps)
+              (StateStoresDependency(oldStore, _), StateStoresDependency(newStore, _)) <-
+                config.stateStoresDependencies(scope.currentProps) zip config.stateStoresDependencies(
+                  scope.nextProps
+                )
               if oldStore != newStore
             } {
               oldStore.deregister(scope.backend)
@@ -96,18 +103,13 @@ abstract class HydroReactComponent {
         }
         .componentWillUnmount { scope =>
           LogExceptionsCallback {
-            for (StateStoresDependency(store, _) <- getStateStoresDependencies(scope.props)) {
+            for (StateStoresDependency(store, _) <- config.stateStoresDependencies(scope.props)) {
               store.deregister(scope.backend)
             }
           }
         }
     }
     step4.build
-  }
-
-  // **************** Private helper methods ****************//
-  private def getStateStoresDependencies(props: Props): Seq[StateStoresDependency] = {
-    config.stateStoresDependencies.map(_.apply(props))
   }
 
   // **************** Protected types ****************//
@@ -122,11 +124,12 @@ abstract class HydroReactComponent {
       $.modState(oldState =>
         logExceptions {
           var state = oldState
-          for (StateStoresDependency(_, stateUpdate) <- getStateStoresDependencies(props)) {
+          for (StateStoresDependency(_, stateUpdate) <- config.stateStoresDependencies(props)) {
             state = stateUpdate(state)
           }
           state
-      })
+        }
+      )
     }
   }
   trait WillMount { def willMount(props: Props, state: State): Callback }
@@ -140,18 +143,51 @@ abstract class HydroReactComponent {
   }
 
   case class StateStoresDependency(store: StateStore[_], stateUpdate: State => State)
-  case class ComponentConfig(
-      backendConstructor: BackendScope[Props, State] => Backend,
-      initialState: State,
-      componentName: String = HydroReactComponent.this.getClass.getSimpleName,
-      stateStoresDependencies: Seq[Props => StateStoresDependency] = Seq(),
+  class ComponentConfig(
+      val backendConstructor: BackendScope[Props, State] => Backend,
+      val initialStateFromProps: Props => State,
+      val componentName: String,
+      val maybeStateStoresDependencies: Option[Props => Seq[StateStoresDependency]],
   ) {
     def withStateStoresDependency(store: StateStore[_], stateUpdate: State => State): ComponentConfig =
       withStateStoresDependencyFromProps(_ => StateStoresDependency(store, stateUpdate))
 
     def withStateStoresDependencyFromProps(
-        dependencyFromProps: Props => StateStoresDependency): ComponentConfig =
-      copy(stateStoresDependencies = stateStoresDependencies :+ dependencyFromProps)
+        dependencyFromProps: Props => StateStoresDependency
+    ): ComponentConfig = {
+      new ComponentConfig(
+        backendConstructor = backendConstructor,
+        initialStateFromProps = initialStateFromProps,
+        componentName = componentName,
+        maybeStateStoresDependencies = Some(props => {
+          stateStoresDependencies(props) :+ dependencyFromProps(props)
+        }),
+      )
+    }
+
+    private[HydroReactComponent] def stateStoresDependencies(props: Props): Seq[StateStoresDependency] = {
+      maybeStateStoresDependencies match {
+        case None                      => Seq()
+        case Some(propsToDependencies) => propsToDependencies(props)
+      }
+    }
+  }
+  object ComponentConfig {
+    def apply(
+        backendConstructor: BackendScope[Props, State] => Backend,
+        initialState: State = null.asInstanceOf[State],
+        initialStateFromProps: Props => State = null,
+        componentName: String = HydroReactComponent.this.getClass.getSimpleName,
+        stateStoresDependencies: Option[Props => Seq[StateStoresDependency]] = None,
+    ): ComponentConfig = {
+      new ComponentConfig(
+        backendConstructor = backendConstructor,
+        initialStateFromProps =
+          Option(initialState).map(s => (_: Props) => s) getOrElse checkNotNull(initialStateFromProps),
+        componentName = componentName,
+        maybeStateStoresDependencies = stateStoresDependencies,
+      )
+    }
   }
 }
 object HydroReactComponent {
@@ -164,7 +200,7 @@ object HydroReactComponent {
       backendConstructor = statelessConfig.backendConstructor,
       initialState = (): Unit,
       componentName = statelessConfig.componentName,
-      stateStoresDependencies = Seq(),
+      stateStoresDependencies = None,
     )
 
     case class StatelessComponentConfig(

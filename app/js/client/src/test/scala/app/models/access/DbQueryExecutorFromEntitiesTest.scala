@@ -82,7 +82,8 @@ object DbQueryExecutorFromEntitiesTest extends TestSuite {
 
       withTransactions(transaction1, transaction2, transaction3)
         .assertFilteredWith(
-          ModelFields.Transaction.categoryCode isAnyOf Seq(testCategoryA.code, testCategoryB.code))
+          ModelFields.Transaction.categoryCode isAnyOf Seq(testCategoryA.code, testCategoryB.code)
+        )
         .containsExactly(transaction1, transaction2)
     }
     "filter(noneOf)" - {
@@ -92,7 +93,8 @@ object DbQueryExecutorFromEntitiesTest extends TestSuite {
 
       withTransactions(transaction1, transaction2, transaction3)
         .assertFilteredWith(
-          ModelFields.Transaction.categoryCode isNoneOf Seq(testCategoryA.code, testCategoryB.code))
+          ModelFields.Transaction.categoryCode isNoneOf Seq(testCategoryA.code, testCategoryB.code)
+        )
         .containsExactly(transaction3)
     }
     "filter(containsIgnoreCase)" - {
@@ -197,10 +199,13 @@ object DbQueryExecutorFromEntitiesTest extends TestSuite {
 
       withTransactions(transaction1, transaction2, transaction3)
         .assertThat(
-          _.sort(DbQuery.Sorting
-            .descBy(ModelFields.Transaction.transactionGroupId)
-            .thenAscBy(ModelFields.Transaction.createdDate))
-            .data())
+          _.sort(
+            DbQuery.Sorting
+              .descBy(ModelFields.Transaction.transactionGroupId)
+              .thenAscBy(ModelFields.Transaction.createdDate)
+          )
+            .data()
+        )
         .containsExactlyInOrder(transaction3, transaction1, transaction2)
     }
     "limit()" - {
@@ -212,7 +217,8 @@ object DbQueryExecutorFromEntitiesTest extends TestSuite {
         .assertThat(
           _.sort(DbQuery.Sorting.ascBy(ModelFields.Transaction.createdDate))
             .limit(2)
-            .data())
+            .data()
+        )
         .containsExactlyInOrder(transaction1, transaction2)
     }
     "findOne()" - {
@@ -250,7 +256,7 @@ object DbQueryExecutorFromEntitiesTest extends TestSuite {
       tags = tags,
       createdDate = createDateTime(2012, JANUARY, day),
       transactionDate = createDateTime(2012, JANUARY, day),
-      consumedDate = createDateTime(2012, JANUARY, day)
+      consumedDate = createDateTime(2012, JANUARY, day),
     )
   }
   private def withTransactions(transactions: Transaction*) = new Object {

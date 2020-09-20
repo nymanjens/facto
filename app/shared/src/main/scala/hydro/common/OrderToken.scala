@@ -7,7 +7,8 @@ case class OrderToken(parts: List[Int]) extends Ordered[OrderToken] {
   require(parts.nonEmpty)
   require(
     parts.tail.isEmpty || parts.last != OrderToken.middleValue,
-    s"Redundant ${OrderToken.middleValue} at end of $parts")
+    s"Redundant ${OrderToken.middleValue} at end of $parts",
+  )
 
   override def compare(that: OrderToken): Int = {
     @tailrec
@@ -35,7 +36,8 @@ object OrderToken {
   def middleBetween(lower: Option[OrderToken], higher: Option[OrderToken]): OrderToken = {
     require(
       lower.isEmpty || higher.isEmpty || lower.get <= higher.get,
-      s"Not true that lower=$lower <= higher=$higher")
+      s"Not true that lower=$lower <= higher=$higher",
+    )
 
     type HasCarryOver = Boolean
     def middleBetweenWithCarryOver(
@@ -96,7 +98,8 @@ object OrderToken {
       lower.get
     } else {
       val result = OrderToken(
-        removeTrailingMiddleValues(innerMiddleBetween(lower.map(_.parts), higher.map(_.parts))))
+        removeTrailingMiddleValues(innerMiddleBetween(lower.map(_.parts), higher.map(_.parts)))
+      )
       doSanityCheck(result)
       result
     }
@@ -125,14 +128,16 @@ object OrderToken {
           resultIndexBaseline = resultIndexBaseline,
           numValues = middleIndexOffset,
           lower = lower,
-          higher = Some(middle))
+          higher = Some(middle),
+        )
       }
       if (middleIndexOffset + 1 < numValues) {
         resultFiller(
           resultIndexBaseline = resultIndexBaseline + middleIndexOffset + 1,
           numValues = numValues - (middleIndexOffset + 1),
           lower = Some(middle),
-          higher = higher)
+          higher = higher,
+        )
       }
     }
     resultFiller(numValues = numValues, lower = lowerExclusive, higher = higherExclusive)

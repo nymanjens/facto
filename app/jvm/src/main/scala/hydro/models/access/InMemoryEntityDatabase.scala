@@ -83,10 +83,11 @@ object InMemoryEntityDatabase {
             var previousValue: E2 = null.asInstanceOf[E2]
             val castEntity = entity.asInstanceOf[E2]
             idToEntityMap.computeIfPresent(
-              entity.id, { (id, existingEntity) =>
+              entity.id,
+              { (id, existingEntity) =>
                 previousValue = existingEntity.asInstanceOf[E2]
                 UpdatableEntity.merge(previousValue, castEntity)
-              }
+              },
             )
             if (previousValue != null) {
               for (set <- sortingToEntities.values) {
@@ -147,11 +148,13 @@ object InMemoryEntityDatabase {
   private final class TypeToCollectionMap(entitiesFetcher: EntitiesFetcher, sortings: Sortings) {
     private val typeToCollection: Map[EntityType.any, EntityCollection.any] = {
       for (entityType <- EntityTypes.all) yield {
-        def internal[E <: Entity](
-            implicit entityType: EntityType[E]): (EntityType.any, EntityCollection.any) = {
+        def internal[E <: Entity](implicit
+            entityType: EntityType[E]
+        ): (EntityType.any, EntityCollection.any) = {
           entityType -> new EntityCollection[E](
             fetchEntities = () => entitiesFetcher.fetch(entityType),
-            sortings = sortings(entityType).asInstanceOf[Set[DbQuery.Sorting[E]]])
+            sortings = sortings(entityType).asInstanceOf[Set[DbQuery.Sorting[E]]],
+          )
         }
         internal(entityType)
       }

@@ -13,8 +13,8 @@ import hydro.flux.react.uielements.Bootstrap
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
-private[transactiongroupform] final class TotalFlowInput(
-    implicit i18n: I18n,
+private[transactiongroupform] final class TotalFlowInput(implicit
+    i18n: I18n,
     clock: Clock,
     exchangeRateManager: ExchangeRateManager,
 ) {
@@ -27,7 +27,8 @@ private[transactiongroupform] final class TotalFlowInput(
           case Some(forceValue) => forceValue.formatFloat
           case None             => props.defaultValue.formatFloat
         })
-    })
+      }
+    )
     .renderPS(($, props, state) =>
       logExceptions {
         def onChange(e: ReactEventFromInput): Callback = LogExceptionsCallback {
@@ -61,18 +62,19 @@ private[transactiongroupform] final class TotalFlowInput(
               ^.name := getClass.getSimpleName,
               ^.value := state.valueString,
               ^.disabled := props.forceValue.isDefined,
-              ^.onChange ==> onChange
+              ^.onChange ==> onChange,
             ),
             ^^.ifDefined(foreignMoney) { money =>
               Bootstrap.InputGroupAddon(
                 <.i(^.className := money.currency.iconClass),
                 " ",
-                money.formatFloat
+                money.formatFloat,
               )
-            }
-          )
+            },
+          ),
         )
-    })
+      }
+    )
     .componentWillReceiveProps(scope =>
       LogExceptionsCallback {
         scope.nextProps.forceValue match {
@@ -82,7 +84,8 @@ private[transactiongroupform] final class TotalFlowInput(
         }
         // Not calling listener here because we only have a listener in the props. The parent
         // component doesn't need to be notified of changes it made to the props.
-    })
+      }
+    )
     .build
 
   // **************** API ****************//

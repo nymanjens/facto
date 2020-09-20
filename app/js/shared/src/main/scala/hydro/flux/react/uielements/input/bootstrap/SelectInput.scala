@@ -39,12 +39,12 @@ class SelectInput[Value] private (implicit valueTag: ClassTag[Value]) {
             <.option(
               ^.value := optionId,
               ^.key := optionId,
-              option.name
+              option.name,
             )
           }
-        }.toVdomArray
+        }.toVdomArray,
       )
-    }
+    },
   )
 
   // **************** API ****************//
@@ -68,7 +68,7 @@ class SelectInput[Value] private (implicit valueTag: ClassTag[Value]) {
       inputClasses = inputClasses,
       listener = listener,
       extra = ExtraProps.create(options, valueToId = valueToId, valueToName = valueToName),
-      valueTransformer = ValueTransformer
+      valueTransformer = ValueTransformer,
     )
     ref.mutableRef.component(props)
   }
@@ -77,8 +77,8 @@ class SelectInput[Value] private (implicit valueTag: ClassTag[Value]) {
 
   // **************** Public inner types ****************//
   final class Reference private[SelectInput] (
-      private[SelectInput] val mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps])
-      extends InputComponent.Reference[Value, ExtraProps](mutableRef)
+      private[SelectInput] val mutableRef: InputComponent.ThisMutableRef[Value, ExtraProps]
+  ) extends InputComponent.Reference[Value, ExtraProps](mutableRef)
 
   case class ExtraProps private (idToOptionMap: Map[String, ExtraProps.ValueAndName])
   object ExtraProps {

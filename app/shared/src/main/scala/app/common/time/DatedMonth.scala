@@ -5,10 +5,12 @@ import java.time.LocalTime
 import java.time.Month
 
 import hydro.common.I18n
+import hydro.common.time.Clock
 import hydro.common.time.LocalDateTime
 import hydro.common.time.TimeUtils
 
 import scala.collection.immutable.Seq
+import scala.collection.mutable
 
 case class DatedMonth(startDate: LocalDate) extends Ordered[DatedMonth] {
   TimeUtils.requireStartOfMonth(startDate)
@@ -53,10 +55,12 @@ object DatedMonth {
     Month.SEPTEMBER -> "app.date.month.sep.abbrev",
     Month.OCTOBER -> "app.date.month.oct.abbrev",
     Month.NOVEMBER -> "app.date.month.nov.abbrev",
-    Month.DECEMBER -> "app.date.month.dec.abbrev"
+    Month.DECEMBER -> "app.date.month.dec.abbrev",
   )
 
   def of(year: Int, month: Month): DatedMonth = DatedMonth(LocalDate.of(year, month, 1))
+
+  def current(implicit clock: Clock): DatedMonth = DatedMonth.containing(clock.now)
 
   def containing(date: LocalDate): DatedMonth = {
     DatedMonth(startOfMonthContaining(date))
@@ -65,9 +69,18 @@ object DatedMonth {
   def containing(dateTime: LocalDateTime): DatedMonth = containing(dateTime.toLocalDate)
 
   def allMonthsIn(year: Int): Seq[DatedMonth] = {
-    Month.values()
     for (month <- TimeUtils.allMonths)
       yield DatedMonth(LocalDate.of(year, month, 1))
+  }
+
+  def monthsInClosedRange(start: DatedMonth, endInclusive: DatedMonth): Seq[DatedMonth] = {
+    val resultBuilder = mutable.Buffer[DatedMonth]()
+    var cursor = start
+    while (cursor <= endInclusive) {
+      resultBuilder.append(cursor)
+      cursor = DatedMonth(cursor.startDateOfNextMonth)
+    }
+    resultBuilder.toVector
   }
 
   private def startOfMonthContaining(date: LocalDate): LocalDate = {

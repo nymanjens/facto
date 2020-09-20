@@ -31,7 +31,7 @@ object TimeUtils {
     try {
       LocalDateTime.of(
         LocalDate.of(yyyy.toInt, mm.toInt, dd.toInt),
-        LocalTime.MIN
+        LocalTime.MIN,
       )
     } catch {
       case e: NumberFormatException => throw new IllegalArgumentException(e)

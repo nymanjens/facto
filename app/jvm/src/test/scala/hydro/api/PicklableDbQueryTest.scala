@@ -21,20 +21,22 @@ class PicklableDbQueryTest extends HookedSpecification {
 
     "null object" in {
       testFromRegularToRegular(
-        DbQuery[User](filter = DbQuery.Filter.NullFilter(), sorting = None, limit = None))
+        DbQuery[User](filter = DbQuery.Filter.NullFilter(), sorting = None, limit = None)
+      )
     }
     "limit" in {
       testFromRegularToRegular(
         DbQuery[User](
           filter = DbQuery.Filter.NullFilter(),
           sorting = None,
-          limit = Some(192)
-        ))
+          limit = Some(192),
+        )
+      )
     }
     "filters" in {
       val filters: Seq[DbQuery.Filter[User]] = Seq(
         (ModelFields.User.loginName === "a") && (ModelFields.User.loginName !== "b"),
-        ModelFields.User.name containsIgnoreCase "abc"
+        ModelFields.User.name containsIgnoreCase "abc",
       )
       for (filter <- filters) yield {
         testFromRegularToRegular(DbQuery[User](filter = filter, sorting = None, limit = Some(192)))

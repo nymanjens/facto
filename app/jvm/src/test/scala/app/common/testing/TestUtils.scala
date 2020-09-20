@@ -53,8 +53,9 @@ object TestUtils {
         tags = tags,
         createdDate = actualDate,
         transactionDate = actualDate,
-        consumedDate = actualDate
-      ))
+        consumedDate = actualDate,
+      )
+    )
   }
 
   def persistBalanceCheck(
@@ -70,8 +71,9 @@ object TestUtils {
         moneyReservoirCode = reservoir.code,
         balanceInCents = balanceInCents,
         createdDate = actualDate,
-        checkDate = actualDate
-      ))
+        checkDate = actualDate,
+      )
+    )
   }
 
   def persist[E <: Entity: EntityType](entity: E)(implicit entityAccess: JvmEntityAccess): E = {
@@ -82,7 +84,7 @@ object TestUtils {
       name = "Robot",
       isAdmin = false,
       expandCashFlowTablesByDefault = true,
-      expandLiquidationTablesByDefault = true
+      expandLiquidationTablesByDefault = true,
     )
     val addition =
       if (entity.idOption.isDefined) EntityModification.Add(entity)
@@ -95,7 +97,7 @@ object TestUtils {
     val instant = Instant.ofEpochSecond(milli).atZone(ZoneId.of("Europe/Paris"))
     LocalDateTime.of(
       instant.toLocalDate,
-      instant.toLocalTime
+      instant.toLocalTime,
     )
   }
 }

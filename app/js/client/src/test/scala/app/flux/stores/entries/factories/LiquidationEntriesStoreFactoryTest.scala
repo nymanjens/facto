@@ -45,37 +45,43 @@ object LiquidationEntriesStoreFactoryTest extends TestSuite {
         flowInCents = 201,
         day = 10,
         account = testAccountA,
-        reservoir = testReservoirOfAccountB)
+        reservoir = testReservoirOfAccountB,
+      )
       val trans2 = persistTransaction(
         groupId = 2,
         flowInCents = 202,
         day = 11,
         account = testAccountA,
-        reservoir = testReservoirOfAccountB)
+        reservoir = testReservoirOfAccountB,
+      )
       val trans3 = persistTransaction(
         groupId = 2,
         flowInCents = 203,
         day = 12,
         account = testAccountB,
-        reservoir = testReservoirOfAccountA)
+        reservoir = testReservoirOfAccountA,
+      )
       val trans4 = persistTransaction(
         groupId = 3,
         flowInCents = 4,
         day = 13,
         account = testAccountA,
-        reservoir = testReservoirOfAccountB)
+        reservoir = testReservoirOfAccountB,
+      )
       val trans5 = persistTransaction(
         groupId = 4,
         flowInCents = 5,
         day = 14,
         account = testAccountB,
-        reservoir = testReservoirOfAccountA)
+        reservoir = testReservoirOfAccountA,
+      )
       val trans6 = persistTransaction(
         groupId = 5,
         flowInCents = 6,
         day = 15,
         account = testAccountA,
-        reservoir = testReservoirOfAccountB)
+        reservoir = testReservoirOfAccountB,
+      )
 
       // Get expectations
       val expectedEntries = Vector(
@@ -83,7 +89,7 @@ object LiquidationEntriesStoreFactoryTest extends TestSuite {
         LiquidationEntry(Seq(trans2, trans3), ReferenceMoney(-200)),
         LiquidationEntry(Seq(trans4), ReferenceMoney(-204)),
         LiquidationEntry(Seq(trans5), ReferenceMoney(-199)),
-        LiquidationEntry(Seq(trans6), ReferenceMoney(-205))
+        LiquidationEntry(Seq(trans6), ReferenceMoney(-205)),
       )
 
       // Run tests
@@ -91,14 +97,15 @@ object LiquidationEntriesStoreFactoryTest extends TestSuite {
       await(
         Future.sequence(
           for (i <- 1 to expectedEntries.size)
-            yield
-              async {
-                val subList = expectedEntries.takeRight(i)
+            yield async {
+              val subList = expectedEntries.takeRight(i)
 
-                val state = await(factory.get(pair, maxNumEntries = subList.size).stateFuture)
-                state.entries.map(_.entry) ==> subList
-                state.hasMore ==> (i < expectedEntries.size)
-              }))
+              val state = await(factory.get(pair, maxNumEntries = subList.size).stateFuture)
+              state.entries.map(_.entry) ==> subList
+              state.hasMore ==> (i < expectedEntries.size)
+            }
+        )
+      )
 
       // All entries
       val allEntriesState = await(factory.get(pair, maxNumEntries = 10000).stateFuture)
@@ -122,7 +129,7 @@ object LiquidationEntriesStoreFactoryTest extends TestSuite {
       transactionDate = createDateTime(2012, JANUARY, day),
       consumedDate = createDateTime(2012, JANUARY, day),
       beneficiaryAccountCode = account.code,
-      moneyReservoirCode = reservoir.code
+      moneyReservoirCode = reservoir.code,
     )
     entityAccess.addRemotelyAddedEntities(transaction)
     transaction

@@ -31,14 +31,15 @@ import scala.async.Async.await
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-final class BalanceCheckForm(implicit i18n: I18n,
-                             clock: Clock,
-                             accountingConfig: Config,
-                             user: User,
-                             entityAccess: AppJsEntityAccess,
-                             exchangeRateManager: ExchangeRateManager,
-                             dispatcher: Dispatcher,
-                             pageHeader: PageHeader,
+final class BalanceCheckForm(implicit
+    i18n: I18n,
+    clock: Clock,
+    accountingConfig: Config,
+    user: User,
+    entityAccess: AppJsEntityAccess,
+    exchangeRateManager: ExchangeRateManager,
+    dispatcher: Dispatcher,
+    pageHeader: PageHeader,
 ) {
 
   private val waitForFuture = new WaitForFuture[Props]
@@ -114,8 +115,9 @@ final class BalanceCheckForm(implicit i18n: I18n,
                     Bootstrap.FontAwesomeIcon("times"),
                     " ",
                     i18n("app.delete"),
-                    ^.onClick --> onDelete
-                  ))
+                    ^.onClick --> onDelete,
+                  ),
+                )
               }
             )
           )
@@ -128,20 +130,20 @@ final class BalanceCheckForm(implicit i18n: I18n,
                 name = "issuer",
                 label = i18n("app.issuer"),
                 defaultValue = props.operationMeta.issuer.name,
-                disabled = true
+                disabled = true,
               ),
               TextInput(
                 ref = TextInput.ref(),
                 name = "money-reservoir",
                 label = i18n("app.reservoir"),
                 defaultValue = props.operationMeta.reservoir.name,
-                disabled = true
+                disabled = true,
               ),
               dateMappedInput(
                 ref = checkDateRef,
                 defaultValue = props.operationMeta.checkDate,
                 valueTransformer = MappedInput.ValueTransformer.StringToLocalDateTime,
-                delegateRefFactory = TextInput.ref _
+                delegateRefFactory = TextInput.ref _,
               ) { mappedExtraProps =>
                 TextInput(
                   ref = mappedExtraProps.ref,
@@ -162,19 +164,19 @@ final class BalanceCheckForm(implicit i18n: I18n,
                 defaultValue = props.operationMeta.balanceInCents,
                 required = false, // not required to be different from 0.0
                 showErrorMessage = state.showErrorMessages,
-                currency = props.operationMeta.reservoir.currency
-              )
+                currency = props.operationMeta.reservoir.currency,
+              ),
             ),
             Bootstrap.FormGroup(
               Bootstrap.Col(sm = 10, smOffset = 2)(
                 Bootstrap.Button(tpe = "submit")(
                   ^.onClick ==> onSubmit,
-                  i18n("app.ok")
+                  i18n("app.ok"),
                 )
               )
-            )
+            ),
           )
-        )
+        ),
       )
     }
 
@@ -188,7 +190,8 @@ final class BalanceCheckForm(implicit i18n: I18n,
           case OperationMeta.Edit(existingBalanceCheck) =>
             AppActions.UpdateBalanceCheck(
               existingBalanceCheck = existingBalanceCheck,
-              newBalanceCheckWithoutId = balanceCheckWithoutId)
+              newBalanceCheckWithoutId = balanceCheckWithoutId,
+            )
         }
 
         dispatcher.dispatch(action)
@@ -203,13 +206,13 @@ final class BalanceCheckForm(implicit i18n: I18n,
           val maybeBalanceCheck = for {
             checkDate <- checkDateRef().value
             balance <- balanceRef().value
-          } yield
-            BalanceCheck(
-              issuerId = user.id,
-              moneyReservoirCode = props.operationMeta.reservoir.code,
-              balanceInCents = balance,
-              createdDate = clock.now,
-              checkDate = checkDate)
+          } yield BalanceCheck(
+            issuerId = user.id,
+            moneyReservoirCode = props.operationMeta.reservoir.code,
+            balanceInCents = balance,
+            createdDate = clock.now,
+            checkDate = checkDate,
+          )
 
           maybeBalanceCheck match {
             case Some(balanceCheckWithoutId) =>
@@ -218,7 +221,8 @@ final class BalanceCheckForm(implicit i18n: I18n,
             case None =>
           }
           newState
-      }).runNow()
+        }
+      ).runNow()
     }
 
     private def onDelete: Callback = LogExceptionsCallback {

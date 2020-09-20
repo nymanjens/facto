@@ -161,7 +161,8 @@ object GuavaReplacement {
         require(!forwardMap.contains(key), s"key $key already exists in keySet ${forwardMap.keySet}")
         require(
           !backwardMap.contains(value),
-          s"value $value already exists in valueSet ${backwardMap.keySet}")
+          s"value $value already exists in valueSet ${backwardMap.keySet}",
+        )
         forwardMap.put(key, value)
         backwardMap.put(value, key)
         this

@@ -36,7 +36,8 @@ object UpdatableEntity {
       }
 
     var result: E = baseEntity
-    val allFields = oldEntity.lastUpdateTime.timePerField.keySet ++ newEntity.lastUpdateTime.timePerField.keySet
+    val allFields =
+      oldEntity.lastUpdateTime.timePerField.keySet ++ newEntity.lastUpdateTime.timePerField.keySet
     for (field <- allFields) {
       val oldUpdateTime = oldEntity.lastUpdateTime.timePerField.getOrElse(field, Instant.MIN)
       val newUpdateTime = newEntity.lastUpdateTime.timePerField.getOrElse(field, Instant.MIN)
@@ -47,7 +48,8 @@ object UpdatableEntity {
         }
         setFromEntity(
           field.asInstanceOf[ModelField[_, E]],
-          if (oldUpdateTime <= newUpdateTime) newEntity else oldEntity)
+          if (oldUpdateTime <= newUpdateTime) newEntity else oldEntity,
+        )
       }
     }
 
@@ -107,7 +109,7 @@ object UpdatableEntity {
           } else {
             candidate
           }
-        }
+        },
       ).canonicalized
     }
   }

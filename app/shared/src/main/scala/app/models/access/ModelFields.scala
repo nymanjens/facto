@@ -37,11 +37,13 @@ object ModelFields {
     val expandCashFlowTablesByDefault: ModelField[Boolean, E] = ModelField(
       "expandCashFlowTablesByDefault",
       _.expandCashFlowTablesByDefault,
-      v => _.copy(expandCashFlowTablesByDefault = v))
+      v => _.copy(expandCashFlowTablesByDefault = v),
+    )
     val expandLiquidationTablesByDefault: ModelField[Boolean, E] = ModelField(
       "expandLiquidationTablesByDefault",
       _.expandLiquidationTablesByDefault,
-      v => _.copy(expandLiquidationTablesByDefault = v))
+      v => _.copy(expandLiquidationTablesByDefault = v),
+    )
   }
 
   object Transaction {
@@ -105,7 +107,8 @@ object ModelFields {
     val ratioReferenceToForeignCurrency: ModelField[Double, E] = ModelField(
       "ratioReferenceToForeignCurrency",
       _.ratioReferenceToForeignCurrency,
-      v => _.copy(ratioReferenceToForeignCurrency = v))
+      v => _.copy(ratioReferenceToForeignCurrency = v),
+    )
   }
 
   // **************** Field-related methods **************** //
