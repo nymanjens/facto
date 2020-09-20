@@ -98,7 +98,7 @@ final class ChartSpecInput(implicit
               )
             ),
             <.td(
-              <<.ifThen(lineIndex > 0) {
+              <<.ifThen(props.chartSpec.lines.size > 1 || lineIndex > 0) {
                 Bootstrap.Button(Variant.info, Size.xs, tag = <.a)(
                   Bootstrap.FontAwesomeIcon("times"),
                   ^.onClick --> props.notifyUpdatedChartSpec(_.withRemovedLine(lineIndex)),
