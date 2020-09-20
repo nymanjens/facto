@@ -1,5 +1,7 @@
 package app.flux.stores.entries.factories
 
+import java.time.Duration
+
 import app.common.money.Currency
 import app.common.money.ExchangeRateManager
 import app.common.money.MoneyWithGeneralCurrency
@@ -284,24 +286,30 @@ object SummaryExchangeRateGainsStoreFactory {
 
       def incrementLatestBalance(date: LocalDateTime, addition: MoneyWithGeneralCurrency): Unit = {
         val (lastDate, lastBalance) = dateToBalanceUpdates.last
-        require(lastDate <= date)
         dateToBalanceUpdates.put(
-          date,
+          ensureUniqueDateIncrement(date),
           Update(balance = lastBalance.balance + addition, changeComparedToLast = addition),
         )
       }
 
       def addBalanceUpdate(date: LocalDateTime, balance: MoneyWithGeneralCurrency): Unit = {
         val (lastDate, lastBalance) = dateToBalanceUpdates.last
-        require(lastDate <= date)
         dateToBalanceUpdates.put(
-          date,
+          ensureUniqueDateIncrement(date),
           Update(balance = balance, changeComparedToLast = balance - lastBalance.balance),
         )
       }
 
-      def result: DateToBalanceFunction =
+      def result: DateToBalanceFunction = {
         new DateToBalanceFunction(SortedMap.apply(dateToBalanceUpdates.toSeq: _*))
+      }
+
+      private def ensureUniqueDateIncrement(date: LocalDateTime): LocalDateTime = {
+        val (lastDate, lastBalance) = dateToBalanceUpdates.last
+
+        if (lastDate < date) date
+        else lastDate.plus(Duration.ofSeconds(1))
+      }
     }
   }
 }

@@ -73,7 +73,9 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
 
       persistTransaction(flow = 789, date = createDateTime(2012, JANUARY, 5)) // Balance = 789 GBP
       persistBalanceCheck(balance = 100, date = createDateTime(2012, NOVEMBER, 5)) // Balance = 100
-      persistTransaction(flow = 100, date = createDateTime(2012, DECEMBER, 5)) // Balance = 200 GBP
+      persistTransaction(flow = 20, date = createDateTime(2012, DECEMBER, 5)) // Balance = 120 GBP
+      persistTransaction(flow = 20, date = createDateTime(2012, DECEMBER, 5)) // Balance = 140 GBP
+      persistTransaction(flow = 80, date = createDateTime(2012, DECEMBER, 5)) // Balance = 200 GBP
       persistBalanceCheck(balance = 200, date = createDateTime(2012, DECEMBER, 25)) // Balance check
 
       persistTransaction(flow = -400, date = createDateTime(2013, JANUARY, 5)) // Balance = -200 GBP
