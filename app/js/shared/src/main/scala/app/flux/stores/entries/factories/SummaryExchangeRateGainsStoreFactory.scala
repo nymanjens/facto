@@ -1,6 +1,7 @@
 package app.flux.stores.entries.factories
 
 import java.time.Duration
+import java.time.LocalTime
 
 import app.common.money.Currency
 import app.common.money.ExchangeRateManager
@@ -287,7 +288,7 @@ object SummaryExchangeRateGainsStoreFactory {
       def incrementLatestBalance(date: LocalDateTime, addition: MoneyWithGeneralCurrency): Unit = {
         val (lastDate, lastBalance) = dateToBalanceUpdates.last
         dateToBalanceUpdates.put(
-          ensureUniqueDateIncrement(date),
+          maybeAddSomeSecondsToAvoidEdgeCases(date),
           Update(balance = lastBalance.balance + addition, changeComparedToLast = addition),
         )
       }
@@ -295,7 +296,7 @@ object SummaryExchangeRateGainsStoreFactory {
       def addBalanceUpdate(date: LocalDateTime, balance: MoneyWithGeneralCurrency): Unit = {
         val (lastDate, lastBalance) = dateToBalanceUpdates.last
         dateToBalanceUpdates.put(
-          ensureUniqueDateIncrement(date),
+          maybeAddSomeSecondsToAvoidEdgeCases(date),
           Update(balance = balance, changeComparedToLast = balance - lastBalance.balance),
         )
       }
@@ -304,11 +305,26 @@ object SummaryExchangeRateGainsStoreFactory {
         new DateToBalanceFunction(SortedMap.apply(dateToBalanceUpdates.toSeq: _*))
       }
 
-      private def ensureUniqueDateIncrement(date: LocalDateTime): LocalDateTime = {
-        val (lastDate, lastBalance) = dateToBalanceUpdates.last
+      /** Avoids duplicates dates and 00:00. Assumes that dates are provided to this builder in chronological order. */
+      private def maybeAddSomeSecondsToAvoidEdgeCases(date: LocalDateTime): LocalDateTime = {
+        var candidate = date
 
-        if (lastDate < date) date
-        else lastDate.plus(Duration.ofSeconds(1))
+        // Avoid LocalDateTimes that start at '00:00', which on the first day of the month interferes
+        // with DatedMonth.startOfNextMonth.
+        candidate = if (candidate.toLocalTime == LocalTime.MIN) {
+          candidate.plus(Duration.ofSeconds(1))
+        } else {
+          candidate
+        }
+
+        // Avoid dates that are already in the dateToBalanceUpdates map (assuming dates were presented in
+        // chronological order)
+        val (lastDate, lastBalance) = dateToBalanceUpdates.last
+        candidate =
+          if (lastDate < candidate) candidate
+          else lastDate.plus(Duration.ofSeconds(1))
+
+        candidate
       }
     }
   }
