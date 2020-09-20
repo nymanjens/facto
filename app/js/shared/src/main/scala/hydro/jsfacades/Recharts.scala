@@ -38,6 +38,19 @@ object Recharts {
     )(children: _*)
   }
 
+  def ComposedChart(
+      data: Seq[Map[String, js.Any]],
+      margin: Margin,
+  )(children: VdomNode*) = {
+    val component = JsComponent[js.Object, Children.Varargs, Null](ComposedChartComponent)
+    component(
+      js.Dynamic.literal(
+        data = data.map(_.toJSDictionary).toJSArray,
+        margin = margin.toJsObject,
+      )
+    )(children: _*)
+  }
+
   def Line(
       key: String,
       tpe: String,
@@ -52,6 +65,23 @@ object Recharts {
           `type` = tpe,
           dataKey = dataKey,
           stroke = stroke,
+          isAnimationActive = false,
+        )
+      )
+  }
+
+  def Bar(
+      key: String,
+      dataKey: String,
+      fill: String,
+  ) = {
+    val component = JsComponent[js.Object, Children.None, Null](BarComponent)
+    component
+      .withKey(key)
+      .apply(
+        js.Dynamic.literal(
+          dataKey = dataKey,
+          fill = fill,
           isAnimationActive = false,
         )
       )
@@ -117,9 +147,17 @@ object Recharts {
   @js.native
   private object LineChartComponent extends js.Object
 
+  @JSImport("recharts", "ComposedChart")
+  @js.native
+  private object ComposedChartComponent extends js.Object
+
   @JSImport("recharts", "Line")
   @js.native
   private object LineComponent extends js.Object
+
+  @JSImport("recharts", "Bar")
+  @js.native
+  private object BarComponent extends js.Object
 
   @JSImport("recharts", "CartesianGrid")
   @js.native

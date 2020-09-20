@@ -104,7 +104,7 @@ final class Chart(implicit
         // **************** Chart **************** //
         <.div(
           Recharts.ResponsiveContainer(width = "100%", height = 450)(
-            Recharts.LineChart(
+            Recharts.ComposedChart(
               data = assembleData(),
               margin = Recharts.Margin(top = 5, right = 50, left = 50, bottom = 35),
             )(
@@ -118,12 +118,21 @@ final class Chart(implicit
               Recharts.Tooltip(formatter = formatDoubleMoney()),
               Recharts.Legend(),
               (for ((line, lineIndex) <- props.chartSpec.lines.zipWithIndex)
-                yield Recharts.Line(
-                  key = lineName(line, lineIndex),
-                  tpe = "linear",
-                  dataKey = lineName(line, lineIndex),
-                  stroke = lineColors(lineIndex % lineColors.size),
-                )).toVdomArray,
+                yield {
+                  if (line.cumulative)
+                    Recharts.Line(
+                      key = lineName(line, lineIndex),
+                      tpe = "linear",
+                      dataKey = lineName(line, lineIndex),
+                      stroke = lineColors(lineIndex % lineColors.size),
+                    )
+                  else
+                    Recharts.Bar(
+                      key = lineName(line, lineIndex),
+                      dataKey = lineName(line, lineIndex),
+                      fill = lineColors(lineIndex % lineColors.size),
+                    )
+                }).toVdomArray,
             )
           )
         ),
