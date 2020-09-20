@@ -81,7 +81,8 @@ private[stores] final class ComplexQueryFilter(implicit
           case Prefix.Category =>
             QueryFilterPair.anyOf(
               ModelFields.Transaction.categoryCode,
-              filterOptions(suffix, accountingConfig.categoriesSeq)(_.name).map(_.code),
+              // Adding suffix as categoryCode to allow filtering on dummy categories such as "Exchange"
+              filterOptions(suffix, accountingConfig.categoriesSeq)(_.name).map(_.code) :+ suffix,
             )
           case Prefix.Description =>
             QueryFilterPair.containsIgnoreCase(ModelFields.Transaction.description, suffix)
