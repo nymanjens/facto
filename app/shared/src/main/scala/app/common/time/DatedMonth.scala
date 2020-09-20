@@ -5,6 +5,7 @@ import java.time.LocalTime
 import java.time.Month
 
 import hydro.common.I18n
+import hydro.common.time.Clock
 import hydro.common.time.LocalDateTime
 import hydro.common.time.TimeUtils
 
@@ -58,6 +59,8 @@ object DatedMonth {
   )
 
   def of(year: Int, month: Month): DatedMonth = DatedMonth(LocalDate.of(year, month, 1))
+
+  def current(implicit clock: Clock): DatedMonth = DatedMonth.containing(clock.now)
 
   def containing(date: LocalDate): DatedMonth = {
     DatedMonth(startOfMonthContaining(date))

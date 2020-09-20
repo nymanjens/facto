@@ -18,6 +18,7 @@ import app.models.accounting.Transaction
 import app.models.accounting.config.Account
 import app.models.accounting.config.Config
 import app.models.accounting.config.MoneyReservoir
+import hydro.common.time.Clock
 import hydro.common.time.JavaTimeImplicits._
 import hydro.common.time.LocalDateTime
 import hydro.models.access.DbQueryImplicits._
@@ -41,6 +42,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
     exchangeRateManager: ExchangeRateManager,
     accountingConfig: Config,
     complexQueryFilter: ComplexQueryFilter,
+    clock: Clock,
 ) extends EntriesStoreFactory[GainsForYear] {
 
   // **************** Public API ****************//
@@ -153,7 +155,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
               }
               DatedMonth.monthsInClosedRange(
                 DatedMonth.containing(entityToDate(mergedRows.head)),
-                DatedMonth.containing(entityToDate(mergedRows.last)),
+                Seq(DatedMonth.current, DatedMonth.containing(entityToDate(mergedRows.last))).max,
               )
           }
       }
