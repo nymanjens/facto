@@ -24,6 +24,7 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
 
   override def tests = TestSuite {
     val testModule = new TestModule()
+    implicit val fakeClock = testModule.fakeClock
     implicit val entityAccess = testModule.fakeEntityAccess
     implicit val exchangeRateManager = testModule.exchangeRateManager
     implicit val testAccountingConfig = testModule.testAccountingConfig
@@ -50,14 +51,18 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
 
     "foreign reservoir" - async {
       persistGbpRate(date = createDateTime(2012, JANUARY, 30), ratio = 1.0)
+      persistGbpRate(date = createDateTime(2012, DECEMBER, 20), ratio = 1.8)
       persistGbpRate(date = createDateTime(2012, DECEMBER, 30), ratio = 1.1)
 
       persistGbpRate(date = createDateTime(2013, JANUARY, 2), ratio = 1.0)
       persistGbpRate(date = createDateTime(2013, JANUARY, 30), ratio = 1.2)
-      persistGbpRate(date = createDateTime(2013, FEBRUARY, 2), ratio = 1.0)
+      persistGbpRate(date = createDateTime(2013, FEBRUARY, 2), ratio = 1.9)
+      persistGbpRate(date = createDateTime(2013, FEBRUARY, 4), ratio = 1.0)
       persistGbpRate(date = createDateTime(2013, FEBRUARY, 27), ratio = 1.3)
       persistGbpRate(date = createDateTime(2013, MARCH, 2), ratio = 1.2)
+      persistGbpRate(date = createDateTime(2013, MARCH, 6), ratio = 1.9)
       persistGbpRate(date = createDateTime(2013, MARCH, 30), ratio = 1.4)
+      persistGbpRate(date = createDateTime(2013, APRIL, 4), ratio = 1.9)
       persistGbpRate(date = createDateTime(2013, APRIL, 30), ratio = 1.5)
       persistGbpRate(date = createDateTime(2013, MAY, 2), ratio = 1.3)
       persistGbpRate(date = createDateTime(2013, MAY, 6), ratio = 1.7)
@@ -69,10 +74,14 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
       persistTransaction(flow = 789, date = createDateTime(2012, JANUARY, 5)) // Balance = 789 GBP
       persistBalanceCheck(balance = 100, date = createDateTime(2012, NOVEMBER, 5)) // Balance = 100
       persistTransaction(flow = 100, date = createDateTime(2012, DECEMBER, 5)) // Balance = 200 GBP
+      persistBalanceCheck(balance = 200, date = createDateTime(2012, DECEMBER, 25)) // Balance check
 
       persistTransaction(flow = -400, date = createDateTime(2013, JANUARY, 5)) // Balance = -200 GBP
+      persistBalanceCheck(balance = -200, date = createDateTime(2013, FEBRUARY, 2)) // Balance check
       persistBalanceCheck(balance = -100, date = createDateTime(2013, FEBRUARY, 5)) // Balance = -100
       persistTransaction(flow = 200, date = createDateTime(2013, MARCH, 5)) // Balance = 100
+      persistBalanceCheck(balance = 100, date = createDateTime(2013, MARCH, 12)) // Balance check
+      persistBalanceCheck(balance = 100, date = createDateTime(2013, APRIL, 13)) // Balance check
       persistTransaction(flow = 300, date = createDateTime(2013, MAY, 5)) // Balance = 400
       persistTransaction(flow = -600, date = createDateTime(2013, MAY, 9)) // Balance = -200
 
