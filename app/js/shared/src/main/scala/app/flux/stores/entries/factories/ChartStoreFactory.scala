@@ -44,17 +44,17 @@ final class ChartStoreFactory(implicit
 
   /* override */
   final class Store(
-                     filterFromQuery: DbQuery.Filter[Transaction],
-                     chartStoreFromEntities: ChartStoreFromEntities,
-                     summaryExchangeRateGainsStore: StateStore[Option[ExchangeRateGains]],
+      filterFromQuery: DbQuery.Filter[Transaction],
+      chartStoreFromEntities: ChartStoreFromEntities,
+      summaryExchangeRateGainsStore: StateStore[Option[ExchangeRateGains]],
   ) extends CombiningStateStore[Option[LinePoints], Option[ExchangeRateGains], LinePoints](
         chartStoreFromEntities,
         summaryExchangeRateGainsStore,
       ) {
 
     override protected def combineStoreStates(
-                                               maybeChartFromEntities: Option[LinePoints],
-                                               maybeSummaryExchangeRateGains: Option[ExchangeRateGains],
+        maybeChartFromEntities: Option[LinePoints],
+        maybeSummaryExchangeRateGains: Option[ExchangeRateGains],
     ): LinePoints = {
       (for {
         chartFromEntities <- maybeChartFromEntities
