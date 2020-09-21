@@ -235,10 +235,10 @@ templates:
         flowAsFloat: 900
 
 predefinedCharts:
-  - name: "Account A's transactions"
+  - name: "Alice's transactions"
     chartSpec:
       lines:
-        - query: "beneficiary:'Account A'"
+        - query: "beneficiary:Alice"
 
 constants:
   commonAccount: *accountCommon
