@@ -1,11 +1,11 @@
-package app.flux.react.app.transactionviews
+package app.common.accounting
+
+import app.common.accounting.ChartSpec.Line
+import utest.TestSuite
 
 import scala.collection.immutable.Seq
-import app.common.accounting.ChartSpec
-import app.common.accounting.ChartSpec.Line
-import utest._
 
-object ChartSpecInputTest extends TestSuite {
+object ChartSpecTest extends TestSuite {
 
   override def tests = TestSuite {
     "ChartSpec" - {
