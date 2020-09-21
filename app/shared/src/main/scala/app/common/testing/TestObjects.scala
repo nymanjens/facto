@@ -7,6 +7,7 @@ import java.time.Month._
 import app.api.ScalaJsApi.GetInitialDataResponse
 import app.api.ScalaJsApi.UpdateToken
 import app.api.ScalaJsApi.UserPrototype
+import app.common.accounting.ChartSpec
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup
@@ -200,6 +201,7 @@ object TestObjects {
       "CASH_GBP" -> testReservoirCashGbp,
     ),
     templates = Seq(testTemplate),
+    predefinedCharts = Seq(ChartSpec(Seq(ChartSpec.Line("beneficiary:'Account A'")))),
     constants = testConstants,
   )
 

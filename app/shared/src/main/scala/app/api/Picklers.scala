@@ -1,5 +1,6 @@
 package app.api
 
+import app.common.accounting.ChartSpec
 import app.common.money.Currency
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
@@ -74,6 +75,15 @@ object Picklers extends StandardPicklers {
     }
     override def unpickle(implicit state: UnpickleState): Currency = logExceptions {
       Currency.of(state.unpickle[String])
+    }
+  }
+
+  implicit object ChartSpecPickler extends Pickler[ChartSpec] {
+    override def pickle(value: ChartSpec)(implicit state: PickleState): Unit = logExceptions {
+      state.pickle(value.lines)
+    }
+    override def unpickle(implicit state: UnpickleState): ChartSpec = logExceptions {
+      ChartSpec(state.unpickle[Seq[ChartSpec.Line]])
     }
   }
 

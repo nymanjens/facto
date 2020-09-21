@@ -2,18 +2,19 @@ package app.models.accounting.config
 
 import java.util.Collections
 
-import hydro.common.Require.requireNonNull
-import hydro.common.Annotations.nullable
-import app.models.accounting.config.Account.{SummaryTotalRowDef => ParsedSummaryTotalRowDef}
-import app.models.accounting.config.MoneyReservoir.NullMoneyReservoir
+import app.common.accounting.{ChartSpec => ParsedChartSpec}
 import app.models.accounting.config.{Account => ParsedAccount}
 import app.models.accounting.config.{Category => ParsedCategory}
 import app.models.accounting.config.{Config => ParsedConfig}
 import app.models.accounting.config.{Constants => ParsedConstants}
 import app.models.accounting.config.{MoneyReservoir => ParsedMoneyReservoir}
 import app.models.accounting.config.{Template => ParsedTemplate}
+import app.models.accounting.config.Account.{SummaryTotalRowDef => ParsedSummaryTotalRowDef}
+import app.models.accounting.config.MoneyReservoir.NullMoneyReservoir
 import com.google.common.base.Preconditions.checkNotNull
 import com.google.common.collect.ImmutableList
+import hydro.common.Annotations.nullable
+import hydro.common.Require.requireNonNull
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.ListMap
@@ -26,9 +27,10 @@ object Parsable {
       categories: java.util.List[Category],
       moneyReservoirs: java.util.List[MoneyReservoir],
       templates: java.util.List[Template],
+      predefinedCharts: java.util.List[ChartSpec],
       constants: Constants,
   ) {
-    def this() = this(null, null, null, null, null)
+    def this() = this(null, null, null, null, predefinedCharts = new java.util.ArrayList(), null)
 
     def parse: ParsedConfig = {
       requireNonNull(accounts, categories, moneyReservoirs, templates, constants)
@@ -38,11 +40,19 @@ object Parsable {
       val parsedTemplates = templates.asScala.toVector map { tpl =>
         tpl.parse(parsedAccounts, parsedReservoirs, parsedCategories)
       }
+      val parsedPredefinedCharts = predefinedCharts.asScala.toVector.map(_.parse)
 
       // Validation
       parsedAccounts.values foreach (_.validateCodes(parsedReservoirs.values))
 
-      ParsedConfig(parsedAccounts, parsedCategories, parsedReservoirs, parsedTemplates, constants.parse)
+      ParsedConfig(
+        accounts = parsedAccounts,
+        categories = parsedCategories,
+        moneyReservoirsMap = parsedReservoirs,
+        templates = parsedTemplates,
+        predefinedCharts = parsedPredefinedCharts,
+        constants = constants.parse,
+      )
     }
   }
 
@@ -200,6 +210,32 @@ object Parsable {
         )
       }
     }
+  }
+
+  case class ChartSpec(lines: java.util.List[ChartSpec.Line]) {
+    def this() = this(lines = null)
+
+    def parse(): ParsedChartSpec = {
+      ParsedChartSpec(lines = lines.asScala.toVector.map(_.parse))
+    }
+  }
+  object ChartSpec {
+    case class Line(
+        query: String,
+        inverted: Boolean = false,
+        cumulative: Boolean = false,
+    ) {
+      def this() = this(query = null)
+
+      def parse(): ParsedChartSpec.Line = {
+        ParsedChartSpec.Line(
+          query = checkNotNull(query),
+          inverted = inverted,
+          cumulative = cumulative,
+        )
+      }
+    }
+
   }
 
   case class Constants(

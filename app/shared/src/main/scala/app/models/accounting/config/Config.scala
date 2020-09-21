@@ -1,5 +1,6 @@
 package app.models.accounting.config
 
+import app.common.accounting.ChartSpec
 import hydro.common.Require.requireNonNull
 import app.models.access.AppEntityAccess
 import app.models.accounting.config.MoneyReservoir.NullMoneyReservoir
@@ -9,7 +10,7 @@ import scala.collection.immutable.ListMap
 import scala.collection.immutable.Seq
 
 /**
-  * Contains the accountin configuration of this application. This is assumed to remain constant.
+  * Contains the accounting configuration of this application. This is assumed to remain constant.
   *
   * @param accounts   Maps code to account
   * @param categories Maps code to category
@@ -19,6 +20,7 @@ case class Config(
     categories: ListMap[String, Category],
     moneyReservoirsMap: ListMap[String, MoneyReservoir],
     templates: Seq[Template],
+    predefinedCharts: Seq[ChartSpec],
     constants: Constants,
 ) {
   requireNonNull(accounts, categories, moneyReservoirsMap, templates, constants)
