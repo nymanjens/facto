@@ -25,6 +25,7 @@ import hydro.flux.react.uielements.PageHeader
 import hydro.flux.react.HydroReactComponent
 import hydro.flux.react.uielements.Bootstrap
 import hydro.flux.react.ReactVdomUtils.<<
+import hydro.flux.react.uielements.Panel
 import hydro.flux.router.RouterContext
 import hydro.jsfacades.Recharts
 import japgolly.scalajs.react._
@@ -97,13 +98,39 @@ final class Chart(implicit
         pageHeader(router.currentPage),
         // **************** Chartspec **************** //
         Bootstrap.Row(
-          chartSpecInput(
-            chartSpec = props.chartSpec,
-            onChartSpecUpdate = newChartSpec => {
-              router.setPage(AppPages.Chart.fromChartSpec(newChartSpec))
-              Callback.empty
-            },
-          )
+          Bootstrap.Col(lg = 8)(
+            Bootstrap.Panel()(
+              Bootstrap.PanelHeading(i18n("app.graph-lines")),
+              Bootstrap.PanelBody(
+                chartSpecInput(
+                  chartSpec = props.chartSpec,
+                  onChartSpecUpdate = newChartSpec => {
+                    router.setPage(AppPages.Chart.fromChartSpec(newChartSpec))
+                    Callback.empty
+                  },
+                )
+              ),
+            )
+          ),
+          <<.ifThen(accountingConfig.predefinedCharts.nonEmpty) {
+            Bootstrap.Col(lg = 4)(
+              Bootstrap.Panel()(
+                Bootstrap.PanelHeading(i18n("app.predefined-charts")),
+                Bootstrap.PanelBody(
+                  <.ul(
+                    accountingConfig.predefinedCharts.map { predefinedChart =>
+                      <.li(
+                        ^.key := predefinedChart.name,
+                        router.anchorWithHrefTo(AppPages.Chart.fromChartSpec(predefinedChart.chartSpec))(
+                          predefinedChart.name
+                        ),
+                      )
+                    }.toVdomArray
+                  )
+                ),
+              )
+            )
+          },
         ),
         // **************** Chart **************** //
         <.div(

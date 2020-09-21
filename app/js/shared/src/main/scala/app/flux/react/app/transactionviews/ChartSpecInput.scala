@@ -55,21 +55,20 @@ final class ChartSpecInput(implicit
 
     override def render(props: Props, state: State) = logExceptions {
       implicit val _: Props = props
-      Panel(title = i18n("app.graph-lines"), lg = 8) {
-        <.span(
-          Table(
-            tableClasses = Seq("table-chart-spec"),
-            tableHeaders = Seq(
-              <.th(i18n("app.query"), ^.width := "100%"),
-              <.th(i18n("app.inverted")),
-              <.th(i18n("app.cumulative")),
-              <.th(),
-            ),
-            tableRowDatas = tableRowDatas,
+
+      <.span(
+        Table(
+          tableClasses = Seq("table-chart-spec"),
+          tableHeaders = Seq(
+            <.th(i18n("app.query"), ^.width := "100%"),
+            <.th(i18n("app.inverted")),
+            <.th(i18n("app.cumulative")),
+            <.th(),
           ),
-          addButton,
-        )
-      }
+          tableRowDatas = tableRowDatas,
+        ),
+        addButton,
+      )
     }
 
     private def tableRowDatas(implicit props: Props): Seq[Table.TableRowData] = {
