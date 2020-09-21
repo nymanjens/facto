@@ -164,3 +164,4 @@ app.add-line=Nieuwe grafieklijn
 app.cumulated-total=Het gecumuleerde totaal op {0}
 app.for-query=Voor '{0}'
 app.predefined-charts=Voorgedefinieerde grafieken
+app.line-n=Lijn {0}

@@ -211,3 +211,4 @@ app.add-line=Add line
 app.cumulated-total=The cumulated total on {0}
 app.for-query=For '{0}'
 app.predefined-charts=Predefined charts
+app.line-n=Line {0}

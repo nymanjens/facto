@@ -244,7 +244,7 @@ final class Chart(implicit
     }
 
     private def lineName(line: Line, lineIndex: Int): String = {
-      s"Graph ${lineIndex + 1}: '${line.query}'"
+      s"${i18n("app.line-n", lineIndex + 1)}: '${line.query}'"
     }
 
     private def formatMonth(month: DatedMonth): String = {
