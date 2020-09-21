@@ -154,9 +154,9 @@ final class Chart(implicit
                       i18n("app.for-query", line.query),
                       ": ",
                       chartData.lastOption
-                          .map(data => data(lineName(line, lineIndex)))
-                          .map(formatDoubleMoney())
-                          .getOrElse("0.00"): String,
+                        .map(data => data(lineName(line, lineIndex)))
+                        .map(formatDoubleMoney())
+                        .getOrElse("0.00"): String,
                     )
                   }
                 ).toVdomArray
