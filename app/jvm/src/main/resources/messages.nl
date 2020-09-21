@@ -161,3 +161,5 @@ app.inverted=Geïnverteerd
 app.query=Query
 app.cumulative=Cumulatief
 app.add-line=Nieuwe grafieklijn
+app.cumulated-total=Het gecumuleerde totaal op {0}
+app.for-query=Voor '{0}'

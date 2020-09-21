@@ -24,6 +24,7 @@ import hydro.common.time.Clock
 import hydro.flux.react.uielements.PageHeader
 import hydro.flux.react.HydroReactComponent
 import hydro.flux.react.uielements.Bootstrap
+import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.router.RouterContext
 import hydro.jsfacades.Recharts
 import japgolly.scalajs.react._
@@ -88,6 +89,9 @@ final class Chart(implicit
       implicit val router = props.router
       implicit val _ = props
       implicit val __ = state
+
+      val chartData = assembleData()
+
       <.span(
         ^.className := "charts-page",
         pageHeader(router.currentPage),
@@ -105,7 +109,7 @@ final class Chart(implicit
         <.div(
           Recharts.ResponsiveContainer(width = "100%", height = 450)(
             Recharts.ComposedChart(
-              data = assembleData(),
+              data = chartData,
               margin = Recharts.Margin(top = 5, right = 50, left = 50, bottom = 35),
             )(
               Recharts.CartesianGrid(strokeDasharray = "3 3", vertical = false),
@@ -134,7 +138,31 @@ final class Chart(implicit
                     )
                 }).toVdomArray,
             )
-          )
+          ),
+          <<.ifThen(props.chartSpec.lines.exists(_.cumulative)) {
+            <.div(
+              i18n("app.cumulated-total", formatMonth(DatedMonth.current)),
+              ":",
+              <.ul(
+                (
+                  for {
+                    (line, lineIndex) <- props.chartSpec.lines.zipWithIndex
+                    if line.cumulative
+                  } yield {
+                    <.li(
+                      ^.key := lineIndex,
+                      i18n("app.for-query", line.query),
+                      ": ",
+                      chartData.lastOption
+                          .map(data => data(lineName(line, lineIndex)))
+                          .map(formatDoubleMoney())
+                          .getOrElse("0.00"): String,
+                    )
+                  }
+                ).toVdomArray
+              ),
+            )
+          },
         ),
       )
     }
