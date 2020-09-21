@@ -3,6 +3,7 @@ package app.flux.router
 import app.common.accounting.ChartSpec
 import app.models.accounting.BalanceCheck
 import app.models.accounting.config.Account
+import app.models.accounting.config.Config
 import app.models.accounting.config.MoneyReservoir
 import app.models.accounting.config.Template
 import hydro.common.I18n
@@ -181,11 +182,15 @@ object AppPages {
   }
   object Chart {
 
-    val empty: Chart = Chart.fromChartSpec(ChartSpec.singleEmptyLine)
-
     def fromChartSpec(chartSpec: ChartSpec): Chart = {
       new Chart(
         js.URIUtils.encodeURIComponent(chartSpec.stringify)
+      )
+    }
+
+    def firstPredefined(implicit accountingConfig: Config): Chart = {
+      Chart.fromChartSpec(
+        accountingConfig.predefinedCharts.headOption.map(_.chartSpec) getOrElse ChartSpec.singleEmptyLine
       )
     }
   }
