@@ -2,6 +2,7 @@ package app.common.accounting
 
 import app.common.accounting.ChartSpec.Line
 import utest.TestSuite
+import utest._
 
 import scala.collection.immutable.Seq
 
