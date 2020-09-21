@@ -122,9 +122,12 @@ final class Chart(implicit
                     accountingConfig.predefinedCharts.map { predefinedChart =>
                       <.li(
                         ^.key := predefinedChart.name,
-                        router.anchorWithHrefTo(AppPages.Chart.fromChartSpec(predefinedChart.chartSpec))(
-                          predefinedChart.name
-                        ),
+                        if (predefinedChart.chartSpec == props.chartSpec)
+                          <.b(predefinedChart.name)
+                        else
+                          router.anchorWithHrefTo(AppPages.Chart.fromChartSpec(predefinedChart.chartSpec))(
+                            predefinedChart.name
+                          ),
                       )
                     }.toVdomArray
                   )
