@@ -224,30 +224,30 @@ object Parsable {
     }
   }
   object PredefinedChart {
-  case class ChartSpec(lines: java.util.List[ChartSpec.Line]) {
-    def this() = this(lines = null)
+    case class ChartSpec(lines: java.util.List[ChartSpec.Line]) {
+      def this() = this(lines = null)
 
-    def parse(): ParsedChartSpec = {
-      ParsedChartSpec(lines = lines.asScala.toVector.map(_.parse))
-    }
-  }
-  object ChartSpec {
-    case class Line(
-        query: String,
-        inverted: Boolean = false,
-        cumulative: Boolean = false,
-    ) {
-      def this() = this(query = null)
-
-      def parse(): ParsedChartSpec.Line = {
-        ParsedChartSpec.Line(
-          query = checkNotNull(query),
-          inverted = inverted,
-          cumulative = cumulative,
-        )
+      def parse(): ParsedChartSpec = {
+        ParsedChartSpec(lines = lines.asScala.toVector.map(_.parse))
       }
     }
-  }
+    object ChartSpec {
+      case class Line(
+          query: String,
+          inverted: Boolean = false,
+          cumulative: Boolean = false,
+      ) {
+        def this() = this(query = null)
+
+        def parse(): ParsedChartSpec.Line = {
+          ParsedChartSpec.Line(
+            query = checkNotNull(query),
+            inverted = inverted,
+            cumulative = cumulative,
+          )
+        }
+      }
+    }
   }
 
   case class Constants(
