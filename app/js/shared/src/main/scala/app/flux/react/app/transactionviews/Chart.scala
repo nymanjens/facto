@@ -10,8 +10,8 @@ import app.common.money.ExchangeRateManager
 import app.common.money.Money
 import app.common.money.ReferenceMoney
 import app.common.time.DatedMonth
-import app.flux.react.app.transactionviews.ChartSpecInput.ChartSpec
-import app.flux.react.app.transactionviews.ChartSpecInput.Line
+import app.common.accounting.ChartSpec
+import app.common.accounting.ChartSpec.Line
 import app.flux.router.AppPages
 import app.flux.stores.entries.factories.ChartStoreFactory
 import app.flux.stores.entries.factories.ChartStoreFactory.LinePoints

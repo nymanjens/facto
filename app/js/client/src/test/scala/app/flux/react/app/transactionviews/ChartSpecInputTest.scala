@@ -1,8 +1,8 @@
 package app.flux.react.app.transactionviews
 
 import scala.collection.immutable.Seq
-import app.flux.react.app.transactionviews.ChartSpecInput.ChartSpec
-import app.flux.react.app.transactionviews.ChartSpecInput.Line
+import app.common.accounting.ChartSpec
+import app.common.accounting.ChartSpec.Line
 import utest._
 
 object ChartSpecInputTest extends TestSuite {
