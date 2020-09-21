@@ -68,6 +68,8 @@ final class ChartSpecInput(implicit
           tableRowDatas = tableRowDatas,
         ),
         addButton,
+        " ",
+        clearButton,
       )
     }
 
@@ -115,6 +117,15 @@ final class ChartSpecInput(implicit
         " ",
         i18n("app.add-line"),
         ^.onClick --> props.notifyUpdatedChartSpec(_.withAddedEmptyLine),
+      )
+    }
+
+    private def clearButton(implicit props: Props): VdomNode = {
+      Bootstrap.Button(Variant.default, tag = <.a)(
+        Bootstrap.FontAwesomeIcon("times"),
+        " ",
+        i18n("app.clear"),
+        ^.onClick --> props.notifyUpdatedChartSpec(_ => ChartSpec.singleEmptyLine),
       )
     }
   }
