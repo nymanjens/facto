@@ -10,7 +10,7 @@ import app.common.testing.TestObjects._
 import app.common.time.DatedMonth
 import app.common.time.YearRange
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForMonth
-import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForYear
+import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.ExchangeRateGains
 import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
 import hydro.common.time.LocalDateTimes.createDateTime
 import utest._
@@ -37,7 +37,7 @@ object SummaryTableTest extends TestSuite {
               createTransaction(year = 2012, month = JUNE, flow = -2, category = testCategoryC),
             )
           ),
-          GainsForYear(
+          ExchangeRateGains(
             monthToGains = Map(
               DatedMonth.of(2012, JUNE) ->
                 GainsForMonth.forSingle(testReservoirCashGbp, ReferenceMoney(123))
@@ -53,7 +53,7 @@ object SummaryTableTest extends TestSuite {
               createTransaction(year = 2013, category = testCategoryB),
             )
           ),
-          GainsForYear.empty,
+          ExchangeRateGains.empty,
         ),
       ),
       netWorth = ReferenceMoney(23737373),

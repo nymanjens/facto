@@ -34,19 +34,19 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
     "no transactions" - async {
       val store = factory.get(testAccountA, year = 2013)
 
-      val gainsForYear = await(store.stateFuture)
-      gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2012, DECEMBER, 1))) ==> GainsForMonth.empty
-      gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2013, JANUARY, 1))) ==> GainsForMonth.empty
-      gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2013, DECEMBER, 1))) ==> GainsForMonth.empty
+      val exchangeRateGains = await(store.stateFuture)
+      exchangeRateGains.gainsForMonth(DatedMonth(LocalDate.of(2012, DECEMBER, 1))) ==> GainsForMonth.empty
+      exchangeRateGains.gainsForMonth(DatedMonth(LocalDate.of(2013, JANUARY, 1))) ==> GainsForMonth.empty
+      exchangeRateGains.gainsForMonth(DatedMonth(LocalDate.of(2013, DECEMBER, 1))) ==> GainsForMonth.empty
     }
 
     "domestic reservoir" - async {
       persistTransaction(flow = 789, date = createDateTime(2013, JANUARY, 5), reservoir = testReservoirCashA)
 
       val store = factory.get(testAccountA, year = 2013)
-      val gainsForYear = await(store.stateFuture)
+      val exchangeRateGains = await(store.stateFuture)
 
-      gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2013, JANUARY, 1))) ==> GainsForMonth.empty
+      exchangeRateGains.gainsForMonth(DatedMonth(LocalDate.of(2013, JANUARY, 1))) ==> GainsForMonth.empty
     }
 
     "foreign reservoir" - async {
@@ -88,29 +88,29 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
       persistTransaction(flow = -600, date = createDateTime(2013, MAY, 9)) // Balance = -200
 
       val store = factory.get(testAccountA, year = 2013)
-      val gainsForYear = await(store.stateFuture)
+      val exchangeRateGains = await(store.stateFuture)
 
-      gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2012, JANUARY, 1))) ==> GainsForMonth.empty
-      gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2012, NOVEMBER, 1))) ==> GainsForMonth.empty
-      gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2012, DECEMBER, 1))) ==> GainsForMonth.empty
+      exchangeRateGains.gainsForMonth(DatedMonth(LocalDate.of(2012, JANUARY, 1))) ==> GainsForMonth.empty
+      exchangeRateGains.gainsForMonth(DatedMonth(LocalDate.of(2012, NOVEMBER, 1))) ==> GainsForMonth.empty
+      exchangeRateGains.gainsForMonth(DatedMonth(LocalDate.of(2012, DECEMBER, 1))) ==> GainsForMonth.empty
 
-      gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2013, JANUARY, 1))) ==>
+      exchangeRateGains.gainsForMonth(DatedMonth(LocalDate.of(2013, JANUARY, 1))) ==>
         GainsForMonth.forSingle(testReservoirCashGbp, refMoney(20 - 80))
-      gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2013, FEBRUARY, 1))) ==>
+      exchangeRateGains.gainsForMonth(DatedMonth(LocalDate.of(2013, FEBRUARY, 1))) ==>
         GainsForMonth.forSingle(testReservoirCashGbp, refMoney(-20 + 30))
-      gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2013, MARCH, 1))) ==>
+      exchangeRateGains.gainsForMonth(DatedMonth(LocalDate.of(2013, MARCH, 1))) ==>
         GainsForMonth.forSingle(testReservoirCashGbp, refMoney(-10 + 40))
-      gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2013, APRIL, 1))) ==>
+      exchangeRateGains.gainsForMonth(DatedMonth(LocalDate.of(2013, APRIL, 1))) ==>
         GainsForMonth.forSingle(testReservoirCashGbp, refMoney(10))
-      gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2013, MAY, 1))) ==>
+      exchangeRateGains.gainsForMonth(DatedMonth(LocalDate.of(2013, MAY, 1))) ==>
         GainsForMonth.forSingle(testReservoirCashGbp, refMoney(60 + 120))
-      gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2013, JUNE, 1))) ==>
+      exchangeRateGains.gainsForMonth(DatedMonth(LocalDate.of(2013, JUNE, 1))) ==>
         GainsForMonth.forSingle(testReservoirCashGbp, refMoney(-20))
-      gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2013, JULY, 1))) ==>
+      exchangeRateGains.gainsForMonth(DatedMonth(LocalDate.of(2013, JULY, 1))) ==>
         GainsForMonth.forSingle(testReservoirCashGbp, refMoney(0))
-      gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2013, AUGUST, 1))) ==>
+      exchangeRateGains.gainsForMonth(DatedMonth(LocalDate.of(2013, AUGUST, 1))) ==>
         GainsForMonth.forSingle(testReservoirCashGbp, refMoney(20))
-      gainsForYear.gainsForMonth(DatedMonth(LocalDate.of(2013, SEPTEMBER, 1))) ==>
+      exchangeRateGains.gainsForMonth(DatedMonth(LocalDate.of(2013, SEPTEMBER, 1))) ==>
         GainsForMonth.forSingle(testReservoirCashGbp, refMoney(0))
     }
   }

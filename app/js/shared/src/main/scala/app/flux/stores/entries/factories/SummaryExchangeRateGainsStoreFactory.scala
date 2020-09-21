@@ -12,7 +12,7 @@ import app.flux.stores.entries.ComplexQueryFilter
 import app.flux.stores.entries.EntriesStore
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.DateToBalanceFunction
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForMonth
-import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForYear
+import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.ExchangeRateGains
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppJsEntityAccess
 import app.models.access.ModelFields
@@ -46,7 +46,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
     accountingConfig: Config,
     complexQueryFilter: ComplexQueryFilter,
     clock: Clock,
-) extends EntriesStoreFactory[GainsForYear] {
+) extends EntriesStoreFactory[ExchangeRateGains] {
 
   // **************** Public API ****************//
   def get(account: Account = null, year: Int = -1): Store =
@@ -55,11 +55,11 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
   // **************** Implementation of EntriesStoreFactory methods/types ****************//
   override protected def createNew(input: Input) = new Store {
     override protected def calculateState() = async {
-      GainsForYear.sum {
+      ExchangeRateGains.sum {
         val futures = for {
           reservoir <- accountingConfig.moneyReservoirs(includeHidden = true)
           if isRelevantReservoir(reservoir)
-        } yield calculateGainsForYear(reservoir)
+        } yield calculateExchangeRateGains(reservoir)
 
         await(Future.sequence(futures))
       }
@@ -75,7 +75,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
     }
 
     // **************** Private helper methods ****************//
-    private def calculateGainsForYear(reservoir: MoneyReservoir): Future[GainsForYear] = async {
+    private def calculateExchangeRateGains(reservoir: MoneyReservoir): Future[ExchangeRateGains] = async {
       val oldestRelevantBalanceCheck: Option[BalanceCheck] = input.year match {
         case None => None
         case Some(year) =>
@@ -163,7 +163,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
           }
       }
 
-      GainsForYear(
+      ExchangeRateGains(
         monthToGains = monthsInPeriod.map { month =>
           val gain: ReferenceMoney = {
             def gainFromMoney(date: LocalDateTime, amount: MoneyWithGeneralCurrency): ReferenceMoney = {
@@ -219,20 +219,20 @@ object SummaryExchangeRateGainsStoreFactory {
     keys.map(key => key -> valueCombiner(maps.filter(_ contains key).map(_.apply(key)))).toMap
   }
 
-  case class GainsForYear(
+  case class ExchangeRateGains(
       monthToGains: Map[DatedMonth, GainsForMonth],
       protected override val impactingTransactionIds: Set[Long],
       protected override val impactingBalanceCheckIds: Set[Long],
   ) extends EntriesStore.StateTrait {
     def gainsForMonth(month: DatedMonth): GainsForMonth = monthToGains.getOrElse(month, GainsForMonth.empty)
     def currencies: Seq[Currency] = monthToGains.values.toStream.flatMap(_.currencies).distinct.toVector
-    def nonEmpty: Boolean = this != GainsForYear.empty
+    def nonEmpty: Boolean = this != ExchangeRateGains.empty
   }
 
-  object GainsForYear {
-    val empty: GainsForYear = GainsForYear(Map(), Set(), Set())
+  object ExchangeRateGains {
+    val empty: ExchangeRateGains = ExchangeRateGains(Map(), Set(), Set())
 
-    def sum(gains: Seq[GainsForYear]): GainsForYear = GainsForYear(
+    def sum(gains: Seq[ExchangeRateGains]): ExchangeRateGains = ExchangeRateGains(
       monthToGains = combineMapValues(gains.map(_.monthToGains))(GainsForMonth.sum),
       impactingTransactionIds = gains.map(_.impactingTransactionIds).reduceOption(_ union _) getOrElse Set(),
       impactingBalanceCheckIds = gains.map(_.impactingBalanceCheckIds).reduceOption(_ union _) getOrElse Set(),

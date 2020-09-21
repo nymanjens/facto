@@ -8,7 +8,7 @@ import app.common.testing.TestObjects._
 import app.flux.stores.entries.AccountPair
 import app.flux.stores.entries.ComplexQueryFilter
 import app.flux.stores.entries.EntriesStore
-import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForYear
+import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.ExchangeRateGains
 import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
 import app.models.access.ModelFields
 import app.models.accounting._
@@ -317,7 +317,7 @@ object StoreFactoryStateUpdateTest extends TestSuite {
     state match {
       case s: EntriesListStoreFactory.State[_] =>
         s.copy(impactingTransactionIds = Set(), impactingBalanceCheckIds = Set())
-      case s: GainsForYear =>
+      case s: ExchangeRateGains =>
         s.copy(impactingTransactionIds = Set(), impactingBalanceCheckIds = Set())
       case s: SummaryForYear =>
         s

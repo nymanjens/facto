@@ -5,7 +5,7 @@ import app.common.money.ReferenceMoney
 import app.common.time.DatedMonth
 import app.flux.stores.entries.ComplexQueryFilter
 import app.flux.stores.entries.factories.ChartStoreFactory.LinePoints
-import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForYear
+import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.ExchangeRateGains
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Config
 import app.models.accounting.Transaction
@@ -44,17 +44,17 @@ final class ChartStoreFactory(implicit
 
   /* override */
   final class Store(
-      filterFromQuery: DbQuery.Filter[Transaction],
-      chartStoreFromEntities: ChartStoreFromEntities,
-      summaryExchangeRateGainsStore: StateStore[Option[GainsForYear]],
-  ) extends CombiningStateStore[Option[LinePoints], Option[GainsForYear], LinePoints](
+                     filterFromQuery: DbQuery.Filter[Transaction],
+                     chartStoreFromEntities: ChartStoreFromEntities,
+                     summaryExchangeRateGainsStore: StateStore[Option[ExchangeRateGains]],
+  ) extends CombiningStateStore[Option[LinePoints], Option[ExchangeRateGains], LinePoints](
         chartStoreFromEntities,
         summaryExchangeRateGainsStore,
       ) {
 
     override protected def combineStoreStates(
-        maybeChartFromEntities: Option[LinePoints],
-        maybeSummaryExchangeRateGains: Option[GainsForYear],
+                                               maybeChartFromEntities: Option[LinePoints],
+                                               maybeSummaryExchangeRateGains: Option[ExchangeRateGains],
     ): LinePoints = {
       (for {
         chartFromEntities <- maybeChartFromEntities

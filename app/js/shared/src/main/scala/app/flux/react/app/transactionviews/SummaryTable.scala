@@ -13,7 +13,7 @@ import app.common.time.YearRange
 import app.flux.react.uielements
 import app.flux.router.AppPages
 import app.flux.stores.entries._
-import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForYear
+import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.ExchangeRateGains
 import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryCell
 import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
 import app.flux.stores.entries.factories.CashFlowEntriesStoreFactory
@@ -205,13 +205,13 @@ private[transactionviews] final class SummaryTable(implicit
 
     def builder(allTransactionsYearRange: YearRange): Builder = new Builder(allTransactionsYearRange)
 
-    case class YearData(summary: SummaryForYear, exchangeRateGains: GainsForYear)
+    case class YearData(summary: SummaryForYear, exchangeRateGains: ExchangeRateGains)
 
     final class Builder(allTransactionsYearRange: YearRange) {
       var netWorth: ReferenceMoney = ReferenceMoney(0)
       val yearsToData: mutable.LinkedHashMap[Int, AllYearsData.YearData] = mutable.LinkedHashMap()
 
-      def addYear(year: Int, summary: SummaryForYear, exchangeRateGains: GainsForYear): Builder = {
+      def addYear(year: Int, summary: SummaryForYear, exchangeRateGains: ExchangeRateGains): Builder = {
         yearsToData.put(year, YearData(summary, exchangeRateGains))
         this
       }
@@ -539,7 +539,7 @@ private[transactionviews] final class SummaryTable(implicit
           dataBuilder.addYear(
             year,
             summaryForYearStore.state getOrElse SummaryForYear.empty,
-            exchangeRateGainsStore.flatMap(_.state) getOrElse GainsForYear.empty,
+            exchangeRateGainsStore.flatMap(_.state) getOrElse ExchangeRateGains.empty,
           )
           usedStores += summaryForYearStore
           usedStores ++= exchangeRateGainsStore.toSeq
