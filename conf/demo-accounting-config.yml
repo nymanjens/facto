@@ -234,6 +234,12 @@ templates:
         description: Wages
         flowAsFloat: 900
 
+predefinedCharts:
+  - name: "Account A's transactions"
+    chartSpec:
+      lines:
+        - query: "beneficiary:'Account A'"
+
 constants:
   commonAccount: *accountCommon
   accountingCategory: *catAcc

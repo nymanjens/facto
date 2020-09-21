@@ -45,6 +45,7 @@ class ConfigTest extends HookedSpecification {
     config.categories mustEqual testAccountingConfig.categories
     config.moneyReservoirsMap mustEqual testAccountingConfig.moneyReservoirsMap
     config.templates mustEqual testAccountingConfig.templates
+    config.predefinedCharts mustEqual testAccountingConfig.predefinedCharts
     config.constants mustEqual testAccountingConfig.constants
     config mustEqual testAccountingConfig
   }

@@ -201,7 +201,12 @@ object TestObjects {
       "CASH_GBP" -> testReservoirCashGbp,
     ),
     templates = Seq(testTemplate),
-    predefinedCharts = Seq(ChartSpec(Seq(ChartSpec.Line("beneficiary:'Account A'")))),
+    predefinedCharts = Seq(
+      PredefinedChart(
+        name = "Account A's transactions",
+        chartSpec = ChartSpec(Seq(ChartSpec.Line("beneficiary:'Account A'"))),
+      )
+    ),
     constants = testConstants,
   )
 

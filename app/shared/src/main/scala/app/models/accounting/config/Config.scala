@@ -20,7 +20,7 @@ case class Config(
     categories: ListMap[String, Category],
     moneyReservoirsMap: ListMap[String, MoneyReservoir],
     templates: Seq[Template],
-    predefinedCharts: Seq[ChartSpec],
+    predefinedCharts: Seq[PredefinedChart],
     constants: Constants,
 ) {
   requireNonNull(accounts, categories, moneyReservoirsMap, templates, constants)

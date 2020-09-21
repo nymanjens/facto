@@ -7,6 +7,7 @@ import app.models.accounting.config.{Account => ParsedAccount}
 import app.models.accounting.config.{Category => ParsedCategory}
 import app.models.accounting.config.{Config => ParsedConfig}
 import app.models.accounting.config.{Constants => ParsedConstants}
+import app.models.accounting.config.{PredefinedChart => ParsedPredefinedChart}
 import app.models.accounting.config.{MoneyReservoir => ParsedMoneyReservoir}
 import app.models.accounting.config.{Template => ParsedTemplate}
 import app.models.accounting.config.Account.{SummaryTotalRowDef => ParsedSummaryTotalRowDef}
@@ -27,7 +28,7 @@ object Parsable {
       categories: java.util.List[Category],
       moneyReservoirs: java.util.List[MoneyReservoir],
       templates: java.util.List[Template],
-      predefinedCharts: java.util.List[ChartSpec],
+      predefinedCharts: java.util.List[PredefinedChart],
       constants: Constants,
   ) {
     def this() = this(null, null, null, null, predefinedCharts = new java.util.ArrayList(), null)
@@ -212,6 +213,17 @@ object Parsable {
     }
   }
 
+  case class PredefinedChart(name: String, chartSpec: PredefinedChart.ChartSpec) {
+    def this() = this(null, null)
+
+    def parse(): ParsedPredefinedChart = {
+      ParsedPredefinedChart(
+        name = checkNotNull(name),
+        chartSpec = chartSpec.parse(),
+      )
+    }
+  }
+  object PredefinedChart {
   case class ChartSpec(lines: java.util.List[ChartSpec.Line]) {
     def this() = this(lines = null)
 
@@ -235,7 +247,7 @@ object Parsable {
         )
       }
     }
-
+  }
   }
 
   case class Constants(
