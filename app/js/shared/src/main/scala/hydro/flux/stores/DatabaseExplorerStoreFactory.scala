@@ -18,7 +18,7 @@ final class DatabaseExplorerStoreFactory(implicit entityAccess: JsEntityAccess) 
   def get(entityType: EntityType.any): Store = getCachedOrCreate(entityType)
 
   // **************** Implementation of base class methods and types **************** //
-  override def createNew(input: Input): Store = new Store(input)
+  override protected def createNew(input: Input): Store = new Store(input)
 
   /* override */
   protected type Input = EntityType.any

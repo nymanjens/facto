@@ -31,7 +31,7 @@ final class CollapsedExpandedStateStoreFactory() {
     /* override */
     protected type Input = String
 
-    protected override def createNew(input: Input): Store = {
+    protected override protected def createNew(input: Input): Store = {
       val store = new Store(input)
       allStores.add(store)
       store
