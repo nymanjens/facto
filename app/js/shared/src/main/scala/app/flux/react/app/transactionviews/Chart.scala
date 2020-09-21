@@ -161,15 +161,15 @@ final class Chart(implicit
                 yield {
                   if (line.cumulative)
                     Recharts.Line(
-                      key = lineName(line, lineIndex),
                       tpe = "linear",
-                      dataKey = lineName(line, lineIndex),
+                      key = line.name,
+                      dataKey = line.name,
                       stroke = lineColors(lineIndex % lineColors.size),
                     )
                   else
                     Recharts.Bar(
-                      key = lineName(line, lineIndex),
-                      dataKey = lineName(line, lineIndex),
+                      key = line.name,
+                      dataKey = line.name,
                       fill = lineColors(lineIndex % lineColors.size),
                     )
                 }).toVdomArray,
@@ -187,10 +187,10 @@ final class Chart(implicit
                   } yield {
                     <.li(
                       ^.key := lineIndex,
-                      i18n("app.for-query", lineName(line, lineIndex)),
+                      i18n("app.for-query", line.name),
                       ": ",
                       chartData.lastOption
-                        .map(data => data(lineName(line, lineIndex)))
+                        .map(data => data(line.name))
                         .map(formatDoubleMoney())
                         .getOrElse("0.00"): String,
                     )
@@ -208,8 +208,8 @@ final class Chart(implicit
       for (month <- getAllMonths()) yield {
         Map[String, js.Any](
           "month" -> formatMonth(month)
-        ) ++ props.chartSpec.lines.zipWithIndex.map { case (line, lineIndex) =>
-          lineName(line, lineIndex) -> {
+        ) ++ props.chartSpec.lines.map { line =>
+          line.name -> {
             val amount =
               state
                 .lineToPoints(line)
@@ -241,10 +241,6 @@ final class Chart(implicit
       } else {
         DatedMonth.monthsInClosedRange(allDatesWithData.min, allDatesWithData.max)
       }
-    }
-
-    private def lineName(line: Line, lineIndex: Int): String = {
-      s"${i18n("app.line-n", lineIndex + 1)}: '${line.query}'"
     }
 
     private def formatMonth(month: DatedMonth): String = {

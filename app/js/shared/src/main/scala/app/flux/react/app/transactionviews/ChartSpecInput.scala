@@ -2,6 +2,7 @@ package app.flux.react.app.transactionviews
 
 import app.common.money.ExchangeRateManager
 import app.common.accounting.ChartSpec
+import app.common.accounting.ChartSpec.Line
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Config
 import app.models.user.User
@@ -80,22 +81,28 @@ final class ChartSpecInput(implicit
             <.td(
               SingleTextInputForm(
                 defaultValue = line.query,
-                onChange =
-                  newQuery => props.notifyUpdatedChartSpec(_.modified(lineIndex, _.copy(query = newQuery))),
+                onChange = newQuery =>
+                  props.notifyUpdatedChartSpec(
+                    modifyAndCopyNameFromQuery(lineIndex, _.copy(query = newQuery))
+                  ),
               )
             ),
             <.td(
               <.input(
                 ^.tpe := "checkbox",
                 ^.checked := line.inverted,
-                ^.onChange --> props.notifyUpdatedChartSpec(_.modified(lineIndex, _.toggleInverted)),
+                ^.onChange --> props.notifyUpdatedChartSpec(
+                  modifyAndCopyNameFromQuery(lineIndex, _.toggleInverted)
+                ),
               )
             ),
             <.td(
               <.input(
                 ^.tpe := "checkbox",
                 ^.checked := line.cumulative,
-                ^.onChange --> props.notifyUpdatedChartSpec(_.modified(lineIndex, _.toggleCumulative)),
+                ^.onChange --> props.notifyUpdatedChartSpec(
+                  modifyAndCopyNameFromQuery(lineIndex, _.toggleCumulative)
+                ),
               )
             ),
             <.td(
@@ -126,6 +133,17 @@ final class ChartSpecInput(implicit
         " ",
         i18n("app.clear"),
         ^.onClick --> props.notifyUpdatedChartSpec(_ => ChartSpec.singleEmptyLine),
+      )
+    }
+
+    private def modifyAndCopyNameFromQuery(lineIndex: Int, lineModification: Line => Line)(
+        chartSpec: ChartSpec
+    ): ChartSpec = {
+      chartSpec.modified(
+        lineIndex,
+        lineModification andThen { newLine =>
+          newLine.copy(name = s"${i18n("app.line-n", lineIndex + 1)}: '${newLine.query}'")
+        },
       )
     }
   }
