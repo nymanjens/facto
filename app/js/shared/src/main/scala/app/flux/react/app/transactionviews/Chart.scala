@@ -50,10 +50,10 @@ final class Chart(implicit
     Seq("purple", "orange", "green", "deeppink", "#DD0", "fuchsia", "red", "blue")
 
   // **************** API ****************//
-  def apply(stringifiedChartSpecs: String, router: RouterContext): VdomElement = {
+  def apply(chartSpec: ChartSpec, router: RouterContext): VdomElement = {
     component(
       Props(
-        chartSpec = ChartSpec.parseStringified(stringifiedChartSpecs),
+        chartSpec = chartSpec,
         router = router,
       )
     )
@@ -100,7 +100,7 @@ final class Chart(implicit
           chartSpecInput(
             chartSpec = props.chartSpec,
             onChartSpecUpdate = newChartSpec => {
-              router.setPage(AppPages.Chart.fromStringifiedChartSpec(newChartSpec.stringify))
+              router.setPage(AppPages.Chart.fromChartSpec(newChartSpec))
               Callback.empty
             },
           )

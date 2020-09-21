@@ -1,5 +1,6 @@
 package app.flux.router
 
+import app.common.accounting.ChartSpec
 import app.models.accounting.BalanceCheck
 import app.models.accounting.config.Account
 import app.models.accounting.config.MoneyReservoir
@@ -174,20 +175,17 @@ object AppPages {
   // **************** Chart **************** //
   case class Chart private (encodedChartSpecs: String)
       extends PageBase("app.chart", iconClass = "fa fa-bar-chart-o") {
-    def stringifiedChartSpec: String = {
-      if (encodedChartSpecs == "-") ""
-      else js.URIUtils.decodeURIComponent(js.URIUtils.decodeURI(encodedChartSpecs))
+    def chartSpec: ChartSpec = {
+      ChartSpec.parseStringified(js.URIUtils.decodeURIComponent(js.URIUtils.decodeURI(encodedChartSpecs)))
     }
   }
   object Chart {
 
-    val empty: Chart = Chart.fromStringifiedChartSpec("")
+    val empty: Chart = Chart.fromChartSpec(ChartSpec.singleEmptyLine)
 
-    def fromStringifiedChartSpec(stringifiedChartSpec: String): Chart = {
+    def fromChartSpec(chartSpec: ChartSpec): Chart = {
       new Chart(
-        // Translate empty string to something else so that the URL is always parsable
-        if (stringifiedChartSpec.isEmpty) "-"
-        else js.URIUtils.encodeURIComponent(stringifiedChartSpec)
+        js.URIUtils.encodeURIComponent(chartSpec.stringify)
       )
     }
   }
