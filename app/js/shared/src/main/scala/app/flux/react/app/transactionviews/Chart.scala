@@ -187,7 +187,7 @@ final class Chart(implicit
                   } yield {
                     <.li(
                       ^.key := lineIndex,
-                      i18n("app.for-query", line.query),
+                      i18n("app.for-query", lineName(line, lineIndex)),
                       ": ",
                       chartData.lastOption
                         .map(data => data(lineName(line, lineIndex)))
