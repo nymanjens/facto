@@ -96,9 +96,9 @@ final class Chart(implicit
       <.span(
         ^.className := "charts-page",
         pageHeader(router.currentPage),
-        // **************** Chartspec **************** //
         Bootstrap.Row(
           Bootstrap.Col(lg = 8)(
+            // **************** Chartspec **************** //
             Bootstrap.Panel()(
               Bootstrap.PanelHeading(i18n("app.graph-lines")),
               Bootstrap.PanelBody(
@@ -114,6 +114,7 @@ final class Chart(implicit
           ),
           <<.ifThen(accountingConfig.predefinedCharts.nonEmpty) {
             Bootstrap.Col(lg = 4)(
+              // **************** Predefined charts **************** //
               Bootstrap.Panel()(
                 Bootstrap.PanelHeading(i18n("app.predefined-charts")),
                 Bootstrap.PanelBody(
@@ -132,6 +133,11 @@ final class Chart(implicit
             )
           },
         ),
+        // **************** Chart title **************** //
+        <<.ifDefined(accountingConfig.predefinedCharts.find(_.chartSpec == props.chartSpec)) {
+          predefinedChart =>
+            <.h2(predefinedChart.name)
+        },
         // **************** Chart **************** //
         <.div(
           Recharts.ResponsiveContainer(width = "100%", height = 450)(
