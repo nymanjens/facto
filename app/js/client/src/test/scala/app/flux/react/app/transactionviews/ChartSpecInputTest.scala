@@ -16,22 +16,21 @@ object ChartSpecInputTest extends TestSuite {
         "singleEmptyLine" - {
           testRoundTrip(ChartSpec.singleEmptyLine)
         }
-        "single empty line" - {
-          testRoundTrip(ChartSpec(Seq(Line())))
-        }
         "single non-empty line" - {
-          testRoundTrip(ChartSpec(Seq(Line(query = "ABC", inverted = true, cumulative = true))))
+          testRoundTrip(
+            ChartSpec(Seq(Line(name = "DEF@GHI", query = "ABC", inverted = true, cumulative = true)))
+          )
         }
         "multiple lines" - {
           testRoundTrip(
             ChartSpec(
               Seq(
-                Line(query = "ABC", inverted = true, cumulative = true),
-                Line(query = "DEF", inverted = true, cumulative = true),
-                Line(),
-                Line(query = "ABC", inverted = true, cumulative = true),
-                Line(),
-                Line(),
+                Line(name = "@@@", query = "ABC", inverted = true, cumulative = true),
+                Line(name = "|||", query = "DEF", inverted = true, cumulative = true),
+                Line(name = "X", query = "", inverted = false, cumulative = false),
+                Line(name = "Y", query = "ABC", inverted = true, cumulative = true),
+                Line(name = "", query = "", inverted = false, cumulative = false),
+                Line(name = "", query = "", inverted = false, cumulative = false),
               )
             )
           )

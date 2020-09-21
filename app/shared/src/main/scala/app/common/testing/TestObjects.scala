@@ -204,7 +204,16 @@ object TestObjects {
     predefinedCharts = Seq(
       PredefinedChart(
         name = "Account A's transactions",
-        chartSpec = ChartSpec(Seq(ChartSpec.Line("beneficiary:'Account A'"))),
+        chartSpec = ChartSpec(
+          Seq(
+            ChartSpec.Line(
+              name = "Transactions",
+              query = "beneficiary:'Account A'",
+              inverted = false,
+              cumulative = false,
+            )
+          )
+        ),
       )
     ),
     constants = testConstants,

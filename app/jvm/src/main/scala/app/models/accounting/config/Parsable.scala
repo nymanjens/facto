@@ -233,14 +233,16 @@ object Parsable {
     }
     object ChartSpec {
       case class Line(
+          name: String,
           query: String,
           inverted: Boolean = false,
           cumulative: Boolean = false,
       ) {
-        def this() = this(query = null)
+        def this() = this(name = null, query = null)
 
         def parse(): ParsedChartSpec.Line = {
           ParsedChartSpec.Line(
+            name = checkNotNull(name),
             query = checkNotNull(query),
             inverted = inverted,
             cumulative = cumulative,

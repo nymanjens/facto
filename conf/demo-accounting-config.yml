@@ -238,7 +238,8 @@ predefinedCharts:
   - name: "Alice's transactions"
     chartSpec:
       lines:
-        - query: "beneficiary:Alice"
+        - name: "Alice's transactions"
+          query: "beneficiary:Alice"
 
 constants:
   commonAccount: *accountCommon

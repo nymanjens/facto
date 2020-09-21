@@ -1,12 +1,13 @@
 package app.common.accounting
 
 import app.common.accounting.ChartSpec.Line
+import hydro.common.GuavaReplacement.Splitter
 
 import scala.collection.immutable.Seq
 
 case class ChartSpec(lines: Seq[Line]) {
   def withAddedEmptyLine: ChartSpec = {
-    ChartSpec(lines :+ Line())
+    ChartSpec(lines :+ Line.empty)
   }
 
   def withRemovedLine(index: Int): ChartSpec = {
@@ -20,35 +21,46 @@ case class ChartSpec(lines: Seq[Line]) {
   }
 
   def stringify: String = {
-    lines.map(_.stringify).mkString(ChartSpec.lineDelimiter)
+    lines.map(_.stringify).mkString(String.valueOf(ChartSpec.lineDelimiter))
   }
 }
 object ChartSpec {
-  val singleEmptyLine = ChartSpec(lines = Seq(Line()))
+  val singleEmptyLine = ChartSpec(lines = Seq(Line.empty))
 
-  private val lineDelimiter = "~~"
+  private val lineDelimiter = '~'
 
   def parseStringified(string: String): ChartSpec = {
-    val lines = string.split(lineDelimiter).filter(_.nonEmpty).map(Line.parseStringified).toVector
+    val lines = Splitter.on(lineDelimiter).split(string).map(Line.parseStringified)
     if (lines.nonEmpty) ChartSpec(lines) else ChartSpec.singleEmptyLine
   }
 
   case class Line(
-      query: String = "",
-      inverted: Boolean = false,
-      cumulative: Boolean = false,
+      name: String,
+      query: String,
+      inverted: Boolean,
+      cumulative: Boolean,
   ) {
     def toggleInverted: Line = copy(inverted = !inverted)
     def toggleCumulative: Line = copy(cumulative = !cumulative)
 
     def stringify: String = {
-      s"${if (inverted) "I" else "_"}${if (cumulative) "C" else "_"}$query"
+      def stripDelimiterCharacters(s: String): String = {
+        s.replace(String.valueOf(Line.delimiter), "").replace(String.valueOf(ChartSpec.lineDelimiter), "")
+      }
+      s"${if (inverted) "I" else "_"}${if (cumulative) "C" else "_"}" +
+        s"${stripDelimiterCharacters(name)}${Line.delimiter}${stripDelimiterCharacters(query)}"
     }
   }
   object Line {
+    val empty: Line = Line(name = "", query = "", inverted = false, cumulative = false)
+
+    private val delimiter = '^'
+
     def parseStringified(string: String): Line = {
+      val Seq(name, query) = Splitter.on(delimiter).split(string.substring(2))
       Line(
-        query = string.substring(2),
+        name = name,
+        query = query,
         inverted = string.charAt(0) match {
           case 'I' => true
           case '_' => false

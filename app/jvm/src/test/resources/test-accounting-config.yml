@@ -106,7 +106,8 @@ predefinedCharts:
   - name: "Account A's transactions"
     chartSpec:
       lines:
-        - query: "beneficiary:'Account A'"
+        - name: "Transactions"
+          query: "beneficiary:'Account A'"
 
 constants:
     commonAccount: *accCommon
