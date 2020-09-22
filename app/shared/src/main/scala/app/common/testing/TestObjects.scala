@@ -209,8 +209,6 @@ object TestObjects {
             ChartSpec.Line(
               name = "Transactions",
               query = "beneficiary:'Account A'",
-              inverted = false,
-              cumulative = false,
             )
           )
         ),

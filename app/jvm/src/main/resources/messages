@@ -213,3 +213,4 @@ app.for-query=For {0}
 app.predefined-charts=Predefined charts
 app.line-n=Line {0}
 app.clear=Clear
+app.bars=Bars

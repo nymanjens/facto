@@ -64,6 +64,7 @@ final class ChartSpecInput(implicit
             <.th(i18n("app.query"), ^.width := "100%"),
             <.th(i18n("app.inverted")),
             <.th(i18n("app.cumulative")),
+            <.th(i18n("app.bars")),
             <.th(),
           ),
           tableRowDatas = tableRowDatas,
@@ -102,6 +103,15 @@ final class ChartSpecInput(implicit
                 ^.checked := line.cumulative,
                 ^.onChange --> props.notifyUpdatedChartSpec(
                   modifyAndCopyNameFromQuery(lineIndex, _.toggleCumulative)
+                ),
+              )
+            ),
+            <.td(
+              <.input(
+                ^.tpe := "checkbox",
+                ^.checked := line.showBars,
+                ^.onChange --> props.notifyUpdatedChartSpec(
+                  modifyAndCopyNameFromQuery(lineIndex, _.toggleShowBars)
                 ),
               )
             ),

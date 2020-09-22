@@ -37,27 +37,29 @@ object ChartSpec {
   case class Line(
       name: String,
       query: String,
-      inverted: Boolean,
-      cumulative: Boolean,
+      inverted: Boolean = false,
+      cumulative: Boolean = false,
+      showBars: Boolean = false,
   ) {
     def toggleInverted: Line = copy(inverted = !inverted)
     def toggleCumulative: Line = copy(cumulative = !cumulative)
+    def toggleShowBars: Line = copy(showBars = !showBars)
 
     def stringify: String = {
       def stripDelimiterCharacters(s: String): String = {
         s.replace(String.valueOf(Line.delimiter), "").replace(String.valueOf(ChartSpec.lineDelimiter), "")
       }
-      s"${if (inverted) "I" else "_"}${if (cumulative) "C" else "_"}" +
+      s"${if (inverted) "I" else "_"}${if (cumulative) "C" else "_"}${if (showBars) "B" else "_"}" +
         s"${stripDelimiterCharacters(name)}${Line.delimiter}${stripDelimiterCharacters(query)}"
     }
   }
   object Line {
-    val empty: Line = Line(name = "", query = "", inverted = false, cumulative = false)
+    val empty: Line = Line(name = "", query = "")
 
     private val delimiter = '^'
 
     def parseStringified(string: String): Line = {
-      val Seq(name, query) = Splitter.on(delimiter).split(string.substring(2))
+      val Seq(name, query) = Splitter.on(delimiter).split(string.substring(3))
       Line(
         name = name,
         query = query,
@@ -67,6 +69,10 @@ object ChartSpec {
         },
         cumulative = string.charAt(1) match {
           case 'C' => true
+          case '_' => false
+        },
+        showBars = string.charAt(2) match {
+          case 'B' => true
           case '_' => false
         },
       )

@@ -166,3 +166,4 @@ app.for-query=Voor {0}
 app.predefined-charts=Voorgedefinieerde grafieken
 app.line-n=Lijn {0}
 app.clear=Leegmaken
+app.bars=Staven

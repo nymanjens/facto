@@ -237,6 +237,7 @@ object Parsable {
           query: String,
           inverted: Boolean = false,
           cumulative: Boolean = false,
+          showBars: Boolean = false,
       ) {
         def this() = this(name = null, query = null)
 
@@ -246,6 +247,7 @@ object Parsable {
             query = checkNotNull(query),
             inverted = inverted,
             cumulative = cumulative,
+            showBars = showBars,
           )
         }
       }

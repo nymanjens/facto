@@ -26,12 +26,12 @@ object ChartSpecTest extends TestSuite {
           testRoundTrip(
             ChartSpec(
               Seq(
-                Line(name = "@@@", query = "ABC", inverted = true, cumulative = true),
+                Line(name = "@@@", query = "ABC", inverted = true, cumulative = true, showBars = true),
                 Line(name = "|||", query = "DEF", inverted = true, cumulative = true),
-                Line(name = "X", query = "", inverted = false, cumulative = false),
+                Line(name = "X", query = ""),
                 Line(name = "Y", query = "ABC", inverted = true, cumulative = true),
-                Line(name = "", query = "", inverted = false, cumulative = false),
-                Line(name = "", query = "", inverted = false, cumulative = false),
+                Line(name = "", query = ""),
+                Line(name = "", query = ""),
               )
             )
           )
