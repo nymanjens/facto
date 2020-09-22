@@ -74,6 +74,7 @@ object Recharts {
       key: String,
       dataKey: String,
       fill: String,
+      stackId: String,
   ) = {
     val component = JsComponent[js.Object, Children.None, Null](BarComponent)
     component
@@ -83,6 +84,7 @@ object Recharts {
           dataKey = dataKey,
           fill = fill,
           isAnimationActive = false,
+          stackId = stackId,
         )
       )
   }

@@ -159,22 +159,19 @@ final class Chart(implicit
               Recharts.Legend(),
               (for ((line, lineIndex) <- props.chartSpec.lines.zipWithIndex)
                 yield {
-                  if (
-                    line.cumulative ||
-                    // Don't show more than one bar chart because it is very hard to interpet
-                    props.chartSpec.lines.count(!_.cumulative) > 1
-                  )
+                  if (line.showBars)
+                    Recharts.Bar(
+                      key = line.name,
+                      dataKey = line.name,
+                      fill = lineColors(lineIndex % lineColors.size),
+                      stackId = "single-stack-id",
+                    )
+                  else
                     Recharts.Line(
                       tpe = "linear",
                       key = line.name,
                       dataKey = line.name,
                       stroke = lineColors(lineIndex % lineColors.size),
-                    )
-                  else
-                    Recharts.Bar(
-                      key = line.name,
-                      dataKey = line.name,
-                      fill = lineColors(lineIndex % lineColors.size),
                     )
                 }).toVdomArray,
             )
