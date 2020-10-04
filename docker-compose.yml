@@ -12,7 +12,7 @@ services:
   web:
     depends_on: [db]
     command: bin/server
-    image: nymanjens/facto:v3.26
+    image: nymanjens/facto:latest
     ports: ["9000:9000"]
     restart: always
     environment:
