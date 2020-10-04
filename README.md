@@ -45,7 +45,7 @@ The following commands will launch a new server alongside a database in Docker c
 wget https://raw.githubusercontent.com/nymanjens/facto/master/docker-compose.yml
 
 # Choose a unique random string here of sufficient length
-export APPLICATION_SECRET=abcdefghijklmnopqrstuvwxyz
+export APPLICATION_SECRET="$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)"
 
 # Create an empty database with a single admin user
 docker-compose run web bin/server -DdropAndCreateNewDb
