@@ -195,11 +195,11 @@ templates:
       - beneficiaryCode: Common
         moneyReservoirCode: "" # N/A
         categoryCode: ENDOW
-        description: Endowment for ${account.longName}
+        description: Endowment
       - beneficiaryCode: ${account.code}
         moneyReservoirCode: "" # N/A
         categoryCode: ENDOW
-        description: Endowment for ${account.longName}
+        description: Endowment
 
   - code: bakery
     name: Bakery
