@@ -17,7 +17,7 @@ Familiy Accounting Tool keeps track of every transaction your family makes. Its 
 
 ![screenshot](screenshot.png "Screenshot")
 
-## Installation
+## Installation from release
 
 - Download the [latest release](https://github.com/nymanjens/facto/releases)
 - Unpack the archive and open a terminal in the unpacked folder
@@ -34,7 +34,28 @@ Familiy Accounting Tool keeps track of every transaction your family makes. Its 
     bin/server
     ```
 
-- Browse to http://localhost:9000
+- Browse to http://localhost:9000/app/useradministration (username: "admin", password: "changeme")
+
+## Installation with Docker
+
+The following commands will launch a new server alongside a database in Docker containers:
+
+```
+# Get the docker-compose.yml file
+wget https://raw.githubusercontent.com/nymanjens/facto/master/docker-compose.yml
+
+# Choose a unique random string here of sufficient length
+export APPLICATION_SECRET=abcdefghijklmnopqrstuvwxyz
+
+# Create an empty database with a single admin user
+docker-compose run web bin/server -DdropAndCreateNewDb
+docker-compose run web bin/server -DcreateAdminUser
+
+# Bring up the server
+docker-compose up
+```
+
+When done, browse to http://<ip_address>:9000/app/useradministration (username: "admin", password: "changeme")
 
 ## Configuration
 - `conf/application.conf`:<br>
