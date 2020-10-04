@@ -26,11 +26,9 @@ Familiy Accounting Tool keeps track of every transaction your family makes. Its 
     ```
     # Create database tables
     bin/server -DdropAndCreateNewDb
-    rm RUNNING_PID
 
     # Create admin user
     bin/server -DcreateAdminUser
-    rm RUNNING_PID
 
     # Run application
     bin/server
