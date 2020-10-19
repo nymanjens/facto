@@ -127,17 +127,21 @@ private[router] final class RouterFactory(implicit
         )
 
         // wrap/connect components to the circuit
-        (staticRoute(RouterFactory.pathPrefix, StandardPages.Root)
-          ~> redirectToPage(AppPages.CashFlow)(Redirect.Replace)
-          | factoRouterConfig.parentRules.map(_.rule).reduceLeft(_ | _)
-          | (
-            for {
-              parentRule <- factoRouterConfig.parentRules
-              popupRule <- factoRouterConfig.popupRules
-            } yield popupRule.ruleFromParent(parentRule)
-          ).reduceLeft(_ | _)
+        (
+          emptyRule
+            | staticRoute(RouterFactory.pathPrefix, StandardPages.Root)
+            ~> redirectToPage(AppPages.CashFlow)(Redirect.Replace)
 
-        // Fallback
+            | factoRouterConfig.parentRules.map(_.rule).reduceLeft(_ | _)
+
+            | (
+              for {
+                parentRule <- factoRouterConfig.parentRules
+                popupRule <- factoRouterConfig.popupRules
+              } yield popupRule.ruleFromParent(parentRule)
+            ).reduceLeft(_ | _)
+
+          // Fallback
         ).notFound(redirectToPage(AppPages.CashFlow)(Redirect.Replace))
           .onPostRender((prev, cur) =>
             LogExceptionsCallback(dispatcher.dispatch(StandardActions.SetPageLoadingState(isLoading = false)))
