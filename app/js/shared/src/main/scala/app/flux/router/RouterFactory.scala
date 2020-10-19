@@ -238,7 +238,7 @@ private[router] final class RouterFactory(implicit
       PopupRule(
         ruleFromParent = parentRule => {
           val route: RouteB[P] =
-            RouterFactory.pathPrefix ~ "[" ~ pageClassName ~ "]" /
+            RouterFactory.pathPrefix ~ "@" ~ pageClassName ~ "@" /
               parentToPopupPage(parentRule.routeWithoutPrefix.asInstanceOf[RouteB[Page]])
 
           dynamicRouteCT[P](route) ~> dynRenderR { case (page, ctl) =>
@@ -266,8 +266,8 @@ private[router] final class RouterFactory(implicit
       PopupRule(
         ruleFromParent = parentRule => {
           val route: RouteB[P] =
-            RouterFactory.pathPrefix ~ "[" ~ pageClassName /
-              prependDynamicPart("]" / parentRule.routeWithoutPrefix.asInstanceOf[RouteB[Page]])
+            RouterFactory.pathPrefix ~ "@" ~ pageClassName /
+              prependDynamicPart("@" / parentRule.routeWithoutPrefix.asInstanceOf[RouteB[Page]])
 
           dynamicRouteCT[P](route) ~> dynRenderR { case (page, ctl) =>
             renderParentAndPopup(
