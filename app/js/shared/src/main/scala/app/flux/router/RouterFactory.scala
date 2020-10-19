@@ -9,6 +9,9 @@ import scala.collection.immutable.Seq
 import hydro.common.JsLoggingUtils.logExceptions
 import hydro.flux.action.Dispatcher
 import hydro.flux.action.StandardActions
+import hydro.flux.react.uielements.Bootstrap
+import hydro.flux.react.uielements.Bootstrap.Size
+import hydro.flux.react.uielements.Bootstrap.Variant
 import hydro.flux.router.Page
 import hydro.flux.router.RouterContext
 import hydro.flux.router.StandardPages
@@ -197,7 +200,7 @@ private[router] final class RouterFactory(implicit
         routeWithoutPrefix = routeWithoutPrefix const page,
         renderer = (p, context) => renderer(context),
         rule = staticRoute(RouterFactory.pathPrefix ~ routeWithoutPrefix, page) ~> renderR(ctl =>
-          logExceptions(renderer(RouterContext(page, ctl)))
+          logExceptions(<.span(renderer(RouterContext(page, ctl))))
         ),
       )
     }
@@ -219,7 +222,7 @@ private[router] final class RouterFactory(implicit
         renderer = renderer,
         rule = dynamicRouteCT[P](RouterFactory.pathPrefix ~ routeWithoutPrefix) ~> dynRenderR {
           case (page, ctl) =>
-            logExceptions(renderer(page, RouterContext(page, ctl)))
+            logExceptions(<.span(renderer(page, RouterContext(page, ctl))))
         },
       )
     }
@@ -293,8 +296,18 @@ private[router] final class RouterFactory(implicit
         logExceptions {
           <.span(
             parentRule.render(page.parentPage, RouterContext(page.parentPage, ctl)),
-            <.span(
+            <.div(
               ^.className := "popup-editor",
+              <.div(
+                ^.className := "close-button-container",
+                Bootstrap.Button(
+                  variant = Variant.default,
+                  size = Size.sm,
+                  tag = RouterContext(page, ctl).anchorWithHrefTo(page.parentPage),
+                )(
+                  Bootstrap.FontAwesomeIcon("times", fixedWidth = true)
+                ),
+              ),
               popupRenderer(page, RouterContext(page, ctl)),
             ),
           )
