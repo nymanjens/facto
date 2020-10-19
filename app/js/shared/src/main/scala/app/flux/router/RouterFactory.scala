@@ -1,5 +1,6 @@
 package app.flux.router
 
+import app.flux.router.AppPages.Liquidation
 import app.flux.router.AppPages.PopupEditorPage
 import hydro.common.I18n
 import hydro.common.JsLoggingUtils.LogExceptionsCallback
@@ -15,6 +16,7 @@ import hydro.flux.router.StandardPages
 import hydro.models.access.EntityAccess
 import japgolly.scalajs.react.extra.router.StaticDsl.RouteB
 import japgolly.scalajs.react.extra.router._
+import japgolly.scalajs.react.extra.router.StaticDsl.Route
 import japgolly.scalajs.react.extra.router.StaticDsl.RouteB.Composition
 import japgolly.scalajs.react.vdom.html_<^._
 import org.scalajs.dom
@@ -173,6 +175,8 @@ private[router] final class RouterFactory(implicit
       routeWithoutPrefix: RouteB[P],
       private val renderer: (P, RouterContext) => VdomElement,
       rule: StaticDsl.Rule[Page],
+  )(implicit
+      val classTag: ClassTag[P]
   ) {
     def render(page: Page, context: RouterContext): VdomElement = {
       renderer(page.asInstanceOf[P], context)
@@ -245,12 +249,7 @@ private[router] final class RouterFactory(implicit
             RouterFactory.pathPrefix ~ "@" ~ pageClassName ~ "@" /
               parentToPopupPage(parentRule.routeWithoutPrefix.asInstanceOf[RouteB[Page]])
 
-          dynamicRouteCT[P](route) ~> dynRenderR { case (page, ctl) =>
-            renderParentAndPopup(
-              parentRule.render(page.parentPage, RouterContext(page.parentPage, ctl)),
-              popupRenderer(page, RouterContext(page, ctl)),
-            )
-          }
+          dynamicRouteForPopup(route, parentRule, popupRenderer)
         }
       )
     }
@@ -273,28 +272,33 @@ private[router] final class RouterFactory(implicit
             RouterFactory.pathPrefix ~ "@" ~ pageClassName /
               prependDynamicPart("@" / parentRule.routeWithoutPrefix.asInstanceOf[RouteB[Page]])
 
-          dynamicRouteCT[P](route) ~> dynRenderR { case (page, ctl) =>
-            renderParentAndPopup(
-              parentRule.render(page.parentPage, RouterContext(page.parentPage, ctl)),
-              popupRenderer(page, RouterContext(page, ctl)),
-            )
-          }
+          dynamicRouteForPopup(route, parentRule, popupRenderer)
         }
       )
     }
 
-    private def renderParentAndPopup[P <: PopupEditorPage](
-        parent: VdomElement,
-        popupEditor: VdomElement,
-    ): VdomElement = {
-      logExceptions {
-        <.span(
-          parent,
+    private def dynamicRouteForPopup[P <: PopupEditorPage](
+        route: RouteB[P],
+        parentRule: ParentRule.any,
+        popupRenderer: (P, RouterContext) => VdomElement,
+    )(implicit
+        dsl: RouterConfigDsl[Page],
+        pageClass: ClassTag[P],
+    ): StaticDsl.Rule[Page] = {
+      import dsl._
+
+      dynamicRoute[P](route) {
+        case p: P if parentRule.classTag.runtimeClass == p.parentPage.getClass => p
+      } ~> dynRenderR { case (page, ctl) =>
+        logExceptions {
           <.span(
-            ^.className := "popup-editor",
-            popupEditor,
-          ),
-        )
+            parentRule.render(page.parentPage, RouterContext(page.parentPage, ctl)),
+            <.span(
+              ^.className := "popup-editor",
+              popupRenderer(page, RouterContext(page, ctl)),
+            ),
+          )
+        }
       }
     }
   }
