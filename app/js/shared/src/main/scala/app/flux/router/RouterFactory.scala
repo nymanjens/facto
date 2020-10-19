@@ -38,7 +38,7 @@ private[router] final class RouterFactory(implicit
   private def routerConfig(implicit reactAppModule: app.flux.react.app.Module) = {
     RouterConfigDsl[Page]
       .buildConfig { dsl =>
-        implicit val _: RouterConfigDsl[Page] = dsl
+        implicit val implicitDsl: RouterConfigDsl[Page] = dsl
         import dsl._
         val codeString: RouteB[String] = string("[a-zA-Z0-9_-]+")
         val returnToPath: RouteB[Option[String]] = ("?returnto=" ~ string(".+")).option
