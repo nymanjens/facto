@@ -243,7 +243,7 @@ private[router] final class RouterFactory(implicit
 
           dynamicRouteCT[P](route) ~> dynRenderR { case (page, ctl) =>
             renderParentAndPopup(
-              parentRule.render(page.parentPage, RouterContext(page, ctl)),
+              parentRule.render(page.parentPage, RouterContext(page.parentPage, ctl)),
               popupRenderer(page, RouterContext(page, ctl)),
             )
           }
@@ -271,7 +271,7 @@ private[router] final class RouterFactory(implicit
 
           dynamicRouteCT[P](route) ~> dynRenderR { case (page, ctl) =>
             renderParentAndPopup(
-              parentRule.render(page.parentPage, RouterContext(page, ctl)),
+              parentRule.render(page.parentPage, RouterContext(page.parentPage, ctl)),
               popupRenderer(page, RouterContext(page, ctl)),
             )
           }
