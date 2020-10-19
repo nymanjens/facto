@@ -72,9 +72,6 @@ private[router] final class RouterFactory(implicit
               reactAppModule.searchResults(page.query, ctl)
             },
             ParentRule.static(AppPages.TemplateList, reactAppModule.templateList.apply),
-            ParentRule.dynamic(returnToPath.caseClass[AppPages.NewTransactionGroup]) { (page, ctl) =>
-              reactAppModule.transactionGroupForm.forCreate(page.returnToPath, ctl)
-            },
             ParentRule.dynamic((long ~ returnToPath).caseClass[AppPages.NewTransactionGroupFromCopy]) {
               (page, ctl) =>
                 reactAppModule.transactionGroupForm.forCreateFromCopy(
@@ -118,11 +115,14 @@ private[router] final class RouterFactory(implicit
             },
           ),
           popupRules = Seq(
-            PopupRule.dynamic(suffix => (long ~ suffix).caseClass[AppPages.EditTransactionGroup2]) {
+            PopupRule.static(_.caseClass[AppPages.NewTransactionGroup]) { (page, ctl) =>
+              reactAppModule.transactionGroupForm.forCreate(returnToPath = ctl.toPath(page), ctl)
+            },
+            PopupRule.dynamic(suffix => (long ~ suffix).caseClass[AppPages.EditTransactionGroup]) {
               (page, ctl) =>
                 reactAppModule.transactionGroupForm
-                  .forEdit(page.transactionGroupId, returnToPath = Path(""), ctl)
-            }
+                  .forEdit(page.transactionGroupId, returnToPath = ctl.toPath(page), ctl)
+            },
           ),
         )
 

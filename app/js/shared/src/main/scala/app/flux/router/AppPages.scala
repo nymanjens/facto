@@ -65,17 +65,17 @@ object AppPages {
   case object TemplateList extends PageBase("app.templates", iconClass = "icon-template")
 
   // **************** Accounting forms - transactions **************** //
-  case class NewTransactionGroup2 private (override val parentPage: Page) extends PopupEditorPage {
+  case class NewTransactionGroup private (override val parentPage: Page) extends PopupEditorPage {
     override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
       Future.successful(i18n("app.new-transaction"))
     override def iconClass = "icon-new-empty"
   }
-  object NewTransactionGroup2 {
-    def apply()(implicit routerContext: RouterContext): NewTransactionGroup2 =
-      NewTransactionGroup2(parentPage = PopupEditorPage.getParentPage(routerContext))
+  object NewTransactionGroup {
+    def apply()(implicit routerContext: RouterContext): NewTransactionGroup =
+      NewTransactionGroup(parentPage = PopupEditorPage.getParentPage(routerContext))
   }
 
-  case class EditTransactionGroup2 private (
+  case class EditTransactionGroup private (
       transactionGroupId: Long,
       override val parentPage: Page,
   ) extends PopupEditorPage {
@@ -83,41 +83,14 @@ object AppPages {
       Future.successful(i18n("app.edit-transaction"))
     override def iconClass = "icon-new-empty"
   }
-  object EditTransactionGroup2 {
+  object EditTransactionGroup {
     // Note: Getting ID here rather than TransactionGroup because we may not have fetched the TransactionGroup.
-    def apply(transactionGroupId: Long)(implicit routerContext: RouterContext): EditTransactionGroup2 = {
-      EditTransactionGroup2(
+    def apply(transactionGroupId: Long)(implicit routerContext: RouterContext): EditTransactionGroup = {
+      EditTransactionGroup(
         transactionGroupId = transactionGroupId,
         parentPage = PopupEditorPage.getParentPage(routerContext),
       )
     }
-  }
-
-  case class NewTransactionGroup private (override val encodedReturnTo: Option[String])
-      extends HasReturnTo
-      with Page {
-    override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
-      Future.successful(i18n("app.new-transaction"))
-    override def iconClass = "icon-new-empty"
-  }
-  object NewTransactionGroup {
-    def apply()(implicit routerContext: RouterContext): NewTransactionGroup =
-      NewTransactionGroup(HasReturnTo.getCurrentEncodedPath)
-  }
-
-  case class EditTransactionGroup private (
-      transactionGroupId: Long,
-      override val encodedReturnTo: Option[String],
-  ) extends HasReturnTo
-      with Page {
-    override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
-      Future.successful(i18n("app.edit-transaction"))
-    override def iconClass = "icon-new-empty"
-  }
-  object EditTransactionGroup {
-    // Note: Getting ID here rather than TransactionGroup because we may not have fetched the TransactionGroup.
-    def apply(transactionGroupId: Long)(implicit routerContext: RouterContext): EditTransactionGroup =
-      EditTransactionGroup(transactionGroupId, HasReturnTo.getCurrentEncodedPath)
   }
 
   case class NewTransactionGroupFromCopy private (
