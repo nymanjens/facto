@@ -58,11 +58,64 @@ private[router] final class RouterFactory(implicit
           }
         }
 
-        val config = HydroRouterConfig(
+        val factoRouterConfig = FactoRouterConfig(
           parentRules = Seq(
+            ParentRule.static(StandardPages.UserProfile, reactAppModule.userProfile.apply),
+            ParentRule.static(StandardPages.UserAdministration, reactAppModule.userAdministration.apply),
+            ParentRule.static(StandardPages.DatabaseExplorer, reactAppModule.databaseExplorer.apply),
+            ParentRule.static(AppPages.Everything, reactAppModule.everything.apply),
+            ParentRule.static(AppPages.CashFlow, reactAppModule.cashFlow.apply),
+            ParentRule.static(AppPages.Liquidation, reactAppModule.liquidation.apply),
+            ParentRule.static(AppPages.Endowments, reactAppModule.endowments.apply),
+            ParentRule.static(AppPages.Summary, reactAppModule.summary.apply),
             ParentRule.dynamic(query.caseClass[StandardPages.Search]) { (page, ctl) =>
               reactAppModule.searchResults(page.query, ctl)
-            }
+            },
+            ParentRule.static(AppPages.TemplateList, reactAppModule.templateList.apply),
+            ParentRule.dynamic(returnToPath.caseClass[AppPages.NewTransactionGroup]) { (page, ctl) =>
+              reactAppModule.transactionGroupForm.forCreate(page.returnToPath, ctl)
+            },
+            ParentRule.dynamic((long ~ returnToPath).caseClass[AppPages.NewTransactionGroupFromCopy]) {
+              (page, ctl) =>
+                reactAppModule.transactionGroupForm.forCreateFromCopy(
+                  page.transactionGroupId,
+                  page.returnToPath,
+                  ctl,
+                )
+            },
+            ParentRule.dynamic(
+              (codeString ~ returnToPath).caseClass[AppPages.NewTransactionGroupFromReservoir]
+            ) { (page, ctl) =>
+              reactAppModule.transactionGroupForm.forReservoir(page.reservoirCode, page.returnToPath, ctl)
+            },
+            ParentRule.dynamic((codeString ~ returnToPath).caseClass[AppPages.NewFromTemplate]) {
+              (page, ctl) =>
+                reactAppModule.transactionGroupForm.forTemplate(page.templateCode, page.returnToPath, ctl)
+            },
+            ParentRule.dynamic(
+              ((codeString / codeString) ~ returnToPath).caseClass[AppPages.NewForRepayment]
+            ) { (page, ctl) =>
+              reactAppModule.transactionGroupForm.forRepayment(
+                page.accountCode1,
+                page.accountCode2,
+                page.returnToPath,
+                ctl,
+              )
+            },
+            ParentRule.dynamic(returnToPath.caseClass[AppPages.NewForLiquidationSimplification]) {
+              (page, ctl) =>
+                reactAppModule.transactionGroupForm.forLiquidationSimplification(page.returnToPath, ctl)
+            },
+            ParentRule.dynamic((codeString ~ returnToPath).caseClass[AppPages.NewBalanceCheck]) {
+              (page, ctl) =>
+                reactAppModule.balanceCheckForm.forCreate(page.reservoirCode, page.returnToPath, ctl)
+            },
+            ParentRule.dynamic((long ~ returnToPath).caseClass[AppPages.EditBalanceCheck]) { (page, ctl) =>
+              reactAppModule.balanceCheckForm.forEdit(page.balanceCheckId, page.returnToPath, ctl)
+            },
+            ParentRule.dynamic(query.caseClass[AppPages.Chart]) { (page, ctl) =>
+              reactAppModule.chart(page.chartSpec, ctl)
+            },
           ),
           popupRules = Seq(
             PopupRule.dynamic(suffix => (long ~ suffix).caseClass[AppPages.EditTransactionGroup2]) {
@@ -74,90 +127,15 @@ private[router] final class RouterFactory(implicit
         )
 
         // wrap/connect components to the circuit
-        (emptyRule
-
-          | staticRoute(RouterFactory.pathPrefix, StandardPages.Root)
+        (staticRoute(RouterFactory.pathPrefix, StandardPages.Root)
           ~> redirectToPage(AppPages.CashFlow)(Redirect.Replace)
-
-          | staticRuleFromPage(StandardPages.UserProfile, reactAppModule.userProfile.apply)
-
-          | staticRuleFromPage(StandardPages.UserAdministration, reactAppModule.userAdministration.apply)
-
-          | staticRuleFromPage(StandardPages.DatabaseExplorer, reactAppModule.databaseExplorer.apply)
-
-          | staticRuleFromPage(AppPages.Everything, reactAppModule.everything.apply)
-
-          | staticRuleFromPage(AppPages.CashFlow, reactAppModule.cashFlow.apply)
-
-          | staticRuleFromPage(AppPages.Liquidation, reactAppModule.liquidation.apply)
-
-          | staticRuleFromPage(AppPages.Endowments, reactAppModule.endowments.apply)
-
-          | staticRuleFromPage(AppPages.Summary, reactAppModule.summary.apply)
-
-          | dynamicRuleFromPage(_ ~ query.caseClass[StandardPages.Search]) { (page, ctl) =>
-            reactAppModule.searchResults(page.query, ctl)
-          }
-          | staticRuleFromPage(AppPages.TemplateList, reactAppModule.templateList.apply)
-
-          | dynamicRuleFromPage(_ ~ returnToPath.caseClass[AppPages.NewTransactionGroup]) { (page, ctl) =>
-            reactAppModule.transactionGroupForm.forCreate(page.returnToPath, ctl)
-          }
-
-          | dynamicRuleFromPage(_ / (long ~ returnToPath).caseClass[AppPages.EditTransactionGroup]) {
-            (page, ctl) =>
-              reactAppModule.transactionGroupForm.forEdit(page.transactionGroupId, page.returnToPath, ctl)
-          }
-
-          | dynamicRuleFromPage(_ / (long ~ returnToPath).caseClass[AppPages.NewTransactionGroupFromCopy]) {
-            (page, ctl) =>
-              reactAppModule.transactionGroupForm.forCreateFromCopy(
-                page.transactionGroupId,
-                page.returnToPath,
-                ctl,
-              )
-          }
-
-          | dynamicRuleFromPage(
-            _ / (codeString ~ returnToPath).caseClass[AppPages.NewTransactionGroupFromReservoir]
-          ) { (page, ctl) =>
-            reactAppModule.transactionGroupForm.forReservoir(page.reservoirCode, page.returnToPath, ctl)
-          }
-
-          | dynamicRuleFromPage(_ / (codeString ~ returnToPath).caseClass[AppPages.NewFromTemplate]) {
-            (page, ctl) =>
-              reactAppModule.transactionGroupForm.forTemplate(page.templateCode, page.returnToPath, ctl)
-          }
-
-          | dynamicRuleFromPage(
-            _ / ((codeString / codeString) ~ returnToPath).caseClass[AppPages.NewForRepayment]
-          ) { (page, ctl) =>
-            reactAppModule.transactionGroupForm.forRepayment(
-              page.accountCode1,
-              page.accountCode2,
-              page.returnToPath,
-              ctl,
-            )
-          }
-
-          | dynamicRuleFromPage(_ ~ returnToPath.caseClass[AppPages.NewForLiquidationSimplification]) {
-            (page, ctl) =>
-              reactAppModule.transactionGroupForm.forLiquidationSimplification(page.returnToPath, ctl)
-          }
-
-          | dynamicRuleFromPage(_ / (codeString ~ returnToPath).caseClass[AppPages.NewBalanceCheck]) {
-            (page, ctl) =>
-              reactAppModule.balanceCheckForm.forCreate(page.reservoirCode, page.returnToPath, ctl)
-          }
-
-          | dynamicRuleFromPage(_ / (long ~ returnToPath).caseClass[AppPages.EditBalanceCheck]) {
-            (page, ctl) =>
-              reactAppModule.balanceCheckForm.forEdit(page.balanceCheckId, page.returnToPath, ctl)
-          }
-
-          | dynamicRuleFromPage(_ ~ query.caseClass[AppPages.Chart]) { (page, ctl) =>
-            reactAppModule.chart(page.chartSpec, ctl)
-          }
+          | factoRouterConfig.parentRules.map(_.rule).reduceLeft(_ | _)
+          | (
+            for {
+              parentRule <- factoRouterConfig.parentRules
+              popupRule <- factoRouterConfig.popupRules
+            } yield popupRule.ruleFromParent(parentRule)
+          ).reduceLeft(_ | _)
 
         // Fallback
         ).notFound(redirectToPage(AppPages.CashFlow)(Redirect.Replace))
@@ -182,7 +160,7 @@ private[router] final class RouterFactory(implicit
     )
   }
 
-  private case class HydroRouterConfig(
+  private case class FactoRouterConfig(
       parentRules: Seq[ParentRule.any],
       popupRules: Seq[PopupRule.any],
   )
@@ -198,6 +176,23 @@ private[router] final class RouterFactory(implicit
   }
   private object ParentRule {
     type any = ParentRule[_ <: Page]
+
+    def static[P <: Page](page: P, renderer: RouterContext => VdomElement)(implicit
+        pageClass: ClassTag[P],
+        dsl: RouterConfigDsl[Page],
+    ): ParentRule[P] = {
+      import dsl._
+
+      val routeWithoutPrefix: RouteB[Unit] = page.getClass.getSimpleName.toLowerCase
+
+      ParentRule[P](
+        routeWithoutPrefix = routeWithoutPrefix const page,
+        renderer = (p, context) => renderer(context),
+        rule = staticRoute(RouterFactory.pathPrefix ~ routeWithoutPrefix, page) ~> renderR(ctl =>
+          logExceptions(renderer(RouterContext(page, ctl)))
+        ),
+      )
+    }
 
     def dynamic[P <: Page](
         dynamicPartOfRoute: RouteB[P]
@@ -228,6 +223,32 @@ private[router] final class RouterFactory(implicit
   private object PopupRule {
     type any = PopupRule[_ <: PopupEditorPage]
 
+    def static[P <: PopupEditorPage](
+        parentToPopupPage: RouteB[Page] => RouteB[P]
+    )(popupRenderer: RouterContext => VdomElement)(implicit
+        pageClass: ClassTag[P],
+        dsl: RouterConfigDsl[Page],
+    ): PopupRule[P] = {
+      import dsl._
+
+      val pageClassName = pageClass.runtimeClass.getSimpleName.toLowerCase
+
+      PopupRule(
+        ruleFromParent = parentRule => {
+          val route: RouteB[P] =
+            RouterFactory.pathPrefix ~ "[" ~ pageClassName ~ "]" /
+              parentToPopupPage(parentRule.routeWithoutPrefix.asInstanceOf[RouteB[Page]])
+
+          dynamicRouteCT[P](route) ~> dynRenderR { case (page, ctl) =>
+            renderParentAndPopup(
+              parentRule.render(page.parentPage, RouterContext(page, ctl)),
+              popupRenderer(RouterContext(page, ctl)),
+            )
+          }
+        }
+      )
+    }
+
     def dynamic[P <: PopupEditorPage](
         prependDynamicPart: RouteB[Page] => RouteB[P]
     )(
@@ -247,18 +268,28 @@ private[router] final class RouterFactory(implicit
               prependDynamicPart("]" / parentRule.routeWithoutPrefix.asInstanceOf[RouteB[Page]])
 
           dynamicRouteCT[P](route) ~> dynRenderR { case (page, ctl) =>
-            logExceptions {
-              <.span(
-                parentRule.render(page.parentPage, RouterContext(page, ctl)),
-                <.span(
-                  ^.className := "popup-editor",
-                popupRenderer(page, RouterContext(page, ctl)),
-                )
-              )
-            }
+            renderParentAndPopup(
+              parentRule.render(page.parentPage, RouterContext(page, ctl)),
+              popupRenderer(page, RouterContext(page, ctl)),
+            )
           }
         }
       )
+    }
+
+    private def renderParentAndPopup[P <: PopupEditorPage](
+        parent: VdomElement,
+        popupEditor: VdomElement,
+    ): VdomElement = {
+      logExceptions {
+        <.span(
+          parent,
+          <.span(
+            ^.className := "popup-editor",
+            popupEditor,
+          ),
+        )
+      }
     }
   }
 }
