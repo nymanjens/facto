@@ -225,7 +225,9 @@ private[router] final class RouterFactory(implicit
 
     def static[P <: PopupEditorPage](
         parentToPopupPage: RouteB[Page] => RouteB[P]
-    )(popupRenderer: RouterContext => VdomElement)(implicit
+    )(
+        popupRenderer: (P, RouterContext) => VdomElement
+    )(implicit
         pageClass: ClassTag[P],
         dsl: RouterConfigDsl[Page],
     ): PopupRule[P] = {
@@ -242,7 +244,7 @@ private[router] final class RouterFactory(implicit
           dynamicRouteCT[P](route) ~> dynRenderR { case (page, ctl) =>
             renderParentAndPopup(
               parentRule.render(page.parentPage, RouterContext(page, ctl)),
-              popupRenderer(RouterContext(page, ctl)),
+              popupRenderer(page, RouterContext(page, ctl)),
             )
           }
         }
