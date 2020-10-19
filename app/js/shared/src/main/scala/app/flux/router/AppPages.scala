@@ -44,6 +44,18 @@ object AppPages {
     }
   }
 
+  sealed trait PopupEditorPage extends Page {
+    def parentPage: Page
+  }
+  private object PopupEditorPage {
+    def getParentPage(routerContext: RouterContext): Page = {
+      routerContext.currentPage match {
+        case currentPage: PopupEditorPage => currentPage.parentPage
+        case currentPage                  => currentPage
+      }
+    }
+  }
+
   // **************** Accounting data views **************** //
   case object Everything extends PageBase("app.everything", iconClass = "icon-list")
   case object CashFlow extends PageBase("app.cash-flow", iconClass = "icon-money")
@@ -53,6 +65,34 @@ object AppPages {
   case object TemplateList extends PageBase("app.templates", iconClass = "icon-template")
 
   // **************** Accounting forms - transactions **************** //
+  case class NewTransactionGroup2 private (override val parentPage: Page) extends PopupEditorPage {
+    override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
+      Future.successful(i18n("app.new-transaction"))
+    override def iconClass = "icon-new-empty"
+  }
+  object NewTransactionGroup2 {
+    def apply()(implicit routerContext: RouterContext): NewTransactionGroup2 =
+      NewTransactionGroup2(parentPage = PopupEditorPage.getParentPage(routerContext))
+  }
+
+  case class EditTransactionGroup2 private (
+      transactionGroupId: Long,
+      override val parentPage: Page,
+  ) extends PopupEditorPage {
+    override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
+      Future.successful(i18n("app.edit-transaction"))
+    override def iconClass = "icon-new-empty"
+  }
+  object EditTransactionGroup2 {
+    // Note: Getting ID here rather than TransactionGroup because we may not have fetched the TransactionGroup.
+    def apply(transactionGroupId: Long)(implicit routerContext: RouterContext): EditTransactionGroup2 = {
+      EditTransactionGroup2(
+        transactionGroupId = transactionGroupId,
+        parentPage = PopupEditorPage.getParentPage(routerContext),
+      )
+    }
+  }
+
   case class NewTransactionGroup private (override val encodedReturnTo: Option[String])
       extends HasReturnTo
       with Page {

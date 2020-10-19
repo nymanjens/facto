@@ -1,7 +1,10 @@
 package app.flux.router
 
+import app.flux.router.AppPages.PopupEditorPage
 import hydro.common.I18n
 import hydro.common.JsLoggingUtils.LogExceptionsCallback
+
+import scala.collection.immutable.Seq
 import hydro.common.JsLoggingUtils.logExceptions
 import hydro.flux.action.Dispatcher
 import hydro.flux.action.StandardActions
@@ -12,6 +15,7 @@ import hydro.flux.router.StandardPages
 import hydro.models.access.EntityAccess
 import japgolly.scalajs.react.extra.router.StaticDsl.RouteB
 import japgolly.scalajs.react.extra.router._
+import japgolly.scalajs.react.extra.router.StaticDsl.RouteB.Composition
 import japgolly.scalajs.react.vdom.html_<^._
 import org.scalajs.dom
 
@@ -34,6 +38,7 @@ private[router] final class RouterFactory(implicit
   private def routerConfig(implicit reactAppModule: app.flux.react.app.Module) = {
     RouterConfigDsl[Page]
       .buildConfig { dsl =>
+        implicit val _: RouterConfigDsl[Page] = dsl
         import dsl._
         val codeString: RouteB[String] = string("[a-zA-Z0-9_-]+")
         val returnToPath: RouteB[Option[String]] = ("?returnto=" ~ string(".+")).option
@@ -52,6 +57,21 @@ private[router] final class RouterFactory(implicit
             logExceptions(renderer(page, RouterContext(page, ctl)))
           }
         }
+
+        val config = HydroRouterConfig(
+          parentRules = Seq(
+            ParentRule.dynamic(query.caseClass[StandardPages.Search]) { (page, ctl) =>
+              reactAppModule.searchResults(page.query, ctl)
+            }
+          ),
+          popupRules = Seq(
+            PopupRule.dynamic(suffix => (long ~ suffix).caseClass[AppPages.EditTransactionGroup2]) {
+              (page, ctl) =>
+                reactAppModule.transactionGroupForm
+                  .forEdit(page.transactionGroupId, returnToPath = Path(""), ctl)
+            }
+          ),
+        )
 
         // wrap/connect components to the circuit
         (emptyRule
@@ -160,6 +180,86 @@ private[router] final class RouterFactory(implicit
     reactAppModule.layout(RouterContext(resolution.page, routerCtl))(
       <.div(^.key := resolution.page.toString, resolution.render())
     )
+  }
+
+  private case class HydroRouterConfig(
+      parentRules: Seq[ParentRule.any],
+      popupRules: Seq[PopupRule.any],
+  )
+
+  private case class ParentRule[P <: Page](
+      routeWithoutPrefix: RouteB[P],
+      private val renderer: (P, RouterContext) => VdomElement,
+      rule: StaticDsl.Rule[Page],
+  ) {
+    def render(page: Page, context: RouterContext): VdomElement = {
+      renderer(page.asInstanceOf[P], context)
+    }
+  }
+  private object ParentRule {
+    type any = ParentRule[_ <: Page]
+
+    def dynamic[P <: Page](
+        dynamicPartOfRoute: RouteB[P]
+    )(
+        renderer: (P, RouterContext) => VdomElement
+    )(implicit
+        pageClass: ClassTag[P],
+        dsl: RouterConfigDsl[Page],
+    ): ParentRule[P] = {
+      import dsl._
+
+      val routeWithoutPrefix = pageClass.runtimeClass.getSimpleName.toLowerCase / dynamicPartOfRoute
+
+      ParentRule[P](
+        routeWithoutPrefix = routeWithoutPrefix,
+        renderer = renderer,
+        rule = dynamicRouteCT[P](RouterFactory.pathPrefix ~ routeWithoutPrefix) ~> dynRenderR {
+          case (page, ctl) =>
+            logExceptions(renderer(page, RouterContext(page, ctl)))
+        },
+      )
+    }
+  }
+
+  private case class PopupRule[P <: PopupEditorPage](
+      ruleFromParent: ParentRule.any => StaticDsl.Rule[Page]
+  )
+  private object PopupRule {
+    type any = PopupRule[_ <: PopupEditorPage]
+
+    def dynamic[P <: PopupEditorPage](
+        prependDynamicPart: RouteB[Page] => RouteB[P]
+    )(
+        popupRenderer: (P, RouterContext) => VdomElement
+    )(implicit
+        pageClass: ClassTag[P],
+        dsl: RouterConfigDsl[Page],
+    ): PopupRule[P] = {
+      import dsl._
+
+      val pageClassName = pageClass.runtimeClass.getSimpleName.toLowerCase
+
+      PopupRule(
+        ruleFromParent = parentRule => {
+          val route: RouteB[P] =
+            RouterFactory.pathPrefix ~ "[" ~ pageClassName /
+              prependDynamicPart("]" / parentRule.routeWithoutPrefix.asInstanceOf[RouteB[Page]])
+
+          dynamicRouteCT[P](route) ~> dynRenderR { case (page, ctl) =>
+            logExceptions {
+              <.span(
+                parentRule.render(page.parentPage, RouterContext(page, ctl)),
+                <.span(
+                  ^.className := "popup-editor",
+                popupRenderer(page, RouterContext(page, ctl)),
+                )
+              )
+            }
+          }
+        }
+      )
+    }
   }
 }
 private[router] object RouterFactory {
