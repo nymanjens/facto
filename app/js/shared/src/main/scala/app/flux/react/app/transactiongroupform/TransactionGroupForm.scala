@@ -316,7 +316,7 @@ final class TransactionGroupForm(implicit
                 <.span(
                   Bootstrap.Button(tag = <.a)(
                     ^.className := "delete-button",
-                    Bootstrap.FontAwesomeIcon("times"),
+                    Bootstrap.FontAwesomeIcon("trash-o"),
                     " ",
                     i18n("app.delete"),
                     ^.onClick --> onDelete,
