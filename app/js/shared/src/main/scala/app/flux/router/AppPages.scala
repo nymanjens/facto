@@ -49,7 +49,10 @@ object AppPages {
   }
   object PopupEditorPage {
     def getParentPage(routerContext: RouterContext): Page = {
-      routerContext.currentPage match {
+      getParentPage(routerContext.currentPage)
+    }
+    def getParentPage(page: Page): Page = {
+      page match {
         case currentPage: PopupEditorPage => currentPage.parentPage
         case currentPage                  => currentPage
       }

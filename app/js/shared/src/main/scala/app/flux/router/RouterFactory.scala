@@ -23,6 +23,7 @@ import japgolly.scalajs.react.extra.router._
 import japgolly.scalajs.react.extra.router.StaticDsl.Route
 import japgolly.scalajs.react.extra.router.StaticDsl.RouteB.Composition
 import japgolly.scalajs.react.vdom.html_<^._
+import japgolly.scalajs.react.Callback
 import org.scalajs.dom
 
 import scala.async.Async.async
@@ -160,14 +161,22 @@ private[router] final class RouterFactory(implicit
           )
       }
       .renderWith(layout)
+      // Clear post render for popups because the default scrolls to the top
+      .setPostRender((maybePreviuosPage, currentPage) => {
+        maybePreviuosPage match {
+          case Some(previousPage)
+              if PopupEditorPage.getParentPage(previousPage) == PopupEditorPage.getParentPage(currentPage) =>
+            Callback.empty
+          case _ => RouterConfig.defaultPostRenderFn(maybePreviuosPage, currentPage)
+        }
+      })
   }
 
   private def layout(routerCtl: RouterCtl[Page], resolution: Resolution[Page])(implicit
       reactAppModule: app.flux.react.app.Module
   ) = {
-    val context = RouterContext(resolution.page, routerCtl)
-    reactAppModule.layout(context)(
-      <.div(^.key := PopupEditorPage.getParentPage(context).toString, resolution.render())
+    reactAppModule.layout(RouterContext(resolution.page, routerCtl))(
+      <.div(^.key := PopupEditorPage.getParentPage(resolution.page).toString, resolution.render())
     )
   }
 
