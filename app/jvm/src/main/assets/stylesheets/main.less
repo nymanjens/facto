@@ -6,7 +6,7 @@
   width: 54%;
   padding-top: 7px;
   padding-bottom: 9px;
-  z-index:9999;
+  z-index: 9999908;
 }
 
 .table {
@@ -116,6 +116,33 @@ table.table-bordered {
   }
 }
 
+/****** popup editor ******/
+.popup-editor {
+  position: fixed;
+
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+
+  overflow-y: scroll;
+  overflow-x: hidden;
+
+  z-index: 9999905;
+  padding: 25px;
+
+  background-color: #f8f8f8;
+  border: 2px solid #aaa;
+  border-radius: 15px;
+
+  .close-button-container {
+    position: fixed;
+    top: 32px;
+    right: 50px;
+    z-index: 9999906;
+  }
+}
+
 /****** transactiongroup-form css ******/
 .transaction-group-form {
   .delete-button {
@@ -189,7 +216,7 @@ table.table-bordered {
       background-color: #F6F6FF;
       margin: 0 0 0 20px;
       padding: 5px 10px;
-      z-index: 9999;
+      z-index: 9999901;
 
       white-space: nowrap;
       overflow: hidden;
@@ -298,7 +325,7 @@ div.ReactTags__selected a.ReactTags__remove {
 /* Styles for suggestions */
 div.ReactTags__suggestions {
     position: absolute;
-    z-index: 999;
+    z-index: 9999907;
 }
 div.ReactTags__suggestions ul {
     list-style-type: none;
