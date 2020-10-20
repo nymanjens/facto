@@ -5,6 +5,7 @@ import app.common.money.ExchangeRateManager
 import app.flux.action.AppActions
 import app.flux.react.uielements.input.MappedInput
 import app.flux.react.uielements.input.bootstrap.MoneyInput
+import app.flux.router.AppPages.PopupEditorPage
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.BalanceCheck
 import app.models.accounting.config.Config
@@ -54,14 +55,14 @@ final class BalanceCheckForm(implicit
   }
 
   // **************** API ****************//
-  def forCreate(reservoirCode: String, returnToPath: Path, router: RouterContext): VdomElement = {
-    create(Props(OperationMeta.AddNew(accountingConfig.moneyReservoir(reservoirCode)), returnToPath, router))
+  def forCreate(reservoirCode: String, router: RouterContext): VdomElement = {
+    create(Props(OperationMeta.AddNew(accountingConfig.moneyReservoir(reservoirCode)), router))
   }
 
-  def forEdit(balanceCheckId: Long, returnToPath: Path, router: RouterContext): VdomElement =
+  def forEdit(balanceCheckId: Long, router: RouterContext): VdomElement =
     create(async {
       val balanceCheck = await(entityAccess.newQuery[BalanceCheck]().findById(balanceCheckId))
-      Props(OperationMeta.Edit(balanceCheck), returnToPath, router)
+      Props(OperationMeta.Edit(balanceCheck), router)
     })
 
   // **************** Private helper methods ****************//
@@ -95,7 +96,7 @@ final class BalanceCheckForm(implicit
 
   private case class State(showErrorMessages: Boolean)
 
-  private case class Props(operationMeta: OperationMeta, returnToPath: Path, router: RouterContext)
+  private case class Props(operationMeta: OperationMeta, router: RouterContext)
 
   private final class Backend(val $ : BackendScope[Props, State]) {
     private val checkDateRef = dateMappedInput.ref()
@@ -217,7 +218,7 @@ final class BalanceCheckForm(implicit
           maybeBalanceCheck match {
             case Some(balanceCheckWithoutId) =>
               submitValid(balanceCheckWithoutId)
-              props.router.setPath(props.returnToPath)
+              props.router.setPage(PopupEditorPage.getParentPage(props.router))
             case None =>
           }
           newState
@@ -231,7 +232,7 @@ final class BalanceCheckForm(implicit
         case OperationMeta.AddNew(_) => throw new AssertionError("Should never happen")
         case OperationMeta.Edit(balanceCheck) =>
           dispatcher.dispatch(AppActions.RemoveBalanceCheck(existingBalanceCheck = balanceCheck))
-          props.router.setPath(props.returnToPath)
+          props.router.setPage(PopupEditorPage.getParentPage(props.router))
       }
     }
   }

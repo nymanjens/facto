@@ -65,54 +65,39 @@ private[router] final class RouterFactory(implicit
           ),
           popupRules = Seq(
             PopupRule.static(_.caseClass[AppPages.NewTransactionGroup]) { (page, ctl) =>
-              reactAppModule.transactionGroupForm.forCreate(returnToPath = ctl.toPath(page), ctl)
+              reactAppModule.transactionGroupForm.forCreate(ctl)
             },
             PopupRule.dynamic(suffix => (long ~ suffix).caseClass[AppPages.EditTransactionGroup]) {
               (page, ctl) =>
-                reactAppModule.transactionGroupForm
-                  .forEdit(page.transactionGroupId, returnToPath = ctl.toPath(page), ctl)
+                reactAppModule.transactionGroupForm.forEdit(page.transactionGroupId, ctl)
             },
             PopupRule.dynamic(suffix => (long ~ suffix).caseClass[AppPages.NewTransactionGroupFromCopy]) {
               (page, ctl) =>
-                reactAppModule.transactionGroupForm.forCreateFromCopy(
-                  page.transactionGroupId,
-                  returnToPath = ctl.toPath(page),
-                  ctl,
-                )
+                reactAppModule.transactionGroupForm.forCreateFromCopy(page.transactionGroupId, ctl)
             },
             PopupRule.dynamic(suffix =>
               (codeString ~ suffix).caseClass[AppPages.NewTransactionGroupFromReservoir]
             ) { (page, ctl) =>
-              reactAppModule.transactionGroupForm
-                .forReservoir(page.reservoirCode, returnToPath = ctl.toPath(page), ctl)
+              reactAppModule.transactionGroupForm.forReservoir(page.reservoirCode, ctl)
             },
             PopupRule.dynamic(suffix => (codeString ~ suffix).caseClass[AppPages.NewFromTemplate]) {
               (page, ctl) =>
-                reactAppModule.transactionGroupForm
-                  .forTemplate(page.templateCode, returnToPath = ctl.toPath(page), ctl)
+                reactAppModule.transactionGroupForm.forTemplate(page.templateCode, ctl)
             },
             PopupRule.dynamic(suffix =>
               ((codeString / codeString) ~ suffix).caseClass[AppPages.NewForRepayment]
             ) { (page, ctl) =>
-              reactAppModule.transactionGroupForm.forRepayment(
-                page.accountCode1,
-                page.accountCode2,
-                returnToPath = ctl.toPath(page),
-                ctl,
-              )
+              reactAppModule.transactionGroupForm.forRepayment(page.accountCode1, page.accountCode2, ctl)
             },
             PopupRule.static(_.caseClass[AppPages.NewForLiquidationSimplification]) { (page, ctl) =>
-              reactAppModule.transactionGroupForm
-                .forLiquidationSimplification(returnToPath = ctl.toPath(page), ctl)
+              reactAppModule.transactionGroupForm                .forLiquidationSimplification( ctl)
             },
             PopupRule.dynamic(suffix => (codeString ~ suffix).caseClass[AppPages.NewBalanceCheck]) {
               (page, ctl) =>
-                reactAppModule.balanceCheckForm
-                  .forCreate(page.reservoirCode, returnToPath = ctl.toPath(page), ctl)
+                reactAppModule.balanceCheckForm.forCreate(page.reservoirCode, ctl)
             },
             PopupRule.dynamic(suffix => (long ~ suffix).caseClass[AppPages.EditBalanceCheck]) { (page, ctl) =>
-              reactAppModule.balanceCheckForm
-                .forEdit(page.balanceCheckId, returnToPath = ctl.toPath(page), ctl)
+              reactAppModule.balanceCheckForm.forEdit(page.balanceCheckId, ctl)
             },
           ),
         )

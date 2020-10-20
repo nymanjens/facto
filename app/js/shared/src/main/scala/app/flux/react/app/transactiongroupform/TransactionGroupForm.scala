@@ -11,6 +11,7 @@ import app.flux.action.AppActions
 import app.flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
 import app.flux.react.app.transactionviews.Liquidation
 import app.flux.router.AppPages
+import app.flux.router.AppPages.PopupEditorPage
 import app.flux.stores.entries.AccountPair
 import app.flux.stores.entries.factories.LiquidationEntriesStoreFactory
 import app.models.access.AppJsEntityAccess
@@ -86,11 +87,11 @@ final class TransactionGroupForm(implicit
   }
 
   // **************** API ****************//
-  def forCreate(returnToPath: Path, router: RouterContext): VdomElement = {
-    forCreate(TransactionGroup.Partial.withSingleEmptyTransaction, returnToPath, router)
+  def forCreate(router: RouterContext): VdomElement = {
+    forCreate(TransactionGroup.Partial.withSingleEmptyTransaction, router)
   }
 
-  def forEdit(transactionGroupId: Long, returnToPath: Path, router: RouterContext): VdomElement =
+  def forEdit(transactionGroupId: Long, router: RouterContext): VdomElement =
     create(async {
       val group = await(entityAccess.newQuery[TransactionGroup]().findById(transactionGroupId))
       val transactions = await(group.transactions)
@@ -98,12 +99,11 @@ final class TransactionGroupForm(implicit
       Props(
         operationMeta = OperationMeta.Edit(group, transactions),
         groupPartial = TransactionGroup.Partial.from(group, transactions),
-        returnToPath = returnToPath,
         router = router,
       )
     })
 
-  def forCreateFromCopy(transactionGroupId: Long, returnToPath: Path, router: RouterContext): VdomElement = {
+  def forCreateFromCopy(transactionGroupId: Long, router: RouterContext): VdomElement = {
     def clearedUncopyableFields(groupPartial: TransactionGroup.Partial): TransactionGroup.Partial = {
       val clearedTransactions = for (transaction <- groupPartial.transactions) yield {
         Transaction.Partial(
@@ -130,13 +130,12 @@ final class TransactionGroupForm(implicit
       Props(
         operationMeta = OperationMeta.AddNew,
         groupPartial = clearedUncopyableFields(TransactionGroup.Partial.from(group, transactions)),
-        returnToPath = returnToPath,
         router = router,
       )
     })
   }
 
-  def forReservoir(reservoirCode: String, returnToPath: Path, router: RouterContext): VdomElement = {
+  def forReservoir(reservoirCode: String,  router: RouterContext): VdomElement = {
     val reservoir = accountingConfig.moneyReservoir(reservoirCode)
     forCreate(
       TransactionGroup.Partial(
@@ -147,24 +146,18 @@ final class TransactionGroupForm(implicit
           )
         )
       ),
-      returnToPath,
       router,
     )
   }
 
-  def forTemplate(templateCode: String, returnToPath: Path, router: RouterContext): VdomElement = {
+  def forTemplate(templateCode: String,  router: RouterContext): VdomElement = {
     val template = accountingConfig.templateWithCode(templateCode)
     // If this user is not associated with an account, it should not see any templates.
     val userAccount = accountingConfig.accountOf(user).get
-    forCreate(template.toPartial(userAccount), returnToPath, router)
+    forCreate(template.toPartial(userAccount), router)
   }
 
-  def forRepayment(
-      accountCode1: String,
-      accountCode2: String,
-      returnToPath: Path,
-      router: RouterContext,
-  ): VdomElement = {
+  def forRepayment(      accountCode1: String,      accountCode2: String,      router: RouterContext  ): VdomElement = {
     val account1 = accountingConfig.accounts(accountCode1)
     val account2 = accountingConfig.accounts(accountCode2)
 
@@ -186,18 +179,16 @@ final class TransactionGroupForm(implicit
         ),
         zeroSum = true,
       ),
-      returnToPath,
       router,
     )
   }
 
-  def forLiquidationSimplification(returnToPath: Path, router: RouterContext): VdomElement =
+  def forLiquidationSimplification( router: RouterContext): VdomElement =
     create(async {
       def props(groupPartial: TransactionGroup.Partial): Props =
         Props(
           operationMeta = OperationMeta.AddNew,
           groupPartial = groupPartial,
-          returnToPath = returnToPath,
           router = router,
         )
       val commonAccount = accountingConfig.constants.commonAccount
@@ -257,16 +248,11 @@ final class TransactionGroupForm(implicit
     })
 
   // **************** Private helper methods ****************//
-  private def forCreate(
-      transactionGroupPartial: TransactionGroup.Partial,
-      returnToPath: Path,
-      router: RouterContext,
-  ): VdomElement = {
+  private def forCreate(      transactionGroupPartial: TransactionGroup.Partial,      router: RouterContext  ): VdomElement = {
     create(
       Props(
         operationMeta = OperationMeta.AddNew,
         groupPartial = transactionGroupPartial,
-        returnToPath = returnToPath,
         router = router,
       )
     )
@@ -308,7 +294,6 @@ final class TransactionGroupForm(implicit
   private case class Props(
       operationMeta: OperationMeta,
       groupPartial: TransactionGroup.Partial,
-      returnToPath: Path,
       router: RouterContext,
   )
 
@@ -566,7 +551,7 @@ final class TransactionGroupForm(implicit
                 case None =>
                   submitValid(datas, state)
                   if (redirectOnSuccess) {
-                    props.router.setPath(props.returnToPath)
+                    props.router.setPage(PopupEditorPage.getParentPage(props.router))
                   }
               }
             }
@@ -583,7 +568,7 @@ final class TransactionGroupForm(implicit
         case OperationMeta.AddNew => throw new AssertionError("Should never happen")
         case OperationMeta.Edit(group, transactions) =>
           dispatcher.dispatch(AppActions.RemoveTransactionGroup(transactionGroupWithId = group))
-          props.router.setPath(props.returnToPath)
+          props.router.setPage(PopupEditorPage.getParentPage(props.router))
       }
     }
     private def onCopy(implicit router: RouterContext): Callback = LogExceptionsCallback {
