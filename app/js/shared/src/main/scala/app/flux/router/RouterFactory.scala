@@ -90,7 +90,7 @@ private[router] final class RouterFactory(implicit
               reactAppModule.transactionGroupForm.forRepayment(page.accountCode1, page.accountCode2, ctl)
             },
             PopupRule.static(_.caseClass[AppPages.NewForLiquidationSimplification]) { (page, ctl) =>
-              reactAppModule.transactionGroupForm                .forLiquidationSimplification( ctl)
+              reactAppModule.transactionGroupForm.forLiquidationSimplification(ctl)
             },
             PopupRule.dynamic(suffix => (codeString ~ suffix).caseClass[AppPages.NewBalanceCheck]) {
               (page, ctl) =>

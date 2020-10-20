@@ -135,7 +135,7 @@ final class TransactionGroupForm(implicit
     })
   }
 
-  def forReservoir(reservoirCode: String,  router: RouterContext): VdomElement = {
+  def forReservoir(reservoirCode: String, router: RouterContext): VdomElement = {
     val reservoir = accountingConfig.moneyReservoir(reservoirCode)
     forCreate(
       TransactionGroup.Partial(
@@ -150,14 +150,14 @@ final class TransactionGroupForm(implicit
     )
   }
 
-  def forTemplate(templateCode: String,  router: RouterContext): VdomElement = {
+  def forTemplate(templateCode: String, router: RouterContext): VdomElement = {
     val template = accountingConfig.templateWithCode(templateCode)
     // If this user is not associated with an account, it should not see any templates.
     val userAccount = accountingConfig.accountOf(user).get
     forCreate(template.toPartial(userAccount), router)
   }
 
-  def forRepayment(      accountCode1: String,      accountCode2: String,      router: RouterContext  ): VdomElement = {
+  def forRepayment(accountCode1: String, accountCode2: String, router: RouterContext): VdomElement = {
     val account1 = accountingConfig.accounts(accountCode1)
     val account2 = accountingConfig.accounts(accountCode2)
 
@@ -183,7 +183,7 @@ final class TransactionGroupForm(implicit
     )
   }
 
-  def forLiquidationSimplification( router: RouterContext): VdomElement =
+  def forLiquidationSimplification(router: RouterContext): VdomElement =
     create(async {
       def props(groupPartial: TransactionGroup.Partial): Props =
         Props(
@@ -248,7 +248,10 @@ final class TransactionGroupForm(implicit
     })
 
   // **************** Private helper methods ****************//
-  private def forCreate(      transactionGroupPartial: TransactionGroup.Partial,      router: RouterContext  ): VdomElement = {
+  private def forCreate(
+      transactionGroupPartial: TransactionGroup.Partial,
+      router: RouterContext,
+  ): VdomElement = {
     create(
       Props(
         operationMeta = OperationMeta.AddNew,
