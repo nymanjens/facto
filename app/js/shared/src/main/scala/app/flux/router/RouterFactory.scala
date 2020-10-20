@@ -12,6 +12,7 @@ import hydro.flux.action.StandardActions
 import hydro.flux.react.uielements.Bootstrap
 import hydro.flux.react.uielements.Bootstrap.Size
 import hydro.flux.react.uielements.Bootstrap.Variant
+import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.router.Page
 import hydro.flux.router.RouterContext
 import hydro.flux.router.StandardPages
@@ -164,8 +165,19 @@ private[router] final class RouterFactory(implicit
   private def layout(routerCtl: RouterCtl[Page], resolution: Resolution[Page])(implicit
       reactAppModule: app.flux.react.app.Module
   ) = {
-    reactAppModule.layout(RouterContext(resolution.page, routerCtl))(
-      <.div(^.key := resolution.page.toString, resolution.render())
+    val context = RouterContext(resolution.page, routerCtl)
+    reactAppModule.layout(context)(
+      <.div(^.key := PopupEditorPage.getParentPage(context).toString, resolution.render())
+    )
+  }
+
+  private def renderPageMaybeWithPopup(parent: VdomElement, maybePopup: Option[VdomElement]): VdomElement = {
+    <.span(
+      ^.key := "page-maybe-with-popup",
+      <.span(^.key := "parent", parent),
+      <<.ifDefined(maybePopup) { popup =>
+        <.span(^.key := "popup", popup)
+      },
     )
   }
 
@@ -200,7 +212,12 @@ private[router] final class RouterFactory(implicit
         routeWithoutPrefix = routeWithoutPrefix const page,
         renderer = (p, context) => renderer(context),
         rule = staticRoute(RouterFactory.pathPrefix ~ routeWithoutPrefix, page) ~> renderR(ctl =>
-          logExceptions(<.span(renderer(RouterContext(page, ctl))))
+          logExceptions(
+            renderPageMaybeWithPopup(
+              parent = renderer(RouterContext(page, ctl)),
+              maybePopup = None,
+            )
+          )
         ),
       )
     }
@@ -220,10 +237,15 @@ private[router] final class RouterFactory(implicit
       ParentRule[P](
         routeWithoutPrefix = routeWithoutPrefix,
         renderer = renderer,
-        rule = dynamicRouteCT[P](RouterFactory.pathPrefix ~ routeWithoutPrefix) ~> dynRenderR {
-          case (page, ctl) =>
-            logExceptions(<.span(renderer(page, RouterContext(page, ctl))))
-        },
+        rule =
+          dynamicRouteCT[P](RouterFactory.pathPrefix ~ routeWithoutPrefix) ~> dynRenderR { case (page, ctl) =>
+            logExceptions(
+              renderPageMaybeWithPopup(
+                parent = renderer(page, RouterContext(page, ctl)),
+                maybePopup = None,
+              )
+            )
+          },
       )
     }
   }
@@ -294,21 +316,23 @@ private[router] final class RouterFactory(implicit
         case p: P if parentRule.classTag.runtimeClass == p.parentPage.getClass => p
       } ~> dynRenderR { case (page, ctl) =>
         logExceptions {
-          <.span(
-            parentRule.render(page.parentPage, RouterContext(page.parentPage, ctl)),
-            <.div(
-              ^.className := "popup-editor",
+          renderPageMaybeWithPopup(
+            parent = parentRule.render(page.parentPage, RouterContext(page.parentPage, ctl)),
+            maybePopup = Some(
               <.div(
-                ^.className := "close-button-container",
-                Bootstrap.Button(
-                  variant = Variant.default,
-                  size = Size.sm,
-                  tag = RouterContext(page, ctl).anchorWithHrefTo(page.parentPage),
-                )(
-                  Bootstrap.FontAwesomeIcon("times", fixedWidth = true)
+                ^.className := "popup-editor",
+                <.div(
+                  ^.className := "close-button-container",
+                  Bootstrap.Button(
+                    variant = Variant.default,
+                    size = Size.sm,
+                    tag = RouterContext(page, ctl).anchorWithHrefTo(page.parentPage),
+                  )(
+                    Bootstrap.FontAwesomeIcon("times", fixedWidth = true)
+                  ),
                 ),
-              ),
-              popupRenderer(page, RouterContext(page, ctl)),
+                popupRenderer(page, RouterContext(page, ctl)),
+              )
             ),
           )
         }

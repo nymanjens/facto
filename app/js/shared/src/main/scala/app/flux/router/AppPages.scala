@@ -47,7 +47,7 @@ object AppPages {
   sealed trait PopupEditorPage extends Page {
     def parentPage: Page
   }
-  private object PopupEditorPage {
+  object PopupEditorPage {
     def getParentPage(routerContext: RouterContext): Page = {
       routerContext.currentPage match {
         case currentPage: PopupEditorPage => currentPage.parentPage
