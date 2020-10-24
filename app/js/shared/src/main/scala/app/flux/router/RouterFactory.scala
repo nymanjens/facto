@@ -145,16 +145,20 @@ private[router] final class RouterFactory(implicit
       reactAppModule: app.flux.react.app.Module
   ) = {
     reactAppModule.layout(RouterContext(resolution.page, routerCtl))(
-      <.div(^.key := PopupEditorPage.getParentPage(resolution.page).toString, resolution.render())
+      <.div(resolution.render())
     )
   }
 
-  private def renderPageMaybeWithPopup(parent: VdomElement, maybePopup: Option[VdomElement]): VdomElement = {
+  private def renderPageMaybeWithPopup(
+      page: Page,
+      parent: VdomElement,
+      maybePopup: Option[VdomElement],
+  ): VdomElement = {
     <.span(
       ^.key := "page-maybe-with-popup",
-      <.span(^.key := "parent", parent),
+      <.span(^.key := s"parent-${PopupEditorPage.getParentPage(page)}", parent),
       <<.ifDefined(maybePopup) { popup =>
-        <.span(^.key := "popup", popup)
+        <.span(^.key := s"popup-$page", popup)
       },
     )
   }
@@ -191,10 +195,7 @@ private[router] final class RouterFactory(implicit
         renderer = (p, context) => renderer(context),
         rule = staticRoute(RouterFactory.pathPrefix ~ routeWithoutPrefix, page) ~> renderR(ctl =>
           logExceptions(
-            renderPageMaybeWithPopup(
-              parent = renderer(RouterContext(page, ctl)),
-              maybePopup = None,
-            )
+            renderPageMaybeWithPopup(page, parent = renderer(RouterContext(page, ctl)), maybePopup = None)
           )
         ),
       )
@@ -219,6 +220,7 @@ private[router] final class RouterFactory(implicit
           dynamicRouteCT[P](RouterFactory.pathPrefix ~ routeWithoutPrefix) ~> dynRenderR { case (page, ctl) =>
             logExceptions(
               renderPageMaybeWithPopup(
+                page,
                 parent = renderer(page, RouterContext(page, ctl)),
                 maybePopup = None,
               )
@@ -295,6 +297,7 @@ private[router] final class RouterFactory(implicit
       } ~> dynRenderR { case (page, ctl) =>
         logExceptions {
           renderPageMaybeWithPopup(
+            page = page,
             parent = parentRule.render(page.parentPage, RouterContext(page.parentPage, ctl)),
             maybePopup = Some(
               <.div(
