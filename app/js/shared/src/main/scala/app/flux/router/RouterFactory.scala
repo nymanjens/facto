@@ -119,15 +119,6 @@ private[router] final class RouterFactory(implicit
 
           // Fallback
         ).notFound(redirectToPage(AppPages.CashFlow)(Redirect.Replace))
-          .onPostRender((prev, cur) =>
-            LogExceptionsCallback(dispatcher.dispatch(StandardActions.SetPageLoadingState(isLoading = false)))
-          )
-          .onPostRender((_, page) =>
-            LogExceptionsCallback(async {
-              val title = await(page.title)
-              dom.document.title = s"$title | Facto"
-            })
-          )
       }
       .renderWith(layout)
       // Clear post render for popups because the default scrolls to the top
@@ -139,6 +130,16 @@ private[router] final class RouterFactory(implicit
           case _ => RouterConfig.defaultPostRenderFn(maybePreviuosPage, currentPage)
         }
       })
+      // add additional post-render that should happen every time
+      .onPostRender((prev, cur) =>
+        LogExceptionsCallback(dispatcher.dispatch(StandardActions.SetPageLoadingState(isLoading = false)))
+      )
+      .onPostRender((_, page) =>
+        LogExceptionsCallback(async {
+          val title = await(page.title)
+          dom.document.title = s"$title | Facto"
+        })
+      )
   }
 
   private def layout(routerCtl: RouterCtl[Page], resolution: Resolution[Page])(implicit
