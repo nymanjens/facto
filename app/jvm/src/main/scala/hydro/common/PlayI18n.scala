@@ -22,7 +22,7 @@ object PlayI18n {
 
     // ****************** Implementation of PlayI18n trait ****************** //
     override def apply(key: String, args: Any*): String = {
-      messagesApi(key, args)(defaultLang)
+      messagesApi(key, args: _*)(defaultLang)
     }
 
     override val allI18nMessages: Map[String, String] = {
