@@ -1,17 +1,20 @@
-package app.flux.stores.entries
+package app.common.accounting
 
-import app.common.accounting.ComplexQueryFilter
+import app.common.testing.TestObjects.createTransaction
+import app.common.testing.TestObjects.testAccountA
+import app.common.testing.TestObjects.testAccountB
 import app.common.testing.TestObjects.testCategory
-import app.common.testing.TestObjects._
-import app.flux.stores.entries.ComplexQueryFilter.Prefix
-import app.flux.stores.entries.ComplexQueryFilter.QueryPart
+import app.common.testing.TestObjects.testCategoryA
+import app.common.testing.TestObjects.testCategoryB
+import app.common.testing.TestObjects.testReservoirCashA
+import app.common.testing.TestObjects.testReservoirHidden
+import app.common.testing.TestObjects.testUserA
+import app.common.testing.TestObjects.testUserB
 import app.models.access.AppEntityAccess
 import app.models.accounting.Transaction
-import hydro.models.access.EntityAccess
-import utest._
+import utest.TestSuite
 
 import scala.collection.immutable.Seq
-import scala.language.reflectiveCalls
 
 object ComplexQueryFilterTest extends TestSuite {
 
