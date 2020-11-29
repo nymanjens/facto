@@ -1,6 +1,6 @@
 package app.flux.stores.entries.factories
 
-import app.flux.stores.entries.ComplexQueryFilter
+import app.common.accounting.ComplexQueryFilter
 import app.flux.stores.entries.GeneralEntry
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppJsEntityAccess

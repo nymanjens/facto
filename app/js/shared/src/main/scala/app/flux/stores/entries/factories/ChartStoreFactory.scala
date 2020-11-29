@@ -1,9 +1,9 @@
 package app.flux.stores.entries.factories
 
+import app.common.accounting.ComplexQueryFilter
 import app.common.money.ExchangeRateManager
 import app.common.money.ReferenceMoney
 import app.common.time.DatedMonth
-import app.flux.stores.entries.ComplexQueryFilter
 import app.flux.stores.entries.factories.ChartStoreFactory.LinePoints
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.ExchangeRateGains
 import app.models.access.AppJsEntityAccess

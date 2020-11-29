@@ -2,11 +2,11 @@ package app.flux.stores.entries.factories
 
 import java.time.Month._
 
+import app.common.accounting.ComplexQueryFilter
 import hydro.common.testing.FakeJsEntityAccess
 import app.common.testing.TestModule
 import app.common.testing.TestObjects._
 import app.flux.stores.entries.AccountPair
-import app.flux.stores.entries.ComplexQueryFilter
 import app.flux.stores.entries.EntriesStore
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.ExchangeRateGains
 import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
