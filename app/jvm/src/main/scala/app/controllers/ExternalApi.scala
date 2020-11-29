@@ -21,11 +21,13 @@ import com.google.inject.Inject
 import hydro.common.time.Clock
 import hydro.common.time.TimeUtils
 import hydro.models.Entity
+import hydro.models.access.DbQuery.Sorting
 import hydro.models.access.DbQueryImplicits._
 import play.api.i18n.I18nSupport
 import play.api.i18n.MessagesApi
 import play.api.mvc._
 
+import scala.async.Async.await
 import scala.collection.immutable.Seq
 
 final class ExternalApi @Inject() (implicit
@@ -111,11 +113,12 @@ final class ExternalApi @Inject() (implicit
 
   def refactorTransactionCategory(
       encodedSearchString: String,
-      newCategory: String,
-      dryOrWet: String,
+      newCategoryCode: String,
+      dryOrWetRun: String,
       applicationSecret: String,
   ) = Action { implicit request =>
     validateApplicationSecret(applicationSecret)
+    require(accountingConfig.categories.contains(newCategoryCode), s"Unrecognized category: $newCategoryCode")
 
     val searchString = URLDecoder.decode(encodedSearchString.replace("+", "%2B"), "UTF-8")
     val searchQuery = (new ComplexQueryFilter).fromQuery(searchString)
@@ -125,10 +128,48 @@ final class ExternalApi @Inject() (implicit
         .filter(searchQuery)
         .sort(AppDbQuerySorting.Transaction.deterministicallyByCreateDate.reversed)
         .data()
+    val transactionsToEdit = matchedTransactions.filterNot(_.categoryCode == newCategoryCode)
+
+    implicit val issuer = Users.getOrCreateRobotUser()
+    val modifications =   (
+      for {
+        transactionGroupId <- transactionsToEdit.map(_.transactionGroupId).distinct
+        (transaction, newId) <- zipWithIncrementingId(
+          entityAccess
+            .newQuerySync[Transaction]()
+            .filter(ModelFields.Transaction.transactionGroupId === transactionGroupId)
+            .sort(AppDbQuerySorting.Transaction.deterministicallyByCreateDate)
+            .data()
+        )
+      } yield Seq(
+        EntityModification.createRemove(transaction),
+        EntityModification.createAddWithId(
+          newId,
+          transaction.copy(
+            idOption = None,
+            categoryCode =
+              if (transactionsToEdit contains transaction) newCategoryCode
+              else transaction.categoryCode,
+          ),
+        ),
+      )
+      ).flatten
+
+    dryOrWetRun match {
+      case "dry" =>     // Do nothing
+      case "wet" =>        entityAccess.persistEntityModifications(modifications     )
+    }
+
+
 
     Ok(
-      s"""searchString = ${searchString}
-         |#transactions that match  searchString= ${matchedTransactions.size}
+      s"""searchString                           = $searchString
+         |new category                           = $newCategoryCode
+         |#transactions that match  searchString = ${matchedTransactions.size}
+         |#transactions that will be edited      = ${transactionsToEdit.size}
+         |#entity modifications                  = ${modifications.size}
+         |
+         |Run                                    = $dryOrWetRun
          |""".stripMargin
     )
   }
