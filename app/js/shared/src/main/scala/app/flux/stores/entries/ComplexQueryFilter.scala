@@ -6,7 +6,7 @@ import app.common.money.Money
 import app.flux.stores.entries.ComplexQueryFilter.Prefix
 import app.flux.stores.entries.ComplexQueryFilter.QueryFilterPair
 import app.flux.stores.entries.ComplexQueryFilter.QueryPart
-import app.models.access.AppJsEntityAccess
+import app.models.access.AppEntityAccess
 import app.models.access.ModelFields
 import app.models.accounting._
 import app.models.accounting.config.Config
@@ -18,7 +18,7 @@ import scala.collection.immutable.Seq
 import scala.collection.mutable
 
 private[stores] final class ComplexQueryFilter(implicit
-    entityAccess: AppJsEntityAccess,
+    entityAccess: AppEntityAccess,
     accountingConfig: Config,
 ) {
 
