@@ -25,6 +25,7 @@ GET  /externalapi/dbschema/:appSecret/  hydro.controllers.StandardActions.databa
 GET  /externalapi/acc/trans/addfromtpl/:tplCode/:appSecret/  app.controllers.ExternalApi.addTransactionFromTemplate(tplCode, appSecret)
 GET  /externalapi/acc/money/xchgmeasurement/:date/:currency/:ratio/:appSecret/  app.controllers.ExternalApi.addExchangeRateMeasurement(date, currency, ratio: Double, appSecret)
 GET  /externalapi/acc/bc/list/:appSecret/  app.controllers.ExternalApi.listBalanceCorrections(appSecret)
+GET  /externalapi/acc/trans/refactor/:searchString/:newCategory/:dryOrWet/:appSecret/  app.controllers.ExternalApi.refactorTransactionCategory(searchString, newCategory, dryOrWet, appSecret)
 
 # Auth
 GET  /login/                           hydro.controllers.Auth.login(returnTo ?= "/")

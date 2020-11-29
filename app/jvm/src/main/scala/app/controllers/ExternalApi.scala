@@ -1,5 +1,7 @@
 package app.controllers
 
+import java.net.URLDecoder
+
 import app.common.money.Currency
 import app.common.money.MoneyWithGeneralCurrency
 import app.models.access.JvmEntityAccess
@@ -103,6 +105,19 @@ final class ExternalApi @Inject() (implicit
     }
 
     Ok(resultBuilder.toString().trim())
+  }
+
+  def refactorTransactionCategory(
+      encodedSearchString: String,
+      newCategory: String,
+      dryOrWet: String,
+      applicationSecret: String,
+  ) = Action { implicit request =>
+    validateApplicationSecret(applicationSecret)
+
+    val searchString = URLDecoder.decode(encodedSearchString.replace("+", "%2B"), "UTF-8")
+
+    Ok(s"searchString = ${searchString}")
   }
 
   // ********** private helper methods ********** //
