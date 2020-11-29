@@ -2,8 +2,10 @@ package app.controllers
 
 import java.net.URLDecoder
 
+import app.common.accounting.ComplexQueryFilter
 import app.common.money.Currency
 import app.common.money.MoneyWithGeneralCurrency
+import app.models.access.AppDbQuerySorting
 import app.models.access.JvmEntityAccess
 import app.models.access.ModelFields
 import app.models.accounting._
@@ -116,8 +118,19 @@ final class ExternalApi @Inject() (implicit
     validateApplicationSecret(applicationSecret)
 
     val searchString = URLDecoder.decode(encodedSearchString.replace("+", "%2B"), "UTF-8")
+    val searchQuery = (new ComplexQueryFilter).fromQuery(searchString)
+    val matchedTransactions =
+      entityAccess
+        .newQuerySync[Transaction]()
+        .filter(searchQuery)
+        .sort(AppDbQuerySorting.Transaction.deterministicallyByCreateDate.reversed)
+        .data()
 
-    Ok(s"searchString = ${searchString}")
+    Ok(
+      s"""searchString = ${searchString}
+         |#transactions that match  searchString= ${matchedTransactions.size}
+         |""".stripMargin
+    )
   }
 
   // ********** private helper methods ********** //
