@@ -1,23 +1,23 @@
-package app.flux.stores.entries
+package app.common.accounting
 
-import hydro.common.GuavaReplacement.Splitter
-import hydro.common.Annotations.visibleForTesting
+import app.common.accounting.ComplexQueryFilter.Prefix
+import app.common.accounting.ComplexQueryFilter.QueryFilterPair
+import app.common.accounting.ComplexQueryFilter.QueryPart
 import app.common.money.Money
-import app.flux.stores.entries.ComplexQueryFilter.Prefix
-import app.flux.stores.entries.ComplexQueryFilter.QueryFilterPair
-import app.flux.stores.entries.ComplexQueryFilter.QueryPart
 import app.models.access.AppEntityAccess
 import app.models.access.ModelFields
 import app.models.accounting._
 import app.models.accounting.config.Config
-import hydro.models.access.DbQueryImplicits._
+import hydro.common.Annotations.visibleForTesting
+import hydro.common.GuavaReplacement.Splitter
 import hydro.models.access.DbQuery
+import hydro.models.access.DbQueryImplicits._
 import hydro.models.access.ModelField
 
 import scala.collection.immutable.Seq
 import scala.collection.mutable
 
-private[stores] final class ComplexQueryFilter(implicit
+final class ComplexQueryFilter(implicit
     entityAccess: AppEntityAccess,
     accountingConfig: Config,
 ) {
@@ -99,7 +99,7 @@ private[stores] final class ComplexQueryFilter(implicit
     }
   }
 
-  @visibleForTesting private[stores] def parsePrefixAndSuffix(string: String): Option[(Prefix, String)] = {
+  @visibleForTesting private[accounting] def parsePrefixAndSuffix(string: String): Option[(Prefix, String)] = {
     val prefixStringToPrefix: Map[String, Prefix] = {
       for {
         prefix <- Prefix.all
@@ -114,7 +114,7 @@ private[stores] final class ComplexQueryFilter(implicit
       case _ => None
     }
   }
-  @visibleForTesting private[stores] def splitInParts(query: String): Seq[QueryPart] = {
+  @visibleForTesting private[accounting] def splitInParts(query: String): Seq[QueryPart] = {
     val quotes = Seq('"', '\'')
     val parts = mutable.Buffer[QueryPart]()
     val nextPart = new StringBuilder
@@ -205,15 +205,15 @@ object ComplexQueryFilter {
       )
   }
 
-  @visibleForTesting private[stores] case class QueryPart(unquotedString: String, negated: Boolean = false)
-  @visibleForTesting private[stores] object QueryPart {
+  @visibleForTesting private[accounting] case class QueryPart(unquotedString: String, negated: Boolean = false)
+  @visibleForTesting private[accounting] object QueryPart {
     def not(unquotedString: String): QueryPart = QueryPart(unquotedString, negated = true)
   }
 
-  @visibleForTesting private[stores] sealed abstract class Prefix private (val prefixStrings: Seq[String]) {
+  @visibleForTesting private[accounting] sealed abstract class Prefix private (val prefixStrings: Seq[String]) {
     override def toString = getClass.getSimpleName
   }
-  @visibleForTesting private[stores] object Prefix {
+  @visibleForTesting private[accounting] object Prefix {
     def all: Seq[Prefix] =
       Seq(Issuer, Beneficiary, Reservoir, Category, Description, Flow, Detail, Tag)
 

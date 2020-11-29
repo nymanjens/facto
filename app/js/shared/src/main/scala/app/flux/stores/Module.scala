@@ -1,6 +1,7 @@
 package app.flux.stores
 
 import app.api.ScalaJsApiClient
+import app.common.accounting.ComplexQueryFilter
 import hydro.common.I18n
 import app.common.money.ExchangeRateManager
 import app.flux.stores.entries._

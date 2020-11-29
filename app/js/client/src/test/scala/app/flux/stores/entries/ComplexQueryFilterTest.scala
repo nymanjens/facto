@@ -1,5 +1,6 @@
 package app.flux.stores.entries
 
+import app.common.accounting.ComplexQueryFilter
 import app.common.testing.TestObjects.testCategory
 import app.common.testing.TestObjects._
 import app.flux.stores.entries.ComplexQueryFilter.Prefix
