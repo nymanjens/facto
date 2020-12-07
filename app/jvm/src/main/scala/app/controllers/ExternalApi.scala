@@ -131,7 +131,7 @@ final class ExternalApi @Inject() (implicit
     val transactionsToEdit = matchedTransactions.filterNot(_.categoryCode == newCategoryCode)
 
     implicit val issuer = Users.getOrCreateRobotUser()
-    val modifications =   (
+    val modifications = (
       for {
         transactionGroupId <- transactionsToEdit.map(_.transactionGroupId).distinct
         (transaction, newId) <- zipWithIncrementingId(
@@ -153,14 +153,12 @@ final class ExternalApi @Inject() (implicit
           ),
         ),
       )
-      ).flatten
+    ).flatten
 
     dryOrWetRun match {
-      case "dry" =>     // Do nothing
-      case "wet" =>        entityAccess.persistEntityModifications(modifications     )
+      case "dry" => // Do nothing
+      case "wet" => entityAccess.persistEntityModifications(modifications)
     }
-
-
 
     Ok(
       s"""searchString                           = $searchString

@@ -15,9 +15,9 @@ import scala.reflect.ClassTag
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 /**
-  * Wrapper component around a given input component that provides a dynamic default value for
-  * that component.
-  */
+ * Wrapper component around a given input component that provides a dynamic default value for
+ * that component.
+ */
 class InputWithDefaultFromReference[Value] private () {
 
   private val component = ScalaComponent

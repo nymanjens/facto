@@ -38,8 +38,8 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 /**
-  * Store factory that calculates the monthly gains and losses made by exchange rate fluctuations.
-  */
+ * Store factory that calculates the monthly gains and losses made by exchange rate fluctuations.
+ */
 final class SummaryExchangeRateGainsStoreFactory(implicit
     entityAccess: AppJsEntityAccess,
     exchangeRateManager: ExchangeRateManager,

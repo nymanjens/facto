@@ -19,11 +19,11 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 /**
-  * Store factory that calculates the year span of all transactions of an account.
-  *
-  * The calculated range is guaranteed to contain at least all years there are transactions for but may also contain
-  * more (although unlikely).
-  */
+ * Store factory that calculates the year span of all transactions of an account.
+ *
+ * The calculated range is guaranteed to contain at least all years there are transactions for but may also contain
+ * more (although unlikely).
+ */
 final class SummaryYearsStoreFactory(implicit entityAccess: AppJsEntityAccess)
     extends EntriesStoreFactory[State] {
 

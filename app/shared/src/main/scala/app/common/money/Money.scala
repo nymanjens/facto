@@ -9,10 +9,10 @@ import scala.util.Failure
 import scala.util.Try
 
 /**
-  * Base class for any type that represents an amount of money.
-  *
-  * Although this has a `currency` method, implementations are allowed to pick a single fixed currency.
-  */
+ * Base class for any type that represents an amount of money.
+ *
+ * Although this has a `currency` method, implementations are allowed to pick a single fixed currency.
+ */
 trait Money {
 
   def cents: Long
@@ -55,20 +55,20 @@ object Money {
     (float.toDouble * 100).round
 
   /**
-    * Parses a string representing an amount of money in the floating point format (without currency)
-    * to its number of cents.
-    *
-    * This method is lenient in its input. It allows both the point or the comma as decimal delimiter. It
-    * detects the comma as separator of thousands. It also allows the 'k' suffix which represents x1000.
-    *
-    * Examples:
-    *   - floatStringToCents("1,234") = Some(123400)
-    *   - floatStringToCents("1 234") = Some(123400)
-    *   - floatStringToCents("1,23") = Some(123)
-    *   - floatStringToCents("1.23") = Some(123)
-    *   - floatStringToCents("1.23k") = Some(123000)
-    *   - floatStringToCents("1.23M") = Some(123000000)
-    */
+   * Parses a string representing an amount of money in the floating point format (without currency)
+   * to its number of cents.
+   *
+   * This method is lenient in its input. It allows both the point or the comma as decimal delimiter. It
+   * detects the comma as separator of thousands. It also allows the 'k' suffix which represents x1000.
+   *
+   * Examples:
+   *   - floatStringToCents("1,234") = Some(123400)
+   *   - floatStringToCents("1 234") = Some(123400)
+   *   - floatStringToCents("1,23") = Some(123)
+   *   - floatStringToCents("1.23") = Some(123)
+   *   - floatStringToCents("1.23k") = Some(123000)
+   *   - floatStringToCents("1.23M") = Some(123000000)
+   */
   def floatStringToCents(string: String): Option[Long] = tryFloatStringToCents(string).toOption
 
   def tryFloatStringToCents(string: String): Try[Long] = {

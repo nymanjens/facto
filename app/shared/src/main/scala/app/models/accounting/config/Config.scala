@@ -10,11 +10,11 @@ import scala.collection.immutable.ListMap
 import scala.collection.immutable.Seq
 
 /**
-  * Contains the accounting configuration of this application. This is assumed to remain constant.
-  *
-  * @param accounts   Maps code to account
-  * @param categories Maps code to category
-  */
+ * Contains the accounting configuration of this application. This is assumed to remain constant.
+ *
+ * @param accounts   Maps code to account
+ * @param categories Maps code to category
+ */
 case class Config(
     accounts: ListMap[String, Account],
     categories: ListMap[String, Category],

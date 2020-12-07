@@ -35,9 +35,9 @@ class TemplateMatcher(implicit
 
   // **************** Public API **************** //
   /**
-    * Returns a template that a group with the given subset of transactions is probably an instance of or None if no
-    * such template exists.
-    */
+   * Returns a template that a group with the given subset of transactions is probably an instance of or None if no
+   * such template exists.
+   */
   def getMatchingTemplate(transactionsSubset: Seq[Transaction]): Option[Template] = {
     // Only try first description, since the template we are looking for *has* to be at least in that entry
     templatesIndex

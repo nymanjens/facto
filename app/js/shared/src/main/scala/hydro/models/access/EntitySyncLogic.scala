@@ -25,10 +25,10 @@ trait EntitySyncLogic {
   def canBeExecutedLocally[E <: Entity: EntityType](dbQuery: DbQuery[E], db: LocalDatabase): Future[Boolean]
 
   /**
-    * Perform entity updates to the given local database as a result of the given modification.
-    *
-    * Note that this method may be called multiple times with the same modification.
-    */
+   * Perform entity updates to the given local database as a result of the given modification.
+   *
+   * Note that this method may be called multiple times with the same modification.
+   */
   def handleEntityModificationUpdate(
       entityModifications: Seq[EntityModification],
       db: LocalDatabase,

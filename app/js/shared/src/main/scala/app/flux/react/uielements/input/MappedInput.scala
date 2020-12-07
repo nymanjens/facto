@@ -184,9 +184,9 @@ object MappedInput {
   trait ValueTransformer[DelegateValue, Value] {
 
     /**
-      * Returns the Value that corresponds to the given DelegateValue or None iff the DelegateValue is
-      * invalid.
-      */
+     * Returns the Value that corresponds to the given DelegateValue or None iff the DelegateValue is
+     * invalid.
+     */
     def forward(delegateValue: DelegateValue): Option[Value]
 
     /** Returns the DelegateValue corresponding to the given value. */

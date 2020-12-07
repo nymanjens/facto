@@ -4,10 +4,10 @@ import japgolly.scalajs.react._
 import org.scalajs.dom.console
 
 /**
-  * Contains base traits to be used by input components that describe a single value.
-  *
-  * Aggregate input values are not supported.
-  */
+ * Contains base traits to be used by input components that describe a single value.
+ *
+ * Aggregate input values are not supported.
+ */
 object InputBase {
 
   /** A reference to an input component. */
@@ -25,11 +25,11 @@ object InputBase {
     def valueOrDefault: Value
 
     /**
-      * Sets the value of the input component and returns the value after this change.
-      *
-      * The return value may be different from the input if the input is invalid for this
-      * field.
-      */
+     * Sets the value of the input component and returns the value after this change.
+     *
+     * The return value may be different from the input if the input is invalid for this
+     * field.
+     */
     def setValue(value: Value): Value
 
     final def valueIsValid: Boolean = value.isDefined

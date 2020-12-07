@@ -34,9 +34,9 @@ object TransactionGroup {
   def tupled = (this.apply _).tupled
 
   /**
-    * Same as TransactionGroup, except all fields are optional, plus an additional `transactions` and `zeroSum` which
-    * a `TransactionGroup` stores implicitly.
-    */
+   * Same as TransactionGroup, except all fields are optional, plus an additional `transactions` and `zeroSum` which
+   * a `TransactionGroup` stores implicitly.
+   */
   case class Partial(
       transactions: Seq[Transaction.Partial],
       zeroSum: Boolean = false,

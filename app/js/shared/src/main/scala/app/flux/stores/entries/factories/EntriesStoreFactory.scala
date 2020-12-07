@@ -10,9 +10,9 @@ private[entries] abstract class EntriesStoreFactory[StateT <: EntriesStore.State
 
   // **************** Abstract methods/types ****************//
   /**
-    * The (immutable) input type that together with injected dependencies is enough to
-    * calculate the latest value of `State`. Example: Int.
-    */
+   * The (immutable) input type that together with injected dependencies is enough to
+   * calculate the latest value of `State`. Example: Int.
+   */
   protected type Input
 
   protected def createNew(input: Input): Store

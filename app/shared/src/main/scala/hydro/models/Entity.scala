@@ -9,9 +9,9 @@ trait Entity {
   final def id: Long = idOption.getOrElse(throw new IllegalStateException(s"This entity has no ID: $this"))
 
   /**
-    * The Entity ID wrapped in an Option.
-    * Expected to be None when Entity not yet persisted, otherwise Some[Id].
-    */
+   * The Entity ID wrapped in an Option.
+   * Expected to be None when Entity not yet persisted, otherwise Some[Id].
+   */
   def idOption: Option[Long]
 
   /** Returns a copy of this Entity with an ID. */

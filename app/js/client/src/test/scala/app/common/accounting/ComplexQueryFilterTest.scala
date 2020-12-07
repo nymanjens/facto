@@ -12,7 +12,6 @@ import app.common.accounting.ComplexQueryFilter.QueryPart
 import scala.collection.immutable.Seq
 import scala.language.reflectiveCalls
 
-
 object ComplexQueryFilterTest extends TestSuite {
 
   override def tests = TestSuite {

@@ -99,7 +99,9 @@ final class ComplexQueryFilter(implicit
     }
   }
 
-  @visibleForTesting private[accounting] def parsePrefixAndSuffix(string: String): Option[(Prefix, String)] = {
+  @visibleForTesting private[accounting] def parsePrefixAndSuffix(
+      string: String
+  ): Option[(Prefix, String)] = {
     val prefixStringToPrefix: Map[String, Prefix] = {
       for {
         prefix <- Prefix.all
@@ -205,12 +207,17 @@ object ComplexQueryFilter {
       )
   }
 
-  @visibleForTesting private[accounting] case class QueryPart(unquotedString: String, negated: Boolean = false)
+  @visibleForTesting private[accounting] case class QueryPart(
+      unquotedString: String,
+      negated: Boolean = false,
+  )
   @visibleForTesting private[accounting] object QueryPart {
     def not(unquotedString: String): QueryPart = QueryPart(unquotedString, negated = true)
   }
 
-  @visibleForTesting private[accounting] sealed abstract class Prefix private (val prefixStrings: Seq[String]) {
+  @visibleForTesting private[accounting] sealed abstract class Prefix private (
+      val prefixStrings: Seq[String]
+  ) {
     override def toString = getClass.getSimpleName
   }
   @visibleForTesting private[accounting] object Prefix {

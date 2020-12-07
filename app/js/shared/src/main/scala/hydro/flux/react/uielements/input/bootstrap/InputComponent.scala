@@ -26,9 +26,9 @@ import scala.util.Success
 import scala.util.Try
 
 /**
-  * ReactScala component that can be used as building block for input components that fit
-  * in a Bootstrap row.
-  */
+ * ReactScala component that can be used as building block for input components that fit
+ * in a Bootstrap row.
+ */
 object InputComponent {
 
   // **************** API ****************//
@@ -145,16 +145,16 @@ object InputComponent {
   trait ValueTransformer[Value, -ExtraProps] {
 
     /**
-      * Returns the Value that corresponds to the given String or None iff the current value is
-      * invalid (excluding the case where the default value is invalid).
-      */
+     * Returns the Value that corresponds to the given String or None iff the current value is
+     * invalid (excluding the case where the default value is invalid).
+     */
     def stringToValue(string: String, extraProps: ExtraProps): Option[Value]
 
     /**
-      * Returns the string value of given value.
-      *
-      * @throws Exception (any) if the given value is invalid for given props
-      */
+     * Returns the string value of given value.
+     *
+     * @throws Exception (any) if the given value is invalid for given props
+     */
     def valueToString(value: Value, extraProps: ExtraProps): String
 
     /** Return true if the given value represents an empty input. */

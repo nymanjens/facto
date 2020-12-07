@@ -20,9 +20,9 @@ trait RouterContext {
   def toPath(page: Page): Path
 
   /**
-    * Return an anchor tag that has the `href` and `onclick` attribute pre-filled to redirect the
-    * browser on a click.
-    */
+   * Return an anchor tag that has the `href` and `onclick` attribute pre-filled to redirect the
+   * browser on a click.
+   */
   def anchorWithHrefTo(page: Page): VdomTagOf[html.Anchor]
 
   // **************** Setters **************** //

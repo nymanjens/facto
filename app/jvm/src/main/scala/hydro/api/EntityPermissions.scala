@@ -5,21 +5,21 @@ import hydro.models.modification.EntityModification
 import hydro.models.Entity
 
 /**
-  * Permissions for arbitrary Entity read/write operations.
-  *
-  * Note that this explicitly excludes server-implemented modifications, which can have custom permissions.
-  */
+ * Permissions for arbitrary Entity read/write operations.
+ *
+ * Note that this explicitly excludes server-implemented modifications, which can have custom permissions.
+ */
 trait EntityPermissions {
 
   /** Throws an exception if this modifications is not allowed as write operation. */
   def checkAllowedForWrite(modification: EntityModification)(implicit user: User): Unit
 
   /**
-    * Returns true if the given entity can be read by the given user.
-    *
-    * Warning: EntityPermissions doesn't resend EntityModifications if permissions change. It is the responsibility
-    * of the updater to foresee a mechanism to invalidate the local database(s).
-    */
+   * Returns true if the given entity can be read by the given user.
+   *
+   * Warning: EntityPermissions doesn't resend EntityModifications if permissions change. It is the responsibility
+   * of the updater to foresee a mechanism to invalidate the local database(s).
+   */
   def isAllowedToRead(entity: Entity)(implicit user: User): Boolean
 
   final def isAllowedToStream(entityModification: EntityModification)(implicit user: User): Boolean = {

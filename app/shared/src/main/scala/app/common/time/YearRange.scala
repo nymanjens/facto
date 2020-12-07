@@ -3,10 +3,10 @@ package app.common.time
 import scala.collection.immutable.Seq
 
 /**
-  * A continuous range of years.
-  *
-  * Example.: YearRange.closed(2014, 2017) consists of the years [2014, 2015, 2016, 2017].
-  */
+ * A continuous range of years.
+ *
+ * Example.: YearRange.closed(2014, 2017) consists of the years [2014, 2015, 2016, 2017].
+ */
 case class YearRange private (private val years: Set[Int]) {
   def firstYear: Int = {
     require(!this.isEmpty)

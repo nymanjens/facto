@@ -3,10 +3,10 @@ package hydro.flux.stores
 import scala.collection.mutable
 
 /**
-  * Abstract base class for any store that exposes a single listenable state.
-  *
-  * @tparam State An immutable type that contains all state maintained by this store
-  */
+ * Abstract base class for any store that exposes a single listenable state.
+ *
+ * @tparam State An immutable type that contains all state maintained by this store
+ */
 abstract class StateStore[State] {
 
   private val _stateUpdateListeners: mutable.Set[StateStore.Listener] = mutable.LinkedHashSet()

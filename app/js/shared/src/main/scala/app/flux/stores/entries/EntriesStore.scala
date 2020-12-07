@@ -10,10 +10,10 @@ import app.models.user.User
 import hydro.flux.stores.AsyncEntityDerivedStateStore
 
 /**
-  * Abstract base class for a store with transaction-derived entries.
-  *
-  * @tparam State An immutable type that contains all state maintained by this store
-  */
+ * Abstract base class for a store with transaction-derived entries.
+ *
+ * @tparam State An immutable type that contains all state maintained by this store
+ */
 abstract class EntriesStore[State <: EntriesStore.StateTrait](implicit entityAccess: AppJsEntityAccess)
     extends AsyncEntityDerivedStateStore[State] {
 

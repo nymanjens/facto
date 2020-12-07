@@ -12,13 +12,13 @@ import hydro.models.UpdatableEntity.LastUpdateTime
 import scala.util.Random
 
 /**
-  * Indicates an idempotent addition, update or removal of an entity.
-  *
-  * This modification may be used for desired modifications (not yet persisted) or to indicate an already changed state.
-  *
-  * It is important that these modifications are created and treated as idempotent modifications, i.e. applying a
-  * modification a second time is a no-op.
-  */
+ * Indicates an idempotent addition, update or removal of an entity.
+ *
+ * This modification may be used for desired modifications (not yet persisted) or to indicate an already changed state.
+ *
+ * It is important that these modifications are created and treated as idempotent modifications, i.e. applying a
+ * modification a second time is a no-op.
+ */
 sealed trait EntityModification {
   def entityType: EntityType.any
   def entityId: Long
@@ -85,10 +85,10 @@ object EntityModification {
   }
 
   /**
-    * Update to an existing entity.
-    *
-    * If no entity exists yet, it is not added (i.e. this is not an upsert).
-    */
+   * Update to an existing entity.
+   *
+   * If no entity exists yet, it is not added (i.e. this is not an upsert).
+   */
   case class Update[E <: UpdatableEntity: EntityType](updatedEntity: E) extends EntityModification {
     require(updatedEntity.idOption.isDefined, s"Entity ID must be defined (for entity $updatedEntity)")
     require(

@@ -9,11 +9,11 @@ import hydro.models.access.ModelField
 import scala.collection.immutable.Seq
 
 /**
-  * Extension of Entity that allows safe* client updates via lastUpdateTime.
-  *
-  * *Safe means that EntityModifications can be re-ordered but all clients will eventually have the same
-  * view on the entity.
-  */
+ * Extension of Entity that allows safe* client updates via lastUpdateTime.
+ *
+ * *Safe means that EntityModifications can be re-ordered but all clients will eventually have the same
+ * view on the entity.
+ */
 trait UpdatableEntity extends Entity {
 
   def lastUpdateTime: LastUpdateTime
@@ -72,12 +72,12 @@ object UpdatableEntity {
     }
 
     /**
-      * Returns an instance that merges the fields in `this` and `that`.
-      *
-      * If `forceIncrement` is true: for all instants in `that` that are smaller than their corresponding
-      * value in `this` (if any), the returned value will be strictly higher than the highest value. This
-      * means that all set fields in `that` force an increment.
-      */
+     * Returns an instance that merges the fields in `this` and `that`.
+     *
+     * If `forceIncrement` is true: for all instants in `that` that are smaller than their corresponding
+     * value in `this` (if any), the returned value will be strictly higher than the highest value. This
+     * means that all set fields in `that` force an increment.
+     */
     def merge(that: LastUpdateTime, forceIncrement: Boolean): LastUpdateTime = {
       def mergeInstant(thisTime: Option[Instant], thatTime: Option[Instant]): Option[Instant] =
         (thisTime, thatTime) match {

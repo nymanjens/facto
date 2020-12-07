@@ -16,10 +16,10 @@ trait RemoteDatabaseProxy {
   def persistEntityModifications(modifications: Seq[EntityModification]): PersistEntityModificationsResponse
 
   /**
-    * Start listening for entity modifications.
-    *
-    * Upon receiving any modifications, the given listener should be invoked.
-    */
+   * Start listening for entity modifications.
+   *
+   * Upon receiving any modifications, the given listener should be invoked.
+   */
   def startCheckingForModifiedEntityUpdates(
       maybeNewEntityModificationsListener: Seq[EntityModification] => Future[Unit]
   ): Unit
@@ -27,9 +27,9 @@ trait RemoteDatabaseProxy {
   def clearLocalDatabase(): Future[Unit]
 
   /**
-    * If there is a local database, this future completes when it's finished loading. Otherwise, this future never
-    * completes.
-    */
+   * If there is a local database, this future completes when it's finished loading. Otherwise, this future never
+   * completes.
+   */
   def localDatabaseReadyFuture: Future[Unit]
 
   def registerPendingModificationsListener(listener: PendingModificationsListener): Unit

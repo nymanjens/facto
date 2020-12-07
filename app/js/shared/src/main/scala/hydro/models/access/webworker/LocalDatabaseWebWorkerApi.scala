@@ -10,9 +10,9 @@ import scala.scalajs.js
 trait LocalDatabaseWebWorkerApi {
 
   /**
-    * Creates a database with the given name and properties. If a database with that name already exists, this
-    * method returns when that database is ready.
-    */
+   * Creates a database with the given name and properties. If a database with that name already exists, this
+   * method returns when that database is ready.
+   */
   def createIfNecessary(dbName: String, inMemory: Boolean, separateDbPerCollection: Boolean): Future[Unit]
 
   def executeDataQuery(lokiQuery: LokiQuery): Future[Seq[js.Dictionary[js.Any]]]
@@ -20,10 +20,10 @@ trait LocalDatabaseWebWorkerApi {
   def executeCountQuery(lokiQuery: LokiQuery): Future[Int]
 
   /**
-    * Executes the given operations in sequence.
-    *
-    * Returns true if database was modified.
-    */
+   * Executes the given operations in sequence.
+   *
+   * Returns true if database was modified.
+   */
   def applyWriteOperations(operations: Seq[WriteOperation]): Future[Boolean]
 
   def saveDatabase(): Future[Unit]

@@ -12,11 +12,11 @@ import scala.concurrent.Promise
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 /**
-  * Abstract base class for any store that exposes a single listenable state and calculates the new value of the state
-  * in an async manner from `JsEntityAccess`.
-  *
-  * @tparam State An immutable type that contains all state maintained by this store
-  */
+ * Abstract base class for any store that exposes a single listenable state and calculates the new value of the state
+ * in an async manner from `JsEntityAccess`.
+ *
+ * @tparam State An immutable type that contains all state maintained by this store
+ */
 abstract class AsyncEntityDerivedStateStore[State](implicit entityAccess: JsEntityAccess)
     extends StateStore[Option[State]] {
   entityAccess.registerListener(JsEntityAccessListener)

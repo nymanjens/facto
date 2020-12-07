@@ -8,8 +8,8 @@ import java.time.Month
 import hydro.common.Require.requireNonNull
 
 /**
-  * Drop-in replacement for java.time.LocalDateTime, which isn't supported by scala.js yet.
-  */
+ * Drop-in replacement for java.time.LocalDateTime, which isn't supported by scala.js yet.
+ */
 trait LocalDateTime extends Comparable[LocalDateTime] {
 
   def toLocalDate: LocalDate

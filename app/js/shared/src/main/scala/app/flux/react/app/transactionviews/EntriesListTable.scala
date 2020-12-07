@@ -55,9 +55,9 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](i
   }
 
   /**
-    * @param calculateTableDataFromEntryAndRowNum Returns an a seq of table datas from an entry and the number of the
-    *                                             row. The first row is zero.
-    */
+   * @param calculateTableDataFromEntryAndRowNum Returns an a seq of table datas from an entry and the number of the
+   *                                             row. The first row is zero.
+   */
   def withRowNumber(
       tableTitle: String,
       tableClasses: Seq[String] = Seq(),

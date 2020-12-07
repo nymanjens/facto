@@ -13,10 +13,10 @@ import scala.util.Failure
 import scala.util.Success
 
 /**
-  * Dispatcher is used to broadcast payloads to registered callbacks.
-  *
-  * Modelled after Facebook's dispatcher: https://github.com/facebook/flux/blob/master/src/Dispatcher.js
-  */
+ * Dispatcher is used to broadcast payloads to registered callbacks.
+ *
+ * Modelled after Facebook's dispatcher: https://github.com/facebook/flux/blob/master/src/Dispatcher.js
+ */
 trait Dispatcher {
 
   def registerAsync(callback: Action => Future[Unit]): Unit

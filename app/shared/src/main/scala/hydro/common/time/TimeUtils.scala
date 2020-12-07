@@ -16,11 +16,11 @@ object TimeUtils {
   def allMonths: Seq[Month] = Month.values().toList
 
   /**
-    * Parses the incoming date string to a LocalDateTime.
-    *
-    * @param dateString in the form of yyyy-mm-dd, e.g. "2016-03-13". Leading zeros may be omitted.
-    * @throws IllegalArgumentException if the given string could not be parsed
-    */
+   * Parses the incoming date string to a LocalDateTime.
+   *
+   * @param dateString in the form of yyyy-mm-dd, e.g. "2016-03-13". Leading zeros may be omitted.
+   * @throws IllegalArgumentException if the given string could not be parsed
+   */
   def parseDateString(dateString: String): LocalDateTime = {
     require(!dateString.startsWith("-"), dateString)
     require(!dateString.endsWith("-"), dateString)

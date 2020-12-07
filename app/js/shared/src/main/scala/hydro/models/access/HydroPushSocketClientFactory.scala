@@ -116,10 +116,10 @@ final class HydroPushSocketClientFactory(implicit clock: Clock) {
     }
 
     /**
-      * This method checks that we get regular heartbeats. If not, it closes and re-opens the connection.
-      *
-      * This aims to solve a bug that sometimes the connection seems to be open while nothing actually gets received.
-      */
+     * This method checks that we get regular heartbeats. If not, it closes and re-opens the connection.
+     *
+     * This aims to solve a bug that sometimes the connection seems to be open while nothing actually gets received.
+     */
     private def startCheckingLastPacketTimeNotTooLongAgo(): Unit = {
       val timeoutDuration = 15.seconds
       def cyclicLogic(): Unit = {

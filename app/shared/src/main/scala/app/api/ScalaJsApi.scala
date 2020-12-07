@@ -40,9 +40,9 @@ object ScalaJsApi {
   type UpdateToken = String
 
   /**
-    * @param i18nMessages Maps key to the message with placeholders.
-    * @param nextUpdateToken An update token for all changes since this call
-    */
+   * @param i18nMessages Maps key to the message with placeholders.
+   * @param nextUpdateToken An update token for all changes since this call
+   */
   case class GetInitialDataResponse(
       accountingConfig: Config,
       user: User,
@@ -73,13 +73,13 @@ object ScalaJsApi {
   }
 
   /**
-    * Copy of the User model with all fields optional.
-    *
-    * @param id Required for update. Unset for add.
-    * @param loginName Required for add.
-    * @param plainTextPassword Required for add.
-    * @param name Required for add.
-    */
+   * Copy of the User model with all fields optional.
+   *
+   * @param id Required for update. Unset for add.
+   * @param loginName Required for add.
+   * @param plainTextPassword Required for add.
+   * @param name Required for add.
+   */
   case class UserPrototype(
       id: Option[Long] = None,
       loginName: Option[String] = None,

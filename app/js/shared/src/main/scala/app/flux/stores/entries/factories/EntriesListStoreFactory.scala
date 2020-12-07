@@ -7,9 +7,9 @@ import app.models.access.AppJsEntityAccess
 import scala.collection.immutable.Seq
 
 /**
-  * @tparam AdditionalInput The (immutable) input type that together with injected dependencies and the max number of
-  *                         entries is enough to calculate the latest value of `State`. Example: Int.
-  */
+ * @tparam AdditionalInput The (immutable) input type that together with injected dependencies and the max number of
+ *                         entries is enough to calculate the latest value of `State`. Example: Int.
+ */
 abstract class EntriesListStoreFactory[Entry, AdditionalInput](implicit entityAccess: AppJsEntityAccess)
     extends EntriesStoreFactory[EntriesListStoreFactory.State[Entry]] {
 
@@ -29,8 +29,8 @@ abstract class EntriesListStoreFactory[Entry, AdditionalInput](implicit entityAc
 object EntriesListStoreFactory {
 
   /**
-    * @param entries the latest `maxNumEntries` entries sorted from old to new.
-    */
+   * @param entries the latest `maxNumEntries` entries sorted from old to new.
+   */
   case class State[Entry](
       entries: Seq[WithIsPending[Entry]],
       hasMore: Boolean,

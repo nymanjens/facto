@@ -276,9 +276,9 @@ final class TransactionGroupForm(implicit
   }
 
   /**
-    * @param foreignCurrency Any foreign currency of any of the selected money reservoirs. If there are multiple,
-    *                        this can by any of these.
-    */
+   * @param foreignCurrency Any foreign currency of any of the selected money reservoirs. If there are multiple,
+   *                        this can by any of these.
+   */
   private case class State(
       panelIndices: Seq[Int],
       nextPanelIndex: Int,

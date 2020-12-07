@@ -20,12 +20,12 @@ private[access] final class FutureLocalDatabase(unsafeLocalDatabaseFuture: Futur
   unsafeLocalDatabaseFuture.map(performPendingUpdates)
 
   /**
-    * Returns future for the LocalDatabase.
-    *
-    * @param safe If true, errors thrown by the database future are caught and translated into a never-ending
-    *     future
-    * @param includesLatestUpdates If true, the future completes when there are no more scheduled updates
-    */
+   * Returns future for the LocalDatabase.
+   *
+   * @param safe If true, errors thrown by the database future are caught and translated into a never-ending
+   *     future
+   * @param includesLatestUpdates If true, the future completes when there are no more scheduled updates
+   */
   def future(safe: Boolean = true, includesLatestUpdates: Boolean = true): Future[LocalDatabase] = async {
     val db = await {
       if (safe) safeLocalDatabaseFuture else unsafeLocalDatabaseFuture
@@ -39,11 +39,11 @@ private[access] final class FutureLocalDatabase(unsafeLocalDatabaseFuture: Futur
   }
 
   /**
-    * Returns the LocalDatabase if it is ready.
-    *
-    * @param includesLatestUpdates If true, the LocalDatabase is only ready when there are no more scheduled
-    *     updates
-    */
+   * Returns the LocalDatabase if it is ready.
+   *
+   * @param includesLatestUpdates If true, the LocalDatabase is only ready when there are no more scheduled
+   *     updates
+   */
   def option(includesLatestUpdates: Boolean = true): Option[LocalDatabase] = {
     safeLocalDatabaseFuture.value match {
       case Some(Success(localDatabase)) =>
@@ -60,10 +60,10 @@ private[access] final class FutureLocalDatabase(unsafeLocalDatabaseFuture: Futur
   }
 
   /**
-    * Schedule an operation to be executed immediately after the LocalDatabase has loaded.
-    *
-    * Note: If the LocalDatabase has already loaded, the given function is executed ASAP.
-    */
+   * Schedule an operation to be executed immediately after the LocalDatabase has loaded.
+   *
+   * Note: If the LocalDatabase has already loaded, the given function is executed ASAP.
+   */
   def scheduleUpdateAtStart(func: LocalDatabase => Future[Unit]): Unit = {
     pendingUpdates.prepend(func)
     lastUpdateDonePromise = Promise()
@@ -71,11 +71,11 @@ private[access] final class FutureLocalDatabase(unsafeLocalDatabaseFuture: Futur
   }
 
   /**
-    * Schedule an operation to be executed when the LocalDatabase has loaded and all other updates are done.
-    *
-    * Note: If the LocalDatabase has already loaded and all other updates are done, the given function is
-    * executed ASAP.
-    */
+   * Schedule an operation to be executed when the LocalDatabase has loaded and all other updates are done.
+   *
+   * Note: If the LocalDatabase has already loaded and all other updates are done, the given function is
+   * executed ASAP.
+   */
   def scheduleUpdateAtEnd(func: LocalDatabase => Future[Unit]): Unit = {
     pendingUpdates += func
     lastUpdateDonePromise = Promise()

@@ -8,9 +8,9 @@ abstract class StoreFactory {
 
   // **************** Abstract methods/types ****************//
   /**
-    * The (immutable) input type that together with injected dependencies is enough to
-    * calculate the latest value of `State`. Example: Int.
-    */
+   * The (immutable) input type that together with injected dependencies is enough to
+   * calculate the latest value of `State`. Example: Int.
+   */
   protected type Input
 
   /** The type of store that gets created by this factory. */

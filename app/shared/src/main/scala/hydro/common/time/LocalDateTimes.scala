@@ -4,8 +4,8 @@ import java.time.LocalTime
 import java.time.Month
 
 /**
-  * Extension of `LocalDateTime`, which should keep the same API as `java.time.LocalDateTime`.
-  */
+ * Extension of `LocalDateTime`, which should keep the same API as `java.time.LocalDateTime`.
+ */
 object LocalDateTimes {
 
   def ofJavaLocalDateTime(javaDateTime: java.time.LocalDateTime): LocalDateTime = {

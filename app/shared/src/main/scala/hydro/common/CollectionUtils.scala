@@ -33,11 +33,11 @@ object CollectionUtils {
   }
 
   /**
-    * Converts the given values to a bimap that associates an integer with each value.
-    *
-    * These associated integers remain stable as long as the `stableNameMapper` returns the same value,
-    * even if the order of values is changed, or values are added/removed.
-    */
+   * Converts the given values to a bimap that associates an integer with each value.
+   *
+   * These associated integers remain stable as long as the `stableNameMapper` returns the same value,
+   * even if the order of values is changed, or values are added/removed.
+   */
   def toBiMapWithStableIntKeys[V](
       stableNameMapper: V => String,
       values: Iterable[V],

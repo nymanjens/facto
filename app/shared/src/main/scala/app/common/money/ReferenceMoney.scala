@@ -3,11 +3,11 @@ package app.common.money
 import app.common.money.CentOperations.CentOperationsNumeric
 
 /**
-  * Represents an amount of money in the (default) reference currency.
-  *
-  * Note that this can't be converted into other currencies since we don't know what date we should assume for the
-  * exchange rate.
-  */
+ * Represents an amount of money in the (default) reference currency.
+ *
+ * Note that this can't be converted into other currencies since we don't know what date we should assume for the
+ * exchange rate.
+ */
 case class ReferenceMoney(override val cents: Long) extends Money with CentOperations[ReferenceMoney] {
 
   override def currency = Currency.default

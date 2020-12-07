@@ -119,11 +119,11 @@ private[transactionviews] final class SummaryTable(implicit
   ) {
 
     /**
-      * Returns the categories of the transactions in the order configured for this account.
-      *
-      * If any transactions are not part of the configured seq, their categories are appended at the end. This should
-      * normally not happen.
-      */
+     * Returns the categories of the transactions in the order configured for this account.
+     *
+     * If any transactions are not part of the configured seq, their categories are appended at the end. This should
+     * normally not happen.
+     */
     def categories(implicit account: Account): Seq[Category] = {
       account.categories.filter(categoriesSet) ++ categoriesSet.filterNot(account.categories.contains)
     }

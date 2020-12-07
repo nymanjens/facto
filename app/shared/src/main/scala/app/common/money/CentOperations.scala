@@ -3,10 +3,10 @@ package app.common.money
 import hydro.common.GuavaReplacement.DoubleMath.roundToLong
 
 /**
-  * Can be mixed in a type that has cents to add some arithmetic operations.
-  *
-  * @tparam M The concrete type implementing this trait.
-  */
+ * Can be mixed in a type that has cents to add some arithmetic operations.
+ *
+ * @tparam M The concrete type implementing this trait.
+ */
 trait CentOperations[M <: CentOperations[M]] {
 
   // **************** Methods to be overridden **************** //
@@ -41,10 +41,10 @@ trait CentOperations[M <: CentOperations[M]] {
 object CentOperations {
 
   /**
-    * Can be used to easily create a Numeric for a CentOperations subclass.
-    *
-    * @tparam M The concrete type implementing this trait.
-    */
+   * Can be used to easily create a Numeric for a CentOperations subclass.
+   *
+   * @tparam M The concrete type implementing this trait.
+   */
   trait CentOperationsNumeric[M <: CentOperations[M]] extends Numeric[M] {
     override def negate(x: M): M = -x
     override def plus(x: M, y: M): M = x + y

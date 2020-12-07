@@ -1,8 +1,8 @@
 package app.common.money
 
 /**
-  * @param code The three letter symbol.
-  */
+ * @param code The three letter symbol.
+ */
 sealed abstract class Currency(
     val code: String,
     val symbol: String,

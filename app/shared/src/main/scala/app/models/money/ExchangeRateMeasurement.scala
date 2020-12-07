@@ -6,13 +6,13 @@ import hydro.common.time.LocalDateTime
 import hydro.models.Entity
 
 /**
-  * Measurements of the exchange rate of the reference currency to another (foreign) currency at a certain point in
-  * time.
-  *
-  * This exchange rate is valid from this `date` until the `date` of the next measurement.
-  *
-  * ExchangeRateMeasurement entities are immutable.
-  */
+ * Measurements of the exchange rate of the reference currency to another (foreign) currency at a certain point in
+ * time.
+ *
+ * This exchange rate is valid from this `date` until the `date` of the next measurement.
+ *
+ * ExchangeRateMeasurement entities are immutable.
+ */
 case class ExchangeRateMeasurement(
     date: LocalDateTime,
     foreignCurrencyCode: String,

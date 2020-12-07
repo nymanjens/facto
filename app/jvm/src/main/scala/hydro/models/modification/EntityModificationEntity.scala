@@ -7,11 +7,11 @@ import app.models.user.User
 import hydro.models.Entity
 
 /**
-  * Symbolises a modification to an entity.
-  *
-  * EntityModificationEntity entities are immutable and are assumed to be relatively short-lived, especially after
-  * code updates to related models.
-  */
+ * Symbolises a modification to an entity.
+ *
+ * EntityModificationEntity entities are immutable and are assumed to be relatively short-lived, especially after
+ * code updates to related models.
+ */
 case class EntityModificationEntity(
     userId: Long,
     modification: EntityModification,
