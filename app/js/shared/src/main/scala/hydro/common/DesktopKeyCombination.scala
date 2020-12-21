@@ -4,22 +4,25 @@ import hydro.common.GuavaReplacement.Iterables.getOnlyElement
 import japgolly.scalajs.react.raw.SyntheticKeyboardEvent
 
 sealed trait DesktopKeyCombination {
-  def ctrlOrMeta: Boolean
+  def ctrl: Boolean
   def shift: Boolean
   def alt: Boolean
+  def meta: Boolean
 }
 object DesktopKeyCombination {
 
   def fromEvent(event: SyntheticKeyboardEvent[_]): DesktopKeyCombination = {
-    val ctrlOrMeta = if (BrowserUtils.isMacOsX) event.metaKey else event.ctrlKey
+    val ctrl = if (BrowserUtils.isMacOsX) event.metaKey else event.ctrlKey
+    val meta = if (BrowserUtils.isMacOsX) event.ctrlKey else event.metaKey
     val key = event.key
 
     if (key.length == 1) {
       CharacterKey(
         character = getOnlyElement(key),
-        ctrlOrMeta = ctrlOrMeta,
+        ctrl = ctrl,
         shift = event.shiftKey,
         alt = event.altKey,
+        meta = meta,
       )
     } else {
       SpecialKey(
@@ -32,25 +35,28 @@ object DesktopKeyCombination {
           case "ArrowDown" => ArrowDown
           case _           => UnknownKeyType(key)
         },
-        ctrlOrMeta = ctrlOrMeta,
+        ctrl = ctrl,
         shift = event.shiftKey,
         alt = event.altKey,
+        meta = meta,
       )
     }
   }
 
   case class CharacterKey(
       character: Char,
-      override val ctrlOrMeta: Boolean,
+      override val ctrl: Boolean,
       override val shift: Boolean,
       override val alt: Boolean,
+      override val meta: Boolean,
   ) extends DesktopKeyCombination
 
   case class SpecialKey(
       specialKeyType: SpecialKeyType,
-      override val ctrlOrMeta: Boolean,
+      override val ctrl: Boolean,
       override val shift: Boolean,
       override val alt: Boolean,
+      override val meta: Boolean,
   ) extends DesktopKeyCombination
 
   sealed trait SpecialKeyType

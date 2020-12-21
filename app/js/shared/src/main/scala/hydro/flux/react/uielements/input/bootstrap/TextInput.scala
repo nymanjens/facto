@@ -131,7 +131,7 @@ object TextInput {
 
     keyCombination match {
       case special @ SpecialKey(
-            ArrowUp | ArrowDown, /* ctrlOrMeta */ false, /* shift */ false, /* alt */ false,
+            ArrowUp | ArrowDown, /* ctrl */ false, /* shift */ false, /* alt */ false, /* meta */ false,
           ) =>
         val newValue =
           special.specialKeyType match {
