@@ -1,5 +1,6 @@
 package app.flux.react.app
 
+import hydro.jsfacades.Mousetrap
 import app.common.money.ExchangeRateManager
 import app.flux.router.AppPages
 import app.flux.stores.entries.factories.AllEntriesStoreFactory
@@ -62,6 +63,36 @@ private[app] final class Menu(implicit
       ),
       enableSearch = true,
       router = router,
+      configureAdditionalKeyboardShortcuts = () => configureAdditionalKeyboardShortcuts(),
+    )
+  }
+  private def configureAdditionalKeyboardShortcuts()(implicit router: RouterContext): Unit = {
+    def bind(shortcut: String, runnable: () => Unit): Unit = {
+      Mousetrap.bind(
+        shortcut,
+        e => {
+          e.preventDefault()
+          runnable()
+        },
+      )
+    }
+    def bindGlobal(shortcut: String, runnable: () => Unit): Unit = {
+      Mousetrap.bindGlobal(
+        shortcut,
+        e => {
+          e.preventDefault()
+          runnable()
+        },
+      )
+    }
+
+    bindGlobal(
+      "alt+escape",
+      () => {
+        router.currentPage match {
+          case page: AppPages.PopupEditorPage => router.setPage(page.parentPage)
+        }
+      },
     )
   }
 
