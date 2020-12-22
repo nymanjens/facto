@@ -87,7 +87,7 @@ private[app] final class Menu(implicit
     }
 
     bindGlobal(
-      "alt+escape",
+      "escape",
       () => {
         router.currentPage match {
           case page: AppPages.PopupEditorPage => router.setPage(page.parentPage)
