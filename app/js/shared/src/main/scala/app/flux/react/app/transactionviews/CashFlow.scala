@@ -223,8 +223,6 @@ final class CashFlow(implicit
     val link = router.anchorWithHrefTo(AppPages.EditBalanceCheck(balanceCorrection))
     Bootstrap.Button(size = Size.xs, tag = link)(
       Bootstrap.FontAwesomeIcon("pencil", fixedWidth = true),
-      " ",
-      i18n("app.edit"),
     )
   }
 
