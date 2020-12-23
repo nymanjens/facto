@@ -22,8 +22,6 @@ import app.models.accounting.config.MoneyReservoir
 import app.models.user.User
 import hydro.common.JsLoggingUtils.LogExceptionsCallback
 import hydro.common.time.Clock
-import hydro.common.CollectionUtils
-import hydro.common.CollectionUtils.ifThenSeq
 import hydro.flux.action.Dispatcher
 import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.uielements.PageHeader
@@ -98,9 +96,10 @@ final class CashFlow(implicit
                       <.th(i18n("app.consumed")),
                       <.th(i18n("app.beneficiary")),
                       <.th(i18n("app.category")),
-                      <.th(i18n("app.description"), " ", transactionGroupAddButton(reservoir)),
+                      <.th(i18n("app.description")),
                       <.th(i18n("app.flow")),
                       <.th(i18n("app.balance"), " ", balanceCheckAddNewButton(reservoir)),
+                      <.th(transactionGroupAddButton(reservoir)),
                     ),
                     calculateTableDataFromEntryAndRowNum = (cashFlowEntry, rowNumber) =>
                       cashFlowEntry match {
@@ -114,20 +113,15 @@ final class CashFlow(implicit
                             <.td(uielements.MoneyWithCurrency(entry.flow)),
                             <.td(
                               uielements.MoneyWithCurrency(entry.balance),
-                              <<.ifThen(entry.balanceVerified) {
-                                <.span(" ", Bootstrap.FontAwesomeIcon("check", fixedWidth = true))
+                              entry.balanceVerified match {
+                                case true =>
+                                  <.span(" ", Bootstrap.FontAwesomeIcon("check", fixedWidth = true))
+                                case false if rowNumber == 0 =>
+                                  <.span(" ", balanceCheckConfirmButton(reservoir, entry))
+                                case _ => VdomArray.empty()
                               },
-                              <.span(
-                                ^.className := "table-hover-buttons",
-                                <<.joinWithSpaces(
-                                  uielements.AccountingEditButtons.transactionGroupEditButtons(entry.groupId) +:
-                                    ifThenSeq(
-                                      !entry.balanceVerified && rowNumber == 0,
-                                      balanceCheckConfirmButton(reservoir, entry),
-                                    )
-                                ),
-                              ),
                             ),
+                            <.td(uielements.AccountingEditButtons.transactionGroupEditButtons(entry.groupId)),
                           )
                         case entry @ CashFlowEntry.BalanceCorrection(balanceCorrection, expectedAmount) =>
                           Seq[VdomElement](
@@ -200,7 +194,9 @@ final class CashFlow(implicit
   )(implicit router: RouterContext): VdomElement = {
     val link = router.anchorWithHrefTo(AppPages.NewTransactionGroupFromReservoir(reservoir))
     Bootstrap.Button(Variant.info, Size.xs, tag = link)(
-      <.i(^.className := "icon-new-empty")
+      <.i(^.className := "icon-new-empty"),
+      " ",
+      i18n("app.add-new"),
     )
   }
 
