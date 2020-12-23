@@ -36,6 +36,25 @@
     padding-left: 20px;
     color: #999;
   }
+
+  tr {
+    transform: scale(1);
+
+    .table-hover-buttons {
+      visibility: hidden;
+
+      text-align: right;
+      padding: 5px 0;
+
+      position: absolute;
+      z-index: 1;
+      top: 0px;
+      right: 10px;
+    }
+    &:hover .table-hover-buttons {
+      visibility: visible;
+    }
+  }
 }
 
 .btn-huge {
