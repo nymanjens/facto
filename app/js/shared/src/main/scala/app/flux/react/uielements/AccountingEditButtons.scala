@@ -22,7 +22,9 @@ object AccountingEditButtons {
     )
   }
 
-  def transactionGroupEditButton(groupId: Long)(implicit router: RouterContext, i18n: I18n): VdomElement = {
+  private def transactionGroupEditButton(
+      groupId: Long
+  )(implicit router: RouterContext, i18n: I18n): VdomElement = {
     Bootstrap
       .Button(
         Variant.default,
