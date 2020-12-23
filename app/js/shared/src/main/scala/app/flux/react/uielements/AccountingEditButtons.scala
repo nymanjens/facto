@@ -29,20 +29,19 @@ object AccountingEditButtons {
         Size.xs,
         tag = router.anchorWithHrefTo(AppPages.EditTransactionGroup(groupId)),
       )(
-        Bootstrap.FontAwesomeIcon("pencil", fixedWidth = true),
-        " ",
-        i18n("app.edit"),
+        Bootstrap.FontAwesomeIcon("pencil", fixedWidth = true)
       )
   }
 
   private def transactionGroupCopyButton(
       groupId: Long
   )(implicit router: RouterContext, i18n: I18n): VdomElement = {
-    Bootstrap.Button(Variant.info, Size.xs, tag = <.a)(
-      Bootstrap.FontAwesomeIcon("copy"),
-      ^.onClick --> LogExceptionsCallback {
-        router.setPage(AppPages.NewTransactionGroupFromCopy(transactionGroupId = groupId))
-      },
+    Bootstrap.Button(
+      Variant.default,
+      Size.xs,
+      tag = router.anchorWithHrefTo(AppPages.NewTransactionGroupFromCopy(transactionGroupId = groupId)),
+    )(
+      Bootstrap.FontAwesomeIcon("copy")
     )
   }
 

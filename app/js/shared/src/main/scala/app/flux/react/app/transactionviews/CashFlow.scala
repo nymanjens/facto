@@ -195,8 +195,6 @@ final class CashFlow(implicit
     val link = router.anchorWithHrefTo(AppPages.NewTransactionGroupFromReservoir(reservoir))
     Bootstrap.Button(Variant.info, Size.xs, tag = link)(
       <.i(^.className := "icon-new-empty"),
-      " ",
-      i18n("app.add-new"),
     )
   }
 
