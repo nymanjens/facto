@@ -66,7 +66,7 @@ final class SearchResults(implicit
                 <.td(entry.categories.map(_.name).mkString(", ")),
                 <.td(descriptionWithEntryCount(entry)),
                 <.td(uielements.MoneyWithCurrency(entry.flow)),
-                <.td(uielements.AccountingEditButtons.transactionGroupEditButtons(entry.groupId)),
+                <.td(uielements.TransactionGroupEditButtons(entry.groupId)),
               ),
           )
         ),

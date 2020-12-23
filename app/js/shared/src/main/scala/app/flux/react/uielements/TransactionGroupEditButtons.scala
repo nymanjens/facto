@@ -11,18 +11,18 @@ import hydro.flux.react.uielements.Bootstrap.Variant
 import hydro.flux.router.RouterContext
 import japgolly.scalajs.react.vdom.html_<^._
 
-object AccountingEditButtons {
+object TransactionGroupEditButtons {
 
-  def transactionGroupEditButtons(groupId: Long)(implicit router: RouterContext, i18n: I18n): VdomArray = {
+  def apply(groupId: Long)(implicit router: RouterContext, i18n: I18n): VdomArray = {
     <<.joinWithSpaces(
       Seq(
-        transactionGroupEditButton(groupId),
-        transactionGroupCopyButton(groupId),
+        editButton(groupId),
+        copyButton(groupId),
       )
     )
   }
 
-  private def transactionGroupEditButton(
+  private def editButton(
       groupId: Long
   )(implicit router: RouterContext, i18n: I18n): VdomElement = {
     Bootstrap
@@ -35,7 +35,7 @@ object AccountingEditButtons {
       )
   }
 
-  private def transactionGroupCopyButton(
+  private def copyButton(
       groupId: Long
   )(implicit router: RouterContext, i18n: I18n): VdomElement = {
     Bootstrap.Button(
