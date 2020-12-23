@@ -120,7 +120,7 @@ final class CashFlow(implicit
                               <.span(
                                 ^.className := "table-hover-buttons",
                                 <<.joinWithSpaces(
-                                  uielements.AccountingEditButtons.transactionGroupEditButton(entry.groupId) +:
+                                  uielements.AccountingEditButtons.transactionGroupEditButtons(entry.groupId) +:
                                     ifThenSeq(
                                       !entry.balanceVerified && rowNumber == 0,
                                       balanceCheckConfirmButton(reservoir, entry),
