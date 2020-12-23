@@ -98,7 +98,7 @@ final class Liquidation(implicit
                     <.td(descriptionWithEntryCount(entry)),
                     <.td(uielements.MoneyWithCurrency(entry.flow)),
                     <.td(uielements.MoneyWithCurrency(entry.debt)),
-                    <.td(uielements.TransactionGroupEditButton(entry.groupId)),
+                    <.td(uielements.AccountingEditButtons.transactionGroupEditButton(entry.groupId)),
                   ),
               )
             }
