@@ -83,7 +83,7 @@ final class Endowments(implicit
                     <.td(entry.categories.map(_.name).mkString(", ")),
                     <.td(descriptionWithEntryCount(entry)),
                     <.td(uielements.MoneyWithCurrency(entry.flow)),
-                    <.td(uielements.TransactionGroupEditButton(entry.groupId)),
+                    <.td(uielements.TransactionGroupEditButtons(entry.groupId)),
                   ),
               )
             }

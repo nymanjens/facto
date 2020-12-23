@@ -121,7 +121,11 @@ final class CashFlow(implicit
                                 case _ => VdomArray.empty()
                               },
                             ),
-                            <.td(uielements.TransactionGroupEditButton(entry.groupId)),
+                            <.td(
+                              uielements.TransactionGroupEditButtons(
+                                entry.groupId
+                              )
+                            ),
                           )
                         case entry @ CashFlowEntry.BalanceCorrection(balanceCorrection, expectedAmount) =>
                           Seq[VdomElement](
@@ -194,9 +198,7 @@ final class CashFlow(implicit
   )(implicit router: RouterContext): VdomElement = {
     val link = router.anchorWithHrefTo(AppPages.NewTransactionGroupFromReservoir(reservoir))
     Bootstrap.Button(Variant.info, Size.xs, tag = link)(
-      <.i(^.className := "icon-new-empty"),
-      " ",
-      i18n("app.add-new"),
+      <.i(^.className := "icon-new-empty")
     )
   }
 
@@ -224,9 +226,7 @@ final class CashFlow(implicit
   def balanceCheckEditButton(balanceCorrection: BalanceCheck)(implicit router: RouterContext): VdomElement = {
     val link = router.anchorWithHrefTo(AppPages.EditBalanceCheck(balanceCorrection))
     Bootstrap.Button(size = Size.xs, tag = link)(
-      Bootstrap.FontAwesomeIcon("pencil", fixedWidth = true),
-      " ",
-      i18n("app.edit"),
+      Bootstrap.FontAwesomeIcon("pencil", fixedWidth = true)
     )
   }
 
