@@ -155,6 +155,7 @@ final class BalanceCheckForm(implicit
                   showErrorMessage = state.showErrorMessages,
                   additionalValidator = mappedExtraProps.additionalValidator,
                   focusOnMount = true,
+                  autoComplete = false,
                   arrowHandler = TextInput.ArrowHandler.DateHandler,
                 )
               },

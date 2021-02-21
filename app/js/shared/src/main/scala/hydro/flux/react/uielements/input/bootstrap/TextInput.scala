@@ -38,6 +38,9 @@ object TextInput {
         ^.value := valueString,
         ^.onChange ==> ((event: ReactEventFromInput) => onChange(event.target.value)),
         ^.autoFocus := extraProps.focusOnMount,
+        ^^.ifThen(!extraProps.autoComplete) {
+          ^.autoComplete.off
+        },
         ^.disabled := extraProps.disabled,
         ^^.ifDefined(extraProps.arrowHandler) { arrowHandler =>
           ^.onKeyDown ==> handleKeyDown(arrowHandler, currentValue = valueString, onChange = onChange),
@@ -58,6 +61,7 @@ object TextInput {
       additionalValidator: InputValidator[String] = InputValidator.alwaysValid,
       inputClasses: Seq[String] = Seq(),
       focusOnMount: Boolean = false,
+      autoComplete: Boolean = true,
       disabled: Boolean = false,
       arrowHandler: ArrowHandler = null,
       listener: InputBase.Listener[String] = InputBase.Listener.nullInstance,
@@ -75,6 +79,7 @@ object TextInput {
       extra = ExtraProps(
         inputType = inputType,
         focusOnMount = focusOnMount,
+        autoComplete = autoComplete,
         disabled = disabled,
         arrowHandler = Option(arrowHandler),
       ),
@@ -117,6 +122,7 @@ object TextInput {
   case class ExtraProps private[TextInput] (
       inputType: String,
       focusOnMount: Boolean,
+      autoComplete: Boolean,
       disabled: Boolean,
       arrowHandler: Option[ArrowHandler],
   )
