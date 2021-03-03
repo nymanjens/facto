@@ -18,7 +18,7 @@ object DesktopKeyCombination {
 
     if (key.length == 1) {
       CharacterKey(
-        character = getOnlyElement(key),
+        character = getOnlyElement(key).toLower,
         ctrl = ctrl,
         shift = event.shiftKey,
         alt = event.altKey,
@@ -43,13 +43,21 @@ object DesktopKeyCombination {
     }
   }
 
+  /** @param character Must be lowercase */
   case class CharacterKey(
       character: Char,
       override val ctrl: Boolean,
       override val shift: Boolean,
       override val alt: Boolean,
       override val meta: Boolean,
-  ) extends DesktopKeyCombination
+  ) extends DesktopKeyCombination {
+    require(character == character.toLower, "character must be lowercase for an unambiguous comparison")
+
+    def capitalizedCharacter: Char = {
+      if (shift) character.toUpper
+      else character
+    }
+  }
 
   case class SpecialKey(
       specialKeyType: SpecialKeyType,
