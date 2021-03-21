@@ -110,11 +110,12 @@ private[transactiongroupform] final class TransactionPanel(implicit
       ref: Reference,
       title: String,
       defaultValues: Transaction.Partial,
-      forceFlowValue: Option[ReferenceMoney] = None,
+      forceFlowValue: Option[ReferenceMoney],
+      fractionToShow: Option[Double],
       showErrorMessages: Boolean,
       defaultPanel: Option[Proxy],
       focusOnMount: Boolean,
-      closeButtonCallback: Option[Callback] = None,
+      closeButtonCallback: Option[Callback],
       onFormChange: () => Unit,
   ): VdomElement = {
 
@@ -122,6 +123,7 @@ private[transactiongroupform] final class TransactionPanel(implicit
       title = title,
       defaultValues = defaultValues,
       forceFlowValue = forceFlowValue,
+      fractionToShow = fractionToShow,
       showErrorMessages = showErrorMessages,
       defaultPanel = defaultPanel,
       focusOnMount = focusOnMount,
@@ -233,6 +235,7 @@ private[transactiongroupform] final class TransactionPanel(implicit
       title: String,
       defaultValues: Transaction.Partial,
       forceFlowValue: Option[ReferenceMoney],
+      fractionToShow: Option[Double],
       showErrorMessages: Boolean,
       defaultPanel: Option[Proxy],
       focusOnMount: Boolean,
@@ -421,7 +424,7 @@ private[transactiongroupform] final class TransactionPanel(implicit
           currency = state.moneyReservoir.currency,
           listener = AnythingChangedListener,
           addon = cents =>
-            ifThenOption(state.moneyReservoir.currency.isForeign) {
+            ifThenOption[VdomNode](state.moneyReservoir.currency.isForeign) {
               <.span(
                 <.i(^.className := Currency.default.iconClass),
                 " ",
@@ -431,7 +434,11 @@ private[transactiongroupform] final class TransactionPanel(implicit
                   state.transactionDate,
                 ).exchangedForReferenceCurrency.formatFloat,
               )
-            }, // orElse ifThenOption(),
+            } orElse props.fractionToShow.map { fraction =>
+              <.span(
+                f"${fraction * 100}%1.1f %%"
+              )
+            },
         ),
         TextAreaInput(
           ref = detailDescriptionRef,

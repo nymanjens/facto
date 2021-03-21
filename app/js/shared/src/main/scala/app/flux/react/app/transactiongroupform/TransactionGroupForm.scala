@@ -1,9 +1,5 @@
 package app.flux.react.app.transactiongroupform
 
-import hydro.flux.react.uielements.Bootstrap
-import hydro.flux.react.uielements.Bootstrap.Size
-import hydro.flux.react.uielements.Bootstrap.Variant
-import hydro.common.I18n
 import app.common.money.Currency
 import app.common.money.ExchangeRateManager
 import app.common.money.ReferenceMoney
@@ -20,20 +16,22 @@ import app.models.accounting.TransactionGroup
 import app.models.accounting.config.Account
 import app.models.accounting.config.Config
 import app.models.user.User
+import hydro.common.I18n
 import hydro.common.JsLoggingUtils.LogExceptionsCallback
 import hydro.common.JsLoggingUtils.LogExceptionsFuture
 import hydro.common.JsLoggingUtils.logExceptions
 import hydro.common.time.Clock
 import hydro.common.time.JavaTimeImplicits._
-import hydro.common.time.LocalDateTime
+import hydro.common.ScalaUtils.ifThenOption
 import hydro.flux.action.Dispatcher
+import hydro.flux.react.uielements.Bootstrap
+import hydro.flux.react.uielements.Bootstrap.Variant
 import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.ReactVdomUtils.^^
 import hydro.flux.react.uielements.PageHeader
 import hydro.flux.react.uielements.WaitForFuture
 import hydro.flux.router.RouterContext
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.extra.router.Path
 import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.async.Async.async
@@ -72,6 +70,7 @@ final class TransactionGroupForm(implicit
           }
           State(
             panelIndices = 0 until numberOfTransactions,
+            flowFractions = (0 until numberOfTransactions).map(_ => 0.0),
             nextPanelIndex = numberOfTransactions,
             // The following fields are updated by onFormChange() when the component is mounted
             foreignCurrency = None,
@@ -281,6 +280,7 @@ final class TransactionGroupForm(implicit
    */
   private case class State(
       panelIndices: Seq[Int],
+      flowFractions: Seq[Double],
       nextPanelIndex: Int,
       showErrorMessages: Boolean = false,
       globalErrorMessage: Option[String] = None,
@@ -289,9 +289,28 @@ final class TransactionGroupForm(implicit
       totalFlow: ReferenceMoney,
       totalFlowExceptLast: ReferenceMoney,
   ) {
-    def plusPanel(): State =
-      copy(panelIndices = panelIndices :+ nextPanelIndex, nextPanelIndex = nextPanelIndex + 1)
-    def minusPanelIndex(index: Int): State = copy(panelIndices = panelIndices.filter(_ != index))
+    def plusPanel(panelRef: Int => transactionPanel.Reference): State = {
+      copy(
+        panelIndices = panelIndices :+ nextPanelIndex,
+        flowFractions = flowFractions :+ 0.0,
+        nextPanelIndex = nextPanelIndex + 1,
+      ).withRefreshedFlowFractions(panelRef)
+    }
+
+    def minusPanelIndex(index: Int, panelRef: Int => transactionPanel.Reference): State = {
+      copy(panelIndices = panelIndices.filter(_ != index)).withRefreshedFlowFractions(panelRef)
+    }
+
+    def withRefreshedFlowFractions(panelRef: Int => transactionPanel.Reference): State = {
+      val flows = for (panelIndex <- panelIndices) yield {
+        val datedMoney = panelRef(panelIndex).apply().flowValueOrDefault
+        datedMoney.exchangedForReferenceCurrency
+      }
+      val sumOfFlow = flows.sum
+      copy(
+        flowFractions = flows.map(flow => if (sumOfFlow.isZero) 0.0 else flow.toDouble / sumOfFlow.toDouble)
+      )
+    }
   }
 
   private case class Props(
@@ -373,6 +392,11 @@ final class TransactionGroupForm(implicit
                   } else {
                     None
                   },
+                  fractionToShow = ifThenOption(
+                    state.panelIndices.size >= 2 && !state.foreignCurrency.isDefined && !state.totalFlow.isZero
+                  ) {
+                    state.flowFractions(i)
+                  },
                   showErrorMessages = state.showErrorMessages,
                   defaultPanel =
                     if (firstPanel) None else Some(panelRef(panelIndex = state.panelIndices.head)()),
@@ -411,12 +435,12 @@ final class TransactionGroupForm(implicit
     }
 
     private val addTransactionPanelCallback: Callback = LogExceptionsCallback {
-      $.modState(state => logExceptions(state.plusPanel())).runNow()
+      $.modState(state => logExceptions(state.plusPanel(panelRef))).runNow()
       LogExceptionsFuture(onFormChange()) // Make sure the state is updated after this
     }
 
     private def removeTransactionPanel(index: Int): Callback = LogExceptionsCallback {
-      $.modState(state => logExceptions(state.minusPanelIndex(index))).runNow()
+      $.modState(state => logExceptions(state.minusPanelIndex(index, panelRef))).runNow()
       LogExceptionsFuture(onFormChange()) // Make sure the state is updated after this
     }
 
@@ -450,7 +474,7 @@ final class TransactionGroupForm(implicit
           var newState = state.copy(
             foreignCurrency = currencies.find(_.isForeign),
             totalFlowExceptLast = flows.dropRight(1).sum,
-          )
+          ).withRefreshedFlowFractions(panelRef)
           if (state.totalFlowRestriction == TotalFlowRestriction.AnyTotal) {
             newState = newState.copy(totalFlow = flows.sum)
           }
