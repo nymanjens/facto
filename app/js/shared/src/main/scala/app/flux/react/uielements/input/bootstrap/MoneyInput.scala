@@ -35,19 +35,13 @@ object MoneyInput {
         onChange: String => Callback,
         extraProps: ExtraProps,
     ) => {
-      def referenceMoney(currency: Currency, date: LocalDateTime) = {
-        val datedMoney = {
-          val cents = ValueTransformer.stringToValue(valueString, extraProps) getOrElse 0L
-          DatedMoney(cents, currency, date)
-        }
-        datedMoney.exchangedForReferenceCurrency(extraProps.exchangeRateManager)
-      }
       def materializeInputIfValid(): Callback = {
         ValueTransformer.stringToValue(valueString, extraProps) match {
           case Some(cents) => onChange(ValueTransformer.valueToString(cents, extraProps))
           case None        => Callback.empty
         }
       }
+      val value = ValueTransformer.stringToValue(valueString, extraProps) getOrElse 0L
 
       Bootstrap.InputGroup(
         Bootstrap.InputGroupAddon(
@@ -63,47 +57,12 @@ object MoneyInput {
           ^.onChange ==> ((event: ReactEventFromInput) => onChange(event.target.value)),
           ^.onBlur ==> ((event: ReactEventFromInput) => materializeInputIfValid()),
         ),
-        ^^.ifThen(extraProps.currency.isForeign && extraProps.dateForCurrencyConversion.isDefined) {
-          Bootstrap.InputGroupAddon(
-            <.i(^.className := Currency.default.iconClass),
-            " ",
-            referenceMoney(extraProps.currency, extraProps.dateForCurrencyConversion.get).formatFloat,
-          )
-        },
+        ^^.ifDefined(extraProps.addon(value))(t => Bootstrap.InputGroupAddon(t)),
       )
     },
   )
 
   // **************** API ****************//
-  def withCurrencyConversion(
-      ref: Reference,
-      name: String,
-      label: String,
-      defaultValue: Long,
-      required: Boolean = false,
-      showErrorMessage: Boolean,
-      inputClasses: Seq[String] = Seq(),
-      forceValue: Option[Long] = None,
-      currency: Currency,
-      date: LocalDateTime,
-      listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance,
-  )(implicit
-      exchangeRateManager: ExchangeRateManager,
-      i18n: I18n,
-  ): VdomElement = applyInternal(
-    ref = ref,
-    name = name,
-    label = label,
-    defaultValue = defaultValue,
-    required = required,
-    showErrorMessage = showErrorMessage,
-    inputClasses = inputClasses,
-    forceValue = forceValue,
-    currency = currency,
-    dateForCurrencyConversion = Some(date),
-    listener = listener,
-  )
-
   def apply(
       ref: Reference,
       name: String,
@@ -115,36 +74,7 @@ object MoneyInput {
       forceValue: Option[Long] = None,
       currency: Currency,
       listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance,
-  )(implicit
-      exchangeRateManager: ExchangeRateManager,
-      i18n: I18n,
-  ): VdomElement = applyInternal(
-    ref = ref,
-    name = name,
-    label = label,
-    defaultValue = defaultValue,
-    required = required,
-    showErrorMessage = showErrorMessage,
-    inputClasses = inputClasses,
-    forceValue = forceValue,
-    currency = currency,
-    dateForCurrencyConversion = None,
-    listener = listener,
-  )
-
-  // **************** Private helper methods ****************//
-  private def applyInternal(
-      ref: Reference,
-      name: String,
-      label: String,
-      defaultValue: Long,
-      required: Boolean,
-      showErrorMessage: Boolean,
-      inputClasses: Seq[String],
-      forceValue: Option[Long],
-      currency: Currency,
-      dateForCurrencyConversion: Option[LocalDateTime],
-      listener: InputBase.Listener[Value],
+      addon: Value => Option[VdomNode] = _ => None,
   )(implicit
       exchangeRateManager: ExchangeRateManager,
       i18n: I18n,
@@ -160,7 +90,7 @@ object MoneyInput {
       extra = ExtraProps(
         forceValue = forceValue,
         currency = currency,
-        dateForCurrencyConversion = dateForCurrencyConversion,
+        addon = addon,
       ),
       valueTransformer = ValueTransformer,
     )
@@ -177,7 +107,7 @@ object MoneyInput {
   case class ExtraProps(
       forceValue: Option[Long],
       currency: Currency,
-      dateForCurrencyConversion: Option[LocalDateTime],
+      addon: Value => Option[VdomNode],
   )(implicit val exchangeRateManager: ExchangeRateManager)
 
   // **************** Private inner types ****************//

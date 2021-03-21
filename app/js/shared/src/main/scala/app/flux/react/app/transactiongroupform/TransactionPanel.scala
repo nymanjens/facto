@@ -28,12 +28,15 @@ import app.common.SinglePendingTaskQueue
 import hydro.common.time.Clock
 import hydro.common.time.LocalDateTime
 import hydro.common.time.LocalDateTimes
+import hydro.common.ScalaUtils.ifThenOption
 import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.uielements.HalfPanel
 import hydro.flux.react.uielements.input.InputBase
 import hydro.flux.react.uielements.input.bootstrap.SelectInput
 import hydro.flux.react.uielements.input.bootstrap.TextAreaInput
 import hydro.flux.react.uielements.input.bootstrap.TextInput
+import hydro.flux.react.uielements.Bootstrap
+import hydro.flux.react.ReactVdomUtils.^^
 import hydro.models.access.DbQueryImplicits._
 import japgolly.scalajs.react.Ref.ToScalaComponent
 import japgolly.scalajs.react._
@@ -403,7 +406,7 @@ private[transactiongroupform] final class TransactionPanel(implicit
             listener = AnythingChangedListener,
           )
         },
-        MoneyInput.withCurrencyConversion(
+        MoneyInput(
           ref = flowRef,
           name = "flow",
           label = i18n("app.flow"),
@@ -416,8 +419,19 @@ private[transactiongroupform] final class TransactionPanel(implicit
               .cents
           ),
           currency = state.moneyReservoir.currency,
-          date = state.transactionDate,
           listener = AnythingChangedListener,
+          addon = cents =>
+            ifThenOption(state.moneyReservoir.currency.isForeign) {
+              <.span(
+                <.i(^.className := Currency.default.iconClass),
+                " ",
+                DatedMoney(
+                  cents,
+                  state.moneyReservoir.currency,
+                  state.transactionDate,
+                ).exchangedForReferenceCurrency.formatFloat,
+              )
+            }, // orElse ifThenOption(),
         ),
         TextAreaInput(
           ref = detailDescriptionRef,
