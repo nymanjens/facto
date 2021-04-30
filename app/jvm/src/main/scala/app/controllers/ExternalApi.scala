@@ -56,18 +56,9 @@ final class ExternalApi @Inject() (implicit
     implicit request =>
       validateApplicationSecret(applicationSecret)
 
-      implicit val issuer = Users.getOrCreateRobotUser()
-      val template = accountingConfig.templateWithCode(templateCode)
-
-      val groupAddition = EntityModification.createAddWithRandomId(TransactionGroup(createdDate = clock.now))
-      val transactionsWithoutId = toTransactions(template, transactionGroup = groupAddition.entity, issuer)
-      val transactionAdditions =
-        for ((transactionWithoutId, id) <- zipWithIncrementingId(transactionsWithoutId)) yield {
-          EntityModification.createAddWithId(id, transactionWithoutId)
-        }
-
-      entityAccess.persistEntityModifications(
-        groupAddition +: transactionAdditions
+      persistTransactionGroup(transactionsWithoutIdFunc =
+        (group, issuer) =>
+          toTransactions(accountingConfig.templateWithCode(templateCode), transactionGroup = group, issuer)
       )
 
       Ok("OK")
@@ -80,21 +71,12 @@ final class ExternalApi @Inject() (implicit
       s"This method requires POST text data (text/plain) in YAML format, but got ${request.body}",
     )
 
-    implicit val issuer = Users.getOrCreateRobotUser()
-
-    val groupAddition = EntityModification.createAddWithRandomId(TransactionGroup(createdDate = clock.now))
-
-    val transactionsWithoutId: Seq[Transaction] = ValidatingYamlParser.parse(
-      request.body.asText.get,
-      TransactionGroupParsableValue(transactionGroupId = groupAddition.entity.id, issuerId = issuer.id),
-    )
-    val transactionAdditions =
-      for ((transactionWithoutId, id) <- zipWithIncrementingId(transactionsWithoutId)) yield {
-        EntityModification.createAddWithId(id, transactionWithoutId)
-      }
-
-    entityAccess.persistEntityModifications(
-      groupAddition +: transactionAdditions
+    persistTransactionGroup(transactionsWithoutIdFunc =
+      (group, issuer) =>
+        ValidatingYamlParser.parse(
+          request.body.asText.get,
+          TransactionGroupParsableValue(transactionGroupId = group.id, issuerId = issuer.id),
+        )
     )
 
     Ok("OK")
@@ -216,6 +198,24 @@ final class ExternalApi @Inject() (implicit
     require(
       applicationSecret == realApplicationSecret,
       s"Invalid application secret. Found '$applicationSecret' but should be '$realApplicationSecret'",
+    )
+  }
+
+  private def persistTransactionGroup(
+      transactionsWithoutIdFunc: (TransactionGroup, User) => Seq[Transaction]
+  ) = {
+    implicit val issuer = Users.getOrCreateRobotUser()
+
+    val groupAddition = EntityModification.createAddWithRandomId(TransactionGroup(createdDate = clock.now))
+
+    val transactionsWithoutId: Seq[Transaction] = transactionsWithoutIdFunc(groupAddition.entity, issuer)
+    val transactionAdditions =
+      for ((transactionWithoutId, id) <- zipWithIncrementingId(transactionsWithoutId)) yield {
+        EntityModification.createAddWithId(id, transactionWithoutId)
+      }
+
+    entityAccess.persistEntityModifications(
+      groupAddition +: transactionAdditions
     )
   }
 
