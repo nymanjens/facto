@@ -1,5 +1,9 @@
 package hydro.common
 
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+
 import hydro.common.GuavaReplacement.Preconditions.checkNotNull
 import hydro.common.ValidatingYamlParser.ParsableValue.MapParsableValue.MaybeRequiredMapValue
 import hydro.common.ValidatingYamlParser.ParsableValue.MapParsableValue.MaybeRequiredMapValue.Optional
@@ -85,13 +89,23 @@ object ValidatingYamlParser {
     object LocalDateTimeValue extends ParsableValue[LocalDateTime] {
       override def parse(yamlValue: Any) = {
         yamlValue match {
+          case v: java.util.Date =>
+            ParseResult.success(
+              LocalDateTime.of(
+                java.time.LocalDateTime.ofInstant(v.toInstant, ZoneId.systemDefault()).toLocalDate,
+                LocalTime.MIN,
+              )
+            )
           case v: String =>
             try {
               ParseResult.success(TimeUtils.parseDateString(v))
             } catch {
               case e: Exception => ParseResult.onlyError(e.getMessage)
             }
-          case _ => ParseResult.onlyError(s"Expected a date in yyyy-mm-dd format, but found $yamlValue")
+          case _ =>
+            ParseResult.onlyError(
+              s"Expected a date in yyyy-mm-dd format, but found $yamlValue of type ${yamlValue.getClass}"
+            )
         }
       }
     }
