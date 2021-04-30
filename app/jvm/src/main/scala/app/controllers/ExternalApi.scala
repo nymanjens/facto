@@ -1,6 +1,7 @@
 package app.controllers
 
 import java.net.URLDecoder
+import java.time.LocalTime
 
 import app.common.accounting.ComplexQueryFilter
 import app.common.money.Currency
@@ -13,21 +14,31 @@ import app.models.accounting.config.Account
 import app.models.accounting.config.Config
 import app.models.accounting.config.MoneyReservoir
 import app.models.accounting.config.Template
-import hydro.models.modification.EntityModification
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
 import app.models.user.Users
 import com.google.inject.Inject
+import hydro.common.ValidatingYamlParser.ParsableValue.DoubleValue
+import hydro.common.ValidatingYamlParser.ParsableValue.ListParsableValue
+import hydro.common.ValidatingYamlParser.ParsableValue.LocalDateTimeValue
+import hydro.common.ValidatingYamlParser.ParsableValue.MapParsableValue
+import hydro.common.ValidatingYamlParser.ParsableValue.MapParsableValue.MaybeRequiredMapValue.Optional
+import hydro.common.ValidatingYamlParser.ParsableValue.MapParsableValue.MaybeRequiredMapValue.Required
+import hydro.common.ValidatingYamlParser.ParsableValue.MapParsableValue.StringMap
+import hydro.common.ValidatingYamlParser.ParsableValue.StringValue
 import hydro.common.time.Clock
+import hydro.common.time.LocalDateTime
 import hydro.common.time.TimeUtils
+import hydro.common.ScalaUtils.ifThenOption
+import hydro.common.Tags
+import hydro.common.ValidatingYamlParser
+import hydro.models.modification.EntityModification
 import hydro.models.Entity
-import hydro.models.access.DbQuery.Sorting
 import hydro.models.access.DbQueryImplicits._
 import play.api.i18n.I18nSupport
 import play.api.i18n.MessagesApi
 import play.api.mvc._
 
-import scala.async.Async.await
 import scala.collection.immutable.Seq
 
 final class ExternalApi @Inject() (implicit
@@ -60,6 +71,33 @@ final class ExternalApi @Inject() (implicit
       )
 
       Ok("OK")
+  }
+
+  def addTransaction(applicationSecret: String) = Action { implicit request =>
+    validateApplicationSecret(applicationSecret)
+    require(
+      request.body.asText.isDefined,
+      s"This method requires POST text data (text/plain) in YAML format, but got ${request.body}",
+    )
+
+    implicit val issuer = Users.getOrCreateRobotUser()
+
+    val groupAddition = EntityModification.createAddWithRandomId(TransactionGroup(createdDate = clock.now))
+
+    val transactionsWithoutId: Seq[Transaction] = ValidatingYamlParser.parse(
+      request.body.asText.get,
+      TransactionGroupParsableValue(transactionGroupId = groupAddition.entity.id, issuerId = issuer.id),
+    )
+    val transactionAdditions =
+      for ((transactionWithoutId, id) <- zipWithIncrementingId(transactionsWithoutId)) yield {
+        EntityModification.createAddWithId(id, transactionWithoutId)
+      }
+
+    entityAccess.persistEntityModifications(
+      groupAddition +: transactionAdditions
+    )
+
+    Ok("OK")
   }
 
   def addExchangeRateMeasurement(
@@ -259,5 +297,74 @@ final class ExternalApi @Inject() (implicit
       start until end
     }
     entities zip ids
+  }
+
+  private case class TransactionGroupParsableValue(transactionGroupId: Long, issuerId: Long)
+      extends MapParsableValue[Seq[Transaction]] {
+    private val transactionParsableValue = TransactionParsableValue(transactionGroupId, issuerId)
+
+    override val supportedKeyValuePairs = Map(
+      "transactions" -> Required(ListParsableValue(transactionParsableValue)(_.description))
+    )
+    override def parseFromParsedMapValues(map: StringMap) = {
+      map.required[Seq[Transaction]]("transactions")
+    }
+  }
+
+  private case class TransactionParsableValue(transactionGroupId: Long, issuerId: Long)
+      extends MapParsableValue[Transaction] {
+    override val supportedKeyValuePairs = Map(
+      "beneficiaryCode" -> Required(StringValue),
+      "moneyReservoirCode" -> Required(StringValue),
+      "categoryCode" -> Required(StringValue),
+      "description" -> Required(StringValue),
+      "flowAsFloat" -> Required(DoubleValue),
+      "detailDescription" -> Optional(StringValue),
+      "tags" -> Optional(ListParsableValue(StringValue)(s => s)),
+      "transactionDate" -> Optional(LocalDateTimeValue),
+      "consumedDate" -> Optional(LocalDateTimeValue),
+    )
+    override def parseFromParsedMapValues(map: StringMap) = {
+      val today = LocalDateTime.of(clock.now.toLocalDate, LocalTime.MIN)
+
+      Transaction(
+        transactionGroupId = transactionGroupId,
+        issuerId = issuerId,
+        beneficiaryAccountCode = map.required[String]("beneficiaryCode"),
+        moneyReservoirCode = map.required[String]("moneyReservoirCode"),
+        categoryCode = map.required[String]("categoryCode"),
+        description = map.required[String]("description"),
+        flowInCents = (map.required[Double]("flowAsFloat") * 100).round,
+        detailDescription = map.optional("detailDescription", defaultValue = ""),
+        tags = map.optional("tags", defaultValue = Seq()),
+        createdDate = clock.now,
+        transactionDate = map.optional("transactionDate", defaultValue = today),
+        consumedDate = map.optional("consumedDate", defaultValue = today),
+      )
+    }
+
+    override def additionalValidationErrors(transaction: Transaction): Seq[String] = {
+      def maybeError(
+          fieldName: String,
+          getter: Transaction => String,
+          options: Traversable[String],
+      ): Option[String] = {
+        ifThenOption(!options.toSet.contains(getter(transaction))) {
+          s"$fieldName=${getter(transaction)} was not recognized (valid values: ${options}",
+        }
+      }
+
+      val allMoneyReservoirs =
+        accountingConfig.moneyReservoirs(includeHidden = true, includeNullReservoir = true).map(_.code)
+
+      Seq(
+        maybeError("beneficiaryAccountCode", _.beneficiaryAccountCode, accountingConfig.accounts.keySet),
+        maybeError("moneyReservoirCode", _.moneyReservoirCode, allMoneyReservoirs),
+        maybeError("categoryCode", _.categoryCode, accountingConfig.categories.keySet),
+        ifThenOption(!transaction.tags.forall(Tags.isValidTag)) {
+          s"Invalid tag in transaction.tags: ${transaction.tags}"
+        },
+      ).flatten
+    }
   }
 }
