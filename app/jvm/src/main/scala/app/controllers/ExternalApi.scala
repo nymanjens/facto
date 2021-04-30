@@ -40,6 +40,8 @@ import play.api.i18n.MessagesApi
 import play.api.mvc._
 
 import scala.collection.immutable.Seq
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 
 final class ExternalApi @Inject() (implicit
     override val messagesApi: MessagesApi,
@@ -78,6 +80,20 @@ final class ExternalApi @Inject() (implicit
           TransactionGroupParsableValue(transactionGroupId = group.id, issuerId = issuer.id),
         )
     )
+
+    Ok("OK")
+  }
+
+  def deleteTransaction(applicationSecret: String, transactionGroupId: Long) = Action { implicit request =>
+    validateApplicationSecret(applicationSecret)
+    implicit val issuer = Users.getOrCreateRobotUser()
+
+    val group: TransactionGroup = entityAccess.newQuerySync[TransactionGroup]().findById(transactionGroupId)
+    val transactions: Seq[Transaction] = Await.result(group.transactions, Duration.Inf)
+
+    val transactionDeletions = transactions map (EntityModification.createRemove(_))
+    val groupDeletion = EntityModification.createRemove(group)
+    entityAccess.persistEntityModifications(transactionDeletions :+ groupDeletion)
 
     Ok("OK")
   }
