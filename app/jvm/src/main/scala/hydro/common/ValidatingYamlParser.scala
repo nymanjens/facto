@@ -7,6 +7,7 @@ import hydro.common.ValidatingYamlParser.ParsableValue.MapParsableValue.MaybeReq
 import hydro.common.ValidatingYamlParser.ParsableValue.MapParsableValue.StringMap
 import hydro.common.ValidatingYamlParser.ParseResult.ValidationError
 import hydro.common.time.LocalDateTime
+import hydro.common.time.TimeUtils
 import org.yaml.snakeyaml.Yaml
 
 import scala.collection.immutable.Seq
@@ -51,6 +52,16 @@ object ValidatingYamlParser {
         }
       }
     }
+    object DoubleValue extends ParsableValue[Double] {
+      override def parse(yamlValue: Any) = {
+        yamlValue match {
+          case v: Int               => ParseResult.success(v.toDouble)
+          case v: java.lang.Integer => ParseResult.success(v.toDouble)
+          case v: java.lang.Double  => ParseResult.success(v.toDouble)
+          case v                    => parsePrimitiveValue[Double](v)
+        }
+      }
+    }
     object StringValue extends ParsableValue[String] {
       override def parse(yamlValue: Any) = {
         yamlValue match {
@@ -68,6 +79,19 @@ object ValidatingYamlParser {
           case "false" | "False" | "FALSE" | "no" | "No" => ParseResult.success(false)
           case v: java.lang.Boolean                      => ParseResult.success[Boolean](v)
           case v                                         => parsePrimitiveValue[Boolean](v)
+        }
+      }
+    }
+    object LocalDateTimeValue extends ParsableValue[LocalDateTime] {
+      override def parse(yamlValue: Any) = {
+        yamlValue match {
+          case v: String =>
+            try {
+              ParseResult.success(TimeUtils.parseDateString(v))
+            } catch {
+              case e: Exception => ParseResult.onlyError(e.getMessage)
+            }
+          case _ => ParseResult.onlyError(s"Expected a date in yyyy-mm-dd format, but found $yamlValue")
         }
       }
     }
@@ -207,6 +231,9 @@ object ValidatingYamlParser {
           def apply(v: IntValue.type): Required[Int] = Required(v, valueIfInvalid = 0)
           def apply(v: StringValue.type): Required[String] = Required(v, valueIfInvalid = "")
           def apply(v: BooleanValue.type): Required[Boolean] = Required(v, valueIfInvalid = false)
+          def apply(v: DoubleValue.type): Required[Double] = Required(v, valueIfInvalid = 0.0)
+          def apply(v: LocalDateTimeValue.type): Required[LocalDateTime] =
+            Required(v, valueIfInvalid = LocalDateTime.MIN)
         }
         case class Optional(override val parsableValue: ParsableValue[_]) extends MaybeRequiredMapValue
       }
