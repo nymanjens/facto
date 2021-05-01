@@ -147,6 +147,22 @@ final class ExternalApi @Inject() (implicit
     Ok(resultBuilder.toString().trim())
   }
 
+  def listCurrentBalances(applicationSecret: String) = Action { implicit request =>
+    validateApplicationSecret(applicationSecret)
+
+    val resultBuilder = StringBuilder.newBuilder
+    resultBuilder.append("OK\n\n")
+
+    for (moneyReservoir <- accountingConfig.moneyReservoirs(includeHidden = true)) {
+      val currentBalance = getCurrentBalance(moneyReservoir)
+      resultBuilder.append(
+        s"${moneyReservoir.code}: { balance: ${currentBalance.toDouble}, currency: ${currentBalance.currency.code} }\n"
+      )
+    }
+
+    Ok(resultBuilder.toString().trim())
+  }
+
   def refactorTransactionCategory(
       encodedSearchString: String,
       newCategoryCode: String,
@@ -298,6 +314,38 @@ final class ExternalApi @Inject() (implicit
           Nil
       }
     findMismatches(mergedRows.toList, currentBalance = MoneyWithGeneralCurrency(0, moneyReservoir.currency))
+  }
+
+  private def getCurrentBalance(moneyReservoir: MoneyReservoir): MoneyWithGeneralCurrency = {
+    val balanceChecks =
+      entityAccess
+        .newQuerySync[BalanceCheck]()
+        .filter(ModelFields.BalanceCheck.moneyReservoirCode === moneyReservoir.code)
+        .data()
+    val transactions =
+      entityAccess
+        .newQuerySync[Transaction]()
+        .filter(ModelFields.Transaction.moneyReservoirCode === moneyReservoir.code)
+        .data()
+
+    // merge the two
+    val mergedRows = (transactions ++ balanceChecks).sortBy {
+      case trans: Transaction => (trans.transactionDate, trans.createdDate)
+      case bc: BalanceCheck   => (bc.checkDate, bc.createdDate)
+    }
+
+    def nextBalance(
+        nextRows: List[Entity],
+        currentBalance: MoneyWithGeneralCurrency,
+    ): MoneyWithGeneralCurrency =
+      (nextRows: @unchecked) match {
+        case (trans: Transaction) :: rest =>
+          nextBalance(rest, currentBalance = currentBalance + trans.flow)
+        case (bc: BalanceCheck) :: rest =>
+          nextBalance(rest, bc.balance)
+        case Nil => currentBalance
+      }
+    nextBalance(mergedRows.toList, currentBalance = MoneyWithGeneralCurrency(0, moneyReservoir.currency))
   }
 
   private def forceSign(money: MoneyWithGeneralCurrency): String = {

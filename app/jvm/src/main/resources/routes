@@ -27,6 +27,7 @@ POST /externalapi/acc/trans/add/:appSecret/  app.controllers.ExternalApi.addTran
 DELETE /externalapi/acc/trans/:transactionGroupId/:appSecret/  app.controllers.ExternalApi.deleteTransaction(appSecret, transactionGroupId: Long)
 GET  /externalapi/acc/money/xchgmeasurement/:date/:currency/:ratio/:appSecret/  app.controllers.ExternalApi.addExchangeRateMeasurement(date, currency, ratio: Double, appSecret)
 GET  /externalapi/acc/bc/list/:appSecret/  app.controllers.ExternalApi.listBalanceCorrections(appSecret)
+GET  /externalapi/acc/balance/list/:appSecret/  app.controllers.ExternalApi.listCurrentBalances(appSecret)
 GET  /externalapi/acc/trans/refactor/:searchString/:newCategory/:dryOrWet/:appSecret/  app.controllers.ExternalApi.refactorTransactionCategory(searchString, newCategory, dryOrWet, appSecret)
 
 # Auth
