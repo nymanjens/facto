@@ -67,11 +67,13 @@ When done, browse to http://<ip_address>:9000/app/useradministration (username: 
 ## Configuration
 - `conf/application.conf`:<br>
   Setup and configure a database here.
-- `conf/accounting-config.yml`:<br>
-  Edit this file to reflect your situation and preferences.
 - Add users:<br>
   A default user is created with the `-DcreateAdminUser` flag (username: admin, password:
   changeme). This account can create new users.
+- `conf/accounting-config.yml`:<br>
+  Edit this file to reflect your situation and preferences. Note that
+  `userLoginName` has to refer to a user that already exists in the database
+  (see previous pointq)
 
 ## Usage
 To effectively use this tool, you must learn to input the transactions correctly. Therefore,
