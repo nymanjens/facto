@@ -73,7 +73,7 @@ When done, browse to http://<ip_address>:9000/app/useradministration (username: 
 - `conf/accounting-config.yml`:<br>
   Edit this file to reflect your situation and preferences. Note that
   `userLoginName` has to refer to a user that already exists in the database
-  (see previous pointq)
+  (see previous point)
 
 ## Usage
 To effectively use this tool, you must learn to input the transactions correctly. Therefore,
