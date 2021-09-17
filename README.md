@@ -36,7 +36,13 @@ Familiy Accounting Tool keeps track of every transaction your family makes. Its 
 
 - Browse to http://localhost:9000/app/useradministration (username: "admin", password: "changeme")
 
-## Installation with Docker
+## Installation with Docker (discouraged)
+
+**Warning:** The following works fine for launching a demo server to have a look.
+But if you want to run this as a service with real data and custom
+configuration, it is recommended to follow the "Installation from release"
+section instead (see [this issue](https://github.com/nymanjens/facto/issues/4)
+for the reasons why).
 
 The following commands will launch a new server alongside a database in Docker containers:
 
