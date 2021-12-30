@@ -28,7 +28,8 @@ DELETE /externalapi/acc/trans/:transactionGroupId/:appSecret/  app.controllers.E
 GET  /externalapi/acc/money/xchgmeasurement/:date/:currency/:ratio/:appSecret/  app.controllers.ExternalApi.addExchangeRateMeasurement(date, currency, ratio: Double, appSecret)
 GET  /externalapi/acc/bc/list/:appSecret/  app.controllers.ExternalApi.listBalanceCorrections(appSecret)
 GET  /externalapi/acc/balance/list/:appSecret/  app.controllers.ExternalApi.listCurrentBalances(appSecret)
-GET  /externalapi/acc/trans/refactor/:searchString/:newCategory/:dryOrWet/:appSecret/  app.controllers.ExternalApi.refactorTransactionCategory(searchString, newCategory, dryOrWet, appSecret)
+GET  /externalapi/acc/refactor/changecategory/:searchString/:newCategory/:dryOrWet/:appSecret/  app.controllers.ExternalApi.refactorTransactionCategory(searchString, newCategory, dryOrWet, appSecret)
+GET  /externalapi/acc/refactor/addtag/:searchString/:tagToAdd/:dryOrWet/:appSecret/  app.controllers.ExternalApi.addTagRefactor(searchString, tagToAdd, dryOrWet, appSecret)
 
 # Auth
 GET  /login/                           hydro.controllers.Auth.login(returnTo ?= "/")

@@ -163,14 +163,60 @@ final class ExternalApi @Inject() (implicit
     Ok(resultBuilder.toString().trim())
   }
 
+  def addTagRefactor(
+      encodedSearchString: String,
+      tagToAdd: String,
+      dryOrWetRun: String,
+      applicationSecret: String,
+  ) = Action { implicit request =>
+    require(Tags.isValidTag(tagToAdd))
+
+    applyRefactor(
+      encodedSearchString = encodedSearchString,
+      updateDescription = s"Adding tag '$tagToAdd'",
+      updateToApplyToMatchingTransactions = t => {
+        if (t.tags contains tagToAdd) t
+        else t.copy(tags = t.tags :+ tagToAdd)
+      },
+      dryOrWetRun = dryOrWetRun,
+      applicationSecret = applicationSecret,
+    )
+  }
+
   def refactorTransactionCategory(
       encodedSearchString: String,
       newCategoryCode: String,
       dryOrWetRun: String,
       applicationSecret: String,
   ) = Action { implicit request =>
-    validateApplicationSecret(applicationSecret)
     require(accountingConfig.categories.contains(newCategoryCode), s"Unrecognized category: $newCategoryCode")
+
+    applyRefactor(
+      encodedSearchString = encodedSearchString,
+      updateDescription = s"Changing category to $newCategoryCode",
+      updateToApplyToMatchingTransactions = _.copy(categoryCode = newCategoryCode),
+      dryOrWetRun = dryOrWetRun,
+      applicationSecret = applicationSecret,
+    )
+  }
+
+  // ********** private helper methods ********** //
+  private def validateApplicationSecret(applicationSecret: String): Unit = {
+    val realApplicationSecret: String = playConfiguration.get[String]("play.http.secret.key")
+    require(
+      applicationSecret == realApplicationSecret,
+      s"Invalid application secret. Found '$applicationSecret' but should be '$realApplicationSecret'",
+    )
+  }
+
+  def applyRefactor(
+      encodedSearchString: String,
+      updateDescription: String,
+      updateToApplyToMatchingTransactions: Transaction => Transaction,
+      dryOrWetRun: String,
+      applicationSecret: String,
+  ) = {
+    validateApplicationSecret(applicationSecret)
 
     val searchString = URLDecoder.decode(encodedSearchString.replace("+", "%2B"), "UTF-8")
     val searchQuery = (new ComplexQueryFilter).fromQuery(searchString)
@@ -180,7 +226,7 @@ final class ExternalApi @Inject() (implicit
         .filter(searchQuery)
         .sort(AppDbQuerySorting.Transaction.deterministicallyByCreateDate.reversed)
         .data()
-    val transactionsToEdit = matchedTransactions.filterNot(_.categoryCode == newCategoryCode)
+    val transactionsToEdit = matchedTransactions.filterNot(t => updateToApplyToMatchingTransactions(t) == t)
 
     implicit val issuer = Users.getOrCreateRobotUser()
     val modifications = (
@@ -197,12 +243,10 @@ final class ExternalApi @Inject() (implicit
         EntityModification.createRemove(transaction),
         EntityModification.createAddWithId(
           newId,
-          transaction.copy(
-            idOption = None,
-            categoryCode =
-              if (transactionsToEdit contains transaction) newCategoryCode
-              else transaction.categoryCode,
-          ),
+          (
+            if (transactionsToEdit contains transaction) updateToApplyToMatchingTransactions(transaction)
+            else transaction
+          ).copy(idOption = None),
         ),
       )
     ).flatten
@@ -214,22 +258,17 @@ final class ExternalApi @Inject() (implicit
 
     Ok(
       s"""searchString                           = $searchString
-         |new category                           = $newCategoryCode
-         |#transactions that match  searchString = ${matchedTransactions.size}
+         |update                                 = $updateDescription
+         |#transactions that match searchString  = ${matchedTransactions.size}
          |#transactions that will be edited      = ${transactionsToEdit.size}
          |#entity modifications                  = ${modifications.size}
          |
          |Run                                    = $dryOrWetRun
+         |
+         |Transactions that will be edited:
+         |
+         |${transactionsToEdit.map(t => s"- ${t.description} (${t.category}, ${t.tags})\n").mkString("")}
          |""".stripMargin
-    )
-  }
-
-  // ********** private helper methods ********** //
-  private def validateApplicationSecret(applicationSecret: String): Unit = {
-    val realApplicationSecret: String = playConfiguration.get[String]("play.http.secret.key")
-    require(
-      applicationSecret == realApplicationSecret,
-      s"Invalid application secret. Found '$applicationSecret' but should be '$realApplicationSecret'",
     )
   }
 
