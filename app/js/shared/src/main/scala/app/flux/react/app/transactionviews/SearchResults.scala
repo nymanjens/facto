@@ -45,6 +45,13 @@ final class SearchResults(implicit
             tableClasses = Seq("table-search"),
             numEntriesStrategy = NumEntriesStrategy(start = 500),
             additionalInput = props.query,
+            calculateExtraTitle = { context =>
+              val totalFlow = context.entriesInChronologicalOrder
+                .flatMap(_.transactions)
+                .map(_.flow.exchangedForReferenceCurrency)
+                .sum
+              Some(s"${i18n("app.total")}: $totalFlow")
+            },
             tableHeaders = Seq(
               <.th(i18n("app.issuer")),
               <.th(i18n("app.payed")),

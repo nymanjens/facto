@@ -89,8 +89,11 @@ final class CashFlow(implicit
                     ),
                     collapsedExpandedStateStore = Some(collapsedExpandedStateStoreHandle.getStore(tableName)),
                     additionalInput = reservoir,
-                    latestEntryToTableTitleExtra =
-                      latestEntry => s"${i18n("app.balance")}: ${latestEntry.balance}",
+                    calculateExtraTitle = { context =>
+                      context.maybeLatestEntry map { latestEntry =>
+                        s"${i18n("app.balance")}: ${latestEntry.balance}"
+                      }
+                    },
                     tableHeaders = Seq(
                       <.th(i18n("app.payed")),
                       <.th(i18n("app.consumed")),

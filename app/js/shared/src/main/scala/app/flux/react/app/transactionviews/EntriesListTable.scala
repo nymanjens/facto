@@ -1,5 +1,6 @@
 package app.flux.react.app.transactionviews
 
+import app.flux.react.app.transactionviews.EntriesListTable.CalculateExtraTitleContext
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.stores.entries.WithIsPending
 import app.flux.stores.entries.factories.EntriesListStoreFactory
@@ -35,7 +36,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](i
       numEntriesStrategy: NumEntriesStrategy,
       collapsedExpandedStateStore: Option[CollapsedExpandedStateStoreFactory.Store] = None,
       additionalInput: AdditionalInput,
-      latestEntryToTableTitleExtra: Entry => String = null,
+      calculateExtraTitle: CalculateExtraTitleContext[Entry] => Option[String] = _ => None,
       hideEmptyTable: Boolean = false,
       tableHeaders: Seq[VdomElement],
       calculateTableData: Entry => Seq[VdomElement],
@@ -47,7 +48,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](i
       numEntriesStrategy = numEntriesStrategy,
       collapsedExpandedStateStore = collapsedExpandedStateStore,
       additionalInput = additionalInput,
-      latestEntryToTableTitleExtra = latestEntryToTableTitleExtra,
+      calculateExtraTitle = calculateExtraTitle,
       hideEmptyTable = hideEmptyTable,
       tableHeaders = tableHeaders,
       calculateTableDataFromEntryAndRowNum = (entry, rowNum) => calculateTableData(entry),
@@ -65,7 +66,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](i
       numEntriesStrategy: NumEntriesStrategy,
       collapsedExpandedStateStore: Option[CollapsedExpandedStateStoreFactory.Store],
       additionalInput: AdditionalInput,
-      latestEntryToTableTitleExtra: Entry => String = null,
+      calculateExtraTitle: CalculateExtraTitleContext[Entry] => Option[String] = _ => None,
       hideEmptyTable: Boolean = false,
       tableHeaders: Seq[VdomElement],
       calculateTableDataFromEntryAndRowNum: (Entry, Int) => Seq[VdomElement],
@@ -78,7 +79,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](i
           tableClasses,
           numEntriesStrategy,
           collapsedExpandedStateStore,
-          latestEntryToTableTitleExtra = Option(latestEntryToTableTitleExtra),
+          calculateExtraTitle = calculateExtraTitle,
           hideEmptyTable,
           tableHeaders,
           calculateTableDataFromEntryAndRowNum,
@@ -103,7 +104,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](i
       tableClasses: Seq[String],
       numEntriesStrategy: NumEntriesStrategy,
       collapsedExpandedStateStore: Option[CollapsedExpandedStateStoreFactory.Store],
-      latestEntryToTableTitleExtra: Option[Entry => String],
+      calculateExtraTitle: CalculateExtraTitleContext[Entry] => Option[String],
       hideEmptyTable: Boolean,
       tableHeaders: Seq[VdomElement],
       calculateTableDataFromEntryAndRowNum: (Entry, Int) => Seq[VdomElement],
@@ -200,10 +201,12 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](i
         case Some(storeState) =>
           val numEntries = storeState.entries.size + (if (storeState.hasMore) "+" else "")
           <.span(
-            <<.ifDefined(props.latestEntryToTableTitleExtra) { latestEntryToTableTitleExtra =>
-              <<.ifDefined(storeState.entries.lastOption) { latestEntry =>
-                <.span(latestEntryToTableTitleExtra(latestEntry.entry), " ")
-              }
+            <<.ifDefined(
+              props.calculateExtraTitle(
+                CalculateExtraTitleContext(entriesInChronologicalOrder = storeState.entries.map(_.entry))
+              )
+            ) { extraTitle =>
+              <.span(extraTitle, " ")
             },
             <.span(s"(${i18n("app.n-entries", numEntries)})"),
           )
@@ -249,6 +252,12 @@ private[transactionviews] object EntriesListTable {
       for ((prev, next) <- seq.dropRight(1) zip seq.drop(1)) {
         require(prev < next, s"$prev should be strictly smaller than $next")
       }
+    }
+  }
+
+  case class CalculateExtraTitleContext[Entry](entriesInChronologicalOrder: Seq[Entry]) {
+    def maybeLatestEntry: Option[Entry] = {
+      entriesInChronologicalOrder.lastOption
     }
   }
 }

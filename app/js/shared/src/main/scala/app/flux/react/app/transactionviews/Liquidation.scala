@@ -77,7 +77,9 @@ final class Liquidation(implicit
                 ),
                 collapsedExpandedStateStore = Some(collapsedExpandedStateStoreHandle.getStore(tableName)),
                 additionalInput = accountPair,
-                latestEntryToTableTitleExtra = latestEntry => latestEntry.debt.toString,
+                calculateExtraTitle = { context =>
+                  context.maybeLatestEntry map { latestEntry => latestEntry.debt.toString }
+                },
                 hideEmptyTable = true,
                 tableHeaders = Seq(
                   <.th(i18n("app.payed")),
