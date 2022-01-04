@@ -16,15 +16,15 @@ object TransactionGroupEditButtons {
   def apply(groupId: Long)(implicit router: RouterContext, i18n: I18n): VdomArray = {
     <<.joinWithSpaces(
       Seq(
-        editButton(groupId),
-        copyButton(groupId),
+        editButton(groupId).apply(^.key := "edit"),
+        copyButton(groupId).apply(^.key := "copy"),
       )
     )
   }
 
   private def editButton(
       groupId: Long
-  )(implicit router: RouterContext, i18n: I18n): VdomElement = {
+  )(implicit router: RouterContext, i18n: I18n): VdomTag = {
     Bootstrap
       .Button(
         Variant.default,
@@ -37,7 +37,7 @@ object TransactionGroupEditButtons {
 
   private def copyButton(
       groupId: Long
-  )(implicit router: RouterContext, i18n: I18n): VdomElement = {
+  )(implicit router: RouterContext, i18n: I18n): VdomTag = {
     Bootstrap.Button(
       Variant.default,
       Size.xs,
