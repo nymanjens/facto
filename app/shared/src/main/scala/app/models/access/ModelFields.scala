@@ -1,5 +1,6 @@
 package app.models.access
 
+import app.common.TagFiltering
 import hydro.common.GuavaReplacement.ImmutableBiMap
 import hydro.models.modification.EntityType
 import app.models.money.ExchangeRateMeasurement
@@ -72,6 +73,10 @@ object ModelFields {
       ModelField("transactionDate", _.transactionDate, v => _.copy(transactionDate = v))
     val consumedDate: ModelField[LocalDateTime, E] =
       ModelField("consumedDate", _.consumedDate, v => _.copy(consumedDate = v))
+
+    // Derived fields for fast database lookups
+    val tagsNormalized: ModelField[Seq[String], E] =
+      ModelField("tagsNormalized", _.tags.map(TagFiltering.normalize), v => e => e)
   }
 
   object TransactionGroup {
@@ -130,6 +135,7 @@ object ModelFields {
     Transaction.flowInCents,
     Transaction.detailDescription,
     Transaction.tags,
+    Transaction.tagsNormalized,
     Transaction.createdDate,
     Transaction.transactionDate,
     Transaction.consumedDate,

@@ -4,6 +4,7 @@ import app.common.accounting.ComplexQueryFilter.Prefix
 import app.common.accounting.ComplexQueryFilter.QueryFilterPair
 import app.common.accounting.ComplexQueryFilter.QueryPart
 import app.common.money.Money
+import app.common.TagFiltering
 import app.models.access.AppEntityAccess
 import app.models.access.ModelFields
 import app.models.accounting._
@@ -93,7 +94,10 @@ final class ComplexQueryFilter(implicit
           case Prefix.Detail =>
             QueryFilterPair.containsIgnoreCase(ModelFields.Transaction.detailDescription, suffix)
           case Prefix.Tag =>
-            QueryFilterPair.seqContains(ModelFields.Transaction.tags, suffix)
+            QueryFilterPair.seqContains(
+              ModelFields.Transaction.tagsNormalized,
+              TagFiltering.normalize(suffix),
+            )
         }
       case None => fallback
     }

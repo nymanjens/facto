@@ -58,6 +58,7 @@ object AppConverters {
       ModelFields.Transaction.flowInCents,
       ModelFields.Transaction.detailDescription,
       ModelFields.Transaction.tags,
+      ModelFields.Transaction.tagsNormalized,
       ModelFields.Transaction.createdDate,
       ModelFields.Transaction.transactionDate,
       ModelFields.Transaction.consumedDate,
