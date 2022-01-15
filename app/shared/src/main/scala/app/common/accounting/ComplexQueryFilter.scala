@@ -11,12 +11,16 @@ import app.models.accounting._
 import app.models.accounting.config.Config
 import hydro.common.Annotations.visibleForTesting
 import hydro.common.GuavaReplacement.Splitter
+import hydro.common.time.LocalDateTime
 import hydro.models.access.DbQuery
+import hydro.models.access.DbQuery.PicklableOrdering
 import hydro.models.access.DbQueryImplicits._
 import hydro.models.access.ModelField
 
+import java.time.Month
 import scala.collection.immutable.Seq
 import scala.collection.mutable
+import scala.util.Try
 
 final class ComplexQueryFilter(implicit
     entityAccess: AppEntityAccess,
@@ -98,6 +102,12 @@ final class ComplexQueryFilter(implicit
               ModelFields.Transaction.tagsNormalized,
               TagFiltering.normalize(suffix),
             )
+          case Prefix.ConsumedStartYear if Try(suffix.toInt).isSuccess =>
+            QueryFilterPair.isGreaterOrEqualThan(
+              ModelFields.Transaction.consumedDate,
+              LocalDateTime.of(suffix.toInt, Month.JANUARY, dayOfMonth = 1, hour = 0, minute = 0),
+            )
+
         }
       case None => fallback
     }
@@ -180,6 +190,16 @@ object ComplexQueryFilter {
     def isEqualTo[V](field: ModelField[V, Transaction], value: V): QueryFilterPair =
       anyOf(field, Seq(value))
 
+    def isGreaterOrEqualThan[V: PicklableOrdering](
+        field: ModelField[V, Transaction],
+        value: V,
+    ): QueryFilterPair =
+      QueryFilterPair(
+        estimatedExecutionCost = 1,
+        positiveFilter = field >= value,
+        negativeFilter = field < value,
+      )
+
     def anyOf[V](field: ModelField[V, Transaction], values: Seq[V]): QueryFilterPair =
       values match {
         case Seq(value) =>
@@ -226,7 +246,7 @@ object ComplexQueryFilter {
   }
   @visibleForTesting private[accounting] object Prefix {
     def all: Seq[Prefix] =
-      Seq(Issuer, Beneficiary, Reservoir, Category, Description, Flow, Detail, Tag)
+      Seq(Issuer, Beneficiary, Reservoir, Category, Description, Flow, Detail, Tag, ConsumedStartYear)
 
     object Issuer extends Prefix(Seq("issuer", "i", "u", "user"))
     object Beneficiary extends Prefix(Seq("beneficiary", "b"))
@@ -236,5 +256,6 @@ object ComplexQueryFilter {
     object Flow extends Prefix(Seq("flow", "amount", "a"))
     object Detail extends Prefix(Seq("detail"))
     object Tag extends Prefix(Seq("tag", "t"))
+    object ConsumedStartYear extends Prefix(Seq("consumedStart"))
   }
 }
