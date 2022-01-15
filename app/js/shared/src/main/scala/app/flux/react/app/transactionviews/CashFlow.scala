@@ -91,7 +91,11 @@ final class CashFlow(implicit
                     additionalInput = reservoir,
                     calculateExtraTitle = { context =>
                       context.maybeLatestEntry map { latestEntry =>
-                        s"${i18n("app.balance")}: ${latestEntry.balance}"
+                        s"${i18n("app.balance")}: ${latestEntry.balance}" + (
+                          if (reservoir.currency.isForeign)
+                            s" (${latestEntry.balance.withDate(clock.now).exchangedForReferenceCurrency})"
+                          else ""
+                        )
                       }
                     },
                     tableHeaders = Seq(
