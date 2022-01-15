@@ -11,6 +11,7 @@ import app.models.accounting.config.Config
 import app.models.accounting.Transaction
 import hydro.common.time.Clock
 import hydro.common.time.LocalDateTime
+import hydro.common.ScalaUtils
 import hydro.flux.stores.AsyncEntityDerivedStateStore
 import hydro.flux.stores.CombiningStateStore
 import hydro.flux.stores.StateStore
@@ -60,31 +61,37 @@ final class ChartStoreFactory(implicit
         chartFromEntities <- maybeChartFromEntities
         summaryExchangeRateGains <- maybeSummaryExchangeRateGains
       } yield {
-        chartFromEntities ++
-          LinePoints(
-            summaryExchangeRateGains.monthToGains
-              // Future months are irrelevant for exchange rate gains because they are not yet known
-              .filterKeys(_ <= DatedMonth.current)
-              .mapValues(gainsForMonth => {
-                gainsForMonth.reservoirToGains.map { case (reservoir, gains) =>
-                  // Dummy transaction to be filterable
-                  val dummyTransaction = Transaction(
-                    transactionGroupId = EntityModification.generateRandomId(),
-                    issuerId = EntityModification.generateRandomId(),
-                    beneficiaryAccountCode = reservoir.owner.code,
-                    moneyReservoirCode = reservoir.code,
-                    categoryCode = "Exchange",
-                    description = "Exchange rate gains",
-                    flowInCents = 0,
-                    createdDate = LocalDateTime.MIN,
-                    transactionDate = LocalDateTime.MIN,
-                    consumedDate = LocalDateTime.MIN,
-                    idOption = Some(EntityModification.generateRandomId()),
-                  )
-                  if (filterFromQuery(dummyTransaction)) gains else ReferenceMoney(0)
-                }.sum
-              })
-          )
+        val exchangeRateGainsPoints = LinePoints(
+          summaryExchangeRateGains.monthToGains
+            // Future months are irrelevant for exchange rate gains because they are not yet known
+            .filterKeys(_ <= DatedMonth.current)
+            .mapValues(gainsForMonth => {
+              gainsForMonth.reservoirToGains.map { case (reservoir, gains) =>
+                // Dummy transaction to be filterable
+                val dummyTransaction = Transaction(
+                  transactionGroupId = EntityModification.generateRandomId(),
+                  issuerId = EntityModification.generateRandomId(),
+                  beneficiaryAccountCode = reservoir.owner.code,
+                  moneyReservoirCode = reservoir.code,
+                  categoryCode = "Exchange",
+                  description = "Exchange rate gains",
+                  flowInCents = 0,
+                  createdDate = LocalDateTime.MIN,
+                  transactionDate = LocalDateTime.MIN,
+                  consumedDate = LocalDateTime.MIN,
+                  idOption = Some(EntityModification.generateRandomId()),
+                )
+                if (filterFromQuery(dummyTransaction)) gains else ReferenceMoney(0)
+              }.sum
+            })
+            // Omit leading zeros
+            .toVector
+            .sortBy(_._1)
+            .dropWhile(_._2.isZero)
+            .toMap
+        )
+
+        chartFromEntities ++ exchangeRateGainsPoints
       }) getOrElse LinePoints.empty
     }
   }
