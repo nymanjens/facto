@@ -83,6 +83,13 @@ object StandardConvertersTest extends TestSuite {
           checkOrdering(lower = -1, higher = 99999)
           checkOrdering(lower = -99999, higher = 10)
         }
+        "Random numbers" - {
+          for (i <- 1 to 100) yield {
+            val long = Random.nextLong
+            checkOrdering(lower = long, higher = long + 1)
+            checkOrdering(lower = long - 1, higher = long)
+          }
+        }
       }
     }
 
