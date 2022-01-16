@@ -144,12 +144,12 @@ object StandardConverters {
 
       val firstBits = bitsLookupTable.get(string(0))
       var result: Long = firstBits & 0x7
-      for(char <- string.substring(1)) {
+      for (char <- string.substring(1)) {
         result = result << 6
         result += bitsLookupTable.get(char)
       }
 
-      if ((firstBits & 0x20) == 0)  {
+      if ((firstBits & 0x20) == 0) {
         result -= twoPower63
       }
       result

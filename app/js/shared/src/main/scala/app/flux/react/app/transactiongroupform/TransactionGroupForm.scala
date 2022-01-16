@@ -471,10 +471,12 @@ final class TransactionGroupForm(implicit
             panelRef(panelIndex).apply().moneyReservoir.valueOrDefault.currency
           }
 
-          var newState = state.copy(
-            foreignCurrency = currencies.find(_.isForeign),
-            totalFlowExceptLast = flows.dropRight(1).sum,
-          ).withRefreshedFlowFractions(panelRef)
+          var newState = state
+            .copy(
+              foreignCurrency = currencies.find(_.isForeign),
+              totalFlowExceptLast = flows.dropRight(1).sum,
+            )
+            .withRefreshedFlowFractions(panelRef)
           if (state.totalFlowRestriction == TotalFlowRestriction.AnyTotal) {
             newState = newState.copy(totalFlow = flows.sum)
           }
