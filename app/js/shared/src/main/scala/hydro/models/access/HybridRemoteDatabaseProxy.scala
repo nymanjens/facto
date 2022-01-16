@@ -2,8 +2,8 @@ package hydro.models.access
 
 import scala.concurrent.duration._
 import hydro.common.time.JavaTimeImplicits._
-import java.time.Duration
 
+import java.time.Duration
 import app.api.ScalaJsApi.GetInitialDataResponse
 import app.api.ScalaJsApiClient
 import hydro.models.modification.EntityModification
@@ -11,6 +11,7 @@ import hydro.models.modification.EntityType
 import app.models.modification.EntityTypes
 import hydro.common.JsLoggingUtils.logFailure
 import hydro.common.time.Clock
+import hydro.common.GuavaReplacement
 import hydro.models.Entity
 import hydro.models.access.SingletonKey.NextUpdateTokenKey
 import hydro.models.access.SingletonKey.VersionKey
@@ -317,6 +318,7 @@ object HybridRemoteDatabaseProxy {
       clock: Clock,
       entitySyncLogic: EntitySyncLogic,
   ): Future[Unit] = async {
+    val startTime = GuavaReplacement.Stopwatch.createStarted()
     console.log(s"  Populating database...")
 
     // Reset database
@@ -341,7 +343,7 @@ object HybridRemoteDatabaseProxy {
     // the database becomes valid.
     await(db.save())
 
-    console.log(s"  Population done!")
+    console.log(s"  Population done after ${startTime.elapsed}!")
   }
 
   private def dbStatusBecomesReadyFuture(db: LocalDatabase)(implicit
