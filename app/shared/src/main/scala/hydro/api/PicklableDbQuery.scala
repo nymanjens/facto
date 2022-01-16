@@ -49,13 +49,18 @@ object PicklableDbQuery {
           FieldWithValue.fromRegular(field, value),
           PicklableOrdering.fromRegular(f.picklableOrdering),
         )
+      case f @ DbQuery.Filter.LessThan(field, value) =>
+        LessThan(FieldWithValue.fromRegular(field, value), PicklableOrdering.fromRegular(f.picklableOrdering))
       case f @ DbQuery.Filter.GreaterOrEqualThan(field, value) =>
         GreaterOrEqualThan(
           FieldWithValue.fromRegular(field, value),
           PicklableOrdering.fromRegular(f.picklableOrdering),
         )
-      case f @ DbQuery.Filter.LessThan(field, value) =>
-        LessThan(FieldWithValue.fromRegular(field, value), PicklableOrdering.fromRegular(f.picklableOrdering))
+      case f @ DbQuery.Filter.LessOrEqualThan(field, value) =>
+        LessOrEqualThan(
+          FieldWithValue.fromRegular(field, value),
+          PicklableOrdering.fromRegular(f.picklableOrdering),
+        )
       case DbQuery.Filter.AnyOf(field, values) =>
         AnyOf(PicklableModelField.fromRegular(field), values.map(FieldWithValue.fromRegular(field, _)))
       case DbQuery.Filter.NoneOf(field, values) =>
@@ -82,6 +87,7 @@ object PicklableDbQuery {
             fieldWithValue.field.toRegular.asInstanceOf[ModelField[V, E]],
             fieldWithValue.value.asInstanceOf[V],
           )
+
         internal
       }
     }
@@ -92,6 +98,7 @@ object PicklableDbQuery {
             fieldWithValue.field.toRegular.asInstanceOf[ModelField[V, E]],
             fieldWithValue.value.asInstanceOf[V],
           )
+
         internal
       }
     }
@@ -103,6 +110,19 @@ object PicklableDbQuery {
             fieldWithValue.value
               .asInstanceOf[V],
           )(ordering.toRegular.asInstanceOf[DbQuery.PicklableOrdering[V]])
+
+        internal
+      }
+    }
+    case class LessThan(fieldWithValue: FieldWithValue, ordering: PicklableOrdering) extends Filter {
+      override def toRegular = {
+        def internal[V, E]: DbQuery.Filter[_] =
+          DbQuery.Filter.LessThan[V, E](
+            fieldWithValue.field.toRegular.asInstanceOf[ModelField[V, E]],
+            fieldWithValue.value
+              .asInstanceOf[V],
+          )(ordering.toRegular.asInstanceOf[DbQuery.PicklableOrdering[V]])
+
         internal
       }
     }
@@ -115,13 +135,14 @@ object PicklableDbQuery {
             fieldWithValue.value
               .asInstanceOf[V],
           )(ordering.toRegular.asInstanceOf[DbQuery.PicklableOrdering[V]])
+
         internal
       }
     }
-    case class LessThan(fieldWithValue: FieldWithValue, ordering: PicklableOrdering) extends Filter {
+    case class LessOrEqualThan(fieldWithValue: FieldWithValue, ordering: PicklableOrdering) extends Filter {
       override def toRegular = {
         def internal[V, E]: DbQuery.Filter[_] =
-          DbQuery.Filter.LessThan[V, E](
+          DbQuery.Filter.LessOrEqualThan[V, E](
             fieldWithValue.field.toRegular.asInstanceOf[ModelField[V, E]],
             fieldWithValue.value
               .asInstanceOf[V],

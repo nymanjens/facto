@@ -15,6 +15,7 @@ object DbQueryImplicits {
   implicit class OrderedKeyWrapper[V: PicklableOrdering, E](field: ModelField[V, E]) {
     def <(value: V): Filter[E] = Filter.LessThan(field, value)
     def >(value: V): Filter[E] = Filter.GreaterThan(field, value)
+    def <=(value: V): Filter[E] = Filter.LessOrEqualThan(field, value)
     def >=(value: V): Filter[E] = Filter.GreaterOrEqualThan(field, value)
   }
 

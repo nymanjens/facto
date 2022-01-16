@@ -80,9 +80,11 @@ private final class LocalDatabaseImpl(implicit
           case DbQuery.Filter.NotEqual(field, value) => keyValueFilter(Operation.NotEqual, field, value)
           case DbQuery.Filter.GreaterThan(field, value) =>
             keyValueFilter(Operation.GreaterThan, field, value)
+          case DbQuery.Filter.LessThan(field, value) => keyValueFilter(Operation.LessThan, field, value)
           case DbQuery.Filter.GreaterOrEqualThan(field, value) =>
             keyValueFilter(Operation.GreaterOrEqualThan, field, value)
-          case DbQuery.Filter.LessThan(field, value) => keyValueFilter(Operation.LessThan, field, value)
+          case DbQuery.Filter.LessOrEqualThan(field, value) =>
+            keyValueFilter(Operation.LessOrEqualThan, field, value)
           case DbQuery.Filter.AnyOf(field, values) =>
             rawKeyValueFilter(Operation.AnyOf, field, values.map(Scala2Js.toJs(_, field)).toJSArray)
           case DbQuery.Filter.NoneOf(field, values) =>

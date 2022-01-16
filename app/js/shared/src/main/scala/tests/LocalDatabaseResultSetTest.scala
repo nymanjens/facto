@@ -81,6 +81,15 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
         .assertFilteredWith(ModelFields.Transaction.createdDate >= transaction2.createdDate)
         .containsExactly(transaction2, transaction3)
     },
+    ManualTest("queryExecutor().filter(lessOrEqualThan)") {
+      val transaction1 = createTransaction(day = 1)
+      val transaction2 = createTransaction(day = 2)
+      val transaction3 = createTransaction(day = 3)
+
+      withTransactions(transaction1, transaction2, transaction3)
+        .assertFilteredWith(ModelFields.Transaction.createdDate <= transaction2.createdDate)
+        .containsExactly(transaction1, transaction2)
+    },
     ManualTest("queryExecutor().filter(anyOf)") {
       val transaction1 = createTransaction(category = testCategoryA)
       val transaction2 = createTransaction(category = testCategoryB)

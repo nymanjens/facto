@@ -62,6 +62,14 @@ object DbQuery {
         field.get(entity) > value
       }
     }
+    case class LessThan[V, E](field: ModelField[V, E], value: V)(implicit
+        val picklableOrdering: PicklableOrdering[V]
+    ) extends Filter[E] {
+      override def apply(entity: E) = {
+        implicit val ordering = implicitly[PicklableOrdering[V]].toOrdering
+        field.get(entity) < value
+      }
+    }
     case class GreaterOrEqualThan[V, E](field: ModelField[V, E], value: V)(implicit
         val picklableOrdering: PicklableOrdering[V]
     ) extends Filter[E] {
@@ -70,12 +78,12 @@ object DbQuery {
         field.get(entity) >= value
       }
     }
-    case class LessThan[V, E](field: ModelField[V, E], value: V)(implicit
+    case class LessOrEqualThan[V, E](field: ModelField[V, E], value: V)(implicit
         val picklableOrdering: PicklableOrdering[V]
     ) extends Filter[E] {
       override def apply(entity: E) = {
         implicit val ordering = implicitly[PicklableOrdering[V]].toOrdering
-        field.get(entity) < value
+        field.get(entity) <= value
       }
     }
     case class AnyOf[V, E](field: ModelField[V, E], values: Seq[V]) extends Filter[E] {

@@ -200,6 +200,16 @@ object ComplexQueryFilter {
         negativeFilter = field < value,
       )
 
+    def isLessOrEqualThan[V: PicklableOrdering](
+        field: ModelField[V, Transaction],
+        value: V,
+    ): QueryFilterPair =
+      QueryFilterPair(
+        estimatedExecutionCost = 1,
+        positiveFilter = field <= value,
+        negativeFilter = field > value,
+      )
+
     def anyOf[V](field: ModelField[V, Transaction], values: Seq[V]): QueryFilterPair =
       values match {
         case Seq(value) =>
