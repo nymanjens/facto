@@ -63,6 +63,26 @@ private[tests] class LocalDatabaseResultSetTest extends ManualTestSuite {
         .assertFilteredWith(ModelFields.Transaction.createdDate < transaction3.createdDate)
         .containsExactly(transaction1, transaction2)
     },
+    ManualTest("queryExecutor().filter(lessThan) < negative number") {
+      val transaction1 = createTransaction(flow = 10)
+      val transaction2 = createTransaction(flow = -1)
+      val transaction3 = createTransaction(flow = -5)
+      val transaction4 = createTransaction(flow = -10)
+
+      withTransactions(transaction1, transaction2, transaction3, transaction4)
+        .assertFilteredWith(ModelFields.Transaction.flowInCents < -500)
+        .containsExactly(transaction4)
+    },
+    ManualTest("queryExecutor().filter(lessThan) < zero") {
+      val transaction1 = createTransaction(flow = 10)
+      val transaction2 = createTransaction(flow = 1)
+      val transaction3 = createTransaction(flow = 0)
+      val transaction4 = createTransaction(flow = -10)
+
+      withTransactions(transaction1, transaction2, transaction3, transaction4)
+        .assertFilteredWith(ModelFields.Transaction.flowInCents < 0)
+        .containsExactly(transaction4)
+    },
     ManualTest("queryExecutor().filter(greaterThan)") {
       val transaction1 = createTransaction(day = 1)
       val transaction2 = createTransaction(day = 2)

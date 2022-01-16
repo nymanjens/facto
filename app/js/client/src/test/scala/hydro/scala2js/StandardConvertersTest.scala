@@ -2,7 +2,6 @@ package hydro.scala2js
 
 import java.time.Instant
 import java.time.Month.MARCH
-
 import app.common.testing.TestObjects._
 import app.models.access.ModelFields
 import app.models.user.User
@@ -16,6 +15,7 @@ import scala.collection.immutable.Seq
 import scala.concurrent.duration._
 import scala.concurrent.duration.FiniteDuration
 import scala.scalajs.js
+import scala.util.Random
 
 object StandardConvertersTest extends TestSuite {
   val dateTime = LocalDateTime.of(2022, MARCH, 13, 12, 13)
@@ -54,10 +54,35 @@ object StandardConvertersTest extends TestSuite {
         testToJsAndBack[Long](6886911427549585129L)
         testToJsAndBack[Long](-6886911427549585129L)
       }
+      "to JS and back (random numbers)" - {
+        for (i <- 1 to 100) yield {
+          testToJsAndBack[Long](Random.nextLong)
+        }
+      }
       "Produces ordered results" - {
-        val lower = Scala2Js.toJs(999L).asInstanceOf[String]
-        val higher = Scala2Js.toJs(1000L).asInstanceOf[String]
-        (lower < higher) ==> true
+        def checkOrdering(lower: Long, higher: Long) = {
+          val lowerJs = Scala2Js.toJs(lower).asInstanceOf[String]
+          val higherJs = Scala2Js.toJs(higher).asInstanceOf[String]
+          (lowerJs < higherJs) ==> true
+        }
+        "Positive numbers" - {
+          checkOrdering(lower = 999, higher = 1000)
+          checkOrdering(lower = 0, higher = 1000)
+          checkOrdering(lower = 0, higher = 1)
+        }
+        "Negative numbers" - {
+          checkOrdering(lower = -3, higher = -2)
+          checkOrdering(lower = -33, higher = -32)
+          checkOrdering(lower = -33, higher = -1)
+          checkOrdering(lower = -99999, higher = -99)
+        }
+        "Negative/positive numbers" - {
+          checkOrdering(lower = -1, higher = 1)
+          checkOrdering(lower = -1, higher = 0)
+          checkOrdering(lower = -99999, higher = 0)
+          checkOrdering(lower = -1, higher = 99999)
+          checkOrdering(lower = -99999, higher = 10)
+        }
       }
     }
 

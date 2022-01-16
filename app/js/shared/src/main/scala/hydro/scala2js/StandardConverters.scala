@@ -104,19 +104,34 @@ object StandardConverters {
   }
 
   implicit object LongConverter extends Converter[Long] {
+    private final val twoPower63: Long = 1L << 63
+
     override def toJs(long: Long) = {
+      // Note: Using A and B as sign here because that way, the alphabetical order
+      // is the same as the numerical order.
+      val signChar = if (long < 0) 'A' else 'B'
+
+      // Note: Negative numbers are moved into the positive part of the long range so alphabetical
+      // ordering is the same as numerical order
+      val number = if (long < 0) long + twoPower63 else long
+
       // Note: It would be easier to implement this by `"%022d".format(long)`
       // but that transforms the given long to a javascript number (double precision)
       // causing the least significant long digits sometimes to become zero
       // (e.g. 6886911427549585292 becomes 6886911427549585000)
-      val signChar = if (long < 0) "-" else ""
-      val stringWithoutSign = Math.abs(long).toString
+      val stringWithoutSign = Math.abs(number).toString
 
       val numZerosToPrepend = 22 - stringWithoutSign.size
       require(numZerosToPrepend > 0)
       signChar + ("0" * numZerosToPrepend) + stringWithoutSign
     }
-    override def toScala(value: js.Any) = value.asInstanceOf[String].toLong
+    override def toScala(value: js.Any) = {
+      val string = value.asInstanceOf[String]
+      string.head match {
+        case 'A' => string.substring(1).toLong - twoPower63
+        case 'B' => +string.substring(1).toLong
+      }
+    }
   }
 
   implicit object DoubleConverter extends Converter[Double] {
