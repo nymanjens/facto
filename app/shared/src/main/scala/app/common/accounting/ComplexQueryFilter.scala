@@ -93,7 +93,11 @@ final class ComplexQueryFilter(implicit
             QueryFilterPair.containsIgnoreCase(ModelFields.Transaction.description, suffix)
           case Prefix.Flow =>
             Money.floatStringToCents(suffix).map { flowInCents =>
-              QueryFilterPair.isEqualTo(ModelFields.Transaction.flowInCents, flowInCents)
+              QueryFilterPair.or(
+                QueryFilterPair.isEqualTo(ModelFields.Transaction.flowInCents, flowInCents),
+                // Include a check for the inverse flow
+                QueryFilterPair.isEqualTo(ModelFields.Transaction.flowInCents, -flowInCents),
+              )
             } getOrElse fallback
           case Prefix.FlowMinimum =>
             Money.floatStringToCents(suffix).map { flowInCents =>
