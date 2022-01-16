@@ -256,6 +256,6 @@ object ComplexQueryFilter {
     object Flow extends Prefix(Seq("flow", "amount", "a"))
     object Detail extends Prefix(Seq("detail"))
     object Tag extends Prefix(Seq("tag", "t"))
-    object ConsumedStartYear extends Prefix(Seq("consumedStart"))
+    object ConsumedStartYear extends Prefix(Seq("consumedStart", "start"))
   }
 }
