@@ -95,6 +95,14 @@ final class ComplexQueryFilter(implicit
             Money.floatStringToCents(suffix).map { flowInCents =>
               QueryFilterPair.isEqualTo(ModelFields.Transaction.flowInCents, flowInCents)
             } getOrElse fallback
+          case Prefix.FlowMinimum =>
+            Money.floatStringToCents(suffix).map { flowInCents =>
+              QueryFilterPair.isGreaterOrEqualThan(ModelFields.Transaction.flowInCents, flowInCents)
+            } getOrElse fallback
+          case Prefix.FlowMaximum =>
+            Money.floatStringToCents(suffix).map { flowInCents =>
+              QueryFilterPair.isLessOrEqualThan(ModelFields.Transaction.flowInCents, flowInCents)
+            } getOrElse fallback
           case Prefix.Detail =>
             QueryFilterPair.containsIgnoreCase(ModelFields.Transaction.detailDescription, suffix)
           case Prefix.Tag =>
@@ -102,12 +110,13 @@ final class ComplexQueryFilter(implicit
               ModelFields.Transaction.tagsNormalized,
               TagFiltering.normalize(suffix),
             )
-          case Prefix.ConsumedStartYear if Try(suffix.toInt).isSuccess =>
-            QueryFilterPair.isGreaterOrEqualThan(
-              ModelFields.Transaction.consumedDate,
-              LocalDateTime.of(suffix.toInt, Month.JANUARY, dayOfMonth = 1, hour = 0, minute = 0),
-            )
-
+          case Prefix.ConsumedStartYear =>
+            Try(suffix.toInt).toOption.map { year =>
+              QueryFilterPair.isGreaterOrEqualThan(
+                ModelFields.Transaction.consumedDate,
+                LocalDateTime.of(year, Month.JANUARY, dayOfMonth = 1, hour = 0, minute = 0),
+              )
+            } getOrElse fallback
         }
       case None => fallback
     }
@@ -256,7 +265,19 @@ object ComplexQueryFilter {
   }
   @visibleForTesting private[accounting] object Prefix {
     def all: Seq[Prefix] =
-      Seq(Issuer, Beneficiary, Reservoir, Category, Description, Flow, Detail, Tag, ConsumedStartYear)
+      Seq(
+        Issuer,
+        Beneficiary,
+        Reservoir,
+        Category,
+        Description,
+        Flow,
+        FlowMinimum,
+        FlowMaximum,
+        Detail,
+        Tag,
+        ConsumedStartYear,
+      )
 
     object Issuer extends Prefix(Seq("issuer", "i", "u", "user"))
     object Beneficiary extends Prefix(Seq("beneficiary", "b"))
@@ -264,6 +285,8 @@ object ComplexQueryFilter {
     object Category extends Prefix(Seq("category", "c"))
     object Description extends Prefix(Seq("description"))
     object Flow extends Prefix(Seq("flow", "amount", "a"))
+    object FlowMinimum extends Prefix(Seq("minFlow", "minAmount", "minA"))
+    object FlowMaximum extends Prefix(Seq("maxFlow", "maxAmount", "maxA"))
     object Detail extends Prefix(Seq("detail"))
     object Tag extends Prefix(Seq("tag", "t"))
     object ConsumedStartYear extends Prefix(Seq("consumedStart", "start"))
