@@ -1,5 +1,6 @@
 package app.flux.react.app.transactionviews
 
+import scala.scalajs.js
 import app.common.money.ExchangeRateManager
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.react.uielements
@@ -62,16 +63,27 @@ final class SearchResultsEditAllPanel(implicit
           case None => "..."
           case Some(matchingEntries) =>
             Bootstrap.Col(lg = 6)(
-              Bootstrap.FormHorizontal(
-                TextInput(
-                  ref = TextInput.ref(),
-                  name = "issuer",
-                  label = i18n("app.issuer"),
-                  defaultValue = "ABC",
-                )
-              )
+              Bootstrap.Row(
+                ^.style := js.Dictionary("paddingBottom" -> "15px"),
+                Bootstrap.Col(sm = 4)(<.span()),
+                Bootstrap.Col(sm = 8) {
+                  <.b(i18n("app.n-entries", matchingEntries.size))
+                },
+              ),
+              editAllForm(props, state),
             )
         }
+      )
+    }
+
+    private def editAllForm(props: Props, state: State) = {
+      Bootstrap.FormHorizontal(
+        TextInput(
+          ref = TextInput.ref(),
+          name = "issuer",
+          label = i18n("app.issuer"),
+          defaultValue = "ABC",
+        )
       )
     }
   }
