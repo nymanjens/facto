@@ -214,3 +214,5 @@ app.predefined-charts=Predefined charts
 app.line-n=Line {0}
 app.clear=Clear
 app.bars=Bars
+app.edit-all-results=Edit all results
+app.hide-edit-all-results-panel=Hide edit all results panel
