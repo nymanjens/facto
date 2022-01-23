@@ -63,27 +63,40 @@ final class SearchResultsEditAllPanel(implicit
           case None => "..."
           case Some(matchingEntries) =>
             Bootstrap.Col(lg = 6)(
-              Bootstrap.Row(
-                ^.style := js.Dictionary("paddingBottom" -> "15px"),
-                Bootstrap.Col(sm = 4)(<.span()),
-                Bootstrap.Col(sm = 8) {
-                  <.b(i18n("app.n-entries", matchingEntries.size))
-                },
-              ),
-              editAllForm(props, state),
+              editAllForm(props, state)
             )
         }
       )
     }
 
     private def editAllForm(props: Props, state: State) = {
+      val matchingEntries = state.maybeMatchingEntries.get
+
       Bootstrap.FormHorizontal(
+        TextInput(
+          ref = TextInput.ref(),
+          name = "query",
+          label = i18n("app.query"),
+          defaultValue = props.query,
+          disabled = true,
+        ),
+        Bootstrap.Row(
+          ^.style := js.Dictionary("paddingBottom" -> "15px"),
+          Bootstrap.Col(sm = 4)(<.span()),
+          Bootstrap.Col(sm = 8) {
+            i18n(
+              "app.matching-n-grouped-entries-m-individual-entries",
+              matchingEntries.size,
+              matchingEntries.flatMap(_.transactions).size,
+            )
+          },
+        ),
         TextInput(
           ref = TextInput.ref(),
           name = "issuer",
           label = i18n("app.issuer"),
           defaultValue = "ABC",
-        )
+        ),
       )
     }
   }

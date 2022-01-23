@@ -216,3 +216,4 @@ app.clear=Clear
 app.bars=Bars
 app.edit-all-results=Edit all results
 app.hide-edit-all-results-panel=Hide edit all results panel
+app.matching-n-grouped-entries-m-individual-entries=Matching {0} grouped entries ({1} individual entries)
