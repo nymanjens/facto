@@ -16,6 +16,7 @@ import hydro.flux.react.uielements.Bootstrap.Variant
 import hydro.flux.react.uielements.PageHeader
 import hydro.flux.react.uielements.Panel
 import hydro.flux.react.HydroReactComponent
+import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.router.RouterContext
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
@@ -31,6 +32,7 @@ final class SearchResults(implicit
     i18n: I18n,
     pageHeader: PageHeader,
     descriptionWithEntryCount: DescriptionWithEntryCount,
+    searchResultsEditAllPanel: SearchResultsEditAllPanel,
 ) extends HydroReactComponent {
 
   private val entriesListTable: EntriesListTable[GeneralEntry, ComplexQueryStoreFactory.Query] =
@@ -75,6 +77,7 @@ final class SearchResults(implicit
             )
           )
         ),
+        <<.ifThen(state.showUpdateAllPanel)(searchResultsEditAllPanel(props.query)),
         Panel(i18n("app.search-results"))(
           entriesListTable(
             tableTitle = i18n("app.all"),
