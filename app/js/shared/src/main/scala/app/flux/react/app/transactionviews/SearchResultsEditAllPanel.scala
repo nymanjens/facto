@@ -2,6 +2,7 @@ package app.flux.react.app.transactionviews
 
 import scala.scalajs.js
 import app.common.money.ExchangeRateManager
+import app.flux.action.AppActions
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.react.uielements
 import app.flux.react.uielements.DescriptionWithEntryCount
@@ -19,6 +20,7 @@ import hydro.common.Formatting._
 import hydro.common.I18n
 import hydro.common.time.Clock
 import hydro.common.Tags
+import hydro.flux.action.Dispatcher
 import hydro.flux.react.uielements.input.InputBase
 import hydro.flux.react.uielements.Bootstrap
 import hydro.flux.react.uielements.Bootstrap.Variant
@@ -39,6 +41,7 @@ final class SearchResultsEditAllPanel(implicit
     entityAccess: AppJsEntityAccess,
     accountingConfig: Config,
     i18n: I18n,
+    dispatcher: Dispatcher,
     tagsStoreFactory: TagsStoreFactory,
 ) extends HydroReactComponent {
 
@@ -72,7 +75,6 @@ final class SearchResultsEditAllPanel(implicit
   )
   protected case class State(
       showErrorMessages: Boolean = false,
-      feedbackStatusMessage: String = "",
       editAllOperation: EditAllOperation = EditAllOperation.NoneSelected,
       maybeMatchingEntries: Option[Seq[GeneralEntry]] = None,
       allTags: Seq[String] = Seq(),
@@ -124,16 +126,13 @@ final class SearchResultsEditAllPanel(implicit
           defaultValue = props.query,
           disabled = true,
         ),
-        Bootstrap.Row(
+        Bootstrap.Col(sm = 8, smOffset = 4)(
           ^.style := js.Dictionary("paddingBottom" -> "15px"),
-          Bootstrap.Col(sm = 4)(<.span()),
-          Bootstrap.Col(sm = 8) {
-            i18n(
-              "app.matching-n-grouped-entries-m-individual-entries",
-              matchingEntries.size,
-              matchingEntries.flatMap(_.transactions).size,
-            )
-          },
+          i18n(
+            "app.matching-n-grouped-entries-m-individual-entries",
+            matchingEntries.size,
+            matchingEntries.flatMap(_.transactions).size,
+          ),
         ),
         operationSelectInput(
           ref = operationSelectInput.ref(),
@@ -168,13 +167,37 @@ final class SearchResultsEditAllPanel(implicit
               defaultValue = Seq(),
             )
         },
-        TextInput(
-          ref = TextInput.ref(),
-          name = "issuer",
-          label = i18n("app.issuer"),
-          defaultValue = "ABC",
+        Bootstrap.FormGroup(
+          Bootstrap.Col(sm = 10, smOffset = 2)(
+            Bootstrap.Button(tpe = "submit")(
+              ^.onClick ==> onSubmit,
+              ^.disabled := state.editAllOperation == EditAllOperation.NoneSelected,
+              i18n("app.ok"),
+            )
+          )
         ),
       )
+    }
+
+    private def onSubmit(e: ReactEventFromInput): Callback = LogExceptionsCallback {
+      e.preventDefault()
+
+      $.modState(state =>
+        logExceptions {
+          val transactions = state.maybeMatchingEntries.get.flatMap(_.transactions)
+
+          state.editAllOperation match {
+            case EditAllOperation.NoneSelected =>
+            case EditAllOperation.ChangeCategory =>
+              for (category <- categoryRef().value) {
+                dispatcher.dispatch(AppActions.EditAllChangeCategory(transactions, category))
+              }
+            case EditAllOperation.AddTag =>
+          }
+
+          state.copy(showErrorMessages = true)
+        }
+      ).runNow()
     }
 
     private object OperationListener extends InputBase.Listener[EditAllOperation] {

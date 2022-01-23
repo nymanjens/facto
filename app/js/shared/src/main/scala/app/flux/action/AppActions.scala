@@ -3,6 +3,7 @@ package app.flux.action
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup
+import app.models.accounting.config.Category
 import hydro.flux.action.Action
 
 import scala.collection.immutable.Seq
@@ -23,4 +24,7 @@ object AppActions {
   case class UpdateBalanceCheck(existingBalanceCheck: BalanceCheck, newBalanceCheckWithoutId: BalanceCheck)
       extends Action
   case class RemoveBalanceCheck(existingBalanceCheck: BalanceCheck) extends Action
+
+  // **************** Refactor actions **************** //
+  case class EditAllChangeCategory(transactions: Seq[Transaction], newCategory: Category) extends Action
 }
