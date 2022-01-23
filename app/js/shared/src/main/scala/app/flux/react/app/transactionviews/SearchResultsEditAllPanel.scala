@@ -10,6 +10,8 @@ import app.flux.stores.entries.GeneralEntry
 import app.flux.stores.entries.factories.ComplexQueryStoreFactory
 import app.flux.stores.entries.factories.TagsStoreFactory
 import app.models.access.AppJsEntityAccess
+import app.models.accounting.config.Account
+import app.models.accounting.config.Category
 import app.models.accounting.config.Config
 import hydro.common.JsLoggingUtils.LogExceptionsCallback
 import hydro.common.JsLoggingUtils.logExceptions
@@ -41,6 +43,7 @@ final class SearchResultsEditAllPanel(implicit
 ) extends HydroReactComponent {
 
   private val operationSelectInput = SelectInput.forType[EditAllOperation]
+  private val categorySelectInput = SelectInput.forType[Category]
 
   // **************** API ****************//
   def apply(query: String): VdomElement = {
@@ -73,7 +76,16 @@ final class SearchResultsEditAllPanel(implicit
       editAllOperation: EditAllOperation = EditAllOperation.NoneSelected,
       maybeMatchingEntries: Option[Seq[GeneralEntry]] = None,
       allTags: Seq[String] = Seq(),
-  )
+  ) {
+    lazy val possibleCategoriesForEntries: Seq[Category] = {
+      val entries = maybeMatchingEntries getOrElse Seq()
+      val transactions = entries.flatMap(_.transactions)
+      val beneficiaries: Set[Account] = transactions.map(_.beneficiary).toSet
+
+      // Each touched beneficiary must support the new category
+      accountingConfig.categoriesSeq.filter(category => beneficiaries.forall(_.categories contains category))
+    }
+  }
 
   sealed abstract class EditAllOperation(val name: String)
   object EditAllOperation {
@@ -86,7 +98,8 @@ final class SearchResultsEditAllPanel(implicit
 
   protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
 
-    private val tagsRef = TagInput.ref()
+    private val categoryRef = categorySelectInput.ref()
+    private val tagRef = TagInput.ref()
 
     override def render(props: Props, state: State) = {
       Panel(i18n("app.edit-all-results"))(
@@ -135,10 +148,18 @@ final class SearchResultsEditAllPanel(implicit
         state.editAllOperation match {
           case EditAllOperation.NoneSelected => <.span()
           case EditAllOperation.ChangeCategory =>
-            <.span()
+            categorySelectInput(
+              ref = categoryRef,
+              name = "category",
+              label = i18n("app.category"),
+              options = state.possibleCategoriesForEntries,
+              valueToId = _.code,
+              valueToName = category =>
+                if (category.helpText.isEmpty) category.name else s"${category.name} (${category.helpText})",
+            )
           case EditAllOperation.AddTag =>
             TagInput(
-              ref = tagsRef,
+              ref = tagRef,
               name = "tag",
               label = i18n("app.tag"),
               suggestions = state.allTags,
