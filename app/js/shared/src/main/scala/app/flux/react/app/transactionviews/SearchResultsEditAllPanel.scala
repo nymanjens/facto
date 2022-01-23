@@ -37,32 +37,41 @@ final class SearchResultsEditAllPanel(implicit
   }
 
   // **************** Implementation of HydroReactComponent methods ****************//
-  override protected val config = ComponentConfig(
-    backendConstructor = new Backend(_),
-    initialState = State(),
-  )
+  override protected val config = ComponentConfig(backendConstructor = new Backend(_), initialState = State())
+    .withStateStoresDependencyFromProps { props =>
+      val store = complexQueryStoreFactory.get(props.query, maxNumEntries = Int.MaxValue)
+      StateStoresDependency(
+        store,
+        oldState => oldState.copy(maybeMatchingEntries = store.state.map(_.entries.map(_.entry))),
+      )
+    }
 
   // **************** Private inner types ****************//
   protected case class Props(
       query: String
   )
   protected case class State(
+      maybeMatchingEntries: Option[Seq[GeneralEntry]] = None
   )
 
   protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
 
     override def render(props: Props, state: State) = {
       Panel(i18n("app.edit-all-results"))(
-        Bootstrap.Col(lg = 6)(
-          Bootstrap.FormHorizontal(
-            TextInput(
-              ref = TextInput.ref(),
-              name = "issuer",
-              label = i18n("app.issuer"),
-              defaultValue = "ABC",
+        state.maybeMatchingEntries match {
+          case None => "..."
+          case Some(matchingEntries) =>
+            Bootstrap.Col(lg = 6)(
+              Bootstrap.FormHorizontal(
+                TextInput(
+                  ref = TextInput.ref(),
+                  name = "issuer",
+                  label = i18n("app.issuer"),
+                  defaultValue = "ABC",
+                )
+              )
             )
-          )
-        )
+        }
       )
     }
   }

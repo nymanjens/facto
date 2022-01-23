@@ -44,10 +44,7 @@ final class SearchResults(implicit
   }
 
   // **************** Implementation of HydroReactComponent methods ****************//
-  override protected val config = ComponentConfig(
-    backendConstructor = new Backend(_),
-    initialState = State(),
-  )
+  override protected val config = ComponentConfig(backendConstructor = new Backend(_), initialState = State())
 
   // **************** Private inner types ****************//
   protected case class Props(
