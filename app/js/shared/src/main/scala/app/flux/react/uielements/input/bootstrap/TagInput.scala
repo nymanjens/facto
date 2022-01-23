@@ -36,7 +36,7 @@ object TagInput {
       defaultValue: Seq[String],
       showErrorMessage: Boolean,
       additionalValidator: InputValidator[Seq[String]],
-      inputClasses: Seq[String],
+      inputClasses: Seq[String] = Seq(),
       listener: InputBase.Listener[Seq[String]] = InputBase.Listener.nullInstance,
   )(implicit i18n: I18n): VdomElement = {
     val props = Props(

@@ -36,6 +36,7 @@ final class Module(implicit
     pageHeader: PageHeader,
     descriptionWithEntryCount: DescriptionWithEntryCount,
     templateMatcher: TemplateMatcher,
+    tagsStoreFactory: TagsStoreFactory,
 ) {
 
   implicit lazy val everything = new Everything

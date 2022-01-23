@@ -5,13 +5,19 @@ import app.common.money.ExchangeRateManager
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.react.uielements
 import app.flux.react.uielements.DescriptionWithEntryCount
+import app.flux.react.uielements.input.bootstrap.TagInput
 import app.flux.stores.entries.GeneralEntry
 import app.flux.stores.entries.factories.ComplexQueryStoreFactory
+import app.flux.stores.entries.factories.TagsStoreFactory
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Config
+import hydro.common.JsLoggingUtils.LogExceptionsCallback
+import hydro.common.JsLoggingUtils.logExceptions
 import hydro.common.Formatting._
 import hydro.common.I18n
 import hydro.common.time.Clock
+import hydro.common.Tags
+import hydro.flux.react.uielements.input.InputBase
 import hydro.flux.react.uielements.Bootstrap
 import hydro.flux.react.uielements.Bootstrap.Variant
 import hydro.flux.react.uielements.PageHeader
@@ -19,6 +25,7 @@ import hydro.flux.react.uielements.Panel
 import hydro.flux.react.HydroReactComponent
 import hydro.flux.react.uielements.input.bootstrap.TextInput
 import hydro.flux.react.uielements.HalfPanel
+import hydro.flux.react.uielements.input.bootstrap.SelectInput
 import hydro.flux.router.RouterContext
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
@@ -30,7 +37,10 @@ final class SearchResultsEditAllPanel(implicit
     entityAccess: AppJsEntityAccess,
     accountingConfig: Config,
     i18n: I18n,
+    tagsStoreFactory: TagsStoreFactory,
 ) extends HydroReactComponent {
+
+  private val operationSelectInput = SelectInput.forType[EditAllOperation]
 
   // **************** API ****************//
   def apply(query: String): VdomElement = {
@@ -46,26 +56,37 @@ final class SearchResultsEditAllPanel(implicit
         oldState => oldState.copy(maybeMatchingEntries = store.state.map(_.entries.map(_.entry))),
       )
     }
+    .withStateStoresDependency(
+      tagsStoreFactory.get(),
+      _.copy(allTags =
+        tagsStoreFactory.get().state.map(_.tagToTransactionIds.keySet.toVector) getOrElse Seq()
+      ),
+    )
 
   // **************** Private inner types ****************//
   protected case class Props(
       query: String
   )
   protected case class State(
-      maybeMatchingEntries: Option[Seq[GeneralEntry]] = None,
-      editAllOperation: Option[EditAllOperation] = None,
+      showErrorMessages: Boolean = false,
       feedbackStatusMessage: String = "",
+      editAllOperation: EditAllOperation = EditAllOperation.NoneSelected,
+      maybeMatchingEntries: Option[Seq[GeneralEntry]] = None,
+      allTags: Seq[String] = Seq(),
   )
 
-  sealed abstract class EditAllOperation(name: String)
+  sealed abstract class EditAllOperation(val name: String)
   object EditAllOperation {
-    def all: Seq[EditAllOperation] = Seq(ChangeCategory, AddTag)
+    def all: Seq[EditAllOperation] = Seq(NoneSelected, ChangeCategory, AddTag)
 
+    object NoneSelected extends EditAllOperation("-----------")
     object ChangeCategory extends EditAllOperation(i18n("app.change-category"))
     object AddTag extends EditAllOperation(i18n("app.add-tag"))
   }
 
   protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
+
+    private val tagsRef = TagInput.ref()
 
     override def render(props: Props, state: State) = {
       Panel(i18n("app.edit-all-results"))(
@@ -101,6 +122,31 @@ final class SearchResultsEditAllPanel(implicit
             )
           },
         ),
+        operationSelectInput(
+          ref = operationSelectInput.ref(),
+          name = "operation",
+          label = i18n("app.operation"),
+          defaultValue = state.editAllOperation,
+          options = EditAllOperation.all,
+          valueToId = _.getClass.getSimpleName,
+          valueToName = _.name,
+          listener = OperationListener,
+        ),
+        state.editAllOperation match {
+          case EditAllOperation.NoneSelected => <.span()
+          case EditAllOperation.ChangeCategory =>
+            <.span()
+          case EditAllOperation.AddTag =>
+            TagInput(
+              ref = tagsRef,
+              name = "tag",
+              label = i18n("app.tag"),
+              suggestions = state.allTags,
+              showErrorMessage = state.showErrorMessages,
+              additionalValidator = tags => tags.size == 1 && tags.forall(Tags.isValidTag),
+              defaultValue = Seq(),
+            )
+        },
         TextInput(
           ref = TextInput.ref(),
           name = "issuer",
@@ -108,6 +154,12 @@ final class SearchResultsEditAllPanel(implicit
           defaultValue = "ABC",
         ),
       )
+    }
+
+    private object OperationListener extends InputBase.Listener[EditAllOperation] {
+      override def onChange(newOperation: EditAllOperation, directUserChange: Boolean) = {
+        $.modState(_.copy(editAllOperation = newOperation))
+      }
     }
   }
 }
