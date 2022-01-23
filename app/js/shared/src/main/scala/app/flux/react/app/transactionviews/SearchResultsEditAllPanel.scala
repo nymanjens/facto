@@ -19,6 +19,8 @@ import hydro.common.JsLoggingUtils.logExceptions
 import hydro.common.Formatting._
 import hydro.common.I18n
 import hydro.common.time.Clock
+import hydro.common.GuavaReplacement
+import hydro.common.GuavaReplacement.Iterables.getOnlyElement
 import hydro.common.Tags
 import hydro.flux.action.Dispatcher
 import hydro.flux.react.uielements.input.InputBase
@@ -193,6 +195,9 @@ final class SearchResultsEditAllPanel(implicit
                 dispatcher.dispatch(AppActions.EditAllChangeCategory(transactions, category))
               }
             case EditAllOperation.AddTag =>
+              for (tag <- tagRef().value) {
+                dispatcher.dispatch(AppActions.EditAllAddTag(transactions, getOnlyElement(tag)))
+              }
           }
 
           state.copy(showErrorMessages = true)

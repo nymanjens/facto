@@ -27,4 +27,5 @@ object AppActions {
 
   // **************** Refactor actions **************** //
   case class EditAllChangeCategory(transactions: Seq[Transaction], newCategory: Category) extends Action
+  case class EditAllAddTag(transactions: Seq[Transaction], newTag: String) extends Action
 }
