@@ -52,8 +52,18 @@ final class SearchResultsEditAllPanel(implicit
       query: String
   )
   protected case class State(
-      maybeMatchingEntries: Option[Seq[GeneralEntry]] = None
+      maybeMatchingEntries: Option[Seq[GeneralEntry]] = None,
+      editAllOperation: Option[EditAllOperation] = None,
+      feedbackStatusMessage: String = "",
   )
+
+  sealed abstract class EditAllOperation(name: String)
+  object EditAllOperation {
+    def all: Seq[EditAllOperation] = Seq(ChangeCategory, AddTag)
+
+    object ChangeCategory extends EditAllOperation(i18n("app.change-category"))
+    object AddTag extends EditAllOperation(i18n("app.add-tag"))
+  }
 
   protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
 
