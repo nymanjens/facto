@@ -36,12 +36,14 @@ final class Module(implicit
     pageHeader: PageHeader,
     descriptionWithEntryCount: DescriptionWithEntryCount,
     templateMatcher: TemplateMatcher,
+    tagsStoreFactory: TagsStoreFactory,
 ) {
 
   implicit lazy val everything = new Everything
   implicit lazy val cashFlow = new CashFlow
   implicit lazy val liquidation = new Liquidation
   implicit lazy val endowments = new Endowments
+  implicit private lazy val searchResultsEditAllPanel = new SearchResultsEditAllPanel
   implicit lazy val searchResults = new SearchResults
   implicit private lazy val summaryTable = new SummaryTable
   implicit lazy val summary = new Summary

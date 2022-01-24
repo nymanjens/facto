@@ -11,8 +11,12 @@ import app.flux.stores.entries.factories.ComplexQueryStoreFactory
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Config
 import hydro.common.time.Clock
+import hydro.flux.react.uielements.Bootstrap
+import hydro.flux.react.uielements.Bootstrap.Variant
 import hydro.flux.react.uielements.PageHeader
 import hydro.flux.react.uielements.Panel
+import hydro.flux.react.HydroReactComponent
+import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.router.RouterContext
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
@@ -28,17 +32,49 @@ final class SearchResults(implicit
     i18n: I18n,
     pageHeader: PageHeader,
     descriptionWithEntryCount: DescriptionWithEntryCount,
-) {
+    searchResultsEditAllPanel: SearchResultsEditAllPanel,
+) extends HydroReactComponent {
 
   private val entriesListTable: EntriesListTable[GeneralEntry, ComplexQueryStoreFactory.Query] =
     new EntriesListTable
 
-  private val component = ScalaComponent
-    .builder[Props](getClass.getSimpleName)
-    .renderP((_, props) => {
+  // **************** API ****************//
+  def apply(query: String, router: RouterContext): VdomElement = {
+    component(Props(query, router))
+  }
+
+  // **************** Implementation of HydroReactComponent methods ****************//
+  override protected val config = ComponentConfig(backendConstructor = new Backend(_), initialState = State())
+
+  // **************** Private inner types ****************//
+  protected case class Props(
+      query: String,
+      router: RouterContext,
+  )
+  protected case class State(
+      showUpdateAllPanel: Boolean = false
+  )
+
+  protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
+
+    override def render(props: Props, state: State) = {
       implicit val router = props.router
       <.span(
-        pageHeader(router.currentPage),
+        pageHeader.withExtension(router.currentPage)(
+          <.span(
+            Bootstrap.Button(variant = Variant.default)(
+              ^.onClick --> $.modState(state => state.copy(showUpdateAllPanel = !state.showUpdateAllPanel)),
+              Bootstrap.FontAwesomeIcon("magic"),
+              " ",
+              if (state.showUpdateAllPanel) {
+                i18n("app.hide-edit-all-results-panel")
+              } else {
+                i18n("app.edit-all-results")
+              },
+            )
+          )
+        ),
+        <<.ifThen(state.showUpdateAllPanel)(searchResultsEditAllPanel(props.query)),
         Panel(i18n("app.search-results"))(
           entriesListTable(
             tableTitle = i18n("app.all"),
@@ -78,14 +114,6 @@ final class SearchResults(implicit
           )
         ),
       )
-    })
-    .build
-
-  // **************** API ****************//
-  def apply(query: String, router: RouterContext): VdomElement = {
-    component(Props(query, router))
+    }
   }
-
-  // **************** Private inner types ****************//
-  private case class Props(query: String, router: RouterContext)
 }

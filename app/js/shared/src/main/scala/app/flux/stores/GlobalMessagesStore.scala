@@ -50,7 +50,7 @@ final class GlobalMessagesStore(implicit
       getCompletionMessage.lift.apply(action) match {
         case Some(message) =>
           setState(Message(string = message, messageType = Message.Type.Success))
-          clearMessageAfterDelay()
+          clearMessageAfterDelay(delay = getCompletionMessageDelay(action))
         case None =>
       }
 
@@ -60,7 +60,7 @@ final class GlobalMessagesStore(implicit
           setState(
             Message(string = i18n("app.sending-data-to-server-failed"), messageType = Message.Type.Failure)
           )
-          clearMessageAfterDelay()
+          clearMessageAfterDelay(delay = 10.seconds)
         case None =>
       }
 
@@ -99,12 +99,34 @@ final class GlobalMessagesStore(implicit
       i18n("app.successfully-edited-a-balance-check-for", newBalanceCheck.moneyReservoir.name)
     case RemoveBalanceCheck(existingBalanceCheck) =>
       i18n("app.successfully-deleted-balance-check-for", existingBalanceCheck.moneyReservoir.name)
+
+    // **************** Refactor actions **************** //
+    case action @ EditAllChangeCategory(transactions, newCategory) =>
+      val transactionsString = i18n(
+        "app.n-groups-m-individual-transactions",
+        action.affectedTransactions.map(_.transactionGroupId).distinct.size,
+        action.affectedTransactions.size,
+      )
+      i18n("app.successfully-changed-category-of-0-to-1", transactionsString, newCategory.name)
+    case action @ EditAllAddTag(transactions, newTag) =>
+      val transactionsString = i18n(
+        "app.n-groups-m-individual-transactions",
+        action.affectedTransactions.map(_.transactionGroupId).distinct.size,
+        action.affectedTransactions.size,
+      )
+      i18n("app.successfully-added-tag-1-to-0", transactionsString, newTag)
+  }
+  private def getCompletionMessageDelay(action: Action): FiniteDuration = {
+    action match {
+      case _: RefactorAction => 10.seconds
+      case _                 => 2.seconds
+    }
   }
 
   /** Clear this message after some delay */
-  private def clearMessageAfterDelay(): Unit = {
+  private def clearMessageAfterDelay(delay: FiniteDuration): Unit = {
     val uniqueStateWhenCreatedMessage = _state
-    js.timers.setTimeout(2.seconds)(logExceptions {
+    js.timers.setTimeout(delay)(logExceptions {
       if (_state == uniqueStateWhenCreatedMessage) {
         // state has remained unchanged since start of timer
         setState(None)

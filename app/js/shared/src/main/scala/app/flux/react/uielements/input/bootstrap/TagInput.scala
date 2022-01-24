@@ -2,6 +2,7 @@ package app.flux.react.uielements.input.bootstrap
 
 import hydro.common.I18n
 import hydro.common.JsLoggingUtils.logExceptions
+import hydro.common.ScalaUtils
 import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.ReactVdomUtils.^^
 import hydro.flux.react.uielements.input.InputBase
@@ -36,7 +37,7 @@ object TagInput {
       defaultValue: Seq[String],
       showErrorMessage: Boolean,
       additionalValidator: InputValidator[Seq[String]],
-      inputClasses: Seq[String],
+      inputClasses: Seq[String] = Seq(),
       listener: InputBase.Listener[Seq[String]] = InputBase.Listener.nullInstance,
   )(implicit i18n: I18n): VdomElement = {
     val props = Props(
@@ -86,7 +87,10 @@ object TagInput {
   }
 
   private final class Proxy(val component: ThisComponentU) extends InputBase.Proxy[Seq[String]] {
-    override def value = Some(component.state.tags)
+    override def value = {
+      val value = component.state.tags
+      ScalaUtils.ifThenOption(component.props.additionalValidator.isValid(value))(value)
+    }
     override def valueOrDefault = value getOrElse Seq()
     override def setValue(newValue: Seq[String]) = {
       component.modState(_.withTags(newValue))
