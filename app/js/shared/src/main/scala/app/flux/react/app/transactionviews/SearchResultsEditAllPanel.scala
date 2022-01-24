@@ -244,15 +244,12 @@ final class SearchResultsEditAllPanel(implicit
           $.modState { state =>
             state.copy(maybeWillAffectMessage = {
               for (refactorAction <- maybeGetRefactorAction(state)) yield {
-                val affectedTransactions =
-                  refactorAction.transactions.filterNot(t => refactorAction.updateToApply(t) == t)
-
                 i18n(
                   "app.this-operation-will-affect-0",
                   i18n(
                     "app.n-groups-m-individual-transactions",
-                    affectedTransactions.map(_.transactionGroupId).distinct.size,
-                    affectedTransactions.size,
+                    refactorAction.affectedTransactions.map(_.transactionGroupId).distinct.size,
+                    refactorAction.affectedTransactions.size,
                   ),
                 )
               }

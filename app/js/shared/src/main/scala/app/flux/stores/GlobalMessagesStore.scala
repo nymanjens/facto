@@ -101,18 +101,18 @@ final class GlobalMessagesStore(implicit
       i18n("app.successfully-deleted-balance-check-for", existingBalanceCheck.moneyReservoir.name)
 
     // **************** Refactor actions **************** //
-    case EditAllChangeCategory(transactions, newCategory) =>
+    case action @ EditAllChangeCategory(transactions, newCategory) =>
       val transactionsString = i18n(
         "app.n-groups-m-individual-transactions",
-        transactions.map(_.transactionGroupId).distinct.size,
-        transactions.size,
+        action.affectedTransactions.map(_.transactionGroupId).distinct.size,
+        action.affectedTransactions.size,
       )
       i18n("app.successfully-changed-category-of-0-to-1", transactionsString, newCategory.name)
-    case EditAllAddTag(transactions, newTag) =>
+    case action @ EditAllAddTag(transactions, newTag) =>
       val transactionsString = i18n(
         "app.n-groups-m-individual-transactions",
-        transactions.map(_.transactionGroupId).distinct.size,
-        transactions.size,
+        action.affectedTransactions.map(_.transactionGroupId).distinct.size,
+        action.affectedTransactions.size,
       )
       i18n("app.successfully-added-tag-1-to-0", transactionsString, newTag)
   }

@@ -61,7 +61,7 @@ private[stores] final class TransactionAndGroupStore(implicit
 
     // **************** Refactor actions **************** //
     case refactorAction: RefactorAction =>
-      applyRefactor(refactorAction.transactions, refactorAction.updateToApply)
+      applyRefactor(refactorAction)
   }
 
   private def zipWithIncrementingId[E](entities: Seq[E]): Seq[(E, Long)] = {
@@ -73,21 +73,18 @@ private[stores] final class TransactionAndGroupStore(implicit
     entities zip ids
   }
 
-  private def applyRefactor(
-      transactions: Seq[Transaction],
-      updateToApply: Transaction => Transaction,
-  ): Future[Unit] = async {
-    val transactionsToEdit = transactions.filterNot(t => updateToApply(t) == t)
+  private def applyRefactor(refactorAction: RefactorAction): Future[Unit] = async {
+    val affectedTransactions = refactorAction.affectedTransactions
 
     val modifications = await(
       Future.sequence(
         for {
-          transactionGroupId <- transactionsToEdit.map(_.transactionGroupId).distinct
+          transactionGroupId <- affectedTransactions.map(_.transactionGroupId).distinct
         } yield {
           getRefactorModifications(
             transactionGroupId,
-            updateToApply,
-            shouldBeEdited = transactionsToEdit.contains,
+            refactorAction.updateToApply,
+            shouldBeEdited = affectedTransactions.contains,
           )
         }
       )
@@ -97,12 +94,12 @@ private[stores] final class TransactionAndGroupStore(implicit
 
     console.log(
       s"""
-         |#given transactions                  = ${transactions.size}
-         |#transactions that were edited       = ${transactionsToEdit.size}
+         |#given transactions                  = ${refactorAction.transactions.size}
+         |#transactions that were edited       = ${affectedTransactions.size}
          |
          |Transactions that were edited:
          |
-         |${transactionsToEdit.map(t => s"- ${t.description} (${t.category}, ${t.tags})\n").mkString("")}
+         |${affectedTransactions.map(t => s"- ${t.description} (${t.category}, ${t.tags})\n").mkString("")}
          |""".stripMargin
     )
   }
