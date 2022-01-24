@@ -131,9 +131,12 @@ final class SearchResultsEditAllPanel(implicit
         Bootstrap.Col(sm = 8, smOffset = 4)(
           ^.style := js.Dictionary("paddingBottom" -> "15px"),
           i18n(
-            "app.matching-n-grouped-entries-m-individual-entries",
-            matchingEntries.size,
-            matchingEntries.flatMap(_.transactions).size,
+            "app.matching-1",
+            i18n(
+              "app.n-groups-m-individual-transactions",
+              matchingEntries.size,
+              matchingEntries.flatMap(_.transactions).size,
+            ),
           ),
         ),
         operationSelectInput(
