@@ -26,6 +26,21 @@ object AppActions {
   case class RemoveBalanceCheck(existingBalanceCheck: BalanceCheck) extends Action
 
   // **************** Refactor actions **************** //
-  case class EditAllChangeCategory(transactions: Seq[Transaction], newCategory: Category) extends Action
-  case class EditAllAddTag(transactions: Seq[Transaction], newTag: String) extends Action
+  sealed trait RefactorAction extends Action {
+    def transactions: Seq[Transaction]
+    def updateToApply(transaction: Transaction): Transaction
+  }
+  case class EditAllChangeCategory(override val transactions: Seq[Transaction], newCategory: Category)
+      extends RefactorAction {
+    override def updateToApply(transaction: Transaction): Transaction = {
+      transaction.copy(categoryCode = newCategory.code)
+    }
+  }
+  case class EditAllAddTag(override val transactions: Seq[Transaction], newTag: String)
+      extends RefactorAction {
+    override def updateToApply(transaction: Transaction): Transaction = {
+      if (transaction.tags contains newTag) transaction
+      else transaction.copy(tags = transaction.tags :+ newTag)
+    }
+  }
 }

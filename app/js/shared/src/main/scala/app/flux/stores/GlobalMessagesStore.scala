@@ -118,8 +118,8 @@ final class GlobalMessagesStore(implicit
   }
   private def getCompletionMessageDelay(action: Action): FiniteDuration = {
     action match {
-      case _: EditAllChangeCategory | _: EditAllAddTag => 10.seconds
-      case _                                           => 2.seconds
+      case _: RefactorAction => 10.seconds
+      case _                 => 2.seconds
     }
   }
 
