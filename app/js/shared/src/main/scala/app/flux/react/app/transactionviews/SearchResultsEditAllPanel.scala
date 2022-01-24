@@ -3,6 +3,7 @@ package app.flux.react.app.transactionviews
 import scala.scalajs.js
 import app.common.money.ExchangeRateManager
 import app.flux.action.AppActions
+import app.flux.action.AppActions.RefactorAction
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.react.uielements
 import app.flux.react.uielements.DescriptionWithEntryCount
@@ -32,11 +33,14 @@ import hydro.flux.react.HydroReactComponent
 import hydro.flux.react.uielements.input.bootstrap.TextInput
 import hydro.flux.react.uielements.HalfPanel
 import hydro.flux.react.uielements.input.bootstrap.SelectInput
+import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.router.RouterContext
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
+import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 final class SearchResultsEditAllPanel(implicit
     complexQueryStoreFactory: ComplexQueryStoreFactory,
@@ -79,6 +83,7 @@ final class SearchResultsEditAllPanel(implicit
       showErrorMessages: Boolean = false,
       editAllOperation: EditAllOperation = EditAllOperation.NoneSelected,
       maybeMatchingEntries: Option[Seq[GeneralEntry]] = None,
+      maybeWillAffectMessage: Option[String] = None,
       allTags: Seq[String] = Seq(),
   ) {
     lazy val possibleCategoriesForEntries: Seq[Category] = {
@@ -131,7 +136,7 @@ final class SearchResultsEditAllPanel(implicit
         Bootstrap.Col(sm = 8, smOffset = 4)(
           ^.style := js.Dictionary("paddingBottom" -> "15px"),
           i18n(
-            "app.matching-1",
+            "app.matching-0",
             i18n(
               "app.n-groups-m-individual-transactions",
               matchingEntries.size,
@@ -160,6 +165,7 @@ final class SearchResultsEditAllPanel(implicit
               valueToId = _.code,
               valueToName = category =>
                 if (category.helpText.isEmpty) category.name else s"${category.name} (${category.helpText})",
+              listener = AnyChangeListener,
             )
           case EditAllOperation.AddTag =>
             TagInput(
@@ -170,7 +176,14 @@ final class SearchResultsEditAllPanel(implicit
               showErrorMessage = state.showErrorMessages,
               additionalValidator = tags => tags.size == 1 && tags.forall(Tags.isValidTag),
               defaultValue = Seq(),
+              listener = AnyChangeListener,
             )
+        },
+        <<.ifDefined(state.maybeWillAffectMessage) { willAffectMessage =>
+          Bootstrap.Col(sm = 8, smOffset = 4)(
+            ^.style := js.Dictionary("paddingBottom" -> "15px"),
+            willAffectMessage,
+          )
         },
         Bootstrap.FormGroup(
           Bootstrap.Col(sm = 10, smOffset = 2)(
@@ -184,23 +197,29 @@ final class SearchResultsEditAllPanel(implicit
       )
     }
 
+    private def maybeGetRefactorAction(state: State): Option[RefactorAction] = {
+      val transactions = state.maybeMatchingEntries.get.flatMap(_.transactions)
+
+      state.editAllOperation match {
+        case EditAllOperation.NoneSelected => None
+        case EditAllOperation.ChangeCategory =>
+          for (category <- categoryRef().value) yield {
+            AppActions.EditAllChangeCategory(transactions, category)
+          }
+        case EditAllOperation.AddTag =>
+          for (tag <- tagRef().value) yield {
+            AppActions.EditAllAddTag(transactions, getOnlyElement(tag))
+          }
+      }
+    }
+
     private def onSubmit(e: ReactEventFromInput): Callback = LogExceptionsCallback {
       e.preventDefault()
 
       $.modState(state =>
         logExceptions {
-          val transactions = state.maybeMatchingEntries.get.flatMap(_.transactions)
-
-          state.editAllOperation match {
-            case EditAllOperation.NoneSelected =>
-            case EditAllOperation.ChangeCategory =>
-              for (category <- categoryRef().value) {
-                dispatcher.dispatch(AppActions.EditAllChangeCategory(transactions, category))
-              }
-            case EditAllOperation.AddTag =>
-              for (tag <- tagRef().value) {
-                dispatcher.dispatch(AppActions.EditAllAddTag(transactions, getOnlyElement(tag)))
-              }
+          for (action <- maybeGetRefactorAction(state)) {
+            dispatcher.dispatch(action)
           }
 
           state.copy(showErrorMessages = true)
@@ -210,7 +229,37 @@ final class SearchResultsEditAllPanel(implicit
 
     private object OperationListener extends InputBase.Listener[EditAllOperation] {
       override def onChange(newOperation: EditAllOperation, directUserChange: Boolean) = {
-        $.modState(_.copy(editAllOperation = newOperation))
+        {
+          $.modState(_.copy(editAllOperation = newOperation))
+        } >> {
+          AnyChangeListener.onChange(newOperation, directUserChange)
+        }
+      }
+    }
+    private object AnyChangeListener extends InputBase.Listener[Any] {
+      override def onChange(newValue: Any, directUserChange: Boolean) = {
+        // Schedule AnyChangeListener update async because it relies on the updated operation in the state and
+        // updated references
+        Future {
+          $.modState { state =>
+            state.copy(maybeWillAffectMessage = {
+              for (refactorAction <- maybeGetRefactorAction(state)) yield {
+                val affectedTransactions =
+                  refactorAction.transactions.filterNot(t => refactorAction.updateToApply(t) == t)
+
+                i18n(
+                  "app.this-operation-will-affect-0",
+                  i18n(
+                    "app.n-groups-m-individual-transactions",
+                    affectedTransactions.map(_.transactionGroupId).distinct.size,
+                    affectedTransactions.size,
+                  ),
+                )
+              }
+            })
+          }.runNow()
+        }
+        Callback.empty
       }
     }
   }
