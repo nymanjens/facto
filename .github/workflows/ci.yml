@@ -1,4 +1,4 @@
-name: CI
+name: Build and tests
 on: [pull_request, push]
 jobs:
   test:
