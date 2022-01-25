@@ -27,11 +27,18 @@ object TextInput extends HydroReactComponent {
   def apply(
       ref: Reference,
       name: String,
+      defaultValue: String = "",
       placeholder: String = "",
       classes: Seq[String] = Seq(),
       focusOnMount: Boolean = false,
   ): VdomElement = {
-    val props = Props(name = name, placeholder = placeholder, classes = classes, focusOnMount = focusOnMount)
+    val props = Props(
+      name = name,
+      defaultValue = defaultValue,
+      placeholder = placeholder,
+      classes = classes,
+      focusOnMount = focusOnMount,
+    )
     ref.mutableRef.component(props)
   }
 
@@ -46,16 +53,20 @@ object TextInput extends HydroReactComponent {
   }
 
   // **************** Implementation of HydroReactComponent methods ****************//
-  override protected val config = ComponentConfig(backendConstructor = new Backend(_), initialState = State())
+  override protected val config = ComponentConfig(
+    backendConstructor = new Backend(_),
+    initialStateFromProps = props => State(value = props.defaultValue),
+  )
 
   // **************** Implementation of HydroReactComponent types ****************//
   protected case class Props private[TextInput] (
       name: String,
+      defaultValue: String,
       placeholder: String,
       classes: Seq[String],
       focusOnMount: Boolean,
   )
-  protected case class State(value: String = "") {
+  protected case class State(value: String) {
     def withValue(newValue: String): State = copy(value = newValue)
   }
 

@@ -1,5 +1,7 @@
 package app.flux.react.app.transactionviews
 
+import hydro.common.JsLoggingUtils.LogExceptionsCallback
+import hydro.flux.react.uielements.input.TextInput
 import hydro.common.Formatting._
 import hydro.common.I18n
 import app.common.money.ExchangeRateManager
@@ -18,10 +20,13 @@ import hydro.flux.react.uielements.Panel
 import hydro.flux.react.HydroReactComponent
 import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.router.RouterContext
+import hydro.flux.router.StandardPages
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
+
+import scala.scalajs.js
 
 final class SearchResults(implicit
     complexQueryStoreFactory: ComplexQueryStoreFactory,
@@ -57,6 +62,8 @@ final class SearchResults(implicit
 
   protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
 
+    private val queryInputRef = TextInput.ref()
+
     override def render(props: Props, state: State) = {
       implicit val router = props.router
       <.span(
@@ -74,6 +81,7 @@ final class SearchResults(implicit
             )
           )
         ),
+        wideSearchBar(props.query),
         <<.ifThen(state.showUpdateAllPanel)(searchResultsEditAllPanel(props.query)),
         Panel(i18n("app.search-results"))(
           entriesListTable(
@@ -111,6 +119,42 @@ final class SearchResults(implicit
                 <.td(uielements.MoneyWithCurrency(entry.flow)),
                 <.td(uielements.TransactionGroupEditButtons(entry.groupId)),
               ),
+          )
+        ),
+      )
+    }
+
+    private def wideSearchBar(query: String)(implicit router: RouterContext) = {
+      Bootstrap.Row(
+        ^.style := js.Dictionary(
+          "paddingLeft" -> "20px",
+          "paddingRight" -> "20px",
+          "paddingBottom" -> "20px",
+        ),
+        <.form(
+          Bootstrap.InputGroup(
+            ^.className := "custom-search-form",
+            TextInput(
+              ref = queryInputRef,
+              name = "query",
+              defaultValue = query,
+              classes = Seq("form-control"),
+            ),
+            Bootstrap.InputGroupButton(
+              Bootstrap.Button(variant = Variant.default, tpe = "submit")(
+                ^.onClick ==> { (e: ReactEventFromInput) =>
+                  LogExceptionsCallback {
+                    e.preventDefault()
+
+                    queryInputRef().value match {
+                      case Some(query) => router.setPage(StandardPages.Search.fromInput(query))
+                      case None        =>
+                    }
+                  }
+                },
+                Bootstrap.FontAwesomeIcon("search"),
+              )
+            ),
           )
         ),
       )
