@@ -86,7 +86,7 @@ object ComplexQueryFilterTest extends TestSuite {
 
         withTransactions(transaction1, transaction2, transaction3)
           .assertThatQuery(" amount:-2.12")
-          .containsExactly(transaction1, transaction2)
+          .containsExactly(transaction1)
       }
       "detail filter" - {
         val transaction1 = createTransaction(detailDescription = "this is a fish")
