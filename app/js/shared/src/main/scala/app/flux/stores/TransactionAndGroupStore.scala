@@ -90,7 +90,7 @@ private[stores] final class TransactionAndGroupStore(implicit
       )
     ).flatten
 
-    entityAccess.persistModifications(modifications)
+    await(entityAccess.persistModifications(modifications))
 
     console.log(
       s"""
