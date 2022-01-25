@@ -1,7 +1,7 @@
 Family Accounting Tool
 ======================
 
-[![Build Status](https://travis-ci.org/nymanjens/facto.svg?branch=master)](https://travis-ci.org/nymanjens/facto)
+[![CI Status](https://github.com/nymanjens/facto/actions/workflows/ci.yml/badge.svg)](https://github.com/nymanjens/facto/actions)
 
 Familiy Accounting Tool keeps track of every transaction your family makes. Its goal is to:
 
