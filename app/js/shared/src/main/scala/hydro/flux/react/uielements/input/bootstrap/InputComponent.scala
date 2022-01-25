@@ -221,6 +221,7 @@ object InputComponent {
     override def value = {
       ValueTransformer.stringToValue(component.state.valueString, props) match {
         case Some(value) if props.required && props.valueTransformer.isEmptyValue(value) => None
+        case Some(value) if !props.additionalValidator.isValid(value)                    => None
         case other                                                                       => other
       }
     }

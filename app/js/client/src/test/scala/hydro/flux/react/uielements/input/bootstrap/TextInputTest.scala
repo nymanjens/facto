@@ -50,6 +50,18 @@ object TextInputTest extends TestSuite {
       tester.hasError ==> true
     }
 
+    "Returns value if additional validator indicates an valid value" - {
+      val tester = createTestComponent(defaultValue = "VALID_VALUE", showErrorMessage = true)
+
+      testRef().value ==> Some("VALID_VALUE")
+    }
+
+    "Returns no value if additional validator indicates an invalid value" - {
+      val tester = createTestComponent(defaultValue = "INVALID_VALUE", showErrorMessage = true)
+
+      testRef().value ==> None
+    }
+
     "Input name is given name" - {
       val tester = createTestComponent()
       tester.inputName ==> "dummy-name"
