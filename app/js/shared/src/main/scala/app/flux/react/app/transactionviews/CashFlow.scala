@@ -246,5 +246,12 @@ final class CashFlow(implicit
 }
 
 object CashFlow {
-  val minNumEntriesPerReservoir: Int = 10
+
+  def minNumEntriesPerReservoir(implicit user: User): Int = {
+    if (user.expandCashFlowTablesByDefault) {
+      10
+    } else {
+      35
+    }
+  }
 }
