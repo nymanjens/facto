@@ -59,21 +59,23 @@ final class StandardActions @Inject() (implicit
 
       val cutoffTime = clock.nowInstant.minus(Duration.ofDays(182))
 
-      val totalCount = dbRun(entityAccess.newSlickQuery[EntityModificationEntity]()).length
+      val totalCount = dbRun(entityAccess.newSlickQuery[EntityModificationEntity]().map(_.instantNanos)).length
       val oldModificationsCount = dbRun(
         entityAccess
           .newSlickQuery[EntityModificationEntity]()
           .filter(_.instant < cutoffTime)
+          .map(_.instantNanos)
       ).length
 
       val extraInfo = if (dryOrWetRun == "wet") {
-        dbRun(
+        val result: Int = dbRun(
           entityAccess
             .newSlickQuery[EntityModificationEntity]()
             .filter(_.instant < cutoffTime)
             .delete
         )
-        "Successfully removed the old modifications\n"
+
+        s"Successfully removed $result old modifications\n"
       } else {
         ""
       }
