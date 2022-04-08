@@ -110,21 +110,21 @@ object ValidatingYamlParser {
       }
     }
 
-    class WithStringSimplification[V](delegate: ParsableValue[V], stringToValue: String => V)
+    class WithStringSimplification[V](delegate: ParsableValue[V], stringToDelegateInput: String => Any)
         extends ParsableValue[V] {
       override def parse(yamlValue: Any): ParseResult[V] = {
         yamlValue match {
-          case v: java.lang.Integer => ParseResult.success(stringToValue(v.toString))
-          case v: java.lang.Long    => ParseResult.success(stringToValue(v.toString))
-          case v: java.lang.Boolean => ParseResult.success(stringToValue(v.toString))
-          case v: java.lang.String  => ParseResult.success(stringToValue(v.toString))
+          case v: java.lang.Integer => delegate.parse(stringToDelegateInput(v.toString))
+          case v: java.lang.Long    => delegate.parse(stringToDelegateInput(v.toString))
+          case v: java.lang.Boolean => delegate.parse(stringToDelegateInput(v.toString))
+          case v: java.lang.String  => delegate.parse(stringToDelegateInput(v.toString))
           case _                    => delegate.parse(yamlValue)
         }
       }
     }
     object WithStringSimplification {
-      def apply[V](delegate: ParsableValue[V])(stringToValue: String => V): ParsableValue[V] = {
-        new WithStringSimplification[V](delegate, stringToValue)
+      def apply[V](delegate: ParsableValue[V])(stringToDelegateInput: String => Any): ParsableValue[V] = {
+        new WithStringSimplification[V](delegate, stringToDelegateInput)
       }
     }
 
@@ -167,43 +167,48 @@ object ValidatingYamlParser {
     }
     abstract class MapParsableValue[V] extends ParsableValue[V] {
       override final def parse(yamlValue: Any): ParseResult[V] = {
-        if (yamlValue.isInstanceOf[java.util.Map[_, _]]) {
-          val yamlMap = yamlValue.asInstanceOf[java.util.Map[String, _]].asScala
+        val maybeYamlMap = yamlValue match {
+          case v: Map[_, _]           => Some(v.asInstanceOf[Map[String, _]])
+          case v: java.util.Map[_, _] => Some(v.asInstanceOf[java.util.Map[String, _]].asScala)
+          case _                      => None
+        }
+        maybeYamlMap match {
+          case Some(yamlMap) =>
+            val mapWithParsedValues = mutable.Map[String, Any]()
+            val validationErrors = mutable.Buffer[ValidationError]()
 
-          val mapWithParsedValues = mutable.Map[String, Any]()
-          val validationErrors = mutable.Buffer[ValidationError]()
-
-          for ((mapKey, mapValue) <- yamlMap) {
-            if (supportedKeyValuePairs.contains(mapKey)) {
-              supportedKeyValuePairs(mapKey).parsableValue.parse(mapValue) match {
-                case ParseResult(maybeParsedValue, errors) =>
-                  validationErrors.append(errors.map(_.prependPath(mapKey)): _*)
-                  for (parsedValue <- maybeParsedValue) {
-                    mapWithParsedValues.put(mapKey, parsedValue)
-                  }
+            for ((mapKey, mapValue) <- yamlMap) {
+              if (supportedKeyValuePairs.contains(mapKey)) {
+                supportedKeyValuePairs(mapKey).parsableValue.parse(mapValue) match {
+                  case ParseResult(maybeParsedValue, errors) =>
+                    validationErrors.append(errors.map(_.prependPath(mapKey)): _*)
+                    for (parsedValue <- maybeParsedValue) {
+                      mapWithParsedValues.put(mapKey, parsedValue)
+                    }
+                }
+              } else {
+                validationErrors.append(ValidationError(s"Unknown field: $mapKey"))
               }
-            } else {
-              validationErrors.append(ValidationError(s"Unknown field: $mapKey"))
             }
-          }
 
-          supportedKeyValuePairs.collect {
-            case (mapKey, MaybeRequiredMapValue.Required(_, valueIfInvalid)) if !yamlMap.contains(mapKey) =>
-              validationErrors.append(ValidationError(s"Required field: $mapKey"))
-              mapWithParsedValues.put(mapKey, valueIfInvalid)
-          }
-          supportedKeyValuePairs.collect {
-            case (mapKey, mapValue) if !yamlMap.contains(mapKey) =>
-          }
+            supportedKeyValuePairs.collect {
+              case (mapKey, MaybeRequiredMapValue.Required(_, valueIfInvalid)) if !yamlMap.contains(mapKey) =>
+                validationErrors.append(ValidationError(s"Required field: $mapKey"))
+                mapWithParsedValues.put(mapKey, valueIfInvalid)
+            }
+            supportedKeyValuePairs.collect {
+              case (mapKey, mapValue) if !yamlMap.contains(mapKey) =>
+            }
 
-          val resultValue =
-            parseFromParsedMapValues(StringMap(mapWithParsedValues.toMap, supportedKeyValuePairs))
+            val resultValue =
+              parseFromParsedMapValues(StringMap(mapWithParsedValues.toMap, supportedKeyValuePairs))
 
-          validationErrors.append(additionalValidationErrors(resultValue).map(e => ValidationError(e)): _*)
+            validationErrors.append(additionalValidationErrors(resultValue).map(e => ValidationError(e)): _*)
 
-          ParseResult(Some(resultValue), validationErrors.toVector)
-        } else {
-          ParseResult.onlyError(s"Expected a map but found $yamlValue")
+            ParseResult(Some(resultValue), validationErrors.toVector)
+
+          case None =>
+            ParseResult.onlyError(s"Expected a map but found $yamlValue")
         }
       }
 
@@ -257,7 +262,20 @@ object ValidatingYamlParser {
   case class ParseResult[+V](
       maybeValue: Option[V],
       validationErrors: Seq[ValidationError] = Seq(),
-  )
+  ) {
+    require(maybeValue.isDefined || validationErrors.nonEmpty, this.toString)
+    require(maybeValue.isEmpty || validationErrors.isEmpty, this.toString)
+
+    def map[V2](function: V => V2): ParseResult[V2] = {
+      ParseResult(maybeValue.map(function), validationErrors)
+    }
+    def flatMap[V2](function: V => ParseResult[V2]): ParseResult[V2] = {
+      maybeValue match {
+        case None        => this.asInstanceOf[ParseResult[V2]]
+        case Some(value) => function(value)
+      }
+    }
+  }
   object ParseResult {
     def onlyError[V](validationError: String): ParseResult[V] = {
       ParseResult[V](maybeValue = None, validationErrors = Seq(ValidationError(validationError)))
