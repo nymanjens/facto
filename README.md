@@ -30,6 +30,7 @@ db.default.driver=com.mysql.jdbc.Driver
 db.default.url="jdbc:mysql://localhost/facto?user=mysqluser&password=mysqlpassword"
 db.default.slick.profile = "slick.jdbc.MySQLProfile$"
 ```
+
   - Choose secret values for `play.http.secret.key` and `app.setup.defaultPassword`
 
 - Open a terminal in the unpacked folder
