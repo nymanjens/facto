@@ -20,7 +20,19 @@ Familiy Accounting Tool keeps track of every transaction your family makes. Its 
 ## Installation from release
 
 - Download the [latest release](https://github.com/nymanjens/facto/releases)
-- Unpack the archive and open a terminal in the unpacked folder
+- Unpack the archive
+- Open `conf/application.conf` in the unpacked folder:
+  - Configure a database. The easiest way is to set up a MariaDB server locally,
+    create an empty database called `facto` and configure it as follows:
+
+```
+db.default.driver=com.mysql.jdbc.Driver
+db.default.url="jdbc:mysql://localhost/facto?user=mysqluser&password=mysqlpassword"
+db.default.slick.profile = "slick.jdbc.MySQLProfile$"
+```
+  - Choose secret values for `play.http.secret.key` and `app.setup.defaultPassword`
+
+- Open a terminal in the unpacked folder
 - Run following commands to get the app running:
 
     ```
