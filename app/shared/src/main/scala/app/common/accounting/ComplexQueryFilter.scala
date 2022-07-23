@@ -35,15 +35,7 @@ final class ComplexQueryFilter(implicit
       DbQuery.Filter.And(
         Seq(
           splitInParts(query)
-            .map { case QueryPart(string, negated) =>
-              val filterPair = createFilterPair(singlePartWithoutNegation = string)
-
-              if (negated) {
-                filterPair.negated
-              } else {
-                filterPair
-              }
-            }
+            .map(toFilterPair)
             .sortBy(_.estimatedExecutionCost)
             .map(_.positiveFilter): _*
         )
@@ -52,6 +44,20 @@ final class ComplexQueryFilter(implicit
   }
 
   // **************** Private helper methods **************** //
+  private def toFilterPair(queryPart: QueryPart): QueryFilterPair = {
+    val QueryPart(content, negated) = queryPart
+
+    val filterPair = content match {
+      case QueryPart.Content.Literal(content) => createFilterPair(singlePartWithoutNegation = content)
+    }
+
+    if (negated) {
+      filterPair.negated
+    } else {
+      filterPair
+    }
+  }
+
   private def createFilterPair(singlePartWithoutNegation: String): QueryFilterPair = {
     def filterOptions[T](inputString: String, options: Seq[T])(nameFunc: T => String): Seq[T] =
       options.filter(option => nameFunc(option).toLowerCase contains inputString.toLowerCase)
@@ -150,26 +156,36 @@ final class ComplexQueryFilter(implicit
     var currentQuote: Option[Char] = None
     var negated = false
 
-    for (char <- query) char match {
-      case '-' if nextPart.isEmpty && currentQuote.isEmpty && !negated =>
-        negated = true
-      case _
-          if (quotes contains char) && (nextPart.isEmpty || nextPart
-            .endsWith(":")) && currentQuote.isEmpty =>
-        currentQuote = Some(char)
-      case _ if currentQuote contains char =>
-        currentQuote = None
-      case ' ' if currentQuote.isEmpty && nextPart.nonEmpty =>
-        parts += QueryPart(nextPart.result().trim, negated = negated)
-        nextPart.clear()
-        negated = false
-      case ' ' if currentQuote.isEmpty && nextPart.isEmpty =>
-      // do nothing
-      case _ =>
-        nextPart += char
+    for (char <- query) {
+      currentQuote match {
+        case None =>
+          char match {
+            case '-' if nextPart.isEmpty && !negated =>
+              negated = true
+            case _
+                if (quotes contains char) && (nextPart.isEmpty || nextPart
+                  .endsWith(":")) =>
+              currentQuote = Some(char)
+            case ' ' if nextPart.nonEmpty =>
+              parts += QueryPart(QueryPart.Content.Literal(nextPart.result().trim), negated = negated)
+              nextPart.clear()
+              negated = false
+            case ' ' if nextPart.isEmpty =>
+              // do nothing
+            case _ =>
+              nextPart += char
+          }
+        case Some(quoteCurrentlyIn) =>
+          char match {
+            case `quoteCurrentlyIn` =>
+              currentQuote = None
+            case _ =>
+              nextPart += char
+          }
+      }
     }
     if (nextPart.nonEmpty) {
-      parts += QueryPart(nextPart.result().trim, negated = negated)
+      parts += QueryPart(QueryPart.Content.Literal(nextPart.result().trim), negated = negated)
     }
     Seq(parts: _*)
   }
@@ -255,11 +271,17 @@ object ComplexQueryFilter {
   }
 
   @visibleForTesting private[accounting] case class QueryPart(
-      unquotedString: String,
+      content: QueryPart.Content,
       negated: Boolean = false,
   )
   @visibleForTesting private[accounting] object QueryPart {
-    def not(unquotedString: String): QueryPart = QueryPart(unquotedString, negated = true)
+    def not(content: Content): QueryPart = QueryPart(content, negated = true)
+
+    sealed trait Content
+    object Content {
+      case class Literal(content: String) extends Content
+      case class Or(queryParts: Seq[QueryPart]) extends Content
+    }
   }
 
   @visibleForTesting private[accounting] sealed abstract class Prefix private (

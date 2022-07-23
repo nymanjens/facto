@@ -179,30 +179,35 @@ object ComplexQueryFilterTest extends TestSuite {
     }
 
     "splitInParts()" - {
+      def literal(string: String): QueryPart.Content = QueryPart.Content.Literal(string)
+
       "empty string" - {
         complexQueryFilter.splitInParts("") ==> Seq()
       }
       "negation" - {
         complexQueryFilter.splitInParts("-a c -def") ==>
-          Seq(QueryPart.not("a"), QueryPart("c"), QueryPart.not("def"))
+          Seq(QueryPart.not(literal("a")), QueryPart(literal("c")), QueryPart.not(literal("def")))
       }
       "double negation" - {
-        complexQueryFilter.splitInParts("--a") ==> Seq(QueryPart.not("-a"))
+        complexQueryFilter.splitInParts("--a") ==> Seq(QueryPart.not(literal("-a")))
       }
       "double quotes" - {
-        complexQueryFilter.splitInParts(""" "-a c" """) ==> Seq(QueryPart("-a c"))
+        complexQueryFilter.splitInParts(""" "-a c" """) ==> Seq(QueryPart(literal("-a c")))
       }
       "single quotes" - {
-        complexQueryFilter.splitInParts(" '-a c' ") ==> Seq(QueryPart("-a c"))
+        complexQueryFilter.splitInParts(" '-a c' ") ==> Seq(QueryPart(literal("-a c")))
       }
       "negated quotes" - {
-        complexQueryFilter.splitInParts("-'XX YY'") ==> Seq(QueryPart.not("XX YY"))
+        complexQueryFilter.splitInParts("-'XX YY'") ==> Seq(QueryPart.not(literal("XX YY")))
       }
       "quote after colon" - {
-        complexQueryFilter.splitInParts("-don:'t wont'") ==> Seq(QueryPart.not("don:t wont"))
+        complexQueryFilter.splitInParts("-don:'t wont'") ==> Seq(QueryPart.not(literal("don:t wont")))
       }
       "quote inside text" - {
-        complexQueryFilter.splitInParts("-don't won't") ==> Seq(QueryPart.not("don't"), QueryPart("won't"))
+        complexQueryFilter.splitInParts("-don't won't") ==> Seq(
+          QueryPart.not(literal("don't")),
+          QueryPart(literal("won't")),
+        )
       }
     }
   }
