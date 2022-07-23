@@ -134,11 +134,20 @@ object ComplexQueryFilterTest extends TestSuite {
         val transaction3 = createTransaction(description = "cat", tags = Seq("monkey"))
 
         withTransactions(transaction1, transaction2, transaction3)
-          .assertThatQuery("fish tag:monkey")
+          .assertThatQuery("fish (tag:monkey sh)")
           .containsExactly(transaction1)
         withTransactions(transaction1, transaction2, transaction3)
-          .assertThatQuery("fish -tag:monkey")
+          .assertThatQuery("fish -(tag:monkey sh)")
           .containsExactly(transaction2)
+      }
+      "filter with OR" - {
+        val transaction1 = createTransaction(description = "cat dog fish", tags = Seq("monkey"))
+        val transaction2 = createTransaction(description = "fish")
+        val transaction3 = createTransaction(description = "donkey", tags = Seq("monkey"))
+
+        withTransactions(transaction1, transaction2, transaction3)
+          .assertThatQuery("(fish -dog) OR (donkey tag:monkey)")
+          .containsExactly(transaction2, transaction3)
       }
     }
 
@@ -218,8 +227,7 @@ object ComplexQueryFilterTest extends TestSuite {
       "with simple brackets" - {
         complexQueryFilter.splitInParts("a (b c)") ==> Seq(
           literal("a"),
-          literal("b"),
-          literal("c"),
+          and(literal("b"), literal("c")),
         )
       }
       "with simple brackets and negation" - {
@@ -235,15 +243,14 @@ object ComplexQueryFilterTest extends TestSuite {
       }
       "brackets and quotes" - {
         complexQueryFilter.splitInParts(""" ("abc ( " def) """) ==> Seq(
-          literal("abc ("),
-          literal("def"),
+          and(literal("abc ("), literal("def"))
         )
       }
       "nested brackets" - {
         complexQueryFilter.splitInParts("a -((b c) d)") ==> Seq(
           literal("a"),
           not(
-            and(literal("b"), literal("c"), literal("d"))
+            and(and(literal("b"), literal("c")), literal("d"))
           ),
         )
       }
@@ -252,6 +259,44 @@ object ComplexQueryFilterTest extends TestSuite {
           literal("a"),
           literal("func()"),
           literal("b"),
+        )
+      }
+      "OR statement: Simple" - {
+        complexQueryFilter.splitInParts("a OR b") ==> Seq(
+          or(literal("a"), literal("b"))
+        )
+      }
+      "OR statement: Multiple with brackets" - {
+        complexQueryFilter.splitInParts("a b OR (c OR d or e) OR f g") ==> Seq(
+          literal("a"),
+          or(
+            or(
+              literal("b"),
+              or(
+                or(
+                  literal("c"),
+                  literal("d"),
+                ),
+                literal("e"),
+              ),
+            ),
+            literal("f"),
+          ),
+          literal("g"),
+        )
+      }
+      "OR and AND combined" - {
+        complexQueryFilter.splitInParts("(a b) OR (c d)") ==> Seq(
+          or(
+            and(
+              literal("a"),
+              literal("b"),
+            ),
+            and(
+              literal("c"),
+              literal("d"),
+            ),
+          )
         )
       }
     }

@@ -12,6 +12,7 @@ import app.models.accounting.config.Config
 import hydro.common.Annotations.visibleForTesting
 import hydro.common.GuavaReplacement.Splitter
 import hydro.common.time.LocalDateTime
+import hydro.common.GuavaReplacement.Iterables.getOnlyElement
 import hydro.models.access.DbQuery
 import hydro.models.access.DbQuery.PicklableOrdering
 import hydro.models.access.DbQueryImplicits._
@@ -152,6 +153,19 @@ final class ComplexQueryFilter(implicit
     var bracketCount = 0
     var negated = false
 
+    def insertNextPart(): Unit = {
+      if (nextPart.nonEmpty) {
+        if (negated) {
+          parts += QueryPart.Not(QueryPart.Literal(nextPart.result().trim))
+        } else {
+          parts += QueryPart.Literal(nextPart.result().trim)
+        }
+      }
+
+      nextPart.clear()
+      negated = false
+    }
+
     for (char <- query) {
       currentQuote match {
         case None =>
@@ -166,16 +180,8 @@ final class ComplexQueryFilter(implicit
                     currentQuote = Some(char)
                   case '-' if nextPart.isEmpty && !negated =>
                     negated = true
-                  case ' ' if nextPart.nonEmpty =>
-                    if (negated) {
-                      parts += QueryPart.Not(QueryPart.Literal(nextPart.result().trim))
-                    } else {
-                      parts += QueryPart.Literal(nextPart.result().trim)
-                    }
-                    nextPart.clear()
-                    negated = false
-                  case ' ' if nextPart.isEmpty =>
-                  // do nothing
+                  case ' ' =>
+                    insertNextPart()
                   case _ =>
                     nextPart += char
                 }
@@ -184,10 +190,14 @@ final class ComplexQueryFilter(implicit
                   case ')' =>
                     bracketCount -= 1
                     if (bracketCount == 0) {
+                      val positivePart = {
+                        val split = splitInParts(nextPart.result())
+                        if (split.size == 1) getOnlyElement(split) else QueryPart.And(split)
+                      }
                       if (negated) {
-                        parts += QueryPart.Not(QueryPart.And(splitInParts(nextPart.result())))
+                        parts += QueryPart.Not(positivePart)
                       } else {
-                        parts ++= splitInParts(nextPart.result())
+                        parts += positivePart
                       }
                       nextPart.clear()
                       negated = false
@@ -219,14 +229,34 @@ final class ComplexQueryFilter(implicit
           }
       }
     }
-    if (nextPart.nonEmpty) {
-      if (negated) {
-        parts += QueryPart.Not(QueryPart.Literal(nextPart.result().trim))
+    insertNextPart()
+
+    convertLiteralOrStatements(Seq(parts: _*))
+  }
+
+  private def convertLiteralOrStatements(parts: Seq[QueryPart]): Seq[QueryPart] = {
+    var result = mutable.Buffer[QueryPart]()
+
+    for (i <- parts.indices) {
+      if (result.size < 2) {
+        result.append(parts(i))
       } else {
-        parts += QueryPart.Literal(nextPart.result().trim)
+        val left = result.dropRight(1).last
+        val middle = result.last
+        val right = parts(i)
+
+        middle match {
+          case QueryPart.Literal(s) if s.toLowerCase == "or" =>
+            result = result.dropRight(2)
+            result.append(QueryPart.Or(Seq(left, right)))
+
+          case _ =>
+            result.append(right)
+        }
       }
     }
-    Seq(parts: _*)
+
+    Seq(result: _*)
   }
 }
 
