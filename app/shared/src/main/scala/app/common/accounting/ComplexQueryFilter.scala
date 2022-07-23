@@ -45,16 +45,11 @@ final class ComplexQueryFilter(implicit
 
   // **************** Private helper methods **************** //
   private def toFilterPair(queryPart: QueryPart): QueryFilterPair = {
-    val QueryPart(content, negated) = queryPart
-
-    val filterPair = content match {
-      case QueryPart.Content.Literal(content) => createFilterPair(singlePartWithoutNegation = content)
-    }
-
-    if (negated) {
-      filterPair.negated
-    } else {
-      filterPair
+    queryPart match {
+      case QueryPart.Literal(content) => createFilterPair(singlePartWithoutNegation = content)
+      case QueryPart.Not(part)        => toFilterPair(part).negated
+      case QueryPart.And(parts)       => QueryFilterPair.and(parts.map(toFilterPair): _*)
+      case QueryPart.Or(parts)        => QueryFilterPair.or(parts.map(toFilterPair): _*)
     }
   }
 
@@ -154,38 +149,82 @@ final class ComplexQueryFilter(implicit
     val parts = mutable.Buffer[QueryPart]()
     val nextPart = new StringBuilder
     var currentQuote: Option[Char] = None
+    var bracketCount = 0
     var negated = false
 
     for (char <- query) {
       currentQuote match {
         case None =>
           char match {
-            case '-' if nextPart.isEmpty && !negated =>
-              negated = true
-            case _
-                if (quotes contains char) && (nextPart.isEmpty || nextPart
-                  .endsWith(":")) =>
-              currentQuote = Some(char)
-            case ' ' if nextPart.nonEmpty =>
-              parts += QueryPart(QueryPart.Content.Literal(nextPart.result().trim), negated = negated)
-              nextPart.clear()
-              negated = false
-            case ' ' if nextPart.isEmpty =>
-              // do nothing
             case _ =>
-              nextPart += char
+              if (bracketCount == 0) {
+                char match {
+                  case '(' if nextPart.isEmpty =>
+                    bracketCount += 1
+                  case _ if (quotes contains char) && (nextPart.isEmpty || !nextPart.last.isLetterOrDigit) =>
+                    // Check the previous character to avoid parsing the ' in e.g. don't
+                    currentQuote = Some(char)
+                  case '-' if nextPart.isEmpty && !negated =>
+                    negated = true
+                  case ' ' if nextPart.nonEmpty =>
+                    if (negated) {
+                      parts += QueryPart.Not(QueryPart.Literal(nextPart.result().trim))
+                    } else {
+                      parts += QueryPart.Literal(nextPart.result().trim)
+                    }
+                    nextPart.clear()
+                    negated = false
+                  case ' ' if nextPart.isEmpty =>
+                  // do nothing
+                  case _ =>
+                    nextPart += char
+                }
+              } else {
+                char match {
+                  case ')' =>
+                    bracketCount -= 1
+                    if (bracketCount == 0) {
+                      if (negated) {
+                        parts += QueryPart.Not(QueryPart.And(splitInParts(nextPart.result())))
+                      } else {
+                        parts ++= splitInParts(nextPart.result())
+                      }
+                      nextPart.clear()
+                      negated = false
+                    } else {
+                      nextPart += char
+                    }
+                  case _ if (quotes contains char) && (nextPart.isEmpty || !nextPart.last.isLetterOrDigit) =>
+                    // Check the previous character to avoid parsing the ' in e.g. don't
+                    currentQuote = Some(char)
+                    nextPart += char
+                  case '(' =>
+                    bracketCount += 1
+                    nextPart += char
+                  case _ =>
+                    nextPart += char
+                }
+              }
+
           }
         case Some(quoteCurrentlyIn) =>
           char match {
             case `quoteCurrentlyIn` =>
               currentQuote = None
+              if (bracketCount > 0) {
+                nextPart += char
+              }
             case _ =>
               nextPart += char
           }
       }
     }
     if (nextPart.nonEmpty) {
-      parts += QueryPart(QueryPart.Content.Literal(nextPart.result().trim), negated = negated)
+      if (negated) {
+        parts += QueryPart.Not(QueryPart.Literal(nextPart.result().trim))
+      } else {
+        parts += QueryPart.Literal(nextPart.result().trim)
+      }
     }
     Seq(parts: _*)
   }
@@ -212,6 +251,14 @@ object ComplexQueryFilter {
       QueryFilterPair(
         positiveFilter = DbQuery.Filter.Or(queryFilterPairs.toVector.map(_.positiveFilter)),
         negativeFilter = DbQuery.Filter.And(queryFilterPairs.toVector.map(_.negativeFilter)),
+        estimatedExecutionCost = queryFilterPairs.map(_.estimatedExecutionCost).sum,
+      )
+    }
+
+    def and(queryFilterPairs: QueryFilterPair*): QueryFilterPair = {
+      QueryFilterPair(
+        positiveFilter = DbQuery.Filter.And(queryFilterPairs.toVector.map(_.positiveFilter)),
+        negativeFilter = DbQuery.Filter.Or(queryFilterPairs.toVector.map(_.negativeFilter)),
         estimatedExecutionCost = queryFilterPairs.map(_.estimatedExecutionCost).sum,
       )
     }
@@ -270,18 +317,12 @@ object ComplexQueryFilter {
       )
   }
 
-  @visibleForTesting private[accounting] case class QueryPart(
-      content: QueryPart.Content,
-      negated: Boolean = false,
-  )
+  @visibleForTesting private[accounting] sealed trait QueryPart
   @visibleForTesting private[accounting] object QueryPart {
-    def not(content: Content): QueryPart = QueryPart(content, negated = true)
-
-    sealed trait Content
-    object Content {
-      case class Literal(content: String) extends Content
-      case class Or(queryParts: Seq[QueryPart]) extends Content
-    }
+    case class Not(queryPart: QueryPart) extends QueryPart
+    case class Literal(content: String) extends QueryPart
+    case class And(queryParts: Seq[QueryPart]) extends QueryPart
+    case class Or(queryParts: Seq[QueryPart]) extends QueryPart
   }
 
   @visibleForTesting private[accounting] sealed abstract class Prefix private (

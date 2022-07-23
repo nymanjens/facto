@@ -179,34 +179,79 @@ object ComplexQueryFilterTest extends TestSuite {
     }
 
     "splitInParts()" - {
-      def literal(string: String): QueryPart.Content = QueryPart.Content.Literal(string)
+      def literal(s: String): QueryPart = QueryPart.Literal(s)
+      def not(q: QueryPart): QueryPart = QueryPart.Not(q)
+      def and(qs: QueryPart*): QueryPart = QueryPart.And(Seq(qs: _*))
+      def or(qs: QueryPart*): QueryPart = QueryPart.Or(Seq(qs: _*))
 
       "empty string" - {
         complexQueryFilter.splitInParts("") ==> Seq()
       }
       "negation" - {
         complexQueryFilter.splitInParts("-a c -def") ==>
-          Seq(QueryPart.not(literal("a")), QueryPart(literal("c")), QueryPart.not(literal("def")))
+          Seq(not(literal("a")), literal("c"), not(literal("def")))
       }
       "double negation" - {
-        complexQueryFilter.splitInParts("--a") ==> Seq(QueryPart.not(literal("-a")))
+        complexQueryFilter.splitInParts("--a") ==> Seq(not(literal("-a")))
       }
       "double quotes" - {
-        complexQueryFilter.splitInParts(""" "-a c" """) ==> Seq(QueryPart(literal("-a c")))
+        complexQueryFilter.splitInParts(""" "-a c" """) ==> Seq(literal("-a c"))
+      }
+      "double quotes without closing quotes" - {
+        complexQueryFilter.splitInParts(""" "a b """) ==> Seq(literal("a b"))
       }
       "single quotes" - {
-        complexQueryFilter.splitInParts(" '-a c' ") ==> Seq(QueryPart(literal("-a c")))
+        complexQueryFilter.splitInParts(" '-a c' ") ==> Seq(literal("-a c"))
       }
       "negated quotes" - {
-        complexQueryFilter.splitInParts("-'XX YY'") ==> Seq(QueryPart.not(literal("XX YY")))
+        complexQueryFilter.splitInParts("-'XX YY'") ==> Seq(not(literal("XX YY")))
       }
       "quote after colon" - {
-        complexQueryFilter.splitInParts("-don:'t wont'") ==> Seq(QueryPart.not(literal("don:t wont")))
+        complexQueryFilter.splitInParts("-don:'t wont'") ==> Seq(not(literal("don:t wont")))
       }
       "quote inside text" - {
         complexQueryFilter.splitInParts("-don't won't") ==> Seq(
-          QueryPart.not(literal("don't")),
-          QueryPart(literal("won't")),
+          not(literal("don't")),
+          literal("won't"),
+        )
+      }
+      "with simple brackets" - {
+        complexQueryFilter.splitInParts("a (b c)") ==> Seq(
+          literal("a"),
+          literal("b"),
+          literal("c"),
+        )
+      }
+      "with simple brackets and negation" - {
+        complexQueryFilter.splitInParts("a -(b c)") ==> Seq(
+          literal("a"),
+          not(and(literal("b"), literal("c"))),
+        )
+      }
+      "brackets as part of text" - {
+        complexQueryFilter.splitInParts("func()") ==> Seq(
+          literal("func()")
+        )
+      }
+      "brackets and quotes" - {
+        complexQueryFilter.splitInParts(""" ("abc ( " def) """) ==> Seq(
+          literal("abc ("),
+          literal("def"),
+        )
+      }
+      "nested brackets" - {
+        complexQueryFilter.splitInParts("a -((b c) d)") ==> Seq(
+          literal("a"),
+          not(
+            and(literal("b"), literal("c"), literal("d"))
+          ),
+        )
+      }
+      "nested brackets with inner one as part of text" - {
+        complexQueryFilter.splitInParts("a ( func() ) b") ==> Seq(
+          literal("a"),
+          literal("func()"),
+          literal("b"),
         )
       }
     }
