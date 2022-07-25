@@ -12,6 +12,7 @@ import app.models.accounting.config.Config
 import hydro.common.Annotations.visibleForTesting
 import hydro.common.GuavaReplacement.Splitter
 import hydro.common.time.LocalDateTime
+import hydro.common.GuavaReplacement.Iterables.getOnlyElement
 import hydro.models.access.DbQuery
 import hydro.models.access.DbQuery.PicklableOrdering
 import hydro.models.access.DbQueryImplicits._
@@ -35,15 +36,7 @@ final class ComplexQueryFilter(implicit
       DbQuery.Filter.And(
         Seq(
           splitInParts(query)
-            .map { case QueryPart(string, negated) =>
-              val filterPair = createFilterPair(singlePartWithoutNegation = string)
-
-              if (negated) {
-                filterPair.negated
-              } else {
-                filterPair
-              }
-            }
+            .map(toFilterPair)
             .sortBy(_.estimatedExecutionCost)
             .map(_.positiveFilter): _*
         )
@@ -52,6 +45,15 @@ final class ComplexQueryFilter(implicit
   }
 
   // **************** Private helper methods **************** //
+  private def toFilterPair(queryPart: QueryPart): QueryFilterPair = {
+    queryPart match {
+      case QueryPart.Literal(content) => createFilterPair(singlePartWithoutNegation = content)
+      case QueryPart.Not(part)        => toFilterPair(part).negated
+      case QueryPart.And(parts)       => QueryFilterPair.and(parts.map(toFilterPair): _*)
+      case QueryPart.Or(parts)        => QueryFilterPair.or(parts.map(toFilterPair): _*)
+    }
+  }
+
   private def createFilterPair(singlePartWithoutNegation: String): QueryFilterPair = {
     def filterOptions[T](inputString: String, options: Seq[T])(nameFunc: T => String): Seq[T] =
       options.filter(option => nameFunc(option).toLowerCase contains inputString.toLowerCase)
@@ -148,30 +150,113 @@ final class ComplexQueryFilter(implicit
     val parts = mutable.Buffer[QueryPart]()
     val nextPart = new StringBuilder
     var currentQuote: Option[Char] = None
+    var bracketCount = 0
     var negated = false
 
-    for (char <- query) char match {
-      case '-' if nextPart.isEmpty && currentQuote.isEmpty && !negated =>
-        negated = true
-      case _
-          if (quotes contains char) && (nextPart.isEmpty || nextPart
-            .endsWith(":")) && currentQuote.isEmpty =>
-        currentQuote = Some(char)
-      case _ if currentQuote contains char =>
-        currentQuote = None
-      case ' ' if currentQuote.isEmpty && nextPart.nonEmpty =>
-        parts += QueryPart(nextPart.result().trim, negated = negated)
-        nextPart.clear()
-        negated = false
-      case ' ' if currentQuote.isEmpty && nextPart.isEmpty =>
-      // do nothing
-      case _ =>
-        nextPart += char
+    def insertNextPart(): Unit = {
+      if (nextPart.nonEmpty) {
+        if (negated) {
+          parts += QueryPart.Not(QueryPart.Literal(nextPart.result().trim))
+        } else {
+          parts += QueryPart.Literal(nextPart.result().trim)
+        }
+      }
+
+      nextPart.clear()
+      negated = false
     }
-    if (nextPart.nonEmpty) {
-      parts += QueryPart(nextPart.result().trim, negated = negated)
+
+    for (char <- query) {
+      currentQuote match {
+        case None =>
+          char match {
+            case _ =>
+              if (bracketCount == 0) {
+                char match {
+                  case '(' if nextPart.isEmpty =>
+                    bracketCount += 1
+                  case _ if (quotes contains char) && (nextPart.isEmpty || !nextPart.last.isLetterOrDigit) =>
+                    // Check the previous character to avoid parsing the ' in e.g. don't
+                    currentQuote = Some(char)
+                  case '-' if nextPart.isEmpty && !negated =>
+                    negated = true
+                  case ' ' =>
+                    insertNextPart()
+                  case _ =>
+                    nextPart += char
+                }
+              } else {
+                char match {
+                  case ')' =>
+                    bracketCount -= 1
+                    if (bracketCount == 0) {
+                      val positivePart = {
+                        val split = splitInParts(nextPart.result())
+                        if (split.size == 1) getOnlyElement(split) else QueryPart.And(split)
+                      }
+                      if (negated) {
+                        parts += QueryPart.Not(positivePart)
+                      } else {
+                        parts += positivePart
+                      }
+                      nextPart.clear()
+                      negated = false
+                    } else {
+                      nextPart += char
+                    }
+                  case _ if (quotes contains char) && (nextPart.isEmpty || !nextPart.last.isLetterOrDigit) =>
+                    // Check the previous character to avoid parsing the ' in e.g. don't
+                    currentQuote = Some(char)
+                    nextPart += char
+                  case '(' =>
+                    bracketCount += 1
+                    nextPart += char
+                  case _ =>
+                    nextPart += char
+                }
+              }
+
+          }
+        case Some(quoteCurrentlyIn) =>
+          char match {
+            case `quoteCurrentlyIn` =>
+              currentQuote = None
+              if (bracketCount > 0) {
+                nextPart += char
+              }
+            case _ =>
+              nextPart += char
+          }
+      }
     }
-    Seq(parts: _*)
+    insertNextPart()
+
+    convertLiteralOrStatements(Seq(parts: _*))
+  }
+
+  private def convertLiteralOrStatements(parts: Seq[QueryPart]): Seq[QueryPart] = {
+    var result = mutable.Buffer[QueryPart]()
+
+    for (i <- parts.indices) {
+      if (result.size < 2) {
+        result.append(parts(i))
+      } else {
+        val left = result.dropRight(1).last
+        val middle = result.last
+        val right = parts(i)
+
+        middle match {
+          case QueryPart.Literal(s) if s.toLowerCase == "or" =>
+            result = result.dropRight(2)
+            result.append(QueryPart.Or(Seq(left, right)))
+
+          case _ =>
+            result.append(right)
+        }
+      }
+    }
+
+    Seq(result: _*)
   }
 }
 
@@ -196,6 +281,14 @@ object ComplexQueryFilter {
       QueryFilterPair(
         positiveFilter = DbQuery.Filter.Or(queryFilterPairs.toVector.map(_.positiveFilter)),
         negativeFilter = DbQuery.Filter.And(queryFilterPairs.toVector.map(_.negativeFilter)),
+        estimatedExecutionCost = queryFilterPairs.map(_.estimatedExecutionCost).sum,
+      )
+    }
+
+    def and(queryFilterPairs: QueryFilterPair*): QueryFilterPair = {
+      QueryFilterPair(
+        positiveFilter = DbQuery.Filter.And(queryFilterPairs.toVector.map(_.positiveFilter)),
+        negativeFilter = DbQuery.Filter.Or(queryFilterPairs.toVector.map(_.negativeFilter)),
         estimatedExecutionCost = queryFilterPairs.map(_.estimatedExecutionCost).sum,
       )
     }
@@ -254,12 +347,12 @@ object ComplexQueryFilter {
       )
   }
 
-  @visibleForTesting private[accounting] case class QueryPart(
-      unquotedString: String,
-      negated: Boolean = false,
-  )
+  @visibleForTesting private[accounting] sealed trait QueryPart
   @visibleForTesting private[accounting] object QueryPart {
-    def not(unquotedString: String): QueryPart = QueryPart(unquotedString, negated = true)
+    case class Not(queryPart: QueryPart) extends QueryPart
+    case class Literal(content: String) extends QueryPart
+    case class And(queryParts: Seq[QueryPart]) extends QueryPart
+    case class Or(queryParts: Seq[QueryPart]) extends QueryPart
   }
 
   @visibleForTesting private[accounting] sealed abstract class Prefix private (

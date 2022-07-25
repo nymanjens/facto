@@ -134,11 +134,20 @@ object ComplexQueryFilterTest extends TestSuite {
         val transaction3 = createTransaction(description = "cat", tags = Seq("monkey"))
 
         withTransactions(transaction1, transaction2, transaction3)
-          .assertThatQuery("fish tag:monkey")
+          .assertThatQuery("fish (tag:monkey sh)")
           .containsExactly(transaction1)
         withTransactions(transaction1, transaction2, transaction3)
-          .assertThatQuery("fish -tag:monkey")
+          .assertThatQuery("fish -(tag:monkey sh)")
           .containsExactly(transaction2)
+      }
+      "filter with OR" - {
+        val transaction1 = createTransaction(description = "cat dog fish", tags = Seq("monkey"))
+        val transaction2 = createTransaction(description = "fish")
+        val transaction3 = createTransaction(description = "donkey", tags = Seq("monkey"))
+
+        withTransactions(transaction1, transaction2, transaction3)
+          .assertThatQuery("(fish -dog) OR (donkey tag:monkey)")
+          .containsExactly(transaction2, transaction3)
       }
     }
 
@@ -179,30 +188,116 @@ object ComplexQueryFilterTest extends TestSuite {
     }
 
     "splitInParts()" - {
+      def literal(s: String): QueryPart = QueryPart.Literal(s)
+      def not(q: QueryPart): QueryPart = QueryPart.Not(q)
+      def and(qs: QueryPart*): QueryPart = QueryPart.And(Seq(qs: _*))
+      def or(qs: QueryPart*): QueryPart = QueryPart.Or(Seq(qs: _*))
+
       "empty string" - {
         complexQueryFilter.splitInParts("") ==> Seq()
       }
       "negation" - {
         complexQueryFilter.splitInParts("-a c -def") ==>
-          Seq(QueryPart.not("a"), QueryPart("c"), QueryPart.not("def"))
+          Seq(not(literal("a")), literal("c"), not(literal("def")))
       }
       "double negation" - {
-        complexQueryFilter.splitInParts("--a") ==> Seq(QueryPart.not("-a"))
+        complexQueryFilter.splitInParts("--a") ==> Seq(not(literal("-a")))
       }
       "double quotes" - {
-        complexQueryFilter.splitInParts(""" "-a c" """) ==> Seq(QueryPart("-a c"))
+        complexQueryFilter.splitInParts(""" "-a c" """) ==> Seq(literal("-a c"))
+      }
+      "double quotes without closing quotes" - {
+        complexQueryFilter.splitInParts(""" "a b """) ==> Seq(literal("a b"))
       }
       "single quotes" - {
-        complexQueryFilter.splitInParts(" '-a c' ") ==> Seq(QueryPart("-a c"))
+        complexQueryFilter.splitInParts(" '-a c' ") ==> Seq(literal("-a c"))
       }
       "negated quotes" - {
-        complexQueryFilter.splitInParts("-'XX YY'") ==> Seq(QueryPart.not("XX YY"))
+        complexQueryFilter.splitInParts("-'XX YY'") ==> Seq(not(literal("XX YY")))
       }
       "quote after colon" - {
-        complexQueryFilter.splitInParts("-don:'t wont'") ==> Seq(QueryPart.not("don:t wont"))
+        complexQueryFilter.splitInParts("-don:'t wont'") ==> Seq(not(literal("don:t wont")))
       }
       "quote inside text" - {
-        complexQueryFilter.splitInParts("-don't won't") ==> Seq(QueryPart.not("don't"), QueryPart("won't"))
+        complexQueryFilter.splitInParts("-don't won't") ==> Seq(
+          not(literal("don't")),
+          literal("won't"),
+        )
+      }
+      "with simple brackets" - {
+        complexQueryFilter.splitInParts("a (b c)") ==> Seq(
+          literal("a"),
+          and(literal("b"), literal("c")),
+        )
+      }
+      "with simple brackets and negation" - {
+        complexQueryFilter.splitInParts("a -(b c)") ==> Seq(
+          literal("a"),
+          not(and(literal("b"), literal("c"))),
+        )
+      }
+      "brackets as part of text" - {
+        complexQueryFilter.splitInParts("func()") ==> Seq(
+          literal("func()")
+        )
+      }
+      "brackets and quotes" - {
+        complexQueryFilter.splitInParts(""" ("abc ( " def) """) ==> Seq(
+          and(literal("abc ("), literal("def"))
+        )
+      }
+      "nested brackets" - {
+        complexQueryFilter.splitInParts("a -((b c) d)") ==> Seq(
+          literal("a"),
+          not(
+            and(and(literal("b"), literal("c")), literal("d"))
+          ),
+        )
+      }
+      "nested brackets with inner one as part of text" - {
+        complexQueryFilter.splitInParts("a ( func() ) b") ==> Seq(
+          literal("a"),
+          literal("func()"),
+          literal("b"),
+        )
+      }
+      "OR statement: Simple" - {
+        complexQueryFilter.splitInParts("a OR b") ==> Seq(
+          or(literal("a"), literal("b"))
+        )
+      }
+      "OR statement: Multiple with brackets" - {
+        complexQueryFilter.splitInParts("a b OR (c OR d or e) OR f g") ==> Seq(
+          literal("a"),
+          or(
+            or(
+              literal("b"),
+              or(
+                or(
+                  literal("c"),
+                  literal("d"),
+                ),
+                literal("e"),
+              ),
+            ),
+            literal("f"),
+          ),
+          literal("g"),
+        )
+      }
+      "OR and AND combined" - {
+        complexQueryFilter.splitInParts("(a b) OR (c d)") ==> Seq(
+          or(
+            and(
+              literal("a"),
+              literal("b"),
+            ),
+            and(
+              literal("c"),
+              literal("d"),
+            ),
+          )
+        )
       }
     }
   }
