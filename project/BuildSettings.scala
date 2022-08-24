@@ -94,10 +94,10 @@ object BuildSettings {
     "startbootstrap-sb-admin-2" -> "1.0.7",
     // Used in ScalaJS code
     "lokijs" -> "1.4.2",
-    "react" -> "16.2.0",
-    "react-dom" -> "16.2.0",
+    "react" -> "16.14.0",
+    "react-dom" -> "16.14.0",
     "react-tag-input" -> "4.9.1",
-    "react-autosuggest" -> "9.3.2",
+    "react-autosuggest" -> "10.1.0",
     "recharts" -> "1.8.5",
     "mousetrap" -> "^1.6.2",
     "global-mousetrap" -> s"file:${projectRootDirectory / "app/js/shared/src/main/npm-packages/global-mousetrap"}"
