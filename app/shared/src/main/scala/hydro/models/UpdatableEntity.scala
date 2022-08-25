@@ -1,8 +1,8 @@
 package hydro.models
 
 import java.time.Instant
-
 import hydro.common.time.JavaTimeImplicits._
+import hydro.common.ScalaUtils
 import hydro.models.UpdatableEntity.LastUpdateTime
 import hydro.models.access.ModelField
 
@@ -111,6 +111,11 @@ object UpdatableEntity {
           }
         },
       ).canonicalized
+    }
+
+    def mostRecentInstant(): Option[Instant] = {
+      val allInstants = timePerField.values.toVector ++ otherFieldsTime
+      ScalaUtils.ifThenOption(allInstants.nonEmpty)(allInstants.max)
     }
   }
   object LastUpdateTime {
