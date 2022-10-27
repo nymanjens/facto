@@ -1,11 +1,12 @@
 package app.common.money
 
 import java.lang.Math.abs
-
 import hydro.common.GuavaReplacement.DoubleMath.roundToLong
 import hydro.common.time.LocalDateTime
+import hydro.common.GuavaReplacement.Splitter
 
 import scala.util.Failure
+import scala.util.Success
 import scala.util.Try
 
 /**
@@ -73,36 +74,19 @@ object Money {
 
   def tryFloatStringToCents(string: String): Try[Long] = {
     def parseWithoutSignOrMetricPrefix(string: String): Try[Long] = {
-      def parseCents(string: String): Try[Long] = {
+      def parseCents(string: String): Long = {
         string match {
-          case _ if string.length == 1 => Try(string.toLong * 10)
-          case _ if string.length == 2 => Try(string.toLong)
-          case _                       => Failure(new Exception(s"string.size == ${string.length}"))
+          case _ if string.length == 0 => 0
+          case _ if string.length == 1 => string.toLong * 10
+          case _ if string.length == 2 => string.toLong
+          case _                       => throw new Exception(s"string.size == ${string.length}")
         }
       }
-      def parseNonCents(string: String): Try[Long] = {
-        Try(string.toLong * 100)
-      }
-      def parseDelimitedBy(delimiter: String, string: String): Try[Long] = {
-        require(string contains delimiter)
-
-        val firstPart = string.substring(0, string.indexOf(delimiter))
-        val secondPart = string.substring(string.indexOf(delimiter) + 1)
-        require(!(firstPart contains delimiter))
-
-        if (secondPart contains delimiter) {
-          Failure(new Exception(s"secondPart '$secondPart' contains delimiter '$delimiter'"))
+      def parseNonCents(string: String): Long = {
+        if (string.isEmpty) {
+          0
         } else {
-          (firstPart, secondPart) match {
-            case ("", "") => Failure(new Exception(s"Empty string ($string)"))
-            case ("", _)  => parseCents(secondPart)
-            case (_, "")  => parseNonCents(firstPart)
-            case _ =>
-              for {
-                nonCents <- parseNonCents(firstPart)
-                cents <- parseCents(secondPart)
-              } yield nonCents + cents
-          }
+          string.toLong * 100
         }
       }
       def containsOnlyDigitsAndDelimiters(string: String): Boolean = {
@@ -113,21 +97,28 @@ object Money {
 
       if (!containsOnlyDigitsAndDelimiters(string)) {
         Failure(new Exception(s"string '$string' contains illegal characters"))
-      } else if (string contains ".") {
-        parseDelimitedBy(".", string.replace(",", ""))
-      } else if (string contains ",") {
-        val commaParts = string.split(",")
-        if (
-          !string.startsWith(",")
-          && commaParts.nonEmpty
-          && commaParts.tail.map(_.length).toSet == Set(3)
-        ) {
-          parseNonCents(string.replace(",", ""))
-        } else {
-          parseDelimitedBy(",", string)
-        }
+      } else if (!string.exists(_.isDigit)) {
+        Failure(new Exception(s"string '$string' contains no digits"))
       } else {
-        parseNonCents(string)
+        val parts = Splitter.on('.').split(string).flatMap(Splitter.on(',').split)
+
+        if (parts.size <= 1) {
+          require(parts.size == 1)
+          Success(parseNonCents(parts.mkString("")))
+        } else {
+          if (parts.drop(1).dropRight(1).exists(_.length != 3)) {
+            Failure(new Exception(s"Middle parts of separated amounts need to have length 3"))
+          } else if (parts(0).isEmpty && parts(1).length > 2) {
+            Failure(new Exception(s"Only the decimal part can start with a dot"))
+          } else if (parts.last.length > 3) {
+            Failure(new Exception(s"Last part of separated amounts needs to have length 3"))
+          } else if (parts.last.length < 3) {
+            Success(parseNonCents(parts.dropRight(1).mkString("")) + parseCents(parts.last))
+          } else {
+            require(parts.last.length == 3)
+            Success(parseNonCents(parts.mkString("")))
+          }
+        }
       }
     }
 
@@ -159,7 +150,7 @@ object Money {
 
   private def cleanCurrencyString(str: String): String = {
     var result = str.trim
-    for(characterToRemove <- " $€£¥₹") {
+    for (characterToRemove <- " $€£¥₹") {
       result = result.replace(characterToRemove.toString, "")
     }
     result
