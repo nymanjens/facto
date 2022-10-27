@@ -66,7 +66,7 @@ object MoneyTest extends TestSuite {
           Case("1,234", Option(123400)),
           Case("1 234", Option(123400)),
           Case(" 1 , 234 . 56 ", Option(123456)),
-          Case("12.\t", Option(12000)),
+          Case("12.\t", Option(1200)),
           Case("€12", Option(1200)),
           Case("€12.", Option(1200)),
           Case("€.12", Option(12)),
