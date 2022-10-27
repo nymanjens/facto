@@ -151,10 +151,17 @@ object Money {
       }
     }
 
-    val stringWithoutSpaces = string.replace(" ", "")
-    val (isNegative, stringWithoutSign) = detectAndRemoveSign(stringWithoutSpaces)
+    val (isNegative, stringWithoutSign) = detectAndRemoveSign(cleanCurrencyString(string))
     val (decimal, stringWithoutSignOrMetricPrefix) = detectAndRemoveMetricPrefix(stringWithoutSign)
     val factor = (if (isNegative) -1 else 1) * decimal
     parseWithoutSignOrMetricPrefix(stringWithoutSignOrMetricPrefix) map (cents => factor * cents)
+  }
+
+  private def cleanCurrencyString(str: String): String = {
+    var result = str.trim
+    for(characterToRemove <- " $€£¥₹") {
+      result = result.replace(characterToRemove.toString, "")
+    }
+    result
   }
 }
