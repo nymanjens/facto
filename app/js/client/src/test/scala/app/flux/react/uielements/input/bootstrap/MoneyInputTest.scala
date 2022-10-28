@@ -25,6 +25,7 @@ object MoneyInputTest extends TestSuite {
           "3.14 / 2.71" - { testNameToCents() ==> Some(115) }
 
           "1 - 1/2 - 2.3 * 2" - { testNameToCents() ==> Some(-410) }
+          "1000*.5897" - { testNameToCents() ==> Some(58970) }
         }
 
         "empty string" - { StringArithmetic.floatStringToCents("") ==> None }

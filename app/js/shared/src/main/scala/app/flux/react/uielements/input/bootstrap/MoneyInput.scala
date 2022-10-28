@@ -17,6 +17,9 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
+import scala.util.Failure
+import scala.util.Success
+import scala.util.Try
 
 object MoneyInput {
 
@@ -127,15 +130,19 @@ object MoneyInput {
   }
 
   @visibleForTesting private[bootstrap] object StringArithmetic {
-    private sealed abstract class Operation(val apply: (Long, Long) => Long, val toChar: Char)
+    private sealed abstract class Operation(val apply: (Double, Double) => Double, val toChar: Char)
     private case object Plus extends Operation(_ + _, '+')
     private case object Minus extends Operation(_ - _, '-')
-    private case object Times extends Operation(_ * _ / 100, '*')
-    private case object DividedBy extends Operation((lhs, rhs) => if (rhs == 0) 0 else lhs * 100 / rhs, '/')
+    private case object Times extends Operation(_ * _, '*')
+    private case object DividedBy extends Operation((lhs, rhs) => if (rhs == 0) 0 else lhs / rhs, '/')
 
     def floatStringToCents(string: String): Option[Long] = {
-      def inner(string: String, operations: List[Operation]): Option[Long] = operations match {
-        case Nil => Money.floatStringToCents(string)
+      def inner(string: String, operations: List[Operation]): Option[Double] = operations match {
+        case Nil =>
+          Try(string.trim.toDouble) match {
+            case Success(value) => Some(value)
+            case Failure(_) => Money.floatStringToCents(string).map(_ / 100.0)
+          }
         case operation :: otherOperations if string contains operation.toChar =>
           val parts = {
             val rawParts = Splitter.on(operation.toChar).split(string)
@@ -153,7 +160,7 @@ object MoneyInput {
           }
         case _ :: otherOperations => inner(string, otherOperations)
       }
-      inner(string, operations = List(Plus, Minus, Times, DividedBy))
+      inner(string, operations = List(Plus, Minus, Times, DividedBy)).map(Money.floatToCents)
     }
   }
 }
