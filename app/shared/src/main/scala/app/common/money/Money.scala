@@ -3,6 +3,7 @@ package app.common.money
 import java.lang.Math.abs
 import hydro.common.GuavaReplacement.DoubleMath.roundToLong
 import hydro.common.time.LocalDateTime
+import hydro.common.Annotations.visibleForTesting
 import hydro.common.GuavaReplacement.Splitter
 
 import scala.util.Failure
@@ -72,7 +73,8 @@ object Money {
    */
   def floatStringToCents(string: String): Option[Long] = tryFloatStringToCents(string).toOption
 
-  def tryFloatStringToCents(string: String): Try[Long] = {
+  @visibleForTesting
+  private[money] def tryFloatStringToCents(string: String): Try[Long] = {
     def parseWithoutSignOrMetricPrefix(string: String): Try[Long] = {
       def parseCents(string: String): Long = {
         string match {
