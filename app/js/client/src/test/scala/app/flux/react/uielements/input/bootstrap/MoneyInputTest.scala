@@ -21,8 +21,8 @@ object MoneyInputTest extends TestSuite {
 
           "1/1" - { testNameToCents() ==> Some(100) }
           "1/2" - { testNameToCents() ==> Some(50) }
-          "2 / 3" - { testNameToCents() ==> Some(66) }
-          "3.14 / 2.71" - { testNameToCents() ==> Some(115) }
+          "3 / 2" - { testNameToCents() ==> Some(150) }
+          "2.1 / 3" - { testNameToCents() ==> Some(70) }
 
           "1 - 1/2 - 2.3 * 2" - { testNameToCents() ==> Some(-410) }
           "1000*.5897" - { testNameToCents() ==> Some(58970) }
