@@ -75,7 +75,7 @@ docker-compose run web bin/server -DcreateAdminUser
 docker-compose up
 ```
 
-When done, browse to http://<ip_address>:9000/app/useradministration (username: "admin", password: "changeme")
+When done, browse to http://localhost:9000/ (username: "admin", password: "changeme")
 
 ## Configuration
 - `conf/application.conf`:<br>
