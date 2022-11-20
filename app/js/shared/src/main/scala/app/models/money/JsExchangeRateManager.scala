@@ -3,6 +3,7 @@ package app.models.money
 import app.common.money.Currency
 import app.common.money.ExchangeRateManager
 import app.models.access.AppJsEntityAccess
+import hydro.common.time.Clock
 import hydro.models.modification.EntityModification
 import hydro.common.time.LocalDateTime
 import hydro.models.access.JsEntityAccess
@@ -13,9 +14,11 @@ import scala.collection.mutable
 
 final class JsExchangeRateManager(
     ratioReferenceToForeignCurrency: Map[Currency, SortedMap[LocalDateTime, Double]]
-)(implicit entityAccess: AppJsEntityAccess)
+)(implicit entityAccess: AppJsEntityAccess, clock: Clock)
     extends ExchangeRateManager {
   entityAccess.registerListener(JsEntityAccessListener)
+
+  private val moneyValueIndexCurrency: Currency = Currency.General("<index>")
 
   private val measurementsCache: mutable.Map[Currency, SortedMap[LocalDateTime, Double]] =
     mutable.Map(ratioReferenceToForeignCurrency.toVector: _*)
@@ -38,6 +41,11 @@ final class JsExchangeRateManager(
             s"supported ($firstCurrency -> $secondCurrency)"
         )
     }
+  }
+
+  override def getMoneyValueRatioHistoricalToToday(date: LocalDateTime): Double = {
+    ratioReferenceToForeignCurrency(moneyValueIndexCurrency, clock.now) /
+      ratioReferenceToForeignCurrency(moneyValueIndexCurrency, date)
   }
 
   // **************** Private helper methods ****************//
