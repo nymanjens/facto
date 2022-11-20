@@ -50,7 +50,7 @@ object TransactionGroup {
         accountingConfig: Config,
         exchangeRateManager: ExchangeRateManager,
     ): Partial = {
-      val isZeroSum = transactions.map(_.flow.exchangedForReferenceCurrency).sum == ReferenceMoney(0)
+      val isZeroSum = transactions.map(_.flow.exchangedForReferenceCurrency()).sum == ReferenceMoney(0)
       Partial(
         transactions = transactions.map(Transaction.Partial.from),
         zeroSum = isZeroSum,

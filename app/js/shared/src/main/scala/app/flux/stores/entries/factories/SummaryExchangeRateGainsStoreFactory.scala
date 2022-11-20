@@ -167,8 +167,8 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
         monthToGains = monthsInPeriod.map { month =>
           val gain: ReferenceMoney = {
             def gainFromMoney(date: LocalDateTime, amount: MoneyWithGeneralCurrency): ReferenceMoney = {
-              val valueAtDate = amount.withDate(date).exchangedForReferenceCurrency
-              val valueAtEnd = amount.withDate(month.startTimeOfNextMonth).exchangedForReferenceCurrency
+              val valueAtDate = amount.withDate(date).exchangedForReferenceCurrency()
+              val valueAtEnd = amount.withDate(month.startTimeOfNextMonth).exchangedForReferenceCurrency()
               valueAtEnd - valueAtDate
             }
 

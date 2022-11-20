@@ -304,7 +304,7 @@ final class TransactionGroupForm(implicit
     def withRefreshedFlowFractions(panelRef: Int => transactionPanel.Reference): State = {
       val flows = for (panelIndex <- panelIndices) yield {
         val datedMoney = panelRef(panelIndex).apply().flowValueOrDefault
-        datedMoney.exchangedForReferenceCurrency
+        datedMoney.exchangedForReferenceCurrency()
       }
       val sumOfFlow = flows.sum
       copy(
@@ -465,7 +465,7 @@ final class TransactionGroupForm(implicit
         logExceptions {
           val flows = for (panelIndex <- state.panelIndices) yield {
             val datedMoney = panelRef(panelIndex).apply().flowValueOrDefault
-            datedMoney.exchangedForReferenceCurrency
+            datedMoney.exchangedForReferenceCurrency()
           }
           val currencies = for (panelIndex <- state.panelIndices) yield {
             panelRef(panelIndex).apply().moneyReservoir.valueOrDefault.currency

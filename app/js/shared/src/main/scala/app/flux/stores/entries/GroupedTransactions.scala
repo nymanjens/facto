@@ -67,7 +67,7 @@ abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
           flow
         }
       case _ => // Multiple currencies --> only show reference currency
-        transactions.map(_.flow.exchangedForReferenceCurrency).sum
+        transactions.map(_.flow.exchangedForReferenceCurrency()).sum
     }
   }
 

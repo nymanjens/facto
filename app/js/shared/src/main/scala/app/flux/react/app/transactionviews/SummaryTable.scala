@@ -554,7 +554,7 @@ private[transactionviews] final class SummaryTable(implicit
             if (store.state.isDefined) {
               dataBuilder.addToNetWorth(
                 store.state.get.entries.lastOption
-                  .map(_.entry.balance.withDate(clock.now).exchangedForReferenceCurrency) getOrElse
+                  .map(_.entry.balance.withDate(clock.now).exchangedForReferenceCurrency()) getOrElse
                   ReferenceMoney(0)
               )
             }

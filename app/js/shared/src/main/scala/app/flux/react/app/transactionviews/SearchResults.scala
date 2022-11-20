@@ -92,7 +92,7 @@ final class SearchResults(implicit
             calculateExtraTitle = { context =>
               val totalFlow = context.entriesInChronologicalOrder
                 .flatMap(_.transactions)
-                .map(_.flow.exchangedForReferenceCurrency)
+                .map(_.flow.exchangedForReferenceCurrency())
                 .sum
               Some(s"${i18n("app.total")}: $totalFlow")
             },

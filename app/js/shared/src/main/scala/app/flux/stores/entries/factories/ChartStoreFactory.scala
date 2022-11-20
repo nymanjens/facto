@@ -117,7 +117,7 @@ final class ChartStoreFactory(implicit
           .groupBy(t => DatedMonth.containing(t.consumedDate))
           // Don't show future transactions in charts because the data will likely paint an incomplete picture
           .filterKeys(_ <= DatedMonth.current)
-          .mapValues(_.map(_.flow.exchangedForReferenceCurrency).sum)
+          .mapValues(_.map(_.flow.exchangedForReferenceCurrency()).sum)
       )
     }
 

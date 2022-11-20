@@ -432,7 +432,7 @@ private[transactiongroupform] final class TransactionPanel(implicit
                   cents,
                   state.moneyReservoir.currency,
                   state.transactionDate,
-                ).exchangedForReferenceCurrency.formatFloat,
+                ).exchangedForReferenceCurrency().formatFloat,
               )
             } orElse props.fractionToShow.map { fraction =>
               <.span(

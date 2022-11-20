@@ -106,7 +106,7 @@ object SummaryForYearStoreFactory {
         accountingConfig: Config,
     ): ReferenceMoney = {
       if (_totalFlow eq null) {
-        _totalFlow = transactions.map(_.flow.exchangedForReferenceCurrency).sum
+        _totalFlow = transactions.map(_.flow.exchangedForReferenceCurrency()).sum
       }
       _totalFlow
     }
