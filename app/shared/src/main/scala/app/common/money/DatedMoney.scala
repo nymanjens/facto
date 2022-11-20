@@ -12,10 +12,10 @@ case class DatedMoney(override val cents: Long, override val currency: Currency,
     extends MoneyWithGeneralCurrency {
 
   def exchangedForReferenceCurrency(
-      correctedForInflation: Boolean = false
+      correctForInflation: Boolean = false
   )(implicit exchangeRateManager: ExchangeRateManager): ReferenceMoney = {
     val inflationCorrection = {
-      if (correctedForInflation) {
+      if (correctForInflation) {
         exchangeRateManager.getMoneyValueRatioHistoricalToToday(date)
       } else {
         1.0
