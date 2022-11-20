@@ -3,6 +3,7 @@ package app.flux.react.app.balancecheckform
 import hydro.common.I18n
 import app.common.money.ExchangeRateManager
 import app.flux.stores.GlobalMessagesStore
+import app.flux.stores.InMemoryUserConfigFactory
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Config
 import app.models.user.User
@@ -17,6 +18,7 @@ final class Module(implicit
     entityAccess: AppJsEntityAccess,
     exchangeRateManager: ExchangeRateManager,
     globalMessagesStore: GlobalMessagesStore,
+    inMemoryUserConfigFactory: InMemoryUserConfigFactory,
     dispatcher: Dispatcher,
     clock: Clock,
     pageHeader: PageHeader,

@@ -3,6 +3,7 @@ package app.flux.react.app.transactiongroupform
 import hydro.common.I18n
 import app.common.money.ExchangeRateManager
 import app.flux.stores.GlobalMessagesStore
+import app.flux.stores.InMemoryUserConfigFactory
 import app.flux.stores.entries.factories.LiquidationEntriesStoreFactory
 import app.flux.stores.entries.factories.TagsStoreFactory
 import app.models.access.AppJsEntityAccess
@@ -19,6 +20,7 @@ final class Module(implicit
     entityAccess: AppJsEntityAccess,
     exchangeRateManager: ExchangeRateManager,
     globalMessagesStore: GlobalMessagesStore,
+    inMemoryUserConfigFactory: InMemoryUserConfigFactory,
     tagsStoreFactory: TagsStoreFactory,
     dispatcher: Dispatcher,
     clock: Clock,

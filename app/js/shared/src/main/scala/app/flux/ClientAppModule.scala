@@ -57,6 +57,7 @@ final class ClientAppModule(implicit
   implicit private val collapsedExpandedStateStoreFactory =
     fluxStoresModule.collapsedExpandedStateStoreFactory
   implicit private val globalMessagesStore = fluxStoresModule.globalMessagesStore
+  implicit private val inMemoryUserConfigFactory = fluxStoresModule.inMemoryUserConfigFactory
   implicit private val pageLoadingStateStore = fluxStoresModule.pageLoadingStateStore
   implicit private val pendingModificationsStore = fluxStoresModule.pendingModificationsStore
   implicit private val applicationIsOnlineStore = fluxStoresModule.applicationIsOnlineStore

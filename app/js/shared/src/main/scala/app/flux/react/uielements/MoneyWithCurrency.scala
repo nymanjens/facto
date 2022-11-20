@@ -13,7 +13,7 @@ object MoneyWithCurrency extends HydroReactComponent.Stateless {
   // **************** API ****************//
   def apply(
       money: Money,
-      correctForInflation: Boolean = false,
+      correctForInflation: Boolean = true,
   )(implicit exchangeRateManager: ExchangeRateManager): VdomElement = {
     component(Props(money, correctForInflation, exchangeRateManager))
   }
@@ -34,7 +34,8 @@ object MoneyWithCurrency extends HydroReactComponent.Stateless {
 
       props.money match {
         case money: DatedMoney if money.currency != Currency.default || props.correctForInflation =>
-          val referenceMoney = money.exchangedForReferenceCurrency(correctForInflation = props.correctForInflation)
+          val referenceMoney =
+            money.exchangedForReferenceCurrency(correctForInflation = props.correctForInflation)
           <.span(
             money.toString + " ",
             <.span(^.className := "reference-currency", referenceMoney.toString),

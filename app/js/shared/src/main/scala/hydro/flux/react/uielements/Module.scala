@@ -17,6 +17,7 @@ final class Module(implicit
     user: User,
     entityAccess: JsEntityAccess,
     globalMessagesStore: GlobalMessagesStore,
+    inMemoryUserConfigFactory: InMemoryUserConfigFactory,
     pageLoadingStateStore: PageLoadingStateStore,
     pendingModificationsStore: PendingModificationsStore,
     applicationIsOnlineStore: ApplicationIsOnlineStore,
