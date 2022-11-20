@@ -6,6 +6,7 @@ import app.common.money.ExchangeRateManager
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.react.uielements
 import app.flux.react.uielements.DescriptionWithEntryCount
+import app.flux.react.uielements.MoneyWithCurrency
 import app.flux.stores.entries.GeneralEntry
 import app.flux.stores.entries.factories.AllEntriesStoreFactory
 import app.models.access.AppJsEntityAccess
@@ -28,6 +29,7 @@ final class Everything(implicit
     i18n: I18n,
     pageHeader: PageHeader,
     descriptionWithEntryCount: DescriptionWithEntryCount,
+    moneyWithCurrency: MoneyWithCurrency,
 ) {
 
   private val entriesListTable: EntriesListTable[GeneralEntry, Unit] = new EntriesListTable
@@ -64,7 +66,7 @@ final class Everything(implicit
                 <.td(entry.moneyReservoirs.map(_.shorterName).mkString(", ")),
                 <.td(entry.categories.map(_.name).mkString(", ")),
                 <.td(descriptionWithEntryCount(entry)),
-                <.td(uielements.MoneyWithCurrency(entry.flow)),
+                <.td(moneyWithCurrency(entry.flow)),
                 <.td(uielements.TransactionGroupEditButtons(entry.groupId)),
               ),
           )

@@ -4,6 +4,7 @@ import app.common.accounting.TemplateMatcher
 import hydro.common.I18n
 import app.common.money.ExchangeRateManager
 import app.flux.react.uielements.DescriptionWithEntryCount
+import app.flux.react.uielements.MoneyWithCurrency
 import app.flux.stores.GlobalMessagesStore
 import app.flux.stores.InMemoryUserConfigFactory
 import app.flux.stores.CollapsedExpandedStateStoreFactory
@@ -39,6 +40,7 @@ final class Module(implicit
     descriptionWithEntryCount: DescriptionWithEntryCount,
     templateMatcher: TemplateMatcher,
     tagsStoreFactory: TagsStoreFactory,
+    moneyWithCurrency: MoneyWithCurrency,
 ) {
 
   implicit lazy val everything = new Everything

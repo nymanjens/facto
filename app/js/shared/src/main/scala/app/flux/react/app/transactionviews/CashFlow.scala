@@ -11,6 +11,7 @@ import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.react.uielements
 import app.flux.react.uielements.CollapseAllExpandAllButtons
 import app.flux.react.uielements.DescriptionWithEntryCount
+import app.flux.react.uielements.MoneyWithCurrency
 import app.flux.router.AppPages
 import app.flux.stores.entries.CashFlowEntry
 import app.flux.stores.entries.factories.CashFlowEntriesStoreFactory
@@ -46,6 +47,7 @@ final class CashFlow(implicit
     i18n: I18n,
     pageHeader: PageHeader,
     descriptionWithEntryCount: DescriptionWithEntryCount,
+    moneyWithCurrency: MoneyWithCurrency,
 ) {
 
   private val entriesListTable: EntriesListTable[CashFlowEntry, MoneyReservoir] = new EntriesListTable
@@ -117,9 +119,9 @@ final class CashFlow(implicit
                             <.td(entry.beneficiaries.map(_.shorterName).mkString(", ")),
                             <.td(entry.categories.map(_.name).mkString(", ")),
                             <.td(descriptionWithEntryCount(entry)),
-                            <.td(uielements.MoneyWithCurrency(entry.flow)),
+                            <.td(moneyWithCurrency(entry.flow)),
                             <.td(
-                              uielements.MoneyWithCurrency(entry.balance),
+                              moneyWithCurrency(entry.balance),
                               entry.balanceVerified match {
                                 case true =>
                                   <.span(" ", Bootstrap.FontAwesomeIcon("check", fixedWidth = true))
@@ -146,14 +148,14 @@ final class CashFlow(implicit
                               ^.style := js.Dictionary("fontWeight" -> "bold"),
                               if (entry.balanceIncrease.cents > 0) "+" else "-",
                               " ",
-                              uielements.MoneyWithCurrency(
+                              moneyWithCurrency(
                                 if (entry.balanceIncrease.cents > 0) entry.balanceIncrease
                                 else -entry.balanceIncrease
                               ),
                             ),
                             <.td(
                               ^.style := js.Dictionary("fontWeight" -> "bold"),
-                              uielements.MoneyWithCurrency(balanceCorrection.balance),
+                              moneyWithCurrency(balanceCorrection.balance),
                             ),
                             <.td(balanceCheckEditButton(balanceCorrection)),
                           )

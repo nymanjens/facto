@@ -6,6 +6,7 @@ import app.common.money.ExchangeRateManager
 import app.flux.react.app.balancecheckform.BalanceCheckForm
 import app.flux.react.app.transactiongroupform.TransactionGroupForm
 import app.flux.react.uielements.DescriptionWithEntryCount
+import app.flux.react.uielements.MoneyWithCurrency
 import app.flux.stores._
 import app.flux.stores.entries.factories._
 import app.models.access.AppJsEntityAccess
@@ -56,6 +57,7 @@ final class Module(implicit
   implicit private lazy val sbadminLayout = hydroUielementsModule.sbadminLayout
   private val appUielementsModule = new app.flux.react.uielements.Module
   implicit private lazy val descriptionWithEntryCount = appUielementsModule.descriptionWithEntryCount
+  implicit private lazy val moneyWithCurrency = appUielementsModule.moneyWithCurrency
 
   private val userManagementModule = new hydro.flux.react.uielements.usermanagement.Module
   private val databaseExplorerModule = new hydro.flux.react.uielements.dbexplorer.Module
