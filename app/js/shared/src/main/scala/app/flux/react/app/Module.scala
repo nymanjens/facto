@@ -66,6 +66,7 @@ final class Module(implicit
   private val transactionViewsModule = new app.flux.react.app.transactionviews.Module
 
   implicit private lazy val menu: Menu = new Menu
+  implicit private lazy val inflationToggleButton: InflationToggleButton = new InflationToggleButton
 
   implicit lazy val layout: Layout = new Layout
 
