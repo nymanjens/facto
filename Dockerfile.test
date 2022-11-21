@@ -1,0 +1,6 @@
+FROM openlaw/scala-builder:node AS builder
+
+WORKDIR /src
+COPY . .
+RUN apk add --update nodejs npm
+RUN sbt -mem 2048 test
