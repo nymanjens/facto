@@ -195,9 +195,13 @@ object SummaryTableTest extends TestSuite {
     implicit val summaryForYearStoreFactory = storesModule.summaryForYearStoreFactory
     implicit val summaryExchangeRateGainsStoreFactory = storesModule.summaryExchangeRateGainsStoreFactory
     implicit val cashFlowEntriesStoreFactory = storesModule.cashFlowEntriesStoreFactory
+    implicit val inMemoryUserConfigFactory = storesModule.inMemoryUserConfigFactory
 
     private val appCommonAccountingModule = new app.common.accounting.Module()
     implicit val templateMatcher = appCommonAccountingModule.templateMatcher
+
+    private val appUielementsModule = new app.flux.react.uielements.Module
+    implicit val moneyWithCurrency = appUielementsModule.moneyWithCurrency
 
     val summaryTable: SummaryTable = new SummaryTable
   }

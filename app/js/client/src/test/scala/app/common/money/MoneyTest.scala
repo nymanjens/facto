@@ -89,7 +89,7 @@ object MoneyTest extends TestSuite {
         persistGbpMeasurement(daysBeforeNow = 1, ratio = 1.3)
 
         val money = DatedMoney(10, Currency.Gbp, clock.now)
-        money.exchangedForReferenceCurrency ==> ReferenceMoney(13)
+        money.exchangedForReferenceCurrency() ==> ReferenceMoney(13)
       }
 
       "exchangedForCurrency" - {
