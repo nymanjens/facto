@@ -38,7 +38,7 @@ final class SbadminLayout(implicit
       leftMenu: VdomElement,
       pageContent: VdomElement,
       extraFooter: Seq[TagMod] = Seq(),
-      extraNavbarTopRightContent: Seq[TagMod] = Seq(),
+      extraNavbarTopRightContent: Seq[VdomNode] = Seq(),
   )(implicit
       router: RouterContext
   ): VdomElement = {
@@ -64,7 +64,7 @@ final class SbadminLayout(implicit
           pageLoadingSpinner(),
         ),
         <.ul(^.className := "nav navbar-top-links navbar-right")(
-          extraNavbarTopRightContent: _*
+          extraNavbarTopRightContent.map(e => Bootstrap.NavbarBrand()(e)): _*
         )(
           Bootstrap.NavbarBrand()(
             ^.style := js.Dictionary("fontSize" -> "14px"),

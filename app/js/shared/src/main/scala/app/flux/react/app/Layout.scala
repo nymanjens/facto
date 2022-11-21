@@ -20,7 +20,7 @@ final class Layout(implicit
         title = "Family Accounting Tool",
         leftMenu = menu(),
         pageContent = <.span(children),
-        extraNavbarTopRightContent = Seq(inflationToggleButton(): TagMod),
+        extraNavbarTopRightContent = Seq(inflationToggleButton()),
       )
     }
     .build
