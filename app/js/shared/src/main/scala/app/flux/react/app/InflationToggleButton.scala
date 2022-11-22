@@ -9,6 +9,8 @@ import hydro.flux.react.uielements.Bootstrap.Variant
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
+import scala.scalajs.js
+
 private[app] final class InflationToggleButton(implicit
     accountingConfig: Config,
     inMemoryUserConfigStore: InMemoryUserConfigFactory,
@@ -38,12 +40,16 @@ private[app] final class InflationToggleButton(implicit
     override def render(props: Props, state: State) = logExceptions {
       if (accountingConfig.constants.supportInflationCorrections) {
         <.div(
-          ^.className := "facto-custom-switch-button",
-          <.input(
-            ^.tpe := "checkbox"
-          ),
-          <.label(
-            ^.className := "label-primary"
+          <.i(^.className := "icon-inflation"),
+          " ",
+          <.span(
+            ^.className := "facto-custom-switch-button",
+            <.input(
+              ^.tpe := "checkbox"
+            ),
+            <.label(
+              ^.className := "label-primary"
+            ),
           ),
         )
       } else {
