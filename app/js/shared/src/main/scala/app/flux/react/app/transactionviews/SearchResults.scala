@@ -11,6 +11,7 @@ import app.flux.react.uielements.DescriptionWithEntryCount
 import app.flux.react.uielements.MoneyWithCurrency
 import app.flux.stores.entries.GeneralEntry
 import app.flux.stores.entries.factories.ComplexQueryStoreFactory
+import app.flux.stores.InMemoryUserConfigStore
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Config
 import hydro.common.time.Clock
@@ -39,6 +40,7 @@ final class SearchResults(implicit
     descriptionWithEntryCount: DescriptionWithEntryCount,
     moneyWithCurrency: MoneyWithCurrency,
     searchResultsEditAllPanel: SearchResultsEditAllPanel,
+    inMemoryUserConfigStore: InMemoryUserConfigStore,
 ) extends HydroReactComponent {
 
   private val entriesListTable: EntriesListTable[GeneralEntry, ComplexQueryStoreFactory.Query] =
@@ -51,6 +53,10 @@ final class SearchResults(implicit
 
   // **************** Implementation of HydroReactComponent methods ****************//
   override protected val config = ComponentConfig(backendConstructor = new Backend(_), initialState = State())
+    .withStateStoresDependency(
+      inMemoryUserConfigStore,
+      _.copy(correctForInflation = inMemoryUserConfigStore.state.correctForInflation),
+    )
 
   // **************** Private inner types ****************//
   protected case class Props(
@@ -58,7 +64,8 @@ final class SearchResults(implicit
       router: RouterContext,
   )
   protected case class State(
-      showUpdateAllPanel: Boolean = false
+      showUpdateAllPanel: Boolean = false,
+      correctForInflation: Boolean = false,
   )
 
   protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
@@ -117,7 +124,7 @@ final class SearchResults(implicit
                 <.td(entry.moneyReservoirs.map(_.shorterName).mkString(", ")),
                 <.td(entry.categories.map(_.name).mkString(", ")),
                 <.td(descriptionWithEntryCount(entry)),
-                <.td(moneyWithCurrency(entry.flow)),
+                <.td(moneyWithCurrency(entry.flow, correctForInflation = state.correctForInflation)),
                 <.td(uielements.TransactionGroupEditButtons(entry.groupId)),
               ),
           )
