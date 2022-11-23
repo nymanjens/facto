@@ -15,7 +15,7 @@ final class MoneyWithCurrency(implicit
   // **************** API ****************//
   def apply(
       money: Money,
-      correctForInflation: Boolean = true,
+      correctForInflation: Boolean = false,
   ): VdomElement = {
     component(Props(money, correctForInflation))
   }
