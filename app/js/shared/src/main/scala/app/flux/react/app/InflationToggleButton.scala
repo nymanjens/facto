@@ -1,6 +1,6 @@
 package app.flux.react.app
 
-import app.flux.stores.InMemoryUserConfigFactory
+import app.flux.stores.InMemoryUserConfigStore
 import app.models.accounting.config.Config
 import hydro.common.JsLoggingUtils.logExceptions
 import hydro.common.JsLoggingUtils.LogExceptionsFuture
@@ -12,7 +12,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 private[app] final class InflationToggleButton(implicit
     accountingConfig: Config,
-    inMemoryUserConfigStore: InMemoryUserConfigFactory,
+    inMemoryUserConfigStore: InMemoryUserConfigStore,
 ) extends HydroReactComponent {
 
   // **************** API ****************//

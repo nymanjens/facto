@@ -47,7 +47,7 @@ final class Module(implicit
   implicit val chartStoreFactory = new ChartStoreFactory
   implicit val collapsedExpandedStateStoreFactory = new CollapsedExpandedStateStoreFactory
   implicit val globalMessagesStore = new GlobalMessagesStore
-  implicit val inMemoryUserConfigFactory = new InMemoryUserConfigFactory
+  implicit val inMemoryUserConfigStore = new InMemoryUserConfigStore
   implicit val pageLoadingStateStore = new PageLoadingStateStore
   implicit val pendingModificationsStore = new PendingModificationsStore
   implicit val applicationIsOnlineStore = new ApplicationIsOnlineStore

@@ -4,14 +4,14 @@ import app.common.money.Currency
 import app.common.money.DatedMoney
 import app.common.money.ExchangeRateManager
 import app.common.money.Money
-import app.flux.stores.InMemoryUserConfigFactory
+import app.flux.stores.InMemoryUserConfigStore
 import hydro.flux.react.HydroReactComponent
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
 final class MoneyWithCurrency(implicit
     exchangeRateManager: ExchangeRateManager,
-    inMemoryUserConfigFactory: InMemoryUserConfigFactory,
+    inMemoryUserConfigStore: InMemoryUserConfigStore,
 ) extends HydroReactComponent.Stateless {
 
   // **************** API ****************//

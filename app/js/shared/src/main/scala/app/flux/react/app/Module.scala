@@ -38,7 +38,7 @@ final class Module(implicit
     chartStoreFactory: ChartStoreFactory,
     collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
     globalMessagesStore: GlobalMessagesStore,
-    inMemoryUserConfigFactory: InMemoryUserConfigFactory,
+    inMemoryUserConfigStore: InMemoryUserConfigStore,
     pageLoadingStateStore: PageLoadingStateStore,
     pendingModificationsStore: PendingModificationsStore,
     applicationIsOnlineStore: ApplicationIsOnlineStore,
