@@ -1,18 +1,14 @@
 package app.flux.react.app
 
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import hydro.common.JsLoggingUtils.logExceptions
 import app.flux.stores.InMemoryUserConfigFactory
 import app.models.accounting.config.Config
-import hydro.common.JsLoggingUtils.LogExceptionsCallback
+import hydro.common.JsLoggingUtils.logExceptions
 import hydro.common.JsLoggingUtils.LogExceptionsFuture
 import hydro.flux.react.HydroReactComponent
-import hydro.flux.react.uielements.Bootstrap
-import hydro.flux.react.uielements.Bootstrap.Variant
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
-import scala.scalajs.js
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 private[app] final class InflationToggleButton(implicit
     accountingConfig: Config,
