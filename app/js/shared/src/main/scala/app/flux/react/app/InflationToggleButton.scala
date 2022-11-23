@@ -1,8 +1,11 @@
 package app.flux.react.app
 
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import hydro.common.JsLoggingUtils.logExceptions
 import app.flux.stores.InMemoryUserConfigFactory
 import app.models.accounting.config.Config
+import hydro.common.JsLoggingUtils.LogExceptionsCallback
+import hydro.common.JsLoggingUtils.LogExceptionsFuture
 import hydro.flux.react.HydroReactComponent
 import hydro.flux.react.uielements.Bootstrap
 import hydro.flux.react.uielements.Bootstrap.Variant
@@ -45,10 +48,20 @@ private[app] final class InflationToggleButton(implicit
           <.span(
             ^.className := "facto-custom-switch-button",
             <.input(
-              ^.tpe := "checkbox"
+              ^.tpe := "checkbox",
+              ^.checked := state.correctForInflationEnabled,
+              ^.readOnly := true,
             ),
             <.label(
-              ^.className := "label-primary"
+              ^.className := "label-primary",
+              ^.onClick --> {
+                LogExceptionsFuture {
+                  inMemoryUserConfigStore.mutateState(s =>
+                    s.copy(correctForInflation = !s.correctForInflation)
+                  )
+                }
+                $.modState(s => s.copy(correctForInflationEnabled = !s.correctForInflationEnabled))
+              },
             ),
           ),
         )
