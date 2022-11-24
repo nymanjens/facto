@@ -57,7 +57,7 @@ final class SearchResults(implicit
       _.copy(correctForInflation = inMemoryUserConfigStore.state.correctForInflation),
     )
 
-  // **************** Private inner types ****************//
+  // **************** Implementation of HydroReactComponent types ****************//
   protected case class Props(
       query: String,
       router: RouterContext,
@@ -123,7 +123,10 @@ final class SearchResults(implicit
                 <.td(entry.moneyReservoirs.map(_.shorterName).mkString(", ")),
                 <.td(entry.categories.map(_.name).mkString(", ")),
                 <.td(descriptionWithEntryCount(entry)),
-                <.td(uielements.MoneyWithCurrency.sum(entry.flows, correctForInflation = state.correctForInflation)),
+                <.td(
+                  uielements.MoneyWithCurrency
+                    .sum(entry.flows, correctForInflation = state.correctForInflation)
+                ),
                 <.td(uielements.TransactionGroupEditButtons(entry.groupId)),
               ),
           )
