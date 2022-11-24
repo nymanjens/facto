@@ -117,7 +117,7 @@ final class CashFlow(implicit
                             <.td(entry.beneficiaries.map(_.shorterName).mkString(", ")),
                             <.td(entry.categories.map(_.name).mkString(", ")),
                             <.td(descriptionWithEntryCount(entry)),
-                            <.td(uielements.MoneyWithCurrency(entry.flow)),
+                            <.td(uielements.MoneyWithCurrency.sum(entry.flows)),
                             <.td(
                               uielements.MoneyWithCurrency(entry.balance),
                               entry.balanceVerified match {
