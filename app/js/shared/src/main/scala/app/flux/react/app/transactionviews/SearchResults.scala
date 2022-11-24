@@ -8,7 +8,6 @@ import app.common.money.ExchangeRateManager
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.react.uielements
 import app.flux.react.uielements.DescriptionWithEntryCount
-import app.flux.react.uielements.MoneyWithCurrency
 import app.flux.stores.entries.GeneralEntry
 import app.flux.stores.entries.factories.ComplexQueryStoreFactory
 import app.flux.stores.InMemoryUserConfigStore
@@ -27,6 +26,7 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
+
 import scala.scalajs.js
 
 final class SearchResults(implicit
@@ -38,7 +38,6 @@ final class SearchResults(implicit
     i18n: I18n,
     pageHeader: PageHeader,
     descriptionWithEntryCount: DescriptionWithEntryCount,
-    moneyWithCurrency: MoneyWithCurrency,
     searchResultsEditAllPanel: SearchResultsEditAllPanel,
     inMemoryUserConfigStore: InMemoryUserConfigStore,
 ) extends HydroReactComponent {
@@ -124,7 +123,7 @@ final class SearchResults(implicit
                 <.td(entry.moneyReservoirs.map(_.shorterName).mkString(", ")),
                 <.td(entry.categories.map(_.name).mkString(", ")),
                 <.td(descriptionWithEntryCount(entry)),
-                <.td(moneyWithCurrency(entry.flow, correctForInflation = state.correctForInflation)),
+                <.td(uielements.MoneyWithCurrency(entry.flow)),
                 <.td(uielements.TransactionGroupEditButtons(entry.groupId)),
               ),
           )

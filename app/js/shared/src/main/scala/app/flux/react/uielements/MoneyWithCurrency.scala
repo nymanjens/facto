@@ -8,16 +8,14 @@ import hydro.flux.react.HydroReactComponent
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
-final class MoneyWithCurrency(implicit
-    exchangeRateManager: ExchangeRateManager,
-) extends HydroReactComponent.Stateless {
+object MoneyWithCurrency extends HydroReactComponent.Stateless {
 
   // **************** API ****************//
   def apply(
       money: Money,
-      correctForInflation: Boolean = false,
-  ): VdomElement = {
-    component(Props(money, correctForInflation))
+      correctForInflation: Boolean = true,
+  )(implicit exchangeRateManager: ExchangeRateManager): VdomElement = {
+    component(Props(money, correctForInflation, exchangeRateManager))
   }
 
   // **************** Implementation of HydroReactComponent methods ****************//
@@ -27,10 +25,13 @@ final class MoneyWithCurrency(implicit
   protected case class Props(
       money: Money,
       correctForInflation: Boolean,
+      exchangeRateManager: ExchangeRateManager,
   )
 
   protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
     override def render(props: Props, state: State): VdomElement = {
+      implicit val _: ExchangeRateManager = props.exchangeRateManager
+
       props.money match {
         case money: DatedMoney if money.currency != Currency.default || props.correctForInflation =>
           val referenceMoney =

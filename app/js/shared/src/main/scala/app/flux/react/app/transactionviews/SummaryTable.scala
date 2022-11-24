@@ -11,7 +11,6 @@ import app.common.money.ReferenceMoney
 import app.common.time.DatedMonth
 import app.common.time.YearRange
 import app.flux.react.uielements
-import app.flux.react.uielements.MoneyWithCurrency
 import app.flux.router.AppPages
 import app.flux.stores.entries._
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.ExchangeRateGains
@@ -54,7 +53,6 @@ private[transactionviews] final class SummaryTable(implicit
     exchangeRateManager: ExchangeRateManager,
     i18n: I18n,
     templateMatcher: TemplateMatcher,
-    moneyWithCurrency: MoneyWithCurrency,
 ) {
 
   private val component = {
@@ -403,7 +401,7 @@ private[transactionviews] final class SummaryTable(implicit
                                   router.anchorWithHrefTo(
                                     AppPages.EditTransactionGroup(transaction.transactionGroupId)
                                   )(
-                                    moneyWithCurrency(transaction.flow),
+                                    uielements.MoneyWithCurrency(transaction.flow),
                                     " - ",
                                     <<.joinWithSpaces(
                                       maybeTemplateIcon.toVector ++
