@@ -200,9 +200,6 @@ object SummaryTableTest extends TestSuite {
     private val appCommonAccountingModule = new app.common.accounting.Module()
     implicit val templateMatcher = appCommonAccountingModule.templateMatcher
 
-    private val appUielementsModule = new app.flux.react.uielements.Module
-    implicit val moneyWithCurrency = appUielementsModule.moneyWithCurrency
-
     val summaryTable: SummaryTable = new SummaryTable
   }
 }
