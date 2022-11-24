@@ -13,7 +13,7 @@ object MoneyWithCurrency extends HydroReactComponent.Stateless {
   // **************** API ****************//
   def apply(
       money: Money,
-      correctForInflation: Boolean = true,
+      correctForInflation: Boolean = false,
   )(implicit exchangeRateManager: ExchangeRateManager): VdomElement = {
     component(Props(money, correctForInflation, exchangeRateManager))
   }
