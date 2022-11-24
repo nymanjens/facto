@@ -123,7 +123,7 @@ final class SearchResults(implicit
                 <.td(entry.moneyReservoirs.map(_.shorterName).mkString(", ")),
                 <.td(entry.categories.map(_.name).mkString(", ")),
                 <.td(descriptionWithEntryCount(entry)),
-                <.td(uielements.MoneyWithCurrency.sum(entry.flows)),
+                <.td(uielements.MoneyWithCurrency.sum(entry.flows, correctForInflation = state.correctForInflation)),
                 <.td(uielements.TransactionGroupEditButtons(entry.groupId)),
               ),
           )

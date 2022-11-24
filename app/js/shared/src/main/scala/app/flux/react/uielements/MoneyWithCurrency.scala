@@ -20,28 +20,42 @@ object MoneyWithCurrency {
       correctForInflation: Boolean = false,
   )(implicit exchangeRateManager: ExchangeRateManager): VdomElement = {
     money match {
-      case money: DatedMoney if money.currency != Currency.default || correctForInflation =>
-        val referenceMoney = {
-          money.exchangedForReferenceCurrency(correctForInflation = correctForInflation)
-        }
-        render(primary = money, secondary = referenceMoney, secondaryClass = "reference-currency")
-      case money =>
-        render(money)
+      case money: DatedMoney => sum(Seq(money), correctForInflation = correctForInflation)
+      case money             => render(money)
     }
   }
 
-  def sum(moneySeq: Seq[DatedMoney])(implicit exchangeRateManager: ExchangeRateManager): VdomElement = {
+  def sum(
+      moneySeq: Seq[DatedMoney],
+      correctForInflation: Boolean = false,
+  )(implicit exchangeRateManager: ExchangeRateManager): VdomElement = {
     val currencies = moneySeq.map(_.currency).distinct
     val referenceSum = moneySeq.map(_.exchangedForReferenceCurrency()).sum
 
-    currencies match {
-      case Seq(Currency.default) =>
-        render(referenceSum)
-      case Seq(currency) if currency != Currency.default => // All transactions have the same foreign currency
-        val foreignCurrencySum = moneySeq.sum(MoneyWithGeneralCurrency.numeric(currency))
-        render(primary = foreignCurrencySum, secondary = referenceSum, secondaryClass = "reference-currency")
-      case _ => // Multiple currencies --> only show reference currency
-        render(referenceSum)
+    if (correctForInflation) {
+      val correctedReferenceSum =
+        moneySeq.map(_.exchangedForReferenceCurrency(correctForInflation = true)).sum
+      if (referenceSum == correctedReferenceSum) {
+        sum(moneySeq, correctForInflation = false)
+      } else {
+        currencies match {
+          case Seq(currency)
+              if currency != Currency.default => // All transactions have the same foreign currency
+            val foreignCurrencySum = moneySeq.sum(MoneyWithGeneralCurrency.numeric(currency))
+            renderCorrectedForInflation(correctedReferenceSum, foreignCurrencySum)
+          case _ => // Only reference currency or multiple currencies --> only show reference currency
+            renderCorrectedForInflation(correctedReferenceSum, referenceSum)
+        }
+      }
+    } else {
+      currencies match {
+        case Seq(currency)
+            if currency != Currency.default => // All transactions have the same foreign currency
+          val foreignCurrencySum = moneySeq.sum(MoneyWithGeneralCurrency.numeric(currency))
+          renderWithReferenceCurrency(foreignCurrencySum, referenceSum)
+        case _ => // Only reference currency or multiple currencies --> only show reference currency
+          render(referenceSum)
+      }
     }
   }
 
@@ -49,10 +63,19 @@ object MoneyWithCurrency {
   private def render(money: Money): VdomElement = {
     <.span(money.toString)
   }
-  private def render(primary: Money, secondary: Money, secondaryClass: String): VdomElement = {
+
+  private def renderWithReferenceCurrency(money: Money, referenceMoney: Money): VdomElement = {
     <.span(
-      primary.toString + " ",
-      <.span(^.className := secondaryClass, secondary.toString),
+      money.toString + " ",
+      <.span(^.className := "secondary-currency", referenceMoney.toString),
+    )
+  }
+
+  private def renderCorrectedForInflation(moneyCorrected: Money, originalMoney: Money): VdomElement = {
+    <.span(
+      <.span(^.className := "corrected-for-inflation", moneyCorrected.toString),
+      " ",
+      <.span(^.className := "secondary-currency", originalMoney.toString),
     )
   }
 }
