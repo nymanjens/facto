@@ -1,48 +1,58 @@
 package app.flux.react.uielements
 
+import scala.collection.immutable.Seq
 import app.common.money.Currency
 import app.common.money.DatedMoney
 import app.common.money.ExchangeRateManager
 import app.common.money.Money
+import app.common.money.MoneyWithGeneralCurrency
+import hydro.common.GuavaReplacement.Preconditions
+import hydro.common.GuavaReplacement.Preconditions.checkNotNull
 import hydro.flux.react.HydroReactComponent
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
-object MoneyWithCurrency extends HydroReactComponent.Stateless {
+object MoneyWithCurrency {
 
   // **************** API ****************//
   def apply(
       money: Money,
       correctForInflation: Boolean = false,
   )(implicit exchangeRateManager: ExchangeRateManager): VdomElement = {
-    component(Props(money, correctForInflation, exchangeRateManager))
+    money match {
+      case money: DatedMoney if money.currency != Currency.default || correctForInflation =>
+        val referenceMoney = {
+          money.exchangedForReferenceCurrency(correctForInflation = correctForInflation)
+        }
+        render(primary = money, secondary = referenceMoney, secondaryClass = "reference-currency")
+      case money =>
+        render(money)
+    }
   }
 
-  // **************** Implementation of HydroReactComponent methods ****************//
-  override protected val statelessConfig = StatelessComponentConfig(backendConstructor = new Backend(_))
+  def sum(moneySeq: Seq[DatedMoney])(implicit exchangeRateManager: ExchangeRateManager): VdomElement = {
+    val currencies = moneySeq.map(_.currency).distinct
+    val referenceSum = moneySeq.map(_.exchangedForReferenceCurrency()).sum
 
-  // **************** Implementation of HydroReactComponent types ****************//
-  protected case class Props(
-      money: Money,
-      correctForInflation: Boolean,
-      exchangeRateManager: ExchangeRateManager,
-  )
-
-  protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
-    override def render(props: Props, state: State): VdomElement = {
-      implicit val _: ExchangeRateManager = props.exchangeRateManager
-
-      props.money match {
-        case money: DatedMoney if money.currency != Currency.default || props.correctForInflation =>
-          val referenceMoney =
-            money.exchangedForReferenceCurrency(correctForInflation = props.correctForInflation)
-          <.span(
-            money.toString + " ",
-            <.span(^.className := "reference-currency", referenceMoney.toString),
-          )
-        case money =>
-          <.span(money.toString)
-      }
+    currencies match {
+      case Seq(Currency.default) =>
+        render(referenceSum)
+      case Seq(currency) if currency != Currency.default => // All transactions have the same foreign currency
+        val foreignCurrencySum = moneySeq.sum(MoneyWithGeneralCurrency.numeric(currency))
+        render(primary = foreignCurrencySum, secondary = referenceSum, secondaryClass = "reference-currency")
+      case _ => // Multiple currencies --> only show reference currency
+        render(referenceSum)
     }
+  }
+
+  // **************** Private helper methods ****************//
+  private def render(money: Money): VdomElement = {
+    <.span(money.toString)
+  }
+  private def render(primary: Money, secondary: Money, secondaryClass: String): VdomElement = {
+    <.span(
+      primary.toString + " ",
+      <.span(^.className := secondaryClass, secondary.toString),
+    )
   }
 }
