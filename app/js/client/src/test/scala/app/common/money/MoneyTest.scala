@@ -96,7 +96,6 @@ object MoneyTest extends TestSuite {
         persistExchangeRate(currency = "<index>", daysBeforeNow = 5, ratio = 200)
         persistExchangeRate(currency = "GBP", daysBeforeNow = 10, ratio = 1.3)
 
-
         DatedMoney(10, Currency.Eur, clock.now)
           .exchangedForReferenceCurrency(correctForInflation = true) ==> ReferenceMoney(10)
         DatedMoney(10, Currency.Eur, clock.now.plus(Duration.ofDays(-6)))

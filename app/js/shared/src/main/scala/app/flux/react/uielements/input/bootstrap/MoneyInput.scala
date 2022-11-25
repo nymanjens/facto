@@ -141,7 +141,7 @@ object MoneyInput {
         case Nil =>
           Try(string.trim.toDouble) match {
             case Success(value) => Some(value)
-            case Failure(_) => Money.floatStringToCents(string).map(_ / 100.0)
+            case Failure(_)     => Money.floatStringToCents(string).map(_ / 100.0)
           }
         case operation :: otherOperations if string contains operation.toChar =>
           val parts = {

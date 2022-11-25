@@ -59,7 +59,8 @@ final class StandardActions @Inject() (implicit
 
       val cutoffTime = clock.nowInstant.minus(Duration.ofDays(182))
 
-      val totalCount = dbRun(entityAccess.newSlickQuery[EntityModificationEntity]().map(_.instantNanos)).length
+      val totalCount =
+        dbRun(entityAccess.newSlickQuery[EntityModificationEntity]().map(_.instantNanos)).length
       val oldModificationsCount = dbRun(
         entityAccess
           .newSlickQuery[EntityModificationEntity]()
