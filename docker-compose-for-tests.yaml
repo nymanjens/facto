@@ -1,0 +1,13 @@
+# To run all tests and repeat on each source change:
+#   docker-compose --file=docker-compose-for-tests.yaml up
+
+version: "3.7"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    tty: true
+    volumes:
+      - .:/src
+    command: 'sbt -mem 2048 "~testQuick"'
