@@ -383,7 +383,7 @@ private[transactionviews] final class SummaryTable(implicit
                           cornerContent = <<.ifThen(cellData.nonEmpty)(s"(${cellData.transactions.size})")
                         )(
                           /* centralContent = */
-                          if (cellData.nonEmpty) cellData.totalFlow.formatFloat else "",
+                          ^^.ifThen(cellData.nonEmpty) {cellData.totalFlow.formatFloat},
                           ^^.ifThen(cellData.nonEmpty) {
                             <.div(
                               ^.className := "entries",
