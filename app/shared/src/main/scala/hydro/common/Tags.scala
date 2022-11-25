@@ -7,7 +7,7 @@ import scala.math.abs
 import scala.util.matching.Regex
 
 object Tags {
-  private val validTagRegex: Regex = """[a-zA-Z0-9-_@$&()+=!.<>;: ]+""".r
+  private val validTagRegex: Regex = """[a-zA-Z0-9-_@$&()+=!.<>#;: ]+""".r
 
   def isValidTag(tag: String): Boolean = tag match {
     case validTagRegex() => true
