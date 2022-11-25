@@ -123,7 +123,9 @@ object SummaryTableTest extends TestSuite {
         }
         "only before June" - {
           fakeClock.setNow(createDateTime(2012, JUNE, 2))
-          allYearsData.yearlyAverage(2012, testCategoryA, correctForInflation = false) ==> ReferenceMoney(roundToLong(2200.0 / 5))
+          allYearsData.yearlyAverage(2012, testCategoryA, correctForInflation = false) ==> ReferenceMoney(
+            roundToLong(2200.0 / 5)
+          )
         }
         "only after first transaction of year (April)" - {
           val newAllYearsData = allYearsData.copy(allTransactionsYearRange = YearRange.closed(2012, 2013))
@@ -167,20 +169,36 @@ object SummaryTableTest extends TestSuite {
         allYearsData.currenciesWithExchangeRateGains ==> Seq(Currency.Gbp)
       }
       "exchangeRateGains" - {
-        allYearsData.exchangeRateGains(Currency.Gbp, DatedMonth.of(2012, JUNE)) ==> ReferenceMoney(123)
-        allYearsData.exchangeRateGains(Currency.Gbp, DatedMonth.of(2012, AUGUST)) ==> ReferenceMoney(0)
+        allYearsData.exchangeRateGains(
+          Currency.Gbp,
+          DatedMonth.of(2012, JUNE),
+          correctForInflation = false,
+        ) ==> ReferenceMoney(123)
+        allYearsData.exchangeRateGains(
+          Currency.Gbp,
+          DatedMonth.of(2012, AUGUST),
+          correctForInflation = false,
+        ) ==> ReferenceMoney(0)
       }
       "averageExchangeRateGains" - {
         "full year" - {
-          allYearsData.averageExchangeRateGains(Currency.Gbp, 2012) ==> ReferenceMoney(roundToLong(123 / 12))
+          allYearsData.averageExchangeRateGains(
+            Currency.Gbp,
+            2012,
+            correctForInflation = false,
+          ) ==> ReferenceMoney(roundToLong(123 / 12))
         }
         "only before June" - {
           fakeClock.setNow(createDateTime(2012, JUNE, 2))
-          allYearsData.averageExchangeRateGains(Currency.Gbp, 2012) ==> ReferenceMoney(0)
+          allYearsData.averageExchangeRateGains(
+            Currency.Gbp,
+            2012,
+            correctForInflation = false,
+          ) ==> ReferenceMoney(0)
         }
         "only after first transaction of year (April)" - {
           val newAllYearsData = allYearsData.copy(allTransactionsYearRange = YearRange.closed(2012, 2013))
-          newAllYearsData.averageExchangeRateGains(Currency.Gbp, 2012) ==>
+          newAllYearsData.averageExchangeRateGains(Currency.Gbp, 2012, correctForInflation = false) ==>
             ReferenceMoney(roundToLong(123.0 / 9))
         }
       }
