@@ -138,7 +138,10 @@ private[transactionviews] final class SummaryTable(implicit
       val summary = yearsToData(month.year).summary
       val exchangeRateData = yearsToData(month.year).exchangeRateGains
 
-      summary.categories.filterNot(categoriesToIgnore).map(summary.cell(_, month).totalFlow).sum +
+      summary.categories
+        .filterNot(categoriesToIgnore)
+        .map(summary.cell(_, month).totalFlow(correctForInflation = false))
+        .sum +
         exchangeRateData.gainsForMonth(month).total
     }
     def averageWithoutCategories(categoriesToIgnore: Set[Category], year: Int): ReferenceMoney = {
@@ -158,12 +161,16 @@ private[transactionviews] final class SummaryTable(implicit
       monthsForAverage(year) match {
         case Seq() => ReferenceMoney(0)
         case months =>
-          val totalFlow = months.map(yearsToData(year).summary.cell(category, _).totalFlow).sum
+          val totalFlow =
+            months.map(yearsToData(year).summary.cell(category, _).totalFlow(correctForInflation = false)).sum
           totalFlow / months.size
       }
     }
     def yearlyTotal(year: Int, category: Category): ReferenceMoney = {
-      DatedMonth.allMonthsIn(year).map(month => yearsToData(year).summary.cell(category, month).totalFlow).sum
+      DatedMonth
+        .allMonthsIn(year)
+        .map(month => yearsToData(year).summary.cell(category, month).totalFlow(correctForInflation = false))
+        .sum
     }
 
     def monthsForAverage(year: Int): Seq[DatedMonth] = {
@@ -383,7 +390,9 @@ private[transactionviews] final class SummaryTable(implicit
                           cornerContent = <<.ifThen(cellData.nonEmpty)(s"(${cellData.transactions.size})")
                         )(
                           /* centralContent = */
-                          ^^.ifThen(cellData.nonEmpty) { cellData.totalFlow.formatFloat },
+                          ^^.ifThen(cellData.nonEmpty) {
+                            formatFloat(cellData.totalFlow, props.correctForInflation)
+                          },
                           ^^.ifThen(cellData.nonEmpty) {
                             <.div(
                               ^.className := "entries",
@@ -572,6 +581,20 @@ private[transactionviews] final class SummaryTable(implicit
       usedStores.filterNot(allRegisteredStores).foreach(_.register(this))
       allRegisteredStores.filterNot(usedStores).foreach(_.deregister(this))
       allRegisteredStores = usedStores
+    }
+
+    private def formatFloat(
+        correctForInflationToMoney: Boolean => ReferenceMoney,
+        correctForInflation: Boolean,
+    ): VdomElement = {
+      val moneyWithoutCorrection = correctForInflationToMoney(false)
+      val moneyToShow =
+        if (correctForInflation) correctForInflationToMoney(true) else moneyWithoutCorrection
+
+      <.span(
+        ^^.ifThen(moneyWithoutCorrection != moneyToShow)(^.className := "corrected-for-inflation"),
+        moneyToShow.formatFloat,
+      )
     }
 
     private def cellClasses(month: DatedMonth)(implicit data: AllYearsData): Seq[String] =
