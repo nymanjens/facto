@@ -2,6 +2,7 @@
 #   docker-compose --file=docker-compose-for-tests.yaml up
 
 version: "3.7"
+
 services:
   app:
     build:
@@ -9,5 +10,26 @@ services:
       dockerfile: Dockerfile.test
     tty: true
     volumes:
+      # Run the test on the current directory
       - .:/src
+      # Exclude all target folders from the previous volume binding by explicitly binding them to an
+      # empty named volume
+      - app_shared_jvm_target:/src/app/shared/.jvm/target
+      - app_js_shared_target:/src/app/js/shared/target
+      - app_js_manualtests_target:/src/app/js/manualtests/target
+      - app_js_webworker_target:/src/app/js/webworker/target
+      - app_js_client_target:/src/app/js/client/target
+      - app_jvm_target:/src/app/jvm/target
+      - project_target:/src/project/target
+      - project_project_target:/src/project/project/target
     command: 'sbt -mem 2048 "~testQuick"'
+
+volumes:
+  app_shared_jvm_target:
+  app_js_shared_target:
+  app_js_manualtests_target:
+  app_js_webworker_target:
+  app_js_client_target:
+  app_jvm_target:
+  project_target:
+  project_project_target:
