@@ -5,6 +5,7 @@ import hydro.flux.react.uielements.Bootstrap.Size
 import hydro.flux.react.uielements.Bootstrap.Variant
 import hydro.common.I18n
 import app.common.money.ExchangeRateManager
+import app.flux.stores.InMemoryUserConfigStore
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Config
 import app.models.user.User
@@ -29,6 +30,7 @@ final class Summary(implicit
     exchangeRateManager: ExchangeRateManager,
     i18n: I18n,
     pageHeader: PageHeader,
+    inMemoryUserConfigStore: InMemoryUserConfigStore,
 ) extends HydroReactComponent {
 
   // **************** API ****************//
@@ -43,6 +45,9 @@ final class Summary(implicit
       yearLowerBound = clock.now.getYear - 1,
       expandedYear = clock.now.getYear,
     ),
+  ).withStateStoresDependency(
+    inMemoryUserConfigStore,
+    _.copy(correctForInflation = inMemoryUserConfigStore.state.correctForInflation),
   )
 
   // **************** Private inner types ****************//
@@ -53,6 +58,7 @@ final class Summary(implicit
       yearLowerBound: Int,
       expandedYear: Int,
       showYearlyTotal: Boolean = false, // instead of average
+      correctForInflation: Boolean = false,
   )
 
   protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
@@ -99,6 +105,7 @@ final class Summary(implicit
               onShowHiddenYears = $.modState(_.copy(yearLowerBound = Int.MinValue)),
               onSetExpandedYear = year => $.modState(_.copy(expandedYear = year)),
               onShowYearlyTotalToggle = $.modState(s => s.copy(showYearlyTotal = !s.showYearlyTotal)),
+              correctForInflation = state.correctForInflation,
             )
           }
         }.toVdomArray,

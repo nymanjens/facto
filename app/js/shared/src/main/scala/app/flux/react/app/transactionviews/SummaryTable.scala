@@ -77,6 +77,7 @@ private[transactionviews] final class SummaryTable(implicit
       onShowHiddenYears: Callback,
       onSetExpandedYear: Int => Callback,
       onShowYearlyTotalToggle: Callback,
+      correctForInflation: Boolean,
   )(implicit router: RouterContext): VdomElement = {
     component
       .withKey(key)
@@ -90,6 +91,7 @@ private[transactionviews] final class SummaryTable(implicit
           onShowHiddenYears = onShowHiddenYears,
           onSetExpandedYear = onSetExpandedYear,
           onShowYearlyTotalToggle = onShowYearlyTotalToggle,
+          correctForInflation = correctForInflation,
           router = router,
         )
       )
@@ -107,6 +109,7 @@ private[transactionviews] final class SummaryTable(implicit
       onShowHiddenYears: Callback,
       onSetExpandedYear: Int => Callback,
       onShowYearlyTotalToggle: Callback,
+      correctForInflation: Boolean,
       router: RouterContext,
   )
 
