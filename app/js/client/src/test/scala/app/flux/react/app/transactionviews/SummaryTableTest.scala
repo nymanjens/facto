@@ -118,16 +118,16 @@ object SummaryTableTest extends TestSuite {
       }
       "yearlyAverage" - {
         "full year" - {
-          allYearsData.yearlyAverage(2012, testCategoryA) ==>
+          allYearsData.yearlyAverage(2012, testCategoryA, correctForInflation = false) ==>
             ReferenceMoney(roundToLong((2200.0 + 120) / 12))
         }
         "only before June" - {
           fakeClock.setNow(createDateTime(2012, JUNE, 2))
-          allYearsData.yearlyAverage(2012, testCategoryA) ==> ReferenceMoney(roundToLong(2200.0 / 5))
+          allYearsData.yearlyAverage(2012, testCategoryA, correctForInflation = false) ==> ReferenceMoney(roundToLong(2200.0 / 5))
         }
         "only after first transaction of year (April)" - {
           val newAllYearsData = allYearsData.copy(allTransactionsYearRange = YearRange.closed(2012, 2013))
-          newAllYearsData.yearlyAverage(2012, testCategoryA) ==>
+          newAllYearsData.yearlyAverage(2012, testCategoryA, correctForInflation = false) ==>
             ReferenceMoney(roundToLong((2200.0 + 120) / 9))
         }
       }

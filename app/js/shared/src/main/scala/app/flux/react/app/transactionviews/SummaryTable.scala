@@ -157,19 +157,19 @@ private[transactionviews] final class SummaryTable(implicit
     }
 
     def years: Seq[Int] = yearsToData.toVector.map(_._1)
-    def yearlyAverage(year: Int, category: Category): ReferenceMoney = {
+    def yearlyAverage(year: Int, category: Category, correctForInflation: Boolean): ReferenceMoney = {
       monthsForAverage(year) match {
         case Seq() => ReferenceMoney(0)
         case months =>
           val totalFlow =
-            months.map(yearsToData(year).summary.cell(category, _).totalFlow(correctForInflation = false)).sum
+            months.map(yearsToData(year).summary.cell(category, _).totalFlow(correctForInflation = correctForInflation)).sum
           totalFlow / months.size
       }
     }
-    def yearlyTotal(year: Int, category: Category): ReferenceMoney = {
+    def yearlyTotal(year: Int, category: Category, correctForInflation: Boolean): ReferenceMoney = {
       DatedMonth
         .allMonthsIn(year)
-        .map(month => yearsToData(year).summary.cell(category, month).totalFlow(correctForInflation = false))
+        .map(month => yearsToData(year).summary.cell(category, month).totalFlow(correctForInflation = correctForInflation))
         .sum
     }
 
@@ -434,13 +434,13 @@ private[transactionviews] final class SummaryTable(implicit
                       <.td(
                         ^.key := s"avg-${category.code}-$year",
                         ^.className := "average",
-                        data.yearlyAverage(year, category).formatFloat,
+                        formatFloat(c => data.yearlyAverage(year, category, correctForInflation=c), props.correctForInflation),
                       )
                     case TotalColumn(year) =>
                       <.td(
                         ^.key := s"total-${category.code}-$year",
                         ^.className := "average",
-                        data.yearlyTotal(year, category).formatFloat,
+                        formatFloat(c => data.yearlyTotal(year, category, correctForInflation=c), props.correctForInflation),
                       )
                   }.toVdomArray,
                 )
