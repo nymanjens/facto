@@ -74,42 +74,71 @@ object SummaryTableTest extends TestSuite {
       }
       "totalWithoutCategories" - {
         allYearsData
-          .totalWithoutCategories(categoriesToIgnore = Set(), month = DatedMonth.of(2012, JUNE)) ==>
+          .totalWithoutCategories(
+            categoriesToIgnore = Set(),
+            month = DatedMonth.of(2012, JUNE),
+            correctForInflation = false,
+          ) ==>
           ReferenceMoney(120 - 200 + 123)
         allYearsData
           .totalWithoutCategories(
             categoriesToIgnore = Set(testCategoryC),
             month = DatedMonth.of(2012, JUNE),
+            correctForInflation = false,
           ) ==>
           ReferenceMoney(120 + 123)
       }
       "averageWithoutCategories" - {
         "full year" - {
           allYearsData
-            .averageWithoutCategories(categoriesToIgnore = Set(), year = 2012) ==>
+            .averageWithoutCategories(
+              categoriesToIgnore = Set(),
+              year = 2012,
+              correctForInflation = false,
+            ) ==>
             ReferenceMoney(roundToLong((2200.0 + 120 - 200 + 123) / 12))
           allYearsData
-            .averageWithoutCategories(categoriesToIgnore = Set(testCategoryC), year = 2012) ==>
+            .averageWithoutCategories(
+              categoriesToIgnore = Set(testCategoryC),
+              year = 2012,
+              correctForInflation = false,
+            ) ==>
             ReferenceMoney(roundToLong((2200.0 + 120 + 123) / 12))
         }
         "only before June" - {
           fakeClock.setNow(createDateTime(2012, JUNE, 2))
 
           allYearsData
-            .averageWithoutCategories(categoriesToIgnore = Set(), year = 2012) ==>
+            .averageWithoutCategories(
+              categoriesToIgnore = Set(),
+              year = 2012,
+              correctForInflation = false,
+            ) ==>
             ReferenceMoney(roundToLong(2200.0 / 5))
           allYearsData
-            .averageWithoutCategories(categoriesToIgnore = Set(testCategoryC), year = 2012) ==>
+            .averageWithoutCategories(
+              categoriesToIgnore = Set(testCategoryC),
+              year = 2012,
+              correctForInflation = false,
+            ) ==>
             ReferenceMoney(roundToLong(2200.0 / 5))
         }
         "only after first transaction of year (April)" - {
           val newAllYearsData = allYearsData.copy(allTransactionsYearRange = YearRange.closed(2012, 2013))
 
           newAllYearsData
-            .averageWithoutCategories(categoriesToIgnore = Set(), year = 2012) ==>
+            .averageWithoutCategories(
+              categoriesToIgnore = Set(),
+              year = 2012,
+              correctForInflation = false,
+            ) ==>
             ReferenceMoney(roundToLong((2200.0 + 120 - 200 + 123) / 9))
           newAllYearsData
-            .averageWithoutCategories(categoriesToIgnore = Set(testCategoryC), year = 2012) ==>
+            .averageWithoutCategories(
+              categoriesToIgnore = Set(testCategoryC),
+              year = 2012,
+              correctForInflation = false,
+            ) ==>
             ReferenceMoney(roundToLong((2200.0 + 120 + 123) / 9))
         }
       }

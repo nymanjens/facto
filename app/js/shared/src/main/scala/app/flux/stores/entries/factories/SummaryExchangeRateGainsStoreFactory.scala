@@ -242,7 +242,17 @@ object SummaryExchangeRateGainsStoreFactory {
   case class GainsForMonth private (reservoirToGains: Map[MoneyReservoir, ReferenceMoney]) {
     reservoirToGains.values.foreach(gain => require(!gain.isZero))
 
-    lazy val total: ReferenceMoney = reservoirToGains.values.sum
+    private lazy val totalInternal: ReferenceMoney = reservoirToGains.values.sum
+    def total(correctForInflation: Boolean, month: DatedMonth)(implicit
+        exchangeRateManager: ExchangeRateManager
+    ): ReferenceMoney = {
+      if (correctForInflation) {
+        totalInternal.withDate(month.middleTime).exchangedForReferenceCurrency(correctForInflation = true)
+      } else {
+        totalInternal
+      }
+    }
+
     def nonEmpty: Boolean = reservoirToGains.nonEmpty
     def currencies: Seq[Currency] = reservoirToGains.keys.toStream.map(_.currency).distinct.toVector
     def gains(currency: Currency): ReferenceMoney =
