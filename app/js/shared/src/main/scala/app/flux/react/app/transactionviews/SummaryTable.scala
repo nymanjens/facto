@@ -413,7 +413,10 @@ private[transactionviews] final class SummaryTable(implicit
                                   router.anchorWithHrefTo(
                                     AppPages.EditTransactionGroup(transaction.transactionGroupId)
                                   )(
-                                    uielements.MoneyWithCurrency(transaction.flow),
+                                    uielements.MoneyWithCurrency(
+                                      transaction.flow,
+                                      correctForInflation = props.correctForInflation,
+                                    ),
                                     " - ",
                                     <<.joinWithSpaces(
                                       maybeTemplateIcon.toVector ++
