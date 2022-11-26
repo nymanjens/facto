@@ -260,8 +260,16 @@ object Parsable {
       endowmentCategory: Category,
       liquidationDescription: String,
       zoneId: String,
+      supportInflationCorrections: Boolean,
   ) {
-    def this() = this(null, null, null, liquidationDescription = "Liquidation", zoneId = "Europe/Brussels")
+    def this() = this(
+      null,
+      null,
+      null,
+      liquidationDescription = "Liquidation",
+      zoneId = "Europe/Brussels",
+      supportInflationCorrections = false,
+    )
 
     def parse: ParsedConstants = {
       ParsedConstants(
@@ -270,6 +278,7 @@ object Parsable {
         endowmentCategory = endowmentCategory.parse,
         liquidationDescription = liquidationDescription,
         zoneId = zoneId,
+        supportInflationCorrections = supportInflationCorrections,
       )
     }
   }

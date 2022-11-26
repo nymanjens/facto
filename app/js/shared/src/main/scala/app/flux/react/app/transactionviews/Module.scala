@@ -5,6 +5,7 @@ import hydro.common.I18n
 import app.common.money.ExchangeRateManager
 import app.flux.react.uielements.DescriptionWithEntryCount
 import app.flux.stores.GlobalMessagesStore
+import app.flux.stores.InMemoryUserConfigStore
 import app.flux.stores.CollapsedExpandedStateStoreFactory
 import app.flux.stores.entries.factories._
 import app.models.access.AppJsEntityAccess
@@ -32,6 +33,7 @@ final class Module(implicit
     chartStoreFactory: ChartStoreFactory,
     collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
     globalMessagesStore: GlobalMessagesStore,
+    inMemoryUserConfigStore: InMemoryUserConfigStore,
     clock: Clock,
     pageHeader: PageHeader,
     descriptionWithEntryCount: DescriptionWithEntryCount,

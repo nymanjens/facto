@@ -9,5 +9,6 @@
 .icon-food { *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xe808;&nbsp;'); }
 .icon-building { *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xe811;&nbsp;'); }
 .icon-template { *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xf0f6;&nbsp;'); }
+.icon-inflation { *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xf201;&nbsp;'); }
 .icon-bicycle { *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xf206;&nbsp;'); }
 .icon-balance-scale { *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xf24e;&nbsp;'); }

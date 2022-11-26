@@ -77,6 +77,12 @@
       "css": "bicycle",
       "code": 61958,
       "src": "fontawesome"
+    },
+    {
+      "uid": "ea2d9a8c51ca42b38ef0d2a07f16d9a7",
+      "css": "inflation",
+      "code": 61953,
+      "src": "fontawesome"
     }
   ]
 }

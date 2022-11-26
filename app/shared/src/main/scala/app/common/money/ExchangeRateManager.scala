@@ -10,4 +10,7 @@ trait ExchangeRateManager {
       secondCurrency: Currency,
       date: LocalDateTime,
   ): Double
+
+  /** Returns the value of money at `date` divided by the value of the same amount today. */
+  def getMoneyValueRatioHistoricalToToday(date: LocalDateTime): Double
 }

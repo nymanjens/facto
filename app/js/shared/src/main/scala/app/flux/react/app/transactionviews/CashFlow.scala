@@ -93,7 +93,7 @@ final class CashFlow(implicit
                       context.maybeLatestEntry map { latestEntry =>
                         s"${i18n("app.balance")}: ${latestEntry.balance}" + (
                           if (reservoir.currency.isForeign)
-                            s" (${latestEntry.balance.withDate(clock.now).exchangedForReferenceCurrency})"
+                            s" (${latestEntry.balance.withDate(clock.now).exchangedForReferenceCurrency()})"
                           else ""
                         )
                       }
@@ -117,7 +117,7 @@ final class CashFlow(implicit
                             <.td(entry.beneficiaries.map(_.shorterName).mkString(", ")),
                             <.td(entry.categories.map(_.name).mkString(", ")),
                             <.td(descriptionWithEntryCount(entry)),
-                            <.td(uielements.MoneyWithCurrency(entry.flow)),
+                            <.td(uielements.MoneyWithCurrency.sum(entry.flows)),
                             <.td(
                               uielements.MoneyWithCurrency(entry.balance),
                               entry.balanceVerified match {

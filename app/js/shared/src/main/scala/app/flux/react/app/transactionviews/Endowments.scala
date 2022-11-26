@@ -10,6 +10,7 @@ import app.flux.react.uielements.DescriptionWithEntryCount
 import app.flux.stores.entries.GeneralEntry
 import app.flux.stores.entries.factories.EndowmentEntriesStoreFactory
 import app.flux.stores.CollapsedExpandedStateStoreFactory
+import app.flux.stores.InMemoryUserConfigStore
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Account
 import app.models.accounting.config.Config
@@ -18,6 +19,7 @@ import hydro.common.Unique
 import hydro.common.time.Clock
 import hydro.flux.react.uielements.PageHeader
 import hydro.flux.react.uielements.Panel
+import hydro.flux.react.HydroReactComponent
 import hydro.flux.router.RouterContext
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
@@ -35,17 +37,38 @@ final class Endowments(implicit
     i18n: I18n,
     pageHeader: PageHeader,
     descriptionWithEntryCount: DescriptionWithEntryCount,
-) {
+    inMemoryUserConfigStore: InMemoryUserConfigStore,
+) extends HydroReactComponent {
 
   private val entriesListTable: EntriesListTable[GeneralEntry, Account] = new EntriesListTable
   private val collapsedExpandedStateStoreHandle = collapsedExpandedStateStoreFactory
     .initializeView(getClass.getSimpleName, defaultExpanded = true)
 
-  private val component = ScalaComponent
-    .builder[Props](getClass.getSimpleName)
-    .initialState(State())
-    .renderPS(($, props, state) => {
+  // **************** API ****************//
+  def apply(router: RouterContext): VdomElement = {
+    component(Props(router))
+  }
+
+  // **************** Implementation of HydroReactComponent methods ****************//
+  override protected val config = ComponentConfig(backendConstructor = new Backend(_), initialState = State())
+    .withStateStoresDependency(
+      inMemoryUserConfigStore,
+      _.copy(correctForInflation = inMemoryUserConfigStore.state.correctForInflation),
+    )
+
+  // **************** Implementation of HydroReactComponent types ****************//
+  protected case class Props(
+      router: RouterContext
+  )
+  protected case class State(
+      correctForInflation: Boolean = false
+  )
+
+  protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
+
+    override def render(props: Props, state: State) = {
       implicit val router = props.router
+
       <.span(
         pageHeader.withExtension(router.currentPage) {
           CollapseAllExpandAllButtons(
@@ -82,7 +105,10 @@ final class Endowments(implicit
                     <.td(entry.moneyReservoirs.map(_.shorterName).mkString(", ")),
                     <.td(entry.categories.map(_.name).mkString(", ")),
                     <.td(descriptionWithEntryCount(entry)),
-                    <.td(uielements.MoneyWithCurrency(entry.flow)),
+                    <.td(
+                      uielements.MoneyWithCurrency
+                        .sum(entry.flows, correctForInflation = state.correctForInflation)
+                    ),
                     <.td(uielements.TransactionGroupEditButtons(entry.groupId)),
                   ),
               )
@@ -90,15 +116,6 @@ final class Endowments(implicit
           }.toVdomArray
         },
       )
-    })
-    .build
-
-  // **************** API ****************//
-  def apply(router: RouterContext): VdomElement = {
-    component(Props(router))
+    }
   }
-
-  // **************** Private inner types ****************//
-  private case class Props(router: RouterContext)
-  private case class State()
 }

@@ -2,14 +2,14 @@
   font-family: 'fontello';
   font-style: normal;
   font-weight: normal;
- 
+
   /* fix buttons height */
   line-height: 1em;
- 
+
   /* you can be more comfortable with increased icons size */
   /* font-size: 120%; */
 }
- 
+
 .icon-crown { *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xe800;&nbsp;'); }
 .icon-new-empty { *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xe801;&nbsp;'); }
 .icon-tennis { *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xe802;&nbsp;'); }
@@ -20,5 +20,6 @@
 .icon-food { *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xe808;&nbsp;'); }
 .icon-building { *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xe811;&nbsp;'); }
 .icon-template { *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xf0f6;&nbsp;'); }
+.icon-inflation { *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xf201;&nbsp;'); }
 .icon-bicycle { *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xf206;&nbsp;'); }
 .icon-balance-scale { *zoom: expression( this.runtimeStyle['zoom'] = '1', this.innerHTML = '&#xf24e;&nbsp;'); }

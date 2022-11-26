@@ -1,5 +1,7 @@
 package app.flux.stores.entries
 
+import scala.collection.immutable.Seq
+import app.common.money.DatedMoney
 import app.common.money.ExchangeRateManager
 import app.common.money.Money
 import app.common.money.MoneyWithGeneralCurrency
@@ -67,8 +69,12 @@ abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
           flow
         }
       case _ => // Multiple currencies --> only show reference currency
-        transactions.map(_.flow.exchangedForReferenceCurrency).sum
+        transactions.map(_.flow.exchangedForReferenceCurrency()).sum
     }
+  }
+
+  def flows(implicit accountingConfig: Config): Seq[DatedMoney] = {
+    transactions.map(_.flow)
   }
 
   @tailrec

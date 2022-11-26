@@ -86,14 +86,28 @@ object MoneyTest extends TestSuite {
 
     "DatedMoney" - {
       "exchangedForReferenceCurrency" - {
-        persistGbpMeasurement(daysBeforeNow = 1, ratio = 1.3)
+        persistExchangeRate(currency = "GBP", daysBeforeNow = 1, ratio = 1.3)
 
         val money = DatedMoney(10, Currency.Gbp, clock.now)
-        money.exchangedForReferenceCurrency ==> ReferenceMoney(13)
+        money.exchangedForReferenceCurrency() ==> ReferenceMoney(13)
+      }
+      "exchangedForReferenceCurrency(correctForInflation)" - {
+        persistExchangeRate(currency = "<index>", daysBeforeNow = 10, ratio = 100)
+        persistExchangeRate(currency = "<index>", daysBeforeNow = 5, ratio = 200)
+        persistExchangeRate(currency = "GBP", daysBeforeNow = 10, ratio = 1.3)
+
+        DatedMoney(10, Currency.Eur, clock.now)
+          .exchangedForReferenceCurrency(correctForInflation = true) ==> ReferenceMoney(10)
+        DatedMoney(10, Currency.Eur, clock.now.plus(Duration.ofDays(-6)))
+          .exchangedForReferenceCurrency(correctForInflation = true) ==> ReferenceMoney(20)
+        DatedMoney(10, Currency.Gbp, clock.now)
+          .exchangedForReferenceCurrency(correctForInflation = true) ==> ReferenceMoney(13)
+        DatedMoney(10, Currency.Gbp, clock.now.plus(Duration.ofDays(-6)))
+          .exchangedForReferenceCurrency(correctForInflation = true) ==> ReferenceMoney(26)
       }
 
       "exchangedForCurrency" - {
-        persistGbpMeasurement(daysBeforeNow = 1, ratio = 1.3)
+        persistExchangeRate(currency = "GBP", daysBeforeNow = 1, ratio = 1.3)
 
         val date = clock.now
         val money = DatedMoney(10, Currency.Gbp, date)
@@ -102,14 +116,14 @@ object MoneyTest extends TestSuite {
     }
   }
 
-  private def persistGbpMeasurement(daysBeforeNow: Int, ratio: Double)(implicit
+  private def persistExchangeRate(currency: String, daysBeforeNow: Int, ratio: Double)(implicit
       entityAccess: FakeJsEntityAccess,
       clock: Clock,
   ): Unit = {
     entityAccess.addWithRandomId(
       ExchangeRateMeasurement(
         date = clock.now.plus(Duration.ofDays(-daysBeforeNow)),
-        foreignCurrencyCode = Gbp.code,
+        foreignCurrencyCode = currency,
         ratioReferenceToForeignCurrency = ratio,
       )
     )

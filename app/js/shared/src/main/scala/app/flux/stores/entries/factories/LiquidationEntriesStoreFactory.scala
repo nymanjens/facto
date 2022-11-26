@@ -40,7 +40,7 @@ final class LiquidationEntriesStoreFactory(implicit
         nextTransactions match {
           case trans :: rest =>
             val addsTo1To2Debt = trans.beneficiary == accountPair.account2
-            val flow = trans.flow.exchangedForReferenceCurrency
+            val flow = trans.flow.exchangedForReferenceCurrency()
             val newDebt = if (addsTo1To2Debt) currentDebt + flow else currentDebt - flow
             LiquidationEntry(Seq(trans), newDebt) #:: convertToEntries(rest, newDebt)
           case Nil =>

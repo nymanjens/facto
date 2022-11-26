@@ -77,6 +77,7 @@ private[transactionviews] final class SummaryTable(implicit
       onShowHiddenYears: Callback,
       onSetExpandedYear: Int => Callback,
       onShowYearlyTotalToggle: Callback,
+      correctForInflation: Boolean,
   )(implicit router: RouterContext): VdomElement = {
     component
       .withKey(key)
@@ -90,6 +91,7 @@ private[transactionviews] final class SummaryTable(implicit
           onShowHiddenYears = onShowHiddenYears,
           onSetExpandedYear = onSetExpandedYear,
           onShowYearlyTotalToggle = onShowYearlyTotalToggle,
+          correctForInflation = correctForInflation,
           router = router,
         )
       )
@@ -107,6 +109,7 @@ private[transactionviews] final class SummaryTable(implicit
       onShowHiddenYears: Callback,
       onSetExpandedYear: Int => Callback,
       onShowYearlyTotalToggle: Callback,
+      correctForInflation: Boolean,
       router: RouterContext,
   )
 
@@ -131,36 +134,63 @@ private[transactionviews] final class SummaryTable(implicit
     def cell(category: Category, month: DatedMonth): SummaryCell =
       yearsToData(month.year).summary.cell(category, month)
 
-    def totalWithoutCategories(categoriesToIgnore: Set[Category], month: DatedMonth): ReferenceMoney = {
+    def totalWithoutCategories(
+        categoriesToIgnore: Set[Category],
+        month: DatedMonth,
+        correctForInflation: Boolean,
+    ): ReferenceMoney = {
       val summary = yearsToData(month.year).summary
       val exchangeRateData = yearsToData(month.year).exchangeRateGains
 
-      summary.categories.filterNot(categoriesToIgnore).map(summary.cell(_, month).totalFlow).sum +
-        exchangeRateData.gainsForMonth(month).total
+      summary.categories
+        .filterNot(categoriesToIgnore)
+        .map(summary.cell(_, month).totalFlow(correctForInflation = correctForInflation))
+        .sum +
+        exchangeRateData.gainsForMonth(month).total(correctForInflation = correctForInflation, month = month)
     }
-    def averageWithoutCategories(categoriesToIgnore: Set[Category], year: Int): ReferenceMoney = {
+    def averageWithoutCategories(
+        categoriesToIgnore: Set[Category],
+        year: Int,
+        correctForInflation: Boolean,
+    ): ReferenceMoney = {
       monthsForAverage(year) match {
         case Seq() => ReferenceMoney(0)
         case months =>
-          val total = months.map(totalWithoutCategories(categoriesToIgnore, _)).sum
+          val total = months.map(totalWithoutCategories(categoriesToIgnore, _, correctForInflation)).sum
           total / months.size
       }
     }
-    def totalWithoutCategories(categoriesToIgnore: Set[Category], year: Int): ReferenceMoney = {
-      DatedMonth.allMonthsIn(year).map(totalWithoutCategories(categoriesToIgnore, _)).sum
+    def totalWithoutCategories(
+        categoriesToIgnore: Set[Category],
+        year: Int,
+        correctForInflation: Boolean,
+    ): ReferenceMoney = {
+      DatedMonth.allMonthsIn(year).map(totalWithoutCategories(categoriesToIgnore, _, correctForInflation)).sum
     }
 
     def years: Seq[Int] = yearsToData.toVector.map(_._1)
-    def yearlyAverage(year: Int, category: Category): ReferenceMoney = {
+    def yearlyAverage(year: Int, category: Category, correctForInflation: Boolean): ReferenceMoney = {
       monthsForAverage(year) match {
         case Seq() => ReferenceMoney(0)
         case months =>
-          val totalFlow = months.map(yearsToData(year).summary.cell(category, _).totalFlow).sum
+          val totalFlow =
+            months
+              .map(
+                yearsToData(year).summary
+                  .cell(category, _)
+                  .totalFlow(correctForInflation = correctForInflation)
+              )
+              .sum
           totalFlow / months.size
       }
     }
-    def yearlyTotal(year: Int, category: Category): ReferenceMoney = {
-      DatedMonth.allMonthsIn(year).map(month => yearsToData(year).summary.cell(category, month).totalFlow).sum
+    def yearlyTotal(year: Int, category: Category, correctForInflation: Boolean): ReferenceMoney = {
+      DatedMonth
+        .allMonthsIn(year)
+        .map(month =>
+          yearsToData(year).summary.cell(category, month).totalFlow(correctForInflation = correctForInflation)
+        )
+        .sum
     }
 
     def monthsForAverage(year: Int): Seq[DatedMonth] = {
@@ -176,16 +206,34 @@ private[transactionviews] final class SummaryTable(implicit
 
     lazy val currenciesWithExchangeRateGains: Seq[Currency] =
       yearsToData.values.toStream.flatMap(_.exchangeRateGains.currencies).distinct.toVector
-    def exchangeRateGains(currency: Currency, month: DatedMonth): ReferenceMoney =
-      yearsToData(month.year).exchangeRateGains.gainsForMonth(month).gains(currency)
-    def averageExchangeRateGains(currency: Currency, year: Int): ReferenceMoney = {
-      monthsForAverage(year) match {
-        case Seq()  => ReferenceMoney(0)
-        case months => months.map(exchangeRateGains(currency, _)).sum / months.size
+    def exchangeRateGains(
+        currency: Currency,
+        month: DatedMonth,
+        correctForInflation: Boolean,
+    ): ReferenceMoney = {
+      val result = yearsToData(month.year).exchangeRateGains.gainsForMonth(month).gains(currency)
+      if (correctForInflation) {
+        result.withDate(month.middleTime).exchangedForReferenceCurrency(correctForInflation = true)
+      } else {
+        result
       }
     }
-    def totalExchangeRateGains(currency: Currency, year: Int): ReferenceMoney = {
-      DatedMonth.allMonthsIn(year).map(exchangeRateGains(currency, _)).sum
+    def averageExchangeRateGains(
+        currency: Currency,
+        year: Int,
+        correctForInflation: Boolean,
+    ): ReferenceMoney = {
+      monthsForAverage(year) match {
+        case Seq()  => ReferenceMoney(0)
+        case months => months.map(exchangeRateGains(currency, _, correctForInflation)).sum / months.size
+      }
+    }
+    def totalExchangeRateGains(
+        currency: Currency,
+        year: Int,
+        correctForInflation: Boolean,
+    ): ReferenceMoney = {
+      DatedMonth.allMonthsIn(year).map(exchangeRateGains(currency, _, correctForInflation)).sum
     }
 
     private lazy val categoriesSet: Set[Category] = {
@@ -380,7 +428,9 @@ private[transactionviews] final class SummaryTable(implicit
                           cornerContent = <<.ifThen(cellData.nonEmpty)(s"(${cellData.transactions.size})")
                         )(
                           /* centralContent = */
-                          if (cellData.nonEmpty) cellData.totalFlow.formatFloat else "",
+                          ^^.ifThen(cellData.nonEmpty) {
+                            formatFloat(cellData.totalFlow, props.correctForInflation)
+                          },
                           ^^.ifThen(cellData.nonEmpty) {
                             <.div(
                               ^.className := "entries",
@@ -401,7 +451,10 @@ private[transactionviews] final class SummaryTable(implicit
                                   router.anchorWithHrefTo(
                                     AppPages.EditTransactionGroup(transaction.transactionGroupId)
                                   )(
-                                    uielements.MoneyWithCurrency(transaction.flow),
+                                    uielements.MoneyWithCurrency(
+                                      transaction.flow,
+                                      correctForInflation = props.correctForInflation,
+                                    ),
                                     " - ",
                                     <<.joinWithSpaces(
                                       maybeTemplateIcon.toVector ++
@@ -419,13 +472,19 @@ private[transactionviews] final class SummaryTable(implicit
                       <.td(
                         ^.key := s"avg-${category.code}-$year",
                         ^.className := "average",
-                        data.yearlyAverage(year, category).formatFloat,
+                        formatFloat(
+                          c => data.yearlyAverage(year, category, correctForInflation = c),
+                          props.correctForInflation,
+                        ),
                       )
                     case TotalColumn(year) =>
                       <.td(
                         ^.key := s"total-${category.code}-$year",
                         ^.className := "average",
-                        data.yearlyTotal(year, category).formatFloat,
+                        formatFloat(
+                          c => data.yearlyTotal(year, category, correctForInflation = c),
+                          props.correctForInflation,
+                        ),
                       )
                   }.toVdomArray,
                 )
@@ -446,19 +505,28 @@ private[transactionviews] final class SummaryTable(implicit
                     <.td(
                       ^.key := s"gain-${currency.code}-${month.year}-${month.month}",
                       ^^.classes(cellClasses(month)),
-                      data.exchangeRateGains(currency, month).formatFloat,
+                      formatFloat(
+                        c => data.exchangeRateGains(currency, month, correctForInflation = c),
+                        props.correctForInflation,
+                      ),
                     )
                   case AverageColumn(year) =>
                     <.td(
                       ^.key := s"avg-$year",
                       ^.className := "average",
-                      data.averageExchangeRateGains(currency, year).formatFloat,
+                      formatFloat(
+                        c => data.averageExchangeRateGains(currency, year, correctForInflation = c),
+                        props.correctForInflation,
+                      ),
                     )
                   case TotalColumn(year) =>
                     <.td(
                       ^.key := s"total-$year",
                       ^.className := "average",
-                      data.totalExchangeRateGains(currency, year).formatFloat,
+                      formatFloat(
+                        c => data.totalExchangeRateGains(currency, year, correctForInflation = c),
+                        props.correctForInflation,
+                      ),
                     )
                 }.toVdomArray,
               )
@@ -488,25 +556,32 @@ private[transactionviews] final class SummaryTable(implicit
                   case OmittedYearsColumn(_) =>
                     <.td(^.key := "omitted-years", "...")
                   case MonthColumn(month) =>
-                    val total = data.totalWithoutCategories(categoriesToIgnore, month)
                     <.td(
                       ^.key := s"total-$rowIndex-${month.year}-${month.month}",
                       ^^.classes(cellClasses(month)),
-                      <<.ifThen(total.nonZero) {
-                        total.formatFloat
-                      },
+                      formatFloat(
+                        c => data.totalWithoutCategories(categoriesToIgnore, month, correctForInflation = c),
+                        props.correctForInflation,
+                        hideZero = true,
+                      ),
                     )
                   case AverageColumn(year) =>
                     <.td(
                       ^.key := s"average-$rowIndex-$year",
                       ^.className := "average",
-                      data.averageWithoutCategories(categoriesToIgnore, year).formatFloat,
+                      formatFloat(
+                        c => data.averageWithoutCategories(categoriesToIgnore, year, correctForInflation = c),
+                        props.correctForInflation,
+                      ),
                     )
                   case TotalColumn(year) =>
                     <.td(
                       ^.key := s"total-$rowIndex-$year",
                       ^.className := "average",
-                      data.totalWithoutCategories(categoriesToIgnore, year).formatFloat,
+                      formatFloat(
+                        c => data.totalWithoutCategories(categoriesToIgnore, year, correctForInflation = c),
+                        props.correctForInflation,
+                      ),
                     )
                 }.toVdomArray,
               )
@@ -554,7 +629,7 @@ private[transactionviews] final class SummaryTable(implicit
             if (store.state.isDefined) {
               dataBuilder.addToNetWorth(
                 store.state.get.entries.lastOption
-                  .map(_.entry.balance.withDate(clock.now).exchangedForReferenceCurrency) getOrElse
+                  .map(_.entry.balance.withDate(clock.now).exchangedForReferenceCurrency()) getOrElse
                   ReferenceMoney(0)
               )
             }
@@ -569,6 +644,21 @@ private[transactionviews] final class SummaryTable(implicit
       usedStores.filterNot(allRegisteredStores).foreach(_.register(this))
       allRegisteredStores.filterNot(usedStores).foreach(_.deregister(this))
       allRegisteredStores = usedStores
+    }
+
+    private def formatFloat(
+        correctForInflationToMoney: Boolean => ReferenceMoney,
+        correctForInflation: Boolean,
+        hideZero: Boolean = false,
+    ): VdomElement = {
+      val moneyWithoutCorrection = correctForInflationToMoney(false)
+      val moneyToShow =
+        if (correctForInflation) correctForInflationToMoney(true) else moneyWithoutCorrection
+
+      <.span(
+        ^^.ifThen(moneyWithoutCorrection != moneyToShow)(^.className := "corrected-for-inflation"),
+        moneyToShow.formatFloat,
+      )
     }
 
     private def cellClasses(month: DatedMonth)(implicit data: AllYearsData): Seq[String] =

@@ -89,11 +89,16 @@ table.table-bordered {
 }
 
 /****** Money ******/
-.reference-currency {
+.secondary-currency {
   color: #AAA;
   font-size: 11px;
   &:before { content: "(" }
   &:after { content: ")" }
+}
+
+.corrected-for-inflation {
+  color: #b97a06;
+  font-weight: bold;
 }
 
 /****** loading page ******/
@@ -143,7 +148,56 @@ table.table-bordered {
   }
 }
 
-/****** transactiongroup-form css ******/
+/****** facto-custom-switch-button ******/
+// Inspired by https://bootsnipp.com/snippets/xp0QM
+.facto-custom-switch-button {
+  input[type="checkbox"] {
+    display: none;
+  }
+  label {
+    cursor: pointer;
+    height: 0px;
+    position: relative;
+    width: 30px;
+    margin-left: 5px;
+  }
+  label::before {
+    background: rgb(0, 0, 0);
+    box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.5);
+    border-radius: 6px;
+    content: '';
+    height: 12px;
+    margin-top: -6px;
+    position:absolute;
+    opacity: 0.3;
+    transition: all 0.4s ease-in-out;
+    width: 30px;
+  }
+  label::after {
+    background: rgb(255, 255, 255);
+    border-radius: 12px;
+    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.3);
+    content: '';
+    height: 18px;
+    left: -3px;
+    margin-top: -6px;
+    position: absolute;
+    top: -3px;
+    transition: all 0.3s ease-in-out;
+    width: 18px;
+  }
+  input[type="checkbox"]:checked + label::before {
+    background: inherit;
+    opacity: 0.5;
+  }
+  input[type="checkbox"]:checked + label::after {
+    background: inherit;
+    left: 15px;
+  }
+}
+
+
+/****** transactiongroup-form ******/
 .transaction-group-form {
   .delete-button {
     margin-left: 10px;

@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'fontello';
-  src: url('../font/fontello.eot?29421976');
-  src: url('../font/fontello.eot?29421976#iefix') format('embedded-opentype'),
-       url('../font/fontello.woff2?29421976') format('woff2'),
-       url('../font/fontello.woff?29421976') format('woff'),
-       url('../font/fontello.ttf?29421976') format('truetype'),
-       url('../font/fontello.svg?29421976#fontello') format('svg');
+  src: url('../font/fontello.eot?79514863');
+  src: url('../font/fontello.eot?79514863#iefix') format('embedded-opentype'),
+       url('../font/fontello.woff2?79514863') format('woff2'),
+       url('../font/fontello.woff?79514863') format('woff'),
+       url('../font/fontello.ttf?79514863') format('truetype'),
+       url('../font/fontello.svg?79514863#fontello') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -15,46 +15,45 @@
 @media screen and (-webkit-min-device-pixel-ratio:0) {
   @font-face {
     font-family: 'fontello';
-    src: url('../font/fontello.svg?29421976#fontello') format('svg');
+    src: url('../font/fontello.svg?79514863#fontello') format('svg');
   }
 }
 */
- 
- [class^="icon-"]:before, [class*=" icon-"]:before {
+[class^="icon-"]:before, [class*=" icon-"]:before {
   font-family: "fontello";
   font-style: normal;
   font-weight: normal;
-  speak: none;
- 
+  speak: never;
+
   display: inline-block;
   text-decoration: inherit;
   width: 1em;
   margin-right: .2em;
   text-align: center;
   /* opacity: .8; */
- 
+
   /* For safety - reset parent styles, that can break glyph codes*/
   font-variant: normal;
   text-transform: none;
- 
+
   /* fix buttons height, for twitter bootstrap */
   line-height: 1em;
- 
+
   /* Animation center compensation - margins should be symmetric */
   /* remove if not needed */
   margin-left: .2em;
- 
+
   /* you can be more comfortable with increased icons size */
   /* font-size: 120%; */
- 
+
   /* Font smoothing. That was taken from TWBS */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
- 
+
   /* Uncomment for 3D effect */
   /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
 }
- 
+
 .icon-crown:before { content: '\e800'; } /* '' */
 .icon-new-empty:before { content: '\e801'; } /* '' */
 .icon-tennis:before { content: '\e802'; } /* '' */
@@ -65,5 +64,6 @@
 .icon-food:before { content: '\e808'; } /* '' */
 .icon-building:before { content: '\e811'; } /* '' */
 .icon-template:before { content: '\f0f6'; } /* '' */
+.icon-inflation:before { content: '\f201'; } /* '' */
 .icon-bicycle:before { content: '\f206'; } /* '' */
 .icon-balance-scale:before { content: '\f24e'; } /* '' */

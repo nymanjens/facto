@@ -98,17 +98,26 @@ object SummaryForYearStoreFactory {
 
   case class SummaryCell(transactions: Seq[Transaction]) {
     private var _totalFlow: ReferenceMoney = _
+    private var _totalFlowCorrectedForInflation: ReferenceMoney = _
 
     def nonEmpty: Boolean = transactions.nonEmpty
 
-    def totalFlow(implicit
+    def totalFlow(correctForInflation: Boolean)(implicit
         exchangeRateManager: ExchangeRateManager,
         accountingConfig: Config,
     ): ReferenceMoney = {
-      if (_totalFlow eq null) {
-        _totalFlow = transactions.map(_.flow.exchangedForReferenceCurrency).sum
+      if (correctForInflation) {
+        if (_totalFlowCorrectedForInflation eq null) {
+          _totalFlowCorrectedForInflation =
+            transactions.map(_.flow.exchangedForReferenceCurrency(correctForInflation = true)).sum
+        }
+        _totalFlowCorrectedForInflation
+      } else {
+        if (_totalFlow eq null) {
+          _totalFlow = transactions.map(_.flow.exchangedForReferenceCurrency()).sum
+        }
+        _totalFlow
       }
-      _totalFlow
     }
   }
   object SummaryCell {

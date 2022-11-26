@@ -122,8 +122,8 @@ object SummaryForYearStoreFactoryTest extends TestSuite {
           emptyCell.nonEmpty ==> false
         }
         "totalFlow" - {
-          categoryAJuneCell.totalFlow ==> ReferenceMoney(-1000)
-          emptyCell.totalFlow ==> ReferenceMoney(0)
+          categoryAJuneCell.totalFlow(correctForInflation = false) ==> ReferenceMoney(-1000)
+          emptyCell.totalFlow(correctForInflation = false) ==> ReferenceMoney(0)
         }
       }
     }

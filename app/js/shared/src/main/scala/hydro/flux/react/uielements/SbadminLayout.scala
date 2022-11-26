@@ -33,8 +33,14 @@ final class SbadminLayout(implicit
 ) {
 
   // **************** API ****************//
-  def apply(title: TagMod, leftMenu: VdomElement, pageContent: VdomElement, extraFooter: Seq[TagMod] = Seq())(
-      implicit router: RouterContext
+  def apply(
+      title: TagMod,
+      leftMenu: VdomElement,
+      pageContent: VdomElement,
+      extraFooter: Seq[TagMod] = Seq(),
+      extraNavbarTopRightContent: Seq[VdomNode] = Seq(),
+  )(implicit
+      router: RouterContext
   ): VdomElement = {
     <.div(
       ^.id := "wrapper",
@@ -57,8 +63,9 @@ final class SbadminLayout(implicit
           " ",
           pageLoadingSpinner(),
         ),
-        <.ul(
-          ^.className := "nav navbar-top-links navbar-right",
+        <.ul(^.className := "nav navbar-top-links navbar-right")(
+          extraNavbarTopRightContent.map(e => Bootstrap.NavbarBrand()(e)): _*
+        )(
           Bootstrap.NavbarBrand()(
             ^.style := js.Dictionary("fontSize" -> "14px"),
             user.name,

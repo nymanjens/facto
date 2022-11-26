@@ -113,3 +113,4 @@ constants:
     commonAccount: *accCommon
     accountingCategory: *catA
     endowmentCategory: *catB
+    supportInflationCorrections: true

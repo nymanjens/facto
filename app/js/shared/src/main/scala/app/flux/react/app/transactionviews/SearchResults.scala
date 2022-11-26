@@ -10,6 +10,7 @@ import app.flux.react.uielements
 import app.flux.react.uielements.DescriptionWithEntryCount
 import app.flux.stores.entries.GeneralEntry
 import app.flux.stores.entries.factories.ComplexQueryStoreFactory
+import app.flux.stores.InMemoryUserConfigStore
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Config
 import hydro.common.time.Clock
@@ -38,6 +39,7 @@ final class SearchResults(implicit
     pageHeader: PageHeader,
     descriptionWithEntryCount: DescriptionWithEntryCount,
     searchResultsEditAllPanel: SearchResultsEditAllPanel,
+    inMemoryUserConfigStore: InMemoryUserConfigStore,
 ) extends HydroReactComponent {
 
   private val entriesListTable: EntriesListTable[GeneralEntry, ComplexQueryStoreFactory.Query] =
@@ -50,14 +52,19 @@ final class SearchResults(implicit
 
   // **************** Implementation of HydroReactComponent methods ****************//
   override protected val config = ComponentConfig(backendConstructor = new Backend(_), initialState = State())
+    .withStateStoresDependency(
+      inMemoryUserConfigStore,
+      _.copy(correctForInflation = inMemoryUserConfigStore.state.correctForInflation),
+    )
 
-  // **************** Private inner types ****************//
+  // **************** Implementation of HydroReactComponent types ****************//
   protected case class Props(
       query: String,
       router: RouterContext,
   )
   protected case class State(
-      showUpdateAllPanel: Boolean = false
+      showUpdateAllPanel: Boolean = false,
+      correctForInflation: Boolean = false,
   )
 
   protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
@@ -92,7 +99,7 @@ final class SearchResults(implicit
             calculateExtraTitle = { context =>
               val totalFlow = context.entriesInChronologicalOrder
                 .flatMap(_.transactions)
-                .map(_.flow.exchangedForReferenceCurrency)
+                .map(_.flow.exchangedForReferenceCurrency())
                 .sum
               Some(s"${i18n("app.total")}: $totalFlow")
             },
@@ -116,7 +123,10 @@ final class SearchResults(implicit
                 <.td(entry.moneyReservoirs.map(_.shorterName).mkString(", ")),
                 <.td(entry.categories.map(_.name).mkString(", ")),
                 <.td(descriptionWithEntryCount(entry)),
-                <.td(uielements.MoneyWithCurrency(entry.flow)),
+                <.td(
+                  uielements.MoneyWithCurrency
+                    .sum(entry.flows, correctForInflation = state.correctForInflation)
+                ),
                 <.td(uielements.TransactionGroupEditButtons(entry.groupId)),
               ),
           )

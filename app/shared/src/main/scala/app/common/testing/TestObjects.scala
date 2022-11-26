@@ -184,6 +184,7 @@ object TestObjects {
     endowmentCategory = testCategoryB,
     liquidationDescription = "Liquidation",
     zoneId = "Europe/Brussels",
+    supportInflationCorrections = true,
   )
 
   implicit val testAccountingConfig: Config = Config(

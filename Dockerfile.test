@@ -1,0 +1,4 @@
+FROM openlaw/scala-builder:node AS builder
+
+WORKDIR /src
+RUN apk add --update nodejs npm

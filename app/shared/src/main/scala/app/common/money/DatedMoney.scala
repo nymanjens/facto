@@ -11,8 +11,18 @@ import hydro.common.time.LocalDateTime
 case class DatedMoney(override val cents: Long, override val currency: Currency, date: LocalDateTime)
     extends MoneyWithGeneralCurrency {
 
-  def exchangedForReferenceCurrency(implicit exchangeRateManager: ExchangeRateManager): ReferenceMoney =
-    ReferenceMoney(exchangedForCurrency(Currency.default).cents)
+  def exchangedForReferenceCurrency(
+      correctForInflation: Boolean = false
+  )(implicit exchangeRateManager: ExchangeRateManager): ReferenceMoney = {
+    val inflationCorrection = {
+      if (correctForInflation) {
+        exchangeRateManager.getMoneyValueRatioHistoricalToToday(date)
+      } else {
+        1.0
+      }
+    }
+    ReferenceMoney(exchangedForCurrency(Currency.default).cents) * inflationCorrection
+  }
 
   def exchangedForCurrency(
       otherCurrency: Currency

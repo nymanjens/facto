@@ -1,0 +1,27 @@
+# To run all tests and repeat on each source change:
+#   docker-compose --file=docker-compose-for-tests.yaml up
+
+version: "3.7"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    tty: true
+    volumes:
+      # Run the test on the current directory
+      - .:/src
+      # Exclude all target folders from the previous volume binding by explicitly binding them to an
+      # empty volume
+      - /src/app/shared/.jvm/target/
+      - /src/app/shared/.js/target/
+      - /src/app/js/shared/target/
+      - /src/app/js/manualtests/target/
+      - /src/app/js/webworker/target/
+      - /src/app/js/client/target/
+      - /src/app/jvm/target/
+      - /src/project/target/
+      - /src/project/project/target/
+    command: 'sbt -mem 2048 "~testQuick"'
+    # command: 'ls -l /src/project/target/'

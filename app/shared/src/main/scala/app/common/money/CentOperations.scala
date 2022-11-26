@@ -21,6 +21,7 @@ trait CentOperations[M <: CentOperations[M]] {
   final def +(that: M): M = doCentOperationToSelfType(_ + _)(that)
   final def -(that: M): M = doCentOperationToSelfType(_ - _)(that)
   final def *(number: Long): M = withCents(cents * number)
+  final def *(number: Double): M = withCents(roundToLong(cents * number))
   final def /(number: Long): M = withCents(roundToLong(cents * 1.0 / number))
   final def ==(that: M): Boolean = doCentOperation(_ == _)(that)
   final def >(that: M): Boolean = doCentOperation(_ > _)(that)
