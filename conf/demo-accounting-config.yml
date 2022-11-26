@@ -245,3 +245,7 @@ constants:
   commonAccount: *accountCommon
   accountingCategory: *catAcc
   endowmentCategory: *catEndow
+
+  # If true, then a button will be shown to enable/disable inflation corrections. These are made
+  # using the price index stored in the exchange rate of a special "<index>" currency.
+  supportInflationCorrections: false
