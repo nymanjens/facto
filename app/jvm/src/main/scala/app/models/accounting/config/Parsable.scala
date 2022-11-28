@@ -117,8 +117,17 @@ object Parsable {
       owner: Account,
       hidden: Boolean,
       currency: String @nullable,
+      assumeThisFollowsInflationUntilNextMarketValueAppreciation: Boolean,
   ) {
-    def this() = this(null, null, null, null, hidden = false, null)
+    def this() = this(
+      null,
+      null,
+      null,
+      null,
+      hidden = false,
+      null,
+      assumeThisFollowsInflationUntilNextMarketValueAppreciation = false,
+    )
 
     def parse: ParsedMoneyReservoir = {
       val parsedShorterName = if (shorterName == null) name else shorterName
@@ -129,6 +138,8 @@ object Parsable {
         owner.parse,
         hidden,
         currencyCode = Option(currency),
+        assumeThisFollowsInflationUntilNextMarketValueAppreciation =
+          assumeThisFollowsInflationUntilNextMarketValueAppreciation,
       )
     }
   }
