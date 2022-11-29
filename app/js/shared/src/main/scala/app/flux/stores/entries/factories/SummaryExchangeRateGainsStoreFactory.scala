@@ -44,7 +44,6 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
     entityAccess: AppJsEntityAccess,
     exchangeRateManager: ExchangeRateManager,
     accountingConfig: Config,
-    complexQueryFilter: ComplexQueryFilter,
     clock: Clock,
 ) extends EntriesStoreFactory[ExchangeRateGains] {
 
