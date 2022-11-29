@@ -91,7 +91,7 @@ object TestObjects {
       shorterName = "Cash Common",
       owner = testAccountCommon,
       hidden = false,
-      assumeThisFollowsInflationUntilNextMarketValueAppreciation=false,
+      assumeThisFollowsInflationUntilNextMarketValueAppreciation = false,
     )
   def testReservoirCardCommon =
     MoneyReservoir(
@@ -100,7 +100,7 @@ object TestObjects {
       shorterName = "Card Common",
       owner = testAccountCommon,
       hidden = false,
-      assumeThisFollowsInflationUntilNextMarketValueAppreciation=false,
+      assumeThisFollowsInflationUntilNextMarketValueAppreciation = false,
     )
   def testReservoirCashA =
     MoneyReservoir(
@@ -108,7 +108,8 @@ object TestObjects {
       name = "Cash A",
       shorterName = "Cash A",
       owner = testAccountA,
-      hidden = false,assumeThisFollowsInflationUntilNextMarketValueAppreciation=false,
+      hidden = false,
+      assumeThisFollowsInflationUntilNextMarketValueAppreciation = false,
     )
   def testReservoirCardA =
     MoneyReservoir(
@@ -116,7 +117,8 @@ object TestObjects {
       name = "Card A",
       shorterName = "Card A",
       owner = testAccountA,
-      hidden = false,assumeThisFollowsInflationUntilNextMarketValueAppreciation=false,
+      hidden = false,
+      assumeThisFollowsInflationUntilNextMarketValueAppreciation = false,
     )
   def testReservoirCashB =
     MoneyReservoir(
@@ -124,7 +126,8 @@ object TestObjects {
       name = "Cash B",
       shorterName = "Cash B",
       owner = testAccountB,
-      hidden = false,assumeThisFollowsInflationUntilNextMarketValueAppreciation=false,
+      hidden = false,
+      assumeThisFollowsInflationUntilNextMarketValueAppreciation = false,
     )
   def testReservoirCardB =
     MoneyReservoir(
@@ -132,7 +135,8 @@ object TestObjects {
       name = "Card B",
       shorterName = "Card B",
       owner = testAccountB,
-      hidden = false,assumeThisFollowsInflationUntilNextMarketValueAppreciation=false,
+      hidden = false,
+      assumeThisFollowsInflationUntilNextMarketValueAppreciation = false,
     )
   def testReservoirHidden =
     MoneyReservoir(
@@ -140,7 +144,8 @@ object TestObjects {
       name = "Card Hidden",
       shorterName = "Card Hidden",
       owner = testAccountB,
-      hidden = true,assumeThisFollowsInflationUntilNextMarketValueAppreciation=false,
+      hidden = true,
+      assumeThisFollowsInflationUntilNextMarketValueAppreciation = false,
     )
   def testReservoirCashGbp =
     MoneyReservoir(
@@ -149,7 +154,8 @@ object TestObjects {
       shorterName = "Cash GBP",
       owner = testAccountA,
       hidden = true,
-      currencyCode = Some("GBP"),assumeThisFollowsInflationUntilNextMarketValueAppreciation=false,
+      currencyCode = Some("GBP"),
+      assumeThisFollowsInflationUntilNextMarketValueAppreciation = false,
     )
   def testReservoirOfAccountA: MoneyReservoir = testReservoirCashA
   def testReservoirOfAccountB: MoneyReservoir = testReservoirCashB

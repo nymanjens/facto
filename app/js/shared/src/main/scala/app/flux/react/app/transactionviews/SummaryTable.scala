@@ -152,7 +152,9 @@ private[transactionviews] final class SummaryTable(implicit
         .filterNot(categoriesToIgnore)
         .map(summary.cell(_, month).totalFlow(correctForInflation = correctForInflation))
         .sum +
-        exchangeRateData.gainsForMonth(month).total(correctForInflation = correctForInflation, month = month) +
+        exchangeRateData
+          .gainsForMonth(month)
+          .total(correctForInflation = correctForInflation, month = month) +
         inflationData.gainsForMonth(month).total
     }
     def averageWithoutCategories(
