@@ -3,6 +3,7 @@ package app.common.accounting
 import app.common.money.MoneyWithGeneralCurrency
 import app.common.time.DatedMonth
 import hydro.common.time.LocalDateTime
+import hydro.common.time.JavaTimeImplicits._
 
 import java.time.Duration
 import java.time.LocalTime
