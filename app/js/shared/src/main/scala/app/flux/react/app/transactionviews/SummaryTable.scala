@@ -146,12 +146,14 @@ private[transactionviews] final class SummaryTable(implicit
     ): ReferenceMoney = {
       val summary = yearsToData(month.year).summary
       val exchangeRateData = yearsToData(month.year).exchangeRateGains
+      val inflationData = yearsToData(month.year).inflationGains
 
       summary.categories
         .filterNot(categoriesToIgnore)
         .map(summary.cell(_, month).totalFlow(correctForInflation = correctForInflation))
         .sum +
-        exchangeRateData.gainsForMonth(month).total(correctForInflation = correctForInflation, month = month)
+        exchangeRateData.gainsForMonth(month).total(correctForInflation = correctForInflation, month = month) +
+        inflationData.gainsForMonth(month).total
     }
     def averageWithoutCategories(
         categoriesToIgnore: Set[Category],
