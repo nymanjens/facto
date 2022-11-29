@@ -34,6 +34,7 @@ final class Module(implicit
     summaryForYearStoreFactory: SummaryForYearStoreFactory,
     summaryYearsStoreFactory: SummaryYearsStoreFactory,
     summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
+    summaryInflationGainsStoreFactory: SummaryInflationGainsStoreFactory,
     chartStoreFactory: ChartStoreFactory,
     collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
     globalMessagesStore: GlobalMessagesStore,

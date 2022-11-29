@@ -241,6 +241,7 @@ object SummaryTableTest extends TestSuite {
     implicit val summaryYearsStoreFactory = storesModule.summaryYearsStoreFactory
     implicit val summaryForYearStoreFactory = storesModule.summaryForYearStoreFactory
     implicit val summaryExchangeRateGainsStoreFactory = storesModule.summaryExchangeRateGainsStoreFactory
+    implicit val summaryInflationGainsStoreFactory = storesModule.summaryInflationGainsStoreFactory
     implicit val cashFlowEntriesStoreFactory = storesModule.cashFlowEntriesStoreFactory
     implicit val inMemoryUserConfigStore = storesModule.inMemoryUserConfigStore
 

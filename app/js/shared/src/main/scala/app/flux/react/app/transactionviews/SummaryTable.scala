@@ -18,6 +18,8 @@ import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryCell
 import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
 import app.flux.stores.entries.factories.CashFlowEntriesStoreFactory
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory
+import app.flux.stores.entries.factories.SummaryInflationGainsStoreFactory
+import app.flux.stores.entries.factories.SummaryInflationGainsStoreFactory.InflationGains
 import app.flux.stores.entries.factories.SummaryForYearStoreFactory
 import app.flux.stores.entries.factories.SummaryYearsStoreFactory
 import app.models.access.AppJsEntityAccess
@@ -45,6 +47,7 @@ private[transactionviews] final class SummaryTable(implicit
     summaryYearsStoreFactory: SummaryYearsStoreFactory,
     summaryForYearStoreFactory: SummaryForYearStoreFactory,
     summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
+    summaryInflationGainsStoreFactory: SummaryInflationGainsStoreFactory,
     cashFlowEntriesStoreFactory: CashFlowEntriesStoreFactory,
     entityAccess: AppJsEntityAccess,
     user: User,
