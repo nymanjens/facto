@@ -31,6 +31,8 @@ import app.models.user.User
 import hydro.common.JsLoggingUtils.LogExceptionsCallback
 import hydro.common.JsLoggingUtils.logExceptions
 import hydro.common.time.Clock
+import hydro.common.ScalaUtils
+import hydro.common.ScalaUtils.ifThenOption
 import hydro.flux.react.ReactVdomUtils._
 import hydro.flux.react.uielements.Bootstrap
 import hydro.flux.react.uielements.BootstrapTags
@@ -239,6 +241,10 @@ private[transactionviews] final class SummaryTable(implicit
       DatedMonth.allMonthsIn(year).map(exchangeRateGains(currency, _, correctForInflation)).sum
     }
 
+    def inflationGains(month: DatedMonth): ReferenceMoney = {
+      yearsToData(month.year).inflationGains.gainsForMonth(month).total
+    }
+
     private lazy val categoriesSet: Set[Category] = {
       for {
         yearData <- yearsToData.values
@@ -256,14 +262,23 @@ private[transactionviews] final class SummaryTable(implicit
 
     def builder(allTransactionsYearRange: YearRange): Builder = new Builder(allTransactionsYearRange)
 
-    case class YearData(summary: SummaryForYear, exchangeRateGains: ExchangeRateGains)
+    case class YearData(
+        summary: SummaryForYear,
+        exchangeRateGains: ExchangeRateGains,
+        inflationGains: InflationGains,
+    )
 
     final class Builder(allTransactionsYearRange: YearRange) {
       var netWorth: ReferenceMoney = ReferenceMoney(0)
       val yearsToData: mutable.LinkedHashMap[Int, AllYearsData.YearData] = mutable.LinkedHashMap()
 
-      def addYear(year: Int, summary: SummaryForYear, exchangeRateGains: ExchangeRateGains): Builder = {
-        yearsToData.put(year, YearData(summary, exchangeRateGains))
+      def addYear(
+          year: Int,
+          summary: SummaryForYear,
+          exchangeRateGains: ExchangeRateGains,
+          inflationGains: InflationGains,
+      ): Builder = {
+        yearsToData.put(year, YearData(summary, exchangeRateGains, inflationGains))
         this
       }
 
@@ -535,6 +550,45 @@ private[transactionviews] final class SummaryTable(implicit
               )
             }).toVdomArray
           },
+          // **************** Inflation gains data **************** //
+          ^^.ifThen(props.query.isEmpty && props.correctForInflation) {
+            <.tr(
+              ^.key := "inflation-gains",
+              columns.map {
+                case TitleColumn =>
+                  <.td(^.key := "title", i18n("app.inflation-gains"))
+                case OmittedYearsColumn(_) =>
+                  <.td(^.key := "omitted-years", "...")
+                case MonthColumn(month) =>
+                  <.td(
+                    ^.key := s"gain-${month.year}-${month.month}",
+                    ^^.classes(cellClasses(month)),
+                    formatFloat(
+                      c => if (c) data.inflationGains(month) else ReferenceMoney(0),
+                      props.correctForInflation,
+                    ),
+                  )
+                case AverageColumn(year) =>
+                  <.td(
+                    ^.key := s"avg-$year",
+                    ^.className := "average",
+//                      formatFloat(
+//                        c => data.averageExchangeRateGains(currency, year, correctForInflation = c),
+//                        props.correctForInflation,
+//                      ),
+                  )
+                case TotalColumn(year) =>
+                  <.td(
+                    ^.key := s"total-$year",
+                    ^.className := "average",
+//                      formatFloat(
+//                        c => data.totalExchangeRateGains(currency, year, correctForInflation = c),
+//                        props.correctForInflation,
+//                      ),
+                  )
+              }.toVdomArray,
+            )
+          },
           // **************** Total rows **************** //
           ^^.ifThen(props.query.isEmpty || data.categories.nonEmpty) {
             {
@@ -613,14 +667,23 @@ private[transactionviews] final class SummaryTable(implicit
             case "" => Some(summaryExchangeRateGainsStoreFactory.get(account = props.account, year = year))
             case _  => None
           }
+          val inflationGainsStore = props.query match {
+            case "" =>
+              ifThenOption(props.correctForInflation) {
+                summaryInflationGainsStoreFactory.get(account = props.account, year = year)
+              }
+            case _ => None
+          }
 
           dataBuilder.addYear(
             year,
             summaryForYearStore.state getOrElse SummaryForYear.empty,
             exchangeRateGainsStore.flatMap(_.state) getOrElse ExchangeRateGains.empty,
+            inflationGainsStore.flatMap(_.state) getOrElse InflationGains.empty,
           )
           usedStores += summaryForYearStore
           usedStores ++= exchangeRateGainsStore.toSeq
+          usedStores ++= inflationGainsStore.toSeq
         }
         for (reservoir <- accountingConfig.visibleReservoirs) {
           if (reservoir.owner == props.account) {

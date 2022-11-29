@@ -140,6 +140,7 @@ app.search-results-for=Zoekresultaten voor {0}
 app.sending-data-to-server=Data aan het versturen...
 app.sending-data-to-server-failed=Het versturen van data is mislukt
 app.exchange-rate-gains=Winst
+app.inflation-gains=Inflatie
 app.example-query=drank b:gemeensch c:plezier a:-2.1 -t:vakantie-2017
 app.n-entries={0} inboekingen
 app.collapse-all=Allen inklappen
