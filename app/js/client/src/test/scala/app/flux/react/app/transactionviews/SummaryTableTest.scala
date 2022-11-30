@@ -1,7 +1,6 @@
 package app.flux.react.app.transactionviews
 
 import java.time.Month._
-
 import hydro.common.GuavaReplacement.DoubleMath.roundToLong
 import app.common.money.Currency
 import app.common.money.ReferenceMoney
@@ -12,6 +11,7 @@ import app.common.time.YearRange
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForMonth
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.ExchangeRateGains
 import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
+import app.flux.stores.entries.factories.SummaryInflationGainsStoreFactory.InflationGains
 import hydro.common.time.LocalDateTimes.createDateTime
 import utest._
 
@@ -45,6 +45,7 @@ object SummaryTableTest extends TestSuite {
             impactingTransactionIds = Set(),
             impactingBalanceCheckIds = Set(),
           ),
+          InflationGains.empty,
         ),
         2013 -> summaryTable.AllYearsData.YearData(
           SummaryForYear(
@@ -54,6 +55,7 @@ object SummaryTableTest extends TestSuite {
             )
           ),
           ExchangeRateGains.empty,
+          InflationGains.empty,
         ),
       ),
       netWorth = ReferenceMoney(23737373),
