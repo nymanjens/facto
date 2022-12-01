@@ -47,8 +47,15 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
 ) extends EntriesStoreFactory[ExchangeRateGains] {
 
   // **************** Public API ****************//
-  def get(account: Account = null, year: Int = -1): Store =
-    get(Input(account = Option(account), year = if (year == -1) None else Some(year)))
+  def get(account: Account = null, year: Int = -1, correctForInflation: Boolean): Store = {
+    get(
+      Input(
+        account = Option(account),
+        year = if (year == -1) None else Some(year),
+        correctForInflation = correctForInflation,
+      )
+    )
+  }
 
   // **************** Implementation of EntriesStoreFactory methods/types ****************//
   override protected def createNew(input: Input) = new Store {
@@ -167,7 +174,14 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
             def gainFromMoney(date: LocalDateTime, amount: MoneyWithGeneralCurrency): ReferenceMoney = {
               val valueAtDate = amount.withDate(date).exchangedForReferenceCurrency()
               val valueAtEnd = amount.withDate(month.startTimeOfNextMonth).exchangedForReferenceCurrency()
-              valueAtEnd - valueAtDate
+              val result = valueAtEnd - valueAtDate
+              if (input.correctForInflation) {
+                result
+                  .withDate(month.startTimeOfNextMonth)
+                  .exchangedForReferenceCurrency(correctForInflation = true)
+              } else {
+                result
+              }
             }
 
             val gainFromIntialMoney = gainFromMoney(month.startTime, dateToBalanceFunction(month.startTime))
@@ -207,7 +221,11 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
   }
 
   /* override */
-  protected case class Input(account: Option[Account], year: Option[Int])
+  protected case class Input(
+      account: Option[Account],
+      year: Option[Int],
+      correctForInflation: Boolean,
+  )
 }
 
 object SummaryExchangeRateGainsStoreFactory {
@@ -240,16 +258,7 @@ object SummaryExchangeRateGainsStoreFactory {
   case class GainsForMonth private (reservoirToGains: Map[MoneyReservoir, ReferenceMoney]) {
     reservoirToGains.values.foreach(gain => require(!gain.isZero))
 
-    private lazy val totalInternal: ReferenceMoney = reservoirToGains.values.sum
-    def total(correctForInflation: Boolean, month: DatedMonth)(implicit
-        exchangeRateManager: ExchangeRateManager
-    ): ReferenceMoney = {
-      if (correctForInflation) {
-        totalInternal.withDate(month.middleTime).exchangedForReferenceCurrency(correctForInflation = true)
-      } else {
-        totalInternal
-      }
-    }
+    lazy val total: ReferenceMoney = reservoirToGains.values.sum
 
     def nonEmpty: Boolean = reservoirToGains.nonEmpty
     def currencies: Seq[Currency] = reservoirToGains.keys.toStream.map(_.currency).distinct.toVector

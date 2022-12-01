@@ -148,16 +148,18 @@ final class ChartStoreFactory(implicit
     val filterFromQuery = complexQueryFilter.fromQuery(input.queryString)
     new Store(
       filterFromQuery,
-      new ChartStoreFromEntities(filterFromQuery),
-      summaryExchangeRateGainsStoreFactory.get(),
+      new ChartStoreFromEntities(filterFromQuery, correctForInflation = input.correctForInflation),
+      summaryExchangeRateGainsStoreFactory.get(correctForInflation = input.correctForInflation),
       if (input.correctForInflation) summaryInflationGainsStoreFactory.get()
       else FixedStateStore(Some(InflationGains.empty)),
     )
   }
 
   // **************** Private inner types **************** //
-  private final class ChartStoreFromEntities(filterFromQuery: DbQuery.Filter[Transaction])
-      extends AsyncEntityDerivedStateStore[LinePoints] {
+  private final class ChartStoreFromEntities(
+      filterFromQuery: DbQuery.Filter[Transaction],
+      correctForInflation: Boolean,
+  ) extends AsyncEntityDerivedStateStore[LinePoints] {
     override protected def calculateState(): Future[LinePoints] = async {
       val transactions: Seq[Transaction] =
         await(entityAccess.newQuery[Transaction]().filter(filterFromQuery).data())
@@ -167,7 +169,9 @@ final class ChartStoreFactory(implicit
           .groupBy(t => DatedMonth.containing(t.consumedDate))
           // Don't show future transactions in charts because the data will likely paint an incomplete picture
           .filterKeys(_ <= DatedMonth.current)
-          .mapValues(_.map(_.flow.exchangedForReferenceCurrency()).sum)
+          .mapValues(
+            _.map(_.flow.exchangedForReferenceCurrency(correctForInflation = correctForInflation)).sum
+          )
       )
     }
 

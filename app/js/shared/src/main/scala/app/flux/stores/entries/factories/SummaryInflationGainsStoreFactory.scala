@@ -168,8 +168,12 @@ final class SummaryInflationGainsStoreFactory(implicit
                 .withDate(month.startTimeOfNextMonth)
                 .exchangedForReferenceCurrency(correctForInflation = true)
 
+              val currencyFluctuation = (valueAtEnd - valueAtDate)
+                .withDate(month.startTimeOfNextMonth)
+                .exchangedForReferenceCurrency(correctForInflation = true)
+
               // Subtract currency fluctuation effects, which is already handled in SummaryExchangeRateGainsStoreFactory
-              (correctedValueAtEnd - correctedValueAtDate) - (valueAtEnd - valueAtDate)
+              (correctedValueAtEnd - correctedValueAtDate) - currencyFluctuation
             }
 
             val gainFromIntialMoney = gainFromMoney(month.startTime, dateToBalanceFunction(month.startTime))

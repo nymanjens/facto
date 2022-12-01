@@ -145,16 +145,20 @@ private[transactionviews] final class SummaryTable(implicit
         correctForInflation: Boolean,
     ): ReferenceMoney = {
       val summary = yearsToData(month.year).summary
-      val exchangeRateData = yearsToData(month.year).exchangeRateGains
+      val exchangeRateData = {
+        if (correctForInflation) {
+          yearsToData(month.year).exchangeRateGainsCorrectedForInflation
+        } else {
+          yearsToData(month.year).exchangeRateGains
+        }
+      }
       val inflationData = yearsToData(month.year).inflationGains
 
       summary.categories
         .filterNot(categoriesToIgnore)
         .map(summary.cell(_, month).totalFlow(correctForInflation = correctForInflation))
         .sum +
-        exchangeRateData
-          .gainsForMonth(month)
-          .total(correctForInflation = correctForInflation, month = month) +
+        exchangeRateData.gainsForMonth(month).total +
         inflationData.gainsForMonth(month).total
     }
     def averageWithoutCategories(
@@ -220,12 +224,13 @@ private[transactionviews] final class SummaryTable(implicit
         month: DatedMonth,
         correctForInflation: Boolean,
     ): ReferenceMoney = {
-      val result = yearsToData(month.year).exchangeRateGains.gainsForMonth(month).gains(currency)
-      if (correctForInflation) {
-        result.withDate(month.middleTime).exchangedForReferenceCurrency(correctForInflation = true)
-      } else {
-        result
-      }
+      val gains =
+        if (correctForInflation) {
+          yearsToData(month.year).exchangeRateGainsCorrectedForInflation
+        } else {
+          yearsToData(month.year).exchangeRateGains
+        }
+      gains.gainsForMonth(month).gains(currency)
     }
     def averageExchangeRateGains(
         currency: Currency,
@@ -278,6 +283,7 @@ private[transactionviews] final class SummaryTable(implicit
     case class YearData(
         summary: SummaryForYear,
         exchangeRateGains: ExchangeRateGains,
+        exchangeRateGainsCorrectedForInflation: ExchangeRateGains,
         inflationGains: InflationGains,
     )
 
@@ -289,9 +295,13 @@ private[transactionviews] final class SummaryTable(implicit
           year: Int,
           summary: SummaryForYear,
           exchangeRateGains: ExchangeRateGains,
+          exchangeRateGainsCorrectedForInflation: ExchangeRateGains,
           inflationGains: InflationGains,
       ): Builder = {
-        yearsToData.put(year, YearData(summary, exchangeRateGains, inflationGains))
+        yearsToData.put(
+          year,
+          YearData(summary, exchangeRateGains, exchangeRateGainsCorrectedForInflation, inflationGains),
+        )
         this
       }
 
@@ -677,8 +687,26 @@ private[transactionviews] final class SummaryTable(implicit
           val summaryForYearStore =
             summaryForYearStoreFactory.get(account = props.account, year = year, query = props.query)
           val exchangeRateGainsStore = props.query match {
-            case "" => Some(summaryExchangeRateGainsStoreFactory.get(account = props.account, year = year))
-            case _  => None
+            case "" =>
+              Some(
+                summaryExchangeRateGainsStoreFactory.get(
+                  account = props.account,
+                  year = year,
+                  correctForInflation = false,
+                )
+              )
+            case _ => None
+          }
+          val exchangeRateGainsStoreCorrectedForInflation = props.query match {
+            case "" =>
+              ifThenOption(props.correctForInflation) {
+                summaryExchangeRateGainsStoreFactory.get(
+                  account = props.account,
+                  year = year,
+                  correctForInflation = true,
+                )
+              }
+            case _ => None
           }
           val inflationGainsStore = props.query match {
             case "" =>
@@ -692,10 +720,12 @@ private[transactionviews] final class SummaryTable(implicit
             year,
             summaryForYearStore.state getOrElse SummaryForYear.empty,
             exchangeRateGainsStore.flatMap(_.state) getOrElse ExchangeRateGains.empty,
+            exchangeRateGainsStoreCorrectedForInflation.flatMap(_.state) getOrElse ExchangeRateGains.empty,
             inflationGainsStore.flatMap(_.state) getOrElse InflationGains.empty,
           )
           usedStores += summaryForYearStore
           usedStores ++= exchangeRateGainsStore.toSeq
+          usedStores ++= exchangeRateGainsStoreCorrectedForInflation.toSeq
           usedStores ++= inflationGainsStore.toSeq
         }
         for (reservoir <- accountingConfig.visibleReservoirs) {
