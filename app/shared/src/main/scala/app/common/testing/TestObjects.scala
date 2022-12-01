@@ -220,7 +220,7 @@ object TestObjects {
               query = "beneficiary:'Account A'",
             )
           ),
-          correctForInflation = true,
+          correctForInflation = false,
         ),
       )
     ),
