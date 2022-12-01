@@ -235,11 +235,14 @@ object Parsable {
     }
   }
   object PredefinedChart {
-    case class ChartSpec(lines: java.util.List[ChartSpec.Line]) {
-      def this() = this(lines = null)
+    case class ChartSpec(lines: java.util.List[ChartSpec.Line], correctForInflation: Boolean) {
+      def this() = this(lines = null, correctForInflation = false)
 
       def parse(): ParsedChartSpec = {
-        ParsedChartSpec(lines = lines.asScala.toVector.map(_.parse))
+        ParsedChartSpec(
+          lines = lines.asScala.toVector.map(_.parse),
+          correctForInflation = correctForInflation,
+        )
       }
     }
     object ChartSpec {

@@ -219,7 +219,8 @@ object TestObjects {
               name = "Transactions",
               query = "beneficiary:'Account A'",
             )
-          )
+          ),
+          correctForInflation = true,
         ),
       )
     ),

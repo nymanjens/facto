@@ -66,7 +66,8 @@ final class Chart(implicit
     initialState = State(),
     stateStoresDependencies = Some(props =>
       for (line <- props.chartSpec.lines) yield {
-        val store = chartStoreFactory.get(line.query, correctForInflation = false)
+        val store =
+          chartStoreFactory.get(line.query, correctForInflation = props.chartSpec.correctForInflation)
         StateStoresDependency(
           store,
           oldState => oldState.copy(lineToPoints = oldState.lineToPoints.updated(line, store.state)),

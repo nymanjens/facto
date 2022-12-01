@@ -185,7 +185,8 @@ object AppPages {
 
     def firstPredefined(implicit accountingConfig: Config): Chart = {
       Chart.fromChartSpec(
-        accountingConfig.predefinedCharts.headOption.map(_.chartSpec) getOrElse ChartSpec.singleEmptyLine
+        accountingConfig.predefinedCharts.headOption.map(_.chartSpec) getOrElse ChartSpec
+          .singleEmptyLine(correctForInflation = false)
       )
     }
   }

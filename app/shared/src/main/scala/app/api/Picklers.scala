@@ -81,9 +81,10 @@ object Picklers extends StandardPicklers {
   implicit object ChartSpecPickler extends Pickler[ChartSpec] {
     override def pickle(value: ChartSpec)(implicit state: PickleState): Unit = logExceptions {
       state.pickle(value.lines)
+      state.pickle(value.correctForInflation)
     }
     override def unpickle(implicit state: UnpickleState): ChartSpec = logExceptions {
-      ChartSpec(state.unpickle[Seq[ChartSpec.Line]])
+      ChartSpec(state.unpickle[Seq[ChartSpec.Line]], state.unpickle[Boolean])
     }
   }
 
