@@ -6,6 +6,7 @@ import app.common.money.ReferenceMoney
 import app.common.time.DatedMonth
 import app.flux.stores.entries.factories.ChartStoreFactory.LinePoints
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.ExchangeRateGains
+import app.flux.stores.entries.factories.SummaryInflationGainsStoreFactory.InflationGains
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Config
 import app.models.accounting.Transaction
@@ -14,6 +15,8 @@ import hydro.common.time.LocalDateTime
 import hydro.common.ScalaUtils
 import hydro.flux.stores.AsyncEntityDerivedStateStore
 import hydro.flux.stores.CombiningStateStore
+import hydro.flux.stores.CombiningStateStore3
+import hydro.flux.stores.FixedStateStore
 import hydro.flux.stores.StateStore
 import hydro.flux.stores.StoreFactory
 import hydro.models.access.DbQuery
@@ -33,40 +36,55 @@ final class ChartStoreFactory(implicit
     accountingConfig: Config,
     complexQueryFilter: ComplexQueryFilter,
     summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
+    summaryInflationGainsStoreFactory: SummaryInflationGainsStoreFactory,
     exchangeRateManager: ExchangeRateManager,
     clock: Clock,
 ) extends StoreFactory {
   // **************** Public API **************** //
-  def get(query: String): Store = getCachedOrCreate(query)
+  def get(query: String, correctForInflation: Boolean): Store = {
+    getCachedOrCreate(Input(query, correctForInflation))
+  }
 
   // **************** Implementation of base class methods and types **************** //
   /* override */
-  protected type Input = String
+  protected case class Input(
+      queryString: String,
+      correctForInflation: Boolean,
+  )
 
   /* override */
   final class Store(
       filterFromQuery: DbQuery.Filter[Transaction],
       chartStoreFromEntities: ChartStoreFromEntities,
       summaryExchangeRateGainsStore: StateStore[Option[ExchangeRateGains]],
-  ) extends CombiningStateStore[Option[LinePoints], Option[ExchangeRateGains], LinePoints](
+      summaryInflationGainsStore: StateStore[Option[InflationGains]],
+  ) extends CombiningStateStore3[
+        Option[LinePoints],
+        Option[ExchangeRateGains],
+        Option[InflationGains],
+        LinePoints,
+      ](
         chartStoreFromEntities,
         summaryExchangeRateGainsStore,
+        summaryInflationGainsStore,
       ) {
 
     override protected def combineStoreStates(
         maybeChartFromEntities: Option[LinePoints],
-        maybeSummaryExchangeRateGains: Option[ExchangeRateGains],
+        maybeExchangeRateGains: Option[ExchangeRateGains],
+        maybeInflationGains: Option[InflationGains],
     ): LinePoints = {
       (for {
         chartFromEntities <- maybeChartFromEntities
-        summaryExchangeRateGains <- maybeSummaryExchangeRateGains
+        exchangeRateGains <- maybeExchangeRateGains
+        inflationGains <- maybeInflationGains
       } yield {
         val exchangeRateGainsPoints = LinePoints(
-          summaryExchangeRateGains.monthToGains
+          exchangeRateGains.monthToGains
             // Future months are irrelevant for exchange rate gains because they are not yet known
             .filterKeys(_ <= DatedMonth.current)
-            .mapValues(gainsForMonth => {
-              gainsForMonth.reservoirToGains.map { case (reservoir, gains) =>
+            .map { case (month, gainsForMonth) =>
+              month -> gainsForMonth.reservoirToGains.map { case (reservoir, gains) =>
                 // Dummy transaction to be filterable
                 val dummyTransaction = Transaction(
                   transactionGroupId = EntityModification.generateRandomId(),
@@ -75,15 +93,15 @@ final class ChartStoreFactory(implicit
                   moneyReservoirCode = reservoir.code,
                   categoryCode = "Exchange",
                   description = "Exchange rate gains",
-                  flowInCents = 0,
-                  createdDate = LocalDateTime.MIN,
-                  transactionDate = LocalDateTime.MIN,
-                  consumedDate = LocalDateTime.MIN,
+                  flowInCents = gains.cents,
+                  createdDate = month.middleTime,
+                  transactionDate = month.middleTime,
+                  consumedDate = month.middleTime,
                   idOption = Some(EntityModification.generateRandomId()),
                 )
                 if (filterFromQuery(dummyTransaction)) gains else ReferenceMoney(0)
               }.sum
-            })
+            }
             // Omit leading zeros
             .toVector
             .sortBy(_._1)
@@ -91,17 +109,49 @@ final class ChartStoreFactory(implicit
             .toMap
         )
 
-        chartFromEntities ++ exchangeRateGainsPoints
+        val inflationGainsPoints = LinePoints(
+          inflationGains.monthToGains
+            // Future months are irrelevant for inflation gains because they are not yet known
+            .filterKeys(_ <= DatedMonth.current)
+            .map { case (month, gainsForMonth) =>
+              month -> gainsForMonth.reservoirToGains.map { case (reservoir, gains) =>
+                // Dummy transaction to be filterable
+                val dummyTransaction = Transaction(
+                  transactionGroupId = EntityModification.generateRandomId(),
+                  issuerId = EntityModification.generateRandomId(),
+                  beneficiaryAccountCode = reservoir.owner.code,
+                  moneyReservoirCode = reservoir.code,
+                  categoryCode = "Inflation",
+                  description = "Inflation gains",
+                  flowInCents = gains.cents,
+                  createdDate = month.middleTime,
+                  transactionDate = month.middleTime,
+                  consumedDate = month.middleTime,
+                  idOption = Some(EntityModification.generateRandomId()),
+                )
+                if (filterFromQuery(dummyTransaction)) gains else ReferenceMoney(0)
+              }.sum
+            }
+            // Omit leading zeros
+            .toVector
+            .sortBy(_._1)
+            .dropWhile(_._2.isZero)
+            .toMap
+        )
+
+        chartFromEntities ++ exchangeRateGainsPoints ++ inflationGainsPoints
       }) getOrElse LinePoints.empty
     }
   }
 
-  override protected def createNew(queryString: Input): Store = {
-    val filterFromQuery = complexQueryFilter.fromQuery(queryString)
+  override protected def createNew(input: Input): Store = {
+    val filterFromQuery = complexQueryFilter.fromQuery(input.queryString)
     new Store(
       filterFromQuery,
       new ChartStoreFromEntities(filterFromQuery),
       summaryExchangeRateGainsStoreFactory.get(),
+      if (input.correctForInflation) summaryInflationGainsStoreFactory.get()
+      else FixedStateStore(Some(InflationGains.empty)),
     )
   }
 
