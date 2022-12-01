@@ -37,7 +37,7 @@ object SummaryTableTest extends TestSuite {
               createTransaction(year = 2012, month = JUNE, flow = -2, category = testCategoryC),
             )
           ),
-          ExchangeRateGains(
+          exchangeRateGains = ExchangeRateGains(
             monthToGains = Map(
               DatedMonth.of(2012, JUNE) ->
                 GainsForMonth.forSingle(testReservoirCashGbp, ReferenceMoney(123))
@@ -45,17 +45,19 @@ object SummaryTableTest extends TestSuite {
             impactingTransactionIds = Set(),
             impactingBalanceCheckIds = Set(),
           ),
-          InflationGains.empty,
+          exchangeRateGainsCorrectedForInflation = ExchangeRateGains.empty,
+          inflationGains = InflationGains.empty,
         ),
         2013 -> summaryTable.AllYearsData.YearData(
-          SummaryForYear(
+          summary = SummaryForYear(
             Seq(
               createTransaction(year = 2013, category = testCategoryA),
               createTransaction(year = 2013, category = testCategoryB),
             )
           ),
-          ExchangeRateGains.empty,
-          InflationGains.empty,
+          exchangeRateGains = ExchangeRateGains.empty,
+          exchangeRateGainsCorrectedForInflation = ExchangeRateGains.empty,
+          inflationGains = InflationGains.empty,
         ),
       ),
       netWorth = ReferenceMoney(23737373),

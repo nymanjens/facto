@@ -150,7 +150,8 @@ object StoreFactoryStateUpdateTest extends TestSuite {
     )
 
     "SummaryExchangeRateGainsStoreFactory" - runTest(
-      store = testModule.summaryExchangeRateGainsStoreFactory.get(account = testAccountA, year = 2015),
+      store = testModule.summaryExchangeRateGainsStoreFactory
+        .get(account = testAccountA, year = 2015, correctForInflation = false),
       updatesWithImpact = ListMap(
         // Seed random fluctuating prices
         Add(createExchangeRateMeasurement(year = 2014)) -> StateImpact.NoChange,
