@@ -75,6 +75,20 @@ final class Chart(implicit
         )
       }
     ),
+  ).withStateStoresDependencyFromProps(props =>
+    StateStoresDependency(
+      inMemoryUserConfigStore,
+      state => {
+        if (inMemoryUserConfigStore.state.correctForInflation != props.chartSpec.correctForInflation) {
+          props.router.setPage(
+            AppPages.Chart.fromChartSpec(
+              props.chartSpec.copy(correctForInflation = inMemoryUserConfigStore.state.correctForInflation)
+            )
+          )
+        }
+        state
+      },
+    )
   )
 
   // **************** Private inner types ****************//
