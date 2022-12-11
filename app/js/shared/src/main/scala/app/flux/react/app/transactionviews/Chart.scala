@@ -26,6 +26,7 @@ import hydro.flux.react.HydroReactComponent
 import hydro.flux.react.uielements.Bootstrap
 import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.uielements.Panel
+import hydro.flux.react.ReactVdomUtils.^^
 import hydro.flux.router.RouterContext
 import hydro.jsfacades.Recharts
 import japgolly.scalajs.react._
@@ -211,10 +212,15 @@ final class Chart(implicit
                       ^.key := lineIndex,
                       i18n("app.for-query", line.name),
                       ": ",
-                      chartData.lastOption
-                        .map(data => data(line.name))
-                        .map(formatDoubleMoney())
-                        .getOrElse("0.00"): String,
+                      <.span(
+                        ^^.ifThen(props.chartSpec.correctForInflation)(
+                          ^.className := "corrected-for-inflation"
+                        ),
+                        chartData.lastOption
+                          .map(data => data(line.name))
+                          .map(formatDoubleMoney())
+                          .getOrElse("0.00"): String,
+                      ),
                     )
                   }
                 ).toVdomArray
