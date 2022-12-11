@@ -2,7 +2,6 @@ package app.flux.react.app.transactionviews
 
 import scala.scalajs.js.JSConverters._
 import java.time.Month
-
 import app.common.money.Currency
 
 import scala.collection.immutable.Seq
@@ -15,6 +14,7 @@ import app.common.accounting.ChartSpec.Line
 import app.flux.router.AppPages
 import app.flux.stores.entries.factories.ChartStoreFactory
 import app.flux.stores.entries.factories.ChartStoreFactory.LinePoints
+import app.flux.stores.InMemoryUserConfigStore
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Config
 import app.models.user.User
@@ -45,6 +45,7 @@ final class Chart(implicit
     pageHeader: PageHeader,
     chartSpecInput: ChartSpecInput,
     chartStoreFactory: ChartStoreFactory,
+    inMemoryUserConfigStore: InMemoryUserConfigStore,
 ) extends HydroReactComponent {
 
   private val lineColors: Seq[String] =
@@ -85,7 +86,12 @@ final class Chart(implicit
       lineToPoints: Map[Line, LinePoints] = Map()
   )
 
-  protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
+  protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) with WillMount {
+
+    override def willMount(props: Props, state: State): Callback = {
+      inMemoryUserConfigStore.mutateState(_.copy(correctForInflation = props.chartSpec.correctForInflation))
+      Callback.empty
+    }
 
     override def render(props: Props, state: State) = logExceptions {
       implicit val router = props.router
