@@ -71,67 +71,20 @@ final class SummaryInflationGainsStoreFactory(implicit
 
     // **************** Private helper methods ****************//
     private def calculateInflationGains(reservoir: MoneyReservoir): Future[InflationGains] = async {
-      val oldestRelevantBalanceCheck: Option[BalanceCheck] = input.year match {
-        case None => None
-        case Some(year) =>
-          await(
-            entityAccess
-              .newQuery[BalanceCheck]()
-              .filter(ModelFields.BalanceCheck.moneyReservoirCode === reservoir.code)
-              .filter(ModelFields.BalanceCheck.checkDate < DatedMonth.allMonthsIn(year).head.startTime)
-              .sort(AppDbQuerySorting.BalanceCheck.deterministicallyByCheckDate.reversed)
-              .limit(1)
-              .data()
-          ).headOption
-      }
-      val oldestBalanceDate: LocalDateTime =
-        oldestRelevantBalanceCheck.map(_.checkDate).getOrElse(LocalDateTime.MIN)
-      val initialBalance =
-        oldestRelevantBalanceCheck.map(_.balance).getOrElse(MoneyWithGeneralCurrency(0, reservoir.currency))
-
-      val balanceChecksFuture: Future[Seq[BalanceCheck]] =
-        entityAccess
-          .newQuery[BalanceCheck]()
-          .filter(ModelFields.BalanceCheck.moneyReservoirCode === reservoir.code)
-          .filter(
-            input.year match {
-              case None => DbQuery.Filter.NullFilter()
-              case Some(year) =>
-                filterInRange(
-                  ModelFields.BalanceCheck.checkDate,
-                  oldestBalanceDate,
-                  DatedMonth.allMonthsIn(year).last.startTimeOfNextMonth,
-                )
-            }
+      val transactionsAndBalanceChecks =
+        await(
+          accountingEntryUtils.getTransactionsAndBalanceChecks(
+            moneyReservoir = reservoir,
+            yearFilter = input.year,
           )
-          .data()
+        )
 
-      val transactionsFuture: Future[Seq[Transaction]] =
-        entityAccess
-          .newQuery[Transaction]()
-          .filter(ModelFields.Transaction.moneyReservoirCode === reservoir.code)
-          .filter(
-            input.year match {
-              case None => DbQuery.Filter.NullFilter()
-              case Some(year) =>
-                filterInRange(
-                  ModelFields.Transaction.transactionDate,
-                  oldestBalanceDate,
-                  DatedMonth.allMonthsIn(year).last.startTimeOfNextMonth,
-                )
-            }
-          )
-          .data()
-      val balanceChecks: Seq[BalanceCheck] = await(balanceChecksFuture)
-      val transactions: Seq[Transaction] = await(transactionsFuture)
-
-      val mergedRows: Seq[Entity] = (transactions ++ balanceChecks).sortBy {
-        case trans: Transaction => (trans.transactionDate, trans.createdDate)
-        case bc: BalanceCheck   => (bc.checkDate, bc.createdDate)
-      }
       val dateToBalanceFunction: DateToBalanceFunction = {
-        val builder = new DateToBalanceFunction.Builder(oldestBalanceDate, initialBalance)
-        mergedRows.foreach {
+        val builder = new DateToBalanceFunction.Builder(
+          initialDate = transactionsAndBalanceChecks.oldestBalanceDate,
+          initialBalance = transactionsAndBalanceChecks.initialBalance,
+        )
+        transactionsAndBalanceChecks.mergedRows.foreach {
           case transaction: Transaction =>
             builder.incrementLatestBalance(transaction.transactionDate, transaction.flow)
           case balanceCheck: BalanceCheck =>
@@ -143,7 +96,7 @@ final class SummaryInflationGainsStoreFactory(implicit
       val monthsInPeriod: Seq[DatedMonth] = input.year match {
         case Some(year) => DatedMonth.allMonthsIn(year)
         case None =>
-          mergedRows match {
+          transactionsAndBalanceChecks.mergedRows match {
             case Seq() => Seq()
             case _ =>
               def entityToDate(entity: Entity): LocalDateTime = {
@@ -153,8 +106,11 @@ final class SummaryInflationGainsStoreFactory(implicit
                 }
               }
               DatedMonth.monthsInClosedRange(
-                DatedMonth.containing(entityToDate(mergedRows.head)),
-                Seq(DatedMonth.current, DatedMonth.containing(entityToDate(mergedRows.last))).max,
+                DatedMonth.containing(entityToDate(transactionsAndBalanceChecks.mergedRows.head)),
+                Seq(
+                  DatedMonth.current,
+                  DatedMonth.containing(entityToDate(transactionsAndBalanceChecks.mergedRows.last)),
+                ).max,
               )
           }
       }
@@ -191,8 +147,8 @@ final class SummaryInflationGainsStoreFactory(implicit
           }
           month -> GainsForMonth.forSingle(reservoir, gain)
         }.toMap,
-        impactingTransactionIds = transactions.toStream.map(_.id).toSet,
-        impactingBalanceCheckIds = (balanceChecks.toStream ++ oldestRelevantBalanceCheck).map(_.id).toSet,
+        impactingTransactionIds = transactionsAndBalanceChecks.impactingTransactionIds,
+        impactingBalanceCheckIds = transactionsAndBalanceChecks.impactingBalanceCheckIds,
       )
     }
 
@@ -205,13 +161,6 @@ final class SummaryInflationGainsStoreFactory(implicit
         case None    => true
         case Some(a) => account == a
       }
-    }
-    private def filterInRange[E](
-        field: ModelField[LocalDateTime, E],
-        start: LocalDateTime,
-        end: LocalDateTime,
-    ): DbQuery.Filter[E] = {
-      (field >= start) && (field < end)
     }
   }
 
