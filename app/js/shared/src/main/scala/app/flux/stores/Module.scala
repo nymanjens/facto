@@ -34,6 +34,7 @@ final class Module(implicit
   new BalanceCheckStore
 
   implicit private val complexQueryFilter = new ComplexQueryFilter
+  implicit private val accountingEntryUtils = new AccountingEntryUtils
 
   implicit val allEntriesStoreFactory = new AllEntriesStoreFactory
   implicit val cashFlowEntriesStoreFactory = new CashFlowEntriesStoreFactory

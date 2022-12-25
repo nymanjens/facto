@@ -2,6 +2,7 @@ package app.flux.stores.entries.factories
 
 import app.common.money.ExchangeRateManager
 import app.common.money.MoneyWithGeneralCurrency
+import app.flux.stores.entries.AccountingEntryUtils
 import app.flux.stores.entries.CashFlowEntry.BalanceCorrection
 import app.flux.stores.entries.CashFlowEntry.RegularEntry
 import app.flux.stores.entries.CashFlowEntry
@@ -28,6 +29,7 @@ final class CashFlowEntriesStoreFactory(implicit
     entityAccess: AppJsEntityAccess,
     accountingConfig: Config,
     exchangeRateManager: ExchangeRateManager,
+    accountingEntryUtils: AccountingEntryUtils,
 ) extends EntriesListStoreFactory[CashFlowEntry, MoneyReservoir] {
 
   override protected def createNew(maxNumEntries: Int, moneyReservoir: MoneyReservoir) = new Store {
@@ -70,34 +72,13 @@ final class CashFlowEntriesStoreFactory(implicit
         }
       }
 
-      val oldestBalanceDate = oldestRelevantBalanceCheck.map(_.checkDate).getOrElse(LocalDateTime.MIN)
-      val initialBalance =
-        oldestRelevantBalanceCheck
-          .map(_.balance)
-          .getOrElse(MoneyWithGeneralCurrency(0, moneyReservoir.currency))
-
-      val balanceChecksFuture: Future[Seq[BalanceCheck]] =
-        entityAccess
-          .newQuery[BalanceCheck]()
-          .filter(ModelFields.BalanceCheck.moneyReservoirCode === moneyReservoir.code)
-          .filter(ModelFields.BalanceCheck.checkDate >= oldestBalanceDate)
-          .data()
-
-      // get relevant transactions
-      val transactionsFuture: Future[Seq[Transaction]] =
-        entityAccess
-          .newQuery[Transaction]()
-          .filter(ModelFields.Transaction.moneyReservoirCode === moneyReservoir.code)
-          .filter(ModelFields.Transaction.transactionDate >= oldestBalanceDate)
-          .data()
-      val balanceChecks: Seq[BalanceCheck] = await(balanceChecksFuture)
-      val transactions: Seq[Transaction] = await(transactionsFuture)
-
-      // merge the two
-      val mergedRows = (transactions ++ balanceChecks).sortBy {
-        case trans: Transaction => (trans.transactionDate, trans.createdDate)
-        case bc: BalanceCheck   => (bc.checkDate, bc.createdDate)
-      }
+      val transactionsAndBalanceChecks =
+        await(
+          accountingEntryUtils.getTransactionsAndBalanceChecks(
+            moneyReservoir = moneyReservoir,
+            oldestRelevantBalanceCheck = oldestRelevantBalanceCheck,
+          )
+        )
 
       // convert to entries (recursion does not lead to growing stack because of Stream)
       def convertToEntries(
@@ -116,7 +97,10 @@ final class CashFlowEntriesStoreFactory(implicit
           case Nil =>
             Stream.empty
         }
-      var entries = convertToEntries(mergedRows.toList, initialBalance).toList
+      var entries = convertToEntries(
+        transactionsAndBalanceChecks.mergedRows.toList,
+        transactionsAndBalanceChecks.initialBalance,
+      ).toList
 
       // combine entries of same group and merge BC's with same balance (recursion does not lead to growing stack because of Stream)
       def combineSimilar(nextEntries: List[CashFlowEntry]): Stream[CashFlowEntry] = nextEntries match {
@@ -148,8 +132,8 @@ final class CashFlowEntriesStoreFactory(implicit
       EntriesListStoreFactory.State(
         entries.takeRight(maxNumEntries).map(addIsPending),
         hasMore = entries.size > maxNumEntries,
-        impactingTransactionIds = transactions.toStream.map(_.id).toSet,
-        impactingBalanceCheckIds = (balanceChecks.toStream ++ oldestRelevantBalanceCheck).map(_.id).toSet,
+        impactingTransactionIds = transactionsAndBalanceChecks.impactingTransactionIds,
+        impactingBalanceCheckIds = transactionsAndBalanceChecks.impactingBalanceCheckIds,
       )
     }
 
