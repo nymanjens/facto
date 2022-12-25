@@ -340,7 +340,7 @@ object StoreFactoryStateUpdateTest extends TestSuite {
   private final class ThisTestModule extends TestModule {
 
     implicit private val complexQueryFilter = new ComplexQueryFilter
-    implicit private val accountingEntryUtils = new AccountingEntryUtils()
+    implicit private val accountingEntryUtils = new AccountingEntryUtils
 
     val allEntriesStoreFactory = new AllEntriesStoreFactory
     val cashFlowEntriesStoreFactory = new CashFlowEntriesStoreFactory

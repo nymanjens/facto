@@ -2,12 +2,12 @@ package app.flux.stores.entries.factories
 
 import java.time.Duration
 import java.time.Month.JANUARY
-
 import app.common.money.Currency
 import app.common.money.MoneyWithGeneralCurrency
 import hydro.common.testing.FakeJsEntityAccess
 import app.common.testing.TestModule
 import app.common.testing.TestObjects._
+import app.flux.stores.entries.AccountingEntryUtils
 import app.flux.stores.entries.CashFlowEntry.BalanceCorrection
 import app.flux.stores.entries.CashFlowEntry.RegularEntry
 import app.models.accounting._
@@ -28,6 +28,7 @@ object CashFlowEntriesStoreFactoryTest extends TestSuite {
     val testModule = new TestModule()
     implicit val entityAccess = testModule.fakeEntityAccess
     implicit val exchangeRateManager = testModule.exchangeRateManager
+    implicit val accountingEntryUtils = new AccountingEntryUtils
     val factory: CashFlowEntriesStoreFactory = new CashFlowEntriesStoreFactory()
 
     "empty result" - async {

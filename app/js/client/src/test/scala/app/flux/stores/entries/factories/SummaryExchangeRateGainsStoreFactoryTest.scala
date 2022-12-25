@@ -30,7 +30,7 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
     implicit val testAccountingConfig = testModule.testAccountingConfig
     implicit val complexQueryFilter = new ComplexQueryFilter()
     implicit val accountingEntryUtils = new AccountingEntryUtils()
-    val factory: SummaryExchangeRateGainsStoreFactory = new SummaryExchangeRateGainsStoreFactory()
+    val factory: SummaryExchangeRateGainsStoreFactory = new SummaryExchangeRateGainsStoreFactory
 
     "no transactions" - async {
       val store = factory.get(testAccountA, year = 2013, correctForInflation = false)
