@@ -237,5 +237,27 @@ object AccountingEntryUtils {
         }
       }
     }
+
+    case class GainsFromInflation()(implicit
+        exchangeRateManager: ExchangeRateManager
+    ) extends GainFromMoneyFunction {
+      override def apply(
+          startDate: LocalDateTime,
+          endDate: LocalDateTime,
+          amount: MoneyWithGeneralCurrency,
+      ): ReferenceMoney = {
+        val correctedValueAtStart =
+          amount.withDate(startDate).exchangedForReferenceCurrency(correctForInflation = true)
+        val correctedValueAtEnd = amount
+          .withDate(endDate)
+          .exchangedForReferenceCurrency(correctForInflation = true)
+
+        val currencyFluctuation =
+          GainsFromExchangeRate(correctGainsForInflation = true).apply(startDate, endDate, amount)
+
+        // Subtract currency fluctuation effects, which is already handled in SummaryExchangeRateGainsStoreFactory
+        (correctedValueAtEnd - correctedValueAtStart) - currencyFluctuation
+      }
+    }
   }
 }

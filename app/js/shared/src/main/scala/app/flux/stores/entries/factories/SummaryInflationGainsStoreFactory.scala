@@ -89,26 +89,32 @@ final class SummaryInflationGainsStoreFactory(implicit
         monthToGains = monthsInPeriod.map { month =>
           val gain = transactionsAndBalanceChecks.calculateGainsInMonth(
             month,
-            (startDate, endDate, amount) => {
-              val correctedValueAtStart =
-                amount.withDate(startDate).exchangedForReferenceCurrency(correctForInflation = true)
-              val correctedValueAtEnd = amount
-                .withDate(endDate)
-                .exchangedForReferenceCurrency(correctForInflation = true)
-
-              val currencyFluctuation = GainFromMoneyFunction
-                .GainsFromExchangeRate(correctGainsForInflation = true)
-                .apply(startDate, endDate, amount)
-
-              // Subtract currency fluctuation effects, which is already handled in SummaryExchangeRateGainsStoreFactory
-              (correctedValueAtEnd - correctedValueAtStart) - currencyFluctuation
-            },
+            GainFromMoneyFunction.GainsFromInflation(),
           )
           month -> GainsForMonth.forSingle(reservoir, gain)
         }.toMap,
         impactingTransactionIds = transactionsAndBalanceChecks.impactingTransactionIds,
         impactingBalanceCheckIds = transactionsAndBalanceChecks.impactingBalanceCheckIds,
       )
+    }
+
+    private def calculateInflationGainsAtAppreciationTimes(
+        reservoir: MoneyReservoir
+    ): Future[InflationGains] = async {
+      val transactionsAndBalanceChecks =
+        await(
+          accountingEntryUtils.getTransactionsAndBalanceChecks(
+            moneyReservoir = reservoir,
+            yearFilter = input.year,
+          )
+        )
+
+      val monthsInPeriod: Seq[DatedMonth] = input.year match {
+        case Some(year) => DatedMonth.allMonthsIn(year)
+        case None       => transactionsAndBalanceChecks.monthsCoveredByEntriesUpUntilToday
+      }
+
+      ???
     }
 
     private def isRelevantReservoir(reservoir: MoneyReservoir): Boolean = {
