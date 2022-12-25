@@ -215,5 +215,27 @@ object AccountingEntryUtils {
         amount: MoneyWithGeneralCurrency,
     ): ReferenceMoney
   }
-  object GainFromMoneyFunction {}
+  object GainFromMoneyFunction {
+
+    case class GainsFromExchangeRate(correctGainsForInflation: Boolean)(implicit
+        exchangeRateManager: ExchangeRateManager
+    ) extends GainFromMoneyFunction {
+      override def apply(
+          startDate: LocalDateTime,
+          endDate: LocalDateTime,
+          amount: MoneyWithGeneralCurrency,
+      ): ReferenceMoney = {
+        val valueAtStart = amount.withDate(startDate).exchangedForReferenceCurrency()
+        val valueAtEnd = amount.withDate(endDate).exchangedForReferenceCurrency()
+        val result = valueAtEnd - valueAtStart
+        if (correctGainsForInflation) {
+          result
+            .withDate(endDate)
+            .exchangedForReferenceCurrency(correctForInflation = true)
+        } else {
+          result
+        }
+      }
+    }
+  }
 }

@@ -13,6 +13,7 @@ import app.flux.stores.entries.EntriesStore
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForMonth
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.ExchangeRateGains
 import app.flux.stores.entries.AccountingEntryUtils
+import app.flux.stores.entries.AccountingEntryUtils.GainFromMoneyFunction
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppJsEntityAccess
 import app.models.access.ModelFields
@@ -100,18 +101,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
         monthToGains = monthsInPeriod.map { month =>
           val gain = transactionsAndBalanceChecks.calculateGainsInMonth(
             month,
-            (startDate, endDate, amount) => {
-              val valueAtStart = amount.withDate(startDate).exchangedForReferenceCurrency()
-              val valueAtEnd = amount.withDate(endDate).exchangedForReferenceCurrency()
-              val result = valueAtEnd - valueAtStart
-              if (input.correctForInflation) {
-                result
-                  .withDate(endDate)
-                  .exchangedForReferenceCurrency(correctForInflation = true)
-              } else {
-                result
-              }
-            },
+            GainFromMoneyFunction.GainsFromExchangeRate(correctGainsForInflation = input.correctForInflation),
           )
           month -> GainsForMonth.forSingle(reservoir, gain)
         }.toMap,

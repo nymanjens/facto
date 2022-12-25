@@ -9,6 +9,7 @@ import app.common.time.DatedMonth
 import app.flux.stores.entries.factories.SummaryInflationGainsStoreFactory.GainsForMonth
 import app.flux.stores.entries.factories.SummaryInflationGainsStoreFactory.InflationGains
 import app.flux.stores.entries.AccountingEntryUtils
+import app.flux.stores.entries.AccountingEntryUtils.GainFromMoneyFunction
 import app.flux.stores.entries.EntriesStore
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppJsEntityAccess
@@ -89,17 +90,15 @@ final class SummaryInflationGainsStoreFactory(implicit
           val gain = transactionsAndBalanceChecks.calculateGainsInMonth(
             month,
             (startDate, endDate, amount) => {
-              val valueAtStart = amount.withDate(startDate).exchangedForReferenceCurrency()
-              val valueAtEnd = amount.withDate(endDate).exchangedForReferenceCurrency()
               val correctedValueAtStart =
                 amount.withDate(startDate).exchangedForReferenceCurrency(correctForInflation = true)
               val correctedValueAtEnd = amount
                 .withDate(endDate)
                 .exchangedForReferenceCurrency(correctForInflation = true)
 
-              val currencyFluctuation = (valueAtEnd - valueAtStart)
-                .withDate(endDate)
-                .exchangedForReferenceCurrency(correctForInflation = true)
+              val currencyFluctuation = GainFromMoneyFunction
+                .GainsFromExchangeRate(correctGainsForInflation = true)
+                .apply(startDate, endDate, amount)
 
               // Subtract currency fluctuation effects, which is already handled in SummaryExchangeRateGainsStoreFactory
               (correctedValueAtEnd - correctedValueAtStart) - currencyFluctuation
