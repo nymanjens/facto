@@ -75,7 +75,7 @@ final class CashFlowEntriesStoreFactory(implicit
       val transactionsAndBalanceChecks =
         await(
           accountingEntryUtils.getTransactionsAndBalanceChecks(
-            moneyReservoir = moneyReservoir,
+            reservoir = moneyReservoir,
             oldestRelevantBalanceCheck = oldestRelevantBalanceCheck,
           )
         )

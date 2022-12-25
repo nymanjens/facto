@@ -30,6 +30,8 @@ import hydro.models.Entity
 import scala.async.Async.async
 import scala.async.Async.await
 import scala.collection.immutable.Seq
+import scala.collection.immutable.SortedMap
+import scala.collection.immutable.SortedSet
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
@@ -71,11 +73,19 @@ final class SummaryInflationGainsStoreFactory(implicit
     }
 
     // **************** Private helper methods ****************//
-    private def calculateInflationGains(reservoir: MoneyReservoir): Future[InflationGains] = async {
+    private def calculateInflationGains(reservoir: MoneyReservoir): Future[InflationGains] = {
+      if (reservoir.assumeThisFollowsInflationUntilNextMarketValueAppreciation) {
+        calculateInflationGainsAtAppreciationTimes(reservoir)
+      } else {
+        calculateRegularInflationGains(reservoir)
+      }
+    }
+
+    private def calculateRegularInflationGains(reservoir: MoneyReservoir): Future[InflationGains] = async {
       val transactionsAndBalanceChecks =
         await(
           accountingEntryUtils.getTransactionsAndBalanceChecks(
-            moneyReservoir = reservoir,
+            reservoir = reservoir,
             yearFilter = input.year,
           )
         )
@@ -104,8 +114,10 @@ final class SummaryInflationGainsStoreFactory(implicit
       val transactionsAndBalanceChecks =
         await(
           accountingEntryUtils.getTransactionsAndBalanceChecks(
-            moneyReservoir = reservoir,
-            yearFilter = input.year,
+            reservoir = reservoir,
+            // Always load all entries before the current year. This is not optimal, but simplifies the code.
+            oldestRelevantBalanceCheck = None,
+            upperBoundDateTime = input.year.map(y => DatedMonth.allMonthsIn(y).last.startTimeOfNextMonth),
           )
         )
 
@@ -114,7 +126,59 @@ final class SummaryInflationGainsStoreFactory(implicit
         case None       => transactionsAndBalanceChecks.monthsCoveredByEntriesUpUntilToday
       }
 
-      ???
+      val marketValueAppreciationDates: SortedSet[LocalDateTime] = SortedSet(
+        transactionsAndBalanceChecks.transactions
+          .filter(t => t.tags.contains("#market-value-appreciation"))
+          .map(_.transactionDate) : _*
+      )
+
+      val dateToBalanceFunction = transactionsAndBalanceChecks.getCachedDateToBalanceFunction()
+
+      InflationGains(
+        monthToGains = monthsInPeriod.map { month =>
+          val gain = {
+            val result =
+              for {
+                endDate <- marketValueAppreciationDates
+                  .from(month.startTime)
+                  .to(month.startTimeOfNextMonth)
+                  .lastOption
+              } yield {
+                val startDate =
+                  marketValueAppreciationDates.to(month.startTime).lastOption getOrElse LocalDateTime.MIN
+
+                val gainFromInitialMoney = GainFromMoneyFunction
+                  .GainsFromInflation()
+                  .apply(
+                    startDate = startDate,
+                    endDate = endDate,
+                    amount = dateToBalanceFunction(startDate),
+                  )
+
+                val gainFromUpdates =
+                  dateToBalanceFunction
+                    .updatesInRange(startDate, endDate)
+                    .map { case (date, DateToBalanceFunction.Update(balance, changeComparedToLast)) =>
+                      GainFromMoneyFunction
+                        .GainsFromInflation()
+                        .apply(
+                          startDate = date,
+                          endDate = endDate,
+                          amount = changeComparedToLast,
+                        )
+                    }
+                    .sum
+                gainFromInitialMoney + gainFromUpdates
+              }
+
+            result getOrElse ReferenceMoney(0)
+          }
+
+          month -> GainsForMonth.forSingle(reservoir, gain)
+        }.toMap,
+        impactingTransactionIds = transactionsAndBalanceChecks.impactingTransactionIds,
+        impactingBalanceCheckIds = transactionsAndBalanceChecks.impactingBalanceCheckIds,
+      )
     }
 
     private def isRelevantReservoir(reservoir: MoneyReservoir): Boolean = {

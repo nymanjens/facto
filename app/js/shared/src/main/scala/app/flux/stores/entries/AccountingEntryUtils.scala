@@ -36,7 +36,7 @@ final class AccountingEntryUtils(implicit
 ) {
 
   def getTransactionsAndBalanceChecks(
-      moneyReservoir: MoneyReservoir,
+      reservoir: MoneyReservoir,
       yearFilter: Option[Int],
   ): Future[TransactionsAndBalanceChecks] = async {
     val oldestRelevantBalanceCheck: Option[BalanceCheck] = yearFilter match {
@@ -45,7 +45,7 @@ final class AccountingEntryUtils(implicit
         await(
           entityAccess
             .newQuery[BalanceCheck]()
-            .filter(ModelFields.BalanceCheck.moneyReservoirCode === moneyReservoir.code)
+            .filter(ModelFields.BalanceCheck.moneyReservoirCode === reservoir.code)
             .filter(ModelFields.BalanceCheck.checkDate < DatedMonth.allMonthsIn(year).head.startTime)
             .sort(AppDbQuerySorting.BalanceCheck.deterministicallyByCheckDate.reversed)
             .limit(1)
@@ -55,7 +55,7 @@ final class AccountingEntryUtils(implicit
 
     await(
       getTransactionsAndBalanceChecks(
-        moneyReservoir = moneyReservoir,
+        reservoir = reservoir,
         oldestRelevantBalanceCheck = oldestRelevantBalanceCheck,
         upperBoundDateTime = yearFilter.map(y => DatedMonth.allMonthsIn(y).last.startTimeOfNextMonth),
       )
@@ -63,14 +63,14 @@ final class AccountingEntryUtils(implicit
   }
 
   def getTransactionsAndBalanceChecks(
-      moneyReservoir: MoneyReservoir,
+      reservoir: MoneyReservoir,
       oldestRelevantBalanceCheck: Option[BalanceCheck],
       upperBoundDateTime: Option[LocalDateTime] = None,
   ): Future[TransactionsAndBalanceChecks] = async {
     val transactionsFuture: Future[Seq[Transaction]] =
       entityAccess
         .newQuery[Transaction]()
-        .filter(ModelFields.Transaction.moneyReservoirCode === moneyReservoir.code)
+        .filter(ModelFields.Transaction.moneyReservoirCode === reservoir.code)
         .filter(
           filterBetween(
             ModelFields.Transaction.transactionDate,
@@ -83,7 +83,7 @@ final class AccountingEntryUtils(implicit
     val balanceChecksFuture: Future[Seq[BalanceCheck]] =
       entityAccess
         .newQuery[BalanceCheck]()
-        .filter(ModelFields.BalanceCheck.moneyReservoirCode === moneyReservoir.code)
+        .filter(ModelFields.BalanceCheck.moneyReservoirCode === reservoir.code)
         .filter(
           filterBetween(
             ModelFields.BalanceCheck.checkDate,
@@ -98,7 +98,7 @@ final class AccountingEntryUtils(implicit
       balanceChecks = await(balanceChecksFuture),
       initialBalance = oldestRelevantBalanceCheck
         .map(_.balance)
-        .getOrElse(MoneyWithGeneralCurrency(0, moneyReservoir.currency)),
+        .getOrElse(MoneyWithGeneralCurrency(0, reservoir.currency)),
       oldestRelevantBalanceCheck = oldestRelevantBalanceCheck,
     )
   }
@@ -188,7 +188,7 @@ object AccountingEntryUtils {
     }
 
     private var dateToBalanceFunctionCache: DateToBalanceFunction = null
-    private def getCachedDateToBalanceFunction()(implicit accountingConfig: Config): DateToBalanceFunction = {
+    def getCachedDateToBalanceFunction()(implicit accountingConfig: Config): DateToBalanceFunction = {
       if (dateToBalanceFunctionCache == null) {
         dateToBalanceFunctionCache = calculateDateToBalanceFunction()
       }

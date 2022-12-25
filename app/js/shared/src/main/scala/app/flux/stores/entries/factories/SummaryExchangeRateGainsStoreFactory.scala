@@ -87,7 +87,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
       val transactionsAndBalanceChecks =
         await(
           accountingEntryUtils.getTransactionsAndBalanceChecks(
-            moneyReservoir = reservoir,
+            reservoir = reservoir,
             yearFilter = input.year,
           )
         )

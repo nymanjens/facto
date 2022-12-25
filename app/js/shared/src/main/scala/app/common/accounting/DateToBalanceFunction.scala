@@ -17,8 +17,16 @@ final class DateToBalanceFunction(
     dateToBalanceUpdates.to(date).values.last.balance
   }
 
-  def updatesInRange(month: DatedMonth): SortedMap[LocalDateTime, DateToBalanceFunction.Update] =
+  def updatesInRange(month: DatedMonth): SortedMap[LocalDateTime, DateToBalanceFunction.Update] = {
     dateToBalanceUpdates.range(month.startTime, month.startTimeOfNextMonth)
+  }
+
+  def updatesInRange(
+      start: LocalDateTime,
+      end: LocalDateTime,
+  ): SortedMap[LocalDateTime, DateToBalanceFunction.Update] = {
+    dateToBalanceUpdates.range(start, end)
+  }
 }
 
 object DateToBalanceFunction {
