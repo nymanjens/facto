@@ -79,8 +79,6 @@ final class SummaryInflationGainsStoreFactory(implicit
           )
         )
 
-      val dateToBalanceFunction = transactionsAndBalanceChecks.calculateDateToBalanceFunction()
-
       val monthsInPeriod: Seq[DatedMonth] = input.year match {
         case Some(year) => DatedMonth.allMonthsIn(year)
         case None       => transactionsAndBalanceChecks.monthsCoveredByEntriesUpUntilToday
@@ -88,34 +86,25 @@ final class SummaryInflationGainsStoreFactory(implicit
 
       InflationGains(
         monthToGains = monthsInPeriod.map { month =>
-          val gain: ReferenceMoney = {
-            def gainFromMoney(date: LocalDateTime, amount: MoneyWithGeneralCurrency): ReferenceMoney = {
-              val valueAtDate = amount.withDate(date).exchangedForReferenceCurrency()
-              val valueAtEnd = amount.withDate(month.startTimeOfNextMonth).exchangedForReferenceCurrency()
-              val correctedValueAtDate =
-                amount.withDate(date).exchangedForReferenceCurrency(correctForInflation = true)
+          val gain = transactionsAndBalanceChecks.calculateGainsInMonth(
+            month,
+            (startDate, endDate, amount) => {
+              val valueAtStart = amount.withDate(startDate).exchangedForReferenceCurrency()
+              val valueAtEnd = amount.withDate(endDate).exchangedForReferenceCurrency()
+              val correctedValueAtStart =
+                amount.withDate(startDate).exchangedForReferenceCurrency(correctForInflation = true)
               val correctedValueAtEnd = amount
-                .withDate(month.startTimeOfNextMonth)
+                .withDate(endDate)
                 .exchangedForReferenceCurrency(correctForInflation = true)
 
-              val currencyFluctuation = (valueAtEnd - valueAtDate)
-                .withDate(month.startTimeOfNextMonth)
+              val currencyFluctuation = (valueAtEnd - valueAtStart)
+                .withDate(endDate)
                 .exchangedForReferenceCurrency(correctForInflation = true)
 
               // Subtract currency fluctuation effects, which is already handled in SummaryExchangeRateGainsStoreFactory
-              (correctedValueAtEnd - correctedValueAtDate) - currencyFluctuation
-            }
-
-            val gainFromIntialMoney = gainFromMoney(month.startTime, dateToBalanceFunction(month.startTime))
-            val gainFromUpdates =
-              dateToBalanceFunction
-                .updatesInRange(month)
-                .map { case (date, DateToBalanceFunction.Update(balance, changeComparedToLast)) =>
-                  gainFromMoney(date, changeComparedToLast)
-                }
-                .sum
-            gainFromIntialMoney + gainFromUpdates
-          }
+              (correctedValueAtEnd - correctedValueAtStart) - currencyFluctuation
+            },
+          )
           month -> GainsForMonth.forSingle(reservoir, gain)
         }.toMap,
         impactingTransactionIds = transactionsAndBalanceChecks.impactingTransactionIds,

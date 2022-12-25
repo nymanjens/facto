@@ -91,8 +91,6 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
           )
         )
 
-      val dateToBalanceFunction = transactionsAndBalanceChecks.calculateDateToBalanceFunction()
-
       val monthsInPeriod: Seq[DatedMonth] = input.year match {
         case Some(year) => DatedMonth.allMonthsIn(year)
         case None       => transactionsAndBalanceChecks.monthsCoveredByEntriesUpUntilToday
@@ -100,30 +98,21 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
 
       ExchangeRateGains(
         monthToGains = monthsInPeriod.map { month =>
-          val gain: ReferenceMoney = {
-            def gainFromMoney(date: LocalDateTime, amount: MoneyWithGeneralCurrency): ReferenceMoney = {
-              val valueAtDate = amount.withDate(date).exchangedForReferenceCurrency()
-              val valueAtEnd = amount.withDate(month.startTimeOfNextMonth).exchangedForReferenceCurrency()
-              val result = valueAtEnd - valueAtDate
+          val gain = transactionsAndBalanceChecks.calculateGainsInMonth(
+            month,
+            (startDate, endDate, amount) => {
+              val valueAtStart = amount.withDate(startDate).exchangedForReferenceCurrency()
+              val valueAtEnd = amount.withDate(endDate).exchangedForReferenceCurrency()
+              val result = valueAtEnd - valueAtStart
               if (input.correctForInflation) {
                 result
-                  .withDate(month.startTimeOfNextMonth)
+                  .withDate(endDate)
                   .exchangedForReferenceCurrency(correctForInflation = true)
               } else {
                 result
               }
-            }
-
-            val gainFromInitialMoney = gainFromMoney(month.startTime, dateToBalanceFunction(month.startTime))
-            val gainFromUpdates =
-              dateToBalanceFunction
-                .updatesInRange(month)
-                .map { case (date, DateToBalanceFunction.Update(balance, changeComparedToLast)) =>
-                  gainFromMoney(date, changeComparedToLast)
-                }
-                .sum
-            gainFromInitialMoney + gainFromUpdates
-          }
+            },
+          )
           month -> GainsForMonth.forSingle(reservoir, gain)
         }.toMap,
         impactingTransactionIds = transactionsAndBalanceChecks.impactingTransactionIds,

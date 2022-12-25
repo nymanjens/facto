@@ -3,6 +3,7 @@ package app.flux.stores.entries
 import app.common.accounting.DateToBalanceFunction
 import app.common.money.ExchangeRateManager
 import app.common.money.MoneyWithGeneralCurrency
+import app.common.money.ReferenceMoney
 import app.common.time.DatedMonth
 import app.flux.stores.entries.AccountingEntryUtils.TransactionsAndBalanceChecks
 import app.models.access.AppDbQuerySorting
@@ -161,7 +162,40 @@ object AccountingEntryUtils {
       }
     }
 
-    def calculateDateToBalanceFunction()(implicit accountingConfig: Config): DateToBalanceFunction = {
+    def calculateGainsInMonth(
+        month: DatedMonth,
+        linearGainFromMoneyFunc: GainFromMoneyFunction,
+    )(implicit accountingConfig: Config): ReferenceMoney = {
+      val dateToBalanceFunction = getCachedDateToBalanceFunction()
+
+      val gainFromInitialMoney = linearGainFromMoneyFunc(
+        startDate = month.startTime,
+        endDate = month.startTimeOfNextMonth,
+        amount = dateToBalanceFunction(month.startTime),
+      )
+      val gainFromUpdates =
+        dateToBalanceFunction
+          .updatesInRange(month)
+          .map { case (date, DateToBalanceFunction.Update(balance, changeComparedToLast)) =>
+            linearGainFromMoneyFunc(
+              startDate = date,
+              endDate = month.startTimeOfNextMonth,
+              amount = changeComparedToLast,
+            )
+          }
+          .sum
+      gainFromInitialMoney + gainFromUpdates
+    }
+
+    private var dateToBalanceFunctionCache: DateToBalanceFunction = null
+    private def getCachedDateToBalanceFunction()(implicit accountingConfig: Config): DateToBalanceFunction = {
+      if (dateToBalanceFunctionCache == null) {
+        dateToBalanceFunctionCache = calculateDateToBalanceFunction()
+      }
+      dateToBalanceFunctionCache
+    }
+
+    private def calculateDateToBalanceFunction()(implicit accountingConfig: Config): DateToBalanceFunction = {
       val builder =
         new DateToBalanceFunction.Builder(initialDate = oldestBalanceDate, initialBalance = initialBalance)
       mergedRows.foreach {
@@ -173,4 +207,13 @@ object AccountingEntryUtils {
       builder.result
     }
   }
+
+  trait GainFromMoneyFunction {
+    def apply(
+        startDate: LocalDateTime,
+        endDate: LocalDateTime,
+        amount: MoneyWithGeneralCurrency,
+    ): ReferenceMoney
+  }
+  object GainFromMoneyFunction {}
 }
