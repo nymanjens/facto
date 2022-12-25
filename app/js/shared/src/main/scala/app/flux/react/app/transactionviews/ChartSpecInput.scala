@@ -142,7 +142,9 @@ final class ChartSpecInput(implicit
         Bootstrap.FontAwesomeIcon("times"),
         " ",
         i18n("app.clear"),
-        ^.onClick --> props.notifyUpdatedChartSpec(_ => ChartSpec.singleEmptyLine(correctForInflation = props.chartSpec.correctForInflation)),
+        ^.onClick --> props.notifyUpdatedChartSpec(_ =>
+          ChartSpec.singleEmptyLine(correctForInflation = props.chartSpec.correctForInflation)
+        ),
       )
     }
 

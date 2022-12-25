@@ -92,7 +92,10 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
         )
 
       val dateToBalanceFunction: DateToBalanceFunction = {
-        val builder = new DateToBalanceFunction.Builder(initialDate=transactionsAndBalanceChecks.oldestBalanceDate, initialBalance=transactionsAndBalanceChecks.initialBalance)
+        val builder = new DateToBalanceFunction.Builder(
+          initialDate = transactionsAndBalanceChecks.oldestBalanceDate,
+          initialBalance = transactionsAndBalanceChecks.initialBalance,
+        )
         transactionsAndBalanceChecks.mergedRows.foreach {
           case transaction: Transaction =>
             builder.incrementLatestBalance(transaction.transactionDate, transaction.flow)
@@ -116,7 +119,10 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
               }
               DatedMonth.monthsInClosedRange(
                 DatedMonth.containing(entityToDate(transactionsAndBalanceChecks.mergedRows.head)),
-                Seq(DatedMonth.current, DatedMonth.containing(entityToDate(transactionsAndBalanceChecks.mergedRows.last))).max,
+                Seq(
+                  DatedMonth.current,
+                  DatedMonth.containing(entityToDate(transactionsAndBalanceChecks.mergedRows.last)),
+                ).max,
               )
           }
       }
