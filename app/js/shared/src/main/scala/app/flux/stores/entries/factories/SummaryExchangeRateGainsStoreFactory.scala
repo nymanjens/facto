@@ -12,6 +12,7 @@ import app.common.time.DatedMonth
 import app.flux.stores.entries.EntriesStore
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForMonth
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.ExchangeRateGains
+import app.flux.stores.entries.AccountingEntryUtils
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppJsEntityAccess
 import app.models.access.ModelFields
@@ -44,6 +45,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
     exchangeRateManager: ExchangeRateManager,
     accountingConfig: Config,
     clock: Clock,
+    accountingEntryUtils: AccountingEntryUtils,
 ) extends EntriesStoreFactory[ExchangeRateGains] {
 
   // **************** Public API ****************//
@@ -81,66 +83,17 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
 
     // **************** Private helper methods ****************//
     private def calculateExchangeRateGains(reservoir: MoneyReservoir): Future[ExchangeRateGains] = async {
-      val oldestRelevantBalanceCheck: Option[BalanceCheck] = input.year match {
-        case None => None
-        case Some(year) =>
-          await(
-            entityAccess
-              .newQuery[BalanceCheck]()
-              .filter(ModelFields.BalanceCheck.moneyReservoirCode === reservoir.code)
-              .filter(ModelFields.BalanceCheck.checkDate < DatedMonth.allMonthsIn(year).head.startTime)
-              .sort(AppDbQuerySorting.BalanceCheck.deterministicallyByCheckDate.reversed)
-              .limit(1)
-              .data()
-          ).headOption
-      }
-      val oldestBalanceDate = oldestRelevantBalanceCheck.map(_.checkDate).getOrElse(LocalDateTime.MIN)
-      val initialBalance =
-        oldestRelevantBalanceCheck.map(_.balance).getOrElse(MoneyWithGeneralCurrency(0, reservoir.currency))
-
-      val balanceChecksFuture: Future[Seq[BalanceCheck]] =
-        entityAccess
-          .newQuery[BalanceCheck]()
-          .filter(ModelFields.BalanceCheck.moneyReservoirCode === reservoir.code)
-          .filter(
-            input.year match {
-              case None => DbQuery.Filter.NullFilter()
-              case Some(year) =>
-                filterInRange(
-                  ModelFields.BalanceCheck.checkDate,
-                  oldestBalanceDate,
-                  DatedMonth.allMonthsIn(year).last.startTimeOfNextMonth,
-                )
-            }
+      val transactionsAndBalanceChecks =
+        await(
+          accountingEntryUtils.getTransactionsAndBalanceChecks(
+            moneyReservoir = reservoir,
+            yearFilter = input.year,
           )
-          .data()
+        )
 
-      val transactionsFuture: Future[Seq[Transaction]] =
-        entityAccess
-          .newQuery[Transaction]()
-          .filter(ModelFields.Transaction.moneyReservoirCode === reservoir.code)
-          .filter(
-            input.year match {
-              case None => DbQuery.Filter.NullFilter()
-              case Some(year) =>
-                filterInRange(
-                  ModelFields.Transaction.transactionDate,
-                  oldestBalanceDate,
-                  DatedMonth.allMonthsIn(year).last.startTimeOfNextMonth,
-                )
-            }
-          )
-          .data()
-      val balanceChecks: Seq[BalanceCheck] = await(balanceChecksFuture)
-      val transactions: Seq[Transaction] = await(transactionsFuture)
-
-      val mergedRows: Seq[Entity] = (transactions ++ balanceChecks).sortBy {
-        case trans: Transaction => (trans.transactionDate, trans.createdDate)
-        case bc: BalanceCheck   => (bc.checkDate, bc.createdDate)
-      }
       val dateToBalanceFunction: DateToBalanceFunction = {
-        val builder = new DateToBalanceFunction.Builder(oldestBalanceDate, initialBalance)
-        mergedRows.foreach {
+        val builder = new DateToBalanceFunction.Builder(initialDate=transactionsAndBalanceChecks.oldestBalanceDate, initialBalance=transactionsAndBalanceChecks.initialBalance)
+        transactionsAndBalanceChecks.mergedRows.foreach {
           case transaction: Transaction =>
             builder.incrementLatestBalance(transaction.transactionDate, transaction.flow)
           case balanceCheck: BalanceCheck =>
@@ -152,7 +105,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
       val monthsInPeriod: Seq[DatedMonth] = input.year match {
         case Some(year) => DatedMonth.allMonthsIn(year)
         case None =>
-          mergedRows match {
+          transactionsAndBalanceChecks.mergedRows match {
             case Seq() => Seq()
             case _ =>
               def entityToDate(entity: Entity): LocalDateTime = {
@@ -162,8 +115,8 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
                 }
               }
               DatedMonth.monthsInClosedRange(
-                DatedMonth.containing(entityToDate(mergedRows.head)),
-                Seq(DatedMonth.current, DatedMonth.containing(entityToDate(mergedRows.last))).max,
+                DatedMonth.containing(entityToDate(transactionsAndBalanceChecks.mergedRows.head)),
+                Seq(DatedMonth.current, DatedMonth.containing(entityToDate(transactionsAndBalanceChecks.mergedRows.last))).max,
               )
           }
       }
@@ -196,8 +149,8 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
           }
           month -> GainsForMonth.forSingle(reservoir, gain)
         }.toMap,
-        impactingTransactionIds = transactions.toStream.map(_.id).toSet,
-        impactingBalanceCheckIds = (balanceChecks.toStream ++ oldestRelevantBalanceCheck).map(_.id).toSet,
+        impactingTransactionIds = transactionsAndBalanceChecks.impactingTransactionIds,
+        impactingBalanceCheckIds = transactionsAndBalanceChecks.impactingBalanceCheckIds,
       )
     }
 
@@ -210,13 +163,6 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
         case None    => true
         case Some(a) => account == a
       }
-    }
-    private def filterInRange[E](
-        field: ModelField[LocalDateTime, E],
-        start: LocalDateTime,
-        end: LocalDateTime,
-    ): DbQuery.Filter[E] = {
-      (field >= start) && (field < end)
     }
   }
 

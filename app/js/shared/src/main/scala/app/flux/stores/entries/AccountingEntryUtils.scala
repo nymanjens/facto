@@ -4,6 +4,7 @@ import app.common.money.ExchangeRateManager
 import app.common.money.MoneyWithGeneralCurrency
 import app.common.time.DatedMonth
 import app.flux.stores.entries.AccountingEntryUtils.TransactionsAndBalanceChecks
+import app.models.access.AppDbQuerySorting
 import app.models.access.AppJsEntityAccess
 import app.models.access.ModelFields
 import app.models.access.ModelFields.BalanceCheck.E
@@ -32,10 +33,29 @@ final class AccountingEntryUtils(implicit
 
   def getTransactionsAndBalanceChecks(
       moneyReservoir: MoneyReservoir,
-      yearFilter: Option[Int] ,
+      yearFilter: Option[Int],
   ): Future[TransactionsAndBalanceChecks] = async {
-    val upperBoundDateTime = yearFilter.map(y => DatedMonth.allMonthsIn(y).last.startTimeOfNextMonth)
-    ???
+    val oldestRelevantBalanceCheck: Option[BalanceCheck] = yearFilter match {
+      case None => None
+      case Some(year) =>
+        await(
+          entityAccess
+            .newQuery[BalanceCheck]()
+            .filter(ModelFields.BalanceCheck.moneyReservoirCode === moneyReservoir.code)
+            .filter(ModelFields.BalanceCheck.checkDate < DatedMonth.allMonthsIn(year).head.startTime)
+            .sort(AppDbQuerySorting.BalanceCheck.deterministicallyByCheckDate.reversed)
+            .limit(1)
+            .data()
+        ).headOption
+    }
+
+    await(
+      getTransactionsAndBalanceChecks(
+        moneyReservoir = moneyReservoir,
+        oldestRelevantBalanceCheck = oldestRelevantBalanceCheck,
+        upperBoundDateTime = yearFilter.map(y => DatedMonth.allMonthsIn(y).last.startTimeOfNextMonth),
+      )
+    )
   }
 
   def getTransactionsAndBalanceChecks(
@@ -112,6 +132,10 @@ object AccountingEntryUtils {
 
     def impactingBalanceCheckIds: Set[Long] = {
       (balanceChecks.toStream ++ oldestRelevantBalanceCheck).map(_.id).toSet
+    }
+
+    def oldestBalanceDate: LocalDateTime = {
+      oldestRelevantBalanceCheck.map(_.checkDate).getOrElse(LocalDateTime.MIN)
     }
   }
 }

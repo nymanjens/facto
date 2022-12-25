@@ -82,7 +82,7 @@ final class SummaryInflationGainsStoreFactory(implicit
               .data()
           ).headOption
       }
-      val oldestBalanceDate = oldestRelevantBalanceCheck.map(_.checkDate).getOrElse(LocalDateTime.MIN)
+      val oldestBalanceDate: LocalDateTime = oldestRelevantBalanceCheck.map(_.checkDate).getOrElse(LocalDateTime.MIN)
       val initialBalance =
         oldestRelevantBalanceCheck.map(_.balance).getOrElse(MoneyWithGeneralCurrency(0, reservoir.currency))
 
