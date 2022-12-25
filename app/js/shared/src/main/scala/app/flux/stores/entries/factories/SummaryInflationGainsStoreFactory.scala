@@ -74,8 +74,8 @@ final class SummaryInflationGainsStoreFactory(implicit
 
     // **************** Private helper methods ****************//
     private def calculateInflationGains(reservoir: MoneyReservoir): Future[InflationGains] = {
-      if (reservoir.assumeThisFollowsInflationUntilNextMarketValueAppreciation) {
-        calculateInflationGainsAtAppreciationTimes(reservoir)
+      if (reservoir.assumeThisFollowsInflationUntilNextBalanceCheck) {
+        calculateInflationGainsAtCheckTimes(reservoir)
       } else {
         calculateRegularInflationGains(reservoir)
       }
@@ -108,7 +108,7 @@ final class SummaryInflationGainsStoreFactory(implicit
       )
     }
 
-    private def calculateInflationGainsAtAppreciationTimes(
+    private def calculateInflationGainsAtCheckTimes(
         reservoir: MoneyReservoir
     ): Future[InflationGains] = async {
       val transactionsAndBalanceChecks =
@@ -126,10 +126,8 @@ final class SummaryInflationGainsStoreFactory(implicit
         case None       => transactionsAndBalanceChecks.monthsCoveredByEntriesUpUntilToday
       }
 
-      val marketValueAppreciationDates: SortedSet[LocalDateTime] = SortedSet(
-        transactionsAndBalanceChecks.transactions
-          .filter(t => t.tags.contains("#market-value-appreciation"))
-          .map(_.transactionDate) : _*
+      val balanceCheckDates: SortedSet[LocalDateTime] = SortedSet(
+        transactionsAndBalanceChecks.balanceChecks.map(_.checkDate): _*
       )
 
       val dateToBalanceFunction = transactionsAndBalanceChecks.getCachedDateToBalanceFunction()
@@ -139,13 +137,9 @@ final class SummaryInflationGainsStoreFactory(implicit
           val gain = {
             val result =
               for {
-                endDate <- marketValueAppreciationDates
-                  .from(month.startTime)
-                  .to(month.startTimeOfNextMonth)
-                  .lastOption
+                endDate <- balanceCheckDates.from(month.startTime).to(month.startTimeOfNextMonth).lastOption
               } yield {
-                val startDate =
-                  marketValueAppreciationDates.to(month.startTime).lastOption getOrElse LocalDateTime.MIN
+                val startDate = balanceCheckDates.to(month.startTime).lastOption getOrElse LocalDateTime.MIN
 
                 val gainFromInitialMoney = GainFromMoneyFunction
                   .GainsFromInflation()

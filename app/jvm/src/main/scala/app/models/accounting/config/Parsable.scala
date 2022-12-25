@@ -117,7 +117,7 @@ object Parsable {
       owner: Account,
       hidden: Boolean,
       currency: String @nullable,
-      assumeThisFollowsInflationUntilNextMarketValueAppreciation: Boolean,
+      assumeThisFollowsInflationUntilNextBalanceCheck: Boolean,
   ) {
     def this() = this(
       null,
@@ -126,7 +126,7 @@ object Parsable {
       null,
       hidden = false,
       null,
-      assumeThisFollowsInflationUntilNextMarketValueAppreciation = false,
+      assumeThisFollowsInflationUntilNextBalanceCheck = false,
     )
 
     def parse: ParsedMoneyReservoir = {
@@ -138,8 +138,7 @@ object Parsable {
         owner.parse,
         hidden,
         currencyCode = Option(currency),
-        assumeThisFollowsInflationUntilNextMarketValueAppreciation =
-          assumeThisFollowsInflationUntilNextMarketValueAppreciation,
+        assumeThisFollowsInflationUntilNextBalanceCheck = assumeThisFollowsInflationUntilNextBalanceCheck,
       )
     }
   }
