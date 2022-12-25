@@ -1,5 +1,6 @@
 package app.flux.stores.entries
 
+import app.common.accounting.DateToBalanceFunction
 import app.common.money.ExchangeRateManager
 import app.common.money.MoneyWithGeneralCurrency
 import app.common.time.DatedMonth
@@ -12,6 +13,7 @@ import app.models.accounting.Transaction
 import app.models.accounting.config.Config
 import app.models.accounting.config.MoneyReservoir
 import app.models.accounting.BalanceCheck
+import hydro.common.time.Clock
 import hydro.common.time.JavaTimeImplicits._
 import hydro.common.time.LocalDateTime
 import hydro.models.access.DbQueryImplicits._
@@ -22,6 +24,7 @@ import hydro.models.access.ModelField
 
 import scala.async.Async.async
 import scala.async.Async.await
+import scala.collection.immutable.Seq
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
@@ -136,6 +139,38 @@ object AccountingEntryUtils {
 
     def oldestBalanceDate: LocalDateTime = {
       oldestRelevantBalanceCheck.map(_.checkDate).getOrElse(LocalDateTime.MIN)
+    }
+
+    def monthsCoveredByEntriesUpUntilToday(implicit clock: Clock): Seq[DatedMonth] = {
+      mergedRows match {
+        case Seq() => Seq()
+        case _ =>
+          def entityToDate(entity: Entity): LocalDateTime = {
+            entity match {
+              case trans: Transaction => trans.transactionDate
+              case bc: BalanceCheck   => bc.checkDate
+            }
+          }
+          DatedMonth.monthsInClosedRange(
+            DatedMonth.containing(entityToDate(mergedRows.head)),
+            Seq(
+              DatedMonth.current,
+              DatedMonth.containing(entityToDate(mergedRows.last)),
+            ).max,
+          )
+      }
+    }
+
+    def calculateDateToBalanceFunction()(implicit accountingConfig: Config): DateToBalanceFunction = {
+      val builder =
+        new DateToBalanceFunction.Builder(initialDate = oldestBalanceDate, initialBalance = initialBalance)
+      mergedRows.foreach {
+        case transaction: Transaction =>
+          builder.incrementLatestBalance(transaction.transactionDate, transaction.flow)
+        case balanceCheck: BalanceCheck =>
+          builder.addBalanceUpdate(balanceCheck.checkDate, balanceCheck.balance)
+      }
+      builder.result
     }
   }
 }

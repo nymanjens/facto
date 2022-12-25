@@ -91,40 +91,11 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
           )
         )
 
-      val dateToBalanceFunction: DateToBalanceFunction = {
-        val builder = new DateToBalanceFunction.Builder(
-          initialDate = transactionsAndBalanceChecks.oldestBalanceDate,
-          initialBalance = transactionsAndBalanceChecks.initialBalance,
-        )
-        transactionsAndBalanceChecks.mergedRows.foreach {
-          case transaction: Transaction =>
-            builder.incrementLatestBalance(transaction.transactionDate, transaction.flow)
-          case balanceCheck: BalanceCheck =>
-            builder.addBalanceUpdate(balanceCheck.checkDate, balanceCheck.balance)
-        }
-        builder.result
-      }
+      val dateToBalanceFunction = transactionsAndBalanceChecks.calculateDateToBalanceFunction()
 
       val monthsInPeriod: Seq[DatedMonth] = input.year match {
         case Some(year) => DatedMonth.allMonthsIn(year)
-        case None =>
-          transactionsAndBalanceChecks.mergedRows match {
-            case Seq() => Seq()
-            case _ =>
-              def entityToDate(entity: Entity): LocalDateTime = {
-                entity match {
-                  case trans: Transaction => trans.transactionDate
-                  case bc: BalanceCheck   => bc.checkDate
-                }
-              }
-              DatedMonth.monthsInClosedRange(
-                DatedMonth.containing(entityToDate(transactionsAndBalanceChecks.mergedRows.head)),
-                Seq(
-                  DatedMonth.current,
-                  DatedMonth.containing(entityToDate(transactionsAndBalanceChecks.mergedRows.last)),
-                ).max,
-              )
-          }
+        case None       => transactionsAndBalanceChecks.monthsCoveredByEntriesUpUntilToday
       }
 
       ExchangeRateGains(
@@ -143,7 +114,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
               }
             }
 
-            val gainFromIntialMoney = gainFromMoney(month.startTime, dateToBalanceFunction(month.startTime))
+            val gainFromInitialMoney = gainFromMoney(month.startTime, dateToBalanceFunction(month.startTime))
             val gainFromUpdates =
               dateToBalanceFunction
                 .updatesInRange(month)
@@ -151,7 +122,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
                   gainFromMoney(date, changeComparedToLast)
                 }
                 .sum
-            gainFromIntialMoney + gainFromUpdates
+            gainFromInitialMoney + gainFromUpdates
           }
           month -> GainsForMonth.forSingle(reservoir, gain)
         }.toMap,
