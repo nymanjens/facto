@@ -2,7 +2,6 @@ package app.flux.stores.entries.factories
 
 import java.time.LocalDate
 import java.time.Month._
-
 import app.common.accounting.ComplexQueryFilter
 import app.common.money.ReferenceMoney
 import hydro.common.testing.FakeJsEntityAccess
@@ -10,6 +9,7 @@ import app.common.testing.TestModule
 import app.common.testing.TestObjects._
 import app.common.time.DatedMonth
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForMonth
+import app.flux.stores.entries.AccountingEntryUtils
 import app.models.accounting.config.MoneyReservoir
 import hydro.models.modification.EntityModification
 import hydro.common.time.LocalDateTime
@@ -29,6 +29,7 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
     implicit val exchangeRateManager = testModule.exchangeRateManager
     implicit val testAccountingConfig = testModule.testAccountingConfig
     implicit val complexQueryFilter = new ComplexQueryFilter()
+    implicit val accountingEntryUtils = new AccountingEntryUtils()
     val factory: SummaryExchangeRateGainsStoreFactory = new SummaryExchangeRateGainsStoreFactory()
 
     "no transactions" - async {

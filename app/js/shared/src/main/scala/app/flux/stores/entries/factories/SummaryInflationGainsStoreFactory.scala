@@ -8,6 +8,7 @@ import app.common.money.ReferenceMoney
 import app.common.time.DatedMonth
 import app.flux.stores.entries.factories.SummaryInflationGainsStoreFactory.GainsForMonth
 import app.flux.stores.entries.factories.SummaryInflationGainsStoreFactory.InflationGains
+import app.flux.stores.entries.AccountingEntryUtils
 import app.flux.stores.entries.EntriesStore
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppJsEntityAccess
@@ -38,6 +39,7 @@ final class SummaryInflationGainsStoreFactory(implicit
     accountingConfig: Config,
     complexQueryFilter: ComplexQueryFilter,
     clock: Clock,
+    accountingEntryUtils: AccountingEntryUtils,
 ) extends EntriesStoreFactory[InflationGains] {
 
   // **************** Public API ****************//
@@ -82,7 +84,8 @@ final class SummaryInflationGainsStoreFactory(implicit
               .data()
           ).headOption
       }
-      val oldestBalanceDate: LocalDateTime = oldestRelevantBalanceCheck.map(_.checkDate).getOrElse(LocalDateTime.MIN)
+      val oldestBalanceDate: LocalDateTime =
+        oldestRelevantBalanceCheck.map(_.checkDate).getOrElse(LocalDateTime.MIN)
       val initialBalance =
         oldestRelevantBalanceCheck.map(_.balance).getOrElse(MoneyWithGeneralCurrency(0, reservoir.currency))
 
