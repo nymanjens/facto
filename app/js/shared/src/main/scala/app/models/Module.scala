@@ -2,9 +2,9 @@ package app.models
 
 import hydro.common.time.Clock
 import app.api.ScalaJsApi.GetInitialDataResponse
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.models.access.AppJsEntityAccess
-import app.models.money.JsExchangeRateManager
+import app.models.money.JsCurrencyValueManager
 
 final class Module(implicit
     entityAccess: AppJsEntityAccess,
@@ -12,6 +12,6 @@ final class Module(implicit
     clock: Clock,
 ) {
 
-  implicit lazy val exchangeRateManager: ExchangeRateManager =
-    new JsExchangeRateManager(getInitialDataResponse.ratioReferenceToForeignCurrency)
+  implicit lazy val currencyValueManager: CurrencyValueManager =
+    new JsCurrencyValueManager(getInitialDataResponse.ratioReferenceToForeignCurrency)
 }

@@ -14,14 +14,14 @@ import utest._
 
 import scala.collection.SortedMap
 
-object JsExchangeRateManagerTest extends TestSuite {
+object JsCurrencyValueManagerTest$ extends TestSuite {
 
   override def tests = TestSuite {
     val testModule = new TestModule()
     implicit val clock = testModule.fakeClock
     implicit val entityAccess = testModule.fakeEntityAccess
-    val exchangeRateManager: JsExchangeRateManager =
-      new JsExchangeRateManager(
+    val currencyValueManager: JsCurrencyValueManager =
+      new JsCurrencyValueManager(
         ratioReferenceToForeignCurrency = Map(
           Gbp -> SortedMap(
             yesterdayPlusMillis(1000) -> 2.0,
@@ -33,36 +33,36 @@ object JsExchangeRateManagerTest extends TestSuite {
 
     "getRatioSecondToFirstCurrency()" - {
       "without data" - {
-        exchangeRateManager.getRatioSecondToFirstCurrency(Eur, Eur, clock.now) ==> 1.0
-        exchangeRateManager.getRatioSecondToFirstCurrency(Eur, Usd, clock.now) ==> 1.0
+        currencyValueManager.getRatioSecondToFirstCurrency(Eur, Eur, clock.now) ==> 1.0
+        currencyValueManager.getRatioSecondToFirstCurrency(Eur, Usd, clock.now) ==> 1.0
       }
       "before first data point" - {
-        exchangeRateManager.getRatioSecondToFirstCurrency(Gbp, Eur, yesterdayPlusMillis(0)) ==> 1.0
-        exchangeRateManager.getRatioSecondToFirstCurrency(Gbp, Eur, yesterdayPlusMillis(999)) ==> 1.0
+        currencyValueManager.getRatioSecondToFirstCurrency(Gbp, Eur, yesterdayPlusMillis(0)) ==> 1.0
+        currencyValueManager.getRatioSecondToFirstCurrency(Gbp, Eur, yesterdayPlusMillis(999)) ==> 1.0
       }
       "at first data point" - {
-        exchangeRateManager.getRatioSecondToFirstCurrency(Gbp, Eur, yesterdayPlusMillis(1000)) ==> 2.0
+        currencyValueManager.getRatioSecondToFirstCurrency(Gbp, Eur, yesterdayPlusMillis(1000)) ==> 2.0
       }
       "after first data point" - {
-        exchangeRateManager.getRatioSecondToFirstCurrency(Gbp, Eur, yesterdayPlusMillis(1001)) ==> 2.0
+        currencyValueManager.getRatioSecondToFirstCurrency(Gbp, Eur, yesterdayPlusMillis(1001)) ==> 2.0
       }
       "at second data point" - {
-        exchangeRateManager.getRatioSecondToFirstCurrency(Gbp, Eur, yesterdayPlusMillis(2000)) ==> 3.0
+        currencyValueManager.getRatioSecondToFirstCurrency(Gbp, Eur, yesterdayPlusMillis(2000)) ==> 3.0
       }
       "after last data point" - {
         "gbp / eur" - {
-          exchangeRateManager.getRatioSecondToFirstCurrency(Gbp, Eur, clock.now) ==> 0.5
+          currencyValueManager.getRatioSecondToFirstCurrency(Gbp, Eur, clock.now) ==> 0.5
         }
         "eur / gbp" - {
-          exchangeRateManager.getRatioSecondToFirstCurrency(Eur, Gbp, clock.now) ==> 2.0
+          currencyValueManager.getRatioSecondToFirstCurrency(Eur, Gbp, clock.now) ==> 2.0
         }
       }
       "after change was persisted" - {
         persistGbpMeasurement(yesterdayPlusMillis(4000), 4.0)
 
-        exchangeRateManager.getRatioSecondToFirstCurrency(Gbp, Eur, yesterdayPlusMillis(3999)) ==> 0.5
-        exchangeRateManager.getRatioSecondToFirstCurrency(Gbp, Eur, yesterdayPlusMillis(4000)) ==> 4.0
-        exchangeRateManager.getRatioSecondToFirstCurrency(Gbp, Eur, clock.now) ==> 4.0
+        currencyValueManager.getRatioSecondToFirstCurrency(Gbp, Eur, yesterdayPlusMillis(3999)) ==> 0.5
+        currencyValueManager.getRatioSecondToFirstCurrency(Gbp, Eur, yesterdayPlusMillis(4000)) ==> 4.0
+        currencyValueManager.getRatioSecondToFirstCurrency(Gbp, Eur, clock.now) ==> 4.0
       }
     }
   }

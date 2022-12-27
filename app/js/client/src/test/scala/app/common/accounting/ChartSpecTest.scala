@@ -15,11 +15,14 @@ object ChartSpecTest extends TestSuite {
           ChartSpec.parseStringified(chartSpec.stringify) ==> chartSpec
         }
         "singleEmptyLine" - {
-          testRoundTrip(ChartSpec.singleEmptyLine)
+          testRoundTrip(ChartSpec.singleEmptyLine(correctForInflation = false))
         }
         "single non-empty line" - {
           testRoundTrip(
-            ChartSpec(Seq(Line(name = "DEF@GHI", query = "ABC", inverted = true, cumulative = true)))
+            ChartSpec(
+              Seq(Line(name = "DEF@GHI", query = "ABC", inverted = true, cumulative = true)),
+              correctForInflation = true,
+            )
           )
         }
         "multiple lines" - {
@@ -32,7 +35,8 @@ object ChartSpecTest extends TestSuite {
                 Line(name = "Y", query = "ABC", inverted = true, cumulative = true),
                 Line(name = "", query = ""),
                 Line(name = "", query = ""),
-              )
+              ),
+              correctForInflation = false,
             )
           )
         }

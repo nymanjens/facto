@@ -1,7 +1,7 @@
 package app.flux.stores.entries.factories
 
 import app.common.accounting.ComplexQueryFilter
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.common.money.ReferenceMoney
 import app.common.time.DatedMonth
 import app.flux.stores.entries.EntriesStore
@@ -103,7 +103,7 @@ object SummaryForYearStoreFactory {
     def nonEmpty: Boolean = transactions.nonEmpty
 
     def totalFlow(correctForInflation: Boolean)(implicit
-        exchangeRateManager: ExchangeRateManager,
+        currencyValueManager: CurrencyValueManager,
         accountingConfig: Config,
     ): ReferenceMoney = {
       if (correctForInflation) {

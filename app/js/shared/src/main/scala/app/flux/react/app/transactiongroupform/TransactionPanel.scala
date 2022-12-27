@@ -5,7 +5,7 @@ import hydro.common.I18n
 import hydro.common.Tags
 import app.common.money.Currency
 import app.common.money.DatedMoney
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.common.money.ReferenceMoney
 import app.flux.react.uielements.input.InputWithDefaultFromReference
 import app.flux.react.uielements.input.MappedInput
@@ -53,7 +53,7 @@ private[transactiongroupform] final class TransactionPanel(implicit
     i18n: I18n,
     accountingConfig: Config,
     user: User,
-    exchangeRateManager: ExchangeRateManager,
+    currencyValueManager: CurrencyValueManager,
     clock: Clock,
     entityAccess: AppJsEntityAccess,
     tagsStoreFactory: TagsStoreFactory,

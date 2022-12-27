@@ -30,7 +30,7 @@ final class ClientAppModule(implicit
 
   // Create and unpack Models module
   private val modelsModule = new app.models.Module
-  implicit private val exchangeRateManager = modelsModule.exchangeRateManager
+  implicit private val currencyValueManager = modelsModule.currencyValueManager
 
   // Create and unpack app.common modules
   private val appCommonAccountingModule = new app.common.accounting.Module()
@@ -52,6 +52,8 @@ final class ClientAppModule(implicit
   implicit private val summaryYearsStoreFactory = fluxStoresModule.summaryYearsStoreFactory
   implicit private val summaryExchangeRateGainsStoreFactory =
     fluxStoresModule.summaryExchangeRateGainsStoreFactory
+  implicit private val summaryInflationGainsStoreFactory =
+    fluxStoresModule.summaryInflationGainsStoreFactory
   implicit private val chartStoreFactory =
     fluxStoresModule.chartStoreFactory
   implicit private val collapsedExpandedStateStoreFactory =

@@ -63,6 +63,8 @@ object BuildSettings {
       "com.typesafe.play" %% "play-cache" % versions.play,
       "com.typesafe.play" %% "play-ws" % versions.play,
       "com.typesafe.play" %% "play-specs2" % versions.play % Test,
+      "com.typesafe.play" %% "play-mailer" % "6.0.1",
+      "com.typesafe.play" %% "play-mailer-guice" % "6.0.1",
       "com.google.truth" % "truth" % "1.1.2" % Test,
       "com.google.testparameterinjector" % "test-parameter-injector" % "1.9" % Test,
       "org.yaml" % "snakeyaml" % "1.14",

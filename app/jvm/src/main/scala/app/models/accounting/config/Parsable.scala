@@ -117,8 +117,17 @@ object Parsable {
       owner: Account,
       hidden: Boolean,
       currency: String @nullable,
+      assumeThisFollowsInflationUntilNextBalanceCheck: Boolean,
   ) {
-    def this() = this(null, null, null, null, hidden = false, null)
+    def this() = this(
+      null,
+      null,
+      null,
+      null,
+      hidden = false,
+      null,
+      assumeThisFollowsInflationUntilNextBalanceCheck = false,
+    )
 
     def parse: ParsedMoneyReservoir = {
       val parsedShorterName = if (shorterName == null) name else shorterName
@@ -129,6 +138,7 @@ object Parsable {
         owner.parse,
         hidden,
         currencyCode = Option(currency),
+        assumeThisFollowsInflationUntilNextBalanceCheck = assumeThisFollowsInflationUntilNextBalanceCheck,
       )
     }
   }
@@ -224,11 +234,14 @@ object Parsable {
     }
   }
   object PredefinedChart {
-    case class ChartSpec(lines: java.util.List[ChartSpec.Line]) {
-      def this() = this(lines = null)
+    case class ChartSpec(lines: java.util.List[ChartSpec.Line], correctForInflation: Boolean) {
+      def this() = this(lines = null, correctForInflation = false)
 
       def parse(): ParsedChartSpec = {
-        ParsedChartSpec(lines = lines.asScala.toVector.map(_.parse))
+        ParsedChartSpec(
+          lines = lines.asScala.toVector.map(_.parse),
+          correctForInflation = correctForInflation,
+        )
       }
     }
     object ChartSpec {

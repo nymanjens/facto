@@ -1,7 +1,6 @@
 package app.flux.react.app.transactionviews
 
 import java.time.Month._
-
 import hydro.common.GuavaReplacement.DoubleMath.roundToLong
 import app.common.money.Currency
 import app.common.money.ReferenceMoney
@@ -12,6 +11,7 @@ import app.common.time.YearRange
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForMonth
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.ExchangeRateGains
 import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
+import app.flux.stores.entries.factories.SummaryInflationGainsStoreFactory.InflationGains
 import hydro.common.time.LocalDateTimes.createDateTime
 import utest._
 
@@ -37,7 +37,7 @@ object SummaryTableTest extends TestSuite {
               createTransaction(year = 2012, month = JUNE, flow = -2, category = testCategoryC),
             )
           ),
-          ExchangeRateGains(
+          exchangeRateGains = ExchangeRateGains(
             monthToGains = Map(
               DatedMonth.of(2012, JUNE) ->
                 GainsForMonth.forSingle(testReservoirCashGbp, ReferenceMoney(123))
@@ -45,15 +45,19 @@ object SummaryTableTest extends TestSuite {
             impactingTransactionIds = Set(),
             impactingBalanceCheckIds = Set(),
           ),
+          exchangeRateGainsCorrectedForInflation = ExchangeRateGains.empty,
+          inflationGains = InflationGains.empty,
         ),
         2013 -> summaryTable.AllYearsData.YearData(
-          SummaryForYear(
+          summary = SummaryForYear(
             Seq(
               createTransaction(year = 2013, category = testCategoryA),
               createTransaction(year = 2013, category = testCategoryB),
             )
           ),
-          ExchangeRateGains.empty,
+          exchangeRateGains = ExchangeRateGains.empty,
+          exchangeRateGainsCorrectedForInflation = ExchangeRateGains.empty,
+          inflationGains = InflationGains.empty,
         ),
       ),
       netWorth = ReferenceMoney(23737373),
@@ -241,6 +245,7 @@ object SummaryTableTest extends TestSuite {
     implicit val summaryYearsStoreFactory = storesModule.summaryYearsStoreFactory
     implicit val summaryForYearStoreFactory = storesModule.summaryForYearStoreFactory
     implicit val summaryExchangeRateGainsStoreFactory = storesModule.summaryExchangeRateGainsStoreFactory
+    implicit val summaryInflationGainsStoreFactory = storesModule.summaryInflationGainsStoreFactory
     implicit val cashFlowEntriesStoreFactory = storesModule.cashFlowEntriesStoreFactory
     implicit val inMemoryUserConfigStore = storesModule.inMemoryUserConfigStore
 

@@ -1,6 +1,6 @@
 package app.flux.react.app.transactionviews
 
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.react.uielements
 import app.flux.react.uielements.CollapseAllExpandAllButtons
@@ -35,7 +35,7 @@ final class Liquidation(implicit
     clock: Clock,
     accountingConfig: Config,
     user: User,
-    exchangeRateManager: ExchangeRateManager,
+    currencyValueManager: CurrencyValueManager,
     i18n: I18n,
     pageHeader: PageHeader,
     descriptionWithEntryCount: DescriptionWithEntryCount,

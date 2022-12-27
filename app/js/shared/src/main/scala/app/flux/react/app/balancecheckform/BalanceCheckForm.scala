@@ -1,7 +1,7 @@
 package app.flux.react.app.balancecheckform
 
 import hydro.common.I18n
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.flux.action.AppActions
 import app.flux.react.uielements.input.MappedInput
 import app.flux.react.uielements.input.bootstrap.MoneyInput
@@ -38,7 +38,7 @@ final class BalanceCheckForm(implicit
     accountingConfig: Config,
     user: User,
     entityAccess: AppJsEntityAccess,
-    exchangeRateManager: ExchangeRateManager,
+    currencyValueManager: CurrencyValueManager,
     dispatcher: Dispatcher,
     pageHeader: PageHeader,
 ) {

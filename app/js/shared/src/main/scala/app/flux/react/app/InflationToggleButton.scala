@@ -2,6 +2,7 @@ package app.flux.react.app
 
 import app.flux.stores.InMemoryUserConfigStore
 import app.models.accounting.config.Config
+import hydro.common.I18n
 import hydro.common.JsLoggingUtils.logExceptions
 import hydro.common.JsLoggingUtils.LogExceptionsFuture
 import hydro.flux.react.HydroReactComponent
@@ -13,6 +14,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 private[app] final class InflationToggleButton(implicit
     accountingConfig: Config,
     inMemoryUserConfigStore: InMemoryUserConfigStore,
+    i18n: I18n,
 ) extends HydroReactComponent {
 
   // **************** API ****************//
@@ -39,7 +41,7 @@ private[app] final class InflationToggleButton(implicit
     override def render(props: Props, state: State) = logExceptions {
       if (accountingConfig.constants.supportInflationCorrections) {
         <.div(
-          <.i(^.className := "icon-inflation"),
+          <.i(^.className := "icon-inflation", tooltip(i18n("app.correct-for-inflation"))),
           " ",
           <.span(
             ^.className := "facto-custom-switch-button",
@@ -64,6 +66,16 @@ private[app] final class InflationToggleButton(implicit
       } else {
         VdomArray.empty()
       }
+    }
+
+    private def tooltip(tooltipText: String): TagMod = {
+      TagMod(
+        ^.className := "with-tooltip",
+        <.span(
+          ^.className := "tooltiptext",
+          tooltipText,
+        ),
+      )
     }
   }
 }

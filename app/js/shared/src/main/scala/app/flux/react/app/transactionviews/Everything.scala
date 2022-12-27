@@ -2,7 +2,7 @@ package app.flux.react.app.transactionviews
 
 import hydro.common.Formatting._
 import hydro.common.I18n
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.react.uielements
 import app.flux.react.uielements.DescriptionWithEntryCount
@@ -24,7 +24,7 @@ final class Everything(implicit
     entityAccess: AppJsEntityAccess,
     clock: Clock,
     accountingConfig: Config,
-    exchangeRateManager: ExchangeRateManager,
+    currencyValueManager: CurrencyValueManager,
     i18n: I18n,
     pageHeader: PageHeader,
     descriptionWithEntryCount: DescriptionWithEntryCount,

@@ -2,11 +2,10 @@ package app.flux.react.app.transactionviews
 
 import scala.scalajs.js.JSConverters._
 import java.time.Month
-
 import app.common.money.Currency
 
 import scala.collection.immutable.Seq
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.common.money.Money
 import app.common.money.ReferenceMoney
 import app.common.time.DatedMonth
@@ -15,6 +14,7 @@ import app.common.accounting.ChartSpec.Line
 import app.flux.router.AppPages
 import app.flux.stores.entries.factories.ChartStoreFactory
 import app.flux.stores.entries.factories.ChartStoreFactory.LinePoints
+import app.flux.stores.InMemoryUserConfigStore
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Config
 import app.models.user.User
@@ -26,6 +26,7 @@ import hydro.flux.react.HydroReactComponent
 import hydro.flux.react.uielements.Bootstrap
 import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.uielements.Panel
+import hydro.flux.react.ReactVdomUtils.^^
 import hydro.flux.router.RouterContext
 import hydro.jsfacades.Recharts
 import japgolly.scalajs.react._
@@ -40,11 +41,12 @@ final class Chart(implicit
     user: User,
     clock: Clock,
     accountingConfig: Config,
-    exchangeRateManager: ExchangeRateManager,
+    currencyValueManager: CurrencyValueManager,
     i18n: I18n,
     pageHeader: PageHeader,
     chartSpecInput: ChartSpecInput,
     chartStoreFactory: ChartStoreFactory,
+    inMemoryUserConfigStore: InMemoryUserConfigStore,
 ) extends HydroReactComponent {
 
   private val lineColors: Seq[String] =
@@ -66,13 +68,28 @@ final class Chart(implicit
     initialState = State(),
     stateStoresDependencies = Some(props =>
       for (line <- props.chartSpec.lines) yield {
-        val store = chartStoreFactory.get(line.query)
+        val store =
+          chartStoreFactory.get(line.query, correctForInflation = props.chartSpec.correctForInflation)
         StateStoresDependency(
           store,
           oldState => oldState.copy(lineToPoints = oldState.lineToPoints.updated(line, store.state)),
         )
       }
     ),
+  ).withStateStoresDependencyFromProps(props =>
+    StateStoresDependency(
+      inMemoryUserConfigStore,
+      state => {
+        if (inMemoryUserConfigStore.state.correctForInflation != props.chartSpec.correctForInflation) {
+          props.router.setPage(
+            AppPages.Chart.fromChartSpec(
+              props.chartSpec.copy(correctForInflation = inMemoryUserConfigStore.state.correctForInflation)
+            )
+          )
+        }
+        state
+      },
+    )
   )
 
   // **************** Private inner types ****************//
@@ -84,7 +101,12 @@ final class Chart(implicit
       lineToPoints: Map[Line, LinePoints] = Map()
   )
 
-  protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
+  protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) with WillMount {
+
+    override def willMount(props: Props, state: State): Callback = {
+      inMemoryUserConfigStore.mutateState(_.copy(correctForInflation = props.chartSpec.correctForInflation))
+      Callback.empty
+    }
 
     override def render(props: Props, state: State) = logExceptions {
       implicit val router = props.router
@@ -190,10 +212,15 @@ final class Chart(implicit
                       ^.key := lineIndex,
                       i18n("app.for-query", line.name),
                       ": ",
-                      chartData.lastOption
-                        .map(data => data(line.name))
-                        .map(formatDoubleMoney())
-                        .getOrElse("0.00"): String,
+                      <.span(
+                        ^^.ifThen(props.chartSpec.correctForInflation)(
+                          ^.className := "corrected-for-inflation"
+                        ),
+                        chartData.lastOption
+                          .map(data => data(line.name))
+                          .map(formatDoubleMoney())
+                          .getOrElse("0.00"): String,
+                      ),
                     )
                   }
                 ).toVdomArray

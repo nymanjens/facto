@@ -3,7 +3,7 @@ package app.flux.stores
 import app.api.ScalaJsApiClient
 import app.common.accounting.ComplexQueryFilter
 import hydro.common.I18n
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.flux.stores.entries._
 import app.flux.stores.entries.factories._
 import app.models.access.AppJsEntityAccess
@@ -23,7 +23,7 @@ final class Module(implicit
     accountingConfig: Config,
     user: User,
     entityAccess: AppJsEntityAccess,
-    exchangeRateManager: ExchangeRateManager,
+    currencyValueManager: CurrencyValueManager,
     dispatcher: Dispatcher,
     clock: Clock,
     scalaJsApiClient: ScalaJsApiClient,
@@ -34,6 +34,7 @@ final class Module(implicit
   new BalanceCheckStore
 
   implicit private val complexQueryFilter = new ComplexQueryFilter
+  implicit private val accountingEntryUtils = new AccountingEntryUtils
 
   implicit val allEntriesStoreFactory = new AllEntriesStoreFactory
   implicit val cashFlowEntriesStoreFactory = new CashFlowEntriesStoreFactory
@@ -44,6 +45,7 @@ final class Module(implicit
   implicit val summaryForYearStoreFactory = new SummaryForYearStoreFactory
   implicit val summaryYearsStoreFactory = new SummaryYearsStoreFactory
   implicit val summaryExchangeRateGainsStoreFactory = new SummaryExchangeRateGainsStoreFactory
+  implicit val summaryInflationGainsStoreFactory = new SummaryInflationGainsStoreFactory
   implicit val chartStoreFactory = new ChartStoreFactory
   implicit val collapsedExpandedStateStoreFactory = new CollapsedExpandedStateStoreFactory
   implicit val globalMessagesStore = new GlobalMessagesStore

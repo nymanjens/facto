@@ -2,36 +2,52 @@ package app.common.accounting
 
 import app.common.accounting.ChartSpec.Line
 import hydro.common.GuavaReplacement.Splitter
+import hydro.common.ScalaUtils
 
 import scala.collection.immutable.Seq
 
-case class ChartSpec(lines: Seq[Line]) {
+case class ChartSpec(
+    lines: Seq[Line],
+    correctForInflation: Boolean,
+) {
   def withAddedEmptyLine: ChartSpec = {
-    ChartSpec(lines :+ Line.empty)
+    copy(lines = lines :+ Line.empty)
   }
 
   def withRemovedLine(index: Int): ChartSpec = {
     val mutableLines = lines.toBuffer
     mutableLines.remove(index)
-    ChartSpec(mutableLines.toVector)
+    copy(lines = mutableLines.toVector)
   }
 
   def modified(index: Int, modification: Line => Line) = {
-    ChartSpec(lines.updated(index, modification(lines(index))))
+    copy(lines = lines.updated(index, modification(lines(index))))
   }
 
   def stringify: String = {
-    lines.map(_.stringify).mkString(String.valueOf(ChartSpec.lineDelimiter))
+    val inflationSuffix = if (correctForInflation) "+I" else "-I"
+    lines.map(_.stringify).mkString(String.valueOf(ChartSpec.lineDelimiter)) + inflationSuffix
   }
 }
 object ChartSpec {
-  val singleEmptyLine = ChartSpec(lines = Seq(Line.empty))
+  def singleEmptyLine(correctForInflation: Boolean) =
+    ChartSpec(lines = Seq(Line.empty), correctForInflation = correctForInflation)
 
   private val lineDelimiter = '~'
 
   def parseStringified(string: String): ChartSpec = {
-    val lines = Splitter.on(lineDelimiter).split(string).map(Line.parseStringified)
-    if (lines.nonEmpty) ChartSpec(lines) else ChartSpec.singleEmptyLine
+    val correctForInflation = if (string.endsWith("+I")) {
+      true
+    } else if (string.endsWith("-I")) {
+      false
+    } else {
+      throw new AssertionError(string)
+    }
+    val stringRemainder = string.substring(0, string.length - 2)
+
+    val lines = Splitter.on(lineDelimiter).split(stringRemainder).map(Line.parseStringified)
+    if (lines.nonEmpty) ChartSpec(lines, correctForInflation)
+    else ChartSpec.singleEmptyLine(correctForInflation = correctForInflation)
   }
 
   case class Line(

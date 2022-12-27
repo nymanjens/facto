@@ -1,6 +1,6 @@
 package app.common.testing
 
-import app.models.money.JsExchangeRateManager
+import app.models.money.JsCurrencyValueManager
 import hydro.common.testing.FakeClock
 import hydro.common.testing.FakeI18n
 import hydro.flux.action.Dispatcher
@@ -19,7 +19,7 @@ class TestModule {
   implicit lazy val fakeScalaJsApiClient = new FakeScalaJsApiClient
 
   // ******************* Non-fake implementations ******************* //
-  implicit lazy val exchangeRateManager = new JsExchangeRateManager(ratioReferenceToForeignCurrency = Map())
+  implicit lazy val currencyValueManager = new JsCurrencyValueManager(ratioReferenceToForeignCurrency = Map())
   implicit lazy val hydroPushSocketClientFactory: HydroPushSocketClientFactory =
     new HydroPushSocketClientFactory
   implicit val pageHeader = new PageHeader

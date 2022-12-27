@@ -2,7 +2,7 @@ package app.flux.stores.entries
 
 import scala.collection.immutable.Seq
 import app.common.money.DatedMoney
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.common.money.Money
 import app.common.money.MoneyWithGeneralCurrency
 import app.models.access.AppJsEntityAccess
@@ -54,7 +54,7 @@ abstract class GroupedTransactions(val transactions: Seq[Transaction]) {
   def mostRecentTransaction: Transaction = transactions.maxBy(_.transactionDate)
   def tags: Seq[String] = transactions.flatMap(_.tags).distinct
 
-  def flow(implicit exchangeRateManager: ExchangeRateManager, accountingConfig: Config): Money = {
+  def flow(implicit currencyValueManager: CurrencyValueManager, accountingConfig: Config): Money = {
     val currencies = transactions.map(_.flow.currency).distinct
     currencies match {
       case Seq(currency) => // All transactions have the same currency

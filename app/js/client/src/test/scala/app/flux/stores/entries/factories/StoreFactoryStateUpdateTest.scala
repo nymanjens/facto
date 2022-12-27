@@ -1,7 +1,6 @@
 package app.flux.stores.entries.factories
 
 import java.time.Month._
-
 import app.common.accounting.ComplexQueryFilter
 import hydro.common.testing.FakeJsEntityAccess
 import app.common.testing.TestModule
@@ -10,6 +9,8 @@ import app.flux.stores.entries.AccountPair
 import app.flux.stores.entries.EntriesStore
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.ExchangeRateGains
 import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
+import app.flux.stores.entries.AccountingEntryUtils
+import app.flux.stores.entries.AccountingEntryUtils
 import app.models.access.ModelFields
 import app.models.accounting._
 import hydro.models.modification.EntityModification._
@@ -150,7 +151,8 @@ object StoreFactoryStateUpdateTest extends TestSuite {
     )
 
     "SummaryExchangeRateGainsStoreFactory" - runTest(
-      store = testModule.summaryExchangeRateGainsStoreFactory.get(account = testAccountA, year = 2015),
+      store = testModule.summaryExchangeRateGainsStoreFactory
+        .get(account = testAccountA, year = 2015, correctForInflation = false),
       updatesWithImpact = ListMap(
         // Seed random fluctuating prices
         Add(createExchangeRateMeasurement(year = 2014)) -> StateImpact.NoChange,
@@ -338,6 +340,7 @@ object StoreFactoryStateUpdateTest extends TestSuite {
   private final class ThisTestModule extends TestModule {
 
     implicit private val complexQueryFilter = new ComplexQueryFilter
+    implicit private val accountingEntryUtils = new AccountingEntryUtils
 
     val allEntriesStoreFactory = new AllEntriesStoreFactory
     val cashFlowEntriesStoreFactory = new CashFlowEntriesStoreFactory

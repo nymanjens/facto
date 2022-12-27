@@ -91,6 +91,7 @@ object TestObjects {
       shorterName = "Cash Common",
       owner = testAccountCommon,
       hidden = false,
+      assumeThisFollowsInflationUntilNextBalanceCheck = false,
     )
   def testReservoirCardCommon =
     MoneyReservoir(
@@ -99,6 +100,7 @@ object TestObjects {
       shorterName = "Card Common",
       owner = testAccountCommon,
       hidden = false,
+      assumeThisFollowsInflationUntilNextBalanceCheck = false,
     )
   def testReservoirCashA =
     MoneyReservoir(
@@ -107,6 +109,7 @@ object TestObjects {
       shorterName = "Cash A",
       owner = testAccountA,
       hidden = false,
+      assumeThisFollowsInflationUntilNextBalanceCheck = false,
     )
   def testReservoirCardA =
     MoneyReservoir(
@@ -115,6 +118,7 @@ object TestObjects {
       shorterName = "Card A",
       owner = testAccountA,
       hidden = false,
+      assumeThisFollowsInflationUntilNextBalanceCheck = false,
     )
   def testReservoirCashB =
     MoneyReservoir(
@@ -123,6 +127,7 @@ object TestObjects {
       shorterName = "Cash B",
       owner = testAccountB,
       hidden = false,
+      assumeThisFollowsInflationUntilNextBalanceCheck = false,
     )
   def testReservoirCardB =
     MoneyReservoir(
@@ -131,6 +136,7 @@ object TestObjects {
       shorterName = "Card B",
       owner = testAccountB,
       hidden = false,
+      assumeThisFollowsInflationUntilNextBalanceCheck = false,
     )
   def testReservoirHidden =
     MoneyReservoir(
@@ -139,6 +145,7 @@ object TestObjects {
       shorterName = "Card Hidden",
       owner = testAccountB,
       hidden = true,
+      assumeThisFollowsInflationUntilNextBalanceCheck = false,
     )
   def testReservoirCashGbp =
     MoneyReservoir(
@@ -148,6 +155,7 @@ object TestObjects {
       owner = testAccountA,
       hidden = true,
       currencyCode = Some("GBP"),
+      assumeThisFollowsInflationUntilNextBalanceCheck = false,
     )
   def testReservoirOfAccountA: MoneyReservoir = testReservoirCashA
   def testReservoirOfAccountB: MoneyReservoir = testReservoirCashB
@@ -211,7 +219,8 @@ object TestObjects {
               name = "Transactions",
               query = "beneficiary:'Account A'",
             )
-          )
+          ),
+          correctForInflation = false,
         ),
       )
     ),

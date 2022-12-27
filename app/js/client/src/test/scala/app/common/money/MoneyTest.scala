@@ -6,7 +6,7 @@ import app.common.money.Currency.Gbp
 import hydro.common.testing.FakeJsEntityAccess
 import app.common.testing.TestModule
 import app.models.money.ExchangeRateMeasurement
-import app.models.money.JsExchangeRateManager
+import app.models.money.JsCurrencyValueManager
 import hydro.common.time.Clock
 import utest.TestSuite
 import utest._
@@ -19,7 +19,7 @@ object MoneyTest extends TestSuite {
     val testModule = new TestModule()
     implicit val clock = testModule.fakeClock
     implicit val entityAccess = testModule.fakeEntityAccess
-    implicit val exchangeRateManager: JsExchangeRateManager = testModule.exchangeRateManager
+    implicit val currencyValueManager: JsCurrencyValueManager = testModule.currencyValueManager
 
     "Money" - {
       "unary -" - {

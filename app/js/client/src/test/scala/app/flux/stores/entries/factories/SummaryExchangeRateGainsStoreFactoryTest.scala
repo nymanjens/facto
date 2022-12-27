@@ -2,7 +2,6 @@ package app.flux.stores.entries.factories
 
 import java.time.LocalDate
 import java.time.Month._
-
 import app.common.accounting.ComplexQueryFilter
 import app.common.money.ReferenceMoney
 import hydro.common.testing.FakeJsEntityAccess
@@ -10,6 +9,7 @@ import app.common.testing.TestModule
 import app.common.testing.TestObjects._
 import app.common.time.DatedMonth
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForMonth
+import app.flux.stores.entries.AccountingEntryUtils
 import app.models.accounting.config.MoneyReservoir
 import hydro.models.modification.EntityModification
 import hydro.common.time.LocalDateTime
@@ -26,13 +26,14 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
     val testModule = new TestModule()
     implicit val fakeClock = testModule.fakeClock
     implicit val entityAccess = testModule.fakeEntityAccess
-    implicit val exchangeRateManager = testModule.exchangeRateManager
+    implicit val currencyValueManager = testModule.currencyValueManager
     implicit val testAccountingConfig = testModule.testAccountingConfig
     implicit val complexQueryFilter = new ComplexQueryFilter()
-    val factory: SummaryExchangeRateGainsStoreFactory = new SummaryExchangeRateGainsStoreFactory()
+    implicit val accountingEntryUtils = new AccountingEntryUtils()
+    val factory: SummaryExchangeRateGainsStoreFactory = new SummaryExchangeRateGainsStoreFactory
 
     "no transactions" - async {
-      val store = factory.get(testAccountA, year = 2013)
+      val store = factory.get(testAccountA, year = 2013, correctForInflation = false)
 
       val exchangeRateGains = await(store.stateFuture)
       exchangeRateGains.gainsForMonth(DatedMonth(LocalDate.of(2012, DECEMBER, 1))) ==> GainsForMonth.empty
@@ -43,7 +44,7 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
     "domestic reservoir" - async {
       persistTransaction(flow = 789, date = createDateTime(2013, JANUARY, 5), reservoir = testReservoirCashA)
 
-      val store = factory.get(testAccountA, year = 2013)
+      val store = factory.get(testAccountA, year = 2013, correctForInflation = false)
       val exchangeRateGains = await(store.stateFuture)
 
       exchangeRateGains.gainsForMonth(DatedMonth(LocalDate.of(2013, JANUARY, 1))) ==> GainsForMonth.empty
@@ -87,7 +88,7 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
       persistTransaction(flow = 300, date = createDateTime(2013, MAY, 5)) // Balance = 400
       persistTransaction(flow = -600, date = createDateTime(2013, MAY, 9)) // Balance = -200
 
-      val store = factory.get(testAccountA, year = 2013)
+      val store = factory.get(testAccountA, year = 2013, correctForInflation = false)
       val exchangeRateGains = await(store.stateFuture)
 
       exchangeRateGains.gainsForMonth(DatedMonth(LocalDate.of(2012, JANUARY, 1))) ==> GainsForMonth.empty

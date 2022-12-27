@@ -11,6 +11,7 @@ import play.api.i18n.I18nSupport
 import play.api.i18n.Messages
 import play.api.i18n.MessagesApi
 import play.api.mvc._
+import play.api.libs.mailer._
 
 final class Auth @Inject() (implicit
     override val messagesApi: MessagesApi,
@@ -18,6 +19,7 @@ final class Auth @Inject() (implicit
     entityAccess: JvmEntityAccess,
     playConfiguration: play.api.Configuration,
     env: play.api.Environment,
+    mailerClient: MailerClient,
 ) extends AbstractController(components)
     with I18nSupport {
 
@@ -28,7 +30,10 @@ final class Auth @Inject() (implicit
 
   def authenticate(returnTo: String) = Action { implicit request =>
     Forms.loginForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(views.html.login(formWithErrors, returnTo)),
+      formWithErrors => {
+        maybeSendLoginFailedEmail(formWithErrors("loginName").value, formWithErrors("password").value)
+        BadRequest(views.html.login(formWithErrors, returnTo))
+      },
       user => Redirect(returnTo).withSession("username" -> user._1),
     )
   }
@@ -41,6 +46,24 @@ final class Auth @Inject() (implicit
 
   def amILoggedIn = Action { implicit request =>
     Ok(AuthenticatedAction.getAuthenticatedUser(request).isDefined.toString)
+  }
+
+  private def maybeSendLoginFailedEmail(loginName: Option[String], password: Option[String]): Unit = {
+    val enabled =
+      playConfiguration.getOptional[Boolean]("app.mailer.onFailedLoginAttempt.enable") getOrElse false
+    if (enabled) {
+      val email = Email(
+        subject = playConfiguration.get[String]("app.mailer.onFailedLoginAttempt.subject"),
+        from = playConfiguration.get[String]("app.mailer.onFailedLoginAttempt.from"),
+        to = Seq(playConfiguration.get[String]("app.mailer.onFailedLoginAttempt.to")),
+        bodyText = Some(
+          "Failed login attempt:\n" +
+            s"- login name: '${loginName.getOrElse("")}'\n" +
+            s"- password: ${password.getOrElse("").length} characters"
+        ),
+      )
+      mailerClient.send(email)
+    }
   }
 }
 

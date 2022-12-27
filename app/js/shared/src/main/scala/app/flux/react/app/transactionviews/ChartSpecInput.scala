@@ -1,6 +1,6 @@
 package app.flux.react.app.transactionviews
 
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.common.accounting.ChartSpec
 import app.common.accounting.ChartSpec.Line
 import app.models.access.AppJsEntityAccess
@@ -142,7 +142,9 @@ final class ChartSpecInput(implicit
         Bootstrap.FontAwesomeIcon("times"),
         " ",
         i18n("app.clear"),
-        ^.onClick --> props.notifyUpdatedChartSpec(_ => ChartSpec.singleEmptyLine),
+        ^.onClick --> props.notifyUpdatedChartSpec(_ =>
+          ChartSpec.singleEmptyLine(correctForInflation = props.chartSpec.correctForInflation)
+        ),
       )
     }
 

@@ -1,7 +1,7 @@
 package app.flux.react.app
 
 import hydro.jsfacades.Mousetrap
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.flux.router.AppPages
 import app.flux.stores.entries.factories.AllEntriesStoreFactory
 import app.models.access.AppJsEntityAccess

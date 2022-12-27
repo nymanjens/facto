@@ -2,7 +2,7 @@ package app.flux.react.app
 
 import app.common.accounting.TemplateMatcher
 import hydro.common.I18n
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.flux.react.app.balancecheckform.BalanceCheckForm
 import app.flux.react.app.transactiongroupform.TransactionGroupForm
 import app.flux.react.uielements.DescriptionWithEntryCount
@@ -24,7 +24,7 @@ final class Module(implicit
     accountingConfig: Config,
     user: User,
     entityAccess: AppJsEntityAccess,
-    exchangeRateManager: ExchangeRateManager,
+    currencyValueManager: CurrencyValueManager,
     allEntriesStoreFactory: AllEntriesStoreFactory,
     cashFlowEntriesStoreFactory: CashFlowEntriesStoreFactory,
     liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory,
@@ -34,6 +34,7 @@ final class Module(implicit
     summaryForYearStoreFactory: SummaryForYearStoreFactory,
     summaryYearsStoreFactory: SummaryYearsStoreFactory,
     summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
+    summaryInflationGainsStoreFactory: SummaryInflationGainsStoreFactory,
     chartStoreFactory: ChartStoreFactory,
     collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
     globalMessagesStore: GlobalMessagesStore,
