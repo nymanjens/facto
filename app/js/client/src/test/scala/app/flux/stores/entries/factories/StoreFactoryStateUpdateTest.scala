@@ -54,8 +54,7 @@ object StoreFactoryStateUpdateTest extends TestSuite {
     )
 
     "CashFlowEntriesStoreFactory" - runTest(
-      store =
-        testModule.cashFlowEntriesStoreFactory.get(moneyReservoir = testReservoirCardA, maxNumEntries = 2),
+      store = testModule.cashFlowEntriesStoreFactory.get(reservoir = testReservoirCardA, maxNumEntries = 2),
       updatesWithImpact = ListMap(
         // Add Transactions and BalanceChecks
         Add(createTransaction(id = 10, day = 10, reservoir = testReservoirCardA)) -> StateImpact.Change,

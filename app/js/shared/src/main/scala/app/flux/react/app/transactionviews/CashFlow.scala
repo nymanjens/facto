@@ -16,6 +16,7 @@ import app.flux.stores.entries.CashFlowEntry
 import app.flux.stores.entries.factories.CashFlowEntriesStoreFactory
 import app.flux.stores.CollapsedExpandedStateStoreFactory
 import app.flux.stores.InMemoryUserConfigStore
+import app.flux.stores.entries.factories.CashFlowEntriesStoreFactory.CashFlowAdditionalInput
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.BalanceCheck
 import app.models.accounting.config.Config
@@ -51,7 +52,8 @@ final class CashFlow(implicit
     inMemoryUserConfigStore: InMemoryUserConfigStore,
 ) extends HydroReactComponent {
 
-  private val entriesListTable: EntriesListTable[CashFlowEntry, MoneyReservoir] = new EntriesListTable
+  private val entriesListTable: EntriesListTable[CashFlowEntry, CashFlowAdditionalInput] =
+    new EntriesListTable
   private val collapsedExpandedStateStoreHandle = collapsedExpandedStateStoreFactory
     .initializeView(getClass.getSimpleName, defaultExpanded = user.expandCashFlowTablesByDefault)
 
@@ -75,11 +77,26 @@ final class CashFlow(implicit
       includeUnrelatedReservoirs: Boolean = false,
       includeHiddenReservoirs: Boolean = false,
       correctForInflation: Boolean = false,
-  )
+      private val reservoirsThatShowAllBalanceChecks: Set[MoneyReservoir] = Set(),
+  ) {
+    def showAllBalanceChecks(reservoir: MoneyReservoir): Boolean = {
+      reservoirsThatShowAllBalanceChecks contains reservoir
+    }
+
+    def withToggledShowAllBalanceChecks(reservoir: MoneyReservoir): State = {
+      if (reservoirsThatShowAllBalanceChecks contains reservoir) {
+        copy(reservoirsThatShowAllBalanceChecks = reservoirsThatShowAllBalanceChecks - reservoir)
+      } else {
+        copy(reservoirsThatShowAllBalanceChecks = reservoirsThatShowAllBalanceChecks + reservoir)
+      }
+    }
+  }
 
   protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
     override def render(props: Props, state: State) = {
       implicit val router = props.router
+      implicit val _ = state
+
       <.span(
         pageHeader.withExtension(router.currentPage) {
           CollapseAllExpandAllButtons(
@@ -111,7 +128,12 @@ final class CashFlow(implicit
                       intermediateBeforeInf = Seq(150),
                     ),
                     collapsedExpandedStateStore = Some(collapsedExpandedStateStoreHandle.getStore(tableName)),
-                    additionalInput = reservoir,
+                    additionalInput = CashFlowAdditionalInput(
+                      reservoir = reservoir,
+                      showAllBalanceChecks = {
+                        state.showAllBalanceChecks(reservoir)
+                      },
+                    ),
                     calculateExtraTitle = { context =>
                       context.maybeLatestEntry map { latestEntry =>
                         s"${i18n("app.balance")}: ${latestEntry.balance}" + (
@@ -128,7 +150,13 @@ final class CashFlow(implicit
                       <.th(i18n("app.category")),
                       <.th(i18n("app.description")),
                       <.th(i18n("app.flow")),
-                      <.th(i18n("app.balance"), " ", balanceCheckAddNewButton(reservoir)),
+                      <.th(
+                        i18n("app.balance"),
+                        " ",
+                        balanceCheckAddNewButton(reservoir),
+                        " ",
+                        toggleShowAllBalanceChecks(reservoir),
+                      ),
                       <.th(transactionGroupAddButton(reservoir)),
                     ),
                     calculateTableDataFromEntryAndRowNum = (cashFlowEntry, rowNumber) =>
@@ -175,10 +203,10 @@ final class CashFlow(implicit
                             ),
                             <.td(
                               ^.style := js.Dictionary("fontWeight" -> "bold"),
-                              if (entry.balanceIncrease.cents > 0) "+" else "-",
+                              if (entry.balanceIncrease.cents >= 0) "+" else "-",
                               " ",
                               uielements.MoneyWithCurrency(
-                                if (entry.balanceIncrease.cents > 0) entry.balanceIncrease
+                                if (entry.balanceIncrease.cents >= 0) entry.balanceIncrease
                                 else -entry.balanceIncrease
                               ),
                             ),
@@ -219,52 +247,68 @@ final class CashFlow(implicit
         ),
       )
     }
-  }
 
-  // **************** Private helper methods ****************//
-  private def balanceCheckAddNewButton(
-      reservoir: MoneyReservoir
-  )(implicit router: RouterContext): VdomElement = {
-    val link = router.anchorWithHrefTo(AppPages.NewBalanceCheck(reservoir))
-    Bootstrap.Button(Variant.info, Size.xs, tag = link)(
-      Bootstrap.FontAwesomeIcon("check-square-o", fixedWidth = true)
-    )
-  }
-  private def transactionGroupAddButton(
-      reservoir: MoneyReservoir
-  )(implicit router: RouterContext): VdomElement = {
-    val link = router.anchorWithHrefTo(AppPages.NewTransactionGroupFromReservoir(reservoir))
-    Bootstrap.Button(Variant.info, Size.xs, tag = link)(
-      <.i(^.className := "icon-new-empty")
-    )
-  }
+    // **************** Private helper methods ****************//
+    private def balanceCheckAddNewButton(
+        reservoir: MoneyReservoir
+    )(implicit router: RouterContext): VdomElement = {
+      val link = router.anchorWithHrefTo(AppPages.NewBalanceCheck(reservoir))
+      Bootstrap.Button(Variant.info, Size.xs, tag = link)(
+        Bootstrap.FontAwesomeIcon("check-square-o", fixedWidth = true)
+      )
+    }
 
-  private def balanceCheckConfirmButton(reservoir: MoneyReservoir, entry: CashFlowEntry.RegularEntry)(implicit
-      router: RouterContext
-  ): VdomElement = {
-    Bootstrap.Button(Variant.info, Size.xs)(
-      ^.onClick --> LogExceptionsCallback {
-        dispatcher.dispatch(
-          AppActions.AddBalanceCheck(
-            BalanceCheck(
-              issuerId = user.id,
-              moneyReservoirCode = reservoir.code,
-              balanceInCents = entry.balance.cents,
-              createdDate = clock.now,
-              checkDate = entry.mostRecentTransaction.transactionDate,
+    private def toggleShowAllBalanceChecks(
+        reservoir: MoneyReservoir
+    )(implicit router: RouterContext, state: State): VdomElement = {
+      Bootstrap.Button(size = Size.xs)(
+        Bootstrap.Glyphicon(
+          if (state.showAllBalanceChecks(reservoir)) "zoom-out" else "zoom-in"
+        ),
+        ^.onClick --> LogExceptionsCallback(
+          $.modState(_.withToggledShowAllBalanceChecks(reservoir)).runNow()
+        ),
+      )
+    }
+
+    private def transactionGroupAddButton(
+        reservoir: MoneyReservoir
+    )(implicit router: RouterContext): VdomElement = {
+      val link = router.anchorWithHrefTo(AppPages.NewTransactionGroupFromReservoir(reservoir))
+      Bootstrap.Button(Variant.info, Size.xs, tag = link)(
+        <.i(^.className := "icon-new-empty")
+      )
+    }
+
+    private def balanceCheckConfirmButton(reservoir: MoneyReservoir, entry: CashFlowEntry.RegularEntry)(
+        implicit router: RouterContext
+    ): VdomElement = {
+      Bootstrap.Button(Variant.info, Size.xs)(
+        ^.onClick --> LogExceptionsCallback {
+          dispatcher.dispatch(
+            AppActions.AddBalanceCheck(
+              BalanceCheck(
+                issuerId = user.id,
+                moneyReservoirCode = reservoir.code,
+                balanceInCents = entry.balance.cents,
+                createdDate = clock.now,
+                checkDate = entry.mostRecentTransaction.transactionDate,
+              )
             )
           )
-        )
-      }.void,
-      Bootstrap.FontAwesomeIcon("check-square-o", fixedWidth = true),
-    )
-  }
+        }.void,
+        Bootstrap.FontAwesomeIcon("check-square-o", fixedWidth = true),
+      )
+    }
 
-  def balanceCheckEditButton(balanceCorrection: BalanceCheck)(implicit router: RouterContext): VdomElement = {
-    val link = router.anchorWithHrefTo(AppPages.EditBalanceCheck(balanceCorrection))
-    Bootstrap.Button(size = Size.xs, tag = link)(
-      Bootstrap.FontAwesomeIcon("pencil", fixedWidth = true)
-    )
+    def balanceCheckEditButton(
+        balanceCorrection: BalanceCheck
+    )(implicit router: RouterContext): VdomElement = {
+      val link = router.anchorWithHrefTo(AppPages.EditBalanceCheck(balanceCorrection))
+      Bootstrap.Button(size = Size.xs, tag = link)(
+        Bootstrap.FontAwesomeIcon("pencil", fixedWidth = true)
+      )
+    }
   }
 }
 

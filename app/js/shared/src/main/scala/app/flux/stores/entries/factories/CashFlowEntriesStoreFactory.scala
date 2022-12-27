@@ -9,6 +9,7 @@ import app.flux.stores.entries.CashFlowEntry
 import app.flux.stores.entries.WithIsPending
 import app.flux.stores.entries.WithIsPending.isAnyPending
 import app.flux.stores.entries.WithIsPending.isPending
+import app.flux.stores.entries.factories.CashFlowEntriesStoreFactory.CashFlowAdditionalInput
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppJsEntityAccess
 import app.models.access.ModelFields
@@ -30,9 +31,9 @@ final class CashFlowEntriesStoreFactory(implicit
     accountingConfig: Config,
     currencyValueManager: CurrencyValueManager,
     accountingEntryUtils: AccountingEntryUtils,
-) extends EntriesListStoreFactory[CashFlowEntry, MoneyReservoir] {
+) extends EntriesListStoreFactory[CashFlowEntry, CashFlowAdditionalInput] {
 
-  override protected def createNew(maxNumEntries: Int, moneyReservoir: MoneyReservoir) = new Store {
+  override protected def createNew(maxNumEntries: Int, additionalInput: CashFlowAdditionalInput) = new Store {
     override protected def calculateState() = async {
       val oldestRelevantBalanceCheck: Option[BalanceCheck] = {
         val numTransactionsToFetch = 3 * maxNumEntries
@@ -40,7 +41,7 @@ final class CashFlowEntriesStoreFactory(implicit
           await(
             entityAccess
               .newQuery[Transaction]()
-              .filter(ModelFields.Transaction.moneyReservoirCode === moneyReservoir.code)
+              .filter(ModelFields.Transaction.moneyReservoirCode === reservoir.code)
               .count()
           )
 
@@ -53,7 +54,7 @@ final class CashFlowEntriesStoreFactory(implicit
             await(
               entityAccess
                 .newQuery[Transaction]()
-                .filter(ModelFields.Transaction.moneyReservoirCode === moneyReservoir.code)
+                .filter(ModelFields.Transaction.moneyReservoirCode === reservoir.code)
                 .sort(AppDbQuerySorting.Transaction.deterministicallyByTransactionDate.reversed)
                 .limit(numTransactionsToFetch)
                 .data()
@@ -63,7 +64,7 @@ final class CashFlowEntriesStoreFactory(implicit
           await(
             entityAccess
               .newQuery[BalanceCheck]()
-              .filter(ModelFields.BalanceCheck.moneyReservoirCode === moneyReservoir.code)
+              .filter(ModelFields.BalanceCheck.moneyReservoirCode === reservoir.code)
               .filter(ModelFields.BalanceCheck.checkDate < oldestTransDate)
               .sort(AppDbQuerySorting.BalanceCheck.deterministicallyByCheckDate.reversed)
               .limit(1)
@@ -75,7 +76,7 @@ final class CashFlowEntriesStoreFactory(implicit
       val transactionsAndBalanceChecks =
         await(
           accountingEntryUtils.getTransactionsAndBalanceChecks(
-            reservoir = moneyReservoir,
+            reservoir = reservoir,
             oldestRelevantBalanceCheck = oldestRelevantBalanceCheck,
           )
         )
@@ -109,7 +110,7 @@ final class CashFlowEntriesStoreFactory(implicit
             RegularEntry(x.transactions ++ y.transactions, y.balance, balanceVerified = false) :: rest
           )
         case (x: BalanceCorrection) :: (y: BalanceCorrection) :: rest
-            if x.balanceCheck.balance == y.balanceCheck.balance =>
+            if x.balanceCheck.balance == y.balanceCheck.balance && compactBalanceChecks =>
           combineSimilar(x :: rest)
         case entry :: rest =>
           entry #:: combineSimilar(rest)
@@ -118,16 +119,18 @@ final class CashFlowEntriesStoreFactory(implicit
       }
       entries = combineSimilar(entries).toList
 
-      // merge validating BalanceCorrections into RegularEntries (recursion does not lead to growing stack because of Stream)
-      def mergeValidatingBCs(nextEntries: List[CashFlowEntry]): Stream[CashFlowEntry] = nextEntries match {
-        case (regular: RegularEntry) :: BalanceCorrection(bc, _) :: rest if regular.balance == bc.balance =>
-          mergeValidatingBCs(regular.copy(balanceVerified = true) :: rest)
-        case entry :: rest =>
-          entry #:: mergeValidatingBCs(rest)
-        case Nil =>
-          Stream.empty
+      if (compactBalanceChecks) {
+        // merge validating BalanceCorrections into RegularEntries (recursion does not lead to growing stack because of Stream)
+        def mergeValidatingBCs(nextEntries: List[CashFlowEntry]): Stream[CashFlowEntry] = nextEntries match {
+          case (regular: RegularEntry) :: BalanceCorrection(bc, _) :: rest if regular.balance == bc.balance =>
+            mergeValidatingBCs(regular.copy(balanceVerified = true) :: rest)
+          case entry :: rest =>
+            entry #:: mergeValidatingBCs(rest)
+          case Nil =>
+            Stream.empty
+        }
+        entries = mergeValidatingBCs(entries).toList
       }
-      entries = mergeValidatingBCs(entries).toList
 
       EntriesListStoreFactory.State(
         entries.takeRight(maxNumEntries).map(addIsPending),
@@ -138,17 +141,37 @@ final class CashFlowEntriesStoreFactory(implicit
     }
 
     override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) =
-      transaction.moneyReservoir == moneyReservoir
+      transaction.moneyReservoir == reservoir
 
     override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) =
-      balanceCheck.moneyReservoir == moneyReservoir
+      balanceCheck.moneyReservoir == reservoir
 
     private def addIsPending(entry: CashFlowEntry): WithIsPending[CashFlowEntry] = entry match {
       case e: RegularEntry      => WithIsPending(e, isPending = isAnyPending(e.transactions))
       case e: BalanceCorrection => WithIsPending(e, isPending = isPending(e.balanceCheck))
     }
+
+    private def reservoir: MoneyReservoir = {
+      additionalInput.reservoir
+    }
+    private def compactBalanceChecks: Boolean = {
+      !additionalInput.showAllBalanceChecks
+    }
   }
 
-  def get(moneyReservoir: MoneyReservoir, maxNumEntries: Int): Store =
-    get(Input(maxNumEntries = maxNumEntries, additionalInput = moneyReservoir))
+  def get(reservoir: MoneyReservoir, maxNumEntries: Int, showAllBalanceChecks: Boolean = false): Store = {
+    get(
+      Input(
+        maxNumEntries = maxNumEntries,
+        additionalInput =
+          CashFlowAdditionalInput(reservoir = reservoir, showAllBalanceChecks = showAllBalanceChecks),
+      )
+    )
+  }
+}
+object CashFlowEntriesStoreFactory {
+  case class CashFlowAdditionalInput(
+      reservoir: MoneyReservoir,
+      showAllBalanceChecks: Boolean,
+  )
 }
