@@ -7,6 +7,7 @@ import hydro.common.JsLoggingUtils.logExceptions
 import hydro.flux.stores.StateStore
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.component.builder.Builder
+import japgolly.scalajs.react.component.builder.Lifecycle
 import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
@@ -32,82 +33,57 @@ abstract class HydroReactComponent {
     var step4: Builder.Step4[Props, Children.None, State, Backend] =
       step3.renderPS((scope, props, state) => scope.backend.render(props, state))
 
+    val hasHooks = config.maybeStateStoresDependencies.isDefined
+    val hooks = config.maybeStateStoresDependencies.map(
+      new StateStoreDependencyHooks(_)
+    ) getOrElse StateStoreDependencyHooks.none
+
     val dummyBackend = config.backendConstructor(null)
-    if (dummyBackend.isInstanceOf[WillMount]) {
-      step4 = step4
-        .componentWillMount(scope =>
-          scope.backend.asInstanceOf[WillMount].willMount(scope.props, scope.state)
-        )
+    if (dummyBackend.isInstanceOf[WillMount] || hasHooks) {
+      step4 = step4.componentWillMount { scope =>
+        logExceptions {
+          hooks.willMount(scope) >>
+            TraitCaster.getWillMountOrDefault(scope.backend).willMount(scope.props, scope.state)
+        }
+      }
     }
-    if (dummyBackend.isInstanceOf[WillUnmount]) {
+    if (dummyBackend.isInstanceOf[WillUnmount] || hasHooks) {
       step4 = step4
-        .componentWillUnmount(scope =>
-          scope.backend.asInstanceOf[WillUnmount].willUnmount(scope.props, scope.state)
-        )
+        .componentWillUnmount { scope =>
+          logExceptions {
+            hooks.willUnmount(scope) >>
+              TraitCaster.getWillUnmountOrDefault(scope.backend).willUnmount(scope.props, scope.state)
+          }
+        }
     }
     if (dummyBackend.isInstanceOf[DidMount]) {
-      step4 = step4
-        .componentDidMount(scope => scope.backend.asInstanceOf[DidMount].didMount(scope.props, scope.state))
+      step4 = step4.componentDidMount { scope =>
+        logExceptions { TraitCaster.getDidMountOrDefault(scope.backend).didMount(scope.props, scope.state) }
+      }
     }
-    if (dummyBackend.isInstanceOf[WillReceiveProps]) {
-      step4 = step4
-        .componentWillReceiveProps(scope =>
-          scope.backend
-            .asInstanceOf[WillReceiveProps]
-            .willReceiveProps(currentProps = scope.currentProps, nextProps = scope.nextProps, scope.state)
-        )
+    if (dummyBackend.isInstanceOf[WillReceiveProps] || hasHooks) {
+      step4 = step4.componentWillReceiveProps { scope =>
+        logExceptions {
+          hooks.willReceiveProps(scope) >>
+            TraitCaster
+              .getWillReceivePropsOrDefault(scope.backend)
+              .willReceiveProps(currentProps = scope.currentProps, nextProps = scope.nextProps, scope.state)
+        }
+      }
     }
     if (dummyBackend.isInstanceOf[DidUpdate]) {
-      step4 = step4
-        .componentDidUpdate(scope =>
-          scope.backend
-            .asInstanceOf[DidUpdate]
+      step4 = step4.componentDidUpdate { scope =>
+        logExceptions {
+          TraitCaster
+            .getDidUpdateOrDefault(scope.backend)
             .didUpdate(
               prevProps = scope.prevProps,
               currentProps = scope.currentProps,
               prevState = scope.prevState,
               currentState = scope.currentState,
             )
-        )
-    }
-    if (config.maybeStateStoresDependencies.nonEmpty) {
-      step4 = step4
-        .componentWillMount { scope =>
-          logExceptions {
-            for (StateStoresDependency(store, _) <- config.stateStoresDependencies(scope.props)) {
-              store.register(scope.backend)
-            }
-            scope.backend.updateStateFromStoresCallback(scope.props)
-          }
         }
-        .componentWillReceiveProps { scope =>
-          logExceptions {
-            var anythingChanged = false
-            for {
-              (StateStoresDependency(oldStore, _), StateStoresDependency(newStore, _)) <-
-                config.stateStoresDependencies(scope.currentProps) zip config.stateStoresDependencies(
-                  scope.nextProps
-                )
-              if oldStore != newStore
-            } {
-              oldStore.deregister(scope.backend)
-              newStore.register(scope.backend)
-              anythingChanged = true
-            }
-            if (anythingChanged) {
-              scope.backend.updateStateFromStoresCallback(scope.nextProps)
-            } else {
-              Callback.empty
-            }
-          }
-        }
-        .componentWillUnmount { scope =>
-          LogExceptionsCallback {
-            for (StateStoresDependency(store, _) <- config.stateStoresDependencies(scope.props)) {
-              store.deregister(scope.backend)
-            }
-          }
-        }
+      }
     }
     step4.build
   }
@@ -187,6 +163,82 @@ abstract class HydroReactComponent {
         componentName = componentName,
         maybeStateStoresDependencies = stateStoresDependencies,
       )
+    }
+  }
+
+  // **************** Private helper methods ****************//
+  private class StateStoreDependencyHooks(dependencies: Props => Seq[StateStoresDependency]) {
+    def willMount(scope: Lifecycle.ComponentWillMount[Props, State, Backend]): Callback = {
+      for (StateStoresDependency(store, _) <- dependencies(scope.props)) {
+        store.register(scope.backend)
+      }
+      scope.backend.updateStateFromStoresCallback(scope.props)
+    }
+    def willReceiveProps(
+        scope: Lifecycle.ComponentWillReceiveProps[Props, State, Backend]
+    ): Callback = {
+      var anythingChanged = false
+      for {
+        (StateStoresDependency(oldStore, _), StateStoresDependency(newStore, _)) <-
+          dependencies(scope.currentProps) zip dependencies(scope.nextProps)
+        if oldStore != newStore
+      } {
+        oldStore.deregister(scope.backend)
+        newStore.register(scope.backend)
+        anythingChanged = true
+      }
+      if (anythingChanged) {
+        scope.backend.updateStateFromStoresCallback(scope.nextProps)
+      } else {
+        Callback.empty
+      }
+    }
+
+    def willUnmount(
+        scope: Lifecycle.ComponentWillUnmount[Props, State, Backend]
+    ): Callback = {
+      for (StateStoresDependency(store, _) <- dependencies(scope.props)) {
+        store.deregister(scope.backend)
+      }
+      Callback.empty
+    }
+  }
+  private object StateStoreDependencyHooks {
+    def none: StateStoreDependencyHooks = {
+      new StateStoreDependencyHooks(_ => Seq())
+    }
+  }
+
+  private object TraitCaster {
+    def getWillMountOrDefault(backend: Backend): WillMount = {
+      backend match {
+        case b: WillMount => b
+        case _            => (_, _) => Callback.empty
+      }
+    }
+    def getWillUnmountOrDefault(backend: Backend): WillUnmount = {
+      backend match {
+        case b: WillUnmount => b
+        case _              => (_, _) => Callback.empty
+      }
+    }
+    def getDidMountOrDefault(backend: Backend): DidMount = {
+      backend match {
+        case b: DidMount => b
+        case _           => (_, _) => Callback.empty
+      }
+    }
+    def getWillReceivePropsOrDefault(backend: Backend): WillReceiveProps = {
+      backend match {
+        case b: WillReceiveProps => b
+        case _                   => (_, _, _) => Callback.empty
+      }
+    }
+    def getDidUpdateOrDefault(backend: Backend): DidUpdate = {
+      backend match {
+        case b: DidUpdate => b
+        case _            => (_, _, _, _) => Callback.empty
+      }
     }
   }
 }
