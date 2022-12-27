@@ -148,6 +148,35 @@ table.table-bordered {
   }
 }
 
+/****** tooltips ******/
+.with-tooltip {
+  position: relative;
+  display: inline-block;
+
+  .tooltiptext {
+    visibility: hidden;
+    width: 140px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+
+    font-size: 13px;
+    font-style: normal;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+    top: 38px;
+    left: -18px;
+  }
+
+  &:hover .tooltiptext {
+    visibility: visible;
+  }
+}
+
 /****** facto-custom-switch-button ******/
 // Inspired by https://bootsnipp.com/snippets/xp0QM
 .facto-custom-switch-button {
