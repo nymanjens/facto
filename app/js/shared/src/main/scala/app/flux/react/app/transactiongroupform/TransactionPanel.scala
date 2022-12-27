@@ -50,13 +50,13 @@ import scala.collection.immutable.Seq
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 private[transactiongroupform] final class TransactionPanel(implicit
-                                                           i18n: I18n,
-                                                           accountingConfig: Config,
-                                                           user: User,
-                                                           currencyValueManager: CurrencyValueManager,
-                                                           clock: Clock,
-                                                           entityAccess: AppJsEntityAccess,
-                                                           tagsStoreFactory: TagsStoreFactory,
+    i18n: I18n,
+    accountingConfig: Config,
+    user: User,
+    currencyValueManager: CurrencyValueManager,
+    clock: Clock,
+    entityAccess: AppJsEntityAccess,
+    tagsStoreFactory: TagsStoreFactory,
 ) {
 
   private val anythingChangedQueue = SinglePendingTaskQueue.create()

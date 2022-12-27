@@ -26,10 +26,10 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 final class CashFlowEntriesStoreFactory(implicit
-                                        entityAccess: AppJsEntityAccess,
-                                        accountingConfig: Config,
-                                        currencyValueManager: CurrencyValueManager,
-                                        accountingEntryUtils: AccountingEntryUtils,
+    entityAccess: AppJsEntityAccess,
+    accountingConfig: Config,
+    currencyValueManager: CurrencyValueManager,
+    accountingEntryUtils: AccountingEntryUtils,
 ) extends EntriesListStoreFactory[CashFlowEntry, MoneyReservoir] {
 
   override protected def createNew(maxNumEntries: Int, moneyReservoir: MoneyReservoir) = new Store {

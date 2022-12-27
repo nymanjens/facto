@@ -22,15 +22,15 @@ import japgolly.scalajs.react.vdom.html_<^._
 import scala.collection.immutable.Seq
 
 final class Summary(implicit
-                    summaryTable: SummaryTable,
-                    entityAccess: AppJsEntityAccess,
-                    user: User,
-                    clock: Clock,
-                    accountingConfig: Config,
-                    currencyValueManager: CurrencyValueManager,
-                    i18n: I18n,
-                    pageHeader: PageHeader,
-                    inMemoryUserConfigStore: InMemoryUserConfigStore,
+    summaryTable: SummaryTable,
+    entityAccess: AppJsEntityAccess,
+    user: User,
+    clock: Clock,
+    accountingConfig: Config,
+    currencyValueManager: CurrencyValueManager,
+    i18n: I18n,
+    pageHeader: PageHeader,
+    inMemoryUserConfigStore: InMemoryUserConfigStore,
 ) extends HydroReactComponent {
 
   // **************** API ****************//

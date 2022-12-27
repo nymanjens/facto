@@ -79,8 +79,8 @@ object MoneyInput {
       listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance,
       addon: Value => Option[VdomNode] = _ => None,
   )(implicit
-    currencyValueManager: CurrencyValueManager,
-    i18n: I18n,
+      currencyValueManager: CurrencyValueManager,
+      i18n: I18n,
   ): VdomElement = {
     val props = Props[Value, ExtraProps](
       label = label,

@@ -27,17 +27,17 @@ import japgolly.scalajs.react.vdom.html_<^._
 import scala.collection.immutable.Seq
 
 final class Endowments(implicit
-                       entriesStoreFactory: EndowmentEntriesStoreFactory,
-                       collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
-                       entityAccess: AppJsEntityAccess,
-                       clock: Clock,
-                       accountingConfig: Config,
-                       user: User,
-                       currencyValueManager: CurrencyValueManager,
-                       i18n: I18n,
-                       pageHeader: PageHeader,
-                       descriptionWithEntryCount: DescriptionWithEntryCount,
-                       inMemoryUserConfigStore: InMemoryUserConfigStore,
+    entriesStoreFactory: EndowmentEntriesStoreFactory,
+    collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
+    entityAccess: AppJsEntityAccess,
+    clock: Clock,
+    accountingConfig: Config,
+    user: User,
+    currencyValueManager: CurrencyValueManager,
+    i18n: I18n,
+    pageHeader: PageHeader,
+    descriptionWithEntryCount: DescriptionWithEntryCount,
+    inMemoryUserConfigStore: InMemoryUserConfigStore,
 ) extends HydroReactComponent {
 
   private val entriesListTable: EntriesListTable[GeneralEntry, Account] = new EntriesListTable

@@ -14,9 +14,9 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
 private[transactiongroupform] final class TotalFlowInput(implicit
-                                                         i18n: I18n,
-                                                         clock: Clock,
-                                                         currencyValueManager: CurrencyValueManager,
+    i18n: I18n,
+    clock: Clock,
+    currencyValueManager: CurrencyValueManager,
 ) {
 
   private val component = ScalaComponent

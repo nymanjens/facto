@@ -37,12 +37,12 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 /** Store factory that calculates the monthly gains and losses made by inflation. */
 final class SummaryInflationGainsStoreFactory(implicit
-                                              entityAccess: AppJsEntityAccess,
-                                              currencyValueManager: CurrencyValueManager,
-                                              accountingConfig: Config,
-                                              complexQueryFilter: ComplexQueryFilter,
-                                              clock: Clock,
-                                              accountingEntryUtils: AccountingEntryUtils,
+    entityAccess: AppJsEntityAccess,
+    currencyValueManager: CurrencyValueManager,
+    accountingConfig: Config,
+    complexQueryFilter: ComplexQueryFilter,
+    clock: Clock,
+    accountingEntryUtils: AccountingEntryUtils,
 ) extends EntriesStoreFactory[InflationGains] {
 
   // **************** Public API ****************//

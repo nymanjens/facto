@@ -30,16 +30,16 @@ import scala.collection.immutable.Seq
 import scala.scalajs.js
 
 final class SearchResults(implicit
-                          complexQueryStoreFactory: ComplexQueryStoreFactory,
-                          entityAccess: AppJsEntityAccess,
-                          clock: Clock,
-                          accountingConfig: Config,
-                          currencyValueManager: CurrencyValueManager,
-                          i18n: I18n,
-                          pageHeader: PageHeader,
-                          descriptionWithEntryCount: DescriptionWithEntryCount,
-                          searchResultsEditAllPanel: SearchResultsEditAllPanel,
-                          inMemoryUserConfigStore: InMemoryUserConfigStore,
+    complexQueryStoreFactory: ComplexQueryStoreFactory,
+    entityAccess: AppJsEntityAccess,
+    clock: Clock,
+    accountingConfig: Config,
+    currencyValueManager: CurrencyValueManager,
+    i18n: I18n,
+    pageHeader: PageHeader,
+    descriptionWithEntryCount: DescriptionWithEntryCount,
+    searchResultsEditAllPanel: SearchResultsEditAllPanel,
+    inMemoryUserConfigStore: InMemoryUserConfigStore,
 ) extends HydroReactComponent {
 
   private val entriesListTable: EntriesListTable[GeneralEntry, ComplexQueryStoreFactory.Query] =

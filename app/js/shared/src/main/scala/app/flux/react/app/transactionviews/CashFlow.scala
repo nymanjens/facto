@@ -37,18 +37,18 @@ import scala.collection.immutable.Seq
 import scala.scalajs.js
 
 final class CashFlow(implicit
-                     entriesStoreFactory: CashFlowEntriesStoreFactory,
-                     collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
-                     dispatcher: Dispatcher,
-                     entityAccess: AppJsEntityAccess,
-                     clock: Clock,
-                     accountingConfig: Config,
-                     user: User,
-                     currencyValueManager: CurrencyValueManager,
-                     i18n: I18n,
-                     pageHeader: PageHeader,
-                     descriptionWithEntryCount: DescriptionWithEntryCount,
-                     inMemoryUserConfigStore: InMemoryUserConfigStore,
+    entriesStoreFactory: CashFlowEntriesStoreFactory,
+    collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
+    dispatcher: Dispatcher,
+    entityAccess: AppJsEntityAccess,
+    clock: Clock,
+    accountingConfig: Config,
+    user: User,
+    currencyValueManager: CurrencyValueManager,
+    i18n: I18n,
+    pageHeader: PageHeader,
+    descriptionWithEntryCount: DescriptionWithEntryCount,
+    inMemoryUserConfigStore: InMemoryUserConfigStore,
 ) extends HydroReactComponent {
 
   private val entriesListTable: EntriesListTable[CashFlowEntry, MoneyReservoir] = new EntriesListTable
@@ -140,9 +140,17 @@ final class CashFlow(implicit
                             <.td(entry.beneficiaries.map(_.shorterName).mkString(", ")),
                             <.td(entry.categories.map(_.name).mkString(", ")),
                             <.td(descriptionWithEntryCount(entry)),
-                            <.td(uielements.MoneyWithCurrency.sum(entry.flows, correctForInflation = state.correctForInflation)),
                             <.td(
-                              uielements.MoneyWithCurrency(entry.balance, correctForInflation = state.correctForInflation),
+                              uielements.MoneyWithCurrency.sum(
+                                entry.flows,
+                                correctForInflation = state.correctForInflation,
+                              )
+                            ),
+                            <.td(
+                              uielements.MoneyWithCurrency(
+                                entry.balance,
+                                correctForInflation = state.correctForInflation,
+                              ),
                               entry.balanceVerified match {
                                 case true =>
                                   <.span(" ", Bootstrap.FontAwesomeIcon("check", fixedWidth = true))

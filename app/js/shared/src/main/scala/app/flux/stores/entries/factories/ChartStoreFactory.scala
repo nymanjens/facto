@@ -32,13 +32,13 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
  * Store factory that calculates the points on a graph based on a search query. This includes exchange rate gains.
  */
 final class ChartStoreFactory(implicit
-                              entityAccess: AppJsEntityAccess,
-                              accountingConfig: Config,
-                              complexQueryFilter: ComplexQueryFilter,
-                              summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
-                              summaryInflationGainsStoreFactory: SummaryInflationGainsStoreFactory,
-                              currencyValueManager: CurrencyValueManager,
-                              clock: Clock,
+    entityAccess: AppJsEntityAccess,
+    accountingConfig: Config,
+    complexQueryFilter: ComplexQueryFilter,
+    summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
+    summaryInflationGainsStoreFactory: SummaryInflationGainsStoreFactory,
+    currencyValueManager: CurrencyValueManager,
+    clock: Clock,
 ) extends StoreFactory {
   // **************** Public API **************** //
   def get(query: String, correctForInflation: Boolean): Store = {

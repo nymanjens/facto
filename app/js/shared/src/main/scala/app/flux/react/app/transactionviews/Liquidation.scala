@@ -29,16 +29,16 @@ import japgolly.scalajs.react.vdom.html_<^._
 import scala.collection.immutable.Seq
 
 final class Liquidation(implicit
-                        entriesStoreFactory: LiquidationEntriesStoreFactory,
-                        collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
-                        entityAccess: AppJsEntityAccess,
-                        clock: Clock,
-                        accountingConfig: Config,
-                        user: User,
-                        currencyValueManager: CurrencyValueManager,
-                        i18n: I18n,
-                        pageHeader: PageHeader,
-                        descriptionWithEntryCount: DescriptionWithEntryCount,
+    entriesStoreFactory: LiquidationEntriesStoreFactory,
+    collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
+    entityAccess: AppJsEntityAccess,
+    clock: Clock,
+    accountingConfig: Config,
+    user: User,
+    currencyValueManager: CurrencyValueManager,
+    i18n: I18n,
+    pageHeader: PageHeader,
+    descriptionWithEntryCount: DescriptionWithEntryCount,
 ) {
 
   private val entriesListTable: EntriesListTable[LiquidationEntry, AccountPair] = new EntriesListTable

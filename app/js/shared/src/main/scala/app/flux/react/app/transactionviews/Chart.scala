@@ -36,17 +36,17 @@ import scala.collection.mutable
 import scala.scalajs.js
 
 final class Chart(implicit
-                  summaryTable: SummaryTable,
-                  entityAccess: AppJsEntityAccess,
-                  user: User,
-                  clock: Clock,
-                  accountingConfig: Config,
-                  currencyValueManager: CurrencyValueManager,
-                  i18n: I18n,
-                  pageHeader: PageHeader,
-                  chartSpecInput: ChartSpecInput,
-                  chartStoreFactory: ChartStoreFactory,
-                  inMemoryUserConfigStore: InMemoryUserConfigStore,
+    summaryTable: SummaryTable,
+    entityAccess: AppJsEntityAccess,
+    user: User,
+    clock: Clock,
+    accountingConfig: Config,
+    currencyValueManager: CurrencyValueManager,
+    i18n: I18n,
+    pageHeader: PageHeader,
+    chartSpecInput: ChartSpecInput,
+    chartStoreFactory: ChartStoreFactory,
+    inMemoryUserConfigStore: InMemoryUserConfigStore,
 ) extends HydroReactComponent {
 
   private val lineColors: Seq[String] =

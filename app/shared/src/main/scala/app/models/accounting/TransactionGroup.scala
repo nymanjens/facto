@@ -47,8 +47,8 @@ object TransactionGroup {
     val withSingleEmptyTransaction: Partial = Partial(transactions = Seq(Transaction.Partial.empty))
 
     def from(group: TransactionGroup, transactions: Seq[Transaction])(implicit
-                                                                      accountingConfig: Config,
-                                                                      currencyValueManager: CurrencyValueManager,
+        accountingConfig: Config,
+        currencyValueManager: CurrencyValueManager,
     ): Partial = {
       val isZeroSum = transactions.map(_.flow.exchangedForReferenceCurrency()).sum == ReferenceMoney(0)
       Partial(

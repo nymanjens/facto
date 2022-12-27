@@ -12,16 +12,16 @@ import hydro.flux.action.Dispatcher
 import hydro.flux.react.uielements.PageHeader
 
 final class Module(implicit
-                   i18n: I18n,
-                   accountingConfig: Config,
-                   user: User,
-                   entityAccess: AppJsEntityAccess,
-                   currencyValueManager: CurrencyValueManager,
-                   globalMessagesStore: GlobalMessagesStore,
-                   inMemoryUserConfigStore: InMemoryUserConfigStore,
-                   dispatcher: Dispatcher,
-                   clock: Clock,
-                   pageHeader: PageHeader,
+    i18n: I18n,
+    accountingConfig: Config,
+    user: User,
+    entityAccess: AppJsEntityAccess,
+    currencyValueManager: CurrencyValueManager,
+    globalMessagesStore: GlobalMessagesStore,
+    inMemoryUserConfigStore: InMemoryUserConfigStore,
+    dispatcher: Dispatcher,
+    clock: Clock,
+    pageHeader: PageHeader,
 ) {
 
   implicit lazy val balanceCheckForm: BalanceCheckForm = new BalanceCheckForm

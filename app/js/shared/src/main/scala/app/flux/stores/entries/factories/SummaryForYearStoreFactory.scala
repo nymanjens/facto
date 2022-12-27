@@ -103,8 +103,8 @@ object SummaryForYearStoreFactory {
     def nonEmpty: Boolean = transactions.nonEmpty
 
     def totalFlow(correctForInflation: Boolean)(implicit
-                                                currencyValueManager: CurrencyValueManager,
-                                                accountingConfig: Config,
+        currencyValueManager: CurrencyValueManager,
+        accountingConfig: Config,
     ): ReferenceMoney = {
       if (correctForInflation) {
         if (_totalFlowCorrectedForInflation eq null) {

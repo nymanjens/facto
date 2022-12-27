@@ -20,14 +20,14 @@ import japgolly.scalajs.react.vdom.html_<^._
 import scala.collection.immutable.Seq
 
 final class Everything(implicit
-                       entriesStoreFactory: AllEntriesStoreFactory,
-                       entityAccess: AppJsEntityAccess,
-                       clock: Clock,
-                       accountingConfig: Config,
-                       currencyValueManager: CurrencyValueManager,
-                       i18n: I18n,
-                       pageHeader: PageHeader,
-                       descriptionWithEntryCount: DescriptionWithEntryCount,
+    entriesStoreFactory: AllEntriesStoreFactory,
+    entityAccess: AppJsEntityAccess,
+    clock: Clock,
+    accountingConfig: Config,
+    currencyValueManager: CurrencyValueManager,
+    i18n: I18n,
+    pageHeader: PageHeader,
+    descriptionWithEntryCount: DescriptionWithEntryCount,
 ) {
 
   private val entriesListTable: EntriesListTable[GeneralEntry, Unit] = new EntriesListTable

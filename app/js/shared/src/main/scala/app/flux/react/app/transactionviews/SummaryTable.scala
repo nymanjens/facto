@@ -46,18 +46,18 @@ import scala.collection.immutable.Seq
 import scala.collection.mutable
 
 private[transactionviews] final class SummaryTable(implicit
-                                                   summaryYearsStoreFactory: SummaryYearsStoreFactory,
-                                                   summaryForYearStoreFactory: SummaryForYearStoreFactory,
-                                                   summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
-                                                   summaryInflationGainsStoreFactory: SummaryInflationGainsStoreFactory,
-                                                   cashFlowEntriesStoreFactory: CashFlowEntriesStoreFactory,
-                                                   entityAccess: AppJsEntityAccess,
-                                                   user: User,
-                                                   clock: Clock,
-                                                   accountingConfig: Config,
-                                                   currencyValueManager: CurrencyValueManager,
-                                                   i18n: I18n,
-                                                   templateMatcher: TemplateMatcher,
+    summaryYearsStoreFactory: SummaryYearsStoreFactory,
+    summaryForYearStoreFactory: SummaryForYearStoreFactory,
+    summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
+    summaryInflationGainsStoreFactory: SummaryInflationGainsStoreFactory,
+    cashFlowEntriesStoreFactory: CashFlowEntriesStoreFactory,
+    entityAccess: AppJsEntityAccess,
+    user: User,
+    clock: Clock,
+    accountingConfig: Config,
+    currencyValueManager: CurrencyValueManager,
+    i18n: I18n,
+    templateMatcher: TemplateMatcher,
 ) {
 
   private val component = {

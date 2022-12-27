@@ -30,9 +30,9 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 final class AccountingEntryUtils(implicit
-                                 entityAccess: AppJsEntityAccess,
-                                 accountingConfig: Config,
-                                 currencyValueManager: CurrencyValueManager,
+    entityAccess: AppJsEntityAccess,
+    accountingConfig: Config,
+    currencyValueManager: CurrencyValueManager,
 ) {
 
   def getTransactionsAndBalanceChecks(

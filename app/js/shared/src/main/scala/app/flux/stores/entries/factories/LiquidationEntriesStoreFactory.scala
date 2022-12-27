@@ -23,9 +23,9 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 final class LiquidationEntriesStoreFactory(implicit
-                                           entityAccess: AppJsEntityAccess,
-                                           accountingConfig: Config,
-                                           currencyValueManager: CurrencyValueManager,
+    entityAccess: AppJsEntityAccess,
+    accountingConfig: Config,
+    currencyValueManager: CurrencyValueManager,
 ) extends EntriesListStoreFactory[LiquidationEntry, AccountPair] {
 
   override protected def createNew(maxNumEntries: Int, accountPair: AccountPair) = new Store {

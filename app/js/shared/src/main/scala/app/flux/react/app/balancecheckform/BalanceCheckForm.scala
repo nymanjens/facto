@@ -33,14 +33,14 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 final class BalanceCheckForm(implicit
-                             i18n: I18n,
-                             clock: Clock,
-                             accountingConfig: Config,
-                             user: User,
-                             entityAccess: AppJsEntityAccess,
-                             currencyValueManager: CurrencyValueManager,
-                             dispatcher: Dispatcher,
-                             pageHeader: PageHeader,
+    i18n: I18n,
+    clock: Clock,
+    accountingConfig: Config,
+    user: User,
+    entityAccess: AppJsEntityAccess,
+    currencyValueManager: CurrencyValueManager,
+    dispatcher: Dispatcher,
+    pageHeader: PageHeader,
 ) {
 
   private val waitForFuture = new WaitForFuture[Props]
