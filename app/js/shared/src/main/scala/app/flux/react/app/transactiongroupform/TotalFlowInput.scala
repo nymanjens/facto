@@ -2,7 +2,7 @@ package app.flux.react.app.transactiongroupform
 
 import hydro.common.I18n
 import app.common.money.Currency
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.common.money.Money
 import app.common.money.ReferenceMoney
 import hydro.common.JsLoggingUtils.LogExceptionsCallback
@@ -14,9 +14,9 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
 private[transactiongroupform] final class TotalFlowInput(implicit
-    i18n: I18n,
-    clock: Clock,
-    exchangeRateManager: ExchangeRateManager,
+                                                         i18n: I18n,
+                                                         clock: Clock,
+                                                         currencyValueManager: CurrencyValueManager,
 ) {
 
   private val component = ScalaComponent

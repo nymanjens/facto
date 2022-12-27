@@ -4,7 +4,7 @@ import hydro.flux.react.uielements.Bootstrap
 import hydro.flux.react.uielements.Bootstrap.Size
 import hydro.flux.react.uielements.Bootstrap.Variant
 import hydro.common.I18n
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.flux.stores.InMemoryUserConfigStore
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Config
@@ -22,15 +22,15 @@ import japgolly.scalajs.react.vdom.html_<^._
 import scala.collection.immutable.Seq
 
 final class Summary(implicit
-    summaryTable: SummaryTable,
-    entityAccess: AppJsEntityAccess,
-    user: User,
-    clock: Clock,
-    accountingConfig: Config,
-    exchangeRateManager: ExchangeRateManager,
-    i18n: I18n,
-    pageHeader: PageHeader,
-    inMemoryUserConfigStore: InMemoryUserConfigStore,
+                    summaryTable: SummaryTable,
+                    entityAccess: AppJsEntityAccess,
+                    user: User,
+                    clock: Clock,
+                    accountingConfig: Config,
+                    currencyValueManager: CurrencyValueManager,
+                    i18n: I18n,
+                    pageHeader: PageHeader,
+                    inMemoryUserConfigStore: InMemoryUserConfigStore,
 ) extends HydroReactComponent {
 
   // **************** API ****************//

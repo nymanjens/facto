@@ -5,7 +5,7 @@ import java.time.Month
 import app.common.money.Currency
 
 import scala.collection.immutable.Seq
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.common.money.Money
 import app.common.money.ReferenceMoney
 import app.common.time.DatedMonth
@@ -36,17 +36,17 @@ import scala.collection.mutable
 import scala.scalajs.js
 
 final class Chart(implicit
-    summaryTable: SummaryTable,
-    entityAccess: AppJsEntityAccess,
-    user: User,
-    clock: Clock,
-    accountingConfig: Config,
-    exchangeRateManager: ExchangeRateManager,
-    i18n: I18n,
-    pageHeader: PageHeader,
-    chartSpecInput: ChartSpecInput,
-    chartStoreFactory: ChartStoreFactory,
-    inMemoryUserConfigStore: InMemoryUserConfigStore,
+                  summaryTable: SummaryTable,
+                  entityAccess: AppJsEntityAccess,
+                  user: User,
+                  clock: Clock,
+                  accountingConfig: Config,
+                  currencyValueManager: CurrencyValueManager,
+                  i18n: I18n,
+                  pageHeader: PageHeader,
+                  chartSpecInput: ChartSpecInput,
+                  chartStoreFactory: ChartStoreFactory,
+                  inMemoryUserConfigStore: InMemoryUserConfigStore,
 ) extends HydroReactComponent {
 
   private val lineColors: Seq[String] =

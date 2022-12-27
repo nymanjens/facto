@@ -26,7 +26,7 @@ object SummaryForYearStoreFactoryTest extends TestSuite {
     implicit val entityAccess = testModule.fakeEntityAccess
     implicit val testAccountingConfig = testModule.testAccountingConfig
     implicit val complexQueryFilter = new ComplexQueryFilter()
-    implicit val exchangeRateManager = testModule.exchangeRateManager
+    implicit val currencyValueManager = testModule.currencyValueManager
     val factory: SummaryForYearStoreFactory = new SummaryForYearStoreFactory()
 
     "empty result" - async {

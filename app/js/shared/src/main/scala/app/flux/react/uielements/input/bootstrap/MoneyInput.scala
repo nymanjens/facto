@@ -5,7 +5,7 @@ import hydro.common.I18n
 import hydro.common.Annotations.visibleForTesting
 import app.common.money.Currency
 import app.common.money.DatedMoney
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.common.money.Money
 import hydro.common.time.LocalDateTime
 import hydro.flux.react.ReactVdomUtils.^^
@@ -79,8 +79,8 @@ object MoneyInput {
       listener: InputBase.Listener[Value] = InputBase.Listener.nullInstance,
       addon: Value => Option[VdomNode] = _ => None,
   )(implicit
-      exchangeRateManager: ExchangeRateManager,
-      i18n: I18n,
+    currencyValueManager: CurrencyValueManager,
+    i18n: I18n,
   ): VdomElement = {
     val props = Props[Value, ExtraProps](
       label = label,
@@ -111,7 +111,7 @@ object MoneyInput {
       forceValue: Option[Long],
       currency: Currency,
       addon: Value => Option[VdomNode],
-  )(implicit val exchangeRateManager: ExchangeRateManager)
+  )(implicit val currencyValueManager: CurrencyValueManager)
 
   // **************** Private inner types ****************//
   /** Number of cents. */

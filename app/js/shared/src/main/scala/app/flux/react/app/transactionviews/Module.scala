@@ -2,7 +2,7 @@ package app.flux.react.app.transactionviews
 
 import app.common.accounting.TemplateMatcher
 import hydro.common.I18n
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.flux.react.uielements.DescriptionWithEntryCount
 import app.flux.stores.GlobalMessagesStore
 import app.flux.stores.InMemoryUserConfigStore
@@ -16,30 +16,30 @@ import hydro.flux.action.Dispatcher
 import hydro.flux.react.uielements.PageHeader
 
 final class Module(implicit
-    i18n: I18n,
-    accountingConfig: Config,
-    user: User,
-    entityAccess: AppJsEntityAccess,
-    dispatcher: Dispatcher,
-    exchangeRateManager: ExchangeRateManager,
-    allEntriesStoreFactory: AllEntriesStoreFactory,
-    cashFlowEntriesStoreFactory: CashFlowEntriesStoreFactory,
-    liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory,
-    endowmentEntriesStoreFactory: EndowmentEntriesStoreFactory,
-    complexQueryStoreFactory: ComplexQueryStoreFactory,
-    summaryForYearStoreFactory: SummaryForYearStoreFactory,
-    summaryYearsStoreFactory: SummaryYearsStoreFactory,
-    summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
-    summaryInflationGainsStoreFactory: SummaryInflationGainsStoreFactory,
-    chartStoreFactory: ChartStoreFactory,
-    collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
-    globalMessagesStore: GlobalMessagesStore,
-    inMemoryUserConfigStore: InMemoryUserConfigStore,
-    clock: Clock,
-    pageHeader: PageHeader,
-    descriptionWithEntryCount: DescriptionWithEntryCount,
-    templateMatcher: TemplateMatcher,
-    tagsStoreFactory: TagsStoreFactory,
+                   i18n: I18n,
+                   accountingConfig: Config,
+                   user: User,
+                   entityAccess: AppJsEntityAccess,
+                   dispatcher: Dispatcher,
+                   currencyValueManager: CurrencyValueManager,
+                   allEntriesStoreFactory: AllEntriesStoreFactory,
+                   cashFlowEntriesStoreFactory: CashFlowEntriesStoreFactory,
+                   liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory,
+                   endowmentEntriesStoreFactory: EndowmentEntriesStoreFactory,
+                   complexQueryStoreFactory: ComplexQueryStoreFactory,
+                   summaryForYearStoreFactory: SummaryForYearStoreFactory,
+                   summaryYearsStoreFactory: SummaryYearsStoreFactory,
+                   summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
+                   summaryInflationGainsStoreFactory: SummaryInflationGainsStoreFactory,
+                   chartStoreFactory: ChartStoreFactory,
+                   collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
+                   globalMessagesStore: GlobalMessagesStore,
+                   inMemoryUserConfigStore: InMemoryUserConfigStore,
+                   clock: Clock,
+                   pageHeader: PageHeader,
+                   descriptionWithEntryCount: DescriptionWithEntryCount,
+                   templateMatcher: TemplateMatcher,
+                   tagsStoreFactory: TagsStoreFactory,
 ) {
 
   implicit lazy val everything = new Everything

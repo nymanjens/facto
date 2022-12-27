@@ -1,6 +1,6 @@
 package app.flux.stores.entries.factories
 
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.common.money.MoneyWithGeneralCurrency
 import app.flux.stores.entries.AccountingEntryUtils
 import app.flux.stores.entries.CashFlowEntry.BalanceCorrection
@@ -26,10 +26,10 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 final class CashFlowEntriesStoreFactory(implicit
-    entityAccess: AppJsEntityAccess,
-    accountingConfig: Config,
-    exchangeRateManager: ExchangeRateManager,
-    accountingEntryUtils: AccountingEntryUtils,
+                                        entityAccess: AppJsEntityAccess,
+                                        accountingConfig: Config,
+                                        currencyValueManager: CurrencyValueManager,
+                                        accountingEntryUtils: AccountingEntryUtils,
 ) extends EntriesListStoreFactory[CashFlowEntry, MoneyReservoir] {
 
   override protected def createNew(maxNumEntries: Int, moneyReservoir: MoneyReservoir) = new Store {

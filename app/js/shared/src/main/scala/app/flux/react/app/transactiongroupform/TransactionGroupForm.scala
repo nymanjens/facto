@@ -1,7 +1,7 @@
 package app.flux.react.app.transactiongroupform
 
 import app.common.money.Currency
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.common.money.ReferenceMoney
 import app.flux.action.AppActions
 import app.flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
@@ -42,19 +42,19 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 final class TransactionGroupForm(implicit
-    i18n: I18n,
-    clock: Clock,
-    accountingConfig: Config,
-    user: User,
-    entityAccess: AppJsEntityAccess,
-    exchangeRateManager: ExchangeRateManager,
-    dispatcher: Dispatcher,
-    transactionPanel: TransactionPanel,
-    addTransactionPanel: AddTransactionPanel,
-    totalFlowInput: TotalFlowInput,
-    totalFlowRestrictionInput: TotalFlowRestrictionInput,
-    liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory,
-    pageHeader: PageHeader,
+                                 i18n: I18n,
+                                 clock: Clock,
+                                 accountingConfig: Config,
+                                 user: User,
+                                 entityAccess: AppJsEntityAccess,
+                                 currencyValueManager: CurrencyValueManager,
+                                 dispatcher: Dispatcher,
+                                 transactionPanel: TransactionPanel,
+                                 addTransactionPanel: AddTransactionPanel,
+                                 totalFlowInput: TotalFlowInput,
+                                 totalFlowRestrictionInput: TotalFlowRestrictionInput,
+                                 liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory,
+                                 pageHeader: PageHeader,
 ) {
 
   private val waitForFuture = new WaitForFuture[Props]

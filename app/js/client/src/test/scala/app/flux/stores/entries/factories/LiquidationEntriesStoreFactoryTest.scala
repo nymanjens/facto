@@ -28,7 +28,7 @@ object LiquidationEntriesStoreFactoryTest extends TestSuite {
   override def tests = TestSuite {
     val testModule = new TestModule()
     implicit val entityAccess = testModule.fakeEntityAccess
-    implicit val exchangeRateManager = testModule.exchangeRateManager
+    implicit val currencyValueManager = testModule.currencyValueManager
     val factory: LiquidationEntriesStoreFactory = new LiquidationEntriesStoreFactory()
 
     "empty result" - async {

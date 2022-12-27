@@ -1,7 +1,7 @@
 package app.flux.stores.entries.factories
 
 import hydro.common.GuavaReplacement.Iterables.getOnlyElement
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.common.money.ReferenceMoney
 import app.flux.stores.entries.WithIsPending.isAnyPending
 import app.flux.stores.entries._
@@ -23,9 +23,9 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 final class LiquidationEntriesStoreFactory(implicit
-    entityAccess: AppJsEntityAccess,
-    accountingConfig: Config,
-    exchangeRateManager: ExchangeRateManager,
+                                           entityAccess: AppJsEntityAccess,
+                                           accountingConfig: Config,
+                                           currencyValueManager: CurrencyValueManager,
 ) extends EntriesListStoreFactory[LiquidationEntry, AccountPair] {
 
   override protected def createNew(maxNumEntries: Int, accountPair: AccountPair) = new Store {

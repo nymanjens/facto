@@ -27,7 +27,7 @@ object CashFlowEntriesStoreFactoryTest extends TestSuite {
   override def tests = TestSuite {
     val testModule = new TestModule()
     implicit val entityAccess = testModule.fakeEntityAccess
-    implicit val exchangeRateManager = testModule.exchangeRateManager
+    implicit val currencyValueManager = testModule.currencyValueManager
     implicit val accountingEntryUtils = new AccountingEntryUtils
     val factory: CashFlowEntriesStoreFactory = new CashFlowEntriesStoreFactory()
 

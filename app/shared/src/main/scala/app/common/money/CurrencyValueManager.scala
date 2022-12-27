@@ -3,7 +3,7 @@ package app.common.money
 import hydro.common.time.LocalDateTime
 
 /** Converter for an amount of money from one currency into another. */
-trait ExchangeRateManager {
+trait CurrencyValueManager {
 
   def getRatioSecondToFirstCurrency(
       firstCurrency: Currency,

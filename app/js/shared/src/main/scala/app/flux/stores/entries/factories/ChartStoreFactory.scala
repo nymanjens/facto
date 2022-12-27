@@ -1,7 +1,7 @@
 package app.flux.stores.entries.factories
 
 import app.common.accounting.ComplexQueryFilter
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.common.money.ReferenceMoney
 import app.common.time.DatedMonth
 import app.flux.stores.entries.factories.ChartStoreFactory.LinePoints
@@ -32,13 +32,13 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
  * Store factory that calculates the points on a graph based on a search query. This includes exchange rate gains.
  */
 final class ChartStoreFactory(implicit
-    entityAccess: AppJsEntityAccess,
-    accountingConfig: Config,
-    complexQueryFilter: ComplexQueryFilter,
-    summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
-    summaryInflationGainsStoreFactory: SummaryInflationGainsStoreFactory,
-    exchangeRateManager: ExchangeRateManager,
-    clock: Clock,
+                              entityAccess: AppJsEntityAccess,
+                              accountingConfig: Config,
+                              complexQueryFilter: ComplexQueryFilter,
+                              summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
+                              summaryInflationGainsStoreFactory: SummaryInflationGainsStoreFactory,
+                              currencyValueManager: CurrencyValueManager,
+                              clock: Clock,
 ) extends StoreFactory {
   // **************** Public API **************** //
   def get(query: String, correctForInflation: Boolean): Store = {

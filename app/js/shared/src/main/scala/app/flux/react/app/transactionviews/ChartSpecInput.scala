@@ -1,6 +1,6 @@
 package app.flux.react.app.transactionviews
 
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.common.accounting.ChartSpec
 import app.common.accounting.ChartSpec.Line
 import app.models.access.AppJsEntityAccess

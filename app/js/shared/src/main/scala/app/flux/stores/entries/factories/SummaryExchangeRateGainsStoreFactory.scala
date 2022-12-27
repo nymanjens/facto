@@ -5,7 +5,7 @@ import java.time.LocalTime
 import app.common.accounting.ComplexQueryFilter
 import app.common.accounting.DateToBalanceFunction
 import app.common.money.Currency
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.common.money.MoneyWithGeneralCurrency
 import app.common.money.ReferenceMoney
 import app.common.time.DatedMonth
@@ -42,11 +42,11 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
  * Store factory that calculates the monthly gains and losses made by exchange rate fluctuations.
  */
 final class SummaryExchangeRateGainsStoreFactory(implicit
-    entityAccess: AppJsEntityAccess,
-    exchangeRateManager: ExchangeRateManager,
-    accountingConfig: Config,
-    clock: Clock,
-    accountingEntryUtils: AccountingEntryUtils,
+                                                 entityAccess: AppJsEntityAccess,
+                                                 currencyValueManager: CurrencyValueManager,
+                                                 accountingConfig: Config,
+                                                 clock: Clock,
+                                                 accountingEntryUtils: AccountingEntryUtils,
 ) extends EntriesStoreFactory[ExchangeRateGains] {
 
   // **************** Public API ****************//

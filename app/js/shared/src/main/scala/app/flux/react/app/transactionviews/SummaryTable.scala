@@ -6,7 +6,7 @@ import hydro.common.I18n
 import hydro.common.Annotations.visibleForTesting
 import hydro.common.Tags
 import app.common.money.Currency
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.common.money.ReferenceMoney
 import app.common.time.DatedMonth
 import app.common.time.YearRange
@@ -46,18 +46,18 @@ import scala.collection.immutable.Seq
 import scala.collection.mutable
 
 private[transactionviews] final class SummaryTable(implicit
-    summaryYearsStoreFactory: SummaryYearsStoreFactory,
-    summaryForYearStoreFactory: SummaryForYearStoreFactory,
-    summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
-    summaryInflationGainsStoreFactory: SummaryInflationGainsStoreFactory,
-    cashFlowEntriesStoreFactory: CashFlowEntriesStoreFactory,
-    entityAccess: AppJsEntityAccess,
-    user: User,
-    clock: Clock,
-    accountingConfig: Config,
-    exchangeRateManager: ExchangeRateManager,
-    i18n: I18n,
-    templateMatcher: TemplateMatcher,
+                                                   summaryYearsStoreFactory: SummaryYearsStoreFactory,
+                                                   summaryForYearStoreFactory: SummaryForYearStoreFactory,
+                                                   summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
+                                                   summaryInflationGainsStoreFactory: SummaryInflationGainsStoreFactory,
+                                                   cashFlowEntriesStoreFactory: CashFlowEntriesStoreFactory,
+                                                   entityAccess: AppJsEntityAccess,
+                                                   user: User,
+                                                   clock: Clock,
+                                                   accountingConfig: Config,
+                                                   currencyValueManager: CurrencyValueManager,
+                                                   i18n: I18n,
+                                                   templateMatcher: TemplateMatcher,
 ) {
 
   private val component = {

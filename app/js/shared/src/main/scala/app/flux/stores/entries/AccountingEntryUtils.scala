@@ -1,7 +1,7 @@
 package app.flux.stores.entries
 
 import app.common.accounting.DateToBalanceFunction
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.common.money.MoneyWithGeneralCurrency
 import app.common.money.ReferenceMoney
 import app.common.time.DatedMonth
@@ -30,9 +30,9 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 final class AccountingEntryUtils(implicit
-    entityAccess: AppJsEntityAccess,
-    accountingConfig: Config,
-    exchangeRateManager: ExchangeRateManager,
+                                 entityAccess: AppJsEntityAccess,
+                                 accountingConfig: Config,
+                                 currencyValueManager: CurrencyValueManager,
 ) {
 
   def getTransactionsAndBalanceChecks(
@@ -218,7 +218,7 @@ object AccountingEntryUtils {
   object GainFromMoneyFunction {
 
     case class GainsFromExchangeRate(correctGainsForInflation: Boolean)(implicit
-        exchangeRateManager: ExchangeRateManager
+        currencyValueManager: CurrencyValueManager
     ) extends GainFromMoneyFunction {
       override def apply(
           startDate: LocalDateTime,
@@ -239,7 +239,7 @@ object AccountingEntryUtils {
     }
 
     case class GainsFromInflation()(implicit
-        exchangeRateManager: ExchangeRateManager
+        currencyValueManager: CurrencyValueManager
     ) extends GainFromMoneyFunction {
       override def apply(
           startDate: LocalDateTime,

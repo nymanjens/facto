@@ -1,6 +1,6 @@
 package app.models.accounting
 
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.common.money.ReferenceMoney
 import app.models.access.AppDbQuerySorting
 import app.models.access.ModelFields
@@ -47,8 +47,8 @@ object TransactionGroup {
     val withSingleEmptyTransaction: Partial = Partial(transactions = Seq(Transaction.Partial.empty))
 
     def from(group: TransactionGroup, transactions: Seq[Transaction])(implicit
-        accountingConfig: Config,
-        exchangeRateManager: ExchangeRateManager,
+                                                                      accountingConfig: Config,
+                                                                      currencyValueManager: CurrencyValueManager,
     ): Partial = {
       val isZeroSum = transactions.map(_.flow.exchangedForReferenceCurrency()).sum == ReferenceMoney(0)
       Partial(

@@ -3,7 +3,7 @@ package app.flux.react.uielements
 import scala.collection.immutable.Seq
 import app.common.money.Currency
 import app.common.money.DatedMoney
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.common.money.Money
 import app.common.money.MoneyWithGeneralCurrency
 import hydro.common.GuavaReplacement.Preconditions
@@ -18,7 +18,7 @@ object MoneyWithCurrency {
   def apply(
       money: Money,
       correctForInflation: Boolean = false,
-  )(implicit exchangeRateManager: ExchangeRateManager): VdomElement = {
+  )(implicit currencyValueManager: CurrencyValueManager): VdomElement = {
     money match {
       case money: DatedMoney => sum(Seq(money), correctForInflation = correctForInflation)
       case money             => render(money)
@@ -28,7 +28,7 @@ object MoneyWithCurrency {
   def sum(
       moneySeq: Seq[DatedMoney],
       correctForInflation: Boolean = false,
-  )(implicit exchangeRateManager: ExchangeRateManager): VdomElement = {
+  )(implicit currencyValueManager: CurrencyValueManager): VdomElement = {
     val currencies = moneySeq.map(_.currency).distinct
     val referenceSum = moneySeq.map(_.exchangedForReferenceCurrency()).sum
 

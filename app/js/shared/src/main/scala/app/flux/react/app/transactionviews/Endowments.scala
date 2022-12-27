@@ -2,7 +2,7 @@ package app.flux.react.app.transactionviews
 
 import hydro.common.Formatting._
 import hydro.common.I18n
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.react.uielements
 import app.flux.react.uielements.CollapseAllExpandAllButtons
@@ -27,17 +27,17 @@ import japgolly.scalajs.react.vdom.html_<^._
 import scala.collection.immutable.Seq
 
 final class Endowments(implicit
-    entriesStoreFactory: EndowmentEntriesStoreFactory,
-    collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
-    entityAccess: AppJsEntityAccess,
-    clock: Clock,
-    accountingConfig: Config,
-    user: User,
-    exchangeRateManager: ExchangeRateManager,
-    i18n: I18n,
-    pageHeader: PageHeader,
-    descriptionWithEntryCount: DescriptionWithEntryCount,
-    inMemoryUserConfigStore: InMemoryUserConfigStore,
+                       entriesStoreFactory: EndowmentEntriesStoreFactory,
+                       collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
+                       entityAccess: AppJsEntityAccess,
+                       clock: Clock,
+                       accountingConfig: Config,
+                       user: User,
+                       currencyValueManager: CurrencyValueManager,
+                       i18n: I18n,
+                       pageHeader: PageHeader,
+                       descriptionWithEntryCount: DescriptionWithEntryCount,
+                       inMemoryUserConfigStore: InMemoryUserConfigStore,
 ) extends HydroReactComponent {
 
   private val entriesListTable: EntriesListTable[GeneralEntry, Account] = new EntriesListTable

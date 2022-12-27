@@ -2,7 +2,7 @@ package app.flux.react.app.transactionviews
 
 import hydro.common.Formatting._
 import hydro.common.I18n
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.react.uielements
 import app.flux.react.uielements.DescriptionWithEntryCount
@@ -20,14 +20,14 @@ import japgolly.scalajs.react.vdom.html_<^._
 import scala.collection.immutable.Seq
 
 final class Everything(implicit
-    entriesStoreFactory: AllEntriesStoreFactory,
-    entityAccess: AppJsEntityAccess,
-    clock: Clock,
-    accountingConfig: Config,
-    exchangeRateManager: ExchangeRateManager,
-    i18n: I18n,
-    pageHeader: PageHeader,
-    descriptionWithEntryCount: DescriptionWithEntryCount,
+                       entriesStoreFactory: AllEntriesStoreFactory,
+                       entityAccess: AppJsEntityAccess,
+                       clock: Clock,
+                       accountingConfig: Config,
+                       currencyValueManager: CurrencyValueManager,
+                       i18n: I18n,
+                       pageHeader: PageHeader,
+                       descriptionWithEntryCount: DescriptionWithEntryCount,
 ) {
 
   private val entriesListTable: EntriesListTable[GeneralEntry, Unit] = new EntriesListTable

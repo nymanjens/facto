@@ -2,7 +2,7 @@ package app.flux.react.app
 
 import app.common.accounting.TemplateMatcher
 import hydro.common.I18n
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.flux.react.app.balancecheckform.BalanceCheckForm
 import app.flux.react.app.transactiongroupform.TransactionGroupForm
 import app.flux.react.uielements.DescriptionWithEntryCount
@@ -20,34 +20,34 @@ import hydro.flux.stores.UserStore
 import hydro.flux.stores.DatabaseExplorerStoreFactory
 
 final class Module(implicit
-    i18n: I18n,
-    accountingConfig: Config,
-    user: User,
-    entityAccess: AppJsEntityAccess,
-    exchangeRateManager: ExchangeRateManager,
-    allEntriesStoreFactory: AllEntriesStoreFactory,
-    cashFlowEntriesStoreFactory: CashFlowEntriesStoreFactory,
-    liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory,
-    endowmentEntriesStoreFactory: EndowmentEntriesStoreFactory,
-    tagsStoreFactory: TagsStoreFactory,
-    complexQueryStoreFactory: ComplexQueryStoreFactory,
-    summaryForYearStoreFactory: SummaryForYearStoreFactory,
-    summaryYearsStoreFactory: SummaryYearsStoreFactory,
-    summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
-    summaryInflationGainsStoreFactory: SummaryInflationGainsStoreFactory,
-    chartStoreFactory: ChartStoreFactory,
-    collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
-    globalMessagesStore: GlobalMessagesStore,
-    inMemoryUserConfigStore: InMemoryUserConfigStore,
-    pageLoadingStateStore: PageLoadingStateStore,
-    pendingModificationsStore: PendingModificationsStore,
-    applicationIsOnlineStore: ApplicationIsOnlineStore,
-    localDatabaseHasBeenLoadedStore: LocalDatabaseHasBeenLoadedStore,
-    userStore: UserStore,
-    databaseExplorerStoreFactory: DatabaseExplorerStoreFactory,
-    dispatcher: Dispatcher,
-    clock: Clock,
-    templateMatcher: TemplateMatcher,
+                   i18n: I18n,
+                   accountingConfig: Config,
+                   user: User,
+                   entityAccess: AppJsEntityAccess,
+                   currencyValueManager: CurrencyValueManager,
+                   allEntriesStoreFactory: AllEntriesStoreFactory,
+                   cashFlowEntriesStoreFactory: CashFlowEntriesStoreFactory,
+                   liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory,
+                   endowmentEntriesStoreFactory: EndowmentEntriesStoreFactory,
+                   tagsStoreFactory: TagsStoreFactory,
+                   complexQueryStoreFactory: ComplexQueryStoreFactory,
+                   summaryForYearStoreFactory: SummaryForYearStoreFactory,
+                   summaryYearsStoreFactory: SummaryYearsStoreFactory,
+                   summaryExchangeRateGainsStoreFactory: SummaryExchangeRateGainsStoreFactory,
+                   summaryInflationGainsStoreFactory: SummaryInflationGainsStoreFactory,
+                   chartStoreFactory: ChartStoreFactory,
+                   collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
+                   globalMessagesStore: GlobalMessagesStore,
+                   inMemoryUserConfigStore: InMemoryUserConfigStore,
+                   pageLoadingStateStore: PageLoadingStateStore,
+                   pendingModificationsStore: PendingModificationsStore,
+                   applicationIsOnlineStore: ApplicationIsOnlineStore,
+                   localDatabaseHasBeenLoadedStore: LocalDatabaseHasBeenLoadedStore,
+                   userStore: UserStore,
+                   databaseExplorerStoreFactory: DatabaseExplorerStoreFactory,
+                   dispatcher: Dispatcher,
+                   clock: Clock,
+                   templateMatcher: TemplateMatcher,
 ) {
 
   // Configuration of submodules

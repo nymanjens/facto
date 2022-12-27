@@ -1,7 +1,7 @@
 package app.models.money
 
 import app.common.money.Currency
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.models.access.AppJsEntityAccess
 import hydro.common.time.Clock
 import hydro.models.modification.EntityModification
@@ -12,10 +12,10 @@ import scala.collection.immutable.Seq
 import scala.collection.SortedMap
 import scala.collection.mutable
 
-final class JsExchangeRateManager(
+final class JsCurrencyValueManager(
     ratioReferenceToForeignCurrency: Map[Currency, SortedMap[LocalDateTime, Double]]
 )(implicit entityAccess: AppJsEntityAccess, clock: Clock)
-    extends ExchangeRateManager {
+    extends CurrencyValueManager {
   entityAccess.registerListener(JsEntityAccessListener)
 
   private val moneyValueIndexCurrency: Currency = Currency.General("<index>")
@@ -23,7 +23,7 @@ final class JsExchangeRateManager(
   private val measurementsCache: mutable.Map[Currency, SortedMap[LocalDateTime, Double]] =
     mutable.Map(ratioReferenceToForeignCurrency.toVector: _*)
 
-  // **************** Implementation of ExchangeRateManager trait ****************//
+  // **************** Implementation of CurrencyValueManager trait ****************//
   override def getRatioSecondToFirstCurrency(
       firstCurrency: Currency,
       secondCurrency: Currency,

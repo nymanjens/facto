@@ -26,7 +26,7 @@ object SummaryExchangeRateGainsStoreFactoryTest extends TestSuite {
     val testModule = new TestModule()
     implicit val fakeClock = testModule.fakeClock
     implicit val entityAccess = testModule.fakeEntityAccess
-    implicit val exchangeRateManager = testModule.exchangeRateManager
+    implicit val currencyValueManager = testModule.currencyValueManager
     implicit val testAccountingConfig = testModule.testAccountingConfig
     implicit val complexQueryFilter = new ComplexQueryFilter()
     implicit val accountingEntryUtils = new AccountingEntryUtils()

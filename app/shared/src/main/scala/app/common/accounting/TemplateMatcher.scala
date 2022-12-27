@@ -1,6 +1,6 @@
 package app.common.accounting
 
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.common.money.ReferenceMoney
 import app.models.access.AppEntityAccess
 import app.models.accounting.config.Config

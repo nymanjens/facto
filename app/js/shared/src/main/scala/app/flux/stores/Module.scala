@@ -3,7 +3,7 @@ package app.flux.stores
 import app.api.ScalaJsApiClient
 import app.common.accounting.ComplexQueryFilter
 import hydro.common.I18n
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.flux.stores.entries._
 import app.flux.stores.entries.factories._
 import app.models.access.AppJsEntityAccess
@@ -19,15 +19,15 @@ import hydro.flux.stores.DatabaseExplorerStoreFactory
 import hydro.models.access.HydroPushSocketClientFactory
 
 final class Module(implicit
-    i18n: I18n,
-    accountingConfig: Config,
-    user: User,
-    entityAccess: AppJsEntityAccess,
-    exchangeRateManager: ExchangeRateManager,
-    dispatcher: Dispatcher,
-    clock: Clock,
-    scalaJsApiClient: ScalaJsApiClient,
-    hydroPushSocketClientFactory: HydroPushSocketClientFactory,
+                   i18n: I18n,
+                   accountingConfig: Config,
+                   user: User,
+                   entityAccess: AppJsEntityAccess,
+                   currencyValueManager: CurrencyValueManager,
+                   dispatcher: Dispatcher,
+                   clock: Clock,
+                   scalaJsApiClient: ScalaJsApiClient,
+                   hydroPushSocketClientFactory: HydroPushSocketClientFactory,
 ) {
 
   new TransactionAndGroupStore

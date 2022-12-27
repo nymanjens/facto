@@ -2,7 +2,7 @@ package app.flux.stores.entries.factories
 
 import app.common.accounting.ComplexQueryFilter
 import app.common.accounting.DateToBalanceFunction
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.common.money.MoneyWithGeneralCurrency
 import app.common.money.ReferenceMoney
 import app.common.time.DatedMonth
@@ -37,12 +37,12 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 /** Store factory that calculates the monthly gains and losses made by inflation. */
 final class SummaryInflationGainsStoreFactory(implicit
-    entityAccess: AppJsEntityAccess,
-    exchangeRateManager: ExchangeRateManager,
-    accountingConfig: Config,
-    complexQueryFilter: ComplexQueryFilter,
-    clock: Clock,
-    accountingEntryUtils: AccountingEntryUtils,
+                                              entityAccess: AppJsEntityAccess,
+                                              currencyValueManager: CurrencyValueManager,
+                                              accountingConfig: Config,
+                                              complexQueryFilter: ComplexQueryFilter,
+                                              clock: Clock,
+                                              accountingEntryUtils: AccountingEntryUtils,
 ) extends EntriesStoreFactory[InflationGains] {
 
   // **************** Public API ****************//

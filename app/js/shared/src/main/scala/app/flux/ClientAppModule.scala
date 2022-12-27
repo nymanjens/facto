@@ -30,7 +30,7 @@ final class ClientAppModule(implicit
 
   // Create and unpack Models module
   private val modelsModule = new app.models.Module
-  implicit private val exchangeRateManager = modelsModule.exchangeRateManager
+  implicit private val currencyValueManager = modelsModule.currencyValueManager
 
   // Create and unpack app.common modules
   private val appCommonAccountingModule = new app.common.accounting.Module()

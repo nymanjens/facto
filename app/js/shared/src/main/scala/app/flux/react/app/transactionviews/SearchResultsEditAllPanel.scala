@@ -1,7 +1,7 @@
 package app.flux.react.app.transactionviews
 
 import scala.scalajs.js
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.flux.action.AppActions
 import app.flux.action.AppActions.RefactorAction
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy

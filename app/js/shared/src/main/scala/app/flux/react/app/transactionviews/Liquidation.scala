@@ -1,6 +1,6 @@
 package app.flux.react.app.transactionviews
 
-import app.common.money.ExchangeRateManager
+import app.common.money.CurrencyValueManager
 import app.flux.react.app.transactionviews.EntriesListTable.NumEntriesStrategy
 import app.flux.react.uielements
 import app.flux.react.uielements.CollapseAllExpandAllButtons
@@ -29,16 +29,16 @@ import japgolly.scalajs.react.vdom.html_<^._
 import scala.collection.immutable.Seq
 
 final class Liquidation(implicit
-    entriesStoreFactory: LiquidationEntriesStoreFactory,
-    collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
-    entityAccess: AppJsEntityAccess,
-    clock: Clock,
-    accountingConfig: Config,
-    user: User,
-    exchangeRateManager: ExchangeRateManager,
-    i18n: I18n,
-    pageHeader: PageHeader,
-    descriptionWithEntryCount: DescriptionWithEntryCount,
+                        entriesStoreFactory: LiquidationEntriesStoreFactory,
+                        collapsedExpandedStateStoreFactory: CollapsedExpandedStateStoreFactory,
+                        entityAccess: AppJsEntityAccess,
+                        clock: Clock,
+                        accountingConfig: Config,
+                        user: User,
+                        currencyValueManager: CurrencyValueManager,
+                        i18n: I18n,
+                        pageHeader: PageHeader,
+                        descriptionWithEntryCount: DescriptionWithEntryCount,
 ) {
 
   private val entriesListTable: EntriesListTable[LiquidationEntry, AccountPair] = new EntriesListTable

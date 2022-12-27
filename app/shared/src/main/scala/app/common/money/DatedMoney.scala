@@ -13,10 +13,10 @@ case class DatedMoney(override val cents: Long, override val currency: Currency,
 
   def exchangedForReferenceCurrency(
       correctForInflation: Boolean = false
-  )(implicit exchangeRateManager: ExchangeRateManager): ReferenceMoney = {
+  )(implicit currencyValueManager: CurrencyValueManager): ReferenceMoney = {
     val inflationCorrection = {
       if (correctForInflation) {
-        exchangeRateManager.getMoneyValueRatioHistoricalToToday(date)
+        currencyValueManager.getMoneyValueRatioHistoricalToToday(date)
       } else {
         1.0
       }
@@ -26,8 +26,8 @@ case class DatedMoney(override val cents: Long, override val currency: Currency,
 
   def exchangedForCurrency(
       otherCurrency: Currency
-  )(implicit exchangeRateManager: ExchangeRateManager): DatedMoney = {
-    val ratio = exchangeRateManager.getRatioSecondToFirstCurrency(currency, otherCurrency, date)
+  )(implicit currencyValueManager: CurrencyValueManager): DatedMoney = {
+    val ratio = currencyValueManager.getRatioSecondToFirstCurrency(currency, otherCurrency, date)
     val centsInOtherCurrency = roundToLong(ratio * cents)
     DatedMoney(centsInOtherCurrency, otherCurrency, date)
   }
