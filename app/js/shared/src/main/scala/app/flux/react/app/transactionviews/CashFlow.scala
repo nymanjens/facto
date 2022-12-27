@@ -195,24 +195,28 @@ final class CashFlow(implicit
             }
           }
         ).toVdomArray,
-        // includeUnrelatedReservoirs toggle button
-        Bootstrap.Button(Variant.info, Size.lg, block = true, tag = <.a)(
-          ^.onClick --> LogExceptionsCallback(
-            $.modState(s => s.copy(includeUnrelatedReservoirs = !s.includeUnrelatedReservoirs)).runNow()
+        Bootstrap.Row(
+          Bootstrap.Col(sm = 6)(
+            // includeUnrelatedReservoirs toggle button
+            Bootstrap.Button(Variant.info, Size.lg, block = true, tag = <.a)(
+              ^.onClick --> LogExceptionsCallback(
+                $.modState(s => s.copy(includeUnrelatedReservoirs = !s.includeUnrelatedReservoirs)).runNow()
+              ),
+              if (state.includeUnrelatedReservoirs) i18n("app.hide-other-accounts")
+              else i18n("app.show-other-accounts"),
+            )
           ),
-          if (state.includeUnrelatedReservoirs) i18n("app.hide-other-accounts")
-          else i18n("app.show-other-accounts"),
+          Bootstrap.Col(sm = 6)(
+            // includeHiddenReservoirs toggle button
+            Bootstrap.Button(Variant.info, Size.lg, block = true, tag = <.a)(
+              ^.onClick --> LogExceptionsCallback(
+                $.modState(s => s.copy(includeHiddenReservoirs = !s.includeHiddenReservoirs)).runNow()
+              ),
+              if (state.includeHiddenReservoirs) i18n("app.hide-hidden-reservoirs")
+              else i18n("app.show-hidden-reservoirs"),
+            )
+          ),
         ),
-        // includeHiddenReservoirs toggle button
-        <<.ifThen(state.includeHiddenReservoirs || state.includeUnrelatedReservoirs) {
-          Bootstrap.Button(Variant.info, Size.lg, block = true, tag = <.a)(
-            ^.onClick --> LogExceptionsCallback(
-              $.modState(s => s.copy(includeHiddenReservoirs = !s.includeHiddenReservoirs)).runNow()
-            ),
-            if (state.includeHiddenReservoirs) i18n("app.hide-hidden-reservoirs")
-            else i18n("app.show-hidden-reservoirs"),
-          )
-        },
       )
     }
   }
