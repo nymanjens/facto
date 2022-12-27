@@ -731,7 +731,7 @@ private[transactionviews] final class SummaryTable(implicit
         for (reservoir <- accountingConfig.visibleReservoirs) {
           if (reservoir.owner == props.account) {
             val store = cashFlowEntriesStoreFactory.get(
-              moneyReservoir = reservoir,
+              reservoir = reservoir,
               maxNumEntries = CashFlow.minNumEntriesPerReservoir,
             )
 
