@@ -15,6 +15,7 @@ import app.flux.router.AppPages
 import app.flux.stores.entries.CashFlowEntry
 import app.flux.stores.entries.factories.CashFlowEntriesStoreFactory
 import app.flux.stores.CollapsedExpandedStateStoreFactory
+import app.flux.stores.InMemoryUserConfigStore
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.BalanceCheck
 import app.models.accounting.config.Config
@@ -26,6 +27,7 @@ import hydro.flux.action.Dispatcher
 import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.uielements.PageHeader
 import hydro.flux.react.uielements.Panel
+import hydro.flux.react.HydroReactComponent
 import hydro.flux.router.RouterContext
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.VdomArray
@@ -46,16 +48,37 @@ final class CashFlow(implicit
     i18n: I18n,
     pageHeader: PageHeader,
     descriptionWithEntryCount: DescriptionWithEntryCount,
-) {
+    inMemoryUserConfigStore: InMemoryUserConfigStore,
+) extends HydroReactComponent {
 
   private val entriesListTable: EntriesListTable[CashFlowEntry, MoneyReservoir] = new EntriesListTable
   private val collapsedExpandedStateStoreHandle = collapsedExpandedStateStoreFactory
     .initializeView(getClass.getSimpleName, defaultExpanded = user.expandCashFlowTablesByDefault)
 
-  private val component = ScalaComponent
-    .builder[Props](getClass.getSimpleName)
-    .initialState(State(includeUnrelatedReservoirs = false, includeHiddenReservoirs = false))
-    .renderPS(($, props, state) => {
+  // **************** API ****************//
+  def apply(router: RouterContext): VdomElement = {
+    component(Props(router))
+  }
+
+  // **************** Implementation of HydroReactComponent methods ****************//
+  override protected val config = ComponentConfig(backendConstructor = new Backend(_), initialState = State())
+    .withStateStoresDependency(
+      inMemoryUserConfigStore,
+      _.copy(correctForInflation = inMemoryUserConfigStore.state.correctForInflation),
+    )
+
+  // **************** Implementation of HydroReactComponent types ****************//
+  protected case class Props(
+      router: RouterContext
+  )
+  protected case class State(
+      includeUnrelatedReservoirs: Boolean = false,
+      includeHiddenReservoirs: Boolean = false,
+      correctForInflation: Boolean = false,
+  )
+
+  protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
+    override def render(props: Props, state: State) = {
       implicit val router = props.router
       <.span(
         pageHeader.withExtension(router.currentPage) {
@@ -117,9 +140,9 @@ final class CashFlow(implicit
                             <.td(entry.beneficiaries.map(_.shorterName).mkString(", ")),
                             <.td(entry.categories.map(_.name).mkString(", ")),
                             <.td(descriptionWithEntryCount(entry)),
-                            <.td(uielements.MoneyWithCurrency.sum(entry.flows)),
+                            <.td(uielements.MoneyWithCurrency.sum(entry.flows, correctForInflation = state.correctForInflation)),
                             <.td(
-                              uielements.MoneyWithCurrency(entry.balance),
+                              uielements.MoneyWithCurrency(entry.balance, correctForInflation = state.correctForInflation),
                               entry.balanceVerified match {
                                 case true =>
                                   <.span(" ", Bootstrap.FontAwesomeIcon("check", fixedWidth = true))
@@ -183,12 +206,7 @@ final class CashFlow(implicit
           )
         },
       )
-    })
-    .build
-
-  // **************** API ****************//
-  def apply(router: RouterContext): VdomElement = {
-    component(Props(router))
+    }
   }
 
   // **************** Private helper methods ****************//
@@ -236,13 +254,6 @@ final class CashFlow(implicit
       Bootstrap.FontAwesomeIcon("pencil", fixedWidth = true)
     )
   }
-
-  // **************** Private inner types ****************//
-  private case class Props(router: RouterContext)
-  private case class State(
-      includeUnrelatedReservoirs: Boolean,
-      includeHiddenReservoirs: Boolean,
-  )
 }
 
 object CashFlow {
