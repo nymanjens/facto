@@ -203,10 +203,10 @@ final class CashFlow(implicit
                             ),
                             <.td(
                               ^.style := js.Dictionary("fontWeight" -> "bold"),
-                              if (entry.balanceIncrease.cents > 0) "+" else "-",
+                              if (entry.balanceIncrease.cents >= 0) "+" else "-",
                               " ",
                               uielements.MoneyWithCurrency(
-                                if (entry.balanceIncrease.cents > 0) entry.balanceIncrease
+                                if (entry.balanceIncrease.cents >= 0) entry.balanceIncrease
                                 else -entry.balanceIncrease
                               ),
                             ),
