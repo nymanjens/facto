@@ -127,7 +127,8 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](i
   protected class Backend($ : BackendScope[Props, State])
       extends BackendBase($)
       with WillMount
-      with WillUnmount {
+      with WillUnmount
+      with WillReceiveProps {
     private var entriesStore: entriesStoreFactory.Store = _
 
     override def willMount(props: Props, state: State): Callback = LogExceptionsCallback {
@@ -145,6 +146,15 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](i
             .copy(maxNumEntries = maxNumEntries)
         }
       ).runNow()
+    }
+
+    override def willReceiveProps(currentProps: Props, nextProps: Props, state: State): Callback = {
+      entriesStore.deregister(EntriesStoreListener)
+      entriesStore = entriesStoreFactory.get(
+        entriesStoreFactory.Input(maxNumEntries = state.maxNumEntries, nextProps.additionalInput)
+      )
+      entriesStore.register(EntriesStoreListener)
+      $.modState(_.withEntriesFrom(entriesStore))
     }
 
     override def willUnmount(props: Props, state: State): Callback = LogExceptionsCallback {
