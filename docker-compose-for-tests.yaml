@@ -24,3 +24,6 @@ services:
       - /src/project/target/
       - /src/project/project/target/
     command: 'sbt -mem 2048 "~testQuick"'
+
+# Fixes Docker network issue: https://stackoverflow.com/a/62333327
+networks: {default: {ipam: {config: [{subnet: 172.17.0.0/16}]}}}
