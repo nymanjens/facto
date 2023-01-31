@@ -53,7 +53,49 @@ final class ExternalApi @Inject() (implicit
 ) extends AbstractController(components)
     with I18nSupport {
 
-  // ********** actions ********** //
+  // ********** actions: read only ********** //
+  def listBalanceCorrections(applicationSecret: String) = Action { implicit request =>
+    validateApplicationSecret(applicationSecret)
+
+    val resultBuilder = StringBuilder.newBuilder
+    resultBuilder.append("OK\n\n")
+
+    for (moneyReservoir <- accountingConfig.moneyReservoirs(includeHidden = true)) {
+      val balanceCorrections = findBalanceCorrections(moneyReservoir)
+      if (balanceCorrections.nonEmpty) {
+        val extraIfHidden = if (moneyReservoir.hidden) " [HIDDEN]" else ""
+        resultBuilder.append(s"${moneyReservoir.name} (${moneyReservoir.code})${extraIfHidden}:\n")
+        for (correction <- balanceCorrections.reverse) {
+          resultBuilder.append(
+            s"  ${correction.balanceCheck.checkDate.toLocalDate}: " +
+              s"${correction.expectedAmount} -> ${correction.balanceCheck.balance} " +
+              s"(${forceSign(correction.balanceCheck.balance - correction.expectedAmount)})\n"
+          )
+        }
+        resultBuilder.append("\n")
+      }
+    }
+
+    Ok(resultBuilder.toString().trim())
+  }
+
+  def listCurrentBalances(applicationSecret: String) = Action { implicit request =>
+    validateApplicationSecret(applicationSecret)
+
+    val resultBuilder = StringBuilder.newBuilder
+    resultBuilder.append("OK\n\n")
+
+    for (moneyReservoir <- accountingConfig.moneyReservoirs(includeHidden = true)) {
+      val currentBalance = getCurrentBalance(moneyReservoir)
+      resultBuilder.append(
+        s"${moneyReservoir.code}: { balance: ${currentBalance.toDouble}, currency: ${currentBalance.currency.code} }\n"
+      )
+    }
+
+    Ok(resultBuilder.toString().trim())
+  }
+
+  // ********** actions: mutating ********** //
   def addTransactionFromTemplate(templateCode: String, applicationSecret: String) = Action {
     implicit request =>
       validateApplicationSecret(applicationSecret)
@@ -120,47 +162,6 @@ final class ExternalApi @Inject() (implicit
       )
     )
     Ok("OK")
-  }
-
-  def listBalanceCorrections(applicationSecret: String) = Action { implicit request =>
-    validateApplicationSecret(applicationSecret)
-
-    val resultBuilder = StringBuilder.newBuilder
-    resultBuilder.append("OK\n\n")
-
-    for (moneyReservoir <- accountingConfig.moneyReservoirs(includeHidden = true)) {
-      val balanceCorrections = findBalanceCorrections(moneyReservoir)
-      if (balanceCorrections.nonEmpty) {
-        val extraIfHidden = if (moneyReservoir.hidden) " [HIDDEN]" else ""
-        resultBuilder.append(s"${moneyReservoir.name} (${moneyReservoir.code})${extraIfHidden}:\n")
-        for (correction <- balanceCorrections.reverse) {
-          resultBuilder.append(
-            s"  ${correction.balanceCheck.checkDate.toLocalDate}: " +
-              s"${correction.expectedAmount} -> ${correction.balanceCheck.balance} " +
-              s"(${forceSign(correction.balanceCheck.balance - correction.expectedAmount)})\n"
-          )
-        }
-        resultBuilder.append("\n")
-      }
-    }
-
-    Ok(resultBuilder.toString().trim())
-  }
-
-  def listCurrentBalances(applicationSecret: String) = Action { implicit request =>
-    validateApplicationSecret(applicationSecret)
-
-    val resultBuilder = StringBuilder.newBuilder
-    resultBuilder.append("OK\n\n")
-
-    for (moneyReservoir <- accountingConfig.moneyReservoirs(includeHidden = true)) {
-      val currentBalance = getCurrentBalance(moneyReservoir)
-      resultBuilder.append(
-        s"${moneyReservoir.code}: { balance: ${currentBalance.toDouble}, currency: ${currentBalance.currency.code} }\n"
-      )
-    }
-
-    Ok(resultBuilder.toString().trim())
   }
 
   def addTagRefactor(

@@ -19,16 +19,20 @@ GET  /scalajsapi/*path                 hydro.controllers.InternalApi.scalaJsApiG
 GET  /websocket/scalajsapi/            hydro.controllers.InternalApi.scalaJsApiWebsocket
 GET  /websocket/hydropush/:updateToken/  hydro.controllers.InternalApi.hydroPushSocketWebsocket(updateToken)
 
-# External API
+# External API (standard actions)
 GET  /externalapi/healthcheck/         hydro.controllers.StandardActions.healthCheck
 GET  /externalapi/dbschema/:appSecret/  hydro.controllers.StandardActions.databaseSchema(appSecret)
 GET  /externalapi/clearoldentitymodifications/:dryOrWet/:appSecret/  hydro.controllers.StandardActions.clearOldEntityModifications(dryOrWet, appSecret)
+
+# External API (read-only actions)
+GET  /externalapi/acc/bc/list/:appSecret/  app.controllers.ExternalApi.listBalanceCorrections(appSecret)
+GET  /externalapi/acc/balance/list/:appSecret/  app.controllers.ExternalApi.listCurrentBalances(appSecret)
+
+# External API (mutating actions)
 GET  /externalapi/acc/trans/addfromtpl/:tplCode/:appSecret/  app.controllers.ExternalApi.addTransactionFromTemplate(tplCode, appSecret)
 POST /externalapi/acc/trans/add/:appSecret/  app.controllers.ExternalApi.addTransaction(appSecret)
 DELETE /externalapi/acc/trans/:transactionGroupId/:appSecret/  app.controllers.ExternalApi.deleteTransaction(appSecret, transactionGroupId: Long)
 GET  /externalapi/acc/money/xchgmeasurement/:date/:currency/:ratio/:appSecret/  app.controllers.ExternalApi.addExchangeRateMeasurement(date, currency, ratio: Double, appSecret)
-GET  /externalapi/acc/bc/list/:appSecret/  app.controllers.ExternalApi.listBalanceCorrections(appSecret)
-GET  /externalapi/acc/balance/list/:appSecret/  app.controllers.ExternalApi.listCurrentBalances(appSecret)
 GET  /externalapi/acc/refactor/changecategory/:searchString/:newCategory/:dryOrWet/:appSecret/  app.controllers.ExternalApi.refactorTransactionCategory(searchString, newCategory, dryOrWet, appSecret)
 GET  /externalapi/acc/refactor/addtag/:searchString/:tagToAdd/:dryOrWet/:appSecret/  app.controllers.ExternalApi.addTagRefactor(searchString, tagToAdd, dryOrWet, appSecret)
 
