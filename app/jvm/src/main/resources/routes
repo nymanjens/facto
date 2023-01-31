@@ -25,6 +25,7 @@ GET  /externalapi/dbschema/:appSecret/  hydro.controllers.StandardActions.databa
 GET  /externalapi/clearoldentitymodifications/:dryOrWet/:appSecret/  hydro.controllers.StandardActions.clearOldEntityModifications(dryOrWet, appSecret)
 
 # External API (read-only actions)
+GET  /externalapi/acc/reservoirs/list/:appSecret/  app.controllers.ExternalApi.listReservoirs(appSecret)
 GET  /externalapi/acc/bc/list/:appSecret/  app.controllers.ExternalApi.listBalanceCorrections(appSecret)
 GET  /externalapi/acc/balance/list/:appSecret/  app.controllers.ExternalApi.listCurrentBalances(appSecret)
 

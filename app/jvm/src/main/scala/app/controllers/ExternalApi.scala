@@ -1,11 +1,15 @@
 package app.controllers
 
+import net.liftweb.json.DefaultFormats
+import net.liftweb.json.Serialization
+
 import java.net.URLDecoder
 import java.time.LocalTime
-
 import app.common.accounting.ComplexQueryFilter
 import app.common.money.Currency
 import app.common.money.MoneyWithGeneralCurrency
+import app.controllers.ExternalApi.JsonSerializableMoneyReservoir.JsonSerializableBalanceCorrection
+import app.controllers.ExternalApi.JsonSerializableMoneyReservoir
 import app.models.access.AppDbQuerySorting
 import app.models.access.JvmEntityAccess
 import app.models.access.ModelFields
@@ -40,6 +44,7 @@ import play.api.i18n.MessagesApi
 import play.api.mvc._
 
 import scala.collection.immutable.Seq
+import scala.collection.immutable.SortedMap
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
@@ -54,6 +59,40 @@ final class ExternalApi @Inject() (implicit
     with I18nSupport {
 
   // ********** actions: read only ********** //
+  def listReservoirs(applicationSecret: String) = Action { implicit request =>
+    validateApplicationSecret(applicationSecret)
+
+    val moneyReservoirs: Seq[JsonSerializableMoneyReservoir] =
+      for (reservoir <- accountingConfig.moneyReservoirs(includeHidden = true)) yield {
+        val balance = getCurrentBalance(reservoir)
+        val latestBalanceCheck = getLastBalanceCheck(reservoir)
+        val balanceCorrections = findBalanceCorrections(reservoir)
+
+        JsonSerializableMoneyReservoir(
+          code = reservoir.code,
+          name = reservoir.name,
+          ownerAccountCode = reservoir.owner.code,
+          hidden = reservoir.hidden,
+          currencyCode = balance.currency.code,
+          balance = balance.toDouble,
+          lastBalanceCheckDate = latestBalanceCheck.map(_.checkDate.toLocalDate.toString).orNull,
+          balanceCorrections = balanceCorrections.map(bc =>
+            JsonSerializableBalanceCorrection(
+              date = bc.balanceCheck.checkDate.toLocalDate.toString,
+              expectedBalance = bc.expectedAmount.toDouble,
+              checkedBalance = bc.balanceCheck.balance.toDouble,
+            )
+          ),
+        )
+      }
+
+    Ok(
+      JsonSerializableMoneyReservoir.toJson(
+        moneyReservoirs.sortBy(r => (-r.balanceCorrections.size, r.hidden))
+      )
+    )
+  }
+
   def listBalanceCorrections(applicationSecret: String) = Action { implicit request =>
     validateApplicationSecret(applicationSecret)
 
@@ -356,6 +395,12 @@ final class ExternalApi @Inject() (implicit
     findMismatches(mergedRows.toList, currentBalance = MoneyWithGeneralCurrency(0, moneyReservoir.currency))
   }
 
+  private def getLastBalanceCheck(moneyReservoir: MoneyReservoir): Option[BalanceCheck] = {
+    entityAccess
+      .newQuerySync[BalanceCheck]()
+      .sort(AppDbQuerySorting.BalanceCheck.deterministicallyByCheckDate.reversed)
+      .findOne(ModelFields.BalanceCheck.moneyReservoirCode === moneyReservoir.code)
+  }
   private def getCurrentBalance(moneyReservoir: MoneyReservoir): MoneyWithGeneralCurrency = {
     val balanceChecks =
       entityAccess
@@ -470,5 +515,28 @@ final class ExternalApi @Inject() (implicit
         },
       ).flatten
     }
+  }
+}
+object ExternalApi {
+  case class JsonSerializableMoneyReservoir(
+      code: String,
+      name: String,
+      ownerAccountCode: String,
+      hidden: Boolean,
+      currencyCode: String,
+      balance: Double,
+      lastBalanceCheckDate: String,
+      balanceCorrections: Seq[JsonSerializableBalanceCorrection],
+  ) {}
+  object JsonSerializableMoneyReservoir {
+    def toJson(reservoirs: Seq[JsonSerializableMoneyReservoir]): String = {
+      implicit val formats = DefaultFormats
+      Serialization.writePretty(reservoirs)
+    }
+    case class JsonSerializableBalanceCorrection(
+        date: String,
+        expectedBalance: Double,
+        checkedBalance: Double,
+    )
   }
 }

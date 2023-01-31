@@ -75,6 +75,7 @@ object BuildSettings {
       "com.h2database" % "h2" % "1.4.195" % Test,
       "org.xerial" % "sqlite-jdbc" % "3.8.11.2",
       "com.google.code.findbugs" % "jsr305" % "1.3.9",
+      "net.liftweb" %% "lift-json" % "3.4.2",
       "net.jcip" % "jcip-annotations" % "1.0",
       "javax.xml.bind" % "jaxb-api" % "2.3.0"
     ))
