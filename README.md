@@ -19,7 +19,8 @@ Familiy Accounting Tool keeps track of every transaction your family makes. Its 
 
 ## Installation from release
 
-- Download the [latest release](https://github.com/nymanjens/facto/releases)
+- Download "Binaries (compiled files) with demo configuration" from the [latest
+  release](https://github.com/nymanjens/facto/releases)
 - Unpack the archive
 - Open `conf/application.conf` in the unpacked folder:
   - Configure a database. The easiest way is to set up a MariaDB server locally,
