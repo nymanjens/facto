@@ -10,6 +10,7 @@ import app.common.money.Currency
 import app.common.money.MoneyWithGeneralCurrency
 import app.controllers.ExternalApi.JsonSerializableMoneyReservoir.JsonSerializableBalanceCorrection
 import app.controllers.ExternalApi.JsonSerializableMoneyReservoir
+import app.controllers.ExternalApi.JsonSerializableTransaction
 import app.models.access.AppDbQuerySorting
 import app.models.access.JvmEntityAccess
 import app.models.access.ModelFields
@@ -91,6 +92,37 @@ final class ExternalApi @Inject() (implicit
         moneyReservoirs.sortBy(r => (-r.balanceCorrections.size, r.hidden))
       )
     )
+  }
+
+  def searchTransactions(encodedSearchString: String, applicationSecret: String) = Action {
+    implicit request =>
+      validateApplicationSecret(applicationSecret)
+
+      val searchString = decodeUrlEncodedString(encodedSearchString)
+      val searchQuery = (new ComplexQueryFilter).fromQuery(searchString)
+      val matchedTransactions =
+        entityAccess
+          .newQuerySync[Transaction]()
+          .filter(searchQuery)
+          .sort(AppDbQuerySorting.Transaction.deterministicallyByConsumedDate.reversed)
+          .data()
+
+      val serializableTransactions = matchedTransactions.map { transaction =>
+        JsonSerializableTransaction(
+          transactionGroupId = transaction.transactionGroupId,
+          beneficiaryAccountCode = transaction.beneficiaryAccountCode,
+          moneyReservoirCode = transaction.moneyReservoirCode,
+          categoryCode = transaction.categoryCode,
+          description = transaction.description,
+          flowInCents = transaction.flowInCents,
+          tags = transaction.tags,
+          createdDate = transaction.createdDate.toLocalDate.toString,
+          transactionDate = transaction.transactionDate.toLocalDate.toString,
+          consumedDate = transaction.consumedDate.toLocalDate.toString,
+        )
+      }
+
+      Ok(JsonSerializableTransaction.toJson(serializableTransactions))
   }
 
   // ********** actions: mutating ********** //
@@ -217,7 +249,7 @@ final class ExternalApi @Inject() (implicit
   ) = {
     validateApplicationSecret(applicationSecret)
 
-    val searchString = URLDecoder.decode(encodedSearchString.replace("+", "%2B"), "UTF-8")
+    val searchString = decodeUrlEncodedString(encodedSearchString)
     val searchQuery = (new ComplexQueryFilter).fromQuery(searchString)
     val matchedTransactions =
       entityAccess
@@ -298,6 +330,7 @@ final class ExternalApi @Inject() (implicit
       require(!s.isEmpty)
       s
     }
+
     val groupPartial = template.toPartial(Account.nullInstance)
     for (partial <- groupPartial.transactions)
       yield Transaction(
@@ -351,6 +384,7 @@ final class ExternalApi @Inject() (implicit
         case Nil =>
           Nil
       }
+
     findMismatches(mergedRows.toList, currentBalance = MoneyWithGeneralCurrency(0, moneyReservoir.currency))
   }
 
@@ -389,6 +423,7 @@ final class ExternalApi @Inject() (implicit
           nextBalance(rest, bc.balance)
         case Nil => currentBalance
       }
+
     nextBalance(mergedRows.toList, currentBalance = MoneyWithGeneralCurrency(0, moneyReservoir.currency))
   }
 
@@ -405,6 +440,10 @@ final class ExternalApi @Inject() (implicit
       start until end
     }
     entities zip ids
+  }
+
+  private def decodeUrlEncodedString(s: String): String = {
+    URLDecoder.decode(s.replace("+", "%2B"), "UTF-8")
   }
 
   private case class TransactionGroupParsableValue(transactionGroupId: Long, issuerId: Long)
@@ -486,7 +525,7 @@ object ExternalApi {
       balance: Double,
       lastBalanceCheckDate: String,
       balanceCorrections: Seq[JsonSerializableBalanceCorrection],
-  ) {}
+  )
   object JsonSerializableMoneyReservoir {
     def toJson(reservoirs: Seq[JsonSerializableMoneyReservoir]): String = {
       implicit val formats = DefaultFormats
@@ -497,5 +536,24 @@ object ExternalApi {
         expectedBalance: Double,
         checkedBalance: Double,
     )
+  }
+
+  case class JsonSerializableTransaction(
+      transactionGroupId: Long,
+      beneficiaryAccountCode: String,
+      moneyReservoirCode: String,
+      categoryCode: String,
+      description: String,
+      flowInCents: Long,
+      tags: Seq[String],
+      createdDate: String,
+      transactionDate: String,
+      consumedDate: String,
+  )
+  object JsonSerializableTransaction {
+    def toJson(transactions: Seq[JsonSerializableTransaction]): String = {
+      implicit val formats = DefaultFormats
+      Serialization.writePretty(transactions)
+    }
   }
 }
