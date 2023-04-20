@@ -72,7 +72,7 @@ object BuildSettings {
       "com.typesafe.slick" %% "slick-hikaricp" % "3.2.0",
       "commons-lang" % "commons-lang" % "2.6",
       "mysql" % "mysql-connector-java" % "5.1.36",
-      "com.h2database" % "h2" % "1.4.195" % Test,
+      "com.h2database" % "h2" % "1.4.195", // TODO: Change back to % Test
       "org.xerial" % "sqlite-jdbc" % "3.8.11.2",
       "com.google.code.findbugs" % "jsr305" % "1.3.9",
       "net.liftweb" %% "lift-json" % "3.4.2",
