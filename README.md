@@ -27,9 +27,11 @@ Familiy Accounting Tool keeps track of every transaction your family makes. Its 
     create an empty database called `facto` and configure it as follows:
 
 ```
-db.default.driver=com.mysql.jdbc.Driver
-db.default.url="jdbc:mysql://localhost/facto?user=mysqluser&password=mysqlpassword"
-db.default.slick.profile = "slick.jdbc.MySQLProfile$"
+db.default {
+  driver = com.mysql.jdbc.Driver
+  url = "jdbc:mysql://localhost/facto?user=mysqluser&password=mysqlpassword"
+  slick.profile = "slick.jdbc.MySQLProfile$"
+}
 ```
 
   - Choose secret values for `play.http.secret.key` and `app.setup.defaultPassword`
