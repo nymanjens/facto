@@ -144,7 +144,3 @@ You should:
 - You can re-count your cash and see if it matches the calculated value.
   If it does, you can use the checkbox button to mark this.
   If it doesn't, you have made an error or lost money.
-
-## Special thanks
-
-To the sponsor of this project: @indeedeng
