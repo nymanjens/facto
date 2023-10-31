@@ -68,8 +68,8 @@ object BuildSettings {
       "com.google.truth" % "truth" % "1.1.2" % Test,
       "com.google.testparameterinjector" % "test-parameter-injector" % "1.9" % Test,
       "org.yaml" % "snakeyaml" % "1.14",
-      "com.typesafe.slick" %% "slick" % "3.2.0",
-      "com.typesafe.slick" %% "slick-hikaricp" % "3.2.0",
+      "com.typesafe.slick" %% "slick" % "3.3.0",
+      "com.typesafe.slick" %% "slick-hikaricp" % "3.3.0",
       "commons-lang" % "commons-lang" % "2.6",
       "mysql" % "mysql-connector-java" % "5.1.36",
       "com.h2database" % "h2" % "1.4.195", // TODO: Change back to % Test
