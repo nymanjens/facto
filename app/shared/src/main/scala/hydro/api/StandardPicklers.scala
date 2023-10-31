@@ -135,6 +135,30 @@ abstract class StandardPicklers {
     }
 
   implicit val picklableDbQueryPickler: Pickler[PicklableDbQuery] = {
+    implicit val picklableOrderingPickler: Pickler[PicklableDbQuery.PicklableOrdering] =
+      compositePickler[PicklableDbQuery.PicklableOrdering]
+        .addConcreteType[PicklableDbQuery.PicklableOrdering.LongOrdering.type]
+        .addConcreteType[PicklableDbQuery.PicklableOrdering.MaybeLongOrdering.type]
+        .addConcreteType[PicklableDbQuery.PicklableOrdering.IntOrdering.type]
+        .addConcreteType[PicklableDbQuery.PicklableOrdering.MaybeIntOrdering.type]
+        .addConcreteType[PicklableDbQuery.PicklableOrdering.StringOrdering.type]
+        .addConcreteType[PicklableDbQuery.PicklableOrdering.LocalDateTimeOrdering.type]
+    implicit def filterPickler: Pickler[PicklableDbQuery.Filter] =
+      compositePickler[PicklableDbQuery.Filter]
+        .addConcreteType[PicklableDbQuery.Filter.NullFilter]
+        .addConcreteType[PicklableDbQuery.Filter.Equal]
+        .addConcreteType[PicklableDbQuery.Filter.NotEqual]
+        .addConcreteType[PicklableDbQuery.Filter.GreaterThan]
+        .addConcreteType[PicklableDbQuery.Filter.GreaterOrEqualThan]
+        .addConcreteType[PicklableDbQuery.Filter.LessThan]
+        .addConcreteType[PicklableDbQuery.Filter.AnyOf]
+        .addConcreteType[PicklableDbQuery.Filter.NoneOf]
+        .addConcreteType[PicklableDbQuery.Filter.ContainsIgnoreCase]
+        .addConcreteType[PicklableDbQuery.Filter.DoesntContainIgnoreCase]
+        .addConcreteType[PicklableDbQuery.Filter.SeqContains]
+        .addConcreteType[PicklableDbQuery.Filter.SeqDoesntContain]
+        .addConcreteType[PicklableDbQuery.Filter.Or]
+        .addConcreteType[PicklableDbQuery.Filter.And]
     implicit val fieldWithDirectionPickler: Pickler[PicklableDbQuery.Sorting.FieldWithDirection] =
       boopickle.Default.generatePickler
     implicit val sortingPickler: Pickler[PicklableDbQuery.Sorting] = boopickle.Default.generatePickler

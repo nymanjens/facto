@@ -173,8 +173,8 @@ object InternalApi {
     private val publisher_ : TriggerablePublisher[HydroPushSocketPacket.Heartbeat.type] =
       new TriggerablePublisher()
 
-    actorSystem.scheduler.schedule(initialDelay = 0.seconds, interval = 5.seconds) {
-      publisher_.trigger(HydroPushSocketPacket.Heartbeat)
+    actorSystem.scheduler.scheduleAtFixedRate(initialDelay = 0.seconds, interval = 5.seconds) {
+      () => publisher_.trigger(HydroPushSocketPacket.Heartbeat)
     }
 
     def publisher: Publisher[HydroPushSocketPacket.Heartbeat.type] = publisher_

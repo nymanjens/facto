@@ -37,7 +37,7 @@ object BuildSettings {
   /** Declare global dependency versions here to avoid mismatches in multi part dependencies */
   object versions {
     val scala = "2.12.2" // Must be the same as in .travis.yml
-    val play = "2.6.15" // Must be the same as the Play sbt-plugin in plugins.sbt
+    val play = "2.8.20" // Must be the same as the Play sbt-plugin in plugins.sbt
 
     val uTest = "0.4.7"
     val scalajsReact = "1.2.1"
@@ -68,8 +68,8 @@ object BuildSettings {
       "com.google.truth" % "truth" % "1.1.2" % Test,
       "com.google.testparameterinjector" % "test-parameter-injector" % "1.9" % Test,
       "org.yaml" % "snakeyaml" % "1.14",
-      "com.typesafe.slick" %% "slick" % "3.2.0",
-      "com.typesafe.slick" %% "slick-hikaricp" % "3.2.0",
+      "com.typesafe.slick" %% "slick" % "3.3.0",
+      "com.typesafe.slick" %% "slick-hikaricp" % "3.3.0",
       "commons-lang" % "commons-lang" % "2.6",
       "mysql" % "mysql-connector-java" % "5.1.36",
       "com.h2database" % "h2" % "1.4.195", // TODO: Change back to % Test

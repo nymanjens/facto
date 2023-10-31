@@ -22,7 +22,7 @@ object StandardSlickEntityTableDefs {
       def userId = column[Long]("userId")
       def entityId = column[Long]("entityId")
       def change = column[EntityModification]("modification")
-      def instant = column[Instant]("date")
+      def instant = column[Instant]("date")(instantToSqlTimestampMapper)
       // The instant field can't hold the nano precision of the `instant` field above. It thus
       // has to be persisted separately.
       def instantNanos = column[Long]("instantNanos")

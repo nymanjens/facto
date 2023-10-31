@@ -14,6 +14,8 @@ import play.api.Logger
 
 final class ConfigModule extends AbstractModule {
 
+  val logger: Logger = Logger(this.getClass())
+
   override def configure() = {}
 
   @Provides()
@@ -46,7 +48,7 @@ final class ConfigModule extends AbstractModule {
     } catch {
       case e: Throwable =>
         val stackTrace = Throwables.getStackTraceAsString(e)
-        Logger.error(s"Error when parsing accounting-config.yml: $stackTrace")
+        logger.error(s"Error when parsing accounting-config.yml: $stackTrace")
         throw e
     }
   }

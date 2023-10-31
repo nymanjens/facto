@@ -27,7 +27,7 @@ final class StandardActions @Inject() (implicit
     with I18nSupport {
 
   def index() = AuthenticatedAction { implicit user => implicit request =>
-    Redirect(hydro.controllers.routes.StandardActions.reactAppRoot())
+    Redirect(hydro.controllers.routes.StandardActions.reactAppRoot)
   }
 
   def reactAppRoot = AuthenticatedAction { implicit user => implicit request =>

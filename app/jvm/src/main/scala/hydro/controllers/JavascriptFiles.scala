@@ -93,26 +93,26 @@ object JavascriptFiles {
     override def urlPath = call.path()
   }
 
-  private object Assets {
-    private val clientAppProjectName: String = "client"
-    private val webworkerProjectName: String = "webworker-client"
+  object Assets {
+    private def clientAppProjectName: String = "client"
+    private def webworkerProjectName: String = "webworker-client"
 
-    val clientApp: Asset =
+    def clientApp: Asset =
       firstExistingVersionedAsset(s"$clientAppProjectName-opt.js", s"$clientAppProjectName-fastopt.js")
-    val clientAppDeps: Asset =
+    def clientAppDeps: Asset =
       firstExistingVersionedAsset(
         s"$clientAppProjectName-opt-library.js",
         s"$clientAppProjectName-fastopt-library.js",
       )
-    val webworker: Asset =
+    def webworker: Asset =
       firstExistingVersionedAsset(s"$webworkerProjectName-opt.js", s"$webworkerProjectName-fastopt.js")
-    val webworkerDeps: Asset =
+    def webworkerDeps: Asset =
       firstExistingVersionedAsset(
         s"$webworkerProjectName-opt-library.js",
         s"$webworkerProjectName-fastopt-library.js",
       )
 
-    val standardAssets: Seq[Asset] = Seq(
+    def standardAssets: Seq[Asset] = Seq(
       clientApp,
       clientAppDeps,
       webworker,
