@@ -111,7 +111,7 @@ lazy val manualTests: Project = (project in file("app/js/manualtests"))
   .dependsOn(sharedJsCopy, jsShared)
 
 // Client projects
-lazy val clientProjects = Seq(client)
+lazy val clientProjects = Seq(client, webworkerClient, manualTests)
 
 lazy val server = (project in file("app/jvm"))
   .settings(
