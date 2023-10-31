@@ -37,7 +37,7 @@ object BuildSettings {
   /** Declare global dependency versions here to avoid mismatches in multi part dependencies */
   object versions {
     val scala = "2.12.2" // Must be the same as in .travis.yml
-    val play = "2.6.15" // Must be the same as the Play sbt-plugin in plugins.sbt
+    val play = "2.8.20" // Must be the same as the Play sbt-plugin in plugins.sbt
 
     val uTest = "0.4.7"
     val scalajsReact = "1.2.1"

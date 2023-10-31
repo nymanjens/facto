@@ -1,6 +1,9 @@
 import sbt.Keys._
 import sbt.Project.projectToRef
 
+// Treat eviction issues as warning
+ThisBuild / evictionErrorLevel := Level.Warn
+
 // a special crossProject for configuring a JS/JVM/shared structure
 lazy val shared = (crossProject.crossType(CrossType.Pure) in file("app/shared"))
   .settings(
@@ -31,26 +34,26 @@ lazy val client: Project = (project in file("app/js/client"))
     version := BuildSettings.version,
     scalaVersion := BuildSettings.versions.scala,
     scalacOptions ++= BuildSettings.scalacOptions,
-    scalacOptions in fullOptJS ++= Seq("-Xelide-below", "WARNING"),
+    fullOptJS / scalacOptions ++= Seq("-Xelide-below", "WARNING"),
     libraryDependencies ++= BuildSettings.scalajsDependencies.value,
     // use Scala.js provided launcher code to start the client app
     scalaJSUseMainModuleInitializer := true,
     // use uTest framework for tests
     testFrameworks += new TestFramework("utest.runner.Framework"),
     // Execute the tests in browser-like environment
-    requiresDOM in Test := true,
+    Test / requiresDOM := true,
     // Fix for bug that produces a huge amount of warnings (https://github.com/webpack/webpack/issues/4518).
     // Unfortunately, this means no source maps :-/
-    emitSourceMaps in fastOptJS := false,
+    fastOptJS / emitSourceMaps := false,
     // scalajs-bundler NPM packages
-    npmDependencies in Compile ++= BuildSettings.npmDependencies(baseDirectory.value / "../../.."),
+    Compile / npmDependencies ++= BuildSettings.npmDependencies(baseDirectory.value / "../../.."),
     // Custom webpack config
-    webpackConfigFile in Test := None,
-    webpackConfigFile in fastOptJS := Some(baseDirectory.value / "../webpack.dev.js"),
-    webpackConfigFile in fullOptJS := Some(baseDirectory.value / "../webpack.prod.js"),
+    Test / webpackConfigFile := None,
+    fastOptJS / webpackConfigFile := Some(baseDirectory.value / "../webpack.dev.js"),
+    fullOptJS / webpackConfigFile := Some(baseDirectory.value / "../webpack.prod.js"),
     // Enable faster builds when developing
     webpackBundlingMode := BundlingMode.LibraryOnly(),
-    webpackBundlingMode in Test := BundlingMode.LibraryAndApplication()
+    Test / webpackBundlingMode := BundlingMode.LibraryAndApplication()
   )
   .enablePlugins(ScalaJSBundlerPlugin, ScalaJSWeb)
   .dependsOn(sharedJsCopy, jsShared)
@@ -62,19 +65,19 @@ lazy val webworkerClient: Project = (project in file("app/js/webworker"))
     version := BuildSettings.version,
     scalaVersion := BuildSettings.versions.scala,
     scalacOptions ++= BuildSettings.scalacOptions,
-    scalacOptions in fullOptJS ++= Seq("-Xelide-below", "WARNING"),
+    fullOptJS / scalacOptions ++= Seq("-Xelide-below", "WARNING"),
     libraryDependencies ++= BuildSettings.scalajsDependencies.value,
     // use Scala.js provided launcher code to start the client app
     scalaJSUseMainModuleInitializer := true,
     // Fix for bug that produces a huge amount of warnings (https://github.com/webpack/webpack/issues/4518).
     // Unfortunately, this means no source maps :-/
-    emitSourceMaps in fastOptJS := false,
+    fastOptJS / emitSourceMaps := false,
     // scalajs-bundler NPM packages
-    npmDependencies in Compile ++= BuildSettings.npmDependencies(baseDirectory.value / "../../.."),
+    Compile / npmDependencies ++= BuildSettings.npmDependencies(baseDirectory.value / "../../.."),
     // Custom webpack config
-    webpackConfigFile in Test := None,
-    webpackConfigFile in fastOptJS := Some(baseDirectory.value / "../webpack.dev.js"),
-    webpackConfigFile in fullOptJS := Some(baseDirectory.value / "../webpack.prod.js"),
+    Test / webpackConfigFile := None,
+    fastOptJS / webpackConfigFile := Some(baseDirectory.value / "../webpack.dev.js"),
+    fullOptJS / webpackConfigFile := Some(baseDirectory.value / "../webpack.prod.js"),
     // Enable faster builds when developing
     webpackBundlingMode := BundlingMode.LibraryOnly()
   )
@@ -88,19 +91,19 @@ lazy val manualTests: Project = (project in file("app/js/manualtests"))
     version := BuildSettings.version,
     scalaVersion := BuildSettings.versions.scala,
     scalacOptions ++= BuildSettings.scalacOptions,
-    scalacOptions in fullOptJS ++= Seq("-Xelide-below", "WARNING"),
+    fullOptJS / scalacOptions ++= Seq("-Xelide-below", "WARNING"),
     libraryDependencies ++= BuildSettings.scalajsDependencies.value,
     // use Scala.js provided launcher code to start the client app
     scalaJSUseMainModuleInitializer := true,
     // Fix for bug that produces a huge amount of warnings (https://github.com/webpack/webpack/issues/4518).
     // Unfortunately, this means no source maps :-/
-    emitSourceMaps in fastOptJS := false,
+    fastOptJS / emitSourceMaps := false,
     // scalajs-bundler NPM packages
-    npmDependencies in Compile ++= BuildSettings.npmDependencies(baseDirectory.value / "../../.."),
+    Compile / npmDependencies ++= BuildSettings.npmDependencies(baseDirectory.value / "../../.."),
     // Custom webpack config
-    webpackConfigFile in Test := None,
-    webpackConfigFile in fastOptJS := Some(baseDirectory.value / "../webpack.dev.js"),
-    webpackConfigFile in fullOptJS := Some(baseDirectory.value / "../webpack.prod.js"),
+    Test / webpackConfigFile := None,
+    fastOptJS / webpackConfigFile := Some(baseDirectory.value / "../webpack.dev.js"),
+    fullOptJS / webpackConfigFile := Some(baseDirectory.value / "../webpack.prod.js"),
     // Enable faster builds when developing
     webpackBundlingMode := BundlingMode.LibraryOnly()
   )
@@ -108,7 +111,7 @@ lazy val manualTests: Project = (project in file("app/js/manualtests"))
   .dependsOn(sharedJsCopy, jsShared)
 
 // Client projects
-lazy val clientProjects = Seq(client, webworkerClient, manualTests)
+lazy val clientProjects = Seq(client)
 
 lazy val server = (project in file("app/jvm"))
   .settings(
@@ -119,21 +122,21 @@ lazy val server = (project in file("app/jvm"))
     libraryDependencies ++= BuildSettings.jvmDependencies.value,
     libraryDependencies += guice,
     javaOptions := Seq("-Dconfig.file=conf/application.conf"),
-    javaOptions in Test := Seq("-Dconfig.resource=test-application.conf"),
+    Test / javaOptions := Seq("-Dconfig.resource=test-application.conf"),
     // connect to the client project
     scalaJSProjects := clientProjects,
-    pipelineStages in Assets := Seq(scalaJSPipeline),
+    Assets / pipelineStages := Seq(scalaJSPipeline),
     pipelineStages := Seq(scalaJSProd, digest, gzip),
     // Expose as sbt-web assets some files retrieved from the NPM packages of the `client` project
     // @formatter:off
-    npmAssets ++= NpmAssets.ofProject(client) { modules => (modules / "jquery").*** }.value,
-    npmAssets ++= NpmAssets.ofProject(client) { modules => (modules / "bootstrap").*** }.value,
-    npmAssets ++= NpmAssets.ofProject(client) { modules => (modules / "metismenu").*** }.value,
-    npmAssets ++= NpmAssets.ofProject(client) { modules => (modules / "font-awesome").*** }.value,
-    npmAssets ++= NpmAssets.ofProject(client) { modules => (modules / "startbootstrap-sb-admin-2").*** }.value,
+    npmAssets ++= NpmAssets.ofProject(client) { modules => (modules / "jquery").allPaths }.value,
+    npmAssets ++= NpmAssets.ofProject(client) { modules => (modules / "bootstrap").allPaths }.value,
+    npmAssets ++= NpmAssets.ofProject(client) { modules => (modules / "metismenu").allPaths }.value,
+    npmAssets ++= NpmAssets.ofProject(client) { modules => (modules / "font-awesome").allPaths }.value,
+    npmAssets ++= NpmAssets.ofProject(client) { modules => (modules / "startbootstrap-sb-admin-2").allPaths }.value,
     // @formatter:on
     // compress CSS
-    LessKeys.compress in Assets := true
+    Assets / LessKeys.compress := true
   )
   .enablePlugins(PlayScala, WebScalaJSBundlerPlugin)
   .disablePlugins(PlayFilters) // Don't use the default filters
