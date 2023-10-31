@@ -264,7 +264,6 @@ object ValidatingYamlParser {
       validationErrors: Seq[ValidationError] = Seq(),
   ) {
     require(maybeValue.isDefined || validationErrors.nonEmpty, this.toString)
-    require(maybeValue.isEmpty || validationErrors.isEmpty, this.toString)
 
     def map[V2](function: V => V2): ParseResult[V2] = {
       ParseResult(maybeValue.map(function), validationErrors)
