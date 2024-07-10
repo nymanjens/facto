@@ -3,13 +3,13 @@ Family Accounting Tool
 
 [![CI Status](https://github.com/nymanjens/facto/actions/workflows/ci.yml/badge.svg)](https://github.com/nymanjens/facto/actions)
 
-Familiy Accounting Tool keeps track of every transaction your family makes. Its goal is to:
+Family Accounting Tool keeps track of every transaction your family makes. Its goal is to:
 
-- Extract usefull statistics from the data<br>
+- Extract useful statistics from the data<br>
   _E.g.: How much is spent on food each month?_
 - Calculate internal debt<br>
   _E.g.: Alice buys toilet paper for the whole family with her own money. This tool then registers
-  that the family ows Alice the cost of the toilet paper._
+  that the family owes Alice the cost of the toilet paper._
 - Provide a way to check if no money is disappearing in unexpected expenses<br>
   _E.g.: You will notice when there are hidden banking costs_
 
@@ -97,12 +97,12 @@ To effectively use this tool, you must learn to input the transactions correctly
 it's important to understand the meaning of categories and accounts.
 
 ### Categories
-These are used to split up your expenses into categories. Every account has some special
+These are used to split up your expenses into categories. Every account has some
 special categories:
 
 - **Accounting category:**<br>
-  Used for non-real income/expenses. This category will be ignored when analysing the montly
-  surplus/deficit in terms of expenses. Use this category e.g. when the expense will be payed
+  Used for non-real income/expenses. This category will be ignored when analysing the monthly
+  surplus/deficit in terms of expenses. Use this category e.g. when the expense will be paid
   back by your employer
 - **Endowment category:**<br>
   Used for money transfer to the common account (see example in the next section)
@@ -127,9 +127,9 @@ Special fields:
 - **Beneficiary:**<br>
   In case of an expense: The one that will benefit from the expense<br>
   In case of an income: The one that was paid
-- **Payed with/to:**<br>
-  In case of an expense: Payed with<br>
-  In case of an income: Payed to
+- **Paid with/to:**<br>
+  In case of an expense: Paid with<br>
+  In case of an income: Paid to
 - **Flow:**<br>
   In case of an expense: Negative number representing the price<br>
   In case of an income: Positive number
