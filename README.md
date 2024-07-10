@@ -146,3 +146,16 @@ You should:
   If it does, you can use the checkbox button to mark this.
   If it doesn't, you have made an error or lost money.
 
+## About this project
+
+This project was created and maintained by me (Jens) in my spare time for my
+family, and I made it open source in the hope that it might be useful for
+others.
+
+If you decide to use this, chances are you'll either be using it a lot, or stop
+using it after some time. If you are in the former category, please send me a
+message at nymanjens.nj@gmail.com (or consider [sending a
+donation](https://github.com/sponsors/nymanjens)) so I know others are using
+this. Definitely also let me know if you have any interest in upgrading to newer
+versions or using the more advanced (hidden) features like exchange rates and
+inflation correction.
