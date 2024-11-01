@@ -10,6 +10,7 @@ import app.models.accounting.config.Template
 import app.models.user.User
 import hydro.common.I18n
 import hydro.common.time.Clock
+import hydro.common.CollectionUtils
 import hydro.flux.react.uielements.SbadminMenu
 import hydro.flux.react.uielements.SbadminMenu.MenuItem
 import hydro.flux.router.RouterContext
@@ -37,15 +38,21 @@ private[app] final class Menu(implicit
             shortcuts = Seq("shift+alt+e", "shift+alt+a"),
           ),
           MenuItem(i18n("app.cash-flow.html"), AppPages.CashFlow, shortcuts = Seq("shift+alt+c")),
+        ) ++ CollectionUtils.ifThenSeq(
+          accountingConfig.accounts.size > 1,
           MenuItem(
             i18n("app.liquidation.html"),
             AppPages.Liquidation,
             shortcuts = Seq("shift+alt+l", "shift+alt+v"),
           ),
+        ) ++ CollectionUtils.ifThenSeq(
+          accountingConfig.accounts.size > 1,
           MenuItem(i18n("app.endowments.html"), AppPages.Endowments, shortcuts = Seq("shift+alt+d")),
-          MenuItem(i18n("app.summary.html"), AppPages.Summary, shortcuts = Seq("shift+alt+s")),
-          MenuItem(i18n("app.chart.html"), AppPages.Chart.firstPredefined, shortcuts = Seq("shift+alt+r")),
-        ),
+        )
+          ++ Seq(
+            MenuItem(i18n("app.summary.html"), AppPages.Summary, shortcuts = Seq("shift+alt+s")),
+            MenuItem(i18n("app.chart.html"), AppPages.Chart.firstPredefined, shortcuts = Seq("shift+alt+r")),
+          ),
         Seq(
           MenuItem(
             i18n("app.templates.html"),
