@@ -150,7 +150,7 @@ object SummaryTableTest extends TestSuite {
         }
       }
       "years" - {
-        allYearsData.years ==> Seq(2012, 2013)
+        allYearsData.years ==> Seq(AccountingYear( 2012), AccountingYear(2013))
       }
       "yearlyAverage" - {
         "full year" - {
