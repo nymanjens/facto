@@ -186,7 +186,11 @@ private[transactionviews] final class SummaryTable(implicit
     }
 
     def years: Seq[AccountingYear] = yearsToData.toVector.map(_._1)
-    def yearlyAverage(year: AccountingYear, category: Category, correctForInflation: Boolean): ReferenceMoney = {
+    def yearlyAverage(
+        year: AccountingYear,
+        category: Category,
+        correctForInflation: Boolean,
+    ): ReferenceMoney = {
       monthsForAverage(year) match {
         case Seq() => ReferenceMoney(0)
         case months =>
@@ -201,7 +205,11 @@ private[transactionviews] final class SummaryTable(implicit
           totalFlow / months.size
       }
     }
-    def yearlyTotal(year: AccountingYear, category: Category, correctForInflation: Boolean): ReferenceMoney = {
+    def yearlyTotal(
+        year: AccountingYear,
+        category: Category,
+        correctForInflation: Boolean,
+    ): ReferenceMoney = {
       DatedMonth
         .allMonthsIn(year)
         .map(month =>
@@ -785,7 +793,9 @@ private[transactionviews] final class SummaryTable(implicit
     private case class MonthColumn(month: DatedMonth) extends Column
     private case class AverageColumn(year: AccountingYear) extends Column
     private case class TotalColumn(year: AccountingYear) extends Column
-    private def columnsForYear(year: AccountingYear, expandedYear: AccountingYear)(implicit props: Props): Seq[Column] = {
+    private def columnsForYear(year: AccountingYear, expandedYear: AccountingYear)(implicit
+        props: Props
+    ): Seq[Column] = {
       val avgOrTotal = if (props.showYearlyTotal) TotalColumn(year) else AverageColumn(year)
       if (year == expandedYear) {
         DatedMonth.allMonthsIn(year).map(MonthColumn) :+ avgOrTotal

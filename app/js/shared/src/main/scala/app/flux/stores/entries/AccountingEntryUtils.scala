@@ -37,8 +37,8 @@ final class AccountingEntryUtils(implicit
 ) {
 
   def getTransactionsAndBalanceChecks(
-    reservoir: MoneyReservoir,
-    yearFilter: Option[AccountingYear],
+      reservoir: MoneyReservoir,
+      yearFilter: Option[AccountingYear],
   ): Future[TransactionsAndBalanceChecks] = async {
     val oldestRelevantBalanceCheck: Option[BalanceCheck] = yearFilter match {
       case None => None
