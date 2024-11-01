@@ -245,7 +245,13 @@ constants:
   commonAccount: *accountCommon
   accountingCategory: *catAcc
   endowmentCategory: *catEndow
+  liquidationDescription: Liquidation
+  zoneId: "Europe/Brussels"
 
   # If true, then a button will be shown to enable/disable inflation corrections. These are made
   # using the price index stored in the exchange rate of a special "<index>" currency.
   supportInflationCorrections: false
+
+  # Whenever facto shows a year, this will be the first month. If this is January, calendar years
+  # are used.
+  firstMonthOfYear: January
