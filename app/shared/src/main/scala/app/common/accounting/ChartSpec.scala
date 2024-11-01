@@ -1,5 +1,6 @@
 package app.common.accounting
 
+import app.common.accounting.ChartSpec.AggregationPeriod
 import app.common.accounting.ChartSpec.Line
 import hydro.common.GuavaReplacement.Splitter
 import hydro.common.ScalaUtils
@@ -9,6 +10,7 @@ import scala.collection.immutable.Seq
 case class ChartSpec(
     lines: Seq[Line],
     correctForInflation: Boolean,
+    aggregationPeriod: AggregationPeriod,
 ) {
   def withAddedEmptyLine: ChartSpec = {
     copy(lines = lines :+ Line.empty)
@@ -20,34 +22,59 @@ case class ChartSpec(
     copy(lines = mutableLines.toVector)
   }
 
-  def modified(index: Int, modification: Line => Line) = {
+  def modified(index: Int, modification: Line => Line): ChartSpec = {
     copy(lines = lines.updated(index, modification(lines(index))))
   }
 
   def stringify: String = {
     val inflationSuffix = if (correctForInflation) "+I" else "-I"
-    lines.map(_.stringify).mkString(String.valueOf(ChartSpec.lineDelimiter)) + inflationSuffix
+    val periodSuffix = aggregationPeriod match {
+      case AggregationPeriod.Month => "<>M"
+      case AggregationPeriod.Year  => "<>Y"
+    }
+    lines.map(_.stringify).mkString(String.valueOf(ChartSpec.lineDelimiter)) + inflationSuffix + periodSuffix
   }
 }
 object ChartSpec {
-  def singleEmptyLine() =
-    ChartSpec(lines = Seq(Line.empty), correctForInflation = false)
+  def singleEmptyLine(): ChartSpec =
+    ChartSpec(
+      lines = Seq(Line.empty),
+      correctForInflation = false,
+      aggregationPeriod = AggregationPeriod.Month,
+    )
 
   private val lineDelimiter = '~'
 
   def parseStringified(string: String): ChartSpec = {
-    val correctForInflation = if (string.endsWith("+I")) {
-      true
-    } else if (string.endsWith("-I")) {
-      false
-    } else {
-      throw new AssertionError(string)
+    var stringRemainder = string
+    val aggregationPeriod =
+      if (stringRemainder.contains("<>")) {
+        val suffix = stringRemainder.substring(stringRemainder.length - 3)
+        stringRemainder = stringRemainder.substring(0, stringRemainder.length - 3)
+        suffix match {
+          case "<>M" => AggregationPeriod.Month
+          case "<>Y" => AggregationPeriod.Year
+        }
+      } else {
+        AggregationPeriod.Month
+      }
+    val correctForInflation = {
+      val suffix = stringRemainder.substring(stringRemainder.length - 2)
+      stringRemainder = stringRemainder.substring(0, stringRemainder.length - 2)
+      suffix match {
+        case "+I" => true
+        case "-I" => false
+      }
     }
-    val stringRemainder = string.substring(0, string.length - 2)
 
     val lines = Splitter.on(lineDelimiter).split(stringRemainder).map(Line.parseStringified)
-    if (lines.nonEmpty) ChartSpec(lines, correctForInflation)
-    else ChartSpec.singleEmptyLine().copy(correctForInflation = correctForInflation)
+    if (lines.nonEmpty) {
+      ChartSpec(lines, correctForInflation, aggregationPeriod)
+    } else {
+      ChartSpec
+        .singleEmptyLine()
+        .copy(correctForInflation = correctForInflation, aggregationPeriod = aggregationPeriod)
+    }
   }
 
   case class Line(
@@ -93,5 +120,11 @@ object ChartSpec {
         },
       )
     }
+  }
+
+  sealed trait AggregationPeriod
+  object AggregationPeriod {
+    object Month extends AggregationPeriod
+    object Year extends AggregationPeriod
   }
 }

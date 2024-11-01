@@ -84,11 +84,21 @@ object Picklers extends StandardPicklers {
     override def pickle(value: ChartSpec)(implicit state: PickleState): Unit = logExceptions {
       state.pickle(value.lines)
       state.pickle(value.correctForInflation)
+      state.pickle(value.aggregationPeriod)
     }
     override def unpickle(implicit state: UnpickleState): ChartSpec = logExceptions {
-      ChartSpec(state.unpickle[Seq[ChartSpec.Line]], state.unpickle[Boolean])
+      ChartSpec(
+        state.unpickle[Seq[ChartSpec.Line]],
+        state.unpickle[Boolean],
+        state.unpickle[ChartSpec.AggregationPeriod],
+      )
     }
   }
+  implicit val chartSpecAggregationPeriodPickler: Pickler[ChartSpec.AggregationPeriod] =
+    enumPickler(
+      _.getClass.getSimpleName,
+      Seq(ChartSpec.AggregationPeriod.Month, ChartSpec.AggregationPeriod.Year),
+    )
 
   override implicit val entityPickler: Pickler[Entity] = compositePickler[Entity]
     .addConcreteType[User]

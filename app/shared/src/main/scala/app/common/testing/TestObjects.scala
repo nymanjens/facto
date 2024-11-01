@@ -222,6 +222,7 @@ object TestObjects {
             )
           ),
           correctForInflation = false,
+          aggregationPeriod = ChartSpec.AggregationPeriod.Month,
         ),
       )
     ),

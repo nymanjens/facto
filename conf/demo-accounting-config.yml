@@ -237,6 +237,8 @@ templates:
 predefinedCharts:
   - name: "Alice's transactions"
     chartSpec:
+      correctForInflation: false
+      aggregationPeriod: Month # "Month" or "Year"
       lines:
         - name: "Alice's transactions"
           query: "beneficiary:Alice"

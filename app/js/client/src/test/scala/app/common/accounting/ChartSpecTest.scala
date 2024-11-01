@@ -15,13 +15,14 @@ object ChartSpecTest extends TestSuite {
           ChartSpec.parseStringified(chartSpec.stringify) ==> chartSpec
         }
         "singleEmptyLine" - {
-          testRoundTrip(ChartSpec.singleEmptyLine(correctForInflation = false))
+          testRoundTrip(ChartSpec.singleEmptyLine())
         }
         "single non-empty line" - {
           testRoundTrip(
             ChartSpec(
               Seq(Line(name = "DEF@GHI", query = "ABC", inverted = true, cumulative = true)),
               correctForInflation = true,
+              aggregationPeriod = ChartSpec.AggregationPeriod.Month,
             )
           )
         }
@@ -37,6 +38,7 @@ object ChartSpecTest extends TestSuite {
                 Line(name = "", query = ""),
               ),
               correctForInflation = false,
+              aggregationPeriod = ChartSpec.AggregationPeriod.Year,
             )
           )
         }

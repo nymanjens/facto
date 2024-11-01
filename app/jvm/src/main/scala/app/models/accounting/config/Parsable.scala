@@ -234,13 +234,21 @@ object Parsable {
     }
   }
   object PredefinedChart {
-    case class ChartSpec(lines: java.util.List[ChartSpec.Line], correctForInflation: Boolean) {
-      def this() = this(lines = null, correctForInflation = false)
+    case class ChartSpec(
+        lines: java.util.List[ChartSpec.Line],
+        correctForInflation: Boolean,
+        aggregationPeriod: String,
+    ) {
+      def this() = this(lines = null, correctForInflation = false, aggregationPeriod = "Month")
 
       def parse(): ParsedChartSpec = {
         ParsedChartSpec(
           lines = lines.asScala.toVector.map(_.parse),
           correctForInflation = correctForInflation,
+          aggregationPeriod = aggregationPeriod match {
+            case "Month" => ParsedChartSpec.AggregationPeriod.Month
+            case "Year"  => ParsedChartSpec.AggregationPeriod.Year
+          },
         )
       }
     }
