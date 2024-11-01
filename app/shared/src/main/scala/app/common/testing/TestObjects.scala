@@ -193,6 +193,7 @@ object TestObjects {
     liquidationDescription = "Liquidation",
     zoneId = "Europe/Brussels",
     supportInflationCorrections = true,
+    firstMonthOfYear = Month.JANUARY,
   )
 
   implicit val testAccountingConfig: Config = Config(
