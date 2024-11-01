@@ -44,8 +44,8 @@ final class Summary(implicit
   override protected val config = ComponentConfig(
     backendConstructor = new Backend(_),
     initialState = State(
-      yearLowerBound = DatedMonth.current.accountingYear.plusYears(-1),
-      expandedYear = DatedMonth.current.accountingYear,
+      yearLowerBound = AccountingYear.current minusYears 1,
+      expandedYear = AccountingYear.current,
     ),
   ).withStateStoresDependency(
     inMemoryUserConfigStore,

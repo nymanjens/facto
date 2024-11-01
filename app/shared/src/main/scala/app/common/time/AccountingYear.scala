@@ -22,12 +22,16 @@ case class AccountingYear(startYear: Int) extends Ordered[AccountingYear] {
     }
   }
 
-  def plusYears(diff: Int): AccountingYear = {
-    AccountingYear(startYear + diff)
+  def minusYears(diff: Int): AccountingYear = {
+    AccountingYear(startYear - diff)
   }
 }
 object AccountingYear {
   def from(date: LocalDateTime)(implicit accountingConfig: Config): AccountingYear = {
     DatedMonth.containing(date).accountingYear
+  }
+
+  def current(implicit clock: Clock, accountingConfig: Config): AccountingYear = {
+    DatedMonth.current.accountingYear
   }
 }
