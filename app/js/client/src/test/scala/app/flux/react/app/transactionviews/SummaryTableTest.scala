@@ -97,14 +97,14 @@ object SummaryTableTest extends TestSuite {
           allYearsData
             .averageWithoutCategories(
               categoriesToIgnore = Set(),
-              year = 2012,
+              accountingYear = 2012,
               correctForInflation = false,
             ) ==>
             ReferenceMoney(roundToLong((2200.0 + 120 - 200 + 123) / 12))
           allYearsData
             .averageWithoutCategories(
               categoriesToIgnore = Set(testCategoryC),
-              year = 2012,
+              accountingYear = 2012,
               correctForInflation = false,
             ) ==>
             ReferenceMoney(roundToLong((2200.0 + 120 + 123) / 12))
@@ -115,14 +115,14 @@ object SummaryTableTest extends TestSuite {
           allYearsData
             .averageWithoutCategories(
               categoriesToIgnore = Set(),
-              year = 2012,
+              accountingYear = 2012,
               correctForInflation = false,
             ) ==>
             ReferenceMoney(roundToLong(2200.0 / 5))
           allYearsData
             .averageWithoutCategories(
               categoriesToIgnore = Set(testCategoryC),
-              year = 2012,
+              accountingYear = 2012,
               correctForInflation = false,
             ) ==>
             ReferenceMoney(roundToLong(2200.0 / 5))
@@ -133,14 +133,14 @@ object SummaryTableTest extends TestSuite {
           newAllYearsData
             .averageWithoutCategories(
               categoriesToIgnore = Set(),
-              year = 2012,
+              accountingYear = 2012,
               correctForInflation = false,
             ) ==>
             ReferenceMoney(roundToLong((2200.0 + 120 - 200 + 123) / 9))
           newAllYearsData
             .averageWithoutCategories(
               categoriesToIgnore = Set(testCategoryC),
-              year = 2012,
+              accountingYear = 2012,
               correctForInflation = false,
             ) ==>
             ReferenceMoney(roundToLong((2200.0 + 120 + 123) / 9))

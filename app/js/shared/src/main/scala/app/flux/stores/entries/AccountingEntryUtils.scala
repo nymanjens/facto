@@ -4,6 +4,7 @@ import app.common.accounting.DateToBalanceFunction
 import app.common.money.CurrencyValueManager
 import app.common.money.MoneyWithGeneralCurrency
 import app.common.money.ReferenceMoney
+import app.common.time.AccountingYear
 import app.common.time.DatedMonth
 import app.flux.stores.entries.AccountingEntryUtils.TransactionsAndBalanceChecks
 import app.models.access.AppDbQuerySorting
@@ -36,8 +37,8 @@ final class AccountingEntryUtils(implicit
 ) {
 
   def getTransactionsAndBalanceChecks(
-      reservoir: MoneyReservoir,
-      yearFilter: Option[Int],
+    reservoir: MoneyReservoir,
+    yearFilter: Option[AccountingYear],
   ): Future[TransactionsAndBalanceChecks] = async {
     val oldestRelevantBalanceCheck: Option[BalanceCheck] = yearFilter match {
       case None => None
