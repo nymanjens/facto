@@ -71,7 +71,29 @@ abstract class StandardPicklers {
         state.pickle(valueToNumber.get(value))
       }
       override def unpickle(implicit state: UnpickleState): T = {
-        valueToNumber.inverse().get(state.unpickle[Int])
+        val intValue = state.unpickle[Int]
+        try {
+          valueToNumber.inverse().get(intValue)
+        } catch {
+          case t: Throwable =>
+            throw new RuntimeException(
+              s"Could not unpickle intValue=$intValue (valueToNumber=$valueToNumber)",
+              t,
+            )
+        }
+      }
+    }
+  }
+
+  def enumPicklerWithoutName[T](values: Seq[T]): Pickler[T] = {
+    val valueToNumber: Map[T, Int] = values.zipWithIndex.toMap
+
+    new Pickler[T] {
+      override def pickle(value: T)(implicit state: PickleState): Unit = {
+        state.pickle(valueToNumber(value))
+      }
+      override def unpickle(implicit state: UnpickleState): T = {
+        values(state.unpickle[Int])
       }
     }
   }
