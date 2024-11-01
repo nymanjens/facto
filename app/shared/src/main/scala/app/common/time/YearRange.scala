@@ -41,7 +41,7 @@ object YearRange {
   val empty: YearRange = YearRange(Set())
   def closed(startYear: AccountingYear, endYear: AccountingYear): YearRange = {
     require(startYear <= endYear, s"startYear=$startYear should not be later than endYear=$endYear")
-    YearRange((startYear.startYear to endYear.startYear).map(AccountingYear).toSet)
+    YearRange((startYear.startYear to endYear.startYear).map(AccountingYear.apply).toSet)
   }
   def single(year: AccountingYear): YearRange = YearRange(Set(year))
 }

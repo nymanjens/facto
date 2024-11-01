@@ -21,4 +21,13 @@ case class AccountingYear(startYear: Int) extends Ordered[AccountingYear] {
       s"$startYear - ${startYear + 1}"
     }
   }
+
+  def plusYears(diff: Int): AccountingYear = {
+    AccountingYear(startYear + diff)
+  }
+}
+object AccountingYear {
+  def from(date: LocalDateTime)(implicit accountingConfig: Config): AccountingYear = {
+    DatedMonth.containing(date).accountingYear
+  }
 }
