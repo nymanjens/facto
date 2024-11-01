@@ -87,7 +87,7 @@ object DatedMonth {
     monthsInClosedRange(
       DatedMonth.of(year.startYear, startMonth),
       DatedMonth.of(year.startYear + 1, startMonth),
-    )
+    ).take(12)
   }
 
   def monthsInClosedRange(start: DatedMonth, endInclusive: DatedMonth): Seq[DatedMonth] = {
