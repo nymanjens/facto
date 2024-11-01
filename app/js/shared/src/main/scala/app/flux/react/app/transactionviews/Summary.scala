@@ -59,7 +59,7 @@ final class Summary(implicit
       query: String = "",
       yearLowerBound: AccountingYear,
       expandedYear: AccountingYear,
-      showYearlyTotal: Boolean = false, // instead of average
+      showYearlyTotal: Boolean = true, // instead of average
       correctForInflation: Boolean = false,
   )
 
