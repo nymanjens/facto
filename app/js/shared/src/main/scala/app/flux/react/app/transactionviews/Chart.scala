@@ -10,7 +10,10 @@ import app.common.money.Money
 import app.common.money.ReferenceMoney
 import app.common.time.DatedMonth
 import app.common.accounting.ChartSpec
+import app.common.accounting.ChartSpec.AggregationPeriod
 import app.common.accounting.ChartSpec.Line
+import app.common.time.AccountingYear
+import app.common.time.YearRange
 import app.flux.router.AppPages
 import app.flux.stores.entries.factories.ChartStoreFactory
 import app.flux.stores.entries.factories.ChartStoreFactory.LinePoints
@@ -152,9 +155,9 @@ final class Chart(implicit
             )(
               Recharts.CartesianGrid(strokeDasharray = "3 3", vertical = false),
               Recharts.XAxis(
-                dataKey = "month",
+                dataKey = "x",
                 tickFormatter = s => s.toString.takeRight(4),
-                ticks = assembleAllJanuaries().toJSArray,
+                ticks = assembleTicks().toJSArray,
               ),
               Recharts.YAxis(tickFormatter = formatDoubleMoney(roundToInteger = true)),
               Recharts.Tooltip(formatter = formatDoubleMoney()),
@@ -212,17 +215,48 @@ final class Chart(implicit
     }
 
     private def assembleData()(implicit props: Props, state: State): Seq[Map[String, js.Any]] = {
+      props.chartSpec.aggregationPeriod match {
+        case AggregationPeriod.Month =>
+          assembleDataGeneric[DatedMonth](
+            keys = getAllMonths(),
+            getFlowAtKey = (month, linePoints) =>
+              linePoints.points
+                .getOrElse(month, ReferenceMoney(0)),
+            formatKey = formatMonth,
+          )
+        case AggregationPeriod.Year =>
+          assembleDataGeneric[AccountingYear](
+            keys = getAllYears(),
+            getFlowAtKey = (year, linePoints) =>
+              DatedMonth
+                .allMonthsIn(year)
+                .map(month =>
+                  linePoints.points
+                    .getOrElse(month, ReferenceMoney(0))
+                )
+                .sum,
+            formatKey = _.toHumanReadableString,
+          )
+      }
+    }
+
+    private def assembleDataGeneric[K](
+        keys: Seq[K],
+        getFlowAtKey: (K, LinePoints) => ReferenceMoney,
+        formatKey: K => String,
+    )(implicit props: Props, state: State): Seq[Map[String, js.Any]] = {
       val cumulativeMap = mutable.Map[Line, ReferenceMoney]().withDefaultValue(ReferenceMoney(0))
-      for (month <- getAllMonths()) yield {
+
+      for (key <- keys) yield {
         Map[String, js.Any](
-          "month" -> formatMonth(month)
+          "x" -> formatKey(key)
         ) ++ props.chartSpec.lines.map { line =>
+          val amount = getFlowAtKey(
+            key,
+            state
+              .lineToPoints(line),
+          )
           line.name -> {
-            val amount =
-              state
-                .lineToPoints(line)
-                .points
-                .getOrElse(month, ReferenceMoney(0))
             val result = {
               if (line.cumulative) {
                 val newCumulativeAmount = cumulativeMap(line) + amount
@@ -238,8 +272,11 @@ final class Chart(implicit
       }
     }
 
-    private def assembleAllJanuaries()(implicit props: Props, state: State): Seq[String] = {
-      getAllMonths().filter(_.month == Month.JANUARY).map(formatMonth)
+    private def assembleTicks()(implicit props: Props, state: State): Seq[String] = {
+      props.chartSpec.aggregationPeriod match {
+        case AggregationPeriod.Month => getAllMonths().filter(_.month == Month.JANUARY).map(formatMonth)
+        case AggregationPeriod.Year  => getAllYears().map(_.toHumanReadableString)
+      }
     }
 
     private def getAllMonths()(implicit props: Props, state: State): Seq[DatedMonth] = {
@@ -248,6 +285,15 @@ final class Chart(implicit
         Seq()
       } else {
         DatedMonth.monthsInClosedRange(allDatesWithData.min, allDatesWithData.max)
+      }
+    }
+
+    private def getAllYears()(implicit props: Props, state: State): Seq[AccountingYear] = {
+      val allDatesWithData = state.lineToPoints.flatMap(_._2.points.keySet)
+      if (allDatesWithData.isEmpty) {
+        Seq()
+      } else {
+        YearRange.closed(allDatesWithData.min.accountingYear, allDatesWithData.max.accountingYear).toSeq
       }
     }
 
