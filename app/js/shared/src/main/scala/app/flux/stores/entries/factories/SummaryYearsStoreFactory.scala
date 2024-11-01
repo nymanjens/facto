@@ -1,5 +1,6 @@
 package app.flux.stores.entries.factories
 
+import app.common.time.AccountingYear
 import app.common.time.YearRange
 import app.flux.stores.entries.EntriesStore
 import app.flux.stores.entries.factories.SummaryYearsStoreFactory.State
@@ -9,6 +10,7 @@ import app.models.access.ModelFields
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.accounting.config.Account
+import app.models.accounting.config.Config
 import hydro.models.access.DbQuery
 import hydro.models.access.DbQueryImplicits._
 
@@ -24,7 +26,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
  * The calculated range is guaranteed to contain at least all years there are transactions for but may also contain
  * more (although unlikely).
  */
-final class SummaryYearsStoreFactory(implicit entityAccess: AppJsEntityAccess)
+final class SummaryYearsStoreFactory(implicit entityAccess: AppJsEntityAccess, accountingConfig: Config)
     extends EntriesStoreFactory[State] {
 
   // **************** Implementation of EntriesStoreFactory methods/types ****************//
@@ -39,7 +41,8 @@ final class SummaryYearsStoreFactory(implicit entityAccess: AppJsEntityAccess)
         earliest <- maybeEarliest
         latest <- maybeLatest
       } yield State(
-        YearRange.closed(earliest.consumedDate.getYear, latest.consumedDate.getYear),
+        YearRange
+          .closed(AccountingYear.from(earliest.consumedDate), AccountingYear.from(latest.consumedDate)),
         impactingTransactionIds = Set(earliest.id, latest.id),
       )
 
@@ -48,7 +51,7 @@ final class SummaryYearsStoreFactory(implicit entityAccess: AppJsEntityAccess)
 
     override protected def transactionUpsertImpactsState(transaction: Transaction, oldState: State) =
       transaction.beneficiaryAccountCode == account.code && !oldState.yearRange.contains(
-        transaction.consumedDate.getYear
+        AccountingYear.from(transaction.consumedDate)
       )
     override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) = false
 
