@@ -2,14 +2,16 @@ package app.common.time
 
 import java.time.LocalDate
 import java.time.Month._
-
 import hydro.common.testing.FakeI18n
 import hydro.common.testing.HookedSpecification
 import app.common.testing.TestModule
+import app.common.testing.TestObjects
 import com.google.inject.Guice
 import com.google.inject.Inject
 import hydro.common.time.LocalDateTime
 import hydro.common.time.LocalDateTimes.createDateTime
+
+import java.time.Month
 
 class DatedMonthTest extends HookedSpecification {
 
@@ -37,21 +39,44 @@ class DatedMonthTest extends HookedSpecification {
   }
 
   "allMonthsIn" in {
-    val months = DatedMonth.allMonthsIn(1990)
-    months mustEqual Seq(
-      DatedMonth(LocalDate.of(1990, JANUARY, 1)),
-      DatedMonth(LocalDate.of(1990, FEBRUARY, 1)),
-      DatedMonth(LocalDate.of(1990, MARCH, 1)),
-      DatedMonth(LocalDate.of(1990, APRIL, 1)),
-      DatedMonth(LocalDate.of(1990, MAY, 1)),
-      DatedMonth(LocalDate.of(1990, JUNE, 1)),
-      DatedMonth(LocalDate.of(1990, JULY, 1)),
-      DatedMonth(LocalDate.of(1990, AUGUST, 1)),
-      DatedMonth(LocalDate.of(1990, SEPTEMBER, 1)),
-      DatedMonth(LocalDate.of(1990, OCTOBER, 1)),
-      DatedMonth(LocalDate.of(1990, NOVEMBER, 1)),
-      DatedMonth(LocalDate.of(1990, DECEMBER, 1)),
-    )
+    "start=January" in {
+      val months = DatedMonth.allMonthsIn(AccountingYear(1990))(
+        TestObjects.createAccountingConfig(firstMonthOfYear = Month.JANUARY)
+      )
+      months mustEqual Seq(
+        DatedMonth(LocalDate.of(1990, JANUARY, 1)),
+        DatedMonth(LocalDate.of(1990, FEBRUARY, 1)),
+        DatedMonth(LocalDate.of(1990, MARCH, 1)),
+        DatedMonth(LocalDate.of(1990, APRIL, 1)),
+        DatedMonth(LocalDate.of(1990, MAY, 1)),
+        DatedMonth(LocalDate.of(1990, JUNE, 1)),
+        DatedMonth(LocalDate.of(1990, JULY, 1)),
+        DatedMonth(LocalDate.of(1990, AUGUST, 1)),
+        DatedMonth(LocalDate.of(1990, SEPTEMBER, 1)),
+        DatedMonth(LocalDate.of(1990, OCTOBER, 1)),
+        DatedMonth(LocalDate.of(1990, NOVEMBER, 1)),
+        DatedMonth(LocalDate.of(1990, DECEMBER, 1)),
+      )
+    }
+    "start=August" in {
+      val months = DatedMonth.allMonthsIn(AccountingYear(1990))(
+        TestObjects.createAccountingConfig(firstMonthOfYear = Month.AUGUST)
+      )
+      months mustEqual Seq(
+        DatedMonth(LocalDate.of(1990, AUGUST, 1)),
+        DatedMonth(LocalDate.of(1990, SEPTEMBER, 1)),
+        DatedMonth(LocalDate.of(1990, OCTOBER, 1)),
+        DatedMonth(LocalDate.of(1990, NOVEMBER, 1)),
+        DatedMonth(LocalDate.of(1990, DECEMBER, 1)),
+        DatedMonth(LocalDate.of(1991, JANUARY, 1)),
+        DatedMonth(LocalDate.of(1991, FEBRUARY, 1)),
+        DatedMonth(LocalDate.of(1991, MARCH, 1)),
+        DatedMonth(LocalDate.of(1991, APRIL, 1)),
+        DatedMonth(LocalDate.of(1991, MAY, 1)),
+        DatedMonth(LocalDate.of(1991, JUNE, 1)),
+        DatedMonth(LocalDate.of(1991, JULY, 1)),
+      )
+    }
   }
 
   "startTime" in {

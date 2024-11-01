@@ -5,6 +5,7 @@ import app.common.accounting.ComplexQueryFilter
 import hydro.common.testing.FakeJsEntityAccess
 import app.common.testing.TestModule
 import app.common.testing.TestObjects._
+import app.common.time.AccountingYear
 import app.flux.stores.entries.AccountPair
 import app.flux.stores.entries.EntriesStore
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.ExchangeRateGains
@@ -151,7 +152,7 @@ object StoreFactoryStateUpdateTest extends TestSuite {
 
     "SummaryExchangeRateGainsStoreFactory" - runTest(
       store = testModule.summaryExchangeRateGainsStoreFactory
-        .get(account = testAccountA, year = 2015, correctForInflation = false),
+        .get(account = testAccountA, year = AccountingYear(2015), correctForInflation = false),
       updatesWithImpact = ListMap(
         // Seed random fluctuating prices
         Add(createExchangeRateMeasurement(year = 2014)) -> StateImpact.NoChange,
@@ -191,7 +192,7 @@ object StoreFactoryStateUpdateTest extends TestSuite {
     )
 
     "SummaryForYearStoreFactory" - runTest(
-      store = testModule.summaryForYearStoreFactory.get(account = testAccountA, year = 2015),
+      store = testModule.summaryForYearStoreFactory.get(account = testAccountA, year = AccountingYear(2015)),
       updatesWithImpact = ListMap(
         // Add Transactions
         Add(createTransaction(id = 10, year = 2015, beneficiary = testAccountA)) -> StateImpact.Change,

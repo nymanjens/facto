@@ -6,74 +6,83 @@ import scala.collection.immutable.Seq
 
 class YearRangeTest extends Specification {
 
+  val y2005 = AccountingYear(2005)
+  val y2006 = AccountingYear(2006)
+  val y2007 = AccountingYear(2007)
+  val y2008 = AccountingYear(2008)
+  val y2009 = AccountingYear(2009)
+  val y2010 = AccountingYear(2010)
+  val y2011 = AccountingYear(2011)
+  val y2012 = AccountingYear(2012)
+
   "closed" in {
-    YearRange.closed(2007, 2010).toSeq mustEqual Seq(2007, 2008, 2009, 2010)
-    YearRange.closed(2007, 2007).toSeq mustEqual Seq(2007)
-    YearRange.closed(2009, 2008).toSeq must throwA[IllegalArgumentException]
+    YearRange.closed(y2007, y2010).toSeq mustEqual Seq(y2007, y2008, y2009, y2010)
+    YearRange.closed(y2007, y2007).toSeq mustEqual Seq(y2007)
+    YearRange.closed(y2009, y2008).toSeq must throwA[IllegalArgumentException]
   }
   "single" in {
-    YearRange.single(2007).toSeq mustEqual Seq(2007)
+    YearRange.single(y2007).toSeq mustEqual Seq(y2007)
   }
   "empty" in {
     YearRange.empty.toSeq mustEqual Seq()
   }
   "firstYear" in {
-    YearRange.closed(2007, 2010).firstYear mustEqual 2007
+    YearRange.closed(y2007, y2010).firstYear mustEqual y2007
     YearRange.empty.firstYear must throwA[IllegalArgumentException]
   }
   "lastYear" in {
-    YearRange.closed(2007, 2010).lastYear mustEqual 2010
+    YearRange.closed(y2007, y2010).lastYear mustEqual y2010
     YearRange.empty.lastYear must throwA[IllegalArgumentException]
   }
   "contains" in {
-    YearRange.closed(2007, 2010).contains(2006) mustEqual false
-    YearRange.closed(2007, 2010).contains(2007) mustEqual true
-    YearRange.closed(2007, 2010).contains(2008) mustEqual true
-    YearRange.closed(2007, 2010).contains(2009) mustEqual true
-    YearRange.closed(2007, 2010).contains(2010) mustEqual true
-    YearRange.closed(2007, 2010).contains(2011) mustEqual false
-    YearRange.empty.contains(2010) mustEqual false
+    YearRange.closed(y2007, y2010).contains(y2006) mustEqual false
+    YearRange.closed(y2007, y2010).contains(y2007) mustEqual true
+    YearRange.closed(y2007, y2010).contains(y2008) mustEqual true
+    YearRange.closed(y2007, y2010).contains(y2009) mustEqual true
+    YearRange.closed(y2007, y2010).contains(y2010) mustEqual true
+    YearRange.closed(y2007, y2010).contains(y2011) mustEqual false
+    YearRange.empty.contains(y2010) mustEqual false
   }
   "isEmpty" in {
-    YearRange.closed(2007, 2010).isEmpty mustEqual false
+    YearRange.closed(y2007, y2010).isEmpty mustEqual false
     YearRange.empty.isEmpty mustEqual true
   }
   "size" in {
-    YearRange.closed(2007, 2010).size mustEqual 4
-    YearRange.single(2007).size mustEqual 1
+    YearRange.closed(y2007, y2010).size mustEqual 4
+    YearRange.single(y2007).size mustEqual 1
     YearRange.empty.size mustEqual 0
   }
   "copyIncluding" in {
-    YearRange.closed(2007, 2010).copyIncluding(2008) mustEqual YearRange.closed(2007, 2010)
-    YearRange.closed(2007, 2010).copyIncluding(2005) mustEqual YearRange.closed(2005, 2010)
-    YearRange.closed(2007, 2010).copyIncluding(2012) mustEqual YearRange.closed(2007, 2012)
+    YearRange.closed(y2007, y2010).copyIncluding(y2008) mustEqual YearRange.closed(y2007, y2010)
+    YearRange.closed(y2007, y2010).copyIncluding(y2005) mustEqual YearRange.closed(y2005, y2010)
+    YearRange.closed(y2007, y2010).copyIncluding(y2012) mustEqual YearRange.closed(y2007, y2012)
 
-    YearRange.single(2008).copyIncluding(2008) mustEqual YearRange.single(2008)
-    YearRange.single(2008).copyIncluding(2006) mustEqual YearRange.closed(2006, 2008)
-    YearRange.single(2008).copyIncluding(2012) mustEqual YearRange.closed(2008, 2012)
+    YearRange.single(y2008).copyIncluding(y2008) mustEqual YearRange.single(y2008)
+    YearRange.single(y2008).copyIncluding(y2006) mustEqual YearRange.closed(y2006, y2008)
+    YearRange.single(y2008).copyIncluding(y2012) mustEqual YearRange.closed(y2008, y2012)
 
-    YearRange.empty.copyIncluding(2008) mustEqual YearRange.single(2008)
+    YearRange.empty.copyIncluding(y2008) mustEqual YearRange.single(y2008)
   }
   "copyWithLowerBound" in {
-    YearRange.closed(2007, 2010).copyWithLowerBound(2008) mustEqual YearRange.closed(2008, 2010)
-    YearRange.closed(2007, 2010).copyWithLowerBound(2005) mustEqual YearRange.closed(2007, 2010)
-    YearRange.closed(2007, 2010).copyWithLowerBound(2012) mustEqual YearRange.empty
+    YearRange.closed(y2007, y2010).copyWithLowerBound(y2008) mustEqual YearRange.closed(y2008, y2010)
+    YearRange.closed(y2007, y2010).copyWithLowerBound(y2005) mustEqual YearRange.closed(y2007, y2010)
+    YearRange.closed(y2007, y2010).copyWithLowerBound(y2012) mustEqual YearRange.empty
 
-    YearRange.single(2008).copyWithLowerBound(2008) mustEqual YearRange.single(2008)
-    YearRange.single(2008).copyWithLowerBound(2006) mustEqual YearRange.single(2008)
-    YearRange.single(2008).copyWithLowerBound(2012) mustEqual YearRange.empty
+    YearRange.single(y2008).copyWithLowerBound(y2008) mustEqual YearRange.single(y2008)
+    YearRange.single(y2008).copyWithLowerBound(y2006) mustEqual YearRange.single(y2008)
+    YearRange.single(y2008).copyWithLowerBound(y2012) mustEqual YearRange.empty
 
-    YearRange.empty.copyWithLowerBound(2008) mustEqual YearRange.empty
+    YearRange.empty.copyWithLowerBound(y2008) mustEqual YearRange.empty
   }
   "copyLessThan" in {
-    YearRange.closed(2007, 2010).copyLessThan(2008) mustEqual YearRange.single(2007)
-    YearRange.closed(2007, 2010).copyLessThan(2005) mustEqual YearRange.empty
-    YearRange.closed(2007, 2010).copyLessThan(2012) mustEqual YearRange.closed(2007, 2010)
+    YearRange.closed(y2007, y2010).copyLessThan(y2008) mustEqual YearRange.single(y2007)
+    YearRange.closed(y2007, y2010).copyLessThan(y2005) mustEqual YearRange.empty
+    YearRange.closed(y2007, y2010).copyLessThan(y2012) mustEqual YearRange.closed(y2007, y2010)
 
-    YearRange.single(2008).copyLessThan(2008) mustEqual YearRange.empty
-    YearRange.single(2008).copyLessThan(2006) mustEqual YearRange.empty
-    YearRange.single(2008).copyLessThan(2009) mustEqual YearRange.single(2008)
+    YearRange.single(y2008).copyLessThan(y2008) mustEqual YearRange.empty
+    YearRange.single(y2008).copyLessThan(y2006) mustEqual YearRange.empty
+    YearRange.single(y2008).copyLessThan(y2009) mustEqual YearRange.single(y2008)
 
-    YearRange.empty.copyLessThan(2008) mustEqual YearRange.empty
+    YearRange.empty.copyLessThan(y2008) mustEqual YearRange.empty
   }
 }

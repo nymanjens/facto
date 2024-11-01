@@ -228,6 +228,10 @@ object TestObjects {
     constants = testConstants,
   )
 
+  def createAccountingConfig(firstMonthOfYear: Month = Month.JANUARY): Config = {
+    testAccountingConfig.copy(constants = testConstants.copy(firstMonthOfYear = firstMonthOfYear))
+  }
+
   private def createListMap[K, V](elems: (K, V)*): ListMap[K, V] = {
     val resultBuilder = ListMap.newBuilder[K, V]
     elems.foreach(resultBuilder += _)
