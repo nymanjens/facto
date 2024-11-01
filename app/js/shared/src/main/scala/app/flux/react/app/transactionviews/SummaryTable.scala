@@ -377,7 +377,7 @@ private[transactionviews] final class SummaryTable(implicit
                     <.a(
                       ^.href := "javascript:void(0)",
                       ^.onClick --> props.onShowHiddenYears,
-                      yearRange.firstYear,
+                      yearRange.firstYear.startYear,
                       <<.ifThen(yearRange.size > 1)("-"),
                     ),
                   )
@@ -389,7 +389,11 @@ private[transactionviews] final class SummaryTable(implicit
                   <.th(
                     ^.key := year.startYear,
                     ^.colSpan := columnsForYear(year, expandedYear = props.expandedYear).size,
-                    <.a(^.href := "javascript:void(0)", ^.onClick --> props.onSetExpandedYear(year), year),
+                    <.a(
+                      ^.href := "javascript:void(0)",
+                      ^.onClick --> props.onSetExpandedYear(year),
+                      year.toHumanReadableString,
+                    ),
                   )
                 )
               case TotalColumn(year) =>
@@ -397,7 +401,11 @@ private[transactionviews] final class SummaryTable(implicit
                   <.th(
                     ^.key := year.startYear,
                     ^.colSpan := columnsForYear(year, expandedYear = props.expandedYear).size,
-                    <.a(^.href := "javascript:void(0)", ^.onClick --> props.onSetExpandedYear(year), year),
+                    <.a(
+                      ^.href := "javascript:void(0)",
+                      ^.onClick --> props.onSetExpandedYear(year),
+                      year.toHumanReadableString,
+                    ),
                   )
                 )
             }.toVdomArray
@@ -413,7 +421,7 @@ private[transactionviews] final class SummaryTable(implicit
                   <.a(
                     ^.href := "javascript:void(0)",
                     ^.onClick --> props.onShowHiddenYears,
-                    <<.ifThen(yearRange.size > 1)(yearRange.lastYear),
+                    <<.ifThen(yearRange.size > 1)(yearRange.lastYear.endYear),
                   ),
                 )
               case MonthColumn(month) =>
@@ -687,7 +695,7 @@ private[transactionviews] final class SummaryTable(implicit
       val (data, usedStores): (AllYearsData, Set[EntriesStore[_]]) = {
         val yearsStore = summaryYearsStoreFactory.get(props.account)
         val allTransactionsYearRange = yearsStore.state.map(_.yearRange) getOrElse
-          YearRange.closed(AccountingYear.current minusYears  1, AccountingYear.current)
+          YearRange.closed(AccountingYear.current minusYears 1, AccountingYear.current)
         val yearRange = allTransactionsYearRange
           .copyIncluding(AccountingYear.current)
           .copyWithLowerBound(props.yearLowerBound)

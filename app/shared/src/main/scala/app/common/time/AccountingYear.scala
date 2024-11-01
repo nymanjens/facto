@@ -14,7 +14,16 @@ import scala.collection.mutable
 
 case class AccountingYear(startYear: Int) extends Ordered[AccountingYear] {
   override def compare(that: AccountingYear): Int = this.startYear compareTo that.startYear
-  def toHumanReadableString(implicit accountingConfig: Config) = {
+
+  def endYear(implicit accountingConfig: Config): Int = {
+    if (accountingConfig.constants.firstMonthOfYear == Month.JANUARY) {
+      startYear
+    } else {
+      startYear + 1
+    }
+  }
+
+  def toHumanReadableString(implicit accountingConfig: Config): String = {
     if (accountingConfig.constants.firstMonthOfYear == Month.JANUARY) {
       startYear.toString
     } else {
