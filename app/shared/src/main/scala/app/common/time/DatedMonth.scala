@@ -28,9 +28,9 @@ case class DatedMonth(startDate: LocalDate) extends Ordered[DatedMonth] {
   def accountingYear(implicit accountingConfig: Config): AccountingYear = {
     val firstMonthOfYear = accountingConfig.constants.firstMonthOfYear
     if (month.getValue < firstMonthOfYear.getValue) {
-      AccountingYear.ofStartYear(startDate.getYear - 1)
+      AccountingYear(startDate.getYear - 1)
     } else {
-      AccountingYear.ofStartYear(startDate.getYear)
+      AccountingYear(startDate.getYear)
     }
   }
 
@@ -82,10 +82,11 @@ object DatedMonth {
 
   def containing(dateTime: LocalDateTime): DatedMonth = containing(dateTime.toLocalDate)
 
-  def allMonthsIn(year: AccountingYear): Seq[DatedMonth] = {
+  def allMonthsIn(year: AccountingYear)(implicit accountingConfig: Config): Seq[DatedMonth] = {
+    val startMonth = accountingConfig.constants.firstMonthOfYear
     monthsInClosedRange(
-      DatedMonth.of(year.startYear, year.startMonth),
-      DatedMonth.of(year.startYear + 1, year.startMonth),
+      DatedMonth.of(year.startYear, startMonth),
+      DatedMonth.of(year.startYear + 1, startMonth),
     )
   }
 

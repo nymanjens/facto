@@ -689,7 +689,7 @@ private[transactionviews] final class SummaryTable(implicit
         val allTransactionsYearRange = yearsStore.state.map(_.yearRange) getOrElse
           YearRange.closed(clock.now.getYear - 1, clock.now.getYear)
         val yearRange = allTransactionsYearRange
-          .copyIncluding(clock.now.getYear)
+          .copyIncluding(DatedMonth.current.accountingYear)
           .copyWithLowerBound(props.yearLowerBound)
           .copyIncluding(props.expandedYear)
 
