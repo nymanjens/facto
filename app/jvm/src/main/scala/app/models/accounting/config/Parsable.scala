@@ -1,7 +1,6 @@
 package app.models.accounting.config
 
 import java.util.Collections
-
 import app.common.accounting.{ChartSpec => ParsedChartSpec}
 import app.models.accounting.config.{Account => ParsedAccount}
 import app.models.accounting.config.{Category => ParsedCategory}
@@ -17,6 +16,7 @@ import com.google.common.collect.ImmutableList
 import hydro.common.Annotations.nullable
 import hydro.common.Require.requireNonNull
 
+import java.time.Month
 import scala.collection.JavaConverters._
 import scala.collection.immutable.ListMap
 import scala.collection.immutable.Seq
@@ -274,6 +274,7 @@ object Parsable {
       liquidationDescription: String,
       zoneId: String,
       supportInflationCorrections: Boolean,
+      firstMonthOfYear: String,
   ) {
     def this() = this(
       null,
@@ -282,6 +283,7 @@ object Parsable {
       liquidationDescription = "Liquidation",
       zoneId = "Europe/Brussels",
       supportInflationCorrections = false,
+      firstMonthOfYear = "January",
     )
 
     def parse: ParsedConstants = {
@@ -292,6 +294,7 @@ object Parsable {
         liquidationDescription = liquidationDescription,
         zoneId = zoneId,
         supportInflationCorrections = supportInflationCorrections,
+        firstMonthOfYear = Month.valueOf(firstMonthOfYear.toUpperCase),
       )
     }
   }

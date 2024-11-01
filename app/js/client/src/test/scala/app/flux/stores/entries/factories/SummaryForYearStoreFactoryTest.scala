@@ -2,11 +2,11 @@ package app.flux.stores.entries.factories
 
 import java.time.Month
 import java.time.Month._
-
 import app.common.accounting.ComplexQueryFilter
 import app.common.money.ReferenceMoney
 import hydro.common.testing.FakeJsEntityAccess
 import app.common.testing.TestObjects._
+import app.common.time.AccountingYear
 import app.common.time.DatedMonth
 import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
 import app.models.accounting.Transaction
@@ -30,7 +30,7 @@ object SummaryForYearStoreFactoryTest extends TestSuite {
     val factory: SummaryForYearStoreFactory = new SummaryForYearStoreFactory()
 
     "empty result" - async {
-      val store = factory.get(testAccountA, 2012, query = "abc")
+      val store = factory.get(testAccountA, AccountingYear(2012), query = "abc")
       val state = await(store.stateFuture)
 
       state ==> SummaryForYear.empty
@@ -38,7 +38,7 @@ object SummaryForYearStoreFactoryTest extends TestSuite {
     "single transaction" - async {
       val transaction = persistTransaction()
 
-      val store = factory.get(testAccountA, 2012, query = "abc")
+      val store = factory.get(testAccountA, AccountingYear(2012), query = "abc")
       val state = await(store.stateFuture)
 
       state ==> SummaryForYear(Seq(transaction))
@@ -48,7 +48,7 @@ object SummaryForYearStoreFactoryTest extends TestSuite {
       val transaction2 = persistTransaction(day = 2, month = JANUARY)
       val transaction3 = persistTransaction(day = 3, month = JANUARY)
 
-      val store = factory.get(testAccountA, 2012, query = "abc")
+      val store = factory.get(testAccountA, AccountingYear(2012), query = "abc")
       val state = await(store.stateFuture)
 
       state ==> SummaryForYear(Seq(transaction1, transaction2, transaction3))
@@ -56,7 +56,7 @@ object SummaryForYearStoreFactoryTest extends TestSuite {
     "transaction in different year" - async {
       persistTransaction(year = 2010)
 
-      val store = factory.get(testAccountA, 2012, query = "abc")
+      val store = factory.get(testAccountA, AccountingYear(2012), query = "abc")
       val state = await(store.stateFuture)
 
       state ==> SummaryForYear.empty
@@ -65,7 +65,7 @@ object SummaryForYearStoreFactoryTest extends TestSuite {
     "transaction for different account" - async {
       persistTransaction(beneficiary = testAccountB)
 
-      val store = factory.get(testAccountA, 2012, query = "abc")
+      val store = factory.get(testAccountA, AccountingYear(2012), query = "abc")
       val state = await(store.stateFuture)
 
       state ==> SummaryForYear.empty
@@ -74,7 +74,7 @@ object SummaryForYearStoreFactoryTest extends TestSuite {
     "transaction outside filter" - async {
       persistTransaction(description = "xyz")
 
-      val store = factory.get(testAccountA, 2012, query = "abc")
+      val store = factory.get(testAccountA, AccountingYear(2012), query = "abc")
       val state = await(store.stateFuture)
 
       state ==> SummaryForYear.empty

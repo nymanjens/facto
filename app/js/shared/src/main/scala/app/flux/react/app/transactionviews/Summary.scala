@@ -5,6 +5,8 @@ import hydro.flux.react.uielements.Bootstrap.Size
 import hydro.flux.react.uielements.Bootstrap.Variant
 import hydro.common.I18n
 import app.common.money.CurrencyValueManager
+import app.common.time.AccountingYear
+import app.common.time.DatedMonth
 import app.flux.stores.InMemoryUserConfigStore
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Config
@@ -42,8 +44,8 @@ final class Summary(implicit
   override protected val config = ComponentConfig(
     backendConstructor = new Backend(_),
     initialState = State(
-      yearLowerBound = clock.now.getYear - 1,
-      expandedYear = clock.now.getYear,
+      yearLowerBound = AccountingYear.current minusYears 1,
+      expandedYear = AccountingYear.current,
     ),
   ).withStateStoresDependency(
     inMemoryUserConfigStore,
@@ -55,8 +57,8 @@ final class Summary(implicit
   protected case class State(
       includeUnrelatedAccounts: Boolean = false,
       query: String = "",
-      yearLowerBound: Int,
-      expandedYear: Int,
+      yearLowerBound: AccountingYear,
+      expandedYear: AccountingYear,
       showYearlyTotal: Boolean = false, // instead of average
       correctForInflation: Boolean = false,
   )
@@ -102,7 +104,7 @@ final class Summary(implicit
               yearLowerBound = state.yearLowerBound,
               expandedYear = state.expandedYear,
               showYearlyTotal = state.showYearlyTotal,
-              onShowHiddenYears = $.modState(_.copy(yearLowerBound = Int.MinValue)),
+              onShowHiddenYears = $.modState(_.copy(yearLowerBound = AccountingYear(Int.MinValue))),
               onSetExpandedYear = year => $.modState(_.copy(expandedYear = year)),
               onShowYearlyTotalToggle = $.modState(s => s.copy(showYearlyTotal = !s.showYearlyTotal)),
               correctForInflation = state.correctForInflation,

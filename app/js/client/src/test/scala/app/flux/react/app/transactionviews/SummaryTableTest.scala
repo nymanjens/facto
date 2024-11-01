@@ -6,6 +6,7 @@ import app.common.money.Currency
 import app.common.money.ReferenceMoney
 import app.common.testing.TestModule
 import app.common.testing.TestObjects._
+import app.common.time.AccountingYear
 import app.common.time.DatedMonth
 import app.common.time.YearRange
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForMonth
@@ -27,9 +28,9 @@ object SummaryTableTest extends TestSuite {
     fakeClock.setNow(createDateTime(2013, JANUARY, 2))
 
     val allYearsData = summaryTable.AllYearsData(
-      allTransactionsYearRange = YearRange.closed(2010, 2013),
+      allTransactionsYearRange = YearRange.closed(AccountingYear(2010), AccountingYear(2013)),
       yearsToData = ListMap(
-        2012 -> summaryTable.AllYearsData.YearData(
+        AccountingYear(2012) -> summaryTable.AllYearsData.YearData(
           SummaryForYear(
             Seq(
               createTransaction(year = 2012, month = APRIL, flow = 22, category = testCategoryA),
@@ -48,7 +49,7 @@ object SummaryTableTest extends TestSuite {
           exchangeRateGainsCorrectedForInflation = ExchangeRateGains.empty,
           inflationGains = InflationGains.empty,
         ),
-        2013 -> summaryTable.AllYearsData.YearData(
+        AccountingYear( 2013) -> summaryTable.AllYearsData.YearData(
           summary = SummaryForYear(
             Seq(
               createTransaction(year = 2013, category = testCategoryA),
@@ -97,14 +98,14 @@ object SummaryTableTest extends TestSuite {
           allYearsData
             .averageWithoutCategories(
               categoriesToIgnore = Set(),
-              year = 2012,
+              accountingYear = AccountingYear(2012),
               correctForInflation = false,
             ) ==>
             ReferenceMoney(roundToLong((2200.0 + 120 - 200 + 123) / 12))
           allYearsData
             .averageWithoutCategories(
               categoriesToIgnore = Set(testCategoryC),
-              year = 2012,
+              accountingYear = AccountingYear(2012),
               correctForInflation = false,
             ) ==>
             ReferenceMoney(roundToLong((2200.0 + 120 + 123) / 12))
@@ -115,64 +116,72 @@ object SummaryTableTest extends TestSuite {
           allYearsData
             .averageWithoutCategories(
               categoriesToIgnore = Set(),
-              year = 2012,
+              accountingYear = AccountingYear(2012),
               correctForInflation = false,
             ) ==>
             ReferenceMoney(roundToLong(2200.0 / 5))
           allYearsData
             .averageWithoutCategories(
               categoriesToIgnore = Set(testCategoryC),
-              year = 2012,
+              accountingYear = AccountingYear(2012),
               correctForInflation = false,
             ) ==>
             ReferenceMoney(roundToLong(2200.0 / 5))
         }
         "only after first transaction of year (April)" - {
-          val newAllYearsData = allYearsData.copy(allTransactionsYearRange = YearRange.closed(2012, 2013))
+          val newAllYearsData = allYearsData.copy(allTransactionsYearRange =
+            YearRange.closed(AccountingYear(2012), AccountingYear(2013))
+          )
 
           newAllYearsData
             .averageWithoutCategories(
               categoriesToIgnore = Set(),
-              year = 2012,
+              accountingYear = AccountingYear(2012),
               correctForInflation = false,
             ) ==>
             ReferenceMoney(roundToLong((2200.0 + 120 - 200 + 123) / 9))
           newAllYearsData
             .averageWithoutCategories(
               categoriesToIgnore = Set(testCategoryC),
-              year = 2012,
+              accountingYear = AccountingYear(2012),
               correctForInflation = false,
             ) ==>
             ReferenceMoney(roundToLong((2200.0 + 120 + 123) / 9))
         }
       }
       "years" - {
-        allYearsData.years ==> Seq(2012, 2013)
+        allYearsData.years ==> Seq(AccountingYear( 2012), AccountingYear(2013))
       }
       "yearlyAverage" - {
         "full year" - {
-          allYearsData.yearlyAverage(2012, testCategoryA, correctForInflation = false) ==>
+          allYearsData.yearlyAverage(AccountingYear(2012), testCategoryA, correctForInflation = false) ==>
             ReferenceMoney(roundToLong((2200.0 + 120) / 12))
         }
         "only before June" - {
           fakeClock.setNow(createDateTime(2012, JUNE, 2))
-          allYearsData.yearlyAverage(2012, testCategoryA, correctForInflation = false) ==> ReferenceMoney(
+          allYearsData.yearlyAverage(
+            AccountingYear(2012),
+            testCategoryA,
+            correctForInflation = false,
+          ) ==> ReferenceMoney(
             roundToLong(2200.0 / 5)
           )
         }
         "only after first transaction of year (April)" - {
-          val newAllYearsData = allYearsData.copy(allTransactionsYearRange = YearRange.closed(2012, 2013))
-          newAllYearsData.yearlyAverage(2012, testCategoryA, correctForInflation = false) ==>
+          val newAllYearsData = allYearsData.copy(allTransactionsYearRange =
+            YearRange.closed(AccountingYear(2012), AccountingYear(2013))
+          )
+          newAllYearsData.yearlyAverage(AccountingYear(2012), testCategoryA, correctForInflation = false) ==>
             ReferenceMoney(roundToLong((2200.0 + 120) / 9))
         }
       }
       "monthsForAverage" - {
         "full year" - {
-          allYearsData.monthsForAverage(2012) ==> DatedMonth.allMonthsIn(2012)
+          allYearsData.monthsForAverage(AccountingYear(2012)) ==> DatedMonth.allMonthsIn(AccountingYear(2012))
         }
         "only before June" - {
           fakeClock.setNow(createDateTime(2012, JUNE, 2))
-          allYearsData.monthsForAverage(2012) ==>
+          allYearsData.monthsForAverage(AccountingYear(2012)) ==>
             Seq(
               DatedMonth.of(2012, JANUARY),
               DatedMonth.of(2012, FEBRUARY),
@@ -182,9 +191,11 @@ object SummaryTableTest extends TestSuite {
             )
         }
         "only after first transaction of year (April)" - {
-          val newAllYearsData = allYearsData.copy(allTransactionsYearRange = YearRange.closed(2012, 2013))
+          val newAllYearsData = allYearsData.copy(allTransactionsYearRange =
+            YearRange.closed(AccountingYear(2012), AccountingYear(2013))
+          )
 
-          newAllYearsData.monthsForAverage(2012) ==>
+          newAllYearsData.monthsForAverage(AccountingYear(2012)) ==>
             Seq(
               DatedMonth.of(2012, APRIL),
               DatedMonth.of(2012, MAY),
@@ -217,7 +228,7 @@ object SummaryTableTest extends TestSuite {
         "full year" - {
           allYearsData.averageExchangeRateGains(
             Currency.Gbp,
-            2012,
+            AccountingYear(2012),
             correctForInflation = false,
           ) ==> ReferenceMoney(roundToLong(123 / 12))
         }
@@ -225,13 +236,19 @@ object SummaryTableTest extends TestSuite {
           fakeClock.setNow(createDateTime(2012, JUNE, 2))
           allYearsData.averageExchangeRateGains(
             Currency.Gbp,
-            2012,
+            AccountingYear(2012),
             correctForInflation = false,
           ) ==> ReferenceMoney(0)
         }
         "only after first transaction of year (April)" - {
-          val newAllYearsData = allYearsData.copy(allTransactionsYearRange = YearRange.closed(2012, 2013))
-          newAllYearsData.averageExchangeRateGains(Currency.Gbp, 2012, correctForInflation = false) ==>
+          val newAllYearsData = allYearsData.copy(allTransactionsYearRange =
+            YearRange.closed(AccountingYear(2012), AccountingYear(2013))
+          )
+          newAllYearsData.averageExchangeRateGains(
+            Currency.Gbp,
+            AccountingYear(2012),
+            correctForInflation = false,
+          ) ==>
             ReferenceMoney(roundToLong(123.0 / 9))
         }
       }

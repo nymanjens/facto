@@ -5,6 +5,7 @@ import app.common.accounting.DateToBalanceFunction
 import app.common.money.CurrencyValueManager
 import app.common.money.MoneyWithGeneralCurrency
 import app.common.money.ReferenceMoney
+import app.common.time.AccountingYear
 import app.common.time.DatedMonth
 import app.flux.stores.entries.factories.SummaryInflationGainsStoreFactory.GainsForMonth
 import app.flux.stores.entries.factories.SummaryInflationGainsStoreFactory.InflationGains
@@ -46,8 +47,8 @@ final class SummaryInflationGainsStoreFactory(implicit
 ) extends EntriesStoreFactory[InflationGains] {
 
   // **************** Public API ****************//
-  def get(account: Account = null, year: Int = -1): Store = {
-    get(Input(account = Option(account), year = if (year == -1) None else Some(year)))
+  def get(account: Account = null, year: AccountingYear = null): Store = {
+    get(Input(account = Option(account), year = Option(year)))
   }
 
   // **************** Implementation of EntriesStoreFactory methods/types ****************//
@@ -65,11 +66,11 @@ final class SummaryInflationGainsStoreFactory(implicit
 
     override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) = {
       isRelevantReservoir(transaction.moneyReservoir) &&
-      (input.year.isEmpty || transaction.transactionDate.getYear <= input.year.get)
+      (input.year.isEmpty || AccountingYear.from(transaction.transactionDate) <= input.year.get)
     }
     override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) = {
       isRelevantReservoir(balanceCheck.moneyReservoir) &&
-      (input.year.isEmpty || balanceCheck.checkDate.getYear <= input.year.get)
+      (input.year.isEmpty || AccountingYear.from(balanceCheck.checkDate) <= input.year.get)
     }
 
     // **************** Private helper methods ****************//
@@ -188,7 +189,7 @@ final class SummaryInflationGainsStoreFactory(implicit
   }
 
   /* override */
-  protected case class Input(account: Option[Account], year: Option[Int])
+  protected case class Input(account: Option[Account], year: Option[AccountingYear])
 }
 
 object SummaryInflationGainsStoreFactory {

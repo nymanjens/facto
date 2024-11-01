@@ -1,9 +1,10 @@
 package app.common.time
 
+import app.models.accounting.config.Config
+
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.Month
-
 import hydro.common.I18n
 import hydro.common.time.Clock
 import hydro.common.time.LocalDateTime
@@ -23,6 +24,15 @@ case class DatedMonth(startDate: LocalDate) extends Ordered[DatedMonth] {
 
   def month: Month = startDate.getMonth
   def year: Int = startDate.getYear
+
+  def accountingYear(implicit accountingConfig: Config): AccountingYear = {
+    val firstMonthOfYear = accountingConfig.constants.firstMonthOfYear
+    if (month.getValue < firstMonthOfYear.getValue) {
+      AccountingYear(startDate.getYear - 1)
+    } else {
+      AccountingYear(startDate.getYear)
+    }
+  }
 
   def contains(date: LocalDateTime): Boolean = {
     date.getYear == startDate.getYear && date.getMonth == startDate.getMonth
@@ -72,9 +82,12 @@ object DatedMonth {
 
   def containing(dateTime: LocalDateTime): DatedMonth = containing(dateTime.toLocalDate)
 
-  def allMonthsIn(year: Int): Seq[DatedMonth] = {
-    for (month <- TimeUtils.allMonths)
-      yield DatedMonth(LocalDate.of(year, month, 1))
+  def allMonthsIn(year: AccountingYear)(implicit accountingConfig: Config): Seq[DatedMonth] = {
+    val startMonth = accountingConfig.constants.firstMonthOfYear
+    monthsInClosedRange(
+      DatedMonth.of(year.startYear, startMonth),
+      DatedMonth.of(year.startYear + 1, startMonth),
+    ).take(12)
   }
 
   def monthsInClosedRange(start: DatedMonth, endInclusive: DatedMonth): Seq[DatedMonth] = {

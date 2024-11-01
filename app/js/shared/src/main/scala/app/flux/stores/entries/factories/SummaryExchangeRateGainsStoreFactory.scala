@@ -8,6 +8,7 @@ import app.common.money.Currency
 import app.common.money.CurrencyValueManager
 import app.common.money.MoneyWithGeneralCurrency
 import app.common.money.ReferenceMoney
+import app.common.time.AccountingYear
 import app.common.time.DatedMonth
 import app.flux.stores.entries.EntriesStore
 import app.flux.stores.entries.factories.SummaryExchangeRateGainsStoreFactory.GainsForMonth
@@ -50,11 +51,11 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
 ) extends EntriesStoreFactory[ExchangeRateGains] {
 
   // **************** Public API ****************//
-  def get(account: Account = null, year: Int = -1, correctForInflation: Boolean): Store = {
+  def get(account: Account = null, year: AccountingYear = null, correctForInflation: Boolean): Store = {
     get(
       Input(
         account = Option(account),
-        year = if (year == -1) None else Some(year),
+        year = Option(year),
         correctForInflation = correctForInflation,
       )
     )
@@ -75,11 +76,11 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
 
     override protected def transactionUpsertImpactsState(transaction: Transaction, state: State) = {
       isRelevantReservoir(transaction.moneyReservoir) &&
-      (input.year.isEmpty || transaction.transactionDate.getYear <= input.year.get)
+      (input.year.isEmpty || AccountingYear.from(transaction.transactionDate) <= input.year.get)
     }
     override protected def balanceCheckUpsertImpactsState(balanceCheck: BalanceCheck, state: State) = {
       isRelevantReservoir(balanceCheck.moneyReservoir) &&
-      (input.year.isEmpty || balanceCheck.checkDate.getYear <= input.year.get)
+      (input.year.isEmpty || AccountingYear.from(balanceCheck.checkDate) <= input.year.get)
     }
 
     // **************** Private helper methods ****************//
@@ -125,7 +126,7 @@ final class SummaryExchangeRateGainsStoreFactory(implicit
   /* override */
   protected case class Input(
       account: Option[Account],
-      year: Option[Int],
+      year: Option[AccountingYear],
       correctForInflation: Boolean,
   )
 }

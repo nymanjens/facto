@@ -3,6 +3,7 @@ package app.flux.stores.entries.factories
 import app.common.accounting.ComplexQueryFilter
 import app.common.money.CurrencyValueManager
 import app.common.money.ReferenceMoney
+import app.common.time.AccountingYear
 import app.common.time.DatedMonth
 import app.flux.stores.entries.EntriesStore
 import app.flux.stores.entries.factories.SummaryForYearStoreFactory.SummaryForYear
@@ -31,7 +32,7 @@ final class SummaryForYearStoreFactory(implicit
 ) extends EntriesStoreFactory[SummaryForYear] {
 
   // **************** Public API ****************//
-  def get(account: Account, year: Int, query: String = ""): Store =
+  def get(account: Account, year: AccountingYear, query: String = ""): Store =
     get(Input(account = account, year = year, query = query))
 
   // **************** Implementation of EntriesStoreFactory methods/types ****************//
@@ -61,10 +62,13 @@ final class SummaryForYearStoreFactory(implicit
   }
 
   /* override */
-  protected case class Input(account: Account, year: Int, query: String = "")
+  protected case class Input(account: Account, year: AccountingYear, query: String = "")
 
   // **************** Private helper methods ****************//
-  private def filterInYear[E](field: ModelField[LocalDateTime, E], year: Int): DbQuery.Filter[E] = {
+  private def filterInYear[E](
+      field: ModelField[LocalDateTime, E],
+      year: AccountingYear,
+  ): DbQuery.Filter[E] = {
     val months = DatedMonth.allMonthsIn(year)
     field >= months.head.startTime && field < months.last.startTimeOfNextMonth
   }

@@ -3,6 +3,7 @@ package app.flux.stores.entries.factories
 import hydro.common.testing.FakeJsEntityAccess
 import app.common.testing.TestModule
 import app.common.testing.TestObjects._
+import app.common.time.AccountingYear
 import app.common.time.YearRange
 import app.models.accounting.config.Account
 import utest._
@@ -29,7 +30,7 @@ object SummaryYearsStoreFactoryTest extends TestSuite {
 
       val state = await(factory.get(testAccountA).stateFuture)
 
-      state.yearRange ==> YearRange.single(2012)
+      state.yearRange ==> YearRange.single(AccountingYear(2012))
     }
     "transactions in multiple years" - async {
       persistTransaction(2010)
@@ -40,7 +41,7 @@ object SummaryYearsStoreFactoryTest extends TestSuite {
 
       val state = await(factory.get(testAccountA).stateFuture)
 
-      state.yearRange ==> YearRange.closed(2010, 2018)
+      state.yearRange ==> YearRange.closed(AccountingYear(2010), AccountingYear(2018))
     }
     "transaction for different account" - async {
       persistTransaction(2012, beneficiary = testAccountB)

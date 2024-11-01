@@ -193,6 +193,7 @@ object TestObjects {
     liquidationDescription = "Liquidation",
     zoneId = "Europe/Brussels",
     supportInflationCorrections = true,
+    firstMonthOfYear = Month.JANUARY,
   )
 
   implicit val testAccountingConfig: Config = Config(
@@ -226,6 +227,10 @@ object TestObjects {
     ),
     constants = testConstants,
   )
+
+  def createAccountingConfig(firstMonthOfYear: Month = Month.JANUARY): Config = {
+    testAccountingConfig.copy(constants = testConstants.copy(firstMonthOfYear = firstMonthOfYear))
+  }
 
   private def createListMap[K, V](elems: (K, V)*): ListMap[K, V] = {
     val resultBuilder = ListMap.newBuilder[K, V]
