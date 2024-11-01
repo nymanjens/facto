@@ -12,7 +12,9 @@ import boopickle.Default._
 import hydro.api.StandardPicklers
 import hydro.models.Entity
 import hydro.models.UpdatableEntity.LastUpdateTime
+import scala.collection.JavaConverters._
 
+import java.time.Month
 import scala.collection.immutable.Seq
 import scala.collection.immutable.Set
 
@@ -94,4 +96,7 @@ object Picklers extends StandardPicklers {
     .addConcreteType[TransactionGroup]
     .addConcreteType[BalanceCheck]
     .addConcreteType[ExchangeRateMeasurement]
+
+  implicit val MonthPickler: Pickler[Month] =
+    enumPickler(stableNameMapper = _.name, values = Month.values().toVector)
 }
