@@ -46,7 +46,6 @@ final class Chart(implicit
     pageHeader: PageHeader,
     chartSpecInput: ChartSpecInput,
     chartStoreFactory: ChartStoreFactory,
-    inMemoryUserConfigStore: InMemoryUserConfigStore,
 ) extends HydroReactComponent {
 
   private val lineColors: Seq[String] =
@@ -76,20 +75,6 @@ final class Chart(implicit
         )
       }
     ),
-  ).withStateStoresDependencyFromProps(props =>
-    StateStoresDependency(
-      inMemoryUserConfigStore,
-      state => {
-        if (inMemoryUserConfigStore.state.correctForInflation != props.chartSpec.correctForInflation) {
-          props.router.setPage(
-            AppPages.Chart.fromChartSpec(
-              props.chartSpec.copy(correctForInflation = inMemoryUserConfigStore.state.correctForInflation)
-            )
-          )
-        }
-        state
-      },
-    )
   )
 
   // **************** Private inner types ****************//
@@ -101,12 +86,7 @@ final class Chart(implicit
       lineToPoints: Map[Line, LinePoints] = Map()
   )
 
-  protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) with WillMount {
-
-    override def willMount(props: Props, state: State): Callback = {
-      inMemoryUserConfigStore.mutateState(_.copy(correctForInflation = props.chartSpec.correctForInflation))
-      Callback.empty
-    }
+  protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
 
     override def render(props: Props, state: State) = logExceptions {
       implicit val router = props.router

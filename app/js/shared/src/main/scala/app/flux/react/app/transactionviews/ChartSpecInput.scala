@@ -69,9 +69,42 @@ final class ChartSpecInput(implicit
           ),
           tableRowDatas = tableRowDatas,
         ),
-        addButton,
+        <.div(
+          toggleButton(
+            props.chartSpec.correctForInflation,
+            value => _.copy(correctForInflation = value),
+            VdomArray(
+              <.i(^.className := "icon-inflation"),
+              " ",
+              i18n("app.correct-for-inflation"),
+            ),
+          ),
+          " ",
+        ),
+        <.div(
+          ^.marginTop := "5px",
+          addButton,
+          " ",
+          clearButton,
+        ),
+      )
+    }
+
+    private def toggleButton(
+        enabled: Boolean,
+        specUpdate: Boolean => ChartSpec => ChartSpec,
+        content: VdomNode,
+    )(implicit props: Props): VdomNode = {
+      def updateCallback = props.notifyUpdatedChartSpec(specUpdate(!enabled))
+      Bootstrap.Button(if (enabled) Variant.primary else Variant.default)(
+        content,
         " ",
-        clearButton,
+        <.input(
+          ^.tpe := "checkbox",
+          ^.checked := enabled,
+          ^.onChange --> updateCallback,
+        ),
+        ^.onClick --> updateCallback,
       )
     }
 
@@ -142,9 +175,7 @@ final class ChartSpecInput(implicit
         Bootstrap.FontAwesomeIcon("times"),
         " ",
         i18n("app.clear"),
-        ^.onClick --> props.notifyUpdatedChartSpec(_ =>
-          ChartSpec.singleEmptyLine(correctForInflation = props.chartSpec.correctForInflation)
-        ),
+        ^.onClick --> props.notifyUpdatedChartSpec(_ => ChartSpec.singleEmptyLine()),
       )
     }
 

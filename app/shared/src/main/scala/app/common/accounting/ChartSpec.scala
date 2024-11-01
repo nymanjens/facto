@@ -30,8 +30,8 @@ case class ChartSpec(
   }
 }
 object ChartSpec {
-  def singleEmptyLine(correctForInflation: Boolean) =
-    ChartSpec(lines = Seq(Line.empty), correctForInflation = correctForInflation)
+  def singleEmptyLine() =
+    ChartSpec(lines = Seq(Line.empty), correctForInflation = false)
 
   private val lineDelimiter = '~'
 
@@ -47,7 +47,7 @@ object ChartSpec {
 
     val lines = Splitter.on(lineDelimiter).split(stringRemainder).map(Line.parseStringified)
     if (lines.nonEmpty) ChartSpec(lines, correctForInflation)
-    else ChartSpec.singleEmptyLine(correctForInflation = correctForInflation)
+    else ChartSpec.singleEmptyLine().copy(correctForInflation = correctForInflation)
   }
 
   case class Line(
