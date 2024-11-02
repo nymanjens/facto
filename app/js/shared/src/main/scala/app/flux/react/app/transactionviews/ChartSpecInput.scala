@@ -2,6 +2,7 @@ package app.flux.react.app.transactionviews
 
 import app.common.money.CurrencyValueManager
 import app.common.accounting.ChartSpec
+import app.common.accounting.ChartSpec.AggregationPeriod
 import app.common.accounting.ChartSpec.Line
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Config
@@ -57,6 +58,8 @@ final class ChartSpecInput(implicit
     override def render(props: Props, state: State) = logExceptions {
       implicit val _: Props = props
 
+      val compressIcon = Bootstrap.FontAwesomeIcon("compress")
+
       <.span(
         Table(
           tableClasses = Seq("table-chart-spec"),
@@ -80,6 +83,14 @@ final class ChartSpecInput(implicit
             ),
           ),
           " ",
+          dropDownButton[AggregationPeriod](
+            optionLabels = Map(
+              AggregationPeriod.Month -> VdomArray(compressIcon, " ", i18n("app.aggregate-by-month")),
+              AggregationPeriod.Year -> VdomArray(compressIcon, " ", i18n("app.aggregate-by-year")),
+            ),
+            currentValue = props.chartSpec.aggregationPeriod,
+            specUpdate = value => _.copy(aggregationPeriod = value),
+          ),
         ),
         <.div(
           ^.marginTop := "5px",
@@ -105,6 +116,37 @@ final class ChartSpecInput(implicit
           ^.onChange --> updateCallback,
         ),
         ^.onClick --> updateCallback,
+      )
+    }
+
+    private def dropDownButton[V](
+        optionLabels: Map[V, VdomNode],
+        currentValue: V,
+        specUpdate: V => ChartSpec => ChartSpec,
+    )(implicit props: Props): VdomNode = {
+      Bootstrap.ButtonGroup(
+        Bootstrap.Button(variant = Variant.default)(
+          ^.className := "dropdown-toggle",
+          VdomAttr("data-toggle") := "dropdown",
+          VdomAttr("aria-haspopup") := "true",
+          VdomAttr("aria-expanded") := "false",
+          optionLabels(currentValue),
+          " ",
+          Bootstrap.FontAwesomeIcon("caret-down"),
+        ),
+        <.ul(
+          ^.className := "dropdown-menu",
+          (
+            for ((value, label) <- optionLabels) yield {
+              <.li(
+                <.a(
+                  label,
+                  ^.onClick --> props.notifyUpdatedChartSpec(specUpdate(value)),
+                )
+              )
+            }
+          ).toVdomArray,
+        ),
       )
     }
 

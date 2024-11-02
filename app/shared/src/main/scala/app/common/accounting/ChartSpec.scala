@@ -124,6 +124,8 @@ object ChartSpec {
 
   sealed trait AggregationPeriod
   object AggregationPeriod {
+    val all: Seq[AggregationPeriod] = Seq(Month, Year)
+
     object Month extends AggregationPeriod
     object Year extends AggregationPeriod
   }

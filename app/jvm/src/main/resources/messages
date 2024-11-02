@@ -227,3 +227,5 @@ app.operation=Operation
 app.change-category=Change category
 app.add-tag=Add tag
 app.tag=Tag
+app.aggregate-by-month=Aggregate by month
+app.aggregate-by-year=Aggregate by year

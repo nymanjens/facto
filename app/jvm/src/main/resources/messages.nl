@@ -180,3 +180,5 @@ app.operation=Bewerking
 app.change-category=Verander categorie
 app.add-tag=Tag toevoegen
 app.tag=Tag
+app.aggregate-by-month=Samenvoegen per maand
+app.aggregate-by-year=Samenvoegen per jaar

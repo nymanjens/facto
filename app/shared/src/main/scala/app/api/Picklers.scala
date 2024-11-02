@@ -95,9 +95,7 @@ object Picklers extends StandardPicklers {
     }
   }
   implicit val chartSpecAggregationPeriodPickler: Pickler[ChartSpec.AggregationPeriod] =
-    enumPicklerWithoutName(
-      Seq(ChartSpec.AggregationPeriod.Month, ChartSpec.AggregationPeriod.Year)
-    )
+    enumPicklerWithoutName(ChartSpec.AggregationPeriod.all)
 
   override implicit val entityPickler: Pickler[Entity] = compositePickler[Entity]
     .addConcreteType[User]
