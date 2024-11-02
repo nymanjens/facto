@@ -1,6 +1,5 @@
 package app.flux.react.app.transactiongroupform
 import java.util.NoSuchElementException
-
 import hydro.common.I18n
 import hydro.common.Tags
 import app.common.money.Currency
@@ -28,6 +27,7 @@ import app.common.SinglePendingTaskQueue
 import hydro.common.time.Clock
 import hydro.common.time.LocalDateTime
 import hydro.common.time.LocalDateTimes
+import hydro.common.GuavaReplacement.Iterables.getOnlyElement
 import hydro.common.ScalaUtils.ifThenOption
 import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.uielements.HalfPanel
@@ -178,7 +178,9 @@ private[transactiongroupform] final class TransactionPanel(implicit
             transactionDate = backend.transactionDateRef().value.get,
             consumedDate = backend.consumedDateRef().value.get,
             moneyReservoir = backend.moneyReservoirRef().value.get,
-            beneficiaryAccount = backend.beneficiaryAccountRef().value.get,
+            beneficiaryAccount =
+              if (accountingConfig.accounts.size > 1) backend.beneficiaryAccountRef().value.get
+              else getOnlyElement(accountingConfig.accounts.values),
             category = backend.categoryRef().value.get,
             description = backend.descriptionRef().value.get,
             flow = DatedMoney(
@@ -348,24 +350,26 @@ private[transactiongroupform] final class TransactionPanel(implicit
             listener = MoneyReservoirListener,
           )
         },
-        accountInputWithDefault.forOption(
-          ref = beneficiaryAccountRef,
-          defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.beneficiaryAccount),
-          startWithDefault = props.defaultValues.isEmpty,
-          directUserChangeOnly = true,
-          delegateRefFactory = accountSelectInput.ref _,
-        ) { extraProps =>
-          accountSelectInput(
-            ref = extraProps.ref,
-            name = "beneficiary",
-            label = i18n("app.beneficiary"),
-            defaultValue = state.beneficiaryAccount,
-            inputClasses = extraProps.inputClasses,
-            options = accountingConfig.personallySortedAccounts,
-            valueToId = _.code,
-            valueToName = _.longName,
-            listener = BeneficiaryAccountListener,
-          )
+        <<.ifThen(accountingConfig.accounts.size > 1) {
+          accountInputWithDefault.forOption(
+            ref = beneficiaryAccountRef,
+            defaultValueProxy = props.defaultPanel.map(proxy => () => proxy.beneficiaryAccount),
+            startWithDefault = props.defaultValues.isEmpty,
+            directUserChangeOnly = true,
+            delegateRefFactory = accountSelectInput.ref _,
+          ) { extraProps =>
+            accountSelectInput(
+              ref = extraProps.ref,
+              name = "beneficiary",
+              label = i18n("app.beneficiary"),
+              defaultValue = state.beneficiaryAccount,
+              inputClasses = extraProps.inputClasses,
+              options = accountingConfig.personallySortedAccounts,
+              valueToId = _.code,
+              valueToName = _.longName,
+              listener = BeneficiaryAccountListener,
+            )
+          }
         },
         categoryInputWithDefault.forOption(
           ref = categoryRef,
