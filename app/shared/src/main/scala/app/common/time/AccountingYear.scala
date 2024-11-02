@@ -23,11 +23,15 @@ case class AccountingYear(startYear: Int) extends Ordered[AccountingYear] {
     }
   }
 
-  def toHumanReadableString(implicit accountingConfig: Config): String = {
+  def toHumanReadableString(compact: Boolean = false)(implicit accountingConfig: Config): String = {
     if (accountingConfig.constants.firstMonthOfYear == Month.JANUARY) {
       startYear.toString
     } else {
-      s"$startYear - ${startYear + 1}"
+      if (compact) {
+        s"$startYear-${startYear + 1}"
+      } else {
+        s"$startYear - ${startYear + 1}"
+      }
     }
   }
 

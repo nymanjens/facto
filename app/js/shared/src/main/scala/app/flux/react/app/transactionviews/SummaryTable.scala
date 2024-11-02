@@ -392,7 +392,7 @@ private[transactionviews] final class SummaryTable(implicit
                     <.a(
                       ^.href := "javascript:void(0)",
                       ^.onClick --> props.onSetExpandedYear(year),
-                      year.toHumanReadableString,
+                      year.toHumanReadableString(),
                     ),
                   )
                 )
@@ -404,7 +404,7 @@ private[transactionviews] final class SummaryTable(implicit
                     <.a(
                       ^.href := "javascript:void(0)",
                       ^.onClick --> props.onSetExpandedYear(year),
-                      year.toHumanReadableString,
+                      year.toHumanReadableString(),
                     ),
                   )
                 )

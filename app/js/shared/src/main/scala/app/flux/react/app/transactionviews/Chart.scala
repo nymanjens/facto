@@ -156,7 +156,11 @@ final class Chart(implicit
               Recharts.CartesianGrid(strokeDasharray = "3 3", vertical = false),
               Recharts.XAxis(
                 dataKey = "x",
-                tickFormatter = s => s.toString.takeRight(4),
+                tickFormatter = s =>
+                  props.chartSpec.aggregationPeriod match {
+                    case AggregationPeriod.Month => s.toString.takeRight(4)
+                    case AggregationPeriod.Year  => s.toString
+                  },
                 ticks = assembleTicks().toJSArray,
               ),
               Recharts.YAxis(tickFormatter = formatDoubleMoney(roundToInteger = true)),
@@ -235,7 +239,7 @@ final class Chart(implicit
                     .getOrElse(month, ReferenceMoney(0))
                 )
                 .sum,
-            formatKey = _.toHumanReadableString,
+            formatKey = _.toHumanReadableString(compact = true),
           )
       }
     }
@@ -275,7 +279,7 @@ final class Chart(implicit
     private def assembleTicks()(implicit props: Props, state: State): Seq[String] = {
       props.chartSpec.aggregationPeriod match {
         case AggregationPeriod.Month => getAllMonths().filter(_.month == Month.JANUARY).map(formatMonth)
-        case AggregationPeriod.Year  => getAllYears().map(_.toHumanReadableString)
+        case AggregationPeriod.Year  => getAllYears().map(_.toHumanReadableString(compact = true))
       }
     }
 
