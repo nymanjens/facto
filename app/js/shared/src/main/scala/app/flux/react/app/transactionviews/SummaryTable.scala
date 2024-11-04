@@ -485,7 +485,7 @@ private[transactionviews] final class SummaryTable(implicit
                       <.td(
                         ^.key := s"avg-${category.code}-${month.year}-${month.month}",
                         ^^.classes(cellClasses(month)),
-                        uielements.UpperRightCorner(
+                        uielements.UpperLeftCorner(
                           cornerContent = <<.ifThen(cellData.nonEmpty)(s"(${cellData.transactions.size})")
                         )(
                           /* centralContent = */
