@@ -91,8 +91,12 @@ object SlickEntityTableDefs {
       string match {
         case "" => Data()
         case _ =>
-          implicit val formats = DefaultFormats
-          Serialization.read(string)
+          try {
+            implicit val formats = DefaultFormats
+            Serialization.read(string)
+          } catch {
+            case e: Exception => throw new Exception(s"Could not parse '$string'", e)
+          }
       }
     }
 
