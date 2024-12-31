@@ -80,8 +80,12 @@ object SlickEntityTableDefs {
     }
 
     private def serializeData(data: Data): String = {
-      implicit val formats = DefaultFormats
-      Serialization.write(data)
+      if (data == Data()) {
+        ""
+      } else {
+        implicit val formats = DefaultFormats
+        Serialization.write(data)
+      }
     }
     private def deserializeData(string: String): Data = {
       string match {
