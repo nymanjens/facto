@@ -16,5 +16,5 @@ case class Constants(
     // Whenever facto shows a year, this will be the first month. If this is January, calendar years are used.
     firstMonthOfYear: Month,
 ) {
-  requireNonNull(commonAccount, accountingCategory, endowmentCategory, liquidationDescription, zoneId)
+  requireNonNull(commonAccount, accountingCategory, endowmentCategory, liquidationDescription, zoneId, firstMonthOfYear)
 }
