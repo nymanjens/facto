@@ -283,7 +283,6 @@ object Parsable {
       zoneId: String,
       supportInflationCorrections: Boolean,
       firstMonthOfYear: String,
-      attachmentsFolder: String,
   ) {
     def this() = this(
       null,
@@ -293,7 +292,6 @@ object Parsable {
       zoneId = "Europe/Brussels",
       supportInflationCorrections = false,
       firstMonthOfYear = "January",
-      attachmentsFolder = null,
     )
 
     def parse: ParsedConstants = {
@@ -305,7 +303,6 @@ object Parsable {
         zoneId = zoneId,
         supportInflationCorrections = supportInflationCorrections,
         firstMonthOfYear = Month.valueOf(firstMonthOfYear.toUpperCase),
-        attachmentsFolder = Option(attachmentsFolder),
       )
     }
   }
