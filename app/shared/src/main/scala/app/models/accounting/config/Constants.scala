@@ -15,6 +15,15 @@ case class Constants(
     supportInflationCorrections: Boolean,
     // Whenever facto shows a year, this will be the first month. If this is January, calendar years are used.
     firstMonthOfYear: Month,
+    attachmentsFolder: Option[String],
 ) {
-  requireNonNull(commonAccount, accountingCategory, endowmentCategory, liquidationDescription, zoneId, firstMonthOfYear)
+  requireNonNull(
+    commonAccount,
+    accountingCategory,
+    endowmentCategory,
+    liquidationDescription,
+    zoneId,
+    firstMonthOfYear,
+    attachmentsFolder,
+  )
 }

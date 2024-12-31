@@ -194,6 +194,7 @@ object TestObjects {
     zoneId = "Europe/Brussels",
     supportInflationCorrections = true,
     firstMonthOfYear = Month.JANUARY,
+    attachmentsFolder = Some("/test/folder/"),
   )
 
   implicit val testAccountingConfig: Config = Config(
