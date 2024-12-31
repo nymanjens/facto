@@ -94,7 +94,6 @@ object SlickEntityTableDefs {
           implicit val formats = DefaultFormats
           Serialization.read(string)
       }
-
     }
 
     /* override */
