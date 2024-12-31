@@ -93,7 +93,7 @@ object SlickEntityTableDefs {
         case _ =>
           try {
             implicit val formats = DefaultFormats
-            Serialization.read(string)
+            Serialization.read[Data](string)
           } catch {
             case e: Exception => throw new Exception(s"Could not parse '$string'", e)
           }
