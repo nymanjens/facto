@@ -30,6 +30,7 @@ import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.ReactVdomUtils.^^
 import hydro.flux.react.uielements.PageHeader
 import hydro.flux.react.uielements.WaitForFuture
+import hydro.flux.react.HydroReactComponent
 import hydro.flux.router.RouterContext
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
@@ -55,35 +56,9 @@ final class TransactionGroupForm(implicit
     totalFlowRestrictionInput: TotalFlowRestrictionInput,
     liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory,
     pageHeader: PageHeader,
-) {
+) extends HydroReactComponent {
 
   private val waitForFuture = new WaitForFuture[Props]
-  private val component = {
-    ScalaComponent
-      .builder[Props](getClass.getSimpleName)
-      .initialStateFromProps(props =>
-        logExceptions {
-          val numberOfTransactions = props.groupPartial.transactions.length
-          val totalFlowRestriction = props.groupPartial match {
-            case partial if partial.zeroSum => TotalFlowRestriction.ZeroSum
-            case _                          => TotalFlowRestriction.AnyTotal
-          }
-          State(
-            panelIndices = 0 until numberOfTransactions,
-            flowFractions = (0 until numberOfTransactions).map(_ => 0.0),
-            nextPanelIndex = numberOfTransactions,
-            // The following fields are updated by onFormChange() when the component is mounted
-            foreignCurrency = None,
-            totalFlowRestriction = totalFlowRestriction,
-            totalFlow = ReferenceMoney(0),
-            totalFlowExceptLast = ReferenceMoney(0),
-          )
-        }
-      )
-      .renderBackend[Backend]
-      .componentDidMount(scope => LogExceptionsCallback(scope.backend.onFormChange()))
-      .build
-  }
 
   // **************** API ****************//
   def forCreate(router: RouterContext): VdomElement = {
@@ -267,18 +242,40 @@ final class TransactionGroupForm(implicit
     }
   }
 
-  // **************** Private inner types ****************//
-  private sealed trait OperationMeta
-  private object OperationMeta {
-    case object AddNew extends OperationMeta
-    case class Edit(group: TransactionGroup, transactions: Seq[Transaction]) extends OperationMeta
-  }
+  // **************** Implementation of HydroReactComponent methods ****************//
+  override protected val config = ComponentConfig(
+    backendConstructor = new Backend(_),
+    initialStateFromProps = props => {
+      val numberOfTransactions = props.groupPartial.transactions.length
+      val totalFlowRestriction = props.groupPartial match {
+        case partial if partial.zeroSum => TotalFlowRestriction.ZeroSum
+        case _                          => TotalFlowRestriction.AnyTotal
+      }
+      State(
+        panelIndices = 0 until numberOfTransactions,
+        flowFractions = (0 until numberOfTransactions).map(_ => 0.0),
+        nextPanelIndex = numberOfTransactions,
+        // The following fields are updated by onFormChange() when the component is mounted
+        foreignCurrency = None,
+        totalFlowRestriction = totalFlowRestriction,
+        totalFlow = ReferenceMoney(0),
+        totalFlowExceptLast = ReferenceMoney(0),
+      )
+    },
+  )
+
+  // **************** Implementation of HydroReactComponent types ****************//
+  protected case class Props(
+      operationMeta: OperationMeta,
+      groupPartial: TransactionGroup.Partial,
+      router: RouterContext,
+  )
 
   /**
    * @param foreignCurrency Any foreign currency of any of the selected money reservoirs. If there are multiple,
    *                        this can by any of these.
    */
-  private case class State(
+  protected case class State(
       panelIndices: Seq[Int],
       flowFractions: Seq[Double],
       nextPanelIndex: Int,
@@ -313,18 +310,18 @@ final class TransactionGroupForm(implicit
     }
   }
 
-  private case class Props(
-      operationMeta: OperationMeta,
-      groupPartial: TransactionGroup.Partial,
-      router: RouterContext,
-  )
-
-  private final class Backend(val $ : BackendScope[Props, State]) {
+  protected class Backend($ : BackendScope[Props, State])
+      extends BackendBase($)
+      with DidMount {
 
     private val _panelRefs: mutable.Buffer[transactionPanel.Reference] =
       mutable.Buffer(transactionPanel.ref())
 
-    def render(props: Props, state: State) = logExceptions {
+    override def didMount(props: Props, state: State): Callback = {
+      LogExceptionsCallback(onFormChange())
+    }
+
+    override def render(props: Props, state: State): VdomElement = logExceptions {
       implicit val router = props.router
       <.div(
         ^.className := "transaction-group-form",
@@ -609,5 +606,12 @@ final class TransactionGroupForm(implicit
           props.router.setPage(AppPages.NewTransactionGroupFromCopy(transactionGroupId = group.id))
       }
     }
+  }
+
+  // **************** Private inner types ****************//
+  protected sealed trait OperationMeta
+  protected object OperationMeta {
+    case object AddNew extends OperationMeta
+    case class Edit(group: TransactionGroup, transactions: Seq[Transaction]) extends OperationMeta
   }
 }
