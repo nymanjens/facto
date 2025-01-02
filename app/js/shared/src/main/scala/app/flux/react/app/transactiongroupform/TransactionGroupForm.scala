@@ -5,6 +5,7 @@ import org.scalajs.dom.raw.ClipboardEvent
 import app.common.money.Currency
 import app.common.money.CurrencyValueManager
 import app.common.money.ReferenceMoney
+import app.common.AttachmentFormatting
 import app.flux.action.AppActions
 import app.flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
 import app.flux.react.app.transactionviews.Liquidation
@@ -37,6 +38,8 @@ import hydro.flux.react.uielements.WaitForFuture
 import hydro.flux.react.HydroReactComponent
 import hydro.flux.router.RouterContext
 import japgolly.scalajs.react._
+import japgolly.scalajs.react.vdom
+import japgolly.scalajs.react.vdom.all.EmptyVdom
 import japgolly.scalajs.react.vdom.html_<^._
 import org.scalajs.dom
 import org.scalajs.dom.raw.FileReader
@@ -401,7 +404,13 @@ final class TransactionGroupForm(implicit
           Bootstrap.Alert(Variant.danger)(
             errorMessage
           )
-        },
+        }, {
+          for (attachment <- state.attachments)
+            yield attachmentDiv(attachment.filename, attachment.fileSizeBytes, attachment)
+        }.toVdomArray, {
+          for (attachment <- state.attachmentsPendingUpload)
+            yield attachmentDiv(attachment.filename, attachment.fileSizeBytes)
+        }.toVdomArray,
         Bootstrap.FormHorizontal(
           ^.key := "main-form",
           ^.encType := "multipart/form-data",
@@ -461,6 +470,29 @@ final class TransactionGroupForm(implicit
       )
     }
 
+    private def attachmentDiv(
+        filename: String,
+        fileSizeBytes: Int,
+        attachment: Attachment = null,
+    ): VdomTag = {
+      <.div(
+        ^.key := s"$filename/$fileSizeBytes/${Option(attachment).hashCode()}",
+        ^.className := "attachment",
+        (if (attachment == null) EmptyVdom
+         else
+           <.a(
+             ^.href := AttachmentFormatting.getUrl(attachment),
+             ^.target := "_blank",
+           )).apply(
+          Bootstrap.Glyphicon("paperclip"),
+          <.label(s"$filename (${AttachmentFormatting.formatBytes(fileSizeBytes)})"),
+          <<.ifThen(attachment == null) {
+            Bootstrap.FontAwesomeIcon("circle-o-notch", "spin")
+          },
+        ),
+      )
+    }
+
     private def onPasteEvent(event: ClipboardEvent): Unit = {
       val clipboardData = event.clipboardData
       for (i <- 0 until clipboardData.files.length) {
@@ -491,7 +523,7 @@ final class TransactionGroupForm(implicit
                 ).runNow()
 
               case Failure(exception) =>
-                // TODO: Send alert
+              // TODO: Send alert. e.g. via state.globalErrorMessage
             }
           }
           fileReader.readAsArrayBuffer(file)
