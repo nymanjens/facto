@@ -64,7 +64,7 @@ object Transaction {
 
   def tupled = (this.apply _).tupled
 
-  case class Attachment(contentHash: String, filename: String)
+  case class Attachment(contentHash: String, filename: String, fileType: String, fileSizeBytes: Int)
 
   /** Same as Transaction, except all fields are optional. */
   case class Partial(
