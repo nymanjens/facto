@@ -56,4 +56,5 @@ final class Module(implicit
   implicit val localDatabaseHasBeenLoadedStore = new LocalDatabaseHasBeenLoadedStore
   implicit val userStore = new UserStore
   implicit val databaseExplorerStoreFactory = new DatabaseExplorerStoreFactory
+  implicit val attachmentStore = new AttachmentStore()
 }

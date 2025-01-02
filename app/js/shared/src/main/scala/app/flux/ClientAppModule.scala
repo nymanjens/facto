@@ -66,6 +66,7 @@ final class ClientAppModule(implicit
   implicit private val localDatabaseHasBeenLoadedStore = fluxStoresModule.localDatabaseHasBeenLoadedStore
   implicit private val userStore = fluxStoresModule.userStore
   implicit private val databaseExplorerStoreFactory = fluxStoresModule.databaseExplorerStoreFactory
+  implicit private val attachmentStore = fluxStoresModule.attachmentStore
 
   // Create other Flux modules
   implicit private val reactAppModule = new app.flux.react.app.Module
