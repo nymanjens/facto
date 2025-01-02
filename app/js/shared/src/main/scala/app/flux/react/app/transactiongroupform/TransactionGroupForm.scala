@@ -496,6 +496,8 @@ final class TransactionGroupForm(implicit
     private def onPasteEvent(event: ClipboardEvent): Unit = {
       val clipboardData = event.clipboardData
       for (i <- 0 until clipboardData.files.length) {
+        event.preventDefault() // Prevent default if there is at least one pasted file
+
         val file = clipboardData.files(i)
 
         val attachmentPendingUpload = State.AttachmentPendingUpload(
