@@ -1,5 +1,7 @@
 package app.flux.react.app.transactiongroupform
 
+import scala.scalajs.js
+import org.scalajs.dom.raw.ClipboardEvent
 import app.common.money.Currency
 import app.common.money.CurrencyValueManager
 import app.common.money.ReferenceMoney
@@ -10,11 +12,13 @@ import app.flux.router.AppPages
 import app.flux.router.AppPages.PopupEditorPage
 import app.flux.stores.entries.AccountPair
 import app.flux.stores.entries.factories.LiquidationEntriesStoreFactory
+import app.flux.stores.AttachmentStore
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup
 import app.models.accounting.config.Account
 import app.models.accounting.config.Config
+import app.models.accounting.Transaction.Attachment
 import app.models.user.User
 import hydro.common.I18n
 import hydro.common.JsLoggingUtils.LogExceptionsCallback
@@ -34,6 +38,8 @@ import hydro.flux.react.HydroReactComponent
 import hydro.flux.router.RouterContext
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
+import org.scalajs.dom
+import org.scalajs.dom.raw.FileReader
 
 import scala.async.Async.async
 import scala.async.Async.await
@@ -41,6 +47,9 @@ import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.scalajs.js.typedarray.ArrayBuffer
+import scala.util.Failure
+import scala.util.Success
 
 final class TransactionGroupForm(implicit
     i18n: I18n,
@@ -56,6 +65,7 @@ final class TransactionGroupForm(implicit
     totalFlowRestrictionInput: TotalFlowRestrictionInput,
     liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory,
     pageHeader: PageHeader,
+    attachmentStore: AttachmentStore,
 ) extends HydroReactComponent {
 
   private val waitForFuture = new WaitForFuture[Props]
@@ -260,6 +270,8 @@ final class TransactionGroupForm(implicit
         totalFlowRestriction = totalFlowRestriction,
         totalFlow = ReferenceMoney(0),
         totalFlowExceptLast = ReferenceMoney(0),
+        attachments = props.groupPartial.transactions.flatMap(t => t.attachments).distinct,
+        attachmentsPendingUpload = Seq(),
       )
     },
   )
@@ -285,6 +297,8 @@ final class TransactionGroupForm(implicit
       totalFlowRestriction: TotalFlowRestriction,
       totalFlow: ReferenceMoney,
       totalFlowExceptLast: ReferenceMoney,
+      attachments: Seq[Attachment],
+      attachmentsPendingUpload: Seq[State.AttachmentPendingUpload],
   ) {
     def plusPanel(panelRef: Int => transactionPanel.Reference): State = {
       copy(
@@ -309,16 +323,38 @@ final class TransactionGroupForm(implicit
       )
     }
   }
+  protected object State {
+    case class AttachmentPendingUpload(filename: String, fileType: String, fileSizeBytes: Int) {
+      def toAttachment(hash: String): Attachment = {
+        Attachment(
+          filename = filename,
+          contentHash = hash,
+          fileType = fileType,
+          fileSizeBytes = fileSizeBytes,
+        )
+      }
+    }
+  }
 
   protected class Backend($ : BackendScope[Props, State])
       extends BackendBase($)
-      with DidMount {
+      with DidMount
+      with WillUnmount {
 
     private val _panelRefs: mutable.Buffer[transactionPanel.Reference] =
       mutable.Buffer(transactionPanel.ref())
 
+    private val onPasteEventListener: js.Function1[ClipboardEvent, Unit] = e => onPasteEvent(e)
+
     override def didMount(props: Props, state: State): Callback = {
-      LogExceptionsCallback(onFormChange())
+      dom.window.addEventListener("paste", onPasteEventListener)
+      onFormChange()
+      Callback.empty
+    }
+
+    override def willUnmount(props: Props, state: State): Callback = {
+      dom.window.removeEventListener("paste", onPasteEventListener)
+      Callback.empty
     }
 
     override def render(props: Props, state: State): VdomElement = logExceptions {
@@ -368,6 +404,7 @@ final class TransactionGroupForm(implicit
         },
         Bootstrap.FormHorizontal(
           ^.key := "main-form",
+          ^.encType := "multipart/form-data",
           Bootstrap.Row(
             <.div(
               ^.className := "transaction-group-form",
@@ -422,6 +459,44 @@ final class TransactionGroupForm(implicit
           ),
         ),
       )
+    }
+
+    private def onPasteEvent(event: ClipboardEvent): Unit = {
+      val clipboardData = event.clipboardData
+      for (i <- 0 until clipboardData.files.length) {
+        val file = clipboardData.files(i)
+
+        val attachmentPendingUpload = State.AttachmentPendingUpload(
+          filename = file.name,
+          fileType = file.`type`,
+          fileSizeBytes = file.size.toInt,
+        )
+
+        if (! $.state.runNow().attachmentsPendingUpload.contains(attachmentPendingUpload)) {
+          $.modState(state =>
+            state.copy(attachmentsPendingUpload = state.attachmentsPendingUpload :+ attachmentPendingUpload)
+          ).runNow()
+
+          val fileReader = new FileReader()
+          fileReader.onload = e => {
+            val result = fileReader.result.asInstanceOf[ArrayBuffer]
+            attachmentStore.storeFileAndReturnHash(result).onComplete {
+              case Success(hash) =>
+                $.modState(state =>
+                  state.copy(
+                    attachmentsPendingUpload =
+                      state.attachmentsPendingUpload.filter(_ != attachmentPendingUpload),
+                    attachments = state.attachments :+ attachmentPendingUpload.toAttachment(hash),
+                  )
+                ).runNow()
+
+              case Failure(exception) =>
+                // TODO: Send alert
+            }
+          }
+          fileReader.readAsArrayBuffer(file)
+        }
+      }
     }
 
     private def panelRef(panelIndex: Int): transactionPanel.Reference = {
