@@ -325,6 +325,12 @@ final class TransactionGroupForm(implicit
         flowFractions = flows.map(flow => if (sumOfFlow.isZero) 0.0 else flow.toDouble / sumOfFlow.toDouble)
       )
     }
+
+    def containsAttachment(pendingAttachment: State.AttachmentPendingUpload): Boolean = {
+      attachmentsPendingUpload.contains(pendingAttachment) || attachments.exists(a =>
+        pendingAttachment.toAttachment(a.contentHash) == a
+      )
+    }
   }
   protected object State {
     case class AttachmentPendingUpload(filename: String, fileType: String, fileSizeBytes: Int) {
@@ -506,7 +512,7 @@ final class TransactionGroupForm(implicit
           fileSizeBytes = file.size.toInt,
         )
 
-        if (! $.state.runNow().attachmentsPendingUpload.contains(attachmentPendingUpload)) {
+        if (! $.state.runNow().containsAttachment(attachmentPendingUpload)) {
           $.modState(state =>
             state.copy(attachmentsPendingUpload = state.attachmentsPendingUpload :+ attachmentPendingUpload)
           ).runNow()
