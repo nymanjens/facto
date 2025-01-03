@@ -1,6 +1,7 @@
 package app.flux.react.uielements
 
 import app.common.accounting.TemplateMatcher
+import app.common.AttachmentFormatting
 import app.flux.stores.entries.GroupedTransactions
 import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.uielements.Bootstrap
@@ -24,8 +25,22 @@ final class DescriptionWithEntryCount(implicit
       val tagIndications: Seq[VdomNode] =
         entry.tags
           .map(tag => Bootstrap.Label(BootstrapTags.toStableVariant(tag))(^.key := tag, tag): VdomNode)
+      val attachments = entry.transactions
+        .flatMap(_.attachments)
+        .distinct
+        .map(attachment =>
+          <.a(
+            ^.key := attachment.hashCode().toString,
+            ^.href := AttachmentFormatting.getUrl(attachment),
+            ^.target := "_blank",
+            ^.className := "attachment-link",
+            Bootstrap.Glyphicon("paperclip"),
+          )
+        )
       val centralContent =
-        <<.joinWithSpaces(maybeTemplateIcon.toVector ++ tagIndications :+ (entry.description: VdomNode))
+        <<.joinWithSpaces(
+          maybeTemplateIcon.toVector ++ tagIndications :+ (entry.description: VdomNode) :+ attachments.toVdomArray
+        )
 
       if (entry.transactions.size == 1) {
         centralContent
