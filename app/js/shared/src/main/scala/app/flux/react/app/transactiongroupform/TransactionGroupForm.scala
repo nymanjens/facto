@@ -548,7 +548,7 @@ final class TransactionGroupForm(implicit
               case Failure(exception) =>
                 $.modState(state =>
                   state.copy(
-                    globalErrorMessage = Some(s"Failed to upload attachment: $exception"),
+                    globalErrorMessage = Some(s"Failed to upload attachment: ${file.name}"),
                     attachmentsPendingUpload =
                       state.attachmentsPendingUpload.filter(_ != attachmentPendingUpload),
                   )
