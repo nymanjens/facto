@@ -656,6 +656,7 @@ final class TransactionGroupForm(implicit
                 flowInCents = data.flow.cents,
                 detailDescription = data.detailDescription,
                 tags = data.tags,
+                attachments = state.attachments,
                 createdDate = group.createdDate,
                 transactionDate = data.transactionDate,
                 consumedDate = data.consumedDate,
