@@ -50,9 +50,11 @@ final class CsvImportTool @Inject() (implicit clock: Clock, entityAccess: JvmEnt
                 beneficiaryAccountCode = beneficiaryAccountCode,
                 moneyReservoirCode = moneyReservoirCode,
                 categoryCode = categoryCode,
-                description = description,
                 flowInCents = Money.floatToCents(flowAsFloat.toDouble),
+                description = description,
+                detailDescription = "",
                 tags = Seq(s"csv-import-$beneficiaryAccountCode"),
+                attachments = Seq(),
                 createdDate = epochSecondsToDateTime(createdDateStamp.toLong),
                 transactionDate = epochSecondsToDateTime(transactionDateStamp.toLong),
                 consumedDate = epochSecondsToDateTime(
