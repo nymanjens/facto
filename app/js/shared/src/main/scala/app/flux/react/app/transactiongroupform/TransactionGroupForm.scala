@@ -505,8 +505,10 @@ final class TransactionGroupForm(implicit
           Bootstrap.FontAwesomeIcon("circle-o-notch", "spin")
         } else {
           Bootstrap.Button(Variant.default, Size.xs)(
-            ^.onClick --> $.modState(state => state.copy(attachments = state.attachments.filter(_ != attachment))),
-            Bootstrap.FontAwesomeIcon("trash-o")
+            ^.onClick --> $.modState(state =>
+              state.copy(attachments = state.attachments.filter(_ != attachment))
+            ),
+            Bootstrap.FontAwesomeIcon("trash-o"),
           )
         },
       )
@@ -544,7 +546,13 @@ final class TransactionGroupForm(implicit
                 ).runNow()
 
               case Failure(exception) =>
-              // TODO: Send alert. e.g. via state.globalErrorMessage
+                $.modState(state =>
+                  state.copy(
+                    globalErrorMessage = Some(s"Failed to upload attachment: $exception"),
+                    attachmentsPendingUpload =
+                      state.attachmentsPendingUpload.filter(_ != attachmentPendingUpload),
+                  )
+                ).runNow()
             }
           }
           fileReader.readAsArrayBuffer(file)
