@@ -1,5 +1,6 @@
 package app.controllers
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import akka.stream.scaladsl.StreamConverters
 import java.io.InputStream
 import java.nio.charset.StandardCharsets
@@ -32,8 +33,6 @@ final class Application @Inject() (implicit
 
   def getAttachment(contentHash: String, typeEncoded: String, filename: String) = AuthenticatedAction {
     implicit user => implicit request =>
-      val contentType = typeEncoded.replace('>', '/')
-
       val folder = playConfiguration.get[String]("app.accounting.attachmentsFolder")
       val folderPath = Paths.get(folder)
 
@@ -44,17 +43,7 @@ final class Application @Inject() (implicit
       } else if (Files.isDirectory(assetPath)) {
         NotFound(s"Could not find $assetPath")
       } else {
-        val connection = assetPath.toFile.toURI.toURL.openConnection()
-        val stream = connection.getInputStream
-        val source = StreamConverters.fromInputStream(() => stream)
-        RangeResult
-          .ofSource(
-            entityLength = stream.available(), // TODO: This may not be entirely accurate
-            source = source,
-            rangeHeader = request.headers.get(RANGE),
-            fileName = Some(filename),
-            contentType = Some(contentType),
-          )
+        Ok.sendPath(assetPath, inline = true, fileName = _ => Some(filename))
       }
   }
 }
