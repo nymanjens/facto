@@ -36,6 +36,7 @@ import hydro.flux.react.ReactVdomUtils.^^
 import hydro.flux.react.uielements.PageHeader
 import hydro.flux.react.uielements.WaitForFuture
 import hydro.flux.react.HydroReactComponent
+import hydro.flux.react.uielements.Bootstrap.Size
 import hydro.flux.router.RouterContext
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom
@@ -410,13 +411,18 @@ final class TransactionGroupForm(implicit
           Bootstrap.Alert(Variant.danger)(
             errorMessage
           )
-        }, {
-          for (attachment <- state.attachments)
-            yield attachmentDiv(attachment.filename, attachment.fileSizeBytes, attachment)
-        }.toVdomArray, {
-          for (attachment <- state.attachmentsPendingUpload)
-            yield attachmentDiv(attachment.filename, attachment.fileSizeBytes)
-        }.toVdomArray,
+        },
+        <<.ifThen(state.attachments.nonEmpty || state.attachmentsPendingUpload.nonEmpty) {
+          <.div(
+            ^.className := "attachments", {
+              for (attachment <- state.attachments)
+                yield attachmentDiv(attachment.filename, attachment.fileSizeBytes, attachment)
+            }.toVdomArray, {
+              for (attachment <- state.attachmentsPendingUpload)
+                yield attachmentDiv(attachment.filename, attachment.fileSizeBytes)
+            }.toVdomArray,
+          )
+        },
         Bootstrap.FormHorizontal(
           ^.key := "main-form",
           ^.encType := "multipart/form-data",
@@ -484,18 +490,25 @@ final class TransactionGroupForm(implicit
       <.div(
         ^.key := s"$filename/$fileSizeBytes/${Option(attachment).hashCode()}",
         ^.className := "attachment",
-        (if (attachment == null) EmptyVdom
-         else
+        (if (attachment == null) {
+           EmptyVdom
+         } else {
            <.a(
              ^.href := AttachmentFormatting.getUrl(attachment),
              ^.target := "_blank",
-           )).apply(
+           )
+         }).apply(
           Bootstrap.Glyphicon("paperclip"),
           <.label(s"$filename (${AttachmentFormatting.formatBytes(fileSizeBytes)})"),
-          <<.ifThen(attachment == null) {
-            Bootstrap.FontAwesomeIcon("circle-o-notch", "spin")
-          },
         ),
+        if (attachment == null) {
+          Bootstrap.FontAwesomeIcon("circle-o-notch", "spin")
+        } else {
+          Bootstrap.Button(Variant.default, Size.xs)(
+            ^.onClick --> $.modState(state => state.copy(attachments = state.attachments.filter(_ != attachment))),
+            Bootstrap.FontAwesomeIcon("trash-o")
+          )
+        },
       )
     }
 
