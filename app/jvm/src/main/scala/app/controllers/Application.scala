@@ -1,5 +1,9 @@
 package app.controllers
 
+import akka.stream.scaladsl.StreamConverters
+import java.io.InputStream
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
 import app.api.ScalaJsApiServerFactory
 import app.models.access.JvmEntityAccess
 import com.google.inject.Inject
@@ -8,6 +12,8 @@ import hydro.common.time.Clock
 import play.api.i18n.I18nSupport
 import play.api.i18n.MessagesApi
 import play.api.mvc._
+
+import java.nio.file.Paths
 
 final class Application @Inject() (implicit
     override val messagesApi: MessagesApi,
@@ -22,5 +28,33 @@ final class Application @Inject() (implicit
 
   def manualTests() = AuthenticatedAction { implicit user => implicit request =>
     Ok(views.html.manualTests())
+  }
+
+  def getAttachment(contentHash: String, typeEncoded: String, filename: String) = AuthenticatedAction {
+    implicit user => implicit request =>
+      val contentType = typeEncoded.replace('>', '/')
+
+      val folder = playConfiguration.get[String]("app.accounting.attachmentsFolder")
+      val folderPath = Paths.get(folder)
+
+      val assetPath = folderPath.resolve(contentHash)
+
+      if (!Files.exists(assetPath)) {
+        NotFound(s"Could not find $assetPath")
+      } else if (Files.isDirectory(assetPath)) {
+        NotFound(s"Could not find $assetPath")
+      } else {
+        val connection = assetPath.toFile.toURI.toURL.openConnection()
+        val stream = connection.getInputStream
+        val source = StreamConverters.fromInputStream(() => stream)
+        RangeResult
+          .ofSource(
+            entityLength = stream.available(), // TODO: This may not be entirely accurate
+            source = source,
+            rangeHeader = request.headers.get(RANGE),
+            fileName = Some(filename),
+            contentType = Some(contentType),
+          )
+      }
   }
 }
