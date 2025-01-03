@@ -343,6 +343,7 @@ final class ExternalApi @Inject() (implicit
         flowInCents = partial.flowInCents,
         detailDescription = partial.detailDescription,
         tags = partial.tags,
+        attachments = partial.attachments,
         createdDate = clock.now,
         transactionDate = clock.now,
         consumedDate = clock.now,
