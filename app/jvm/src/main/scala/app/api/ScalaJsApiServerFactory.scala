@@ -193,7 +193,7 @@ final class ScalaJsApiServerFactory @Inject() (implicit
       require(Files.exists(folderPath), s"Folder does not exist: $folder")
       require(Files.isDirectory(folderPath), s"Not a folder: $folder")
 
-      val sha256Hash = Hashing.sha256().hashBytes(bytes).toString.take(40)
+      val sha256Hash = Hashing.sha256().hashBytes(bytes).toString
 
       val filePath = folderPath.resolve(sha256Hash)
 
