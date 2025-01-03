@@ -26,6 +26,6 @@ final class AttachmentStore(implicit
     entityAccess: AppJsEntityAccess
 ) {
   def storeFileAndReturnHash(bytes: ArrayBuffer): Future[String] = {
-    Future.never
+    Future("abc123")
   }
 }

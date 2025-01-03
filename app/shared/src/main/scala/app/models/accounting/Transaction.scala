@@ -10,6 +10,7 @@ import app.models.accounting.Transaction.Attachment
 import hydro.models.modification.EntityType
 import app.models.user.User
 import hydro.common.time.LocalDateTime
+import hydro.common.GuavaReplacement
 import hydro.models.Entity
 
 import scala.collection.immutable.Seq
@@ -64,7 +65,26 @@ object Transaction {
 
   def tupled = (this.apply _).tupled
 
-  case class Attachment(contentHash: String, filename: String, fileType: String, fileSizeBytes: Int)
+  case class Attachment(contentHash: String, filename: String, fileType: String, fileSizeBytes: Int) {
+    def toEncodedString(): String = {
+      val typeEncoded = fileType.replace('/', '>')
+      f"$contentHash/$typeEncoded/$fileSizeBytes/$filename"
+    }
+  }
+  object Attachment {
+    def fromEncodedString(string: String): Attachment = {
+      GuavaReplacement.Splitter.on('/').split(string) match {
+        case Seq(contentHash, typeEncoded, fileSizeBytes, filename) =>
+          Attachment(
+            contentHash = contentHash,
+            filename = filename,
+            fileType = typeEncoded.replace('>', '/'),
+            fileSizeBytes = fileSizeBytes.toInt,
+          )
+      }
+
+    }
+  }
 
   /** Same as Transaction, except all fields are optional. */
   case class Partial(
