@@ -19,6 +19,7 @@ import hydro.common.time.LocalDateTime
 import hydro.models.Entity
 import hydro.models.access.DbQuery
 
+import java.nio.ByteBuffer
 import scala.collection.immutable.Seq
 import scala.collection.immutable.TreeMap
 import scala.collection.mutable
@@ -173,6 +174,10 @@ final class ScalaJsApiServerFactory @Inject() (implicit
 
           entityAccess.persistEntityModifications(EntityModification.createUpdateAllFields(updatedUser))
       }
+    }
+    override def storeFileAndReturnHash(bytes: ByteBuffer): String = {
+      println(s"storeFileAndReturnHash($bytes)")
+      "ABCXYZ"
     }
   }
 }

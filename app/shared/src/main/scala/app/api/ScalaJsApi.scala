@@ -10,6 +10,7 @@ import hydro.api.PicklableDbQuery
 import hydro.common.time.LocalDateTime
 import hydro.models.Entity
 
+import java.nio.ByteBuffer
 import scala.collection.SortedMap
 import scala.collection.immutable.Seq
 
@@ -34,6 +35,8 @@ trait ScalaJsApi {
 
   /** Adds or updates a user according to the present fields in the given prototype. */
   def upsertUser(userPrototype: UserPrototype): Unit
+
+  def storeFileAndReturnHash(bytes: ByteBuffer): String
 }
 
 object ScalaJsApi {
