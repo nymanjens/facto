@@ -546,6 +546,7 @@ final class TransactionGroupForm(implicit
                 ).runNow()
 
               case Failure(exception) =>
+                exception.printStackTrace()
                 $.modState(state =>
                   state.copy(
                     globalErrorMessage = Some(s"Failed to upload attachment: ${file.name}"),
