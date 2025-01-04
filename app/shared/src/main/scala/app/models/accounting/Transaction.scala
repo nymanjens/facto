@@ -6,9 +6,11 @@ import app.models.accounting.config.Account
 import app.models.accounting.config.Category
 import app.models.accounting.config.Config
 import app.models.accounting.config.MoneyReservoir
+import app.models.accounting.Transaction.Attachment
 import hydro.models.modification.EntityType
 import app.models.user.User
 import hydro.common.time.LocalDateTime
+import hydro.common.GuavaReplacement
 import hydro.models.Entity
 
 import scala.collection.immutable.Seq
@@ -22,8 +24,9 @@ case class Transaction(
     categoryCode: String,
     description: String,
     flowInCents: Long,
-    detailDescription: String = "",
-    tags: Seq[String] = Seq(),
+    detailDescription: String,
+    tags: Seq[String],
+    attachments: Seq[Attachment],
     createdDate: LocalDateTime,
     transactionDate: LocalDateTime,
     consumedDate: LocalDateTime,
@@ -62,6 +65,27 @@ object Transaction {
 
   def tupled = (this.apply _).tupled
 
+  case class Attachment(contentHash: String, filename: String, fileType: String, fileSizeBytes: Int) {
+    def toEncodedString(): String = {
+      val typeEncoded = fileType.replace('/', '>')
+      f"$contentHash/$typeEncoded/$fileSizeBytes/$filename"
+    }
+  }
+  object Attachment {
+    def fromEncodedString(string: String): Attachment = {
+      GuavaReplacement.Splitter.on('/').split(string) match {
+        case Seq(contentHash, typeEncoded, fileSizeBytes, filename) =>
+          Attachment(
+            contentHash = contentHash,
+            filename = filename,
+            fileType = typeEncoded.replace('>', '/'),
+            fileSizeBytes = fileSizeBytes.toInt,
+          )
+      }
+
+    }
+  }
+
   /** Same as Transaction, except all fields are optional. */
   case class Partial(
       transactionGroupId: Option[Long] = None,
@@ -73,6 +97,7 @@ object Transaction {
       flowInCents: Long = 0,
       detailDescription: String = "",
       tags: Seq[String] = Seq(),
+      attachments: Seq[Attachment] = Seq(),
       createdDate: Option[LocalDateTime] = None,
       transactionDate: Option[LocalDateTime] = None,
       consumedDate: Option[LocalDateTime] = None,
@@ -96,6 +121,7 @@ object Transaction {
         flowInCents: Long = 0,
         detailDescription: String = "",
         tags: Seq[String] = Seq(),
+        attachments: Seq[Attachment] = Seq(),
         createdDate: LocalDateTime = null,
         transactionDate: LocalDateTime = null,
         consumedDate: LocalDateTime = null,
@@ -111,6 +137,7 @@ object Transaction {
         flowInCents = flowInCents,
         detailDescription = detailDescription,
         tags = tags,
+        attachments = attachments,
         createdDate = Option(createdDate),
         transactionDate = Option(transactionDate),
         consumedDate = Option(consumedDate),
@@ -128,6 +155,7 @@ object Transaction {
         flowInCents = transaction.flowInCents,
         detailDescription = transaction.detailDescription,
         tags = transaction.tags,
+        attachments = transaction.attachments,
         createdDate = transaction.createdDate,
         transactionDate = transaction.transactionDate,
         consumedDate = transaction.consumedDate,

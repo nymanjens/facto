@@ -48,6 +48,7 @@ final class Module(implicit
     dispatcher: Dispatcher,
     clock: Clock,
     templateMatcher: TemplateMatcher,
+    attachmentStore: AttachmentStore,
 ) {
 
   // Configuration of submodules

@@ -1,8 +1,11 @@
 package app.flux.react.app.transactiongroupform
 
+import scala.scalajs.js
+import org.scalajs.dom.raw.ClipboardEvent
 import app.common.money.Currency
 import app.common.money.CurrencyValueManager
 import app.common.money.ReferenceMoney
+import app.common.AttachmentFormatting
 import app.flux.action.AppActions
 import app.flux.react.app.transactiongroupform.TotalFlowRestrictionInput.TotalFlowRestriction
 import app.flux.react.app.transactionviews.Liquidation
@@ -10,11 +13,13 @@ import app.flux.router.AppPages
 import app.flux.router.AppPages.PopupEditorPage
 import app.flux.stores.entries.AccountPair
 import app.flux.stores.entries.factories.LiquidationEntriesStoreFactory
+import app.flux.stores.AttachmentStore
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup
 import app.models.accounting.config.Account
 import app.models.accounting.config.Config
+import app.models.accounting.Transaction.Attachment
 import app.models.user.User
 import hydro.common.I18n
 import hydro.common.JsLoggingUtils.LogExceptionsCallback
@@ -30,9 +35,15 @@ import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.ReactVdomUtils.^^
 import hydro.flux.react.uielements.PageHeader
 import hydro.flux.react.uielements.WaitForFuture
+import hydro.flux.react.HydroReactComponent
+import hydro.flux.react.uielements.Bootstrap.Size
 import hydro.flux.router.RouterContext
 import japgolly.scalajs.react._
+import japgolly.scalajs.react.vdom
+import japgolly.scalajs.react.vdom.all.EmptyVdom
 import japgolly.scalajs.react.vdom.html_<^._
+import org.scalajs.dom
+import org.scalajs.dom.raw.FileReader
 
 import scala.async.Async.async
 import scala.async.Async.await
@@ -40,6 +51,9 @@ import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.scalajs.js.typedarray.ArrayBuffer
+import scala.util.Failure
+import scala.util.Success
 
 final class TransactionGroupForm(implicit
     i18n: I18n,
@@ -55,35 +69,10 @@ final class TransactionGroupForm(implicit
     totalFlowRestrictionInput: TotalFlowRestrictionInput,
     liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory,
     pageHeader: PageHeader,
-) {
+    attachmentStore: AttachmentStore,
+) extends HydroReactComponent {
 
   private val waitForFuture = new WaitForFuture[Props]
-  private val component = {
-    ScalaComponent
-      .builder[Props](getClass.getSimpleName)
-      .initialStateFromProps(props =>
-        logExceptions {
-          val numberOfTransactions = props.groupPartial.transactions.length
-          val totalFlowRestriction = props.groupPartial match {
-            case partial if partial.zeroSum => TotalFlowRestriction.ZeroSum
-            case _                          => TotalFlowRestriction.AnyTotal
-          }
-          State(
-            panelIndices = 0 until numberOfTransactions,
-            flowFractions = (0 until numberOfTransactions).map(_ => 0.0),
-            nextPanelIndex = numberOfTransactions,
-            // The following fields are updated by onFormChange() when the component is mounted
-            foreignCurrency = None,
-            totalFlowRestriction = totalFlowRestriction,
-            totalFlow = ReferenceMoney(0),
-            totalFlowExceptLast = ReferenceMoney(0),
-          )
-        }
-      )
-      .renderBackend[Backend]
-      .componentDidMount(scope => LogExceptionsCallback(scope.backend.onFormChange()))
-      .build
-  }
 
   // **************** API ****************//
   def forCreate(router: RouterContext): VdomElement = {
@@ -267,18 +256,42 @@ final class TransactionGroupForm(implicit
     }
   }
 
-  // **************** Private inner types ****************//
-  private sealed trait OperationMeta
-  private object OperationMeta {
-    case object AddNew extends OperationMeta
-    case class Edit(group: TransactionGroup, transactions: Seq[Transaction]) extends OperationMeta
-  }
+  // **************** Implementation of HydroReactComponent methods ****************//
+  override protected val config = ComponentConfig(
+    backendConstructor = new Backend(_),
+    initialStateFromProps = props => {
+      val numberOfTransactions = props.groupPartial.transactions.length
+      val totalFlowRestriction = props.groupPartial match {
+        case partial if partial.zeroSum => TotalFlowRestriction.ZeroSum
+        case _                          => TotalFlowRestriction.AnyTotal
+      }
+      State(
+        panelIndices = 0 until numberOfTransactions,
+        flowFractions = (0 until numberOfTransactions).map(_ => 0.0),
+        nextPanelIndex = numberOfTransactions,
+        // The following fields are updated by onFormChange() when the component is mounted
+        foreignCurrency = None,
+        totalFlowRestriction = totalFlowRestriction,
+        totalFlow = ReferenceMoney(0),
+        totalFlowExceptLast = ReferenceMoney(0),
+        attachments = props.groupPartial.transactions.flatMap(t => t.attachments).distinct,
+        attachmentsPendingUpload = Seq(),
+      )
+    },
+  )
+
+  // **************** Implementation of HydroReactComponent types ****************//
+  protected case class Props(
+      operationMeta: OperationMeta,
+      groupPartial: TransactionGroup.Partial,
+      router: RouterContext,
+  )
 
   /**
    * @param foreignCurrency Any foreign currency of any of the selected money reservoirs. If there are multiple,
    *                        this can by any of these.
    */
-  private case class State(
+  protected case class State(
       panelIndices: Seq[Int],
       flowFractions: Seq[Double],
       nextPanelIndex: Int,
@@ -288,6 +301,8 @@ final class TransactionGroupForm(implicit
       totalFlowRestriction: TotalFlowRestriction,
       totalFlow: ReferenceMoney,
       totalFlowExceptLast: ReferenceMoney,
+      attachments: Seq[Attachment],
+      attachmentsPendingUpload: Seq[State.AttachmentPendingUpload],
   ) {
     def plusPanel(panelRef: Int => transactionPanel.Reference): State = {
       copy(
@@ -311,20 +326,48 @@ final class TransactionGroupForm(implicit
         flowFractions = flows.map(flow => if (sumOfFlow.isZero) 0.0 else flow.toDouble / sumOfFlow.toDouble)
       )
     }
+
+    def containsAttachment(pendingAttachment: State.AttachmentPendingUpload): Boolean = {
+      attachmentsPendingUpload.contains(pendingAttachment) || attachments.exists(a =>
+        pendingAttachment.toAttachment(a.contentHash) == a
+      )
+    }
+  }
+  protected object State {
+    case class AttachmentPendingUpload(filename: String, fileType: String, fileSizeBytes: Int) {
+      def toAttachment(hash: String): Attachment = {
+        Attachment(
+          filename = filename,
+          contentHash = hash,
+          fileType = fileType,
+          fileSizeBytes = fileSizeBytes,
+        )
+      }
+    }
   }
 
-  private case class Props(
-      operationMeta: OperationMeta,
-      groupPartial: TransactionGroup.Partial,
-      router: RouterContext,
-  )
-
-  private final class Backend(val $ : BackendScope[Props, State]) {
+  protected class Backend($ : BackendScope[Props, State])
+      extends BackendBase($)
+      with DidMount
+      with WillUnmount {
 
     private val _panelRefs: mutable.Buffer[transactionPanel.Reference] =
       mutable.Buffer(transactionPanel.ref())
 
-    def render(props: Props, state: State) = logExceptions {
+    private val onPasteEventListener: js.Function1[ClipboardEvent, Unit] = e => onPasteEvent(e)
+
+    override def didMount(props: Props, state: State): Callback = {
+      dom.window.addEventListener("paste", onPasteEventListener)
+      onFormChange()
+      Callback.empty
+    }
+
+    override def willUnmount(props: Props, state: State): Callback = {
+      dom.window.removeEventListener("paste", onPasteEventListener)
+      Callback.empty
+    }
+
+    override def render(props: Props, state: State): VdomElement = logExceptions {
       implicit val router = props.router
       <.div(
         ^.className := "transaction-group-form",
@@ -369,8 +412,20 @@ final class TransactionGroupForm(implicit
             errorMessage
           )
         },
+        <<.ifThen(state.attachments.nonEmpty || state.attachmentsPendingUpload.nonEmpty) {
+          <.div(
+            ^.className := "attachments", {
+              for (attachment <- state.attachments)
+                yield attachmentDiv(attachment.filename, attachment.fileSizeBytes, attachment)
+            }.toVdomArray, {
+              for (attachment <- state.attachmentsPendingUpload)
+                yield attachmentDiv(attachment.filename, attachment.fileSizeBytes)
+            }.toVdomArray,
+          )
+        },
         Bootstrap.FormHorizontal(
           ^.key := "main-form",
+          ^.encType := "multipart/form-data",
           Bootstrap.Row(
             <.div(
               ^.className := "transaction-group-form",
@@ -425,6 +480,85 @@ final class TransactionGroupForm(implicit
           ),
         ),
       )
+    }
+
+    private def attachmentDiv(
+        filename: String,
+        fileSizeBytes: Int,
+        attachment: Attachment = null,
+    ): VdomTag = {
+      <.div(
+        ^.key := s"$filename/$fileSizeBytes/${Option(attachment).hashCode()}",
+        ^.className := "attachment",
+        (if (attachment == null) {
+           EmptyVdom
+         } else {
+           <.a(
+             ^.href := AttachmentFormatting.getUrl(attachment),
+             ^.target := "_blank",
+           )
+         }).apply(
+          Bootstrap.Glyphicon("paperclip"),
+          <.label(s"$filename (${AttachmentFormatting.formatBytes(fileSizeBytes)})"),
+        ),
+        if (attachment == null) {
+          Bootstrap.FontAwesomeIcon("circle-o-notch", "spin")
+        } else {
+          Bootstrap.Button(Variant.default, Size.xs)(
+            ^.onClick --> $.modState(state =>
+              state.copy(attachments = state.attachments.filter(_ != attachment))
+            ),
+            Bootstrap.FontAwesomeIcon("trash-o"),
+          )
+        },
+      )
+    }
+
+    private def onPasteEvent(event: ClipboardEvent): Unit = {
+      val clipboardData = event.clipboardData
+      for (i <- 0 until clipboardData.files.length) {
+        event.preventDefault() // Prevent default if there is at least one pasted file
+
+        val file = clipboardData.files(i)
+
+        val attachmentPendingUpload = State.AttachmentPendingUpload(
+          filename = file.name,
+          fileType = file.`type`,
+          fileSizeBytes = file.size.toInt,
+        )
+
+        if (! $.state.runNow().containsAttachment(attachmentPendingUpload)) {
+          $.modState(state =>
+            state.copy(attachmentsPendingUpload = state.attachmentsPendingUpload :+ attachmentPendingUpload)
+          ).runNow()
+
+          val fileReader = new FileReader()
+          fileReader.onload = e => {
+            val result = fileReader.result.asInstanceOf[ArrayBuffer]
+            attachmentStore.storeFileAndReturnHash(result).onComplete {
+              case Success(hash) =>
+                $.modState(state =>
+                  state.copy(
+                    attachmentsPendingUpload =
+                      state.attachmentsPendingUpload.filter(_ != attachmentPendingUpload),
+                    attachments = state.attachments :+ attachmentPendingUpload.toAttachment(hash),
+                  )
+                ).runNow()
+
+              case Failure(exception) =>
+                exception.printStackTrace()
+                $.modState(state =>
+                  state.copy(
+                    globalErrorMessage = Some(s"Failed to upload attachment: ${file.name}"),
+                    attachmentsPendingUpload =
+                      state.attachmentsPendingUpload.filter(_ != attachmentPendingUpload),
+                  )
+                ).runNow()
+            }
+          }
+          fileReader.readAsArrayBuffer(file)
+        }
+      }
     }
 
     private def panelRef(panelIndex: Int): transactionPanel.Reference = {
@@ -544,6 +678,7 @@ final class TransactionGroupForm(implicit
                 flowInCents = data.flow.cents,
                 detailDescription = data.detailDescription,
                 tags = data.tags,
+                attachments = state.attachments,
                 createdDate = group.createdDate,
                 transactionDate = data.transactionDate,
                 consumedDate = data.consumedDate,
@@ -609,5 +744,12 @@ final class TransactionGroupForm(implicit
           props.router.setPage(AppPages.NewTransactionGroupFromCopy(transactionGroupId = group.id))
       }
     }
+  }
+
+  // **************** Private inner types ****************//
+  protected sealed trait OperationMeta
+  protected object OperationMeta {
+    case object AddNew extends OperationMeta
+    case class Edit(group: TransactionGroup, transactions: Seq[Transaction]) extends OperationMeta
   }
 }

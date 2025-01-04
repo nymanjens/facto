@@ -32,6 +32,7 @@ trait ScalaJsApiClient {
   def executeDataQuery[E <: Entity](dbQuery: DbQuery[E]): Future[Seq[E]]
   def executeCountQuery(dbQuery: DbQuery[_ <: Entity]): Future[Int]
   def upsertUser(userPrototype: UserPrototype): Future[Unit]
+  def storeFileAndReturnHash(bytes: ArrayBuffer): Future[String]
 }
 
 object ScalaJsApiClient {
@@ -73,6 +74,9 @@ object ScalaJsApiClient {
 
     override def upsertUser(userPrototype: UserPrototype) = {
       WebsocketAutowireClient[ScalaJsApi].upsertUser(userPrototype).call()
+    }
+    override def storeFileAndReturnHash(bytes: ArrayBuffer): Future[String] = {
+      WebsocketAutowireClient[ScalaJsApi].storeFileAndReturnHash(TypedArrayBuffer.wrap(bytes)).call()
     }
 
     private object HttpPostAutowireClient extends autowire.Client[ByteBuffer, Pickler, Pickler] {

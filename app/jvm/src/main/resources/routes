@@ -44,3 +44,4 @@ GET  /loggedin/                        hydro.controllers.Auth.amILoggedIn
 
 # Map static resources from the /public folder to the /assets URL path
 GET  /assets/*file                     controllers.Assets.versioned(path="/public", file: Asset)
+GET  /attachments/:contentHash/:typeEncoded/:filename  app.controllers.Application.getAttachment(contentHash: String, typeEncoded: String, filename: String)

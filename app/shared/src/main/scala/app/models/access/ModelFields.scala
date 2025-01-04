@@ -1,6 +1,7 @@
 package app.models.access
 
 import app.common.TagFiltering
+import app.models.accounting.Transaction.Attachment
 import hydro.common.GuavaReplacement.ImmutableBiMap
 import hydro.models.modification.EntityType
 import app.models.money.ExchangeRateMeasurement
@@ -67,6 +68,12 @@ object ModelFields {
     val detailDescription: ModelField[String, E] =
       ModelField("detailDescription", _.detailDescription, v => _.copy(detailDescription = v))
     val tags: ModelField[Seq[String], E] = ModelField("tags", _.tags, v => _.copy(tags = v))
+    val attachments: ModelField[Seq[String], E] =
+      ModelField(
+        "attachments",
+        _.attachments.map(_.toEncodedString()),
+        v => _.copy(attachments = v.map(Attachment.fromEncodedString)),
+      )
     val createdDate: ModelField[LocalDateTime, E] =
       ModelField("createdDate", _.createdDate, v => _.copy(createdDate = v))
     val transactionDate: ModelField[LocalDateTime, E] =
@@ -135,6 +142,7 @@ object ModelFields {
     Transaction.flowInCents,
     Transaction.detailDescription,
     Transaction.tags,
+    Transaction.attachments,
     Transaction.tagsNormalized,
     Transaction.createdDate,
     Transaction.transactionDate,

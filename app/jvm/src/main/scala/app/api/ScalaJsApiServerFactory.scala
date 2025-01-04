@@ -1,5 +1,13 @@
 package app.api
 
+import java.nio.file.Files
+import java.nio.file.Paths
+
+import java.security.MessageDigest
+import java.io.File
+import java.io.FileOutputStream
+import java.nio.ByteBuffer
+import java.nio.channels.FileChannel
 import app.api.ScalaJsApi._
 import hydro.common.UpdateTokens.toUpdateToken
 import hydro.common.PlayI18n
@@ -11,6 +19,7 @@ import hydro.models.modification.EntityType
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
 import app.models.user.Users
+import com.google.common.hash.Hashing
 import com.google.inject._
 import hydro.api.EntityPermissions
 import hydro.api.PicklableDbQuery
@@ -19,6 +28,8 @@ import hydro.common.time.LocalDateTime
 import hydro.models.Entity
 import hydro.models.access.DbQuery
 
+import java.nio.ByteBuffer
+import java.nio.file.Path
 import scala.collection.immutable.Seq
 import scala.collection.immutable.TreeMap
 import scala.collection.mutable
@@ -31,6 +42,7 @@ final class ScalaJsApiServerFactory @Inject() (implicit
     entityAccess: JvmEntityAccess,
     i18n: PlayI18n,
     entityPermissions: EntityPermissions,
+    playConfiguration: play.api.Configuration,
 ) {
 
   def create()(implicit user: User): ScalaJsApi = new ScalaJsApi() {
@@ -172,6 +184,36 @@ final class ScalaJsApiServerFactory @Inject() (implicit
           }
 
           entityAccess.persistEntityModifications(EntityModification.createUpdateAllFields(updatedUser))
+      }
+    }
+    override def storeFileAndReturnHash(bytes: ByteBuffer): String = {
+      val folder = playConfiguration.get[String]("app.accounting.attachmentsFolder")
+      val folderPath = Paths.get(folder)
+
+      require(Files.exists(folderPath), s"Folder does not exist: $folder")
+      require(Files.isDirectory(folderPath), s"Not a folder: $folder")
+
+      val sha256Hash = Hashing.sha256().hashBytes(bytes).toString
+
+      val filePath = folderPath.resolve(sha256Hash)
+
+      if (Files.exists(filePath)) {
+        // This file was already uploaded
+        sha256Hash
+      } else {
+        bytes.flip() // Ensure the ByteBuffer is ready to be read
+        val outputStream = new FileOutputStream(filePath.toFile)
+        val fileChannel: FileChannel = outputStream.getChannel
+        try {
+          while (bytes.hasRemaining) {
+            fileChannel.write(bytes)
+          }
+        } finally {
+          fileChannel.close()
+          outputStream.close()
+        }
+
+        sha256Hash
       }
     }
   }

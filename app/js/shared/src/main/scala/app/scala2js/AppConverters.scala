@@ -2,6 +2,7 @@ package app.scala2js
 
 import app.models.access.ModelFields
 import app.models.accounting._
+import app.models.accounting.Transaction.Attachment
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
 import hydro.models.modification.EntityType
@@ -59,6 +60,7 @@ object AppConverters {
       ModelFields.Transaction.detailDescription,
       ModelFields.Transaction.tags,
       ModelFields.Transaction.tagsNormalized,
+      ModelFields.Transaction.attachments,
       ModelFields.Transaction.createdDate,
       ModelFields.Transaction.transactionDate,
       ModelFields.Transaction.consumedDate,
@@ -74,6 +76,7 @@ object AppConverters {
         flowInCents = dict.getRequired(ModelFields.Transaction.flowInCents),
         detailDescription = dict.getRequired(ModelFields.Transaction.detailDescription),
         tags = dict.getRequired(ModelFields.Transaction.tags),
+        attachments = dict.getRequired(ModelFields.Transaction.attachments).map(Attachment.fromEncodedString),
         createdDate = dict.getRequired(ModelFields.Transaction.createdDate),
         transactionDate = dict.getRequired(ModelFields.Transaction.transactionDate),
         consumedDate = dict.getRequired(ModelFields.Transaction.consumedDate),

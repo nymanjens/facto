@@ -44,6 +44,9 @@ final class ScalaJsApiCallerImpl @Inject() (implicit scalaJsApiServerFactory: Sc
       case "upsertUser" =>
         val userPrototype = Unpickle[UserPrototype].fromBytes(argsMap("userPrototype"))
         Pickle.intoBytes(scalaJsApiServer.upsertUser(userPrototype))
+      case "storeFileAndReturnHash" =>
+        val bytes = Unpickle[ByteBuffer].fromBytes(argsMap("bytes"))
+        Pickle.intoBytes(scalaJsApiServer.storeFileAndReturnHash(bytes))
     }
   }
 }

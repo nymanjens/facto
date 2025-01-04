@@ -16,6 +16,7 @@ import scala.collection.immutable.Seq
 import scala.collection.mutable
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+import scala.scalajs.js.typedarray.ArrayBuffer
 
 final class FakeScalaJsApiClient extends ScalaJsApiClient {
 
@@ -60,6 +61,10 @@ final class FakeScalaJsApiClient extends ScalaJsApiClient {
 
   override def upsertUser(userPrototype: UserPrototype): Future[Unit] = async {
     upsertedUserPrototypes += userPrototype
+  }
+
+  def storeFileAndReturnHash(bytes: ArrayBuffer): Future[String] = {
+    ???
   }
 
   // **************** Additional methods for tests ****************//

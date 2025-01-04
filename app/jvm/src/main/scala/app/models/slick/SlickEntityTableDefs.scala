@@ -1,7 +1,10 @@
 package app.models.slick
 
+import net.liftweb.json.DefaultFormats
+import net.liftweb.json.Serialization
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
+import app.models.accounting.Transaction.Attachment
 import app.models.accounting.TransactionGroup
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
@@ -69,6 +72,33 @@ object SlickEntityTableDefs {
     private implicit val tagsSeqToStringMapper: ColumnType[Seq[String]] = {
       MappedColumnType.base[Seq[String], String](Tags.serializeToString, Tags.parseTagsString)
     }
+    private implicit val attachmentsToStringMapper: ColumnType[Seq[Attachment]] = {
+      MappedColumnType.base[Seq[Attachment], String](
+        a => serializeData(Data(attachments = a)),
+        s => deserializeData(s).attachments,
+      )
+    }
+
+    private def serializeData(data: Data): String = {
+      if (data == Data()) {
+        ""
+      } else {
+        implicit val formats = DefaultFormats
+        Serialization.write(data)
+      }
+    }
+    private def deserializeData(string: String): Data = {
+      string match {
+        case "" => Data()
+        case _ =>
+          try {
+            implicit val formats = DefaultFormats
+            Serialization.read[Data](string)
+          } catch {
+            case e: Exception => throw new Exception(s"Could not parse '$string'", e)
+          }
+      }
+    }
 
     /* override */
     final class Table(tag: SlickTag) extends EntityTable[Transaction](tag, tableName) {
@@ -81,6 +111,7 @@ object SlickEntityTableDefs {
       def flow = column[Long]("flow")
       def detailDescription = column[String]("detailDescription")
       def tags = column[Seq[String]]("tagsString")(tagsSeqToStringMapper)
+      def attachments = column[Seq[Attachment]]("data")(attachmentsToStringMapper)
       def createdDate = column[LocalDateTime]("createdDate")
       def transactionDate = column[LocalDateTime]("transactionDate")
       def consumedDate = column[LocalDateTime]("consumedDate")
@@ -96,12 +127,15 @@ object SlickEntityTableDefs {
           flow,
           detailDescription,
           tags,
+          attachments,
           createdDate,
           transactionDate,
           consumedDate,
           id.?,
         ) <> (Transaction.tupled, Transaction.unapply)
     }
+
+    case class Data(attachments: Seq[Attachment] = Seq())
   }
 
   implicit object TransactionGroupDef extends SlickEntityTableDef[TransactionGroup] {

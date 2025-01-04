@@ -6,6 +6,7 @@ import app.flux.stores.GlobalMessagesStore
 import app.flux.stores.InMemoryUserConfigStore
 import app.flux.stores.entries.factories.LiquidationEntriesStoreFactory
 import app.flux.stores.entries.factories.TagsStoreFactory
+import app.flux.stores.AttachmentStore
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Config
 import app.models.user.User
@@ -26,6 +27,7 @@ final class Module(implicit
     clock: Clock,
     liquidationEntriesStoreFactory: LiquidationEntriesStoreFactory,
     pageHeader: PageHeader,
+    attachmentStore: AttachmentStore,
 ) {
 
   implicit private lazy val transactionPanel: TransactionPanel = new TransactionPanel
