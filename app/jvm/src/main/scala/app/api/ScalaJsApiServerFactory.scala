@@ -197,21 +197,24 @@ final class ScalaJsApiServerFactory @Inject() (implicit
 
       val filePath = folderPath.resolve(sha256Hash)
 
-      require(!Files.exists(filePath), s"File already exists: $filePath")
-
-      bytes.flip() // Ensure the ByteBuffer is ready to be read
-      val outputStream = new FileOutputStream(filePath.toFile)
-      val fileChannel: FileChannel = outputStream.getChannel
-      try {
-        while (bytes.hasRemaining) {
-          fileChannel.write(bytes)
+      if (Files.exists(filePath)) {
+        // This file was already uploaded
+        sha256Hash
+      } else {
+        bytes.flip() // Ensure the ByteBuffer is ready to be read
+        val outputStream = new FileOutputStream(filePath.toFile)
+        val fileChannel: FileChannel = outputStream.getChannel
+        try {
+          while (bytes.hasRemaining) {
+            fileChannel.write(bytes)
+          }
+        } finally {
+          fileChannel.close()
+          outputStream.close()
         }
-      } finally {
-        fileChannel.close()
-        outputStream.close()
-      }
 
-      sha256Hash
+        sha256Hash
+      }
     }
   }
 }
