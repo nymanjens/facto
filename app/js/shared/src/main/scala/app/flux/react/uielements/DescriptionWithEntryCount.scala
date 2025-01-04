@@ -39,7 +39,7 @@ final class DescriptionWithEntryCount(implicit
         )
       val centralContent =
         <<.joinWithSpaces(
-          maybeTemplateIcon.toVector ++ tagIndications :+ (entry.description: VdomNode) :+ attachments.toVdomArray
+          maybeTemplateIcon.toVector ++ tagIndications :+ attachments.toVdomArray :+ (entry.description: VdomNode)
         )
 
       if (entry.transactions.size == 1) {
