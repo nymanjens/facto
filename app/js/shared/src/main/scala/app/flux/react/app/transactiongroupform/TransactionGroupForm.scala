@@ -716,6 +716,13 @@ final class TransactionGroupForm(implicit
                   submitValid(datas, state)
                   if (redirectOnSuccess) {
                     props.router.setPage(PopupEditorPage.getParentPage(props.router))
+                  } else {
+                    newState = newState.copy(
+                      showErrorMessages = false,
+                      globalErrorMessage = None,
+                      attachments = Seq(),
+                      attachmentsPendingUpload = Seq(),
+                    )
                   }
               }
             }
