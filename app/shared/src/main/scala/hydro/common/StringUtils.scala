@@ -14,7 +14,7 @@ object StringUtils {
     .put('‰', "%)C_[7|%*&")
     .build()
 
-  def cleanupForSpecializedCharacters(
+  def cleanupSpecializedCharacters(
       input: String,
       stripNewlines: Boolean,
       substituteNonLatin1: Boolean,

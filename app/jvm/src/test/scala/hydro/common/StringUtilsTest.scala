@@ -14,26 +14,26 @@ class StringUtilsTest {
   case class StringCase(string: String)
 
   @Test
-  def cleanupForSpecializedCharacters_stripsNewlinesConditionally(
+  def cleanupSpecializedCharacters_stripsNewlinesConditionally(
       @TestParameter substituteNonLatin1: Boolean
   ): Unit = {
     assertThat(
-      StringUtils.cleanupForSpecializedCharacters("abc\r\ndef\nghi", stripNewlines = true, substituteNonLatin1)
+      StringUtils.cleanupSpecializedCharacters("abc\r\ndef\nghi", stripNewlines = true, substituteNonLatin1)
     )
       .isEqualTo("abcdefghi")
     assertThat(
-      StringUtils.cleanupForSpecializedCharacters("abc\r\ndef\nghi", stripNewlines = false, substituteNonLatin1)
+      StringUtils.cleanupSpecializedCharacters("abc\r\ndef\nghi", stripNewlines = false, substituteNonLatin1)
     )
       .isEqualTo("abc\ndef\nghi")
   }
 
   @Test
-  def cleanupForSpecializedCharacters_replacesTabBySpaces(
+  def cleanupSpecializedCharacters_replacesTabBySpaces(
       @TestParameter stripNewlines: Boolean,
       @TestParameter substituteNonLatin1: Boolean,
   ): Unit = {
     assertThat(
-      StringUtils.cleanupForSpecializedCharacters(
+      StringUtils.cleanupSpecializedCharacters(
         "\tabc\tdef",
         stripNewlines = stripNewlines,
         substituteNonLatin1,
@@ -43,12 +43,12 @@ class StringUtilsTest {
   }
 
   @Test
-  def cleanupForSpecializedCharacters_replacesQuotes(
+  def cleanupSpecializedCharacters_replacesQuotes(
       @TestParameter stripNewlines: Boolean,
       @TestParameter substituteNonLatin1: Boolean,
   ): Unit = {
     assertThat(
-      StringUtils.cleanupForSpecializedCharacters(
+      StringUtils.cleanupSpecializedCharacters(
         "| abc „“def”  ‚‘xyz’ |",
         stripNewlines = stripNewlines,
         substituteNonLatin1,
@@ -58,7 +58,7 @@ class StringUtilsTest {
   }
 
   @Test
-  def cleanupForSpecializedCharacters_leavesNormalCharactersAsIs(
+  def cleanupSpecializedCharacters_leavesNormalCharactersAsIs(
       @TestParameter(
         Array(
           "",
@@ -77,13 +77,13 @@ class StringUtilsTest {
       @TestParameter stripNewlines: Boolean,
       @TestParameter substituteNonLatin1: Boolean,
   ): Unit = {
-    assertThat(StringUtils.cleanupForSpecializedCharacters(s, stripNewlines, substituteNonLatin1)).isEqualTo(s)
-    assertThat(StringUtils.cleanupForSpecializedCharacters(f"$s ${s}__$s", stripNewlines, substituteNonLatin1))
+    assertThat(StringUtils.cleanupSpecializedCharacters(s, stripNewlines, substituteNonLatin1)).isEqualTo(s)
+    assertThat(StringUtils.cleanupSpecializedCharacters(f"$s ${s}__$s", stripNewlines, substituteNonLatin1))
       .isEqualTo(f"$s ${s}__$s")
   }
 
   @Test
-  def cleanupForSpecializedCharacters_removesInvisibleSpecialCharacters(
+  def cleanupSpecializedCharacters_removesInvisibleSpecialCharacters(
       @TestParameter(
         Array(
           "\r",
@@ -151,13 +151,13 @@ class StringUtilsTest {
       @TestParameter stripNewlines: Boolean,
       @TestParameter substituteNonLatin1: Boolean,
   ): Unit = {
-    assertThat(StringUtils.cleanupForSpecializedCharacters(s, stripNewlines, substituteNonLatin1)).isEmpty()
-    assertThat(StringUtils.cleanupForSpecializedCharacters(f"$s  ${s}__$s", stripNewlines, substituteNonLatin1))
+    assertThat(StringUtils.cleanupSpecializedCharacters(s, stripNewlines, substituteNonLatin1)).isEmpty()
+    assertThat(StringUtils.cleanupSpecializedCharacters(f"$s  ${s}__$s", stripNewlines, substituteNonLatin1))
       .isEqualTo("  __")
   }
 
   @Test
-  def cleanupForSpecializedCharacters_replacesSpecialUnicodeCharactersByQuestionMark(
+  def cleanupSpecializedCharacters_replacesSpecialUnicodeCharactersByQuestionMark(
       @TestParameter(
         Array(
           "↡",
@@ -175,14 +175,14 @@ class StringUtilsTest {
       s: String,
       @TestParameter stripNewlines: Boolean,
   ): Unit = {
-    assertThat(StringUtils.cleanupForSpecializedCharacters(s, stripNewlines, substituteNonLatin1 = true))
+    assertThat(StringUtils.cleanupSpecializedCharacters(s, stripNewlines, substituteNonLatin1 = true))
       .isEqualTo("?")
     assertThat(
-      StringUtils.cleanupForSpecializedCharacters(f"$s++${s}__$s", stripNewlines, substituteNonLatin1 = true)
+      StringUtils.cleanupSpecializedCharacters(f"$s++${s}__$s", stripNewlines, substituteNonLatin1 = true)
     )
       .isEqualTo("?++?__?")
 
-    assertThat(StringUtils.cleanupForSpecializedCharacters(s, stripNewlines, substituteNonLatin1 = false))
+    assertThat(StringUtils.cleanupSpecializedCharacters(s, stripNewlines, substituteNonLatin1 = false))
       .isEqualTo(s)
   }
 }

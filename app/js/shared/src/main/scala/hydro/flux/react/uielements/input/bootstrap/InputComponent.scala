@@ -54,7 +54,7 @@ object InputComponent {
             val cleanedNewString = {
               if (props.cleanupSpecializedCharacters.isDefined) {
                 val options = props.cleanupSpecializedCharacters.get
-                StringUtils.cleanupForSpecializedCharacters(
+                StringUtils.cleanupSpecializedCharacters(
                   newString,
                   stripNewlines = options.stripNewlines,
                   substituteNonLatin1 = options.substituteNonLatin1,
