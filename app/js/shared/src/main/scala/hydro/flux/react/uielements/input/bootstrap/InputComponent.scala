@@ -3,6 +3,7 @@ package hydro.flux.react.uielements.input.bootstrap
 import hydro.common.I18n
 import hydro.common.JsLoggingUtils.LogExceptionsCallback
 import hydro.common.JsLoggingUtils.logExceptions
+import hydro.common.StringUtils
 import hydro.flux.react.ReactVdomUtils.<<
 import hydro.flux.react.ReactVdomUtils.^^
 import hydro.flux.react.uielements.Bootstrap.Variant
@@ -50,14 +51,27 @@ object InputComponent {
       .renderPS((context, props, state) =>
         logExceptions {
           def onChange(newString: String): Callback = LogExceptionsCallback {
-            val newValue = ValueTransformer.stringToValueOrDefault(newString, props)
+            val cleanedNewString = {
+              if (props.cleanupSpecializedCharacters.isDefined) {
+                val options = props.cleanupSpecializedCharacters.get
+                StringUtils.cleanupForSpecializedCharacters(
+                  newString,
+                  stripNewlines = options.stripNewlines,
+                  substituteNonLatin1 = options.substituteNonLatin1,
+                )
+              } else {
+                newString
+              }
+            }
+
+            val newValue = ValueTransformer.stringToValueOrDefault(cleanedNewString, props)
             val oldValue = ValueTransformer.stringToValueOrDefault(state.valueString, props)
             if (oldValue != newValue) {
               for (listener <- context.state.listeners) {
                 listener.onChange(newValue, directUserChange = true).runNow()
               }
             }
-            context.modState(_.withValueString(newString)).runNow()
+            context.modState(_.withValueString(cleanedNewString)).runNow()
           }
           val errorMessage = generateErrorMessage(state, props)
 
@@ -162,12 +176,11 @@ object InputComponent {
   }
 
   object ValueTransformer {
-    def nullInstance[ExtraProps]: ValueTransformer[String, ExtraProps] =
-      new ValueTransformer[String, ExtraProps] {
-        override def stringToValue(string: String, extraProps: ExtraProps) = Some(string)
-        override def valueToString(value: String, extraProps: ExtraProps) = value
-        override def isEmptyValue(value: String) = value == ""
-      }
+    object nullInstance extends ValueTransformer[String, Any] {
+      override def stringToValue(string: String, extraProps: Any) = Some(string)
+      override def valueToString(value: String, extraProps: Any) = value
+      override def isEmptyValue(value: String) = value == ""
+    }
 
     def stringToValue[Value, ExtraProps](string: String, props: Props[Value, ExtraProps]): Option[Value] = {
       props.valueTransformer.stringToValue(string, props.extra)
@@ -183,6 +196,8 @@ object InputComponent {
     }
   }
 
+  case class CleanupCharactersOptions(stripNewlines: Boolean, substituteNonLatin1: Boolean)
+
   case class Props[Value, ExtraProps](
       label: String,
       name: String,
@@ -194,6 +209,9 @@ object InputComponent {
       listener: InputBase.Listener[Value],
       extra: ExtraProps = (): Unit,
       valueTransformer: ValueTransformer[Value, ExtraProps],
+      // If None, no cleanup is done. If set StringUtils.cleanupSpecializedCharacters() will be applied to
+      // the incoming string
+      cleanupSpecializedCharacters: Option[CleanupCharactersOptions] = None,
   )(implicit val i18n: I18n)
 
   case class State[Value](valueString: String, listeners: Seq[InputBase.Listener[Value]] = Seq()) {

@@ -4,6 +4,7 @@ import hydro.common.I18n
 import hydro.flux.react.uielements.input.InputBase
 import hydro.flux.react.uielements.input.InputValidator
 import hydro.flux.react.uielements.input.bootstrap.InputComponent
+import hydro.flux.react.uielements.input.bootstrap.InputComponent.CleanupCharactersOptions
 import hydro.flux.react.uielements.input.bootstrap.InputComponent.Props
 import hydro.flux.react.uielements.input.bootstrap.InputComponent.ValueTransformer
 import hydro.jsfacades.ReactAutosuggest
@@ -62,6 +63,7 @@ object AutosuggestTextInput {
       onSuggestionsFetchRequested: String => Unit,
       onSuggestionsClearRequested: () => Unit,
       listener: InputBase.Listener[String] = InputBase.Listener.nullInstance,
+      substituteNonLatin1: Boolean = true,
   )(implicit i18n: I18n): VdomElement = {
     val props = Props(
       label = label,
@@ -73,6 +75,8 @@ object AutosuggestTextInput {
       inputClasses = inputClasses,
       listener = listener,
       valueTransformer = ValueTransformer.nullInstance,
+      cleanupSpecializedCharacters =
+        Some(CleanupCharactersOptions(stripNewlines = true, substituteNonLatin1 = substituteNonLatin1)),
       extra = ExtraProps(
         suggestions = suggestions,
         onSuggestionsFetchRequested = onSuggestionsFetchRequested,

@@ -1,7 +1,6 @@
 package hydro.flux.react.uielements.input.bootstrap
 
 import java.time.Duration
-
 import hydro.common.DesktopKeyCombination
 import hydro.common.DesktopKeyCombination.ArrowDown
 import hydro.common.DesktopKeyCombination.SpecialKey
@@ -12,6 +11,7 @@ import hydro.common.time.TimeUtils
 import hydro.flux.react.ReactVdomUtils.^^
 import hydro.flux.react.uielements.input.InputBase
 import hydro.flux.react.uielements.input.InputValidator
+import hydro.flux.react.uielements.input.bootstrap.InputComponent.CleanupCharactersOptions
 import hydro.flux.react.uielements.input.bootstrap.InputComponent.Props
 import hydro.flux.react.uielements.input.bootstrap.InputComponent.ValueTransformer
 import japgolly.scalajs.react._
@@ -65,6 +65,7 @@ object TextInput {
       disabled: Boolean = false,
       arrowHandler: ArrowHandler = null,
       listener: InputBase.Listener[String] = InputBase.Listener.nullInstance,
+      substituteNonLatin1: Boolean = true,
   )(implicit i18n: I18n): VdomElement = {
     val props = Props(
       label = label,
@@ -76,6 +77,8 @@ object TextInput {
       inputClasses = inputClasses,
       listener = listener,
       valueTransformer = ValueTransformer.nullInstance,
+      cleanupSpecializedCharacters =
+        Some(CleanupCharactersOptions(stripNewlines = true, substituteNonLatin1 = substituteNonLatin1)),
       extra = ExtraProps(
         inputType = inputType,
         focusOnMount = focusOnMount,

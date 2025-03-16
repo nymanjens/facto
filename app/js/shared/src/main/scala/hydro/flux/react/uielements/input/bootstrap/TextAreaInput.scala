@@ -13,6 +13,7 @@ import japgolly.scalajs.react.vdom.html_<^._
 import hydro.flux.react.uielements.Bootstrap.Variant
 import hydro.flux.react.uielements.Bootstrap.Size
 import hydro.flux.react.uielements.Bootstrap
+import hydro.flux.react.uielements.input.bootstrap.InputComponent.CleanupCharactersOptions
 
 import scala.collection.immutable.Seq
 
@@ -47,6 +48,7 @@ object TextAreaInput {
       showErrorMessage: Boolean,
       inputClasses: Seq[String] = Seq(),
       listener: InputBase.Listener[String] = InputBase.Listener.nullInstance,
+      substituteNonLatin1: Boolean = true,
   )(implicit i18n: I18n): VdomElement = {
     val props = Props(
       label = label,
@@ -57,6 +59,8 @@ object TextAreaInput {
       inputClasses = inputClasses,
       listener = listener,
       valueTransformer = ValueTransformer.nullInstance,
+      cleanupSpecializedCharacters =
+        Some(CleanupCharactersOptions(stripNewlines = false, substituteNonLatin1 = substituteNonLatin1)),
     )
     ref.mutableRef.component(props)
   }
