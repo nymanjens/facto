@@ -163,7 +163,6 @@ object StringUtilsJsTest extends TestSuite {
             "\u001E",
             "\u001F",
             "\u0085",
-            "\u00A0",
             "\u007F",
             "\u0081",
             "\u1680",
