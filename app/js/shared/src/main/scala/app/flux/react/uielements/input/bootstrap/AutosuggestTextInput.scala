@@ -75,7 +75,7 @@ object AutosuggestTextInput {
       inputClasses = inputClasses,
       listener = listener,
       valueTransformer = ValueTransformer.nullInstance,
-      cleanupSpecializedCharacters =
+      sanitizeSpecializedCharacters =
         Some(CleanupCharactersOptions(stripNewlines = true, substituteNonLatin1 = substituteNonLatin1)),
       extra = ExtraProps(
         suggestions = suggestions,

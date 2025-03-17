@@ -59,7 +59,7 @@ object TextAreaInput {
       inputClasses = inputClasses,
       listener = listener,
       valueTransformer = ValueTransformer.nullInstance,
-      cleanupSpecializedCharacters =
+      sanitizeSpecializedCharacters =
         Some(CleanupCharactersOptions(stripNewlines = false, substituteNonLatin1 = substituteNonLatin1)),
     )
     ref.mutableRef.component(props)

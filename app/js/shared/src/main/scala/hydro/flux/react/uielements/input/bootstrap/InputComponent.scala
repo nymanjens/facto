@@ -52,9 +52,9 @@ object InputComponent {
         logExceptions {
           def onChange(newString: String): Callback = LogExceptionsCallback {
             val cleanedNewString = {
-              if (props.cleanupSpecializedCharacters.isDefined) {
-                val options = props.cleanupSpecializedCharacters.get
-                StringUtils.cleanupSpecializedCharacters(
+              if (props.sanitizeSpecializedCharacters.isDefined) {
+                val options = props.sanitizeSpecializedCharacters.get
+                StringUtils.sanitizeSpecializedCharacters(
                   newString,
                   stripNewlines = options.stripNewlines,
                   substituteNonLatin1 = options.substituteNonLatin1,
@@ -209,9 +209,9 @@ object InputComponent {
       listener: InputBase.Listener[Value],
       extra: ExtraProps = (): Unit,
       valueTransformer: ValueTransformer[Value, ExtraProps],
-      // If None, no cleanup is done. If set StringUtils.cleanupSpecializedCharacters() will be applied to
+      // If None, no cleanup is done. If set StringUtils.sanitizeSpecializedCharacters() will be applied to
       // the incoming string
-      cleanupSpecializedCharacters: Option[CleanupCharactersOptions] = None,
+      sanitizeSpecializedCharacters: Option[CleanupCharactersOptions] = None,
   )(implicit val i18n: I18n)
 
   case class State[Value](valueString: String, listeners: Seq[InputBase.Listener[Value]] = Seq()) {
