@@ -44,6 +44,7 @@ final class Application @Inject() (implicit
         NotFound(s"Could not find $assetPath")
       } else {
         Ok.sendPath(assetPath, inline = true, fileName = _ => Some(filename))
+          .withHeaders(CACHE_CONTROL -> "private")
       }
   }
 }
