@@ -53,29 +53,29 @@ db.default {
 
 - Browse to http://localhost:9000/app/useradministration (username: "admin", password: "changeme")
 
-## Installation with Docker (discouraged)
+## Installation with Docker
 
-**Warning:** The following works fine for launching a demo server to have a look.
-But if you want to run this as a service with real data and custom
-configuration, it is recommended to follow the "Installation from release"
-section instead (see [this issue](https://github.com/nymanjens/facto/issues/4)
-for the reasons why).
-
-The following commands will launch a new server alongside a database in Docker containers:
+Move to the directory where the `docker-compose.yml` file and `.env` file will be stored, e.g. `~/facto`:
 
 ```
-# Get the docker-compose.yml file
-wget https://raw.githubusercontent.com/nymanjens/facto/master/docker-compose.yml
+mkdir ./facto
+cd ./facto
+```
 
-# Choose a unique random string here of sufficient length
-export APPLICATION_SECRET="$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)"
+Download the `docker-compose.yml` and `.env` file:
+```
+wget -O docker-compose.yml https://github.com/nymanjens/facto/master/docker/docker-compose.yml
+wget -O .env https://github.com/nymanjens/facto/master/docker/example.env
+```
 
-# Create an empty database with a single admin user
-docker-compose run web sleep 5 # Wait for the database to be ready
-docker-compose run web bin/server -DdropAndCreateNewDb
-docker-compose run web bin/server -DcreateAdminUser
+You can also download the files directly from the repo and place them in the directory you created above.
+Then, edit the `.env` file to set your database password, the app secret and the default setup password to a random string of sufficient length.:
+```
+cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1
+```
 
-# Bring up the server
+Finally, you can start the application with Docker Compose:
+```
 docker-compose up
 ```
 

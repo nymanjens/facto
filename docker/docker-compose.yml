@@ -1,0 +1,36 @@
+name: facto
+
+services:
+  db:
+    container_name: facto_database
+    image: mariadb:10.3
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    healthcheck:
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASS}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
+
+  facto:
+    container_name: facto_server
+    depends_on:
+     - db
+    image: nymanjens/facto:latest
+    ports: ["9000:9000"]
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - facto_config:/opt/facto/conf
+
+volumes:
+  db_data:
+  facto_config:
