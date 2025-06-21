@@ -29,8 +29,7 @@ services:
     env_file:
       - .env
     volumes:
-      - facto_config:/opt/facto/conf
+      - ./config:/opt/facto/conf
 
 volumes:
   db_data:
-  facto_config:
