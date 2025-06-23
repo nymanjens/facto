@@ -74,7 +74,9 @@ Then, edit the `.env` file to set your database password, the app secret and the
 cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1
 ```
 
-You need to create the config directory depending on the name in the `docker-compose.yml` file. If you change the name, you need to ajust the `docker-compose.yml` file accordingly:
+You need to create the config directory depending on the name in the
+`docker-compose.yml` file. If you change the name, you need to adjust the
+`docker-compose.yml` file accordingly:
 ```
 mkdir ./config
 ```
