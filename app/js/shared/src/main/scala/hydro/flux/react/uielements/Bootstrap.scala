@@ -76,8 +76,8 @@ object Bootstrap {
 
   def ControlLabel: VdomTag = <.label(^.className := "control-label")
 
-  def Label(variant: Variant): VdomTag =
-    <.span(^.className := s"label label-${variant.name}")
+  def Label(variant: Variant, tag: VdomTag = <.span): VdomTag =
+    tag(^.className := s"label label-${variant.name}")
 
   def Panel(variant: Variant = Variant.default): VdomTag =
     <.div(^.className := s"panel panel-${variant.name}")
