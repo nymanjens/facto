@@ -107,7 +107,11 @@ final class Endowments(implicit
                     <.td(descriptionWithEntryCount(entry)),
                     <.td(
                       uielements.MoneyWithCurrency
-                        .sum(entry.flows, correctForInflation = state.correctForInflation)
+                        .sum(
+                          entry.flows,
+                          markPositiveFlow = true,
+                          correctForInflation = state.correctForInflation,
+                        )
                     ),
                     <.td(uielements.TransactionGroupEditButtons(entry.groupId)),
                   ),

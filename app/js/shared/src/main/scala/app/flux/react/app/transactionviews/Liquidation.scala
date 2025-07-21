@@ -98,7 +98,7 @@ final class Liquidation(implicit
                     <.td(entry.moneyReservoirs.map(_.shorterName).mkString(", ")),
                     <.td(entry.categories.map(_.name).mkString(", ")),
                     <.td(descriptionWithEntryCount(entry)),
-                    <.td(uielements.MoneyWithCurrency.sum(entry.flows)),
+                    <.td(uielements.MoneyWithCurrency.sum(entry.flows, markPositiveFlow = true)),
                     <.td(uielements.MoneyWithCurrency(entry.debt)),
                     <.td(uielements.TransactionGroupEditButtons(entry.groupId)),
                   ),

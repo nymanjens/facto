@@ -171,6 +171,7 @@ final class CashFlow(implicit
                             <.td(
                               uielements.MoneyWithCurrency.sum(
                                 entry.flows,
+                                markPositiveFlow = true,
                                 correctForInflation = state.correctForInflation,
                               )
                             ),

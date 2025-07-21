@@ -168,7 +168,7 @@ private[transactionviews] final class EntriesListTable[Entry, AdditionalInput](i
       } else {
         Table(
           title = props.tableTitle,
-          tableClasses = props.tableClasses,
+          tableClasses = props.tableClasses :+ "entries-list-table",
           expanded = state.expanded,
           onToggleCollapsedExpanded = props.collapsedExpandedStateStore map { store => () =>
             store.setExpandedForSingleTable(!state.expanded)
