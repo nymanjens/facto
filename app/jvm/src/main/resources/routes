@@ -11,7 +11,6 @@ GET  /appwithoutcreds/                 hydro.controllers.StandardActions.reactAp
 
 # Javscript files
 GET  /localDatabaseWebWorker.js        hydro.controllers.JavascriptFiles.localDatabaseWebWorker
-GET  /serviceWorker.js                 hydro.controllers.JavascriptFiles.serviceWorker
 
 # Internal API
 POST /scalajsapi/*path                 hydro.controllers.InternalApi.scalaJsApiPost(path: String)
