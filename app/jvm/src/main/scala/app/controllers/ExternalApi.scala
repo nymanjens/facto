@@ -8,6 +8,7 @@ import java.time.LocalTime
 import app.common.accounting.ComplexQueryFilter
 import app.common.money.Currency
 import app.common.money.MoneyWithGeneralCurrency
+import app.controllers.ExternalApi.JsonSerializableExchangeRateMeasurement
 import app.controllers.ExternalApi.JsonSerializableMoneyReservoir.JsonSerializableBalanceCorrection
 import app.controllers.ExternalApi.JsonSerializableMoneyReservoir
 import app.controllers.ExternalApi.JsonSerializableTransaction
@@ -39,6 +40,7 @@ import hydro.common.Tags
 import hydro.common.ValidatingYamlParser
 import hydro.models.modification.EntityModification
 import hydro.models.Entity
+import hydro.models.access.DbQuery
 import hydro.models.access.DbQueryImplicits._
 import play.api.i18n.I18nSupport
 import play.api.i18n.MessagesApi
@@ -123,6 +125,30 @@ final class ExternalApi @Inject() (implicit
       }
 
       Ok(JsonSerializableTransaction.toJson(serializableTransactions))
+  }
+
+  def listExchangeRateMeasurements(currency: String, applicationSecret: String) = Action { implicit request =>
+    validateApplicationSecret(applicationSecret)
+
+    val measurements =
+      entityAccess
+        .newQuerySync[ExchangeRateMeasurement]()
+        .filter(ModelFields.ExchangeRateMeasurement.foreignCurrencyCode === currency)
+        .sort(
+          DbQuery.Sorting
+            .ascBy(ModelFields.ExchangeRateMeasurement.date)
+            .thenAscBy(ModelFields.id)
+        )
+        .data()
+
+    val serializableMeasurements = measurements.map { m =>
+      JsonSerializableExchangeRateMeasurement(
+        date = m.date.toLocalDate.toString,
+        ratioReferenceToForeignCurrency = m.ratioReferenceToForeignCurrency,
+      )
+    }
+
+    Ok(JsonSerializableExchangeRateMeasurement.toJson(serializableMeasurements))
   }
 
   // ********** actions: mutating ********** //
@@ -556,6 +582,17 @@ object ExternalApi {
     def toJson(transactions: Seq[JsonSerializableTransaction]): String = {
       implicit val formats = DefaultFormats
       Serialization.writePretty(transactions)
+    }
+  }
+
+  case class JsonSerializableExchangeRateMeasurement(
+      date: String,
+      ratioReferenceToForeignCurrency: Double,
+  )
+  object JsonSerializableExchangeRateMeasurement {
+    def toJson(measurements: Seq[JsonSerializableExchangeRateMeasurement]): String = {
+      implicit val formats = DefaultFormats
+      Serialization.writePretty(measurements)
     }
   }
 }

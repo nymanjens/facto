@@ -26,6 +26,7 @@ GET  /externalapi/clearoldentitymodifications/:dryOrWet/:appSecret/  hydro.contr
 # External API (read-only actions)
 GET  /externalapi/acc/reservoirs/list/:appSecret/  app.controllers.ExternalApi.listReservoirs(appSecret)
 GET  /externalapi/acc/trans/search/:searchString/:appSecret/  app.controllers.ExternalApi.searchTransactions(searchString, appSecret)
+GET  /externalapi/acc/money/xchgmeasurement/:currency/:appSecret/  app.controllers.ExternalApi.listExchangeRateMeasurements(currency, appSecret)
 
 # External API (mutating actions)
 GET  /externalapi/acc/trans/addfromtpl/:tplCode/:appSecret/  app.controllers.ExternalApi.addTransactionFromTemplate(tplCode, appSecret)
