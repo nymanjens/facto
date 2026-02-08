@@ -592,7 +592,7 @@ object ExternalApi {
   object JsonSerializableExchangeRateMeasurement {
     def toJson(measurements: Seq[JsonSerializableExchangeRateMeasurement]): String = {
       implicit val formats = DefaultFormats
-      Serialization.writePretty(measurements)
+      Serialization.write(measurements.map(m => Seq(m.date, m.ratioReferenceToForeignCurrency)))
     }
   }
 }
