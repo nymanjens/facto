@@ -539,7 +539,7 @@ final class TransactionGroupForm(implicit
 
     private def onPasteEvent(event: ClipboardEvent): Unit = {
       val files = event.clipboardData.files
-      if (files != null) {
+      if (files != null && files.length > 0) {
         event.preventDefault()
         handleFiles(files)
       }
