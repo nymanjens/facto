@@ -381,6 +381,22 @@ final class TransactionGroupForm(implicit
         Bootstrap.Row(
           Bootstrap.Col(lg = 12)(
             pageHeader.withExtension(router.currentPage)(
+              Bootstrap.Button(tag = <.label)(
+                ^.marginRight := "5px",
+                Bootstrap.Glyphicon("paperclip"),
+                <.input(
+                  ^.`type` := "file",
+                  ^.multiple := true,
+                  ^.display := "none",
+                  ^.onChange ==> { (e: ReactEventFromInput) =>
+                    val input = e.target.asInstanceOf[dom.html.Input]
+                    Callback {
+                      handleFiles(input.files)
+                      input.value = ""
+                    }
+                  },
+                ),
+              ),
               <<.ifThen(props.operationMeta.isInstanceOf[OperationMeta.Edit]) {
                 <.span(
                   Bootstrap.Button(tag = <.a)(
