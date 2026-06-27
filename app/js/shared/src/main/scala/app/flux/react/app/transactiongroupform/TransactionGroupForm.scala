@@ -1,5 +1,6 @@
 package app.flux.react.app.transactiongroupform
 
+import org.scalajs.dom.console
 import scala.scalajs.js
 import org.scalajs.dom.raw.ClipboardEvent
 import app.common.money.Currency
@@ -44,6 +45,7 @@ import japgolly.scalajs.react.vdom.all.EmptyVdom
 import japgolly.scalajs.react.vdom.html_<^._
 import org.scalajs.dom
 import org.scalajs.dom.raw.FileReader
+import org.scalajs.dom.raw.FileList
 
 import scala.async.Async.async
 import scala.async.Async.await
@@ -371,6 +373,11 @@ final class TransactionGroupForm(implicit
       implicit val router = props.router
       <.div(
         ^.className := "transaction-group-form",
+        ^.onDragOver ==> { e: ReactDragEvent => e.preventDefaultCB },
+        ^.onDragEnter ==> { e: ReactDragEvent => e.preventDefaultCB },
+        ^.onDrop ==> { e: ReactDragEvent =>
+          e.preventDefaultCB >> Callback { handleFiles(e.dataTransfer.files) }
+        },
         Bootstrap.Row(
           Bootstrap.Col(lg = 12)(
             pageHeader.withExtension(router.currentPage)(
@@ -515,11 +522,16 @@ final class TransactionGroupForm(implicit
     }
 
     private def onPasteEvent(event: ClipboardEvent): Unit = {
-      val clipboardData = event.clipboardData
-      for (i <- 0 until clipboardData.files.length) {
-        event.preventDefault() // Prevent default if there is at least one pasted file
+      val files = event.clipboardData.files
+      if (files != null) {
+        event.preventDefault()
+        handleFiles(files)
+      }
+    }
 
-        val file = clipboardData.files(i)
+    private def handleFiles(files: FileList): Unit = {
+      for (i <- 0 until files.length) {
+        val file = files(i)
 
         val attachmentPendingUpload = State.AttachmentPendingUpload(
           filename = file.name,
