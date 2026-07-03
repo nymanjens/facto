@@ -173,6 +173,7 @@ abstract class StandardPicklers {
         .addConcreteType[PicklableDbQuery.Filter.GreaterThan]
         .addConcreteType[PicklableDbQuery.Filter.GreaterOrEqualThan]
         .addConcreteType[PicklableDbQuery.Filter.LessThan]
+        .addConcreteType[PicklableDbQuery.Filter.LessOrEqualThan]
         .addConcreteType[PicklableDbQuery.Filter.AnyOf]
         .addConcreteType[PicklableDbQuery.Filter.NoneOf]
         .addConcreteType[PicklableDbQuery.Filter.ContainsIgnoreCase]
