@@ -1,9 +1,13 @@
 package app.flux.stores
 
+import app.flux.action.AppActions
 import app.flux.action.AppActions.AddTransactionGroup
+import app.flux.action.AppActions.DoneWithLink.PageFactory
 import app.flux.action.AppActions.RefactorAction
 import app.flux.action.AppActions.RemoveTransactionGroup
 import app.flux.action.AppActions.UpdateTransactionGroup
+import app.flux.action.AppActions
+import app.flux.router.AppPages
 import app.models.access.AppDbQuerySorting
 import app.models.access.AppJsEntityAccess
 import app.models.access.ModelFields
@@ -13,6 +17,8 @@ import hydro.common.time.Clock
 import hydro.flux.action.Dispatcher
 import hydro.models.access.DbQueryImplicits._
 import hydro.models.modification.EntityModification
+import hydro.flux.router.Page
+import hydro.flux.router.RouterContext
 import org.scalajs.dom.console
 
 import scala.async.Async.async
@@ -29,7 +35,7 @@ private[stores] final class TransactionAndGroupStore(implicit
 ) {
   dispatcher.registerPartialAsync {
     // **************** Transaction[Group]-related actions **************** //
-    case AddTransactionGroup(transactionsWithoutIdProvider) =>
+    case action @ AddTransactionGroup(transactionsWithoutIdProvider) =>
       async {
         val groupAddition =
           EntityModification.createAddWithRandomId(TransactionGroup(createdDate = clock.now))
@@ -40,9 +46,18 @@ private[stores] final class TransactionAndGroupStore(implicit
             EntityModification.createAddWithId(id, transactionWithoutId)
           }
         await(entityAccess.persistModifications(groupAddition +: transactionAdditions))
+        dispatcher.dispatch(
+          AppActions.DoneWithLink(
+            action,
+            new PageFactory {
+              def create()(implicit routerContext: RouterContext): Page =
+                AppPages.EditTransactionGroup(group.id)
+            }
+          )
+        )
       }
 
-    case UpdateTransactionGroup(group, transactionsWithoutId) =>
+    case action @ UpdateTransactionGroup(group, transactionsWithoutId) =>
       async {
         val transactionDeletions = await(group.transactions) map (EntityModification.createRemove(_))
         val transactionAdditions =
@@ -50,6 +65,15 @@ private[stores] final class TransactionAndGroupStore(implicit
             EntityModification.createAddWithId(id, transactionWithoutId)
           }
         await(entityAccess.persistModifications(transactionDeletions ++ transactionAdditions))
+        dispatcher.dispatch(
+          AppActions.DoneWithLink(
+            action,
+            new PageFactory {
+              def create()(implicit routerContext: RouterContext): Page =
+                AppPages.EditTransactionGroup(group.id)
+            }
+          )
+        )
       }
 
     case RemoveTransactionGroup(group) =>

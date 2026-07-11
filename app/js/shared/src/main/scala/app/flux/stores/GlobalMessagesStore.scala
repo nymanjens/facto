@@ -1,8 +1,8 @@
 package app.flux.stores
 
 import java.time.Instant
-
 import app.flux.action.AppActions._
+import app.flux.action.AppActions.DoneWithLink.PageFactory
 import app.flux.stores.GlobalMessagesStore.Message
 import app.models.accounting._
 import app.models.accounting.config.Config
@@ -49,18 +49,31 @@ final class GlobalMessagesStore(implicit
     case StandardActions.Done(action) =>
       getCompletionMessage.lift.apply(action) match {
         case Some(message) =>
-          setState(Message(string = message, messageType = Message.Type.Success))
-          clearMessageAfterDelay(delay = getCompletionMessageDelay(action))
+          def isSameMessageWithLink(stateMessage: Message): Boolean = {
+            stateMessage.age < java.time.Duration.ofSeconds(
+              10
+            ) && stateMessage.string == message && stateMessage.linkPage.isDefined
+          }
+          if (state.isEmpty || !isSameMessageWithLink(state.get)) {
+            setState(Message(string = message, messageType = Message.Type.Success))
+            clearMessageAfterDelay(delay = getCompletionMessageDelay(action, hasLink = false))
+          }
         case None =>
       }
 
     case StandardActions.Failed(action) =>
+      if (getCompletionMessage.isDefinedAt(action)) {
+        setState(
+          Message(string = i18n("app.sending-data-to-server-failed"), messageType = Message.Type.Failure)
+        )
+        clearMessageAfterDelay(delay = 10.seconds)
+      }
+
+    case DoneWithLink(action, linkPage) =>
       getCompletionMessage.lift.apply(action) match {
         case Some(message) =>
-          setState(
-            Message(string = i18n("app.sending-data-to-server-failed"), messageType = Message.Type.Failure)
-          )
-          clearMessageAfterDelay(delay = 10.seconds)
+          setState(Message(string = message, messageType = Message.Type.Success, linkPage = Some(linkPage)))
+          clearMessageAfterDelay(delay = getCompletionMessageDelay(action, hasLink = true))
         case None =>
       }
 
@@ -116,10 +129,10 @@ final class GlobalMessagesStore(implicit
       )
       i18n("app.successfully-added-tag-1-to-0", transactionsString, newTag)
   }
-  private def getCompletionMessageDelay(action: Action): FiniteDuration = {
+  private def getCompletionMessageDelay(action: Action, hasLink: Boolean): FiniteDuration = {
     action match {
       case _: RefactorAction => 10.seconds
-      case _                 => 2.seconds
+      case _                 => if (hasLink) 10.seconds else 2.seconds
     }
   }
 
@@ -160,14 +173,28 @@ final class GlobalMessagesStore(implicit
 }
 
 object GlobalMessagesStore {
-  case class Message private (string: String, messageType: Message.Type, private val createTime: Instant) {
+  case class Message private (
+      string: String,
+      messageType: Message.Type,
+      private val createTime: Instant,
+      linkPage: Option[PageFactory],
+  ) {
     private[GlobalMessagesStore] def age(implicit clock: Clock): java.time.Duration =
       java.time.Duration.between(createTime, clock.nowInstant)
   }
 
   object Message {
-    def apply(string: String, messageType: Message.Type)(implicit clock: Clock): Message =
-      Message(string = string, messageType = messageType, createTime = clock.nowInstant)
+    def apply(
+        string: String,
+        messageType: Message.Type,
+        linkPage: Option[PageFactory] = None,
+    )(implicit clock: Clock): Message =
+      Message(
+        string = string,
+        messageType = messageType,
+        createTime = clock.nowInstant,
+        linkPage = linkPage,
+      )
 
     sealed trait Type
     object Type {

@@ -1,14 +1,25 @@
 package app.flux.action
 
+import app.flux.action.AppActions.DoneWithLink.PageFactory
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup
 import app.models.accounting.config.Category
 import hydro.flux.action.Action
+import hydro.flux.router.Page
+import hydro.flux.router.RouterContext
 
 import scala.collection.immutable.Seq
 
 object AppActions {
+
+  // **************** Link metadata **************** //
+  case class DoneWithLink(action: Action, linkPage: PageFactory) extends Action
+  object DoneWithLink {
+    trait PageFactory {
+      def create()(implicit routerContext: RouterContext): Page
+    }
+  }
 
   // **************** Transaction[Group]-related actions **************** //
   case class AddTransactionGroup(transactionsWithoutIdProvider: TransactionGroup => Seq[Transaction])
