@@ -1,5 +1,9 @@
 package app.flux.react.uielements.input.bootstrap
 
+import hydro.common.DesktopKeyCombination
+import hydro.common.DesktopKeyCombination.ArrowDown
+import hydro.common.DesktopKeyCombination.SpecialKey
+import hydro.common.DesktopKeyCombination.ArrowUp
 import hydro.common.GuavaReplacement.Splitter
 import hydro.common.I18n
 import hydro.common.Annotations.visibleForTesting
@@ -14,6 +18,7 @@ import hydro.flux.react.uielements.input.bootstrap.InputComponent
 import hydro.flux.react.uielements.input.bootstrap.InputComponent.Props
 import hydro.flux.react.uielements.Bootstrap
 import japgolly.scalajs.react._
+import japgolly.scalajs.react.raw.SyntheticKeyboardEvent
 import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
@@ -44,7 +49,7 @@ object MoneyInput {
           case None        => Callback.empty
         }
       }
-      val value = ValueTransformer.stringToValue(valueString, extraProps) getOrElse 0L
+      val maybeValue = ValueTransformer.stringToValue(valueString, extraProps)
 
       Bootstrap.InputGroup(
         Bootstrap.InputGroupAddon(
@@ -59,8 +64,9 @@ object MoneyInput {
           ^.disabled := extraProps.forceValue.isDefined,
           ^.onChange ==> ((event: ReactEventFromInput) => onChange(event.target.value)),
           ^.onBlur ==> ((event: ReactEventFromInput) => materializeInputIfValid()),
+          ^.onKeyDown ==> handleKeyDown(maybeValue, onChange, extraProps),
         ),
-        ^^.ifDefined(extraProps.addon(value))(t => Bootstrap.InputGroupAddon(t)),
+        ^^.ifDefined(extraProps.addon(maybeValue getOrElse 0L))(t => Bootstrap.InputGroupAddon(t)),
       )
     },
   )
@@ -163,4 +169,34 @@ object MoneyInput {
       inner(string, operations = List(Plus, Minus, Times, DividedBy)).map(Money.floatToCents)
     }
   }
+
+  // **************** Private helper methods ****************//
+  private def handleKeyDown(
+      maybeValue: Option[Long],
+      onChange: String => Callback,
+      extraProps: ExtraProps,
+  )(event: SyntheticKeyboardEvent[_]): Callback = {
+
+    maybeValue match {
+      case None => Callback.empty // Nothing to increment/decrement
+      case Some(currentCents) =>
+        val keyCombination = DesktopKeyCombination.fromEvent(event)
+        keyCombination match {
+          case special @ SpecialKey(
+                ArrowUp | ArrowDown, /* ctrl */ false, /* shift */ false, /* alt */ false, /* meta */ false,
+              ) =>
+            val newCents =
+              special.specialKeyType match {
+                case ArrowUp   => currentCents + 1
+                case ArrowDown => currentCents - 1
+                case _         => throw new AssertionError(special)
+              }
+            event.preventDefault()
+            onChange(Money.centsToFloatString(newCents))
+
+          case _ => Callback.empty
+        }
+    }
+  }
+
 }
