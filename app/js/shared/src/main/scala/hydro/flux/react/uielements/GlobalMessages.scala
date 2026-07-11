@@ -13,11 +13,12 @@ import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.scalajs.js
 
-final class GlobalMessages(implicit globalMessagesStore: GlobalMessagesStore) extends HydroReactComponent {
+final class GlobalMessages(implicit globalMessagesStore: GlobalMessagesStore, i18n: I18n)
+    extends HydroReactComponent {
 
   // **************** API ****************//
-  def apply()(implicit router: RouterContext, i18n: I18n): VdomElement = {
-    component(Props(router, i18n))
+  def apply()(implicit router: RouterContext): VdomElement = {
+    component(Props(router))
   }
 
   // **************** Implementation of HydroReactComponent methods ****************//
@@ -25,7 +26,7 @@ final class GlobalMessages(implicit globalMessagesStore: GlobalMessagesStore) ex
     .withStateStoresDependency(globalMessagesStore, _.copy(maybeMessage = globalMessagesStore.state))
 
   // **************** Implementation of HydroReactComponent types ****************//
-  protected case class Props(router: RouterContext, i18n: I18n)
+  protected case class Props(router: RouterContext)
   protected case class State(maybeMessage: Option[GlobalMessagesStore.Message] = None)
 
   protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
@@ -50,7 +51,7 @@ final class GlobalMessages(implicit globalMessagesStore: GlobalMessagesStore) ex
                 props.router.anchorWithHrefTo(pageFactory.create())(
                   <.span(
                     ^.className := "global-message-link",
-                    s"[${props.i18n("app.edit")}]",
+                    s"[${i18n("app.edit")}]",
                   )
                 ),
               )
