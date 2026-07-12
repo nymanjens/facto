@@ -2,7 +2,8 @@ package app.flux.stores
 
 import app.flux.action.AppActions
 import app.flux.action.AppActions.AddTransactionGroup
-import app.flux.action.AppActions.DoneWithLink.PageFactory
+import hydro.flux.action.StandardActions.DoneWithLink.PageFactory
+import hydro.flux.action.StandardActions
 import app.flux.action.AppActions.RefactorAction
 import app.flux.action.AppActions.RemoveTransactionGroup
 import app.flux.action.AppActions.UpdateTransactionGroup
@@ -47,7 +48,7 @@ private[stores] final class TransactionAndGroupStore(implicit
           }
         await(entityAccess.persistModifications(groupAddition +: transactionAdditions))
         dispatcher.dispatch(
-          AppActions.DoneWithLink(
+          StandardActions.DoneWithLink(
             action,
             new PageFactory {
               def create()(implicit routerContext: RouterContext): Page =
@@ -66,7 +67,7 @@ private[stores] final class TransactionAndGroupStore(implicit
           }
         await(entityAccess.persistModifications(transactionDeletions ++ transactionAdditions))
         dispatcher.dispatch(
-          AppActions.DoneWithLink(
+          StandardActions.DoneWithLink(
             action,
             new PageFactory {
               def create()(implicit routerContext: RouterContext): Page =

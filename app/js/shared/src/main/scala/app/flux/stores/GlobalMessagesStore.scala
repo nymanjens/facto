@@ -2,7 +2,7 @@ package app.flux.stores
 
 import java.time.Instant
 import app.flux.action.AppActions._
-import app.flux.action.AppActions.DoneWithLink.PageFactory
+import hydro.flux.action.StandardActions.DoneWithLink.PageFactory
 import app.flux.stores.GlobalMessagesStore.Message
 import app.models.accounting._
 import app.models.accounting.config.Config
