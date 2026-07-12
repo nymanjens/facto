@@ -32,6 +32,20 @@ object CollectionUtils {
     }
   }
 
+  def maybeIndexOf[T](elems: Seq[T], elem: T): Option[Int] = {
+    elems.indexOf(elem) match {
+      case -1 => None
+      case i  => Some(i)
+    }
+  }
+
+  def checkedIndexOf[T](elems: Seq[T], elem: T): Int = {
+    elems.indexOf(elem) match {
+      case -1 => throw new Exception(s"Expected to find $elem in $elems")
+      case i  => i
+    }
+  }
+
   /**
    * Converts the given values to a bimap that associates an integer with each value.
    *

@@ -33,7 +33,11 @@ object DesktopKeyCombination {
           case "Tab"       => Tab
           case "ArrowUp"   => ArrowUp
           case "ArrowDown" => ArrowDown
+          case _ =>
+            event.keyCode match {
+              case 192 => Backquote
           case _           => UnknownKeyType(key)
+            }
         },
         ctrl = ctrl,
         shift = event.shiftKey,
@@ -74,5 +78,6 @@ object DesktopKeyCombination {
   case object Tab extends SpecialKeyType
   case object ArrowUp extends SpecialKeyType
   case object ArrowDown extends SpecialKeyType
+  case object Backquote extends SpecialKeyType
   case class UnknownKeyType(key: String) extends SpecialKeyType
 }
