@@ -26,7 +26,6 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
-
 import scala.scalajs.js
 
 final class SearchResults(implicit
@@ -67,9 +66,13 @@ final class SearchResults(implicit
       correctForInflation: Boolean = false,
   )
 
-  protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) {
+  protected class Backend($ : BackendScope[Props, State]) extends BackendBase($) with DidMount {
 
     private val queryInputRef = TextInput.ref()
+
+    override def didMount(props: Props, state: State): Callback = LogExceptionsCallback {
+      queryInputRef().focus()
+    }
 
     override def render(props: Props, state: State) = {
       implicit val router = props.router
