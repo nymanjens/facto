@@ -51,20 +51,10 @@ final class SbadminMenu(implicit i18n: I18n) extends HydroReactComponent.Statele
   protected class Backend($ : BackendScope[Props, State])
       extends BackendBase($)
       with WillMount
-      with DidMount
       with WillReceiveProps {
     val queryInputRef = TextInput.ref()
 
     override def willMount(props: Props, state: State): Callback = configureKeyboardShortcuts(props)
-
-    override def didMount(props: Props, state: State): Callback = LogExceptionsCallback {
-      props.router.currentPage match {
-        case page: StandardPages.Search => {
-          queryInputRef().setValue(page.query)
-        }
-        case _ =>
-      }
-    }
 
     override def willReceiveProps(currentProps: Props, nextProps: Props, state: State): Callback =
       configureKeyboardShortcuts(nextProps)
@@ -94,8 +84,10 @@ final class SbadminMenu(implicit i18n: I18n) extends HydroReactComponent.Statele
                         e.preventDefault()
 
                         queryInputRef().value match {
-                          case Some(query) => props.router.setPage(StandardPages.Search.fromInput(query))
-                          case None        =>
+                          case Some(query) =>
+                            queryInputRef().setValue("")
+                            props.router.setPage(StandardPages.Search.fromInput(query))
+                          case None =>
                         }
                       }
                     },
