@@ -98,8 +98,8 @@ final class SearchResults(implicit
             additionalInput = props.query,
             calculateExtraTitle = { context =>
               val totalFlow = context.entriesInChronologicalOrder
-                .flatMap(_.transactions)
-                .map(_.flow.exchangedForReferenceCurrency())
+                .flatMap(_.flows)
+                .map(_.exchangedForReferenceCurrency(correctForInflation = state.correctForInflation))
                 .sum
               Some(s"${i18n("app.total")}: $totalFlow")
             },
