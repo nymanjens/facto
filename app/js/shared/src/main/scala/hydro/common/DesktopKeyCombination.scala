@@ -36,7 +36,7 @@ object DesktopKeyCombination {
           case _ =>
             event.keyCode match {
               case 192 => Backquote
-          case _           => UnknownKeyType(key)
+              case _   => UnknownKeyType(key)
             }
         },
         ctrl = ctrl,
