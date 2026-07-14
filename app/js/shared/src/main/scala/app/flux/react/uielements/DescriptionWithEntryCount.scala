@@ -30,7 +30,7 @@ final class DescriptionWithEntryCount(implicit
           .map(tag =>
             Bootstrap.Label(
               BootstrapTags.toStableVariant(tag),
-              tag = props.router.anchorWithHrefTo(StandardPages.Search.fromInput(s"tag:$tag")),
+              tag = props.router.anchorWithHrefTo(StandardPages.Search.fromInput(s"tagExact:$tag")),
             )(
               ^.key := tag,
               tag,
