@@ -9,6 +9,7 @@ import app.api.ScalaJsApiClient
 import hydro.models.modification.EntityModification
 import hydro.models.modification.EntityType
 import app.models.modification.EntityTypes
+import app.AppVersion
 import hydro.common.JsLoggingUtils.logFailure
 import hydro.common.time.Clock
 import hydro.common.GuavaReplacement
@@ -209,7 +210,6 @@ final class HybridRemoteDatabaseProxy(futureLocalDatabase: FutureLocalDatabase)(
 }
 
 object HybridRemoteDatabaseProxy {
-  private val localDatabaseAndEntityVersion = "hydro-3.1"
   private val maxTimeToPopulate: Duration = Duration.ofMinutes(8)
 
   def create(localDatabase: Future[LocalDatabase])(implicit
@@ -286,10 +286,10 @@ object HybridRemoteDatabaseProxy {
 
           case Some(existingValue @ DbStatus.Ready) =>
             val dbVersionOption = await(db.getSingletonValue(VersionKey))
-            if (dbVersionOption != Some(localDatabaseAndEntityVersion)) {
+            if (dbVersionOption != Some(AppVersion.localDatabaseAndEntityVersion)) {
               console.log(
                 s"  The database version ${dbVersionOption getOrElse "<empty>"} no longer matches " +
-                  s"the newest version $localDatabaseAndEntityVersion"
+                  s"the newest version ${AppVersion.localDatabaseAndEntityVersion}"
               )
               val mandateToFix = await(
                 db.setSingletonValue(
@@ -329,7 +329,7 @@ object HybridRemoteDatabaseProxy {
     )
 
     // Set version
-    await(db.setSingletonValue(VersionKey, localDatabaseAndEntityVersion))
+    await(db.setSingletonValue(VersionKey, AppVersion.localDatabaseAndEntityVersion))
 
     // Populate with entities
     val nextUpdateToken = await(entitySyncLogic.populateLocalDatabaseAndGetUpdateToken(db))
