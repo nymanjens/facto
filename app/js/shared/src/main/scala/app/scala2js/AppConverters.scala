@@ -60,6 +60,7 @@ object AppConverters {
       ModelFields.Transaction.detailDescription,
       ModelFields.Transaction.tags,
       ModelFields.Transaction.tagsNormalized,
+      ModelFields.Transaction.tagsStringNormalized,
       ModelFields.Transaction.attachments,
       ModelFields.Transaction.createdDate,
       ModelFields.Transaction.transactionDate,

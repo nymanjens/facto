@@ -9,6 +9,7 @@ import app.models.user.User
 import hydro.common.time.LocalDateTime
 import hydro.common.CollectionUtils
 import hydro.common.ScalaUtils
+import hydro.common.Tags
 import hydro.models.Entity
 import hydro.models.access.ModelField
 
@@ -84,6 +85,8 @@ object ModelFields {
     // Derived fields for fast database lookups
     val tagsNormalized: ModelField[Seq[String], E] =
       ModelField("tagsNormalized", _.tags.map(TagFiltering.normalize), v => e => e)
+    val tagsStringNormalized: ModelField[String, E] =
+      ModelField("tagsStringNormalized", t => Tags.serializeToString(t.tags.map(TagFiltering.normalize)), v => e => e)
   }
 
   object TransactionGroup {
@@ -144,6 +147,7 @@ object ModelFields {
     Transaction.tags,
     Transaction.attachments,
     Transaction.tagsNormalized,
+    Transaction.tagsStringNormalized,
     Transaction.createdDate,
     Transaction.transactionDate,
     Transaction.consumedDate,

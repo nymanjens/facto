@@ -60,7 +60,7 @@ final class ComplexQueryFilter(implicit
     def fallback = {
       QueryFilterPair.or(
         QueryFilterPair.containsIgnoreCase(ModelFields.Transaction.description, singlePartWithoutNegation),
-        QueryFilterPair.seqContains(ModelFields.Transaction.tags, singlePartWithoutNegation),
+        QueryFilterPair.containsIgnoreCase(ModelFields.Transaction.tagsStringNormalized, TagFiltering.normalize(singlePartWithoutNegation)),
         QueryFilterPair
           .containsIgnoreCase(ModelFields.Transaction.detailDescription, singlePartWithoutNegation),
       )
@@ -111,7 +111,9 @@ final class ComplexQueryFilter(implicit
             } getOrElse fallback
           case Prefix.Detail =>
             QueryFilterPair.containsIgnoreCase(ModelFields.Transaction.detailDescription, suffix)
-          case Prefix.Tag =>
+          case Prefix.TagSubstring =>
+            QueryFilterPair.containsIgnoreCase(ModelFields.Transaction.tagsStringNormalized, TagFiltering.normalize(suffix))
+          case Prefix.TagExact =>
             QueryFilterPair.seqContains(
               ModelFields.Transaction.tagsNormalized,
               TagFiltering.normalize(suffix),
@@ -372,7 +374,8 @@ object ComplexQueryFilter {
         FlowMinimum,
         FlowMaximum,
         Detail,
-        Tag,
+        TagSubstring,
+        TagExact,
         ConsumedStartYear,
       )
 
@@ -382,10 +385,11 @@ object ComplexQueryFilter {
     object Category extends Prefix(Seq("category", "c"))
     object Description extends Prefix(Seq("description"))
     object Flow extends Prefix(Seq("flow", "amount", "a"))
-    object FlowMinimum extends Prefix(Seq("minFlow", "minAmount", "minA"))
-    object FlowMaximum extends Prefix(Seq("maxFlow", "maxAmount", "maxA"))
+    object FlowMinimum extends Prefix(Seq("minFlow", "minAmount", "minA", "min"))
+    object FlowMaximum extends Prefix(Seq("maxFlow", "maxAmount", "maxA", "max"))
     object Detail extends Prefix(Seq("detail"))
-    object Tag extends Prefix(Seq("tag", "t"))
+    object TagSubstring extends Prefix(Seq("tag", "t"))
+    object TagExact extends Prefix(Seq("tagExact"))
     object ConsumedStartYear extends Prefix(Seq("consumedStart", "start"))
   }
 }
