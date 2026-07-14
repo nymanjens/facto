@@ -70,7 +70,7 @@ final class SummaryForYearStoreFactory(implicit
       year: AccountingYear,
   ): DbQuery.Filter[E] = {
     val months = DatedMonth.allMonthsIn(year)
-    field >= months.head.startTime && field < months.last.startTimeOfNextMonth
+    field >= months.head.startTime && field < months.last.nextMonth.startTime
   }
 }
 

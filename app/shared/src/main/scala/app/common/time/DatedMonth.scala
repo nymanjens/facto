@@ -43,7 +43,6 @@ case class DatedMonth(startDate: LocalDate) extends Ordered[DatedMonth] {
   def middleTime: LocalDateTime = LocalDateTime.of(startDate.plusDays(14), LocalTime.MIN)
   def endTime: LocalDateTime = LocalDateTime.of(nextMonth.startDate.minusDays(1), LocalTime.MAX)
 
-  def startTimeOfNextMonth: LocalDateTime = nextMonth.startTime
   def nextMonth: DatedMonth = DatedMonth(startDate.plusMonths(1))
 
   override def compare(that: DatedMonth): Int = this.startDate compareTo that.startDate

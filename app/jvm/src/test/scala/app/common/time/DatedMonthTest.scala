@@ -83,9 +83,9 @@ class DatedMonthTest extends HookedSpecification {
     val month = DatedMonth(LocalDate.of(1990, JUNE, 1))
     month.startTime mustEqual LocalDateTime.of(1990, JUNE, 1, hour = 0, minute = 0)
   }
-  "startTimeOfNextMonth" in {
+  "nextMonth.startTime" in {
     val month = DatedMonth(LocalDate.of(1990, JUNE, 1))
-    month.startTimeOfNextMonth mustEqual LocalDateTime.of(1990, JULY, 1, hour = 0, minute = 0)
+    month.nextMonth.startTime mustEqual LocalDateTime.of(1990, JULY, 1, hour = 0, minute = 0)
   }
 
   "monthsInClosedRange" in {

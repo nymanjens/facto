@@ -58,7 +58,7 @@ final class AccountingEntryUtils(implicit
       getTransactionsAndBalanceChecks(
         reservoir = reservoir,
         oldestRelevantBalanceCheck = oldestRelevantBalanceCheck,
-        upperBoundDateTime = yearFilter.map(y => DatedMonth.allMonthsIn(y).last.startTimeOfNextMonth),
+        upperBoundDateTime = yearFilter.map(y => DatedMonth.allMonthsIn(y).last.nextMonth.startTime),
       )
     )
   }
@@ -171,7 +171,7 @@ object AccountingEntryUtils {
 
       val gainFromInitialMoney = linearGainFromMoneyFunc(
         startDate = month.startTime,
-        endDate = month.startTimeOfNextMonth,
+        endDate = month.nextMonth.startTime,
         amount = dateToBalanceFunction(month.startTime),
       )
       val gainFromUpdates =
@@ -180,7 +180,7 @@ object AccountingEntryUtils {
           .map { case (date, DateToBalanceFunction.Update(balance, changeComparedToLast)) =>
             linearGainFromMoneyFunc(
               startDate = date,
-              endDate = month.startTimeOfNextMonth,
+              endDate = month.nextMonth.startTime,
               amount = changeComparedToLast,
             )
           }

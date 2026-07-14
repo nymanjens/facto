@@ -118,7 +118,7 @@ final class SummaryInflationGainsStoreFactory(implicit
             reservoir = reservoir,
             // Always load all entries before the current year. This is not optimal, but simplifies the code.
             oldestRelevantBalanceCheck = None,
-            upperBoundDateTime = input.year.map(y => DatedMonth.allMonthsIn(y).last.startTimeOfNextMonth),
+            upperBoundDateTime = input.year.map(y => DatedMonth.allMonthsIn(y).last.nextMonth.startTime),
           )
         )
 
@@ -138,7 +138,7 @@ final class SummaryInflationGainsStoreFactory(implicit
           val gain = {
             val result =
               for {
-                endDate <- balanceCheckDates.from(month.startTime).to(month.startTimeOfNextMonth).lastOption
+                endDate <- balanceCheckDates.from(month.startTime).to(month.nextMonth.startTime).lastOption
               } yield {
                 val startDate = balanceCheckDates.to(month.startTime).lastOption getOrElse LocalDateTime.MIN
 
