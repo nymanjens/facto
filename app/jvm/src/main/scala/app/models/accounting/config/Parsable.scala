@@ -45,6 +45,11 @@ object Parsable {
 
       // Validation
       parsedAccounts.values foreach (_.validateCodes(parsedReservoirs.values))
+      val templateCodes = parsedTemplates.map(_.code)
+      require(
+        templateCodes.size == templateCodes.distinct.size,
+        s"Template codes must be unique. Found duplicates: ${templateCodes.diff(templateCodes.distinct).distinct.mkString(", ")}",
+      )
 
       ParsedConfig(
         accounts = parsedAccounts,
