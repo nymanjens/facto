@@ -19,7 +19,7 @@ class TestModule {
   implicit lazy val fakeScalaJsApiClient = new FakeScalaJsApiClient
 
   // ******************* Non-fake implementations ******************* //
-  implicit lazy val currencyValueManager = new JsCurrencyValueManager(ratioReferenceToForeignCurrency = Map())
+  implicit lazy val currencyValueManager = new JsCurrencyValueManager(initialRatioReferenceToForeignCurrency = Map())
   implicit lazy val hydroPushSocketClientFactory: HydroPushSocketClientFactory =
     new HydroPushSocketClientFactory
   implicit val pageHeader = new PageHeader

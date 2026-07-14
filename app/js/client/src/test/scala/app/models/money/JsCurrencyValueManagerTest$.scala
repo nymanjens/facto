@@ -22,7 +22,7 @@ object JsCurrencyValueManagerTest$ extends TestSuite {
     implicit val entityAccess = testModule.fakeEntityAccess
     val currencyValueManager: JsCurrencyValueManager =
       new JsCurrencyValueManager(
-        ratioReferenceToForeignCurrency = Map(
+        initialRatioReferenceToForeignCurrency = Map(
           Gbp -> SortedMap(
             yesterdayPlusMillis(1000) -> 2.0,
             yesterdayPlusMillis(2000) -> 3.0,
