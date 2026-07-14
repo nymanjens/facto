@@ -1,6 +1,8 @@
 package app.flux.stores.entries.factories
 
+import hydro.common.GuavaReplacement.DoubleMath.roundToLong
 import app.common.accounting.ComplexQueryFilter
+import app.common.money.Currency
 import app.common.money.CurrencyValueManager
 import app.common.money.ReferenceMoney
 import app.common.time.DatedMonth
@@ -10,6 +12,8 @@ import app.flux.stores.entries.factories.SummaryInflationGainsStoreFactory.Infla
 import app.models.access.AppJsEntityAccess
 import app.models.accounting.config.Config
 import app.models.accounting.Transaction
+import app.models.modification.EntityTypes
+import app.models.money.ExchangeRateMeasurement
 import hydro.common.time.Clock
 import hydro.common.time.LocalDateTime
 import hydro.common.ScalaUtils
@@ -17,10 +21,12 @@ import hydro.flux.stores.AsyncEntityDerivedStateStore
 import hydro.flux.stores.CombiningStateStore
 import hydro.flux.stores.CombiningStateStore3
 import hydro.flux.stores.FixedStateStore
+import hydro.flux.stores.MappingStore
 import hydro.flux.stores.StateStore
 import hydro.flux.stores.StoreFactory
 import hydro.models.access.DbQuery
 import hydro.models.modification.EntityModification
+import hydro.models.modification.EntityType
 
 import scala.async.Async.async
 import scala.async.Async.await
@@ -53,7 +59,29 @@ final class ChartStoreFactory(implicit
   )
 
   /* override */
-  final class Store(
+  type Store = StateStore[LinePoints]
+
+  override protected def createNew(input: Input): Store = {
+    if (input.queryString.startsWith("@exchangeRate:")) {
+      val foreignCurrencyCode = input.queryString.stripPrefix("@exchangeRate:")
+      MappingStore.map[Option[LinePoints], LinePoints](
+        new ExchangeRateLinePointsStore(foreignCurrencyCode),
+        _.getOrElse(LinePoints.empty),
+      )
+    } else {
+      val filterFromQuery = complexQueryFilter.fromQuery(input.queryString)
+      new StoreWithComplexQuery(
+        filterFromQuery,
+        new ChartStoreFromEntities(filterFromQuery, correctForInflation = input.correctForInflation),
+        summaryExchangeRateGainsStoreFactory.get(correctForInflation = input.correctForInflation),
+        if (input.correctForInflation) summaryInflationGainsStoreFactory.get()
+        else FixedStateStore(Some(InflationGains.empty)),
+      )
+    }
+  }
+
+  // **************** Private inner types **************** //
+  final class StoreWithComplexQuery(
       filterFromQuery: DbQuery.Filter[Transaction],
       chartStoreFromEntities: ChartStoreFromEntities,
       summaryExchangeRateGainsStore: StateStore[Option[ExchangeRateGains]],
@@ -150,18 +178,33 @@ final class ChartStoreFactory(implicit
     }
   }
 
-  override protected def createNew(input: Input): Store = {
-    val filterFromQuery = complexQueryFilter.fromQuery(input.queryString)
-    new Store(
-      filterFromQuery,
-      new ChartStoreFromEntities(filterFromQuery, correctForInflation = input.correctForInflation),
-      summaryExchangeRateGainsStoreFactory.get(correctForInflation = input.correctForInflation),
-      if (input.correctForInflation) summaryInflationGainsStoreFactory.get()
-      else FixedStateStore(Some(InflationGains.empty)),
-    )
+  private final class ExchangeRateLinePointsStore(foreignCurrencyCode: String)
+      extends AsyncEntityDerivedStateStore[LinePoints] {
+    override protected def calculateState(): Future[LinePoints] = async {
+      val currency = Currency.General(foreignCurrencyCode)
+      LinePoints(
+        DatedMonth
+          .monthsInClosedRange(currencyValueManager.getStartOfMeasurementsMonth(currency), DatedMonth.current)
+          .map(month =>
+            month -> toReferenceMoney(
+              currencyValueManager
+                .getRatioSecondToFirstCurrency(currency, Currency.default, month.endTime)
+            )
+          )
+          .toMap
+      )
+    }
+
+    override protected def modificationImpactsState(
+        entityModification: EntityModification,
+        state: LinePoints,
+    ): Boolean = entityModification.entityType == ExchangeRateMeasurement.Type
+
+    private def toReferenceMoney(double: Double): ReferenceMoney = {
+      ReferenceMoney(roundToLong(100 * double))
+    }
   }
 
-  // **************** Private inner types **************** //
   private final class ChartStoreFromEntities(
       filterFromQuery: DbQuery.Filter[Transaction],
       correctForInflation: Boolean,

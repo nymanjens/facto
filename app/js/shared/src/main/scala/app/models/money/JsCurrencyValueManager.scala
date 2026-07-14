@@ -2,18 +2,21 @@ package app.models.money
 
 import app.common.money.Currency
 import app.common.money.CurrencyValueManager
+import app.common.time.DatedMonth
 import app.models.access.AppJsEntityAccess
 import hydro.common.time.Clock
+import hydro.common.time.JavaTimeImplicits._
 import hydro.models.modification.EntityModification
 import hydro.common.time.LocalDateTime
 import hydro.models.access.JsEntityAccess
 
+import java.time.Duration
 import scala.collection.immutable.Seq
 import scala.collection.SortedMap
 import scala.collection.mutable
 
 final class JsCurrencyValueManager(
-    ratioReferenceToForeignCurrency: Map[Currency, SortedMap[LocalDateTime, Double]]
+    initialRatioReferenceToForeignCurrency: Map[Currency, SortedMap[LocalDateTime, Double]]
 )(implicit entityAccess: AppJsEntityAccess, clock: Clock)
     extends CurrencyValueManager {
   entityAccess.registerListener(JsEntityAccessListener)
@@ -21,7 +24,7 @@ final class JsCurrencyValueManager(
   private val moneyValueIndexCurrency: Currency = Currency.General("<index>")
 
   private val measurementsCache: mutable.Map[Currency, SortedMap[LocalDateTime, Double]] =
-    mutable.Map(ratioReferenceToForeignCurrency.toVector: _*)
+    mutable.Map(initialRatioReferenceToForeignCurrency.toVector: _*)
 
   // **************** Implementation of CurrencyValueManager trait ****************//
   override def getRatioSecondToFirstCurrency(
@@ -46,6 +49,20 @@ final class JsCurrencyValueManager(
   override def getMoneyValueRatioHistoricalToToday(date: LocalDateTime): Double = {
     ratioReferenceToForeignCurrency(moneyValueIndexCurrency, clock.now) /
       ratioReferenceToForeignCurrency(moneyValueIndexCurrency, date)
+  }
+
+  override def getStartOfMeasurementsMonth(currency: Currency): DatedMonth = {
+    measurementsCache.get(currency) match {
+      case Some(dateToRatio) =>
+        val dates = dateToRatio.keySet.toVector
+        // Workaround: Filter first date if it is very far away from second measurement
+        if (dates.length >= 2 && dates(1) - dates(0) > Duration.ofDays(70)) {
+          DatedMonth.containing(dates(1))
+        } else {
+          DatedMonth.containing(dates(0))
+        }
+      case None => DatedMonth.current
+    }
   }
 
   // **************** Private helper methods ****************//

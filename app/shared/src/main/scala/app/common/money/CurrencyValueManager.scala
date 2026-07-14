@@ -1,5 +1,6 @@
 package app.common.money
 
+import app.common.time.DatedMonth
 import hydro.common.time.LocalDateTime
 
 /** Converter for an amount of money from one currency into another. */
@@ -13,4 +14,6 @@ trait CurrencyValueManager {
 
   /** Returns the value of money at `date` divided by the value of the same amount today. */
   def getMoneyValueRatioHistoricalToToday(date: LocalDateTime): Double
+
+  def getStartOfMeasurementsMonth(currency: Currency): DatedMonth
 }

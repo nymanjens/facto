@@ -11,6 +11,11 @@ sealed abstract class Currency(
   def iconClass: String = iconClassOption.getOrElse("fa fa-money")
   def isForeign: Boolean = this != Currency.default
   override def toString = code
+  override def equals(o: Any): Boolean = o match {
+    case currency: Currency => code == currency.code
+    case _                  => false
+  }
+  override def hashCode(): Int = code.hashCode()
 }
 
 object Currency {

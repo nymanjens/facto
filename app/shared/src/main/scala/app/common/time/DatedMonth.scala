@@ -38,18 +38,13 @@ case class DatedMonth(startDate: LocalDate) extends Ordered[DatedMonth] {
     date.getYear == startDate.getYear && date.getMonth == startDate.getMonth
   }
 
-  def startDateOfNextMonth: LocalDate = {
-    val result = startDate.plusMonths(1)
-    TimeUtils.requireStartOfMonth(result)
-    result
-  }
-
   def startTime: LocalDateTime = LocalDateTime.of(startDate, LocalTime.MIN)
-
   // Note: This is a heuristic to keep things simple
   def middleTime: LocalDateTime = LocalDateTime.of(startDate.plusDays(14), LocalTime.MIN)
+  def endTime: LocalDateTime = LocalDateTime.of(nextMonth.startDate.minusDays(1), LocalTime.MAX)
 
-  def startTimeOfNextMonth: LocalDateTime = LocalDateTime.of(startDateOfNextMonth, LocalTime.MIN)
+  def startTimeOfNextMonth: LocalDateTime = nextMonth.startTime
+  def nextMonth: DatedMonth = DatedMonth(startDate.plusMonths(1))
 
   override def compare(that: DatedMonth): Int = this.startDate compareTo that.startDate
   override def toString = s"$month $year"
@@ -95,7 +90,7 @@ object DatedMonth {
     var cursor = start
     while (cursor <= endInclusive) {
       resultBuilder.append(cursor)
-      cursor = DatedMonth(cursor.startDateOfNextMonth)
+      cursor = cursor.nextMonth
     }
     resultBuilder.toVector
   }
