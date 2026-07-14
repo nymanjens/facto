@@ -16,9 +16,12 @@ final class DescriptionWithEntryCount(implicit
     templateMatcher: TemplateMatcher
 ) {
   private case class Props(entry: GroupedTransactions, router: RouterContext)
+  private case class State(showDetailDescriptions: Boolean = false)
+
   private val component = ScalaComponent
     .builder[Props](getClass.getSimpleName)
-    .renderP((_, props) => {
+    .initialState(State())
+    .renderPS(($, props, state) => {
       val entry = props.entry
 
       val maybeTemplateIcon: Option[VdomNode] =
@@ -53,11 +56,46 @@ final class DescriptionWithEntryCount(implicit
           maybeTemplateIcon.toVector ++ tagIndications :+ attachments.toVdomArray :+ (entry.description: VdomNode)
         )
 
-      if (entry.transactions.size == 1) {
+      val hasDetailDescriptions = entry.transactions.exists(_.detailDescription.nonEmpty)
+      val detailDescriptions = entry.transactions.flatMap(_.detailDescription.split("\n")).filter(_.nonEmpty)
+
+      val detailContent = if (state.showDetailDescriptions && hasDetailDescriptions) {
+        <.div(^.className := "detail-descriptions")(
+          detailDescriptions.map(desc => <.div(^.key := desc, desc)).toVdomArray
+        )
+      } else {
+        EmptyVdom
+      }
+
+      val cornerContent: Seq[VdomNode] = {
+        val countText: Option[VdomNode] =
+          if (entry.transactions.size == 1) None else Some(s"(${entry.transactions.size})")
+        val detailButton: Option[VdomNode] = if (hasDetailDescriptions) {
+          Some(
+            Bootstrap.Button(variant = Bootstrap.Variant.default, size = Bootstrap.Size.xs)(
+              ^.key := "detail-toggle",
+              ^.onClick --> $.modState(state =>
+                state.copy(showDetailDescriptions = !state.showDetailDescriptions)
+              ),
+              Bootstrap.Glyphicon("align-left"),
+            )
+          )
+        } else {
+          None
+        }
+        countText.toSeq ++ detailButton.toSeq
+      }
+
+      val mainContent = if (entry.transactions.size == 1 && !hasDetailDescriptions) {
         centralContent
       } else {
-        UpperRightCorner(cornerContent = s"(${entry.transactions.size})")(centralContent)
+        UpperRightCorner(cornerContent = cornerContent: _*)(centralContent)
       }
+
+      <.div(^.className := "description-with-entry-count")(
+        mainContent,
+        detailContent,
+      )
     })
     .build
 
