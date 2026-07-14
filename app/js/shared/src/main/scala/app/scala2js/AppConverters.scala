@@ -59,7 +59,7 @@ object AppConverters {
       ModelFields.Transaction.flowInCents,
       ModelFields.Transaction.detailDescription,
       ModelFields.Transaction.tags,
-      ModelFields.Transaction.tagsNormalized,
+      ModelFields.Transaction.tagsSeqNormalized,
       ModelFields.Transaction.tagsStringNormalized,
       ModelFields.Transaction.attachments,
       ModelFields.Transaction.createdDate,

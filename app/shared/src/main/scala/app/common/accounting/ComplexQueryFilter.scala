@@ -115,7 +115,7 @@ final class ComplexQueryFilter(implicit
             QueryFilterPair.containsIgnoreCase(ModelFields.Transaction.tagsStringNormalized, TagFiltering.normalize(suffix))
           case Prefix.TagExact =>
             QueryFilterPair.seqContains(
-              ModelFields.Transaction.tagsNormalized,
+              ModelFields.Transaction.tagsSeqNormalized,
               TagFiltering.normalize(suffix),
             )
           case Prefix.ConsumedStartYear =>

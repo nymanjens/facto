@@ -83,8 +83,8 @@ object ModelFields {
       ModelField("consumedDate", _.consumedDate, v => _.copy(consumedDate = v))
 
     // Derived fields for fast database lookups
-    val tagsNormalized: ModelField[Seq[String], E] =
-      ModelField("tagsNormalized", _.tags.map(TagFiltering.normalize), v => e => e)
+    val tagsSeqNormalized: ModelField[Seq[String], E] =
+      ModelField("tagsSeqNormalized", _.tags.map(TagFiltering.normalize), v => e => e)
     val tagsStringNormalized: ModelField[String, E] =
       ModelField("tagsStringNormalized", t => Tags.serializeToString(t.tags.map(TagFiltering.normalize)), v => e => e)
   }
@@ -146,7 +146,7 @@ object ModelFields {
     Transaction.detailDescription,
     Transaction.tags,
     Transaction.attachments,
-    Transaction.tagsNormalized,
+    Transaction.tagsSeqNormalized,
     Transaction.tagsStringNormalized,
     Transaction.createdDate,
     Transaction.transactionDate,
