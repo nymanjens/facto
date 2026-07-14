@@ -53,7 +53,7 @@ private[stores] final class TransactionAndGroupStore(implicit
             new PageFactory {
               def create()(implicit routerContext: RouterContext): Page =
                 AppPages.EditTransactionGroup(group.id)
-            }
+            },
           )
         )
       }
@@ -72,7 +72,7 @@ private[stores] final class TransactionAndGroupStore(implicit
             new PageFactory {
               def create()(implicit routerContext: RouterContext): Page =
                 AppPages.EditTransactionGroup(group.id)
-            }
+            },
           )
         )
       }

@@ -9,12 +9,12 @@ object AttachmentFormatting {
   }
 
   def formatBytes(fileSizeBytes: Int): String = {
-    if (fileSizeBytes < 1024){
+    if (fileSizeBytes < 1024) {
       f"${fileSizeBytes}B"
-    } else if (fileSizeBytes< 1024*1024){
-      f"${fileSizeBytes/1024}kB"
+    } else if (fileSizeBytes < 1024 * 1024) {
+      f"${fileSizeBytes / 1024}kB"
     } else {
-      f"${fileSizeBytes/1024/1024}MB"
+      f"${fileSizeBytes / 1024 / 1024}MB"
     }
   }
 }

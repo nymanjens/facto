@@ -60,7 +60,10 @@ final class ComplexQueryFilter(implicit
     def fallback = {
       QueryFilterPair.or(
         QueryFilterPair.containsIgnoreCase(ModelFields.Transaction.description, singlePartWithoutNegation),
-        QueryFilterPair.containsIgnoreCase(ModelFields.Transaction.tagsStringNormalized, TagFiltering.normalize(singlePartWithoutNegation)),
+        QueryFilterPair.containsIgnoreCase(
+          ModelFields.Transaction.tagsStringNormalized,
+          TagFiltering.normalize(singlePartWithoutNegation),
+        ),
         QueryFilterPair
           .containsIgnoreCase(ModelFields.Transaction.detailDescription, singlePartWithoutNegation),
       )
@@ -112,7 +115,10 @@ final class ComplexQueryFilter(implicit
           case Prefix.Detail =>
             QueryFilterPair.containsIgnoreCase(ModelFields.Transaction.detailDescription, suffix)
           case Prefix.TagSubstring =>
-            QueryFilterPair.containsIgnoreCase(ModelFields.Transaction.tagsStringNormalized, TagFiltering.normalize(suffix))
+            QueryFilterPair.containsIgnoreCase(
+              ModelFields.Transaction.tagsStringNormalized,
+              TagFiltering.normalize(suffix),
+            )
           case Prefix.TagExact =>
             QueryFilterPair.seqContains(
               ModelFields.Transaction.tagsSeqNormalized,

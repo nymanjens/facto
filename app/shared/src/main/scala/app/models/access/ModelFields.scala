@@ -86,7 +86,11 @@ object ModelFields {
     val tagsSeqNormalized: ModelField[Seq[String], E] =
       ModelField("tagsSeqNormalized", _.tags.map(TagFiltering.normalize), v => e => e)
     val tagsStringNormalized: ModelField[String, E] =
-      ModelField("tagsStringNormalized", t => Tags.serializeToString(t.tags.map(TagFiltering.normalize)), v => e => e)
+      ModelField(
+        "tagsStringNormalized",
+        t => Tags.serializeToString(t.tags.map(TagFiltering.normalize)),
+        v => e => e,
+      )
   }
 
   object TransactionGroup {

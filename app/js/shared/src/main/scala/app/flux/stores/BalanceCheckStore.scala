@@ -21,35 +21,36 @@ private[stores] final class BalanceCheckStore(implicit
     dispatcher: Dispatcher,
 ) {
   dispatcher.registerPartialAsync {
-    case action @ AddBalanceCheck(balanceCheckWithoutId) => async {
-      val bcWithId = EntityModification.createAddWithRandomId(balanceCheckWithoutId)
-      await(entityAccess.persistModifications(bcWithId))
-      dispatcher.dispatch(
-        StandardActions.DoneWithLink(
-          action,
-          new PageFactory {
-            def create()(implicit routerContext: RouterContext): Page =
-              AppPages.EditBalanceCheck(bcWithId.entity)
-          }
+    case action @ AddBalanceCheck(balanceCheckWithoutId) =>
+      async {
+        val bcWithId = EntityModification.createAddWithRandomId(balanceCheckWithoutId)
+        await(entityAccess.persistModifications(bcWithId))
+        dispatcher.dispatch(
+          StandardActions.DoneWithLink(
+            action,
+            new PageFactory {
+              def create()(implicit routerContext: RouterContext): Page =
+                AppPages.EditBalanceCheck(bcWithId.entity)
+            },
+          )
         )
-      )
-    }
+      }
 
-
-    case action @ UpdateBalanceCheck(existingBalanceCheck, newBalanceCheckWithoutId) => async {
-      val bcDeletion = EntityModification.createRemove(existingBalanceCheck)
-      val bcAddition = EntityModification.createAddWithRandomId(newBalanceCheckWithoutId)
-      await(entityAccess.persistModifications(bcDeletion, bcAddition))
-      dispatcher.dispatch(
-        StandardActions.DoneWithLink(
-          action,
-          new PageFactory {
-            def create()(implicit routerContext: RouterContext): Page =
-              AppPages.EditBalanceCheck(bcAddition.entity)
-          }
+    case action @ UpdateBalanceCheck(existingBalanceCheck, newBalanceCheckWithoutId) =>
+      async {
+        val bcDeletion = EntityModification.createRemove(existingBalanceCheck)
+        val bcAddition = EntityModification.createAddWithRandomId(newBalanceCheckWithoutId)
+        await(entityAccess.persistModifications(bcDeletion, bcAddition))
+        dispatcher.dispatch(
+          StandardActions.DoneWithLink(
+            action,
+            new PageFactory {
+              def create()(implicit routerContext: RouterContext): Page =
+                AppPages.EditBalanceCheck(bcAddition.entity)
+            },
+          )
         )
-      )
-    }
+      }
 
     case RemoveBalanceCheck(balanceCheckWithId) =>
       entityAccess.persistModifications(EntityModification.createRemove(balanceCheckWithId))

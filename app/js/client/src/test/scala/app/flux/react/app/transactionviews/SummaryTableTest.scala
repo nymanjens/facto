@@ -49,7 +49,7 @@ object SummaryTableTest extends TestSuite {
           exchangeRateGainsCorrectedForInflation = ExchangeRateGains.empty,
           inflationGains = InflationGains.empty,
         ),
-        AccountingYear( 2013) -> summaryTable.AllYearsData.YearData(
+        AccountingYear(2013) -> summaryTable.AllYearsData.YearData(
           summary = SummaryForYear(
             Seq(
               createTransaction(year = 2013, category = testCategoryA),
@@ -150,7 +150,7 @@ object SummaryTableTest extends TestSuite {
         }
       }
       "years" - {
-        allYearsData.years ==> Seq(AccountingYear( 2012), AccountingYear(2013))
+        allYearsData.years ==> Seq(AccountingYear(2012), AccountingYear(2013))
       }
       "yearlyAverage" - {
         "full year" - {

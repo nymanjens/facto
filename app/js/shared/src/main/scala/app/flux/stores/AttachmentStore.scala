@@ -6,7 +6,7 @@ import scala.concurrent.Future
 import scala.scalajs.js.typedarray.ArrayBuffer
 
 final class AttachmentStore(implicit
-    scalaJsApiClient: ScalaJsApiClient,
+    scalaJsApiClient: ScalaJsApiClient
 ) {
   def storeFileAndReturnHash(bytes: ArrayBuffer): Future[String] = {
     scalaJsApiClient.storeFileAndReturnHash(bytes)
