@@ -1,5 +1,6 @@
 package app.models.access
 
+import com.google.inject.Singleton
 import app.models.accounting.BalanceCheck
 import app.models.accounting.Transaction
 import app.models.accounting.TransactionGroup
@@ -13,6 +14,7 @@ import hydro.models.access.JvmEntityAccessBase
 import hydro.models.modification.EntityType
 import hydro.models.slick.SlickEntityTableDef
 
+@Singleton
 final class JvmEntityAccess @Inject() (implicit clock: Clock)
     extends JvmEntityAccessBase
     with AppEntityAccess {

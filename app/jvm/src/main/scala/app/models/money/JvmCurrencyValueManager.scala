@@ -19,6 +19,7 @@ import hydro.models.modification.EntityModification
 import hydro.common.time.LocalDateTime
 
 import java.time.Duration
+import javax.annotation.Nullable
 import scala.collection.immutable.Seq
 import scala.collection.SortedMap
 import scala.collection.mutable
@@ -28,15 +29,19 @@ import scala.concurrent.Future
 final class JvmCurrencyValueManager @Inject() (implicit entityAccess: JvmEntityAccess, clock: Clock)
     extends CurrencyValueManager {
   private val measurementsCacheWriteLock = new Object
-  @GuardedBy("measurementsCacheWriteLock") @volatile private var measurementsCache
-      : Map[Currency, SortedMap[LocalDateTime, Double]] =
-    recalculateMeasurementsCache()
+  @GuardedBy("measurementsCacheWriteLock") @volatile @Nullable private var measurementsCache
+      : Map[Currency, SortedMap[LocalDateTime, Double]] = null
   entityAccess.entityModificationPublisher.subscribe(EntityModificationSubscriber)
 
   // **************** Implementation of CurrencyValueManager trait ****************//
   protected[app] override def ratioReferenceToForeignCurrencyDataPoints(
       currency: Currency
   ): SortedMap[LocalDateTime, Double] = {
+    if (measurementsCache == null) {
+      measurementsCacheWriteLock.synchronized {
+        measurementsCache = recalculateMeasurementsCache()
+      }
+    }
     measurementsCache.getOrElse(currency, SortedMap())
   }
 
