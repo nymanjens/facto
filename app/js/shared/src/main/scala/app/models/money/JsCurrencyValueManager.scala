@@ -21,60 +21,14 @@ final class JsCurrencyValueManager(
     extends CurrencyValueManager {
   entityAccess.registerListener(JsEntityAccessListener)
 
-  private val moneyValueIndexCurrency: Currency = Currency.General("<index>")
-
   private val measurementsCache: mutable.Map[Currency, SortedMap[LocalDateTime, Double]] =
     mutable.Map(initialRatioReferenceToForeignCurrency.toVector: _*)
 
   // **************** Implementation of CurrencyValueManager trait ****************//
-  override def getRatioSecondToFirstCurrency(
-      firstCurrency: Currency,
-      secondCurrency: Currency,
-      date: LocalDateTime,
-  ): Double = {
-    (firstCurrency, secondCurrency) match {
-      case (Currency.default, Currency.default) => 1.0
-      case (foreignCurrency, Currency.default) =>
-        ratioReferenceToForeignCurrency(foreignCurrency, date)
-      case (Currency.default, foreignCurrency) =>
-        1 / getRatioSecondToFirstCurrency(secondCurrency, firstCurrency, date)
-      case _ =>
-        throw new UnsupportedOperationException(
-          s"Exchanging from non-reference to non-reference currency is not " +
-            s"supported ($firstCurrency -> $secondCurrency)"
-        )
-    }
-  }
-
-  override def getMoneyValueRatioHistoricalToToday(date: LocalDateTime): Double = {
-    ratioReferenceToForeignCurrency(moneyValueIndexCurrency, clock.now) /
-      ratioReferenceToForeignCurrency(moneyValueIndexCurrency, date)
-  }
-
-  override def getStartOfMeasurementsMonth(currency: Currency): DatedMonth = {
-    measurementsCache.get(currency) match {
-      case Some(dateToRatio) =>
-        val dates = dateToRatio.keySet.toVector
-        // Workaround: Filter first date if it is very far away from second measurement
-        if (dates.length >= 2 && dates(1) - dates(0) > Duration.ofDays(70)) {
-          DatedMonth.containing(dates(1))
-        } else {
-          DatedMonth.containing(dates(0))
-        }
-      case None => DatedMonth.current
-    }
-  }
-
-  // **************** Private helper methods ****************//
-  private def ratioReferenceToForeignCurrency(currency: Currency, date: LocalDateTime): Double = {
-    measurementsCache.get(currency) match {
-      case Some(dateToRatio) =>
-        dateToRatio.to(date).lastOption match {
-          case Some((lastDate, lastRatio)) => lastRatio
-          case None                        => 1.0
-        }
-      case None => 1.0
-    }
+  protected[app] override def ratioReferenceToForeignCurrencyDataPoints(
+      currency: Currency
+  ): SortedMap[LocalDateTime, Double] = {
+    measurementsCache.getOrElse(currency, SortedMap())
   }
 
   // **************** Inner type definitions ****************//

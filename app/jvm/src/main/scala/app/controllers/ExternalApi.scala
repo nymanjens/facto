@@ -7,6 +7,7 @@ import java.net.URLDecoder
 import java.time.LocalTime
 import app.common.accounting.ComplexQueryFilter
 import app.common.money.Currency
+import app.common.money.CurrencyValueManager
 import app.common.money.MoneyWithGeneralCurrency
 import app.controllers.ExternalApi.JsonSerializableExchangeRateMeasurement
 import app.controllers.ExternalApi.JsonSerializableMoneyReservoir.JsonSerializableBalanceCorrection
@@ -58,6 +59,7 @@ final class ExternalApi @Inject() (implicit
     playConfiguration: play.api.Configuration,
     accountingConfig: Config,
     entityAccess: JvmEntityAccess,
+    currencyValueManager: CurrencyValueManager,
 ) extends AbstractController(components)
     with I18nSupport {
 
@@ -117,6 +119,7 @@ final class ExternalApi @Inject() (implicit
           categoryCode = transaction.categoryCode,
           description = transaction.description,
           flowInCents = transaction.flowInCents,
+          flowInCentsInReferenceCurrency = transaction.flow.exchangedForReferenceCurrency().cents,
           tags = transaction.tags,
           createdDate = transaction.createdDate.toLocalDate.toString,
           transactionDate = transaction.transactionDate.toLocalDate.toString,
@@ -573,6 +576,7 @@ object ExternalApi {
       categoryCode: String,
       description: String,
       flowInCents: Long,
+      flowInCentsInReferenceCurrency: Long,
       tags: Seq[String],
       createdDate: String,
       transactionDate: String,
