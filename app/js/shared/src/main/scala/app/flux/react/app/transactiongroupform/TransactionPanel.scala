@@ -382,7 +382,7 @@ private[transactiongroupform] final class TransactionPanel(implicit
             ref = extraProps.ref,
             name = "category",
             label = i18n("app.category"),
-            defaultValue = props.defaultValues.category getOrElse state.beneficiaryAccount.categories.head,
+            defaultValue = props.defaultValues.category.filter(state.beneficiaryAccount.categories.contains) getOrElse state.beneficiaryAccount.categories.head,
             inputClasses = extraProps.inputClasses,
             options = state.beneficiaryAccount.categories,
             valueToId = _.code,

@@ -62,7 +62,7 @@ class SelectInput[Value] private (implicit valueTag: ClassTag[Value]) {
     val props = Props(
       label = label,
       name = name,
-      defaultValue = Option(defaultValue) getOrElse options.head,
+      defaultValue = Option(defaultValue).filter(options.contains) getOrElse options.head,
       required = false,
       showErrorMessage = true, // Should never happen
       inputClasses = inputClasses,
