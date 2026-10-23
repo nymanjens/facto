@@ -166,7 +166,19 @@ object MoneyInput {
           }
         case _ :: otherOperations => inner(string, otherOperations)
       }
-      inner(string, operations = List(Plus, Minus, Times, DividedBy)).map(Money.floatToCents)
+      // Allow a trailing '-' to negate the number, for convenience when pasting a positive number that is
+      // an expense.
+      val (signFactor, stringWithoutSignSuffix) = {
+        val withoutSignSuffix =
+          if (string.trim.endsWith("-")) string.trim.stripSuffix("-").trim else string.trim
+        val unwrapped =
+          if (withoutSignSuffix.startsWith("(") && withoutSignSuffix.endsWith(")"))
+            withoutSignSuffix.stripPrefix("(").stripSuffix(")")
+          else withoutSignSuffix
+        (if (string.trim.endsWith("-")) -1 else 1, unwrapped)
+      }
+      inner(stringWithoutSignSuffix, operations = List(Plus, Minus, Times, DividedBy))
+        .map(v => Money.floatToCents(signFactor * v))
     }
   }
 

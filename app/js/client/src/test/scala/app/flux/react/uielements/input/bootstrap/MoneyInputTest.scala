@@ -41,13 +41,23 @@ object MoneyInputTest extends TestSuite {
           " + 1" - { testNameToCents() ==> Some(100) }
         }
 
+        "sign suffix" - {
+          "1-" - { testNameToCents() ==> Some(-100) }
+          "456-" - { testNameToCents() ==> Some(-45600) }
+          "-456-" - { testNameToCents() ==> Some(45600) }
+          " - 1 - " - { testNameToCents() ==> Some(100) }
+          "€123-" - { testNameToCents() ==> Some(-12300) }
+          "12.34-" - { testNameToCents() ==> Some(-1234) }
+          "-12.34-" - { testNameToCents() ==> Some(1234) }
+          "(1+5.1)-" - { testNameToCents() ==> Some(-610) }
+        }
+
         "illegal statements" - {
           "-" - { testNameToCents() ==> None }
           "+" - { testNameToCents() ==> None }
           "*" - { testNameToCents() ==> None }
 
           "1+" - { testNameToCents() ==> None }
-          "1-" - { testNameToCents() ==> None }
           "1*" - { testNameToCents() ==> None }
           "1/" - { testNameToCents() ==> None }
 
