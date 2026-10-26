@@ -11,6 +11,7 @@ import app.models.accounting._
 import app.models.accounting.config.Config
 import hydro.common.Annotations.visibleForTesting
 import hydro.common.GuavaReplacement.Splitter
+import hydro.common.time.DateStringConversions
 import hydro.common.time.LocalDateTime
 import hydro.common.GuavaReplacement.Iterables.getOnlyElement
 import hydro.models.access.DbQuery
@@ -88,6 +89,11 @@ final class ComplexQueryFilter(implicit
               filterOptions(suffix, accountingConfig.moneyReservoirs(includeHidden = true))(_.name)
                 .map(_.code),
             )
+          case Prefix.ReservoirCode =>
+            QueryFilterPair.isEqualTo(
+              ModelFields.Transaction.moneyReservoirCode,
+              accountingConfig.moneyReservoir(suffix).code,
+            )
           case Prefix.Category =>
             QueryFilterPair.anyOf(
               ModelFields.Transaction.categoryCode,
@@ -104,6 +110,11 @@ final class ComplexQueryFilter(implicit
                 QueryFilterPair.isEqualTo(ModelFields.Transaction.flowInCents, -flowInCents),
               )
             } getOrElse fallback
+          case Prefix.FlowExact =>
+            val flowInCents = Money
+              .floatStringToCents(suffix)
+              .getOrElse(throw new IllegalArgumentException(s"Could not parse flow '$suffix'"))
+            QueryFilterPair.isEqualTo(ModelFields.Transaction.flowInCents, flowInCents)
           case Prefix.FlowMinimum =>
             Money.floatStringToCents(suffix).map { flowInCents =>
               QueryFilterPair.isGreaterOrEqualThan(ModelFields.Transaction.flowInCents, flowInCents)
@@ -131,6 +142,11 @@ final class ComplexQueryFilter(implicit
                 LocalDateTime.of(year, Month.JANUARY, dayOfMonth = 1, hour = 0, minute = 0),
               )
             } getOrElse fallback
+          case Prefix.CreatedDateStart =>
+            QueryFilterPair.isGreaterOrEqualThan(
+              ModelFields.Transaction.createdDate,
+              DateStringConversions.stringToDateStrict(suffix),
+            )
         }
       case None => fallback
     }
@@ -374,28 +390,34 @@ object ComplexQueryFilter {
         Issuer,
         Beneficiary,
         Reservoir,
+        ReservoirCode,
         Category,
         Description,
         Flow,
+        FlowExact,
         FlowMinimum,
         FlowMaximum,
         Detail,
         TagSubstring,
         TagExact,
         ConsumedStartYear,
+        CreatedDateStart,
       )
 
     object Issuer extends Prefix(Seq("issuer", "i", "u", "user"))
     object Beneficiary extends Prefix(Seq("beneficiary", "b"))
     object Reservoir extends Prefix(Seq("reservoir", "r"))
+    object ReservoirCode extends Prefix(Seq("reservoirCode"))
     object Category extends Prefix(Seq("category", "c"))
     object Description extends Prefix(Seq("description"))
     object Flow extends Prefix(Seq("flow", "amount", "a"))
+    object FlowExact extends Prefix(Seq("flowExact"))
     object FlowMinimum extends Prefix(Seq("minFlow", "minAmount", "minA", "min"))
     object FlowMaximum extends Prefix(Seq("maxFlow", "maxAmount", "maxA", "max"))
     object Detail extends Prefix(Seq("detail"))
     object TagSubstring extends Prefix(Seq("tag", "t"))
     object TagExact extends Prefix(Seq("tagExact"))
     object ConsumedStartYear extends Prefix(Seq("consumedStart", "start"))
+    object CreatedDateStart extends Prefix(Seq("createdDateStart"))
   }
 }

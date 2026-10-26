@@ -61,6 +61,18 @@ object ComplexQueryFilterTest extends TestSuite {
           .assertThatQuery(s""" r:"${testReservoirHidden.name}" """)
           .containsExactly(transaction2)
       }
+      "reservoirCode filter" - {
+        val transaction1 = createTransaction(reservoir = testReservoirCashA)
+        val transaction2 = createTransaction(reservoir = testReservoirHidden)
+        val transaction3 = createTransaction(reservoir = null)
+
+        withTransactions(transaction1, transaction2, transaction3)
+          .assertThatQuery(s""" reservoirCode:${testReservoirHidden.code} """)
+          .containsExactly(transaction2)
+        intercept[IllegalArgumentException] {
+          complexQueryFilter.fromQuery("reservoirCode:UNKNOWN_CODE")
+        }
+      }
       "category filter" - {
         val transaction1 = createTransaction(category = testCategoryA)
         val transaction2 = createTransaction(category = testCategoryA)
@@ -88,6 +100,18 @@ object ComplexQueryFilterTest extends TestSuite {
           .assertThatQuery(" amount:-2.12")
           .containsExactly(transaction1, transaction2)
       }
+      "flowExact filter" - {
+        val transaction1 = createTransaction(flow = 2.12)
+        val transaction2 = createTransaction(flow = -2.12)
+        val transaction3 = createTransaction(flow = -2.22)
+
+        withTransactions(transaction1, transaction2, transaction3)
+          .assertThatQuery(" flowExact:-2.12")
+          .containsExactly(transaction2)
+        intercept[IllegalArgumentException] {
+          complexQueryFilter.fromQuery("flowExact:not_a_number")
+        }
+      }
       "detail filter" - {
         val transaction1 = createTransaction(detailDescription = "this is a fish")
         val transaction2 = createTransaction(detailDescription = "fishes")
@@ -105,6 +129,18 @@ object ComplexQueryFilterTest extends TestSuite {
         withTransactions(transaction1, transaction2, transaction3)
           .assertThatQuery(" t:cat")
           .containsExactly(transaction1)
+      }
+      "createdDateStart filter" - {
+        val transaction1 = createTransaction(year = 2026, month = java.time.Month.OCTOBER, day = 19)
+        val transaction2 = createTransaction(year = 2026, month = java.time.Month.OCTOBER, day = 20)
+        val transaction3 = createTransaction(year = 2026, month = java.time.Month.OCTOBER, day = 25)
+
+        withTransactions(transaction1, transaction2, transaction3)
+          .assertThatQuery("createdDateStart:2026-10-20")
+          .containsExactly(transaction2, transaction3)
+        intercept[IllegalArgumentException] {
+          complexQueryFilter.fromQuery("createdDateStart:2026-10-99")
+        }
       }
 
       "filter without prefix" - {
