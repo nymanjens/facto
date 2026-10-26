@@ -4,7 +4,9 @@ import net.liftweb.json.DefaultFormats
 import net.liftweb.json.Serialization
 
 import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 import java.time.LocalTime
+import java.util.Base64
 import app.common.accounting.ComplexQueryFilter
 import app.common.money.Currency
 import app.common.money.CurrencyValueManager
@@ -152,6 +154,27 @@ final class ExternalApi @Inject() (implicit
     }
 
     Ok(JsonSerializableExchangeRateMeasurement.toJson(serializableMeasurements))
+  }
+
+  def interactiveTransactionsPreload(content: String) = Action { implicit request =>
+    import app.api.Picklers._
+    import boopickle.Default._
+
+    val decodedContent = decodeUrlEncodedString(content)
+    require(
+      decodedContent.startsWith("base64:"),
+      s"Expected content to start with 'base64:', but got '$decodedContent'",
+    )
+    val base64Part = decodedContent.stripPrefix("base64:")
+    val jsonString = new String(decodeBase64(base64Part), StandardCharsets.UTF_8)
+
+    val transactionGroupPartial = ValidatingYamlParser.parse(
+      jsonString,
+      PartialTransactionGroupParsableValue,
+    )
+    val encodedTransactionGroup = pickleToUrlSafeBase64(transactionGroupPartial)
+
+    Redirect(s"/app/@newtransactiongroupfrompreload/$encodedTransactionGroup@/cashflow")
   }
 
   // ********** actions: mutating ********** //
@@ -497,6 +520,12 @@ final class ExternalApi @Inject() (implicit
     URLDecoder.decode(s.replace("+", "%2B"), "UTF-8")
   }
 
+  private def decodeBase64(s: String): Array[Byte] = {
+    val normalized = s.trim.replace('-', '+').replace('_', '/')
+    val padded = normalized + "=" * ((4 - normalized.length % 4) % 4)
+    Base64.getDecoder.decode(padded)
+  }
+
   private case class TransactionGroupParsableValue(transactionGroupId: Long, issuerId: Long)
       extends MapParsableValue[Seq[Transaction]] {
     private val transactionParsableValue = TransactionParsableValue(transactionGroupId, issuerId)
@@ -563,6 +592,56 @@ final class ExternalApi @Inject() (implicit
         ifThenOption(!transaction.tags.forall(Tags.isValidTag)) {
           s"Invalid tag in transaction.tags: ${transaction.tags}"
         },
+      ).flatten
+    }
+  }
+
+  private object PartialTransactionGroupParsableValue extends MapParsableValue[TransactionGroup.Partial] {
+    override val supportedKeyValuePairs = Map(
+      "transactions" -> Required(ListParsableValue(PartialTransactionParsableValue)(_.description))
+    )
+    override def parseFromParsedMapValues(map: StringMap) = {
+      TransactionGroup.Partial.from(map.required[Seq[Transaction.Partial]]("transactions"))
+    }
+  }
+
+  private object PartialTransactionParsableValue extends MapParsableValue[Transaction.Partial] {
+    override val supportedKeyValuePairs = Map(
+      "beneficiaryCode" -> Optional(StringValue),
+      "moneyReservoirCode" -> Optional(StringValue),
+      "categoryCode" -> Optional(StringValue),
+      "description" -> Optional(StringValue),
+      "flowAsFloat" -> Optional(DoubleValue),
+      "detailDescription" -> Optional(StringValue),
+      "tags" -> Optional(ListParsableValue(StringValue)(s => s)),
+      "transactionDate" -> Optional(LocalDateTimeValue),
+      "consumedDate" -> Optional(LocalDateTimeValue),
+    )
+    override def parseFromParsedMapValues(map: StringMap) = {
+      val moneyReservoir = map.optional[String]("moneyReservoirCode").map(accountingConfig.moneyReservoir)
+      val beneficiary =
+        map.optional[String]("beneficiaryCode").filter(_.nonEmpty).map(accountingConfig.accounts) orElse
+          moneyReservoir.filterNot(_.isNullReservoir).map(_.owner)
+      val transactionDate = map.optional[LocalDateTime]("transactionDate")
+
+      Transaction.Partial(
+        beneficiary = beneficiary,
+        moneyReservoir = moneyReservoir,
+        category = map.optional[String]("categoryCode").filter(_.nonEmpty).map(accountingConfig.categories),
+        description = map.optional("description", defaultValue = ""),
+        flowInCents = (map.optional("flowAsFloat", defaultValue = 0.0) * 100).round,
+        detailDescription = map.optional("detailDescription", defaultValue = ""),
+        tags = map.optional("tags", defaultValue = Seq()),
+        transactionDate = transactionDate,
+        consumedDate = map.optional[LocalDateTime]("consumedDate") orElse transactionDate,
+      )
+    }
+
+    override def additionalValidationErrors(transaction: Transaction.Partial): Seq[String] = {
+      Seq(
+        ifThenOption(!transaction.tags.forall(Tags.isValidTag)) {
+          s"Invalid tag in transaction.tags: ${transaction.tags}"
+        }
       ).flatten
     }
   }

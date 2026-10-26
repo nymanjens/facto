@@ -237,8 +237,7 @@ final class TransactionGroupForm(implicit
       }
     })
 
-  // **************** Private helper methods ****************//
-  private def forCreate(
+  def forCreate(
       transactionGroupPartial: TransactionGroup.Partial,
       router: RouterContext,
   ): VdomElement = {
@@ -251,6 +250,7 @@ final class TransactionGroupForm(implicit
     )
   }
 
+  // **************** Private helper methods ****************//
   private def create(props: Props): VdomElement = create(Future.successful(props))
   private def create(propsFuture: Future[Props]): VdomElement = {
     waitForFuture(futureInput = propsFuture) { props =>

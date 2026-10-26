@@ -1,9 +1,11 @@
 package hydro.api
 
+import java.nio.ByteBuffer
 import scala.collection.immutable.Seq
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
+import java.util.Base64
 
 import app.api.ScalaJsApi.HydroPushSocketPacket
 import app.api.ScalaJsApi.HydroPushSocketPacket.EntityModificationsWithToken
@@ -23,6 +25,19 @@ import hydro.models.UpdatableEntity.LastUpdateTime
 abstract class StandardPicklers {
 
   implicit val entityPickler: Pickler[Entity]
+
+  def pickleToUrlSafeBase64[T: Pickler](value: T): String = {
+    val byteBuffer = Pickle.intoBytes(value)
+    val byteArray = new Array[Byte](byteBuffer.remaining)
+    byteBuffer.get(byteArray)
+    Base64.getUrlEncoder.withoutPadding().encodeToString(byteArray)
+  }
+
+  def unpickleFromUrlSafeBase64[T: Pickler](base64String: String): T = {
+    val padded = base64String + "=" * ((4 - base64String.length % 4) % 4)
+    val bytes = Base64.getUrlDecoder.decode(padded)
+    Unpickle[T].fromBytes(ByteBuffer.wrap(bytes))
+  }
 
   implicit object LocalDateTimePickler extends Pickler[LocalDateTime] {
     override def pickle(dateTime: LocalDateTime)(implicit state: PickleState): Unit = logExceptions {

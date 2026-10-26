@@ -18,6 +18,10 @@ GET  /scalajsapi/*path                 hydro.controllers.InternalApi.scalaJsApiG
 GET  /websocket/scalajsapi/            hydro.controllers.InternalApi.scalaJsApiWebsocket
 GET  /websocket/hydropush/:updateToken/  hydro.controllers.InternalApi.hydroPushSocketWebsocket(updateToken)
 
+# Interactive shortcuts
+# Provide `content` in the form of "base64:<base64 encoded json>"
+GET  /interactive/acc/trans/preload/*content  app.controllers.ExternalApi.interactiveTransactionsPreload(content)
+
 # External API (standard actions)
 GET  /externalapi/healthcheck/         hydro.controllers.StandardActions.healthCheck
 GET  /externalapi/dbschema/:appSecret/  hydro.controllers.StandardActions.databaseSchema(appSecret)

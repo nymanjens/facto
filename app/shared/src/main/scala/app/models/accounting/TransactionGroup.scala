@@ -1,11 +1,14 @@
 package app.models.accounting
 
+import app.common.money.Currency
 import app.common.money.CurrencyValueManager
+import app.common.money.DatedMoney
 import app.common.money.ReferenceMoney
 import app.models.access.AppDbQuerySorting
 import app.models.access.ModelFields
 import app.models.accounting.config.Config
 import hydro.models.modification.EntityType
+import hydro.common.time.Clock
 import hydro.common.time.LocalDateTime
 import hydro.models.Entity
 import hydro.models.access.DbQueryImplicits._
@@ -57,6 +60,31 @@ object TransactionGroup {
         createdDate = Some(group.createdDate),
         idOption = group.idOption,
       )
+    }
+
+    def from(transactions: Seq[Transaction.Partial])(implicit
+        currencyValueManager: CurrencyValueManager,
+        clock: Clock,
+    ): Partial = {
+      if (transactions.isEmpty) {
+        withSingleEmptyTransaction
+      } else {
+        val isZeroSum =
+          transactions.size > 1 &&
+            transactions
+              .map(t =>
+                DatedMoney(
+                  t.flowInCents,
+                  t.moneyReservoir.map(_.currency) getOrElse Currency.default,
+                  t.transactionDate getOrElse clock.now,
+                ).exchangedForReferenceCurrency()
+              )
+              .sum == ReferenceMoney(0)
+        Partial(
+          transactions = transactions,
+          zeroSum = isZeroSum,
+        )
+      }
     }
   }
 }

@@ -106,4 +106,12 @@ object Picklers extends StandardPicklers {
 
   implicit val MonthPickler: Pickler[Month] =
     enumPickler(stableNameMapper = _.name, values = Month.values().toVector)
+
+  implicit val transactionGroupPartialPickler: Pickler[TransactionGroup.Partial] = {
+    implicit val categoryPickler: Pickler[Category] = boopickle.Default.generatePickler
+    implicit val accountPickler: Pickler[Account] = boopickle.Default.generatePickler
+    implicit val moneyReservoirPickler: Pickler[MoneyReservoir] = boopickle.Default.generatePickler
+    implicit val transactionPartialPickler: Pickler[Transaction.Partial] = boopickle.Default.generatePickler
+    boopickle.Default.generatePickler
+  }
 }

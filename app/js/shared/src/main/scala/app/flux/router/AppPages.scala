@@ -1,11 +1,14 @@
 package app.flux.router
 
+import app.api.Picklers._
 import app.common.accounting.ChartSpec
 import app.models.accounting.BalanceCheck
+import app.models.accounting.TransactionGroup
 import app.models.accounting.config.Account
 import app.models.accounting.config.Config
 import app.models.accounting.config.MoneyReservoir
 import app.models.accounting.config.Template
+import boopickle.Default._
 import hydro.common.I18n
 import hydro.flux.router.Page
 import hydro.flux.router.Page.PageBase
@@ -99,6 +102,28 @@ object AppPages {
     ): NewTransactionGroupFromReservoir =
       NewTransactionGroupFromReservoir(
         reservoir.code,
+        parentPage = PopupEditorPage.getParentPage(routerContext),
+      )
+  }
+
+  case class NewTransactionGroupFromPreload private (
+      base64EncodedTransactionGroupPartial: String,
+      override val parentPage: Page,
+  ) extends PopupEditorPage {
+    override def title(implicit i18n: I18n, entityAccess: EntityAccess) =
+      Future.successful(i18n("app.new-transaction"))
+    override def iconClass = "icon-new-empty"
+
+    def transactionGroupPartial: TransactionGroup.Partial = {
+      unpickleFromUrlSafeBase64[TransactionGroup.Partial](base64EncodedTransactionGroupPartial)
+    }
+  }
+  object NewTransactionGroupFromPreload {
+    def apply(transactionGroupPartial: TransactionGroup.Partial)(implicit
+        routerContext: RouterContext
+    ): NewTransactionGroupFromPreload =
+      NewTransactionGroupFromPreload(
+        base64EncodedTransactionGroupPartial = pickleToUrlSafeBase64(transactionGroupPartial),
         parentPage = PopupEditorPage.getParentPage(routerContext),
       )
   }

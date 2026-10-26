@@ -80,6 +80,11 @@ private[router] final class RouterFactory(implicit
             ) { (page, ctl) =>
               reactAppModule.transactionGroupForm.forReservoir(page.reservoirCode, ctl)
             },
+            PopupRule.dynamic(suffix =>
+              (codeString ~ suffix).caseClass[AppPages.NewTransactionGroupFromPreload]
+            ) { (page, ctl) =>
+              reactAppModule.transactionGroupForm.forCreate(page.transactionGroupPartial, ctl)
+            },
             PopupRule.dynamic(suffix => (codeString ~ suffix).caseClass[AppPages.NewFromTemplate]) {
               (page, ctl) =>
                 reactAppModule.transactionGroupForm.forTemplate(page.templateCode, ctl)

@@ -7,6 +7,7 @@ import app.api.ScalaJsApi._
 import app.common.money.Currency
 import app.common.testing.TestObjects._
 import app.models.accounting.Transaction
+import app.models.accounting.TransactionGroup
 import app.models.accounting.config.Config
 import boopickle.Default._
 import boopickle.Pickler
@@ -48,6 +49,28 @@ class PicklersTest extends HookedSpecification {
         nextUpdateToken = testUpdateToken,
       )
     )
+  }
+
+  "TransactionGroup.Partial via pickleToUrlSafeBase64" in {
+    val groupPartial = TransactionGroup.Partial(
+      transactions = Seq(
+        Transaction.Partial(
+          beneficiary = Some(testAccountA),
+          moneyReservoir = Some(testReservoirCashA),
+          category = Some(testCategoryA),
+          description = "test description",
+          flowInCents = -1234,
+          detailDescription = "details",
+          tags = Seq("tag1", "tag2"),
+          transactionDate = Some(LocalDateTimes.createDateTime(2022, MAY, 2)),
+          consumedDate = Some(LocalDateTimes.createDateTime(2022, MAY, 3)),
+        ),
+        Transaction.Partial.empty,
+      )
+    )
+    val encoded = pickleToUrlSafeBase64(groupPartial)
+    encoded must beMatching("[a-zA-Z0-9_-]+")
+    unpickleFromUrlSafeBase64[TransactionGroup.Partial](encoded) mustEqual groupPartial
   }
 
   private def testPickleAndUnpickle[T: Pickler](value: T) = {
