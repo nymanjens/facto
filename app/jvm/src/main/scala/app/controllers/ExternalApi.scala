@@ -199,6 +199,27 @@ final class ExternalApi @Inject() (implicit
     Ok("OK")
   }
 
+  def addBalanceCheck(applicationSecret: String) = Action { implicit request =>
+    validateApplicationSecret(applicationSecret)
+    require(
+      request.body.asText.isDefined,
+      s"This method requires POST text data (text/plain) in YAML format, but got ${request.body}",
+    )
+    implicit val issuer = Users.getOrCreateRobotUser()
+
+    val balanceCheckWithoutId =
+      ValidatingYamlParser.parse(
+        request.body.asText.get,
+        BalanceCheckParsableValue(issuerId = issuer.id),
+      )
+
+    entityAccess.persistEntityModifications(
+      EntityModification.createAddWithRandomId(balanceCheckWithoutId)
+    )
+
+    Ok("OK")
+  }
+
   def addExchangeRateMeasurement(
       dateString: String,
       foreignCurrencyCode: String,
@@ -542,6 +563,37 @@ final class ExternalApi @Inject() (implicit
         ifThenOption(!transaction.tags.forall(Tags.isValidTag)) {
           s"Invalid tag in transaction.tags: ${transaction.tags}"
         },
+      ).flatten
+    }
+  }
+
+  private case class BalanceCheckParsableValue(issuerId: Long) extends MapParsableValue[BalanceCheck] {
+    override val supportedKeyValuePairs = Map(
+      "moneyReservoirCode" -> Required(StringValue),
+      "balanceAsFloat" -> Required(DoubleValue),
+      "checkDate" -> Optional(LocalDateTimeValue),
+    )
+    override def parseFromParsedMapValues(map: StringMap) = {
+      val today = LocalDateTime.of(clock.now.toLocalDate, LocalTime.MIN)
+
+      BalanceCheck(
+        issuerId = issuerId,
+        moneyReservoirCode = map.required[String]("moneyReservoirCode"),
+        balanceInCents = (map.required[Double]("balanceAsFloat") * 100).round,
+        createdDate = clock.now,
+        checkDate = map.optional("checkDate", defaultValue = today),
+      )
+    }
+
+    override def additionalValidationErrors(balanceCheck: BalanceCheck): Seq[String] = {
+      val allMoneyReservoirs =
+        accountingConfig.moneyReservoirs(includeHidden = true, includeNullReservoir = false).map(_.code)
+
+      Seq(
+        ifThenOption(!allMoneyReservoirs.toSet.contains(balanceCheck.moneyReservoirCode)) {
+          s"moneyReservoirCode=${balanceCheck.moneyReservoirCode} was not recognized " +
+            s"(valid values: ${allMoneyReservoirs}"
+        }
       ).flatten
     }
   }
