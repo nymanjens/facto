@@ -154,6 +154,18 @@ object ComplexQueryFilterTest extends TestSuite {
           complexQueryFilter.fromQuery("transactionDateStart:2026-10-99")
         }
       }
+      "groupId filter" - {
+        val transaction1 = createTransaction(groupId = 123)
+        val transaction2 = createTransaction(groupId = 123)
+        val transaction3 = createTransaction(groupId = 456)
+
+        withTransactions(transaction1, transaction2, transaction3)
+          .assertThatQuery("groupId:123")
+          .containsExactly(transaction1, transaction2)
+        intercept[IllegalArgumentException] {
+          complexQueryFilter.fromQuery("groupId:not_a_number")
+        }
+      }
 
       "filter without prefix" - {
         val transaction1 = createTransaction(description = "cat dog fish")
