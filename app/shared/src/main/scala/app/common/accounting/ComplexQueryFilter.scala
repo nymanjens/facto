@@ -147,6 +147,11 @@ final class ComplexQueryFilter(implicit
               ModelFields.Transaction.createdDate,
               DateStringConversions.stringToDateStrict(suffix),
             )
+          case Prefix.TransactionDateStart =>
+            QueryFilterPair.isGreaterOrEqualThan(
+              ModelFields.Transaction.transactionDate,
+              DateStringConversions.stringToDateStrict(suffix),
+            )
         }
       case None => fallback
     }
@@ -402,6 +407,7 @@ object ComplexQueryFilter {
         TagExact,
         ConsumedStartYear,
         CreatedDateStart,
+        TransactionDateStart,
       )
 
     object Issuer extends Prefix(Seq("issuer", "i", "u", "user"))
@@ -419,5 +425,6 @@ object ComplexQueryFilter {
     object TagExact extends Prefix(Seq("tagExact"))
     object ConsumedStartYear extends Prefix(Seq("consumedStart", "start"))
     object CreatedDateStart extends Prefix(Seq("createdDateStart"))
+    object TransactionDateStart extends Prefix(Seq("transactionDateStart"))
   }
 }

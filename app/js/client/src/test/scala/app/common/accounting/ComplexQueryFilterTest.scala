@@ -142,6 +142,18 @@ object ComplexQueryFilterTest extends TestSuite {
           complexQueryFilter.fromQuery("createdDateStart:2026-10-99")
         }
       }
+      "transactionDateStart filter" - {
+        val transaction1 = createTransaction(year = 2026, month = java.time.Month.OCTOBER, day = 19)
+        val transaction2 = createTransaction(year = 2026, month = java.time.Month.OCTOBER, day = 20)
+        val transaction3 = createTransaction(year = 2026, month = java.time.Month.OCTOBER, day = 25)
+
+        withTransactions(transaction1, transaction2, transaction3)
+          .assertThatQuery("transactionDateStart:2026-10-20")
+          .containsExactly(transaction2, transaction3)
+        intercept[IllegalArgumentException] {
+          complexQueryFilter.fromQuery("transactionDateStart:2026-10-99")
+        }
+      }
 
       "filter without prefix" - {
         val transaction1 = createTransaction(description = "cat dog fish")
