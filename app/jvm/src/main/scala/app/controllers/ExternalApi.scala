@@ -330,7 +330,7 @@ final class ExternalApi @Inject() (implicit
     }
 
     for (filePath <- orphanedFiles) {
-      // Files.delete(filePath)
+      Files.delete(filePath)
     }
 
     Ok(
