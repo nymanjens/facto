@@ -40,6 +40,7 @@ POST /externalapi/acc/balancecheck/add/:appSecret/  app.controllers.ExternalApi.
 GET  /externalapi/acc/money/xchgmeasurement/:date/:currency/:ratio/:appSecret/  app.controllers.ExternalApi.addExchangeRateMeasurement(date, currency, ratio: Double, appSecret)
 GET  /externalapi/acc/refactor/changecategory/:searchString/:newCategory/:dryOrWet/:appSecret/  app.controllers.ExternalApi.refactorTransactionCategory(searchString, newCategory, dryOrWet, appSecret)
 GET  /externalapi/acc/refactor/addtag/:searchString/:tagToAdd/:dryOrWet/:appSecret/  app.controllers.ExternalApi.addTagRefactor(searchString, tagToAdd, dryOrWet, appSecret)
+POST /externalapi/acc/deleteorphanedattachments/:appSecret/  app.controllers.ExternalApi.deleteOrphanedAttachments(appSecret)
 
 # Auth
 GET  /login/                           hydro.controllers.Auth.login(returnTo ?= "/")

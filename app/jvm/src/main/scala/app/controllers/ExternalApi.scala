@@ -5,6 +5,8 @@ import net.liftweb.json.Serialization
 
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.time.LocalTime
 import java.util.Base64
 import app.common.accounting.ComplexQueryFilter
@@ -26,6 +28,7 @@ import app.models.accounting.config.Template
 import app.models.money.ExchangeRateMeasurement
 import app.models.user.User
 import app.models.user.Users
+import com.google.common.io.MoreFiles
 import com.google.inject.Inject
 import hydro.common.ValidatingYamlParser.ParsableValue.DoubleValue
 import hydro.common.ValidatingYamlParser.ParsableValue.ListParsableValue
@@ -49,6 +52,7 @@ import play.api.i18n.I18nSupport
 import play.api.i18n.MessagesApi
 import play.api.mvc._
 
+import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
 import scala.collection.immutable.SortedMap
 import scala.concurrent.Await
@@ -301,6 +305,37 @@ final class ExternalApi @Inject() (implicit
       updateToApplyToMatchingTransactions = _.copy(categoryCode = newCategoryCode),
       dryOrWetRun = dryOrWetRun,
       applicationSecret = applicationSecret,
+    )
+  }
+
+  def deleteOrphanedAttachments(applicationSecret: String) = Action { implicit request =>
+    validateApplicationSecret(applicationSecret)
+
+    val folder = playConfiguration.get[String]("app.accounting.attachmentsFolder")
+    val folderPath = Paths.get(folder)
+
+    require(Files.exists(folderPath), s"Folder does not exist: $folder")
+    require(Files.isDirectory(folderPath), s"Not a folder: $folder")
+
+    val referencedHashes: Set[String] =
+      entityAccess
+        .newQuerySync[Transaction]()
+        .data()
+        .flatMap(_.attachments.map(_.contentHash))
+        .toSet
+
+    val allFiles = MoreFiles.listFiles(folderPath).asScala.toVector
+    val orphanedFiles = allFiles.filter { filePath =>
+      Files.isRegularFile(filePath) && !referencedHashes.contains(filePath.getFileName.toString)
+    }
+
+    for (filePath <- orphanedFiles) {
+      // Files.delete(filePath)
+    }
+
+    Ok(
+      s"OK\n\nDeleted ${orphanedFiles.size} orphaned attachments:\n" +
+        orphanedFiles.map(p => s"- $p\n").mkString("")
     )
   }
 
