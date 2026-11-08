@@ -227,7 +227,26 @@ final class Chart(implicit
                       ),
                     )
                   }
-                ).toVdomArray
+                ).toVdomArray,
+                <<.ifThen(props.chartSpec.lines.count(line => line.cumulative && line.showBars) > 1) {
+                  <.li(
+                    ^.key := "total",
+                    i18n("app.total"),
+                    ": ",
+                    <.span(
+                      ^^.ifThen(props.chartSpec.correctForInflation)(
+                        ^.className := "corrected-for-inflation"
+                      ),
+                      chartData.lastOption
+                        .map(data =>
+                          (for (line <- props.chartSpec.lines if line.cumulative && line.showBars)
+                            yield data(line.name).asInstanceOf[Double]).sum
+                        )
+                        .map(formatDoubleMoney())
+                        .getOrElse("0.00"): String,
+                    ),
+                  )
+                },
               ),
             )
           },

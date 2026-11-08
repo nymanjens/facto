@@ -123,17 +123,19 @@ object Recharts {
   ) = {
     val content: js.Function1[js.Dynamic, raw.React.Element] = tooltipProps => {
       val rawPayload =
-        tooltipProps.payload.asInstanceOf[js.UndefOr[js.Array[js.Dynamic]]].getOrElse(js.Array())
+        Option(tooltipProps.payload.asInstanceOf[js.Array[js.Dynamic]])
+          .filterNot(js.isUndefined)
+          .getOrElse(js.Array())
       val entries = modifyPayload(
         rawPayload.toVector.map(entry =>
           TooltipPayloadEntry(
-            name = entry.name.toString,
+            name = Option(entry.name).filterNot(js.isUndefined).map(_.toString).getOrElse(""),
             value = entry.value,
-            color = entry.color.asInstanceOf[js.UndefOr[String]].getOrElse("#000"),
+            color = Option(entry.color.asInstanceOf[String]).filterNot(js.isUndefined).getOrElse("#000"),
           )
         )
       )
-      val label = tooltipProps.label.asInstanceOf[js.UndefOr[Any]].map(_.toString).getOrElse("")
+      val label = Option(tooltipProps.label).filterNot(js.isUndefined).map(_.toString).getOrElse("")
 
       <.div(
         ^.className := "recharts-default-tooltip",
