@@ -1,8 +1,10 @@
 package hydro.jsfacades
 
+import hydro.flux.react.ReactVdomUtils.<<
 import japgolly.scalajs.react.Children
 import japgolly.scalajs.react.JsComponent
-import japgolly.scalajs.react.vdom.html_<^.VdomNode
+import japgolly.scalajs.react.raw
+import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.collection.immutable.Seq
 import scala.scalajs.js
@@ -115,9 +117,64 @@ object Recharts {
     component(js.Dynamic.literal(tickFormatter = tickFormatter))
   }
 
-  def Tooltip(formatter: Function1[Any, String]) = {
+  def Tooltip(
+      formatter: Function1[Any, String],
+      modifyPayload: Seq[TooltipPayloadEntry] => Seq[TooltipPayloadEntry] = identity,
+  ) = {
+    val content: js.Function1[js.Dynamic, raw.React.Element] = tooltipProps => {
+      val rawPayload =
+        tooltipProps.payload.asInstanceOf[js.UndefOr[js.Array[js.Dynamic]]].getOrElse(js.Array())
+      val entries = modifyPayload(
+        rawPayload.toVector.map(entry =>
+          TooltipPayloadEntry(
+            name = entry.name.toString,
+            value = entry.value,
+            color = entry.color.asInstanceOf[js.UndefOr[String]].getOrElse("#000"),
+          )
+        )
+      )
+      val label = tooltipProps.label.asInstanceOf[js.UndefOr[Any]].map(_.toString).getOrElse("")
+
+      <.div(
+        ^.className := "recharts-default-tooltip",
+        ^.style := js.Dynamic.literal(
+          margin = 0,
+          padding = 10,
+          backgroundColor = "#fff",
+          border = "1px solid #ccc",
+          whiteSpace = "nowrap",
+        ),
+        <.p(
+          ^.className := "recharts-tooltip-label",
+          ^.style := js.Dynamic.literal(margin = 0),
+          label,
+        ),
+        <<.ifThen(entries.nonEmpty) {
+          <.ul(
+            ^.className := "recharts-tooltip-item-list",
+            ^.style := js.Dynamic.literal(padding = 0, margin = 0),
+            entries.zipWithIndex.map { case (entry, i) =>
+              <.li(
+                ^.className := "recharts-tooltip-item",
+                ^.key := s"tooltip-item-$i",
+                ^.style := js.Dynamic.literal(
+                  display = "block",
+                  paddingTop = 4,
+                  paddingBottom = 4,
+                  color = entry.color,
+                ),
+                <.span(^.className := "recharts-tooltip-item-name", entry.name),
+                <.span(^.className := "recharts-tooltip-item-separator", " : "),
+                <.span(^.className := "recharts-tooltip-item-value", formatter(entry.value)),
+              )
+            }.toVdomArray,
+          )
+        },
+      ).rawElement
+    }
+
     val component = JsComponent[js.Object, Children.None, Null](TooltipComponent)
-    component(js.Dynamic.literal(formatter = formatter, isAnimationActive = false))
+    component(js.Dynamic.literal(content = content, isAnimationActive = false))
   }
 
   def Legend() = {
@@ -139,6 +196,12 @@ object Recharts {
       bottom = bottom,
     )
   }
+
+  case class TooltipPayloadEntry(
+      name: String,
+      value: Any,
+      color: String = "#000",
+  )
 
   // **************** Private inner types ****************//
   @JSImport("recharts", "ResponsiveContainer")

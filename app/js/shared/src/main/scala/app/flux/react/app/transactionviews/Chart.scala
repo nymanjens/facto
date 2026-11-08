@@ -164,7 +164,24 @@ final class Chart(implicit
                 ticks = assembleTicks().toJSArray,
               ),
               Recharts.YAxis(tickFormatter = formatDoubleMoney(roundToInteger = true)),
-              Recharts.Tooltip(formatter = formatDoubleMoney()),
+              Recharts.Tooltip(
+                formatter = formatDoubleMoney(),
+                modifyPayload = payload => {
+                  val barEntries = for {
+                    (entry, line) <- payload.zip(props.chartSpec.lines)
+                    if line.showBars
+                  } yield entry
+                  if (barEntries.size > 1) {
+                    val sum = barEntries.map(_.value.asInstanceOf[Double]).sum
+                    payload :+ Recharts.TooltipPayloadEntry(
+                      name = i18n("app.total"),
+                      value = sum,
+                    )
+                  } else {
+                    payload
+                  }
+                },
+              ),
               Recharts.Legend(),
               (for ((line, lineIndex) <- props.chartSpec.lines.zipWithIndex)
                 yield {
